@@ -18,6 +18,10 @@ import { agentEnv } from "../../env";
 import type { FileMetadata, StorageAdapter } from "./index";
 import { buildStorageFileUrl } from "./url-utils";
 
+// S3 SDK XML parsing runs on the application thread. Large listings
+// overlapped multi-second production stalls during guest cleanup.
+const ATTACHMENT_LIST_PAGE_SIZE = 100;
+
 export class S3StorageAdapter implements StorageAdapter {
   private client!: S3Client;
   private bucket!: string;
@@ -358,11 +362,10 @@ export class S3StorageAdapter implements StorageAdapter {
     const results: FileMetadata[] = [];
 
     try {
-      const { keys } = await this.listAllKeys(
-        prefix,
-        undefined,
-        options?.signal,
-      );
+      const { keys } = await this.listAllKeys(prefix, {
+        maxKeys: ATTACHMENT_LIST_PAGE_SIZE,
+        signal: options?.signal,
+      });
 
       for (const key of keys) {
         if (!key.endsWith(".json")) {
@@ -389,7 +392,11 @@ export class S3StorageAdapter implements StorageAdapter {
     }
 
     const root = "chat-attachments/";
-    const { prefixes } = await this.listAllKeys(root, "/", signal);
+    const { prefixes } = await this.listAllKeys(root, {
+      delimiter: "/",
+      maxKeys: ATTACHMENT_LIST_PAGE_SIZE,
+      signal,
+    });
     return prefixes
       .map((prefix) => prefix.slice(root.length).replace(/\/$/, ""))
       .filter((threadId) => threadId.length > 0);
@@ -401,8 +408,7 @@ export class S3StorageAdapter implements StorageAdapter {
    */
   private async listAllKeys(
     prefix: string,
-    delimiter?: string,
-    signal?: AbortSignal,
+    options?: { delimiter?: string; maxKeys?: number; signal?: AbortSignal },
   ): Promise<{ keys: string[]; prefixes: string[] }> {
     const keys: string[] = [];
     const prefixes: string[] = [];
@@ -413,10 +419,11 @@ export class S3StorageAdapter implements StorageAdapter {
         new ListObjectsV2Command({
           Bucket: this.bucket,
           Prefix: prefix,
-          Delimiter: delimiter,
+          Delimiter: options?.delimiter,
+          MaxKeys: options?.maxKeys,
           ContinuationToken: continuationToken,
         }),
-        { abortSignal: signal },
+        { abortSignal: options?.signal },
       );
       for (const obj of response.Contents ?? []) {
         if (obj.Key) {

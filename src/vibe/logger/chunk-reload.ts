@@ -63,6 +63,7 @@ export function resetChunkReloadForTests(): void {
 
 interface ChunkReloadRecord {
   at: number;
+  reloadRequestedAt: number | null;
   source: string;
   path: string | null;
   level: ErrorLogLevel;
@@ -114,6 +115,11 @@ function readRecord(logger: EndpointLogger): ChunkReloadRecord | null {
     }
     return {
       at: parsed.at,
+      reloadRequestedAt:
+        typeof parsed.reloadRequestedAt === "number" &&
+        Number.isFinite(parsed.reloadRequestedAt)
+          ? parsed.reloadRequestedAt
+          : null,
       source: typeof parsed.source === "string" ? parsed.source : "unknown",
       path: typeof parsed.path === "string" ? parsed.path : null,
       level: parsed.level === "warn" ? "warn" : "error",
@@ -202,7 +208,7 @@ function logChunk(
   }
 }
 
-/** Observe startup on the reloaded document after the app installs its logger. */
+/** Observe the next same-route document after the app installs its logger. */
 export function observeChunkReloadOutcome(logger: EndpointLogger): void {
   const previous = readRecord(logger);
   const navigation = performance.getEntriesByType("navigation")[0];
@@ -215,11 +221,15 @@ export function observeChunkReloadOutcome(logger: EndpointLogger): void {
     previous.path !== sanitizeTelemetryUrl(getCurrentPathname()) ||
     !navigation ||
     !("type" in navigation) ||
-    navigation.type !== "reload" ||
+    (navigation.type !== "reload" &&
+      navigation.type !== "navigate" &&
+      navigation.type !== "back_forward") ||
     performance.timeOrigin < previous.at
   ) {
     return;
   }
+  const navigationType = navigation.type;
+  const reloaded = navigationType === "reload";
   observedReloadAt = previous.at;
   const onLoaded = (): void => {
     // Let startup errors already queued by hydration reach their handlers.
@@ -227,7 +237,7 @@ export function observeChunkReloadOutcome(logger: EndpointLogger): void {
       if (failedAfterReloadAt === previous.at) {
         return;
       }
-      logChunk(logger, previous.level, "[chunk] Page started after reload", {
+      const context = {
         source: previous.source,
         chunkId: previous.chunkId,
         chunkUrl: previous.chunkUrl,
@@ -237,11 +247,21 @@ export function observeChunkReloadOutcome(logger: EndpointLogger): void {
         firstEdgeTimingNode: previous.edgeTimingNode,
         firstResourceStartedAtMs: previous.resourceStartedAtMs,
         chunkReloadAt: previous.at,
+        reloadRequestedAt: previous.reloadRequestedAt,
         buildIdBefore: previous.buildId,
         buildIdAfter: currentBuildId(),
-        recoveredByReload: true,
-        recoveryEvidence: "page-startup",
-      });
+        recoveredByReload: reloaded ? true : null,
+        recoveryEvidence: reloaded ? "page-startup" : "later-navigation",
+        observedNavigationType: navigationType,
+      };
+      logChunk(
+        logger,
+        previous.level,
+        reloaded
+          ? "[chunk] Page started after reload"
+          : "[chunk] Page started on a later navigation",
+        context,
+      );
       setSessionItem(
         CHUNK_RELOAD_KEY,
         JSON.stringify({ ...previous, outcome: "started" }),
@@ -311,6 +331,7 @@ export function handleChunkLoadFailure(
       ...details,
       sinceReloadMs: now - previous.at,
       chunkReloadAt: previous.at,
+      reloadRequestedAt: previous.reloadRequestedAt,
       firstSource: previous.source,
       firstChunkId: previous.chunkId,
       firstChunkUrl: previous.chunkUrl,
@@ -334,6 +355,7 @@ export function handleChunkLoadFailure(
   }
   const record: ChunkReloadRecord = {
     at: now,
+    reloadRequestedAt: null,
     source,
     path:
       typeof window === "undefined"
@@ -378,6 +400,11 @@ export function handleChunkLoadFailure(
   });
   setTimeout(() => {
     reloadRequestedAt = Date.now();
+    setSessionItem(
+      CHUNK_RELOAD_KEY,
+      JSON.stringify({ ...record, reloadRequestedAt }),
+      logger,
+    );
     reloadPage();
   }, CHUNK_RELOAD_DELAY_MS);
   return true;

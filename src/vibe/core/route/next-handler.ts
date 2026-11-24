@@ -87,6 +87,7 @@ const TRANSPORT_TRACE_ENDPOINTS = new Set([
   "user/public/signup",
   "leads/tracking",
   "vibe/agent/ai-stream/stream",
+  "vibe/agent/ai-stream/cancel",
   "vibe/agent/skills/[id]",
   "vibe/agent/skills/favorites/create",
 ]);

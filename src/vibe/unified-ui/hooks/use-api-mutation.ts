@@ -23,7 +23,7 @@ import type { ApiMutationOptions } from "./types";
  * Type for mutation variables
  * Union type supporting all valid combinations of request data and URL path parameters
  */
-export type MutationVariables<TRequest, TUrlVariables> =
+type MutationData<TRequest, TUrlVariables> =
   // Check if TRequest is never
   [TRequest] extends [never]
     ? // TRequest is never, check TUrlVariables
@@ -39,6 +39,14 @@ export type MutationVariables<TRequest, TUrlVariables> =
         { requestData: TRequest; urlPathParams?: undefined | never }
       : // Both exist
         { requestData: TRequest; urlPathParams: TUrlVariables };
+
+export type MutationVariables<TRequest, TUrlVariables> = MutationData<
+  TRequest,
+  TUrlVariables
+> & {
+  /** Receives the correlation ID of each HTTP attempt before dispatch. */
+  onRequestId?: (requestId: string) => void;
+};
 
 /**
  * Mutation context type for tracking additional mutation state
@@ -165,6 +173,7 @@ export function useApiMutation<TEndpoint extends CreateApiEndpointAny>(
         pathParams: urlPathParams,
         locale,
         user,
+        onRequestId: variables.onRequestId,
         options: {
           onSuccess: options.onSuccess
             ? (

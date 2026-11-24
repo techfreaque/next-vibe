@@ -65,6 +65,8 @@ export const CLIENT_LOG_FINGERPRINT_IGNORE_KEYS: ReadonlySet<string> = new Set([
   "durationMs",
   "offlineMs",
   "elapsedMs",
+  "cancelAckMs",
+  "cancelDispatchMs",
   "ageMs",
   "valueLength",
   "usedCharsAfterCleanup",

@@ -356,27 +356,44 @@ export function useAIStream(): UseAIStreamReturn {
       // Safety timeout: if stream-finished doesn't arrive within 15s, force-clear
       // the aborting state so the stop button doesn't stay stuck indefinitely.
       // What the server answered decides where the stuck stream-finished got
-      // lost: "pending" = the cancel POST itself hung, "cancelled" = the
-      // stream was signalled but never emitted stream-finished, "idle" = the
-      // server saw no live stream (the finish event was lost on the WS).
+      // lost: "pending" = the mutation has not settled, "cancelled" = the
+      // stream was signalled but the UI did not receive stream-finished, and
+      // "idle" = the server saw no live stream.
       // "cancelled" with no stream-finished is what a stream orphaned by a
       // server restart looks like; the cancel endpoint now reaps those after
       // 8s and emits stream-finished, so a timeout here with cancelOutcome
       // "cancelled" means that event was lost on the WS too.
-      let cancelOutcome: "pending" | "cancelled" | "idle" = "pending";
       const cancelStartedAt = Date.now();
-      let cancelAckMs: number | null = null;
+      const attempt: {
+        outcome: "pending" | "cancelled" | "idle";
+        ackMs: number | null;
+        requestId: string | null;
+        requestStartedAt: number | null;
+        timedOut: boolean;
+      } = {
+        outcome: "pending",
+        ackMs: null,
+        requestId: null,
+        requestStartedAt: null,
+        timedOut: false,
+      };
       const safetyTimeout = setTimeout(() => {
         if (useAIStreamStore.getState().isAborting(threadId)) {
+          attempt.timedOut = true;
           logger.warn(
             "Cancel safety timeout fired - force-clearing aborting state",
             {
               threadId,
-              cancelOutcome,
-              cancelAckMs,
+              cancelOutcome: attempt.outcome,
+              cancelAckMs: attempt.ackMs,
+              requestId: attempt.requestId,
+              cancelDispatchMs:
+                attempt.requestStartedAt === null
+                  ? null
+                  : attempt.requestStartedAt - cancelStartedAt,
               elapsedMs: Date.now() - cancelStartedAt,
               isPending: useAIStreamStore.getState().isPending(threadId),
-              cancelRequestAcknowledged: cancelAckMs !== null,
+              cancelRequestAcknowledged: attempt.ackMs !== null,
               online: isOnline(),
               visibilityState: getVisibilityState(),
             },
@@ -398,15 +415,30 @@ export function useAIStream(): UseAIStreamReturn {
       try {
         const result = await cancelMutation.mutateAsync({
           requestData: { threadId },
+          onRequestId: (id) => {
+            attempt.requestId = id;
+            attempt.requestStartedAt = Date.now();
+          },
         });
-        cancelAckMs = Date.now() - cancelStartedAt;
+        const elapsedMs = Date.now() - cancelStartedAt;
 
         if (result.success) {
-          cancelOutcome = result.data.cancelled ? "cancelled" : "idle";
-          logger.info("Cancel endpoint called successfully", {
+          attempt.ackMs = elapsedMs;
+          attempt.outcome = result.data.cancelled ? "cancelled" : "idle";
+          const context = {
             threadId,
-            cancelOutcome,
-          });
+            requestId: attempt.requestId,
+            cancelOutcome: attempt.outcome,
+            cancelAckMs: attempt.ackMs,
+          };
+          if (attempt.timedOut) {
+            logger.warn(
+              "Cancel endpoint acknowledged after the safety timeout",
+              context,
+            );
+          } else {
+            logger.info("Cancel endpoint called successfully", context);
+          }
           // "idle": the server saw no live stream and already reset the thread
           // to IDLE. Its stream-finished WS event is only a courtesy copy and
           // is lost whenever the socket is suspended (hidden mobile tab), which
@@ -420,6 +452,11 @@ export function useAIStream(): UseAIStreamReturn {
           logger.error("Cancel endpoint returned error", {
             message: result.message,
             threadId,
+            requestId: attempt.requestId,
+            elapsedMs,
+            safetyTimedOut: attempt.timedOut,
+            errorKey: result.errorType.errorKey,
+            status: result.errorType.errorCode,
           });
 
           // Even if cancel endpoint fails, clear aborting UI
@@ -430,6 +467,9 @@ export function useAIStream(): UseAIStreamReturn {
         logger.error("Failed to call cancel endpoint", {
           error: parseError(error).message,
           threadId,
+          requestId: attempt.requestId,
+          elapsedMs: Date.now() - cancelStartedAt,
+          safetyTimedOut: attempt.timedOut,
         });
 
         // Even if cancel endpoint fails, clear aborting UI

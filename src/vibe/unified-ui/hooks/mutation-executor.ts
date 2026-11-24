@@ -109,6 +109,7 @@ export async function executeMutation<TEndpoint extends CreateApiEndpointAny>({
   locale,
   options = {},
   user,
+  onRequestId,
 }: {
   endpoint: TEndpoint;
   logger: EndpointLogger;
@@ -120,6 +121,7 @@ export async function executeMutation<TEndpoint extends CreateApiEndpointAny>({
     : TEndpoint["types"]["UrlVariablesOutput"];
   locale: CountryLanguage;
   user: JwtPayloadType;
+  onRequestId?: (requestId: string) => void;
   options?: MutationExecutorOptions<
     TEndpoint["types"]["RequestOutput"],
     TEndpoint["types"]["ResponseOutput"],
@@ -174,6 +176,7 @@ export async function executeMutation<TEndpoint extends CreateApiEndpointAny>({
       pathParams,
       (id) => {
         requestId = id;
+        onRequestId?.(id);
       },
     );
 

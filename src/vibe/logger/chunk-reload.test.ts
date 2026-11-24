@@ -294,7 +294,7 @@ describe("handleChunkLoadFailure", () => {
     expect(reloads).toBe(1);
   });
 
-  it("reports startup after the reload at the original warning level", async () => {
+  it.each(["reload", "navigate"])("reports %s startup at the original warning level", async (navigationType) => {
     const calls: LoggedCall[] = [];
     const logger = createCapturingLogger(calls);
     const now = spyOn(Date, "now").mockReturnValue(
@@ -303,7 +303,7 @@ describe("handleChunkLoadFailure", () => {
     const entry = {
       name: "https://unbottled.ai/en-US/chat",
       entryType: "navigation",
-      type: "reload",
+      type: navigationType,
       startTime: 0,
       duration: 0,
       toJSON: (): string => "",
@@ -340,7 +340,11 @@ describe("handleChunkLoadFailure", () => {
           chunkId: "icon-abc.js",
           buildIdBefore: "old-build",
           buildIdAfter: "new-build",
-          recoveredByReload: true,
+          reloadRequestedAt: expect.any(Number),
+          recoveredByReload: navigationType === "reload" ? true : null,
+          recoveryEvidence:
+            navigationType === "reload" ? "page-startup" : "later-navigation",
+          observedNavigationType: navigationType,
         },
       });
     } finally {

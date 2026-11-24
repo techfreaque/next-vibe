@@ -63,9 +63,14 @@ describe("settleMutationResult (useApiMutation mutateAsync contract)", () => {
 });
 
 it("reports an onError callback failure without invoking the callback twice", async () => {
+  const requestId = "028bc229-f301-40a4-8ae3-45182b8301d4";
   void mock.module("./call-api", () => ({
-    callApi: () => Promise.resolve(notFound),
+    callApi: (...args: Parameters<typeof import("./call-api").callApi>) => {
+      args[6]?.(requestId);
+      return Promise.resolve(notFound);
+    },
   }));
+  const onRequestId = mock(() => undefined);
   const onError = mock(() => Promise.reject(new Error("callback fixture")));
   const error = mock(() => undefined);
   const result = await executeMutation({
@@ -87,15 +92,17 @@ it("reports an onError callback failure without invoking the callback twice", as
       leadId: "00000000-0000-4000-8000-000000000002",
       roles: [],
     },
+    onRequestId,
     options: { onError },
   });
 
   expect(result.success).toBe(false);
+  expect(onRequestId).toHaveBeenCalledWith(requestId);
   expect(onError).toHaveBeenCalledTimes(1);
   expect(error).toHaveBeenCalledWith(
     "Mutation failed",
     expect.any(Error),
-    expect.objectContaining({ phase: "on-error", status: 500 }),
+    expect.objectContaining({ phase: "on-error", requestId, status: 500 }),
   );
 });
 
