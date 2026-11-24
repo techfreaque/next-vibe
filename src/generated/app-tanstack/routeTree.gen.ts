@@ -210,6 +210,7 @@ import { Route as LocaleStoryBlogOneCodebase13PlatformsIndexRouteImport } from '
 import { Route as LocaleStoryBlogOneEndpointEverySurfaceIndexRouteImport } from './routes/$locale.story.blog.one-endpoint-every-surface.index'
 import { Route as LocaleStoryBlogOpenaiAnthropicCompatibleApiIndexRouteImport } from './routes/$locale.story.blog.openai-anthropic-compatible-api.index'
 import { Route as LocaleStoryBlogOpenrouterAlternativesIndexRouteImport } from './routes/$locale.story.blog.openrouter-alternatives.index'
+import { Route as LocaleStoryBlogPoeAlternativesIndexRouteImport } from './routes/$locale.story.blog.poe-alternatives.index'
 import { Route as LocaleStoryBlogReferralForAffiliateProsIndexRouteImport } from './routes/$locale.story.blog.referral-for-affiliate-pros.index'
 import { Route as LocaleStoryBlogReferralForBeginnersIndexRouteImport } from './routes/$locale.story.blog.referral-for-beginners.index'
 import { Route as LocaleStoryBlogReferralForDevelopersIndexRouteImport } from './routes/$locale.story.blog.referral-for-developers.index'
@@ -1872,6 +1873,12 @@ const LocaleStoryBlogOpenrouterAlternativesIndexRoute =
   LocaleStoryBlogOpenrouterAlternativesIndexRouteImport.update({
     id: '/blog/openrouter-alternatives/',
     path: '/blog/openrouter-alternatives/',
+    getParentRoute: () => LocaleStoryRoute,
+  } as any)
+const LocaleStoryBlogPoeAlternativesIndexRoute =
+  LocaleStoryBlogPoeAlternativesIndexRouteImport.update({
+    id: '/blog/poe-alternatives/',
+    path: '/blog/poe-alternatives/',
     getParentRoute: () => LocaleStoryRoute,
   } as any)
 const LocaleStoryBlogReferralForAffiliateProsIndexRoute =
@@ -5656,6 +5663,7 @@ export interface FileRoutesByFullPath {
   '/$locale/story/blog/one-endpoint-every-surface/': typeof LocaleStoryBlogOneEndpointEverySurfaceIndexRoute
   '/$locale/story/blog/openai-anthropic-compatible-api/': typeof LocaleStoryBlogOpenaiAnthropicCompatibleApiIndexRoute
   '/$locale/story/blog/openrouter-alternatives/': typeof LocaleStoryBlogOpenrouterAlternativesIndexRoute
+  '/$locale/story/blog/poe-alternatives/': typeof LocaleStoryBlogPoeAlternativesIndexRoute
   '/$locale/story/blog/referral-for-affiliate-pros/': typeof LocaleStoryBlogReferralForAffiliateProsIndexRoute
   '/$locale/story/blog/referral-for-beginners/': typeof LocaleStoryBlogReferralForBeginnersIndexRoute
   '/$locale/story/blog/referral-for-developers/': typeof LocaleStoryBlogReferralForDevelopersIndexRoute
@@ -6402,6 +6410,7 @@ export interface FileRoutesByTo {
   '/$locale/story/blog/one-endpoint-every-surface': typeof LocaleStoryBlogOneEndpointEverySurfaceIndexRoute
   '/$locale/story/blog/openai-anthropic-compatible-api': typeof LocaleStoryBlogOpenaiAnthropicCompatibleApiIndexRoute
   '/$locale/story/blog/openrouter-alternatives': typeof LocaleStoryBlogOpenrouterAlternativesIndexRoute
+  '/$locale/story/blog/poe-alternatives': typeof LocaleStoryBlogPoeAlternativesIndexRoute
   '/$locale/story/blog/referral-for-affiliate-pros': typeof LocaleStoryBlogReferralForAffiliateProsIndexRoute
   '/$locale/story/blog/referral-for-beginners': typeof LocaleStoryBlogReferralForBeginnersIndexRoute
   '/$locale/story/blog/referral-for-developers': typeof LocaleStoryBlogReferralForDevelopersIndexRoute
@@ -7157,6 +7166,7 @@ export interface FileRoutesById {
   '/$locale/story/blog/one-endpoint-every-surface/': typeof LocaleStoryBlogOneEndpointEverySurfaceIndexRoute
   '/$locale/story/blog/openai-anthropic-compatible-api/': typeof LocaleStoryBlogOpenaiAnthropicCompatibleApiIndexRoute
   '/$locale/story/blog/openrouter-alternatives/': typeof LocaleStoryBlogOpenrouterAlternativesIndexRoute
+  '/$locale/story/blog/poe-alternatives/': typeof LocaleStoryBlogPoeAlternativesIndexRoute
   '/$locale/story/blog/referral-for-affiliate-pros/': typeof LocaleStoryBlogReferralForAffiliateProsIndexRoute
   '/$locale/story/blog/referral-for-beginners/': typeof LocaleStoryBlogReferralForBeginnersIndexRoute
   '/$locale/story/blog/referral-for-developers/': typeof LocaleStoryBlogReferralForDevelopersIndexRoute
@@ -7912,6 +7922,7 @@ export interface FileRouteTypes {
     | '/$locale/story/blog/one-endpoint-every-surface/'
     | '/$locale/story/blog/openai-anthropic-compatible-api/'
     | '/$locale/story/blog/openrouter-alternatives/'
+    | '/$locale/story/blog/poe-alternatives/'
     | '/$locale/story/blog/referral-for-affiliate-pros/'
     | '/$locale/story/blog/referral-for-beginners/'
     | '/$locale/story/blog/referral-for-developers/'
@@ -8658,6 +8669,7 @@ export interface FileRouteTypes {
     | '/$locale/story/blog/one-endpoint-every-surface'
     | '/$locale/story/blog/openai-anthropic-compatible-api'
     | '/$locale/story/blog/openrouter-alternatives'
+    | '/$locale/story/blog/poe-alternatives'
     | '/$locale/story/blog/referral-for-affiliate-pros'
     | '/$locale/story/blog/referral-for-beginners'
     | '/$locale/story/blog/referral-for-developers'
@@ -9412,6 +9424,7 @@ export interface FileRouteTypes {
     | '/$locale/story/blog/one-endpoint-every-surface/'
     | '/$locale/story/blog/openai-anthropic-compatible-api/'
     | '/$locale/story/blog/openrouter-alternatives/'
+    | '/$locale/story/blog/poe-alternatives/'
     | '/$locale/story/blog/referral-for-affiliate-pros/'
     | '/$locale/story/blog/referral-for-beginners/'
     | '/$locale/story/blog/referral-for-developers/'
@@ -11565,6 +11578,13 @@ declare module '@tanstack/react-router' {
       path: '/blog/openrouter-alternatives'
       fullPath: '/$locale/story/blog/openrouter-alternatives/'
       preLoaderRoute: typeof LocaleStoryBlogOpenrouterAlternativesIndexRouteImport
+      parentRoute: typeof LocaleStoryRoute
+    }
+    '/$locale/story/blog/poe-alternatives/': {
+      id: '/$locale/story/blog/poe-alternatives/'
+      path: '/blog/poe-alternatives'
+      fullPath: '/$locale/story/blog/poe-alternatives/'
+      preLoaderRoute: typeof LocaleStoryBlogPoeAlternativesIndexRouteImport
       parentRoute: typeof LocaleStoryRoute
     }
     '/$locale/story/blog/referral-for-affiliate-pros/': {
@@ -15525,6 +15545,7 @@ interface LocaleStoryRouteChildren {
   LocaleStoryBlogOneEndpointEverySurfaceIndexRoute: typeof LocaleStoryBlogOneEndpointEverySurfaceIndexRoute
   LocaleStoryBlogOpenaiAnthropicCompatibleApiIndexRoute: typeof LocaleStoryBlogOpenaiAnthropicCompatibleApiIndexRoute
   LocaleStoryBlogOpenrouterAlternativesIndexRoute: typeof LocaleStoryBlogOpenrouterAlternativesIndexRoute
+  LocaleStoryBlogPoeAlternativesIndexRoute: typeof LocaleStoryBlogPoeAlternativesIndexRoute
   LocaleStoryBlogReferralForAffiliateProsIndexRoute: typeof LocaleStoryBlogReferralForAffiliateProsIndexRoute
   LocaleStoryBlogReferralForBeginnersIndexRoute: typeof LocaleStoryBlogReferralForBeginnersIndexRoute
   LocaleStoryBlogReferralForDevelopersIndexRoute: typeof LocaleStoryBlogReferralForDevelopersIndexRoute
@@ -15627,6 +15648,8 @@ const LocaleStoryRouteChildren: LocaleStoryRouteChildren = {
     LocaleStoryBlogOpenaiAnthropicCompatibleApiIndexRoute,
   LocaleStoryBlogOpenrouterAlternativesIndexRoute:
     LocaleStoryBlogOpenrouterAlternativesIndexRoute,
+  LocaleStoryBlogPoeAlternativesIndexRoute:
+    LocaleStoryBlogPoeAlternativesIndexRoute,
   LocaleStoryBlogReferralForAffiliateProsIndexRoute:
     LocaleStoryBlogReferralForAffiliateProsIndexRoute,
   LocaleStoryBlogReferralForBeginnersIndexRoute:

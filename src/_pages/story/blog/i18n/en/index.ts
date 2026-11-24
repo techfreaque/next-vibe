@@ -14,6 +14,13 @@ export const translations = {
     },
   },
   posts: {
+    poeAlternatives: {
+      title: "8 Poe alternatives for different budgets",
+      category: "Comparison",
+      excerpt:
+        "Compare Poe alternatives for one hosted balance, per-use billing or your own keys. See current prices, trade-offs and where unbottled.ai fits.",
+      readTime: "7 min read",
+    },
     deepseekUncensored: {
       title: "DeepSeek uncensored. What actually removes the filter.",
       category: "Model Guide",

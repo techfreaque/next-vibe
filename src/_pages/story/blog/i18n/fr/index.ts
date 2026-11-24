@@ -16,6 +16,13 @@ export const translations: typeof enTranslations = {
     },
   },
   posts: {
+    poeAlternatives: {
+      title: "8 alternatives à Poe pour différents budgets",
+      category: "Comparatif",
+      excerpt:
+        "Comparez les alternatives à Poe avec solde commun, paiement à l’usage ou clés API personnelles. Tarifs, limites et place de unbottled.ai.",
+      readTime: "7 min de lecture",
+    },
     deepseekUncensored: {
       title: "DeepSeek non censuré. Ce qui enlève vraiment le filtre.",
       category: "Guide des modèles",

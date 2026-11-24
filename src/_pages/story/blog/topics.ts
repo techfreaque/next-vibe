@@ -22,6 +22,7 @@ export type BlogTopic = (typeof BLOG_TOPICS)[number];
 
 /** Section of each post on the blog index. Exhaustive: a new post needs one. */
 export const POST_TOPICS: Record<BlogPostSlug, BlogTopic> = {
+  "poe-alternatives": "developers",
   "janitor-ai-alternatives": "uncensored",
   "free-uncensored-ai": "uncensored",
   "freedomgpt-alternatives": "uncensored",
@@ -121,6 +122,13 @@ interface RelatedGuideSet {
 
 /** Curated hub + siblings. Posts not listed fall back to their topic. */
 const CURATED_RELATED: Partial<Record<BlogPostSlug, RelatedGuideSet>> = {
+  "poe-alternatives": {
+    hub: null,
+    related: [
+      "openrouter-alternatives",
+      "venice-ai-alternatives",
+    ],
+  },
   "free-uncensored-ai": {
     hub: "uncensored",
     related: [
