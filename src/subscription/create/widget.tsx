@@ -137,6 +137,8 @@ export function SubscriptionCreateContainer(): JSX.Element {
     interval: PlanInterval;
   } | null>(null);
   const [isSubProviderModalOpen, setIsSubProviderModalOpen] = useState(false);
+  const [checkingSubscription, setCheckingSubscription] = useState(false);
+  const [subscriptionCheckError, setSubscriptionCheckError] = useState("");
   const [isPackProviderModalOpen, setIsPackProviderModalOpen] = useState(false);
 
   // Crypto plans are one-off invoices. Starter monthly is below what crypto
@@ -156,7 +158,8 @@ export function SubscriptionCreateContainer(): JSX.Element {
     plan: typeof SubscriptionPlanValue,
     interval: PlanInterval,
   ): void => {
-    setPendingPlan({ plan, interval });
+    setCheckingSubscription(true);
+    setSubscriptionCheckError("");
     // The button only shows when the cached subscription read says "none",
     // but that read can be stale or failed (prod: a user subscribed on Nov 7,
     // got "already subscribed" from checkout on Nov 8). Re-check before
@@ -170,7 +173,12 @@ export function SubscriptionCreateContainer(): JSX.Element {
       requestData: undefined,
       pathParams: undefined,
     }).then((fresh) => {
-      if (fresh.success && fresh.data.status === SubscriptionStatus.ACTIVE) {
+      setCheckingSubscription(false);
+      if (!fresh.success) {
+        setSubscriptionCheckError(fresh.message);
+        return undefined;
+      }
+      if (fresh.data.status === SubscriptionStatus.ACTIVE) {
         // Recovered: the cached read was stale and showed a subscribe button
         // to an already-subscribed user.
         logger.warn("Subscribe clicked with stale subscription cache", {
@@ -182,6 +190,7 @@ export function SubscriptionCreateContainer(): JSX.Element {
         void subscriptionEndpoint.read?.refetch();
         return undefined;
       }
+      setPendingPlan({ plan, interval });
       setIsSubProviderModalOpen(true);
       return undefined;
     });
@@ -319,8 +328,20 @@ export function SubscriptionCreateContainer(): JSX.Element {
       subscription={currentSubscription}
       modelCount={totalModelCount}
       onStart={handleSubscribe}
-      startPending={subSubmitting === true || Boolean(subValue?.checkoutUrl)}
-      startError={<FormAlertWidget field={{}} />}
+      startPending={
+        checkingSubscription ||
+        subSubmitting === true ||
+        Boolean(subValue?.checkoutUrl)
+      }
+      startError={
+        subscriptionCheckError ? (
+          <Div role="alert" className="text-sm text-destructive">
+            {subscriptionCheckError}
+          </Div>
+        ) : (
+          <FormAlertWidget field={{}} />
+        )
+      }
     />
   );
 
