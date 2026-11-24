@@ -2,165 +2,306 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title: "Character AI Alternative ohne Filter im Vergleich (2026)",
+    title: "Alternativen zu Character.AI für Rollenspiele (2026)",
+    category: "KI-Rollenspiel",
     description:
-      "Character.AI-Alternativen ohne Filter, verglichen anhand ihrer eigenen Preis-, Filter- und Datenschutzseiten: Janitor AI, SillyTavern, CrushOn, Kindroid, Nomi, Venice und {{appName}}. Dazu: deine Character.AI-Figuren importieren.",
-    category: "Vergleich",
-    imageAlt: "Character.AI-Alternativen ohne Filter im Vergleich",
+      "Alternativen zu Character.AI für Rollenspiel, Geschichten und KI-Begleiter vergleichen. Mit Janitor AI, SpicyChat, DreamGen, SillyTavern und {{appName}}.",
+    imageAlt: "Alternativen zu Character.AI für Rollenspiele und KI-Begleiter",
     keywords:
-      "Character AI Alternative ohne Filter, Character AI Alternative, Character.AI Alternativen, Seiten wie Character AI, Apps wie Character AI, Character AI unzensiert, Character AI ohne Filter, NSFW Character AI Alternative, Janitor AI Alternative, Character AI Charakter importieren, KI-Rollenspiel ohne Filter, Character.AI alternatives, Character AI alternative no filter, sites like Character AI, uncensored Character AI, {{appName}}",
+      "Character AI Alternative, Character AI ohne Filter, KI Rollenspiel, Janitor AI, SillyTavern",
   },
   hero: {
     backToBlog: "Zurück zum Blog",
-    category: "Vergleich",
-    readTime: "10 Min. Lesezeit",
-    title: "Character.AI-Alternativen ohne Filter. Geprüft, nicht geraten.",
+    category: "KI-Rollenspiel",
+    readTime: "9 Min. Lesezeit",
+    title: "Alternativen zu Character.AI für Rollenspiele",
     subtitle:
-      "{{count}} Alternativen und {{appName}}, verglichen anhand dessen, was ihre eigenen Preis-, Filter- und Datenschutzseiten sagen. Geprüft am {{date}}. Deine Figuren nimmst du mit.",
+      "Finde fertige Figuren, einen Begleiter mit Gedächtnis oder ein Modell nach Wahl. Preise geprüft am {{date}}.",
   },
   intro: {
-    lead: "Die meisten Listen mit Character.AI-Alternativen schreiben voneinander ab. „Kein Filter“, „kostenlos“, „am besten für NSFW“: Behauptungen, die niemand geprüft hat. Dann meldest du dich an und stehst nach 50 Nachrichten vor der Bezahlschranke. Oder vor einem Filter, den die Liste nie erwähnt hat.",
-    p2: "Wir haben am {{date}} die Preisseite, die AGB, die Datenschutzerklärung und das Hilfecenter jeder Plattform gelesen. Jede Angabe unten stammt von diesen Seiten, die Quellen sind einen Klick entfernt. Eine dieser Plattformen betreiben wir selbst: {{appName}}. Wir sagen das offen, stellen sie an den Anfang und sagen dir, wo die anderen besser sind.",
+    lead: "Bei Janitor AI suchst du dir eine Figur aus und legst los. Mit SillyTavern betreibst du dein Rollenspiel selbst. Kindroid und Nomi eignen sich für einen Begleiter, der sich an dich erinnern soll.",
+    p2: "Wir betreiben {{appName}} und stellen es wegen der Modellwahl und des Figurenimports zuerst vor. Die Preise der anderen Anbieter stammen aus den verlinkten offiziellen Seiten oder App-Einträgen, geprüft am {{date}}. Alle Vergleichspreise stehen in US-Dollar.",
+  },
+  characterAi: { title: "Was Character.AI heute bietet" },
+  switch: {
+    title: "Warum manche nach einer Alternative suchen",
+    intro:
+      "In öffentlichen Diskussionen tauchen drei unterschiedliche Gründe auf.",
+    reasons: {
+      filtering: {
+        body: "Unterbrochene Szenen. Im Community-Update vom August 2025 griff Character.AI die Rückmeldung auf, dass der Filter zu oft ins Gespräch eingriff.",
+        source: "Community-Update auf Reddit",
+      },
+      continuity: {
+        body: "Verlorener Faden. Eine Person suchte nach Figuren mit besserem Gedächtnis und glaubwürdigen Dialogen, die ihr in ruhigen Szenen Platz für eigene Beiträge lassen.",
+        source: "Diskussion über Rollenspiel und Gedächtnis auf Reddit",
+      },
+      oldSite: {
+        body: "Das Ende der alten Website. In einer Diskussion über den Wechsel schrieb eine Person, dass sie danach ganz zu einem anderen Dienst wechselte.",
+        source: "Diskussion über den Abschied von Character.AI auf Reddit",
+      },
+    },
   },
   criteria: {
-    title: "Was beim Wechsel wirklich zählt",
-    intro: "Fünf Fragen. Beantworte sie, bevor du wählst.",
+    title: "Was du vor dem Wechsel prüfen solltest",
+    intro:
+      "Spiele dieselbe Szene in zwei Apps. Kehre am nächsten Tag zurück und frag nach einem Detail vom Anfang.",
     filter:
-      "Filter: Was ist erlaubt, wer entscheidet, gibt es eine Altersprüfung? „Ungefiltert“ auf der Startseite und „verboten“ in den AGB gibt es auf derselben Seite.",
+      "Prüfe, welche Themen das Modell zulässt und ob der Dienst eine Altersprüfung verlangt.",
     memory:
-      "Gedächtnis: wie viel der Geschichte das Modell vor jeder Antwort liest. Kleiner Kontext heißt: Deine Figur vergisst die frühen Kapitel.",
+      "Prüfe, ob die App ältere Details aus gespeicherten Erinnerungen, Zusammenfassungen oder Lorebooks wieder aufgreift.",
     price:
-      "Preis: Pauschal-Abo, Nachrichtenlimit oder Bezahlung pro Nutzung. Gratisstufen reichen von unbegrenzt bis zur Vorschau mit 50 Nachrichten.",
+      "Rechne aus, wie viele Nachrichten oder Credits dein bevorzugtes Modell braucht. Zähle neue Antwortversuche mit.",
     privacy:
-      "Datenschutz: Werden deine Chats gespeichert, fürs Training genutzt, für Werbung? Rollenspiel ist persönlich. Lies diesen Teil.",
+      "Prüfe, wo der Verlauf gespeichert wird und wer deine Eingaben verarbeitet.",
     characters:
-      "Figuren: eine große Community-Bibliothek, eigene Kreationen oder beides. Und kannst du die mitnehmen, die du schon hast?",
+      "Entscheide, ob du fertige Figuren, bearbeitbare Figurenkarten oder einen festen Begleiter willst.",
   },
   table: {
-    title: "Alle im direkten Vergleich",
-    intro:
-      "Auf dem Handy seitlich scrollen. Angaben zur Konkurrenz am {{date}} auf deren eigenen Seiten geprüft. Angaben zu {{appName}} live aus unserer Konfiguration. Character.AI steht als gefilterte Referenz am Ende der Tabelle.",
+    title: "Character.AI und die Alternativen im direkten Vergleich",
   },
   us: {
-    title: "{{appName}}: Modell wählen, Filter einstellen",
+    title: "1. {{appName}}: Figur mitbringen, Modell wählen",
     intro:
-      "Keine Figuren-App mit einem Hausmodell. Ein Chat mit {{modelCount}} Modellen, in dem Figuren Skills sind, die du auswählst, baust oder importierst.",
+      "Beginne eine Szene im Browser oder lege eine Figur als wiederverwendbaren Skill an.",
     models:
-      "Modelle: {{uncensored}} unzensierte Modelle neben {{mainstream}} Mainstream- und {{open}} offenen. Wechsle pro Nachricht, mitten in der Szene. {{ownModel}} ist trainiert mit Büchern und Dokumenten, die im Mainstream-Internet verbannt sind, und lenkt eine düstere Geschichte deshalb nicht auf sicheres Terrain zurück.",
+      "Unter den {{modelCount}} Chatmodellen findest du {{uncensored}} unzensierte, {{mainstream}} Mainstream-Modelle und {{open}} offene Modelle. Der Wechsel klappt mitten in der Szene.",
     characters:
-      "Figuren: Der Roleplay-Skill bringt jedes Modell dazu, in der Rolle zu bleiben. Die Skills-Seite listet eingebaute Figuren und Community-Skills, die andere Nutzer veröffentlicht haben. Bau deine eigene im Editor, oder lass den Skill Creator sie im Chat mit dir schreiben.",
+      "Der Rollenspiel-Skill hilft dem Modell, in seiner Rolle zu bleiben. Du kannst veröffentlichte Skills nutzen oder mit dem Editor und dem Skill Creator eigene Figuren erstellen.",
+    consent:
+      "Für unzensierte Modelle musst du einmal bestätigen, dass du mindestens 18 bist und ungefilterte Antworten akzeptierst.",
     import:
-      "Import: Füg einen öffentlichen Character.AI- oder Talkie-Link ein und du bekommst deine eigene Kopie der Figur, mit Nennung des ursprünglichen Erstellers.",
+      "Importiere eine Figur über einen öffentlichen Link von Character.AI oder Talkie. Die Kopie nennt den ursprünglichen Autor.",
     privacy:
-      "Datenschutz: Inkognito-Chats bleiben in deinem Browser, kein Konto nötig. Private Chats werden nur in deinem Konto gespeichert.",
+      "Der Inkognito-Chat läuft ohne Konto. Der Verlauf bleibt im Browser. Jede Eingabe geht zur Verarbeitung an den Modellanbieter.",
     price:
-      "Preis: {{guestCredits}} kostenlose Credits im Monat ohne Konto, {{freeCredits}} mit Konto. Tarife ab {{subPrice}} im Monat. Credit-Pakete stocken einen aktiven Tarif auf und verfallen nie.",
-    weak: "Wo wir schwächer sind: Unsere Community-Bibliothek ist klein neben Character.AI oder Janitor AI, und Credits werden nach Verbrauch abgerechnet. Lange Szenen auf Premium-Modellen summieren sich.",
-    skillsLink: "Eingebaute und Community-Skills ansehen",
-    roleplayLink: "Roleplay-Skill öffnen",
-    creatorLink: "Figur mit dem Skill Creator bauen",
+      "{{guestCredits}} Credits im Monat als Gast oder {{freeCredits}} mit einem Gratis-Konto. Abos beginnen bei {{subPrice}} im Monat. Die Modelle verbrauchen Credits.",
+    weak: "Charaktere lassen sich bei Character.AI und Janitor AI leichter entdecken. Wer viel spielt, kann die Ausgaben mit einem Pauschaltarif besser planen.",
+    skillsLink: "Integrierte und veröffentlichte Skills ansehen",
+    roleplayLink: "Rollenspiel-Skill öffnen",
+    creatorLink: "Figur mit dem Skill Creator erstellen",
   },
   list: {
-    title: "Die {{count}} Alternativen im Einzelnen",
+    title: "Neun Alternativen im Detail",
     intro:
-      "Von ihren eigenen Seiten, geprüft am {{date}}. Was jede ist, was ihr Filter wirklich erlaubt, was sie kostet, was mit deinen Chats passiert.",
-    heading: "{{number}}. {{name}}: {{kind}}",
-    filter: "Filter:",
-    price: "Preis:",
-    priceValue: "Gratisstufe: {{free}}. Bezahlt: {{plans}}.",
-    privacy: "Datenschutz:",
-    pro: "Stärke:",
-    con: "Haken:",
-    forWho: "Nimm sie, wenn:",
-    versusLink: "{{appName}} vs. {{name}}: der ganze Vergleich",
-    visit: "Zu {{name}}",
+      "Wähle nach deinem Spielstil. Die Quellen zu Preisen und Funktionen stehen jeweils beim Anbieter.",
+    heading: "{{number}}. {{name}}: {{bestFor}}",
+    filter: "Inhaltsregeln.",
+    price: "Preis.",
+    pro: "Stärke.",
+    con: "Nachteil.",
+    versusLink: "{{appName}} im Vergleich zu {{name}}",
+  },
+  options: {
+    characterAi: {
+      summary:
+        "Character.AI bietet öffentliche und selbst erstellte Figuren für Textrollenspiele, mit Stimmen und Anrufen. Berechtigte Nutzer können im Standardchat weiterhin unbegrenzt gratis schreiben.",
+      pricing:
+        "Standardchats sind kostenlos. In den USA gibt es diese Tarife ({{plans}}). Lite bietet einige Premiumfunktionen und zeigt Werbung. Plus enthält alle Gedächtnisfunktionen und blendet Werbung aus.",
+      filter:
+        "Pornografische Inhalte sind verboten. Offene Figurendialoge sind erst ab 18 verfügbar.",
+      privacy: "Einstellung zur Nutzung fürs Modelltraining",
+      pro: "Viele Figuren aus Fandoms. Stimmen und Anrufe sind eingebaut.",
+      con: "Ein Abo ergänzt Funktionen. Die Regeln für explizite Inhalte gelten weiter.",
+    },
+    janitorAi: {
+      bestFor: "Figuren aus der Community",
+      summary:
+        "Millionen von Community-Figuren, bearbeitbare Personas und auf Wunsch ein externes Modell.",
+      pricing:
+        "Standardchats sind unbegrenzt. Der US App Store listet {{plans}}.",
+      filter:
+        "Figuren mit dem Label Limitless dürfen Themen für Erwachsene haben. Die App startet im eingeschränkten Modus.",
+      privacy: "Externe Proxys können Eingaben erhalten",
+      pro: "Große Figurenauswahl und unbegrenzte kostenlose Standardchats. Janitor+ bietet fünfmal so viel Kontext, Vorrang und neue Antwortvarianten mit Premiummodellen.",
+      con: "Der Gratis-Kontext umfasst etwa 9.000 Token. Ein externer Proxy bringt Aufwand und möglicherweise Zusatzkosten mit.",
+    },
+    sillyTavern: {
+      bestFor: "volle Kontrolle auf dem eigenen Rechner",
+      summary:
+        "Kostenlose Oberfläche mit offenem Quellcode für lokale und gehostete Modelle. Unterstützt Figurenkarten, Lorebooks und Prompt-Vorlagen.",
+      pricing:
+        "Die Software ist gratis. Lokale Modelle laufen auf deiner Hardware. Gehostete APIs rechnen separat ab.",
+      filter: "Die Regeln hängen vom gewählten Modell und Backend ab.",
+      privacy: "Lokale Verlaufsdateien. Gehostete APIs erhalten Eingaben.",
+      pro: "Du bestimmst Figurenkarten, Lorebooks, Prompts und Modelle. Der gesamte Aufbau kann lokal laufen.",
+      con: "Installation und Pflege liegen bei dir. Für lokale Modelle brauchst du passende Hardware.",
+    },
+    chub: {
+      bestFor: "Lorebooks und verzweigte Geschichten",
+      summary:
+        "Figurenkarten und eine gehostete Oberfläche mit Lorebooks, die Schlüsselwörter erkennen, mehreren Figuren pro Chat und einem Baum für alternative Handlungsverläufe.",
+      pricing:
+        "Chub beschreibt gelegentliche einmalige Testcredits. Das gehostete Abo kostet {{plans}}. Externe Modelle haben eigene Tarife.",
+      filter:
+        "Chub bezeichnet seine eigenen Modelle als unzensiert. Externe Anbieter setzen eigene Regeln.",
+      privacy:
+        "Geteilte Chats können öffentlich erscheinen. Externe APIs erhalten Eingaben.",
+      pro: "Verzweige Szenen, hänge ein Lorebook an und exportiere Chats als SillyTavern-JSONL oder als Text.",
+      con: "Für den laufenden Einsatz brauchst du ein Abo oder ein eigenes Backend. Testcredits gibt es nur begrenzt und ohne Garantie.",
+      free: "Gelegentliche Testcredits",
+    },
+    crushOn: {
+      bestFor: "sofort spielbare Szenen für Erwachsene",
+      summary:
+        "Community-Figuren, Gruppenszenen, Stimmen und Modellwechsel ohne eigenen API-Schlüssel.",
+      pricing:
+        "Unbegrenzte Chats auf Gratis-Modellen und 100 monatliche Credits für Pro-Modelle. Monatlich stehen diese Tarife zur Wahl ({{plans}}).",
+      filter:
+        "Rollenspiele für Erwachsene sind möglich. Für fortgeschrittene Modelle gelten eigene Zugangsregeln und Creditlimits.",
+      privacy:
+        "Die geprüfte Datenschutzerklärung lässt den Zugriff für Figurenersteller offen",
+      pro: "Mit fertigen Figuren starten, Gruppen bilden und mitten im Chat das Modell ändern.",
+      con: "Pro und Ultra haben getrennte Kontingente. Ein Abo macht den Zugriff auf Premiummodelle nicht pauschal unbegrenzt.",
+    },
+    spicyChat: {
+      bestFor: "Figuren und Personas für Erwachsene",
+      summary:
+        "Gehostetes Rollenspiel mit Community-Figuren, mehreren Personas für dich und Gedächtnisfunktionen im Abo.",
+      pricing:
+        "Gratis mit 4.096 Token Kontext. Die geprüften US-Jahresabos kosten {{plans}}. Monatsangebote stehen auf der Website.",
+      filter:
+        "Rollenspiele für Erwachsene sind möglich. Öffentliche Figuren werden moderiert.",
+      privacy: "Gehostet. Antworten verwenden den laufenden Chat als Kontext.",
+      pro: "Abos umgehen Warteschlangen und erlauben es, Erinnerungen zu bearbeiten. Höhere Stufen ergänzen semantisches Gedächtnis und Bilder im Chat.",
+      con: "Gratis bleiben Werbung und Wartezeiten. Sprachausgabe und Steuerung der Textgenerierung gibt es in der höchsten Stufe.",
+    },
+    kindroid: {
+      bestFor: "einen Begleiter mit Live-Anrufen",
+      summary:
+        "Ein eigener Begleiter mit Vorgeschichte, dauerhaftem Gedächtnis, Selfies sowie Sprach- und Videoanrufen.",
+      pricing:
+        "Einmalig 50 Testnachrichten, in einigen Regionen 15. Der US App Store listet {{plans}}. Im Web kann das Abo günstiger sein.",
+      filter:
+        "Ab 18. Laut Kindroid greift die Moderation bei schweren realen Gefahren auf Kontoebene ein.",
+      privacy: "Verschlüsselt bei Speicherung und Übertragung",
+      pro: "Anrufe mit Ton und Bild, selbstständige Nachrichten, Gruppen und Selfies gehören zum Begleiter.",
+      con: "Nach Testkontingent oder Aboende kannst du nur noch lesen. Mehr Gedächtnis kostet extra.",
+      free: "Einmaliges Testkontingent",
+    },
+    nomi: {
+      bestFor: "einen Begleiter mit täglichem Freikontingent",
+      summary:
+        "KI-Begleiter mit Langzeitgedächtnis, Selfies und Gruppenchat. Sprachfunktionen gibt es im Abo.",
+      pricing:
+        "50 Nachrichten am Tag gratis. Das Standard-Abo gibt es mit verschiedenen Laufzeiten ({{plans}}).",
+      filter:
+        "Ab 18. Nomi bezeichnet Textchats als ungefiltert. Für Bilder gelten eigene Regeln.",
+      privacy: "Laut Nomi kein Verkauf oder Verleih personenbezogener Daten",
+      pro: "Kehre zu derselben Figur zurück oder bringe mehrere Begleiter in einem Gruppenchat zusammen.",
+      con: "Gratis gibt es ein Tageslimit. Für Sprachfunktionen brauchst du ein Abo.",
+    },
+    venice: {
+      bestFor: "private Figurenchats und Medien",
+      summary:
+        "Figurenchats neben regulärem KI-Chat, Bildgenerierung und einer Auswahl an Modellen.",
+      pricing:
+        "Mit den Basismodellen sind täglich 10 Texteingaben und 15 Bildanfragen gratis. {{plans}}. Eigene Figuren brauchen Pro.",
+      filter:
+        "Der Filter für Erwachseneninhalte ist standardmäßig aktiv. Berechtigte Pro-Nutzer können ihn abschalten.",
+      privacy: "Verlauf bleibt standardmäßig auf dem Gerät",
+      pro: "Figuren, Chat und Bilder in einer App. Bezahlte Tarife bieten eine optionale verschlüsselte Sicherung.",
+      con: "Der Gratis-Chat ist begrenzt. Premiummodelle und manche Medienfunktionen verbrauchen Credits.",
+    },
+    nanoGpt: {
+      bestFor: "Modellwahl mit Abrechnung nach Verbrauch",
+      summary:
+        "Webchat und API mit Text- und Medienmodellen. Nutze eine Vorlage oder bring einen eigenen Figurenprompt mit.",
+      pricing:
+        "Ein kostenloses Webmodell. Erste Aufladung ab 0,10 US-Dollar per Krypto oder 1 US-Dollar per Karte. {{plans}}. PRO deckt ausgewählte offene Modelle ab.",
+      filter: "Ab 18. Die Einschränkungen hängen von Modell und Anbieter ab.",
+      privacy:
+        "Verlauf standardmäßig lokal. Anbieterregeln unterscheiden sich.",
+      pro: "Zahle nach Verbrauch. Die API lässt sich auch in SillyTavern einbinden.",
+      con: "Du baust die Figuren selbst oder nutzt eine andere Oberfläche. Die meisten Modelle greifen auf dein Guthaben zu.",
+    },
   },
   import: {
-    title: "Nimm deine Character.AI-Figuren mit",
+    title: "So nimmst du eine Figur aus Character.AI mit",
     intro:
-      "Wechseln heißt nicht, von vorn anzufangen. Importiere eine Figur über ihren öffentlichen Link in unter einer Minute.",
+      "Beginne eine neue Geschichte mit den Angaben, die der Urheber öffentlich gemacht hat.",
     steps: {
       account: {
         title: "Anmelden",
-        body: "Der Import braucht ein kostenloses Konto, damit die Figur einen Besitzer hat.",
+        body: "Mit einem Gratis-Konto kannst du die importierte Figur später bearbeiten.",
       },
       create: {
-        title: "Figuren-Editor öffnen",
-        body: "Klick auf der Skills-Seite auf „Eigenen Skill Erstellen“ und wähl „Per Link importieren“.",
+        title: "Figureneditor öffnen",
+        body: "Erstelle auf der Skills-Seite einen benutzerdefinierten Skill und wähle den Import per Link.",
       },
       paste: {
         title: "Öffentlichen Link einfügen",
-        body: "Character.AI (character.ai, c.ai) oder Talkie (talkie-ai.com). Wir übernehmen, was die öffentliche Seite zeigt: Name, Avatar, Begrüßung, Beschreibung und Tags, dazu die Definition, wenn der Ersteller sie öffentlich gemacht hat. Behalte sie privat, nicht gelistet oder öffentlich.",
+        body: "Verwende einen Link von Character.AI oder Talkie. Der Import übernimmt sichtbare Felder wie Name, Avatar, Begrüßung und Beschreibung. Öffentliche Definitionen lassen sich ebenfalls übernehmen.",
       },
       model: {
         title: "Modell wählen",
-        body: "Die Figur läuft jetzt auf jedem unserer Modelle. Starte mit einem unzensierten und wechsle mitten in der Szene, wenn ein Modell flach wird. Der Thread behält seinen Verlauf.",
+        body: "Beginne einen Chat mit deiner Kopie. Du kannst das Modell im selben Gespräch wechseln.",
       },
     },
     callout:
-      "Der ursprüngliche Ersteller wird bei der importierten Figur genannt, mit Link zur Quelle. Importierst du denselben Link zweimal, öffnet sich deine bestehende Kopie statt eines Duplikats.",
+      "Die Kopie nennt den Urheber und verlinkt das Original. Alte Chatverläufe bleiben beim bisherigen Dienst.",
   },
   privacy: {
-    title: "Wer liest dein Rollenspiel?",
-    intro: "Auf {{appName}} passiert genau das.",
+    title: "Wo dein Chat landet",
+    intro: "So funktioniert Inkognito bei {{appName}}.",
     incognito:
-      "Inkognito-Chats liegen im lokalen Speicher deines Browsers, nicht auf unseren Servern. Löschst du deine Browserdaten, sind sie weg.",
+      "Der Verlauf liegt im Browserspeicher. Wenn du ihn leerst, verschwindet auch der Chat.",
     transit:
-      "Jede Nachricht läuft trotzdem über unseren Server zum Modellanbieter, der die Antwort schreibt. So funktioniert jede gehostete KI. Der Credit-Verbrauch wird für die Abrechnung erfasst.",
-    others:
-      "Für die anderen: Lies die Datenschutzzeile in jeder Karte oben. Mehrere Plattformen schreiben in ihrer eigenen Richtlinie, dass Chats ihre Modelle trainieren oder Werbung speisen können.",
+      "Deine Eingaben gehen über unseren Dienst an den gehosteten Modellanbieter. Den Creditverbrauch erfassen wir für die Abrechnung.",
     callout:
-      "Inkognito hält deine Geschichte von unseren Servern fern. Vor dem Modell, das die Antworten schreibt, verbirgt es sie nicht.",
+      "Für einen vollständig lokalen Aufbau kannst du SillyTavern mit einem Modell auf eigener Hardware kombinieren.",
   },
   stay: {
-    title: "Wann Character.AI trotzdem die richtige Wahl ist",
-    intro: "Manchmal ist der Filter das Feature.",
+    title: "Wann sich Character.AI weiterhin lohnt",
+    intro:
+      "Character.AI passt, wenn du vertraute Figuren und lockere, moderierte Chats suchst.",
     library:
-      "Du willst die größte Bibliothek fertiger Figuren und nie selbst eine bauen.",
-    flat: "Du willst unbegrenzt kostenlose Nachrichten und nimmst dafür Werbung und ein gefiltertes Modell in Kauf.",
-    filter:
-      "Der Nutzer ist ein Teenager, oder ein Teenager nutzt dasselbe Gerät. Dann passt eine abgeriegelte App besser.",
+      "Du hast schon Lieblingsfiguren und nutzt die eingebauten Sprachanrufe.",
+    flat: "Du schreibst vor allem im Standardchat und legst mehr Wert auf unbegrenzte Gratisnachrichten als auf Modellwahl.",
     callout:
-      "Ungefiltert heißt ohne Sicherheitsnetz. Was du schreibst und veröffentlichst, verantwortest du, und das Recht an deinem Wohnort gilt trotzdem.",
+      "Die Plattform lohnt sich, wenn ihre Werkzeuge und Regeln zu deinen Geschichten passen.",
   },
   faq: {
-    title: "FAQ",
+    title: "Häufige Fragen",
     best: {
-      q: "Was ist die beste Character.AI-Alternative ohne Filter?",
-      a: "Kommt darauf an, was du willst. Eine riesige kostenlose Community-Bibliothek: Janitor AI. Volle Kontrolle auf deinem eigenen Rechner: SillyTavern. Ein langfristiger Begleiter mit Stimme und Selfies: Kindroid oder Nomi. Modellwahl, unzensierte Modelle und eigene Figuren auf einem Guthaben: {{appName}}.",
+      q: "Was ist die beste Alternative zu Character.AI?",
+      a: "Janitor AI bietet viele Community-Figuren. SillyTavern bietet lokale Kontrolle und Lorebooks. Kindroid und Nomi eignen sich für feste Begleiter. Mit {{appName}} kannst du eine öffentliche Figur importieren und das Modell wechseln.",
     },
     free: {
-      q: "Gibt es eine kostenlose Character.AI-Alternative ohne Filter?",
-      a: "Ja. Janitor AI hat eine Gratisstufe mit NSFW-Bots, die als Limitless markiert sind. SillyTavern ist freie Software, das Modell bringst du selbst mit. {{appName}} gibt dir {{guestCredits}} kostenlose Credits im Monat ohne Konto und {{freeCredits}} mit Konto, unzensierte Modelle inklusive nach einer einmaligen 18+-Bestätigung.",
+      q: "Gibt es eine kostenlose Alternative zu Character.AI?",
+      a: "Janitor AI bietet unbegrenzte Standardchats. Bei Nomi sind 50 Nachrichten pro Tag gratis. SillyTavern ist kostenlos und braucht ein separates Modell. Bei {{appName}} bekommst du {{guestCredits}} Credits im Monat als Gast oder {{freeCredits}} mit einem Gratis-Konto.",
     },
     import: {
-      q: "Kann ich meine Character.AI-Figuren in eine andere App umziehen?",
-      a: "Auf {{appName}} ja: Füg den öffentlichen Link der Figur ein und du bekommst deine eigene Kopie mit Name, Avatar, Begrüßung, Beschreibung und Tags, dazu die Definition, wenn sie öffentlich ist. Talkie-Links funktionieren auch. Du brauchst ein kostenloses Konto.",
+      q: "Kann ich Figuren und Chats aus Character.AI mitnehmen?",
+      a: "Mit einem Gratis-Konto kann {{appName}} sichtbare Felder aus einem öffentlichen Link von Character.AI oder Talkie übernehmen. Private Definitionen und alte Gespräche bleiben beim bisherigen Dienst.",
     },
     nsfw: {
-      q: "Welche Character.AI-Alternativen erlauben NSFW?",
-      a: "Laut ihren eigenen Seiten: Janitor AI erlaubt als Limitless markierte NSFW-Bots für Nutzer, die sich selbst als volljährig angeben. CrushOn hat nach einer Altersprüfung einen Unfiltered-Schalter. Kindroid nennt sich ungefiltert, mit ein paar roten Linien. Nomi lässt Text ungefiltert und filtert Nacktheit in Bildern. {{appName}} schaltet unzensierte Modelle nach einer einmaligen 18+-Bestätigung frei. Character.AI sagt, pornografische Inhalte werden nie unterstützt.",
+      q: "Welche Alternativen zu Character.AI erlauben Rollenspieltexte für Erwachsene?",
+      a: "Janitor AI mit Limitless, CrushOn und SpicyChat erlauben Erwachseneninhalte nach ihren jeweiligen Regeln. Bei SillyTavern entscheidet das Backend. {{appName}} schaltet unzensierte Modelle nach einer Bestätigung ab 18 frei.",
     },
     private: {
-      q: "Welche Alternative hält meine Chats privat?",
-      a: "SillyTavern speichert Chats auf deinem eigenen Rechner. Auf {{appName}} bleiben Inkognito-Chats in deinem Browser. Venice sagt, der Verlauf bleibt auf deinem Gerät. Nachrichten an ein gehostetes Modell erreichen trotzdem den Anbieter, der sie beantwortet.",
+      q: "Welche Alternative zu Character.AI läuft lokal?",
+      a: "SillyTavern kann mit einem lokalen Modell laufen und den Verlauf auf deinem Rechner speichern. Venice und der Inkognito-Chat von {{appName}} speichern den Verlauf auf dem Gerät. Gehostete Anbieter verarbeiten weiterhin die Eingaben.",
     },
     account: {
-      q: "Brauche ich ein Konto zum Ausprobieren?",
-      a: "Nicht auf {{appName}}: Inkognito-Chat funktioniert ohne. Ein kostenloses Konto brauchst du, um Figuren zu importieren, eigene zu veröffentlichen und Chats geräteübergreifend zu behalten.",
+      q: "Kann ich {{appName}} ohne Konto ausprobieren?",
+      a: "Ja. Nutze deine Gastcredits im Inkognito-Chat. Melde dich an, wenn du Figuren importieren oder gespeicherte Chats auf mehreren Geräten nutzen willst.",
     },
-    roleplayLink: "KI-Rollenspiel ohne Filter: Modelle, Gedächtnis und Preise",
-    kindsLink:
-      "Abliteriert, nachtrainiert oder eigenes Weltbild: die drei Arten unzensierter KI",
+    memory: {
+      q: "Welche Alternativen eignen sich für lange Szenen?",
+      a: "Chub und SillyTavern fügen über Lorebooks passende Details zum Kontext hinzu. Kindroid und Nomi setzen auf das Gedächtnis eines festen Begleiters. Prüfe vor dem Bezahlen, woran sich das Modell aus einer frühen Szene erinnert.",
+    },
+    roleplayLink: "KI-Rollenspiel ohne Filter",
+    kindsLink: "Wie sich unzensierte KI-Modelle unterscheiden",
   },
   partners: {
-    body: "Du betreibst eine Rollenspiel-Community, einen Discord oder einen Kanal über KI-Figuren? Das Partnerprogramm von {{appName}} zahlt dir {{referralPercent}} % jeder Zahlung, die du vermittelst, jeden Monat.",
-    link: "Zum Partnerprogramm",
+    body: "Leitest du eine Rollenspiel-Community? Das Partnerprogramm von {{appName}} zahlt {{referralPercent}} % jeder vermittelten Zahlung.",
+    link: "Partnerprogramm ansehen",
   },
   cta: {
-    title: "Bring eine Figur mit. Wähl das Modell.",
+    title: "Modell wählen und Szene beginnen",
     subtitle:
-      "{{guestCredits}} kostenlose Credits im Monat, kein Konto nötig. Unzensiert, offen oder Mainstream: Wechsle jederzeit.",
+      "Als Gast startest du mit {{guestCredits}} Gratiscredits im Monat.",
     start: "Rollenspiel starten",
     skills: "Skills ansehen",
   },

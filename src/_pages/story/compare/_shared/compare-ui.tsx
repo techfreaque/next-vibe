@@ -84,7 +84,10 @@ export function planText(
 }
 
 /** Free tier column. */
-export function freeText(platform: PlatformData, t: CompareT): string {
+export function freeText(
+  platform: Pick<PlatformData, "kind" | "freeTier">,
+  t: CompareT,
+): string {
   if (platform.kind === "local") {
     return t("common.free.local");
   }
@@ -93,7 +96,7 @@ export function freeText(platform: PlatformData, t: CompareT): string {
 
 /** Paid column: cheapest plan, or pay-as-you-go. */
 export function paidText(
-  platform: PlatformData,
+  platform: Pick<PlatformData, "plans" | "payAsYouGo">,
   locale: CountryLanguage,
   t: CompareT,
 ): string {
@@ -114,7 +117,7 @@ export function paidText(
 
 /** Every paid plan, for the detail cards. */
 export function allPlansText(
-  platform: PlatformData,
+  platform: Pick<PlatformData, "plans" | "payAsYouGo">,
   locale: CountryLanguage,
   t: CompareT,
 ): string {
@@ -129,7 +132,10 @@ export function availabilityText(value: Availability, t: CompareT): string {
   return t(`common.availability.${value}`);
 }
 
-export function mediaText(platform: PlatformData, t: CompareT): string {
+export function mediaText(
+  platform: Pick<PlatformData, "media">,
+  t: CompareT,
+): string {
   const items = (["image", "video", "voice"] as const).flatMap((kind) => {
     const value = platform.media[kind];
     if (value === "no") {
@@ -141,7 +147,10 @@ export function mediaText(platform: PlatformData, t: CompareT): string {
   return items.length > 0 ? items.join(" · ") : t("common.media.none");
 }
 
-export function openSourceText(platform: PlatformData, t: CompareT): string {
+export function openSourceText(
+  platform: Pick<PlatformData, "openSource" | "selfHost">,
+  t: CompareT,
+): string {
   if (platform.openSource === "yes") {
     return platform.selfHost
       ? t("common.openSource.yesSelfHost")
@@ -205,6 +214,8 @@ export interface TableRowData {
   href: string | null;
   external: string | null;
   isUs: boolean;
+  summary?: string;
+  sources?: readonly PlatformSource[];
   cells: {
     kind: string;
     free: string;
@@ -284,10 +295,12 @@ export function CompareTable({
   rows,
   locale,
   minWidth = "min-w-[72rem]",
+  showSources = false,
 }: {
   rows: readonly TableRowData[];
   locale: CountryLanguage;
   minWidth?: string;
+  showSources?: boolean;
 }): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
   return (
@@ -330,6 +343,25 @@ export function CompareTable({
                         : t("common.table.versusLink", { name: row.name })}
                     </Link>
                   )}
+                  {row.summary !== undefined && (
+                    <P className="mt-1 min-w-44 max-w-64 text-xs leading-relaxed text-muted-foreground">
+                      {row.summary}
+                    </P>
+                  )}
+                  {showSources &&
+                    row.sources?.map((source) => (
+                      <ExternalLink
+                        key={source.url}
+                        href={source.url}
+                        target="_blank"
+                        rel="noopener noreferrer nofollow"
+                        className={`${LINK_CLASS} mt-1 block text-xs`}
+                      >
+                        {t(`common.sourceKinds.${source.kind}`, {
+                          name: row.name,
+                        })}
+                      </ExternalLink>
+                    ))}
                 </TableCell>
                 {TABLE_COLUMNS.map((col) => (
                   <TableCell
@@ -387,16 +419,23 @@ export function CompareLinks({
 export function CompareInlineLinks({
   locale,
   versus,
+  includeHub = true,
 }: {
   locale: CountryLanguage;
   versus: readonly VersusKey[];
+  includeHub?: boolean;
 }): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
   const { t: configT } = configScopedTranslation.scopedT(locale);
   const appName = configT("appName");
   return (
     <>
-      <CardLink href={`/${locale}${COMPARE_HUB_PATH}`} label={t("links.hub")} />
+      {includeHub && (
+        <CardLink
+          href={`/${locale}${COMPARE_HUB_PATH}`}
+          label={t("links.hub")}
+        />
+      )}
       {versus.map((key) => (
         <CardLink
           key={key}

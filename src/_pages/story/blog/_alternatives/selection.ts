@@ -1,0 +1,205 @@
+import type { PlatformKey } from "../../compare/_shared/platforms";
+import type { BlogPostSlug } from "../posts-meta";
+import type { MarketPlatformKey } from "./catalog";
+
+interface Selection {
+  subject: { platform: PlatformKey } | { market: MarketPlatformKey };
+  platforms?: readonly PlatformKey[];
+  market: readonly MarketPlatformKey[];
+}
+
+const LOCAL_APPS = [
+  "openWebUi",
+  "jan",
+  "anythingLlm",
+  "gpt4all",
+  "llamaCpp",
+] as const;
+const LOWER_REFUSAL_CHATS = [
+  "unrestricted",
+  "uncensoredCom",
+  "hemmingway",
+  "shannon",
+  "nokeep",
+  "icelake",
+  "uncensoredChat",
+] as const;
+const GENERAL_ASSISTANTS = [
+  "claude",
+  "gemini",
+  "perplexity",
+  "copilot",
+  "meta",
+  "mistral",
+  "deepseek",
+  "qwen",
+  "kimi",
+] as const;
+
+export const ALTERNATIVE_GUIDES = {
+  "nofiltergpt-alternatives": {
+    subject: { market: "noFilter" },
+    platforms: ["ollama"],
+    market: [
+      ...LOWER_REFUSAL_CHATS,
+      "maple",
+      "morse",
+      "jan",
+      "openWebUi",
+      "grok",
+    ],
+  },
+  "freedomgpt-alternatives": {
+    subject: { platform: "freedomGpt" },
+    platforms: ["openRouter"],
+    market: [
+      "noFilter",
+      ...LOWER_REFUSAL_CHATS,
+      "poe",
+      "typingMind",
+      ...LOCAL_APPS,
+    ],
+  },
+  "gab-ai-alternatives": {
+    subject: { platform: "gabAi" },
+    platforms: ["ollama"],
+    market: [
+      "grok",
+      "perplexity",
+      "noFilter",
+      ...LOWER_REFUSAL_CHATS,
+      "poe",
+      "openWebUi",
+    ],
+  },
+  "openrouter-alternatives": {
+    subject: { platform: "openRouter" },
+    market: [
+      "vercel",
+      "liteLlm",
+      "portkey",
+      "cloudflare",
+      "requesty",
+      "helicone",
+      "bifrost",
+      "llmGateway",
+      "truefoundry",
+      "eden",
+      "together",
+      "deepInfra",
+      "bedrock",
+      "huggingFace",
+      "kong",
+      "apiko",
+      "zerouter",
+      "ngrok",
+      "sandbase",
+    ],
+  },
+  "venice-ai-alternatives": {
+    subject: { platform: "venice" },
+    platforms: ["ollama"],
+    market: [
+      "maple",
+      "confer",
+      "lumo",
+      "duck",
+      "morse",
+      "harbor",
+      "leo",
+      "noFilter",
+      ...LOWER_REFUSAL_CHATS,
+      "poe",
+      "typingMind",
+      "jan",
+      "openWebUi",
+    ],
+  },
+  "character-ai-alternatives": {
+    subject: { platform: "characterAi" },
+    market: [
+      "dreamgen",
+      "novelai",
+      "chai",
+      "replika",
+      "polybuzz",
+      "fictionlab",
+      "zeta",
+      "characterTavern",
+      "hemmingway",
+      "aiDungeon",
+      "talkie",
+      "perchance",
+      "candy",
+    ],
+  },
+  "chatgpt-alternative-without-filters": {
+    subject: { market: "chatGpt" },
+    platforms: [
+      "venice",
+      "nanoGpt",
+      "freedomGpt",
+      "uncensoredAi",
+      "gabAi",
+      "lmStudio",
+      "ollama",
+      "openRouter",
+    ],
+    market: [
+      "noFilter",
+      ...LOWER_REFUSAL_CHATS,
+      "grok",
+      "maple",
+      "morse",
+      "poe",
+      ...GENERAL_ASSISTANTS,
+      "jan",
+      "openWebUi",
+      "chub",
+      "spicychat",
+    ],
+  },
+  "chatgpt-jailbreak-alternative": {
+    subject: { market: "chatGpt" },
+    platforms: [
+      "venice",
+      "uncensoredAi",
+      "freedomGpt",
+      "nanoGpt",
+      "gabAi",
+      "lmStudio",
+      "ollama",
+      "sillyTavern",
+    ],
+    market: [
+      "noFilter",
+      ...LOWER_REFUSAL_CHATS,
+      "grok",
+      "maple",
+      "morse",
+      "jan",
+      "openWebUi",
+    ],
+  },
+  "grok-alternative": {
+    subject: { market: "grok" },
+    platforms: [
+      "venice",
+      "freedomGpt",
+      "nanoGpt",
+      "uncensoredAi",
+      "gabAi",
+      "lmStudio",
+      "ollama",
+    ],
+    market: [
+      ...GENERAL_ASSISTANTS,
+      "chatGpt",
+      "noFilter",
+      ...LOWER_REFUSAL_CHATS,
+      "poe",
+    ],
+  },
+} satisfies Partial<Record<BlogPostSlug, Selection>>;
+
+export type AlternativesSlug = keyof typeof ALTERNATIVE_GUIDES;

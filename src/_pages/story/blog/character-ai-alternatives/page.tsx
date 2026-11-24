@@ -1,14 +1,3 @@
-/**
- * Blog post: Character.AI alternatives without the filter.
- * /[locale]/story/blog/character-ai-alternatives
- *
- * Competitor facts (plans, filter, privacy, pros and cons, sources) come from
- * the comparison pages' research data (compare/_shared/platforms.ts + compare
- * i18n), checked on COMPARE_CHECKED_DATE. Our own numbers (free credits,
- * plans, packs, model counts, the own-worldview model) are read live from
- * config via loadUsFacts. The referral share comes from the referral config.
- */
-
 import type { Metadata } from "next";
 import { SKILL_CREATOR_ID } from "next-vibe/agent/skills/constants";
 import { roleplaySkillSkill } from "next-vibe/agent/skills/default-skills/roleplay-character/skill";
@@ -49,23 +38,36 @@ import {
 } from "../../_shared/marketing";
 import {
   allPlansText,
+  availabilityText,
   CompareInlineLinks,
-  CompareTable,
   formatCompareDate,
   freeText,
   LINK_CLASS,
-  platformRow,
-  usRow,
+  mediaText,
+  openSourceText,
+  paidText,
+  type TableRowData,
 } from "../../compare/_shared/compare-ui";
 import {
-  COMPARE_CHECKED_DATE,
-  isVersusKey,
-  type PlatformKey,
-  PLATFORMS,
+  type PlatformSource,
+  VERSUS_KEYS,
   versusPath,
 } from "../../compare/_shared/platforms";
 import type { UsParams } from "../../compare/_shared/us-facts";
 import { scopedTranslation as compareScopedTranslation } from "../../compare/i18n";
+import {
+  AlternativesComparison,
+  alternativesFaq,
+  AlternativesLinks,
+} from "../_alternatives/comparison";
+import { guideCards } from "../guide-links";
+import {
+  ALTERNATIVES,
+  CHECKED_DATE,
+  RESEARCH,
+  SWITCH_SOURCES,
+  TABLE_KEYS,
+} from "./facts";
 import { scopedTranslation } from "./i18n";
 
 export const revalidate = 3600;
@@ -76,18 +78,6 @@ const ROLEPLAY_SKILL_ID = roleplaySkillSkill.id;
 interface Props {
   params: Promise<{ locale: CountryLanguage }>;
 }
-
-/** The alternatives, in list order. Character.AI itself closes the table. */
-const ALTERNATIVES: readonly PlatformKey[] = [
-  "janitorAi",
-  "sillyTavern",
-  "crushOn",
-  "kindroid",
-  "nomi",
-  "venice",
-];
-
-const TABLE_KEYS: readonly PlatformKey[] = [...ALTERNATIVES, "characterAi"];
 
 const IMPORT_STEPS: readonly ("account" | "create" | "paste" | "model")[] = [
   "account",
@@ -103,7 +93,8 @@ const FAQ_KEYS: readonly (
   | "nsfw"
   | "private"
   | "account"
-)[] = ["best", "free", "import", "nsfw", "private", "account"];
+  | "memory"
+)[] = ["best", "free", "import", "nsfw", "private", "account", "memory"];
 
 export interface CharacterAiAlternativesPageData {
   locale: CountryLanguage;
@@ -145,17 +136,95 @@ export function TanstackPage({
   const { t } = scopedTranslation.scopedT(locale);
   const { t: compareT } = compareScopedTranslation.scopedT(locale);
   const back = { href: `/${locale}/story/blog`, label: t("hero.backToBlog") };
-  const checked = formatCompareDate(COMPARE_CHECKED_DATE, locale);
   const stats = {
     ...us,
-    date: checked,
-    count: ALTERNATIVES.length,
+    date: formatCompareDate(CHECKED_DATE, locale),
     referralPercent: Math.round(REFERRAL_CONFIG.DIRECT_PERCENTAGE * 100),
   };
-  const rows = [
-    usRow(locale, compareT, us),
-    ...TABLE_KEYS.map((key) => platformRow(PLATFORMS[key], locale, compareT)),
+  const versusHref = (key: keyof typeof RESEARCH): string | null => {
+    const versus = VERSUS_KEYS.find((entry) => entry === key);
+    return versus === undefined ? null : `/${locale}${versusPath(versus)}`;
+  };
+  const rows: TableRowData[] = TABLE_KEYS.map((key): TableRowData => {
+    const platform = RESEARCH[key];
+    return {
+      key,
+      name: platform.name,
+      href: versusHref(key),
+      external: platform.url,
+      isUs: false,
+      sources: platform.sources.slice(0, 2),
+      cells: {
+        kind: compareT(`common.kinds.${platform.kind}`),
+        free:
+          key === "kindroid" || key === "chub"
+            ? t(`options.${key}.free`)
+            : freeText(platform, compareT),
+        paid: paidText(platform, locale, compareT),
+        filter: t(`options.${key}.filter`),
+        privacy: t(`options.${key}.privacy`),
+        api: availabilityText(platform.api, compareT),
+        media: mediaText(platform, compareT),
+        open: openSourceText(platform, compareT),
+      },
+    };
+  });
+  const faq = [
+    ...FAQ_KEYS.map((key) => ({
+      key,
+      question: t(`faq.${key}.q`, stats),
+      answer: t(`faq.${key}.a`, stats),
+    })),
+    alternativesFaq(SLUG, locale, us.appName),
   ];
+
+  const sourceLinks = (platform: {
+    name: string;
+    sources: readonly PlatformSource[];
+  }): JSX.Element => (
+    <Span className="flex flex-wrap gap-x-4 gap-y-1 text-sm">
+      {platform.sources.map(({ kind, url }) => (
+        <ExternalLink
+          key={url}
+          href={url}
+          target="_blank"
+          rel="noopener noreferrer nofollow"
+          className={LINK_CLASS}
+        >
+          {compareT(`common.sourceKinds.${kind}`, { name: platform.name })}
+        </ExternalLink>
+      ))}
+    </Span>
+  );
+
+  const platformFacts = (key: keyof typeof RESEARCH): JSX.Element => (
+    <ArticleList
+      items={[
+        <Span key="price">
+          <Span className="font-semibold text-foreground">
+            {t("list.price")}
+          </Span>{" "}
+          {t(`options.${key}.pricing`, {
+            plans: allPlansText(RESEARCH[key], locale, compareT),
+          })}
+        </Span>,
+        <Span key="filter">
+          <Span className="font-semibold text-foreground">
+            {t("list.filter")}
+          </Span>{" "}
+          {t(`options.${key}.filter`)}
+        </Span>,
+        <Span key="pro">
+          <Span className="font-semibold text-foreground">{t("list.pro")}</Span>{" "}
+          {t(`options.${key}.pro`)}
+        </Span>,
+        <Span key="con">
+          <Span className="font-semibold text-foreground">{t("list.con")}</Span>{" "}
+          {t(`options.${key}.con`)}
+        </Span>,
+      ]}
+    />
+  );
 
   return (
     <Div className="min-h-screen bg-background">
@@ -175,6 +244,37 @@ export function TanstackPage({
         </Div>
 
         <ArticleSection
+          id="character-ai"
+          title={t("characterAi.title")}
+          intro={t("options.characterAi.summary")}
+        >
+          {platformFacts("characterAi")}
+          {sourceLinks(RESEARCH.characterAi)}
+        </ArticleSection>
+
+        <ArticleSection
+          id="why-switch"
+          title={t("switch.title")}
+          intro={t("switch.intro")}
+        >
+          <ArticleList
+            items={SWITCH_SOURCES.map(([key, href]) => (
+              <Span key={href}>
+                {t(`switch.reasons.${key}.body`)}{" "}
+                <ExternalLink
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer nofollow"
+                  className={LINK_CLASS}
+                >
+                  {t(`switch.reasons.${key}.source`)}
+                </ExternalLink>
+              </Span>
+            ))}
+          />
+        </ArticleSection>
+
+        <ArticleSection
           id="criteria"
           title={t("criteria.title")}
           intro={t("criteria.intro")}
@@ -190,13 +290,13 @@ export function TanstackPage({
           />
         </ArticleSection>
 
-        <ArticleSection
-          id="table"
+        <AlternativesComparison
+          locale={locale}
+          slug={SLUG}
+          us={us}
+          customRows={rows}
           title={t("table.title")}
-          intro={t("table.intro", stats)}
-        >
-          <CompareTable rows={rows} locale={locale} />
-        </ArticleSection>
+        />
 
         <ArticleSection
           id="us"
@@ -206,7 +306,8 @@ export function TanstackPage({
           <ArticleList
             items={[
               t("us.models", stats),
-              t("us.characters", stats),
+              t("us.characters"),
+              t("us.consent"),
               t("us.import"),
               t("us.privacy"),
               t("us.price", stats),
@@ -232,7 +333,8 @@ export function TanstackPage({
           intro={t("list.intro", stats)}
         >
           {ALTERNATIVES.map((key, index) => {
-            const platform = PLATFORMS[key];
+            const platform = RESEARCH[key];
+            const href = versusHref(key);
             return (
               <Div
                 key={key}
@@ -241,75 +343,22 @@ export function TanstackPage({
               >
                 <ArticleH3>
                   {t("list.heading", {
-                    number: index + 1,
+                    number: index + 2,
                     name: platform.name,
-                    kind: compareT(`common.kinds.${platform.kind}`),
+                    bestFor: t(`options.${key}.bestFor`),
                   })}
                 </ArticleH3>
-                <ArticleP>{compareT(`platforms.${key}.what`)}</ArticleP>
-                <ArticleList
-                  items={[
-                    <Span key="filter">
-                      <Span className="font-semibold text-foreground">
-                        {t("list.filter")}
-                      </Span>{" "}
-                      {compareT(`platforms.${key}.filter`)}
-                    </Span>,
-                    <Span key="price">
-                      <Span className="font-semibold text-foreground">
-                        {t("list.price")}
-                      </Span>{" "}
-                      {t("list.priceValue", {
-                        free: freeText(platform, compareT),
-                        plans: allPlansText(platform, locale, compareT),
-                      })}{" "}
-                      {compareT(`platforms.${key}.pricingNote`)}
-                    </Span>,
-                    <Span key="privacy">
-                      <Span className="font-semibold text-foreground">
-                        {t("list.privacy")}
-                      </Span>{" "}
-                      {compareT(`platforms.${key}.privacy`)}
-                    </Span>,
-                    <Span key="pro">
-                      <Span className="font-semibold text-foreground">
-                        {t("list.pro")}
-                      </Span>{" "}
-                      {compareT(`platforms.${key}.pro1`)}
-                    </Span>,
-                    <Span key="con">
-                      <Span className="font-semibold text-foreground">
-                        {t("list.con")}
-                      </Span>{" "}
-                      {compareT(`platforms.${key}.con1`)}
-                    </Span>,
-                  ]}
-                />
-                <ArticleP>
-                  <Span className="font-semibold text-foreground">
-                    {t("list.forWho")}
-                  </Span>{" "}
-                  {compareT(`platforms.${key}.forWho`)}
-                </ArticleP>
-                {isVersusKey(key) ? (
+                <ArticleP>{t(`options.${key}.summary`)}</ArticleP>
+                {platformFacts(key)}
+                {sourceLinks(platform)}
+                {href !== null && (
                   <CardLink
-                    href={`/${locale}${versusPath(key)}`}
+                    href={href}
                     label={t("list.versusLink", {
                       appName: us.appName,
                       name: platform.name,
                     })}
                   />
-                ) : (
-                  <Span className="text-sm">
-                    <ExternalLink
-                      href={platform.url}
-                      target="_blank"
-                      rel="noopener noreferrer nofollow"
-                      className={LINK_CLASS}
-                    >
-                      {t("list.visit", { name: platform.name })}
-                    </ExternalLink>
-                  </Span>
                 )}
               </Div>
             );
@@ -341,13 +390,7 @@ export function TanstackPage({
           title={t("privacy.title")}
           intro={t("privacy.intro", stats)}
         >
-          <ArticleList
-            items={[
-              t("privacy.incognito"),
-              t("privacy.transit"),
-              t("privacy.others"),
-            ]}
-          />
+          <ArticleList items={[t("privacy.incognito"), t("privacy.transit")]} />
           <Callout icon={EyeOff} tone="neutral">
             {t("privacy.callout")}
           </Callout>
@@ -358,28 +401,18 @@ export function TanstackPage({
           title={t("stay.title")}
           intro={t("stay.intro")}
         >
-          <ArticleList
-            items={[t("stay.library"), t("stay.flat"), t("stay.filter")]}
-          />
+          <ArticleList items={[t("stay.library"), t("stay.flat")]} />
           <Callout icon={Scale} tone="neutral">
             {t("stay.callout")}
           </Callout>
         </ArticleSection>
 
         <ArticleSection id="faq" title={t("faq.title")}>
-          <JsonLd
-            id="faq-structured-data"
-            data={buildFaqStructuredData(
-              FAQ_KEYS.map((key) => ({
-                question: t(`faq.${key}.q`, stats),
-                answer: t(`faq.${key}.a`, stats),
-              })),
-            )}
-          />
-          {FAQ_KEYS.map((key) => (
+          <JsonLd id="faq-structured-data" data={buildFaqStructuredData(faq)} />
+          {faq.map(({ key, question, answer }) => (
             <Div key={key} className="flex flex-col gap-2">
-              <ArticleH3>{t(`faq.${key}.q`, stats)}</ArticleH3>
-              <ArticleP>{t(`faq.${key}.a`, stats)}</ArticleP>
+              <ArticleH3>{question}</ArticleH3>
+              <ArticleP>{answer}</ArticleP>
             </Div>
           ))}
           <Div className="flex flex-col">
@@ -391,9 +424,17 @@ export function TanstackPage({
               href={`/${locale}/story/blog/abliterated-vs-uncensored-models`}
               label={t("faq.kindsLink")}
             />
+            {guideCards(locale, ["janitor-ai-alternatives"]).map((card) => (
+              <CardLink
+                key={card.slug}
+                href={`/${locale}${card.path}`}
+                label={card.title}
+              />
+            ))}
             <CompareInlineLinks
               locale={locale}
-              versus={["characterAi", "janitorAi", "venice"]}
+              includeHub={false}
+              versus={["characterAi", "janitorAi", "venice", "nanoGpt"]}
             />
           </Div>
         </ArticleSection>
@@ -404,6 +445,8 @@ export function TanstackPage({
             {t("partners.link")}
           </Link>
         </Callout>
+
+        <AlternativesLinks locale={locale} exclude={SLUG} />
 
         <ArticleEnd
           post={{ slug: SLUG, locale }}

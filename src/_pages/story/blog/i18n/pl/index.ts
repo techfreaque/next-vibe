@@ -153,12 +153,11 @@ export const translations: typeof enTranslations = {
       readTime: "9 min czytania",
     },
     characterAiAlternatives: {
-      title:
-        "Alternatywy dla Character.AI bez filtra. Sprawdzone, nie zgadywane.",
+      title: "Alternatywy dla Character.AI do odgrywania ról",
       category: "Porównanie",
       excerpt:
-        "Janitor AI, SillyTavern, CrushOn, Kindroid, Nomi, Venice i my, porównani na podstawie ich własnych stron z cenami, zasadami treści i prywatnością. Do tego: import postaci z Character.AI z linku.",
-      readTime: "10 min czytania",
+        "Porównaj Janitor AI, SillyTavern, Chub, SpicyChat i inne opcje. Sprawdź ceny, zasady treści i import publicznych postaci.",
+      readTime: "9 min czytania",
     },
     abliteratedExplained: {
       title:
