@@ -1,11 +1,9 @@
 /**
  * Skills Index Generator (domain-co-located).
  *
- * Scans all skill.ts files and generates src/generated/skills/index.ts — static
- * imports of every skill constant + COMPANION_SKILLS / DEFAULT_SKILLS arrays.
- * Byte-identical to the former tooling/generators/skills-index. Skill file list
- * comes from the shared GeneratorContext; each skill.ts is imported here to read
- * its real id.
+ * Emits the skill catalog separately from the embedding index so UI consumers
+ * can import skill definitions without loading search vectors. Both use the
+ * same ordered list of skill IDs from the shared GeneratorContext.
  */
 
 import "server-only";
@@ -30,6 +28,7 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import { GENERATED_DIR, getApiDir, getSrcDir, VIBE_DIR } from "@/env/paths";
 
 const OUTPUT_FILE = `${GENERATED_DIR}/skills/index.ts`;
+const CATALOG_FILE = `${GENERATED_DIR}/skills/catalog.ts`;
 
 /**
  * Real locations of the modules the emitted files import. Both are resolved
@@ -121,11 +120,11 @@ async function extractSkills(
   });
 }
 
-function generateContent(skills: SkillEntry[], outputFile: string): string {
+function generateCatalog(skills: SkillEntry[]): string {
   const companions = skills.filter((s) => s.isCompanion);
   const nonCompanions = skills.filter((s) => !s.isCompanion);
 
-  const absOutputFile = `${process.cwd()}/${outputFile}`;
+  const absOutputFile = join(process.cwd(), CATALOG_FILE);
 
   const header = generateFileHeader(
     "AUTO-GENERATED SKILLS INDEX",
@@ -143,16 +142,6 @@ function generateContent(skills: SkillEntry[], outputFile: string): string {
     )
     .join("\n");
 
-  const embeddingImports = skills
-    .map((s) => {
-      const embeddingPath = s.absPath.replace(
-        /skill\.ts$/,
-        "skill.embedding.ts",
-      );
-      return `import { embedding as ${s.exportName}Embedding } from "${getRelativeImportPath(embeddingPath, absOutputFile)}";`;
-    })
-    .join("\n");
-
   const companionNames = companions.map((s) => s.exportName);
   const companionSingleLine = `export const COMPANION_SKILLS: Skill[] = [${companionNames.join(", ")}];`;
   const companionList =
@@ -162,21 +151,14 @@ function generateContent(skills: SkillEntry[], outputFile: string): string {
 
   const skillIdList = skills.map((s) => `  "${s.skillId}",`).join("\n");
 
-  const embeddingList = skills
-    .map((s) => `  ${s.exportName}Embedding,`)
-    .join("\n");
-
   return `${header}
 
 /* eslint-disable prettier/prettier */
 /* eslint-disable simple-import-sort/imports */
 
-import type { Skill } from "${getRelativeImportPath(SKILL_CONFIG_MODULE, outputFile)}";
-import type { SkillEmbedding } from "${getRelativeImportPath(SKILL_EMBEDDING_TYPE_MODULE, outputFile)}";
+import type { Skill } from "${getRelativeImportPath(SKILL_CONFIG_MODULE, CATALOG_FILE)}";
 
 ${imports}
-
-${embeddingImports}
 
 export const COMPANION_SKILLS: Skill[] = [${companionSingleLine.length <= 80 ? companionList : `\n${companionList}\n`}];
 
@@ -190,6 +172,35 @@ export const DEFAULT_SKILLS: Skill[] = [
   ...COMPANION_SKILLS,
 ${nonCompanions.map((s) => `  ${s.exportName},`).join("\n")}
 ];
+`;
+}
+
+function generateEmbeddingIndex(skills: SkillEntry[]): string {
+  const absOutputFile = join(process.cwd(), OUTPUT_FILE);
+  const embeddingImports = skills
+    .map((s) => {
+      const embeddingPath = s.absPath.replace(
+        /skill\.ts$/,
+        "skill.embedding.ts",
+      );
+      return `import { embedding as ${s.exportName}Embedding } from "${getRelativeImportPath(embeddingPath, absOutputFile)}";`;
+    })
+    .join("\n");
+
+  const embeddingList = skills
+    .map((s) => `  ${s.exportName}Embedding,`)
+    .join("\n");
+
+  return `${generateFileHeader("AUTO-GENERATED SKILL EMBEDDING INDEX", "generators/skills-index")}
+
+/* eslint-disable prettier/prettier */
+/* eslint-disable simple-import-sort/imports */
+
+import type { SkillEmbedding } from "${getRelativeImportPath(SKILL_EMBEDDING_TYPE_MODULE, OUTPUT_FILE)}";
+
+${embeddingImports}
+
+export * from "./catalog";
 
 export const DEFAULT_SKILL_EMBEDDINGS: (SkillEmbedding | undefined)[] = [
 ${embeddingList}
@@ -198,16 +209,16 @@ ${embeddingList}
 }
 
 /**
- * Generate the skills index. Consumes shared skill file list; writes one file.
+ * Write both indexes from the same ordered skill list.
  * Returns the resolved skills so the embeddings pass can consume them in-memory
  * (no re-import of the just-written generated index).
  */
-async function generateSkillsIndex(
+export async function generateSkillsIndex(
   ctx: GeneratorContext,
 ): Promise<{ result: GeneratorResult; skills: SkillEntry[] }> {
   const skills = await extractSkills(ctx.files.skill, ctx.logger);
-  const content = generateContent(skills, OUTPUT_FILE);
-  await writeGeneratedFile(OUTPUT_FILE, content);
+  await writeGeneratedFile(CATALOG_FILE, generateCatalog(skills));
+  await writeGeneratedFile(OUTPUT_FILE, generateEmbeddingIndex(skills));
 
   return {
     result: {
@@ -381,11 +392,11 @@ export const generator: GeneratorDefinition = {
     return findFilesRecursively(getApiDir(), "skill.ts");
   },
   /**
-   * Only the skills index. The embedding files written alongside it are
+   * Both indexes. The individual embedding files written alongside skills are
    * API-gated (no embedding provider → none written), so listing them would
    * make the existence check fail permanently and the cache never hit.
    */
-  output: OUTPUT_FILE,
+  output: [CATALOG_FILE, OUTPUT_FILE],
   async generate(ctx) {
     const { result: index, skills } = await generateSkillsIndex(ctx);
     const emb = await generateSkillEmbeddings(ctx, skills);

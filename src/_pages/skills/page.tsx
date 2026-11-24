@@ -14,7 +14,7 @@ import {
   type SkillCategoryValue,
   SkillSourceFilter,
 } from "next-vibe/agent/skills/enum";
-import { scopedTranslation as skillTranslations } from "next-vibe/agent/skills/i18n";
+import { scopedTranslation as skillTranslations } from "next-vibe/agent/skills/labels/i18n";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
 import { AuthRepository } from "next-vibe/identity/auth/repository";

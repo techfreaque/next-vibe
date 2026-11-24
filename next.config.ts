@@ -160,7 +160,7 @@ const nextConfig: NextConfig = {
     ignoreBuildErrors: true,
   },
 
-  webpack(config, { dev, isServer }) {
+  webpack(config, { buildId, dev, isServer }) {
     if (!dev) {
       config.parallelism = 2;
     }
@@ -220,10 +220,16 @@ const nextConfig: NextConfig = {
       if (splitChunks && typeof splitChunks === "object") {
         splitChunks.cacheGroups = {
           ...splitChunks.cacheGroups,
-          i18nLocaleShared: {
+          i18nLocales: {
             test: /[\\/](?:i18n|layout-i18n|i18n[\\/]shared)[\\/](de|pl|fr|it|es)[\\/]/,
             chunks: "async",
-            minChunks: 2,
+            // Each lazy dictionary keeps its own module boundary. In production
+            // its build-scoped URL lets webpack compute the filename from the
+            // chunk ID without shipping thousands of content hashes to guests.
+            minChunks: dev ? 2 : 1,
+            ...(dev
+              ? {}
+              : { filename: `static/chunks/locales/${buildId}/[id].js` }),
             minSize: 0,
             priority: 50,
             reuseExistingChunk: true,

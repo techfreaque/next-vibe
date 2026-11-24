@@ -1,7 +1,6 @@
 "use client";
 
-import { scopedTranslation as agentScopedTranslation } from "next-vibe/agent/i18n";
-import { scopedTranslation as skillsScopedTranslation } from "next-vibe/agent/skills/i18n";
+import { scopedTranslation as skillsScopedTranslation } from "next-vibe/agent/skills/labels/i18n";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { Div } from "next-vibe/ui/components/div";
 import { Span } from "next-vibe/ui/components/span";
@@ -39,15 +38,16 @@ interface MediaFactRow {
 export function MediaModelPageClient({
   locale,
   facts,
+  description,
   sections,
 }: {
   locale: CountryLanguage;
   facts: MediaModelFacts;
+  description: string;
   /** Server-rendered similar models / FAQ / blog sections, above the CTA. */
   sections: ReactNode;
 }): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
-  const { t: agentT } = agentScopedTranslation.scopedT(locale);
   const { t: skillsT } = skillsScopedTranslation.scopedT(locale);
   const typeLabel = t(`catalog.types.${facts.type}`);
   const ctaLabel =
@@ -123,7 +123,7 @@ export function MediaModelPageClient({
         back={{ href: `/${locale}/models`, label: t("model.back") }}
         eyebrow={`${facts.labName} · ${typeLabel}`}
         title={<Span className="[overflow-wrap:anywhere]">{facts.name}</Span>}
-        subtitle={agentT(facts.description)}
+        subtitle={description}
         actions={<Cta href={href} label={ctaLabel} />}
       >
         <Div className="mt-6 flex flex-wrap items-center gap-3">

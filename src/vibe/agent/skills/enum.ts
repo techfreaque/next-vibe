@@ -9,7 +9,7 @@ import type { IconKey } from "next-vibe/unified-ui/widgets/form-fields/icon-fiel
 import { ModelUtility, type ModelUtilityValue } from "../models/enum";
 import type { ModelsTranslationKey } from "../models/i18n";
 import { scopedTranslation as modelsScopedTranslation } from "../models/i18n";
-import { scopedTranslation } from "./i18n";
+import { scopedTranslation } from "./labels/i18n";
 
 /**
  * Model Selection Mode Enum

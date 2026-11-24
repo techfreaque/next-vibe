@@ -4,14 +4,13 @@
  */
 
 import type { ChatModelId } from "next-vibe/agent/ai-stream/models";
-import { scopedTranslation as agentScopedTranslation } from "next-vibe/agent/i18n";
 import type { Modality } from "next-vibe/agent/models/enum";
 import { CHAT_MESSAGE_PRICE_REFERENCE } from "next-vibe/agent/models/models";
 import {
   ContentLevel,
   type ContentLevelValue,
 } from "next-vibe/agent/skills/enum";
-import { scopedTranslation as skillsScopedTranslation } from "next-vibe/agent/skills/i18n";
+import { scopedTranslation as skillsScopedTranslation } from "next-vibe/agent/skills/labels/i18n";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { getLanguageFromLocale } from "next-vibe/core/i18n/core/language-utils";
 
@@ -426,14 +425,6 @@ export function buildFactRows(
       missing: false,
     },
   ];
-}
-
-export function modelDescription(
-  facts: ModelFacts,
-  locale: CountryLanguage,
-): string {
-  const { t } = agentScopedTranslation.scopedT(locale);
-  return t(facts.description);
 }
 
 /** "image", "8s clip", "600 characters": what one priced use is. */

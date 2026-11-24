@@ -9,6 +9,7 @@
 
 import type { Metadata } from "next";
 import { getEnvAvailability } from "next-vibe/agent/env-availability";
+import { scopedTranslation as agentScopedTranslation } from "next-vibe/agent/i18n";
 import type { ModelStatsResponseOutput } from "next-vibe/agent/refusal-index/model/[modelId]/definition";
 import { RefusalPublicRepository } from "next-vibe/agent/refusal-index/repository";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
@@ -96,6 +97,7 @@ export interface ChatModelPageData {
   kind: "chat";
   locale: CountryLanguage;
   facts: ModelFacts;
+  description: string;
   pickerModels: PickerModel[];
   refusal: ModelStatsResponseOutput | null;
   seo: ModelSeoContent;
@@ -107,6 +109,7 @@ export interface MediaModelPageData {
   kind: "media";
   locale: CountryLanguage;
   facts: MediaModelFacts;
+  description: string;
   seo: ModelSeoContent;
   structuredData: JsonLdNode;
 }
@@ -117,6 +120,7 @@ export async function tanstackLoader({
   params,
 }: Props): Promise<ModelPageData> {
   const { locale, modelId } = await params;
+  const { t: agentT } = agentScopedTranslation.scopedT(locale);
   const availability = await getEnvAvailability();
   const facts = resolveModelFacts(locale, modelId, availability);
   if (facts === null) {
@@ -128,6 +132,7 @@ export async function tanstackLoader({
       kind: "media",
       locale,
       facts: media,
+      description: agentT(media.description),
       ...buildMediaModelPageSeo(media, locale, availability),
     };
   }
@@ -143,6 +148,7 @@ export async function tanstackLoader({
     kind: "chat",
     locale,
     facts,
+    description: agentT(facts.description),
     pickerModels: buildPickerModels(facts, availability),
     refusal: stats?.success ? stats.data : null,
     ...buildChatModelPageSeo(facts, locale, availability),

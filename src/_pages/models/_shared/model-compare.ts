@@ -19,7 +19,7 @@ import {
   IntelligenceLevel,
   type IntelligenceLevelValue,
 } from "next-vibe/agent/skills/enum";
-import { scopedTranslation as skillsScopedTranslation } from "next-vibe/agent/skills/i18n";
+import { scopedTranslation as skillsScopedTranslation } from "next-vibe/agent/skills/labels/i18n";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 
 import { configScopedTranslation } from "@/env/i18n";

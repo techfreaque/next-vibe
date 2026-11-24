@@ -20,7 +20,6 @@ import {
   buildFactRows,
   chatHref,
   compareHref,
-  modelDescription,
   modelHref,
   priceFootnote,
 } from "../_shared/model-format";
@@ -49,6 +48,7 @@ export function ModelPageClient({
       <MediaModelPageClient
         locale={data.locale}
         facts={data.facts}
+        description={data.description}
         sections={sections}
       />
     );
@@ -60,6 +60,7 @@ function ChatModelPage({
   locale,
   facts,
   pickerModels,
+  description,
   refusal,
   sections,
 }: ChatModelClientData & { sections: ReactNode }): JSX.Element {
@@ -81,7 +82,7 @@ function ChatModelPage({
         back={{ href: `/${locale}/models`, label: t("model.back") }}
         eyebrow={facts.labName}
         title={<Span className="[overflow-wrap:anywhere]">{facts.name}</Span>}
-        subtitle={modelDescription(facts, locale)}
+        subtitle={description}
         actions={
           <>
             {tryInChat}
