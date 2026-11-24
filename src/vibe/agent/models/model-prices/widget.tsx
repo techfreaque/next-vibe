@@ -31,10 +31,14 @@ export function ModelPricesWidget(): JSX.Element {
         <Badge variant="outline">{summary.totalProviders} providers</Badge>
         <Badge variant="outline">{summary.totalModels} found</Badge>
         <Badge variant={summary.modelsUpdated > 0 ? "default" : "secondary"}>
-          {summary.modelsUpdated} updated
+          {t("get.response.summary.modelsUpdated")} {summary.modelsUpdated}
         </Badge>
         <Badge variant={summary.fileUpdated ? "default" : "secondary"}>
-          {summary.fileUpdated ? "written" : "no changes"}
+          {summary.fileUpdated
+            ? "written"
+            : value.diff
+              ? "preview"
+              : "no changes"}
         </Badge>
       </Div>
 

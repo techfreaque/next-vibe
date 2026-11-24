@@ -1,7 +1,7 @@
 /**
  * Unified Model Prices Repository
  *
- * Runs all price fetchers in parallel, then writes models.ts once.
+ * Runs all price fetchers in parallel and computes the proposed source diff.
  * Each provider lives in its own file under ./providers/.
  */
 
@@ -10,6 +10,7 @@ import "server-only";
 import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
+import { createPatch } from "diff";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
@@ -18,10 +19,13 @@ import {
 } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { EndpointLogger } from "next-vibe/logger/types";
+import { Platform } from "next-vibe/platforms/platforms";
 
 import { getSrcDir } from "@/env/paths";
 
-import { chatModelDefinitions } from "../../ai-stream/models";
+import { generateMediaGenInlineEnumContent } from "../../ai-stream/model-enums-generator/media-gen-enum-generator";
+import { generateVisionEnumFileContent } from "../../ai-stream/model-enums-generator/vision-enum-generator";
+import { chatModelDefinitions, ChatModelId } from "../../ai-stream/models";
 import { imageGenModelDefinitions } from "../../image-generation/models";
 import { musicGenModelDefinitions } from "../../music-generation/models";
 import { sttModelDefinitions } from "../../speech-to-text/models";
@@ -836,16 +840,35 @@ export function removeProviderEntry(
 }
 
 export class ModelPricesRepository {
+  static async fetchProviderPrices(
+    logger: EndpointLogger,
+  ): Promise<ProviderPriceResult[]> {
+    return await Promise.all(
+      [...BASE_FETCHERS, UNBOTTLED_FETCHER].map((fetcher) =>
+        fetcher.fetch(logger),
+      ),
+    );
+  }
+
   static async fetchAndUpdate(
+    write: boolean,
+    platform: Platform,
     logger: EndpointLogger,
     t: ModelPricesT,
   ): Promise<ResponseType<ModelPricesGetResponseOutput>> {
     try {
-      const fetchers: PriceFetcher[] = [...BASE_FETCHERS, UNBOTTLED_FETCHER];
-
-      const providerResults: ProviderPriceResult[] = await Promise.all(
-        fetchers.map((fetcher) => fetcher.fetch(logger)),
-      );
+      // A CLI platform can also be forwarded over the network. Require the
+      // explicit flag in the process that would write to its own checkout.
+      const cliArgs = process.argv.slice(2);
+      const endOfFlags = cliArgs.indexOf("--");
+      const cliFlags =
+        endOfFlags === -1 ? cliArgs : cliArgs.slice(0, endOfFlags);
+      const writeSource =
+        write &&
+        platform === Platform.CLI &&
+        cliFlags.some((arg) => arg === "--write" || arg === "--write=true");
+      const providerResults =
+        await ModelPricesRepository.fetchProviderPrices(logger);
 
       const allUpdates = providerResults.flatMap((r) => r.updates);
       const allModalityUpdates = providerResults.flatMap(
@@ -863,12 +886,12 @@ export class ModelPricesRepository {
       // Role file paths - model definitions live in modality-specific subdirs
       const roleFilePaths: Record<string, string> = {
         // Definitions live in models-definitions.ts (models.ts only re-exports).
-        chat: join(agentDir, "ai-stream/models-definitions.ts"),
-        "image-gen": join(agentDir, "image-generation/models.ts"),
-        "music-gen": join(agentDir, "music-generation/models.ts"),
-        "video-gen": join(agentDir, "video-generation/models.ts"),
-        tts: join(agentDir, "text-to-speech/models.ts"),
-        stt: join(agentDir, "speech-to-text/models.ts"),
+        chat: "ai-stream/models-definitions.ts",
+        "image-gen": "image-generation/models.ts",
+        "music-gen": "music-generation/models.ts",
+        "video-gen": "video-generation/models.ts",
+        tts: "text-to-speech/models.ts",
+        stt: "speech-to-text/models.ts",
       };
       // Build a map of modelId → role for fast lookup
       const modelIdToRole: Record<string, string> = {};
@@ -892,10 +915,11 @@ export class ModelPricesRepository {
       }
 
       // Load all role file contents
-      const roleFileContents: Record<string, string> = {};
+      const originalContents: Record<string, string> = {};
       for (const [role, path] of Object.entries(roleFilePaths)) {
-        roleFileContents[role] = readFileSync(path, "utf-8");
+        originalContents[role] = readFileSync(join(agentDir, path), "utf-8");
       }
+      const roleFileContents = { ...originalContents };
       let updatedCount = 0;
 
       // Helper to get role-specific enum prefix for contextWindow regex
@@ -972,6 +996,7 @@ export class ModelPricesRepository {
                 migrateRegex,
                 "$1$2calculateCreditCost$3",
               );
+              updatedCount++;
             }
           }
 
@@ -1035,8 +1060,8 @@ export class ModelPricesRepository {
         if (result.changed) {
           roleFileContents[op.role] = result.content;
           updatedCount++;
-          logger.info(
-            `[Unbottled] ${op.action === "add" ? "Added" : "Removed"} provider entry for ${op.modelId}`,
+          logger.debug(
+            `[Unbottled] Proposed ${op.action} for provider entry ${op.modelId}`,
           );
         }
       }
@@ -1049,7 +1074,9 @@ export class ModelPricesRepository {
         if (result.changed) {
           roleFileContents[op.role] = result.content;
           updatedCount++;
-          logger.info(`[Unbottled] Updated provider entry for ${op.modelId}`);
+          logger.debug(
+            `[Unbottled] Proposed provider entry update for ${op.modelId}`,
+          );
         }
       }
 
@@ -1078,6 +1105,11 @@ export class ModelPricesRepository {
       // Apply modality updates (inputs/outputs from API architecture data)
       // For chat models: use fetched modality data from OpenRouter
       // Index modality updates by enumKey for dedup and cross-role lookup
+      const proposedChatDefinitions: Record<string, ModelDefinition> = {
+        ...chatModelDefinitions,
+      };
+      const chatEnumEntries = Object.entries(ChatModelId);
+      const chatIdByEnumKey = new Map(chatEnumEntries);
       const modalityByEnumKey = new Map<
         string,
         { inputs: Modality[]; outputs: Modality[]; source: string }
@@ -1112,6 +1144,16 @@ export class ModelPricesRepository {
           if (result.changed) {
             roleFileContents[role] = result.content;
             updatedCount++;
+            const chatId =
+              role === "chat" ? chatIdByEnumKey.get(enumKey) : undefined;
+            const chatDef = chatId && proposedChatDefinitions[chatId];
+            if (chatId && chatDef) {
+              proposedChatDefinitions[chatId] = {
+                ...chatDef,
+                inputs: modData.inputs,
+                outputs: modData.outputs,
+              };
+            }
           }
         }
       }
@@ -1334,6 +1376,12 @@ export class ModelPricesRepository {
                 `$1\n    enabled: false, // auto-disabled: ${disableReason}`,
               );
               updatedCount++;
+              if (role === "chat") {
+                proposedChatDefinitions[modelId] = {
+                  ...proposedChatDefinitions[modelId],
+                  enabled: false,
+                };
+              }
             }
           } else if (
             modelIdsWithPriceSuccess.has(modelId) &&
@@ -1349,97 +1397,91 @@ export class ModelPricesRepository {
                 "$1\n",
               );
               updatedCount++;
+              if (role === "chat") {
+                proposedChatDefinitions[modelId] = {
+                  ...proposedChatDefinitions[modelId],
+                  enabled: true,
+                };
+              }
             }
           }
         }
       }
 
-      // Write updated role files back to disk
-      for (const [role, path] of Object.entries(roleFilePaths)) {
-        const originalContent = readFileSync(path, "utf-8");
-        if (roleFileContents[role] !== originalContent) {
-          writeFileSync(path, roleFileContents[role], "utf-8");
+      const mediaTargets = [
+        { role: "image-gen", modality: "image" },
+        { role: "video-gen", modality: "video" },
+        { role: "music-gen", modality: "audio" },
+      ] satisfies { role: string; modality: Modality }[];
+      for (const { role, modality } of mediaTargets) {
+        const proposed = generateMediaGenInlineEnumContent(
+          roleFileContents[role],
+          modality,
+          proposedChatDefinitions,
+          chatEnumEntries,
+        );
+        if (proposed !== roleFileContents[role]) {
+          roleFileContents[role] = proposed;
+          updatedCount++;
         }
       }
 
-      // Re-generate vision model enums from the (possibly updated) chat model definitions.
-      // We use runtime imports because model files have just been written back to disk
-      // and the in-memory defs reflect the latest modality data.
+      const visionPath = "ai-stream/vision-models.generated.ts";
       try {
-        const { generateVisionEnumFileContent } =
-          await import("../../ai-stream/model-enums-generator/vision-enum-generator");
-        const { ChatModelId: ChatModelIdEnum } =
-          await import("../../ai-stream/models");
-        const content = generateVisionEnumFileContent(
-          chatModelDefinitions,
-          Object.entries(ChatModelIdEnum) as Array<[string, string]>,
+        originalContents.vision = readFileSync(
+          join(agentDir, visionPath),
+          "utf-8",
         );
-        const visionGenPath = join(
-          agentDir,
-          "ai-stream/vision-models.generated.ts",
+        roleFileContents.vision = generateVisionEnumFileContent(
+          proposedChatDefinitions,
+          chatEnumEntries,
         );
-        const existingVision = readFileSync(visionGenPath, "utf-8").toString();
-        if (content !== existingVision) {
-          writeFileSync(visionGenPath, content, "utf-8");
-          logger.info("Vision model enums regenerated");
+        if (roleFileContents.vision !== originalContents.vision) {
+          updatedCount++;
         }
+        roleFilePaths.vision = visionPath;
       } catch (visionErr) {
         logger.warn(
           `Vision enum generation failed: ${parseError(visionErr).message}`,
         );
       }
 
-      // Re-generate LLM-derived entries inline in ImageGenModelId / VideoGenModelId / MusicGenModelId
-      try {
-        const { updateMediaGenInlineEnum } =
-          await import("../../ai-stream/model-enums-generator/media-gen-enum-generator");
-        const { ChatModelId: ChatModelIdEnum } =
-          await import("../../ai-stream/models");
-        const chatEnumEntries = Object.entries(ChatModelIdEnum) as Array<
-          [string, string]
-        >;
+      const changedFiles = Object.entries(roleFilePaths).filter(
+        ([role]) => roleFileContents[role] !== originalContents[role],
+      );
+      const diff = changedFiles
+        .map(([role, path]) =>
+          createPatch(
+            `src/vibe/agent/${path}`,
+            originalContents[role],
+            roleFileContents[role],
+          ),
+        )
+        .join("\n");
 
-        updateMediaGenInlineEnum(
-          join(agentDir, "image-generation/models.ts"),
-          "image",
-          chatModelDefinitions,
-          chatEnumEntries,
-          logger,
-        );
-        updateMediaGenInlineEnum(
-          join(agentDir, "video-generation/models.ts"),
-          "video",
-          chatModelDefinitions,
-          chatEnumEntries,
-          logger,
-        );
-        updateMediaGenInlineEnum(
-          join(agentDir, "music-generation/models.ts"),
-          "audio",
-          chatModelDefinitions,
-          chatEnumEntries,
-          logger,
-        );
-      } catch (mediaGenErr) {
-        logger.warn(
-          `Media-gen enum generation failed: ${parseError(mediaGenErr).message}`,
-        );
+      if (writeSource) {
+        for (const [role, path] of changedFiles) {
+          writeFileSync(join(agentDir, path), roleFileContents[role], "utf-8");
+        }
       }
 
-      logger.info("Unified model pricing update completed", {
-        providers: fetchers.length,
-        totalUpdates: allUpdates.length,
-        written: updatedCount,
+      const fileUpdated = writeSource && changedFiles.length > 0;
+      logger.info("Model price comparison completed", {
+        providers: providerResults.length,
+        proposedChanges: updatedCount,
+        filesWithChanges: changedFiles.length,
+        filesWritten: fileUpdated ? changedFiles.length : 0,
         failures: allFailures.length,
       });
 
       return success({
         summary: {
-          totalProviders: fetchers.length,
+          totalProviders: providerResults.length,
           totalModels: allUpdates.length,
           modelsUpdated: updatedCount,
-          fileUpdated: updatedCount > 0,
+          fileUpdated,
         },
+        diff,
         providerResults: providerResults.map((r) => ({
           provider: r.provider,
           modelsFound: r.modelsFound,

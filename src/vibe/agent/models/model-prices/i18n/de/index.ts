@@ -6,16 +6,18 @@ export const translations: typeof enTranslations = {
     title: "Alle Modellpreise aktualisieren",
     titleShort: "Preise aktualisieren",
     description:
-      "Aktuelle Preise für alle Modelle von jeder Anbieter-API (OpenRouter, Replicate usw.) abrufen und models.ts aktualisieren",
+      "Ruft aktuelle Anbieterpreise ab und zeigt Änderungen am Modellkatalog. Mit --write in der lokalen CLI übernehmen.",
     form: {
       title: "Modellpreis-Updater",
+      write: "Änderungen in Quelldateien schreiben",
     },
     response: {
+      diff: "Quelldatei-Diff",
       summary: {
         title: "Aktualisierungsübersicht",
         totalProviders: "Ausgeführte Anbieter",
         totalModels: "Modelle gesamt",
-        modelsUpdated: "Aktualisierte Modelle",
+        modelsUpdated: "Vorgeschlagene Änderungen",
         fileUpdated: "Datei aktualisiert",
       },
       updates: {
@@ -89,7 +91,8 @@ export const translations: typeof enTranslations = {
     },
     success: {
       title: "Erfolg",
-      description: "Alle Modellpreise erfolgreich abgerufen und aktualisiert",
+      description:
+        "Anbieterpreise abgerufen und mit dem Modellkatalog verglichen.",
     },
   },
   tags: {
@@ -98,6 +101,6 @@ export const translations: typeof enTranslations = {
   updateAllModelPrices: {
     name: "Alle Modellpreise aktualisieren",
     description:
-      "Ruft aktuelle Preise für alle Modelle von jeder Anbieter-API ab und aktualisiert models.ts",
+      "Vergleicht aktuelle Anbieterpreise mit dem Modellkatalog und protokolliert die Änderungen zur Prüfung.",
   },
 };

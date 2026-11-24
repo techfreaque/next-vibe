@@ -5,16 +5,18 @@ export const translations = {
     title: "Update All Model Prices",
     titleShort: "Update Prices",
     description:
-      "Fetch live pricing for all models from every provider API (OpenRouter, Replicate, etc.) and update models.ts",
+      "Fetch live provider prices and show proposed catalog changes. Pass --write in the local CLI to apply them.",
     form: {
       title: "Model Price Updater",
+      write: "Write changes to source files",
     },
     response: {
+      diff: "Source diff",
       summary: {
         title: "Update Summary",
         totalProviders: "Providers Run",
         totalModels: "Total Models",
-        modelsUpdated: "Models Updated",
+        modelsUpdated: "Proposed changes",
         fileUpdated: "File Updated",
       },
       updates: {
@@ -89,7 +91,8 @@ export const translations = {
     },
     success: {
       title: "Success",
-      description: "Successfully fetched and updated all model prices",
+      description:
+        "Fetched provider prices and compared them with the catalog.",
     },
   },
   tags: {
@@ -97,7 +100,6 @@ export const translations = {
   },
   updateAllModelPrices: {
     name: "Update All Model Prices",
-    description:
-      "Fetches live pricing for all models from every provider API and updates models.ts",
+    description: "Reports a source diff from live provider pricing for review.",
   },
 };

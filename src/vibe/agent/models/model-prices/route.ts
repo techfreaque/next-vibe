@@ -11,6 +11,12 @@ import { ModelPricesRepository } from "./repository";
 export const { GET, tools } = endpointsHandler({
   endpoint: modelPricesEndpoints,
   [Methods.GET]: {
-    handler: ({ logger, t }) => ModelPricesRepository.fetchAndUpdate(logger, t),
+    handler: async ({ data, platform, logger, t }) =>
+      await ModelPricesRepository.fetchAndUpdate(
+        data.write,
+        platform,
+        logger,
+        t,
+      ),
   },
 });

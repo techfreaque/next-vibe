@@ -56,10 +56,22 @@ function spliceEnumEntries(source: string, entries: EnumEntry[]): string {
   return before + middle + after;
 }
 
-/**
- * Update the llm-generated section of a media-gen enum file.
- * Returns true if the file was modified.
- */
+/** Render the LLM-generated section of a media-gen enum in memory. */
+export function generateMediaGenInlineEnumContent(
+  source: string,
+  modality: Modality,
+  chatDefs: Record<string, ModelDefinition>,
+  chatEnumEntries: Array<[string, string]>,
+): string {
+  const entries = collectEntriesForModality(
+    modality,
+    chatDefs,
+    chatEnumEntries,
+  );
+  return spliceEnumEntries(source, entries);
+}
+
+/** Update the LLM-generated section on disk and return whether it changed. */
 export function updateMediaGenInlineEnum(
   filePath: string,
   modality: Modality,
@@ -67,13 +79,13 @@ export function updateMediaGenInlineEnum(
   chatEnumEntries: Array<[string, string]>,
   logger: { info: (msg: string) => void; warn: (msg: string) => void },
 ): boolean {
-  const entries = collectEntriesForModality(
+  const existing = readFileSync(filePath, "utf-8");
+  const updated = generateMediaGenInlineEnumContent(
+    existing,
     modality,
     chatDefs,
     chatEnumEntries,
   );
-  const existing = readFileSync(filePath, "utf-8");
-  const updated = spliceEnumEntries(existing, entries);
   if (updated === existing) {
     return false;
   }

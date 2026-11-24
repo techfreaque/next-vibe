@@ -1,12 +1,12 @@
 /**
  * Unified Model Prices Endpoint Definition
- * Fetches live pricing for ALL models from ALL providers and updates models.ts.
- * Replaces the separate media-prices and openrouter endpoints.
+ * Compares live provider pricing with the model catalog.
  */
 
 import { createEndpoint } from "next-vibe/core/definition/create-i18n";
 import {
   EndpointErrorTypes,
+  FieldDataType,
   LayoutType,
   Methods,
   WidgetType,
@@ -16,6 +16,7 @@ import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
 import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
 import {
   objectField,
+  requestField,
   responseArrayField,
   responseField,
 } from "next-vibe/unified-ui/_shared/utils-i18n";
@@ -49,8 +50,15 @@ const { GET } = createEndpoint({
 
   fields: customWidgetObject({
     render: ModelPricesWidget,
-    usage: { response: true } as const,
+    usage: { request: "data", response: true } as const,
     children: {
+      write: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "get.form.write",
+        schema: z.boolean().default(false),
+      }),
+
       summary: objectField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "get.response.summary.title" as const,
@@ -83,6 +91,12 @@ const { GET } = createEndpoint({
             schema: z.boolean(),
           }),
         },
+      }),
+
+      diff: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "get.response.diff",
+        schema: z.string(),
       }),
 
       providerResults: responseArrayField(scopedTranslation, {
@@ -255,6 +269,9 @@ const { GET } = createEndpoint({
   },
 
   examples: {
+    requests: {
+      default: { write: false },
+    },
     responses: {
       default: {
         summary: {
@@ -263,6 +280,7 @@ const { GET } = createEndpoint({
           modelsUpdated: 0,
           fileUpdated: false,
         },
+        diff: "",
         providerResults: [],
         updates: [],
         failures: [],

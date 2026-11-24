@@ -24,11 +24,11 @@ function renderCli(value: ModelPricesGetResponseOutput): string {
 
   // Header
   const { summary } = value;
-  lines.push(chalk.bold.cyan("═══ Model Price Update ═══"));
+  lines.push(chalk.bold.cyan("═══ Model Price Comparison ═══"));
   lines.push(
     `${chalk.dim("Providers:")} ${String(summary.totalProviders)}  ` +
-      `${chalk.dim("Updated:")} ${chalk.green(String(summary.modelsUpdated))}/${String(summary.totalModels)}  ` +
-      `${chalk.dim("File:")} ${summary.fileUpdated ? chalk.green("✓ written") : chalk.dim("no changes")}`,
+      `${chalk.dim("Proposed changes:")} ${chalk.green(String(summary.modelsUpdated))}  ` +
+      `${chalk.dim("Files:")} ${summary.fileUpdated ? chalk.green("written") : chalk.dim(value.diff ? "preview" : "no changes")}`,
   );
 
   // Provider summary (one line each)
@@ -59,6 +59,9 @@ function renderCli(value: ModelPricesGetResponseOutput): string {
     lines.push(chalk.green("✓ No failures - all models priced."));
   }
 
+  if (value.diff) {
+    lines.push("", value.diff);
+  }
   return lines.join("\n");
 }
 
@@ -67,7 +70,7 @@ function renderMcp(value: ModelPricesGetResponseOutput): string {
   const { summary } = value;
 
   lines.push(
-    `Updated ${String(summary.modelsUpdated)}/${String(summary.totalModels)} models across ${String(summary.totalProviders)} providers. File ${summary.fileUpdated ? "written" : "unchanged"}.`,
+    `${String(summary.modelsUpdated)} proposed changes across ${String(summary.totalProviders)} providers.`,
   );
 
   for (const r of value.providerResults) {
@@ -87,6 +90,9 @@ function renderMcp(value: ModelPricesGetResponseOutput): string {
     lines.push("\nNo failures.");
   }
 
+  if (value.diff) {
+    lines.push("", value.diff);
+  }
   return lines.join("\n");
 }
 
@@ -108,7 +114,7 @@ export function ModelPricesWidget({ field }: CliWidgetProps): JSX.Element {
 
   return (
     <Box flexDirection="column">
-      <Text wrap="truncate-end">{output}</Text>
+      <Text>{output}</Text>
     </Box>
   );
 }

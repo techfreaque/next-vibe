@@ -23907,12 +23907,13 @@ export const endpointsMeta: EndpointMeta[] = [
     title: "Aktualizuj wszystkie ceny modeli",
     titleShort: "Aktualizuj ceny",
     description:
-      "Pobierz aktualne ceny dla wszystkich modeli z każdego API dostawcy (OpenRouter, Replicate itp.) i zaktualizuj models.ts",
+      "Pobiera aktualne ceny dostawców i pokazuje proponowane zmiany w katalogu. Użyj --write w lokalnym CLI, aby je zapisać.",
     icon: "database",
     category: "ai",
     subCategory: "Inference",
     tags: ["Modele"],
     examples: {
+      inputs: { default: { write: false } },
       responses: {
         default: {
           summary: {
@@ -23921,6 +23922,7 @@ export const endpointsMeta: EndpointMeta[] = [
             modelsUpdated: 0,
             fileUpdated: false,
           },
+          diff: "",
           providerResults: [],
           updates: [],
           failures: [],

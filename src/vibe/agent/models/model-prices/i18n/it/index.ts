@@ -7,16 +7,18 @@ export const translations: typeof enTranslations = {
     title: "Aggiorna tutti i prezzi del modello",
     titleShort: "Aggiornare i prezzi",
     description:
-      "Ottieni prezzi in tempo reale per tutti i modelli da ogni fornitore API (OpenRouter, Replicate, ecc.) e aggiorna modelli.ts",
+      "Recupera i prezzi correnti dei fornitori e mostra le modifiche proposte. Usa --write nella CLI locale per applicarle.",
     form: {
       title: "Aggiornamento del prezzo del modello",
+      write: "Scrivi le modifiche nei file sorgente",
     },
     response: {
+      diff: "Diff dei file sorgente",
       summary: {
         title: "Aggiornamento sommario",
         totalProviders: "Correre i fornitori",
         totalModels: "Modelli totali",
-        modelsUpdated: "Modelli Aggiornati",
+        modelsUpdated: "Modifiche proposte",
         fileUpdated: "Aggiornamento del file",
       },
       updates: {
@@ -93,7 +95,7 @@ export const translations: typeof enTranslations = {
     success: {
       title: "Operazione riuscita",
       description:
-        "Con successo ottenuto e aggiornato tutti i prezzi dei modelli",
+        "Prezzi dei fornitori recuperati e confrontati con il catalogo.",
     },
   },
   tags: {
@@ -102,6 +104,6 @@ export const translations: typeof enTranslations = {
   updateAllModelPrices: {
     name: "Aggiorna tutti i prezzi dei modelli",
     description:
-      "Recupera i prezzi correnti di tutti i modelli dalle API dei fornitori e aggiorna models.ts.",
+      "Confronta i prezzi correnti dei fornitori con il catalogo e riporta le differenze da esaminare.",
   },
 };

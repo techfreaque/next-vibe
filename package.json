@@ -239,6 +239,7 @@
     "confbox": "0.1.8",
     "cron-parser": "5.10.3",
     "date-fns": "4.4.0",
+    "diff": "9.0.0",
     "dotenv": "18.0.9",
     "drizzle-kit": "0.31.11",
     "drizzle-orm": "0.45.4",

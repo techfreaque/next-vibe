@@ -1,7 +1,6 @@
 /**
  * Unified Model Prices Update Task
- * Fetches live prices from ALL provider APIs and updates models.ts.
- * Runs weekly - replaces the separate media-prices and openrouter tasks.
+ * Reports weekly pricing diffs from provider APIs.
  */
 
 import "server-only";
@@ -32,7 +31,7 @@ const modelPricesTask = createCronTask(definitions.GET, tools.GET, {
   priority: CronTaskPriority.LOW,
   timeout: TASK_TIMEOUTS.MEDIUM,
   historyInterval: HISTORY_INTERVALS.EVERY_RUN,
-  taskInput: undefined,
+  taskInput: { write: false },
   hidden: true,
 });
 
