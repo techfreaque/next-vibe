@@ -121773,7 +121773,7 @@
                 },
                 "type": "optional"
               },
-              "defaultValue": "Europe/Vienna"
+              "defaultValue": "UTC"
             },
             "type": "default"
           },
@@ -122165,7 +122165,7 @@
                 },
                 "type": "optional"
               },
-              "defaultValue": "Europe/Vienna"
+              "defaultValue": "UTC"
             },
             "type": "default"
           },
@@ -606698,435 +606698,47 @@
                 "hidden": true,
                 "schema": {
                   "def": {
-                    "type": "nullable",
-                    "innerType": {
+                    "type": "pipe",
+                    "in": {
                       "def": {
-                        "type": "enum",
-                        "entries": {
-                          "GPT_5_5": "gpt-55",
-                          "GPT_5_5_PRO": "gpt-55-pro",
-                          "GPT_5_4": "gpt-54",
-                          "GPT_5_4_PRO": "gpt-54-pro",
-                          "GPT_5_4_MINI": "gpt-5.4-mini",
-                          "GPT_5_4_NANO": "gpt-5.4-nano",
-                          "GPT_5_3_CODEX": "gpt-53-codex",
-                          "GPT_5_3_CHAT": "gpt-53-chat",
-                          "GPT_5_2": "gpt-52",
-                          "GPT_5_2_CHAT": "gpt-52-chat",
-                          "GPT_5_2_PRO": "gpt-52-pro",
-                          "GPT_5_1": "gpt-51",
-                          "GPT_5_1_CODEX": "gpt-51-codex",
-                          "GTP_5_PRO": "gpt-5-pro",
-                          "GPT_5_CODEX": "gpt-5-codex",
-                          "GPT_5": "gpt-5",
-                          "GPT_5_MINI": "gpt-5-mini",
-                          "GPT_5_NANO": "gpt-5-nano",
-                          "GEMINI_3_1_PRO_PREVIEW_CUSTOM_TOOLS": "gemini-3.1-pro-preview-customtools",
-                          "GEMINI_3_1_FLASH_LITE_PREVIEW": "gemini-3.1-flash-lite-preview",
-                          "GEMINI_3_5_FLASH": "gemini-3.5-flash",
-                          "GEMINI_3_FLASH": "gemini-3-flash",
-                          "GEMINI_2_5_PRO": "gemini-2.5-pro",
-                          "GEMINI_2_5_FLASH": "gemini-2.5-flash",
-                          "GEMINI_2_5_FLASH_LITE": "gemini-2.5-flash-lite",
-                          "GROK_4_FAST": "grok-4-fast",
-                          "GROK_4": "grok-4",
-                          "GROK_4_3": "grok-4.3",
-                          "GROK_4_20": "grok-4.20",
-                          "CLAUDE_HAIKU_4_5": "claude-haiku-4.5",
-                          "CLAUDE_SONNET_4_5": "claude-sonnet-4.5",
-                          "CLAUDE_SONNET_4_6": "claude-sonnet-4.6",
-                          "CLAUDE_OPUS_4_5": "claude-opus-4.5",
-                          "CLAUDE_OPUS_4_6": "claude-opus-4.6",
-                          "CLAUDE_OPUS_4_7": "claude-opus-4.7",
-                          "GLM_4_5V": "glm-4.5v",
-                          "KIMI_K2": "kimi-k2",
-                          "KIMI_K2_5": "kimi_k2_5",
-                          "KIMI_K2_THINKING": "kimi-k2-thinking",
-                          "DEEPSEEK_V32": "deepseek-v3.2",
-                          "DEEPSEEK_V31": "deepseek-v3.1",
-                          "DEEPSEEK_R1": "deepseek-r1",
-                          "QWEN3_235B_FREE": "qwen3_235b-free",
-                          "DEEPSEEK_R1_DISTILL": "deepseek-r1-distill",
-                          "QWEN_2_5_7B": "qwen-2-5-7b",
-                          "CLAUDE_CODE_HAIKU": "claude-code-haiku",
-                          "CLAUDE_CODE_SONNET": "claude-code-sonnet",
-                          "CLAUDE_CODE_OPUS": "claude-code-opus",
-                          "CLAUDE_CODE_FABLE": "claude-code-fable",
-                          "GPT_OSS_120B": "gpt-oss-120b-free",
-                          "FREEDOMGPT_LIBERTY": "freedomgpt-liberty",
-                          "GAB_AI_ARYA": "gab-ai-arya",
-                          "UNCENSORED_LM_V1_2": "uncensored-lm-v1.2",
-                          "GLM_5_1": "glm-5.1",
-                          "GLM_5": "glm-5",
-                          "GLM_5_TURBO": "glm-5-turbo",
-                          "GLM_4_7": "glm-4.7",
-                          "GLM_4_7_FLASH": "glm-4.7-flash",
-                          "GLM_4_6": "glm-4.6",
-                          "GLM_4_5_AIR": "glm-4.5-air",
-                          "VENICE_UNCENSORED": "venice-uncensored",
-                          "VENICE_UNCENSORED_ROLEPLAY": "venice-uncensored-roleplay",
-                          "GEMMA_4_UNCENSORED": "gemma-4-uncensored",
-                          "QWEN_3_6_PLUS_UNCENSORED": "qwen-3.6-plus-uncensored",
-                          "GLM_4_7_FLASH_HERETIC": "glm-4.7-flash-heretic",
-                          "MIMO_V2_6_FLASH_ABLITERATED": "mimo-v2.6-flash-abliterated",
-                          "GLM_5_3_UNCENSORED": "glm-5.3-uncensored",
-                          "GLM_5_3_FLASH_UNCENSORED": "glm-5.3-flash-uncensored",
-                          "MINIMAX_M2_7": "minimax-m2.7",
-                          "MIMO_V2_PRO": "mimo-v2-pro",
-                          "GEMINI_3_1_FLASH_IMAGE_PREVIEW": "gemini-3.1-flash-image-preview",
-                          "GEMINI_3_PRO_IMAGE_PREVIEW": "gemini-3-pro-image-preview",
-                          "GPT_5_IMAGE_MINI": "gpt-5-image-mini",
-                          "GPT_5_IMAGE": "gpt-5-image",
-                          "GPT_5_4_IMAGE_2": "gpt-5.4-image-2",
-                          "GEMINI_NANO_BANANA_2_1": "gemini-nano-banana-2.1",
-                          "KIMI_K2_6": "kimi-k2.6",
-                          "DEEPSEEK_V4_PRO": "deepseek-v4-pro",
-                          "DEEPSEEK_V4_FLASH": "deepseek-v4-flash",
-                          "CLAUDE_OPUS_4_8": "claude-opus-4.8",
-                          "CLAUDE_SONNET_5": "claude-sonnet-5",
-                          "CLAUDE_OPUS_5": "claude-opus-5",
-                          "CLAUDE_OPUS_5_FAST": "claude-opus-5-fast",
-                          "CLAUDE_FABLE_5": "claude-fable-5",
-                          "GROK_4_5": "grok-4.5",
-                          "GROK_4_6": "grok-4.6",
-                          "GPT_5_6_LUNA": "gpt-5.6-luna",
-                          "GPT_5_6_LUNA_PRO": "gpt-5.6-luna-pro",
-                          "GPT_5_6_TERRA": "gpt-5.6-terra",
-                          "GPT_5_6_TERRA_PRO": "gpt-5.6-terra-pro",
-                          "GPT_5_6_SOL": "gpt-5.6-sol",
-                          "GPT_5_6_SOL_PRO": "gpt-5.6-sol-pro",
-                          "GEMINI_3_6_FLASH": "gemini-3.6-flash",
-                          "GEMINI_3_5_FLASH_LITE": "gemini-3.5-flash-lite",
-                          "GEMINI_3_7_FLASH": "gemini-3.7-flash",
-                          "KIMI_K3": "kimi-k3",
-                          "GLM_5_2": "glm-5.2",
-                          "MINIMAX_M3": "minimax-m3",
-                          "QWEN_3_7_FLASH": "qwen-3.7-flash",
-                          "QWEN_3_8_MAX": "qwen-3.8-max",
-                          "MIMO_V2_5": "mimo-v2.5",
-                          "MIMO_V2_5_PRO": "mimo-v2.5-pro",
-                          "META_MUSE_SPARK_1_2": "meta-muse-spark-1.2",
-                          "MISTRAL_MEDIUM_3_5": "mistral-medium-3.5",
-                          "CLAUDE_OPUS_5_5": "claude-opus-5.5",
-                          "CLAUDE_SONNET_5_5": "claude-sonnet-5.5",
-                          "CLAUDE_HAIKU_5_5": "claude-haiku-5.5",
-                          "CLAUDE_FABLE_5_1": "claude-fable-5.1",
-                          "CLAUDE_FABLE_5_2": "claude-fable-5.2",
-                          "GPT_6_ASTRA": "gpt-6-astra",
-                          "GPT_6_1_SOL": "gpt-6.1-sol",
-                          "GPT_6_1_TERRA": "gpt-6.1-terra",
-                          "GPT_6_LUNA": "gpt-6-luna",
-                          "GEMINI_4_ARGON": "gemini-4-argon",
-                          "GEMINI_3_8_FLASH": "gemini-3.8-flash",
-                          "GROK_4_7": "grok-4.7",
-                          "KIMI_K3_1_PRO": "kimi-k3.1-pro",
-                          "DEEPSEEK_V4_1_FLASH": "deepseek-v4.1-flash",
-                          "QWEN_3_8_FLASH": "qwen-3.8-flash",
-                          "GLM_5_3": "glm-5.3",
-                          "GLM_5_3_FLASH": "glm-5.3-flash",
-                          "MIMO_V2_6_PRO": "mimo-v2.6-pro",
-                          "MIMO_V2_6_FLASH": "mimo-v2.6-flash",
-                          "META_MUSE_SPARK_1_3": "meta-muse-spark-1.3",
-                          "META_MUSE_WONDER": "meta-muse-wonder",
-                          "MISTRAL_LARGE_4": "mistral-large-4",
-                          "VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED": "venice-deepseek-v4.1-flash-uncensored",
-                          "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
-                          "GEMINI_4_CARBON": "gemini-4-carbon",
-                          "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
-                          "META_MUSE_EMBER": "meta-muse-ember",
-                          "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
-                          "GPT_6_2_SOL": "gpt-6.2-sol",
-                          "GPT_6_2_ASTRA": "gpt-6.2-astra",
-                          "SUPERGEMMA_4_26B": "supergemma4-26b-uncensored",
-                          "DEEPSEEK_V4_1_FLASH_CSF": "deepseek-v4.1-flash-1017-abliterated-csf",
-                          "QWEN_4_MAX": "qwen-4-max",
-                          "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
+                        "type": "nullable",
+                        "innerType": {
+                          "def": {
+                            "type": "string",
+                            "checks": [{}]
+                          },
+                          "type": "string"
                         }
                       },
-                      "type": "enum",
-                      "enum": {
-                        "GPT_5_5": "gpt-55",
-                        "GPT_5_5_PRO": "gpt-55-pro",
-                        "GPT_5_4": "gpt-54",
-                        "GPT_5_4_PRO": "gpt-54-pro",
-                        "GPT_5_4_MINI": "gpt-5.4-mini",
-                        "GPT_5_4_NANO": "gpt-5.4-nano",
-                        "GPT_5_3_CODEX": "gpt-53-codex",
-                        "GPT_5_3_CHAT": "gpt-53-chat",
-                        "GPT_5_2": "gpt-52",
-                        "GPT_5_2_CHAT": "gpt-52-chat",
-                        "GPT_5_2_PRO": "gpt-52-pro",
-                        "GPT_5_1": "gpt-51",
-                        "GPT_5_1_CODEX": "gpt-51-codex",
-                        "GTP_5_PRO": "gpt-5-pro",
-                        "GPT_5_CODEX": "gpt-5-codex",
-                        "GPT_5": "gpt-5",
-                        "GPT_5_MINI": "gpt-5-mini",
-                        "GPT_5_NANO": "gpt-5-nano",
-                        "GEMINI_3_1_PRO_PREVIEW_CUSTOM_TOOLS": "gemini-3.1-pro-preview-customtools",
-                        "GEMINI_3_1_FLASH_LITE_PREVIEW": "gemini-3.1-flash-lite-preview",
-                        "GEMINI_3_5_FLASH": "gemini-3.5-flash",
-                        "GEMINI_3_FLASH": "gemini-3-flash",
-                        "GEMINI_2_5_PRO": "gemini-2.5-pro",
-                        "GEMINI_2_5_FLASH": "gemini-2.5-flash",
-                        "GEMINI_2_5_FLASH_LITE": "gemini-2.5-flash-lite",
-                        "GROK_4_FAST": "grok-4-fast",
-                        "GROK_4": "grok-4",
-                        "GROK_4_3": "grok-4.3",
-                        "GROK_4_20": "grok-4.20",
-                        "CLAUDE_HAIKU_4_5": "claude-haiku-4.5",
-                        "CLAUDE_SONNET_4_5": "claude-sonnet-4.5",
-                        "CLAUDE_SONNET_4_6": "claude-sonnet-4.6",
-                        "CLAUDE_OPUS_4_5": "claude-opus-4.5",
-                        "CLAUDE_OPUS_4_6": "claude-opus-4.6",
-                        "CLAUDE_OPUS_4_7": "claude-opus-4.7",
-                        "GLM_4_5V": "glm-4.5v",
-                        "KIMI_K2": "kimi-k2",
-                        "KIMI_K2_5": "kimi_k2_5",
-                        "KIMI_K2_THINKING": "kimi-k2-thinking",
-                        "DEEPSEEK_V32": "deepseek-v3.2",
-                        "DEEPSEEK_V31": "deepseek-v3.1",
-                        "DEEPSEEK_R1": "deepseek-r1",
-                        "QWEN3_235B_FREE": "qwen3_235b-free",
-                        "DEEPSEEK_R1_DISTILL": "deepseek-r1-distill",
-                        "QWEN_2_5_7B": "qwen-2-5-7b",
-                        "CLAUDE_CODE_HAIKU": "claude-code-haiku",
-                        "CLAUDE_CODE_SONNET": "claude-code-sonnet",
-                        "CLAUDE_CODE_OPUS": "claude-code-opus",
-                        "CLAUDE_CODE_FABLE": "claude-code-fable",
-                        "GPT_OSS_120B": "gpt-oss-120b-free",
-                        "FREEDOMGPT_LIBERTY": "freedomgpt-liberty",
-                        "GAB_AI_ARYA": "gab-ai-arya",
-                        "UNCENSORED_LM_V1_2": "uncensored-lm-v1.2",
-                        "GLM_5_1": "glm-5.1",
-                        "GLM_5": "glm-5",
-                        "GLM_5_TURBO": "glm-5-turbo",
-                        "GLM_4_7": "glm-4.7",
-                        "GLM_4_7_FLASH": "glm-4.7-flash",
-                        "GLM_4_6": "glm-4.6",
-                        "GLM_4_5_AIR": "glm-4.5-air",
-                        "VENICE_UNCENSORED": "venice-uncensored",
-                        "VENICE_UNCENSORED_ROLEPLAY": "venice-uncensored-roleplay",
-                        "GEMMA_4_UNCENSORED": "gemma-4-uncensored",
-                        "QWEN_3_6_PLUS_UNCENSORED": "qwen-3.6-plus-uncensored",
-                        "GLM_4_7_FLASH_HERETIC": "glm-4.7-flash-heretic",
-                        "MIMO_V2_6_FLASH_ABLITERATED": "mimo-v2.6-flash-abliterated",
-                        "GLM_5_3_UNCENSORED": "glm-5.3-uncensored",
-                        "GLM_5_3_FLASH_UNCENSORED": "glm-5.3-flash-uncensored",
-                        "MINIMAX_M2_7": "minimax-m2.7",
-                        "MIMO_V2_PRO": "mimo-v2-pro",
-                        "GEMINI_3_1_FLASH_IMAGE_PREVIEW": "gemini-3.1-flash-image-preview",
-                        "GEMINI_3_PRO_IMAGE_PREVIEW": "gemini-3-pro-image-preview",
-                        "GPT_5_IMAGE_MINI": "gpt-5-image-mini",
-                        "GPT_5_IMAGE": "gpt-5-image",
-                        "GPT_5_4_IMAGE_2": "gpt-5.4-image-2",
-                        "GEMINI_NANO_BANANA_2_1": "gemini-nano-banana-2.1",
-                        "KIMI_K2_6": "kimi-k2.6",
-                        "DEEPSEEK_V4_PRO": "deepseek-v4-pro",
-                        "DEEPSEEK_V4_FLASH": "deepseek-v4-flash",
-                        "CLAUDE_OPUS_4_8": "claude-opus-4.8",
-                        "CLAUDE_SONNET_5": "claude-sonnet-5",
-                        "CLAUDE_OPUS_5": "claude-opus-5",
-                        "CLAUDE_OPUS_5_FAST": "claude-opus-5-fast",
-                        "CLAUDE_FABLE_5": "claude-fable-5",
-                        "GROK_4_5": "grok-4.5",
-                        "GROK_4_6": "grok-4.6",
-                        "GPT_5_6_LUNA": "gpt-5.6-luna",
-                        "GPT_5_6_LUNA_PRO": "gpt-5.6-luna-pro",
-                        "GPT_5_6_TERRA": "gpt-5.6-terra",
-                        "GPT_5_6_TERRA_PRO": "gpt-5.6-terra-pro",
-                        "GPT_5_6_SOL": "gpt-5.6-sol",
-                        "GPT_5_6_SOL_PRO": "gpt-5.6-sol-pro",
-                        "GEMINI_3_6_FLASH": "gemini-3.6-flash",
-                        "GEMINI_3_5_FLASH_LITE": "gemini-3.5-flash-lite",
-                        "GEMINI_3_7_FLASH": "gemini-3.7-flash",
-                        "KIMI_K3": "kimi-k3",
-                        "GLM_5_2": "glm-5.2",
-                        "MINIMAX_M3": "minimax-m3",
-                        "QWEN_3_7_FLASH": "qwen-3.7-flash",
-                        "QWEN_3_8_MAX": "qwen-3.8-max",
-                        "MIMO_V2_5": "mimo-v2.5",
-                        "MIMO_V2_5_PRO": "mimo-v2.5-pro",
-                        "META_MUSE_SPARK_1_2": "meta-muse-spark-1.2",
-                        "MISTRAL_MEDIUM_3_5": "mistral-medium-3.5",
-                        "CLAUDE_OPUS_5_5": "claude-opus-5.5",
-                        "CLAUDE_SONNET_5_5": "claude-sonnet-5.5",
-                        "CLAUDE_HAIKU_5_5": "claude-haiku-5.5",
-                        "CLAUDE_FABLE_5_1": "claude-fable-5.1",
-                        "CLAUDE_FABLE_5_2": "claude-fable-5.2",
-                        "GPT_6_ASTRA": "gpt-6-astra",
-                        "GPT_6_1_SOL": "gpt-6.1-sol",
-                        "GPT_6_1_TERRA": "gpt-6.1-terra",
-                        "GPT_6_LUNA": "gpt-6-luna",
-                        "GEMINI_4_ARGON": "gemini-4-argon",
-                        "GEMINI_3_8_FLASH": "gemini-3.8-flash",
-                        "GROK_4_7": "grok-4.7",
-                        "KIMI_K3_1_PRO": "kimi-k3.1-pro",
-                        "DEEPSEEK_V4_1_FLASH": "deepseek-v4.1-flash",
-                        "QWEN_3_8_FLASH": "qwen-3.8-flash",
-                        "GLM_5_3": "glm-5.3",
-                        "GLM_5_3_FLASH": "glm-5.3-flash",
-                        "MIMO_V2_6_PRO": "mimo-v2.6-pro",
-                        "MIMO_V2_6_FLASH": "mimo-v2.6-flash",
-                        "META_MUSE_SPARK_1_3": "meta-muse-spark-1.3",
-                        "META_MUSE_WONDER": "meta-muse-wonder",
-                        "MISTRAL_LARGE_4": "mistral-large-4",
-                        "VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED": "venice-deepseek-v4.1-flash-uncensored",
-                        "GEMINI_4_HYDROGEN": "gemini-4-hydrogen",
-                        "GEMINI_4_CARBON": "gemini-4-carbon",
-                        "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
-                        "META_MUSE_EMBER": "meta-muse-ember",
-                        "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
-                        "GPT_6_2_SOL": "gpt-6.2-sol",
-                        "GPT_6_2_ASTRA": "gpt-6.2-astra",
-                        "SUPERGEMMA_4_26B": "supergemma4-26b-uncensored",
-                        "DEEPSEEK_V4_1_FLASH_CSF": "deepseek-v4.1-flash-1017-abliterated-csf",
-                        "QWEN_4_MAX": "qwen-4-max",
-                        "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
+                      "type": "nullable"
+                    },
+                    "out": {
+                      "def": {
+                        "type": "transform"
                       },
-                      "options": [
-                        "gpt-55",
-                        "gpt-55-pro",
-                        "gpt-54",
-                        "gpt-54-pro",
-                        "gpt-5.4-mini",
-                        "gpt-5.4-nano",
-                        "gpt-53-codex",
-                        "gpt-53-chat",
-                        "gpt-52",
-                        "gpt-52-chat",
-                        "gpt-52-pro",
-                        "gpt-51",
-                        "gpt-51-codex",
-                        "gpt-5-pro",
-                        "gpt-5-codex",
-                        "gpt-5",
-                        "gpt-5-mini",
-                        "gpt-5-nano",
-                        "gemini-3.1-pro-preview-customtools",
-                        "gemini-3.1-flash-lite-preview",
-                        "gemini-3.5-flash",
-                        "gemini-3-flash",
-                        "gemini-2.5-pro",
-                        "gemini-2.5-flash",
-                        "gemini-2.5-flash-lite",
-                        "grok-4-fast",
-                        "grok-4",
-                        "grok-4.3",
-                        "grok-4.20",
-                        "claude-haiku-4.5",
-                        "claude-sonnet-4.5",
-                        "claude-sonnet-4.6",
-                        "claude-opus-4.5",
-                        "claude-opus-4.6",
-                        "claude-opus-4.7",
-                        "glm-4.5v",
-                        "kimi-k2",
-                        "kimi_k2_5",
-                        "kimi-k2-thinking",
-                        "deepseek-v3.2",
-                        "deepseek-v3.1",
-                        "deepseek-r1",
-                        "qwen3_235b-free",
-                        "deepseek-r1-distill",
-                        "qwen-2-5-7b",
-                        "claude-code-haiku",
-                        "claude-code-sonnet",
-                        "claude-code-opus",
-                        "claude-code-fable",
-                        "gpt-oss-120b-free",
-                        "freedomgpt-liberty",
-                        "gab-ai-arya",
-                        "uncensored-lm-v1.2",
-                        "glm-5.1",
-                        "glm-5",
-                        "glm-5-turbo",
-                        "glm-4.7",
-                        "glm-4.7-flash",
-                        "glm-4.6",
-                        "glm-4.5-air",
-                        "venice-uncensored",
-                        "venice-uncensored-roleplay",
-                        "gemma-4-uncensored",
-                        "qwen-3.6-plus-uncensored",
-                        "glm-4.7-flash-heretic",
-                        "mimo-v2.6-flash-abliterated",
-                        "glm-5.3-uncensored",
-                        "glm-5.3-flash-uncensored",
-                        "minimax-m2.7",
-                        "mimo-v2-pro",
-                        "gemini-3.1-flash-image-preview",
-                        "gemini-3-pro-image-preview",
-                        "gpt-5-image-mini",
-                        "gpt-5-image",
-                        "gpt-5.4-image-2",
-                        "gemini-nano-banana-2.1",
-                        "kimi-k2.6",
-                        "deepseek-v4-pro",
-                        "deepseek-v4-flash",
-                        "claude-opus-4.8",
-                        "claude-sonnet-5",
-                        "claude-opus-5",
-                        "claude-opus-5-fast",
-                        "claude-fable-5",
-                        "grok-4.5",
-                        "grok-4.6",
-                        "gpt-5.6-luna",
-                        "gpt-5.6-luna-pro",
-                        "gpt-5.6-terra",
-                        "gpt-5.6-terra-pro",
-                        "gpt-5.6-sol",
-                        "gpt-5.6-sol-pro",
-                        "gemini-3.6-flash",
-                        "gemini-3.5-flash-lite",
-                        "gemini-3.7-flash",
-                        "kimi-k3",
-                        "glm-5.2",
-                        "minimax-m3",
-                        "qwen-3.7-flash",
-                        "qwen-3.8-max",
-                        "mimo-v2.5",
-                        "mimo-v2.5-pro",
-                        "meta-muse-spark-1.2",
-                        "mistral-medium-3.5",
-                        "claude-opus-5.5",
-                        "claude-sonnet-5.5",
-                        "claude-haiku-5.5",
-                        "claude-fable-5.1",
-                        "claude-fable-5.2",
-                        "gpt-6-astra",
-                        "gpt-6.1-sol",
-                        "gpt-6.1-terra",
-                        "gpt-6-luna",
-                        "gemini-4-argon",
-                        "gemini-3.8-flash",
-                        "grok-4.7",
-                        "kimi-k3.1-pro",
-                        "deepseek-v4.1-flash",
-                        "qwen-3.8-flash",
-                        "glm-5.3",
-                        "glm-5.3-flash",
-                        "mimo-v2.6-pro",
-                        "mimo-v2.6-flash",
-                        "meta-muse-spark-1.3",
-                        "meta-muse-wonder",
-                        "mistral-large-4",
-                        "venice-deepseek-v4.1-flash-uncensored",
-                        "gemini-4-hydrogen",
-                        "gemini-4-carbon",
-                        "minimax-m3.1-flash",
-                        "meta-muse-ember",
-                        "drummer-artemis-31b",
-                        "gpt-6.2-sol",
-                        "gpt-6.2-astra",
-                        "supergemma4-26b-uncensored",
-                        "deepseek-v4.1-flash-1017-abliterated-csf",
-                        "qwen-4-max",
-                        "kimi-k3.1-pro-uncensored"
-                      ]
+                      "type": "transform"
                     }
                   },
-                  "type": "nullable"
+                  "type": "pipe",
+                  "in": {
+                    "def": {
+                      "type": "nullable",
+                      "innerType": {
+                        "def": {
+                          "type": "string",
+                          "checks": [{}]
+                        },
+                        "type": "string"
+                      }
+                    },
+                    "type": "nullable"
+                  },
+                  "out": {
+                    "def": {
+                      "type": "transform"
+                    },
+                    "type": "transform"
+                  }
                 },
                 "usage": {
                   "response": true
@@ -618438,6 +618050,174 @@
           "label": "Timeout in ms for Chrome MCP operations. Default: 120000.",
           "description": "Timeout in ms for Chrome MCP operations. Default: 120000.",
           "placeholder": "120000",
+          "columns": 12,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "FREE_CRAWLER_MODE": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "Skip anonymous crawler lead creation. off, shadow or enforce.",
+          "description": "Skip anonymous crawler lead creation. off, shadow or enforce.",
+          "placeholder": "off",
+          "columns": 12,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "FREE_CLUSTER_MODE": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "Share a spending allowance across matching leads. off, shadow or enforce.",
+          "description": "Share a spending allowance across matching leads. off, shadow or enforce.",
+          "placeholder": "off",
+          "columns": 12,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "FREE_MODEL_MODE": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "Require purchased credits for models outside the free list. off, shadow or enforce.",
+          "description": "Require purchased credits for models outside the free list. off, shadow or enforce.",
+          "placeholder": "off",
+          "columns": 12,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "FREE_CLUSTER_CREDITS": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "Free credits per cluster and window.",
+          "description": "Free credits per cluster and window.",
+          "placeholder": "20",
+          "columns": 12,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "FREE_CLUSTER_WINDOW_HOURS": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "Fixed spending windows in hours, aligned to the Unix epoch.",
+          "description": "Fixed spending windows in hours, aligned to the Unix epoch.",
+          "placeholder": "24",
+          "columns": 12,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "FREE_CLUSTER_RULES": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "Match IPv4 /24 or IPv6 /48, user-agent fingerprint, or both limits independently.",
+          "description": "Match IPv4 /24 or IPv6 /48, user-agent fingerprint, or both limits independently.",
+          "placeholder": "both",
+          "columns": 12,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "FREE_MODEL_ALLOWLIST": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "Comma-separated model registry IDs eligible for free credits.",
+          "description": "Comma-separated model registry IDs eligible for free credits.",
+          "placeholder": "glm-5.3-flash-uncensored,glm-5.3-flash",
           "columns": 12,
           "schema": {
             "def": {
@@ -632822,6 +632602,27 @@
           },
           "schemaType": "primitive"
         },
+        "revision": {
+          "type": "text",
+          "label": "Build-Commit",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string",
+                  "checks": [{}]
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
         "environment": {
           "type": "container",
           "title": "Umgebung",
@@ -642268,14 +642069,15 @@
                                   "shape": {
                                     "errorKey": {
                                       "def": {
-                                        "type": "string"
+                                        "type": "custom",
+                                        "check": "custom",
+                                        "abort": true
                                       },
-                                      "type": "string"
+                                      "type": "custom"
                                     },
                                     "errorCode": {
                                       "def": {
                                         "type": "number",
-                                        "coerce": true,
                                         "checks": []
                                       },
                                       "type": "number",
@@ -642532,14 +642334,15 @@
                                 "shape": {
                                   "errorKey": {
                                     "def": {
-                                      "type": "string"
+                                      "type": "custom",
+                                      "check": "custom",
+                                      "abort": true
                                     },
-                                    "type": "string"
+                                    "type": "custom"
                                   },
                                   "errorCode": {
                                     "def": {
                                       "type": "number",
-                                      "coerce": true,
                                       "checks": []
                                     },
                                     "type": "number",
@@ -643202,9 +643005,93 @@
               "type": "optional",
               "innerType": {
                 "def": {
-                  "type": "string"
+                  "type": "union",
+                  "options": [
+                    {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    },
+                    {
+                      "def": {
+                        "type": "pipe",
+                        "in": {
+                          "def": {
+                            "type": "number",
+                            "checks": []
+                          },
+                          "type": "number",
+                          "isFinite": true
+                        },
+                        "out": {
+                          "def": {
+                            "type": "transform"
+                          },
+                          "type": "transform"
+                        }
+                      },
+                      "type": "pipe",
+                      "in": {
+                        "def": {
+                          "type": "number",
+                          "checks": []
+                        },
+                        "type": "number",
+                        "isFinite": true
+                      },
+                      "out": {
+                        "def": {
+                          "type": "transform"
+                        },
+                        "type": "transform"
+                      }
+                    }
+                  ]
                 },
-                "type": "string"
+                "type": "union",
+                "options": [
+                  {
+                    "def": {
+                      "type": "string"
+                    },
+                    "type": "string"
+                  },
+                  {
+                    "def": {
+                      "type": "pipe",
+                      "in": {
+                        "def": {
+                          "type": "number",
+                          "checks": []
+                        },
+                        "type": "number",
+                        "isFinite": true
+                      },
+                      "out": {
+                        "def": {
+                          "type": "transform"
+                        },
+                        "type": "transform"
+                      }
+                    },
+                    "type": "pipe",
+                    "in": {
+                      "def": {
+                        "type": "number",
+                        "checks": []
+                      },
+                      "type": "number",
+                      "isFinite": true
+                    },
+                    "out": {
+                      "def": {
+                        "type": "transform"
+                      },
+                      "type": "transform"
+                    }
+                  }
+                ]
               }
             },
             "type": "optional"
@@ -643225,9 +643112,93 @@
               "type": "optional",
               "innerType": {
                 "def": {
-                  "type": "string"
+                  "type": "union",
+                  "options": [
+                    {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    },
+                    {
+                      "def": {
+                        "type": "pipe",
+                        "in": {
+                          "def": {
+                            "type": "number",
+                            "checks": []
+                          },
+                          "type": "number",
+                          "isFinite": true
+                        },
+                        "out": {
+                          "def": {
+                            "type": "transform"
+                          },
+                          "type": "transform"
+                        }
+                      },
+                      "type": "pipe",
+                      "in": {
+                        "def": {
+                          "type": "number",
+                          "checks": []
+                        },
+                        "type": "number",
+                        "isFinite": true
+                      },
+                      "out": {
+                        "def": {
+                          "type": "transform"
+                        },
+                        "type": "transform"
+                      }
+                    }
+                  ]
                 },
-                "type": "string"
+                "type": "union",
+                "options": [
+                  {
+                    "def": {
+                      "type": "string"
+                    },
+                    "type": "string"
+                  },
+                  {
+                    "def": {
+                      "type": "pipe",
+                      "in": {
+                        "def": {
+                          "type": "number",
+                          "checks": []
+                        },
+                        "type": "number",
+                        "isFinite": true
+                      },
+                      "out": {
+                        "def": {
+                          "type": "transform"
+                        },
+                        "type": "transform"
+                      }
+                    },
+                    "type": "pipe",
+                    "in": {
+                      "def": {
+                        "type": "number",
+                        "checks": []
+                      },
+                      "type": "number",
+                      "isFinite": true
+                    },
+                    "out": {
+                      "def": {
+                        "type": "transform"
+                      },
+                      "type": "transform"
+                    }
+                  }
+                ]
               }
             },
             "type": "optional"
@@ -647850,9 +647821,93 @@
               "type": "optional",
               "innerType": {
                 "def": {
-                  "type": "string"
+                  "type": "union",
+                  "options": [
+                    {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    },
+                    {
+                      "def": {
+                        "type": "pipe",
+                        "in": {
+                          "def": {
+                            "type": "number",
+                            "checks": []
+                          },
+                          "type": "number",
+                          "isFinite": true
+                        },
+                        "out": {
+                          "def": {
+                            "type": "transform"
+                          },
+                          "type": "transform"
+                        }
+                      },
+                      "type": "pipe",
+                      "in": {
+                        "def": {
+                          "type": "number",
+                          "checks": []
+                        },
+                        "type": "number",
+                        "isFinite": true
+                      },
+                      "out": {
+                        "def": {
+                          "type": "transform"
+                        },
+                        "type": "transform"
+                      }
+                    }
+                  ]
                 },
-                "type": "string"
+                "type": "union",
+                "options": [
+                  {
+                    "def": {
+                      "type": "string"
+                    },
+                    "type": "string"
+                  },
+                  {
+                    "def": {
+                      "type": "pipe",
+                      "in": {
+                        "def": {
+                          "type": "number",
+                          "checks": []
+                        },
+                        "type": "number",
+                        "isFinite": true
+                      },
+                      "out": {
+                        "def": {
+                          "type": "transform"
+                        },
+                        "type": "transform"
+                      }
+                    },
+                    "type": "pipe",
+                    "in": {
+                      "def": {
+                        "type": "number",
+                        "checks": []
+                      },
+                      "type": "number",
+                      "isFinite": true
+                    },
+                    "out": {
+                      "def": {
+                        "type": "transform"
+                      },
+                      "type": "transform"
+                    }
+                  }
+                ]
               }
             },
             "type": "optional"
@@ -647873,9 +647928,93 @@
               "type": "optional",
               "innerType": {
                 "def": {
-                  "type": "string"
+                  "type": "union",
+                  "options": [
+                    {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    },
+                    {
+                      "def": {
+                        "type": "pipe",
+                        "in": {
+                          "def": {
+                            "type": "number",
+                            "checks": []
+                          },
+                          "type": "number",
+                          "isFinite": true
+                        },
+                        "out": {
+                          "def": {
+                            "type": "transform"
+                          },
+                          "type": "transform"
+                        }
+                      },
+                      "type": "pipe",
+                      "in": {
+                        "def": {
+                          "type": "number",
+                          "checks": []
+                        },
+                        "type": "number",
+                        "isFinite": true
+                      },
+                      "out": {
+                        "def": {
+                          "type": "transform"
+                        },
+                        "type": "transform"
+                      }
+                    }
+                  ]
                 },
-                "type": "string"
+                "type": "union",
+                "options": [
+                  {
+                    "def": {
+                      "type": "string"
+                    },
+                    "type": "string"
+                  },
+                  {
+                    "def": {
+                      "type": "pipe",
+                      "in": {
+                        "def": {
+                          "type": "number",
+                          "checks": []
+                        },
+                        "type": "number",
+                        "isFinite": true
+                      },
+                      "out": {
+                        "def": {
+                          "type": "transform"
+                        },
+                        "type": "transform"
+                      }
+                    },
+                    "type": "pipe",
+                    "in": {
+                      "def": {
+                        "type": "number",
+                        "checks": []
+                      },
+                      "type": "number",
+                      "isFinite": true
+                    },
+                    "out": {
+                      "def": {
+                        "type": "transform"
+                      },
+                      "type": "transform"
+                    }
+                  }
+                ]
               }
             },
             "type": "optional"
@@ -656888,7 +657027,7 @@
   },
   {
     "toolName": "task-watchdog-sweep",
-    "title": "Task-Wächter Durchlauf",
+    "title": "Aufgabenüberwachung",
     "titleShort": "Wächter-Durchlauf",
     "description": "Findet hängende, kreisende und verwaiste Hintergrund-Tasks, stoppt sie mit protokolliertem Grund und eröffnet einen Vorfall. Läuft jede Minute.",
     "fields": {

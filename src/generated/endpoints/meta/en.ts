@@ -6569,6 +6569,7 @@ export const endpointsMeta: EndpointMeta[] = [
             { key: "sendFailed", value: 0 },
             { key: "bounced", value: 2 },
             { key: "expired", value: 11 },
+            { key: "reminded", value: 9 },
             { key: "confirmed", value: 38 },
           ],
           previousSignupSteps: [
@@ -6577,6 +6578,7 @@ export const endpointsMeta: EndpointMeta[] = [
             { key: "sendFailed", value: 0 },
             { key: "bounced", value: 2 },
             { key: "expired", value: 11 },
+            { key: "reminded", value: 9 },
             { key: "confirmed", value: 38 },
           ],
           signupTrackedSince: "2026-11-22",
@@ -6656,6 +6658,7 @@ export const endpointsMeta: EndpointMeta[] = [
             { key: "sendFailed", value: 0 },
             { key: "bounced", value: 2 },
             { key: "expired", value: 11 },
+            { key: "reminded", value: 9 },
             { key: "confirmed", value: 38 },
           ],
           previousSignupSteps: [
@@ -6664,6 +6667,7 @@ export const endpointsMeta: EndpointMeta[] = [
             { key: "sendFailed", value: 0 },
             { key: "bounced", value: 2 },
             { key: "expired", value: 11 },
+            { key: "reminded", value: 9 },
             { key: "confirmed", value: 38 },
           ],
           signupTrackedSince: "2026-11-22",

@@ -1,0 +1,32 @@
+name: Generated output
+
+on:
+  pull_request:
+  push:
+    branches: [dev, main]
+
+permissions:
+  contents: read
+
+jobs:
+  generated-output:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.14
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile --ignore-scripts
+
+      - name: Check generated output
+        run: |
+          bun src/vibe/platforms/cli/vibe-runtime.ts gen --force
+          changes="$(git status --porcelain=v1 --untracked-files=all -- src/generated/)"
+          if [[ -n "$changes" ]]; then
+            printf '%s\n' "$changes"
+            echo "::error::Generated output is stale. Run vibe gen --force and commit the changes under src/generated."
+            exit 1
+          fi

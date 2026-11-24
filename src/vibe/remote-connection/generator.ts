@@ -2,10 +2,10 @@
  * Remote Capabilities Generator Repository
  *
  * Generates per-locale, per-role static capability snapshot files.
- * Output: src/generated/remote-capabilities/{locale}/{role}.ts
+ * Output: src/generated/remote-capabilities/{locale}/{role}.json
  *
- * Also generates version.ts with the build version string (git SHA or package
- * version) - changes only on deploy, so remote sync can skip unchanged snapshots.
+ * Also generates version.ts with a digest of the snapshots so remote sync can
+ * skip unchanged snapshots across builds.
  *
  * These files are pure data - no TS imports of definition files - so they are
  * fast and safe to import in any context including the sync cron.
@@ -14,9 +14,7 @@
 import "server-only";
 
 // Generator output messages and error strings don't need internationalization
-import { execSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
 import { GENERATED_DIR, getApiDir } from "@/env/paths";
@@ -48,60 +46,7 @@ import type { RemoteToolCapability } from "./db";
 
 const OUTPUT_DIR = `${GENERATED_DIR}/remote-capabilities`;
 
-// ─── Build version ────────────────────────────────────────────────────────────
-
-/**
- * Compute build version: git SHA if available, else package version, else timestamp.
- * This changes only on deploy - used by remote sync to skip unchanged snapshots.
- *
- * Uses execSync("git rev-parse") instead of reading .git/ files directly —
- * subprocess calls are opaque to Turbopack's static file-glob analysis.
- */
-// ─── Repository ───────────────────────────────────────────────────────────────
-
 class RemoteCapabilitiesGenerator {
-  /**
-   * Compute build version: git SHA if available, else package version, else timestamp.
-   * This changes only on deploy - used by remote sync to skip unchanged snapshots.
-   *
-   * Uses execSync("git rev-parse") instead of reading .git/ files directly —
-   * subprocess calls are opaque to Turbopack's static file-glob analysis.
-   */
-  private static getBuildVersion(): string {
-    try {
-      // execSync is opaque to Turbopack - no file-glob warnings
-      const sha = execSync("git rev-parse --short=12 HEAD", {
-        encoding: "utf-8",
-        stdio: ["ignore", "pipe", "ignore"],
-      }).trim();
-      if (sha) {
-        return sha;
-      }
-    } catch {
-      // Not a git repo or git not installed - fall through
-    }
-
-    try {
-      const cwd = process.env["PWD"] ?? process.cwd();
-      const pkgPath = join(cwd, "package.json");
-      if (existsSync(pkgPath)) {
-        const pkg = JSON.parse(readFileSync(pkgPath, "utf8")) as {
-          version?: string;
-        };
-        if (pkg.version) {
-          return pkg.version;
-        }
-      }
-    } catch {
-      // Ignore
-    }
-
-    // Fallback: hash the current timestamp to something short and stable per build
-    return createHash("sha256")
-      .update(String(Date.now()))
-      .digest("hex")
-      .slice(0, 12);
-  }
   /** Locales we generate files for */
   private static readonly GENERATE_LOCALES: CountryLanguage[] = [
     "en-US",
@@ -178,10 +123,8 @@ class RemoteCapabilitiesGenerator {
 
     logger.debug(`Loaded ${loadedEndpoints.length} endpoint definitions`);
 
-    // ── 3. Build version string ─────────────────────────────────────────
-    const version = RemoteCapabilitiesGenerator.getBuildVersion();
-
-    // ── 4. Generate per-locale × per-role files ─────────────────────────
+    // ── 3. Generate per-locale × per-role files ──────────────────────────
+    const snapshotHash = createHash("sha256");
     let filesWritten = 0;
     let maxFilteredCount = 0;
 
@@ -204,14 +147,28 @@ class RemoteCapabilitiesGenerator {
           maxFilteredCount = roleEndpoints.length;
         }
 
-        const capabilities = RemoteCapabilitiesGenerator.serializeForLocaleRole(
-          roleEndpoints,
-          locale,
-        );
+        // Zod getters can read the local timezone while fields are serialized.
+        // Use UTC for snapshots and restore the process setting before any await.
+        const previousTimezone = process.env["TZ"];
+        let capabilities: RemoteToolCapability[];
+        process.env["TZ"] = "UTC";
+        try {
+          capabilities = RemoteCapabilitiesGenerator.serializeForLocaleRole(
+            roleEndpoints,
+            locale,
+          );
+        } finally {
+          if (previousTimezone === undefined) {
+            delete process.env["TZ"];
+          } else {
+            process.env["TZ"] = previousTimezone;
+          }
+        }
 
         const outputFile = join(localeDir, `${roleName}.json`);
         const content =
           RemoteCapabilitiesGenerator.renderCapabilitiesFile(capabilities);
+        snapshotHash.update(`${localeName}/${roleName}.json\0`).update(content);
         await writeGeneratedFile(outputFile, content, false);
         filesWritten++;
 
@@ -221,7 +178,8 @@ class RemoteCapabilitiesGenerator {
       }
     }
 
-    // ── 5. Write version.ts ─────────────────────────────────────────────
+    // ── 4. Write version.ts ─────────────────────────────────────────────
+    const version = snapshotHash.digest("hex").slice(0, 12);
     const versionFile = join(outputDir, "version.ts");
     await writeGeneratedFile(
       versionFile,
@@ -552,7 +510,7 @@ class RemoteCapabilitiesGenerator {
     return `${header}
 
 /**
- * Build version string for remote capability sync.
+ * Snapshot version for remote capability sync.
  * Local instances send this in every sync request so the cloud can skip
  * re-processing capability snapshots that haven't changed since last sync.
  */
@@ -565,7 +523,7 @@ export const generator: GeneratorDefinition = {
   key: "remote-capabilities",
   phase: "default",
   needs: {},
-  cacheKey: "endpoints",
+  cacheKey: "remote-capabilities",
   findInputs(live) {
     const translationFiles = findFilesRecursively(
       getApiDir(),
