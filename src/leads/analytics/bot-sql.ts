@@ -5,7 +5,8 @@ import "server-only";
  *
  * Every lead analytics report and the lead list filter classify the lead's
  * user agent with these SQL expressions, so a count in a report and the
- * drilled list always agree. Order matters: the first matching family wins.
+ * drilled list always agree. Browser impersonation also uses lead attribution.
+ * Order matters: the first matching family wins.
  *
  * Three classes, never two:
  * - bot: a known crawler, preview fetcher or automation client (BOT_FAMILIES),
@@ -113,8 +114,11 @@ export const BOT_FAMILY_PATTERNS: ReadonlyArray<{
   },
 ];
 
-/** Bot family key (BotFamily value) of a user agent expression. */
-export function botFamilySql(userAgent: AnyColumn | SQL): SQL<string> {
+/** Bot family key using the user agent and any corroborating automation evidence. */
+export function botFamilySql(
+  userAgent: AnyColumn | SQL,
+  browserAutomation: SQL,
+): SQL<string> {
   const cases = BOT_FAMILY_PATTERNS.map(
     ({ family, pattern }) =>
       sql`WHEN (${userAgent}) ~* ${pattern} THEN ${family}`,
@@ -122,6 +126,7 @@ export function botFamilySql(userAgent: AnyColumn | SQL): SQL<string> {
   return sql<string>`(CASE
     WHEN (${userAgent}) IS NULL OR btrim(${userAgent}) = '' THEN ${BotFamily.NO_UA}
     ${sql.join(cases, sql` `)}
+    WHEN ${browserAutomation} THEN ${BotFamily.AUTOMATION}
     ELSE ${BotFamily.HUMAN}
   END)`;
 }
@@ -130,7 +135,7 @@ export function botFamilySql(userAgent: AnyColumn | SQL): SQL<string> {
  * Device class of a lead, derived from the user agent with the same rules as
  * `parseLeadUserAgent` but with this file's bot families (known bots are BOT,
  * so the device split agrees with the bot split). The stored `device_type`
- * only counts when no user agent is recorded. `family` = botFamilySql(UA).
+ * only counts when no user agent is recorded.
  */
 export function leadDeviceSql(
   deviceType: SQL,

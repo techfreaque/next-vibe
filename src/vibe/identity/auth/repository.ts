@@ -1241,9 +1241,8 @@ export class AuthRepository {
     context: AuthContext,
     logger: EndpointLogger,
   ): Promise<InferUserType<TRoles>> {
-    // Only middleware can mark an anonymous document after a failed guest
-    // lookup or insert. Do not authenticate, revalidate a stale cookie, or
-    // create another lead when its page loaders resolve the public context.
+    // Middleware marks public documents that should render without a lead.
+    // Resolve the public context without guest identity lookup or creation.
     if (
       context.platform === Platform.NEXT_PAGE &&
       (await isDegradedPublicDocument())

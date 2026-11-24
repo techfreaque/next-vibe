@@ -6,7 +6,7 @@ export const DEGRADED_PUBLIC_DOCUMENT_HEADER = "x-vibe-leadless-document";
 
 const markedResponses = new WeakSet<Response>();
 
-/** Pages with a single, read-only loader. Token and account routes stay closed. */
+/** Public pages whose loaders can render without a visitor identity. */
 const publicPages = new Set([
   "docs/api",
   "models",
@@ -28,20 +28,27 @@ const publicPages = new Set([
   "story/uncensored-ai",
 ]);
 
-export function isPublicDocumentPath(path: string): boolean {
+export function isPublicDocumentPath(
+  path: string,
+  includeSkillPages = true,
+): boolean {
   const route = path.match(/^\/[a-z]{2}-[A-Z]+\/(.+?)\/?$/)?.[1] ?? "";
   return (
     publicPages.has(route) ||
     /^models\/[\w.-]+$/.test(route) ||
     /^models\/compare\/[\w.-]+\/[\w.-]+$/.test(route) ||
+    (includeSkillPages && /^skill\/[\w.-]+$/.test(route)) ||
     /^story\/(?:blog|compare)\/[\w-]+$/.test(route)
   );
 }
 
-export function canRenderWithoutLead(request: NextRequest): boolean {
+export function canRenderWithoutLead(
+  request: NextRequest,
+  { includeSkillPages = false } = {},
+): boolean {
   return (
     (request.method === "GET" || request.method === "HEAD") &&
-    isPublicDocumentPath(request.nextUrl.pathname) &&
+    isPublicDocumentPath(request.nextUrl.pathname, includeSkillPages) &&
     !request.headers.has("authorization") &&
     !request.headers.has("next-action") &&
     !request.cookies.has(AUTH_TOKEN_COOKIE_NAME) &&

@@ -11,6 +11,11 @@ import "server-only";
 import { type SQL, sql } from "drizzle-orm";
 import { utcSql } from "next-vibe/unified-ui/analytics/window-sql";
 
+import {
+  CHROME_131_CRAWLER_REFERRER_HOST,
+  CHROME_131_CRAWLER_REFERRER_PATH,
+  CHROME_131_CRAWLER_UA,
+} from "@/leads/growth/chrome-131-crawler";
 import { PaymentStatus } from "@/payment/enum";
 
 import {
@@ -42,6 +47,20 @@ import type { LeadDrillFilters, LeadSegmentFilters } from "./filters";
 import { LEAD_SEGMENT_TEXT_KEYS, pickSegmentFilters } from "./filters";
 
 type LeadDimensionValue = (typeof LeadDimension)[keyof typeof LeadDimension];
+
+// The Nov 20 crawl paired this exact browser string with a Google origin
+// referrer. Preserve older traffic and leads with observed account or chat activity.
+const chrome131Crawler = sql`(
+  ident.ua = ${CHROME_131_CRAWLER_UA}
+  AND l.created_at >= timestamp '2026-11-20'
+  AND l.metadata->>'anonymous' = 'true'
+  AND l.metadata->>'referer' = ${CHROME_131_CRAWLER_REFERRER_PATH}
+  AND j.first_referrer_host = ${CHROME_131_CRAWLER_REFERRER_HOST}
+  AND l.email IS NULL
+  AND l.converted_user_id IS NULL AND j.user_id IS NULL
+  AND l.signed_up_at IS NULL AND j.signed_up_at IS NULL
+  AND j.first_chat_at IS NULL AND lead_chat.first_at IS NULL
+)`;
 
 /**
  * `SELECT` of one row per lead with every derived dimension and funnel stamp.
@@ -75,9 +94,6 @@ export function leadFactsSql(leadCondition: SQL = sql`TRUE`): SQL {
     CROSS JOIN LATERAL (
       SELECT ${leadUserAgentSql("l")} AS ua, ${leadIpSql("l")} AS ip
     ) ident
-    CROSS JOIN LATERAL (
-      SELECT ${botFamilySql(sql`ident.ua`)} AS bot_family
-    ) fam
     LEFT JOIN growth_journeys j ON j.lead_id = l.id
     LEFT JOIN users u ON u.id = coalesce(j.user_id, l.converted_user_id)
     LEFT JOIN (
@@ -92,6 +108,9 @@ export function leadFactsSql(leadCondition: SQL = sql`TRUE`): SQL {
       SELECT user_id, min(created_at) AS first_at FROM payment_transactions
       WHERE status = ${PaymentStatus.SUCCEEDED} AND amount > 0 GROUP BY user_id
     ) pay ON pay.user_id = u.id
+    CROSS JOIN LATERAL (
+      SELECT ${botFamilySql(sql`ident.ua`, chrome131Crawler)} AS bot_family
+    ) fam
     WHERE ${leadCondition}
   `;
 }

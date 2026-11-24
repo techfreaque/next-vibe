@@ -4,6 +4,7 @@ import { NextRequest } from "next-vibe/ui/lib/request";
 
 import { AUTH_TOKEN_COOKIE_NAME, LEAD_ID_COOKIE_NAME } from "@/env/constants";
 import * as geo from "@/leads/geo/lookup";
+import { CHROME_131_CRAWLER_UA } from "@/leads/growth/chrome-131-crawler";
 import { proxy } from "@/proxy";
 
 import { defaultLocale } from "../../../core/i18n/core/config";
@@ -70,6 +71,7 @@ it("limits public fallback to anonymous read-only documents and keeps real DB er
       "timeout exceeded when trying to connect",
       200,
     ],
+    ["/en-US/skill/uncensored", "GET", "", "insert", "Query read timeout", 503],
     ["/en-US/docs/api", "GET", "", "insert", "constraint error", 500],
     [
       "/en-US/docs/api",
@@ -190,4 +192,46 @@ it("bounds a cold geo lookup before the insert starts", async () => {
   expect(response.status).toBe(200);
   expect(performance.now() - start).toBeLessThan(500);
   expect(create).not.toHaveBeenCalled();
+});
+
+it("serves Chrome 131 crawler documents before guest provisioning", async () => {
+  captureErrors();
+  const create = spyOn(leadOps, "createAnonymousLead").mockRejectedValue(
+    new Error("Lead provisioning attempted"),
+  );
+  const headers = {
+    "user-agent": CHROME_131_CRAWLER_UA,
+    accept: "text/html",
+    referer: "https://www.google.com/",
+  };
+  for (const path of [
+    "/fr-FR/models/example",
+    "/it-IT/models/compare/example/another",
+    "/pl-PL/skill/uncensored",
+    "/es-ES/story/blog/example",
+  ]) {
+    const incoming = new NextRequest(`https://example.test${path}`, { headers });
+    const response = await proxy(incoming);
+    expect(response.status).toBe(200);
+    expect(response.headers.has("set-cookie")).toBe(false);
+    expect(response.headers.get("Cache-Control")).toBe("private, no-store");
+    expect(forwardDegradedPublicDocument(new Headers(), response)).toBe(true);
+  }
+  expect(create).not.toHaveBeenCalled();
+
+  for (const [path, extraHeaders] of [
+    ["/en-US/models/example", { "sec-fetch-site": "cross-site" }],
+    ["/en-US/models/example", { "sec-ch-ua": '"Chromium";v="131"' }],
+    ["/en-US/models/example", { referer: "https://www.google.com/search" }],
+    ["/en-US/models/example", { referer: "https://google.com.example.test/" }],
+    ["/en-US/models/example", { cookie: `${AUTH_TOKEN_COOKIE_NAME}=session` }],
+    ["/en-US/models/example?ref=partner", {}],
+    ["/en-US/user/signup", {}],
+  ] as const) {
+    const incoming = new NextRequest(`https://example.test${path}`, {
+      headers: { ...headers, ...extraHeaders },
+    });
+    expect((await proxy(incoming)).status).toBe(500);
+  }
+  expect(create).toHaveBeenCalledTimes(7);
 });

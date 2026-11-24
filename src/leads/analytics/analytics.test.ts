@@ -8,6 +8,7 @@ import { AnalyticsRange } from "next-vibe/unified-ui/analytics/enum";
 import { resolveAnalyticsWindow } from "next-vibe/unified-ui/analytics/window";
 
 import { CreditTransactionType } from "@/credits/enum";
+import { CHROME_131_CRAWLER_UA } from "@/leads/growth/chrome-131-crawler";
 import { PaymentStatus } from "@/payment/enum";
 
 import {
@@ -476,4 +477,94 @@ test("funnel counts people once and tracked signup steps only", async () => {
   expect(wall("consentDeclined")).toBe(1);
   expect(result.data.wallTrackedSince).toBe("2026-10-03");
   expect(result.data.previousWallSteps).toBeNull();
+});
+
+test("acquisition, funnel and drill-down agree on the Chrome 131 crawler", async () => {
+  const at = "2026-11-23 12:00:00";
+  const rows = [
+    { n: 201, ua: null, host: "google.com", ref: "/" },
+    { n: 202, ua: CHROME_131_CRAWLER_UA, host: "google.com", ref: "/" },
+    { n: 203, ua: CHROME_131_CRAWLER_UA, host: null, ref: null },
+    { n: 204, ua: CHROME_131_CRAWLER_UA, host: "google.com", ref: "/search" },
+    { n: 205, ua: CHROME_131_CRAWLER_UA, host: "google.com", ref: "/" },
+    { n: 206, ua: CHROME_131_CRAWLER_UA, host: "google.com", ref: "/" },
+    {
+      n: 207,
+      ua: CHROME_131_CRAWLER_UA.replace("Win64; x64", "WOW64"),
+      host: "google.com",
+      ref: "/",
+    },
+  ];
+  for (const { n, ua, host, ref } of rows) {
+    const metadata = {
+      anonymous: true,
+      userAgent: n === 201 ? CHROME_131_CRAWLER_UA : "ignored metadata UA",
+      referer: ref,
+    };
+    await pg.query(
+      `INSERT INTO leads (id, created_at, country, business_name, user_agent, metadata)
+       VALUES ($1, $2, 'FR', '', $3, $4)`,
+      [id(n), at, ua, JSON.stringify(metadata)],
+    );
+    await pg.query(
+      `INSERT INTO growth_journeys (lead_id, first_referrer_host, first_touch_at)
+       VALUES ($1, $2, $3)`,
+      [id(n), host, at],
+    );
+    await pg.query(
+      "INSERT INTO growth_visits (lead_id, visited_at) VALUES ($1, $2)",
+      [id(n), at],
+    );
+  }
+  await pg.query(
+    "INSERT INTO chat_threads (lead_id, created_at) VALUES ($1, $2)",
+    [id(205), at],
+  );
+  await pg.query("INSERT INTO users VALUES ($1, $2, true)", [id(906), at]);
+  await pg.query("UPDATE leads SET converted_user_id = $1 WHERE id = $2", [
+    id(906),
+    id(206),
+  ]);
+
+  const params = {
+    range: AnalyticsRange.CUSTOM,
+    from: "2026-11-23",
+    to: "2026-11-23",
+  };
+  const { computeAcquisitionCore } = await import("./acquisition/repository");
+  const core = await computeAcquisitionCore(
+    resolveAnalyticsWindow(params, new Date("2026-11-23T12:00:00Z")),
+    {},
+  );
+  expect(core.kpis.humanVisits.value).toBe(5);
+  expect(core.kpis.botVisits.value).toBe(2);
+
+  const { db } = await import("next-vibe/database");
+  const { matchingLeadIdsSql } = await import("./segment-sql");
+  const bots = matchingLeadIdsSql({
+    createdFrom: params.from,
+    createdTo: params.to,
+    botFamily: BotFamily.AUTOMATION,
+  });
+  expect(
+    bots && (await db.execute(bots)).rows.map((row) => row.id).toSorted(),
+  ).toEqual([id(201), id(202)]);
+
+  const { FunnelReportRepository } = await import("./funnel/repository");
+  const { default: definition } = await import("./funnel/definition");
+  const { t } = definition.GET.scopedTranslation.scopedT(defaultLocale);
+  const logger = createEndpointLogger(false, defaultLocale);
+  const funnel = await FunnelReportRepository.getReport(
+    definition.GET.requestSchema.parse(params),
+    t,
+    logger,
+  );
+  expect(funnel.success && funnel.data.steps).toEqual([
+    { key: "leads", value: 7 },
+    { key: "humans", value: 5 },
+    { key: "firstChats", value: 1 },
+    { key: "signups", value: 1 },
+    { key: "emailConfirmed", value: 1 },
+    { key: "payers", value: 0 },
+  ]);
 });

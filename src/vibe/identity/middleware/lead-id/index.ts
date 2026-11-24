@@ -20,6 +20,7 @@ import {
   isAcquisitionVisit,
   isLikelyBot,
 } from "@/leads/growth/attribution";
+import { matchesChrome131CrawlerHeaders } from "@/leads/growth/chrome-131-crawler";
 
 import { coreEnv } from "../../../core/env";
 import type { CountryLanguage } from "../../../core/i18n/core/config";
@@ -188,6 +189,13 @@ async function withinGuestBudget<T>(
   }
 }
 
+function leadlessPublicDocument(): NextResponse {
+  const response = NextResponseClass.next();
+  response.headers.set("Cache-Control", "private, no-store");
+  markDegradedPublicDocument(response);
+  return response;
+}
+
 export function leadFailureResponse(
   request: NextRequest,
   logger: EndpointLogger,
@@ -224,10 +232,7 @@ export function leadFailureResponse(
     },
   );
   if (renderPublic) {
-    const response = NextResponseClass.next();
-    response.headers.set("Cache-Control", "private, no-store");
-    markDegradedPublicDocument(response);
-    return response;
+    return leadlessPublicDocument();
   }
   return new NextResponseClass(
     status === 503 ? "Service Unavailable" : "Internal Server Error",
@@ -271,6 +276,14 @@ export async function createLeadId(
   locale: CountryLanguage,
   deadlineMs = performance.now() + GUEST_LEAD_DB_BUDGET_MS,
 ): Promise<NextResponse> {
+  if (
+    matchesChrome131CrawlerHeaders(request.headers) &&
+    !request.nextUrl.search &&
+    canRenderWithoutLead(request, { includeSkillPages: true })
+  ) {
+    return leadlessPublicDocument();
+  }
+
   const logger = createEndpointLogger(false, locale);
 
   const anonymousRead =

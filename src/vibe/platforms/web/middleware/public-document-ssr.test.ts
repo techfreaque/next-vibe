@@ -1,4 +1,5 @@
 import { expect, it, mock, spyOn } from "bun:test";
+import { drizzle } from "drizzle-orm/node-postgres";
 import { ChatModelId } from "next-vibe/agent/ai-stream/models";
 import * as agentEnvironment from "next-vibe/agent/env";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
@@ -7,13 +8,19 @@ import { UserPermissionRole, UserRole } from "next-vibe/identity/roles/enum";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import { Platform } from "next-vibe/platforms/platforms";
 import * as navigationModule from "next-vibe/ui/hooks/use-navigation";
+import { NextRequest } from "next-vibe/ui/lib/request";
 import { renderToStaticMarkup } from "react-dom/server";
 
 import { toModelSlug } from "@/_pages/models/_shared/model-facts";
-import { LEAD_ID_COOKIE_NAME } from "@/env/constants";
+import { LEAD_ID_COOKIE_NAME, LOCALE_COOKIE_NAME } from "@/env/constants";
+import * as geo from "@/leads/geo/lookup";
+import { CHROME_131_CRAWLER_UA } from "@/leads/growth/chrome-131-crawler";
 import { NewsletterSubscriptionStatus } from "@/newsletter/enum";
 
-import { DEGRADED_PUBLIC_DOCUMENT_HEADER } from "./public-document";
+import {
+  DEGRADED_PUBLIC_DOCUMENT_HEADER,
+  forwardDegradedPublicDocument,
+} from "./public-document";
 
 const requestHeaders = new Headers();
 let requestPath = "/en-US/story";
@@ -44,11 +51,11 @@ mock.module("next-vibe/agent/env", () => ({
 }));
 
 const database = { ...databaseModule };
-const select = mock();
-const insert = mock();
+const logQuery = mock();
+const db = drizzle.mock({ logger: { logQuery } });
 mock.module("next-vibe/database", () => ({
   ...database,
-  db: { select, insert },
+  db,
 }));
 
 it("renders marked public documents without a lead or optional database reads", async () => {
@@ -65,6 +72,7 @@ it("renders marked public documents without a lead or optional database reads", 
   const { tanstackLoader: loadStory } = await import("@/_pages/story/page");
   const { tanstackLoader: loadModel, TanstackPage: renderModel } =
     await import("@/_pages/models/[modelId]/page");
+  const { loadSkillLandingPage } = await import("@/_pages/skill/[skillId]/loader");
   const locale = defaultLocale;
   const logger = createEndpointLogger(false, locale);
   const page = { platform: Platform.NEXT_PAGE, locale };
@@ -143,8 +151,16 @@ it("renders marked public documents without a lead or optional database reads", 
   );
   expect(markup).toContain(model.facts.name);
   expect(markup).toContain("<h1");
-  expect(select).not.toHaveBeenCalled();
-  expect(insert).not.toHaveBeenCalled();
+  requestPath = `/${locale}/skill/uncensored`;
+  const skill = await loadSkillLandingPage({
+    params: Promise.resolve({ locale, skillId: "uncensored" }),
+  });
+  expect(skill).toMatchObject({
+    skillId: "uncensored",
+    user: { isPublic: true, leadId: "" },
+    skillData: { name: expect.any(String) },
+  });
+  expect(logQuery).not.toHaveBeenCalled();
 
   // Other platforms and unmarked pages retain their existing guest identity.
   const existing = {
@@ -185,4 +201,79 @@ it("renders marked public documents without a lead or optional database reads", 
   });
   expect(getState).toHaveBeenCalledTimes(1);
   getState.mockRestore();
+});
+
+it("provisions a lead and resolves a guest session for browser navigation", async () => {
+  const { proxy } = await import("@/proxy");
+  const { GrowthJourneyRepository } =
+    await import("@/leads/growth/repository");
+  const { AuthRepository } = await import("next-vibe/identity/auth/repository");
+  const { LeadAuthRepository } =
+    await import("next-vibe/identity/lead/device-auth");
+  const leadOps = await import("next-vibe/identity/lead/middleware-ops");
+  const locale = "en-US";
+  const logger = createEndpointLogger(false, locale);
+  const createLead = spyOn(leadOps, "createAnonymousLead");
+  const validateLead = spyOn(
+    LeadAuthRepository,
+    "validateLeadId",
+  ).mockResolvedValue(true);
+  const lookup = spyOn(geo, "geoCountryForIp").mockResolvedValue(null);
+  const recordTouch = spyOn(
+    GrowthJourneyRepository,
+    "recordTouch",
+  ).mockResolvedValue(undefined);
+
+  try {
+    requestPath = `/${locale}/models`;
+    const browserHeaderSets: Record<string, string>[] = [
+      {
+        "sec-fetch-site": "cross-site",
+        "sec-fetch-dest": "document",
+        "sec-fetch-mode": "navigate",
+        "sec-fetch-user": "?1",
+      },
+      { cookie: `${LOCALE_COOKIE_NAME}=${locale}` },
+    ];
+    for (const browserHeaders of browserHeaderSets) {
+      const leadId = crypto.randomUUID();
+      createLead.mockResolvedValueOnce(leadId);
+      const request = new NextRequest(`https://example.test${requestPath}`, {
+        headers: {
+          "user-agent": CHROME_131_CRAWLER_UA,
+          accept: "text/html",
+          referer: "https://www.google.com/",
+          ...browserHeaders,
+        },
+      });
+      const response = await proxy(request);
+      expect(response.status).toBe(200);
+      expect(response.cookies.get(LEAD_ID_COOKIE_NAME)?.value).toBe(leadId);
+      expect(response.headers.get("x-middleware-request-cookie")).toContain(
+        `${LEAD_ID_COOKIE_NAME}=${leadId}`,
+      );
+      expect(forwardDegradedPublicDocument(requestHeaders, response)).toBe(
+        false,
+      );
+
+      readCookies.mockReturnValue(
+        new Map([[LEAD_ID_COOKIE_NAME, { value: leadId }]]),
+      );
+      const guest = await AuthRepository.getAuthMinimalUser(
+        [UserRole.PUBLIC],
+        { platform: Platform.NEXT_PAGE, locale, request },
+        logger,
+      );
+      expect(guest.isPublic).toBeTruthy();
+      expect(guest.leadId).toBe(leadId);
+      expect(guest.roles).toEqual([UserPermissionRole.PUBLIC]);
+      expect(validateLead).toHaveBeenLastCalledWith(leadId, logger);
+    }
+    expect(createLead).toHaveBeenCalledTimes(2);
+  } finally {
+    createLead.mockRestore();
+    validateLead.mockRestore();
+    lookup.mockRestore();
+    recordTouch.mockRestore();
+  }
 });
