@@ -621944,6 +621944,30 @@
           },
           "schemaType": "primitive"
         },
+        "VIBE_SETUP_STATE": {
+          "type": "form_field",
+          "fieldType": "select",
+          "label": "First-run setup progress, written by the /setup page: in-progress once the admin login is saved, complete when setup finishes. Unset means the instance was configured without it.",
+          "description": "First-run setup progress, written by the /setup page: in-progress once the admin login is saved, complete when setup finishes. Unset means the instance was configured without it.",
+          "placeholder": "",
+          "columns": 12,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
         "VIBE_SERVER_MODE": {
           "type": "form_field",
           "fieldType": "text",
