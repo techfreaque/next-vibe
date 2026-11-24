@@ -23,9 +23,7 @@ import { configScopedTranslation } from "@/env/i18n";
 import {
   buildPickerModels,
   type ModelFacts,
-  type ModelRef,
   type PickerModel,
-  suggestComparisons,
 } from "../_shared/model-facts";
 import { tierName } from "../_shared/model-format";
 import type { MediaModelFacts } from "../_shared/model-media-facts";
@@ -97,7 +95,6 @@ export interface ChatModelPageData {
   kind: "chat";
   locale: CountryLanguage;
   facts: ModelFacts;
-  comparisons: ModelRef[];
   pickerModels: PickerModel[];
   refusal: ModelStatsResponseOutput | null;
   seo: ModelSeoContent;
@@ -143,7 +140,6 @@ export async function tanstackLoader({
     kind: "chat",
     locale,
     facts,
-    comparisons: suggestComparisons(facts, availability),
     pickerModels: buildPickerModels(facts, availability),
     refusal: stats.success ? stats.data : null,
     ...buildChatModelPageSeo(facts, locale, availability),

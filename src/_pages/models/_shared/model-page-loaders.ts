@@ -30,6 +30,7 @@ import {
   getModelFacts,
   type ModelFacts,
   resolveSuccessor,
+  suggestComparisons,
 } from "./model-facts";
 import { mediaUnitText } from "./model-format";
 import { findMediaFacts, type MediaModelFacts } from "./model-media-facts";
@@ -39,13 +40,16 @@ import {
   chatModelFaq,
   chatModelLanding,
   chatModelMeta,
+  chatPlanPricing,
   findRelatedMediaModels,
   findRelatedModels,
   mediaBestForContent,
   mediaModelBlogSlugs,
   mediaModelFaq,
   mediaModelMeta,
+  mediaPlanPricing,
   type ModelLandingKey,
+  nearestRows,
 } from "./model-seo";
 import type { BlogLink, ModelSeoContent } from "./model-seo-sections";
 import {
@@ -160,11 +164,17 @@ export function buildChatModelPageSeo(
   availability: AgentEnvAvailability,
 ): ModelPageSeo {
   const related = findRelatedModels(facts, availability);
+  const nearest = suggestComparisons(facts, availability).flatMap((ref) => {
+    const other = getModelFacts(ref.id, availability);
+    return other === null ? [] : [other];
+  });
   return {
     seo: {
       bestFor: bestForContent(facts, locale),
+      plans: chatPlanPricing(facts, locale),
+      nearest: nearestRows(facts, nearest, locale),
       related,
-      faq: chatModelFaq(facts, locale, related),
+      faq: chatModelFaq(facts, locale, related, nearest),
       blog: [
         ...landingLink(chatModelLanding(facts), locale),
         ...blogLinks(chatModelBlogSlugs(facts), locale),
@@ -187,6 +197,8 @@ export function buildMediaModelPageSeo(
   return {
     seo: {
       bestFor: mediaBestForContent(facts, locale),
+      plans: mediaPlanPricing(facts, locale),
+      nearest: [],
       related: findRelatedMediaModels(facts, availability),
       faq: mediaModelFaq(facts, locale),
       blog: blogLinks(mediaModelBlogSlugs(facts), locale),
@@ -225,6 +237,8 @@ export function buildComparePageSeo(
     moreRight: moreComparisons(right, left, availability),
     seo: {
       bestFor: null,
+      plans: null,
+      nearest: [],
       related: [],
       faq: compareFaq(left, right, locale),
       blog: [

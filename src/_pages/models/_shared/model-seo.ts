@@ -17,10 +17,17 @@ import {
   IntelligenceLevel,
   type IntelligenceLevelValue,
 } from "next-vibe/agent/skills/enum";
+import { scopedTranslation as skillsScopedTranslation } from "next-vibe/agent/skills/i18n";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translation";
 
 import { configScopedTranslation } from "@/env/i18n";
+import {
+  FREE_CREDIT_ALLOWANCE,
+  FREE_CREDIT_SIGNED_IN_TOTAL,
+} from "@/products/constants";
+import { scopedTranslation as productsScopedTranslation } from "@/products/i18n";
+import { getSubscriptionTiers } from "@/products/repository-client";
 
 import type { FaqItem } from "../../_components/faq-structured-data";
 import type { BlogPostSlug } from "../../story/blog/posts-meta";
@@ -32,6 +39,8 @@ import {
   type ModelFacts,
 } from "./model-facts";
 import {
+  chatHref,
+  compareHref,
   formatMoney,
   formatNumber,
   isApiCallable,
@@ -60,6 +69,8 @@ const PRICEY_CREDITS = 10;
 const MAX_GOOD_ITEMS = 6;
 const MAX_SKIP_ITEMS = 3;
 const MAX_RELATED = 6;
+/** Comparison partners in the "vs the closest alternatives" table. */
+const MAX_NEAREST = 3;
 
 // ─── Titles ──────────────────────────────────────────────────────────────────
 
@@ -592,6 +603,161 @@ export function findRelatedMediaModels(
     }));
 }
 
+// ─── Price per plan ──────────────────────────────────────────────────────────
+
+export interface PlanRow {
+  plan: string;
+  /** Monthly price label, or the localized "free". */
+  price: string;
+  credits: string;
+  /** "about 120" / "under 1" uses of this model per month. */
+  uses: string;
+}
+
+/** How far each plan goes with one model, computed from the product config. */
+export interface PlanPricing {
+  intro: string;
+  usesLabel: string;
+  rows: PlanRow[];
+  footnote: string;
+  /** Chat with the model preselected; null where the page has its own CTA. */
+  cta: { href: string; label: string } | null;
+}
+
+/** Whole uses a monthly credit amount covers; a sub-one count reads "under 1". */
+function usesPerMonth(
+  credits: number,
+  perUse: number,
+  locale: CountryLanguage,
+): string {
+  const { t } = scopedTranslation.scopedT(locale);
+  const count = Math.floor(credits / perUse);
+  return count < 1
+    ? t("plans.underOne")
+    : t("plans.about", { count: formatNumber(count, locale) });
+}
+
+function planRows(perUse: number, locale: CountryLanguage): PlanRow[] {
+  const { t } = scopedTranslation.scopedT(locale);
+  const { t: productT } = productsScopedTranslation.scopedT(locale);
+  const free = t("plans.free");
+  const row = (plan: string, price: string, credits: number): PlanRow => ({
+    plan,
+    price,
+    credits: formatNumber(credits, locale),
+    uses: usesPerMonth(credits, perUse, locale),
+  });
+  return [
+    row(t("plans.guest"), free, FREE_CREDIT_ALLOWANCE.guest),
+    row(t("plans.account"), free, FREE_CREDIT_SIGNED_IN_TOTAL),
+    ...getSubscriptionTiers(locale).map((tier) => ({
+      plan: productT(tier.name),
+      price: tier.priceLabel,
+      credits: tier.creditsLabel,
+      uses: usesPerMonth(tier.credits, perUse, locale),
+    })),
+  ];
+}
+
+/** Null for free and legacy models: there is nothing to plan for. */
+export function chatPlanPricing(
+  facts: ModelFacts,
+  locale: CountryLanguage,
+): PlanPricing | null {
+  if (facts.isLegacy || facts.creditsPerMessage <= 0) {
+    return null;
+  }
+  const { t } = scopedTranslation.scopedT(locale);
+  return {
+    intro: t("plans.intro", {
+      model: facts.name,
+      credits: formatNumber(facts.creditsPerMessage, locale),
+      money: formatMoney(facts.creditsPerMessage, locale),
+    }),
+    usesLabel: t("plans.messages"),
+    rows: planRows(facts.creditsPerMessage, locale),
+    footnote: `${referenceTurnText(facts, locale, t)} ${t("plans.footnote")}`,
+    cta: {
+      href: chatHref(locale, facts),
+      label: t("model.chatCta", { model: facts.name }),
+    },
+  };
+}
+
+export function mediaPlanPricing(
+  facts: MediaModelFacts,
+  locale: CountryLanguage,
+): PlanPricing | null {
+  if (facts.isLegacy || facts.price === null || facts.price.credits <= 0) {
+    return null;
+  }
+  const { t } = scopedTranslation.scopedT(locale);
+  return {
+    intro: t("plans.mediaIntro", {
+      model: facts.name,
+      credits: formatNumber(facts.price.credits, locale),
+      money: formatMoney(facts.price.credits, locale),
+      unit: mediaUnitText(facts.price, t),
+    }),
+    usesLabel: t("plans.uses"),
+    rows: planRows(facts.price.credits, locale),
+    footnote: t("plans.mediaFootnote"),
+    cta: null,
+  };
+}
+
+// ─── Nearest models table ────────────────────────────────────────────────────
+
+export interface NearestRow {
+  slug: string;
+  name: string;
+  tier: string;
+  intelligence: string;
+  context: string;
+  price: string;
+  /** Head-to-head page; null on the row of the model the page is about. */
+  compare: { href: string; label: string } | null;
+}
+
+/** The page's model first, then its closest comparison partners. */
+export function nearestRows(
+  facts: ModelFacts,
+  nearest: readonly ModelFacts[],
+  locale: CountryLanguage,
+): NearestRow[] {
+  if (nearest.length === 0) {
+    return [];
+  }
+  const { t } = scopedTranslation.scopedT(locale);
+  const { t: skillsT } = skillsScopedTranslation.scopedT(locale);
+  const toRow = (model: ModelFacts, isSelf: boolean): NearestRow => ({
+    slug: model.slug,
+    name: model.name,
+    tier: tierName(model.content, locale),
+    intelligence: skillsT(model.intelligence),
+    context: formatTokenCount(model.contextWindow),
+    price:
+      model.creditsPerMessage > 0
+        ? t("related.perMessage", {
+            credits: formatNumber(model.creditsPerMessage, locale),
+          })
+        : t("facts.priceFree"),
+    compare: isSelf
+      ? null
+      : {
+          href: compareHref(locale, facts.id, model.id),
+          label: t("model.compareWith", {
+            model: facts.name,
+            other: model.name,
+          }),
+        },
+  });
+  return [
+    toRow(facts, true),
+    ...nearest.slice(0, MAX_NEAREST).map((model) => toRow(model, false)),
+  ];
+}
+
 // ─── FAQ ─────────────────────────────────────────────────────────────────────
 
 /** "Is <model> uncensored?" answer, shared by model and compare pages. */
@@ -628,16 +794,83 @@ export function apiAnswer(facts: ModelFacts, locale: CountryLanguage): string {
       });
 }
 
+/**
+ * "Is <model> free?": what the guest and free-account allowances buy, then
+ * the cheapest plan. Empty for free and legacy models.
+ */
+function freeFaqItem(facts: ModelFacts, locale: CountryLanguage): FaqItem[] {
+  const starter = getSubscriptionTiers(locale)[0];
+  if (facts.isLegacy || facts.creditsPerMessage <= 0 || starter === undefined) {
+    return [];
+  }
+  const { t } = scopedTranslation.scopedT(locale);
+  const perUse = facts.creditsPerMessage;
+  const guestMessages = Math.floor(FREE_CREDIT_ALLOWANCE.guest / perUse);
+  const accountMessages = Math.floor(FREE_CREDIT_SIGNED_IN_TOTAL / perUse);
+  const vars = {
+    model: facts.name,
+    credits: formatNumber(perUse, locale),
+    guest: formatNumber(FREE_CREDIT_ALLOWANCE.guest, locale),
+    guestMessages: formatNumber(guestMessages, locale),
+    account: formatNumber(FREE_CREDIT_SIGNED_IN_TOTAL, locale),
+    accountMessages: formatNumber(accountMessages, locale),
+    planPrice: starter.priceLabel,
+    planCredits: starter.creditsLabel,
+    planMessages: formatNumber(Math.floor(starter.credits / perUse), locale),
+  };
+  return [
+    {
+      question: t("faq.free.q", { model: facts.name }),
+      answer:
+        guestMessages >= 1
+          ? t("faq.free.a", vars)
+          : accountMessages >= 1
+            ? t("faq.free.aAccount", vars)
+            : t("faq.free.aPaid", vars),
+    },
+  ];
+}
+
+/** "<model> or <closest model>?": price, context and tier, from the registry. */
+function versusFaqItem(
+  facts: ModelFacts,
+  other: ModelFacts | undefined,
+  locale: CountryLanguage,
+): FaqItem[] {
+  if (other === undefined) {
+    return [];
+  }
+  const { t } = scopedTranslation.scopedT(locale);
+  return [
+    {
+      question: t("faq.versus.q", { model: facts.name, other: other.name }),
+      answer: t("faq.versus.a", {
+        model: facts.name,
+        other: other.name,
+        credits: formatNumber(facts.creditsPerMessage, locale),
+        otherCredits: formatNumber(other.creditsPerMessage, locale),
+        context: formatTokenCount(facts.contextWindow),
+        otherContext: formatTokenCount(other.contextWindow),
+        tier: tierName(facts.content, locale),
+        otherTier: tierName(other.content, locale),
+      }),
+    },
+  ];
+}
+
 /** Visible FAQ for a chat model page; the FAQPage JSON-LD uses the same items. */
 export function chatModelFaq(
   facts: ModelFacts,
   locale: CountryLanguage,
   related: readonly RelatedModel[] = [],
+  nearest: readonly ModelFacts[] = [],
 ): FaqItem[] {
   const { t } = scopedTranslation.scopedT(locale);
   const model = facts.name;
   const credits = formatNumber(facts.creditsPerMessage, locale);
   const money = formatMoney(facts.creditsPerMessage, locale);
+  const freeItem = freeFaqItem(facts, locale);
+  const versusItem = versusFaqItem(facts, nearest[0], locale);
 
   const priceAnswer =
     facts.creditsPerMessage <= 0
@@ -677,6 +910,7 @@ export function chatModelFaq(
       answer: uncensoredAnswer(facts, locale),
     },
     { question: t("faq.api.q", { model }), answer: apiAnswer(facts, locale) },
+    ...freeItem,
     {
       question: t("faq.context.q", { model }),
       answer: t("faq.context.a", {
@@ -715,6 +949,8 @@ export function chatModelFaq(
       }),
     });
   }
+
+  items.push(...versusItem);
 
   if (!facts.isLegacy) {
     items.push({

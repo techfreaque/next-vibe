@@ -273,6 +273,36 @@ export const translations: typeof enTranslations = {
     perMessage: "~{{credits}} Credits pro Nachricht",
     perUse: "{{credits}} Credits pro {{unit}}",
   },
+  plans: {
+    heading: "{{model}}: so weit reicht jeder Tarif",
+    intro:
+      "Eine Referenznachricht mit {{model}} kostet etwa {{credits}} Credits ({{money}}). So viel bringt jeder Tarif im Monat.",
+    mediaIntro:
+      "Mit {{model}} kostet eine Nutzung ({{unit}}) {{credits}} Credits ({{money}}). So oft reicht jeder Tarif im Monat.",
+    messages: "Nachrichten pro Monat",
+    uses: "Nutzungen pro Monat",
+    colPlan: "Tarif",
+    colPrice: "Preis pro Monat",
+    colCredits: "Credits pro Monat",
+    guest: "Gast, ohne Anmeldung",
+    account: "Kostenloses Konto",
+    free: "Kostenlos",
+    about: "ca. {{count}}",
+    underOne: "unter 1",
+    footnote:
+      "Lange Prompts, Dateien und Tool-Aufrufe kosten pro Nachricht mehr. Dieselben Credits gelten für jedes Modell.",
+    mediaFootnote:
+      "Länge, Größe oder Qualität ändern den Preis pro Nutzung. Dieselben Credits gelten für jedes Modell.",
+  },
+  nearest: {
+    heading: "{{model}} gegen die nächsten Alternativen",
+    intro:
+      "Preis, Kontext und Inhaltsstufe nebeneinander. Der Direktvergleich zeigt jedes Detail.",
+    colModel: "Modell",
+    colPrice: "Preis pro Nachricht",
+    colCompare: "Direktvergleich",
+    thisModel: "Diese Seite",
+  },
   faq: {
     heading: "{{model}}: Fragen und Antworten",
     price: {
@@ -321,6 +351,18 @@ export const translations: typeof enTranslations = {
     cheaper: {
       q: "Gibt es eine günstigere Alternative zu {{model}}?",
       a: "{{other}}: gleiche Stufe, gleiche oder höhere Intelligenzstufe und rund {{otherCredits}} statt {{credits}} Credits pro Beispielnachricht.",
+    },
+    free: {
+      q: "Ist {{model}} kostenlos nutzbar?",
+      a: "Zum Testen ja. Gäste bekommen ohne Anmeldung {{guest}} Credits im Monat, genug für etwa {{guestMessages}} Nachrichten mit {{model}}. Ein kostenloses Konto hält {{account}} Credits, etwa {{accountMessages}} Nachrichten. Tarife starten bei {{planPrice}} im Monat für {{planCredits}} Credits, etwa {{planMessages}} Nachrichten.",
+      aAccount:
+        "Eine Referenznachricht kostet {{credits}} Credits, mehr als die {{guest}} Gast-Credits. Ein kostenloses Konto hält {{account}} Credits im Monat, etwa {{accountMessages}} Nachrichten mit {{model}}. Tarife starten bei {{planPrice}} im Monat für {{planCredits}} Credits, etwa {{planMessages}} Nachrichten.",
+      aPaid:
+        "Mit dem Gratiskontingent nicht. Eine Referenznachricht kostet {{credits}} Credits, mehr als die {{account}} Gratis-Credits im Monat. Tarife starten bei {{planPrice}} im Monat für {{planCredits}} Credits, etwa {{planMessages}} Nachrichten mit {{model}}.",
+    },
+    versus: {
+      q: "{{model}} oder {{other}}: welches Modell passt?",
+      a: "{{model}} kostet etwa {{credits}} Credits pro Referenznachricht, hat ein Kontextfenster von {{context}} Token und gehört zur Stufe {{tier}}. {{other}} kostet etwa {{otherCredits}} Credits, fasst {{otherContext}} Token Kontext und gehört zur Stufe {{otherTier}}. Beide laufen im selben Chat. Wechsle mitten im Gespräch und urteile selbst.",
     },
     try: {
       q: "Wie teste ich {{model}}?",
@@ -424,8 +466,6 @@ export const translations: typeof enTranslations = {
     legacyBanner:
       "{{model}} ist ein älteres Modell. Öffne {{successor}} für einen neuen Chat.",
     legacyCta: "Zu {{successor}}",
-    compareHeading: "{{model}} im Vergleich",
-    compareIntro: "Dieselben Fakten, direkt nebeneinander.",
     compareWith: "{{model}} vs. {{other}}",
     ctaTitle: "{{model}} jetzt testen.",
     ctaSubtitle:

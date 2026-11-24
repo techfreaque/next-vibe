@@ -8,7 +8,12 @@ import {
 import { ContentLevel } from "next-vibe/agent/skills/enum";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 
+import {
+  FREE_CREDIT_ALLOWANCE,
+  FREE_CREDIT_SIGNED_IN_TOTAL,
+} from "@/products/constants";
 import { getCreditUnitPrice } from "@/products/credit-money";
+import { getSubscriptionTiers } from "@/products/repository-client";
 
 import { buildFaqStructuredData } from "../../_components/faq-structured-data";
 import {
@@ -30,12 +35,15 @@ import {
   chatModelFaq,
   chatModelLanding,
   chatModelMeta,
+  chatPlanPricing,
   findRelatedMediaModels,
   findRelatedModels,
   HAND_PICKED_MODEL_IDS,
   mediaBestForContent,
   mediaModelFaq,
   mediaModelMeta,
+  mediaPlanPricing,
+  nearestRows,
 } from "./model-seo";
 import {
   buildChatModelStructuredData,
@@ -338,6 +346,39 @@ describe("FAQ", () => {
     }
   });
 
+  test("free and versus answers render in every locale", () => {
+    for (const locale of LOCALES) {
+      for (const facts of listModelFacts(ALL)) {
+        const nearest = suggestComparisons(facts, ALL).flatMap((ref) => {
+          const other = getModelFacts(ref.id, ALL);
+          return other === null ? [] : [other];
+        });
+        const faq = chatModelFaq(
+          facts,
+          locale,
+          findRelatedModels(facts, ALL),
+          nearest,
+        );
+        const free = facts.isLegacy || facts.creditsPerMessage <= 0 ? 0 : 1;
+        const versus = nearest.length > 0 ? 1 : 0;
+        expect(faq.length).toBe(
+          chatModelFaq(facts, locale, findRelatedModels(facts, ALL)).length +
+            versus,
+        );
+        if (locale === "en-US") {
+          expect(
+            faq.some(
+              (item) => item.question === `Is ${facts.name} free to use?`,
+            ),
+          ).toBe(free === 1);
+        }
+        for (const item of faq) {
+          expect(`${item.question} ${item.answer}`).not.toMatch(/\{\{|—/);
+        }
+      }
+    }
+  });
+
   test("FAQPage JSON-LD carries the visible text verbatim", () => {
     const faq = chatModelFaq(factsOf(ChatModelId.CLAUDE_SONNET_5_5), "de-DE");
     const parsed = JSON.parse(JSON.stringify(buildFaqStructuredData(faq)));
@@ -394,5 +435,76 @@ describe("structured data", () => {
     expect(service.offers.price).toBeCloseTo(facts.price.credits * amount, 6);
     expect(service.offers.priceCurrency).toBe(currency);
     expect(JSON.stringify(withoutPrice)).not.toContain('"offers"');
+  });
+});
+
+describe("price per plan", () => {
+  test("one row per free allowance and plan, uses from the config", () => {
+    const facts = factsOf(ChatModelId.CLAUDE_SONNET_5_5);
+    const plans = chatPlanPricing(facts, "en-US");
+    expect(plans).not.toBeNull();
+    if (plans === null) {
+      return;
+    }
+    const tiers = getSubscriptionTiers("en-US");
+    expect(plans.rows.length).toBe(2 + tiers.length);
+    const perMessage = facts.creditsPerMessage;
+    const expected = [
+      FREE_CREDIT_ALLOWANCE.guest,
+      FREE_CREDIT_SIGNED_IN_TOTAL,
+      ...tiers.map((tier) => tier.credits),
+    ].map((credits) => Math.floor(credits / perMessage));
+    plans.rows.forEach((row, index) => {
+      const count = expected[index] ?? 0;
+      expect(row.uses).toBe(
+        count < 1
+          ? "under 1"
+          : `about ${new Intl.NumberFormat("en").format(count)}`,
+      );
+    });
+    expect(plans.rows.slice(2).map((row) => row.price)).toEqual(
+      tiers.map((tier) => tier.priceLabel),
+    );
+    expect(plans.cta?.href).toBe(chatHref("en-US", facts));
+  });
+
+  test("no table for legacy or free models; every locale fills its text", () => {
+    for (const locale of LOCALES) {
+      for (const facts of listModelFacts(ALL)) {
+        const plans = chatPlanPricing(facts, locale);
+        expect(plans === null).toBe(
+          facts.isLegacy || facts.creditsPerMessage <= 0,
+        );
+        const text = plans === null ? "" : JSON.stringify(plans);
+        expect(text).not.toMatch(/\{\{|—/);
+      }
+      for (const facts of listMediaFacts(ALL)) {
+        const plans = mediaPlanPricing(facts, locale);
+        expect(JSON.stringify(plans)).not.toMatch(/\{\{|—/);
+      }
+    }
+  });
+});
+
+describe("nearest models table", () => {
+  test("the page's model first, at most three partners, canonical links", () => {
+    for (const facts of listModelFacts(ALL)) {
+      const nearest = suggestComparisons(facts, ALL).flatMap((ref) => {
+        const other = getModelFacts(ref.id, ALL);
+        return other === null ? [] : [other];
+      });
+      const rows = nearestRows(facts, nearest, "de-DE");
+      if (nearest.length === 0) {
+        expect(rows).toEqual([]);
+        continue;
+      }
+      expect(rows[0]?.slug).toBe(facts.slug);
+      expect(rows[0]?.compare).toBeNull();
+      expect(rows.length).toBeLessThanOrEqual(4);
+      for (const row of rows.slice(1)) {
+        expect(row.compare?.href).toMatch(/^\/de-DE\/models\/compare\//);
+        expect(row.slug).not.toBe(facts.slug);
+      }
+    }
   });
 });

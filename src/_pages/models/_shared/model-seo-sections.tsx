@@ -1,6 +1,7 @@
 /**
  * Server-rendered content sections for the public model pages: best for,
- * similar models, FAQ (with its FAQPage JSON-LD) and related blog posts.
+ * price per plan, nearest models, similar models, FAQ (with its FAQPage
+ * JSON-LD) and related blog posts.
  * Plain markup, no state or effects, so it adds no client logic; all text is
  * computed in the page loader (model-seo.ts) and passed in as data.
  */
@@ -14,6 +15,14 @@ import { JsonLd } from "next-vibe/ui/components/json-ld";
 import { Li } from "next-vibe/ui/components/li";
 import { Link } from "next-vibe/ui/components/link";
 import { Span } from "next-vibe/ui/components/span";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "next-vibe/ui/components/table";
 import { H3, P } from "next-vibe/ui/components/typography";
 import { Ul } from "next-vibe/ui/components/ul";
 import type { JSX } from "react";
@@ -23,10 +32,15 @@ import {
   type FaqItem,
 } from "@/_pages/_components/faq-structured-data";
 
-import { PageSection } from "../../story/_shared/marketing";
+import { Cta, PageSection } from "../../story/_shared/marketing";
 import { scopedTranslation } from "../i18n";
 import { formatNumber, mediaUnitText, modelHref } from "./model-format";
-import type { BestForContent, RelatedModel } from "./model-seo";
+import type {
+  BestForContent,
+  NearestRow,
+  PlanPricing,
+  RelatedModel,
+} from "./model-seo";
 
 export interface BlogLink {
   /** Locale-less path, e.g. "/story/blog/<slug>". */
@@ -38,6 +52,10 @@ export interface BlogLink {
 /** Everything the sections render, computed server-side in the page loader. */
 export interface ModelSeoContent {
   bestFor: BestForContent | null;
+  /** Uses per month on every plan; null for free, legacy and unpriced models. */
+  plans: PlanPricing | null;
+  /** The model plus its closest comparison partners; empty when none. */
+  nearest: NearestRow[];
   related: RelatedModel[];
   faq: FaqItem[];
   blog: BlogLink[];
@@ -96,6 +114,172 @@ function BestForSection({
               </Ul>
             </Div>
           )}
+        </Div>
+      </Div>
+    </PageSection>
+  );
+}
+
+const HEAD_CLASS = "text-xs font-semibold uppercase tracking-wide";
+const LINK_CLASS =
+  "font-medium text-primary underline-offset-4 hover:underline";
+
+function PlansSection({
+  model,
+  plans,
+  t,
+}: {
+  model: string;
+  plans: PlanPricing;
+  t: ModelsT;
+}): JSX.Element {
+  return (
+    <PageSection
+      title={t("plans.heading", { model })}
+      intro={plans.intro}
+      tone="muted"
+      narrow
+    >
+      <Div
+        data-testid="model-plans"
+        className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0"
+      >
+        <Div className="overflow-hidden rounded-xl border border-border bg-card">
+          <Table className="min-w-[32rem]">
+            <TableHeader>
+              <TableRow className="bg-muted/50 hover:bg-muted/50">
+                <TableHead className={HEAD_CLASS}>
+                  {t("plans.colPlan")}
+                </TableHead>
+                <TableHead className={HEAD_CLASS}>
+                  {t("plans.colPrice")}
+                </TableHead>
+                <TableHead className={HEAD_CLASS}>
+                  {t("plans.colCredits")}
+                </TableHead>
+                <TableHead className={HEAD_CLASS}>{plans.usesLabel}</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {plans.rows.map((row) => (
+                <TableRow key={row.plan}>
+                  <TableCell className="font-medium text-foreground">
+                    {row.plan}
+                  </TableCell>
+                  <TableCell className="tabular-nums text-muted-foreground">
+                    {row.price}
+                  </TableCell>
+                  <TableCell className="tabular-nums text-muted-foreground">
+                    {row.credits}
+                  </TableCell>
+                  <TableCell className="font-semibold tabular-nums text-foreground">
+                    {row.uses}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </Div>
+      </Div>
+      <P className="mt-4 text-xs text-muted-foreground">{plans.footnote}</P>
+      {plans.cta !== null && (
+        <Div className="mt-6">
+          <Cta href={plans.cta.href} label={plans.cta.label} />
+        </Div>
+      )}
+    </PageSection>
+  );
+}
+
+function NearestSection({
+  model,
+  rows,
+  locale,
+  t,
+}: {
+  model: string;
+  rows: NearestRow[];
+  locale: CountryLanguage;
+  t: ModelsT;
+}): JSX.Element {
+  return (
+    <PageSection
+      title={t("nearest.heading", { model })}
+      intro={t("nearest.intro")}
+    >
+      <Div
+        data-testid="model-nearest"
+        className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0"
+      >
+        <Div className="overflow-hidden rounded-xl border border-border bg-card">
+          <Table className="min-w-[44rem]">
+            <TableHeader>
+              <TableRow className="bg-muted/50 hover:bg-muted/50">
+                <TableHead className={HEAD_CLASS}>
+                  {t("nearest.colModel")}
+                </TableHead>
+                <TableHead className={HEAD_CLASS}>{t("facts.tier")}</TableHead>
+                <TableHead className={HEAD_CLASS}>
+                  {t("facts.intelligence")}
+                </TableHead>
+                <TableHead className={HEAD_CLASS}>
+                  {t("facts.context")}
+                </TableHead>
+                <TableHead className={HEAD_CLASS}>
+                  {t("nearest.colPrice")}
+                </TableHead>
+                <TableHead className={HEAD_CLASS}>
+                  {t("nearest.colCompare")}
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {rows.map((row) => (
+                <TableRow
+                  key={row.slug}
+                  className={row.compare === null ? "bg-primary/5" : undefined}
+                >
+                  <TableCell className="align-top">
+                    {row.compare === null ? (
+                      <Span className="font-semibold text-foreground">
+                        {row.name}
+                      </Span>
+                    ) : (
+                      <Link
+                        href={modelHref(locale, row.slug)}
+                        className={LINK_CLASS}
+                      >
+                        {row.name}
+                      </Link>
+                    )}
+                  </TableCell>
+                  <TableCell className="align-top text-sm text-muted-foreground">
+                    {row.tier}
+                  </TableCell>
+                  <TableCell className="align-top text-sm text-muted-foreground">
+                    {row.intelligence}
+                  </TableCell>
+                  <TableCell className="align-top text-sm tabular-nums text-muted-foreground">
+                    {row.context}
+                  </TableCell>
+                  <TableCell className="align-top text-sm tabular-nums text-muted-foreground">
+                    {row.price}
+                  </TableCell>
+                  <TableCell className="align-top text-sm">
+                    {row.compare === null ? (
+                      <Span className="text-muted-foreground">
+                        {t("nearest.thisModel")}
+                      </Span>
+                    ) : (
+                      <Link href={row.compare.href} className={LINK_CLASS}>
+                        {row.compare.label}
+                      </Link>
+                    )}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </Div>
       </Div>
     </PageSection>
@@ -252,6 +436,17 @@ export function ModelSeoSections({
     <>
       {content.bestFor !== null && (
         <BestForSection model={model} content={content.bestFor} t={t} />
+      )}
+      {content.plans !== null && (
+        <PlansSection model={model} plans={content.plans} t={t} />
+      )}
+      {content.nearest.length > 1 && (
+        <NearestSection
+          model={model}
+          rows={content.nearest}
+          locale={locale}
+          t={t}
+        />
       )}
       {content.related.length > 0 && (
         <RelatedSection related={content.related} locale={locale} t={t} />

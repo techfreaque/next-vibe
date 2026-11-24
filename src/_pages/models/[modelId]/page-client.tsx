@@ -1,10 +1,8 @@
 "use client";
 
 import { Div } from "next-vibe/ui/components/div";
-import { ArrowRight } from "next-vibe/ui/components/icons/ArrowRight";
 import { History } from "next-vibe/ui/components/icons/History";
 import { Scale } from "next-vibe/ui/components/icons/Scale";
-import { Link } from "next-vibe/ui/components/link";
 import { Span } from "next-vibe/ui/components/span";
 import { P } from "next-vibe/ui/components/typography";
 import type { JSX, ReactNode } from "react";
@@ -36,8 +34,9 @@ type ChatModelClientData = Omit<ChatModelPageData, "seo" | "structuredData">;
 type MediaModelClientData = Omit<MediaModelPageData, "seo" | "structuredData">;
 
 /**
- * `sections`: the server-rendered best for / similar models / FAQ / blog
- * sections (model-seo-sections), placed above the closing CTA.
+ * `sections`: the server-rendered best for / price per plan / nearest models /
+ * similar models / FAQ / blog sections (model-seo-sections), placed above the
+ * closing CTA.
  */
 export function ModelPageClient({
   sections,
@@ -60,7 +59,6 @@ export function ModelPageClient({
 function ChatModelPage({
   locale,
   facts,
-  comparisons,
   pickerModels,
   refusal,
   sections,
@@ -162,32 +160,6 @@ function ChatModelPage({
       </PageSection>
 
       <SampleAnswersSlot modelId={facts.id} locale={locale} stats={refusal} />
-
-      {comparisons.length > 0 && (
-        <PageSection
-          tone="muted"
-          title={t("model.compareHeading", { model: facts.name })}
-          intro={t("model.compareIntro")}
-        >
-          <Div className="grid grid-cols-1 gap-3 md:grid-cols-3">
-            {comparisons.map((other) => (
-              <Link
-                key={other.id}
-                href={compareHref(locale, facts.id, other.id)}
-                className="group flex min-h-11 items-center justify-between gap-3 rounded-xl border border-border bg-card p-4 font-medium shadow-xs transition-colors hover:border-primary/40"
-              >
-                <Span className="min-w-0 [overflow-wrap:anywhere]">
-                  {t("model.compareWith", {
-                    model: facts.name,
-                    other: other.name,
-                  })}
-                </Span>
-                <ArrowRight className="h-4 w-4 shrink-0 text-primary transition-transform group-hover:translate-x-0.5" />
-              </Link>
-            ))}
-          </Div>
-        </PageSection>
-      )}
 
       {sections}
 
