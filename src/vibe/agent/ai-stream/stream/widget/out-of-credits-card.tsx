@@ -8,6 +8,7 @@ import { AlertCircle } from "next-vibe/ui/components/icons/AlertCircle";
 import { Coins } from "next-vibe/ui/components/icons/Coins";
 import { Gift } from "next-vibe/ui/components/icons/Gift";
 import { Loader2 } from "next-vibe/ui/components/icons/Loader2";
+import { Lock } from "next-vibe/ui/components/icons/Lock";
 import { Mail } from "next-vibe/ui/components/icons/Mail";
 import { X } from "next-vibe/ui/components/icons/X";
 import { Link } from "next-vibe/ui/components/link";
@@ -192,11 +193,22 @@ function GuestAuthBody({
 
   return (
     <Div className="flex flex-col gap-3 @2xl/ooc:flex-row @2xl/ooc:items-center @2xl/ooc:gap-6">
-      <CardHead
-        icon={<Gift className="h-4 w-4" />}
-        title={title}
-        description={description}
-      />
+      <Div className="flex min-w-0 flex-1 flex-col gap-2">
+        <CardHead
+          icon={<Gift className="h-4 w-4" />}
+          title={title}
+          description={description}
+        />
+        <Div className="pl-11">
+          <P
+            data-testid="guest-privacy-line"
+            className="m-0 flex items-start gap-1.5 text-xs leading-snug text-muted-foreground"
+          >
+            <Lock className="mt-px h-3 w-3 flex-shrink-0" />
+            <Span>{t("outOfCredits.guest.privacy")}</Span>
+          </P>
+        </Div>
+      </Div>
       <Div className="flex flex-shrink-0 flex-col gap-2 @md/ooc:ml-11 @md/ooc:flex-row @md/ooc:flex-wrap @md/ooc:items-center @md/ooc:gap-x-4 @md/ooc:gap-y-2 @2xl/ooc:ml-0">
         <Button asChild size="sm" className="w-full @md/ooc:w-auto">
           <Link

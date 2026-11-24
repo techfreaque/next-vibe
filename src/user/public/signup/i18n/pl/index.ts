@@ -265,6 +265,8 @@ export const translations: typeof enTranslations = {
   form: {
     title: "Załóż konto",
     description: "Każdy model. Twoje zasady. Start za darmo.",
+    privacy:
+      "E-mail tylko do logowania. Bez telefonu, bez karty, bez zewnętrznych trackerów.",
   },
   footer: {
     alreadyHaveAccount: "Masz już konto? Zaloguj się",

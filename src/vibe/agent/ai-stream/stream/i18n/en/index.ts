@@ -722,6 +722,8 @@ export const translations = {
       title: "Out of free credits",
       description:
         "Free account: {{signedIn}} credits every month, {{max}} with the newsletter. You land right back in this chat.",
+      privacy:
+        "Email only for login. No phone, no card, no third-party trackers.",
       signUp: "Sign up free",
       haveAccount: "Have an account?",
       logIn: "Log in",

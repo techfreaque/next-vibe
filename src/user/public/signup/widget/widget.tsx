@@ -28,6 +28,7 @@ import { AlertCircle } from "next-vibe/ui/components/icons/AlertCircle";
 import { Gift } from "next-vibe/ui/components/icons/Gift";
 import { Heart } from "next-vibe/ui/components/icons/Heart";
 import { Info } from "next-vibe/ui/components/icons/Info";
+import { Lock } from "next-vibe/ui/components/icons/Lock";
 import { Label } from "next-vibe/ui/components/label";
 import { Link } from "next-vibe/ui/components/link";
 import {
@@ -276,6 +277,13 @@ function SignupFields({ field }: CustomWidgetProps): React.JSX.Element {
           {t("form.title")}
         </CardTitle>
         <CardDescription>{t("form.description")}</CardDescription>
+        <P
+          data-testid="signup-privacy-line"
+          className="m-0 mt-1 text-balance text-center text-xs leading-relaxed text-muted-foreground"
+        >
+          <Lock className="mr-1.5 inline-block h-3 w-3 align-[-2px]" />
+          {t("form.privacy")}
+        </P>
       </CardHeader>
       <CardContent className="flex flex-col gap-5 p-6 pt-4 sm:p-8 sm:pt-4">
         {/* Names stack — the auth card is phone-width on every screen */}

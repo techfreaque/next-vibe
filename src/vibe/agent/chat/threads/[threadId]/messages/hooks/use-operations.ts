@@ -22,6 +22,7 @@ import { useCallback, useLayoutEffect, useMemo, useRef } from "react";
 import { useCredits } from "@/credits/hooks";
 import { sendWallBeacon } from "@/leads/tracking/wall-beacon";
 import { formatCreditAmount } from "@/products/credit-money";
+import { getPricingParams } from "@/products/repository-client";
 
 import type { ChatModelId } from "../../../../../ai-stream/models";
 import { getChatModelById } from "../../../../../ai-stream/models";
@@ -155,13 +156,17 @@ function passesCreditGuard(
   };
   if (creditsTotal <= 0) {
     reportWall();
+    const pricing = isGuest ? getPricingParams(locale) : undefined;
     toast({
       // Guests can't top up — point them at a free account instead
       title: isGuest
         ? t("outOfCredits.guest.title")
         : t("input.noCredits.title"),
-      description: isGuest
-        ? t("outOfCredits.guest.description")
+      description: pricing
+        ? t("outOfCredits.guest.description", {
+            signedIn: pricing.freeCreditsSignedIn,
+            max: pricing.freeCreditsMax,
+          })
         : t("input.noCredits.description"),
       variant: "destructive",
       duration: Infinity,

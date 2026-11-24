@@ -715,6 +715,8 @@ export const translations: typeof enTranslations = {
       title: "Darmowe kredyty się skończyły",
       description:
         "Darmowe konto: {{signedIn}} kredytów co miesiąc, {{max}} z newsletterem. Wrócisz prosto do tego czatu.",
+      privacy:
+        "E-mail tylko do logowania. Bez telefonu, bez karty, bez zewnętrznych trackerów.",
       signUp: "Załóż darmowe konto",
       haveAccount: "Masz już konto?",
       logIn: "Zaloguj się",

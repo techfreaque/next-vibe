@@ -267,6 +267,8 @@ export const translations: typeof enTranslations = {
   form: {
     title: "Konto erstellen",
     description: "Jedes Modell. Deine Regeln. Kostenlos starten.",
+    privacy:
+      "E-Mail nur für den Login. Keine Telefonnummer, keine Karte, keine Tracker von Drittanbietern.",
   },
   footer: {
     alreadyHaveAccount: "Schon ein Konto? Anmelden",

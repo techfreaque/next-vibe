@@ -732,6 +732,8 @@ export const translations: typeof enTranslations = {
       title: "Plus de crédits gratuits",
       description:
         "Compte gratuit : {{signedIn}} crédits chaque mois, {{max}} avec la newsletter. Vous revenez directement dans cette discussion.",
+      privacy:
+        "E-mail uniquement pour la connexion. Ni téléphone, ni carte, aucun traceur tiers.",
       signUp: "Inscription gratuite",
       haveAccount: "Vous avez un compte ?",
       logIn: "Se connecter",

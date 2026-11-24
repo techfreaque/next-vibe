@@ -742,6 +742,8 @@ export const translations: typeof enTranslations = {
       title: "Crediti gratuiti esauriti",
       description:
         "Con un account gratuito hai {{signedIn}} crediti al mese, {{max}} con la newsletter. Dopo la registrazione torni subito qui.",
+      privacy:
+        "Email solo per l'accesso. Niente telefono, niente carta, nessun tracker di terze parti.",
       signUp: "Iscriviti gratis",
       haveAccount: "Hai già un account?",
       logIn: "Accedi",

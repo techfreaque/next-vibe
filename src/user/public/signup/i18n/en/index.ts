@@ -156,6 +156,8 @@ export const translations = {
   form: {
     title: "Create your account",
     description: "Every model. Your rules. Free to start.",
+    privacy:
+      "Email only for login. No phone, no card, no third-party trackers.",
   },
   actions: {
     submit: "Send confirmation code",

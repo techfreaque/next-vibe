@@ -723,6 +723,8 @@ export const translations: typeof enTranslations = {
       title: "Gratis-Credits aufgebraucht",
       description:
         "Gratis-Konto: {{signedIn}} Credits jeden Monat, {{max}} mit Newsletter. Danach geht es genau hier weiter.",
+      privacy:
+        "E-Mail nur für den Login. Keine Telefonnummer, keine Karte, keine Tracker von Drittanbietern.",
       signUp: "Gratis registrieren",
       haveAccount: "Schon ein Konto?",
       logIn: "Anmelden",

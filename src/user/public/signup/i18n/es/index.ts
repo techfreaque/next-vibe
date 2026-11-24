@@ -161,6 +161,8 @@ export const translations: typeof enTranslations = {
   form: {
     title: "Crea tu cuenta",
     description: "Todos los modelos. Tus reglas. Gratis para empezar.",
+    privacy:
+      "Correo solo para iniciar sesión. Sin teléfono, sin tarjeta, sin rastreadores de terceros.",
   },
   actions: {
     submit: "Enviar código de confirmación",

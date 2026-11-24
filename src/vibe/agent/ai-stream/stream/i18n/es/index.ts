@@ -737,6 +737,8 @@ export const translations: typeof enTranslations = {
       title: "Se agotaron los créditos gratis",
       description:
         "Con una cuenta gratis tienes {{signedIn}} créditos al mes, {{max}} con el boletín. Tras registrarte, vuelves a este chat.",
+      privacy:
+        "Correo solo para iniciar sesión. Sin teléfono, sin tarjeta, sin rastreadores de terceros.",
       signUp: "Regístrate gratis",
       haveAccount: "¿Tienes una cuenta?",
       logIn: "Iniciar sesión",
