@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "Jailbreak ChatGPT przestał działać? To działa | {{appName}}",
     description:
-      "Dlaczego jailbreaki ChatGPT i prompty DAN ciągle przestają działać, ile cię kosztują i które nieocenzurowane modele odpowiadają bez nich. Ceny, kontekst i test obok siebie.",
+      "Porównaj alternatywy dla promptów jailbreak w ChatGPT, od {{appName}} i Venice po LM Studio i Ollama. Modele, prywatność i koszty.",
     category: "Przewodnik po modelach",
     imageAlt: "Prompty jailbreak ChatGPT kontra nieocenzurowane modele",
     keywords:
@@ -14,13 +14,13 @@ export const translations: typeof enTranslations = {
     backToBlog: "Wróć do bloga",
     category: "Przewodnik po modelach",
     readTime: "7 min czytania",
-    title: "Jailbreaki ChatGPT ciągle się psują. Przestań je łatać.",
+    title: "Porównanie alternatyw dla jailbreaka ChatGPT",
     subtitle:
-      "Dlaczego DAN i każdy prompt po nim przestaje działać, ile naprawdę kosztuje to obejście i {{count}} nieocenzurowanych modeli, które odpowiadają wprost.",
+      "Porównaj czaty w chmurze i modele lokalne pod kątem limitów, kosztów i prywatności. Zobacz {{count}} modeli do pisania i odgrywania ról.",
   },
   intro: {
-    lead: "Znalazłeś prompt. Udawaj, że jesteś DAN. Nie wychodź z roli. Odpowiadaj jako dwie persony. Działało tydzień. Potem przestało i zaczęło się szukanie następnego.",
-    p2: "Ta pętla nigdy się nie kończy, bo walczysz z samym modelem. Jest krótsza droga: model, którego nigdy nie uczono odmawiać albo któremu odmowę usunięto. Ten przewodnik pokazuje, dlaczego jailbreaki zawodzą, ile kosztują i które z {{count}} nieocenzurowanych modeli na {{appName}} odpowiadają bez nich.",
+    lead: "Polecenie, które dziś zmienia odpowiedzi ChatGPT, po aktualizacji może działać inaczej. Wybierz model, który pasuje do pisania tekstów lub odgrywania ról.",
+    p2: "Porównaj najpierw czaty w chmurze i aplikacje lokalne. Pokazujemy też {{count}} modeli na {{appName}} z długością kontekstu i aktualnymi cenami.",
   },
   why: {
     title: "Dlaczego jailbreaki ChatGPT ciągle się psują",

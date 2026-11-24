@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "Jailbreak de ChatGPT: ya no funciona. Esto sí | {{appName}}",
     description:
-      "Por qué los jailbreaks de ChatGPT y los prompts DAN siempre acaban rompiéndose, cuánto te cuestan y qué modelos sin censura responden sin ellos. Precios, contexto y una prueba lado a lado.",
+      "Compara alternativas a los prompts de jailbreak de ChatGPT, desde {{appName}} y Venice hasta LM Studio y Ollama. Modelos, privacidad y costes.",
     category: "Guía de modelos",
     imageAlt: "Prompts de jailbreak de ChatGPT frente a modelos sin censura",
     keywords:
@@ -14,13 +14,13 @@ export const translations: typeof enTranslations = {
     backToBlog: "Volver al blog",
     category: "Guía de modelos",
     readTime: "7 min de lectura",
-    title: "Los jailbreaks de ChatGPT siempre se rompen. Deja de hacerlos.",
+    title: "Compara alternativas al jailbreak de ChatGPT",
     subtitle:
-      "Por qué DAN y todos los prompts posteriores acaban fallando, lo que cuesta de verdad el rodeo y {{count}} modelos sin censura que responden sin rodeos.",
+      "Compara chats alojados y modelos locales por límites, coste y privacidad. Descubre {{count}} modelos para escritura y rol.",
   },
   intro: {
-    lead: "Encontraste el prompt. Finge que eres DAN. No salgas del personaje. Responde como dos personajes. Funcionó una semana. Luego dejó de hacerlo y empezó la búsqueda del siguiente.",
-    p2: "Ese bucle no termina nunca, porque estás peleando contra el propio modelo. Hay un camino más corto: un modelo al que nunca se entrenó para negarse, o al que se le quitó la negativa. Esta guía muestra por qué fallan los jailbreaks, cuánto cuestan y cuáles de los {{count}} modelos sin censura de {{appName}} responden sin ellos.",
+    lead: "Un prompt que hoy cambia las respuestas de ChatGPT puede funcionar de otra forma tras una actualización. Elige un modelo que encaje con tu escritura o juego de rol.",
+    p2: "Compara primero los chats alojados y las aplicaciones locales. También mostramos {{count}} modelos en {{appName}} con su contexto y precios vigentes.",
   },
   why: {
     title: "Por qué los jailbreaks de ChatGPT siempre se rompen",

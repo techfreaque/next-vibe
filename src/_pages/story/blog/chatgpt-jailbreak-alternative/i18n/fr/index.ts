@@ -5,7 +5,7 @@ export const translations: typeof enTranslations = {
     title:
       "Jailbreak ChatGPT : il ne marche plus. Voici ce qui marche | {{appName}}",
     description:
-      "Pourquoi les jailbreaks ChatGPT et les prompts DAN finissent toujours par casser, ce qu'ils vous coûtent, et les modèles non censurés qui répondent sans. Prix, contexte et test côte à côte.",
+      "Comparez les alternatives aux prompts de jailbreak pour ChatGPT, de {{appName}} et Venice à LM Studio et Ollama. Choix des modèles, confidentialité et coûts.",
     category: "Guide des modèles",
     imageAlt: "Prompts de jailbreak ChatGPT face aux modèles non censurés",
     keywords:
@@ -15,13 +15,13 @@ export const translations: typeof enTranslations = {
     backToBlog: "Retour au blog",
     category: "Guide des modèles",
     readTime: "7 min de lecture",
-    title: "Les jailbreaks ChatGPT cassent toujours. Arrêtez de jailbreaker.",
+    title: "Les alternatives au jailbreak de ChatGPT",
     subtitle:
-      "Pourquoi DAN et tous les prompts qui ont suivi finissent par échouer, ce que ce détour coûte vraiment, et {{count}} modèles non censurés qui répondent sans détour.",
+      "Comparez les chats hébergés et les modèles locaux selon leurs limites, leurs tarifs et leur confidentialité. Découvrez {{count}} modèles pour écrire et jouer des rôles.",
   },
   intro: {
-    lead: "Vous avez trouvé le prompt. Fais comme si tu étais DAN. Reste dans le rôle. Réponds en deux personnages. Ça a marché une semaine. Puis plus du tout, et la chasse au suivant a commencé.",
-    p2: "Cette boucle ne s'arrête jamais, parce que vous vous battez contre le modèle lui-même. Il existe un chemin plus court : un modèle qu'on n'a jamais entraîné à refuser, ou dont on a retiré le refus. Ce guide montre pourquoi les jailbreaks échouent, ce qu'ils coûtent, et quels modèles non censurés de {{appName}}, {{count}} au total, répondent sans.",
+    lead: "Un prompt qui modifie les réponses de ChatGPT aujourd’hui peut se comporter différemment après une mise à jour. Choisissez un modèle adapté à vos textes ou à vos jeux de rôle.",
+    p2: "Comparez d’abord les chats hébergés et les applis locales. Nous présentons aussi {{count}} modèles sur {{appName}}, avec leur fenêtre de contexte et leurs tarifs en vigueur.",
   },
   why: {
     title: "Pourquoi les jailbreaks ChatGPT cassent toujours",

@@ -3,7 +3,7 @@ export const translations = {
     title:
       "ChatGPT Jailbreak Prompts Keep Breaking. Use This Instead | {{appName}}",
     description:
-      "Why ChatGPT jailbreak and DAN prompts stop working, what they cost you, and the uncensored models that answer without one. Prices, context and a side-by-side test.",
+      "Compare alternatives to ChatGPT jailbreak prompts, from {{appName}} and Venice to LM Studio and Ollama. See model choices, privacy and costs.",
     category: "Model Guide",
     imageAlt: "ChatGPT jailbreak prompts compared with uncensored models",
     keywords:
@@ -13,13 +13,13 @@ export const translations = {
     backToBlog: "Back to Blog",
     category: "Model Guide",
     readTime: "7 min read",
-    title: "ChatGPT jailbreaks keep breaking. Stop jailbreaking.",
+    title: "Compare ChatGPT jailbreak alternatives",
     subtitle:
-      "Why DAN and every prompt after it stops working, what the workaround really costs, and {{count}} uncensored models that answer the question straight.",
+      "Compare hosted chat and local models on limits, cost and privacy. See {{count}} model picks for writing and roleplay.",
   },
   intro: {
-    lead: "You found the prompt. Pretend you are DAN. Stay in character. Answer as two personas. It worked for a week. Then it didn't, and you went looking for the next one.",
-    p2: "That loop never ends, because you are fighting the model itself. There is a shorter path: use a model that was never trained to refuse, or had the refusal taken out. This guide shows why jailbreaks fail, what they cost, and which {{count}} uncensored models on {{appName}} answer without one.",
+    lead: "A prompt that changes how ChatGPT answers today may behave differently after an update. Choose a model that already fits your writing or roleplay.",
+    p2: "Compare hosted chats and local apps first. We also list {{count}} models on {{appName}} with context and live prices.",
   },
   why: {
     title: "Why ChatGPT jailbreaks keep breaking",

@@ -47,6 +47,11 @@ import { LINK_CLASS } from "../../compare/_shared/compare-ui";
 import { ABLITERATION_SOURCES } from "../../compare/_shared/platforms";
 import type { UsParams } from "../../compare/_shared/us-facts";
 import {
+  AlternativesComparison,
+  alternativesFaq,
+  AlternativesLinks,
+} from "../_alternatives/comparison";
+import {
   type ComparePair,
   findOwnWorldviewRow,
   UncensoredModelTable,
@@ -138,11 +143,14 @@ export function TanstackPage({
     count: rows.length,
     ownModel: own?.name ?? us.ownModel,
   };
-  const faq = FAQ_KEYS.map((key) => ({
-    key,
-    question: t(`faq.${key}.q`, stats),
-    answer: t(`faq.${key}.a`, stats),
-  }));
+  const faq = [
+    ...FAQ_KEYS.map((key) => ({
+      key,
+      question: t(`faq.${key}.q`, stats),
+      answer: t(`faq.${key}.a`, stats),
+    })),
+    alternativesFaq(SLUG, locale, us.appName),
+  ];
 
   return (
     <Div className="min-h-screen bg-background">
@@ -160,6 +168,8 @@ export function TanstackPage({
           <ArticleLead>{t("intro.lead")}</ArticleLead>
           <ArticleP>{t("intro.p2", stats)}</ArticleP>
         </Div>
+
+        <AlternativesComparison locale={locale} slug={SLUG} us={us} />
 
         <ArticleSection id="why" title={t("why.title")} intro={t("why.intro")}>
           <ArticleList
@@ -302,6 +312,8 @@ export function TanstackPage({
             />
           </Div>
         </ArticleSection>
+
+        <AlternativesLinks locale={locale} exclude={SLUG} />
 
         <ArticleEnd
           post={{ slug: SLUG, locale }}

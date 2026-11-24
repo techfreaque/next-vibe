@@ -5,7 +5,7 @@ export const translations: typeof enTranslations = {
     title:
       "ChatGPT-Jailbreak funktioniert nicht mehr? Das hier schon | {{appName}}",
     description:
-      "Warum ChatGPT-Jailbreaks und DAN-Prompts immer wieder scheitern, was sie Sie kosten und welche unzensierten Modelle ganz ohne antworten. Preise, Kontext und ein direkter Vergleichstest.",
+      "Alternativen zu ChatGPT-Jailbreak-Prompts im Vergleich: {{appName}}, Venice, LM Studio und Ollama. Mit Modellauswahl, Datenschutz und Kosten.",
     category: "Modell-Guide",
     imageAlt:
       "ChatGPT-Jailbreak-Prompts im Vergleich mit unzensierten Modellen",
@@ -16,13 +16,13 @@ export const translations: typeof enTranslations = {
     backToBlog: "Zurück zum Blog",
     category: "Modell-Guide",
     readTime: "7 Min. Lesezeit",
-    title: "ChatGPT-Jailbreaks brechen immer wieder. Hören Sie auf damit.",
+    title: "Alternativen zu ChatGPT-Jailbreaks im Vergleich",
     subtitle:
-      "Warum DAN und jeder Prompt danach scheitert, was der Umweg wirklich kostet, und {{count}} unzensierte Modelle, die die Frage direkt beantworten.",
+      "Vergleiche Cloud-Chats und lokale Modelle nach Limits, Kosten und Datenschutz. Dazu {{count}} Modelle für Schreiben und Rollenspiel.",
   },
   intro: {
-    lead: "Sie haben den Prompt gefunden. Tu so, als wärst du DAN. Bleib in der Rolle. Antworte als zwei Personas. Eine Woche lang ging es. Dann nicht mehr, und die Suche nach dem nächsten begann.",
-    p2: "Diese Schleife endet nie, denn Sie kämpfen gegen das Modell selbst. Es gibt einen kürzeren Weg: ein Modell, das nie aufs Verweigern trainiert wurde oder dem die Verweigerung entfernt wurde. Dieser Guide zeigt, warum Jailbreaks scheitern, was sie kosten und welche {{count}} unzensierten Modelle auf {{appName}} ohne antworten.",
+    lead: "Ein Prompt, der ChatGPT heute anders antworten lässt, kann nach einem Update anders wirken. Wähle ein Modell, das zu deinen Texten oder Rollenspielen passt.",
+    p2: "Vergleiche zuerst gehostete Chats und lokale Apps. Dazu findest du {{count}} Modelle auf {{appName}} mit Kontextfenster und aktuellen Preisen.",
   },
   why: {
     title: "Warum ChatGPT-Jailbreaks immer wieder brechen",
