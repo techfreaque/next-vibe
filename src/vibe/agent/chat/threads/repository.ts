@@ -212,6 +212,7 @@ export class ThreadsRepository {
     loopInstanceId,
     syncEligible,
     parentThreadId,
+    allowGuestBackgroundCreation = false,
   }: {
     threadId: string;
     rootFolderId: DefaultFolderId;
@@ -230,6 +231,8 @@ export class ThreadsRepository {
     syncEligible?: boolean;
     /** Spawning thread when this is a sub-stream/sub-agent child. NULL/absent = top-level. */
     parentThreadId?: string | null;
+    /** Set only by headless, server-side AI runs. Never taken from request data. */
+    allowGuestBackgroundCreation?: boolean;
   }): Promise<
     ResponseType<{
       threadId: string;
@@ -303,7 +306,9 @@ export class ThreadsRepository {
         rootFolderId: folder.rootFolderId,
         parentId: folder.parentId,
       });
-    } else if (!subFolderId) {
+    }
+
+    if (!subFolderId || user.isPublic) {
       const { getDefaultFolderConfig } = await import("../config");
       const { hasRolePermission } = await import("../permissions/permissions");
 
@@ -317,9 +322,15 @@ export class ThreadsRepository {
         });
       }
 
+      const isGuestBackgroundRun =
+        user.isPublic &&
+        allowGuestBackgroundCreation &&
+        rootFolderId === DefaultFolderId.BACKGROUND &&
+        !subFolderId;
+
       if (
-        rootFolderId === DefaultFolderId.PUBLIC ||
-        (user.isPublic && rootFolderId !== DefaultFolderId.BACKGROUND)
+        (user.isPublic && !isGuestBackgroundRun) ||
+        (!subFolderId && rootFolderId === DefaultFolderId.PUBLIC)
       ) {
         const hasPermission = await hasRolePermission(
           user,
@@ -368,9 +379,7 @@ export class ThreadsRepository {
         subFolderId,
       });
       const hasPermission =
-        (!user.isPublic ||
-          (rootFolderId === DefaultFolderId.BACKGROUND &&
-            folder.rootFolderId === rootFolderId)) &&
+        (!user.isPublic || folder.rootFolderId === rootFolderId) &&
         (await canCreateThreadInFolder(user, folder, logger, locale));
 
       logger.debug("Permission check result", {
@@ -434,7 +443,7 @@ export class ThreadsRepository {
 
     await db.insert(chatThreads).values({
       id: threadId,
-      userId: userId ?? null,
+      userId: user.isPublic ? null : (userId ?? null),
       leadId: resolvedLeadId,
       title,
       rootFolderId,

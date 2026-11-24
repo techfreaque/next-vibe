@@ -68,6 +68,7 @@ export async function runHeadlessIntakePhase(params: {
   explicitParentMessageId?: string;
   /** Revival: when set, insert the deferred TOOL message at the leaf first. */
   deferredWakeUpPayload?: WakeUpPayload;
+  allowGuestBackgroundCreation: boolean;
   user: JwtPayloadType;
   locale: CountryLanguage;
   logger: EndpointLogger;
@@ -78,6 +79,7 @@ export async function runHeadlessIntakePhase(params: {
     isRevival,
     explicitParentMessageId,
     deferredWakeUpPayload,
+    allowGuestBackgroundCreation,
     user,
     locale,
     logger,
@@ -118,6 +120,7 @@ export async function runHeadlessIntakePhase(params: {
       userId,
       leadId: undefined,
       isIncognito: false,
+      allowGuestBackgroundCreation,
       logger,
       user,
       locale,

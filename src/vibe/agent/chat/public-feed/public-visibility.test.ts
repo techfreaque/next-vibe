@@ -32,9 +32,12 @@ import { sendTestRequest } from "next-vibe/tooling/testing/testing-suite/send-te
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { ErrorResponseTypes } from "next-vibe/core/route/response.schema";
+import { resolveTaskOwnerUser } from "next-vibe/tasks/cron/resolve-task-user";
 
 import { DEFAULT_CHAT_MODEL_ID } from "../../ai-stream/constants";
 import { runAutoQueueBranch } from "../../ai-stream/repository/intake/queue";
+import { runHeadlessIntakePhase } from "../../ai-stream/repository/setup/headless-intake-phase";
+import type { AiStreamPostRequestOutput } from "../../ai-stream/stream/definition";
 import { scopedTranslation as aiStreamTranslation } from "../../ai-stream/stream/i18n";
 import { NO_SKILL_ID } from "../../skills/constants";
 import { chatFolders, chatMessages, chatThreads } from "../db";
@@ -339,30 +342,130 @@ describe("public root visibility", () => {
     TEST_TIMEOUT,
   );
 
-  it(
-    "denies guest creation in Private and Shared and derives Background ownership from the guest identity",
-    async () => {
-      for (const root of [DefaultFolderId.PRIVATE, DefaultFolderId.SHARED]) {
-        expect(await ensure(guest, crypto.randomUUID(), root)).toEqual({
-          success: false,
-          forbidden: true,
+  it.each(Object.values(DefaultFolderId))(
+    "checks creation and persistence for guests, customers and role-less accounts in %s",
+    async (rootFolderId) => {
+      const isIncognito = rootFolderId === DefaultFolderId.INCOGNITO;
+      for (const user of [guest, customer, roleless]) {
+        const threadId = crypto.randomUUID();
+        const allowed = isIncognito || !user.isPublic;
+        expect(await ensure(user, threadId, rootFolderId)).toEqual({
+          success: allowed,
+          forbidden: !allowed,
         });
+        const rows = await db
+          .select({
+            userId: chatThreads.userId,
+            rootFolderId: chatThreads.rootFolderId,
+          })
+          .from(chatThreads)
+          .where(eq(chatThreads.id, threadId));
+        expect(rows).toEqual(
+          isIncognito || user.isPublic
+            ? []
+            : [{ userId: user.id, rootFolderId }],
+        );
       }
+    },
+    TEST_TIMEOUT,
+  );
+
+  function streamData(
+    threadId: string,
+    rootFolderId: DefaultFolderId,
+    userMessageId: string | null,
+  ): AiStreamPostRequestOutput {
+    return {
+      operation: "send",
+      rootFolderId,
+      subFolderId: null,
+      threadId,
+      userMessageId,
+      parentMessageId: null,
+      content: "Guest reply",
+      role: ChatMessageRole.USER,
+      model: DEFAULT_CHAT_MODEL_ID,
+      skill: NO_SKILL_ID,
+      favoriteConfig: null,
+      toolConfirmations: null,
+      messageHistory: [],
+      voiceMode: { enabled: false },
+      audioInput: { file: null },
+      resumeToken: null,
+      timezone: "UTC",
+      attachments: null,
+      executionContext: { mode: "local" },
+    };
+  }
+
+  it(
+    "server-side guest pre-calls keep one lead-owned Background thread",
+    async () => {
       const threadId = crypto.randomUUID();
-      const created = await ThreadsRepository.ensureThread({
-        threadId,
-        rootFolderId: DefaultFolderId.BACKGROUND,
-        subFolderId: null,
-        isIncognito: false,
+      const result = await runHeadlessIntakePhase({
+        data: streamData(threadId, DefaultFolderId.BACKGROUND, null),
+        intake: {
+          preCalls: [{ routeId: "fixture", args: {}, result: {}, success: true }],
+        },
+        isRevival: false,
+        allowGuestBackgroundCreation: true,
         user: guest,
         logger,
         locale: defaultLocale,
       });
-      expect(created.success).toBe(true);
+      expect(result.success).toBe(true);
+      const [thread] = await db
+        .select({ leadId: chatThreads.leadId, userId: chatThreads.userId })
+        .from(chatThreads)
+        .where(eq(chatThreads.id, threadId));
+      expect(thread).toEqual({ leadId: guest.leadId, userId: null });
       expect(await ensure(guest, threadId, DefaultFolderId.BACKGROUND)).toEqual({
         success: true,
         forbidden: false,
       });
+      const privateThreadId = crypto.randomUUID();
+      const denied = await runHeadlessIntakePhase({
+        data: streamData(privateThreadId, DefaultFolderId.PRIVATE, null),
+        intake: {
+          preCalls: [{ routeId: "fixture", args: {}, result: {}, success: true }],
+        },
+        isRevival: false,
+        allowGuestBackgroundCreation: true,
+        user: guest,
+        logger,
+        locale: defaultLocale,
+      });
+      expect(!denied.success && denied.errorType.errorKey).toBe(
+        ErrorResponseTypes.FORBIDDEN.errorKey,
+      );
+      const rows = await db
+        .select({ id: chatThreads.id })
+        .from(chatThreads)
+        .where(eq(chatThreads.id, privateThreadId));
+      expect(rows).toEqual([]);
+    },
+    TEST_TIMEOUT,
+  );
+
+  it(
+    "cron without a request user can create a Background thread",
+    async () => {
+      const cron = await resolveTaskOwnerUser(
+        { type: "system" },
+        defaultLocale,
+        logger,
+      );
+      expect(cron).not.toBeNull();
+      if (!cron) return;
+      const threadId = crypto.randomUUID();
+      try {
+        expect(await ensure(cron.user, threadId, DefaultFolderId.BACKGROUND)).toEqual({
+          success: true,
+          forbidden: false,
+        });
+      } finally {
+        await db.delete(chatThreads).where(eq(chatThreads.id, threadId));
+      }
     },
     TEST_TIMEOUT,
   );
@@ -376,27 +479,7 @@ describe("public root visibility", () => {
         .set({ streamingState: ThreadStreamingState.STREAMING })
         .where(eq(chatThreads.id, publicThreadId));
       const queued = await runAutoQueueBranch({
-        data: {
-          operation: "send",
-          rootFolderId: DefaultFolderId.PUBLIC,
-          subFolderId: null,
-          threadId: publicThreadId,
-          userMessageId: messageId,
-          parentMessageId: null,
-          content: "Guest reply",
-          role: ChatMessageRole.USER,
-          model: DEFAULT_CHAT_MODEL_ID,
-          skill: NO_SKILL_ID,
-          favoriteConfig: null,
-          toolConfirmations: null,
-          messageHistory: [],
-          voiceMode: { enabled: false },
-          audioInput: { file: null },
-          resumeToken: null,
-          timezone: "UTC",
-          attachments: null,
-          executionContext: { mode: "local" },
-        },
+        data: streamData(publicThreadId, DefaultFolderId.PUBLIC, messageId),
         user: guest,
         userId: undefined,
         t: aiStreamTranslation.scopedT(defaultLocale).t,

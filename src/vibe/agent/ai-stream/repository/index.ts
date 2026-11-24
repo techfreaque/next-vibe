@@ -954,6 +954,12 @@ export class AiStreamRepository {
         !(data.toolConfirmations && data.toolConfirmations.length > 0));
     const effectiveHeadlessIntake: HeadlessIntake | undefined =
       headlessIntake ?? (needsIntakeDerivation ? {} : undefined);
+    // Preserve lead-owned threads created by server-side agent runs.
+    const allowGuestBackgroundCreation =
+      request === undefined &&
+      awaitResult === true &&
+      !isRevival &&
+      !relayReceiver;
     if (effectiveHeadlessIntake) {
       const intakeResult = await runHeadlessIntakePhase({
         data,
@@ -961,6 +967,7 @@ export class AiStreamRepository {
         isRevival,
         explicitParentMessageId,
         deferredWakeUpPayload,
+        allowGuestBackgroundCreation,
         user,
         locale,
         logger,
@@ -1058,6 +1065,7 @@ export class AiStreamRepository {
       maxDuration: AiStreamRepository.maxDuration,
       request,
       headless: awaitResult,
+      allowGuestBackgroundCreation,
       subAgentDepth,
       isRevival,
       relayReceiver,

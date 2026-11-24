@@ -570,6 +570,7 @@ export async function setupAiStream(params: {
   extraInstructions: string | undefined;
   excludeMemories: boolean | undefined;
   headless: boolean | undefined;
+  allowGuestBackgroundCreation: boolean;
   subAgentDepth: number;
   /** Whether this is a revival stream (resume-stream after wakeUp task completed). */
   isRevival: boolean | undefined;
@@ -761,6 +762,7 @@ export async function setupAiStream(params: {
     userId,
     leadId,
     isIncognito,
+    allowGuestBackgroundCreation: params.allowGuestBackgroundCreation,
     logger,
     user,
     locale,
