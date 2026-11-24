@@ -1,0 +1,78 @@
+diff --git a/dist/index.js b/dist/index.js
+--- a/dist/index.js
++++ b/dist/index.js
+@@ -319,15 +319,17 @@
+         removableBindings = findRemovableBindings(path);
+       },
+       ImportDeclaration(path) {
+-        let removalsBefore = removals;
++        let removedSpecifier = false;
+         for (let specifier of path.get("specifiers")) {
+           let local = specifier.get("local");
+           if (shouldBeRemoved(local)) {
+             specifier.remove();
+-            removals++;
++            // Import specifiers do not reference other bindings. An import-only
++            // removal pass cannot expose more dead code.
++            removedSpecifier = true;
+           }
+         }
+-        if (removals > removalsBefore && path.node.specifiers.length === 0) {
++        if (removedSpecifier && path.node.specifiers.length === 0) {
+           path.remove();
+         }
+       },
+@@ -417,10 +419,13 @@
+ }
+ function find_referenced_identifiers_default(ast) {
+   const referenced = /* @__PURE__ */ new Set();
++  // Babel initializes scope before entering a freshly parsed Program. Rebuild
++  // only a cached scope, since callers may have mutated the AST in place.
++  const hasCachedScope = traverse.cache.scope.has(ast.program);
+   let removable;
+   traverse(ast, {
+     Program(path) {
+-      path.scope.crawl();
++      if (hasCachedScope) path.scope.crawl();
+       removable = findRemovableBindings(path);
+     },
+     ImportDeclaration(path) {
+diff --git a/dist/index.cjs b/dist/index.cjs
+--- a/dist/index.cjs
++++ b/dist/index.cjs
+@@ -360,15 +360,17 @@
+         removableBindings = findRemovableBindings(path);
+       },
+       ImportDeclaration(path) {
+-        let removalsBefore = removals;
++        let removedSpecifier = false;
+         for (let specifier of path.get("specifiers")) {
+           let local = specifier.get("local");
+           if (shouldBeRemoved(local)) {
+             specifier.remove();
+-            removals++;
++            // Import specifiers do not reference other bindings. An import-only
++            // removal pass cannot expose more dead code.
++            removedSpecifier = true;
+           }
+         }
+-        if (removals > removalsBefore && path.node.specifiers.length === 0) {
++        if (removedSpecifier && path.node.specifiers.length === 0) {
+           path.remove();
+         }
+       },
+@@ -458,10 +460,13 @@
+ }
+ function find_referenced_identifiers_default(ast) {
+   const referenced = /* @__PURE__ */ new Set();
++  // Babel initializes scope before entering a freshly parsed Program. Rebuild
++  // only a cached scope, since callers may have mutated the AST in place.
++  const hasCachedScope = traverse.cache.scope.has(ast.program);
+   let removable;
+   traverse(ast, {
+     Program(path) {
+-      path.scope.crawl();
++      if (hasCachedScope) path.scope.crawl();
+       removable = findRemovableBindings(path);
+     },
+     ImportDeclaration(path) {

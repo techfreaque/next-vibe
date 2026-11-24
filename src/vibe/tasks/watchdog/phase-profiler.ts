@@ -156,10 +156,52 @@ function dependencyFamily(sourceURL = ""): string | undefined {
   const marker = "/node_modules/";
   const start = sourceURL.lastIndexOf(marker);
   if (start >= 0) {
-    // Scoped packages like @babel/traverse and @babel/types share a caller stack.
-    return sourceURL.slice(start + marker.length).split("/", 1)[0];
+    const [scopeOrPackage, packageName] = sourceURL
+      .slice(start + marker.length)
+      .split("/", 2);
+    if (
+      packageName &&
+      scopeOrPackage.startsWith("@") &&
+      scopeOrPackage !== "@babel"
+    ) {
+      return `${scopeOrPackage}/${packageName}`;
+    }
+    return scopeOrPackage;
   }
   return undefined;
+}
+
+function stackKey(frames: SamplingProfileStackFrame[]): string {
+  const head = frames.slice(0, 5);
+  const parts = head.map(frameKey);
+  const families = new Set(
+    head.map((frame) => dependencyFamily(frame.sourceURL)),
+  );
+  if (families.has(undefined)) {
+    return parts.join(" < ");
+  }
+
+  // Keep compiler callers beyond Babel and its dead-code pass.
+  let previousIndex = head.length - 1;
+  for (
+    let index = head.length;
+    index < frames.length && parts.length < 8;
+    index++
+  ) {
+    const frame = frames[index];
+    const family = dependencyFamily(frame.sourceURL);
+    if (families.has(family)) {
+      continue;
+    }
+    const gap = index > previousIndex + 1 ? "… < " : "";
+    parts.push(`${gap}${frameKey(frame)}`);
+    if (family === undefined) {
+      break;
+    }
+    families.add(family);
+    previousIndex = index;
+  }
+  return parts.join(" < ");
 }
 
 function topCounts(counts: Map<string, number>, limit: number): string {
@@ -233,20 +275,7 @@ function summarize(
     const [innermost] = appFrames;
     if (innermost) {
       bump(hotFrames, frameKey(innermost));
-      const head = appFrames.slice(0, 5);
-      const family = dependencyFamily(innermost.sourceURL);
-      const caller = family
-        ? appFrames.find(
-            (frame) => dependencyFamily(frame.sourceURL) !== family,
-          )
-        : undefined;
-      const stack = head.map((frame) => frameKey(frame)).join(" < ");
-      bump(
-        hotStacks,
-        caller && !head.includes(caller)
-          ? `${stack} < … < ${frameKey(caller)}`
-          : stack,
-      );
+      bump(hotStacks, stackKey(appFrames));
     }
   }
 
