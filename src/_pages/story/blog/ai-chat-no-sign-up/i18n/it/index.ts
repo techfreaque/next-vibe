@@ -2,19 +2,19 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title: "Chat IA senza registrazione, email o account | {{appName}}",
+    title: "Chat AI gratis senza registrazione né email | {{appName}}",
     description:
-      "Chat IA senza registrazione e senza account su {{appName}}: crediti gratuiti ogni mese, modelli dai mainstream ai senza censura, cronologia in incognito salvata nel tuo browser. Cosa vuol dire anonimo qui, e cosa no.",
+      "Chat AI gratis, senza registrazione e senza account su {{appName}}: crediti gratuiti ogni mese, modelli dai mainstream ai senza censura, cronologia in incognito salvata nel tuo browser. Cosa vuol dire anonimo qui, e cosa no.",
     category: "Guida",
     imageAlt: "Una chat IA che parte senza modulo di registrazione",
     keywords:
-      "chat IA senza registrazione, chat AI anonima, chat IA anonima, IA senza account, chat AI senza registrazione, chat IA gratis senza registrazione, chat IA senza login, chat IA privata, chat IA senza censura senza registrazione, chat IA in incognito, chatbot senza email, {{appName}}",
+      "chat AI gratis senza registrazione, chat IA senza registrazione, chat AI anonima, chat IA anonima, IA senza account, chat AI senza registrazione, chat IA gratis senza registrazione, chat IA senza login, chat IA privata, chat IA senza censura senza registrazione, chat IA in incognito, chatbot senza email, {{appName}}",
   },
   hero: {
     backToBlog: "Torna al blog",
     category: "Guida",
     readTime: "6 min di lettura",
-    title: "Chat IA senza registrazione. Niente email. Niente numero.",
+    title: "Chat AI gratis e senza registrazione. Niente email. Niente numero.",
     subtitle:
       "{{guestCredits}} crediti gratuiti al mese, {{modelCount}} modelli di chat, una cronologia in incognito che resta nel tuo browser. E l'elenco onesto di ciò che l'anonimato non copre.",
   },

@@ -2,7 +2,7 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title: "ChatGPT-Alternative ohne Filter | {{appName}}",
+    title: "ChatGPT ohne Filter: die unzensierte Alternative | {{appName}}",
     description:
       "Du suchst ChatGPT ohne Filter? Erfahre, welche Schutzmechanismen GPT behält, vergleiche offene und unzensierte Modelle und teste einen anderen Chatbot ohne Konto.",
     category: "Ratgeber",
@@ -14,7 +14,7 @@ export const translations: typeof enTranslations = {
     backToBlog: "Zurück zum Blog",
     category: "Ratgeber",
     readTime: "7 Min. Lesezeit",
-    title: "Eine ChatGPT-Alternative mit unzensierten Modellen",
+    title: "ChatGPT ohne Filter: eine Alternative mit unzensierten Modellen",
     subtitle:
       "Vergleiche auf {{appName}} Mainstream-Modelle, offene Modelle und unzensierte KI. Erfahre, was ein Modellwechsel im Chat ändert und was die Modelle kosten.",
   },

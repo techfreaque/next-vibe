@@ -2,19 +2,19 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title: "KI Chat ohne Anmeldung: keine E-Mail, kein Konto | {{appName}}",
+    title: "KI-Chat kostenlos ohne Anmeldung, ohne E-Mail | {{appName}}",
     description:
-      "KI Chat ohne Anmeldung und ohne Registrierung auf {{appName}}: Gratis-Credits jeden Monat, Mainstream- bis unzensierte Modelle, Inkognito-Verlauf im Browser. Was anonym hier heißt und was nicht.",
+      "Kostenloser KI-Chat ohne Anmeldung und ohne Registrierung auf {{appName}}: Gratis-Credits jeden Monat, Mainstream- bis unzensierte Modelle, Inkognito-Verlauf im Browser. Was anonym hier heißt und was nicht.",
     category: "Ratgeber",
     imageAlt: "Ein KI-Chat, der ohne Anmeldeformular startet",
     keywords:
-      "KI Chat ohne Anmeldung, KI ohne Registrierung, anonymer KI Chat, KI Chat ohne Konto, KI Chat ohne Login, privater KI Chat, kostenloser KI Chat ohne Registrierung, unzensierter KI Chat ohne Anmeldung, Inkognito KI Chat, Chatbot ohne E-Mail, {{appName}}",
+      "KI Chat ohne Anmeldung, KI Chat kostenlos ohne Anmeldung, KI ohne Registrierung, anonymer KI Chat, KI Chat ohne Konto, KI Chat ohne Login, privater KI Chat, kostenloser KI Chat ohne Registrierung, unzensierter KI Chat ohne Anmeldung, Inkognito KI Chat, Chatbot ohne E-Mail, {{appName}}",
   },
   hero: {
     backToBlog: "Zurück zum Blog",
     category: "Ratgeber",
     readTime: "6 Min. Lesezeit",
-    title: "KI-Chat ohne Anmeldung. Ohne E-Mail. Ohne Handynummer.",
+    title: "Kostenloser KI-Chat ohne Anmeldung. Ohne E-Mail. Ohne Handynummer.",
     subtitle:
       "{{guestCredits}} Gratis-Credits im Monat, {{modelCount}} Chat-Modelle, ein Inkognito-Verlauf, der in Ihrem Browser bleibt. Und eine ehrliche Liste dessen, was anonym nicht abdeckt.",
   },

@@ -107,6 +107,13 @@ export const translations: typeof enTranslations = {
         "Gab AI è libero sulla politica, rigido sui contenuti per adulti e conserva le tue chat. Sei alternative verificate su termini, prezzi e privacy policy.",
       readTime: "9 min di lettura",
     },
+    freeUncensoredAi: {
+      title: "AI senza censura gratis. Cosa vuol dire davvero gratis.",
+      category: "Guida",
+      excerpt:
+        "Cosa danno davvero gratis Venice, uncensored.ai, FreedomGPT, Gab AI, OpenRouter, Ollama, LM Studio e noi. Ogni limite giornaliero e ogni fregatura, verificati sulle loro pagine.",
+      readTime: "8 min di lettura",
+    },
     noFilterGptAlternatives: {
       title: "Alternative a NoFilterGPT. Più modelli, stessa libertà.",
       category: "Confronto",

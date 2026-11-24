@@ -109,6 +109,13 @@ export const translations: typeof enTranslations = {
         "Gab AI ist frei bei Politik, streng bei Erwachseneninhalten und speichert deine Chats. Sechs Alternativen, geprüft an ihren Bedingungen, Preisen und Datenschutzseiten.",
       readTime: "9 Min. Lesezeit",
     },
+    freeUncensoredAi: {
+      title: "Unzensierte KI kostenlos. Was gratis wirklich heißt.",
+      category: "Ratgeber",
+      excerpt:
+        "Was Venice, uncensored.ai, FreedomGPT, Gab AI, OpenRouter, Ollama, LM Studio und wir wirklich gratis geben. Jedes Tageslimit und jeder Haken, geprüft auf ihren eigenen Seiten.",
+      readTime: "8 Min. Lesezeit",
+    },
     noFilterGptAlternatives: {
       title: "NoFilterGPT Alternativen. Mehr Modelle, gleiche Freiheit.",
       category: "Vergleich",

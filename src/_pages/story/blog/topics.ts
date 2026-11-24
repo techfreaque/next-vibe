@@ -22,6 +22,7 @@ export type BlogTopic = (typeof BLOG_TOPICS)[number];
 
 /** Section of each post on the blog index. Exhaustive: a new post needs one. */
 export const POST_TOPICS: Record<BlogPostSlug, BlogTopic> = {
+  "free-uncensored-ai": "uncensored",
   "freedomgpt-alternatives": "uncensored",
   "gab-ai-alternatives": "uncensored",
   "nofiltergpt-alternatives": "uncensored",
@@ -92,6 +93,7 @@ export const HUB_GUIDES: Record<TopicHub, readonly BlogPostSlug[]> = {
     "nofiltergpt-alternatives",
     "freedomgpt-alternatives",
     "gab-ai-alternatives",
+    "free-uncensored-ai",
     "ai-chat-no-sign-up",
     "uncensored-llm-without-gpu",
     "uncensored-llm-api",
@@ -117,6 +119,14 @@ interface RelatedGuideSet {
 
 /** Curated hub + siblings. Posts not listed fall back to their topic. */
 const CURATED_RELATED: Partial<Record<BlogPostSlug, RelatedGuideSet>> = {
+  "free-uncensored-ai": {
+    hub: "uncensored",
+    related: [
+      "ai-chat-no-sign-up",
+      "uncensored-llm-without-gpu",
+      "nofiltergpt-alternatives",
+    ],
+  },
   "freedomgpt-alternatives": {
     hub: "uncensored",
     related: [
@@ -200,9 +210,9 @@ const CURATED_RELATED: Partial<Record<BlogPostSlug, RelatedGuideSet>> = {
   "ai-chat-no-sign-up": {
     hub: "uncensored",
     related: [
+      "free-uncensored-ai",
       "venice-ai-alternatives",
       "uncensored-llm-without-gpu",
-      "best-uncensored-llm",
     ],
   },
   "uncensored-llm-without-gpu": {

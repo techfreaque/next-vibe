@@ -109,6 +109,13 @@ export const translations: typeof enTranslations = {
         "Gab AI daje swobodę w polityce, jest surowy przy treściach dla dorosłych i trzyma twoje czaty. Sześć alternatyw sprawdzonych na ich regulaminach, cennikach i politykach prywatności.",
       readTime: "9 min czytania",
     },
+    freeUncensoredAi: {
+      title: "AI bez cenzury za darmo. Co naprawdę znaczy darmowe.",
+      category: "Poradnik",
+      excerpt:
+        "Co Venice, uncensored.ai, FreedomGPT, Gab AI, OpenRouter, Ollama, LM Studio i my naprawdę dajemy za darmo. Każdy dzienny limit i haczyk, sprawdzone na ich własnych stronach.",
+      readTime: "8 min czytania",
+    },
     noFilterGptAlternatives: {
       title: "Alternatywy dla NoFilterGPT. Więcej modeli, ta sama swoboda.",
       category: "Porównanie",

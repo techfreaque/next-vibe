@@ -35,8 +35,24 @@ describe("seo-locales", () => {
   it("builds valid alternates with x-default and no GLOBAL region", () => {
     const alternates = seoLanguageAlternates("https://example.com/", "models");
     expect(Object.keys(alternates).toSorted()).toEqual(
-      ["de-DE", "en", "en-US", "fr-FR", "it-IT", "es-ES", "pl-PL", "x-default"].toSorted(),
+      [
+        "de-DE",
+        "de",
+        "en",
+        "en-US",
+        "fr-FR",
+        "fr",
+        "it-IT",
+        "it",
+        "es-ES",
+        "es",
+        "pl-PL",
+        "pl",
+        "x-default",
+      ].toSorted(),
     );
+    expect(alternates["de"]).toBe("https://example.com/de-DE/models");
+    expect(alternates["es"]).toBe("https://example.com/es-ES/models");
     expect(alternates["x-default"]).toBe("https://example.com/en-GLOBAL/models");
     expect(alternates["en"]).toBe("https://example.com/en-GLOBAL/models");
     expect(seoLanguageAlternates("https://example.com", "")["de-DE"]).toBe(

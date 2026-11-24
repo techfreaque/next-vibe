@@ -2,11 +2,11 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title: "Alternative à ChatGPT sans filtres | {{appName}}",
+    title: "ChatGPT sans filtre : l'alternative non censurée | {{appName}}",
     description:
       "Vous cherchez un ChatGPT sans filtre ? Voyez quelles protections GPT conserve, comparez les modèles ouverts et sans censure et essayez un autre chatbot sans compte.",
     category: "Guide",
-    imageAlt: "{{appName}} : une alternative à ChatGPT sans filtres",
+    imageAlt: "{{appName}} : une alternative à ChatGPT sans filtre",
     keywords:
       "alternative à ChatGPT, alternative à ChatGPT sans filtres, alternative à ChatGPT non censurée, ChatGPT sans restrictions, chat IA sans filtre, IA non censurée, UncensoredLM, IA non censurée pour la politique, {{appName}}, Claude, GPT, Gemini, DeepSeek, Venice",
   },
@@ -14,7 +14,8 @@ export const translations: typeof enTranslations = {
     backToBlog: "Retour au blog",
     category: "Guide",
     readTime: "7 min de lecture",
-    title: "Une alternative à ChatGPT avec des modèles sans censure",
+    title:
+      "ChatGPT sans filtre : une alternative avec des modèles sans censure",
     subtitle:
       "Comparez les modèles grand public, ouverts et sans censure sur {{appName}}. Voyez ce que change le choix du modèle et combien coûte chaque option.",
   },

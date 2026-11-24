@@ -2,9 +2,10 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title: "Chat IA sans inscription : ni e-mail, ni compte | {{appName}}",
+    title:
+      "Chat IA gratuit sans inscription : ni e-mail, ni compte | {{appName}}",
     description:
-      "Un chat IA sans inscription et sans compte sur {{appName}} : crédits gratuits chaque mois, des modèles grand public aux non censurés, historique incognito gardé dans votre navigateur. Ce qu'anonyme veut dire, et ce qu'il ne veut pas dire.",
+      "Un chat IA gratuit, sans inscription et sans compte sur {{appName}} : crédits gratuits chaque mois, des modèles grand public aux non censurés, historique incognito gardé dans votre navigateur. Ce qu'anonyme veut dire, et ce qu'il ne veut pas dire.",
     category: "Guide",
     imageAlt: "Un chat IA qui démarre sans formulaire d'inscription",
     keywords:
@@ -14,7 +15,7 @@ export const translations: typeof enTranslations = {
     backToBlog: "Retour au blog",
     category: "Guide",
     readTime: "6 min de lecture",
-    title: "Un chat IA sans inscription. Sans e-mail. Sans numéro.",
+    title: "Un chat IA gratuit et sans inscription. Sans e-mail. Sans numéro.",
     subtitle:
       "{{guestCredits}} crédits gratuits par mois, {{modelCount}} modèles de chat, un historique incognito qui reste dans votre navigateur. Et la liste honnête de ce que l'anonymat ne couvre pas.",
   },

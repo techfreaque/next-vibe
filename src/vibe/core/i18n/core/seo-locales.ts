@@ -32,8 +32,11 @@ export function hreflangFor(locale: CountryLanguage): string {
 }
 
 /**
- * hreflang alternates for a locale-less path: every indexable locale plus
- * x-default. Keys are hreflang values, values are absolute URLs.
+ * hreflang alternates for a locale-less path: every indexable locale, the bare
+ * language for languages without a GLOBAL locale (so de-AT, de-CH, fr-BE,
+ * fr-CA, es-MX and friends get the German/French/Spanish page instead of the
+ * English x-default), plus x-default. Keys are hreflang values, values are
+ * absolute URLs.
  */
 export function seoLanguageAlternates(
   baseUrl: string,
@@ -44,6 +47,10 @@ export function seoLanguageAlternates(
   const alternates: Record<string, string> = {};
   for (const locale of SEO_LOCALES) {
     alternates[hreflangFor(locale)] = `${base}/${locale}${suffix}`;
+  }
+  for (const locale of SEO_LOCALES) {
+    const language = locale.split("-")[0] ?? locale;
+    alternates[language] ??= `${base}/${canonicalSeoLocale(locale)}${suffix}`;
   }
   alternates["x-default"] = `${base}/${SEO_DEFAULT_LOCALE}${suffix}`;
   return alternates;

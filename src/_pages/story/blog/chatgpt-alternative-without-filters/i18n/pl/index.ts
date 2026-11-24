@@ -2,9 +2,9 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title: "Alternatywa dla ChatGPT bez filtrów | {{appName}}",
+    title: "ChatGPT bez cenzury: alternatywa bez filtrów | {{appName}}",
     description:
-      "Szukasz ChatGPT bez filtrów? Sprawdź, jakie zabezpieczenia zachowuje GPT, porównaj modele otwarte i bez cenzury i wypróbuj inny chatbot bez konta.",
+      "Szukasz ChatGPT bez cenzury i bez filtrów? Sprawdź, jakie zabezpieczenia zachowuje GPT, porównaj modele otwarte i bez cenzury i wypróbuj inny chatbot bez konta.",
     category: "Poradnik",
     imageAlt: "{{appName}}: alternatywa dla ChatGPT bez filtrów",
     keywords:
@@ -14,7 +14,7 @@ export const translations: typeof enTranslations = {
     backToBlog: "Wróć do bloga",
     category: "Poradnik",
     readTime: "7 min czytania",
-    title: "Alternatywa dla ChatGPT z modelami bez cenzury",
+    title: "ChatGPT bez cenzury: alternatywa z modelami bez filtrów",
     subtitle:
       "Porównaj popularne modele, modele otwarte i modele bez cenzury w {{appName}}. Sprawdź, jak zmiana modelu wpływa na rozmowę i ile kosztują poszczególne opcje.",
   },

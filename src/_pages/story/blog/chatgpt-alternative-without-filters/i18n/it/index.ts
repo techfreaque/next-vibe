@@ -2,7 +2,7 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title: "Un’alternativa a ChatGPT senza filtri | {{appName}}",
+    title: "ChatGPT senza filtri: l’alternativa senza censura | {{appName}}",
     description:
       "Cerchi ChatGPT senza filtri? Scopri quali protezioni mantiene GPT, confronta i modelli aperti e senza censura e prova un altro chatbot senza registrarti.",
     category: "Guida",
@@ -13,8 +13,8 @@ export const translations: typeof enTranslations = {
   hero: {
     backToBlog: "Torna al blog",
     category: "Guida",
-    readTime: "7 min lettura",
-    title: "Un’alternativa a ChatGPT con modelli senza censura",
+    readTime: "7 min di lettura",
+    title: "ChatGPT senza filtri: un’alternativa con modelli senza censura",
     subtitle:
       "Confronta i modelli più diffusi, aperti e senza censura su {{appName}}. Scopri cosa cambia nella chat quando passi a un altro modello e quanto costa ciascuna opzione.",
   },
@@ -80,56 +80,55 @@ export const translations: typeof enTranslations = {
     compare:
       "Confronta le coppie disponibili per prezzo, finestra di contesto e funzionalità.",
     compareLink: "Confronta {{a}} con {{b}}",
-    guideLink: "Leggi la guida di ogni modello non censurato",
+    guideLink: "Leggi la guida a tutti i modelli senza censura",
   },
   privacy: {
-    title: "Una chat AI non filtrata è privata?",
-    intro: "Dipende dalla cartella. Ecco cosa succede.",
+    title: "Una chat AI senza filtri è privata?",
+    intro: "Dipende dalla cartella. Ecco cosa succede, esattamente.",
     incognito:
-      "Incognito chat live nella memoria locale del tuo browser. La conversazione non viene salvata sui nostri server (i supporti generati vengono memorizzati temporaneamente per motivi tecnici). Cancellare i dati del browser ed è andato.",
+      "Le chat in incognito restano nella memoria locale del tuo browser. La conversazione non viene salvata sui nostri server (i file generati restano salvati per un po' per motivi tecnici). Cancelli i dati del browser e spariscono.",
     transit:
-      "Ogni messaggio passa ancora attraverso il nostro server al fornitore di modelli che scrive la risposta. Ecco come funziona ogni AI ospitato. L'utilizzo del credito viene registrato in modo da fatturare funziona.",
+      "Ogni messaggio passa comunque dal nostro server fino al fornitore del modello che scrive la risposta. Funziona così per qualsiasi AI ospitata online. Il consumo di crediti viene registrato per la fatturazione.",
     memory:
-      "La memoria è spenta in incognito. La memoria persistente ha bisogno di un account gratuito e della cartella privata.",
+      "In incognito la memoria è spenta. La memoria persistente richiede un account gratuito e la cartella privata.",
     private:
-      "Le chat private vengono salvate sul server e visibili solo sul tuo account. Apriteli da qualsiasi dispositivo in cui accedete.",
+      "Le chat private vengono salvate sul server e le vede solo il tuo account. Aprile da qualsiasi dispositivo su cui hai fatto l'accesso.",
     callout:
-      "Versione breve: incognito mantiene la tua storia fuori dai nostri server. Non nasconde i tuoi messaggi dal modello che li risponde.",
+      "In breve: l'incognito tiene la tua cronologia fuori dai nostri server. Non nasconde i tuoi messaggi al modello che risponde.",
   },
   pricing: {
     title: "Quanto costa?",
-    intro: "Crediti. Un saldo per ogni modello.",
-    free: "Gratis: {{guestCredits}} accredita un mese senza un account, {{freeCredits}} con un account gratuito, {{maxCredits}} con un account e la newsletter. Abbastanza da provare diversi modelli sulle proprie richieste.",
-    sub: "Piani mensili: quattro dimensioni, a partire dai crediti {{subCredits}} per {{subPrice}}.",
-    pack: "Pacchetti per ricaricare i crediti dell’abbonamento. {{packCredits}} crediti per {{packPrice}}. Non scadono mai. Paga con carta, PayPal o criptovalute.",
+    intro: "Crediti. Un solo saldo per tutti i modelli.",
+    free: "Gratis: {{guestCredits}} crediti al mese senza account, {{freeCredits}} con un account gratuito, {{maxCredits}} con account e newsletter. Abbastanza per provare diversi modelli con le tue domande.",
+    sub: "Piani mensili: quattro tagli, a partire da {{subCredits}} crediti per {{subPrice}}.",
+    pack: "Pacchetti di crediti: una ricarica per gli abbonati, {{packCredits}} crediti per {{packPrice}}. Non scadono mai. Carta, PayPal o cripto.",
     oneBalance:
-      "Lo stesso saldo copre l'immagine, la generazione di video e musica, l'ingresso vocale e l'output, e la ricerca web.",
+      "Lo stesso saldo copre la generazione di immagini, video e musica, la voce in ingresso e in uscita e la ricerca web.",
     metered:
-      "Ogni messaggio costa crediti in base al modello. I modelli Flash costano una frazione di un modello di frontiera. Ogni pagina modello mostra il prezzo.",
-    link: "Vedi piani e pacchetti di credito",
+      "Ogni messaggio costa crediti in base al modello. I modelli Flash costano una frazione di un modello di punta. Ogni pagina modello mostra il prezzo.",
+    link: "Vedi piani e pacchetti di crediti",
   },
   chatgptBetter: {
-    title: "Quando è ChatGPT la scelta migliore?",
-    intro: "A volte. Ecco qua quando.",
+    title: "Quando conviene ChatGPT?",
+    intro: "A volte. Ecco quando.",
     oneVendor:
-      "Usa solo i modelli OpenAI e non colpisci mai un rifiuto. Poi un venditore, una app, un abbonamento è più semplice.",
+      "Usi solo modelli OpenAI e non incappi mai in un rifiuto. Allora un fornitore, un'app e un abbonamento sono più semplici.",
     flatRate:
-      "Si desidera una tassa piana e non si vuole mai pensare a costo per messaggio. I crediti sono misurati e l'uso quotidiano pesante dei modelli di frontiera aggiunge.",
+      "Vuoi un prezzo fisso e non pensare mai al costo per messaggio. I crediti si pagano a consumo, e l'uso quotidiano intenso dei modelli di punta si fa sentire.",
     firstFeatures:
-      "Si desidera che le nuove funzioni app di un laboratorio il giorno di lancio. I laboratori spesso spediscono nuove funzionalità nelle proprie app prima.",
+      "Vuoi le novità di un laboratorio il giorno stesso del lancio. I laboratori spesso portano le nuove funzioni prima nelle proprie app.",
     wantFilter:
-      "Vuoi il filtro. Il conto di un bambino o un posto di lavoro con regole rigorose ha bisogno di guardrails. Potete rimanere sul livello principale qui, ma un prodotto bloccato può adattarsi meglio.",
+      "Vuoi il filtro. L'account di un minore o un ambiente di lavoro con regole rigide ha bisogno di paletti. Qui puoi restare sul livello mainstream, ma un prodotto blindato può andarti meglio.",
   },
   limits: {
-    title: "Quali sono i lati negativi?",
-    intro:
-      "Non filtrato viene fornito con i tradeoff. Conosceteli prima di passare.",
+    title: "Quali sono i contro?",
+    intro: "Senza filtri ci sono dei compromessi. Conoscili prima di cambiare.",
     smaller:
-      "La maggior parte dei modelli non censurati sono più piccoli dei modelli di frontiera. Molti sono costruiti per la conversazione e la finzione, non l'analisi difficile. UncensoredLM è costruito per le risposte franche, non per il codice. Sul ragionamento più duro e lungo lavoro di codifica, i modelli principali top ancora vincere.",
+      "La maggior parte dei modelli senza censura è più piccola dei modelli di punta. Diversi sono fatti per conversare e per la narrativa, non per analisi impegnative. UncensoredLM è fatto per risposte schiette, non per il codice. Nel ragionamento più difficile e nei lavori di codice lunghi vincono ancora i migliori modelli mainstream.",
     tools:
-      "Non ogni modello non censurato supporta le chiamate degli strumenti. Controllare la pagina del modello prima di contare sulla ricerca web o altri strumenti.",
+      "Non tutti i modelli senza censura supportano le chiamate agli strumenti. Controlla la pagina del modello prima di contare sulla ricerca web o su altri strumenti.",
     vendor:
-      "I modelli più diffusi conservano le misure di sicurezza del loro fornitore. Anche i modelli senza censura possono rifiutare una richiesta.",
+      "I modelli mainstream conservano le misure di sicurezza del loro fornitore. Anche i modelli senza censura possono rifiutare una richiesta.",
     responsibility:
       "Verifica le informazioni importanti prima di condividere una risposta o di prendere una decisione basata su ciò che dice.",
   },
@@ -138,29 +137,29 @@ export const translations: typeof enTranslations = {
       q: "Posso disattivare le misure di sicurezza di GPT in un’alternativa a ChatGPT?",
       a: "Su {{appName}}, GPT mantiene le misure di sicurezza del suo fornitore. Se scegli un modello senza censura, risponde quell’altro modello, con il suo comportamento.",
     },
-    title: "FAQ",
+    title: "Domande frequenti",
     free: {
-      q: "{{appName}} è gratuito?",
-      a: "Nessun conto: {{guestCredits}} crediti gratuiti al mese. Conto gratuito: {{freeCredits}}. Account + newsletter: {{maxCredits}}. Dopo di che: un piano, da {{subPrice}} al mese.",
+      q: "{{appName}} è gratis?",
+      a: "Senza account: {{guestCredits}} crediti gratuiti al mese. Con un account gratuito: {{freeCredits}}. Con account e newsletter: {{maxCredits}}. Poi un piano, da {{subPrice}} al mese.",
     },
     account: {
-      q: "Mi serve un conto?",
-      a: "No. Incognito chat funziona senza uno. Hai bisogno di un account per la memoria e per le chat salvate sul server.",
+      q: "Mi serve un account?",
+      a: "No. La chat in incognito funziona senza. L'account serve per la memoria e per salvare le chat sul server.",
     },
     api: {
       q: "Posso usare questi modelli nei miei strumenti?",
-      a: "Si'. Ogni piano a pagamento include un OpenAI -compatibile API. Una chiave, ogni modello, quelle non censurate incluse.",
+      a: "Sì. Ogni piano a pagamento include un'API compatibile con OpenAI. Una chiave, tutti i modelli, compresi quelli senza censura.",
     },
     openSource: {
       q: "{{appName}} è open source?",
-      a: "Si'. Il codice è open source sotto MIT e GPL v3, e si può eseguire la propria istanza.",
+      a: "Sì. Il codice è open source con licenza MIT e GPL v3, e puoi far girare la tua istanza.",
     },
-    apiLink: "Impostare lo API nei tuoi strumenti di codifica",
-    selfHostLink: "Eseguire la propria istanza",
+    apiLink: "Configura l'API nei tuoi strumenti di sviluppo",
+    selfHostLink: "Avvia la tua istanza",
   },
   partners: {
-    body: "Eseguire un canale, newsletter o comunità su AI? Il programma partner {{appName}} paga una quota ricorrente di ogni pagamento che si riferisce.",
-    link: "Vedere il programma partner",
+    body: "Hai un canale, una newsletter o una community sull'AI? Il programma partner di {{appName}} ti paga una quota ricorrente su ogni pagamento che porti.",
+    link: "Scopri il programma partner",
   },
   cta: {
     title: "Scegli un modello e inizia a chattare",

@@ -2,19 +2,20 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title: "Czat AI bez rejestracji: bez maila, bez konta | {{appName}}",
+    title: "Czat AI za darmo bez rejestracji, bez maila | {{appName}}",
     description:
-      "Czat AI bez rejestracji i bez logowania na {{appName}}: darmowe kredyty co miesiąc, modele od głównego nurtu po nieocenzurowane, historia incognito w twojej przeglądarce. Co tu znaczy anonimowo, a co nie.",
+      "Czat AI za darmo, bez rejestracji i bez logowania na {{appName}}: darmowe kredyty co miesiąc, modele od głównego nurtu po nieocenzurowane, historia incognito w twojej przeglądarce. Co tu znaczy anonimowo, a co nie.",
     category: "Poradnik",
     imageAlt: "Czat AI, który startuje bez formularza rejestracji",
     keywords:
-      "czat AI bez rejestracji, AI bez logowania, czat AI bez konta, anonimowy czat AI, darmowy czat AI bez rejestracji, prywatny czat AI, chatbot bez rejestracji, nieocenzurowany czat AI bez rejestracji, czat AI incognito, AI bez maila, {{appName}}",
+      "czat AI bez rejestracji, czat AI za darmo, AI za darmo bez rejestracji, AI bez logowania, czat AI bez konta, anonimowy czat AI, darmowy czat AI bez rejestracji, prywatny czat AI, chatbot bez rejestracji, nieocenzurowany czat AI bez rejestracji, czat AI incognito, AI bez maila, {{appName}}",
   },
   hero: {
     backToBlog: "Wróć do bloga",
     category: "Poradnik",
     readTime: "6 min czytania",
-    title: "Czat AI bez rejestracji. Bez maila. Bez numeru telefonu.",
+    title:
+      "Czat AI za darmo i bez rejestracji. Bez maila. Bez numeru telefonu.",
     subtitle:
       "{{guestCredits}} darmowych kredytów miesięcznie, {{modelCount}} modeli czatu, historia incognito, która zostaje w twojej przeglądarce. I uczciwa lista tego, czego anonimowość nie obejmuje.",
   },

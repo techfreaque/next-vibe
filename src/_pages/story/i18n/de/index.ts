@@ -3,7 +3,7 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   meta: {
     title:
-      "Unzensierter KI-Chat: {{modelCount}} Modelle, gratis testen | {{appName}}",
+      "Unzensierter KI-Chat: {{modelCount}} Modelle, kostenlos testen | {{appName}}",
     category: "KI-Chat-Plattform",
     description:
       "{{modelCount}} KI-Modelle in einem Chat, davon {{uncensoredCount}} unzensiert oder abliteriert. Direkt im Browser mit bis zu {{credits}} Gratis-Credits für Gäste. Ohne Anmeldung. Den Filter wählst du.",

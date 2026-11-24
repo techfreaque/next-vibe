@@ -197,6 +197,7 @@ import { Route as LocaleStoryBlogClaudeWithoutFiltersIndexRouteImport } from './
 import { Route as LocaleStoryBlogDeadTradingBotToMonitoringEngineIndexRouteImport } from './routes/$locale.story.blog.dead-trading-bot-to-monitoring-engine.index'
 import { Route as LocaleStoryBlogDeepseekUncensoredIndexRouteImport } from './routes/$locale.story.blog.deepseek-uncensored.index'
 import { Route as LocaleStoryBlogE2eTestsFoundRealBugsIndexRouteImport } from './routes/$locale.story.blog.e2e-tests-found-real-bugs.index'
+import { Route as LocaleStoryBlogFreeUncensoredAiIndexRouteImport } from './routes/$locale.story.blog.free-uncensored-ai.index'
 import { Route as LocaleStoryBlogFreedomgptAlternativesIndexRouteImport } from './routes/$locale.story.blog.freedomgpt-alternatives.index'
 import { Route as LocaleStoryBlogGabAiAlternativesIndexRouteImport } from './routes/$locale.story.blog.gab-ai-alternatives.index'
 import { Route as LocaleStoryBlogGrokAlternativeIndexRouteImport } from './routes/$locale.story.blog.grok-alternative.index'
@@ -1792,6 +1793,12 @@ const LocaleStoryBlogE2eTestsFoundRealBugsIndexRoute =
   LocaleStoryBlogE2eTestsFoundRealBugsIndexRouteImport.update({
     id: '/blog/e2e-tests-found-real-bugs/',
     path: '/blog/e2e-tests-found-real-bugs/',
+    getParentRoute: () => LocaleStoryRoute,
+  } as any)
+const LocaleStoryBlogFreeUncensoredAiIndexRoute =
+  LocaleStoryBlogFreeUncensoredAiIndexRouteImport.update({
+    id: '/blog/free-uncensored-ai/',
+    path: '/blog/free-uncensored-ai/',
     getParentRoute: () => LocaleStoryRoute,
   } as any)
 const LocaleStoryBlogFreedomgptAlternativesIndexRoute =
@@ -5629,6 +5636,7 @@ export interface FileRoutesByFullPath {
   '/$locale/story/blog/dead-trading-bot-to-monitoring-engine/': typeof LocaleStoryBlogDeadTradingBotToMonitoringEngineIndexRoute
   '/$locale/story/blog/deepseek-uncensored/': typeof LocaleStoryBlogDeepseekUncensoredIndexRoute
   '/$locale/story/blog/e2e-tests-found-real-bugs/': typeof LocaleStoryBlogE2eTestsFoundRealBugsIndexRoute
+  '/$locale/story/blog/free-uncensored-ai/': typeof LocaleStoryBlogFreeUncensoredAiIndexRoute
   '/$locale/story/blog/freedomgpt-alternatives/': typeof LocaleStoryBlogFreedomgptAlternativesIndexRoute
   '/$locale/story/blog/gab-ai-alternatives/': typeof LocaleStoryBlogGabAiAlternativesIndexRoute
   '/$locale/story/blog/grok-alternative/': typeof LocaleStoryBlogGrokAlternativeIndexRoute
@@ -6373,6 +6381,7 @@ export interface FileRoutesByTo {
   '/$locale/story/blog/dead-trading-bot-to-monitoring-engine': typeof LocaleStoryBlogDeadTradingBotToMonitoringEngineIndexRoute
   '/$locale/story/blog/deepseek-uncensored': typeof LocaleStoryBlogDeepseekUncensoredIndexRoute
   '/$locale/story/blog/e2e-tests-found-real-bugs': typeof LocaleStoryBlogE2eTestsFoundRealBugsIndexRoute
+  '/$locale/story/blog/free-uncensored-ai': typeof LocaleStoryBlogFreeUncensoredAiIndexRoute
   '/$locale/story/blog/freedomgpt-alternatives': typeof LocaleStoryBlogFreedomgptAlternativesIndexRoute
   '/$locale/story/blog/gab-ai-alternatives': typeof LocaleStoryBlogGabAiAlternativesIndexRoute
   '/$locale/story/blog/grok-alternative': typeof LocaleStoryBlogGrokAlternativeIndexRoute
@@ -7126,6 +7135,7 @@ export interface FileRoutesById {
   '/$locale/story/blog/dead-trading-bot-to-monitoring-engine/': typeof LocaleStoryBlogDeadTradingBotToMonitoringEngineIndexRoute
   '/$locale/story/blog/deepseek-uncensored/': typeof LocaleStoryBlogDeepseekUncensoredIndexRoute
   '/$locale/story/blog/e2e-tests-found-real-bugs/': typeof LocaleStoryBlogE2eTestsFoundRealBugsIndexRoute
+  '/$locale/story/blog/free-uncensored-ai/': typeof LocaleStoryBlogFreeUncensoredAiIndexRoute
   '/$locale/story/blog/freedomgpt-alternatives/': typeof LocaleStoryBlogFreedomgptAlternativesIndexRoute
   '/$locale/story/blog/gab-ai-alternatives/': typeof LocaleStoryBlogGabAiAlternativesIndexRoute
   '/$locale/story/blog/grok-alternative/': typeof LocaleStoryBlogGrokAlternativeIndexRoute
@@ -7879,6 +7889,7 @@ export interface FileRouteTypes {
     | '/$locale/story/blog/dead-trading-bot-to-monitoring-engine/'
     | '/$locale/story/blog/deepseek-uncensored/'
     | '/$locale/story/blog/e2e-tests-found-real-bugs/'
+    | '/$locale/story/blog/free-uncensored-ai/'
     | '/$locale/story/blog/freedomgpt-alternatives/'
     | '/$locale/story/blog/gab-ai-alternatives/'
     | '/$locale/story/blog/grok-alternative/'
@@ -8623,6 +8634,7 @@ export interface FileRouteTypes {
     | '/$locale/story/blog/dead-trading-bot-to-monitoring-engine'
     | '/$locale/story/blog/deepseek-uncensored'
     | '/$locale/story/blog/e2e-tests-found-real-bugs'
+    | '/$locale/story/blog/free-uncensored-ai'
     | '/$locale/story/blog/freedomgpt-alternatives'
     | '/$locale/story/blog/gab-ai-alternatives'
     | '/$locale/story/blog/grok-alternative'
@@ -9375,6 +9387,7 @@ export interface FileRouteTypes {
     | '/$locale/story/blog/dead-trading-bot-to-monitoring-engine/'
     | '/$locale/story/blog/deepseek-uncensored/'
     | '/$locale/story/blog/e2e-tests-found-real-bugs/'
+    | '/$locale/story/blog/free-uncensored-ai/'
     | '/$locale/story/blog/freedomgpt-alternatives/'
     | '/$locale/story/blog/gab-ai-alternatives/'
     | '/$locale/story/blog/grok-alternative/'
@@ -11448,6 +11461,13 @@ declare module '@tanstack/react-router' {
       path: '/blog/e2e-tests-found-real-bugs'
       fullPath: '/$locale/story/blog/e2e-tests-found-real-bugs/'
       preLoaderRoute: typeof LocaleStoryBlogE2eTestsFoundRealBugsIndexRouteImport
+      parentRoute: typeof LocaleStoryRoute
+    }
+    '/$locale/story/blog/free-uncensored-ai/': {
+      id: '/$locale/story/blog/free-uncensored-ai/'
+      path: '/blog/free-uncensored-ai'
+      fullPath: '/$locale/story/blog/free-uncensored-ai/'
+      preLoaderRoute: typeof LocaleStoryBlogFreeUncensoredAiIndexRouteImport
       parentRoute: typeof LocaleStoryRoute
     }
     '/$locale/story/blog/freedomgpt-alternatives/': {
@@ -15472,6 +15492,7 @@ interface LocaleStoryRouteChildren {
   LocaleStoryBlogDeadTradingBotToMonitoringEngineIndexRoute: typeof LocaleStoryBlogDeadTradingBotToMonitoringEngineIndexRoute
   LocaleStoryBlogDeepseekUncensoredIndexRoute: typeof LocaleStoryBlogDeepseekUncensoredIndexRoute
   LocaleStoryBlogE2eTestsFoundRealBugsIndexRoute: typeof LocaleStoryBlogE2eTestsFoundRealBugsIndexRoute
+  LocaleStoryBlogFreeUncensoredAiIndexRoute: typeof LocaleStoryBlogFreeUncensoredAiIndexRoute
   LocaleStoryBlogFreedomgptAlternativesIndexRoute: typeof LocaleStoryBlogFreedomgptAlternativesIndexRoute
   LocaleStoryBlogGabAiAlternativesIndexRoute: typeof LocaleStoryBlogGabAiAlternativesIndexRoute
   LocaleStoryBlogGrokAlternativeIndexRoute: typeof LocaleStoryBlogGrokAlternativeIndexRoute
@@ -15559,6 +15580,8 @@ const LocaleStoryRouteChildren: LocaleStoryRouteChildren = {
     LocaleStoryBlogDeepseekUncensoredIndexRoute,
   LocaleStoryBlogE2eTestsFoundRealBugsIndexRoute:
     LocaleStoryBlogE2eTestsFoundRealBugsIndexRoute,
+  LocaleStoryBlogFreeUncensoredAiIndexRoute:
+    LocaleStoryBlogFreeUncensoredAiIndexRoute,
   LocaleStoryBlogFreedomgptAlternativesIndexRoute:
     LocaleStoryBlogFreedomgptAlternativesIndexRoute,
   LocaleStoryBlogGabAiAlternativesIndexRoute:
