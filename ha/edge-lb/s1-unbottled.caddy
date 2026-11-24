@@ -90,7 +90,7 @@ unbottled.ai {
 			}
 		}
 	}
-	@meta_crawler header_regexp User-Agent (?i)facebookexternalhit|meta-externalagent|meta-externalfetcher
+	@meta_crawler header_regexp User-Agent (?i)facebookexternalhit|meta-externalagent|meta-externalfetcher|meta-webindexer
 	log_append @meta_crawler automation meta-crawler
 	@next_asset path /_next/*
 	log_append @next_asset surface next-asset
