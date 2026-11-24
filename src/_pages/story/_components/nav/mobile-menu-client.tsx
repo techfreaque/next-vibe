@@ -17,6 +17,7 @@ import { useCallback, useEffect, useState } from "react";
 
 import { ThemeToggleMobile } from "../../../_components/theme-toggle";
 import { scopedTranslation } from "../i18n";
+import { navLabelTranslation } from "../i18n/nav-labels";
 import type { NavItemType } from "./nav-constants";
 
 interface MobileMenuClientProps {
@@ -66,6 +67,7 @@ export function MobileMenuClient({
   isPublic,
 }: MobileMenuClientProps): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
+  const { t: navLabel } = navLabelTranslation.scopedT(locale);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>(
     {},
@@ -107,7 +109,7 @@ export function MobileMenuClient({
         size="icon"
         className="md:hidden"
         onClick={toggleMenu}
-        aria-label={t("common.accessibility.srOnly.toggleMenu")}
+        aria-label={navLabel("toggleMenu")}
       >
         {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
       </Button>

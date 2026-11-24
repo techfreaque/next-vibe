@@ -25,6 +25,7 @@ import {
 } from "react";
 
 import { scopedTranslation } from "../i18n";
+import { navLabelTranslation } from "../i18n/nav-labels";
 import type { NavChildItem, NavItemType } from "./nav-constants";
 
 interface OverflowNavProps {
@@ -191,6 +192,7 @@ export function OverflowNav({
   totalModelCount,
 }: OverflowNavProps): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
+  const { t: navLabel } = navLabelTranslation.scopedT(locale);
   const pathname = usePathname() ?? "";
   const containerRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -302,7 +304,7 @@ export function OverflowNav({
               variant="ghost"
               size="icon"
               className="shrink-0 h-9 w-9"
-              aria-label="More navigation items"
+              aria-label={navLabel("moreNavigation")}
             >
               <MoreHorizontal className="h-4 w-4" />
             </Button>

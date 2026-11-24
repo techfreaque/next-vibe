@@ -2,8 +2,9 @@ export function getDocumentLang(): string {
   return "";
 }
 
-export function setDocumentLang(lang: string): void {
+export function setDocumentLang(lang: string, dir?: "ltr" | "rtl"): void {
   void lang;
+  void dir;
 }
 
 export function getRootCssVar(name: string): string {

@@ -64,13 +64,6 @@ export const translations: typeof enTranslations = {
       },
     },
   },
-  common: {
-    accessibility: {
-      srOnly: {
-        toggleMenu: "Afficher ou masquer le menu",
-      },
-    },
-  },
   home: {
     splitHero: {
       seeHow: "Voir comment ça marche",

@@ -63,13 +63,6 @@ export const translations: typeof enTranslations = {
       },
     },
   },
-  common: {
-    accessibility: {
-      srOnly: {
-        toggleMenu: "Menü umschalten",
-      },
-    },
-  },
   home: {
     splitHero: {
       seeHow: "So funktioniert's",

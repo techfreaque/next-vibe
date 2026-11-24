@@ -5,7 +5,7 @@ import { useLogger } from "next-vibe/ui/hooks/use-logger";
 import { useRouter } from "next-vibe/ui/hooks/use-navigation";
 import { usePathname } from "next-vibe/ui/hooks/use-pathname";
 import { setCookie } from "next-vibe/ui/lib/cookies";
-import { getDocumentLang, setDocumentLang } from "next-vibe/ui/lib/css-vars";
+import { setDocumentLang } from "next-vibe/ui/lib/css-vars";
 import { assignUrl } from "next-vibe/ui/lib/location";
 import { storage } from "next-vibe/ui/lib/storage";
 import {
@@ -16,6 +16,7 @@ import {
   useEffect,
   useSyncExternalStore,
 } from "react";
+import { z } from "zod";
 
 import { LOCALE_COOKIE_NAME } from "@/env/constants";
 
@@ -24,10 +25,14 @@ import type { CountryInfo, CountryLanguage, Languages } from "./config";
 import {
   availableCountries,
   Countries,
+  CountryLanguageValues,
   defaultLocaleConfig,
   globalCountryInfo,
 } from "./config";
-import { languageForCountry } from "./language-utils";
+import {
+  getLanguageAndCountryFromLocale,
+  languageForCountry,
+} from "./language-utils";
 
 // Translation context type with country support
 interface TranslationContextType {
@@ -80,6 +85,7 @@ interface TranslationProviderProps {
 }
 
 const noopSubscribe = (): (() => void) => () => undefined;
+const routeLocaleSchema = z.enum(CountryLanguageValues);
 
 // false during SSR + hydration, true on the client afterwards
 function useIsMounted(): boolean {
@@ -100,15 +106,10 @@ export function TranslationProvider({
   const mounted = useIsMounted();
   const logger = useLogger();
 
-  // Extract language and country from current locale (from route)
-  const currentLanguage =
-    (currentLocale?.split("-")[0] as Languages) || defaultLocaleConfig.language;
-  const currentCountryCode =
-    (currentLocale?.split("-")[1] as Countries) || defaultLocaleConfig.country;
-
-  // Use current locale from route - no internal state needed
-  const language = currentLanguage;
-  const country = currentCountryCode;
+  // The root loader can be reused during navigation. Prefer the active route.
+  const routeLocale =
+    routeLocaleSchema.safeParse(pathname?.split("/")[1]).data ?? currentLocale;
+  const { language, country } = getLanguageAndCountryFromLocale(routeLocale);
 
   // Find the current country info
   const currentCountry =
@@ -200,7 +201,11 @@ export function TranslationProvider({
     navigateToLocale(newLocale);
   };
 
-  // Simple mount effect - only save current locale if none exists
+  useEffect(() => {
+    setDocumentLang(routeLocale, "ltr");
+  }, [routeLocale]);
+
+  // Seed the saved preference when there isn't one.
   useEffect(() => {
     if (typeof window === "undefined") {
       return;
@@ -208,19 +213,13 @@ export function TranslationProvider({
     async function initializeLocale(): Promise<void> {
       // Only save to localStorage if no preference exists (respect existing localStorage)
       const savedLocale = await storage.getItem(LOCALE_COOKIE_NAME, logger);
-      if (!savedLocale && currentLocale) {
-        await storage.setItem(LOCALE_COOKIE_NAME, currentLocale, logger);
-        await setCookie(LOCALE_COOKIE_NAME, currentLocale, logger);
-      }
-
-      // Update document language for accessibility (web only)
-      const newLocale = savedLocale ?? currentLocale;
-      if (newLocale !== getDocumentLang()) {
-        setDocumentLang(newLocale);
+      if (!savedLocale && routeLocale) {
+        await storage.setItem(LOCALE_COOKIE_NAME, routeLocale, logger);
+        await setCookie(LOCALE_COOKIE_NAME, routeLocale, logger);
       }
     }
     void initializeLocale();
-  }, [currentLocale, logger]);
+  }, [routeLocale, logger]);
 
   return (
     <TranslationContext.Provider

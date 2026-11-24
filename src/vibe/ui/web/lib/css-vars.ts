@@ -2,8 +2,14 @@ export function getDocumentLang(): string {
   return document.documentElement.lang;
 }
 
-export function setDocumentLang(lang: string): void {
-  document.documentElement.lang = lang;
+export function setDocumentLang(lang: string, dir?: "ltr" | "rtl"): void {
+  const root = document.documentElement;
+  if (root.lang !== lang) {
+    root.lang = lang;
+  }
+  if (dir && root.dir !== dir) {
+    root.dir = dir;
+  }
 }
 
 export function getRootCssVar(name: string): string {

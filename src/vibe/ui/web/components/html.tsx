@@ -4,6 +4,7 @@ import type { StyleType } from "../utils/style-type";
 
 export type HtmlProps = {
   lang?: string;
+  dir?: "ltr" | "rtl" | "auto";
   children: ReactNode;
   suppressHydrationWarning?: boolean;
 } & StyleType;
@@ -14,6 +15,7 @@ export type HtmlProps = {
  */
 export function Html({
   lang,
+  dir,
   children,
   className,
   style,
@@ -22,6 +24,7 @@ export function Html({
   return (
     <html
       lang={lang}
+      dir={dir}
       className={className}
       style={style}
       suppressHydrationWarning={suppressHydrationWarning}

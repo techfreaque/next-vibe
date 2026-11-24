@@ -1,19 +1,16 @@
 /* eslint-disable oxlint-plugin-jsx-capitalization/jsx-capitalization -- platform-agnostic HTML wrapper */
-import type { JSX, ReactNode } from "react";
+import type { JSX } from "react";
 
-import type { StyleType } from "../../web/utils/style-type";
+import type { HtmlProps } from "../../web/components/html";
 
-export type HtmlProps = {
-  lang?: string;
-  children: ReactNode;
-  suppressHydrationWarning?: boolean;
-} & StyleType;
+export type { HtmlProps } from "../../web/components/html";
 
 /**
  * Platform-agnostic HTML wrapper component (TanStack Start implementation)
  */
 export function Html({
   lang,
+  dir,
   children,
   className,
   style,
@@ -22,6 +19,7 @@ export function Html({
   return (
     <html
       lang={lang}
+      dir={dir}
       className={className}
       style={style}
       suppressHydrationWarning={suppressHydrationWarning}

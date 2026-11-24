@@ -129,6 +129,7 @@ export function TanstackPage({
     // script swaps to the OS scheme before first paint.
     <Html
       lang={locale}
+      dir="ltr"
       className={`${theme === "light" ? "light" : "dark"} ${inter.variable}`.trim()}
       suppressHydrationWarning
     >

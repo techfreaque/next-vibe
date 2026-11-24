@@ -62,13 +62,6 @@ export const translations = {
       },
     },
   },
-  common: {
-    accessibility: {
-      srOnly: {
-        toggleMenu: "Toggle menu",
-      },
-    },
-  },
   home: {
     splitHero: {
       seeHow: "See how it works",
