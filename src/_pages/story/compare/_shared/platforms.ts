@@ -1,6 +1,6 @@
 /**
  * Competitor facts for the comparison pages, verified on each platform's own
- * pages on COMPARE_CHECKED_DATE (pricing, features, privacy, API docs). Every
+ * pages on each platform's check date (pricing, features, privacy, API docs). Every
  * number here has a source URL in `sources`. Prices are the platform's own
  * USD list prices; copy formats them per locale and never repeats them.
  *
@@ -13,7 +13,7 @@ import { ApiProvider } from "next-vibe/agent/models/models";
 
 import type { UpstreamProvider } from "./us-facts";
 
-/** Day every competitor fact below was last checked on its source page. */
+/** Original verification date, used until a platform's full re-check. */
 export const COMPARE_CHECKED_DATE = "2026-11-17";
 /** Day the comparison pages first shipped. */
 export const COMPARE_PUBLISHED_DATE = "2026-11-17";
@@ -120,7 +120,7 @@ export const PLATFORMS: Record<PlatformKey, PlatformData> = {
     url: "https://venice.ai",
     kind: "uncensoredChat",
     freeTier: true,
-    payAsYouGo: false,
+    payAsYouGo: true,
     plans: [
       { name: "Pro", price: 18, period: "month" },
       { name: "Pro Plus", price: 68, period: "month" },
@@ -131,11 +131,17 @@ export const PLATFORMS: Record<PlatformKey, PlatformData> = {
     selfHost: false,
     media: { image: "yes", video: "yes", voice: "yes" },
     upstream: ApiProvider.VENICE_AI,
+    checkedDate: "2026-11-24",
     sources: [
       { kind: "pricing", url: "https://venice.ai/pricing" },
       { kind: "privacy", url: "https://venice.ai/privacy" },
-      { kind: "models", url: "https://docs.venice.ai/overview/models" },
-      { kind: "api", url: "https://docs.venice.ai/overview/pricing" },
+      { kind: "terms", url: "https://venice.ai/legal/tos" },
+      { kind: "models", url: "https://docs.venice.ai/models/overview" },
+      { kind: "models", url: "https://docs.venice.ai/models/text" },
+      {
+        kind: "api",
+        url: "https://docs.venice.ai/guides/integrations/x402-venice-api",
+      },
       { kind: "docs", url: "https://docs.venice.ai/overview/vvv-diem" },
       {
         kind: "help",
@@ -185,10 +191,12 @@ export const PLATFORMS: Record<PlatformKey, PlatformData> = {
     selfHost: false,
     media: { image: "yes", video: "yes", voice: "yes" },
     upstream: ApiProvider.NANO_GPT,
+    checkedDate: "2026-11-24",
     sources: [
       { kind: "pricing", url: "https://nano-gpt.com/pricing" },
       { kind: "privacy", url: "https://nano-gpt.com/privacy" },
-      { kind: "terms", url: "https://nano-gpt.com/terms" },
+      { kind: "terms", url: "https://nano-gpt.com/legal/terms-of-service" },
+      { kind: "api", url: "https://nano-gpt.com/api" },
       { kind: "models", url: "https://api.nano-gpt.com/api/v1/models" },
       { kind: "docs", url: "https://nano-gpt.com/llms-full.txt" },
     ],
@@ -233,6 +241,7 @@ export const PLATFORMS: Record<PlatformKey, PlatformData> = {
     selfHost: true,
     media: { image: "yes", video: "yes", voice: "partial" },
     upstream: ApiProvider.FREEDOMGPT,
+    checkedDate: "2026-11-24",
     sources: [
       { kind: "home", url: "https://www.freedomgpt.com/" },
       { kind: "pricing", url: "https://chat.freedomgpt.com/pricing" },
@@ -241,7 +250,11 @@ export const PLATFORMS: Record<PlatformKey, PlatformData> = {
         url: "https://www.freedomgpt.com/blog/what-is-uncensored-ai",
       },
       { kind: "privacy", url: "https://www.freedomgpt.com/privacy-policy" },
-      { kind: "api", url: "https://docs.freedomgpt.com/" },
+      { kind: "terms", url: "https://www.freedomgpt.com/terms-of-service" },
+      {
+        kind: "api",
+        url: "https://docs.freedomgpt.com/api-reference/introduction",
+      },
       { kind: "repo", url: "https://github.com/ohmplatform/FreedomGPT" },
     ],
   },
@@ -293,8 +306,14 @@ export const PLATFORMS: Record<PlatformKey, PlatformData> = {
     selfHost: false,
     media: { image: "no", video: "no", voice: "no" },
     upstream: null,
+    // The US App Store and help center were reviewed on 2026-11-24.
+    // The pricing and legal URLs did not expose the full web documents.
     sources: [
       { kind: "pricing", url: "https://janitorai.com/plus" },
+      {
+        kind: "appStore",
+        url: "https://apps.apple.com/us/app/janitor-interactive-stories/id6692609366",
+      },
       {
         kind: "help",
         url: "https://help.janitorai.com/en/article/faq-subscription-janitorai-1o8ccf2/",
@@ -328,11 +347,16 @@ export const PLATFORMS: Record<PlatformKey, PlatformData> = {
     selfHost: true,
     media: { image: "partial", video: "no", voice: "partial" },
     upstream: null,
+    checkedDate: "2026-11-24",
     sources: [
       { kind: "docs", url: "https://docs.sillytavern.app/" },
       {
         kind: "docs",
         url: "https://docs.sillytavern.app/usage/api-connections/",
+      },
+      {
+        kind: "docs",
+        url: "https://docs.sillytavern.app/administration/config-yaml/",
       },
       { kind: "repo", url: "https://github.com/SillyTavern/SillyTavern" },
     ],
@@ -353,8 +377,10 @@ export const PLATFORMS: Record<PlatformKey, PlatformData> = {
     selfHost: false,
     media: { image: "no", video: "no", voice: "yes" },
     upstream: null,
+    checkedDate: "2026-11-24",
     sources: [
       { kind: "pricing", url: "https://character.ai/subscribe" },
+      { kind: "blog", url: "https://blog.character.ai/new-styles-new-plan/" },
       {
         kind: "help",
         url: "https://support.character.ai/hc/en-us/articles/56173313531675-About-c-ai-lite",
@@ -368,6 +394,10 @@ export const PLATFORMS: Record<PlatformKey, PlatformData> = {
         url: "https://support.character.ai/hc/en-us/articles/53182286684059-What-is-Age-Assurance",
       },
       { kind: "privacy", url: "https://character.ai/privacy" },
+      {
+        kind: "help",
+        url: "https://support.character.ai/hc/en-us/articles/42788047758747-How-do-I-manage-update-my-model-training-settings",
+      },
     ],
   },
   kindroid: {
@@ -387,8 +417,10 @@ export const PLATFORMS: Record<PlatformKey, PlatformData> = {
     selfHost: false,
     media: { image: "yes", video: "yes", voice: "yes" },
     upstream: null,
+    checkedDate: "2026-11-24",
     sources: [
       { kind: "docs", url: "https://kindroid.ai/v2/docs/subscriptions/" },
+      { kind: "models", url: "https://kindroid.ai/v2/docs/polaris-llm-guide/" },
       {
         kind: "appStore",
         url: "https://apps.apple.com/us/app/kindroid-your-personal-ai/id6451038161",
@@ -410,7 +442,6 @@ export const PLATFORMS: Record<PlatformKey, PlatformData> = {
     freeTier: true,
     payAsYouGo: false,
     plans: [
-      { name: "Launch", price: 9.99, period: "month" },
       { name: "Standard", price: 15.99, period: "month" },
       { name: "Standard", price: 39.99, period: "quarter" },
       { name: "Standard", price: 99.99, period: "year" },
@@ -418,14 +449,22 @@ export const PLATFORMS: Record<PlatformKey, PlatformData> = {
     api: "partial",
     openSource: "no",
     selfHost: false,
-    media: { image: "yes", video: "no", voice: "yes" },
+    media: { image: "yes", video: "yes", voice: "yes" },
     upstream: null,
+    checkedDate: "2026-11-24",
     sources: [
       {
         kind: "appStore",
         url: "https://apps.apple.com/us/app/nomi-ai-companion-with-a-soul/id6450270929",
       },
       { kind: "features", url: "https://nomi.ai/ai-girlfriend/" },
+      { kind: "help", url: "https://wiki.nomi.ai/Does_Nomi_offer_refunds%3F" },
+      { kind: "help", url: "https://wiki.nomi.ai/2025_July_Q%26A_Summary" },
+      { kind: "models", url: "https://wiki.nomi.ai/2026_11_Stream_Summary" },
+      {
+        kind: "features",
+        url: "https://nomi.ai/nomi-knowledge/v3-nomi-video-generation-how-to-get-great-ai-videos-of-your-nomis/",
+      },
       {
         kind: "help",
         url: "https://nomi.ai/nomi-knowledge/getting-started-nomi-selfies/",
@@ -454,8 +493,11 @@ export const PLATFORMS: Record<PlatformKey, PlatformData> = {
     selfHost: false,
     media: { image: "no", video: "no", voice: "yes" },
     upstream: null,
+    // The public offer and help wiki were reviewed on 2026-11-24.
+    // The main site did not expose its current privacy policy and guidelines.
     sources: [
       { kind: "pricing", url: "https://crushon.ai/pricing" },
+      { kind: "features", url: "https://chat.crushon.ai/" },
       { kind: "privacy", url: "https://crushon.ai/privacy-policy" },
       { kind: "guidelines", url: "https://crushon.ai/community-guidelines" },
     ],
@@ -470,6 +512,7 @@ export const PLATFORMS: Record<PlatformKey, PlatformData> = {
     plans: [
       { name: "Pro", price: 20, period: "month" },
       { name: "Max", price: 100, period: "month" },
+      { name: "Pro", price: 200, period: "year" },
       { name: "Team", price: 500, period: "month" },
     ],
     api: "yes",
@@ -477,8 +520,12 @@ export const PLATFORMS: Record<PlatformKey, PlatformData> = {
     selfHost: true,
     media: { image: "no", video: "no", voice: "partial" },
     upstream: null,
+    checkedDate: "2026-11-24",
     sources: [
       { kind: "pricing", url: "https://ollama.com/pricing" },
+      { kind: "privacy", url: "https://ollama.com/privacy" },
+      { kind: "terms", url: "https://ollama.com/terms" },
+      { kind: "blog", url: "https://ollama.com/blog/new-app" },
       { kind: "repo", url: "https://github.com/ollama/ollama" },
       { kind: "docs", url: "https://docs.ollama.com/faq" },
       {
@@ -486,6 +533,7 @@ export const PLATFORMS: Record<PlatformKey, PlatformData> = {
         url: "https://docs.ollama.com/api/openai-compatibility",
       },
       { kind: "models", url: "https://ollama.com/search?q=abliterated" },
+      { kind: "models", url: "https://ollama.com/library/dolphin3" },
     ],
   },
   lmStudio: {
@@ -504,8 +552,12 @@ export const PLATFORMS: Record<PlatformKey, PlatformData> = {
     selfHost: true,
     media: { image: "no", video: "no", voice: "partial" },
     upstream: null,
+    checkedDate: "2026-11-24",
     sources: [
       { kind: "pricing", url: "https://lmstudio.ai/pricing" },
+      { kind: "privacy", url: "https://lmstudio.ai/app-privacy" },
+      { kind: "terms", url: "https://lmstudio.ai/app-terms" },
+      { kind: "models", url: "https://lmstudio.ai/models" },
       { kind: "blog", url: "https://lmstudio.ai/blog/free-for-work" },
       {
         kind: "api",

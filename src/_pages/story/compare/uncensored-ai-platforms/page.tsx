@@ -55,7 +55,6 @@ import {
 } from "../_shared/compare-ui";
 import {
   ABLITERATION_SOURCES,
-  COMPARE_CHECKED_DATE,
   COMPARE_HUB_PATH,
   COMPARE_LATEST_CHECK_DATE,
   isVersusKey,
@@ -140,7 +139,7 @@ export function TanstackPage({
 }: HubPageData): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
   const { t: chatT } = uncensoredChatTranslation.scopedT(locale);
-  const checked = formatCompareDate(COMPARE_CHECKED_DATE, locale);
+  const checked = formatCompareDate(COMPARE_LATEST_CHECK_DATE, locale);
   const stats = {
     ...params,
     count: PLATFORM_KEYS.length,
@@ -202,9 +201,7 @@ export function TanstackPage({
         back={back}
         category={t("hub.hero.category")}
         readTime={t("hub.hero.readTime")}
-        date={t("common.updated", {
-          date: formatCompareDate(COMPARE_LATEST_CHECK_DATE, locale),
-        })}
+        date={t("common.updated", { date: checked })}
         title={title}
         subtitle={t("hub.hero.subtitle", stats)}
       />

@@ -172,13 +172,13 @@ export const translations: typeof enTranslations = {
       pricingNote:
         "Gratuit : 10 prompts texte et 15 prompts image par jour, modèles de base uniquement. 100 crédits = 1 $. La vidéo, la musique et les modèles de pointe coûtent des crédits en plus.",
       models:
-        "420 modèles dans sa documentation (148 en texte). Environ 17 modèles texte sont étiquetés non censurés, emmenés par Venice Uncensored 1.2 (Dolphin Mistral 24B Venice Edition), plus des versions non censurées de GLM, DeepSeek et Qwen. Claude, GPT, Gemini et Grok aussi.",
+        "Le catalogue de l’API compte 303 modèles, dont 143 de texte. 17 modèles de texte portent la mention sans censure. Claude, GPT, Gemini et Grok figurent aussi au catalogue.",
       filterShort: "Filtre adulte actif par défaut, Pro peut le couper",
       filter:
-        "Un Mature Filter est actif par défaut. Les abonnés Pro le désactivent dans leurs préférences. Un mode Safe Venice optionnel, verrouillé par un code PIN, masque les personnages et images pour adultes.",
-      privacyShort: "L'historique reste sur votre appareil",
+        "Le filtre pour adultes est activé par défaut. Les comptes Pro peuvent le désactiver dans les réglages. Les conditions exigent l’accord parental entre 13 et 17 ans et imposent à ces utilisateurs de laisser le filtre activé.",
+      privacyShort: "L’historique reste sur ton appareil par défaut",
       privacy:
-        "Venice affirme que l'historique des conversations reste sur votre appareil et n'est jamais stocké sur ses serveurs. Pour les modèles tiers en mode Anonymous, elle vous conseille de partir du principe que le fournisseur conserve vos contenus.",
+        "Venice garde l’historique sur ton appareil par défaut. Les offres payantes permettent de le sauvegarder et de le restaurer sous forme chiffrée. En mode Anonymous, Venice conseille de partir du principe que le fournisseur conserve ton contenu. Pro propose aussi, sur certains modèles, le traitement isolé au niveau matériel et le chiffrement de bout en bout.",
       apiShort: "",
       api: "API compatible OpenAI, facturée au token en crédits USD. Le DIEM staké donne 1 $ de crédit API par jour. Paiement à la requête sans compte en USDC via x402.",
       forWho:
@@ -186,7 +186,7 @@ export const translations: typeof enTranslations = {
       pro1: "Gros catalogue avec beaucoup de modèles texte non censurés et des prix API bas sur ces modèles.",
       pro2: "Par défaut, l'historique reste sur votre appareil.",
       con1: "Offre gratuite serrée : 10 prompts texte par jour sur les modèles de base.",
-      con2: "Couper le filtre adulte et accéder à la plupart des médias demande Pro plus des crédits.",
+      con2: "Il faut Pro pour désactiver le filtre pour adultes. La vidéo, la musique et les modèles premium utilisent des crédits.",
     },
     uncensoredAi: {
       what: "Appli de chat sans censure à modèle unique, avec un forum communautaire et des archives de documents. Web, iOS et Android.",
@@ -212,21 +212,21 @@ export const translations: typeof enTranslations = {
     nanoGpt: {
       what: "Appli web et API à l'usage pour des modèles texte, image, vidéo et audio. Pas d'abonnement obligatoire, offre optionnelle pour les modèles open source.",
       pricingNote:
-        "Recharge dès 0,10 $ en crypto ou 1 $ par carte, sans frais de dépôt. Gratuit : un modèle, sur le web uniquement. PRO couvre seulement les modèles open source : Claude, GPT, Gemini et Grok sont débités de votre solde.",
+        "Premier dépôt à partir de 0,10 USD en crypto ou 1 USD par carte, puis 5 USD par carte. La recharge demande une connexion. Le web propose un modèle gratuit. PRO couvre certains modèles de texte et d’image open source à usage personnel. Claude, GPT, Gemini et Grok sont débités du solde.",
       models:
-        "631 modèles texte dans son API publique, dont environ 39 non censurés ou abliterated : Venice Uncensored, GLM 5.3 Uncensored, DeepSeek V4.1 Flash Uncensored, Kimi K3.1 abliterated et d'autres. Les modèles grand public aussi.",
+        "L’API publique des modèles de texte renvoie 596 entrées, dont 38 avec uncensored, abliterated ou Dolphin dans leur identifiant. Exemples : Venice Uncensored, GLM 5.3 Uncensored, DeepSeek V4.1 Flash Uncensored et une variante de Kimi K3.1 Pro sans refus.",
       filterShort: "Pas d'interdiction globale du NSFW, 18+",
       filter:
-        "Les conditions exigent d'avoir 18 ans ou plus. Elles interdisent les contenus pédocriminels, les images intimes non consenties et les deepfakes sexuellement explicites, pas les contenus pour adultes en général.",
-      privacyShort: "Chats dans votre navigateur, sans compte",
+        "Tu dois avoir au moins 18 ans et l’âge légal pour conclure un contrat dans ton pays. Les conditions interdisent le matériel pédopornographique et les contenus intimes ou sexuellement explicites montrant des personnes identifiables sans leur consentement, y compris les deepfakes. Chaque fournisseur peut imposer ses propres restrictions.",
+      privacyShort: "L’historique reste dans le navigateur par défaut",
       privacy:
-        "Par défaut, les conversations sont stockées dans votre navigateur. La synchronisation cloud est optionnelle. NanoGPT affirme ne pas journaliser ni conserver les prompts et les réponses. Aucun compte requis. Certaines routes de fournisseurs autorisent l'entraînement.",
+        "L’historique reste par défaut dans le navigateur, avec synchronisation dans le cloud en option. NanoGPT dit ne pas enregistrer les requêtes et réponses lors du traitement ordinaire. La journalisation de l’API et la mémoire du chat sont facultatives. Certains fournisseurs peuvent conserver les requêtes ou les utiliser pour l’entraînement.",
       apiShort: "",
-      api: "API compatible OpenAI, aussi au format Anthropic Messages, avec paiements x402 sans compte. Chaque réponse renvoie son coût.",
+      api: "API compatible avec OpenAI et Anthropic Messages. Paiement sans compte via x402. Tant que la facturation est en cours, certaines réponses indiquent une estimation ou aucun prix.",
       forWho:
         "Les utilisateurs au paiement à l'usage et les développeurs qui veulent tous les modèles, le paiement en crypto et aucun abonnement.",
       pro1: "Liste de modèles immense, prix catalogue, ticket d'entrée à dix centimes.",
-      pro2: "Pas besoin de compte, les chats restent dans votre navigateur.",
+      pro2: "Le modèle web gratuit fonctionne sans compte. L’historique reste dans le navigateur par défaut.",
       con1: "L'offre gratuite se limite à un modèle sur le web.",
       con2: "La confidentialité dépend de la route de fournisseur choisie.",
     },
@@ -254,7 +254,7 @@ export const translations: typeof enTranslations = {
     freedomGpt: {
       what: "Appli d'IA tout-en-un : des modèles grand public à côté de son propre modèle sans censure, Liberty, avec génération d'images et de vidéo. Il existe aussi une ancienne appli de bureau open source pour les modèles hors ligne.",
       pricingNote:
-        "Gratuit, sans carte ni compte. Pro inclut 2 200 crédits par mois : une réponse premium coûte environ 10 crédits, une image environ 25, une vidéo de 5 secondes environ 400.",
+        "Tu peux commencer sans carte ni compte. Pro inclut 2 200 crédits par mois avec des recharges ponctuelles. FreedomGPT estime une réponse premium à 10 crédits, une image à 25 et une vidéo de 5 secondes à 400.",
       models:
         "ChatGPT, Claude, Gemini, Grok, DeepSeek, Qwen, Llama, Mistral et d'autres, plus Liberty et d'autres modèles sans censure dans la même liste. Aucun total publié.",
       filterShort: "Modèles sans censure, soumis au droit US et à l'éthique",
@@ -262,7 +262,7 @@ export const translations: typeof enTranslations = {
         "FreedomGPT indique que tous ses utilisateurs et tous les modèles qu'elle héberge doivent respecter le droit américain, et qu'elle n'autorise pas l'usage de ses modèles à des fins contraires à l'éthique. L'étiquette « sans censure » ne garantit pas une réponse à chaque demande.",
       privacyShort: "Messages partagés avec les fournisseurs d'IA",
       privacy:
-        "Sa politique indique que les messages, enregistrements vocaux et images sont partagés avec des fournisseurs d'IA tiers pour produire les réponses. Aucune durée de conservation n'est indiquée. L'utiliser sans compte ne rend pas une requête cloud locale.",
+        "FreedomGPT envoie les messages et pièces jointes au fournisseur nécessaire pour répondre. Sa politique mobile indique que les fournisseurs ne peuvent utiliser messages, enregistrements et images que pour générer une réponse. Elle ne fixe pas de délai de conservation pour ces données.",
       apiShort: "",
       api: "API sur chat.freedomgpt.com/api/v1 avec une clé du tableau de bord. Tarifs non documentés.",
       forWho:
@@ -296,7 +296,7 @@ export const translations: typeof enTranslations = {
     janitorAi: {
       what: "Site communautaire de personnages avec des millions de bots créés par les utilisateurs, un modèle gratuit intégré (JLLM) et la possibilité de brancher votre propre modèle via un proxy API.",
       pricingNote:
-        "Gratuit : chats illimités sur les modèles standard, environ 9K tokens de contexte. janitor+ ajoute 5 fois plus de mémoire de personnage, une vitesse prioritaire et plus de modèles. Son Router facture les autres modèles au token, sur le web uniquement, pour les abonnés uniquement.",
+        "L’App Store américain affiche janitor+ à 12,99 USD par mois ou 99 USD par an. Le centre d’aide indique que les chats gratuits sur les modèles standard sont illimités, avec environ 9 000 jetons de contexte. janitor+ propose cinq fois plus de contexte, des réponses prioritaires et un quota mensuel de nouvelles réponses sur les modèles premium.",
       models:
         "JLLM, son propre modèle gratuit (modèle de base non communiqué). Ou n'importe quel modèle branché via un proxy : son guide officiel utilise OpenRouter.",
       filterShort: "Bots NSFW autorisés s'ils sont étiquetés, 18+ déclaratif",
@@ -319,13 +319,13 @@ export const translations: typeof enTranslations = {
       pricingNote:
         "L'appli est gratuite pour toujours. Vous payez l'API que vous branchez, ou rien si vous faites tourner un modèle en local.",
       models:
-        "Aucun inclus. Se connecte à des backends locaux (KoboldCpp, llama.cpp, Ollama, text-generation-webui) et à environ 16 API cloud, dont OpenAI, Claude, Google, Mistral, DeepSeek, OpenRouter et tout endpoint compatible OpenAI.",
+        "SillyTavern ne fournit aucun modèle. Il se connecte à des moteurs locaux comme KoboldCpp, llama.cpp, Ollama et Oobabooga TextGeneration WebUI, et à des API cloud comme OpenAI, Anthropic et OpenRouter.",
       filterShort: "Aucun filtre maison : le modèle décide",
       filter:
         "Pas de filtre propre. Les limites sont celles qu'impose le modèle ou le fournisseur branché.",
-      privacyShort: "Installation locale, aucun pistage",
+      privacyShort: "Chats stockés sur ton appareil",
       privacy:
-        "Le projet indique ne proposer aucun service hébergé et ne pas pister les données des utilisateurs. Les chats sont stockés sur votre machine. Tout ce que vous envoyez à une API cloud relève de la politique de ce fournisseur.",
+        "SillyTavern stocke les chats dans le dossier de données de l’installation locale. Si tu connectes une API ou une extension dans le cloud, elle reçoit les données que tu lui envoies et applique sa propre politique.",
       apiShort: "Se connecte à des API",
       api: "Un client, pas un fournisseur. Il parle à l'API que vous configurez.",
       forWho:
@@ -338,16 +338,16 @@ export const translations: typeof enTranslations = {
     characterAi: {
       what: "La plus grande plateforme grand public de chat avec personnages, plus de 10 millions de personnages sur ses propres modèles, avec des règles de contenu strictes. Présente ici comme contrepoint filtré.",
       pricingNote:
-        "Gratuit : messages illimités avec publicités. lite supprime la plupart des pubs (prix US, variable selon le pays). c.ai+ ajoute les meilleurs modèles de chat, une meilleure mémoire et supprime le mode lent.",
+        "Gratuit : messages illimités avec publicité. c.ai lite réduit la publicité et donne un quota quotidien de messages premium. c.ai+ supprime la pub, ouvre les chats premium en illimité et donne accès à toutes les fonctions de mémoire. Les prix varient selon le pays.",
       models:
-        "Uniquement ses propres modèles, proposés comme styles de chat (PipSqueak, DeepSqueak, LongSqueak). Aucun autre choix de modèle, pas de clé personnelle.",
+        "Character.AI propose ses propres styles de chat. PipSqueak 3 et ShortSqueak sont gratuits. DeepSqueak et LongSqueak sont premium. Tu ne peux pas connecter la clé d’un modèle externe.",
       filterShort: "Filtré, la pornographie ne sera jamais acceptée",
       filter:
         "Le contenu pornographique est contraire à ses conditions et, selon ses propres mots, ne sera accepté à aucun moment à l'avenir. Chaque utilisateur passe une vérification d'âge via Persona. Les utilisateurs identifiés comme mineurs n'ont droit qu'au mode lecture, sans chat.",
       privacyShort:
         "Les chats peuvent entraîner ses modèles et cibler des pubs",
       privacy:
-        "Sa politique de confidentialité indique que les informations servent à entraîner ses modèles d'IA et à proposer de la publicité ciblée.",
+        "Character.AI peut utiliser les chats pour entraîner ses modèles. Le centre d’aide explique comment les utilisateurs de l’EEE et du Royaume-Uni peuvent retirer les nouveaux contenus de cet entraînement.",
       apiShort: "",
       api: "Pas d'API publique pour développeurs.",
       forWho:
@@ -360,9 +360,9 @@ export const translations: typeof enTranslations = {
     kindroid: {
       what: "Appli de compagnon IA : un ami ou partenaire persistant, avec une longue mémoire, des appels vocaux et vidéo, des selfies et des chats de groupe.",
       pricingNote:
-        "Pas d'offre gratuite durable : un aperçu de 50 messages, puis lecture seule. Ultra et MAX sont des options mensuelles en plus. Prix de l'App Store US ; Kindroid indique que le paiement sur le web est généralement moins cher.",
+        "Aperçu unique de 50 messages, ou 15 dans certaines régions. Ensuite, le compte passe en lecture seule. L’essai séparé de 3 jours demande un moyen de paiement et se transforme en abonnement sans annulation. Ultra et MAX sont des options mensuelles. Prix de l’App Store américain.",
       models:
-        "Ses propres modèles (Polaris, Ember, Reverie et d'autres) et ses propres modèles de selfies. Pas de clé personnelle.",
+        "Ember alimente l’aperçu gratuit et l’essai. Les abonnés peuvent choisir Polaris et d’autres modèles maison, dont Reverie. Kindroid a aussi ses propres modèles de selfie.",
       filterShort: "Position sans filtre, lignes rouges au niveau du compte",
       filter:
         "Elle se dit vraiment sans filtre et n'en applique aucun à l'IA elle-même, mais analyse les messages pour quelques lignes rouges, comme un risque imminent d'automutilation ou de violence envers autrui. 18+ : un abonnement payant vaut vérification d'âge, Yoti est l'alternative.",
@@ -375,21 +375,22 @@ export const translations: typeof enTranslations = {
         "Les adultes qui veulent un compagnon IA sur la durée, avec voix, vidéo et photos.",
       pro1: "Panoplie complète de compagnon : mémoire, selfies, voix et appels vidéo en direct.",
       pro2: "Position sans filtre, pensée pour les adultes.",
-      con1: "Il faut payer pour continuer après 50 messages.",
+      con1: "À la fin de l’aperçu gratuit, il faut un essai ou un abonnement pour continuer à écrire.",
       con2: "Les meilleurs niveaux de mémoire s'empilent : Ultra et MAX en plus de l'offre de base.",
     },
     nomi: {
-      what: "Appli de compagnon IA bâtie autour de la mémoire à long terme : ami, partenaire ou mentor, avec selfies, voix et chats de groupe.",
+      what: "Compagnon IA avec mémoire à long terme, selfies, voix, chats de groupe et création de vidéos à partir d’images.",
       pricingNote:
-        "Offre gratuite avec messages et images quotidiens (limites non publiées). L'abonnement débloque les messages illimités et la voix. Prix de l'App Store US ; aucune grille tarifaire publique sur le web.",
+        "Gratuit : 50 messages par jour. Standard débloque les messages illimités et la voix. Prix de l’App Store américain. L’ancien forfait Launch était une offre ponctuelle de la bêta.",
       models:
-        "Ses propres modèles, non nommés publiquement. Pas de clé personnelle.",
+        "Ses propres modèles de compagnon, dont Cambrian 6 et Solstice. Pas de clé de modèle externe.",
       filterShort: "Texte sans filtre, filtre de nudité sur les images",
       filter:
         "Son site indique que les conversations ne sont pas bridées par des filtres de contenu arbitraires. Les images ont un filtre de nudité, à cause des boutiques d'applis et des prestataires de paiement. Interdit aux moins de 18 ans.",
-      privacyShort: "Jamais vendu, supprimé avec votre compte",
+      privacyShort:
+        "Pas de vente de données. La suppression du compte comporte des exceptions.",
       privacy:
-        "Sa politique indique que les données personnelles ne sont jamais vendues ni louées et ne sont pas conservées après la suppression de votre compte (sous environ 28 jours).",
+        "Nomi dit ne pas vendre ni louer tes données personnelles. Elles sont généralement supprimées sous environ 28 jours après la fermeture du compte. Des exceptions concernent les archives d’entraînement, de communication et les obligations légales. Les données d’entraînement conservées ne te sont plus attribuées.",
       apiShort: "API personnelle vers vos compagnons",
       api: "API REST pour discuter avec vos propres Nomis, pas une API de modèle générale.",
       forWho:
@@ -397,14 +398,14 @@ export const translations: typeof enTranslations = {
       pro1: "Une mémoire pensée pour les relations longues.",
       pro2: "Offre gratuite et engagement clair de ne pas vendre vos données.",
       con1: "Filtre de nudité sur les images.",
-      con2: "Voix uniquement avec abonnement, limites gratuites non publiées.",
+      con2: "La voix demande un abonnement. Le forfait gratuit limite le chat à 50 messages par jour.",
     },
     crushOn: {
       what: "Site de chat NSFW avec personnages, un interrupteur Unfiltered et un accès aux modèles tiers décompté en crédits.",
       pricingNote:
-        "Gratuit : 100 crédits de messages par mois, modèles gratuits illimités, historique effacé après 7 jours d'inactivité. Les offres annuelles sont moins chères. Les modèles Pro demandent un abonnement ou un pack séparé.",
+        "L’offre publique annonce des chats illimités sur les modèles gratuits et 100 crédits mensuels pour les modèles Pro. Les offres annuelles reviennent moins cher. L’accès Ultra dépend de l’abonnement et utilise des crédits séparément des packs Pro.",
       models:
-        "Des modèles tiers répartis par niveau ; son site cite Claude 4, Gemini 2.5 Flash, GPT-4.1 et DeepSeek V4. Liste complète après connexion.",
+        "Les modèles et les limites de contexte dépendent de l’offre. Le catalogue de CrushOn.AI cite Claude Opus 4.7, GLM 5.3, Gemini 3.1 Pro et DeepSeek V4 Pro dans l’offre Ultra.",
       filterShort: "Interrupteur Unfiltered après vérification d'âge",
       filter:
         "Un interrupteur Unfiltered débloque le texte pour adultes après vérification d'âge : selfie ou pièce d'identité via Didit, AgeGo, ou un paiement de 0,99 $. Ses règles interdisent quand même les images sexuelles explicites, les images réalistes de personnes réelles, les mineurs et les personnages vieillis artificiellement.",
@@ -421,17 +422,17 @@ export const translations: typeof enTranslations = {
       con2: "Historique gratuit effacé après 7 jours d'inactivité ; les chats peuvent entraîner les modèles.",
     },
     ollama: {
-      what: "Outil gratuit sous licence MIT qui télécharge et fait tourner des modèles open source sur votre ordinateur, avec une API locale. Vend aussi des modèles hébergés dans le cloud.",
+      what: "Outil sous licence MIT pour exécuter des modèles ouverts sur ton ordinateur, avec une API locale et une application de chat officielle pour macOS et Windows. Il propose aussi des modèles cloud payants.",
       pricingNote:
         "Faire tourner des modèles sur votre propre matériel est gratuit et illimité. Les offres payantes ne concernent que ses modèles cloud.",
       models:
         "N'importe quel modèle open source de sa bibliothèque, dont Dolphin 3 et des versions abliterated publiées par la communauté, comme Qwen 3.8 abliterated. Ollama ne vérifie pas les publications communautaires.",
       filterShort: "Celui du modèle que vous chargez",
       filter:
-        "Aucun filtre propre en local. Un modèle abliterated ne refuse pas. Un modèle d'origine garde les refus appris à l'entraînement.",
+        "En local, c’est le modèle chargé qui décide. Les modèles de la communauté obtenus par ablitération visent à réduire les refus. Le service cloud a ses propres conditions.",
       privacyShort: "100 % local, les prompts ne quittent jamais votre machine",
       privacy:
-        "Ollama affirme ne voir ni vos prompts ni vos données quand vous tournez en local. Le cloud peut être désactivé complètement.",
+        "Ollama dit ne pas voir les requêtes et réponses traitées en local. Tu peux désactiver le cloud. Sa politique indique que les requêtes et réponses cloud sont traitées temporairement et ne servent pas à l’entraînement. Ollama collecte certaines métadonnées.",
       apiShort: "",
       api: "Serveur compatible OpenAI sur localhost:11434, plus une API cloud pour ses modèles hébergés.",
       forWho:
@@ -439,14 +440,14 @@ export const translations: typeof enTranslations = {
       pro1: "Confidentialité totale et zéro coût par message.",
       pro2: "Bibliothèque immense, API locale compatible OpenAI.",
       con1: "Votre matériel plafonne la qualité : un modèle 70B pèse 43 Go à télécharger, avant même le contexte.",
-      con2: "Surtout ligne de commande et API : l'interface de chat, c'est à vous de l'ajouter.",
+      con2: "L’application de chat officielle existe pour macOS et Windows. Sous Linux, utilise la ligne de commande, l’API ou une autre interface.",
     },
     lmStudio: {
       what: "Appli de bureau à l'interface soignée pour télécharger et faire tourner des modèles en local (GGUF et MLX), plus un serveur API local.",
       pricingNote:
-        "Gratuit pour un usage personnel et professionnel depuis juillet 2025. Les offres payantes ajoutent des modèles hébergés et plus d'appareils.",
+        "Les modèles locaux sont gratuits pour un usage personnel ou professionnel. Bionic+ et Pro ajoutent le traitement cloud, la recherche web et des limites d’appareils plus élevées. L’offre gratuite comprend la transcription hors ligne et LM Link pour cinq appareils au maximum.",
       models:
-        "Des modèles locaux depuis Hugging Face, dont des versions GGUF abliterated et Dolphin.",
+        "Exécute en local des modèles GGUF ou MLX de Hugging Face, dont Dolphin et des variantes communautaires aux refus réduits. Le catalogue cloud inclut Kimi K3.1 Pro, DeepSeek V4 Pro et GLM-5.3.",
       filterShort: "Celui du modèle que vous chargez",
       filter:
         "Aucun filtre propre pour les modèles locaux. Ce qui refuse, c'est le modèle que vous choisissez.",
@@ -482,7 +483,7 @@ export const translations: typeof enTranslations = {
     },
     intro: {
       lead: "Chaque site d'IA sans censure se dit le plus privé, le plus libre, le moins filtré. La moitié interdit pourtant les contenus pour adultes. Certains s'entraînent sur vos chats. L'un d'eux vous vend un jeton crypto. Les pages marketing ne vous diront pas lesquels.",
-      p2: "Alors on a vérifié. Pour chaque plateforme : sa page tarifs, ses conditions, sa politique de confidentialité et sa doc API, le {{date}}. Ci-dessous : le bon choix selon l'usage, le tableau complet, une fiche par plateforme avec ses sources, et les cas où vous ne devriez pas nous choisir.",
+      p2: "Nous avons consulté les tarifs, politiques et documentations officielles. Dernières vérifications le {{date}}. Chaque fiche indique sa date et ses sources.",
       disclosure:
         "Transparence : {{appName}} fait partie des plateformes de cette page, et nous achetons chez plusieurs des autres. Venice, uncensored.ai, NanoGPT, FreedomGPT, Gab AI et OpenRouter servent une partie de nos modèles via leurs API. Nous disons où, chiffres en direct à l'appui. Pas de notes, pas d'étoiles : des faits et des sources, à vous de juger.",
     },
@@ -499,9 +500,8 @@ export const translations: typeof enTranslations = {
         body: "La plupart des modèles non censurés sont des modèles grand public dont on a retiré les refus. uncensored.ai vend un seul modèle, avec ses propres positions. Sur {{appName}}, il tourne sous le nom {{ownModel}}, à côté de tout le reste.",
       },
       privacy: {
-        title:
-          "Des chats qui ne touchent jamais un serveur : Venice ou NanoGPT",
-        body: "Les deux gardent l'historique dans votre navigateur par défaut. NanoGPT ne demande même pas de compte. Sur {{appName}}, les chats incognito font pareil.",
+        title: "Historique dans le navigateur : Venice ou NanoGPT",
+        body: "Les deux conservent l’historique sur ton appareil par défaut. Le modèle web gratuit de NanoGPT fonctionne sans compte. Sur {{appName}}, l’historique incognito reste dans le navigateur.",
       },
       roleplay: {
         title:
@@ -524,15 +524,15 @@ export const translations: typeof enTranslations = {
       },
       filtered: {
         title: "Vous voulez le filtre : Character.AI",
-        body: "Tout public par conception, avec vérification d'âge pour tous. Le bon choix pour les ados ou un environnement de travail strict.",
+        body: "Chat filtré avec contrôle de l’âge. Les comptes des moins de 18 ans peuvent uniquement lire.",
       },
     },
     table: {
       title: "Les {{count}} plateformes et {{appName}}, côte à côte",
       intro:
-        "Sur mobile, faites défiler vers la droite. Infos des concurrents vérifiées le {{date}} sur leurs propres pages, les nôtres lues en direct dans notre configuration.",
+        "Sur mobile, fais défiler horizontalement. Dernières vérifications le {{date}}. La date de chaque plateforme figure sur sa fiche. Nos données viennent de la configuration actuelle.",
       footnote:
-        "Prix catalogue en USD, tirés de la page de chaque plateforme ; Kindroid et Nomi n'affichent leurs prix qu'au paiement après connexion, les leurs viennent donc de l'App Store US. Taxes, prix régionaux et promos varient. « Limité » signifie via votre propre clé API, une option payante ou une API personnelle de compagnon.",
+        "Les prix sont les tarifs publics américains. Pour Kindroid, Nomi et janitor+, nous utilisons les fiches de l’App Store américain. Taxes, prix régionaux et promotions varient. Limité peut désigner une API personnelle, une clé externe ou un module complémentaire.",
     },
     kinds: {
       title:
@@ -554,7 +554,7 @@ export const translations: typeof enTranslations = {
     platforms: {
       title: "Chaque plateforme en détail",
       intro:
-        "Ce que c'est, ce que ça coûte, comment ça filtre, où vont vos chats, et les sources. Vérifié le {{date}}.",
+        "Ce que chaque plateforme propose, coûte et filtre. Dernières vérifications le {{date}}. Chaque fiche indique sa date et ses sources.",
       price: "Prix : {{plans}}. {{note}}",
       models: "Modèles : {{text}}",
       filter: "Filtre et consentement : {{text}}",
@@ -607,7 +607,7 @@ export const translations: typeof enTranslations = {
     },
     method: {
       title: "Notre méthode",
-      intro: "Les règles que nous nous sommes imposées. Vérifié le {{date}}.",
+      intro: "Notre méthode. Dernière vérification des sources le {{date}}.",
       sources:
         "Pages officielles uniquement : page tarifs, conditions, politique de confidentialité, centre d'aide, doc API ou liste de modèles de chaque plateforme. Aucun site d'avis n'a servi de source.",
       prices:
@@ -634,7 +634,7 @@ export const translations: typeof enTranslations = {
       },
       private: {
         q: "Quelle IA sans censure protège le mieux votre vie privée ?",
-        a: "Un modèle local : rien ne quitte votre machine. Parmi les services hébergés, Venice et NanoGPT gardent l'historique dans votre navigateur par défaut, et NanoGPT ne demande aucun compte. Sur {{appName}}, les chats incognito restent dans votre navigateur. Tout service hébergé envoie quand même votre message à un fournisseur de modèle.",
+        a: "Le traitement local garde les chats sur ton ordinateur. Venice et NanoGPT conservent l’historique sur ton appareil par défaut. Le modèle web gratuit de NanoGPT fonctionne sans compte. Sur {{appName}}, l’historique incognito reste dans le navigateur. Les services hébergés envoient les requêtes au modèle qui répond.",
       },
       difference: {
         q: "Quelle différence entre modèles abliterated et modèles non censurés ?",
@@ -701,7 +701,7 @@ export const translations: typeof enTranslations = {
       verdict:
         "Choisissez Venice si vous voulez son catalogue complet, un historique uniquement local et le prix au token le plus bas sur ses propres modèles, et que payer Pro pour couper le filtre adulte ne vous gêne pas. Choisissez {{appName}} si vous voulez les modèles non censurés de Venice à côté de Claude, GPT, du modèle d'uncensored.ai et de versions abliterated de GLM et DeepSeek venues d'autres fournisseurs, dans un seul chat, sans filtre à débloquer au-delà d'une confirmation unique de majorité (18+).",
       themPros: {
-        a: "Catalogue plus grand : 420 modèles dans sa documentation, vidéo, musique et voix comprises.",
+        a: "303 modèles dans le catalogue de l’API, dont la vidéo, la musique et la voix.",
         b: "L'historique reste sur votre appareil par défaut. Un vrai point fort côté confidentialité.",
         c: "Le moyen le moins cher d'appeler les modèles de Venice : pas de marge d'intermédiaire, plus le staking DIEM pour du crédit API quotidien.",
       },
@@ -718,7 +718,7 @@ export const translations: typeof enTranslations = {
       usCons: {
         a: "Sur les modèles de Venice, nous coûtons plus cher : notre marge de {{markup}} % s'ajoute au prix de Venice.",
         b: "Catalogue globalement plus petit que celui de Venice.",
-        c: "Les chats privés sont stockés sur nos serveurs. Seuls les chats incognito restent dans votre navigateur, alors que Venice garde tout l'historique en local.",
+        c: "Nous stockons les chats privés pour les synchroniser. L’historique incognito reste dans ton navigateur. Venice garde l’historique en local par défaut et propose des sauvegardes chiffrées dans ses offres payantes.",
       },
       chooseThem: {
         a: "Vous voulez le plus gros catalogue non censuré chez un seul fournisseur.",
@@ -742,7 +742,7 @@ export const translations: typeof enTranslations = {
         },
         q2: {
           q: "Venice AI est-elle gratuite ?",
-          a: "Venice a une offre gratuite avec 10 prompts texte et 15 prompts image par jour sur les modèles de base. Pro lève les limites et permet de couper le filtre adulte.",
+          a: "Le compte gratuit donne droit à 10 demandes de texte et 15 d’images par jour sur les modèles de base. Pro inclut le texte illimité, jusqu’à 1 000 images par jour sur les modèles Pro et la désactivation du filtre pour les adultes.",
         },
         q3: {
           q: "Venice est-elle moins chère que {{appName}} ?",
@@ -750,7 +750,7 @@ export const translations: typeof enTranslations = {
         },
         q4: {
           q: "Qui protège le mieux votre vie privée, Venice ou {{appName}} ?",
-          a: "Venice garde tout l'historique sur votre appareil. Sur {{appName}}, les chats incognito font pareil ; les chats privés sont stockés sur nos serveurs pour se synchroniser entre vos appareils. Dans les deux cas, votre message part chez un fournisseur de modèle pour obtenir une réponse.",
+          a: "Venice garde l’historique sur ton appareil par défaut et propose une sauvegarde chiffrée dans ses offres payantes. {{appName}} garde l’historique incognito dans le navigateur et enregistre les chats privés pour les synchroniser. Les deux services transmettent les messages au modèle qui répond.",
         },
       },
       cta: { title: "Essayez les modèles de Venice à côté de tout le reste" },
@@ -784,7 +784,7 @@ export const translations: typeof enTranslations = {
       },
       themCons: {
         a: "Aucun contenu adulte, jamais, et les scènes sombres sont adoucies.",
-        b: "Sa politique de confidentialité autorise l'entraînement sur vos informations et la publicité ciblée.",
+        b: "Les chats peuvent servir à l’entraînement. Le centre d’aide explique comment exclure les nouveaux contenus dans l’EEE et au Royaume-Uni.",
         c: "Uniquement ses propres modèles. Aucun choix, pas de clé personnelle.",
       },
       usPros: {
@@ -799,7 +799,7 @@ export const translations: typeof enTranslations = {
       },
       chooseThem: {
         a: "Vous voulez un chat tout public avec une bibliothèque de personnages géante.",
-        b: "Vous avez moins de 18 ans, ou vous configurez le compte d'un ado.",
+        b: "Le mode lecture suffit à un lecteur de moins de 18 ans.",
         c: "Vous voulez des messages gratuits illimités sans jamais penser au coût.",
       },
       chooseUs: {
@@ -861,7 +861,7 @@ export const translations: typeof enTranslations = {
       },
       themCons: {
         a: "Environ 9K tokens de contexte gratuit : les longues campagnes oublient.",
-        b: "Les meilleurs modèles demandent le Router de janitor+ ou votre propre clé API et un proxy à configurer.",
+        b: "janitor+ inclut un quota mensuel sur les modèles premium. Pour connecter ton modèle, il faut une clé API et un proxy.",
         c: "Texte uniquement, et l'appli mobile démarre en Safe Mode.",
       },
       usPros: {
@@ -904,7 +904,7 @@ export const translations: typeof enTranslations = {
         },
         q4: {
           q: "Lequel a la meilleure mémoire pour un long jeu de rôle ?",
-          a: "Le modèle gratuit de Janitor a environ 9K tokens de contexte ; janitor+ augmente la mémoire de personnage. Sur {{appName}}, le contexte dépend du modèle choisi, et beaucoup de modèles de jeu de rôle en tiennent bien plus.",
+          a: "Janitor AI indique environ 9 000 jetons de contexte en gratuit et cinq fois plus avec janitor+. Sur {{appName}}, le contexte dépend du modèle choisi.",
         },
       },
       cta: {
@@ -927,16 +927,16 @@ export const translations: typeof enTranslations = {
         readTime: "6 min de lecture",
       },
       intro: {
-        lead: "NanoGPT est la réponse au paiement à l'usage face aux abonnements IA : rechargez dix centimes, utilisez n'importe quel modèle, sans compte. Plusieurs de nos modèles non censurés tournent sur son API. La vraie question n'est donc pas lequel est meilleur, mais lequel colle à votre façon d'utiliser l'IA.",
+        lead: "NanoGPT facture à l’usage et permet d’essayer un modèle gratuit sans inscription. Son API fournit plusieurs de nos modèles sans censure. Voici quand choisir chaque plateforme.",
         p2: "Infos sur NanoGPT tirées de ses pages tarifs, confidentialité et conditions, et de sa liste publique de modèles, vérifiées le {{date}}. Les nôtres sont lues en direct dans notre configuration.",
       },
       relation:
         "Nous sommes client de NanoGPT : {{nanoGptModels}} de nos modèles passent par l'API de NanoGPT (dont {{nanoGptUncensored}} non censurés), notamment {{nanoGptExamples}}.",
       verdict:
-        "Choisissez NanoGPT pour le catalogue le plus large au prix catalogue, le paiement à l'usage sans compte et une API pour tout. Choisissez {{appName}} si vous voulez un sélecteur de modèles trié et testé, avec des modèles non censurés de plusieurs fournisseurs, des crédits gratuits chaque mois, des skills et de la mémoire, et une appli open source que vous pouvez auto-héberger.",
+        "Choisis NanoGPT pour un vaste catalogue et le paiement à l’usage, même sans compte via l’API x402. Choisis {{appName}} pour une sélection testée de plusieurs fournisseurs, des crédits gratuits chaque mois, des compétences, une mémoire et un chat open source à héberger toi-même.",
       themPros: {
-        a: "631 modèles texte dans son API, dont environ 39 non censurés ou abliterated.",
-        b: "Sans compte, sans abonnement : démarrez avec dix centimes en crypto.",
+        a: "596 entrées pour les modèles de texte. 38 identifiants contiennent uncensored, abliterated ou Dolphin.",
+        b: "Aucun abonnement requis. Après connexion, premier dépôt en crypto à partir de 0,10 USD.",
         c: "Prix catalogue sur les modèles routés automatiquement, moins cher que n'importe quel intermédiaire.",
       },
       themCons: {
@@ -955,12 +955,12 @@ export const translations: typeof enTranslations = {
         c: "Les offres d'abord : les packs de crédits rechargent une offre active.",
       },
       chooseThem: {
-        a: "Vous voulez payer à l'usage, sans abonnement et sans compte.",
+        a: "Tu veux payer à l’usage ou appeler l’API sans compte via x402.",
         b: "Il vous faut un modèle obscur que seul un catalogue immense propose.",
         c: "Vous construisez sur l'API et voulez les prix catalogue.",
       },
       chooseUs: {
-        a: "Vous voulez une sélection testée plutôt que 631 options.",
+        a: "Tu veux une sélection de modèles testés.",
         b: "Vous voulez des crédits gratuits chaque mois et un chat soigné, avec skills et mémoire.",
         c: "Vous voulez le modèle d'uncensored.ai et ceux de Venice à côté de ceux de NanoGPT, dans un même fil.",
       },
@@ -976,7 +976,7 @@ export const translations: typeof enTranslations = {
         },
         q2: {
           q: "NanoGPT demande-t-il un compte ?",
-          a: "Non. Il fonctionne avec un identifiant utilisateur généré et garde les chats dans votre navigateur par défaut.",
+          a: "Le modèle web gratuit fonctionne sans compte. Il faut se connecter pour recharger son solde sur le site. L’API accepte les paiements x402 sans compte.",
         },
         q3: {
           q: "Les deux ont-ils une API ?",
