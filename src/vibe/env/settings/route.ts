@@ -15,8 +15,8 @@ export const { GET, PATCH, POST, tools } = endpointsHandler({
     handler: ({ logger, t }) => SystemSettingsRepository.getSettings(logger, t),
   },
   [Methods.PATCH]: {
-    handler: ({ data, logger, t }) =>
-      SystemSettingsRepository.patchSettings(data, logger, t),
+    handler: ({ data, user, logger, t }) =>
+      SystemSettingsRepository.patchSettings(data, logger, t, user),
   },
   [Methods.POST]: {
     handler: ({ data, user, logger, t, locale }) =>

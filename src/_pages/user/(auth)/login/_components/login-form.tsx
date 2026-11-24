@@ -2,10 +2,10 @@
 
 import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { SYSTEM_SETTINGS_ALIAS } from "next-vibe/env/settings/constants";
 import { broadcastAuthChange } from "next-vibe/identity/auth/tab-sync";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { isDefaultAdminPassword } from "next-vibe/identity/default-admin-password";
+import { SETUP_PATH_SEGMENT } from "next-vibe/identity/setup-state";
 import type { Platform } from "next-vibe/platforms/platforms";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
@@ -65,7 +65,7 @@ function DevQuickLogin({
       if (result.success) {
         broadcastAuthChange("login", logger);
         const target = isDefaultAdminPassword(devSeedPassword)
-          ? `/${locale}/tools/${SYSTEM_SETTINGS_ALIAS}`
+          ? `/${locale}/${SETUP_PATH_SEGMENT}`
           : (callbackUrl ?? `/${locale}`);
         assignUrl(target);
       } else {
@@ -132,7 +132,7 @@ export function LoginForm({
                     requestData.password,
                   );
                   const target = usedDefaultPassword
-                    ? `/${locale}/tools/${SYSTEM_SETTINGS_ALIAS}`
+                    ? `/${locale}/${SETUP_PATH_SEGMENT}`
                     : (callbackUrl ?? `/${locale}`);
                   assignUrl(target);
                 },

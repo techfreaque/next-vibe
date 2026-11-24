@@ -19,6 +19,7 @@ import { Sparkles } from "next-vibe/ui/components/icons/Sparkles";
 import { Wand2 } from "next-vibe/ui/components/icons/Wand2";
 import type { InputChangeEvent } from "next-vibe/ui/components/input";
 import { Input } from "next-vibe/ui/components/input";
+import { Link } from "next-vibe/ui/components/link";
 import {
   Select,
   SelectContent,
@@ -34,6 +35,7 @@ import { storage } from "next-vibe/ui/lib/storage";
 import type { JSX } from "react";
 import React, { useCallback, useEffect, useState } from "react";
 
+import { SETUP_PATH_SEGMENT } from "../../identity/setup-state";
 import { ServerFramework } from "../../platforms/web/enum";
 import { cn } from "../../unified-ui/_shared/cn";
 import {
@@ -393,7 +395,7 @@ export function SystemSettingsWidget(): JSX.Element {
   const [showExport, setShowExport] = useState(false);
   const [showWizard, setShowWizard] = useState(false);
 
-  // Auto-show wizard when data loads: always if default password, otherwise unless dismissed
+  // Reopen the wizard after the reload that follows one of its saved steps
   useEffect(() => {
     if (!value) {
       return;
@@ -411,13 +413,9 @@ export function SystemSettingsWidget(): JSX.Element {
         logger,
       );
       const inProgress = !!progress && progress !== WIZARD_PROGRESS_DONE;
-      const hasDefaultPassword = value.onboardingIssues?.some((issue) =>
-        issue.toLowerCase().includes("default"),
-      );
-      if (
-        inProgress ||
-        (value.needsOnboarding && (!dismissed || hasDefaultPassword))
-      ) {
+      // First-run setup lives on the /setup page (the banner links there);
+      // this wizard only opens by itself to resume a run started here.
+      if (inProgress && !dismissed) {
         setShowWizard(true);
       }
     })();
@@ -583,6 +581,13 @@ export function SystemSettingsWidget(): JSX.Element {
                   </Span>
                 ))}
               </Div>
+              {isWritable && (
+                <Button variant="outline" size="sm" className="ml-auto" asChild>
+                  <Link href={`/${locale}/${SETUP_PATH_SEGMENT}`}>
+                    {t("widget.openSetup")}
+                  </Link>
+                </Button>
+              )}
             </Div>
           )}
 

@@ -48,6 +48,7 @@ import type { EndpointLogger } from "../../../logger/types";
 import type { BuildProfile, FileToCompile } from "../definition";
 import type { scopedTranslation } from "../i18n";
 import { PROFILE_DEFAULTS, ROOT_DIR } from "./constants";
+import { applyEnvFileChanges, snapshotEnvFile } from "./env-file-reload";
 import { outputFormatter } from "./output-formatter";
 
 /** Build Vite `define` entries for all NEXT_PUBLIC_AGENT_* flags.
@@ -1545,6 +1546,7 @@ class ViteCompiler {
       }
     | { success: false; message: string }
   > {
+    snapshotEnvFile();
     try {
       // Vite hashes NODE_ENV and the resulting plugin list for client deps.
       // This is always a dev server, even when launched from a production shell.
@@ -2354,6 +2356,11 @@ class ViteCompiler {
                 } catch {
                   /* ignore close errors */
                 }
+                // The fresh server must see the edited .env, not the boot values.
+                const changedKeys = applyEnvFileChanges();
+                serverFileLog(
+                  `[env-reload] applied ${changedKeys.length} changed .env key(s)`,
+                );
                 // Spawn a fresh server: new nitro() call = new ctx = clean _initialized.
                 const result = await viteCompiler.startTanstackDevServer(
                   fileConfig,

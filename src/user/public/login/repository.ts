@@ -20,11 +20,17 @@ import type {
   JwtPrivatePayloadType,
   JWTPublicPayloadType,
 } from "next-vibe/identity/auth/types";
+import {
+  DEFAULT_ADMIN_EMAIL,
+  isDefaultAdminPassword,
+} from "next-vibe/identity/default-admin-password";
+import { identityEnv } from "next-vibe/identity/env";
 import type { LeadsT } from "next-vibe/identity/lead/i18n";
 import { scopedTranslation as leadsScopedTranslation } from "next-vibe/identity/lead/i18n";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { UserRolesRepository } from "next-vibe/identity/roles/repository";
 import { SessionRepository } from "next-vibe/identity/session/repository";
+import { canUseSetupBootstrap } from "next-vibe/identity/setup-state";
 import { loginAttempts, users } from "next-vibe/identity/user/db";
 import { UserDetailLevel } from "next-vibe/identity/user/enum";
 import { UserRepository } from "next-vibe/identity/user/repository";
@@ -174,7 +180,12 @@ export class LoginRepository {
         (await LoginRepository.getDummyHash());
 
       // Always run Argon2 - constant-time regardless of whether user exists
-      const isPasswordValid = await verifyPassword(password, storedHash);
+      const matchesPassword = await verifyPassword(password, storedHash);
+      const isBootstrap =
+        email === DEFAULT_ADMIN_EMAIL && isDefaultAdminPassword(password);
+      const isPasswordValid =
+        matchesPassword &&
+        (!isBootstrap || canUseSetupBootstrap(identityEnv, email, password));
 
       if (!userRow && pending && isPasswordValid) {
         if (!data.resendPending) {

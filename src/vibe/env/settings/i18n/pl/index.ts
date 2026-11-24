@@ -183,6 +183,7 @@ export const translations: typeof enTranslations = {
     boolTrue: "wł.",
     boolFalse: "wył.",
     logPathDisabled: "logowanie do pliku wyłączone",
+    openSetup: "Otwórz konfigurację",
     restartWizard: "Kreator konfiguracji",
     generate: "Generuj",
     editConfirmHint: "[Enter] potwierdź  [Esc] anuluj",

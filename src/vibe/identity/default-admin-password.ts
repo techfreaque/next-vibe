@@ -9,7 +9,10 @@
 
 export const DEFAULT_ADMIN_PASSWORD = "change-me-now" as const;
 
-const DEFAULT_ADMIN_PASSWORDS: readonly string[] = [
+/** Placeholder admin email a fresh install ships with. */
+export const DEFAULT_ADMIN_EMAIL = "admin@please.change.me" as const;
+
+export const DEFAULT_ADMIN_PASSWORDS: readonly string[] = [
   DEFAULT_ADMIN_PASSWORD,
   "your-admin-password",
 ];

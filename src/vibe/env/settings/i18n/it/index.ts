@@ -184,6 +184,7 @@ export const translations: typeof enTranslations = {
     boolTrue: "su",
     boolFalse: "Fuori.",
     logPathDisabled: "file di registrazione disabilitato",
+    openSetup: "Apri la configurazione",
     restartWizard: "Creazione guidata",
     exportProd: "Esportazione per la produzione",
     generate: "Generazione",

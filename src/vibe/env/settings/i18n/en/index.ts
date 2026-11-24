@@ -180,6 +180,7 @@ export const translations = {
     boolTrue: "on",
     boolFalse: "off",
     logPathDisabled: "file logging disabled",
+    openSetup: "Open setup",
     restartWizard: "Setup Wizard",
     exportProd: "Export for Production",
     generate: "Generate",

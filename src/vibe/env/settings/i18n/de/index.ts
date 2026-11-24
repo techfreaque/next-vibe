@@ -184,6 +184,7 @@ export const translations: typeof enTranslations = {
     boolTrue: "an",
     boolFalse: "aus",
     logPathDisabled: "Datei-Logging deaktiviert",
+    openSetup: "Einrichtung öffnen",
     restartWizard: "Einrichtungsassistent",
     generate: "Generieren",
     editConfirmHint: "[Enter] bestätigen  [Esc] abbrechen",

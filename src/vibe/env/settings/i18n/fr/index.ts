@@ -184,6 +184,7 @@ export const translations: typeof enTranslations = {
     boolTrue: "activé",
     boolFalse: "désactivé",
     logPathDisabled: "journalisation dans un fichier désactivée",
+    openSetup: "Ouvrir la configuration",
     restartWizard: "Assistant de configuration",
     exportProd: "Exporter pour la production",
     generate: "Générer",

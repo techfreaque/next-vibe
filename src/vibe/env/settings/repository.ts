@@ -9,6 +9,7 @@ import { constants, existsSync } from "node:fs";
 import { access, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 
+import { parse } from "dotenv";
 import type { ZodTypeAny } from "zod";
 
 import type { CountryLanguage } from "../../core/i18n/core/config";
@@ -20,10 +21,18 @@ import {
 } from "../../core/route/response.schema";
 import { parseError } from "../../core/utils/parse-error";
 import type { JwtPrivatePayloadType } from "../../identity/auth/types";
-import { isDefaultAdminPassword } from "../../identity/default-admin-password";
+import {
+  DEFAULT_ADMIN_EMAIL,
+  DEFAULT_ADMIN_PASSWORD,
+  isDefaultAdminPassword,
+} from "../../identity/default-admin-password";
+import { identityEnv } from "../../identity/env";
+import { UserRole } from "../../identity/roles/enum";
+import { getSetupPhase } from "../../identity/setup-state";
 import type { EndpointLogger } from "../../logger/types";
 import type { EnvExample } from "../define-env";
 import {
+  decryptEnvValue,
   encryptEnvValue,
   isEncryptedValue,
   loadOrCreateKey,
@@ -36,8 +45,11 @@ import type {
   SystemSettingsPostResponseOutput,
 } from "./definition";
 import type { SystemSettingsT } from "./i18n";
+import { resolveSetupSave } from "./setup-save";
 
 export class SystemSettingsRepository {
+  private static pendingWrite = Promise.resolve();
+
   /** Patterns for detecting sensitive env keys by name */
   private static readonly SENSITIVE_PATTERNS = [
     "_KEY",
@@ -80,7 +92,7 @@ export class SystemSettingsRepository {
     return join(process.cwd(), ".env");
   }
 
-  private static async checkWritable(): Promise<boolean> {
+  static async checkWritable(): Promise<boolean> {
     // Docker detection
     if (process.env["VIBE_IS_DOCKER"] === "true") {
       return false;
@@ -99,7 +111,7 @@ export class SystemSettingsRepository {
     }
   }
 
-  private static isDevMode(): boolean {
+  static isDevMode(): boolean {
     const devPidPath = join(process.cwd(), ".tmp", ".atlas.pid");
     return existsSync(devPidPath);
   }
@@ -285,8 +297,8 @@ export class SystemSettingsRepository {
     data: { settings: Record<string, string> },
     logger: EndpointLogger,
     t: SystemSettingsT,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ): Promise<ResponseType<any>> {
+    user?: JwtPrivatePayloadType,
+  ): Promise<ResponseType<SystemSettingsPatchResponseOutput>> {
     try {
       const writable = await SystemSettingsRepository.checkWritable();
       if (!writable) {
@@ -326,6 +338,34 @@ export class SystemSettingsRepository {
       const skippedKeys: string[] = [];
       const cryptoKey = loadOrCreateKey();
       const settingsToWrite = data.settings;
+      const phase = getSetupPhase(identityEnv);
+      const setup = resolveSetupSave(phase, settingsToWrite);
+      const rejectSetup = (): ResponseType<SystemSettingsPatchResponseOutput> =>
+        fail({
+          message: t("patch.errors.validation.description"),
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+        });
+      if (setup.kind !== "settings") {
+        if (setup.kind === "invalid" || !user?.roles.includes(UserRole.ADMIN)) {
+          return rejectSetup();
+        }
+        const onDisk = parse(existingContent);
+        const storedPassword = decryptEnvValue(
+          onDisk["VIBE_ADMIN_USER_PASSWORD"] ?? DEFAULT_ADMIN_PASSWORD,
+          cryptoKey,
+        );
+        if (
+          storedPassword === null ||
+          getSetupPhase({
+            VIBE_SETUP_STATE: onDisk["VIBE_SETUP_STATE"],
+            VIBE_ADMIN_USER_EMAIL:
+              onDisk["VIBE_ADMIN_USER_EMAIL"] ?? DEFAULT_ADMIN_EMAIL,
+            VIBE_ADMIN_USER_PASSWORD: storedPassword,
+          }) !== phase
+        ) {
+          return rejectSetup();
+        }
+      }
       const keysToUpdate = new Set(Object.keys(settingsToWrite));
 
       // Rebuild the file line by line.
@@ -459,8 +499,23 @@ export class SystemSettingsRepository {
         );
       }
 
-      // Write back
-      await writeFile(envPath, outputLines.join("\n"), "utf-8");
+      const writeSettings = (): Promise<void> =>
+        writeFile(envPath, outputLines.join("\n"), "utf-8");
+      if (setup.kind === "credentials" && user) {
+        const { AdminLoginSyncRepository } =
+          await import("../../identity/admin-login-sync");
+        const saved = await AdminLoginSyncRepository.sync(
+          user.id,
+          setup.email,
+          setup.password,
+          writeSettings,
+        );
+        if (!saved) {
+          return rejectSetup();
+        }
+      } else {
+        await writeSettings();
+      }
 
       if (skippedKeys.length > 0) {
         logger.debug(
@@ -633,6 +688,7 @@ export class SystemSettingsRepository {
     data: SystemSettingsPatchRequestInput,
     logger: EndpointLogger,
     t: SystemSettingsT,
+    user?: JwtPrivatePayloadType,
   ): Promise<ResponseType<SystemSettingsPatchResponseOutput>> {
     const settings: Record<string, string> = {};
     for (const [key, value] of Object.entries(data)) {
@@ -640,6 +696,10 @@ export class SystemSettingsRepository {
         settings[key] = value;
       }
     }
-    return SystemSettingsRepository.updateSettings({ settings }, logger, t);
+    const saved = SystemSettingsRepository.pendingWrite.then(() =>
+      SystemSettingsRepository.updateSettings({ settings }, logger, t, user),
+    );
+    SystemSettingsRepository.pendingWrite = saved.then(() => undefined);
+    return saved;
   }
 }

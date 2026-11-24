@@ -29,6 +29,7 @@ import { Route as LocaleFrameSplatRouteImport } from './routes/$locale.frame.$'
 import { Route as LocaleHelpIndexRouteImport } from './routes/$locale.help.index'
 import { Route as LocaleModelsIndexRouteImport } from './routes/$locale.models.index'
 import { Route as LocalePricingIndexRouteImport } from './routes/$locale.pricing.index'
+import { Route as LocaleSetupIndexRouteImport } from './routes/$locale.setup.index'
 import { Route as LocaleSkillsIndexRouteImport } from './routes/$locale.skills.index'
 import { Route as LocaleStoryIndexRouteImport } from './routes/$locale.story.index'
 import { Route as LocaleSubscriptionIndexRouteImport } from './routes/$locale.subscription.index'
@@ -862,6 +863,11 @@ const LocaleModelsIndexRoute = LocaleModelsIndexRouteImport.update({
 const LocalePricingIndexRoute = LocalePricingIndexRouteImport.update({
   id: '/$locale/pricing/',
   path: '/$locale/pricing/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LocaleSetupIndexRoute = LocaleSetupIndexRouteImport.update({
+  id: '/$locale/setup/',
+  path: '/$locale/setup/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LocaleSkillsIndexRoute = LocaleSkillsIndexRouteImport.update({
@@ -5233,6 +5239,7 @@ export interface FileRoutesByFullPath {
   '/$locale/help/': typeof LocaleHelpIndexRoute
   '/$locale/models/': typeof LocaleModelsIndexRoute
   '/$locale/pricing/': typeof LocalePricingIndexRoute
+  '/$locale/setup/': typeof LocaleSetupIndexRoute
   '/$locale/skills/': typeof LocaleSkillsIndexRoute
   '/$locale/story/': typeof LocaleStoryIndexRoute
   '/$locale/subscription/': typeof LocaleSubscriptionIndexRoute
@@ -5982,6 +5989,7 @@ export interface FileRoutesByTo {
   '/$locale/help': typeof LocaleHelpIndexRoute
   '/$locale/models': typeof LocaleModelsIndexRoute
   '/$locale/pricing': typeof LocalePricingIndexRoute
+  '/$locale/setup': typeof LocaleSetupIndexRoute
   '/$locale/skills': typeof LocaleSkillsIndexRoute
   '/$locale/story': typeof LocaleStoryIndexRoute
   '/$locale/subscription': typeof LocaleSubscriptionIndexRoute
@@ -6738,6 +6746,7 @@ export interface FileRoutesById {
   '/$locale/help/': typeof LocaleHelpIndexRoute
   '/$locale/models/': typeof LocaleModelsIndexRoute
   '/$locale/pricing/': typeof LocalePricingIndexRoute
+  '/$locale/setup/': typeof LocaleSetupIndexRoute
   '/$locale/skills/': typeof LocaleSkillsIndexRoute
   '/$locale/story/': typeof LocaleStoryIndexRoute
   '/$locale/subscription/': typeof LocaleSubscriptionIndexRoute
@@ -7495,6 +7504,7 @@ export interface FileRouteTypes {
     | '/$locale/help/'
     | '/$locale/models/'
     | '/$locale/pricing/'
+    | '/$locale/setup/'
     | '/$locale/skills/'
     | '/$locale/story/'
     | '/$locale/subscription/'
@@ -8244,6 +8254,7 @@ export interface FileRouteTypes {
     | '/$locale/help'
     | '/$locale/models'
     | '/$locale/pricing'
+    | '/$locale/setup'
     | '/$locale/skills'
     | '/$locale/story'
     | '/$locale/subscription'
@@ -8999,6 +9010,7 @@ export interface FileRouteTypes {
     | '/$locale/help/'
     | '/$locale/models/'
     | '/$locale/pricing/'
+    | '/$locale/setup/'
     | '/$locale/skills/'
     | '/$locale/story/'
     | '/$locale/subscription/'
@@ -9752,6 +9764,7 @@ export interface RootRouteChildren {
   LocaleCortexIndexRoute: typeof LocaleCortexIndexRoute
   LocaleDesignTestIndexRoute: typeof LocaleDesignTestIndexRoute
   LocalePricingIndexRoute: typeof LocalePricingIndexRoute
+  LocaleSetupIndexRoute: typeof LocaleSetupIndexRoute
   LocaleSkillsIndexRoute: typeof LocaleSkillsIndexRoute
   LocaleToolsIndexRoute: typeof LocaleToolsIndexRoute
   LocaleTrackIndexRoute: typeof LocaleTrackIndexRoute
@@ -10324,6 +10337,13 @@ declare module '@tanstack/react-router' {
       path: '/$locale/pricing'
       fullPath: '/$locale/pricing/'
       preLoaderRoute: typeof LocalePricingIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/$locale/setup/': {
+      id: '/$locale/setup/'
+      path: '/$locale/setup'
+      fullPath: '/$locale/setup/'
+      preLoaderRoute: typeof LocaleSetupIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/$locale/skills/': {
@@ -16885,6 +16905,7 @@ const rootRouteChildren: RootRouteChildren = {
   LocaleCortexIndexRoute: LocaleCortexIndexRoute,
   LocaleDesignTestIndexRoute: LocaleDesignTestIndexRoute,
   LocalePricingIndexRoute: LocalePricingIndexRoute,
+  LocaleSetupIndexRoute: LocaleSetupIndexRoute,
   LocaleSkillsIndexRoute: LocaleSkillsIndexRoute,
   LocaleToolsIndexRoute: LocaleToolsIndexRoute,
   LocaleTrackIndexRoute: LocaleTrackIndexRoute,

@@ -13,6 +13,7 @@ import { AuthRepository } from "next-vibe/identity/auth/repository";
 import { identityEnv } from "next-vibe/identity/env";
 import { leads, userLeadLinks } from "next-vibe/identity/lead/db";
 import { LeadSource, LeadStatus } from "next-vibe/identity/lead/enum";
+import { retireShippedPlaceholderAdmin } from "next-vibe/identity/placeholder-admin";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { UserRolesRepository } from "next-vibe/identity/roles/repository";
 import { SessionRepository } from "next-vibe/identity/session/repository";
@@ -49,6 +50,15 @@ function createUserSeed(
   };
 }
 
+/** Retire a leftover shipped login after an instance is configured. */
+async function retireDefaultAdminLogin(logger: EndpointLogger): Promise<void> {
+  try {
+    await retireShippedPlaceholderAdmin(identityEnv);
+  } catch (error) {
+    logger.error("Could not retire the default admin login", parseError(error));
+  }
+}
+
 /**
  * Development seed function for auth module
  */
@@ -56,6 +66,7 @@ export async function dev(
   logger: EndpointLogger,
   locale: CountryLanguage,
 ): Promise<void> {
+  await retireDefaultAdminLogin(logger);
   // Create all dev seed users from shared constants
   const allUsers = DEV_SEED_USERS.map((seedUser, index) =>
     createUserSeed(locale, {
@@ -557,6 +568,7 @@ export async function prod(
   locale: CountryLanguage,
 ): Promise<void> {
   logger.debug("🌱 Seeding auth data for production environment");
+  await retireDefaultAdminLogin(logger);
 
   // Create admin user - use env email if set, fallback to support email
   const adminUser = createUserSeed(locale, {

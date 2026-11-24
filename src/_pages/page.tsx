@@ -4,6 +4,7 @@ import { coreEnv } from "next-vibe/core/env";
 import { DefaultFolderId } from "next-vibe/core/execution-context";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { VibeMode } from "next-vibe/env/env-util";
+import { SetupStatusRepository } from "next-vibe/env/settings/setup-status";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { UserDetailLevel } from "next-vibe/identity/user/enum";
 import { UserRepository } from "next-vibe/identity/user/repository";
@@ -31,26 +32,6 @@ export async function tanstackLoader({
     notFound();
   }
 
-  // Agent mode only: go straight to chat (no landing page)
-  if (coreEnv.NEXT_PUBLIC_VIBE_MODE === VibeMode.AGENT) {
-    const logger = createEndpointLogger(false, locale);
-    const userResponse = await UserRepository.getUserByAuth(
-      {
-        detailLevel: UserDetailLevel.MINIMAL,
-        roles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN],
-      },
-      locale,
-      logger,
-    );
-    const user = userResponse.success ? userResponse.data : undefined;
-    const isAuthenticated = user !== undefined && !user.isPublic;
-    const defaultFolder = isAuthenticated
-      ? DefaultFolderId.PRIVATE
-      : DefaultFolderId.INCOGNITO;
-    redirect(`/${locale}/threads/${defaultFolder}`);
-  }
-
-  // Dev and prod: check auth - logged-in users go straight to chat
   const logger = createEndpointLogger(false, locale);
   const userResponse = await UserRepository.getUserByAuth(
     {
@@ -63,6 +44,25 @@ export async function tanstackLoader({
   const user = userResponse.success ? userResponse.data : undefined;
   const isAuthenticated = user !== undefined && !user.isPublic;
 
+  // Fresh self-hosted instance: first-run setup before anything else.
+  if (
+    SetupStatusRepository.isPending() &&
+    (await SetupStatusRepository.shouldRedirectToSetup(
+      isAuthenticated && user.roles.includes(UserRole.ADMIN),
+    ))
+  ) {
+    redirect(`/${locale}/setup`);
+  }
+
+  // Agent mode only: go straight to chat (no landing page)
+  if (coreEnv.NEXT_PUBLIC_VIBE_MODE === VibeMode.AGENT) {
+    const defaultFolder = isAuthenticated
+      ? DefaultFolderId.PRIVATE
+      : DefaultFolderId.INCOGNITO;
+    redirect(`/${locale}/threads/${defaultFolder}`);
+  }
+
+  // Dev and prod: logged-in users go straight to chat
   if (isAuthenticated) {
     redirect(`/${locale}/threads/${DefaultFolderId.PRIVATE}`);
   }
