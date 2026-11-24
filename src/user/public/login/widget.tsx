@@ -14,9 +14,9 @@ import {
   CardHeader,
   CardTitle,
 } from "next-vibe/ui/components/card";
-import type { DivRefObject } from "next-vibe/ui/components/div";
 import { Div } from "next-vibe/ui/components/div";
 import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
+import { Mail } from "next-vibe/ui/components/icons/Mail";
 import { Shield } from "next-vibe/ui/components/icons/Shield";
 import type { InputRefObject } from "next-vibe/ui/components/input";
 import { Input } from "next-vibe/ui/components/input";
@@ -45,7 +45,7 @@ import { EmailFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/email
 import { PasswordFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/password-field/widget";
 import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { authPageHref, CALLBACK_URL_PARAM } from "./callback-url";
 import type definition from "./definition";
@@ -54,7 +54,7 @@ interface CustomWidgetProps {
   field: (typeof definition.POST)["fields"];
 }
 
-type Phase = "credentials" | "code";
+type Phase = "credentials" | "code" | "email";
 
 export function LoginFormContainer({
   field,
@@ -78,7 +78,10 @@ export function LoginFormContainer({
   const [recovery, setRecovery] = useState(false);
   const [handled, setHandled] = useState<typeof response>(undefined);
   const codeRef = useRef<InputRefObject>(null);
-  const otpRef = useRef<DivRefObject>(null);
+  const focusCode = useCallback(
+    (input: { focus(): void } | null): void => input?.focus(),
+    [],
+  );
   const onSubmit = useWidgetOnSubmit();
   // Last code auto-submitted; a failed code is not re-sent until it is edited
   const lastAutoSubmitted = useRef("");
@@ -91,11 +94,19 @@ export function LoginFormContainer({
     response.errorType.errorKey ===
       ErrorResponseTypes.TWO_FACTOR_REQUIRED.errorKey;
 
+  const emailRequired =
+    response &&
+    !response.success &&
+    response.errorType.errorKey ===
+      ErrorResponseTypes.EMAIL_CONFIRMATION_REQUIRED.errorKey;
+
   // Adjust state during render (no effect): react once per new response
   if (response !== handled) {
     setHandled(response);
     if (twoFactorRequired) {
       setPhase("code");
+    } else if (emailRequired) {
+      setPhase("email");
     }
   }
 
@@ -108,44 +119,33 @@ export function LoginFormContainer({
   }, [response, logger]);
 
   useEffect(() => {
-    if (phase !== "code") {
-      return;
-    }
-    if (recovery) {
+    if (phase === "code" && recovery) {
       codeRef.current?.focus();
-      return;
-    }
-    // The OTP's real input overlays its container: resolve it by hit-test
-    const rect = otpRef.current?.getBoundingClientRect();
-    if (rect) {
-      // oxlint-disable-next-line restricted/no-browser-globals -- shared InputOTP exposes no ref/autoFocus; hit-test is the only way to reach its overlaid input
-      const hit = document.elementFromPoint(
-        rect.left + rect.width / 2,
-        rect.top + rect.height / 2,
-      );
-      if (hit instanceof HTMLInputElement) {
-        hit.focus();
-      }
     }
   }, [phase, recovery]);
 
   const handleOtpChange = (v: string): void => {
     const next = v.replace(/\D/g, "").slice(0, 6);
-    form?.setValue("twoFactorCode", next, { shouldDirty: true });
+    form?.setValue(phase === "email" ? "emailCode" : "twoFactorCode", next, {
+      shouldDirty: true,
+    });
     if (next.length < 6) {
       lastAutoSubmitted.current = "";
       return;
     }
-    if (isSubmitting || next === lastAutoSubmitted.current) {
+    const submission = `${phase}:${next}`;
+    if (isSubmitting || submission === lastAutoSubmitted.current) {
       return;
     }
-    lastAutoSubmitted.current = next;
+    lastAutoSubmitted.current = submission;
     onSubmit?.();
   };
 
   const backToCredentials = (): void => {
     form?.setValue("twoFactorCode", "");
     lastAutoSubmitted.current = "";
+    form?.setValue("emailCode", "");
+    form?.setValue("resendPending", false);
     setRecovery(false);
     setPhase("credentials");
   };
@@ -156,32 +156,41 @@ export function LoginFormContainer({
       ? response.message
       : undefined;
 
-  if (phase === "code") {
+  if (phase !== "credentials") {
+    const emailStep = phase === "email";
     const email = form?.watch("email") ?? "";
-    const code = form?.watch("twoFactorCode") ?? "";
+    const code = form?.watch(emailStep ? "emailCode" : "twoFactorCode") ?? "";
     return (
       <Card className="rounded-xl shadow-sm">
         <CardHeader className="items-center gap-2 p-6 pb-2 text-center sm:p-8 sm:pb-2">
           <Div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
-            <Shield className="h-6 w-6" />
+            {emailStep ? (
+              <Mail className="h-6 w-6" />
+            ) : (
+              <Shield className="h-6 w-6" />
+            )}
           </Div>
           <CardTitle className="text-2xl tracking-tight">
-            {t("twoFactorStep.title")}
+            {t(emailStep ? "emailCode" : "twoFactorStep.title")}
           </CardTitle>
           <CardDescription>
-            {recovery
-              ? t("twoFactorStep.recoveryHelper")
-              : t("twoFactorStep.helper")}
+            {emailStep
+              ? emailRequired
+                ? response.message
+                : t("errors.pendingEmail")
+              : recovery
+                ? t("twoFactorStep.recoveryHelper")
+                : t("twoFactorStep.helper")}
           </CardDescription>
           <Div
             className="mt-1 max-w-full truncate rounded-full bg-muted px-3 py-1 text-xs text-muted-foreground"
-            data-testid="login-2fa-email"
+            data-testid={emailStep ? "login-email-address" : "login-2fa-email"}
           >
             {email}
           </Div>
         </CardHeader>
         <CardContent className="flex flex-col gap-4 p-6 pt-4 sm:p-8 sm:pt-4">
-          {recovery ? (
+          {!emailStep && recovery ? (
             <Input
               ref={codeRef}
               name="twoFactorCode"
@@ -203,12 +212,15 @@ export function LoginFormContainer({
             />
           ) : (
             <Div
-              ref={otpRef}
-              data-testid="login-2fa-otp"
-              aria-label={t("twoFactorStep.codeLabel")}
+              data-testid={emailStep ? "login-email-otp" : "login-2fa-otp"}
               className="flex justify-center"
             >
               <InputOTP
+                key={phase}
+                inputRef={focusCode}
+                aria-label={t(
+                  emailStep ? "emailCode" : "twoFactorStep.codeLabel",
+                )}
                 maxLength={6}
                 value={code}
                 onChange={handleOtpChange}
@@ -227,7 +239,7 @@ export function LoginFormContainer({
             </Div>
           )}
 
-          {visibleError && (
+          {visibleError && !emailRequired && (
             <Div role="alert" data-testid="login-2fa-error">
               <P className="text-center text-sm text-destructive">
                 {visibleError}
@@ -239,7 +251,10 @@ export function LoginFormContainer({
             type="submit"
             data-testid="endpoint-submit"
             size="lg"
-            disabled={isSubmitting || code.length === 0}
+            disabled={
+              isSubmitting ||
+              (emailStep ? code.length !== 6 : code.length === 0)
+            }
           >
             {isSubmitting
               ? t("twoFactorStep.verifying")
@@ -247,21 +262,37 @@ export function LoginFormContainer({
           </Button>
 
           <Div className="flex flex-col items-center gap-1 border-t pt-4 text-sm">
-            <Button
-              type="button"
-              variant="link"
-              size="sm"
-              data-testid="login-2fa-toggle"
-              onClick={() => {
-                form?.setValue("twoFactorCode", "");
-                lastAutoSubmitted.current = "";
-                setRecovery(!recovery);
-              }}
-            >
-              {recovery
-                ? t("twoFactorStep.useApp")
-                : t("twoFactorStep.useRecovery")}
-            </Button>
+            {emailStep ? (
+              <Button
+                type="button"
+                variant="link"
+                disabled={isSubmitting}
+                onClick={() => {
+                  form?.setValue("emailCode", "");
+                  form?.setValue("resendPending", true);
+                  lastAutoSubmitted.current = "";
+                  onSubmit?.();
+                }}
+              >
+                {t("errors.resendPending")}
+              </Button>
+            ) : (
+              <Button
+                type="button"
+                variant="link"
+                size="sm"
+                data-testid="login-2fa-toggle"
+                onClick={() => {
+                  form?.setValue("twoFactorCode", "");
+                  lastAutoSubmitted.current = "";
+                  setRecovery(!recovery);
+                }}
+              >
+                {recovery
+                  ? t("twoFactorStep.useApp")
+                  : t("twoFactorStep.useRecovery")}
+              </Button>
+            )}
             <Button
               type="button"
               variant="ghost"

@@ -41,6 +41,7 @@ export const translations: typeof enTranslations = {
     permission_error: "Berechtigungsfehler",
     sms_error: "SMS-Fehler",
     token_expired_error: "Token abgelaufen",
+    email_confirmation_required: "Bestätigungscode per E-Mail",
     two_factor_required: "Zwei-Faktor-Authentifizierung erforderlich",
     unauthorized: "Nicht autorisiert",
     unknown_error: "Unbekannter Fehler",

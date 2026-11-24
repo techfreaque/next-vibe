@@ -10,8 +10,10 @@ import { configScopedTranslation } from "@/env/i18n";
 import { EmailTemplate } from "@/messenger/providers/email/smtp-client/components/template.email";
 import { createTrackingContext } from "@/messenger/providers/email/smtp-client/components/tracking_context.email";
 import { EmailSendingRepository } from "@/messenger/providers/email/smtp-client/email-sending/repository";
+import { SmtpRepository } from "@/messenger/providers/email/smtp-client/repository";
 import { FREE_CREDIT_SIGNED_IN_TOTAL } from "@/products/constants";
 
+import { scopedTranslation as verifyTranslation } from "../verify-email/i18n";
 import type { PendingSignup } from "./db";
 import { scopedTranslation } from "./i18n";
 
@@ -27,7 +29,7 @@ export async function sendSignupChallenge(
   logger: EndpointLogger,
 ): Promise<string | null> {
   const { t } = scopedTranslation.scopedT(locale);
-  return deliverChallenge(
+  const delivery = await deliverChallenge(
     pending,
     challenge,
     locale,
@@ -35,6 +37,7 @@ export async function sendSignupChallenge(
     t("confirmation.link"),
     t("confirmation.hint"),
   );
+  return delivery.messageId;
 }
 
 /**
@@ -50,7 +53,7 @@ export async function sendSignupReminder(
 ): Promise<string | null> {
   const { t } = scopedTranslation.scopedT(locale);
   const { t: globalT } = configScopedTranslation.scopedT(locale);
-  return deliverChallenge(
+  const delivery = await deliverChallenge(
     pending,
     challenge,
     locale,
@@ -59,6 +62,34 @@ export async function sendSignupReminder(
     t("reminder.hint", { credits: FREE_CREDIT_SIGNED_IN_TOTAL }),
     t("reminder.ignore"),
     t("reminder.button"),
+  );
+  return delivery.messageId;
+}
+
+export async function sendAccountChallenge(
+  recipient: Omit<ChallengeRecipient, "subscribeToNewsletter"> & { id: string },
+  challenge: { code: string; token: string },
+  locale: CountryLanguage,
+  logger: EndpointLogger,
+): Promise<{ messageId: string | null; bounced: boolean }> {
+  const { t } = verifyTranslation.scopedT(locale);
+  const { NewsletterConfirmRepository } =
+    await import("@/newsletter/confirm/repository");
+  const subscribeToNewsletter =
+    await NewsletterConfirmRepository.hasPendingForAccount(
+      recipient.id,
+      recipient.email,
+    );
+  return deliverChallenge(
+    { ...recipient, subscribeToNewsletter },
+    challenge,
+    locale,
+    logger,
+    t("title"),
+    t("accountChallenge.mail"),
+    null,
+    t("widget.confirmButton"),
+    `${coreEnv.NEXT_PUBLIC_APP_URL}/${locale}/user/verify-email/${encodeURIComponent(challenge.token)}`,
   );
 }
 
@@ -71,12 +102,12 @@ async function deliverChallenge(
   hint: string,
   footer: string | null = null,
   buttonText: string = subject,
-): Promise<string | null> {
+  url = `${coreEnv.NEXT_PUBLIC_APP_URL}/${locale}/user/signup?confirm=1#${challenge.token}`,
+): Promise<{ messageId: string | null; bounced: boolean }> {
   const { t } = scopedTranslation.scopedT(locale);
   const newsletterNotice = pending.subscribeToNewsletter
     ? t("confirmation.newsletter")
     : null;
-  const url = `${coreEnv.NEXT_PUBLIC_APP_URL}/${locale}/user/signup?confirm=1#${challenge.token}`;
   const text = [
     hint,
     challenge.code,
@@ -126,5 +157,10 @@ async function deliverChallenge(
     logger,
     locale,
   );
-  return sent.success ? sent.data.result.messageId : null;
+  return sent.success
+    ? { messageId: sent.data.result.messageId, bounced: false }
+    : {
+        messageId: null,
+        bounced: SmtpRepository.isBadRecipientError(sent.message),
+      };
 }

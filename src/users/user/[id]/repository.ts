@@ -312,6 +312,7 @@ export class UserByIdRepository {
         if (data.email !== existingUser.email) {
           // Admin sets the address directly: the user's own pending change is void
           updateData.pendingEmail = null;
+          updateData.emailVerified = data.emailVerified ?? false;
         }
       }
       if (data.isActive !== undefined) {

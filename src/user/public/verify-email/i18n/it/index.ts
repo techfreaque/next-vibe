@@ -32,6 +32,20 @@ export const translations: typeof enTranslations = {
     changedDescription:
       "Ora accedi con {{email}}. Il vecchio indirizzo non è più in uso.",
   },
+  accountChallenge: {
+    settings: "Impostazioni account",
+    prompt:
+      "Inserisci il codice di sei cifre inviato a {{email}}. È valido per 30 minuti. Puoi anche aprire il link nell’email e accedere di nuovo.",
+    mail: "Conferma il tuo indirizzo con il link qui sotto. Per accedere puoi anche inserire questo codice entro 30 minuti.",
+    notice:
+      "Conferma {{email}} prima del prossimo accesso. Intanto puoi continuare a usare il tuo account.",
+    undeliverable:
+      "Non siamo riusciti a consegnare l’email a {{email}}. Se hai già effettuato l’accesso, controlla l’indirizzo nelle impostazioni. In alternativa, contatta l’assistenza.",
+    invalid:
+      "Il codice è errato o scaduto. Controlla l’ultima email o richiedi un nuovo codice.",
+    cooldown: "Attendi cinque minuti prima di richiedere un’altra email.",
+    dismiss: "Nascondi",
+  },
   creditsPrompt: {
     title: "Conferma la tua email per sbloccare i crediti gratuiti",
     description:

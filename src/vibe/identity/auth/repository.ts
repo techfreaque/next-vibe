@@ -46,6 +46,7 @@ import {
   filterUserPermissionRoles,
   UserPermissionRole,
   UserRole,
+  UserRoleDB,
 } from "../roles/enum";
 import { UserRolesRepository } from "../roles/repository";
 import { scopedTranslation as sessionScopedTranslation } from "../session/i18n";
@@ -360,17 +361,21 @@ export class AuthRepository {
         return null;
       }
 
-      // Fetch user roles
-      const userRolesResponse = await UserRolesRepository.findByUserId(
+      // Use the same implicit customer role as HTTP authentication. A live
+      // account can have no explicit customer row (or only a partner role).
+      const roles = await AuthRepository.getUserRolesInternal(
         userId,
+        UserRoleDB,
         logger,
         locale,
       );
-      const roles = userRolesResponse.success
-        ? userRolesResponse.data.map((r) => r.role)
-        : [];
 
-      return { isPublic: false, id: userId, leadId, roles };
+      return {
+        isPublic: false,
+        id: userId,
+        leadId,
+        roles: filterUserPermissionRoles(roles),
+      };
     } catch (error) {
       logger.error("Error validating user session", parseError(error));
       return null;
@@ -825,6 +830,7 @@ export class AuthRepository {
   ): Promise<ResponseType<string>> {
     try {
       const token = await new SignJWT(payload)
+        .setJti(crypto.randomUUID())
         .setProtectedHeader({ alg: "HS256" })
         .setIssuedAt()
         .setExpirationTime(`${AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS}s`)

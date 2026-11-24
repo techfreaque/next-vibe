@@ -30,6 +30,20 @@ export const translations = {
     changedDescription:
       "You now log in with {{email}}. Your old address is no longer used.",
   },
+  accountChallenge: {
+    settings: "Account settings",
+    prompt:
+      "Enter the six-digit code sent to {{email}}. It works for 30 minutes. You can also confirm with the link in the email and sign in again.",
+    mail: "Confirm this email address using the link below. If you’re signing in, you can also enter this code within 30 minutes.",
+    notice:
+      "Confirm {{email}} before your next sign-in. You can keep using your account now.",
+    undeliverable:
+      "We couldn’t deliver the email to {{email}}. Check the address in Settings if you’re signed in, or contact support.",
+    invalid:
+      "That code is incorrect or expired. Check the latest email or request another code.",
+    cooldown: "Wait five minutes between email requests.",
+    dismiss: "Dismiss",
+  },
   creditsPrompt: {
     title: "Confirm your email to unlock your free credits",
     description:

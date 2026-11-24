@@ -405,8 +405,11 @@ function reportApiFailure(
     response.errorType;
   const errorKey = errorType?.errorKey ?? "errorTypes.unknown_error";
   const errorCode = errorType?.errorCode ?? diag.status ?? 500;
-  // TWO_FACTOR_REQUIRED is a 202 login step, not a failure
-  if (errorKey === ErrorResponseTypes.TWO_FACTOR_REQUIRED.errorKey) {
+  // Both prompts ask the caller to complete the next sign-in step.
+  if (
+    errorKey === ErrorResponseTypes.TWO_FACTOR_REQUIRED.errorKey ||
+    errorKey === ErrorResponseTypes.EMAIL_CONFIRMATION_REQUIRED.errorKey
+  ) {
     return;
   }
   if (user.isPublic && PUBLIC_EXPECTED_ERROR_KEYS.has(errorKey)) {

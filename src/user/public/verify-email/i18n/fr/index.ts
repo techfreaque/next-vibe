@@ -32,6 +32,20 @@ export const translations: typeof enTranslations = {
     changedDescription:
       "Vous vous connectez désormais avec {{email}}. L'ancienne adresse n'est plus utilisée.",
   },
+  accountChallenge: {
+    settings: "Paramètres du compte",
+    prompt:
+      "Saisissez le code à six chiffres envoyé à {{email}}. Il est valable 30 minutes. Vous pouvez aussi ouvrir le lien du message, puis vous reconnecter.",
+    mail: "Confirmez votre adresse e-mail avec le lien ci-dessous. Pour vous connecter, vous pouvez aussi saisir ce code dans les 30 minutes.",
+    notice:
+      "Confirmez {{email}} avant votre prochaine connexion. Vous pouvez continuer à utiliser votre compte.",
+    undeliverable:
+      "L’e-mail n’a pas pu être livré à {{email}}. Si votre session est ouverte, vérifiez l’adresse dans les paramètres. Sinon, contactez l’assistance.",
+    invalid:
+      "Ce code est incorrect ou a expiré. Consultez le dernier e-mail ou demandez un nouveau code.",
+    cooldown: "Patientez cinq minutes avant de demander un autre e-mail.",
+    dismiss: "Masquer",
+  },
   creditsPrompt: {
     title: "Confirmez votre e-mail pour débloquer vos crédits gratuits",
     description:

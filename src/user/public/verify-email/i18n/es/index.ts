@@ -32,6 +32,20 @@ export const translations: typeof enTranslations = {
     changedDescription:
       "Ahora puedes iniciar sesión con {{email}}. La dirección anterior dejó de usarse.",
   },
+  accountChallenge: {
+    settings: "Ajustes de la cuenta",
+    prompt:
+      "Introduce el código de seis cifras que enviamos a {{email}}. Caduca en 30 minutos. También puedes abrir el enlace del correo y volver a iniciar sesión.",
+    mail: "Confirma tu dirección con el enlace de abajo. Si estás iniciando sesión, también puedes introducir este código en los próximos 30 minutos.",
+    notice:
+      "Confirma {{email}} antes de volver a iniciar sesión. Puedes seguir usando tu cuenta.",
+    undeliverable:
+      "No pudimos entregar el correo a {{email}}. Si tienes la sesión abierta, revisa la dirección en Ajustes. También puedes contactar con soporte.",
+    invalid:
+      "El código es incorrecto o ha caducado. Revisa el último correo o pide otro código.",
+    cooldown: "Espera cinco minutos antes de pedir otro correo.",
+    dismiss: "Ocultar",
+  },
   creditsPrompt: {
     title: "Confirma tu correo para desbloquear tus créditos gratis",
     description:

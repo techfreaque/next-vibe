@@ -2,13 +2,13 @@
  * Verify-email repository.
  * - token present: verify (public, idempotent) and flip users.emailVerified,
  *   or, for an email-change link, swap the pending address in
- * - no token: resend request for the logged-in user (the mail is sent by the
- *   route's email template; this only reports state)
+ * - no token: reserve the shared challenge for a session notice or manual resend
  */
 
 import "server-only";
 
-import { and, eq, inArray } from "drizzle-orm";
+import { and, eq, exists, inArray } from "drizzle-orm";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
@@ -23,6 +23,8 @@ import { users } from "next-vibe/identity/user/db";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { findUserByNormalizedEmail } from "../signup/email-guard";
+import { requestAccountChallenge } from "./account-challenge";
+import { accountEmailChallenges } from "./db";
 import type {
   VerifyEmailPostRequestOutput,
   VerifyEmailPostResponseOutput,
@@ -40,6 +42,8 @@ export class VerifyEmailRepository {
     user: JwtPayloadType,
     logger: EndpointLogger,
     t: VerifyEmailT,
+    locale: CountryLanguage,
+    deliver?: Parameters<typeof requestAccountChallenge>[4],
   ): Promise<ResponseType<VerifyEmailPostResponseOutput>> {
     try {
       if (data.token) {
@@ -52,7 +56,11 @@ export class VerifyEmailRepository {
         });
       }
       const [row] = await db
-        .select({ email: users.email, verified: users.emailVerified })
+        .select({
+          email: users.email,
+          verified: users.emailVerified,
+          privateName: users.privateName,
+        })
         .from(users)
         .where(eq(users.id, user.id))
         .limit(1);
@@ -61,6 +69,18 @@ export class VerifyEmailRepository {
           message: t("errors.userNotFound"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
+      }
+      if (!row.verified) {
+        const issued = await requestAccountChallenge(
+          { ...row, id: user.id, leadId: user.leadId },
+          data.notice ? "notice" : "resend",
+          locale,
+          logger,
+          deliver,
+        );
+        if (!issued.success) {
+          return issued;
+        }
       }
       return success({
         verified: row.verified,
@@ -105,7 +125,15 @@ export class VerifyEmailRepository {
     if (!row) {
       return invalid();
     }
-    if (!isValidVerificationToken(token, row.id, row.email)) {
+    const issuedAt = getTokenIssuedAt(token);
+    const isChallenge = isValidVerificationToken(
+      token,
+      row.id,
+      row.email,
+      Date.now(),
+      "account-challenge",
+    );
+    if (!isChallenge && !isValidVerificationToken(token, row.id, row.email)) {
       const { pendingEmail } = row;
       if (
         pendingEmail &&
@@ -125,20 +153,51 @@ export class VerifyEmailRepository {
       }
       return invalid();
     }
-    if (!row.verified) {
-      await db
+    if (!row.verified || isChallenge) {
+      // Newly issued links must still belong to the current dispatch.
+      // Older verification and email-change links retain their original semantics.
+      const activeChallenge =
+        isChallenge && issuedAt
+          ? exists(
+              db
+                .select({ id: accountEmailChallenges.userId })
+                .from(accountEmailChallenges)
+                .where(
+                  and(
+                    eq(accountEmailChallenges.userId, row.id),
+                    eq(accountEmailChallenges.email, row.email),
+                    eq(accountEmailChallenges.sentAt, issuedAt),
+                    eq(accountEmailChallenges.deliveryFailed, false),
+                    eq(accountEmailChallenges.bounced, false),
+                  ),
+                ),
+            )
+          : undefined;
+      const [updated] = await db
         .update(users)
-        .set({ emailVerified: true, updatedAt: new Date() })
-        .where(eq(users.id, row.id));
+        .set({
+          emailVerified: true,
+          updatedAt: row.verified ? undefined : new Date(),
+        })
+        .where(
+          and(
+            eq(users.id, row.id),
+            eq(users.email, row.email),
+            activeChallenge,
+          ),
+        )
+        .returning({ id: users.id });
+      if (!updated) {
+        return invalid();
+      }
       logger.debug("Email verified", { userId: row.id });
     }
     // Newsletter ticked at signup: this link is its double opt-in too
-    const linkIssuedAt = getTokenIssuedAt(token);
-    if (linkIssuedAt) {
+    if (issuedAt) {
       const { NewsletterConfirmRepository } =
         await import("@/newsletter/confirm/repository");
       await NewsletterConfirmRepository.confirmForVerifiedAccount(
-        { userId: row.id, email: row.email, linkIssuedAt },
+        { userId: row.id, email: row.email, linkIssuedAt: issuedAt },
         logger,
       );
     }

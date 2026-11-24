@@ -4,6 +4,7 @@ import {
   and,
   desc,
   eq,
+  exists,
   gte,
   inArray,
   isNotNull,
@@ -13,6 +14,7 @@ import {
   sql,
 } from "drizzle-orm";
 import { coreEnv } from "next-vibe/core/env";
+import { LanguagesArr } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
   fail,
@@ -32,6 +34,7 @@ import {
   MessengerProvider,
 } from "@/messenger/accounts/enum";
 import { messengerEnv } from "@/messenger/env";
+import { emails } from "@/messenger/messages/db";
 import { imapClientEnv } from "@/messenger/providers/email/imap-client/env";
 import type { SystemMailboxConfig } from "@/messenger/system-mailbox/config";
 import { systemMailboxEnv } from "@/messenger/system-mailbox/env";
@@ -40,6 +43,8 @@ import {
   visitDeliveryReports,
 } from "@/messenger/system-mailbox/imap-ops";
 
+import { accountEmailChallenges } from "../../verify-email/db";
+import { scopedTranslation as verifyTranslation } from "../../verify-email/i18n";
 import { SignupBounceReason } from "../bounce-reason";
 import { pendingSignups, signupEvents } from "../db";
 import { SignupEventType } from "../event-type";
@@ -187,7 +192,16 @@ export async function recordSignupDeliveryReport(
 ): Promise<number> {
   let marked = 0;
   const { messageId, sentAt, sender, subject } = report;
-  for (const { recipient, reason } of report.failures) {
+  const accountSubjects = LanguagesArr.map((language) =>
+    verifyTranslation.scopedT(`${language}-GLOBAL`).t("title"),
+  );
+  for (const { recipient, reason, temporary } of report.failures) {
+    const soft = temporary || reason === SignupBounceReason.MAILBOX_FULL;
+    const deliveryStatus = soft ? { deliveryFailed: true } : { bounced: true };
+    const accountAddress = eq(
+      sql`lower(${accountEmailChallenges.email})`,
+      recipient,
+    );
     const recipientAndTime = and(
       eq(pendingSignups.email, recipient),
       lte(pendingSignups.sentAt, new Date(receivedAt.getTime() + 999)),
@@ -199,6 +213,38 @@ export async function recordSignupDeliveryReport(
         : eq(pendingSignups.bounceReason, SignupBounceReason.OTHER),
     );
     if (messageId) {
+      const ids = [messageId, messageId.slice(1, -1)];
+      // A permanent DSN can arrive after a resend has replaced the current ID.
+      const previousDispatch = soft
+        ? undefined
+        : exists(
+            db
+              .select({ id: emails.id })
+              .from(emails)
+              .where(
+                and(
+                  inArray(emails.messageId, ids),
+                  eq(sql`lower(${emails.recipientEmail})`, recipient),
+                  inArray(emails.subject, accountSubjects),
+                ),
+              ),
+          );
+      const bounced = await db
+        .update(accountEmailChallenges)
+        .set(deliveryStatus)
+        .where(
+          and(
+            accountAddress,
+            eq(accountEmailChallenges.bounced, false),
+            soft ? eq(accountEmailChallenges.deliveryFailed, false) : undefined,
+            or(
+              inArray(accountEmailChallenges.messageId, ids),
+              previousDispatch,
+            ),
+          ),
+        )
+        .returning({ id: accountEmailChallenges.userId });
+      marked += bounced.length;
       const matched = await db
         .update(pendingSignups)
         .set({ bounced: true, bounceReason: reason })
@@ -224,6 +270,29 @@ export async function recordSignupDeliveryReport(
       !subject
     ) {
       continue;
+    }
+    if (accountSubjects.some((translated) => translated === subject)) {
+      const bounced = await db
+        .update(accountEmailChallenges)
+        .set(deliveryStatus)
+        .where(
+          and(
+            accountAddress,
+            eq(accountEmailChallenges.bounced, false),
+            soft ? eq(accountEmailChallenges.deliveryFailed, false) : undefined,
+            isNotNull(accountEmailChallenges.messageId),
+            gte(
+              accountEmailChallenges.sentAt,
+              new Date(sentAt.getTime() - 45_000),
+            ),
+            lte(
+              accountEmailChallenges.sentAt,
+              new Date(sentAt.getTime() + 999),
+            ),
+          ),
+        )
+        .returning({ id: accountEmailChallenges.userId });
+      marked += bounced.length;
     }
     // A returned original Date can identify a dispatch when the DSN omitted
     // its ID. Keep the window shorter than the per-address resend cooldown.
@@ -326,7 +395,10 @@ export async function syncSignupBounces(
     if (!scanned) {
       logger.error(
         "Signup bounce sync could not connect to any configured mailbox",
-        { configuredMailboxes: mailbox.configs.length, connectionFailures },
+        {
+          configuredMailboxes: mailbox.configs.length,
+          connectionFailures,
+        },
       );
       return fail({
         message: t("bounceSync.mailboxUnavailable"),

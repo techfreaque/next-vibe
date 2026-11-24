@@ -244,6 +244,7 @@ export const translations: typeof enTranslations = {
       label: "Continua a leggere",
     },
   },
+  emailCode: "Codice di conferma via email",
   twoFactorStep: {
     title: "Controllo a due passi",
     helper: "Inserisci il codice a 6 cifre dalla tua app di autenticatore.",

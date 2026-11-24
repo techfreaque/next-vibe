@@ -44,6 +44,12 @@ import { scopedTranslation as creditsScopedTranslation } from "../../../credits/
 import { pendingSignups } from "../signup/db";
 import { scopedTranslation as signupTranslation } from "../signup/i18n";
 import { issueSignupChallenge, pendingStatus } from "../signup/pending";
+import {
+  claimAccountCode,
+  requestAccountChallenge,
+} from "../verify-email/account-challenge";
+import { scopedTranslation as verifyTranslation } from "../verify-email/i18n";
+import { VerifyEmailRepository } from "../verify-email/repository";
 import type {
   LoginPostRequestOutput,
   LoginPostResponseOutput,
@@ -110,6 +116,7 @@ export class LoginRepository {
     logger: EndpointLogger,
     platform: Platform,
     t: LoginT,
+    deliver?: Parameters<typeof requestAccountChallenge>[4],
   ): Promise<ResponseType<LoginPostResponseOutput>> {
     // Extract data from request
     const { email, password, rememberMe } = data;
@@ -155,6 +162,7 @@ export class LoginRepository {
           password: users.password,
           id: users.id,
           emailVerified: users.emailVerified,
+          privateName: users.privateName,
           isBanned: users.isBanned,
           isActive: users.isActive,
           createdAt: users.createdAt,
@@ -261,6 +269,45 @@ export class LoginRepository {
         });
       }
 
+      if (!userRow.emailVerified) {
+        if (!data.emailCode) {
+          const issued = await requestAccountChallenge(
+            { id: userRow.id, privateName: userRow.privateName, email, leadId },
+            data.resendPending ? "resend" : "login",
+            locale,
+            logger,
+            deliver,
+          );
+          // Keep the email step open on a delivery error or cooldown so that
+          // the person can retry explicitly without submitting another password.
+          return fail({
+            message: issued.success
+              ? verifyTranslation
+                  .scopedT(locale)
+                  .t("accountChallenge.prompt", { email })
+              : issued.message,
+            errorType: ErrorResponseTypes.EMAIL_CONFIRMATION_REQUIRED,
+          });
+        }
+        const claim = await claimAccountCode(
+          userRow.id,
+          email,
+          data.emailCode,
+          locale,
+        );
+        if (!claim.success) {
+          return claim;
+        }
+        const confirmed = await VerifyEmailRepository.verify(
+          claim.data,
+          logger,
+          verifyTranslation.scopedT(locale).t,
+        );
+        if (!confirmed.success) {
+          return confirmed;
+        }
+      }
+
       // Re-fetch full user object (needed downstream)
       const userResponse = await UserRepository.getUserByEmail(
         email,
@@ -268,11 +315,15 @@ export class LoginRepository {
         locale,
         logger,
       );
-      if (!userResponse.success) {
+      if (
+        !userResponse.success ||
+        userResponse.data.id !== userRow.id ||
+        !userResponse.data.emailVerified
+      ) {
         return fail({
           message: t("errors.invalid_credentials"),
           errorType: ErrorResponseTypes.UNAUTHORIZED,
-          cause: userResponse,
+          cause: userResponse.success ? undefined : userResponse,
         });
       }
 
@@ -518,7 +569,10 @@ export class LoginRepository {
         token: tokenResponse.data,
         expiresAt,
       };
-      await SessionRepository.create(sessionData, locale);
+      const session = await SessionRepository.create(sessionData, locale);
+      if (!session.success) {
+        return session;
+      }
 
       // Create the response data - LoginPostResponseOutput
       // Always include the token in the response body so cross-origin clients

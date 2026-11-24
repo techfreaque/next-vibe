@@ -32,6 +32,20 @@ export const translations: typeof enTranslations = {
     changedDescription:
       "Du meldest dich ab jetzt mit {{email}} an. Die alte Adresse ist nicht mehr aktiv.",
   },
+  accountChallenge: {
+    settings: "Kontoeinstellungen",
+    prompt:
+      "Gib den sechsstelligen Code ein, den wir an {{email}} geschickt haben. Er gilt 30 Minuten. Du kannst auch den Link in der E-Mail öffnen und dich danach anmelden.",
+    mail: "Bestätige deine E-Mail-Adresse über den Link unten. Beim Anmelden kannst du auch diesen Code eingeben. Er gilt 30 Minuten.",
+    notice:
+      "Bestätige {{email}} vor deiner nächsten Anmeldung. Dein Konto kannst du jetzt weiter nutzen.",
+    undeliverable:
+      "Die E-Mail an {{email}} konnte nicht zugestellt werden. Wenn du angemeldet bist, prüfe die Adresse in den Einstellungen. Sonst wende dich an den Support.",
+    invalid:
+      "Der Code ist falsch oder abgelaufen. Prüfe die neueste E-Mail oder fordere einen neuen Code an.",
+    cooldown: "Warte fünf Minuten, bevor du eine neue E-Mail anforderst.",
+    dismiss: "Ausblenden",
+  },
   creditsPrompt: {
     title: "E-Mail bestätigen, Gratis-Credits freischalten",
     description:

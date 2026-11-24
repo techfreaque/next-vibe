@@ -40,6 +40,8 @@ function InputOTP({
   className,
   style,
   containerClassName,
+  inputRef,
+  "aria-label": label,
   maxLength = 6,
   value: controlledValue,
   onChange,
@@ -59,17 +61,22 @@ function InputOTP({
         )}
       >
         {children}
+        <StyledTextInput
+          accessibilityLabel={label}
+          ref={inputRef}
+          value={value}
+          onChangeText={onChangeValue}
+          maxLength={maxLength}
+          keyboardType="number-pad"
+          {...applyStyleType({
+            nativeStyle,
+            className: cn(
+              "absolute inset-0 h-full w-full opacity-0",
+              className,
+            ),
+          })}
+        />
       </StyledView>
-      <StyledTextInput
-        value={value}
-        onChangeText={onChangeValue}
-        maxLength={maxLength}
-        keyboardType="number-pad"
-        {...applyStyleType({
-          nativeStyle,
-          className: cn("absolute opacity-0 w-0 h-0", className),
-        })}
-      />
     </OTPContext.Provider>
   );
 }

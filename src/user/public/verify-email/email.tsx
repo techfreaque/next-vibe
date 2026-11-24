@@ -19,7 +19,6 @@ import {
 } from "next-vibe/core/route/response.schema";
 import { UserDetailLevel } from "next-vibe/identity/user/enum";
 import { UserRepository } from "next-vibe/identity/user/repository";
-import type { EndpointLogger } from "next-vibe/logger/types";
 import type { ReactElement } from "react";
 import { z } from "zod";
 
@@ -163,7 +162,6 @@ async function buildVerificationEmail(
   recipient: VerifyRecipient,
   locale: CountryLanguage,
   template: { component: typeof VerifyEmail },
-  reminder = false,
 ): Promise<SuccessResponseType<EmailResolvedData> | ErrorResponseType> {
   const { t } = scopedTranslation.scopedT(locale);
   const { t: globalT } = configScopedTranslation.scopedT(locale);
@@ -189,16 +187,13 @@ async function buildVerificationEmail(
   return success({
     toEmail: recipient.email,
     toName: recipient.name,
-    subject: reminder
-      ? t("email.reminder.subject", subjectParams)
-      : t("email.subject", subjectParams),
+    subject: t("email.subject", subjectParams),
     leadId: recipient.leadId,
     jsx: template.component({
       props: {
         name: recipient.name,
         verifyUrl,
         credits: subjectParams.credits,
-        reminder,
         ...(newsletterPending
           ? { newsletterBonusCredits: FREE_CREDIT_ALLOWANCE.newsletterBonus }
           : {}),
@@ -237,46 +232,6 @@ async function renderForUser(
     },
     locale,
     template,
-  );
-}
-
-/**
- * Reminder for an account that has not clicked its signup link yet
- * (verify-email-reminder cron). Skips verified or missing accounts.
- */
-export async function renderVerificationReminder(
-  userId: string,
-  locale: CountryLanguage,
-  logger: EndpointLogger,
-): Promise<
-  SuccessResponseType<EmailResolvedData | EmailRenderSkip> | ErrorResponseType
-> {
-  const found = await UserRepository.getUserById(
-    userId,
-    UserDetailLevel.STANDARD,
-    locale,
-    logger,
-  );
-  if (!found.success) {
-    return fail({
-      message: found.message,
-      errorType: ErrorResponseTypes.NOT_FOUND,
-      cause: found,
-    });
-  }
-  if (found.data.emailVerified) {
-    return success({ skip: true as const, reason: "already verified" });
-  }
-  return buildVerificationEmail(
-    {
-      id: found.data.id,
-      leadId: found.data.leadId,
-      email: found.data.email,
-      name: found.data.privateName,
-    },
-    locale,
-    verifyEmailResendEmailTemplate,
-    true,
   );
 }
 

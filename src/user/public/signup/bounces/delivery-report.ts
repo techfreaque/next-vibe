@@ -6,6 +6,7 @@ import {
 } from "../bounce-reason";
 
 interface FailedRecipient {
+  temporary?: true;
   recipient: string;
   reason: typeof SignupBounceReasonValue;
 }
@@ -75,6 +76,7 @@ function structuredFailures(status: string): FailedRecipient[] {
       failures.push({
         recipient,
         reason: classify(`${code} ${fields.get("diagnostic-code") ?? ""}`),
+        ...(code.startsWith("4.") ? { temporary: true as const } : {}),
       });
     }
   }

@@ -60,6 +60,13 @@ const { POST } = createEndpoint({
         schema: z.string().min(16).max(256).optional(),
       }),
 
+      notice: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        hidden: true,
+        label: "accountChallenge.notice",
+        schema: z.boolean().optional(),
+      }),
       verified: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         label: "response.verified",

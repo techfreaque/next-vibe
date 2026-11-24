@@ -245,6 +245,7 @@ export const translations: typeof enTranslations = {
       label: "Zapamiętaj mnie",
     },
   },
+  emailCode: "Kod potwierdzający z e-maila",
   twoFactorStep: {
     title: "Drugi krok",
     helper: "Wpisz 6-cyfrowy kod z aplikacji uwierzytelniającej.",

@@ -9,7 +9,7 @@
 
 import "server-only";
 
-import { and, eq, gte, inArray, lt } from "drizzle-orm";
+import { and, eq, gte, inArray, lt, notExists } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
@@ -20,12 +20,14 @@ import {
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import { users } from "next-vibe/identity/user/db";
+import { UserDetailLevel } from "next-vibe/identity/user/enum";
+import { UserRepository } from "next-vibe/identity/user/repository";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { emails } from "@/messenger/messages/db";
-import { EmailSendingRepository } from "@/messenger/providers/email/smtp-client/email-sending/repository";
 
-import { renderVerificationReminder } from "../public/verify-email/email";
+import { requestAccountChallenge } from "../public/verify-email/account-challenge";
+import { accountEmailChallenges } from "../public/verify-email/db";
 import type {
   VerifyEmailReminderPostRequestOutput,
   VerifyEmailReminderPostResponseOutput,
@@ -51,6 +53,17 @@ export class VerifyEmailReminderRepository {
         .where(
           and(
             eq(users.emailVerified, false),
+            notExists(
+              db
+                .select({ id: accountEmailChallenges.userId })
+                .from(accountEmailChallenges)
+                .where(
+                  and(
+                    eq(accountEmailChallenges.userId, users.id),
+                    eq(accountEmailChallenges.email, users.email),
+                  ),
+                ),
+            ),
             eq(users.isActive, true),
             eq(users.isBanned, false),
             gte(users.createdAt, from),
@@ -93,43 +106,29 @@ export class VerifyEmailReminderRepository {
           continue;
         }
         const locale: CountryLanguage = user.locale;
-        const rendered = await renderVerificationReminder(
-          user.id,
-          locale,
-          logger,
-        );
-        if (!rendered.success) {
-          logger.error("Verify reminder render failed", {
-            userId: user.id,
-            error: rendered.message,
-          });
-          failed++;
-          continue;
-        }
-        if ("skip" in rendered.data) {
-          skipped++;
-          continue;
-        }
         if (data.dryRun) {
           sent++;
           continue;
         }
-        const { jsx, subject, toEmail, toName, leadId } = rendered.data;
-        const result = await EmailSendingRepository.sendEmail(
-          {
-            jsx,
-            subject,
-            toEmail,
-            toName,
-            locale,
-            emailJourneyVariant: null,
-            emailCampaignStage: null,
-            leadId,
-          },
-          logger,
+        const account = await UserRepository.getUserById(
+          user.id,
+          UserDetailLevel.STANDARD,
           locale,
+          logger,
         );
-        if (result.success) {
+        if (!account.success || account.data.emailVerified) {
+          skipped++;
+          continue;
+        }
+        const result = await requestAccountChallenge(
+          account.data,
+          "notice",
+          locale,
+          logger,
+        );
+        if (result.success && result.data === "existing") {
+          skipped++;
+        } else if (result.success) {
           sent++;
         } else {
           logger.error("Verify reminder send failed", {

@@ -4,6 +4,7 @@ import { chatThreads } from "next-vibe/agent/chat/db";
 import { chatFavorites } from "next-vibe/agent/skills/favorites/db";
 import { DefaultFolderId } from "next-vibe/core/execution-context";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
+import { success } from "next-vibe/core/route/response.schema";
 import { db } from "next-vibe/database";
 import { verifyPassword } from "next-vibe/identity/auth/password";
 import type { JWTPublicPayloadType } from "next-vibe/identity/auth/types";
@@ -16,9 +17,10 @@ import { createEndpointLogger } from "next-vibe/logger/server";
 import { Platform } from "next-vibe/platforms/platforms";
 import { resolveTestAdminUser } from "next-vibe/tooling/testing/testing-suite/resolve-test-user";
 import { deleteTestUser } from "next-vibe/tooling/testing/testing-suite/test-users";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 
 import { scopedTranslation as creditTranslation } from "@/credits/i18n";
+import { PublicCapRepository } from "@/credits/public-cap/repository";
 import { CreditRepository } from "@/credits/repository";
 import { newsletterSubscriptions } from "@/newsletter/db";
 import { referralCodes, userReferrals } from "@/referral/db";
@@ -139,8 +141,17 @@ describe("pending signup", () => {
     ).toHaveLength(0);
     const before = await CreditRepository.getBalance(user, logger, creditsT, defaultLocale);
     expect(before.success && before.data.free).toBe(20);
-    const spent = await CreditRepository.deductCreditsForFeature(user, 3, "signup-fixture", logger, creditsT, defaultLocale);
-    expect(spent.success).toBe(true);
+    // Exercise the fixture's wallet carryover independently of today's shared
+    // free-tier usage. Only the disposable lead's real wallet is debited.
+    const gate = vi.spyOn(PublicCapRepository, "gate").mockResolvedValue(success());
+    const meter = vi.spyOn(PublicCapRepository, "incrementSpend").mockResolvedValue(undefined);
+    try {
+      const spent = await CreditRepository.deductCreditsForFeature(user, 3, "signup-fixture", logger, creditsT, defaultLocale);
+      expect(spent.success).toBe(true);
+    } finally {
+      gate.mockRestore();
+      meter.mockRestore();
+    }
     const [thread] = await db
       .insert(chatThreads)
       .values({

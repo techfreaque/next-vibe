@@ -10,6 +10,8 @@ import { DashIcon } from "./icons/DashIcon";
 
 export type InputOTPProps = {
   containerClassName?: string;
+  inputRef?: (input: { focus(): void } | null) => void;
+  "aria-label"?: string;
   value?: string;
   onChange?: (value: string) => void;
   maxLength?: number;
@@ -36,6 +38,8 @@ function InputOTP({
   className,
   style,
   containerClassName,
+  inputRef,
+  "aria-label": label,
   maxLength = 6,
   value,
   onChange,
@@ -43,6 +47,8 @@ function InputOTP({
 }: InputOTPProps): React.JSX.Element {
   return (
     <OTPInput
+      ref={inputRef}
+      aria-label={label}
       maxLength={maxLength}
       value={value}
       onChange={onChange}

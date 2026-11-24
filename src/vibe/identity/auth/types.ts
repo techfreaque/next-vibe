@@ -29,7 +29,7 @@ const publicJwtPayloadSchema = z.object({
     .default([UserPermissionRole.PUBLIC]),
 });
 
-const privateJwtPayloadSchema = z.object({
+export const privateJwtPayloadSchema = z.object({
   id: z.uuid(),
   // user has always a leadId
   leadId: z.uuid(),

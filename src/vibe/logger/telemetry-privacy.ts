@@ -5,11 +5,11 @@ import {
 import type { LoggerMetadata } from "./types";
 
 const SECRET_FIELD =
-  /^(?:token|resetToken|verificationToken|confirmationToken|accessToken|refreshToken|authToken|magicLinkToken|password|confirmPassword)$/i;
+  /^(?:token|resetToken|verificationToken|confirmationToken|accessToken|refreshToken|authToken|magicLinkToken|emailCode|twoFactorCode|password|confirmPassword)$/i;
 const REDACTED = "[redacted]";
 // Handle both intact and truncated JSON in historical validation diagnostics.
 const SERIALIZED_SECRET =
-  /("(?:token|resetToken|verificationToken|confirmationToken|accessToken|refreshToken|authToken|magicLinkToken|password|confirmPassword)"\s*:\s*")(?:\\.|[^"\\\r\n])*/gi;
+  /("(?:token|resetToken|verificationToken|confirmationToken|accessToken|refreshToken|authToken|magicLinkToken|emailCode|twoFactorCode|password|confirmPassword)"\s*:\s*")(?:\\.|[^"\\\r\n])*/gi;
 const URL_IN_TEXT =
   /https?:\/\/[^\s"'<>()]+|(?<![\w/%])\/{1,2}[^/\s"'<>()][^\s"'<>()]*/gi;
 

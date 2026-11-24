@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import { eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { cookies } from "next-vibe/ui/lib/headers";
 
 import { AUTH_TOKEN_COOKIE_NAME } from "@/env/constants";
@@ -19,6 +19,7 @@ import {
 } from "../../core/route/response.schema";
 import { parseError } from "../../core/utils/parse-error";
 import { db } from "../../database";
+import { users } from "../user/db";
 import type { NewSession, Session } from "./db";
 import { sessions } from "./db";
 import type { SessionT } from "./i18n";
@@ -131,7 +132,31 @@ export class SessionRepository {
     try {
       // Note: Logger not available for internal session methods
 
-      const [inserted] = await db.insert(sessions).values(data).returning();
+      // Check the address when the session is written, including concurrent
+      // changes to the account. Renewals of existing sessions use extendSession.
+      const eligible = db
+        .select({
+          id: sql<string>`coalesce(${data.id ?? null}::uuid, gen_random_uuid())`,
+          userId: users.id,
+          token: sql<string>`${data.token}::text`,
+          name: sql<string | null>`${data.name ?? null}::text`,
+          expiresAt: sql<Date>`${data.expiresAt.toISOString()}::timestamp`,
+          createdAt: sql<Date>`${(data.createdAt ?? new Date()).toISOString()}::timestamp`,
+        })
+        .from(users)
+        .where(
+          and(
+            eq(users.id, data.userId),
+            eq(users.emailVerified, true),
+            eq(users.isActive, true),
+            eq(users.isBanned, false),
+          ),
+        )
+        .for("share");
+      const [inserted] = await db
+        .insert(sessions)
+        .select(eligible.getSQL())
+        .returning();
 
       if (!inserted) {
         const { t } = scopedTranslation.scopedT(locale);

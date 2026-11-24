@@ -12,6 +12,8 @@ describe("pod login boundary", () => {
     expect(isPodLoginResource("GET", "/_next/static/chunks/main.js")).toBe(true);
     expect(isPodLoginResource("GET", "/api/en-US/user/public/login/options")).toBe(true);
     expect(isPodLoginResource("POST", "/api/en-US/user/public/login")).toBe(true);
+    expect(isPodLoginResource("GET", "/fr-FR/user/verify-email/header.signature")).toBe(true);
+    expect(isPodLoginResource("POST", "/api/fr-FR/user/public/verify-email")).toBe(true);
     expect(isPodLoginResource("POST", "/en-US/user/login")).toBe(false);
     expect(isPodLoginResource("POST", "/api/en-US/user/public/signup")).toBe(false);
   });

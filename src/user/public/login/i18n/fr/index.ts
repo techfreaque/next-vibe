@@ -249,6 +249,7 @@ export const translations: typeof enTranslations = {
       label: "Rester connecté",
     },
   },
+  emailCode: "Code reçu par e-mail",
   twoFactorStep: {
     title: "Vérification en deux étapes",
     helper:

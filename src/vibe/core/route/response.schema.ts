@@ -379,6 +379,7 @@ type ErrorTypes =
   | "EXTERNAL_SERVICE_ERROR"
   | "INVALID_RESPONSE_ERROR"
   | "BAD_REQUEST"
+  | "EMAIL_CONFIRMATION_REQUIRED"
   | "TWO_FACTOR_REQUIRED"
   | "PERMISSION_ERROR"
   | "PAYMENT_ERROR"
@@ -414,6 +415,10 @@ export const ErrorResponseTypes: ErrorResponseTypesElements = {
   EXTERNAL_SERVICE_ERROR: {
     errorKey: "errorTypes.external_service_error",
     errorCode: 500,
+  },
+  EMAIL_CONFIRMATION_REQUIRED: {
+    errorKey: "errorTypes.email_confirmation_required",
+    errorCode: 202,
   },
   TWO_FACTOR_REQUIRED: {
     errorKey: "errorTypes.two_factor_required",

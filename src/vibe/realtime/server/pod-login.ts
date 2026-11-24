@@ -13,13 +13,18 @@ import {
 /** The login form, its two endpoints, and the assets needed to render it. */
 export function isPodLoginResource(method: string, path: string): boolean {
   if (method === "POST") {
-    return /^\/api\/[a-z]{2}-[A-Z]+\/user\/public\/login$/.test(path);
+    return /^\/api\/[a-z]{2}-[A-Z]+\/user\/public\/(?:login|verify-email)$/.test(
+      path,
+    );
   }
   if (method !== "GET" && method !== "HEAD") {
     return false;
   }
   return (
     /^\/[a-z]{2}-[A-Z]+\/user\/login$/.test(path) ||
+    /^\/[a-z]{2}-[A-Z]+\/user\/verify-email\/[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/.test(
+      path,
+    ) ||
     /^\/api\/[a-z]{2}-[A-Z]+\/user\/public\/login\/options$/.test(path) ||
     path.startsWith("/_next/static/") ||
     path === "/favicon.ico" ||

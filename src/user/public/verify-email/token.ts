@@ -18,10 +18,14 @@ import { identityEnv } from "next-vibe/identity/env";
 export const VERIFY_TOKEN_TTL_DAYS = 7;
 const TTL_MS = VERIFY_TOKEN_TTL_DAYS * 24 * 60 * 60 * 1000;
 
-export type VerificationTokenPurpose = "verify" | "email-change";
+export type VerificationTokenPurpose =
+  | "verify"
+  | "email-change"
+  | "account-challenge";
 
 const KEY_LABEL: Record<VerificationTokenPurpose, string> = {
   verify: "email-verify:v1",
+  "account-challenge": "account-challenge:v1",
   "email-change": "email-change:v1",
 };
 

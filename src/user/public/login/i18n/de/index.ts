@@ -246,6 +246,7 @@ export const translations: typeof enTranslations = {
       label: "Angemeldet bleiben",
     },
   },
+  emailCode: "Bestätigungscode per E-Mail",
   twoFactorStep: {
     title: "Zweiter Schritt",
     helper: "Gib den 6-stelligen Code aus deiner Authenticator-App ein.",

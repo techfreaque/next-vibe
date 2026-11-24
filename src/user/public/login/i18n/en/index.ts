@@ -241,6 +241,7 @@ export const translations = {
       label: "Keep me logged in",
     },
   },
+  emailCode: "Email confirmation code",
   twoFactorStep: {
     title: "Two-step check",
     helper: "Enter the 6-digit code from your authenticator app.",

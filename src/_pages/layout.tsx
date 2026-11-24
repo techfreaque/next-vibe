@@ -28,6 +28,10 @@ import { cookies } from "next-vibe/ui/lib/headers";
 import { notFound } from "next-vibe/ui/lib/not-found";
 import type { JSX, ReactNode } from "react";
 
+import { AUTH_TOKEN_COOKIE_NAME } from "@/env/constants";
+import { SessionEmailBanner } from "@/user/public/verify-email/session-banner";
+import { sessionNoticeRecipient } from "@/user/public/verify-email/session-notice";
+
 import { buildSiteStructuredData } from "./_components/structured-data";
 import { scopedTranslation } from "./layout-i18n";
 import { RootProviders } from "./layout-shared";
@@ -88,6 +92,7 @@ interface RootLayoutProps {
 interface RootLayoutData {
   locale: CountryLanguage;
   structuredData: JsonLdNode;
+  emailNotice: Awaited<ReturnType<typeof sessionNoticeRecipient>>;
   theme: ThemePreference;
   availability: AgentEnvAvailability;
   children?: ReactNode;
@@ -104,7 +109,12 @@ export async function tanstackLoader({
   if (!/^[a-z]{2}-[A-Z]+$/.test(locale)) {
     notFound();
   }
-  const themeCookie = (await cookies()).get("theme_v2")?.value;
+  const jar = await cookies();
+  const themeCookie = jar.get("theme_v2")?.value;
+  const token = jar.get(AUTH_TOKEN_COOKIE_NAME)?.value;
+  const emailNotice = token
+    ? await sessionNoticeRecipient(token, locale)
+    : null;
   const theme: ThemePreference =
     themeCookie === "light" || themeCookie === "system" ? themeCookie : "dark";
   const availability = await getEnvAvailability();
@@ -114,12 +124,13 @@ export async function tanstackLoader({
     providerCount: getAvailableChatProviderCount(false, availability),
   });
 
-  return { locale, structuredData, theme, availability };
+  return { locale, structuredData, theme, availability, emailNotice };
 }
 
 export function TanstackPage({
   locale,
   structuredData,
+  emailNotice,
   theme,
   availability,
   children,
@@ -150,6 +161,13 @@ export function TanstackPage({
           theme={theme}
           availability={availability}
         >
+          {emailNotice && (
+            <SessionEmailBanner
+              key={emailNotice.user.id + emailNotice.email}
+              {...emailNotice}
+              locale={locale}
+            />
+          )}
           <Outlet>{children}</Outlet>
         </RootProviders>
         <Scripts />

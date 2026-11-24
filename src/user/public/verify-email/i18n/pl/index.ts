@@ -32,6 +32,20 @@ export const translations: typeof enTranslations = {
     changedDescription:
       "Od teraz logujesz się adresem {{email}}. Stary adres nie jest już używany.",
   },
+  accountChallenge: {
+    settings: "Ustawienia konta",
+    prompt:
+      "Wpisz sześciocyfrowy kod wysłany na {{email}}. Masz na to 30 minut. Możesz też kliknąć link w wiadomości i zalogować się ponownie.",
+    mail: "Potwierdź adres e-mail, klikając poniższy link. Przy logowaniu możesz też wpisać ten kod w ciągu 30 minut.",
+    notice:
+      "Potwierdź adres {{email}} przed następnym logowaniem. Teraz możesz dalej korzystać z konta.",
+    undeliverable:
+      "Nie udało się dostarczyć wiadomości na {{email}}. Jeśli masz otwarte konto, sprawdź adres w ustawieniach. Możesz też skontaktować się z pomocą.",
+    invalid:
+      "Kod jest błędny lub stracił ważność. Sprawdź ostatnią wiadomość lub poproś o nowy kod.",
+    cooldown: "Kolejną wiadomość możesz zamówić po pięciu minutach.",
+    dismiss: "Ukryj",
+  },
   creditsPrompt: {
     title: "Potwierdź e-mail, by odblokować darmowe kredyty",
     description:

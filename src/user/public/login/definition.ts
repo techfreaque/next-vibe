@@ -100,6 +100,16 @@ const { POST } = createEndpoint({
         schema: z.boolean().optional(),
       }),
 
+      emailCode: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "emailCode",
+        schema: z
+          .string()
+          .regex(/^(?:[0-9]{6})?$/)
+          .optional(),
+      }),
+
       twoFactorCode: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,

@@ -16,6 +16,8 @@ import { Body } from "next-vibe/ui/components/body";
 import type { JSX } from "react";
 import { useEffect, useState } from "react";
 
+import { NativeSessionNotice } from "@/user/public/verify-email/native-session-notice";
+
 import { RootProviders } from "./layout-shared";
 
 /**
@@ -55,6 +57,7 @@ export default function RootLayoutNative(): JSX.Element {
     <Body>
       <RootProviders locale={locale} availability={availability}>
         <Slot />
+        <NativeSessionNotice locale={locale} />
         <PortalHost />
       </RootProviders>
     </Body>

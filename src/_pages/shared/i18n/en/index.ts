@@ -38,6 +38,7 @@ export const translations = {
     permission_error: "Permission error",
     sms_error: "SMS error",
     token_expired_error: "Token expired",
+    email_confirmation_required: "Email confirmation code",
     two_factor_required: "Two-factor authentication required",
     unauthorized: "Unauthorized",
     unknown_error: "Unknown error",

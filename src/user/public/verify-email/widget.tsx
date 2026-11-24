@@ -21,6 +21,7 @@ import {
   useWidgetOnSubmit,
   useWidgetPlatform,
   useWidgetTranslation,
+  useWidgetUser,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
@@ -32,6 +33,7 @@ import type definition from "./definition";
 export function VerifyEmailWidget(): JSX.Element {
   const t = useWidgetTranslation<typeof definition.POST>();
   const locale = useWidgetLocale();
+  const user = useWidgetUser();
   const platform = useWidgetPlatform();
   const isCli = platform === Platform.CLI || platform === Platform.MCP;
   const form = useWidgetForm<typeof definition.POST>();
@@ -86,7 +88,7 @@ export function VerifyEmailWidget(): JSX.Element {
       <FormAlertWidget field={{}} />
       {done ? (
         <Link
-          href={`/${locale}/threads`}
+          href={user.isPublic ? `/${locale}/user/login` : `/${locale}/threads`}
           className="inline-flex min-h-11 items-center rounded-lg bg-primary px-5 font-medium text-primary-foreground"
         >
           {t("widget.continue")}

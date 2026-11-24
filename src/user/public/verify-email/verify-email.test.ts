@@ -1,115 +1,96 @@
-import { confirmedTestSignup } from "next-vibe/tooling/testing/testing-suite/confirmed-signup";
 /**
  * Verify-email integration: a legacy unverified account builds a
- * verification mail; the token verifies (idempotent); bad tokens are rejected.
- * Mail is never sent (the test instance has no SMTP account; we only render).
+ * verification mail. Its link verifies idempotently. SMTP is captured in-process.
  */
 
 import { eq } from "drizzle-orm";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
+import { success } from "next-vibe/core/route/response.schema";
 import { db } from "next-vibe/database";
-import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { users } from "next-vibe/identity/user/db";
-import { UserDetailLevel } from "next-vibe/identity/user/enum";
-import { UserRepository } from "next-vibe/identity/user/repository";
 import { createEndpointLogger } from "next-vibe/logger/server";
-import { resolveTestAdminUser } from "next-vibe/tooling/testing/testing-suite/resolve-test-user";
 import { sendTestRequest } from "next-vibe/tooling/testing/testing-suite/send-test-request";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import {
+  createTestUser,
+  deleteTestUser,
+} from "next-vibe/tooling/testing/testing-suite/test-users";
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 
-import userDeleteDefinitions from "@/users/user/[id]/definition";
-
+import { SmtpSendingRepository } from "@/messenger/providers/email/smtp-client/sending/repository";
+import { requestAccountChallenge } from "./account-challenge";
 import definition from "./definition";
-import { verifyEmailSignupEmailTemplate } from "./email";
 import { createVerificationToken } from "./token";
 
 const logger = createEndpointLogger(false, defaultLocale);
 const endpoint = definition.POST;
 
 describe("verify-email", () => {
-  let admin: JwtPrivatePayloadType;
+  let leadId = "";
   let email = "";
   let userId = "";
 
   const publicUser = () => ({
     isPublic: true as const,
-    leadId: admin.leadId,
+    leadId,
     roles: [UserPermissionRole.PUBLIC],
   });
   const verifiedFlag = async (): Promise<boolean | undefined> =>
-    (await db.select({ v: users.emailVerified }).from(users).where(eq(users.id, userId)))[0]?.v;
+    (
+      await db
+        .select({ v: users.emailVerified })
+        .from(users)
+        .where(eq(users.id, userId))
+    )[0]?.v;
 
   beforeAll(async () => {
-    admin = await resolveTestAdminUser();
-    email = `test-verify-${Date.now()}-${Math.floor(Math.random() * 100000)}@example-test.invalid`;
-    const res = await confirmedTestSignup(
-      {
-        privateName: "Verify Test",
-        publicName: "VerifyTest",
-        email,
-        password: "SecurePass123",
-        confirmPassword: "SecurePass123",
-        acceptTerms: true,
-        subscribeToNewsletter: false,
-      },
-      publicUser(),
-    );
-    expect(res.success).toBe(true);
-    const found = await UserRepository.getUserByEmail(
-      email,
-      UserDetailLevel.STANDARD,
-      defaultLocale,
-      logger,
-    );
-    if (!found.success) {
-      throw new Error("user missing");
+    email = `test-verify-${crypto.randomUUID()}@example-test.invalid`;
+    const result = await createTestUser(email, "Verify Test");
+    if (!result.success) {
+      return expect.fail(result.message);
     }
-    userId = found.data.id;
+    userId = result.data.user.id;
+    leadId = result.data.user.leadId;
     // This legacy account predates mandatory confirmation.
-    await db.update(users).set({ emailVerified: false }).where(eq(users.id, userId));
+    await db
+      .update(users)
+      .set({ emailVerified: false })
+      .where(eq(users.id, userId));
   }, 60_000);
 
   afterAll(async () => {
-    await sendTestRequest({
-      endpoint: userDeleteDefinitions.DELETE,
-      urlPathParams: { id: userId },
-      user: admin,
-      toolExecutionContext: undefined,
-    });
+    if (userId) {
+      await deleteTestUser(userId);
+    }
   });
 
   it("a legacy unverified account builds a verification mail with a valid link", async () => {
     expect(await verifiedFlag()).toBe(false);
-    const rendered = await verifyEmailSignupEmailTemplate.render({
-      requestData: {
-        privateName: "Verify Test",
-        publicName: "VerifyTest",
-        email,
-        password: "x",
-        confirmPassword: "x",
-        acceptTerms: true,
-        subscribeToNewsletter: false,
-      },
-      urlPathParams: undefined as never,
-      responseData: { message: "" } as never,
-      user: publicUser() as never,
-      t: verifyEmailSignupEmailTemplate.scopedTranslation.scopedT(defaultLocale).t,
-      locale: defaultLocale,
-      logger,
-      tracking: {
-        leadId: undefined,
-        userId: undefined,
-        campaignId: undefined,
-        locale: defaultLocale,
-        baseUrl: "http://x",
-      },
-    });
-    expect(rendered.success).toBe(true);
-    if (rendered.success && "toEmail" in rendered.data) {
-      expect(rendered.data.toEmail).toBe(email);
-    } else {
-      throw new Error("expected a mail, got skip/error");
+    const smtp = vi.spyOn(SmtpSendingRepository, "sendEmail").mockResolvedValue(
+      success({
+        messageId: `<${userId}@fixture.invalid>`,
+        accountId: "fixture",
+        accountName: "Fixture",
+        accepted: [email],
+        rejected: [],
+        response: "Accepted",
+      }),
+    );
+    try {
+      const result = await requestAccountChallenge(
+        { id: userId, email, leadId, privateName: "Verify Test" },
+        "login",
+        defaultLocale,
+        logger,
+      );
+      expect(result.success).toBe(true);
+      const mail = smtp.mock.calls[0]?.[0];
+      expect(mail?.to).toBe(email);
+      expect(mail?.text).toMatch(/\b[0-9]{6}\b/);
+      expect(mail?.text).toContain(`/${defaultLocale}/user/verify-email/`);
+      expect(mail?.html).toContain(`/${defaultLocale}/user/verify-email/`);
+    } finally {
+      smtp.mockRestore();
     }
   }, 60_000);
 
@@ -121,7 +102,9 @@ describe("verify-email", () => {
       user: publicUser(),
     });
     expect(bad.success).toBe(false);
-    const wrongUser = createVerificationToken("00000000-0000-4000-8000-000000000000", email) ?? "";
+    const wrongUser =
+      createVerificationToken("00000000-0000-4000-8000-000000000000", email) ??
+      "";
     expect(
       (
         await sendTestRequest({
@@ -167,7 +150,7 @@ describe("verify-email", () => {
       data: {},
       user: {
         id: userId,
-        leadId: admin.leadId,
+        leadId,
         isPublic: false,
         roles: [UserPermissionRole.CUSTOMER],
       },
