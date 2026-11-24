@@ -1,0 +1,72 @@
+# App HTTP, WebSocket, app readiness, logical origin used by DNS and selection.
+header >X-HA-Upstream {args[3]}
+header >X-HA-App-Instance {args[0]}
+handle /_ha/ready {
+	reverse_proxy {args[2]} {
+		header_up -*
+		transport http {
+			dial_timeout 500ms
+			response_header_timeout 1s
+		}
+	}
+}
+# Internal selection and data admission share one interpretation of the probe.
+# DNS and rollout canaries still read the strict response at /_ha/ready.
+handle /_ha/admit {
+	reverse_proxy {args[2]} {
+		method GET
+		rewrite /_ha/ready?
+		header_up -*
+		transport http {
+			dial_timeout 500ms
+			response_header_timeout 1s
+		}
+		@database_down {
+			status 503
+			header X-HA-Readiness v1-db-unavailable
+		}
+		handle_response @database_down {
+			copy_response
+		}
+		@ready status 200
+		handle_response @ready {
+			copy_response
+		}
+		handle_response {
+			respond "admit" 200
+		}
+	}
+}
+import /data/ha-routing/pause.caddy
+# Admission happens before Caddy sends a body to the application.
+forward_auth 127.0.0.1:19381 {
+	uri /_ha/admit?
+	copy_headers X-HA-DB-Path
+	header_up -*
+	transport http {
+		dial_timeout 500ms
+		response_header_timeout 2s
+	}
+}
+@ws path /ws*
+reverse_proxy @ws {args[1]} {
+	import /data/ha-routing/headers.caddy
+	stream_close_delay 10m
+}
+# Bound a first attempt on public pages. An API call, upload, established
+# stream or a terminal recovery attempt keeps its normal application timeout.
+@public_read {
+	method GET HEAD
+	header X-HA-First 1
+	header X-HA-DB-Path remote
+	path / /en-* /de-* /pl-*
+}
+reverse_proxy @public_read {args[0]} {
+	import /data/ha-routing/headers.caddy
+	transport http {
+		response_header_timeout 5s
+	}
+}
+reverse_proxy {args[0]} {
+	import /data/ha-routing/headers.caddy
+}

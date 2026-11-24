@@ -34,6 +34,17 @@ FILES=(${HA_COMPOSE_FILES:--f docker-compose.prod.yml -f docker-compose.standalo
 log() { printf '%s [ha-node] %s\n' "$(date -u +%H:%M:%S)" "$*"; }
 compose() { docker compose -p "$PROJECT" --env-file .env "${FILES[@]}" "$@"; }
 
+# A promotion can recreate the same image with the peer fenced and a planned
+# admission pause. The promotion controller runs its own writer/edge checks.
+edge_canary() {
+  if [ "${HA_NO_ROLLBACK:-0}" = 1 ] && [ -z "${HA_NEW_IMAGE_REF:-}" ]; then return 0; fi
+  bash scripts/ha-edge-canary.sh "$@"
+}
+previous_image=$(docker inspect -f '{{.Image}}' "$APP" 2>/dev/null || true)
+if [ -n "$previous_image" ]; then
+  edge_canary || { log "current edge failed preflight; stopping before recreate"; exit 1; }
+fi
+
 # 1. Env: Server 1's .env is the source of truth for identity/keys/URLs.
 if [ -f .env.from-s1 ]; then
   if [ -f ha/scripts/merge-env.py ] && [ -f .ha-database-url ]; then
@@ -86,6 +97,7 @@ health_wait() {
     tries=$((tries + 1)); [ "$tries" -ge 90 ] && { log "no 200 from $HEALTH_URL after 180s"; return 1; }
     sleep 2
   done
+  edge_canary --wait
 }
 
 # 4. Roll. Drain-based deploy (vibe image-push, HA_DRAIN_WAIT=1): this node is
@@ -116,8 +128,9 @@ if [ "${HA_NO_ROLLBACK:-0}" = "1" ]; then
 fi
 log "ERROR: new image unhealthy, rolling back to :${ROLLBACK_TAG}"
 compose logs --tail=60 app || true
-if docker image inspect "${IMAGE_NAME}:${ROLLBACK_TAG}" >/dev/null 2>&1; then
-  docker tag "${IMAGE_NAME}:${ROLLBACK_TAG}" "${IMAGE_NAME}:${IMAGE_TAG}"
+rollback_ref=${previous_image:-${IMAGE_NAME}:${ROLLBACK_TAG}}
+if docker image inspect "$rollback_ref" >/dev/null 2>&1; then
+  docker tag "$rollback_ref" "${IMAGE_NAME}:${IMAGE_TAG}"
   compose up -d --no-deps --force-recreate app
   health_wait && log "rolled back, $APP healthy on previous image" || log "ROLLBACK ALSO UNHEALTHY: Server 1 is carrying all traffic"
 fi

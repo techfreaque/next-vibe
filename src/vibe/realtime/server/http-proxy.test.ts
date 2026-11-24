@@ -279,3 +279,35 @@ it("reports truncated buffered requests before opening the upstream connection",
     }),
   );
 });
+
+it("rejects a write before dispatch when the HA database path is down", async () => {
+  const response = await handleHttpProxy(
+    new Request("http://localhost/checkout", { method: "POST", body: "fixture" }),
+    { nextPort: 0, logger, isShuttingDown: () => false, databaseReadiness: () => Promise.resolve(AbortSignal.abort()) },
+  );
+  expect(response.status).toBe(503);
+  expect(response.headers.get("retry-after")).toBe("1");
+});
+
+it("releases a read waiting for headers when HA database readiness fails", async () => {
+  const db = new AbortController();
+  const slow = Bun.serve({
+    hostname: "127.0.0.1",
+    port: 0,
+    fetch: async () => {
+      db.abort();
+      await Bun.sleep(100);
+      return new Response("too late");
+    },
+  });
+  try {
+    const response = await handleHttpProxy(new Request("http://localhost/en-US/story"), {
+      nextPort: slow.port ?? 0, logger, isShuttingDown: () => false,
+      databaseReadiness: () => Promise.resolve(db.signal),
+    });
+    expect(response.status).toBe(503);
+    expect(await response.text()).toBe("Database unavailable");
+  } finally {
+    await slow.stop(true);
+  }
+});

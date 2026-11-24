@@ -1,0 +1,18 @@
+# First data request after selecting a healthy origin. An HTTP status is a
+# successful round trip to Caddy, so lb_retries alone cannot replay it.
+reverse_proxy {args[0]} {
+	header_up X-HA-First 1
+	stream_close_delay 10m
+	@failed status 500 502 503 504
+	handle_response @failed {
+		route {
+			@replayable method GET HEAD
+			header @replayable X-HA-Retry-Status {rp.status_code}
+			reverse_proxy @replayable {args[1]} {
+				header_up -X-HA-First
+				stream_close_delay 10m
+			}
+			copy_response
+		}
+	}
+}

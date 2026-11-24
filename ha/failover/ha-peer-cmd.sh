@@ -34,16 +34,43 @@ pg_state() {
 
 fence_self() {
   # Mark first: even if a docker call below fails, the watchdog keeps enforcing.
-  echo fenced > "$STATE_DIR/role"
-  date -u +%s > "$STATE_DIR/fenced-at"
-  for c in ${HA_FENCE_CONTAINERS:-}; do
-    docker inspect "$c" >/dev/null 2>&1 || continue
-    docker update --restart=no "$c" >/dev/null 2>&1 || true
-    if [ "$(docker inspect -f '{{.State.Running}}' "$c" 2>/dev/null)" = "true" ]; then
-      docker stop -t "${HA_FENCE_STOP_TIMEOUT:-30}" "$c" >/dev/null 2>&1 || true
-    fi
+  echo fenced > "$STATE_DIR/role.fence.$$" && mv "$STATE_DIR/role.fence.$$" "$STATE_DIR/role" || return 1
+  date -u +%s > "$STATE_DIR/fenced-at" || return 1
+  local c
+  for c in ${HA_FENCE_CONTAINERS:?}; do
+    docker update --restart=no "$c" >/dev/null || return 1
+    docker stop -t "${HA_FENCE_STOP_TIMEOUT:-30}" "$c" >/dev/null || return 1
   done
-  logger -t ha-peer-cmd "FENCED: stopped ${HA_FENCE_CONTAINERS:-<none>}"
+  stopped_and_disabled || return 1
+  logger -t ha-peer-cmd "FENCED: stopped ${HA_FENCE_CONTAINERS}"
+}
+
+stopped_and_disabled() {
+  local c
+  [[ " ${HA_FENCE_CONTAINERS:-} " == *" ${HA_LOCAL_PG:?} "* ]] || return 1
+  [[ " ${HA_FENCE_CONTAINERS:-} " == *" next-vibe-app "* ]] || return 1
+  for c in $HA_FENCE_CONTAINERS; do
+    [ "$(docker inspect -f '{{.State.Status}} {{.HostConfig.RestartPolicy.Name}}' "$c")" = 'exited no' ] || return 1
+  done
+}
+
+# Proof is generated afresh from the stopped writer's control file. The helper
+# has a read-only data mount, no network and never starts PostgreSQL.
+fence_proof() {
+  [ "$NODE" = s1 ] && [ "$(role)" = fenced ] && stopped_and_disabled || return 1
+  local c="$HA_LOCAL_PG" control image
+  image="$(docker inspect -f '{{.Image}}' "$c")" || return 1
+  control="$(docker run --rm --pull=never --network none --read-only --cap-drop ALL --user postgres \
+    --volumes-from "$c:ro" -e LC_ALL=C --entrypoint pg_controldata "$image" "${HA_PG_DATA:-/var/lib/postgresql/data}")" || return 1
+  awk -F ':[[:space:]]+' '
+    /^Database system identifier:/ { id=$2 }
+    /^Database cluster state:/ { state=$2 }
+    /^Latest checkpoint location:/ { lsn=$2 }
+    /^Latest checkpoint.s TimeLineID:/ { timeline=$2 }
+    END {
+      if (state != "shut down" || id !~ /^[0-9]+$/ || timeline !~ /^[0-9]+$/ || lsn !~ /^[0-9A-F]+\/[0-9A-F]+$/) exit 1
+      print "s1-fenced", id, timeline, lsn
+    }' <<< "$control"
 }
 
 case "${SSH_ORIGINAL_COMMAND:-${1:-}}" in
@@ -54,13 +81,14 @@ fence)
   if [ "${HA_ALLOW_REMOTE_FENCE:-0}" != "1" ]; then
     echo "refused: remote fence not allowed on $NODE"; exit 3
   fi
-  fence_self
+  fence_self || { echo "fence incomplete"; exit 1; }
   echo "node=$NODE role=$(role) pg=$(pg_state) ts=$(date -u +%s)"
   ;;
+fence-proof) fence_proof ;;
 fence-local)
   # Same as fence, for the local watchdog / an operator on this box.
   [ -z "${SSH_ORIGINAL_COMMAND:-}" ] || { echo refused; exit 3; }
-  fence_self
+  fence_self || { echo "fence incomplete"; exit 1; }
   echo "node=$NODE role=$(role) pg=$(pg_state) ts=$(date -u +%s)"
   ;;
 *)

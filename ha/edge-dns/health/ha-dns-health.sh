@@ -11,28 +11,10 @@
 # one app AND one NS, but the other NS has already dropped the dead A, and
 # resolvers simply fail over to the reachable NS.
 #
-# Liveness signal: GET https://<host-header unbottled.ai>/robots.txt via the
-# node's PUBLIC IP must return 200. /robots.txt is app-served, unauthenticated,
-# and returns 200 only while the Next.js app is actually serving (the port
-# refuses the connection while a container is down/restarting). The app's
-# authenticated /health endpoint can't be used as an anonymous probe (401).
-#
-# Own-app check (2026-11-17): each box's Caddy falls back to the PEER's app
-# when its local app fails, so a node whose app is dead still answers the
-# public probe (served by the peer) and used to stay in DNS (S2, 2026-11-17,
-# ~30 min in a Next.js restart loop). Two extra conditions now:
-#   1. Served-by header: both Caddys stamp `X-HA-Upstream: {upstream_hostport}`
-#      (header_down, overwrites anything the app sets) on app responses. The
-#      public probe of node N passes only if that header names N's LOCAL
-#      upstream (SERVED_BY, e.g. s1=next-vibe-app:3000). Absent or peer value
-#      = fail. Covers TLS + Caddy + the node's own app in one request.
-#   2. Direct app probe: the same DB-backed request straight to the app port
-#      over WG (DIRECT_URLS, e.g. s2=http://10.88.0.2:3100), bypassing Caddy.
-#      DIRECT_SCOPE=self (default) runs it only for THIS box's own node: a
-#      direct probe of the PEER also fails whenever WG is down, which would
-#      drop a healthy peer from this box's zone during a link outage (the
-#      header check already proves the peer's own app answered).
-#      DIRECT_SCOPE=all probes every node, off disables it.
+# Production: GET /_ha/ready over verified public TLS. The addressed Caddy
+# serves only its own app's writable-PG/renderer probe. Require its own
+# X-HA-Upstream and the ready marker. Optional direct probes support older
+# configurations; current production needs no guest identity or direct WG URL.
 #
 # Manual drain: a file drain.<node> next to the zone removes <node> at once.
 #
@@ -40,21 +22,20 @@
 # removed, and PASS rise_threshold consecutive probes to be re-added. Prevents
 # a single lost packet from yanking a node.
 #
-# Never-dark guard: if the computed healthy set is EMPTY (both probes failing —
-# almost always a probe-side fault, e.g. this box's egress is down), publish
-# BOTH anyway. A wrong-but-present A beats an empty apex.
+# If no check passes, publish only administratively eligible addresses. If
+# every node is manually drained, keep the previously rendered zone.
 #
 # Env (set by docker-compose.health.yml):
 #   NODES            space list of "name=ip" e.g. "s1=72.61.156.49 s2=179.198.214.41"
 #   HEALTH_HOST      Host header + SNI for the probe (default unbottled.ai)
-#   HEALTH_PATH      path to probe (default /robots.txt; prod: /api/en-US/credits)
-#   HEALTH_EXPECT    substring the body must contain (prod: "success":true)
+#   HEALTH_PATH      path to probe (default /robots.txt; prod: /_ha/ready)
+#   HEALTH_EXPECT    substring the body must contain (prod: ready)
 #   PROBE_COOKIE_FILE  file with one "lead_id=<uuid>" line for the probe lead
 #   ZONE_FILE        rendered zone path (default /etc/powerdns/zones/unbottled.ai.zone)
 #   ZONE_TMPL        template path (default /zone.tmpl)
 #   CHECK_INTERVAL   seconds between sweeps (default 10)
 #   PROBE_TIMEOUT    per-probe curl timeout (default 4)
-#   FAIL_THRESHOLD   consecutive fails to drop a node (default 2  → ~20s)
+#   FAIL_THRESHOLD   consecutive fails to drop a node (script default 2, prod 1)
 #   RISE_THRESHOLD   consecutive passes to restore a node (default 2)
 #   APEX_TTL         TTL on the apex A records (default 30)
 #   SERVED_BY        space list "name=upstream[,upstream]" of each node's LOCAL
@@ -67,9 +48,9 @@
 #   SELF_IP          this box's public IP (compose passes NODE_PUBLIC_IP)
 #   DIRECT_TIMEOUT   per-request timeout of the direct probe (default PROBE_TIMEOUT)
 #
-# Reload: the daemon just REWRITES the zone file with a bumped serial. PowerDNS
-# is configured with bind-check-interval=5, so it re-reads a changed zone within
-# 5s — no control socket, no shared binary. This image needs only curl + awk.
+# The host ha-dns-publish.path reloads the zone and purges apex + www
+# immediately after the atomic rename. The 5 s BIND polling interval remains
+# available when the path unit is stopped.
 # ===========================================================================
 set -u
 
@@ -198,15 +179,20 @@ note_pass(){
 render(){ # render the healthy A set into the zone; bump serial + rewrite only on change
   ips="$*"
   if [ -z "$ips" ]; then
-    log "WARN computed healthy set EMPTY — never-dark fallback: publishing ALL nodes"
-    for n in $(node_names); do ips="$ips $(node_ip "$n")"; done
+    log "no passing origin; keeping administratively eligible addresses"
+    for n in $(node_names); do
+      [ -f "$(dirname "$ZONE_FILE")/drain.$n" ] || ips="$ips $(node_ip "$n")"
+    done
+    # An operator drained both nodes. Preserve the last published zone.
+    [ -n "$ips" ] || return 0
   fi
   # canonical healthy set for change-detection (sorted, space-joined)
   newset="$(for ip in $ips; do echo "$ip"; done | sort | tr '\n' ' ')"
   oldset="$(grep -E '^@[[:space:]]+[0-9]+[[:space:]]+IN[[:space:]]+A' "$ZONE_FILE" 2>/dev/null | awk '{print $NF}' | sort | tr '\n' ' ')"
   # unchanged set AND template not edited since the last render → leave zone
   # (and serial) alone. Editing the template (static records) re-renders.
-  [ "$newset" = "$oldset" ] && [ ! "$ZONE_TMPL" -nt "$ZONE_FILE" ] && return 0
+  oldttl="$(awk '$1=="@" && $3=="IN" && $4=="A" {print $2; exit}' "$ZONE_FILE" 2>/dev/null)"
+  [ "$newset" = "$oldset" ] && [ "$oldttl" = "$APEX_TTL" ] && [ ! "$ZONE_TMPL" -nt "$ZONE_FILE" ] && return 0
 
   # Build the apex + www A blocks (PowerDNS BIND parser accepts "name TTL IN A ip").
   apex=""; www=""
@@ -219,12 +205,13 @@ render(){ # render the healthy A set into the zone; bump serial + rewrite only o
   # SOA). ~133 years of headroom. (Cosmetic anyway: no AXFR secondaries; pdns
   # reloads on mtime via bind-check-interval.)
   serial="$(( $(date -u +%s) - 1700000000 ))"
-  tmp="$(mktemp)"
+  # Same mount: the path unit sees a complete zone in a single rename.
+  tmp="$(mktemp "$(dirname "$ZONE_FILE")/.unbottled-zone.XXXXXX")"
   sed -e "s/@@SERIAL@@/${serial}/" "$ZONE_TMPL" \
     | awk -v apex="$apex" -v www="$www" '/^;;APEX_A_RECORDS;;$/ { printf apex; next } /^;;WWW_A_RECORDS;;$/ { printf www; next } { print }' > "$tmp"
   chmod 644 "$tmp"              # mktemp is 0600; pdns (setuid=pdns) must read it
   mv "$tmp" "$ZONE_FILE"
-  log "apex A changed: [${oldset}] -> [${newset}] — zone rewritten (serial ${serial}); pdns auto-reloads ≤${CHECK_INTERVAL}s"
+  log "apex A changed: [${oldset}] -> [${newset}] — zone rewritten (serial ${serial}); ha-dns-publish reloads the zone and purges cached address answers"
 }
 
 sweep(){ # one probe round over all nodes + render

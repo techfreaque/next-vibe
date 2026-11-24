@@ -28,11 +28,10 @@ services:
       # Probe BOTH nodes over the public internet (Host/SNI = unbottled.ai).
       NODES: "${EDGE_NODES:-s1=72.61.156.49 s2=179.198.214.41}"
       HEALTH_HOST: "${EDGE_HEALTH_HOST:-unbottled.ai}"
-      # DB-backed probe: the credits API for a fixed probe lead reads Postgres,
-      # so a node whose app lost its DB drops out of DNS (see the daemon).
-      HEALTH_PATH: "${EDGE_HEALTH_PATH:-/api/en-US/credits}"
-      HEALTH_EXPECT: '${EDGE_HEALTH_EXPECT:-"success":true}'
-      PROBE_COOKIE_FILE: "/probe-cookie"
+      # This endpoint serves only the addressed app's writable-PG and HTTP
+      # readiness. No guest identity, cookies or DB writes.
+      HEALTH_PATH: "${EDGE_HEALTH_PATH:-/_ha/ready}"
+      HEALTH_EXPECT: "${EDGE_HEALTH_EXPECT:-ready}"
       # Own-app check (2026-11-17, see the daemon header): each Caddy falls
       # back to the peer's app, so the public probe must also prove the node's
       # OWN app served it. Both Caddys stamp X-HA-Upstream: {upstream_hostport};
@@ -43,33 +42,27 @@ services:
       # (bypassing Caddy). self = only this box's own node (a peer's direct
       # probe would also fail on a WG outage and drop a healthy peer).
       DIRECT_URLS: "${EDGE_DIRECT_URLS:-s1=http://10.88.0.1:3000 s2=http://10.88.0.2:3100}"
-      DIRECT_SCOPE: "${EDGE_DIRECT_SCOPE:-self}"
+      # The public readiness route always terminates on the local app.
+      DIRECT_SCOPE: "${EDGE_DIRECT_SCOPE:-off}"
       # This box's node: from NODE_PUBLIC_IP (edge-up.sh / the same env as
       # edge-dns), or EDGE_SELF_NODE=s1|s2 explicitly.
       SELF_IP: "${NODE_PUBLIC_IP:-}"
       SELF_NODE: "${EDGE_SELF_NODE:-}"
       ZONE_FILE: "/etc/powerdns/zones/unbottled.ai.zone"
       ZONE_TMPL: "/zone.tmpl"
-      CHECK_INTERVAL: "${EDGE_CHECK_INTERVAL:-10}"
-      PROBE_TIMEOUT: "${EDGE_PROBE_TIMEOUT:-4}"
+      CHECK_INTERVAL: "${EDGE_CHECK_INTERVAL:-2}"
+      PROBE_TIMEOUT: "${EDGE_PROBE_TIMEOUT:-2}"
       # PRE-CUTOVER: accept the peer box's internal (self-signed) cert for
       # unbottled.ai (a real LE cert can't be issued until the registrar
       # delegates). Set EDGE_PROBE_INSECURE=0 at cutover once both boxes hold a
       # real LE cert for unbottled.ai. Liveness (200 on /robots.txt) is unchanged.
       PROBE_INSECURE: "${EDGE_PROBE_INSECURE:-0}"
-      FAIL_THRESHOLD: "${EDGE_FAIL_THRESHOLD:-2}"
+      FAIL_THRESHOLD: "${EDGE_FAIL_THRESHOLD:-1}"
       RISE_THRESHOLD: "${EDGE_RISE_THRESHOLD:-2}"
-      APEX_TTL: "${EDGE_APEX_TTL:-30}"
+      APEX_TTL: "${EDGE_APEX_TTL:-10}"
     volumes:
       - ./health/ha-dns-health.sh:/ha-dns-health.sh:ro
       - ./zone.unbottled.ai.tmpl:/zone.tmpl:ro
-      # "lead_id=<uuid>" of the probe lead; create once per deployment:
-      #   curl -s -D - -o /dev/null -A unbottled-ha-probe/1 https://unbottled.ai/en-US/story | grep -i set-cookie
-      # then exempt it from same-IP guest linking (else every guest lead from
-      # the IP it was created from joins its pool and the probe's credits
-      # query grows with each one; 2026-11-18):
-      #   UPDATE leads SET metadata = metadata || '{"ipLinkExempt": true}' WHERE id = '<uuid>';
-      - ${EDGE_PROBE_COOKIE_FILE:-./probe-cookie}:/probe-cookie:ro
       - ${EDGE_ZONE_DIR:-/srv/ha-edge/zones}:/etc/powerdns/zones
     depends_on:
       - pdns

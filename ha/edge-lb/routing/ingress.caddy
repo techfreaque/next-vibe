@@ -1,0 +1,121 @@
+# Arguments: own HTTP app, peer public IPv4, own drain-file name.
+route {
+	header {
+		Retry-After 1
+		match {
+			status 503
+			header !Retry-After
+		}
+	}
+	@from_peer {
+		remote_ip {args[1]}
+		header X-HA-Relay 1
+		import /data/ha-relay/accept.caddy
+	}
+	handle @from_peer {
+		reverse_proxy 127.0.0.1:19381 {
+			stream_close_delay 10m
+		}
+	}
+	@unexpected_relay header X-HA-Relay 1
+	respond @unexpected_relay 403
+	request_header -Proxy-Authorization
+	request_header -X-HA-Relay
+	request_header -X-HA-DB-Path
+	request_header -X-HA-First
+	request_header X-HA-Client {remote_host}
+	request_header X-HA-Host {host}
+	# Read-only drill from the other host. With the marker enabled, deliberately
+	# exercise a stale local selection using the real first-attempt/replay path.
+	@drill {
+		method GET
+		path /_ha/replay-check
+		remote_ip {args[1]}
+		file {
+			root /data/ha-drain
+			try_files /probe.{args[2]}
+		}
+	}
+	handle @drill {
+		route {
+			rewrite * /robots.txt
+			import /data/ha-routing/attempt.caddy 127.0.0.1:19381 127.0.0.1:19382
+		}
+	}
+	respond /_ha/replay-check 404
+	handle /_ha/ready {
+		reverse_proxy 127.0.0.1:19381
+	}
+	# A full browser navigation may read an explicitly staged public document
+	# while the local writer is unavailable. RSC/API/session responses stay dynamic.
+	@legal {
+		method GET HEAD
+		path /en-US/story/terms-of-service /en-US/story/privacy-policy
+		header Accept *text/html*
+		not header RSC *
+		not header Next-Router-State-Tree *
+		file {
+			root /data/ha-public
+			try_files {http.request.uri.path}.html
+		}
+	}
+	reverse_proxy @legal 127.0.0.1:19381 {
+		method GET
+		rewrite /_ha/admit?
+		header_up -*
+		@unavailable status 502 503 504
+		handle_response @unavailable {
+			route {
+				root * /data/ha-public
+				rewrite * {http.request.orig_uri.path}.html
+				header Cache-Control no-store
+				header Content-Security-Policy "default-src 'none'; base-uri 'none'; frame-ancestors 'none'"
+				header X-HA-Read-Only public-document
+				file_server
+			}
+		}
+		handle_response {
+			request_header -X-HA-DB-Path
+		}
+	}
+	# Only release assets explicitly staged from the same image on both edges.
+	@asset {
+		method GET HEAD
+		path_regexp ^/_next/static/(chunks|css)/([a-zA-Z0-9_~-]+/)*[a-zA-Z0-9_~-]*[0-9a-f]{8,}[a-zA-Z0-9_~-]*\.(js|css)$
+		file {
+			root /data/ha-public
+		}
+	}
+	handle @asset {
+		root * /data/ha-public
+		header Cache-Control "public, max-age=31536000, immutable"
+		file_server
+	}
+	import /data/ha-routing/pause.caddy
+	# After proving the writer cut, skip stale load-balancer cooldowns.
+	@handoff file {
+		root /data/ha-drain
+		try_files /primary-s2
+	}
+	handle @handoff {
+		route {
+			@on_s2 expression `"{args[2]}" == "s2"`
+			reverse_proxy @on_s2 127.0.0.1:19381 {
+				stream_close_delay 10m
+			}
+			reverse_proxy 127.0.0.1:19382 {
+				stream_close_delay 10m
+			}
+		}
+	}
+	@prefer_peer file {
+		root /data/ha-drain
+		try_files /{args[2]}
+	}
+	handle @prefer_peer {
+		import /data/ha-routing/select.caddy 127.0.0.1:19382 127.0.0.1:19381 {args[0]}
+	}
+	handle {
+		import /data/ha-routing/select.caddy 127.0.0.1:19381 127.0.0.1:19382 {args[0]}
+	}
+}

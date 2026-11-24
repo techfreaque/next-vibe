@@ -1,0 +1,46 @@
+# Only the admission GET is load-balanced/retried for every method. It carries
+# no body, cookie or authorization. The original request is still untouched.
+reverse_proxy {args[0]} {args[1]} {
+	method GET
+	rewrite /_ha/admit?
+	header_up -*
+	lb_policy first
+	lb_try_duration 2s
+	lb_retries 2
+	lb_try_interval 75ms
+	health_uri /_ha/admit
+	health_interval 2s
+	health_timeout 1500ms
+	health_status 200
+	fail_duration 2s
+	max_fails 1
+	unhealthy_status 502 503 504
+	transport http {
+		dial_timeout 500ms
+		response_header_timeout 1500ms
+	}
+	@own {
+		header X-HA-Upstream {args[2]}
+		status 200
+	}
+	handle_response @own {
+		import /data/ha-routing/attempt.caddy 127.0.0.1:19381 127.0.0.1:19382
+	}
+	@other status 200
+	handle_response @other {
+		import /data/ha-routing/attempt.caddy 127.0.0.1:19382 127.0.0.1:19381
+	}
+	# An origin failed since the most recent active check. Dispatch to the
+	# opposite origin, which checks readiness before accepting the request.
+	@own_failed header X-HA-Upstream {args[2]}
+	handle_response @own_failed {
+		reverse_proxy 127.0.0.1:19382 {
+			stream_close_delay 10m
+		}
+	}
+	handle_response {
+		reverse_proxy 127.0.0.1:19381 {
+			stream_close_delay 10m
+		}
+	}
+}

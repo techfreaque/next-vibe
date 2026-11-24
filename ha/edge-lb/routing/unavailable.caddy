@@ -1,0 +1,3 @@
+header Retry-After 1
+header Cache-Control no-store
+respond "Service temporarily unavailable" 503

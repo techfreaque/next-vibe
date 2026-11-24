@@ -51,6 +51,7 @@ import {
 
 /** Node-local drain helper, shipped from the commit to both HA boxes. */
 const DRAIN_SCRIPT = "scripts/ha-node-drain.sh";
+const EDGE_CANARY_SCRIPT = "scripts/ha-edge-canary.sh";
 
 /** One HA box as the drain orchestration reaches it. */
 interface DrainBox {
@@ -145,6 +146,55 @@ export class ImagePushRepository {
       return exportResult;
     }
     const contextDir = exportResult.data;
+
+    // Older release archives also contain the old deploy drivers. Installing
+    // those on an HA node would silently remove its automatic edge rollback.
+    if (data.push && !existsSync(join(contextDir, EDGE_CANARY_SCRIPT))) {
+      const targets: { host: string; password?: string }[] = [];
+      if (data.primary && transferTarget && imagePushEnv.SSH_DEPLOY_SCRIPT) {
+        targets.push({
+          host: transferTarget,
+          password: imagePushEnv.SSH_SERVER_PWD,
+        });
+      }
+      if (
+        (!data.primary ||
+          (transferTarget && data.secondary && !data.sshTarget)) &&
+        imagePushEnv.SSH_SERVER2 &&
+        imagePushEnv.SSH_SERVER2_DEPLOY_SCRIPT
+      ) {
+        targets.push({
+          host: imagePushEnv.SSH_SERVER2,
+          password: imagePushEnv.SSH_SERVER2_PWD,
+        });
+      }
+      for (const target of targets) {
+        const preflight = await ImagePushRepository.runRemote(
+          target.host,
+          "test ! -f /etc/ha-failover/ha.env",
+          undefined,
+          target.password,
+        );
+        if (preflight.exitCode !== 0 || preflight.error !== undefined) {
+          return fail({
+            message: t("post.repository.messages.drainPreflightFailed", {
+              target: target.host,
+              error:
+                preflight.error ??
+                (preflight.exitCode === 1
+                  ? t("post.repository.messages.scriptMissing", {
+                      path: EDGE_CANARY_SCRIPT,
+                      sha: shortSha,
+                    })
+                  : t("post.repository.messages.scriptRemoteExit", {
+                      code: preflight.exitCode,
+                    })),
+            }),
+            errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          });
+        }
+      }
+    }
 
     // A full disk mid-build also kills the local dev databases: free space
     // first when the docker root runs low.
@@ -348,9 +398,17 @@ export class ImagePushRepository {
         {
           script: imagePushEnv.SSH_DEPLOY_SCRIPT,
           password: imagePushEnv.SSH_SERVER_PWD,
-          envPrefix: drainPlan
-            ? `NO_GIT_RESET=1 HA_DRAIN_WAIT=1 HA_DRAIN_TIMEOUT=${String(drainPlan.timeout)}`
-            : "NO_GIT_RESET=1",
+          envPrefix: [
+            "NO_GIT_RESET=1",
+            !data.sshTarget && imagePushEnv.SSH_SERVER2
+              ? "HA_EDGE_CANARY_REQUIRED=1"
+              : "",
+            drainPlan
+              ? `HA_DRAIN_WAIT=1 HA_DRAIN_TIMEOUT=${String(drainPlan.timeout)}`
+              : "",
+          ]
+            .filter(Boolean)
+            .join(" "),
         },
       );
       if (!deployResult.success) {
@@ -1013,7 +1071,10 @@ export class ImagePushRepository {
         box.target,
         box.projectDir,
         contextDir,
-        [{ from: DRAIN_SCRIPT, to: DRAIN_SCRIPT }],
+        [
+          { from: EDGE_CANARY_SCRIPT, to: EDGE_CANARY_SCRIPT },
+          { from: DRAIN_SCRIPT, to: DRAIN_SCRIPT },
+        ],
         box.password,
         t,
       );
@@ -1527,6 +1588,17 @@ export class ImagePushRepository {
       return success(undefined);
     }
 
+    const canarySync = await ImagePushRepository.syncHaFiles(
+      sshTarget,
+      ImagePushRepository.projectDirOf(script),
+      contextDir,
+      [{ from: EDGE_CANARY_SCRIPT, to: EDGE_CANARY_SCRIPT }],
+      password,
+      t,
+    );
+    if (!canarySync.success) {
+      return canarySync;
+    }
     const syncResult = await ImagePushRepository.syncDeployScript(
       sshTarget,
       script,

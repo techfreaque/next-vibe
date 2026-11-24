@@ -12,6 +12,17 @@ if [ "${NO_GIT_RESET:-0}" != "1" ]; then
   git reset --hard origin/$(git rev-parse --abbrev-ref HEAD)
 fi
 
+edge_canary() {
+  if [ "${HA_EDGE_CANARY_REQUIRED:-0}" = 1 ] || [ -f /etc/ha-failover/ha.env ]; then
+    bash scripts/ha-edge-canary.sh "$@"
+  fi
+}
+APP_CONTAINER="${APP_CONTAINER_NAME:-next-vibe-app}"
+previous_image=$(docker inspect -f '{{.Image}}' "$APP_CONTAINER" 2>/dev/null || true)
+if [ -n "$previous_image" ]; then
+  edge_canary || { echo "Current HA edge failed preflight; stopping before recreate."; exit 1; }
+fi
+
 # Postgres is the SHARED primary (Server 2's app and standby use it too): an
 # app deploy must never restart it. It used to be rebuilt + `up -d` on every
 # deploy; after the build-cache prune at the end of the previous deploy the
@@ -68,7 +79,6 @@ fi
 # never blocks the deploy. Old archives are pruned to the newest LOG_ARCHIVE_KEEP.
 LOG_ARCHIVE_DIR="${LOG_ARCHIVE_DIR:-/unbottled/logs}"
 LOG_ARCHIVE_KEEP="${LOG_ARCHIVE_KEEP:-30}"
-APP_CONTAINER="${APP_CONTAINER_NAME:-next-vibe-app}"
 archive_app_logs() {
   mkdir -p "$LOG_ARCHIVE_DIR" 2>/dev/null || { echo "  (log archive: cannot create $LOG_ARCHIVE_DIR, skipping)"; return 0; }
   if docker inspect "$APP_CONTAINER" >/dev/null 2>&1; then
@@ -132,6 +142,7 @@ wait_app_healthy() {
     fi
     sleep 2
   done
+  edge_canary --wait
 }
 if ! wait_app_healthy; then
   docker logs --tail=50 "$APP_CONTAINER" 2>&1 || true
@@ -139,6 +150,7 @@ if ! wait_app_healthy; then
   # :rollback at the previous :latest before loading the new one).
   IMAGE_REF=$($COMPOSE config --images app 2>/dev/null | head -1)
   ROLLBACK_REF="${IMAGE_REF%:*}:rollback"
+  ROLLBACK_REF=${previous_image:-$ROLLBACK_REF}
   if [ "${HA_NO_ROLLBACK:-0}" != "1" ] && [ -n "$IMAGE_REF" ] && docker image inspect "$ROLLBACK_REF" > /dev/null 2>&1; then
     echo "Rolling back: $ROLLBACK_REF -> $IMAGE_REF"
     docker tag "$ROLLBACK_REF" "$IMAGE_REF"

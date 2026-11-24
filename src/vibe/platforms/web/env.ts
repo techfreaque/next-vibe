@@ -13,6 +13,17 @@ export const {
   schema: serverSystemEnvSchema,
   examples: serverSystemEnvExamples,
 } = defineEnv({
+  HA_DB_ADMISSION: {
+    schema: z
+      .string()
+      .default("false")
+      .transform((value) => value === "true"),
+    example: "false",
+    comment:
+      "Gate HTTP requests on the app container's HA PostgreSQL readiness probe.",
+    commented: true,
+    fieldType: "boolean",
+  },
   VIBE_DISABLE_PROXY: {
     schema: z
       .string()

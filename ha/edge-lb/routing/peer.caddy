@@ -1,0 +1,16 @@
+# The remote edge accepts one hop and runs its own local admission check.
+bind 127.0.0.1
+reverse_proxy https://{args[0]} {
+	header_up Host unbottled.ai
+	header_up X-HA-Relay 1
+	import /data/ha-relay/send.caddy
+	header_up -X-HA-First
+	transport http {
+		tls_server_name unbottled.ai
+		dial_timeout 1500ms
+	}
+	stream_close_delay 10m
+}
+handle_errors {
+	import /data/ha-routing/unavailable.caddy
+}

@@ -1,0 +1,9 @@
+[Unit]
+Description=Publish changes to the unbottled.ai authoritative zone
+After=docker.service
+
+[Path]
+PathChanged=/srv/ha-edge/zones/unbottled.ai.zone
+
+[Install]
+WantedBy=multi-user.target

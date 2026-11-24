@@ -26,7 +26,7 @@ apex A set locally in sub-second.
    S1  ha-dns-health ────probes BOTH boxes───►    S2  ha-dns-health ────probes BOTH boxes
         │ writes S1's apex A set                        │ writes S2's apex A set
         ▼                                                ▼
-   apex A = {healthy boxes}  (TTL 30s)             apex A = {healthy boxes} (TTL 30s)
+   apex A = {healthy boxes}  (TTL 10s)             apex A = {healthy boxes} (TTL 10s)
             │                                                │
             └───────── round-robin across both public IPs ───┘
                               │
@@ -40,58 +40,19 @@ apex A set locally in sub-second.
   SPF, DKIM, DMARC, `*`, `s2`) mirror the hosttech zone 391416 EXACTLY — cutting
   the delegation here changes NOTHING except who answers.
 - **Round-robin apex A** across both public IPs = load spread between boxes.
-  **TTL 30s** = resolvers re-fetch fast.
-- **`ha-dns-health` daemon, one per box.** Every 10s it probes EVERY box's app
-  over the public internet (`GET https://unbottled.ai/robots.txt` via that box's
-  IP — 200 only when the app actually serves; `/robots.txt` is app-served +
-  unauthenticated; the `/health` endpoint needs auth → 401 → unusable as a
-  probe). A box that fails 2 consecutive probes is dropped from THIS box's apex
-  A set (zone rewritten; PowerDNS auto-reloads within 5s via
-  `bind-check-interval`). A box must pass 2 consecutive probes to be re-added
-  (flap damping). Never-dark guard: if the computed set is empty (both probes
-  fail — almost always a local egress fault) it publishes BOTH.
-- **Own-app check (2026-11-17).** Each box's Caddy falls back to the PEER's
-  app, so "the public probe passed" alone does not mean the box's own app is
-  alive (S2's app was dead ~30 min on 2026-11-17 while its probe passed via
-  S1). Both Caddys stamp `X-HA-Upstream: {upstream_hostport}` on app
-  responses; a public probe of a node passes only if it names that node's
-  local upstream (`SERVED_BY`: s1=`next-vibe-app:3000`, s2=`unbottled-app:3000`).
-  Each daemon also probes its OWN box's app directly over WG (`DIRECT_URLS`,
-  s1=`10.88.0.1:3000`, s2=`10.88.0.2:3100`, `DIRECT_SCOPE=self`; the peer is
-  not probed directly, a WG outage would drop a healthy peer). A Caddy deploy
-  drain (`/data/ha-drain/<node>`) now also drops the node from DNS, which is
-  what the deploy flow does anyway. Failing probes log their reason once.
-  Offline test: `docker run --rm -v "$PWD/ha/edge-dns/health:/t:ro" alpine:3.20 sh /t/test-ha-dns-health.sh`.
+  **TTL 10s** = resolvers re-fetch fast.
+- Each daemon probes `GET /_ha/ready` over verified public TLS on each fixed IP. A 200, the ready marker and the expected local `X-HA-Upstream` are required. The endpoint checks the app's own writable PostgreSQL path and its renderer. It cannot fall through to the other app. A sweep runs two seconds after the preceding sweep; each request has a two-second timeout. One failure removes a node, two successes restore it. A manual drain takes precedence, including when neither probe passes. Direct WG and fixed-cookie probes are legacy options.
 
 ### The "a box dies → it loses an app AND a nameserver" risk — handled
 
 Each box runs its OWN pdns + its OWN health daemon, independently. When S1 dies:
 
 - Resolvers still have `ns2` (S1 app down, S1 NS down). They query `ns2`.
-- S2's health daemon has ALREADY dropped S1's A record (within ~30-60s), so
-  `ns2` answers with S2's IP only. Traffic lands on the live box.
-- The dead `ns1` is simply unreachable; resolvers fail over to `ns2` by design
-  (that's what multiple NS are for). No AXFR/replication between the boxes is
-  needed — each daemon authors its own apex A from its own health view, so the
-  survivor is always correct even with the peer (and its daemon) gone.
+- Until PostgreSQL is promoted and the S2 app reconnects to its local backends, both probes can fail. The survivor then publishes the eligible addresses. Once S2 is ready, ns2 publishes only S2. End-to-end service recovery includes promotion, origin readiness and recursive resolver behaviour.
 
-## Failover timing (measured on the S2 staging instance)
+## Failover timing
 
-| Phase                                                    | Time               |
-| -------------------------------------------------------- | ------------------ |
-| Detect (2 × 10s probe interval)                          | ~18-20s (measured) |
-| Zone rewrite + PowerDNS reload (`bind-check-interval=5`) | ≤5-10s             |
-| Client apex-A TTL expiry                                 | ≤30s               |
-| **Total worst case**                                     | **~50-60s**        |
-| **Typical**                                              | **~30-40s**        |
-
-Browsers do happy-eyeballs/connection-failure retry across the still-cached A
-records, so an active user whose resolver still holds both A's reconnects to the
-survivor near-instantly; the DNS drop matters mainly for NEW resolutions.
-
-Tune in `docker-compose.health.yml`: `EDGE_CHECK_INTERVAL`, `EDGE_FAIL_THRESHOLD`,
-`EDGE_APEX_TTL`. Don't drop the TTL below ~20s (resolver-churn / some resolvers
-clamp very low TTLs upward).
+Caddy checks every 2 seconds and also checks admission before dispatch. The DNS sweep takes the two sequential public probe durations plus a 2-second interval. Install `ha-dns-publish.path` and `ha-dns-publish.service` under `/etc/systemd/system` on each host and enable the path unit. An atomic zone rename triggers an immediate zone reload and an exact cache purge for apex and www. PowerDNS also checks the zone at 5-second intervals. Apex/www records carry a 10-second TTL. Resolver floors and existing connections can extend client convergence. Verify the actual server via `X-HA-Upstream` on a request pinned to the old edge. Tune `EDGE_CHECK_INTERVAL`, `EDGE_FAIL_THRESHOLD` and `EDGE_APEX_TTL` in the health Compose file.
 
 ## Files
 

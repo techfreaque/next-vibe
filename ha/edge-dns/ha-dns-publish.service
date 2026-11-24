@@ -1,0 +1,9 @@
+[Unit]
+Description=Reload the unbottled.ai zone and expire cached address answers
+After=docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/docker exec ha-edge-pdns pdns_control bind-reload-now unbottled.ai
+ExecStart=/usr/bin/docker exec ha-edge-pdns pdns_control purge unbottled.ai
+ExecStart=/usr/bin/docker exec ha-edge-pdns pdns_control purge www.unbottled.ai

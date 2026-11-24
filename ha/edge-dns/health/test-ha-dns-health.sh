@@ -98,6 +98,10 @@ setup $S1; touch $W/run/zones/drain.s2; sweeps 1; expect "drain.s2" "$S1 "
 rm $W/run/zones/drain.s2; sweeps 2; expect "undrained after rise" "$S2 $S1 "
 resp $S1 000 - ""; resp $S2 200 10.88.0.1:3000 "$good"; sweeps 2; expect "never-dark" "$S2 $S1 "
 
+touch "$W/run/zones/drain.s2"; sweeps 1; expect "never-dark respects a drained node" "$S1 "
+APEX_TTL=10; sweeps 1
+awk '$1=="@" && $3=="IN" && $4=="A" && $2==10 {found=1} END{exit !found}' "$ZONE_FILE" && ok "TTL-only update" || bad "TTL unchanged"
+
 echo "== H: body / code checks unchanged"
 setup $S1; resp $S2 200 unbottled-app:3000 '{"success":false}'; sweeps 2; expect "bad body" "$S1 "
 setup $S1; resp $S2 502 unbottled-app:3000 "$good"; sweeps 2; expect "502" "$S1 "

@@ -8,7 +8,7 @@
 # The watchdog (`ha-failover watch`) runs as ha-failover-watch.service.
 #
 #   ha-failover status              roles, replication, peer reachability
-#   ha-failover promote [--yes]     S2: make this box the primary (S1 is DEAD)
+#   ha-failover promote [--dry-run|--yes] S2: make this box the primary (S1 is DEAD)
 #   ha-failover hold <reason>       S2: pause AUTO failover (planned S1 work)
 #   ha-failover unhold
 #   ha-failover witness             ask check-host.net whether S1 is down
@@ -59,7 +59,7 @@ FAILOVER_AFTER="${HA_FAILOVER_AFTER:-180}"
 AUTO="${HA_AUTO_FAILOVER:-0}"
 MAIL="${HA_MAIL_BIN:-/usr/local/sbin/ha-mail}"
 PEER_CMD="${HA_PEER_CMD_BIN:-/usr/local/sbin/ha-peer-cmd}"
-mkdir -p "$STATE_DIR"
+if [[ " $* " != *" --dry-run "* && "${1:-}" != observe-loss ]]; then mkdir -p "$STATE_DIR"; fi
 
 log() { printf '%s [ha-failover %s] %s\n' "$(date -u +%FT%TZ)" "$NODE" "$*"; }
 role() { cat "$STATE_DIR/role" 2>/dev/null || echo "${HA_DEFAULT_ROLE:-standby}"; }
@@ -88,41 +88,51 @@ peer_ssh() { # peer_ssh <verb>
 
 # Is the peer box alive on ANY path? Prints the paths that answered.
 peer_paths() {
-  local up=""
-  ping -c1 -W2 "$PEER_WG" >/dev/null 2>&1 && up="$up wg-icmp"
-  tcp "$PEER_WG" 22 && up="$up wg-ssh"
-  [ -n "${HA_PEER_PG_PORT:-}" ] && tcp "$PEER_WG" "$HA_PEER_PG_PORT" && up="$up wg-pg"
-  tcp "$PEER_PUBLIC" 443 && up="$up pub-443"
-  tcp "$PEER_PUBLIC" 22 && up="$up pub-22"
-  echo "$up"
+  {
+    (ping -c1 -W2 "$PEER_WG" >/dev/null 2>&1 && echo wg-icmp) &
+    (tcp "$PEER_WG" 22 && echo wg-ssh) &
+    if [ -n "${HA_PEER_PG_PORT:-}" ]; then (tcp "$PEER_WG" "$HA_PEER_PG_PORT" && echo wg-pg) & fi
+    (tcp "$PEER_PUBLIC" 443 && echo pub-443) &
+    (tcp "$PEER_PUBLIC" 22 && echo pub-22) &
+    wait
+  } | tr '\n' ' '
 }
 internet_ok() {
-  local n=0
-  for ip in 1.1.1.1 8.8.8.8 9.9.9.9; do tcp "$ip" 443 && n=$((n + 1)); done
-  [ "$n" -ge 2 ]
+  local count
+  count="$({
+    for ip in 1.1.1.1 8.8.8.8 9.9.9.9; do (tcp "$ip" 443 && echo online) & done
+    wait
+  } | wc -l)"
+  [ "$count" -ge 2 ]
 }
 
-# External witness: check-host.net TCP probe of PEER_PUBLIC:443 from 3-4
-# nodes in other networks. Prints down|up|unknown.
 witness() {
-  local id res target="${1:-$PEER_PUBLIC}"
-  id="$(curl -s --max-time 15 -H 'Accept: application/json' \
-    "https://check-host.net/check-tcp?host=${target}:443&max_nodes=4" \
-    | python3 -c 'import json,sys; print(json.load(sys.stdin).get("request_id",""))' 2>/dev/null)"
-  [ -n "$id" ] || { echo unknown; return; }
-  sleep 20
-  res="$(curl -s --max-time 15 -H 'Accept: application/json' "https://check-host.net/check-result/$id")"
-  printf '%s' "$res" | python3 -c '
-import json,sys
-try: d=json.load(sys.stdin)
-except Exception: print("unknown"); sys.exit()
-ok=fail=0
-for node,v in d.items():
-    if not v: continue                 # pending / no answer from that node
-    r=next((x for x in v if isinstance(x,dict)),{}) if isinstance(v,list) else {}
-    if "time" in r: ok+=1
-    elif "error" in r or "message" in r: fail+=1
-print("up" if ok else ("down" if fail>=2 else "unknown"))' 2>/dev/null || echo unknown
+  timeout 26 python3 "${HA_WITNESS_BIN:-/usr/local/lib/unbottled-ha/witness.py}" "${1:-$PEER_PUBLIC}" || echo unknown
+}
+
+# During the planned physical power-off the real watcher is primary and held.
+# Observe the same paths, interval, threshold and witness in memory only.
+observe_loss() {
+  [ "$NODE" = s2 ] && [ -n "$(peer_paths)" ] && internet_ok || { echo "need healthy S1 baseline from S2"; return 1; }
+  local since=-1 sample w
+  log "observer baseline healthy; awaiting physical loss"
+  while :; do
+    sample=$SECONDS
+    if [ -n "$(peer_paths)" ] || ! internet_ok; then
+      [ "$since" -lt 0 ] || log "observer continuity reset"
+      since=-1
+    else
+      if [ "$since" -lt 0 ]; then since=$sample; log "observer first complete all-path loss"; fi
+      if [ $((sample - since)) -ge "$FAILOVER_AFTER" ]; then
+        w="$(witness)"
+        log "observer witness=$w elapsed=$((SECONDS - since))s"
+        if [ "$w" = down ] && [ -z "$(peer_paths)" ] && internet_ok; then
+          log "observer final checks passed; decision only"; return 0
+        fi
+      fi
+    fi
+    sleep "$INTERVAL"
+  done
 }
 
 pg_q() { docker exec "${2:-$LOCAL_PG}" psql -U postgres -Atc "$1" 2>/dev/null; }
@@ -134,11 +144,20 @@ replication_line() {
 # promote_pg <container>: wait for replay to catch up with what was received,
 # then pg_ctl promote and wait until writable. Used by promote AND the drill.
 promote_pg() {
-  local c="$1" i
-  for i in $(seq 1 30); do
-    [ "$(pg_q "select coalesce(pg_last_wal_replay_lsn() >= pg_last_wal_receive_lsn(), true)" "$c")" = "t" ] && break
-    sleep 1
-  done
+  local c="$1" i caught_up=false
+  # The offline clone drill has no WAL receiver. A production standby must
+  # know its receive position and finish replay before opening for writes.
+  if [ "${2:-}" = offline-clone ]; then
+    [ "$c" != "$LOCAL_PG" ] || return 1
+  else
+    for i in $(seq 1 30); do
+      if [ "$(pg_q 'select pg_last_wal_replay_lsn() >= pg_last_wal_receive_lsn()' "$c")" = t ]; then
+        caught_up=true; break
+      fi
+      sleep 1
+    done
+    [ "$caught_up" = true ] || { log "received WAL has not finished replaying; promotion refused"; return 1; }
+  fi
   log "promoting $c ($(pg_q "select 'replay='||pg_last_wal_replay_lsn()" "$c"))"
   docker exec -u postgres "$c" pg_ctl promote -D "$PG_DATA" >/dev/null || return 1
   for i in $(seq 1 60); do
@@ -149,19 +168,26 @@ promote_pg() {
 }
 
 # Point the S2 app at this box's backends and recreate it.
-switch_app_local() {
+switch_app_local() (
+  set -euo pipefail
   cd "$APP_DIR" || return 1
-  local url ts
+  local url ts img ref
+  local -a compose=(docker compose -p unbottled --env-file .env -f docker-compose.prod.yml -f docker-compose.standalone.yml -f docker-compose.s2-ha.yml)
+  ref="$("${compose[@]}" config --images app)" && img="$(docker image inspect -f '{{.Id}}' "$ref")" || return 1
+  [ "$img" = "$(docker inspect -f '{{.Image}}' unbottled-app)" ] || { echo "app image drift"; return 1; }
+  umask 077
   ts="$(date -u +%Y%m%d%H%M%S)"
   url="$(cat .ha-database-url)"
   cp .ha-database-url ".ha-database-url.bak-$ts"; cp .env ".env.bak.failover-$ts"
   [ -f .ha-overrides ] && cp .ha-overrides ".ha-overrides.bak-$ts"
   # postgres://s2app:<pw>@10.88.0.1:5432/... -> @pg-replica:5432/...
+  [[ "$url" == postgres*://*@*/* ]] || return 1
   printf '%s\n' "$url" | sed -E "s#@[^/]+/#@${HA_LOCAL_DB_HOST:-pg-replica}:5432/#" > .ha-database-url.new
   mv .ha-database-url.new .ha-database-url; chmod 600 .ha-database-url
   local muser mpass
   muser="$(grep -E '^MINIO_ROOT_USER=' .env | tail -1 | cut -d= -f2-)"
   mpass="$(grep -E '^MINIO_ROOT_PASSWORD=' .env | tail -1 | cut -d= -f2-)"
+  [ -n "$muser" ] && [ -n "$mpass" ] || return 1
   umask 077
   cat > .ha-overrides <<EOF
 HA_ROLE=primary
@@ -170,12 +196,28 @@ HA_S3_ENDPOINT=${HA_LOCAL_S3_ENDPOINT:-http://unbottled-minio:9000}
 HA_S3_ACCESS_KEY_ID=$muser
 HA_S3_SECRET_ACCESS_KEY=$mpass
 HA_TASK_RUNNER=true
-HA_DB_SETUP=true
+HA_DB_SETUP=false
 EOF
   # Re-merge .env in place (same file as base + overrides) so compose sees it.
   python3 ha/scripts/merge-env.py .env .env .env.next .ha-database-url .ha-overrides >/dev/null \
     && chmod 600 .env.next && mv .env.next .env || return 1
-  HA_NO_ROLLBACK=1 bash scripts/deploy-ha-node.sh
+  "${compose[@]}" up -d --no-build --pull never --no-deps --force-recreate app
+)
+
+# Optional prewarmed web, armed by an operator after capacity and image checks.
+# The canonical app still starts the single task runner once PG is writable.
+use_ready_warm_app() {
+  local warm=unbottled-ha-warm dir="${HA_CADDY_DRAIN_DIR:-/root/caddy_data/ha-drain}" cmd image
+  [ -f "$dir/warm-on-promote" ] || return 1
+  image="$(docker inspect -f '{{.Image}}' unbottled-app)" && [ -n "$image" ] &&
+    [ "$(docker inspect -f '{{.Image}}' "$warm")" = "$image" ] || return 1
+  cmd="$(docker inspect -f '{{json .Config.Cmd}}' "$warm")"
+  [ "$cmd" = '["bun","src/vibe/platforms/cli/vibe-runtime.ts","start","--seed=false","--db-setup=false","--task-runner=false"]' ] || return 1
+  timeout 2 docker exec "$warm" bun -e '
+    const r=await fetch("http://127.0.0.1:3099/_ha/ready");
+    if(r.status!==200 || r.headers.get("x-ha-db-path")!=="local") process.exit(1)
+  ' >/dev/null 2>&1 || return 1
+  touch "$dir/use-warm"
 }
 
 # Interim DNS failover while unbottled.ai is still delegated to hosttech
@@ -185,8 +227,21 @@ EOF
 dns_failover() {
   local ns
   ns="$(dig +short NS unbottled.ai @1.1.1.1 2>/dev/null | tr '\n' ' ')"
-  case "$ns" in
-  *unbottled.ai.*) log "DNS: self-hosted NS ($ns): health daemon handles the apex"; echo "self-hosted NS, health daemon removed $PEER"; return 0 ;;
+  case " $ns" in
+  *" ns1.unbottled.ai. "*|*" ns2.unbottled.ai. "*)
+    local i apex www
+    for i in $(seq 1 15); do
+      apex="$(dig +time=1 +tries=1 +short @"$SELF_PUBLIC" unbottled.ai A)"
+      www="$(dig +time=1 +tries=1 +short @"$SELF_PUBLIC" www.unbottled.ai A)"
+      if [ "$apex" = "$SELF_PUBLIC" ] && [ "$www" = "$SELF_PUBLIC" ]; then
+        log "DNS: surviving authority serves only $SELF_PUBLIC for apex and www"; return 0
+      fi
+      sleep 1
+    done
+    echo "surviving authority has not converged on $SELF_PUBLIC"; return 1 ;;
+
+  *".hosttech.eu. "*|*".hosttech.ch. "*) ;;
+  *) echo "DNS delegation unknown; verify authority before changing records"; return 1 ;;
   esac
   [ -f "$SECRETS" ] && { set -a; . "$SECRETS"; set +a; }
   [ -n "${HOSTTECH_DNS_KEY:-}" ] || { echo "hosttech NS but no HOSTTECH_DNS_KEY: change A records by hand"; return 1; }
@@ -223,42 +278,138 @@ cmd_status() {
   return 0
 }
 
-cmd_promote() {
-  local yes=0 auto=0 force=0 t0 out
-  for a in "$@"; do case "$a" in --yes) yes=1 ;; --auto) auto=1; yes=1 ;; --force) force=1 ;; esac; done
+cmd_promote() (
+  local yes=0 auto=0 force=0 dry=0 planned=0 target="" t0
+  for a in "$@"; do case "$a" in --yes) yes=1 ;; --auto) auto=1; yes=1 ;; --force) force=1 ;; --dry-run) dry=1 ;; --planned) planned=1 ;; --target-lsn=*) target="${a#*=}" ;; *) echo "unsupported promote option"; return 2 ;; esac; done
   [ "$NODE" = "s2" ] || { echo "promote runs on Server 2 only"; return 2; }
-  [ "$(role)" = "primary" ] && { echo "already primary"; return 0; }
-  local paths; paths="$(peer_paths)"
-  if [ -n "$paths" ] && [ "$force" != 1 ]; then
-    echo "REFUSED: Server 1 still answers on [$paths]. Promoting now would split the brain."
-    echo "If S1 is truly broken but still pingable, stop its app + Postgres first, then rerun with --force."
-    return 3
+  if [ "$dry" = 1 ]; then
+    local rc=0 paths
+    paths="$(peer_paths)"
+    echo "READ ONLY: role=$(role), auto=$AUTO, hold=$([ -f "$STATE_DIR/hold" ] && echo yes || echo no), peer paths=[$paths]"
+    echo "replication: $(replication_line)"
+    [ "$(pg_q 'select pg_is_in_recovery() and pg_last_wal_replay_lsn() = pg_last_wal_receive_lsn()')" = t ] || rc=1
+    for f in .env .ha-database-url ha/scripts/merge-env.py scripts/deploy-ha-node.sh docker-compose.s2-ha.yml; do
+      [ -s "$APP_DIR/$f" ] || { echo "missing $f"; rc=1; }
+    done
+    if ! (cd "$APP_DIR" && docker compose -p unbottled --env-file .env -f docker-compose.prod.yml -f docker-compose.standalone.yml -f docker-compose.s2-ha.yml config -q); then rc=1; fi
+    if [ "$(docker exec unbottled-redis redis-cli ping 2>/dev/null)" != PONG ]; then echo "local Redis unavailable"; rc=1; fi
+    if ! docker exec unbottled-minio sh -c 'export MC_HOST_local="http://$MINIO_ROOT_USER:$MINIO_ROOT_PASSWORD@127.0.0.1:9000"; mc stat local/chat-media >/dev/null 2>&1'; then echo "local chat-media bucket unavailable"; rc=1; fi
+    if ! docker exec unbottled-app bun -e '
+      const u=new URL(process.env.DATABASE_URL); u.hostname=process.argv[1]; u.port="5432";
+      const c=new (require("pg").Client)({connectionString:u.href,connectionTimeoutMillis:1500,query_timeout:1500});
+      try {await c.connect(); const r=await c.query("select pg_is_in_recovery() as standby"); if(!r.rows[0].standby) process.exitCode=1;}
+      catch {process.exitCode=1;} finally {await c.end();}
+    ' "${HA_LOCAL_DB_HOST:-pg-replica}" >/dev/null 2>&1; then echo "app login on local standby failed"; rc=1; fi
+    if ! timeout 8 docker exec unbottled-app bun -e '
+      const {S3Client,HeadBucketCommand}=require("@aws-sdk/client-s3");
+      const s3=new S3Client({endpoint:process.argv[1],region:"us-east-1",forcePathStyle:true,
+        credentials:{accessKeyId:process.env.MINIO_ROOT_USER,secretAccessKey:process.env.MINIO_ROOT_PASSWORD}});
+      const redis=new Bun.RedisClient(process.argv[2]);
+      try {await s3.send(new HeadBucketCommand({Bucket:"chat-media"})); if(await redis.send("PING",[])!=="PONG") process.exitCode=1;}
+      catch {process.exitCode=1;} finally {s3.destroy();redis.close();}
+    ' "${HA_LOCAL_S3_ENDPOINT:-http://unbottled-minio:9000}" "${HA_LOCAL_REDIS_URL:-redis://unbottled-redis:6379}" >/dev/null 2>&1; then
+      echo "app access to promotion storage or Redis failed"; rc=1
+    fi
+    echo "Delegated nameservers: $(dig +time=2 +tries=1 +short NS unbottled.ai @1.1.1.1 | tr '\n' ' ')"
+    local vote
+    vote="$(witness)"; echo "External witness: $vote"
+    if [ -n "$paths" ]; then [ "$vote" = up ] || rc=1; else [ "$vote" = down ] || rc=1; fi
+    internet_ok || { echo "S2 internet quorum unavailable"; rc=1; }
+    [ -z "$paths" ] || echo "live promotion would refuse while S1 answers"
+    echo "Plan: fence S1, replay received WAL, promote PG, switch app to local PG/Redis/MinIO, start one task runner on the replicated schema, verify app and DNS."
+    echo "No fence, promotion, config write, service restart, mail or DNS update performed."
+    return "$rc"
+  fi
+  exec 9>"$STATE_DIR/promotion.lock" && flock -n 9 || { echo "promotion already in progress"; return 3; }
+  [ "$(role)" = standby ] || { echo "standby role required; verify database and app independently"; return 3; }
+  [ "$(pg_q 'select pg_is_in_recovery()')" = t ] || { echo "local database is not in recovery"; return 3; }
+  local fence paths
+  if [ "$planned" = 1 ]; then
+    [ "$auto$force$yes" = 001 ] && [ -s "$STATE_DIR/hold" ] && [[ "$target" =~ ^[A-F0-9]{1,8}/[A-F0-9]{1,8}$ ]] || {
+      echo "planned promotion requires a hold, --yes and a final --target-lsn"; return 3; }
+    fence="$(peer_ssh fence-proof)" || { echo "S1 durable fence or clean shutdown unverified"; return 3; }
+    local proof='^s1-fenced ([0-9]+) ([0-9]+) ([0-9A-F]{1,8}/[0-9A-F]{1,8})$'
+    [[ "$fence" =~ $proof ]] || { echo "invalid S1 fence proof"; return 3; }
+    local sysid="${BASH_REMATCH[1]}" timeline="${BASH_REMATCH[2]}" checkpoint="${BASH_REMATCH[3]}"
+    [ "$(pg_q "select pg_is_in_recovery() and (pg_control_system()).system_identifier::text = '$sysid' and (pg_control_checkpoint()).timeline_id = $timeline and pg_last_wal_replay_lsn() >= '$target'::pg_lsn and pg_last_wal_replay_lsn() > '$checkpoint'::pg_lsn")" = t ] || {
+      echo "S2 has not proved replay through both final positions on S1's timeline"; return 3; }
+  else
+    [ -z "$target" ] || { echo "--target-lsn requires --planned"; return 2; }
+    paths="$(peer_paths)"
+    if [ -n "$paths" ] && [ "$force" != 1 ]; then
+      echo "REFUSED: Server 1 still answers on [$paths]. A planned switch requires a verified fence."
+      return 3
+    fi
   fi
   if [ "$yes" != 1 ]; then
     echo "!! Promote Server 2 to PRIMARY. Server 1 must be DOWN. Replication: $(replication_line)"
     read -r -p "type PROMOTE to continue: " ok; [ "$ok" = "PROMOTE" ] || { echo aborted; return 1; }
   fi
   t0=$(date +%s)
-  set_role promoting
-  local fence; fence="$(peer_ssh fence || echo 'S1 unreachable (expected when dead)')"
-  promote_pg "$LOCAL_PG" || { set_role standby; alert "FAILOVER FAILED: pg promote" "pg_ctl promote on $LOCAL_PG failed. Replication: $(replication_line)"; return 1; }
-  set_role primary; date -u +%s > "$STATE_DIR/promoted-at"
-  out="$(switch_app_local 2>&1)"; local app_rc=$?
-  out="$(printf '%s\n' "$out" | tail -15)"
-  local dns; dns="$(dns_failover 2>&1)"
+  if [ "$auto" = 1 ]; then
+    internet_ok && [ ! -f "$STATE_DIR/hold" ] || { echo "automatic promotion blocked"; return 3; }
+  fi
+  if [ "$planned" = 0 ]; then
+    if ! fence="$(peer_ssh fence)"; then
+      fence="fence unconfirmed"
+      if [ -n "$(peer_paths)" ]; then echo "S1 reachable without a confirmed fence"; return 3; fi
+    fi
+  fi
+  [ "$auto" = 0 ] || [ ! -f "$STATE_DIR/hold" ] || return 3
+  set_role promoting || return 1
+  if ! promote_pg "$LOCAL_PG"; then
+    case "$(pg_q 'select pg_is_in_recovery()')" in
+      t) set_role standby ;;
+      f) set_role primary ;;
+      *) log "cannot verify PG role; retain promoting state and keep S1 fenced" ;;
+    esac
+    alert "FAILOVER INCOMPLETE: verify PG role" "Replication: $(replication_line). Verify both roles before allowing writes."
+    return 1
+  fi
+  set_role primary || { log "writable database but role persistence failed; keep S1 fenced"; return 1; }
+  date -u +%s > "$STATE_DIR/promoted-at"
+  local warm_active=0 dir="${HA_CADDY_DRAIN_DIR:-/root/caddy_data/ha-drain}"
+  if [ -f "$dir/warm-on-promote" ]; then
+    for delay in 1 2 3; do
+      if use_ready_warm_app; then warm_active=1; log "prewarmed S2 web selected"; break; fi
+      sleep 0.25
+    done
+  fi
+  switch_app_local >/dev/null 2>&1; local app_rc=$?
+  # App/deploy logs can contain credentials; keep only the return code in mail.
+  local app_ready=0 i
+  if [ "$app_rc" -eq 0 ]; then
+    for i in $(seq 1 90); do
+      if app_probe; then app_ready=1; break; fi
+      sleep 1
+    done
+  fi
+  if [ "$app_ready" -ne 1 ]; then
+    alert "FAILOVER INCOMPLETE: S2 database is PRIMARY" "Application recreation or the DB-backed HTTP check failed (recreate rc=$app_rc). Keep S1 fenced; recover the app on S2."
+    return 1
+  fi
+  # On the supervised path the operator verifies the canonical instance and
+  # releases the HTTP pause independently. It may already serve warm traffic.
+  if [ "$planned" = 0 ] && [ "$warm_active" = 1 ]; then
+    mv "$dir/use-warm" "$STATE_DIR/last-warm-cut" || return 1
+  fi
+  local dns
+  if ! dns="$(dns_failover 2>&1)"; then
+    alert "FAILOVER INCOMPLETE: check authoritative DNS" "S2 database and app are primary. Keep S1 fenced and verify both nameservers."
+    return 1
+  fi
   alert "FAILOVER DONE: Server 2 is primary ($( [ $auto = 1 ] && echo automatic || echo manual))" \
 "Server 2 promoted itself to primary in $(( $(date +%s) - t0 ))s.
 Trigger: $( [ $auto = 1 ] && echo "automatic (S1 unreachable on all paths + external witness agreed)" || echo "manual ha-failover promote")
 Fence S1: $fence
 Postgres: $(replication_line)
-App recreate (rc=$app_rc):
-$out
+App recreate rc=$app_rc; DB-backed HTTP probe passed.
 DNS: $dns
 
 S1 will fence itself (app + Postgres stopped, restart=no) as soon as it is back
 and sees S2 primary. Rejoin is manual: ha/README.md 'Rejoin after failover'."
   return 0
-}
+)
 
 watch_s2() {
   local r paths now since
@@ -300,6 +451,7 @@ Without streaming, a failover would lose everything since the last replayed WAL.
     return
   fi
   if ! internet_ok; then
+    if [ -f "$STATE_DIR/peer-down-since" ]; then mv -f "$STATE_DIR/peer-down-since" "$STATE_DIR/last-isolated-sample"; fi
     log "S1 unreachable but so is the internet from here: S2 is the isolated one, doing nothing"
     return
   fi
@@ -696,7 +848,7 @@ cmd_drill_promote() {
   local i; for i in $(seq 1 60); do [ "$(pg_q 'select pg_is_in_recovery()' "$DRILL_PG")" = "t" ] && break; sleep 1; done
   log "drill: clone up as standby ($(pg_q "select 'replay='||pg_last_wal_replay_lsn()" "$DRILL_PG")), clone took $(( $(date +%s) - t0 ))s"
   t1=$(date +%s)
-  promote_pg "$DRILL_PG" || { echo "drill promote FAILED"; return 1; }
+  promote_pg "$DRILL_PG" offline-clone || { echo "drill promote FAILED"; return 1; }
   pg_q "create table ha_drill_probe(x int); insert into ha_drill_probe values (1); drop table ha_drill_probe; select 'write-ok'" "$DRILL_PG"
   local tp=$(( $(date +%s) - t1 ))
   # Drill app = the real S2 app image + .env with the post-failover overrides,
@@ -786,9 +938,19 @@ cmd_drill_partition_undo() {
 case "${1:-status}" in
 status) cmd_status ;;
 promote) shift; cmd_promote "$@" ;;
-hold) shift; echo "${*:-manual hold} (set $(date -u +%FT%TZ))" > "$STATE_DIR/hold"; echo "auto failover on hold" ;;
-unhold) rm -f "$STATE_DIR/hold"; echo "hold cleared" ;;
+hold)
+  shift
+  exec 9>"$STATE_DIR/promotion.lock" && flock -n 9 || { echo "promotion in progress; check PG role now"; exit 3; }
+  echo "${*:-manual hold} (set $(date -u +%FT%TZ))" > "$STATE_DIR/hold.new" && mv "$STATE_DIR/hold.new" "$STATE_DIR/hold" || exit 1
+  echo "auto failover on hold" ;;
+unhold) if [ -f "$STATE_DIR/hold" ]; then mv "$STATE_DIR/hold" "$STATE_DIR/last-hold" || exit 1; fi; echo "hold cleared" ;;
 witness) shift; witness "$@" ;;
+observe-loss) observe_loss ;;
+q104-promote-fixture)
+  [ "$NODE" = s2 ] && [ "$LOCAL_PG" != q104-pg-standby ] &&
+    [ "$(docker inspect -f '{{index .Config.Labels "ai.unbottled.q104"}} {{.HostConfig.NetworkMode}}' q104-pg-standby)" = 'fixture q104-isolated' ] &&
+    [ "$(docker inspect -f '{{index .Config.Labels "ai.unbottled.q104"}} {{.State.Status}}' q104-pg-writer)" = 'fixture exited' ] &&
+    PG_DATA=/var/lib/postgresql/data/q104 promote_pg q104-pg-standby ;;
 watch) cmd_watch ;;
 dns-failover) dns_failover ;;
 drill-promote) cmd_drill_promote ;;

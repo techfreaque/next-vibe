@@ -24,7 +24,9 @@ import { parseError } from "../../core/utils/parse-error";
 import { sanitizeRoutePath } from "../../logger/client-context";
 import type { EndpointLogger } from "../../logger/types";
 import { mintRequestId } from "../../logger/with-log-context";
+import { serverSystemEnv } from "../../platforms/web/env";
 import { proxyTimingHeader, readProxyTimingHeader } from "../core/proxy-timing";
+import { databaseAdmission, databaseUnavailable } from "./database-admission";
 import { PROXY_LOADING_HTML } from "./proxy-loading-page";
 
 // ─── Recent-request tracker (diagnoses Next.js crashes) ─────────────────────────
@@ -81,6 +83,7 @@ const PROXY_REQUEST_TIMEOUT_MS = 600_000;
 
 interface HttpProxyContext {
   nextPort: number;
+  databaseReadiness?: (requireReady?: boolean) => Promise<AbortSignal>;
   logger: EndpointLogger;
   /** True once the server is stopping — suppresses retries and expected errors. */
   isShuttingDown: () => boolean;
@@ -100,6 +103,21 @@ export async function handleHttpProxy(
 ): Promise<Response> {
   const { nextPort, logger, isShuttingDown } = ctx;
   const url = new URL(req.url);
+  // The readiness companion uses robots.txt to check the renderer independently.
+  const readiness =
+    ctx.databaseReadiness ??
+    (serverSystemEnv.HA_DB_ADMISSION ? databaseAdmission : undefined);
+  const strictProbe = url.pathname === "/_ha/ready";
+  const db =
+    url.pathname === "/robots.txt" ? undefined : await readiness?.(strictProbe);
+  if (db?.aborted) {
+    return databaseUnavailable();
+  }
+  if (db && strictProbe) {
+    return new Response("ready\n", {
+      headers: { "cache-control": "no-store", "x-ha-readiness": "v1-ready" },
+    });
+  }
   const clientRequestId = req.headers.get(REQUEST_ID_HEADER_NAME);
   const requestId =
     clientRequestId && /^[A-Za-z0-9_-]{8,64}$/.test(clientRequestId)
@@ -183,6 +201,9 @@ export async function handleHttpProxy(
   }
 
   for (let attempt = 0; attempt <= PROXY_RETRY_DELAYS.length; attempt++) {
+    if (db?.aborted) {
+      return databaseUnavailable();
+    }
     const proxyResult = await new Promise<Response | null>((resolve) => {
       let settled = false;
       let timedOut = false;
@@ -193,6 +214,7 @@ export async function handleHttpProxy(
           return;
         }
         settled = true;
+        db?.removeEventListener("abort", onDatabaseLoss);
         clearTimeout(timeoutHandle);
         // oxlint-disable-next-line promise/no-multiple-resolved -- `settled` guard prevents double-resolve; static analysis can't track it
         resolve(result);
@@ -362,8 +384,17 @@ export async function handleHttpProxy(
         },
       );
 
+      function onDatabaseLoss(): void {
+        settle(databaseUnavailable());
+        proxyReq.destroy();
+      }
+      // Once headers have been delivered, settle() removes this listener.
+      // Never interrupt a write whose commit outcome may already be unknown.
+      if (req.method === "GET" || req.method === "HEAD") {
+        db?.addEventListener("abort", onDatabaseLoss, { once: true });
+      }
       proxyReq.on("error", (err) => {
-        if (timedOut) {
+        if (timedOut || settled) {
           return;
         }
         const nodeErr = err as NodeJS.ErrnoException;

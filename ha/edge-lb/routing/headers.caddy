@@ -1,0 +1,9 @@
+# The public ingress sets these two values from the connection. Only a verified
+# relay hop from the other box's allowlisted public IP can preserve them.
+header_up Host {http.request.header.X-HA-Host}
+header_up X-Forwarded-Host {http.request.header.X-HA-Host}
+header_up X-Forwarded-Proto https
+header_up X-Forwarded-For {http.request.header.X-HA-Client}
+header_up X-Real-IP {http.request.header.X-HA-Client}
+header_up -Proxy-Authorization
+header_up -X-HA-*

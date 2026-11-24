@@ -1,0 +1,14 @@
+# Only active during an operator-initiated handoff. Hold before selecting an
+# origin, so release always selects from the new readiness state.
+@paused file {
+	root /data/ha-drain
+	try_files /switchover.pause
+}
+forward_auth @paused unix//data/ha-drain/switchover.sock {
+	uri /admit?
+	header_up -*
+	transport http {
+		dial_timeout 300ms
+		response_header_timeout 13s
+	}
+}

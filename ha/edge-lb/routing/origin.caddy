@@ -1,0 +1,31 @@
+# Only the S2 label carrier supplies a standby application as the fourth argument.
+bind 127.0.0.1
+route {
+	@warm {
+		expression `"{args[3]}" != "disabled"`
+		file {
+			root /data/ha-drain
+			try_files /use-warm
+		}
+	}
+	handle @warm {
+		route {
+			import /data/ha-routing/origin-handlers.caddy {args[3]}:3000 {args[3]}:3000 {args[3]}:3099 {args[0]}
+		}
+	}
+	handle {
+		route {
+			import /data/ha-routing/origin-handlers.caddy {args[0]} {args[1]} {args[2]} {args[0]}
+		}
+	}
+}
+handle_errors {
+	header >X-HA-Upstream {args[0]}
+	handle /_ha/admit {
+		# Connection refused, timeout or missing readiness listener.
+		respond "admit" 200
+	}
+	handle {
+		import /data/ha-routing/unavailable.caddy
+	}
+}

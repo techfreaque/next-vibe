@@ -146,6 +146,7 @@ cmd_preflight() {
   if [ "$other" = "$NODE" ]; then
     [ -f "$CADDY_DRAIN_DIR/$NODE" ] && die "this box ($NODE) is drained at Caddy: never drain both nodes"
     local_probe || die "this box's app ($APP_URL) fails the DB-backed probe: refusing to move traffic onto it"
+    bash scripts/ha-edge-canary.sh || die "peer edge preflight failed"
     log "preflight OK: $NODE healthy and serving, ready to take $target's traffic"
   else
     log "preflight OK: no conflicting drain on $NODE"
@@ -174,6 +175,7 @@ cmd_edge_off() {
   check_node "$target"
   if [ "$target" = "$NODE" ]; then
     [ -f "$CADDY_DRAIN_DIR/$NODE" ] && warm_up
+    bash scripts/ha-edge-canary.sh || die "edge canary failed; keeping $NODE drained"
     rm -f "$CADDY_DRAIN_DIR/$NODE"
     log "caddy: $NODE serves its own traffic again"
   fi
@@ -199,6 +201,7 @@ cmd_swap() {
   [ "$from" != "$to" ] || die "swap needs two different nodes"
   if [ "$NODE" = "$from" ]; then
     local_probe || die "this box's app fails the DB-backed probe: not taking traffic back"
+    bash scripts/ha-edge-canary.sh || die "edge canary failed; refusing the swap"
     warm_up
     rm -f "$CADDY_DRAIN_DIR/$NODE"
     log "caddy: $NODE serves its own traffic again"

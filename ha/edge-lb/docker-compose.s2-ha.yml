@@ -16,12 +16,12 @@
 #
 # Guards (while Server 1 is primary): no migrations / seeds / db-function
 # deploys / task loop on this node. Server 1 owns migrations (it is rolled
-# first) and the cron/task runner. After a failover HA_DB_SETUP/HA_TASK_RUNNER
-# flip to true here and Server 1 is fenced (its app + Postgres stopped).
+# first) and the cron/task runner. Promotion enables only HA_TASK_RUNNER.
+# The replicated schema is already current and s2app is not its DDL owner.
 #
 # Port: WireGuard only (10.88.0.2:3100 -> container 3000, single-port proxy
-# mode = HTTP + /ws on one port). Server 1's Caddy uses it as its fallback
-# upstream; this box's Caddy reaches the app by container name. Public traffic
+# mode = HTTP + /ws on one port). The deploy script can probe this address.
+# S1's fallback uses the public S2 TLS edge; local Caddy uses the container name. Public traffic
 # arrives through Caddy, whose site config lives on the persistent
 # `unbottled-edge` container (docker-compose.s2-edge.yml) so recreating this
 # app never removes the vhost.
@@ -35,7 +35,7 @@ services:
     #   HA_REDIS_URL     redis://unbottled-redis:6379
     #   HA_S3_*          unbottled-minio (the replication target) + its creds
     #   HA_TASK_RUNNER   true (crons run here; S1 is fenced, never both)
-    #   HA_DB_SETUP      true (S2-only deploys then run migrations)
+    #   HA_DB_SETUP      false (schema changes require the migration owner)
     environment:
       DATABASE_URL: ${HA_DATABASE_URL:?HA_DATABASE_URL must be set in .env}
       # Smaller per-process pool than S1 (default 10): every S2 connection
@@ -57,6 +57,7 @@ services:
       S3_BUCKET: "chat-media"
       S3_ACCESS_KEY_ID: ${HA_S3_ACCESS_KEY_ID:-${S3_ACCESS_KEY_ID:?S3_ACCESS_KEY_ID must be set in .env}}
       S3_SECRET_ACCESS_KEY: ${HA_S3_SECRET_ACCESS_KEY:-${S3_SECRET_ACCESS_KEY:?S3_SECRET_ACCESS_KEY must be set in .env}}
+      HA_DB_ADMISSION: "true"
       VIBE_DISABLE_PROXY: "false"
       NEXT_PUBLIC_APP_URL: "https://unbottled.ai"
       NEXT_PUBLIC_PROJECT_URL: "https://unbottled.ai"

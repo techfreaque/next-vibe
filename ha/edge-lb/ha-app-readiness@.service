@@ -1,0 +1,18 @@
+[Unit]
+Description=Unbottled app database readiness (%i)
+After=docker.service
+Requires=docker.service
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+# Container recreation ends docker exec. The next invocation uses the new
+# container's credentials and network, including after an S2 promotion.
+ExecStart=/bin/sh -c 'exec /usr/bin/docker exec -i -w /app --user 64193:64193 %i bun - < /usr/local/lib/unbottled-ha/readiness.cjs'
+# Stopping the Docker CLI alone can leave the exec process inside the app.
+ExecStop=-/usr/bin/docker exec --user 64193:64193 %i sh -c 'read -r pid < /tmp/unbottled-ha-readiness.pid && kill -TERM "$$pid"'
+Restart=always
+RestartSec=1
+
+[Install]
+WantedBy=multi-user.target
