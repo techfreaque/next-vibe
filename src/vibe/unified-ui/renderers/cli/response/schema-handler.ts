@@ -29,7 +29,7 @@ interface ZodCheck {
 interface ZodInternal {
   _def: {
     innerType?: z.ZodTypeAny;
-    defaultValue?: () => FormFieldValue;
+    defaultValue?: FormFieldValue | (() => FormFieldValue);
     description?: string;
     checks?: ZodCheck[];
   };
@@ -136,19 +136,18 @@ export class SchemaUIHandler {
 
     // Extract default value and unwrap default schemas
     if (currentSchema instanceof z.ZodDefault && hasZodDef(currentSchema)) {
-      const defaultFn = currentSchema._def.defaultValue;
-      if (typeof defaultFn === "function") {
-        const value = defaultFn();
-        if (
-          typeof value === "string" ||
-          typeof value === "number" ||
-          typeof value === "boolean" ||
-          value === null ||
-          value === undefined ||
-          (Array.isArray(value) && value.every((v) => typeof v === "string"))
-        ) {
-          defaultValue = value;
-        }
+      // Zod 4 exposes the resolved default through a getter.
+      const rawDefault = currentSchema._def.defaultValue;
+      const value =
+        typeof rawDefault === "function" ? rawDefault() : rawDefault;
+      if (
+        typeof value === "string" ||
+        typeof value === "number" ||
+        typeof value === "boolean" ||
+        value === null ||
+        (Array.isArray(value) && value.every((v) => typeof v === "string"))
+      ) {
+        defaultValue = value;
       }
       const innerType = currentSchema._def.innerType;
       if (innerType) {
