@@ -8,6 +8,7 @@ export const translations = {
   bonusAccount:
     "Confirm your email: +{{bonusCredits}} free credits, {{freeCreditsMax}} a month in total.",
   emailPlaceholder: "you@example.com",
+  invalidEmail: "Enter a valid email address.",
   subscribe: "Subscribe",
   alreadyIn: "You are on the list. Watch your inbox.",
   success: "Almost there. Check your inbox to confirm.",

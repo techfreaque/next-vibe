@@ -18,7 +18,7 @@ import { Skeleton } from "next-vibe/ui/components/skeleton";
 import { Span } from "next-vibe/ui/components/span";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
 import type { JSX } from "react";
-import { useState } from "react";
+import { useId, useState } from "react";
 
 import { useNewsletterEmail } from "@/newsletter/promo-state";
 import type { StatusGetResponseOutput } from "@/newsletter/status/definition";
@@ -80,13 +80,11 @@ export function NewsletterSubscribeInline({
   const manualEmail = useNewsletterEmail((state) => state.email);
   const setManualEmail = useNewsletterEmail((state) => state.setEmail);
   const [editing, setEditing] = useState(false);
+  const validationMessageId = useId();
   const email = userEmail || manualEmail;
   const isLoggedIn = !user.isPublic;
-  const { submit, isPending, result } = useInlineNewsletterSubscription(
-    locale,
-    user,
-    promo.refresh,
-  );
+  const { submit, isPending, result, invalidEmail, clearValidationError } =
+    useInlineNewsletterSubscription(locale, user, promo.refresh);
   const isSubscribed = useInlineNewsletterAddressStatus(
     locale,
     user,
@@ -130,14 +128,17 @@ export function NewsletterSubscribeInline({
     );
   }
 
-  const notificationMessage =
-    result === "error"
-      ? t("error")
-      : result === "sent"
-        ? t("success")
-        : isSubscribed
-          ? t("alreadyIn")
-          : null;
+  const hasValidationError = invalidEmail === email;
+  let notificationMessage: string | null = null;
+  if (hasValidationError) {
+    notificationMessage = t("invalidEmail");
+  } else if (result === "error") {
+    notificationMessage = t("error");
+  } else if (result === "sent") {
+    notificationMessage = t("success");
+  } else if (isSubscribed) {
+    notificationMessage = t("alreadyIn");
+  }
 
   return (
     <Div className={cn("flex w-full flex-col gap-3", className)}>
@@ -154,12 +155,8 @@ export function NewsletterSubscribeInline({
       )}
 
       <Form
-        onSubmit={() => {
-          if (!email.includes("@")) {
-            return;
-          }
-          return submit(email);
-        }}
+        noValidate
+        onSubmit={() => submit(email)}
         className="flex flex-col gap-2 sm:flex-row"
       >
         <Input<"email">
@@ -174,10 +171,15 @@ export function NewsletterSubscribeInline({
           onChange={(event) => {
             if (user.isPublic) {
               setEditing(true);
+              clearValidationError();
               setManualEmail(event.target.value);
             }
           }}
           aria-label={t("emailPlaceholder")}
+          aria-invalid={hasValidationError || undefined}
+          aria-describedby={
+            hasValidationError ? validationMessageId : undefined
+          }
           disabled={isPending || isLoggedIn}
           name="email"
           id={`newsletter-email-inline-${variant}`}
@@ -200,9 +202,11 @@ export function NewsletterSubscribeInline({
 
       {notificationMessage !== null && (
         <Div
+          id={hasValidationError ? validationMessageId : undefined}
+          role={hasValidationError ? "alert" : undefined}
           className={cn(
             "rounded-lg border px-3 py-2 text-xs",
-            result === "error"
+            hasValidationError || result === "error"
               ? "border-destructive/30 bg-destructive/10 text-destructive"
               : "border-success/30 bg-success/10 text-success",
           )}
@@ -263,11 +267,8 @@ export function NewsletterPendingNotice({
 }): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
   const promo = useInlineNewsletterPromo(locale, user);
-  const { submit, isPending, result } = useInlineNewsletterSubscription(
-    locale,
-    user,
-    promo.refresh,
-  );
+  const { submit, isPending, result, invalidEmail } =
+    useInlineNewsletterSubscription(locale, user, promo.refresh);
 
   return (
     <Div
@@ -308,8 +309,10 @@ export function NewsletterPendingNotice({
           {result === "sent" && (
             <Span className="text-xs text-success">{t("pending.resent")}</Span>
           )}
-          {result === "error" && (
-            <Span className="text-xs text-destructive">{t("error")}</Span>
+          {(invalidEmail === email || result === "error") && (
+            <Span className="text-xs text-destructive">
+              {t(invalidEmail === email ? "invalidEmail" : "error")}
+            </Span>
           )}
         </Div>
       )}

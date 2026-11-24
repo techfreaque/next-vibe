@@ -103,6 +103,8 @@ interface InlineSubscription {
   submit: (email: string) => Promise<void>;
   isPending: boolean;
   result: "sent" | "error" | null;
+  invalidEmail: string | null;
+  clearValidationError: () => void;
 }
 
 export function useInlineNewsletterSubscription(
@@ -113,6 +115,7 @@ export function useInlineNewsletterSubscription(
   const logger = useLogger();
   const submitting = useRef(false);
   const [loadFailed, setLoadFailed] = useState(false);
+  const [invalidEmail, setInvalidEmail] = useState<string | null>(null);
   const mutation = useMutation({
     mutationFn: async ({
       endpoint,
@@ -144,16 +147,20 @@ export function useInlineNewsletterSubscription(
       return;
     }
     submitting.current = true;
+    setLoadFailed(false);
+    setInvalidEmail(null);
+    mutation.reset();
     try {
       const { default: endpoints } = await import("../subscribe/definition");
       const request = endpoints.POST.requestSchema.safeParse({ email });
-      if (request.success) {
-        setLoadFailed(false);
-        await mutation.mutateAsync({
-          endpoint: endpoints.POST,
-          requestData: request.data,
-        });
+      if (!request.success) {
+        setInvalidEmail(email);
+        return;
       }
+      await mutation.mutateAsync({
+        endpoint: endpoints.POST,
+        requestData: request.data,
+      });
     } catch (error) {
       logger.error(
         "Failed to submit inline newsletter subscription",
@@ -174,5 +181,9 @@ export function useInlineNewsletterSubscription(
         : mutation.data?.success
           ? "sent"
           : null,
+    invalidEmail,
+    clearValidationError: () => {
+      setInvalidEmail(null);
+    },
   };
 }

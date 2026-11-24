@@ -10,6 +10,7 @@ export const translations: typeof enTranslations = {
   bonusAccount:
     "Potwierdź e-mail: +{{bonusCredits}} darmowych kredytów, razem {{freeCreditsMax}} miesięcznie.",
   emailPlaceholder: "ty@przyklad.pl",
+  invalidEmail: "Wpisz poprawny adres e-mail.",
   subscribe: "Zapisz się",
   alreadyIn: "Jesteś na liście. Zajrzyj do skrzynki.",
   success: "Już prawie. Sprawdź skrzynkę i potwierdź.",

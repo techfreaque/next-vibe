@@ -21,6 +21,7 @@ export interface FormProps<TRequest extends FieldValues = FieldValues> {
   form?: UseFormReturn<TRequest>;
   onSubmit?: () => void | Promise<void>;
   className?: string;
+  noValidate?: boolean;
   /** When true, renders FormProvider without a <form> element.
    *  Use this to embed form fields inside an existing form (avoids nested <form>). */
   noFormElement?: boolean;
@@ -133,6 +134,7 @@ export function Form<TRequest extends FieldValues>(
         <form
           className={cn(props.className)}
           onSubmit={handleSubmit}
+          noValidate={props.noValidate}
           data-hydrated={hydratedAttr}
         >
           {props.children}
@@ -146,6 +148,7 @@ export function Form<TRequest extends FieldValues>(
     <form
       className={cn(props.className)}
       onSubmit={handleSubmit}
+      noValidate={props.noValidate}
       data-hydrated={hydratedAttr}
     >
       {props.children}

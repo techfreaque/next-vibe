@@ -159,6 +159,8 @@ export type InputProps<
   name?: string;
   id?: string;
   "aria-label"?: string;
+  "aria-invalid"?: boolean;
+  "aria-describedby"?: string;
 } & StyleType;
 
 const keyboardInputModes = {
