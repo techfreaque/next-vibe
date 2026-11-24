@@ -49,6 +49,11 @@ import {
 } from "../../_shared/marketing";
 import type { UsParams } from "../../compare/_shared/us-facts";
 import {
+  AlternativesComparison,
+  alternativesFaq,
+  AlternativesLinks,
+} from "../_alternatives/comparison";
+import {
   type ComparePair,
   pickRow,
   UncensoredModelTable,
@@ -187,11 +192,14 @@ export function TanstackPage({
       (key !== "imagine" || imagine.length > 0) &&
       ((key !== "account" && key !== "price") || grok !== undefined),
   );
-  const faq = faqKeys.map((key) => ({
-    key,
-    question: t(`faq.${key}.q`, stats),
-    answer: t(`faq.${key}.a`, stats),
-  }));
+  const faq = [
+    ...faqKeys.map((key) => ({
+      key,
+      question: t(`faq.${key}.q`, stats),
+      answer: t(`faq.${key}.a`, stats),
+    })),
+    alternativesFaq(SLUG, locale, us.appName),
+  ];
 
   return (
     <Div className="min-h-screen bg-background">
@@ -209,6 +217,8 @@ export function TanstackPage({
           <ArticleLead>{t("intro.lead")}</ArticleLead>
           <ArticleP>{t("intro.p2", stats)}</ArticleP>
         </Div>
+
+        <AlternativesComparison locale={locale} slug={SLUG} us={us} />
 
         <ArticleSection
           id="honest"
@@ -366,6 +376,8 @@ export function TanstackPage({
             />
           </Div>
         </ArticleSection>
+
+        <AlternativesLinks locale={locale} exclude={SLUG} />
 
         <ArticleEnd
           post={{ slug: SLUG, locale }}

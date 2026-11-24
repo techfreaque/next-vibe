@@ -5,7 +5,7 @@ export const translations: typeof enTranslations = {
     title:
       "Alternatives à Grok : moins filtré que Grok, même chat | {{appName}}",
     description:
-      "Grok est-il non censuré ? Pas vraiment. Jusqu'où Grok va vraiment, les meilleures alternatives à Grok selon vos besoins, et comment utiliser Grok à côté de modèles abliterated dans un même chat. Prix en direct.",
+      "Comparez les alternatives à Grok pour la recherche web, les médias et le chat avec moins de refus. Avec {{appName}}, Perplexity, Gemini, Venice et des applis locales.",
     category: "Comparatif",
     imageAlt: "Grok à côté d'alternatives non censurées",
     keywords:
@@ -15,27 +15,27 @@ export const translations: typeof enTranslations = {
     backToBlog: "Retour au blog",
     category: "Comparatif",
     readTime: "7 min de lecture",
-    title: "Alternatives à Grok. Quand l'insolence ne suffit plus.",
+    title: "Alternatives à Grok pour la recherche, les médias et le chat",
     subtitle:
-      "Jusqu'où Grok va vraiment, {{count}} alternatives sans couche de refus, et Grok lui-même dans le même chat.",
+      "Comparez Grok à des assistants de recherche, des applis de création et des modèles qui refusent moins de demandes.",
   },
   intro: {
-    lead: "Grok se vend comme l'IA qui dit ce que les autres taisent. Face à ChatGPT et Claude, c'est souvent vrai. Ça reste un modèle d'entreprise, avec des règles que son propriétaire peut changer du jour au lendemain.",
+    lead: "Grok peut chercher sur X et sur le web, discuter à voix haute et générer des images et des vidéos. Ses règles d’utilisation fixent des limites. La meilleure alternative dépend des fonctions que vous utilisez le plus.",
     p2: "Ici : ce que Grok fait ou refuse, les alternatives classées selon ce que vous voulez vraiment, et comment garder {{grokName}} tout en ajoutant des modèles sans refus, dans un même fil. {{appName}} fait tourner {{grokName}} à côté de {{uncensored}} modèles non censurés.",
   },
   honest: {
-    title: "Grok est-il vraiment sans filtre ?",
-    intro: "Plus détendu que les deux géants. Pas non censuré.",
+    title: "Fonctions et limites de Grok",
+    intro: "Le ton de la conversation et les règles d’utilisation.",
     looser:
-      "Plus détendu. Grok accepte l'humour grinçant, les avis tranchés et les sujets rugueux que les chatbots grand public esquivent ou noient sous les avertissements.",
+      "Style. Grok propose le chat écrit et vocal. Le ton dépend du modèle et du mode choisis.",
     filtered:
       "Toujours filtré. xAI garde une politique d'utilisation et un entraînement de sécurité. Certaines demandes sont encore refusées, adoucies ou détournées.",
     shifts:
-      "Cible mouvante. xAI règle le comportement et le prompt système de Grok souvent, et publiquement. Ce qui marchait le mois dernier peut ne plus marcher aujourd'hui.",
+      "Les mises à jour des modèles et des règles peuvent modifier les réponses. Essayez les fonctions qui vous importent avec vos demandes habituelles.",
     catalog:
-      "Notre catalogue range {{grokName}} dans le niveau {{grokTier}} : moins de refus que les modèles grand public, mais toujours une politique derrière.",
+      "Notre catalogue classe {{grokName}} dans le niveau {{grokTier}}. Les règles du fournisseur s’appliquent toujours.",
     callout:
-      "Un modèle d'entreprise plus détendu reste un modèle d'entreprise. Ses limites sont fixées par une seule société, et elles bougent.",
+      "Vérifiez les fonctions du produit, les règles du fournisseur et le modèle que vous comptez utiliser.",
   },
   why: {
     title: "Pourquoi chercher une alternative à Grok",

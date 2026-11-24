@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "Grok-Alternativen: weniger Filter, gleicher Chat | {{appName}}",
     description:
-      "Ist Grok unzensiert? Nicht ganz. Wie ungefiltert Grok wirklich ist, die besten Grok-Alternativen nach Einsatzzweck und wie du Grok neben abliterierten Modellen in einem Chat nutzt. Live-Preise.",
+      "Grok-Alternativen für Webrecherche, Medien und Chats mit weniger Ablehnungen. Mit {{appName}}, Perplexity, Gemini, Venice und lokalen Apps.",
     category: "Vergleich",
     imageAlt: "Grok neben unzensierten Grok-Alternativen",
     keywords:
@@ -14,27 +14,27 @@ export const translations: typeof enTranslations = {
     backToBlog: "Zurück zum Blog",
     category: "Vergleich",
     readTime: "7 Min. Lesezeit",
-    title: "Grok-Alternativen. Wenn frech nicht reicht.",
+    title: "Grok-Alternativen für Suche, Medien und Chat",
     subtitle:
-      "Wie ungefiltert Grok wirklich ist, {{count}} Alternativen ohne Verweigerungsschicht und Grok selbst im selben Chat.",
+      "Vergleiche Grok mit Rechercheassistenten, Kreativ-Apps und Modellen, die seltener ablehnen.",
   },
   intro: {
-    lead: "Grok verkauft sich als die KI, die sagt, was andere nicht sagen. Neben ChatGPT und Claude stimmt das oft. Trotzdem bleibt es ein Konzernmodell mit Regeln, die sein Eigentümer über Nacht ändern kann.",
+    lead: "Grok durchsucht X und das Web, führt Sprachdialoge und erzeugt Bilder und Videos. Die veröffentlichten Nutzungsregeln setzen Grenzen. Welche Alternative passt, hängt davon ab, wofür du Grok am häufigsten nutzt.",
     p2: "Hier: was Grok macht und was nicht, die Alternativen nach dem, was du wirklich willst, und wie du {{grokName}} behältst und Modelle ohne Verweigerungen dazunimmst, in einem Thread. {{appName}} betreibt {{grokName}} neben {{uncensored}} unzensierten Modellen.",
   },
   honest: {
-    title: "Wie ungefiltert ist Grok wirklich?",
-    intro: "Lockerer als die großen zwei. Nicht unzensiert.",
+    title: "Funktionen und Grenzen von Grok",
+    intro: "Gesprächston und Nutzungsregeln.",
     looser:
-      "Lockerer. Grok macht Witze, Hot Takes und raue Themen mit, denen Mainstream-Chatbots ausweichen oder die sie in Warnhinweise packen.",
+      "Gesprächsstil. Grok bietet Text und Sprache. Der Ton hängt von Modell und Modus ab.",
     filtered:
       "Trotzdem gefiltert. xAI hat Nutzungsrichtlinien und Sicherheitstraining. Manche Anfragen werden weiter abgelehnt, entschärft oder umgelenkt.",
     shifts:
-      "Bewegliches Ziel. xAI justiert Groks Verhalten und Systemprompt oft und öffentlich nach. Was letzten Monat ging, geht heute vielleicht nicht mehr.",
+      "Neue Modelle und Richtlinien können Antworten verändern. Prüfe deine wichtigsten Funktionen mit typischen Aufgaben.",
     catalog:
-      "Unser Katalog ordnet {{grokName}} in die Stufe {{grokTier}} ein: weniger Verweigerungen als Mainstream-Modelle, aber weiter mit Regeln dahinter.",
+      "Wir führen {{grokName}} in der Stufe {{grokTier}}. Die Nutzungsregeln des Anbieters gelten weiterhin.",
     callout:
-      "Ein lockeres Konzernmodell bleibt ein Konzernmodell. Seine Grenzen setzt eine einzige Firma, und sie verschieben sich.",
+      "Vergleiche Funktionen, Anbieterrichtlinien und genau das Modell, das du einsetzen willst.",
   },
   why: {
     title: "Warum Leute eine Grok-Alternative suchen",

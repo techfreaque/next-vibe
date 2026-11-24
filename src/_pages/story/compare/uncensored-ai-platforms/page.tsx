@@ -38,6 +38,7 @@ import {
   ArticleSection,
 } from "../../_shared/article";
 import { Callout, CardLink, Cta } from "../../_shared/marketing";
+import { AlternativesLinks } from "../../blog/_alternatives/comparison";
 import { scopedTranslation as uncensoredChatTranslation } from "../../uncensored-ai/i18n";
 import {
   allPlansText,
@@ -434,6 +435,8 @@ export function TanstackPage({
         >
           <CompareLinks locale={locale} includeHub={false} />
         </ArticleSection>
+
+        <AlternativesLinks locale={locale} />
 
         <ArticleSection
           id="methodology"
