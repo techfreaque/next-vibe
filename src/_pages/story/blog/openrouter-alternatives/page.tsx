@@ -47,12 +47,9 @@ import { Callout, CardLink, Cta } from "../../_shared/marketing";
 import {
   allPlansText,
   CompareInlineLinks,
-  CompareTable,
   formatCompareDate,
   freeText,
   LINK_CLASS,
-  platformRow,
-  usRow,
 } from "../../compare/_shared/compare-ui";
 import {
   COMPARE_CHECKED_DATE,
@@ -63,6 +60,13 @@ import {
 } from "../../compare/_shared/platforms";
 import type { UsParams } from "../../compare/_shared/us-facts";
 import { scopedTranslation as compareScopedTranslation } from "../../compare/i18n";
+import { MARKET_CHECKED_DATE } from "../_alternatives/catalog";
+import {
+  AlternativesComparison,
+  alternativesFaq,
+  AlternativesLinks,
+  alternativesTotal,
+} from "../_alternatives/comparison";
 import { UncensoredModelTable, type UncensoredRow } from "../uncensored-rows";
 import { loadUncensoredRows } from "../uncensored-rows-data";
 import { scopedTranslation } from "./i18n";
@@ -84,8 +88,6 @@ const ALTERNATIVES: readonly PlatformKey[] = [
   "freedomGpt",
   "ollama",
 ];
-
-const TABLE_KEYS: readonly PlatformKey[] = [...ALTERNATIVES, "openRouter"];
 
 const FAQ_KEYS: readonly (
   | "best"
@@ -173,15 +175,14 @@ export function TanstackPage({
     apiUncensored: rows.length,
     example: example?.id ?? "",
   };
-  const tableRows = [
-    usRow(locale, compareT, us),
-    ...TABLE_KEYS.map((key) => platformRow(PLATFORMS[key], locale, compareT)),
+  const faq = [
+    ...FAQ_KEYS.map((key) => ({
+      key,
+      question: t(`faq.${key}.q`, stats),
+      answer: t(`faq.${key}.a`, stats),
+    })),
+    alternativesFaq(SLUG, locale, us.appName),
   ];
-  const faq = FAQ_KEYS.map((key) => ({
-    key,
-    question: t(`faq.${key}.q`, stats),
-    answer: t(`faq.${key}.a`, stats),
-  }));
 
   return (
     <Div className="min-h-screen bg-background">
@@ -191,7 +192,11 @@ export function TanstackPage({
         readTime={t("hero.readTime")}
         post={{ slug: SLUG, locale }}
         title={t("hero.title")}
-        subtitle={t("hero.subtitle", stats)}
+        subtitle={t("hero.subtitle", {
+          ...stats,
+          count: alternativesTotal(SLUG, ALTERNATIVES),
+          date: formatCompareDate(MARKET_CHECKED_DATE, locale),
+        })}
       />
 
       <ArticleBody>
@@ -217,13 +222,13 @@ export function TanstackPage({
           />
         </ArticleSection>
 
-        <ArticleSection
-          id="table"
+        <AlternativesComparison
+          locale={locale}
+          slug={SLUG}
+          us={us}
+          platforms={ALTERNATIVES}
           title={t("table.title")}
-          intro={t("table.intro", stats)}
-        >
-          <CompareTable rows={tableRows} locale={locale} />
-        </ArticleSection>
+        />
 
         <ArticleSection
           id="us"
@@ -419,10 +424,13 @@ export function TanstackPage({
             />
             <CompareInlineLinks
               locale={locale}
+              includeHub={false}
               versus={["openRouter", "nanoGpt", "venice"]}
             />
           </Div>
         </ArticleSection>
+
+        <AlternativesLinks locale={locale} exclude={SLUG} />
 
         <ArticleEnd
           post={{ slug: SLUG, locale }}

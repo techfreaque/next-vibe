@@ -5,7 +5,7 @@ export const translations: typeof enTranslations = {
     title:
       "OpenRouter-Alternativen mit unzensierten Modellen (2026) | {{appName}}",
     description:
-      "OpenRouter-Alternativen, geprüft an ihren eigenen Docs und Preisseiten: NanoGPT, Venice, uncensored.ai, Gab AI, FreedomGPT, Ollama und {{appName}}. API-Formate, unzensierte Modelle, Gebühren und ein Umstieg in zwei Zeilen.",
+      "OpenRouter im Vergleich mit Vercel AI Gateway, LiteLLM, Portkey, Cloudflare, NanoGPT und {{appName}}. Gebühren, Eigenbetrieb, Filter und Datenschutz.",
     category: "Entwickler-Guide",
     imageAlt: "OpenRouter-Alternativen für Entwickler im Vergleich",
     keywords:
@@ -15,13 +15,13 @@ export const translations: typeof enTranslations = {
     backToBlog: "Zurück zum Blog",
     category: "Entwickler-Guide",
     readTime: "9 Min. Lesezeit",
-    title: "OpenRouter-Alternativen. Ein Schlüssel, weniger Verweigerungen.",
+    title: "OpenRouter-Alternativen für Modellrouting",
     subtitle:
       "{{count}} Alternativen und {{appName}} im Vergleich: API-Formate, unzensierte Modelle, Gebühren. Geprüft am {{date}}.",
   },
   intro: {
-    lead: "OpenRouter ist die Standardantwort auf einen Schlüssel für alle Modelle. Eine gute Antwort. Aber das unzensierte Regal ist dünn, auf jede Aufladung kommt eine Gebühr, und es ist eine API, kein Ort, an dem dein Team chatten kann.",
-    p2: "Hier: was du vor dem Wechsel prüfen solltest, {{count}} Alternativen laut ihren eigenen Docs und Preisseiten (geprüft am {{date}}) und wo {{appName}} hineinpasst. Offen gesagt: Wir kaufen selbst bei OpenRouter ein. {{openRouterModels}} unserer Modelle laufen darüber.",
+    lead: "OpenRouter verbindet eine API mit vielen Anbietern und bietet einen Webchat. Der Standardtarif nennt 5,5 % Plattformgebühr. Andere Gateways lohnen sich, wenn du den Router selbst betreiben, Limits feiner steuern oder anders abrechnen willst.",
+    p2: "Wir haben Cloud-Gateways, selbst betriebene Proxys und Apps mit unzensierten Modellen anhand offizieller Dokumentation und Preise geprüft. Wir kaufen selbst bei OpenRouter ein. {{openRouterModels}} unserer Modelle laufen darüber.",
   },
   criteria: {
     title: "Was du vor dem Wechsel vergleichen solltest",
@@ -39,8 +39,6 @@ export const translations: typeof enTranslations = {
   },
   table: {
     title: "Alle im direkten Vergleich",
-    intro:
-      "Auf dem Handy seitlich scrollen. Angaben der Anbieter am {{date}} auf ihren eigenen Seiten geprüft. Angaben zu {{appName}} live aus unserer Konfiguration. OpenRouter schließt die Tabelle als Referenz ab.",
   },
   us: {
     title: "{{appName}}: ein Schlüssel, jede Art von Modell",

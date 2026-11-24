@@ -5,7 +5,7 @@ export const translations: typeof enTranslations = {
     title:
       "Alternative a OpenRouter con modelli senza censura (2026) | {{appName}}",
     description:
-      "Alternative a OpenRouter confrontate sulla loro documentazione e sui listini: NanoGPT, Venice, uncensored.ai, Gab AI, FreedomGPT, Ollama e {{appName}}. Formati API, modelli senza censura, commissioni e un passaggio in due righe.",
+      "Confronta OpenRouter con Vercel AI Gateway, LiteLLM, Portkey, Cloudflare, NanoGPT e {{appName}}. Costi, hosting proprio, filtri e privacy.",
     category: "Guida per sviluppatori",
     imageAlt: "Alternative a OpenRouter per sviluppatori, a confronto",
     keywords:
@@ -15,13 +15,13 @@ export const translations: typeof enTranslations = {
     backToBlog: "Torna al blog",
     category: "Guida per sviluppatori",
     readTime: "9 min di lettura",
-    title: "Alternative a OpenRouter. Una chiave, meno rifiuti.",
+    title: "Alternative a OpenRouter per instradare le richieste ai modelli",
     subtitle:
       "{{count}} alternative e {{appName}} a confronto: formati API, modelli senza censura, commissioni. Verificato il {{date}}.",
   },
   intro: {
-    lead: "OpenRouter è la risposta di default a una chiave per tutti i modelli. Una buona risposta. Ma lo scaffale senza censura è scarno, ogni ricarica paga una commissione ed è un'API, non un posto dove il tuo team può chattare.",
-    p2: "Qui sotto: cosa controllare prima di cambiare, {{count}} alternative secondo la loro documentazione e i loro listini (verificato il {{date}}) e dove si colloca {{appName}}. Trasparenza totale: anche noi compriamo da OpenRouter. {{openRouterModels}} dei nostri modelli passano da lì.",
+    lead: "OpenRouter collega più fornitori con una chiave API e offre una chat web. Il piano Standard indica una commissione del 5,5%. Confronta gli altri gateway se vuoi gestire il router in proprio, affinare i limiti o cambiare metodo di fatturazione.",
+    p2: "Abbiamo verificato gateway ospitati, proxy da installare in proprio e app con modelli senza censura consultando documentazione e listini ufficiali. Anche noi acquistiamo accesso da OpenRouter. {{openRouterModels}} dei nostri modelli passano da lì.",
   },
   criteria: {
     title: "Cosa confrontare prima di cambiare",
@@ -39,8 +39,6 @@ export const translations: typeof enTranslations = {
   },
   table: {
     title: "Tutte a confronto",
-    intro:
-      "Su mobile scorri di lato. Dati dei concorrenti verificati il {{date}} sulle loro pagine. Dati di {{appName}} letti in tempo reale dalla nostra configurazione. OpenRouter chiude la tabella come riferimento.",
   },
   us: {
     title: "{{appName}}: una chiave, ogni tipo di modello",

@@ -5,7 +5,7 @@ export const translations: typeof enTranslations = {
     title:
       "Alternatives à OpenRouter avec modèles non censurés (2026) | {{appName}}",
     description:
-      "Alternatives à OpenRouter comparées d'après leur propre doc et leurs pages de prix : NanoGPT, Venice, uncensored.ai, Gab AI, FreedomGPT, Ollama et {{appName}}. Formats d'API, modèles non censurés, frais, et une migration en deux lignes.",
+      "Comparez OpenRouter à Vercel AI Gateway, LiteLLM, Portkey, Cloudflare, NanoGPT et {{appName}}. Frais, autohébergement, filtres et confidentialité.",
     category: "Guide développeur",
     imageAlt: "Alternatives à OpenRouter pour développeurs, comparées",
     keywords:
@@ -15,13 +15,13 @@ export const translations: typeof enTranslations = {
     backToBlog: "Retour au blog",
     category: "Guide développeur",
     readTime: "9 min de lecture",
-    title: "Alternatives à OpenRouter. Une clé, moins de refus.",
+    title: "Alternatives à OpenRouter pour le routage des modèles",
     subtitle:
       "{{count}} alternatives et {{appName}} comparées : formats d'API, modèles non censurés, frais. Vérifié le {{date}}.",
   },
   intro: {
-    lead: "OpenRouter, c'est la réponse par défaut à une clé pour tous les modèles. Une bonne réponse. Mais son rayon non censuré est maigre, des frais tombent sur chaque recharge, et c'est une API, pas un endroit où votre équipe peut discuter.",
-    p2: "Ci-dessous : ce qu'il faut vérifier avant de changer, {{count}} alternatives d'après leur propre doc et leurs pages de prix (vérifié le {{date}}), et la place de {{appName}}. En toute transparence : nous achetons aussi chez OpenRouter. {{openRouterModels}} de nos modèles passent par lui.",
+    lead: "OpenRouter donne accès à plusieurs fournisseurs avec une clé API et propose un chat web. Son offre Standard affiche 5,5 % de frais de plateforme. Comparez les autres passerelles pour héberger le routeur vous-même, affiner les limites ou changer de facturation.",
+    p2: "Nous avons comparé les passerelles hébergées, les proxys autohébergés et les applis avec des modèles sans censure à partir de leur documentation et de leurs tarifs officiels. Nous sommes aussi clients d’OpenRouter. {{openRouterModels}} de nos modèles passent par ce service.",
   },
   criteria: {
     title: "Ce qu'il faut comparer avant de changer",
@@ -39,8 +39,6 @@ export const translations: typeof enTranslations = {
   },
   table: {
     title: "Toutes, côte à côte",
-    intro:
-      "Faites défiler sur mobile. Infos des concurrents vérifiées le {{date}} sur leurs propres pages. Infos {{appName}} lues en direct dans notre configuration. OpenRouter ferme le tableau comme référence.",
   },
   us: {
     title: "{{appName}} : une clé, tous les types de modèles",

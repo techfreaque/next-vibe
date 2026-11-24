@@ -3,7 +3,7 @@ export const translations = {
     title:
       "OpenRouter Alternatives With Uncensored Models (2026) | {{appName}}",
     description:
-      "OpenRouter alternatives compared from their own docs and pricing pages: NanoGPT, Venice, uncensored.ai, Gab AI, FreedomGPT, Ollama and {{appName}}. API formats, uncensored coverage, fees, and a two-line switch.",
+      "Compare OpenRouter with Vercel AI Gateway, LiteLLM, Portkey, Cloudflare, NanoGPT and {{appName}}. See hosted fees, self-hosting, filters and privacy.",
     category: "Developer Guide",
     imageAlt: "OpenRouter alternatives for developers, compared",
     keywords:
@@ -13,13 +13,13 @@ export const translations = {
     backToBlog: "Back to Blog",
     category: "Developer Guide",
     readTime: "9 min read",
-    title: "OpenRouter alternatives. One key, fewer refusals.",
+    title: "OpenRouter alternatives for routing model requests",
     subtitle:
       "{{count}} alternatives and {{appName}}, compared on API formats, uncensored coverage and fees. Checked {{date}}.",
   },
   intro: {
-    lead: "OpenRouter is the default answer to one key for every model. A good answer. But its uncensored shelf is thin, a fee sits on every top-up, and it is an API, not a place your team can chat.",
-    p2: "Below: what to check before you switch, {{count}} alternatives from their own docs and pricing pages (checked {{date}}), and where {{appName}} fits. Full disclosure: we buy from OpenRouter too. {{openRouterModels}} of our models route through it.",
+    lead: "OpenRouter routes one API key across many providers and offers a web chat. Its Standard plan lists a 5.5% platform fee. Compare other gateways if you want to run the router yourself, set more granular limits or change how you pay.",
+    p2: "We checked hosted gateways, self-hosted proxies and apps with uncensored models against their official docs and pricing. We buy model access from OpenRouter too. {{openRouterModels}} of our models route through it.",
   },
   criteria: {
     title: "What to compare before you switch",
@@ -37,8 +37,6 @@ export const translations = {
   },
   table: {
     title: "All of them, side by side",
-    intro:
-      "Scroll sideways on mobile. Competitor facts checked {{date}} on their own pages. {{appName}} facts read live from our config. OpenRouter closes the table as the baseline.",
   },
   us: {
     title: "{{appName}}: one key, every kind of model",

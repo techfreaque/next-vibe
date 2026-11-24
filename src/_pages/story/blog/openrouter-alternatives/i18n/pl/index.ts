@@ -5,7 +5,7 @@ export const translations: typeof enTranslations = {
     title:
       "Alternatywy dla OpenRoutera z modelami bez cenzury (2026) | {{appName}}",
     description:
-      "Alternatywy dla OpenRoutera sprawdzone w ich własnej dokumentacji i cennikach: NanoGPT, Venice, uncensored.ai, Gab AI, FreedomGPT, Ollama i {{appName}}. Formaty API, modele bez cenzury, opłaty i przesiadka w dwóch linijkach.",
+      "Porównaj OpenRouter z Vercel AI Gateway, LiteLLM, Portkey, Cloudflare, NanoGPT i {{appName}}. Sprawdź opłaty, własny hosting, filtry i prywatność.",
     category: "Przewodnik dla deweloperów",
     imageAlt: "Alternatywy dla OpenRoutera dla deweloperów, porównanie",
     keywords:
@@ -15,13 +15,13 @@ export const translations: typeof enTranslations = {
     backToBlog: "Wróć do bloga",
     category: "Przewodnik dla deweloperów",
     readTime: "9 min czytania",
-    title: "Alternatywy dla OpenRoutera. Jeden klucz, mniej odmów.",
+    title: "Alternatywy dla OpenRouter do przekazywania zapytań do modeli",
     subtitle:
       "{{count}} alternatyw i {{appName}} w porównaniu: formaty API, modele bez cenzury, opłaty. Sprawdzone {{date}}.",
   },
   intro: {
-    lead: "OpenRouter to domyślna odpowiedź na jeden klucz do wszystkich modeli. Dobra odpowiedź. Ale półka z modelami bez cenzury jest pustawa, każde doładowanie obciąża opłata, a to API, nie miejsce, w którym twój zespół może czatować.",
-    p2: "Poniżej: co sprawdzić przed zmianą, {{count}} alternatyw według ich własnej dokumentacji i cenników (sprawdzone {{date}}) i gdzie pasuje {{appName}}. Uczciwie: sami kupujemy od OpenRoutera. Przez niego idzie {{openRouterModels}} naszych modeli.",
+    lead: "OpenRouter zapewnia dostęp do wielu dostawców przez jeden klucz API i ma czat w przeglądarce. W planie Standard podaje 5,5% opłaty platformowej. Porównaj inne bramki, jeśli zależy ci na własnym hostingu, dokładniejszych limitach lub innym rozliczaniu.",
+    p2: "Sprawdziliśmy bramki w chmurze, samodzielnie hostowane proxy i aplikacje z modelami bez cenzury w oficjalnych dokumentacjach i cennikach. Sami kupujemy dostęp od OpenRoutera. Przez niego działa {{openRouterModels}} naszych modeli.",
   },
   criteria: {
     title: "Co porównać przed zmianą",
@@ -38,8 +38,6 @@ export const translations: typeof enTranslations = {
   },
   table: {
     title: "Wszystkie obok siebie",
-    intro:
-      "Na telefonie przewiń w bok. Dane konkurencji sprawdzone {{date}} na ich własnych stronach. Dane {{appName}} na żywo z naszej konfiguracji. Tabelę zamyka OpenRouter jako punkt odniesienia.",
   },
   us: {
     title: "{{appName}}: jeden klucz, każdy rodzaj modelu",
