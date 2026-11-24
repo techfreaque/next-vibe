@@ -51,6 +51,7 @@ import {
 import { EndpointsPage } from "../../unified-ui/renderers/web/EndpointsPage";
 import {
   WIZARD_DISMISSED_STORAGE_KEY,
+  WIZARD_PROGRESS_DONE,
   WIZARD_PROGRESS_STORAGE_KEY,
 } from "./constants";
 import type endpoints from "./definition";
@@ -405,10 +406,11 @@ export function SystemSettingsWidget(): JSX.Element {
       // A saved wizard step restarts the dev server and reloads the page.
       // Reopen the wizard where the user was, even though the step just
       // fixed the onboarding issue that opened it.
-      const inProgress = !!(await storage.getItem(
+      const progress = await storage.getItem(
         WIZARD_PROGRESS_STORAGE_KEY,
         logger,
-      ));
+      );
+      const inProgress = !!progress && progress !== WIZARD_PROGRESS_DONE;
       const hasDefaultPassword = value.onboardingIssues?.some((issue) =>
         issue.toLowerCase().includes("default"),
       );
