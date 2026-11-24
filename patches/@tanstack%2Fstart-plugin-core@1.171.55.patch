@@ -89,3 +89,17 @@ diff --git a/dist/esm/start-compiler/handleCreateServerFn.js b/dist/esm/start-co
  }
  /**
  * Handles createServerFn transformations for a batch of candidates.
+diff --git a/dist/esm/start-compiler/compiler.js b/dist/esm/start-compiler/compiler.js
+--- a/dist/esm/start-compiler/compiler.js
++++ b/dist/esm/start-compiler/compiler.js
+@@ -693,7 +693,9 @@
+ 					methodChain
+ 				});
+ 			}
+-			const refIdents = findReferencedIdentifiers(ast);
++			// Scope setup still traverses every reference. The snapshot only
++			// needs declarations and can skip unrelated source branches.
++			const refIdents = findReferencedIdentifiers(ast, true);
+ 			const context = {
+ 				ast,
+ 				id,

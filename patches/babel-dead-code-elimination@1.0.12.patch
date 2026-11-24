@@ -22,15 +22,39 @@ diff --git a/dist/index.js b/dist/index.js
            path.remove();
          }
        },
-@@ -417,10 +419,13 @@
+@@ -415,12 +417,36 @@
+     referenced.add(ident);
+   }
  }
- function find_referenced_identifiers_default(ast) {
+-function find_referenced_identifiers_default(ast) {
++// The snapshot only visits declarations. Scope initialization still sees
++// the whole program, including every reference and nested binding.
++function markDeclarationSubtrees(node, subtrees) {
++  let needed = node.type === "ImportDeclaration" ||
++    node.type === "VariableDeclarator" || node.type === "FunctionDeclaration";
++  for (const key of t.VISITOR_KEYS[node.type] ?? []) {
++    const child = node[key];
++    if (Array.isArray(child)) {
++      for (const item of child) {
++        if (item && markDeclarationSubtrees(item, subtrees)) needed = true;
++      }
++    } else if (child && markDeclarationSubtrees(child, subtrees)) {
++      needed = true;
++    }
++  }
++  if (needed) subtrees.add(node);
++  return needed;
++}
++function find_referenced_identifiers_default(ast, pruneSubtrees = false) {
    const referenced = /* @__PURE__ */ new Set();
++  const subtrees = pruneSubtrees ? new WeakSet() : void 0;
++  if (subtrees && !markDeclarationSubtrees(ast.program, subtrees)) return referenced;
 +  // Babel initializes scope before entering a freshly parsed Program. Rebuild
 +  // only a cached scope, since callers may have mutated the AST in place.
 +  const hasCachedScope = traverse.cache.scope.has(ast.program);
    let removable;
    traverse(ast, {
++    shouldSkip: subtrees && ((path) => !subtrees.has(path.node)),
      Program(path) {
 -      path.scope.crawl();
 +      if (hasCachedScope) path.scope.crawl();
@@ -61,18 +85,66 @@ diff --git a/dist/index.cjs b/dist/index.cjs
            path.remove();
          }
        },
-@@ -458,10 +460,13 @@
+@@ -456,12 +458,36 @@
+     referenced.add(ident);
+   }
  }
- function find_referenced_identifiers_default(ast) {
+-function find_referenced_identifiers_default(ast) {
++// The snapshot only visits declarations. Scope initialization still sees
++// the whole program, including every reference and nested binding.
++function markDeclarationSubtrees(node, subtrees) {
++  let needed = node.type === "ImportDeclaration" ||
++    node.type === "VariableDeclarator" || node.type === "FunctionDeclaration";
++  for (const key of t.VISITOR_KEYS[node.type] ?? []) {
++    const child = node[key];
++    if (Array.isArray(child)) {
++      for (const item of child) {
++        if (item && markDeclarationSubtrees(item, subtrees)) needed = true;
++      }
++    } else if (child && markDeclarationSubtrees(child, subtrees)) {
++      needed = true;
++    }
++  }
++  if (needed) subtrees.add(node);
++  return needed;
++}
++function find_referenced_identifiers_default(ast, pruneSubtrees = false) {
    const referenced = /* @__PURE__ */ new Set();
++  const subtrees = pruneSubtrees ? new WeakSet() : void 0;
++  if (subtrees && !markDeclarationSubtrees(ast.program, subtrees)) return referenced;
 +  // Babel initializes scope before entering a freshly parsed Program. Rebuild
 +  // only a cached scope, since callers may have mutated the AST in place.
 +  const hasCachedScope = traverse.cache.scope.has(ast.program);
    let removable;
    traverse(ast, {
++    shouldSkip: subtrees && ((path) => !subtrees.has(path.node)),
      Program(path) {
 -      path.scope.crawl();
 +      if (hasCachedScope) path.scope.crawl();
        removable = findRemovableBindings(path);
      },
      ImportDeclaration(path) {
+diff --git a/dist/index.d.ts b/dist/index.d.ts
+--- a/dist/index.d.ts
++++ b/dist/index.d.ts
+@@ -7,6 +7,7 @@
+  */
+ declare function export_default$1(ast: ParseResult<types.File>, candidates?: Set<NodePath<types.Identifier>>): void;
+ 
+-declare function export_default(ast: ParseResult<types.File>): Set<NodePath<types.Identifier>>;
++/** @param pruneSubtrees - Skip declaration-free branches during the reference snapshot. */
++declare function export_default(ast: ParseResult<types.File>, pruneSubtrees?: boolean): Set<NodePath<types.Identifier>>;
+ 
+ export { export_default$1 as deadCodeElimination, export_default as findReferencedIdentifiers };
+diff --git a/dist/index.d.cts b/dist/index.d.cts
+--- a/dist/index.d.cts
++++ b/dist/index.d.cts
+@@ -7,6 +7,7 @@
+  */
+ declare function export_default$1(ast: ParseResult<types.File>, candidates?: Set<NodePath<types.Identifier>>): void;
+ 
+-declare function export_default(ast: ParseResult<types.File>): Set<NodePath<types.Identifier>>;
++/** @param pruneSubtrees - Skip declaration-free branches during the reference snapshot. */
++declare function export_default(ast: ParseResult<types.File>, pruneSubtrees?: boolean): Set<NodePath<types.Identifier>>;
+ 
+ export { export_default$1 as deadCodeElimination, export_default as findReferencedIdentifiers };

@@ -21,7 +21,6 @@ import { databaseEnv } from "./env";
 import {
   APP_POOL_KEY,
   createStandardPool,
-  guardPool,
   LONG_RUNNING_POOL_MAX,
   processSharedPool,
   ResilientPool,
@@ -181,28 +180,35 @@ export function createLongRunningPool(): Pool {
 }
 
 function createSocketPool(port: number, resolvedUrl: string): Pool {
-  return guardPool(
-    new ResilientPool(
-      {
-        host: "127.0.0.1",
-        port,
-        database: "postgres",
-        user: "postgres",
-        password: "postgres",
-        max: 10,
-        idleTimeoutMillis: 30_000,
-        connectionTimeoutMillis: 30_000,
+  const socketPool = new ResilientPool(
+    {
+      host: "127.0.0.1",
+      port,
+      database: "postgres",
+      user: "postgres",
+      password: "postgres",
+      max: 10,
+      idleTimeoutMillis: 30_000,
+      connectionTimeoutMillis: 30_000,
+    },
+    resolveConnectRetryOptions({
+      retries: 2,
+      onRetry: (error, attempt, delayMs) => {
+        process.stderr.write(
+          `[pglite] Connection startup on port ${String(port)} failed. Retrying (attempt ${String(attempt + 1)}, delay ${String(delayMs)}ms): ${error.message}\n`,
+        );
       },
-      resolveConnectRetryOptions({
-        retries: 2,
-        recover: async (error) => {
-          if ("code" in error && error.code === "ECONNREFUSED") {
-            await ensurePgliteOwner(port, resolvedUrl, false);
-          }
-        },
-      }),
-    ),
+      // A previous owner can accept TCP and exit before completing the pg
+      // handshake. Re-elect on that path too, before spending another attempt.
+      recover: () => ensurePgliteOwner(port, resolvedUrl, false),
+    }),
   );
+  socketPool.on("error", (error: Error) => {
+    process.stderr.write(
+      `[pglite] Idle connection on port ${String(port)} failed and was discarded: ${error.message}\n`,
+    );
+  });
+  return socketPool;
 }
 
 // ─── Module singletons ────────────────────────────────────────────────────────
