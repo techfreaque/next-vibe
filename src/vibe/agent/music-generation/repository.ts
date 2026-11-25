@@ -372,6 +372,7 @@ export class MusicGenerationRepository {
         logger,
         tCredits,
         { modelId: audioModel.id, apiProvider: audioModel.apiProvider },
+        generationResult.data.upstreamCostUsd,
       );
       if (!deductResult.success) {
         return deductResult;

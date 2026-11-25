@@ -16,6 +16,7 @@ const ledger: UsageLedgerPort = {
     Promise.resolve({
       calls: 0,
       billedCredits: 0,
+      upstreamCostUsd: 0,
       packCredits: 0,
       freeCredits: 0,
       walletCount: 0,

@@ -1,6 +1,17 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  spendAlert: {
+    explained: "Das Ledger erklärt die Nutzungsspitze bei {{provider}}.",
+    unexplained: "API-Schlüssel möglicherweise kompromittiert: {{provider}}.",
+    cap: "Ausgaben von {{spend}} in {{hours}} Std. ({{rate}}/Std., Limit {{cap}}/Std.).",
+    drain:
+      "Die Ausgaben von {{rate}}/Std. liegen beim {{ratio}}-Fachen des bisherigen Schnitts von {{baseline}}/Std. über {{coveredHours}} erfasste Stunden (Limit: {{limit}}-fach).",
+    ledgerCost:
+      "Das Ledger weist für diesen Zeitraum Anbieterkosten von {{cost}} aus.",
+    topWallets:
+      "Guthabenkonten mit dem höchsten Credit-Verbrauch: {{wallets}}.",
+  },
   category: "Finanzen",
   documents: {
     search: "Dokumente suchen",

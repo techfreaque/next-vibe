@@ -570,6 +570,7 @@ export class VideoGenerationRepository {
         logger,
         tCredits,
         { modelId: videoModel.id, apiProvider: videoModel.apiProvider },
+        generated.upstreamCostUsd,
       );
       if (!deductResult.success) {
         return deductResult;

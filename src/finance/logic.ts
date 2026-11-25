@@ -3,10 +3,12 @@
  *
  * Pure functions: currency conversion, margin computation, spike / drain /
  * refund / cancellation detection, alert dedup. No I/O, so the thresholds are
- * unit-testable. Alert text is operator-facing (mail + error log), English only.
+ * unit-testable. Alerts are used in the admin, mail and error log.
  */
 
 /* eslint-disable i18next/no-literal-string */
+
+import { z } from "zod";
 
 import { FINANCE_CONFIG } from "./config";
 import {
@@ -21,6 +23,7 @@ import {
   ThresholdKey,
   type ThresholdKeyValue,
 } from "./enum";
+import type { FinanceT } from "./i18n";
 
 // ─── Thresholds ──────────────────────────────────────────────────────────────
 
@@ -482,6 +485,8 @@ export interface LedgerUsageBreakdown {
   calls: number;
   /** All credits billed on the provider's models in the window. */
   billedCredits: number;
+  /** Recorded provider costs plus estimates for rows without recorded costs. */
+  upstreamCostUsd: number;
   /** Part of billedCredits paid from packs (purchased, subscription, earned, bonus). */
   packCredits: number;
   /** Part of billedCredits paid from the free allowance. */
@@ -496,6 +501,14 @@ const KEY_THEFT_NOTE = (label: string): string =>
 
 const pct = (part: number, whole: number): number =>
   whole > 0 ? round2((part / whole) * 100) : 0;
+
+function describeTopWallets(ledger: LedgerUsageBreakdown): string {
+  return ledger.topWallets
+    .map(
+      (w) => `${w.wallet} ${pct(w.credits, ledger.billedCredits).toFixed(0)}%`,
+    )
+    .join(", ");
+}
 
 interface LedgerAssessment {
   severity: typeof AlertSeverityValue;
@@ -533,11 +546,7 @@ function assessLedgerSpike(input: {
     billedUsd > 0
       ? round2(((billedUsd - input.spendUsd) / billedUsd) * 100)
       : null;
-  const top = ledger.topWallets
-    .map(
-      (w) => `${w.wallet} ${pct(w.credits, ledger.billedCredits).toFixed(0)}%`,
-    )
-    .join(", ");
+  const top = describeTopWallets(ledger);
   const who = `${ledger.calls} calls from ${ledger.walletCount} wallet${ledger.walletCount === 1 ? "" : "s"}${top ? ` (top: ${top})` : ""}.`;
   const billed = `Billed ${money(billedUsd)} in credits (pack ${money(packUsd)}, free ${money(freeUsd)}) vs ${money(input.spendUsd)} estimated upstream cost`;
   const verdict = covered
@@ -563,6 +572,78 @@ function assessLedgerSpike(input: {
   };
 }
 
+const providerSpendAlertMetadata = z.object({
+  spendBasis: z.literal("provider-api"),
+  providerLabel: z.string(),
+  ledgerExplained: z.boolean(),
+  ledgerUpstreamCostUsd: z.number().nullable(),
+  topWallets: z.string(),
+  spendUsd: z.number(),
+  elapsedHours: z.number(),
+  perHourUsd: z.number(),
+  hourlySpendCapUsd: z.number(),
+  trailingAvgHourlyUsd: z.number().nullable(),
+  trailingCoveredHours: z.number(),
+  drainRatio: z.number().nullable(),
+  drainMultiplier: z.number(),
+});
+
+type ProviderSpendAlertType =
+  | typeof FinanceAlertType.SPEND_SPIKE
+  | typeof FinanceAlertType.BALANCE_DRAIN;
+
+/** Render provider API alerts in the reader's locale, including stored alerts. */
+export function formatProviderSpendAlert(
+  type: AlertCandidate["type"],
+  metadata: AlertCandidate["metadata"],
+  t: FinanceT,
+): string | null {
+  if (
+    type !== FinanceAlertType.SPEND_SPIKE &&
+    type !== FinanceAlertType.BALANCE_DRAIN
+  ) {
+    return null;
+  }
+  const parsed = providerSpendAlertMetadata.safeParse(metadata);
+  return parsed.success
+    ? providerSpendAlertMessage(type, parsed.data, t)
+    : null;
+}
+
+function providerSpendAlertMessage(
+  type: ProviderSpendAlertType,
+  facts: z.output<typeof providerSpendAlertMetadata>,
+  t: FinanceT,
+): string {
+  const lead = facts.ledgerExplained
+    ? t("spendAlert.explained", { provider: facts.providerLabel })
+    : t("spendAlert.unexplained", { provider: facts.providerLabel });
+  const detail =
+    type === FinanceAlertType.SPEND_SPIKE
+      ? t("spendAlert.cap", {
+          spend: money(facts.spendUsd),
+          hours: facts.elapsedHours.toFixed(1),
+          rate: money(facts.perHourUsd),
+          cap: money(facts.hourlySpendCapUsd),
+        })
+      : t("spendAlert.drain", {
+          rate: money(facts.perHourUsd),
+          ratio: (facts.drainRatio ?? 0).toFixed(1),
+          baseline: money(facts.trailingAvgHourlyUsd ?? 0),
+          coveredHours: facts.trailingCoveredHours.toFixed(1),
+          limit: facts.drainMultiplier,
+        });
+  const ledger =
+    facts.ledgerUpstreamCostUsd === null
+      ? ""
+      : ` ${t("spendAlert.ledgerCost", { cost: money(facts.ledgerUpstreamCostUsd) })}`;
+  const wallets =
+    facts.ledgerExplained && facts.topWallets
+      ? ` ${t("spendAlert.topWallets", { wallets: facts.topWallets })}`
+      : "";
+  return `${lead} ${detail}${ledger}${wallets}`;
+}
+
 /**
  * Spend-spike detector. Two independent tripwires on the spend since the last
  * reading, scaled to dollars per hour:
@@ -570,7 +651,7 @@ function assessLedgerSpike(input: {
  *  - drain: more than drainMultiplier x the trailing hourly average
  * Both ignore spends below minSpikeUsd (noise on a quiet account).
  *
- * provider-api spend: a stolen-key detector, CRITICAL "possible key compromise".
+ * Provider-api spend is a WARNING if the ledger explains it, otherwise CRITICAL.
  * usage-ledger spend: worded as a usage spike from our own ledger (see
  * assessLedgerSpike); never "key compromise", since it cannot see key theft.
  */
@@ -583,8 +664,9 @@ export function detectProviderAnomalies(input: {
   balanceUsd: number | null;
   thresholds: Thresholds;
   spendBasis: SpendBasis;
-  /** Who / what in the window; only for usage-ledger spend (null = unavailable). */
+  /** Billed usage by this provider's accounts during the same spend window. */
   ledgerUsage?: LedgerUsageBreakdown | null;
+  t: FinanceT;
 }): AlertCandidate[] {
   const { thresholds: th } = input;
   if (input.elapsedHours <= 0 || input.spendUsd < th.minSpikeUsd) {
@@ -601,7 +683,14 @@ export function detectProviderAnomalies(input: {
           ledger: input.ledgerUsage ?? null,
         })
       : null;
-  const metadata = {
+  const ledgerCost = input.ledgerUsage?.upstreamCostUsd ?? null;
+  const ledgerExplained =
+    ledgerCost !== null &&
+    ledgerCost > 0 &&
+    ledgerCost >=
+      input.spendUsd * (1 - FINANCE_CONFIG.providerLedgerTolerance) &&
+    ledgerCost <= input.spendUsd * (1 + FINANCE_CONFIG.providerLedgerTolerance);
+  const spendFacts = {
     provider: input.provider,
     spendUsd: round2(input.spendUsd),
     elapsedHours: round2(input.elapsedHours),
@@ -611,21 +700,41 @@ export function detectProviderAnomalies(input: {
     trailingCoveredHours: input.trailing.coveredHours,
     trailingCoverage: input.trailing.coverage,
     balanceUsd: input.balanceUsd === null ? null : round2(input.balanceUsd),
-    ...(ledger ? ledger.metadata : { spendBasis: "provider-api" }),
   };
-  const severity = ledger ? ledger.severity : AlertSeverity.CRITICAL;
-  const lead = ledger
-    ? `Usage spike on ${input.providerLabel} (estimated from our own credit ledger).`
-    : `Possible key compromise: ${input.providerLabel}.`;
-  const tail = ledger ? ` ${ledger.detail}` : "";
-  const costWord = ledger ? "estimated upstream cost" : "spent";
+  const providerFacts = {
+    ...spendFacts,
+    spendBasis: "provider-api",
+    providerLabel: input.providerLabel,
+    ledgerExplained,
+    ledgerUpstreamCostUsd: ledgerCost,
+    topWallets: input.ledgerUsage ? describeTopWallets(input.ledgerUsage) : "",
+    hourlySpendCapUsd: th.hourlySpendCapUsd,
+    drainRatio:
+      trailingPerHour !== null && trailingPerHour > 0
+        ? perHour / trailingPerHour
+        : null,
+    drainMultiplier: th.drainMultiplier,
+  } satisfies z.output<typeof providerSpendAlertMetadata>;
+  const metadata = ledger
+    ? { ...spendFacts, ...ledger.metadata }
+    : providerFacts;
+  const severity =
+    ledger?.severity ??
+    (ledgerExplained ? AlertSeverity.WARNING : AlertSeverity.CRITICAL);
+  const lead = `Usage spike on ${input.providerLabel} (estimated from our own credit ledger).`;
   if (perHour > th.hourlySpendCapUsd) {
     out.push({
       type: FinanceAlertType.SPEND_SPIKE,
       severity,
       subject: input.provider,
       dedupKey: `${FinanceAlertType.SPEND_SPIKE}:${input.provider}`,
-      message: `${lead} ${money(input.spendUsd)} ${costWord} in ${input.elapsedHours.toFixed(1)}h (${money(perHour)}/h, cap ${money(th.hourlySpendCapUsd)}/h).${tail}`,
+      message: ledger
+        ? `${lead} ${money(input.spendUsd)} estimated upstream cost in ${input.elapsedHours.toFixed(1)}h (${money(perHour)}/h, cap ${money(th.hourlySpendCapUsd)}/h). ${ledger.detail}`
+        : providerSpendAlertMessage(
+            FinanceAlertType.SPEND_SPIKE,
+            providerFacts,
+            input.t,
+          ),
       metadata,
     });
   }
@@ -639,7 +748,13 @@ export function detectProviderAnomalies(input: {
       severity,
       subject: input.provider,
       dedupKey: `${FinanceAlertType.BALANCE_DRAIN}:${input.provider}`,
-      message: `${lead} ${ledger ? "Estimated spend" : "Spending"} ${money(perHour)}/h is ${(perHour / trailingPerHour).toFixed(1)}x the trailing average of ${money(trailingPerHour)}/h over ${input.trailing.coveredHours.toFixed(1)}h of covered data (limit ${th.drainMultiplier}x).${tail}`,
+      message: ledger
+        ? `${lead} Estimated spend ${money(perHour)}/h is ${(perHour / trailingPerHour).toFixed(1)}x the trailing average of ${money(trailingPerHour)}/h over ${input.trailing.coveredHours.toFixed(1)}h of covered data (limit ${th.drainMultiplier}x). ${ledger.detail}`
+        : providerSpendAlertMessage(
+            FinanceAlertType.BALANCE_DRAIN,
+            providerFacts,
+            input.t,
+          ),
       metadata,
     });
   }

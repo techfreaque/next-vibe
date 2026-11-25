@@ -4502,6 +4502,7 @@ export class CreditRepository {
     // oxlint-disable-next-line no-unused-vars -- locale is unused on server, but required on native
     locale: CountryLanguage,
     attribution?: UsageAttribution,
+    upstreamCost?: UsageUpstreamCost,
   ): Promise<ResponseType<DeductForModelResult>> {
     if (cost <= 0) {
       logger.debug("Skipping credit deduction - zero or negative cost", {
@@ -4542,7 +4543,7 @@ export class CreditRepository {
         t,
         locale,
         false,
-        undefined,
+        upstreamCost,
         attribution?.apiProvider,
       );
 

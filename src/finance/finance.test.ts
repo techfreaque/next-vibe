@@ -10,14 +10,23 @@
 
 import "server-only";
 
-import { afterAll, beforeAll, beforeEach, describe, expect, it } from "bun:test";
-import { and, eq, gte, like } from "drizzle-orm";
+import {
+  afterAll,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  it,
+} from "bun:test";
+import { and, eq, gte, inArray, like } from "drizzle-orm";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { db } from "next-vibe/database";
 import { pgliteReady } from "next-vibe/database/client";
 import { users } from "next-vibe/identity/user/db";
 import { createEndpointLogger } from "next-vibe/logger/server";
 
+import { creditTransactions, creditWallets } from "@/credits/db";
+import { CreditTransactionType } from "@/credits/enum";
 import { paymentRefunds, paymentTransactions } from "@/payment/db";
 import {
   PaymentProvider,
@@ -26,6 +35,7 @@ import {
   RefundStatus,
 } from "@/payment/enum";
 import { ApiProvider } from "@/vibe/agent/models/models";
+import { VideoGenModelId } from "@/vibe/agent/video-generation/models";
 
 import { FINANCE_CONFIG } from "./config";
 import {
@@ -69,9 +79,11 @@ import {
   type FinanceDeps,
   FinanceRepository,
 } from "./repository";
-import { UNCENSORED_CREDIT_UNIT } from "./sources/dashboard";
+import {
+  type DashboardCredentials,
+  UNCENSORED_CREDIT_UNIT,
+} from "./sources/dashboard";
 import type { FinanceHttp, HttpRequest, HttpResult } from "./sources/http";
-import { usagePricing } from "./sources/providers";
 import type { StripeLedgerPort } from "./sources/revenue";
 
 type TestCurrency = "USD" | "EUR" | "PLN";
@@ -126,17 +138,22 @@ describe("computeMargin", () => {
   });
 });
 
+const utcDayBounds = (
+  y: number,
+  m: number,
+  d: number,
+): { start: Date; end: Date } => ({
+  start: new Date(Date.UTC(y, m, d)),
+  end: new Date(Date.UTC(y, m, d + 1)),
+});
+
 describe("classifyCostCoverage", () => {
   // Prod shape: cost tracking began 2026-11-08 21:00 UTC.
   const firstHour = new Date(Date.UTC(2026, 10, 8, 21));
   const now = new Date(Date.UTC(2026, 10, 9, 13));
-  const day = (y: number, m: number, d: number): { start: Date; end: Date } => ({
-    start: new Date(Date.UTC(y, m, d)),
-    end: new Date(Date.UTC(y, m, d + 1)),
-  });
 
   it("is NONE before tracking began or when no snapshots exist", () => {
-    const d = day(2026, 10, 7);
+    const d = utcDayBounds(2026, 10, 7);
     expect(
       classifyCostCoverage({
         snapshotHours: 0,
@@ -161,7 +178,7 @@ describe("classifyCostCoverage", () => {
   });
 
   it("is PARTIAL on the day tracking began (straddles the start)", () => {
-    const d = day(2026, 10, 8); // starts 00:00, before firstHour 21:00
+    const d = utcDayBounds(2026, 10, 8); // starts 00:00, before firstHour 21:00
     expect(
       classifyCostCoverage({
         snapshotHours: 2,
@@ -175,7 +192,7 @@ describe("classifyCostCoverage", () => {
   });
 
   it("is COMPLETE on a fully-tracked day whose elapsed hours are covered", () => {
-    const d = day(2026, 10, 9); // starts after firstHour; 13 elapsed hours by now
+    const d = utcDayBounds(2026, 10, 9); // starts after firstHour; 13 elapsed hours by now
     expect(
       classifyCostCoverage({
         snapshotHours: 13,
@@ -189,7 +206,7 @@ describe("classifyCostCoverage", () => {
   });
 
   it("is PARTIAL on a fully-tracked day with a wide gap in readings", () => {
-    const d = day(2026, 10, 9);
+    const d = utcDayBounds(2026, 10, 9);
     expect(
       classifyCostCoverage({
         snapshotHours: 5, // 13 expected, far below tolerance
@@ -270,6 +287,10 @@ describe("trailingSpendRate", () => {
   });
 });
 
+/** A fully-covered trailing baseline at the given $/h. */
+const baselineAt = (perHourUsd: number): ReturnType<typeof trailingSpendRate> =>
+  trailingSpendRate({ windowSpendUsd: perHourUsd * 48, coveredHours: 48 });
+
 describe("detectProviderAnomalies", () => {
   const base = {
     provider: FinanceSource.OPENROUTER,
@@ -277,10 +298,8 @@ describe("detectProviderAnomalies", () => {
     balanceUsd: 100,
     thresholds: DEFAULT_THRESHOLDS,
     spendBasis: "provider-api" as const,
+    t,
   };
-  /** A fully-covered trailing baseline at the given $/h. */
-  const baselineAt = (perHourUsd: number): ReturnType<typeof trailingSpendRate> =>
-    trailingSpendRate({ windowSpendUsd: perHourUsd * 48, coveredHours: 48 });
   const noBaseline = trailingSpendRate({ windowSpendUsd: 0, coveredHours: 0 });
 
   it("flags an hourly spend over the cap as possible key compromise", () => {
@@ -296,6 +315,54 @@ describe("detectProviderAnomalies", () => {
     expect(out[0]?.metadata.spendBasis).toBe("provider-api");
   });
 
+  it.each([
+    { ledgerCost: 8, severity: AlertSeverity.WARNING },
+    { ledgerCost: 12, severity: AlertSeverity.WARNING },
+    { ledgerCost: 7.99, severity: AlertSeverity.CRITICAL },
+    { ledgerCost: 12.01, severity: AlertSeverity.CRITICAL },
+  ])(
+    "classifies a $10 spike against $ledgerCost in the ledger",
+    ({ ledgerCost, severity }) => {
+      const alerts = detectProviderAnomalies({
+        ...base,
+        thresholds: { ...DEFAULT_THRESHOLDS, hourlySpendCapUsd: 8 },
+        spendUsd: 10,
+        elapsedHours: 1,
+        trailing: baselineAt(1),
+        ledgerUsage: {
+          upstreamCostUsd: ledgerCost,
+          calls: 2,
+          billedCredits: 1300,
+          packCredits: 1300,
+          freeCredits: 0,
+          walletCount: 2,
+          topWallets: [
+            { wallet: "user u-1", credits: 1040 },
+            { wallet: "user u-2", credits: 260 },
+          ],
+        },
+      });
+      expect(alerts.map((alert) => alert.type)).toEqual([
+        FinanceAlertType.SPEND_SPIKE,
+        FinanceAlertType.BALANCE_DRAIN,
+      ]);
+      for (const alert of alerts) {
+        expect(alert.severity).toBe(severity);
+        expect(alert.metadata.ledgerUpstreamCostUsd).toBe(ledgerCost);
+        if (severity === AlertSeverity.WARNING) {
+          expect(alert.message).toContain(
+            "Usage spike explained by ledger: OpenRouter",
+          );
+          expect(alert.message).toContain("user u-1 80%, user u-2 20%");
+        } else {
+          expect(alert.message).toContain(
+            "Possible key compromise: OpenRouter",
+          );
+        }
+      }
+    },
+  );
+
   describe("ledger-estimated providers (no spend API)", () => {
     const ledgerBase = {
       ...base,
@@ -308,6 +375,7 @@ describe("detectProviderAnomalies", () => {
     const onePayer = {
       calls: 100,
       billedCredits: 650,
+      upstreamCostUsd: 5,
       packCredits: 600,
       freeCredits: 50,
       walletCount: 2,
@@ -448,7 +516,10 @@ describe("detectProviderAnomalies", () => {
   it("stays silent on insufficient trailing data instead of crying wolf", () => {
     // Under a clean hour of covered data there is no meaningful baseline, so the
     // relative drain tripwire holds its fire (the absolute cap still guards).
-    const trailing = trailingSpendRate({ windowSpendUsd: 0.2, coveredHours: 0.5 });
+    const trailing = trailingSpendRate({
+      windowSpendUsd: 0.2,
+      coveredHours: 0.5,
+    });
     const out = detectProviderAnomalies({
       ...base,
       spendUsd: 10,
@@ -461,7 +532,10 @@ describe("detectProviderAnomalies", () => {
   it("still fires on a genuine sustained rate spike with a solid baseline", () => {
     // Two days of covered data at ~$0.31/h, then $30 in one hour: both the drain
     // (97x) and the absolute cap trip - real detection is intact.
-    const trailing = trailingSpendRate({ windowSpendUsd: 15, coveredHours: 48 });
+    const trailing = trailingSpendRate({
+      windowSpendUsd: 15,
+      coveredHours: 48,
+    });
     const out = detectProviderAnomalies({
       ...base,
       spendUsd: 30,
@@ -619,6 +693,7 @@ let billedCalls = 10;
 let ledgerBreakdown: LedgerUsageBreakdown = {
   calls: 0,
   billedCredits: 0,
+  upstreamCostUsd: 0,
   packCredits: 0,
   freeCredits: 0,
   walletCount: 0,
@@ -672,15 +747,55 @@ const stripePort: StripeLedgerPort = {
   async listBalanceTransactions() {
     const at = Math.floor(Date.UTC(2031, 2, 3, 10) / 1000);
     return [
-      { id: "txn_t1", reportingCategory: "charge", amount: 10000, fee: 320, currency: "usd", createdUnix: at },
-      { id: "txn_t2", reportingCategory: "refund", amount: -2000, fee: 0, currency: "usd", createdUnix: at },
-      { id: "txn_t3", reportingCategory: "dispute", amount: -1000, fee: 1500, currency: "usd", createdUnix: at },
-      { id: "txn_t4", reportingCategory: "payout", amount: -5000, fee: 0, currency: "usd", createdUnix: at },
-      { id: "txn_t5", reportingCategory: "fee", amount: -100, fee: 0, currency: "usd", createdUnix: at },
+      {
+        id: "txn_t1",
+        reportingCategory: "charge",
+        amount: 10000,
+        fee: 320,
+        currency: "usd",
+        createdUnix: at,
+      },
+      {
+        id: "txn_t2",
+        reportingCategory: "refund",
+        amount: -2000,
+        fee: 0,
+        currency: "usd",
+        createdUnix: at,
+      },
+      {
+        id: "txn_t3",
+        reportingCategory: "dispute",
+        amount: -1000,
+        fee: 1500,
+        currency: "usd",
+        createdUnix: at,
+      },
+      {
+        id: "txn_t4",
+        reportingCategory: "payout",
+        amount: -5000,
+        fee: 0,
+        currency: "usd",
+        createdUnix: at,
+      },
+      {
+        id: "txn_t5",
+        reportingCategory: "fee",
+        amount: -100,
+        fee: 0,
+        currency: "usd",
+        createdUnix: at,
+      },
     ];
   },
   async listCancellations() {
-    return [{ id: "evt_t1", createdUnix: Math.floor(Date.UTC(2031, 2, 3, 11) / 1000) }];
+    return [
+      {
+        id: "evt_t1",
+        createdUnix: Math.floor(Date.UTC(2031, 2, 3, 11) / 1000),
+      },
+    ];
   },
 };
 
@@ -699,12 +814,14 @@ const testDeps: FinanceDeps = {
       : undefined,
   dashboardCredentials: () => null,
   stripePort: () => stripePort,
-  nowPaymentsPort: () => null,
+  nowPaymentsPort: (): null => null,
   usageLedger: {
     billedCalls: async () => billedCalls,
-    async usageBreakdown(_modelIds, from, to) {
+    async usageBreakdown(apiProviders, from, to) {
       ledgerWindows.push({ from, to });
-      return ledgerBreakdown;
+      return apiProviders.includes(ApiProvider.OPENROUTER)
+        ? defaultFinanceDeps.usageLedger.usageBreakdown(apiProviders, from, to)
+        : ledgerBreakdown;
     },
   },
   recipients: () => ["ops@example.com"],
@@ -749,7 +866,7 @@ async function insertPayment(
     })
     .returning({ id: paymentTransactions.id });
   if (!row) {
-    throw new Error("failed to seed payment transaction");
+    return expect.unreachable("failed to seed payment transaction");
   }
   return row.id;
 }
@@ -784,17 +901,53 @@ async function ingest(
     defaultLocale,
   );
   if (!result.success) {
-    throw new Error(result.message);
+    return expect.unreachable(result.message);
   }
   return result.data;
 }
 
-async function checkAutoTopUpBalances(nano: number, venice: number, minutes: number, dryRun = false): Promise<FinanceIngestResponseOutput["alerts"]> {
+async function checkAutoTopUpBalances(
+  nano: number,
+  venice: number,
+  minutes: number,
+  dryRun = false,
+): Promise<FinanceIngestResponseOutput["alerts"]> {
   nanoGptBalance = nano;
   veniceBalance = venice;
   observedAt = new Date(NOW.getTime() + minutes * 60_000);
   const result = await ingest(IngestScope.BALANCES, dryRun);
-  return result.alerts.filter((alert) => alert.type === FinanceAlertType.LOW_BALANCE);
+  return result.alerts.filter(
+    (alert) => alert.type === FinanceAlertType.LOW_BALANCE,
+  );
+}
+
+async function seedPreviousReading(usage: number): Promise<void> {
+  await db.insert(financeProviderSnapshots).values({
+    provider: FinanceSource.OPENROUTER,
+    bucketAt: new Date(Date.UTC(2031, 2, 4, 11)),
+    capturedAt: new Date(Date.UTC(2031, 2, 4, 11, 30)),
+    balanceUsd: 500 - usage,
+    balanceNative: 500 - usage,
+    unit: "usd",
+    cumulativeUsageUsd: usage,
+    spendUsd: 0.5,
+    elapsedHours: 1,
+  });
+}
+
+async function checkOpenRouterBalance(
+  balance: number,
+  mins: number,
+  dryRun = false,
+): Promise<FinanceIngestResponseOutput["alerts"][number] | undefined> {
+  openRouterCredits = openRouterUsage + 40 + balance;
+  observedAt = new Date(NOW.getTime() + mins * 60_000);
+  const result = await ingest(IngestScope.BALANCES, dryRun);
+  return result.alerts.find(
+    (alert) =>
+      alert.type === FinanceAlertType.LOW_BALANCE &&
+      alert.subject === FinanceSource.OPENROUTER,
+  );
 }
 
 describe("finance ingest (mocked externals)", () => {
@@ -848,20 +1001,6 @@ describe("finance ingest (mocked externals)", () => {
     FinanceRepository.deps = defaultFinanceDeps;
   });
 
-  async function seedPreviousReading(usage: number): Promise<void> {
-    await db.insert(financeProviderSnapshots).values({
-      provider: FinanceSource.OPENROUTER,
-      bucketAt: new Date(Date.UTC(2031, 2, 4, 11)),
-      capturedAt: new Date(Date.UTC(2031, 2, 4, 11, 30)),
-      balanceUsd: 500 - usage,
-      balanceNative: 500 - usage,
-      unit: "usd",
-      cumulativeUsageUsd: usage,
-      spendUsd: 0.5,
-      elapsedHours: 1,
-    });
-  }
-
   it("prices API-less providers from the usage log and keeps going", async () => {
     const data = await ingest(IngestScope.BALANCES);
     const uncensored = data.sources.find(
@@ -879,21 +1018,30 @@ describe("finance ingest (mocked externals)", () => {
     expect(freedom?.fallback).toBe(true);
     expect(freedom?.reason).toContain("$0.08/call");
     // No HTTP attempt was made for them
-    expect(httpCalls.some((u) => u.includes("uncensored") || u.includes("freedomgpt"))).toBe(false);
+    expect(
+      httpCalls.some(
+        (u) => u.includes("uncensored") || u.includes("freedomgpt"),
+      ),
+    ).toBe(false);
 
     const or = data.sources.find((s) => s.source === FinanceSource.OPENROUTER);
     expect(or?.status).toBe(SourceRunStatus.OK);
     // Balance is the shared account wallet (500 - 140 account-wide usage)...
     expect(or?.balanceUsd).toBe(360);
     // ...but spend is THIS key's usage counter, never the account-wide total.
-    expect(httpCalls.some((u) => u.includes("openrouter.ai/api/v1/key"))).toBe(true);
+    expect(httpCalls.some((u) => u.includes("openrouter.ai/api/v1/key"))).toBe(
+      true,
+    );
     const [orSnap] = await db
       .select()
       .from(financeProviderSnapshots)
       .where(
         and(
           eq(financeProviderSnapshots.provider, FinanceSource.OPENROUTER),
-          eq(financeProviderSnapshots.bucketAt, new Date(Date.UTC(2031, 2, 4, 12))),
+          eq(
+            financeProviderSnapshots.bucketAt,
+            new Date(Date.UTC(2031, 2, 4, 12)),
+          ),
         ),
       );
     expect(orSnap?.cumulativeUsageUsd).toBe(100);
@@ -932,7 +1080,10 @@ describe("finance ingest (mocked externals)", () => {
       .where(
         and(
           eq(financeProviderSnapshots.provider, FinanceSource.UNCENSORED_AI),
-          eq(financeProviderSnapshots.bucketAt, new Date(Date.UTC(2031, 2, 4, 12))),
+          eq(
+            financeProviderSnapshots.bucketAt,
+            new Date(Date.UTC(2031, 2, 4, 12)),
+          ),
         ),
       );
     expect(stored?.balanceNative).toBeNull();
@@ -957,15 +1108,18 @@ describe("finance ingest (mocked externals)", () => {
     let allocatedCredits = 80;
     FinanceRepository.deps = {
       ...testDeps,
-      apiKey: (source) =>
-        source === FinanceSource.UNCENSORED_AI ? undefined : testDeps.apiKey(source),
-      dashboardCredentials: (source) =>
+      apiKey: (source): string | undefined =>
+        source === FinanceSource.UNCENSORED_AI
+          ? undefined
+          : testDeps.apiKey(source),
+      dashboardCredentials: (source): DashboardCredentials | null =>
         source === FinanceSource.UNCENSORED_AI
           ? { email: "finance@example.test", password: "fixture-password" }
           : null,
       usageLedger: {
         ...testDeps.usageLedger,
-        async billedCalls(_models, dateRange) {
+        async billedCalls(models, dateRange): Promise<number> {
+          expect(models.length).toBeGreaterThan(0);
           if (dateRange) {
             expect(dateRange).toEqual({ from: previousCapture, to: NOW });
             return 3;
@@ -973,7 +1127,7 @@ describe("finance ingest (mocked externals)", () => {
           return 100;
         },
       },
-      async http(request) {
+      async http(request): Promise<HttpResult> {
         const url = new URL(request.url);
         if (url.hostname !== "mkstqjtsujvcaobdksxs.supabase.co") {
           return await mockHttp(request);
@@ -993,32 +1147,50 @@ describe("finance ingest (mocked externals)", () => {
           default:
             return {
               status: 200,
-              json: [{ status: "active", total_credits: allocatedCredits, credits_remaining: 10 }],
+              json: [
+                {
+                  status: "active",
+                  total_credits: allocatedCredits,
+                  credits_remaining: 10,
+                },
+              ],
             };
         }
       },
     };
     const result = await ingest(IngestScope.BALANCES);
-    expect(result.sources.find((source) => source.source === FinanceSource.UNCENSORED_AI))
-      .toMatchObject({ balanceUsd: 0.75, spendUsd: 1.5, fallback: false });
-    expect(result.alerts).toContainEqual(expect.objectContaining({
-      subject: FinanceSource.UNCENSORED_AI,
-      severity: AlertSeverity.CRITICAL,
-      type: FinanceAlertType.LOW_BALANCE,
-    }));
+    expect(
+      result.sources.find(
+        (source) => source.source === FinanceSource.UNCENSORED_AI,
+      ),
+    ).toMatchObject({ balanceUsd: 0.75, spendUsd: 1.5, fallback: false });
+    expect(result.alerts).toContainEqual(
+      expect.objectContaining({
+        subject: FinanceSource.UNCENSORED_AI,
+        severity: AlertSeverity.CRITICAL,
+        type: FinanceAlertType.LOW_BALANCE,
+      }),
+    );
     const status = await FinanceRepository.status(t, logger);
-    expect(status.success && status.data.sources.find((source) => source.source === FinanceSource.UNCENSORED_AI))
-      .toMatchObject({ balanceNative: 15, fallback: false, lastSpendUsd: 1.5 });
+    expect(
+      status.success &&
+        status.data.sources.find(
+          (source) => source.source === FinanceSource.UNCENSORED_AI,
+        ),
+    ).toMatchObject({ balanceNative: 15, fallback: false, lastSpendUsd: 1.5 });
 
     allocatedCredits = 20;
     const retry = await ingest(IngestScope.BALANCES);
-    expect(retry.sources.find((source) => source.source === FinanceSource.UNCENSORED_AI))
-      .toMatchObject({
-        balanceUsd: 0.75,
-        spendUsd: expect.closeTo(0.15),
-        fallback: true,
-        reason: expect.stringContaining("dashboard usage counter decreased"),
-      });
+    expect(
+      retry.sources.find(
+        (source) => source.source === FinanceSource.UNCENSORED_AI,
+      ),
+    ).toMatchObject({
+      balanceUsd: 0.75,
+      spendUsd: expect.closeTo(0.15),
+      fallback: true,
+      reason: expect.stringContaining("dashboard usage counter decreased"),
+    });
   });
 
   it("raises a ledger spike as a WARNING usage spike with who / what", async () => {
@@ -1038,6 +1210,7 @@ describe("finance ingest (mocked externals)", () => {
     ledgerBreakdown = {
       calls: 1000,
       billedCredits: 6500,
+      upstreamCostUsd: 50,
       packCredits: 6500,
       freeCredits: 0,
       walletCount: 1,
@@ -1061,9 +1234,8 @@ describe("finance ingest (mocked externals)", () => {
   });
 
   it("the live usage ledger breakdown query runs and adds up", async () => {
-    const { modelIds } = usagePricing(ApiProvider.UNCENSORED_AI);
     const all = await defaultFinanceDeps.usageLedger.usageBreakdown(
-      modelIds,
+      [ApiProvider.UNCENSORED_AI],
       new Date(Date.UTC(2020, 0, 1)),
       new Date(Date.UTC(2100, 0, 1)),
     );
@@ -1073,19 +1245,113 @@ describe("finance ingest (mocked externals)", () => {
       Math.min(all.walletCount, 3),
     );
     const none = await defaultFinanceDeps.usageLedger.usageBreakdown(
-      modelIds,
+      [ApiProvider.UNCENSORED_AI],
       FUTURE,
       new Date(FUTURE.getTime() + 1000),
     );
     expect(none).toEqual({
       calls: 0,
       billedCredits: 0,
+      upstreamCostUsd: 0,
       packCredits: 0,
       freeCredits: 0,
       walletCount: 0,
       topWallets: [],
     });
   });
+
+  it.each([
+    { saleMinor: 800, expectedNetSales: 8.64 },
+    { saleMinor: 0, expectedNetSales: 0 },
+  ])(
+    "waits for the revenue pull before alerting with net sales of $expectedNetSales",
+    async ({ saleMinor, expectedNetSales }) => {
+      const dayStart = new Date(Date.UTC(2031, 2, 3));
+      const walletId = crypto.randomUUID();
+      await db.insert(creditWallets).values({ id: walletId });
+      try {
+        await db.insert(creditTransactions).values({
+          walletId,
+          type: CreditTransactionType.USAGE,
+          amount: -1839,
+          balanceAfter: 0,
+          createdAt: dayStart,
+        });
+        await db.insert(financeProviderSnapshots).values(
+          Array.from(Array<undefined>(24).keys(), (hour) => {
+            const bucketAt = new Date(
+              dayStart.getTime() + hour * FINANCE_CONFIG.hourMs,
+            );
+            return {
+              provider: FinanceSource.OPENROUTER,
+              bucketAt,
+              capturedAt: bucketAt,
+              spendUsd: hour === 0 ? 15.41 : 0,
+            };
+          }),
+        );
+        await db
+          .update(financeSourceStatus)
+          .set({ lastOkAt: new Date(Date.UTC(2031, 2, 3, 6)) })
+          .where(
+            inArray(financeSourceStatus.source, [
+              FinanceSource.STRIPE,
+              FinanceSource.NOWPAYMENTS,
+            ]),
+          );
+
+        observedAt = new Date(Date.UTC(2031, 2, 4, 0, 2));
+        const beforeRevenue = await ingest(IngestScope.BALANCES);
+        expect(
+          beforeRevenue.alerts.find(
+            (alert) => alert.type === FinanceAlertType.THIN_MARGIN,
+          ),
+        ).toBeUndefined();
+
+        FinanceRepository.deps = {
+          ...testDeps,
+          stripePort: (): StripeLedgerPort => ({
+            ...stripePort,
+            async listBalanceTransactions(): ReturnType<
+              StripeLedgerPort["listBalanceTransactions"]
+            > {
+              return saleMinor === 0
+                ? []
+                : [
+                    {
+                      id: "txn_closed_day",
+                      reportingCategory: "charge",
+                      amount: saleMinor,
+                      fee: 0,
+                      currency: "eur",
+                      createdUnix: dayStart.getTime() / 1000 + 3600,
+                    },
+                  ];
+            },
+          }),
+        };
+        observedAt = new Date(Date.UTC(2031, 2, 4, 6));
+        const afterRevenue = await ingest(IngestScope.REVENUE);
+        const margin = afterRevenue.alerts.find(
+          (alert) => alert.type === FinanceAlertType.THIN_MARGIN,
+        );
+        expect(margin).toMatchObject({
+          severity: AlertSeverity.WARNING,
+          delivery: "sent",
+        });
+        expect(margin?.message).toContain(
+          `16.2% (floor 20%). Credits billed $18.39, net sales $${expectedNetSales.toFixed(2)}`,
+        );
+
+        const dryRun = await ingest(IngestScope.BALANCES, true);
+        expect(
+          dryRun.days.find((day) => day.day === "2031-03-03")?.netRevenueUsd,
+        ).toBe(expectedNetSales);
+      } finally {
+        await db.delete(creditWallets).where(eq(creditWallets.id, walletId));
+      }
+    },
+  );
 
   it("is idempotent: a re-run in the same hour keeps one snapshot", async () => {
     await ingest(IngestScope.BALANCES);
@@ -1132,13 +1398,15 @@ describe("finance ingest (mocked externals)", () => {
     const day = second.days.find((d) => d.day === "2031-03-03");
     expect(day?.netRevenueUsd).toBe(70);
     expect(day?.processorFeesUsd).toBe(19.2);
-    const stripe = second.sources.find((s) => s.source === FinanceSource.STRIPE);
+    const stripe = second.sources.find(
+      (s) => s.source === FinanceSource.STRIPE,
+    );
     expect(stripe?.fallback).toBe(false);
     const rollups = await db
       .select()
       .from(financeDailyRollups)
       .where(gte(financeDailyRollups.day, FUTURE));
-    expect(rollups.map((r) => r.netRevenueUsd).sort()).toEqual([0, 70]);
+    expect(rollups.map((r) => r.netRevenueUsd).toSorted()).toEqual([0, 70]);
   });
 
   it("falls back to the local sales ledger when a processor API key is missing", async () => {
@@ -1146,17 +1414,21 @@ describe("finance ingest (mocked externals)", () => {
     // our own succeeded payments instead (none in this 2031 window) and stays OK.
     FinanceRepository.deps = {
       ...testDeps,
-      stripePort: () => null,
-      nowPaymentsPort: () => null,
+      stripePort: (): null => null,
+      nowPaymentsPort: (): null => null,
     };
     try {
       const data = await ingest(IngestScope.REVENUE);
-      const stripe = data.sources.find((s) => s.source === FinanceSource.STRIPE);
+      const stripe = data.sources.find(
+        (s) => s.source === FinanceSource.STRIPE,
+      );
       expect(stripe?.status).toBe(SourceRunStatus.OK);
       expect(stripe?.reason).toContain("FALLBACK: local sales ledger");
       expect(stripe?.fallback).toBe(true);
       expect(stripe?.events).toBe(0);
-      const np = data.sources.find((s) => s.source === FinanceSource.NOWPAYMENTS);
+      const np = data.sources.find(
+        (s) => s.source === FinanceSource.NOWPAYMENTS,
+      );
       expect(np?.status).toBe(SourceRunStatus.OK);
       expect(np?.fallback).toBe(true);
       expect(np?.reason).toContain("NOWPAYMENTS_EMAIL + NOWPAYMENTS_PASSWORD");
@@ -1176,13 +1448,31 @@ describe("finance ingest (mocked externals)", () => {
     // one pending ($20, must NOT count), one EUR charge (FX -> USD), one refund.
     const [anyUser] = await db.select({ id: users.id }).from(users).limit(1);
     if (!anyUser) {
-      throw new Error("test requires at least one user");
+      return expect.unreachable("test requires at least one user");
     }
     const day = new Date(Date.UTC(2031, 2, 3, 15));
-    const okA = await insertPayment(anyUser.id, "25.00", "USD", PaymentStatus.SUCCEEDED, day);
-    const okB = await insertPayment(anyUser.id, "50.00", "USD", PaymentStatus.SUCCEEDED, day);
+    await insertPayment(
+      anyUser.id,
+      "25.00",
+      "USD",
+      PaymentStatus.SUCCEEDED,
+      day,
+    );
+    const okB = await insertPayment(
+      anyUser.id,
+      "50.00",
+      "USD",
+      PaymentStatus.SUCCEEDED,
+      day,
+    );
     await insertPayment(anyUser.id, "20.00", "USD", PaymentStatus.PENDING, day);
-    await insertPayment(anyUser.id, "10.00", "EUR", PaymentStatus.SUCCEEDED, day);
+    await insertPayment(
+      anyUser.id,
+      "10.00",
+      "EUR",
+      PaymentStatus.SUCCEEDED,
+      day,
+    );
     await insertRefund(anyUser.id, okB, "5.00", "USD", day);
 
     // Realistic prod shape: the Stripe key is set but the connected account
@@ -1190,15 +1480,17 @@ describe("finance ingest (mocked externals)", () => {
     // own succeeded payments via reconciliation.
     FinanceRepository.deps = {
       ...testDeps,
-      stripePort: () => ({
-        listBalanceTransactions: async () => [],
-        listCancellations: async () => [],
+      stripePort: (): StripeLedgerPort => ({
+        listBalanceTransactions: async (): Promise<[]> => [],
+        listCancellations: async (): Promise<[]> => [],
       }),
-      nowPaymentsPort: () => null,
+      nowPaymentsPort: (): null => null,
     };
     try {
       const data = await ingest(IngestScope.REVENUE);
-      const stripe = data.sources.find((s) => s.source === FinanceSource.STRIPE);
+      const stripe = data.sources.find(
+        (s) => s.source === FinanceSource.STRIPE,
+      );
       expect(stripe?.status).toBe(SourceRunStatus.OK);
       // 2 USD charges + 1 EUR charge + 1 refund = 4 events; pending excluded.
       expect(stripe?.events).toBe(4);
@@ -1233,7 +1525,7 @@ describe("finance ingest (mocked externals)", () => {
     // A real sale on a historical day that has NO provider cost snapshots.
     const [anyUser] = await db.select({ id: users.id }).from(users).limit(1);
     if (!anyUser) {
-      throw new Error("test requires at least one user");
+      return expect.unreachable("test requires at least one user");
     }
     const sale = new Date(Date.UTC(2031, 2, 2, 15)); // 2031-03-02
     await insertPayment(
@@ -1246,8 +1538,8 @@ describe("finance ingest (mocked externals)", () => {
     // No processor API: the backfill falls back (flagged) to our own ledger.
     FinanceRepository.deps = {
       ...testDeps,
-      stripePort: () => null,
-      nowPaymentsPort: () => null,
+      stripePort: (): null => null,
+      nowPaymentsPort: (): null => null,
     };
     try {
       const result = await FinanceRepository.ingest(
@@ -1263,7 +1555,7 @@ describe("finance ingest (mocked externals)", () => {
         defaultLocale,
       );
       if (!result.success) {
-        throw new Error(result.message);
+        return expect.unreachable(result.message);
       }
       // Three days recomputed; revenue reconstructed from the ledger.
       expect(result.data.days).toHaveLength(3);
@@ -1300,12 +1592,18 @@ describe("finance ingest (mocked externals)", () => {
     // and the day's revenue doubled. The window re-pull must replace, not add.
     const [anyUser] = await db.select({ id: users.id }).from(users).limit(1);
     if (!anyUser) {
-      throw new Error("test requires at least one user");
+      return expect.unreachable("test requires at least one user");
     }
     const sale = new Date(Date.UTC(2031, 2, 3, 10));
-    await insertPayment(anyUser.id, "100.00", "USD", PaymentStatus.SUCCEEDED, sale);
+    await insertPayment(
+      anyUser.id,
+      "100.00",
+      "USD",
+      PaymentStatus.SUCCEEDED,
+      sale,
+    );
     try {
-      FinanceRepository.deps = { ...testDeps, stripePort: () => null };
+      FinanceRepository.deps = { ...testDeps, stripePort: (): null => null };
       await ingest(IngestScope.REVENUE);
       FinanceRepository.deps = testDeps;
       await ingest(IngestScope.REVENUE);
@@ -1340,7 +1638,7 @@ describe("finance ingest (mocked externals)", () => {
   it("adds the flat-rate Gab plan to daily cost when its key is set", async () => {
     FinanceRepository.deps = {
       ...testDeps,
-      apiKey: (source) =>
+      apiKey: (source): string | undefined =>
         source === FinanceSource.GAB ? "test-key" : testDeps.apiKey(source),
     };
     try {
@@ -1398,6 +1696,99 @@ describe("finance ingest (mocked externals)", () => {
     ).toHaveLength(1);
   });
 
+  it("reconciles OpenRouter against its ledger window and still sends a later unexplained drain", async () => {
+    const walletId = crypto.randomUUID();
+    const start = new Date(Date.UTC(2031, 2, 4, 11, 30));
+    await db.insert(creditWallets).values({ id: walletId });
+    try {
+      const debit = {
+        walletId,
+        type: CreditTransactionType.USAGE,
+        modelId: VideoGenModelId.VEO_3_1_LITE,
+        balanceAfter: 0,
+      };
+      await db.insert(creditTransactions).values([
+        {
+          ...debit,
+          amount: -500,
+          createdAt: start,
+          metadata: {
+            cost: 500,
+            apiProvider: ApiProvider.OPENROUTER,
+            upstreamCostUsd: 4.04,
+          },
+        },
+        {
+          ...debit,
+          amount: -260,
+          createdAt: start,
+          metadata: { cost: 260 },
+        },
+        {
+          ...debit,
+          amount: -1000,
+          createdAt: start,
+          metadata: { cost: 1000, apiProvider: ApiProvider.UNBOTTLED },
+        },
+        {
+          ...debit,
+          amount: -1000,
+          createdAt: new Date(start.getTime() - 1000),
+          metadata: { cost: 1000, apiProvider: ApiProvider.OPENROUTER },
+        },
+        {
+          ...debit,
+          amount: -1000,
+          createdAt: NOW,
+          metadata: { cost: 1000, apiProvider: ApiProvider.OPENROUTER },
+        },
+      ]);
+      await seedPreviousReading(100);
+      openRouterUsage = 106.04;
+
+      const result = await ingest(IngestScope.BALANCES);
+      const drain = result.alerts.find(
+        (alert) => alert.type === FinanceAlertType.BALANCE_DRAIN,
+      );
+      expect(drain).toMatchObject({
+        severity: AlertSeverity.WARNING,
+        delivery: "sent",
+      });
+      expect(drain?.message).toContain(
+        "Usage spike explained by ledger: OpenRouter",
+      );
+      expect(drain?.message).toContain("$6.04 in provider costs");
+      expect(drain?.message).toContain(`wallet ${walletId} 100%`);
+      expect(ledgerWindows).toContainEqual({ from: start, to: NOW });
+
+      const { t: de } = scopedTranslation.scopedT("de-DE");
+      const status = await FinanceRepository.status(de, logger);
+      expect(status.success).toBe(true);
+      expect(
+        status.success &&
+          status.data.alerts.find(
+            (alert) => alert.type === FinanceAlertType.BALANCE_DRAIN,
+          )?.message,
+      ).toContain("Das Ledger erklärt die Nutzungsspitze bei OpenRouter.");
+
+      observedAt = new Date(NOW.getTime() + FINANCE_CONFIG.hourMs);
+      openRouterUsage += 45;
+      const next = await ingest(IngestScope.BALANCES);
+      const unexplained = next.alerts.find(
+        (alert) => alert.type === FinanceAlertType.BALANCE_DRAIN,
+      );
+      expect(unexplained).toMatchObject({
+        severity: AlertSeverity.CRITICAL,
+        delivery: "sent",
+      });
+      expect(unexplained?.message).toContain(
+        "Possible key compromise: OpenRouter",
+      );
+    } finally {
+      await db.delete(creditWallets).where(eq(creditWallets.id, walletId));
+    }
+  });
+
   it("a dry run reports alerts but stores and sends nothing", async () => {
     await seedPreviousReading(100);
     openRouterUsage = 190;
@@ -1420,7 +1811,7 @@ describe("finance ingest (mocked externals)", () => {
   });
 
   it("without a recipient the alert is still logged and recorded", async () => {
-    FinanceRepository.deps = { ...testDeps, recipients: () => [] };
+    FinanceRepository.deps = { ...testDeps, recipients: (): string[] => [] };
     try {
       await seedPreviousReading(100);
       openRouterUsage = 190;
@@ -1454,10 +1845,9 @@ describe("finance ingest (mocked externals)", () => {
         delivery: "sent",
       }),
     ]);
-    expect((await checkAutoTopUpBalances(4.5, 3, 63)).map((alert) => alert.delivery)).toEqual([
-      "suppressed",
-      "suppressed",
-    ]);
+    expect(
+      (await checkAutoTopUpBalances(4.5, 3, 63)).map((alert) => alert.delivery),
+    ).toEqual(["suppressed", "suppressed"]);
 
     // A recovery clears only this provider's low-balance streak.
     expect(await checkAutoTopUpBalances(5, 3, 64)).toEqual([
@@ -1479,28 +1869,24 @@ describe("finance ingest (mocked externals)", () => {
   });
 
   it("waits for OpenRouter's grace period and resets it on recovery or a missed hour", async () => {
-    async function checkBalance(balance: number, mins: number, dryRun = false) {
-      openRouterCredits = openRouterUsage + 40 + balance;
-      observedAt = new Date(NOW.getTime() + mins * 60_000);
-      const result = await ingest(IngestScope.BALANCES, dryRun);
-      return result.alerts.find(
-        (alert) => alert.type === FinanceAlertType.LOW_BALANCE &&
-          alert.subject === FinanceSource.OPENROUTER,
-      );
-    }
-
-    expect(await checkBalance(4, 0)).toBeUndefined();
-    expect(await checkBalance(4, 60)).toBeUndefined();
-    expect(await checkBalance(4, 61, true)).toMatchObject({ delivery: "dry-run" });
-    expect(await checkBalance(4, 61)).toMatchObject({
+    expect(await checkOpenRouterBalance(4, 0)).toBeUndefined();
+    expect(await checkOpenRouterBalance(4, 60)).toBeUndefined();
+    expect(await checkOpenRouterBalance(4, 61, true)).toMatchObject({
+      delivery: "dry-run",
+    });
+    expect(await checkOpenRouterBalance(4, 61)).toMatchObject({
       severity: AlertSeverity.CRITICAL,
       delivery: "sent",
     });
-    expect(await checkBalance(4, 62)).toMatchObject({ delivery: "suppressed" });
-    expect(await checkBalance(5, 63)).toBeUndefined();
-    expect(await checkBalance(4, 64)).toBeUndefined();
-    expect(await checkBalance(4, 180)).toBeUndefined();
-    expect(await checkBalance(4, 241)).toMatchObject({ delivery: "sent" });
+    expect(await checkOpenRouterBalance(4, 62)).toMatchObject({
+      delivery: "suppressed",
+    });
+    expect(await checkOpenRouterBalance(5, 63)).toBeUndefined();
+    expect(await checkOpenRouterBalance(4, 64)).toBeUndefined();
+    expect(await checkOpenRouterBalance(4, 180)).toBeUndefined();
+    expect(await checkOpenRouterBalance(4, 241)).toMatchObject({
+      delivery: "sent",
+    });
     expect(mails).toHaveLength(2);
   });
 
@@ -1544,7 +1930,8 @@ describe("finance ingest (mocked externals)", () => {
     let failUsage = false;
     FinanceRepository.deps = {
       ...testDeps,
-      apiKey: (source) => (source === FinanceSource.GAB ? "test-key" : testDeps.apiKey(source)),
+      apiKey: (source): string | undefined =>
+        source === FinanceSource.GAB ? "test-key" : testDeps.apiKey(source),
       async http(request): Promise<HttpResult> {
         const url = new URL(request.url);
         if (url.origin !== "https://gab.ai" || url.pathname !== "/v1/usage") {
@@ -1554,7 +1941,9 @@ describe("finance ingest (mocked externals)", () => {
         expect(request.method).toBe("GET");
         expect(request.headers.Authorization).toBe("Bearer test-key");
         if (failUsage) {
-          expect(url.searchParams.get("start_date")).toBe(bucketAt.toISOString());
+          expect(url.searchParams.get("start_date")).toBe(
+            bucketAt.toISOString(),
+          );
           return { status: 503, json: null };
         }
         expect(url.searchParams.get("start_date")).toBe(startDate);
@@ -1562,7 +1951,10 @@ describe("finance ingest (mocked externals)", () => {
         if (url.searchParams.get("before") === "cursor") {
           return {
             status: 200,
-            json: { data: [{ created: endSeconds - 3_600, credits_used: 3 }], has_more: false },
+            json: {
+              data: [{ created: endSeconds - 3_600, credits_used: 3 }],
+              has_more: false,
+            },
           };
         }
         return {
@@ -1581,8 +1973,14 @@ describe("finance ingest (mocked externals)", () => {
     try {
       const result = await ingest(IngestScope.BALANCES);
       expect(usageCalls).toBe(2);
-      expect(result.sources.find(({ source }) => source === FinanceSource.GAB))
-        .toMatchObject({ balanceUsd: null, spendUsd: null, fallback: false, reason: expect.stringContaining("7 Gab credits charged") });
+      expect(
+        result.sources.find(({ source }) => source === FinanceSource.GAB),
+      ).toMatchObject({
+        balanceUsd: null,
+        spendUsd: null,
+        fallback: false,
+        reason: expect.stringContaining("7 Gab credits charged"),
+      });
       expect(result.alerts).toEqual([
         expect.objectContaining({
           subject: FinanceSource.GAB,
@@ -1591,22 +1989,29 @@ describe("finance ingest (mocked externals)", () => {
         }),
       ]);
       const status = await FinanceRepository.status(t, logger);
-      expect(status.success && status.data.sources.find(({ source }) => source === FinanceSource.GAB))
-        .toMatchObject({ balanceNative: 150, lastSpendNative: 7 });
+      expect(
+        status.success &&
+          status.data.sources.find(
+            ({ source }) => source === FinanceSource.GAB,
+          ),
+      ).toMatchObject({ balanceNative: 150, lastSpendNative: 7 });
 
       failUsage = true;
       gabBalance = 40;
       observedAt = new Date(NOW.getTime() + FINANCE_CONFIG.hourMs);
       const duringOutage = await ingest(IngestScope.BALANCES);
       expect(duringOutage.alerts).toEqual([
-        expect.objectContaining({ subject: FinanceSource.GAB, severity: AlertSeverity.CRITICAL }),
+        expect.objectContaining({
+          subject: FinanceSource.GAB,
+          severity: AlertSeverity.CRITICAL,
+        }),
       ]);
-      expect(duringOutage.sources.find(({ source }) => source === FinanceSource.GAB)).toMatchObject(
-        {
-          status: SourceRunStatus.OK,
-          reason: expect.stringContaining("Gab usage unavailable (HTTP 503)"),
-        },
-      );
+      expect(
+        duringOutage.sources.find(({ source }) => source === FinanceSource.GAB),
+      ).toMatchObject({
+        status: SourceRunStatus.OK,
+        reason: expect.stringContaining("Gab usage unavailable (HTTP 503)"),
+      });
     } finally {
       FinanceRepository.deps = testDeps;
     }
@@ -1680,7 +2085,9 @@ describe("finance ingest (mocked externals)", () => {
       ingest(IngestScope.BALANCES),
       ingest(IngestScope.BALANCES),
     ]);
-    const deliveries = outcomes.flatMap((outcome) => outcome.alerts.map((alert) => alert.delivery));
+    const deliveries = outcomes.flatMap((outcome) =>
+      outcome.alerts.map((alert) => alert.delivery),
+    );
     expect(deliveries.toSorted()).toEqual(["sent", "suppressed"]);
     expect(mails).toHaveLength(1);
   });

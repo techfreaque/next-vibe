@@ -18,7 +18,7 @@ import { Platform } from "next-vibe/platforms/platforms";
 
 import { creditPolicyReason } from "@/credits/anti-farming/reason";
 import { protectedBalance } from "@/credits/anti-farming/spending";
-import type { UsageAttribution } from "@/credits/db";
+import type { UsageAttribution, UsageUpstreamCost } from "@/credits/db";
 import type { CreditsT } from "@/credits/i18n";
 import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
 import { CreditRepository } from "@/credits/repository";
@@ -216,7 +216,19 @@ export async function deductMediaCredits(
   logger: EndpointLogger,
   tCredits: CreditsT,
   attribution: UsageAttribution,
+  upstreamCostUsd?: number,
 ): Promise<ResponseType<void>> {
+  const upstreamCost: UsageUpstreamCost | undefined =
+    upstreamCostUsd !== undefined &&
+    Number.isFinite(upstreamCostUsd) &&
+    upstreamCostUsd >= 0
+      ? {
+          upstreamCostUsd,
+          fallbackCostUsd: 0,
+          upstreamProvider: null,
+          billingBasis: "upstream_cost",
+        }
+      : undefined;
   const deductResult = await CreditRepository.deductCreditsForFeature(
     user,
     creditCost,
@@ -225,6 +237,7 @@ export async function deductMediaCredits(
     tCredits,
     locale,
     attribution,
+    upstreamCost,
   );
 
   if (!deductResult.success) {

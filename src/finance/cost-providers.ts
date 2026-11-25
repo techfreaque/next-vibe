@@ -100,6 +100,16 @@ export function resolveModelProvider(modelId: string | null): string {
   return MODEL_PROVIDER_INDEX.get(modelId) ?? UNATTRIBUTED_PROVIDER;
 }
 
+/** Model IDs to use when an older usage row has no provider stamp. */
+export function legacyModelIdsForProviders(
+  providers: readonly ApiProvider[],
+): string[] {
+  const matches: ReadonlySet<string> = new Set(providers);
+  return [...MODEL_PROVIDER_INDEX]
+    .filter(([, provider]) => matches.has(provider))
+    .map(([modelId]) => modelId);
+}
+
 /** Display name of a cost provider key. */
 export function costProviderLabel(key: string): string {
   const service = toolServices.find(({ apiProvider }) => apiProvider === key);

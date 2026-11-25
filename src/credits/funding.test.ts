@@ -43,13 +43,21 @@ import {
   checkMediaBalance,
   deductMediaCredits,
 } from "../vibe/agent/shared/media-generation";
-import { type CreditTransaction, creditTransactions, creditWallets } from "./db";
+import {
+  type CreditTransaction,
+  creditTransactions,
+  creditWallets,
+} from "./db";
 import {
   CreditFundingType,
   CreditPackType,
   CreditTransactionType,
 } from "./enum";
-import { FREE_ALLOWANCE_BASE, packFundingType, splitFreeDebit } from "./funding";
+import {
+  FREE_ALLOWANCE_BASE,
+  packFundingType,
+  splitFreeDebit,
+} from "./funding";
 import { scopedTranslation as creditsScopedTranslation } from "./i18n";
 import { CreditRepository } from "./repository";
 import { TOOL_COST_PROVIDERS } from "./tool-cost-providers";
@@ -278,6 +286,7 @@ describe("deduction walk stamps the funding bucket", () => {
       modelId: ImageGenModelId.FLUX_2_MAX,
       apiProvider: ApiProvider.MODELSLAB,
     };
+    const upstreamCostUsd = 0.123456789;
     const charged = await deductMediaCredits(
       spender.user,
       cost,
@@ -286,6 +295,7 @@ describe("deduction walk stamps the funding bucket", () => {
       logger,
       creditsT,
       attribution,
+      upstreamCostUsd,
     );
     expect(charged.success).toBe(true);
 
@@ -293,7 +303,14 @@ describe("deduction walk stamps the funding bucket", () => {
     for (const row of rows) {
       expect(row.feature).toBe(IMAGE_GEN_ALIAS);
       expect(row.modelId).toBe(attribution.modelId);
-      expect(row.metadata).toMatchObject({ apiProvider: attribution.apiProvider });
+      expect(row.metadata).toMatchObject({
+        apiProvider: attribution.apiProvider,
+      });
+      const costShare =
+        "upstreamCostUsd" in row.metadata
+          ? row.metadata.upstreamCostUsd
+          : undefined;
+      expect(costShare).toBeCloseTo(upstreamCostUsd * (-row.amount / cost), 9);
     }
     expect(rows.every((row) => row.fundingType !== null)).toBe(true);
     const total = rows.reduce((sum, row) => sum - row.amount, 0);
@@ -385,7 +402,9 @@ describe("pre-generation balance check uses the spendable amount", () => {
   let holder: TestUser;
 
   beforeAll(async () => {
-    const created = await createTestUser(`funding-spendable-${stamp}@example.com`);
+    const created = await createTestUser(
+      `funding-spendable-${stamp}@example.com`,
+    );
     expect(created.success).toBe(true);
     if (!created.success) {
       return;

@@ -1,4 +1,13 @@
 export const translations = {
+  spendAlert: {
+    explained: "Usage spike explained by ledger: {{provider}}.",
+    unexplained: "Possible key compromise: {{provider}}.",
+    cap: "{{spend}} spent in {{hours}}h ({{rate}}/h, cap {{cap}}/h).",
+    drain:
+      "Spending {{rate}}/h is {{ratio}}x the trailing average of {{baseline}}/h over {{coveredHours}}h of covered data (limit {{limit}}x).",
+    ledgerCost: "The ledger shows {{cost}} in provider costs for this window.",
+    topWallets: "Top wallets by credits spent: {{wallets}}.",
+  },
   category: "Finance",
   documents: {
     search: "Search documents",

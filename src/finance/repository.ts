@@ -20,7 +20,9 @@ import {
   gte,
   inArray,
   isNotNull,
+  isNull,
   lt,
+  or,
   sql,
 } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
@@ -47,6 +49,10 @@ import { agentEnv } from "@/vibe/agent/env";
 
 import { FINANCE_CONFIG } from "./config";
 import { ConsumptionRepository } from "./consumption-repository";
+import {
+  legacyModelIdsForProviders,
+  listedCreditsToProviderCostUsd,
+} from "./cost-providers";
 import {
   financeAlerts,
   financeDailyRollups,
@@ -86,7 +92,9 @@ import {
   detectCreditLowBalance,
   detectDayAnomalies,
   detectProviderAnomalies,
+  formatProviderSpendAlert,
   isDuplicateAlert,
+  type LedgerUsageBreakdown,
   resolveThresholds,
   round2,
   type SpendBasis,
@@ -145,7 +153,7 @@ export interface FinanceDeps {
   ): DashboardCredentials | null;
   stripePort(): StripeLedgerPort | null;
   nowPaymentsPort(http: FinanceHttp): NowPaymentsPort | null;
-  /** Our own usage log, for providers without measured USD spend. */
+  /** Our own usage log, for estimating and reconciling provider spend. */
   usageLedger: UsageLedgerPort;
   /**
    * Finance-alert recipients (ops inbox + Thea mailbox); empty when none
@@ -238,27 +246,33 @@ export const defaultFinanceDeps: FinanceDeps = {
         );
       return Number(row?.calls ?? 0);
     },
-    async usageBreakdown(modelIds, from, to) {
-      const empty = {
-        calls: 0,
-        billedCredits: 0,
-        packCredits: 0,
-        freeCredits: 0,
-        walletCount: 0,
-        topWallets: [],
-      };
-      if (modelIds.length === 0) {
-        return empty;
-      }
+    async usageBreakdown(apiProviders, from, to) {
+      const stampedProvider = sql<string>`nullif(${creditTransactions.metadata}->>'apiProvider', '')`;
+      const legacyIds = legacyModelIdsForProviders(apiProviders);
+      const upstream = sql`(${creditTransactions.metadata}->>'upstreamCostUsd')::numeric`;
+      const fallback = sql`(${creditTransactions.metadata}->>'fallbackCostUsd')::numeric`;
       const where = and(
         eq(creditTransactions.type, CreditTransactionType.USAGE),
-        inArray(creditTransactions.modelId, [...modelIds]),
+        lt(creditTransactions.amount, 0),
+        notSignupCarryover,
+        or(
+          inArray(stampedProvider, apiProviders),
+          and(
+            isNull(stampedProvider),
+            inArray(sql<string>`${creditTransactions.modelId}`, legacyIds),
+          ),
+        ),
         gte(creditTransactions.createdAt, from),
         lt(creditTransactions.createdAt, to),
       );
       const [totals] = await db
         .select({
           calls: sql<number>`count(distinct coalesce(${creditTransactions.messageId}::text, ${creditTransactions.metadata}->>'messageId', ${creditTransactions.id}::text))`,
+          upstreamCostUsd: sql<number>`coalesce(sum(case
+            when ${upstream} is not null or ${fallback} is not null
+              then coalesce(${upstream}, 0) + coalesce(${fallback}, 0)
+            else -${creditTransactions.amount} * ${listedCreditsToProviderCostUsd(1)}::numeric
+          end), 0)`,
         })
         .from(creditTransactions)
         .where(where);
@@ -292,6 +306,7 @@ export const defaultFinanceDeps: FinanceDeps = {
       );
       return {
         calls: Number(totals?.calls ?? 0),
+        upstreamCostUsd: Number(totals?.upstreamCostUsd ?? 0),
         billedCredits: round2(billedCredits),
         packCredits: round2(billedCredits - freeCredits),
         freeCredits: round2(freeCredits),
@@ -524,6 +539,7 @@ export class FinanceRepository {
             balances,
             runSpend,
             logger,
+            t,
           );
           sources.push(report);
         }
@@ -550,6 +566,7 @@ export class FinanceRepository {
         now,
         data,
         pulled,
+        sources,
         runSpend,
         thresholds,
         candidates,
@@ -615,6 +632,7 @@ export class FinanceRepository {
     balances: LowBalanceObservation[],
     runSpend: Map<string, number>,
     logger: EndpointLogger,
+    t: FinanceT,
   ): Promise<SourceReport> {
     const deps = FinanceRepository.deps;
     const base: SourceReport = {
@@ -786,19 +804,21 @@ export class FinanceRepository {
           bucketAt,
         );
         runSpend.set(provider, delta.spendUsd);
-        // Ledger-estimated providers: who / what drove the window, so the
-        // alert reads as a usage spike with its margin, not a key compromise.
-        const ledgerUsage =
-          spendBasis === "usage-ledger" &&
-          adapter.ledgerBreakdown !== null &&
-          previous &&
-          delta.spendUsd >= thresholds.minSpikeUsd
-            ? await adapter.ledgerBreakdown(
-                deps.usageLedger,
-                previous.capturedAt,
-                now,
-              )
-            : null;
+        let ledgerUsage: LedgerUsageBreakdown | null = null;
+        if (previous && delta.spendUsd >= thresholds.minSpikeUsd) {
+          try {
+            ledgerUsage = await deps.usageLedger.usageBreakdown(
+              adapter.apiProviders,
+              previous.capturedAt,
+              now,
+            );
+          } catch (error) {
+            logger.warn("[Finance] Provider ledger reconciliation failed", {
+              provider,
+              error: parseError(error).message,
+            });
+          }
+        }
         candidates.push(
           ...detectProviderAnomalies({
             provider,
@@ -810,6 +830,7 @@ export class FinanceRepository {
             thresholds,
             spendBasis,
             ledgerUsage,
+            t,
           }),
         );
       }
@@ -1140,6 +1161,7 @@ export class FinanceRepository {
     now: Date,
     data: { dryRun: boolean },
     pulled: RevenueEventInput[],
+    sources: SourceReport[],
     runSpend: Map<string, number>,
     thresholds: Thresholds,
     candidates: AlertCandidate[],
@@ -1149,6 +1171,18 @@ export class FinanceRepository {
     const yesterday = new Date(today.getTime() - DAY_MS);
     const firstSnapshotHour =
       await FinanceRepository.firstProviderSnapshotHour();
+    const refreshedRevenueSources = new Set(
+      sources
+        .filter((s) => s.kind === "revenue" && s.status === SourceRunStatus.OK)
+        .map((s) => s.source),
+    );
+    const storedRevenueStatus = await db
+      .select({
+        source: financeSourceStatus.source,
+        lastOkAt: financeSourceStatus.lastOkAt,
+      })
+      .from(financeSourceStatus)
+      .where(inArray(financeSourceStatus.source, RevenueSources));
     const out: DayReport[] = [];
     for (const dayStart of [yesterday, today]) {
       const key = dayKey(dayStart);
@@ -1159,6 +1193,7 @@ export class FinanceRepository {
             now,
             firstSnapshotHour,
             pulled,
+            refreshedRevenueSources,
             runSpend,
             isToday,
           )
@@ -1186,18 +1221,30 @@ export class FinanceRepository {
         },
         thresholds,
       );
-      // Margin / billing-gap are only judged on a complete, fully-tracked past
-      // day: never on a partial "today", and never when cost coverage is not
-      // COMPLETE (an incomplete cost would cry wolf with a false negative margin).
+      // The midnight balance run can close the cost window hours before the
+      // daily revenue pull. A zero is meaningful only after every source has
+      // been pulled since the day closed, including sources with no sales.
+      const dayEnd = dayStart.getTime() + DAY_MS;
+      const revenueTrusted = RevenueSources.every((source) => {
+        const lastOkAt = storedRevenueStatus
+          .find((row) => row.source === source)
+          ?.lastOkAt?.getTime();
+        return (
+          refreshedRevenueSources.has(source) ||
+          (lastOkAt ?? Number.NEGATIVE_INFINITY) >= dayEnd
+        );
+      });
       const costTrusted = !isToday && comp.coverage === CostCoverage.COMPLETE;
       candidates.push(
-        ...anomalies.filter(
-          (a) =>
-            costTrusted ||
-            (a.type !== FinanceAlertType.NEGATIVE_MARGIN &&
-              a.type !== FinanceAlertType.THIN_MARGIN &&
-              a.type !== FinanceAlertType.BILLING_GAP),
-        ),
+        ...anomalies.filter((a) => {
+          if (
+            a.type === FinanceAlertType.NEGATIVE_MARGIN ||
+            a.type === FinanceAlertType.THIN_MARGIN
+          ) {
+            return costTrusted && revenueTrusted;
+          }
+          return a.type !== FinanceAlertType.BILLING_GAP || costTrusted;
+        }),
       );
     }
     logger.debug("[Finance] Rollup computed", { days: out.length });
@@ -1251,13 +1298,19 @@ export class FinanceRepository {
   }
 
   /** Read stored revenue snapshots for one UTC day into a DayRevenue total. */
-  private static async readDayRevenue(dayStart: Date): Promise<DayRevenue> {
+  private static async readDayRevenue(
+    dayStart: Date,
+    refreshedSources?: ReadonlySet<typeof FinanceSourceValue>,
+  ): Promise<DayRevenue> {
     const revenue = emptyDay();
     const snaps = await db
       .select()
       .from(financeRevenueSnapshots)
       .where(eq(financeRevenueSnapshots.day, dayStart));
     for (const s of snaps) {
+      if (refreshedSources?.has(s.source)) {
+        continue;
+      }
       addDay(revenue, {
         grossUsd: s.grossUsd,
         refundsUsd: s.refundsUsd,
@@ -1423,14 +1476,19 @@ export class FinanceRepository {
     now: Date,
     firstSnapshotHour: Date | null,
     pulled: RevenueEventInput[],
+    refreshedRevenueSources: ReadonlySet<typeof FinanceSourceValue>,
     runSpend: Map<string, number>,
     isToday: boolean,
   ): Promise<DayComputation> {
     const next = new Date(dayStart.getTime() + DAY_MS);
     const key = dayKey(dayStart);
-    const revenue = emptyDay();
-    for (const days of aggregateEvents(pulled).values()) {
-      addDay(revenue, days.get(key));
+    const revenue = await FinanceRepository.readDayRevenue(
+      dayStart,
+      refreshedRevenueSources,
+    );
+    const revenueBySource = aggregateEvents(pulled);
+    for (const source of refreshedRevenueSources) {
+      addDay(revenue, revenueBySource.get(source)?.get(key));
     }
     const { perProvider, snapshotHours } = await FinanceRepository.readDayCost(
       dayStart,
@@ -1834,12 +1892,20 @@ export class FinanceRepository {
     const out: AlertReport[] = [];
     for (const c of candidates) {
       const [last] = await db
-        .select({ createdAt: financeAlerts.createdAt })
+        .select({
+          createdAt: financeAlerts.createdAt,
+          severity: financeAlerts.severity,
+        })
         .from(financeAlerts)
         .where(eq(financeAlerts.dedupKey, c.dedupKey))
         .orderBy(desc(financeAlerts.createdAt))
         .limit(1);
+      const escalatesProviderSpend =
+        c.metadata.spendBasis === "provider-api" &&
+        last?.severity === AlertSeverity.WARNING &&
+        c.severity === AlertSeverity.CRITICAL;
       if (
+        !escalatesProviderSpend &&
         isDuplicateAlert(
           last?.createdAt ?? null,
           now,
@@ -2002,7 +2068,7 @@ export class FinanceRepository {
           type: a.type,
           severity: a.severity,
           subject: a.subject,
-          message: a.message,
+          message: formatProviderSpendAlert(a.type, a.metadata, t) ?? a.message,
           delivery: a.delivery,
           createdAt: a.createdAt.toISOString(),
         })),

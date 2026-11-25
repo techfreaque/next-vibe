@@ -84,6 +84,8 @@ export const FINANCE_CONFIG = {
 
   /** Wallets named in a ledger-estimated spike alert (biggest spenders first). */
   ledgerTopWallets: 3,
+  /** Maximum relative difference between provider spend and ledger cost. */
+  providerLedgerTolerance: 0.2,
 
   /** Default thresholds. Keyed by ThresholdKey value suffix (see enum.ts). */
   thresholdDefaults: {

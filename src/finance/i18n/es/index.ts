@@ -1,6 +1,16 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  spendAlert: {
+    explained: "El registro de uso explica el pico en {{provider}}.",
+    unexplained: "Posible compromiso de la clave de API de {{provider}}.",
+    cap: "Se gastaron {{spend}} en {{hours}} h ({{rate}}/h, tope de {{cap}}/h).",
+    drain:
+      "El gasto de {{rate}}/h equivale a {{ratio}} veces el promedio reciente de {{baseline}}/h en {{coveredHours}} h con datos (límite: {{limit}} veces).",
+    ledgerCost:
+      "El registro indica un costo de {{cost}} del proveedor en este periodo.",
+    topWallets: "Carteras con mayor consumo de créditos: {{wallets}}.",
+  },
   category: "Finanzas",
   documents: {
     search: "Documentos de búsqueda",

@@ -40,16 +40,16 @@ import {
 import type { FinanceHttp } from "./http";
 import type { ProviderResult } from "./types";
 
-/** Our own usage log, used when a provider's USD spend is unavailable. */
+/** Our own usage log, used to estimate and reconcile provider spend. */
 export interface UsageLedgerPort {
   /** Distinct billed calls on these model IDs, optionally in [from, to). */
   billedCalls(
     modelIds: readonly ChatModelId[],
     window?: { from: Date; to: Date },
   ): Promise<number>;
-  /** Who / what was billed on these model ids in [from, to): alert context. */
+  /** Who / what was billed by these APIs in [from, to). */
   usageBreakdown(
-    modelIds: readonly ChatModelId[],
+    apiProviders: readonly ApiProvider[],
     from: Date,
     to: Date,
   ): Promise<LedgerUsageBreakdown>;
@@ -70,17 +70,8 @@ export interface ProviderAdapter {
     from: Date,
     to: Date,
   ): Promise<number | null>;
-  /**
-   * Usage-ledger providers only: the billed usage behind a spend window, so a
-   * spike alert can say who / what drove it. null for provider-api adapters.
-   */
-  ledgerBreakdown:
-    | ((
-        ledger: UsageLedgerPort,
-        from: Date,
-        to: Date,
-      ) => Promise<LedgerUsageBreakdown | null>)
-    | null;
+  /** Ledger provider IDs billed by the monitored account. */
+  apiProviders: readonly ApiProvider[];
   fetchBalance(
     http: FinanceHttp,
     apiKey: string,
@@ -123,7 +114,7 @@ const openRouter: ProviderAdapter = {
   endpoint: "https://openrouter.ai/api/v1/credits",
   noEndpointReason: null,
   spendBasis: "provider-api",
-  ledgerBreakdown: null,
+  apiProviders: [ApiProvider.OPENROUTER],
   async fetchBalance(http, apiKey) {
     const res = await http({
       url: "https://openrouter.ai/api/v1/credits",
@@ -179,7 +170,7 @@ const nanoGpt: ProviderAdapter = {
   endpoint: "https://nano-gpt.com/api/check-balance",
   noEndpointReason: null,
   spendBasis: "provider-api",
-  ledgerBreakdown: null,
+  apiProviders: [ApiProvider.NANO_GPT],
   async fetchBalance(http, apiKey) {
     const res = await http({
       url: "https://nano-gpt.com/api/check-balance",
@@ -214,7 +205,7 @@ const venice: ProviderAdapter = {
   endpoint: "https://api.venice.ai/api/v1/api_keys/rate_limits",
   noEndpointReason: null,
   spendBasis: "provider-api",
-  ledgerBreakdown: null,
+  apiProviders: [ApiProvider.VENICE_AI],
   async fetchBalance(http, apiKey) {
     const res = await http({
       url: "https://api.venice.ai/api/v1/api_keys/rate_limits",
@@ -269,7 +260,7 @@ const gab: ProviderAdapter = {
   endpoint: "https://gab.ai/v1/credits",
   noEndpointReason: null,
   spendBasis: "provider-api",
-  ledgerBreakdown: null,
+  apiProviders: [ApiProvider.GAB_AI],
   async fetchBalance(http, apiKey) {
     const res = await http({
       url: "https://gab.ai/v1/credits",
@@ -371,7 +362,7 @@ const modelsLab: ProviderAdapter = {
   endpoint: "https://modelslab.com/api/wallet_balance",
   noEndpointReason: null,
   spendBasis: "provider-api",
-  ledgerBreakdown: null,
+  apiProviders: [ApiProvider.MODELSLAB],
   async fetchBalance(http, apiKey) {
     const res = await http({
       url: "https://modelslab.com/api/wallet_balance",
@@ -410,7 +401,7 @@ const edenAi: ProviderAdapter = {
   endpoint: "https://api.edenai.run/v2/cost_management/credits/",
   noEndpointReason: null,
   spendBasis: "provider-api",
-  ledgerBreakdown: null,
+  apiProviders: [ApiProvider.EDEN_AI_TTS, ApiProvider.EDEN_AI_STT],
   async fetchBalance(http, apiKey) {
     const res = await http({
       url: "https://api.edenai.run/v2/cost_management/credits/",
@@ -482,6 +473,7 @@ function usageLedgerAdapter(input: {
     endpoint: input.dashboard.balanceUrl,
     noEndpointReason: null,
     spendBasis: "usage-ledger",
+    apiProviders: [input.apiProvider],
     dashboard: input.dashboard,
     async estimateSpend(ledger, from, to) {
       const { modelIds, unitPriceUsd } = usagePricing(input.apiProvider);
@@ -490,13 +482,6 @@ function usageLedgerAdapter(input: {
       }
       const calls = await ledger.billedCalls(modelIds, { from, to });
       return calls * unitPriceUsd;
-    },
-    async ledgerBreakdown(ledger, from, to) {
-      const pricing = usagePricing(input.apiProvider);
-      if (pricing.modelIds.length === 0) {
-        return null;
-      }
-      return await ledger.usageBreakdown(pricing.modelIds, from, to);
     },
     // oxlint-disable-next-line no-unused-vars
     async fetchBalance(_http, _apiKey, ledger) {
