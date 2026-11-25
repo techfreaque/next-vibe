@@ -420682,17 +420682,20 @@
                         "type": "enum",
                         "entries": {
                           "enums.platform.characterAi": "enums.platform.characterAi",
-                          "enums.platform.talkie": "enums.platform.talkie"
+                          "enums.platform.talkie": "enums.platform.talkie",
+                          "enums.platform.characterCard": "enums.platform.characterCard"
                         }
                       },
                       "type": "enum",
                       "enum": {
                         "enums.platform.characterAi": "enums.platform.characterAi",
-                        "enums.platform.talkie": "enums.platform.talkie"
+                        "enums.platform.talkie": "enums.platform.talkie",
+                        "enums.platform.characterCard": "enums.platform.characterCard"
                       },
                       "options": [
                         "enums.platform.characterAi",
-                        "enums.platform.talkie"
+                        "enums.platform.talkie",
+                        "enums.platform.characterCard"
                       ]
                     },
                     "sourceUrl": {
@@ -451272,6 +451275,88 @@
     "category": "ai",
     "tags": ["competenze"],
     "aliases": ["skill-delete"],
+    "credits": 0
+  },
+  {
+    "toolName": "skill-export",
+    "title": "Esporta scheda personaggio",
+    "titleShort": "Esporta scheda",
+    "description": "Esporta una skill come scheda personaggio V2 in formato JSON. Importala in SillyTavern, RisuAI, Chub o qualsiasi app in formato Tavern, oppure tienila come backup. Funziona per le tue skill, le skill pubbliche della community e le skill integrate pubbliche. La scheda cita l'autore e rimanda alla pagina della skill.",
+    "fields": {
+      "usage": {
+        "request": "urlPathParams",
+        "response": true
+      },
+      "children": {
+        "id": {
+          "type": "form_field",
+          "fieldType": "entity_picker",
+          "labelField": "name",
+          "label": "Skill",
+          "description": "La skill da esportare",
+          "schema": {
+            "def": {
+              "type": "string"
+            },
+            "type": "string"
+          },
+          "usage": {
+            "request": "urlPathParams"
+          },
+          "schemaType": "primitive"
+        },
+        "name": {
+          "type": "text",
+          "label": "Nome",
+          "schema": {
+            "def": {
+              "type": "string"
+            },
+            "type": "string"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "fileName": {
+          "type": "text",
+          "label": "Nome file",
+          "schema": {
+            "def": {
+              "type": "string"
+            },
+            "type": "string"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "card": {
+          "type": "text",
+          "label": "JSON della scheda",
+          "schema": {
+            "def": {
+              "type": "string"
+            },
+            "type": "string"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        }
+      },
+      "type": "custom-widget",
+      "schemaType": "object"
+    },
+    "executionMode": "via-execute-route",
+    "isAsync": true,
+    "instanceId": "local",
+    "category": "ai",
+    "tags": ["competenze"],
+    "aliases": ["skill-export"],
     "credits": 0
   },
   {
@@ -607646,6 +607731,329 @@
     "credits": 0
   },
   {
+    "toolName": "skill-import-card",
+    "title": "Importa scheda personaggio",
+    "titleShort": "Importa scheda",
+    "description": "Importa una scheda personaggio (V1, V2 o V3) da SillyTavern, Chub, RisuAI o qualsiasi app in formato Tavern. Accetta il file .json, una scheda .png con i dati incorporati o il JSON della scheda come testo. Nome, descrizione, personalità, scenario, primo messaggio, dialogo di esempio, istruzioni della scheda e tag diventano un nuovo personaggio tuo. L'immagine di una scheda PNG diventa l'avatar. Nulla nella scheda viene eseguito. Importare di nuovo la stessa scheda restituisce il personaggio esistente.",
+    "fields": {
+      "usage": {
+        "request": "data",
+        "response": true
+      },
+      "children": {
+        "card": {
+          "type": "form_field",
+          "fieldType": "file",
+          "label": "File della scheda",
+          "description": "Scheda personaggio in .json o .png",
+          "accept": ".json,.png,application/json,image/png",
+          "columns": 12,
+          "schema": {
+            "def": {
+              "type": "string",
+              "checks": [{}, {}]
+            },
+            "type": "string"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "visibility": {
+          "type": "form_field",
+          "fieldType": "select",
+          "label": "Visibilità",
+          "description": "Privato: solo tu. Non in elenco: fuori dalla lista pubblica. Pubblico: visibile a tutti.",
+          "options": [
+            {
+              "value": "enums.visibility.private",
+              "label": "enums.visibility.private"
+            },
+            {
+              "value": "enums.visibility.unlisted",
+              "label": "enums.visibility.unlisted"
+            },
+            {
+              "value": "enums.visibility.public",
+              "label": "enums.visibility.public"
+            }
+          ],
+          "columns": 12,
+          "schema": {
+            "def": {
+              "type": "default",
+              "innerType": {
+                "def": {
+                  "type": "enum",
+                  "entries": {
+                    "enums.visibility.private": "enums.visibility.private",
+                    "enums.visibility.unlisted": "enums.visibility.unlisted",
+                    "enums.visibility.public": "enums.visibility.public"
+                  }
+                },
+                "type": "enum",
+                "enum": {
+                  "enums.visibility.private": "enums.visibility.private",
+                  "enums.visibility.unlisted": "enums.visibility.unlisted",
+                  "enums.visibility.public": "enums.visibility.public"
+                },
+                "options": [
+                  "enums.visibility.private",
+                  "enums.visibility.unlisted",
+                  "enums.visibility.public"
+                ]
+              },
+              "defaultValue": "enums.visibility.private"
+            },
+            "type": "default"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "id": {
+          "type": "text",
+          "label": "ID personaggio",
+          "schema": {
+            "def": {
+              "type": "string"
+            },
+            "type": "string"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "name": {
+          "type": "text",
+          "label": "Nome",
+          "schema": {
+            "def": {
+              "type": "string"
+            },
+            "type": "string"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "platform": {
+          "type": "text",
+          "label": "Origine",
+          "hidden": true,
+          "schema": {
+            "def": {
+              "type": "enum",
+              "entries": {
+                "enums.platform.characterAi": "enums.platform.characterAi",
+                "enums.platform.talkie": "enums.platform.talkie",
+                "enums.platform.characterCard": "enums.platform.characterCard"
+              }
+            },
+            "type": "enum",
+            "enum": {
+              "enums.platform.characterAi": "enums.platform.characterAi",
+              "enums.platform.talkie": "enums.platform.talkie",
+              "enums.platform.characterCard": "enums.platform.characterCard"
+            },
+            "options": [
+              "enums.platform.characterAi",
+              "enums.platform.talkie",
+              "enums.platform.characterCard"
+            ]
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "creatorName": {
+          "type": "text",
+          "label": "Autore della scheda",
+          "schema": {
+            "def": {
+              "type": "nullable",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "nullable"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "sourceUrl": {
+          "type": "text",
+          "label": "Link di origine",
+          "hidden": true,
+          "schema": {
+            "def": {
+              "type": "string"
+            },
+            "type": "string"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "avatarUrl": {
+          "type": "text",
+          "label": "Avatar",
+          "hidden": true,
+          "schema": {
+            "def": {
+              "type": "nullable",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "nullable"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "alreadyImported": {
+          "type": "text",
+          "label": "Già importato",
+          "schema": {
+            "def": {
+              "type": "boolean"
+            },
+            "type": "boolean"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "importedFields": {
+          "type": "text",
+          "label": "Importato",
+          "hidden": true,
+          "schema": {
+            "def": {
+              "type": "array",
+              "element": {
+                "def": {
+                  "type": "enum",
+                  "entries": {
+                    "name": "name",
+                    "avatar": "avatar",
+                    "greeting": "greeting",
+                    "description": "description",
+                    "definition": "definition",
+                    "tags": "tags"
+                  }
+                },
+                "type": "enum",
+                "enum": {
+                  "name": "name",
+                  "avatar": "avatar",
+                  "greeting": "greeting",
+                  "description": "description",
+                  "definition": "definition",
+                  "tags": "tags"
+                },
+                "options": [
+                  "name",
+                  "avatar",
+                  "greeting",
+                  "description",
+                  "definition",
+                  "tags"
+                ]
+              }
+            },
+            "type": "array",
+            "element": {
+              "def": {
+                "type": "enum",
+                "entries": {
+                  "name": "name",
+                  "avatar": "avatar",
+                  "greeting": "greeting",
+                  "description": "description",
+                  "definition": "definition",
+                  "tags": "tags"
+                }
+              },
+              "type": "enum",
+              "enum": {
+                "name": "name",
+                "avatar": "avatar",
+                "greeting": "greeting",
+                "description": "description",
+                "definition": "definition",
+                "tags": "tags"
+              },
+              "options": [
+                "name",
+                "avatar",
+                "greeting",
+                "description",
+                "definition",
+                "tags"
+              ]
+            }
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "backButton": {
+          "schemaType": "widget",
+          "usage": {
+            "request": "data"
+          },
+          "type": "navigate_button",
+          "label": "Indietro",
+          "icon": "arrow-left",
+          "variant": "outline",
+          "prefillFromGet": false,
+          "renderInModal": false
+        },
+        "submitButton": {
+          "schemaType": "widget",
+          "usage": {
+            "request": "data"
+          },
+          "type": "submit_button",
+          "text": "post.submitButton.label",
+          "loadingText": "post.submitButton.loadingText",
+          "icon": "upload",
+          "variant": "primary",
+          "size": "default",
+          "className": "ml-auto"
+        }
+      },
+      "type": "custom-widget",
+      "schemaType": "object"
+    },
+    "executionMode": "via-execute-route",
+    "isAsync": true,
+    "instanceId": "local",
+    "category": "ai",
+    "tags": ["competenze"],
+    "aliases": ["skill-import-card"],
+    "credits": 0
+  },
+  {
     "toolName": "skill-import",
     "title": "Importa il carattere dal link",
     "titleShort": "Importazione dal link",
@@ -607764,15 +608172,21 @@
               "type": "enum",
               "entries": {
                 "enums.platform.characterAi": "enums.platform.characterAi",
-                "enums.platform.talkie": "enums.platform.talkie"
+                "enums.platform.talkie": "enums.platform.talkie",
+                "enums.platform.characterCard": "enums.platform.characterCard"
               }
             },
             "type": "enum",
             "enum": {
               "enums.platform.characterAi": "enums.platform.characterAi",
-              "enums.platform.talkie": "enums.platform.talkie"
+              "enums.platform.talkie": "enums.platform.talkie",
+              "enums.platform.characterCard": "enums.platform.characterCard"
             },
-            "options": ["enums.platform.characterAi", "enums.platform.talkie"]
+            "options": [
+              "enums.platform.characterAi",
+              "enums.platform.talkie",
+              "enums.platform.characterCard"
+            ]
           },
           "usage": {
             "response": true

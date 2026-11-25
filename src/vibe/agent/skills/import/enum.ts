@@ -14,11 +14,13 @@ export const {
 } = createEnumOptions(scopedTranslation, {
   CHARACTER_AI: "enums.platform.characterAi",
   TALKIE: "enums.platform.talkie",
+  CHARACTER_CARD: "enums.platform.characterCard",
 });
 
 export const SkillImportPlatformDB = [
   SkillImportPlatform.CHARACTER_AI,
   SkillImportPlatform.TALKIE,
+  SkillImportPlatform.CHARACTER_CARD,
 ] as const;
 
 /**

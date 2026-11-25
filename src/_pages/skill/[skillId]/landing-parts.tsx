@@ -229,6 +229,16 @@ export function ImportedCredit({
 }): JSX.Element {
   const { t } = importTranslation.scopedT(locale);
   const platform = t(importedFrom.platform);
+  // Card imports have no page to link back to: plain credit line.
+  if (!importedFrom.sourceUrl) {
+    return (
+      <Span>
+        {importedFrom.creatorName
+          ? t("post.result.cardCredit", { creator: importedFrom.creatorName })
+          : t("post.result.cardCreditUnknown")}
+      </Span>
+    );
+  }
   return (
     <Link
       href={importedFrom.sourceUrl}

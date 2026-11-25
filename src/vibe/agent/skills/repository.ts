@@ -1355,6 +1355,15 @@ export class SkillsRepository {
     toolExecutionContext: ToolExecutionContext,
     relayed = false,
     forcedSlug?: string,
+    importMetadata?: Pick<
+      typeof customSkills.$inferInsert,
+      | "avatarUrl"
+      | "importSource"
+      | "importSourceKey"
+      | "skillType"
+      | "status"
+      | "publishedAt"
+    >,
   ): Promise<ResponseType<SkillCreateResponseOutput>> {
     try {
       const userId = user.id;
@@ -1421,14 +1430,14 @@ export class SkillsRepository {
           ? SkillOwnershipType.PUBLIC
           : SkillOwnershipType.USER,
         compactTrigger: data.compactTrigger ?? null,
+        ...importMetadata,
       } satisfies typeof customSkills.$inferInsert;
 
       // When relaying, upsert so a stale same-slug row is refreshed rather than
       // throwing a unique-constraint violation.
+      const insert = db.insert(customSkills).values(insertValues);
       const [skill] = forcedSlug
-        ? await db
-            .insert(customSkills)
-            .values(insertValues)
+        ? await insert
             .onConflictDoUpdate({
               target: customSkills.slug,
               set: {
@@ -1459,8 +1468,20 @@ export class SkillsRepository {
               setWhere: eq(customSkills.userId, userId),
             })
             .returning()
-        : await db.insert(customSkills).values(insertValues).returning();
+        : await (
+            importMetadata
+              ? insert.onConflictDoNothing({
+                  target: [customSkills.userId, customSkills.importSourceKey],
+                })
+              : insert
+          ).returning();
 
+      if (!skill && importMetadata) {
+        return fail({
+          message: t("post.errors.conflict.title"),
+          errorType: ErrorResponseTypes.CONFLICT,
+        });
+      }
       if (!skill) {
         logger.warn(
           "Relayed skill create rejected: slug owned by another user",

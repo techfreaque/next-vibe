@@ -28,8 +28,9 @@ import { ErrorResponseTypes, fail, success } from "./response.schema";
 export function wrapSuccessResponse<TResponse>(
   data: TResponse,
   status = 200,
+  headers?: Record<string, string>,
 ): NextResponse<ResponseType<TResponse>> {
-  return NextResponse.json(success(data), { status });
+  return NextResponse.json(success(data), { status, headers });
 }
 
 /**

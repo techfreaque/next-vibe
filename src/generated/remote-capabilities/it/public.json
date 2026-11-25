@@ -71625,17 +71625,20 @@
                         "type": "enum",
                         "entries": {
                           "enums.platform.characterAi": "enums.platform.characterAi",
-                          "enums.platform.talkie": "enums.platform.talkie"
+                          "enums.platform.talkie": "enums.platform.talkie",
+                          "enums.platform.characterCard": "enums.platform.characterCard"
                         }
                       },
                       "type": "enum",
                       "enum": {
                         "enums.platform.characterAi": "enums.platform.characterAi",
-                        "enums.platform.talkie": "enums.platform.talkie"
+                        "enums.platform.talkie": "enums.platform.talkie",
+                        "enums.platform.characterCard": "enums.platform.characterCard"
                       },
                       "options": [
                         "enums.platform.characterAi",
-                        "enums.platform.talkie"
+                        "enums.platform.talkie",
+                        "enums.platform.characterCard"
                       ]
                     },
                     "sourceUrl": {
@@ -71714,6 +71717,88 @@
     "category": "ai",
     "tags": ["competenze"],
     "aliases": ["skill-get"],
+    "credits": 0
+  },
+  {
+    "toolName": "skill-export",
+    "title": "Esporta scheda personaggio",
+    "titleShort": "Esporta scheda",
+    "description": "Esporta una skill come scheda personaggio V2 in formato JSON. Importala in SillyTavern, RisuAI, Chub o qualsiasi app in formato Tavern, oppure tienila come backup. Funziona per le tue skill, le skill pubbliche della community e le skill integrate pubbliche. La scheda cita l'autore e rimanda alla pagina della skill.",
+    "fields": {
+      "usage": {
+        "request": "urlPathParams",
+        "response": true
+      },
+      "children": {
+        "id": {
+          "type": "form_field",
+          "fieldType": "entity_picker",
+          "labelField": "name",
+          "label": "Skill",
+          "description": "La skill da esportare",
+          "schema": {
+            "def": {
+              "type": "string"
+            },
+            "type": "string"
+          },
+          "usage": {
+            "request": "urlPathParams"
+          },
+          "schemaType": "primitive"
+        },
+        "name": {
+          "type": "text",
+          "label": "Nome",
+          "schema": {
+            "def": {
+              "type": "string"
+            },
+            "type": "string"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "fileName": {
+          "type": "text",
+          "label": "Nome file",
+          "schema": {
+            "def": {
+              "type": "string"
+            },
+            "type": "string"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "card": {
+          "type": "text",
+          "label": "JSON della scheda",
+          "schema": {
+            "def": {
+              "type": "string"
+            },
+            "type": "string"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        }
+      },
+      "type": "custom-widget",
+      "schemaType": "object"
+    },
+    "executionMode": "via-execute-route",
+    "isAsync": true,
+    "instanceId": "local",
+    "category": "ai",
+    "tags": ["competenze"],
+    "aliases": ["skill-export"],
     "credits": 0
   },
   {

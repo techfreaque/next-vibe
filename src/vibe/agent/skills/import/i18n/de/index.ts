@@ -9,6 +9,7 @@ export const translations: typeof enTranslations = {
     platform: {
       characterAi: "Character.AI",
       talkie: "Talkie",
+      characterCard: "Charakterkarte",
     },
     visibility: {
       private: "Privat",
@@ -62,6 +63,8 @@ export const translations: typeof enTranslations = {
         "Du hast {{name}} bereits importiert. Deine Kopie wird geöffnet.",
       credit: "Ursprünglich von {{creator}} auf {{platform}}",
       creditUnknown: "Importiert von {{platform}}",
+      cardCredit: "Karte von {{creator}}",
+      cardCreditUnknown: "Aus einer Charakterkarte importiert",
       fieldsList: "Übernommen: {{fields}}",
       openSkill: "Charakter öffnen",
       importAnother: "Weiteren importieren",

@@ -7,6 +7,7 @@ export const translations = {
     platform: {
       characterAi: "Character.AI",
       talkie: "Talkie",
+      characterCard: "Character card",
     },
     visibility: {
       private: "Private",
@@ -59,6 +60,8 @@ export const translations = {
       alreadyImported: "You already imported {{name}}. Opening your copy.",
       credit: "Originally by {{creator}} on {{platform}}",
       creditUnknown: "Imported from {{platform}}",
+      cardCredit: "Card by {{creator}}",
+      cardCreditUnknown: "Imported from a character card",
       fieldsList: "Imported: {{fields}}",
       openSkill: "Open character",
       importAnother: "Import another",

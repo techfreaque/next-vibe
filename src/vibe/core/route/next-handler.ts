@@ -385,6 +385,7 @@ export function createNextHandler<T extends CreateApiEndpointAny>(
       return wrapSuccessResponse(
         result.data as T["types"]["ResponseOutput"],
         200,
+        result.headers,
       );
     } catch (error) {
       // Handle ErrorResponseError - return the contained proper error response

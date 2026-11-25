@@ -7,6 +7,7 @@
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { Download } from "next-vibe/ui/components/icons/Download";
+import { Upload } from "next-vibe/ui/components/icons/Upload";
 import { Span } from "next-vibe/ui/components/span";
 import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
 import {
@@ -32,6 +33,7 @@ import { useProviderAvailability } from "../../env-availability-store";
 import { scopedTranslation as skillIdTranslation } from "../[id]/i18n";
 import { useVariantPlatformDefaults, VariantList } from "../[id]/widget";
 import type { SkillVariantData } from "../db";
+import { scopedTranslation as skillCardImportTranslation } from "../import/card/i18n";
 import { scopedTranslation as skillImportTranslation } from "../import/i18n";
 import type defintion from "./definition";
 
@@ -55,6 +57,7 @@ export function SkillCreateContainer({
   const availability = useProviderAvailability();
   const { t: tId } = skillIdTranslation.scopedT(locale);
   const { t: tImport } = skillImportTranslation.scopedT(locale);
+  const { t: tCardImport } = skillCardImportTranslation.scopedT(locale);
   const navigation = useWidgetNavigation();
 
   // Import from a Character.AI / Talkie link instead of filling the form.
@@ -65,6 +68,21 @@ export function SkillCreateContainer({
       import("../[id]/definition"),
     ]);
     navigation.push(importDef.default.POST, {
+      renderInModal: true,
+      replaceOnSuccess: {
+        endpoint: skillDef.default.GET,
+        getUrlPathParams: (responseData) => ({ id: responseData.id }),
+      },
+    });
+  }, [navigation]);
+
+  // Import a SillyTavern / Chub / RisuAI character card file.
+  const handleCardImport = useCallback(async (): Promise<void> => {
+    const [cardDef, skillDef] = await Promise.all([
+      import("../import/card/definition"),
+      import("../[id]/definition"),
+    ]);
+    navigation.push(cardDef.default.POST, {
       renderInModal: true,
       replaceOnSuccess: {
         endpoint: skillDef.default.GET,
@@ -96,12 +114,17 @@ export function SkillCreateContainer({
   return (
     <Div className="flex flex-col gap-0">
       {/* Top Actions: Back Button + Submit Button */}
-      <Div className="flex flex-row gap-2 px-4 pt-4 pb-4">
+      <Div className="flex flex-row flex-wrap gap-2 px-4 pt-4 pb-4">
         <NavigateButtonWidget field={children.backButton} />
 
         <Button type="button" variant="outline" onClick={handleImport}>
           <Download className="mr-2 h-4 w-4" />
           {tImport("post.titleShort")}
+        </Button>
+
+        <Button type="button" variant="outline" onClick={handleCardImport}>
+          <Upload className="mr-2 h-4 w-4" />
+          {tCardImport("post.titleShort")}
         </Button>
 
         {/* Submit Button */}

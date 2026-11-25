@@ -556,12 +556,13 @@ export function createGenericHandler<T extends CreateApiEndpointAny>(
       logger,
     );
 
-    // Preserve isErrorResponse flag and performance metadata from handler result
+    // Preserve response metadata from the handler result
     return {
       success: true,
       data: responseValidation.data as T["types"]["ResponseOutput"],
       ...(result.isErrorResponse && { isErrorResponse: true as const }),
       ...(result.performance && { performance: result.performance }),
+      ...(result.headers && { headers: result.headers }),
     };
   };
 

@@ -33,6 +33,7 @@ import { CheckCircle2 } from "next-vibe/ui/components/icons/CheckCircle2";
 import { ChevronDown } from "next-vibe/ui/components/icons/ChevronDown";
 import { Copy } from "next-vibe/ui/components/icons/Copy";
 import { DollarSign } from "next-vibe/ui/components/icons/DollarSign";
+import { Download } from "next-vibe/ui/components/icons/Download";
 import { ExternalLink } from "next-vibe/ui/components/icons/ExternalLink";
 import { Eye } from "next-vibe/ui/components/icons/Eye";
 import { Film } from "next-vibe/ui/components/icons/Film";
@@ -180,6 +181,7 @@ import type {
   default as definitionPatch,
   SkillGetResponseOutput,
 } from "./definition";
+import { scopedTranslation as skillExportTranslation } from "./export/i18n";
 import { useSkill } from "./hooks";
 import { ShareSkillDialog } from "./share-skill";
 
@@ -757,6 +759,7 @@ export function SkillViewContainer({
   const context = useWidgetContext();
   const { logger, user } = context;
   const locale = useWidgetLocale();
+  const { t: tExport } = skillExportTranslation.scopedT(locale);
   const availability = useProviderAvailability();
   const viewDefaults = useViewDefaults(availability);
   const t = useWidgetTranslation<typeof definitionGet.GET>();
@@ -797,6 +800,17 @@ export function SkillViewContainer({
     }
     const voteDef = await import("./vote/definition");
     navigation.push(voteDef.default.POST, {
+      urlPathParams: { id: skillId },
+      renderInModal: true,
+    });
+  }, [skillId, navigation]);
+
+  const handleExport = useCallback(async (): Promise<void> => {
+    if (!skillId) {
+      return;
+    }
+    const exportDef = await import("./export/definition");
+    navigation.push(exportDef.default.GET, {
       urlPathParams: { id: skillId },
       renderInModal: true,
     });
@@ -1193,6 +1207,21 @@ export function SkillViewContainer({
                       t={t}
                       className="h-7 border-0 px-2 text-xs"
                     />
+                  )}
+                  {skillId && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="h-7 p-0 @sm:px-2 @sm:gap-1 text-xs text-muted-foreground hover:text-foreground"
+                      onClick={handleExport}
+                      title={tExport("get.title")}
+                    >
+                      <Download className="h-3 w-3" />
+                      <Span className="hidden @sm:inline">
+                        {tExport("get.titleShort")}
+                      </Span>
+                    </Button>
                   )}
                   {isOwner && skillId && (
                     <Button
@@ -1778,7 +1807,7 @@ function ImportedAvatar({
   );
 }
 
-/** "Originally by X on Character.AI", linking back to the source page. */
+/** "Originally by X on Character.AI", linking back to the source page; card imports get a plain "Card by X". */
 function ImportedFromCredit({
   importedFrom,
 }: {
@@ -1787,6 +1816,16 @@ function ImportedFromCredit({
   const locale = useWidgetLocale();
   const { t } = skillImportTranslation.scopedT(locale);
   const platform = t(importedFrom.platform);
+  // Card imports have no page to link back to: plain credit line.
+  if (!importedFrom.sourceUrl) {
+    return (
+      <Span className="text-xs text-muted-foreground">
+        {importedFrom.creatorName
+          ? t("post.result.cardCredit", { creator: importedFrom.creatorName })
+          : t("post.result.cardCreditUnknown")}
+      </Span>
+    );
+  }
   return (
     <Link
       href={importedFrom.sourceUrl}

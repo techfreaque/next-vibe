@@ -337,6 +337,8 @@ export type ErrorResponseType<
 export interface SuccessResponseType<TResponseData> {
   success: true;
   data: TResponseData;
+  /** Internal metadata forwarded to the HTTP response. */
+  headers?: Record<string, string>;
   isErrorResponse?: true;
   performance?: Partial<Record<TranslatedKeyType, number>>;
   /** When true, the task runner will NOT automatically mark this task as completed/failed.

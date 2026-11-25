@@ -179,7 +179,7 @@ function extractNextDataJson(html: string): string | null {
   return match?.[1]?.trim() || null;
 }
 
-function parseJson<T>(raw: string, schema: z.ZodType<T>): T | null {
+export function parseJson<T>(raw: string, schema: z.ZodType<T>): T | null {
   try {
     const parsed = schema.safeParse(JSON.parse(raw));
     return parsed.success ? parsed.data : null;
@@ -191,7 +191,7 @@ function parseJson<T>(raw: string, schema: z.ZodType<T>): T | null {
 // ─── Text helpers ───────────────────────────────────────────────────────────
 
 /** Trim, normalize newlines, drop empty strings. */
-function clean(value: string | null | undefined): string | null {
+export function clean(value: string | null | undefined): string | null {
   if (typeof value !== "string") {
     return null;
   }
@@ -562,7 +562,12 @@ export function importSourceKey(
   platform: typeof SkillImportPlatformValue,
   sourceId: string,
 ): string {
-  const prefix = platform === SkillImportPlatform.TALKIE ? "talkie" : "cai";
+  const prefix =
+    platform === SkillImportPlatform.TALKIE
+      ? "talkie"
+      : platform === SkillImportPlatform.CHARACTER_CARD
+        ? "card"
+        : "cai";
   return `${prefix}:${sourceId}`;
 }
 

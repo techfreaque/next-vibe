@@ -30,7 +30,6 @@ import type { SkillImportSource } from "../db";
 import { customSkills } from "../db";
 import {
   SkillCategory,
-  SkillOwnershipType,
   SkillStatus,
   SkillType,
 } from "../enum";
@@ -83,11 +82,12 @@ const inFlight = new Set<string>();
 export function consumeImportRateLimit(
   userId: string,
   now: number = Date.now(),
+  max: number = RATE_LIMIT_MAX,
 ): { allowed: boolean; retryAfterSeconds: number } {
   const recent = (importHits.get(userId) ?? []).filter(
     (ts) => now - ts < RATE_LIMIT_WINDOW_MS,
   );
-  if (recent.length >= RATE_LIMIT_MAX) {
+  if (recent.length >= max) {
     importHits.set(userId, recent);
     const oldest = recent[0] ?? now;
     return {
@@ -208,13 +208,38 @@ async function storeAvatar(
       return null;
     }
     const buffer = Buffer.from(new Uint8Array(await response.arrayBuffer()));
-    if (buffer.length === 0 || buffer.length > MAX_AVATAR_BYTES) {
-      logger.warn("Character import: avatar size out of range", {
-        sourceUrl,
-        bytes: buffer.length,
-      });
-      return null;
-    }
+    return await storeAvatarBytes(buffer, mimeType, userId, logger);
+  } catch (error) {
+    logger.warn("Character import: avatar store failed", {
+      sourceUrl,
+      error: parseError(error).message,
+    });
+    return null;
+  }
+}
+
+/**
+ * Store avatar bytes in the public avatar folder. Returns the portable
+ * storage URL, or null when the image type or size is unusable.
+ */
+export async function storeAvatarBytes(
+  buffer: Buffer,
+  mimeType: string,
+  userId: string,
+  logger: EndpointLogger,
+): Promise<string | null> {
+  const ext = AVATAR_TYPES[mimeType];
+  if (!ext) {
+    logger.warn("Character import: avatar has unsupported type", { mimeType });
+    return null;
+  }
+  if (buffer.length === 0 || buffer.length > MAX_AVATAR_BYTES) {
+    logger.warn("Character import: avatar size out of range", {
+      bytes: buffer.length,
+    });
+    return null;
+  }
+  try {
     const stored = await getStorageAdapter().uploadFile(buffer, {
       filename: `character-avatar.${ext}`,
       mimeType,
@@ -224,7 +249,6 @@ async function storeAvatar(
     return stored.url || null;
   } catch (error) {
     logger.warn("Character import: avatar store failed", {
-      sourceUrl,
       error: parseError(error).message,
     });
     return null;
@@ -243,7 +267,7 @@ interface ExistingImport {
 
 export class SkillImportRepository {
   /** The caller's existing import of this source (by dedupe key or source URL). */
-  private static async findExisting(
+  static async findExisting(
     userId: string,
     keys: string[],
     sourceUrls: string[],
@@ -277,17 +301,18 @@ export class SkillImportRepository {
     return row ?? null;
   }
 
-  private static existingResponse(
+  /** Response for a source the caller already imported. */
+  static existingResponse(
     existing: ExistingImport,
-    link: DetectedCharacterLink,
+    fallback: { platform: typeof SkillImportPlatformValue; sourceUrl: string },
   ): SkillImportPostResponseOutput {
     const source = existing.importSource;
     return {
       id: existing.slug || existing.id,
       name: existing.name,
-      platform: source?.platform ?? link.platform,
+      platform: source?.platform ?? fallback.platform,
       creatorName: source?.creatorName ?? null,
-      sourceUrl: source?.sourceUrl ?? link.fetchUrl,
+      sourceUrl: source?.sourceUrl ?? fallback.sourceUrl,
       avatarUrl: existing.avatarUrl,
       alreadyImported: true,
       importedFields: [],
@@ -330,7 +355,10 @@ export class SkillImportRepository {
       );
       if (preExisting) {
         return success(
-          SkillImportRepository.existingResponse(preExisting, link),
+          SkillImportRepository.existingResponse(preExisting, {
+            platform: link.platform,
+            sourceUrl: link.fetchUrl,
+          }),
         );
       }
 
@@ -435,50 +463,86 @@ export class SkillImportRepository {
       [character.sourceUrl],
     );
     if (existing) {
-      return success(SkillImportRepository.existingResponse(existing, link));
+      return success(
+        SkillImportRepository.existingResponse(existing, {
+          platform: link.platform,
+          sourceUrl: link.fetchUrl,
+        }),
+      );
     }
 
-    return await SkillImportRepository.createImportedSkill(
-      character,
-      key,
-      data,
-      user,
-      userId,
-      platform,
-      fetchImpl,
-      logger,
-      locale,
-      t,
-      toolExecutionContext,
-    );
-  }
-
-  private static async createImportedSkill(
-    character: ParsedCharacter,
-    key: string,
-    data: SkillImportPostRequestOutput,
-    user: JwtPayloadType,
-    userId: string,
-    platform: string,
-    fetchImpl: typeof globalThis.fetch,
-    logger: EndpointLogger,
-    locale: CountryLanguage,
-    t: SkillImportT,
-    toolExecutionContext: ToolExecutionContext,
-  ): Promise<ResponseType<SkillImportPostResponseOutput>> {
     const avatarUrl = character.avatarSourceUrl
       ? await storeAvatar(character.avatarSourceUrl, userId, fetchImpl, logger)
       : null;
 
-    const content = buildSkillContent(
+    return await SkillImportRepository.createImportedSkill({
       character,
-      t("post.result.creditUnknown", { platform }),
-    );
-    const importedFields: ImportedField[] = content.importedFields.filter(
-      (field) => field !== "avatar" || avatarUrl !== null,
-    );
+      key,
+      visibility: data.visibility,
+      avatarUrl,
+      fallbackTagline: t("post.result.creditUnknown", { platform }),
+      user,
+      userId,
+      logger,
+      locale,
+      toolExecutionContext,
+    });
+  }
 
-    const isPublic = data.visibility === SkillImportVisibility.PUBLIC;
+  /**
+   * Create the skill for a parsed character (link or card import). The avatar
+   * is already stored; `fallbackTagline` is the localized "Imported from X".
+   */
+  static async createImportedSkill({
+    character,
+    key,
+    visibility,
+    avatarUrl,
+    fallbackTagline,
+    user,
+    userId,
+    logger,
+    locale,
+    toolExecutionContext,
+  }: {
+    character: ParsedCharacter;
+    key: string;
+    visibility: SkillImportPostRequestOutput["visibility"];
+    avatarUrl: string | null;
+    fallbackTagline: string;
+    user: JwtPayloadType;
+    userId: string;
+    logger: EndpointLogger;
+    locale: CountryLanguage;
+    toolExecutionContext: ToolExecutionContext;
+  }): Promise<ResponseType<SkillImportPostResponseOutput>> {
+    const content = buildSkillContent(character, fallbackTagline);
+    // "avatar" means "stored": a link import can fail the download, and a
+    // PNG card brings its image without a source URL.
+    const importedFields: ImportedField[] = content.importedFields.filter(
+      (field) => field !== "avatar",
+    );
+    if (avatarUrl !== null) {
+      importedFields.splice(1, 0, "avatar");
+    }
+
+    const isPublic = visibility === SkillImportVisibility.PUBLIC;
+    const importSource: SkillImportSource = {
+      platform: character.platform,
+      sourceUrl: character.sourceUrl,
+      sourceId: character.sourceId,
+      creatorName: character.creatorName,
+      creatorUrl: character.creatorUrl,
+      tags: character.tags,
+      importedAt: new Date().toISOString(),
+    };
+    const status =
+      visibility === SkillImportVisibility.PUBLIC
+        ? SkillStatus.PUBLISHED
+        : visibility === SkillImportVisibility.UNLISTED
+          ? SkillStatus.UNLISTED
+          : SkillStatus.DRAFT;
+
     const { t: skillsT } = skillsScopedTranslation.scopedT(locale);
     const created = await SkillsRepository.createSkill(
       {
@@ -501,53 +565,40 @@ export class SkillImportRepository {
       logger,
       skillsT,
       toolExecutionContext,
-    );
-    if (!created.success) {
-      return created;
-    }
-
-    const importSource: SkillImportSource = {
-      platform: character.platform,
-      sourceUrl: character.sourceUrl,
-      sourceId: character.sourceId,
-      creatorName: character.creatorName,
-      creatorUrl: character.creatorUrl,
-      tags: character.tags,
-      importedAt: new Date().toISOString(),
-    };
-    const status =
-      data.visibility === SkillImportVisibility.PUBLIC
-        ? SkillStatus.PUBLISHED
-        : data.visibility === SkillImportVisibility.UNLISTED
-          ? SkillStatus.UNLISTED
-          : SkillStatus.DRAFT;
-
-    await db
-      .update(customSkills)
-      .set({
+      false,
+      undefined,
+      {
         avatarUrl,
         importSource,
         importSourceKey: key,
         skillType: SkillType.PERSONA,
         status,
-        ownershipType: isPublic
-          ? SkillOwnershipType.PUBLIC
-          : SkillOwnershipType.USER,
         publishedAt: isPublic ? new Date() : null,
-        updatedAt: new Date(),
-      })
-      .where(
-        and(
-          eq(customSkills.slug, created.data.id),
-          eq(customSkills.userId, userId),
-        ),
-      );
+      },
+    );
+    if (!created.success) {
+      if (
+        created.errorType.errorCode === ErrorResponseTypes.CONFLICT.errorCode
+      ) {
+        const existing = await SkillImportRepository.findExisting(
+          userId,
+          [key],
+          [],
+        );
+        if (existing) {
+          return success(
+            SkillImportRepository.existingResponse(existing, character),
+          );
+        }
+      }
+      return created;
+    }
 
     logger.info("Character imported", {
       platform: character.platform,
       sourceId: character.sourceId,
       skillId: created.data.id,
-      visibility: data.visibility,
+      visibility,
       hasAvatar: avatarUrl !== null,
       importedFields,
     });

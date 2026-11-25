@@ -8,6 +8,8 @@ export const SKILL_REPORT_ALIAS = "skill-report" as const;
 export const SKILL_PUBLISH_ALIAS = "skill-publish" as const;
 export const SKILL_MODERATION_ALIAS = "skill-moderation" as const;
 export const SKILL_IMPORT_ALIAS = "skill-import" as const;
+export const SKILL_IMPORT_CARD_ALIAS = "skill-import-card" as const;
+export const SKILL_EXPORT_ALIAS = "skill-export" as const;
 
 /**
  * Storage namespace (the thread-files `threadId` slot, so it must be a UUID)
