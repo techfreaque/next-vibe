@@ -8,6 +8,7 @@ export const scopedTranslation = createScopedTranslation({
   fr: () => require("next-vibe/ui/i18n/fr").translations,
   it: () => require("./it").translations,
   es: () => require("./es").translations,
+  sk: () => require("./sk").translations,
 });
 
 export type UITranslationKey =

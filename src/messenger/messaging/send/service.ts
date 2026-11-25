@@ -59,6 +59,7 @@ export async function sendViaMessagingAccount(
     // 1. Resolve provider through unified registry (reads messenger_accounts)
     const providerResult = await getProviderByMessengerAccountId(
       params.messagingAccountId,
+      locale,
     );
 
     if (!providerResult.success) {

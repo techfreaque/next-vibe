@@ -45,6 +45,7 @@ export const translations: typeof enTranslations = {
     FR: "Europe/Paris",
     IT: "Europe/Rome",
     ES: "Europe/Madrid",
+    SK: "Europe/Bratislava",
     US: "America/New_York",
     GLOBAL: "UTC",
   },
@@ -71,5 +72,6 @@ export const translations: typeof enTranslations = {
     fr: "Francese",
     it: "Italiano",
     es: "Spagnolo",
+    sk: "Slovacco",
   },
 };

@@ -4419,6 +4419,7 @@ export const translations: typeof enTranslations = {
     language: {
       it: "Włoski",
       es: "Hiszpański",
+      sk: "Słowacki",
       label: "Język",
       description: "Filtruj według preferencji językowych",
       all: "Wszystkie języki",
@@ -5243,6 +5244,7 @@ export const translations: typeof enTranslations = {
     language: {
       it: "Włoski",
       es: "Hiszpański",
+      sk: "Słowacki",
       de: "Niemiecki",
       pl: "Polski",
       fr: "Francuski",
@@ -5373,6 +5375,7 @@ export const translations: typeof enTranslations = {
   languages: {
     it: "Włoski",
     es: "Hiszpański",
+    sk: "Słowacki",
     en: "Angielski",
     de: "Niemiecki",
     pl: "Polski",

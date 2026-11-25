@@ -19,6 +19,7 @@ export const category: CategoryDefinition = {
     "fr-FR": "Produits",
     "it-IT": "Prodotti",
     "es-ES": "Productos",
+    "sk-SK": "Produkty",
   },
   group: "business",
   icon: "package",
@@ -40,6 +41,7 @@ export const category: CategoryDefinition = {
         "fr-FR": "Catalogue",
         "it-IT": "Catalogo",
         "es-ES": "Catálogo",
+        "sk-SK": "Katalóg",
       },
       // inherits parent defaultEntry (products-catalog-list)
     },
@@ -54,6 +56,7 @@ export const category: CategoryDefinition = {
         "fr-FR": "Catégories",
         "it-IT": "Categorie",
         "es-ES": "Categorías",
+        "sk-SK": "Kategórie",
       },
     },
   },

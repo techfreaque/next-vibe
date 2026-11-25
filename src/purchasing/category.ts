@@ -19,6 +19,7 @@ export const category: CategoryDefinition = {
     "fr-FR": "Achats",
     "it-IT": "Acquisti",
     "es-ES": "Compras",
+    "sk-SK": "Nákup",
   },
   group: "business",
   icon: "shopping-bag",
@@ -40,6 +41,7 @@ export const category: CategoryDefinition = {
         "fr-FR": "Commandes",
         "it-IT": "Ordini",
         "es-ES": "Pedidos",
+        "sk-SK": "Nákupné objednávky",
       },
     },
     "Purchasing: Vendors": {
@@ -53,6 +55,7 @@ export const category: CategoryDefinition = {
         "fr-FR": "Fournisseurs",
         "it-IT": "Fornitori",
         "es-ES": "Proveedores",
+        "sk-SK": "Dodávatelia",
       },
     },
   },

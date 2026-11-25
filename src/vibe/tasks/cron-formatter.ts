@@ -6,7 +6,8 @@
 
 import { CronExpressionParser as cronParser } from "cron-parser";
 
-import type { CountryLanguage } from "../core/i18n/core/config";
+import { type CountryLanguage, Languages } from "../core/i18n/core/config";
+import { getLanguageFromLocale } from "../core/i18n/core/language-utils";
 import { parseError } from "../core/utils/parse-error";
 import type { EndpointLogger } from "../logger/types";
 import { scopedTranslation } from "./i18n";
@@ -131,8 +132,8 @@ function generateDescription(
     const [start, end] = minute.split("-");
     parts.push(
       t("cron.patterns.fromMinuteToMinute", {
-        start,
-        end,
+        from: start,
+        to: end,
       }),
     );
   } else if (minute !== "0") {
@@ -145,7 +146,7 @@ function generateDescription(
 
   // Handle hour
   if (hour === "*") {
-    if (!parts.some((p) => p.includes("minute"))) {
+    if (minute === "0") {
       parts.push(t("cron.frequency.everyHour"));
     }
   } else if (hour.includes("/")) {
@@ -175,8 +176,8 @@ function generateDescription(
     const [start, end] = hour.split("-");
     parts.push(
       t("cron.patterns.fromHourToHour", {
-        start: formatHour(start, locale),
-        end: formatHour(end, locale),
+        from: formatHour(start, locale),
+        to: formatHour(end, locale),
       }),
     );
   } else {
@@ -280,6 +281,9 @@ function generateDescription(
 function formatHour(hour: string, locale: CountryLanguage): string {
   const { t } = scopedTranslation.scopedT(locale);
   const h = parseInt(hour, 10);
+  if (getLanguageFromLocale(locale) === Languages.SK && h >= 0 && h < 24) {
+    return `${h}:00`;
+  }
   if (h === 0) {
     return t("cron.time.midnight");
   }

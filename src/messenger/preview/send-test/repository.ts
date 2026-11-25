@@ -102,7 +102,7 @@ export class EmailPreviewSendTestRepository {
       }
 
       // Get subject
-      const subject = getTemplateSubject(template, locale);
+      const subject = getTemplateSubject(template, locale, data.props);
 
       // Send email using existing email sending infrastructure
       const sendResult = await EmailSendingRepository.sendEmail(

@@ -135,6 +135,11 @@ export const translations: typeof enTranslations = {
         description:
           "Traducción que se muestra en los ejemplos públicos (opcional)",
       },
+      textSk: {
+        label: "Pregunta (eslovaco)",
+        description:
+          "Traducción que se muestra en los ejemplos públicos (opcional)",
+      },
       generatedBy: { label: "Propuestas" },
       active: {
         label: "Activa",

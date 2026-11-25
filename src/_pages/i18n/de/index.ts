@@ -225,6 +225,7 @@ export const translations: typeof enTranslations = {
     languages: {
       it: "Italienisch",
       es: "Spanisch",
+      sk: "Slowakisch",
       en: "English",
       de: "Deutsch",
       pl: "Polski",
@@ -311,6 +312,7 @@ export const translations: typeof enTranslations = {
     languages: {
       it: "Italienisch",
       es: "Spanisch",
+      sk: "Slowakisch",
       en: "Englisch",
       de: "Deutsch",
       pl: "Polnisch",

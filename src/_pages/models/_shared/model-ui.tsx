@@ -137,6 +137,7 @@ export function SampleAnswersSlot({
       fr: sample.questionFr,
       it: sample.questionIt,
       es: sample.questionEs,
+      sk: sample.questionSk,
     };
     return questionByLanguage[language] ?? sample.questionEn;
   };

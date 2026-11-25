@@ -61,7 +61,7 @@ describe("client-locale-loader", () => {
     const out = transformViteClientLocaleSource(source, id);
 
     expect(out).not.toContain("require(");
-    for (const language of ["de", "pl", "fr", "it", "es"]) {
+    for (const language of ["de", "pl", "fr", "it", "es", "sk"]) {
       expect(out).toContain(
         `__vibeI18nLang === "${language}" ? (await import("./${language}")).translations : undefined`,
       );
@@ -79,13 +79,14 @@ describe("client-locale-loader", () => {
   });
 
   it.each([
-    "src/user/public/signup/i18n/index.ts",
-    "src/vibe/agent/ai-stream/stream/i18n/index.ts",
-  ])("keeps SSR up to date with locale edits in %s", (file) => {
+    ["src/user/public/signup/i18n/index.ts", "de"],
+    ["src/vibe/agent/ai-stream/stream/i18n/index.ts", "de"],
+    ["src/vibe/agent/models/i18n/index.ts", "sk"],
+  ])("keeps SSR up to date with locale edits in %s", (file, language) => {
     const id = resolve(file);
     const source = readFileSync(id, "utf8");
     const out = transformViteDevSsrLocaleSource(source, id);
-    expect(out).toContain('from "./de"');
+    expect(out).toContain(`from "./${language}"`);
     expect(out).not.toContain("require(");
     expect(transformViteDevSsrLocaleSource(source, `${id}?t=123`)).toBe(out);
     expect(

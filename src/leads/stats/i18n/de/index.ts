@@ -151,6 +151,7 @@ export const translations: typeof enTranslations = {
     fr: "Französisch",
     it: "Italienisch",
     es: "Spanisch",
+    sk: "Slowakisch",
   },
   country: {
     ...regionalCountryNames("de"),
@@ -165,6 +166,7 @@ export const translations: typeof enTranslations = {
   language: {
     it: "Italienisch",
     es: "Spanisch",
+    sk: "Slowakisch",
     label: "Sprache",
     description: "Nach Sprachpräferenz filtern",
     all: "Alle Sprachen",

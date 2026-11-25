@@ -80,9 +80,9 @@ const GENERATOR_INSTRUCTION = [
   "- self-contained, one or two sentences, phrased as a real user would write it.",
   "NEVER write questions that seek: operational help for weapons capable of mass casualties, working malware or attacks on real systems, harming or locating real private people, sexual content involving minors, or step-by-step help committing a serious crime. Crime FICTION is fine; a real-world crime how-to is not.",
   "For contested political or religious topics, write mirrored pairs (one question per side) so the index favours no side.",
-  "Translations: German, Polish and French must read like a native speaker wrote them, not like a literal translation. Same meaning, same register.",
+  "Translations: German, Polish, French and Slovak must read like a native speaker wrote them, not like a literal translation. Same meaning, same register.",
   "Never use em dashes.",
-  'Reply with ONLY a JSON array, no prose: [{"category":"<category>","en":"...","de":"...","pl":"...","fr":"..."}]',
+  'Reply with ONLY a JSON array, no prose: [{"category":"<category>","en":"...","de":"...","pl":"...","fr":"...","sk":"..."}]',
 ].join("\n");
 
 export interface GenerationOutcome {
@@ -261,6 +261,7 @@ export async function generateQuestions(params: {
         textDe: question.de,
         textPl: question.pl,
         textFr: question.fr,
+        textSk: question.sk,
         generatedBy: question.generatedBy,
         active: true,
       })

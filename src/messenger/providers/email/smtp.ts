@@ -32,6 +32,7 @@ import { scopedTranslation as providerScopedTranslation } from "../../i18n";
 import { messengerFolders } from "../../messages/db";
 import type { SpecialFolderTypeValue } from "../../messages/enum";
 import { SpecialFolderType } from "../../messages/enum";
+import { scopedTranslation as mailboxTranslation } from "../../system-mailbox/i18n";
 import { LocalStateProvider } from "../local-state-base";
 import type { SendMessageInput, SendMessageResult } from "../provider";
 import { toImapShape } from "./imap-client/db";
@@ -62,6 +63,9 @@ export class SmtpMessengerProvider extends LocalStateProvider {
   ): Promise<ResponseType<SendMessageResult>> {
     const { t: smtpT } = smtpScopedTranslation.scopedT(locale);
     const { t } = providerScopedTranslation.scopedT(locale);
+    const subject =
+      input.subject ??
+      mailboxTranslation.scopedT(locale).t("inbox.widget.noSubject");
     const { language, country } = getLanguageAndCountryFromLocale(locale);
 
     const selectionCriteria: SmtpSelectionCriteria = {
@@ -76,7 +80,7 @@ export class SmtpMessengerProvider extends LocalStateProvider {
       {
         to: input.to,
         toName: input.toName,
-        subject: input.subject ?? "(no subject)",
+        subject,
         html: input.html ?? `<p>${input.text}</p>`,
         text: input.text,
         replyTo: input.replyTo,
@@ -104,7 +108,7 @@ export class SmtpMessengerProvider extends LocalStateProvider {
       {
         from: `${input.senderName ?? ""} <${result.data.accountName}>`,
         to: input.toName ? `${input.toName} <${input.to}>` : input.to,
-        subject: input.subject ?? "(no subject)",
+        subject,
         html: input.html ?? `<p>${input.text}</p>`,
         text: input.text,
         messageId: result.data.messageId,

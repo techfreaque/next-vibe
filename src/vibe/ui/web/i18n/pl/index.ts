@@ -33,6 +33,19 @@ export const translations: typeof enTranslations = {
     allCountries: "Wszystkie kraje",
   },
   ui: {
+    errorBoundary: {
+      title: "Błąd",
+      tryAgain: "Spróbuj ponownie",
+      componentStack: "Stos komponentów",
+      stackTrace: "Ślad stosu",
+      componentStackFull: "Pełny stos komponentów",
+      details: "Szczegóły błędu",
+      name: "Nazwa:",
+      message: "Komunikat:",
+      cause: "Przyczyna:",
+      noStackTrace: "Ślad stosu jest niedostępny",
+      noComponentStack: "Stos komponentów jest niedostępny",
+    },
     markdown: {
       thinking: "Myślenie",
       reasoningProcess: "Proces rozumowania",

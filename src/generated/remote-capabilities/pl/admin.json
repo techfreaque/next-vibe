@@ -109055,6 +109055,7 @@
                         "FR": "FR",
                         "IT": "IT",
                         "ES": "ES",
+                        "SK": "SK",
                         "US": "US",
                         "GLOBAL": "GLOBAL",
                         "AD": "AD",
@@ -109214,6 +109215,7 @@
                       "FR": "FR",
                       "IT": "IT",
                       "ES": "ES",
+                      "SK": "SK",
                       "US": "US",
                       "GLOBAL": "GLOBAL",
                       "AD": "AD",
@@ -109371,6 +109373,7 @@
                       "FR",
                       "IT",
                       "ES",
+                      "SK",
                       "US",
                       "GLOBAL",
                       "AD",
@@ -109540,6 +109543,7 @@
                         "FR": "fr",
                         "IT": "it",
                         "ES": "es",
+                        "SK": "sk",
                         "EN": "en"
                       }
                     },
@@ -109550,9 +109554,10 @@
                       "FR": "fr",
                       "IT": "it",
                       "ES": "es",
+                      "SK": "sk",
                       "EN": "en"
                     },
-                    "options": ["de", "pl", "fr", "it", "es", "en"]
+                    "options": ["de", "pl", "fr", "it", "es", "sk", "en"]
                   },
                   "usage": {
                     "response": true
@@ -112956,6 +112961,10 @@
               "label": "countries.es"
             },
             {
+              "value": "SK",
+              "label": "countries.sk"
+            },
+            {
               "value": "AD",
               "label": "countries.ad"
             },
@@ -113560,6 +113569,7 @@
                     "FR": "FR",
                     "IT": "IT",
                     "ES": "ES",
+                    "SK": "SK",
                     "US": "US",
                     "GLOBAL": "GLOBAL",
                     "AD": "AD",
@@ -113719,6 +113729,7 @@
                   "FR": "FR",
                   "IT": "IT",
                   "ES": "ES",
+                  "SK": "SK",
                   "US": "US",
                   "GLOBAL": "GLOBAL",
                   "AD": "AD",
@@ -113876,6 +113887,7 @@
                   "FR",
                   "IT",
                   "ES",
+                  "SK",
                   "US",
                   "GLOBAL",
                   "AD",
@@ -114067,6 +114079,10 @@
             {
               "value": "es",
               "label": "languages.es"
+            },
+            {
+              "value": "sk",
+              "label": "languages.sk"
             }
           ],
           "schema": {
@@ -114081,6 +114097,7 @@
                     "FR": "fr",
                     "IT": "it",
                     "ES": "es",
+                    "SK": "sk",
                     "EN": "en"
                   }
                 },
@@ -114091,9 +114108,10 @@
                   "FR": "fr",
                   "IT": "it",
                   "ES": "es",
+                  "SK": "sk",
                   "EN": "en"
                 },
-                "options": ["de", "pl", "fr", "it", "es", "en"]
+                "options": ["de", "pl", "fr", "it", "es", "sk", "en"]
               }
             },
             "type": "optional"
@@ -114909,6 +114927,7 @@
                         "FR": "FR",
                         "IT": "IT",
                         "ES": "ES",
+                        "SK": "SK",
                         "US": "US",
                         "GLOBAL": "GLOBAL",
                         "AD": "AD",
@@ -115068,6 +115087,7 @@
                       "FR": "FR",
                       "IT": "IT",
                       "ES": "ES",
+                      "SK": "SK",
                       "US": "US",
                       "GLOBAL": "GLOBAL",
                       "AD": "AD",
@@ -115225,6 +115245,7 @@
                       "FR",
                       "IT",
                       "ES",
+                      "SK",
                       "US",
                       "GLOBAL",
                       "AD",
@@ -115394,6 +115415,7 @@
                         "FR": "fr",
                         "IT": "it",
                         "ES": "es",
+                        "SK": "sk",
                         "EN": "en"
                       }
                     },
@@ -115404,9 +115426,10 @@
                       "FR": "fr",
                       "IT": "it",
                       "ES": "es",
+                      "SK": "sk",
                       "EN": "en"
                     },
-                    "options": ["de", "pl", "fr", "it", "es", "en"]
+                    "options": ["de", "pl", "fr", "it", "es", "sk", "en"]
                   },
                   "usage": {
                     "response": true
@@ -127558,6 +127581,10 @@
                   "label": "countries.es"
                 },
                 {
+                  "value": "SK",
+                  "label": "countries.sk"
+                },
+                {
                   "value": "AD",
                   "label": "countries.ad"
                 },
@@ -128159,6 +128186,7 @@
                     "FR": "FR",
                     "IT": "IT",
                     "ES": "ES",
+                    "SK": "SK",
                     "US": "US",
                     "GLOBAL": "GLOBAL",
                     "AD": "AD",
@@ -128318,6 +128346,7 @@
                   "FR": "FR",
                   "IT": "IT",
                   "ES": "ES",
+                  "SK": "SK",
                   "US": "US",
                   "GLOBAL": "GLOBAL",
                   "AD": "AD",
@@ -128475,6 +128504,7 @@
                   "FR",
                   "IT",
                   "ES",
+                  "SK",
                   "US",
                   "GLOBAL",
                   "AD",
@@ -128663,6 +128693,10 @@
                 {
                   "value": "es",
                   "label": "languages.es"
+                },
+                {
+                  "value": "sk",
+                  "label": "languages.sk"
                 }
               ],
               "schema": {
@@ -128674,6 +128708,7 @@
                     "FR": "fr",
                     "IT": "it",
                     "ES": "es",
+                    "SK": "sk",
                     "EN": "en"
                   }
                 },
@@ -128684,9 +128719,10 @@
                   "FR": "fr",
                   "IT": "it",
                   "ES": "es",
+                  "SK": "sk",
                   "EN": "en"
                 },
-                "options": ["de", "pl", "fr", "it", "es", "en"]
+                "options": ["de", "pl", "fr", "it", "es", "sk", "en"]
               },
               "usage": {
                 "request": "data"
@@ -134744,6 +134780,10 @@
                   "label": "countries.es"
                 },
                 {
+                  "value": "SK",
+                  "label": "countries.sk"
+                },
+                {
                   "value": "AD",
                   "label": "countries.ad"
                 },
@@ -135345,6 +135385,7 @@
                     "FR": "FR",
                     "IT": "IT",
                     "ES": "ES",
+                    "SK": "SK",
                     "US": "US",
                     "GLOBAL": "GLOBAL",
                     "AD": "AD",
@@ -135504,6 +135545,7 @@
                   "FR": "FR",
                   "IT": "IT",
                   "ES": "ES",
+                  "SK": "SK",
                   "US": "US",
                   "GLOBAL": "GLOBAL",
                   "AD": "AD",
@@ -135661,6 +135703,7 @@
                   "FR",
                   "IT",
                   "ES",
+                  "SK",
                   "US",
                   "GLOBAL",
                   "AD",
@@ -135849,6 +135892,10 @@
                 {
                   "value": "es",
                   "label": "languages.es"
+                },
+                {
+                  "value": "sk",
+                  "label": "languages.sk"
                 }
               ],
               "schema": {
@@ -135860,6 +135907,7 @@
                     "FR": "fr",
                     "IT": "it",
                     "ES": "es",
+                    "SK": "sk",
                     "EN": "en"
                   }
                 },
@@ -135870,9 +135918,10 @@
                   "FR": "fr",
                   "IT": "it",
                   "ES": "es",
+                  "SK": "sk",
                   "EN": "en"
                 },
-                "options": ["de", "pl", "fr", "it", "es", "en"]
+                "options": ["de", "pl", "fr", "it", "es", "sk", "en"]
               },
               "usage": {
                 "request": "data"
@@ -155064,6 +155113,10 @@
               "label": "countries.es"
             },
             {
+              "value": "SK",
+              "label": "countries.sk"
+            },
+            {
               "value": "AD",
               "label": "countries.ad"
             },
@@ -155669,6 +155722,7 @@
                     "FR": "FR",
                     "IT": "IT",
                     "ES": "ES",
+                    "SK": "SK",
                     "US": "US",
                     "GLOBAL": "GLOBAL",
                     "AD": "AD",
@@ -155828,6 +155882,7 @@
                   "FR": "FR",
                   "IT": "IT",
                   "ES": "ES",
+                  "SK": "SK",
                   "US": "US",
                   "GLOBAL": "GLOBAL",
                   "AD": "AD",
@@ -155985,6 +156040,7 @@
                   "FR",
                   "IT",
                   "ES",
+                  "SK",
                   "US",
                   "GLOBAL",
                   "AD",
@@ -156174,6 +156230,10 @@
             {
               "value": "es",
               "label": "languages.es"
+            },
+            {
+              "value": "sk",
+              "label": "languages.sk"
             }
           ],
           "columns": 6,
@@ -156189,6 +156249,7 @@
                     "FR": "fr",
                     "IT": "it",
                     "ES": "es",
+                    "SK": "sk",
                     "EN": "en"
                   }
                 },
@@ -156199,9 +156260,10 @@
                   "FR": "fr",
                   "IT": "it",
                   "ES": "es",
+                  "SK": "sk",
                   "EN": "en"
                 },
-                "options": ["de", "pl", "fr", "it", "es", "en"]
+                "options": ["de", "pl", "fr", "it", "es", "sk", "en"]
               }
             },
             "type": "optional"
@@ -162014,6 +162076,10 @@
               "label": "countries.es"
             },
             {
+              "value": "SK",
+              "label": "countries.sk"
+            },
+            {
               "value": "AD",
               "label": "countries.ad"
             },
@@ -162615,6 +162681,7 @@
                 "FR": "FR",
                 "IT": "IT",
                 "ES": "ES",
+                "SK": "SK",
                 "US": "US",
                 "GLOBAL": "GLOBAL",
                 "AD": "AD",
@@ -162774,6 +162841,7 @@
               "FR": "FR",
               "IT": "IT",
               "ES": "ES",
+              "SK": "SK",
               "US": "US",
               "GLOBAL": "GLOBAL",
               "AD": "AD",
@@ -162931,6 +162999,7 @@
               "FR",
               "IT",
               "ES",
+              "SK",
               "US",
               "GLOBAL",
               "AD",
@@ -163119,6 +163188,10 @@
             {
               "value": "es",
               "label": "languages.es"
+            },
+            {
+              "value": "sk",
+              "label": "languages.sk"
             }
           ],
           "schema": {
@@ -163130,6 +163203,7 @@
                 "FR": "fr",
                 "IT": "it",
                 "ES": "es",
+                "SK": "sk",
                 "EN": "en"
               }
             },
@@ -163140,9 +163214,10 @@
               "FR": "fr",
               "IT": "it",
               "ES": "es",
+              "SK": "sk",
               "EN": "en"
             },
-            "options": ["de", "pl", "fr", "it", "es", "en"]
+            "options": ["de", "pl", "fr", "it", "es", "sk", "en"]
           },
           "usage": {
             "request": "data"
@@ -168557,6 +168632,10 @@
                   "label": "countries.es"
                 },
                 {
+                  "value": "SK",
+                  "label": "countries.sk"
+                },
+                {
                   "value": "AD",
                   "label": "countries.ad"
                 },
@@ -169164,6 +169243,7 @@
                             "FR": "FR",
                             "IT": "IT",
                             "ES": "ES",
+                            "SK": "SK",
                             "US": "US",
                             "GLOBAL": "GLOBAL",
                             "AD": "AD",
@@ -169323,6 +169403,7 @@
                           "FR": "FR",
                           "IT": "IT",
                           "ES": "ES",
+                          "SK": "SK",
                           "US": "US",
                           "GLOBAL": "GLOBAL",
                           "AD": "AD",
@@ -169480,6 +169561,7 @@
                           "FR",
                           "IT",
                           "ES",
+                          "SK",
                           "US",
                           "GLOBAL",
                           "AD",
@@ -169643,6 +169725,7 @@
                           "FR": "FR",
                           "IT": "IT",
                           "ES": "ES",
+                          "SK": "SK",
                           "US": "US",
                           "GLOBAL": "GLOBAL",
                           "AD": "AD",
@@ -169802,6 +169885,7 @@
                         "FR": "FR",
                         "IT": "IT",
                         "ES": "ES",
+                        "SK": "SK",
                         "US": "US",
                         "GLOBAL": "GLOBAL",
                         "AD": "AD",
@@ -169959,6 +170043,7 @@
                         "FR",
                         "IT",
                         "ES",
+                        "SK",
                         "US",
                         "GLOBAL",
                         "AD",
@@ -170150,6 +170235,10 @@
                 {
                   "value": "es",
                   "label": "languages.es"
+                },
+                {
+                  "value": "sk",
+                  "label": "languages.sk"
                 }
               ],
               "schema": {
@@ -170167,6 +170256,7 @@
                             "FR": "fr",
                             "IT": "it",
                             "ES": "es",
+                            "SK": "sk",
                             "EN": "en"
                           }
                         },
@@ -170177,9 +170267,10 @@
                           "FR": "fr",
                           "IT": "it",
                           "ES": "es",
+                          "SK": "sk",
                           "EN": "en"
                         },
-                        "options": ["de", "pl", "fr", "it", "es", "en"]
+                        "options": ["de", "pl", "fr", "it", "es", "sk", "en"]
                       }
                     },
                     "type": "array",
@@ -170192,6 +170283,7 @@
                           "FR": "fr",
                           "IT": "it",
                           "ES": "es",
+                          "SK": "sk",
                           "EN": "en"
                         }
                       },
@@ -170202,9 +170294,10 @@
                         "FR": "fr",
                         "IT": "it",
                         "ES": "es",
+                        "SK": "sk",
                         "EN": "en"
                       },
-                      "options": ["de", "pl", "fr", "it", "es", "en"]
+                      "options": ["de", "pl", "fr", "it", "es", "sk", "en"]
                     }
                   }
                 },
@@ -171508,6 +171601,10 @@
                         "label": "countries.es"
                       },
                       {
+                        "value": "SK",
+                        "label": "countries.sk"
+                      },
+                      {
                         "value": "AD",
                         "label": "countries.ad"
                       },
@@ -172109,6 +172206,7 @@
                           "FR": "FR",
                           "IT": "IT",
                           "ES": "ES",
+                          "SK": "SK",
                           "US": "US",
                           "GLOBAL": "GLOBAL",
                           "AD": "AD",
@@ -172268,6 +172366,7 @@
                         "FR": "FR",
                         "IT": "IT",
                         "ES": "ES",
+                        "SK": "SK",
                         "US": "US",
                         "GLOBAL": "GLOBAL",
                         "AD": "AD",
@@ -172425,6 +172524,7 @@
                         "FR",
                         "IT",
                         "ES",
+                        "SK",
                         "US",
                         "GLOBAL",
                         "AD",
@@ -172609,6 +172709,10 @@
                       {
                         "value": "es",
                         "label": "languages.es"
+                      },
+                      {
+                        "value": "sk",
+                        "label": "languages.sk"
                       }
                     ],
                     "schema": {
@@ -172620,6 +172724,7 @@
                           "FR": "fr",
                           "IT": "it",
                           "ES": "es",
+                          "SK": "sk",
                           "EN": "en"
                         }
                       },
@@ -172630,9 +172735,10 @@
                         "FR": "fr",
                         "IT": "it",
                         "ES": "es",
+                        "SK": "sk",
                         "EN": "en"
                       },
-                      "options": ["de", "pl", "fr", "it", "es", "en"]
+                      "options": ["de", "pl", "fr", "it", "es", "sk", "en"]
                     },
                     "usage": {
                       "response": true
@@ -178194,6 +178300,7 @@
                             "FR": "FR",
                             "IT": "IT",
                             "ES": "ES",
+                            "SK": "SK",
                             "US": "US",
                             "GLOBAL": "GLOBAL",
                             "AD": "AD",
@@ -178353,6 +178460,7 @@
                           "FR": "FR",
                           "IT": "IT",
                           "ES": "ES",
+                          "SK": "SK",
                           "US": "US",
                           "GLOBAL": "GLOBAL",
                           "AD": "AD",
@@ -178510,6 +178618,7 @@
                           "FR",
                           "IT",
                           "ES",
+                          "SK",
                           "US",
                           "GLOBAL",
                           "AD",
@@ -178671,6 +178780,7 @@
                             "FR": "fr",
                             "IT": "it",
                             "ES": "es",
+                            "SK": "sk",
                             "EN": "en"
                           }
                         },
@@ -178681,9 +178791,10 @@
                           "FR": "fr",
                           "IT": "it",
                           "ES": "es",
+                          "SK": "sk",
                           "EN": "en"
                         },
-                        "options": ["de", "pl", "fr", "it", "es", "en"]
+                        "options": ["de", "pl", "fr", "it", "es", "sk", "en"]
                       },
                       "status": {
                         "def": {
@@ -181015,6 +181126,10 @@
               "label": "countries.es"
             },
             {
+              "value": "SK",
+              "label": "countries.sk"
+            },
+            {
               "value": "AD",
               "label": "countries.ad"
             },
@@ -181621,6 +181736,7 @@
                     "FR": "FR",
                     "IT": "IT",
                     "ES": "ES",
+                    "SK": "SK",
                     "US": "US",
                     "GLOBAL": "GLOBAL",
                     "AD": "AD",
@@ -181781,6 +181897,7 @@
                   "FR": "FR",
                   "IT": "IT",
                   "ES": "ES",
+                  "SK": "SK",
                   "US": "US",
                   "GLOBAL": "GLOBAL",
                   "AD": "AD",
@@ -181939,6 +182056,7 @@
                   "FR",
                   "IT",
                   "ES",
+                  "SK",
                   "US",
                   "GLOBAL",
                   "AD",
@@ -182132,6 +182250,10 @@
             {
               "value": "es",
               "label": "languages.es"
+            },
+            {
+              "value": "sk",
+              "label": "languages.sk"
             }
           ],
           "columns": 4,
@@ -182148,6 +182270,7 @@
                     "FR": "fr",
                     "IT": "it",
                     "ES": "es",
+                    "SK": "sk",
                     "EN": "en"
                   }
                 },
@@ -182159,9 +182282,10 @@
                   "FR": "fr",
                   "IT": "it",
                   "ES": "es",
+                  "SK": "sk",
                   "EN": "en"
                 },
-                "options": ["all", "de", "pl", "fr", "it", "es", "en"]
+                "options": ["all", "de", "pl", "fr", "it", "es", "sk", "en"]
               }
             },
             "type": "default"
@@ -188640,6 +188764,10 @@
               "label": "countries.es"
             },
             {
+              "value": "SK",
+              "label": "countries.sk"
+            },
+            {
               "value": "AD",
               "label": "countries.ad"
             },
@@ -189247,6 +189375,7 @@
                         "FR": "FR",
                         "IT": "IT",
                         "ES": "ES",
+                        "SK": "SK",
                         "US": "US",
                         "GLOBAL": "GLOBAL",
                         "AD": "AD",
@@ -189406,6 +189535,7 @@
                       "FR": "FR",
                       "IT": "IT",
                       "ES": "ES",
+                      "SK": "SK",
                       "US": "US",
                       "GLOBAL": "GLOBAL",
                       "AD": "AD",
@@ -189563,6 +189693,7 @@
                       "FR",
                       "IT",
                       "ES",
+                      "SK",
                       "US",
                       "GLOBAL",
                       "AD",
@@ -189726,6 +189857,7 @@
                       "FR": "FR",
                       "IT": "IT",
                       "ES": "ES",
+                      "SK": "SK",
                       "US": "US",
                       "GLOBAL": "GLOBAL",
                       "AD": "AD",
@@ -189885,6 +190017,7 @@
                     "FR": "FR",
                     "IT": "IT",
                     "ES": "ES",
+                    "SK": "SK",
                     "US": "US",
                     "GLOBAL": "GLOBAL",
                     "AD": "AD",
@@ -190042,6 +190175,7 @@
                     "FR",
                     "IT",
                     "ES",
+                    "SK",
                     "US",
                     "GLOBAL",
                     "AD",
@@ -190234,6 +190368,10 @@
             {
               "value": "es",
               "label": "languages.es"
+            },
+            {
+              "value": "sk",
+              "label": "languages.sk"
             }
           ],
           "schema": {
@@ -190251,6 +190389,7 @@
                         "FR": "fr",
                         "IT": "it",
                         "ES": "es",
+                        "SK": "sk",
                         "EN": "en"
                       }
                     },
@@ -190261,9 +190400,10 @@
                       "FR": "fr",
                       "IT": "it",
                       "ES": "es",
+                      "SK": "sk",
                       "EN": "en"
                     },
-                    "options": ["de", "pl", "fr", "it", "es", "en"]
+                    "options": ["de", "pl", "fr", "it", "es", "sk", "en"]
                   }
                 },
                 "type": "array",
@@ -190276,6 +190416,7 @@
                       "FR": "fr",
                       "IT": "it",
                       "ES": "es",
+                      "SK": "sk",
                       "EN": "en"
                     }
                   },
@@ -190286,9 +190427,10 @@
                     "FR": "fr",
                     "IT": "it",
                     "ES": "es",
+                    "SK": "sk",
                     "EN": "en"
                   },
-                  "options": ["de", "pl", "fr", "it", "es", "en"]
+                  "options": ["de", "pl", "fr", "it", "es", "sk", "en"]
                 }
               }
             },
@@ -192100,6 +192242,7 @@
                     "FR": "FR",
                     "IT": "IT",
                     "ES": "ES",
+                    "SK": "SK",
                     "US": "US",
                     "GLOBAL": "GLOBAL",
                     "AD": "AD",
@@ -192259,6 +192402,7 @@
                   "FR": "FR",
                   "IT": "IT",
                   "ES": "ES",
+                  "SK": "SK",
                   "US": "US",
                   "GLOBAL": "GLOBAL",
                   "AD": "AD",
@@ -192416,6 +192560,7 @@
                   "FR",
                   "IT",
                   "ES",
+                  "SK",
                   "US",
                   "GLOBAL",
                   "AD",
@@ -192579,6 +192724,7 @@
                   "FR": "FR",
                   "IT": "IT",
                   "ES": "ES",
+                  "SK": "SK",
                   "US": "US",
                   "GLOBAL": "GLOBAL",
                   "AD": "AD",
@@ -192738,6 +192884,7 @@
                 "FR": "FR",
                 "IT": "IT",
                 "ES": "ES",
+                "SK": "SK",
                 "US": "US",
                 "GLOBAL": "GLOBAL",
                 "AD": "AD",
@@ -192895,6 +193042,7 @@
                 "FR",
                 "IT",
                 "ES",
+                "SK",
                 "US",
                 "GLOBAL",
                 "AD",
@@ -193068,6 +193216,7 @@
                     "FR": "fr",
                     "IT": "it",
                     "ES": "es",
+                    "SK": "sk",
                     "EN": "en"
                   }
                 },
@@ -193078,9 +193227,10 @@
                   "FR": "fr",
                   "IT": "it",
                   "ES": "es",
+                  "SK": "sk",
                   "EN": "en"
                 },
-                "options": ["de", "pl", "fr", "it", "es", "en"]
+                "options": ["de", "pl", "fr", "it", "es", "sk", "en"]
               }
             },
             "type": "array",
@@ -193093,6 +193243,7 @@
                   "FR": "fr",
                   "IT": "it",
                   "ES": "es",
+                  "SK": "sk",
                   "EN": "en"
                 }
               },
@@ -193103,9 +193254,10 @@
                 "FR": "fr",
                 "IT": "it",
                 "ES": "es",
+                "SK": "sk",
                 "EN": "en"
               },
-              "options": ["de", "pl", "fr", "it", "es", "en"]
+              "options": ["de", "pl", "fr", "it", "es", "sk", "en"]
             }
           },
           "usage": {
@@ -195195,6 +195347,10 @@
               "label": "countries.es"
             },
             {
+              "value": "SK",
+              "label": "countries.sk"
+            },
+            {
               "value": "AD",
               "label": "countries.ad"
             },
@@ -195799,6 +195955,7 @@
                     "FR": "FR",
                     "IT": "IT",
                     "ES": "ES",
+                    "SK": "SK",
                     "US": "US",
                     "GLOBAL": "GLOBAL",
                     "AD": "AD",
@@ -195958,6 +196115,7 @@
                   "FR": "FR",
                   "IT": "IT",
                   "ES": "ES",
+                  "SK": "SK",
                   "US": "US",
                   "GLOBAL": "GLOBAL",
                   "AD": "AD",
@@ -196115,6 +196273,7 @@
                   "FR",
                   "IT",
                   "ES",
+                  "SK",
                   "US",
                   "GLOBAL",
                   "AD",
@@ -196278,6 +196437,7 @@
                   "FR": "FR",
                   "IT": "IT",
                   "ES": "ES",
+                  "SK": "SK",
                   "US": "US",
                   "GLOBAL": "GLOBAL",
                   "AD": "AD",
@@ -196437,6 +196597,7 @@
                 "FR": "FR",
                 "IT": "IT",
                 "ES": "ES",
+                "SK": "SK",
                 "US": "US",
                 "GLOBAL": "GLOBAL",
                 "AD": "AD",
@@ -196594,6 +196755,7 @@
                 "FR",
                 "IT",
                 "ES",
+                "SK",
                 "US",
                 "GLOBAL",
                 "AD",
@@ -196784,6 +196946,10 @@
             {
               "value": "es",
               "label": "languages.es"
+            },
+            {
+              "value": "sk",
+              "label": "languages.sk"
             }
           ],
           "schema": {
@@ -196798,6 +196964,7 @@
                     "FR": "fr",
                     "IT": "it",
                     "ES": "es",
+                    "SK": "sk",
                     "EN": "en"
                   }
                 },
@@ -196808,9 +196975,10 @@
                   "FR": "fr",
                   "IT": "it",
                   "ES": "es",
+                  "SK": "sk",
                   "EN": "en"
                 },
-                "options": ["de", "pl", "fr", "it", "es", "en"]
+                "options": ["de", "pl", "fr", "it", "es", "sk", "en"]
               }
             },
             "type": "array",
@@ -196823,6 +196991,7 @@
                   "FR": "fr",
                   "IT": "it",
                   "ES": "es",
+                  "SK": "sk",
                   "EN": "en"
                 }
               },
@@ -196833,9 +197002,10 @@
                 "FR": "fr",
                 "IT": "it",
                 "ES": "es",
+                "SK": "sk",
                 "EN": "en"
               },
-              "options": ["de", "pl", "fr", "it", "es", "en"]
+              "options": ["de", "pl", "fr", "it", "es", "sk", "en"]
             }
           },
           "usage": {
@@ -214481,6 +214651,10 @@
             {
               "value": "es",
               "label": "languages.es"
+            },
+            {
+              "value": "sk",
+              "label": "languages.sk"
             }
           ],
           "schema": {
@@ -214492,6 +214666,7 @@
                 "fr": "fr",
                 "it": "it",
                 "es": "es",
+                "sk": "sk",
                 "en": "en"
               }
             },
@@ -214502,9 +214677,10 @@
               "fr": "fr",
               "it": "it",
               "es": "es",
+              "sk": "sk",
               "en": "en"
             },
-            "options": ["de", "pl", "fr", "it", "es", "en"]
+            "options": ["de", "pl", "fr", "it", "es", "sk", "en"]
           },
           "usage": {
             "request": "data"
@@ -214545,6 +214721,10 @@
             {
               "value": "ES",
               "label": "countries.es"
+            },
+            {
+              "value": "SK",
+              "label": "countries.sk"
             },
             {
               "value": "AD",
@@ -215148,6 +215328,7 @@
                 "FR": "FR",
                 "IT": "IT",
                 "ES": "ES",
+                "SK": "SK",
                 "US": "US",
                 "GLOBAL": "GLOBAL",
                 "AD": "AD",
@@ -215307,6 +215488,7 @@
               "FR": "FR",
               "IT": "IT",
               "ES": "ES",
+              "SK": "SK",
               "US": "US",
               "GLOBAL": "GLOBAL",
               "AD": "AD",
@@ -215464,6 +215646,7 @@
               "FR",
               "IT",
               "ES",
+              "SK",
               "US",
               "GLOBAL",
               "AD",
@@ -215894,6 +216077,10 @@
             {
               "value": "es",
               "label": "languages.es"
+            },
+            {
+              "value": "sk",
+              "label": "languages.sk"
             }
           ],
           "schema": {
@@ -215905,6 +216092,7 @@
                 "fr": "fr",
                 "it": "it",
                 "es": "es",
+                "sk": "sk",
                 "en": "en"
               }
             },
@@ -215915,9 +216103,10 @@
               "fr": "fr",
               "it": "it",
               "es": "es",
+              "sk": "sk",
               "en": "en"
             },
-            "options": ["de", "pl", "fr", "it", "es", "en"]
+            "options": ["de", "pl", "fr", "it", "es", "sk", "en"]
           },
           "usage": {
             "request": "data"
@@ -215958,6 +216147,10 @@
             {
               "value": "ES",
               "label": "countries.es"
+            },
+            {
+              "value": "SK",
+              "label": "countries.sk"
             },
             {
               "value": "AD",
@@ -216561,6 +216754,7 @@
                 "FR": "FR",
                 "IT": "IT",
                 "ES": "ES",
+                "SK": "SK",
                 "US": "US",
                 "GLOBAL": "GLOBAL",
                 "AD": "AD",
@@ -216720,6 +216914,7 @@
               "FR": "FR",
               "IT": "IT",
               "ES": "ES",
+              "SK": "SK",
               "US": "US",
               "GLOBAL": "GLOBAL",
               "AD": "AD",
@@ -216877,6 +217072,7 @@
               "FR",
               "IT",
               "ES",
+              "SK",
               "US",
               "GLOBAL",
               "AD",
@@ -318414,6 +318610,10 @@
                   "label": "countries.es"
                 },
                 {
+                  "value": "SK",
+                  "label": "countries.sk"
+                },
+                {
                   "value": "AD",
                   "label": "countries.ad"
                 },
@@ -319016,6 +319216,7 @@
                     "FR": "FR",
                     "IT": "IT",
                     "ES": "ES",
+                    "SK": "SK",
                     "US": "US",
                     "GLOBAL": "GLOBAL",
                     "AD": "AD",
@@ -319175,6 +319376,7 @@
                   "FR": "FR",
                   "IT": "IT",
                   "ES": "ES",
+                  "SK": "SK",
                   "US": "US",
                   "GLOBAL": "GLOBAL",
                   "AD": "AD",
@@ -319332,6 +319534,7 @@
                   "FR",
                   "IT",
                   "ES",
+                  "SK",
                   "US",
                   "GLOBAL",
                   "AD",
@@ -319518,6 +319721,10 @@
                 {
                   "value": "es",
                   "label": "languages.es"
+                },
+                {
+                  "value": "sk",
+                  "label": "languages.sk"
                 }
               ],
               "columns": 6,
@@ -319530,6 +319737,7 @@
                     "FR": "fr",
                     "IT": "it",
                     "ES": "es",
+                    "SK": "sk",
                     "EN": "en"
                   }
                 },
@@ -319540,9 +319748,10 @@
                   "FR": "fr",
                   "IT": "it",
                   "ES": "es",
+                  "SK": "sk",
                   "EN": "en"
                 },
-                "options": ["de", "pl", "fr", "it", "es", "en"]
+                "options": ["de", "pl", "fr", "it", "es", "sk", "en"]
               },
               "usage": {
                 "request": "data"
@@ -387698,6 +387907,26 @@
                 },
                 "schemaType": "primitive"
               },
+              "questionSk": {
+                "type": "text",
+                "hidden": true,
+                "schema": {
+                  "def": {
+                    "type": "nullable",
+                    "innerType": {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    }
+                  },
+                  "type": "nullable"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
               "verdict": {
                 "type": "badge",
                 "label": "Werdykt",
@@ -387990,6 +388219,30 @@
           "type": "form_field",
           "fieldType": "textarea",
           "label": "Pytanie (hiszpański)",
+          "description": "Zostaw puste, aby usunąć tłumaczenie",
+          "columns": 6,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string",
+                  "checks": [{}]
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "textSk": {
+          "type": "form_field",
+          "fieldType": "textarea",
+          "label": "Pytanie (słowacki)",
           "description": "Zostaw puste, aby usunąć tłumaczenie",
           "columns": 6,
           "schema": {
@@ -388515,6 +388768,26 @@
                 },
                 "schemaType": "primitive"
               },
+              "textSk": {
+                "type": "text",
+                "hidden": true,
+                "schema": {
+                  "def": {
+                    "type": "nullable",
+                    "innerType": {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    }
+                  },
+                  "type": "nullable"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
               "generatedBy": {
                 "type": "text",
                 "label": "Zaproponował",
@@ -388823,6 +389096,30 @@
           "type": "form_field",
           "fieldType": "textarea",
           "label": "Pytanie (hiszpański)",
+          "description": "Tłumaczenie do publicznych przykładów (opcjonalne)",
+          "columns": 6,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string",
+                  "checks": [{}]
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "textSk": {
+          "type": "form_field",
+          "fieldType": "textarea",
+          "label": "Pytanie (słowacki)",
           "description": "Tłumaczenie do publicznych przykładów (opcjonalne)",
           "columns": 6,
           "schema": {

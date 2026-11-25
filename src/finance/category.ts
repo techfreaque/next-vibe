@@ -20,6 +20,7 @@ export const category: CategoryDefinition = {
     "fr-FR": "Finance",
     "it-IT": "Finanze",
     "es-ES": "Finanzas",
+    "sk-SK": "Financie",
   },
   group: "business",
   icon: "wallet",

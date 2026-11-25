@@ -30,6 +30,9 @@ const localizedSubjects: [CountryLanguage, string][] = [
   ["de-DE", "Fehlerbericht"],
   ["pl-PL", "Zgłoszenie błędu"],
   ["fr-FR", "Signaler un bug"],
+  ["it-IT", "Segnalazione di un errore"],
+  ["es-ES", "Informe de error"],
+  ["sk-SK", "Nahlásenie chyby"],
 ];
 
 describe("contact mail", () => {

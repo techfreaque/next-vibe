@@ -21,7 +21,10 @@ import {
 import { ProductIds, productsRepository } from "@/products/platform-products";
 
 import { listBlogPostCards } from "../../story/blog/posts-cards";
-import { BLOG_POST_DATES, type BlogPostSlug } from "../../story/blog/posts-meta";
+import {
+  BLOG_POST_DATES,
+  type BlogPostSlug,
+} from "../../story/blog/posts-meta";
 import { sitemapLocales } from "../sitemap.xml/build-sitemap";
 import { buildLlmsTxt, resolveLlmsLocale } from "./build-llms";
 
@@ -37,7 +40,9 @@ describe("llms.txt", () => {
     const text = await buildLlmsTxt(locale, "short");
     expect(text.startsWith("# ")).toBe(true);
     expect(text).toContain(`${FREE_CREDIT_ALLOWANCE.guest} without an account`);
-    expect(text).toContain(`${FREE_CREDIT_SIGNED_IN_TOTAL} with a free account`);
+    expect(text).toContain(
+      `${FREE_CREDIT_SIGNED_IN_TOTAL} with a free account`,
+    );
     expect(text).toContain(`${FREE_CREDIT_MAX_TOTAL} with a free account and`);
     expect(text).toContain("HTTP 402");
     expect(text).toContain("/v1/images/generations");
@@ -69,6 +74,8 @@ describe("llms.txt", () => {
   it("only accepts site locales from ?locale=", () => {
     expect(resolveLlmsLocale("de-DE")).toBe("de-DE");
     expect(resolveLlmsLocale("es-MX")).toBe("es-ES");
+    expect(resolveLlmsLocale("sk")).toBe("sk-SK");
+    expect(resolveLlmsLocale("sk-DE")).toBe("sk-SK");
     expect(resolveLlmsLocale("it-CH")).toBe("it-IT");
     expect(resolveLlmsLocale("fr")).toBe("fr-FR");
     expect(resolveLlmsLocale("FR-fr")).toBe("fr-FR");
@@ -97,7 +104,9 @@ describe("JSON-LD", () => {
         products[ProductIds.CREDIT_PACK].price,
       ]);
       for (const offer of offers) {
-        expect(offer.priceCurrency).toBe(products[ProductIds.CREDIT_PACK].currency);
+        expect(offer.priceCurrency).toBe(
+          products[ProductIds.CREDIT_PACK].currency,
+        );
       }
     }
   });
@@ -114,7 +123,9 @@ describe("JSON-LD", () => {
       // Google Article fields: image with real size, author/publisher by name.
       expect(json).toContain('"image":{"@type":"ImageObject"');
       expect(json).toContain('"width":1200,"height":630');
-      expect(json).toMatch(/"author":\{"@type":"Organization","@id":"[^"]+","name":"[^"]+"/);
+      expect(json).toMatch(
+        /"author":\{"@type":"Organization","@id":"[^"]+","name":"[^"]+"/,
+      );
     }
   });
 

@@ -19,6 +19,7 @@ export const category: CategoryDefinition = {
     "fr-FR": "Bureau",
     "it-IT": "Desktop",
     "es-ES": "Escritorio",
+    "sk-SK": "Pracovná plocha",
   },
   group: "platform",
   icon: "monitor",
@@ -40,6 +41,7 @@ export const category: CategoryDefinition = {
         "fr-FR": "Fenêtres",
         "it-IT": "Finestre",
         "es-ES": "Ventanas",
+        "sk-SK": "Okná",
       },
       // inherits parent defaultEntry (desktop-list-windows)
     },
@@ -54,6 +56,7 @@ export const category: CategoryDefinition = {
         "fr-FR": "Interaction",
         "it-IT": "Interazione",
         "es-ES": "Interacción",
+        "sk-SK": "Interakcia",
       },
     },
     Capture: {
@@ -67,6 +70,7 @@ export const category: CategoryDefinition = {
         "fr-FR": "Capture",
         "it-IT": "Acquisizione",
         "es-ES": "Captura",
+        "sk-SK": "Snímanie",
       },
     },
     Inspection: {
@@ -80,6 +84,7 @@ export const category: CategoryDefinition = {
         "fr-FR": "Inspection",
         "it-IT": "Ispezione",
         "es-ES": "Inspección",
+        "sk-SK": "Kontrola",
       },
     },
   },

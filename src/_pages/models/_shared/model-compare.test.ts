@@ -54,6 +54,7 @@ const LOCALES: readonly CountryLanguage[] = [
   "fr-FR",
   "it-IT",
   "es-ES",
+  "sk-SK",
 ];
 
 function factsOf(id: ChatModelId): ModelFacts {
@@ -160,7 +161,8 @@ describe("compare pages", () => {
   test("localized compare links use canonical order for either input order", () => {
     const uncensored = ChatModelId.UNCENSORED_LM_V1_2;
     const sonnet = ChatModelId.CLAUDE_SONNET_5_5;
-    const canonical = "/de-DE/models/compare/uncensored-lm-v1-2/claude-sonnet-5-5";
+    const canonical =
+      "/de-DE/models/compare/uncensored-lm-v1-2/claude-sonnet-5-5";
     expect(compareHref("de-DE", sonnet, uncensored)).toBe(canonical);
     expect(compareHref("de-DE", uncensored, sonnet)).toBe(canonical);
   });

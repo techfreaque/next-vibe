@@ -97,6 +97,7 @@ export class NewsletterUnsubscribeSmsServiceImpl implements NewsletterUnsubscrib
         user || { isPublic: true as const },
         logger,
         sendT,
+        locale,
       );
 
       if (!smsResult.success) {
@@ -175,6 +176,7 @@ export class NewsletterUnsubscribeSmsServiceImpl implements NewsletterUnsubscrib
         user || { id: "system", isPublic: false as const },
         logger,
         sendT2,
+        locale,
       );
 
       if (!smsResult.success) {

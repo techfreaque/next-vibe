@@ -9,6 +9,7 @@ export const countryOptions = [
   { value: "US", label: "countries.us" },
   { value: "IT", label: "countries.it" },
   { value: "ES", label: "countries.es" },
+  { value: "SK", label: "countries.sk" },
   { value: "AD", label: "countries.ad" },
   { value: "AG", label: "countries.ag" },
   { value: "AI", label: "countries.ai" },
@@ -176,6 +177,7 @@ export function regionalCountryNames(language: Languages): RegionalNames {
   const regions = {
     it: name("IT"),
     es: name("ES"),
+    sk: name("SK"),
     ad: name("AD"),
     ag: name("AG"),
     ai: name("AI"),

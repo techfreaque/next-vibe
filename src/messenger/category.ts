@@ -19,6 +19,7 @@ export const category: CategoryDefinition = {
     "fr-FR": "Messagerie",
     "it-IT": "Messaggistica",
     "es-ES": "Mensajería",
+    "sk-SK": "Správy",
   },
   group: "comms",
   icon: "mail",
@@ -40,6 +41,7 @@ export const category: CategoryDefinition = {
         "fr-FR": "Comptes",
         "it-IT": "Account",
         "es-ES": "Cuentas",
+        "sk-SK": "Účty",
       },
       // inherits parent defaultEntry (messenger-accounts)
     },
@@ -54,6 +56,7 @@ export const category: CategoryDefinition = {
         "fr-FR": "Boîte de réception",
         "it-IT": "Posta in arrivo",
         "es-ES": "Bandeja de entrada",
+        "sk-SK": "Doručená pošta",
       },
     },
     Messages: {
@@ -67,6 +70,7 @@ export const category: CategoryDefinition = {
         "fr-FR": "Messages",
         "it-IT": "Messaggi",
         "es-ES": "Mensajes",
+        "sk-SK": "Správy",
       },
     },
     Providers: {
@@ -80,6 +84,7 @@ export const category: CategoryDefinition = {
         "fr-FR": "Fournisseurs",
         "it-IT": "Fornitori",
         "es-ES": "Proveedores",
+        "sk-SK": "Poskytovatelia",
       },
     },
   },

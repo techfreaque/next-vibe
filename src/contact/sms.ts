@@ -93,6 +93,7 @@ export class ContactSmsServiceImpl implements ContactSmsService {
           ({ id: crypto.randomUUID(), isPublic: false } as JwtPayloadType),
         logger,
         sendT,
+        locale,
       );
 
       if (!smsResult.success) {
@@ -160,6 +161,7 @@ export class ContactSmsServiceImpl implements ContactSmsService {
         user || ({ isPublic: true } as JwtPayloadType),
         logger,
         sendT,
+        locale,
       );
 
       if (!smsResult.success) {

@@ -160,6 +160,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "fr-FR": "Agent IA",
       "it-IT": "Agente IA",
       "es-ES": "Agente de IA",
+      "sk-SK": "Agent AI",
     },
     group: "ai",
     icon: "bot",
@@ -178,6 +179,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Inférence",
           "it-IT": "Inferenza",
           "es-ES": "Inferencia",
+          "sk-SK": "Inferencia",
         },
       },
       Generation: {
@@ -192,6 +194,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Génération",
           "it-IT": "Generazione",
           "es-ES": "Generación",
+          "sk-SK": "Generovanie",
         },
       },
       Tools: {
@@ -206,6 +209,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Outils",
           "it-IT": "Strumenti",
           "es-ES": "Herramientas",
+          "sk-SK": "Nástroje",
         },
       },
       Search: {
@@ -220,6 +224,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Recherche",
           "it-IT": "Ricerca",
           "es-ES": "Búsqueda",
+          "sk-SK": "Vyhľadávanie",
         },
       },
       chat: {
@@ -234,6 +239,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Chat",
           "it-IT": "Chat",
           "es-ES": "Chat",
+          "sk-SK": "Chat",
         },
       },
       chatFavorites: {
@@ -248,6 +254,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Favoris",
           "it-IT": "Preferiti",
           "es-ES": "Favoritos",
+          "sk-SK": "Obľúbené",
         },
       },
       chatOrganization: {
@@ -262,6 +269,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Organisation",
           "it-IT": "Organizzazione",
           "es-ES": "Organización",
+          "sk-SK": "Organizácia",
         },
       },
       chatSettings: {
@@ -276,6 +284,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Paramètres du chat",
           "it-IT": "Impostazioni chat",
           "es-ES": "Configuración del chat",
+          "sk-SK": "Nastavenia chatu",
         },
       },
       skillsManagement: {
@@ -290,6 +299,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Compétences",
           "it-IT": "Skill",
           "es-ES": "Skills",
+          "sk-SK": "Zručnosti",
         },
       },
       skillsCommunity: {
@@ -304,6 +314,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Compétences de la communauté",
           "it-IT": "Skill della community",
           "es-ES": "Skills de la comunidad",
+          "sk-SK": "Zručnosti komunity",
         },
       },
       skillsModeration: {
@@ -318,6 +329,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Modération des compétences",
           "it-IT": "Moderazione delle skill",
           "es-ES": "Moderación de skills",
+          "sk-SK": "Moderovanie zručností",
         },
       },
       threadsManagement: {
@@ -332,6 +344,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Fils de discussion",
           "it-IT": "Conversazioni",
           "es-ES": "Conversaciones",
+          "sk-SK": "Konverzácie",
         },
       },
       threadsSharing: {
@@ -346,6 +359,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Partage de fils",
           "it-IT": "Condivisione delle conversazioni",
           "es-ES": "Conversaciones compartidas",
+          "sk-SK": "Zdieľanie konverzácií",
         },
       },
       threadsSearch: {
@@ -360,6 +374,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Recherche de fils",
           "it-IT": "Ricerca nelle conversazioni",
           "es-ES": "Búsqueda de conversaciones",
+          "sk-SK": "Vyhľadávanie konverzácií",
         },
       },
       messagesModerating: {
@@ -374,6 +389,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Messages",
           "it-IT": "Messaggi",
           "es-ES": "Mensajes",
+          "sk-SK": "Správy",
         },
       },
       messagesSearch: {
@@ -388,6 +404,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Recherche de messages",
           "it-IT": "Ricerca nei messaggi",
           "es-ES": "Búsqueda de mensajes",
+          "sk-SK": "Vyhľadávanie správ",
         },
       },
       messagesFiles: {
@@ -402,6 +419,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Fichiers des messages",
           "it-IT": "Allegati dei messaggi",
           "es-ES": "Archivos de mensajes",
+          "sk-SK": "Súbory v správach",
         },
       },
       tasksCron: {
@@ -416,6 +434,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Tâches planifiées",
           "it-IT": "Attività pianificate",
           "es-ES": "Tareas programadas",
+          "sk-SK": "Naplánované úlohy",
         },
       },
     },
@@ -431,6 +450,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "fr-FR": "Cortex",
       "it-IT": "Cortex",
       "es-ES": "Cortex",
+      "sk-SK": "Cortex",
     },
     group: "ai",
     icon: "brain",
@@ -448,6 +468,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "fr-FR": "Analytique",
       "it-IT": "Analisi",
       "es-ES": "Analítica",
+      "sk-SK": "Analytika",
     },
     group: "analytics",
     icon: "bar-chart-2",
@@ -467,6 +488,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Activité",
           "it-IT": "Attività",
           "es-ES": "Negocio",
+          "sk-SK": "Podnikanie",
         },
       },
       "Vibe Sense": {
@@ -481,6 +503,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Vibe Sense",
           "it-IT": "Vibe Sense",
           "es-ES": "Vibe Sense",
+          "sk-SK": "Vibe Sense",
         },
       },
       Indicators: {
@@ -495,6 +518,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Indicateurs",
           "it-IT": "Indicatori",
           "es-ES": "Indicadores",
+          "sk-SK": "Ukazovatele",
         },
       },
       Evaluators: {
@@ -509,6 +533,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Évaluateurs",
           "it-IT": "Valutatori",
           "es-ES": "Evaluadores",
+          "sk-SK": "Vyhodnocovanie",
         },
       },
       Transformers: {
@@ -523,6 +548,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Transformateurs",
           "it-IT": "Trasformatori",
           "es-ES": "Transformadores",
+          "sk-SK": "Transformácie",
         },
       },
       leadsData: {
@@ -537,6 +563,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Données des leads",
           "it-IT": "Dati sui contatti commerciali",
           "es-ES": "Datos de prospectos",
+          "sk-SK": "Údaje o potenciálnych zákazníkoch",
         },
       },
       usersData: {
@@ -551,6 +578,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Données des utilisateurs",
           "it-IT": "Dati degli utenti",
           "es-ES": "Datos de usuarios",
+          "sk-SK": "Údaje o používateľoch",
         },
       },
       messengerData: {
@@ -565,6 +593,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Données de la messagerie",
           "it-IT": "Dati di messaggistica",
           "es-ES": "Datos de mensajería",
+          "sk-SK": "Údaje o správach",
         },
       },
       paymentsData: {
@@ -579,6 +608,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Données des paiements",
           "it-IT": "Dati sui pagamenti",
           "es-ES": "Datos de pagos",
+          "sk-SK": "Údaje o platbách",
         },
       },
       creditsData: {
@@ -593,6 +623,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Données des crédits",
           "it-IT": "Dati sui crediti",
           "es-ES": "Datos de créditos",
+          "sk-SK": "Údaje o kreditoch",
         },
       },
       subscriptionsData: {
@@ -607,6 +638,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Données des abonnements",
           "it-IT": "Dati sugli abbonamenti",
           "es-ES": "Datos de suscripciones",
+          "sk-SK": "Údaje o predplatnom",
         },
       },
       referralData: {
@@ -621,6 +653,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Données du parrainage",
           "it-IT": "Dati sugli inviti",
           "es-ES": "Datos de referidos",
+          "sk-SK": "Údaje o odporúčaniach",
         },
       },
       newsletterData: {
@@ -635,6 +668,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Données de la newsletter",
           "it-IT": "Dati della newsletter",
           "es-ES": "Datos del boletín",
+          "sk-SK": "Údaje o newsletteri",
         },
       },
       chatData: {
@@ -649,6 +683,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Données du chat",
           "it-IT": "Dati delle chat",
           "es-ES": "Datos del chat",
+          "sk-SK": "Údaje o chatoch",
         },
       },
       systemData: {
@@ -663,6 +698,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Données système",
           "it-IT": "Dati di sistema",
           "es-ES": "Datos del sistema",
+          "sk-SK": "Systémové údaje",
         },
       },
       financeData: {
@@ -677,6 +713,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Données financières",
           "it-IT": "Dati finanziari",
           "es-ES": "Datos financieros",
+          "sk-SK": "Finančné údaje",
         },
       },
     },
@@ -692,6 +729,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "fr-FR": "Paiements",
       "it-IT": "Pagamenti",
       "es-ES": "Pagos",
+      "sk-SK": "Platby",
     },
     group: "business",
     icon: "credit-card",
@@ -711,6 +749,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Transactions",
           "it-IT": "Transazioni",
           "es-ES": "Transacciones",
+          "sk-SK": "Transakcie",
         },
       },
       Providers: {
@@ -725,6 +764,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Fournisseurs",
           "it-IT": "Fornitori",
           "es-ES": "Proveedores",
+          "sk-SK": "Poskytovatelia platieb",
         },
       },
     },
@@ -740,6 +780,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "fr-FR": "Abonnements",
       "it-IT": "Abbonamenti",
       "es-ES": "Suscripciones",
+      "sk-SK": "Predplatné",
     },
     group: "business",
     icon: "refresh-cw",
@@ -758,6 +799,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Abonnements",
           "it-IT": "Abbonamenti",
           "es-ES": "Suscripciones",
+          "sk-SK": "Predplatné",
         },
       },
       Management: {
@@ -772,6 +814,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Gestion",
           "it-IT": "Gestione",
           "es-ES": "Gestión",
+          "sk-SK": "Správa",
         },
       },
       subscriptionAnalytics: {
@@ -786,6 +829,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Analytique",
           "it-IT": "Analisi",
           "es-ES": "Analítica",
+          "sk-SK": "Analytika",
         },
       },
     },
@@ -801,6 +845,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "fr-FR": "Crédits",
       "it-IT": "Crediti",
       "es-ES": "Créditos",
+      "sk-SK": "Kredity",
     },
     group: "business",
     icon: "coins",
@@ -819,6 +864,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Crédits",
           "it-IT": "Crediti",
           "es-ES": "Créditos",
+          "sk-SK": "Kredity",
         },
       },
       Management: {
@@ -833,6 +879,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Gestion",
           "it-IT": "Gestione",
           "es-ES": "Gestión",
+          "sk-SK": "Správa",
         },
       },
     },
@@ -848,6 +895,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "fr-FR": "Leads",
       "it-IT": "Contatti commerciali",
       "es-ES": "Prospectos",
+      "sk-SK": "Potenciálni zákazníci",
     },
     group: "business",
     icon: "target",
@@ -867,6 +915,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Analyses",
           "it-IT": "Analisi",
           "es-ES": "Análisis",
+          "sk-SK": "Analytika",
         },
       },
       Management: {
@@ -881,6 +930,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Gestion",
           "it-IT": "Gestione",
           "es-ES": "Gestión",
+          "sk-SK": "Správa",
         },
       },
       Import: {
@@ -895,6 +945,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Import",
           "it-IT": "Importazione",
           "es-ES": "Importación",
+          "sk-SK": "Import",
         },
       },
       Leads: {
@@ -909,6 +960,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Leads",
           "it-IT": "Contatti commerciali",
           "es-ES": "Prospectos",
+          "sk-SK": "Potenciálni zákazníci",
         },
       },
       emailCampaignsProcessing: {
@@ -923,6 +975,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Campagnes",
           "it-IT": "Campagne",
           "es-ES": "Campañas",
+          "sk-SK": "Kampane",
         },
       },
       emailCampaignsJourneys: {
@@ -937,6 +990,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Parcours",
           "it-IT": "Percorsi",
           "es-ES": "Secuencias",
+          "sk-SK": "Komunikačné scenáre",
         },
       },
       emailCampaignsQueue: {
@@ -951,6 +1005,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "File d'attente",
           "it-IT": "Coda",
           "es-ES": "Cola",
+          "sk-SK": "Front",
         },
       },
       emailCampaignsStats: {
@@ -965,6 +1020,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Stats des campagnes",
           "it-IT": "Statistiche campagne",
           "es-ES": "Estadísticas de campañas",
+          "sk-SK": "Štatistiky kampaní",
         },
       },
       leadMagnetIntegrations: {
@@ -979,6 +1035,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Intégrations",
           "it-IT": "Integrazioni",
           "es-ES": "Integraciones",
+          "sk-SK": "Integrácie",
         },
       },
       growth: {
@@ -993,6 +1050,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Croissance",
           "it-IT": "Crescita",
           "es-ES": "Crecimiento",
+          "sk-SK": "Rast",
         },
       },
       outreach: {
@@ -1007,6 +1065,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Prospection",
           "it-IT": "Primi contatti",
           "es-ES": "Contacto inicial",
+          "sk-SK": "Oslovovanie zákazníkov",
         },
       },
     },
@@ -1022,6 +1081,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "fr-FR": "Comptabilité",
       "it-IT": "Contabilità",
       "es-ES": "Contabilidad",
+      "sk-SK": "Účtovníctvo",
     },
     group: "business",
     icon: "receipt",
@@ -1040,6 +1100,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Comptes",
           "it-IT": "Account",
           "es-ES": "Cuentas",
+          "sk-SK": "Účty",
         },
       },
       Journal: {
@@ -1054,6 +1115,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Journal",
           "it-IT": "Libro giornale",
           "es-ES": "Libro diario",
+          "sk-SK": "Účtovný denník",
         },
       },
       Ledger: {
@@ -1068,6 +1130,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Grand livre",
           "it-IT": "Libro mastro",
           "es-ES": "Libro mayor",
+          "sk-SK": "Hlavná kniha",
         },
       },
       Periods: {
@@ -1082,6 +1145,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Périodes",
           "it-IT": "Periodi",
           "es-ES": "Períodos",
+          "sk-SK": "Účtovné obdobia",
         },
       },
       Accounting: {
@@ -1096,6 +1160,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Configuration",
           "it-IT": "Configurazione iniziale",
           "es-ES": "Configuración inicial",
+          "sk-SK": "Nastavenie",
         },
       },
     },
@@ -1111,6 +1176,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "fr-FR": "Entreprises",
       "it-IT": "Aziende",
       "es-ES": "Empresas",
+      "sk-SK": "Firmy",
     },
     group: "business",
     icon: "building",
@@ -1129,6 +1195,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Entreprises",
           "it-IT": "Aziende",
           "es-ES": "Empresas",
+          "sk-SK": "Firmy",
         },
       },
       "Company Members": {
@@ -1143,6 +1210,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Membres",
           "it-IT": "Membri",
           "es-ES": "Miembros",
+          "sk-SK": "Členovia",
         },
       },
     },
@@ -1158,6 +1226,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "fr-FR": "Produits",
       "it-IT": "Prodotti",
       "es-ES": "Productos",
+      "sk-SK": "Produkty",
     },
     group: "business",
     icon: "package",
@@ -1176,6 +1245,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Catalogue",
           "it-IT": "Catalogo",
           "es-ES": "Catálogo",
+          "sk-SK": "Katalóg",
         },
       },
       "Category Management": {
@@ -1190,6 +1260,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Catégories",
           "it-IT": "Categorie",
           "es-ES": "Categorías",
+          "sk-SK": "Kategórie",
         },
       },
     },
@@ -1205,6 +1276,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "fr-FR": "Point de vente",
       "it-IT": "Punto vendita",
       "es-ES": "Punto de venta",
+      "sk-SK": "Predajné miesto",
     },
     group: "business",
     icon: "shopping-cart",
@@ -1223,6 +1295,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Commandes",
           "it-IT": "Ordini",
           "es-ES": "Pedidos",
+          "sk-SK": "Objednávky",
         },
       },
       "POS: Sessions": {
@@ -1237,6 +1310,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Sessions",
           "it-IT": "Sessioni",
           "es-ES": "Sesiones",
+          "sk-SK": "Pokladničné zmeny",
         },
       },
       "POS: Terminals": {
@@ -1251,6 +1325,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Terminaux",
           "it-IT": "Terminali",
           "es-ES": "Terminales",
+          "sk-SK": "Terminály",
         },
       },
       "POS: Products": {
@@ -1265,6 +1340,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Produits",
           "it-IT": "Prodotti",
           "es-ES": "Productos",
+          "sk-SK": "Produkty",
         },
       },
     },
@@ -1280,6 +1356,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "fr-FR": "Inventaire",
       "it-IT": "Inventario",
       "es-ES": "Inventario",
+      "sk-SK": "Zásoby",
     },
     group: "business",
     icon: "box",
@@ -1298,6 +1375,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Stock",
           "it-IT": "Scorte",
           "es-ES": "Existencias",
+          "sk-SK": "Stav zásob",
         },
       },
       "Inventory: Transfers": {
@@ -1312,6 +1390,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Transferts",
           "it-IT": "Trasferimenti",
           "es-ES": "Transferencias",
+          "sk-SK": "Presuny zásob",
         },
       },
       "Inventory: Warehouses": {
@@ -1326,6 +1405,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Entrepôts",
           "it-IT": "Magazzini",
           "es-ES": "Almacenes",
+          "sk-SK": "Sklady",
         },
       },
     },
@@ -1341,6 +1421,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "fr-FR": "Achats",
       "it-IT": "Acquisti",
       "es-ES": "Compras",
+      "sk-SK": "Nákup",
     },
     group: "business",
     icon: "shopping-bag",
@@ -1359,6 +1440,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Commandes",
           "it-IT": "Ordini",
           "es-ES": "Pedidos",
+          "sk-SK": "Nákupné objednávky",
         },
       },
       "Purchasing: Vendors": {
@@ -1373,6 +1455,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Fournisseurs",
           "it-IT": "Fornitori",
           "es-ES": "Proveedores",
+          "sk-SK": "Dodávatelia",
         },
       },
     },
@@ -1388,6 +1471,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "fr-FR": "Parrainage",
       "it-IT": "Inviti",
       "es-ES": "Referidos",
+      "sk-SK": "Odporúčania",
     },
     group: "business",
     icon: "share-2",
@@ -1406,6 +1490,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Programme",
           "it-IT": "Programma",
           "es-ES": "Programa",
+          "sk-SK": "Program",
         },
       },
       Payouts: {
@@ -1420,6 +1505,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Versements",
           "it-IT": "Liquidazioni",
           "es-ES": "Desembolsos",
+          "sk-SK": "Výplaty",
         },
       },
     },
@@ -1435,6 +1521,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "fr-FR": "Taxes",
       "it-IT": "Imposte",
       "es-ES": "Impuestos",
+      "sk-SK": "Dane",
     },
     group: "business",
     icon: "file-text",
@@ -1453,6 +1540,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Taux de taxe",
           "it-IT": "Aliquote fiscali",
           "es-ES": "Tasas impositivas",
+          "sk-SK": "Daňové sadzby",
         },
       },
       "Tax Reports": {
@@ -1467,6 +1555,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Rapports",
           "it-IT": "Report",
           "es-ES": "Informes",
+          "sk-SK": "Daňové výkazy",
         },
       },
     },
@@ -1482,6 +1571,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "fr-FR": "Finance",
       "it-IT": "Finanze",
       "es-ES": "Finanzas",
+      "sk-SK": "Financie",
     },
     group: "business",
     icon: "wallet",
@@ -1515,6 +1605,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "fr-FR": "Notifications",
       "it-IT": "Notifiche",
       "es-ES": "Notificaciones",
+      "sk-SK": "Oznámenia",
     },
     group: "business",
     icon: "bell",
@@ -1532,6 +1623,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "fr-FR": "Messagerie",
       "it-IT": "Messaggistica",
       "es-ES": "Mensajería",
+      "sk-SK": "Správy",
     },
     group: "comms",
     icon: "mail",
@@ -1550,6 +1642,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Comptes",
           "it-IT": "Account",
           "es-ES": "Cuentas",
+          "sk-SK": "Účty",
         },
       },
       Inbox: {
@@ -1564,6 +1657,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Boîte de réception",
           "it-IT": "Posta in arrivo",
           "es-ES": "Bandeja de entrada",
+          "sk-SK": "Doručená pošta",
         },
       },
       Messages: {
@@ -1578,6 +1672,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Messages",
           "it-IT": "Messaggi",
           "es-ES": "Mensajes",
+          "sk-SK": "Správy",
         },
       },
       Providers: {
@@ -1592,6 +1687,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Fournisseurs",
           "it-IT": "Fornitori",
           "es-ES": "Proveedores",
+          "sk-SK": "Poskytovatelia",
         },
       },
     },
@@ -1607,6 +1703,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "fr-FR": "Newsletter",
       "it-IT": "Newsletter",
       "es-ES": "Boletín",
+      "sk-SK": "Newsletter",
     },
     group: "comms",
     icon: "send",
@@ -1625,6 +1722,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Stats des campagnes",
           "it-IT": "Statistiche campagne",
           "es-ES": "Estadísticas de campañas",
+          "sk-SK": "Štatistiky kampaní",
         },
       },
       emailCampaignsProcessing: {
@@ -1639,6 +1737,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Campagnes",
           "it-IT": "Campagne",
           "es-ES": "Campañas",
+          "sk-SK": "Kampane",
         },
       },
       emailCampaignsJourneys: {
@@ -1653,6 +1752,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Parcours",
           "it-IT": "Percorsi",
           "es-ES": "Secuencias",
+          "sk-SK": "Komunikačné scenáre",
         },
       },
       emailCampaignsQueue: {
@@ -1667,6 +1767,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "File d'attente",
           "it-IT": "Coda",
           "es-ES": "Cola",
+          "sk-SK": "Front",
         },
       },
       Subscriptions: {
@@ -1681,6 +1782,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Abonnements",
           "it-IT": "Abbonamenti",
           "es-ES": "Suscripciones",
+          "sk-SK": "Predplatné",
         },
       },
     },
@@ -1696,6 +1798,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "fr-FR": "Navigateur",
       "it-IT": "Browser",
       "es-ES": "Navegador",
+      "sk-SK": "Prehliadač",
     },
     group: "platform",
     icon: "globe",
@@ -1714,6 +1817,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Pages",
           "it-IT": "Pagine",
           "es-ES": "Páginas",
+          "sk-SK": "Stránky",
         },
       },
       Interaction: {
@@ -1728,6 +1832,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Interaction",
           "it-IT": "Interazione",
           "es-ES": "Interacción",
+          "sk-SK": "Interakcia",
         },
       },
       Inspection: {
@@ -1742,6 +1847,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Inspection",
           "it-IT": "Ispezione",
           "es-ES": "Inspección",
+          "sk-SK": "Kontrola",
         },
       },
       DevTools: {
@@ -1756,6 +1862,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "DevTools",
           "it-IT": "Strumenti di sviluppo",
           "es-ES": "Herramientas de desarrollo",
+          "sk-SK": "Nástroje pre vývojárov",
         },
       },
     },
@@ -1771,6 +1878,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "fr-FR": "SSH et infra",
       "it-IT": "SSH e infrastruttura",
       "es-ES": "SSH e infraestructura",
+      "sk-SK": "SSH a infraštruktúra",
     },
     group: "platform",
     icon: "terminal",
@@ -1789,6 +1897,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Connexions",
           "it-IT": "Connessioni",
           "es-ES": "Conexiones",
+          "sk-SK": "Pripojenia",
         },
       },
       Linux: {
@@ -1803,6 +1912,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Utilisateurs Linux",
           "it-IT": "Utenti Linux",
           "es-ES": "Usuarios de Linux",
+          "sk-SK": "Používatelia Linuxu",
         },
       },
     },
@@ -1818,6 +1928,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "fr-FR": "Bureau",
       "it-IT": "Desktop",
       "es-ES": "Escritorio",
+      "sk-SK": "Pracovná plocha",
     },
     group: "platform",
     icon: "monitor",
@@ -1836,6 +1947,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Fenêtres",
           "it-IT": "Finestre",
           "es-ES": "Ventanas",
+          "sk-SK": "Okná",
         },
       },
       Interaction: {
@@ -1850,6 +1962,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Interaction",
           "it-IT": "Interazione",
           "es-ES": "Interacción",
+          "sk-SK": "Interakcia",
         },
       },
       Capture: {
@@ -1864,6 +1977,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Capture",
           "it-IT": "Acquisizione",
           "es-ES": "Captura",
+          "sk-SK": "Snímanie",
         },
       },
       Inspection: {
@@ -1878,6 +1992,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Inspection",
           "it-IT": "Ispezione",
           "es-ES": "Inspección",
+          "sk-SK": "Kontrola",
         },
       },
     },
@@ -1893,6 +2008,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "fr-FR": "Compte",
       "it-IT": "Account",
       "es-ES": "Cuenta",
+      "sk-SK": "Účet",
     },
     group: "system",
     icon: "user",
@@ -1912,6 +2028,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Connexion et inscription",
           "it-IT": "Accesso e registrazione",
           "es-ES": "Acceso y registro",
+          "sk-SK": "Prihlásenie a registrácia",
         },
       },
       profile: {
@@ -1926,6 +2043,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Profil",
           "it-IT": "Profilo",
           "es-ES": "Perfil",
+          "sk-SK": "Profil",
         },
       },
       sessions: {
@@ -1940,6 +2058,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Sessions",
           "it-IT": "Sessioni",
           "es-ES": "Sesiones",
+          "sk-SK": "Relácie",
         },
       },
       directory: {
@@ -1954,6 +2073,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Annuaire",
           "it-IT": "Elenco",
           "es-ES": "Directorio",
+          "sk-SK": "Adresár",
         },
       },
       manageUsers: {
@@ -1968,6 +2088,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Gérer les utilisateurs",
           "it-IT": "Gestione utenti",
           "es-ES": "Gestión de usuarios",
+          "sk-SK": "Správa používateľov",
         },
       },
       userStats: {
@@ -1982,6 +2103,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Inscriptions",
           "it-IT": "Iscrizioni",
           "es-ES": "Registros",
+          "sk-SK": "Registrácie",
         },
       },
       remoteInstances: {
@@ -1996,6 +2118,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Instances distantes",
           "it-IT": "Istanze remote",
           "es-ES": "Instancias remotas",
+          "sk-SK": "Vzdialené inštancie",
         },
       },
       remoteSelf: {
@@ -2010,6 +2133,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Instance locale",
           "it-IT": "Il mio account",
           "es-ES": "Mi cuenta",
+          "sk-SK": "Môj účet",
         },
       },
     },
@@ -2254,6 +2378,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       "fr-FR": "Base de données",
       "it-IT": "Database",
       "es-ES": "Base de datos",
+      "sk-SK": "Databáza",
     },
     group: "system",
     icon: "database",
@@ -2272,6 +2397,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Migrations",
           "it-IT": "Migrazioni",
           "es-ES": "Migraciones",
+          "sk-SK": "Migrácie",
         },
       },
       Tools: {
@@ -2286,6 +2412,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
           "fr-FR": "Outils",
           "it-IT": "Strumenti",
           "es-ES": "Herramientas",
+          "sk-SK": "Nástroje",
         },
       },
     },

@@ -328,6 +328,7 @@ export const translations = {
   languages: {
     it: "Italian",
     es: "Spanish",
+    sk: "Slovak",
     en: "English",
     de: "German",
     pl: "Polish",

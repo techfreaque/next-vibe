@@ -1,12 +1,14 @@
 import type { ZodError, ZodIssue } from "zod";
 import { z } from "zod";
+import slovakZodLocale from "zod/v4/locales/sk.js";
 
 import { sanitizeLogText } from "../../logger/telemetry-privacy";
 import type { EndpointLogger } from "../../logger/types";
 import type { Platform } from "../../platforms/platforms";
 import { isAgentPlatform, isCliPlatform } from "../../platforms/platforms";
 import type { CreateApiEndpointAny } from "../definition/endpoint-base";
-import type { CountryLanguage } from "../i18n/core/config";
+import { type CountryLanguage, Languages } from "../i18n/core/config";
+import { getLanguageFromLocale } from "../i18n/core/language-utils";
 import { scopedTranslation as sharedScopedTranslation } from "../i18n/shared";
 import type { ResponseType } from "../route/response.schema";
 import { ErrorResponseTypes, fail } from "../route/response.schema";
@@ -16,6 +18,8 @@ import {
   formatValidationErrorCompact,
   formatValidationErrorDetails,
 } from "./format-validation-error";
+
+const { localeError: slovakZodError } = slovakZodLocale();
 
 /**
  * Validate data against a schema
@@ -56,7 +60,18 @@ export function validateData<TSchema extends z.ZodType>(
   try {
     // reportInput puts the offending value on each issue, so the log says WHAT
     // was rejected (e.g. which model id) - summarizeIssueForLog redacts it.
-    const result = schema.safeParse(data, { reportInput: true });
+    const result = schema.safeParse(data, {
+      reportInput: true,
+      // A per-parse error map supplies Slovak defaults while schema-defined
+      // messages retain precedence and other requests keep their own defaults.
+      error:
+        getLanguageFromLocale(locale) === Languages.SK
+          ? (issue): ReturnType<typeof slovakZodError> =>
+              issue.code === "invalid_format" && issue.format === "email"
+                ? t("validation.invalidEmail")
+                : slovakZodError(issue)
+          : undefined,
+    });
 
     if (!result.success) {
       const issues = result.error.issues ?? [];

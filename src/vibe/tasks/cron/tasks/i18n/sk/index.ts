@@ -1,0 +1,500 @@
+import type { translations as enTranslations } from "../en";
+
+export const translations: typeof enTranslations = {
+  priority: {
+    critical: "Kritická",
+    high: "Vysoká",
+    medium: "Stredná",
+    low: "Nízka",
+    background: "Na pozadí",
+  },
+  taskCategory: {
+    development: "Vývoj",
+    build: "Zostavenie",
+    watch: "Sledovanie zmien",
+    generator: "Generátor",
+    test: "Test",
+    maintenance: "Údržba",
+    database: "Databáza",
+    system: "Systém",
+    monitoring: "Monitorovanie",
+    leadManagement: "Správa potenciálnych zákazníkov",
+  },
+  status: {
+    pending: "Čaká",
+    running: "Prebieha",
+    completed: "Dokončené",
+    failed: "Zlyhalo",
+    timeout: "Časový limit",
+    cancelled: "Zrušené",
+    skipped: "Preskočené",
+    blocked: "Blokované",
+    scheduled: "Plánované",
+    stopped: "Zastavené",
+    error: "Chyba",
+  },
+  hiddenFilter: {
+    visible: "Viditeľné",
+    hidden: "Skryté",
+    all: "Všetky",
+  },
+  enabledFilter: {
+    all: "Všetky",
+    enabled: "Zapnuté",
+    disabled: "Vypnuté",
+  },
+  outputMode: {
+    storeOnly: "Iba uložiť",
+    notifyOnFailure: "Upozorniť na zlyhanie",
+    notifyAlways: "Upozorniť vždy",
+  },
+  category: "Koncový bod API",
+  tags: {
+    tasks: "Úlohy",
+    cron: "Cron",
+    scheduling: "Plánovanie",
+  },
+  errors: {
+    fetchCronTasks: "Naplánované úlohy sa nepodarilo načítať.",
+    createCronTask: "Naplánovanú úlohu sa nepodarilo vytvoriť.",
+    invalidTaskInput:
+      "Vstup úlohy nezodpovedá schéme požiadavky koncového bodu.",
+    endpointNotFound: "Pre dané ID trasy sa nenašiel koncový bod.",
+    targetInstanceForbidden:
+      "Cieľovú inštanciu úlohy môže nastaviť iba správca.",
+  },
+  list: {
+    columns: {
+      createdAt: "Čas vytvorenia",
+      updatedAt: "Čas poslednej aktualizácie",
+    },
+  },
+  get: {
+    title: "Zobraziť naplánované úlohy",
+    titleShort: "Naplánované úlohy",
+    description: "Načítať zoznam naplánovaných úloh s voliteľným filtrovaním",
+    container: {
+      title: "Zoznam naplánovaných úloh",
+      description: "Zobraziť a filtrovať naplánované úlohy",
+    },
+    fields: {
+      status: {
+        label: "Stav",
+        description: "Filtrovať podľa stavu úlohy",
+        placeholder: "Vyberte stav…",
+      },
+      priority: {
+        label: "Priorita",
+        description: "Filter podľa priority úlohy",
+        placeholder: "Vyberte prioritu…",
+      },
+      category: {
+        label: "Kategória",
+        description: "Filter podľa kategórie úloh",
+        placeholder: "Vyberte kategóriu…",
+      },
+      enabled: {
+        label: "Stav",
+        description: "Filtrovať podľa toho, či je úloha zapnutá",
+        placeholder: "Všetky úlohy",
+      },
+      hidden: {
+        label: "Viditeľnosť",
+        description:
+          "Filtrovať podľa viditeľnosti. Predvolene sa zobrazia iba viditeľné úlohy.",
+        placeholder: "Viditeľné úlohy",
+      },
+      search: {
+        label: "Hľadať",
+        description:
+          "Filtrovať úlohy podľa názvu, trasy, popisu alebo kategórie",
+        placeholder: "Hľadať úlohy…",
+      },
+      sort: {
+        label: "Zoradenie",
+        description: "Poradie úloh v zozname",
+      },
+      limit: {
+        label: "Limit",
+        description: "Najvyšší počet úloh vo výsledku",
+      },
+      offset: {
+        label: "Posun",
+        description: "Počet úloh, ktoré sa majú preskočiť",
+      },
+    },
+    response: {
+      tasks: {
+        title: "Úlohy",
+      },
+      task: {
+        title: "Úloha",
+        description: "Údaje o jednotlivých úlohách",
+        id: "ID úlohy",
+        shortId: "Krátke ID",
+        routeId: "ID trasy",
+        name: "Názov úlohy",
+        displayName: "Názov",
+        taskDescription: "Opis",
+        schedule: "Plán",
+        enabled: "Zapnuté",
+        hidden: "Skryté",
+        priority: "Priorita",
+        status: "Stav",
+        category: "Kategória",
+        lastRun: "Posledné spustenie",
+        nextRun: "Ďalšie spustenie",
+        version: "Verzia",
+        timezone: "Časové pásmo",
+        timeout: "Časový limit (ms)",
+        retries: "Počet opakovaní",
+        retryDelay: "Odstup medzi pokusmi (ms)",
+        taskInput: "Vstup úlohy",
+        runOnce: "Spustiť raz",
+        outputMode: "Režim výstupu",
+        owner: "Vlastník",
+        notificationTargets: "Príjemcovia oznámení",
+        lastExecutedAt: "Čas posledného spustenia",
+        lastExecutionStatus: "Stav posledného spustenia",
+        lastExecutionError: "Chyba pri poslednom spustení",
+        lastExecutionDuration: "Trvanie posledného spustenia (ms)",
+        nextExecutionAt: "Čas ďalšieho spustenia",
+        executionCount: "Počet spustení",
+        consecutiveFailures: "Po sebe nasledujúce zlyhania",
+        successCount: "Počet úspešných spustení",
+        errorCount: "Počet chýb",
+        averageExecutionTime: "Priemerné trvanie (ms)",
+        targetInstance: "Cieľová inštancia",
+        tags: "Značky",
+        createdAt: "Čas vytvorenia",
+        updatedAt: "Čas poslednej aktualizácie",
+      },
+      totalTasks: "Úlohy spolu",
+    },
+    errors: {
+      internal: {
+        title: "Pri načítaní úloh nastala interná chyba servera.",
+        description: "Pri sťahovaní zoznamu úloh nastala neočakávaná chyba",
+      },
+      unauthorized: {
+        title: "Neautorizovaný prístup do zoznamu úloh",
+        description: "Nemáte povolenie na zobrazenie zoznamu úloh",
+      },
+      validation: {
+        title: "Neplatné parametre požiadavky",
+        description: "Zadané parametre požiadavky sú neplatné.",
+      },
+      forbidden: {
+        title: "Prístup zakázaný",
+        description: "Prístup k tomuto zdroju je zakázaný",
+      },
+      notFound: {
+        title: "Úlohy sa nenašli",
+        description: "Nezistili sa žiadne úlohy, ktoré by spĺňali kritériá",
+      },
+      network: {
+        title: "Chyba siete",
+        description: "Nastala chyba siete pri získavaní úloh",
+      },
+      unknown: {
+        title: "Neznáma chyba",
+        description: "Nastala neznáma chyba",
+      },
+      unsaved: {
+        title: "Neuložené zmeny",
+        description: "Najprv vyriešte neuložené zmeny.",
+      },
+      conflict: {
+        title: "Chyba konfliktu",
+        description: "Pri spracovaní žiadosti nastal konflikt",
+      },
+    },
+    success: {
+      retrieved: {
+        title: "Úlohy sa načítali",
+        description: "Zoznam úloh sa načítal.",
+      },
+    },
+  },
+  post: {
+    title: "Vytvoriť naplánovanú úlohu",
+    titleShort: "Vytvoriť úlohu",
+    description: "Vytvoriť novú naplánovanú úlohu",
+    container: {
+      title: "Vytvoriť úlohu",
+      description: "Nastaviť novú naplánovanú úlohu",
+    },
+    fields: {
+      id: {
+        label: "ID úlohy",
+        description:
+          'Jedinečný, stabilný identifikátor pre túto úlohu (napr. "db-health")',
+        placeholder: "Zadajte ID úlohy…",
+      },
+      routeId: {
+        label: "ID trasy",
+        description:
+          "Identifikátor obslužnej funkcie: názov úlohy, alias koncového bodu alebo cron-steps.",
+        placeholder: "Zadajte ID trasy…",
+      },
+      displayName: {
+        label: "Zobrazovaný názov",
+        description: "Názov úlohy, ktorý sa zobrazí používateľom",
+        placeholder: "Zadajte zobrazovaný názov…",
+      },
+      outputMode: {
+        label: "Režim výstupu",
+        description: "Kedy odoslať oznámenia po dokončení úlohy",
+        placeholder: "Vyberte režim výstupu…",
+      },
+      description: {
+        label: "Opis",
+        description: "Opis úlohy",
+        placeholder: "Zadajte opis…",
+      },
+      schedule: {
+        label: "Plán",
+        description: "Výraz cron určujúci čas spustenia",
+        placeholder: "*/5 * * * *",
+      },
+      priority: {
+        label: "Priorita",
+        description: "Úroveň priority úlohy",
+      },
+      category: {
+        label: "Kategória",
+        description: "Kategória úlohy",
+      },
+      enabled: {
+        label: "Zapnuté",
+        description: "Zapne alebo vypne úlohu.",
+      },
+      hidden: {
+        label: "Skryté",
+        description:
+          "Skryť úlohu v systémových pokynoch pre AI aj v predvolených zoznamoch úloh",
+      },
+      timeout: {
+        label: "Časový limit (ms)",
+        description: "Maximálny čas vykonávania v milisekundách",
+      },
+      retries: {
+        label: "Počet opakovaní",
+        description: "Počet opakovaných pokusov",
+      },
+      retryDelay: {
+        label: "Odstup medzi pokusmi (ms)",
+        description: "Odstup medzi pokusmi v milisekundách",
+      },
+      taskInput: {
+        label: "Vstup úlohy",
+        description: "Vstupné údaje JSON pre úlohu",
+        placeholder: '{ "dryRun": false }',
+        invalidJson:
+          "Neplatný JSON. Skontrolujte úvodzovky, čiarky a zátvorky.",
+        notObject:
+          'Vstupom úlohy musí byť objekt JSON, napríklad { "key": "value" }.',
+      },
+      runOnce: {
+        label: "Spustiť raz",
+        description: "Úloha sa spustí iba raz a potom sa vypne.",
+      },
+      targetInstance: {
+        label: "Cieľová inštancia",
+        description:
+          "ID inštancie, na ktorej má úloha bežať, napríklad hermes alebo thea-prod. Ak pole necháte prázdne, spustí sa len na hostiteľskej inštancii.",
+        placeholder:
+          "Pre spustenie iba na hostiteľskej inštancii nechajte pole prázdne.",
+      },
+    },
+    response: {
+      task: {
+        title: "Vytvorená úloha",
+        id: "ID úlohy",
+        shortId: "Krátke ID",
+        routeId: "ID trasy",
+        displayName: "Názov",
+        taskDescription: "Opis",
+        version: "Verzia",
+        category: "Kategória",
+        schedule: "Plán",
+        timezone: "Časové pásmo",
+        enabled: "Zapnuté",
+        hidden: "Skryté",
+        priority: "Priorita",
+        timeout: "Časový limit (ms)",
+        retries: "Počet opakovaní",
+        retryDelay: "Odstup medzi pokusmi (ms)",
+        taskInput: "Vstup úlohy",
+        runOnce: "Spustiť raz",
+        outputMode: "Režim výstupu",
+        notificationTargets: "Príjemcovia oznámení",
+        lastExecutedAt: "Čas posledného spustenia",
+        lastExecutionStatus: "Stav posledného spustenia",
+        lastExecutionError: "Chyba pri poslednom spustení",
+        lastExecutionDuration: "Trvanie posledného spustenia (ms)",
+        nextExecutionAt: "Čas ďalšieho spustenia",
+        executionCount: "Počet spustení",
+        successCount: "Počet úspešných spustení",
+        errorCount: "Počet chýb",
+        averageExecutionTime: "Priemerné trvanie (ms)",
+        consecutiveFailures: "Po sebe nasledujúce zlyhania",
+        targetInstance: "Cieľová inštancia",
+        tags: "Značky",
+        owner: "Vlastník",
+        createdAt: "Čas vytvorenia",
+        updatedAt: "Čas poslednej aktualizácie",
+      },
+    },
+    errors: {
+      validation: {
+        title: "Overenie vstupu zlyhalo",
+        description: "Údaje o úlohe sú neplatné.",
+      },
+      unauthorized: {
+        title: "Vyžaduje sa prihlásenie",
+        description: "Nemáte povolenie na vytváranie úloh",
+      },
+      internal: {
+        title: "Interná chyba",
+        description: "Nastala chyba pri vytváraní úlohy",
+      },
+      forbidden: {
+        title: "Prístup zakázaný",
+        description: "Prístup k tomuto zdroju je zakázaný",
+      },
+      conflict: {
+        title: "Konflikt",
+        description: "Úloha s týmto názvom už existuje",
+      },
+      network: {
+        title: "Chyba siete",
+        description: "Nastala chyba siete",
+      },
+      unknown: {
+        title: "Neznáma chyba",
+        description: "Nastala neznáma chyba",
+      },
+      notFound: {
+        title: "Nenašlo sa",
+        description: "Požadovaný zdroj sa nenašiel.",
+      },
+      unsaved: {
+        title: "Neuložené zmeny",
+        description: "Sú tu neuložené zmeny.",
+      },
+    },
+    success: {
+      created: {
+        title: "Úloha vytvorená",
+        description: "Úloha bola úspešne vytvorená",
+      },
+    },
+  },
+  widget: {
+    pagination: {
+      info: "Strana {{page}} z {{totalPages}}",
+      prev: "Predchádzajúce",
+      next: "Ďalej",
+    },
+    title: "Naplánované úlohy",
+    loading: "Načítavajú sa úlohy…",
+    header: {
+      stats: "Štatistiky",
+      graphs: "Grafy",
+      history: "História",
+      queue: "Rad",
+      refresh: "Obnoviť",
+      create: "Nová úloha",
+    },
+    filter: {
+      all: "Všetky",
+      running: "Prebieha",
+      completed: "Dokončené",
+      failed: "Zlyhalo",
+      pending: "Čaká",
+      disabled: "Vypnuté",
+      allPriorities: "Všetky priority",
+      allCategories: "Všetky kategórie",
+      visible: "Viditeľné",
+      hiddenOnly: "Skryté",
+      allTasks: "Všetky úlohy",
+    },
+    search: {
+      placeholder: "Hľadať úlohy…",
+    },
+    sort: {
+      nameAsc: "Podľa názvu od A po Z",
+      nameDesc: "Podľa názvu od Z po A",
+      schedule: "Plán",
+      lastRunNewest: "Posledné spustenie (od najnovších)",
+      executionsMost: "Najviac spustení",
+    },
+    task: {
+      runCount: "Počet spustení: {{count}}",
+      successCount: "Úspešné spustenia: {{count}}",
+      failureCount: "Počet zlyhaní: {{count}}",
+      executions: "Spustenia:",
+      lastRun: "Posledné spustenie:",
+      never: "Nikdy",
+      nextRun: "Ďalšie spustenie:",
+      notScheduled: "Neplánované",
+      routeId: "ID trasy",
+      hiddenBadge: "Skryté",
+      owner: {
+        system: "Systém",
+        user: "Používateľ",
+      },
+      outputMode: {
+        storeOnly: "Iba uložiť",
+        notifyOnFailure: "Upozorniť na zlyhanie",
+        notifyAlways: "Upozorniť vždy",
+      },
+    },
+    action: {
+      select: "Vybrať {{task}}",
+      view: "Zobraziť podrobnosti",
+      history: "Zobraziť históriu",
+      edit: "Upraviť úlohu",
+      delete: "Odstrániť úlohu",
+      runNow: "Spustiť teraz",
+    },
+    bulk: {
+      selected: "Vybraté: {count}",
+      selectAll: "Vybrať položky na tejto stránke",
+      clearSelection: "Zrušiť výber",
+      enable: "Zapnúť",
+      disable: "Vypnúť",
+      runNow: "Spustiť teraz",
+      delete: "Odstrániť",
+      confirmDeleteTitle: "Odstrániť úlohy?",
+      confirmDelete:
+        "Natrvalo odstrániť vybraté úlohy ({count})? Odstránenie sa nedá vrátiť.",
+      cancel: "Zrušiť",
+      success: "Úspešné: {{succeeded}}. Neúspešné: {{failed}}.",
+    },
+    empty: {
+      noTasks: "Žiadne naplánované úlohy",
+      noTasksDesc: "Začnite vytvorením prvej naplánovanej úlohy.",
+      noMatches: "Vašim filtrom nezodpovedá žiadna úloha.",
+      noMatchesDesc: "Skúste upraviť kritériá vyhľadávania alebo filtrovania",
+      clearFilters: "Zrušiť filtre",
+    },
+    create: {
+      created: "Úloha vytvorená",
+      route: "Trasa",
+      schedule: "Plán",
+      nextRun: "Ďalšie spustenie",
+      notScheduled: "Neplánované",
+      owner: "Vlastník",
+      ownerSystem: "Systém",
+      ownerYou: "Vy",
+      ownerUser: "Používateľ {{id}}",
+      enabled: "Zapnuté",
+      disabled: "Vypnuté",
+      taskInput: "Vstup úlohy",
+      noInput: "Bez vstupných údajov sa trasa spustí s predvolenými hodnotami.",
+      openTask: "Otvoriť úlohu",
+    },
+  },
+};

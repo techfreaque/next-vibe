@@ -333,6 +333,7 @@ const generatedQuestionSchema = z.object({
   de: z.string(),
   pl: z.string(),
   fr: z.string(),
+  sk: z.string(),
 });
 
 export interface GeneratedQuestion {
@@ -341,6 +342,7 @@ export interface GeneratedQuestion {
   de: string;
   pl: string;
   fr: string;
+  sk: string;
 }
 
 /** Em dashes are banned in user-facing copy: rewrite as a comma pause. */
@@ -389,6 +391,7 @@ export function parseGeneratorReply(
       de: cleanText(parsed.data.de),
       pl: cleanText(parsed.data.pl),
       fr: cleanText(parsed.data.fr),
+      sk: cleanText(parsed.data.sk),
     };
     if (
       !known.has(category) ||
@@ -396,7 +399,8 @@ export function parseGeneratorReply(
       question.en.length > 400 ||
       question.de === "" ||
       question.pl === "" ||
-      question.fr === ""
+      question.fr === "" ||
+      question.sk === ""
     ) {
       continue;
     }

@@ -4,7 +4,7 @@
  */
 
 import { format } from "date-fns";
-import { de, enUS, es, fr, it, type Locale, pl } from "date-fns/locale";
+import { de, enUS, es, fr, it, type Locale, pl, sk } from "date-fns/locale";
 import type z from "zod";
 
 import { dateSchema } from "../../definition/common.schema";
@@ -22,7 +22,7 @@ function getLocaleString(countryLanguage: CountryLanguage): string {
     : countryLanguage;
 }
 
-const dateLocales = { de, en: enUS, es, fr, it, pl };
+const dateLocales = { de, en: enUS, es, fr, it, pl, sk };
 
 function getDateFnsLocale(countryLanguage: CountryLanguage): Locale {
   return dateLocales[getLanguageFromLocale(countryLanguage)];

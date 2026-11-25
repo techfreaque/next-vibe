@@ -5078,7 +5078,7 @@ export class CreditRepository {
                 jsx: adminJsx,
                 subject: emailT("email.creditPack.admin.subject", {
                   appName,
-                  credits: totalCredits.toLocaleString(),
+                  credits: totalCredits.toLocaleString(userLocale),
                 }),
                 toEmail: adminEmail,
                 toName: appName,

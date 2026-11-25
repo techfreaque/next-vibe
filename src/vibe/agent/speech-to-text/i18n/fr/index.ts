@@ -242,6 +242,7 @@ export const translations: typeof enTranslations = {
     de: "Allemand",
     pl: "Polonais",
     es: "Espagnol",
+    sk: "Slovaque",
     fr: "Français",
     it: "Italien",
   },

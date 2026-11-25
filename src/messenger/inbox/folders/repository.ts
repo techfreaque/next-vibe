@@ -36,6 +36,7 @@ export class InboxFoldersRepository {
 
       const providerResult = await getProviderByMessengerAccountId(
         data.accountId,
+        locale,
       );
       if (!providerResult.success) {
         return fail({

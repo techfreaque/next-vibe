@@ -91,6 +91,7 @@ export const translations: typeof enTranslations = {
     authenticationFailed: "Uwierzytelnianie użytkownika nie powiodło się",
   },
   validation: {
+    invalidEmail: "Wpisz poprawny adres e-mail.",
     missingFields: "Brakuje wymaganych pól ({{count}}):",
     failedOne: "Walidacja nie powiodła się (1 błąd):",
     failedMany: "Walidacja nie powiodła się (błędów: {{count}}):",

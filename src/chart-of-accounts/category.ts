@@ -19,6 +19,7 @@ export const category: CategoryDefinition = {
     "fr-FR": "Comptabilité",
     "it-IT": "Contabilità",
     "es-ES": "Contabilidad",
+    "sk-SK": "Účtovníctvo",
   },
   group: "business",
   icon: "receipt",
@@ -40,6 +41,7 @@ export const category: CategoryDefinition = {
         "fr-FR": "Comptes",
         "it-IT": "Account",
         "es-ES": "Cuentas",
+        "sk-SK": "Účty",
       },
     },
     Journal: {
@@ -53,6 +55,7 @@ export const category: CategoryDefinition = {
         "fr-FR": "Journal",
         "it-IT": "Libro giornale",
         "es-ES": "Libro diario",
+        "sk-SK": "Účtovný denník",
       },
     },
     Ledger: {
@@ -66,6 +69,7 @@ export const category: CategoryDefinition = {
         "fr-FR": "Grand livre",
         "it-IT": "Libro mastro",
         "es-ES": "Libro mayor",
+        "sk-SK": "Hlavná kniha",
       },
     },
     Periods: {
@@ -79,6 +83,7 @@ export const category: CategoryDefinition = {
         "fr-FR": "Périodes",
         "it-IT": "Periodi",
         "es-ES": "Períodos",
+        "sk-SK": "Účtovné obdobia",
       },
     },
     Accounting: {
@@ -92,6 +97,7 @@ export const category: CategoryDefinition = {
         "fr-FR": "Configuration",
         "it-IT": "Configurazione iniziale",
         "es-ES": "Configuración inicial",
+        "sk-SK": "Nastavenie",
       },
     },
   },

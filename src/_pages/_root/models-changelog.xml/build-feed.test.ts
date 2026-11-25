@@ -1,5 +1,4 @@
 import { describe, expect, test } from "bun:test";
-
 import type { AgentEnvAvailability } from "next-vibe/agent/env-availability";
 import type { ModelChangelogEvent } from "next-vibe/agent/models/model-changelog/types";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
@@ -90,6 +89,7 @@ describe("model changelog view", () => {
       "fr-FR",
       "it-IT",
       "es-ES",
+      "sk-SK",
     ];
     for (const locale of locales) {
       const view = buildChangelogPageView(locale, ALL, EVENTS);

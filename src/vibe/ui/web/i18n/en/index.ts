@@ -31,6 +31,19 @@ export const translations = {
     allCountries: "All Countries",
   },
   ui: {
+    errorBoundary: {
+      title: "Error",
+      tryAgain: "Try Again",
+      componentStack: "Component Stack",
+      stackTrace: "Stack Trace",
+      componentStackFull: "Component Stack (full)",
+      details: "Error Details",
+      name: "Name:",
+      message: "Message:",
+      cause: "Cause:",
+      noStackTrace: "No stack trace available",
+      noComponentStack: "No component stack available",
+    },
     markdown: {
       thinking: "Thinking",
       reasoningProcess: "Reasoning Process",

@@ -20,6 +20,7 @@ export const category: CategoryDefinition = {
     "fr-FR": "Analytique",
     "it-IT": "Analisi",
     "es-ES": "Analítica",
+    "sk-SK": "Analytika",
   },
   group: "analytics",
   icon: "bar-chart-2",
@@ -42,6 +43,7 @@ export const category: CategoryDefinition = {
         "fr-FR": "Activité",
         "it-IT": "Attività",
         "es-ES": "Negocio",
+        "sk-SK": "Podnikanie",
       },
     },
     "Vibe Sense": {
@@ -55,6 +57,7 @@ export const category: CategoryDefinition = {
         "fr-FR": "Vibe Sense",
         "it-IT": "Vibe Sense",
         "es-ES": "Vibe Sense",
+        "sk-SK": "Vibe Sense",
       },
     },
     Indicators: {
@@ -68,6 +71,7 @@ export const category: CategoryDefinition = {
         "fr-FR": "Indicateurs",
         "it-IT": "Indicatori",
         "es-ES": "Indicadores",
+        "sk-SK": "Ukazovatele",
       },
     },
     Evaluators: {
@@ -81,6 +85,7 @@ export const category: CategoryDefinition = {
         "fr-FR": "Évaluateurs",
         "it-IT": "Valutatori",
         "es-ES": "Evaluadores",
+        "sk-SK": "Vyhodnocovanie",
       },
     },
     Transformers: {
@@ -94,6 +99,7 @@ export const category: CategoryDefinition = {
         "fr-FR": "Transformateurs",
         "it-IT": "Trasformatori",
         "es-ES": "Transformadores",
+        "sk-SK": "Transformácie",
       },
     },
     leadsData: {
@@ -107,6 +113,7 @@ export const category: CategoryDefinition = {
         "fr-FR": "Données des leads",
         "it-IT": "Dati sui contatti commerciali",
         "es-ES": "Datos de prospectos",
+        "sk-SK": "Údaje o potenciálnych zákazníkoch",
       },
     },
     usersData: {
@@ -120,6 +127,7 @@ export const category: CategoryDefinition = {
         "fr-FR": "Données des utilisateurs",
         "it-IT": "Dati degli utenti",
         "es-ES": "Datos de usuarios",
+        "sk-SK": "Údaje o používateľoch",
       },
     },
     messengerData: {
@@ -133,6 +141,7 @@ export const category: CategoryDefinition = {
         "fr-FR": "Données de la messagerie",
         "it-IT": "Dati di messaggistica",
         "es-ES": "Datos de mensajería",
+        "sk-SK": "Údaje o správach",
       },
     },
     paymentsData: {
@@ -146,6 +155,7 @@ export const category: CategoryDefinition = {
         "fr-FR": "Données des paiements",
         "it-IT": "Dati sui pagamenti",
         "es-ES": "Datos de pagos",
+        "sk-SK": "Údaje o platbách",
       },
     },
     creditsData: {
@@ -159,6 +169,7 @@ export const category: CategoryDefinition = {
         "fr-FR": "Données des crédits",
         "it-IT": "Dati sui crediti",
         "es-ES": "Datos de créditos",
+        "sk-SK": "Údaje o kreditoch",
       },
     },
     subscriptionsData: {
@@ -172,6 +183,7 @@ export const category: CategoryDefinition = {
         "fr-FR": "Données des abonnements",
         "it-IT": "Dati sugli abbonamenti",
         "es-ES": "Datos de suscripciones",
+        "sk-SK": "Údaje o predplatnom",
       },
     },
     referralData: {
@@ -185,6 +197,7 @@ export const category: CategoryDefinition = {
         "fr-FR": "Données du parrainage",
         "it-IT": "Dati sugli inviti",
         "es-ES": "Datos de referidos",
+        "sk-SK": "Údaje o odporúčaniach",
       },
     },
     newsletterData: {
@@ -198,6 +211,7 @@ export const category: CategoryDefinition = {
         "fr-FR": "Données de la newsletter",
         "it-IT": "Dati della newsletter",
         "es-ES": "Datos del boletín",
+        "sk-SK": "Údaje o newsletteri",
       },
     },
     chatData: {
@@ -211,6 +225,7 @@ export const category: CategoryDefinition = {
         "fr-FR": "Données du chat",
         "it-IT": "Dati delle chat",
         "es-ES": "Datos del chat",
+        "sk-SK": "Údaje o chatoch",
       },
     },
     systemData: {
@@ -224,6 +239,7 @@ export const category: CategoryDefinition = {
         "fr-FR": "Données système",
         "it-IT": "Dati di sistema",
         "es-ES": "Datos del sistema",
+        "sk-SK": "Systémové údaje",
       },
     },
     financeData: {
@@ -237,6 +253,7 @@ export const category: CategoryDefinition = {
         "fr-FR": "Données financières",
         "it-IT": "Dati finanziari",
         "es-ES": "Datos financieros",
+        "sk-SK": "Finančné údaje",
       },
     },
   },

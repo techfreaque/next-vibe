@@ -82,7 +82,7 @@ function CreditPackUserEmail({
       locale={locale}
       title={t("email.creditPack.user.title")}
       previewText={t("email.creditPack.user.previewText", {
-        credits: props.credits.toLocaleString(),
+        credits: props.credits.toLocaleString(locale),
       })}
       recipientEmail={recipientEmail}
       tracking={userTracking}
@@ -111,7 +111,7 @@ function CreditPackUserEmail({
         }}
       >
         {t("email.creditPack.user.body", {
-          credits: props.credits.toLocaleString(),
+          credits: props.credits.toLocaleString(locale),
         })}
       </Span>
 
@@ -133,7 +133,7 @@ function CreditPackUserEmail({
             display: "block",
           }}
         >
-          +{props.credits.toLocaleString()}
+          +{props.credits.toLocaleString(locale)}
         </Span>
         <Span
           style={{
@@ -390,7 +390,7 @@ function CreditPackAdminEmail({
                 {t("email.creditPack.admin.labelCredits")}:
               </td>
               <td style={{ paddingBottom: "8px" }}>
-                {props.credits.toLocaleString()}
+                {props.credits.toLocaleString(locale)}
               </td>
             </tr>
           </tbody>
@@ -467,7 +467,7 @@ export const creditPackAdminEmailTemplate: EmailTemplateDefinition<
         toName: adminEmail,
         subject: t("email.creditPack.admin.subject", {
           appName: globalT("appName"),
-          credits: requestData.amount,
+          credits: requestData.amount.toLocaleString(locale),
         }),
         leadId: user.leadId,
         jsx: creditPackAdminEmailTemplate.component({

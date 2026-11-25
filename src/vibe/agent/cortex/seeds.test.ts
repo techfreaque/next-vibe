@@ -3,7 +3,7 @@
  *
  * Tests the locale-aware template registry without a live DB.
  * Verifies:
- * - All 3 locales produce 16 memory templates + 5 document templates
+ * - All site languages produce 16 memory templates + 5 document templates
  * - Each locale uses its own translated paths and content
  * - No duplicate IDs or paths within a locale
  * - All templates have non-empty content
@@ -21,7 +21,15 @@ import {
   getMemoryTemplates,
 } from "./seeds/templates";
 
-const LOCALES = ["en-US", "de-DE", "pl-PL", "fr-FR"] as const;
+const LOCALES = [
+  "en-US",
+  "de-DE",
+  "pl-PL",
+  "fr-FR",
+  "it-IT",
+  "es-ES",
+  "sk-SK",
+] as const;
 
 for (const locale of LOCALES) {
   describe(`Template registry [${locale}]`, () => {
@@ -108,6 +116,21 @@ describe("Locale roots", () => {
     expect(roots.memories).toBe("/wspomnienia");
     expect(roots.documents).toBe("/dokumenty");
   });
+});
+
+describe("Slovak Cortex directories", () => {
+  for (const locale of ["sk-SK", "sk-GLOBAL"] as const) {
+    it(`[${locale}] translates display roots and preserves the inbox icon`, () => {
+      expect(getLocaleRoots(locale)).toEqual({
+        memories: "/pamäte",
+        documents: "/dokumenty",
+      });
+      const inbox = getDefaultDocumentDirs(locale).find(
+        (dir) => dir.path === "/documents/inbox",
+      );
+      expect(inbox?.icon).toBe("inbox");
+    });
+  }
 });
 
 describe("Locale content isolation (paths canonical, content translated)", () => {

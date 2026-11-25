@@ -33,6 +33,19 @@ export const translations: typeof enTranslations = {
     allCountries: "Todos los países",
   },
   ui: {
+    errorBoundary: {
+      title: "Error",
+      tryAgain: "Volver a intentar",
+      componentStack: "Pila de componentes",
+      stackTrace: "Traza de la pila",
+      componentStackFull: "Pila completa de componentes",
+      details: "Detalles del error",
+      name: "Nombre:",
+      message: "Mensaje:",
+      cause: "Causa:",
+      noStackTrace: "Traza de la pila no disponible",
+      noComponentStack: "Pila de componentes no disponible",
+    },
     markdown: {
       thinking: "Razonando",
       reasoningProcess: "Razonamiento",

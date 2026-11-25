@@ -23,6 +23,7 @@ export const category: CategoryDefinition = {
     "fr-FR": "Paiements",
     "it-IT": "Pagamenti",
     "es-ES": "Pagos",
+    "sk-SK": "Platby",
   },
   group: "business",
   icon: "credit-card",
@@ -48,6 +49,7 @@ export const category: CategoryDefinition = {
         "fr-FR": "Transactions",
         "it-IT": "Transazioni",
         "es-ES": "Transacciones",
+        "sk-SK": "Transakcie",
       },
     },
     Providers: {
@@ -61,6 +63,7 @@ export const category: CategoryDefinition = {
         "fr-FR": "Fournisseurs",
         "it-IT": "Fornitori",
         "es-ES": "Proveedores",
+        "sk-SK": "Poskytovatelia platieb",
       },
     },
   },

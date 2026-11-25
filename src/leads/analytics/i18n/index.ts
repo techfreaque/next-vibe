@@ -14,6 +14,7 @@ export const scopedTranslation = createScopedTranslation({
   fr: () => require("./fr").translations,
   it: () => require("./it").translations,
   es: () => require("./es").translations,
+  sk: () => require("./sk").translations,
 });
 
 export type LeadAnalyticsTranslationKey =

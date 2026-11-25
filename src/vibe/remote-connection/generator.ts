@@ -55,6 +55,7 @@ class RemoteCapabilitiesGenerator {
     "fr-FR",
     "it-IT",
     "es-ES",
+    "sk-SK",
   ];
 
   /** Locale → short basename */
@@ -67,6 +68,7 @@ class RemoteCapabilitiesGenerator {
     "fr-FR": "fr",
     "it-IT": "it",
     "es-ES": "es",
+    "sk-SK": "sk",
   };
 
   /** User roles we generate snapshots for */

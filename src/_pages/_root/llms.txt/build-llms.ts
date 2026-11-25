@@ -190,6 +190,7 @@ export async function buildLlmsTxt(
       fr: page("/story", resolveLlmsLocale("fr")),
       it: page("/story", resolveLlmsLocale("it")),
       es: page("/story", resolveLlmsLocale("es")),
+      sk: page("/story", resolveLlmsLocale("sk")),
     }),
   ];
 

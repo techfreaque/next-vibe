@@ -19,6 +19,7 @@ export const category: CategoryDefinition = {
     "fr-FR": "Inventaire",
     "it-IT": "Inventario",
     "es-ES": "Inventario",
+    "sk-SK": "Zásoby",
   },
   group: "business",
   icon: "box",
@@ -40,6 +41,7 @@ export const category: CategoryDefinition = {
         "fr-FR": "Stock",
         "it-IT": "Scorte",
         "es-ES": "Existencias",
+        "sk-SK": "Stav zásob",
       },
     },
     "Inventory: Transfers": {
@@ -53,6 +55,7 @@ export const category: CategoryDefinition = {
         "fr-FR": "Transferts",
         "it-IT": "Trasferimenti",
         "es-ES": "Transferencias",
+        "sk-SK": "Presuny zásob",
       },
     },
     "Inventory: Warehouses": {
@@ -66,6 +69,7 @@ export const category: CategoryDefinition = {
         "fr-FR": "Entrepôts",
         "it-IT": "Magazzini",
         "es-ES": "Almacenes",
+        "sk-SK": "Sklady",
       },
     },
   },

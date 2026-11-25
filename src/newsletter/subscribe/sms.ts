@@ -89,6 +89,7 @@ export class NewsletterSubscribeSmsServiceImpl implements NewsletterSubscribeSms
         user,
         logger,
         sendT,
+        locale,
       );
 
       if (!smsResult.success) {
@@ -163,6 +164,7 @@ export class NewsletterSubscribeSmsServiceImpl implements NewsletterSubscribeSms
         user,
         logger,
         sendT,
+        locale,
       );
 
       if (!smsResult.success) {

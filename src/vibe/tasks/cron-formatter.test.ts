@@ -12,13 +12,26 @@ import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import { describe, expect, it } from "vitest";
 
-import { isCronTaskDue } from "./cron-formatter";
+import { formatCronSchedule, isCronTaskDue } from "./cron-formatter";
 
 const logger = createEndpointLogger(false, defaultLocale);
 
 const HOURLY = "0 * * * *";
 const EVERY_MINUTE = "* * * * *";
 const DAILY_6AM = "0 6 * * *";
+
+describe("Slovak schedule descriptions", () => {
+  for (const locale of ["sk-SK", "sk-GLOBAL"] as const) {
+    it(`uses a 24-hour clock and resolves range boundaries for ${locale}`, () => {
+      expect(formatCronSchedule("0 14-16 * * *", "UTC", locale, logger)).toBe(
+        "Od 14:00 do 16:00",
+      );
+      expect(formatCronSchedule("5-9 * * * *", "UTC", locale, logger)).toBe(
+        "Od 5. do 9. minúty",
+      );
+    });
+  }
+});
 
 describe("isCronTaskDue - catch-up semantics", () => {
   it("manual schedule is never due", () => {
@@ -186,16 +199,34 @@ describe("isCronTaskDue - catch-up semantics", () => {
     it("every-minute one-shot (import jobs) still fires within a minute", () => {
       const at = new Date("2026-11-09T14:00:30Z");
       expect(
-        isCronTaskDue(logger, EVERY_MINUTE, new Date("2026-11-09T14:00:45Z"), null, at),
+        isCronTaskDue(
+          logger,
+          EVERY_MINUTE,
+          new Date("2026-11-09T14:00:45Z"),
+          null,
+          at,
+        ),
       ).toBe(false);
       expect(
-        isCronTaskDue(logger, EVERY_MINUTE, new Date("2026-11-09T14:01:05Z"), null, at),
+        isCronTaskDue(
+          logger,
+          EVERY_MINUTE,
+          new Date("2026-11-09T14:01:05Z"),
+          null,
+          at,
+        ),
       ).toBe(true);
     });
 
     it("unanchored never-ran tasks keep startup catch-up", () => {
       expect(
-        isCronTaskDue(logger, DAILY_8AM, new Date("2026-11-09T22:06:03Z"), null, null),
+        isCronTaskDue(
+          logger,
+          DAILY_8AM,
+          new Date("2026-11-09T22:06:03Z"),
+          null,
+          null,
+        ),
       ).toBe(true);
     });
   });

@@ -24,6 +24,7 @@ export const category: CategoryDefinition = {
     "fr-FR": "Compte",
     "it-IT": "Account",
     "es-ES": "Cuenta",
+    "sk-SK": "Účet",
   },
   group: "system",
   icon: "user",
@@ -50,6 +51,7 @@ export const category: CategoryDefinition = {
         "fr-FR": "Connexion et inscription",
         "it-IT": "Accesso e registrazione",
         "es-ES": "Acceso y registro",
+        "sk-SK": "Prihlásenie a registrácia",
       },
     },
     profile: {
@@ -63,6 +65,7 @@ export const category: CategoryDefinition = {
         "fr-FR": "Profil",
         "it-IT": "Profilo",
         "es-ES": "Perfil",
+        "sk-SK": "Profil",
       },
     },
     sessions: {
@@ -76,6 +79,7 @@ export const category: CategoryDefinition = {
         "fr-FR": "Sessions",
         "it-IT": "Sessioni",
         "es-ES": "Sesiones",
+        "sk-SK": "Relácie",
       },
     },
     directory: {
@@ -89,6 +93,7 @@ export const category: CategoryDefinition = {
         "fr-FR": "Annuaire",
         "it-IT": "Elenco",
         "es-ES": "Directorio",
+        "sk-SK": "Adresár",
       },
     },
     manageUsers: {
@@ -102,6 +107,7 @@ export const category: CategoryDefinition = {
         "fr-FR": "Gérer les utilisateurs",
         "it-IT": "Gestione utenti",
         "es-ES": "Gestión de usuarios",
+        "sk-SK": "Správa používateľov",
       },
     },
     userStats: {
@@ -115,6 +121,7 @@ export const category: CategoryDefinition = {
         "fr-FR": "Inscriptions",
         "it-IT": "Iscrizioni",
         "es-ES": "Registros",
+        "sk-SK": "Registrácie",
       },
     },
     remoteInstances: {
@@ -128,6 +135,7 @@ export const category: CategoryDefinition = {
         "fr-FR": "Instances distantes",
         "it-IT": "Istanze remote",
         "es-ES": "Instancias remotas",
+        "sk-SK": "Vzdialené inštancie",
       },
     },
     remoteSelf: {
@@ -141,6 +149,7 @@ export const category: CategoryDefinition = {
         "fr-FR": "Instance locale",
         "it-IT": "Il mio account",
         "es-ES": "Mi cuenta",
+        "sk-SK": "Môj účet",
       },
     },
   },

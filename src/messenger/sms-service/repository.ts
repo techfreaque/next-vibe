@@ -7,6 +7,10 @@
 import "server-only";
 
 import { and, eq } from "drizzle-orm";
+import {
+  type CountryLanguage,
+  defaultLocale,
+} from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
@@ -59,6 +63,7 @@ export class SmsServiceRepository {
     user: JwtPayloadType,
     logger: EndpointLogger,
     t: EmailSendT,
+    locale: CountryLanguage = defaultLocale,
   ): Promise<ResponseType<SmsSendResponse>> {
     try {
       logger.debug("SMS service: Sending SMS notification", {
@@ -92,7 +97,10 @@ export class SmsServiceRepository {
       }
 
       // Route through provider registry
-      const providerResult = await getProviderByMessengerAccountId(account.id);
+      const providerResult = await getProviderByMessengerAccountId(
+        account.id,
+        locale,
+      );
       if (!providerResult.success) {
         return fail({
           message: t("errors.server.description"),
@@ -108,7 +116,7 @@ export class SmsServiceRepository {
           userId: user.id,
         },
         logger,
-        "en-US",
+        locale,
       );
 
       if (!result.success) {

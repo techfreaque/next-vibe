@@ -115,7 +115,7 @@ export class EmailPreviewRenderRepository {
       // Render to HTML
       const html = withHostedEmailLogo(await render(jsx));
 
-      const subject = getTemplateSubject(template, locale);
+      const subject = getTemplateSubject(template, locale, data.props);
 
       logger.info("Email preview rendered successfully", {
         templateId: data.templateId,

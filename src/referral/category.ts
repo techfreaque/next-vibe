@@ -20,6 +20,7 @@ export const category: CategoryDefinition = {
     "fr-FR": "Parrainage",
     "it-IT": "Inviti",
     "es-ES": "Referidos",
+    "sk-SK": "Odporúčania",
   },
   group: "business",
   icon: "share-2",
@@ -41,6 +42,7 @@ export const category: CategoryDefinition = {
         "fr-FR": "Programme",
         "it-IT": "Programma",
         "es-ES": "Programa",
+        "sk-SK": "Program",
       },
       // inherits parent defaultEntry (admins: referral-overview, customers: referral-stats)
     },
@@ -55,6 +57,7 @@ export const category: CategoryDefinition = {
         "fr-FR": "Versements",
         "it-IT": "Liquidazioni",
         "es-ES": "Desembolsos",
+        "sk-SK": "Výplaty",
       },
     },
   },

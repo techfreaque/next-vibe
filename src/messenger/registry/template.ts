@@ -15,6 +15,8 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import type { JSX, ReactElement } from "react";
 import type { z } from "zod";
 
+import { configScopedTranslation } from "@/env/i18n";
+
 import type { TrackingContext } from "../providers/email/smtp-client/components/tracking_context.email";
 
 /**
@@ -263,7 +265,15 @@ export function renderTemplateComponent(
 export function getTemplateSubject(
   template: EmailTemplateDefinitionAny,
   locale: CountryLanguage,
+  props: Record<string, string | number | boolean> = {},
 ): string {
   const { t } = template.scopedTranslation.scopedT(locale);
-  return t(template.meta.defaultSubject);
+  const { t: configT } = configScopedTranslation.scopedT(locale);
+  const subject: string = t(template.meta.defaultSubject);
+  return subject.replace(/\{\{([^{}]+)\}\}/gu, (token: string, key: string) => {
+    if (key === "appName") {
+      return configT("appName");
+    }
+    return Object.hasOwn(props, key) ? String(props[key]) : token;
+  });
 }

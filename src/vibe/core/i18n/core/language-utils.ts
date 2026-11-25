@@ -81,6 +81,7 @@ class LanguageMapper {
         fr: groupCountries("fr"),
         it: groupCountries("it"),
         es: groupCountries("es"),
+        sk: groupCountries("sk"),
       };
     }
     return this._languageGroupMap;

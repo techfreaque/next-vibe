@@ -19,6 +19,7 @@ export const category: CategoryDefinition = {
     "fr-FR": "Crédits",
     "it-IT": "Crediti",
     "es-ES": "Créditos",
+    "sk-SK": "Kredity",
   },
   group: "business",
   icon: "coins",
@@ -40,6 +41,7 @@ export const category: CategoryDefinition = {
         "fr-FR": "Crédits",
         "it-IT": "Crediti",
         "es-ES": "Créditos",
+        "sk-SK": "Kredity",
       },
       // inherits parent defaultEntry (credits-balance)
     },
@@ -54,6 +56,7 @@ export const category: CategoryDefinition = {
         "fr-FR": "Gestion",
         "it-IT": "Gestione",
         "es-ES": "Gestión",
+        "sk-SK": "Správa",
       },
     },
   },

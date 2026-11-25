@@ -7,6 +7,7 @@ export const scopedTranslation = createScopedTranslation({
   de: () => require("./de").translations,
   pl: () => require("./pl").translations,
   fr: () => require("./fr").translations,
+  sk: () => require("./sk").translations,
 });
 
 export type FolderPermissionsTranslationKey =

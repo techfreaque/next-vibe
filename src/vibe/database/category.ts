@@ -19,6 +19,7 @@ export const category: CategoryDefinition = {
     "fr-FR": "Base de données",
     "it-IT": "Database",
     "es-ES": "Base de datos",
+    "sk-SK": "Databáza",
   },
   group: "system",
   icon: "database",
@@ -40,6 +41,7 @@ export const category: CategoryDefinition = {
         "fr-FR": "Migrations",
         "it-IT": "Migrazioni",
         "es-ES": "Migraciones",
+        "sk-SK": "Migrácie",
       },
     },
     Tools: {
@@ -53,6 +55,7 @@ export const category: CategoryDefinition = {
         "fr-FR": "Outils",
         "it-IT": "Strumenti",
         "es-ES": "Herramientas",
+        "sk-SK": "Nástroje",
       },
     },
   },

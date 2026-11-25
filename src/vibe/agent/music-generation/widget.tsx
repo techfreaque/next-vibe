@@ -343,8 +343,10 @@ export function MusicGenerationContainer({
               )}
               {result.creditCost !== undefined && (
                 <Badge variant="outline" className="text-[10px]">
-                  {result.creditCost}{" "}
-                  {result.creditCost === 1 ? "credit" : "credits"}
+                  {t("post.response.creditCost")}:{" "}
+                  {result.creditCost.toLocaleString(locale, {
+                    maximumFractionDigits: 20,
+                  })}
                 </Badge>
               )}
             </Div>

@@ -15,6 +15,7 @@ const countries = [
   "FR",
   "IT",
   "ES",
+  "SK",
   "US",
   "GLOBAL",
   "AD",
@@ -172,6 +173,7 @@ const languages = {
   FR: "fr",
   IT: "it",
   ES: "es",
+  SK: "sk",
   EN: "en",
 } as const;
 const languageNames = {
@@ -181,6 +183,7 @@ const languageNames = {
   fr: "Français",
   it: "Italiano",
   es: "Español",
+  sk: "Slovenčina",
 };
 const currencySymbols = { USD: "$", EUR: "€", PLN: "zł" };
 type Language = keyof typeof languageNames;
@@ -233,8 +236,16 @@ const countryInfo = {
   FR: region("FR", "fr", "EUR", "Europe/Paris"),
   IT: region("IT", "it", "EUR", "Europe/Rome", ["fr"]),
   ES: region("ES", "es", "EUR", "Europe/Madrid"),
+  SK: region("SK", "sk", "EUR", "Europe/Bratislava"),
   US: region("US", "en", "USD", "America/New_York", ["es"]),
-  GLOBAL: region("GLOBAL", "en", "USD", "UTC", ["de", "fr", "pl", "it", "es"]),
+  GLOBAL: region("GLOBAL", "en", "USD", "UTC", [
+    "de",
+    "fr",
+    "pl",
+    "it",
+    "es",
+    "sk",
+  ]),
   AD: region("AD", "es", "EUR", "Europe/Andorra"),
   AG: region("AG", "en", "USD", "America/Antigua"),
   AI: region("AI", "en", "USD", "America/Anguilla"),
@@ -392,7 +403,7 @@ export const languageConfig = {
   currencies: { EUR: "EUR", USD: "USD", PLN: "PLN" } as const,
   currenciesArr: ["EUR", "USD", "PLN"] as const,
   languages,
-  languagesArr: ["de", "pl", "fr", "it", "es", "en"] as const,
+  languagesArr: ["de", "pl", "fr", "it", "es", "sk", "en"] as const,
   mappings: {
     currencyByCountry: Object.fromEntries(
       Object.values(countryInfo).map(({ code, currency }) => [code, currency]),

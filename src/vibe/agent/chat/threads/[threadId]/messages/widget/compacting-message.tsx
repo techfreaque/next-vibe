@@ -40,6 +40,12 @@ export function CompactingMessage({
   const [isExpanded, setIsExpanded] = useState(false);
 
   const contentTokens = Math.ceil(content.length / 4);
+  const numberFormat = new Intl.NumberFormat(locale);
+  const messageCountLabel =
+    compactedMessageCount !== undefined && compactedMessageCount > 0
+      ? `${t("tags.messages")}: ${numberFormat.format(compactedMessageCount)}`
+      : null;
+  const tokenCountLabel = `${t("widget.common.assistantMessageActions.tokens")}: ${numberFormat.format(contentTokens)}`;
 
   if (isFailed) {
     return (
@@ -49,13 +55,12 @@ export function CompactingMessage({
           <Span className="text-sm font-medium text-destructive">
             {t("compacting.failed")}
           </Span>
-          {compactedMessageCount !== undefined && compactedMessageCount > 0 && (
+          {messageCountLabel !== null && (
             <Badge
               variant="outline"
               className="text-xs bg-destructive/10 border-destructive/30 flex-shrink-0"
             >
-              {compactedMessageCount}{" "}
-              {compactedMessageCount === 1 ? "msg" : "msgs"}
+              {messageCountLabel}
             </Badge>
           )}
         </Div>
@@ -79,16 +84,14 @@ export function CompactingMessage({
             <Span className="text-sm font-medium text-purple-700 dark:text-purple-300 truncate">
               {isStreaming ? t("compacting.loading") : t("compacting.title")}
             </Span>
-            {compactedMessageCount !== undefined &&
-              compactedMessageCount > 0 && (
-                <Badge
-                  variant="outline"
-                  className="text-xs bg-purple-500/10 border-purple-500/30 flex-shrink-0"
-                >
-                  {compactedMessageCount}{" "}
-                  {compactedMessageCount === 1 ? "msg" : "msgs"}
-                </Badge>
-              )}
+            {messageCountLabel !== null && (
+              <Badge
+                variant="outline"
+                className="text-xs bg-purple-500/10 border-purple-500/30 flex-shrink-0"
+              >
+                {messageCountLabel}
+              </Badge>
+            )}
           </Div>
 
           <Div className="flex items-center gap-2 flex-shrink-0">
@@ -96,12 +99,12 @@ export function CompactingMessage({
               <Div className="flex items-center gap-1.5 text-xs text-purple-600 dark:text-purple-400">
                 <Loader2 className="h-3 w-3 animate-spin" />
                 {contentTokens > 0 && (
-                  <Span className="font-medium">{contentTokens} tokens</Span>
+                  <Span className="font-medium">{tokenCountLabel}</Span>
                 )}
               </Div>
             ) : (
               <Span className="text-xs text-muted-foreground font-medium">
-                {contentTokens} tokens
+                {tokenCountLabel}
               </Span>
             )}
 

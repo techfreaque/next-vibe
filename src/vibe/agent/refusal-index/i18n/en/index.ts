@@ -119,6 +119,10 @@ export const translations = {
         label: "Question (Spanish)",
         description: "Display translation for public samples (optional)",
       },
+      textSk: {
+        label: "Question (Slovak)",
+        description: "Display translation for public samples (optional)",
+      },
       generatedBy: { label: "Proposed by" },
       active: {
         label: "Active",

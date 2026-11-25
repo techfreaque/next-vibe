@@ -20,6 +20,7 @@ export const category: CategoryDefinition = {
     "fr-FR": "Abonnements",
     "it-IT": "Abbonamenti",
     "es-ES": "Suscripciones",
+    "sk-SK": "Predplatné",
   },
   group: "business",
   icon: "refresh-cw",
@@ -41,6 +42,7 @@ export const category: CategoryDefinition = {
         "fr-FR": "Abonnements",
         "it-IT": "Abbonamenti",
         "es-ES": "Suscripciones",
+        "sk-SK": "Predplatné",
       },
     },
     Management: {
@@ -54,6 +56,7 @@ export const category: CategoryDefinition = {
         "fr-FR": "Gestion",
         "it-IT": "Gestione",
         "es-ES": "Gestión",
+        "sk-SK": "Správa",
       },
     },
     subscriptionAnalytics: {
@@ -67,6 +70,7 @@ export const category: CategoryDefinition = {
         "fr-FR": "Analytique",
         "it-IT": "Analisi",
         "es-ES": "Analítica",
+        "sk-SK": "Analytika",
       },
     },
   },

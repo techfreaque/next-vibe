@@ -7,6 +7,10 @@
 import "server-only";
 
 import { eq } from "drizzle-orm";
+import {
+  type CountryLanguage,
+  defaultLocale,
+} from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import { ErrorResponseTypes, fail } from "next-vibe/core/route/response.schema";
 import { db } from "next-vibe/database";
@@ -29,8 +33,9 @@ import { WhatsAppMessengerProvider } from "./whatsapp/whatsapp-business";
  */
 export async function getProviderByMessengerAccountId(
   accountId: string,
+  locale: CountryLanguage = defaultLocale,
 ): Promise<ResponseType<MessengerProvider>> {
-  const { t } = providerScopedTranslation.scopedT("en-US");
+  const { t } = providerScopedTranslation.scopedT(locale);
   const [account] = await db
     .select({
       channel: messengerAccounts.channel,

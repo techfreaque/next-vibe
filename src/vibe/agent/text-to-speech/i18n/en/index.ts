@@ -106,6 +106,7 @@ export const translations = {
     de: "German",
     pl: "Polish",
     es: "Spanish",
+    sk: "Slovak",
     fr: "French",
     it: "Italian",
   },

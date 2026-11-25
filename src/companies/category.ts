@@ -19,6 +19,7 @@ export const category: CategoryDefinition = {
     "fr-FR": "Entreprises",
     "it-IT": "Aziende",
     "es-ES": "Empresas",
+    "sk-SK": "Firmy",
   },
   group: "business",
   icon: "building",
@@ -40,6 +41,7 @@ export const category: CategoryDefinition = {
         "fr-FR": "Entreprises",
         "it-IT": "Aziende",
         "es-ES": "Empresas",
+        "sk-SK": "Firmy",
       },
       // inherits parent defaultEntry (companies-list)
     },
@@ -54,6 +56,7 @@ export const category: CategoryDefinition = {
         "fr-FR": "Membres",
         "it-IT": "Membri",
         "es-ES": "Miembros",
+        "sk-SK": "Členovia",
       },
     },
   },

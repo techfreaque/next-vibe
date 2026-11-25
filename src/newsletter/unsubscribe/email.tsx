@@ -328,7 +328,7 @@ export const adminNewsletterUnsubscribeEmailTemplate: EmailTemplateDefinition<
       t,
       locale,
       recipientEmail,
-      unsubscribedAt: new Date().toLocaleDateString(),
+      unsubscribedAt: new Date().toLocaleDateString(locale),
     }),
   exampleProps: {
     unsubscribedEmail: "unsubscribed@example.com",
@@ -346,7 +346,7 @@ export const adminNewsletterUnsubscribeEmailTemplate: EmailTemplateDefinition<
           t,
           locale,
           recipientEmail: contactClientRepository.getSupportEmail(locale),
-          unsubscribedAt: new Date().toLocaleDateString(),
+          unsubscribedAt: new Date().toLocaleDateString(locale),
         }),
       });
     } catch {

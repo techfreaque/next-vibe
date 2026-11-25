@@ -16,6 +16,7 @@ export const SEO_LOCALES: readonly CountryLanguage[] = [
   "fr-FR",
   "it-IT",
   "es-ES",
+  "sk-SK",
   "en-GLOBAL",
   "en-US",
 ];

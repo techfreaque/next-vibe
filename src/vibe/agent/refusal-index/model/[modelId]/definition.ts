@@ -139,6 +139,11 @@ const { GET } = createEndpoint({
               hidden: true,
               schema: z.string().nullable(),
             }),
+            questionSk: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              hidden: true,
+              schema: z.string().nullable(),
+            }),
             verdict: responseField(scopedTranslation, {
               type: WidgetType.BADGE,
               label: "public.fields.verdict.label" as const,

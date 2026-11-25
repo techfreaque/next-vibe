@@ -20,6 +20,7 @@ export const category: CategoryDefinition = {
     "fr-FR": "SSH et infra",
     "it-IT": "SSH e infrastruttura",
     "es-ES": "SSH e infraestructura",
+    "sk-SK": "SSH a infraštruktúra",
   },
   group: "platform",
   icon: "terminal",
@@ -41,6 +42,7 @@ export const category: CategoryDefinition = {
         "fr-FR": "Connexions",
         "it-IT": "Connessioni",
         "es-ES": "Conexiones",
+        "sk-SK": "Pripojenia",
       },
     },
     Linux: {
@@ -54,6 +56,7 @@ export const category: CategoryDefinition = {
         "fr-FR": "Utilisateurs Linux",
         "it-IT": "Utenti Linux",
         "es-ES": "Usuarios de Linux",
+        "sk-SK": "Používatelia Linuxu",
       },
     },
   },

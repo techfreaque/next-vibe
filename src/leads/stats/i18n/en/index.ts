@@ -148,6 +148,7 @@ export const translations = {
     fr: "French",
     it: "Italian",
     es: "Spanish",
+    sk: "Slovak",
   },
   country: {
     ...regionalCountryNames("en"),
@@ -162,6 +163,7 @@ export const translations = {
   language: {
     it: "Italian",
     es: "Spanish",
+    sk: "Slovak",
     label: "Language",
     description: "Filter by language preference",
     all: "All Languages",

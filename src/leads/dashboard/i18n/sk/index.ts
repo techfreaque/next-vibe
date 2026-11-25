@@ -1,0 +1,114 @@
+import type { translations as enTranslations } from "../en";
+
+export const translations: typeof enTranslations = {
+  tags: {
+    leads: "kontakty",
+    dashboard: "prehľad",
+  },
+  get: {
+    title: "Prehľad kontaktov",
+    titleShort: "Prehľad kontaktov",
+    description:
+      "Aktuálne počty aktívnych kontaktov, nových kontaktov, prebiehajúcich kampaní a konverzií",
+    errors: {
+      unauthorized: {
+        title: "Vyžaduje sa prihlásenie",
+        description: "Vyžaduje sa prihlásenie",
+      },
+      validation: {
+        title: "Neplatné údaje",
+        description: "Neplatné parametre požiadavky",
+      },
+      server: {
+        title: "Chyba servera",
+        description: "Údaje prehľadu sa nepodarilo načítať",
+      },
+      unknown: {
+        title: "Neznáma chyba",
+        description: "Vyskytla sa neočakávaná chyba",
+      },
+      network: {
+        title: "Chyba siete",
+        description: "Sieťové pripojenie zlyhalo",
+      },
+      forbidden: {
+        title: "Prístup zamietnutý",
+        description: "K týmto údajom nemáte prístup",
+      },
+      notFound: {
+        title: "Nenašlo sa",
+        description: "Údaje prehľadu sa nenašli",
+      },
+      unsavedChanges: {
+        title: "Neuložené zmeny",
+        description: "Máte neuložené zmeny",
+      },
+      conflict: {
+        title: "Konflikt",
+        description: "Nastal konflikt údajov",
+      },
+    },
+    success: {
+      title: "Úspech",
+      description: "Údaje prehľadu sa načítali",
+    },
+    response: {
+      last7Days: "Posledných 7 dní",
+      activeLeadsCount: "Aktívne kontakty",
+      newThisWeekCount: "Nové tento týždeň",
+      runningCampaignsCount: "Prebiehajúce kampane",
+      convertedCount: "Konverzie",
+      totalLeadsCount: "Kontakty spolu",
+      conversionRate: "Miera konverzie",
+      statusBreakdown: "Rozdelenie podľa stavu",
+      recentLeads: "Najnovšie kontakty",
+      "recentLeads.id": "ID",
+      "recentLeads.businessName": "Názov firmy",
+      "recentLeads.email": "E-mail",
+      "recentLeads.status": "Stav",
+      "recentLeads.source": "Zdroj",
+      "recentLeads.createdAt": "Vytvorené",
+    },
+  },
+  widget: {
+    reports: "Prehľady",
+    last7Days: "Posledných 7 dní",
+    humanLeads: "Kontakty od ľudí",
+    botLeads: "Kontakty robotov",
+    signups: "Registrácie",
+    payers: "Platiaci",
+    flaggedNetworks: "Označené siete",
+    acquisition: "Akvizícia",
+    acquisitionDesc: "Odkiaľ prichádzajú návštevníci a kontakty",
+    funnel: "Konverzný lievik",
+    funnelDesc:
+      "Ktorý krok konverzného lievika dosiahli kontakty z jednotlivých zdrojov",
+    abuse: "Signály zneužívania",
+    abuseDesc: "Náhle nárasty kontaktov a čerpanie bezplatných kreditov",
+    loading: "Načítava sa prehľad…",
+    activeLeads: "Aktívne kontakty",
+    newThisWeek: "Nové tento týždeň",
+    runningCampaigns: "V kampani",
+    converted: "Konverzie",
+    totalLeads: "Kontakty spolu za celé obdobie",
+    conversionRate: "Miera konverzie",
+    quickActions: "Rýchle akcie",
+    newLead: "Nový kontakt",
+    newLeadDesc: "Vytvorte nový kontakt ručne",
+    allLeads: "Všetky kontakty",
+    allLeadsDesc: "Zobrazte a filtrujte všetky kontakty",
+    campaignStats: "Štatistiky kampaní",
+    campaignStatsDesc: "Vyhodnoťte výkonnosť kampaní",
+    searchLeads: "Vyhľadať kontakty",
+    searchLeadsDesc: "Nájdite kontakty podľa mena alebo e-mailu",
+    importLeads: "Import",
+    importLeadsDesc: "Hromadne importovať kontakty zo súboru CSV",
+    statusBreakdown: "Rozdelenie podľa stavu",
+    recentLeads: "Najnovšie kontakty",
+    viewAll: "Zobraziť všetko",
+    noLeadsYet: "Zatiaľ žiadne kontakty",
+    noLeadsHint:
+      "Vytvorte prvý kontakt alebo importujte kontakty zo súboru CSV",
+    createFirst: "Vytvoriť kontakt",
+  },
+};

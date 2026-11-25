@@ -20,6 +20,7 @@ describe("seo-locales", () => {
     expect(canonicalSeoLocale("pl-GLOBAL")).toBe("pl-PL");
     expect(canonicalSeoLocale("it-CH")).toBe("it-IT");
     expect(canonicalSeoLocale("es-MX")).toBe("es-ES");
+    expect(canonicalSeoLocale("sk-GLOBAL")).toBe("sk-SK");
     expect(canonicalSeoLocale("de-AT")).toBe("de-DE");
     expect(canonicalSeoLocale("fr-CA")).toBe("fr-FR");
     expect(canonicalSeoLocale("fr-DE")).toBe("fr-FR");
@@ -46,6 +47,8 @@ describe("seo-locales", () => {
         "it",
         "es-ES",
         "es",
+        "sk-SK",
+        "sk",
         "pl-PL",
         "pl",
         "x-default",
@@ -53,7 +56,10 @@ describe("seo-locales", () => {
     );
     expect(alternates["de"]).toBe("https://example.com/de-DE/models");
     expect(alternates["es"]).toBe("https://example.com/es-ES/models");
-    expect(alternates["x-default"]).toBe("https://example.com/en-GLOBAL/models");
+    expect(alternates["sk"]).toBe("https://example.com/sk-SK/models");
+    expect(alternates["x-default"]).toBe(
+      "https://example.com/en-GLOBAL/models",
+    );
     expect(alternates["en"]).toBe("https://example.com/en-GLOBAL/models");
     expect(seoLanguageAlternates("https://example.com", "")["de-DE"]).toBe(
       "https://example.com/de-DE",

@@ -18,6 +18,7 @@ export const category: CategoryDefinition = {
     "fr-FR": "Agent IA",
     "it-IT": "Agente IA",
     "es-ES": "Agente de IA",
+    "sk-SK": "Agent AI",
   },
   group: "ai",
   icon: "bot",
@@ -39,6 +40,7 @@ export const category: CategoryDefinition = {
         "fr-FR": "Inférence",
         "it-IT": "Inferenza",
         "es-ES": "Inferencia",
+        "sk-SK": "Inferencia",
       },
     },
     Generation: {
@@ -52,6 +54,7 @@ export const category: CategoryDefinition = {
         "fr-FR": "Génération",
         "it-IT": "Generazione",
         "es-ES": "Generación",
+        "sk-SK": "Generovanie",
       },
     },
     Tools: {
@@ -65,6 +68,7 @@ export const category: CategoryDefinition = {
         "fr-FR": "Outils",
         "it-IT": "Strumenti",
         "es-ES": "Herramientas",
+        "sk-SK": "Nástroje",
       },
     },
     Search: {
@@ -78,6 +82,7 @@ export const category: CategoryDefinition = {
         "fr-FR": "Recherche",
         "it-IT": "Ricerca",
         "es-ES": "Búsqueda",
+        "sk-SK": "Vyhľadávanie",
       },
     },
     chat: {
@@ -91,6 +96,7 @@ export const category: CategoryDefinition = {
         "fr-FR": "Chat",
         "it-IT": "Chat",
         "es-ES": "Chat",
+        "sk-SK": "Chat",
       },
     },
     chatFavorites: {
@@ -104,6 +110,7 @@ export const category: CategoryDefinition = {
         "fr-FR": "Favoris",
         "it-IT": "Preferiti",
         "es-ES": "Favoritos",
+        "sk-SK": "Obľúbené",
       },
     },
     chatOrganization: {
@@ -117,6 +124,7 @@ export const category: CategoryDefinition = {
         "fr-FR": "Organisation",
         "it-IT": "Organizzazione",
         "es-ES": "Organización",
+        "sk-SK": "Organizácia",
       },
     },
     chatSettings: {
@@ -130,6 +138,7 @@ export const category: CategoryDefinition = {
         "fr-FR": "Paramètres du chat",
         "it-IT": "Impostazioni chat",
         "es-ES": "Configuración del chat",
+        "sk-SK": "Nastavenia chatu",
       },
     },
     skillsManagement: {
@@ -143,6 +152,7 @@ export const category: CategoryDefinition = {
         "fr-FR": "Compétences",
         "it-IT": "Skill",
         "es-ES": "Skills",
+        "sk-SK": "Zručnosti",
       },
     },
     skillsCommunity: {
@@ -156,6 +166,7 @@ export const category: CategoryDefinition = {
         "fr-FR": "Compétences de la communauté",
         "it-IT": "Skill della community",
         "es-ES": "Skills de la comunidad",
+        "sk-SK": "Zručnosti komunity",
       },
     },
     skillsModeration: {
@@ -169,6 +180,7 @@ export const category: CategoryDefinition = {
         "fr-FR": "Modération des compétences",
         "it-IT": "Moderazione delle skill",
         "es-ES": "Moderación de skills",
+        "sk-SK": "Moderovanie zručností",
       },
     },
     threadsManagement: {
@@ -182,6 +194,7 @@ export const category: CategoryDefinition = {
         "fr-FR": "Fils de discussion",
         "it-IT": "Conversazioni",
         "es-ES": "Conversaciones",
+        "sk-SK": "Konverzácie",
       },
     },
     threadsSharing: {
@@ -195,6 +208,7 @@ export const category: CategoryDefinition = {
         "fr-FR": "Partage de fils",
         "it-IT": "Condivisione delle conversazioni",
         "es-ES": "Conversaciones compartidas",
+        "sk-SK": "Zdieľanie konverzácií",
       },
     },
     threadsSearch: {
@@ -208,6 +222,7 @@ export const category: CategoryDefinition = {
         "fr-FR": "Recherche de fils",
         "it-IT": "Ricerca nelle conversazioni",
         "es-ES": "Búsqueda de conversaciones",
+        "sk-SK": "Vyhľadávanie konverzácií",
       },
     },
     messagesModerating: {
@@ -221,6 +236,7 @@ export const category: CategoryDefinition = {
         "fr-FR": "Messages",
         "it-IT": "Messaggi",
         "es-ES": "Mensajes",
+        "sk-SK": "Správy",
       },
     },
     messagesSearch: {
@@ -234,6 +250,7 @@ export const category: CategoryDefinition = {
         "fr-FR": "Recherche de messages",
         "it-IT": "Ricerca nei messaggi",
         "es-ES": "Búsqueda de mensajes",
+        "sk-SK": "Vyhľadávanie správ",
       },
     },
     messagesFiles: {
@@ -247,6 +264,7 @@ export const category: CategoryDefinition = {
         "fr-FR": "Fichiers des messages",
         "it-IT": "Allegati dei messaggi",
         "es-ES": "Archivos de mensajes",
+        "sk-SK": "Súbory v správach",
       },
     },
     tasksCron: {
@@ -260,6 +278,7 @@ export const category: CategoryDefinition = {
         "fr-FR": "Tâches planifiées",
         "it-IT": "Attività pianificate",
         "es-ES": "Tareas programadas",
+        "sk-SK": "Naplánované úlohy",
       },
     },
   },

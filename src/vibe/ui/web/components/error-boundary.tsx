@@ -10,6 +10,7 @@ import { createClientLogger } from "../../../logger/client";
 import { reportRenderError } from "../../../logger/report-render-error";
 import type { EndpointLogger } from "../../../logger/types";
 import { LoggerContext } from "../hooks/logger-provider";
+import { scopedTranslation } from "../i18n";
 import {
   Accordion,
   AccordionContent,
@@ -65,12 +66,12 @@ export function DefaultErrorFallback({
   error,
   errorInfo,
   reset,
+  locale,
 }: ErrorFallbackProps): JSX.Element {
-  // Get full stack trace if available
-  const noStackTrace = "No stack trace available";
-  const noComponentStack = "No component stack available";
-  const stackTrace = error.stack || noStackTrace;
-  const componentStack = errorInfo?.componentStack || noComponentStack;
+  const { t } = scopedTranslation.scopedT(locale);
+  const stackTrace = error.stack || t("ui.errorBoundary.noStackTrace");
+  const componentStack =
+    errorInfo?.componentStack || t("ui.errorBoundary.noComponentStack");
 
   // Extract component names from stack - strip bundle URLs, keep "at ComponentName"
   const componentStackLines = componentStack
@@ -82,15 +83,7 @@ export function DefaultErrorFallback({
   // First line is the failing component, next few are its ancestors
   const topComponents = componentStackLines.slice(0, 8).join("\n");
 
-  const errorTitle = "Error";
-  const tryAgainLabel = "Try Again";
-  const componentStackLabel = "Component Stack";
-  const stackTraceLabel = "Stack Trace";
-  const componentStackFullLabel = "Component Stack (full)";
-  const errorDetailsLabel = "Error Details";
-  const nameLabel = "Name:";
-  const messageLabel = "Message:";
-  const causeLabel = "Cause:";
+  const errorTitle = t("ui.errorBoundary.title");
 
   return (
     <Card className="border-destructive max-w-4xl mx-auto my-4">
@@ -107,7 +100,7 @@ export function DefaultErrorFallback({
             className="flex items-center gap-2 mb-4"
           >
             <RotateCcw className="h-4 w-4" />
-            {tryAgainLabel}
+            {t("ui.errorBoundary.tryAgain")}
           </Button>
         </Div>
 
@@ -115,7 +108,7 @@ export function DefaultErrorFallback({
         {topComponents && (
           <Div className="mb-4 p-3 bg-destructive/10 border border-destructive/30 rounded-md">
             <Span className="text-xs font-semibold text-destructive uppercase tracking-wide block mb-1">
-              {componentStackLabel}
+              {t("ui.errorBoundary.componentStack")}
             </Span>
             <Pre className="text-xs text-destructive/80 whitespace-pre-wrap break-all">
               {topComponents}
@@ -127,7 +120,7 @@ export function DefaultErrorFallback({
         <Accordion type="multiple" collapsible className="space-y-4">
           <AccordionItem value="stackTrace">
             <AccordionTrigger className="text-sm font-semibold">
-              {stackTraceLabel}
+              {t("ui.errorBoundary.stackTrace")}
             </AccordionTrigger>
             <AccordionContent>
               <Pre className="mt-2 p-4 bg-muted rounded-md text-xs overflow-auto max-h-64 border border-border">
@@ -138,7 +131,7 @@ export function DefaultErrorFallback({
 
           <AccordionItem value="componentStack">
             <AccordionTrigger className="text-sm font-semibold">
-              {componentStackFullLabel}
+              {t("ui.errorBoundary.componentStackFull")}
             </AccordionTrigger>
             <AccordionContent>
               <Pre className="mt-2 p-4 bg-muted rounded-md text-xs overflow-auto max-h-64 border border-border">
@@ -149,21 +142,27 @@ export function DefaultErrorFallback({
 
           <AccordionItem value="errorDetails">
             <AccordionTrigger className="text-sm font-semibold">
-              {errorDetailsLabel}
+              {t("ui.errorBoundary.details")}
             </AccordionTrigger>
             <AccordionContent>
               <Div className="mt-2 p-4 bg-muted rounded-md text-xs space-y-2 border border-border">
                 <Div>
-                  <Span className="font-semibold">{nameLabel}</Span>{" "}
+                  <Span className="font-semibold">
+                    {t("ui.errorBoundary.name")}
+                  </Span>{" "}
                   {error.name}
                 </Div>
                 <Div>
-                  <Span className="font-semibold">{messageLabel}</Span>{" "}
+                  <Span className="font-semibold">
+                    {t("ui.errorBoundary.message")}
+                  </Span>{" "}
                   {error.message}
                 </Div>
                 {error.cause !== undefined && (
                   <Div>
-                    <Span className="font-semibold">{causeLabel}</Span>{" "}
+                    <Span className="font-semibold">
+                      {t("ui.errorBoundary.cause")}
+                    </Span>{" "}
                     {String(error.cause)}
                   </Div>
                 )}

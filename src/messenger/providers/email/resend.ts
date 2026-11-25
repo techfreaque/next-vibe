@@ -27,6 +27,7 @@ import {
 } from "../../accounts/enum";
 import { messengerEnv } from "../../env";
 import { scopedTranslation as providerScopedTranslation } from "../../i18n";
+import { scopedTranslation as mailboxTranslation } from "../../system-mailbox/i18n";
 import type { SendMessageInput, SendMessageResult } from "../provider";
 import { SendOnlyProvider } from "../send-only-base";
 import { buildListUnsubscribeHeaders } from "./list-unsubscribe";
@@ -60,6 +61,9 @@ export class ResendMessengerProvider extends SendOnlyProvider {
     locale: CountryLanguage,
   ): Promise<ResponseType<SendMessageResult>> {
     const { t } = providerScopedTranslation.scopedT(locale);
+    const subject =
+      input.subject ??
+      mailboxTranslation.scopedT(locale).t("inbox.widget.noSubject");
     try {
       const [account] = await db
         .select()
@@ -93,7 +97,7 @@ export class ResendMessengerProvider extends SendOnlyProvider {
       const { data, error } = await resend.emails.send({
         from: `${fromName} <${fromEmail}>`,
         to: [input.to],
-        subject: input.subject ?? "(no subject)",
+        subject,
         text: input.text,
         html,
         attachments: logo

@@ -86,6 +86,7 @@ const LOCALES: readonly CountryLanguage[] = [
   "fr-FR",
   "it-IT",
   "es-ES",
+  "sk-SK",
 ];
 
 function factsOf(id: ChatModelId): ModelFacts {
@@ -229,8 +230,12 @@ describe("fact sheets and trial links", () => {
     const facts = factsOf(ChatModelId.CLAUDE_SONNET_5_5);
     const rows = buildFactRows(facts, "en-US");
     expect(facts.providers[0]).toBe(facts.priceProvider);
-    expect(chatPlanPricing(facts, "en-US")?.footnote).toContain("Cached input costs");
-    expect(chatModelFaq(facts, "en-US")[0]?.answer).toContain("Cache writes cost");
+    expect(chatPlanPricing(facts, "en-US")?.footnote).toContain(
+      "Cached input costs",
+    );
+    expect(chatModelFaq(facts, "en-US")[0]?.answer).toContain(
+      "Cache writes cost",
+    );
     expect(rows.find((row) => row.key === "price")?.hint).toContain(
       facts.priceProvider,
     );
@@ -404,6 +409,8 @@ describe("structured data", () => {
       ["it-IT", "Home", "Modelli IA"],
       ["es-ES", "Inicio", "Modelos de IA"],
       ["es-MX", "Inicio", "Modelos de IA"],
+      ["sk-SK", "Domov", "Modely AI"],
+      ["sk-GLOBAL", "Domov", "Modely AI"],
     ];
     for (const [locale, home, section] of cases) {
       const root = `https://unbottled.ai/${locale}`;
@@ -461,7 +468,12 @@ describe("structured data", () => {
     }
     const locale = "pl-PL";
     const { amount, currency } = getCreditUnitPrice(locale);
-    const withPrice = buildMediaModelStructuredData(facts, locale, "d", "image");
+    const withPrice = buildMediaModelStructuredData(
+      facts,
+      locale,
+      "d",
+      "image",
+    );
     const withoutPrice = buildMediaModelStructuredData(
       { ...facts, price: null },
       locale,

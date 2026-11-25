@@ -1,4 +1,4 @@
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 
@@ -7,6 +7,15 @@ import { Glob } from "bun";
 // Run with Bun so the verifier reads the same TypeScript dictionaries as SSR.
 // --allow-protected lists the explicitly deferred design scopes separately.
 const allowProtected = process.argv.includes("--allow-protected");
+const siteLocales = ["it", "es", "sk"];
+const requestedLocale = process.argv
+  .find((argument) => argument.startsWith("--locale="))
+  ?.slice("--locale=".length);
+if (requestedLocale !== undefined && !siteLocales.includes(requestedLocale)) {
+  process.stderr.write(`Unsupported locale: ${requestedLocale}\n`);
+  process.exit(1);
+}
+const locales = requestedLocale === undefined ? siteLocales : [requestedLocale];
 const protectedScope =
   /^src\/(?:_pages\/skill\/\[skillId\]\/|vibe\/agent\/(?:chat\/folder[^/]*\/|ai-stream\/stream\/widget\/chat-ui\/))/;
 const root = resolve(import.meta.dirname, "..");
@@ -14,7 +23,8 @@ const errors = [];
 const deferred = [];
 let scopes = 0;
 let strings = 0;
-const tokenList = (value) => (value.match(/\{\{[^{}]+\}\}/g) ?? []).toSorted();
+const tokenList = (value) =>
+  (value.match(/\{\{[^{}]+\}\}|\{[a-zA-Z_][\w.-]*\}/g) ?? []).toSorted();
 
 function compare(source, translated, path) {
   if (
@@ -25,15 +35,20 @@ function compare(source, translated, path) {
     return;
   }
   if (source !== null && typeof source === "object") {
-    if (
-      !translated ||
-      Object.keys(source).toSorted().join("\0") !==
-        Object.keys(translated).toSorted().join("\0")
-    ) {
-      errors.push(`${path} has different keys`);
+    if (!translated) {
+      errors.push(`${path} is missing its dictionary`);
       return;
     }
+    for (const key of Object.keys(translated)) {
+      if (!Object.hasOwn(source, key)) {
+        errors.push(`${path}.${key} has no matching English key`);
+      }
+    }
     for (const [key, value] of Object.entries(source)) {
+      if (!Object.hasOwn(translated, key)) {
+        errors.push(`${path}.${key} is missing`);
+        continue;
+      }
       compare(value, translated[key], `${path}.${key}`);
     }
   } else if (typeof source === "string") {
@@ -61,28 +76,34 @@ for (const english of [
   }
   const source = (await import(pathToFileURL(join(root, english)).href))
     .translations;
-  if (
+  const previousLocalesDeferred =
     allowProtected &&
     protectedScope.test(scope) &&
     ["it", "es"].every(
       (lang) => !existsSync(join(root, scope, lang, "index.ts")),
-    )
-  ) {
-    deferred.push(scope);
-    continue;
-  }
+    );
+  const loaderPath = join(root, scope, "index.ts");
+  const loader = existsSync(loaderPath) ? readFileSync(loaderPath, "utf8") : "";
   scopes++;
-  for (const lang of ["it", "es"]) {
+  for (const lang of locales) {
+    if (previousLocalesDeferred && (lang === "it" || lang === "es")) {
+      deferred.push(`${scope}/${lang}`);
+      continue;
+    }
     const path = join(root, scope, lang, "index.ts");
     if (!existsSync(path)) {
       errors.push(`${scope} is missing ${lang}`);
       continue;
     }
-    compare(
-      source,
-      (await import(pathToFileURL(path).href)).translations,
-      `${scope}/${lang}`,
-    );
+    if (!new RegExp(`^\\s*${lang}:\\s*`, "m").test(loader)) {
+      errors.push(`${scope} does not register ${lang}`);
+    }
+    try {
+      const dictionary = (await import(pathToFileURL(path).href)).translations;
+      compare(source, dictionary, `${scope}/${lang}`);
+    } catch (error) {
+      errors.push(`${scope}/${lang} could not load: ${error.message}`);
+    }
   }
 }
 

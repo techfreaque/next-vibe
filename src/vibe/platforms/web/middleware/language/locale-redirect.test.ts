@@ -15,7 +15,9 @@ import type { CountryLanguage } from "../../../../core/i18n/core/config";
 import { middleware } from "../index";
 import { buildLocaleRedirectPath, detectLocale } from "./index";
 
-const supportedLocales: CountryLanguage[] = Object.values(languageConfig.countryInfo).map(({ language, code }): CountryLanguage => `${language}-${code}`);
+const supportedLocales: CountryLanguage[] = Object.values(
+  languageConfig.countryInfo,
+).map(({ language, code }): CountryLanguage => `${language}-${code}`);
 const options = {
   supportedLocales,
   defaultLocale: "en-GLOBAL" as const,
@@ -46,15 +48,34 @@ describe("locale redirect mapping", () => {
   });
 
   it("serves each configured regional language and negotiates language before location", () => {
-    for (const { code, languages } of Object.values(languageConfig.countryInfo)) {
+    for (const { code, languages } of Object.values(
+      languageConfig.countryInfo,
+    )) {
       for (const language of languages) {
         expect(target(`/${language}-${code}/story`)).toBe("(none)");
       }
     }
-    expect(target("/story", { "accept-language": "de-AT" })).toBe("/de-AT/story");
-    expect(target("/story", { "accept-language": "es", "cf-ipcountry": "US" })).toBe("/es-US/story");
-    expect(target("/story", { "accept-language": "fr-CA;q=0.2,it-CH;q=0.9" })).toBe("/it-CH/story");
+    expect(target("/story", { "accept-language": "de-AT" })).toBe(
+      "/de-AT/story",
+    );
+    expect(
+      target("/story", { "accept-language": "es", "cf-ipcountry": "US" }),
+    ).toBe("/es-US/story");
+    expect(
+      target("/story", { "accept-language": "fr-CA;q=0.2,it-CH;q=0.9" }),
+    ).toBe("/it-CH/story");
     expect(target("/story", { "cf-ipcountry": "MX" })).toBe("/es-MX/story");
+  });
+
+  it("negotiates Slovak from the URL, browser, cookie, or country", () => {
+    expect(target("/sk-SK/story")).toBe("(none)");
+    expect(target("/sk-sk/story")).toBe("/sk-SK/story");
+    expect(target("/sk/story")).toBe("/sk-GLOBAL/story");
+    expect(target("/story", { "accept-language": "sk-SK" })).toBe(
+      "/sk-SK/story",
+    );
+    expect(target("/story", { "cf-ipcountry": "SK" })).toBe("/sk-SK/story");
+    expect(target("/story", { cookie: "locale=sk-SK" })).toBe("/sk-SK/story");
   });
 
   it("replaces a language-only segment", () => {
@@ -110,9 +131,7 @@ describe("locale redirect mapping", () => {
     expect(target("/story", { "accept-language": "fr" })).toBe(
       "/fr-GLOBAL/story",
     );
-    expect(target("/", { "accept-language": "fr-CA,fr;q=0.9" })).toBe(
-      "/fr-CA",
-    );
+    expect(target("/", { "accept-language": "fr-CA,fr;q=0.9" })).toBe("/fr-CA");
     expect(target("/user", { cookie: "locale=fr-FR" })).toBe("/fr-FR/user");
     expect(target("/fr-fr/user")).toBe("/fr-FR/user");
     expect(target("/api/credits", { "accept-language": "fr-FR" })).toBe(

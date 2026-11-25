@@ -92,6 +92,7 @@ export const translations = {
     authenticationFailed: "User authentication failed",
   },
   validation: {
+    invalidEmail: "Enter a valid email address.",
     missingFields: "Missing required fields ({{count}}):",
     failedOne: "Validation failed (1 error):",
     failedMany: "Validation failed ({{count}} errors):",

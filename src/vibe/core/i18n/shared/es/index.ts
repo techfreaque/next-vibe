@@ -94,6 +94,7 @@ export const translations: typeof enTranslations = {
     authenticationFailed: "Falló la autenticación del usuario",
   },
   validation: {
+    invalidEmail: "Introduce una dirección de correo electrónico válida.",
     missingFields: "Falta de campos necesarios ({{count}}):",
     failedOne: "La validación falló (1 error):",
     failedMany: "Falló la validación (errores {{count}}):",

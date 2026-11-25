@@ -28,7 +28,7 @@
 "use strict";
 
 const LAZY_LOCALE_PATTERN =
-  /\(\)\s*=>\s*require\((["'])([^"'`]+\/(de|pl|fr|it|es))\1\)\.translations/g;
+  /\(\)\s*=>\s*require\((["'])([^"'`]+\/(de|pl|fr|it|es|sk))\1\)\.translations/g;
 
 const LANGUAGE_EXPRESSION =
   'typeof location === "undefined" ? undefined : (location.pathname.split("/")[1] || "").split("-")[0].toLowerCase()';
@@ -62,9 +62,8 @@ function transformClientLocaleSource(source) {
 /** Apply the browser locale loader to Vite scope IDs, including HMR queries. */
 function transformViteClientLocaleSource(source, id) {
   const path = id.replace(/\?.*$/, "");
-  const isScope = /[\\/](?:i18n|layout-i18n|i18n[\\/]shared)[\\/]index\.ts$/.test(
-    path,
-  );
+  const isScope =
+    /[\\/](?:i18n|layout-i18n|i18n[\\/]shared)[\\/]index\.ts$/.test(path);
   return isScope ? transformClientLocaleSource(source) : source;
 }
 
@@ -88,7 +87,9 @@ function transformDevSsrLocaleSource(source) {
 function transformViteDevSsrLocaleSource(source, id) {
   const path = id.replaceAll("\\", "/").replace(/\?.*$/, "");
   const isLiveScope =
-    /\/src\/(?:_pages\/create|user\/public\/signup|vibe\/agent\/(?:ai-stream\/stream|media-studio\/history))\/i18n\/index\.ts$/.test(path);
+    /\/src\/(?:_pages\/create|user\/public\/signup|vibe\/agent\/(?:ai-stream\/stream|media-studio\/history|models))\/i18n\/index\.ts$/.test(
+      path,
+    );
   return isLiveScope ? transformDevSsrLocaleSource(source) : source;
 }
 
@@ -107,5 +108,7 @@ function clientLocaleLoader(source) {
 module.exports = clientLocaleLoader;
 module.exports.transformClientLocaleSource = transformClientLocaleSource;
 module.exports.transformDevSsrLocaleSource = transformDevSsrLocaleSource;
-module.exports.transformViteClientLocaleSource = transformViteClientLocaleSource;
-module.exports.transformViteDevSsrLocaleSource = transformViteDevSsrLocaleSource;
+module.exports.transformViteClientLocaleSource =
+  transformViteClientLocaleSource;
+module.exports.transformViteDevSsrLocaleSource =
+  transformViteDevSsrLocaleSource;

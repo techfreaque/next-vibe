@@ -4378,6 +4378,7 @@ export const translations = {
     language: {
       it: "Italian",
       es: "Spanish",
+      sk: "Slovak",
       label: "Language",
       description: "Filter by language preference",
       all: "All Languages",
@@ -5193,6 +5194,7 @@ export const translations = {
     language: {
       it: "Italian",
       es: "Spanish",
+      sk: "Slovak",
       de: "German",
       pl: "Polish",
       fr: "French",
@@ -5323,6 +5325,7 @@ export const translations = {
   languages: {
     it: "Italian",
     es: "Spanish",
+    sk: "Slovak",
     en: "English",
     de: "German",
     pl: "Polish",

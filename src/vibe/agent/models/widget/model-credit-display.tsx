@@ -149,9 +149,19 @@ function calculateCostRanges(model: ModelOptionTokenBased): {
   };
 }
 
-/** Format numbers with commas for readability */
-function formatNumber(num: number): string {
-  return num.toLocaleString("en-US");
+// The catalog renders a price for every model, so share the formatter across rows.
+const creditNumberFormats = new Map<CountryLanguage, Intl.NumberFormat>();
+
+function creditNumberFormat(locale: CountryLanguage): Intl.NumberFormat {
+  const existing = creditNumberFormats.get(locale);
+  if (existing) {
+    return existing;
+  }
+  const formatter = new Intl.NumberFormat(locale, {
+    maximumFractionDigits: 20,
+  });
+  creditNumberFormats.set(locale, formatter);
+  return formatter;
 }
 
 /** Format token count for display (e.g., "32K" instead of "32,000") */
@@ -191,6 +201,7 @@ export function ModelCreditDisplay({
   moneyClassName,
 }: ModelCreditDisplayProps): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
+  const formatNumber = creditNumberFormat(locale).format;
   const model = modelOption ?? findModel(modelId);
   const [isOpen, setIsOpen] = useState(false);
   const openTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -224,7 +235,7 @@ export function ModelCreditDisplay({
   } else if (model.creditCostPerImage) {
     // Image generation (fixed cost per image)
     const cost = getModelPrice(model);
-    costText = t("creditDisplay.badge.perImg", { cost });
+    costText = t("creditDisplay.badge.perImg", { cost: formatNumber(cost) });
     costCredits = cost;
 
     popoverContent = (
@@ -256,7 +267,7 @@ export function ModelCreditDisplay({
   } else if (model.creditCostPerClip !== undefined) {
     // Music/audio generation (fixed cost per clip)
     const cost = getModelPrice(model);
-    costText = t("creditDisplay.badge.perClip", { cost });
+    costText = t("creditDisplay.badge.perClip", { cost: formatNumber(cost) });
     costCredits = cost;
 
     popoverContent = (
@@ -296,7 +307,9 @@ export function ModelCreditDisplay({
       Math.round(
         model.creditCostPerSecond * (1 + STANDARD_MARKUP_PERCENTAGE) * 10000,
       ) / 10000;
-    costText = t("creditDisplay.badge.perClip", { cost: totalCost });
+    costText = t("creditDisplay.badge.perClip", {
+      cost: formatNumber(totalCost),
+    });
     costCredits = totalCost;
 
     popoverContent = (
@@ -316,13 +329,15 @@ export function ModelCreditDisplay({
         <Div className="space-y-2">
           <Span className="text-xs text-muted-foreground block leading-relaxed">
             {t("creditDisplay.media.videoBreakdown", {
-              costPerSecond: displayCostPerSecond,
-              duration,
-              total: totalCost,
+              costPerSecond: formatNumber(displayCostPerSecond),
+              duration: formatNumber(duration),
+              total: formatNumber(totalCost),
             })}
           </Span>
           <Span className="text-xs text-muted-foreground block leading-relaxed">
-            {t("creditDisplay.media.videoDescription", { duration })}
+            {t("creditDisplay.media.videoDescription", {
+              duration: formatNumber(duration),
+            })}
           </Span>
         </Div>
         <Div className="pt-3 border-t">
@@ -345,7 +360,9 @@ export function ModelCreditDisplay({
       },
       { name: "creditDisplay.media.ttsScenarios.long" as const, chars: 2000 },
     ];
-    costText = t("creditDisplay.badge.approxPerMsg", { cost: avgCost });
+    costText = t("creditDisplay.badge.approxPerMsg", {
+      cost: formatNumber(avgCost),
+    });
     costCredits = avgCost;
 
     popoverContent = (
@@ -362,7 +379,9 @@ export function ModelCreditDisplay({
           </Span>
           <Span className="text-sm font-bold">
             {t("creditDisplay.badge.ratePerChar", {
-              rate: Math.round(costPerCharWithMarkup * 10000) / 10000,
+              rate: formatNumber(
+                Math.round(costPerCharWithMarkup * 10000) / 10000,
+              ),
             })}
           </Span>
         </Div>
@@ -388,7 +407,9 @@ export function ModelCreditDisplay({
                     </Span>
                   </Div>
                   <Span className="font-mono font-semibold text-sm">
-                    {cost === 0 ? t("creditDisplay.badge.lessThanMin") : cost}
+                    {cost === 0
+                      ? t("creditDisplay.badge.lessThanMin")
+                      : formatNumber(cost)}
                   </Span>
                 </Div>
               );
@@ -421,7 +442,9 @@ export function ModelCreditDisplay({
       },
       { name: "creditDisplay.media.sttScenarios.long" as const, seconds: 60 },
     ];
-    costText = t("creditDisplay.badge.approxPerMsg", { cost: avgCost });
+    costText = t("creditDisplay.badge.approxPerMsg", {
+      cost: formatNumber(avgCost),
+    });
     costCredits = avgCost;
 
     popoverContent = (
@@ -438,7 +461,9 @@ export function ModelCreditDisplay({
           </Span>
           <Span className="text-sm font-bold">
             {t("creditDisplay.badge.ratePerSec", {
-              rate: Math.round(costPerSecWithMarkup * 10000) / 10000,
+              rate: formatNumber(
+                Math.round(costPerSecWithMarkup * 10000) / 10000,
+              ),
             })}
           </Span>
         </Div>
@@ -459,12 +484,14 @@ export function ModelCreditDisplay({
                     <Span className="font-medium">{t(scenario.name)}</Span>
                     <Span className="text-muted-foreground block text-[10px] leading-tight">
                       {t("creditDisplay.badge.seconds", {
-                        count: scenario.seconds,
+                        count: formatNumber(scenario.seconds),
                       })}
                     </Span>
                   </Div>
                   <Span className="font-mono font-semibold text-sm">
-                    {cost === 0 ? t("creditDisplay.badge.lessThanMin") : cost}
+                    {cost === 0
+                      ? t("creditDisplay.badge.lessThanMin")
+                      : formatNumber(cost)}
                   </Span>
                 </Div>
               );
@@ -491,7 +518,9 @@ export function ModelCreditDisplay({
       costRanges.length > 0 ? costRanges[costRanges.length - 1].cost : 0;
     const midCost =
       costRanges.length > 1 ? costRanges[1].cost : (minCost + maxCost) / 2;
-    costText = t("creditDisplay.badge.approxPerMsg", { cost: midCost });
+    costText = t("creditDisplay.badge.approxPerMsg", {
+      cost: formatNumber(midCost),
+    });
     costCredits = midCost;
     perMessage = true;
 
@@ -512,8 +541,8 @@ export function ModelCreditDisplay({
           </Span>
           <Span className="text-sm font-bold">
             {t("creditDisplay.tokenBased.costRangeValue", {
-              min: minCost,
-              max: maxCost,
+              min: formatNumber(minCost),
+              max: formatNumber(maxCost),
             })}
           </Span>
         </Div>
@@ -556,7 +585,7 @@ export function ModelCreditDisplay({
                     </Span>
                   </Div>
                   <Span className="font-mono font-semibold text-sm">
-                    {scenario.cost}
+                    {formatNumber(scenario.cost)}
                   </Span>
                 </Div>
               );
@@ -589,7 +618,9 @@ export function ModelCreditDisplay({
     if (isTrulyFree) {
       costText = t("selector.free");
     } else {
-      costText = t("creditDisplay.badge.exactPerMsg", { cost: creditCostRaw });
+      costText = t("creditDisplay.badge.exactPerMsg", {
+        cost: formatNumber(creditCostRaw),
+      });
       costCredits = creditCostRaw;
       perMessage = true;
     }
@@ -733,8 +764,8 @@ export function ModelCreditDisplay({
           {freeMessages !== null && (
             <Span className="mt-1 block text-[10px] text-muted-foreground">
               {t("creditDisplay.freePlanMessages", {
-                count: freeMessages,
-                credits: FREE_PLAN_MONTHLY_CREDITS,
+                count: formatNumber(freeMessages),
+                credits: formatNumber(FREE_PLAN_MONTHLY_CREDITS),
               })}
             </Span>
           )}

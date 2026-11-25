@@ -19,6 +19,7 @@ export const category: CategoryDefinition = {
     "fr-FR": "Cortex",
     "it-IT": "Cortex",
     "es-ES": "Cortex",
+    "sk-SK": "Cortex",
   },
   group: "ai",
   icon: "brain",

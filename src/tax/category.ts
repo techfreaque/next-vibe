@@ -20,6 +20,7 @@ export const category: CategoryDefinition = {
     "fr-FR": "Taxes",
     "it-IT": "Imposte",
     "es-ES": "Impuestos",
+    "sk-SK": "Dane",
   },
   group: "business",
   icon: "file-text",
@@ -41,6 +42,7 @@ export const category: CategoryDefinition = {
         "fr-FR": "Taux de taxe",
         "it-IT": "Aliquote fiscali",
         "es-ES": "Tasas impositivas",
+        "sk-SK": "Daňové sadzby",
       },
       // inherits parent defaultEntry (tax/rate/list)
     },
@@ -55,6 +57,7 @@ export const category: CategoryDefinition = {
         "fr-FR": "Rapports",
         "it-IT": "Report",
         "es-ES": "Informes",
+        "sk-SK": "Daňové výkazy",
       },
     },
   },

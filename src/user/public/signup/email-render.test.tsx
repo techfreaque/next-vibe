@@ -7,10 +7,12 @@ import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { success } from "next-vibe/core/route/response.schema";
 import { createEndpointLogger } from "next-vibe/logger/server";
 
+import { getTemplate } from "@/generated/email";
+import { buildListUnsubscribeHeaders } from "@/messenger/providers/email/list-unsubscribe";
 import { createTrackingContext } from "@/messenger/providers/email/smtp-client/components/tracking_context.email";
 import { EMAIL_LOGO_FALLBACK_PATH } from "@/messenger/providers/email/smtp-client/email-logo";
-import { buildListUnsubscribeHeaders } from "@/messenger/providers/email/list-unsubscribe";
 import { SmtpSendingRepository } from "@/messenger/providers/email/smtp-client/sending/repository";
+import { getTemplateSubject } from "@/messenger/registry/template";
 
 import { sendSignupChallenge } from "./confirmation-mail";
 import { signupWelcomeEmailTemplate } from "./email";
@@ -24,6 +26,7 @@ const locales: CountryLanguage[] = [
   "fr-FR",
   "it-IT",
   "es-ES",
+  "sk-SK",
 ];
 const logoUrl = new URL(
   EMAIL_LOGO_FALLBACK_PATH,
@@ -85,8 +88,9 @@ test.each(locales)(
         const mail = send.mock.lastCall?.[0];
         expect(mail?.leadId).toBe("test-lead");
         expect(mail?.subject).toBe(t("confirmation.link"));
-        expect(buildListUnsubscribeHeaders(recipientEmail, mail?.unsubscribeUrl))
-          .toEqual({});
+        expect(
+          buildListUnsubscribeHeaders(recipientEmail, mail?.unsubscribeUrl),
+        ).toEqual({});
         const { html = "", text = "" } = mail ?? {};
         const url = `${coreClientEnv.NEXT_PUBLIC_APP_URL}/${locale}/user/signup?confirm=1#test-token`;
         expect(text).toContain(t("confirmation.hint"));
@@ -108,6 +112,32 @@ test.each(locales)(
     }
   },
 );
+
+test.each(locales)(
+  "welcome preview resolves the brand in %s",
+  async (locale) => {
+    const template = await getTemplate("signup-welcome");
+    expect(template).toBeDefined();
+    if (!template) {
+      return;
+    }
+    const subject = getTemplateSubject(template, locale, {});
+    expect(subject).toContain("unbottled.ai");
+    expect(subject).not.toContain("{{");
+  },
+);
+
+test("Slovak admin preview includes the supplied account name", async () => {
+  const template = await getTemplate("admin-signup-notification");
+  expect(template).toBeDefined();
+  if (!template) {
+    return;
+  }
+  const subject = getTemplateSubject(template, "sk-SK", {
+    privateName: "Zuzana",
+  });
+  expect(subject).toBe("Nová registrácia: Zuzana");
+});
 
 test.each([recipientEmail, "creator@gmail.com"])(
   "signup welcome fits within the email size limit for %s",

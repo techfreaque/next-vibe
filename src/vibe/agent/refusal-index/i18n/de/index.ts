@@ -132,6 +132,10 @@ export const translations: typeof enTranslations = {
         label: "Frage (Spanisch)",
         description: "Anzeige-Übersetzung für öffentliche Beispiele (optional)",
       },
+      textSk: {
+        label: "Frage (Slowakisch)",
+        description: "Anzeige-Übersetzung für öffentliche Beispiele (optional)",
+      },
       generatedBy: { label: "Vorgeschlagen von" },
       active: {
         label: "Aktiv",

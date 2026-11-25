@@ -3345,6 +3345,7 @@ export const translations = {
   language: {
     it: "Italian",
     es: "Spanish",
+    sk: "Slovak",
     en: "English",
     de: "German",
     pl: "Polish",
