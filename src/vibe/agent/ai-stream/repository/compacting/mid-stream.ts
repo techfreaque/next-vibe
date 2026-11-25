@@ -10,16 +10,17 @@
 
 import "server-only";
 
-import type { ModelMessage, streamText } from "ai";
+import { APICallError, type ModelMessage, type streamText } from "ai";
 import { ErrorResponseTypes, fail } from "next-vibe/core/route/response.schema";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { v4 as uuidv4 } from "uuid";
 
-import type { ChatModelId } from "../../models";
+import { type ChatModelId, getChatModelById } from "../../models";
 import type { AiStreamT } from "../../stream/i18n";
 import { AbortReason, StreamAbortError } from "../core/constants";
 import type { ToolExecutionContextImpl } from "../core/stream";
+import { providerErrorTranslationKey } from "../errors/provider-error-key";
 import { buildCompactingInstructions, runCompactingLLM } from "./core";
 import {
   buildMidStreamCompactedMessages,
@@ -293,7 +294,29 @@ export class MidStreamCompactingHandler {
         return null;
       }
 
-      logger.error("[MidStreamCompacting] Compacting failed", errorObj);
+      const modelConfig = getChatModelById(model);
+      const upstreamError = APICallError.isInstance(errorObj) ? errorObj : null;
+      logger.error("[MidStreamCompacting] Compacting failed", errorObj, {
+        model,
+        apiProvider: modelConfig.apiProvider,
+        providerModel: modelConfig.providerModel,
+        streamFailureEvidence: {
+          threadId,
+          compactingMessageId,
+          systemMessageCount: systemMessages.length,
+          headCount: head.length,
+          middleTurnsCount: middleTurns.length,
+          recentTurnsCount: recentTurns.length,
+          upstreamStatus: upstreamError?.statusCode,
+          upstreamRetryable: upstreamError?.isRetryable,
+          upstreamResponseBytes: upstreamError?.responseBody?.length,
+          upstreamReason:
+            providerErrorTranslationKey(upstreamError?.responseBody ?? null) ??
+            providerErrorTranslationKey(errorObj.message),
+          upstreamCauseName:
+            errorObj.cause instanceof Error ? errorObj.cause.name : null,
+        },
+      });
       await MidStreamCompactingHandler.handleFailure({
         compactingMessageId,
         errorMessage: errorObj.message,

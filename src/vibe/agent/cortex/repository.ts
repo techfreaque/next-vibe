@@ -186,44 +186,48 @@ export function normalizePath(raw: string): string {
 }
 
 /**
- * Validate a path is safe and well-formed
+ * Identify the first invalid path condition without including the path in logs.
  */
-export function isValidPath(path: string): boolean {
+export function getPathValidationError(path: string): string | null {
   if (path.length > MAX_PATH_LENGTH) {
-    return false;
+    return "path-too-long";
   }
   if (!path.startsWith("/")) {
-    return false;
+    return "missing-leading-slash";
   }
   if (path.includes("..")) {
-    return false;
+    return "double-dot";
   }
   if (path.includes("//")) {
-    return false;
+    return "repeated-slash";
   }
 
   const segments = path.split("/").filter(Boolean);
   if (segments.length > MAX_DEPTH) {
-    return false;
+    return "path-too-deep";
   }
 
   // No empty or whitespace-only segments
   for (const seg of segments) {
     if (seg.trim().length === 0) {
-      return false;
+      return "blank-segment";
     }
     // No control characters - intentional use of control char regex
     // eslint-disable-next-line no-control-regex
     if (/[\u0000-\u001F\u007F]/.test(seg)) {
-      return false;
+      return "control-character";
     }
     // No SQL LIKE wildcards in path segments
     if (/[%_]/.test(seg)) {
-      return false;
+      return "sql-like-wildcard";
     }
   }
 
-  return true;
+  return null;
+}
+
+export function isValidPath(path: string): boolean {
+  return getPathValidationError(path) === null;
 }
 
 /**

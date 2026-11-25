@@ -23,7 +23,7 @@ import { CortexNodeType } from "../enum";
 import {
   basename,
   DOCUMENTS_PREFIX,
-  isValidPath,
+  getPathValidationError,
   MEMORIES_PREFIX,
   normalizePath,
   normalizeToCanonicalPath,
@@ -53,7 +53,9 @@ export class CortexTreeRepository {
   > {
     const path = normalizeToCanonicalPath(normalizePath(rawPath), locale);
 
-    if (!isValidPath(path)) {
+    const pathError = getPathValidationError(path);
+    if (pathError !== null) {
+      logger.warn("[Cortex Tree] Rejected invalid path", { pathError });
       return fail({
         message: t("get.errors.validation.title"),
         errorType: ErrorResponseTypes.VALIDATION_ERROR,
