@@ -171,6 +171,35 @@ function publicBaseUrl(): string {
   return t("websiteUrl");
 }
 
+/** One sitemap `<loc>` with its `<lastmod>` (YYYY-MM-DD or null). */
+export interface SitemapUrl {
+  url: string;
+  lastmod: string | null;
+}
+
+/**
+ * Every absolute `<loc>` the sitemap lists, in the same order. IndexNow
+ * submits exactly this set, so a page is pinged iff crawlers can find it.
+ */
+export function listSitemapUrls(
+  availability: AgentEnvAvailability,
+  skillPages: readonly SitemapSkillPage[] = [],
+  baseUrl: string = publicBaseUrl(),
+): SitemapUrl[] {
+  const base = baseUrl.replace(/\/+$/, "");
+  const locales = sitemapLocales();
+  const urls: SitemapUrl[] = [];
+  for (const entry of collectSitemapEntries(availability, skillPages)) {
+    for (const locale of locales) {
+      urls.push({
+        url: `${base}/${locale}${entry.path}`,
+        lastmod: entry.lastmod,
+      });
+    }
+  }
+  return urls;
+}
+
 export function buildSitemapXml(
   availability: AgentEnvAvailability,
   skillPages: readonly SitemapSkillPage[] = [],

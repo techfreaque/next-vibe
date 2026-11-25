@@ -167,6 +167,7 @@ import { Route as ApiLocalePurchasingDashboardRouteImport } from './routes/api.$
 import { Route as ApiLocaleReferralLinksRouteImport } from './routes/api.$locale.referral.links'
 import { Route as ApiLocaleReferralPayoutRouteImport } from './routes/api.$locale.referral.payout'
 import { Route as ApiLocaleReferralStatsRouteImport } from './routes/api.$locale.referral.stats'
+import { Route as ApiLocaleSeoIndexnowRouteImport } from './routes/api.$locale.seo.indexnow'
 import { Route as ApiLocaleSubscriptionCancelRouteImport } from './routes/api.$locale.subscription.cancel'
 import { Route as ApiLocaleSubscriptionCreateRouteImport } from './routes/api.$locale.subscription.create'
 import { Route as ApiLocaleSubscriptionDashboardRouteImport } from './routes/api.$locale.subscription.dashboard'
@@ -1636,6 +1637,11 @@ const ApiLocaleReferralStatsRoute = ApiLocaleReferralStatsRouteImport.update({
   id: '/stats',
   path: '/stats',
   getParentRoute: () => ApiLocaleReferralRoute,
+} as any)
+const ApiLocaleSeoIndexnowRoute = ApiLocaleSeoIndexnowRouteImport.update({
+  id: '/api/$locale/seo/indexnow',
+  path: '/api/$locale/seo/indexnow',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ApiLocaleSubscriptionCancelRoute =
   ApiLocaleSubscriptionCancelRouteImport.update({
@@ -5399,6 +5405,7 @@ export interface FileRoutesByFullPath {
   '/api/$locale/referral/links': typeof ApiLocaleReferralLinksRoute
   '/api/$locale/referral/payout': typeof ApiLocaleReferralPayoutRoute
   '/api/$locale/referral/stats': typeof ApiLocaleReferralStatsRoute
+  '/api/$locale/seo/indexnow': typeof ApiLocaleSeoIndexnowRoute
   '/api/$locale/subscription/cancel': typeof ApiLocaleSubscriptionCancelRoute
   '/api/$locale/subscription/create': typeof ApiLocaleSubscriptionCreateRoute
   '/api/$locale/subscription/dashboard': typeof ApiLocaleSubscriptionDashboardRoute
@@ -6157,6 +6164,7 @@ export interface FileRoutesByTo {
   '/api/$locale/referral/links': typeof ApiLocaleReferralLinksRoute
   '/api/$locale/referral/payout': typeof ApiLocaleReferralPayoutRoute
   '/api/$locale/referral/stats': typeof ApiLocaleReferralStatsRoute
+  '/api/$locale/seo/indexnow': typeof ApiLocaleSeoIndexnowRoute
   '/api/$locale/subscription/cancel': typeof ApiLocaleSubscriptionCancelRoute
   '/api/$locale/subscription/create': typeof ApiLocaleSubscriptionCreateRoute
   '/api/$locale/subscription/dashboard': typeof ApiLocaleSubscriptionDashboardRoute
@@ -6924,6 +6932,7 @@ export interface FileRoutesById {
   '/api/$locale/referral/links': typeof ApiLocaleReferralLinksRoute
   '/api/$locale/referral/payout': typeof ApiLocaleReferralPayoutRoute
   '/api/$locale/referral/stats': typeof ApiLocaleReferralStatsRoute
+  '/api/$locale/seo/indexnow': typeof ApiLocaleSeoIndexnowRoute
   '/api/$locale/subscription/cancel': typeof ApiLocaleSubscriptionCancelRoute
   '/api/$locale/subscription/create': typeof ApiLocaleSubscriptionCreateRoute
   '/api/$locale/subscription/dashboard': typeof ApiLocaleSubscriptionDashboardRoute
@@ -7691,6 +7700,7 @@ export interface FileRouteTypes {
     | '/api/$locale/referral/links'
     | '/api/$locale/referral/payout'
     | '/api/$locale/referral/stats'
+    | '/api/$locale/seo/indexnow'
     | '/api/$locale/subscription/cancel'
     | '/api/$locale/subscription/create'
     | '/api/$locale/subscription/dashboard'
@@ -8449,6 +8459,7 @@ export interface FileRouteTypes {
     | '/api/$locale/referral/links'
     | '/api/$locale/referral/payout'
     | '/api/$locale/referral/stats'
+    | '/api/$locale/seo/indexnow'
     | '/api/$locale/subscription/cancel'
     | '/api/$locale/subscription/create'
     | '/api/$locale/subscription/dashboard'
@@ -9215,6 +9226,7 @@ export interface FileRouteTypes {
     | '/api/$locale/referral/links'
     | '/api/$locale/referral/payout'
     | '/api/$locale/referral/stats'
+    | '/api/$locale/seo/indexnow'
     | '/api/$locale/subscription/cancel'
     | '/api/$locale/subscription/create'
     | '/api/$locale/subscription/dashboard'
@@ -9958,6 +9970,7 @@ export interface RootRouteChildren {
   ApiLocalePosDashboardRoute: typeof ApiLocalePosDashboardRoute
   ApiLocalePosProductLookupRoute: typeof ApiLocalePosProductLookupRoute
   ApiLocalePurchasingDashboardRoute: typeof ApiLocalePurchasingDashboardRoute
+  ApiLocaleSeoIndexnowRoute: typeof ApiLocaleSeoIndexnowRoute
   ApiLocaleTaxReportRoute: typeof ApiLocaleTaxReportRoute
   ApiLocaleUserSessionCleanupRoute: typeof ApiLocaleUserSessionCleanupRoute
   ApiLocaleUserSignupReminderRoute: typeof ApiLocaleUserSignupReminderRoute
@@ -11421,6 +11434,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/api/$locale/referral/stats'
       preLoaderRoute: typeof ApiLocaleReferralStatsRouteImport
       parentRoute: typeof ApiLocaleReferralRoute
+    }
+    '/api/$locale/seo/indexnow': {
+      id: '/api/$locale/seo/indexnow'
+      path: '/api/$locale/seo/indexnow'
+      fullPath: '/api/$locale/seo/indexnow'
+      preLoaderRoute: typeof ApiLocaleSeoIndexnowRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/api/$locale/subscription/cancel': {
       id: '/api/$locale/subscription/cancel'
@@ -17211,6 +17231,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiLocalePosDashboardRoute: ApiLocalePosDashboardRoute,
   ApiLocalePosProductLookupRoute: ApiLocalePosProductLookupRoute,
   ApiLocalePurchasingDashboardRoute: ApiLocalePurchasingDashboardRoute,
+  ApiLocaleSeoIndexnowRoute: ApiLocaleSeoIndexnowRoute,
   ApiLocaleTaxReportRoute: ApiLocaleTaxReportRoute,
   ApiLocaleUserSessionCleanupRoute: ApiLocaleUserSessionCleanupRoute,
   ApiLocaleUserSignupReminderRoute: ApiLocaleUserSignupReminderRoute,
