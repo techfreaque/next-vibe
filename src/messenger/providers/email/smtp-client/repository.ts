@@ -44,6 +44,7 @@ import { buildListUnsubscribeHeaders } from "../list-unsubscribe";
 import { SMTP_ERROR_MESSAGES } from "./constants";
 import type { SmtpClientT } from "./i18n";
 import { prepareSmtpEmailLogo } from "./inline-logo";
+import { resolvePlainText } from "./plain-text";
 
 export interface SmtpSelectionCriteria {
   campaignType: typeof CampaignTypeValue;
@@ -832,7 +833,7 @@ export class SmtpRepository {
         replyTo: params.replyTo,
         subject: params.subject,
         ...(await prepareSmtpEmailLogo(params.html)),
-        text: params.text,
+        text: resolvePlainText(params.html, params.text),
         headers,
       });
 

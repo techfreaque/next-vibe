@@ -47,11 +47,15 @@ ns2         IN A     179.198.214.41
 ; ---- s2 test node (kept from hosttech) ----
 s2          IN A     179.198.214.41
 
-; ---- mail: delegated to a42.ch (mailcow on Server 3), unchanged from hosttech ----
+; ---- mail: delegated to a42.ch (mailcow on Server 3) ----
 @               IN MX    10 mail.a42.ch.
 @               IN TXT   "v=spf1 mx a:mail.a42.ch ip4:213.167.224.8 ~all"
 @               IN TXT   "google-site-verification=NOKigdHHCK4FdcTtScYAO4dInFHrQSbIs49FhK_-VjcV"
-_dmarc          IN TXT   "v=DMARC1; p=quarantine; rua=mailto:dmarc@a42.ch"
+; DMARC aggregate reports go to dmarc@unbottled.ai (mailcow alias -> hi@unbottled.ai).
+; An external rua (dmarc@a42.ch) is ignored unless a42.ch publishes an
+; unbottled.ai._report._dmarc authorization record, so reports never arrived.
+_dmarc          IN TXT   "v=DMARC1; p=quarantine; rua=mailto:dmarc@unbottled.ai; adkim=r; aspf=r"
+_smtp._tls      IN TXT   "v=TLSRPTv1; rua=mailto:dmarc@unbottled.ai"
 dkim._domainkey IN TXT   "v=DKIM1;k=rsa;t=s;s=email;p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAy5Wp4ilOAMbYtzGV+qxfbxPbL6I/mDyg66BIH7jvt3rRAil6oYWRyKCke0aR7Lo4klBLe1nVTezuiVlehcH2aJ056MBUhp/HDNJhoS51gKelAMztLnyYyYpO/1jucNUAyRo7vkplGFBEnsrpMkkcufTp7jPqgkkE8P4TH15sDGLST55wz5" "hjkX5eXh6C07BVp5lyZuBelgdbK2Q/q8zoaC1XeZA9A2H4mp6Jg29bIF2ipgaUyRzgHVRZkVFnNZv83tdFQPAg1+Ft/Xs5H4QIdxAIzmrGvJjdxHqRMP9yWquJAETgm5YeitZtjNlY7qYUdFJ7RKpez3xax2KL+hmDHQIDAQAB"
 autodiscover    IN CNAME mail.a42.ch.
 autoconfig      IN CNAME mail.a42.ch.
