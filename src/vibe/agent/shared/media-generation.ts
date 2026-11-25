@@ -60,6 +60,22 @@ export async function resolveMediaReference(
   if (url.startsWith("data:")) {
     return BASE64_DATA_URI.test(url) ? url : null;
   }
+  // A Cortex upload path ("/uploads/images/<thread>/<file>.md", sometimes
+  // prefixed with our origin by the model) names a stored attachment, not a
+  // fetchable URL: swap in the attachment's real file URL. Only the caller's
+  // own uploads resolve; anything else falls through unchanged.
+  const uploadPath = cortexUploadPath(url);
+  if (uploadPath && !user.isPublic) {
+    const { resolveUploadAttachmentUrl } =
+      await import("../cortex/mounts/uploads");
+    const attachmentUrl = await resolveUploadAttachmentUrl(user.id, uploadPath);
+    if (attachmentUrl && attachmentUrl !== url) {
+      logger.info("[Media] Resolved Cortex upload path to its stored file", {
+        uploadPath,
+      });
+      return resolveMediaReference(attachmentUrl, user, logger, locale);
+    }
+  }
   const ref = parseStorageFileRef(url);
   if (ref) {
     const file = await ChatFileRepository.getFile(ref, user, logger, locale);
@@ -74,6 +90,24 @@ export async function resolveMediaReference(
     return `data:${mimeType};base64,${file.buffer.toString("base64")}`;
   }
   return url.startsWith("https://") || url.startsWith("http://") ? url : null;
+}
+
+/** "/uploads/..." path of a Cortex upload reference (bare or with an origin). */
+function cortexUploadPath(url: string): string | null {
+  if (url.startsWith("/uploads/")) {
+    return url;
+  }
+  if (!/^https?:\/\//.test(url)) {
+    return null;
+  }
+  try {
+    const { pathname } = new URL(url);
+    return pathname.startsWith("/uploads/")
+      ? decodeURIComponent(pathname)
+      : null;
+  } catch {
+    return null;
+  }
 }
 
 /** Split a base64 data URI into mime type + payload (null for anything else). */

@@ -208,11 +208,22 @@ export class IndexNowRepository {
       await writeSubmitted(submitted);
 
       if (failure) {
+        // The key file passed the preflight above, so a 403
+        // "SiteVerificationNotCompleted" means the engine has not finished
+        // verifying the (newly reachable) key yet, not that the key is wrong
+        // (prod 2026-11-25 10:02, right after the key file stopped 307ing).
+        const rejectionCode =
+          /"errorCode"\s*:\s*"([A-Za-z]{1,64})"/.exec(failure.body)?.[1] ??
+          null;
         logger.error("IndexNow: submission rejected", {
           ...base,
           submittedUrls,
           httpStatus: failure.status,
           response: failure.body,
+          rejectionCode,
+          keyReachable: true,
+          keyUrl: indexNowKeyUrl(baseUrl),
+          verificationPending: rejectionCode === "SiteVerificationNotCompleted",
         });
         return fail({
           message:

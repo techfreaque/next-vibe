@@ -96,6 +96,10 @@ import {
 } from "./text-parts";
 import { TokenAccumulator } from "./token-accumulator";
 import {
+  answerMissingToolResults,
+  findUnansweredToolCalls,
+} from "./tool-pairing";
+import {
   onToolCall,
   onToolError,
   onToolResult,
@@ -419,7 +423,11 @@ export class StreamLoop implements StreamLoopState {
               toolChoice?: "none";
               maxOutputTokens?: number;
             }> => {
-              const prepared = await this.prepareStep(stepMessages, stepNumber);
+              const prepared = this.answerUnansweredToolCalls(
+                await this.prepareStep(stepMessages, stepNumber),
+                stepMessages,
+                stepNumber,
+              );
               ctx.stepPricingStartedAt = Date.now();
               const sent = prepared.messages ?? stepMessages;
               this.lastPromptStep = stepNumber;
@@ -981,6 +989,14 @@ export class StreamLoop implements StreamLoopState {
       const errorMeta = {
         error: errorText,
         promptToolHistory: summarizePromptToolHistory(this.lastPromptMessages),
+        // Which call lacked a result (ids/names only, never tool input).
+        unansweredToolCalls: findUnansweredToolCalls(this.lastPromptMessages)
+          .slice(0, 5)
+          .map(({ toolCallId, toolName, closedBy }) => ({
+            toolCallId,
+            toolName,
+            closedBy,
+          })),
         promptStep: this.lastPromptStep,
         providerStepEvidence: {
           sawVisibleText: this.p.ctx.stepHasAnswerText,
@@ -1341,6 +1357,52 @@ export class StreamLoop implements StreamLoopState {
   // ─── prepareStep pipeline ───────────────────────────────────────────────────
   // (mid-stream compacting → wakeUp injection → queued-message injection →
   //  cortex refresh — see loop/steps.ts)
+
+  /**
+   * Last line of defence before the SDK builds the step request: a tool call
+   * without a result makes it throw AI_MissingToolResultsError and the whole
+   * turn dies. Name the call (and whether the SDK's own step messages already
+   * lacked it or our pipeline - compacting / injection - dropped it), then
+   * answer it with an error result so the model can re-run it if needed.
+   */
+  private answerUnansweredToolCalls<T extends { messages?: ModelMessage[] }>(
+    prepared: T,
+    stepMessages: ModelMessage[],
+    stepNumber: number,
+  ): T {
+    const candidate = prepared.messages ?? stepMessages;
+    const unanswered = findUnansweredToolCalls(candidate);
+    if (unanswered.length === 0) {
+      return prepared;
+    }
+    const inSdkStepMessages = new Set(
+      findUnansweredToolCalls(stepMessages).map((call) => call.toolCallId),
+    );
+    this.p.logger.error(
+      "[prepareStep] Tool call without a result in the step prompt - answered with an error result",
+      {
+        stepNumber,
+        threadId: this.p.threadId,
+        model: this.p.model,
+        pipelineRewrotePrompt: prepared.messages !== undefined,
+        unansweredCount: unanswered.length,
+        unansweredToolCalls: unanswered.slice(0, 5).map((call) => ({
+          toolCallId: call.toolCallId,
+          toolName: call.toolName,
+          closedBy: call.closedBy,
+          messageIndex: call.messageIndex,
+          cause: inSdkStepMessages.has(call.toolCallId)
+            ? "missing-in-sdk-step-messages"
+            : "dropped-by-prepare-step-pipeline",
+        })),
+        promptToolHistory: summarizePromptToolHistory(candidate),
+      },
+    );
+    return {
+      ...prepared,
+      messages: answerMissingToolResults(candidate, unanswered),
+    };
+  }
 
   private async prepareStep(
     stepMessages: ModelMessage[],

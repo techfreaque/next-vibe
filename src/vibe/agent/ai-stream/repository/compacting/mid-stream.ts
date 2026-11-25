@@ -21,9 +21,12 @@ import type { AiStreamT } from "../../stream/i18n";
 import { AbortReason, StreamAbortError } from "../core/constants";
 import type { ToolExecutionContextImpl } from "../core/stream";
 import { buildCompactingInstructions, runCompactingLLM } from "./core";
-
-/** How many recent non-system messages to preserve verbatim (not summarized). */
-const RECENT_TURNS_TO_KEEP = 8;
+import {
+  buildMidStreamCompactedMessages,
+  partitionForMidStreamCompacting,
+  RECENT_TURNS_TO_KEEP,
+  unansweredAfterCompacting,
+} from "./mid-stream-partition";
 
 export class MidStreamCompactingHandler {
   /**
@@ -73,53 +76,10 @@ export class MidStreamCompactingHandler {
       t,
     } = params;
 
-    // Partition messages
-    const systemMessages = stepMessages.filter((m) => m.role === "system");
-    const nonSystemMessages = stepMessages.filter((m) => m.role !== "system");
-
-    // Always preserve the first non-system message (the original user task prompt) verbatim.
-    // It must never be summarized away — the AI needs the task instruction even after compacting.
-    const firstUserMessage = nonSystemMessages[0];
-    const afterFirst = nonSystemMessages.slice(1);
-
-    // Take the last RECENT_TURNS_TO_KEEP messages from afterFirst as the "recent" tail.
-    // IMPORTANT: The split point must land on a clean boundary:
-    // 1. Never start `recentTurns` on a `tool` result — it needs its preceding `assistant`
-    //    tool-call message, otherwise AI SDK throws AI_MissingToolResultsError.
-    // 2. Never END `middleTurns` on an `assistant` with tool-call parts — it needs the
-    //    following `tool` result messages to be valid, otherwise AI SDK throws
-    //    AI_InvalidPromptError ("messages do not match ModelMessage[] schema").
-    //
-    // Walk backward until we land on a safe cut point: a `user` message, or an `assistant`
-    // message whose content has no tool-call parts.
-    let cutIndex = Math.max(0, afterFirst.length - RECENT_TURNS_TO_KEEP);
-    // Step 1: skip over `tool` result messages at the cut point
-    while (cutIndex > 0 && afterFirst[cutIndex]?.role === "tool") {
-      cutIndex--;
-    }
-    // Step 2: if we landed on an `assistant` that issued tool calls, skip it too —
-    // its tool result siblings are in recentTurns and we'd produce an incomplete pair.
-    while (cutIndex > 0) {
-      const msg = afterFirst[cutIndex - 1];
-      if (
-        msg?.role === "assistant" &&
-        Array.isArray(msg.content) &&
-        msg.content.some(
-          (part) => (part as { type?: string }).type === "tool-call",
-        )
-      ) {
-        cutIndex--;
-        // Skip over the tool results that follow this assistant message
-        while (cutIndex > 0 && afterFirst[cutIndex]?.role === "tool") {
-          cutIndex--;
-        }
-      } else {
-        break;
-      }
-    }
-
-    const recentTurns = afterFirst.slice(cutIndex);
-    const middleTurns = afterFirst.slice(0, cutIndex);
+    // Partition: system / head (task prompt + its tool results) / middle
+    // (summarized) / recent (verbatim) - see mid-stream-partition.ts.
+    const partition = partitionForMidStreamCompacting(stepMessages);
+    const { systemMessages, head, middleTurns, recentTurns } = partition;
 
     // Nothing to compact — token pressure comes from system messages or a single huge
     // recent turn, neither of which we can safely summarize. Continue without compacting.
@@ -127,7 +87,8 @@ export class MidStreamCompactingHandler {
       logger.debug(
         "[MidStreamCompacting] No middle turns to compact - skipping",
         {
-          nonSystemMessageCount: nonSystemMessages.length,
+          headCount: head.length,
+          recentTurnsCount: recentTurns.length,
           recentTurnsToKeep: RECENT_TURNS_TO_KEEP,
         },
       );
@@ -141,15 +102,34 @@ export class MidStreamCompactingHandler {
     if (
       lastMiddle?.role === "assistant" &&
       Array.isArray(lastMiddle.content) &&
-      lastMiddle.content.some(
-        (part) => (part as { type?: string }).type === "tool-call",
-      )
+      lastMiddle.content.some((part) => part.type === "tool-call")
     ) {
       logger.warn(
         "[MidStreamCompacting] Skipping — middleTurns ends on assistant with open tool calls",
         {
           middleTurnsCount: middleTurns.length,
           recentTurnsCount: recentTurns.length,
+        },
+      );
+      return null;
+    }
+
+    // Never hand the SDK a compacted prompt with a tool call missing its
+    // result (AI_MissingToolResultsError kills the turn): skip instead.
+    const unanswered = unansweredAfterCompacting(partition);
+    if (unanswered.length > 0) {
+      logger.error(
+        "[MidStreamCompacting] Skipping - compacted prompt would leave tool calls without a result",
+        {
+          threadId,
+          headCount: head.length,
+          middleTurnsCount: middleTurns.length,
+          recentTurnsCount: recentTurns.length,
+          unansweredToolCalls: unanswered.slice(0, 5).map((call) => ({
+            toolCallId: call.toolCallId,
+            toolName: call.toolName,
+            closedBy: call.closedBy,
+          })),
         },
       );
       return null;
@@ -210,7 +190,7 @@ export class MidStreamCompactingHandler {
     // assistant tool call and the summary claimed "no user request was made".
     const compactingMessages: ModelMessage[] = [
       ...systemMessages,
-      ...(firstUserMessage ? [firstUserMessage] : []),
+      ...head,
       ...middleTurns,
       {
         role: "user" as const,
@@ -363,15 +343,10 @@ export class MidStreamCompactingHandler {
     // Build the compacted message array for the SDK.
     // Structure: system messages → original user task (always preserved) →
     //            summary of middle turns → recent turns verbatim.
-    const compacted: ModelMessage[] = [
-      ...systemMessages,
-      ...(firstUserMessage ? [firstUserMessage] : []),
-      {
-        role: "system" as const,
-        content: `Previous conversation summary:\n\n${compactedSummary}`,
-      },
-      ...recentTurns,
-    ];
+    const compacted = buildMidStreamCompactedMessages(
+      partition,
+      compactedSummary,
+    );
 
     logger.debug("[MidStreamCompacting] Compacting complete", {
       compactingMessageId,

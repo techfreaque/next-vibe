@@ -179,6 +179,33 @@ export async function readUploadPath(
   userId: string,
   path: string,
 ): Promise<VirtualReadResult | null> {
+  const attachment = await findUploadAttachment(userId, path);
+  if (!attachment) {
+    return null;
+  }
+  return renderUploadAttachment(attachment);
+}
+
+/**
+ * The stored file URL behind a Cortex upload path, for tools that receive the
+ * virtual path instead of the file. Models pass "/uploads/images/<thread>/
+ * <file>.md" (or prefix it with the site origin) as an input image URL; prod
+ * 2026-11-25: image-to-image and describe-image failed with "Error while
+ * downloading https://unbottled.ai/uploads/images/...-png.md" (a 404 page).
+ * null = not an upload path, or no such file for this user.
+ */
+export async function resolveUploadAttachmentUrl(
+  userId: string,
+  path: string,
+): Promise<string | null> {
+  const attachment = await findUploadAttachment(userId, path);
+  return attachment?.url || null;
+}
+
+async function findUploadAttachment(
+  userId: string,
+  path: string,
+): Promise<AttachmentRow | null> {
   const segments = path.split("/").filter(Boolean);
   // uploads / type / threadSlug / filename.md
   if (segments.length < 4) {
@@ -219,10 +246,12 @@ export async function readUploadPath(
       slugify(a.filename) === targetFilename || a.filename === targetFilename,
   );
 
-  if (!attachment) {
-    return null;
-  }
+  return attachment ?? null;
+}
 
+async function renderUploadAttachment(
+  attachment: AttachmentRow,
+): Promise<VirtualReadResult> {
   const { formatBytes } = await import("../_shared/format-bytes");
 
   const frontmatterLines = [

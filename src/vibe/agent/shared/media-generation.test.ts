@@ -69,3 +69,49 @@ describe("resolveMediaReference (no storage access)", () => {
     ).toBeNull();
   });
 });
+
+describe("resolveMediaReference (Cortex upload paths)", () => {
+  it("swaps a Cortex upload path, bare or with our origin, for the stored file", async () => {
+    const { mock } = await import("bun:test");
+    const calls: string[] = [];
+    void mock.module("../cortex/mounts/uploads", () => ({
+      resolveUploadAttachmentUrl: (_userId: string, path: string): string | null => {
+        calls.push(path);
+        return path.endsWith("-png.md") ? "https://cdn.example.com/stored.png" : null;
+      },
+    }));
+    const { resolveMediaReference } = await import("./media-generation");
+    const { createEndpointLogger } = await import("next-vibe/logger/server");
+    const logger = createEndpointLogger(false, "en-GLOBAL");
+    const user = {
+      isPublic: false as const,
+      id: "22222222-2222-4222-8222-222222222222",
+      leadId: "11111111-1111-4111-8111-111111111111",
+      roles: [UserPermissionRole.CUSTOMER],
+    };
+    // Prod 2026-11-25: image-to-image got this exact shape and 404ed.
+    const prodShape =
+      "https://unbottled.ai/uploads/images/zdj-cie-08291f9b-2020-4314-bf35-449c4213eaa1/remote-db0c7f6a-b04a-48ec-b7e0-82d04c5f5528-1-png.md";
+    expect(await resolveMediaReference(prodShape, user, logger, "en-GLOBAL")).toBe(
+      "https://cdn.example.com/stored.png",
+    );
+    expect(
+      await resolveMediaReference(
+        "/uploads/images/t-08291f9b-2020-4314-bf35-449c4213eaa1/a-png.md",
+        user,
+        logger,
+        "en-GLOBAL",
+      ),
+    ).toBe("https://cdn.example.com/stored.png");
+    // Unknown upload: the original URL is kept (provider reports the failure).
+    expect(
+      await resolveMediaReference(
+        "https://cdn.example.com/uploads/other.png",
+        user,
+        logger,
+        "en-GLOBAL",
+      ),
+    ).toBe("https://cdn.example.com/uploads/other.png");
+    expect(calls).toHaveLength(3);
+  });
+});
