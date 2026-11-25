@@ -21,6 +21,7 @@ import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-ba
 import { definitionLoader } from "next-vibe/core/definition/loader";
 import { DefaultFolderId } from "next-vibe/core/execution-context";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { ErrorResponseTypes } from "next-vibe/core/route/response.schema";
 import type { WidgetData } from "next-vibe/core/utils/json";
 import { AWAIT_TASK_ALIAS } from "next-vibe/execute-tool/await-task/constants";
 import { endpoints as cancelCallEndpoints } from "next-vibe/execute-tool/call-control/cancel/definition";
@@ -47,6 +48,7 @@ import { ChevronRight } from "next-vibe/ui/components/icons/ChevronRight";
 import { Copy } from "next-vibe/ui/components/icons/Copy";
 import { Loader2 } from "next-vibe/ui/components/icons/Loader2";
 import { X } from "next-vibe/ui/components/icons/X";
+import { Pre } from "next-vibe/ui/components/pre";
 import { Span } from "next-vibe/ui/components/span";
 import { copyToClipboard } from "next-vibe/ui/lib/clipboard";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
@@ -767,32 +769,17 @@ export function ToolCallRenderer({
   const handleCopyJson = (e: DivMouseEvent): void => {
     e.stopPropagation();
 
-    // Build request: merge args with top-level metadata fields not already present in args
-    const argsObj =
-      toolCall.args &&
-      typeof toolCall.args === "object" &&
-      !Array.isArray(toolCall.args)
-        ? (toolCall.args as Record<string, ToolCall["args"]>)
-        : undefined;
-    const metaOverrides: Record<string, string> = {};
-    if (toolCall.callbackMode && (!argsObj || !("callbackMode" in argsObj))) {
-      metaOverrides["callbackMode"] = toolCall.callbackMode;
-    }
-    if (toolCall.remoteTaskId && (!argsObj || !("remoteTaskId" in argsObj))) {
-      metaOverrides["remoteTaskId"] = toolCall.remoteTaskId;
-    }
-
     const payload: {
       toolName: string;
       request?: ToolCall["args"];
       response?: ToolCall["result"];
       error?: ToolCall["error"];
-    } = { toolName: toolCall.toolName };
-    if (toolCall.args || Object.keys(metaOverrides).length > 0) {
-      payload.request = argsObj
-        ? { ...argsObj, ...metaOverrides }
-        : metaOverrides;
-    }
+      remoteTaskId?: string;
+    } = {
+      toolName: toolCall.toolName,
+      request: toolCall.rawArgs ?? toolCall.args,
+      ...(toolCall.remoteTaskId && { remoteTaskId: toolCall.remoteTaskId }),
+    };
     if (toolCall.result) {
       if (typeof toolCall.result === "string") {
         try {
@@ -1320,6 +1307,12 @@ export function ToolCallRenderer({
         {/* Content */}
         <CollapsibleContent>
           <Div className="border-t border-border/50 bg-card">
+            {toolCall.error?.errorType.errorKey ===
+              ErrorResponseTypes.VALIDATION_ERROR.errorKey && (
+              <Pre className="max-h-72 overflow-auto whitespace-pre-wrap break-words px-4 py-2 text-xs">
+                {JSON.stringify(toolCall.rawArgs ?? toolCall.args, null, 2)}
+              </Pre>
+            )}
             {/* Deferred result notice */}
             {isDeferred && (
               <Div className="flex items-center gap-2 px-3 py-2 text-xs text-purple-500 bg-purple-500/5 border-b border-purple-500/10">

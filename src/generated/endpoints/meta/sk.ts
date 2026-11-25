@@ -23639,15 +23639,19 @@ export const endpointsMeta: EndpointMeta[] = [
       inputs: {
         default: {
           threadId: "550e8400-e29b-41d4-a716-446655440000",
-          title: "My Renamed Thread",
-          description: "A short description of this conversation",
+          title: "Weekend plans",
+          description: "Comparing train routes for a weekend trip.",
+        },
+        activeThread: {
+          title: "Weekend plans",
+          description: "Comparing train routes for a weekend trip.",
         },
       },
       responses: {
         default: {
           updatedThreadId: "550e8400-e29b-41d4-a716-446655440000",
-          updatedTitle: "My Renamed Thread",
-          updatedPreview: "A short description of this conversation",
+          updatedTitle: "Weekend plans",
+          updatedPreview: "Comparing train routes for a weekend trip.",
           updatedAt: "2024-01-15T10:00:00.000Z",
         },
       },
@@ -27747,6 +27751,14 @@ export const endpointsMeta: EndpointMeta[] = [
     examples: {
       inputs: {
         default: { toolName: "vibe_agent_skills_GET", input: {} },
+        renameAfterAnswer: {
+          toolName: "rename-thread",
+          input: {
+            title: "Weekend plans",
+            description: "Comparing train routes for a weekend trip.",
+          },
+          callbackMode: "endLoop",
+        },
         remoteBackground: {
           toolName: "bash",
           input: { command: "echo hello" },

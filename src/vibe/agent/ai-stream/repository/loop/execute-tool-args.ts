@@ -5,8 +5,8 @@
  *  1. The real call nested one level too deep:
  *       { callbackMode: "wait", input: { toolName: "cortex-write", input: {...} } }
  *     → { callbackMode: "wait", toolName: "cortex-write", input: {...} }
- *  2. An invented callbackMode ("omit", "none", ...) → dropped, so the default
- *     (wait) applies instead of rejecting the whole call.
+ *  2. A recognized callbackMode in the wrong case is canonicalized. Other
+ *     values survive for validation.
  *  3. `input` sent as a JSON-encoded string instead of an object
  *     (kimi-k3 / glm-5.3, prod 2026-11-17) → parsed, when it is valid JSON.
  *
@@ -15,7 +15,10 @@
  */
 
 import type { WidgetData } from "next-vibe/core/utils/json";
-import { CallbackModeDB } from "next-vibe/execute-tool/constants";
+import {
+  CallbackModeDB,
+  EXECUTE_TOOL_ALIAS,
+} from "next-vibe/execute-tool/constants";
 
 interface ArgsRecord {
   [key: string]: WidgetData;
@@ -137,8 +140,10 @@ export function normalizeExecuteToolArgs(args: ArgsRecord): ArgsRecord {
   }
 
   const nested = out["input"];
+  const redundantWrapper =
+    out["toolName"] === EXECUTE_TOOL_ALIAS && !out["instanceId"];
   if (
-    typeof out["toolName"] !== "string" &&
+    (typeof out["toolName"] !== "string" || redundantWrapper) &&
     nested !== undefined &&
     isRecord(nested) &&
     typeof nested["toolName"] === "string"
@@ -156,15 +161,30 @@ export function normalizeExecuteToolArgs(args: ArgsRecord): ArgsRecord {
       typeof rawInner === "string"
         ? (parseRecordString(rawInner) ?? rawInner)
         : rawInner;
+    // A repair must account for every field. Ambiguous envelopes need a retry.
+    if (
+      (rawInner !== undefined && Object.keys(fields).length > 0) ||
+      (!redundantWrapper &&
+        Object.hasOwn(out, "toolName") &&
+        out["toolName"] !== toolName) ||
+      (out["instanceId"] !== undefined &&
+        instanceId !== undefined &&
+        out["instanceId"] !== instanceId) ||
+      (out["callbackMode"] !== undefined &&
+        callbackMode !== undefined &&
+        out["callbackMode"] !== callbackMode)
+    ) {
+      return out;
+    }
     out = {
       ...without(out, "input"),
       toolName,
       input: innerInput === undefined ? fields : innerInput,
     };
-    if (out["callbackMode"] === undefined && callbackMode) {
+    if (out["callbackMode"] === undefined && callbackMode !== undefined) {
       out["callbackMode"] = callbackMode;
     }
-    if (out["instanceId"] === undefined && instanceId) {
+    if (out["instanceId"] === undefined && instanceId !== undefined) {
       out["instanceId"] = instanceId;
     }
   }
@@ -176,14 +196,41 @@ export function normalizeExecuteToolArgs(args: ArgsRecord): ArgsRecord {
     const caseFixed =
       typeof mode === "string"
         ? CallbackModeDB.find(
-            (known) => known.toLowerCase() === mode.trim().toLowerCase(),
+            (known) =>
+              known.toLowerCase() ===
+              mode
+                .trim()
+                .toLowerCase()
+                .replace(/^end_loop$/, "endloop")
+                .replace(/^wake_up$/, "wakeup"),
           )
         : undefined;
-    out =
-      caseFixed !== undefined
-        ? { ...out, callbackMode: caseFixed }
-        : without(out, "callbackMode");
+    out = caseFixed !== undefined ? { ...out, callbackMode: caseFixed } : out;
   }
 
   return out;
+}
+
+/** Loop control reads the same envelope used for dispatch, not the display defaults. */
+export function modelDispatchControls(
+  toolName: string,
+  args: WidgetData,
+): {
+  callbackMode?: (typeof CallbackModeDB)[number];
+  wrappedToolName?: string;
+} {
+  if (!isRecord(args)) {
+    return {};
+  }
+  const dispatch =
+    toolName === EXECUTE_TOOL_ALIAS ? normalizeExecuteToolArgs(args) : args;
+  return {
+    callbackMode: CallbackModeDB.find(
+      (mode) => mode === dispatch["callbackMode"],
+    ),
+    wrappedToolName:
+      typeof dispatch["toolName"] === "string"
+        ? dispatch["toolName"]
+        : undefined,
+  };
 }

@@ -32,13 +32,17 @@ import type {
 } from "ai";
 import {
   APICallError,
+  InvalidToolInputError,
   stepCountIs,
   type StopCondition,
   streamText as aiStreamText,
 } from "ai";
+import { errorResponseSchema } from "next-vibe/core/route/error-response.schema";
+import { ErrorResponseTypes } from "next-vibe/core/route/response.schema";
 import type { WidgetData } from "next-vibe/core/utils/json";
 import { WidgetDataSchema } from "next-vibe/core/utils/json";
 import { CallbackMode } from "next-vibe/execute-tool/constants";
+import { z } from "zod";
 
 import { DEFAULT_TURN_STEP_LIMIT } from "../../../chat/settings/constants";
 import { ApiProvider, calculateCreditCost } from "../../../models/models";
@@ -63,6 +67,7 @@ import {
   type DrainableLoop,
   registerActiveLoop,
 } from "./active-loops";
+import { modelDispatchControls } from "./execute-tool-args";
 import {
   abortReasonAsError,
   complete,
@@ -456,13 +461,36 @@ export class StreamLoop implements StreamLoopState {
               // Read here (SDK-typed) so steps.ts stays free of the SDK's
               // untyped tool input: which calls of this step asked endLoop,
               // and were they all the silent rename?
-              const endLoopCalls = stepResult.toolCalls.filter(
-                (call) =>
-                  typeof call.input === "object" &&
-                  call.input !== null &&
-                  "callbackMode" in call.input &&
-                  call.input.callbackMode === CallbackMode.END_LOOP,
+              const rejected = new Set(
+                stepResult.toolResults
+                  .filter(
+                    (result) =>
+                      errorResponseSchema.safeParse(result.output).data
+                        ?.errorType.errorKey ===
+                      ErrorResponseTypes.VALIDATION_ERROR.errorKey,
+                  )
+                  .map((result) => result.toolCallId),
               );
+              const endLoopCalls = stepResult.toolCalls.flatMap((call) => {
+                if (
+                  rejected.has(call.toolCallId) ||
+                  InvalidToolInputError.isInstance(call.error)
+                ) {
+                  return [];
+                }
+                const controls = modelDispatchControls(
+                  call.toolName,
+                  WidgetDataSchema.safeParse(call.input).data,
+                );
+                return controls.callbackMode === CallbackMode.END_LOOP
+                  ? [
+                      isThreadRenameCall(
+                        call.toolName,
+                        controls.wrappedToolName,
+                      ),
+                    ]
+                  : [];
+              });
               // Explicit fields, never a spread: the SDK's step result is a
               // class whose usage/text/files are prototype getters.
               this.onStepFinish({
@@ -474,17 +502,7 @@ export class StreamLoop implements StreamLoopState {
                 requestedEndLoop: endLoopCalls.length > 0,
                 endLoopOnlyRename:
                   endLoopCalls.length > 0 &&
-                  endLoopCalls.every((call) =>
-                    isThreadRenameCall(
-                      call.toolName,
-                      typeof call.input === "object" &&
-                        call.input !== null &&
-                        "toolName" in call.input &&
-                        typeof call.input.toolName === "string"
-                        ? call.input.toolName
-                        : undefined,
-                    ),
-                  ),
+                  endLoopCalls.every((isRename) => isRename),
               });
             },
           }
@@ -711,7 +729,25 @@ export class StreamLoop implements StreamLoopState {
         }
         ctx.allSeenToolCallIds.add(part.toolCallId);
 
+        // SDK error messages interpolate the entire raw payload. Keep only the
+        // schema issues for persistence and telemetry, including malformed JSON.
+        let validationIssues: string | undefined;
+        if (InvalidToolInputError.isInstance(part.error)) {
+          const cause = part.error.cause;
+          const issues = cause instanceof Error ? cause.cause : undefined;
+          validationIssues =
+            issues instanceof z.ZodError
+              ? issues.issues
+                  .map((issue) =>
+                    [issue.path.join("."), issue.message]
+                      .filter(Boolean)
+                      .join(": "),
+                  )
+                  .join(". ")
+              : "Expected a JSON object matching the tool argument schema.";
+        }
         const result = await this.onToolCall({
+          validationIssues,
           type: "tool-call",
           toolCallId: effectiveToolCallId,
           toolName: part.toolName,
@@ -1279,6 +1315,7 @@ export class StreamLoop implements StreamLoopState {
    * Process tool-call event from stream
    */
   private async onToolCall(part: {
+    validationIssues?: string;
     type: "tool-call";
     toolCallId: string;
     toolName: string;

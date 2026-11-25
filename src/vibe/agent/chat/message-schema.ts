@@ -53,6 +53,7 @@ export const toolCallSchema: z.ZodType<ToolCall> = z.object({
   toolCallId: z.string(),
   toolName: z.string(),
   args: WidgetDataSchema,
+  rawArgs: tolerant(WidgetDataSchema),
   result: WidgetDataSchema.optional(),
   // Framework-produced structured error; branded translation keys make a
   // structural Zod schema impossible — guard the shape only.

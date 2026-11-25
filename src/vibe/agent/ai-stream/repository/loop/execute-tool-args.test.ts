@@ -45,14 +45,22 @@ describe("normalizeExecuteToolArgs", () => {
     });
   });
 
-  it("drops an invented callbackMode", () => {
+  it("retains an invented callbackMode for validation", () => {
     expect(
       normalizeExecuteToolArgs({
         callbackMode: "omit",
         toolName: "cortex-read",
         input: { path: "/a.md" },
       }),
-    ).toEqual({ toolName: "cortex-read", input: { path: "/a.md" } });
+    ).toEqual({ callbackMode: "omit", toolName: "cortex-read", input: { path: "/a.md" } });
+  });
+
+  it("unwraps a redundant local dispatcher and retains the nested endLoop intent", () => {
+    const inner = { toolName: "rename-thread", input: { title: "Plans" }, callbackMode: "endLoop" };
+    const raw = { toolName: "execute-tool", input: inner };
+    expect(normalizeExecuteToolArgs(raw)).toEqual(inner);
+    expect(raw.input).toBe(inner);
+    expect(normalizeExecuteToolArgs({ ...raw, instanceId: "other" })).toEqual({ ...raw, instanceId: "other" });
   });
 
   it("keeps a real callbackMode sent in the wrong case", () => {

@@ -279,8 +279,28 @@ export async function handleIncomingToolRequest(
       : {}),
   };
 
-  const runExecute = (): Promise<ResponseType<WidgetData>> =>
-    RouteExecuteRepository.execute(
+  const runExecute = async (): Promise<ResponseType<WidgetData>> => {
+    if (inboundPlatform === Platform.AI) {
+      // The receiving instance owns the target schema. Its version can differ
+      // from the caller's, and remote-only tools have no local definition there.
+      const { modelTargetIssues } =
+        await import("../../platforms/ai/tools-loader");
+      const issues = await modelTargetIssues(
+        requestData.toolName,
+        requestData.input,
+        taskUserCtx.user,
+        "remote-dispatch",
+      );
+      if (issues.length) {
+        return fail({
+          message: t("executor.errors.parameterValidationFailed", {
+            errors: issues.join(". "),
+          }),
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+        });
+      }
+    }
+    return RouteExecuteRepository.execute(
       {
         toolName: requestData.toolName,
         input: requestData.input,
@@ -299,6 +319,7 @@ export async function handleIncomingToolRequest(
       // CLI_AUTH_BYPASS and run admin-only endpoints.
       inboundPlatform,
     );
+  };
 
   if (isAsyncMode) {
     const dispatched = await runExecute();

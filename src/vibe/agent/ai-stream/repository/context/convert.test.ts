@@ -87,6 +87,21 @@ describe("toAiSdkMessages tool-call id uniqueness", () => {
     expect(toolCallIds(result)).toEqual(["execute-tool_0", "execute-tool_0_dup2"]);
   });
 
+  it("replays the original arguments when display fields include server defaults", async () => {
+    const rawArgs = { toolName: "generate_image", input: { prompt: "Test image" } };
+    const stored = {
+      ...call("enriched", { toolName: "generate_image", input: { prompt: "Test image", model: "display default" } }),
+      rawArgs,
+    };
+    const messages = await toAiSdkMessages(
+      [toolMessage(stored)], logger, "UTC", DefaultFolderId.PRIVATE, undefined, false, rootlessToolExecutionContext(),
+    );
+    expect(messages).toContainEqual(expect.objectContaining({
+      role: "assistant",
+      content: [expect.objectContaining({ type: "tool-call", input: rawArgs })],
+    }));
+  });
+
   it("drops a true duplicate (same id, same args)", async () => {
     const result = await toAiSdkMessages(
       [

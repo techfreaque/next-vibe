@@ -13,6 +13,7 @@ import { z } from "zod";
 import { getEndpoint } from "@/generated/endpoints/endpoint";
 
 import { claimExecuteToolCallId } from "../../agent/ai-stream/repository/core/stream";
+import { normalizeExecuteToolArgs } from "../../agent/ai-stream/repository/loop/execute-tool-args";
 import {
   FOLDER_ALLOWS_REMOTE_TOOLS,
   FOLDER_BLOCKED_CALLBACK_MODES,
@@ -28,9 +29,14 @@ import type { CreateApiEndpointAny } from "../../core/definition/endpoint-base";
 import { FieldUsage } from "../../core/definition/enums";
 import type { CountryLanguage } from "../../core/i18n/core/config";
 import { permissionsRegistry } from "../../core/permissions/registry";
-import { type WidgetData, WidgetDataSchema } from "../../core/utils/json";
+import { ErrorResponseTypes, fail } from "../../core/route/response.schema";
+import { type WidgetData } from "../../core/utils/json";
 import { parseError } from "../../core/utils/parse-error";
-import { CallbackMode, EXECUTE_TOOL_ALIAS } from "../../execute-tool/constants";
+import {
+  CallbackMode,
+  CallbackModeDB,
+  EXECUTE_TOOL_ALIAS,
+} from "../../execute-tool/constants";
 import type { JwtPayloadType } from "../../identity/auth/types";
 import { filterUserPermissionRoles } from "../../identity/roles/enum";
 import type { EndpointLogger } from "../../logger/types";
@@ -39,6 +45,11 @@ import {
   generateSchemaForUsage,
 } from "../../unified-ui/_shared/utils";
 import { Platform } from "../platforms";
+import {
+  rawToolArgumentSchema,
+  toolSchemaSummary,
+  unknownToolFields,
+} from "./tool-arguments";
 import { dropEnumValues, toolInputToJsonSchema } from "./tool-json-schema";
 
 /**
@@ -49,11 +60,15 @@ import { dropEnumValues, toolInputToJsonSchema } from "./tool-json-schema";
  */
 export type CoreTool = ToolSet[string];
 
+type RouteModelArgs = (
+  args: Record<string, WidgetData>,
+) => Record<string, WidgetData>;
+
 /**
  * Create AI SDK CoreTool from endpoint
  * This is the ONLY AI-specific logic - converting to AI SDK format
  */
-function createToolFromEndpoint(
+export function createToolFromEndpoint(
   endpoint: CreateApiEndpointAny,
   context: {
     user: JwtPayloadType;
@@ -61,6 +76,7 @@ function createToolFromEndpoint(
     logger: EndpointLogger;
     toolExecutionContext: ToolExecutionContext;
     requiresConfirmation: boolean;
+    routeModelArgs?: RouteModelArgs;
   },
 ): CoreTool {
   const { t } = endpoint.scopedTranslation.scopedT(context.locale);
@@ -136,44 +152,55 @@ function createToolFromEndpoint(
 
   // Wrap JSON Schema in AI SDK's jsonSchema() function
   // This creates a FlexibleSchema that the AI SDK can use
+  const argumentSchema = rawToolArgumentSchema(
+    schemaObj,
+    zodSchemaWithTransforms,
+    toolName === EXECUTE_TOOL_ALIAS ? normalizeExecuteToolArgs : undefined,
+  ).superRefine(async (raw, ctx) => {
+    if (toolName !== EXECUTE_TOOL_ALIAS) {
+      return;
+    }
+    const normalized = normalizeExecuteToolArgs(raw);
+    const {
+      toolName: targetName,
+      input,
+      instanceId,
+    } = context.routeModelArgs?.(normalized) ?? normalized;
+    if (typeof targetName !== "string") {
+      return;
+    }
+    if (targetName === EXECUTE_TOOL_ALIAS && !instanceId) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["toolName"],
+        message:
+          "Nested execute-tool envelope is ambiguous. Use the target toolName, its input object, and one top-level callbackMode.",
+      });
+      return;
+    }
+    if (targetName.includes("__") || instanceId) {
+      // The receiving instance validates against its own deployed target.
+      return;
+    }
+    for (const message of await modelTargetIssues(
+      targetName,
+      input,
+      context.user,
+    )) {
+      ctx.addIssue({ code: "custom", path: ["input"], message });
+    }
+  });
+  // Some provider adapters invoke execute directly. Validate those calls too,
+  // while avoiding a second target-schema lookup for the SDK's validated input.
+  const validatedCalls = new WeakSet<Record<string, WidgetData>>();
   const inputSchema = jsonSchema<Record<string, WidgetData>>(jsonSchemaObject, {
-    validate: (value) => {
-      // Extract callbackMode before validation (not part of endpoint schema).
-      // callbackMode is read by tool-call-handler for stream control (endLoop, approve)
-      // and by the execute handler below for async modes (detach, wakeUp).
-      const callbackModeRaw =
-        typeof value === "object" &&
-        value !== null &&
-        "callbackMode" in value &&
-        typeof value.callbackMode === "string"
-          ? value.callbackMode
-          : undefined;
-
-      // Use the original Zod schema (with transforms) for validation
-      const result = zodSchemaWithTransforms.safeParse(value);
-      if (result.success) {
-        const typedResult = z
-          .record(z.string(), WidgetDataSchema)
-          .safeParse(result.data);
-        if (!typedResult.success) {
-          return {
-            success: false,
-            error: typedResult.error,
-          };
-        }
-        // Add callbackMode back to the validated data so it reaches tool-call-handler
-        return {
-          success: true,
-          value:
-            callbackModeRaw !== undefined
-              ? { ...typedResult.data, callbackMode: callbackModeRaw }
-              : typedResult.data,
-        };
+    validate: async (value) => {
+      const result = await argumentSchema.safeParseAsync(value);
+      if (!result.success) {
+        return { success: false, error: result.error };
       }
-      return {
-        success: false,
-        error: result.error,
-      };
+      validatedCalls.add(result.data);
+      return { success: true, value: result.data };
     },
   });
 
@@ -181,12 +208,39 @@ function createToolFromEndpoint(
     description,
     inputSchema,
     execute: async (params, options) => {
+      if (!validatedCalls.delete(params)) {
+        const checked = await argumentSchema.safeParseAsync(params);
+        if (!checked.success) {
+          const { scopedTranslation } = await import("./i18n");
+          return fail({
+            message: scopedTranslation
+              .scopedT(context.locale)
+              .t("executor.errors.parameterValidationFailed", {
+                errors: checked.error.message,
+              }),
+            errorType: ErrorResponseTypes.VALIDATION_ERROR,
+          });
+        }
+      }
       // Extract callbackMode from params - async modes (detach, wakeUp) route through
       // RouteExecuteRepository which handles task creation, backfill, and resume-stream.
       // For execute-tool itself, callbackMode must stay in restParams so the route
       // handler receives it (execute-tool handles all callbackModes natively).
-      const { callbackMode: callbackModeParam, ...strippedParams } = (params ??
-        {}) as Record<string, WidgetData>;
+      const normalized =
+        toolName === EXECUTE_TOOL_ALIAS
+          ? normalizeExecuteToolArgs(params)
+          : params;
+      if (normalized !== params) {
+        context.logger.info("[ToolsLoader] Normalized model tool arguments", {
+          toolName,
+          callbackMode: CallbackModeDB.find(
+            (mode) => mode === normalized["callbackMode"],
+          ),
+        });
+      }
+      const dispatchArgs = context.routeModelArgs?.(normalized) ?? normalized;
+      const { callbackMode: callbackModeParam, ...strippedParams } =
+        dispatchArgs;
       const baseParams =
         toolName === EXECUTE_TOOL_ALIAS && callbackModeParam !== undefined
           ? { ...strippedParams, callbackMode: callbackModeParam }
@@ -222,11 +276,9 @@ function createToolFromEndpoint(
       };
 
       // CallbackMode is imported at the top of the file - use it directly (no async import needed)
-      const callbackMode =
-        typeof callbackModeParam === "string" &&
-        Object.values(CallbackMode).includes(callbackModeParam as never)
-          ? (callbackModeParam as (typeof CallbackMode)[keyof typeof CallbackMode])
-          : null;
+      const callbackMode = CallbackModeDB.find(
+        (mode) => mode === callbackModeParam,
+      );
 
       context.logger.debug("[ToolsLoader] CoreTool execute called", {
         toolName,
@@ -293,7 +345,7 @@ function createToolFromEndpoint(
         // For execute-tool: effective callbackMode is in restParams.callbackMode.
         const earlyCallbackMode =
           toolName === EXECUTE_TOOL_ALIAS
-            ? restParams.callbackMode
+            ? (restParams.callbackMode ?? CallbackMode.WAIT)
             : callbackMode;
         // For execute-tool: only eagerly set waitingForRemoteResult when there IS a remote
         // instanceId (remote WAIT creates a task that blocks the stream). For local inline
@@ -374,11 +426,23 @@ function createToolFromEndpoint(
 
         // execute-tool: restParams already has the correct shape ({ toolName, input, callbackMode, instanceId? })
         // Other tools: wrap in { toolName, input: restParams, callbackMode }
-        const executeData = (
+        const { default: dispatchDefinition } =
+          await import("../../execute-tool/definition");
+        // Apply the schema's execution defaults only here. The SDK call and
+        // history keep the original model arguments, including an omitted mode.
+        const executeData = dispatchDefinition.POST.requestSchema.safeParse(
           toolName === EXECUTE_TOOL_ALIAS
             ? restParams
-            : { toolName, input: restParams, callbackMode }
-        ) as Parameters<typeof RouteExecuteRepository.execute>[0];
+            : { toolName, input: restParams, callbackMode },
+        );
+        if (!executeData.success) {
+          return fail({
+            message: execT("executor.errors.parameterValidationFailed", {
+              errors: executeData.error.message,
+            }),
+            errorType: ErrorResponseTypes.VALIDATION_ERROR,
+          });
+        }
 
         // Build a per-call context snapshot with the resolved IDs.
         // Reset waitingForRemoteResult to false in the copy so we can detect whether
@@ -419,7 +483,7 @@ function createToolFromEndpoint(
         );
 
         const result = await RouteExecuteRepository.execute(
-          executeData,
+          executeData.data,
           context.user,
           context.locale,
           context.logger,
@@ -561,6 +625,56 @@ export function generateInputSchema(
   }
 }
 
+/** Validate the model's own target fields before confirmation, dispatch or caller defaults. */
+export async function modelTargetIssues(
+  toolName: string,
+  input: WidgetData,
+  user: JwtPayloadType,
+  source: "model" | "remote-dispatch" = "model",
+): Promise<string[]> {
+  // Match the executor's supported aliases, including older prefixed route IDs.
+  const name = toolName.trim();
+  const endpoint =
+    (await getEndpoint(name)) ??
+    (name.includes("_")
+      ? await getEndpoint(name.replaceAll("_", "-"))
+      : null) ??
+    (!name.startsWith("vibe_") ? await getEndpoint(`vibe_${name}`) : null);
+  if (
+    !endpoint ||
+    !permissionsRegistry.validateEndpointAccess(endpoint, user, Platform.AI)
+      .allowed
+  ) {
+    return [];
+  }
+  const schema = generateInputSchema(
+    endpoint,
+    filterUserPermissionRoles(user.roles),
+  );
+  let modelInput = input;
+  if (
+    source === "remote-dispatch" &&
+    input &&
+    typeof input === "object" &&
+    !Array.isArray(input) &&
+    !(input instanceof Date)
+  ) {
+    // The caller may already have resolved hidden fields (e.g. the threadId
+    // for rename-thread). They still go through the receiving route's filter.
+    const declared =
+      endpoint.requestSchema instanceof z.ZodObject
+        ? endpoint.requestSchema.shape
+        : {};
+    modelInput = Object.fromEntries(
+      Object.entries(input).filter(
+        ([key]) =>
+          Object.hasOwn(schema.shape, key) || !Object.hasOwn(declared, key),
+      ),
+    );
+  }
+  return unknownToolFields(toolInputToJsonSchema(schema), modelInput, "input");
+}
+
 /**
  * Build a compact one-line schema summary for a tool catalog entry.
  * Extracts property names and their JSON Schema types from a Zod schema.
@@ -576,20 +690,7 @@ function buildSchemaSummary(
     const jsonSchemaObj = toolInputToJsonSchema(zodSchema);
     // Model / voice ids no configured provider can serve are not offered.
     dropEnumValues(jsonSchemaObj, unavailableModelIds);
-    const props = jsonSchemaObj.properties;
-    if (!props || Object.keys(props).length === 0) {
-      return "{}";
-    }
-    const entries = Object.entries(props).map(([k, v]) => {
-      const type =
-        typeof v === "boolean"
-          ? "any"
-          : v.enum
-            ? v.enum.map(String).join("|")
-            : (v.type ?? "any");
-      return `${k}: ${type}`;
-    });
-    return `{ ${entries.join(", ")} }`;
+    return toolSchemaSummary(jsonSchemaObj);
   } catch {
     return "{}";
   }
@@ -658,6 +759,8 @@ export async function loadTools(params: {
   toolConfirmationConfig?: Map<string, boolean>;
   /** Stream context - rootFolderId, threadId, aiMessageId, etc. */
   toolExecutionContext: ToolExecutionContext;
+  /** A relay may route unprefixed tool names to the caller's catalog. */
+  routeModelArgs?: RouteModelArgs;
 }): Promise<{
   tools: ToolSet | undefined;
   toolsMeta: Map<
@@ -888,6 +991,7 @@ export async function loadTools(params: {
       logger: params.logger,
       toolExecutionContext: params.toolExecutionContext,
       requiresConfirmation: false,
+      routeModelArgs: params.routeModelArgs,
     });
 
     const tools: ToolSet = {

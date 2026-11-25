@@ -96,6 +96,8 @@ export type ToolCall = {
   toolCallId: string; // AI SDK tool call ID (e.g., "toolu_bdrk_01X8QxqpkW7HVqYiChTpDLzN")
   toolName: string;
   args: WidgetData;
+  /** Original model input when request defaults enriched the display fields. */
+  rawArgs?: WidgetData;
   result?: WidgetData;
   error?: ErrorResponseType; // Structured error with translation key, params, errorType, and optional nested cause
   executionTime?: number;

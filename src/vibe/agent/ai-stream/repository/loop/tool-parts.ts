@@ -5,6 +5,7 @@
 import "server-only";
 
 import type { JSONValue } from "ai";
+import { errorResponseSchema } from "next-vibe/core/route/error-response.schema";
 import {
   type ErrorResponseType,
   ErrorResponseTypes,
@@ -14,9 +15,13 @@ import type { WidgetData } from "next-vibe/core/utils/json";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import {
   CallbackMode,
-  CallbackModeDB,
   EXECUTE_TOOL_ALIAS,
 } from "next-vibe/execute-tool/constants";
+import {
+  loggedToolName,
+  safeToolIssues,
+  toolArgsForLog,
+} from "next-vibe/platforms/ai/tool-arguments";
 import { Platform } from "next-vibe/platforms/platforms";
 
 import { getEndpoint } from "@/generated/endpoints/endpoint";
@@ -29,6 +34,7 @@ import {
   describeExecuteToolValidationStage,
   describeNestedExecuteToolArgs,
   describeToolArgShape,
+  modelDispatchControls,
   normalizeExecuteToolArgs,
 } from "./execute-tool-args";
 import {
@@ -42,7 +48,12 @@ import type { StreamLoopState } from "./state";
 function isPlainRecord(
   v: WidgetData | undefined,
 ): v is { [key: string]: WidgetData } {
-  return typeof v === "object" && v !== null && !Array.isArray(v);
+  return (
+    typeof v === "object" &&
+    v !== null &&
+    !Array.isArray(v) &&
+    !(v instanceof Date)
+  );
 }
 
 /**
@@ -106,6 +117,42 @@ async function enrichToolArgsWithRequestDefaults(
   }
 }
 
+function logValidationFailure(
+  state: StreamLoopState,
+  call: ToolCall,
+  issues: string,
+): void {
+  const raw = call.rawArgs ?? call.args;
+  const target = modelDispatchControls(call.toolName, raw).wrappedToolName;
+  state.p.logger.warn("[AI Stream] Invalid model tool arguments", {
+    model: state.p.model,
+    toolName: loggedToolName(call.toolName),
+    targetToolName: target ? loggedToolName(target) : undefined,
+    args: toolArgsForLog(raw),
+    issues: safeToolIssues(issues, raw),
+  });
+}
+
+function applyEndLoop(state: StreamLoopState, call: ToolCall): void {
+  if (call.callbackMode !== CallbackMode.END_LOOP) {
+    return;
+  }
+  const { ctx } = state.p;
+  const { wrappedToolName } = modelDispatchControls(
+    call.toolName,
+    call.rawArgs ?? call.args,
+  );
+  if (
+    !ctx.turnHasAnswerText &&
+    isThreadRenameCall(call.toolName, wrappedToolName) &&
+    endLoopNeedsAnswerStep(state.p.toolExecutionContext)
+  ) {
+    ctx.endLoopAwaitingAnswer = true;
+  } else {
+    ctx.shouldStopLoop = true;
+  }
+}
+
 /** Return type for onToolCall */
 export interface ToolCallResult {
   currentAssistantMessageId: string | null;
@@ -115,6 +162,7 @@ export interface ToolCallResult {
   requiresConfirmation: boolean;
   pendingToolMessage: {
     messageId: string;
+    validationIssues?: string;
     toolCallData: {
       toolCall: ToolCall;
       parentId: string | null;
@@ -132,86 +180,34 @@ export async function onToolCall(
     toolCallId: string;
     toolName: string;
     input?: WidgetData;
+    validationIssues?: string;
   },
 ): Promise<ToolCallResult> {
   const { ctx, threadId, model, skill, userId, toolsConfig, logger } = state.p;
   const { sequenceId, dbWriter } = ctx;
 
   // Get tool arguments from the AI SDK part.input
-  let toolCallArgs: WidgetData = part.input ?? {};
-
-  // The AI only emits the args it chose (e.g. { prompt }); server-authoritative
-  // request fields (like a media-gen `model` resolved from the favorite/skill
-  // cascade) are filled in by the target tool's requestDefaults at execution
-  // time and were NEVER reflected back into the recorded call — so the tool
-  // message showed no model. Resolve them here and fold them into the recorded
-  // input so the call reflects what actually ran. For execute-tool the resolved
-  // fields belong to the WRAPPED tool and go into its nested `input`.
-  toolCallArgs = await enrichToolArgsWithRequestDefaults(
-    part.toolName,
-    toolCallArgs,
-    state,
-    logger,
-  );
-
-  // Read callbackMode from tool args - any tool can pass this to control loop behavior
-  const callbackModeArg =
-    typeof toolCallArgs === "object" &&
-    toolCallArgs !== null &&
-    !Array.isArray(toolCallArgs) &&
-    "callbackMode" in toolCallArgs
-      ? (CallbackModeDB.find(
-          (m) => m === String(toolCallArgs["callbackMode"]),
-        ) ?? null)
-      : null;
-
-  // endLoop: stop the AI loop after this step completes.
-  // wakeUp does NOT stop the loop - the AI gets {taskId, hint} back immediately
-  // and continues its turn (generates acknowledgement text), then ends naturally.
-  // The revival happens later when the background task completes.
-  if (callbackModeArg === CallbackMode.END_LOOP) {
-    const wrappedToolName =
-      typeof toolCallArgs === "object" &&
-      toolCallArgs !== null &&
-      !Array.isArray(toolCallArgs) &&
-      !(toolCallArgs instanceof Date) &&
-      typeof toolCallArgs["toolName"] === "string"
-        ? toolCallArgs["toolName"]
-        : undefined;
-    if (
-      !ctx.stepHasAnswerText &&
-      isThreadRenameCall(part.toolName, wrappedToolName) &&
-      endLoopNeedsAnswerStep(state.p.toolExecutionContext)
-    ) {
-      // The silent rename fired with endLoop in a step with no visible answer
-      // (only thinking or tool calls; any earlier text preceded the latest
-      // tool results): stopping here ends the turn on a blank, billed bubble. Keep the loop alive; the SDK side (onStepFinish ->
-      // prepareStep) runs ONE text-only answer step.
-      ctx.endLoopAwaitingAnswer = true;
-      logger.info(
-        "[AI Stream] endLoop before any answer text - deferring stop to a forced answer step",
-        { toolName: part.toolName, toolCallId: part.toolCallId },
+  const rawArgs = part.input === undefined ? {} : part.input;
+  const toolCallArgs = part.validationIssues
+    ? rawArgs
+    : await enrichToolArgsWithRequestDefaults(
+        part.toolName,
+        rawArgs,
+        state,
+        logger,
       );
-    } else {
-      ctx.shouldStopLoop = true;
-      logger.debug(
-        "[AI Stream] Model requested loop stop via callbackMode endLoop",
-        {
-          toolName: part.toolName,
-          toolCallId: part.toolCallId,
-          callbackMode: callbackModeArg,
-        },
-      );
-    }
-  }
+  const { callbackMode: callbackModeArg } = part.validationIssues
+    ? {}
+    : modelDispatchControls(part.toolName, rawArgs);
 
   // All tool metadata comes from toolsConfig built during setup
   const toolConfig = toolsConfig.get(part.toolName);
   const creditCost = toolConfig?.credits ?? 0;
   // requiresConfirmation from toolsConfig takes precedence; callbackMode can also request it
   const requiresConfirmation =
-    (toolConfig?.requiresConfirmation ?? false) ||
-    callbackModeArg === CallbackMode.APPROVE;
+    !part.validationIssues &&
+    ((toolConfig?.requiresConfirmation ?? false) ||
+      callbackModeArg === CallbackMode.APPROVE);
 
   const prep = await state.ensureAssistantMessage(ctx.currentParentId);
 
@@ -232,6 +228,7 @@ export async function onToolCall(
     toolCallId,
     toolName: part.toolName,
     args: toolCallArgs,
+    ...(toolCallArgs !== rawArgs && { rawArgs }),
     creditsUsed: creditCost,
     requiresConfirmation,
     isConfirmed: false,
@@ -292,6 +289,7 @@ export async function onToolCall(
     requiresConfirmation: false,
     pendingToolMessage: {
       messageId: toolMessageId,
+      validationIssues: part.validationIssues,
       toolCallData: {
         toolCall: toolCallData,
         parentId: toolParentId,
@@ -349,8 +347,7 @@ export async function onToolResult(
   // Detect ErrorResponseType returned as a "successful" tool result.
   // When a tool returns fail({...}) without throwing, the AI SDK treats it as
   // isError=false, but the output is {success: false, message: ..., errorType: ...}.
-  const isErrorResponse =
-    !isError &&
+  const errorMessage =
     output !== null &&
     output !== undefined &&
     typeof output === "object" &&
@@ -358,34 +355,33 @@ export async function onToolResult(
     "success" in output &&
     output.success === false &&
     "message" in output &&
-    typeof output.message === "string";
+    typeof output.message === "string"
+      ? output.message
+      : undefined;
+  const isErrorResponse = errorMessage !== undefined;
 
   const effectiveIsError = isError || isErrorResponse;
 
-  let toolError: ErrorResponseType | undefined;
-  if (effectiveIsError) {
-    if (isErrorResponse && typeof output === "object" && output !== null) {
-      // Output is a structured ErrorResponseType from fail() - fold its message
-      // into the detail key so the AI sees the specific error
-      // (e.g. "Tool not found: xyz") rather than a generic wrapper.
-      const errObj = output as Record<string, JSONValue>;
-      const errDetail =
-        typeof errObj.message === "string" ? errObj.message : "";
-      toolError = errDetail
-        ? fail({
-            message: t("errors.toolExecutionErrorDetail", { error: errDetail }),
-            errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-          })
-        : fail({
-            message: t("errors.toolExecutionError"),
-            errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-          });
-    } else {
-      toolError = fail({
-        message: t("errors.toolExecutionError"),
+  const structured = isErrorResponse
+    ? errorResponseSchema.safeParse(output).data
+    : undefined;
+  const toolError = effectiveIsError
+    ? (structured ??
+      fail({
+        message: isErrorResponse
+          ? t("errors.toolExecutionErrorDetail", { error: errorMessage })
+          : t("errors.toolExecutionError"),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-      });
-    }
+      }))
+    : undefined;
+
+  if (
+    toolError?.errorType.errorKey ===
+    ErrorResponseTypes.VALIDATION_ERROR.errorKey
+  ) {
+    logValidationFailure(state, toolCallData.toolCall, toolError.message);
+  } else {
+    applyEndLoop(state, toolCallData.toolCall);
   }
 
   const cleanedOutput: JSONValue | undefined =
@@ -680,13 +676,43 @@ export async function onToolError(
       sequenceId,
       toolCall: recoveredToolCall,
     });
-    return emitOriginalToolError(state, part, toolMessageId, {
-      toolCall: recoveredToolCall,
-      parentId,
-    });
+    const recovered = { toolCall: recoveredToolCall, parentId };
+    if (
+      typeof part.error === "string" &&
+      part.error.startsWith(`Invalid input for tool ${part.toolName}:`)
+    ) {
+      // Some transports send only tool-error. The SDK's string embeds raw
+      // input before the issue details. Exclude that echo from telemetry.
+      const issueStart = part.error.lastIndexOf("\nError message: ");
+      const issues =
+        issueStart >= 0
+          ? part.error.slice(issueStart + "\nError message: ".length)
+          : "Expected a JSON object matching the tool argument schema.";
+      logValidationFailure(state, recoveredToolCall, issues);
+      return emitOriginalToolError(
+        state,
+        { ...part, error: issues },
+        toolMessageId,
+        recovered,
+        ErrorResponseTypes.VALIDATION_ERROR,
+      );
+    }
+    return emitOriginalToolError(state, part, toolMessageId, recovered);
   }
 
   const { messageId: toolMessageId, toolCallData } = pendingToolMessage;
+
+  if (pendingToolMessage.validationIssues) {
+    const issues = pendingToolMessage.validationIssues;
+    logValidationFailure(state, toolCallData.toolCall, issues);
+    return emitOriginalToolError(
+      state,
+      { ...part, error: issues },
+      toolMessageId,
+      toolCallData,
+      ErrorResponseTypes.VALIDATION_ERROR,
+    );
+  }
 
   // Step 1: Check if tool is allowed (activeToolNames permission layer).
   // null = all tools allowed. If set and tool not in it, it's disabled for this user.
@@ -792,10 +818,11 @@ export async function onToolError(
   const fallbackResult = await executeFallbackTool(
     state,
     part.toolName,
-    toolCallData.toolCall.args,
+    toolCallData.toolCall.rawArgs ?? toolCallData.toolCall.args,
   );
 
   if (fallbackResult && "data" in fallbackResult) {
+    applyEndLoop(state, toolCallData.toolCall);
     logger.debug(
       "[AI Stream] Tool fallback execution succeeded (discovered via tool-help)",
       {
@@ -843,21 +870,24 @@ export async function onToolError(
     // executeFallbackTool already logged the failure at the right level.
     logger.debug("[AI Stream] Emitting tool error result to model", {
       toolName: part.toolName,
-      error: fallbackResult.error,
+      errorKey: fallbackResult.error.errorType.errorKey,
       toolCallId: part.toolCallId,
     });
 
     // Pass the actual error message from the tool so the model gets actionable context,
     // not a generic "please try again" that hides what went wrong.
-    const errorResponse = fail({
-      message: fallbackResult.error as typeof fallbackResult.error &
-        "createScopedTranslation-key",
-      errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
-    });
+    const errorResponse = fallbackResult.error;
+    if (
+      errorResponse.errorType.errorKey ===
+      ErrorResponseTypes.VALIDATION_ERROR.errorKey
+    ) {
+      logValidationFailure(state, toolCallData.toolCall, errorResponse.message);
+    }
     const toolCallWithError: ToolCall = {
       ...toolCallData.toolCall,
       error: errorResponse,
       isPartial: false,
+      status: "failed",
     };
 
     await dbWriter.emitToolResult({
@@ -892,7 +922,7 @@ async function executeFallbackTool(
   state: StreamLoopState,
   toolName: string,
   args: WidgetData | undefined,
-): Promise<{ data: WidgetData } | { error: string } | null> {
+): Promise<{ data: WidgetData } | { error: ErrorResponseType } | null> {
   const { user, locale, logger, toolExecutionContext, model, skill } = state.p;
 
   try {
@@ -905,24 +935,45 @@ async function executeFallbackTool(
       await import("next-vibe/execute-tool/repository/run-endpoint-by-name");
 
     // Tool-call args are always a JSON object; narrow the loose WidgetData type.
-    const rawArgs: Record<string, WidgetData> =
-      args !== null &&
-      args !== undefined &&
-      typeof args === "object" &&
-      !Array.isArray(args) &&
-      !(args instanceof Date)
-        ? args
-        : {};
-    // execute-tool calls that failed SDK validation are usually nested one
-    // level too deep or carry an invented callbackMode - repair, then run.
-    const inputArgs =
-      toolName === EXECUTE_TOOL_ALIAS
-        ? normalizeExecuteToolArgs(rawArgs)
-        : rawArgs;
+    if (args !== undefined && !isPlainRecord(args)) {
+      return {
+        error: fail({
+          message: state.p.t("errors.toolExecutionErrorDetail", {
+            error: "Expected a JSON object matching the tool argument schema.",
+          }),
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+        }),
+      };
+    }
+    const rawArgs = args ?? {};
+    const controls = modelDispatchControls(toolName, rawArgs);
+    const { callbackMode: requestedMode, ...targetArgs } = rawArgs;
+    const wrapper = toolName === EXECUTE_TOOL_ALIAS;
+    const inputArgs = wrapper ? normalizeExecuteToolArgs(rawArgs) : targetArgs;
+    const { modelTargetIssues } =
+      await import("next-vibe/platforms/ai/tools-loader");
+    const issues = await modelTargetIssues(toolName, inputArgs, user);
+    if (!wrapper && requestedMode !== undefined && !controls.callbackMode) {
+      issues.push(
+        `callbackMode: expected ${Object.values(CallbackMode).join("|")}`,
+      );
+    }
+    if (issues.length) {
+      return {
+        error: fail({
+          message: state.p.t("errors.toolExecutionErrorDetail", {
+            error: issues.join(". "),
+          }),
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+        }),
+      };
+    }
     const result = await runEndpointByName({
       toolName,
       input: inputArgs,
-      callbackMode: CallbackMode.WAIT,
+      callbackMode: wrapper
+        ? CallbackMode.WAIT
+        : (controls.callbackMode ?? CallbackMode.WAIT),
       user,
       locale,
       logger,
@@ -943,7 +994,7 @@ async function executeFallbackTool(
           // A tool still dispatched after the user cancelled means the cancel
           // did not stop the loop (pairs with the client's cancel timeout).
           streamAborted: state.p.streamAbortController.signal.aborted,
-          error: result.message,
+          error: safeToolIssues(result.message, rawArgs),
           errorKey: result.errorType.errorKey,
           errorCode: result.errorType.errorCode,
           causeKey: result.cause?.errorType.errorKey ?? null,
@@ -989,7 +1040,7 @@ async function executeFallbackTool(
       );
       // Detail that used to arrive via messageParams is now interpolated into
       // the message itself, so it needs no separate append.
-      return { error: result.message };
+      return { error: result };
     }
 
     // runInProcess wraps success data as { result: actualData } for MCP/AI display.
@@ -1031,6 +1082,7 @@ async function emitOriginalToolError(
     toolCall: ToolCall;
     parentId: string | null;
   },
+  errorType = ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
 ): Promise<{
   currentParentId: string | null;
 }> {
@@ -1058,11 +1110,11 @@ async function emitOriginalToolError(
         message: t("errors.toolExecutionErrorDetail", {
           error: sdkErrorMessage,
         }),
-        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+        errorType,
       })
     : fail({
         message: t("errors.toolExecutionFailed"),
-        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+        errorType,
       });
 
   logger.debug("[AI Stream] Tool error event received", {

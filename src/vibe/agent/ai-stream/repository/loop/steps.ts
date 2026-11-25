@@ -16,6 +16,7 @@ import {
 } from "../../../models/models";
 import { AbortReason, StreamAbortError } from "../core/constants";
 import { buildSseMessageRow } from "../core/db-writer/sse-row";
+import { splitInlineThink } from "../core/inline-think-splitter";
 import { QueueRegistry } from "../core/stream";
 import { estimateInputTokens } from "../core/token-estimator";
 import { injectPendingWakeUpResults } from "../revival/revival";
@@ -83,7 +84,7 @@ export async function onFinishStep(
   // stop now, exactly like a normal endLoop.
   if (ctx.endLoopAwaitingAnswer && ctx.pendingToolMessages.size === 0) {
     ctx.endLoopAwaitingAnswer = false;
-    if (ctx.stepHasAnswerText) {
+    if (ctx.turnHasAnswerText) {
       ctx.shouldStopLoop = true;
     }
   }
@@ -314,6 +315,9 @@ export async function prepareStep(
     // final-step guard).
     state.p.ctx.queuedMessageInjected = true;
     state.p.ctx.turnStepOffset = stepNumber;
+    state.p.ctx.sdkTurnHasAnswerText = false;
+    state.p.ctx.turnHasAnswerText = false;
+    state.p.ctx.forcedAnswerStepUsed = false;
     return {
       ...injected,
       ...(injected.messages
@@ -636,13 +640,12 @@ export function onStepFinish(
   const { ctx, modelConfig } = state.p;
 
   // SDK-ordered endLoop decision (onStepFinish -> stopWhen -> prepareStep).
-  // Judged per STEP: text of an earlier step came before this step's tool
-  // results, so it is not the answer the turn ends on (prod + route T1:
-  // answer, then a lone rename step -> blank final bubble).
+  ctx.sdkTurnHasAnswerText ||=
+    splitInlineThink(stepResult.text).text.trim().length > 0;
   if (stepResult.requestedEndLoop) {
     if (
       stepResult.endLoopOnlyRename &&
-      stepResult.text.trim().length === 0 &&
+      !ctx.sdkTurnHasAnswerText &&
       !ctx.forcedAnswerStepUsed &&
       endLoopNeedsAnswerStep(state.p.toolExecutionContext)
     ) {

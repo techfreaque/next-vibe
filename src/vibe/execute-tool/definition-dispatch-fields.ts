@@ -114,6 +114,14 @@ export const dispatchResponseFields = {
 
 /** Spread into the definition's `examples.requests`. */
 export const dispatchRequestExamples = {
+  renameAfterAnswer: {
+    toolName: "rename-thread",
+    input: {
+      title: "Weekend plans",
+      description: "Comparing train routes for a weekend trip.",
+    },
+    callbackMode: CallbackMode.END_LOOP,
+  },
   remoteBackground: {
     toolName: "bash",
     input: { command: "echo hello" },

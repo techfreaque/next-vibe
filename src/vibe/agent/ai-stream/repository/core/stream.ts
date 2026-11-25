@@ -47,6 +47,7 @@ export interface PendingToolData {
   /** Set by tools-loader after this call's execute() returned: true when it
    *  parked a remote WAIT/END_LOOP task (see onToolResult). */
   remoteWait?: boolean;
+  validationIssues?: string;
   toolCallData: {
     toolCall: ToolCall;
     parentId: string | null;
@@ -125,10 +126,7 @@ export class ToolExecutionContextImpl {
    *  (non-whitespace text-delta; reasoning does not count). A turn that ends
    *  without it is an empty answer: see finalize.complete(). */
   turnHasAnswerText = false;
-  /** Consumer side: the CURRENT step streamed visible answer text. Reset at
-   *  every finish-step. A step that fires the rename+endLoop without it has
-   *  no answer after the last tool results (text of an earlier step came
-   *  BEFORE those results), so the turn would end on a blank bubble. */
+  /** Consumer-side step diagnostic, reset after finish-step. */
   stepHasAnswerText = false;
   /** Consumer side: an endLoop tool call arrived before any answer text, so
    *  the loop was NOT stopped - the SDK side forces one text-only answer step
@@ -137,6 +135,8 @@ export class ToolExecutionContextImpl {
   /** SDK side: endLoop was requested and the turn already has its answer, so
    *  stopWhen ends the loop. */
   sdkEndLoopStop = false;
+  /** SDK callbacks run independently of the stream consumer. */
+  sdkTurnHasAnswerText = false;
   /** SDK side: the next step is a forced text-only answer step (endLoop came
    *  before any answer). Consumed by prepareStep. */
   forceAnswerNextStep = false;

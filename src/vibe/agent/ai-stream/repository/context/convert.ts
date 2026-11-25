@@ -567,7 +567,7 @@ export async function toAiSdkMessage(
                   type: "tool-call",
                   toolCallId: toolCall.toolCallId,
                   toolName: toolCall.toolName,
-                  input: toolCall.args,
+                  input: toolCall.rawArgs ?? toolCall.args,
                 },
               ],
             },
@@ -592,7 +592,7 @@ export async function toAiSdkMessage(
               type: "tool-call",
               toolCallId: toolCall.toolCallId,
               toolName: toolCall.toolName,
-              input: toolCall.args,
+              input: toolCall.rawArgs ?? toolCall.args,
             },
           ],
         };
@@ -857,7 +857,7 @@ export async function toAiSdkMessages(
         //    effectiveToolCallId below). Suffix is [A-Za-z0-9_-] only so it
         //    stays valid for Anthropic's tool_use id pattern.
         const argsKey = JSON.stringify({
-          args: toolCall.args ?? null,
+          args: toolCall.rawArgs ?? toolCall.args ?? null,
           result: toolCall.result ?? null,
           error: toolCall.error ?? null,
         });
@@ -896,7 +896,7 @@ export async function toAiSdkMessages(
           type: "tool-call",
           toolCallId: effectiveToolCallId,
           toolName: toolCall.toolName,
-          input: toolCall.args,
+          input: toolCall.rawArgs ?? toolCall.args,
         });
 
         if (toolCall.isDeferred) {

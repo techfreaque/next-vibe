@@ -16,7 +16,7 @@ import { AuthRepository } from "../../identity/auth/repository";
 import type { UserRoleValue } from "../../identity/roles/enum";
 import { filterUserPermissionRoles } from "../../identity/roles/enum";
 import type { EndpointLogger } from "../../logger/types";
-import type { Platform } from "../../platforms/platforms";
+import { Platform } from "../../platforms/platforms";
 import {
   collectServerDefaults,
   generateRoleFilteredRequestSchema,
@@ -365,6 +365,25 @@ export function createGenericHandler<T extends CreateApiEndpointAny>(
     );
 
     if (!validationResult.success) {
+      if (
+        platform === Platform.AI &&
+        validationResult.errorType.errorKey ===
+          ErrorResponseTypes.VALIDATION_ERROR.errorKey
+      ) {
+        const [{ toolSchemaSummary }, { toolInputToJsonSchema }] =
+          await Promise.all([
+            import("../../platforms/ai/tool-arguments"),
+            import("../../platforms/ai/tool-json-schema"),
+          ]);
+        return fail({
+          message: sharedScopedTranslation
+            .scopedT(locale)
+            .t("errors.invalidRequestDataDetail", {
+              error: `${validationResult.message}. Expected input ${toolSchemaSummary(toolInputToJsonSchema(roleFilteredRequestSchema))}`,
+            }),
+          errorType: validationResult.errorType,
+        });
+      }
       return validationResult;
     }
 

@@ -307,6 +307,10 @@ export async function runWsProviderStream(params: {
       //    caller is also owned by loopUser, so capability/connection lookups resolve.
       //  - inference-provider: callerUser, so capability checks and connection lookups
       //    use the original requesting user's identity (incognito, no local persist).
+      const { RemoteConnectionRepository } =
+        await import("next-vibe/remote-connection/repository");
+      const providerSelfInstanceId =
+        await RemoteConnectionRepository.getLocalInstanceId(loopUser.id);
       const loaded = await loadTools({
         requestedTools: [EXECUTE_TOOL_ALIAS],
         user: loopUser,
@@ -314,59 +318,31 @@ export async function runWsProviderStream(params: {
         logger,
         systemPrompt: "",
         toolExecutionContext: headlessCtx,
+        // Validation and execution resolve the same catalog. Unprefixed tool
+        // names refer to the caller unless they explicitly address this provider.
+        routeModelArgs: (args) => {
+          const name = args["toolName"];
+          const instanceId = args["instanceId"];
+          if (
+            typeof name === "string" &&
+            name &&
+            !name.includes("__") &&
+            !instanceId
+          ) {
+            return { ...args, toolName: `${callerInstanceId}__${name}` };
+          }
+          if (instanceId && instanceId === providerSelfInstanceId) {
+            return Object.fromEntries(
+              Object.entries(args).filter(([key]) => key !== "instanceId"),
+            );
+          }
+          return args;
+        },
       });
       if (loaded.tools) {
         toolsOverride = loaded.tools;
-        // Default UNPREFIXED, instance-less calls back to the CALLER. The
-        // catalog instructs `<callerInstanceId>__<name>`, but the model often
-        // follows tool-help listings (unprefixed names) — without this rewrite
-        // those calls silently execute against the PROVIDER's own catalog
-        // (wrong side: model-pipe mode means every tool is the caller's).
-        const baseExecuteTool = loaded.tools[EXECUTE_TOOL_ALIAS];
-        const baseExecute = baseExecuteTool?.execute;
-        // The model addresses instances as the CALLER knows them, so a call
-        // naming THIS instance means "run it here" - this instance has no
-        // connection row to itself, so drop the hint and execute locally.
-        const { RemoteConnectionRepository } =
-          await import("next-vibe/remote-connection/repository");
-        const providerSelfInstanceId =
-          await RemoteConnectionRepository.getLocalInstanceId(loopUser.id);
-        if (baseExecuteTool && baseExecute) {
-          toolsOverride = {
-            ...loaded.tools,
-            [EXECUTE_TOOL_ALIAS]: {
-              ...baseExecuteTool,
-              execute: (
-                args: Record<string, WidgetData>,
-                options: Parameters<NonNullable<CoreTool["execute"]>>[1],
-              ): ReturnType<NonNullable<CoreTool["execute"]>> => {
-                const requestedName = args["toolName"];
-                const explicitInstance = args["instanceId"];
-                const needsRewrite =
-                  typeof requestedName === "string" &&
-                  requestedName.length > 0 &&
-                  !requestedName.includes("__") &&
-                  (explicitInstance === undefined ||
-                    explicitInstance === null ||
-                    explicitInstance === "");
-                const targetsProviderItself =
-                  explicitInstance === providerSelfInstanceId;
-                const argsWithoutInstance = Object.fromEntries(
-                  Object.entries(args).filter(([key]) => key !== "instanceId"),
-                );
-                const effectiveArgs = needsRewrite
-                  ? {
-                      ...args,
-                      toolName: `${callerInstanceId}__${requestedName}`,
-                    }
-                  : targetsProviderItself
-                    ? argsWithoutInstance
-                    : args;
-                return baseExecute(effectiveArgs, options);
-              },
-            },
-          };
-
+        const baseExecute = loaded.tools[EXECUTE_TOOL_ALIAS]?.execute;
+        if (baseExecute) {
           // Register EVERY caller tool spec as a first-class CoreTool with its
           // real schema, executing through the same execute-tool round-trip.
           // With only the meta-tool + a text catalog the model has to EXPLORE
@@ -392,8 +368,13 @@ export async function runWsProviderStream(params: {
                 args: Record<string, WidgetData>,
                 options: Parameters<NonNullable<CoreTool["execute"]>>[1],
               ): Promise<WidgetData> => {
+                const { callbackMode, ...input } = args;
                 const envelope = await baseExecute(
-                  { toolName: prefixedName, input: args },
+                  {
+                    toolName: prefixedName,
+                    input,
+                    ...(callbackMode !== undefined && { callbackMode }),
+                  },
                   options,
                 );
                 // The round-trip returns the execute-tool ENVELOPE ({result})

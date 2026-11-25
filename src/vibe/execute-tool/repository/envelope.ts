@@ -83,22 +83,23 @@ export function parseDispatchEnvelope(params: {
     const misplaced = CallbackModeDB.find(
       (m) => m === String(input["callbackMode"]),
     );
-    const cleanInput: Record<string, WidgetData> = { ...input };
-    delete cleanInput["callbackMode"];
-    input = cleanInput;
+    // Only remove a field when we actually consume it. A conflicting or
+    // invalid value stays in input for target validation.
     if (
+      !user.isPublic &&
       misplaced &&
-      (data.callbackMode === undefined ||
-        data.callbackMode === null ||
-        data.callbackMode === CallbackMode.WAIT)
+      (!data.callbackMode ||
+        data.callbackMode === CallbackMode.WAIT ||
+        data.callbackMode === misplaced)
     ) {
+      const cleanInput: Record<string, WidgetData> = { ...input };
+      delete cleanInput["callbackMode"];
+      input = cleanInput;
       logger.debug(
         "[RouteExecute] Hoisted misplaced callbackMode from input to envelope",
         { toolName, misplaced, envelopeMode: data.callbackMode ?? null },
       );
       data = { ...data, callbackMode: misplaced, input };
-    } else {
-      data = { ...data, input };
     }
   }
 
