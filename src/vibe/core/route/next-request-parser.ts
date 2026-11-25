@@ -7,8 +7,10 @@
 import "server-only";
 
 import type { NextRequest } from "next-vibe/ui/lib/request";
+import type { z } from "zod";
 
 import type { EndpointLogger } from "../../logger/types";
+import { isStringQueryField } from "../definition/common.schema";
 import { parseError } from "../utils/parse-error";
 import { sanitizeTelemetryUrl } from "../utils/telemetry-url";
 
@@ -77,7 +79,10 @@ function tryParseValue(value: string): ParsedValue {
  * Example: ?user.name=John&user.age=30 => { user: { name: "John", age: "30" } }
  * Example: ?filters={"status":"active"} => { filters: { status: "active" } }
  */
-export function parseSearchParams(searchParams: URLSearchParams): ParsedObject {
+export function parseSearchParams(
+  searchParams: URLSearchParams,
+  requestSchema?: z.ZodType,
+): ParsedObject {
   const result: ParsedObject = {};
 
   for (const [rawKey, value] of searchParams.entries()) {
@@ -147,7 +152,9 @@ export function parseSearchParams(searchParams: URLSearchParams): ParsedObject {
       }
     } else {
       // Simple key-value pair - try to parse as appropriate type
-      result[key] = tryParseValue(value);
+      result[key] = isStringQueryField(requestSchema, key)
+        ? value
+        : tryParseValue(value);
     }
   }
 

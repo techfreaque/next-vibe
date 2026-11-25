@@ -103,6 +103,7 @@ export function CortexSearchWidget({
               {results.map((result, i) => (
                 <Button
                   key={i}
+                  type="button"
                   variant="ghost"
                   onClick={() => void openFile(result.resultPath)}
                   className="w-full h-auto flex items-start gap-2 p-3 justify-start rounded-md border border-border hover:border-primary/50 transition-colors"

@@ -253,6 +253,7 @@ export async function handleHttpProxy(
           agent: false,
         },
         (proxyRes) => {
+          const previousUpstreamResponseAt = lastUpstreamOkAt;
           lastUpstreamOkAt = Date.now();
           const status = proxyRes.statusCode ?? 200;
           const responseContentType = proxyRes.headers["content-type"];
@@ -262,6 +263,7 @@ export async function handleHttpProxy(
             req.headers.get("accept")?.includes("application/json") &&
             responseContentType?.includes("text/html");
           if (status >= 500 || unexpectedApiNotFound) {
+            const retryAfter = proxyRes.headers["retry-after"];
             logger.error("[Proxy] Upstream returned an HTTP failure", {
               requestId,
               path: sanitizeRoutePath(url.pathname),
@@ -269,6 +271,14 @@ export async function handleHttpProxy(
               status,
               contentType: responseContentType,
               elapsedMs: lastUpstreamOkAt - proxyStartMs,
+              previousUpstreamResponseAgeMs:
+                previousUpstreamResponseAt > 0
+                  ? lastUpstreamOkAt - previousUpstreamResponseAt
+                  : undefined,
+              retryAfterSeconds:
+                typeof retryAfter === "string" && /^\d{1,6}$/.test(retryAfter)
+                  ? Number(retryAfter)
+                  : undefined,
               targetPort: nextPort,
             });
           }

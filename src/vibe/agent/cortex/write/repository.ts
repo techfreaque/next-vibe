@@ -93,6 +93,10 @@ export class CortexWriteRepository {
     if (isVirtualWritable(path)) {
       const mountPrefix = getMountPrefix(path, locale);
       if (!mountPrefix) {
+        logger.warn("Cortex write denied", {
+          endpoint: "cortex-write",
+          reason: "unrecognized-virtual-mount",
+        });
         return fail({
           message: t("post.errors.forbidden.title"),
           errorType: ErrorResponseTypes.FORBIDDEN,
@@ -131,6 +135,13 @@ export class CortexWriteRepository {
     }
 
     if (!isWritablePath(path, locale)) {
+      const mountPrefix = getMountPrefix(path, locale);
+      logger.warn("Cortex write denied", {
+        endpoint: "cortex-write",
+        mount: mountPrefix ?? undefined,
+        reason:
+          mountPrefix || path === "/" ? "read-only-mount" : "outside-mounts",
+      });
       return fail({
         message: t("post.errors.forbidden.title"),
         errorType: ErrorResponseTypes.FORBIDDEN,

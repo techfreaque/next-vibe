@@ -19,6 +19,7 @@ import {
   type CountryLanguage,
   defaultLocale,
 } from "../../core/i18n/core/config";
+import type { EndpointAccessDenial } from "../../core/permissions/types";
 import type { JwtPayloadType } from "../../identity/auth/types";
 import { UserPermissionRole } from "../../identity/roles/enum";
 import type { EndpointLogger } from "../../logger/types";
@@ -262,6 +263,25 @@ export async function isRequestedUidLinkedLead(
 
 // ─── Channel authorization ────────────────────────────────────────────────────
 
+type WsChannelAccess =
+  | { allowed: true }
+  | {
+      allowed: false;
+      reason:
+        | "identity-mismatch"
+        | "channel-format"
+        | "descriptor-missing"
+        | "endpoint-missing"
+        | "descriptor-mismatch"
+        | "resolver-missing"
+        | "resource-denied";
+    }
+  | {
+      allowed: false;
+      reason: "endpoint-permission";
+      permission: EndpointAccessDenial;
+    };
+
 /**
  * Authorize a channel subscription request.
  *
@@ -279,7 +299,7 @@ export async function authorizeWsChannel(
   descriptor: WsChannelDescriptor | undefined,
   logger: EndpointLogger,
   locale: CountryLanguage,
-): Promise<boolean> {
+): Promise<WsChannelAccess> {
   const userId = user.isPublic ? user.leadId : user.id;
 
   if (channel.startsWith("user/")) {
@@ -289,14 +309,16 @@ export async function authorizeWsChannel(
     // construction, so no per-endpoint resolver runs here. (A reverse-ws
     // connector authenticates as the peer-account user and joins the bridge
     // endpoint's user-scoped channel exactly this way.)
-    return channel.startsWith(`user/${userId}/`);
+    return channel.startsWith(`user/${userId}/`)
+      ? { allowed: true }
+      : { allowed: false, reason: "identity-mismatch" };
   }
 
   if (!channel.startsWith("ws-")) {
     logger.warn("[WS] Channel subscription denied — unknown format", {
       channel,
     });
-    return false;
+    return { allowed: false, reason: "channel-format" };
   }
 
   // Endpoint channel — MUST carry a structured descriptor. We never parse params
@@ -309,7 +331,7 @@ export async function authorizeWsChannel(
         channel,
       },
     );
-    return false;
+    return { allowed: false, reason: "descriptor-missing" };
   }
 
   const endpointChannels = await getEndpointChannels();
@@ -321,7 +343,7 @@ export async function authorizeWsChannel(
       channel,
       descriptor: descriptorKey(descriptor.endpointPath, descriptor.method),
     });
-    return false;
+    return { allowed: false, reason: "endpoint-missing" };
   }
   const { entry } = match;
 
@@ -342,7 +364,7 @@ export async function authorizeWsChannel(
         canonical,
       },
     );
-    return false;
+    return { allowed: false, reason: "descriptor-mismatch" };
   }
 
   const { permissionsRegistry } =
@@ -354,7 +376,11 @@ export async function authorizeWsChannel(
     Platform.NEXT_PAGE,
   );
   if (!roleResult.allowed) {
-    return false;
+    return {
+      allowed: false,
+      reason: "endpoint-permission",
+      permission: roleResult.denial,
+    };
   }
 
   // FAIL-CLOSED: every registered channel carries a resolveChannel (the generator
@@ -365,7 +391,7 @@ export async function authorizeWsChannel(
       "[WS] Channel subscription denied — registry entry has no resolveChannel",
       { channel },
     );
-    return false;
+    return { allowed: false, reason: "resolver-missing" };
   }
 
   // Run the route resolver with the SUBSCRIBER's identity. The decision both
@@ -386,5 +412,7 @@ export async function authorizeWsChannel(
     logger,
     locale,
   });
-  return decision.kind !== "deny";
+  return decision.kind === "deny"
+    ? { allowed: false, reason: "resource-denied" }
+    : { allowed: true };
 }

@@ -29,6 +29,24 @@ const PUBLIC_BADGE_PATH =
 // the same script long after its first successful load.
 const RECENT_RESOURCE_END_MS = 60_000;
 
+/** Describe the markup's URL form before the browser resolves it. */
+export function resourceSourceKind(source: string | null): string {
+  if (source === null) {
+    return "missing";
+  }
+  const value = source.trim();
+  if (!value) {
+    return "empty";
+  }
+  if (value.startsWith("//")) {
+    return "protocol-relative";
+  }
+  if (value.startsWith("/")) {
+    return "root-relative";
+  }
+  return /^[a-z][a-z0-9+.-]*:/i.test(value) ? "absolute" : "relative";
+}
+
 /** Path of a resource URL without query/hash (may carry signed tokens). */
 export function describeUrl(raw: string | null | undefined): string | null {
   if (!raw) {
@@ -157,6 +175,7 @@ export function navigationTimingEvidence(): {
   documentEdgeRequestId: string | null;
   documentProxyTimingStage: ProxyTimingStage | null;
   documentNavigationType: string | null;
+  documentNavigationPath: string | null;
 } {
   const entry =
     typeof performance === "undefined" ||
@@ -172,6 +191,7 @@ export function navigationTimingEvidence(): {
       documentEdgeRequestId: null,
       documentProxyTimingStage: null,
       documentNavigationType: null,
+      documentNavigationPath: null,
     };
   }
   return {
@@ -189,6 +209,7 @@ export function navigationTimingEvidence(): {
         ?.description,
     ),
     documentNavigationType: entry.type,
+    documentNavigationPath: describeUrl(entry.name),
   };
 }
 

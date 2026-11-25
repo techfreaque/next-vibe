@@ -18,11 +18,12 @@ import type { JSX, ReactElement } from "react";
 import { useCallback, useMemo, useRef } from "react";
 import type {
   DefaultValues,
+  FieldError,
   Path,
   UseFormProps,
   UseFormReturn,
 } from "react-hook-form";
-import { useForm } from "react-hook-form";
+import { get, useForm } from "react-hook-form";
 
 import type { CreateApiEndpointAny } from "../../../core/definition/endpoint-base";
 import { WidgetType } from "../../../core/definition/enums";
@@ -47,6 +48,7 @@ import type {
 } from "../../_shared/react-types";
 import { isResponseField } from "../../_shared/type-guards";
 import { WidgetContextProvider } from "../../_shared/WidgetContextProvider";
+import { flattenFormErrors } from "../../hooks/serialize-form-errors";
 import {
   useNavigationStack,
   type UseNavigationStackReturn,
@@ -272,10 +274,10 @@ export function EndpointRenderer<TEndpoint extends CreateApiEndpointAny>({
         (errors) => {
           // Report the failing fields and rules without collecting form values.
           const endpointKey = `${endpoint.path.join("/")}/${endpoint.method}`;
-          const errorEntries = Object.entries(errors);
-          const fields = errorEntries.map(([field, error]) => ({
-            rule: `${field}: ${String(error?.type ?? "invalid")}`,
-            message: String(error?.message ?? ""),
+          const errorEntries = flattenFormErrors(errors);
+          const fields = errorEntries.map(({ field, type, message }) => ({
+            rule: `${field}: ${type}`,
+            message,
           }));
           const signature = fields
             .map(({ rule }) => rule)
@@ -292,12 +294,18 @@ export function EndpointRenderer<TEndpoint extends CreateApiEndpointAny>({
             signature,
             count: blocked,
           };
-          const firstInvalidField = errorEntries[0];
-          const fieldRef = firstInvalidField?.[1]?.ref;
+          const firstInvalidField = errorEntries[0]?.field;
+          const fieldError = firstInvalidField
+            ? get<typeof errors, FieldError | undefined>(
+                errors,
+                firstInvalidField,
+              )
+            : undefined;
+          const fieldRef = fieldError?.ref;
           const context = {
             endpoint: endpointKey,
             alias: endpoint.aliases?.[0] ?? null,
-            firstInvalidField: firstInvalidField?.[0] ?? null,
+            firstInvalidField: firstInvalidField ?? null,
             firstInvalidFieldHasFocusTarget:
               typeof fieldRef === "object" &&
               fieldRef !== null &&

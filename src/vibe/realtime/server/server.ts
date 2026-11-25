@@ -585,7 +585,10 @@ export function startWebSocketServer(
           // rejection is unambiguous: a self-connection that reaches here lost
           // its leadId query param, a browser one lost its cookies.
           logger.warn("[WS] Rejected upgrade - no lead id (cookie or query)", {
+            endpoint: "/ws",
+            status: 401,
             requestId,
+            requestedChannel: channel !== null,
             browserHandshake: req.headers.has("origin"),
             fetchSite: req.headers.get("sec-fetch-site"),
             hasLeadCookie: cookieHeader
@@ -621,15 +624,20 @@ export function startWebSocketServer(
           // Endpoint (ws-*) channels are always subscribed via the post-upgrade
           // message protocol, where the structured descriptor travels — so no
           // descriptor is available (or needed) here.
-          if (
-            !(await authorizeWsChannel(
-              user,
+          const access = await authorizeWsChannel(
+            user,
+            channel,
+            undefined,
+            logger,
+            upgradeLocale,
+          );
+          if (!access.allowed) {
+            logger.warn("[WS] Upgrade channel denied", {
+              requestId,
               channel,
-              undefined,
-              logger,
-              upgradeLocale,
-            ))
-          ) {
+              socketAuthSource,
+              denialReason: access.reason,
+            });
             return new Response("Forbidden", { status: 403 });
           }
         }
@@ -762,15 +770,14 @@ export function startWebSocketServer(
 
           if (msg.type === "subscribe") {
             recordWsSubscribe();
-            if (
-              !(await authorizeWsChannel(
-                ws.data.user,
-                msg.channel,
-                msg.descriptor,
-                logger,
-                msg.locale,
-              ))
-            ) {
+            const access = await authorizeWsChannel(
+              ws.data.user,
+              msg.channel,
+              msg.descriptor,
+              logger,
+              msg.locale,
+            );
+            if (!access.allowed) {
               const identity = describeSubscribeIdentity(
                 ws.data.user,
                 msg.channel,
@@ -802,9 +809,13 @@ export function startWebSocketServer(
                 "[WS] Subscribe denied - socket identity may not join channel",
                 {
                   channel: msg.channel,
+                  endpoint: msg.descriptor
+                    ? msg.descriptor.endpointPath.join("/")
+                    : "/ws",
                   requestId: ws.data.requestId,
                   connectedForMs: Date.now() - ws.data.connectedAt,
                   hasEndpointDescriptor: msg.descriptor !== undefined,
+                  denialReason: access.reason,
                   isPublic: ws.data.user.isPublic,
                   socketAuthSource: ws.data.socketAuthSource,
                   connectorInstanceId: ws.data.connectorInstanceId,

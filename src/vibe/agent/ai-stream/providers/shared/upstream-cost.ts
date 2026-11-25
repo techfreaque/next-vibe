@@ -57,19 +57,28 @@ function isUsd(currency: string | null | undefined): boolean {
 export function readNanoGptCostUsd(
   body: Parameters<MetadataExtractor["extractMetadata"]>[0]["parsedBody"],
 ): number | null {
+  return readNanoGptCostChunk(body).costUsd;
+}
+
+function readNanoGptCostChunk(
+  body: Parameters<MetadataExtractor["extractMetadata"]>[0]["parsedBody"],
+): { costUsd: number | null; sawUsage: boolean; sawPricing: boolean } {
   const parsed = nanoGptCostSchema.safeParse(body);
   if (!parsed.success) {
-    return null;
+    return { costUsd: null, sawUsage: false, sawPricing: false };
   }
   const pricing = parsed.data.x_nanogpt_pricing;
   const fromPricing = isUsd(pricing?.currency)
     ? positiveCost(pricing?.costUsd)
     : null;
-  if (fromPricing !== null) {
-    return fromPricing;
-  }
   const usage = parsed.data.usage;
-  return isUsd(usage?.currency) ? positiveCost(usage?.cost) : null;
+  return {
+    costUsd:
+      fromPricing ??
+      (isUsd(usage?.currency) ? positiveCost(usage?.cost) : null),
+    sawUsage: usage !== null && usage !== undefined,
+    sawPricing: pricing !== null && pricing !== undefined,
+  };
 }
 
 /** USD a Venice response (body or stream chunk) reports, null when none. */
@@ -104,11 +113,24 @@ export const nanoGptCostExtractor: MetadataExtractor = {
     ),
   createStreamExtractor: () => {
     let costUsd: number | null = null;
+    let sawUsage = false;
+    let sawPricing = false;
     return {
       processChunk: (parsedChunk): void => {
-        costUsd = readNanoGptCostUsd(parsedChunk) ?? costUsd;
+        const evidence = readNanoGptCostChunk(parsedChunk);
+        costUsd = evidence.costUsd ?? costUsd;
+        sawUsage ||= evidence.sawUsage;
+        sawPricing ||= evidence.sawPricing;
       },
-      buildMetadata: () => upstreamCostMetadata(ApiProvider.NANO_GPT, costUsd),
+      buildMetadata: () => {
+        return (
+          upstreamCostMetadata(ApiProvider.NANO_GPT, costUsd) ?? {
+            [ApiProvider.NANO_GPT]: {
+              missingCostEvidence: { sawUsage, sawPricing },
+            },
+          }
+        );
+      },
     };
   },
 };

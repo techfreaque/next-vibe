@@ -5,6 +5,7 @@
 
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { EndpointLogger } from "next-vibe/logger/types";
+import { z } from "zod";
 
 import { CORTEX_WRITE_ALIAS } from "../../../cortex/constants";
 import { FETCH_URL_ALIAS } from "../../../fetch-url-content/constants";
@@ -64,6 +65,17 @@ export interface ParsedToolCall {
   name: string;
   arguments: Record<string, JSONValue>;
 }
+
+const adjacentToolCallArrays = z
+  .array(
+    z.array(
+      z.object({
+        name: z.string().min(1),
+        arguments: z.record(z.string(), z.json()),
+      }),
+    ),
+  )
+  .min(2);
 
 /**
  * Generate system prompt for tool calling instructions
@@ -195,6 +207,29 @@ function tryParseToolCallsJson(
     const parsed = JSON.parse(jsonStr) as ParsedToolCall[];
     if (Array.isArray(parsed)) {
       return parsed;
+    }
+  } catch {
+    // Continue to aggressive cleanup
+  }
+
+  // Some models repeat the array wrapper instead of adding calls to the
+  // existing array. Join complete arrays without changing argument strings.
+  const adjacentArrays = raw
+    .trim()
+    .replaceAll(/"(?:[^"\\]|\\[\s\S])*"|\]\s*\[/g, (part) =>
+      part.startsWith('"') ? part : "],[",
+    );
+  try {
+    const parsed = adjacentToolCallArrays.safeParse(
+      JSON.parse(`[${adjacentArrays}]`),
+    );
+    if (parsed.success) {
+      const toolCalls = parsed.data.flat();
+      logger.info("Parsed adjacent tool-call arrays", {
+        arrayCount: parsed.data.length,
+        toolCallCount: toolCalls.length,
+      });
+      return toolCalls;
     }
   } catch {
     // Continue to aggressive cleanup

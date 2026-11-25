@@ -120,13 +120,13 @@ export class CreditValidatorHandler {
     }
 
     if (!validationResult.data.canUseModel) {
-      // debug: the caller reports the 402 (stream "Setup failed" warn, or the
-      // pulse scheduler's one-time SKIPPED log for cron tasks).
-      logger.debug("Insufficient credits", {
-        user,
+      // Keep numeric evidence beside the localized 402 without creating a
+      // second error-log entry for the same refusal.
+      logger.info("[AiStream] Wallet balance refused generation", {
+        walletKind: user.isPublic ? "lead" : "user",
         modelId: modelInfo.id,
-        cost: modelCost,
-        balance: validationResult.data.balance,
+        requiredCredits: modelCost,
+        spendableCredits: eligible.data,
       });
 
       return fail({
@@ -150,6 +150,13 @@ export class CreditValidatorHandler {
       locale,
     );
     if (!capGate.success) {
+      logger.info("[AiStream] Daily free-tier gate refused generation", {
+        walletKind: user.isPublic ? "lead" : "user",
+        modelId: modelInfo.id,
+        requiredCredits: modelCost,
+        spendableCredits: eligible.data,
+        gateErrorKey: capGate.errorType.errorKey,
+      });
       return fail({
         message: capGate.message,
         errorType: ErrorResponseTypes.PAYMENT_REQUIRED,

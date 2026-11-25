@@ -33,6 +33,12 @@ beforeAll(() => {
       if (path === "/api/en-US/failing") {
         return Response.json({ message: "framework failure" }, { status: 500 });
       }
+      if (path === "/api/en-US/unavailable") {
+        return new Response("Service Unavailable", {
+          status: 503,
+          headers: { "Retry-After": "5" },
+        });
+      }
       if (path === "/api/en-US/unmatched") {
         return new Response("<h1>Not Found</h1>", {
           status: 404,
@@ -46,7 +52,10 @@ beforeAll(() => {
         return new Response(null, { status: 204 });
       }
       if (path === "/api/en-US/cached") {
-        return new Response(null, { status: 304, headers: { etag: '"fixture"' } });
+        return new Response(null, {
+          status: 304,
+          headers: { etag: '"fixture"' },
+        });
       }
       return Response.json(
         {
@@ -95,11 +104,14 @@ it("correlates a startup refusal and its retry outcome", async () => {
   });
   const info = mock((_message: string, ..._metadata: LoggerMetadata[]) => {});
   try {
-    const response = await handleHttpProxy(new Request("http://127.0.0.1:3000/robots.txt"), {
-      nextPort: port,
-      logger: { ...logger, warn, info },
-      isShuttingDown: () => false,
-    });
+    const response = await handleHttpProxy(
+      new Request("http://127.0.0.1:3000/robots.txt"),
+      {
+        nextPort: port,
+        logger: { ...logger, warn, info },
+        isShuttingDown: () => false,
+      },
+    );
     expect(await response.text()).toBe("ready");
     const first = warn.mock.calls[0]?.[1];
     const requestId =
@@ -152,7 +164,9 @@ it("correlates framework API failures and preserves the upstream responses", asy
     ),
   );
   expect(responses.map((response) => response.status)).toEqual([500, 404, 404]);
-  expect(await Promise.all(responses.map((response) => response.text()))).toEqual([
+  expect(
+    await Promise.all(responses.map((response) => response.text())),
+  ).toEqual([
     '{"message":"framework failure"}',
     "<h1>Not Found</h1>",
     '{"success":false}',
@@ -195,6 +209,35 @@ it("forwards bodyless upstream responses", async () => {
   expect(cached.headers.get("etag")).toBe('"fixture"');
 });
 
+it("records a serving upstream's retry interval on a 503", async () => {
+  const error = mock((_message: string, ..._metadata: LoggerMetadata[]) => {});
+  const context = {
+    nextPort,
+    logger: { ...logger, error },
+    isShuttingDown: () => false,
+  };
+  const warm = await handleHttpProxy(
+    new Request("http://127.0.0.1:3000/robots.txt"),
+    context,
+  );
+  await warm.text();
+  const response = await handleHttpProxy(
+    new Request("http://127.0.0.1:3000/api/en-US/unavailable"),
+    context,
+  );
+  expect(response.status).toBe(503);
+  expect(response.headers.get("retry-after")).toBe("5");
+  expect(await response.text()).toBe("Service Unavailable");
+  expect(error).toHaveBeenCalledWith(
+    "[Proxy] Upstream returned an HTTP failure",
+    expect.objectContaining({
+      status: 503,
+      retryAfterSeconds: 5,
+      previousUpstreamResponseAgeMs: expect.any(Number),
+    }),
+  );
+});
+
 it("identifies and logs a synthetic 503 with the client request id", async () => {
   const socket = Bun.serve({ port: 0, fetch: () => new Response("fixture") });
   const port = socket.port ?? 0;
@@ -205,10 +248,16 @@ it("identifies and logs a synthetic 503 with the client request id", async () =>
       method: "POST",
       headers: { "x-request-id": "fixture-request-503" },
     }),
-    { nextPort: port, logger: { ...logger, warn }, isShuttingDown: () => false },
+    {
+      nextPort: port,
+      logger: { ...logger, warn },
+      isShuttingDown: () => false,
+    },
   );
   expect(response.status).toBe(503);
-  expect(readProxyTimingHeader(response.headers.get("server-timing"))).toBe("upstream-unavailable");
+  expect(readProxyTimingHeader(response.headers.get("server-timing"))).toBe(
+    "upstream-unavailable",
+  );
   expect(warn).toHaveBeenCalledWith(
     "[Proxy] Upstream unavailable for a non-retriable request",
     expect.objectContaining({ requestId: "fixture-request-503" }),
@@ -282,8 +331,16 @@ it("reports truncated buffered requests before opening the upstream connection",
 
 it("rejects a write before dispatch when the HA database path is down", async () => {
   const response = await handleHttpProxy(
-    new Request("http://localhost/checkout", { method: "POST", body: "fixture" }),
-    { nextPort: 0, logger, isShuttingDown: () => false, databaseReadiness: () => Promise.resolve(AbortSignal.abort()) },
+    new Request("http://localhost/checkout", {
+      method: "POST",
+      body: "fixture",
+    }),
+    {
+      nextPort: 0,
+      logger,
+      isShuttingDown: () => false,
+      databaseReadiness: () => Promise.resolve(AbortSignal.abort()),
+    },
   );
   expect(response.status).toBe(503);
   expect(response.headers.get("retry-after")).toBe("1");
@@ -301,10 +358,15 @@ it("releases a read waiting for headers when HA database readiness fails", async
     },
   });
   try {
-    const response = await handleHttpProxy(new Request("http://localhost/en-US/story"), {
-      nextPort: slow.port ?? 0, logger, isShuttingDown: () => false,
-      databaseReadiness: () => Promise.resolve(db.signal),
-    });
+    const response = await handleHttpProxy(
+      new Request("http://localhost/en-US/story"),
+      {
+        nextPort: slow.port ?? 0,
+        logger,
+        isShuttingDown: () => false,
+        databaseReadiness: () => Promise.resolve(db.signal),
+      },
+    );
     expect(response.status).toBe(503);
     expect(await response.text()).toBe("Database unavailable");
   } finally {

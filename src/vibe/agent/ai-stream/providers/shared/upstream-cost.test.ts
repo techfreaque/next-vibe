@@ -153,6 +153,33 @@ describe("NanoGPT chat model surfaces the real cost", () => {
       0.0000188,
     );
   });
+
+  it("preserves evidence when NanoGPT reports tokens without a cost", async () => {
+    const provider = createNanoGPT(
+      logger,
+      fakeFetch(() =>
+        sse([
+          {
+            id: "c",
+            choices: [{ index: 0, delta: { content: "Hi" } }],
+          },
+          {
+            id: "c",
+            choices: [{ index: 0, delta: {}, finish_reason: "stop" }],
+            usage: { prompt_tokens: 14, completion_tokens: 2 },
+          },
+        ]),
+      ),
+    );
+    const result = streamText({ model: provider.chat("m"), prompt: "Hi" });
+
+    expect(await result.text).toBe("Hi");
+    expect((await result.usage).inputTokens).toBe(14);
+    expect(readStepUpstreamCost(await result.providerMetadata)).toMatchObject({
+      costUsd: null,
+      nanoGptCostEvidence: { sawUsage: true, sawPricing: false },
+    });
+  });
 });
 
 it("NanoGPT distinguishes text arrays from media in rejected requests", async () => {

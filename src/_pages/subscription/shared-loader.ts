@@ -53,6 +53,11 @@ export async function subscriptionLoader({
   const paymentType = getParam("type");
   const paymentStatus = getParam("payment");
   const callbackToken = getParam("cbtoken");
+  // Stripe fills its Checkout Session placeholder. NOWPayments removes it
+  // from its success URL. Stripe subscriptions are reconciled by webhooks.
+  const isStripeSubscriptionRedirect =
+    paymentType === "subscription" &&
+    /^cs_(?:live|test)_[a-zA-Z0-9]+$/.test(getParam("session_id") ?? "");
 
   if (isAuthenticated && paymentStatus === "success" && callbackToken) {
     if (paymentType === "credits") {
@@ -62,7 +67,7 @@ export async function subscriptionLoader({
         locale,
         logger,
       );
-    } else {
+    } else if (!isStripeSubscriptionRedirect) {
       const { SubscriptionRepository } =
         await import("@/subscription/repository");
       await SubscriptionRepository.handleNowPaymentsSuccessRedirect(

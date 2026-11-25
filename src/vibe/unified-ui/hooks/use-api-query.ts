@@ -237,6 +237,7 @@ export function useApiQuery<TEndpoint extends CreateApiEndpointAny>({
       const currentRequestData = hasStoredParams
         ? deserializeQueryParams<TEndpoint["types"]["RequestOutput"]>(
             storedParams as FormQueryParams,
+            endpoint.requestSchema,
           )
         : requestData;
 

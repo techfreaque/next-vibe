@@ -3,6 +3,7 @@ import { QueryClient } from "@tanstack/react-query";
 import { z } from "zod";
 import { create } from "zustand";
 
+import { isStringQueryField } from "../../core/definition/common.schema";
 import { type CreateApiEndpointAny } from "../../core/definition/endpoint-base";
 import type { Methods } from "../../core/definition/enums";
 import type { CountryLanguage } from "../../core/i18n/core/config";
@@ -362,6 +363,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
  */
 export function deserializeQueryParams<T>(
   params: FormQueryParams | undefined,
+  requestSchema: z.ZodType,
 ): T {
   if (!params) {
     return {} as T;
@@ -371,7 +373,7 @@ export function deserializeQueryParams<T>(
   const result: Record<string, unknown> = {};
 
   for (const [key, value] of Object.entries(params)) {
-    if (typeof value === "string") {
+    if (typeof value === "string" && !isStringQueryField(requestSchema, key)) {
       // Try to parse as JSON (for nested objects that were stringified)
       if (
         (value.startsWith("{") && value.endsWith("}")) ||

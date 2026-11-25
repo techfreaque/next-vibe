@@ -351314,8 +351314,86 @@
               "type": "default",
               "innerType": {
                 "def": {
-                  "type": "optional",
-                  "innerType": {
+                  "type": "union",
+                  "options": [
+                    {
+                      "def": {
+                        "type": "enum",
+                        "entries": {
+                          "sortMode.hot": "sortMode.hot",
+                          "sortMode.new": "sortMode.new",
+                          "sortMode.rising": "sortMode.rising"
+                        }
+                      },
+                      "type": "enum",
+                      "enum": {
+                        "sortMode.hot": "sortMode.hot",
+                        "sortMode.new": "sortMode.new",
+                        "sortMode.rising": "sortMode.rising"
+                      },
+                      "options": [
+                        "sortMode.hot",
+                        "sortMode.new",
+                        "sortMode.rising"
+                      ]
+                    },
+                    {
+                      "def": {
+                        "type": "pipe",
+                        "in": {
+                          "def": {
+                            "type": "enum",
+                            "entries": {
+                              "hot": "hot",
+                              "new": "new",
+                              "rising": "rising"
+                            }
+                          },
+                          "type": "enum",
+                          "enum": {
+                            "hot": "hot",
+                            "new": "new",
+                            "rising": "rising"
+                          },
+                          "options": ["hot", "new", "rising"]
+                        },
+                        "out": {
+                          "def": {
+                            "type": "transform"
+                          },
+                          "type": "transform"
+                        }
+                      },
+                      "type": "pipe",
+                      "in": {
+                        "def": {
+                          "type": "enum",
+                          "entries": {
+                            "hot": "hot",
+                            "new": "new",
+                            "rising": "rising"
+                          }
+                        },
+                        "type": "enum",
+                        "enum": {
+                          "hot": "hot",
+                          "new": "new",
+                          "rising": "rising"
+                        },
+                        "options": ["hot", "new", "rising"]
+                      },
+                      "out": {
+                        "def": {
+                          "type": "transform"
+                        },
+                        "type": "transform"
+                      }
+                    }
+                  ]
+                },
+                "type": "union",
+                "options": [
+                  {
                     "def": {
                       "type": "enum",
                       "entries": {
@@ -351335,9 +351413,60 @@
                       "sortMode.new",
                       "sortMode.rising"
                     ]
+                  },
+                  {
+                    "def": {
+                      "type": "pipe",
+                      "in": {
+                        "def": {
+                          "type": "enum",
+                          "entries": {
+                            "hot": "hot",
+                            "new": "new",
+                            "rising": "rising"
+                          }
+                        },
+                        "type": "enum",
+                        "enum": {
+                          "hot": "hot",
+                          "new": "new",
+                          "rising": "rising"
+                        },
+                        "options": ["hot", "new", "rising"]
+                      },
+                      "out": {
+                        "def": {
+                          "type": "transform"
+                        },
+                        "type": "transform"
+                      }
+                    },
+                    "type": "pipe",
+                    "in": {
+                      "def": {
+                        "type": "enum",
+                        "entries": {
+                          "hot": "hot",
+                          "new": "new",
+                          "rising": "rising"
+                        }
+                      },
+                      "type": "enum",
+                      "enum": {
+                        "hot": "hot",
+                        "new": "new",
+                        "rising": "rising"
+                      },
+                      "options": ["hot", "new", "rising"]
+                    },
+                    "out": {
+                      "def": {
+                        "type": "transform"
+                      },
+                      "type": "transform"
+                    }
                   }
-                },
-                "type": "optional"
+                ]
               },
               "defaultValue": "sortMode.hot"
             },

@@ -471,6 +471,7 @@ export class AbortErrorHandler {
                 imageCount: cutOffImageCount,
                 imageOutputTokens,
                 modelCreditCost,
+                upstreamCostEvidence: "stream-interrupted-before-cost",
               },
             );
           }

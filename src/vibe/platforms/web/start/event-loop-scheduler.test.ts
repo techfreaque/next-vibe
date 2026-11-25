@@ -2,6 +2,7 @@ import { describe, expect, it } from "bun:test";
 
 import {
   cpuPressureWindow,
+  cpuThrottleWindow,
   describeSchedulerEvidence,
   readThreadSchedulerSample,
   threadSchedulerDelta,
@@ -21,17 +22,45 @@ describe("describeSchedulerEvidence", () => {
   });
 
   it("excludes the scheduled 50 ms from CPU attribution and identifies off-CPU time", () => {
-    expect(describeSchedulerEvidence({ stallThreadCpuMs: 78, stallRunQueueMs: 35 }, 84, 50))
-      .toBe("no-dominant-scheduler-counter");
-    expect(describeSchedulerEvidence({ stallThreadCpuMs: 418, stallRunQueueMs: 6 }, 917, 50))
-      .toBe("outside-cpu-and-runnable-wait");
+    expect(
+      describeSchedulerEvidence(
+        { stallThreadCpuMs: 78, stallRunQueueMs: 35 },
+        84,
+        50,
+      ),
+    ).toBe("no-dominant-scheduler-counter");
+    expect(
+      describeSchedulerEvidence(
+        { stallThreadCpuMs: 418, stallRunQueueMs: 6 },
+        917,
+        50,
+      ),
+    ).toBe("outside-cpu-and-runnable-wait");
   });
 
   it("keeps ambiguous or unavailable scheduler evidence explicit", () => {
     expect(describeSchedulerEvidence({ stallThreadCpuMs: 12 }, 200)).toBe(
       "no-dominant-scheduler-counter",
     );
-    expect(describeSchedulerEvidence(undefined, 200)).toBe("no-scheduler-sample");
+    expect(describeSchedulerEvidence(undefined, 200)).toBe(
+      "no-scheduler-sample",
+    );
+  });
+});
+
+describe("cpuThrottleWindow", () => {
+  it("distinguishes quota throttling from an available zero sample", () => {
+    const initial = { periods: 2, microseconds: 20_000 };
+    expect(cpuThrottleWindow(initial, initial)).toEqual({
+      throttledPeriods: 0,
+      throttledMs: 0,
+    });
+    expect(
+      cpuThrottleWindow(initial, { periods: 5, microseconds: 112_500 }),
+    ).toEqual({ throttledPeriods: 3, throttledMs: 93 });
+    expect(
+      cpuThrottleWindow(initial, { periods: 1, microseconds: 19_000 }),
+    ).toBeUndefined();
   });
 });
 

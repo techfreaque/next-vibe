@@ -357,6 +357,10 @@ export async function complete(
     logger.warn("[AI Stream] Provider content filter triggered", {
       model,
       threadId,
+      apiProvider: modelConfig.apiProvider,
+      providerModel: modelConfig.providerModel,
+      partialOutputChars: state.p.ctx.currentAssistantContent.length,
+      outputTokens: finalOutputTokens,
     });
     const { ctx, user, t } = state.p;
     await ctx.dbWriter.emitErrorMessage({
@@ -479,6 +483,10 @@ export async function complete(
         budgetCutStage: ctx.creditBudgetStopped ? "next-step-input" : "output",
         budgetNextInputTokens: ctx.creditBudgetNextInputTokens,
         outputCapped: ctx.creditBudgetCapped,
+        balanceEvidence: {
+          spendableCreditsAtStart: state.p.creditBalance,
+          creditsAlreadyDeducted: ctx.dbWriter.totalCreditsDeducted,
+        },
         isEmptyAnswer,
         errorKey: ErrorResponseTypes.PAYMENT_REQUIRED.errorKey,
         steps: ctx.tokenStepCount,
@@ -570,6 +578,8 @@ export async function complete(
       providerModel: modelConfig.providerModel,
       providerError: ctx.lastProviderErrorText,
       totalTokens: usage.totalTokens,
+      outputTokens: usage.outputTokens,
+      reasoningTokens,
       finishReason: finishReason ?? null,
       outputCapped: ctx.creditBudgetCapped,
       loopStopped: ctx.creditBudgetStopped,
@@ -591,38 +601,38 @@ export async function complete(
       totalTokens: null,
       finishReason: finishReason ?? null,
     });
-    // The provider said why (overload, filter, unavailable): show that.
-    // A balance-capped step ran out of output: say so. Otherwise tokens
-    // were charged (prompt read, maybe hidden output): say so, and that
-    // only the provider's cost was billed.
-    const providerKey =
-      finishReason === "error"
-        ? providerErrorTranslationKey(ctx.lastProviderErrorText)
-        : null;
-    const emptyKey =
-      providerKey ??
-      (ctx.creditBudgetCapped && finishReason !== "content-filter"
-        ? "errors.creditBudgetReached"
-        : actualCreditCost > 0
-          ? "errors.emptyAnswer"
-          : "errors.noResponse");
-    await ctx.dbWriter.emitErrorMessage({
-      threadId,
-      errorType: StreamErrorType.STREAM_ERROR,
-      error: fail({
-        message: t(emptyKey),
-        errorType:
-          emptyKey === "errors.creditBudgetReached"
-            ? ErrorResponseTypes.PAYMENT_REQUIRED
-            : providerKey
-              ? ErrorResponseTypes.EXTERNAL_SERVICE_ERROR
-              : ErrorResponseTypes.INTERNAL_ERROR,
-      }),
-      content: t(emptyKey),
-      parentId: ctx.lastParentId,
-      sequenceId: ctx.lastSequenceId,
-      user,
-    });
+    // A content filter already emitted its specific error above. All other
+    // empty streams need a visible explanation, including balance caps.
+    if (finishReason !== "content-filter") {
+      const providerKey =
+        finishReason === "error"
+          ? providerErrorTranslationKey(ctx.lastProviderErrorText)
+          : null;
+      const emptyKey =
+        providerKey ??
+        (ctx.creditBudgetCapped
+          ? "errors.creditBudgetReached"
+          : actualCreditCost > 0
+            ? "errors.emptyAnswer"
+            : "errors.noResponse");
+      await ctx.dbWriter.emitErrorMessage({
+        threadId,
+        errorType: StreamErrorType.STREAM_ERROR,
+        error: fail({
+          message: t(emptyKey),
+          errorType:
+            emptyKey === "errors.creditBudgetReached"
+              ? ErrorResponseTypes.PAYMENT_REQUIRED
+              : providerKey
+                ? ErrorResponseTypes.EXTERNAL_SERVICE_ERROR
+                : ErrorResponseTypes.INTERNAL_ERROR,
+        }),
+        content: t(emptyKey),
+        parentId: ctx.lastParentId,
+        sequenceId: ctx.lastSequenceId,
+        user,
+      });
+    }
   }
 
   logger.debug("[AI Stream] Stream completed", {

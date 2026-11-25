@@ -978,6 +978,10 @@ export class StreamLoop implements StreamLoopState {
         error: errorText,
         promptToolHistory: summarizePromptToolHistory(this.lastPromptMessages),
         promptStep: this.lastPromptStep,
+        providerStepEvidence: {
+          sawVisibleText: this.p.ctx.stepHasAnswerText,
+          waitingToolResults: this.p.ctx.pendingToolMessages.size,
+        },
         initialPromptToolHistory:
           this.lastPromptStep > 0
             ? summarizePromptToolHistory(this.p.messages)

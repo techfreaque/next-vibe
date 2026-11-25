@@ -19,7 +19,6 @@ import {
   success,
 } from "next-vibe/core/route/response.schema";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import TurndownService from "turndown";
 import { z } from "zod";
 
 import { createFixtureFetch } from "../ai-stream/testing/fetch-cache";
@@ -27,6 +26,7 @@ import { getStorageAdapter } from "../chat/storage/index";
 import { agentEnv } from "../env";
 import { PROVIDER_SETUP_INSTRUCTIONS } from "../env-availability";
 import type { FetchUrlContentGetResponseOutput } from "./definition";
+import { htmlToMarkdown } from "./html-to-markdown";
 import type { FetchUrlContentT } from "./i18n";
 
 interface TruncateResult {
@@ -67,6 +67,7 @@ type FetchResult<T> =
       upstreamStatus?: number;
       proxyElapsedMs?: number;
       proxyBodyStatus?: string;
+      proxyBodyRead?: "complete" | "deadline" | "stream-error";
       targetStatusCode?: number;
       solutionVerified?: boolean;
       deadlineFired?: boolean;
@@ -276,24 +277,6 @@ class FetchUrlService {
    */
   readonly TIMEOUT = 60_000;
   private readonly SCRAPPEY_API_URL = "https://publisher.scrappey.com/api/v1";
-  private turndownService: TurndownService;
-
-  constructor() {
-    this.turndownService = new TurndownService({
-      headingStyle: "atx",
-      codeBlockStyle: "fenced",
-      bulletListMarker: "-",
-      emDelimiter: "*",
-      strongDelimiter: "**",
-    });
-
-    this.turndownService.addRule("strikethrough", {
-      filter: ["del", "s"],
-      replacement: (content) => `~~${content}~~`,
-    });
-
-    this.turndownService.remove(["script", "style", "noscript"]);
-  }
 
   async fetchUrl(
     url: string,
@@ -339,6 +322,7 @@ class FetchUrlService {
 
     const markdownResult = this.convertHtmlToMarkdown(
       scrappeyResponse.solution.response,
+      scrappeyResponse.solution.currentUrl,
     );
     if (!markdownResult.ok) {
       return markdownResult;
@@ -425,7 +409,12 @@ class FetchUrlService {
         // Scrappey's body names the reason (blocked, login wall, proxy
         // failure); the status line alone ("500 Internal Server Error") left
         // every failed fetch undiagnosable.
-        const raw = await response.text().catch(() => "");
+        let proxyBodyRead: "complete" | "deadline" | "stream-error" =
+          "complete";
+        const raw = await response.text().catch(() => {
+          proxyBodyRead = signal.aborted ? "deadline" : "stream-error";
+          return "";
+        });
         let statusEvidence: z.infer<typeof proxyStatusSchema> | undefined;
         if (raw.length <= 64_000 && raw.trimStart().startsWith("{")) {
           try {
@@ -443,6 +432,7 @@ class FetchUrlService {
           proxyElapsedMs: Math.round(performance.now() - proxyStartedAt),
           deadlineFired: signal.aborted,
           proxyBodyStatus: statusEvidence?.status,
+          proxyBodyRead,
           targetStatusCode: statusEvidence?.solution?.statusCode,
           solutionVerified: statusEvidence?.solution?.verified,
           failureStage: "proxy-status",
@@ -482,10 +472,13 @@ class FetchUrlService {
     }
   }
 
-  private convertHtmlToMarkdown(html: string): FetchResult<string> {
+  private convertHtmlToMarkdown(
+    html: string,
+    sourceUrl: string,
+  ): FetchResult<string> {
     try {
       const cleanedHtml = this.cleanHtml(html);
-      const markdown = this.turndownService.turndown(cleanedHtml);
+      const markdown = htmlToMarkdown(cleanedHtml, sourceUrl);
       return { ok: true, data: this.cleanMarkdown(markdown) };
     } catch (error) {
       const errorMessage =
@@ -622,6 +615,7 @@ export class FetchUrlContentRepository {
           timeoutMs: fetchService.TIMEOUT,
           proxyElapsedMs: result.proxyElapsedMs,
           proxyBodyStatus: result.proxyBodyStatus,
+          proxyBodyRead: result.proxyBodyRead,
           targetStatusCode: result.targetStatusCode,
           solutionVerified: result.solutionVerified,
           deadlineFired: result.deadlineFired,

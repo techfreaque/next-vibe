@@ -67,6 +67,30 @@ function parseRecordString(value: string): ArgsRecord | null {
   }
 }
 
+/** Distinguish invalid JSON from a plain string without logging model input. */
+export function describeExecuteToolInputEncoding(
+  value: WidgetData,
+): string | undefined {
+  if (typeof value !== "string") {
+    return undefined;
+  }
+  const trimmed = value.trim();
+  if (trimmed.startsWith("```")) {
+    return "code-fence";
+  }
+  if (trimmed.length === 0) {
+    return "empty-string";
+  }
+  try {
+    const parsed: WidgetData = JSON.parse(trimmed);
+    return isRecord(parsed) ? "json-object" : "json-non-object";
+  } catch {
+    return trimmed.startsWith("{") || trimmed.startsWith("[")
+      ? "malformed-json"
+      : "plain-text";
+  }
+}
+
 export function describeNestedExecuteToolArgs(value: WidgetData): {
   nestedExecuteToolTargetShape?: string;
   nestedExecuteToolInputShape?: string;

@@ -280,7 +280,10 @@ export function createNextHandler<T extends CreateApiEndpointAny>(
       traceStage = "request-body";
       const requestData =
         endpoint.method === Methods.GET
-          ? parseSearchParams(request.nextUrl.searchParams)
+          ? parseSearchParams(
+              request.nextUrl.searchParams,
+              endpoint.requestSchema,
+            )
           : await parseRequestBody(request, logger);
 
       // Call shared generic handler (does auth, permissions, validation, business logic, email, SMS)

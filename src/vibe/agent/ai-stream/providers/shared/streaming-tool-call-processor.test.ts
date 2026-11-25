@@ -16,7 +16,10 @@ import {
   processStreamingResponseWithToolCalls,
 } from "./streaming-tool-call-processor";
 
-import { generateToolSystemPrompt } from "./tool-calling-prompt-engineering";
+import {
+  generateToolSystemPrompt,
+  parseToolCalls,
+} from "./tool-calling-prompt-engineering";
 
 const logger = createEndpointLogger(false, defaultLocale);
 
@@ -156,6 +159,30 @@ describe("processStreamingResponseWithToolCalls", () => {
     expect(result.text).toBe("On it. ");
     expect(result.toolCalls).toEqual(["generate_image"]);
     expect(result.finishReason).toBe("tool_calls");
+  });
+
+  it("joins adjacent tool-call arrays in the same block", async () => {
+    const first = [{ name: "lookup", arguments: { text: 'Keep "] [" here' } }];
+    const second = [{ name: "summarize", arguments: { text: "second call" } }];
+    const markup = `<tool_calls>${JSON.stringify(first)}\n${JSON.stringify(second)}</tool_calls>`;
+    const result = await run(upstream([markup], "stop"));
+
+    expect(result.text).toBe("");
+    expect(result.toolCalls).toEqual(["lookup", "summarize"]);
+    expect(result.finishReason).toBe("tool_calls");
+    expect(parseToolCalls(markup, logger).toolCalls).toEqual([
+      ...first,
+      ...second,
+    ]);
+  });
+
+  it("rejects adjacent arrays when a call has malformed arguments", () => {
+    const error = mock(() => undefined);
+    const markup =
+      '<tool_calls>[{"name":"lookup","arguments":{}}]\n[{"name":"summarize","arguments":"missing object"}]</tool_calls>';
+
+    expect(parseToolCalls(markup, { ...logger, error }).toolCalls).toBeNull();
+    expect(error).toHaveBeenCalledTimes(1);
   });
 
   it("reports the shape of rejected markup without its arguments", async () => {

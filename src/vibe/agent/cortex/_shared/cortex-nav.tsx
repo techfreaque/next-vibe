@@ -179,6 +179,7 @@ export function CortexNav({
       {/* Back */}
       {isPushed && (
         <Button
+          type="button"
           variant="ghost"
           size="sm"
           onClick={() => navigation.pop()}
@@ -217,6 +218,7 @@ export function CortexNav({
           return (
             <Button
               key={action}
+              type="button"
               variant="ghost"
               size="sm"
               onClick={() => void navigate(action)}

@@ -100,6 +100,10 @@ it("reports quick reconnects and times out hidden, offline drops", async () => {
         message: "[WS Client] Connection lost",
         context: {
           requestId: new URL(firstSocketUrl).searchParams.get("requestId"),
+          closedAtMs: expect.any(Number),
+          reconnectRequestId: new URL(
+            TestSocket.sockets[1]?.url ?? "",
+          ).searchParams.get("requestId"),
           code: 1012,
           reason: "server drain",
           attempts: 1,
@@ -184,10 +188,18 @@ it("reports quick reconnects and times out hidden, offline drops", async () => {
     Object.defineProperty(navigator, "onLine", { value: true });
     fakeWindow.dispatchEvent(new Event("online"));
     expect(TestSocket.sockets).toHaveLength(exhaustedSocketCount + 2);
-    TestSocket.sockets.at(-1)?.open();
+    const recoveredSocket = TestSocket.sockets.at(-1);
+    recoveredSocket?.open();
     expect(warnings.at(-1)).toMatchObject({
       message: "[WS Client] Reconnected after disconnect",
-      context: { noticeableDownMs: 121_000, offlineMs: 181_000 },
+      context: {
+        noticeableDownMs: 121_000,
+        offlineMs: 181_000,
+        reconnectRequestId: new URL(recoveredSocket?.url ?? "").searchParams.get(
+          "requestId",
+        ),
+        reconnectHandshakeMs: 0,
+      },
     });
 
     const socketBeforePagehide = TestSocket.sockets.at(-1);

@@ -1,11 +1,24 @@
 import { describe, expect, it } from "bun:test";
 
 import {
+  describeExecuteToolInputEncoding,
   describeExecuteToolValidationStage,
   describeNestedExecuteToolArgs,
   describeToolArgShape,
   normalizeExecuteToolArgs,
 } from "./execute-tool-args";
+
+describe("describeExecuteToolInputEncoding", () => {
+  it("distinguishes invalid JSON, plain text, and code fences", () => {
+    expect(describeExecuteToolInputEncoding('{"title":')).toBe("malformed-json");
+    expect(describeExecuteToolInputEncoding("a title")).toBe("plain-text");
+    expect(describeExecuteToolInputEncoding('  ```json\n{}\n```')).toBe("code-fence");
+    expect(describeExecuteToolInputEncoding('{"title":"a title"}')).toBe("json-object");
+    expect(describeExecuteToolInputEncoding('["a title"]')).toBe("json-non-object");
+    expect(describeExecuteToolInputEncoding("  ")).toBe("empty-string");
+    expect(describeExecuteToolInputEncoding({ title: "a title" })).toBeUndefined();
+  });
+});
 
 describe("describeToolArgShape", () => {
   it("distinguishes missing, empty and malformed model arguments", () => {

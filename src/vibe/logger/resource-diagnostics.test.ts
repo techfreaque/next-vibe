@@ -9,14 +9,28 @@ import { identifyBrowserAutomation } from "./client-context";
 import {
   classifyResourceFailure,
   describeResourceResponse,
+  resourceSourceKind,
   resourceTiming,
 } from "./resource-diagnostics";
 
 describe("browser failure attribution", () => {
-  it("keeps Meta crawlers and safety scanners distinct from ordinary browsers", () => {
-    expect(identifyBrowserAutomation("Mozilla/5.0 meta-externalagent/1.1")).toBe(
-      "meta-crawler",
+  it("distinguishes relative markup from resolved and missing resource sources", () => {
+    expect(resourceSourceKind("/static/menu.svg")).toBe("root-relative");
+    expect(resourceSourceKind("./menu.svg")).toBe("relative");
+    expect(resourceSourceKind("//example.test/menu.svg")).toBe(
+      "protocol-relative",
     );
+    expect(resourceSourceKind("https://example.test/menu.svg")).toBe(
+      "absolute",
+    );
+    expect(resourceSourceKind(" ")).toBe("empty");
+    expect(resourceSourceKind(null)).toBe("missing");
+  });
+
+  it("keeps Meta crawlers and safety scanners distinct from ordinary browsers", () => {
+    expect(
+      identifyBrowserAutomation("Mozilla/5.0 meta-externalagent/1.1"),
+    ).toBe("meta-crawler");
     expect(identifyBrowserAutomation("facebookexternalhit/1.1")).toBe(
       "meta-crawler",
     );
@@ -53,7 +67,11 @@ describe("browser failure attribution", () => {
         responseEnd: 77_351,
         decodedBodySize: 0,
       }),
-    ).toEqual({ decodedBodySize: 0, responseWaitMs: 40, responseReadMs: 77_211 });
+    ).toEqual({
+      decodedBodySize: 0,
+      responseWaitMs: 40,
+      responseReadMs: 77_211,
+    });
   });
 
   it("leaves masked phases unavailable", () => {
@@ -64,7 +82,11 @@ describe("browser failure attribution", () => {
         responseEnd: 300,
         decodedBodySize: 0,
       }),
-    ).toEqual({ decodedBodySize: 0, responseWaitMs: null, responseReadMs: null });
+    ).toEqual({
+      decodedBodySize: 0,
+      responseWaitMs: null,
+      responseReadMs: null,
+    });
   });
 
   it("reads independent edge and app markers from one response", () => {
@@ -72,7 +94,9 @@ describe("browser failure attribution", () => {
     const header = `vibe-edge;desc="s2", vibe-edge-request;desc="${edgeRequestId}", vibe-proxy;desc="upstream-timeout"`;
     expect(readEdgeTimingHeader(header)).toBe("s2");
     expect(readEdgeRequestTimingHeader(header)).toBe(edgeRequestId);
-    expect(readEdgeRequestTimingHeader('vibe-edge-request;desc="unexpected"')).toBeNull();
+    expect(
+      readEdgeRequestTimingHeader('vibe-edge-request;desc="unexpected"'),
+    ).toBeNull();
     expect(readProxyTimingHeader(header)).toBe("upstream-timeout");
     expect(readEdgeTimingHeader('vibe-edge;desc="unknown"')).toBeNull();
     expect(readEdgeTimingHeader(null)).toBeNull();

@@ -246,8 +246,9 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
     // Deserialize JSON-stringified nested objects back to their original form
     return deserializeQueryParams<TEndpoint["types"]["RequestOutput"]>(
       rawQueryParams,
+      endpoint.requestSchema,
     );
-  }, [rawQueryParams, defaultQueryParams]);
+  }, [rawQueryParams, defaultQueryParams, endpoint.requestSchema]);
 
   // Create a function to update query params in the store
   const setQueryParams = useCallback(

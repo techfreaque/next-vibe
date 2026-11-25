@@ -44,7 +44,13 @@ describe("guest lead database deadline (local Postgres)", () => {
         withLeadDatabaseDeadline(pool, start + 100, async () => {
           started = true;
         }),
-      ).rejects.toThrow("Guest lead database deadline exceeded");
+      ).rejects.toMatchObject({
+        message: "Guest lead database deadline exceeded",
+        phase: "checkout",
+        poolTotal: 1,
+        poolIdle: 0,
+        poolWaiting: 1,
+      });
       expect(performance.now() - start).toBeLessThan(1500);
       held.release();
       fixtureReleased = true;
@@ -53,7 +59,9 @@ describe("guest lead database deadline (local Postgres)", () => {
       expect(pool.idleCount).toBe(1);
       expect(pool.waitingCount).toBe(0);
     } finally {
-      if (!fixtureReleased) {held.release();}
+      if (!fixtureReleased) {
+        held.release();
+      }
       await pool.end();
     }
   });
@@ -93,7 +101,10 @@ describe("guest lead database deadline (local Postgres)", () => {
             .select({ value: sql`pg_sleep(2)` })
             .from(sql`(VALUES (1)) AS fixture(id)`),
         ),
-      ).rejects.toThrow("Guest lead database deadline exceeded");
+      ).rejects.toMatchObject({
+        message: "Guest lead database deadline exceeded",
+        phase: "lookup",
+      });
       expect(performance.now() - start).toBeLessThan(1500);
       await pool.query("SELECT 1");
       expect(pool.idleCount).toBe(1);
@@ -186,7 +197,9 @@ describe("guest lead database deadline (local Postgres)", () => {
       sockets.add(upstream);
       downstream.pipe(upstream);
       upstream.on("data", (data: Buffer) => {
-        if (!dropReplies) {downstream.write(data);}
+        if (!dropReplies) {
+          downstream.write(data);
+        }
       });
       const close = (): void => {
         downstream.destroy();

@@ -29,6 +29,7 @@ import { parseError } from "../../../core/utils/parse-error";
 import { db } from "../../../database";
 import { databaseFailureDiagnostics } from "../../../database/error-diagnostics";
 import { Environment } from "../../../env/env-util";
+import { sanitizeRoutePath } from "../../../logger/client-context";
 import { createEndpointLogger } from "../../../logger/server";
 import type { EndpointLogger } from "../../../logger/types";
 import { frameExchangeTokens } from "../../../platforms/vibe-frame/db";
@@ -37,7 +38,10 @@ import {
   markDegradedPublicDocument,
 } from "../../../platforms/web/middleware/public-document";
 import { shouldSkipPath } from "../../../platforms/web/middleware/utils";
-import { GUEST_LEAD_DB_BUDGET_MS } from "../../lead/database-deadline";
+import {
+  GUEST_LEAD_DB_BUDGET_MS,
+  GuestLeadDatabaseDeadlineError,
+} from "../../lead/database-deadline";
 import { leads } from "../../lead/db";
 import {
   createAnonymousLead,
@@ -210,6 +214,9 @@ export function leadFailureResponse(
   const renderPublic = !!details.driverFailure && canRenderWithoutLead(request);
   const status = renderPublic ? 200 : details.driverFailure ? 503 : 500;
   const requestId = request.headers.get(REQUEST_ID_HEADER_NAME);
+  const databaseDeadline =
+    error instanceof GuestLeadDatabaseDeadlineError ? error : undefined;
+  const budgetOverrunMs = Math.round(performance.now() - deadlineMs);
   logger.error(
     operation === "create"
       ? "Anonymous lead creation failed in middleware"
@@ -226,10 +233,14 @@ export function leadFailureResponse(
           : (creationStage ?? operation),
       requestId:
         requestId && UUID_REGEX.test(requestId) ? requestId : undefined,
-      elapsedMs: Math.round(
-        performance.now() - deadlineMs + GUEST_LEAD_DB_BUDGET_MS,
-      ),
+      elapsedMs: budgetOverrunMs + GUEST_LEAD_DB_BUDGET_MS,
+      budgetOverrunMs: Math.max(0, budgetOverrunMs),
+      databaseDeadlinePhase: databaseDeadline?.phase,
+      poolTotal: databaseDeadline?.poolTotal,
+      poolIdle: databaseDeadline?.poolIdle,
+      poolWaiting: databaseDeadline?.poolWaiting,
       method: request.method,
+      path: sanitizeRoutePath(request.nextUrl.pathname),
       status,
       renderWithoutLead: renderPublic,
     },

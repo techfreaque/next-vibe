@@ -693,6 +693,7 @@ async function reportIdb(
   failure: LargeStoreFailure,
   logger: EndpointLogger,
   valueLength?: number,
+  fallbackValueFound?: boolean,
 ): Promise<void> {
   reportStorageFailure(logger, {
     platform: "web",
@@ -705,7 +706,10 @@ async function reportIdb(
       operation !== "get" || isQuotaError(failure.error)
         ? await backend.usage()
         : undefined,
-    extra: { indexedDbStage: failure.stage ?? null },
+    extra: {
+      indexedDbStage: failure.stage ?? null,
+      fallbackValueFound: fallbackValueFound ?? null,
+    },
   });
 }
 
@@ -724,8 +728,17 @@ export function createLargeStorage(
       }
       const stored = await backend.get(key);
       if (!stored.ok) {
-        await reportIdb(backend, "get", key, stored, logger);
-        return getLocalItem(key, logger);
+        const fallback = getLocalItem(key, logger);
+        await reportIdb(
+          backend,
+          "get",
+          key,
+          stored,
+          logger,
+          undefined,
+          fallback !== null,
+        );
+        return fallback;
       }
       if (stored.value !== null) {
         return stored.value;

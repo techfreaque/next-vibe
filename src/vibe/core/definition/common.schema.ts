@@ -5,6 +5,16 @@ import type { TranslatedKeyType } from "../i18n/core/scoped-translation";
 
 // Common reusable schemas
 
+/** A direct string field stays text even when its value resembles JSON. */
+export function isStringQueryField(
+  schema: z.ZodType | undefined,
+  field: string,
+): boolean {
+  return (
+    schema instanceof z.ZodObject && schema.shape[field] instanceof z.ZodString
+  );
+}
+
 export const dateSchema = z
   .union([z.string(), z.date(), z.coerce.number()])
   .transform((val): Date => {

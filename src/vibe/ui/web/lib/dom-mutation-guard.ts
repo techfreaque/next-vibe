@@ -156,6 +156,7 @@ let occurrences = 0;
 let summaryArmed = false;
 const laterOperations = new Map<string, number>();
 const laterSamples: string[] = [];
+const laterTargetMarkers = new Set<string>();
 let reporter: DomGuardReporter | null = null;
 const buffered: DomGuardEvent[] = [];
 
@@ -189,6 +190,12 @@ function record(
     laterOperations.set(kind, (laterOperations.get(kind) ?? 0) + 1);
     if (laterSamples.length < SUMMARY_SAMPLE_LIMIT) {
       laterSamples.push(describeNode(target));
+      const markers = getMutationTargetMarkers(target);
+      if (markers) {
+        for (const marker of markers.split(",")) {
+          laterTargetMarkers.add(marker);
+        }
+      }
     }
     armSummary();
     return;
@@ -237,7 +244,7 @@ function armSummary(): void {
       parentNode: "summary",
       targetNode: laterSamples.join(" | ").slice(0, 300),
       targetActualParent: null,
-      targetExtensionMarkers: null,
+      targetExtensionMarkers: [...laterTargetMarkers].join(","),
       occurrence: occurrences,
       path: sanitizeTelemetryUrl(window.location.pathname) ?? "/",
       summary: true,
@@ -247,6 +254,7 @@ function armSummary(): void {
     };
     laterOperations.clear();
     laterSamples.length = 0;
+    laterTargetMarkers.clear();
     if (reporter) {
       reporter(event, getDomEnvironmentHints());
       return;

@@ -79,7 +79,16 @@ const { GET } = createEndpoint({
         description: "get.sortMode.description" as const,
         columns: 6,
         options: FeedSortModeOptions,
-        schema: z.enum(FeedSortModeDB).optional().default(FeedSortMode.HOT),
+        schema: z
+          .union([
+            z.enum(FeedSortModeDB),
+            z
+              .enum(["hot", "new", "rising"])
+              .transform(
+                (mode): (typeof FeedSortModeDB)[number] => `sortMode.${mode}`,
+              ),
+          ])
+          .default(FeedSortMode.HOT),
       }),
       page: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,

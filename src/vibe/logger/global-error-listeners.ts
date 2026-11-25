@@ -10,7 +10,9 @@ import {
   addWindowListener,
   querySelector,
 } from "next-vibe/ui/lib/dom";
+import { getDomEnvironmentHints } from "next-vibe/ui/lib/dom-mutation-guard";
 import { getCurrentOrigin, getCurrentUrl } from "next-vibe/ui/lib/location";
+import { getUserAgent } from "next-vibe/ui/lib/media";
 
 import {
   currentBuildId,
@@ -22,6 +24,7 @@ import { claimErrorReport } from "./client-context";
 import {
   describeUrl,
   navigationTimingEvidence,
+  resourceSourceKind,
   resourceTiming,
   urlExtension,
 } from "./resource-diagnostics";
@@ -117,6 +120,18 @@ function handleWindowError(logger: EndpointLogger, event: Event): void {
         source: "window.error.resource",
         tag,
         resource,
+        resourceSourceKind: resourceSourceKind(
+          target.getAttribute(
+            target instanceof HTMLLinkElement ? "href" : "src",
+          ),
+        ),
+        imageUsesSrcset:
+          target instanceof HTMLImageElement
+            ? Boolean(
+                target.getAttribute("srcset") ||
+                target.parentElement?.tagName === "PICTURE",
+              )
+            : null,
         // ids are redacted from `resource`; a missing extension on a file URL
         // means the src was cut short (e.g. a markdown image mid-stream)
         resourceExt: urlExtension(src),
@@ -144,20 +159,22 @@ function handleWindowError(logger: EndpointLogger, event: Event): void {
   if (error && !claimErrorReport(error)) {
     return;
   }
+  const file = describeUrl(event.filename);
+  const navigation = navigationTimingEvidence();
+  const fromPageDocument =
+    file !== null && file === describeUrl(getCurrentUrl());
+  const fromNavigationDocument =
+    file !== null && file === navigation.documentNavigationPath;
   const context = {
     source: "window.onerror",
-    file: describeUrl(event.filename),
+    file,
     line: event.lineno,
     column: event.colno,
     pageBuildId: currentBuildId(),
-    ...navigationTimingEvidence(),
-    // Thrown from the page document itself (not a /_next/ chunk): an inline
-    // script. Ours are only Next's data pushes; app logic lives in chunks, so
-    // this is usually code injected by an extension (e.g. a wallet's
-    // `window.ethereum` shim) or a page-rewriting proxy.
-    fromPageDocument:
-      !!event.filename &&
-      describeUrl(event.filename) === describeUrl(getCurrentUrl()),
+    ...navigation,
+    // After a client navigation an inline script can still name the initial HTML URL.
+    fromPageDocument,
+    fromNavigationDocument,
   };
   if (error) {
     if (isChunkLoadError(error)) {
@@ -168,9 +185,21 @@ function handleWindowError(logger: EndpointLogger, event: Event): void {
       });
       return;
     }
+    const dom =
+      fromPageDocument || fromNavigationDocument || error.name === "RangeError"
+        ? getDomEnvironmentHints()
+        : null;
     logger.error(`Uncaught error: ${error.message}`, error, {
       ...context,
       extensionOrigin: extensionOrigin(error.stack),
+      ...(dom
+        ? {
+            translatedClass: dom.translatedClass,
+            fontWrapperCount: dom.fontWrapperCount,
+            extensionMarkers: dom.extensionMarkers,
+            googleSearchApp: /\bGSA\//.test(getUserAgent()),
+          }
+        : {}),
     });
     return;
   }

@@ -66,6 +66,8 @@ export interface StepUpstreamCost {
   /** The provider-metadata usage object as reported (null when absent), for
    *  logging a missing cost. */
   reportedUsage: JSONValue | null;
+  /** Upstream fields the NanoGPT adapter saw without a billable cost. */
+  nanoGptCostEvidence?: JSONValue;
 }
 
 /** What a turn (or a set of finished steps) is charged. */
@@ -265,7 +267,14 @@ export function readStepUpstreamCost(
   const usage = entry?.usage;
   const reportedUsage = usage ?? null;
   if (!isJsonRecord(usage)) {
-    return { costUsd: null, provider, reportedUsage };
+    const nanoGptCostEvidence =
+      providerMetadata?.[ApiProvider.NANO_GPT]?.missingCostEvidence;
+    return {
+      costUsd: null,
+      provider,
+      reportedUsage,
+      ...(nanoGptCostEvidence === undefined ? {} : { nanoGptCostEvidence }),
+    };
   }
   const upstream = isJsonRecord(usage.costDetails)
     ? usage.costDetails.upstreamInferenceCost
@@ -407,6 +416,7 @@ export class TokenAccumulator {
         fallbackUsd,
         // What the provider DID report, so the next missing cost is diagnosable.
         reportedUsage: upstream.reportedUsage,
+        nanoGptCostEvidence: upstream.nanoGptCostEvidence,
         upstreamCostEvidence:
           upstream.reportedUsage === null
             ? "usage-missing"

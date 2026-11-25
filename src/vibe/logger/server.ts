@@ -154,6 +154,16 @@ export const SERVER_LOG_FINGERPRINT_IGNORE_KEYS: ReadonlySet<string> = new Set([
   "imageTransportCounts",
   "upstreamCostEvidence",
   "dispatchedArgsShape",
+  "balanceEvidence",
+  "providerStepEvidence",
+  "nanoGptCostEvidence",
+  "maxSchedulerSampleMs",
+  "windowCpuThrottle",
+  "previousUpstreamResponseAgeMs",
+  "retryAfterSeconds",
+  "budgetOverrunMs",
+  "poolTotal",
+  "poolIdle",
 ]);
 
 /**

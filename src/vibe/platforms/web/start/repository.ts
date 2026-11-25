@@ -88,8 +88,10 @@ import type {
 } from "./definition";
 import {
   cpuPressureWindow,
+  cpuThrottleWindow,
   describeSchedulerEvidence,
   readCpuPressureSample,
+  readCpuThrottleSample,
   readThreadSchedulerSample,
   threadSchedulerDelta,
 } from "./event-loop-scheduler";
@@ -804,6 +806,7 @@ export class ServerStartRepository {
       let lastSchedulerSample = readThreadSchedulerSample();
       let lastTickAt = performance.now();
       let maxTickerDelayMs = 0;
+      let maxSchedulerSampleMs = 0;
       let tickerSamples = 0;
       let worstStall: {
         ms: number;
@@ -824,7 +827,12 @@ export class ServerStartRepository {
         tickerSamples++;
         const previousSchedulerSample = lastSchedulerSample;
         if (previousSchedulerSample) {
+          const sampleStartedAt = performance.now();
           lastSchedulerSample = readThreadSchedulerSample();
+          maxSchedulerSampleMs = Math.max(
+            maxSchedulerSampleMs,
+            performance.now() - sampleStartedAt,
+          );
         }
         if (stallMs >= stallCaptureMs && stallMs > (worstStall?.ms ?? 0)) {
           const endedAt = Date.now();
@@ -873,6 +881,7 @@ export class ServerStartRepository {
       // disk, fs ops = sync file IO, involuntary switches = CPU contention.
       let lastRusage = process.resourceUsage();
       let lastCpuPressure = readCpuPressureSample();
+      let lastCpuThrottle = readCpuThrottleSample();
       let lagWindowStartedAt = Date.now();
       const logLagWindow = async (): Promise<void> => {
         try {
@@ -902,6 +911,12 @@ export class ServerStartRepository {
             cpuPressure,
           );
           lastCpuPressure = cpuPressure;
+          const cpuThrottle = readCpuThrottleSample();
+          const windowCpuThrottle = cpuThrottleWindow(
+            lastCpuThrottle,
+            cpuThrottle,
+          );
+          lastCpuThrottle = cpuThrottle;
 
           const uptime2 = Math.floor(process.uptime());
           const mem = process.memoryUsage();
@@ -913,12 +928,14 @@ export class ServerStartRepository {
           const tickerEvidence = {
             tickerSamples,
             maxTickerDelayMs: Math.round(maxTickerDelayMs),
+            maxSchedulerSampleMs: Math.round(maxSchedulerSampleMs),
             tickerCaptureThresholdMs: stallCaptureMs,
             lagWindowStartedAt: new Date(windowStartedAt).toISOString(),
             lagWindowEndedAt: new Date(windowEndedAt).toISOString(),
           };
           tickerSamples = 0;
           maxTickerDelayMs = 0;
+          maxSchedulerSampleMs = 0;
           if (stall) {
             await PhaseProfiler.flush(stall.startedAt);
           }
@@ -943,6 +960,7 @@ export class ServerStartRepository {
           const lagContext = {
             ...tickerEvidence,
             windowCpuPressure,
+            windowCpuThrottle,
             heapMb,
             prevHeapMb,
             rssMb: Math.round(mem.rss / 1024 / 1024),

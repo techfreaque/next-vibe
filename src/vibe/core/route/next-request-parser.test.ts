@@ -4,10 +4,31 @@
  */
 
 import { describe, expect, it } from "bun:test";
+import { z } from "zod";
 
 import { parseSearchParams } from "./next-request-parser";
 
 describe("parseSearchParams", () => {
+  it("keeps string fields literal while decoding structured fields and numbers", () => {
+    const schema = z.object({
+      query: z.string(),
+      limit: z.number(),
+      filter: z.object({ status: z.string() }),
+    });
+    for (const query of ['{"kind":"message"}', '["message"]', "false", "001"]) {
+      const params = new URLSearchParams({
+        query,
+        limit: "10",
+        filter: '{"status":"open"}',
+      });
+      expect(schema.parse(parseSearchParams(params, schema))).toEqual({
+        query,
+        limit: 10,
+        filter: { status: "open" },
+      });
+    }
+  });
+
   it("parses dot notation into nested objects", () => {
     expect(
       parseSearchParams(
@@ -29,7 +50,9 @@ describe("parseSearchParams", () => {
       parseSearchParams(new URLSearchParams("status[0]=a&status[1]=b")),
     ).toEqual({ status: ["a", "b"] });
     expect(
-      parseSearchParams(new URLSearchParams("filter[types][0]=x&filter[types][1]=y")),
+      parseSearchParams(
+        new URLSearchParams("filter[types][0]=x&filter[types][1]=y"),
+      ),
     ).toEqual({ filter: { types: ["x", "y"] } });
   });
 });

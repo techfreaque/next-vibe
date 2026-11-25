@@ -130,3 +130,39 @@ export function cpuPressureWindow(
     ? undefined
     : { hostSomeMs, cgroupSomeMs };
 }
+
+interface CpuThrottleSample {
+  periods: number;
+  microseconds: number;
+}
+
+/** Read the cgroup v2 CPU quota counters when Docker exposes them. */
+export function readCpuThrottleSample(): CpuThrottleSample | undefined {
+  if (process.platform !== "linux") {
+    return undefined;
+  }
+  try {
+    const stat = readFileSync("/sys/fs/cgroup/cpu.stat", "utf8");
+    const periods = /^nr_throttled (\d+)$/m.exec(stat)?.[1];
+    const microseconds = /^throttled_usec (\d+)$/m.exec(stat)?.[1];
+    if (periods !== undefined && microseconds !== undefined) {
+      return { periods: Number(periods), microseconds: Number(microseconds) };
+    }
+  } catch {
+    // Optional on platforms without a unified cgroup.
+  }
+  return undefined;
+}
+
+export function cpuThrottleWindow(
+  before: CpuThrottleSample | undefined,
+  after: CpuThrottleSample | undefined,
+): { throttledPeriods: number; throttledMs: number } | undefined {
+  if (!before || !after || after.periods < before.periods) {
+    return undefined;
+  }
+  const throttledMs = pressureDeltaMs(before.microseconds, after.microseconds);
+  return throttledMs === undefined
+    ? undefined
+    : { throttledPeriods: after.periods - before.periods, throttledMs };
+}

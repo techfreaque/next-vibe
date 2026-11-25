@@ -142,6 +142,7 @@ let lastNetworkChangeAt: number | null = null;
 /** Close details of the socket that started the current outage. */
 interface DropInfo {
   requestId: string;
+  closedAtMs: number;
   code: number;
   reason: string;
   wasClean: boolean;
@@ -222,6 +223,7 @@ function stopDropCheck(): void {
 function reportDrop(
   logger: EndpointLogger,
   dropReportTrigger: "reconnected" | "deadline" | "pagehide",
+  recovery?: { reconnectRequestId: string; reconnectHandshakeMs: number },
 ): void {
   if (disconnectedAt === null || dropReported) {
     return;
@@ -230,6 +232,7 @@ function reportDrop(
   stopDropCheck();
   logger.error("[WS Client] Connection lost", {
     ...pendingDrop,
+    ...recovery,
     offlineMs: Date.now() - disconnectedAt,
     noticeableDownMs: currentNoticeableDownMs(),
     attempts: dropReconnectCount,
@@ -280,13 +283,23 @@ function sendSubscribe(channel: string, state: ChannelState): void {
   });
 }
 
-function handleOpen(logger: EndpointLogger): void {
+function handleOpen(
+  logger: EndpointLogger,
+  requestId: string,
+  connectStartedAt: number,
+): void {
   openedAt = Date.now();
   lastFrameAt = null;
   if (disconnectedAt !== null) {
+    // Correlate the successful retry with its own edge and server records.
+    const recovery = {
+      reconnectRequestId: requestId,
+      reconnectHandshakeMs: openedAt - connectStartedAt,
+    };
     if (dropReported) {
       logger.warn("[WS Client] Reconnected after disconnect", {
         ...pendingDrop,
+        ...recovery,
         attempts: dropReconnectCount,
         failedHandshakesDuringDrop,
         lastFailedHandshakeRequestId,
@@ -300,7 +313,7 @@ function handleOpen(logger: EndpointLogger): void {
         recovered: true,
       });
     } else {
-      reportDrop(logger, "reconnected");
+      reportDrop(logger, "reconnected", recovery);
     }
   }
   disconnectedAt = null;
@@ -531,6 +544,7 @@ function connect(logger: EndpointLogger): void {
       updateDropVisibility();
       pendingDrop = {
         requestId,
+        closedAtMs: closedAt,
         code: event.code,
         reason: event.reason.slice(0, 200),
         wasClean: event.wasClean,
@@ -607,7 +621,7 @@ function connect(logger: EndpointLogger): void {
   ws.addEventListener("open", () => {
     if (sharedWs === ws) {
       pendingHandshake = null;
-      handleOpen(logger);
+      handleOpen(logger, requestId, connectStartedAt);
     }
   });
   ws.addEventListener("message", handleMessage);

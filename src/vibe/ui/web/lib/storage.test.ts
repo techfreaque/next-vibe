@@ -93,7 +93,8 @@ function createMemoryBackend(failPut = false): {
         data.delete(key);
         return ok(true);
       },
-      usage: () => Promise.resolve({ originUsageBytes: 1, originQuotaBytes: 2 }),
+      usage: () =>
+        Promise.resolve({ originUsageBytes: 1, originQuotaBytes: 2 }),
     },
   };
 }
@@ -187,11 +188,12 @@ describe("largeStorage (IndexedDB with localStorage migration)", () => {
     local.items.set("incognito_messages", "[legacy]");
     installLocalStorage(local);
     const { backend } = createMemoryBackend();
-    backend.get = () => Promise.resolve({
-      ok: false,
-      error: "QuotaExceededError",
-      stage: "open-request",
-    });
+    backend.get = () =>
+      Promise.resolve({
+        ok: false,
+        error: "QuotaExceededError",
+        stage: "open-request",
+      });
     const store = createLargeStorage(() => backend);
 
     expect(await store.getItem("incognito_messages", logger)).toBe("[legacy]");
@@ -200,6 +202,12 @@ describe("largeStorage (IndexedDB with localStorage migration)", () => {
       originUsageBytes: 1,
       originQuotaBytes: 2,
       indexedDbStage: "open-request",
+      fallbackValueFound: true,
+    });
+    expect(await store.getItem("incognito_threads", logger)).toBeNull();
+    expect(calls[1]?.context).toMatchObject({
+      indexedDbStage: "open-request",
+      fallbackValueFound: false,
     });
   });
 

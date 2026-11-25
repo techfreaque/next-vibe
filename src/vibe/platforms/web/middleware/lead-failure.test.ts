@@ -8,6 +8,7 @@ import { CHROME_131_CRAWLER_UA } from "@/leads/growth/chrome-131-crawler";
 import { proxy } from "@/proxy";
 
 import { defaultLocale } from "../../../core/i18n/core/config";
+import { GuestLeadDatabaseDeadlineError } from "../../../identity/lead/database-deadline";
 import * as leadOps from "../../../identity/lead/middleware-ops";
 import { createLeadId } from "../../../identity/middleware/lead-id";
 import * as serverLogger from "../../../logger/server";
@@ -141,9 +142,9 @@ it("limits public fallback to anonymous read-only documents and keeps real DB er
 });
 
 it("forwards only the proxy's decision and preserves an unverified guest cookie", async () => {
-  captureErrors();
+  const report = captureErrors();
   const validate = spyOn(leadOps, "validateLeadIdExists").mockRejectedValue(
-    new Error("Guest lead database deadline exceeded"),
+    new GuestLeadDatabaseDeadlineError("lookup", null),
   );
   const create = spyOn(leadOps, "createAnonymousLead");
   const cookie = `${LEAD_ID_COOKIE_NAME}=${crypto.randomUUID()}`;
@@ -170,6 +171,10 @@ it("forwards only the proxy's decision and preserves an unverified guest cookie"
       ),
     ).toBe(degraded ? "1" : null);
     expect(response.headers.has("set-cookie")).toBe(false);
+    expect(report).toHaveBeenLastCalledWith(
+      "Anonymous lead lookup failed in middleware",
+      expect.objectContaining({ path, databaseDeadlinePhase: "lookup" }),
+    );
   }
   expect(create).not.toHaveBeenCalled();
   validate.mockResolvedValue(true);
