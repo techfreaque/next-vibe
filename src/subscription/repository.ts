@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import { desc, eq, sql } from "drizzle-orm";
+import { and, desc, eq, isNull, lte, or, sql } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
@@ -34,6 +34,7 @@ import {
 import { createTrackingContext } from "../messenger/providers/email/smtp-client/components/tracking_context.email";
 import { scopedTranslation as checkoutScopedTranslation } from "../payment/checkout/i18n";
 import { SubscriptionCheckoutRepository } from "../payment/checkout/repository";
+import { paymentTransactions } from "../payment/db";
 import { PaymentProvider, type PaymentProviderValue } from "../payment/enum";
 import { getPaymentProvider } from "../payment/providers";
 import { StripeProvider } from "../payment/providers/stripe/repository";
@@ -135,67 +136,8 @@ export class SubscriptionRepository {
   }
 
   /**
-   * Tier a renewal invoice pays for. On a Stripe cycle invoice the billed price
-   * wins (a downgrade scheduled last period takes effect now) and the row is
-   * switched to it; otherwise the row's plan.
-   */
-  private static async renewalTier(
-    subscription: Subscription,
-    providerSubscriptionId: string,
-    billingReason: string | undefined,
-    logger: EndpointLogger,
-  ): Promise<SubscriptionTierProductId | null> {
-    const rowTier = getTierProductForPlan(subscription.planId);
-    const stripe = StripeProvider.getStripe();
-    if (
-      billingReason !== "subscription_cycle" ||
-      subscription.provider !== PaymentProvider.STRIPE ||
-      !stripe
-    ) {
-      return rowTier;
-    }
-    try {
-      const stripeSub = await stripe.subscriptions.retrieve(
-        providerSubscriptionId,
-      );
-      const billed =
-        SubscriptionRepository.tierFromStripeSubscription(stripeSub);
-      if (!billed) {
-        return rowTier;
-      }
-      if (
-        billed.productId !== rowTier ||
-        billed.billingInterval !== subscription.billingInterval
-      ) {
-        await db
-          .update(subscriptions)
-          .set({
-            planId: getPlanForTierProduct(billed.productId),
-            productId: billed.productId,
-            billingInterval: billed.billingInterval,
-            updatedAt: new Date(),
-          })
-          .where(eq(subscriptions.id, subscription.id));
-        logger.info("Renewal switched the subscription tier", {
-          subscriptionId: subscription.id,
-          from: rowTier,
-          to: billed.productId,
-        });
-      }
-      return billed.productId;
-    } catch (error) {
-      logger.error("Could not read the billed tier for a renewal", {
-        error: parseError(error),
-        providerSubscriptionId,
-      });
-      return rowTier;
-    }
-  }
-
-  /**
    * Generate canonical idempotency key for subscription credit grants.
-   * Shared across all credit grant paths (invoice handler, subscription.updated, auto-sync)
-   * to prevent duplicate grants from different webhook/sync triggers.
+   * Shared by checkout, paid invoices and refund correlation.
    */
   private static renewalSessionKey(
     providerSubscriptionId: string,
@@ -386,20 +328,12 @@ export class SubscriptionRepository {
                 currentPeriodEnd * 1000 !==
                   subscription.currentPeriodEnd.getTime();
 
-              // Check if period advanced forward (renewal happened)
-              const periodAdvanced =
-                periodChanged &&
-                subscription.currentPeriodEnd &&
-                currentPeriodEnd * 1000 >
-                  subscription.currentPeriodEnd.getTime();
-
               if (newStatus !== subscription.status || periodChanged) {
                 logger.info("Auto-syncing subscription from Stripe", {
                   userId,
                   oldStatus: subscription.status,
                   newStatus,
                   periodChanged,
-                  periodAdvanced,
                   oldPeriodEnd: subscription.currentPeriodEnd,
                   newPeriodEnd: new Date(currentPeriodEnd * 1000),
                 });
@@ -414,9 +348,9 @@ export class SubscriptionRepository {
                     cancelAt: stripeResponse.cancel_at
                       ? new Date(stripeResponse.cancel_at * 1000)
                       : null,
-                    // Clear grace period fields on successful renewal
-                    paymentFailedAt: null,
-                    gracePeriodEndsAt: null,
+                    ...(newStatus === SubscriptionStatus.ACTIVE
+                      ? { paymentFailedAt: null, gracePeriodEndsAt: null }
+                      : {}),
                     updatedAt: new Date(),
                   })
                   .where(eq(subscriptions.id, subscription.id))
@@ -424,76 +358,6 @@ export class SubscriptionRepository {
 
                 if (updated) {
                   subscription = updated;
-                }
-
-                // Grant renewal credits if period advanced (missed webhook recovery)
-                if (periodAdvanced && newStatus === SubscriptionStatus.ACTIVE) {
-                  try {
-                    const { CreditRepository } =
-                      await import("../credits/repository");
-                    const { scopedTranslation: creditsScopedTranslation } =
-                      await import("../credits/i18n");
-                    const { t: creditsT } =
-                      creditsScopedTranslation.scopedT(locale);
-
-                    const productId = getTierProductForPlan(
-                      subscription.planId,
-                    );
-
-                    if (productId) {
-                      const product = productsRepository.getProduct(
-                        productId,
-                        locale,
-                      );
-                      // Credits expire at exact period end - new period credits are pre-granted via invoice.paid
-                      const expiresAt = periodGrantExpiry(
-                        subscription.billingInterval === BillingInterval.YEARLY,
-                        new Date(currentPeriodStart * 1000),
-                        new Date(currentPeriodEnd * 1000),
-                      );
-
-                      // Canonical idempotency key shared across all credit grant paths
-                      // Prevents duplicate grants from invoice handler, subscription.updated, and auto-sync
-                      const sessionId =
-                        SubscriptionRepository.renewalSessionKey(
-                          subscription.providerSubscriptionId ??
-                            subscription.id,
-                          currentPeriodEnd * 1000,
-                        );
-
-                      logger.info(
-                        "Auto-granting renewal credits (missed webhook)",
-                        {
-                          userId,
-                          credits: product.credits,
-                          expiresAt: expiresAt.toISOString(),
-                          sessionId,
-                        },
-                      );
-
-                      await CreditRepository.addUserCredits(
-                        userId,
-                        product.credits,
-                        "subscription",
-                        logger,
-                        creditsT,
-                        expiresAt,
-                        sessionId,
-                      );
-
-                      logger.info("Successfully auto-granted renewal credits", {
-                        userId,
-                        credits: product.credits,
-                        sessionId,
-                      });
-                    }
-                  } catch (creditError) {
-                    logger.error("Failed to auto-grant renewal credits", {
-                      error: parseError(creditError),
-                      userId,
-                    });
-                    // Don't fail the whole sync if credit granting fails
-                  }
                 }
               }
             } // end else (stripeClient configured)
@@ -531,87 +395,6 @@ export class SubscriptionRepository {
                 userId,
               });
             }
-          }
-        }
-
-        // Safety net: If subscription is active with a valid future period,
-        // ensure renewal credits exist. Catches cases where the webhook or
-        // auto-sync updated the period but credit granting silently failed.
-        if (
-          subscription.status === SubscriptionStatus.ACTIVE &&
-          subscription.currentPeriodEnd &&
-          new Date(subscription.currentPeriodEnd) > new Date() &&
-          subscription.providerSubscriptionId
-        ) {
-          try {
-            const { creditPacks } = await import("../credits/db");
-            const periodEndMs = subscription.currentPeriodEnd.getTime();
-            const expectedSessionId = SubscriptionRepository.renewalSessionKey(
-              subscription.providerSubscriptionId,
-              periodEndMs,
-            );
-
-            const [existingPack] = await db
-              .select({ id: creditPacks.id })
-              .from(creditPacks)
-              .where(
-                sql`${creditPacks.metadata}->>'sessionId' = ${expectedSessionId}`,
-              )
-              .limit(1);
-
-            if (!existingPack) {
-              const { CreditRepository } =
-                await import("../credits/repository");
-              const { scopedTranslation: creditsScopedTranslation } =
-                await import("../credits/i18n");
-              const { t: creditsT } = creditsScopedTranslation.scopedT(locale);
-
-              const productId = getTierProductForPlan(subscription.planId);
-
-              if (productId) {
-                const product = productsRepository.getProduct(
-                  productId,
-                  locale,
-                );
-                const expiresAt = periodGrantExpiry(
-                  subscription.billingInterval === BillingInterval.YEARLY,
-                  subscription.currentPeriodStart ?? new Date(periodEndMs),
-                  new Date(periodEndMs),
-                );
-
-                logger.info("Safety-net: granting missing renewal credits", {
-                  userId,
-                  credits: product.credits,
-                  expiresAt: expiresAt.toISOString(),
-                  sessionId: expectedSessionId,
-                });
-
-                await CreditRepository.addUserCredits(
-                  userId,
-                  product.credits,
-                  "subscription",
-                  logger,
-                  creditsT,
-                  expiresAt,
-                  expectedSessionId,
-                );
-
-                logger.info(
-                  "Safety-net: successfully granted renewal credits",
-                  {
-                    userId,
-                    credits: product.credits,
-                    sessionId: expectedSessionId,
-                  },
-                );
-              }
-            }
-          } catch (creditError) {
-            logger.error("Safety-net credit grant failed", {
-              error: parseError(creditError),
-              userId,
-            });
-            // Don't fail the whole request if safety net fails
           }
         }
       }
@@ -1385,8 +1168,7 @@ export class SubscriptionRepository {
           )
         : null;
 
-      // Use canonical renewalSessionKey so the safety-net idempotency check
-      // recognises that credits were already granted on the initial checkout.
+      // Checkout and the credit ledger share the subscription period key.
       // providerSubscriptionId is set for both Stripe and NOWPayments paths.
       const checkoutSessionId = providerSubscriptionId
         ? SubscriptionRepository.renewalSessionKey(
@@ -1582,300 +1364,137 @@ export class SubscriptionRepository {
     }
   }
 
-  /**
-   * Handle invoice.created webhook - pre-grant credits before payment confirmation.
-   * This ensures users have credits immediately when a new billing period starts.
-   * Idempotency: uses SubscriptionRepository.renewalSessionKey() so duplicate webhooks or later invoice.paid
-   * events won't double-grant.
-   */
-  static async handleInvoiceCreated(
-    invoice: WebhookData,
-    subscriptionId: string,
-    logger: EndpointLogger,
-    locale: CountryLanguage,
-  ): Promise<void> {
-    try {
-      const invoiceId = invoice.id;
-      const billingReason = invoice.billing_reason;
-
-      logger.info("Processing invoice created for credit pre-grant", {
-        invoiceId,
-        subscriptionId,
-        billingReason,
-      });
-
-      // Skip initial checkout invoice - handled separately by checkout flow
-      if (billingReason === "subscription_create") {
-        logger.info("Skipping credit pre-grant - initial checkout invoice", {
-          billingReason,
-          invoiceId,
-        });
-        return;
-      }
-
-      // Skip voided or $0 invoices - don't pre-grant credits for non-chargeable invoices
-      if (invoice.status === "void" || invoice.status === "uncollectible") {
-        logger.info(
-          "Skipping credit pre-grant - invoice is void/uncollectible",
-          {
-            invoiceId,
-            status: invoice.status,
-          },
-        );
-        return;
-      }
-      if (
-        invoice.amount_total !== undefined &&
-        invoice.amount_total !== null &&
-        invoice.amount_total <= 0
-      ) {
-        logger.info("Skipping credit pre-grant - $0 or negative invoice", {
-          invoiceId,
-          amountTotal: invoice.amount_total,
-        });
-        return;
-      }
-
-      const [subscription] = await db
-        .select()
-        .from(subscriptions)
-        .where(eq(subscriptions.providerSubscriptionId, subscriptionId))
-        .limit(1);
-
-      if (!subscription) {
-        logger.error("Subscription not found for invoice created", {
-          subscriptionId,
-          invoiceId,
-        });
-        return;
-      }
-
-      const providerName = subscription.provider;
-      const provider = getPaymentProvider(providerName);
-      const subscriptionResult = await provider.retrieveSubscription(
-        subscriptionId,
-        logger,
-        locale,
-      );
-
-      if (!subscriptionResult.success) {
-        logger.error("Failed to retrieve subscription for credit pre-grant", {
-          subscriptionId,
-          error: subscriptionResult.message,
-        });
-        return;
-      }
-
-      // Import credit dependencies
-      const { CreditRepository } = await import("../credits/repository");
-      const { scopedTranslation: creditsScopedTranslation } =
-        await import("../credits/i18n");
-
-      // Look up user's locale for translations
-      let userLocale: CountryLanguage = locale;
-      {
-        const { users: usersTable } =
-          await import("next-vibe/identity/user/db");
-
-        const [userRow] = await db
-          .select({ locale: usersTable.locale })
-          .from(usersTable)
-          .where(eq(usersTable.id, subscription.userId))
-          .limit(1);
-        if (userRow?.locale) {
-          userLocale = userRow.locale;
-        }
-      }
-      const { t: creditsT } = creditsScopedTranslation.scopedT(userLocale);
-
-      const productId = await SubscriptionRepository.renewalTier(
-        subscription,
-        subscriptionId,
-        billingReason,
-        logger,
-      );
-
-      if (!productId) {
-        logger.warn("No product ID found for subscription plan", {
-          planId: subscription.planId,
-          invoiceId,
-        });
-        return;
-      }
-
-      const product = productsRepository.getProduct(productId, userLocale);
-      const periodEnd = subscriptionResult.data.currentPeriodEnd
-        ? new Date(subscriptionResult.data.currentPeriodEnd)
-        : null;
-
-      if (!periodEnd) {
-        logger.error("Cannot pre-grant credits without period end date", {
-          subscriptionId,
-          invoiceId,
-        });
-        return;
-      }
-
-      const expiresAt = periodGrantExpiry(
-        subscription.billingInterval === BillingInterval.YEARLY,
-        subscriptionResult.data.currentPeriodStart
-          ? new Date(subscriptionResult.data.currentPeriodStart)
-          : periodEnd,
-        periodEnd,
-      );
-
-      // Canonical idempotency key - shared with invoice.paid and subscription.updated
-      const renewalSessionId = SubscriptionRepository.renewalSessionKey(
-        subscriptionId,
-        periodEnd.getTime(),
-      );
-
-      // Idempotency check
-      {
-        const { creditPacks } = await import("../credits/db");
-
-        const [existingPack] = await db
-          .select()
-          .from(creditPacks)
-          .where(
-            sql`${creditPacks.metadata}->>'sessionId' = ${renewalSessionId}`,
-          )
-          .limit(1);
-
-        if (existingPack) {
-          logger.info("Credits already pre-granted for this period", {
-            renewalSessionId,
-            packId: existingPack.id,
-            userId: subscription.userId,
-          });
-          return;
-        }
-      }
-
-      logger.info("Pre-granting subscription credits", {
-        userId: subscription.userId,
-        credits: product.credits,
-        expiresAt: expiresAt?.toISOString(),
-        renewalSessionId,
-        invoiceId,
-      });
-
-      await CreditRepository.addUserCredits(
-        subscription.userId,
-        product.credits,
-        "subscription",
-        logger,
-        creditsT,
-        expiresAt ?? undefined,
-        renewalSessionId,
-      );
-
-      logger.info("Successfully pre-granted subscription credits", {
-        userId: subscription.userId,
-        credits: product.credits,
-        invoiceId,
-      });
-    } catch (error) {
-      logger.error("Failed to process invoice created", {
-        error: parseError(error),
-        subscriptionId,
-      });
-    }
-  }
-
-  /**
-   * Handle invoice payment succeeded webhook from payment provider
-   * Called by payment repository when invoice.payment_succeeded webhook received
-   */
+  /** A settled invoice grants the period on its billed line, even on a late replay. */
   static async handleInvoicePaymentSucceeded(
     invoice: WebhookData,
     subscriptionId: string,
     logger: EndpointLogger,
     locale: CountryLanguage,
-  ): Promise<void> {
+  ): Promise<ResponseType<void>> {
+    const { t } = scopedTranslation.scopedT(locale);
+    if (
+      invoice.billing_reason === "subscription_create" ||
+      invoice.status !== "paid" ||
+      !invoice.amount_paid ||
+      invoice.amount_paid <= 0
+    ) {
+      return success();
+    }
+    // Prorated upgrades have their own credit adjustment; they do not buy a new period.
+    if (
+      !invoice.billingPeriod &&
+      invoice.billing_reason === "subscription_update"
+    ) {
+      return success();
+    }
     try {
-      const invoiceId = invoice.id;
-      const billingReason = invoice.billing_reason;
-
-      logger.info("Processing invoice payment", {
-        invoiceId,
-        subscriptionId,
-        billingReason,
-      });
-
+      const period = invoice.billingPeriod;
+      if (!period || period.end <= period.start) {
+        return fail({
+          message: t("errors.database_error", {
+            error: `Missing billed period for ${invoice.id}`,
+          }),
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        });
+      }
       const [subscription] = await db
         .select()
         .from(subscriptions)
         .where(eq(subscriptions.providerSubscriptionId, subscriptionId))
         .limit(1);
-
       if (!subscription) {
-        // The FIRST invoice (subscription_create) routinely beats
-        // checkout.session.completed - which creates the row and grants the
-        // initial credits itself - so missing here is the expected race.
-        // Any other billing reason means a paid renewal we cannot attribute.
-        const isInitialCheckout = billingReason === "subscription_create";
-        (isInitialCheckout ? logger.warn : logger.error).bind(logger)(
-          "Subscription not found for invoice payment",
-          {
-            subscriptionId,
-            invoiceId,
-            billingReason: billingReason ?? "undefined",
-            creditGrantPath: isInitialCheckout
-              ? "checkout-session-completed"
-              : "subscription-renewal",
-          },
-        );
-        return;
-      }
-
-      // Detect late payment: subscription was in PAST_DUE or CANCELED state
-      const isLatePayment =
-        subscription.status === SubscriptionStatus.PAST_DUE ||
-        subscription.status === SubscriptionStatus.CANCELED;
-
-      logger.info("Found subscription for invoice", {
-        subscriptionId,
-        userId: subscription.userId,
-        currentStatus: subscription.status,
-        isLatePayment,
-      });
-
-      const providerName = subscription.provider;
-      const provider = getPaymentProvider(providerName);
-      const subscriptionResult = await provider.retrieveSubscription(
-        subscriptionId,
-        logger,
-        locale,
-      );
-
-      if (!subscriptionResult.success) {
-        logger.error("Failed to retrieve subscription from provider", {
-          subscriptionId,
-          error: subscriptionResult.message,
+        return fail({
+          message: t("errors.database_error", {
+            error: `Missing subscription for ${invoice.id}`,
+          }),
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
         });
-        return;
       }
-
-      // Update subscription period and clear grace period if it was set
-      await db
-        .update(subscriptions)
-        .set({
-          currentPeriodStart: subscriptionResult.data.currentPeriodStart
-            ? new Date(subscriptionResult.data.currentPeriodStart)
-            : new Date(),
-          currentPeriodEnd: subscriptionResult.data.currentPeriodEnd
-            ? new Date(subscriptionResult.data.currentPeriodEnd)
-            : undefined,
-          status: SubscriptionStatus.ACTIVE,
-          paymentFailedAt: null, // Clear grace period fields
-          gracePeriodEndsAt: null,
-          updatedAt: new Date(),
-        })
-        .where(eq(subscriptions.providerSubscriptionId, subscriptionId));
-
-      // Growth funnel: first paid renewal = second-month retention (write-once)
-      if (billingReason === "subscription_cycle") {
+      const start = new Date(period.start * 1000);
+      const end = new Date(period.end * 1000);
+      // A replay may arrive after another plan change. Use the price on the
+      // signed invoice, not the price of today's Stripe subscription.
+      const price = period.priceId
+        ? await StripeProvider.getStripe()?.prices.retrieve(period.priceId)
+        : undefined;
+      const productId = price?.metadata.internalProductId;
+      const tier =
+        productId && isSubscriptionTierProductId(productId)
+          ? productId
+          : getTierProductForPlan(subscription.planId);
+      const interval =
+        price?.recurring?.interval === "year"
+          ? BillingInterval.YEARLY
+          : price?.recurring?.interval === "month"
+            ? BillingInterval.MONTHLY
+            : subscription.billingInterval;
+      if (!tier) {
+        return fail({
+          message: t("errors.database_error", {
+            error: `Missing subscription tier for ${invoice.id}`,
+          }),
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        });
+      }
+      const { CreditRepository } = await import("../credits/repository");
+      const { scopedTranslation: creditsTranslation } =
+        await import("../credits/i18n");
+      const grant = await CreditRepository.addUserCredits(
+        subscription.userId,
+        getTierCredits(tier),
+        "subscription",
+        logger,
+        creditsTranslation.scopedT(locale).t,
+        periodGrantExpiry(interval === BillingInterval.YEARLY, start, end),
+        subscriptionRenewalSessionKey(subscriptionId, end.getTime()),
+        invoice.id,
+      );
+      if (!grant.success) {
+        return grant;
+      }
+      if (end.getTime() > Date.now()) {
+        const paidAt = invoice.invoicePaidAt
+          ? new Date(invoice.invoicePaidAt * 1000 + 999)
+          : undefined;
+        await db
+          .update(subscriptions)
+          .set({
+            ...(invoice.billing_reason === "subscription_cycle" &&
+              price && {
+                planId: getPlanForTierProduct(tier),
+                productId: tier,
+                billingInterval: interval,
+              }),
+            currentPeriodStart: start,
+            currentPeriodEnd: end,
+            status: SubscriptionStatus.ACTIVE,
+            paymentFailedAt: null,
+            gracePeriodEndsAt: null,
+            updatedAt: new Date(),
+          })
+          .where(
+            and(
+              eq(subscriptions.id, subscription.id),
+              or(
+                isNull(subscriptions.currentPeriodEnd),
+                lte(subscriptions.currentPeriodEnd, end),
+              ),
+              paidAt
+                ? or(
+                    isNull(subscriptions.canceledAt),
+                    lte(subscriptions.canceledAt, paidAt),
+                  )
+                : undefined,
+              paidAt
+                ? or(
+                    isNull(subscriptions.paymentFailedAt),
+                    lte(subscriptions.paymentFailedAt, paidAt),
+                  )
+                : undefined,
+            ),
+          );
+      }
+      if (invoice.billing_reason === "subscription_cycle") {
         const { GrowthJourneyRepository } =
           await import("@/leads/growth/repository");
         const { FunnelStep } = await import("@/leads/growth/enum");
@@ -1885,192 +1504,18 @@ export class SubscriptionRepository {
           logger,
         );
       }
-
-      // Add monthly credits for renewal (skip only the initial checkout payment - handled separately)
-      // Use deny-list: skip "subscription_create" which is the first invoice at checkout
-      // All other billing reasons (subscription_cycle, subscription_update, undefined, etc.) should grant credits
-      const isInitialCheckout = billingReason === "subscription_create";
-      if (!isInitialCheckout) {
-        logger.info("Processing renewal credits", {
-          billingReason: billingReason ?? "undefined",
-          invoiceId,
-        });
-
-        // This is a renewal - add monthly credits with expiration
-        const { CreditRepository } = await import("../credits/repository");
-        const { scopedTranslation: creditsScopedTranslation } =
-          await import("../credits/i18n");
-
-        // Look up user's locale from DB for credit/product translations
-        let userLocaleForInvoice: CountryLanguage = locale;
-        {
-          const { users: usersTable } =
-            await import("next-vibe/identity/user/db");
-
-          const [userRow] = await db
-            .select({ locale: usersTable.locale })
-            .from(usersTable)
-            .where(eq(usersTable.id, subscription.userId))
-            .limit(1);
-          if (userRow?.locale) {
-            userLocaleForInvoice = userRow.locale;
-          }
-        }
-        const { t: creditsT } =
-          creditsScopedTranslation.scopedT(userLocaleForInvoice);
-
-        const productId = await SubscriptionRepository.renewalTier(
-          subscription,
-          subscriptionId,
-          billingReason,
-          logger,
-        );
-
-        if (productId) {
-          const product = productsRepository.getProduct(
-            productId,
-            userLocaleForInvoice,
-          );
-          const periodEnd = subscriptionResult.data.currentPeriodEnd
-            ? new Date(subscriptionResult.data.currentPeriodEnd)
-            : null;
-
-          if (!periodEnd) {
-            logger.error(
-              "Cannot grant renewal credits without period end date",
-              {
-                subscriptionId,
-                invoiceId,
-              },
-            );
-            return;
-          }
-
-          // Credits expire at exact period end - no grace buffer needed
-          const expiresAt = periodGrantExpiry(
-            subscription.billingInterval === BillingInterval.YEARLY,
-            subscriptionResult.data.currentPeriodStart
-              ? new Date(subscriptionResult.data.currentPeriodStart)
-              : periodEnd,
-            periodEnd,
-          );
-
-          // Canonical idempotency key shared across all credit grant paths
-          const renewalSessionId = SubscriptionRepository.renewalSessionKey(
-            subscriptionId,
-            periodEnd.getTime(),
-          );
-
-          // IDEMPOTENCY CHECK: Verify credits haven't been added for this period already
-          {
-            const { creditPacks } = await import("../credits/db");
-
-            const [existingPack] = await db
-              .select()
-              .from(creditPacks)
-              .where(
-                sql`${creditPacks.metadata}->>'sessionId' = ${renewalSessionId}`,
-              )
-              .limit(1);
-
-            if (existingPack) {
-              logger.info("Renewal credits already processed for period", {
-                renewalSessionId,
-                packId: existingPack.id,
-                userId: subscription.userId,
-              });
-              return; // Idempotent - already processed
-            }
-          }
-
-          // For late payments, revive only the amount that was revoked (not the full pack).
-          // This accounts for credits already consumed before revocation.
-          let creditsToGrant = product.credits;
-
-          if (isLatePayment) {
-            const { creditTransactions: creditTxTable } =
-              await import("../credits/db");
-            const { CreditTransactionType } = await import("../credits/enum");
-
-            // Look up revoked credits from this grace period only (not all-time).
-            // Scope by paymentFailedAt - revocations happen after that timestamp.
-            const scopeStart =
-              subscription.paymentFailedAt ??
-              subscription.currentPeriodEnd ??
-              new Date(0);
-            const revokedTxs = await db
-              .select({ amount: creditTxTable.amount })
-              .from(creditTxTable)
-              .where(
-                sql`${creditTxTable.type} = ${CreditTransactionType.EXPIRY}
-                    AND ${creditTxTable.metadata}->>'reason' = 'subscription_grace_period_expired'
-                    AND ${creditTxTable.createdAt} >= ${scopeStart}
-                    AND ${creditTxTable.walletId} IN (
-                      SELECT id FROM credit_wallets WHERE user_id = ${subscription.userId}
-                    )`,
-              );
-
-            const totalRevoked = revokedTxs.reduce(
-              (sum, tx) => sum + Math.abs(tx.amount),
-              0,
-            );
-
-            if (totalRevoked > 0) {
-              creditsToGrant = totalRevoked;
-              logger.info("Late payment - reviving revoked credits", {
-                userId: subscription.userId,
-                totalRevoked,
-                originalProductCredits: product.credits,
-                scopeStart: scopeStart.toISOString(),
-              });
-            }
-          }
-
-          logger.info("Granting renewal credits", {
-            userId: subscription.userId,
-            credits: creditsToGrant,
-            isLatePayment,
-            expiresAt: expiresAt?.toISOString(),
-            renewalSessionId,
-          });
-
-          await CreditRepository.addUserCredits(
-            subscription.userId,
-            creditsToGrant,
-            "subscription",
-            logger,
-            creditsT,
-            expiresAt ?? undefined,
-            renewalSessionId,
-          );
-
-          logger.info("Successfully granted renewal credits", {
-            userId: subscription.userId,
-            credits: creditsToGrant,
-            invoiceId,
-          });
-        } else {
-          logger.warn("No product ID found for subscription plan", {
-            planId: subscription.planId,
-            invoiceId,
-          });
-        }
-      } else {
-        logger.info("Skipping credit grant - initial checkout invoice", {
-          billingReason,
-          invoiceId,
-        });
-      }
-
-      logger.info("Invoice payment processed successfully", {
-        subscriptionId,
-        billingReason,
-        invoiceId,
-      });
+      return success();
     } catch (error) {
-      logger.error("Failed to process invoice payment", {
-        error: parseError(error),
-        subscriptionId,
+      logger.error(
+        "Failed to grant paid subscription period",
+        parseError(error),
+        { invoiceId: invoice.id, subscriptionId },
+      );
+      return fail({
+        message: t("errors.database_error", {
+          error: parseError(error).message,
+        }),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   }
@@ -2145,7 +1590,12 @@ export class SubscriptionRepository {
           gracePeriodEndsAt,
           updatedAt: now,
         })
-        .where(eq(subscriptions.providerSubscriptionId, subscriptionId));
+        .where(
+          and(
+            eq(subscriptions.providerSubscriptionId, subscriptionId),
+            sql`not exists(select 1 from ${paymentTransactions} where ${paymentTransactions.providerInvoiceId} = ${invoiceId})`,
+          ),
+        );
 
       logger.info("Set subscription to PAST_DUE with grace period", {
         subscriptionId,
@@ -2155,9 +1605,7 @@ export class SubscriptionRepository {
         gracePeriodDays: GRACE_PERIOD_DAYS,
       });
 
-      // IMPORTANT: User still has access during grace period
-      // Credits have already been granted for this period
-      // They will expire when the subscription period ends, not when grace period ends
+      // Existing credits remain available under the grace-period rules.
     } catch (error) {
       logger.error("Failed to process invoice payment failure", {
         error: parseError(error),
@@ -2221,7 +1669,6 @@ export class SubscriptionRepository {
   static async handleSubscriptionUpdated(
     subscriptionId: string,
     logger: EndpointLogger,
-    locale: CountryLanguage,
   ): Promise<void> {
     try {
       const [subscription] = await db
@@ -2288,10 +1735,6 @@ export class SubscriptionRepository {
           to: stripeTier.productId,
         });
       }
-      const effectivePlanId = stripeTier
-        ? getPlanForTierProduct(stripeTier.productId)
-        : subscription.planId;
-
       // Update subscription with proper period information
       // Clear grace period fields when subscription is active again
       const isActive = status === SubscriptionStatus.ACTIVE;
@@ -2312,94 +1755,6 @@ export class SubscriptionRepository {
           updatedAt: new Date(),
         })
         .where(eq(subscriptions.providerSubscriptionId, fullSubscription.id));
-
-      // If period renewed, pre-grant credits regardless of payment status.
-      // Idempotency key prevents double-granting if invoice.created already handled it.
-      if (periodRenewed) {
-        logger.info("Subscription period renewed - pre-granting credits", {
-          userId: subscription.userId,
-          oldPeriodEnd: oldPeriodEnd.toISOString(),
-          newPeriodEnd: newPeriodEnd.toISOString(),
-        });
-
-        const { CreditRepository } = await import("../credits/repository");
-        const { scopedTranslation: creditsScopedTranslation } =
-          await import("../credits/i18n");
-
-        // Look up user's locale from DB for credit/product translations
-        let userLocaleForUpdate: CountryLanguage = locale;
-        {
-          const { users: usersTable } =
-            await import("next-vibe/identity/user/db");
-
-          const [userRow] = await db
-            .select({ locale: usersTable.locale })
-            .from(usersTable)
-            .where(eq(usersTable.id, subscription.userId))
-            .limit(1);
-          if (userRow?.locale) {
-            userLocaleForUpdate = userRow.locale;
-          }
-        }
-        const { t: creditsT } =
-          creditsScopedTranslation.scopedT(userLocaleForUpdate);
-
-        const productId = getTierProductForPlan(effectivePlanId);
-
-        if (productId) {
-          const product = productsRepository.getProduct(
-            productId,
-            userLocaleForUpdate,
-          );
-
-          // Canonical idempotency key shared across all credit grant paths
-          const renewalSessionId = SubscriptionRepository.renewalSessionKey(
-            fullSubscription.id,
-            newPeriodEnd.getTime(),
-          );
-
-          // Check if credits already granted for this period
-          const { creditPacks } = await import("../credits/db");
-
-          const [existingPack] = await db
-            .select()
-            .from(creditPacks)
-            .where(
-              sql`${creditPacks.metadata}->>'sessionId' = ${renewalSessionId}`,
-            )
-            .limit(1);
-
-          if (!existingPack) {
-            // Credits expire at exact period end - no grace buffer needed
-            await CreditRepository.addUserCredits(
-              subscription.userId,
-              product.credits,
-              "subscription",
-              logger,
-              creditsT,
-              periodGrantExpiry(
-                (stripeTier?.billingInterval ??
-                  subscription.billingInterval) === BillingInterval.YEARLY,
-                new Date(currentPeriodStart * 1000),
-                newPeriodEnd,
-              ),
-              renewalSessionId,
-            );
-
-            logger.info("Granted renewal credits", {
-              userId: subscription.userId,
-              credits: product.credits,
-              expiresAt: newPeriodEnd.toISOString(),
-              renewalSessionId,
-            });
-          } else {
-            logger.debug("Renewal credits already granted for this period", {
-              userId: subscription.userId,
-              renewalSessionId,
-            });
-          }
-        }
-      }
 
       logger.debug("Subscription updated successfully", {
         subscriptionId: fullSubscription.id,
@@ -2543,54 +1898,6 @@ export class SubscriptionRepository {
           changes.push(
             `Updated subscription status from ${localSubscription.status} to ${newStatus}`,
           );
-        }
-
-        // Grant renewal credits if period advanced (with idempotency)
-        if (periodChanged) {
-          const newPeriodEndMs = currentPeriodEnd * 1000;
-
-          const productId = getTierProductForPlan(localSubscription.planId);
-
-          if (productId) {
-            const product = productsRepository.getProduct(productId, locale);
-            const renewalSessionId = SubscriptionRepository.renewalSessionKey(
-              localSubscription.providerSubscriptionId,
-              newPeriodEndMs,
-            );
-
-            const { creditPacks: creditPacksTable } =
-              await import("../credits/db");
-            const [existingPack] = await db
-              .select({ id: creditPacksTable.id })
-              .from(creditPacksTable)
-              .where(
-                sql`${creditPacksTable.metadata}->>'sessionId' = ${renewalSessionId}`,
-              )
-              .limit(1);
-
-            if (!existingPack) {
-              const { CreditRepository: CreditRepo } =
-                await import("../credits/repository");
-              const { scopedTranslation: cScopedTranslation } =
-                await import("../credits/i18n");
-              const { t: cT } = cScopedTranslation.scopedT(locale);
-
-              await CreditRepo.addUserCredits(
-                userId,
-                product.credits,
-                "subscription",
-                logger,
-                cT,
-                periodGrantExpiry(
-                  localSubscription.billingInterval === BillingInterval.YEARLY,
-                  new Date(currentPeriodStart * 1000),
-                  new Date(newPeriodEndMs),
-                ),
-                renewalSessionId,
-              );
-              changes.push(`Granted ${product.credits} renewal credits`);
-            }
-          }
         }
       }
 

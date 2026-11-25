@@ -13,7 +13,7 @@
 
 import "server-only";
 
-import { and, eq, inArray, isNotNull, sql } from "drizzle-orm";
+import { and, eq, isNotNull, sql } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
@@ -26,9 +26,11 @@ import { db } from "next-vibe/database";
 import { users } from "next-vibe/identity/user/db";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { creditPacks } from "@/credits/db";
+import { creditPacks, creditTransactions, creditWallets } from "@/credits/db";
 import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
 import { CreditRepository } from "@/credits/repository";
+import { paymentTransactions, paymentWebhooks } from "@/payment/db";
+import { PaymentProvider, PaymentStatus } from "@/payment/enum";
 import {
   getTierCredits,
   getTierProductForPlan,
@@ -44,12 +46,6 @@ import {
   yearlyBackfillKey,
   yearlyMonthGrantKey,
 } from "./slots";
-
-const LIVE_STATUSES = [
-  SubscriptionStatus.ACTIVE,
-  SubscriptionStatus.TRIALING,
-  SubscriptionStatus.PAST_DUE,
-];
 
 export interface YearlyGrantResult {
   scanned: number;
@@ -88,6 +84,10 @@ async function liveYearlySubscriptions(): Promise<
     currentPeriodEnd: Date;
   }>
 > {
+  // Older initial checkout rows have no invoice id. Their signed paid
+  // invoice still identifies the subscription and exact service period.
+  const object = sql`((${paymentWebhooks.data} #>> '{}')::jsonb -> 'data' -> 'object')`;
+  const periodEnd = sql`extract(epoch from ${subscriptions.currentPeriodEnd})`;
   const rows = await db
     .select({
       id: subscriptions.id,
@@ -103,7 +103,23 @@ async function liveYearlySubscriptions(): Promise<
     .where(
       and(
         eq(subscriptions.billingInterval, BillingInterval.YEARLY),
-        inArray(subscriptions.status, LIVE_STATUSES),
+        eq(subscriptions.status, SubscriptionStatus.ACTIVE),
+        sql`(exists (
+          select 1 from ${paymentTransactions} where ${paymentTransactions.userId} = ${subscriptions.userId}
+          and ${paymentTransactions.provider} = ${subscriptions.provider}
+          and ${paymentTransactions.status} = ${PaymentStatus.SUCCEEDED} and ${paymentTransactions.amount} > 0
+          and ${paymentTransactions.providerSessionId} = case when ${subscriptions.provider} = ${PaymentProvider.NOWPAYMENTS}
+            then ${subscriptions.providerSubscriptionId} else 'renewal_' || ${subscriptions.providerSubscriptionId} || '_' || (${periodEnd} * 1000)::bigint end
+        ) or (${subscriptions.provider} = ${PaymentProvider.STRIPE} and exists (
+          select 1 from ${paymentWebhooks}
+          where ${paymentWebhooks.eventType} in ('invoice.paid', 'invoice.payment_succeeded')
+          and ${object}->>'status' = 'paid' and (${object}->>'amount_paid')::numeric > 0
+          and coalesce(${object} #>> '{parent,subscription_details,subscription}', ${object}->>'subscription') = ${subscriptions.providerSubscriptionId}
+          and exists (select 1 from jsonb_array_elements(${object} #> '{lines,data}') line
+            where (line #>> '{period,end}')::bigint = ${periodEnd}
+              and (line #>> '{period,start}')::bigint = extract(epoch from ${subscriptions.currentPeriodStart})
+              and coalesce(line #>> '{parent,subscription_item_details,proration}', line->>'proration','false') = 'false')
+        )))`,
         isNotNull(subscriptions.currentPeriodStart),
         isNotNull(subscriptions.currentPeriodEnd),
       ),
@@ -121,11 +137,22 @@ async function liveYearlySubscriptions(): Promise<
   );
 }
 
-async function packExists(sessionId: string): Promise<boolean> {
+async function grantExists(
+  userId: string,
+  sessionId: string,
+): Promise<boolean> {
   const [row] = await db
-    .select({ id: creditPacks.id })
-    .from(creditPacks)
-    .where(sql`${creditPacks.metadata}->>'sessionId' = ${sessionId}`)
+    .select({ id: creditWallets.id })
+    .from(creditWallets)
+    .where(
+      and(
+        eq(creditWallets.userId, userId),
+        sql`(exists(select 1 from ${creditTransactions} where ${creditTransactions.walletId} = ${creditWallets.id}
+             and ${creditTransactions.amount} > 0 and ${creditTransactions.metadata}->>'sessionId' = ${sessionId})
+          or exists(select 1 from ${creditPacks} where ${creditPacks.walletId} = ${creditWallets.id}
+             and ${creditPacks.metadata}->>'sessionId' = ${sessionId}))`,
+      ),
+    )
     .limit(1);
   return Boolean(row);
 }
@@ -229,7 +256,7 @@ export class YearlyCreditsRepository {
           currentMonth: current ? current.index + 1 : 0,
         };
         const backfillKey = yearlyBackfillKey(subKey, sub.currentPeriodStart);
-        if (await packExists(backfillKey)) {
+        if (await grantExists(sub.userId, backfillKey)) {
           rows.push({
             ...base,
             missedMonths: 0,
@@ -246,7 +273,12 @@ export class YearlyCreditsRepository {
           if (slot.index === 0 || !current || slot.index >= current.index) {
             continue;
           }
-          if (!(await packExists(yearlyMonthGrantKey(subKey, slot.start)))) {
+          if (
+            !(await grantExists(
+              sub.userId,
+              yearlyMonthGrantKey(subKey, slot.start),
+            ))
+          ) {
             missedMonths++;
           }
         }

@@ -21,12 +21,12 @@ import Stripe from "stripe";
 
 import { productsRepository } from "@/products/repository-client";
 
-import { paymentInvoices, paymentTransactions } from "../../db";
+import { ensureCheckoutTransaction } from "../../checkout/transaction";
+import { paymentInvoices } from "../../db";
 import {
   CheckoutMode,
   InvoiceStatus,
   PaymentProvider as PaymentProviderEnum,
-  PaymentStatus,
 } from "../../enum";
 import { paymentEnv } from "../../env";
 import type {
@@ -255,12 +255,11 @@ export class StripeProvider implements PaymentProvider {
       );
 
       try {
-        await db.insert(paymentTransactions).values({
+        await ensureCheckoutTransaction({
           userId: params.userId,
           providerSessionId: session.id,
           amount: (product.price * lineQuantity).toFixed(2),
           currency: product.currency,
-          status: PaymentStatus.PENDING,
           provider: PaymentProviderEnum.STRIPE,
           mode:
             mode === "payment"
@@ -278,7 +277,20 @@ export class StripeProvider implements PaymentProvider {
           error: parseError(txError),
           sessionId: session.id,
         });
-        // Continue - webhook can still process
+        await stripeClient.checkout.sessions
+          .expire(session.id)
+          .catch((error: Error) => {
+            logger.error("Failed to expire untracked Stripe checkout", {
+              sessionId: session.id,
+              error: parseError(error).message,
+            });
+          });
+        return fail({
+          message: tCheckout("errors.checkoutCreationFailed.detail", {
+            error: parseError(txError).message,
+          }),
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        });
       }
 
       // Store invoice in database with callback token for one-time payments
@@ -511,6 +523,47 @@ export class StripeProvider implements PaymentProvider {
         ) {
           webhookData.charge = charge.id;
         }
+      }
+      if (eventData.object === "invoice") {
+        const forSubscription = (item: Stripe.InvoiceLineItem): boolean => {
+          const detail = item.parent?.subscription_item_details;
+          return detail
+            ? !detail.proration &&
+                (!detail.subscription ||
+                  detail.subscription === webhookData.subscription)
+            : "type" in item &&
+                item.type === "subscription" &&
+                !("proration" in item && item.proration);
+        };
+        let line = eventData.lines?.data.find(forSubscription);
+        if (
+          !line &&
+          eventData.lines?.has_more &&
+          webhookData.subscription &&
+          eventData.status === "paid" &&
+          eventData.billing_reason !== "subscription_create" &&
+          (event.type === "invoice.paid" ||
+            event.type === "invoice.payment_succeeded")
+        ) {
+          for await (const item of stripeClient.invoices.listLineItems(
+            eventData.id,
+            { limit: 100 },
+          )) {
+            if (forSubscription(item)) {
+              line = item;
+              break;
+            }
+          }
+        }
+        if (line) {
+          const price = line.pricing?.price_details?.price;
+          webhookData.billingPeriod = {
+            ...line.period,
+            priceId: typeof price === "string" ? price : price?.id,
+          };
+        }
+        webhookData.invoicePaidAt =
+          eventData.status_transitions?.paid_at ?? undefined;
       }
       // Invoice / invoice payment: what was actually paid (renewal commission)
       if (

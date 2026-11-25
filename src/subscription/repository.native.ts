@@ -148,7 +148,7 @@ export class SubscriptionRepository {
     _logger: EndpointLogger,
     // oxlint-disable-next-line no-unused-vars
     _locale: CountryLanguage,
-  ): Promise<void> {
+  ): Promise<ResponseType<void>> {
     // oxlint-disable-next-line restricted-syntax
     throw new Error(
       "handleInvoicePaymentSucceeded is not implemented on native",
@@ -172,8 +172,6 @@ export class SubscriptionRepository {
     _subscriptionId: string,
     // oxlint-disable-next-line no-unused-vars
     _logger: EndpointLogger,
-    // oxlint-disable-next-line no-unused-vars
-    _locale: CountryLanguage,
   ): Promise<void> {
     // oxlint-disable-next-line restricted-syntax
     throw new Error("handleSubscriptionUpdated is not implemented on native");
@@ -189,20 +187,6 @@ export class SubscriptionRepository {
   ): Promise<ResponseType<{ message: string; changes: string[] }>> {
     // oxlint-disable-next-line restricted-syntax
     throw new Error("syncSubscriptionWithStripe is not implemented on native");
-  }
-
-  static async handleInvoiceCreated(
-    // oxlint-disable-next-line no-unused-vars
-    _invoice: WebhookData,
-    // oxlint-disable-next-line no-unused-vars
-    _subscriptionId: string,
-    // oxlint-disable-next-line no-unused-vars
-    _logger: EndpointLogger,
-    // oxlint-disable-next-line no-unused-vars
-    _locale: CountryLanguage,
-  ): Promise<void> {
-    // oxlint-disable-next-line restricted-syntax
-    throw new Error("handleInvoiceCreated is not implemented on native");
   }
 
   static async handleInvoicePaymentFailed(

@@ -13,9 +13,8 @@ export async function prod(
   locale: CountryLanguage,
 ): Promise<void> {
   try {
-    const { backfillReferredRenewalCommissions } =
-      await import("./renewal/backfill");
-    const result = await backfillReferredRenewalCommissions(logger, locale);
+    const { backfillPaidRenewals } = await import("./renewal/backfill");
+    const result = await backfillPaidRenewals(logger, locale, "referred");
     if (result.replayed > 0) {
       logger.info("Payment seeds: missed renewal commissions booked", {
         replayed: result.replayed,

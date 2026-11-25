@@ -80,7 +80,7 @@ export interface PaidRenewalInvoice {
 }
 
 export interface RenewalRecordResult {
-  /** Null when nothing was recorded (initial invoice, $0, unattributable) */
+  /** Null when nothing was recorded (initial invoice or $0) */
   transactionId: string | null;
   /** Commission base in USD cents (null when not booked) */
   revenueUsdCents: number | null;
@@ -90,8 +90,7 @@ export class PaymentRenewalRepository {
   /**
    * Record a paid renewal invoice and book its referral commission.
    * Safe to call any number of times, concurrently, for the same invoice.
-   * Fails only on a database error (the webhook then stays unprocessed and
-   * the provider retries).
+   * Missing attribution or settlement data leaves the event open for retry.
    */
   static async recordPaidRenewal(
     invoice: PaidRenewalInvoice,
@@ -108,7 +107,16 @@ export class PaymentRenewalRepository {
         // commission from the checkout amount.
         return success(none);
       }
-      const amountPaidMinor = invoice.amountPaidMinor ?? 0;
+      const { t } = scopedTranslation.scopedT(locale);
+      const amountPaidMinor = invoice.amountPaidMinor;
+      if (amountPaidMinor === null) {
+        return fail({
+          message: t("errors.server.detail", {
+            error: `Missing amount paid for ${invoice.invoiceId}`,
+          }),
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        });
+      }
       if (amountPaidMinor <= 0) {
         logger.debug("Renewal invoice paid nothing - no payment recorded", {
           invoiceId: invoice.invoiceId,
@@ -129,7 +137,12 @@ export class PaymentRenewalRepository {
             amountPaidMinor,
           },
         );
-        return success(none);
+        return fail({
+          message: t("errors.server.detail", {
+            error: `Unsupported invoice currency for ${invoice.invoiceId}`,
+          }),
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        });
       }
 
       // Owner: the subscription row, else the provider customer
@@ -163,7 +176,12 @@ export class PaymentRenewalRepository {
             currency,
           },
         );
-        return success(none);
+        return fail({
+          message: t("errors.server.detail", {
+            error: `Missing invoice owner for ${invoice.invoiceId}`,
+          }),
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        });
       }
 
       // The renewal credit grant is keyed by subscription + period end; storing
@@ -213,7 +231,6 @@ export class PaymentRenewalRepository {
       if (!transactionId) {
         // Conflict on insert but no row on read: only possible if it was
         // deleted in between. Let the provider retry.
-        const { t } = scopedTranslation.scopedT(locale);
         return fail({
           message: t("errors.server.detail", {
             error: `renewal transaction for ${invoice.invoiceId} vanished`,

@@ -155,6 +155,8 @@ export class CreditRepository {
     _expiresAt?: Date,
     // oxlint-disable-next-line no-unused-vars
     _sessionId?: string,
+    // oxlint-disable-next-line no-unused-vars -- native stub
+    _paidInvoiceId?: string,
   ): Promise<ResponseType<AddUserCreditsResult>> {
     // oxlint-disable-next-line restricted-syntax
     throw new Error("addUserCredits is not implemented on native");

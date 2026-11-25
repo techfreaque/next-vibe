@@ -83,6 +83,9 @@ export interface WebhookData {
   currency?: string;
   subscription?: string;
   billing_reason?: string;
+  /** Service period on the recurring, non-proration invoice line (Unix seconds). */
+  billingPeriod?: { start: number; end: number; priceId?: string };
+  invoicePaidAt?: number;
   parent?: Stripe.InvoiceItem.Parent | Stripe.Invoice.Parent;
   /** Charge / dispute / checkout session: the payment intent it belongs to */
   payment_intent?: string;

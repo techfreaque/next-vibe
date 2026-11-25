@@ -21,7 +21,9 @@ import {
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { creditPacks, creditWallets } from "@/credits/db";
-import { PaymentProvider } from "@/payment/enum";
+import { paymentTransactions } from "@/payment/db";
+import { CheckoutMode, PaymentProvider, PaymentStatus } from "@/payment/enum";
+import { subscriptionRenewalSessionKey } from "../renewal-key";
 
 import { subscriptions } from "../db";
 import { BillingInterval, SubscriptionPlan, SubscriptionStatus } from "../enum";
@@ -78,6 +80,20 @@ describe("yearly plan monthly credits", () => {
         currentPeriodStart: periodStart,
         currentPeriodEnd: periodEnd,
       });
+      await db
+        .insert(paymentTransactions)
+        .values({
+          userId: user.user.id,
+          provider: PaymentProvider.STRIPE,
+          status: PaymentStatus.SUCCEEDED,
+          mode: CheckoutMode.SUBSCRIPTION,
+          amount: "88.00",
+          currency: "USD",
+          providerSessionId: subscriptionRenewalSessionKey(
+            `sub_test_yearly_${plan}_${stamp}`,
+            periodEnd.getTime(),
+          ),
+        });
     }
   }, 60_000);
 
@@ -89,6 +105,78 @@ describe("yearly plan monthly credits", () => {
       await deleteTestUser(user.user.id);
     }
   }, 60_000);
+
+  it("an unpaid annual period and a past-due subscription receive no monthly or backfill credits", async () => {
+    const newBuyer = await createTestUser(`yearly-unpaid-${stamp}@example.com`);
+    if (!newBuyer.success) {
+      return expect.fail("failed to create buyer");
+    }
+    const buyer = newBuyer.data;
+    try {
+      const subId = `sub_yearly_unpaid_${stamp}`;
+      const unpaidStart = addUtcMonths(periodStart, 24);
+      const unpaidEnd = addUtcMonths(periodEnd, 24);
+      const unpaidNow = addUtcMonths(now, 24);
+      await db
+        .insert(subscriptions)
+        .values({
+          userId: buyer.user.id,
+          planId: SubscriptionPlan.SUBSCRIPTION,
+          billingInterval: BillingInterval.YEARLY,
+          status: SubscriptionStatus.ACTIVE,
+          provider: PaymentProvider.STRIPE,
+          providerSubscriptionId: subId,
+          currentPeriodStart: unpaidStart,
+          currentPeriodEnd: unpaidEnd,
+        });
+      await YearlyCreditsRepository.grantCurrentMonth(
+        logger,
+        defaultLocale,
+        t,
+        unpaidNow,
+      );
+      expect(await packTotal(buyer.user.id, "yearly-month:")).toBe(0);
+      await db
+        .update(subscriptions)
+        .set({ status: SubscriptionStatus.PAST_DUE })
+        .where(eq(subscriptions.userId, buyer.user.id));
+      await db
+        .insert(paymentTransactions)
+        .values({
+          userId: buyer.user.id,
+          provider: PaymentProvider.STRIPE,
+          status: PaymentStatus.SUCCEEDED,
+          currency: "USD",
+          amount: "88.00",
+          mode: CheckoutMode.SUBSCRIPTION,
+          providerSessionId: subscriptionRenewalSessionKey(
+            subId,
+            unpaidEnd.getTime(),
+          ),
+        });
+      await YearlyCreditsRepository.grantCurrentMonth(
+        logger,
+        defaultLocale,
+        t,
+        unpaidNow,
+      );
+      const backfill = await YearlyCreditsRepository.backfill(
+        true,
+        logger,
+        defaultLocale,
+        t,
+        unpaidNow,
+      );
+      expect(backfill.success).toBe(true);
+      expect(
+        backfill.success &&
+          backfill.data.rows.some((r) => r.userEmail === buyer.email),
+      ).toBe(false);
+      expect(await packTotal(buyer.user.id, "yearly-month:")).toBe(0);
+    } finally {
+      await deleteTestUser(buyer.user.id);
+    }
+  });
 
   it("backfill dry run lists the missed months and grants nothing", async () => {
     const res = await YearlyCreditsRepository.backfill(

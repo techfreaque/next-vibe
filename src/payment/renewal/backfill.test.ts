@@ -30,7 +30,7 @@ import { subscriptionRenewalSessionKey } from "@/subscription/renewal-key";
 import { paymentTransactions, paymentWebhooks } from "../db";
 import { PaymentProvider } from "../enum";
 import {
-  backfillReferredRenewalCommissions,
+  backfillPaidRenewals,
   RENEWAL_RECORDING_START,
 } from "./backfill";
 
@@ -123,7 +123,7 @@ async function txFor(invoiceId: string): Promise<
     .where(eq(paymentTransactions.providerInvoiceId, invoiceId));
 }
 
-describe("backfillReferredRenewalCommissions", () => {
+describe("backfillPaidRenewals", () => {
   beforeAll(async () => {
     const created = await Promise.all(
       ["referred", "plain", "referrer"].map((role) =>
@@ -171,7 +171,7 @@ describe("backfillReferredRenewalCommissions", () => {
   });
 
   it("books the referred renewals once, dated at payment; matured ones confirm", async () => {
-    await backfillReferredRenewalCommissions(logger, defaultLocale);
+    await backfillPaidRenewals(logger, defaultLocale, "referred");
 
     const [old] = await txFor(invoices.old);
     const [recent] = await txFor(invoices.recent);
@@ -207,10 +207,23 @@ describe("backfillReferredRenewalCommissions", () => {
     // Paid two days ago: still in the hold period
     expect(recentEarning?.status).toBe(ReferralEarningStatus.PENDING);
 
+    const selected = [invoices.plain, invoices.initial];
+    await backfillPaidRenewals(logger, defaultLocale, selected);
+    await backfillPaidRenewals(logger, defaultLocale, selected);
+    const plainRows = await txFor(invoices.plain);
+    expect(plainRows).toHaveLength(1);
+    expect(plainRows[0]?.createdAt.getTime()).toBe(sec(OLD_PAID) * 1000);
+    expect(await txFor(invoices.initial)).toHaveLength(0);
+    expect(
+      await db.select({ id: referralEarnings.id }).from(referralEarnings)
+        .where(eq(referralEarnings.transactionId, plainRows[0].id)),
+    ).toHaveLength(0);
+
     // Rerun: nothing new
-    const again = await backfillReferredRenewalCommissions(
+    const again = await backfillPaidRenewals(
       logger,
       defaultLocale,
+      "referred",
     );
     expect(again.replayed).toBe(0);
     expect(await txFor(invoices.old)).toHaveLength(1);

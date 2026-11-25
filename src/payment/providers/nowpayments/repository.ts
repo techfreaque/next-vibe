@@ -24,12 +24,12 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { type Product, productsRepository } from "@/products/repository-client";
 
-import { paymentInvoices, paymentTransactions } from "../../db";
+import { ensureCheckoutTransaction } from "../../checkout/transaction";
+import { paymentInvoices } from "../../db";
 import {
   CheckoutMode,
   InvoiceStatus,
   PaymentProvider as PaymentProviderEnum,
-  PaymentStatus,
 } from "../../enum";
 import { paymentEnv } from "../../env";
 import type {
@@ -412,12 +412,11 @@ export class NOWPaymentsProvider implements PaymentProvider {
 
     // Create payment transaction record for tracking and referral payouts
     try {
-      await db.insert(paymentTransactions).values({
+      await ensureCheckoutTransaction({
         userId: params.userId,
         providerSessionId: invoice.id,
         amount: totalAmount.toFixed(2),
         currency: product.currency,
-        status: PaymentStatus.PENDING,
         provider: PaymentProviderEnum.NOWPAYMENTS,
         mode: CheckoutMode.PAYMENT,
         metadata: params.metadata,
@@ -432,7 +431,12 @@ export class NOWPaymentsProvider implements PaymentProvider {
         error: parseError(txError),
         invoiceId: invoice.id,
       });
-      // Continue - webhook can still process
+      return fail({
+        message: t("errors.checkoutCreationFailed.detail", {
+          error: parseError(txError).message,
+        }),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
 
     return success<CheckoutSessionResult>({
@@ -566,6 +570,7 @@ export class NOWPaymentsProvider implements PaymentProvider {
           id: payload.invoice_id || payload.payment_id,
           metadata: mergedMetadata,
           customer: payload.order_id.split("_")[0],
+          currency: payload.price_currency,
           amount_total: Math.round(payload.price_amount * 100), // Convert to cents
         },
       });

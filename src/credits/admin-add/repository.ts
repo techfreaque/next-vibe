@@ -196,7 +196,7 @@ export class AdminAddCreditsRepository {
     }
     return success({
       recipientId: recipient.data.id,
-      packId: result.data.packId,
+      packId: result.data.packId ?? undefined,
       message: t("repository.bonusCreditsAdded", { amount: data.amount }),
     });
   }

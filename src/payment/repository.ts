@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import { desc, eq, sql } from "drizzle-orm";
+import { and, desc, eq, inArray, ne, sql } from "drizzle-orm";
 import {
   ErrorResponseTypes,
   fail,
@@ -56,7 +56,10 @@ const PAYMENT_METHOD_TO_STRIPE: Record<
 };
 
 import { coreEnv } from "next-vibe/core/env";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import {
+  type CountryLanguage,
+  CurrenciesArr,
+} from "next-vibe/core/i18n/core/config";
 import { db } from "next-vibe/database";
 import { VibeMode } from "next-vibe/env/env-util";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
@@ -66,6 +69,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
 
 import { subscriptions } from "../subscription/db";
+import { ensureCheckoutTransaction } from "./checkout/transaction";
 import { paymentMethods, paymentTransactions, paymentWebhooks } from "./db";
 import type {
   PaymentGetRequestOutput,
@@ -208,19 +212,15 @@ export class PaymentRepository {
       // Store transaction in database
       let transaction;
       try {
-        [transaction] = await db
-          .insert(paymentTransactions)
-          .values({
-            userId: user.id,
-            providerSessionId: session.id,
-            amount: "0", // Will be updated via webhook
-            currency: "USD", // Will be updated via webhook
-            status: PaymentStatus.PENDING,
-            provider: PaymentProvider.STRIPE,
-            mode: data.mode,
-            metadata: null,
-          })
-          .returning();
+        transaction = await ensureCheckoutTransaction({
+          userId: user.id,
+          providerSessionId: session.id,
+          amount: "0", // Will be updated via webhook
+          currency: "USD", // Will be updated via webhook
+          provider: PaymentProvider.STRIPE,
+          mode: data.mode,
+          metadata: null,
+        });
       } catch (dbError) {
         // If DB insert fails, expire the Stripe session
         logger.error("Failed to store transaction, expiring Stripe session", {
@@ -472,21 +472,27 @@ export class PaymentRepository {
 
       switch (event.type) {
         case "checkout.session.completed":
-          // Async methods (delayed PayPal, bank debits) complete the session
-          // before the money settles: grant only once it is paid.
-          if (eventData.payment_status === "unpaid") {
+        case "checkout.session.async_payment_succeeded": {
+          if (
+            event.type === "checkout.session.completed" &&
+            eventData.payment_status === "unpaid"
+          ) {
             logger.info("Checkout completed, payment still settling", {
               sessionId: eventData.id,
             });
             break;
           }
-          await this.handleCheckoutSessionCompleted(eventData, logger);
+          const checkout = await this.handleCheckoutSessionCompleted(
+            eventData,
+            logger,
+            locale,
+            provider,
+          );
+          if (!checkout.success) {
+            return checkout;
+          }
           break;
-        case "checkout.session.async_payment_succeeded":
-          // Same path as an instantly paid session; every grant in it is
-          // keyed by the session / subscription period, so a retry is a no-op.
-          await this.handleCheckoutSessionCompleted(eventData, logger);
-          break;
+        }
         case "checkout.session.async_payment_failed":
           await this.handleCheckoutSessionExpired(eventData, logger);
           break;
@@ -495,9 +501,6 @@ export class PaymentRepository {
           break;
         case "payment_intent.payment_failed":
           await this.handlePaymentFailed(eventData, logger);
-          break;
-        case "invoice.created":
-          await this.handleInvoiceCreated(eventData, logger, locale);
           break;
         case "invoice.payment_succeeded":
         case "invoice.paid": {
@@ -542,7 +545,7 @@ export class PaymentRepository {
           await this.handleSubscriptionDeleted(eventData, logger, locale);
           break;
         case "customer.subscription.updated":
-          await this.handleSubscriptionUpdated(eventData, logger, locale);
+          await this.handleSubscriptionUpdated(eventData, logger);
           break;
         case "checkout.session.expired":
           await this.handleCheckoutSessionExpired(eventData, logger);
@@ -666,7 +669,10 @@ export class PaymentRepository {
           updatedAt: new Date(),
         })
         .where(
-          eq(paymentTransactions.providerPaymentIntentId, paymentIntentId),
+          and(
+            eq(paymentTransactions.providerPaymentIntentId, paymentIntentId),
+            ne(paymentTransactions.status, PaymentStatus.REFUNDED),
+          ),
         );
 
       logger.debug("Payment succeeded processed", {
@@ -694,7 +700,13 @@ export class PaymentRepository {
           updatedAt: new Date(),
         })
         .where(
-          eq(paymentTransactions.providerPaymentIntentId, paymentIntentId),
+          and(
+            eq(paymentTransactions.providerPaymentIntentId, paymentIntentId),
+            inArray(paymentTransactions.status, [
+              PaymentStatus.PENDING,
+              PaymentStatus.PROCESSING,
+            ]),
+          ),
         );
 
       logger.debug("Payment failed processed", {
@@ -765,59 +777,6 @@ export class PaymentRepository {
     return undefined;
   }
 
-  /**
-   * Handle invoice.created - pre-grant credits before payment confirmation.
-   * This ensures users have credits immediately when a new billing period starts,
-   * even if payment takes time or fails temporarily.
-   */
-  private static async handleInvoiceCreated(
-    data: WebhookData,
-    logger: EndpointLogger,
-    locale: CountryLanguage,
-  ): Promise<void> {
-    try {
-      const invoiceId = data.id;
-      const billingReason = data.billing_reason;
-
-      logger.info("Invoice created - checking for credit pre-grant", {
-        invoiceId,
-        billingReason,
-        hasRootSubscription: "subscription" in data,
-        hasParent: "parent" in data,
-      });
-
-      const subscriptionId = this.extractSubscriptionIdFromInvoice(
-        data,
-        logger,
-      );
-
-      if (!subscriptionId) {
-        return;
-      }
-
-      // Subscription module handles pre-granting logic
-      const { SubscriptionRepository } =
-        await import("../subscription/repository");
-      await SubscriptionRepository.handleInvoiceCreated(
-        data,
-        subscriptionId,
-        logger,
-        locale,
-      );
-    } catch (error) {
-      logger.error("Failed to process invoice created", {
-        error: parseError(error),
-        invoiceId: data.id,
-      });
-    }
-  }
-
-  /**
-   * Paid invoice: the subscription module renews the period and credits, then
-   * the payment is recorded and the referral commission booked on the amount
-   * actually paid. Only the recording can fail the webhook (provider retries);
-   * credit grants are idempotent on their own key.
-   */
   private static async handleInvoicePaymentSucceeded(
     data: WebhookData,
     logger: EndpointLogger,
@@ -834,27 +793,19 @@ export class PaymentRepository {
       return success();
     }
 
-    try {
-      // Subscription module handles its own business logic
-      const { SubscriptionRepository } =
-        await import("../subscription/repository");
-      await SubscriptionRepository.handleInvoicePaymentSucceeded(
-        data,
-        subscriptionId,
-        logger,
-        locale,
-      );
-    } catch (error) {
-      logger.error("Failed to process invoice payment succeeded", {
-        error: parseError(error),
-        invoiceId: data.id,
-      });
+    if (data.status !== "paid") {
+      return success();
     }
-
     const { PaymentRenewalRepository } = await import("./renewal/renewal");
     const recorded = await PaymentRenewalRepository.recordPaidRenewal(
       {
         invoiceId: data.id,
+        paidAt: data.invoicePaidAt
+          ? new Date(data.invoicePaidAt * 1000)
+          : undefined,
+        periodEnd: data.billingPeriod
+          ? new Date(data.billingPeriod.end * 1000)
+          : undefined,
         subscriptionId,
         billingReason: data.billing_reason ?? null,
         amountPaidMinor: data.amount_paid ?? null,
@@ -865,7 +816,17 @@ export class PaymentRepository {
       logger,
       locale,
     );
-    return recorded.success ? success() : recorded;
+    if (!recorded.success || !recorded.data.transactionId) {
+      return recorded.success ? success() : recorded;
+    }
+    const { SubscriptionRepository } =
+      await import("../subscription/repository");
+    return SubscriptionRepository.handleInvoicePaymentSucceeded(
+      data,
+      subscriptionId,
+      logger,
+      locale,
+    );
   }
 
   private static async handleInvoicePaymentFailed(
@@ -1064,7 +1025,15 @@ export class PaymentRepository {
           status: PaymentStatus.FAILED,
           updatedAt: new Date(),
         })
-        .where(eq(paymentTransactions.providerSessionId, sessionId));
+        .where(
+          and(
+            eq(paymentTransactions.providerSessionId, sessionId),
+            inArray(paymentTransactions.status, [
+              PaymentStatus.PENDING,
+              PaymentStatus.PROCESSING,
+            ]),
+          ),
+        );
 
       logger.info("Checkout session expired - marked transaction as failed", {
         sessionId,
@@ -1080,7 +1049,12 @@ export class PaymentRepository {
   private static async handleCheckoutSessionCompleted(
     data: WebhookData,
     logger: EndpointLogger,
-  ): Promise<void> {
+    locale: CountryLanguage,
+    provider:
+      | typeof PaymentProvider.STRIPE
+      | typeof PaymentProvider.NOWPAYMENTS,
+  ): Promise<ResponseType<void>> {
+    const { t } = scopedTranslation.scopedT(locale);
     try {
       const sessionId = data.id;
       const metadata =
@@ -1101,17 +1075,61 @@ export class PaymentRepository {
       );
 
       // Find transaction by session ID first - it holds the authoritative userId
-      const [transaction] = await db
+      let [transaction] = await db
         .select()
         .from(paymentTransactions)
-        .where(eq(paymentTransactions.providerSessionId, sessionId))
+        .where(
+          and(
+            eq(paymentTransactions.provider, provider),
+            eq(paymentTransactions.providerSessionId, sessionId),
+          ),
+        )
         .limit(1);
 
+      const settledCurrency = CurrenciesArr.find(
+        (code) => code === data.currency?.toUpperCase(),
+      );
+      if (
+        !transaction &&
+        data.customer &&
+        settledCurrency &&
+        typeof data.amount_total === "number"
+      ) {
+        const [owner] = await db
+          .select({ id: users.id })
+          .from(users)
+          .where(
+            provider === PaymentProvider.STRIPE
+              ? eq(users.stripeCustomerId, data.customer)
+              : eq(users.id, data.customer),
+          )
+          .limit(1);
+        if (owner && (!metadata?.userId || owner.id === metadata.userId)) {
+          transaction = await ensureCheckoutTransaction({
+            userId: owner.id,
+            provider,
+            providerSessionId: sessionId,
+            amount: (data.amount_total / 100).toFixed(2),
+            currency: settledCurrency,
+            mode:
+              provider === PaymentProvider.STRIPE &&
+              (data.subscription || type === "subscription")
+                ? CheckoutMode.SUBSCRIPTION
+                : CheckoutMode.PAYMENT,
+            metadata: metadata ?? null,
+          });
+        }
+      }
       if (!transaction) {
         logger.warn("No transaction found for checkout session", {
           sessionId,
         });
-        return;
+        return fail({
+          message: t("errors.server.detail", {
+            error: `Missing checkout transaction for ${sessionId}`,
+          }),
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        });
       }
 
       // Look up user's locale from DB - the transaction userId is the source of truth
@@ -1129,11 +1147,37 @@ export class PaymentRepository {
             userId: transaction.userId,
           },
         );
-        return;
+        return fail({
+          message: t("errors.server.detail", {
+            error: `Missing checkout owner for ${sessionId}`,
+          }),
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        });
       }
 
       const userLocale = userRecord.locale;
       const { t: creditsT } = creditsScopedTranslation.scopedT(userLocale);
+
+      // Stripe's settled total includes discounts and local currency pricing.
+      // NOWPayments checkouts store their fiat price when the invoice is opened.
+      let settlement;
+      if (
+        transaction.provider === PaymentProvider.STRIPE &&
+        transaction.mode !== CheckoutMode.SETUP
+      ) {
+        if (!settledCurrency || typeof data.amount_total !== "number") {
+          return fail({
+            message: t("errors.server.detail", {
+              error: `Missing or unsupported settlement amount/currency for ${sessionId}`,
+            }),
+            errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          });
+        }
+        settlement = {
+          amount: (data.amount_total / 100).toFixed(2),
+          currency: settledCurrency,
+        };
+      }
 
       // Route to appropriate module based on purchase type
       if (type === "credit_pack") {
@@ -1173,12 +1217,17 @@ export class PaymentRepository {
       await db
         .update(paymentTransactions)
         .set({
+          ...settlement,
           status: PaymentStatus.SUCCEEDED,
-          providerPaymentIntentId:
-            data.payment_intent ?? transaction.providerPaymentIntentId,
+          providerPaymentIntentId: data.payment_intent,
           updatedAt: new Date(),
         })
-        .where(eq(paymentTransactions.id, transaction.id));
+        .where(
+          and(
+            eq(paymentTransactions.id, transaction.id),
+            ne(paymentTransactions.status, PaymentStatus.REFUNDED),
+          ),
+        );
 
       logger.debug("Transaction status updated to succeeded", {
         transactionId: transaction.id,
@@ -1281,17 +1330,18 @@ export class PaymentRepository {
           );
         }
       }
+      return success();
     } catch (error) {
-      if (typeof error === "object" && error && "id" in error) {
-        logger.error("Failed to process checkout session completed", {
-          error: parseError(error),
-          sessionId: String(error.id),
-        });
-      } else {
-        logger.error("Failed to process checkout session completed", {
-          error: parseError(error),
-        });
-      }
+      logger.error("Failed to process checkout session completed", {
+        error: parseError(error),
+        sessionId: data.id,
+      });
+      return fail({
+        message: t("errors.server.detail", {
+          error: parseError(error).message,
+        }),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
   }
 
@@ -1331,7 +1381,6 @@ export class PaymentRepository {
   private static async handleSubscriptionUpdated(
     data: WebhookData,
     logger: EndpointLogger,
-    locale: CountryLanguage,
   ): Promise<void> {
     try {
       logger.debug("Subscription updated - delegating to subscription module", {
@@ -1340,11 +1389,7 @@ export class PaymentRepository {
 
       const { SubscriptionRepository } =
         await import("../subscription/repository");
-      await SubscriptionRepository.handleSubscriptionUpdated(
-        data.id,
-        logger,
-        locale,
-      );
+      await SubscriptionRepository.handleSubscriptionUpdated(data.id, logger);
     } catch (error) {
       if (typeof error === "object" && error && "id" in error) {
         logger.error("Failed to process subscription updated", {

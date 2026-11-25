@@ -274,6 +274,20 @@ describe("PaymentRenewalRepository", () => {
     ]);
   });
 
+  it("retries a paid invoice when the owner arrives after the webhook", async () => {
+    const subscriptionId = `sub_test_renewal_unreferred_${stamp}`;
+    const paid = invoice("retry-owner", subscriptionId, 800, { currency: "eur" });
+    const first = await PaymentRenewalRepository.recordPaidRenewal(paid, logger, defaultLocale);
+    expect(first.success).toBe(false);
+    expect(await transactionsFor(paid.invoiceId)).toHaveLength(0);
+    await addSubscription(upline, subscriptionId, BillingInterval.MONTHLY);
+    await Promise.all([1, 2].map(() => PaymentRenewalRepository.recordPaidRenewal(paid, logger, defaultLocale)));
+    const rows = await transactionsFor(paid.invoiceId);
+    expect(rows).toHaveLength(1);
+    expect(rows[0]).toMatchObject({ amount: "8.00", currency: "EUR" });
+    expect(await earningsOf(rows[0].id)).toHaveLength(0);
+  });
+
   it("the first invoice and $0 invoices record nothing", async () => {
     const first = invoice("create", monthlySub, 800, {
       billingReason: "subscription_create",

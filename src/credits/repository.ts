@@ -222,11 +222,12 @@ interface AddReferralBonusResult {
 }
 /**
  * Result of addUserCredits. `granted` is false when an idempotency key
- * (sessionId) already had a pack: `packId` then points at that existing grant.
+ * (sessionId) already received credits, including fully consumed packs.
  * Callers gate one-time side effects (confirmation emails) on `granted`.
  */
 export interface AddUserCreditsResult {
-  packId: string;
+  /** Null when a previously granted pack has since been deleted. */
+  packId: string | null;
   granted: boolean;
 }
 
@@ -879,6 +880,7 @@ export class CreditRepository {
                           expiredAmount: lockedPack.remaining,
                           originalAmount: lockedPack.originalAmount,
                           reason: "subscription_grace_period_expired",
+                          sessionId: lockedPack.metadata?.sessionId,
                         },
                       });
                     }
@@ -2546,6 +2548,7 @@ export class CreditRepository {
     t: CreditsT,
     expiresAt?: Date,
     sessionId?: string,
+    paidInvoiceId?: string,
   ): Promise<ResponseType<AddUserCreditsResult>> {
     try {
       // Add to user wallet (credits are pooled across user + linked leads)
@@ -2573,18 +2576,69 @@ export class CreditRepository {
         packType = CreditPackType.BONUS;
       }
 
+      const invoiceKey = paidInvoiceId
+        ? `subscription-invoice:${paidInvoiceId}`
+        : undefined;
       // Atomic: insert pack, increment balance, create transaction in one transaction
       const result = await withTransaction(
         logger,
         async (tx): Promise<AddUserCreditsResult | undefined> => {
-          // Fast path: key already granted (the common retry / page-load case)
+          let creditAmount = amount;
           if (sessionId) {
+            // Spending can delete the pack and null its ledger FK. Serialize
+            // grants on this wallet and retain the positive ledger entry as proof.
+            await tx
+              .select({ id: creditWallets.id })
+              .from(creditWallets)
+              .where(eq(creditWallets.id, wallet.id))
+              .for("update");
             const existingId = await CreditRepository.findPackIdBySessionId(
               tx,
               sessionId,
             );
             if (existingId) {
               return { packId: existingId, granted: false };
+            }
+            const [prior] = await tx
+              .select({ packId: creditTransactions.packId })
+              .from(creditTransactions)
+              .where(
+                and(
+                  eq(creditTransactions.walletId, wallet.id),
+                  sql`${creditTransactions.amount} > 0`,
+                  or(
+                    sql`${creditTransactions.metadata}->>'sessionId' = ${sessionId}`,
+                    invoiceKey
+                      ? sql`${creditTransactions.metadata}->>'grantKey' = ${invoiceKey}`
+                      : undefined,
+                  ),
+                ),
+              )
+              .orderBy(desc(creditTransactions.createdAt))
+              .limit(1);
+            if (prior) {
+              if (invoiceKey) {
+                // During rollout a previously advanced pack may have been
+                // revoked at grace expiry. Restore only its unused remainder.
+                const [expiry] = await tx
+                  .select({ amount: creditTransactions.amount })
+                  .from(creditTransactions)
+                  .where(
+                    and(
+                      eq(creditTransactions.walletId, wallet.id),
+                      eq(creditTransactions.type, CreditTransactionType.EXPIRY),
+                      sql`${creditTransactions.metadata}->>'reason' = 'subscription_grace_period_expired'`,
+                      sql`${creditTransactions.metadata}->>'sessionId' = ${sessionId}`,
+                      sql`NOT EXISTS (SELECT 1 FROM credit_transactions settled WHERE settled.metadata->>'grantKey' = ${invoiceKey})`,
+                    ),
+                  )
+                  .orderBy(desc(creditTransactions.createdAt))
+                  .limit(1);
+                creditAmount = Math.min(amount, -(expiry?.amount ?? 0));
+              }
+              if (!invoiceKey || creditAmount <= 0) {
+                return { packId: prior.packId, granted: false };
+              }
             }
           }
 
@@ -2595,8 +2649,8 @@ export class CreditRepository {
             .insert(creditPacks)
             .values({
               walletId: wallet.id,
-              originalAmount: amount,
-              remaining: amount,
+              originalAmount: creditAmount,
+              remaining: creditAmount,
               type: packType,
               expiresAt: finalExpiresAt,
               source: type === "bonus" ? type : `${type}_purchase`,
@@ -2614,7 +2668,7 @@ export class CreditRepository {
           const [updated] = await tx
             .update(creditWallets)
             .set({
-              balance: sql`${creditWallets.balance} + ${amount}`,
+              balance: sql`${creditWallets.balance} + ${creditAmount}`,
               updatedAt: new Date(),
             })
             .where(eq(creditWallets.id, wallet.id))
@@ -2622,13 +2676,14 @@ export class CreditRepository {
 
           const purchaseMetadata: PurchaseMetadata = {
             packQuantity: 1,
+            ...(invoiceKey && { grantKey: invoiceKey }),
             ...(sessionId && { sessionId, totalPaid: 0, currency: "USD" }),
             ...(type === "bonus" && { bonusGrant: true }),
           };
 
           await tx.insert(creditTransactions).values({
             walletId: wallet.id,
-            amount,
+            amount: creditAmount,
             balanceAfter: updated.balance,
             type:
               type === "subscription"
@@ -2646,7 +2701,7 @@ export class CreditRepository {
 
       if (result) {
         if (!result.granted) {
-          logger.info("Idempotency: credit pack already exists for session", {
+          logger.info("Idempotency: credits already granted for session", {
             sessionId,
             existingPackId: result.packId,
             userId,

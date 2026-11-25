@@ -90,6 +90,8 @@ export interface FreeResetMetadata {
 }
 
 export interface PurchaseMetadata {
+  /** Durable receipt for a paid subscription invoice (uq_transactions_grant_key). */
+  grantKey?: string;
   bonusGrant?: true;
   sessionId?: string;
   /** Set (instead of sessionId) on a duplicate grant neutralised by the uq_packs_session_id migration */
@@ -161,6 +163,7 @@ export interface UsageMetadata
 }
 
 export interface ExpiryMetadata {
+  sessionId?: string;
   expiredPackId: string;
   expiredAmount: number;
   packType?: "subscription" | "permanent" | "bonus" | "earned";

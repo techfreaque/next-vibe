@@ -9,9 +9,10 @@
 
 import "server-only";
 
-import { eq, sql } from "drizzle-orm";
+import { eq, inArray, sql } from "drizzle-orm";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { db } from "next-vibe/database";
+import { users } from "next-vibe/identity/user/db";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import {
   createTestUser,
@@ -24,7 +25,7 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { creditPacks } from "@/credits/db";
 import { ProductIds } from "@/products/repository-client";
 
-import { paymentTransactions } from "./db";
+import { paymentTransactions, paymentWebhooks } from "./db";
 import { CheckoutMode, PaymentProvider, PaymentStatus } from "./enum";
 import { paymentEnv } from "./env";
 import { PaymentRepository } from "./repository";
@@ -35,15 +36,19 @@ const canSign = Boolean(secret && paymentEnv.STRIPE_SECRET_KEY);
 const stamp = Date.now();
 
 let user: TestUser;
+const eventIds = new Set<string>();
 
 function sessionEvent(
   type: string,
   sessionId: string,
   paymentStatus: "paid" | "unpaid",
   eventSuffix: string,
+  customer?: string,
 ): string {
+  const id = `evt_test_async_${stamp}_${eventSuffix}`;
+  eventIds.add(id);
   return JSON.stringify({
-    id: `evt_test_async_${stamp}_${eventSuffix}`,
+    id,
     object: "event",
     type,
     data: {
@@ -51,6 +56,7 @@ function sessionEvent(
         id: sessionId,
         object: "checkout.session",
         payment_status: paymentStatus,
+        customer,
         amount_total: 500,
         currency: "usd",
         metadata: {
@@ -118,6 +124,7 @@ describe.skipIf(!canSign)("async Stripe payments", () => {
   }, 60_000);
 
   afterAll(async () => {
+    await db.delete(paymentWebhooks).where(inArray(paymentWebhooks.providerEventId, [...eventIds]));
     await deleteTestUser(user.user.id);
   }, 60_000);
 
@@ -155,6 +162,37 @@ describe.skipIf(!canSign)("async Stripe payments", () => {
         ),
       ),
     ).toBe(true);
+    expect(await packCredits(sessionId)).toBe(500);
+  }, 60_000);
+
+  it("retries a paid checkout until its row exists and records the settled price once", async () => {
+    const sessionId = `cs_test_async_retry_${stamp}`;
+    const event = sessionEvent("checkout.session.completed", sessionId, "paid", "retry");
+    expect(await deliver(event)).toBe(false);
+    expect(await packCredits(sessionId)).toBe(0);
+    await pendingTransaction(sessionId);
+    await db.update(paymentTransactions).set({ amount: "9.00", currency: "EUR" })
+      .where(eq(paymentTransactions.providerSessionId, sessionId));
+    expect(await deliver(event)).toBe(true);
+    expect(await deliver(event)).toBe(true);
+    expect(await deliver(sessionEvent("checkout.session.async_payment_failed", sessionId, "unpaid", "stale-failure"))).toBe(true);
+    expect(await db.select({
+      amount: paymentTransactions.amount, currency: paymentTransactions.currency, status: paymentTransactions.status,
+    }).from(paymentTransactions).where(eq(paymentTransactions.providerSessionId, sessionId)))
+      .toEqual([{ amount: "5.00", currency: "USD", status: PaymentStatus.SUCCEEDED }]);
+    expect(await packCredits(sessionId)).toBe(500);
+  }, 60_000);
+
+  it("recovers a missing row from the verified buyer and settles concurrent events once", async () => {
+    const sessionId = `cs_test_async_orphan_${stamp}`;
+    const customer = `cus_test_async_${stamp}`;
+    await db.update(users).set({ stripeCustomerId: customer }).where(eq(users.id, user.user.id));
+    const events = ["orphan1", "orphan2"].map((key) =>
+      sessionEvent("checkout.session.completed", sessionId, "paid", key, customer));
+    expect(await Promise.all(events.map(deliver))).toEqual([true, true]);
+    const rows = await db.select().from(paymentTransactions).where(eq(paymentTransactions.providerSessionId, sessionId));
+    expect(rows).toHaveLength(1);
+    expect(rows[0]).toMatchObject({ userId: user.user.id, status: PaymentStatus.SUCCEEDED, amount: "5.00", currency: "USD" });
     expect(await packCredits(sessionId)).toBe(500);
   }, 60_000);
 

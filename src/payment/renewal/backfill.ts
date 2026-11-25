@@ -2,7 +2,8 @@
  * One-off replay: renewal invoices paid before renewals were recorded
  * (RENEWAL_RECORDING_START) never booked their referral commission. Replay
  * them from the webhook log through the normal renewal path
- * (PaymentRenewalRepository.recordPaidRenewal), for referred buyers only.
+ * (PaymentRenewalRepository.recordPaidRenewal). The production seed selects
+ * referred buyers. A targeted replay selects the supplied invoice IDs.
  *
  * - Keyed by the provider invoice id like the live path, so it is safe to run
  *   on every start: recorded invoices are skipped, reruns book nothing.
@@ -11,7 +12,6 @@
  *   then applies as it would have: earnings past it are confirmed right away
  *   through confirmMaturedEarnings, which grants the credits; younger ones
  *   wait for the confirm cron like any other earning.
- * Other (non-referred) renewals are left alone: nothing is owed on them.
  */
 
 import "server-only";
@@ -55,8 +55,12 @@ interface LoggedInvoice {
   periodEndSec: number | null;
 }
 
+type RenewalSelection = "referred" | readonly string[];
+
 /** Paid, non-initial invoices from the webhook log without a recorded payment */
-async function unrecordedLoggedRenewals(): Promise<LoggedInvoice[]> {
+async function unrecordedLoggedRenewals(
+  selection: RenewalSelection,
+): Promise<LoggedInvoice[]> {
   const object = sql`((${paymentWebhooks.data} #>> '{}')::jsonb -> 'data' -> 'object')`;
   const rows = await db
     .selectDistinctOn([sql`${object} ->> 'id'`], {
@@ -82,7 +86,9 @@ async function unrecordedLoggedRenewals(): Promise<LoggedInvoice[]> {
     .where(
       and(
         inArray(paymentWebhooks.eventType, PAID_INVOICE_EVENTS),
-        lt(paymentWebhooks.createdAt, RENEWAL_RECORDING_START),
+        selection === "referred"
+          ? lt(paymentWebhooks.createdAt, RENEWAL_RECORDING_START)
+          : inArray(sql`${object} ->> 'id'`, selection),
         sql`${object} ->> 'billing_reason' IS DISTINCT FROM ${INITIAL_BILLING_REASON}`,
         sql`COALESCE((${object} ->> 'amount_paid')::integer, 0) > 0`,
         sql`NOT EXISTS (SELECT 1 FROM ${paymentTransactions} WHERE ${paymentTransactions.providerInvoiceId} = ${object} ->> 'id')`,
@@ -121,28 +127,31 @@ async function invoiceOwner(invoice: LoggedInvoice): Promise<string | null> {
   return null;
 }
 
-export async function backfillReferredRenewalCommissions(
+export async function backfillPaidRenewals(
   logger: EndpointLogger,
   locale: CountryLanguage,
+  selection: RenewalSelection,
 ): Promise<RenewalBackfillResult> {
   const result: RenewalBackfillResult = { replayed: 0, confirmed: 0 };
   try {
-    const candidates = await unrecordedLoggedRenewals();
+    const candidates = await unrecordedLoggedRenewals(selection);
     for (const invoice of candidates) {
       if (!invoice.subscriptionId) {
         continue;
       }
-      const ownerId = await invoiceOwner(invoice);
-      if (!ownerId) {
-        continue;
-      }
-      const [referred] = await db
-        .select({ id: userReferrals.id })
-        .from(userReferrals)
-        .where(eq(userReferrals.referredUserId, ownerId))
-        .limit(1);
-      if (!referred) {
-        continue;
+      if (selection === "referred") {
+        const ownerId = await invoiceOwner(invoice);
+        if (!ownerId) {
+          continue;
+        }
+        const [referred] = await db
+          .select({ id: userReferrals.id })
+          .from(userReferrals)
+          .where(eq(userReferrals.referredUserId, ownerId))
+          .limit(1);
+        if (!referred) {
+          continue;
+        }
       }
 
       const paidAt = invoice.paidAtSec
@@ -186,14 +195,14 @@ export async function backfillReferredRenewalCommissions(
           );
       }
       result.replayed++;
-      logger.info("Renewal backfill: missed renewal commission booked", {
+      logger.info("Renewal backfill: paid invoice recorded", {
         invoiceId: invoice.invoiceId,
         transactionId: recorded.data.transactionId,
         revenueUsdCents: recorded.data.revenueUsdCents,
       });
     }
 
-    if (result.replayed > 0) {
+    if (selection === "referred" && result.replayed > 0) {
       const confirmed = await ReferralRepository.confirmMaturedEarnings(
         logger,
         creditsScopedTranslation.scopedT(locale).t,
