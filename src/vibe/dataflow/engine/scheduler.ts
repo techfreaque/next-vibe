@@ -17,10 +17,14 @@ import { db } from "../../database";
 import { maybeColorize, semantic } from "../../logger/colors";
 import { formatDuration, formatSense } from "../../logger/formatters";
 import type { EndpointLogger } from "../../logger/types";
+import { TASK_TIMEOUTS } from "../../tasks/constants";
 import { pipelineGraphs } from "../db";
 import { RunStatus } from "../enum";
-import { getLatestRun } from "../store/runs";
+import { getLatestRun, reapStaleRuns } from "../store/runs";
 import { runGraph } from "./runner";
+
+// Both Sense cron tasks use the medium timeout.
+const STALE_RUN_AGE_MS = 2 * TASK_TIMEOUTS.MEDIUM;
 
 interface SchedulerResult {
   graphsChecked: number;
@@ -36,6 +40,11 @@ interface SchedulerResult {
 export async function runDueGraphs(
   logger: EndpointLogger,
 ): Promise<SchedulerResult> {
+  const reaped = await reapStaleRuns(STALE_RUN_AGE_MS);
+  if (reaped > 0) {
+    logger.warn(formatSense(`Marked ${reaped} stale graph runs as failed`));
+  }
+
   // Find all active, non-archived graphs with cron triggers
   const graphs = await db
     .select({

@@ -7,7 +7,7 @@
 
 import "server-only";
 
-import { desc, eq } from "drizzle-orm";
+import { and, desc, eq, isNull, lt, sql } from "drizzle-orm";
 
 import { db } from "../../database";
 import { pipelineRuns } from "../db";
@@ -54,13 +54,41 @@ export async function completeRun(
       nodeCount,
       finishedAt: new Date(),
     })
-    .where(eq(pipelineRuns.id, runId));
+    .where(
+      and(
+        eq(pipelineRuns.id, runId),
+        eq(pipelineRuns.status, RunStatus.RUNNING),
+        isNull(pipelineRuns.finishedAt),
+      ),
+    );
+}
+
+/** Fail abandoned runs without overwriting runs that have already finished. */
+export async function reapStaleRuns(maxAgeMs: number): Promise<number> {
+  const finishedAt = new Date();
+  const cutoff = new Date(finishedAt.getTime() - maxAgeMs);
+  const rows = await db
+    .update(pipelineRuns)
+    .set({
+      status: RunStatus.FAILED,
+      errorCount: sql`${pipelineRuns.errorCount} + 1`,
+      finishedAt,
+    })
+    .where(
+      and(
+        eq(pipelineRuns.status, RunStatus.RUNNING),
+        isNull(pipelineRuns.finishedAt),
+        lt(pipelineRuns.startedAt, cutoff),
+      ),
+    )
+    .returning({ id: pipelineRuns.id });
+  return rows.length;
 }
 
 // ─── Read ────────────────────────────────────────────────────────────────────
 
 /**
- * Get the most recent completed run for a graph.
+ * Get the most recent run for a graph, including an in-progress run.
  * Used by the scheduler to determine lastRunAt.
  */
 export async function getLatestRun(graphId: string): Promise<{
