@@ -1,5 +1,6 @@
 "use client";
 
+import chatSettingsDefinition from "next-vibe/agent/chat/settings/definition";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { Platform } from "next-vibe/platforms/platforms";
@@ -92,6 +93,16 @@ export function SettingsPageClient({
             create: { formOptions: { persistForm: false } },
           }}
         />
+        {/* Anchor target for in-chat links (e.g. raising the per-turn step limit) */}
+        <Div id="chat" className="scroll-mt-20 pt-6">
+          <EndpointsPage
+            logger={logger}
+            endpoint={chatSettingsDefinition}
+            user={user}
+            locale={locale}
+            platform={platform}
+          />
+        </Div>
       </Div>
     </Div>
   );

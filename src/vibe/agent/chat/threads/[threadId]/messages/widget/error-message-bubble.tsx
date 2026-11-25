@@ -1,6 +1,5 @@
 "use client";
 
-import { endpointToUrlSegment } from "next-vibe/core/core-utils/path";
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
 import type { DefaultFolderId } from "next-vibe/core/execution-context";
 import { useTranslation } from "next-vibe/core/i18n/core/client";
@@ -42,7 +41,6 @@ import { scopedTranslation as streamScopedTranslation } from "../../../../../ai-
 import { OutOfCreditsCard } from "../../../../../ai-stream/stream/widget/out-of-credits-card";
 import type { ChatMessage } from "../../../../db";
 import { useModelSelectorState } from "../../../../model-selector-state";
-import chatSettingsDefinition from "../../../../settings/definition";
 import { scopedTranslation } from "../i18n";
 import { CopyButton } from "./copy-button";
 import { useMessageGroupName } from "./embedded-context";
@@ -192,7 +190,7 @@ export function ErrorMessageBubble({
           </Span>
           {!user.isPublic && (
             <Link
-              href={`/${locale}/tools/${endpointToUrlSegment(chatSettingsDefinition.GET)}`}
+              href={`/${locale}/user/settings#chat`}
               className="text-sm text-primary underline underline-offset-2"
             >
               {streamT("info.raiseTurnStepLimit")}
