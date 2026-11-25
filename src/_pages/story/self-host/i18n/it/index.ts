@@ -2,103 +2,212 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title: "Ospita {{appName}} sul tuo computer",
+    title: "{{appName}} in self-hosting: il tuo server, ogni modello",
     description:
-      "Esegui tutto {{appName}} sul tuo computer. Quattro comandi, poi la configurazione guidata nel browser. Collega il tuo account {{appName}} o usa le tue chiavi API.",
+      "Fai girare {{appName}} sulla tua macchina. git clone, bun i, vibe dev. Accedi con il tuo account {{appName}} e tutti i {{modelCount}} modelli funzionano. Nessuna chiave dei provider.",
     category: "Self-hosting",
-    imageAlt: "Guida rapida al self-hosting di {{appName}}",
+    imageAlt: "{{appName}} in self-hosting sulla tua macchina",
     keywords:
-      "self-hosting, next-vibe, {{appName}}, open source, IA privata, IA locale, OpenRouter",
+      "self-host, self-hosting, chat IA self-hosted, next-vibe, {{appName}}, open source, IA privata, IA locale, IA senza censura",
   },
   hero: {
     badge: "Gratis e open source",
-    title: "Eseguilo sul tuo computer.",
-    titleHighlight: "Tieni tutto sotto controllo.",
+    title: "Il tuo server.",
+    titleHighlight: "Ogni modello.",
     subtitle:
-      "Tutto {{appName}} sul tuo computer. Collega il tuo account {{appName}} per accedere ai modelli o usa le tue chiavi API. Esegui quattro comandi e completa la configurazione nel browser.",
-    ctaQuickstart: "Inizia con quattro comandi",
+      "{{appName}} sulla tua macchina. Accedi con il tuo account {{appName}} e tutti i {{modelCount}} modelli funzionano. Zero chiavi dei provider. Le tue chat non escono mai dal tuo database.",
+    ctaStart: "Avvialo ora",
     ctaGithub: "Vedi su GitHub",
   },
-  quickstart: {
-    eyebrow: "Guida rapida",
-    title: "Quattro comandi. Poi apri il browser.",
-    intro:
-      "Al primo accesso si apre una configurazione guidata. Ti accompagna fino alla fine senza farti modificare file.",
+  diagram: {
+    link: "Un solo accesso",
+    instance: {
+      label: "Gira da te",
+      title: "La tua istanza",
+      points: {
+        chats: "Chat, memorie e documenti nel tuo Postgres",
+        files: "File caricati e media generati sul tuo disco",
+        tools: "Thea, i cron job e ogni strumento IA",
+        admin: "Il tuo login admin. Le tue regole.",
+      },
+    },
+    account: {
+      label: "Gira su {{appName}}",
+      title: "Il tuo account",
+      points: {
+        models: "{{modelCount}} modelli, dai mainstream ai senza censura",
+        credits: "Consumo scalato dai tuoi crediti {{appName}}",
+        keys: "Zero chiavi dei provider da gestire",
+        unlock: "Si sblocca con qualsiasi piano o pacchetto di crediti",
+      },
+    },
   },
-  paths: {
-    eyebrow: "Scegli la tua IA",
-    title: "Il tuo computer. I modelli che scegli tu.",
+  start: {
+    eyebrow: "Installazione",
+    title: "Clona. Installa. Avvia.",
     intro:
-      "Trovi entrambe le opzioni nel passaggio dedicato al fornitore IA della configurazione guidata. Puoi cambiare quando vuoi.",
+      "Tre comandi nel terminale. Tutto il resto succede nel browser. Nessun file di configurazione da toccare.",
+    terminal: {
+      eyebrow: "Nel terminale",
+      title: "Avvia la tua istanza",
+      copyAll: "Copia tutto",
+      copy: "Copia",
+      copied: "Copiato",
+      rows: {
+        clone: "Scarica il codice",
+        cd: "Entra nella cartella",
+        install: "Installa. Mette anche vibe nel tuo PATH.",
+        dev: "Avvia. Database e dati iniziali si configurano da soli.",
+      },
+      facts: {
+        docker: "Niente Docker",
+        postgres: "Niente installazione di Postgres",
+        config: "Niente .env da sistemare",
+      },
+      troubleshoot: {
+        notFound: {
+          problem: "vibe: command not found?",
+          fix: "Apri un nuovo terminale oppure lancia",
+        },
+        port: {
+          problem: "Porta 3000 occupata?",
+          fix: "Usa un'altra porta:",
+        },
+      },
+    },
+    prereqs: {
+      summary: "Macchina nuova? Prima installa git e Bun",
+      body: "Una volta per macchina. Ti servono git e Bun 1.3 o successivo. Scegli il tuo sistema.",
+      newTerminal:
+        "Poi apri un nuovo terminale, così git e bun sono nel tuo PATH.",
+    },
+    browser: {
+      eyebrow: "Nel browser",
+      title: "Il resto lo fa la procedura guidata",
+      recommended: "Consigliato",
+      steps: {
+        open: {
+          title: "Apri {{url}}",
+          body: "Un'istanza nuova apre da sola la configurazione guidata. Clicca su «Avvia la configurazione».",
+        },
+        admin: {
+          title: "Crea il tuo login admin",
+          body: "La tua email, la tua password. Sostituisce l'accesso predefinito. Le chiavi di sicurezza sono già generate.",
+        },
+        ai: {
+          title: "Collega il tuo account {{appName}}",
+          body: "Inserisci email e password di {{appName}}. Con qualsiasi piano o pacchetto di crediti si sbloccano tutti i modelli. Nessuna chiave.",
+        },
+        extras: {
+          title: "Extra, quando servono",
+          body: "Email, pagamenti Stripe, storage S3. Tutto opzionale. Salta e torna dopo.",
+        },
+      },
+      done: "Chiudi la configurazione. Inizia a chattare.",
+    },
+  },
+  ai: {
+    eyebrow: "Collega l'IA",
+    title: "Un accesso. Ogni modello.",
+    intro: "La tua istanza fa girare l'app. {{appName}} fa girare i modelli.",
     account: {
       badge: "Consigliato",
-      title: "Collega il tuo account {{appName}}",
-      body: "Accedi una volta nella configurazione guidata. Le chat girano sulla tua istanza. I modelli girano su {{appName}} e consumano i tuoi crediti. Non devi gestire chiavi API.",
+      title: "Il tuo account {{appName}}",
+      body: "Accedi una volta nella procedura guidata. Ogni chat gira sulla tua istanza, ogni chiamata ai modelli gira su {{appName}} e scala i tuoi crediti.",
       points: {
-        models:
-          "Tutti i {{modelCount}} modelli, da quelli tradizionali a quelli senza censura, con un solo accesso.",
-        local: "Le chat restano nel tuo database locale.",
-        sync: "I ricordi, i documenti, le skill e i preferiti si sincronizzano in automatico. Le conversazioni richiedono l’attivazione. Puoi configurare ogni categoria a parte.",
-        paid: "Serve un piano a pagamento o un pacchetto di crediti. Fino a tre istanze per account.",
+        models: {
+          title: "{{modelCount}} modelli",
+          body: "Mainstream, open e senza censura. Lo stesso catalogo di {{appName}}.",
+        },
+        local: {
+          title: "Le chat restano da te",
+          body: "I thread vivono nel tuo database. Si sincronizzano solo se lo attivi tu.",
+        },
+        sync: {
+          title: "Il tuo setup ti segue",
+          body: "Memorie, documenti, skill e preferiti si sincronizzano di default. Un interruttore ciascuno.",
+        },
+        paid: {
+          title: "Basta un acquisto qualsiasi",
+          body: "Un abbonamento o un pacchetto di crediti. Fino a tre istanze per account.",
+        },
       },
-      cta: "Crea un account {{appName}}",
+      cta: "Crea il tuo account {{appName}}",
+      pricing: "Vedi i piani",
     },
-    standalone: {
-      badge: "Senza account",
-      title: "Usa l’istanza con le tue chiavi",
-      body: "Puoi iniziare senza un account da noi. Incolla una chiave del fornitore nello stesso passaggio e paga direttamente il fornitore.",
-      points: {
-        openrouter: "OpenRouter: centinaia di modelli, una chiave.",
-        claude:
-          "Hai già effettuato l’accesso a Claude Code su questo computer? Lo rileviamo automaticamente. Non serve una chiave.",
-        more: "Trovi altri fornitori in Tutte le impostazioni.",
-        billing:
-          "Paghi direttamente il fornitore, senza addebiti da {{appName}}.",
+    claude: {
+      title: "Claude Code su questa macchina",
+      body: "Hai fatto login con la CLI claude? La procedura lo rileva. I modelli Claude girano sul tuo abbonamento Claude. Niente da inserire.",
+    },
+    keys: {
+      title: "Le tue chiavi dei provider",
+      body: "Senza account {{appName}}. Incolla una chiave nello stesso passaggio e paghi direttamente il provider.",
+      providers: {
+        openrouter: "OpenRouter",
+        venice: "Venice AI",
+        nanogpt: "NanoGPT",
       },
       cta: "Ottieni una chiave OpenRouter",
     },
   },
   own: {
     eyebrow: "Il tuo server, le tue regole",
-    title: "Controlli la piattaforma. Scegli il filtro.",
+    title: "Il tuo stack. Il tuo filtro.",
     subtitle:
-      "Il tuo Postgres, i tuoi file, i tuoi log. Scegli i modelli e quanto vuoi filtrare le risposte.",
+      "Il tuo Postgres, i tuoi file, i tuoi log. Scegli tu i modelli e quanto filtro c'è tra te e loro.",
     cards: {
-      data: {
-        title: "I tuoi dati restano dove li tieni",
-        body: "Conversazioni, ricordi e file restano nel tuo database e nello spazio di archiviazione che scegli.",
+      bill: {
+        title: "Il tuo conto, la tua scelta",
+        body: "I modelli si pagano con i tuoi crediti {{appName}} o direttamente al tuo provider. Decidi tu.",
       },
       filter: {
         title: "Il tuo livello di filtro",
-        body: "Scegli tra modelli tradizionali, aperti o senza censura per ogni skill e conversazione. Hai tu l’ultima parola.",
+        body: "Modelli mainstream, open o senza censura. Decidi per skill e per thread. Nessun ufficio policy di mezzo.",
       },
-      keys: {
-        title: "Scegli tu come pagare",
-        body: "Paga l’uso dei modelli con i tuoi crediti {{appName}} o direttamente al tuo fornitore.",
+      code: {
+        title: "Codice aperto, nessun vincolo",
+        body: "Lo stesso codice di {{appName}}, pubblico su GitHub. Leggilo, modificalo, fanne un fork.",
       },
     },
   },
   includes: {
-    title: "Tutte le funzioni della versione cloud.",
-    intro: "Lo stesso codice di {{appName}}, con tutte le funzionalità.",
+    title: "Tutto quello che ha il cloud.",
+    intro: "Lo stesso codice di {{appName}}. Niente tenuto da parte.",
     items: {
       models:
         "{{modelCount}} modelli di chat, più immagini, video, musica e voce",
       memory: "Memoria persistente e chat in incognito",
       search: "Ricerca web e lettura delle pagine",
-      thea: "Thea, la tua amministratrice IA: esegue attività e crea strumenti su richiesta",
-      admin: "Pannello di amministrazione e cron job",
-      tools: "SSH, automazione del browser e client di posta come strumenti IA",
+      thea: "Thea, la tua admin IA: esegue attività, crea strumenti su richiesta",
+      admin: "Dashboard admin e cron job",
+      tools: "SSH, automazione del browser e client email come strumenti IA",
+    },
+  },
+  server: {
+    eyebrow: "In produzione",
+    title: "Portalo su un server.",
+    intro:
+      "Stesso repo, stessi tre comandi. Poi una build di produzione al posto del server di sviluppo.",
+    terminalTitle: "Sul tuo server",
+    rows: {
+      start: "Primo avvio: build di produzione",
+      update: "Dopo aver scaricato modifiche: aggiornamento senza downtime",
+    },
+    points: {
+      proxy: "Punta Caddy o nginx sulla porta 3000 per l'HTTPS.",
+      env: "Alla prima visita la stessa procedura guidata. Preferisci le variabili d'ambiente? Impostale nel deploy e riavvia.",
+      connect:
+        "Colleghi il tuo account {{appName}} dal server esattamente come dal portatile.",
     },
   },
   developers: {
-    title: "Vuoi sviluppare sul framework?",
-    body: "Per ogni funzionalità basta un file di definizione. Da lì ottieni una pagina web, un comando CLI, uno strumento MCP e uno strumento IA.",
+    title: "Vuoi costruirci sopra?",
+    body: "Ogni funzione è un file di definizione che diventa pagina web, comando CLI, strumento MCP e strumento IA.",
     cta: "Scopri come funziona next-vibe",
   },
   help: {
-    title: "Hai un problema o lo installi per un team?",
+    title: "Bloccato, o lo installi per un team?",
     description:
-      "Ti aiutiamo con la configurazione, le installazioni per team e le integrazioni personalizzate. Una persona legge ogni messaggio.",
+      "Aiuto con il setup, installazioni per team, integrazioni su misura. Ogni messaggio lo legge una persona.",
   },
 };

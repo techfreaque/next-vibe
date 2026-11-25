@@ -2,79 +2,171 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title: "{{appName}} selbst hosten: Deine Instanz, Deine Regeln",
+    title: "{{appName}} selbst hosten: Dein Server, jedes Modell",
     description:
-      "Der komplette {{appName}}-Stack auf deinem eigenen Rechner. Vier Befehle, danach ein Einrichtungsassistent im Browser. Mit deinem {{appName}}-Konto oder eigenen Schlüsseln.",
+      "{{appName}} auf deinem eigenen Rechner. git clone, bun i, vibe dev. Mit deinem {{appName}}-Konto anmelden und alle {{modelCount}} Modelle laufen. Ohne Anbieterschlüssel.",
     category: "Self-Host",
-    imageAlt: "{{appName}} selbst hosten: Schnellstart",
+    imageAlt: "{{appName}} auf dem eigenen Rechner selbst hosten",
     keywords:
-      "self-host, selbst hosten, next-vibe, {{appName}}, Open Source, private KI, lokale KI, OpenRouter",
+      "self-host, selbst hosten, selbst gehosteter KI-Chat, next-vibe, {{appName}}, Open Source, private KI, lokale KI, unzensierte KI",
   },
   hero: {
     badge: "Kostenlos und Open Source",
-    title: "Selbst betreiben.",
-    titleHighlight: "Alles besitzen.",
+    title: "Dein Server.",
+    titleHighlight: "Jedes Modell.",
     subtitle:
-      "Der komplette {{appName}}-Stack auf deinem Rechner. Verbinde dein {{appName}}-Konto für alle Modelle oder nutze eigene Schlüssel. Vier Befehle, den Rest erledigt der Browser.",
-    ctaQuickstart: "In vier Befehlen starten",
+      "{{appName}} auf deinem eigenen Rechner. Mit deinem {{appName}}-Konto anmelden, und alle {{modelCount}} Modelle laufen. Keine Anbieterschlüssel. Deine Chats verlassen nie deine Datenbank.",
+    ctaStart: "Jetzt starten",
     ctaGithub: "Auf GitHub ansehen",
   },
-  quickstart: {
-    eyebrow: "Schnellstart",
-    title: "Vier Befehle. Dann übernimmt der Browser.",
-    intro:
-      "Keine Konfigurationsdateien. Beim ersten Login startet ein Einrichtungsassistent und führt dich durch den Rest.",
+  diagram: {
+    link: "Eine Anmeldung",
+    instance: {
+      label: "Läuft auf deinem Rechner",
+      title: "Deine Instanz",
+      points: {
+        chats: "Chats, Erinnerungen und Dokumente in deinem eigenen Postgres",
+        files: "Uploads und generierte Medien auf deiner Platte",
+        tools: "Thea, Cronjobs und jedes KI-Tool",
+        admin: "Dein Admin-Login. Deine Regeln.",
+      },
+    },
+    account: {
+      label: "Läuft auf {{appName}}",
+      title: "Dein Konto",
+      points: {
+        models: "{{modelCount}} Modelle, von Mainstream bis unzensiert",
+        credits: "Abrechnung über dein {{appName}}-Guthaben",
+        keys: "Kein einziger Anbieterschlüssel",
+        unlock: "Freigeschaltet mit jedem Abo oder Guthabenpaket",
+      },
+    },
   },
-  paths: {
-    eyebrow: "KI wählen",
-    title: "Dein Rechner. Deine Modelle.",
+  start: {
+    eyebrow: "Einrichtung",
+    title: "Klonen. Installieren. Starten.",
     intro:
-      "Beide Wege stecken im Schritt KI-Anbieter des Einrichtungsassistenten. Jederzeit umstellbar.",
+      "Drei Befehle im Terminal. Alles andere passiert im Browser. Keine Konfigurationsdateien.",
+    terminal: {
+      eyebrow: "Im Terminal",
+      title: "Instanz starten",
+      copyAll: "Alles kopieren",
+      copy: "Kopieren",
+      copied: "Kopiert",
+      rows: {
+        clone: "Code holen",
+        cd: "Ins Verzeichnis wechseln",
+        install: "Installieren. Legt vibe auch in deinen PATH.",
+        dev: "Starten. Datenbank und Startdaten richten sich selbst ein.",
+      },
+      facts: {
+        docker: "Kein Docker",
+        postgres: "Keine Postgres-Installation",
+        config: "Kein .env-Gefrickel",
+      },
+      troubleshoot: {
+        notFound: {
+          problem: "vibe: command not found?",
+          fix: "Neues Terminal öffnen oder ausführen:",
+        },
+        port: {
+          problem: "Port 3000 belegt?",
+          fix: "Anderen Port nehmen:",
+        },
+      },
+    },
+    prereqs: {
+      summary: "Neuer Rechner? Erst git und Bun installieren",
+      body: "Einmal pro Rechner. Du brauchst git und Bun ab Version 1.3. Wähle dein System.",
+      newTerminal:
+        "Danach ein neues Terminal öffnen, damit git und bun im PATH liegen.",
+    },
+    browser: {
+      eyebrow: "Im Browser",
+      title: "Den Rest erledigt der Einrichtungsassistent",
+      recommended: "Empfohlen",
+      steps: {
+        open: {
+          title: "{{url}} öffnen",
+          body: "Eine frische Instanz öffnet den Einrichtungsassistenten von selbst. Auf „Einrichtung starten“ klicken.",
+        },
+        admin: {
+          title: "Admin-Login anlegen",
+          body: "Deine E-Mail, dein Passwort. Ersetzt den eingebauten Standard. Sicherheitsschlüssel sind schon erzeugt.",
+        },
+        ai: {
+          title: "{{appName}}-Konto verbinden",
+          body: "E-Mail und Passwort deines {{appName}}-Kontos eingeben. Mit jedem Abo oder Guthabenpaket sind alle Modelle freigeschaltet. Keine Schlüssel.",
+        },
+        extras: {
+          title: "Extras, wenn du sie brauchst",
+          body: "E-Mail, Stripe-Zahlungen, S3-Speicher. Alles optional. Überspringen und später nachholen.",
+        },
+      },
+      done: "Einrichtung abschließen. Chat starten.",
+    },
+  },
+  ai: {
+    eyebrow: "KI verbinden",
+    title: "Eine Anmeldung. Jedes Modell.",
+    intro: "Deine Instanz betreibt die App. {{appName}} betreibt die Modelle.",
     account: {
       badge: "Empfohlen",
-      title: "Dein {{appName}}-Konto verbinden",
-      body: "Einmal im Assistenten anmelden. Deine Instanz führt jeden Chat, die Modelle laufen auf {{appName}} und rechnen über dein Guthaben ab. Kein Schlüssel-Jonglieren.",
+      title: "Dein {{appName}}-Konto",
+      body: "Einmal im Einrichtungsassistenten anmelden. Jeder Chat läuft auf deiner Instanz, jeder Modellaufruf auf {{appName}} und wird über dein Guthaben abgerechnet.",
       points: {
-        models:
-          "Alle {{modelCount}} Modelle, von Mainstream bis unzensiert, mit einem Login.",
-        local: "Chats bleiben in deiner lokalen Datenbank.",
-        sync: "Erinnerungen, Dokumente, Skills und Favoriten synchronisieren standardmäßig, Threads nicht. Ein Schalter pro Bereich.",
-        paid: "Setzt ein bezahltes Abo oder Guthabenpaket voraus. Bis zu drei Instanzen pro Konto.",
+        models: {
+          title: "{{modelCount}} Modelle",
+          body: "Mainstream, offen und unzensiert. Dieselbe Auswahl wie auf {{appName}}.",
+        },
+        local: {
+          title: "Chats bleiben lokal",
+          body: "Threads liegen in deiner Datenbank. Synchronisiert wird nur, wenn du es einschaltest.",
+        },
+        sync: {
+          title: "Dein Setup zieht mit",
+          body: "Erinnerungen, Dokumente, Skills und Favoriten synchronisieren standardmäßig. Je ein Schalter.",
+        },
+        paid: {
+          title: "Jeder Kauf schaltet frei",
+          body: "Ein Abo oder ein beliebiges Guthabenpaket. Bis zu drei Instanzen pro Konto.",
+        },
       },
-      cta: "{{appName}}-Konto anlegen",
+      cta: "{{appName}}-Konto erstellen",
+      pricing: "Tarife ansehen",
     },
-    standalone: {
-      badge: "Ohne Konto",
-      title: "Eigenständig, mit eigenen Schlüsseln",
-      body: "Kein Konto bei uns. Im selben Schritt einen Anbieter-Schlüssel einfügen und direkt beim Anbieter zahlen.",
-      points: {
-        openrouter: "OpenRouter: Hunderte Modelle, ein Schlüssel.",
-        claude:
-          "Claude Code auf diesem Rechner angemeldet? Wird automatisch erkannt. Kein Schlüssel nötig.",
-        more: "Weitere Anbieter jederzeit unter Alle Einstellungen anzeigen.",
-        billing:
-          "Du zahlst direkt beim Anbieter. Keine Rechnung von {{appName}}.",
+    claude: {
+      title: "Claude Code auf diesem Rechner",
+      body: "Mit der claude-CLI angemeldet? Der Assistent erkennt das. Claude-Modelle laufen über dein Claude-Abo. Nichts einzutragen.",
+    },
+    keys: {
+      title: "Eigene Anbieterschlüssel",
+      body: "Kein {{appName}}-Konto. Schlüssel im selben Schritt einfügen und direkt beim Anbieter zahlen.",
+      providers: {
+        openrouter: "OpenRouter",
+        venice: "Venice AI",
+        nanogpt: "NanoGPT",
       },
       cta: "OpenRouter-Schlüssel holen",
     },
   },
   own: {
     eyebrow: "Dein Server, deine Regeln",
-    title: "Den Stack besitzen. Den Filter bestimmen.",
+    title: "Dein Stack. Dein Filter.",
     subtitle:
       "Dein Postgres, deine Dateien, deine Logs. Du wählst die Modelle und wie viel Filter zwischen dir und ihnen sitzt.",
     cards: {
-      data: {
-        title: "Deine Daten bleiben, wo sie sind",
-        body: "Threads, Erinnerungen und Dateien liegen in deiner eigenen Datenbank und deinem Speicherpfad.",
-      },
-      filter: {
-        title: "Deine Filterstufe",
-        body: "Mainstream, offen oder unzensiert. Du entscheidest pro Skill und pro Thread. Keine Richtlinien-Abteilung dazwischen.",
-      },
-      keys: {
+      bill: {
         title: "Deine Rechnung, deine Wahl",
         body: "Modellkosten laufen über dein {{appName}}-Guthaben oder direkt an deinen eigenen Anbieter. Du entscheidest.",
+      },
+      filter: {
+        title: "Dein Filterniveau",
+        body: "Mainstream, offen oder unzensiert. Du entscheidest pro Skill und pro Thread. Keine Richtlinienabteilung dazwischen.",
+      },
+      code: {
+        title: "Offener Code, kein Lock-in",
+        body: "Dieselbe Codebasis wie {{appName}}, öffentlich auf GitHub. Lesen, ändern, forken.",
       },
     },
   },
@@ -86,18 +178,35 @@ export const translations: typeof enTranslations = {
       memory: "Dauerhaftes Gedächtnis und Inkognito-Chats",
       search: "Websuche und Seitenabruf",
       thea: "Thea, deine KI-Admin: erledigt Aufgaben, baut Tools auf Zuruf",
-      admin: "Admin-Dashboard und Cron-Jobs",
-      tools: "SSH, Browser-Automatisierung, E-Mail-Client als KI-Tools",
+      admin: "Admin-Dashboard und Cronjobs",
+      tools: "SSH, Browserautomatisierung und E-Mail-Client als KI-Tools",
+    },
+  },
+  server: {
+    eyebrow: "Live gehen",
+    title: "Ab auf den Server.",
+    intro:
+      "Dasselbe Repo, dieselben drei Befehle. Dann ein Produktions-Build statt Dev-Server.",
+    terminalTitle: "Auf deinem Server",
+    rows: {
+      start: "Erster Start: Produktions-Build",
+      update: "Nach git pull: Update ohne Ausfallzeit",
+    },
+    points: {
+      proxy: "Caddy oder nginx für HTTPS auf Port 3000 zeigen lassen.",
+      env: "Beim ersten Aufruf derselbe Einrichtungsassistent. Lieber Umgebungsvariablen? Im Deployment setzen und neu starten.",
+      connect:
+        "Dein {{appName}}-Konto verbindest du auf dem Server genau wie auf dem Laptop.",
     },
   },
   developers: {
-    title: "Du willst darauf aufbauen?",
-    body: "Jedes Feature ist eine Definitionsdatei. Daraus werden Webseite, CLI-Befehl, MCP-Tool und KI-Tool.",
+    title: "Willst du darauf aufbauen?",
+    body: "Jede Funktion ist eine Definitionsdatei, die zur Webseite, zum CLI-Befehl, zum MCP-Tool und zum KI-Tool wird.",
     cta: "So funktioniert next-vibe",
   },
   help: {
-    title: "Hängst du fest, oder soll es fürs ganze Team laufen?",
+    title: "Festgefahren? Oder fürs ganze Team?",
     description:
-      "Hilfe beim Einrichten, Team-Installationen, individuelle Integrationen. Jede Nachricht liest ein Mensch.",
+      "Hilfe beim Setup, Team-Installationen, eigene Integrationen. Jede Nachricht liest ein Mensch.",
   },
 };
