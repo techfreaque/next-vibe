@@ -11,7 +11,7 @@ import { defaultLocale } from "../../core/i18n/core/config";
 import { createEndpointLogger } from "../../logger/server";
 import type { LoggerMetadata } from "../../logger/types";
 import { readProxyTimingHeader } from "../core/proxy-timing";
-import { handleHttpProxy } from "./http-proxy";
+import { handleHttpProxy, summarizeInFlightRequests } from "./http-proxy";
 
 const logger = createEndpointLogger(false, defaultLocale);
 
@@ -375,5 +375,143 @@ it("releases a read waiting for headers when HA database readiness fails", async
     expect(await response.text()).toBe("Database unavailable");
   } finally {
     await slow.stop(true);
+  }
+});
+
+it("returns 504 for page headers and gives assets, traffic streams, and writes more time", async () => {
+  const pageReceived = Promise.withResolvers<void>();
+  const slow = Bun.serve({
+    hostname: "127.0.0.1",
+    port: 0,
+    fetch: async (req) => {
+      if (new URL(req.url).pathname.endsWith("/fixture-token")) {
+        pageReceived.resolve();
+      }
+      await Bun.sleep(225);
+      return new Response("upstream");
+    },
+  });
+  const error = mock((_message: string, ..._metadata: LoggerMetadata[]) => {});
+  const ctx = {
+    nextPort: slow.port ?? 0,
+    pageRenderTimeoutMs: 100,
+    databaseReadiness: (): Promise<AbortSignal> =>
+      Promise.resolve(new AbortController().signal),
+    logger: { ...logger, error },
+    isShuttingDown: () => false,
+  };
+  try {
+    const page = handleHttpProxy(
+      new Request("http://localhost/en-US/user/reset-password/fixture-token?secret=fixture"),
+      ctx,
+    );
+    const head = handleHttpProxy(
+      new Request("http://localhost/de-DE", { method: "HEAD" }),
+      ctx,
+    );
+    const bypasses = [
+      new Request("http://localhost/api/en-US/slow"),
+      new Request("http://localhost/_next/static/slow"),
+      new Request("http://localhost/media/slow"),
+      new Request("http://localhost/en-US/slow.webm"),
+      new Request("http://localhost/uploads/slow"),
+      new Request("http://localhost/en-US/streaming/slow"),
+      new Request("http://localhost/ws"),
+      new Request("http://localhost/en-US/events", {
+        headers: { accept: "text/event-stream" },
+      }),
+      new Request("http://localhost/en-US/slow", {
+        method: "POST",
+        body: "upload",
+      }),
+    ].map((request) => handleHttpProxy(request, ctx));
+
+    await Promise.race([pageReceived.promise, page]);
+    expect(summarizeInFlightRequests()).toContain("GET /en-US/user/reset-password/:token");
+    expect(summarizeInFlightRequests()).not.toContain("fixture-token");
+    const response = await page;
+    expect(response.status).toBe(504);
+    expect(readProxyTimingHeader(response.headers.get("server-timing"))).toBe(
+      "upstream-timeout",
+    );
+    expect(await response.text()).toBe("Gateway Timeout");
+    const headResponse = await head;
+    expect(headResponse.status).toBe(504);
+    expect(headResponse.body).toBeNull();
+    const preserved = await Promise.all(bypasses);
+    expect(preserved.map((res) => res.status)).toEqual(bypasses.map(() => 200));
+    expect(await Promise.all(preserved.map((res) => res.text()))).toEqual(
+      bypasses.map(() => "upstream"),
+    );
+    expect(error).toHaveBeenCalledTimes(2);
+    expect(summarizeInFlightRequests()).not.toContain("/en-US/user/reset-password/");
+  } finally {
+    await slow.stop(true);
+  }
+});
+
+it("counts reconnect backoff against the page deadline", async () => {
+  const reserved = Bun.serve({ port: 0, fetch: () => new Response("fixture") });
+  const port = reserved.port ?? 0;
+  await reserved.stop(true);
+  const response = await handleHttpProxy(new Request("http://localhost/en-US"), {
+    nextPort: port,
+    pageRenderTimeoutMs: 100,
+    logger,
+    isShuttingDown: () => false,
+  });
+  expect(response.status).toBe(504);
+});
+
+it("lets an open page response continue streaming past the header deadline", async () => {
+  const encoder = new TextEncoder();
+  const streaming = Bun.serve({
+    hostname: "127.0.0.1",
+    port: 0,
+    fetch: () =>
+      new Response(new ReadableStream({
+        async start(controller) {
+          controller.enqueue(encoder.encode("first "));
+          await Bun.sleep(225);
+          controller.enqueue(encoder.encode("last"));
+          controller.close();
+        },
+      })),
+  });
+  try {
+    const response = await handleHttpProxy(new Request("http://localhost/en-US/story"), {
+      nextPort: streaming.port ?? 0,
+      pageRenderTimeoutMs: 100,
+      logger,
+      isShuttingDown: () => false,
+    });
+    expect(response.status).toBe(200);
+    expect(summarizeInFlightRequests()).toContain("GET /en-US/story");
+    expect(await response.text()).toBe("first last");
+  } finally {
+    await streaming.stop(true);
+  }
+});
+
+it("reports renderer health on both readiness paths", async () => {
+  let ready = false;
+  const db = new AbortController();
+  const ctx = {
+    nextPort,
+    logger,
+    databaseReadiness: () => Promise.resolve(db.signal),
+    isRendererReady: () => ready,
+    isShuttingDown: () => false,
+  };
+  for (const path of ["/robots.txt", "/_ha/ready"]) {
+    const req = new Request(`http://localhost${path}`);
+    ready = false;
+    const unavailable = await handleHttpProxy(req, ctx);
+    expect(unavailable.status).toBe(503);
+    expect(unavailable.headers.get("x-ha-readiness")).toBe("v1-renderer-unavailable");
+    ready = true;
+    const restored = await handleHttpProxy(req, ctx);
+    expect(restored.status).toBe(200);
+    await restored.text();
   }
 });

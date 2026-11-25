@@ -397,6 +397,7 @@ interface WebSocketServerOptions {
   port: number;
   /** Actual app port when Vite falls back from the preferred internal port. */
   appPort?: number;
+  isRendererReady?: () => boolean;
   /** Permit overlapping listeners during a production handoff. */
   reusePort?: boolean;
   logger: EndpointLogger;
@@ -643,7 +644,7 @@ export function startWebSocketServer(
               requestId,
               channel,
               socketAuthSource,
-              denialReason: access.reason,
+              denial: access,
             });
             return new Response("Forbidden", { status: 403 });
           }
@@ -690,6 +691,7 @@ export function startWebSocketServer(
       return handleHttpProxy(req, {
         nextPort,
         logger,
+        isRendererReady: options.isRendererReady,
         isShuttingDown: () => shuttingDown,
       });
     },
@@ -827,6 +829,7 @@ export function startWebSocketServer(
                   connectedForMs: Date.now() - ws.data.connectedAt,
                   hasEndpointDescriptor: msg.descriptor !== undefined,
                   denialReason: access.reason,
+                  denial: access,
                   isPublic: ws.data.user.isPublic,
                   socketAuthSource: ws.data.socketAuthSource,
                   connectorInstanceId: ws.data.connectorInstanceId,

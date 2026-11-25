@@ -66,7 +66,10 @@ import {
 import { resolveLogTarget } from "../../../logger/log-target";
 import type { EndpointLogger } from "../../../logger/types";
 import { takeWsActivitySummary } from "../../../realtime/server/activity";
-import { summarizeRecentRequests } from "../../../realtime/server/http-proxy";
+import {
+  summarizeInFlightRequests,
+  summarizeRecentRequests,
+} from "../../../realtime/server/http-proxy";
 import { TASK_WATCHDOG_SWEEP_ALIAS } from "../../../tasks/watchdog/constants";
 import { PhaseProfiler } from "../../../tasks/watchdog/phase-profiler";
 import { ServerFramework } from "../enum";
@@ -99,6 +102,7 @@ import {
 } from "./event-loop-scheduler";
 import type { ServerStartT } from "./i18n";
 import { scopedTranslation as serverStartScopedTranslation } from "./i18n";
+import { NextRendererWatchdog } from "./next-renderer-watchdog";
 import { findPortHolders } from "./port-holders";
 import { patchRuntimeEnvPlaceholders } from "./runtime-env-patch";
 import {
@@ -110,16 +114,13 @@ import {
 } from "./self-heal";
 
 /**
- * Signal every live process re-parented to THIS process other than `keepPid`.
- * Only the supervisor calls it: in a container it is PID 1, so when its child
- * crashes, the child's Next.js wrapper and next-server are re-parented to it.
- * Left running, such an orphan can keep the internal port (or a wedged socket
- * on it) for the next generation. A no-op where orphans go to the real init
- * (local runs) and off Linux.
+ * Signal the direct children of a process on Linux. The supervisor uses this
+ * to clear orphans re-parented to PID 1. The renderer watchdog uses it to kill
+ * the Node renderer spawned by `bun run next` before killing its wrapper.
  */
-function signalOrphanedDescendants(
+function signalChildProcesses(
+  parentPid: number,
   signal: NodeJS.Signals,
-  keepPid: number | undefined,
 ): number[] {
   if (process.platform !== "linux") {
     return [];
@@ -142,17 +143,15 @@ function signalOrphanedDescendants(
       // exited meanwhile
     }
   }
-  const orphans = childPidsFromProcStat(stats, process.pid).filter(
-    (pid) => pid !== keepPid,
-  );
-  for (const pid of orphans) {
+  const children = childPidsFromProcStat(stats, parentPid);
+  for (const pid of children) {
     try {
       process.kill(pid, signal);
     } catch {
       // already gone
     }
   }
-  return orphans;
+  return children;
 }
 
 /**
@@ -160,6 +159,8 @@ function signalOrphanedDescendants(
  */
 /** Restart backoff delays in ms (doubles each attempt, capped at 30s) */
 const NEXT_RESTART_DELAYS = [2000, 4000, 8000, 16000, 30000];
+const NEXT_STARTUP_GRACE_MS = 30_000;
+const NEXT_RESTART_GRACE_MS = 60_000;
 
 /** Health snapshot file written every 60s so the supervisor can read pre-crash memory on OOM */
 const HEALTH_SNAPSHOT_FILE = ".tmp/.vibe-health.json";
@@ -544,7 +545,7 @@ export class ServerStartRepository {
         // us (container PID 1). SIGTERM now: next-server closes its listener
         // at once (port free) and drains; survivors get SIGKILL before the
         // respawn below.
-        const orphans = signalOrphanedDescendants("SIGTERM", undefined);
+        const orphans = signalChildProcesses(process.pid, "SIGTERM");
         if (orphans.length > 0) {
           logger.warn(
             "[Supervisor] Stopping processes orphaned by the crashed server",
@@ -562,7 +563,7 @@ export class ServerStartRepository {
           void writeServerLogOfflineHint();
           // Give the error log row a moment to be written.
           setTimeout(() => {
-            signalOrphanedDescendants("SIGKILL", undefined);
+            signalChildProcesses(process.pid, "SIGKILL");
             process.exit(1);
           }, 2000);
           return;
@@ -585,7 +586,7 @@ export class ServerStartRepository {
           if (supervisorShuttingDown) {
             return;
           }
-          signalOrphanedDescendants("SIGKILL", undefined);
+          signalChildProcesses(process.pid, "SIGKILL");
           ServerStartRepository.supervisedChild = spawnChild();
         }, delay);
       });
@@ -2047,18 +2048,24 @@ export class ServerStartRepository {
       }
       const formatNextjs = createNextjsFormatter(nextPort, port);
       let proxyStarted = false;
+      let rendererWatchdog: NextRendererWatchdog | undefined;
       const openProxy = async (): Promise<void> => {
+        rendererWatchdog?.markStarted();
         if (proxyStarted || ServerStartRepository.nextServerShuttingDown) {
           return;
         }
-        const wsHandle = await startWebProxy({ port: wsPort, logger });
+        const wsHandle = await startWebProxy({
+          port: wsPort,
+          isRendererReady: (): boolean => rendererWatchdog?.isReady() ?? false,
+          logger,
+        });
         ServerStartRepository.wsServerHandle = wsHandle ?? null;
         proxyStarted = true;
         onReady?.();
       };
 
       /** Spawn Next.js, wire stdio, register exit→restart handler. Returns the child process. */
-      const spawnNextProcess = (): ChildProcess => {
+      const spawnNextProcess = (startupGraceMs: number): ChildProcess => {
         const proc = spawn(
           "bun",
           [
@@ -2095,6 +2102,25 @@ export class ServerStartRepository {
             } as NodeJS.ProcessEnv,
           },
         );
+        const watchdog = new NextRendererWatchdog({
+          child: proc,
+          signalChild: (signal): boolean => {
+            const signaled =
+              proc.pid === undefined
+                ? []
+                : signalChildProcesses(proc.pid, signal);
+            return proc.kill(signal) || signaled.length > 0;
+          },
+          nextPort,
+          startupGraceMs,
+          isCurrent: (): boolean =>
+            ServerStartRepository.nextServerProcess === proc &&
+            !ServerStartRepository.nextServerShuttingDown &&
+            !ServerStartRepository.nextServerRestarting,
+          summarizeInFlight: summarizeInFlightRequests,
+          logger,
+        });
+        rendererWatchdog = watchdog;
 
         // Last output lines go into the exit log: the reason Next.js died
         // must reach the error log, not only docker stdout.
@@ -2115,8 +2141,12 @@ export class ServerStartRepository {
         });
 
         proc.on("exit", (code, signal) => {
-          ServerStartRepository.nextServerProcess = null;
+          watchdog.stop();
           removePidFromFile(VIBE_START_PID_FILE, proc.pid ?? 0);
+          if (ServerStartRepository.nextServerProcess !== proc) {
+            return;
+          }
+          ServerStartRepository.nextServerProcess = null;
 
           // Intentional shutdown or SIGUSR1-triggered restart - do not queue a second restart
           if (
@@ -2149,8 +2179,10 @@ export class ServerStartRepository {
           };
 
           const isCleanExit = code === 0 || signal === "SIGTERM";
-          const likelyOom = signal === "SIGKILL";
-          if (isCleanExit) {
+          const likelyOom = signal === "SIGKILL" && !watchdog.wasKilled();
+          if (watchdog.wasKilled()) {
+            logger.info("[Start] Unresponsive Next.js child exited", diag);
+          } else if (isCleanExit) {
             // clean exit without shuttingDown flag = unexpected (e.g. Next.js self-exited 0)
             logger.warn(
               "Next.js exited cleanly but unexpectedly - restarting",
@@ -2197,7 +2229,11 @@ export class ServerStartRepository {
           );
 
           setTimeout(() => {
-            if (ServerStartRepository.nextServerShuttingDown) {
+            if (
+              ServerStartRepository.nextServerShuttingDown ||
+              ServerStartRepository.nextServerRestarting ||
+              ServerStartRepository.nextServerProcess !== null
+            ) {
               return;
             }
             // Reclaim the port first: a leftover next-server (orphaned by a
@@ -2207,17 +2243,20 @@ export class ServerStartRepository {
             logger.info(
               `Restarting Next.js (attempt #${ServerStartRepository.nextRestartCount})...`,
             );
-            const newProc = spawnNextProcess();
+            const newProc = spawnNextProcess(NEXT_RESTART_GRACE_MS);
             ServerStartRepository.nextServerProcess = newProc;
             addPidToFile(VIBE_START_PID_FILE, newProc.pid ?? 0);
             // Wait for it to be ready so proxy stops returning 503
             void ServerStartRepository.waitForNextServer(
               `http://127.0.0.1:${nextPort}`,
-              60000,
+              NEXT_RESTART_GRACE_MS,
               logger,
             )
               .then(async (up) => {
-                if (ServerStartRepository.nextServerProcess !== newProc) {
+                if (
+                  ServerStartRepository.nextServerProcess !== newProc ||
+                  newProc.killed
+                ) {
                   return undefined;
                 }
                 if (up) {
@@ -2250,7 +2289,7 @@ export class ServerStartRepository {
         return proc;
       };
 
-      const nextProcess = spawnNextProcess();
+      const nextProcess = spawnNextProcess(NEXT_STARTUP_GRACE_MS);
       ServerStartRepository.nextServerProcess = nextProcess;
       addPidToFile(VIBE_START_PID_FILE, nextProcess.pid ?? 0);
 
@@ -2267,13 +2306,19 @@ export class ServerStartRepository {
       // Wait for Next.js to be ready on its port
       const nextUp = await ServerStartRepository.waitForNextServer(
         `http://127.0.0.1:${nextPort}`,
-        30000,
+        NEXT_STARTUP_GRACE_MS,
         logger,
       );
-      if (nextUp && ServerStartRepository.nextServerProcess === nextProcess) {
+      if (
+        ServerStartRepository.nextServerProcess !== nextProcess ||
+        nextProcess.killed
+      ) {
+        return success(undefined);
+      }
+      if (nextUp) {
         ServerStartRepository.nextUptime.markUp();
         await openProxy();
-      } else if (ServerStartRepository.nextServerProcess === nextProcess) {
+      } else {
         ServerStartRepository.trackLateNextReadiness(
           nextProcess,
           nextPort,
@@ -2322,7 +2367,11 @@ export class ServerStartRepository {
         if (ServerStartRepository.lateReadinessProcess === proc) {
           ServerStartRepository.lateReadinessProcess = null;
         }
-        if (up && ServerStartRepository.nextServerProcess === proc) {
+        if (
+          up &&
+          ServerStartRepository.nextServerProcess === proc &&
+          !proc.killed
+        ) {
           ServerStartRepository.nextUptime.markUp();
           await onReady();
           logger.info("Next.js answered after a slow start");

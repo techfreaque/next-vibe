@@ -80,14 +80,22 @@ export interface WebProxyHandle {
 export async function startWebProxy({
   port,
   appPort,
+  isRendererReady,
   reusePort,
   logger,
 }: {
   port: number;
   appPort?: number;
+  isRendererReady?: () => boolean;
   reusePort?: boolean;
   logger: EndpointLogger;
 }): Promise<WebProxyHandle | undefined> {
   const { startWebSocketServer } = await import("../../realtime/server/server");
-  return startWebSocketServer({ port, appPort, reusePort, logger });
+  return startWebSocketServer({
+    port,
+    appPort,
+    isRendererReady,
+    reusePort,
+    logger,
+  });
 }

@@ -79,14 +79,47 @@ export function summarizeRecentRequests(): string {
  */
 let lastUpstreamOkAt = 0;
 
-// Proxy timeout is always high — timeout enforcement belongs on the app server
-// via the endpoint definition's timeoutMs, not here. The proxy must not cut off
-// long-running requests (SSR cold-start, media gen, execute-tool) before the app
-// server's own deadline fires.
+const inFlightRequests = new Map<symbol, RecentRequest>();
+
+export function summarizeInFlightRequests(): string {
+  const shown: string[] = [];
+  const now = Date.now();
+  for (const { method, path, ts } of inFlightRequests.values()) {
+    shown.push(`${method} ${sanitizeRoutePath(path)} (${String(now - ts)}ms)`);
+    if (shown.length === 8) {
+      break;
+    }
+  }
+  const remaining = inFlightRequests.size - shown.length;
+  return shown.length === 0
+    ? "none"
+    : `${shown.join(", ")}${remaining > 0 ? `, +${String(remaining)} more` : ""}`;
+}
+
+// Caddy can replay a 504 for GET/HEAD until we commit upstream headers.
+const PAGE_RENDER_TIMEOUT_MS = 30_000;
+// Long-running endpoint calls retain the app's own deadline.
 const PROXY_REQUEST_TIMEOUT_MS = 600_000;
+const NON_PAGE_PATH =
+  /^\/(?:api|_next|_ha|(?:(?:[a-z]{2}-[a-z]+)\/)?(?:media|uploads?|streams?|streaming|ws|static|images))(?:\/|$)/i;
+const ASSET_EXTENSION =
+  /\.(?:avif|webp|png|jpe?g|gif|svg|ico|bmp|tiff?|mp[34]|m4[av]|webm|mov|avi|mkv|wav|aac|flac|og[agv]|opus|m3u8|mpd|m4s|ts|vtt|pdf|woff2?|ttf|otf|eot|css|js|map|xml|txt|json|gz|zip|md)$/i;
+
+function isPageRender(req: Request, pathname: string): boolean {
+  return (
+    (req.method === "GET" || req.method === "HEAD") &&
+    !NON_PAGE_PATH.test(pathname) &&
+    !ASSET_EXTENSION.test(pathname) &&
+    !req.headers.has("upgrade") &&
+    !req.headers.has("range") &&
+    !req.headers.get("accept")?.toLowerCase().includes("text/event-stream")
+  );
+}
 
 interface HttpProxyContext {
   nextPort: number;
+  isRendererReady?: () => boolean;
+  pageRenderTimeoutMs?: number;
   databaseReadiness?: (requireReady?: boolean) => Promise<AbortSignal>;
   logger: EndpointLogger;
   /** True once the server is stopping — suppresses retries and expected errors. */
@@ -114,6 +147,22 @@ export async function handleHttpProxy(
   const strictProbe = url.pathname === "/_ha/ready";
   const db =
     url.pathname === "/robots.txt" ? undefined : await readiness?.(strictProbe);
+  if (
+    (strictProbe || url.pathname === "/robots.txt") &&
+    ctx.isRendererReady?.() === false
+  ) {
+    return new Response(
+      req.method === "HEAD" ? null : "Renderer unavailable\n",
+      {
+        status: 503,
+        headers: {
+          "cache-control": "no-store",
+          "retry-after": "1",
+          "x-ha-readiness": "v1-renderer-unavailable",
+        },
+      },
+    );
+  }
   if (db?.aborted) {
     return databaseUnavailable();
   }
@@ -159,6 +208,27 @@ export async function handleHttpProxy(
   let retryRequestId: string | undefined;
   const proxyStartMs = Date.now();
   trackRequest(req.method, url.pathname);
+  const pageDeadline = isPageRender(req, url.pathname)
+    ? performance.now() + (ctx.pageRenderTimeoutMs ?? PAGE_RENDER_TIMEOUT_MS)
+    : undefined;
+  const remainingPageTime = (): number =>
+    pageDeadline === undefined
+      ? Infinity
+      : Math.max(0, pageDeadline - performance.now());
+  const upstreamTimeout = (): Response => {
+    if (!isShuttingDown()) {
+      logger.error("[Proxy] Upstream request timed out", {
+        requestId,
+        path: sanitizeRoutePath(url.pathname),
+        method: req.method,
+        elapsedMs: Date.now() - proxyStartMs,
+      });
+    }
+    return new Response(req.method === "HEAD" ? null : "Gateway Timeout", {
+      status: 504,
+      headers: { "server-timing": proxyTimingHeader("upstream-timeout") },
+    });
+  };
 
   // Bun's internal idle timeout can fire mid-stream and truncate the body before
   // all bytes reach the proxy. Buffer multipart (file uploads) and JSON bodies
@@ -208,9 +278,22 @@ export async function handleHttpProxy(
     if (db?.aborted) {
       return databaseUnavailable();
     }
+    const remainingMs = remainingPageTime();
+    if (remainingMs === 0) {
+      return upstreamTimeout();
+    }
     const proxyResult = await new Promise<Response | null>((resolve) => {
       let settled = false;
-      let timedOut = false;
+      let headersReceived = false;
+      const inFlight = Symbol();
+      inFlightRequests.set(inFlight, {
+        method: req.method,
+        path: url.pathname,
+        ts: Date.now(),
+      });
+      const stopTracking = (): void => {
+        inFlightRequests.delete(inFlight);
+      };
       // settle() wraps resolve() with a guard so the timeout and the normal
       // response path can't both resolve the Promise.
       const settle = (result: Response | null): void => {
@@ -218,30 +301,21 @@ export async function handleHttpProxy(
           return;
         }
         settled = true;
+        if (!headersReceived) {
+          stopTracking();
+        }
         db?.removeEventListener("abort", onDatabaseLoss);
         clearTimeout(timeoutHandle);
         // oxlint-disable-next-line promise/no-multiple-resolved -- `settled` guard prevents double-resolve; static analysis can't track it
         resolve(result);
       };
-      const timeoutHandle = setTimeout(() => {
-        timedOut = true;
-        if (!isShuttingDown()) {
-          logger.error("[Proxy] Upstream request timed out", {
-            requestId,
-            path: sanitizeRoutePath(url.pathname),
-            method: req.method,
-            elapsedMs: Date.now() - proxyStartMs,
-          });
-        }
-        settle(
-          new Response("Gateway Timeout", {
-            status: 504,
-            headers: { "server-timing": proxyTimingHeader("upstream-timeout") },
-          }),
-        );
-        // A synthetic 504 has already been sent and reported above.
-        proxyReq.destroy();
-      }, PROXY_REQUEST_TIMEOUT_MS);
+      const timeoutHandle = setTimeout(
+        () => {
+          settle(upstreamTimeout());
+          proxyReq.destroy();
+        },
+        Math.min(Math.ceil(remainingMs), PROXY_REQUEST_TIMEOUT_MS),
+      );
       const proxyReq = http.request(
         {
           hostname: "127.0.0.1",
@@ -257,6 +331,14 @@ export async function handleHttpProxy(
           agent: false,
         },
         (proxyRes) => {
+          if (settled) {
+            proxyRes.destroy();
+            return;
+          }
+          headersReceived = true;
+          proxyRes.once("end", stopTracking);
+          proxyRes.once("close", stopTracking);
+          proxyRes.once("error", stopTracking);
           const previousUpstreamResponseAt = lastUpstreamOkAt;
           lastUpstreamOkAt = Date.now();
           const status = proxyRes.statusCode ?? 200;
@@ -382,6 +464,7 @@ export async function handleHttpProxy(
             },
             cancel(reason): void {
               downstreamClosed = true;
+              stopTracking();
               // The browser went away: stop reading from Next.js.
               logger.debug("[Proxy] Client closed response mid-body", {
                 path: url.pathname,
@@ -413,16 +496,16 @@ export async function handleHttpProxy(
         db?.addEventListener("abort", onDatabaseLoss, { once: true });
       }
       proxyReq.on("error", (err) => {
-        if (timedOut || settled) {
+        if (settled) {
           return;
         }
-        const nodeErr = err as NodeJS.ErrnoException;
-        const isConnRefused = nodeErr.code === "ECONNREFUSED";
+        const errorCode = "code" in err ? String(err.code) : undefined;
+        const isConnRefused = errorCode === "ECONNREFUSED";
         const shuttingDown = isShuttingDown();
         // On ECONNREFUSED while running — signal retry via null (idempotent only).
         // Non-idempotent methods and shutdown: return 502/503 immediately.
         if (isConnRefused && !shuttingDown && isIdempotent) {
-          lastProxyError = nodeErr.code ?? err.message;
+          lastProxyError = errorCode;
           // On first ECONNREFUSED, dump recent request history. Before
           // Next.js has ever answered, this is the boot window (it never went
           // down); that is reported separately so a real crash stays an
@@ -478,7 +561,7 @@ export async function handleHttpProxy(
         if (!shuttingDown) {
           logger.error("[Proxy] Server unreachable", {
             requestId,
-            errorCode: nodeErr.code ?? "UNKNOWN",
+            errorCode: errorCode ?? "UNKNOWN",
             error: err.message,
             path: url.pathname,
             method: req.method,
@@ -537,7 +620,10 @@ export async function handleHttpProxy(
     if (isShuttingDown()) {
       break;
     }
-    const delay = PROXY_RETRY_DELAYS[attempt] ?? 8000;
+    const delay = Math.min(
+      PROXY_RETRY_DELAYS[attempt] ?? 8000,
+      Math.ceil(remainingPageTime()),
+    );
     const mem = process.memoryUsage();
     logger.warn("[Proxy] Server not ready, retrying", {
       requestId: retryRequestId,
@@ -558,6 +644,9 @@ export async function handleHttpProxy(
     });
   }
 
+  if (remainingPageTime() === 0) {
+    return upstreamTimeout();
+  }
   const mem = process.memoryUsage();
   logger.error("[Proxy] All retries exhausted - returning 503", {
     requestId: retryRequestId,
