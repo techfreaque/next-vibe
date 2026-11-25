@@ -68,6 +68,8 @@ export const translations: typeof enTranslations = {
         "Den Entwurf hat {{model}} geschrieben, kein unzensiertes Modell. Nichts gepostet. Mit einer unzensierten Skill-Variante neu entwerfen.",
       draftMissing:
         "Übergib draftMessageId (lastAiMessageId aus ai-run) oder draftThreadId (threadId aus ai-run).",
+      emDash:
+        "Der Entwurf enthält einen Geviertstrich (U+2014). Nichts gepostet. Lass ihn neu schreiben und sag dem Autor: Punkt, Komma oder Doppelpunkt statt Strich.",
       draftEmpty: "Entwurf {{draftMessageId}} enthält keinen Text.",
       draftAlreadyPosted:
         "Dieser Entwurf ist bereits im Forum (Thread {{threadId}}). Nichts gepostet.",

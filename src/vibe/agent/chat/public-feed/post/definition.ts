@@ -9,8 +9,8 @@
  *
  * Reply mode: pass threadId. New-thread mode: pass title + category.
  * Guard rails: no reply to your own AI post (no self-loops), one AI answer per
- * human post, no draft posted twice, no duplicate thread titles, and an hourly
- * cap per account.
+ * human post, no draft posted twice, no duplicate thread titles, no em dashes
+ * in the draft, and an hourly cap per account.
  */
 
 import { createEndpoint } from "next-vibe/core/definition/create-i18n";

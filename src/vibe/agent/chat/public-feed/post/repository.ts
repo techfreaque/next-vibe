@@ -2,7 +2,8 @@
  * Forum Post Repository
  * Publishes an AI draft verbatim in the public forum, behind guard rails that
  * keep automated posting honest: no self-replies, one AI answer per human
- * post, no reposted drafts, no duplicate titles, an hourly cap per account.
+ * post, no reposted drafts, no duplicate titles, no em dashes, an hourly cap
+ * per account.
  */
 
 import "server-only";
@@ -44,6 +45,7 @@ import type { ForumPostT } from "./i18n";
 
 const HOUR_MS = 60 * 60 * 1000;
 const POST_ROLES = [ChatMessageRole.USER, ChatMessageRole.ASSISTANT];
+const EM_DASH = "\u2014";
 
 export class ForumPostRepository {
   static async post(
@@ -125,7 +127,17 @@ export class ForumPostRepository {
         });
       }
 
-      // ── 2. Never post the same draft twice ──
+      // ── 2. No em dashes: platform copy rule, checked here so the caller
+      // never has to scan the draft by hand. Verbatim publishing means the
+      // draft is refused, never patched. ──
+      if (content.includes(EM_DASH)) {
+        return fail({
+          message: t("post.guard.emDash"),
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+        });
+      }
+
+      // ── 3. Never post the same draft twice ──
       const [alreadyPosted] = await db
         .select({ threadId: chatMessages.threadId })
         .from(chatMessages)
@@ -148,7 +160,7 @@ export class ForumPostRepository {
         });
       }
 
-      // ── 3. Hourly cap on AI forum posts per account ──
+      // ── 4. Hourly cap on AI forum posts per account ──
       const [{ recent }] = await db
         .select({ recent: count() })
         .from(chatMessages)
@@ -170,7 +182,7 @@ export class ForumPostRepository {
         });
       }
 
-      // ── 4. Target: reply in an existing thread, or open a new one ──
+      // ── 5. Target: reply in an existing thread, or open a new one ──
       let threadId: string;
       let folderId: string | null;
       let parentId: string | undefined;
@@ -265,7 +277,7 @@ export class ForumPostRepository {
         isNewThread = true;
       }
 
-      // ── 5. Publish the draft unchanged, attributed to its own model ──
+      // ── 6. Publish the draft unchanged, attributed to its own model ──
       const posted = await MessagesRepository.createMessage(
         {
           threadId,

@@ -67,6 +67,8 @@ export const translations: typeof enTranslations = {
         "Szkic napisał {{model}}, a nie model bez cenzury. Nic nie opublikowano. Napisz go ponownie wariantem skilla bez cenzury.",
       draftMissing:
         "Podaj draftMessageId (lastAiMessageId z ai-run) albo draftThreadId (threadId z ai-run).",
+      emDash:
+        "Szkic zawiera pauzę (U+2014). Nic nie opublikowano. Zleć nową wersję i każ autorowi użyć kropki, przecinka albo dwukropka.",
       draftEmpty: "Szkic {{draftMessageId}} nie zawiera tekstu.",
       draftAlreadyPosted:
         "Ten szkic jest już na forum (wątek {{threadId}}). Nic nie opublikowano.",

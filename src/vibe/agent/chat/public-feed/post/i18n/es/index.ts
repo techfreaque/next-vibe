@@ -68,6 +68,8 @@ export const translations: typeof enTranslations = {
         "El borrador fue escrito por {{model}}, no un modelo sin censura. Nada publicado. Redraft con una variante de habilidad sin censura.",
       draftMissing:
         "Paso draftMessageId (lastAiMessageId de ai-run) o draftThreadId (threadId de ai-run).",
+      emDash:
+        "El borrador contiene una raya (U+2014). No se publicó nada. Pide una nueva versión y que el autor use punto, coma o dos puntos.",
       draftEmpty: "El proyecto {{draftMessageId}} no tiene texto que publicar.",
       draftAlreadyPosted:
         "Este borrador ya se publica en el foro (el texto {{threadId}}). Nada publicado.",

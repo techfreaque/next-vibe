@@ -65,6 +65,8 @@ export const translations = {
         "Draft was written by {{model}}, not an uncensored model. Nothing posted. Redraft with an uncensored skill variant.",
       draftMissing:
         "Pass draftMessageId (lastAiMessageId from ai-run) or draftThreadId (threadId from ai-run).",
+      emDash:
+        "The draft contains an em dash (U+2014). Nothing posted. Redraft it and tell the writer to use a period, comma or colon instead.",
       draftEmpty: "Draft {{draftMessageId}} has no text to post.",
       draftAlreadyPosted:
         "This draft is already posted in the forum (thread {{threadId}}). Nothing posted.",

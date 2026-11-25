@@ -232,7 +232,7 @@ describe("forum-post", () => {
   );
 
   it(
-    "rejects an unknown category, a mainstream draft when uncensored is required, and a foreign draft",
+    "rejects an unknown category, a mainstream draft when uncensored is required, an em dash and a foreign draft",
     async () => {
       const badCategory = await sendTestRequest({
         toolExecutionContext: undefined,
@@ -272,6 +272,28 @@ describe("forum-post", () => {
       expect(mainstream.success).toBe(false);
       if (!mainstream.success) {
         expect(mainstream.errorType.errorCode).toBe(
+          ErrorResponseTypes.VALIDATION_ERROR.errorCode,
+        );
+      }
+
+      // An em dash anywhere in the draft → refused, nothing posted
+      const emDash = await sendTestRequest({
+        toolExecutionContext: undefined,
+        endpoint: postEndpoints.POST,
+        data: {
+          draftMessageId: await createDraft(
+            `${stamp} honest answers — not hedged ones`,
+          ),
+          threadId: undefined,
+          parentId: undefined,
+          title: `${stamp} dash`,
+          category: "Philosophy",
+        },
+        user: admin,
+      });
+      expect(emDash.success).toBe(false);
+      if (!emDash.success) {
+        expect(emDash.errorType.errorCode).toBe(
           ErrorResponseTypes.VALIDATION_ERROR.errorCode,
         );
       }

@@ -68,6 +68,8 @@ export const translations: typeof enTranslations = {
         "Le brouillon a été écrit par {{model}}, pas par un modèle non censuré. Rien n'a été publié. Réécrivez-le avec une variante de skill non censurée.",
       draftMissing:
         "Passez draftMessageId (lastAiMessageId d'ai-run) ou draftThreadId (threadId d'ai-run).",
+      emDash:
+        "Le brouillon contient un tiret cadratin (U+2014). Rien n'a été publié. Fais-le réécrire avec un point, une virgule ou deux-points à la place.",
       draftEmpty: "Le brouillon {{draftMessageId}} ne contient aucun texte.",
       draftAlreadyPosted:
         "Ce brouillon est déjà publié sur le forum (fil {{threadId}}). Rien n'a été publié.",

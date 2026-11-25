@@ -68,6 +68,8 @@ export const translations: typeof enTranslations = {
         "Il progetto è stato scritto da {{model}}, non un modello non censurato. Niente postato. Redraft con una variante di abilità non censurata.",
       draftMissing:
         "Passare draftMessageId (lastAiMessageId da ai-run) o draftThreadId (threadId da ai-run).",
+      emDash:
+        "La bozza contiene una lineetta (U+2014). Nulla è stato pubblicato. Falla riscrivere con un punto, una virgola o i due punti.",
       draftEmpty: "Il progetto {{draftMessageId}} non ha testo da inviare.",
       draftAlreadyPosted:
         "Questa bozza è già postata nel forum (thread {{threadId}}). Niente postato.",
