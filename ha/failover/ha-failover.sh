@@ -481,6 +481,37 @@ If S1 is really dead: ssh S2 and run: ha-failover promote"
   cmd_promote --auto
 }
 
+s2_role_ssh_alert_context() {
+  {
+    if ping -n -c1 -W2 "$PEER_WG" >/dev/null 2>&1; then
+      echo "WG ICMP: replied"
+    else
+      echo "WG ICMP: no reply within 2s"
+    fi
+  } &
+  {
+    local code
+    if code="$(curl -s --noproxy '*' --max-time 3 --resolve "unbottled.ai:443:$PEER_PUBLIC" \
+      -o /dev/null -w '%{http_code}' https://unbottled.ai/robots.txt 2>/dev/null)"; then
+      echo "S2 public HTTPS edge: HTTP $code"
+    else
+      echo "S2 public HTTPS edge: request failed within 3s"
+    fi
+  } &
+  {
+    local replication
+    replication="$(timeout -k 1 3 docker exec "$LOCAL_PG" psql -U postgres -XAtqc "
+      select coalesce((select 'slot_active=' || s.active
+        || ' sender=' || coalesce(r.state, 'none')
+        || ' replay_behind_bytes=' || coalesce(pg_wal_lsn_diff(pg_current_wal_lsn(), r.replay_lsn)::text, 'unknown')
+        from pg_replication_slots s left join pg_stat_replication r on r.pid = s.active_pid
+        where s.slot_name = 's2_replica'), 'slot missing')
+    " 2>/dev/null)" || replication="query unavailable"
+    echo "S1 PostgreSQL replication (S2 slot): ${replication:-query unavailable}"
+  } &
+  wait
+}
+
 watch_s1() {
   local r st
   r="$(role)"
@@ -504,14 +535,19 @@ S1 stopped and disabled: ${HA_FENCE_CONTAINERS:-}. Its Caddy now serves unbottle
 Rejoin S1 as a standby: ha/README.md 'Rejoin after failover'."
     ;;
   "")
-    local now; now=$(date +%s)
+    local now down; now=$(date +%s)
     [ -f "$STATE_DIR/peer-down-since" ] || echo "$now" > "$STATE_DIR/peer-down-since"
-    [ $((now - $(cat "$STATE_DIR/peer-down-since"))) -ge "${HA_PEER_ALERT_AFTER:-300}" ] && alert_once s2-down "Server 2 unreachable from Server 1" "S1 cannot reach S2 over WG for 5+ min. S1 keeps serving alone; the standby and failover target are gone until S2 is back."
+    down=$((now - $(cat "$STATE_DIR/peer-down-since")))
+    if [ "$down" -ge "${HA_PEER_ALERT_AFTER:-300}" ] && ! was_alerted s2-down; then
+      alert_once s2-down "Server 1: S2 role SSH probe failed" "S1 received no role response from S2 over WireGuard SSH for ${down}s.
+Independent observations from S1 at $(date -u +%FT%TZ):
+$(s2_role_ssh_alert_context)"
+    fi
     ;;
   *)
     if [ -f "$STATE_DIR/peer-down-since" ]; then
       rm -f "$STATE_DIR/peer-down-since"
-      was_alerted s2-down && alert "Server 2 reachable again" "S2 reports: $st"
+      was_alerted s2-down && alert "Server 1: S2 role SSH probe recovered" "S2 reports: $st"
       clear_once s2-down
     fi
     ;;
