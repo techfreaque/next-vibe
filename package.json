@@ -406,6 +406,7 @@
     "chrome-devtools-mcp@1.12.0": "patches/chrome-devtools-mcp@1.12.0.patch",
     "next-themes@0.4.6": "patches/next-themes@0.4.6.patch",
     "next@16.4.5": "patches/next@16.4.5.patch",
+    "nitro@3.0.261103-rc": "patches/nitro@3.0.261103-rc.patch",
     "vite@8.3.5": "patches/vite@8.3.5.patch"
   }
 }

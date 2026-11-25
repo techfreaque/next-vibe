@@ -383425,6 +383425,7 @@
     "titleShort": "Szczegóły skilla",
     "description": "Pobierz konkretną skill według ID",
     "fields": {
+      "noFormElement": true,
       "usage": {
         "request": "urlPathParams",
         "response": true

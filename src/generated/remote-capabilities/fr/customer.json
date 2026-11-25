@@ -60424,6 +60424,7 @@
     "titleShort": "Détails de la compétence",
     "description": "Récupérer une compétence précise par son ID",
     "fields": {
+      "noFormElement": true,
       "usage": {
         "request": "urlPathParams",
         "response": true

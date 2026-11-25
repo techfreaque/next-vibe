@@ -86,7 +86,9 @@ diff --git a/dist/esm/core/code-splitter/compilers.js b/dist/esm/core/code-split
  	const localModuleLevelBindings = /* @__PURE__ */ new Set();
  	for (const node of ast.program.body) collectLocalBindingsFromStatement(node, localModuleLevelBindings);
  	localModuleLevelBindings.delete("Route");
-@@ -110,10 +109,17 @@
+@@ -108,12 +107,19 @@
+ 		if (groupIndex === -1) hasNonSplit = true;
+ 		else splitGroupsPresent.add(groupIndex);
  	}
 -	if (!hasNonSplit && splitGroupsPresent.size < 2) return /* @__PURE__ */ new Set();
 +	if (splitGroupsPresent.size === 0 || (!hasNonSplit && splitGroupsPresent.size < 2)) return /* @__PURE__ */ new Set();
@@ -106,20 +108,38 @@ diff --git a/dist/esm/core/code-splitter/compilers.js b/dist/esm/core/code-split
  	const refsByGroup = /* @__PURE__ */ new Map();
  	for (const prop of routeOptions.properties) {
  		if (!t.isObjectProperty(prop)) continue;
-@@ -180,8 +186,7 @@
+@@ -180,8 +186,24 @@
  		return true;
  	});
  }
 -function compileCodeSplitReferenceRoute(opts) {
 -	const ast = parseAst(opts);
-+function compileCodeSplitReferenceRoute(opts, ast = parseAst(opts), deferScopeCrawl = false) {
++function findDirectFileRoute(program) {
++	const index = program.body.findIndex((statement) => {
++		if (!t.isExportNamedDeclaration(statement) || !t.isVariableDeclaration(statement.declaration)) return false;
++		const [declaration] = statement.declaration.declarations;
++		return statement.declaration.declarations.length === 1 &&
++			t.isIdentifier(declaration.id, { name: "Route" }) &&
++			t.isCallExpression(declaration.init) &&
++			t.isCallExpression(declaration.init.callee) &&
++			t.isIdentifier(declaration.init.callee.callee, { name: "createFileRoute" });
++	});
++	if (index < 0) return -1;
++	let factories = 0;
++	t.traverseFast(program, (node) => {
++		if (t.isCallExpression(node) && t.isIdentifier(node.callee) && allCreateRouteFns.includes(node.callee.name)) factories++;
++	});
++	return factories === 1 ? index : -1;
++}
++function compileCodeSplitReferenceRoute(opts, ast = parseAst(opts), optimizeTraversal = false) {
  	const refIdents = findReferencedIdentifiers(ast);
  	const knownExportedIdents = /* @__PURE__ */ new Set();
  	function findIndexForSplitNode(str) {
-@@ -207,9 +212,17 @@
+@@ -207,9 +229,17 @@
  		* `import '../shared/imported'`
  		*/
  		const removableImportPaths = /* @__PURE__ */ new Set([]);
+-		programPath.traverse({ CallExpression: (path) => {
 +		let scopeNeedsCrawl = false;
 +		const refreshScope = () => {
 +			if (scopeNeedsCrawl) {
@@ -127,14 +147,14 @@ diff --git a/dist/esm/core/code-splitter/compilers.js b/dist/esm/core/code-split
 +				scopeNeedsCrawl = false;
 +			}
 +		};
- 		programPath.traverse({ CallExpression: (path) => {
++		const visitRouteCall = (path) => {
  			if (!t.isIdentifier(path.node.callee)) return;
  			if (!allCreateRouteFns.includes(path.node.callee.name)) return;
 +			refreshScope();
  			createRouteFn = path.node.callee.name;
  			function babelHandleReference(routeOptions) {
  				const hasImportedOrDefinedIdentifier = (name) => {
-@@ -217,6 +230,8 @@
+@@ -217,6 +247,8 @@
  				};
  				const addRouteHmr = (insertionPath, routeOptions) => {
  					if (!opts.addHmr || hmrAdded) return;
@@ -143,7 +163,7 @@ diff --git a/dist/esm/core/code-splitter/compilers.js b/dist/esm/core/code-split
  					opts.compilerPlugins?.forEach((plugin) => {
  						if ((plugin.onAddHmr?.({
  							programPath,
-@@ -280,13 +295,14 @@
+@@ -280,13 +312,14 @@
  								const codeSplitGroup = [...new Set(opts.codeSplitGroupings[codeSplitGroupingByKey])];
  								if (!SPLIT_NODES_CONFIG.has(key)) return;
  								if (t.isBooleanLiteral(prop.value) || t.isNullLiteral(prop.value) || t.isIdentifier(prop.value) && prop.value.name === "undefined") return;
@@ -159,7 +179,7 @@ diff --git a/dist/esm/core/code-splitter/compilers.js b/dist/esm/core/code-split
  										if (existingImportPath) removableImportPaths.add(existingImportPath);
  										const isExported = hasExport(ast, value);
  										if (isExported) knownExportedIdents.add(value.name);
-@@ -322,7 +338,7 @@
+@@ -322,7 +355,7 @@
  									const value = prop.value;
  									let shouldSplit = true;
  									if (t.isIdentifier(value)) {
@@ -168,19 +188,37 @@ diff --git a/dist/esm/core/code-splitter/compilers.js b/dist/esm/core/code-split
  										if (existingImportPath) removableImportPaths.add(existingImportPath);
  										const isExported = hasExport(ast, value);
  										if (isExported) knownExportedIdents.add(value.name);
-@@ -337,7 +353,10 @@
+@@ -337,7 +370,10 @@
  								}
  							}
  						}
 -						programPath.scope.crawl();
 +						// In dev, the last split can leave this to the DCE pass,
 +						// which rebuilds scope before inspecting any bindings.
-+						if (deferScopeCrawl) scopeNeedsCrawl = true;
++						if (optimizeTraversal) scopeNeedsCrawl = true;
 +						else programPath.scope.crawl();
  					});
  					addRouteHmr(insertionPath, routeOptions);
  				}
-@@ -375,6 +394,9 @@
+@@ -347,7 +383,16 @@
+ 				const caller = resolveIdentifier(path, path.parentPath.node.init);
+ 				if (t.isCallExpression(caller)) babelHandleReference(resolveIdentifier(path, caller.arguments[0]));
+ 			}
+-		} });
++		};
++		// Generated file routes have one direct factory call. Find it on the
++		// parsed nodes and create a scoped path only for that call.
++		const directRoute = optimizeTraversal ? findDirectFileRoute(ast.program) : -1;
++		if (directRoute === -1) {
++			programPath.traverse({ CallExpression: visitRouteCall });
++		} else {
++			const declaration = programPath.get("body")[directRoute].get("declaration").get("declarations")[0];
++			visitRouteCall(declaration.get("init").get("callee"));
++		}
+ 		/**
+ 		* If the component for the route is being imported,
+ 		* and it's not being used, remove the import statement
+@@ -375,6 +420,9 @@
  				programPath.pushContainer("body", t.exportNamedDeclaration(null, reExportSpecifiers, t.stringLiteral(sharedModuleUrl)));
  			}
  		}
@@ -190,7 +228,7 @@ diff --git a/dist/esm/core/code-splitter/compilers.js b/dist/esm/core/code-split
  	} } });
  	if (!modified) return null;
  	deadCodeElimination(ast, refIdents);
-@@ -585,8 +607,7 @@
+@@ -585,8 +633,7 @@
  * This function should read get the options from by searching for the key `codeSplitGroupings`
  * on createFileRoute and return it's values if it exists, else return undefined
  */
@@ -200,7 +238,7 @@ diff --git a/dist/esm/core/code-splitter/compilers.js b/dist/esm/core/code-split
  	let codeSplitGroupings = void 0;
  	babel.traverse(ast, { Program: { enter(programPath) {
  		programPath.traverse({ CallExpression(path) {
-@@ -626,20 +647,13 @@
+@@ -626,20 +673,13 @@
  		"For the best optimization, these items should either have their export statements removed, or be imported from another location that is not a route file."
  	].join("\n");
  }
@@ -228,7 +266,7 @@ diff --git a/dist/esm/core/code-splitter/compilers.js b/dist/esm/core/code-split
  }
  function resolveIdentifier(path, node) {
  	if (t.isIdentifier(node)) {
-@@ -671,38 +685,22 @@
+@@ -671,38 +711,22 @@
  	}
  }
  function hasExport(ast, node) {
@@ -262,6 +300,8 @@ diff --git a/dist/esm/core/code-splitter/compilers.js b/dist/esm/core/code-split
 -				}
 -			}
 -		}
+-	});
+-	return found;
 +	return t.traverseFast(ast, (current) => {
 +		let found = false;
 +		if (t.isExportNamedDeclaration(current)) {
@@ -277,8 +317,7 @@ diff --git a/dist/esm/core/code-splitter/compilers.js b/dist/esm/core/code-split
 +			else if (t.isFunctionDeclaration(declaration)) found = declaration.id?.name === node.name;
 +		}
 +		if (found) return t.traverseFast.stop;
- 	});
--	return found;
++	});
  }
  function removeExports(ast, node) {
  	let removed = false;

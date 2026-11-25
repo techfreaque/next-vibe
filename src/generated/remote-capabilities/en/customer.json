@@ -60424,6 +60424,7 @@
     "titleShort": "Skill Details",
     "description": "Retrieve a specific skill by ID",
     "fields": {
+      "noFormElement": true,
       "usage": {
         "request": "urlPathParams",
         "response": true

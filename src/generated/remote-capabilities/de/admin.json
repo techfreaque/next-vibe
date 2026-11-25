@@ -383425,6 +383425,7 @@
     "titleShort": "Skill-Details",
     "description": "Eine bestimmte Skill anhand der ID abrufen",
     "fields": {
+      "noFormElement": true,
       "usage": {
         "request": "urlPathParams",
         "response": true

@@ -383425,6 +383425,7 @@
     "titleShort": "Detalles de la habilidad",
     "description": "Recuperar una habilidad específica por ID",
     "fields": {
+      "noFormElement": true,
       "usage": {
         "request": "urlPathParams",
         "response": true

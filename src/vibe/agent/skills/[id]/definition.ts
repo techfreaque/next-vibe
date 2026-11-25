@@ -913,6 +913,8 @@ const { GET } = createEndpoint({
 
   fields: customWidgetObject({
     render: SkillViewContainer,
+    // The hidden route ID needs form context, but the view can embed its own form.
+    noFormElement: true,
     usage: { request: "urlPathParams", response: true } as const,
     children: {
       // === URL PARAMETERS ===

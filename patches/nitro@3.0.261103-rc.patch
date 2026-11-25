@@ -1,0 +1,50 @@
+diff --git a/dist/runtime/internal/vite/dev-worker.mjs b/dist/runtime/internal/vite/dev-worker.mjs
+--- a/dist/runtime/internal/vite/dev-worker.mjs
++++ b/dist/runtime/internal/vite/dev-worker.mjs
+@@ -145,20 +145,38 @@
+   // Modules the change cannot affect keep their state (and their singletons).
+   invalidateFile(file) {
+     const { evaluatedModules } = this.runner;
+-    const seen = new Set();
+-    const invalidate = (mod) => {
+-      if (!mod || seen.has(mod.id)) {
++    const affected = new Set();
++    const collect = (mod) => {
++      if (!mod || affected.has(mod)) {
+         return;
+       }
+-      seen.add(mod.id);
++      affected.add(mod);
+       for (const importer of mod.importers) {
+-        invalidate(evaluatedModules.getModuleById(importer));
+-      }
+-      evaluatedModules.invalidateModule(mod);
++        collect(evaluatedModules.getModuleById(importer));
++      }
+     };
+     for (const mod of evaluatedModules.getModulesByFile(file) || []) {
+-      invalidate(mod);
++      collect(mod);
++    }
++
++    // TanStack builds its generated tree by mutating the imported Route instances.
++    // Keep those instances together so a reload cannot re-parent routes still in
++    // use by requests running with the previous tree.
++    for (const mod of affected) {
++      if (!mod.file.endsWith("/routeTree.gen.ts")) {
++        continue;
++      }
++      const routesDirectory = mod.file.slice(0, -"routeTree.gen.ts".length) + "routes/";
++      for (const id of mod.imports) {
++        const route = evaluatedModules.getModuleById(id);
++        if (route?.file.startsWith(routesDirectory)) {
++          collect(route);
++        }
++      }
++    }
++    for (const mod of affected) {
++      evaluatedModules.invalidateModule(mod);
+     }
+   }
+ 
+   // Whether `file` is part of this environment's evaluated module graph.

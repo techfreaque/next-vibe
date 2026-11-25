@@ -60424,6 +60424,7 @@
     "titleShort": "Dettagli sull'abilità",
     "description": "Recuperare una specifica abilità di ID",
     "fields": {
+      "noFormElement": true,
       "usage": {
         "request": "urlPathParams",
         "response": true
