@@ -22,6 +22,7 @@ import {
 } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
+import { PosOrderStatus } from "../../../enum";
 import { scopedTranslation } from "../../../i18n";
 
 const PosOrderGetWidgetLazy = lazyWidget(() =>
@@ -67,6 +68,12 @@ const { GET } = createEndpoint({
             label: "orderGet.get.response.id",
             hidden: true,
             schema: z.uuid(),
+          }),
+          companyId: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            label: "terminalCreate.post.companyId.label",
+            hidden: true,
+            schema: z.uuid().optional(),
           }),
           orderNumber: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
@@ -266,17 +273,29 @@ const { GET } = createEndpoint({
       default: {
         result: {
           id: "eeff1122-e89b-12d3-a456-426614174003",
+          companyId: "00000000-0000-4000-8000-000000000001",
           orderNumber: "POS-20240101-0001",
           sessionId: "ccddee00-e89b-12d3-a456-426614174002",
           customerId: null,
-          status: "OPEN",
+          status: PosOrderStatus.OPEN,
           currency: "EUR",
           subtotal: 10.0,
           taxAmount: 2.0,
           total: 12.0,
           journalEntryId: null,
           createdAt: new Date("2024-01-01T10:00:00.000Z"),
-          items: [],
+          items: [
+            {
+              itemId: "ff001122-e89b-42d3-a456-426614174004",
+              productId: null,
+              description: "Notebook",
+              quantity: 2,
+              unitPrice: 5,
+              taxRate: 0.2,
+              taxAmountItem: 2,
+              lineTotal: 12,
+            },
+          ],
           payments: [],
         },
       },

@@ -19,6 +19,7 @@ export const translations: typeof enTranslations = {
       description: "Počet účtov na stranu, najviac 200.",
     },
     response: {
+      balance: "Zostatok",
       total: "Spolu",
       accounts: "Účty",
       id: "Identifikátor",
@@ -77,8 +78,11 @@ export const translations: typeof enTranslations = {
       description: "Účtový rozvrh sa načítal",
     },
     widget: {
+      debitSide: "MD",
+      creditSide: "D",
       loading: "Načítavajú sa účty…",
-      empty: "Zatiaľ tu nie sú žiadne účty. Nastavte účtový rozvrh podľa šablóny.",
+      empty:
+        "Zatiaľ tu nie sú žiadne účty. Nastavte účtový rozvrh podľa šablóny.",
       createButton: "Nový účet",
       inactive: "Neaktívne",
       setupButton: "Nastaviť účtový rozvrh",

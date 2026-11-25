@@ -99,6 +99,7 @@ export const translations = {
     description: "Items per page",
   },
   widget: {
+    filters: "Filters",
     pageCount: "Total pages",
     back: "Back",
     title: "Sales Estimates",

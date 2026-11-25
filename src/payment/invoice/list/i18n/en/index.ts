@@ -14,6 +14,7 @@ export const translations = {
       description: "Filter the invoice list",
     },
     response: {
+      customerName: "Customer",
       total: "Total",
       invoices: "Invoices",
       id: "Invoice ID",
@@ -90,13 +91,13 @@ export const translations = {
   },
   search: {
     label: "Search documents",
-    description:
-      "Search invoices by document number, invoice ID or customer ID, and filter by company or status.",
-    placeholder: "Document number or ID",
+    description: "Search by invoice number, customer name or ID.",
+    placeholder: "Invoice number or customer",
   },
   status: {
     label: "Status",
-    description: "Filter by invoice status",
+    description:
+      "Filter by invoice status or show overdue invoices with an outstanding balance.",
     placeholder: "All statuses",
   },
   customerId: {
@@ -113,6 +114,8 @@ export const translations = {
     description: "Results per page",
   },
   widget: {
+    filters: "Filters",
+    partlyPaid: "Partly paid",
     pageCount: "Total pages",
     title: "Customer Invoices",
     newInvoice: "New Invoice",

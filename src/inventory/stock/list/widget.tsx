@@ -3,350 +3,318 @@
 import { Badge } from "next-vibe/ui/components/badge";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
-import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
-import { Loader2 } from "next-vibe/ui/components/icons/Loader2";
+import { EmptyBlock } from "next-vibe/ui/components/empty-block";
+import { Input } from "next-vibe/ui/components/input";
+import { Label } from "next-vibe/ui/components/label";
+import { LoadingBlock } from "next-vibe/ui/components/loading-block";
+import { RecordTable } from "next-vibe/ui/components/record-table";
 import { Span } from "next-vibe/ui/components/span";
+import { WidgetHeader } from "next-vibe/ui/components/widget-header";
+import { WidgetShell } from "next-vibe/ui/components/widget-shell";
+import { formatMoney } from "next-vibe/unified-ui/_shared/format-money";
 import { usePickerCallback } from "next-vibe/unified-ui/_shared/picker-context";
 import {
+  useWidgetForm,
+  useWidgetIsInteractive,
+  useWidgetLocale,
   useWidgetNavigation,
+  useWidgetResponse,
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import type { JSX } from "react";
+import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
+import { type JSX, useId, useState } from "react";
 
 import type definition from "./definition";
 import type { InventoryStockListGetResponseOutput } from "./definition";
 
-type StockRow = NonNullable<
-  InventoryStockListGetResponseOutput["stockLevels"]
->[number];
+type StockRow = InventoryStockListGetResponseOutput["stockLevels"][number];
 
-function stockStatusBadge(
-  row: StockRow,
-  lowStockLabel: string,
-  outOfStockLabel: string,
-  statusOkLabel: string,
-): JSX.Element | null {
-  if (row.quantityAvailable <= 0) {
-    return (
-      <Badge variant="destructive" className="text-xs h-5 px-2 shrink-0">
-        {outOfStockLabel}
-      </Badge>
-    );
-  }
-  if (row.isLowStock) {
-    return (
-      <Badge
-        variant="outline"
-        className="text-xs h-5 px-2 shrink-0 border-amber-500 text-amber-600 dark:text-amber-400"
-      >
-        {lowStockLabel}
-      </Badge>
-    );
-  }
-  return (
-    <Badge
-      variant="outline"
-      className="text-xs h-5 px-2 shrink-0 border-emerald-500 text-emerald-700 dark:text-emerald-400"
-    >
-      {statusOkLabel}
-    </Badge>
-  );
-}
-
-function quantityColorClass(row: StockRow): string {
-  if (row.quantityAvailable <= 0) {
-    return "text-red-600 dark:text-red-400 font-bold text-xl";
-  }
-  if (row.isLowStock) {
-    return "text-amber-600 dark:text-amber-400 font-bold text-xl";
-  }
-  return "text-emerald-700 dark:text-emerald-400 font-bold text-xl";
-}
-
-function StockItem({
-  row,
-  lowStockLabel,
-  outOfStockLabel,
-  statusOkLabel,
-  onHandLabel,
-  reservedLabel,
-  availableLabel,
-  reorderLabel,
-  bulletLabel,
-  onTransfer,
-  transferLabel,
-  onAdjust,
-  adjustLabel,
-  isPickerMode,
-  onPick,
-}: {
-  row: StockRow;
-  lowStockLabel: string;
-  outOfStockLabel: string;
-  statusOkLabel: string;
-  onHandLabel: string;
-  reservedLabel: string;
-  availableLabel: string;
-  reorderLabel: string;
-  bulletLabel: string;
-  onTransfer: (warehouseId: string, productId: string) => void;
-  transferLabel: string;
-  onAdjust: (warehouseId: string, productId: string) => void;
-  adjustLabel: string;
-  isPickerMode: boolean;
-  onPick: ((row: StockRow) => void) | undefined;
-}): JSX.Element {
-  return (
-    <Div
-      className={`flex items-center gap-4 py-3 px-4 border-b last:border-b-0 hover:bg-muted/20 transition-all${
-        row.quantityAvailable <= 0
-          ? " border-l-2 border-l-red-500"
-          : row.isLowStock
-            ? " border-l-2 border-l-amber-500"
-            : ""
-      }${isPickerMode ? " cursor-pointer" : ""}`}
-      onClick={isPickerMode && onPick ? () => onPick(row) : undefined}
-    >
-      {/* Product + warehouse info */}
-      <Div className="flex-1 min-w-0">
-        <Span className="block text-sm font-semibold truncate">
-          {row.productName ?? row.productId}
-        </Span>
-        <Div className="flex items-center gap-1.5 mt-0.5">
-          <Span className="text-xs text-muted-foreground">
-            {row.warehouseName ?? row.warehouseId}
-          </Span>
-          {row.reorderPoint !== null ? (
-            <>
-              <Span className="text-xs text-muted-foreground">
-                {bulletLabel}
-              </Span>
-              <Span className="text-xs text-muted-foreground">
-                {reorderLabel}: {row.reorderPoint}
-              </Span>
-            </>
-          ) : null}
-        </Div>
-      </Div>
-
-      {/* Quantities */}
-      <Div className="flex items-center gap-5 shrink-0 text-sm">
-        <Div className="flex flex-col items-end gap-0.5">
-          <Span className="text-xs text-muted-foreground">{onHandLabel}</Span>
-          <Span className="font-medium tabular-nums">{row.quantityOnHand}</Span>
-        </Div>
-        <Div className="flex flex-col items-end gap-0.5">
-          <Span className="text-xs text-muted-foreground">{reservedLabel}</Span>
-          <Span className="font-medium tabular-nums text-muted-foreground">
-            {row.quantityReserved}
-          </Span>
-        </Div>
-        <Div className="flex flex-col items-end gap-0.5">
-          <Span className="text-xs text-muted-foreground">
-            {availableLabel}
-          </Span>
-          <Span className={`tabular-nums ${quantityColorClass(row)}`}>
-            {row.quantityAvailable}
-          </Span>
-        </Div>
-        <Div className="w-24 flex justify-center">
-          {stockStatusBadge(row, lowStockLabel, outOfStockLabel, statusOkLabel)}
-        </Div>
-        {!isPickerMode && (
-          <>
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              className="h-7 px-2 text-xs shrink-0"
-              onClick={() => {
-                onAdjust(row.warehouseId, row.productId);
-              }}
-            >
-              {adjustLabel}
-            </Button>
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              className="h-7 px-2 text-xs shrink-0"
-              onClick={() => {
-                onTransfer(row.warehouseId, row.productId);
-              }}
-            >
-              {transferLabel}
-            </Button>
-          </>
-        )}
-      </Div>
-    </Div>
-  );
-}
-
-export function InventoryStockListWidget(
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  _props: {
-    field: (typeof definition.GET)["fields"];
-  },
-): JSX.Element {
+export function InventoryStockListWidget(): JSX.Element {
   const data = useWidgetValue<typeof definition.GET>();
-  const navigation = useWidgetNavigation();
-  const t = useWidgetTranslation<typeof definition.GET>();
-  const onPick = usePickerCallback<StockRow>();
-  const isPickerMode = !!onPick;
-
-  const handleAdjust = (warehouseId: string, productId: string): void => {
-    void (async (): Promise<void> => {
-      const def = await import("../adjust/definition");
-      navigation.push(def.default.POST, {
+  const form = useWidgetForm<typeof definition.GET>();
+  const locale = useWidgetLocale(),
+    t = useWidgetTranslation<typeof definition.GET>(),
+    navigation = useWidgetNavigation();
+  const response = useWidgetResponse();
+  const onPick = usePickerCallback<StockRow>(),
+    interactive = useWidgetIsInteractive();
+  const [search, setSearch] = useState(""),
+    [visibleCount, setVisibleCount] = useState(25);
+  const inputId = useId();
+  const number = new Intl.NumberFormat(locale);
+  const receive = (): void => {
+    void import("../receive/definition").then((mod) =>
+      navigation.push(mod.default.POST, {
         data: {
-          warehouseId,
-          productId,
-          quantity: undefined,
-          reason: undefined,
+          warehouseId: form.getValues("warehouseId"),
+          productId: form.getValues("productId"),
         },
-        popNavigationOnSuccess: 1,
-      });
-    })();
-  };
-
-  const handleTransfer = (warehouseId: string, productId: string): void => {
-    void (async (): Promise<void> => {
-      const def = await import("../../transfer/create/definition");
-      navigation.push(def.default.POST, {
-        data: {
-          fromWarehouseId: warehouseId,
-          items: [{ productId, quantityRequested: 1 }],
-        },
-      });
-    })();
-  };
-
-  const rows = data?.stockLevels ?? [];
-  const lowStockCount = rows.filter((r) => r.isLowStock).length;
-  const outOfStockCount = rows.filter((r) => r.quantityAvailable <= 0).length;
-
-  // Loading state
-  if (!data) {
-    return (
-      <Div className="max-w-2xl mx-auto w-full px-4 pt-8 pb-6 flex items-center justify-center py-12 text-muted-foreground">
-        <Loader2 className="h-5 w-5 animate-spin mr-2" />
-        <Span className="text-sm">{t("stockList.get.widget.loading")}</Span>
-      </Div>
+      }),
     );
-  }
-
-  return (
-    <Div className="max-w-2xl mx-auto w-full px-4 pt-8 pb-6 flex flex-col gap-4">
-      {navigation.canGoBack && (
+  };
+  const adjust = (row: StockRow): void => {
+    void import("../adjust/definition").then((mod) =>
+      navigation.push(mod.default.POST, {
+        data: { warehouseId: row.warehouseId, productId: row.productId },
+        popNavigationOnSuccess: 1,
+      }),
+    );
+  };
+  const transfer = (row: StockRow): void => {
+    void import("../../transfer/create/definition").then((mod) =>
+      navigation.push(mod.default.POST, {
+        data: {
+          companyId: row.companyId,
+          fromWarehouseId: row.warehouseId,
+          items: [{ productId: row.productId, quantityRequested: 1 }],
+        },
+      }),
+    );
+  };
+  const actions = (row: StockRow): JSX.Element | null =>
+    interactive && !onPick ? (
+      <Div className="flex flex-wrap gap-1">
         <Button
           type="button"
-          variant="ghost"
           size="sm"
-          onClick={() => {
-            navigation.pop();
-          }}
-          className="self-start gap-1.5 -ml-1"
+          variant="ghost"
+          onClick={() => adjust(row)}
         >
-          <ChevronLeft className="h-4 w-4" />
-          {t("stockList.get.widget.back")}
+          {t("stockList.get.widget.adjust")}
         </Button>
-      )}
-
-      {/* Alert banner for low/out-of-stock */}
-      {outOfStockCount > 0 || lowStockCount > 0 ? (
-        <Div className="flex items-center gap-3 px-4 py-3 rounded-lg border border-amber-300 bg-amber-50 dark:border-amber-800 dark:bg-amber-950/30">
-          <Span className="text-amber-700 dark:text-amber-400 text-sm font-medium">
-            {outOfStockCount > 0 ? (
-              <>
-                {outOfStockCount} {t("stockList.get.widget.outOfStock")}
-                {lowStockCount > 0
-                  ? t("stockList.get.widget.bulletSeparator")
-                  : null}{" "}
-              </>
-            ) : null}
-            {lowStockCount > 0 ? (
-              <>
-                {lowStockCount} {t("stockList.get.widget.belowReorderPoint")}
-              </>
-            ) : null}
-          </Span>
-        </Div>
-      ) : null}
-
-      {/* Header */}
-      <Div className="flex items-center justify-between">
-        <Span className="text-sm font-medium">
-          {rows.length} {t("stockList.get.widget.total")}
-        </Span>
+        <Button
+          type="button"
+          size="sm"
+          variant="ghost"
+          onClick={() => transfer(row)}
+        >
+          {t("stockList.get.widget.transfer")}
+        </Button>
       </Div>
-
-      {/* Stock table */}
-      {rows.length > 0 ? (
-        <Div className="rounded-lg border overflow-hidden">
-          <Div className="flex items-center gap-4 px-4 py-2 bg-muted/40 border-b text-xs font-medium text-muted-foreground uppercase tracking-wide">
-            <Span className="flex-1">
-              {t("stockList.get.response.productName")}
-            </Span>
-            <Div className="flex items-center gap-5 shrink-0">
-              <Span className="w-14 text-right">
-                {t("stockList.get.widget.onHand")}
-              </Span>
-              <Span className="w-16 text-right">
-                {t("stockList.get.widget.reserved")}
-              </Span>
-              <Span className="w-16 text-right">
-                {t("stockList.get.widget.available")}
-              </Span>
-              <Span className="w-24 text-center">
-                {t("stockList.get.response.isLowStock")}
-              </Span>
-              <Span className="w-16" />
+    ) : null;
+  const status = (row: StockRow): JSX.Element => (
+    <Badge
+      variant={
+        row.quantityAvailable <= 0
+          ? "destructive"
+          : row.isLowStock
+            ? "warning"
+            : "success"
+      }
+    >
+      {row.quantityAvailable <= 0
+        ? t("stockList.get.widget.outOfStock")
+        : row.isLowStock
+          ? t("stockList.get.widget.lowStock")
+          : t("stockList.get.widget.statusOk")}
+    </Badge>
+  );
+  const rows = data?.stockLevels ?? [],
+    query = search.trim().toLocaleLowerCase(locale);
+  const matching = query
+    ? rows.filter((row) =>
+        [row.productName, row.warehouseName].some((name) =>
+          name?.toLocaleLowerCase(locale).includes(query),
+        ),
+      )
+    : rows;
+  const visible = interactive ? matching.slice(0, visibleCount) : matching;
+  const receiveButton =
+    interactive && !onPick ? (
+      <Button type="button" size="sm" onClick={receive}>
+        {t("stockReceive.post.title")}
+      </Button>
+    ) : undefined;
+  const cost = (row: StockRow): string =>
+    row.currency && row.unitCost !== null
+      ? formatMoney(row.unitCost, row.currency, locale)
+      : "";
+  const title = (row: StockRow): string =>
+    row.productName ?? t("stockList.get.widget.unnamedProduct");
+  return (
+    <WidgetShell layout="page">
+      <WidgetHeader
+        size="page"
+        title={t("stockList.get.title")}
+        subtitle={t("stockList.get.description")}
+        actions={receiveButton}
+      />
+      <FormAlertWidget field={{}} />
+      {!data && response?.success !== false && (
+        <LoadingBlock message={t("stockList.get.widget.loading")} />
+      )}
+      {data && (
+        <>
+          {interactive && rows.length > 0 && (
+            <Div className="flex max-w-sm flex-col gap-1">
+              <Label htmlFor={inputId}>
+                {t("stockList.get.widget.search")}
+              </Label>
+              <Input
+                id={inputId}
+                value={search}
+                onChangeText={(value) => {
+                  setSearch(value);
+                  setVisibleCount(25);
+                }}
+              />
             </Div>
-          </Div>
-          {rows.map((row) => (
-            <StockItem
-              key={row.id}
-              row={row}
-              lowStockLabel={t("stockList.get.widget.lowStock")}
-              outOfStockLabel={t("stockList.get.widget.outOfStock")}
-              statusOkLabel={t("stockList.get.widget.statusOk")}
-              onHandLabel={t("stockList.get.widget.onHand")}
-              reservedLabel={t("stockList.get.widget.reserved")}
-              availableLabel={t("stockList.get.widget.available")}
-              reorderLabel={t("stockList.get.response.reorderPoint")}
-              bulletLabel={t("stockList.get.widget.bulletSeparator")}
-              onAdjust={handleAdjust}
-              adjustLabel={t("stockList.get.widget.adjust")}
-              onTransfer={handleTransfer}
-              transferLabel={t("stockList.get.widget.transfer")}
-              isPickerMode={isPickerMode}
-              onPick={onPick}
+          )}
+          {visible.length > 0 ? (
+            <RecordTable
+              label={t("stockList.get.title")}
+              columns={[
+                {
+                  id: "product",
+                  label: t("stockList.get.response.productName"),
+                },
+                {
+                  id: "warehouse",
+                  label: t("stockList.get.response.warehouseName"),
+                },
+                {
+                  id: "onHand",
+                  label: t("stockList.get.widget.onHand"),
+                  numeric: true,
+                },
+                {
+                  id: "reserved",
+                  label: t("stockList.get.widget.reserved"),
+                  numeric: true,
+                },
+                {
+                  id: "available",
+                  label: t("stockList.get.widget.available"),
+                  numeric: true,
+                },
+                {
+                  id: "cost",
+                  label: t("stockList.get.response.unitCost"),
+                  numeric: true,
+                },
+                {
+                  id: "value",
+                  label: t("stockList.get.widget.stockValue"),
+                  numeric: true,
+                },
+                { id: "status", label: t("stockList.get.widget.stockStatus") },
+                { id: "actions", label: t("stockList.get.widget.actions") },
+              ]}
+              rows={visible.map((row) => {
+                const product = onPick ? (
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => onPick(row)}
+                  >
+                    {title(row)}
+                  </Button>
+                ) : (
+                  title(row)
+                );
+                return {
+                  id: row.id,
+                  cells: {
+                    product,
+                    warehouse: row.warehouseName,
+                    onHand: number.format(row.quantityOnHand),
+                    reserved: number.format(row.quantityReserved),
+                    available: number.format(row.quantityAvailable),
+                    cost: cost(row),
+                    value:
+                      row.currency && typeof row.stockValue === "number"
+                        ? formatMoney(row.stockValue, row.currency, locale)
+                        : "",
+                    status: status(row),
+                    actions: actions(row),
+                  },
+                };
+              })}
+              compact={
+                <Div className="flex flex-col gap-2">
+                  {visible.map((row) => (
+                    <Div
+                      key={row.id}
+                      className="flex flex-col gap-2 rounded-lg border bg-card p-3"
+                    >
+                      <Div className="flex flex-wrap items-center justify-between gap-2">
+                        {onPick ? (
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => onPick(row)}
+                          >
+                            {title(row)}
+                          </Button>
+                        ) : (
+                          <Span className="font-semibold">{title(row)}</Span>
+                        )}
+                        {status(row)}
+                      </Div>
+                      <Span className="text-sm text-muted-foreground">
+                        {row.warehouseName}
+                      </Span>
+                      <Div className="grid grid-cols-2 gap-1 text-sm">
+                        <Span>{t("stockList.get.widget.available")}</Span>
+                        <Span className="text-right font-semibold tabular-nums">
+                          {number.format(row.quantityAvailable)}
+                        </Span>
+                        <Span>{t("stockList.get.widget.reserved")}</Span>
+                        <Span className="text-right tabular-nums">
+                          {number.format(row.quantityReserved)}
+                        </Span>
+                        {typeof row.stockValue === "number" && row.currency && (
+                          <>
+                            <Span>{t("stockList.get.widget.stockValue")}</Span>
+                            <Span className="text-right tabular-nums">
+                              {formatMoney(
+                                row.stockValue,
+                                row.currency,
+                                locale,
+                              )}
+                            </Span>
+                          </>
+                        )}
+                        {row.unitCost !== null && row.currency && (
+                          <>
+                            <Span>{t("stockList.get.response.unitCost")}</Span>
+                            <Span className="text-right tabular-nums">
+                              {cost(row)}
+                            </Span>
+                          </>
+                        )}
+                      </Div>
+                      {actions(row)}
+                    </Div>
+                  ))}
+                </Div>
+              }
             />
-          ))}
-        </Div>
-      ) : null}
-
-      {/* Empty state */}
-      {rows.length === 0 ? (
-        <Div className="flex flex-col items-center gap-3 py-16 text-center border rounded-lg border-dashed">
-          <Div
-            className="w-12 h-12 rounded-full bg-muted flex items-center justify-center text-2xl select-none"
-            aria-hidden="true"
-          >
-            {t("stockList.get.widget.emptyIcon")}
-          </Div>
-          <Div className="flex flex-col gap-1">
-            <Span className="text-sm font-semibold">
-              {t("stockList.get.widget.empty")}
-            </Span>
-            <Span className="text-xs text-muted-foreground">
-              {t("stockList.get.widget.emptyHint")}
-            </Span>
-          </Div>
-        </Div>
-      ) : null}
-    </Div>
+          ) : (
+            <EmptyBlock
+              title={
+                query
+                  ? t("stockList.get.widget.noMatches")
+                  : t("stockList.get.widget.empty")
+              }
+              message={query ? undefined : t("stockList.get.widget.emptyHint")}
+            />
+          )}
+          {visible.length < matching.length && (
+            <Button
+              type="button"
+              variant="outline"
+              className="self-start"
+              onClick={() => setVisibleCount((count) => count + 25)}
+            >
+              {t("stockList.get.widget.loadMore")}
+            </Button>
+          )}
+        </>
+      )}
+    </WidgetShell>
   );
 }

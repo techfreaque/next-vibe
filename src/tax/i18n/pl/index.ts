@@ -115,7 +115,7 @@ export const translations: typeof enTranslations = {
         empty:
           "Brak skonfigurowanych stawek podatkowych. Dodaj pierwszą stawkę.",
         emptySetup:
-          "Brak stawek podatkowych. Każda faktura wymaga stawki podatkowej — skonfiguruj teraz.",
+          "Dodaj stawki podatkowe stosowane na fakturach Twojej firmy.",
         columnRate: "Stawka podatkowa",
         columnTypeRateActions: "Typ / Stawka / Status",
         backToCatalog: "← Produkty",
@@ -331,14 +331,28 @@ export const translations: typeof enTranslations = {
   },
 
   report: {
-    title: "Raport podatkowy",
-    titleShort: "Raport podatkowy",
-    description: "Podatki zestawione według stawki i okresu",
+    title: "Podatek według stawki",
+    titleShort: "Podatek według stawki",
+    description:
+      "Sprawdź podatek zapisany na fakturach sprzedaży, korektach, fakturach zakupu i paragonach.",
     widget: {
-      columnRate: "Stawka",
-      total: "Łącznie",
-      empty: "Brak danych podatkowych dla tego okresu.",
+      scope:
+        "Dla faktur sprzedaży obowiązuje data powiązanego księgowania lub data utworzenia. Zakupy liczymy według daty faktury. Sprzedaż kasową liczymy według daty zakończenia (UTC) i uwzględniamy pozycje z dodatnią stawką lub zapisaną kwotą podatku. Jeśli wystawiona faktura ma to samo księgowanie, ujmujemy sprzedaż na fakturze.",
+      empty: "Brak pozycji dokumentów spełniających kryteria.",
+      range: "{{from}} do {{to}}",
+      total: "Razem",
+      previousMonth: "Pokaż poprzedni miesiąc",
+      unknownRate: "Nie można ustalić stawki",
+      run: "Utwórz raport",
+      running: "Tworzenie raportu…",
+      selectCompany: "Wybierz firmę dla tego raportu.",
     },
+    currency: {
+      label: "Waluta",
+      placeholder: "Waluta firmy",
+      description: "Domyślnie używamy waluty firmy.",
+    },
+    currencies: { EUR: "EUR", PLN: "PLN", USD: "USD" },
     companyId: {
       label: "Firma",
       description: "Firma, dla której ma zostać wygenerowany raport",
@@ -347,21 +361,20 @@ export const translations: typeof enTranslations = {
     dateFrom: {
       label: "Od",
       description: "Data początkowa okresu raportu",
-      placeholder: "2024-01-01",
+      placeholder: "Początek miesiąca",
     },
     dateTo: {
       label: "Do",
       description: "Data końcowa okresu raportu",
-      placeholder: "2024-12-31",
+      placeholder: "Dzisiaj",
     },
     response: {
       rows: "Wiersze raportu",
       row: {
-        taxRateCode: "Kod stawki podatkowej",
-        taxRateName: "Nazwa stawki podatkowej",
+        direction: "Rodzaj dokumentu",
+        rate: "Stawka podatku",
         taxableAmount: "Podstawa opodatkowania",
         taxAmount: "Kwota podatku",
-        period: "Okres",
       },
     },
     success: {
@@ -371,7 +384,7 @@ export const translations: typeof enTranslations = {
     errors: {
       validation: {
         title: "Błąd walidacji",
-        description: "Sprawdź swoje dane i spróbuj ponownie",
+        description: "Data końcowa nie może być wcześniejsza niż początkowa.",
       },
       unauthorized: {
         title: "Brak autoryzacji",
@@ -403,6 +416,12 @@ export const translations: typeof enTranslations = {
   },
 
   enums: {
+    reportDirection: {
+      posSales: "Sprzedaż kasowa",
+      sales: "Faktury sprzedaży",
+      creditNotes: "Korekty sprzedaży",
+      purchases: "Faktury zakupu",
+    },
     taxType: {
       vat: "VAT",
       gst: "GST",

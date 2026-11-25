@@ -5,7 +5,16 @@
 
 import "server-only";
 
-import { and, countDistinct, eq, gt, inArray, lt, lte, or } from "drizzle-orm";
+import {
+  and,
+  asc,
+  countDistinct,
+  eq,
+  inArray,
+  isNull,
+  or,
+  sql,
+} from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
@@ -21,6 +30,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import { companyMembers } from "@/companies/db";
 import { CompanyMemberRole } from "@/companies/enum";
 import { CompanyAuthRepository } from "@/companies/repository";
+import { catalogProducts } from "@/products/db";
 
 import { stockLevels, warehouses, warehouseTransfers } from "../db";
 import { scopedTranslation } from "../i18n";
@@ -104,73 +114,80 @@ export class InventoryDashboardRepository {
         });
       }
 
-      const [inStockRows, outOfStockRows, lowStockRows, transferRows] =
-        await Promise.all([
-          // In Stock: distinct products with quantityOnHand > 0 in any company warehouse
-          db
-            .select({ count: countDistinct(stockLevels.productId) })
-            .from(stockLevels)
-            .where(
-              and(
-                inArray(stockLevels.warehouseId, warehouseIds),
-                gt(stockLevels.quantityOnHand, 0),
-              ),
+      const available = sql`${stockLevels.quantityOnHand} - ${stockLevels.quantityReserved}`;
+      const products = db
+        .select({
+          productId: stockLevels.productId,
+          companyId: warehouses.companyId,
+          available: sql<string>`sum(${available})`.as("available"),
+          low: sql<boolean>`bool_or(case when ${stockLevels.reorderPoint} is not null then ${available} <= ${stockLevels.reorderPoint}
+          else ${available} < ${LOW_STOCK_FALLBACK_THRESHOLD} end)`.as("low"),
+        })
+        .from(stockLevels)
+        .innerJoin(warehouses, eq(warehouses.id, stockLevels.warehouseId))
+        .where(inArray(warehouses.id, warehouseIds))
+        .groupBy(warehouses.companyId, stockLevels.productId)
+        .as("product_totals");
+      const [[health], transferRows, attention] = await Promise.all([
+        db
+          .select({
+            inStock: sql<number>`count(*) filter (where ${products.available} > 0)::int`,
+            outOfStock: sql<number>`count(*) filter (where ${products.available} <= 0)::int`,
+            lowStock: sql<number>`count(*) filter (where ${products.available} > 0 and ${products.low})::int`,
+          })
+          .from(products),
+        db
+          .select({ count: countDistinct(warehouseTransfers.id) })
+          .from(warehouseTransfers)
+          .where(
+            and(
+              inArray(warehouseTransfers.companyId, companyIds),
+              eq(warehouseTransfers.status, "IN_TRANSIT"),
             ),
-
-          // Out of stock: distinct products with quantityOnHand <= 0 across all warehouses
-          db
-            .select({ count: countDistinct(stockLevels.productId) })
-            .from(stockLevels)
-            .where(
-              and(
-                inArray(stockLevels.warehouseId, warehouseIds),
-                lte(stockLevels.quantityOnHand, 0),
-              ),
-            ),
-
-          // Low stock: below reorderPoint where set, else below fallback threshold
-          // Products where quantityOnHand > 0 but below the low stock threshold
-          db
-            .select({ count: countDistinct(stockLevels.productId) })
-            .from(stockLevels)
-            .where(
-              and(
-                inArray(stockLevels.warehouseId, warehouseIds),
-                gt(stockLevels.quantityOnHand, 0),
-                or(
-                  // Has reorder point set and is below it
-                  and(
-                    gt(stockLevels.reorderPoint, 0),
-                    lt(stockLevels.quantityOnHand, stockLevels.reorderPoint),
-                  ),
-                  // No reorder point: below fallback threshold
-                  and(
-                    lte(stockLevels.reorderPoint, 0),
-                    lt(
-                      stockLevels.quantityOnHand,
-                      LOW_STOCK_FALLBACK_THRESHOLD,
-                    ),
-                  ),
+          ),
+        db
+          .select({
+            id: stockLevels.id,
+            companyId: warehouses.companyId,
+            warehouseId: warehouses.id,
+            warehouseName: warehouses.name,
+            productId: stockLevels.productId,
+            productName: catalogProducts.name,
+            available: sql<number>`${available}`.mapWith(Number),
+          })
+          .from(stockLevels)
+          .innerJoin(warehouses, eq(warehouses.id, stockLevels.warehouseId))
+          .leftJoin(
+            catalogProducts,
+            and(
+              eq(catalogProducts.id, stockLevels.productId),
+              or(
+                eq(catalogProducts.companyId, warehouses.companyId),
+                and(
+                  isNull(catalogProducts.companyId),
+                  eq(catalogProducts.ownerUserId, userId),
                 ),
               ),
             ),
-
-          // Pending transfers (IN_TRANSIT status) for these companies
-          db
-            .select({ count: countDistinct(warehouseTransfers.id) })
-            .from(warehouseTransfers)
-            .where(
-              and(
-                inArray(warehouseTransfers.companyId, companyIds),
-                eq(warehouseTransfers.status, "IN_TRANSIT"),
-              ),
+          )
+          .where(
+            and(
+              inArray(warehouses.id, warehouseIds),
+              sql`(${available} <= 0 OR (case when ${stockLevels.reorderPoint} is null then ${available} < ${LOW_STOCK_FALLBACK_THRESHOLD} else ${available} <= ${stockLevels.reorderPoint} end))`,
             ),
-        ]);
-
+          )
+          .orderBy(
+            asc(available),
+            asc(catalogProducts.name),
+            asc(stockLevels.id),
+          )
+          .limit(8),
+      ]);
       return success({
-        inStockCount: inStockRows[0]?.count ?? 0,
-        outOfStockCount: outOfStockRows[0]?.count ?? 0,
-        lowStockCount: lowStockRows[0]?.count ?? 0,
+        attention,
+        inStockCount: health?.inStock ?? 0,
+        outOfStockCount: health?.outOfStock ?? 0,
+        lowStockCount: health?.lowStock ?? 0,
         pendingTransferCount: transferRows[0]?.count ?? 0,
         warehouseCount: warehouseIds.length,
       });

@@ -19,6 +19,7 @@ export const translations: typeof enTranslations = {
       success: "Position hinzugefügt",
       message: "Statusmeldung",
       line: {
+        currency: "Währung",
         title: "Positionsdetails",
         subtitle: "Erstellte Rechnungsposition",
         id: "Positions-ID",
@@ -113,7 +114,7 @@ export const translations: typeof enTranslations = {
     searchPlaceholder: "Name oder SKU…",
     searchButton: "Suchen",
     clearProduct: "Löschen",
-    noProductResults: "Keine Treffer — unten manuell eingeben.",
+    noProductResults: "Keine Treffer. Geben Sie die Artikeldaten unten ein.",
     orManual: "Oder manuell eingeben",
     multiplier: "×",
     taxLabel: "Steuer",

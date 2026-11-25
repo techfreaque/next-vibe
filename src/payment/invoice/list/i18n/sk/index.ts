@@ -16,6 +16,7 @@ export const translations: typeof enTranslations = {
       description: "Filtrovať zoznam faktúr",
     },
     response: {
+      customerName: "Zákazník",
       total: "Spolu",
       invoices: "Faktúry",
       id: "ID faktúry",
@@ -92,13 +93,13 @@ export const translations: typeof enTranslations = {
   },
   search: {
     label: "Hľadať doklady",
-    description:
-      "Vyhľadávajte podľa čísla dokladu, ID faktúry alebo ID odberateľa. Výsledky môžete filtrovať podľa firmy alebo stavu.",
-    placeholder: "Číslo dokladu alebo ID",
+    description: "Vyhľadávajte podľa čísla faktúry, mena zákazníka alebo ID.",
+    placeholder: "Číslo faktúry alebo zákazník",
   },
   status: {
     label: "Stav",
-    description: "Filtrovať podľa stavu faktúry",
+    description:
+      "Filtrujte podľa stavu alebo zobrazte faktúry po splatnosti so zostatkom na úhradu.",
     placeholder: "Všetky stavy",
   },
   customerId: {
@@ -115,6 +116,8 @@ export const translations: typeof enTranslations = {
     description: "Počet výsledkov na strane",
   },
   widget: {
+    filters: "Filtre",
+    partlyPaid: "Čiastočne uhradená",
     pageCount: "Počet strán",
     title: "Vydané faktúry",
     newInvoice: "Nová faktúra",

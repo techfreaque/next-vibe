@@ -4,16 +4,36 @@ import { Badge } from "next-vibe/ui/components/badge";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { Span } from "next-vibe/ui/components/span";
+import { WidgetHeader } from "next-vibe/ui/components/widget-header";
+import { WidgetShell } from "next-vibe/ui/components/widget-shell";
 import {
+  formatDocDate,
+  formatMoney,
+} from "next-vibe/unified-ui/_shared/format-money";
+import {
+  useWidgetForm,
+  useWidgetIsInteractive,
+  useWidgetLocale,
   useWidgetNavigation,
+  useWidgetResponse,
+  useWidgetResponseOnly,
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
+import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-field/widget";
+import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import type { JSX } from "react";
 
+import { formatAccountingDateInput } from "../../shared/calendar-date";
 import type definition from "./definition";
 import type { BalanceSheetResponseOutput } from "./definition";
+import {
+  reportAmountClass,
+  ReportCompanyPicker,
+  ReportDateFilter,
+  ReportMenu,
+  ReportPeriodMenu,
+} from "./report-controls";
 
 interface BalanceSheetWidgetProps {
   field: (typeof definition.GET)["fields"];
@@ -23,22 +43,13 @@ type BalanceSheetItem = NonNullable<
   BalanceSheetResponseOutput["assets"]
 >[number];
 
-function formatAmount(n: number): string {
-  return new Intl.NumberFormat(undefined, {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(n);
-}
-
-function formatDate(d: Date): string {
-  return d.toLocaleDateString();
-}
-
 function AccountLine({
+  formatAmount,
   item,
   subtypeLabel,
   onDrill,
 }: {
+  formatAmount: (value: number) => string;
   item: BalanceSheetItem;
   subtypeLabel: string;
   onDrill: (accountId: string) => () => void;
@@ -58,7 +69,9 @@ function AccountLine({
       <Span className="text-xs text-muted-foreground hidden sm:block">
         {subtypeLabel}
       </Span>
-      <Span className="font-mono text-right w-24 shrink-0">
+      <Span
+        className={`shrink-0 text-right ${reportAmountClass(item.balance)}`}
+      >
         {formatAmount(item.balance)}
       </Span>
     </Div>
@@ -66,16 +79,20 @@ function AccountLine({
 }
 
 function Section({
+  formatAmount,
   title,
   items,
+  extraLine,
   total,
   totalLabel,
   noEntriesLabel,
   getSubtypeLabel,
   onDrill,
 }: {
+  formatAmount: (value: number) => string;
   title: string;
   items: BalanceSheetItem[];
+  extraLine?: { label: string; amount: number };
   total: number;
   totalLabel: string;
   noEntriesLabel: string;
@@ -84,12 +101,13 @@ function Section({
 }): JSX.Element {
   return (
     <Div className="rounded-md border overflow-hidden flex-1">
-      <Div className="px-3 py-2 bg-muted/50 border-b text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+      <Div className="px-3 py-2 bg-muted/50 border-b text-xs font-semibold text-muted-foreground">
         {title}
       </Div>
-      {items.length > 0 ? (
+      {items.length > 0 || extraLine ? (
         items.map((item) => (
           <AccountLine
+            formatAmount={formatAmount}
             key={item.code}
             item={item}
             subtypeLabel={getSubtypeLabel(item.subtype)}
@@ -101,9 +119,17 @@ function Section({
           {noEntriesLabel}
         </Div>
       )}
+      {extraLine && (
+        <Div className="flex items-center justify-between gap-2 border-b px-3 py-2 text-sm">
+          <Span>{extraLine.label}</Span>
+          <Span className={reportAmountClass(extraLine.amount)}>
+            {formatAmount(extraLine.amount)}
+          </Span>
+        </Div>
+      )}
       <Div className="flex items-center justify-between px-3 py-2 border-t bg-muted/30 text-sm font-semibold">
         <Span>{totalLabel}</Span>
-        <Span className="font-mono">{formatAmount(total)}</Span>
+        <Span className={reportAmountClass(total)}>{formatAmount(total)}</Span>
       </Div>
     </Div>
   );
@@ -111,39 +137,28 @@ function Section({
 
 export function BalanceSheetWidget(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  _props: BalanceSheetWidgetProps,
+  { field: { children } }: BalanceSheetWidgetProps,
 ): JSX.Element {
   const data = useWidgetValue<typeof definition.GET>();
   const t = useWidgetTranslation<typeof definition.GET>();
   const navigation = useWidgetNavigation();
-
-  const handleNavProfitLoss = (): void => {
-    void (async (): Promise<void> => {
-      const def = await import("../profit-loss/definition");
-      navigation.push(def.default.GET, {});
-    })();
-  };
-
-  const handleNavTrialBalance = (): void => {
-    void (async (): Promise<void> => {
-      const def = await import("../trial-balance/definition");
-      navigation.push(def.default.GET, {});
-    })();
-  };
-
-  const handleNavTaxReport = (): void => {
-    void (async (): Promise<void> => {
-      const def = await import("../tax-report/definition");
-      navigation.push(def.default.GET, {});
-    })();
-  };
-
-  const handleNavReceivablesAging = (): void => {
-    void (async (): Promise<void> => {
-      const def = await import("../receivables-aging/definition");
-      navigation.push(def.default.GET, {});
-    })();
-  };
+  const form = useWidgetForm<typeof definition.GET>();
+  const locale = useWidgetLocale();
+  const response = useWidgetResponse();
+  const interactive = useWidgetIsInteractive();
+  const responseOnly = useWidgetResponseOnly();
+  const showInputs = interactive && !responseOnly;
+  const companyId = form.watch("companyId");
+  const requestedCurrency = form.watch("currency")?.trim().toUpperCase();
+  const asOf = formatAccountingDateInput(form.watch("asOfDate"));
+  const ready =
+    response?.success !== false &&
+    (!showInputs ||
+      ((!companyId || data?.reportCompanyId === companyId) &&
+        (!asOf || asOf === formatAccountingDateInput(data?.asOfDateResponse)) &&
+        (!requestedCurrency || data?.reportCurrency === requestedCurrency)));
+  const formatAmount = (value: number): string =>
+    formatMoney(value, data?.reportCurrency, locale);
 
   const handleAccountDrill = (accountId: string): (() => void) => {
     return (): void => {
@@ -158,39 +173,68 @@ export function BalanceSheetWidget(
   };
 
   return (
-    <Div className="flex flex-col gap-4">
-      <Div className="flex items-center justify-between gap-3 flex-wrap">
-        <SubmitButtonWidget<typeof definition.GET>
-          field={{
-            size: "sm",
-            variant: "default",
-            text: "reports.widget.run" as const,
-            loadingText: "reports.widget.running" as const,
-          }}
-        />
-        <Div className="flex gap-1 flex-wrap">
-          <Button size="sm" variant="ghost" onClick={handleNavProfitLoss}>
-            {t("reports.nav.profitLoss")}
-          </Button>
-          <Button size="sm" variant="ghost" onClick={handleNavTrialBalance}>
-            {t("reports.nav.trialBalance")}
-          </Button>
-          <Button size="sm" variant="ghost" onClick={handleNavTaxReport}>
-            {t("reports.nav.taxReport")}
-          </Button>
-          <Button size="sm" variant="ghost" onClick={handleNavReceivablesAging}>
-            {t("reports.nav.receivablesAging")}
-          </Button>
+    <WidgetShell layout="page">
+      <WidgetHeader
+        size="page"
+        title={t("balanceSheet.title")}
+        subtitle={t("balanceSheet.description")}
+        actions={
+          interactive && (
+            <ReportMenu
+              current="balanceSheet"
+              companyId={companyId || data?.reportCompanyId}
+            />
+          )
+        }
+      />
+      {showInputs && (
+        <Div className="flex flex-wrap items-end gap-2 rounded-md border bg-card p-3">
+          <ReportCompanyPicker
+            selectedId={companyId}
+            reportId={data?.reportCompanyId}
+            reportName={data?.reportCompanyName}
+            onChange={(id) =>
+              form.setValue("companyId", id, { shouldDirty: true })
+            }
+          />
+          <Div className="w-40">
+            <TextFieldWidget
+              fieldName="currency"
+              field={{
+                ...children.currency,
+                description: undefined,
+                placeholder: "reports.widget.autoCurrency",
+              }}
+            />
+          </Div>
+          <ReportDateFilter
+            id="report-as-of"
+            label={t("balanceSheet.asOfDate.label")}
+            day={asOf ?? formatAccountingDateInput(data?.asOfDateResponse)}
+            onChange={(date) =>
+              form.setValue("asOfDate", date, { shouldDirty: true })
+            }
+          />
+          <ReportPeriodMenu
+            onChange={({ to: end }) =>
+              form.setValue("asOfDate", end, { shouldDirty: true })
+            }
+          />
         </Div>
-      </Div>
-
-      {data?.assets !== undefined ? (
+      )}
+      <FormAlertWidget field={{}} />
+      {ready && data?.reportCurrency && (
+        <Span className="text-sm font-medium">
+          {t("reports.currency")} {data.reportCurrency}
+        </Span>
+      )}
+      {ready && data?.assets !== undefined ? (
         <Div className="flex flex-col gap-4">
           {data.asOfDateResponse && (
             <Div className="flex items-center justify-between">
               <Span className="text-sm text-muted-foreground">
                 {t("balanceSheet.widget.asOf")}{" "}
-                {formatDate(data.asOfDateResponse)}
+                {formatDocDate(data.asOfDateResponse, locale)}
               </Span>
               {data.isBalanced !== undefined && (
                 <Badge
@@ -207,6 +251,7 @@ export function BalanceSheetWidget(
 
           <Div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <Section
+              formatAmount={formatAmount}
               title={t("balanceSheet.response.assets")}
               items={data.assets}
               total={data.totalAssets ?? 0}
@@ -220,6 +265,7 @@ export function BalanceSheetWidget(
 
             <Div className="flex flex-col gap-4">
               <Section
+                formatAmount={formatAmount}
                 title={t("balanceSheet.response.liabilities")}
                 items={data.liabilities}
                 total={data.totalLiabilities ?? 0}
@@ -231,8 +277,17 @@ export function BalanceSheetWidget(
                 onDrill={handleAccountDrill}
               />
               <Section
+                formatAmount={formatAmount}
                 title={t("balanceSheet.response.equity")}
                 items={data.equity}
+                extraLine={
+                  data.unclosedEarnings
+                    ? {
+                        label: t("balanceSheet.response.unclosedEarnings"),
+                        amount: data.unclosedEarnings,
+                      }
+                    : undefined
+                }
                 total={data.totalEquity ?? 0}
                 totalLabel={t("balanceSheet.response.totalEquity")}
                 noEntriesLabel={t("balanceSheet.widget.noEntries")}
@@ -243,7 +298,11 @@ export function BalanceSheetWidget(
               />
               <Div className="rounded-md border px-3 py-2 flex items-center justify-between text-sm font-semibold bg-muted/30">
                 <Span>{t("balanceSheet.widget.liabilitiesAndEquity")}</Span>
-                <Span className="font-mono">
+                <Span
+                  className={reportAmountClass(
+                    (data.totalLiabilities ?? 0) + (data.totalEquity ?? 0),
+                  )}
+                >
                   {formatAmount(
                     (data.totalLiabilities ?? 0) + (data.totalEquity ?? 0),
                   )}
@@ -252,11 +311,13 @@ export function BalanceSheetWidget(
             </Div>
           </Div>
         </Div>
-      ) : (
+      ) : response?.success === false ? null : (
         <Div className="text-center py-10 text-sm text-muted-foreground border border-dashed rounded-md">
-          {t("balanceSheet.widget.selectCompany")}
+          {companyId || data?.reportCompanyId
+            ? t("reports.widget.running")
+            : t("balanceSheet.widget.selectCompany")}
         </Div>
       )}
-    </Div>
+    </WidgetShell>
   );
 }

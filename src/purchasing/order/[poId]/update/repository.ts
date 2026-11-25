@@ -15,14 +15,16 @@ import {
   success,
 } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
-import { db } from "next-vibe/database";
 import type { EndpointLogger } from "next-vibe/logger/types";
-
-import { CompanyMemberRole } from "@/companies/enum";
-import { CompanyAuthRepository } from "@/companies/repository";
 
 import { purchaseOrderLines, purchaseOrders } from "../../../db";
 import { scopedTranslation } from "../../../i18n";
+import {
+  purchaseLineAmounts,
+  purchaseTotals,
+  validOrderReferences,
+  withDraftOrder,
+} from "../../draft";
 import type {
   OrderUpdateRequestOutput,
   OrderUpdateResponseOutput,
@@ -39,128 +41,98 @@ export class OrderUpdateRepository {
     const { t } = scopedTranslation.scopedT(locale);
 
     try {
-      const [po] = await db
-        .select()
-        .from(purchaseOrders)
-        .where(eq(purchaseOrders.id, poId))
-        .limit(1);
-
-      if (!po) {
-        return fail({
-          message: t("orderUpdate.patch.errors.notFound.title"),
-          errorType: ErrorResponseTypes.NOT_FOUND,
-        });
-      }
-
-      if (po.status !== "DRAFT") {
-        return fail({
-          message: t("orderUpdate.patch.errors.conflict.title"),
-          errorType: ErrorResponseTypes.CONFLICT,
-        });
-      }
-
-      const authResult = await CompanyAuthRepository.requireMember(
+      return await withDraftOrder(
+        poId,
         userId,
-        po.companyId,
-        CompanyMemberRole.MEMBER,
         logger,
         locale,
-      );
-      if (!authResult.success) {
-        return fail({
-          message: t("orderUpdate.patch.errors.forbidden.title"),
-          errorType: ErrorResponseTypes.FORBIDDEN,
-        });
-      }
-
-      // Calculate line totals if lines are being replaced
-      let subtotal = po.subtotal;
-      let taxAmount = po.taxAmount;
-      let total = po.total;
-
-      if (data.lines !== undefined) {
-        // Replace all lines
-        await db
-          .delete(purchaseOrderLines)
-          .where(eq(purchaseOrderLines.poId, poId));
-
-        if (data.lines.length > 0) {
-          const lineInserts = data.lines.map((line, idx) => {
-            const lineTaxAmount =
-              Math.round(
-                line.quantity * line.unitPrice * line.taxRate * 10000,
-              ) / 10000;
-            const lineTotal =
-              Math.round(line.quantity * line.unitPrice * 10000) / 10000 +
-              lineTaxAmount;
-            return {
-              poId,
-              description: line.description,
-              productId: line.productId ?? null,
-              quantity: line.quantity,
-              unitPrice: line.unitPrice,
-              taxRate: line.taxRate,
-              taxAmount: lineTaxAmount,
-              lineTotal,
-              quantityReceived: 0,
-              sortOrder: line.sortOrder ?? idx,
-            };
-          });
-
-          await db.insert(purchaseOrderLines).values(lineInserts);
-
-          subtotal = lineInserts.reduce(
-            (sum, l) => sum + l.quantity * l.unitPrice,
-            0,
-          );
-          taxAmount = lineInserts.reduce((sum, l) => sum + l.taxAmount, 0);
-          total = subtotal + taxAmount;
-        } else {
-          subtotal = 0;
-          taxAmount = 0;
-          total = 0;
-        }
-      }
-
-      const [updated] = await db
-        .update(purchaseOrders)
-        .set({
-          ...(data.vendorId !== undefined ? { vendorId: data.vendorId } : {}),
-          ...(data.currency !== undefined ? { currency: data.currency } : {}),
-          ...(data.expectedDeliveryDate !== undefined
-            ? { expectedDeliveryDate: data.expectedDeliveryDate }
-            : {}),
-          ...(data.deliveryWarehouseId !== undefined
-            ? { deliveryWarehouseId: data.deliveryWarehouseId }
-            : {}),
-          ...(data.notes !== undefined ? { notes: data.notes } : {}),
-          subtotal,
-          taxAmount,
-          total,
-          updatedAt: new Date(),
-        })
-        .where(eq(purchaseOrders.id, poId))
-        .returning();
-
-      if (!updated) {
-        return fail({
-          message: t("orderUpdate.patch.errors.server.title"),
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        });
-      }
-
-      logger.info("Purchase order updated", { poId });
-
-      return success({
-        result: {
-          id: updated.id,
-          status: updated.status,
-          subtotal: updated.subtotal,
-          taxAmount: updated.taxAmount,
-          total: updated.total,
-          updatedAt: updated.updatedAt,
+        {
+          notFound: t("orderUpdate.patch.errors.notFound.title"),
+          conflict: t("orderUpdate.patch.errors.conflict.title"),
         },
-      });
+        async (tx, po) => {
+          const valid = await validOrderReferences(tx, po.companyId, userId, {
+            vendorId: data.vendorId,
+            warehouseId: data.deliveryWarehouseId,
+            productIds: data.lines?.flatMap((line) =>
+              line.productId ? [line.productId] : [],
+            ),
+          });
+          if (!valid) {
+            return fail({
+              message: t("orderUpdate.patch.errors.validation.title"),
+              errorType: ErrorResponseTypes.VALIDATION_ERROR,
+            });
+          }
+          if (data.lines) {
+            const prepared = [];
+            for (const [index, line] of data.lines.entries()) {
+              const amounts = purchaseLineAmounts(line);
+              if (!amounts) {
+                return fail({
+                  message: t("orderUpdate.patch.errors.validation.title"),
+                  errorType: ErrorResponseTypes.VALIDATION_ERROR,
+                });
+              }
+              prepared.push({
+                poId,
+                ...line,
+                ...amounts,
+                sortOrder: line.sortOrder ?? index,
+                quantityReceived: 0,
+              });
+            }
+            await tx
+              .delete(purchaseOrderLines)
+              .where(eq(purchaseOrderLines.poId, poId));
+            if (prepared.length) {
+              await tx.insert(purchaseOrderLines).values(prepared);
+            }
+          }
+          const totals = await purchaseTotals(tx, poId);
+          const [updated] = await tx
+            .update(purchaseOrders)
+            .set({
+              ...(data.vendorId !== undefined
+                ? { vendorId: data.vendorId }
+                : {}),
+              ...(data.currency !== undefined
+                ? { currency: data.currency }
+                : {}),
+              ...(data.expectedDeliveryDate !== undefined
+                ? { expectedDeliveryDate: data.expectedDeliveryDate }
+                : {}),
+              ...(data.deliveryWarehouseId !== undefined
+                ? { deliveryWarehouseId: data.deliveryWarehouseId }
+                : {}),
+              ...(data.notes !== undefined ? { notes: data.notes } : {}),
+              ...totals,
+              updatedAt: new Date(),
+            })
+            .where(eq(purchaseOrders.id, poId))
+            .returning();
+
+          if (!updated) {
+            return fail({
+              message: t("orderUpdate.patch.errors.server.title"),
+              errorType: ErrorResponseTypes.INTERNAL_ERROR,
+            });
+          }
+
+          logger.info("Purchase order updated", { poId });
+
+          return success({
+            result: {
+              id: updated.id,
+              status: updated.status,
+              subtotal: updated.subtotal,
+              taxAmount: updated.taxAmount,
+              total: updated.total,
+              updatedAt: updated.updatedAt,
+            },
+          });
+        },
+      );
     } catch (error) {
       logger.error("Failed to update purchase order", parseError(error));
       return fail({

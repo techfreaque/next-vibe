@@ -64,7 +64,8 @@ export const translations: typeof enTranslations = {
       },
       forbidden: {
         title: "Prístup zamietnutý",
-        description: "Potrebujete oprávnenie správcu alebo účtovníka tejto firmy.",
+        description:
+          "Potrebujete oprávnenie správcu alebo účtovníka tejto firmy.",
       },
       notFound: {
         title: "Nenašlo sa",
@@ -84,6 +85,16 @@ export const translations: typeof enTranslations = {
       description: "Cenová ponuka bola vytvorená ako koncept",
     },
     widget: {
+      otherRate: "Iná sadzba",
+      item: "Opis",
+      quantity: "Množstvo",
+      price: "Jednotková cena",
+      vatRate: "DPH (%)",
+      add: "Pridať položku",
+      remove: "Odstrániť položku",
+      empty: "Pridajte tovar alebo služby, ktoré ponúkate.",
+      summary: "Súhrn",
+
       back: "Späť",
       submit: "Vytvoriť cenovú ponuku",
       viewButton: "Zobraziť cenovú ponuku",
@@ -110,9 +121,10 @@ export const translations: typeof enTranslations = {
     placeholder: "Zadajte meno zákazníka",
   },
   currency: {
+    code: "{{code}}",
     label: "Mena",
     description: "Mena cenovej ponuky",
-    placeholder: "EUR",
+    placeholder: "Mena firmy",
   },
   validUntil: {
     label: "Platnosť do",

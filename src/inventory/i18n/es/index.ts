@@ -383,6 +383,13 @@ export const translations: typeof enTranslations = {
       description:
         "Vea los niveles de stock para un almacén con disponibilidad e indicadores de bajo valor.",
       widget: {
+        unnamedProduct: "Nombre del producto no disponible",
+        search: "Buscar productos o almacenes",
+        stockStatus: "Estado del stock",
+        actions: "Acciones",
+        noMatches: "No hay existencias que coincidan",
+        loadMore: "Mostrar más",
+
         back: "Atrás",
         lowStock: "Bajo stock",
         available: "Disponible",
@@ -404,7 +411,8 @@ export const translations: typeof enTranslations = {
         outOfStock: "fuera de las reservas",
         belowReorderPoint: "debajo del punto de reordenamiento",
         bulletSeparator: "·",
-        statusOk: "OK",
+        stockValue: "Valor de existencias",
+        statusOk: "En existencias",
       },
       warehouseId: {
         label: "Warehouse ID",
@@ -454,6 +462,7 @@ export const translations: typeof enTranslations = {
         description: "Niveles de stock recuperados",
       },
       response: {
+        currency: "Moneda",
         id: "Stock ID",
         warehouseId: "Warehouse ID",
         warehouseName: "Warehouse",
@@ -1114,6 +1123,10 @@ export const translations: typeof enTranslations = {
         kpiOutOfStock: "Existencias",
         kpiLowStock: "Stock bajo",
         kpiWarehouses: "Almacenes",
+        attention: "Existencias que requieren atención",
+        noAttention: "Ningún artículo necesita reposición.",
+        newPurchaseOrder: "Nuevo pedido",
+        kpiTransfersInTransit: "Traslados en tránsito",
         alertOutOfStock: "Producto {{count}} fuera de stock",
         alertOutOfStockPlural: "Productos {{count}} fuera de stock",
         navStockLevels: "Niveles de existencias",

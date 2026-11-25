@@ -79,6 +79,7 @@ export const translations: typeof enTranslations = {
     placeholder: "Wprowadź ID firmy",
   },
   widget: {
+    unnumberedInvoice: "Faktura bez numeru",
     subtitle:
       "Faktury, oferty i rachunki wystawiane przez Ciebie. Płatności kartą i krypto są w transakcjach płatności.",
     estimatesSent: "Wysłane oferty",

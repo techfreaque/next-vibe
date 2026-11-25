@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import { eq, sql } from "drizzle-orm";
+import { eq, max } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import {
@@ -18,11 +18,15 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { CompanyMemberRole } from "@/companies/enum";
-import { CompanyAuthRepository } from "@/companies/repository";
+import { getDocumentAccess } from "@/finance/document-company-scope";
 
 import { paymentEstimateLines, paymentEstimates } from "../../../db";
 import { EstimateStatus } from "../../../enum";
+import {
+  estimateLine,
+  estimateProductScope,
+  refreshEstimateTotals,
+} from "../../draft";
 import type {
   EstimateLineAddRequestOutput,
   EstimateLineAddResponseOutput,
@@ -52,106 +56,91 @@ export class EstimateLineAddRepository {
         });
       }
 
-      const authResult = await CompanyAuthRepository.requireMember(
-        userId,
-        estimate.companyId,
-        CompanyMemberRole.ACCOUNTANT,
-        logger,
-        locale,
-      );
-      if (!authResult.success) {
-        return authResult;
-      }
-
-      if (estimate.status !== EstimateStatus.DRAFT) {
-        return fail({
-          message: t("post.errors.conflict.title"),
-          errorType: ErrorResponseTypes.CONFLICT,
-        });
-      }
-
-      const quantity = data.quantity ?? 1;
-      const unitPrice = data.unitPrice;
-      const taxRate = data.taxRate ?? 0;
-      const taxAmount = quantity * unitPrice * taxRate;
-      const lineTotal = quantity * unitPrice + taxAmount;
-
-      // Get current max sort order for this estimate
-      const existingLines = await db
-        .select({ sortOrder: paymentEstimateLines.sortOrder })
-        .from(paymentEstimateLines)
-        .where(eq(paymentEstimateLines.estimateId, data.estimateId));
-
-      const maxSortOrder = existingLines.reduce(
-        (max, l) => Math.max(max, l.sortOrder ?? 0),
-        -1,
-      );
-
-      const [line] = await db
-        .insert(paymentEstimateLines)
-        .values({
+      return await db.transaction(async (tx) => {
+        const access = await getDocumentAccess(
+          userId,
+          { companyId: estimate.companyId },
+          tx,
+        );
+        if (!access?.canManage) {
+          return fail({
+            message: t("post.errors.forbidden.title"),
+            errorType: ErrorResponseTypes.FORBIDDEN,
+          });
+        }
+        const [locked] = await tx
+          .select()
+          .from(paymentEstimates)
+          .where(eq(paymentEstimates.id, estimate.id))
+          .for("update");
+        if (
+          !locked ||
+          locked.companyId !== estimate.companyId ||
+          locked.status !== EstimateStatus.DRAFT
+        ) {
+          return fail({
+            message: t("post.errors.conflict.title"),
+            errorType: ErrorResponseTypes.CONFLICT,
+          });
+        }
+        const [{ last }] = await tx
+          .select({ last: max(paymentEstimateLines.sortOrder) })
+          .from(paymentEstimateLines)
+          .where(eq(paymentEstimateLines.estimateId, estimate.id));
+        const values = estimateLine(data, (last ?? -1) + 1);
+        if (
+          !values ||
+          Math.round(locked.total * 10_000) +
+            Math.round(values.lineTotal * 10_000) >=
+            1_000_000_000_000 ||
+          !(await estimateProductScope(
+            tx,
+            locked.companyId,
+            userId,
+            data.productId ? [data.productId] : [],
+          ))
+        ) {
+          return fail({
+            message: t("post.errors.validation.title"),
+            errorType: ErrorResponseTypes.VALIDATION_ERROR,
+          });
+        }
+        const [line] = await tx
+          .insert(paymentEstimateLines)
+          .values({ ...values, estimateId: locked.id })
+          .returning();
+        if (!line) {
+          return fail({
+            message: t("post.errors.server.title"),
+            errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          });
+        }
+        await refreshEstimateTotals(tx, locked.id);
+        logger.debug("Estimate line added", {
+          lineId: line.id,
           estimateId: data.estimateId,
-          description: data.description,
-          productId: data.productId ?? null,
-          quantity,
-          unitPrice,
-          taxRate,
-          taxAmount,
-          lineTotal,
-          sortOrder: maxSortOrder + 1,
-        })
-        .returning();
-
-      if (!line) {
-        return fail({
-          message: t("post.errors.server.title"),
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        });
-      }
-
-      // Update estimate totals by summing all lines
-      await db
-        .update(paymentEstimates)
-        .set({
-          subtotal: sql`(
-            SELECT SUM(unit_price * quantity) FROM payment_estimate_lines
-            WHERE estimate_id = ${data.estimateId}
-          )`,
-          taxAmount: sql`(
-            SELECT SUM(tax_amount) FROM payment_estimate_lines
-            WHERE estimate_id = ${data.estimateId}
-          )`,
-          total: sql`(
-            SELECT SUM(line_total) FROM payment_estimate_lines
-            WHERE estimate_id = ${data.estimateId}
-          )`,
-          updatedAt: new Date(),
-        })
-        .where(eq(paymentEstimates.id, data.estimateId));
-
-      logger.debug("Estimate line added", {
-        lineId: line.id,
-        estimateId: data.estimateId,
-        lineTotal,
-      });
-
-      return success({
-        success: true,
-        message: null,
-        line: {
-          id: line.id,
-          estimateId: line.estimateId,
-          description: line.description,
-          productId: line.productId,
-          quantity: line.quantity,
-          unitPrice: line.unitPrice,
-          taxRate: line.taxRate,
-          taxAmount: line.taxAmount,
           lineTotal: line.lineTotal,
-          sortOrder: line.sortOrder,
-          createdAt: line.createdAt,
-          updatedAt: line.updatedAt,
-        },
+        });
+
+        return success({
+          success: true,
+          message: null,
+          line: {
+            currency: locked.currency,
+            id: line.id,
+            estimateId: line.estimateId,
+            description: line.description,
+            productId: line.productId,
+            quantity: line.quantity,
+            unitPrice: line.unitPrice,
+            taxRate: line.taxRate,
+            taxAmount: line.taxAmount,
+            lineTotal: line.lineTotal,
+            sortOrder: line.sortOrder,
+            createdAt: line.createdAt,
+            updatedAt: line.updatedAt,
+          },
+        });
       });
     } catch (error) {
       const parsed = parseError(error);

@@ -21,6 +21,10 @@ export const translations: typeof enTranslations = {
       message: "Message d'état",
     },
     errors: {
+      appliedPayments:
+        "Une facture avec des paiements ou des avoirs imputés ne peut pas être annulée.",
+      reversalPosting:
+        "Vérifiez l’écriture d’origine et l’ouverture de la période comptable avant d’annuler.",
       unauthorized: {
         title: "Non autorisé",
         description: "Authentification requise",

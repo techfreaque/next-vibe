@@ -24,9 +24,12 @@ import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-a
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 import type { JSX, ReactNode } from "react";
 
+import { useWorkspaceCompany } from "../../_shared/workspace-company-context";
 import type { CompanyTypeValue } from "../../enum";
 import { CompanyType } from "../../enum";
 import { scopedTranslation as companiesScopedTranslation } from "../../i18n";
+import { proposeOpeningMonth } from "../onboard/first-period";
+import { getCompanySetupCountry } from "../onboard/setup-country";
 import type definition from "./definition";
 
 const TYPE_COLOR: Record<typeof CompanyTypeValue, string> = {
@@ -98,6 +101,7 @@ export function CompanyGetWidget(_props: {
   const data = useWidgetValue<typeof definition.GET>();
   const { push: navigate, pop, canGoBack } = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.GET>();
+  const workspace = useWorkspaceCompany();
   const locale = useWidgetLocale();
   const { t: tCompanies } = companiesScopedTranslation.scopedT(locale);
 
@@ -113,6 +117,32 @@ export function CompanyGetWidget(_props: {
         prefillFromGet: true,
         getEndpoint: (await import("./definition")).default.GET,
         popNavigationOnSuccess: 1,
+      });
+    })();
+  };
+
+  const handleSetupAccounting = (): void => {
+    if (!data?.id) {
+      return;
+    }
+    const companyId = data.id;
+    const country = getCompanySetupCountry(data.country);
+    if (data.isActive) {
+      workspace?.register({
+        id: companyId,
+        name: data.name,
+        currency: data.currency,
+      });
+    }
+    void (async (): Promise<void> => {
+      const { default: onboard } = await import("../onboard/definition");
+      navigate(onboard.POST, {
+        urlPathParams: { companyId },
+        data: {
+          country,
+          openFirstPeriod: true,
+          ...proposeOpeningMonth(locale),
+        },
       });
     })();
   };
@@ -192,16 +222,22 @@ export function CompanyGetWidget(_props: {
         ) : (
           <Div />
         )}
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          onClick={handleEdit}
-          className="gap-1.5"
-        >
-          <Pencil className="h-3.5 w-3.5" />
-          {t("get.widget.edit")}
-        </Button>
+        <Div className="flex flex-wrap items-center justify-end gap-2">
+          <Button type="button" size="sm" onClick={handleSetupAccounting}>
+            <BookOpen className="size-4 shrink-0" />
+            {t("get.widget.setupAccounting")}
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={handleEdit}
+            className="gap-1.5"
+          >
+            <Pencil className="h-3.5 w-3.5" />
+            {t("get.widget.edit")}
+          </Button>
+        </Div>
       </Div>
 
       {/* Header */}

@@ -70,6 +70,7 @@ export const translations: typeof enTranslations = {
       description: "Dettagli dell'azienda recuperati",
     },
     widget: {
+      setupAccounting: "Configura la contabilità",
       back: "Indietro",
       loading: "La società di carico...",
       edit: "Modifica",

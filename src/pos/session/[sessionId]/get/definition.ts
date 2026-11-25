@@ -57,6 +57,11 @@ const { GET } = createEndpoint({
         layoutType: LayoutType.GRID_2_COLUMNS,
         usage: { response: true },
         children: {
+          currency: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            label: "dashboard.get.response.currency",
+            schema: z.string().optional(),
+          }),
           id: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             label: "sessionGet.get.response.id",

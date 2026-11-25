@@ -3,30 +3,28 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   enums: {
     country: {
-      AT: "AT (ÖKR)",
-      DE: "DE (SKR03)",
-      XX: "XX (všeobecná osnova IFRS)",
+      AT: "Rakúsko (ÖKR)",
+      DE: "Nemecko (SKR03)",
+      XX: "Všeobecná osnova IFRS",
     },
   },
   post: {
     title: "Nastaviť účtový rozvrh",
-    titleShort: "Nastavenie",
-    description:
-      "Nastavte účtový rozvrh firmy podľa šablóny pre vybranú krajinu. Nastavenie môžete bezpečne spustiť opakovane.",
+    titleShort: "Nastaviť účtový rozvrh",
+    description: "Doplňte firme potrebné účty zo štandardnej šablóny.",
     companyId: {
-      label: "ID firmy",
+      label: "Firma",
       description: "Vyberte firmu, ktorej účtový rozvrh chcete nastaviť.",
-      placeholder: "Zadajte UUID firmy",
+      placeholder: "Vyberte firmu",
     },
     country: {
-      label: "Krajina",
-      description:
-        "Použitá národná osnova (AT = ÖKR, DE = SKR03, XX = všeobecná osnova IFRS)",
-      placeholder: "Vyberte krajinu",
+      label: "Účtovná šablóna",
+      description: "Vyberte štruktúru účtov, ktorú chcete pridať.",
+      placeholder: "Vyberte šablónu",
     },
     response: {
       created: "Vytvorené účty",
-      skipped: "Preskočené účty (už existovali)",
+      skipped: "Zachované existujúce účty",
     },
     errors: {
       unauthorized: {
@@ -35,23 +33,25 @@ export const translations: typeof enTranslations = {
       },
       validation: {
         title: "Neplatné údaje",
-        description: "Neplatné údaje. Skontrolujte ID firmy a krajinu.",
+        description: "Skontrolujte firmu a účtovnú šablónu.",
       },
       forbidden: {
         title: "Prístup zamietnutý",
-        description: "Účtovný rozvrh môžu nastaviť iba vlastníci a správcovia firmy.",
+        description:
+          "Účtovný rozvrh môžu nastaviť iba vlastníci a správcovia firmy.",
       },
       server: {
         title: "Chyba servera",
-        description: "Nastavenie zlyhalo. Skúste to znova.",
+        description: "Skúste šablónu použiť znova.",
       },
       unknown: {
         title: "Neznáma chyba",
         description: "Nastala neočakávaná chyba",
       },
       conflict: {
-        title: "Účtový rozvrh už je nastavený",
-        description: "Firma už má účtový rozvrh.",
+        title: "Skontrolujte nastavenie",
+        description:
+          "Pred použitím šablóny načítajte aktuálne účty firmy znova.",
       },
       network: {
         title: "Chyba siete",
@@ -68,10 +68,21 @@ export const translations: typeof enTranslations = {
     },
     success: {
       title: "Účtový rozvrh pripravený",
-      description: "Všetky účty firmy boli vytvorené.",
+      description:
+        "Šablóna bola použitá. Nižšie si môžete zobraziť nové aj existujúce účty.",
     },
     widget: {
-      viewAccounts: "Zobraziť zoznam účtov",
+      review: "Skontrolujte nastavenie účtov",
+      previewLoading: "Načítavajú sa existujúce účty…",
+      previewFailed: "Aktuálny počet účtov nie je dostupný.",
+      existing: "Existujúce účty: {{count}}.",
+      empty: "Táto firma ešte nemá žiadne účty.",
+      consequences:
+        "Nastavenie doplní chýbajúce čísla účtov zo šablóny a zachová existujúce záznamy.",
+      submit: "Pridať účty zo šablóny",
+      back: "Späť",
+      viewAccounts: "Otvoriť účtový rozvrh",
+      viewPeriods: "Zobraziť účtovné obdobia",
     },
   },
   title: "Nastavenie účtového rozvrhu",

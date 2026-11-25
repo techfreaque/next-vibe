@@ -21,6 +21,7 @@ import {
 } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
+import { PosOrderStatus } from "../../../enum";
 import { scopedTranslation } from "../../../i18n";
 
 const PosOrderVoidWidgetLazy = lazyWidget(() =>
@@ -52,7 +53,7 @@ const { POST } = createEndpoint({
         schema: z.uuid(),
         listEndpoint: async () =>
           (await import("@/pos/order/list/definition")).default.GET,
-        labelField: "id",
+        labelField: "orderNumber",
       }),
 
       result: objectField(scopedTranslation, {
@@ -129,7 +130,7 @@ const { POST } = createEndpoint({
       default: {
         result: {
           id: "eeff1122-e89b-12d3-a456-426614174003",
-          status: "VOIDED",
+          status: PosOrderStatus.VOIDED,
         },
       },
     },

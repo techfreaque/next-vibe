@@ -84,6 +84,16 @@ export const translations: typeof enTranslations = {
       description: "Angebot als Entwurf erstellt",
     },
     widget: {
+      otherRate: "Anderer Steuersatz",
+      item: "Beschreibung",
+      quantity: "Menge",
+      price: "Einzelpreis",
+      vatRate: "USt. %",
+      add: "Position hinzufügen",
+      remove: "Position entfernen",
+      empty: "Fügen Sie die angebotenen Waren oder Leistungen hinzu.",
+      summary: "Zusammenfassung",
+
       back: "Zurück",
       submit: "Angebot erstellen",
       viewButton: "Angebot ansehen",
@@ -110,9 +120,10 @@ export const translations: typeof enTranslations = {
     placeholder: "Kundenname eingeben",
   },
   currency: {
+    code: "{{code}}",
     label: "Währung",
     description: "Angebotswährung",
-    placeholder: "EUR",
+    placeholder: "Unternehmenswährung",
   },
   validUntil: {
     label: "Gültig bis",

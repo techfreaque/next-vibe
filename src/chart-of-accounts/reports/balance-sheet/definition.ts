@@ -24,6 +24,7 @@ import {
 import { z } from "zod";
 
 import { scopedTranslation } from "../../i18n";
+import { accountingDateSchema } from "../../shared/calendar-date";
 
 const BalanceSheetWidget = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.BalanceSheetWidget })),
@@ -51,11 +52,25 @@ const { GET } = createEndpoint({
     children: {
       companyId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
+        fieldType: FieldDataType.ENTITY_PICKER,
         label: "balanceSheet.companyId.label" as const,
         description: "balanceSheet.companyId.description" as const,
         placeholder: "balanceSheet.companyId.placeholder" as const,
-        schema: z.string().uuid(),
+        listEndpoint: async () =>
+          (await import("@/companies/list/definition")).default.GET,
+        labelField: "name",
+        schema: z.string().uuid().optional(),
+      }),
+      currency: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "reports.currency",
+        schema: z
+          .string()
+          .trim()
+          .toUpperCase()
+          .regex(/^(?:[A-Z]{3})?$/)
+          .optional(),
       }),
       asOfDate: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -63,7 +78,23 @@ const { GET } = createEndpoint({
         label: "balanceSheet.asOfDate.label" as const,
         description: "balanceSheet.asOfDate.description" as const,
         placeholder: "balanceSheet.asOfDate.placeholder" as const,
-        schema: z.string().date().optional(),
+        schema: accountingDateSchema.optional(),
+      }),
+
+      reportCompanyId: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "balanceSheet.companyId.label",
+        schema: z.string(),
+      }),
+      reportCompanyName: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "balanceSheet.companyId.label",
+        schema: z.string(),
+      }),
+      reportCurrency: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "reports.currency",
+        schema: z.string(),
       }),
 
       asOfDateResponse: responseField(scopedTranslation, {
@@ -186,6 +217,11 @@ const { GET } = createEndpoint({
           },
         }),
       }),
+      unclosedEarnings: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "balanceSheet.response.unclosedEarnings",
+        schema: z.number(),
+      }),
       totalEquity: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         label: "balanceSheet.response.totalEquity" as const,
@@ -238,6 +274,8 @@ const { GET } = createEndpoint({
     },
   },
 
+  options: { formOptions: { autoSubmit: true, debounceMs: 300 } },
+
   successTypes: {
     title: "balanceSheet.success.title" as const,
     description: "balanceSheet.success.description" as const,
@@ -246,18 +284,22 @@ const { GET } = createEndpoint({
   examples: {
     requests: {
       default: {
-        companyId: "00000000-0000-0000-0000-000000000001",
+        companyId: "00000000-0000-4000-8000-000000000001",
         asOfDate: "2026-12-31",
       },
     },
     responses: {
       default: {
+        reportCompanyId: "00000000-0000-4000-8000-000000000001",
+        reportCompanyName: "Example company",
+        reportCurrency: "EUR",
         asOfDateResponse: "2026-12-31",
         assets: [],
         totalAssets: 0,
         liabilities: [],
         totalLiabilities: 0,
         equity: [],
+        unclosedEarnings: 0,
         totalEquity: 0,
         isBalanced: true,
       },

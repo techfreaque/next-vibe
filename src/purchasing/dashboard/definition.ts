@@ -55,6 +55,41 @@ const { GET } = createEndpoint({
         labelField: "name",
       }),
 
+      overdueDeliveryCount: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "dashboard.get.widget.overdue",
+        schema: z.number().optional(),
+      }),
+      moneyByCurrency: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "dashboard.get.widget.openValue",
+        schema: z
+          .array(
+            z.object({
+              currency: z.string(),
+              openValue: z.number(),
+              settledBills: z.number(),
+            }),
+          )
+          .optional(),
+      }),
+      deliveries: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "dashboard.get.widget.deliveries",
+        schema: z
+          .array(
+            z.object({
+              id: z.string().uuid(),
+              number: z.string(),
+              supplier: z.string().nullable(),
+              expected: z.string().nullable(),
+              overdue: z.boolean().optional(),
+              currency: z.string(),
+              total: z.number(),
+            }),
+          )
+          .optional(),
+      }),
       draftCount: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         label: "dashboard.get.response.draftCount" as const,
@@ -147,6 +182,30 @@ const { GET } = createEndpoint({
         awaitingReceiptCount: 2,
         activeVendorCount: 12,
         dueThisWeekCount: 1,
+        overdueDeliveryCount: 1,
+        moneyByCurrency: [
+          { currency: "EUR", openValue: 4632.5, settledBills: 8120.18 },
+        ],
+        deliveries: [
+          {
+            id: "00000000-0000-4000-8000-000000000021",
+            number: "PO-2026-0142",
+            supplier: "Mlin Paper",
+            expected: "2026-11-23T00:00:00Z",
+            overdue: true,
+            currency: "EUR",
+            total: 2840.5,
+          },
+          {
+            id: "00000000-0000-4000-8000-000000000022",
+            number: "PO-2026-0143",
+            supplier: "Studio Linden",
+            expected: "2026-11-30T00:00:00Z",
+            overdue: false,
+            currency: "EUR",
+            total: 1792,
+          },
+        ],
       },
     },
   },

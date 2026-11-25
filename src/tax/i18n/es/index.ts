@@ -121,7 +121,7 @@ export const translations: typeof enTranslations = {
         empty:
           "No hay tasas de impuestos configuradas. Agregue su primera tasa para empezar.",
         emptySetup:
-          "No hay tasas de impuestos establecidas. Cada factura necesita una tasa de impuestos, configura el suyo ahora.",
+          "Configura los tipos impositivos que aplica tu empresa en sus facturas.",
         columnRate: "Tasa de impuestos",
         columnTypeRateActions: "Tipo / Tasa / Estado",
         backToCatalog: "← Productos",
@@ -358,14 +358,28 @@ export const translations: typeof enTranslations = {
   },
 
   report: {
-    title: "Informe fiscal",
-    titleShort: "Informe fiscal",
-    description: "Impuesto recaudado por tipo y período",
+    title: "Impuestos por tasa",
+    titleShort: "Impuestos por tasa",
+    description:
+      "Consulta los impuestos registrados en facturas de venta, notas de crédito, facturas de compra y ventas en caja.",
     widget: {
-      columnRate: "Tasa",
+      scope:
+        "Las facturas de venta usan la fecha del asiento asociado o la fecha de creación. Las compras usan la fecha de la factura. Las ventas en caja usan su fecha de cierre (UTC) e incluyen las líneas con un tipo positivo o un importe de impuesto registrado. Si una factura emitida comparte el asiento, representa esa venta.",
+      empty: "Ninguna línea de documento coincide con estos filtros.",
+      range: "Del {{from}} al {{to}}",
       total: "Total",
-      empty: "No se han encontrado datos fiscales para este período.",
+      previousMonth: "Ver el mes anterior",
+      unknownRate: "Tasa indeterminada",
+      run: "Generar informe",
+      running: "Generando informe…",
+      selectCompany: "Selecciona la empresa para este informe.",
     },
+    currency: {
+      label: "Moneda",
+      placeholder: "Moneda de la empresa",
+      description: "Por defecto se usa la moneda de la empresa.",
+    },
+    currencies: { EUR: "EUR", PLN: "PLN", USD: "USD" },
     companyId: {
       label: "Company",
       description: "Empresa para generar el informe de impuestos",
@@ -374,21 +388,20 @@ export const translations: typeof enTranslations = {
     dateFrom: {
       label: "Desde",
       description: "Fecha de inicio para el período del informe",
-      placeholder: "2024-01-01",
+      placeholder: "Inicio de este mes",
     },
     dateTo: {
       label: "A",
       description: "Fecha final del período del informe",
-      placeholder: "2024-12-31",
+      placeholder: "Hoy",
     },
     response: {
       rows: "Report Rows",
       row: {
-        taxRateCode: "Código de Tasa de Impuestos",
-        taxRateName: "Tasa de impuestos",
+        direction: "Tipo de documento",
+        rate: "Tasa de impuesto",
         taxableAmount: "Cuantía fiscal",
         taxAmount: "Cuantía fiscal",
-        period: "Período",
       },
     },
     success: {
@@ -398,7 +411,8 @@ export const translations: typeof enTranslations = {
     errors: {
       validation: {
         title: "Error de validación",
-        description: "Comprueba tus entradas e intenta de nuevo",
+        description:
+          "La fecha final debe ser igual o posterior a la fecha inicial.",
       },
       unauthorized: {
         title: "Se requiere autenticación",
@@ -433,6 +447,12 @@ export const translations: typeof enTranslations = {
   },
 
   enums: {
+    reportDirection: {
+      posSales: "Ventas en caja",
+      sales: "Facturas de venta",
+      creditNotes: "Notas de crédito de ventas",
+      purchases: "Facturas de compra",
+    },
     taxType: {
       vat: "VAT",
       gst: "GST",

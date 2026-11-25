@@ -12,7 +12,7 @@ export const translations: typeof enTranslations = {
     title: "Créer un avoir",
     titleShort: "Avoir",
     description:
-      "Créer un avoir rattaché à une facture d'origine. Un avoir total annule toutes les lignes. Un avoir partiel s'applique aux lignes indiquées. Passe une écriture d'extourne : débit Produits, crédit Clients.",
+      "Émettez un avoir total ou partiel sur une facture comptabilisée. L’avoir corrige la créance, le produit et la TVA correspondants.",
     form: {
       title: "Créer un avoir",
       description: "Émettre un avoir sur une facture existante",
@@ -35,6 +35,14 @@ export const translations: typeof enTranslations = {
       },
     },
     errors: {
+      creditLines:
+        "Saisissez des quantités positives et utilisez les taux de TVA de la facture d’origine.",
+      creditLimit:
+        "L’avoir dépasse le montant hors taxe, la TVA ou le total restant de la facture d’origine.",
+      originalPosting:
+        "Rapprochez l’écriture de la facture d’origine avant d’émettre un avoir.",
+      posting:
+        "Vérifiez la devise de l’entreprise, l’ouverture de la période et les comptes d’imputation d’origine.",
       unauthorized: {
         title: "Non autorisé",
         description: "Authentification requise",

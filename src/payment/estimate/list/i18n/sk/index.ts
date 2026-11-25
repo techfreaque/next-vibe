@@ -39,7 +39,10 @@ export const translations: typeof enTranslations = {
         title: "Neplatné údaje",
         description: "Skontrolujte zadané údaje.",
       },
-      server: { title: "Chyba servera", description: "Nastala interná chyba servera." },
+      server: {
+        title: "Chyba servera",
+        description: "Nastala interná chyba servera.",
+      },
       unknown: {
         title: "Neznáma chyba",
         description: "Nastala neznáma chyba.",
@@ -48,9 +51,15 @@ export const translations: typeof enTranslations = {
         title: "Chyba siete",
         description: "Skontrolujte pripojenie.",
       },
-      forbidden: { title: "Prístup zamietnutý", description: "Nemáte potrebné oprávnenie." },
+      forbidden: {
+        title: "Prístup zamietnutý",
+        description: "Nemáte potrebné oprávnenie.",
+      },
       notFound: { title: "Nenašlo sa", description: "Firma sa nenašla" },
-      conflict: { title: "Konflikt", description: "Údaje sa medzičasom zmenili." },
+      conflict: {
+        title: "Konflikt",
+        description: "Údaje sa medzičasom zmenili.",
+      },
       unsavedChanges: {
         title: "Neuložené zmeny",
         description: "Máte neuložené zmeny.",
@@ -101,6 +110,7 @@ export const translations: typeof enTranslations = {
     description: "Počet položiek na strane",
   },
   widget: {
+    filters: "Filtre",
     pageCount: "Počet strán",
     back: "Späť",
     title: "Cenové ponuky",

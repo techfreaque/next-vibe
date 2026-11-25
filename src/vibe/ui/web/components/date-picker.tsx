@@ -10,6 +10,7 @@ import type { JSX } from "react";
 import { useState } from "react";
 
 import { cn } from "../../../unified-ui/_shared/cn";
+import { parseFormDate } from "../../../unified-ui/widgets/form-fields/_shared/date-value";
 import type { StyleType } from "../utils/style-type";
 import { Button } from "./button";
 import { Calendar } from "./calendar";
@@ -40,17 +41,6 @@ function formatDate(date: Date | undefined): string {
   return `${year}-${month}-${day}`;
 }
 
-/**
- * Parse YYYY-MM-DD string to Date
- */
-function parseDate(dateString: string): Date | undefined {
-  if (!dateString) {
-    return undefined;
-  }
-  const date = new Date(dateString);
-  return Number.isNaN(date.getTime()) ? undefined : date;
-}
-
 export function DatePicker({
   value,
   onChange,
@@ -64,26 +54,25 @@ export function DatePicker({
   name,
 }: DatePickerProps): JSX.Element {
   const [open, setOpen] = useState(false);
-  const [inputValue, setInputValue] = useState(formatDate(value));
+  const [draft, setDraft] = useState<string>();
+  const inputValue = draft ?? formatDate(value);
 
   const handleSelect = (date: Date | undefined): void => {
     onChange(date);
-    setInputValue(formatDate(date));
+    setDraft(undefined);
     setOpen(false);
   };
 
   const handleInputChange = (newValue: string): void => {
-    setInputValue(newValue);
-    const parsed = parseDate(newValue);
-    if (parsed) {
+    setDraft(newValue);
+    const parsed = parseFormDate(newValue);
+    if (parsed || !newValue) {
       onChange(parsed);
     }
   };
 
   const handleInputBlur = (): void => {
-    // Reformat to standard format on blur
-    const parsed = parseDate(inputValue);
-    setInputValue(formatDate(parsed));
+    setDraft(undefined);
     if (onBlur) {
       onBlur();
     }
@@ -105,6 +94,7 @@ export function DatePicker({
       <div className="relative flex-1">
         <Input
           type="text"
+          id={name}
           value={inputValue}
           onChange={(e) => handleInputChange(e.target.value)}
           onBlur={handleInputBlur}

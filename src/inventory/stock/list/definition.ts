@@ -51,6 +51,16 @@ const { GET } = createEndpoint({
     usage: { request: "data", response: true } as const,
     render: InventoryStockListWidget,
     children: {
+      companyId: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.ENTITY_PICKER,
+        label: "dashboard.get.companyId.label",
+        description: "dashboard.get.companyId.description",
+        schema: z.uuid().optional(),
+        listEndpoint: async () =>
+          (await import("@/companies/list/definition")).default.GET,
+        labelField: "name",
+      }),
       warehouseId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
@@ -131,6 +141,22 @@ const { GET } = createEndpoint({
               label: "stockList.get.response.reorderPoint",
               schema: z.number().nullable(),
             }),
+            companyId: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              label: "dashboard.get.companyId.label",
+              hidden: true,
+              schema: z.uuid().optional(),
+            }),
+            currency: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              label: "stockList.get.response.currency",
+              schema: z.string().nullable().optional(),
+            }),
+            stockValue: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              label: "stockList.get.widget.stockValue",
+              schema: z.number().nullable().optional(),
+            }),
             unitCost: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               label: "stockList.get.response.unitCost",
@@ -208,8 +234,11 @@ const { GET } = createEndpoint({
             id: "ccddee11-e89b-12d3-a456-426614174001",
             warehouseId: "aabbccdd-e89b-12d3-a456-426614174001",
             productId: "11223344-e89b-12d3-a456-426614174001",
-            productName: "Widget A",
+            productName: "A5 linen notebook",
+            currency: "EUR",
+            companyId: "00000000-0000-4000-8000-000000000001",
             warehouseName: "Main Warehouse",
+            stockValue: 550,
             quantityOnHand: 100,
             quantityReserved: 10,
             quantityOnOrder: 50,

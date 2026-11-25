@@ -25,6 +25,7 @@ export const translations: typeof enTranslations = {
       description: "Rechnungsliste filtern",
     },
     response: {
+      customerName: "Kunde",
       total: "Gesamt",
       invoices: "Rechnungen",
       id: "Rechnungs-ID",
@@ -92,13 +93,13 @@ export const translations: typeof enTranslations = {
   },
   search: {
     label: "Dokumente suchen",
-    description:
-      "Suche nach Belegnummer, Rechnungs-ID oder Kunden-ID. Filtere nach Unternehmen oder Status.",
-    placeholder: "Belegnummer oder ID",
+    description: "Suchen Sie nach Rechnungsnummer, Kundenname oder ID.",
+    placeholder: "Rechnungsnummer oder Kunde",
   },
   status: {
     label: "Status",
-    description: "Nach Rechnungsstatus filtern",
+    description:
+      "Filtern Sie nach Rechnungsstatus oder zeigen Sie überfällige Rechnungen mit offenem Betrag.",
     placeholder: "Alle Status",
   },
   customerId: {
@@ -115,6 +116,8 @@ export const translations: typeof enTranslations = {
     description: "Ergebnisse pro Seite",
   },
   widget: {
+    filters: "Filter",
+    partlyPaid: "Teilbezahlt",
     pageCount: "Seiten insgesamt",
     title: "Ausgangsrechnungen",
     newInvoice: "Neue Rechnung",

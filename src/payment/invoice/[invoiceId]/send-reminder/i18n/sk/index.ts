@@ -8,16 +8,16 @@ export const translations: typeof enTranslations = {
     ar: "pohľadávky",
   },
   post: {
-    title: "Poslať upomienku k úhrade",
-    titleShort: "Poslať upomienku",
+    title: "Pripraviť upomienku",
+    titleShort: "Pripraviť upomienku",
     description:
-      "Pošlite upomienku k faktúre po splatnosti. Faktúra musí byť v stave Otvorená a po dátume splatnosti. Upomienka sa uloží ako poznámka k odberateľovi.",
+      "Pripravte upomienku s aktuálnou dlžnou sumou. Môžete pridať vlastnú poznámku.",
     form: {
-      title: "Poslať upomienku",
-      description: "Upozornite odberateľa na platbu po splatnosti.",
+      title: "Pripraviť upomienku",
+      description: "Pred odoslaním upomienky si skontrolujte dlžnú sumu.",
     },
     response: {
-      success: "Upomienka bola odoslaná",
+      success: "Upomienka je pripravená",
       message: "Informácia o stave",
     },
     errors: {
@@ -52,7 +52,7 @@ export const translations: typeof enTranslations = {
       conflict: {
         title: "Faktúru nemožno upomínať",
         description:
-          "Upomienku môžete odoslať len k otvorenej faktúre po splatnosti.",
+          "Upomienku môžete pripraviť len k neuhradenej faktúre po splatnosti.",
       },
       unsavedChanges: {
         title: "Neuložené zmeny",
@@ -60,8 +60,9 @@ export const translations: typeof enTranslations = {
       },
     },
     success: {
-      title: "Úspech",
-      description: "Upomienka bola odoslaná a zaznamenaná.",
+      title: "Upomienka je pripravená",
+      description:
+        "Upomienka sa uložila do histórie faktúry. Môžete ju poslať odberateľovi.",
     },
   },
   invoiceId: {
@@ -75,9 +76,16 @@ export const translations: typeof enTranslations = {
     placeholder: "Doplňte vlastný text upomienky…",
   },
   widget: {
+    copy: "Kopírovať upomienku",
+    copied: "Upomienka bola skopírovaná",
+    copyFailed: "Kopírovanie zlyhalo. Skúste to znova.",
+    download: "Stiahnuť upomienku",
+    subject: "Upomienka k faktúre č. {{number}}",
+    body: "Neuhradená suma je {{amount}}. Dátum splatnosti bol {{date}}.",
     back: "Späť",
-    submit: "Poslať upomienku",
-    reminderSent: "Upomienka bola odoslaná. Odberateľ dostal upozornenie.",
+    submit: "Pripraviť upomienku",
+    reminderSent:
+      "Upomienka sa uložila do histórie faktúry. Môžete ju poslať odberateľovi.",
     viewInvoice: "Zobraziť faktúru",
   },
 };

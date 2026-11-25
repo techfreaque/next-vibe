@@ -7,6 +7,10 @@ import { Input } from "next-vibe/ui/components/input";
 import { Span } from "next-vibe/ui/components/span";
 import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
 import {
+  formatMoney,
+  formatPercent,
+} from "next-vibe/unified-ui/_shared/format-money";
+import {
   useWidgetForm,
   useWidgetLocale,
   useWidgetLogger,
@@ -24,7 +28,9 @@ import type { JSX } from "react";
 import { useState } from "react";
 
 import productLookupEndpoint from "@/pos/product-lookup/definition";
+import { TaxCalculator } from "@/tax/calculator";
 
+import { useOrderPreview } from "../get/use-order-preview";
 import type definition from "./definition";
 
 interface PosOrderAddItemWidgetProps {
@@ -53,11 +59,9 @@ export function PosOrderAddItemWidget({
   const logger = useWidgetLogger();
   const result = data?.result;
 
-  const fmt = (n: number): string =>
-    new Intl.NumberFormat(locale, {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(n);
+  const order = useOrderPreview(result ? undefined : form.watch("orderId"));
+  const currency = result?.currency ?? order?.currency;
+  const fmt = (n: number): string => formatMoney(n, currency, locale);
 
   const [selectedProduct, setSelectedProduct] =
     useState<SelectedProduct | null>(null);
@@ -68,15 +72,17 @@ export function PosOrderAddItemWidget({
   // Typed, cached product search via the pos/product-lookup endpoint.
   const productSearch = useApiQuery({
     endpoint: productLookupEndpoint.GET,
-    requestData: { query: submittedQuery, companyId: undefined },
+    requestData: { query: submittedQuery, companyId: order?.companyId },
     logger,
     user,
     options: {
-      enabled: submittedQuery.trim().length > 0,
-      queryKey: `product-lookup:${submittedQuery}`,
+      enabled: !!order?.companyId && submittedQuery.trim().length > 0,
+      queryKey: `product-lookup:${order?.companyId ?? ""}:${submittedQuery}`,
     },
   });
-  const searchResults: SelectedProduct[] = productSearch.data?.products ?? [];
+  const searchResults: SelectedProduct[] = (
+    productSearch.data?.products ?? []
+  ).filter((product) => product.currency === currency);
   const isSearching = productSearch.isFetching;
 
   // Live preview
@@ -85,9 +91,11 @@ export function PosOrderAddItemWidget({
   const taxRate = Number(form?.watch("item.taxRate") ?? 0);
   const description = form?.watch("item.description") ?? "";
 
-  const lineSubtotal = qty * unitPrice;
-  const taxAmount = lineSubtotal * taxRate;
-  const lineTotal = lineSubtotal + taxAmount;
+  const { total: lineTotal } = TaxCalculator.calculateLineItemTax({
+    quantity: qty,
+    unitPrice,
+    taxRate,
+  });
 
   const handleProductSearch = (): void => {
     if (!searchQuery.trim()) {
@@ -162,7 +170,7 @@ export function PosOrderAddItemWidget({
         <Div className="rounded-lg border overflow-hidden divide-y">
           <Div className="flex items-center justify-between px-4 py-3 bg-muted/30">
             <Span className="text-sm font-medium">{result.description}</Span>
-            <Span className="text-sm font-mono font-bold tabular-nums">
+            <Span className="text-sm font-semibold tabular-nums">
               {fmt(result.lineTotal)}
             </Span>
           </Div>
@@ -171,7 +179,7 @@ export function PosOrderAddItemWidget({
               {result.quantity} {t("orderAddItem.post.widget.multiplier")}{" "}
               {fmt(result.unitPrice)}
             </Span>
-            <Span className="text-sm font-mono tabular-nums">
+            <Span className="text-sm tabular-nums">
               {fmt(result.lineTotal)}
             </Span>
           </Div>
@@ -179,7 +187,7 @@ export function PosOrderAddItemWidget({
             <Span className="text-sm font-semibold">
               {t("orderAddItem.post.response.orderTotal")}
             </Span>
-            <Span className="text-base font-mono font-bold tabular-nums">
+            <Span className="text-base font-semibold tabular-nums">
               {fmt(result.orderTotal)}
             </Span>
           </Div>
@@ -229,7 +237,7 @@ export function PosOrderAddItemWidget({
 
       {/* === Product search section === */}
       <Div className="flex flex-col gap-2">
-        <Span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+        <Span className="text-sm font-medium text-foreground">
           {t("orderAddItem.post.widget.searchProduct")}
         </Span>
 
@@ -247,7 +255,11 @@ export function PosOrderAddItemWidget({
                   </Span>
                 ) : null}
                 <Span className="text-xs text-muted-foreground">
-                  {fmt(selectedProduct.basePrice)} {selectedProduct.currency}
+                  {formatMoney(
+                    selectedProduct.basePrice,
+                    selectedProduct.currency,
+                    locale,
+                  )}
                 </Span>
               </Div>
             </Div>
@@ -311,9 +323,8 @@ export function PosOrderAddItemWidget({
                         </Span>
                       ) : null}
                     </Div>
-                    <Span className="text-sm font-mono tabular-nums ml-3 shrink-0">
-                      {fmt(product.basePrice)}{" "}
-                      <Span className="text-xs">{product.currency}</Span>
+                    <Span className="text-sm tabular-nums ml-3 shrink-0">
+                      {formatMoney(product.basePrice, product.currency, locale)}
                     </Span>
                   </Button>
                 ))}
@@ -355,6 +366,7 @@ export function PosOrderAddItemWidget({
         <Div className="grid grid-cols-2 gap-3">
           <NumberFieldWidget
             fieldName="item.quantity"
+            presentation="quantity"
             field={withValue(
               field.children.item.children.quantity,
               undefined,
@@ -363,6 +375,8 @@ export function PosOrderAddItemWidget({
           />
           <NumberFieldWidget
             fieldName="item.unitPrice"
+            presentation="money"
+            currency={currency}
             field={withValue(
               field.children.item.children.unitPrice,
               undefined,
@@ -373,6 +387,7 @@ export function PosOrderAddItemWidget({
         {/* Tax rate — optional, collapsed feel */}
         <NumberFieldWidget
           fieldName="item.taxRate"
+          presentation="percent"
           field={withValue(
             field.children.item.children.taxRate,
             undefined,
@@ -386,17 +401,17 @@ export function PosOrderAddItemWidget({
         <Div className="rounded-lg border bg-muted/20 px-4 py-3 flex items-center justify-between">
           <Div className="flex flex-col gap-0.5">
             <Span className="text-xs text-muted-foreground">
-              {description ? `"${String(description)}" — ` : ""}
+              {description ? `${String(description)} · ` : ""}
               {qty} {t("orderAddItem.post.widget.multiplier")} {fmt(unitPrice)}
               {taxRate > 0
-                ? ` + ${(taxRate * 100).toFixed(0)}% ${t("orderAddItem.post.widget.taxNote")}`
+                ? ` + ${formatPercent(taxRate, locale)} ${t("orderAddItem.post.widget.taxNote")}`
                 : ""}
             </Span>
             <Span className="text-xs text-muted-foreground">
               {t("orderAddItem.post.widget.linePreview")}
             </Span>
           </Div>
-          <Span className="text-base font-mono font-bold tabular-nums">
+          <Span className="text-base font-semibold tabular-nums">
             {fmt(lineTotal)}
           </Span>
         </Div>

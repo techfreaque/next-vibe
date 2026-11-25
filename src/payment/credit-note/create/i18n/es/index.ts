@@ -12,7 +12,7 @@ export const translations: typeof enTranslations = {
     title: "Crear nota de crédito",
     titleShort: "Nota de crédito",
     description:
-      "Cree una nota de crédito vinculada a una factura original. El crédito completo niega todas las líneas. El crédito parcial aplica los artículos de línea especificados. Publica una entrada de revistas reversales: Dr Revenue, Cr AR.",
+      "Emite un abono total o parcial sobre una factura contabilizada. El abono revierte la cuenta por cobrar, los ingresos y el IVA correspondientes.",
     form: {
       title: "Crear nota de crédito",
       description: "Emitir un crédito contra una factura existente",
@@ -35,6 +35,14 @@ export const translations: typeof enTranslations = {
       },
     },
     errors: {
+      creditLines:
+        "Introduce cantidades positivas y utiliza los tipos de IVA de la factura original.",
+      creditLimit:
+        "El abono supera el importe neto, el IVA o el total pendiente de abonar de la factura original.",
+      originalPosting:
+        "Concilia el asiento de la factura original antes de emitir un abono.",
+      posting:
+        "Revisa la moneda de la empresa, el periodo contable abierto y las cuentas del asiento original.",
       unauthorized: {
         title: "Se requiere autenticación",
         description: "Inicia sesión para continuar",

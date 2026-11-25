@@ -5,6 +5,7 @@ import { Button, type ButtonMouseEvent } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
 import { Span } from "next-vibe/ui/components/span";
+import { formatMoney } from "next-vibe/unified-ui/_shared/format-money";
 import {
   useWidgetLocale,
   useWidgetNavigation,
@@ -336,7 +337,7 @@ export function OrderGetWidget({
             {t("orderGet.get.response.subtotal")}
           </Span>
           <Span className="font-medium">
-            {result.currency} {result.subtotal.toFixed(2)}
+            {formatMoney(result.subtotal, result.currency, locale)}
           </Span>
         </Div>
         <Div className="p-3 rounded-lg border">
@@ -344,7 +345,7 @@ export function OrderGetWidget({
             {t("orderGet.get.response.taxAmount")}
           </Span>
           <Span className="font-medium">
-            {result.currency} {result.taxAmount.toFixed(2)}
+            {formatMoney(result.taxAmount, result.currency, locale)}
           </Span>
         </Div>
         <Div className="p-3 rounded-lg border bg-muted/30">
@@ -352,7 +353,7 @@ export function OrderGetWidget({
             {t("orderGet.get.response.total")}
           </Span>
           <Span className="font-semibold">
-            {result.currency} {result.total.toFixed(2)}
+            {formatMoney(result.total, result.currency, locale)}
           </Span>
         </Div>
       </Div>
@@ -395,10 +396,11 @@ export function OrderGetWidget({
                   )}
                 </Div>
                 <Span className="shrink-0 w-28 text-right text-muted-foreground">
-                  {line.quantity} {MULTIPLY_SIGN} {line.unitPrice.toFixed(2)}
+                  {line.quantity} {MULTIPLY_SIGN}{" "}
+                  {formatMoney(line.unitPrice, result.currency, locale)}
                 </Span>
                 <Span className="shrink-0 w-20 text-right font-medium">
-                  {result.currency} {line.lineTotal.toFixed(2)}
+                  {formatMoney(line.lineTotal, result.currency, locale)}
                 </Span>
               </Div>
             ))}

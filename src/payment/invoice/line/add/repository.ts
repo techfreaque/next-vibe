@@ -18,8 +18,11 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
+import { getDocumentAccess } from "@/finance/document-company-scope";
+
 import { paymentInvoiceLines, paymentInvoices } from "../../../db";
 import { InvoiceStatus } from "../../../enum";
+import { calculateInvoiceLine } from "../amounts";
 import type {
   InvoiceLineAddRequestOutput,
   InvoiceLineAddResponseOutput,
@@ -36,108 +39,118 @@ export class InvoiceLineAddRepository {
     const { t } = scopedTranslation.scopedT(locale);
 
     try {
-      // Verify invoice exists and belongs to user
-      const [invoice] = await db
-        .select()
-        .from(paymentInvoices)
-        .where(eq(paymentInvoices.id, data.invoiceId))
-        .limit(1);
+      return await db.transaction(async (tx) => {
+        const [invoice] = await tx
+          .select()
+          .from(paymentInvoices)
+          .where(eq(paymentInvoices.id, data.invoiceId))
+          .limit(1)
+          .for("update");
 
-      if (!invoice) {
-        return fail({
-          message: t("post.errors.notFound.title"),
-          errorType: ErrorResponseTypes.NOT_FOUND,
-        });
-      }
+        if (!invoice) {
+          return fail({
+            message: t("post.errors.notFound.title"),
+            errorType: ErrorResponseTypes.NOT_FOUND,
+          });
+        }
 
-      if (invoice.userId !== userId) {
-        return fail({
-          message: t("post.errors.forbidden.title"),
-          errorType: ErrorResponseTypes.FORBIDDEN,
-        });
-      }
+        if (!(await getDocumentAccess(userId, invoice, tx))?.canManage) {
+          return fail({
+            message: t("post.errors.forbidden.title"),
+            errorType: ErrorResponseTypes.FORBIDDEN,
+          });
+        }
 
-      if (invoice.status !== InvoiceStatus.DRAFT) {
-        return fail({
-          message: t("post.errors.conflict.title"),
-          errorType: ErrorResponseTypes.CONFLICT,
-        });
-      }
+        if (invoice.status !== InvoiceStatus.DRAFT) {
+          return fail({
+            message: t("post.errors.conflict.title"),
+            errorType: ErrorResponseTypes.CONFLICT,
+          });
+        }
 
-      const quantity = data.quantity ?? 1;
-      const unitPrice = data.unitPrice;
-      const taxRate = data.taxRate ?? 0;
-      const taxAmount = quantity * unitPrice * taxRate;
-      const lineTotal = quantity * unitPrice + taxAmount;
+        const { quantity, unitPrice, taxRate, taxAmount, lineTotal } =
+          calculateInvoiceLine({
+            quantity: data.quantity ?? 1,
+            unitPrice: data.unitPrice,
+            taxRate: data.taxRate ?? 0,
+          });
+        if (quantity <= 0) {
+          return fail({
+            message: t("post.errors.validation.title"),
+            errorType: ErrorResponseTypes.VALIDATION_ERROR,
+          });
+        }
 
-      // Get current max sort order for this invoice
-      const existingLines = await db
-        .select({ sortOrder: paymentInvoiceLines.sortOrder })
-        .from(paymentInvoiceLines)
-        .where(eq(paymentInvoiceLines.invoiceId, data.invoiceId));
+        // Get current max sort order for this invoice
+        const existingLines = await tx
+          .select({ sortOrder: paymentInvoiceLines.sortOrder })
+          .from(paymentInvoiceLines)
+          .where(eq(paymentInvoiceLines.invoiceId, data.invoiceId));
 
-      const maxSortOrder = existingLines.reduce(
-        (max, l) => Math.max(max, l.sortOrder ?? 0),
-        -1,
-      );
+        const maxSortOrder = existingLines.reduce(
+          (max, l) => Math.max(max, l.sortOrder ?? 0),
+          -1,
+        );
 
-      const [line] = await db
-        .insert(paymentInvoiceLines)
-        .values({
+        const [line] = await tx
+          .insert(paymentInvoiceLines)
+          .values({
+            invoiceId: data.invoiceId,
+            description: data.description,
+            productId: data.productId ?? null,
+            quantity,
+            unitPrice,
+            taxRate,
+            taxAmount,
+            lineTotal,
+            sortOrder: maxSortOrder + 1,
+          })
+          .returning();
+
+        if (!line) {
+          return fail({
+            message: t("post.errors.server.title"),
+            errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          });
+        }
+
+        // Update invoice total by summing all lines
+        await tx
+          .update(paymentInvoices)
+          .set({
+            amount: sql`(
+              SELECT SUM(line_total) FROM payment_invoice_lines
+              WHERE invoice_id = ${data.invoiceId}
+            )`,
+            updatedAt: new Date(),
+          })
+          .where(eq(paymentInvoices.id, data.invoiceId));
+
+        logger.debug("Invoice line added", {
+          lineId: line.id,
           invoiceId: data.invoiceId,
-          description: data.description,
-          productId: data.productId ?? null,
-          quantity,
-          unitPrice,
-          taxRate,
-          taxAmount,
           lineTotal,
-          sortOrder: maxSortOrder + 1,
-        })
-        .returning();
-
-      if (!line) {
-        return fail({
-          message: t("post.errors.server.title"),
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
         });
-      }
 
-      // Update invoice total by summing all lines
-      await db
-        .update(paymentInvoices)
-        .set({
-          amount: sql`(
-            SELECT SUM(line_total) FROM payment_invoice_lines
-            WHERE invoice_id = ${data.invoiceId}
-          )`,
-          updatedAt: new Date(),
-        })
-        .where(eq(paymentInvoices.id, data.invoiceId));
-
-      logger.debug("Invoice line added", {
-        lineId: line.id,
-        invoiceId: data.invoiceId,
-        lineTotal,
-      });
-
-      return success({
-        success: true,
-        message: null,
-        line: {
-          id: line.id,
-          invoiceId: line.invoiceId,
-          description: line.description,
-          productId: line.productId,
-          quantity: line.quantity,
-          unitPrice: line.unitPrice,
-          taxRate: line.taxRate,
-          taxAmount: line.taxAmount,
-          lineTotal: line.lineTotal,
-          sortOrder: line.sortOrder,
-          createdAt: line.createdAt,
-          updatedAt: line.updatedAt,
-        },
+        return success({
+          success: true,
+          message: null,
+          line: {
+            currency: invoice.currency,
+            id: line.id,
+            invoiceId: line.invoiceId,
+            description: line.description,
+            productId: line.productId,
+            quantity: line.quantity,
+            unitPrice: line.unitPrice,
+            taxRate: line.taxRate,
+            taxAmount: line.taxAmount,
+            lineTotal: line.lineTotal,
+            sortOrder: line.sortOrder,
+            createdAt: line.createdAt,
+            updatedAt: line.updatedAt,
+          },
+        });
       });
     } catch (error) {
       const parsed = parseError(error);

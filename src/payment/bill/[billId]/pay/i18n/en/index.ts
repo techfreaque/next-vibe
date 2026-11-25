@@ -7,6 +7,12 @@ export const translations = {
       "Mark an approved bill as paid and post the payment journal entry",
     billId: { label: "Bill ID", description: "The bill to mark as paid" },
     errors: {
+      approvalPosting:
+        "This bill needs a posted approval entry before payment.",
+      paymentAccount:
+        "Choose an active bank or cash account from this company.",
+      paymentPosting:
+        "Check the payment date, company currency and posting accounts.",
       validation: { title: "Validation Error", description: "Invalid input" },
       unauthorized: {
         title: "Not Signed In",

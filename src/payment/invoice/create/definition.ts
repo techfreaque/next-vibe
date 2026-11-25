@@ -12,6 +12,7 @@ import {
   Methods,
   WidgetType,
 } from "next-vibe/core/definition/enums";
+import { CurrenciesArr } from "next-vibe/core/i18n/core/config";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
 import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
@@ -92,17 +93,40 @@ const { POST } = createEndpoint({
 
       currency: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
+        fieldType: FieldDataType.SELECT,
+        options: CurrenciesArr.map((value) => ({
+          value,
+          label: "currency.code",
+          labelParams: { code: value },
+        })),
         label: "currency.label" as const,
         description: "currency.description" as const,
         placeholder: "currency.placeholder" as const,
         columns: 6,
-        schema: z.string().min(3).max(3).default("EUR"),
+        schema: z.enum(CurrenciesArr).optional(),
+      }),
+
+      lineItems: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "post.widget.items",
+        description: "post.widget.itemsDescription",
+        schema: z
+          .array(
+            z.object({
+              description: z.string().trim().min(1).max(500),
+              quantity: z.number().min(0.0001).max(99_999_999),
+              unitPrice: z.number().nonnegative().max(99_999_999),
+              taxRate: z.number().min(0).max(1),
+            }),
+          )
+          .max(100)
+          .optional(),
       }),
 
       notes: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
+        fieldType: FieldDataType.TEXTAREA,
         label: "notes.label" as const,
         description: "notes.description" as const,
         placeholder: "notes.placeholder" as const,

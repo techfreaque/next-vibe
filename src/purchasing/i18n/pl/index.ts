@@ -68,7 +68,7 @@ export const translations: typeof enTranslations = {
         },
         server: {
           title: "Błąd serwera",
-          description: "Nie udało się utworzyć dostawcy — spróbuj ponownie",
+          description: "Nie udało się utworzyć dostawcy. Spróbuj ponownie.",
         },
         unknown: {
           title: "Nieznany błąd",
@@ -141,12 +141,12 @@ export const translations: typeof enTranslations = {
       placeholder: "123456789",
     },
     addressLine1: {
-      label: "Adres — linia 1",
+      label: "Pierwszy wiersz adresu",
       description: "Ulica i numer",
       placeholder: "ul. Główna 1",
     },
     addressLine2: {
-      label: "Adres — linia 2",
+      label: "Drugi wiersz adresu",
       description: "Piętro, biuro itp.",
       placeholder: "Piętro 2",
     },
@@ -323,7 +323,7 @@ export const translations: typeof enTranslations = {
         vatNumber: "NIP",
         taxId: "REGON",
         addressLine1: "Adres",
-        addressLine2: "Adres — linia 2",
+        addressLine2: "Drugi wiersz adresu",
         city: "Miasto",
         region: "Województwo",
         postalCode: "Kod pocztowy",
@@ -384,12 +384,12 @@ export const translations: typeof enTranslations = {
         placeholder: "123456789",
       },
       addressLine1: {
-        label: "Adres — linia 1",
+        label: "Pierwszy wiersz adresu",
         description: "Ulica i numer",
         placeholder: "ul. Główna 1",
       },
       addressLine2: {
-        label: "Adres — linia 2",
+        label: "Drugi wiersz adresu",
         description: "Piętro, biuro itp.",
         placeholder: "Piętro 2",
       },
@@ -553,7 +553,7 @@ export const translations: typeof enTranslations = {
         conflict: { title: "Konflikt", description: "Konflikt danych" },
         server: {
           title: "Błąd serwera",
-          description: "Nie udało się utworzyć zamówienia — spróbuj ponownie",
+          description: "Nie udało się utworzyć zamówienia. Spróbuj ponownie.",
         },
         unknown: {
           title: "Nieznany błąd",
@@ -846,7 +846,7 @@ export const translations: typeof enTranslations = {
     patch: {
       title: "Aktualizuj zamówienie",
       titleShort: "Zaktualizuj zamówienie",
-      description: "Edytuj szkic zamówienia — pola i pozycje.",
+      description: "Edytuj dane i pozycje zamówienia roboczego.",
       widget: { backToPO: "Powrót do zamówienia" },
       poId: { label: "ID zamówienia", description: "Zamówienie do edycji" },
       vendorId: {
@@ -1026,7 +1026,7 @@ export const translations: typeof enTranslations = {
     post: {
       title: "Potwierdź zamówienie",
       titleShort: "Potwierdź zamówienie",
-      description: "Dostawca potwierdził — oznacz jako Potwierdzone.",
+      description: "Zarejestruj potwierdzenie zamówienia przez dostawcę.",
       poId: {
         label: "ID zamówienia",
         description: "Zamówienie do potwierdzenia",
@@ -1172,7 +1172,8 @@ export const translations: typeof enTranslations = {
     post: {
       title: "Konwertuj do faktury",
       titleShort: "Konwertuj na rachunek",
-      description: "Utwórz fakturę zakupu z tego zamówienia.",
+      description:
+        "Utwórz fakturę zakupu z w pełni przyjętego zamówienia. Zatwierdzenie faktury zaksięguje zobowiązanie.",
       widget: {
         back: "Wróć",
         viewBill: "Pokaż fakturę",
@@ -1180,8 +1181,9 @@ export const translations: typeof enTranslations = {
       poId: { label: "ID zamówienia", description: "Zamówienie do konwersji" },
       errors: {
         validation: {
-          title: "Błąd walidacji",
-          description: "Nieprawidłowe ID zamówienia",
+          title: "Sprawdź walutę i kwoty zamówienia",
+          description:
+            "Waluta musi być obsługiwana, a kwoty muszą zgadzać się z pozycjami zamówienia.",
         },
         unauthorized: {
           title: "Nie zalogowano",
@@ -1192,8 +1194,9 @@ export const translations: typeof enTranslations = {
           description: "Brak dostępu do tego zamówienia",
         },
         conflict: {
-          title: "Już skonwertowane",
-          description: "To zamówienie zostało już przekonwertowane do faktury",
+          title: "Nie można utworzyć faktury",
+          description:
+            "Zamówienie musi być w całości przyjęte i nie może mieć przypisanej faktury.",
         },
         server: {
           title: "Błąd serwera",
@@ -1384,14 +1387,24 @@ export const translations: typeof enTranslations = {
       description:
         "Aktualny stan zamówień zakupu i aktywności dostawców dla Twojej firmy.",
       widget: {
+        openValue: "Wartość otwartych zamówień",
+        settledBills: "Rachunki opłacone w tym miesiącu",
+        deliveries: "Oczekiwane dostawy",
+        order: "Zamówienie",
+        supplier: "Dostawca",
+        expected: "Termin",
+        orderTotal: "Wartość zamówienia",
+        noDeliveries: "Brak oczekujących dostaw",
+        overdue: "Opóźnione dostawy",
+        dueSeven: "Termin w ciągu 7 dni",
         kpiDraft: "Szkice",
         kpiConfirmed: "Potwierdzone",
         kpiAwaitingReceipt: "Oczekuje na odbiór",
         kpiActiveVendors: "Aktywni dostawcy",
         warningDueThisWeek:
-          "{{count}} zamówienie do realizacji w tym tygodniu — sprawdź daty dostawy",
+          "W tym tygodniu przypada termin jednej dostawy. Sprawdź jej datę.",
         warningDueThisWeekPlural:
-          "{{count}} zamówień do realizacji w tym tygodniu — sprawdź daty dostawy",
+          "Zamówienia z dostawą w tym tygodniu: {{count}}. Sprawdź terminy.",
         navNewPo: "Nowe zamówienie",
         navAllPos: "Wszystkie ZZ",
         navVendors: "Dostawcy",

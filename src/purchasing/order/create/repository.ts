@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import { and, count, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
@@ -18,11 +18,13 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
+import { companies } from "@/companies/db";
 import { CompanyMemberRole } from "@/companies/enum";
 import { CompanyAuthRepository } from "@/companies/repository";
 
-import { purchaseOrders, purchasingVendors } from "../../db";
+import { purchaseOrders } from "../../db";
 import { scopedTranslation } from "../../i18n";
+import { validOrderReferences } from "../draft";
 import type {
   OrderCreateRequestOutput,
   OrderCreateResponseOutput,
@@ -53,75 +55,76 @@ export class OrderCreateRepository {
         });
       }
 
-      // Verify vendor belongs to same company
-      const [vendor] = await db
-        .select({
-          id: purchasingVendors.id,
-          companyId: purchasingVendors.companyId,
-        })
-        .from(purchasingVendors)
-        .where(eq(purchasingVendors.id, data.vendorId))
-        .limit(1);
+      return await db.transaction(async (tx) => {
+        const [company] = await tx
+          .select({ id: companies.id })
+          .from(companies)
+          .where(
+            and(eq(companies.id, data.companyId), eq(companies.isActive, true)),
+          )
+          .for("update");
+        if (
+          !company ||
+          !(await validOrderReferences(tx, data.companyId, userId, {
+            vendorId: data.vendorId,
+            warehouseId: data.deliveryWarehouseId,
+          }))
+        ) {
+          return fail({
+            message: t("orderCreate.post.errors.notFound.title"),
+            errorType: ErrorResponseTypes.NOT_FOUND,
+          });
+        }
+        const yearPrefix = `PO-${new Date().getUTCFullYear()}-`;
+        const [next] = await tx
+          .select({
+            value: sql<string>`coalesce(max(substring(${purchaseOrders.poNumber} from ${`^${yearPrefix}([0-9]+)$`})::numeric),0)+1`,
+          })
+          .from(purchaseOrders)
+          .where(eq(purchaseOrders.companyId, data.companyId));
+        const poNumber = `${yearPrefix}${String(next.value).padStart(4, "0")}`;
+        const [created] = await tx
+          .insert(purchaseOrders)
+          .values({
+            companyId: data.companyId,
+            vendorId: data.vendorId,
+            poNumber,
+            status: "DRAFT",
+            currency: data.currency,
+            expectedDeliveryDate: data.expectedDeliveryDate ?? null,
+            deliveryWarehouseId: data.deliveryWarehouseId ?? null,
+            notes: data.notes ?? null,
+            subtotal: 0,
+            taxAmount: 0,
+            total: 0,
+            createdByUserId: userId,
+          })
+          .returning();
 
-      if (!vendor || vendor.companyId !== data.companyId) {
-        return fail({
-          message: t("orderCreate.post.errors.notFound.title"),
-          errorType: ErrorResponseTypes.NOT_FOUND,
-        });
-      }
+        if (!created) {
+          return fail({
+            message: t("orderCreate.post.errors.server.title"),
+            errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          });
+        }
 
-      // Generate PO number: PO-{YYYY}-{NNNN} per company per year
-      const year = new Date().getFullYear();
-      const yearPrefix = `PO-${year.toString()}-`;
-
-      const [{ value: existingCount }] = await db
-        .select({ value: count() })
-        .from(purchaseOrders)
-        .where(and(eq(purchaseOrders.companyId, data.companyId)));
-
-      const sequence = (existingCount + 1).toString().padStart(4, "0");
-      const poNumber = `${yearPrefix}${sequence}`;
-
-      const [created] = await db
-        .insert(purchaseOrders)
-        .values({
-          companyId: data.companyId,
-          vendorId: data.vendorId,
-          poNumber,
-          status: "DRAFT",
-          currency: data.currency,
-          expectedDeliveryDate: data.expectedDeliveryDate ?? null,
-          deliveryWarehouseId: data.deliveryWarehouseId ?? null,
-          notes: data.notes ?? null,
-          subtotal: 0,
-          taxAmount: 0,
-          total: 0,
-          createdByUserId: userId,
-        })
-        .returning();
-
-      if (!created) {
-        return fail({
-          message: t("orderCreate.post.errors.server.title"),
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        });
-      }
-
-      logger.info("Purchase order created", {
-        poId: created.id,
-        poNumber: created.poNumber,
-      });
-
-      return success({
-        result: {
-          id: created.id,
+        logger.info("Purchase order created", {
+          poId: created.id,
           poNumber: created.poNumber,
-          status: created.status,
-          subtotal: created.subtotal,
-          taxAmount: created.taxAmount,
-          total: created.total,
-          createdAt: created.createdAt,
-        },
+        });
+
+        return success({
+          result: {
+            currency: created.currency,
+            id: created.id,
+            poNumber: created.poNumber,
+            status: created.status,
+            subtotal: created.subtotal,
+            taxAmount: created.taxAmount,
+            total: created.total,
+            createdAt: created.createdAt,
+          },
+        });
       });
     } catch (error) {
       logger.error("Failed to create purchase order", parseError(error));

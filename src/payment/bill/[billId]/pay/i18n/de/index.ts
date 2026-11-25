@@ -21,6 +21,12 @@ export const translations: typeof enTranslations = {
       description: "Die zu bezahlende Rechnung",
     },
     errors: {
+      approvalPosting:
+        "Vor der Zahlung muss die Freigabebuchung für diese Rechnung vorliegen.",
+      paymentAccount:
+        "Wählen Sie ein aktives Bank- oder Kassenkonto dieses Unternehmens.",
+      paymentPosting:
+        "Prüfen Sie Zahlungsdatum, Unternehmenswährung und Buchungskonten.",
       validation: {
         title: "Validierungsfehler",
         description: "Ungültige Eingabe",

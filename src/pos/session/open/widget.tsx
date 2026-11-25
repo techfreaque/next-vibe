@@ -5,6 +5,7 @@ import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { Span } from "next-vibe/ui/components/span";
 import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
+import { formatMoney } from "next-vibe/unified-ui/_shared/format-money";
 import {
   useWidgetForm,
   useWidgetLocale,
@@ -99,10 +100,7 @@ export function PosSessionOpenWidget({
               {t("sessionOpen.post.response.openingFloat")}
             </Span>
             <Span className="text-sm font-mono font-semibold tabular-nums">
-              {new Intl.NumberFormat(locale, {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              }).format(result.openingFloat)}
+              {formatMoney(result.openingFloat, result?.currency, locale)}
             </Span>
           </Div>
           {result.openedAt ? (

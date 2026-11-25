@@ -19,6 +19,7 @@ export const translations: typeof enTranslations = {
       success: "Položka bola pridaná",
       message: "Stavová správa",
       line: {
+        currency: "Mena",
         title: "Údaje položky",
         subtitle: "Vytvorená položka faktúry",
         id: "ID položky",

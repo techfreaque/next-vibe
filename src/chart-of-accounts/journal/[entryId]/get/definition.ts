@@ -144,6 +144,16 @@ const { GET } = createEndpoint({
                   label: "journalEntryGet.response.accountId",
                   schema: z.string().uuid(),
                 }),
+                accountCode: responseField(scopedTranslation, {
+                  type: WidgetType.TEXT,
+                  label: "accountGet.response.code",
+                  schema: z.string().nullable().optional(),
+                }),
+                accountName: responseField(scopedTranslation, {
+                  type: WidgetType.TEXT,
+                  label: "accountGet.response.name",
+                  schema: z.string().nullable().optional(),
+                }),
                 lineType: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   label: "journalEntryGet.response.lineType",

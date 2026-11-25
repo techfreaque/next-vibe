@@ -164,26 +164,22 @@ function InputInner<
   }, [stringValue]);
 
   // Map web input type to React Native keyboard type
-  const resolvedKeyboardType = React.useMemo(():
-    | "default"
-    | "numeric"
-    | "email-address"
-    | "phone-pad"
-    | undefined => {
-    if (keyboardType) {
-      return keyboardType;
-    }
-    switch (type) {
-      case "email":
-        return "email-address";
-      case "tel":
-        return "phone-pad";
-      case "number":
-        return "numeric";
-      default:
-        return "default";
-    }
-  }, [type, keyboardType]);
+  const resolvedKeyboardType =
+    React.useMemo((): InputProps<T>["keyboardType"] => {
+      if (keyboardType) {
+        return keyboardType;
+      }
+      switch (type) {
+        case "email":
+          return "email-address";
+        case "tel":
+          return "phone-pad";
+        case "number":
+          return "numeric";
+        default:
+          return "default";
+      }
+    }, [type, keyboardType]);
 
   // Map web input type to React Native secure text entry
   const resolvedSecureTextEntry = React.useMemo((): boolean => {

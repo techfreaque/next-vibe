@@ -33,6 +33,7 @@ export class PosSessionOpenRepository {
   ): Promise<
     ResponseType<{
       result: {
+        currency: string;
         id: string;
         terminalId: string;
         openedAt: Date;
@@ -48,7 +49,11 @@ export class PosSessionOpenRepository {
 
       // Verify terminal exists and load companyId for auth
       const [terminal] = await db
-        .select({ id: posTerminals.id, companyId: posTerminals.companyId })
+        .select({
+          id: posTerminals.id,
+          companyId: posTerminals.companyId,
+          currency: posTerminals.currency,
+        })
         .from(posTerminals)
         .where(eq(posTerminals.id, details.terminalId))
         .limit(1);
@@ -115,7 +120,7 @@ export class PosSessionOpenRepository {
         });
       }
 
-      return success({ result: session });
+      return success({ result: { ...session, currency: terminal.currency } });
     } catch (error) {
       logger.error("Error opening POS session", parseError(error));
       return fail({

@@ -25,6 +25,7 @@ import { Bot } from "next-vibe/ui/components/icons/Bot";
 import { Check } from "next-vibe/ui/components/icons/Check";
 import { ChevronDown } from "next-vibe/ui/components/icons/ChevronDown";
 import { ChevronRight } from "next-vibe/ui/components/icons/ChevronRight";
+import { Download } from "next-vibe/ui/components/icons/Download";
 import { Eye } from "next-vibe/ui/components/icons/Eye";
 import { EyeOff } from "next-vibe/ui/components/icons/EyeOff";
 import { Globe } from "next-vibe/ui/components/icons/Globe";
@@ -32,6 +33,7 @@ import { Monitor } from "next-vibe/ui/components/icons/Monitor";
 import { PanelLeft } from "next-vibe/ui/components/icons/PanelLeft";
 import { Pin } from "next-vibe/ui/components/icons/Pin";
 import { PinOff } from "next-vibe/ui/components/icons/PinOff";
+import { Plus } from "next-vibe/ui/components/icons/Plus";
 import { RotateCcw } from "next-vibe/ui/components/icons/RotateCcw";
 import { Search } from "next-vibe/ui/components/icons/Search";
 import { Settings } from "next-vibe/ui/components/icons/Settings";
@@ -85,12 +87,11 @@ import {
   useMemo,
   useRef,
   useState,
+  useSyncExternalStore,
 } from "react";
 
-import {
-  getLocaleLabel,
-  LocalePickerDialog,
-} from "@/_pages/_components/locale-picker";
+import { LocalePickerDialog } from "@/_pages/_components/locale-picker";
+import { getLocaleLabel } from "@/_pages/_components/locale-picker/model";
 import { Logo } from "@/_pages/_components/logo";
 import { ThemeToggleDropdown } from "@/_pages/_components/theme-toggle";
 import {
@@ -98,6 +99,7 @@ import {
   parseToolsInitialState,
   readEndpointSearchParams,
 } from "@/_pages/tools/initial-state";
+import { useWorkspaceCompany } from "@/companies/_shared/workspace-company-context";
 import {
   ADMIN_GROUPS,
   CATEGORY_REGISTRY,
@@ -151,7 +153,7 @@ import {
 import { EndpointsPage } from "../unified-ui/renderers/web/EndpointsPage";
 import { Icon } from "../unified-ui/widgets/form-fields/icon-field/icon-component";
 import type { IconKey } from "../unified-ui/widgets/form-fields/icon-field/icons";
-import { AdminCatalog, localizedLabel } from "./admin-catalog";
+import { AdminCatalog } from "./admin-catalog";
 import { CatalogOverview } from "./catalog-overview";
 import type { CategoryDefinitionSerialized } from "./category-types";
 import type definition from "./definition";
@@ -159,12 +161,22 @@ import type {
   HelpGetRequestInput,
   HelpToolMetadataSerialized,
 } from "./definition";
+import {
+  applyWorkspaceCompany,
+  applyWorkspaceCompanyToEntry,
+  readWorkspaceCompanyOverride,
+} from "./erp-company-scope";
+import { ErpCompanySwitch } from "./erp-company-switch";
+import { erpEntryPoints, erpInvoiceCreate } from "./erp-workflows";
+import { ErpWorkspaceNav } from "./erp-workspace-nav";
 import { scopedTranslation } from "./i18n";
+import { localizedLabel } from "./localized-label";
 import { resolveEffectiveUser } from "./repository/meta-filter";
 
 // ─── Constants ──────────────────────────────────────────────────────────────
 
 const ADMIN_ENDPOINTS_PATH = "tools";
+const subscribeToHydration = (): (() => void) => () => undefined;
 
 type StatsFilter = NonNullable<HelpGetRequestInput["statsFilter"]>;
 
@@ -448,6 +460,15 @@ export function HelpToolsWidget(): JSX.Element {
   const prodOnly = form.watch("includeProdOnly") ?? false;
   const activeViewAsRole = isAdminUser ? form.watch("viewAsRole") : undefined;
   const activeInstanceId = form.watch("instanceId");
+  const workspace = useWorkspaceCompany();
+  const hydrated = useSyncExternalStore(
+    subscribeToHydration,
+    () => true,
+    () => false,
+  );
+  const hasLocalWorkspace =
+    isAdminUser && !activeViewAsRole && !activeInstanceId;
+  const activeCompany = hasLocalWorkspace ? workspace?.active : undefined;
   const triggerRefetchRef = useRef<() => void>(() => undefined);
   const canOpenLocalEndpoint = useCallback(
     (endpoint: CreateApiEndpointAny): boolean => {
@@ -483,7 +504,7 @@ export function HelpToolsWidget(): JSX.Element {
   const [isRestoringTool, setIsRestoringTool] = useState(
     () => !!toolAliasFromPathname(pathname),
   );
-  const [selectedGetInputs, setSelectedGetInputs] = useState<
+  const [selectedToolInputs, setSelectedToolInputs] = useState<
     ReturnType<typeof splitToolInputs>
   >({});
   const selectedAdminEndpointRef = useRef<CreateApiEndpointAny | null>(null);
@@ -495,9 +516,7 @@ export function HelpToolsWidget(): JSX.Element {
     ): void => {
       selectedAdminEndpointRef.current = ep;
       setSelectedAdminEndpointState(ep);
-      setSelectedGetInputs(
-        ep?.method === "GET" ? splitToolInputs(ep, args) : {},
-      );
+      setSelectedToolInputs(ep ? splitToolInputs(ep, args) : {});
     },
     [],
   );
@@ -535,6 +554,9 @@ export function HelpToolsWidget(): JSX.Element {
     isAdminLayout ? parseSidebarPathFromSearch(searchParams) : [],
   );
 
+  const [showAllTools, setShowAllTools] = useState(
+    () => searchParams.get("catalog") === "all",
+  );
   const urlNavStackRef = useRef<ReturnType<typeof useUrlNavStack>>(undefined);
 
   const restoreBaseTool = useCallback(async (): Promise<void> => {
@@ -576,6 +598,7 @@ export function HelpToolsWidget(): JSX.Element {
   }, [canOpenLocalEndpoint, logger, setSelectedAdminEndpoint]);
 
   const restoreCatalogFilters = useCallback((): void => {
+    setShowAllTools(effectiveSearchRef.current.get("catalog") === "all");
     setSidebarPathRaw(parseSidebarPathFromSearch(effectiveSearchRef.current));
     const filters = parseToolsInitialState(effectiveSearchRef.current);
     const previous = form.getValues();
@@ -1028,12 +1051,22 @@ export function HelpToolsWidget(): JSX.Element {
     new Set(),
   );
   const setSidebarPath = useCallback(
-    (path: string[], filter?: StatsFilter): void => {
+    (path: string[], filter?: StatsFilter, mode?: "business" | "all"): void => {
       setSidebarPathRaw(path);
       const sp = copyCatalogSearchParams(effectiveSearchRef.current);
       sp.delete("cat");
       sp.delete("sub");
       sp.delete("p");
+      if (mode) {
+        setShowAllTools(mode === "all");
+        if (mode === "all") {
+          sp.set("catalog", "all");
+        } else {
+          sp.delete("catalog");
+        }
+        sp.delete("q");
+        form.setValue("query", undefined, { shouldDirty: true });
+      }
       if (path[0]) {
         sp.set("cat", path[0]);
       }
@@ -2852,18 +2885,240 @@ export function HelpToolsWidget(): JSX.Element {
       </Div>
     );
 
+    const activeNavigationEntry = urlNavStack?.current;
+    const displayedEndpoint =
+      activeNavigationEntry?.endpoint ?? selectedAdminEndpoint;
+    const displayedMethod = displayedEndpoint?.method;
+    const explicitCompanyId = displayedEndpoint
+      ? readWorkspaceCompanyOverride(
+          displayedEndpoint,
+          activeNavigationEntry?.params ?? selectedToolInputs,
+        )
+      : undefined;
+    const companyInToolbar =
+      explicitCompanyId === undefined
+        ? activeCompany
+        : workspace?.companies.find(({ id }) => id === explicitCompanyId);
+    // Restored browser state can affect whether the toolbar shows the switch.
+    const companySwitcherVisible =
+      hydrated &&
+      hasLocalWorkspace &&
+      workspace &&
+      workspace.companies.length > 0 &&
+      (explicitCompanyId === undefined || companyInToolbar !== undefined);
+    const selectWorkspaceCompany = (id: string): void => {
+      workspace?.select(id);
+      if (displayedMethod !== "GET" || explicitCompanyId === undefined) {
+        return;
+      }
+      // An explicit switch changes the current report. Browser navigation still
+      // restores any explicit company passed by a link or earlier override.
+      const search = new URLSearchParams(effectiveSearchRef.current);
+      search.set("arg.companyId", id);
+      search.delete("companyId");
+      writeSilentUrl(effectivePathnameRef.current, search);
+      urlNavStack?._clearStack();
+      void restoreBaseTool();
+    };
+    const hasBusinessNavigation =
+      hasLocalWorkspace && !!workspace?.companies.length;
+    const showBusinessNavigation = hasBusinessNavigation && !showAllTools;
+    const goHome = (): void => setSidebarPath([], "webPinned", "business");
+    const showDeveloperCatalog = (): void => {
+      setSidebarPath([], "webPinned", "all");
+      if (isMobile) {
+        setAdminSidebarCollapsed(false);
+      }
+    };
+    const browseTools = (): void => {
+      if (showBusinessNavigation) {
+        showDeveloperCatalog();
+      } else {
+        setSidebarPath(sidebarPath);
+      }
+    };
+    const companySwitch = companySwitcherVisible ? (
+      <ErpCompanySwitch
+        t={t}
+        activeCompany={companyInToolbar}
+        companies={workspace.companies}
+        onSelect={
+          !isRestoringTool &&
+          (displayedMethod === undefined || displayedMethod === "GET")
+            ? selectWorkspaceCompany
+            : undefined
+        }
+        onBrowse={isMobile && selectedAdminEndpoint ? browseTools : undefined}
+      />
+    ) : undefined;
+    const navCategory = displayedEndpoint?.category ?? activeCatKey;
+    const activeNavigationCategory = navCategory
+      ? categoryByKey.get(navCategory)
+      : undefined;
+    const endpointSubcategory = displayedEndpoint?.subCategory;
+    const navSubcategory =
+      displayedEndpoint &&
+      endpointSubcategory &&
+      activeNavigationCategory?.subcategories?.[endpointSubcategory] &&
+      endpointToUrlSegment(displayedEndpoint) !==
+        activeNavigationCategory.defaultEntryAlias
+        ? endpointSubcategory
+        : displayedEndpoint
+          ? undefined
+          : activeSubKey;
+    const sidePanel = showBusinessNavigation ? (
+      <ErpWorkspaceNav
+        t={t}
+        locale={locale}
+        categories={CATEGORY_REGISTRY}
+        permitted={response?.webCategories}
+        defaults={response?.erpNavigationAliases}
+        currentCategory={navCategory}
+        currentSubcategory={navSubcategory}
+        currentAlias={
+          displayedEndpoint
+            ? endpointToUrlSegment(displayedEndpoint)
+            : undefined
+        }
+        onOpenTool={(alias) => void handleOpenTool(alias)}
+        onHome={goHome}
+        onAllTools={showDeveloperCatalog}
+        onSelect={(category, subcategory, alias) => {
+          if (alias) {
+            void handleOpenTool(alias);
+          } else {
+            setSidebarPath(
+              subcategory ? [category, subcategory] : [category],
+              "web",
+            );
+          }
+        }}
+        company={isMobile ? undefined : companySwitch}
+        instances={instanceControls}
+      />
+    ) : (
+      <Div className="flex h-full min-h-0 flex-col">
+        {hasBusinessNavigation && (
+          <Div className="shrink-0 border-b p-2">
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="w-full justify-start"
+              onClick={goHome}
+            >
+              {t("erp.home")}
+            </Button>
+          </Div>
+        )}
+        <Div className="min-h-0 flex-1">{toolListSidebar}</Div>
+      </Div>
+    );
     const selectedToolAllowed =
       selectedAdminEndpoint &&
       canOpenLocalEndpoint(selectedAdminEndpoint) &&
       (!urlNavStack?.current ||
         canOpenLocalEndpoint(urlNavStack.current.endpoint));
+    const companyId = activeCompany?.id;
+    const toolInputs = selectedAdminEndpoint
+      ? applyWorkspaceCompany(
+          selectedAdminEndpoint,
+          selectedToolInputs,
+          companyId,
+        )
+      : selectedToolInputs;
+    const scopedStack =
+      companyId && urlNavStack
+        ? urlNavStack.stack.map((entry) =>
+            applyWorkspaceCompanyToEntry(entry, companyId),
+          )
+        : undefined;
+    const navigationOverride =
+      scopedStack && urlNavStack
+        ? {
+            ...urlNavStack,
+            stack: scopedStack,
+            current: scopedStack.at(-1) ?? null,
+          }
+        : urlNavStack;
+    const scopedEntry = navigationOverride?.current;
+    const selectedCompanyId = scopedEntry
+      ? readWorkspaceCompanyOverride(scopedEntry.endpoint, scopedEntry.params)
+      : selectedAdminEndpoint
+        ? readWorkspaceCompanyOverride(selectedAdminEndpoint, toolInputs)
+        : undefined;
+    const toolPageKey = selectedCompanyId
+      ? `${selectedToolId}:${selectedCompanyId}`
+      : selectedToolId;
+    const mutationOptions = {
+      urlPathParams: toolInputs.urlPathParams,
+      autoPrefillData: toolInputs.data,
+    };
     const toolPageProps = {
       logger,
       locale,
       user,
       platform,
-      navigationOverride: urlNavStack,
+      navigationOverride,
       className: "flex flex-col flex-1 min-w-0",
+    };
+    const renderSelectedTool = (
+      endpoint: CreateApiEndpointAny,
+    ): JSX.Element => {
+      switch (endpoint.method) {
+        case "GET":
+          return (
+            <EndpointsPage
+              {...toolPageProps}
+              key={toolPageKey}
+              endpoint={{ GET: endpoint }}
+              endpointOptions={{
+                read: {
+                  urlPathParams: toolInputs.urlPathParams,
+                  initialState: toolInputs.data,
+                },
+              }}
+            />
+          );
+        case "PATCH":
+          return (
+            <EndpointsPage
+              {...toolPageProps}
+              key={toolPageKey}
+              endpoint={{ PATCH: endpoint }}
+              endpointOptions={{ update: mutationOptions }}
+            />
+          );
+        case "DELETE":
+          return (
+            <EndpointsPage
+              {...toolPageProps}
+              key={toolPageKey}
+              endpoint={{ DELETE: endpoint }}
+              endpointOptions={{ delete: mutationOptions }}
+            />
+          );
+        case "PUT":
+          return (
+            <EndpointsPage
+              {...toolPageProps}
+              key={toolPageKey}
+              endpoint={{ PUT: endpoint }}
+              endpointOptions={{ create: mutationOptions }}
+            />
+          );
+        case "POST":
+          return (
+            <EndpointsPage
+              {...toolPageProps}
+              key={toolPageKey}
+              endpoint={{ POST: endpoint }}
+              endpointOptions={{ create: mutationOptions }}
+            />
+          );
+        default:
+          return <EmptyBlock title={t("catalog.toolNotFound")} />;
+      }
     };
     const primaryTool = activeCat?.defaultEntryAlias
       ? visibleTools.find(
@@ -2891,27 +3146,7 @@ export function HelpToolsWidget(): JSX.Element {
             )}
           >
             <HelpAdminLayoutActiveContext.Provider value={true}>
-              {selectedAdminEndpoint.method === "GET" ? (
-                <EndpointsPage
-                  key={selectedToolId}
-                  {...toolPageProps}
-                  endpoint={{ GET: selectedAdminEndpoint }}
-                  endpointOptions={{
-                    read: {
-                      urlPathParams: selectedGetInputs.urlPathParams,
-                      initialState: selectedGetInputs.data,
-                    },
-                  }}
-                />
-              ) : (
-                <EndpointsPage
-                  key={selectedToolId}
-                  {...toolPageProps}
-                  endpoint={{
-                    [selectedAdminEndpoint.method]: selectedAdminEndpoint,
-                  }}
-                />
-              )}
+              {renderSelectedTool(selectedAdminEndpoint)}
             </HelpAdminLayoutActiveContext.Provider>
           </Div>
         )}
@@ -2947,6 +3182,29 @@ export function HelpToolsWidget(): JSX.Element {
               isAdminUser && !activeViewAsRole && !activeInstanceId
                 ? (response?.recordSearchTargets ?? [])
                 : []
+            }
+            erpWorkflowAliases={
+              hasLocalWorkspace && !showAllTools
+                ? response?.erpWorkflowAliases
+                : undefined
+            }
+            activeCompany={activeCompany}
+            hasNoCompany={workspace?.companies.length === 0}
+            accountingOverview={
+              !showAllTools &&
+              activeCompany &&
+              response?.erpWorkflowAliases?.includes(
+                erpEntryPoints.accounting,
+              ) ? (
+                <CatalogOverview
+                  alias={erpEntryPoints.accounting}
+                  companyId={activeCompany.id}
+                  pageProps={{
+                    ...toolPageProps,
+                    navigationOverride: catalogOverviewNavigation,
+                  }}
+                />
+              ) : undefined
             }
             overview={
               isAdminUser &&
@@ -3114,17 +3372,86 @@ export function HelpToolsWidget(): JSX.Element {
             )}
 
             {/* Logo */}
-            <Logo locale={locale} size="h-8" />
-            {selectedAdminEndpoint && (
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                className="ml-auto h-auto min-h-9 max-w-full whitespace-normal"
-                onClick={() => setSidebarPath(sidebarPath)}
-              >
-                {t("catalog.browse")}
-              </Button>
+            <Div
+              className={
+                companySwitcherVisible ? "hidden min-[930px]:block" : undefined
+              }
+            >
+              <Logo locale={locale} size="h-8" />
+            </Div>
+            {(companySwitcherVisible || selectedAdminEndpoint) && (
+              <Div className="ml-auto flex min-w-0 items-center justify-end gap-2">
+                {(isMobile ||
+                  adminSidebarCollapsed ||
+                  !showBusinessNavigation) &&
+                  companySwitch}
+                {hasLocalWorkspace &&
+                  companyInToolbar &&
+                  displayedMethod === "GET" &&
+                  selectedAdminEndpoint && (
+                    <Div className="hidden shrink-0 items-center gap-1 min-[930px]:flex">
+                      {response?.erpWorkflowAliases?.includes(
+                        erpInvoiceCreate,
+                      ) && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          className="size-9"
+                          title={t("erp.newInvoice")}
+                          aria-label={t("erp.newInvoice")}
+                          onClick={() => {
+                            void import("@/payment/invoice/create/definition").then(
+                              ({ default: invoice }) =>
+                                catalogOverviewNavigation.push(invoice.POST, {
+                                  data: { companyId: companyInToolbar.id },
+                                }),
+                            );
+                          }}
+                        >
+                          <Plus className="size-4" aria-hidden="true" />
+                        </Button>
+                      )}
+                      {response?.erpWorkflowAliases?.includes(
+                        "coa-journal-export",
+                      ) && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          className="size-9"
+                          title={t("erp.exports.secondary")}
+                          aria-label={t("erp.exports.secondary")}
+                          onClick={() => {
+                            void import("@/chart-of-accounts/reports/journal-export/definition").then(
+                              ({ default: journal }) =>
+                                catalogOverviewNavigation.push(journal.GET, {
+                                  data: { companyId: companyInToolbar.id },
+                                }),
+                            );
+                          }}
+                        >
+                          <Download className="size-4" aria-hidden="true" />
+                        </Button>
+                      )}
+                    </Div>
+                  )}
+                {selectedAdminEndpoint && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className={cn(
+                      "h-auto min-h-9 max-w-full whitespace-normal",
+                      companySwitcherVisible &&
+                        "hidden min-[930px]:inline-flex",
+                    )}
+                    onClick={browseTools}
+                  >
+                    {t("catalog.browse")}
+                  </Button>
+                )}
+              </Div>
             )}
           </Div>
 
@@ -3142,7 +3469,7 @@ export function HelpToolsWidget(): JSX.Element {
                     className="absolute inset-y-0 left-0 z-[210] w-65 max-w-full border-r border-border bg-background"
                   >
                     <Div className="h-full w-full bg-background">
-                      {toolListSidebar}
+                      {sidePanel}
                     </Div>
                   </MotionDiv>
                 )}
@@ -3170,11 +3497,11 @@ export function HelpToolsWidget(): JSX.Element {
           ) : (
             <Div className="flex flex-row flex-1 min-h-0 w-full">
               <ResizableContainer
-                defaultWidth={280}
+                defaultWidth={showBusinessNavigation ? 232 : 280}
                 minWidth={200}
                 maxWidth="90vw"
                 storageId="admin-endpoints-sidebar"
-                className="bg-background z-10"
+                className="bg-background z-10 max-[930px]:hidden"
                 collapsed={adminSidebarCollapsed}
               >
                 <AnimatePresence initial={false} mode="sync">
@@ -3187,7 +3514,7 @@ export function HelpToolsWidget(): JSX.Element {
                       className="h-full"
                     >
                       <Div className="flex flex-col h-full w-full bg-background overflow-hidden border-r border-border">
-                        {toolListSidebar}
+                        {sidePanel}
                       </Div>
                     </MotionDiv>
                   )}

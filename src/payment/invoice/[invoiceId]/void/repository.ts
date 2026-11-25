@@ -1,15 +1,10 @@
 /**
- * Invoice Void Repository
- * Transitions a DRAFT or OPEN invoice to VOID status.
- * If a journal entry exists, creates a reversal entry.
- *
- * Status transitions: DRAFT→VOID, OPEN→VOID
- * Blocked: PAID invoices cannot be voided.
+ * Voids an unapplied invoice and reverses its receivable in the same transaction.
  */
 
 import "server-only";
 
-import { and, eq, sql } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import {
@@ -22,17 +17,18 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
+import { journalEntries, journalEntryLines } from "@/chart-of-accounts/db";
 import {
-  accountingPeriods,
-  journalEntries,
-  journalEntryLines,
-} from "@/chart-of-accounts/db";
-import {
+  AccountSubtype,
   JournalEntryStatus,
   JournalSourceType,
   LineType,
-  PeriodStatus,
 } from "@/chart-of-accounts/enum";
+import { postJournalEntry } from "@/chart-of-accounts/shared/auto-post";
+import { accountingDay } from "@/chart-of-accounts/shared/journal-validation";
+import { lockLedgerCompany } from "@/chart-of-accounts/shared/ledger-write";
+import { getInvoiceOpenBalanceParts } from "@/finance/document-balance";
+import { getDocumentAccess } from "@/finance/document-company-scope";
 
 import { paymentInvoices } from "../../../db";
 import { InvoiceStatus } from "../../../enum";
@@ -52,205 +48,174 @@ export class InvoiceVoidRepository {
     const { t } = scopedTranslation.scopedT(locale);
 
     try {
-      const [invoice] = await db
-        .select()
+      const [observedInvoice] = await db
+        .select({
+          companyId: paymentInvoices.companyId,
+          userId: paymentInvoices.userId,
+        })
         .from(paymentInvoices)
         .where(eq(paymentInvoices.id, urlPathParams.invoiceId))
         .limit(1);
-
-      if (!invoice) {
+      if (!observedInvoice) {
         return fail({
           message: t("post.errors.notFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
-
-      if (invoice.userId !== userId) {
+      if (!(await getDocumentAccess(userId, observedInvoice))?.canManage) {
         return fail({
           message: t("post.errors.forbidden.title"),
           errorType: ErrorResponseTypes.FORBIDDEN,
         });
       }
 
-      // PAID invoices cannot be voided
-      if (
-        invoice.status !== InvoiceStatus.DRAFT &&
-        invoice.status !== InvoiceStatus.OPEN
-      ) {
-        return fail({
-          message: t("post.errors.conflict.title"),
-          errorType: ErrorResponseTypes.CONFLICT,
-        });
-      }
-
-      // --- Reverse journal entry if one exists (best-effort) ---
-      if (invoice.journalEntryId && invoice.companyId) {
-        try {
-          await InvoiceVoidRepository.tryReverseJournalEntry(
-            invoice.journalEntryId,
-            invoice.id,
-            invoice.companyId,
-            invoice.currency,
-            userId,
-            logger,
-          );
-        } catch (journalError) {
-          logger.warn("Journal reversal failed — invoice void continues", {
-            invoiceId: invoice.id,
-            journalEntryId: invoice.journalEntryId,
-            error: parseError(journalError).message,
+      return await db.transaction(async (tx) => {
+        if (observedInvoice.companyId) {
+          await lockLedgerCompany(tx, observedInvoice.companyId);
+        }
+        const [invoice] = await tx
+          .select()
+          .from(paymentInvoices)
+          .where(eq(paymentInvoices.id, urlPathParams.invoiceId))
+          .limit(1)
+          .for("update");
+        if (!invoice) {
+          return fail({
+            message: t("post.errors.notFound.title"),
+            errorType: ErrorResponseTypes.NOT_FOUND,
           });
         }
-      }
+        if (
+          invoice.companyId !== observedInvoice.companyId ||
+          !(await getDocumentAccess(userId, invoice, tx))?.canManage
+        ) {
+          return fail({
+            message: t("post.errors.forbidden.title"),
+            errorType: ErrorResponseTypes.FORBIDDEN,
+          });
+        }
+        if (
+          (invoice.status !== InvoiceStatus.DRAFT &&
+            invoice.status !== InvoiceStatus.OPEN) ||
+          Number(invoice.amount) < 0
+        ) {
+          return fail({
+            message: t("post.errors.conflict.title"),
+            errorType: ErrorResponseTypes.CONFLICT,
+          });
+        }
 
-      // --- Transition invoice to VOID ---
-      await db
-        .update(paymentInvoices)
-        .set({
-          status: InvoiceStatus.VOID,
-          updatedAt: new Date(),
-        })
-        .where(eq(paymentInvoices.id, urlPathParams.invoiceId));
+        const today = new Date();
+        if (invoice.companyId && invoice.status === InvoiceStatus.OPEN) {
+          const { payments, credits, paymentJoin, creditJoin, amountPaid } =
+            getInvoiceOpenBalanceParts(tx, invoice.companyId, invoice.currency);
+          const [balance] = await tx
+            .select({ amountPaid, credited: credits.credited })
+            .from(paymentInvoices)
+            .leftJoin(payments, paymentJoin)
+            .leftJoin(credits, creditJoin)
+            .where(eq(paymentInvoices.id, invoice.id));
+          if (
+            Number(balance?.amountPaid ?? 0) > 0 ||
+            Number(balance?.credited ?? 0) > 0
+          ) {
+            return fail({
+              message: t("post.errors.appliedPayments"),
+              errorType: ErrorResponseTypes.CONFLICT,
+            });
+          }
 
-      logger.debug("Invoice voided", {
-        invoiceId: urlPathParams.invoiceId,
-        userId,
-        previousStatus: invoice.status,
-      });
+          const [original] = invoice.journalEntryId
+            ? await tx
+                .select()
+                .from(journalEntries)
+                .where(
+                  and(
+                    eq(journalEntries.id, invoice.journalEntryId),
+                    eq(journalEntries.companyId, invoice.companyId),
+                    eq(journalEntries.sourceType, JournalSourceType.AR_INVOICE),
+                    eq(journalEntries.sourceId, invoice.id),
+                    eq(journalEntries.status, JournalEntryStatus.POSTED),
+                  ),
+                )
+                .for("update")
+            : [];
+          if (
+            !original ||
+            original.reversedById ||
+            original.reversalOfId ||
+            accountingDay(today) < accountingDay(original.date)
+          ) {
+            return fail({
+              message: t("post.errors.reversalPosting"),
+              errorType: ErrorResponseTypes.CONFLICT,
+            });
+          }
 
-      return success({
-        success: true,
-        message: null,
+          const lines = await tx
+            .select()
+            .from(journalEntryLines)
+            .where(eq(journalEntryLines.journalEntryId, original.id))
+            .orderBy(journalEntryLines.sortOrder, journalEntryLines.id);
+
+          const reversalId = await postJournalEntry(
+            {
+              companyId: invoice.companyId,
+              date: today,
+              description: `AR invoice reversal: ${invoice.id}`,
+              sourceType: JournalSourceType.AR_INVOICE,
+              sourceId: invoice.id,
+              postedByUserId: userId,
+              lines: lines.map((line) => ({
+                subtype: AccountSubtype.ACCOUNTS_RECEIVABLE,
+                accountNodeId: line.accountId,
+                type:
+                  line.type === LineType.DEBIT
+                    ? LineType.CREDIT
+                    : LineType.DEBIT,
+                currency: line.currency,
+                amount: line.amount,
+                description: line.description ?? undefined,
+              })),
+              logger,
+            },
+            tx,
+          );
+          if (!reversalId) {
+            return fail({
+              message: t("post.errors.reversalPosting"),
+              errorType: ErrorResponseTypes.CONFLICT,
+            });
+          }
+
+          await tx
+            .update(journalEntries)
+            .set({ reversalOfId: original.id, updatedAt: today })
+            .where(eq(journalEntries.id, reversalId));
+          await tx
+            .update(journalEntries)
+            .set({
+              reversedById: reversalId,
+              status: JournalEntryStatus.REVERSED,
+              updatedAt: today,
+            })
+            .where(eq(journalEntries.id, original.id));
+        }
+
+        await tx
+          .update(paymentInvoices)
+          .set({ status: InvoiceStatus.VOID, updatedAt: today })
+          .where(eq(paymentInvoices.id, invoice.id));
+
+        logger.debug("Invoice voided", { invoiceId: invoice.id, userId });
+        return success({ success: true, message: null });
       });
     } catch (error) {
-      const parsed = parseError(error);
-      logger.error("Failed to void invoice", { error: parsed.message });
+      logger.error("Failed to void invoice", parseError(error));
       return fail({
         message: t("post.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
-  }
-
-  /**
-   * Creates a reversal journal entry for the original invoice journal entry.
-   * Mirrors the original lines with flipped DEBIT/CREDIT.
-   * Never throws — caller wraps in try/catch.
-   */
-  private static async tryReverseJournalEntry(
-    originalEntryId: string,
-    invoiceId: string,
-    companyId: string,
-    currency: string,
-    userId: string,
-    logger: EndpointLogger,
-  ): Promise<void> {
-    // Load original journal entry lines
-    const originalLines = await db
-      .select()
-      .from(journalEntryLines)
-      .where(eq(journalEntryLines.journalEntryId, originalEntryId));
-
-    if (originalLines.length === 0) {
-      logger.debug("No journal entry lines found for reversal", {
-        originalEntryId,
-      });
-      return;
-    }
-
-    // Find an open accounting period for today
-    const today = new Date();
-    const [openPeriod] = await db
-      .select({ id: accountingPeriods.id })
-      .from(accountingPeriods)
-      .where(
-        and(
-          eq(accountingPeriods.companyId, companyId),
-          eq(accountingPeriods.status, PeriodStatus.OPEN),
-          sql`${accountingPeriods.startDate} <= ${today}`,
-          sql`${accountingPeriods.endDate} >= ${today}`,
-        ),
-      )
-      .limit(1);
-
-    if (!openPeriod) {
-      logger.debug(
-        "No open accounting period found — skipping journal reversal",
-        { companyId, today },
-      );
-      return;
-    }
-
-    // Generate reversal entry number
-    const year = today.getFullYear();
-    const [{ value: existingCount }] = await db
-      .select({ value: sql<number>`count(*)::int` })
-      .from(journalEntries)
-      .where(eq(journalEntries.periodId, openPeriod.id));
-
-    const entrySeq = (existingCount ?? 0) + 1;
-    const entryNumber = `JE-${year}-${String(entrySeq).padStart(4, "0")}`;
-
-    // Mark the original entry as REVERSED
-    await db
-      .update(journalEntries)
-      .set({
-        status: JournalEntryStatus.REVERSED,
-        updatedAt: today,
-      })
-      .where(eq(journalEntries.id, originalEntryId));
-
-    // Insert reversal journal entry
-    const [reversalEntry] = await db
-      .insert(journalEntries)
-      .values({
-        companyId,
-        periodId: openPeriod.id,
-        entryNumber,
-        date: today,
-        description: `AR Invoice Void Reversal — ${invoiceId}`,
-        status: JournalEntryStatus.DRAFT,
-        sourceType: JournalSourceType.AR_INVOICE,
-        sourceId: invoiceId,
-      })
-      .returning({ id: journalEntries.id });
-
-    if (!reversalEntry) {
-      return;
-    }
-
-    // Insert reversed lines (flip DEBIT↔CREDIT)
-    for (const line of originalLines) {
-      const flippedType =
-        line.type === LineType.DEBIT ? LineType.CREDIT : LineType.DEBIT;
-
-      await db.insert(journalEntryLines).values({
-        journalEntryId: reversalEntry.id,
-        accountId: line.accountId,
-        type: flippedType,
-        amount: line.amount,
-        currency,
-        description: `Reversal: ${line.description ?? ""}`,
-        sortOrder: line.sortOrder ?? 0,
-      });
-    }
-
-    // Mark reversal as POSTED
-    await db
-      .update(journalEntries)
-      .set({
-        status: JournalEntryStatus.POSTED,
-        postedAt: today,
-        postedByUserId: userId,
-        updatedAt: today,
-      })
-      .where(eq(journalEntries.id, reversalEntry.id));
-
-    logger.info("Journal entry reversed for voided AR invoice", {
-      invoiceId,
-      originalEntryId,
-      reversalEntryId: reversalEntry.id,
-      entryNumber,
-    });
   }
 }

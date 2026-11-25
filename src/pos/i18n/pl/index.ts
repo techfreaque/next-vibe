@@ -179,7 +179,7 @@ export const translations: typeof enTranslations = {
         },
         server: {
           title: "Błąd serwera",
-          description: "Nie udało się utworzyć terminala — spróbuj ponownie",
+          description: "Nie udało się utworzyć terminala. Spróbuj ponownie.",
         },
         unknown: {
           title: "Nieznany błąd",
@@ -366,6 +366,8 @@ export const translations: typeof enTranslations = {
 
   sessionClose: {
     post: {
+      mixedCash:
+        "Przed zamknięciem kasy rozlicz płatności gotówkowe w innej walucie.",
       title: "Zamknij sesję",
       titleShort: "Zamknij sesję",
       description: "Zamknij sesję kasjera i zarejestruj stan końcowy kasy.",
@@ -608,7 +610,7 @@ export const translations: typeof enTranslations = {
         selectedProduct: "Wybrany produkt",
         clearProduct: "Wyczyść",
         searchButton: "Szukaj",
-        noProductResults: "Brak wyników — wpisz ręcznie poniżej.",
+        noProductResults: "Brak wyników. Wprowadź dane poniżej.",
       },
       orderId: {
         label: "ID zamówienia",
@@ -694,13 +696,14 @@ export const translations: typeof enTranslations = {
       titleShort: "Usuń pozycję",
       description: "Usuń pozycję z otwartego zamówienia.",
       widget: {
+        chooseLine: "Wybierz pozycję",
         backToOrder: "Wróć do zamówienia",
       },
       orderId: {
-        label: "ID zamówienia",
+        label: "Zamówienie",
         description: "Zamówienie, z którego usuwana jest pozycja",
       },
-      itemId: { label: "ID pozycji", description: "Pozycja do usunięcia" },
+      itemId: { label: "Pozycja", description: "Pozycja do usunięcia" },
       errors: {
         validation: {
           title: "Błąd walidacji",
@@ -825,10 +828,13 @@ export const translations: typeof enTranslations = {
       titleShort: "Anuluj zamówienie",
       description: "Anuluj otwarte zamówienie. Tej operacji nie można cofnąć.",
       widget: {
+        tendered:
+          "Zarejestrowano już płatność. Zamówienie i jego pozycje są zablokowane do edycji.",
+        closed: "To zamówienie jest zamknięte.",
         backToList: "Wróć do listy zamówień",
       },
       orderId: {
-        label: "ID zamówienia",
+        label: "Zamówienie",
         description: "Zamówienie do anulowania",
       },
       errors: {
@@ -895,7 +901,7 @@ export const translations: typeof enTranslations = {
         fullyPaid: "W pełni opłacone",
         qtyTimesPrice: "×",
         loading: "Ładowanie zamówienia...",
-        noItems: "Brak pozycji — dodaj pierwszą.",
+        noItems: "Dodaj pierwszą pozycję.",
         viewJournalEntry: "Pokaż wpis księgowy",
         voidedStamp: "ANULOWANE",
         completedReadOnly:
@@ -1067,7 +1073,7 @@ export const translations: typeof enTranslations = {
       titleShort: "Szukaj produktów",
       description: "Szukaj produktów w katalogu po nazwie lub SKU dla kasy.",
       widget: {
-        noResults: "Brak produktów — spróbuj innego wyszukiwania.",
+        noResults: "Nie znaleziono produktów. Spróbuj innego wyszukiwania.",
         tax: "VAT",
         back: "Wróć",
       },

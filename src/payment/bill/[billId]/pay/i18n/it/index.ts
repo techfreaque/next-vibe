@@ -16,6 +16,12 @@ export const translations: typeof enTranslations = {
       description: "Il disegno di legge per contrassegnare come pagato",
     },
     errors: {
+      approvalPosting:
+        "Prima di pagare questa fattura serve la scrittura contabile di approvazione.",
+      paymentAccount:
+        "Scegli un conto bancario o di cassa attivo di questa azienda.",
+      paymentPosting:
+        "Controlla la data di pagamento, la valuta aziendale e i conti di registrazione.",
       validation: {
         title: "Errore di convalida",
         description: "Input non valido",

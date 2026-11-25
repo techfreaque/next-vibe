@@ -8,16 +8,16 @@ export const translations: typeof enTranslations = {
     ar: "créances",
   },
   post: {
-    title: "Envoyer une relance de paiement",
-    titleShort: "Envoyer une relance",
+    title: "Préparer une relance de paiement",
+    titleShort: "Préparer une relance",
     description:
-      "Envoie une relance de paiement pour une facture en retard. La facture doit être au statut OUVERTE et son échéance dépassée. La relance est consignée dans une note client.",
+      "Préparez une relance avec le solde échu et un message facultatif.",
     form: {
-      title: "Envoyer une relance",
-      description: "Prévenez le client que son paiement est en retard",
+      title: "Préparer une relance",
+      description: "Vérifiez le solde avant de transmettre la relance.",
     },
     response: {
-      success: "Relance envoyée",
+      success: "Brouillon de relance prêt",
       message: "Message d'état",
     },
     errors: {
@@ -52,7 +52,7 @@ export const translations: typeof enTranslations = {
       conflict: {
         title: "Pas en retard",
         description:
-          "Une relance n'est possible que pour une facture ouverte dont l'échéance est dépassée",
+          "La facture doit être ouverte, échue et présenter un solde à régler.",
       },
       unsavedChanges: {
         title: "Modifications non enregistrées",
@@ -60,8 +60,9 @@ export const translations: typeof enTranslations = {
       },
     },
     success: {
-      title: "Succès",
-      description: "Relance de paiement envoyée et consignée",
+      title: "Brouillon de relance prêt",
+      description:
+        "La relance est enregistrée dans l’historique de la facture. Vous pouvez la transmettre au client.",
     },
   },
   invoiceId: {
@@ -75,9 +76,16 @@ export const translations: typeof enTranslations = {
     placeholder: "Ajoutez un mot personnel à la relance...",
   },
   widget: {
+    copy: "Copier la relance",
+    copied: "Relance copiée",
+    copyFailed: "Échec de la copie. Réessayer",
+    download: "Télécharger la relance",
+    subject: "Relance pour la facture {{number}}",
+    body: "Le solde à régler est de {{amount}}. Le paiement était attendu le {{date}}.",
     back: "Retour",
-    submit: "Envoyer la relance",
-    reminderSent: "Relance envoyée. Le client a été prévenu.",
+    submit: "Préparer une relance",
+    reminderSent:
+      "La relance est enregistrée dans l’historique de la facture. Vous pouvez la transmettre au client.",
     viewInvoice: "Voir la facture",
   },
 };

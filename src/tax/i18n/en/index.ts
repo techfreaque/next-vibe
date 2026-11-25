@@ -111,8 +111,7 @@ export const translations = {
         labelDelete: "Delete",
         labelCompound: "Compound",
         empty: "No tax rates configured. Add your first rate to get started.",
-        emptySetup:
-          "No tax rates set up. Every invoice needs a tax rate — configure yours now.",
+        emptySetup: "Set up the tax rates your company uses on invoices.",
         columnRate: "Tax Rate",
         columnTypeRateActions: "Type / Rate / Status",
         backToCatalog: "← Products",
@@ -328,14 +327,28 @@ export const translations = {
   },
 
   report: {
-    title: "Tax Report",
-    titleShort: "Tax Report",
-    description: "Tax collected by rate and period",
+    title: "Tax by rate",
+    titleShort: "Tax by rate",
+    description:
+      "Review recorded tax on sales invoices, credit notes, supplier bills, and till sales.",
     widget: {
-      columnRate: "Rate",
+      scope:
+        "Invoices use their linked ledger date or their creation date. Purchases use the bill date. Till sales use their UTC completion date and include lines with a positive rate or recorded tax. When an issued invoice shares a ledger entry with a till sale, the invoice represents the sale.",
+      empty: "No document lines match these filters.",
+      range: "{{from}} to {{to}}",
       total: "Total",
-      empty: "No tax data found for this period.",
+      previousMonth: "Show previous month",
+      unknownRate: "Rate unavailable",
+      run: "Run report",
+      running: "Running report…",
+      selectCompany: "Select the company for this report.",
     },
+    currency: {
+      label: "Currency",
+      placeholder: "Company currency",
+      description: "Defaults to the company currency.",
+    },
+    currencies: { EUR: "EUR", PLN: "PLN", USD: "USD" },
     companyId: {
       label: "Company",
       description: "Company to generate the tax report for",
@@ -344,21 +357,20 @@ export const translations = {
     dateFrom: {
       label: "From",
       description: "Start date for the report period",
-      placeholder: "2024-01-01",
+      placeholder: "Start of this month",
     },
     dateTo: {
       label: "To",
       description: "End date for the report period",
-      placeholder: "2024-12-31",
+      placeholder: "Today",
     },
     response: {
       rows: "Report Rows",
       row: {
-        taxRateCode: "Tax Rate Code",
-        taxRateName: "Tax Rate Name",
+        direction: "Document type",
+        rate: "Tax rate",
         taxableAmount: "Taxable Amount",
         taxAmount: "Tax Amount",
-        period: "Period",
       },
     },
     success: {
@@ -368,7 +380,7 @@ export const translations = {
     errors: {
       validation: {
         title: "Validation Error",
-        description: "Check your inputs and try again",
+        description: "Choose an end date on or after the start date.",
       },
       unauthorized: {
         title: "Unauthorized",
@@ -400,6 +412,12 @@ export const translations = {
   },
 
   enums: {
+    reportDirection: {
+      posSales: "Till sales",
+      sales: "Sales invoices",
+      creditNotes: "Sales credit notes",
+      purchases: "Supplier bills",
+    },
     taxType: {
       vat: "VAT",
       gst: "GST",

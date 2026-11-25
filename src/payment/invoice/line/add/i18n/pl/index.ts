@@ -19,6 +19,7 @@ export const translations: typeof enTranslations = {
       success: "Pozycja dodana",
       message: "Komunikat statusu",
       line: {
+        currency: "Waluta",
         title: "Szczegóły pozycji",
         subtitle: "Utworzona pozycja faktury",
         id: "ID pozycji",
@@ -113,7 +114,7 @@ export const translations: typeof enTranslations = {
     searchPlaceholder: "Nazwa lub SKU…",
     searchButton: "Szukaj",
     clearProduct: "Wyczyść",
-    noProductResults: "Brak wyników — wpisz dane ręcznie poniżej.",
+    noProductResults: "Brak wyników. Wprowadź dane poniżej.",
     orManual: "Lub wpisz ręcznie",
     multiplier: "×",
     taxLabel: "podatek",

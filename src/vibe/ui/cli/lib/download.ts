@@ -2,6 +2,8 @@ import { writeFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { join } from "node:path";
 
+export const supportsTextFileDownload = true;
+
 export function downloadFile(
   filename: string,
   content: string,

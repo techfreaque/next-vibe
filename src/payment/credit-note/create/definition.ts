@@ -1,7 +1,7 @@
 /**
  * Create Credit Note Endpoint
  * Creates a negative invoice (credit note) linked to an original invoice.
- * Posts a reversal journal entry: Dr Revenue, Cr AR.
+ * Posts the receivable, revenue and VAT adjustment atomically.
  */
 
 import { dateSchema } from "next-vibe/core/definition/common.schema";
@@ -53,6 +53,16 @@ const { POST } = createEndpoint({
     "tags.creditNote" as const,
   ],
   allowedRoles: [UserRole.ADMIN] as const,
+
+  options: {
+    mutationOptions: {
+      onSuccess: async ({ logger, requestData }) => {
+        const { refreshInvoiceDocuments } =
+          await import("@/finance/document-cache");
+        await refreshInvoiceDocuments(logger, requestData.invoiceId);
+      },
+    },
+  },
 
   fields: customWidgetObject({
     render: CreditNoteCreateWidgetLazy,
@@ -214,7 +224,7 @@ const { POST } = createEndpoint({
       default: {
         invoiceId: "456e7890-e89b-12d3-a456-426614174000",
         companyId: "00000000-0000-0000-0000-000000000001",
-        reason: "Returned goods — partial shipment rejected",
+        reason: "Returned goods from a rejected shipment",
       },
     },
     responses: {
@@ -228,7 +238,7 @@ const { POST } = createEndpoint({
           currency: "EUR",
           status: "OPEN",
           amount: "-500.00",
-          reason: "Returned goods — partial shipment rejected",
+          reason: "Returned goods from a rejected shipment",
           createdAt: "2024-01-15T00:00:00.000Z",
           updatedAt: "2024-01-15T00:00:00.000Z",
         },

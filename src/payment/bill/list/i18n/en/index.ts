@@ -58,7 +58,7 @@ export const translations = {
     label: "Search documents",
     description:
       "Search accounts payable by bill number, supplier name or bill ID, and filter by company or status.",
-    placeholder: "Bill number, supplier or ID",
+    placeholder: "Bill number or supplier",
   },
   status: {
     label: "Status",
@@ -77,6 +77,7 @@ export const translations = {
     },
   },
   widget: {
+    filters: "Filters",
     pageCount: "Total pages",
     back: "Back",
     title: "Supplier Bills",

@@ -67,7 +67,7 @@ export const translations = {
         },
         server: {
           title: "Server Error",
-          description: "Failed to create vendor — try again",
+          description: "Failed to create vendor. Try again.",
         },
         unknown: {
           title: "Unknown Error",
@@ -546,7 +546,7 @@ export const translations = {
         conflict: { title: "Conflict", description: "Data conflict" },
         server: {
           title: "Server Error",
-          description: "Failed to create purchase order — try again",
+          description: "Failed to create purchase order. Try again.",
         },
         unknown: {
           title: "Unknown Error",
@@ -847,7 +847,7 @@ export const translations = {
     patch: {
       title: "Update Purchase Order",
       titleShort: "Update Order",
-      description: "Edit a Draft purchase order — fields and lines.",
+      description: "Edit the details and line items on a draft purchase order.",
       widget: {
         backToPO: "Back to Purchase Order",
       },
@@ -1037,8 +1037,7 @@ export const translations = {
     post: {
       title: "Confirm Purchase Order",
       titleShort: "Confirm Order",
-      description:
-        "Vendor has confirmed the purchase order — mark as Confirmed.",
+      description: "Record the supplier’s confirmation of this purchase order.",
       poId: {
         label: "Purchase Order ID",
         description: "Purchase order to confirm",
@@ -1186,7 +1185,8 @@ export const translations = {
     post: {
       title: "Convert to Bill",
       titleShort: "Convert to Bill",
-      description: "Create an AP bill from this purchase order.",
+      description:
+        "Create a supplier bill from a fully received purchase order. Approve the bill to post the payable.",
       widget: {
         back: "Back",
         viewBill: "View bill",
@@ -1197,8 +1197,9 @@ export const translations = {
       },
       errors: {
         validation: {
-          title: "Validation Error",
-          description: "Invalid purchase order ID",
+          title: "Check the currency and order totals",
+          description:
+            "The bill currency must be supported and each total must match the order lines.",
         },
         unauthorized: {
           title: "Not Signed In",
@@ -1209,8 +1210,9 @@ export const translations = {
           description: "No access to this purchase order",
         },
         conflict: {
-          title: "Already Converted",
-          description: "This purchase order was already converted to a bill",
+          title: "Order unavailable for billing",
+          description:
+            "Only a fully received order without an existing bill can be converted.",
         },
         server: { title: "Server Error", description: "Failed to create bill" },
         unknown: {
@@ -1406,14 +1408,24 @@ export const translations = {
       description:
         "Live snapshot of purchase orders and supplier activity for your company.",
       widget: {
+        openValue: "Open order value",
+        settledBills: "Bills settled this month",
+        deliveries: "Upcoming deliveries",
+        order: "Order",
+        supplier: "Supplier",
+        expected: "Expected",
+        orderTotal: "Order total",
+        noDeliveries: "No outstanding deliveries",
+        overdue: "Late deliveries",
+        dueSeven: "Due in the next 7 days",
         kpiDraft: "Drafts",
         kpiConfirmed: "Confirmed",
         kpiAwaitingReceipt: "Awaiting Receipt",
         kpiActiveVendors: "Active Vendors",
         warningDueThisWeek:
-          "{{count}} purchase order due this week — check delivery dates",
+          "One purchase order is due this week. Check its delivery date.",
         warningDueThisWeekPlural:
-          "{{count}} purchase orders due this week — check delivery dates",
+          "{{count}} purchase orders are due this week. Check their delivery dates.",
         navNewPo: "New Purchase Order",
         navAllPos: "All Purchase Orders",
         navVendors: "Vendors",

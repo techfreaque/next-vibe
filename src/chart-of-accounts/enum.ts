@@ -171,6 +171,12 @@ export const JournalEntryStatusDB = [
   JournalEntryStatus.REVERSED,
 ] as const;
 
+/** Reversal changes the display status; the original still counts as a ledger movement. */
+export const ledgerEntryStatuses = [
+  JournalEntryStatus.POSTED,
+  JournalEntryStatus.REVERSED,
+];
+
 export const JournalSourceTypeDB = [
   JournalSourceType.MANUAL,
   JournalSourceType.AR_INVOICE,

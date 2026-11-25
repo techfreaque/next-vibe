@@ -19,6 +19,7 @@ export const translations: typeof enTranslations = {
       description: "Comptes par page (200 max.)",
     },
     response: {
+      balance: "Solde",
       total: "Total",
       accounts: "Comptes",
       id: "ID",
@@ -77,6 +78,8 @@ export const translations: typeof enTranslations = {
       description: "Plan comptable récupéré",
     },
     widget: {
+      debitSide: "Débit",
+      creditSide: "Crédit",
       loading: "Chargement des comptes...",
       empty:
         "Aucun compte pour l'instant. Lancez la configuration pour partir d'un modèle.",

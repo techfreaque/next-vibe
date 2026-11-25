@@ -38,8 +38,6 @@ export const translations: typeof enTranslations = {
       cancelled: "Zrušené",
     },
   },
-
-  // Vendor create
   vendorCreate: {
     post: {
       title: "Vytvoriť dodávateľa",
@@ -79,7 +77,10 @@ export const translations: typeof enTranslations = {
           title: "Chyba siete",
           description: "Skontrolujte pripojenie a skúste to znova",
         },
-        notFound: { title: "Nenašlo sa", description: "Firma sa nenašla" },
+        notFound: {
+          title: "Nenašlo sa",
+          description: "Firma sa nenašla",
+        },
         unsavedChanges: {
           title: "Neuložené zmeny",
           description: "Máte neuložené zmeny",
@@ -148,7 +149,11 @@ export const translations: typeof enTranslations = {
       description: "Byt, kancelária, poschodie a podobne",
       placeholder: "2. poschodie",
     },
-    city: { label: "Mesto", description: "Mesto", placeholder: "Berlín" },
+    city: {
+      label: "Mesto",
+      description: "Mesto",
+      placeholder: "Berlín",
+    },
     region: {
       label: "Región/štát",
       description: "Región alebo štát",
@@ -180,8 +185,6 @@ export const translations: typeof enTranslations = {
       placeholder: "Preferovaný dodávateľ elektroniky",
     },
   },
-
-  // Vendor list
   vendorList: {
     get: {
       title: "Dodávatelia",
@@ -214,7 +217,10 @@ export const translations: typeof enTranslations = {
           title: "Prístup zamietnutý",
           description: "K tejto firme nemáte prístup.",
         },
-        conflict: { title: "Konflikt", description: "Konflikt údajov" },
+        conflict: {
+          title: "Konflikt",
+          description: "Konflikt údajov",
+        },
         server: {
           title: "Chyba servera",
           description: "Dodávateľov sa nepodarilo načítať",
@@ -227,7 +233,10 @@ export const translations: typeof enTranslations = {
           title: "Chyba siete",
           description: "Skontrolujte pripojenie a skúste to znova",
         },
-        notFound: { title: "Nenašlo sa", description: "Firma sa nenašla" },
+        notFound: {
+          title: "Nenašlo sa",
+          description: "Firma sa nenašla",
+        },
         unsavedChanges: {
           title: "Neuložené zmeny",
           description: "Máte neuložené zmeny",
@@ -249,10 +258,11 @@ export const translations: typeof enTranslations = {
         createdAt: "Vytvorené",
       },
     },
-    companyId: { label: "Firma", description: "Firma, ktorej dodávateľov chcete zobraziť" },
+    companyId: {
+      label: "Firma",
+      description: "Firma, ktorej dodávateľov chcete zobraziť",
+    },
   },
-
-  // Vendor get
   vendorGet: {
     get: {
       title: "Načítať dodávateľa",
@@ -266,7 +276,10 @@ export const translations: typeof enTranslations = {
         deactivate: "Deaktivovať",
         select: "Vyberte dodávateľa",
       },
-      vendorId: { label: "ID dodávateľa", description: "Dodávateľ, ktorého údaje chcete zobraziť" },
+      vendorId: {
+        label: "ID dodávateľa",
+        description: "Dodávateľ, ktorého údaje chcete zobraziť",
+      },
       errors: {
         validation: {
           title: "Neplatné údaje",
@@ -280,8 +293,14 @@ export const translations: typeof enTranslations = {
           title: "Prístup zamietnutý",
           description: "K tomuto dodávateľovi nemáte prístup",
         },
-        conflict: { title: "Konflikt", description: "Konflikt údajov" },
-        server: { title: "Chyba servera", description: "Dodávateľa sa nepodarilo načítať" },
+        conflict: {
+          title: "Konflikt",
+          description: "Konflikt údajov",
+        },
+        server: {
+          title: "Chyba servera",
+          description: "Dodávateľa sa nepodarilo načítať",
+        },
         unknown: {
           title: "Neznáma chyba",
           description: "Nastala neočakávaná chyba",
@@ -328,8 +347,6 @@ export const translations: typeof enTranslations = {
       },
     },
   },
-
-  // Vendor update
   vendorUpdate: {
     patch: {
       title: "Upraviť dodávateľa",
@@ -339,7 +356,10 @@ export const translations: typeof enTranslations = {
         backToVendor: "Späť na dodávateľa",
         viewVendor: "Zobraziť dodávateľa",
       },
-      vendorId: { label: "ID dodávateľa", description: "Dodávateľ, ktorého údaje chcete upraviť" },
+      vendorId: {
+        label: "ID dodávateľa",
+        description: "Dodávateľ, ktorého údaje chcete upraviť",
+      },
       name: {
         label: "Názov dodávateľa",
         description: "Obchodné meno dodávateľa",
@@ -385,7 +405,11 @@ export const translations: typeof enTranslations = {
         description: "Byt, kancelária, poschodie a podobne",
         placeholder: "2. poschodie",
       },
-      city: { label: "Mesto", description: "Mesto", placeholder: "Berlín" },
+      city: {
+        label: "Mesto",
+        description: "Mesto",
+        placeholder: "Berlín",
+      },
       region: {
         label: "Región/štát",
         description: "Región alebo štát",
@@ -466,15 +490,16 @@ export const translations: typeof enTranslations = {
       },
     },
   },
-
-  // Vendor deactivate
   vendorDeactivate: {
     post: {
       title: "Deaktivovať dodávateľa",
       titleShort: "Deaktivovať",
       description:
         "Označte dodávateľa ako neaktívneho. Existujúce nákupné objednávky zostanú v evidencii.",
-      vendorId: { label: "ID dodávateľa", description: "Dodávateľ, ktorého chcete deaktivovať" },
+      vendorId: {
+        label: "ID dodávateľa",
+        description: "Dodávateľ, ktorého chcete deaktivovať",
+      },
       widget: {
         warning:
           "Dodávateľ sa deaktivuje. Existujúce nákupné objednávky zostanú zachované.",
@@ -493,7 +518,10 @@ export const translations: typeof enTranslations = {
           title: "Prístup zamietnutý",
           description: "K tomuto dodávateľovi nemáte prístup",
         },
-        conflict: { title: "Konflikt", description: "Konflikt údajov" },
+        conflict: {
+          title: "Konflikt",
+          description: "Konflikt údajov",
+        },
         server: {
           title: "Chyba servera",
           description: "Nepodarilo sa deaktivovať dodávateľa",
@@ -525,8 +553,6 @@ export const translations: typeof enTranslations = {
       },
     },
   },
-
-  // PO create
   orderCreate: {
     post: {
       title: "Vytvoriť nákupnú objednávku",
@@ -545,10 +571,14 @@ export const translations: typeof enTranslations = {
           title: "Prístup zamietnutý",
           description: "Potrebujete rolu člena alebo vyššie oprávnenia.",
         },
-        conflict: { title: "Konflikt", description: "Konflikt údajov" },
+        conflict: {
+          title: "Konflikt",
+          description: "Konflikt údajov",
+        },
         server: {
           title: "Chyba servera",
-          description: "Nákupnú objednávku sa nepodarilo vytvoriť. Skúste to znova.",
+          description:
+            "Nákupnú objednávku sa nepodarilo vytvoriť. Skúste to znova.",
         },
         unknown: {
           title: "Neznáma chyba",
@@ -652,8 +682,6 @@ export const translations: typeof enTranslations = {
       placeholder: "0",
     },
   },
-
-  // PO list
   orderList: {
     get: {
       title: "Nákupné objednávky",
@@ -697,7 +725,10 @@ export const translations: typeof enTranslations = {
           title: "Prístup zamietnutý",
           description: "K tejto firme nemáte prístup.",
         },
-        conflict: { title: "Konflikt", description: "Konflikt údajov" },
+        conflict: {
+          title: "Konflikt",
+          description: "Konflikt údajov",
+        },
         server: {
           title: "Chyba servera",
           description: "Nákupné objednávky sa nepodarilo načítať",
@@ -710,7 +741,10 @@ export const translations: typeof enTranslations = {
           title: "Chyba siete",
           description: "Skontrolujte pripojenie a skúste to znova",
         },
-        notFound: { title: "Nenašlo sa", description: "Firma sa nenašla" },
+        notFound: {
+          title: "Nenašlo sa",
+          description: "Firma sa nenašla",
+        },
         unsavedChanges: {
           title: "Neuložené zmeny",
           description: "Máte neuložené zmeny",
@@ -733,8 +767,6 @@ export const translations: typeof enTranslations = {
       },
     },
   },
-
-  // PO get
   orderGet: {
     get: {
       title: "Načítať nákupnú objednávku",
@@ -782,7 +814,10 @@ export const translations: typeof enTranslations = {
           title: "Prístup zamietnutý",
           description: "K tejto nákupnej objednávke nemáte prístup.",
         },
-        conflict: { title: "Konflikt", description: "Konflikt údajov" },
+        conflict: {
+          title: "Konflikt",
+          description: "Konflikt údajov",
+        },
         server: {
           title: "Chyba servera",
           description: "Nepodarilo sa načítať objednávku",
@@ -843,13 +878,11 @@ export const translations: typeof enTranslations = {
       },
     },
   },
-
-  // PO update
   orderUpdate: {
     patch: {
       title: "Aktualizovať objednávku",
       titleShort: "Upraviť objednávku",
-      description: "Upraviť údaje a položky nákupnej objednávky v stave Koncept.",
+      description: "Upravte údaje a položky v koncepte nákupnej objednávky.",
       widget: {
         backToPO: "Späť na nákupnú objednávku",
       },
@@ -968,8 +1001,6 @@ export const translations: typeof enTranslations = {
       },
     },
   },
-
-  // PO send
   orderSend: {
     post: {
       title: "Odoslať nákupnú objednávku",
@@ -1033,14 +1064,11 @@ export const translations: typeof enTranslations = {
       },
     },
   },
-
-  // PO confirm
   orderConfirm: {
     post: {
       title: "Potvrdiť nákupnú objednávku",
       titleShort: "Potvrdiť objednávku",
-      description:
-        "Dodávateľ potvrdil nákupnú objednávku. Označte ju ako potvrdenú.",
+      description: "Zaznamenajte, že dodávateľ potvrdil nákupnú objednávku.",
       poId: {
         label: "ID objednávky",
         description: "Nákupná objednávka, ktorú chcete potvrdiť",
@@ -1098,8 +1126,6 @@ export const translations: typeof enTranslations = {
       },
     },
   },
-
-  // PO receive
   orderReceive: {
     post: {
       title: "Prijať tovar",
@@ -1127,7 +1153,10 @@ export const translations: typeof enTranslations = {
         label: "Prijaté položky",
         description: "Prijaté množstvá jednotlivých položiek",
       },
-      linePoLineId: { label: "ID položky", description: "Položka nákupnej objednávky" },
+      linePoLineId: {
+        label: "ID položky",
+        description: "Položka nákupnej objednávky",
+      },
       lineQuantityReceived: {
         label: "Prijaté množstvo",
         description: "Prijaté množstvo tejto položky",
@@ -1173,7 +1202,8 @@ export const translations: typeof enTranslations = {
       },
       success: {
         title: "Tovar bol prijatý",
-        description: "Príjem tovaru sa zaevidoval a stav zásob sa aktualizoval.",
+        description:
+          "Príjem tovaru sa zaevidoval a stav zásob sa aktualizoval.",
       },
       response: {
         receiptId: "ID príjemky",
@@ -1182,13 +1212,12 @@ export const translations: typeof enTranslations = {
       },
     },
   },
-
-  // PO convert to bill
   orderConvertToBill: {
     post: {
       title: "Vytvoriť prijatú faktúru",
       titleShort: "Vytvoriť prijatú faktúru",
-      description: "Vytvoriť prijatú faktúru z tejto nákupnej objednávky.",
+      description:
+        "Vytvorte prijatú faktúru z úplne dodanej objednávky. Schválením faktúry zaúčtujete záväzok.",
       widget: {
         back: "Späť",
         viewBill: "Zobraziť prijatú faktúru",
@@ -1199,8 +1228,9 @@ export const translations: typeof enTranslations = {
       },
       errors: {
         validation: {
-          title: "Neplatné údaje",
-          description: "Neplatné ID nákupnej objednávky",
+          title: "Skontrolujte menu a celkové sumy objednávky.",
+          description:
+            "Mena faktúry musí byť podporovaná a celkové sumy musia zodpovedať položkám objednávky.",
         },
         unauthorized: {
           title: "Vyžaduje sa prihlásenie",
@@ -1211,10 +1241,14 @@ export const translations: typeof enTranslations = {
           description: "K tejto nákupnej objednávke nemáte prístup.",
         },
         conflict: {
-          title: "Prijatá faktúra už existuje",
-          description: "Z tejto nákupnej objednávky už bola vytvorená prijatá faktúra.",
+          title: "Z objednávky nemožno vytvoriť faktúru",
+          description:
+            "Faktúru možno vytvoriť len z úplne dodanej objednávky, ku ktorej ešte neexistuje faktúra.",
         },
-        server: { title: "Chyba servera", description: "Prijatú faktúru sa nepodarilo vytvoriť." },
+        server: {
+          title: "Chyba servera",
+          description: "Prijatú faktúru sa nepodarilo vytvoriť.",
+        },
         unknown: {
           title: "Neznáma chyba",
           description: "Vyskytla sa neočakávaná chyba.",
@@ -1243,8 +1277,6 @@ export const translations: typeof enTranslations = {
       },
     },
   },
-
-  // PO line add
   orderLineAdd: {
     post: {
       widget: {
@@ -1333,8 +1365,6 @@ export const translations: typeof enTranslations = {
       },
     },
   },
-
-  // PO line remove
   orderLineRemove: {
     post: {
       title: "Odstrániť položku",
@@ -1344,11 +1374,13 @@ export const translations: typeof enTranslations = {
         label: "ID objednávky",
         description: "Nákupná objednávka, z ktorej chcete odstrániť položku",
       },
-      lineId: { label: "ID položky", description: "Položka, ktorú chcete odstrániť" },
+      lineId: {
+        label: "ID položky",
+        description: "Položka, ktorú chcete odstrániť",
+      },
       widget: {
         backToOrder: "Späť na nákupnú objednávku",
-        warning:
-          "Položka sa natrvalo odstráni z nákupnej objednávky.",
+        warning: "Položka sa natrvalo odstráni z nákupnej objednávky.",
       },
       errors: {
         validation: {
@@ -1399,8 +1431,6 @@ export const translations: typeof enTranslations = {
       },
     },
   },
-
-  // Purchasing Dashboard
   dashboard: {
     get: {
       title: "Prehľad nákupu",
@@ -1408,14 +1438,24 @@ export const translations: typeof enTranslations = {
       description:
         "Sledujte nákupné objednávky, termíny dodávok a úhrady dodávateľom.",
       widget: {
+        openValue: "Hodnota otvorených objednávok",
+        settledBills: "Prijaté faktúry uhradené tento mesiac",
+        deliveries: "Očakávané dodávky",
+        order: "Objednávka",
+        supplier: "Dodávateľ",
+        expected: "Očakávané dodanie",
+        orderTotal: "Celkom za objednávku",
+        noDeliveries: "Všetky dodávky boli prijaté.",
+        overdue: "Oneskorené dodávky",
+        dueSeven: "S termínom do 7 dní",
         kpiDraft: "Koncepty",
         kpiConfirmed: "Potvrdené",
         kpiAwaitingReceipt: "Čaká na príjem",
         kpiActiveVendors: "Aktívni dodávatelia",
         warningDueThisWeek:
-          "{{count}} nákupná objednávka má termín dodania tento týždeň. Skontrolujte dátum dodania.",
+          "Jedna objednávka má termín dodania tento týždeň. Skontrolujte dátum dodania.",
         warningDueThisWeekPlural:
-          "Tento týždeň má termín dodania {{count}} nákupných objednávok. Skontrolujte dátumy dodania.",
+          "Skontrolujte termíny dodania objednávok na tento týždeň. Počet objednávok je {{count}}.",
         navNewPo: "Vytvoriť objednávku",
         navAllPos: "Všetky nákupné objednávky",
         navVendors: "Dodávatelia",
@@ -1439,7 +1479,10 @@ export const translations: typeof enTranslations = {
           title: "Prístup zamietnutý",
           description: "K tejto firme nemáte prístup.",
         },
-        conflict: { title: "Konflikt údajov", description: "Údaje sa medzičasom zmenili." },
+        conflict: {
+          title: "Konflikt údajov",
+          description: "Údaje sa medzičasom zmenili.",
+        },
         server: {
           title: "Chyba servera",
           description: "Prehľad nákupu sa nepodarilo načítať.",
@@ -1452,7 +1495,10 @@ export const translations: typeof enTranslations = {
           title: "Chyba pripojenia",
           description: "Skontrolujte pripojenie a skúste to znova",
         },
-        notFound: { title: "Záznam sa nenašiel", description: "Firma sa nenašla." },
+        notFound: {
+          title: "Záznam sa nenašiel",
+          description: "Firma sa nenašla.",
+        },
         unsavedChanges: {
           title: "Neuložené zmeny",
           description: "Máte neuložené zmeny.",
@@ -1471,8 +1517,6 @@ export const translations: typeof enTranslations = {
       },
     },
   },
-
-  // PO cancel
   orderCancel: {
     post: {
       title: "Zrušiť nákupnú objednávku",
@@ -1502,7 +1546,8 @@ export const translations: typeof enTranslations = {
         },
         conflict: {
           title: "Objednávku nemožno zrušiť",
-          description: "Zrušiť možno iba koncepty alebo odoslané nákupné objednávky",
+          description:
+            "Zrušiť možno iba koncepty alebo odoslané nákupné objednávky",
         },
         server: {
           title: "Chyba servera",

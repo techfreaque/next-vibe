@@ -77,6 +77,7 @@ export const translations = {
     placeholder: "Enter company ID",
   },
   widget: {
+    unnumberedInvoice: "Unnumbered invoice",
     subtitle:
       "Invoices, estimates and bills you issue. Card and crypto checkouts live in processor transactions.",
     estimatesSent: "Estimates sent",

@@ -84,6 +84,16 @@ export const translations: typeof enTranslations = {
       description: "Devis créé au statut brouillon",
     },
     widget: {
+      otherRate: "Autre taux",
+      item: "Désignation",
+      quantity: "Quantité",
+      price: "Prix unitaire",
+      vatRate: "TVA %",
+      add: "Ajouter une ligne",
+      remove: "Supprimer la ligne",
+      empty: "Ajoutez les biens ou services proposés.",
+      summary: "Récapitulatif",
+
       back: "Retour",
       submit: "Créer le devis",
       viewButton: "Voir le devis",
@@ -110,9 +120,10 @@ export const translations: typeof enTranslations = {
     placeholder: "Saisissez le nom du client",
   },
   currency: {
+    code: "{{code}}",
     label: "Devise",
     description: "Devise du devis",
-    placeholder: "EUR",
+    placeholder: "Devise de l’entreprise",
   },
   validUntil: {
     label: "Valable jusqu'au",

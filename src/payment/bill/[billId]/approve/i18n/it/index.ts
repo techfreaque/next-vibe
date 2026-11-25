@@ -25,6 +25,12 @@ export const translations: typeof enTranslations = {
       description: "Il disegno di legge per approvare",
     },
     errors: {
+      existingPosting:
+        "Riconcilia la scrittura esistente prima di approvare la fattura.",
+      billLines:
+        "Aggiungi righe con un totale positivo e usa conti di costo attivi di questa azienda.",
+      posting:
+        "Controlla gli importi, la valuta aziendale, il periodo contabile e i conti di registrazione.",
       validation: {
         title: "Errore di convalida",
         description: "fattura non valida ID",
@@ -75,7 +81,7 @@ export const translations: typeof enTranslations = {
       submit: "Confermare il cambiamento di stato",
       confirmTitle: "Approva questo disegno di legge?",
       confirmDescription:
-        "Una bozza si muove verso il Ricevimento. Una fattura ricevuta si sposta a Approved e invia una voce di giornale se la contabilità è configurata.",
+        "Una bozza passa allo stato Ricevuta. L’approvazione di una fattura ricevuta genera una scrittura contabile.",
       confirmButton: "Sì, Approvo",
       cancelButton: "Annulla",
       approved: "Stato di fattura aggiornato",

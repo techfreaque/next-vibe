@@ -12,6 +12,7 @@ export type WidgetShellPadding = "none" | "sm" | "md";
  */
 export type WidgetShellProps = {
   children?: React.ReactNode;
+  layout?: "compact" | "page";
   padding?: WidgetShellPadding;
   scroll?: boolean;
 } & StyleType;
@@ -26,6 +27,7 @@ export function WidgetShell({
   children,
   className,
   style,
+  layout = "compact",
   padding = "md",
   scroll = true,
 }: WidgetShellProps): React.JSX.Element {
@@ -34,12 +36,19 @@ export function WidgetShell({
       className={cn(
         "@container flex flex-col gap-4",
         scroll ? "flex-1 min-h-0 overflow-y-auto" : "",
-        paddingClasses[padding],
+        layout === "page" && "w-full min-w-0",
+        layout === "compact" && paddingClasses[padding],
         className,
       )}
       style={style}
     >
-      {children}
+      {layout === "page" ? (
+        <div className="mx-auto flex w-full min-w-0 max-w-[1280px] flex-col gap-5 px-4 pb-8 pt-5 @md:px-6 @xl:px-8 @xl:pt-6">
+          {children}
+        </div>
+      ) : (
+        children
+      )}
     </div>
   );
 }

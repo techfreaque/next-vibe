@@ -16,14 +16,20 @@ export const translations: typeof enTranslations = {
     },
   },
   post: {
-    title: "Zarejestruj fakturę zakupową",
-    titleShort: "Utwórz rachunek",
-    description: "Zarejestruj fakturę otrzymaną od dostawcy",
+    title: "Nowa faktura od dostawcy",
+    titleShort: "Nowa faktura od dostawcy",
+    description: "Wpisz dostawcę i pozycje, a następnie zapisz szkic.",
     form: {
       title: "Nowa faktura dostawcy",
       description: "Wprowadź dane faktury otrzymanej od dostawcy",
     },
     errors: {
+      vendor: "Wybierz aktywnego dostawcę tej firmy.",
+      supplier: "Wpisz nazwę lub wybierz dostawcę.",
+      dates: "Wpisz prawidłowe daty wystawienia i płatności.",
+      amounts: "Sprawdź pozycje i dopuszczalną sumę faktury.",
+      expenseAccount: "Wybierz aktywne konto kosztów tej firmy.",
+
       validation: {
         title: "Błąd walidacji",
         description: "Sprawdź wszystkie pola i spróbuj ponownie",
@@ -39,7 +45,7 @@ export const translations: typeof enTranslations = {
       conflict: { title: "Konflikt", description: "Konflikt danych" },
       server: {
         title: "Błąd serwera",
-        description: "Nie można utworzyć faktury — spróbuj ponownie",
+        description: "Nie można utworzyć faktury. Spróbuj ponownie.",
       },
       unknown: {
         title: "Nieznany błąd",
@@ -60,8 +66,33 @@ export const translations: typeof enTranslations = {
       description: "Faktura dostawcy zapisana pomyślnie",
     },
     widget: {
+      supplier: "Dostawca",
+      dates: "Daty i waluta",
+      items: "Pozycje faktury",
+      itemsDescription:
+        "Pozycje opcjonalne. Podaj stawkę VAT jako ułamek od 0 do 1.",
+      itemsHint: "Dodaj towary lub usługi z tej faktury.",
+      item: "Opis",
+      quantity: "Ilość",
+      unitPrice: "Cena jednostkowa",
+      manualTaxRate: "Inna stawka",
+      taxRate: "VAT %",
+      lineTotal: "Suma pozycji",
+      addItem: "Dodaj pozycję",
+      removeItem: "Usuń pozycję",
+      itemError: "Sprawdź opis, ilość, cenę i stawkę VAT.",
+      summary: "Podsumowanie faktury",
+      net: "Netto",
+      tax: "VAT",
+      total: "Razem",
+      chooseVendor: "Wybierz dostawcę",
+      vendorSource: "Z katalogu dostawców",
+      terms: "Użyj terminu dostawcy",
+      manualVendor: "Wpisz dostawcę ręcznie",
+      selectCompanyFirst: "Najpierw wybierz firmę.",
+
       back: "Wróć",
-      submit: "Zapisz fakturę",
+      submit: "Zapisz szkic",
       viewButton: "Pokaż fakturę",
       addAnotherButton: "Dodaj kolejną",
     },
@@ -86,6 +117,7 @@ export const translations: typeof enTranslations = {
     description: "Firma otrzymująca tę fakturę",
     placeholder: "UUID firmy",
   },
+  vendorId: { label: "Wybierz dostawcę", description: "Z katalogu dostawców" },
   supplierName: {
     label: "Nazwa dostawcy",
     description: "Nazwa dostawcy, który wystawił fakturę",
@@ -104,14 +136,15 @@ export const translations: typeof enTranslations = {
   billDate: {
     label: "Data faktury",
     description: "Data wystawienia faktury",
-    placeholder: "2024-01-01",
+    placeholder: "Wybierz datę faktury",
   },
   dueDate: {
     label: "Termin płatności",
     description: "Data wymagalności płatności",
-    placeholder: "2024-01-31",
+    placeholder: "Wybierz termin płatności",
   },
   currency: {
+    code: "{{code}}",
     label: "Waluta",
     description: "Waluta faktury",
     placeholder: "EUR",

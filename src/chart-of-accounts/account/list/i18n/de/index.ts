@@ -20,6 +20,7 @@ export const translations: typeof enTranslations = {
       description: "Konten pro Seite (max. 200)",
     },
     response: {
+      balance: "Saldo",
       total: "Gesamt",
       accounts: "Konten",
       id: "ID",
@@ -79,6 +80,8 @@ export const translations: typeof enTranslations = {
       description: "Kontenplan erfolgreich abgerufen",
     },
     widget: {
+      debitSide: "Soll",
+      creditSide: "Haben",
       loading: "Konten werden geladen...",
       empty:
         "Noch keine Konten. Einrichtung ausführen, um aus einer Vorlage zu laden.",

@@ -103,7 +103,7 @@ export const translations: typeof enTranslations = {
         },
         server: {
           title: "Błąd serwera",
-          description: "Nie udało się utworzyć magazynu — spróbuj ponownie",
+          description: "Nie udało się utworzyć magazynu. Spróbuj ponownie.",
         },
         unknown: {
           title: "Nieznany błąd",
@@ -374,6 +374,13 @@ export const translations: typeof enTranslations = {
       description:
         "Wyświetl stany magazynowe dla wybranego magazynu wraz z dostępnością i wskaźnikami niskiego stanu.",
       widget: {
+        unnamedProduct: "Nazwa produktu niedostępna",
+        search: "Szukaj produktu lub magazynu",
+        stockStatus: "Stan zapasu",
+        actions: "Działania",
+        noMatches: "Brak pasujących pozycji",
+        loadMore: "Pokaż więcej",
+
         back: "Wróć",
         lowStock: "Niski stan",
         available: "Dostępne",
@@ -394,7 +401,8 @@ export const translations: typeof enTranslations = {
         outOfStock: "brak w magazynie",
         belowReorderPoint: "poniżej punktu zamówień",
         bulletSeparator: "·",
-        statusOk: "OK",
+        stockValue: "Wartość zapasu",
+        statusOk: "Na stanie",
       },
       warehouseId: {
         label: "ID magazynu",
@@ -444,6 +452,7 @@ export const translations: typeof enTranslations = {
         description: "Stany magazynowe pobrane",
       },
       response: {
+        currency: "Waluta",
         id: "ID rekordu stanu",
         warehouseId: "ID magazynu",
         warehouseName: "Magazyn",
@@ -554,7 +563,7 @@ export const translations: typeof enTranslations = {
       title: "Przyjęcie towaru",
       titleShort: "Przyjęcie towaru",
       description:
-        "Zarejestruj przyjęcie towaru — aktualizuje stan i średni ważony koszt.",
+        "Zarejestruj przyjęcie towaru, aby zaktualizować stan zapasów i średni ważony koszt.",
       widget: {
         backToStock: "Wróć do stanów",
       },
@@ -1091,6 +1100,10 @@ export const translations: typeof enTranslations = {
         kpiOutOfStock: "Brak w magazynie",
         kpiLowStock: "Niski stan",
         kpiWarehouses: "Magazyny",
+        attention: "Zapasy do uzupełnienia",
+        noAttention: "Żaden produkt nie wymaga uzupełnienia.",
+        newPurchaseOrder: "Nowe zamówienie",
+        kpiTransfersInTransit: "Przesunięcia w drodze",
         alertOutOfStock: "{{count}} produkt niedostępny",
         alertOutOfStockPlural: "{{count}} produktów niedostępnych",
         navStockLevels: "Stany magazynowe",

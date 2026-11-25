@@ -6,10 +6,17 @@ import type { HelpGetResponseOutput } from "next-vibe/help-tool/definition";
 import type { HelpGetRequestInput } from "next-vibe/help-tool/definition";
 import { AuthRepository } from "next-vibe/identity/auth/repository";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import { UserRole } from "next-vibe/identity/roles/enum";
+import { UserPermissionRole, UserRole } from "next-vibe/identity/roles/enum";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import { Platform } from "next-vibe/platforms/platforms";
+import { cookies } from "next-vibe/ui/lib/headers";
 import type { JSX } from "react";
+
+import {
+  readWorkspaceCompanyCookie,
+  WORKSPACE_COMPANY_COOKIE,
+  type WorkspaceCompany,
+} from "@/companies/_shared/workspace-company";
 
 import { parseToolsInitialState } from "./initial-state";
 import { ToolsPageClient } from "./page-client";
@@ -24,6 +31,8 @@ export interface ToolsPageData {
   user: JwtPayloadType;
   platform: Platform;
   initialHelpData: HelpGetResponseOutput | null;
+  workspaceCompanies: WorkspaceCompany[] | null;
+  workspaceCompanyId?: string;
   initialState: Partial<HelpGetRequestInput>;
 }
 
@@ -68,9 +77,27 @@ export async function tanstackLoader({
     logger.error("[SSR help] catch:", parseError(e));
   }
 
+  let workspaceCompanies: WorkspaceCompany[] | null = null;
+  let workspaceCompanyId: string | undefined;
+  if (!user.isPublic && user.roles.includes(UserPermissionRole.ADMIN)) {
+    try {
+      const { listWorkspaceCompanies } =
+        await import("@/companies/_shared/workspace-company.repository");
+      const cookie = (await cookies()).get(WORKSPACE_COMPANY_COOKIE);
+      workspaceCompanyId = readWorkspaceCompanyCookie(cookie?.value, user.id);
+      workspaceCompanies = await listWorkspaceCompanies(user.id);
+    } catch (error) {
+      logger.warn("Unable to load workspace companies", {
+        error: parseError(error).message,
+      });
+    }
+  }
+
   return {
     locale,
     user,
+    workspaceCompanies,
+    workspaceCompanyId,
     platform: Platform.NEXT_PAGE,
     initialHelpData,
     initialState,
@@ -82,6 +109,8 @@ export function TanstackPage({
   user,
   platform,
   initialHelpData,
+  workspaceCompanies,
+  workspaceCompanyId,
   initialState,
 }: ToolsPageData): JSX.Element {
   return (
@@ -90,6 +119,8 @@ export function TanstackPage({
       user={user}
       platform={platform}
       initialHelpData={initialHelpData}
+      workspaceCompanies={workspaceCompanies}
+      workspaceCompanyId={workspaceCompanyId}
       serverState={initialState}
     />
   );

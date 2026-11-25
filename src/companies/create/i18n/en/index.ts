@@ -28,7 +28,7 @@ export const translations = {
     },
     type: {
       label: "Company Type",
-      description: "Business model — B2B, B2C, or individual",
+      description: "Business model (B2B, B2C or individual)",
       placeholder: "Select type",
     },
     vatNumber: {
@@ -80,7 +80,7 @@ export const translations = {
       },
       server: {
         title: "Server Error",
-        description: "Something went wrong on our end — try again",
+        description: "The request failed. Try again.",
       },
       unknown: {
         title: "Unknown Error",
@@ -108,6 +108,7 @@ export const translations = {
       name: "Company Name",
     },
     widget: {
+      setupAccounting: "Set up accounting",
       viewCompany: "View Company",
       back: "Back to List",
     },

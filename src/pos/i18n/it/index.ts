@@ -366,6 +366,8 @@ export const translations: typeof enTranslations = {
   // Session close
   sessionClose: {
     post: {
+      mixedCash:
+        "Prima di chiudere la cassa, riconcilia i pagamenti in contanti in altre valute.",
       title: "Sessione chiusa",
       titleShort: "Sessione chiusa",
       description:
@@ -708,13 +710,14 @@ export const translations: typeof enTranslations = {
       titleShort: "Rimuovi articolo",
       description: "Rimuovere un elemento linea da un ordine aperto.",
       widget: {
+        chooseLine: "Seleziona una riga",
         backToOrder: "Torna all'ordine",
       },
       orderId: {
-        label: "Ordine ID",
+        label: "Ordine",
         description: "Ordina per rimuovere l'elemento da",
       },
-      itemId: { label: "Articolo ID", description: "Articolo da rimuovere" },
+      itemId: { label: "Riga", description: "Articolo da rimuovere" },
       errors: {
         validation: {
           title: "Errore di convalida",
@@ -839,9 +842,12 @@ export const translations: typeof enTranslations = {
       titleShort: "Ordine Void",
       description: "Void un ordine aperto. Non puo' essere annullato.",
       widget: {
+        tendered:
+          "È già stato registrato un pagamento. L’ordine e le sue righe non sono più modificabili.",
+        closed: "Questo ordine è chiuso.",
         backToList: "Torna agli ordini",
       },
-      orderId: { label: "Ordine ID", description: "Ordine a vuoto" },
+      orderId: { label: "Ordine", description: "Ordine a vuoto" },
       errors: {
         validation: {
           title: "Errore di convalida",

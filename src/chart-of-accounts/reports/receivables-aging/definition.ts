@@ -12,6 +12,7 @@ import {
   Methods,
   WidgetType,
 } from "next-vibe/core/definition/enums";
+import { CurrenciesArr } from "next-vibe/core/i18n/core/config";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
 import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
@@ -28,6 +29,47 @@ import { scopedTranslation } from "../../i18n";
 const ReceivablesAgingWidget = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.ReceivablesAgingWidget })),
 );
+
+const agingItems = responseArrayField(scopedTranslation, {
+  type: WidgetType.CONTAINER,
+  child: objectField(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    layoutType: LayoutType.GRID,
+    usage: { response: true },
+    children: {
+      invoiceId: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "receivablesAging.response.invoiceId" as const,
+        schema: z.string(),
+      }),
+      invoiceNumber: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "receivablesAging.response.invoiceId",
+        schema: z.string().nullable(),
+      }),
+      customerName: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "receivablesAging.response.customerId",
+        schema: z.string().nullable(),
+      }),
+      customerId: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "receivablesAging.response.customerId" as const,
+        schema: z.string().nullable(),
+      }),
+      amount: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "receivablesAging.response.amount" as const,
+        schema: z.number(),
+      }),
+      dueDate: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "receivablesAging.response.dueDate" as const,
+        schema: dateSchema.nullable(),
+      }),
+    },
+  }),
+});
 
 const { GET } = createEndpoint({
   scopedTranslation,
@@ -51,11 +93,38 @@ const { GET } = createEndpoint({
     children: {
       companyId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
+        fieldType: FieldDataType.ENTITY_PICKER,
         label: "receivablesAging.companyId.label" as const,
         description: "receivablesAging.companyId.description" as const,
-        placeholder: "receivablesAging.companyId.placeholder" as const,
-        schema: z.string().uuid(),
+        listEndpoint: async () =>
+          (await import("@/companies/list/definition")).default.GET,
+        labelField: "name",
+        schema: z.uuid().optional(),
+      }),
+      currency: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "receivablesAging.response.currency",
+        options: CurrenciesArr.map((value) => ({
+          value,
+          label: `receivablesAging.currencies.${value}` as const,
+        })),
+        schema: z.enum(CurrenciesArr).optional(),
+      }),
+      reportCompanyId: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "receivablesAging.companyId.label",
+        schema: z.uuid().nullable(),
+      }),
+      reportCompanyName: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "receivablesAging.companyId.label",
+        schema: z.string().nullable(),
+      }),
+      reportCurrency: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "receivablesAging.response.currency",
+        schema: z.string().nullable(),
       }),
       asOfDate: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -71,156 +140,11 @@ const { GET } = createEndpoint({
         label: "receivablesAging.response.asOfDate" as const,
         schema: dateSchema,
       }),
-      bucketsCurrentItems: responseArrayField(scopedTranslation, {
-        type: WidgetType.CONTAINER,
-        child: objectField(scopedTranslation, {
-          type: WidgetType.CONTAINER,
-          layoutType: LayoutType.GRID,
-          usage: { response: true },
-          children: {
-            invoiceId: responseField(scopedTranslation, {
-              type: WidgetType.TEXT,
-              label: "receivablesAging.response.invoiceId" as const,
-              schema: z.string(),
-            }),
-            customerId: responseField(scopedTranslation, {
-              type: WidgetType.TEXT,
-              label: "receivablesAging.response.customerId" as const,
-              schema: z.string(),
-            }),
-            amount: responseField(scopedTranslation, {
-              type: WidgetType.TEXT,
-              label: "receivablesAging.response.amount" as const,
-              schema: z.number(),
-            }),
-            dueDate: responseField(scopedTranslation, {
-              type: WidgetType.TEXT,
-              label: "receivablesAging.response.dueDate" as const,
-              schema: dateSchema,
-            }),
-          },
-        }),
-      }),
-      bucketsDays1to30Items: responseArrayField(scopedTranslation, {
-        type: WidgetType.CONTAINER,
-        child: objectField(scopedTranslation, {
-          type: WidgetType.CONTAINER,
-          layoutType: LayoutType.GRID,
-          usage: { response: true },
-          children: {
-            invoiceId: responseField(scopedTranslation, {
-              type: WidgetType.TEXT,
-              label: "receivablesAging.response.invoiceId" as const,
-              schema: z.string(),
-            }),
-            customerId: responseField(scopedTranslation, {
-              type: WidgetType.TEXT,
-              label: "receivablesAging.response.customerId" as const,
-              schema: z.string(),
-            }),
-            amount: responseField(scopedTranslation, {
-              type: WidgetType.TEXT,
-              label: "receivablesAging.response.amount" as const,
-              schema: z.number(),
-            }),
-            dueDate: responseField(scopedTranslation, {
-              type: WidgetType.TEXT,
-              label: "receivablesAging.response.dueDate" as const,
-              schema: dateSchema,
-            }),
-          },
-        }),
-      }),
-      bucketsDays31to60Items: responseArrayField(scopedTranslation, {
-        type: WidgetType.CONTAINER,
-        child: objectField(scopedTranslation, {
-          type: WidgetType.CONTAINER,
-          layoutType: LayoutType.GRID,
-          usage: { response: true },
-          children: {
-            invoiceId: responseField(scopedTranslation, {
-              type: WidgetType.TEXT,
-              label: "receivablesAging.response.invoiceId" as const,
-              schema: z.string(),
-            }),
-            customerId: responseField(scopedTranslation, {
-              type: WidgetType.TEXT,
-              label: "receivablesAging.response.customerId" as const,
-              schema: z.string(),
-            }),
-            amount: responseField(scopedTranslation, {
-              type: WidgetType.TEXT,
-              label: "receivablesAging.response.amount" as const,
-              schema: z.number(),
-            }),
-            dueDate: responseField(scopedTranslation, {
-              type: WidgetType.TEXT,
-              label: "receivablesAging.response.dueDate" as const,
-              schema: dateSchema,
-            }),
-          },
-        }),
-      }),
-      bucketsDays61to90Items: responseArrayField(scopedTranslation, {
-        type: WidgetType.CONTAINER,
-        child: objectField(scopedTranslation, {
-          type: WidgetType.CONTAINER,
-          layoutType: LayoutType.GRID,
-          usage: { response: true },
-          children: {
-            invoiceId: responseField(scopedTranslation, {
-              type: WidgetType.TEXT,
-              label: "receivablesAging.response.invoiceId" as const,
-              schema: z.string(),
-            }),
-            customerId: responseField(scopedTranslation, {
-              type: WidgetType.TEXT,
-              label: "receivablesAging.response.customerId" as const,
-              schema: z.string(),
-            }),
-            amount: responseField(scopedTranslation, {
-              type: WidgetType.TEXT,
-              label: "receivablesAging.response.amount" as const,
-              schema: z.number(),
-            }),
-            dueDate: responseField(scopedTranslation, {
-              type: WidgetType.TEXT,
-              label: "receivablesAging.response.dueDate" as const,
-              schema: dateSchema,
-            }),
-          },
-        }),
-      }),
-      bucketsOver90Items: responseArrayField(scopedTranslation, {
-        type: WidgetType.CONTAINER,
-        child: objectField(scopedTranslation, {
-          type: WidgetType.CONTAINER,
-          layoutType: LayoutType.GRID,
-          usage: { response: true },
-          children: {
-            invoiceId: responseField(scopedTranslation, {
-              type: WidgetType.TEXT,
-              label: "receivablesAging.response.invoiceId" as const,
-              schema: z.string(),
-            }),
-            customerId: responseField(scopedTranslation, {
-              type: WidgetType.TEXT,
-              label: "receivablesAging.response.customerId" as const,
-              schema: z.string(),
-            }),
-            amount: responseField(scopedTranslation, {
-              type: WidgetType.TEXT,
-              label: "receivablesAging.response.amount" as const,
-              schema: z.number(),
-            }),
-            dueDate: responseField(scopedTranslation, {
-              type: WidgetType.TEXT,
-              label: "receivablesAging.response.dueDate" as const,
-              schema: dateSchema,
-            }),
-          },
-        }),
-      }),
+      bucketsCurrentItems: agingItems,
+      bucketsDays1to30Items: agingItems,
+      bucketsDays31to60Items: agingItems,
+      bucketsDays61to90Items: agingItems,
+      bucketsOver90Items: agingItems,
       totalsCurrent: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         label: "receivablesAging.response.current" as const,
@@ -302,24 +226,63 @@ const { GET } = createEndpoint({
   examples: {
     requests: {
       default: {
-        companyId: "00000000-0000-0000-0000-000000000001",
+        companyId: "00000000-0000-4000-8000-000000000001",
         asOfDate: "2026-12-31",
       },
     },
     responses: {
       default: {
+        reportCompanyId: "00000000-0000-4000-8000-000000000001",
+        reportCompanyName: "Atelier Central",
+        reportCurrency: "EUR",
         asOfDateResponse: "2026-12-31",
-        bucketsCurrentItems: [],
-        bucketsDays1to30Items: [],
-        bucketsDays31to60Items: [],
+        bucketsCurrentItems: [
+          {
+            invoiceId: "00000000-0000-4000-8000-000000000102",
+            invoiceNumber: "INV-1051",
+            customerId: "00000000-0000-4000-8000-000000000301",
+            customerName: "Studio Linden",
+            amount: 240,
+            dueDate: "2027-01-10",
+          },
+        ],
+        bucketsDays1to30Items: [
+          {
+            invoiceId: "00000000-0000-4000-8000-000000000101",
+            invoiceNumber: "INV-1042",
+            customerId: "00000000-0000-4000-8000-000000000301",
+            customerName: "Studio Linden",
+            amount: 325.5,
+            dueDate: "2026-12-15",
+          },
+        ],
+        bucketsDays31to60Items: [
+          {
+            invoiceId: "00000000-0000-4000-8000-000000000103",
+            invoiceNumber: "INV-1027",
+            customerId: "00000000-0000-4000-8000-000000000302",
+            customerName: "Northline Design",
+            amount: 480,
+            dueDate: "2026-11-15",
+          },
+        ],
         bucketsDays61to90Items: [],
-        bucketsOver90Items: [],
-        totalsCurrent: 0,
-        totalsDays1to30: 0,
-        totalsDays31to60: 0,
+        bucketsOver90Items: [
+          {
+            invoiceId: "00000000-0000-4000-8000-000000000104",
+            invoiceNumber: "INV-0976",
+            customerId: "00000000-0000-4000-8000-000000000303",
+            customerName: "Fieldworks",
+            amount: 120,
+            dueDate: "2026-09-01",
+          },
+        ],
+        totalsCurrent: 240,
+        totalsDays1to30: 325.5,
+        totalsDays31to60: 480,
         totalsDays61to90: 0,
-        totalsOver90: 0,
-        totalsTotal: 0,
+        totalsOver90: 120,
+        totalsTotal: 1165.5,
       },
     },
   },

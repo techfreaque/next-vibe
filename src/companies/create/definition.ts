@@ -147,6 +147,11 @@ const { POST } = createEndpoint({
             label: "post.response.name",
             schema: z.string(),
           }),
+          country: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            label: "post.country.label",
+            schema: z.string().nullable().optional(),
+          }),
         },
       }),
     },

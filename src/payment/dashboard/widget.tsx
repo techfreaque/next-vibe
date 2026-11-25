@@ -10,6 +10,7 @@ import { Loader2 } from "next-vibe/ui/components/icons/Loader2";
 import { Span } from "next-vibe/ui/components/span";
 import { H3, P } from "next-vibe/ui/components/typography";
 import { WidgetShell } from "next-vibe/ui/components/widget-shell";
+import { formatMoney } from "next-vibe/unified-ui/_shared/format-money";
 import { useRelatedEntityNavigation } from "next-vibe/unified-ui/_shared/related-entities";
 import {
   useWidgetIsInteractive,
@@ -28,15 +29,6 @@ import type definition from "./definition";
 import type { PaymentDashboardResponseOutput } from "./definition";
 
 type RecentInvoice = PaymentDashboardResponseOutput["recentInvoices"][number];
-
-function fmtAmount(amount: number, currency: string): string {
-  return new Intl.NumberFormat(undefined, {
-    style: "currency",
-    currency,
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(amount);
-}
 
 function getStatusBadgeVariant(
   status: string,
@@ -69,6 +61,7 @@ function KpiCard({
   /** Per-currency amounts, preferred over a single total when present */
   amounts?: string;
 }): JSX.Element {
+  const locale = useWidgetLocale();
   return (
     <Div
       className={`rounded-lg border p-4 flex flex-col gap-1 ${highlight ? "border-destructive bg-destructive/5" : "bg-card"}`}
@@ -90,7 +83,7 @@ function KpiCard({
       </Span>
       {total !== undefined && (
         <Span className="text-sm tabular-nums text-muted-foreground">
-          {amounts ?? fmtAmount(total, currency)}
+          {amounts ?? formatMoney(total, currency, locale)}
         </Span>
       )}
     </Div>
@@ -187,12 +180,12 @@ export function PaymentDashboardWidget(_props: {
 
   const perCurrency = (
     key: "open" | "overdue" | "unpaid",
-  ): string | undefined =>
-    data && data.byCurrency.length > 0
-      ? data.byCurrency
-          .map((row) => fmtAmount(row[key], row.currency))
-          .join(" + ")
-      : undefined;
+  ): string | undefined => {
+    const amounts = data?.byCurrency
+      .filter((row) => row[key] > 0)
+      .map((row) => formatMoney(row[key], row.currency, locale));
+    return amounts?.length ? amounts.join(" · ") : undefined;
+  };
 
   return (
     <WidgetShell className="min-w-0 gap-6">
@@ -272,10 +265,12 @@ export function PaymentDashboardWidget(_props: {
                 ...(data.estimates.sentByCurrency.length > 0
                   ? [
                       data.estimates.sentByCurrency
-                        .map((row) => fmtAmount(row.total, row.currency))
+                        .map((row) =>
+                          formatMoney(row.total, row.currency, locale),
+                        )
                         .join(" + "),
                     ]
-                  : [fmtAmount(0, currency)]),
+                  : [formatMoney(0, currency, locale)]),
                 t("widget.estimateDrafts", {
                   count: data.estimates.draftCount,
                 }),
@@ -380,7 +375,7 @@ export function PaymentDashboardWidget(_props: {
                     </Div>
                     <Div className="flex items-center gap-3">
                       <Span className="text-sm font-medium tabular-nums">
-                        {fmtAmount(estimate.total, estimate.currency)}
+                        {formatMoney(estimate.total, estimate.currency, locale)}
                       </Span>
                       {isInteractive && (
                         <Button
@@ -446,7 +441,10 @@ export function PaymentDashboardWidget(_props: {
                     <Div className="flex flex-col gap-0.5 min-w-0">
                       <Div className="flex items-center gap-2">
                         <Span className="font-mono text-sm font-semibold">
-                          #{inv.invoiceSequenceNumber ?? "—"}
+                          {inv.invoiceSequenceNumber === null ||
+                          inv.invoiceSequenceNumber === undefined
+                            ? t("widget.unnumberedInvoice")
+                            : `#${inv.invoiceSequenceNumber}`}
                         </Span>
                         {inv.isOverdue && (
                           <Span className="text-xs font-medium text-destructive">
@@ -456,7 +454,7 @@ export function PaymentDashboardWidget(_props: {
                       </Div>
                       <Div className="flex items-center gap-3 text-xs text-muted-foreground">
                         <Span className="font-medium tabular-nums text-foreground">
-                          {fmtAmount(parseFloat(inv.amount), inv.currency)}
+                          {formatMoney(inv.amount, inv.currency, locale)}
                         </Span>
                         {inv.dueDate && (
                           <Span>

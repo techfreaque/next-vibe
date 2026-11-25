@@ -110,6 +110,7 @@ export const translations: typeof enTranslations = {
     description: "Einträge pro Seite",
   },
   widget: {
+    filters: "Filter",
     pageCount: "Seiten insgesamt",
     back: "Zurück",
     title: "Angebote",

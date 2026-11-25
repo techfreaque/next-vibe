@@ -96,6 +96,11 @@ const { GET } = createEndpoint({
         label: "get.response.customerId" as const,
         schema: z.string().nullable(),
       }),
+      customerName: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "widget.customer",
+        schema: z.string().nullable(),
+      }),
       invoiceSequenceNumber: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         label: "get.response.invoiceSequenceNumber" as const,
@@ -115,6 +120,16 @@ const { GET } = createEndpoint({
         type: WidgetType.TEXT,
         label: "get.response.amount" as const,
         schema: z.string(),
+      }),
+      amountPaid: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "get.response.amountPaid",
+        schema: z.number(),
+      }),
+      amountDue: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "get.response.amountDue",
+        schema: z.number(),
       }),
       dueDate: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
@@ -147,6 +162,78 @@ const { GET } = createEndpoint({
         schema: dateSchema,
       }),
 
+      receipts: responseArrayField(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        child: objectField(scopedTranslation, {
+          type: WidgetType.CONTAINER,
+          layoutType: LayoutType.GRID,
+          usage: { response: true },
+          children: {
+            entryId: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              label: "widget.receiptReference",
+              schema: z.uuid(),
+              hidden: true,
+            }),
+            entryNumber: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              label: "widget.journalEntry",
+              schema: z.string(),
+            }),
+            reference: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              label: "widget.receiptReference",
+              schema: z.string().nullable(),
+            }),
+            date: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              label: "widget.receiptDate",
+              schema: dateSchema,
+            }),
+            amount: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              label: "widget.receiptAmount",
+              schema: z.number(),
+            }),
+            reversed: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              label: "widget.receiptReversed",
+              schema: z.boolean(),
+            }),
+            reversalDate: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              label: "widget.reversalDate",
+              schema: dateSchema.nullable(),
+            }),
+            reversalEntryNumber: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              label: "widget.journalEntry",
+              schema: z.string().nullable(),
+            }),
+            reversalReason: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              label: "widget.reversalReason",
+              schema: z.string().nullable(),
+            }),
+          },
+        }),
+      }),
+      recentReminders: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z
+          .array(
+            z.object({
+              id: z.string(),
+              preparedAt: z.string(),
+              dueDate: z.string(),
+              currency: z.string(),
+              amount: z.string(),
+              note: z.string().nullable(),
+            }),
+          )
+          .optional(),
+      }),
       lines: responseArrayField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         columns: 12,
@@ -271,16 +358,20 @@ const { GET } = createEndpoint({
         canCreateCreditNote: true,
         companyId: "00000000-0000-0000-0000-000000000001",
         customerId: null,
+        customerName: null,
         invoiceSequenceNumber: 1042,
         currency: "EUR",
         status: InvoiceStatus.OPEN,
         amount: "325.00",
+        amountPaid: 0,
+        amountDue: 325,
         dueDate: null,
         paidAt: null,
         notes: null,
         journalEntryId: null,
         createdAt: "2024-01-01T00:00:00.000Z",
         updatedAt: "2024-01-01T00:00:00.000Z",
+        receipts: [],
         lines: [],
       },
     },

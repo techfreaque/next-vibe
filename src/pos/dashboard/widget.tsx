@@ -1,11 +1,11 @@
 "use client";
-
 import { Badge } from "next-vibe/ui/components/badge";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { Monitor } from "next-vibe/ui/components/icons/Monitor";
 import { ShoppingCart } from "next-vibe/ui/components/icons/ShoppingCart";
 import { Span } from "next-vibe/ui/components/span";
+import { formatMoney } from "next-vibe/unified-ui/_shared/format-money";
 import {
   useWidgetLocale,
   useWidgetNavigation,
@@ -252,12 +252,9 @@ export function PosDashboardWidget(
   }
 
   const terminals = data.terminals ?? [];
-  const currencyFormatter = new Intl.NumberFormat(locale, {
-    style: "currency",
-    currency: data.currency ?? "EUR",
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  });
+  const sales = data.salesByCurrency?.length
+    ? data.salesByCurrency
+    : [{ currency: data.currency, amount: data.todaySalesTotal ?? 0 }];
 
   return (
     <Div className="max-w-2xl mx-auto w-full px-4 pt-8 pb-6 flex flex-col gap-5">
@@ -278,8 +275,10 @@ export function PosDashboardWidget(
         />
         <KpiCard
           label={t("dashboard.get.widget.kpiTodaySales")}
-          value={currencyFormatter.format(data.todaySalesTotal ?? 0)}
-          highlight={(data.todaySalesTotal ?? 0) > 0}
+          value={sales
+            .map((row) => formatMoney(row.amount, row.currency, locale))
+            .join(" · ")}
+          highlight={sales.some((row) => row.amount > 0)}
         />
       </Div>
 

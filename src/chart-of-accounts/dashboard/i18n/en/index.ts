@@ -3,7 +3,7 @@ export const translations = {
     title: "Accounting Dashboard",
     titleShort: "Dashboard",
     description:
-      "Overview of your accounting status — open period, entry counts, and quick navigation to all accounting tools.",
+      "See outstanding balances, cash, profit and the current accounting period.",
     companyId: {
       label: "Company ID",
       description: "Company to load the dashboard for",
@@ -51,6 +51,15 @@ export const translations = {
       },
     },
     widget: {
+      noPeriodHint: "Open an accounting period before posting journal entries.",
+      zeroMetricsHint:
+        "These figures update as you issue invoices, approve bills and post transactions.",
+      financialOverview: "Financial overview",
+      openReceivables: "Customers owe you",
+      approvedPayables: "Approved supplier bills due",
+      cashBalance: "Cash and bank",
+      monthToDateProfit: "Profit this month",
+      needsAttention: "Needs attention",
       currentPeriod: "Current Period",
       noPeriod: "No open period",
       createPeriod: "Create Period",

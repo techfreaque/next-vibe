@@ -19,6 +19,10 @@ export const translations = {
       message: "Status message",
     },
     errors: {
+      appliedPayments:
+        "An invoice with payments or credits applied cannot be voided.",
+      reversalPosting:
+        "Check the original posting and an open accounting period before voiding.",
       unauthorized: {
         title: "Unauthorized",
         description: "Authentication required",

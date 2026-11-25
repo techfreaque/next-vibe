@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import { eq } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
@@ -80,7 +80,13 @@ export class OrderConfirmRepository {
       const [updated] = await db
         .update(purchaseOrders)
         .set({ status: "CONFIRMED", confirmedAt: now, updatedAt: now })
-        .where(eq(purchaseOrders.id, poId))
+        .where(
+          and(
+            eq(purchaseOrders.id, poId),
+            eq(purchaseOrders.companyId, po.companyId),
+            inArray(purchaseOrders.status, ["SENT"]),
+          ),
+        )
         .returning({
           id: purchaseOrders.id,
           status: purchaseOrders.status,
@@ -89,8 +95,8 @@ export class OrderConfirmRepository {
 
       if (!updated || !updated.confirmedAt) {
         return fail({
-          message: t("orderConfirm.post.errors.server.title"),
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          message: t("orderConfirm.post.errors.conflict.title"),
+          errorType: ErrorResponseTypes.CONFLICT,
         });
       }
 

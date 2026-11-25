@@ -4,7 +4,7 @@
 
 import "server-only";
 
-import { eq, sql } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import {
@@ -17,11 +17,11 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { CompanyMemberRole } from "@/companies/enum";
-import { CompanyAuthRepository } from "@/companies/repository";
+import { getDocumentAccess } from "@/finance/document-company-scope";
 
 import { paymentEstimateLines, paymentEstimates } from "../../../../db";
 import { EstimateStatus } from "../../../../enum";
+import { refreshEstimateTotals } from "../../../draft";
 import type {
   EstimateLineRemoveResponseOutput,
   EstimateLineRemoveUrlPathParams,
@@ -66,56 +66,58 @@ export class EstimateLineRemoveRepository {
         });
       }
 
-      const authResult = await CompanyAuthRepository.requireMember(
-        userId,
-        estimate.companyId,
-        CompanyMemberRole.ACCOUNTANT,
-        logger,
-        locale,
-      );
-      if (!authResult.success) {
-        return authResult;
-      }
-
-      if (estimate.status !== EstimateStatus.DRAFT) {
-        return fail({
-          message: t("post.errors.conflict.title"),
-          errorType: ErrorResponseTypes.CONFLICT,
+      return await db.transaction(async (tx) => {
+        const access = await getDocumentAccess(
+          userId,
+          { companyId: estimate.companyId },
+          tx,
+        );
+        if (!access?.canManage) {
+          return fail({
+            message: t("post.errors.forbidden.title"),
+            errorType: ErrorResponseTypes.FORBIDDEN,
+          });
+        }
+        const [locked] = await tx
+          .select()
+          .from(paymentEstimates)
+          .where(eq(paymentEstimates.id, estimate.id))
+          .for("update");
+        if (
+          !locked ||
+          locked.companyId !== estimate.companyId ||
+          locked.status !== EstimateStatus.DRAFT
+        ) {
+          return fail({
+            message: t("post.errors.conflict.title"),
+            errorType: ErrorResponseTypes.CONFLICT,
+          });
+        }
+        const [removed] = await tx
+          .delete(paymentEstimateLines)
+          .where(
+            and(
+              eq(paymentEstimateLines.id, urlPathParams.lineId),
+              eq(paymentEstimateLines.estimateId, locked.id),
+            ),
+          )
+          .returning({ id: paymentEstimateLines.id });
+        if (!removed) {
+          return fail({
+            message: t("post.errors.notFound.title"),
+            errorType: ErrorResponseTypes.NOT_FOUND,
+          });
+        }
+        await refreshEstimateTotals(tx, locked.id);
+        logger.debug("Estimate line removed", {
+          lineId: urlPathParams.lineId,
+          estimateId: estimate.id,
         });
-      }
 
-      await db
-        .delete(paymentEstimateLines)
-        .where(eq(paymentEstimateLines.id, urlPathParams.lineId));
-
-      // Recalculate estimate totals
-      await db
-        .update(paymentEstimates)
-        .set({
-          subtotal: sql`COALESCE((
-            SELECT SUM(unit_price * quantity) FROM payment_estimate_lines
-            WHERE estimate_id = ${estimate.id}
-          ), 0)`,
-          taxAmount: sql`COALESCE((
-            SELECT SUM(tax_amount) FROM payment_estimate_lines
-            WHERE estimate_id = ${estimate.id}
-          ), 0)`,
-          total: sql`COALESCE((
-            SELECT SUM(line_total) FROM payment_estimate_lines
-            WHERE estimate_id = ${estimate.id}
-          ), 0)`,
-          updatedAt: new Date(),
-        })
-        .where(eq(paymentEstimates.id, estimate.id));
-
-      logger.debug("Estimate line removed", {
-        lineId: urlPathParams.lineId,
-        estimateId: estimate.id,
-      });
-
-      return success({
-        success: true,
-        message: null,
+        return success({
+          success: true,
+          message: null,
+        });
       });
     } catch (error) {
       const parsed = parseError(error);

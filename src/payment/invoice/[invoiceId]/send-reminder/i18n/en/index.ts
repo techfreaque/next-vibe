@@ -6,16 +6,16 @@ export const translations = {
     ar: "ar",
   },
   post: {
-    title: "Send Payment Reminder",
-    titleShort: "Send Reminder",
+    title: "Prepare payment reminder",
+    titleShort: "Prepare reminder",
     description:
-      "Send a payment reminder for an overdue invoice. Invoice must be OPEN status and past its due date. Logs the reminder as a customer note.",
+      "Create a reminder draft with the current overdue balance and an optional note.",
     form: {
-      title: "Send Reminder",
-      description: "Notify the customer about their overdue payment",
+      title: "Prepare reminder",
+      description: "Review the outstanding amount before sharing the draft.",
     },
     response: {
-      success: "Reminder sent",
+      success: "Reminder draft ready",
       message: "Status message",
     },
     errors: {
@@ -50,7 +50,7 @@ export const translations = {
       conflict: {
         title: "Not Overdue",
         description:
-          "Reminders can only be sent for open invoices past their due date",
+          "A draft requires an open invoice with an outstanding balance and a past due date.",
       },
       unsavedChanges: {
         title: "Unsaved Changes",
@@ -58,8 +58,9 @@ export const translations = {
       },
     },
     success: {
-      title: "Success",
-      description: "Payment reminder sent and logged",
+      title: "Reminder draft ready",
+      description:
+        "Saved in invoice history. The reminder is ready to share with the customer.",
     },
   },
   invoiceId: {
@@ -73,9 +74,16 @@ export const translations = {
     placeholder: "Add a personal note to the reminder...",
   },
   widget: {
+    copy: "Copy reminder",
+    copied: "Reminder copied",
+    copyFailed: "Copy failed. Try again",
+    download: "Download reminder",
+    subject: "Payment reminder for invoice {{number}}",
+    body: "The outstanding balance is {{amount}}. Payment was due on {{date}}.",
     back: "Back",
-    submit: "Send Reminder",
-    reminderSent: "Reminder sent. The customer has been notified.",
+    submit: "Prepare reminder",
+    reminderSent:
+      "Saved in invoice history. The reminder is ready to share with the customer.",
     viewInvoice: "View Invoice",
   },
 };

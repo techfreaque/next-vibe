@@ -7,13 +7,12 @@ export const translations: typeof enTranslations = {
     invoice: "factura",
   },
   post: {
-    title: "Enviar factura",
-    titleShort: "Enviar factura",
-    description:
-      "Marcar un proyecto de factura como enviado - estado de transición a Open",
+    title: "Emitir factura",
+    titleShort: "Emitir factura",
+    description: "Emite el borrador y contabiliza la cuenta por cobrar.",
     form: {
-      title: "Enviar factura",
-      description: "Envía la factura al cliente",
+      title: "Emitir factura",
+      description: "Tras emitirla se generará un enlace para el cliente.",
     },
     response: {
       success: "Factura enviada",
@@ -21,6 +20,10 @@ export const translations: typeof enTranslations = {
       viewUrl: "Vista al cliente URL",
     },
     errors: {
+      invoiceLines:
+        "Añade líneas con un total positivo antes de emitir la factura.",
+      posting:
+        "Revisa el total de la factura, la moneda de la empresa, el periodo contable y las cuentas de registro.",
       unauthorized: {
         title: "Se requiere autenticación",
         description: "Inicia sesión para continuar",
@@ -70,8 +73,8 @@ export const translations: typeof enTranslations = {
   },
   widget: {
     back: "Atrás",
-    submit: "Enviar factura",
-    sent: "Factura enviada",
+    submit: "Emitir factura",
+    sent: "Factura emitida",
     viewUrl: "Enlace de vista al cliente",
   },
 };

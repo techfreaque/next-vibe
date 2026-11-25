@@ -55,6 +55,23 @@ const { GET } = createEndpoint({
         labelField: "name",
       }),
 
+      attention: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "dashboard.get.widget.attention",
+        schema: z
+          .array(
+            z.object({
+              id: z.uuid(),
+              companyId: z.uuid(),
+              warehouseId: z.uuid(),
+              productId: z.uuid(),
+              warehouseName: z.string(),
+              productName: z.string().nullable(),
+              available: z.number(),
+            }),
+          )
+          .optional(),
+      }),
       inStockCount: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         label: "dashboard.get.response.inStockCount" as const,
@@ -142,6 +159,26 @@ const { GET } = createEndpoint({
     },
     responses: {
       default: {
+        attention: [
+          {
+            id: "00000000-0000-4000-8000-000000000001",
+            companyId: "00000000-0000-4000-8000-000000000011",
+            warehouseId: "00000000-0000-4000-8000-000000000021",
+            productId: "00000000-0000-4000-8000-000000000031",
+            warehouseName: "Main warehouse",
+            productName: "A5 linen notebook",
+            available: 0,
+          },
+          {
+            id: "00000000-0000-4000-8000-000000000002",
+            companyId: "00000000-0000-4000-8000-000000000011",
+            warehouseId: "00000000-0000-4000-8000-000000000022",
+            productId: "00000000-0000-4000-8000-000000000032",
+            warehouseName: "Shop floor",
+            productName: "Blue fountain pen",
+            available: 2,
+          },
+        ],
         inStockCount: 42,
         outOfStockCount: 3,
         lowStockCount: 7,

@@ -1,30 +1,29 @@
 export const translations = {
   enums: {
     country: {
-      AT: "AT — ÖKR",
-      DE: "DE — SKR03",
-      XX: "XX — IFRS Generic",
+      AT: "Austria (ÖKR)",
+      DE: "Germany (SKR03)",
+      XX: "Generic IFRS",
     },
   },
   post: {
-    title: "Initialize Chart of Accounts",
-    titleShort: "Setup",
+    title: "Set up the chart of accounts",
+    titleShort: "Set up the chart of accounts",
     description:
-      "Set up a company's chart of accounts from a country-specific template. Idempotent — safe to run multiple times.",
+      "Add the accounts your company needs from a standard template.",
     companyId: {
-      label: "Company ID",
-      description: "The company to initialize the chart of accounts for",
-      placeholder: "Enter company UUID",
+      label: "Company",
+      description: "Choose the company to set up.",
+      placeholder: "Choose a company",
     },
     country: {
-      label: "Country",
-      description:
-        "Country standard to use (AT = ÖKR, DE = SKR03, XX = IFRS Generic)",
-      placeholder: "Select country",
+      label: "Accounting template",
+      description: "Choose the account structure to add.",
+      placeholder: "Choose a template",
     },
     response: {
       created: "Accounts created",
-      skipped: "Accounts skipped (already existed)",
+      skipped: "Existing accounts kept",
     },
     errors: {
       unauthorized: {
@@ -33,7 +32,7 @@ export const translations = {
       },
       validation: {
         title: "Validation Error",
-        description: "Invalid input — check company ID and country",
+        description: "Check the company and accounting template.",
       },
       forbidden: {
         title: "Forbidden",
@@ -41,15 +40,16 @@ export const translations = {
       },
       server: {
         title: "Server Error",
-        description: "Setup failed — please try again",
+        description: "Try applying the template again.",
       },
       unknown: {
         title: "Unknown Error",
         description: "An unexpected error occurred",
       },
       conflict: {
-        title: "Already Initialized",
-        description: "This company already has a chart of accounts",
+        title: "Review setup",
+        description:
+          "Reload the company’s current accounts before applying the template.",
       },
       network: {
         title: "Network Error",
@@ -65,11 +65,22 @@ export const translations = {
       },
     },
     success: {
-      title: "Chart of Accounts Ready",
-      description: "All accounts have been created for the company",
+      title: "Chart of accounts ready",
+      description:
+        "The template was applied. Review the new and existing accounts below.",
     },
     widget: {
-      viewAccounts: "View Account List",
+      review: "Review the account setup",
+      previewLoading: "Looking up existing accounts…",
+      previewFailed: "The current account count is unavailable.",
+      existing: "Existing accounts: {{count}}.",
+      empty: "This company has no accounts yet.",
+      consequences:
+        "Setup adds missing account codes from the template and preserves existing records.",
+      submit: "Add accounts from template",
+      back: "Back",
+      viewAccounts: "Open chart of accounts",
+      viewPeriods: "View accounting periods",
     },
   },
   title: "Chart of Accounts Setup",

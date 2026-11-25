@@ -97,6 +97,26 @@ const { GET } = createEndpoint({
         label: "dashboard.response.currency" as const,
         schema: z.string(),
       }),
+      openReceivables: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "dashboard.widget.openReceivables",
+        schema: z.number().optional(),
+      }),
+      approvedPayables: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "dashboard.widget.approvedPayables",
+        schema: z.number().optional(),
+      }),
+      cashBalance: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "dashboard.widget.cashBalance",
+        schema: z.number().optional(),
+      }),
+      monthToDateProfit: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "dashboard.widget.monthToDateProfit",
+        schema: z.number().optional(),
+      }),
       currentPeriodId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         label: "dashboard.response.currentPeriod" as const,

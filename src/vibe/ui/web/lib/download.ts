@@ -1,3 +1,5 @@
+export const supportsTextFileDownload = true;
+
 export function downloadFile(
   filename: string,
   content: string,

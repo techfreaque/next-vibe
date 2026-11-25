@@ -2,16 +2,22 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   spendAlert: {
-    explained: "Účtovná evidencia vysvetľuje nárast spotreby u poskytovateľa {{provider}}.",
+    explained:
+      "Účtovná evidencia vysvetľuje nárast spotreby u poskytovateľa {{provider}}.",
     unexplained: "Možné zneužitie kľúča poskytovateľa {{provider}}.",
     cap: "Výdavky za {{hours}} h: {{spend}} ({{rate}}/h, limit {{cap}}/h).",
     drain:
       "Hodinové výdavky {{rate}}/h sú {{ratio}}-násobkom priebežného priemeru {{baseline}}/h za posledných {{coveredHours}} h s dostupnými údajmi. Povolený násobok: {{limit}}.",
-    ledgerCost: "Evidované náklady na poskytovateľov za toto obdobie: {{cost}}.",
+    ledgerCost:
+      "Evidované náklady na poskytovateľov za toto obdobie: {{cost}}.",
     topWallets: "Peňaženky s najvyššou spotrebou kreditov: {{wallets}}.",
   },
   category: "Financie",
   documents: {
+    clearCompany: "Zrušiť filter firmy",
+    clearCustomer: "Zrušiť filter zákazníka",
+    pageTotals: "Spolu · {{currency}}",
+    pageDocumentCount: "Počet dokladov na tejto strane: {{count}}",
     search: "Vyhľadať doklady",
     matches: "Nájdené doklady ({{count}})",
     emptyTitle: "Filtrom nezodpovedajú žiadne doklady",
@@ -82,25 +88,33 @@ export const translations: typeof enTranslations = {
       critical: "Kritické",
     },
     threshold: {
-      openrouterAutoTopUpFloorUsd: "Prah upozornenia na automatické dobitie OpenRouter (USD)",
+      openrouterAutoTopUpFloorUsd:
+        "Prah upozornenia na automatické dobitie OpenRouter (USD)",
       openrouterAutoTopUpGraceHours:
         "Lehota na automatické dobitie OpenRouter (hodiny)",
       gabLowBalanceCredits: "Minimálny zostatok Gab AI (kredity)",
-      uncensoredAiLowBalanceCredits: "Minimálny zostatok uncensored.ai (kredity)",
+      uncensoredAiLowBalanceCredits:
+        "Minimálny zostatok uncensored.ai (kredity)",
       freedomGptLowBalanceCredits: "Minimálny zostatok FreedomGPT (kredity)",
-      nanoGptAutoTopUpFloorUsd: "Prah upozornenia na automatické dobitie NanoGPT (USD)",
-      nanoGptAutoTopUpGraceHours: "Lehota na automatické dobitie NanoGPT (hodiny)",
-      veniceAutoTopUpFloorUsd: "Prah upozornenia na automatické dobitie Venice (USD)",
+      nanoGptAutoTopUpFloorUsd:
+        "Prah upozornenia na automatické dobitie NanoGPT (USD)",
+      nanoGptAutoTopUpGraceHours:
+        "Lehota na automatické dobitie NanoGPT (hodiny)",
+      veniceAutoTopUpFloorUsd:
+        "Prah upozornenia na automatické dobitie Venice (USD)",
       modelsLabLowBalanceUsd: "Minimálny zostatok ModelsLab (USD)",
       edenAiLowBalanceUsd: "Minimálny zostatok Eden AI (USD)",
-      veniceAutoTopUpGraceHours: "Lehota na automatické dobitie Venice (hodiny)",
+      veniceAutoTopUpGraceHours:
+        "Lehota na automatické dobitie Venice (hodiny)",
       marginFloorPct: "Minimálna marža (%)",
-      drainMultiplier: "Násobok rýchleho čerpania (priemer za predchádzajúce obdobie)",
+      drainMultiplier:
+        "Násobok rýchleho čerpania (priemer za predchádzajúce obdobie)",
       hourlySpendCapUsd: "Hodinový limit výdavkov na poskytovateľa ($/h)",
       minSpikeUsd: "Najnižšie výdavky na vyhodnotenie nárastu ($)",
       refundRatePct: "Limit podielu vrátených platieb (% všetkých platieb)",
       disputeCountDaily: "Spory za deň",
-      cancellationMultiplier: "Nárast počtu zrušení (násobok priemeru za predchádzajúce obdobie)",
+      cancellationMultiplier:
+        "Nárast počtu zrušení (násobok priemeru za predchádzajúce obdobie)",
       cancellationMin: "Najnižší počet zrušení na vyhodnotenie nárastu",
       billingGapPct: "Limit rozdielu vo fakturácii (% nad fakturovanou sumou)",
       alertDedupHours: "Interval opakovania upozornenia (hodiny)",
@@ -128,15 +142,19 @@ export const translations: typeof enTranslations = {
       grossMarginPct: "Krycia marža, starší výpočet (%)",
       providerSpend: "Výdavky na poskytovateľa ($)",
       providerBalance: "Zostávajúci zostatok u poskytovateľa ($)",
-      providerBalanceNative: "Zostávajúci zostatok u poskytovateľa (kredity poskytovateľa)",
-      providerCost: "Náklady na poskytovateľov podľa našich záznamov využitia ($)",
+      providerBalanceNative:
+        "Zostávajúci zostatok u poskytovateľa (kredity poskytovateľa)",
+      providerCost:
+        "Náklady na poskytovateľov podľa našich záznamov využitia ($)",
       costTotal: "Celkové náklady na všetkých poskytovateľov ($)",
       costPaid: "Náklady na poskytovateľov pri platenom využití ($)",
       costFree: "Náklady na poskytovateľov pri bezplatnom využití ($)",
       consumedList: "Spotrebované kredity v cenníkovej cene ($)",
-      earned: "Výnosy zo spotrebovaných platených kreditov v ich nákupnej cene ($)",
+      earned:
+        "Výnosy zo spotrebovaných platených kreditov v ich nákupnej cene ($)",
       freeList: "Spotrebované bezplatné kredity v cenníkovej cene ($)",
-      aiMarginUsd: "Marža AI: výnosy po odpočítaní nákladov na poskytovateľov ($)",
+      aiMarginUsd:
+        "Marža AI: výnosy po odpočítaní nákladov na poskytovateľov ($)",
       aiMarginPct: "Marža AI (% z výnosov)",
       paidMarginUsd: "Marža plateného používania ($)",
       paidMarginPct: "Marža plateného používania (%)",
@@ -167,7 +185,8 @@ export const translations: typeof enTranslations = {
       },
       windowDays: {
         label: "Obdobie tržieb (dni)",
-        description: "Počet dní spätne na opätovné načítanie tržieb. Predvolená hodnota: 3.",
+        description:
+          "Počet dní spätne na opätovné načítanie tržieb. Predvolená hodnota: 3.",
       },
       backfillFrom: {
         label: "Doplniť údaje od dátumu (YYYY-MM-DD)",
@@ -195,7 +214,8 @@ export const translations: typeof enTranslations = {
       result: "Výsledok importu",
       resultDry: "Skúšobný režim bez zápisu údajov a bez odosielania",
       events: "Počet riadkov: {{count}}",
-      margin: "Denné peňažné príjmy a výdavky na poskytovateľov. Údaje o peňažných tokoch.",
+      margin:
+        "Denné peňažné príjmy a výdavky na poskytovateľov. Údaje o peňažných tokoch.",
       dayLine: "Príjmy: {{cash}} · Výdavky na poskytovateľov: {{cost}}",
       costUnknown: "náklady nie sú známe",
       alerts: "Upozornenia: vyvolané {{raised}}, potlačené {{suppressed}}",
@@ -247,9 +267,11 @@ export const translations: typeof enTranslations = {
       providers: {
         title: "Zostatky u poskytovateľov",
         lastSpend: "Výdavky od poslednej kontroly: {{amount}}",
-        lastSpendEstimate: "Odhadované výdavky od poslednej kontroly: {{amount}}",
+        lastSpendEstimate:
+          "Odhadované výdavky od poslednej kontroly: {{amount}}",
         previousDaySpend: "Poplatky za API za deň {{day}} (UTC): {{amount}}",
-        lastNativeSpend: "Poplatky za API do konca poslednej úplnej hodiny: {{amount}}",
+        lastNativeSpend:
+          "Poplatky za API do konca poslednej úplnej hodiny: {{amount}}",
         noSpend: "Výdavky zatiaľ neboli zmerané",
       },
       revenue: {
@@ -275,7 +297,10 @@ export const translations: typeof enTranslations = {
     description:
       "Nastavte vlastný prah upozornenia. Po vypnutí vlastného nastavenia sa použije predvolená hodnota.",
     fields: {
-      key: { label: "Prahová hodnota", description: "Limit, ktorý chcete zmeniť" },
+      key: {
+        label: "Prahová hodnota",
+        description: "Limit, ktorý chcete zmeniť",
+      },
       value: { label: "Hodnota", description: "Nový limit" },
       enabled: {
         label: "Použiť túto hodnotu",
@@ -299,13 +324,19 @@ export const translations: typeof enTranslations = {
     description:
       "Časové rady finančného monitorovania: tržby podľa spracovateľa platieb, čisté tržby, náklady, marža, výdavky a zostatky u poskytovateľov a upozornenia.",
     fields: {
-      resolution: { label: "Časové rozlíšenie", description: "Dĺžka časového intervalu" },
+      resolution: {
+        label: "Časové rozlíšenie",
+        description: "Dĺžka časového intervalu",
+      },
       range: { label: "Rozsah", description: "Časové obdobie na načítanie" },
       lookback: {
         label: "Intervaly pred začiatkom rozsahu",
         description: "Počet intervalov pred začiatkom rozsahu",
       },
-      metric: { label: "Ukazovateľ", description: "Časový rad, ktorý chcete zobraziť" },
+      metric: {
+        label: "Ukazovateľ",
+        description: "Časový rad, ktorý chcete zobraziť",
+      },
       provider: {
         label: "Poskytovateľ",
         description: "Filtrovať výdavky na poskytovateľov a ich zostatky",
@@ -315,7 +346,10 @@ export const translations: typeof enTranslations = {
         description:
           "ID poskytovateľa API na priradenie nákladov, napríklad openrouter, nano-gpt alebo unattributed",
       },
-      result: { label: "Časový rad", description: "Časové rady finančných údajov" },
+      result: {
+        label: "Časový rad",
+        description: "Časové rady finančných údajov",
+      },
       meta: { label: "Metadáta", description: "Metadáta spracovania" },
     },
   },
@@ -338,7 +372,8 @@ export const translations: typeof enTranslations = {
     },
     conflict: {
       title: "Konflikt",
-      description: "Záznam sa medzičasom zmenil. Obnovte údaje a skúste to znova.",
+      description:
+        "Záznam sa medzičasom zmenil. Obnovte údaje a skúste to znova.",
     },
     server: {
       title: "Chyba servera",
@@ -361,7 +396,8 @@ export const translations: typeof enTranslations = {
     backfill: {
       invalidRange:
         "Zadajte platný počiatočný dátum (YYYY-MM-DD), ktorý je najneskôr v deň konca rozsahu.",
-      tooWide: "Obdobie na doplnenie údajov je príliš dlhé. Najvyšší počet dní na jedno spustenie: {{max}}.",
+      tooWide:
+        "Obdobie na doplnenie údajov je príliš dlhé. Najvyšší počet dní na jedno spustenie: {{max}}.",
     },
   },
   success: {

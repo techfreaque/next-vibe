@@ -17,7 +17,10 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { companies, companyMembers } from "../db";
 import { CompanyMemberRole } from "../enum";
-import type { CompanyCreateRequestTypeOutput } from "./definition";
+import type {
+  CompanyCreatePostResponseOutput,
+  CompanyCreateRequestTypeOutput,
+} from "./definition";
 import { scopedTranslation } from "./i18n";
 
 export class CompaniesCreateRepository {
@@ -26,43 +29,49 @@ export class CompaniesCreateRepository {
     logger: EndpointLogger,
     userId: string,
     locale: CountryLanguage = defaultLocale,
-  ): Promise<ResponseType<{ result: { id: string; name: string } }>> {
+  ): Promise<ResponseType<CompanyCreatePostResponseOutput>> {
     const { t } = scopedTranslation.scopedT(locale);
 
     try {
       const { details } = data;
 
-      const [company] = await db
-        .insert(companies)
-        .values({
-          name: details.name,
-          type: details.type,
-          vatNumber: details.vatNumber,
-          country: details.country,
-          currency: details.currency ?? "EUR",
-          email: details.email,
-          phone: details.phone,
-          website: details.website,
-          ownerUserId: userId,
-        })
-        .returning({ id: companies.id, name: companies.name });
+      return await db.transaction(async (tx) => {
+        const [company] = await tx
+          .insert(companies)
+          .values({
+            name: details.name,
+            type: details.type,
+            vatNumber: details.vatNumber,
+            country: details.country,
+            currency: details.currency ?? "EUR",
+            email: details.email,
+            phone: details.phone,
+            website: details.website,
+            ownerUserId: userId,
+          })
+          .returning({
+            id: companies.id,
+            name: companies.name,
+            country: companies.country,
+          });
 
-      if (!company) {
-        logger.error("Failed to insert company");
-        return fail({
-          message: t("post.errors.server.title"),
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        if (!company) {
+          logger.error("Failed to insert company");
+          return fail({
+            message: t("post.errors.server.title"),
+            errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          });
+        }
+
+        await tx.insert(companyMembers).values({
+          companyId: company.id,
+          userId,
+          role: CompanyMemberRole.OWNER,
+          invitedByUserId: userId,
         });
-      }
 
-      await db.insert(companyMembers).values({
-        companyId: company.id,
-        userId,
-        role: CompanyMemberRole.OWNER,
-        invitedByUserId: userId,
+        return success({ result: company });
       });
-
-      return success({ result: { id: company.id, name: company.name } });
     } catch (error) {
       logger.error("Error creating company", parseError(error));
       return fail({

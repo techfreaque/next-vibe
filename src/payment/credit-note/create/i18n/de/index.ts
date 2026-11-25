@@ -12,7 +12,7 @@ export const translations: typeof enTranslations = {
     title: "Gutschrift erstellen",
     titleShort: "Gutschrift erstellen",
     description:
-      "Gutschrift zur ursprünglichen Rechnung erstellen. Vollgutschrift kehrt alle Positionen um. Teilgutschrift gilt für die angegebenen Positionen. Bucht eine Gegenbuchung: Soll Umsatz, Haben Forderungen.",
+      "Erstellen Sie eine vollständige oder teilweise Gutschrift zu einer gebuchten Rechnung. Sie korrigiert Forderung, Erlös und Umsatzsteuer.",
     form: {
       title: "Gutschrift erstellen",
       description: "Gutschrift gegen eine bestehende Rechnung ausstellen",
@@ -35,6 +35,14 @@ export const translations: typeof enTranslations = {
       },
     },
     errors: {
+      creditLines:
+        "Verwenden Sie positive Mengen und die USt.-Sätze der Originalrechnung.",
+      creditLimit:
+        "Die Gutschrift übersteigt den verbleibenden Netto-, Steuer- oder Bruttobetrag der Originalrechnung.",
+      originalPosting:
+        "Klären Sie die Buchung der Originalrechnung vor der Gutschrift.",
+      posting:
+        "Prüfen Sie Unternehmenswährung, offene Buchungsperiode und die ursprünglichen Buchungskonten.",
       unauthorized: {
         title: "Nicht autorisiert",
         description: "Authentifizierung erforderlich",

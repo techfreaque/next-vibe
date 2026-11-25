@@ -46,7 +46,7 @@ export const translations: typeof enTranslations = {
       },
       server: {
         title: "Błąd serwera",
-        description: "Coś poszło nie tak — spróbuj ponownie",
+        description: "Coś poszło nie tak. Spróbuj ponownie.",
       },
       unknown: {
         title: "Nieznany błąd",
@@ -70,6 +70,7 @@ export const translations: typeof enTranslations = {
       description: "Szczegóły firmy pobrane",
     },
     widget: {
+      setupAccounting: "Skonfiguruj księgowość",
       back: "Wstecz",
       loading: "Ładowanie firmy...",
       edit: "Edytuj",

@@ -8,7 +8,12 @@ export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
     email: undefined,
-    handler: async ({ data, user, logger, locale }) =>
-      CoaJournalReverseRepository.reverseEntry(data, user, logger, locale),
+    handler: async ({ urlPathParams, data, user, logger, locale }) =>
+      CoaJournalReverseRepository.reverseEntry(
+        { ...data, ...urlPathParams },
+        user,
+        logger,
+        locale,
+      ),
   },
 });

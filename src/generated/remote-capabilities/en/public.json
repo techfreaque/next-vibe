@@ -76783,6 +76783,88 @@
           },
           "schemaType": "primitive"
         },
+        "erpWorkflowAliases": {
+          "type": "text",
+          "label": "Accounting workspace",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "array",
+                  "element": {
+                    "def": {
+                      "type": "string"
+                    },
+                    "type": "string"
+                  }
+                },
+                "type": "array",
+                "element": {
+                  "def": {
+                    "type": "string"
+                  },
+                  "type": "string"
+                }
+              }
+            },
+            "type": "optional"
+          },
+          "visibleFor": ["enums.userRole.admin"],
+          "hiddenForPlatforms": [
+            "ai",
+            "mcp",
+            "cron",
+            "remote-skill",
+            "cli",
+            "cli-package"
+          ],
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "erpNavigationAliases": {
+          "type": "text",
+          "label": "Accounting workspace",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "array",
+                  "element": {
+                    "def": {
+                      "type": "string"
+                    },
+                    "type": "string"
+                  }
+                },
+                "type": "array",
+                "element": {
+                  "def": {
+                    "type": "string"
+                  },
+                  "type": "string"
+                }
+              }
+            },
+            "type": "optional"
+          },
+          "visibleFor": ["enums.userRole.admin"],
+          "hiddenForPlatforms": [
+            "ai",
+            "mcp",
+            "cron",
+            "remote-skill",
+            "cli",
+            "cli-package"
+          ],
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
         "recordSearchTargets": {
           "type": "text",
           "label": "Find a record",

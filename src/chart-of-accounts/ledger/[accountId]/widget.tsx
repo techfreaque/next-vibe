@@ -2,182 +2,235 @@
 
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
+import { EmptyBlock } from "next-vibe/ui/components/empty-block";
 import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
+import { ChevronRight } from "next-vibe/ui/components/icons/ChevronRight";
+import { LoadingBlock } from "next-vibe/ui/components/loading-block";
 import { Span } from "next-vibe/ui/components/span";
-import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
 import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "next-vibe/ui/components/table";
+import { WidgetHeader } from "next-vibe/ui/components/widget-header";
+import { WidgetShell } from "next-vibe/ui/components/widget-shell";
+import { formatMoney } from "next-vibe/unified-ui/_shared/format-money";
+import {
+  useWidgetForm,
+  useWidgetIsInteractive,
   useWidgetLocale,
   useWidgetNavigation,
+  useWidgetOnSubmit,
+  useWidgetResponse,
+  useWidgetResponseOnly,
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
+import { scopedTranslation as frameworkTranslation } from "next-vibe/unified-ui/hooks/i18n";
 import { DateFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/date-field/widget";
+import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
+import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 import type { JSX } from "react";
 
 import { LineType } from "../../enum";
-import { scopedTranslation as coaScopedTranslation } from "../../i18n";
 import type definition from "./definition";
-import type { CoaLedgerResponseOutput } from "./definition";
 
-type LedgerLine = NonNullable<CoaLedgerResponseOutput["lines"]>[number];
-
-export function CoaLedgerWidget(_props: {
-  field: (typeof definition.GET)["fields"];
+export function CoaLedgerWidget({
+  field: { children },
+}: {
+  field: typeof definition.GET.fields;
 }): JSX.Element {
   const data = useWidgetValue<typeof definition.GET>();
   const t = useWidgetTranslation<typeof definition.GET>();
   const navigation = useWidgetNavigation();
   const locale = useWidgetLocale();
-  const { t: tCoa } = coaScopedTranslation.scopedT(locale);
+  const form = useWidgetForm<typeof definition.GET>();
+  const onSubmit = useWidgetOnSubmit();
+  const response = useWidgetResponse();
+  const interactive = useWidgetIsInteractive();
+  const responseOnly = useWidgetResponseOnly();
+  const showInputs = interactive && !responseOnly;
+  const { t: frameworkT } = frameworkTranslation.scopedT(locale);
 
-  // accountId lives in urlPathParams, not form data — read from navigation context
-  const currentEntry = navigation.current;
+  const pathParams = navigation.current?.params?.urlPathParams;
   const hasAccountId =
-    !!currentEntry?.params?.urlPathParams &&
-    "accountId" in currentEntry.params.urlPathParams &&
-    !!currentEntry.params.urlPathParams.accountId;
+    !!pathParams && "accountId" in pathParams && !!pathParams.accountId;
 
-  const handleEntryClick = (entryId: string): void => {
+  const page = form.watch("page") ?? 1;
+  const pageSize = form.watch("pageSize") ?? 20;
+  const totalCount = data?.totalCount ?? 0;
+  const pageCount = Math.max(1, Math.ceil(totalCount / pageSize));
+
+  const openEntry = (entryId: string): void => {
     void (async (): Promise<void> => {
-      const def = await import("../../journal/[entryId]/get/definition");
-      navigation.push(def.default.GET, {
-        urlPathParams: { entryId },
-      });
+      const mod = await import("../../journal/[entryId]/get/definition");
+      navigation.push(mod.default.GET, { urlPathParams: { entryId } });
     })();
   };
 
-  const formatAmount = (n: number, currency?: string | null): string => {
-    const formatted = new Intl.NumberFormat(locale, {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(n);
-    return currency ? `${formatted} ${currency}` : formatted;
+  const changePage = (nextPage: number): void => {
+    form.setValue("page", nextPage, { shouldDirty: true });
+    onSubmit?.();
   };
 
-  const isLoading = !data && hasAccountId;
+  const formatLocale = locale.replace(/-GLOBAL$/, "");
+  const date = new Intl.DateTimeFormat(formatLocale, {
+    dateStyle: "medium",
+    timeZone: "UTC",
+  });
 
   return (
-    <Div className="flex flex-col gap-4">
-      {/* Back */}
-      {navigation.canGoBack && (
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={() => navigation.pop()}
-          className="self-start gap-1.5 -ml-1"
-        >
-          <ChevronLeft className="h-4 w-4" />
-          {t("ledger.widget.back")}
-        </Button>
-      )}
-
-      {/* Title */}
-      <Div className="flex items-center justify-between flex-wrap gap-2">
-        <Span className="text-base font-bold">{t("ledger.title")}</Span>
-        {data?.totalCount !== undefined && (
-          <Span className="text-xs text-muted-foreground">
-            {data.totalCount} {t("ledger.widget.totalCount")}
-          </Span>
-        )}
-      </Div>
-
-      {/* Date filters */}
-      <Div className="flex gap-3 flex-wrap">
-        <Div className="flex-1 min-w-32">
+    <WidgetShell layout="page">
+      <WidgetHeader
+        size="page"
+        title={t("ledger.title")}
+        backButton={
+          interactive &&
+          navigation.canGoBack && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => navigation.pop()}
+            >
+              <ChevronLeft className="h-4 w-4" />
+              {t("ledger.widget.back")}
+            </Button>
+          )
+        }
+        actions={
+          showInputs &&
+          hasAccountId && (
+            <SubmitButtonWidget<typeof definition.GET> field={{ size: "sm" }} />
+          )
+        }
+      />
+      {showInputs && hasAccountId && (
+        <Div className="grid gap-3 @sm:grid-cols-2">
           <DateFieldWidget
+            utcCalendarDay
             fieldName="dateFrom"
-            field={withValue(_props.field.children.dateFrom, undefined, null)}
+            field={children.dateFrom}
           />
-        </Div>
-        <Div className="flex-1 min-w-32">
           <DateFieldWidget
+            utcCalendarDay
             fieldName="dateTo"
-            field={withValue(_props.field.children.dateTo, undefined, null)}
+            field={children.dateTo}
           />
         </Div>
-      </Div>
-
-      {/* No account selected */}
-      {!hasAccountId && !data && (
-        <Div className="py-12 text-center text-sm text-muted-foreground border border-dashed rounded-md">
-          {t("ledger.widget.noAccount")}
-        </Div>
       )}
+      <FormAlertWidget field={{}} />
 
-      {/* Loading */}
-      {isLoading && (
-        <Div className="py-12 text-center text-sm text-muted-foreground">
-          {t("ledger.widget.loading")}
-        </Div>
-      )}
-
-      {/* Results */}
-      {data?.lines !== undefined && (
-        <Div className="flex flex-col gap-2">
-          {data.lines.length === 0 ? (
-            <Div className="py-10 text-center text-sm text-muted-foreground border border-dashed rounded-md">
-              {t("ledger.widget.empty")}
-            </Div>
+      {response?.success !== false &&
+        (data?.lines === undefined ? (
+          hasAccountId ? (
+            <LoadingBlock message={t("ledger.widget.loading")} />
           ) : (
-            <Div className="rounded-md border overflow-hidden">
-              {/* Column headers */}
-              <Div className="grid grid-cols-[5rem_1fr_4.5rem_8rem_8rem] gap-2 px-3 py-2 bg-muted/50 border-b text-xs font-medium text-muted-foreground">
-                <Span>{t("ledger.response.date")}</Span>
-                <Span>{t("ledger.response.description")}</Span>
-                <Span>{t("ledger.response.type")}</Span>
-                <Span className="text-right">
-                  {t("ledger.response.amount")}
-                </Span>
-                <Span className="text-right">
-                  {t("ledger.widget.runningBalance")}
-                </Span>
-              </Div>
-
-              {data.lines.map((line: LedgerLine) => {
-                const isDebit = line.type === LineType.DEBIT;
-                return (
-                  <Div
-                    key={line.id}
-                    className="grid grid-cols-[5rem_1fr_4.5rem_8rem_8rem] gap-2 px-3 py-2 border-b last:border-b-0 text-sm hover:bg-muted/20"
-                  >
-                    <Span className="text-xs text-muted-foreground font-mono">
-                      {line.date.toISOString().slice(0, 10)}
-                    </Span>
-                    <Span
-                      className="truncate text-xs text-primary underline cursor-pointer hover:text-primary/70"
-                      onClick={() => handleEntryClick(line.entryId)}
-                    >
-                      {line.description ?? line.entryNumber}
-                    </Span>
-                    <Span
-                      className={`text-xs font-medium ${
-                        isDebit
-                          ? "text-amber-600 dark:text-amber-400"
-                          : "text-emerald-600 dark:text-emerald-400"
-                      }`}
-                    >
-                      {tCoa(line.type as Parameters<typeof tCoa>[0])}
-                    </Span>
-                    <Span
-                      className={`text-right font-mono text-xs ${
-                        isDebit
-                          ? "text-amber-600 dark:text-amber-400"
-                          : "text-emerald-600 dark:text-emerald-400"
-                      }`}
-                    >
-                      {formatAmount(line.amount, line.currency)}
-                    </Span>
-                    <Span className="text-right font-mono text-xs font-medium">
-                      {formatAmount(line.runningBalance)}
-                    </Span>
-                  </Div>
-                );
+            <EmptyBlock title={t("ledger.widget.noAccount")} />
+          )
+        ) : data.lines.length === 0 ? (
+          <EmptyBlock title={t("ledger.widget.empty")} />
+        ) : (
+          <Div className="rounded-md border">
+            <Table scrollLabel={t("ledger.title")}>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>{t("ledger.response.date")}</TableHead>
+                  <TableHead>{t("ledger.response.description")}</TableHead>
+                  <TableHead>{t("ledger.response.type")}</TableHead>
+                  <TableHead className="text-right">
+                    {t("ledger.response.amount")}
+                  </TableHead>
+                  <TableHead className="text-right">
+                    {t("ledger.widget.runningBalance")}
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {data.lines.map((line) => (
+                  <TableRow key={line.id}>
+                    <TableCell className="whitespace-nowrap">
+                      {date.format(new Date(line.date))}
+                    </TableCell>
+                    <TableCell>
+                      {interactive ? (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="h-auto justify-start px-0 text-left text-primary"
+                          onClick={() => openEntry(line.entryId)}
+                        >
+                          {line.description ?? line.entryNumber}
+                        </Button>
+                      ) : (
+                        (line.description ?? line.entryNumber)
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {t(
+                        line.type === LineType.DEBIT
+                          ? LineType.DEBIT
+                          : LineType.CREDIT,
+                      )}
+                    </TableCell>
+                    <TableCell className="text-right tabular-nums whitespace-nowrap">
+                      {formatMoney(line.amount, line.currency, formatLocale)}
+                    </TableCell>
+                    <TableCell className="text-right tabular-nums whitespace-nowrap font-medium">
+                      {formatMoney(
+                        line.runningBalance,
+                        line.currency,
+                        formatLocale,
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </Div>
+        ))}
+      {showInputs && (pageCount > 1 || page > 1) && (
+        <Div className="flex flex-wrap items-center justify-between gap-2">
+          <Span className="text-sm text-muted-foreground">
+            {frameworkT("widgets.pagination.page", {
+              current: page,
+              total: pageCount,
+            })}
+          </Span>
+          <Div className="flex items-center gap-2">
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              disabled={page <= 1}
+              aria-label={frameworkT("widgets.pagination.page", {
+                current: Math.min(page - 1, pageCount),
+                total: pageCount,
               })}
-            </Div>
-          )}
+              onClick={() => changePage(Math.min(page - 1, pageCount))}
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              disabled={page >= pageCount}
+              aria-label={frameworkT("widgets.pagination.page", {
+                current: Math.min(page + 1, pageCount),
+                total: pageCount,
+              })}
+              onClick={() => changePage(page + 1)}
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </Div>
         </Div>
       )}
-    </Div>
+    </WidgetShell>
   );
 }

@@ -13,6 +13,7 @@ export const translations = {
       success: "Success",
       message: "Status message",
       line: {
+        currency: "Currency",
         title: "Line Item",
         subtitle: "Added line details",
         id: "Line ID",

@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
@@ -20,7 +20,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import { CompanyMemberRole } from "@/companies/enum";
 import { CompanyAuthRepository } from "@/companies/repository";
 
-import { journalEntries, journalEntryLines } from "../../../db";
+import { accountNodes, journalEntries, journalEntryLines } from "../../../db";
 import { scopedTranslation } from "../../../i18n";
 import type { CoaJournalEntryGetResponseOutput } from "./definition";
 
@@ -61,8 +61,24 @@ export class CoaJournalEntryGetRepository {
       }
 
       const lines = await db
-        .select()
+        .select({
+          lineId: journalEntryLines.id,
+          accountId: journalEntryLines.accountId,
+          accountCode: accountNodes.code,
+          accountName: accountNodes.name,
+          lineType: journalEntryLines.type,
+          amount: journalEntryLines.amount,
+          currency: journalEntryLines.currency,
+          lineDescription: journalEntryLines.description,
+        })
         .from(journalEntryLines)
+        .leftJoin(
+          accountNodes,
+          and(
+            eq(accountNodes.id, journalEntryLines.accountId),
+            eq(accountNodes.companyId, entry.companyId),
+          ),
+        )
         .where(eq(journalEntryLines.journalEntryId, entryId))
         .orderBy(journalEntryLines.sortOrder);
 
@@ -80,14 +96,7 @@ export class CoaJournalEntryGetRepository {
           sourceId: entry.sourceId ?? null,
           postedAt: entry.postedAt ?? null,
           reversalOfId: entry.reversalOfId ?? null,
-          lines: lines.map((line) => ({
-            lineId: line.id,
-            accountId: line.accountId,
-            lineType: line.type,
-            amount: line.amount,
-            currency: line.currency,
-            lineDescription: line.description ?? null,
-          })),
+          lines,
         },
       });
     } catch (error) {

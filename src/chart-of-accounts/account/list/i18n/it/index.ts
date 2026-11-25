@@ -20,6 +20,7 @@ export const translations: typeof enTranslations = {
       description: "Conti per pagina (max 200)",
     },
     response: {
+      balance: "Saldo",
       total: "Totale",
       accounts: "Account",
       id: "ID",
@@ -78,6 +79,8 @@ export const translations: typeof enTranslations = {
       description: "Grafico dei conti recuperati con successo",
     },
     widget: {
+      debitSide: "Dare",
+      creditSide: "Avere",
       loading: "Conti di carico...",
       empty: "Nessun conto. Eseguire la configurazione per seme da un modello.",
       createButton: "Nuovo account",

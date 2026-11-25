@@ -6,6 +6,7 @@ import { Div } from "next-vibe/ui/components/div";
 import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
 import { Span } from "next-vibe/ui/components/span";
 import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
+import { formatMoney } from "next-vibe/unified-ui/_shared/format-money";
 import {
   useWidgetLocale,
   useWidgetNavigation,
@@ -97,10 +98,7 @@ export function PosOrderCreateWidget({
               {t("orderCreate.post.response.total")}
             </Span>
             <Span className="text-sm font-mono font-bold">
-              {new Intl.NumberFormat(locale, {
-                style: "currency",
-                currency: order.currency,
-              }).format(Number(order.total))}
+              {formatMoney(Number(order.total), order.currency, locale)}
             </Span>
           </Div>
         </Div>

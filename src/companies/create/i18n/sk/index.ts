@@ -22,7 +22,8 @@ export const translations: typeof enTranslations = {
   post: {
     title: "Vytvoriť firmu",
     titleShort: "Nová firma",
-    description: "Zaregistrujte novú firmu. Automaticky získate oprávnenia vlastníka.",
+    description:
+      "Zaregistrujte novú firmu. Automaticky získate oprávnenia vlastníka.",
     name: {
       label: "Názov firmy",
       description: "Obchodné meno firmy",
@@ -30,7 +31,7 @@ export const translations: typeof enTranslations = {
     },
     type: {
       label: "Typ firmy",
-      description: "Obchodný model (B2B, B2C alebo jednotlivec)",
+      description: "Obchodný model B2B, B2C alebo fyzická osoba",
       placeholder: "Vyberte typ",
     },
     vatNumber: {
@@ -82,7 +83,7 @@ export const translations: typeof enTranslations = {
       },
       server: {
         title: "Chyba servera",
-        description: "Na našej strane nastala chyba. Skúste to znova.",
+        description: "Akciu sa nepodarilo dokončiť. Skúste to znova.",
       },
       unknown: {
         title: "Neznáma chyba",
@@ -110,6 +111,7 @@ export const translations: typeof enTranslations = {
       name: "Názov firmy",
     },
     widget: {
+      setupAccounting: "Nastaviť účtovníctvo",
       viewCompany: "Zobraziť firmu",
       back: "Späť na zoznam",
     },

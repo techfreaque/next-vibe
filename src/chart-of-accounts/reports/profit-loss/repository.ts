@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import { and, eq, gte, lte, sql } from "drizzle-orm";
+import { and, eq, gte, inArray, lt, sql } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
@@ -24,10 +24,18 @@ import { accountNodes, journalEntries, journalEntryLines } from "../../db";
 import {
   AccountSubtype,
   AccountType,
-  JournalEntryStatus,
+  ledgerEntryStatuses,
   LineType,
 } from "../../enum";
 import { scopedTranslation } from "../../i18n";
+import {
+  accountingDay,
+  nextAccountingDay,
+} from "../../shared/journal-validation";
+import {
+  findLedgerReportCompany,
+  resolveLedgerReportCurrency,
+} from "../../shared/report-currency";
 import type { ProfitLossRequestOutput } from "./definition";
 
 interface AccountLine {
@@ -54,6 +62,9 @@ export class ProfitLossRepository {
     locale: CountryLanguage,
   ): Promise<
     ResponseType<{
+      reportCompanyId: string;
+      reportCompanyName: string;
+      reportCurrency: string;
       fromResponse: Date;
       toResponse: Date;
       revenue: AccountLine[];
@@ -67,29 +78,41 @@ export class ProfitLossRepository {
   > {
     const { t } = scopedTranslation.scopedT(locale);
 
-    const authResult = await CompanyAuthRepository.requireMember(
-      user.id,
-      data.companyId,
-      null,
-      logger,
-      locale,
-    );
-    if (!authResult.success) {
-      return authResult;
+    if (data.companyId) {
+      const authResult = await CompanyAuthRepository.requireMember(
+        user.id,
+        data.companyId,
+        null,
+        logger,
+        locale,
+      );
+      if (!authResult.success) {
+        return authResult;
+      }
     }
 
     try {
+      const company = await findLedgerReportCompany(user.id, data.companyId);
+      if (!company) {
+        return fail({
+          message: t("profitLoss.widget.selectCompany"),
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+        });
+      }
+
       const today = new Date();
       const fromDate = data.from
         ? new Date(data.from)
-        : new Date(today.getFullYear(), 0, 1);
+        : new Date(Date.UTC(today.getUTCFullYear(), 0, 1));
       const toDate = data.to ? new Date(data.to) : today;
 
       const entryConditions = [
-        eq(journalEntries.companyId, data.companyId),
-        eq(journalEntries.status, JournalEntryStatus.POSTED),
-        gte(journalEntries.date, fromDate),
-        lte(journalEntries.date, toDate),
+        eq(journalEntries.companyId, company.id),
+        eq(accountNodes.companyId, company.id),
+        inArray(journalEntries.status, ledgerEntryStatuses),
+        gte(journalEntries.date, accountingDay(fromDate)),
+        lt(journalEntries.date, nextAccountingDay(toDate)),
+        inArray(accountNodes.type, [AccountType.REVENUE, AccountType.EXPENSE]),
       ];
 
       if (data.periodId) {
@@ -97,6 +120,19 @@ export class ProfitLossRepository {
       }
 
       // Sum net movement per account (credit - debit for revenue, debit - credit for expense)
+      const reportCurrency = await resolveLedgerReportCurrency(
+        company.currency,
+        entryConditions,
+        data.currency,
+      );
+      if (!reportCurrency) {
+        return fail({
+          message: t("reports.mixedCurrency"),
+          errorType: ErrorResponseTypes.CONFLICT,
+        });
+      }
+      entryConditions.push(eq(journalEntryLines.currency, reportCurrency));
+
       const rows = await db
         .select({
           accountId: accountNodes.id,
@@ -116,12 +152,7 @@ export class ProfitLossRepository {
           accountNodes,
           eq(journalEntryLines.accountId, accountNodes.id),
         )
-        .where(
-          and(
-            and(...entryConditions),
-            sql`${accountNodes.type} in (${AccountType.REVENUE}, ${AccountType.EXPENSE})`,
-          ),
-        )
+        .where(and(...entryConditions))
         .groupBy(
           accountNodes.id,
           accountNodes.code,
@@ -189,6 +220,9 @@ export class ProfitLossRepository {
       const netProfit = totalRevenue - totalExpenses;
 
       return success({
+        reportCompanyId: company.id,
+        reportCompanyName: company.name,
+        reportCurrency,
         fromResponse: fromDate,
         toResponse: toDate,
         revenue,

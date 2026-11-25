@@ -111,6 +111,7 @@ export const translations: typeof enTranslations = {
       name: "Nombre de la empresa",
     },
     widget: {
+      setupAccounting: "Configurar la contabilidad",
       viewCompany: "View Company",
       back: "Volver a la lista",
     },

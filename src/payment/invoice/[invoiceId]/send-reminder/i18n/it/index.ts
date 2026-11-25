@@ -8,16 +8,16 @@ export const translations: typeof enTranslations = {
     ar: "A.",
   },
   post: {
-    title: "Inviare il Mittente di Pagamento",
-    titleShort: "Inviare il Mittente",
+    title: "Prepara un sollecito di pagamento",
+    titleShort: "Prepara sollecito",
     description:
-      "Invia un promemoria di pagamento per una fattura in ritardo. La fattura deve essere lo stato OPEN e oltre la sua data di scadenza. Registra il promemoria come una nota del cliente.",
+      "Prepara una bozza con il saldo scaduto e un messaggio facoltativo.",
     form: {
-      title: "Inviare il Mittente",
-      description: "Informare il cliente sul loro pagamento in ritardo",
+      title: "Prepara sollecito",
+      description: "Verifica il saldo prima di condividere la bozza.",
     },
     response: {
-      success: "Mitragliatore inviato",
+      success: "Bozza del sollecito pronta",
       message: "Messaggio di stato",
     },
     errors: {
@@ -52,7 +52,7 @@ export const translations: typeof enTranslations = {
       conflict: {
         title: "Non esagerare.",
         description:
-          "I remittenti possono essere inviati solo per fatture aperte oltre la data di scadenza",
+          "La fattura deve essere aperta e scaduta, con un saldo da pagare.",
       },
       unsavedChanges: {
         title: "Modifiche non salvate",
@@ -60,8 +60,9 @@ export const translations: typeof enTranslations = {
       },
     },
     success: {
-      title: "Operazione riuscita",
-      description: "Promemoria di pagamento inviato e registrato",
+      title: "Bozza del sollecito pronta",
+      description:
+        "Il sollecito è salvato nella cronologia della fattura ed è pronto da condividere con il cliente.",
     },
   },
   invoiceId: {
@@ -76,10 +77,16 @@ export const translations: typeof enTranslations = {
     placeholder: "Aggiungi una nota personale al promemoria...",
   },
   widget: {
+    copy: "Copia il sollecito",
+    copied: "Sollecito copiato",
+    copyFailed: "Copia non riuscita. Riprova",
+    download: "Scarica il sollecito",
+    subject: "Sollecito per la fattura {{number}}",
+    body: "Il saldo da pagare è {{amount}}. Il pagamento era previsto entro il {{date}}.",
     back: "Indietro",
-    submit: "Inviare il Mittente",
+    submit: "Prepara sollecito",
     reminderSent:
-      "Mi hanno mandato un mittente. Il cliente è stato notificato.",
+      "Il sollecito è salvato nella cronologia della fattura ed è pronto da condividere con il cliente.",
     viewInvoice: "Visualizza Fattura",
   },
 };

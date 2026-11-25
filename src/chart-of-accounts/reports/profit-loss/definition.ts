@@ -24,6 +24,7 @@ import {
 import { z } from "zod";
 
 import { scopedTranslation } from "../../i18n";
+import { accountingDateSchema } from "../../shared/calendar-date";
 
 const ProfitLossWidget = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.ProfitLossWidget })),
@@ -51,11 +52,25 @@ const { GET } = createEndpoint({
     children: {
       companyId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
+        fieldType: FieldDataType.ENTITY_PICKER,
         label: "profitLoss.companyId.label" as const,
         description: "profitLoss.companyId.description" as const,
         placeholder: "profitLoss.companyId.placeholder" as const,
-        schema: z.string().uuid(),
+        listEndpoint: async () =>
+          (await import("@/companies/list/definition")).default.GET,
+        labelField: "name",
+        schema: z.string().uuid().optional(),
+      }),
+      currency: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "reports.currency",
+        schema: z
+          .string()
+          .trim()
+          .toUpperCase()
+          .regex(/^(?:[A-Z]{3})?$/)
+          .optional(),
       }),
       from: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -63,7 +78,7 @@ const { GET } = createEndpoint({
         label: "profitLoss.from.label" as const,
         description: "profitLoss.from.description" as const,
         placeholder: "profitLoss.from.placeholder" as const,
-        schema: z.string().date().optional(),
+        schema: accountingDateSchema.optional(),
       }),
       to: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -71,7 +86,7 @@ const { GET } = createEndpoint({
         label: "profitLoss.to.label" as const,
         description: "profitLoss.to.description" as const,
         placeholder: "profitLoss.to.placeholder" as const,
-        schema: z.string().date().optional(),
+        schema: accountingDateSchema.optional(),
       }),
       periodId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -80,6 +95,22 @@ const { GET } = createEndpoint({
         description: "profitLoss.periodId.description" as const,
         placeholder: "profitLoss.periodId.placeholder" as const,
         schema: z.string().uuid().optional(),
+      }),
+
+      reportCompanyId: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "profitLoss.companyId.label",
+        schema: z.string(),
+      }),
+      reportCompanyName: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "profitLoss.companyId.label",
+        schema: z.string(),
+      }),
+      reportCurrency: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "reports.currency",
+        schema: z.string(),
       }),
 
       fromResponse: responseField(scopedTranslation, {
@@ -219,6 +250,8 @@ const { GET } = createEndpoint({
     },
   },
 
+  options: { formOptions: { autoSubmit: true, debounceMs: 300 } },
+
   successTypes: {
     title: "profitLoss.success.title" as const,
     description: "profitLoss.success.description" as const,
@@ -227,13 +260,16 @@ const { GET } = createEndpoint({
   examples: {
     requests: {
       default: {
-        companyId: "00000000-0000-0000-0000-000000000001",
+        companyId: "00000000-0000-4000-8000-000000000001",
         from: "2026-01-01",
         to: "2026-12-31",
       },
     },
     responses: {
       default: {
+        reportCompanyId: "00000000-0000-4000-8000-000000000001",
+        reportCompanyName: "Example company",
+        reportCurrency: "EUR",
         fromResponse: "2026-01-01",
         toResponse: "2026-12-31",
         revenue: [],

@@ -15,6 +15,7 @@ export const translations: typeof enTranslations = {
       success: "Úspech",
       message: "Stavová správa",
       line: {
+        currency: "Mena",
         title: "Položka",
         subtitle: "Údaje pridanej položky",
         id: "ID položky",
@@ -40,7 +41,10 @@ export const translations: typeof enTranslations = {
         title: "Neplatné údaje",
         description: "Skontrolujte údaje položky.",
       },
-      server: { title: "Chyba servera", description: "Nastala interná chyba servera." },
+      server: {
+        title: "Chyba servera",
+        description: "Nastala interná chyba servera.",
+      },
       unknown: {
         title: "Neznáma chyba",
         description: "Nastala neznáma chyba.",
@@ -49,11 +53,18 @@ export const translations: typeof enTranslations = {
         title: "Chyba siete",
         description: "Skontrolujte pripojenie.",
       },
-      forbidden: { title: "Prístup zamietnutý", description: "Nemáte potrebné oprávnenie." },
-      notFound: { title: "Nenašlo sa", description: "Cenová ponuka sa nenašla" },
+      forbidden: {
+        title: "Prístup zamietnutý",
+        description: "Nemáte potrebné oprávnenie.",
+      },
+      notFound: {
+        title: "Nenašlo sa",
+        description: "Cenová ponuka sa nenašla",
+      },
       conflict: {
         title: "Konflikt",
-        description: "Položky možno pridávať iba do cenovej ponuky v stave DRAFT.",
+        description:
+          "Položky možno pridávať iba do cenovej ponuky v stave DRAFT.",
       },
       unsavedChanges: {
         title: "Neuložené zmeny",

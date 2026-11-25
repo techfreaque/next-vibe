@@ -5,7 +5,7 @@ export const translations: typeof enTranslations = {
     title: "Accounting Dashboard",
     titleShort: "Dashboard",
     description:
-      "Panoramica dello stato contabile. periodo aperto, conteggi di entrata e navigazione rapida a tutti gli strumenti contabili.",
+      "Consulta crediti, debiti, liquidità, utile e periodo contabile in corso.",
     companyId: {
       label: "Società ID",
       description: "Azienda per caricare la dashboard",
@@ -56,6 +56,16 @@ export const translations: typeof enTranslations = {
       },
     },
     widget: {
+      noPeriodHint:
+        "Apra un periodo contabile prima di registrare le scritture.",
+      zeroMetricsHint:
+        "I valori si aggiornano quando emette fatture, approva fatture di acquisto e registra operazioni contabili.",
+      financialOverview: "Quadro finanziario",
+      openReceivables: "Crediti verso clienti",
+      approvedPayables: "Fatture fornitori approvate da pagare",
+      cashBalance: "Cassa e banche",
+      monthToDateProfit: "Utile del mese",
+      needsAttention: "Da verificare",
       currentPeriod: "Periodo attuale",
       noPeriod: "Nessun periodo aperto",
       createPeriod: "Creare un periodo",

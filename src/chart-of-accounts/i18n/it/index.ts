@@ -282,7 +282,30 @@ export const translations: typeof enTranslations = {
     },
   },
   journalCreate: {
+    errorDate: "Scegli una data nel periodo selezionato.",
+    errorCurrency: "Usa la valuta contabile dell’azienda per tutte le righe.",
+    errorInvalidLine:
+      "Inserisci un importo positivo in dare o avere con un massimo di quattro decimali.",
+    errorAccount: "Seleziona un conto valido di questa azienda.",
     widget: {
+      lineDescription: "Descrizione riga",
+      incomplete: "Inserisci un importo in Dare o in Avere per ogni riga.",
+      offByLessThan: "Differenza inferiore a {{amount}}",
+      offBy: "Differenza di {{amount}}",
+
+      details: "Dettagli della registrazione",
+      saveDraft: "Salva bozza",
+      addLine: "Aggiungi riga",
+      removeLine: "Rimuovi riga",
+      account: "Conto",
+      side: "Dare o avere",
+      amount: "Importo",
+      currency: "Valuta",
+      missingScope: "Seleziona un’azienda prima di aggiungere righe.",
+      noPeriods: "Nessun periodo contabile aperto per questa azienda.",
+      noAccounts:
+        "Questa azienda non ha conti attivi su cui registrare movimenti.",
+
       back: "Indietro",
       viewEntryButton: "Visualizza l'ingresso",
       postNowButton: "Posta ora",
@@ -297,12 +320,12 @@ export const translations: typeof enTranslations = {
     description:
       "Creare una rivista manuale a doppia entrata. Gli addebiti totali devono essere pari a crediti totali.",
     companyId: {
-      label: "Società ID",
+      label: "Azienda",
       description: "La società per questo articolo di giornale",
       placeholder: "Società UUID",
     },
     periodId: {
-      label: "Periodo ID",
+      label: "Periodo contabile",
       description: "Il periodo contabile",
       placeholder: "Periodo UUID",
     },
@@ -360,6 +383,11 @@ export const translations: typeof enTranslations = {
     errorNotDraft: "Possono essere pubblicate solo le voci DRAFT",
   },
   journalReverse: {
+    errorManaged: "Storna questa registrazione dal documento di origine.",
+    errorDate:
+      "La data dello storno deve coincidere con la registrazione originaria o essere successiva.",
+    errorNoPeriod:
+      "Apri un periodo contabile che comprenda la data dello storno.",
     widget: {
       backButton: "Torna a Giornale",
       reversalCreated: "Entrata inversale creata",
@@ -520,7 +548,13 @@ export const translations: typeof enTranslations = {
     },
   },
   reports: {
+    switchReport: "Report",
+    currency: "Valuta",
+    mixedCurrency:
+      "Il periodo comprende registrazioni in più valute. Seleziona la valuta del report.",
     nav: {
+      ledgerTax: "IVA contabilizzata",
+      payables: "Scadenzario fornitori",
       profitLoss: "P&L",
       balanceSheet: "Foglio di equilibrio",
       trialBalance: "Equilibrio di prova",
@@ -528,6 +562,10 @@ export const translations: typeof enTranslations = {
       receivablesAging: "Crediti Invecchiamento",
     },
     widget: {
+      quickDates: "Scegli periodo",
+      thisMonth: "Questo mese",
+      previousMonth: "Mese precedente",
+      autoCurrency: "Automatica",
       run: "Corri!",
       running: "Correre...",
     },
@@ -639,6 +677,7 @@ export const translations: typeof enTranslations = {
       placeholder: "YYYY-MM-DD",
     },
     response: {
+      unclosedEarnings: "Risultato non chiuso",
       asOfDate: "Come da data",
       assets: "Benefici",
       totalAssets: "Totale delle attività",
@@ -690,40 +729,41 @@ export const translations: typeof enTranslations = {
     },
   },
   receivablesAging: {
+    currencies: { EUR: "EUR", USD: "USD", PLN: "PLN" },
     widget: {
-      asOf: "A partire da",
-      noData: "Nessun credito eccezionale.",
+      asOf: "Data di riferimento",
+      noData: "Nessuna fattura da incassare in questa valuta.",
       totalRow: "Totale",
       viewInvoice: "Vista",
-      selectCompany:
-        "Inserire una Società ID sopra e fare clic su Esegui per generare il rapporto di invecchiamento.",
+      selectCompany: "Scegli un’azienda per consultare il report.",
     },
-    title: "Crediti Invecchiamento",
-    titleShort: "Crediti Invecchiamento",
-    description:
-      "Le fatture eccezionali secchiate per giorni in ritardo. Mostra esattamente dove i soldi sono bloccati.",
+    title: "Fatture da incassare",
+    titleShort: "Fatture da incassare",
+    description: "Crediti aperti per scadenza e valuta.",
     companyId: {
-      label: "Società ID",
-      description: "Società di relazione",
+      label: "Azienda",
+      description: "Scegli l’azienda di cui vuoi consultare i crediti.",
       placeholder: "Società UUID",
     },
     asOfDate: {
-      label: "Come da data",
-      description: "Data di riferimento invecchiato. default a oggi",
+      label: "Data di riferimento",
+      description:
+        "Questa data determina la fascia di ritardo degli importi ancora da incassare oggi.",
       placeholder: "YYYY-MM-DD",
     },
     response: {
-      asOfDate: "Come da data",
+      currency: "Valuta",
+      asOfDate: "Data di riferimento",
       buckets: "Fibbia",
-      current: "Corrente",
+      current: "Non ancora scadute",
       days1to30: "1-30 giorni",
       days31to60: "31–60 Giorni",
       days61to90: "61–90 giorni",
       over90: "Più di 90 giorni",
-      invoiceId: "Fatturazione ID",
-      customerId: "Cliente ID",
+      invoiceId: "Fattura",
+      customerId: "Cliente",
       amount: "Importo",
-      dueDate: "Data di scadenza",
+      dueDate: "Scadenza",
       totals: "Totale",
       total: "Totale",
     },

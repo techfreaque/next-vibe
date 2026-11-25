@@ -11,6 +11,7 @@ import {
   Methods,
   WidgetType,
 } from "next-vibe/core/definition/enums";
+import { CurrenciesArr } from "next-vibe/core/i18n/core/config";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
 import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
@@ -67,6 +68,17 @@ const { POST } = createEndpoint({
         labelField: "name",
       }),
 
+      vendorId: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.ENTITY_PICKER,
+        label: "vendorId.label",
+        description: "vendorId.description",
+        schema: z.uuid().optional(),
+        listEndpoint: async () =>
+          (await import("@/purchasing/vendor/list/definition")).default.GET,
+        labelField: "name",
+      }),
+
       supplierName: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
@@ -74,7 +86,7 @@ const { POST } = createEndpoint({
         description: "supplierName.description" as const,
         placeholder: "supplierName.placeholder" as const,
         columns: 8,
-        schema: z.string().min(1).max(255),
+        schema: z.string().trim().min(1).max(255).optional(),
       }),
 
       supplierVatNumber: requestField(scopedTranslation, {
@@ -104,7 +116,7 @@ const { POST } = createEndpoint({
         description: "billDate.description" as const,
         placeholder: "billDate.placeholder" as const,
         columns: 6,
-        schema: dateSchema,
+        schema: dateSchema.optional(),
       }),
 
       dueDate: requestField(scopedTranslation, {
@@ -114,17 +126,42 @@ const { POST } = createEndpoint({
         description: "dueDate.description" as const,
         placeholder: "dueDate.placeholder" as const,
         columns: 6,
-        schema: dateSchema.optional(),
+        schema: dateSchema.nullable().optional(),
       }),
 
       currency: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
+        fieldType: FieldDataType.SELECT,
+        options: CurrenciesArr.map((value) => ({
+          value,
+          label: "currency.code",
+          labelParams: { code: value },
+        })),
         label: "currency.label" as const,
         description: "currency.description" as const,
         placeholder: "currency.placeholder" as const,
         columns: 6,
-        schema: z.string().min(3).max(3).default("EUR"),
+        schema: z.enum(CurrenciesArr).default("EUR"),
+      }),
+
+      lineItems: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "post.widget.items",
+        description: "post.widget.itemsDescription",
+        schema: z
+          .array(
+            z.object({
+              description: z.string().trim().min(1).max(500),
+              quantity: z.number().min(0.0001).max(99_999_999.9999).default(1),
+              unitPrice: z.number().nonnegative().max(99_999_999.9999),
+              taxRate: z.number().min(0).max(1).default(0),
+              productId: z.uuid().optional(),
+              expenseAccountId: z.uuid().optional(),
+            }),
+          )
+          .max(100)
+          .optional(),
       }),
 
       notes: requestField(scopedTranslation, {
@@ -178,6 +215,12 @@ const { POST } = createEndpoint({
         type: WidgetType.TEXT,
         label: "post.response.taxAmount" as const,
         schema: z.number(),
+      }),
+
+      currencyResponse: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "post.response.currency",
+        schema: z.enum(CurrenciesArr).optional(),
       }),
 
       total: responseField(scopedTranslation, {
@@ -249,6 +292,14 @@ const { POST } = createEndpoint({
         dueDate: "2024-02-15T00:00:00Z",
         currency: "EUR",
         notes: "Monthly services",
+        lineItems: [
+          {
+            description: "Maintenance",
+            quantity: 2,
+            unitPrice: 50,
+            taxRate: 0.19,
+          },
+        ],
       },
     },
     responses: {
@@ -258,9 +309,10 @@ const { POST } = createEndpoint({
         supplierNameResponse: "Acme GmbH",
         billNumberResponse: "INV-2024-001",
         status: BillStatus.DRAFT,
-        subtotal: 0,
-        taxAmount: 0,
-        total: 0,
+        subtotal: 100,
+        taxAmount: 19,
+        total: 119,
+        currencyResponse: "EUR",
         createdAt: new Date("2024-01-15T00:00:00.000Z"),
       },
     },

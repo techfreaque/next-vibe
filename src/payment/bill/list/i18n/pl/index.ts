@@ -66,7 +66,7 @@ export const translations: typeof enTranslations = {
     label: "Szukaj dokumentów",
     description:
       "Szukaj po numerze faktury, nazwie dostawcy lub identyfikatorze. Filtruj według firmy lub statusu.",
-    placeholder: "Numer faktury, dostawca lub identyfikator",
+    placeholder: "Numer faktury lub dostawca",
   },
   status: {
     label: "Status",
@@ -85,6 +85,7 @@ export const translations: typeof enTranslations = {
     },
   },
   widget: {
+    filters: "Filtry",
     pageCount: "Liczba stron",
     back: "Wróć",
     title: "Faktury od dostawców",

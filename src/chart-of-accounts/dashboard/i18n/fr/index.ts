@@ -5,7 +5,7 @@ export const translations: typeof enTranslations = {
     title: "Tableau de bord comptable",
     titleShort: "Tableau de bord",
     description:
-      "Vue d'ensemble de votre comptabilité : période ouverte, nombre d'écritures et accès rapide à tous les outils comptables.",
+      "Consultez les encours, la trésorerie, le résultat et la période comptable en cours.",
     companyId: {
       label: "ID de l'entreprise",
       description: "Entreprise dont vous voulez charger le tableau de bord",
@@ -59,6 +59,16 @@ export const translations: typeof enTranslations = {
       },
     },
     widget: {
+      noPeriodHint:
+        "Ouvrez une période comptable avant de comptabiliser des écritures.",
+      zeroMetricsHint:
+        "Ces chiffres évoluent lorsque vous émettez des factures, approuvez les factures fournisseurs et comptabilisez des opérations.",
+      financialOverview: "Vue financière",
+      openReceivables: "Créances clients",
+      approvedPayables: "Factures fournisseurs approuvées à payer",
+      cashBalance: "Caisse et banques",
+      monthToDateProfit: "Résultat du mois",
+      needsAttention: "À traiter",
       currentPeriod: "Période en cours",
       noPeriod: "Aucune période ouverte",
       createPeriod: "Créer une période",

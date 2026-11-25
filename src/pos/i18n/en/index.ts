@@ -175,7 +175,7 @@ export const translations = {
         },
         server: {
           title: "Server Error",
-          description: "Failed to create terminal — try again",
+          description: "Failed to create terminal. Try again.",
         },
         unknown: {
           title: "Unknown Error",
@@ -359,6 +359,8 @@ export const translations = {
   // Session close
   sessionClose: {
     post: {
+      mixedCash:
+        "Cash payments in another currency need reconciliation before this drawer can close.",
       title: "Close Session",
       titleShort: "Close Session",
       description: "Close a cashier session and record the closing float.",
@@ -604,7 +606,7 @@ export const translations = {
         selectedProduct: "Selected product",
         clearProduct: "Clear",
         searchButton: "Search",
-        noProductResults: "No matches — enter manually below.",
+        noProductResults: "No matches. Enter the item details below.",
       },
       orderId: { label: "Order ID", description: "Order to add item to" },
       productId: {
@@ -686,10 +688,11 @@ export const translations = {
       titleShort: "Remove Item",
       description: "Remove a line item from an open order.",
       widget: {
+        chooseLine: "Select a line item",
         backToOrder: "Back to order",
       },
-      orderId: { label: "Order ID", description: "Order to remove item from" },
-      itemId: { label: "Item ID", description: "Item to remove" },
+      orderId: { label: "Order", description: "Order to remove item from" },
+      itemId: { label: "Line item", description: "Item to remove" },
       errors: {
         validation: {
           title: "Validation Error",
@@ -809,9 +812,12 @@ export const translations = {
       titleShort: "Void Order",
       description: "Void an open order. Cannot be undone.",
       widget: {
+        tendered:
+          "Payment has already been recorded. The items and order can no longer be changed.",
+        closed: "This order is closed.",
         backToList: "Back to orders",
       },
-      orderId: { label: "Order ID", description: "Order to void" },
+      orderId: { label: "Order", description: "Order to void" },
       errors: {
         validation: {
           title: "Validation Error",
@@ -871,7 +877,7 @@ export const translations = {
         fullyPaid: "Fully paid",
         qtyTimesPrice: "×",
         loading: "Loading order...",
-        noItems: "No items yet — add the first item.",
+        noItems: "Add the first item.",
         viewJournalEntry: "View Journal Entry",
         voidedStamp: "VOIDED",
         completedReadOnly: "This order is completed and cannot be modified.",
@@ -1034,7 +1040,7 @@ export const translations = {
       description:
         "Search catalog products by name or SKU for quick POS entry.",
       widget: {
-        noResults: "No products found — try a different search.",
+        noResults: "No products found. Try a different search.",
         tax: "tax",
         back: "Back",
       },

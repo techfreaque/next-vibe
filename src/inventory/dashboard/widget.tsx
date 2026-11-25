@@ -1,12 +1,18 @@
 "use client";
 
 import { Button } from "next-vibe/ui/components/button";
+import { Div } from "next-vibe/ui/components/div";
+import { EmptyBlock } from "next-vibe/ui/components/empty-block";
 import { LoadingBlock } from "next-vibe/ui/components/loading-block";
 import { MetricCard } from "next-vibe/ui/components/metric-card";
 import { MetricGrid } from "next-vibe/ui/components/metric-grid";
+import { RecordTable } from "next-vibe/ui/components/record-table";
+import { Span } from "next-vibe/ui/components/span";
 import { WidgetHeader } from "next-vibe/ui/components/widget-header";
 import { WidgetShell } from "next-vibe/ui/components/widget-shell";
 import {
+  useWidgetIsInteractive,
+  useWidgetLocale,
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetValue,
@@ -20,6 +26,10 @@ export function InventoryDashboardWidget(): JSX.Element {
   const navigation = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.GET>();
 
+  const number = new Intl.NumberFormat(useWidgetLocale(), {
+    maximumFractionDigits: 4,
+  });
+  const interactive = useWidgetIsInteractive();
   const handleStockLevels = (): void => {
     void (async (): Promise<void> => {
       const def = await import("../stock/list/definition");
@@ -46,47 +56,48 @@ export function InventoryDashboardWidget(): JSX.Element {
   }
 
   const outCount = data.outOfStockCount;
-  const pendingCount = data.pendingTransferCount;
-
+  const queue = data.attention ?? [];
+  const receive = (): void => {
+    void import("../stock/receive/definition").then((mod) =>
+      navigation.push(mod.default.POST, {}),
+    );
+  };
+  const newOrder = (companyId: string, warehouseId: string): void => {
+    void import("@/purchasing/order/create/definition").then((mod) =>
+      navigation.push(mod.default.POST, {
+        data: { companyId, deliveryWarehouseId: warehouseId },
+      }),
+    );
+  };
+  const orderAction = (row: (typeof queue)[number]): JSX.Element | null =>
+    interactive ? (
+      <Button
+        type="button"
+        size="sm"
+        variant="outline"
+        onClick={() => newOrder(row.companyId, row.warehouseId)}
+      >
+        {t("dashboard.get.widget.newPurchaseOrder")}
+      </Button>
+    ) : null;
   return (
-    <WidgetShell>
+    <WidgetShell layout="page">
       <WidgetHeader
+        size="page"
         title={t("dashboard.get.title")}
+        subtitle={t("dashboard.get.description")}
         actions={
-          <>
-            <Button
-              type="button"
-              size="sm"
-              variant="default"
-              onClick={handleStockLevels}
-            >
-              {t("dashboard.get.widget.navStockLevels")}
+          interactive && (
+            <Button type="button" size="sm" onClick={receive}>
+              {t("stockReceive.post.title")}
             </Button>
-            <Button
-              type="button"
-              size="sm"
-              variant="outline"
-              onClick={handleTransfers}
-            >
-              {t("dashboard.get.widget.navTransfers")}
-            </Button>
-            <Button
-              type="button"
-              size="sm"
-              variant="outline"
-              onClick={handleWarehouses}
-            >
-              {t("dashboard.get.widget.navWarehouses")}
-            </Button>
-          </>
+          )
         }
       />
-
       <MetricGrid columns={4}>
         <MetricCard
           label={t("dashboard.get.widget.kpiInStock")}
           value={data.inStockCount}
-          variant="success"
         />
         <MetricCard
           label={t("dashboard.get.widget.kpiOutOfStock")}
@@ -99,26 +110,83 @@ export function InventoryDashboardWidget(): JSX.Element {
           variant={data.lowStockCount > 0 ? "warning" : "default"}
         />
         <MetricCard
-          label={t("dashboard.get.widget.kpiWarehouses")}
-          value={data.warehouseCount}
-          variant="info"
+          label={t("dashboard.get.widget.kpiTransfersInTransit")}
+          value={data.pendingTransferCount}
         />
       </MetricGrid>
 
-      {outCount > 0 && (
-        <MetricCard
-          label={t("dashboard.get.widget.alertOutOfStock")}
-          value={outCount}
-          variant="danger"
-        />
-      )}
-
-      {pendingCount > 0 && (
-        <MetricCard
-          label={t("dashboard.get.widget.pendingTransfers")}
-          value={pendingCount}
-          variant="info"
-        />
+      <Div className="flex flex-col gap-3">
+        <Span className="text-lg font-semibold">
+          {t("dashboard.get.widget.attention")}
+        </Span>
+        {queue.length ? (
+          <RecordTable
+            label={t("dashboard.get.widget.attention")}
+            columns={[
+              { id: "product", label: t("stockList.get.response.productName") },
+              {
+                id: "warehouse",
+                label: t("stockList.get.response.warehouseName"),
+              },
+              {
+                id: "available",
+                label: t("stockList.get.widget.available"),
+                numeric: true,
+              },
+              { id: "action", label: t("stockList.get.widget.actions") },
+            ]}
+            rows={queue.map((row) => ({
+              id: row.id,
+              cells: {
+                product:
+                  row.productName ?? t("stockList.get.widget.unnamedProduct"),
+                warehouse: row.warehouseName,
+                available: number.format(row.available),
+                action: orderAction(row),
+              },
+            }))}
+            compact={
+              <Div className="flex flex-col divide-y rounded-lg border bg-card">
+                {queue.map((row) => (
+                  <Div
+                    key={row.id}
+                    className="flex flex-wrap items-center justify-between gap-2 p-3"
+                  >
+                    <Div className="flex min-w-0 flex-col gap-1">
+                      <Span className="font-medium">
+                        {row.productName ??
+                          t("stockList.get.widget.unnamedProduct")}
+                      </Span>
+                      <Span className="text-sm text-muted-foreground">
+                        {row.warehouseName}
+                      </Span>
+                      <Span className="text-sm tabular-nums">
+                        {t("stockList.get.widget.available")}{" "}
+                        {number.format(row.available)}
+                      </Span>
+                    </Div>
+                    {orderAction(row)}
+                  </Div>
+                ))}
+              </Div>
+            }
+          />
+        ) : (
+          <EmptyBlock title={t("dashboard.get.widget.noAttention")} />
+        )}
+      </Div>
+      {interactive && (
+        <Div className="flex flex-wrap gap-2 border-t pt-3">
+          <Button variant="ghost" size="sm" onClick={handleStockLevels}>
+            {t("dashboard.get.widget.navStockLevels")}
+          </Button>
+          <Button variant="ghost" size="sm" onClick={handleTransfers}>
+            {t("dashboard.get.widget.navTransfers")}
+          </Button>
+          <Button variant="ghost" size="sm" onClick={handleWarehouses}>
+            {t("dashboard.get.widget.navWarehouses")}
+          </Button>
+        </Div>
       )}
     </WidgetShell>
   );

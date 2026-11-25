@@ -34,6 +34,7 @@ export class CoaPeriodListRepository {
     ResponseType<{
       periods: Array<{
         id: string;
+        companyId: string;
         name: string;
         startDate: Date;
         endDate: Date;
@@ -75,10 +76,10 @@ export class CoaPeriodListRepository {
         }
       }
 
-      const where =
-        companyIds.length === 1
-          ? eq(accountingPeriods.companyId, companyIds[0] as string)
-          : inArray(accountingPeriods.companyId, companyIds);
+      const where = and(
+        inArray(accountingPeriods.companyId, companyIds),
+        data.status ? eq(accountingPeriods.status, data.status) : undefined,
+      );
 
       const rows = await db
         .select()
@@ -89,6 +90,7 @@ export class CoaPeriodListRepository {
       return success({
         periods: rows.map((r) => ({
           id: r.id,
+          companyId: r.companyId,
           name: r.name,
           startDate: r.startDate,
           endDate: r.endDate,

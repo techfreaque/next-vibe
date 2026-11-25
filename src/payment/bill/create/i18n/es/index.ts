@@ -7,14 +7,21 @@ export const translations: typeof enTranslations = {
     ap: "cuentas pagaderas",
   },
   post: {
-    title: "Crear AP Bill",
-    titleShort: "Crear un proyecto",
-    description: "Grabar una factura recibida de un proveedor",
+    title: "Nueva factura de proveedor",
+    titleShort: "Nueva factura de proveedor",
+    description: "Añade el proveedor y las líneas, y guarda el borrador.",
     form: {
       title: "Nuevo proyecto de ley de proveedores",
       description: "Introduzca los detalles de la factura que recibió",
     },
     errors: {
+      vendor: "Elige un proveedor activo de esta empresa.",
+      supplier: "Escribe un nombre o elige un proveedor.",
+      dates: "Introduce fechas válidas de factura y vencimiento.",
+      amounts:
+        "Revisa las líneas y mantén el total dentro del límite permitido.",
+      expenseAccount: "Elige una cuenta de gastos activa de esta empresa.",
+
       validation: {
         title: "Error de validación",
         description: "Revise todos los campos e inténtelo de nuevo",
@@ -54,8 +61,33 @@ export const translations: typeof enTranslations = {
       description: "Factura de proveedor registrada con éxito",
     },
     widget: {
+      supplier: "Proveedor",
+      dates: "Fechas y moneda",
+      items: "Líneas de factura",
+      itemsDescription:
+        "Líneas opcionales. Introduce el IVA como decimal entre 0 y 1.",
+      itemsHint: "Añade los bienes o servicios de la factura.",
+      item: "Descripción",
+      quantity: "Cantidad",
+      unitPrice: "Precio unitario",
+      manualTaxRate: "Otro tipo",
+      taxRate: "IVA %",
+      lineTotal: "Total de la línea",
+      addItem: "Añadir línea",
+      removeItem: "Eliminar línea",
+      itemError: "Revisa la descripción, la cantidad, el precio y el IVA.",
+      summary: "Resumen de la factura",
+      net: "Base imponible",
+      tax: "IVA",
+      total: "Total",
+      chooseVendor: "Elegir proveedor",
+      vendorSource: "Del directorio de proveedores",
+      terms: "Aplicar plazo del proveedor",
+      manualVendor: "Introducir proveedor manualmente",
+      selectCompanyFirst: "Selecciona primero una empresa.",
+
       back: "Atrás",
-      submit: "Bill.",
+      submit: "Guardar borrador",
       viewButton: "Ver Bill",
       addAnotherButton: "Añadir otro",
     },
@@ -89,6 +121,10 @@ export const translations: typeof enTranslations = {
     description: "La empresa que recibe este proyecto de ley",
     placeholder: "Company UUID",
   },
+  vendorId: {
+    label: "Elegir proveedor",
+    description: "Del directorio de proveedores",
+  },
   supplierName: {
     label: "Nombre del proveedor",
     description: "Nombre del proveedor que envió esta factura",
@@ -107,14 +143,15 @@ export const translations: typeof enTranslations = {
   billDate: {
     label: "Fecha del proyecto",
     description: "Fecha de emisión del proyecto de ley",
-    placeholder: "2024-01-01",
+    placeholder: "Elegir fecha de factura",
   },
   dueDate: {
     label: "Fecha prevista",
     description: "Fecha de pago",
-    placeholder: "2024-01-31",
+    placeholder: "Elegir fecha de vencimiento",
   },
   currency: {
+    code: "{{code}}",
     label: "Moneda",
     description: "Moneda de facturación",
     placeholder: "EUR",

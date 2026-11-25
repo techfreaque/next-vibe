@@ -25,6 +25,7 @@ export const translations: typeof enTranslations = {
       description: "Filtruj listę faktur",
     },
     response: {
+      customerName: "Klient",
       total: "Łącznie",
       invoices: "Faktury",
       id: "ID faktury",
@@ -92,13 +93,13 @@ export const translations: typeof enTranslations = {
   },
   search: {
     label: "Szukaj dokumentów",
-    description:
-      "Szukaj po numerze dokumentu, identyfikatorze faktury lub klienta. Filtruj według firmy lub statusu.",
-    placeholder: "Numer dokumentu lub identyfikator",
+    description: "Szukaj według numeru faktury, nazwy klienta lub ID.",
+    placeholder: "Numer faktury lub klient",
   },
   status: {
     label: "Status",
-    description: "Filtruj według statusu faktury",
+    description:
+      "Filtruj według statusu faktury lub pokaż przeterminowane faktury z kwotą do zapłaty.",
     placeholder: "Wszystkie statusy",
   },
   customerId: {
@@ -115,6 +116,8 @@ export const translations: typeof enTranslations = {
     description: "Wyniki na stronie",
   },
   widget: {
+    filters: "Filtry",
+    partlyPaid: "Częściowo zapłacona",
     pageCount: "Liczba stron",
     title: "Faktury sprzedażowe",
     newInvoice: "Nowa faktura",

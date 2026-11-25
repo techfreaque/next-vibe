@@ -26,6 +26,7 @@ import { z } from "zod";
 
 import { LineTypeOptions } from "../../enum";
 import { scopedTranslation } from "../../i18n";
+import { accountingDateSchema } from "../../shared/calendar-date";
 
 const CoaLedgerWidgetLazy = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.CoaLedgerWidget })),
@@ -70,7 +71,7 @@ const { GET } = createEndpoint({
         description: "ledger.dateFrom.description" as const,
         placeholder: "ledger.dateFrom.placeholder" as const,
         columns: 6,
-        schema: dateSchema.optional(),
+        schema: accountingDateSchema.optional(),
       }),
       dateTo: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -79,7 +80,7 @@ const { GET } = createEndpoint({
         description: "ledger.dateTo.description" as const,
         placeholder: "ledger.dateTo.placeholder" as const,
         columns: 6,
-        schema: dateSchema.optional(),
+        schema: accountingDateSchema.optional(),
       }),
       page: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,

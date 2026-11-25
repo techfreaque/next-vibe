@@ -27,6 +27,17 @@ export const translations: typeof enTranslations = {
       message: "Komunikat statusu",
     },
     errors: {
+      receiptKeyConflict: "Ten klucz jest już przypisany do innej płatności.",
+      paymentPrecision:
+        "Wpisz dodatnią kwotę z maksymalnie dwoma miejscami po przecinku.",
+      paymentStatus:
+        "Rejestruj płatności do otwartych faktur z dodatnią kwotą.",
+      overpayment: "Płatność przekracza kwotę pozostałą do zapłaty.",
+      fullPayment: "W przypadku faktury bez firmy wpisz całą pozostałą kwotę.",
+      issuancePosting:
+        "Przed płatnością zaksięguj należność zgodną z kwotą faktury.",
+      paymentAccount: "Wybierz aktywne konto bankowe lub kasowe tej firmy.",
+      paymentPosting: "Sprawdź datę płatności, walutę firmy i konta księgowe.",
       unauthorized: {
         title: "Brak autoryzacji",
         description: "Wymagana autoryzacja",
@@ -88,6 +99,11 @@ export const translations: typeof enTranslations = {
     label: "Data płatności",
     description: "Kiedy płatność wpłynęła",
     placeholder: "Wybierz datę",
+  },
+  receiptKey: {
+    label: "Klucz płatności",
+    description:
+      "Ponów tę płatność z tym samym kluczem. Dla kolejnego wpływu użyj nowego klucza.",
   },
   accountNodeId: {
     label: "ID węzła konta",

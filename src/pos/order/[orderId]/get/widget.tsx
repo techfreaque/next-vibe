@@ -6,6 +6,7 @@ import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
 import { Span } from "next-vibe/ui/components/span";
+import { formatMoney } from "next-vibe/unified-ui/_shared/format-money";
 import {
   useWidgetLocale,
   useWidgetNavigation,
@@ -17,6 +18,11 @@ import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-a
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 import { type JSX } from "react";
 
+import {
+  PosOrderStatus,
+  PosOrderStatusDB,
+  PosPaymentMethodDB,
+} from "../../../enum";
 import type definition from "./definition";
 import type { PosOrderGetResponseOutput } from "./definition";
 
@@ -126,10 +132,7 @@ export function PosOrderGetWidget({
   };
 
   const fmt = (n: number, currency: string): string =>
-    new Intl.NumberFormat(locale, {
-      style: "currency",
-      currency,
-    }).format(n);
+    formatMoney(n, currency, locale);
 
   if (!order) {
     return (
@@ -159,14 +162,17 @@ export function PosOrderGetWidget({
     );
   }
 
-  const isOpen = order.status.includes("open");
-  const isVoided = order.status.includes("void");
-  const isCompleted = order.status.includes("completed");
+  const isOpen = order.status === PosOrderStatus.OPEN;
+  const isVoided = order.status === PosOrderStatus.VOIDED;
+  const isCompleted = order.status === PosOrderStatus.COMPLETED;
   const totalPaid = order.payments.reduce(
-    (sum: number, p: OrderPayment) => sum + Number(p.amount) - Number(p.change),
+    (sum: number, p: OrderPayment) =>
+      sum + Math.round(p.amount * 10_000) - Math.round(p.change * 10_000),
     0,
   );
-  const outstanding = Number(order.total) - totalPaid;
+  const outstanding = (Math.round(order.total * 10_000) - totalPaid) / 10_000;
+  const canEdit = isOpen && order.payments.length === 0;
+  const translatedStatus = PosOrderStatusDB.find((key) => key === order.status);
 
   return (
     <Div className="max-w-2xl mx-auto w-full px-4 pt-8 pb-6 flex flex-col gap-4">
@@ -195,7 +201,7 @@ export function PosOrderGetWidget({
           <Span
             className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${orderStatusBadgeClass(order.status)}`}
           >
-            {t(order.status as Parameters<typeof t>[0])}
+            {translatedStatus ? t(translatedStatus) : order.status}
           </Span>
         </Div>
         <Span className="text-xs text-muted-foreground tabular-nums">
@@ -267,6 +273,24 @@ export function PosOrderGetWidget({
                 <Span className="text-sm font-mono font-semibold tabular-nums shrink-0">
                   {fmt(Number(item.lineTotal), order.currency)}
                 </Span>
+                {canEdit && (
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => {
+                      void import("../remove-item/definition").then((mod) =>
+                        navigation.push(mod.default.POST, {
+                          data: {
+                            details: { orderId: order.id, itemId: item.itemId },
+                          },
+                        }),
+                      );
+                    }}
+                  >
+                    {t("orderRemoveItem.post.titleShort")}
+                  </Button>
+                )}
               </Div>
             ))}
           </Div>
@@ -295,7 +319,9 @@ export function PosOrderGetWidget({
                   variant={paymentMethodBadgeVariant(payment.method)}
                   className="text-xs shrink-0"
                 >
-                  {t(payment.method as Parameters<typeof t>[0])}
+                  {PosPaymentMethodDB.filter((key) => key === payment.method)
+                    .map((key) => t(key))
+                    .at(0) ?? payment.method}
                 </Badge>
                 <Span className="flex-1 text-sm font-mono tabular-nums">
                   {fmt(Number(payment.amount), order.currency)}
@@ -335,7 +361,8 @@ export function PosOrderGetWidget({
               variant="outline"
               size="sm"
               onClick={() =>
-                handleViewJournalEntry(order.journalEntryId as string)
+                order.journalEntryId &&
+                handleViewJournalEntry(order.journalEntryId)
               }
             >
               {t("orderGet.get.widget.viewJournalEntry")}
@@ -352,6 +379,7 @@ export function PosOrderGetWidget({
               type="button"
               variant="outline"
               size="sm"
+              disabled={!canEdit}
               onClick={() => handleAddItem(order.id)}
             >
               + {t("orderGet.get.widget.addItem")}
@@ -371,7 +399,7 @@ export function PosOrderGetWidget({
             size="lg"
             className="w-full"
             onClick={() => handleComplete(order.id)}
-            disabled={outstanding > 0.005}
+            disabled={outstanding > 0}
           >
             {t("orderGet.get.widget.complete")}
           </Button>
@@ -380,6 +408,7 @@ export function PosOrderGetWidget({
             variant="ghost"
             size="sm"
             className="w-full text-destructive hover:text-destructive"
+            disabled={!canEdit}
             onClick={() => handleVoid(order.id)}
           >
             {t("orderGet.get.widget.void")}
@@ -401,13 +430,9 @@ function OutstandingBalance({
   locale: CountryLanguage;
   t: ReturnType<typeof useWidgetTranslation<typeof definition.GET>>;
 }): JSX.Element {
-  const fmt = (n: number): string =>
-    new Intl.NumberFormat(locale, {
-      style: "currency",
-      currency,
-    }).format(n);
+  const fmt = (n: number): string => formatMoney(n, currency, locale);
 
-  if (outstanding <= 0.005) {
+  if (outstanding <= 0) {
     return (
       <Div className="flex items-center justify-between rounded-lg border border-green-500/30 bg-green-500/10 px-4 py-3">
         <Span className="text-sm font-semibold text-green-700 dark:text-green-400">

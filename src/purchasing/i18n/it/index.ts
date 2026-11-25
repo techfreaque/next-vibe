@@ -1205,7 +1205,8 @@ export const translations: typeof enTranslations = {
     post: {
       title: "Convertire in Bill",
       titleShort: "Convertire in Bill",
-      description: "Creare una fattura AP da questo ordine di acquisto.",
+      description:
+        "Crea una fattura fornitore da un ordine ricevuto per intero. Approva la fattura per contabilizzare il debito.",
       widget: {
         back: "Indietro",
         viewBill: "Vedi il conto",
@@ -1216,8 +1217,9 @@ export const translations: typeof enTranslations = {
       },
       errors: {
         validation: {
-          title: "Errore di convalida",
-          description: "Ordine di acquisto non valido ID",
+          title: "Verifica valuta e totali",
+          description:
+            "La valuta deve essere supportata e i totali devono coincidere con quelli delle righe.",
         },
         unauthorized: {
           title: "Non firmata",
@@ -1228,9 +1230,9 @@ export const translations: typeof enTranslations = {
           description: "Nessun accesso a questo ordine di acquisto",
         },
         conflict: {
-          title: "già convertiti",
+          title: "Ordine non fatturabile",
           description:
-            "Questo ordine di acquisto è stato già convertito in fattura",
+            "Puoi fatturare solo un ordine interamente ricevuto e senza fattura collegata.",
         },
         server: {
           title: "Errore del server",
@@ -1434,14 +1436,24 @@ export const translations: typeof enTranslations = {
       description:
         "snapshot dal vivo degli ordini di acquisto e dell'attività dei fornitori per la vostra azienda.",
       widget: {
+        openValue: "Valore degli ordini aperti",
+        settledBills: "Fatture saldate questo mese",
+        deliveries: "Consegne in arrivo",
+        order: "Ordine",
+        supplier: "Fornitore",
+        expected: "Data prevista",
+        orderTotal: "Totale ordine",
+        noDeliveries: "Nessuna consegna in sospeso",
+        overdue: "Consegne in ritardo",
+        dueSeven: "In scadenza nei prossimi 7 giorni",
         kpiDraft: "Progetti",
         kpiConfirmed: "Confermato",
         kpiAwaitingReceipt: "Ricezione di risveglio",
         kpiActiveVendors: "Vendotori attivi",
         warningDueThisWeek:
-          "Ordine di acquisto {{count}} dovuto questa settimana. date di consegna del controllo",
+          "È prevista una consegna questa settimana. Controlla la data.",
         warningDueThisWeekPlural:
-          "ordini di acquisto {{count}} dovuti questa settimana. date di consegna del controllo",
+          "Sono previste {{count}} consegne questa settimana. Controlla le date.",
         navNewPo: "Nuovo acquisto",
         navAllPos: "Tutti gli ordini di acquisto",
         navVendors: "Fornitori",

@@ -12,7 +12,7 @@ export const translations: typeof enTranslations = {
     title: "Vystaviť dobropis",
     titleShort: "Dobropis",
     description:
-      "Vystavte dobropis k pôvodnej faktúre. Úplný dobropis stornuje všetky položky, čiastočný iba vybrané. Stornovací zápis sa zaúčtuje na stranu Má dať na účte výnosov a na stranu Dal na účte pohľadávok.",
+      "Vystaviť úplný alebo čiastočný dobropis k zaúčtovanej faktúre. Dobropis upraví príslušnú pohľadávku, výnosy a DPH.",
     form: {
       title: "Vystaviť dobropis",
       description: "Vystaviť dobropis k existujúcej faktúre",
@@ -35,6 +35,14 @@ export const translations: typeof enTranslations = {
       },
     },
     errors: {
+      creditLines:
+        "Zadajte položky dobropisu s kladnými množstvami a sadzbami DPH z pôvodnej faktúry.",
+      creditLimit:
+        "Dobropis by prekročil zostávajúcu sumu bez dane, DPH alebo celkovú sumu pôvodnej faktúry.",
+      originalPosting:
+        "Pred vystavením dobropisu skontrolujte a zosúlaďte zaúčtovanie pôvodnej faktúry.",
+      posting:
+        "Skontrolujte menu firmy, otvorené účtovné obdobie a pôvodné účty použité pri zaúčtovaní.",
       unauthorized: {
         title: "Vyžaduje sa prihlásenie",
         description: "Prihláste sa.",
@@ -65,7 +73,8 @@ export const translations: typeof enTranslations = {
       },
       conflict: {
         title: "Dobropis nemožno vystaviť",
-        description: "Dobropis možno vystaviť iba k faktúre v stave OPEN alebo PAID.",
+        description:
+          "Dobropis možno vystaviť iba k faktúre v stave OPEN alebo PAID.",
       },
       unsavedChanges: {
         title: "Neuložené zmeny",

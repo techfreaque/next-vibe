@@ -21,6 +21,20 @@ export const translations: typeof enTranslations = {
       message: "Messaggio di stato",
     },
     errors: {
+      receiptKeyConflict: "Questa chiave è già associata a un altro pagamento.",
+      paymentPrecision:
+        "Inserisci un importo positivo con al massimo due decimali.",
+      paymentStatus:
+        "Registra pagamenti su fatture aperte con importo positivo.",
+      overpayment: "Il pagamento supera il saldo della fattura.",
+      fullPayment:
+        "Per una fattura senza azienda, inserisci l’intero importo residuo.",
+      issuancePosting:
+        "Prima del pagamento, registra un credito pari al totale della fattura.",
+      paymentAccount:
+        "Scegli un conto bancario o di cassa attivo di questa azienda.",
+      paymentPosting:
+        "Controlla la data di pagamento, la valuta aziendale e i conti di registrazione.",
       unauthorized: {
         title: "Autenticazione richiesta",
         description: "Accedi per continuare",
@@ -89,6 +103,11 @@ export const translations: typeof enTranslations = {
     label: "Data di pagamento",
     description: "Quando il pagamento è stato ricevuto",
     placeholder: "Seleziona una data",
+  },
+  receiptKey: {
+    label: "Chiave del pagamento",
+    description:
+      "Usa la stessa chiave per riprovare questo pagamento. Usa una nuova chiave per un altro incasso.",
   },
   accountNodeId: {
     label: "Account Node ID",

@@ -12,7 +12,10 @@ export const translations: typeof enTranslations = {
       placeholder: "UUID účtovného obdobia",
     },
     errors: {
-      unauthorized: { title: "Vyžaduje sa prihlásenie", description: "Vyžaduje sa prihlásenie" },
+      unauthorized: {
+        title: "Vyžaduje sa prihlásenie",
+        description: "Vyžaduje sa prihlásenie",
+      },
       validation: {
         title: "Neplatné údaje",
         description: "Identifikátor obdobia je neplatný.",
@@ -21,7 +24,10 @@ export const translations: typeof enTranslations = {
         title: "Prístup zamietnutý",
         description: "Uzavretie období vyžaduje rolu účtovníka",
       },
-      server: { title: "Chyba servera", description: "Obdobie sa nepodarilo uzavrieť." },
+      server: {
+        title: "Chyba servera",
+        description: "Obdobie sa nepodarilo uzavrieť.",
+      },
       unknown: {
         title: "Neznáma chyba",
         description: "Nastala neočakávaná chyba",
@@ -45,6 +51,8 @@ export const translations: typeof enTranslations = {
       description: "Účtovné obdobie sa uzavrelo.",
     },
     widget: {
+      closeNamed: "Uzavrieť obdobie {{name}}",
+      draftCount: "Nezaúčtované návrhy",
       closedLabel: "Uzavreté",
       failedLabel: "Zlyhalo",
       confirmTitle: "Chcete uzavrieť účtovné obdobie?",

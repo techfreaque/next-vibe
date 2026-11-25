@@ -21,6 +21,10 @@ export const translations: typeof enTranslations = {
       message: "Stavová správa",
     },
     errors: {
+      appliedPayments:
+        "Faktúru s priradenou platbou alebo uplatneným dobropisom nemožno stornovať.",
+      reversalPosting:
+        "Pred stornovaním skontrolujte pôvodné zaúčtovanie a otvorené účtovné obdobie.",
       unauthorized: {
         title: "Vyžaduje sa prihlásenie",
         description: "Prihláste sa.",
@@ -71,8 +75,7 @@ export const translations: typeof enTranslations = {
   widget: {
     back: "Späť",
     submit: "Stornovať faktúru",
-    warning:
-      "Faktúra sa natrvalo stornuje. Operáciu nemožno vrátiť späť.",
+    warning: "Faktúra sa natrvalo stornuje. Operáciu nemožno vrátiť späť.",
     confirm: "Stornovať faktúru",
     voided: "Faktúra bola stornovaná",
     backToList: "Späť na faktúry",

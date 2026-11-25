@@ -48,6 +48,7 @@ export const translations = {
       success: "Success",
       message: "Message",
       line: {
+        currency: "Currency",
         title: "Line Details",
         subtitle: "Added line item",
         id: "Line ID",

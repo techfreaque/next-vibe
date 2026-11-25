@@ -15,6 +15,12 @@ export const translations = {
     description: "Updates the status of a draft or received supplier bill.",
     billId: { label: "Bill ID", description: "The bill to approve" },
     errors: {
+      existingPosting:
+        "Reconcile the existing posting for this bill before approving it.",
+      billLines:
+        "Add bill lines with a positive total and use active expense accounts from this company.",
+      posting:
+        "Check the bill totals, company currency, accounting period and posting accounts.",
       validation: { title: "Validation Error", description: "Invalid bill ID" },
       unauthorized: {
         title: "Not Signed In",
@@ -59,7 +65,7 @@ export const translations = {
       submit: "Confirm status change",
       confirmTitle: "Approve this bill?",
       confirmDescription:
-        "A draft moves to Received. A received bill moves to Approved and posts a journal entry if accounting is configured.",
+        "A draft moves to Received. Approving a received bill posts a journal entry.",
       confirmButton: "Yes, Approve",
       cancelButton: "Cancel",
       approved: "Bill status updated",

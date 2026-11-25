@@ -20,6 +20,7 @@ export const translations: typeof enTranslations = {
       description: "Cuentas por página (max 200)",
     },
     response: {
+      balance: "Saldo",
       total: "Total",
       accounts: "Cuentas",
       id: "ID",
@@ -78,6 +79,8 @@ export const translations: typeof enTranslations = {
       description: "Gráfico de cuentas recuperadas con éxito",
     },
     widget: {
+      debitSide: "Debe",
+      creditSide: "Haber",
       loading: "Carga cuentas...",
       empty:
         "Todavía no hay cuentas. Ejecute la configuración para la semilla de una plantilla.",

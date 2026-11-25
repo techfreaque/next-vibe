@@ -3,7 +3,7 @@
  * Returns KPI overview: terminals, active sessions, today's orders and sales
  */
 
-import { and, eq, gte, inArray, sql, sum } from "drizzle-orm";
+import { and, asc, eq, gte, inArray, lt, sql, sum } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
@@ -16,9 +16,7 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { companyMembers } from "@/companies/db";
-import { CompanyMemberRole } from "@/companies/enum";
-import { CompanyAuthRepository } from "@/companies/repository";
+import { getDocumentCompanies } from "@/finance/document-company-scope";
 
 import { posOrders, posSessions, posTerminals } from "../db";
 import { PosOrderStatus, PosSessionStatus } from "../enum";
@@ -30,23 +28,19 @@ export class PosDashboardRepository {
     userId: string,
     logger: EndpointLogger,
     locale: CountryLanguage = defaultLocale,
+    companyId?: string,
   ): Promise<ResponseType<PosDashboardGetResponseOutput>> {
     const { t } = scopedTranslation.scopedT(locale);
 
     try {
-      // Resolve all companies this user is a member of
-      const memberRows = await db
-        .select({ companyId: companyMembers.companyId })
-        .from(companyMembers)
-        .where(
-          and(
-            eq(companyMembers.userId, userId),
-            eq(companyMembers.isActive, true),
-          ),
-        );
-
-      const companyIds = memberRows.map((m) => m.companyId);
-
+      const companies = await getDocumentCompanies(userId, companyId);
+      const companyIds = companies.map((company) => company.id);
+      if (companyId && !companies.length) {
+        return fail({
+          message: t("dashboard.get.errors.forbidden.title"),
+          errorType: ErrorResponseTypes.FORBIDDEN,
+        });
+      }
       if (companyIds.length === 0) {
         return success({
           terminalsTotal: 0,
@@ -59,18 +53,6 @@ export class PosDashboardRepository {
         });
       }
 
-      // Verify membership (VIEWER+) for at least one company - use first as auth check
-      const authResult = await CompanyAuthRepository.requireMember(
-        userId,
-        companyIds[0],
-        CompanyMemberRole.VIEWER,
-        logger,
-        locale,
-      );
-      if (!authResult.success) {
-        return authResult;
-      }
-
       // Fetch all terminals for the user's companies
       const terminalRows = await db
         .select({
@@ -81,13 +63,17 @@ export class PosDashboardRepository {
           isActive: posTerminals.isActive,
         })
         .from(posTerminals)
-        .where(inArray(posTerminals.companyId, companyIds));
+        .where(inArray(posTerminals.companyId, companyIds))
+        .orderBy(asc(posTerminals.id));
 
       const terminalIds = terminalRows.map((row) => row.id);
 
       // Determine default currency from first active terminal (or fallback to EUR)
       const firstActive = terminalRows.find((row) => row.isActive);
-      const currency = firstActive?.currency ?? "EUR";
+      const currency =
+        (companies.length === 1 ? companies[0]?.currency : null) ??
+        firstActive?.currency ??
+        "EUR";
 
       // Fetch open sessions for these terminals
       const openSessionRows =
@@ -116,43 +102,35 @@ export class PosDashboardRepository {
       const todayStart = new Date();
       todayStart.setUTCHours(0, 0, 0, 0);
 
-      // Today's completed order count and revenue
-      let todayOrderCount = 0;
-      let todaySalesTotal = 0;
+      const tomorrow = new Date(todayStart.getTime() + 86_400_000);
+      const sales =
+        terminalIds.length === 0
+          ? []
+          : await db
+              .select({
+                currency: posOrders.currency,
+                amount: sum(posOrders.total).mapWith(Number),
+                orders: sql<number>`count(*)::int`,
+              })
+              .from(posOrders)
+              .innerJoin(posSessions, eq(posSessions.id, posOrders.sessionId))
+              .where(
+                and(
+                  inArray(posSessions.terminalId, terminalIds),
+                  eq(posOrders.status, PosOrderStatus.COMPLETED),
+                  gte(posOrders.updatedAt, todayStart),
+                  lt(posOrders.updatedAt, tomorrow),
+                ),
+              )
+              .groupBy(posOrders.currency)
+              .orderBy(asc(posOrders.currency));
+      const todayOrderCount = sales.reduce(
+        (count, group) => count + group.orders,
+        0,
+      );
+      const todaySalesTotal =
+        sales.find((group) => group.currency === currency)?.amount ?? 0;
 
-      if (openSessionRows.length > 0) {
-        const sessionIds = openSessionRows.map((s) => s.id);
-
-        // Count completed orders today across all open sessions
-        const [countRow] = await db
-          .select({ value: sql<number>`count(*)::int` })
-          .from(posOrders)
-          .where(
-            and(
-              inArray(posOrders.sessionId, sessionIds),
-              eq(posOrders.status, PosOrderStatus.COMPLETED),
-              gte(posOrders.createdAt, todayStart),
-            ),
-          );
-
-        todayOrderCount = countRow?.value ?? 0;
-
-        // Sum completed order totals today
-        const [sumRow] = await db
-          .select({ value: sum(posOrders.total) })
-          .from(posOrders)
-          .where(
-            and(
-              inArray(posOrders.sessionId, sessionIds),
-              eq(posOrders.status, PosOrderStatus.COMPLETED),
-              gte(posOrders.createdAt, todayStart),
-            ),
-          );
-
-        todaySalesTotal = Number(sumRow?.value ?? 0);
-      }
-
-      // Assemble terminal rows with session info
       const terminals = terminalRows.map((terminal) => {
         const openSessionId = terminalSessionMap.get(terminal.id) ?? null;
         return {
@@ -182,6 +160,10 @@ export class PosDashboardRepository {
         openSessionsCount: openSessionRows.length,
         todayOrderCount,
         todaySalesTotal,
+        salesByCurrency: sales.map((row) => ({
+          currency: row.currency,
+          amount: row.amount,
+        })),
         currency,
         terminals,
       });

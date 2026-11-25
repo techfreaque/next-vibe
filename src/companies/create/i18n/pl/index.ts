@@ -31,7 +31,7 @@ export const translations: typeof enTranslations = {
     },
     type: {
       label: "Typ firmy",
-      description: "Model biznesowy — B2B, B2C lub osoba fizyczna",
+      description: "Model biznesowy (B2B, B2C lub osoba fizyczna)",
       placeholder: "Wybierz typ",
     },
     vatNumber: {
@@ -83,7 +83,7 @@ export const translations: typeof enTranslations = {
       },
       server: {
         title: "Błąd serwera",
-        description: "Coś poszło nie tak — spróbuj ponownie",
+        description: "Coś poszło nie tak. Spróbuj ponownie.",
       },
       unknown: {
         title: "Nieznany błąd",
@@ -111,6 +111,7 @@ export const translations: typeof enTranslations = {
       name: "Nazwa firmy",
     },
     widget: {
+      setupAccounting: "Skonfiguruj księgowość",
       viewCompany: "Zobacz firmę",
       back: "Wróć do listy",
     },

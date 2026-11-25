@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
@@ -21,14 +21,26 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import { CompanyMemberRole } from "@/companies/enum";
 import { CompanyAuthRepository } from "@/companies/repository";
 
-import { journalEntries } from "../../../db";
-import { JournalEntryStatus } from "../../../enum";
+import {
+  accountingPeriods,
+  journalEntries,
+  journalEntryLines,
+} from "../../../db";
+import { JournalEntryStatus, PeriodStatus } from "../../../enum";
 import { scopedTranslation } from "../../../i18n";
-import type { CoaJournalPostRequestOutput } from "./definition";
+import {
+  accountingDay,
+  validateJournalLines,
+} from "../../../shared/journal-validation";
+import {
+  haveCompanyAccounts,
+  journalValidationMessages,
+  lockLedgerCompany,
+} from "../../../shared/ledger-write";
 
 export class CoaJournalPostRepository {
   static async postEntry(
-    data: CoaJournalPostRequestOutput,
+    entryId: string,
     user: JwtPrivatePayloadType,
     logger: EndpointLogger,
     locale: CountryLanguage,
@@ -36,23 +48,21 @@ export class CoaJournalPostRepository {
     try {
       const { t } = scopedTranslation.scopedT(locale);
 
-      const [entry] = await db
-        .select()
+      const [initialEntry] = await db
+        .select({ companyId: journalEntries.companyId })
         .from(journalEntries)
-        .where(eq(journalEntries.id, data.entryId))
-        .limit(1);
+        .where(eq(journalEntries.id, entryId));
 
-      if (!entry) {
+      if (!initialEntry) {
         return fail({
           message: t("errors.notFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
 
-      // Verify ACCOUNTANT+ membership using the entry's companyId
       const authResult = await CompanyAuthRepository.requireMember(
         user.id,
-        entry.companyId,
+        initialEntry.companyId,
         CompanyMemberRole.ACCOUNTANT,
         logger,
         locale,
@@ -61,36 +71,109 @@ export class CoaJournalPostRepository {
         return authResult;
       }
 
-      if (entry.status === JournalEntryStatus.POSTED) {
-        return fail({
-          message: t("journalPost.errorAlreadyPosted"),
-          errorType: ErrorResponseTypes.CONFLICT,
-        });
-      }
+      const result = await db.transaction(async (tx) => {
+        const company = await lockLedgerCompany(tx, initialEntry.companyId);
+        const [entry] = await tx
+          .select()
+          .from(journalEntries)
+          .where(eq(journalEntries.id, entryId))
+          .for("update");
 
-      if (entry.status !== JournalEntryStatus.DRAFT) {
-        return fail({
-          message: t("journalPost.errorNotDraft"),
-          errorType: ErrorResponseTypes.CONFLICT,
-        });
-      }
+        if (!company || !entry) {
+          return fail({
+            message: t("errors.notFound.title"),
+            errorType: ErrorResponseTypes.NOT_FOUND,
+          });
+        }
 
-      await db
-        .update(journalEntries)
-        .set({
-          status: JournalEntryStatus.POSTED,
-          postedAt: new Date(),
-          postedByUserId: user.id,
-          updatedAt: new Date(),
-        })
-        .where(eq(journalEntries.id, data.entryId));
+        if (entry.status === JournalEntryStatus.POSTED) {
+          return fail({
+            message: t("journalPost.errorAlreadyPosted"),
+            errorType: ErrorResponseTypes.CONFLICT,
+          });
+        }
 
-      logger.info("Journal entry posted", {
-        entryId: data.entryId,
-        userId: user.id,
+        if (entry.status !== JournalEntryStatus.DRAFT) {
+          return fail({
+            message: t("journalPost.errorNotDraft"),
+            errorType: ErrorResponseTypes.CONFLICT,
+          });
+        }
+
+        const [period] = await tx
+          .select()
+          .from(accountingPeriods)
+          .where(
+            and(
+              eq(accountingPeriods.id, entry.periodId),
+              eq(accountingPeriods.companyId, entry.companyId),
+            ),
+          );
+        if (!period || period.status !== PeriodStatus.OPEN) {
+          return fail({
+            message: t("journalCreate.errorPeriodClosed"),
+            errorType: ErrorResponseTypes.CONFLICT,
+          });
+        }
+
+        const day = accountingDay(entry.date);
+        if (
+          day < accountingDay(period.startDate) ||
+          day > accountingDay(period.endDate)
+        ) {
+          return fail({
+            message: t("journalCreate.errorDate"),
+            errorType: ErrorResponseTypes.VALIDATION_ERROR,
+          });
+        }
+
+        const lines = await tx
+          .select()
+          .from(journalEntryLines)
+          .where(eq(journalEntryLines.journalEntryId, entry.id));
+        const issue = validateJournalLines(lines, company.currency ?? "EUR");
+        if (issue) {
+          return fail({
+            message: t(journalValidationMessages[issue]),
+            errorType: ErrorResponseTypes.VALIDATION_ERROR,
+          });
+        }
+
+        if (
+          !(await haveCompanyAccounts(
+            tx,
+            entry.companyId,
+            lines.map((line) => line.accountId),
+          ))
+        ) {
+          return fail({
+            message: t("journalCreate.errorAccount"),
+            errorType: ErrorResponseTypes.VALIDATION_ERROR,
+          });
+        }
+
+        const now = new Date();
+        await tx
+          .update(journalEntries)
+          .set({
+            status: JournalEntryStatus.POSTED,
+            postedAt: now,
+            postedByUserId: user.id,
+            updatedAt: now,
+          })
+          .where(eq(journalEntries.id, entry.id));
+
+        return success({ posted: true });
       });
 
-      return success({ posted: true });
+      if (result.success) {
+        logger.info("Journal entry posted", {
+          entryId: entryId,
+          userId: user.id,
+        });
+      }
+
+      return result;
     } catch (error) {
       logger.error("Error posting journal entry", parseError(error));
       const { t } = scopedTranslation.scopedT(locale);

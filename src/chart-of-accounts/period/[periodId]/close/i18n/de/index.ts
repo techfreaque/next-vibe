@@ -54,6 +54,8 @@ export const translations: typeof enTranslations = {
       description: "Die Buchhaltungsperiode wurde abgeschlossen",
     },
     widget: {
+      closeNamed: "{{name}} abschließen",
+      draftCount: "Buchungsentwürfe",
       closedLabel: "Abgeschlossen",
       failedLabel: "Fehlgeschlagen",
       confirmTitle: "Buchungsperiode abschließen?",

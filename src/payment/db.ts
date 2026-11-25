@@ -12,6 +12,7 @@ import {
   pgTable,
   text,
   timestamp,
+  unique,
   uuid,
 } from "drizzle-orm/pg-core";
 
@@ -196,6 +197,36 @@ export const paymentInvoices = pgTable("payment_invoices", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
+
+/**
+ * Stores accepted manual receipt requests and their original responses.
+ * Company invoices share a company scope. Legacy invoices use their own ID.
+ */
+export const paymentInvoiceReceipts = pgTable(
+  "payment_invoice_receipts",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    invoiceId: uuid("invoice_id")
+      .notNull()
+      .references(() => paymentInvoices.id, { onDelete: "cascade" }),
+    scopeId: uuid("scope_id").notNull(),
+    isCompanyScope: boolean("is_company_scope").notNull(),
+    receiptKey: text("receipt_key").notNull(),
+    requestDigest: text("request_digest").notNull(),
+    journalEntryId: uuid("journal_entry_id"),
+    response: jsonb("response")
+      .$type<{ success: true; message: null }>()
+      .notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    unique("uq_payment_invoice_receipt_scope_key").on(
+      table.scopeId,
+      table.isCompanyScope,
+      table.receiptKey,
+    ),
+  ],
+);
 
 /**
  * Payment disputes table

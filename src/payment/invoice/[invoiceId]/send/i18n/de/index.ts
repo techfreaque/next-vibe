@@ -7,13 +7,12 @@ export const translations: typeof enTranslations = {
     invoice: "rechnung",
   },
   post: {
-    title: "Rechnung versenden",
-    titleShort: "Rechnung senden",
-    description:
-      "Entwurfsrechnung als versendet markieren — Status wechselt zu Offen",
+    title: "Rechnung ausstellen",
+    titleShort: "Rechnung ausstellen",
+    description: "Stellen Sie den Entwurf aus und buchen Sie die Forderung.",
     form: {
-      title: "Rechnung versenden",
-      description: "Sendet die Rechnung an den Kunden",
+      title: "Rechnung ausstellen",
+      description: "Nach der Ausstellung steht ein Link für den Kunden bereit.",
     },
     response: {
       success: "Rechnung versendet",
@@ -21,6 +20,10 @@ export const translations: typeof enTranslations = {
       viewUrl: "Kunden-Ansichts-URL",
     },
     errors: {
+      invoiceLines:
+        "Fügen Sie vor der Ausstellung Rechnungspositionen mit einem positiven Gesamtbetrag hinzu.",
+      posting:
+        "Prüfen Sie Rechnungsbetrag, Unternehmenswährung, Buchungsperiode und Buchungskonten.",
       unauthorized: {
         title: "Nicht autorisiert",
         description: "Authentifizierung erforderlich",
@@ -70,8 +73,8 @@ export const translations: typeof enTranslations = {
   },
   widget: {
     back: "Zurück",
-    submit: "Rechnung senden",
-    sent: "Rechnung versendet",
+    submit: "Rechnung ausstellen",
+    sent: "Rechnung ausgestellt",
     viewUrl: "Kunden-Ansichtslink",
   },
 };

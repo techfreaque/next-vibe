@@ -5,6 +5,7 @@ import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
 import { Span } from "next-vibe/ui/components/span";
+import { formatMoney } from "next-vibe/unified-ui/_shared/format-money";
 import {
   useWidgetLocale,
   useWidgetNavigation,
@@ -138,10 +139,7 @@ export function PosSessionGetWidget(
             {t("sessionGet.get.response.openingFloat")}
           </Span>
           <Span className="text-sm font-mono tabular-nums">
-            {new Intl.NumberFormat(locale, {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            }).format(session.openingFloat)}
+            {formatMoney(session.openingFloat, session.currency, locale)}
           </Span>
         </Div>
         {session.closedAt ? (
@@ -160,10 +158,7 @@ export function PosSessionGetWidget(
               {t("sessionGet.get.response.closingFloat")}
             </Span>
             <Span className="text-sm font-mono tabular-nums">
-              {new Intl.NumberFormat(locale, {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              }).format(session.closingFloat)}
+              {formatMoney(session.closingFloat, session.currency, locale)}
             </Span>
           </Div>
         ) : null}

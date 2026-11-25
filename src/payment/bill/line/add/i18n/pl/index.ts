@@ -50,6 +50,7 @@ export const translations: typeof enTranslations = {
       success: "Sukces",
       message: "Wiadomość",
       line: {
+        currency: "Waluta",
         title: "Szczegóły pozycji",
         subtitle: "Dodana pozycja",
         id: "ID pozycji",

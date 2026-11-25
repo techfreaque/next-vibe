@@ -14,7 +14,7 @@ import { UserRole } from "next-vibe/identity/roles/enum";
 import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
 import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
 import {
-  requestField,
+  requestUrlPathParamsField,
   responseField,
 } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
@@ -42,9 +42,9 @@ const { POST } = createEndpoint({
 
   fields: customWidgetObject({
     render: CoaPeriodCloseWidgetLazy,
-    usage: { request: "data", response: true },
+    usage: { request: "urlPathParams", response: true },
     children: {
-      periodId: requestField(scopedTranslation, {
+      periodId: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
         label: "post.periodId.label" as const,
@@ -110,13 +110,14 @@ const { POST } = createEndpoint({
   },
 
   examples: {
-    requests: { default: { periodId: "00000000-0000-0000-0000-000000000010" } },
+    urlPathParams: {
+      default: { periodId: "00000000-0000-4000-8000-000000000010" },
+    },
+    requests: undefined,
     responses: { default: { closed: true } },
   },
 });
 
-export type CoaPeriodCloseRequestInput = typeof POST.types.RequestInput;
-export type CoaPeriodCloseRequestOutput = typeof POST.types.RequestOutput;
 export type CoaPeriodCloseResponseInput = typeof POST.types.ResponseInput;
 export type CoaPeriodCloseResponseOutput = typeof POST.types.ResponseOutput;
 

@@ -3,30 +3,28 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   enums: {
     country: {
-      AT: "AT. ÖKR",
-      DE: "DE. SKR03",
-      XX: "XX - IFRS generico",
+      AT: "Austria (ÖKR)",
+      DE: "Germania (SKR03)",
+      XX: "Modello IFRS generico",
     },
   },
   post: {
-    title: "Inizializzare Grafico dei conti",
-    titleShort: "Configurazione iniziale",
-    description:
-      "Impostare un grafico di account di una società da un modello specifico paese. Idempotent. sicuro per eseguire più volte.",
+    title: "Configura il piano dei conti",
+    titleShort: "Configura il piano dei conti",
+    description: "Completa i conti aziendali con un modello standard.",
     companyId: {
-      label: "Società ID",
-      description: "La società per inizializzare il grafico dei conti per",
-      placeholder: "Entra in azienda UUID",
+      label: "Azienda",
+      description: "Scegli l’azienda da configurare.",
+      placeholder: "Scegli un’azienda",
     },
     country: {
-      label: "Paese",
-      description:
-        "Standard di paese da usare (AT = ÖKR, DE = SKR03, XX = IFRS Generico)",
-      placeholder: "Seleziona il paese",
+      label: "Modello del piano dei conti",
+      description: "Scegli la struttura dei conti da aggiungere.",
+      placeholder: "Scegli un modello",
     },
     response: {
       created: "Conti creati",
-      skipped: "Conti saltati (già esistiti)",
+      skipped: "Conti mantenuti",
     },
     errors: {
       unauthorized: {
@@ -36,7 +34,7 @@ export const translations: typeof enTranslations = {
       },
       validation: {
         title: "Errore di convalida",
-        description: "Input non valido. società di controllo ID e paese",
+        description: "Controlla l’azienda e il modello del piano dei conti.",
       },
       forbidden: {
         title: "Accesso negato",
@@ -45,15 +43,16 @@ export const translations: typeof enTranslations = {
       },
       server: {
         title: "Errore del server",
-        description: "Impostazione fallito. si prega di riprovare",
+        description: "Prova ad applicare di nuovo il modello.",
       },
       unknown: {
         title: "Errore sconosciuto",
         description: "Si è verificato un errore imprevisto",
       },
       conflict: {
-        title: "Già inizializzato",
-        description: "Questa società ha già un grafico dei conti",
+        title: "Controlla la configurazione",
+        description:
+          "Aggiorna i conti dell’azienda prima di applicare il modello.",
       },
       network: {
         title: "Errore di rete",
@@ -70,11 +69,22 @@ export const translations: typeof enTranslations = {
       },
     },
     success: {
-      title: "Grafico dei conti pronti",
-      description: "Tutti i conti sono stati creati per l'azienda",
+      title: "Piano dei conti pronto",
+      description:
+        "Il modello è stato applicato. Controlla i conti aggiunti e quelli mantenuti.",
     },
     widget: {
-      viewAccounts: "Visualizza elenco degli account",
+      review: "Controlla la configurazione",
+      previewLoading: "Ricerca dei conti esistenti…",
+      previewFailed: "Il numero dei conti esistenti non è disponibile.",
+      existing: "Conti esistenti: {{count}}.",
+      empty: "Questa azienda non ha ancora conti contabili.",
+      consequences:
+        "La configurazione aggiunge i codici mancanti nel piano dei conti e conserva i dati esistenti.",
+      submit: "Aggiungi i conti dal modello",
+      back: "Indietro",
+      viewAccounts: "Apri il piano dei conti",
+      viewPeriods: "Vedi i periodi contabili",
     },
   },
   title: "Grafico della configurazione dei conti",

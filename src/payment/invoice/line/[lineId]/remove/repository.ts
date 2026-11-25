@@ -17,6 +17,8 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
+import { getDocumentAccess } from "@/finance/document-company-scope";
+
 import { paymentInvoiceLines, paymentInvoices } from "../../../../db";
 import { InvoiceStatus } from "../../../../enum";
 import type {
@@ -35,72 +37,81 @@ export class InvoiceLineRemoveRepository {
     const { t } = scopedTranslation.scopedT(locale);
 
     try {
-      // Get the line to find its invoice
-      const [line] = await db
-        .select()
-        .from(paymentInvoiceLines)
-        .where(eq(paymentInvoiceLines.id, urlPathParams.lineId))
-        .limit(1);
+      return await db.transaction(async (tx) => {
+        // Get the line to find its invoice
+        const [line] = await tx
+          .select()
+          .from(paymentInvoiceLines)
+          .where(eq(paymentInvoiceLines.id, urlPathParams.lineId))
+          .limit(1);
 
-      if (!line) {
-        return fail({
-          message: t("post.errors.notFound.title"),
-          errorType: ErrorResponseTypes.NOT_FOUND,
+        if (!line) {
+          return fail({
+            message: t("post.errors.notFound.title"),
+            errorType: ErrorResponseTypes.NOT_FOUND,
+          });
+        }
+
+        const [invoice] = await tx
+          .select()
+          .from(paymentInvoices)
+          .where(eq(paymentInvoices.id, line.invoiceId))
+          .limit(1)
+          .for("update");
+
+        if (!invoice) {
+          return fail({
+            message: t("post.errors.notFound.title"),
+            errorType: ErrorResponseTypes.NOT_FOUND,
+          });
+        }
+
+        if (!(await getDocumentAccess(userId, invoice, tx))?.canManage) {
+          return fail({
+            message: t("post.errors.forbidden.title"),
+            errorType: ErrorResponseTypes.FORBIDDEN,
+          });
+        }
+
+        if (invoice.status !== InvoiceStatus.DRAFT) {
+          return fail({
+            message: t("post.errors.conflict.title"),
+            errorType: ErrorResponseTypes.CONFLICT,
+          });
+        }
+
+        const [removed] = await tx
+          .delete(paymentInvoiceLines)
+          .where(eq(paymentInvoiceLines.id, urlPathParams.lineId))
+          .returning({ id: paymentInvoiceLines.id });
+        if (!removed) {
+          return fail({
+            message: t("post.errors.notFound.title"),
+            errorType: ErrorResponseTypes.NOT_FOUND,
+          });
+        }
+
+        // Recalculate invoice total
+        await tx
+          .update(paymentInvoices)
+          .set({
+            amount: sql`COALESCE((
+              SELECT SUM(line_total) FROM payment_invoice_lines
+              WHERE invoice_id = ${invoice.id}
+            ), 0)`,
+            updatedAt: new Date(),
+          })
+          .where(eq(paymentInvoices.id, invoice.id));
+
+        logger.debug("Invoice line removed", {
+          lineId: urlPathParams.lineId,
+          invoiceId: invoice.id,
         });
-      }
 
-      // Verify invoice ownership and draft status
-      const [invoice] = await db
-        .select()
-        .from(paymentInvoices)
-        .where(eq(paymentInvoices.id, line.invoiceId))
-        .limit(1);
-
-      if (!invoice) {
-        return fail({
-          message: t("post.errors.notFound.title"),
-          errorType: ErrorResponseTypes.NOT_FOUND,
+        return success({
+          success: true,
+          message: null,
         });
-      }
-
-      if (invoice.userId !== userId) {
-        return fail({
-          message: t("post.errors.forbidden.title"),
-          errorType: ErrorResponseTypes.FORBIDDEN,
-        });
-      }
-
-      if (invoice.status !== InvoiceStatus.DRAFT) {
-        return fail({
-          message: t("post.errors.conflict.title"),
-          errorType: ErrorResponseTypes.CONFLICT,
-        });
-      }
-
-      await db
-        .delete(paymentInvoiceLines)
-        .where(eq(paymentInvoiceLines.id, urlPathParams.lineId));
-
-      // Recalculate invoice total
-      await db
-        .update(paymentInvoices)
-        .set({
-          amount: sql`COALESCE((
-            SELECT SUM(line_total) FROM payment_invoice_lines
-            WHERE invoice_id = ${invoice.id}
-          ), 0)`,
-          updatedAt: new Date(),
-        })
-        .where(eq(paymentInvoices.id, invoice.id));
-
-      logger.debug("Invoice line removed", {
-        lineId: urlPathParams.lineId,
-        invoiceId: invoice.id,
-      });
-
-      return success({
-        success: true,
-        message: null,
       });
     } catch (error) {
       const parsed = parseError(error);

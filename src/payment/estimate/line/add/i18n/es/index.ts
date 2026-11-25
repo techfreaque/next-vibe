@@ -15,6 +15,7 @@ export const translations: typeof enTranslations = {
       success: "Operación completada",
       message: "Mensaje de Estado",
       line: {
+        currency: "Divisa",
         title: "Tema de la línea",
         subtitle: "Detalles de la línea",
         id: "Línea ID",

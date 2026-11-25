@@ -18,6 +18,21 @@ export const translations = {
       message: "Status message",
     },
     errors: {
+      receiptKeyConflict:
+        "This receipt key already belongs to a different payment.",
+      paymentPrecision:
+        "Enter a positive amount with at most two decimal places.",
+      paymentStatus:
+        "Record payments against open invoices with a positive amount.",
+      overpayment: "The payment exceeds the invoice balance.",
+      fullPayment:
+        "Enter the full remaining amount for an invoice without a company.",
+      issuancePosting:
+        "The invoice needs a posted receivable matching its total before payment.",
+      paymentAccount:
+        "Choose an active bank or cash account from this company.",
+      paymentPosting:
+        "Check the payment date, company currency and posting accounts.",
       unauthorized: {
         title: "Unauthorized",
         description: "Authentication required",
@@ -86,6 +101,11 @@ export const translations = {
     label: "Payment Date",
     description: "When the payment was received",
     placeholder: "Select date",
+  },
+  receiptKey: {
+    label: "Receipt key",
+    description:
+      "Use the same key to retry this payment. Use a new key for another receipt.",
   },
   accountNodeId: {
     label: "Account Node ID",

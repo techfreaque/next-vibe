@@ -8,10 +8,9 @@ export const translations: typeof enTranslations = {
     ar: "contabilidad-receptible",
   },
   post: {
-    title: "Crear factura AR",
-    titleShort: "Crear factura",
-    description:
-      "Crear una nueva factura de cuentas por cobrar para un cliente",
+    title: "Nueva factura",
+    titleShort: "Nueva factura",
+    description: "Prepara una factura para tu cliente.",
     form: {
       title: "Nueva factura",
       description: "Rellene los detalles de la factura",
@@ -78,19 +77,44 @@ export const translations: typeof enTranslations = {
       description: "Factura creada en el proyecto de estatuto",
     },
     widget: {
+      details: "Datos de la factura",
+      draftHint: "Guarda un borrador para revisarlo antes de emitirlo.",
+      items: "Líneas",
+      itemsDescription:
+        "Líneas opcionales del borrador. Usa un tipo de IVA decimal entre 0 y 1.",
+      itemsHint:
+        "Añade bienes o servicios para calcular el total de la factura.",
+      item: "Descripción",
+      quantity: "Cantidad",
+      unitPrice: "Precio unitario",
+      manualTaxRate: "Otro tipo",
+      taxRate: "IVA %",
+      addItem: "Añadir línea",
+      removeItem: "Eliminar línea",
+      itemError:
+        "Introduce una descripción, una cantidad positiva, un precio y un tipo de IVA entre el 0 y el 100 %.",
+      itemsTotalError: "El total es demasiado alto para una sola factura.",
+      summary: "Resumen",
+      net: "Base imponible",
+      tax: "IVA",
+      total: "Total",
+      clearCustomer: "Quitar cliente",
+      lineTotal: "Total de la línea",
+      companyCurrencyValue: "Moneda de la empresa: {{currency}}",
+      companyCurrency: "Si no eliges una moneda, se usa la de la empresa.",
       back: "Atrás",
-      submit: "Crear factura",
+      submit: "Guardar borrador",
       viewButton: "Ver factura",
     },
   },
   companyId: {
-    label: "Company ID",
+    label: "Empresa",
     description: "La empresa que emite esta factura",
     placeholder: "Entrar en la empresa ID",
   },
   customerId: {
-    label: "Cliente ID",
-    description: "Opcional: UUID del cliente (referencia suave al usuario)",
+    label: "Cliente",
+    description: "Busca al cliente por su nombre.",
     placeholder: "Ingrese al cliente ID",
   },
   dueDate: {
@@ -99,9 +123,10 @@ export const translations: typeof enTranslations = {
     placeholder: "Fecha de vencimiento",
   },
   currency: {
+    code: "{{code}}",
     label: "Moneda",
     description: "Moneda de facturación",
-    placeholder: "EUR",
+    placeholder: "Moneda de la empresa",
   },
   notes: {
     label: "Notas",

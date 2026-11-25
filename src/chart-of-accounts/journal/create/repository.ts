@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import { count, eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
@@ -24,6 +24,17 @@ import { CompanyAuthRepository } from "@/companies/repository";
 import { accountingPeriods, journalEntries, journalEntryLines } from "../../db";
 import { LineType, PeriodStatus } from "../../enum";
 import { scopedTranslation } from "../../i18n";
+import {
+  accountingDay,
+  journalLineType,
+  validateJournalLines,
+} from "../../shared/journal-validation";
+import {
+  haveCompanyAccounts,
+  journalValidationMessages,
+  lockLedgerCompany,
+  nextJournalEntryNumber,
+} from "../../shared/ledger-write";
 import type { CoaJournalCreateRequestOutput } from "./definition";
 
 export class CoaJournalCreateRepository {
@@ -48,104 +59,128 @@ export class CoaJournalCreateRepository {
         return authResult;
       }
 
-      // Validate minimum two lines
-      if (data.lines.length < 2) {
+      const date = new Date(data.date);
+      if (!Number.isFinite(date.getTime())) {
         return fail({
-          message: t("journalCreate.errorEmptyLines"),
+          message: t("journalCreate.errorDate"),
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
         });
       }
 
-      // Validate debits = credits
-      let totalDebit = 0;
-      let totalCredit = 0;
-      for (const line of data.lines) {
-        if (line.type === LineType.DEBIT) {
-          totalDebit += line.amount;
-        } else {
-          totalCredit += line.amount;
+      const result = await db.transaction(async (tx) => {
+        const company = await lockLedgerCompany(tx, data.companyId);
+        const [period] = await tx
+          .select()
+          .from(accountingPeriods)
+          .where(
+            and(
+              eq(accountingPeriods.id, data.periodId),
+              eq(accountingPeriods.companyId, data.companyId),
+            ),
+          );
+
+        if (!company || !period) {
+          return fail({
+            message: t("errors.notFound.title"),
+            errorType: ErrorResponseTypes.NOT_FOUND,
+          });
         }
-      }
 
-      if (Math.abs(totalDebit - totalCredit) > 0.0001) {
-        return fail({
-          message: t("journalCreate.errorNotBalanced"),
-          errorType: ErrorResponseTypes.VALIDATION_ERROR,
-        });
-      }
+        if (period.status !== PeriodStatus.OPEN) {
+          return fail({
+            message: t("journalCreate.errorPeriodClosed"),
+            errorType: ErrorResponseTypes.CONFLICT,
+          });
+        }
 
-      // Check period exists and is open
-      const [period] = await db
-        .select()
-        .from(accountingPeriods)
-        .where(eq(accountingPeriods.id, data.periodId))
-        .limit(1);
+        const day = accountingDay(date);
+        if (
+          day < accountingDay(period.startDate) ||
+          day > accountingDay(period.endDate)
+        ) {
+          return fail({
+            message: t("journalCreate.errorDate"),
+            errorType: ErrorResponseTypes.VALIDATION_ERROR,
+          });
+        }
 
-      if (!period) {
-        return fail({
-          message: t("errors.notFound.title"),
-          errorType: ErrorResponseTypes.NOT_FOUND,
-        });
-      }
+        const currency = company.currency ?? "EUR";
+        const lines = data.lines.map((line) => ({
+          ...line,
+          currency: line.currency ?? currency,
+        }));
+        const issue = validateJournalLines(lines, currency);
+        if (issue) {
+          return fail({
+            message: t(journalValidationMessages[issue]),
+            errorType: ErrorResponseTypes.VALIDATION_ERROR,
+          });
+        }
 
-      if (period.status !== PeriodStatus.OPEN) {
-        return fail({
-          message: t("journalCreate.errorPeriodClosed"),
-          errorType: ErrorResponseTypes.CONFLICT,
-        });
-      }
+        if (
+          !(await haveCompanyAccounts(
+            tx,
+            data.companyId,
+            lines.map((line) => line.accountId),
+          ))
+        ) {
+          return fail({
+            message: t("journalCreate.errorAccount"),
+            errorType: ErrorResponseTypes.VALIDATION_ERROR,
+          });
+        }
 
-      // Generate entry number: count existing entries in period + 1
-      const [{ value: existingCount }] = await db
-        .select({ value: count() })
-        .from(journalEntries)
-        .where(eq(journalEntries.periodId, data.periodId));
+        const entryNumber = await nextJournalEntryNumber(
+          tx,
+          data.companyId,
+          date,
+        );
+        const [entry] = await tx
+          .insert(journalEntries)
+          .values({
+            companyId: data.companyId,
+            periodId: data.periodId,
+            entryNumber,
+            date,
+            description: data.description,
+            memo: data.memo ?? null,
+          })
+          .returning({
+            id: journalEntries.id,
+            entryNumber: journalEntries.entryNumber,
+          });
 
-      const entrySeq = (existingCount ?? 0) + 1;
-      const year = new Date(data.date).getFullYear();
-      const entryNumber = `JE-${year}-${String(entrySeq).padStart(4, "0")}`;
+        if (!entry) {
+          return fail({
+            message: t("errors.server.title"),
+            errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          });
+        }
 
-      const [entry] = await db
-        .insert(journalEntries)
-        .values({
-          companyId: data.companyId,
-          periodId: data.periodId,
-          entryNumber,
-          date: new Date(data.date),
-          description: data.description,
-          memo: data.memo ?? null,
-        })
-        .returning({
-          id: journalEntries.id,
-          entryNumber: journalEntries.entryNumber,
-        });
+        await tx.insert(journalEntryLines).values(
+          lines.map((line, sortOrder) => ({
+            journalEntryId: entry.id,
+            accountId: line.accountId,
+            type: journalLineType(line.type) ?? LineType.CREDIT,
+            amount: line.amount,
+            currency: line.currency,
+            description: line.description ?? null,
+            sortOrder,
+          })),
+        );
 
-      if (!entry) {
-        return fail({
-          message: t("errors.server.title"),
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        });
-      }
-
-      for (const [idx, line] of data.lines.entries()) {
-        await db.insert(journalEntryLines).values({
-          journalEntryId: entry.id,
-          accountId: line.accountId,
-          type: line.type === "DEBIT" ? LineType.DEBIT : LineType.CREDIT,
-          amount: line.amount,
-          currency: line.currency,
-          description: line.description ?? null,
-          sortOrder: idx,
-        });
-      }
-
-      logger.info("Journal entry created", {
-        entryId: entry.id,
-        entryNumber: entry.entryNumber,
-        userId: user.id,
+        return success(entry);
       });
 
-      return success({ id: entry.id, entryNumber: entry.entryNumber });
+      if (result.success) {
+        logger.info("Journal entry created", {
+          entryId: result.data.id,
+          entryNumber: result.data.entryNumber,
+          userId: user.id,
+        });
+      }
+
+      return result;
     } catch (error) {
       logger.error("Error creating journal entry", parseError(error));
       const { t } = scopedTranslation.scopedT(locale);

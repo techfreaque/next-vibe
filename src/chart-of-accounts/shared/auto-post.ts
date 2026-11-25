@@ -1,37 +1,38 @@
-/**
- * Auto-posts a journal entry for a company.
- * Best-effort — never throws.
- * Returns journalEntryId if successful, null if company has no CoA configured or posting fails.
- */
-
 import "server-only";
 
-import { and, eq, sql } from "drizzle-orm";
+import { and, asc, eq, inArray, or } from "drizzle-orm";
+import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import {
-  accountingPeriods,
   accountNodes,
   journalEntries,
   journalEntryLines,
   type NewJournalEntryLine,
 } from "../db";
-import type {
-  AccountSubtypeDB,
-  JournalSourceTypeDB,
-  LineTypeDB,
+import {
+  type AccountSubtypeDB,
+  JournalEntryStatus,
+  type JournalSourceTypeDB,
+  type LineTypeDB,
 } from "../enum";
-import { JournalEntryStatus, PeriodStatus } from "../enum";
+import { validateJournalLines } from "./journal-validation";
+import {
+  findOpenPeriod,
+  type LedgerTransaction,
+  lockLedgerCompany,
+  nextJournalEntryNumber,
+} from "./ledger-write";
 
 export interface AutoPostLine {
-  /** Account subtype to resolve. Must be a valid AccountSubtype value. Ignored if accountNodeId is set. */
   subtype: (typeof AccountSubtypeDB)[number];
+  fallbackSubtype?: (typeof AccountSubtypeDB)[number];
   type: (typeof LineTypeDB)[number];
   amount: number;
   currency: string;
   description?: string;
-  /** When provided, skip subtype resolution and use this account node directly */
+  /** Select this active account instead of resolving by subtype. */
   accountNodeId?: string;
 }
 
@@ -43,135 +44,128 @@ export interface AutoPostParams {
   sourceId: string;
   lines: AutoPostLine[];
   logger: EndpointLogger;
+  postedByUserId?: string;
 }
 
-/**
- * Auto-posts a journal entry for a company. Best-effort — never throws.
- * Returns journalEntryId if successful, null if company has no CoA configured or posting fails.
- */
+/** Post inside the caller's transaction. Invalid inputs return null before any write. */
+export async function postJournalEntry(
+  params: AutoPostParams,
+  tx: LedgerTransaction,
+): Promise<string | null> {
+  const {
+    companyId,
+    date,
+    description,
+    sourceType,
+    sourceId,
+    lines,
+    postedByUserId,
+  } = params;
+  const company = await lockLedgerCompany(tx, companyId);
+  if (!company || !Number.isFinite(date.getTime())) {
+    return null;
+  }
+
+  const issue = validateJournalLines(lines, company.currency ?? "EUR");
+  if (issue) {
+    params.logger.warn("Invalid automatic journal entry", {
+      companyId,
+      sourceType,
+      sourceId,
+      issue,
+    });
+    return null;
+  }
+
+  const period = await findOpenPeriod(tx, companyId, date);
+  if (!period) {
+    return null;
+  }
+
+  const accountConditions = lines.flatMap((line) =>
+    line.accountNodeId
+      ? [eq(accountNodes.id, line.accountNodeId)]
+      : [
+          inArray(
+            accountNodes.subtype,
+            line.fallbackSubtype
+              ? [line.subtype, line.fallbackSubtype]
+              : [line.subtype],
+          ),
+        ],
+  );
+  const accounts = await tx
+    .select({ id: accountNodes.id, subtype: accountNodes.subtype })
+    .from(accountNodes)
+    .where(
+      and(
+        eq(accountNodes.companyId, companyId),
+        eq(accountNodes.isActive, true),
+        eq(accountNodes.isPostable, true),
+        or(...accountConditions),
+      ),
+    )
+    .orderBy(asc(accountNodes.code), asc(accountNodes.id))
+    .for("share");
+
+  const resolvedLines: Omit<NewJournalEntryLine, "journalEntryId">[] = [];
+  for (const [sortOrder, line] of lines.entries()) {
+    const account = line.accountNodeId
+      ? accounts.find(({ id }) => id === line.accountNodeId)
+      : (accounts.find(({ subtype }) => subtype === line.subtype) ??
+        accounts.find(({ subtype }) => subtype === line.fallbackSubtype));
+    if (!account) {
+      return null;
+    }
+    resolvedLines.push({
+      accountId: account.id,
+      type: line.type,
+      amount: line.amount,
+      currency: line.currency,
+      description: line.description ?? null,
+      sortOrder,
+    });
+  }
+
+  const entryNumber = await nextJournalEntryNumber(tx, companyId, date);
+  const [entry] = await tx
+    .insert(journalEntries)
+    .values({
+      companyId,
+      periodId: period.id,
+      entryNumber,
+      date,
+      description,
+      status: JournalEntryStatus.POSTED,
+      sourceType,
+      sourceId,
+      postedAt: new Date(),
+      postedByUserId,
+    })
+    .returning({ id: journalEntries.id });
+  if (!entry) {
+    return null;
+  }
+
+  await tx
+    .insert(journalEntryLines)
+    .values(
+      resolvedLines.map((line) => ({ ...line, journalEntryId: entry.id })),
+    );
+  return entry.id;
+}
+
+/** Best-effort posting for callers without an existing transaction. */
 export async function autoPostJournalEntry(
   params: AutoPostParams,
 ): Promise<string | null> {
-  const { logger } = params;
   try {
-    const { companyId, date, description, sourceType, sourceId, lines } =
-      params;
-
-    // 1. Find open accounting period covering date
-    const [period] = await db
-      .select({ id: accountingPeriods.id })
-      .from(accountingPeriods)
-      .where(
-        and(
-          eq(accountingPeriods.companyId, companyId),
-          eq(accountingPeriods.status, PeriodStatus.OPEN),
-          sql`${accountingPeriods.startDate} <= ${date}`,
-          sql`${accountingPeriods.endDate} >= ${date}`,
-        ),
-      )
-      .limit(1);
-
-    if (!period) {
-      return null;
-    }
-
-    const periodId = period.id;
-
-    // 2. Resolve accountNodeId for each line (skip if already provided)
-    const resolvedLines: Array<
-      Pick<
-        NewJournalEntryLine,
-        "accountId" | "type" | "amount" | "currency" | "description"
-      >
-    > = [];
-
-    for (const line of lines) {
-      if (line.accountNodeId) {
-        resolvedLines.push({
-          accountId: line.accountNodeId,
-          type: line.type,
-          amount: line.amount,
-          currency: line.currency,
-          description: line.description,
-        });
-        continue;
-      }
-
-      const [accountNode] = await db
-        .select({ id: accountNodes.id })
-        .from(accountNodes)
-        .where(
-          and(
-            eq(accountNodes.companyId, companyId),
-            eq(accountNodes.subtype, line.subtype),
-            eq(accountNodes.isActive, true),
-          ),
-        )
-        .limit(1);
-
-      if (!accountNode) {
-        // ANY required account node not found → silently return null
-        return null;
-      }
-
-      resolvedLines.push({
-        accountId: accountNode.id,
-        type: line.type,
-        amount: line.amount,
-        currency: line.currency,
-        description: line.description,
-      });
-    }
-
-    // 3. Generate entry number: JE-{YYYYMMDD}-{randomHex6}
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-    const randomHex = Math.floor(Math.random() * 0xffffff)
-      .toString(16)
-      .padStart(6, "0");
-    const entryNumber = `JE-${year}${month}${day}-${randomHex}`;
-
-    // 4. INSERT journal entry (status POSTED)
-    const now = new Date();
-    const [entry] = await db
-      .insert(journalEntries)
-      .values({
-        companyId,
-        periodId,
-        entryNumber,
-        date,
-        description,
-        status: JournalEntryStatus.POSTED,
-        sourceType,
-        sourceId,
-        postedAt: now,
-      })
-      .returning({ id: journalEntries.id });
-
-    if (!entry) {
-      return null;
-    }
-
-    // 5. INSERT all journal entry lines
-    for (const [idx, line] of resolvedLines.entries()) {
-      await db.insert(journalEntryLines).values({
-        journalEntryId: entry.id,
-        accountId: line.accountId,
-        type: line.type,
-        amount: line.amount,
-        currency: line.currency,
-        description: line.description ?? null,
-        sortOrder: idx,
-      });
-    }
-
-    return entry.id;
+    return await db.transaction((tx) => postJournalEntry(params, tx));
   } catch (error) {
-    // Best-effort — log but never propagate
-    logger.error("[autoPostJournalEntry] Failed to post journal entry", {
-      error: error instanceof Error ? error.message : String(error),
-    });
+    params.logger.error(
+      "Failed to post automatic journal entry",
+      parseError(error),
+    );
     return null;
   }
 }

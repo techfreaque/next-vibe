@@ -278,7 +278,31 @@ export const translations: typeof enTranslations = {
     },
   },
   journalCreate: {
+    errorDate: "Choisissez une date dans la période sélectionnée.",
+    errorCurrency:
+      "Utilisez la devise comptable de l’entreprise pour chaque ligne.",
+    errorInvalidLine:
+      "Saisissez un montant positif au débit ou au crédit avec quatre décimales au maximum.",
+    errorAccount: "Sélectionnez un compte valide de cette entreprise.",
     widget: {
+      lineDescription: "Libellé de la ligne",
+      incomplete: "Saisissez un débit ou un crédit sur chaque ligne.",
+      offByLessThan: "Écart inférieur à {{amount}}",
+      offBy: "Écart de {{amount}}",
+
+      details: "Détails de l’écriture",
+      saveDraft: "Enregistrer le brouillon",
+      addLine: "Ajouter une ligne",
+      removeLine: "Retirer la ligne",
+      account: "Compte",
+      side: "Débit ou crédit",
+      amount: "Montant",
+      currency: "Devise",
+      missingScope: "Choisissez une entreprise avant d’ajouter des lignes.",
+      noPeriods: "Aucune période comptable ouverte pour cette entreprise.",
+      noAccounts:
+        "Aucun compte actif autorisant la saisie pour cette entreprise.",
+
       back: "Retour",
       viewEntryButton: "Voir l'écriture",
       postNowButton: "Comptabiliser maintenant",
@@ -293,12 +317,12 @@ export const translations: typeof enTranslations = {
     description:
       "Saisissez une écriture manuelle en partie double. Le total des débits doit égaler le total des crédits.",
     companyId: {
-      label: "ID de l'entreprise",
+      label: "Entreprise",
       description: "L'entreprise concernée par cette écriture",
       placeholder: "UUID de l'entreprise",
     },
     periodId: {
-      label: "ID de la période",
+      label: "Période comptable",
       description: "La période comptable",
       placeholder: "UUID de la période",
     },
@@ -356,6 +380,11 @@ export const translations: typeof enTranslations = {
     errorNotDraft: "Seules les écritures DRAFT peuvent être comptabilisées",
   },
   journalReverse: {
+    errorManaged: "Contrepassez cette écriture depuis sa pièce d’origine.",
+    errorDate:
+      "La date de contrepassation doit être égale ou postérieure à celle de l’écriture initiale.",
+    errorNoPeriod:
+      "Ouvrez un exercice ou une période couvrant la date de contrepassation.",
     widget: {
       backButton: "Retour au journal",
       reversalCreated: "Écriture de contre-passation créée",
@@ -518,7 +547,13 @@ export const translations: typeof enTranslations = {
     },
   },
   reports: {
+    switchReport: "Rapports",
+    currency: "Devise",
+    mixedCurrency:
+      "Cette période contient des écritures dans plusieurs devises. Choisissez la devise du rapport.",
     nav: {
+      ledgerTax: "TVA comptabilisée",
+      payables: "Balance âgée fournisseurs",
       profitLoss: "Résultat",
       balanceSheet: "Bilan",
       trialBalance: "Balance",
@@ -526,6 +561,10 @@ export const translations: typeof enTranslations = {
       receivablesAging: "Balance âgée clients",
     },
     widget: {
+      quickDates: "Choisir les dates",
+      thisMonth: "Ce mois-ci",
+      previousMonth: "Mois précédent",
+      autoCurrency: "Automatique",
       run: "Exécuter",
       running: "Exécution…",
     },
@@ -640,6 +679,7 @@ export const translations: typeof enTranslations = {
       placeholder: "YYYY-MM-DD",
     },
     response: {
+      unclosedEarnings: "Résultat non clôturé",
       asOfDate: "Date d'arrêté",
       assets: "Actif",
       totalAssets: "Total actif",
@@ -694,38 +734,40 @@ export const translations: typeof enTranslations = {
     },
   },
   receivablesAging: {
+    currencies: { EUR: "EUR", USD: "USD", PLN: "PLN" },
     widget: {
-      asOf: "Au",
-      noData: "Aucune créance en cours.",
+      asOf: "Date de référence",
+      noData: "Aucune facture à encaisser dans cette devise.",
       totalRow: "Total",
       viewInvoice: "Voir",
-      selectCompany:
-        "Saisissez un ID d'entreprise ci-dessus et cliquez sur Exécuter pour générer la balance âgée.",
+      selectCompany: "Choisissez une entreprise pour consulter le rapport.",
     },
-    title: "Balance âgée clients",
-    titleShort: "Balance âgée",
-    description:
-      "Factures impayées classées par ancienneté du retard. Montre exactement où la trésorerie est bloquée.",
+    title: "Factures à encaisser",
+    titleShort: "Factures à encaisser",
+    description: "Créances en cours par échéance et par devise.",
     companyId: {
-      label: "ID de l'entreprise",
-      description: "Entreprise concernée",
+      label: "Entreprise",
+      description:
+        "Sélectionnez l’entreprise dont vous souhaitez consulter les créances.",
       placeholder: "UUID de l'entreprise",
     },
     asOfDate: {
-      label: "Date d'arrêté",
-      description: "Date de référence (aujourd'hui par défaut)",
+      label: "Date de référence",
+      description:
+        "Cette date détermine la tranche de retard des montants encore dus aujourd’hui.",
       placeholder: "YYYY-MM-DD",
     },
     response: {
-      asOfDate: "Date d'arrêté",
+      currency: "Devise",
+      asOfDate: "Date de référence",
       buckets: "Tranches",
-      current: "Non échu",
+      current: "À échoir ou à échéance",
       days1to30: "1 à 30 jours",
       days31to60: "31 à 60 jours",
       days61to90: "61 à 90 jours",
       over90: "Plus de 90 jours",
-      invoiceId: "ID de la facture",
-      customerId: "ID du client",
+      invoiceId: "Facture",
+      customerId: "Client",
       amount: "Montant",
       dueDate: "Échéance",
       totals: "Totaux",

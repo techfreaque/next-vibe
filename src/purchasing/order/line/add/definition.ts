@@ -114,6 +114,11 @@ const { POST } = createEndpoint({
         layoutType: LayoutType.STACKED,
         usage: { response: true },
         children: {
+          currency: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            label: "orderCreate.currency.label",
+            schema: z.string().optional(),
+          }),
           lineId: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             label: "orderLineAdd.post.response.lineId" as const,

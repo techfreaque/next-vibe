@@ -4,7 +4,7 @@
 
 import "server-only";
 
-import { and, count, eq, inArray } from "drizzle-orm";
+import { and, count, eq, inArray, lt, sql } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
@@ -20,7 +20,9 @@ import { companyMembers } from "@/companies/db";
 import { CompanyMemberRole } from "@/companies/enum";
 import { CompanyAuthRepository } from "@/companies/repository";
 
-import { accountNodes } from "../../db";
+import { accountNodes, journalEntries, journalEntryLines } from "../../db";
+import { AccountType, ledgerEntryStatuses, LineType } from "../../enum";
+import { nextAccountingDay } from "../../shared/journal-validation";
 import type { CoaAccountListRequestOutput } from "./definition";
 import { scopedTranslation } from "./i18n";
 
@@ -46,6 +48,7 @@ export class CoaAccountListRepository {
         description: string | null;
         sortOrder: number;
         companyId: string;
+        balances?: { currency: string; amount: number }[];
       }>;
     }>
   > {
@@ -82,10 +85,11 @@ export class CoaAccountListRepository {
         }
       }
 
-      const where =
-        companyIds.length === 1
-          ? eq(accountNodes.companyId, companyIds[0] as string)
-          : inArray(accountNodes.companyId, companyIds);
+      const where = and(
+        inArray(accountNodes.companyId, companyIds),
+        data.postableOnly ? eq(accountNodes.isPostable, true) : undefined,
+        data.postableOnly ? eq(accountNodes.isActive, true) : undefined,
+      );
 
       const [{ value: total }] = await db
         .select({ value: count() })
@@ -104,6 +108,58 @@ export class CoaAccountListRepository {
         .limit(pageSize)
         .offset(offset);
 
+      const balances = new Map<
+        string,
+        { currency: string; amount: number }[]
+      >();
+      if (!data.postableOnly && rows.length) {
+        const amounts = await db
+          .select({
+            accountId: journalEntryLines.accountId,
+            currency: journalEntryLines.currency,
+            debitNet: sql`sum(case
+              when ${journalEntryLines.type} in (${LineType.DEBIT}, 'DEBIT') then ${journalEntryLines.amount}
+              when ${journalEntryLines.type} in (${LineType.CREDIT}, 'CREDIT') then -${journalEntryLines.amount}
+              else 0 end)`.mapWith(Number),
+          })
+          .from(journalEntryLines)
+          .innerJoin(
+            journalEntries,
+            eq(journalEntries.id, journalEntryLines.journalEntryId),
+          )
+          .innerJoin(
+            accountNodes,
+            and(
+              eq(accountNodes.id, journalEntryLines.accountId),
+              eq(accountNodes.companyId, journalEntries.companyId),
+            ),
+          )
+          .where(
+            and(
+              inArray(
+                journalEntryLines.accountId,
+                rows.map(({ id }) => id),
+              ),
+              inArray(journalEntries.status, ledgerEntryStatuses),
+              lt(journalEntries.date, nextAccountingDay(new Date())),
+            ),
+          )
+          .groupBy(journalEntryLines.accountId, journalEntryLines.currency)
+          .orderBy(journalEntryLines.currency);
+        const types = new Map(rows.map(({ id, type }) => [id, type]));
+        for (const row of amounts) {
+          const type = types.get(row.accountId);
+          const debitNormal =
+            type === AccountType.ASSET || type === AccountType.EXPENSE;
+          const existing = balances.get(row.accountId) ?? [];
+          existing.push({
+            currency: row.currency,
+            amount: debitNormal ? row.debitNet : -row.debitNet,
+          });
+          balances.set(row.accountId, existing);
+        }
+      }
+
       return success({
         total: total ?? 0,
         accounts: rows.map((r) => ({
@@ -119,6 +175,7 @@ export class CoaAccountListRepository {
           description: r.description ?? null,
           sortOrder: r.sortOrder,
           companyId: r.companyId,
+          balances: data.postableOnly ? undefined : (balances.get(r.id) ?? []),
         })),
       });
     } catch (error) {

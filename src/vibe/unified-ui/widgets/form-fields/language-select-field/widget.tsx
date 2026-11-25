@@ -57,6 +57,7 @@ const LANGUAGES = [
   { value: "es", label: "Spanish (Español)" },
   { value: "fr", label: "French (Français)" },
   { value: "it", label: "Italian (Italiano)" },
+  { value: "sk", label: "Slovak (Slovenčina)" },
   { value: "pt", label: "Portuguese (Português)" },
   { value: "zh", label: "Chinese (中文)" },
   { value: "ja", label: "Japanese (日本語)" },

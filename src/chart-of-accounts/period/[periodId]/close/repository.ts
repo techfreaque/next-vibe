@@ -22,12 +22,12 @@ import { CompanyAuthRepository } from "@/companies/repository";
 
 import { accountingPeriods, journalEntries } from "../../../db";
 import { JournalEntryStatus, PeriodStatus } from "../../../enum";
-import type { CoaPeriodCloseRequestOutput } from "./definition";
+import { lockLedgerCompany } from "../../../shared/ledger-write";
 import { scopedTranslation } from "./i18n";
 
 export class CoaPeriodCloseRepository {
   static async closePeriod(
-    data: CoaPeriodCloseRequestOutput,
+    periodId: string,
     user: JwtPrivatePayloadType,
     logger: EndpointLogger,
     locale: CountryLanguage,
@@ -38,7 +38,7 @@ export class CoaPeriodCloseRepository {
       const [period] = await db
         .select()
         .from(accountingPeriods)
-        .where(eq(accountingPeriods.id, data.periodId))
+        .where(eq(accountingPeriods.id, periodId))
         .limit(1);
 
       if (!period) {
@@ -60,41 +60,72 @@ export class CoaPeriodCloseRepository {
         return authResult;
       }
 
-      // Check for DRAFT entries in this period
-      const draftEntries = await db
-        .select({ id: journalEntries.id })
-        .from(journalEntries)
-        .where(
-          and(
-            eq(journalEntries.periodId, data.periodId),
-            eq(journalEntries.status, JournalEntryStatus.DRAFT),
-          ),
-        )
-        .limit(1);
+      const result = await db.transaction(async (tx) => {
+        const company = await lockLedgerCompany(tx, period.companyId);
+        const [current] = await tx
+          .select({ status: accountingPeriods.status })
+          .from(accountingPeriods)
+          .where(eq(accountingPeriods.id, period.id))
+          .for("update");
 
-      if (draftEntries.length > 0) {
-        return fail({
-          message: t("post.errors.conflict.title"),
-          errorType: ErrorResponseTypes.CONFLICT,
+        if (!company || !current) {
+          return fail({
+            message: t("post.errors.notFound.title"),
+            errorType: ErrorResponseTypes.NOT_FOUND,
+          });
+        }
+
+        if (current.status === PeriodStatus.CLOSED) {
+          return success({ closed: true });
+        }
+
+        if (current.status !== PeriodStatus.OPEN) {
+          return fail({
+            message: t("post.errors.conflict.title"),
+            errorType: ErrorResponseTypes.CONFLICT,
+          });
+        }
+
+        const [draft] = await tx
+          .select({ id: journalEntries.id })
+          .from(journalEntries)
+          .where(
+            and(
+              eq(journalEntries.periodId, period.id),
+              eq(journalEntries.status, JournalEntryStatus.DRAFT),
+            ),
+          )
+          .limit(1);
+
+        if (draft) {
+          return fail({
+            message: t("post.errors.conflict.title"),
+            errorType: ErrorResponseTypes.CONFLICT,
+          });
+        }
+
+        const now = new Date();
+        await tx
+          .update(accountingPeriods)
+          .set({
+            status: PeriodStatus.CLOSED,
+            closedAt: now,
+            closedByUserId: user.id,
+            updatedAt: now,
+          })
+          .where(eq(accountingPeriods.id, period.id));
+
+        return success({ closed: true });
+      });
+
+      if (result.success) {
+        logger.info("Period closed", {
+          periodId: periodId,
+          userId: user.id,
         });
       }
 
-      await db
-        .update(accountingPeriods)
-        .set({
-          status: PeriodStatus.CLOSED,
-          closedAt: new Date(),
-          closedByUserId: user.id,
-          updatedAt: new Date(),
-        })
-        .where(eq(accountingPeriods.id, data.periodId));
-
-      logger.info("Period closed", {
-        periodId: data.periodId,
-        userId: user.id,
-      });
-
-      return success({ closed: true });
+      return result;
     } catch (error) {
       logger.error("Error closing period", parseError(error));
       const { t } = scopedTranslation.scopedT(locale);

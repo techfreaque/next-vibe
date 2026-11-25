@@ -1221,7 +1221,7 @@ export const translations: typeof enTranslations = {
       title: "Convertir en facture",
       titleShort: "Convertir en facture",
       description:
-        "Créer une facture fournisseur à partir de ce bon de commande.",
+        "Créez une facture fournisseur à partir d’une commande entièrement réceptionnée. La validation de la facture comptabilise la dette.",
       widget: {
         back: "Retour",
         viewBill: "Voir la facture",
@@ -1232,8 +1232,9 @@ export const translations: typeof enTranslations = {
       },
       errors: {
         validation: {
-          title: "Erreur de validation",
-          description: "ID de bon de commande invalide",
+          title: "Vérifiez la devise et les totaux",
+          description:
+            "La devise doit être prise en charge et les totaux doivent correspondre aux lignes de commande.",
         },
         unauthorized: {
           title: "Non connecté",
@@ -1244,8 +1245,9 @@ export const translations: typeof enTranslations = {
           description: "Aucun accès à ce bon de commande",
         },
         conflict: {
-          title: "Déjà converti",
-          description: "Ce bon de commande a déjà été converti en facture",
+          title: "Facturation impossible",
+          description:
+            "La commande doit être entièrement réceptionnée et sans facture associée.",
         },
         server: {
           title: "Erreur serveur",
@@ -1445,14 +1447,24 @@ export const translations: typeof enTranslations = {
       description:
         "Instantané en direct des bons de commande et de l'activité fournisseurs de votre entreprise.",
       widget: {
+        openValue: "Montant des commandes ouvertes",
+        settledBills: "Factures réglées ce mois-ci",
+        deliveries: "Livraisons attendues",
+        order: "Commande",
+        supplier: "Fournisseur",
+        expected: "Date prévue",
+        orderTotal: "Total de la commande",
+        noDeliveries: "Aucune livraison en attente",
+        overdue: "Livraisons en retard",
+        dueSeven: "Attendues sous 7 jours",
         kpiDraft: "Brouillons",
         kpiConfirmed: "Confirmés",
         kpiAwaitingReceipt: "En attente de réception",
         kpiActiveVendors: "Fournisseurs actifs",
         warningDueThisWeek:
-          "{{count}} bon de commande attendu cette semaine : vérifiez les dates de livraison",
+          "Une commande doit arriver cette semaine. Vérifiez sa date de livraison.",
         warningDueThisWeekPlural:
-          "{{count}} bons de commande attendus cette semaine : vérifiez les dates de livraison",
+          "{{count}} commandes doivent arriver cette semaine. Vérifiez les dates de livraison.",
         navNewPo: "Nouveau bon de commande",
         navAllPos: "Tous les bons de commande",
         navVendors: "Fournisseurs",

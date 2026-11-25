@@ -11,6 +11,10 @@ const StyledView = styledNative(View);
 
 export function WidgetHeader({
   title,
+  titleAccessory,
+  size = "section",
+  subtitle,
+  breadcrumb,
   backButton,
   actions,
   border = true,
@@ -19,15 +23,33 @@ export function WidgetHeader({
   return (
     <StyledView
       className={cn(
-        "flex-row items-center gap-2 pb-3",
+        size === "page"
+          ? "flex-col items-stretch gap-2 pb-3"
+          : "flex-row items-center gap-2 pb-3",
         border && "border-b border-border",
         className,
       )}
     >
       {backButton}
-      <Text className="font-semibold text-base flex-1">{title}</Text>
+      {size === "page" ? (
+        <StyledView className="min-w-0 gap-1">
+          {breadcrumb}
+          <StyledView className="flex-row flex-wrap items-center gap-2">
+            <Text accessibilityRole="header" className="text-2xl font-semibold">
+              {title}
+            </Text>
+            {titleAccessory}
+          </StyledView>
+          {subtitle && (
+            <Text className="text-sm text-muted-foreground">{subtitle}</Text>
+          )}
+        </StyledView>
+      ) : (
+        <Text className="font-semibold text-base flex-1">{title}</Text>
+      )}
+      {size === "section" && titleAccessory}
       {actions ? (
-        <StyledView className="flex-row items-center gap-2">
+        <StyledView className="flex-row flex-wrap items-center gap-2">
           {actions}
         </StyledView>
       ) : null}

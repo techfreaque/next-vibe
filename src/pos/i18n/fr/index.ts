@@ -373,6 +373,8 @@ export const translations: typeof enTranslations = {
   // Session close
   sessionClose: {
     post: {
+      mixedCash:
+        "Rapprochez les encaissements en devises avant de clôturer cette caisse.",
       title: "Clôturer la session",
       titleShort: "Clôturer la session",
       description:
@@ -718,13 +720,14 @@ export const translations: typeof enTranslations = {
       titleShort: "Retirer un article",
       description: "Retirer une ligne d'une commande ouverte.",
       widget: {
+        chooseLine: "Choisir une ligne",
         backToOrder: "Retour à la commande",
       },
       orderId: {
-        label: "ID de la commande",
+        label: "Commande",
         description: "Commande dont retirer l'article",
       },
-      itemId: { label: "ID de l'article", description: "Article à retirer" },
+      itemId: { label: "Ligne", description: "Article à retirer" },
       errors: {
         validation: {
           title: "Erreur de validation",
@@ -852,10 +855,13 @@ export const translations: typeof enTranslations = {
       titleShort: "Annuler la commande",
       description: "Annuler une commande ouverte. Action irréversible.",
       widget: {
+        tendered:
+          "Un paiement a déjà été enregistré. La commande et ses lignes sont verrouillées.",
+        closed: "Cette commande est clôturée.",
         backToList: "Retour aux commandes",
       },
       orderId: {
-        label: "ID de la commande",
+        label: "Commande",
         description: "Commande à annuler",
       },
       errors: {

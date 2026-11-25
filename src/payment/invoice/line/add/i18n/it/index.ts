@@ -19,6 +19,7 @@ export const translations: typeof enTranslations = {
       success: "Linea aggiunta",
       message: "Messaggio di stato",
       line: {
+        currency: "Valuta",
         title: "Dettagli della linea",
         subtitle: "Linea di fatturazione creata",
         id: "Linea ID",

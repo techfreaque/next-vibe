@@ -48,10 +48,13 @@ const { POST } = createEndpoint({
     children: {
       companyId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
+        fieldType: FieldDataType.ENTITY_PICKER,
         label: "post.companyId.label" as const,
         description: "post.companyId.description" as const,
         placeholder: "post.companyId.placeholder" as const,
+        listEndpoint: async () =>
+          (await import("@/companies/list/definition")).default.GET,
+        labelField: "name",
         columns: 12,
         schema: z.string().uuid(),
       }),

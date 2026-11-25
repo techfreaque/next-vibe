@@ -39,6 +39,7 @@ import {
 } from "../../../_shared/use-widget-context";
 import { scopedTranslation as unifiedInterfaceScopedTranslation } from "../../../hooks/i18n";
 import { getTheme } from "../_shared/constants";
+import { parseFormDate } from "../_shared/date-value";
 import { renderPrefillDisplay } from "../_shared/prefill";
 import { getFieldStyleClassName } from "../_shared/styling";
 import { getFieldValidationState } from "../_shared/validation";
@@ -165,7 +166,7 @@ export function DateTimeFieldWidget<
               ) : (
                 <Input
                   type="datetime-local"
-                  value={toDateTimeLocal(formField.value as Date | undefined)}
+                  value={toDateTimeLocal(parseFormDate(formField.value))}
                   onChange={(e) => {
                     const date = e.target.value
                       ? new Date(e.target.value)

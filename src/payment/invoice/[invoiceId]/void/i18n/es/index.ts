@@ -21,6 +21,10 @@ export const translations: typeof enTranslations = {
       message: "Mensaje de Estado",
     },
     errors: {
+      appliedPayments:
+        "No se puede anular una factura con pagos o abonos aplicados.",
+      reversalPosting:
+        "Antes de anular, comprueba el asiento original y que el periodo contable esté abierto.",
       unauthorized: {
         title: "Se requiere autenticación",
         description: "Inicia sesión para continuar",

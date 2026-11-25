@@ -21,6 +21,12 @@ export const translations: typeof enTranslations = {
       description: "El proyecto de ley para aprobar",
     },
     errors: {
+      existingPosting:
+        "Concilia el asiento existente de esta factura antes de aprobarla.",
+      billLines:
+        "Añade líneas con un total positivo y usa cuentas de gastos activas de esta empresa.",
+      posting:
+        "Revisa los importes, la moneda de la empresa, el periodo contable y las cuentas de registro.",
       validation: {
         title: "Error de validación",
         description: "factura inválida ID",
@@ -68,7 +74,7 @@ export const translations: typeof enTranslations = {
       submit: "Confirmación del cambio de estado",
       confirmTitle: "¿Aprobar este proyecto de ley?",
       confirmDescription:
-        "Un borrador se mueve a Recibido. Una factura recibida se traslada a Aprobado y publica una entrada de diario si la contabilidad está configurada.",
+        "Un borrador pasa a Recibida. Al aprobar una factura recibida se genera un asiento contable.",
       confirmButton: "Sí, aprobar",
       cancelButton: "Cancelar",
       approved: "Actualización de la situación de los proyectos",

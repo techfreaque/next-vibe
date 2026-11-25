@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import {
@@ -18,8 +18,7 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { CompanyMemberRole } from "@/companies/enum";
-import { CompanyAuthRepository } from "@/companies/repository";
+import { getDocumentAccess } from "@/finance/document-company-scope";
 
 import { paymentEstimates } from "../../../db";
 import { EstimateStatus } from "../../../enum";
@@ -53,35 +52,48 @@ export class EstimateAcceptRepository {
         });
       }
 
-      const authResult = await CompanyAuthRepository.requireMember(
-        userId,
-        estimate.companyId,
-        CompanyMemberRole.ACCOUNTANT,
-        logger,
-        locale,
-      );
-      if (!authResult.success) {
-        return authResult;
-      }
+      return await db.transaction(async (tx) => {
+        const access = await getDocumentAccess(
+          userId,
+          { companyId: estimate.companyId },
+          tx,
+        );
+        if (!access?.canManage) {
+          return fail({
+            message: t("post.errors.forbidden.title"),
+            errorType: ErrorResponseTypes.FORBIDDEN,
+          });
+        }
+        const now = new Date();
+        const [updated] = await tx
+          .update(paymentEstimates)
+          .set({
+            status: EstimateStatus.ACCEPTED,
+            acceptedAt: now,
+            updatedAt: now,
+          })
+          .where(
+            and(
+              eq(paymentEstimates.id, estimate.id),
+              eq(paymentEstimates.companyId, estimate.companyId),
+              eq(paymentEstimates.status, EstimateStatus.SENT),
+            ),
+          )
+          .returning({ id: paymentEstimates.id });
+        if (!updated) {
+          return fail({
+            message: t("post.errors.conflict.title"),
+            errorType: ErrorResponseTypes.CONFLICT,
+          });
+        }
 
-      if (estimate.status !== EstimateStatus.SENT) {
-        return fail({
-          message: t("post.errors.conflict.title"),
-          errorType: ErrorResponseTypes.CONFLICT,
+        logger.debug("Estimate accepted", {
+          estimateId: urlPathParams.estimateId,
+          userId,
         });
-      }
 
-      await db
-        .update(paymentEstimates)
-        .set({ status: EstimateStatus.ACCEPTED, updatedAt: new Date() })
-        .where(eq(paymentEstimates.id, urlPathParams.estimateId));
-
-      logger.debug("Estimate accepted", {
-        estimateId: urlPathParams.estimateId,
-        userId,
+        return success({ success: true, message: null });
       });
-
-      return success({ success: true, message: null });
     } catch (error) {
       const parsed = parseError(error);
       logger.error("Failed to accept estimate", { error: parsed.message });

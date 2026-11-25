@@ -13,6 +13,7 @@ import { Span } from "next-vibe/ui/components/span";
 import { P } from "next-vibe/ui/components/typography";
 import { WidgetHeader } from "next-vibe/ui/components/widget-header";
 import { WidgetShell } from "next-vibe/ui/components/widget-shell";
+import { formatMoney } from "next-vibe/unified-ui/_shared/format-money";
 import {
   useWidgetLocale,
   useWidgetTranslation,
@@ -40,10 +41,7 @@ export function FinanceIngestContainer({
   const t = useWidgetTranslation<typeof definition.POST>();
   const locale = useWidgetLocale();
   const result = useWidgetValue<typeof definition.POST>();
-  const money = new Intl.NumberFormat(locale, {
-    style: "currency",
-    currency: "USD",
-  });
+  const money = (amount: number): string => formatMoney(amount, "USD", locale);
 
   return (
     <WidgetShell className="gap-4">
@@ -113,7 +111,7 @@ export function FinanceIngestContainer({
                     </Div>
                     <Span className="text-sm tabular-nums">
                       {s.balanceUsd !== null
-                        ? money.format(s.balanceUsd)
+                        ? money(s.balanceUsd)
                         : s.kind === "revenue" &&
                             s.status === "enums.runStatus.ok"
                           ? t("ingest.widget.events", {
@@ -142,11 +140,11 @@ export function FinanceIngestContainer({
                   <Span className="font-medium">{d.day}</Span>
                   <Span className="text-muted-foreground">
                     {t("ingest.widget.dayLine", {
-                      cash: money.format(d.netRevenueUsd),
+                      cash: money(d.netRevenueUsd),
                       cost:
                         d.upstreamCostUsd === null
                           ? t("ingest.widget.costUnknown")
-                          : money.format(d.upstreamCostUsd),
+                          : money(d.upstreamCostUsd),
                     })}
                   </Span>
                   <Span className="text-xs text-muted-foreground">

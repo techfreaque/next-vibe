@@ -57,7 +57,7 @@ const { POST } = createEndpoint({
             schema: z.uuid(),
             listEndpoint: async () =>
               (await import("@/pos/order/list/definition")).default.GET,
-            labelField: "id",
+            labelField: "orderNumber",
           }),
           itemId: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,

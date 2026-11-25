@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import { and, eq, gte, lte, sql } from "drizzle-orm";
+import { and, eq, gte, inArray, lt, sql } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
@@ -21,8 +21,16 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import { CompanyAuthRepository } from "@/companies/repository";
 
 import { accountNodes, journalEntries, journalEntryLines } from "../../db";
-import { AccountSubtype, JournalEntryStatus, LineType } from "../../enum";
+import { AccountSubtype, ledgerEntryStatuses, LineType } from "../../enum";
 import { scopedTranslation } from "../../i18n";
+import {
+  accountingDay,
+  nextAccountingDay,
+} from "../../shared/journal-validation";
+import {
+  findLedgerReportCompany,
+  resolveLedgerReportCurrency,
+} from "../../shared/report-currency";
 import type { TaxReportRequestOutput } from "./definition";
 
 interface TaxLine {
@@ -41,6 +49,9 @@ export class TaxReportRepository {
     locale: CountryLanguage,
   ): Promise<
     ResponseType<{
+      reportCompanyId: string;
+      reportCompanyName: string;
+      reportCurrency: string;
       fromResponse: Date;
       toResponse: Date;
       vatCollected: number;
@@ -51,32 +62,60 @@ export class TaxReportRepository {
   > {
     const { t } = scopedTranslation.scopedT(locale);
 
-    const authResult = await CompanyAuthRepository.requireMember(
-      user.id,
-      data.companyId,
-      null,
-      logger,
-      locale,
-    );
-    if (!authResult.success) {
-      return authResult;
+    if (data.companyId) {
+      const authResult = await CompanyAuthRepository.requireMember(
+        user.id,
+        data.companyId,
+        null,
+        logger,
+        locale,
+      );
+      if (!authResult.success) {
+        return authResult;
+      }
     }
 
     try {
+      const company = await findLedgerReportCompany(user.id, data.companyId);
+      if (!company) {
+        return fail({
+          message: t("taxReport.widget.selectCompany"),
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+        });
+      }
+
       const today = new Date();
       const fromDate = data.from
         ? new Date(data.from)
-        : new Date(today.getFullYear(), 0, 1);
+        : new Date(Date.UTC(today.getUTCFullYear(), 0, 1));
       const toDate = data.to ? new Date(data.to) : today;
 
       const entryConditions = [
-        eq(journalEntries.companyId, data.companyId),
-        eq(journalEntries.status, JournalEntryStatus.POSTED),
-        gte(journalEntries.date, fromDate),
-        lte(journalEntries.date, toDate),
+        eq(journalEntries.companyId, company.id),
+        eq(accountNodes.companyId, company.id),
+        inArray(journalEntries.status, ledgerEntryStatuses),
+        gte(journalEntries.date, accountingDay(fromDate)),
+        lt(journalEntries.date, nextAccountingDay(toDate)),
+        inArray(accountNodes.subtype, [
+          AccountSubtype.VAT_PAYABLE,
+          AccountSubtype.VAT_RECEIVABLE,
+        ]),
       ];
 
       // Query VAT_PAYABLE and VAT_RECEIVABLE accounts
+      const reportCurrency = await resolveLedgerReportCurrency(
+        company.currency,
+        entryConditions,
+        data.currency,
+      );
+      if (!reportCurrency) {
+        return fail({
+          message: t("reports.mixedCurrency"),
+          errorType: ErrorResponseTypes.CONFLICT,
+        });
+      }
+      entryConditions.push(eq(journalEntryLines.currency, reportCurrency));
+
       const rows = await db
         .select({
           code: accountNodes.code,
@@ -94,12 +133,7 @@ export class TaxReportRepository {
           accountNodes,
           eq(journalEntryLines.accountId, accountNodes.id),
         )
-        .where(
-          and(
-            and(...entryConditions),
-            sql`${accountNodes.subtype} in (${AccountSubtype.VAT_PAYABLE}, ${AccountSubtype.VAT_RECEIVABLE})`,
-          ),
-        )
+        .where(and(...entryConditions))
         .groupBy(accountNodes.code, accountNodes.name, accountNodes.subtype)
         .orderBy(accountNodes.code);
 
@@ -145,6 +179,9 @@ export class TaxReportRepository {
       });
 
       return success({
+        reportCompanyId: company.id,
+        reportCompanyName: company.name,
+        reportCurrency,
         fromResponse: fromDate,
         toResponse: toDate,
         vatCollected,

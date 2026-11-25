@@ -3,7 +3,6 @@
  * POST — open a new accounting period
  */
 
-import { dateSchema } from "next-vibe/core/definition/common.schema";
 import { createEndpoint } from "next-vibe/core/definition/create-i18n";
 import {
   EndpointErrorTypes,
@@ -20,6 +19,7 @@ import {
 } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
+import { accountingDateSchema } from "../../shared/calendar-date";
 import { scopedTranslation } from "./i18n";
 
 const CoaPeriodCreateWidgetLazy = lazyWidget(() =>
@@ -67,21 +67,21 @@ const { POST } = createEndpoint({
       }),
       startDate: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.DATETIME,
+        fieldType: FieldDataType.DATE,
         label: "post.startDate.label" as const,
         description: "post.startDate.description" as const,
         placeholder: "post.startDate.placeholder" as const,
         columns: 6,
-        schema: dateSchema,
+        schema: accountingDateSchema,
       }),
       endDate: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.DATETIME,
+        fieldType: FieldDataType.DATE,
         label: "post.endDate.label" as const,
         description: "post.endDate.description" as const,
         placeholder: "post.endDate.placeholder" as const,
         columns: 6,
-        schema: dateSchema,
+        schema: accountingDateSchema,
       }),
       id: responseField(scopedTranslation, {
         type: WidgetType.TEXT,

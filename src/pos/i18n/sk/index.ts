@@ -42,8 +42,6 @@ export const translations: typeof enTranslations = {
       other: "Iný spôsob",
     },
   },
-
-  // POS Dashboard
   dashboard: {
     get: {
       title: "Prehľad pokladníc",
@@ -66,8 +64,7 @@ export const translations: typeof enTranslations = {
         statusInactive: "Neaktívna",
         statusSessionOpen: "Otvorená zmena",
         emptyTerminals: "Zatiaľ nemáte nastavenú žiadnu pokladnicu.",
-        emptyTerminalsHint:
-          "O nastavenie pokladníc požiadajte správcu.",
+        emptyTerminalsHint: "O nastavenie pokladníc požiadajte správcu.",
       },
       errors: {
         validation: {
@@ -82,7 +79,10 @@ export const translations: typeof enTranslations = {
           title: "Prístup zamietnutý",
           description: "K údajom pokladne nemáte prístup",
         },
-        conflict: { title: "Konflikt údajov", description: "Údaje sa medzičasom zmenili." },
+        conflict: {
+          title: "Konflikt údajov",
+          description: "Údaje sa medzičasom zmenili.",
+        },
         server: {
           title: "Chyba servera",
           description: "Prehľad sa nepodarilo načítať",
@@ -95,7 +95,10 @@ export const translations: typeof enTranslations = {
           title: "Chyba pripojenia",
           description: "Skontrolujte pripojenie a skúste to znova",
         },
-        notFound: { title: "Záznam sa nenašiel", description: "Nenašli sa žiadne údaje pokladne" },
+        notFound: {
+          title: "Záznam sa nenašiel",
+          description: "Nenašli sa žiadne údaje pokladne",
+        },
         unsavedChanges: {
           title: "Neuložené zmeny",
           description: "Máte neuložené zmeny.",
@@ -122,8 +125,6 @@ export const translations: typeof enTranslations = {
       },
     },
   },
-
-  // Terminal create
   terminalCreate: {
     post: {
       title: "Vytvoriť pokladničný terminál",
@@ -187,7 +188,10 @@ export const translations: typeof enTranslations = {
           title: "Chyba siete",
           description: "Skontrolujte pripojenie a skúste to znova",
         },
-        notFound: { title: "Nenašlo sa", description: "Požadovaný zdroj sa nenašiel" },
+        notFound: {
+          title: "Nenašlo sa",
+          description: "Požadovaný zdroj sa nenašiel",
+        },
         unsavedChanges: {
           title: "Neuložené zmeny",
           description: "Máte neuložené zmeny",
@@ -206,8 +210,6 @@ export const translations: typeof enTranslations = {
       },
     },
   },
-
-  // Terminal list
   terminalList: {
     get: {
       title: "Pokladničné terminály",
@@ -247,7 +249,10 @@ export const translations: typeof enTranslations = {
           title: "Prístup zamietnutý",
           description: "Žiadny prístup k tejto spoločnosti",
         },
-        conflict: { title: "Konflikt", description: "Konflikt údajov" },
+        conflict: {
+          title: "Konflikt",
+          description: "Konflikt údajov",
+        },
         server: {
           title: "Chyba servera",
           description: "Terminály sa nepodarilo načítať",
@@ -260,7 +265,10 @@ export const translations: typeof enTranslations = {
           title: "Chyba siete",
           description: "Skontrolujte pripojenie a skúste to znova",
         },
-        notFound: { title: "Nenašlo sa", description: "Firma sa nenašla" },
+        notFound: {
+          title: "Nenašlo sa",
+          description: "Firma sa nenašla",
+        },
         unsavedChanges: {
           title: "Neuložené zmeny",
           description: "Máte neuložené zmeny",
@@ -280,8 +288,6 @@ export const translations: typeof enTranslations = {
       },
     },
   },
-
-  // Session open
   sessionOpen: {
     post: {
       title: "Otvoriť pokladničnú zmenu",
@@ -291,7 +297,8 @@ export const translations: typeof enTranslations = {
         viewOrders: "Zobraziť objednávky",
         backToTerminals: "Späť na terminály",
         selectTerminal: "Terminál pripravený",
-        selectTerminalHint: "Zadajte počiatočný stav hotovosti a otvorte pokladničnú zmenu.",
+        selectTerminalHint:
+          "Zadajte počiatočný stav hotovosti a otvorte pokladničnú zmenu.",
         terminal: "Pokladničný terminál",
         readyToOpen: "Pripravené",
         floatHint: "Počítajte hotovosť v zásuvke pred otvorením.",
@@ -357,13 +364,14 @@ export const translations: typeof enTranslations = {
       },
     },
   },
-
-  // Session close
   sessionClose: {
     post: {
+      mixedCash:
+        "Pred uzavretím pokladnice odsúhlaste hotovostné platby v cudzej mene.",
       title: "Uzavrieť pokladničnú zmenu",
       titleShort: "Uzavrieť pokladničnú zmenu",
-      description: "Uzavrieť pokladničnú zmenu a zaznamenať konečný stav hotovosti.",
+      description:
+        "Uzavrieť pokladničnú zmenu a zaznamenať konečný stav hotovosti.",
       widget: {
         backToTerminals: "Späť na terminály",
         sessionSummary: "Súhrn pokladničnej zmeny",
@@ -382,7 +390,10 @@ export const translations: typeof enTranslations = {
         variance: "Rozdiel",
         reconciliationTitle: "Vyrovnanie hotovosti",
       },
-      sessionId: { label: "ID pokladničnej zmeny", description: "Pokladničná zmena na uzavretie" },
+      sessionId: {
+        label: "ID pokladničnej zmeny",
+        description: "Pokladničná zmena na uzavretie",
+      },
       closingFloat: {
         label: "Hotovosť pri uzavretí pokladnice",
         description: "Hotovosť napočítaná pri uzavretí pokladnice",
@@ -442,8 +453,6 @@ export const translations: typeof enTranslations = {
       },
     },
   },
-
-  // Session get
   sessionGet: {
     get: {
       title: "Načítať pokladničnú zmenu",
@@ -457,7 +466,10 @@ export const translations: typeof enTranslations = {
         loading: "Načítava sa pokladničná zmena…",
         back: "Späť",
       },
-      sessionId: { label: "ID pokladničnej zmeny", description: "Pokladničná zmena na načítanie" },
+      sessionId: {
+        label: "ID pokladničnej zmeny",
+        description: "Pokladničná zmena na načítanie",
+      },
       errors: {
         validation: {
           title: "Neplatné údaje",
@@ -471,7 +483,10 @@ export const translations: typeof enTranslations = {
           title: "Prístup zamietnutý",
           description: "K tejto pokladničnej zmene nemáte prístup",
         },
-        conflict: { title: "Konflikt", description: "Konflikt údajov" },
+        conflict: {
+          title: "Konflikt",
+          description: "Konflikt údajov",
+        },
         server: {
           title: "Chyba servera",
           description: "Pokladničnú zmenu sa nepodarilo načítať",
@@ -509,13 +524,12 @@ export const translations: typeof enTranslations = {
       },
     },
   },
-
-  // Order create
   orderCreate: {
     post: {
       title: "Vytvoriť objednávku",
       titleShort: "Vytvoriť objednávku",
-      description: "Vytvoriť novú objednávku počas otvorenej pokladničnej zmeny.",
+      description:
+        "Vytvoriť novú objednávku počas otvorenej pokladničnej zmeny.",
       widget: {
         addItem: "Pridať položku",
         viewOrder: "Zobraziť objednávku",
@@ -550,7 +564,8 @@ export const translations: typeof enTranslations = {
         },
         conflict: {
           title: "Pokladničná zmena uzavretá",
-          description: "V uzavretej pokladničnej zmene nemožno vytvárať objednávky",
+          description:
+            "V uzavretej pokladničnej zmene nemožno vytvárať objednávky",
         },
         server: {
           title: "Chyba servera",
@@ -587,8 +602,6 @@ export const translations: typeof enTranslations = {
       },
     },
   },
-
-  // Order add item
   orderAddItem: {
     post: {
       title: "Pridať položku",
@@ -606,9 +619,12 @@ export const translations: typeof enTranslations = {
         selectedProduct: "Vybraný produkt",
         clearProduct: "Zrušiť výber",
         searchButton: "Vyhľadať",
-        noProductResults: "Nenašli sa žiadne výsledky. Zadajte položku ručne nižšie.",
+        noProductResults: "Nič sa nenašlo. Zadajte údaje položky nižšie.",
       },
-      orderId: { label: "ID objednávky", description: "Objednávka, do ktorej sa pridá položka" },
+      orderId: {
+        label: "ID objednávky",
+        description: "Objednávka, do ktorej sa pridá položka",
+      },
       productId: {
         label: "ID produktu",
         description: "Nepovinná referencia produktu",
@@ -650,7 +666,10 @@ export const translations: typeof enTranslations = {
           title: "Objednávka nie je otvorená",
           description: "Položky možno pridávať iba do otvorenej objednávky",
         },
-        server: { title: "Chyba servera", description: "Pridanie položky zlyhalo" },
+        server: {
+          title: "Chyba servera",
+          description: "Pridanie položky zlyhalo",
+        },
         unknown: {
           title: "Neznáma chyba",
           description: "Nastala neočakávaná chyba",
@@ -668,7 +687,10 @@ export const translations: typeof enTranslations = {
           description: "Máte neuložené zmeny",
         },
       },
-      success: { title: "Položka pridaná", description: "Položka pridaná do objednávky" },
+      success: {
+        title: "Položka pridaná",
+        description: "Položka pridaná do objednávky",
+      },
       response: {
         id: "ID položky",
         description: "Opis",
@@ -680,18 +702,23 @@ export const translations: typeof enTranslations = {
       },
     },
   },
-
-  // Order remove item
   orderRemoveItem: {
     post: {
       title: "Odstrániť položku",
       titleShort: "Odstrániť položku",
       description: "Odstrániť položku z otvorenej objednávky.",
       widget: {
+        chooseLine: "Vyberte položku",
         backToOrder: "Späť na objednávku",
       },
-      orderId: { label: "ID objednávky", description: "Objednávka, z ktorej sa odstráni položka" },
-      itemId: { label: "ID položky", description: "Položka na odstránenie" },
+      orderId: {
+        label: "Objednávka",
+        description: "Objednávka, z ktorej sa odstráni položka",
+      },
+      itemId: {
+        label: "Položka",
+        description: "Položka na odstránenie",
+      },
       errors: {
         validation: {
           title: "Neplatné údaje",
@@ -709,7 +736,10 @@ export const translations: typeof enTranslations = {
           title: "Objednávka nie je otvorená",
           description: "Položky možno odstraňovať iba z otvorenej objednávky",
         },
-        server: { title: "Chyba servera", description: "Nepodarilo sa odstrániť položku" },
+        server: {
+          title: "Chyba servera",
+          description: "Nepodarilo sa odstrániť položku",
+        },
         unknown: {
           title: "Neznáma chyba",
           description: "Nastala neočakávaná chyba",
@@ -737,22 +767,23 @@ export const translations: typeof enTranslations = {
       },
     },
   },
-
-  // Order complete
   orderComplete: {
     post: {
       title: "Dokončiť objednávku",
       titleShort: "Dokončiť objednávku",
-      description:
-        "Dokončí objednávku, overí úplnú úhradu a zaúčtuje predaj.",
+      description: "Dokončí objednávku, overí úplnú úhradu a zaúčtuje predaj.",
       widget: {
         backToList: "Späť na zoznam objednávok",
         confirmTitle: "Dokončiť túto objednávku?",
-        confirmHint: "Túto akciu nemožno vrátiť späť. Pred dokončením prijmite všetky platby.",
+        confirmHint:
+          "Túto akciu nemožno vrátiť späť. Pred dokončením prijmite všetky platby.",
         orderNumber: "Objednávka",
         cancel: "Zrušiť",
       },
-      orderId: { label: "ID objednávky", description: "Objednávka na dokončenie" },
+      orderId: {
+        label: "ID objednávky",
+        description: "Objednávka na dokončenie",
+      },
       errors: {
         validation: {
           title: "Neplatné údaje",
@@ -803,17 +834,22 @@ export const translations: typeof enTranslations = {
       },
     },
   },
-
-  // Order void
   orderVoid: {
     post: {
       title: "Stornovať objednávku",
       titleShort: "Stornovať objednávku",
-      description: "Stornovať otvorenú objednávku. Túto akciu nemožno vrátiť späť.",
+      description:
+        "Stornovať otvorenú objednávku. Túto akciu nemožno vrátiť späť.",
       widget: {
+        tendered:
+          "Platba už bola zaevidovaná. Objednávku ani jej položky už nemožno meniť.",
+        closed: "Táto objednávka je uzavretá.",
         backToList: "Späť na objednávky",
       },
-      orderId: { label: "ID objednávky", description: "Objednávka na stornovanie" },
+      orderId: {
+        label: "Objednávka",
+        description: "Objednávka na stornovanie",
+      },
       errors: {
         validation: {
           title: "Neplatné údaje",
@@ -831,7 +867,10 @@ export const translations: typeof enTranslations = {
           title: "Objednávka nie je otvorená",
           description: "Stornovať možno iba otvorené objednávky",
         },
-        server: { title: "Chyba servera", description: "Objednávku sa nepodarilo stornovať" },
+        server: {
+          title: "Chyba servera",
+          description: "Objednávku sa nepodarilo stornovať",
+        },
         unknown: {
           title: "Neznáma chyba",
           description: "Nastala neočakávaná chyba",
@@ -849,15 +888,16 @@ export const translations: typeof enTranslations = {
           description: "Máte neuložené zmeny",
         },
       },
-      success: { title: "Objednávka stornovaná", description: "Objednávka bola stornovaná" },
+      success: {
+        title: "Objednávka stornovaná",
+        description: "Objednávka bola stornovaná",
+      },
       response: {
         id: "ID objednávky",
         status: "Stav",
       },
     },
   },
-
-  // Order get
   orderGet: {
     get: {
       title: "Načítať objednávku",
@@ -873,13 +913,16 @@ export const translations: typeof enTranslations = {
         fullyPaid: "Úplne uhradené",
         qtyTimesPrice: "×",
         loading: "Načítava sa objednávka…",
-        noItems: "Zatiaľ žiadne položky. Pridajte prvú.",
+        noItems: "Zatiaľ žiadne položky. Pridajte prvú položku.",
         viewJournalEntry: "Zobraziť účtovný zápis",
         voidedStamp: "VOIDED",
         completedReadOnly: "Objednávka je dokončená a už ju nemožno upravovať.",
         select: "Vyberte objednávku",
       },
-      orderId: { label: "ID objednávky", description: "Objednávka na načítanie" },
+      orderId: {
+        label: "ID objednávky",
+        description: "Objednávka na načítanie",
+      },
       errors: {
         validation: {
           title: "Neplatné údaje",
@@ -893,8 +936,14 @@ export const translations: typeof enTranslations = {
           title: "Prístup zamietnutý",
           description: "K tejto objednávke nemáte prístup",
         },
-        conflict: { title: "Konflikt", description: "Konflikt údajov" },
-        server: { title: "Chyba servera", description: "Objednávku sa nepodarilo načítať" },
+        conflict: {
+          title: "Konflikt",
+          description: "Konflikt údajov",
+        },
+        server: {
+          title: "Chyba servera",
+          description: "Objednávku sa nepodarilo načítať",
+        },
         unknown: {
           title: "Neznáma chyba",
           description: "Nastala neočakávaná chyba",
@@ -946,8 +995,6 @@ export const translations: typeof enTranslations = {
       },
     },
   },
-
-  // Order list
   orderList: {
     get: {
       title: "Objednávky",
@@ -961,7 +1008,8 @@ export const translations: typeof enTranslations = {
         back: "Späť",
         backToTerminals: "Späť na terminály",
         selectSession: "Vyberte pokladničnú zmenu",
-        selectSessionHint: "Zadajte ID pokladničnej zmeny, ktorej objednávky chcete zobraziť.",
+        selectSessionHint:
+          "Zadajte ID pokladničnej zmeny, ktorej objednávky chcete zobraziť.",
         sessionTotal: "Suma za pokladničnú zmenu",
         filterAll: "Všetky",
         loading: "Načítavajú sa objednávky…",
@@ -977,7 +1025,10 @@ export const translations: typeof enTranslations = {
         description: "Filtrovať podľa stavu objednávky",
         placeholder: "Všetky stavy",
       },
-      page: { label: "Strana", description: "Číslo strany (začína na 1)" },
+      page: {
+        label: "Strana",
+        description: "Číslo strany (začína na 1)",
+      },
       pageSize: {
         label: "Na stranu",
         description: "Výsledky na stranu (max. 100)",
@@ -995,8 +1046,14 @@ export const translations: typeof enTranslations = {
           title: "Prístup zamietnutý",
           description: "K tejto pokladničnej zmene nemáte prístup",
         },
-        conflict: { title: "Konflikt", description: "Konflikt údajov" },
-        server: { title: "Chyba servera", description: "Objednávky sa nepodarilo načítať" },
+        conflict: {
+          title: "Konflikt",
+          description: "Konflikt údajov",
+        },
+        server: {
+          title: "Chyba servera",
+          description: "Objednávky sa nepodarilo načítať",
+        },
         unknown: {
           title: "Neznáma chyba",
           description: "Nastala neočakávaná chyba",
@@ -1014,7 +1071,10 @@ export const translations: typeof enTranslations = {
           description: "Máte neuložené zmeny",
         },
       },
-      success: { title: "Objednávky načítané", description: "Zoznam objednávok sa načítal" },
+      success: {
+        title: "Objednávky načítané",
+        description: "Zoznam objednávok sa načítal",
+      },
       response: {
         count: "Spolu",
         id: "ID objednávky",
@@ -1027,8 +1087,6 @@ export const translations: typeof enTranslations = {
       },
     },
   },
-
-  // Product lookup (POS catalog search)
   productLookup: {
     get: {
       title: "Vyhľadávanie produktov",
@@ -1036,7 +1094,7 @@ export const translations: typeof enTranslations = {
       description:
         "Vyhľadať produkty podľa názvu alebo SKU a rýchlo ich pridať na pokladni.",
       widget: {
-        noResults: "Žiadne produkty sa nenašli. Skúste iný hľadaný výraz.",
+        noResults: "Žiadne produkty sa nenašli. Skúste iný výraz.",
         tax: "daň",
         back: "Späť",
       },
@@ -1049,8 +1107,14 @@ export const translations: typeof enTranslations = {
         description: "Vyhľadávanie podľa názvu produktu alebo SKU",
         placeholder: "Káva, BEV-001...",
       },
-      page: { label: "Strana", description: "Číslo strany (začína na 1)" },
-      pageSize: { label: "Na stranu", description: "Výsledky na stranu (max. 50)" },
+      page: {
+        label: "Strana",
+        description: "Číslo strany (začína na 1)",
+      },
+      pageSize: {
+        label: "Na stranu",
+        description: "Výsledky na stranu (max. 50)",
+      },
       errors: {
         validation: {
           title: "Neplatné údaje",
@@ -1064,7 +1128,10 @@ export const translations: typeof enTranslations = {
           title: "Prístup zamietnutý",
           description: "Žiadny prístup k tejto spoločnosti",
         },
-        conflict: { title: "Konflikt", description: "Konflikt údajov" },
+        conflict: {
+          title: "Konflikt",
+          description: "Konflikt údajov",
+        },
         server: {
           title: "Chyba servera",
           description: "Produkty sa nepodarilo vyhľadať",
@@ -1077,7 +1144,10 @@ export const translations: typeof enTranslations = {
           title: "Chyba siete",
           description: "Skontrolujte pripojenie a skúste to znova",
         },
-        notFound: { title: "Nenašlo sa", description: "Nenašli sa žiadne produkty" },
+        notFound: {
+          title: "Nenašlo sa",
+          description: "Nenašli sa žiadne produkty",
+        },
         unsavedChanges: {
           title: "Neuložené zmeny",
           description: "Máte neuložené zmeny",
@@ -1099,8 +1169,6 @@ export const translations: typeof enTranslations = {
       },
     },
   },
-
-  // Order add payment
   orderAddPayment: {
     post: {
       title: "Pridať platbu",
@@ -1114,7 +1182,10 @@ export const translations: typeof enTranslations = {
         changeHint: "Vydať zákazníkovi",
         addAnotherPayment: "Pridať ďalšiu platbu",
       },
-      orderId: { label: "ID objednávky", description: "Objednávka na úhradu" },
+      orderId: {
+        label: "ID objednávky",
+        description: "Objednávka na úhradu",
+      },
       method: {
         label: "Spôsob platby",
         description: "Ako zákazník platí",
@@ -1136,7 +1207,8 @@ export const translations: typeof enTranslations = {
       },
       accountNodeId: {
         label: "Účet na zaúčtovanie platby",
-        description: "Prijímací účet (má prednosť pred predvoleným účtom terminálu)",
+        description:
+          "Prijímací účet (má prednosť pred predvoleným účtom terminálu)",
       },
       errors: {
         validation: {

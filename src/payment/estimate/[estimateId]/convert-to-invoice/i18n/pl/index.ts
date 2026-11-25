@@ -17,6 +17,8 @@ export const translations: typeof enTranslations = {
       invoiceId: "ID utworzonej faktury",
     },
     errors: {
+      reconcile:
+        "Suma pozycji różni się od kwoty oferty. Powiel ofertę i sprawdź nowy szkic.",
       unauthorized: {
         title: "Brak autoryzacji",
         description: "Wymagane uwierzytelnienie",

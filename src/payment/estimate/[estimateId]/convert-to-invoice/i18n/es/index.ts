@@ -17,6 +17,8 @@ export const translations: typeof enTranslations = {
       invoiceId: "Invocación creada ID",
     },
     errors: {
+      reconcile:
+        "La suma de las líneas difiere del total del presupuesto. Duplica el presupuesto para revisar y corregir el borrador.",
       unauthorized: {
         title: "Se requiere autenticación",
         description: "Inicia sesión para continuar",

@@ -372,6 +372,8 @@ export const translations: typeof enTranslations = {
   // Session close
   sessionClose: {
     post: {
+      mixedCash:
+        "Concilia los cobros en efectivo en otras divisas antes de cerrar la caja.",
       title: "Período de sesiones cerrado",
       titleShort: "Período de sesiones cerrado",
       description:
@@ -714,13 +716,14 @@ export const translations: typeof enTranslations = {
       titleShort: "Quitar el artículo",
       description: "Retire un artículo de línea de un orden abierto.",
       widget: {
+        chooseLine: "Selecciona una línea",
         backToOrder: "Regresar al orden",
       },
       orderId: {
-        label: "Orden ID",
+        label: "Pedido",
         description: "Orden para eliminar el artículo de",
       },
-      itemId: { label: "Tema ID", description: "Tema para eliminar" },
+      itemId: { label: "Línea", description: "Tema para eliminar" },
       errors: {
         validation: {
           title: "Error de validación",
@@ -845,9 +848,12 @@ export const translations: typeof enTranslations = {
       titleShort: "Void Order",
       description: "Vacíe una orden abierta. No se puede deshacer.",
       widget: {
+        tendered:
+          "Ya se registró un pago. El pedido y sus líneas están bloqueados.",
+        closed: "Este pedido está cerrado.",
         backToList: "Volver a las órdenes",
       },
-      orderId: { label: "Orden ID", description: "Orden de anulación" },
+      orderId: { label: "Pedido", description: "Orden de anulación" },
       errors: {
         validation: {
           title: "Error de validación",

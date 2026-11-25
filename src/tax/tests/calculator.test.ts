@@ -150,3 +150,24 @@ describe("TaxCalculator.roundToFour", () => {
     expect(TaxCalculator.roundToFour(-1.23456)).toBe(-1.2346);
   });
 });
+
+describe("Decimal ties at the stored precision", () => {
+  it("rounds exact line and tax ties once, including credit amounts", () => {
+    const sale = TaxCalculator.calculateLineItemTax({
+      unitPrice: 0.015,
+      quantity: 0.01,
+      taxRate: 0.25,
+    });
+    expect(sale.subtotal).toBe(0.0002);
+    expect(sale.taxAmount).toBe(0.0001);
+    expect(sale.total).toBe(0.0003);
+    const credit = TaxCalculator.calculateLineItemTax({
+      unitPrice: -0.015,
+      quantity: 0.01,
+      taxRate: 0.25,
+    });
+    expect(credit.total).toBe(-0.0003);
+    expect(TaxCalculator.roundToFour(5e-5)).toBe(0.0001);
+    expect(TaxCalculator.roundToFour(-5e-5)).toBe(-0.0001);
+  });
+});

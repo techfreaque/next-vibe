@@ -105,6 +105,7 @@ export class PosOrderGetRepository {
       return success({
         result: {
           id: order.id,
+          companyId: terminal.companyId,
           orderNumber: order.orderNumber,
           sessionId: order.sessionId,
           customerId: order.customerId ?? null,

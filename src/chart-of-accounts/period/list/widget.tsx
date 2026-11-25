@@ -1,13 +1,16 @@
 "use client";
 
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { Badge } from "next-vibe/ui/components/badge";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { BarChart } from "next-vibe/ui/components/icons/BarChart";
 import { Building } from "next-vibe/ui/components/icons/Building";
 import { Span } from "next-vibe/ui/components/span";
+import { formatDocDate } from "next-vibe/unified-ui/_shared/format-money";
 import { usePickerCallback } from "next-vibe/unified-ui/_shared/picker-context";
 import {
+  useWidgetLocale,
   useWidgetNavigation,
   useWidgetOnSubmit,
   useWidgetTranslation,
@@ -15,53 +18,33 @@ import {
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { type JSX, useEffect, useRef } from "react";
 
+import { PeriodStatus } from "../../enum";
 import type definition from "./definition";
 import type { CoaPeriodListResponseOutput } from "./definition";
 
 type Period = NonNullable<CoaPeriodListResponseOutput["periods"]>[number];
 
-const STATUS_VARIANT_MAP: Record<
-  string,
-  "default" | "secondary" | "destructive" | "outline"
-> = {
-  OPEN: "default",
-  CLOSED: "secondary",
-  LOCKED: "destructive",
-};
-
-const STATUS_COLOR_MAP: Record<string, string> = {
-  OPEN: "bg-emerald-600 hover:bg-emerald-600",
-  CLOSED: "",
-  LOCKED: "",
-};
-
-function fmtDate(d: Date | string): string {
-  if (d instanceof Date) {
-    return d.toLocaleDateString(undefined, {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
-  }
-  return String(d).slice(0, 10);
-}
-
 function PeriodRow({
   period,
   onView,
   statusLabel,
+  locale,
 }: {
   period: Period;
   onView: (id: string) => void;
   statusLabel: string;
+  locale: CountryLanguage;
 }): JSX.Element {
-  const isOpen = period.status === "OPEN";
-  const statusVariant = STATUS_VARIANT_MAP[period.status] ?? "secondary";
-  const statusColorClass = STATUS_COLOR_MAP[period.status] ?? "";
+  const isOpen = period.status === PeriodStatus.OPEN;
+  const statusVariant = isOpen
+    ? "default"
+    : period.status === PeriodStatus.LOCKED
+      ? "destructive"
+      : "secondary";
 
   return (
     <Div
-      className={`flex items-center gap-3 py-2.5 px-4 border-b last:border-b-0 hover:bg-muted/30 transition-colors cursor-pointer ${isOpen ? "bg-green-50/30 dark:bg-green-900/10" : ""}`}
+      className={`flex items-center gap-3 py-2.5 px-4 border-b last:border-b-0 hover:bg-muted/30 transition-colors cursor-pointer `}
       onClick={() => {
         onView(period.id);
       }}
@@ -73,13 +56,10 @@ function PeriodRow({
           {period.name}
         </Span>
         <Span className="text-xs text-muted-foreground">
-          {fmtDate(period.startDate)} — {fmtDate(period.endDate)}
+          {`${formatDocDate(period.startDate, locale)} – ${formatDocDate(period.endDate, locale)}`}
         </Span>
       </Div>
-      <Badge
-        variant={statusVariant}
-        className={`text-xs shrink-0 ${statusColorClass}`}
-      >
+      <Badge variant={statusVariant} className="text-xs shrink-0">
         {statusLabel}
       </Badge>
     </Div>
@@ -94,6 +74,7 @@ export function CoaPeriodListWidget(
 ): JSX.Element {
   const data = useWidgetValue<typeof definition.GET>();
   const navigation = useWidgetNavigation();
+  const locale = useWidgetLocale();
   const t = useWidgetTranslation<typeof definition.GET>();
   const onSubmit = useWidgetOnSubmit();
   const onPick =
@@ -158,9 +139,12 @@ export function CoaPeriodListWidget(
     <Div className="flex flex-col gap-4">
       {/* Header bar */}
       <Div className="flex items-center justify-between gap-2">
-        <Span className="text-sm text-muted-foreground">
-          {periods.length} {t("get.response.periods")}
-        </Span>
+        <Div className="flex flex-wrap items-center gap-2">
+          <Span className="text-sm font-medium">{t("get.title")}</Span>
+          <Badge variant="outline">
+            {new Intl.NumberFormat(locale).format(periods.length)}
+          </Badge>
+        </Div>
         {!isPickerMode && (
           <Button variant="default" size="sm" onClick={handleCreate}>
             {t("get.widget.createButton")}
@@ -179,11 +163,14 @@ export function CoaPeriodListWidget(
             <PeriodRow
               key={period.id}
               period={period}
+              locale={locale}
               onView={handleView}
               statusLabel={t(
-                `enums.periodStatus.${period.status}` as Parameters<
-                  typeof t
-                >[0],
+                period.status === PeriodStatus.OPEN
+                  ? PeriodStatus.OPEN
+                  : period.status === PeriodStatus.LOCKED
+                    ? PeriodStatus.LOCKED
+                    : PeriodStatus.CLOSED,
               )}
             />
           ))}

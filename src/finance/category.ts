@@ -31,6 +31,20 @@ export const category: CategoryDefinition = {
     [UserPermissionRole.PUBLIC]: USER_ME_ALIAS,
   },
   subcategories: {
+    "Bank reconciliation": {
+      icon: "wallet",
+      order: 1,
+      label: {
+        "en-US": "Bank reconciliation",
+        "en-GLOBAL": "Bank reconciliation",
+        "de-DE": "Bankabgleich",
+        "pl-PL": "Uzgadnianie banku",
+        "fr-FR": "Rapprochement bancaire",
+        "it-IT": "Riconciliazione bancaria",
+        "es-ES": "Conciliación bancaria",
+        "sk-SK": "Párovanie bankových pohybov",
+      },
+    },
     Monitoring: {
       icon: "activity",
       order: 0,
@@ -42,6 +56,7 @@ export const category: CategoryDefinition = {
         "fr-FR": "Monitoring",
         "it-IT": "Monitoraggio",
         "es-ES": "Monitoreo",
+        "sk-SK": "Monitorovanie",
       },
     },
   },

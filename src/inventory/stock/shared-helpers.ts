@@ -1,61 +1,53 @@
-/**
- * Shared helpers for stock movement operations
- * Encapsulates the upsert-stockLevel + insert-stockMovement pattern
- */
+import "server-only";
 
-import { and, eq } from "drizzle-orm";
+import { and, eq, isNull, or, sql } from "drizzle-orm";
 import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translation";
-import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
+  type ResponseType,
   success,
 } from "next-vibe/core/route/response.schema";
 import { db } from "next-vibe/database";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import type { LoggerMetadata } from "next-vibe/logger/types";
+
+import { catalogProducts } from "@/products/db";
 
 import { stockLevels, stockMovements, warehouses } from "../db";
 import type { StockMovementTypeDB } from "../enum";
 
-type MovementType = (typeof StockMovementTypeDB)[number];
+export type StockTransaction = Parameters<
+  Parameters<typeof db.transaction>[0]
+>[0];
 
-/**
- * Get warehouse → companyId mapping; returns null if warehouse not found
- */
 export async function getWarehouseCompanyId(
   warehouseId: string,
 ): Promise<string | null> {
   const [row] = await db
     .select({ companyId: warehouses.companyId })
     .from(warehouses)
-    .where(eq(warehouses.id, warehouseId))
-    .limit(1);
+    .where(eq(warehouses.id, warehouseId));
   return row?.companyId ?? null;
 }
 
-/**
- * Apply a stock movement:
- * - Upserts the stockLevels row (creates if not exists, updates quantityOnHand)
- * - Inserts a stockMovements row
- * - Updates weighted average unitCost on receipts
- *
- * Returns { movementId, quantityOnHand, quantityAvailable }
- */
-export async function applyStockMovement(opts: {
-  warehouseId: string;
-  productId: string;
-  type: MovementType;
-  quantity: number; // signed: positive = in, negative = out
-  unitCost?: number;
-  reference?: string;
-  notes?: string;
-  sourceId?: string;
-  sourceType?: string;
-  userId: string;
-  logger: EndpointLogger;
-  insufficientStockError: TranslatedKeyType;
-}): Promise<
+export async function applyStockMovement(
+  opts: {
+    warehouseId: string;
+    companyId?: string;
+    productId: string;
+    type: (typeof StockMovementTypeDB)[number];
+    quantity: number;
+    unitCost?: number;
+    reference?: string;
+    notes?: string;
+    sourceId?: string;
+    sourceType?: string;
+    userId: string;
+    logger: EndpointLogger;
+    insufficientStockError: TranslatedKeyType;
+  },
+  tx?: StockTransaction,
+): Promise<
   ResponseType<{
     movementId: string;
     quantityOnHand: number;
@@ -64,24 +56,69 @@ export async function applyStockMovement(opts: {
     unitCost: number | null;
   }>
 > {
-  const {
-    warehouseId,
-    productId,
-    type,
-    quantity,
-    unitCost,
-    reference,
-    notes,
-    sourceId,
-    sourceType,
-    userId,
-    logger,
-    insufficientStockError,
-  } = opts;
+  if (!tx) {
+    return db.transaction((transaction) =>
+      applyStockMovement(opts, transaction),
+    );
+  }
+  const { warehouseId, productId, quantity, unitCost, userId } = opts;
+  const invalid = fail({
+    message: opts.insufficientStockError,
+    errorType: ErrorResponseTypes.CONFLICT,
+  });
+  const quantityUnits = Math.round(quantity * 10_000);
+  if (
+    !quantityUnits ||
+    !Number.isSafeInteger(quantityUnits) ||
+    quantityUnits / 10_000 !== quantity ||
+    (unitCost !== undefined &&
+      (!Number.isFinite(unitCost) ||
+        unitCost < 0 ||
+        Math.round(unitCost * 10_000) / 10_000 !== unitCost))
+  ) {
+    return invalid;
+  }
 
-  // Get or create stock level
-  const [existing] = await db
-    .select()
+  // Lock the warehouse even for its first stock row, when there is no level to lock yet.
+  const [warehouse] = await tx
+    .select({ companyId: warehouses.companyId })
+    .from(warehouses)
+    .where(
+      and(
+        eq(warehouses.id, warehouseId),
+        eq(warehouses.isActive, true),
+        opts.companyId ? eq(warehouses.companyId, opts.companyId) : undefined,
+      ),
+    )
+    .for("update");
+  if (!warehouse) {
+    return invalid;
+  }
+  const [product] = await tx
+    .select({ id: catalogProducts.id })
+    .from(catalogProducts)
+    .where(
+      and(
+        eq(catalogProducts.id, productId),
+        or(
+          eq(catalogProducts.companyId, warehouse.companyId),
+          and(
+            isNull(catalogProducts.companyId),
+            eq(catalogProducts.ownerUserId, userId),
+          ),
+        ),
+      ),
+    );
+  if (!product) {
+    return invalid;
+  }
+
+  const [level] = await tx
+    .select({
+      onHand: stockLevels.quantityOnHand,
+      reserved: stockLevels.quantityReserved,
+      unitCost: stockLevels.unitCost,
+    })
     .from(stockLevels)
     .where(
       and(
@@ -89,98 +126,58 @@ export async function applyStockMovement(opts: {
         eq(stockLevels.productId, productId),
       ),
     )
-    .limit(1);
-
-  const currentOnHand = existing?.quantityOnHand ?? 0;
-  const currentReserved = existing?.quantityReserved ?? 0;
-  const currentOnOrder = existing?.quantityOnOrder ?? 0;
-  const currentCost = existing?.unitCost ?? null;
-
-  // Validate available stock for outbound movements
-  if (quantity < 0) {
-    const available = currentOnHand - currentReserved;
-    if (available + quantity < 0) {
-      return fail({
-        message: insufficientStockError,
-        errorType: ErrorResponseTypes.CONFLICT,
-      });
-    }
+    .for("update");
+  if (
+    quantity < 0 &&
+    Math.round((level?.onHand ?? 0) * 10_000) -
+      Math.round((level?.reserved ?? 0) * 10_000) +
+      quantityUnits <
+      0
+  ) {
+    return invalid;
   }
 
-  const newOnHand = currentOnHand + quantity;
-
-  // Weighted average cost update (only on positive movements with cost)
-  let newUnitCost = currentCost;
-  if (quantity > 0 && unitCost !== undefined && unitCost !== null) {
-    if (currentCost === null || currentOnHand === 0) {
-      newUnitCost = unitCost;
-    } else {
-      newUnitCost =
-        (currentOnHand * currentCost + quantity * unitCost) /
-        (currentOnHand + quantity);
-    }
-  }
-
-  try {
-    // Upsert stock level
-    if (!existing) {
-      await db.insert(stockLevels).values({
-        warehouseId,
-        productId,
-        quantityOnHand: newOnHand,
-        quantityReserved: currentReserved,
-        quantityOnOrder: currentOnOrder,
-        unitCost: newUnitCost ?? undefined,
+  const cost =
+    quantity > 0 && unitCost !== undefined
+      ? sql`case when ${stockLevels.unitCost} is null or ${stockLevels.quantityOnHand} = 0 then ${unitCost}::numeric
+      else (${stockLevels.quantityOnHand} * ${stockLevels.unitCost} + ${quantity}::numeric * ${unitCost}::numeric) / (${stockLevels.quantityOnHand} + ${quantity}::numeric) end`
+      : stockLevels.unitCost;
+  const [saved] = await tx
+    .insert(stockLevels)
+    .values({ warehouseId, productId, quantityOnHand: quantity, unitCost })
+    .onConflictDoUpdate({
+      target: [stockLevels.warehouseId, stockLevels.productId],
+      set: {
+        quantityOnHand: sql`${stockLevels.quantityOnHand} + ${quantity}::numeric`,
+        unitCost: sql`${cost}`,
         updatedAt: new Date(),
-      });
-    } else {
-      await db
-        .update(stockLevels)
-        .set({
-          quantityOnHand: newOnHand,
-          unitCost: newUnitCost ?? undefined,
-          updatedAt: new Date(),
-        })
-        .where(eq(stockLevels.id, existing.id));
-    }
-
-    // Insert movement record
-    const [movement] = await db
-      .insert(stockMovements)
-      .values({
-        warehouseId,
-        productId,
-        type,
-        quantity,
-        unitCost: unitCost ?? undefined,
-        reference: reference ?? undefined,
-        sourceId: sourceId ?? undefined,
-        sourceType: sourceType ?? undefined,
-        notes: notes ?? undefined,
-        createdByUserId: userId,
-        createdAt: new Date(),
-      })
-      .returning({ id: stockMovements.id });
-
-    if (!movement) {
-      return fail({
-        message: insufficientStockError,
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-      });
-    }
-
-    return success({
-      movementId: movement.id,
-      quantityOnHand: newOnHand,
-      quantityReserved: currentReserved,
-      quantityAvailable: newOnHand - currentReserved,
-      unitCost: newUnitCost,
+      },
+    })
+    .returning({
+      quantityOnHand: stockLevels.quantityOnHand,
+      quantityReserved: stockLevels.quantityReserved,
+      unitCost: stockLevels.unitCost,
     });
-  } catch (error) {
-    logger.error("Error applying stock movement", error as LoggerMetadata);
-    return fail({
-      message: insufficientStockError,
-      errorType: ErrorResponseTypes.INTERNAL_ERROR,
-    });
-  }
+  const movementId = crypto.randomUUID();
+  await tx.insert(stockMovements).values({
+    id: movementId,
+    warehouseId,
+    productId,
+    type: opts.type,
+    quantity,
+    unitCost: quantity < 0 ? level?.unitCost : unitCost,
+    reference: opts.reference,
+    sourceId: opts.sourceId,
+    sourceType: opts.sourceType,
+    notes: opts.notes,
+    createdByUserId: userId,
+  });
+  return success({
+    movementId,
+    ...saved,
+    quantityAvailable:
+      (Math.round(saved.quantityOnHand * 10_000) -
+        Math.round(saved.quantityReserved * 10_000)) /
+      10_000,
+  });
 }

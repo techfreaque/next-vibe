@@ -86,7 +86,7 @@ export const translations: typeof enTranslations = {
     },
     server: {
       title: "Błąd serwera",
-      description: "Operacja nie powiodła się — spróbuj ponownie",
+      description: "Operacja nie powiodła się. Spróbuj ponownie.",
     },
     unknown: {
       title: "Nieznany błąd",
@@ -277,7 +277,29 @@ export const translations: typeof enTranslations = {
     },
   },
   journalCreate: {
+    errorDate: "Wybierz datę z wybranego okresu.",
+    errorCurrency: "W każdej pozycji użyj waluty księgowej firmy.",
+    errorInvalidLine:
+      "Podaj dodatnią kwotę po stronie Wn lub Ma z dokładnością do czterech miejsc po przecinku.",
+    errorAccount: "Wybierz odpowiednie konto tej firmy.",
     widget: {
+      lineDescription: "Opis pozycji",
+      incomplete: "Wpisz kwotę po stronie Wn lub Ma w każdym wierszu.",
+      offByLessThan: "Różnica poniżej {{amount}}",
+      offBy: "Różnica {{amount}}",
+
+      details: "Dane zapisu",
+      saveDraft: "Zapisz szkic",
+      addLine: "Dodaj pozycję",
+      removeLine: "Usuń pozycję",
+      account: "Konto",
+      side: "Strona zapisu",
+      amount: "Kwota",
+      currency: "Waluta",
+      missingScope: "Wybierz firmę przed dodaniem pozycji.",
+      noPeriods: "Ta firma nie ma otwartych okresów rozliczeniowych.",
+      noAccounts: "Ta firma nie ma aktywnych kont do księgowania.",
+
       back: "Wstecz",
       viewEntryButton: "Pokaż wpis",
       postNowButton: "Zaksięguj teraz",
@@ -292,12 +314,12 @@ export const translations: typeof enTranslations = {
     description:
       "Ręczny zapis podwójnego zapisu. Suma debetów musi być równa sumie kredytów.",
     companyId: {
-      label: "ID firmy",
+      label: "Firma",
       description: "Firma dla tego zapisu",
       placeholder: "UUID firmy",
     },
     periodId: {
-      label: "ID okresu",
+      label: "Okres rozliczeniowy",
       description: "Okres rozliczeniowy",
       placeholder: "UUID okresu",
     },
@@ -336,7 +358,7 @@ export const translations: typeof enTranslations = {
     title: "Zaksięguj zapis",
     titleShort: "Zaksięguj",
     description:
-      "Zmień status SZKICU na ZAKSIĘGOWANY. Nieodwracalne — użyj Stornowania zamiast tego.",
+      "Zaksięguj zapis roboczy. Po zaksięgowaniu można go skorygować przez storno.",
     entryId: {
       label: "ID zapisu",
       description: "Zapis do zaksięgowania",
@@ -351,6 +373,9 @@ export const translations: typeof enTranslations = {
     errorNotDraft: "Tylko szkice mogą być zaksięgowane",
   },
   journalReverse: {
+    errorManaged: "Wystornuj zapis w dokumencie źródłowym.",
+    errorDate: "Data storna nie może poprzedzać daty pierwotnego zapisu.",
+    errorNoPeriod: "Otwórz okres księgowy obejmujący datę storna.",
     widget: {
       backButton: "Powrót do dziennika",
       reversalCreated: "Utworzono zapis stornujący",
@@ -446,7 +471,7 @@ export const translations: typeof enTranslations = {
     },
     asOfDate: {
       label: "Na dzień",
-      description: "Data raportu — domyślnie dzisiaj",
+      description: "Data raportu (domyślnie dzisiejsza)",
       placeholder: "RRRR-MM-DD",
     },
     periodId: {
@@ -506,7 +531,13 @@ export const translations: typeof enTranslations = {
     },
   },
   reports: {
+    switchReport: "Raporty",
+    currency: "Waluta",
+    mixedCurrency:
+      "Ten okres obejmuje zapisy w kilku walutach. Wybierz walutę raportu.",
     nav: {
+      ledgerTax: "VAT w księdze głównej",
+      payables: "Wiekowanie zobowiązań",
       profitLoss: "Wynik finansowy",
       balanceSheet: "Bilans",
       trialBalance: "Zestawienie obrotów",
@@ -514,6 +545,10 @@ export const translations: typeof enTranslations = {
       receivablesAging: "Wiekowanie należności",
     },
     widget: {
+      quickDates: "Wybierz zakres",
+      thisMonth: "Bieżący miesiąc",
+      previousMonth: "Poprzedni miesiąc",
+      autoCurrency: "Automatyczna",
       run: "Uruchom",
       running: "Trwa…",
     },
@@ -618,10 +653,11 @@ export const translations: typeof enTranslations = {
     },
     asOfDate: {
       label: "Na dzień",
-      description: "Data raportu — domyślnie dzisiaj",
+      description: "Data raportu (domyślnie dzisiejsza)",
       placeholder: "RRRR-MM-DD",
     },
     response: {
+      unclosedEarnings: "Nierozliczony wynik finansowy",
       asOfDate: "Na dzień",
       assets: "Aktywa",
       totalAssets: "Suma aktywów",
@@ -670,38 +706,39 @@ export const translations: typeof enTranslations = {
     },
   },
   receivablesAging: {
+    currencies: { EUR: "EUR", USD: "USD", PLN: "PLN" },
     widget: {
-      asOf: "Na dzień",
-      noData: "Brak otwartych należności.",
+      asOf: "Data odniesienia",
+      noData: "Brak niezapłaconych faktur w tej walucie.",
       totalRow: "Razem",
       viewInvoice: "Podgląd",
-      selectCompany:
-        "Podaj ID firmy powyżej i kliknij Uruchom, aby wygenerować raport należności.",
+      selectCompany: "Wybierz firmę, aby wyświetlić raport.",
     },
-    title: "Starzenie należności",
-    titleShort: "Starzenie należności",
-    description:
-      "Niezapłacone faktury pogrupowane według dni przeterminowania. Pokazuje, gdzie tkwią pieniądze.",
+    title: "Niezapłacone faktury",
+    titleShort: "Niezapłacone faktury",
+    description: "Otwarte należności według terminu płatności i waluty.",
     companyId: {
-      label: "ID firmy",
-      description: "Firma do raportu",
+      label: "Firma",
+      description: "Wybierz firmę, której należności chcesz sprawdzić.",
       placeholder: "UUID firmy",
     },
     asOfDate: {
-      label: "Na dzień",
-      description: "Data referencyjna — domyślnie dzisiaj",
+      label: "Data odniesienia",
+      description:
+        "Ta data określa przedział opóźnienia dla kwot, które nadal pozostają do zapłaty.",
       placeholder: "RRRR-MM-DD",
     },
     response: {
-      asOfDate: "Na dzień",
+      currency: "Waluta",
+      asOfDate: "Data odniesienia",
       buckets: "Przedziały",
-      current: "Bieżące",
+      current: "W terminie",
       days1to30: "1–30 dni",
       days31to60: "31–60 dni",
       days61to90: "61–90 dni",
       over90: "Ponad 90 dni",
-      invoiceId: "ID faktury",
-      customerId: "ID klienta",
+      invoiceId: "Faktura",
+      customerId: "Klient",
       amount: "Kwota",
       dueDate: "Termin płatności",
       totals: "Sumy",

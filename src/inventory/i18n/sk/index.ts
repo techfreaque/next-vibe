@@ -45,8 +45,6 @@ export const translations: typeof enTranslations = {
       cancelled: "Zrušené",
     },
   },
-
-  // Warehouse create
   warehouseCreate: {
     post: {
       title: "Vytvoriť sklad",
@@ -114,7 +112,10 @@ export const translations: typeof enTranslations = {
           title: "Chyba siete",
           description: "Skontrolujte pripojenie a skúste to znova",
         },
-        notFound: { title: "Firma sa nenašla", description: "Firma sa nenašla" },
+        notFound: {
+          title: "Firma sa nenašla",
+          description: "Firma sa nenašla",
+        },
         unsavedChanges: {
           title: "Neuložené zmeny",
           description: "Máte neuložené zmeny",
@@ -134,8 +135,6 @@ export const translations: typeof enTranslations = {
       },
     },
   },
-
-  // Warehouse list
   warehouseList: {
     get: {
       title: "Sklady",
@@ -173,7 +172,10 @@ export const translations: typeof enTranslations = {
           title: "Prístup zamietnutý",
           description: "K tejto firme nemáte prístup",
         },
-        conflict: { title: "Konflikt", description: "Konflikt údajov" },
+        conflict: {
+          title: "Konflikt",
+          description: "Konflikt údajov",
+        },
         server: {
           title: "Chyba servera",
           description: "Sklady sa nepodarilo načítať",
@@ -186,7 +188,10 @@ export const translations: typeof enTranslations = {
           title: "Chyba siete",
           description: "Skontrolujte pripojenie a skúste to znova",
         },
-        notFound: { title: "Firma sa nenašla", description: "Firma sa nenašla" },
+        notFound: {
+          title: "Firma sa nenašla",
+          description: "Firma sa nenašla",
+        },
         unsavedChanges: {
           title: "Neuložené zmeny",
           description: "Máte neuložené zmeny",
@@ -207,8 +212,6 @@ export const translations: typeof enTranslations = {
       },
     },
   },
-
-  // Warehouse get
   warehouseGet: {
     get: {
       title: "Načítať sklad",
@@ -237,7 +240,10 @@ export const translations: typeof enTranslations = {
           title: "Prístup zamietnutý",
           description: "K tomuto skladu nemáte prístup",
         },
-        conflict: { title: "Konflikt", description: "Konflikt údajov" },
+        conflict: {
+          title: "Konflikt",
+          description: "Konflikt údajov",
+        },
         server: {
           title: "Chyba servera",
           description: "Sklad sa nepodarilo načítať",
@@ -276,8 +282,6 @@ export const translations: typeof enTranslations = {
       },
     },
   },
-
-  // Warehouse update
   warehouseUpdate: {
     patch: {
       title: "Upraviť sklad",
@@ -366,8 +370,6 @@ export const translations: typeof enTranslations = {
       },
     },
   },
-
-  // Stock list
   stockList: {
     get: {
       title: "Stav zásob",
@@ -375,6 +377,12 @@ export const translations: typeof enTranslations = {
       description:
         "Zobraziť stav zásob v sklade vrátane dostupného množstva a upozornení na nízke zásoby.",
       widget: {
+        unnamedProduct: "Produkt bez dostupného názvu",
+        search: "Vyhľadať produkt alebo sklad",
+        stockStatus: "Stav zásob",
+        actions: "Akcie",
+        noMatches: "Vyhľadávaniu nezodpovedá žiadna skladová položka.",
+        loadMore: "Zobraziť viac",
         back: "Späť",
         lowStock: "Nízky stav zásob",
         available: "Dostupné množstvo",
@@ -395,7 +403,8 @@ export const translations: typeof enTranslations = {
         outOfStock: "bez zásob",
         belowReorderPoint: "pod hranicou doobjednania",
         bulletSeparator: "·",
-        statusOk: "V poriadku",
+        stockValue: "Hodnota zásob",
+        statusOk: "Na sklade",
       },
       warehouseId: {
         label: "ID skladu",
@@ -418,7 +427,10 @@ export const translations: typeof enTranslations = {
           title: "Prístup zamietnutý",
           description: "K tomuto skladu nemáte prístup",
         },
-        conflict: { title: "Konflikt", description: "Konflikt údajov" },
+        conflict: {
+          title: "Konflikt",
+          description: "Konflikt údajov",
+        },
         server: {
           title: "Chyba servera",
           description: "Stav zásob sa nepodarilo načítať",
@@ -440,8 +452,12 @@ export const translations: typeof enTranslations = {
           description: "Máte neuložené zmeny",
         },
       },
-      success: { title: "Zásoby načítané", description: "Stav zásob sa načítal" },
+      success: {
+        title: "Zásoby načítané",
+        description: "Stav zásob sa načítal",
+      },
       response: {
+        currency: "Mena",
         id: "ID skladovej položky",
         warehouseId: "ID skladu",
         warehouseName: "Sklad",
@@ -459,8 +475,6 @@ export const translations: typeof enTranslations = {
       },
     },
   },
-
-  // Stock adjust
   stockAdjust: {
     post: {
       title: "Upraviť stav zásob",
@@ -479,7 +493,10 @@ export const translations: typeof enTranslations = {
         label: "ID skladu",
         description: "Sklad, v ktorom sa upraví množstvo zásob",
       },
-      productId: { label: "ID produktu", description: "Produkt, ktorého množstvo chcete upraviť" },
+      productId: {
+        label: "ID produktu",
+        description: "Produkt, ktorého množstvo chcete upraviť",
+      },
       quantity: {
         label: "Množstvo",
         description:
@@ -547,14 +564,12 @@ export const translations: typeof enTranslations = {
       },
     },
   },
-
-  // Stock receive
   stockReceive: {
     post: {
       title: "Prijať zásoby",
       titleShort: "Stav príjmu",
       description:
-        "Zaznamenať príjem zásob. Aktualizuje sa množstvo na sklade aj vážená priemerná obstarávacia cena.",
+        "Zaznamenať príjem zásob. Prepočíta sa množstvo na sklade aj vážená priemerná obstarávacia cena.",
       widget: {
         backToStock: "Späť na sklade",
       },
@@ -562,7 +577,10 @@ export const translations: typeof enTranslations = {
         label: "ID skladu",
         description: "Sklad, ktorý zásoby prijíma",
       },
-      productId: { label: "ID produktu", description: "Produkt, ktorý prijímate na sklad" },
+      productId: {
+        label: "ID produktu",
+        description: "Produkt, ktorý prijímate na sklad",
+      },
       quantity: {
         label: "Množstvo",
         description: "Počet prijatých jednotiek",
@@ -591,7 +609,10 @@ export const translations: typeof enTranslations = {
           title: "Prístup zamietnutý",
           description: "K tomuto skladu nemáte prístup",
         },
-        conflict: { title: "Konflikt", description: "Konflikt údajov" },
+        conflict: {
+          title: "Konflikt",
+          description: "Konflikt údajov",
+        },
         server: {
           title: "Chyba servera",
           description: "Príjem zásob sa nepodarilo zaznamenať",
@@ -626,8 +647,6 @@ export const translations: typeof enTranslations = {
       },
     },
   },
-
-  // Stock issue
   stockIssue: {
     post: {
       title: "Vydať zásoby",
@@ -641,7 +660,10 @@ export const translations: typeof enTranslations = {
         label: "ID skladu",
         description: "Sklad, z ktorého sa vydávajú zásoby",
       },
-      productId: { label: "ID produktu", description: "Produkt, ktorý vydávate zo skladu" },
+      productId: {
+        label: "ID produktu",
+        description: "Produkt, ktorý vydávate zo skladu",
+      },
       quantity: {
         label: "Množstvo",
         description: "Počet jednotiek na výdaj",
@@ -654,7 +676,8 @@ export const translations: typeof enTranslations = {
       },
       unitCost: {
         label: "Jednotková obstarávacia cena",
-        description: "Obstarávacia cena za jednotku. Ak ju nezadáte, použije sa aktuálna vážená priemerná cena.",
+        description:
+          "Obstarávacia cena za jednotku. Ak ju nezadáte, použije sa aktuálna vážená priemerná cena.",
         placeholder: "0.00",
       },
       errors: {
@@ -674,7 +697,10 @@ export const translations: typeof enTranslations = {
           title: "Nedostatok zásob",
           description: "Na výdaj nie je k dispozícii dostatok zásob",
         },
-        server: { title: "Chyba servera", description: "Zásoby sa nepodarilo vydať" },
+        server: {
+          title: "Chyba servera",
+          description: "Zásoby sa nepodarilo vydať",
+        },
         unknown: {
           title: "Neznáma chyba",
           description: "Nastala neočakávaná chyba",
@@ -705,8 +731,6 @@ export const translations: typeof enTranslations = {
       },
     },
   },
-
-  // Transfer create
   transferCreate: {
     post: {
       title: "Vytvoriť presun zásob",
@@ -773,7 +797,10 @@ export const translations: typeof enTranslations = {
           title: "Chyba siete",
           description: "Skontrolujte pripojenie a skúste to znova",
         },
-        notFound: { title: "Sklad sa nenašiel", description: "Sklad sa nenašiel" },
+        notFound: {
+          title: "Sklad sa nenašiel",
+          description: "Sklad sa nenašiel",
+        },
         unsavedChanges: {
           title: "Neuložené zmeny",
           description: "Máte neuložené zmeny",
@@ -792,8 +819,6 @@ export const translations: typeof enTranslations = {
       },
     },
   },
-
-  // Transfer list
   transferList: {
     get: {
       title: "Presuny",
@@ -837,7 +862,10 @@ export const translations: typeof enTranslations = {
           title: "Prístup zamietnutý",
           description: "K tejto firme nemáte prístup",
         },
-        conflict: { title: "Konflikt", description: "Konflikt údajov" },
+        conflict: {
+          title: "Konflikt",
+          description: "Konflikt údajov",
+        },
         server: {
           title: "Chyba servera",
           description: "Presuny sa nepodarilo načítať",
@@ -850,7 +878,10 @@ export const translations: typeof enTranslations = {
           title: "Chyba siete",
           description: "Skontrolujte pripojenie a skúste to znova",
         },
-        notFound: { title: "Firma sa nenašla", description: "Firma sa nenašla" },
+        notFound: {
+          title: "Firma sa nenašla",
+          description: "Firma sa nenašla",
+        },
         unsavedChanges: {
           title: "Neuložené zmeny",
           description: "Máte neuložené zmeny",
@@ -873,8 +904,6 @@ export const translations: typeof enTranslations = {
       },
     },
   },
-
-  // Transfer get
   transferGet: {
     get: {
       title: "Načítať podrobnosti presunu",
@@ -887,7 +916,10 @@ export const translations: typeof enTranslations = {
         status: "Stav",
         select: "Vyberte presun",
       },
-      transferId: { label: "ID presunu", description: "Presun, ktorý chcete načítať" },
+      transferId: {
+        label: "ID presunu",
+        description: "Presun, ktorý chcete načítať",
+      },
       errors: {
         validation: {
           title: "Neplatné údaje",
@@ -901,7 +933,10 @@ export const translations: typeof enTranslations = {
           title: "Prístup zamietnutý",
           description: "K tomuto presunu nemáte prístup",
         },
-        conflict: { title: "Konflikt", description: "Konflikt údajov" },
+        conflict: {
+          title: "Konflikt",
+          description: "Konflikt údajov",
+        },
         server: {
           title: "Chyba servera",
           description: "Presun sa nepodarilo načítať",
@@ -948,8 +983,6 @@ export const translations: typeof enTranslations = {
       },
     },
   },
-
-  // Transfer dispatch
   transferDispatch: {
     post: {
       title: "Expedovať presun",
@@ -959,7 +992,10 @@ export const translations: typeof enTranslations = {
       widget: {
         backToTransfer: "Späť na podrobnosti presunu",
       },
-      transferId: { label: "ID presunu", description: "Presun, ktorý chcete expedovať" },
+      transferId: {
+        label: "ID presunu",
+        description: "Presun, ktorý chcete expedovať",
+      },
       errors: {
         validation: {
           title: "Neplatné údaje",
@@ -1008,8 +1044,6 @@ export const translations: typeof enTranslations = {
       },
     },
   },
-
-  // Transfer receive
   transferReceive: {
     post: {
       title: "Prijať presun",
@@ -1019,7 +1053,10 @@ export const translations: typeof enTranslations = {
       widget: {
         backToTransfer: "Späť na podrobnosti presunu",
       },
-      transferId: { label: "ID presunu", description: "Presun, ktorý chcete prijať" },
+      transferId: {
+        label: "ID presunu",
+        description: "Presun, ktorý chcete prijať",
+      },
       errors: {
         validation: {
           title: "Neplatné údaje",
@@ -1060,7 +1097,8 @@ export const translations: typeof enTranslations = {
       },
       success: {
         title: "Presun prijatý",
-        description: "Skladové pohyby sa zaznamenali a stav zásob sa aktualizoval",
+        description:
+          "Skladové pohyby sa zaznamenali a stav zásob sa aktualizoval",
       },
       response: {
         id: "ID presunu",
@@ -1069,8 +1107,6 @@ export const translations: typeof enTranslations = {
       },
     },
   },
-
-  // Inventory Dashboard
   dashboard: {
     get: {
       title: "Prehľad zásob",
@@ -1082,6 +1118,10 @@ export const translations: typeof enTranslations = {
         kpiOutOfStock: "Bez zásob",
         kpiLowStock: "Nízka zásoba",
         kpiWarehouses: "Sklady",
+        attention: "Zásoby na doplnenie",
+        noAttention: "Žiadna položka nie je pod hranicou doobjednania.",
+        newPurchaseOrder: "Nová nákupná objednávka",
+        kpiTransfersInTransit: "Presuny na ceste",
         alertOutOfStock: "{{count}} produkt bez zásob",
         alertOutOfStockPlural: "Počet produktov bez zásob: {{count}}",
         navStockLevels: "Stav zásob",
@@ -1108,7 +1148,11 @@ export const translations: typeof enTranslations = {
           title: "Prístup zamietnutý",
           description: "K tejto firme nemáte prístup.",
         },
-        conflict: { title: "Konflikt údajov", description: "Požadovaná operácia je v konflikte s existujúcimi údajmi." },
+        conflict: {
+          title: "Konflikt údajov",
+          description:
+            "Požadovaná operácia je v konflikte s existujúcimi údajmi.",
+        },
         server: {
           title: "Chyba servera",
           description: "Prehľad zásob sa nepodarilo načítať",
@@ -1121,7 +1165,10 @@ export const translations: typeof enTranslations = {
           title: "Chyba pripojenia",
           description: "Skontrolujte pripojenie a skúste to znova",
         },
-        notFound: { title: "Záznam sa nenašiel", description: "Firma sa nenašla." },
+        notFound: {
+          title: "Záznam sa nenašiel",
+          description: "Firma sa nenašla.",
+        },
         unsavedChanges: {
           title: "Neuložené zmeny",
           description: "Máte neuložené zmeny.",

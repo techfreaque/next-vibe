@@ -3,30 +3,28 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   enums: {
     country: {
-      AT: "AT — ÖKR",
-      DE: "DE — SKR03",
-      XX: "XX — MSSF Ogólny",
+      AT: "Austria (ÖKR)",
+      DE: "Niemcy (SKR03)",
+      XX: "Ogólny szablon MSSF",
     },
   },
   post: {
-    title: "Inicjalizacja planu kont",
-    titleShort: "Konfiguracja",
-    description:
-      "Konfiguruje plan kont firmy na podstawie szablonu krajowego. Idempotentny — bezpieczne wielokrotne uruchamianie.",
+    title: "Skonfiguruj plan kont",
+    titleShort: "Skonfiguruj plan kont",
+    description: "Uzupełnij konta firmy przy użyciu standardowego szablonu.",
     companyId: {
-      label: "ID firmy",
-      description: "Firma, dla której zostanie skonfigurowany plan kont",
-      placeholder: "Podaj UUID firmy",
+      label: "Firma",
+      description: "Wybierz firmę, której plan kont chcesz ustawić.",
+      placeholder: "Wybierz firmę",
     },
     country: {
-      label: "Kraj",
-      description:
-        "Standard planu kont (AT = ÖKR, DE = SKR03, XX = MSSF Ogólny)",
-      placeholder: "Wybierz kraj",
+      label: "Szablon planu kont",
+      description: "Wybierz strukturę kont do dodania.",
+      placeholder: "Wybierz szablon",
     },
     response: {
       created: "Utworzone konta",
-      skipped: "Pominięte konta (już istniały)",
+      skipped: "Zachowane konta",
     },
     errors: {
       unauthorized: {
@@ -35,7 +33,7 @@ export const translations: typeof enTranslations = {
       },
       validation: {
         title: "Błąd walidacji",
-        description: "Nieprawidłowe dane — sprawdź ID firmy i kraj",
+        description: "Sprawdź firmę i szablon planu kont.",
       },
       forbidden: {
         title: "Brak dostępu",
@@ -44,15 +42,16 @@ export const translations: typeof enTranslations = {
       },
       server: {
         title: "Błąd serwera",
-        description: "Konfiguracja nie powiodła się — spróbuj ponownie",
+        description: "Spróbuj ponownie zastosować szablon.",
       },
       unknown: {
         title: "Nieznany błąd",
         description: "Wystąpił nieoczekiwany błąd",
       },
       conflict: {
-        title: "Już zainicjalizowany",
-        description: "Ta firma ma już plan kont",
+        title: "Sprawdź ustawienia",
+        description:
+          "Odśwież listę kont firmy przed ponownym zastosowaniem szablonu.",
       },
       network: {
         title: "Błąd sieci",
@@ -69,10 +68,21 @@ export const translations: typeof enTranslations = {
     },
     success: {
       title: "Plan kont gotowy",
-      description: "Wszystkie konta zostały utworzone dla firmy",
+      description:
+        "Szablon został zastosowany. Sprawdź nowe i zachowane konta.",
     },
     widget: {
-      viewAccounts: "Pokaż listę kont",
+      review: "Sprawdź ustawienia planu kont",
+      previewLoading: "Sprawdzamy istniejące konta…",
+      previewFailed: "Bieżąca liczba kont jest niedostępna.",
+      existing: "Istniejące konta: {{count}}.",
+      empty: "Ta firma nie ma jeszcze kont księgowych.",
+      consequences:
+        "System doda brakujące numery kont z szablonu i zachowa istniejące dane.",
+      submit: "Dodaj konta z szablonu",
+      back: "Wstecz",
+      viewAccounts: "Otwórz plan kont",
+      viewPeriods: "Zobacz okresy księgowe",
     },
   },
   title: "Konfiguracja planu kont",

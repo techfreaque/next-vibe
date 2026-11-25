@@ -6,8 +6,11 @@ import { Building } from "next-vibe/ui/components/icons/Building";
 import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
 import { ChevronRight } from "next-vibe/ui/components/icons/ChevronRight";
 import { Span } from "next-vibe/ui/components/span";
+import { WidgetHeader } from "next-vibe/ui/components/widget-header";
+import { WidgetShell } from "next-vibe/ui/components/widget-shell";
 import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
 import {
+  useWidgetLocale,
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetValue,
@@ -21,6 +24,9 @@ import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-a
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 import { type JSX } from "react";
 
+import { useWorkspaceCompany } from "../_shared/workspace-company-context";
+import { proposeOpeningMonth } from "../[companyId]/onboard/first-period";
+import { getCompanySetupCountry } from "../[companyId]/onboard/setup-country";
 import type definition from "./definition";
 
 export function CompanyCreateContainer({
@@ -31,6 +37,33 @@ export function CompanyCreateContainer({
   const data = useWidgetValue<typeof definition.POST>();
   const navigation = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.POST>();
+  const locale = useWidgetLocale();
+  const workspace = useWorkspaceCompany();
+
+  const handleSetupAccounting = (): void => {
+    if (!data?.result?.id) {
+      return;
+    }
+    const companyId = data.result.id;
+    const country = getCompanySetupCountry(data.result.country);
+    workspace?.register({
+      id: companyId,
+      name: data.result.name,
+      currency: null,
+    });
+    void (async (): Promise<void> => {
+      const { default: onboard } =
+        await import("../[companyId]/onboard/definition");
+      navigation.push(onboard.POST, {
+        urlPathParams: { companyId },
+        data: {
+          country,
+          openFirstPeriod: true,
+          ...proposeOpeningMonth(locale),
+        },
+      });
+    })();
+  };
 
   const handleViewCompany = (): void => {
     if (!data?.result?.id) {
@@ -60,8 +93,17 @@ export function CompanyCreateContainer({
             </Span>
           </Div>
         </Div>
-        <Div className="flex items-center gap-2">
-          <Button size="sm" onClick={handleViewCompany} className="gap-1.5">
+        <Div className="flex flex-wrap items-center gap-2">
+          <Button type="button" onClick={handleSetupAccounting}>
+            {t("post.widget.setupAccounting")}
+            <ChevronRight className="size-4" />
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={handleViewCompany}
+            className="gap-1.5"
+          >
             {t("post.widget.viewCompany")}
             <ChevronRight className="h-3.5 w-3.5" />
           </Button>
@@ -71,28 +113,28 @@ export function CompanyCreateContainer({
   }
 
   return (
-    <Div className="flex flex-col gap-4">
-      {navigation.canGoBack && (
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={() => navigation.pop()}
-          className="self-start gap-1.5 -ml-1"
-        >
-          <ChevronLeft className="h-4 w-4" />
-          {t("post.widget.back")}
-        </Button>
-      )}
-      <Div className="flex flex-col gap-1">
-        <Span className="text-lg font-semibold">{t("post.title")}</Span>
-        <Span className="text-sm text-muted-foreground">
-          {t("post.description")}
-        </Span>
-      </Div>
+    <WidgetShell layout="page" className="min-w-0 max-w-3xl">
+      <WidgetHeader
+        size="page"
+        title={t("post.title")}
+        subtitle={t("post.description")}
+        backButton={
+          navigation.canGoBack && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => navigation.pop()}
+            >
+              <ChevronLeft className="size-4" />
+              {t("post.widget.back")}
+            </Button>
+          )
+        }
+      />
 
       <Div className="flex flex-col gap-3">
-        <Div className="grid grid-cols-2 gap-3">
+        <Div className="grid gap-3 @lg:grid-cols-2">
           <TextFieldWidget
             fieldName="details.name"
             field={withValue(
@@ -110,7 +152,7 @@ export function CompanyCreateContainer({
             )}
           />
         </Div>
-        <Div className="grid grid-cols-2 gap-3">
+        <Div className="grid gap-3 @lg:grid-cols-2">
           <TextFieldWidget
             fieldName="details.vatNumber"
             field={withValue(
@@ -128,7 +170,7 @@ export function CompanyCreateContainer({
             )}
           />
         </Div>
-        <Div className="grid grid-cols-2 gap-3">
+        <Div className="grid gap-3 @lg:grid-cols-2">
           <TextFieldWidget
             fieldName="details.currency"
             field={withValue(
@@ -146,7 +188,7 @@ export function CompanyCreateContainer({
             )}
           />
         </Div>
-        <Div className="grid grid-cols-2 gap-3">
+        <Div className="grid gap-3 @lg:grid-cols-2">
           <PhoneFieldWidget
             fieldName="details.phone"
             field={withValue(
@@ -167,7 +209,9 @@ export function CompanyCreateContainer({
       </Div>
 
       <FormAlertWidget field={{}} />
-      <SubmitButtonWidget<typeof definition.POST> field={{}} />
-    </Div>
+      <SubmitButtonWidget<typeof definition.POST>
+        field={{ text: "post.title", className: "min-h-11 self-end" }}
+      />
+    </WidgetShell>
   );
 }

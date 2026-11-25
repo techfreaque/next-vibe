@@ -18,6 +18,9 @@ export const translations: typeof enTranslations = {
       "Oznacz zatwierdzoną fakturę jako opłaconą i utwórz zapis płatności",
     billId: { label: "ID faktury", description: "Faktura do opłacenia" },
     errors: {
+      approvalPosting: "Przed płatnością zaksięguj zatwierdzenie tej faktury.",
+      paymentAccount: "Wybierz aktywne konto bankowe lub kasowe tej firmy.",
+      paymentPosting: "Sprawdź datę płatności, walutę firmy i konta księgowe.",
       validation: {
         title: "Błąd walidacji",
         description: "Nieprawidłowe dane",

@@ -77,7 +77,60 @@ const { POST } = createEndpoint({
         schema: z.enum(["AT", "DE", "XX"]),
       }),
 
+      openFirstPeriod: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "post.period.open",
+        description: "post.period.description",
+        schema: z.boolean().optional(),
+      }),
+      periodName: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "post.period.name",
+        schema: z.string().trim().min(1).max(100).optional(),
+      }),
+      periodStart: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.DATE,
+        label: "post.period.start",
+        schema: z.iso.date().optional(),
+      }),
+      periodEnd: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.DATE,
+        label: "post.period.end",
+        schema: z.iso.date().optional(),
+      }),
+
       // RESPONSE FIELDS
+      hasPeriods: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "post.period.title",
+        schema: z.boolean().optional(),
+      }),
+      periodCreated: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "post.period.open",
+        schema: z.boolean().optional(),
+      }),
+      periodNameOut: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "post.period.name",
+        schema: z.string().optional(),
+      }),
+      companyIdOut: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "post.companyId.label",
+        schema: z.uuid().optional(),
+      }),
+
+      companyName: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "post.companyId.label",
+        schema: z.string().optional(),
+      }),
+
       accountsCreated: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         label: "post.response.accountsCreated" as const,

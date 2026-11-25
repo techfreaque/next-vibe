@@ -12,7 +12,7 @@ export const translations: typeof enTranslations = {
     title: "Creare una nota di credito",
     titleShort: "Nota di credito",
     description:
-      "Creare una nota di credito collegata a una fattura originale. Il pieno credito nega tutte le linee. Il credito parziale applica gli elementi di linea specificati. Invia un'inversione di giornale: Dr Revenue, Cr AR.",
+      "Emetti una nota di credito totale o parziale per una fattura registrata. La nota storna il credito, il ricavo e l’IVA corrispondenti.",
     form: {
       title: "Creare una nota di credito",
       description: "Emettere un credito contro una fattura esistente",
@@ -35,6 +35,14 @@ export const translations: typeof enTranslations = {
       },
     },
     errors: {
+      creditLines:
+        "Inserisci quantità positive e usa le aliquote IVA della fattura originale.",
+      creditLimit:
+        "L’importo supera l’imponibile, l’IVA o il totale ancora stornabile della fattura originale.",
+      originalPosting:
+        "Riconcilia la scrittura della fattura originale prima di emettere la nota di credito.",
+      posting:
+        "Controlla la valuta aziendale, il periodo contabile aperto e i conti della scrittura originale.",
       unauthorized: {
         title: "Autenticazione richiesta",
         description: "Accedi per continuare",

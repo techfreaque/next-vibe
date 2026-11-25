@@ -110,10 +110,11 @@ export async function seedDefaultTaxRates(
   companyId: string,
   country: "AT" | "DE" | "XX",
   logger: EndpointLogger,
-): Promise<void> {
+  executor: Pick<typeof db, "insert"> = db,
+): Promise<number> {
   const rates = DEFAULT_TAX_RATES[country];
 
-  const result = await db
+  const inserted = await executor
     .insert(taxRates)
     .values(
       rates.map((rate) => ({
@@ -128,11 +129,13 @@ export async function seedDefaultTaxRates(
         isCompound: false,
       })),
     )
-    .onConflictDoNothing({ target: [taxRates.companyId, taxRates.code] });
+    .onConflictDoNothing({ target: [taxRates.companyId, taxRates.code] })
+    .returning({ id: taxRates.id });
 
   logger.debug("Seeded default tax rates", {
     companyId,
-    inserted: result.rowCount,
+    inserted: inserted.length,
     requested: rates.length,
   });
+  return inserted.length;
 }

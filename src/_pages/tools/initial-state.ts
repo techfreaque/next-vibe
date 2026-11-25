@@ -45,6 +45,7 @@ const FILTER_PARAM_KEYS = [
   "ps",
   "cat",
   "sub",
+  "catalog",
 ];
 
 export function copyCatalogSearchParams(

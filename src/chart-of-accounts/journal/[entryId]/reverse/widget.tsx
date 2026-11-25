@@ -6,11 +6,13 @@ import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
 import { Span } from "next-vibe/ui/components/span";
 import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
 import {
+  useWidgetForm,
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { DateFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/date-field/widget";
+import { EntityPickerFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/entity-picker-field/widget";
 import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 import type { JSX } from "react";
@@ -24,13 +26,15 @@ export function CoaJournalReverseWidget({
 }): JSX.Element {
   const data = useWidgetValue<typeof definition.POST>();
   const navigation = useWidgetNavigation();
+  const form = useWidgetForm<typeof definition.POST>();
+  const entryId = form.watch("entryId");
   const t = useWidgetTranslation<typeof definition.POST>();
 
-  const handleViewEntry = (entryId: string): void => {
+  const handleViewEntry = (reversalEntryId: string): void => {
     void (async (): Promise<void> => {
       const def = await import("../get/definition");
       navigation.push(def.default.GET, {
-        urlPathParams: { entryId },
+        urlPathParams: { entryId: reversalEntryId },
       });
     })();
   };
@@ -83,14 +87,23 @@ export function CoaJournalReverseWidget({
       </Span>
 
       <Div className="flex flex-col gap-3">
+        {!entryId && (
+          <EntityPickerFieldWidget
+            fieldName="entryId"
+            field={field.children.entryId}
+          />
+        )}
         <DateFieldWidget
+          utcCalendarDay
           fieldName="reversalDate"
           field={withValue(field.children.reversalDate, undefined, null)}
         />
       </Div>
 
       <FormAlertWidget field={{}} />
-      <SubmitButtonWidget<typeof definition.POST> field={{}} />
+      <SubmitButtonWidget<typeof definition.POST>
+        field={{ text: "journalReverse.title", variant: "destructive" }}
+      />
     </Div>
   );
 }

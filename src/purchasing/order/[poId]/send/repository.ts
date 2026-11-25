@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import { eq } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
@@ -79,13 +79,19 @@ export class OrderSendRepository {
       const [updated] = await db
         .update(purchaseOrders)
         .set({ status: "SENT", updatedAt: new Date() })
-        .where(eq(purchaseOrders.id, poId))
+        .where(
+          and(
+            eq(purchaseOrders.id, poId),
+            eq(purchaseOrders.companyId, po.companyId),
+            inArray(purchaseOrders.status, ["DRAFT"]),
+          ),
+        )
         .returning({ id: purchaseOrders.id, status: purchaseOrders.status });
 
       if (!updated) {
         return fail({
-          message: t("orderSend.post.errors.server.title"),
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          message: t("orderSend.post.errors.conflict.title"),
+          errorType: ErrorResponseTypes.CONFLICT,
         });
       }
 

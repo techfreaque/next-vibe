@@ -8,9 +8,9 @@ export const translations: typeof enTranslations = {
     ar: "forderungen",
   },
   post: {
-    title: "Ausgangsrechnung erstellen",
-    titleShort: "Rechnung erstellen",
-    description: "Neue Ausgangsrechnung für einen Kunden erstellen",
+    title: "Neue Rechnung",
+    titleShort: "Neue Rechnung",
+    description: "Bereiten Sie eine Rechnung für Ihren Kunden vor.",
     form: {
       title: "Neue Rechnung",
       description: "Rechnungsdaten eingeben",
@@ -77,19 +77,45 @@ export const translations: typeof enTranslations = {
       description: "Rechnung im Entwurfsstatus erstellt",
     },
     widget: {
+      details: "Rechnungsdetails",
+      draftHint: "Speichern Sie einen Entwurf zur Prüfung vor der Ausstellung.",
+      items: "Positionen",
+      itemsDescription:
+        "Optionale Positionen für den Entwurf. Geben Sie den Steuersatz als Dezimalzahl von 0 bis 1 an.",
+      itemsHint:
+        "Fügen Sie Waren oder Leistungen hinzu, um den Rechnungsbetrag zu berechnen.",
+      item: "Beschreibung",
+      quantity: "Menge",
+      unitPrice: "Einzelpreis",
+      manualTaxRate: "Anderer Satz",
+      taxRate: "USt. %",
+      addItem: "Position hinzufügen",
+      removeItem: "Position entfernen",
+      itemError:
+        "Geben Sie eine Beschreibung, eine positive Menge, einen Preis und einen USt.-Satz zwischen 0 und 100 % ein.",
+      itemsTotalError:
+        "Der Gesamtbetrag ist für eine einzelne Rechnung zu hoch.",
+      summary: "Zusammenfassung",
+      net: "Netto",
+      tax: "Umsatzsteuer",
+      total: "Gesamt",
+      clearCustomer: "Kundenauswahl aufheben",
+      lineTotal: "Positionssumme",
+      companyCurrencyValue: "Unternehmenswährung: {{currency}}",
+      companyCurrency: "Ohne Auswahl gilt die Unternehmenswährung.",
       back: "Zurück",
-      submit: "Rechnung erstellen",
+      submit: "Entwurf speichern",
       viewButton: "Rechnung anzeigen",
     },
   },
   companyId: {
-    label: "Firmen-ID",
+    label: "Unternehmen",
     description: "Die Firma, die diese Rechnung ausstellt",
     placeholder: "Firmen-ID eingeben",
   },
   customerId: {
-    label: "Kunden-ID",
-    description: "Optional: UUID des Kunden (weiche Referenz zum Nutzer)",
+    label: "Kunde",
+    description: "Suchen Sie den Kunden anhand seines Namens.",
     placeholder: "Kunden-ID eingeben",
   },
   dueDate: {
@@ -98,9 +124,10 @@ export const translations: typeof enTranslations = {
     placeholder: "Datum auswählen",
   },
   currency: {
+    code: "{{code}}",
     label: "Währung",
     description: "Rechnungswährung",
-    placeholder: "EUR",
+    placeholder: "Unternehmenswährung",
   },
   notes: {
     label: "Hinweise",

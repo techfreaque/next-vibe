@@ -1,5 +1,7 @@
 import { Linking } from "react-native";
 
+export const supportsTextFileDownload = false;
+
 export function downloadFile(
   filename: string,
   content: string,

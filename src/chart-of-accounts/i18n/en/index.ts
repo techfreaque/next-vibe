@@ -75,7 +75,7 @@ export const translations = {
     forbidden: { title: "Forbidden", description: "Insufficient permissions" },
     server: {
       title: "Server Error",
-      description: "Operation failed — please try again",
+      description: "Operation failed. Please try again.",
     },
     unknown: {
       title: "Unknown Error",
@@ -266,7 +266,29 @@ export const translations = {
     },
   },
   journalCreate: {
+    errorDate: "Use a date within the selected period.",
+    errorCurrency: "Use the company’s accounting currency on every line.",
+    errorInvalidLine:
+      "Enter a positive debit or credit amount with up to four decimal places.",
+    errorAccount: "Select a valid account belonging to this company.",
     widget: {
+      lineDescription: "Line description",
+      incomplete: "Enter a debit or credit for each line.",
+      offByLessThan: "Off by less than {{amount}}",
+      offBy: "Off by {{amount}}",
+
+      details: "Entry details",
+      saveDraft: "Save draft",
+      addLine: "Add line",
+      removeLine: "Remove line",
+      account: "Account",
+      side: "Side",
+      amount: "Amount",
+      currency: "Currency",
+      missingScope: "Select a company before adding lines.",
+      noPeriods: "No open periods for this company.",
+      noAccounts: "No active posting accounts for this company.",
+
       back: "Back",
       viewEntryButton: "View Entry",
       postNowButton: "Post Now",
@@ -281,12 +303,12 @@ export const translations = {
     description:
       "Create a manual double-entry journal. Total debits must equal total credits.",
     companyId: {
-      label: "Company ID",
+      label: "Company",
       description: "The company for this journal entry",
       placeholder: "Company UUID",
     },
     periodId: {
-      label: "Period ID",
+      label: "Accounting period",
       description: "The accounting period",
       placeholder: "Period UUID",
     },
@@ -325,7 +347,7 @@ export const translations = {
     title: "Post Journal Entry",
     titleShort: "Post Entry",
     description:
-      "Change a DRAFT entry to POSTED status. Cannot be undone — use Reverse instead.",
+      "Post this draft journal entry. To correct it after posting, create a reversal.",
     entryId: {
       label: "Entry ID",
       description: "The journal entry to post",
@@ -340,6 +362,9 @@ export const translations = {
     errorNotDraft: "Only DRAFT entries can be posted",
   },
   journalReverse: {
+    errorManaged: "Reverse this entry from its source document.",
+    errorDate: "Choose a reversal date on or after the original entry.",
+    errorNoPeriod: "Open an accounting period covering the reversal date.",
     widget: {
       backButton: "Back to Journal",
       reversalCreated: "Reversal entry created",
@@ -432,7 +457,7 @@ export const translations = {
     },
     asOfDate: {
       label: "As Of Date",
-      description: "Report date — defaults to today",
+      description: "Report date (today by default)",
       placeholder: "YYYY-MM-DD",
     },
     periodId: {
@@ -488,7 +513,13 @@ export const translations = {
     },
   },
   reports: {
+    switchReport: "Reports",
+    currency: "Currency",
+    mixedCurrency:
+      "This period contains multiple currencies. Choose one currency to run the report.",
     nav: {
+      ledgerTax: "Ledger VAT",
+      payables: "Payables Aging",
       profitLoss: "P&L",
       balanceSheet: "Balance Sheet",
       trialBalance: "Trial Balance",
@@ -496,6 +527,10 @@ export const translations = {
       receivablesAging: "Receivables Aging",
     },
     widget: {
+      quickDates: "Other dates",
+      thisMonth: "This month",
+      previousMonth: "Previous month",
+      autoCurrency: "Automatic",
       run: "Run",
       running: "Running…",
     },
@@ -597,10 +632,11 @@ export const translations = {
     },
     asOfDate: {
       label: "As Of Date",
-      description: "Report date — defaults to today",
+      description: "Report date (today by default)",
       placeholder: "YYYY-MM-DD",
     },
     response: {
+      unclosedEarnings: "Unclosed earnings",
       asOfDate: "As Of Date",
       assets: "Assets",
       totalAssets: "Total Assets",
@@ -649,40 +685,41 @@ export const translations = {
     },
   },
   receivablesAging: {
+    currencies: { EUR: "EUR", USD: "USD", PLN: "PLN" },
     widget: {
-      asOf: "As of",
-      noData: "No outstanding receivables.",
+      asOf: "Aging date",
+      noData: "No outstanding invoices in this currency.",
       totalRow: "Total",
       viewInvoice: "View",
-      selectCompany:
-        "Enter a Company ID above and click Run to generate the aging report.",
+      selectCompany: "Choose a company to run the report.",
     },
-    title: "Receivables Aging",
-    titleShort: "Receivables Aging",
-    description:
-      "Outstanding invoices bucketed by days overdue. Shows exactly where cash is stuck.",
+    title: "Outstanding invoices",
+    titleShort: "Outstanding invoices",
+    description: "Current open balances by invoice due date and currency.",
     companyId: {
-      label: "Company ID",
-      description: "Company to report on",
+      label: "Company",
+      description: "Choose a company to see its outstanding invoices.",
       placeholder: "Company UUID",
     },
     asOfDate: {
-      label: "As Of Date",
-      description: "Aging reference date — defaults to today",
+      label: "Aging date",
+      description:
+        "This date determines the overdue band for balances still open today.",
       placeholder: "YYYY-MM-DD",
     },
     response: {
-      asOfDate: "As Of Date",
+      currency: "Currency",
+      asOfDate: "Aging date",
       buckets: "Buckets",
       current: "Current",
       days1to30: "1–30 Days",
       days31to60: "31–60 Days",
       days61to90: "61–90 Days",
       over90: "Over 90 Days",
-      invoiceId: "Invoice ID",
-      customerId: "Customer ID",
+      invoiceId: "Invoice",
+      customerId: "Customer",
       amount: "Amount",
-      dueDate: "Due Date",
+      dueDate: "Due",
       totals: "Totals",
       total: "Total",
     },

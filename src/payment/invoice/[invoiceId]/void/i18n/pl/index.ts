@@ -21,6 +21,10 @@ export const translations: typeof enTranslations = {
       message: "Komunikat statusu",
     },
     errors: {
+      appliedPayments:
+        "Nie można anulować faktury z przypisanymi płatnościami lub korektami.",
+      reversalPosting:
+        "Przed anulowaniem sprawdź pierwotny zapis i otwarty okres księgowy.",
       unauthorized: {
         title: "Brak autoryzacji",
         description: "Wymagana autoryzacja",

@@ -85,6 +85,16 @@ export const translations: typeof enTranslations = {
       description: "Estimación creada en el proyecto de estatuto",
     },
     widget: {
+      otherRate: "Otro tipo",
+      item: "Descripción",
+      quantity: "Cantidad",
+      price: "Precio unitario",
+      vatRate: "IVA %",
+      add: "Añadir línea",
+      remove: "Quitar línea",
+      empty: "Añade los productos o servicios presupuestados.",
+      summary: "Resumen",
+
       back: "Atrás",
       submit: "Estimación",
       viewButton: "Estimación",
@@ -111,9 +121,10 @@ export const translations: typeof enTranslations = {
     placeholder: "Ingrese el nombre del cliente",
   },
   currency: {
+    code: "{{code}}",
     label: "Moneda",
     description: "Moneda estimada",
-    placeholder: "EUR",
+    placeholder: "Moneda de la empresa",
   },
   validUntil: {
     label: "Válido hasta",

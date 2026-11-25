@@ -8,9 +8,9 @@ export const translations: typeof enTranslations = {
     ar: "créances-clients",
   },
   post: {
-    title: "Créer une facture client",
-    titleShort: "Créer une facture",
-    description: "Crée une nouvelle facture client (créance) pour un client",
+    title: "Nouvelle facture",
+    titleShort: "Nouvelle facture",
+    description: "Préparez une facture pour votre client.",
     form: {
       title: "Nouvelle facture",
       description: "Renseignez les détails de la facture",
@@ -78,18 +78,44 @@ export const translations: typeof enTranslations = {
       description: "Facture créée à l'état de brouillon",
     },
     widget: {
+      details: "Détails de la facture",
+      draftHint:
+        "Enregistrez un brouillon pour le vérifier avant de l’émettre.",
+      items: "Lignes",
+      itemsDescription:
+        "Lignes de brouillon facultatives. Utilisez un taux de TVA décimal entre 0 et 1.",
+      itemsHint:
+        "Ajoutez des biens ou des services pour calculer le total de la facture.",
+      item: "Description",
+      quantity: "Quantité",
+      unitPrice: "Prix unitaire",
+      manualTaxRate: "Autre taux",
+      taxRate: "TVA %",
+      addItem: "Ajouter une ligne",
+      removeItem: "Supprimer la ligne",
+      itemError:
+        "Saisissez une description, une quantité positive, un prix et un taux de TVA entre 0 et 100 %.",
+      itemsTotalError: "Le total est trop élevé pour une seule facture.",
+      summary: "Récapitulatif",
+      net: "Hors taxe",
+      tax: "TVA",
+      total: "Total",
+      clearCustomer: "Retirer le client",
+      lineTotal: "Total de la ligne",
+      companyCurrencyValue: "Devise de l’entreprise : {{currency}}",
+      companyCurrency: "La devise de l’entreprise s’applique par défaut.",
       back: "Retour",
-      submit: "Créer la facture",
+      submit: "Enregistrer le brouillon",
       viewButton: "Voir la facture",
     },
   },
   companyId: {
-    label: "ID de l'entreprise",
+    label: "Entreprise",
     description: "L'entreprise qui émet cette facture",
     placeholder: "Saisir l'ID de l'entreprise",
   },
   customerId: {
-    label: "ID client",
+    label: "Client",
     description:
       "Facultatif : UUID du client (référence souple à l'utilisateur)",
     placeholder: "Saisir l'ID client",
@@ -100,9 +126,10 @@ export const translations: typeof enTranslations = {
     placeholder: "Choisir l'échéance",
   },
   currency: {
+    code: "{{code}}",
     label: "Devise",
     description: "Devise de la facture",
-    placeholder: "EUR",
+    placeholder: "Devise de l’entreprise",
   },
   notes: {
     label: "Notes",

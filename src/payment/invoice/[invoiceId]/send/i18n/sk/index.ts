@@ -7,12 +7,12 @@ export const translations: typeof enTranslations = {
     invoice: "faktúra",
   },
   post: {
-    title: "Odoslať faktúru",
-    titleShort: "Odoslať faktúru",
-    description: "Označte koncept faktúry ako odoslaný. Faktúra prejde do stavu Otvorená.",
+    title: "Vystaviť faktúru",
+    titleShort: "Vystaviť faktúru",
+    description: "Vystaviť faktúru z konceptu a vytvoriť účtovný zápis.",
     form: {
-      title: "Odoslať faktúru",
-      description: "Odošle faktúru odberateľovi.",
+      title: "Vystaviť faktúru",
+      description: "Po vystavení vytvorte odkaz na faktúru pre zákazníka.",
     },
     response: {
       success: "Faktúra bola odoslaná.",
@@ -20,6 +20,10 @@ export const translations: typeof enTranslations = {
       viewUrl: "Adresa faktúry pre zákazníka",
     },
     errors: {
+      invoiceLines:
+        "Pred vystavením pridajte položky s kladnou celkovou sumou.",
+      posting:
+        "Skontrolujte celkovú sumu faktúry, menu firmy, účtovné obdobie a účty na zaúčtovanie.",
       unauthorized: {
         title: "Vyžaduje sa prihlásenie",
         description: "Prihláste sa.",
@@ -69,8 +73,8 @@ export const translations: typeof enTranslations = {
   },
   widget: {
     back: "Späť",
-    submit: "Odoslať faktúru",
-    sent: "Faktúra bola odoslaná",
+    submit: "Vystaviť faktúru",
+    sent: "Faktúra bola vystavená",
     viewUrl: "Odkaz na faktúru pre zákazníka",
   },
 };

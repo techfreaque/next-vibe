@@ -8,6 +8,7 @@ import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
 import { Loader2 } from "next-vibe/ui/components/icons/Loader2";
 import { ShoppingBag } from "next-vibe/ui/components/icons/ShoppingBag";
 import { Span } from "next-vibe/ui/components/span";
+import { formatMoney } from "next-vibe/unified-ui/_shared/format-money";
 import { usePickerCallback } from "next-vibe/unified-ui/_shared/picker-context";
 import {
   useWidgetForm,
@@ -131,7 +132,7 @@ function PORow({
       {/* Amount */}
       <Div className="shrink-0 text-right min-w-[90px]">
         <Span className="text-sm font-medium">
-          {po.currency} {po.total.toFixed(2)}
+          {formatMoney(po.total, po.currency, locale)}
         </Span>
       </Div>
 

@@ -21,6 +21,10 @@ export const translations: typeof enTranslations = {
       message: "Statusmeldung",
     },
     errors: {
+      appliedPayments:
+        "Eine Rechnung mit zugeordneten Zahlungen oder Gutschriften kann nicht storniert werden.",
+      reversalPosting:
+        "Prüfen Sie vor der Stornierung die Originalbuchung und die offene Buchungsperiode.",
       unauthorized: {
         title: "Nicht autorisiert",
         description: "Authentifizierung erforderlich",

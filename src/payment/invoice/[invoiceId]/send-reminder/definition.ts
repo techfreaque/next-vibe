@@ -1,8 +1,4 @@
-/**
- * Send Payment Reminder Endpoint
- * Sends a payment reminder for an overdue OPEN invoice.
- * Logs the reminder as a customer note.
- */
+/** Prepare and retain a downloadable reminder for a past-due invoice. */
 
 import { createEndpoint } from "next-vibe/core/definition/create-i18n";
 import {
@@ -40,6 +36,15 @@ const { POST } = createEndpoint({
   tags: ["tags.payment" as const, "tags.invoice" as const, "tags.ar" as const],
   allowedRoles: [UserRole.ADMIN] as const,
 
+  options: {
+    mutationOptions: {
+      onSuccess: async (data) => {
+        const { refreshInvoiceDocuments } =
+          await import("@/finance/document-cache");
+        await refreshInvoiceDocuments(data.logger, data.pathParams.invoiceId);
+      },
+    },
+  },
   fields: customWidgetObject({
     render: InvoiceSendReminderWidgetLazy,
     usage: { request: "data&urlPathParams", response: true },
@@ -51,16 +56,16 @@ const { POST } = createEndpoint({
         label: "invoiceId.label" as const,
         description: "invoiceId.description" as const,
         schema: z.uuid(),
-        hidden: true,
+
         listEndpoint: async () =>
           (await import("../../list/definition")).default.GET,
-        labelField: "invoiceSequenceNumber",
+        labelField: "invoiceNumber",
       }),
 
       // REQUEST BODY
       message: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
+        fieldType: FieldDataType.TEXTAREA,
         label: "message.label" as const,
         description: "message.description" as const,
         placeholder: "message.placeholder" as const,
@@ -75,6 +80,21 @@ const { POST } = createEndpoint({
         schema: z.boolean(),
       }),
 
+      draft: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "post.title",
+        schema: z
+          .object({
+            id: z.uuid(),
+            invoiceNumber: z.string(),
+            issuerName: z.string().nullable(),
+            dueDate: z.string(),
+            currency: z.string(),
+            amount: z.string(),
+            note: z.string().nullable(),
+          })
+          .optional(),
+      }),
       responseMessage: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         label: "post.response.message" as const,
@@ -137,6 +157,15 @@ const { POST } = createEndpoint({
       default: {
         success: true,
         responseMessage: null,
+        draft: {
+          id: "00000000-0000-4000-8000-000000000707",
+          invoiceNumber: "INV-1042",
+          issuerName: "Studio Linden",
+          dueDate: "2026-10-15",
+          currency: "EUR",
+          amount: "325.50",
+          note: null,
+        },
       },
     },
   },

@@ -21,6 +21,20 @@ export const translations: typeof enTranslations = {
       message: "Mensaje de Estado",
     },
     errors: {
+      receiptKeyConflict: "Esta clave ya está asociada a otro pago.",
+      paymentPrecision:
+        "Introduce un importe positivo con un máximo de dos decimales.",
+      paymentStatus:
+        "Registra pagos de facturas abiertas con un importe positivo.",
+      overpayment: "El pago supera el saldo de la factura.",
+      fullPayment:
+        "Si la factura no está vinculada a una empresa, introduce el importe pendiente completo.",
+      issuancePosting:
+        "Antes de registrar el pago, contabiliza una cuenta por cobrar por el total de la factura.",
+      paymentAccount:
+        "Elige una cuenta bancaria o de caja activa de esta empresa.",
+      paymentPosting:
+        "Revisa la fecha de pago, la moneda de la empresa y las cuentas de registro.",
       unauthorized: {
         title: "Se requiere autenticación",
         description: "Inicia sesión para continuar",
@@ -89,6 +103,11 @@ export const translations: typeof enTranslations = {
     label: "Fecha de pago",
     description: "Cuando se recibió el pago",
     placeholder: "Selecciona una fecha",
+  },
+  receiptKey: {
+    label: "Clave de pago",
+    description:
+      "Usa la misma clave para reintentar este pago. Para otro cobro, usa una clave nueva.",
   },
   accountNodeId: {
     label: "Nodo de cuenta ID",

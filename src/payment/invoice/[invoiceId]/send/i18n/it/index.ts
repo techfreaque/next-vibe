@@ -7,13 +7,12 @@ export const translations: typeof enTranslations = {
     invoice: "fattura",
   },
   post: {
-    title: "Invia fattura",
-    titleShort: "Invia fattura",
-    description:
-      "Segnare un progetto di fattura come inviato. stato di transizione per aprire",
+    title: "Emetti fattura",
+    titleShort: "Emetti fattura",
+    description: "Emetti la bozza e registra il credito.",
     form: {
-      title: "Invia fattura",
-      description: "Invia la fattura al cliente",
+      title: "Emetti fattura",
+      description: "Dopo l’emissione sarà disponibile un link per il cliente.",
     },
     response: {
       success: "Fattura inviata",
@@ -21,6 +20,10 @@ export const translations: typeof enTranslations = {
       viewUrl: "Vista clienti URL",
     },
     errors: {
+      invoiceLines:
+        "Aggiungi righe con un totale positivo prima di emettere la fattura.",
+      posting:
+        "Controlla il totale della fattura, la valuta aziendale, il periodo contabile e i conti di registrazione.",
       unauthorized: {
         title: "Autenticazione richiesta",
         description: "Accedi per continuare",
@@ -70,8 +73,8 @@ export const translations: typeof enTranslations = {
   },
   widget: {
     back: "Indietro",
-    submit: "Invia fattura",
-    sent: "Fattura inviata",
+    submit: "Emetti fattura",
+    sent: "Fattura emessa",
     viewUrl: "Link di visualizzazione del cliente",
   },
 };

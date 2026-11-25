@@ -8,9 +8,9 @@ export const translations: typeof enTranslations = {
     ar: "pohľadávky",
   },
   post: {
-    title: "Vytvoriť odberateľskú faktúru",
-    titleShort: "Vytvoriť faktúru",
-    description: "Vytvorte novú odberateľskú faktúru.",
+    title: "Nová faktúra",
+    titleShort: "Nová faktúra",
+    description: "Pripravte faktúru pre zákazníka.",
     form: {
       title: "Nová faktúra",
       description: "Vyplňte údaje faktúry.",
@@ -57,7 +57,8 @@ export const translations: typeof enTranslations = {
       },
       forbidden: {
         title: "Prístup zamietnutý",
-        description: "Potrebujete oprávnenie správcu alebo účtovníka tejto firmy.",
+        description:
+          "Potrebujete oprávnenie správcu alebo účtovníka tejto firmy.",
       },
       notFound: {
         title: "Nenašlo sa",
@@ -77,19 +78,44 @@ export const translations: typeof enTranslations = {
       description: "Faktúra bola uložená ako koncept.",
     },
     widget: {
+      details: "Údaje faktúry",
+      draftHint: "Uložte koncept a skontrolujte ho pred vystavením.",
+      items: "Položky",
+      itemsDescription:
+        "Nepovinné položky konceptu. Sadzbu DPH zadajte ako desatinné číslo od 0 do 1.",
+      itemsHint:
+        "Pridajte tovar alebo služby a vypočítajte celkovú sumu faktúry.",
+      item: "Opis",
+      quantity: "Množstvo",
+      unitPrice: "Jednotková cena",
+      manualTaxRate: "Iná sadzba",
+      taxRate: "DPH (%)",
+      addItem: "Pridať položku",
+      removeItem: "Odstrániť položku",
+      itemError:
+        "Zadajte opis, kladné množstvo, cenu a sadzbu DPH od 0 do 100 %.",
+      itemsTotalError: "Celková suma prekračuje limit jednej faktúry.",
+      summary: "Súhrn",
+      net: "Základ dane",
+      tax: "DPH",
+      total: "Spolu",
+      clearCustomer: "Zrušiť výber zákazníka",
+      lineTotal: "Suma položky",
+      companyCurrencyValue: "Mena firmy: {{currency}}",
+      companyCurrency: "Ak nevyberiete inú menu, použije sa mena firmy.",
       back: "Späť",
-      submit: "Vytvoriť faktúru",
+      submit: "Uložiť koncept",
       viewButton: "Zobraziť faktúru",
     },
   },
   companyId: {
-    label: "ID firmy",
+    label: "Firma",
     description: "Firma, ktorá faktúru vystavuje",
     placeholder: "Zadajte ID firmy",
   },
   customerId: {
-    label: "ID odberateľa",
-    description: "Nepovinné UUID odberateľa (voľná väzba na používateľa)",
+    label: "Zákazník",
+    description: "Vyhľadajte zákazníka podľa mena.",
     placeholder: "Zadajte ID zákazníka",
   },
   dueDate: {
@@ -98,9 +124,10 @@ export const translations: typeof enTranslations = {
     placeholder: "Vyberte dátum splatnosti",
   },
   currency: {
+    code: "{{code}}",
     label: "Mena",
     description: "Mena faktúry",
-    placeholder: "EUR",
+    placeholder: "Mena firmy",
   },
   notes: {
     label: "Poznámky",

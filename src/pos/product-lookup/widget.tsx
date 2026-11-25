@@ -6,6 +6,10 @@ import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
 import { Span } from "next-vibe/ui/components/span";
 import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
 import {
+  formatMoney,
+  formatPercent,
+} from "next-vibe/unified-ui/_shared/format-money";
+import {
   useWidgetLocale,
   useWidgetNavigation,
   useWidgetTranslation,
@@ -18,12 +22,6 @@ import type { JSX } from "react";
 import { useState } from "react";
 
 import type definition from "./definition";
-
-const formatPrice = (amount: number, locale: string): string =>
-  new Intl.NumberFormat(locale, {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(amount);
 
 interface PosProductLookupWidgetProps {
   field: (typeof definition.GET)["fields"];
@@ -119,16 +117,13 @@ export function PosProductLookupWidget({
                 </Div>
                 <Div className="flex flex-col items-end gap-0.5 ml-3 shrink-0">
                   <Span className="text-sm font-mono font-semibold tabular-nums">
-                    {formatPrice(product.basePrice, locale)}{" "}
-                    <Span className="text-xs font-normal">
-                      {product.currency}
-                    </Span>
+                    {formatMoney(product.basePrice, product.currency, locale)}
                   </Span>
                   {product.defaultTaxRate !== null &&
                   product.defaultTaxRate !== undefined &&
                   product.defaultTaxRate > 0 ? (
                     <Span className="text-xs text-muted-foreground">
-                      {(product.defaultTaxRate * 100).toFixed(0)}%{" "}
+                      {formatPercent(product.defaultTaxRate, locale)}{" "}
                       {t("productLookup.get.widget.tax")}
                     </Span>
                   ) : null}

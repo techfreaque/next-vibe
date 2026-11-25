@@ -86,6 +86,16 @@ export const translations: typeof enTranslations = {
       description: "Stime create in progetto di stato",
     },
     widget: {
+      otherRate: "Altra aliquota",
+      item: "Descrizione",
+      quantity: "Quantità",
+      price: "Prezzo unitario",
+      vatRate: "IVA %",
+      add: "Aggiungi riga",
+      remove: "Rimuovi riga",
+      empty: "Aggiungi i beni o i servizi del preventivo.",
+      summary: "Riepilogo",
+
       back: "Indietro",
       submit: "Crea il preventivo",
       viewButton: "Visualizza il preventivo",
@@ -112,9 +122,10 @@ export const translations: typeof enTranslations = {
     placeholder: "Inserisci il nome del cliente",
   },
   currency: {
+    code: "{{code}}",
     label: "Valuta",
     description: "Moneta stimata",
-    placeholder: "EUR",
+    placeholder: "Valuta aziendale",
   },
   validUntil: {
     label: "Valido fino a quando",

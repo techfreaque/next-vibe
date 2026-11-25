@@ -10,6 +10,10 @@ export const translations = {
   },
   category: "Finance",
   documents: {
+    clearCompany: "Clear company filter",
+    clearCustomer: "Clear customer filter",
+    pageTotals: "Totals · {{currency}}",
+    pageDocumentCount: "Documents on this page: {{count}}",
     search: "Search documents",
     matches: "Matching documents ({{count}})",
     emptyTitle: "No documents match these filters",

@@ -54,6 +54,8 @@ export const translations: typeof enTranslations = {
       description: "Okres księgowy został zamknięty",
     },
     widget: {
+      closeNamed: "Zamknij okres: {{name}}",
+      draftCount: "Szkice zapisów księgowych",
       closedLabel: "Zamknięty",
       failedLabel: "Nie powiodło się",
       confirmTitle: "Zamknąć okres księgowy?",

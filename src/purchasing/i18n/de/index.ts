@@ -69,7 +69,7 @@ export const translations: typeof enTranslations = {
         server: {
           title: "Serverfehler",
           description:
-            "Lieferant konnte nicht erstellt werden — erneut versuchen",
+            "Lieferant konnte nicht erstellt werden. Bitte versuchen Sie es erneut.",
         },
         unknown: {
           title: "Unbekannter Fehler",
@@ -565,7 +565,7 @@ export const translations: typeof enTranslations = {
         server: {
           title: "Serverfehler",
           description:
-            "Bestellung konnte nicht erstellt werden — erneut versuchen",
+            "Bestellung konnte nicht erstellt werden. Bitte versuchen Sie es erneut.",
         },
         unknown: {
           title: "Unbekannter Fehler",
@@ -860,7 +860,8 @@ export const translations: typeof enTranslations = {
     patch: {
       title: "Bestellung aktualisieren",
       titleShort: "Bestellung aktualisieren",
-      description: "Entwurfsbestellung bearbeiten — Felder und Positionen.",
+      description:
+        "Bearbeiten Sie die Daten und Positionen des Bestellentwurfs.",
       widget: { backToPO: "Zurück zur Bestellung" },
       poId: { label: "Bestell-ID", description: "Zu bearbeitende Bestellung" },
       vendorId: {
@@ -1040,7 +1041,7 @@ export const translations: typeof enTranslations = {
     post: {
       title: "Bestellung bestätigen",
       titleShort: "Bestellung bestätigen",
-      description: "Lieferant hat bestätigt — als Bestätigt markieren.",
+      description: "Erfassen Sie die Bestellbestätigung des Lieferanten.",
       poId: { label: "Bestell-ID", description: "Zu bestätigende Bestellung" },
       widget: {
         back: "Zurück",
@@ -1180,7 +1181,8 @@ export const translations: typeof enTranslations = {
     post: {
       title: "In Rechnung umwandeln",
       titleShort: "In Rechnung umwandeln",
-      description: "Aus dieser Bestellung eine Eingangsrechnung erstellen.",
+      description:
+        "Erstellen Sie aus einer vollständig gelieferten Bestellung eine Eingangsrechnung. Die Freigabe bucht die Verbindlichkeit.",
       widget: {
         back: "Zurück",
         viewBill: "Rechnung anzeigen",
@@ -1188,8 +1190,9 @@ export const translations: typeof enTranslations = {
       poId: { label: "Bestell-ID", description: "Umzuwandelnde Bestellung" },
       errors: {
         validation: {
-          title: "Validierungsfehler",
-          description: "Ungültige Bestell-ID",
+          title: "Währung und Bestellsummen prüfen",
+          description:
+            "Die Währung muss unterstützt werden. Die Summen müssen mit den Bestellpositionen übereinstimmen.",
         },
         unauthorized: {
           title: "Nicht angemeldet",
@@ -1200,9 +1203,9 @@ export const translations: typeof enTranslations = {
           description: "Kein Zugriff auf diese Bestellung",
         },
         conflict: {
-          title: "Bereits umgewandelt",
+          title: "Bestellung kann nicht fakturiert werden",
           description:
-            "Diese Bestellung wurde bereits in eine Rechnung umgewandelt",
+            "Die Bestellung muss vollständig geliefert sein und darf noch keine Eingangsrechnung haben.",
         },
         server: {
           title: "Serverfehler",
@@ -1398,14 +1401,24 @@ export const translations: typeof enTranslations = {
       description:
         "Aktueller Stand der Bestellungen und Lieferantenaktivitäten für Ihr Unternehmen.",
       widget: {
+        openValue: "Offener Bestellwert",
+        settledBills: "Diesen Monat beglichene Rechnungen",
+        deliveries: "Ausstehende Lieferungen",
+        order: "Bestellung",
+        supplier: "Lieferant",
+        expected: "Erwartet am",
+        orderTotal: "Bestellwert",
+        noDeliveries: "Keine ausstehenden Lieferungen",
+        overdue: "Überfällige Lieferungen",
+        dueSeven: "In den nächsten 7 Tagen fällig",
         kpiDraft: "Entwürfe",
         kpiConfirmed: "Bestätigt",
         kpiAwaitingReceipt: "Ausstehende Lieferungen",
         kpiActiveVendors: "Aktive Lieferanten",
         warningDueThisWeek:
-          "{{count}} Bestellung fällig diese Woche — Liefertermine prüfen",
+          "Eine Bestellung ist diese Woche fällig. Prüfen Sie den Liefertermin.",
         warningDueThisWeekPlural:
-          "{{count}} Bestellungen fällig diese Woche — Liefertermine prüfen",
+          "{{count}} Bestellungen sind diese Woche fällig. Prüfen Sie die Liefertermine.",
         navNewPo: "Neue Bestellung",
         navAllPos: "Alle Bestellungen",
         navVendors: "Lieferanten",

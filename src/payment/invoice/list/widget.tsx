@@ -1,14 +1,14 @@
 "use client";
 
-import { formatDate } from "next-vibe/core/i18n/core/localization-utils";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { FilePlus } from "next-vibe/ui/components/icons/FilePlus";
 import { Span } from "next-vibe/ui/components/span";
+import { StatusPill } from "next-vibe/ui/components/status-pill";
 import {
-  StatusPill,
-  type StatusPillVariant,
-} from "next-vibe/ui/components/status-pill";
+  formatDocDate,
+  formatMoney,
+} from "next-vibe/unified-ui/_shared/format-money";
 import { usePickerCallback } from "next-vibe/unified-ui/_shared/picker-context";
 import { useRelatedEntityNavigation } from "next-vibe/unified-ui/_shared/related-entities";
 import {
@@ -21,36 +21,29 @@ import {
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import { NumberFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/number-field/widget";
-import { SelectFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/select-field/widget";
-import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-field/widget";
 import type { JSX } from "react";
+import { useController } from "react-hook-form";
 
 import {
-  DocumentList,
-  DocumentScopePicker,
   useDocumentListCopy,
   useDocumentListHistory,
+} from "@/finance/document-list-hooks";
+import {
+  DocumentList,
+  DocumentPageSize,
+  DocumentScopePicker,
+  DocumentSearch,
+  DocumentStatusTabs,
 } from "@/finance/document-list-ui";
+import { documentStatusVariant } from "@/finance/document-status";
 
-import { InvoiceStatus } from "../../enum";
+import { InvoiceStatus, InvoiceStatusDB } from "../../enum";
 import type definition from "./definition";
+import { OVERDUE_INVOICE_FILTER } from "./filters";
 
 type Row = (typeof definition.GET.types.ResponseOutput)["invoices"][number];
 
-const statusVariants: Record<Row["status"], StatusPillVariant> = {
-  [InvoiceStatus.DRAFT]: "muted",
-  [InvoiceStatus.OPEN]: "info",
-  [InvoiceStatus.PAID]: "success",
-  [InvoiceStatus.VOID]: "muted",
-  [InvoiceStatus.UNCOLLECTIBLE]: "danger",
-};
-
-export function InvoiceListWidget({
-  field: { children },
-}: {
-  field: (typeof definition.GET)["fields"];
-}): JSX.Element {
+export function InvoiceListWidget(): JSX.Element {
   const data = useWidgetValue<typeof definition.GET>();
   const form = useWidgetForm<typeof definition.GET>();
   const onSubmit = useWidgetOnSubmit();
@@ -64,13 +57,17 @@ export function InvoiceListWidget({
   const responseOnly = useWidgetResponseOnly();
   const isInteractive = useWidgetIsInteractive() && !responseOnly;
   const companyId = form.watch("companyId");
+  const { field: searchField } = useController({
+    control: form.control,
+    name: "search",
+  });
+  const { field: statusField } = useController({
+    control: form.control,
+    name: "status",
+  });
   const customerId = form.watch("customerId");
-  const money = (amount: number, currency: string): string =>
-    new Intl.NumberFormat(locale, {
-      style: "currency",
-      currency,
-      currencyDisplay: "code",
-    }).format(amount);
+  const money = (amount: number | string, currency: string): string =>
+    formatMoney(amount, currency, locale);
 
   const rememberFilters = (page: number): void => {
     const values = form.getValues();
@@ -89,14 +86,9 @@ export function InvoiceListWidget({
     rememberFilters(page);
   };
 
-  const submitPage = (page: number): void => {
-    setPage(page);
-    onSubmit?.();
-  };
-
   const clearFilters = (): void => {
     form.reset({ page: 1, pageSize: data?.pageSizeApplied ?? 20 });
-    submitPage(1);
+    setPage(1);
   };
 
   const createDocument = (): void => {
@@ -107,7 +99,7 @@ export function InvoiceListWidget({
         import("../[invoiceId]/get/definition"),
       ]);
       push(createDef.default.POST, {
-        renderInModal: true,
+        renderInModal: false,
         data: data?.selectedCompanyId
           ? { companyId: data.selectedCompanyId }
           : undefined,
@@ -143,36 +135,75 @@ export function InvoiceListWidget({
       loadingLabel={t("widget.loading")}
       emptyTitle={t("widget.empty.title")}
       emptyHint={onPick ? undefined : t("widget.empty.hint")}
+      filterLabel={t("widget.filters")}
       filtered={data?.hasFilters ?? false}
+      statusTabs={
+        isInteractive && onSubmit ? (
+          <DocumentStatusTabs
+            allLabel={t("status.placeholder")}
+            selected={statusField.value}
+            options={[
+              { status: OVERDUE_INVOICE_FILTER, label: t("widget.overdue") },
+              ...InvoiceStatusDB.map((option) => ({
+                status: option,
+                label: t(option),
+              })),
+            ]}
+            onSelect={(value) => {
+              statusField.onChange(value);
+              setPage(1);
+            }}
+          />
+        ) : undefined
+      }
       filters={
         isInteractive && onSubmit ? (
           <>
-            <TextFieldWidget fieldName="search" field={children.search} />
-            <Div className="grid min-w-0 grid-cols-1 gap-3 @sm:grid-cols-2">
-              <SelectFieldWidget fieldName="status" field={children.status} />
-              <NumberFieldWidget
-                fieldName="pageSize"
-                field={children.pageSize}
-              />
-            </Div>
+            <DocumentSearch
+              value={searchField.value}
+              label={t("search.label")}
+              placeholder={t("search.placeholder")}
+              onChange={(value) => {
+                searchField.onChange(value || undefined);
+                setPage(1);
+              }}
+            />
             <Div className="flex min-w-0 flex-wrap items-center gap-2">
               <DocumentScopePicker
                 kind="company"
-                value={companyId}
-                appliedLabel={
-                  data?.selectedCompanyId === companyId
-                    ? data?.selectedCompanyName
+                value={companyId ?? data?.selectedCompanyId ?? undefined}
+                appliedLabel={data?.selectedCompanyName}
+                onSelect={(id) => {
+                  form.setValue("companyId", id, { shouldDirty: true });
+                  setPage(1);
+                }}
+                onClear={
+                  companyId
+                    ? () => {
+                        form.setValue("companyId", undefined, {
+                          shouldDirty: true,
+                        });
+                        setPage(1);
+                      }
                     : undefined
-                }
-                onSelect={(id) =>
-                  form.setValue("companyId", id, { shouldDirty: true })
                 }
               />
               <DocumentScopePicker
                 kind="customer"
                 value={customerId}
-                onSelect={(id) =>
-                  form.setValue("customerId", id, { shouldDirty: true })
+                onSelect={(id) => {
+                  form.setValue("customerId", id, { shouldDirty: true });
+                  setPage(1);
+                }}
+                onClear={
+                  customerId
+                    ? () => {
+                        form.setValue("customerId", undefined, {
+                          shouldDirty: true,
+                        });
+                        setPage(1);
+                      }
+                    : undefined
                 }
               />
             </Div>
@@ -180,7 +211,7 @@ export function InvoiceListWidget({
         ) : undefined
       }
       create={
-        isInteractive && !onPick ? (
+        isInteractive && !onPick && data?.canCreateInvoice === true ? (
           <Button
             type="button"
             size="sm"
@@ -192,39 +223,110 @@ export function InvoiceListWidget({
           </Button>
         ) : undefined
       }
+      columns={[
+        {
+          id: "invoiceSequenceNumber",
+          label: t("get.response.invoiceSequenceNumber"),
+        },
+        { id: "customerName", label: t("get.response.customerName") },
+        { id: "createdAt", label: t("get.response.createdAt") },
+        { id: "dueDate", label: t("get.response.dueDate") },
+        { id: "status", label: t("get.response.status") },
+        { id: "amount", label: t("get.response.amount"), numeric: true },
+        { id: "amountDue", label: t("get.response.amountDue"), numeric: true },
+      ]}
+      pageSize={
+        isInteractive && onSubmit ? (
+          <DocumentPageSize
+            label={t("pageSize.label")}
+            value={data?.pageSizeApplied ?? 20}
+            onChange={(value) => {
+              form.setValue("pageSize", value, { shouldDirty: true });
+              setPage(1);
+            }}
+          />
+        ) : undefined
+      }
       items={(data?.invoices ?? []).map((row) => {
         const reference =
           row.invoiceNumber ??
           (row.invoiceSequenceNumber === null
             ? tDocument("documents.noReference")
             : `INV-${row.invoiceSequenceNumber}`);
+        const partialPayment = row.amountPaid > 0 && row.amountDue > 0;
         const badges = (
           <StatusPill
-            status={t(row.status)}
-            variant={statusVariants[row.status]}
+            status={
+              row.isOverdue
+                ? t("widget.overdue")
+                : partialPayment
+                  ? t("widget.partlyPaid")
+                  : t(row.status)
+            }
+            variant={documentStatusVariant(row.status, {
+              overdue: row.isOverdue,
+              partialPayment,
+            })}
           />
         );
         const meta = (
           <>
-            <Span className="font-semibold">
-              {money(Number(row.amount), row.currency)}
+            <Span className="font-semibold tabular-nums">
+              {money(
+                row.status === InvoiceStatus.OPEN ? row.amountDue : row.amount,
+                row.currency,
+              )}
             </Span>
             {row.dueDate && (
               <Span>
-                {t("widget.due")} {formatDate(row.dueDate, locale, "PP")}
+                {t("widget.due")} {formatDocDate(row.dueDate, locale)}
               </Span>
-            )}
-            {row.isOverdue && (
-              <Span className="text-destructive">{t("widget.overdue")}</Span>
             )}
           </>
         );
+
+        const referenceCell = (
+          <Span className="font-semibold whitespace-nowrap">{reference}</Span>
+        );
+        const dueDateCell = row.dueDate ? (
+          <Span
+            className={
+              row.isOverdue
+                ? "text-destructive whitespace-nowrap"
+                : "whitespace-nowrap"
+            }
+          >
+            {formatDocDate(row.dueDate, locale)}
+          </Span>
+        ) : (
+          "-"
+        );
+        const amountDueCell = (
+          <Span
+            className={
+              row.amountDue > 0 ? "font-semibold" : "text-muted-foreground"
+            }
+          >
+            {money(row.amountDue, row.currency)}
+          </Span>
+        );
         return {
           id: row.id,
-          title: reference,
-          subtitle: row.companyName ?? undefined,
+          title: row.customerName ?? reference,
+          subtitle: row.customerName
+            ? reference
+            : (row.companyName ?? undefined),
           badges,
           meta,
+          cells: {
+            invoiceSequenceNumber: referenceCell,
+            customerName: row.customerName ?? "-",
+            createdAt: formatDocDate(row.createdAt, locale),
+            dueDate: dueDateCell,
+            status: badges,
+            amount: money(row.amount, row.currency),
+            amountDue: amountDueCell,
+          },
           action: isInteractive
             ? {
                 label: tDocument(
@@ -236,6 +338,24 @@ export function InvoiceListWidget({
             : undefined,
         };
       })}
+      pageAmounts={[
+        {
+          column: "amount",
+          label: t("get.response.amount"),
+          values: (data?.invoices ?? []).map((row) => ({
+            currency: row.currency,
+            amount: row.amount,
+          })),
+        },
+        {
+          column: "amountDue",
+          label: t("get.response.amountDue"),
+          values: (data?.invoices ?? []).map((row) => ({
+            currency: row.currency,
+            amount: row.amountDue,
+          })),
+        },
+      ]}
       pagination={
         data
           ? {
@@ -245,9 +365,8 @@ export function InvoiceListWidget({
             }
           : undefined
       }
-      onApply={() => submitPage(1)}
       onClear={clearFilters}
-      onPage={submitPage}
+      onPage={setPage}
     />
   );
 }

@@ -113,8 +113,7 @@ export const translations: typeof enTranslations = {
         labelDelete: "Deaktivovať",
         labelCompound: "Zložená",
         empty: "Zatiaľ nemáte nastavené sadzby dane. Pridajte prvú sadzbu.",
-        emptySetup:
-          "Zatiaľ nemáte nastavené sadzby dane. Každá faktúra potrebuje sadzbu. Nastavte sadzby, ktoré používate.",
+        emptySetup: "Nastavte sadzby dane, ktoré firma používa na faktúrach.",
         columnRate: "Sadzba dane",
         columnTypeRateActions: "Druh, sadzba a stav",
         backToCatalog: "← Produkty",
@@ -248,7 +247,10 @@ export const translations: typeof enTranslations = {
           title: "Prístup zamietnutý",
           description: "Nemáte oprávnenie spravovať sadzby dane.",
         },
-        notFound: { title: "Nenašlo sa", description: "Sadzba dane sa nenašla." },
+        notFound: {
+          title: "Nenašlo sa",
+          description: "Sadzba dane sa nenašla.",
+        },
         conflict: { title: "Konflikt", description: "Údaje sú v rozpore." },
         server: {
           title: "Chyba servera",
@@ -274,8 +276,7 @@ export const translations: typeof enTranslations = {
       description: "Deaktivujte sadzbu dane.",
       widget: {
         backToList: "Späť na sadzby dane",
-        warning:
-          "Sadzba dane sa deaktivuje. Túto akciu nemožno vrátiť späť.",
+        warning: "Sadzba dane sa deaktivuje. Túto akciu nemožno vrátiť späť.",
         confirmTitle: "Chcete deaktivovať túto sadzbu?",
         confirmDescription:
           "Deaktivované sadzby sa už nedajú použiť na nové položky faktúr. Existujúce položky sa nezmenia.",
@@ -307,7 +308,10 @@ export const translations: typeof enTranslations = {
           title: "Prístup zamietnutý",
           description: "Nemáte oprávnenie spravovať sadzby dane.",
         },
-        notFound: { title: "Nenašlo sa", description: "Sadzba dane sa nenašla." },
+        notFound: {
+          title: "Nenašlo sa",
+          description: "Sadzba dane sa nenašla.",
+        },
         conflict: { title: "Konflikt", description: "Údaje sú v rozpore." },
         server: {
           title: "Chyba servera",
@@ -330,37 +334,51 @@ export const translations: typeof enTranslations = {
   },
 
   report: {
-    title: "Daňový prehľad",
-    titleShort: "Daňový prehľad",
-    description: "Vybraná daň podľa sadzby a obdobia",
+    title: "Daň podľa sadzby",
+    titleShort: "Daň podľa sadzby",
+    description:
+      "Skontrolujte zaevidované dane z odberateľských faktúr, dobropisov, dodávateľských faktúr a pokladničných predajov.",
     widget: {
-      columnRate: "Sadzba",
+      scope:
+        "Odberateľské faktúry sa vykazujú ku dňu účtovného zápisu alebo vytvorenia faktúry. Pri nákupoch sa používa dátum dodávateľskej faktúry. Pokladničné predaje sa vykazujú ku dňu dokončenia v UTC a zahŕňajú položky s kladnou sadzbou alebo zaevidovanou daňou. Ak vystavená faktúra a pokladničný predaj odkazujú na ten istý účtovný zápis, predaj sa vykáže podľa faktúry.",
+      empty: "Zvoleným filtrom nezodpovedajú žiadne položky.",
+      range: "od {{from}} do {{to}}",
       total: "Spolu",
-      empty: "Za toto obdobie sa nenašli žiadne daňové údaje.",
+      previousMonth: "Zobraziť predchádzajúci mesiac",
+      unknownRate: "Sadzba nie je k dispozícii",
+      run: "Zobraziť prehľad",
+      running: "Načítava sa prehľad…",
+      selectCompany: "Vyberte spoločnosť pre tento prehľad.",
     },
+    currency: {
+      label: "Mena",
+      placeholder: "Mena spoločnosti",
+      description: "Predvolene sa použije mena spoločnosti.",
+    },
+    currencies: { EUR: "EUR", PLN: "PLN", USD: "USD" },
     companyId: {
       label: "Firma",
-      description: "Vyberte spoločnosť, za ktorú chcete zobraziť daňový prehľad.",
+      description:
+        "Vyberte spoločnosť, za ktorú chcete zobraziť daňový prehľad.",
       placeholder: "ID firmy",
     },
     dateFrom: {
       label: "Od",
       description: "Začiatok obdobia prehľadu.",
-      placeholder: "2024-01-01",
+      placeholder: "Začiatok tohto mesiaca",
     },
     dateTo: {
       label: "Do",
       description: "Koniec obdobia prehľadu.",
-      placeholder: "2024-12-31",
+      placeholder: "Dnes",
     },
     response: {
       rows: "Riadky prehľadu",
       row: {
-        taxRateCode: "Kód sadzby dane",
-        taxRateName: "Názov sadzby dane",
+        direction: "Druh dokladu",
+        rate: "Sadzba dane",
         taxableAmount: "Základ dane",
         taxAmount: "Suma dane",
-        period: "Obdobie",
       },
     },
     success: {
@@ -370,7 +388,8 @@ export const translations: typeof enTranslations = {
     errors: {
       validation: {
         title: "Neplatné údaje",
-        description: "Skontrolujte zadané údaje a skúste to znova.",
+        description:
+          "Zvoľte dátum ukončenia, ktorý nepredchádza dátumu začiatku.",
       },
       unauthorized: {
         title: "Vyžaduje sa prihlásenie",
@@ -402,6 +421,12 @@ export const translations: typeof enTranslations = {
   },
 
   enums: {
+    reportDirection: {
+      posSales: "Pokladničné predaje",
+      sales: "Vystavené faktúry",
+      creditNotes: "Vystavené dobropisy",
+      purchases: "Prijaté faktúry",
+    },
     taxType: {
       vat: "DPH",
       gst: "Daň z tovarov a služieb (GST)",

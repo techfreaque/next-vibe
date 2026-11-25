@@ -7,14 +7,22 @@ export const translations: typeof enTranslations = {
     ap: "comptabilité-fournisseurs",
   },
   post: {
-    title: "Créer une facture fournisseur",
-    titleShort: "Créer une facture",
-    description: "Enregistrer une facture reçue d'un fournisseur",
+    title: "Nouvelle facture fournisseur",
+    titleShort: "Nouvelle facture fournisseur",
+    description:
+      "Saisissez le fournisseur et les lignes, puis enregistrez le brouillon.",
     form: {
       title: "Nouvelle facture fournisseur",
       description: "Saisissez les informations de la facture reçue",
     },
     errors: {
+      vendor: "Sélectionnez un fournisseur actif de cette entreprise.",
+      supplier: "Saisissez un nom ou choisissez un fournisseur.",
+      dates: "Saisissez une date de facture et une échéance valides.",
+      amounts: "Vérifiez les lignes et respectez le plafond de la facture.",
+      expenseAccount:
+        "Choisissez un compte de charges actif de cette entreprise.",
+
       validation: {
         title: "Erreur de validation",
         description: "Vérifiez tous les champs et réessayez",
@@ -51,8 +59,33 @@ export const translations: typeof enTranslations = {
       description: "Facture fournisseur enregistrée",
     },
     widget: {
+      supplier: "Fournisseur",
+      dates: "Dates et devise",
+      items: "Lignes de facture",
+      itemsDescription:
+        "Lignes facultatives. Saisissez un taux de TVA décimal de 0 à 1.",
+      itemsHint: "Ajoutez les biens ou services facturés.",
+      item: "Description",
+      quantity: "Quantité",
+      unitPrice: "Prix unitaire",
+      manualTaxRate: "Autre taux",
+      taxRate: "TVA %",
+      lineTotal: "Total de la ligne",
+      addItem: "Ajouter une ligne",
+      removeItem: "Supprimer la ligne",
+      itemError: "Vérifiez la description, la quantité, le prix et la TVA.",
+      summary: "Récapitulatif de la facture",
+      net: "Hors taxe",
+      tax: "TVA",
+      total: "Total",
+      chooseVendor: "Choisir un fournisseur",
+      vendorSource: "Depuis l’annuaire fournisseurs",
+      terms: "Appliquer le délai du fournisseur",
+      manualVendor: "Saisir le fournisseur manuellement",
+      selectCompanyFirst: "Sélectionnez d’abord une entreprise.",
+
       back: "Retour",
-      submit: "Enregistrer la facture",
+      submit: "Enregistrer le brouillon",
       viewButton: "Voir la facture",
       addAnotherButton: "En ajouter une autre",
     },
@@ -86,6 +119,10 @@ export const translations: typeof enTranslations = {
     description: "L'entreprise destinataire de cette facture",
     placeholder: "UUID de l'entreprise",
   },
+  vendorId: {
+    label: "Choisir un fournisseur",
+    description: "Depuis l’annuaire fournisseurs",
+  },
   supplierName: {
     label: "Nom du fournisseur",
     description: "Nom du fournisseur qui a émis cette facture",
@@ -104,14 +141,15 @@ export const translations: typeof enTranslations = {
   billDate: {
     label: "Date de facture",
     description: "Date d'émission de la facture",
-    placeholder: "2024-01-01",
+    placeholder: "Choisir la date de facture",
   },
   dueDate: {
     label: "Date d'échéance",
     description: "Date limite de paiement",
-    placeholder: "2024-01-31",
+    placeholder: "Choisir la date d’échéance",
   },
   currency: {
+    code: "{{code}}",
     label: "Devise",
     description: "Devise de la facture",
     placeholder: "EUR",

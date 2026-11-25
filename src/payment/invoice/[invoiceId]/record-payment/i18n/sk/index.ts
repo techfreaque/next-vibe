@@ -20,6 +20,19 @@ export const translations: typeof enTranslations = {
       message: "Stavová správa",
     },
     errors: {
+      receiptKeyConflict: "Tento kľúč patrí inej úhrade.",
+      paymentPrecision:
+        "Zadajte kladnú sumu s najviac dvoma desatinnými miestami.",
+      paymentStatus:
+        "Úhradu možno priradiť k otvorenej faktúre s kladnou sumou.",
+      overpayment: "Úhrada prevyšuje zostatok faktúry.",
+      fullPayment: "Pri faktúre bez firmy zadajte celú zostávajúcu sumu.",
+      issuancePosting:
+        "Pred zaevidovaním platby musí byť zaúčtovaná pohľadávka v celkovej sume faktúry.",
+      paymentAccount:
+        "Vyberte aktívny bankový alebo pokladničný účet tejto firmy.",
+      paymentPosting:
+        "Skontrolujte dátum platby, menu firmy a účty na zaúčtovanie.",
       unauthorized: {
         title: "Vyžaduje sa prihlásenie",
         description: "Prihláste sa.",
@@ -88,6 +101,11 @@ export const translations: typeof enTranslations = {
     label: "Dátum platby",
     description: "Dátum prijatia platby",
     placeholder: "Vyberte dátum",
+  },
+  receiptKey: {
+    label: "Kľúč úhrady",
+    description:
+      "Pri opakovaní tejto úhrady použite rovnaký kľúč. Pre inú úhradu použite nový kľúč.",
   },
   accountNodeId: {
     label: "ID účtu",

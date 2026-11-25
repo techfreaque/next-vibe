@@ -15,9 +15,21 @@ export const translations: typeof enTranslations = {
     title: "Skontrolovať stav faktúry",
     titleShort: "Skontrolovať stav faktúry",
     description: "Zmeňte stav konceptu alebo prijatej faktúry.",
-    billId: { label: "ID dodávateľskej faktúry", description: "Dodávateľská faktúra na schválenie" },
+    billId: {
+      label: "ID dodávateľskej faktúry",
+      description: "Dodávateľská faktúra na schválenie",
+    },
     errors: {
-      validation: { title: "Neplatné údaje", description: "Neplatné ID faktúry" },
+      existingPosting:
+        "Pred schválením faktúry skontrolujte a zosúlaďte jej existujúci účtovný zápis.",
+      billLines:
+        "Pridajte položky s kladnou celkovou sumou a použite aktívne nákladové účty tejto firmy.",
+      posting:
+        "Skontrolujte celkové sumy faktúry, menu firmy, účtovné obdobie a účty na zaúčtovanie.",
+      validation: {
+        title: "Neplatné údaje",
+        description: "Neplatné ID faktúry",
+      },
       unauthorized: {
         title: "Vyžaduje sa prihlásenie",
         description: "Na schvaľovanie dodávateľských faktúr sa prihláste",
@@ -38,7 +50,10 @@ export const translations: typeof enTranslations = {
         title: "Neznáma chyba",
         description: "Nastala neočakávaná chyba",
       },
-      network: { title: "Chyba siete", description: "Skontrolujte pripojenie." },
+      network: {
+        title: "Chyba siete",
+        description: "Skontrolujte pripojenie.",
+      },
       notFound: {
         title: "Faktúra sa nenašla",
         description: "Faktúra neexistuje.",
@@ -61,7 +76,7 @@ export const translations: typeof enTranslations = {
       submit: "Potvrdiť zmenu stavu",
       confirmTitle: "Schváliť túto dodávateľskú faktúru?",
       confirmDescription:
-        "Koncept prejde do stavu Prijatá. Prijatá faktúra prejde do stavu Schválená. Ak je účtovníctvo nastavené, vytvorí sa účtovný zápis.",
+        "Koncept prejde do stavu Prijatá. Schválením prijatej faktúry sa zaúčtuje účtovný zápis.",
       confirmButton: "Áno, schváliť",
       cancelButton: "Zrušiť",
       approved: "Stav faktúry bol aktualizovaný.",

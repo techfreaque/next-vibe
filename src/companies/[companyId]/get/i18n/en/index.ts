@@ -44,7 +44,7 @@ export const translations = {
       },
       server: {
         title: "Server Error",
-        description: "Something went wrong — try again",
+        description: "The request failed. Try again.",
       },
       unknown: {
         title: "Unknown Error",
@@ -68,6 +68,7 @@ export const translations = {
       description: "Company details retrieved",
     },
     widget: {
+      setupAccounting: "Set up accounting",
       back: "Back",
       loading: "Loading company...",
       edit: "Edit",

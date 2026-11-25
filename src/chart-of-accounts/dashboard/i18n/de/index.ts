@@ -5,7 +5,7 @@ export const translations: typeof enTranslations = {
     title: "Buchhaltungs-Übersicht",
     titleShort: "Übersicht",
     description:
-      "Aktueller Status der Buchhaltung — offene Periode, Buchungszahlen und schnelle Navigation zu allen Buchhaltungsfunktionen.",
+      "Offene Beträge, Liquidität, Gewinn und die aktuelle Buchungsperiode im Überblick.",
     companyId: {
       label: "Unternehmens-ID",
       description: "Unternehmen, für das die Übersicht geladen wird",
@@ -59,6 +59,16 @@ export const translations: typeof enTranslations = {
       },
     },
     widget: {
+      noPeriodHint:
+        "Öffnen Sie eine Buchungsperiode, bevor Sie Buchungen erfassen.",
+      zeroMetricsHint:
+        "Die Beträge ändern sich, wenn Sie Rechnungen ausstellen, Eingangsrechnungen freigeben und Geschäftsvorfälle buchen.",
+      financialOverview: "Finanzübersicht",
+      openReceivables: "Offene Kundenforderungen",
+      approvedPayables: "Freigegebene Lieferantenrechnungen",
+      cashBalance: "Kasse und Bank",
+      monthToDateProfit: "Gewinn in diesem Monat",
+      needsAttention: "Handlungsbedarf",
       currentPeriod: "Aktuelle Periode",
       noPeriod: "Keine offene Periode",
       createPeriod: "Periode erstellen",

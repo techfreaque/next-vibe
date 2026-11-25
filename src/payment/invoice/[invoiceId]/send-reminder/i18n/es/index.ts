@@ -8,16 +8,16 @@ export const translations: typeof enTranslations = {
     ar: "ar",
   },
   post: {
-    title: "Enviar recordatorio de pago",
-    titleShort: "Enviar recordatorio",
+    title: "Preparar recordatorio de pago",
+    titleShort: "Preparar recordatorio",
     description:
-      "Enviar un recordatorio de pago para una factura atrasada. La facturación debe ser el estado OPEN y pasado su fecha prevista. Registra el recordatorio como nota de cliente.",
+      "Prepara un borrador con el saldo vencido y un mensaje opcional.",
     form: {
-      title: "Enviar recordatorio",
-      description: "Notificar al cliente sobre su pago atrasado",
+      title: "Preparar recordatorio",
+      description: "Revisa el saldo antes de compartir el borrador.",
     },
     response: {
-      success: "Reminder sent",
+      success: "Borrador del recordatorio listo",
       message: "Mensaje de Estado",
     },
     errors: {
@@ -52,7 +52,7 @@ export const translations: typeof enTranslations = {
       conflict: {
         title: "No está retrasado",
         description:
-          "Los recordatorios sólo pueden ser enviados para facturas abiertas después de su fecha prevista",
+          "La factura debe estar abierta y vencida, con saldo pendiente.",
       },
       unsavedChanges: {
         title: "Cambios sin guardar",
@@ -60,8 +60,9 @@ export const translations: typeof enTranslations = {
       },
     },
     success: {
-      title: "Operación completada",
-      description: "Recordatorio de pago enviado y registrado",
+      title: "Borrador del recordatorio listo",
+      description:
+        "Guardado en el historial de la factura. El recordatorio está listo para compartir con el cliente.",
     },
   },
   invoiceId: {
@@ -76,9 +77,16 @@ export const translations: typeof enTranslations = {
     placeholder: "Añada una nota personal al recordatorio...",
   },
   widget: {
+    copy: "Copiar recordatorio",
+    copied: "Recordatorio copiado",
+    copyFailed: "No se pudo copiar. Reintentar",
+    download: "Descargar recordatorio",
+    subject: "Recordatorio de pago de la factura {{number}}",
+    body: "El saldo pendiente es {{amount}}. La fecha de vencimiento fue el {{date}}.",
     back: "Atrás",
-    submit: "Enviar recordatorio",
-    reminderSent: "Reminder envió. El cliente ha sido notificado.",
+    submit: "Preparar recordatorio",
+    reminderSent:
+      "Guardado en el historial de la factura. El recordatorio está listo para compartir con el cliente.",
     viewInvoice: "Ver factura",
   },
 };

@@ -6,6 +6,10 @@ import { Div } from "next-vibe/ui/components/div";
 import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
 import { Span } from "next-vibe/ui/components/span";
 import {
+  formatMoney,
+  formatPercent,
+} from "next-vibe/unified-ui/_shared/format-money";
+import {
   useWidgetLocale,
   useWidgetNavigation,
   useWidgetTranslation,
@@ -17,15 +21,6 @@ import type { JSX } from "react";
 
 import { ProductType } from "../../../enum";
 import type definition from "./definition";
-
-function formatPrice(amount: number, currency: string, locale: string): string {
-  return new Intl.NumberFormat(locale, {
-    style: "currency",
-    currency,
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(amount);
-}
 
 // ProductType enum values are i18n translation keys (e.g. "enums.productType.service")
 // product.type at runtime holds those same key strings
@@ -235,7 +230,7 @@ export function CatalogProductGetWidget({
           </Span>
           <Div className="flex items-baseline gap-1">
             <Span className="text-xl font-bold font-mono">
-              {formatPrice(product.basePrice, product.currency, locale)}
+              {formatMoney(product.basePrice, product.currency, locale)}
             </Span>
             {product.unit ? (
               <Span className="text-xs text-muted-foreground">
@@ -257,8 +252,7 @@ export function CatalogProductGetWidget({
               {t("get.response.defaultTaxRate")}
             </Span>
             <Span className="text-sm font-mono font-semibold">
-              {(product.defaultTaxRate * 100).toFixed(2)}
-              {/* eslint-disable-next-line i18n/no-literal-string */}%
+              {formatPercent(product.defaultTaxRate, locale)}
             </Span>
           </Div>
         ) : null}

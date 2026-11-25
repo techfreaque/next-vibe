@@ -110,6 +110,19 @@ const { POST } = createEndpoint({
         labelField: "name",
       }),
 
+      receiptKey: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "receiptKey.label",
+        description: "receiptKey.description",
+        schema: z
+          .string()
+          .min(1)
+          .max(128)
+          .regex(/^[a-zA-Z0-9._:-]+$/)
+          .optional(),
+      }),
+
       // RESPONSE FIELDS
       success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
@@ -175,6 +188,7 @@ const { POST } = createEndpoint({
         amount: 1476,
         method: ManualPaymentMethod.BANK_TRANSFER,
         paidAt: "2024-01-15T10:00:00Z",
+        receiptKey: "bank-receipt-2024-01-15-1",
       },
     },
     responses: {

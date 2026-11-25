@@ -104,7 +104,7 @@ export const translations: typeof enTranslations = {
         server: {
           title: "Serverfehler",
           description:
-            "Lagerhaus konnte nicht erstellt werden — erneut versuchen",
+            "Lagerhaus konnte nicht erstellt werden. Bitte versuchen Sie es erneut.",
         },
         unknown: {
           title: "Unbekannter Fehler",
@@ -378,6 +378,13 @@ export const translations: typeof enTranslations = {
       description:
         "Lagerbestände eines Lagerhauses mit Verfügbarkeit und Mindestbestandsindikatoren anzeigen.",
       widget: {
+        unnamedProduct: "Produktname nicht verfügbar",
+        search: "Produkte oder Lager suchen",
+        stockStatus: "Bestandsstatus",
+        actions: "Aktionen",
+        noMatches: "Keine passenden Bestände",
+        loadMore: "Mehr anzeigen",
+
         back: "Zurück",
         lowStock: "Mindestbestand unterschritten",
         available: "Verfügbar",
@@ -399,7 +406,8 @@ export const translations: typeof enTranslations = {
         outOfStock: "nicht vorrätig",
         belowReorderPoint: "unter Meldebestand",
         bulletSeparator: "·",
-        statusOk: "OK",
+        stockValue: "Bestandswert",
+        statusOk: "Auf Lager",
       },
       warehouseId: {
         label: "Lagerhaus-ID",
@@ -449,6 +457,7 @@ export const translations: typeof enTranslations = {
         description: "Lagerbestände abgerufen",
       },
       response: {
+        currency: "Währung",
         id: "Bestandsdatensatz-ID",
         warehouseId: "Lagerhaus-ID",
         warehouseName: "Lagerhaus",
@@ -562,7 +571,7 @@ export const translations: typeof enTranslations = {
       title: "Wareneingang buchen",
       titleShort: "Wareneingang",
       description:
-        "Eingehende Ware erfassen — aktualisiert Lagerbestand und gewichteten Durchschnittspreis.",
+        "Erfassen Sie den Wareneingang. Lagerbestand und gewogener Durchschnittspreis werden aktualisiert.",
       widget: {
         backToStock: "Zurück zum Bestand",
       },
@@ -1102,6 +1111,10 @@ export const translations: typeof enTranslations = {
         kpiOutOfStock: "Nicht vorrätig",
         kpiLowStock: "Niedriger Bestand",
         kpiWarehouses: "Lagerhäuser",
+        attention: "Kritische Bestände",
+        noAttention: "Alle Artikel liegen über ihrem Meldebestand.",
+        newPurchaseOrder: "Neue Bestellung",
+        kpiTransfersInTransit: "Umlagerungen unterwegs",
         alertOutOfStock: "{{count}} Produkt nicht vorrätig",
         alertOutOfStockPlural: "{{count}} Produkte nicht vorrätig",
         navStockLevels: "Lagerbestände",

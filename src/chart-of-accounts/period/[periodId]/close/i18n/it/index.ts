@@ -52,6 +52,8 @@ export const translations: typeof enTranslations = {
       description: "Il periodo contabile è stato chiuso",
     },
     widget: {
+      closeNamed: "Chiudi {{name}}",
+      draftCount: "Registrazioni in bozza",
       closedLabel: "Chiuso",
       failedLabel: "Sfigato",
       confirmTitle: "Periodo di contabilità?",

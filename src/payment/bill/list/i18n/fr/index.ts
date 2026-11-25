@@ -72,7 +72,7 @@ export const translations: typeof enTranslations = {
     label: "Rechercher des documents",
     description:
       "Recherchez par numéro de facture, nom du fournisseur ou identifiant. Filtrez par entreprise ou statut.",
-    placeholder: "Numéro de facture, fournisseur ou identifiant",
+    placeholder: "Numéro de facture ou fournisseur",
   },
   status: {
     label: "Statut",
@@ -91,6 +91,7 @@ export const translations: typeof enTranslations = {
     },
   },
   widget: {
+    filters: "Filtres",
     pageCount: "Nombre de pages",
     back: "Retour",
     title: "Factures fournisseurs",

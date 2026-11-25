@@ -4,6 +4,90 @@ export const translations: typeof enTranslations = {
   category: "Pomoc a dokumentácia",
   tag: "Pomoc",
   uncategorized: "Ostatné",
+  erp: {
+    navigation: {
+      sales: "Predaj",
+      purchases: "Nákup",
+      invoices: "Vydané faktúry",
+      estimates: "Cenové ponuky",
+      bills: "Prijaté faktúry",
+    },
+    overview: {
+      loading: "Načítava sa prehľad firmy",
+      loadError: "Prehľad firmy sa nepodarilo načítať",
+    },
+    home: "Domov",
+    title: "Účtovníctvo",
+    description:
+      "Nastavte firmu, spravujte faktúry a pripravte účtovníctvo na mesačnú uzávierku.",
+    companies: "Spravovať firmy",
+    activeDescription: "Skontrolujte účtovníctvo a pripravte ďalšiu faktúru.",
+    newInvoice: "Nová faktúra",
+    createCompany: "Nastaviť firmu",
+    companySwitch: {
+      label: "Účtovaná firma",
+      select: "Vybrať firmu",
+      current: "Aktuálna firma: {{name}}",
+    },
+    workflows: "Bežné úlohy",
+    sales: {
+      title: "Vystavte faktúru odberateľovi",
+      description:
+        "Pripravte návrh faktúry alebo otvorte existujúcu faktúru a zaevidujte úhradu.",
+      primary: "Vytvoriť faktúru",
+      secondary: "Zobraziť faktúry",
+    },
+    expenses: {
+      title: "Zaevidujte dodávateľskú faktúru",
+      description:
+        "Zaúčtujte záväzok voči dodávateľovi a sledujte úhradu na faktúre.",
+      primary: "Pridať dodávateľskú faktúru",
+      secondary: "Zobraziť dodávateľské faktúry",
+    },
+    receivables: {
+      title: "Zistite, kto vám dlhuje",
+      description:
+        "Pozrite si neuhradené pohľadávky podľa počtu dní po splatnosti.",
+      primary: "Zobraziť pohľadávky",
+    },
+    payables: {
+      title: "Skontrolujte záväzky voči dodávateľom",
+      description:
+        "Pozrite si neuhradené záväzky, faktúry na schválenie a sporné sumy.",
+      primary: "Zobraziť záväzky",
+    },
+    bank: {
+      title: "Importujte bankové pohyby",
+      description:
+        "Importujte výpis vo formáte CSV a skontrolujte nespárované transakcie.",
+      primary: "Importovať bankový výpis",
+      secondary: "Zobraziť nespárované transakcie",
+    },
+    stock: {
+      title: "Skontrolujte zásoby",
+      description: "Skontrolujte stav zásob a zistite, čo treba doplniť.",
+      primary: "Otvoriť zásoby",
+    },
+    tax: {
+      title: "Skontrolujte DPH",
+      description:
+        "Pred podaním priznania si overte sumy DPH za zdaňovacie obdobie.",
+      primary: "Otvoriť prehľad DPH",
+    },
+    exports: {
+      title: "Skontrolujte a exportujte účtovný denník",
+      description:
+        "Preverte nezrovnalosti alebo stiahnite zaúčtované zápisy vo formáte CSV.",
+      primary: "Skontrolovať účtovné zápisy",
+      secondary: "Otvoriť export denníka",
+    },
+    close: {
+      title: "Uzavrite účtovné obdobie",
+      description: "Pred uzavretím obdobia skontrolujte obratovú predvahu.",
+      primary: "Zobraziť obdobia",
+      secondary: "Otvoriť obratovú predvahu",
+    },
+  },
   catalog: {
     title: "Katalóg nástrojov",
     searchLabel: "Vyhľadať v katalógu nástrojov",
@@ -16,7 +100,8 @@ export const translations: typeof enTranslations = {
     loadError: "Katalóg sa nepodarilo načítať",
     retry: "Skúsiť znova",
     noTools: "V tomto zobrazení nie sú dostupné žiadne nástroje",
-    noMatches: "Vyhľadávanie výrazu „{{query}}“ nenašlo žiadne nástroje. Skúste iný názov.",
+    noMatches:
+      "Vyhľadávanie výrazu „{{query}}“ nenašlo žiadne nástroje. Skúste iný názov.",
     openPrimary: "Otvoriť: {{title}}",
     allInCategory: "Všetky nástroje",
     general: "Všeobecné",
@@ -160,29 +245,30 @@ export const translations: typeof enTranslations = {
       },
       statsFilter: {
         label: "Filter nástrojov",
-        description: "Zobrazte všetky, iba pripnuté alebo iba povolené nástroje.",
+        description:
+          "Zobrazte všetky, iba pripnuté alebo iba povolené nástroje.",
       },
     },
     hints: {
       noCapabilitySnapshot:
         "Pre inštanciu „{{instanceId}}“ chýba zoznam dostupných funkcií. Pripojte ju a počkajte na ďalšiu synchronizáciu.",
       remoteFullSchema:
-        "Úplná schéma nástrojov inštancie „{{instanceId}}“. Počet: {{count}}. Volanie: execute-tool toolName=\"{{instanceId}}__<name>\" input={...}.",
+        'Úplná schéma nástrojov inštancie „{{instanceId}}“. Počet: {{count}}. Volanie: execute-tool toolName="{{instanceId}}__<name>" input={...}.',
       remoteList:
         "Zo vzdialenej inštancie „{{instanceId}}“ zodpovedá {{matched}} z {{total}} nástrojov. Ak chcete úplné schémy, zúžte výsledky na najviac {{detailThreshold}} položiek alebo zadajte toolName= pre konkrétny nástroj.{{pagination}}",
       toolNotFound:
         "Nástroj „{{name}}“ sa nenašiel. Vyhľadajte ho podľa kľúčového slova pomocou query.",
       detailMode:
-        "Volanie: execute-tool toolName=\"{{name}}\"{{aliases}}. V CLI: vibe {{name}} [--field=value].",
+        'Volanie: execute-tool toolName="{{name}}"{{aliases}}. V CLI: vibe {{name}} [--field=value].',
       detailModeAliases: " (aliasy: {{aliases}})",
       noToolsMatched:
         "Žiadny nástroj nevyhovuje vyhľadávaniu. Skúste všeobecnejší výraz alebo spustite volanie bez parametrov a zobrazte všetky kategórie.",
       compactFullSchema:
-        "Úplná schéma nástrojov. Počet: {{count}}. Volanie: execute-tool toolName=\"<name>\" input={...}.",
+        'Úplná schéma nástrojov. Počet: {{count}}. Volanie: execute-tool toolName="<name>" input={...}.',
       compactCategoryOnly:
-        "Počet nástrojov: {{matched}}. Počet kategórií: {{categories}}. Parametrom category=\"<name>\" vyberte kategóriu alebo podkategóriu. Pod hranicou {{listThreshold}} sa zobrazia názvy nástrojov, pod hranicou {{detailThreshold}} úplné schémy.",
+        'Počet nástrojov: {{matched}}. Počet kategórií: {{categories}}. Parametrom category="<name>" vyberte kategóriu alebo podkategóriu. Pod hranicou {{listThreshold}} sa zobrazia názvy nástrojov, pod hranicou {{detailThreshold}} úplné schémy.',
       compactList:
-        "Počet nástrojov: {{matched}}. Pre úplné schémy zúžte výsledky na najviac {{detailThreshold}} položiek alebo zadajte toolName=\"<name>\" pre konkrétny nástroj. Volanie: execute-tool toolName=\"<name>\".{{pagination}}",
+        'Počet nástrojov: {{matched}}. Pre úplné schémy zúžte výsledky na najviac {{detailThreshold}} položiek alebo zadajte toolName="<name>" pre konkrétny nástroj. Volanie: execute-tool toolName="<name>".{{pagination}}',
       cliFullDetail:
         "Zobrazené podrobnosti nástrojov. Počet: {{count}}. V CLI použite vibe <name> [--field=value].",
       cliList:
@@ -238,8 +324,7 @@ export const translations: typeof enTranslations = {
   interactive: {
     post: {
       title: "Interaktívny režim",
-      description:
-        "Prehliadajte API trasy v strome súborov a spúšťajte ich.",
+      description: "Prehliadajte API trasy v strome súborov a spúšťajte ich.",
       category: "Systémový pomocník",
       tags: {
         system: "systém",
@@ -287,7 +372,8 @@ export const translations: typeof enTranslations = {
     description: "Zobrazte pomoc k príkazom CLI.",
     form: {
       title: "Možnosti pomocníka",
-      description: "Získajte pomoc ku konkrétnemu príkazu alebo všeobecný návod.",
+      description:
+        "Získajte pomoc ku konkrétnemu príkazu alebo všeobecný návod.",
     },
     errors: {
       validation: {
@@ -390,8 +476,7 @@ export const translations: typeof enTranslations = {
       webPinnedLabel: "pripnuté na webe",
       webPinnedTooltip: "Nástroje pripnuté na bočný panel na rýchly prístup",
       pinnedLabel: "pripnuté",
-      pinnedTooltip:
-        "AI vidí pripnuté nástroje v každom kroku.",
+      pinnedTooltip: "AI vidí pripnuté nástroje v každom kroku.",
       enabledLabel: "povolené pre AI",
       enabledTooltip:
         "Ak je pomocník povolený, AI môže tieto nástroje podľa potreby volať.",
@@ -420,10 +505,14 @@ export const translations: typeof enTranslations = {
       legendConfirm: "Vyžiada potvrdenie pred spustením",
       legendWebPin: "Pripnuté na bočný panel",
       stats: "Pripnuté nástroje: {{pinned}} z {{total}}",
-      activeOn: "Nástroj je vždy v kontexte AI. Po odopnutí ho AI použije len podľa potreby.",
-      activeOff: "Nástroj nie je v kontexte AI. Pripnite ho, aby ho AI videla v každom kroku.",
-      confirmOn: "AI sa pred spustením opýta. Kliknutím povolíte automatické schvaľovanie.",
-      confirmOff: "Nástroj sa spustí bez otázky. Kliknutím nastavíte povinné schválenie.",
+      activeOn:
+        "Nástroj je vždy v kontexte AI. Po odopnutí ho AI použije len podľa potreby.",
+      activeOff:
+        "Nástroj nie je v kontexte AI. Pripnite ho, aby ho AI videla v každom kroku.",
+      confirmOn:
+        "AI sa pred spustením opýta. Kliknutím povolíte automatické schvaľovanie.",
+      confirmOff:
+        "Nástroj sa spustí bez otázky. Kliknutím nastavíte povinné schválenie.",
       closeSidebar: "Zavrieť bočný panel nástrojov",
       selectTool: "Vyberte nástroj",
       selectToolHint: "Začnite výberom nástroja z bočného panela.",
@@ -440,8 +529,7 @@ export const translations: typeof enTranslations = {
         "Prejdite si všetky nástroje a pripnite si tie, ktoré má AI používať.",
       webPinsDescription:
         "Skratky na rýchle spustenie nástrojov z bočného panela správcu.",
-      aiAllowedDescription:
-        "AI môže tieto nástroje spustiť podľa potreby.",
+      aiAllowedDescription: "AI môže tieto nástroje spustiť podľa potreby.",
       noAllowedTools: "Žiadne povolené nástroje",
     },
 
@@ -501,7 +589,8 @@ export const translations: typeof enTranslations = {
         },
         unknown: {
           title: "Neočakávaná chyba",
-          description: "Pri načítavaní zoznamu príkazov nastala neočakávaná chyba.",
+          description:
+            "Pri načítavaní zoznamu príkazov nastala neočakávaná chyba.",
         },
         conflict: {
           title: "Konflikt údajov",

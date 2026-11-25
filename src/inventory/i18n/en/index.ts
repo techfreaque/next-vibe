@@ -102,7 +102,7 @@ export const translations = {
         },
         server: {
           title: "Server Error",
-          description: "Failed to create warehouse — try again",
+          description: "Failed to create warehouse. Try again.",
         },
         unknown: {
           title: "Unknown Error",
@@ -373,6 +373,13 @@ export const translations = {
       description:
         "View stock levels for a warehouse with availability and low-stock indicators.",
       widget: {
+        unnamedProduct: "Unavailable product name",
+        search: "Search products or warehouses",
+        stockStatus: "Stock status",
+        actions: "Actions",
+        noMatches: "No matching stock records",
+        loadMore: "Show more",
+
         back: "Back",
         lowStock: "Low stock",
         available: "Available",
@@ -393,7 +400,8 @@ export const translations = {
         outOfStock: "out of stock",
         belowReorderPoint: "below reorder point",
         bulletSeparator: "·",
-        statusOk: "OK",
+        stockValue: "Stock value",
+        statusOk: "In stock",
       },
       warehouseId: {
         label: "Warehouse ID",
@@ -440,6 +448,7 @@ export const translations = {
       },
       success: { title: "Stock Loaded", description: "Stock levels retrieved" },
       response: {
+        currency: "Currency",
         id: "Stock ID",
         warehouseId: "Warehouse ID",
         warehouseName: "Warehouse",
@@ -552,7 +561,7 @@ export const translations = {
       title: "Receive Stock",
       titleShort: "Receive Stock",
       description:
-        "Record incoming stock — updates on-hand quantity and weighted average cost.",
+        "Record a stock receipt to update the quantity on hand and weighted average cost.",
       widget: {
         backToStock: "Back to stock",
       },
@@ -1080,6 +1089,10 @@ export const translations = {
         kpiOutOfStock: "Out of Stock",
         kpiLowStock: "Low Stock",
         kpiWarehouses: "Warehouses",
+        attention: "Stock needing attention",
+        noAttention: "No items are below their stock threshold.",
+        newPurchaseOrder: "New purchase order",
+        kpiTransfersInTransit: "Transfers in transit",
         alertOutOfStock: "{{count}} product out of stock",
         alertOutOfStockPlural: "{{count}} products out of stock",
         navStockLevels: "Stock Levels",

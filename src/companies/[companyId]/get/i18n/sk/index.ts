@@ -46,7 +46,7 @@ export const translations: typeof enTranslations = {
       },
       server: {
         title: "Chyba servera",
-        description: "Niečo sa pokazilo. Skúste to znova.",
+        description: "Akciu sa nepodarilo dokončiť. Skúste to znova.",
       },
       unknown: {
         title: "Neznáma chyba",
@@ -70,6 +70,7 @@ export const translations: typeof enTranslations = {
       description: "Údaje o firme sú pripravené.",
     },
     widget: {
+      setupAccounting: "Nastaviť účtovníctvo",
       back: "Späť",
       loading: "Načítavajú sa údaje o firme…",
       edit: "Upraviť",

@@ -86,7 +86,7 @@ export const translations: typeof enTranslations = {
     },
     server: {
       title: "Serverfehler",
-      description: "Vorgang fehlgeschlagen — bitte erneut versuchen",
+      description: "Vorgang fehlgeschlagen. Bitte versuchen Sie es erneut.",
     },
     unknown: {
       title: "Unbekannter Fehler",
@@ -281,7 +281,30 @@ export const translations: typeof enTranslations = {
     success: { title: "Buchungen geladen", description: "Buchungen abgerufen" },
   },
   journalCreate: {
+    errorDate: "Das Buchungsdatum muss im gewählten Zeitraum liegen.",
+    errorCurrency:
+      "Verwenden Sie für alle Positionen die Buchungswährung des Unternehmens.",
+    errorInvalidLine:
+      "Geben Sie einen positiven Soll- oder Habenbetrag mit höchstens vier Nachkommastellen ein.",
+    errorAccount: "Wählen Sie ein gültiges Konto dieses Unternehmens.",
     widget: {
+      lineDescription: "Buchungstext",
+      incomplete: "Geben Sie für jede Zeile einen Soll- oder Habenbetrag ein.",
+      offByLessThan: "Abweichung unter {{amount}}",
+      offBy: "Differenz {{amount}}",
+
+      details: "Buchungsdaten",
+      saveDraft: "Entwurf speichern",
+      addLine: "Buchungszeile hinzufügen",
+      removeLine: "Buchungszeile entfernen",
+      account: "Konto",
+      side: "Soll oder Haben",
+      amount: "Betrag",
+      currency: "Währung",
+      missingScope: "Wählen Sie zuerst ein Unternehmen.",
+      noPeriods: "Für dieses Unternehmen ist keine Buchungsperiode offen.",
+      noAccounts: "Für dieses Unternehmen sind keine bebuchbaren Konten aktiv.",
+
       back: "Zurück",
       viewEntryButton: "Buchung anzeigen",
       postNowButton: "Jetzt buchen",
@@ -295,12 +318,12 @@ export const translations: typeof enTranslations = {
     titleShort: "Neue Buchung",
     description: "Manuelle doppelte Buchführung. Soll muss Haben entsprechen.",
     companyId: {
-      label: "Unternehmens-ID",
+      label: "Unternehmen",
       description: "Das Unternehmen für diese Buchung",
       placeholder: "Unternehmens-UUID",
     },
     periodId: {
-      label: "Perioden-ID",
+      label: "Buchungsperiode",
       description: "Die Buchhaltungsperiode",
       placeholder: "Perioden-UUID",
     },
@@ -339,7 +362,7 @@ export const translations: typeof enTranslations = {
     title: "Buchung buchen",
     titleShort: "Buchen",
     description:
-      "Entwurf zu GEBUCHT ändern. Nicht rückgängig machbar — Stornierung verwenden.",
+      "Buchen Sie den Entwurf. Eine gebuchte Buchung können Sie durch Stornieren korrigieren.",
     entryId: {
       label: "Buchungs-ID",
       description: "Die zu buchende Buchung",
@@ -354,6 +377,10 @@ export const translations: typeof enTranslations = {
     errorNotDraft: "Nur Entwürfe können gebucht werden",
   },
   journalReverse: {
+    errorManaged: "Stornieren Sie diese Buchung im zugehörigen Beleg.",
+    errorDate:
+      "Das Stornodatum darf nicht vor dem ursprünglichen Buchungsdatum liegen.",
+    errorNoPeriod: "Öffnen Sie eine Buchungsperiode für das Stornodatum.",
     widget: {
       backButton: "Zurück zum Journal",
       reversalCreated: "Gegenbuchung erstellt",
@@ -453,7 +480,7 @@ export const translations: typeof enTranslations = {
     },
     asOfDate: {
       label: "Stichtag",
-      description: "Berichtsdatum — Standard: heute",
+      description: "Berichtsdatum (standardmäßig heute)",
       placeholder: "JJJJ-MM-TT",
     },
     periodId: {
@@ -515,7 +542,13 @@ export const translations: typeof enTranslations = {
     },
   },
   reports: {
+    switchReport: "Berichte",
+    currency: "Währung",
+    mixedCurrency:
+      "Dieser Zeitraum enthält Buchungen in mehreren Währungen. Wählen Sie eine Währung für den Bericht.",
     nav: {
+      ledgerTax: "Umsatzsteuer im Hauptbuch",
+      payables: "Offene Verbindlichkeiten nach Fälligkeit",
       profitLoss: "GuV",
       balanceSheet: "Bilanz",
       trialBalance: "Saldenliste",
@@ -523,6 +556,10 @@ export const translations: typeof enTranslations = {
       receivablesAging: "Forderungsalterung",
     },
     widget: {
+      quickDates: "Zeitraum wählen",
+      thisMonth: "Dieser Monat",
+      previousMonth: "Letzter Monat",
+      autoCurrency: "Automatisch",
       run: "Ausführen",
       running: "Wird ausgeführt…",
     },
@@ -633,10 +670,11 @@ export const translations: typeof enTranslations = {
     },
     asOfDate: {
       label: "Stichtag",
-      description: "Berichtsdatum — Standard: heute",
+      description: "Berichtsdatum (standardmäßig heute)",
       placeholder: "JJJJ-MM-TT",
     },
     response: {
+      unclosedEarnings: "Noch nicht abgeschlossener Gewinn oder Verlust",
       asOfDate: "Stichtag",
       assets: "Aktiva",
       totalAssets: "Summe Aktiva",
@@ -688,40 +726,41 @@ export const translations: typeof enTranslations = {
     },
   },
   receivablesAging: {
+    currencies: { EUR: "EUR", USD: "USD", PLN: "PLN" },
     widget: {
-      asOf: "Stand",
-      noData: "Keine offenen Forderungen.",
+      asOf: "Stichtag",
+      noData: "Keine offenen Rechnungen in dieser Währung.",
       totalRow: "Gesamt",
       viewInvoice: "Ansehen",
-      selectCompany:
-        "Unternehmens-ID eingeben und auf Ausführen klicken, um den Forderungsbericht zu erstellen.",
+      selectCompany: "Wählen Sie ein Unternehmen für die Auswertung.",
     },
-    title: "Forderungsalterung",
-    titleShort: "Forderungsalterung",
-    description:
-      "Offene Forderungen nach Fälligkeitsdauer. Zeigt genau, wo Liquidität festhängt.",
+    title: "Offene Rechnungen",
+    titleShort: "Offene Rechnungen",
+    description: "Offene Beträge nach Fälligkeit und Währung.",
     companyId: {
-      label: "Unternehmens-ID",
-      description: "Unternehmen für den Bericht",
+      label: "Unternehmen",
+      description: "Wählen Sie das Unternehmen für die Auswertung.",
       placeholder: "Unternehmens-UUID",
     },
     asOfDate: {
       label: "Stichtag",
-      description: "Referenzdatum — Standard: heute",
+      description:
+        "Der Stichtag bestimmt die Altersklasse der heute noch offenen Beträge.",
       placeholder: "JJJJ-MM-TT",
     },
     response: {
+      currency: "Währung",
       asOfDate: "Stichtag",
       buckets: "Kategorien",
-      current: "Aktuell",
+      current: "Noch nicht überfällig",
       days1to30: "1–30 Tage",
       days31to60: "31–60 Tage",
       days61to90: "61–90 Tage",
       over90: "Über 90 Tage",
-      invoiceId: "Rechnungs-ID",
-      customerId: "Kunden-ID",
+      invoiceId: "Rechnung",
+      customerId: "Kunde",
       amount: "Betrag",
-      dueDate: "Fälligkeitsdatum",
+      dueDate: "Fällig",
       totals: "Summen",
       total: "Gesamt",
     },

@@ -14,6 +14,7 @@ import { EntityPickerFieldWidget } from "next-vibe/unified-ui/widgets/form-field
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 import type { JSX } from "react";
 
+import { PeriodStatus } from "../../../enum";
 import type definition from "./definition";
 
 function fmtDate(d: Date | string): string {
@@ -38,8 +39,7 @@ export function CoaPeriodGetWidget({
     void (async (): Promise<void> => {
       const def = await import("../close/definition");
       navigation.push(def.default.POST, {
-        data: { periodId: period.id },
-        popNavigationOnSuccess: 1,
+        urlPathParams: { periodId: period.id },
       });
     })();
   };
@@ -71,9 +71,9 @@ export function CoaPeriodGetWidget({
   }
 
   const statusVariant =
-    period.status === "OPEN"
+    period.status === PeriodStatus.OPEN
       ? "default"
-      : period.status === "LOCKED"
+      : period.status === PeriodStatus.LOCKED
         ? "destructive"
         : "secondary";
 
@@ -96,7 +96,11 @@ export function CoaPeriodGetWidget({
           <Span className="text-base font-semibold flex-1">{period.name}</Span>
           <Badge variant={statusVariant} className="text-xs">
             {t(
-              `enums.periodStatus.${period.status}` as Parameters<typeof t>[0],
+              period.status === PeriodStatus.OPEN
+                ? PeriodStatus.OPEN
+                : period.status === PeriodStatus.LOCKED
+                  ? PeriodStatus.LOCKED
+                  : PeriodStatus.CLOSED,
             )}
           </Badge>
         </Div>
@@ -124,7 +128,7 @@ export function CoaPeriodGetWidget({
         </Div>
       </Div>
 
-      {period.status === "OPEN" && (
+      {period.status === PeriodStatus.OPEN && (
         <Div className="flex gap-2">
           <Button
             type="button"

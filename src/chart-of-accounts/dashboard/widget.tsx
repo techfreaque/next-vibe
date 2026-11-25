@@ -1,96 +1,71 @@
 "use client";
 
-import { Badge } from "next-vibe/ui/components/badge";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { EmptyBlock } from "next-vibe/ui/components/empty-block";
 import { LoadingBlock } from "next-vibe/ui/components/loading-block";
+import { SectionGroup } from "next-vibe/ui/components/section-group";
 import { Span } from "next-vibe/ui/components/span";
+import { StatusPill } from "next-vibe/ui/components/status-pill";
 import { WidgetHeader } from "next-vibe/ui/components/widget-header";
 import { WidgetShell } from "next-vibe/ui/components/widget-shell";
 import {
+  formatDocDate,
+  formatMoney,
+} from "next-vibe/unified-ui/_shared/format-money";
+import {
   useWidgetForm,
   useWidgetIsInteractive,
+  useWidgetLocale,
   useWidgetNavigation,
   useWidgetResponse,
   useWidgetResponseOnly,
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
+import { Icon } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icon-component";
 import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import type { JSX } from "react";
 
 import { DocumentScopePicker } from "@/finance/document-list-ui";
 
+import { JournalEntryStatus } from "../enum";
 import type definition from "./definition";
 
 interface AccountingDashboardWidgetProps {
   field: (typeof definition.GET)["fields"];
 }
 
-// Nav card icon names — plain strings used as data, not as i18n text
 const NAV_ICONS = {
-  accounts: "📒",
-  journal: "✏️",
-  periods: "📅",
-  balanceSheet: "⚖️",
-  profitLoss: "📈",
-  trialBalance: "🧾",
-  taxReport: "🏛️",
-  companies: "🏢",
-  invoices: "🧾",
-  bills: "📄",
+  accounts: "book-open",
+  journal: "pencil",
+  periods: "calendar",
+  balanceSheet: "scale",
+  profitLoss: "trending-up",
+  trialBalance: "bar-chart",
+  taxReport: "banknote",
+  companies: "building",
+  invoices: "receipt",
+  bills: "file-text",
 } as const;
-
-// Separator used in period date range display — purely visual punctuation
-const DATE_SEPARATOR = " \u2013 ";
 
 function KpiCard({
   label,
   value,
-  badge,
-  badgeVariant,
-  actionLabel,
-  onAction,
+  empty,
 }: {
   label: string;
-  value: string | number;
-  badge?: string;
-  badgeVariant?: "default" | "secondary" | "destructive" | "outline";
-  actionLabel?: string;
-  onAction?: () => void;
+  value: string;
+  empty: boolean;
 }): JSX.Element {
   return (
-    <Div className="rounded-md border p-4 flex flex-col gap-2 bg-card overflow-hidden">
-      <Span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-        {label}
+    <Div className="flex min-w-0 flex-col gap-2 rounded-md border bg-card p-3 @md:p-4">
+      <Span className="text-sm text-muted-foreground">{label}</Span>
+      <Span
+        className={`break-words text-lg leading-tight tabular-nums @md:text-2xl ${empty ? "text-muted-foreground" : "font-semibold"}`}
+      >
+        {value}
       </Span>
-      <Div className="flex items-end justify-between gap-2 min-w-0">
-        <Span
-          className={`font-bold leading-tight break-words min-w-0 ${typeof value === "number" ? "text-2xl tabular-nums" : "text-base"}`}
-        >
-          {value}
-        </Span>
-        {badge !== undefined && (
-          <Badge
-            variant={badgeVariant ?? "secondary"}
-            className="text-xs shrink-0"
-          >
-            {badge}
-          </Badge>
-        )}
-      </Div>
-      {actionLabel !== undefined && onAction !== undefined && (
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={onAction}
-          className="self-start -ml-2 h-auto py-1 text-xs"
-        >
-          {actionLabel}
-        </Button>
-      )}
     </Div>
   );
 }
@@ -112,9 +87,7 @@ function NavCard({
       onClick={onClick}
       className="h-auto py-3 px-4 flex flex-col items-start gap-1 text-left"
     >
-      <Span className="text-lg" aria-hidden="true">
-        {icon}
-      </Span>
+      <Icon icon={icon} className="h-5 w-5 text-muted-foreground" />
       <Span className="text-sm font-medium">{label}</Span>
     </Button>
   );
@@ -126,17 +99,20 @@ export function AccountingDashboardWidget(
 ): JSX.Element {
   const data = useWidgetValue<typeof definition.GET>();
   const t = useWidgetTranslation<typeof definition.GET>();
+  const locale = useWidgetLocale();
   const navigation = useWidgetNavigation();
   const form = useWidgetForm<typeof definition.GET>();
   const response = useWidgetResponse();
   const responseOnly = useWidgetResponseOnly();
-  const isInteractive = useWidgetIsInteractive() && !responseOnly;
+  const interactive = useWidgetIsInteractive();
+  const embedded = interactive && responseOnly;
+  const isInteractive = interactive && !responseOnly;
   const companyId = form.watch("companyId");
   const selectedCompanyId = data?.selectedCompanyId ?? undefined;
   const hasCompany =
     selectedCompanyId !== undefined &&
-    (!isInteractive || selectedCompanyId === companyId);
-  const canConfigure = isInteractive && data?.canConfigure;
+    (!isInteractive || !companyId || selectedCompanyId === companyId);
+  const canConfigure = interactive && data?.canConfigure;
 
   const handleNavGet = (
     importFn: () => Promise<{
@@ -193,7 +169,7 @@ export function AccountingDashboardWidget(
     () => import("../reports/trial-balance/definition"),
   );
   const handleNavTaxReport = handleNavGet(
-    () => import("../reports/tax-report/definition"),
+    () => import("@/tax/report/definition"),
   );
   const handleNavSetup = handleNavPost(() => import("../setup/definition"));
   const handleNavCreatePeriod = handleNavPost(
@@ -210,29 +186,36 @@ export function AccountingDashboardWidget(
     () => import("@/payment/bill/list/definition"),
   );
 
+  const handleDrafts = (): void => {
+    void (async (): Promise<void> => {
+      const { default: journals } = await import("../journal/list/definition");
+      navigation.push(journals.GET, {
+        data: {
+          companyId: selectedCompanyId,
+          status: JournalEntryStatus.DRAFT,
+        },
+      });
+    })();
+  };
+
   return (
-    <WidgetShell className="min-w-0">
-      <WidgetHeader title={t("dashboard.title")} />
+    <WidgetShell
+      layout={embedded ? "compact" : "page"}
+      padding={embedded ? "none" : "md"}
+      className="min-w-0"
+    >
+      {!embedded && <WidgetHeader size="page" title={t("dashboard.title")} />}
       {isInteractive && (
         <Div className="flex min-w-0 flex-wrap items-center gap-2">
           <DocumentScopePicker
             kind="company"
             required
-            value={companyId}
-            appliedLabel={
-              selectedCompanyId === companyId
-                ? data?.selectedCompanyName
-                : undefined
-            }
+            value={companyId ?? selectedCompanyId}
+            appliedLabel={hasCompany ? data?.selectedCompanyName : undefined}
             onSelect={(id) =>
               form.setValue("companyId", id, { shouldDirty: true })
             }
           />
-          {hasCompany && (
-            <Span className="text-sm text-muted-foreground">
-              {data?.currency}
-            </Span>
-          )}
         </Div>
       )}
       <FormAlertWidget field={{}} />
@@ -244,91 +227,136 @@ export function AccountingDashboardWidget(
       )}
       {hasCompany && data && (
         <Div className="flex min-w-0 flex-col gap-6">
-          {/* Period status bar */}
-          <Div className="rounded-md border px-4 py-3 flex items-center justify-between gap-3 flex-wrap bg-card">
-            <Div className="flex items-center gap-3">
-              <Span className="text-sm font-semibold text-muted-foreground">
+          {data.openReceivables !== undefined &&
+            data.approvedPayables !== undefined &&
+            data.cashBalance !== undefined &&
+            data.monthToDateProfit !== undefined && (
+              <Div className="flex flex-col gap-2">
+                <Span className="text-sm font-semibold">{`${t("dashboard.widget.financialOverview")} · ${data.currency}`}</Span>
+                <Div className="grid min-w-0 grid-cols-2 gap-2 @xl:grid-cols-4">
+                  <KpiCard
+                    label={t("dashboard.widget.openReceivables")}
+                    empty={Math.abs(data.openReceivables) < 0.005}
+                    value={formatMoney(
+                      data.openReceivables,
+                      data.currency,
+                      locale,
+                    )}
+                  />
+                  <KpiCard
+                    label={t("dashboard.widget.approvedPayables")}
+                    empty={Math.abs(data.approvedPayables) < 0.005}
+                    value={formatMoney(
+                      data.approvedPayables,
+                      data.currency,
+                      locale,
+                    )}
+                  />
+                  <KpiCard
+                    label={t("dashboard.widget.cashBalance")}
+                    empty={Math.abs(data.cashBalance) < 0.005}
+                    value={formatMoney(data.cashBalance, data.currency, locale)}
+                  />
+                  <KpiCard
+                    label={t("dashboard.widget.monthToDateProfit")}
+                    empty={Math.abs(data.monthToDateProfit) < 0.005}
+                    value={formatMoney(
+                      data.monthToDateProfit,
+                      data.currency,
+                      locale,
+                    )}
+                  />
+                </Div>
+                {data.openReceivables === 0 &&
+                  data.approvedPayables === 0 &&
+                  data.cashBalance === 0 &&
+                  data.monthToDateProfit === 0 && (
+                    <Span className="text-sm text-muted-foreground">
+                      {t("dashboard.widget.zeroMetricsHint")}
+                    </Span>
+                  )}
+              </Div>
+            )}
+
+          {data.currentPeriodName && (
+            <Div className="flex flex-wrap items-center gap-2 rounded-md border bg-card px-3 py-2 text-sm">
+              <Span className="text-muted-foreground">
                 {t("dashboard.widget.currentPeriod")}
               </Span>
-              {data.currentPeriodName !== null &&
-              data.currentPeriodName !== undefined ? (
-                <Div className="flex items-center gap-2">
-                  <Span className="text-sm font-medium">
-                    {data.currentPeriodName}
-                  </Span>
-                  {data.currentPeriodStartDate !== null &&
-                    data.currentPeriodStartDate !== undefined &&
-                    data.currentPeriodEndDate !== null &&
-                    data.currentPeriodEndDate !== undefined && (
-                      <Span className="text-xs text-muted-foreground">
-                        {`${data.currentPeriodStartDate}${DATE_SEPARATOR}${data.currentPeriodEndDate}`}
-                      </Span>
-                    )}
-                </Div>
-              ) : (
-                <Span className="text-sm text-amber-600 font-medium">
-                  {t("dashboard.widget.noPeriod")}
+              <Span className="font-medium">{data.currentPeriodName}</Span>
+              {data.currentPeriodStartDate && data.currentPeriodEndDate && (
+                <Span className="text-xs text-muted-foreground">
+                  {`${formatDocDate(data.currentPeriodStartDate, locale)} – ${formatDocDate(data.currentPeriodEndDate, locale)}`}
                 </Span>
               )}
             </Div>
-            {canConfigure &&
-              (data.currentPeriodName === null ||
-                data.currentPeriodName === undefined) && (
-                <Button
-                  type="button"
-                  size="sm"
-                  variant="outline"
-                  onClick={handleNavCreatePeriod}
-                >
-                  {t("dashboard.widget.createPeriod")}
-                </Button>
-              )}
-          </Div>
+          )}
 
-          {/* KPI cards */}
-          <Div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-            <KpiCard
-              label={t("dashboard.widget.totalAccounts")}
-              value={data.accountCount}
-              actionLabel={t("dashboard.widget.viewAccounts")}
-              onAction={isInteractive ? handleNavAccountList : undefined}
-            />
-            <KpiCard
-              label={t("dashboard.widget.draftEntries")}
-              value={data.draftEntryCount}
-              badge={
-                data.draftEntryCount > 0
-                  ? String(data.draftEntryCount)
-                  : undefined
-              }
-              badgeVariant={
-                data.draftEntryCount > 0 ? "destructive" : undefined
-              }
-              actionLabel={t("dashboard.widget.viewDrafts")}
-              onAction={isInteractive ? handleNavJournalList : undefined}
-            />
-            <KpiCard
-              label={t("dashboard.widget.postedThisMonth")}
-              value={data.postedThisMonthCount}
-            />
-            <KpiCard
-              label={t("dashboard.widget.setupStatus")}
-              value={
-                data.hasSetup
-                  ? t("dashboard.widget.configured")
-                  : t("dashboard.widget.notSetUp")
-              }
-              badgeVariant={data.hasSetup ? "default" : "secondary"}
-              actionLabel={
-                !canConfigure || data.hasSetup
-                  ? undefined
-                  : t("dashboard.widget.runSetup")
-              }
-              onAction={
-                !canConfigure || data.hasSetup ? undefined : handleNavSetup
-              }
-            />
-          </Div>
+          {(!data.currentPeriodName ||
+            !data.hasSetup ||
+            data.draftEntryCount > 0) && (
+            <SectionGroup title={t("dashboard.widget.needsAttention")}>
+              <Div className="divide-y rounded-md border bg-card">
+                {!data.currentPeriodName && (
+                  <Div className="flex flex-wrap items-center justify-between gap-2 p-3">
+                    <Div className="flex flex-col gap-1">
+                      <Span className="text-sm font-medium">
+                        {t("dashboard.widget.noPeriod")}
+                      </Span>
+                      <Span className="text-sm text-muted-foreground">
+                        {t("dashboard.widget.noPeriodHint")}
+                      </Span>
+                    </Div>
+                    {canConfigure && (
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        onClick={handleNavCreatePeriod}
+                      >
+                        {t("dashboard.widget.createPeriod")}
+                      </Button>
+                    )}
+                  </Div>
+                )}
+                {!data.hasSetup && (
+                  <Div className="flex flex-wrap items-center justify-between gap-2 p-3">
+                    <StatusPill
+                      status={t("dashboard.widget.notSetUp")}
+                      variant="warning"
+                    />
+                    {canConfigure && (
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        onClick={handleNavSetup}
+                      >
+                        {t("dashboard.widget.runSetup")}
+                      </Button>
+                    )}
+                  </Div>
+                )}
+                {data.draftEntryCount > 0 && (
+                  <Div className="flex flex-wrap items-center justify-between gap-2 p-3">
+                    <Span className="text-sm">
+                      {`${t("dashboard.widget.draftEntries")} ${data.draftEntryCount}`}
+                    </Span>
+                    {interactive && (
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        onClick={handleDrafts}
+                      >
+                        {t("dashboard.widget.viewDrafts")}
+                      </Button>
+                    )}
+                  </Div>
+                )}
+              </Div>
+            </SectionGroup>
+          )}
 
           {/* Quick navigation */}
           {isInteractive && (

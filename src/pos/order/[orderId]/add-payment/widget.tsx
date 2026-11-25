@@ -3,9 +3,14 @@
 import { Badge } from "next-vibe/ui/components/badge";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
+import { Banknote } from "next-vibe/ui/components/icons/Banknote";
 import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
+import { CreditCard } from "next-vibe/ui/components/icons/CreditCard";
+import { MoreHorizontal } from "next-vibe/ui/components/icons/MoreHorizontal";
+import { Wallet } from "next-vibe/ui/components/icons/Wallet";
 import { Span } from "next-vibe/ui/components/span";
 import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
+import { formatMoney } from "next-vibe/unified-ui/_shared/format-money";
 import {
   useWidgetForm,
   useWidgetLocale,
@@ -20,26 +25,20 @@ import type { JSX } from "react";
 
 import { PosPaymentMethod, PosPaymentMethodOptions } from "@/pos/enum";
 
+import { cashChangeDue } from "../../display-totals";
+import { useOrderPreview } from "../get/use-order-preview";
 import type definition from "./definition";
 
 interface PosOrderAddPaymentWidgetProps {
   field: (typeof definition.POST)["fields"];
 }
 
-type MethodKey = keyof typeof PosPaymentMethod;
-
-function methodIcon(methodKey: MethodKey): string {
-  if (methodKey === "CASH") {
-    return "💵";
-  }
-  if (methodKey === "CARD") {
-    return "💳";
-  }
-  if (methodKey === "TRANSFER") {
-    return "🏦";
-  }
-  return "···";
-}
+const methodIcons = {
+  [PosPaymentMethod.CASH]: Banknote,
+  [PosPaymentMethod.CARD]: CreditCard,
+  [PosPaymentMethod.TRANSFER]: Wallet,
+  [PosPaymentMethod.OTHER]: MoreHorizontal,
+};
 
 export function PosOrderAddPaymentWidget({
   field,
@@ -51,15 +50,11 @@ export function PosOrderAddPaymentWidget({
   const locale = useWidgetLocale();
   const result = data?.result;
 
+  const preview = useOrderPreview(
+    result ? undefined : form.watch("details.orderId"),
+  );
   const selectedMethod = form?.watch("details.method") ?? PosPaymentMethod.CASH;
   const amount = Number(form?.watch("details.amount") ?? 0);
-
-  const handleMethodSelect = (method: string): void => {
-    form?.setValue(
-      "details.method",
-      method as (typeof PosPaymentMethodOptions)[number]["value"],
-    );
-  };
 
   const handleBackToOrder = (): void => {
     navigation.pop();
@@ -67,7 +62,7 @@ export function PosOrderAddPaymentWidget({
 
   // Success state
   if (result?.id) {
-    const isPaid = result.outstanding <= 0.005;
+    const isPaid = Math.round(result.outstanding * 10_000) === 0;
     return (
       <Div className="flex flex-col gap-5">
         {/* Payment recorded banner */}
@@ -100,10 +95,7 @@ export function PosOrderAddPaymentWidget({
               {t(result.method as Parameters<typeof t>[0])}
             </Badge>
             <Span className="text-sm font-mono font-bold tabular-nums">
-              {new Intl.NumberFormat(locale, {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              }).format(result.amount)}
+              {formatMoney(result.amount, result?.currency, locale)}
             </Span>
           </Div>
           {result.change > 0 ? (
@@ -112,10 +104,7 @@ export function PosOrderAddPaymentWidget({
                 {t("orderAddPayment.post.widget.changeLabel")}
               </Span>
               <Span className="text-sm font-mono font-semibold tabular-nums">
-                {new Intl.NumberFormat(undefined, {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                }).format(result.change)}
+                {formatMoney(result.change, result?.currency, locale)}
               </Span>
             </Div>
           ) : null}
@@ -124,10 +113,7 @@ export function PosOrderAddPaymentWidget({
               {t("orderAddPayment.post.response.totalPaid")}
             </Span>
             <Span className="text-sm font-mono font-semibold tabular-nums">
-              {new Intl.NumberFormat(locale, {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              }).format(result.totalPaid)}
+              {formatMoney(result.totalPaid, result?.currency, locale)}
             </Span>
           </Div>
           <Div className="flex items-center justify-between px-4 py-3">
@@ -143,10 +129,7 @@ export function PosOrderAddPaymentWidget({
               </Badge>
             ) : (
               <Span className="text-sm font-mono font-semibold text-destructive tabular-nums">
-                {new Intl.NumberFormat(undefined, {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                }).format(result.outstanding)}
+                {formatMoney(result.outstanding, result?.currency, locale)}
               </Span>
             )}
           </Div>
@@ -169,10 +152,10 @@ export function PosOrderAddPaymentWidget({
 
   // Payment form
   const isCash = selectedMethod === PosPaymentMethod.CASH;
-  // Change is the difference between tendered amount and what would be due
-  // We don't know the outstanding here without extra context,
-  // so we show raw amount for now — the server validates
-  const changePreview = isCash && amount > 0 ? Math.max(0, amount) : 0;
+  const changePreview =
+    isCash && preview && amount > 0
+      ? cashChangeDue(amount, preview.total, preview.payments ?? [])
+      : 0;
 
   return (
     <Div className="flex flex-col gap-5">
@@ -197,9 +180,7 @@ export function PosOrderAddPaymentWidget({
         </Span>
         <Div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
           {PosPaymentMethodOptions.map((option) => {
-            const methodKey = (
-              Object.keys(PosPaymentMethod) as MethodKey[]
-            ).find((k) => PosPaymentMethod[k] === option.value);
+            const MethodIcon = methodIcons[option.value];
             const isSelected = selectedMethod === option.value;
             return (
               <Button
@@ -207,13 +188,15 @@ export function PosOrderAddPaymentWidget({
                 variant={isSelected ? "default" : "outline"}
                 size="sm"
                 className="h-16 flex-col gap-1 text-sm font-semibold"
-                onClick={() => handleMethodSelect(option.value)}
+                onClick={() =>
+                  form.setValue("details.method", option.value, {
+                    shouldDirty: true,
+                  })
+                }
                 type="button"
               >
-                <Span className="text-xl">
-                  {methodKey !== undefined ? methodIcon(methodKey) : "···"}
-                </Span>
-                <Span className="text-xs">{option.label}</Span>
+                <MethodIcon className="h-5 w-5" />
+                <Span className="text-xs">{t(option.value)}</Span>
               </Button>
             );
           })}
@@ -242,10 +225,7 @@ export function PosOrderAddPaymentWidget({
             </Span>
           </Div>
           <Span className="text-base font-mono font-bold tabular-nums">
-            {new Intl.NumberFormat(undefined, {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            }).format(changePreview)}
+            {formatMoney(changePreview, preview?.currency, locale)}
           </Span>
         </Div>
       ) : null}

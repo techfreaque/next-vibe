@@ -27,6 +27,21 @@ export const translations: typeof enTranslations = {
       message: "Statusmeldung",
     },
     errors: {
+      receiptKeyConflict:
+        "Dieser Zahlungsschlüssel gehört bereits zu einer anderen Zahlung.",
+      paymentPrecision:
+        "Geben Sie einen positiven Betrag mit höchstens zwei Nachkommastellen ein.",
+      paymentStatus:
+        "Zahlungen können für offene Rechnungen mit einem positiven Betrag erfasst werden.",
+      overpayment: "Die Zahlung übersteigt den offenen Rechnungsbetrag.",
+      fullPayment:
+        "Geben Sie bei einer Rechnung ohne Unternehmen den gesamten offenen Betrag ein.",
+      issuancePosting:
+        "Vor der Zahlung muss eine Forderung in Höhe des Rechnungsbetrags gebucht sein.",
+      paymentAccount:
+        "Wählen Sie ein aktives Bank- oder Kassenkonto dieses Unternehmens.",
+      paymentPosting:
+        "Prüfen Sie Zahlungsdatum, Unternehmenswährung und Buchungskonten.",
       unauthorized: {
         title: "Nicht autorisiert",
         description: "Authentifizierung erforderlich",
@@ -88,6 +103,11 @@ export const translations: typeof enTranslations = {
     label: "Zahlungsdatum",
     description: "Wann die Zahlung eingegangen ist",
     placeholder: "Datum auswählen",
+  },
+  receiptKey: {
+    label: "Zahlungsschlüssel",
+    description:
+      "Verwenden Sie bei einem erneuten Versuch denselben Schlüssel. Nutzen Sie für eine weitere Zahlung einen neuen Schlüssel.",
   },
   accountNodeId: {
     label: "Kontoknotens-ID",

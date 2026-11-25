@@ -10,7 +10,7 @@ export const translations = {
     title: "Create Credit Note",
     titleShort: "Credit Note",
     description:
-      "Create a credit note linked to an original invoice. Full credit negates all lines. Partial credit applies the specified line items. Posts a reversal journal entry: Dr Revenue, Cr AR.",
+      "Issue a full or partial credit for a posted invoice. The note reverses the corresponding receivable, revenue and VAT.",
     form: {
       title: "Create Credit Note",
       description: "Issue a credit against an existing invoice",
@@ -33,6 +33,14 @@ export const translations = {
       },
     },
     errors: {
+      creditLines:
+        "Enter credit lines with positive quantities and VAT rates from the original invoice.",
+      creditLimit:
+        "This credit would exceed the remaining net, VAT or total from the original invoice.",
+      originalPosting:
+        "Reconcile the original invoice posting before issuing a credit.",
+      posting:
+        "Check the company currency, open accounting period and original posting accounts.",
       unauthorized: {
         title: "Unauthorized",
         description: "Authentication required",

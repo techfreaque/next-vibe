@@ -7,14 +7,21 @@ export const translations: typeof enTranslations = {
     ap: "contabilità-pagabile",
   },
   post: {
-    title: "Creare AP Bill",
-    titleShort: "Creare Bill",
-    description: "Registrare una fattura ricevuta da un fornitore",
+    title: "Nuova fattura fornitore",
+    titleShort: "Nuova fattura fornitore",
+    description: "Aggiungi il fornitore e le righe, poi salva la bozza.",
     form: {
       title: "Nuovo fornitore Bill",
       description: "Inserisci i dettagli della fattura che hai ricevuto",
     },
     errors: {
+      vendor: "Scegli un fornitore attivo di questa azienda.",
+      supplier: "Inserisci un nome o scegli un fornitore.",
+      dates: "Inserisci date di fattura e scadenza valide.",
+      amounts:
+        "Controlla le righe e mantieni il totale entro il limite consentito.",
+      expenseAccount: "Scegli un conto di costo attivo di questa azienda.",
+
       validation: {
         title: "Errore di convalida",
         description: "Controlla tutti i campi e riprova",
@@ -51,8 +58,33 @@ export const translations: typeof enTranslations = {
       description: "Il conto del fornitore registrato con successo",
     },
     widget: {
+      supplier: "Fornitore",
+      dates: "Date e valuta",
+      items: "Righe fattura",
+      itemsDescription:
+        "Righe facoltative. Inserisci l’aliquota IVA come decimale da 0 a 1.",
+      itemsHint: "Aggiungi i beni o servizi fatturati.",
+      item: "Descrizione",
+      quantity: "Quantità",
+      unitPrice: "Prezzo unitario",
+      manualTaxRate: "Altra aliquota",
+      taxRate: "IVA %",
+      lineTotal: "Totale riga",
+      addItem: "Aggiungi riga",
+      removeItem: "Rimuovi riga",
+      itemError: "Controlla descrizione, quantità, prezzo e IVA.",
+      summary: "Riepilogo fattura",
+      net: "Imponibile",
+      tax: "IVA",
+      total: "Totale",
+      chooseVendor: "Scegli fornitore",
+      vendorSource: "Dall’elenco dei fornitori",
+      terms: "Applica la scadenza del fornitore",
+      manualVendor: "Inserisci il fornitore manualmente",
+      selectCompanyFirst: "Scegli prima un’azienda.",
+
       back: "Indietro",
-      submit: "Registrazione",
+      submit: "Salva bozza",
       viewButton: "Visualizza Bill",
       addAnotherButton: "Aggiungi un altro",
     },
@@ -86,6 +118,10 @@ export const translations: typeof enTranslations = {
     description: "La società che riceve questa fattura",
     placeholder: "Società UUID",
   },
+  vendorId: {
+    label: "Scegli fornitore",
+    description: "Dall’elenco dei fornitori",
+  },
   supplierName: {
     label: "Nome del fornitore",
     description: "Nome del fornitore che ha inviato questa fattura",
@@ -104,14 +140,15 @@ export const translations: typeof enTranslations = {
   billDate: {
     label: "Data di pubblicazione",
     description: "Data dell'emissione della legge",
-    placeholder: "2024-01-01",
+    placeholder: "Scegli la data della fattura",
   },
   dueDate: {
     label: "Data di scadenza",
     description: "Data di pagamento",
-    placeholder: "2024-01-31",
+    placeholder: "Scegli la data di scadenza",
   },
   currency: {
+    code: "{{code}}",
     label: "Valuta",
     description: "Bilancio",
     placeholder: "EUR",

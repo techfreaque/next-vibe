@@ -17,6 +17,8 @@ export const translations: typeof enTranslations = {
       invoiceId: "ID de la facture créée",
     },
     errors: {
+      reconcile:
+        "La somme des lignes diffère du total du devis. Dupliquez le devis pour vérifier et corriger le brouillon.",
       unauthorized: {
         title: "Non autorisé",
         description: "Authentification requise",

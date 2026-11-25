@@ -69,7 +69,7 @@ export const translations: typeof enTranslations = {
     label: "Dokumente suchen",
     description:
       "Suche nach Belegnummer, Lieferant oder Rechnungs-ID. Filtere nach Unternehmen oder Status.",
-    placeholder: "Belegnummer, Lieferant oder ID",
+    placeholder: "Belegnummer oder Lieferant",
   },
   status: {
     label: "Status",
@@ -88,6 +88,7 @@ export const translations: typeof enTranslations = {
     },
   },
   widget: {
+    filters: "Filter",
     pageCount: "Seiten insgesamt",
     back: "Zurück",
     title: "Eingangsrechnungen",

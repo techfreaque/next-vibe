@@ -2,6 +2,89 @@ export const translations = {
   category: "Help & Documentation",
   tag: "Help",
   uncategorized: "Other",
+  erp: {
+    navigation: {
+      sales: "Sales",
+      purchases: "Purchases",
+      invoices: "Invoices",
+      estimates: "Quotes",
+      bills: "Supplier bills",
+    },
+    overview: {
+      loading: "Loading the company overview",
+      loadError: "The company overview could not load",
+    },
+    home: "Home",
+    title: "Accounting workspace",
+    description:
+      "Set up your company, manage invoices and keep your books ready for month-end.",
+    companies: "Manage companies",
+    activeDescription: "Review your books and start your next invoice.",
+    newInvoice: "New invoice",
+    createCompany: "Set up your company",
+    companySwitch: {
+      label: "Accounting company",
+      select: "Select company",
+      current: "Current company: {{name}}",
+    },
+    workflows: "Common workflows",
+    sales: {
+      title: "Invoice a customer",
+      description:
+        "Create a draft invoice, or open an existing invoice to record a payment.",
+      primary: "Create invoice",
+      secondary: "View invoices",
+    },
+    expenses: {
+      title: "Record a supplier bill",
+      description:
+        "Capture what you owe suppliers and track payment from the bill.",
+      primary: "Create bill",
+      secondary: "View bills",
+    },
+    receivables: {
+      title: "Check who owes you",
+      description:
+        "See unpaid customer balances grouped by how long they are overdue.",
+      primary: "View receivables",
+    },
+    payables: {
+      title: "Check what you owe suppliers",
+      description:
+        "See unpaid supplier balances, bills to approve and disputed amounts.",
+      primary: "View payables",
+    },
+    bank: {
+      title: "Import bank activity",
+      description:
+        "Import a CSV statement, then review unmatched transactions.",
+      primary: "Import bank statement",
+      secondary: "View unmatched transactions",
+    },
+    stock: {
+      title: "Review your inventory",
+      description: "Check stock levels and see what needs replenishing.",
+      primary: "Open inventory",
+    },
+    tax: {
+      title: "Review VAT",
+      description: "Check tax totals for the reporting period before filing.",
+      primary: "Open tax report",
+    },
+    exports: {
+      title: "Review and export the journal",
+      description:
+        "Check posting issues or download posted journal entries as a CSV.",
+      primary: "Review postings",
+      secondary: "Open journal export",
+    },
+    close: {
+      title: "Close an accounting period",
+      description: "Review the trial balance before closing the period.",
+      primary: "View periods",
+      secondary: "Open trial balance",
+    },
+  },
   catalog: {
     title: "Tool catalog",
     searchLabel: "Search the tool catalog",

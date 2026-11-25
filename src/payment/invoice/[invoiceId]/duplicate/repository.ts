@@ -8,7 +8,7 @@ import "server-only";
 
 import { eq, max } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { CurrenciesArr, defaultLocale } from "next-vibe/core/i18n/core/config";
+import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
   fail,
@@ -19,6 +19,10 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { z } from "zod";
+
+import { lockLedgerCompany } from "@/chart-of-accounts/shared/ledger-write";
+import { getDocumentAccess } from "@/finance/document-company-scope";
+import { nextCompanyInvoiceSequence } from "@/finance/document-number";
 
 import { paymentInvoiceLines, paymentInvoices } from "../../../db";
 import { InvoiceStatus } from "../../../enum";
@@ -38,143 +42,165 @@ export class InvoiceDuplicateRepository {
     const { t } = scopedTranslation.scopedT(locale);
 
     try {
-      const [source] = await db
-        .select()
+      const [observedInvoice] = await db
+        .select({
+          companyId: paymentInvoices.companyId,
+          userId: paymentInvoices.userId,
+        })
         .from(paymentInvoices)
         .where(eq(paymentInvoices.id, urlPathParams.invoiceId))
         .limit(1);
 
-      if (!source) {
+      if (!observedInvoice) {
         return fail({
           message: t("post.errors.notFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
 
-      if (source.userId !== userId) {
+      if (!(await getDocumentAccess(userId, observedInvoice))?.canManage) {
         return fail({
           message: t("post.errors.forbidden.title"),
           errorType: ErrorResponseTypes.FORBIDDEN,
         });
       }
 
-      // Auto-generate sequence number per company
-      const companyId = source.companyId ?? null;
-      let nextSeq = 1;
-
-      if (companyId) {
-        const [{ value: maxSeq }] = await db
-          .select({ value: max(paymentInvoices.invoiceSequenceNumber) })
+      const { companyId } = observedInvoice;
+      return await db.transaction(async (tx) => {
+        if (companyId) {
+          await lockLedgerCompany(tx, companyId);
+        }
+        const [source] = await tx
+          .select()
           .from(paymentInvoices)
-          .where(eq(paymentInvoices.companyId, companyId));
-        nextSeq = (maxSeq ?? 0) + 1;
-      } else {
-        const [{ value: maxSeq }] = await db
-          .select({ value: max(paymentInvoices.invoiceSequenceNumber) })
-          .from(paymentInvoices)
-          .where(eq(paymentInvoices.userId, userId));
-        nextSeq = (maxSeq ?? 0) + 1;
-      }
-
-      // Generate new provider invoice ID
-      const companyPrefix = companyId
-        ? companyId.slice(0, 8)
-        : userId.slice(0, 8);
-      const arInvoiceId = `AR-${companyPrefix}-${String(nextSeq).padStart(6, "0")}`;
-
-      const rawCurrency = source.currency;
-      const currency = (CurrenciesArr as readonly string[]).includes(
-        rawCurrency,
-      )
-        ? (rawCurrency as (typeof CurrenciesArr)[number])
-        : "EUR";
-
-      // Insert new invoice as DRAFT
-      const [newInvoice] = await db
-        .insert(paymentInvoices)
-        .values({
-          userId,
-          companyId: source.companyId ?? undefined,
-          providerInvoiceId: arInvoiceId,
-          invoiceSequenceNumber: nextSeq,
-          currency,
-          status: InvoiceStatus.DRAFT,
-          amount: "0",
-          dueDate: source.dueDate ?? null,
-          notes: source.notes ?? null,
-          metadata: source.metadata ?? null,
-        })
-        .returning();
-
-      if (!newInvoice) {
-        return fail({
-          message: t("post.errors.server.title"),
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        });
-      }
-
-      // Copy all line items from the source invoice
-      const sourceLines = await db
-        .select()
-        .from(paymentInvoiceLines)
-        .where(eq(paymentInvoiceLines.invoiceId, source.id));
-
-      let totalAmount = 0;
-
-      if (sourceLines.length > 0) {
-        for (const line of sourceLines) {
-          await db.insert(paymentInvoiceLines).values({
-            invoiceId: newInvoice.id,
-            description: line.description,
-            productId: line.productId ?? undefined,
-            quantity: line.quantity,
-            unitPrice: line.unitPrice,
-            taxRate: line.taxRate ?? 0,
-            taxAmount: line.taxAmount,
-            lineTotal: line.lineTotal,
-            sortOrder: line.sortOrder ?? 0,
+          .where(eq(paymentInvoices.id, urlPathParams.invoiceId))
+          .limit(1)
+          .for("update");
+        if (!source) {
+          return fail({
+            message: t("post.errors.notFound.title"),
+            errorType: ErrorResponseTypes.NOT_FOUND,
           });
-          totalAmount += line.lineTotal;
+        }
+        if (
+          source.companyId !== companyId ||
+          !(await getDocumentAccess(userId, source, tx))?.canManage
+        ) {
+          return fail({
+            message: t("post.errors.forbidden.title"),
+            errorType: ErrorResponseTypes.FORBIDDEN,
+          });
         }
 
-        // Update total amount on new invoice
-        await db
-          .update(paymentInvoices)
-          .set({
-            amount: totalAmount.toString(),
-            updatedAt: new Date(),
+        // Auto-generate sequence number per company
+        let nextSeq = 1;
+
+        if (companyId) {
+          nextSeq = await nextCompanyInvoiceSequence(tx, companyId);
+        } else {
+          const [{ value: maxSeq }] = await tx
+            .select({ value: max(paymentInvoices.invoiceSequenceNumber) })
+            .from(paymentInvoices)
+            .where(eq(paymentInvoices.userId, userId));
+          nextSeq = (maxSeq ?? 0) + 1;
+        }
+
+        // Generate new provider invoice ID
+        const companyPrefix = companyId
+          ? companyId.slice(0, 8)
+          : userId.slice(0, 8);
+        const arInvoiceId = `AR-${companyPrefix}-${String(nextSeq).padStart(6, "0")}`;
+
+        const currency = source.currency;
+
+        // Insert new invoice as DRAFT
+        const [newInvoice] = await tx
+          .insert(paymentInvoices)
+          .values({
+            userId,
+            companyId: source.companyId ?? undefined,
+            providerInvoiceId: arInvoiceId,
+            invoiceSequenceNumber: nextSeq,
+            currency,
+            status: InvoiceStatus.DRAFT,
+            amount: "0",
+            dueDate: source.dueDate ?? null,
+            notes: source.notes ?? null,
+            metadata: source.metadata ?? null,
           })
-          .where(eq(paymentInvoices.id, newInvoice.id));
-      }
+          .returning();
 
-      logger.debug("Invoice duplicated", {
-        sourceInvoiceId: source.id,
-        newInvoiceId: newInvoice.id,
-        linesCount: sourceLines.length,
-      });
+        if (!newInvoice) {
+          return fail({
+            message: t("post.errors.server.title"),
+            errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          });
+        }
 
-      const metadataSchema = z.object({ customerId: z.string().optional() });
-      const parsedMeta = metadataSchema.safeParse(newInvoice.metadata);
-      const customerId = parsedMeta.success
-        ? (parsedMeta.data.customerId ?? null)
-        : null;
+        // Copy all line items from the source invoice
+        const sourceLines = await tx
+          .select()
+          .from(paymentInvoiceLines)
+          .where(eq(paymentInvoiceLines.invoiceId, source.id));
 
-      return success({
-        success: true,
-        message: null,
-        invoice: {
-          id: newInvoice.id,
-          companyId: newInvoice.companyId ?? null,
-          customerId,
-          invoiceSequenceNumber: newInvoice.invoiceSequenceNumber ?? null,
-          currency: newInvoice.currency,
-          status: newInvoice.status,
-          dueDate: newInvoice.dueDate ?? null,
-          notes: newInvoice.notes ?? null,
-          amount: totalAmount > 0 ? totalAmount.toString() : newInvoice.amount,
-          createdAt: newInvoice.createdAt,
-          updatedAt: newInvoice.updatedAt,
-        },
+        let totalAmount = 0;
+
+        if (sourceLines.length > 0) {
+          for (const line of sourceLines) {
+            await tx.insert(paymentInvoiceLines).values({
+              invoiceId: newInvoice.id,
+              description: line.description,
+              productId: line.productId ?? undefined,
+              quantity: line.quantity,
+              unitPrice: line.unitPrice,
+              taxRate: line.taxRate ?? 0,
+              taxAmount: line.taxAmount,
+              lineTotal: line.lineTotal,
+              sortOrder: line.sortOrder ?? 0,
+            });
+            totalAmount += line.lineTotal;
+          }
+
+          // Update total amount on new invoice
+          await tx
+            .update(paymentInvoices)
+            .set({
+              amount: totalAmount.toString(),
+              updatedAt: new Date(),
+            })
+            .where(eq(paymentInvoices.id, newInvoice.id));
+        }
+
+        logger.debug("Invoice duplicated", {
+          sourceInvoiceId: source.id,
+          newInvoiceId: newInvoice.id,
+          linesCount: sourceLines.length,
+        });
+
+        const metadataSchema = z.object({ customerId: z.string().optional() });
+        const parsedMeta = metadataSchema.safeParse(newInvoice.metadata);
+        const customerId = parsedMeta.success
+          ? (parsedMeta.data.customerId ?? null)
+          : null;
+
+        return success({
+          success: true,
+          message: null,
+          invoice: {
+            id: newInvoice.id,
+            companyId: newInvoice.companyId ?? null,
+            customerId,
+            invoiceSequenceNumber: newInvoice.invoiceSequenceNumber ?? null,
+            currency: newInvoice.currency,
+            status: newInvoice.status,
+            dueDate: newInvoice.dueDate ?? null,
+            notes: newInvoice.notes ?? null,
+            amount:
+              totalAmount > 0 ? totalAmount.toString() : newInvoice.amount,
+            createdAt: newInvoice.createdAt,
+            updatedAt: newInvoice.updatedAt,
+          },
+        });
       });
     } catch (error) {
       const parsed = parseError(error);

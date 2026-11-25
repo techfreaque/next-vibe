@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import { and, count, eq, gte, lte } from "drizzle-orm";
+import { and, count, eq, gte, inArray, lt, sql } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
@@ -21,8 +21,12 @@ import { CompanyMemberRole } from "@/companies/enum";
 import { CompanyAuthRepository } from "@/companies/repository";
 
 import { accountNodes, journalEntries, journalEntryLines } from "../../db";
-import { JournalEntryStatus, LineType } from "../../enum";
+import { ledgerEntryStatuses, LineType } from "../../enum";
 import { scopedTranslation } from "../../i18n";
+import {
+  accountingDay,
+  nextAccountingDay,
+} from "../../shared/journal-validation";
 import type { CoaLedgerRequestOutput } from "./definition";
 
 export class CoaLedgerRepository {
@@ -76,75 +80,81 @@ export class CoaLedgerRepository {
         return authResult;
       }
 
-      const lineConditions = [
-        eq(journalEntryLines.accountId, accountId),
-        eq(journalEntries.status, JournalEntryStatus.POSTED),
-      ];
-
-      if (data.dateFrom) {
-        lineConditions.push(gte(journalEntries.date, data.dateFrom));
-      }
-      if (data.dateTo) {
-        lineConditions.push(lte(journalEntries.date, data.dateTo));
-      }
-
-      const where = and(...lineConditions);
-
-      const [{ value: totalCount }] = await db
-        .select({ value: count() })
-        .from(journalEntryLines)
-        .innerJoin(
-          journalEntries,
-          eq(journalEntryLines.journalEntryId, journalEntries.id),
-        )
-        .where(where);
-
-      const page = data.page ?? 1;
-      const pageSize = data.pageSize ?? 20;
-      const offset = (page - 1) * pageSize;
-
-      const rows = await db
+      const movements = db
         .select({
           id: journalEntryLines.id,
-          entryId: journalEntries.id,
+          entryId: sql<string>`${journalEntries.id}`.as("entry_id"),
           entryNumber: journalEntries.entryNumber,
           date: journalEntries.date,
-          lineDescription: journalEntryLines.description,
+          description: journalEntryLines.description,
           type: journalEntryLines.type,
           amount: journalEntryLines.amount,
           currency: journalEntryLines.currency,
           sortOrder: journalEntryLines.sortOrder,
+          runningBalance: sql`sum(case
+            when ${journalEntryLines.type} = ${LineType.DEBIT} then ${journalEntryLines.amount}
+            else -${journalEntryLines.amount}
+          end) over (
+            partition by ${journalEntryLines.currency}
+            order by ${journalEntries.date}, ${journalEntries.id}, ${journalEntryLines.sortOrder}, ${journalEntryLines.id}
+            rows unbounded preceding
+          )`
+            .mapWith(Number)
+            .as("running_balance"),
         })
         .from(journalEntryLines)
         .innerJoin(
           journalEntries,
           eq(journalEntryLines.journalEntryId, journalEntries.id),
         )
+        .where(
+          and(
+            eq(journalEntryLines.accountId, accountId),
+            eq(journalEntries.companyId, account.companyId),
+            inArray(journalEntries.status, ledgerEntryStatuses),
+          ),
+        )
+        .as("ledger_movements");
+
+      // Apply the date filter after calculating the window so the balance carries forward.
+      const where = and(
+        data.dateFrom
+          ? gte(movements.date, accountingDay(data.dateFrom))
+          : undefined,
+        data.dateTo
+          ? lt(movements.date, nextAccountingDay(data.dateTo))
+          : undefined,
+      );
+
+      const page = data.page ?? 1;
+      const pageSize = data.pageSize ?? 20;
+      const offset = (page - 1) * pageSize;
+      const [{ value: totalCount }] = await db
+        .select({ value: count() })
+        .from(movements)
+        .where(where);
+      const lines = await db
+        .select({
+          id: movements.id,
+          entryId: movements.entryId,
+          entryNumber: movements.entryNumber,
+          date: movements.date,
+          description: movements.description,
+          type: movements.type,
+          amount: movements.amount,
+          currency: movements.currency,
+          runningBalance: movements.runningBalance,
+        })
+        .from(movements)
         .where(where)
-        .orderBy(journalEntries.date, journalEntryLines.sortOrder)
+        .orderBy(
+          movements.date,
+          movements.entryId,
+          movements.sortOrder,
+          movements.id,
+        )
         .limit(pageSize)
         .offset(offset);
-
-      // Compute running balance: DEBIT increases balance, CREDIT decreases
-      let runningBalance = 0;
-      const lines = rows.map((row) => {
-        if (row.type === LineType.DEBIT) {
-          runningBalance += row.amount;
-        } else {
-          runningBalance -= row.amount;
-        }
-        return {
-          id: row.id,
-          entryId: row.entryId,
-          entryNumber: row.entryNumber,
-          date: row.date,
-          description: row.lineDescription ?? null,
-          type: row.type,
-          amount: row.amount,
-          currency: row.currency,
-          runningBalance,
-        };
-      });
 
       return success({ lines, totalCount: totalCount ?? 0 });
     } catch (error) {

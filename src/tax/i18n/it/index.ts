@@ -118,7 +118,7 @@ export const translations: typeof enTranslations = {
         empty:
           "Nessuna tassa imposta configurata. Aggiungi il tuo primo tasso per iniziare.",
         emptySetup:
-          "Nessuna tassa impostata. Ogni fattura ha bisogno di un tasso di imposta. configurare il vostro ora.",
+          "Configura le aliquote fiscali che la tua azienda applica in fattura.",
         columnRate: "Tasso d'imposta",
         columnTypeRateActions: "Tipo / Tariffa / Stato",
         backToCatalog: "← Prodotti",
@@ -350,14 +350,28 @@ export const translations: typeof enTranslations = {
   },
 
   report: {
-    title: "Relazione fiscale",
-    titleShort: "Relazione fiscale",
-    description: "Tassa raccolta per tasso e periodo",
+    title: "Imposte per aliquota",
+    titleShort: "Imposte per aliquota",
+    description:
+      "Consulta le imposte registrate su fatture di vendita, note di credito, fatture di acquisto e vendite alla cassa.",
     widget: {
-      columnRate: "Tasso",
+      scope:
+        "Per le fatture di vendita vale la data della registrazione collegata o la data di creazione. Per gli acquisti vale la data della fattura. Le vendite alla cassa seguono la data di completamento (UTC) e includono le righe con aliquota positiva o imposta registrata. Se una fattura emessa condivide la registrazione contabile, la vendita compare in fattura.",
+      empty: "Nessuna riga di documento corrisponde ai filtri.",
+      range: "Dal {{from}} al {{to}}",
       total: "Totale",
-      empty: "Nessun dato fiscale trovato per questo periodo.",
+      previousMonth: "Mostra il mese precedente",
+      unknownRate: "Aliquota non determinabile",
+      run: "Genera report",
+      running: "Generazione del report…",
+      selectCompany: "Seleziona l’azienda per questo report.",
     },
+    currency: {
+      label: "Valuta",
+      placeholder: "Valuta aziendale",
+      description: "Per impostazione predefinita si usa la valuta aziendale.",
+    },
+    currencies: { EUR: "EUR", PLN: "PLN", USD: "USD" },
     companyId: {
       label: "Società",
       description: "Società di generare il rapporto fiscale per",
@@ -366,21 +380,20 @@ export const translations: typeof enTranslations = {
     dateFrom: {
       label: "Da",
       description: "Data di inizio per il periodo di relazione",
-      placeholder: "2024-01-01",
+      placeholder: "Inizio del mese corrente",
     },
     dateTo: {
       label: "A",
       description: "Data di scadenza per il periodo di relazione",
-      placeholder: "2024-12-31",
+      placeholder: "Oggi",
     },
     response: {
       rows: "Resoconto righe",
       row: {
-        taxRateCode: "Codice fiscale",
-        taxRateName: "Tasso d'imposta Nome",
+        direction: "Tipo di documento",
+        rate: "Aliquota",
         taxableAmount: "Importo fiscale",
         taxAmount: "Importo fiscale",
-        period: "Periodo",
       },
     },
     success: {
@@ -390,7 +403,7 @@ export const translations: typeof enTranslations = {
     errors: {
       validation: {
         title: "Errore di convalida",
-        description: "Controlla i tuoi input e riprova",
+        description: "La data finale non può precedere la data iniziale.",
       },
       unauthorized: {
         title: "Autenticazione richiesta",
@@ -425,6 +438,12 @@ export const translations: typeof enTranslations = {
   },
 
   enums: {
+    reportDirection: {
+      posSales: "Vendite alla cassa",
+      sales: "Fatture di vendita",
+      creditNotes: "Note di credito a clienti",
+      purchases: "Fatture di acquisto",
+    },
     taxType: {
       vat: "VAT",
       gst: "GST",

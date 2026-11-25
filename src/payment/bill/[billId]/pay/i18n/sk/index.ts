@@ -7,9 +7,21 @@ export const translations: typeof enTranslations = {
     titleShort: "Uhradiť prijatú faktúru",
     description:
       "Označiť schválenú dodávateľskú faktúru ako uhradenú a zaúčtovať platbu",
-    billId: { label: "ID dodávateľskej faktúry", description: "Prijatá faktúra na označenie ako uhradená" },
+    billId: {
+      label: "ID dodávateľskej faktúry",
+      description: "Prijatá faktúra na označenie ako uhradená",
+    },
     errors: {
-      validation: { title: "Neplatné údaje", description: "Neplatné vstupné údaje" },
+      approvalPosting:
+        "Pred úhradou musí byť účtovný zápis o schválení faktúry zaúčtovaný.",
+      paymentAccount:
+        "Vyberte aktívny bankový alebo pokladničný účet tejto firmy.",
+      paymentPosting:
+        "Skontrolujte dátum platby, menu firmy a účty na zaúčtovanie.",
+      validation: {
+        title: "Neplatné údaje",
+        description: "Neplatné vstupné údaje",
+      },
       unauthorized: {
         title: "Vyžaduje sa prihlásenie",
         description: "Prihláste sa a uhraďte faktúry.",
@@ -30,7 +42,10 @@ export const translations: typeof enTranslations = {
         title: "Neznáma chyba",
         description: "Nastala neočakávaná chyba",
       },
-      network: { title: "Chyba siete", description: "Skontrolujte pripojenie." },
+      network: {
+        title: "Chyba siete",
+        description: "Skontrolujte pripojenie.",
+      },
       notFound: {
         title: "Faktúra sa nenašla",
         description: "Faktúra neexistuje.",
@@ -40,7 +55,10 @@ export const translations: typeof enTranslations = {
         description: "Máte neuložené zmeny",
       },
     },
-    success: { title: "Faktúra je uhradená", description: "Faktúra bola označená ako uhradená." },
+    success: {
+      title: "Faktúra je uhradená",
+      description: "Faktúra bola označená ako uhradená.",
+    },
     response: {
       status: "Stav",
       paidAt: "Dátum úhrady",

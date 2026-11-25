@@ -3,30 +3,29 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   enums: {
     country: {
-      AT: "AT — ÖKR",
-      DE: "DE — SKR03",
-      XX: "XX — IFRS Generisch",
+      AT: "Österreich (ÖKR)",
+      DE: "Deutschland (SKR03)",
+      XX: "Allgemeine IFRS-Vorlage",
     },
   },
   post: {
-    title: "Kontenplan initialisieren",
-    titleShort: "Einrichten",
+    title: "Kontenplan einrichten",
+    titleShort: "Kontenplan einrichten",
     description:
-      "Richtet den Kontenplan eines Unternehmens anhand einer länderspezifischen Vorlage ein. Idempotent — mehrfaches Ausführen ist sicher.",
+      "Ergänze die Konten deines Unternehmens mit einer Standardvorlage.",
     companyId: {
-      label: "Unternehmens-ID",
-      description: "Das Unternehmen, für das der Kontenplan eingerichtet wird",
-      placeholder: "Unternehmens-UUID eingeben",
+      label: "Unternehmen",
+      description: "Wähle das Unternehmen aus.",
+      placeholder: "Unternehmen auswählen",
     },
     country: {
-      label: "Land",
-      description:
-        "Zu verwendender Kontenstandard (AT = ÖKR, DE = SKR03, XX = IFRS Generisch)",
-      placeholder: "Land auswählen",
+      label: "Kontenplanvorlage",
+      description: "Wähle die Kontenstruktur, die du ergänzen willst.",
+      placeholder: "Vorlage auswählen",
     },
     response: {
-      created: "Erstellte Konten",
-      skipped: "Übersprungene Konten (bereits vorhanden)",
+      created: "Konten angelegt",
+      skipped: "Konten beibehalten",
     },
     errors: {
       unauthorized: {
@@ -36,7 +35,7 @@ export const translations: typeof enTranslations = {
       },
       validation: {
         title: "Validierungsfehler",
-        description: "Ungültige Eingabe — Unternehmens-ID und Land prüfen",
+        description: "Prüfe das Unternehmen und die Kontenplanvorlage.",
       },
       forbidden: {
         title: "Zugriff verweigert",
@@ -45,15 +44,16 @@ export const translations: typeof enTranslations = {
       },
       server: {
         title: "Serverfehler",
-        description: "Einrichtung fehlgeschlagen — bitte erneut versuchen",
+        description: "Wende die Vorlage erneut an.",
       },
       unknown: {
         title: "Unbekannter Fehler",
         description: "Ein unerwarteter Fehler ist aufgetreten",
       },
       conflict: {
-        title: "Bereits initialisiert",
-        description: "Dieses Unternehmen hat bereits einen Kontenplan",
+        title: "Einrichtung prüfen",
+        description:
+          "Lade die Konten des Unternehmens neu, bevor du die Vorlage anwendest.",
       },
       network: {
         title: "Netzwerkfehler",
@@ -70,10 +70,21 @@ export const translations: typeof enTranslations = {
     },
     success: {
       title: "Kontenplan bereit",
-      description: "Alle Konten wurden für das Unternehmen erstellt",
+      description:
+        "Die Vorlage ist angewendet. Sieh dir die neuen und vorhandenen Konten an.",
     },
     widget: {
-      viewAccounts: "Kontenliste anzeigen",
+      review: "Einrichtung prüfen",
+      previewLoading: "Vorhandene Konten werden geladen…",
+      previewFailed: "Die aktuelle Kontenzahl ist nicht verfügbar.",
+      existing: "Vorhandene Konten: {{count}}.",
+      empty: "Für dieses Unternehmen gibt es noch keine Konten.",
+      consequences:
+        "Die Einrichtung ergänzt fehlende Kontonummern aus der Vorlage und erhält bestehende Daten.",
+      submit: "Konten aus Vorlage hinzufügen",
+      back: "Zurück",
+      viewAccounts: "Kontenplan öffnen",
+      viewPeriods: "Buchungsperioden ansehen",
     },
   },
   title: "Kontenplan-Einrichtung",

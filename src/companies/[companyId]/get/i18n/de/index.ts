@@ -46,7 +46,7 @@ export const translations: typeof enTranslations = {
       },
       server: {
         title: "Serverfehler",
-        description: "Etwas ist schiefgelaufen — bitte erneut versuchen",
+        description: "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut.",
       },
       unknown: {
         title: "Unbekannter Fehler",
@@ -71,6 +71,7 @@ export const translations: typeof enTranslations = {
       description: "Unternehmensdetails abgerufen",
     },
     widget: {
+      setupAccounting: "Buchhaltung einrichten",
       back: "Zurück",
       loading: "Unternehmen wird geladen...",
       edit: "Bearbeiten",

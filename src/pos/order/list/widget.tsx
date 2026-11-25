@@ -5,6 +5,7 @@ import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
 import { Span } from "next-vibe/ui/components/span";
+import { formatMoney } from "next-vibe/unified-ui/_shared/format-money";
 import { usePickerCallback } from "next-vibe/unified-ui/_shared/picker-context";
 import {
   useWidgetForm,
@@ -16,6 +17,7 @@ import {
 import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import { type JSX } from "react";
 
+import { orderTotalsByCurrency } from "../display-totals";
 import type definition from "./definition";
 import type {
   PosOrderListRequestOutput,
@@ -39,14 +41,12 @@ function orderStatusBadgeClass(status: string): string {
 
 function OrderRow({
   order,
-  currency,
   locale,
   onView,
   statusLabel,
   itemsLabel,
 }: {
   order: Order;
-  currency: string;
   locale: CountryLanguage;
   onView: (id: string) => void;
   statusLabel: string;
@@ -76,10 +76,7 @@ function OrderRow({
       </Div>
       <Div className="flex flex-col items-end gap-0.5 shrink-0">
         <Span className="text-sm font-mono font-semibold tabular-nums">
-          {new Intl.NumberFormat(locale, {
-            style: "currency",
-            currency,
-          }).format(Number(order.total))}
+          {formatMoney(order.total, order.currency, locale)}
         </Span>
         <Span className="text-xs text-muted-foreground">{itemsLabel}</Span>
       </Div>
@@ -176,12 +173,7 @@ export function PosOrderListWidget(
   }
 
   const orders = data.orders ?? [];
-  const firstOrder = orders[0];
-  const currency = firstOrder?.currency ?? "EUR";
-
-  const sessionTotal = orders
-    .filter((o: Order) => o.status !== "VOIDED")
-    .reduce((sum: number, o: Order) => sum + Number(o.total), 0);
+  const totals = orderTotalsByCurrency(orders);
 
   // Group: OPEN first, COMPLETED, then VOIDED
   const openOrders = orders.filter((o: Order) => o.status.includes("open"));
@@ -210,12 +202,14 @@ export function PosOrderListWidget(
       {/* Header */}
       <Div className="flex items-center justify-between gap-3">
         <Div className="flex flex-col gap-0.5">
-          <Span className="text-base font-semibold">
-            {new Intl.NumberFormat(locale, {
-              style: "currency",
-              currency,
-            }).format(sessionTotal)}
-          </Span>
+          {totals.map((total) => (
+            <Span
+              key={total.currency}
+              className="text-base font-semibold tabular-nums"
+            >
+              {formatMoney(total.amount, total.currency, locale)}
+            </Span>
+          ))}
           <Span className="text-xs text-muted-foreground">
             {data.count} {t("orderList.get.widget.ordersTotal")}
           </Span>
@@ -282,7 +276,6 @@ export function PosOrderListWidget(
             <OrderRow
               key={order.id}
               order={order}
-              currency={currency}
               locale={locale}
               onView={handleViewOrder}
               statusLabel={getStatusLabel(order.status)}

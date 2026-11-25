@@ -1,54 +1,46 @@
 /**
- * AP Bill Approve Repository
- * Advances bill status: DRAFT→RECEIVED→APPROVED
- * On APPROVED: posts journal entry (Dr Expense / Dr VAT Receivable / Cr AP)
+ * Receives supplier bills and posts approved bills to accounts payable.
  */
 
 import "server-only";
 
-import { and, count, eq } from "drizzle-orm";
+import { and, eq, inArray, isNull } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
-import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
+  type ResponseType,
   success,
 } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import {
-  accountingPeriods,
-  accountNodes,
-  journalEntries,
-  journalEntryLines,
-} from "@/chart-of-accounts/db";
+import { accountNodes, journalEntries } from "@/chart-of-accounts/db";
 import {
   AccountSubtype,
+  AccountType,
   JournalEntryStatus,
   JournalSourceType,
   LineType,
-  PeriodStatus,
 } from "@/chart-of-accounts/enum";
+import {
+  type AutoPostLine,
+  postJournalEntry,
+} from "@/chart-of-accounts/shared/auto-post";
+import { lockLedgerCompany } from "@/chart-of-accounts/shared/ledger-write";
 import { CompanyMemberRole } from "@/companies/enum";
 import { CompanyAuthRepository } from "@/companies/repository";
+import { TaxCalculator } from "@/tax/calculator";
 
 import { paymentBillLines, paymentBills } from "../../../db";
-import type { BillStatusDBType } from "../../../enum";
 import { BillStatus } from "../../../enum";
 import type {
   BillApproveResponseOutput,
   BillApproveUrlPathParams,
 } from "./definition";
 import { scopedTranslation } from "./i18n";
-
-// Status transition map: DRAFT→RECEIVED→APPROVED
-const NEXT_STATUS: Partial<Record<BillStatusDBType, BillStatusDBType>> = {
-  [BillStatus.DRAFT]: BillStatus.RECEIVED,
-  [BillStatus.RECEIVED]: BillStatus.APPROVED,
-};
 
 export class BillApproveRepository {
   static async approveBill(
@@ -60,23 +52,25 @@ export class BillApproveRepository {
     const { t } = scopedTranslation.scopedT(locale);
 
     try {
-      const [bill] = await db
-        .select()
+      const [observedBill] = await db
+        .select({
+          companyId: paymentBills.companyId,
+          status: paymentBills.status,
+        })
         .from(paymentBills)
         .where(eq(paymentBills.id, urlPathParams.billId))
         .limit(1);
 
-      if (!bill) {
+      if (!observedBill) {
         return fail({
           message: t("post.errors.notFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
 
-      // Verify ACCOUNTANT+ membership
       const authResult = await CompanyAuthRepository.requireMember(
         userId,
-        bill.companyId,
+        observedBill.companyId,
         CompanyMemberRole.ACCOUNTANT,
         logger,
         locale,
@@ -85,43 +79,190 @@ export class BillApproveRepository {
         return authResult;
       }
 
-      const nextStatus = NEXT_STATUS[bill.status];
-      if (!nextStatus) {
-        return fail({
-          message: t("post.errors.conflict.title"),
-          errorType: ErrorResponseTypes.CONFLICT,
-        });
-      }
+      return await db.transaction(async (tx) => {
+        await lockLedgerCompany(tx, observedBill.companyId);
+        const [bill] = await tx
+          .select()
+          .from(paymentBills)
+          .where(
+            and(
+              eq(paymentBills.id, urlPathParams.billId),
+              eq(paymentBills.companyId, observedBill.companyId),
+            ),
+          )
+          .limit(1)
+          .for("update");
 
-      let journalEntryId: string | null = bill.journalEntryId;
+        if (!bill) {
+          return fail({
+            message: t("post.errors.notFound.title"),
+            errorType: ErrorResponseTypes.NOT_FOUND,
+          });
+        }
 
-      // Post journal entry when transitioning to APPROVED
-      if (nextStatus === BillStatus.APPROVED) {
-        journalEntryId = await BillApproveRepository.postApprovalJournal(
-          bill,
-          userId,
-          logger,
-        );
-      }
+        if (
+          bill.status !== observedBill.status ||
+          bill.journalEntryId ||
+          (bill.status !== BillStatus.DRAFT &&
+            bill.status !== BillStatus.RECEIVED)
+        ) {
+          return fail({
+            message: t("post.errors.conflict.title"),
+            errorType: ErrorResponseTypes.CONFLICT,
+          });
+        }
 
-      await db
-        .update(paymentBills)
-        .set({
-          status: nextStatus,
+        if (bill.total <= 0) {
+          return fail({
+            message: t("post.errors.billLines"),
+            errorType: ErrorResponseTypes.VALIDATION_ERROR,
+          });
+        }
+
+        const status =
+          bill.status === BillStatus.DRAFT
+            ? BillStatus.RECEIVED
+            : BillStatus.APPROVED;
+        let journalEntryId: string | null = null;
+        if (status === BillStatus.APPROVED) {
+          const [existingPosting] = await tx
+            .select({ id: journalEntries.id })
+            .from(journalEntries)
+            .where(
+              and(
+                eq(journalEntries.companyId, bill.companyId),
+                eq(journalEntries.sourceType, JournalSourceType.AP_BILL),
+                eq(journalEntries.sourceId, bill.id),
+                inArray(journalEntries.status, [
+                  JournalEntryStatus.DRAFT,
+                  JournalEntryStatus.POSTED,
+                ]),
+                isNull(journalEntries.reversalOfId),
+              ),
+            )
+            .limit(1);
+          if (existingPosting) {
+            return fail({
+              message: t("post.errors.existingPosting"),
+              errorType: ErrorResponseTypes.CONFLICT,
+            });
+          }
+
+          const billLines = await tx
+            .select()
+            .from(paymentBillLines)
+            .where(eq(paymentBillLines.billId, bill.id))
+            .orderBy(paymentBillLines.sortOrder, paymentBillLines.id);
+          const explicitAccountIds = billLines.flatMap(({ expenseAccountId }) =>
+            expenseAccountId ? [expenseAccountId] : [],
+          );
+          const expenseAccounts = explicitAccountIds.length
+            ? await tx
+                .select({ id: accountNodes.id })
+                .from(accountNodes)
+                .where(
+                  and(
+                    inArray(accountNodes.id, explicitAccountIds),
+                    eq(accountNodes.companyId, bill.companyId),
+                    eq(accountNodes.type, AccountType.EXPENSE),
+                    eq(accountNodes.isActive, true),
+                    eq(accountNodes.isPostable, true),
+                  ),
+                )
+                .orderBy(accountNodes.id)
+                .for("share")
+            : [];
+          const expenseAccountIds = new Set(
+            expenseAccounts.map(({ id }) => id),
+          );
+          const lineTaxUnits = billLines.reduce(
+            (total, line) => total + Math.round(line.taxAmount * 10_000),
+            0,
+          );
+          if (
+            lineTaxUnits !== Math.round(bill.taxAmount * 10_000) ||
+            billLines.length === 0 ||
+            billLines.some(
+              ({ expenseAccountId, lineTotal, taxAmount }) =>
+                (expenseAccountId !== null &&
+                  !expenseAccountIds.has(expenseAccountId)) ||
+                taxAmount < 0 ||
+                lineTotal < taxAmount,
+            )
+          ) {
+            return fail({
+              message: t("post.errors.billLines"),
+              errorType: ErrorResponseTypes.VALIDATION_ERROR,
+            });
+          }
+
+          const lines: AutoPostLine[] = [];
+          for (const line of billLines) {
+            const net = TaxCalculator.roundToFour(
+              line.lineTotal - line.taxAmount,
+            );
+            if (net > 0) {
+              lines.push({
+                subtype: AccountSubtype.OPEX,
+                accountNodeId: line.expenseAccountId ?? undefined,
+                type: LineType.DEBIT,
+                amount: net,
+                currency: bill.currency,
+                description: line.description,
+              });
+            }
+          }
+          if (bill.taxAmount > 0) {
+            lines.push({
+              subtype: AccountSubtype.VAT_RECEIVABLE,
+              type: LineType.DEBIT,
+              amount: bill.taxAmount,
+              currency: bill.currency,
+              description: "VAT receivable",
+            });
+          }
+          lines.push({
+            subtype: AccountSubtype.ACCOUNTS_PAYABLE,
+            type: LineType.CREDIT,
+            amount: bill.total,
+            currency: bill.currency,
+            description: bill.supplierName,
+          });
+
+          journalEntryId = await postJournalEntry(
+            {
+              companyId: bill.companyId,
+              date: bill.billDate,
+              description: `AP bill: ${bill.supplierName}`,
+              sourceType: JournalSourceType.AP_BILL,
+              sourceId: bill.id,
+              postedByUserId: userId,
+              lines,
+              logger,
+            },
+            tx,
+          );
+          if (!journalEntryId) {
+            return fail({
+              message: t("post.errors.posting"),
+              errorType: ErrorResponseTypes.VALIDATION_ERROR,
+            });
+          }
+        }
+
+        await tx
+          .update(paymentBills)
+          .set({ status, journalEntryId, updatedAt: new Date() })
+          .where(eq(paymentBills.id, bill.id));
+
+        logger.info("AP bill status advanced", {
+          billId: bill.id,
+          from: bill.status,
+          to: status,
           journalEntryId,
-          updatedAt: new Date(),
-        })
-        .where(eq(paymentBills.id, urlPathParams.billId));
+        });
 
-      logger.info("AP bill status advanced", {
-        billId: bill.id,
-        from: bill.status,
-        to: nextStatus,
-      });
-
-      return success({
-        status: nextStatus,
-        journalEntryId,
+        return success({ status, journalEntryId });
       });
     } catch (error) {
       logger.error("Failed to approve AP bill", parseError(error));
@@ -129,200 +270,6 @@ export class BillApproveRepository {
         message: t("post.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
-    }
-  }
-
-  /**
-   * Posts the AP approval journal entry:
-   * Dr: Expense accounts (from line.expenseAccountId or OPEX fallback)
-   * Dr: VAT Receivable (if taxAmount > 0)
-   * Cr: Accounts Payable
-   *
-   * Returns the created journal entry ID, or null if accounts not found.
-   */
-  private static async postApprovalJournal(
-    bill: {
-      id: string;
-      companyId: string;
-      currency: string;
-      subtotal: number;
-      taxAmount: number;
-      total: number;
-      billDate: Date;
-      supplierName: string;
-    },
-    userId: string,
-    logger: EndpointLogger,
-  ): Promise<string | null> {
-    try {
-      // Find AP account node
-      const [apAccount] = await db
-        .select()
-        .from(accountNodes)
-        .where(
-          and(
-            eq(accountNodes.companyId, bill.companyId),
-            eq(accountNodes.subtype, AccountSubtype.ACCOUNTS_PAYABLE),
-            eq(accountNodes.isActive, true),
-          ),
-        )
-        .limit(1);
-
-      if (!apAccount) {
-        logger.warn(
-          "No ACCOUNTS_PAYABLE account found — skipping journal post",
-          {
-            companyId: bill.companyId,
-          },
-        );
-        return null;
-      }
-
-      // Find open period covering the bill date
-      const [period] = await db
-        .select()
-        .from(accountingPeriods)
-        .where(
-          and(
-            eq(accountingPeriods.companyId, bill.companyId),
-            eq(accountingPeriods.status, PeriodStatus.OPEN),
-          ),
-        )
-        .limit(1);
-
-      if (!period) {
-        logger.warn("No open accounting period — skipping journal post", {
-          companyId: bill.companyId,
-        });
-        return null;
-      }
-
-      // Get bill lines to resolve expense accounts
-      const lines = await db
-        .select()
-        .from(paymentBillLines)
-        .where(eq(paymentBillLines.billId, bill.id));
-
-      // Generate entry number
-      const [{ value: existingCount }] = await db
-        .select({ value: count() })
-        .from(journalEntries)
-        .where(eq(journalEntries.periodId, period.id));
-
-      const entrySeq = (existingCount ?? 0) + 1;
-      const year = bill.billDate.getFullYear();
-      const entryNumber = `JE-${year}-${String(entrySeq).padStart(4, "0")}`;
-
-      const [entry] = await db
-        .insert(journalEntries)
-        .values({
-          companyId: bill.companyId,
-          periodId: period.id,
-          entryNumber,
-          date: bill.billDate,
-          description: `AP Bill: ${bill.supplierName}`,
-          sourceType: JournalSourceType.AP_BILL,
-          sourceId: bill.id,
-          status: JournalEntryStatus.POSTED,
-          postedAt: new Date(),
-          postedByUserId: userId,
-        })
-        .returning({ id: journalEntries.id });
-
-      if (!entry) {
-        return null;
-      }
-
-      let sortOrder = 0;
-
-      // Dr: Expense lines
-      for (const line of lines) {
-        let expenseAccountId = line.expenseAccountId;
-
-        if (!expenseAccountId) {
-          // Fall back to OPEX account
-          const [opexAccount] = await db
-            .select()
-            .from(accountNodes)
-            .where(
-              and(
-                eq(accountNodes.companyId, bill.companyId),
-                eq(accountNodes.subtype, AccountSubtype.OPEX),
-                eq(accountNodes.isActive, true),
-              ),
-            )
-            .limit(1);
-
-          expenseAccountId = opexAccount?.id ?? null;
-        }
-
-        if (!expenseAccountId) {
-          logger.warn("No expense account for bill line — skipping debit", {
-            lineId: line.id,
-          });
-          continue;
-        }
-
-        const lineNet = line.lineTotal - line.taxAmount;
-        await db.insert(journalEntryLines).values({
-          journalEntryId: entry.id,
-          accountId: expenseAccountId,
-          type: LineType.DEBIT,
-          amount: lineNet,
-          currency: bill.currency,
-          description: line.description,
-          sortOrder: sortOrder++,
-        });
-      }
-
-      // Dr: VAT Receivable (if tax > 0)
-      if (bill.taxAmount > 0) {
-        const [vatAccount] = await db
-          .select()
-          .from(accountNodes)
-          .where(
-            and(
-              eq(accountNodes.companyId, bill.companyId),
-              eq(accountNodes.subtype, AccountSubtype.VAT_RECEIVABLE),
-              eq(accountNodes.isActive, true),
-            ),
-          )
-          .limit(1);
-
-        if (vatAccount) {
-          await db.insert(journalEntryLines).values({
-            journalEntryId: entry.id,
-            accountId: vatAccount.id,
-            type: LineType.DEBIT,
-            amount: bill.taxAmount,
-            currency: bill.currency,
-            description: "VAT receivable",
-            sortOrder: sortOrder++,
-          });
-        }
-      }
-
-      // Cr: Accounts Payable
-      await db.insert(journalEntryLines).values({
-        journalEntryId: entry.id,
-        accountId: apAccount.id,
-        type: LineType.CREDIT,
-        amount: bill.total,
-        currency: bill.currency,
-        description: `AP: ${bill.supplierName}`,
-        sortOrder: sortOrder++,
-      });
-
-      logger.info("AP approval journal entry posted", {
-        entryId: entry.id,
-        billId: bill.id,
-        total: bill.total,
-      });
-
-      return entry.id;
-    } catch (error) {
-      logger.error("Failed to post AP approval journal", parseError(error));
-      return null;
     }
   }
 }

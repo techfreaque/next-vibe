@@ -7,6 +7,7 @@ import { Div } from "next-vibe/ui/components/div";
 import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
 import { Span } from "next-vibe/ui/components/span";
 import { H3, P } from "next-vibe/ui/components/typography";
+import { formatMoney } from "next-vibe/unified-ui/_shared/format-money";
 import {
   useWidgetIsInteractive,
   useWidgetLocale,
@@ -83,11 +84,7 @@ export function EstimateGetWidget({
   }
 
   const money = (amount: number): string =>
-    new Intl.NumberFormat(locale, {
-      style: "currency",
-      currency: data.currency,
-      currencyDisplay: "code",
-    }).format(amount);
+    formatMoney(amount, data.currency, locale);
 
   function getStatusLabel(status: string): string {
     switch (status) {

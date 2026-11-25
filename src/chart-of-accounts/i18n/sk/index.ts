@@ -72,9 +72,18 @@ export const translations: typeof enTranslations = {
     },
   },
   errors: {
-    unauthorized: { title: "Vyžaduje sa prihlásenie", description: "Vyžaduje sa prihlásenie" },
-    validation: { title: "Neplatné údaje", description: "Skontrolujte všetky polia" },
-    forbidden: { title: "Prístup zamietnutý", description: "Nedostatočné oprávnenia" },
+    unauthorized: {
+      title: "Vyžaduje sa prihlásenie",
+      description: "Vyžaduje sa prihlásenie",
+    },
+    validation: {
+      title: "Neplatné údaje",
+      description: "Skontrolujte všetky polia",
+    },
+    forbidden: {
+      title: "Prístup zamietnutý",
+      description: "Nedostatočné oprávnenia",
+    },
     server: {
       title: "Chyba servera",
       description: "Operácia zlyhala. Skúste to znova.",
@@ -83,12 +92,18 @@ export const translations: typeof enTranslations = {
       title: "Neznáma chyba",
       description: "Nastala neočakávaná chyba",
     },
-    conflict: { title: "Konflikt", description: "Konflikt údajov" },
+    conflict: {
+      title: "Konflikt",
+      description: "Konflikt údajov",
+    },
     network: {
       title: "Chyba siete",
       description: "Server sa nepodarilo kontaktovať",
     },
-    notFound: { title: "Nenašlo sa", description: "Požadovaný zdroj sa nenašiel" },
+    notFound: {
+      title: "Nenašlo sa",
+      description: "Požadovaný zdroj sa nenašiel",
+    },
     unsavedChanges: {
       title: "Neuložené zmeny",
       description: "Máte neuložené zmeny",
@@ -248,9 +263,17 @@ export const translations: typeof enTranslations = {
       description: "Začiatok rozsahu dátumov",
       placeholder: "",
     },
-    dateTo: { label: "Do", description: "Koniec rozsahu dátumov", placeholder: "" },
-    page: { label: "Strana" },
-    pageSize: { label: "Za stranu" },
+    dateTo: {
+      label: "Do",
+      description: "Koniec rozsahu dátumov",
+      placeholder: "",
+    },
+    page: {
+      label: "Strana",
+    },
+    pageSize: {
+      label: "Za stranu",
+    },
     response: {
       entries: "Zápisy",
       id: "ID",
@@ -268,7 +291,27 @@ export const translations: typeof enTranslations = {
     },
   },
   journalCreate: {
+    errorDate: "Zadajte dátum v zvolenom účtovnom období.",
+    errorCurrency: "Na všetkých riadkoch použite účtovnú menu firmy.",
+    errorInvalidLine:
+      "Na strane Má dať alebo Dal zadajte kladnú sumu s najviac štyrmi desatinnými miestami.",
+    errorAccount: "Vyberte platný účet z účtového rozvrhu tejto firmy.",
     widget: {
+      lineDescription: "Opis položky",
+      incomplete: "Na každom riadku zadajte sumu na strane Má dať alebo Dal.",
+      offByLessThan: "Rozdiel je menší ako {{amount}}.",
+      offBy: "Rozdiel je {{amount}}.",
+      details: "Údaje účtovného zápisu",
+      saveDraft: "Uložiť koncept",
+      addLine: "Pridať položku",
+      removeLine: "Odstrániť položku",
+      account: "Účet",
+      side: "Strana",
+      amount: "Suma",
+      currency: "Mena",
+      missingScope: "Pred pridaním položiek vyberte firmu.",
+      noPeriods: "Firma nemá otvorené účtovné obdobie.",
+      noAccounts: "Firma nemá aktívne účty, na ktoré možno účtovať.",
       back: "Späť",
       viewEntryButton: "Zobraziť zápis",
       postNowButton: "Zaúčtovať",
@@ -283,16 +326,20 @@ export const translations: typeof enTranslations = {
     description:
       "Vytvorte účtovný zápis. Súčet na strane Má dať sa musí rovnať súčtu na strane Dal.",
     companyId: {
-      label: "ID firmy",
+      label: "Firma",
       description: "Firma, v ktorej sa zápis zaúčtuje",
       placeholder: "Identifikátor firmy",
     },
     periodId: {
-      label: "ID obdobia",
+      label: "Účtovné obdobie",
       description: "Obdobie, do ktorého zápis patrí",
       placeholder: "Identifikátor obdobia",
     },
-    date: { label: "Dátum", description: "Dátum účtovného prípadu", placeholder: "" },
+    date: {
+      label: "Dátum",
+      description: "Dátum účtovného prípadu",
+      placeholder: "",
+    },
     entryDescription: {
       label: "Popis",
       description: "Účtovný prípad, ktorého sa zápis týka",
@@ -327,13 +374,15 @@ export const translations: typeof enTranslations = {
     title: "Zaúčtovať zápis",
     titleShort: "Zaúčtovať zápis",
     description:
-      "Zaúčtujte koncept. Zaúčtovanie nemožno vrátiť späť. Ak potrebujete zápis opraviť, stornujte ho.",
+      "Zaúčtujte koncept. Na opravu zaúčtovaného zápisu použite storno.",
     entryId: {
       label: "ID zápisu",
       description: "Vyberte zápis, ktorý chcete zaúčtovať.",
       placeholder: "Identifikátor zápisu",
     },
-    response: { posted: "Zaúčtované" },
+    response: {
+      posted: "Zaúčtované",
+    },
     success: {
       title: "Zápis je zaúčtovaný",
       description: "Účtovný zápis bol zaúčtovaný.",
@@ -342,6 +391,9 @@ export const translations: typeof enTranslations = {
     errorNotDraft: "Zaúčtovať môžete len koncepty.",
   },
   journalReverse: {
+    errorManaged: "Tento zápis stornujte zo zdrojového dokladu.",
+    errorDate: "Dátum storna nesmie predchádzať dátumu pôvodného zápisu.",
+    errorNoPeriod: "Otvorte účtovné obdobie, do ktorého patrí dátum storna.",
     widget: {
       backButton: "Späť do účtovného denníka",
       reversalCreated: "Stornovací zápis bol vytvorený.",
@@ -366,7 +418,10 @@ export const translations: typeof enTranslations = {
       reversalEntryId: "ID stornovacieho zápisu",
       reversalEntryNumber: "Číslo stornovacieho zápisu",
     },
-    success: { title: "Zápis bol stornovaný", description: "Stornovací zápis bol vytvorený." },
+    success: {
+      title: "Zápis bol stornovaný",
+      description: "Stornovací zápis bol vytvorený.",
+    },
     errorNotPosted: "Stornovať možno len zaúčtované zápisy.",
     errorAlreadyReversed: "Zápis už bol stornovaný.",
   },
@@ -381,7 +436,8 @@ export const translations: typeof enTranslations = {
     },
     title: "Zápisy na účte",
     titleShort: "Hlavná kniha",
-    description: "Všetky riadky účtovných zápisov na účte vrátane priebežného zostatku",
+    description:
+      "Všetky riadky účtovných zápisov na účte vrátane priebežného zostatku",
     accountId: {
       label: "ID účtu",
       description: "Účet na zobrazenie",
@@ -392,9 +448,17 @@ export const translations: typeof enTranslations = {
       description: "Začiatok rozsahu dátumov",
       placeholder: "",
     },
-    dateTo: { label: "Do", description: "Koniec rozsahu dátumov", placeholder: "" },
-    page: { label: "Strana" },
-    pageSize: { label: "Za stranu" },
+    dateTo: {
+      label: "Do",
+      description: "Koniec rozsahu dátumov",
+      placeholder: "",
+    },
+    page: {
+      label: "Strana",
+    },
+    pageSize: {
+      label: "Za stranu",
+    },
     response: {
       lines: "Riadky",
       id: "ID",
@@ -460,7 +524,10 @@ export const translations: typeof enTranslations = {
       description: "Obratová predvaha bola vypočítaná.",
     },
     errors: {
-      unauthorized: { title: "Vyžaduje sa prihlásenie", description: "Vyžaduje sa prihlásenie" },
+      unauthorized: {
+        title: "Vyžaduje sa prihlásenie",
+        description: "Vyžaduje sa prihlásenie",
+      },
       validation: {
         title: "Neplatné údaje",
         description: "Skontrolujte svoje vstupy",
@@ -477,12 +544,18 @@ export const translations: typeof enTranslations = {
         title: "Neznáma chyba",
         description: "Nastala neočakávaná chyba",
       },
-      conflict: { title: "Konflikt", description: "Konflikt údajov" },
+      conflict: {
+        title: "Konflikt",
+        description: "Konflikt údajov",
+      },
       network: {
         title: "Chyba siete",
         description: "Server sa nepodarilo kontaktovať",
       },
-      notFound: { title: "Nenašlo sa", description: "Firma sa nenašla" },
+      notFound: {
+        title: "Nenašlo sa",
+        description: "Firma sa nenašla",
+      },
       unsavedChanges: {
         title: "Neuložené zmeny",
         description: "Máte neuložené zmeny",
@@ -490,7 +563,13 @@ export const translations: typeof enTranslations = {
     },
   },
   reports: {
+    switchReport: "Výkazy",
+    currency: "Mena",
+    mixedCurrency:
+      "V tomto období sa účtovalo vo viacerých menách. Vyberte menu výkazu.",
     nav: {
+      ledgerTax: "DPH v hlavnej knihe",
+      payables: "Veková štruktúra záväzkov",
       profitLoss: "Výkaz ziskov a strát",
       balanceSheet: "Súvaha",
       trialBalance: "Obratová predvaha",
@@ -498,6 +577,10 @@ export const translations: typeof enTranslations = {
       receivablesAging: "Veková štruktúra pohľadávok",
     },
     widget: {
+      quickDates: "Vybrať obdobie",
+      thisMonth: "Tento mesiac",
+      previousMonth: "Predchádzajúci mesiac",
+      autoCurrency: "Automaticky",
       run: "Zobraziť",
       running: "Spracúva sa…",
     },
@@ -553,7 +636,10 @@ export const translations: typeof enTranslations = {
       description: "Vypočítaný výkaz ziskov a strát",
     },
     errors: {
-      unauthorized: { title: "Vyžaduje sa prihlásenie", description: "Vyžaduje sa prihlásenie" },
+      unauthorized: {
+        title: "Vyžaduje sa prihlásenie",
+        description: "Vyžaduje sa prihlásenie",
+      },
       validation: {
         title: "Neplatné údaje",
         description: "Skontrolujte svoje vstupy",
@@ -562,17 +648,26 @@ export const translations: typeof enTranslations = {
         title: "Prístup zamietnutý",
         description: "Žiadny prístup k tejto spoločnosti",
       },
-      server: { title: "Chyba servera", description: "Nepodarilo sa zostaviť výkaz ziskov a strát." },
+      server: {
+        title: "Chyba servera",
+        description: "Nepodarilo sa zostaviť výkaz ziskov a strát.",
+      },
       unknown: {
         title: "Neznáma chyba",
         description: "Nastala neočakávaná chyba",
       },
-      conflict: { title: "Konflikt", description: "Konflikt údajov" },
+      conflict: {
+        title: "Konflikt",
+        description: "Konflikt údajov",
+      },
       network: {
         title: "Chyba siete",
         description: "Server sa nepodarilo kontaktovať",
       },
-      notFound: { title: "Nenašlo sa", description: "Firma sa nenašla" },
+      notFound: {
+        title: "Nenašlo sa",
+        description: "Firma sa nenašla",
+      },
       unsavedChanges: {
         title: "Neuložené zmeny",
         description: "Máte neuložené zmeny",
@@ -603,6 +698,7 @@ export const translations: typeof enTranslations = {
       placeholder: "RRRR-MM-DD",
     },
     response: {
+      unclosedEarnings: "Výsledok hospodárenia pred uzavretím obdobia",
       asOfDate: "Rozhodný dátum",
       assets: "Aktíva",
       totalAssets: "Celkové aktíva",
@@ -621,7 +717,10 @@ export const translations: typeof enTranslations = {
       description: "Súvaha bola vypočítaná",
     },
     errors: {
-      unauthorized: { title: "Vyžaduje sa prihlásenie", description: "Vyžaduje sa prihlásenie" },
+      unauthorized: {
+        title: "Vyžaduje sa prihlásenie",
+        description: "Vyžaduje sa prihlásenie",
+      },
       validation: {
         title: "Neplatné údaje",
         description: "Skontrolujte svoje vstupy",
@@ -638,12 +737,18 @@ export const translations: typeof enTranslations = {
         title: "Neznáma chyba",
         description: "Nastala neočakávaná chyba",
       },
-      conflict: { title: "Konflikt", description: "Konflikt údajov" },
+      conflict: {
+        title: "Konflikt",
+        description: "Konflikt údajov",
+      },
       network: {
         title: "Chyba siete",
         description: "Server sa nepodarilo kontaktovať",
       },
-      notFound: { title: "Nenašlo sa", description: "Firma sa nenašla" },
+      notFound: {
+        title: "Nenašlo sa",
+        description: "Firma sa nenašla",
+      },
       unsavedChanges: {
         title: "Neuložené zmeny",
         description: "Máte neuložené zmeny",
@@ -651,29 +756,34 @@ export const translations: typeof enTranslations = {
     },
   },
   receivablesAging: {
+    currencies: {
+      EUR: "EUR",
+      USD: "USD",
+      PLN: "PLN",
+    },
     widget: {
       asOf: "Stav k dátumu",
-      noData: "Žiadne neuhradené pohľadávky.",
+      noData: "V tejto mene nie sú žiadne neuhradené faktúry.",
       totalRow: "Spolu",
       viewInvoice: "Zobraziť",
-      selectCompany:
-        "Zadajte ID firmy a kliknutím na Zobraziť zostavte prehľad pohľadávok podľa splatnosti.",
+      selectCompany: "Vyberte firmu, pre ktorú chcete zobraziť prehľad.",
     },
-    title: "Veková štruktúra pohľadávok",
-    titleShort: "Veková štruktúra pohľadávok",
-    description:
-      "Neuhradené faktúry podľa počtu dní po splatnosti. Uvidíte, ktoré pohľadávky viažu vaše peniaze.",
+    title: "Neuhradené faktúry",
+    titleShort: "Neuhradené faktúry",
+    description: "Aktuálne neuhradené sumy podľa splatnosti faktúr a meny.",
     companyId: {
-      label: "ID firmy",
-      description: "Firma, ktorej sa prehľad týka",
+      label: "Firma",
+      description: "Vyberte firmu, ktorej neuhradené faktúry chcete zobraziť.",
       placeholder: "Identifikátor firmy",
     },
     asOfDate: {
       label: "Stav k dátumu",
-      description: "Rozhodný dátum na vyhodnotenie splatnosti (predvolene dnes)",
+      description:
+        "Dátum určuje pásmo splatnosti súm, ktoré sú dnes ešte neuhradené.",
       placeholder: "RRRR-MM-DD",
     },
     response: {
+      currency: "Mena",
       asOfDate: "Stav k dátumu",
       buckets: "Pásma splatnosti",
       current: "V lehote splatnosti",
@@ -681,10 +791,10 @@ export const translations: typeof enTranslations = {
       days31to60: "31 až 60 dní",
       days61to90: "61 až 90 dní",
       over90: "Nad 90 dní",
-      invoiceId: "ID faktúry",
-      customerId: "ID odberateľa",
+      invoiceId: "Faktúra",
+      customerId: "Odberateľ",
       amount: "Suma",
-      dueDate: "Dátum splatnosti",
+      dueDate: "Splatnosť",
       totals: "Súčty",
       total: "Spolu",
     },
@@ -693,7 +803,10 @@ export const translations: typeof enTranslations = {
       description: "Veková štruktúra pohľadávok bola vypočítaná.",
     },
     errors: {
-      unauthorized: { title: "Vyžaduje sa prihlásenie", description: "Prihláste sa." },
+      unauthorized: {
+        title: "Vyžaduje sa prihlásenie",
+        description: "Prihláste sa.",
+      },
       validation: {
         title: "Neplatné údaje",
         description: "Skontrolujte zadané údaje.",
@@ -704,18 +817,25 @@ export const translations: typeof enTranslations = {
       },
       server: {
         title: "Chyba servera",
-        description: "Nepodarilo sa zostaviť prehľad pohľadávok podľa splatnosti.",
+        description:
+          "Nepodarilo sa zostaviť prehľad pohľadávok podľa splatnosti.",
       },
       unknown: {
         title: "Neznáma chyba",
         description: "Vyskytla sa neočakávaná chyba.",
       },
-      conflict: { title: "Konflikt údajov", description: "Údaje sa medzičasom zmenili." },
+      conflict: {
+        title: "Konflikt údajov",
+        description: "Údaje sa medzičasom zmenili.",
+      },
       network: {
         title: "Chyba pripojenia",
         description: "Nepodarilo sa pripojiť k serveru.",
       },
-      notFound: { title: "Záznam sa nenašiel", description: "Firma sa nenašla." },
+      notFound: {
+        title: "Záznam sa nenašiel",
+        description: "Firma sa nenašla.",
+      },
       unsavedChanges: {
         title: "Neuložené zmeny",
         description: "Máte neuložené zmeny.",
@@ -751,8 +871,7 @@ export const translations: typeof enTranslations = {
       noData: "Za toto obdobie nie sú k dispozícii údaje o DPH.",
       summarySection: "Súhrn",
       detailSection: "Rozpis",
-      selectCompany:
-        "Vyberte firmu, pre ktorú chcete zobraziť prehľad DPH.",
+      selectCompany: "Vyberte firmu, pre ktorú chcete zobraziť prehľad DPH.",
     },
     title: "Prehľad DPH",
     titleShort: "Prehľad DPH",
@@ -786,9 +905,15 @@ export const translations: typeof enTranslations = {
       taxAmount: "Suma dane",
       rate: "Sadzba",
     },
-    success: { title: "Prehľad DPH pripravený", description: "Prehľad DPH bol zostavený." },
+    success: {
+      title: "Prehľad DPH pripravený",
+      description: "Prehľad DPH bol zostavený.",
+    },
     errors: {
-      unauthorized: { title: "Vyžaduje sa prihlásenie", description: "Vyžaduje sa prihlásenie" },
+      unauthorized: {
+        title: "Vyžaduje sa prihlásenie",
+        description: "Vyžaduje sa prihlásenie",
+      },
       validation: {
         title: "Neplatné údaje",
         description: "Skontrolujte svoje vstupy",
@@ -805,12 +930,18 @@ export const translations: typeof enTranslations = {
         title: "Neznáma chyba",
         description: "Nastala neočakávaná chyba",
       },
-      conflict: { title: "Konflikt", description: "Konflikt údajov" },
+      conflict: {
+        title: "Konflikt",
+        description: "Konflikt údajov",
+      },
       network: {
         title: "Chyba siete",
         description: "Server sa nepodarilo kontaktovať",
       },
-      notFound: { title: "Nenašlo sa", description: "Firma sa nenašla" },
+      notFound: {
+        title: "Nenašlo sa",
+        description: "Firma sa nenašla",
+      },
       unsavedChanges: {
         title: "Neuložené zmeny",
         description: "Máte neuložené zmeny",

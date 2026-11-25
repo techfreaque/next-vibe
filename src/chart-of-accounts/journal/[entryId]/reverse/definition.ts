@@ -3,7 +3,6 @@
  * POST — create a reversal entry mirroring debits/credits
  */
 
-import { dateSchema } from "next-vibe/core/definition/common.schema";
 import { createEndpoint } from "next-vibe/core/definition/create-i18n";
 import {
   EndpointErrorTypes,
@@ -16,11 +15,13 @@ import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
 import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
 import {
   requestField,
+  requestUrlPathParamsField,
   responseField,
 } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
 import { scopedTranslation } from "../../../i18n";
+import { accountingDateSchema } from "../../../shared/calendar-date";
 
 const CoaJournalReverseWidgetLazy = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.CoaJournalReverseWidget })),
@@ -43,9 +44,9 @@ const { POST } = createEndpoint({
 
   fields: customWidgetObject({
     render: CoaJournalReverseWidgetLazy,
-    usage: { request: "data", response: true },
+    usage: { request: "data&urlPathParams", response: true },
     children: {
-      entryId: requestField(scopedTranslation, {
+      entryId: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
         label: "journalReverse.entryId.label" as const,
@@ -65,7 +66,7 @@ const { POST } = createEndpoint({
         description: "journalReverse.reversalDate.description" as const,
         placeholder: "journalReverse.reversalDate.placeholder" as const,
         columns: 6,
-        schema: dateSchema.optional(),
+        schema: accountingDateSchema.optional(),
       }),
       reversalEntryId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
@@ -125,9 +126,11 @@ const { POST } = createEndpoint({
   },
 
   examples: {
+    urlPathParams: {
+      default: { entryId: "00000000-0000-4000-8000-000000000030" },
+    },
     requests: {
       default: {
-        entryId: "00000000-0000-0000-0000-000000000030",
         reversalDate: new Date("2026-02-01"),
       },
     },
@@ -141,7 +144,8 @@ const { POST } = createEndpoint({
 });
 
 export type CoaJournalReverseRequestInput = typeof POST.types.RequestInput;
-export type CoaJournalReverseRequestOutput = typeof POST.types.RequestOutput;
+export type CoaJournalReverseRequestOutput = typeof POST.types.RequestOutput &
+  typeof POST.types.UrlVariablesOutput;
 export type CoaJournalReverseResponseInput = typeof POST.types.ResponseInput;
 export type CoaJournalReverseResponseOutput = typeof POST.types.ResponseOutput;
 

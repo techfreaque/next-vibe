@@ -84,6 +84,16 @@ export const translations: typeof enTranslations = {
       description: "Oferta utworzona jako szkic",
     },
     widget: {
+      otherRate: "Inna stawka",
+      item: "Opis",
+      quantity: "Ilość",
+      price: "Cena jednostkowa",
+      vatRate: "VAT %",
+      add: "Dodaj pozycję",
+      remove: "Usuń pozycję",
+      empty: "Dodaj towary lub usługi objęte ofertą.",
+      summary: "Podsumowanie",
+
       back: "Wróć",
       submit: "Utwórz ofertę",
       viewButton: "Zobacz ofertę",
@@ -110,9 +120,10 @@ export const translations: typeof enTranslations = {
     placeholder: "Wprowadź nazwę klienta",
   },
   currency: {
+    code: "{{code}}",
     label: "Waluta",
     description: "Waluta oferty",
-    placeholder: "EUR",
+    placeholder: "Waluta firmy",
   },
   validUntil: {
     label: "Ważna do",

@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import { eq, sql } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import {
@@ -18,11 +18,12 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { CompanyMemberRole } from "@/companies/enum";
-import { CompanyAuthRepository } from "@/companies/repository";
+import { lockLedgerCompany } from "@/chart-of-accounts/shared/ledger-write";
+import { getDocumentAccess } from "@/finance/document-company-scope";
 
 import { paymentEstimateLines, paymentEstimates } from "../../../db";
 import { EstimateStatus } from "../../../enum";
+import { nextEstimateNumber, refreshEstimateTotals } from "../../draft";
 import type {
   EstimateDuplicateResponseOutput,
   EstimateDuplicateUrlPathParams,
@@ -52,94 +53,95 @@ export class EstimateDuplicateRepository {
         });
       }
 
-      const authResult = await CompanyAuthRepository.requireMember(
-        userId,
-        estimate.companyId,
-        CompanyMemberRole.ACCOUNTANT,
-        logger,
-        locale,
-      );
-      if (!authResult.success) {
-        return authResult;
-      }
-
-      // Generate new estimate number: EST-{YYYY}-{NNNN} per company per year
-      const year = new Date().getFullYear();
-      const yearPrefix = `EST-${year}-`;
-
-      const [{ value: countThisYear }] = await db
-        .select({ value: sql<number>`count(*)::int` })
-        .from(paymentEstimates)
-        .where(
-          sql`${paymentEstimates.companyId} = ${estimate.companyId}
-          AND ${paymentEstimates.estimateNumber} LIKE ${`${yearPrefix}%`}`,
+      return await db.transaction(async (tx) => {
+        await lockLedgerCompany(tx, estimate.companyId);
+        const access = await getDocumentAccess(
+          userId,
+          { companyId: estimate.companyId },
+          tx,
         );
+        if (!access?.canManage) {
+          return fail({
+            message: t("post.errors.forbidden.title"),
+            errorType: ErrorResponseTypes.FORBIDDEN,
+          });
+        }
+        const [source] = await tx
+          .select()
+          .from(paymentEstimates)
+          .where(eq(paymentEstimates.id, estimate.id))
+          .for("share");
+        if (!source || source.companyId !== estimate.companyId) {
+          return fail({
+            message: t("post.errors.notFound.title"),
+            errorType: ErrorResponseTypes.NOT_FOUND,
+          });
+        }
+        const estimateNumber = await nextEstimateNumber(tx, source.companyId);
+        // Clone the estimate
+        const [newEstimate] = await tx
+          .insert(paymentEstimates)
+          .values({
+            companyId: source.companyId,
+            estimateNumber,
+            status: EstimateStatus.DRAFT,
+            customerId: source.customerId ?? null,
+            customerEmail: source.customerEmail ?? null,
+            customerName: source.customerName ?? null,
+            currency: source.currency,
+            validUntil: source.validUntil ?? null,
+            title: source.title,
+            notes: source.notes ?? null,
+            terms: source.terms ?? null,
+            subtotal: source.subtotal,
+            taxAmount: source.taxAmount,
+            total: source.total,
+          })
+          .returning();
 
-      const nextSeq = (countThisYear ?? 0) + 1;
-      const estimateNumber = `${yearPrefix}${String(nextSeq).padStart(4, "0")}`;
+        if (!newEstimate) {
+          return fail({
+            message: t("post.errors.server.title"),
+            errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          });
+        }
 
-      // Clone the estimate
-      const [newEstimate] = await db
-        .insert(paymentEstimates)
-        .values({
-          companyId: estimate.companyId,
+        // Clone lines
+        const sourceLines = await tx
+          .select()
+          .from(paymentEstimateLines)
+          .where(eq(paymentEstimateLines.estimateId, source.id))
+          .orderBy(paymentEstimateLines.sortOrder);
+
+        if (sourceLines.length > 0) {
+          await tx.insert(paymentEstimateLines).values(
+            sourceLines.map((l) => ({
+              estimateId: newEstimate.id,
+              description: l.description,
+              productId: l.productId ?? null,
+              quantity: l.quantity,
+              unitPrice: l.unitPrice,
+              taxRate: l.taxRate,
+              taxAmount: l.taxAmount,
+              lineTotal: l.lineTotal,
+              sortOrder: l.sortOrder ?? 0,
+            })),
+          );
+        }
+
+        await refreshEstimateTotals(tx, newEstimate.id);
+        logger.info("Estimate duplicated", {
+          sourceEstimateId: urlPathParams.estimateId,
+          newEstimateId: newEstimate.id,
           estimateNumber,
-          status: EstimateStatus.DRAFT,
-          customerId: estimate.customerId ?? null,
-          customerEmail: estimate.customerEmail ?? null,
-          customerName: estimate.customerName ?? null,
-          currency: estimate.currency,
-          validUntil: estimate.validUntil ?? null,
-          title: estimate.title ? `${estimate.title} (Copy)` : null,
-          notes: estimate.notes ?? null,
-          terms: estimate.terms ?? null,
-          subtotal: estimate.subtotal,
-          taxAmount: estimate.taxAmount,
-          total: estimate.total,
-        })
-        .returning();
-
-      if (!newEstimate) {
-        return fail({
-          message: t("post.errors.server.title"),
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
         });
-      }
 
-      // Clone lines
-      const sourceLines = await db
-        .select()
-        .from(paymentEstimateLines)
-        .where(eq(paymentEstimateLines.estimateId, estimate.id))
-        .orderBy(paymentEstimateLines.sortOrder);
-
-      if (sourceLines.length > 0) {
-        await db.insert(paymentEstimateLines).values(
-          sourceLines.map((l) => ({
-            estimateId: newEstimate.id,
-            description: l.description,
-            productId: l.productId ?? null,
-            quantity: l.quantity,
-            unitPrice: l.unitPrice,
-            taxRate: l.taxRate,
-            taxAmount: l.taxAmount,
-            lineTotal: l.lineTotal,
-            sortOrder: l.sortOrder ?? 0,
-          })),
-        );
-      }
-
-      logger.info("Estimate duplicated", {
-        sourceEstimateId: urlPathParams.estimateId,
-        newEstimateId: newEstimate.id,
-        estimateNumber,
-      });
-
-      return success({
-        success: true,
-        message: null,
-        newEstimateId: newEstimate.id,
-        estimateNumber: newEstimate.estimateNumber,
+        return success({
+          success: true,
+          message: null,
+          newEstimateId: newEstimate.id,
+          estimateNumber: newEstimate.estimateNumber,
+        });
       });
     } catch (error) {
       const parsed = parseError(error);

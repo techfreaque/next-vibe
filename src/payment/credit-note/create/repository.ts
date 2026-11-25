@@ -1,20 +1,12 @@
 /**
- * Credit Note Create Repository
- * Creates a negative invoice linked to the original invoice.
- *
- * If no line items supplied → full credit: negates all lines from original invoice.
- * If line items supplied → partial credit: uses provided lines.
- *
- * Journal entry on create:
- *   Dr: Revenue (net amount, negative invoice = reduces revenue already posted)
- *   Cr: AR (reduces what customer owes)
+ * Issues a credit note against a posted company invoice.
  */
 
 import "server-only";
 
-import { and, eq, max, sql } from "drizzle-orm";
+import { and, eq, isNull, sql } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { CurrenciesArr, defaultLocale } from "next-vibe/core/i18n/core/config";
+import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
   fail,
@@ -24,9 +16,9 @@ import {
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import type { EndpointLogger } from "next-vibe/logger/types";
+import { z } from "zod";
 
 import {
-  accountingPeriods,
   accountNodes,
   journalEntries,
   journalEntryLines,
@@ -36,11 +28,16 @@ import {
   JournalEntryStatus,
   JournalSourceType,
   LineType,
-  PeriodStatus,
 } from "@/chart-of-accounts/enum";
-import { CompanyMemberRole } from "@/companies/enum";
-import { CompanyAuthRepository } from "@/companies/repository";
-import { getDocumentCompanies } from "@/finance/document-company-scope";
+import {
+  type AutoPostLine,
+  postJournalEntry,
+} from "@/chart-of-accounts/shared/auto-post";
+import { accountingDay } from "@/chart-of-accounts/shared/journal-validation";
+import { lockLedgerCompany } from "@/chart-of-accounts/shared/ledger-write";
+import { getDocumentAccess } from "@/finance/document-company-scope";
+import { nextCompanyInvoiceSequence } from "@/finance/document-number";
+import { TaxCalculator } from "@/tax/calculator";
 
 import { paymentInvoiceLines, paymentInvoices } from "../../db";
 import { InvoiceStatus } from "../../enum";
@@ -60,382 +57,362 @@ export class CreditNoteCreateRepository {
     const { t } = scopedTranslation.scopedT(locale);
 
     try {
-      // Require ACCOUNTANT or higher
-      const authResult = await CompanyAuthRepository.requireMember(
-        userId,
-        data.companyId,
-        CompanyMemberRole.ACCOUNTANT,
-        logger,
-        locale,
-      );
-      if (!authResult.success) {
-        return authResult;
-      }
-
-      const [company] = await getDocumentCompanies(userId, data.companyId);
-      if (!company) {
+      const scope = { companyId: data.companyId };
+      if (!(await getDocumentAccess(userId, scope))?.canManage) {
         return fail({
           message: t("post.errors.forbidden.title"),
           errorType: ErrorResponseTypes.FORBIDDEN,
         });
       }
 
-      // Load the original invoice
-      const [original] = await db
-        .select()
-        .from(paymentInvoices)
-        .where(
-          and(
-            eq(paymentInvoices.id, data.invoiceId),
-            eq(paymentInvoices.companyId, data.companyId),
-          ),
-        )
-        .limit(1);
+      return await db.transaction(async (tx) => {
+        await lockLedgerCompany(tx, data.companyId);
+        const [original] = await tx
+          .select()
+          .from(paymentInvoices)
+          .where(
+            and(
+              eq(paymentInvoices.id, data.invoiceId),
+              eq(paymentInvoices.companyId, data.companyId),
+            ),
+          )
+          .limit(1)
+          .for("update");
 
-      if (!original) {
-        return fail({
-          message: t("post.errors.notFound.title"),
-          errorType: ErrorResponseTypes.NOT_FOUND,
-        });
-      }
+        if (!original) {
+          return fail({
+            message: t("post.errors.notFound.title"),
+            errorType: ErrorResponseTypes.NOT_FOUND,
+          });
+        }
 
-      // Only OPEN or PAID invoices can be credited
-      if (
-        original.status !== InvoiceStatus.OPEN &&
-        original.status !== InvoiceStatus.PAID
-      ) {
-        return fail({
-          message: t("post.errors.conflict.title"),
-          errorType: ErrorResponseTypes.CONFLICT,
-        });
-      }
+        if (!(await getDocumentAccess(userId, scope, tx))?.canManage) {
+          return fail({
+            message: t("post.errors.forbidden.title"),
+            errorType: ErrorResponseTypes.FORBIDDEN,
+          });
+        }
 
-      const rawCurrency = original.currency;
-      const currency = (CurrenciesArr as readonly string[]).includes(
-        rawCurrency,
-      )
-        ? (rawCurrency as (typeof CurrenciesArr)[number])
-        : "EUR";
+        const originalGrossCents = Math.round(Number(original.amount) * 100);
+        if (
+          originalGrossCents <= 0 ||
+          (original.status !== InvoiceStatus.OPEN &&
+            original.status !== InvoiceStatus.PAID)
+        ) {
+          return fail({
+            message: t("post.errors.conflict.title"),
+            errorType: ErrorResponseTypes.CONFLICT,
+          });
+        }
 
-      // Determine credit lines (full or partial)
-      interface CreditLine {
-        description: string;
-        quantity: number;
-        unitPrice: number;
-        taxRate: number;
-        taxAmount: number;
-        lineTotal: number;
-      }
-
-      let creditLines: CreditLine[] = [];
-
-      if (!data.lineItems || data.lineItems.length === 0) {
-        // Full credit — negate all lines from the original invoice
-        const origLines = await db
+        const originalLines = await tx
           .select()
           .from(paymentInvoiceLines)
-          .where(eq(paymentInvoiceLines.invoiceId, original.id));
+          .where(eq(paymentInvoiceLines.invoiceId, original.id))
+          .orderBy(paymentInvoiceLines.sortOrder, paymentInvoiceLines.id);
+        const originalVatCents = Math.round(
+          originalLines.reduce(
+            (total, line) => total + Math.round(line.taxAmount * 10_000),
+            0,
+          ) / 100,
+        );
+        const originalNetCents = originalGrossCents - originalVatCents;
+        const rates = new Set(originalLines.map((line) => line.taxRate));
 
-        creditLines = origLines.map((l) => ({
-          description: l.description,
-          quantity: l.quantity,
-          unitPrice: -Math.abs(l.unitPrice),
-          taxRate: l.taxRate ?? 0,
-          taxAmount: -Math.abs(l.taxAmount),
-          lineTotal: -Math.abs(l.lineTotal),
-        }));
-      } else {
-        // Partial credit — compute from provided line items
-        creditLines = data.lineItems.map((l) => {
-          const qty = l.quantity;
-          const price = -Math.abs(l.unitPrice);
-          const taxRate = l.taxRate ?? 0;
-          const lineNet = qty * price;
-          const taxAmount = lineNet * (taxRate / 100);
-          const lineTotal = lineNet + taxAmount;
-          return {
-            description: l.description,
-            quantity: qty,
-            unitPrice: price,
-            taxRate,
-            taxAmount,
-            lineTotal,
-          };
-        });
-      }
+        const creditLines = data.lineItems?.length
+          ? data.lineItems.map((line) => {
+              const quantity = TaxCalculator.roundToFour(line.quantity);
+              const unitPrice = TaxCalculator.roundToFour(
+                Math.abs(line.unitPrice),
+              );
+              const taxRate = TaxCalculator.roundToFour(line.taxRate / 100);
+              const { taxAmount, total } = TaxCalculator.calculateLineItemTax({
+                quantity,
+                unitPrice,
+                taxRate,
+              });
+              return {
+                description: line.description,
+                quantity,
+                unitPrice: -unitPrice,
+                taxRate,
+                taxAmount: -taxAmount,
+                lineTotal: -total,
+                productId: null,
+              };
+            })
+          : originalLines.map((line) => ({
+              description: line.description,
+              quantity: line.quantity,
+              unitPrice: -line.unitPrice,
+              taxRate: line.taxRate,
+              taxAmount: -line.taxAmount,
+              lineTotal: -line.lineTotal,
+              productId: line.productId,
+            }));
 
-      const totalAmount = creditLines.reduce((s, l) => s + l.lineTotal, 0);
+        const grossCents = Math.round(
+          creditLines.reduce(
+            (total, line) => total - Math.round(line.lineTotal * 10_000),
+            0,
+          ) / 100,
+        );
+        const vatCents = Math.round(
+          creditLines.reduce(
+            (total, line) => total - Math.round(line.taxAmount * 10_000),
+            0,
+          ) / 100,
+        );
+        const netCents = grossCents - vatCents;
+        if (
+          !Number.isSafeInteger(grossCents) ||
+          !Number.isSafeInteger(vatCents) ||
+          grossCents <= 0 ||
+          netCents < 0 ||
+          vatCents < 0 ||
+          creditLines.some(
+            (line) =>
+              line.quantity <= 0 ||
+              line.lineTotal > 0 ||
+              !rates.has(line.taxRate),
+          )
+        ) {
+          return fail({
+            message: t("post.errors.creditLines"),
+            errorType: ErrorResponseTypes.VALIDATION_ERROR,
+          });
+        }
 
-      // Auto-generate sequence number per company
-      const [{ value: maxSeq }] = await db
-        .select({ value: max(paymentInvoices.invoiceSequenceNumber) })
-        .from(paymentInvoices)
-        .where(eq(paymentInvoices.companyId, data.companyId));
+        const issuedCredits = tx
+          .select({
+            grossCents: sql<string>`-${paymentInvoices.amount} * 100`.as(
+              "gross_cents",
+            ),
+            vatCents:
+              sql<string>`round(coalesce(sum(-${paymentInvoiceLines.taxAmount}), 0) * 100)`.as(
+                "vat_cents",
+              ),
+          })
+          .from(paymentInvoices)
+          .leftJoin(
+            paymentInvoiceLines,
+            eq(paymentInvoiceLines.invoiceId, paymentInvoices.id),
+          )
+          .where(
+            and(
+              eq(paymentInvoices.companyId, data.companyId),
+              eq(paymentInvoices.currency, original.currency),
+              eq(paymentInvoices.status, InvoiceStatus.OPEN),
+              sql`${paymentInvoices.amount} < 0`,
+              sql`${paymentInvoices.metadata}->>'originalInvoiceId' = ${original.id}`,
+            ),
+          )
+          .groupBy(paymentInvoices.id, paymentInvoices.amount)
+          .as("issued_credits");
+        const [prior] = await tx
+          .select({
+            grossCents:
+              sql<number>`coalesce(sum(${issuedCredits.grossCents}), 0)`.mapWith(
+                Number,
+              ),
+            vatCents:
+              sql<number>`coalesce(sum(${issuedCredits.vatCents}), 0)`.mapWith(
+                Number,
+              ),
+          })
+          .from(issuedCredits);
+        const priorGross = prior?.grossCents ?? 0;
+        const priorVat = prior?.vatCents ?? 0;
+        if (
+          grossCents + priorGross > originalGrossCents ||
+          vatCents + priorVat > originalVatCents ||
+          netCents + priorGross - priorVat > originalNetCents
+        ) {
+          return fail({
+            message: t("post.errors.creditLimit"),
+            errorType: ErrorResponseTypes.VALIDATION_ERROR,
+          });
+        }
 
-      const nextSeq = (maxSeq ?? 0) + 1;
-      const cnId = `CN-${data.companyId.slice(0, 8)}-${String(nextSeq).padStart(6, "0")}`;
+        const today = new Date();
+        const originalPosting = original.journalEntryId
+          ? await tx
+              .select({
+                accountId: journalEntryLines.accountId,
+                amount: journalEntryLines.amount,
+                type: journalEntryLines.type,
+                subtype: accountNodes.subtype,
+                date: journalEntries.date,
+              })
+              .from(journalEntryLines)
+              .innerJoin(
+                journalEntries,
+                eq(journalEntries.id, journalEntryLines.journalEntryId),
+              )
+              .innerJoin(
+                accountNodes,
+                eq(accountNodes.id, journalEntryLines.accountId),
+              )
+              .where(
+                and(
+                  eq(journalEntries.id, original.journalEntryId),
+                  eq(journalEntries.companyId, data.companyId),
+                  eq(journalEntries.sourceType, JournalSourceType.AR_INVOICE),
+                  eq(journalEntries.sourceId, original.id),
+                  eq(journalEntries.status, JournalEntryStatus.POSTED),
+                  isNull(journalEntries.reversedById),
+                  isNull(journalEntries.reversalOfId),
+                  eq(accountNodes.companyId, data.companyId),
+                  eq(journalEntryLines.currency, original.currency),
+                ),
+              )
+          : [];
+        const receivable = originalPosting.find(
+          (line) =>
+            line.type === LineType.DEBIT &&
+            line.subtype === AccountSubtype.ACCOUNTS_RECEIVABLE,
+        );
+        const revenue = originalPosting.find(
+          (line) =>
+            line.type === LineType.CREDIT &&
+            (line.subtype === AccountSubtype.REVENUE_SERVICE ||
+              line.subtype === AccountSubtype.REVENUE_SALES),
+        );
+        const vat = originalPosting.find(
+          (line) =>
+            line.type === LineType.CREDIT &&
+            line.subtype === AccountSubtype.VAT_PAYABLE,
+        );
+        if (
+          !receivable ||
+          accountingDay(receivable.date) > accountingDay(today) ||
+          receivable.amount !== originalGrossCents / 100 ||
+          (revenue?.amount ?? 0) !== originalNetCents / 100 ||
+          (vat?.amount ?? 0) !== originalVatCents / 100 ||
+          originalPosting.length !==
+            1 + Number(originalNetCents > 0) + Number(originalVatCents > 0)
+        ) {
+          return fail({
+            message: t("post.errors.originalPosting"),
+            errorType: ErrorResponseTypes.CONFLICT,
+          });
+        }
 
-      // Insert credit note invoice (negative amount, OPEN status)
-      const [creditNote] = await db
-        .insert(paymentInvoices)
-        .values({
+        const creditNoteId = crypto.randomUUID();
+        const currency = original.currency;
+        const postingLines: AutoPostLine[] = [
+          {
+            subtype: AccountSubtype.ACCOUNTS_RECEIVABLE,
+            accountNodeId: receivable.accountId,
+            type: LineType.CREDIT,
+            amount: grossCents / 100,
+            currency,
+          },
+        ];
+        if (netCents > 0 && revenue) {
+          postingLines.push({
+            subtype: revenue.subtype,
+            accountNodeId: revenue.accountId,
+            type: LineType.DEBIT,
+            amount: netCents / 100,
+            currency,
+          });
+        }
+        if (vatCents > 0 && vat) {
+          postingLines.push({
+            subtype: AccountSubtype.VAT_PAYABLE,
+            accountNodeId: vat.accountId,
+            type: LineType.DEBIT,
+            amount: vatCents / 100,
+            currency,
+          });
+        }
+
+        const invoiceSequenceNumber = await nextCompanyInvoiceSequence(
+          tx,
+          data.companyId,
+        );
+        const invoiceNumber = `CN-${String(invoiceSequenceNumber).padStart(6, "0")}`;
+        const journalEntryId = await postJournalEntry(
+          {
+            companyId: data.companyId,
+            date: today,
+            description: `AR credit note: ${invoiceNumber}`,
+            sourceType: JournalSourceType.AR_INVOICE,
+            sourceId: creditNoteId,
+            postedByUserId: userId,
+            lines: postingLines,
+            logger,
+          },
+          tx,
+        );
+        if (!journalEntryId) {
+          return fail({
+            message: t("post.errors.posting"),
+            errorType: ErrorResponseTypes.VALIDATION_ERROR,
+          });
+        }
+
+        const amount = (-grossCents / 100).toFixed(2);
+        const metadata = z
+          .object({ customerId: z.string().optional() })
+          .safeParse(original.metadata);
+        await tx.insert(paymentInvoices).values({
+          id: creditNoteId,
           userId,
           companyId: data.companyId,
-          providerInvoiceId: cnId,
-          invoiceSequenceNumber: nextSeq,
+          providerInvoiceId: `CN-${data.companyId.slice(0, 8)}-${String(invoiceSequenceNumber).padStart(6, "0")}`,
+          invoiceNumber,
+          invoiceSequenceNumber,
           currency,
           status: InvoiceStatus.OPEN,
-          amount: totalAmount.toString(),
-          notes: `Credit note for invoice ${data.invoiceId}. Reason: ${data.reason}`,
-          metadata: { originalInvoiceId: data.invoiceId, reason: data.reason },
-        })
-        .returning();
-
-      if (!creditNote) {
-        return fail({
-          message: t("post.errors.server.title"),
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          amount,
+          notes: data.reason,
+          metadata: {
+            originalInvoiceId: original.id,
+            reason: data.reason,
+            customerId: metadata.success ? metadata.data.customerId : undefined,
+          },
+          journalEntryId,
+          createdAt: today,
+          updatedAt: today,
         });
-      }
+        await tx.insert(paymentInvoiceLines).values(
+          creditLines.map((line, sortOrder) => ({
+            ...line,
+            invoiceId: creditNoteId,
+            sortOrder,
+          })),
+        );
 
-      // Insert credit lines
-      for (let i = 0; i < creditLines.length; i++) {
-        const cl = creditLines[i];
-        if (!cl) {
-          continue;
-        }
-        await db.insert(paymentInvoiceLines).values({
-          invoiceId: creditNote.id,
-          description: cl.description,
-          quantity: cl.quantity,
-          unitPrice: cl.unitPrice,
-          taxRate: cl.taxRate,
-          taxAmount: cl.taxAmount,
-          lineTotal: cl.lineTotal,
-          sortOrder: i,
+        logger.debug("Credit note issued", {
+          creditNoteId,
+          originalInvoiceId: original.id,
+          amount,
+          journalEntryId,
         });
-      }
-
-      // Post reversal journal entry (best-effort)
-      if (totalAmount !== 0) {
-        try {
-          await CreditNoteCreateRepository.tryPostReversalJournalEntry(
-            creditNote.id,
-            data.companyId,
+        return success({
+          success: true,
+          message: null,
+          creditNote: {
+            id: creditNoteId,
+            invoiceId: original.id,
+            companyId: data.companyId,
             currency,
-            totalAmount,
-            userId,
-            logger,
-          );
-        } catch (journalError) {
-          logger.warn(
-            "Credit note journal posting failed — credit note still created",
-            {
-              creditNoteId: creditNote.id,
-              error: parseError(journalError).message,
-            },
-          );
-        }
-      }
-
-      logger.debug("Credit note created", {
-        creditNoteId: creditNote.id,
-        originalInvoiceId: data.invoiceId,
-        totalAmount,
-        linesCount: creditLines.length,
-      });
-
-      return success({
-        success: true,
-        message: null,
-        creditNote: {
-          id: creditNote.id,
-          invoiceId: data.invoiceId,
-          companyId: creditNote.companyId ?? null,
-          currency: creditNote.currency,
-          status: creditNote.status,
-          amount: totalAmount.toString(),
-          reason: data.reason,
-          createdAt: creditNote.createdAt,
-          updatedAt: creditNote.updatedAt,
-        },
+            status: InvoiceStatus.OPEN,
+            amount,
+            reason: data.reason,
+            createdAt: today,
+            updatedAt: today,
+          },
+        });
       });
     } catch (error) {
-      const parsed = parseError(error);
-      logger.error("Failed to create credit note", { error: parsed.message });
+      logger.error("Failed to create credit note", parseError(error));
       return fail({
         message: t("post.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
-  }
-
-  /**
-   * Posts the reversal journal entry for a credit note.
-   * Dr: Revenue (negative = reduces revenue)
-   * Cr: AR (negative = reduces receivable)
-   * Never throws.
-   */
-  private static async tryPostReversalJournalEntry(
-    creditNoteId: string,
-    companyId: string,
-    currency: string,
-    totalAmount: number,
-    userId: string,
-    logger: EndpointLogger,
-  ): Promise<void> {
-    const absAmount = Math.abs(totalAmount);
-
-    // Find AR account
-    const [arAccount] = await db
-      .select({ id: accountNodes.id })
-      .from(accountNodes)
-      .where(
-        and(
-          eq(accountNodes.companyId, companyId),
-          eq(accountNodes.subtype, AccountSubtype.ACCOUNTS_RECEIVABLE),
-          eq(accountNodes.isActive, true),
-          eq(accountNodes.isPostable, true),
-        ),
-      )
-      .limit(1);
-
-    if (!arAccount) {
-      logger.debug(
-        "No AR account node found — skipping credit note journal entry",
-        { companyId },
-      );
-      return;
-    }
-
-    // Find Revenue account
-    const [revenueAccount] = await db
-      .select({ id: accountNodes.id })
-      .from(accountNodes)
-      .where(
-        and(
-          eq(accountNodes.companyId, companyId),
-          eq(accountNodes.subtype, AccountSubtype.REVENUE_SERVICE),
-          eq(accountNodes.isActive, true),
-          eq(accountNodes.isPostable, true),
-        ),
-      )
-      .limit(1);
-
-    const [revenueFallback] = revenueAccount
-      ? [revenueAccount]
-      : await db
-          .select({ id: accountNodes.id })
-          .from(accountNodes)
-          .where(
-            and(
-              eq(accountNodes.companyId, companyId),
-              eq(accountNodes.subtype, AccountSubtype.REVENUE_SALES),
-              eq(accountNodes.isActive, true),
-              eq(accountNodes.isPostable, true),
-            ),
-          )
-          .limit(1);
-
-    const finalRevenueAccount = revenueAccount ?? revenueFallback;
-
-    if (!finalRevenueAccount) {
-      logger.debug(
-        "No Revenue account node found — skipping credit note journal entry",
-        {
-          companyId,
-        },
-      );
-      return;
-    }
-
-    // Find open accounting period
-    const today = new Date();
-    const [openPeriod] = await db
-      .select({ id: accountingPeriods.id })
-      .from(accountingPeriods)
-      .where(
-        and(
-          eq(accountingPeriods.companyId, companyId),
-          eq(accountingPeriods.status, PeriodStatus.OPEN),
-          sql`${accountingPeriods.startDate} <= ${today}`,
-          sql`${accountingPeriods.endDate} >= ${today}`,
-        ),
-      )
-      .limit(1);
-
-    if (!openPeriod) {
-      logger.debug(
-        "No open accounting period — skipping credit note journal entry",
-        { companyId },
-      );
-      return;
-    }
-
-    const year = today.getFullYear();
-    const [{ value: existingCount }] = await db
-      .select({ value: sql<number>`count(*)::int` })
-      .from(journalEntries)
-      .where(eq(journalEntries.periodId, openPeriod.id));
-
-    const entrySeq = (existingCount ?? 0) + 1;
-    const entryNumber = `JE-${year}-${String(entrySeq).padStart(4, "0")}`;
-
-    const [entry] = await db
-      .insert(journalEntries)
-      .values({
-        companyId,
-        periodId: openPeriod.id,
-        entryNumber,
-        date: today,
-        description: `AR Credit Note ${creditNoteId}`,
-        status: JournalEntryStatus.DRAFT,
-        sourceType: JournalSourceType.AR_INVOICE,
-        sourceId: creditNoteId,
-      })
-      .returning({ id: journalEntries.id });
-
-    if (!entry) {
-      return;
-    }
-
-    // Dr: Revenue (credit note reduces revenue)
-    await db.insert(journalEntryLines).values({
-      journalEntryId: entry.id,
-      accountId: finalRevenueAccount.id,
-      type: LineType.DEBIT,
-      amount: absAmount,
-      currency,
-      description: "Credit note — revenue reduction",
-      sortOrder: 0,
-    });
-
-    // Cr: AR (credit note reduces receivable)
-    await db.insert(journalEntryLines).values({
-      journalEntryId: entry.id,
-      accountId: arAccount.id,
-      type: LineType.CREDIT,
-      amount: absAmount,
-      currency,
-      description: "Credit note — AR reduction",
-      sortOrder: 1,
-    });
-
-    await db
-      .update(journalEntries)
-      .set({
-        status: JournalEntryStatus.POSTED,
-        postedAt: today,
-        postedByUserId: userId,
-        updatedAt: today,
-      })
-      .where(eq(journalEntries.id, entry.id));
-
-    logger.info("Credit note journal entry posted", {
-      creditNoteId,
-      journalEntryId: entry.id,
-      entryNumber,
-      amount: absAmount,
-    });
   }
 }

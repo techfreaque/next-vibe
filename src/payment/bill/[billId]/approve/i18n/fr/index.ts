@@ -25,6 +25,12 @@ export const translations: typeof enTranslations = {
       description: "La facture à approuver",
     },
     errors: {
+      existingPosting:
+        "Rapprochez l’écriture existante de cette facture avant de la valider.",
+      billLines:
+        "Ajoutez des lignes dont le total est positif et utilisez des comptes de charges actifs de cette entreprise.",
+      posting:
+        "Vérifiez les montants, la devise de l’entreprise, la période comptable et les comptes d’imputation.",
       validation: {
         title: "Erreur de validation",
         description: "ID de facture invalide",
@@ -75,7 +81,7 @@ export const translations: typeof enTranslations = {
       submit: "Confirmer le changement de statut",
       confirmTitle: "Approuver cette facture ?",
       confirmDescription:
-        "Un brouillon passe au statut Reçue. Une facture reçue passe au statut Approuvée. Une écriture est créée si la comptabilité est configurée.",
+        "Un brouillon passe à l’état Reçue. Valider une facture reçue crée une écriture comptable.",
       confirmButton: "Oui, approuver",
       cancelButton: "Annuler",
       approved: "Statut de la facture mis à jour",

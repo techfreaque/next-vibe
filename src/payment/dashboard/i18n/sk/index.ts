@@ -79,6 +79,7 @@ export const translations: typeof enTranslations = {
     placeholder: "Zadajte ID firmy",
   },
   widget: {
+    unnumberedInvoice: "Faktúra bez čísla",
     subtitle:
       "Faktúry, cenové ponuky a dodávateľské faktúry. Platby kartou a kryptomenami nájdete medzi transakciami spracovateľa platieb.",
     estimatesSent: "Odoslané cenové ponuky",

@@ -7,13 +7,12 @@ export const translations: typeof enTranslations = {
     invoice: "faktura",
   },
   post: {
-    title: "Wyślij fakturę",
-    titleShort: "Wyślij fakturę",
-    description:
-      "Oznacz fakturę szkic jako wysłaną — status zmienia się na Otwarta",
+    title: "Wystaw fakturę",
+    titleShort: "Wystaw fakturę",
+    description: "Wystaw szkic i zaksięguj należność.",
     form: {
-      title: "Wyślij fakturę",
-      description: "Wysyła fakturę do klienta",
+      title: "Wystaw fakturę",
+      description: "Po wystawieniu otrzymasz link dla klienta.",
     },
     response: {
       success: "Faktura wysłana",
@@ -21,6 +20,9 @@ export const translations: typeof enTranslations = {
       viewUrl: "URL widoku klienta",
     },
     errors: {
+      invoiceLines: "Przed wystawieniem dodaj pozycje o dodatniej sumie.",
+      posting:
+        "Sprawdź kwotę faktury, walutę firmy, okres księgowy i konta księgowe.",
       unauthorized: {
         title: "Brak autoryzacji",
         description: "Wymagana autoryzacja",
@@ -70,8 +72,8 @@ export const translations: typeof enTranslations = {
   },
   widget: {
     back: "Wróć",
-    submit: "Wyślij fakturę",
-    sent: "Faktura wysłana",
+    submit: "Wystaw fakturę",
+    sent: "Faktura wystawiona",
     viewUrl: "Link widoku klienta",
   },
 };

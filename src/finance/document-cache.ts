@@ -4,12 +4,14 @@ export async function refreshInvoiceDocuments(
   logger: EndpointLogger,
   invoiceId?: string,
 ): Promise<void> {
-  const [{ apiClient }, list, detail] = await Promise.all([
+  const [{ apiClient }, list, detail, dashboard] = await Promise.all([
     import("next-vibe/unified-ui/hooks/store"),
     import("@/payment/invoice/list/definition"),
     import("@/payment/invoice/[invoiceId]/get/definition"),
+    import("@/payment/dashboard/definition"),
   ]);
   await Promise.all([
+    apiClient.refetchEndpoint(dashboard.default.GET, logger),
     apiClient.refetchEndpoint(list.default.GET, logger),
     invoiceId
       ? apiClient.refetchEndpoint(detail.default.GET, logger, {
@@ -23,12 +25,14 @@ export async function refreshBillDocuments(
   logger: EndpointLogger,
   billId?: string,
 ): Promise<void> {
-  const [{ apiClient }, list, detail] = await Promise.all([
+  const [{ apiClient }, list, detail, dashboard] = await Promise.all([
     import("next-vibe/unified-ui/hooks/store"),
     import("@/payment/bill/list/definition"),
     import("@/payment/bill/[billId]/get/definition"),
+    import("@/payment/dashboard/definition"),
   ]);
   await Promise.all([
+    apiClient.refetchEndpoint(dashboard.default.GET, logger),
     apiClient.refetchEndpoint(list.default.GET, logger),
     billId
       ? apiClient.refetchEndpoint(detail.default.GET, logger, {
@@ -42,12 +46,14 @@ export async function refreshEstimateDocuments(
   logger: EndpointLogger,
   estimateId?: string,
 ): Promise<void> {
-  const [{ apiClient }, list, detail] = await Promise.all([
+  const [{ apiClient }, list, detail, dashboard] = await Promise.all([
     import("next-vibe/unified-ui/hooks/store"),
     import("@/payment/estimate/list/definition"),
     import("@/payment/estimate/[estimateId]/get/definition"),
+    import("@/payment/dashboard/definition"),
   ]);
   await Promise.all([
+    apiClient.refetchEndpoint(dashboard.default.GET, logger),
     apiClient.refetchEndpoint(list.default.GET, logger),
     estimateId
       ? apiClient.refetchEndpoint(detail.default.GET, logger, {

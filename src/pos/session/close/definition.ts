@@ -72,6 +72,11 @@ const { POST } = createEndpoint({
         layoutType: LayoutType.STACKED,
         usage: { response: true },
         children: {
+          currency: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            label: "dashboard.get.response.currency",
+            schema: z.string().optional(),
+          }),
           id: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             label: "sessionClose.post.response.id",

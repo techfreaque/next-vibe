@@ -1,18 +1,10 @@
 /**
- * Invoice Send Repository
- * Transitions a draft invoice to Open status and posts a journal entry
- *
- * Journal posting on send (DRAFT → OPEN):
- *   Dr: AR accountNode (company's ACCOUNTS_RECEIVABLE node)
- *   Cr: Revenue accountNode (REVENUE_SERVICE or REVENUE_SALES)
- *   Cr: VAT Payable (if tax amount > 0)
- *
- * Only posts if accounts are found. Never blocks the send if accounts missing.
+ * Issues a draft invoice and posts the company's receivable.
  */
 
 import "server-only";
 
-import { and, eq, sql } from "drizzle-orm";
+import { and, eq, ne, sql } from "drizzle-orm";
 import { coreEnv } from "next-vibe/core/env";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
@@ -27,18 +19,16 @@ import { db } from "next-vibe/database";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import {
-  accountingPeriods,
-  accountNodes,
-  journalEntries,
-  journalEntryLines,
-} from "@/chart-of-accounts/db";
-import {
   AccountSubtype,
-  JournalEntryStatus,
   JournalSourceType,
   LineType,
-  PeriodStatus,
 } from "@/chart-of-accounts/enum";
+import {
+  type AutoPostLine,
+  postJournalEntry,
+} from "@/chart-of-accounts/shared/auto-post";
+import { lockLedgerCompany } from "@/chart-of-accounts/shared/ledger-write";
+import { getDocumentAccess } from "@/finance/document-company-scope";
 
 import { paymentInvoiceLines, paymentInvoices } from "../../../db";
 import { InvoiceStatus } from "../../../enum";
@@ -59,318 +49,192 @@ export class InvoiceSendRepository {
     const { t } = scopedTranslation.scopedT(locale);
 
     try {
-      const [invoice] = await db
-        .select()
+      const [observedInvoice] = await db
+        .select({
+          companyId: paymentInvoices.companyId,
+          userId: paymentInvoices.userId,
+        })
         .from(paymentInvoices)
         .where(eq(paymentInvoices.id, urlPathParams.invoiceId))
         .limit(1);
-
-      if (!invoice) {
+      if (!observedInvoice) {
         return fail({
           message: t("post.errors.notFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
-
-      if (invoice.userId !== userId) {
+      if (!(await getDocumentAccess(userId, observedInvoice))?.canManage) {
         return fail({
           message: t("post.errors.forbidden.title"),
           errorType: ErrorResponseTypes.FORBIDDEN,
         });
       }
 
-      if (invoice.status !== InvoiceStatus.DRAFT) {
-        return fail({
-          message: t("post.errors.conflict.title"),
-          errorType: ErrorResponseTypes.CONFLICT,
-        });
-      }
-
-      // --- Journal entry posting (best-effort, never blocks send) ---
-      let journalEntryId: string | null = null;
-
-      if (invoice.companyId) {
-        try {
-          journalEntryId = await InvoiceSendRepository.tryPostJournalEntry(
-            invoice.id,
-            invoice.companyId,
-            invoice.currency,
-            userId,
-            logger,
-          );
-        } catch (journalError) {
-          logger.warn("Journal entry posting failed — invoice send continues", {
-            invoiceId: invoice.id,
-            error: parseError(journalError).message,
+      return await db.transaction(async (tx) => {
+        if (observedInvoice.companyId) {
+          await lockLedgerCompany(tx, observedInvoice.companyId);
+        }
+        const [invoice] = await tx
+          .select()
+          .from(paymentInvoices)
+          .where(eq(paymentInvoices.id, urlPathParams.invoiceId))
+          .limit(1)
+          .for("update");
+        if (!invoice) {
+          return fail({
+            message: t("post.errors.notFound.title"),
+            errorType: ErrorResponseTypes.NOT_FOUND,
           });
         }
-      }
+        if (
+          invoice.companyId !== observedInvoice.companyId ||
+          !(await getDocumentAccess(userId, invoice, tx))?.canManage
+        ) {
+          return fail({
+            message: t("post.errors.forbidden.title"),
+            errorType: ErrorResponseTypes.FORBIDDEN,
+          });
+        }
+        if (invoice.status !== InvoiceStatus.DRAFT || invoice.journalEntryId) {
+          return fail({
+            message: t("post.errors.conflict.title"),
+            errorType: ErrorResponseTypes.CONFLICT,
+          });
+        }
 
-      // --- Transition invoice to OPEN ---
-      await db
-        .update(paymentInvoices)
-        .set({
-          status: InvoiceStatus.OPEN,
-          journalEntryId: journalEntryId ?? undefined,
-          updatedAt: new Date(),
-        })
-        .where(eq(paymentInvoices.id, urlPathParams.invoiceId));
+        const today = new Date();
+        let invoiceNumber = invoice.invoiceNumber;
+        let journalEntryId: string | null = null;
+        if (invoice.companyId) {
+          const [totals] = await tx
+            .select({
+              grossCents:
+                sql<number>`round(sum(${paymentInvoiceLines.lineTotal}) * 100)`.mapWith(
+                  Number,
+                ),
+              vatCents:
+                sql<number>`round(sum(${paymentInvoiceLines.taxAmount}) * 100)`.mapWith(
+                  Number,
+                ),
+            })
+            .from(paymentInvoiceLines)
+            .where(eq(paymentInvoiceLines.invoiceId, invoice.id));
+          const grossCents = totals?.grossCents ?? 0;
+          const vatCents = totals?.vatCents ?? 0;
+          if (
+            grossCents <= 0 ||
+            grossCents !== Math.round(Number(invoice.amount) * 100) ||
+            vatCents < 0 ||
+            vatCents > grossCents
+          ) {
+            return fail({
+              message: t("post.errors.invoiceLines"),
+              errorType: ErrorResponseTypes.VALIDATION_ERROR,
+            });
+          }
 
-      // Generate public view token for customer link
-      const viewToken = generateInvoiceViewToken(urlPathParams.invoiceId);
-      const viewUrl = `${coreEnv.NEXT_PUBLIC_APP_URL}/invoice/${urlPathParams.invoiceId}?token=${viewToken}`;
+          const existingNumber = invoiceNumber?.trim();
+          const sequence = invoice.invoiceSequenceNumber;
+          const reference =
+            existingNumber ||
+            (sequence && sequence > 0 ? `INV-${sequence}` : "");
+          if (reference) {
+            const [duplicate] = await tx
+              .select({ id: paymentInvoices.id })
+              .from(paymentInvoices)
+              .where(
+                and(
+                  eq(paymentInvoices.companyId, invoice.companyId),
+                  ne(paymentInvoices.id, invoice.id),
+                  sql`lower(trim(${paymentInvoices.invoiceNumber})) = lower(${reference})`,
+                ),
+              )
+              .limit(1);
+            if (duplicate) {
+              return fail({
+                message: t("post.errors.conflict.title"),
+                errorType: ErrorResponseTypes.CONFLICT,
+              });
+            }
+            if (!existingNumber) {
+              invoiceNumber = reference;
+            }
+          }
 
-      logger.debug("Invoice sent", {
-        invoiceId: urlPathParams.invoiceId,
-        userId,
-        journalEntryId,
-        viewUrl,
-      });
+          const lines: AutoPostLine[] = [
+            {
+              subtype: AccountSubtype.ACCOUNTS_RECEIVABLE,
+              type: LineType.DEBIT,
+              currency: invoice.currency,
+              amount: grossCents / 100,
+            },
+          ];
+          const netCents = grossCents - vatCents;
+          if (netCents > 0) {
+            lines.push({
+              subtype: AccountSubtype.REVENUE_SERVICE,
+              fallbackSubtype: AccountSubtype.REVENUE_SALES,
+              type: LineType.CREDIT,
+              currency: invoice.currency,
+              amount: netCents / 100,
+            });
+          }
+          if (vatCents > 0) {
+            lines.push({
+              subtype: AccountSubtype.VAT_PAYABLE,
+              type: LineType.CREDIT,
+              currency: invoice.currency,
+              amount: vatCents / 100,
+            });
+          }
 
-      return success({
-        success: true,
-        message: null,
-        viewUrl,
+          journalEntryId = await postJournalEntry(
+            {
+              companyId: invoice.companyId,
+              date: today,
+              description: `AR invoice: ${reference || invoice.id}`,
+              sourceType: JournalSourceType.AR_INVOICE,
+              sourceId: invoice.id,
+              postedByUserId: userId,
+              lines,
+              logger,
+            },
+            tx,
+          );
+          if (!journalEntryId) {
+            return fail({
+              message: t("post.errors.posting"),
+              errorType: ErrorResponseTypes.VALIDATION_ERROR,
+            });
+          }
+        }
+
+        await tx
+          .update(paymentInvoices)
+          .set({
+            status: InvoiceStatus.OPEN,
+            invoiceNumber,
+            journalEntryId,
+            updatedAt: today,
+          })
+          .where(eq(paymentInvoices.id, invoice.id));
+
+        const viewToken = generateInvoiceViewToken(invoice.id);
+        const viewUrl = `${coreEnv.NEXT_PUBLIC_APP_URL}/invoice/${invoice.id}?token=${viewToken}`;
+        logger.debug("Invoice issued", {
+          invoiceId: invoice.id,
+          userId,
+          journalEntryId,
+        });
+
+        return success({ success: true, message: null, viewUrl });
       });
     } catch (error) {
-      const parsed = parseError(error);
-      logger.error("Failed to send invoice", { error: parsed.message });
+      logger.error("Failed to send invoice", parseError(error));
       return fail({
         message: t("post.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
-  }
-
-  /**
-   * Attempts to create and post a journal entry for this AR invoice.
-   * Returns the journal entry ID on success, null if accounts or period not found.
-   * Never throws — caller wraps in try/catch.
-   */
-  private static async tryPostJournalEntry(
-    invoiceId: string,
-    companyId: string,
-    currency: string,
-    userId: string,
-    logger: EndpointLogger,
-  ): Promise<string | null> {
-    // Sum all line totals (gross) and tax amounts from invoice lines
-    const lines = await db
-      .select({
-        lineTotal: paymentInvoiceLines.lineTotal,
-        taxAmount: paymentInvoiceLines.taxAmount,
-      })
-      .from(paymentInvoiceLines)
-      .where(eq(paymentInvoiceLines.invoiceId, invoiceId));
-
-    if (lines.length === 0) {
-      return null;
-    }
-
-    const totalGross = lines.reduce((sum, l) => sum + l.lineTotal, 0);
-    const totalTax = lines.reduce((sum, l) => sum + l.taxAmount, 0);
-    const totalNet = totalGross - totalTax;
-
-    if (totalGross <= 0) {
-      return null;
-    }
-
-    // Find AR account node for this company
-    const [arAccount] = await db
-      .select({ id: accountNodes.id })
-      .from(accountNodes)
-      .where(
-        and(
-          eq(accountNodes.companyId, companyId),
-          eq(accountNodes.subtype, AccountSubtype.ACCOUNTS_RECEIVABLE),
-          eq(accountNodes.isActive, true),
-          eq(accountNodes.isPostable, true),
-        ),
-      )
-      .limit(1);
-
-    if (!arAccount) {
-      logger.debug("No AR account node found — skipping journal entry", {
-        companyId,
-      });
-      return null;
-    }
-
-    // Find Revenue account (prefer REVENUE_SERVICE, fall back to REVENUE_SALES)
-    const [revenueAccount] = await db
-      .select({ id: accountNodes.id })
-      .from(accountNodes)
-      .where(
-        and(
-          eq(accountNodes.companyId, companyId),
-          eq(accountNodes.subtype, AccountSubtype.REVENUE_SERVICE),
-          eq(accountNodes.isActive, true),
-          eq(accountNodes.isPostable, true),
-        ),
-      )
-      .limit(1);
-
-    const [revenueSalesAccount] = revenueAccount
-      ? [revenueAccount]
-      : await db
-          .select({ id: accountNodes.id })
-          .from(accountNodes)
-          .where(
-            and(
-              eq(accountNodes.companyId, companyId),
-              eq(accountNodes.subtype, AccountSubtype.REVENUE_SALES),
-              eq(accountNodes.isActive, true),
-              eq(accountNodes.isPostable, true),
-            ),
-          )
-          .limit(1);
-
-    const finalRevenueAccount = revenueAccount ?? revenueSalesAccount;
-
-    if (!finalRevenueAccount) {
-      logger.debug("No Revenue account node found — skipping journal entry", {
-        companyId,
-      });
-      return null;
-    }
-
-    // Find VAT Payable account (only needed if tax > 0)
-    let vatAccount: { id: string } | undefined;
-    if (totalTax > 0) {
-      const [vat] = await db
-        .select({ id: accountNodes.id })
-        .from(accountNodes)
-        .where(
-          and(
-            eq(accountNodes.companyId, companyId),
-            eq(accountNodes.subtype, AccountSubtype.VAT_PAYABLE),
-            eq(accountNodes.isActive, true),
-            eq(accountNodes.isPostable, true),
-          ),
-        )
-        .limit(1);
-      vatAccount = vat;
-    }
-
-    // Find an open accounting period for today
-    const today = new Date();
-    const [openPeriod] = await db
-      .select({ id: accountingPeriods.id })
-      .from(accountingPeriods)
-      .where(
-        and(
-          eq(accountingPeriods.companyId, companyId),
-          eq(accountingPeriods.status, PeriodStatus.OPEN),
-          sql`${accountingPeriods.startDate} <= ${today}`,
-          sql`${accountingPeriods.endDate} >= ${today}`,
-        ),
-      )
-      .limit(1);
-
-    if (!openPeriod) {
-      logger.debug("No open accounting period found — skipping journal entry", {
-        companyId,
-        today,
-      });
-      return null;
-    }
-
-    // Generate entry number
-    const year = today.getFullYear();
-    const [{ value: existingCount }] = await db
-      .select({ value: sql<number>`count(*)::int` })
-      .from(journalEntries)
-      .where(eq(journalEntries.periodId, openPeriod.id));
-
-    const entrySeq = (existingCount ?? 0) + 1;
-    const entryNumber = `JE-${year}-${String(entrySeq).padStart(4, "0")}`;
-
-    // Insert journal entry (DRAFT then immediately POSTED)
-    const [entry] = await db
-      .insert(journalEntries)
-      .values({
-        companyId,
-        periodId: openPeriod.id,
-        entryNumber,
-        date: today,
-        description: `AR Invoice ${invoiceId}`,
-        status: JournalEntryStatus.DRAFT,
-        sourceType: JournalSourceType.AR_INVOICE,
-        sourceId: invoiceId,
-      })
-      .returning({ id: journalEntries.id });
-
-    if (!entry) {
-      return null;
-    }
-
-    let sortOrder = 0;
-
-    // Dr: AR (total gross)
-    await db.insert(journalEntryLines).values({
-      journalEntryId: entry.id,
-      accountId: arAccount.id,
-      type: LineType.DEBIT,
-      amount: totalGross,
-      currency,
-      description: "AR Invoice — receivable",
-      sortOrder: sortOrder++,
-    });
-
-    // Cr: Revenue (net of tax)
-    await db.insert(journalEntryLines).values({
-      journalEntryId: entry.id,
-      accountId: finalRevenueAccount.id,
-      type: LineType.CREDIT,
-      amount: totalTax > 0 ? totalNet : totalGross,
-      currency,
-      description: "AR Invoice — revenue",
-      sortOrder: sortOrder++,
-    });
-
-    // Cr: VAT Payable (if tax > 0 and account found)
-    if (totalTax > 0 && vatAccount) {
-      await db.insert(journalEntryLines).values({
-        journalEntryId: entry.id,
-        accountId: vatAccount.id,
-        type: LineType.CREDIT,
-        amount: totalTax,
-        currency,
-        description: "AR Invoice — VAT payable",
-        sortOrder: sortOrder++,
-      });
-    } else if (totalTax > 0 && !vatAccount) {
-      // No VAT account — credit all to revenue to keep books balanced
-      await db
-        .update(journalEntryLines)
-        .set({
-          amount: totalGross,
-        })
-        .where(
-          and(
-            eq(journalEntryLines.journalEntryId, entry.id),
-            eq(journalEntryLines.accountId, finalRevenueAccount.id),
-          ),
-        );
-    }
-
-    // Mark as POSTED
-    await db
-      .update(journalEntries)
-      .set({
-        status: JournalEntryStatus.POSTED,
-        postedAt: today,
-        postedByUserId: userId,
-        updatedAt: today,
-      })
-      .where(eq(journalEntries.id, entry.id));
-
-    logger.info("Journal entry posted for AR invoice", {
-      invoiceId,
-      journalEntryId: entry.id,
-      entryNumber,
-    });
-
-    return entry.id;
   }
 }

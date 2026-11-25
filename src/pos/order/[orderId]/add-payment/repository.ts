@@ -3,7 +3,7 @@
  * Records a payment against an open order
  */
 
-import { eq, sum } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
@@ -13,15 +13,12 @@ import {
   success,
 } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
-import { db } from "next-vibe/database";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { CompanyMemberRole } from "@/companies/enum";
-import { CompanyAuthRepository } from "@/companies/repository";
-
-import { posOrders, posPayments, posSessions, posTerminals } from "../../../db";
-import { PosOrderStatus } from "../../../enum";
+import { posPayments } from "../../../db";
+import { PosPaymentMethod } from "../../../enum";
 import { scopedTranslation } from "../../../i18n";
+import { withOpenOrder } from "../../open-order";
 import type { PosOrderAddPaymentPostRequestOutput } from "./definition";
 
 export class PosOrderAddPaymentRepository {
@@ -33,6 +30,7 @@ export class PosOrderAddPaymentRepository {
   ): Promise<
     ResponseType<{
       result: {
+        currency: string;
         id: string;
         method: string;
         amount: number;
@@ -48,103 +46,92 @@ export class PosOrderAddPaymentRepository {
       const { details } = data;
 
       // Verify order exists and is open
-      const [order] = await db
-        .select({
-          id: posOrders.id,
-          status: posOrders.status,
-          total: posOrders.total,
-          sessionId: posOrders.sessionId,
-        })
-        .from(posOrders)
-        .where(eq(posOrders.id, details.orderId))
-        .limit(1);
-
-      if (!order) {
-        return fail({
-          message: t("orderAddPayment.post.errors.notFound.title"),
-          errorType: ErrorResponseTypes.NOT_FOUND,
-        });
-      }
-
-      // Verify user is a member of the order's company via session → terminal chain
-      const [session] = await db
-        .select({ terminalId: posSessions.terminalId })
-        .from(posSessions)
-        .where(eq(posSessions.id, order.sessionId))
-        .limit(1);
-
-      if (session) {
-        const [terminal] = await db
-          .select({ companyId: posTerminals.companyId })
-          .from(posTerminals)
-          .where(eq(posTerminals.id, session.terminalId))
-          .limit(1);
-
-        if (terminal) {
-          const authResult = await CompanyAuthRepository.requireMember(
-            userId,
-            terminal.companyId,
-            CompanyMemberRole.MEMBER,
-            logger,
-            locale,
-          );
-          if (!authResult.success) {
-            return authResult;
-          }
-        }
-      }
-
-      if (order.status !== PosOrderStatus.OPEN) {
-        return fail({
-          message: t("orderAddPayment.post.errors.conflict.title"),
-          errorType: ErrorResponseTypes.CONFLICT,
-        });
-      }
-
-      const [payment] = await db
-        .insert(posPayments)
-        .values({
-          orderId: details.orderId,
-          method: details.method,
-          amount: details.amount,
-          change: details.change ?? 0,
-          reference: details.reference,
-          accountNodeId: details.accountNodeId,
-        })
-        .returning({
-          id: posPayments.id,
-          method: posPayments.method,
-          amount: posPayments.amount,
-          change: posPayments.change,
-        });
-
-      if (!payment) {
-        logger.error("Failed to insert payment");
-        return fail({
-          message: t("orderAddPayment.post.errors.server.title"),
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        });
-      }
-
-      // Calculate total paid so far
-      const [paidTotals] = await db
-        .select({ totalPaid: sum(posPayments.amount) })
-        .from(posPayments)
-        .where(eq(posPayments.orderId, details.orderId));
-
-      const totalPaid = Number(paidTotals?.totalPaid ?? 0);
-      const outstanding = Math.max(0, order.total - totalPaid);
-
-      return success({
-        result: {
-          id: payment.id,
-          method: payment.method,
-          amount: payment.amount,
-          change: payment.change,
-          totalPaid,
-          outstanding,
+      return await withOpenOrder(
+        details.orderId,
+        userId,
+        logger,
+        locale,
+        {
+          notFound: t("orderAddPayment.post.errors.notFound.title"),
+          conflict: t("orderAddPayment.post.errors.conflict.title"),
         },
-      });
+        async (tx, order) => {
+          const [paid] = await tx
+            .select({
+              total: sql<string>`coalesce(sum(${posPayments.amount} - ${posPayments.change}),0)`,
+            })
+            .from(posPayments)
+            .where(eq(posPayments.orderId, details.orderId));
+          const remaining =
+            Math.round(order.total * 10_000) -
+            Math.round(Number(paid.total) * 10_000);
+          const amount = Math.round(details.amount * 10_000);
+          const change =
+            details.change === undefined &&
+            details.method === PosPaymentMethod.CASH
+              ? Math.max(0, amount - remaining)
+              : Math.round((details.change ?? 0) * 10_000);
+          if (
+            remaining <= 0 ||
+            !Number.isSafeInteger(amount) ||
+            amount <= 0 ||
+            amount / 10_000 !== details.amount ||
+            !Number.isSafeInteger(change) ||
+            change < 0 ||
+            change >= amount ||
+            (details.change !== undefined &&
+              details.change !== change / 10_000) ||
+            (change > 0 && details.method !== PosPaymentMethod.CASH) ||
+            amount - change > remaining
+          ) {
+            return fail({
+              message: t("orderAddPayment.post.errors.conflict.title"),
+              errorType: ErrorResponseTypes.CONFLICT,
+            });
+          }
+          const [payment] = await tx
+            .insert(posPayments)
+            .values({
+              orderId: details.orderId,
+              method: details.method,
+              amount: details.amount,
+              change: change / 10_000,
+              reference: details.reference,
+              accountNodeId: details.accountNodeId,
+            })
+            .returning({
+              id: posPayments.id,
+              method: posPayments.method,
+              amount: posPayments.amount,
+              change: posPayments.change,
+            });
+
+          if (!payment) {
+            logger.error("Failed to insert payment");
+            return fail({
+              message: t("orderAddPayment.post.errors.server.title"),
+              errorType: ErrorResponseTypes.INTERNAL_ERROR,
+            });
+          }
+
+          const outstanding = (remaining - amount + change) / 10_000;
+          const totalPaid =
+            (Math.round(order.total * 10_000) -
+              Math.round(outstanding * 10_000)) /
+            10_000;
+          return success({
+            result: {
+              currency: order.currency,
+              id: payment.id,
+              method: payment.method,
+              amount: payment.amount,
+              change: payment.change,
+              totalPaid,
+              outstanding,
+            },
+          });
+        },
+      );
     } catch (error) {
       logger.error("Error adding payment to POS order", parseError(error));
       return fail({

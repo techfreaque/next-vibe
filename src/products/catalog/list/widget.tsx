@@ -13,6 +13,7 @@ import {
   SelectValue,
 } from "next-vibe/ui/components/select";
 import { Span } from "next-vibe/ui/components/span";
+import { formatMoney } from "next-vibe/unified-ui/_shared/format-money";
 import { usePickerCallback } from "next-vibe/unified-ui/_shared/picker-context";
 import {
   useWidgetForm,
@@ -40,19 +41,6 @@ const PRODUCT_TYPE_VARIANT: Record<
   [ProductType.PHYSICAL]: "secondary",
   [ProductType.DIGITAL]: "outline",
 };
-
-function formatPrice(amount: number, currency: string, locale: string): string {
-  try {
-    return new Intl.NumberFormat(locale, {
-      style: "currency",
-      currency,
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(amount);
-  } catch {
-    return `${amount.toFixed(2)} ${currency}`;
-  }
-}
 
 function ProductRow({
   product,
@@ -137,7 +125,7 @@ function ProductRow({
 
         <Div className="flex items-baseline gap-1">
           <Span className="text-sm font-bold font-mono tabular-nums">
-            {formatPrice(product.basePrice, product.currency, locale)}
+            {formatMoney(product.basePrice, product.currency, locale)}
           </Span>
           {product.unit ? (
             <Span className="text-xs text-muted-foreground">

@@ -4,7 +4,9 @@ import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
 import { Span } from "next-vibe/ui/components/span";
+import { formatMoney } from "next-vibe/unified-ui/_shared/format-money";
 import {
+  useWidgetLocale,
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetValue,
@@ -20,6 +22,7 @@ export function OrderLineRemoveWidget(_props: {
   field: (typeof definition.POST)["fields"];
 }): JSX.Element {
   const data = useWidgetValue<typeof definition.POST>();
+  const locale = useWidgetLocale();
   const navigation = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.POST>();
 
@@ -42,19 +45,25 @@ export function OrderLineRemoveWidget(_props: {
             <Span className="text-muted-foreground block text-xs">
               {t("orderLineRemove.post.response.subtotal")}
             </Span>
-            <Span className="font-medium">{result.subtotal.toFixed(2)}</Span>
+            <Span className="font-medium">
+              {formatMoney(result.subtotal, result.currency, locale)}
+            </Span>
           </Div>
           <Div className="p-3 rounded-lg border">
             <Span className="text-muted-foreground block text-xs">
               {t("orderLineRemove.post.response.taxAmount")}
             </Span>
-            <Span className="font-medium">{result.taxAmount.toFixed(2)}</Span>
+            <Span className="font-medium">
+              {formatMoney(result.taxAmount, result.currency, locale)}
+            </Span>
           </Div>
           <Div className="p-3 rounded-lg border bg-muted/30">
             <Span className="text-muted-foreground block text-xs">
               {t("orderLineRemove.post.response.total")}
             </Span>
-            <Span className="font-semibold">{result.total.toFixed(2)}</Span>
+            <Span className="font-semibold">
+              {formatMoney(result.total, result.currency, locale)}
+            </Span>
           </Div>
         </Div>
 

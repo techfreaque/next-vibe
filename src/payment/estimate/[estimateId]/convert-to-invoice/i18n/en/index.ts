@@ -15,6 +15,8 @@ export const translations = {
       invoiceId: "Created Invoice ID",
     },
     errors: {
+      reconcile:
+        "The saved items and estimate total disagree. Duplicate the estimate to review and correct the draft.",
       unauthorized: {
         title: "Unauthorized",
         description: "Authentication required",

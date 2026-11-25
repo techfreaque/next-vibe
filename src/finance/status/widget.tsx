@@ -17,6 +17,7 @@ import { Span } from "next-vibe/ui/components/span";
 import { H3, P } from "next-vibe/ui/components/typography";
 import { WidgetHeader } from "next-vibe/ui/components/widget-header";
 import { WidgetShell } from "next-vibe/ui/components/widget-shell";
+import { formatMoney } from "next-vibe/unified-ui/_shared/format-money";
 import { useRelatedEntityNavigation } from "next-vibe/unified-ui/_shared/related-entities";
 import {
   useWidgetEndpointMutations,
@@ -75,12 +76,7 @@ export function FinanceStatusWidget(): JSX.Element {
   const isInteractive = useWidgetIsInteractive() && !responseOnly;
   const openRelated = useRelatedEntityNavigation();
 
-  const money = new Intl.NumberFormat(locale, {
-    style: "currency",
-    currency: "USD",
-    currencyDisplay: "code",
-    maximumFractionDigits: 2,
-  });
+  const money = (amount: number): string => formatMoney(amount, "USD", locale);
   const pct = new Intl.NumberFormat(locale, { maximumFractionDigits: 1 });
   const when = (iso: string | null): string =>
     iso ? new Date(iso).toLocaleString(locale) : t("status.widget.never");
@@ -233,15 +229,15 @@ export function FinanceStatusWidget(): JSX.Element {
             <Div className="grid grid-cols-2 gap-2 @md:grid-cols-3 @xl:grid-cols-5">
               <Stat
                 label={t("status.widget.margin.earned")}
-                value={money.format(data.week.earnedUsd)}
+                value={money(data.week.earnedUsd)}
               />
               <Stat
                 label={t("status.widget.margin.cost")}
-                value={money.format(data.week.providerCostUsd)}
+                value={money(data.week.providerCostUsd)}
               />
               <Stat
                 label={t("status.widget.margin.margin")}
-                value={money.format(data.week.aiMarginUsd)}
+                value={money(data.week.aiMarginUsd)}
                 negative={data.week.aiMarginUsd < 0}
               />
               <Stat
@@ -257,13 +253,13 @@ export function FinanceStatusWidget(): JSX.Element {
             </Div>
             <P className="text-xs text-muted-foreground">
               {t("status.widget.margin.basis", {
-                free: money.format(data.week.freeListUsd),
+                free: money(data.week.freeListUsd),
               })}
             </P>
             <P className="text-xs text-muted-foreground">
               {t("status.widget.margin.cash", {
-                net: money.format(data.week.cashNetUsd),
-                fees: money.format(data.week.processorFeesUsd),
+                net: money(data.week.cashNetUsd),
+                fees: money(data.week.processorFeesUsd),
               })}
             </P>
             {data.days.length === 0 ? (
@@ -277,8 +273,7 @@ export function FinanceStatusWidget(): JSX.Element {
                   >
                     <Span className="font-medium">{d.day}</Span>
                     <Span className="text-muted-foreground">
-                      {money.format(d.earnedUsd)} -{" "}
-                      {money.format(d.providerCostUsd)}
+                      {money(d.earnedUsd)} - {money(d.providerCostUsd)}
                     </Span>
                     <Span
                       className={
@@ -287,14 +282,14 @@ export function FinanceStatusWidget(): JSX.Element {
                           : "font-semibold"
                       }
                     >
-                      {money.format(d.aiMarginUsd)}
+                      {money(d.aiMarginUsd)}
                       {d.aiMarginPct === null
                         ? ""
                         : ` (${pct.format(d.aiMarginPct)}%)`}
                     </Span>
                     <Span className="w-full text-xs text-muted-foreground @md:w-auto">
                       {t("status.widget.margin.cashDay", {
-                        net: money.format(d.cashNetUsd),
+                        net: money(d.cashNetUsd),
                       })}
                     </Span>
                   </Div>
@@ -328,7 +323,7 @@ export function FinanceStatusWidget(): JSX.Element {
                   </Div>
                   <Span className="text-sm font-bold tabular-nums">
                     {s.balanceUsd !== null
-                      ? money.format(s.balanceUsd)
+                      ? money(s.balanceUsd)
                       : s.balanceNative !== null
                         ? `${pct.format(s.balanceNative)} ${s.unit ?? ""}`
                         : t("status.widget.noBalance")}
@@ -341,7 +336,7 @@ export function FinanceStatusWidget(): JSX.Element {
                         s.fallback
                           ? "status.widget.providers.lastSpendEstimate"
                           : "status.widget.providers.lastSpend",
-                        { amount: money.format(s.lastSpendUsd) },
+                        { amount: money(s.lastSpendUsd) },
                       )}
                     </Span>
                   )}

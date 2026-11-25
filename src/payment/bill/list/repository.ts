@@ -118,14 +118,18 @@ export class BillListRepository {
         .limit(pageSize)
         .offset(offset);
 
-      const now = new Date();
+      const today = new Date();
+      today.setUTCHours(0, 0, 0, 0);
+      const selectedCompanyId =
+        data.companyId ??
+        (selectedCompanies.length === 1 ? selectedCompanies[0]?.id : undefined);
       return success({
         totalCount: total,
         ...pagination,
         hasFilters,
-        selectedCompanyId: data.companyId ?? null,
-        selectedCompanyName: data.companyId
-          ? (companyNames.get(data.companyId) ?? null)
+        selectedCompanyId: selectedCompanyId ?? null,
+        selectedCompanyName: selectedCompanyId
+          ? (companyNames.get(selectedCompanyId) ?? null)
           : null,
         bills: rows.map((row) => ({
           ...row,
@@ -134,7 +138,7 @@ export class BillListRepository {
             (row.status === BillStatus.RECEIVED ||
               row.status === BillStatus.APPROVED) &&
             row.dueDate !== null &&
-            row.dueDate < now,
+            row.dueDate < today,
         })),
       });
     } catch (error) {

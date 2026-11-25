@@ -118,7 +118,7 @@ export const translations: typeof enTranslations = {
         empty:
           "Aucun taux de taxe configuré. Ajoutez votre premier taux pour commencer.",
         emptySetup:
-          "Aucun taux de taxe en place. Chaque facture en a besoin : configurez les vôtres maintenant.",
+          "Configurez les taux de taxe que votre entreprise applique sur ses factures.",
         columnRate: "Taux de taxe",
         columnTypeRateActions: "Type / Taux / Statut",
         backToCatalog: "← Produits",
@@ -343,14 +343,28 @@ export const translations: typeof enTranslations = {
   },
 
   report: {
-    title: "Rapport fiscal",
-    titleShort: "Rapport fiscal",
-    description: "Taxes collectées par taux et par période",
+    title: "Taxes par taux",
+    titleShort: "Taxes par taux",
+    description:
+      "Consultez les taxes enregistrées sur les factures de vente, les avoirs, les factures fournisseurs et les ventes en caisse.",
     widget: {
-      columnRate: "Taux",
+      scope:
+        "Les factures de vente suivent la date de l’écriture liée ou leur date de création. Les achats suivent la date de la facture fournisseur. Les ventes en caisse suivent leur date de clôture (UTC), pour les lignes avec un taux positif ou un montant de taxe enregistré. Si une facture émise partage la même écriture, elle représente la vente.",
+      empty: "Aucune ligne de document ne correspond à ces filtres.",
+      range: "Du {{from}} au {{to}}",
       total: "Total",
-      empty: "Aucune donnée fiscale pour cette période.",
+      previousMonth: "Afficher le mois précédent",
+      unknownRate: "Taux indéterminé",
+      run: "Générer le rapport",
+      running: "Génération du rapport…",
+      selectCompany: "Sélectionnez l’entreprise concernée.",
     },
+    currency: {
+      label: "Devise",
+      placeholder: "Devise de l’entreprise",
+      description: "La devise de l’entreprise est utilisée par défaut.",
+    },
+    currencies: { EUR: "EUR", PLN: "PLN", USD: "USD" },
     companyId: {
       label: "Entreprise",
       description: "Entreprise pour laquelle générer le rapport fiscal",
@@ -359,21 +373,20 @@ export const translations: typeof enTranslations = {
     dateFrom: {
       label: "Du",
       description: "Date de début de la période",
-      placeholder: "2024-01-01",
+      placeholder: "Début du mois en cours",
     },
     dateTo: {
       label: "Au",
       description: "Date de fin de la période",
-      placeholder: "2024-12-31",
+      placeholder: "Aujourd’hui",
     },
     response: {
       rows: "Lignes du rapport",
       row: {
-        taxRateCode: "Code du taux",
-        taxRateName: "Nom du taux",
+        direction: "Type de document",
+        rate: "Taux de taxe",
         taxableAmount: "Montant imposable",
         taxAmount: "Montant de la taxe",
-        period: "Période",
       },
     },
     success: {
@@ -383,7 +396,8 @@ export const translations: typeof enTranslations = {
     errors: {
       validation: {
         title: "Erreur de validation",
-        description: "Vérifiez vos saisies et réessayez",
+        description:
+          "La date de fin doit être égale ou postérieure à la date de début.",
       },
       unauthorized: {
         title: "Non autorisé",
@@ -416,6 +430,12 @@ export const translations: typeof enTranslations = {
   },
 
   enums: {
+    reportDirection: {
+      posSales: "Ventes en caisse",
+      sales: "Factures de vente",
+      creditNotes: "Avoirs clients",
+      purchases: "Factures fournisseurs",
+    },
     taxType: {
       vat: "TVA",
       gst: "GST",

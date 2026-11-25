@@ -8,7 +8,12 @@ export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
     email: undefined,
-    handler: async ({ data, user, logger, locale }) =>
-      CoaPeriodCloseRepository.closePeriod(data, user, logger, locale),
+    handler: async ({ urlPathParams, user, logger, locale }) =>
+      CoaPeriodCloseRepository.closePeriod(
+        urlPathParams.periodId,
+        user,
+        logger,
+        locale,
+      ),
   },
 });

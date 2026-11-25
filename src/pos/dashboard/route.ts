@@ -12,7 +12,12 @@ import { PosDashboardRepository } from "./repository";
 export const { GET, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
-    handler: ({ user, logger, locale }) =>
-      PosDashboardRepository.getDashboard(user.id, logger, locale),
+    handler: ({ data, user, logger, locale }) =>
+      PosDashboardRepository.getDashboard(
+        user.id,
+        logger,
+        locale,
+        data.companyId,
+      ),
   },
 });

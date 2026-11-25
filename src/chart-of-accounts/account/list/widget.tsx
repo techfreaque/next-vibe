@@ -1,12 +1,26 @@
 "use client";
 
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { Building } from "next-vibe/ui/components/icons/Building";
 import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
 import { Span } from "next-vibe/ui/components/span";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "next-vibe/ui/components/table";
+import { WidgetHeader } from "next-vibe/ui/components/widget-header";
+import { WidgetShell } from "next-vibe/ui/components/widget-shell";
+import { formatMoney } from "next-vibe/unified-ui/_shared/format-money";
 import { usePickerCallback } from "next-vibe/unified-ui/_shared/picker-context";
 import {
+  useWidgetForm,
+  useWidgetLocale,
   useWidgetNavigation,
   useWidgetOnSubmit,
   useWidgetTranslation,
@@ -21,33 +35,6 @@ import type { CoaAccountListResponseOutput } from "./definition";
 
 type AccountRow = NonNullable<CoaAccountListResponseOutput["accounts"]>[number];
 
-// TYPE_COLORS — keyed by AccountType enum value (i18n key path)
-const TYPE_COLOR: Record<string, string> = {
-  [AccountType.ASSET]:
-    "bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300",
-  [AccountType.LIABILITY]:
-    "bg-orange-100 text-orange-800 dark:bg-orange-900/40 dark:text-orange-300",
-  [AccountType.EQUITY]:
-    "bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-300",
-  [AccountType.REVENUE]:
-    "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300",
-  [AccountType.EXPENSE]:
-    "bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300",
-};
-
-const TYPE_HEADER_COLOR: Record<string, string> = {
-  [AccountType.ASSET]:
-    "bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800",
-  [AccountType.LIABILITY]:
-    "bg-orange-50 dark:bg-orange-950/20 border-orange-200 dark:border-orange-800",
-  [AccountType.EQUITY]:
-    "bg-purple-50 dark:bg-purple-950/20 border-purple-200 dark:border-purple-800",
-  [AccountType.REVENUE]:
-    "bg-emerald-50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-800",
-  [AccountType.EXPENSE]:
-    "bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-800",
-};
-
 // Ordered by accounting convention: Assets, Liabilities, Equity, Revenue, Expenses
 const TYPE_ORDER = [
   AccountType.ASSET,
@@ -56,23 +43,6 @@ const TYPE_ORDER = [
   AccountType.REVENUE,
   AccountType.EXPENSE,
 ] as const;
-
-function TypeBadge({
-  type,
-  label,
-}: {
-  type: string;
-  label: string;
-}): JSX.Element {
-  const color = TYPE_COLOR[type] ?? "bg-muted text-muted-foreground";
-  return (
-    <Span
-      className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium shrink-0 ${color}`}
-    >
-      {label}
-    </Span>
-  );
-}
 
 function FlagBadge({ label }: { label: string }): JSX.Element {
   return (
@@ -84,25 +54,21 @@ function FlagBadge({ label }: { label: string }): JSX.Element {
 
 // Build a map of accountId → indent depth based on parentId chain
 function buildAccountIndentMap(rows: AccountRow[]): Map<string, number> {
+  const parents = new Map(rows.map(({ id, parentId }) => [id, parentId]));
   const depthMap = new Map<string, number>();
-  const idSet = new Set(rows.map((r) => r.id));
-
-  function getDepth(id: string): number {
-    if (depthMap.has(id)) {
-      return depthMap.get(id) ?? 0;
+  for (const { id } of rows) {
+    const visited = new Set([id]);
+    let parent = parents.get(id);
+    while (
+      parent &&
+      parents.has(parent) &&
+      !visited.has(parent) &&
+      visited.size < 5
+    ) {
+      visited.add(parent);
+      parent = parents.get(parent);
     }
-    const row = rows.find((r) => r.id === id);
-    if (!row?.parentId || !idSet.has(row.parentId)) {
-      depthMap.set(id, 0);
-      return 0;
-    }
-    const d = 1 + getDepth(row.parentId);
-    depthMap.set(id, d);
-    return d;
-  }
-
-  for (const row of rows) {
-    getDepth(row.id);
+    depthMap.set(id, visited.size - 1);
   }
   return depthMap;
 }
@@ -120,63 +86,58 @@ function AccountItem({
   account,
   indent,
   onView,
-  typeLabel,
   subtypeLabel,
   inactiveLabel,
   postableLabel,
   systemLabel,
+  locale,
+  debitLabel,
+  creditLabel,
 }: {
   account: AccountRow;
   indent: number;
   onView: (id: string) => void;
-  typeLabel: string;
   subtypeLabel: string;
   inactiveLabel: string;
   postableLabel: string;
   systemLabel: string;
+  locale: CountryLanguage;
+  debitLabel: string;
+  creditLabel: string;
 }): JSX.Element {
-  const indentClass = INDENT_CLASS[Math.min(indent, 4)] ?? "pl-16";
+  const debitNormal =
+    account.type === AccountType.ASSET || account.type === AccountType.EXPENSE;
   return (
-    <Button
-      type="button"
-      variant="ghost"
-      className={`w-full flex items-center gap-2 py-2 pr-3 h-auto border-b last:border-b-0 rounded-none justify-start font-normal hover:bg-muted/30 transition-colors ${indentClass} ${!account.isActive ? "opacity-60" : ""}`}
-      onClick={() => {
-        onView(account.id);
-      }}
-    >
-      {/* Indent indicator — purely decorative line */}
-      {indent > 0 && (
-        <Div className="w-2 h-3 border-l border-b border-muted-foreground/25 shrink-0 -mt-1 rounded-bl-sm" />
-      )}
-
-      {/* Code — monospace, muted */}
-      <Span className="font-mono text-xs font-semibold text-muted-foreground w-14 shrink-0">
+    <TableRow onClick={() => onView(account.id)}>
+      <TableCell className="w-16 align-top font-mono text-xs text-muted-foreground">
         {account.code}
-      </Span>
-
-      {/* Name */}
-      <Span
-        className={`flex-1 text-sm font-medium truncate ${!account.isActive ? "line-through text-muted-foreground" : ""}`}
+      </TableCell>
+      <TableCell
+        className={`min-w-0 text-left ${INDENT_CLASS[indent] ?? "pl-3"}`}
       >
-        {account.name}
-      </Span>
-
-      {/* Subtype — small gray, hidden on small screens */}
-      <Span className="text-xs text-muted-foreground truncate max-w-[8rem] hidden md:block shrink-0">
-        {subtypeLabel}
-      </Span>
-
-      {/* Flag badges */}
-      <Div className="hidden sm:flex items-center gap-1 shrink-0">
-        {account.isPostable && <FlagBadge label={postableLabel} />}
-        {account.isSystem && <FlagBadge label={systemLabel} />}
-        {!account.isActive && <FlagBadge label={inactiveLabel} />}
-      </Div>
-
-      {/* Type badge */}
-      <TypeBadge type={account.type} label={typeLabel} />
-    </Button>
+        <Span className="block whitespace-normal break-words text-left font-medium">
+          {account.name}
+        </Span>
+        <Div className="mt-0.5 flex flex-wrap items-center gap-1 text-xs text-muted-foreground">
+          <Span>{subtypeLabel}</Span>
+          {!account.isActive && <FlagBadge label={inactiveLabel} />}
+          {account.isPostable && <FlagBadge label={postableLabel} />}
+          {account.isSystem && <FlagBadge label={systemLabel} />}
+        </Div>
+      </TableCell>
+      <TableCell className="align-top text-right tabular-nums">
+        {(account.balances ?? []).map(({ currency, amount }) => (
+          <Span key={currency} className="block [overflow-wrap:anywhere]">
+            {formatMoney(Math.abs(amount), currency, locale)}
+            {amount !== 0 && (
+              <Span className="ml-1 text-xs text-muted-foreground">
+                {amount > 0 === debitNormal ? debitLabel : creditLabel}
+              </Span>
+            )}
+          </Span>
+        ))}
+      </TableCell>
+    </TableRow>
   );
 }
 
@@ -186,6 +147,8 @@ export function CoaAccountListWidget(_props: {
 }): JSX.Element {
   const data = useWidgetValue<typeof definition.GET>();
   const navigation = useWidgetNavigation();
+  const locale = useWidgetLocale();
+  const companyId = useWidgetForm<typeof definition.GET>().watch("companyId");
   const t = useWidgetTranslation<typeof definition.GET>();
   const onSubmit = useWidgetOnSubmit();
   const onPick = usePickerCallback<{
@@ -243,42 +206,44 @@ export function CoaAccountListWidget(_props: {
   const handleCreate = (): void => {
     void (async (): Promise<void> => {
       const def = await import("../create/definition");
-      navigation.push(def.default.POST, {});
+      navigation.push(def.default.POST, {
+        data: companyId ? { companyId } : undefined,
+      });
     })();
   };
 
   const handleSetup = (): void => {
     void (async (): Promise<void> => {
       const def = await import("../../setup/definition");
-      navigation.push(def.default.POST, {});
+      navigation.push(def.default.POST, {
+        data: companyId ? { companyId } : undefined,
+      });
     })();
   };
 
-  // Loading state
+  const backButton = navigation.canGoBack && (
+    <Button
+      type="button"
+      variant="ghost"
+      size="sm"
+      onClick={() => navigation.pop()}
+    >
+      <ChevronLeft className="h-4 w-4" />
+      {t("get.widget.back")}
+    </Button>
+  );
   if (!data) {
     return (
-      <Div className="flex flex-col gap-4">
-        {navigation.canGoBack && (
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={() => navigation.pop()}
-            className="self-start gap-1.5 -ml-1"
-          >
-            <ChevronLeft className="h-4 w-4" />
-            {t("get.widget.back")}
-          </Button>
-        )}
-        <Div className="flex flex-col items-center gap-4 py-10 rounded-lg border border-dashed">
-          <Div className="flex h-14 w-14 items-center justify-center rounded-full bg-muted border-2 border-dashed border-muted-foreground/30">
-            <Building className="h-6 w-6 text-muted-foreground" />
-          </Div>
-          <Span className="text-sm text-muted-foreground">
-            {t("get.widget.loading")}
-          </Span>
-        </Div>
-      </Div>
+      <WidgetShell layout={isPickerMode ? "compact" : "page"}>
+        <WidgetHeader
+          size={isPickerMode ? "section" : "page"}
+          title={t("get.title")}
+          backButton={backButton}
+        />
+        <Span className="py-10 text-sm text-muted-foreground">
+          {t("get.widget.loading")}
+        </Span>
+      </WidgetShell>
     );
   }
 
@@ -347,91 +312,62 @@ export function CoaAccountListWidget(_props: {
   }, {});
 
   return (
-    <Div className="flex flex-col gap-4">
-      {navigation.canGoBack && (
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={() => navigation.pop()}
-          className="self-start gap-1.5 -ml-1"
-        >
-          <ChevronLeft className="h-4 w-4" />
-          {t("get.widget.back")}
-        </Button>
-      )}
-      {/* Header bar */}
-      <Div className="flex items-center justify-between gap-2">
-        <Span className="text-sm text-muted-foreground">
-          {data.total ?? accounts.length} {t("get.response.accounts")}
-        </Span>
-        {!isPickerMode && (
-          <Div className="flex items-center gap-2">
-            <Button
-              type="button"
-              variant="default"
-              size="sm"
-              onClick={handleCreate}
-            >
+    <WidgetShell layout={isPickerMode ? "compact" : "page"}>
+      <WidgetHeader
+        size={isPickerMode ? "section" : "page"}
+        title={t("get.title")}
+        backButton={backButton}
+        actions={
+          !isPickerMode && (
+            <Button type="button" size="sm" onClick={handleCreate}>
               {t("get.widget.createButton")}
             </Button>
+          )
+        }
+      />
+      <Span className="text-sm text-muted-foreground">
+        {`${t("get.response.total")} ${new Intl.NumberFormat(locale).format(data.total)}`}
+      </Span>
+      {TYPE_ORDER.filter((type) => grouped[type]?.length).map((type) => (
+        <Div key={type} className="min-w-0 rounded-md border bg-card">
+          <Div className="flex items-center justify-between gap-2 border-b px-3 py-2">
+            <Span className="font-semibold">{accountTypeLabels[type]}</Span>
+            <Span className="text-sm tabular-nums text-muted-foreground">
+              {grouped[type]?.length}
+            </Span>
           </Div>
-        )}
-      </Div>
-
-      {/* Accounts loaded and non-empty */}
-      {accounts.length > 0 && (
-        <Div className="flex flex-col gap-4">
-          {TYPE_ORDER.filter((type) => grouped[type]?.length).map((type) => (
-            <Div
-              key={type}
-              className={`rounded-md border overflow-hidden ${TYPE_HEADER_COLOR[type] ?? ""}`}
-            >
-              {/* Section header */}
-              <Div
-                className={`px-3 py-2 border-b flex items-center justify-between ${TYPE_HEADER_COLOR[type] ?? "bg-muted/50"}`}
-              >
-                <Span className="text-xs font-semibold uppercase tracking-wide">
-                  {accountTypeLabels[type] ?? type}
-                </Span>
-                <Span className="text-xs text-muted-foreground">
-                  {grouped[type]?.length}
-                </Span>
-              </Div>
-
-              {/* Column headers */}
-              <Div className="flex items-center gap-2 px-3 py-1.5 border-b bg-background/50 text-xs font-medium text-muted-foreground">
-                <Span className="w-14 shrink-0">{t("get.response.code")}</Span>
-                <Span className="flex-1">{t("get.response.name")}</Span>
-                <Span className="max-w-[8rem] hidden md:block shrink-0">
-                  {t("get.response.subtype")}
-                </Span>
-                <Span className="hidden sm:block w-28 shrink-0" />
-                <Span className="w-16 shrink-0 text-right">
-                  {t("get.response.type")}
-                </Span>
-              </Div>
-
-              {/* Account rows */}
+          <Table className="table-fixed">
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-16">{t("get.response.code")}</TableHead>
+                <TableHead>{t("get.response.name")}</TableHead>
+                <TableHead className="w-28 text-right @md:w-36">
+                  {t("get.response.balance")}
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
               {grouped[type]?.map((account) => (
                 <AccountItem
                   key={account.id}
                   account={account}
                   indent={indentMap.get(account.id) ?? 0}
                   onView={handleView}
-                  typeLabel={accountTypeLabels[account.type] ?? account.type}
                   subtypeLabel={
                     accountSubtypeLabels[account.subtype] ?? account.subtype
                   }
                   inactiveLabel={t("get.widget.inactive")}
                   postableLabel={t("get.response.isPostable")}
                   systemLabel={t("get.response.isSystem")}
+                  locale={locale}
+                  debitLabel={t("get.widget.debitSide")}
+                  creditLabel={t("get.widget.creditSide")}
                 />
               ))}
-            </Div>
-          ))}
+            </TableBody>
+          </Table>
         </Div>
-      )}
+      ))}
 
       {/* Empty state — data loaded but no accounts */}
       {accounts.length === 0 && (
@@ -452,6 +388,6 @@ export function CoaAccountListWidget(_props: {
           )}
         </Div>
       )}
-    </Div>
+    </WidgetShell>
   );
 }

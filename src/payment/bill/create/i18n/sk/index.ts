@@ -7,14 +7,21 @@ export const translations: typeof enTranslations = {
     ap: "záväzky",
   },
   post: {
-    title: "Vytvoriť prijatú dodávateľskú faktúru",
-    titleShort: "Vytvoriť prijatú faktúru",
-    description: "Zaevidujte faktúru prijatú od dodávateľa.",
+    title: "Nová prijatá faktúra",
+    titleShort: "Nová prijatá faktúra",
+    description: "Zadajte dodávateľa a položky. Potom uložte koncept.",
     form: {
       title: "Nová prijatá faktúra",
       description: "Zadajte údaje prijatej faktúry.",
     },
     errors: {
+      vendor: "Vyberte aktívneho dodávateľa tejto firmy.",
+      supplier: "Zadajte názov dodávateľa alebo ho vyberte z adresára.",
+      dates: "Zadajte platný dátum faktúry a dátum splatnosti.",
+      amounts:
+        "Skontrolujte sumy položiek. Celková suma faktúry musí byť v podporovanom rozsahu.",
+      expenseAccount: "Vyberte aktívny nákladový účet tejto firmy.",
+
       validation: {
         title: "Neplatné údaje",
         description: "Skontrolujte všetky polia a skúste to znova",
@@ -40,7 +47,10 @@ export const translations: typeof enTranslations = {
         title: "Chyba siete",
         description: "Skontrolujte pripojenie a skúste to znova",
       },
-      notFound: { title: "Nenašlo sa", description: "Požadovaný zdroj sa nenašiel" },
+      notFound: {
+        title: "Nenašlo sa",
+        description: "Požadovaný zdroj sa nenašiel",
+      },
       unsavedChanges: {
         title: "Neuložené zmeny",
         description: "Máte neuložené zmeny",
@@ -51,8 +61,33 @@ export const translations: typeof enTranslations = {
       description: "Prijatá faktúra bola zaevidovaná.",
     },
     widget: {
+      supplier: "Dodávateľ",
+      dates: "Dátumy a mena",
+      items: "Položky faktúry",
+      itemsDescription:
+        "Položky sú nepovinné. Sadzbu DPH zadajte ako desatinné číslo od 0 do 1.",
+      itemsHint: "Pridajte tovar alebo služby uvedené na faktúre.",
+      item: "Opis",
+      quantity: "Množstvo",
+      unitPrice: "Jednotková cena",
+      manualTaxRate: "Iná sadzba",
+      taxRate: "DPH (%)",
+      lineTotal: "Suma položky",
+      addItem: "Pridať položku",
+      removeItem: "Odstrániť položku",
+      itemError: "Skontrolujte opis, množstvo, cenu a sadzbu DPH.",
+      summary: "Súhrn prijatej faktúry",
+      net: "Základ dane",
+      tax: "DPH",
+      total: "Spolu",
+      chooseVendor: "Vybrať dodávateľa",
+      vendorSource: "Z adresára dodávateľov",
+      terms: "Použiť platobné podmienky dodávateľa",
+      manualVendor: "Zadať dodávateľa ručne",
+      selectCompanyFirst: "Pred výberom dodávateľa z adresára vyberte firmu.",
+
       back: "Späť",
-      submit: "Evidovať prijatú faktúru",
+      submit: "Uložiť koncept",
       viewButton: "Zobraziť prijatú faktúru",
       addAnotherButton: "Pridať ďalšiu",
     },
@@ -86,6 +121,10 @@ export const translations: typeof enTranslations = {
     description: "Firma, ktorá faktúru prijala",
     placeholder: "UUID firmy",
   },
+  vendorId: {
+    label: "Vybrať dodávateľa",
+    description: "Z adresára dodávateľov",
+  },
   supplierName: {
     label: "Názov dodávateľa",
     description: "Názov dodávateľa, ktorý faktúru vystavil",
@@ -104,14 +143,15 @@ export const translations: typeof enTranslations = {
   billDate: {
     label: "Dátum vystavenia",
     description: "Dátum vystavenia faktúry",
-    placeholder: "2024-01-01",
+    placeholder: "Vyberte dátum vystavenia",
   },
   dueDate: {
     label: "Dátum splatnosti",
     description: "Dátum splatnosti",
-    placeholder: "2024-01-31",
+    placeholder: "Vyberte dátum splatnosti",
   },
   currency: {
+    code: "{{code}}",
     label: "Mena",
     description: "Mena faktúry",
     placeholder: "EUR",

@@ -4,6 +4,90 @@ export const translations: typeof enTranslations = {
   category: "Aiuto & Documentazione",
   tag: "Aiuto",
   uncategorized: "Altro",
+  erp: {
+    navigation: {
+      sales: "Vendite",
+      purchases: "Acquisti",
+      invoices: "Fatture emesse",
+      estimates: "Preventivi",
+      bills: "Fatture fornitori",
+    },
+    overview: {
+      loading: "Caricamento del riepilogo aziendale",
+      loadError: "Impossibile caricare il riepilogo aziendale",
+    },
+    home: "Pagina iniziale",
+    title: "Area contabilità",
+    description:
+      "Configura la tua azienda, gestisci le fatture e prepara i conti per la chiusura del mese.",
+    companies: "Gestisci le aziende",
+    activeDescription: "Controlla i conti e prepara la prossima fattura.",
+    newInvoice: "Nuova fattura",
+    createCompany: "Configura la tua azienda",
+    companySwitch: {
+      label: "Azienda per la contabilità",
+      select: "Seleziona azienda",
+      current: "Azienda corrente: {{name}}",
+    },
+    workflows: "Attività frequenti",
+    sales: {
+      title: "Fattura a un cliente",
+      description:
+        "Prepara una bozza di fattura o apri una fattura esistente per registrare un incasso.",
+      primary: "Crea fattura di vendita",
+      secondary: "Vedi fatture di vendita",
+    },
+    expenses: {
+      title: "Registra una fattura fornitore",
+      description:
+        "Registra gli importi dovuti ai fornitori e monitora i pagamenti dalla fattura.",
+      primary: "Crea fattura di acquisto",
+      secondary: "Vedi fatture di acquisto",
+    },
+    receivables: {
+      title: "Controlla i crediti",
+      description: "Vedi gli importi non incassati per fascia di ritardo.",
+      primary: "Vedi crediti",
+    },
+    payables: {
+      title: "Controlla i debiti verso fornitori",
+      description:
+        "Vedi gli importi aperti e le fatture da approvare o contestate.",
+      primary: "Vedi debiti verso fornitori",
+    },
+    bank: {
+      title: "Importa movimenti bancari",
+      description:
+        "Importa un estratto CSV, poi controlla i movimenti da riconciliare.",
+      primary: "Importa estratto conto",
+      secondary: "Vedi movimenti da riconciliare",
+    },
+    stock: {
+      title: "Controlla il magazzino",
+      description: "Verifica le scorte e individua gli articoli da riordinare.",
+      primary: "Apri magazzino",
+    },
+    tax: {
+      title: "Verifica l’IVA",
+      description:
+        "Controlla gli importi IVA del periodo prima della dichiarazione.",
+      primary: "Apri il report IVA",
+    },
+    exports: {
+      title: "Controlla ed esporta il giornale",
+      description:
+        "Controlla le anomalie o scarica le scritture contabilizzate in formato CSV.",
+      primary: "Controlla le registrazioni",
+      secondary: "Apri esportazione del giornale",
+    },
+    close: {
+      title: "Chiudi un periodo contabile",
+      description:
+        "Verifica il bilancio di verifica prima di chiudere il periodo.",
+      primary: "Vedi periodi",
+      secondary: "Apri il bilancio di verifica",
+    },
+  },
   catalog: {
     title: "Catalogo degli strumenti",
     searchLabel: "Cerca il catalogo degli strumenti",

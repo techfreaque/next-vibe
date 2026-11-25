@@ -58,6 +58,13 @@ const { GET } = createEndpoint({
         columns: 12,
         schema: z.string().uuid().optional(),
       }),
+      postableOnly: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "get.response.isPostable",
+        schema: z.boolean().optional(),
+        hidden: true,
+      }),
       page: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
@@ -144,6 +151,14 @@ const { GET } = createEndpoint({
               type: WidgetType.TEXT,
               label: "get.response.sortOrder" as const,
               schema: z.number(),
+            }),
+            balances: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              label: "get.response.balance",
+              hidden: true,
+              schema: z
+                .array(z.object({ currency: z.string(), amount: z.number() }))
+                .optional(),
             }),
             companyId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,

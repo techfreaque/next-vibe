@@ -12,6 +12,7 @@ import {
   Methods,
   WidgetType,
 } from "next-vibe/core/definition/enums";
+import { CurrenciesArr } from "next-vibe/core/i18n/core/config";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
 import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
@@ -21,6 +22,8 @@ import {
   responseField,
 } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
+
+import { accountingDateSchema } from "@/chart-of-accounts/shared/calendar-date";
 
 import { scopedTranslation } from "./i18n";
 
@@ -34,7 +37,7 @@ const lineSchema = z.object({
   quantity: z.coerce.number().positive().default(1),
   unitPrice: z.coerce.number().nonnegative(),
   taxRate: z.coerce.number().min(0).max(1).default(0),
-  sortOrder: z.coerce.number().int().default(0),
+  sortOrder: z.coerce.number().int().nonnegative().optional(),
 });
 
 const { POST } = createEndpoint({
@@ -111,22 +114,27 @@ const { POST } = createEndpoint({
 
       currency: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
+        fieldType: FieldDataType.SELECT,
+        options: CurrenciesArr.map((value) => ({
+          value,
+          label: "currency.code",
+          labelParams: { code: value },
+        })),
         label: "currency.label" as const,
         description: "currency.description" as const,
         placeholder: "currency.placeholder" as const,
         columns: 6,
-        schema: z.string().min(3).max(3).default("EUR"),
+        schema: z.enum(CurrenciesArr).optional(),
       }),
 
       validUntil: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.DATETIME,
+        fieldType: FieldDataType.DATE,
         label: "validUntil.label" as const,
         description: "validUntil.description" as const,
         placeholder: "validUntil.placeholder" as const,
         columns: 6,
-        schema: dateSchema.optional(),
+        schema: accountingDateSchema.optional(),
       }),
 
       title: requestField(scopedTranslation, {
@@ -165,7 +173,7 @@ const { POST } = createEndpoint({
         label: "lines.label" as const,
         description: "lines.description" as const,
         columns: 12,
-        schema: z.array(lineSchema).default([]),
+        schema: z.array(lineSchema).max(500).default([]),
       }),
 
       // RESPONSE FIELDS

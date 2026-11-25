@@ -21,6 +21,20 @@ export const translations: typeof enTranslations = {
       message: "Message d'état",
     },
     errors: {
+      receiptKeyConflict: "Cette clé est déjà associée à un autre paiement.",
+      paymentPrecision:
+        "Saisissez un montant positif avec deux décimales au maximum.",
+      paymentStatus:
+        "Enregistrez les paiements sur des factures ouvertes dont le montant est positif.",
+      overpayment: "Le paiement dépasse le solde de la facture.",
+      fullPayment:
+        "Pour une facture sans entreprise, saisissez la totalité du solde.",
+      issuancePosting:
+        "Avant d’enregistrer le paiement, comptabilisez une créance égale au total de la facture.",
+      paymentAccount:
+        "Sélectionnez un compte bancaire ou de caisse actif de cette entreprise.",
+      paymentPosting:
+        "Vérifiez la date de règlement, la devise de l’entreprise et les comptes d’imputation.",
       unauthorized: {
         title: "Non autorisé",
         description: "Authentification requise",
@@ -89,6 +103,11 @@ export const translations: typeof enTranslations = {
     label: "Date de paiement",
     description: "Date de réception du paiement",
     placeholder: "Choisir une date",
+  },
+  receiptKey: {
+    label: "Clé de paiement",
+    description:
+      "Réutilisez la même clé si vous réessayez ce paiement. Utilisez une nouvelle clé pour un autre encaissement.",
   },
   accountNodeId: {
     label: "ID du compte comptable",

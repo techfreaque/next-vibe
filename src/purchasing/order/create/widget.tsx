@@ -9,6 +9,7 @@ import {
   withValue,
   withValueNonStrict,
 } from "next-vibe/unified-ui/_shared/field-helpers";
+import { formatMoney } from "next-vibe/unified-ui/_shared/format-money";
 import {
   useWidgetLocale,
   useWidgetNavigation,
@@ -34,10 +35,7 @@ export function OrderCreateWidget({
   const locale = useWidgetLocale();
 
   const formatAmount = (amount: number): string => {
-    return new Intl.NumberFormat(locale, {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(amount);
+    return formatMoney(amount, data?.result?.currency, locale);
   };
 
   const handleViewOrder = (e: ButtonMouseEvent): void => {

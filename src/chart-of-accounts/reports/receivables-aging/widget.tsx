@@ -1,268 +1,421 @@
 "use client";
 
-import { Button, type ButtonMouseEvent } from "next-vibe/ui/components/button";
+import { CurrenciesArr } from "next-vibe/core/i18n/core/config";
+import { Button } from "next-vibe/ui/components/button";
+import { DatePicker } from "next-vibe/ui/components/date-picker";
 import { Div } from "next-vibe/ui/components/div";
-import { Span } from "next-vibe/ui/components/span";
+import { EmptyBlock } from "next-vibe/ui/components/empty-block";
+import { Label } from "next-vibe/ui/components/label";
+import { ListItem } from "next-vibe/ui/components/list-item";
+import { RecordTable } from "next-vibe/ui/components/record-table";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "next-vibe/ui/components/select";
+import { Span } from "next-vibe/ui/components/span";
+import { WidgetHeader } from "next-vibe/ui/components/widget-header";
+import { WidgetShell } from "next-vibe/ui/components/widget-shell";
+import {
+  formatDocDate,
+  formatMoney,
+} from "next-vibe/unified-ui/_shared/format-money";
+import {
+  useWidgetForm,
+  useWidgetIsInteractive,
+  useWidgetLocale,
   useWidgetNavigation,
+  useWidgetResponse,
+  useWidgetResponseOnly,
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
+import { parseFormDate } from "next-vibe/unified-ui/widgets/form-fields/_shared/date-value";
+import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
-import type { JSX } from "react";
+import { type JSX, useState } from "react";
 
-import invoiceGetDefinitions from "@/payment/invoice/[invoiceId]/get/definition";
+import { useWorkspaceCompany } from "@/companies/_shared/workspace-company-context";
+import { DocumentScopePicker } from "@/finance/document-list-ui";
 
+import type { ChartOfAccountsTranslationKey } from "../../i18n";
 import type definition from "./definition";
 import type { ReceivablesAgingResponseOutput } from "./definition";
 
-interface ReceivablesAgingWidgetProps {
-  field: (typeof definition.GET)["fields"];
-}
+const relatedReports: readonly {
+  label: ChartOfAccountsTranslationKey;
+  load: () => Promise<{
+    default: {
+      GET: Parameters<ReturnType<typeof useWidgetNavigation>["push"]>[0];
+    };
+  }>;
+}[] = [
+  {
+    label: "reports.nav.profitLoss",
+    load: () => import("../profit-loss/definition"),
+  },
+  {
+    label: "reports.nav.balanceSheet",
+    load: () => import("../balance-sheet/definition"),
+  },
+  {
+    label: "reports.nav.trialBalance",
+    load: () => import("../trial-balance/definition"),
+  },
+  {
+    label: "reports.nav.taxReport",
+    load: () => import("../tax-report/definition"),
+  },
+] as const;
 
-type AgingItem = NonNullable<
-  ReceivablesAgingResponseOutput["bucketsCurrentItems"]
->[number];
-
-function formatAmount(n: number): string {
-  return new Intl.NumberFormat(undefined, {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(n);
-}
-
-function formatDate(d: Date): string {
-  return d.toLocaleDateString();
-}
-
-interface BucketConfig {
-  label: string;
-  items: AgingItem[];
-  total: number;
-  colorClass: string;
-  headerClass: string;
-}
-
-function BucketSection({
-  bucket,
-  onViewInvoice,
-  viewInvoiceLabel,
-}: {
-  bucket: BucketConfig;
-  onViewInvoice: (invoiceId: string) => (e: ButtonMouseEvent) => void;
-  viewInvoiceLabel: string;
-}): JSX.Element {
-  return (
-    <Div className="rounded-md border overflow-hidden">
-      <Div
-        className={`px-3 py-2 border-b text-xs font-semibold flex items-center justify-between ${bucket.headerClass}`}
-      >
-        <Span>{bucket.label}</Span>
-        <Span className={`font-mono text-sm font-bold ${bucket.colorClass}`}>
-          {formatAmount(bucket.total)}
-        </Span>
-      </Div>
-      {bucket.items.length > 0 ? (
-        bucket.items.map((item) => (
-          <Div
-            key={item.invoiceId}
-            className="flex items-center gap-2 px-3 py-1.5 border-b last:border-b-0 text-xs hover:bg-muted/40 transition-colors"
-          >
-            <Span className="font-mono text-muted-foreground w-28 shrink-0 truncate">
-              {item.invoiceId}
-            </Span>
-            <Span className="flex-1 truncate text-muted-foreground">
-              {item.customerId}
-            </Span>
-            <Span className="text-muted-foreground shrink-0">
-              {formatDate(item.dueDate)}
-            </Span>
-            <Span className="font-mono font-medium shrink-0 w-20 text-right">
-              {formatAmount(item.amount)}
-            </Span>
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              className="shrink-0 h-6 px-2 text-xs"
-              onClick={onViewInvoice(item.invoiceId)}
-            >
-              {viewInvoiceLabel}
-            </Button>
-          </Div>
-        ))
-      ) : (
-        <Div className="px-3 py-2 text-xs text-muted-foreground italic" />
-      )}
-    </Div>
-  );
-}
-
-export function ReceivablesAgingWidget(
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  _props: ReceivablesAgingWidgetProps,
-): JSX.Element {
+export function ReceivablesAgingWidget(): JSX.Element {
   const data = useWidgetValue<typeof definition.GET>();
   const t = useWidgetTranslation<typeof definition.GET>();
+  const form = useWidgetForm<typeof definition.GET>();
+  const response = useWidgetResponse();
+  const locale = useWidgetLocale();
   const navigation = useWidgetNavigation();
+  const interactive = useWidgetIsInteractive();
+  const responseOnly = useWidgetResponseOnly();
+  const showInputs = interactive && !responseOnly;
+  const workspace = useWorkspaceCompany();
+  const companyId = form.watch("companyId");
+  const reportCompanyId = companyId || data?.reportCompanyId || undefined;
+  const isActiveCompany = Boolean(
+    reportCompanyId && workspace?.active?.id === reportCompanyId,
+  );
+  const currency = form.watch("currency");
+  const date = form.watch("asOfDate");
+  const [expanded, setExpanded] = useState<string>();
+  const reportDate = data?.asOfDateResponse
+    ? new Date(data.asOfDateResponse)
+    : null;
+  const ready =
+    response?.success !== false &&
+    data?.reportCurrency &&
+    (!showInputs ||
+      ((!companyId || data.reportCompanyId === companyId) &&
+        (!currency || currency === data.reportCurrency) &&
+        (!date || date === reportDate?.toISOString().slice(0, 10))));
+  const bands = [
+    {
+      key: "current",
+      items: data?.bucketsCurrentItems ?? [],
+      total: data?.totalsCurrent ?? 0,
+    },
+    {
+      key: "days1to30",
+      items: data?.bucketsDays1to30Items ?? [],
+      total: data?.totalsDays1to30 ?? 0,
+    },
+    {
+      key: "days31to60",
+      items: data?.bucketsDays31to60Items ?? [],
+      total: data?.totalsDays31to60 ?? 0,
+    },
+    {
+      key: "days61to90",
+      items: data?.bucketsDays61to90Items ?? [],
+      total: data?.totalsDays61to90 ?? 0,
+    },
+    {
+      key: "over90",
+      items: data?.bucketsOver90Items ?? [],
+      total: data?.totalsOver90 ?? 0,
+    },
+  ] as const;
+  type Item = ReceivablesAgingResponseOutput["bucketsCurrentItems"][number];
+  const customers = new Map<
+    string,
+    { id: string; name: string; bands: number[]; total: number; items: Item[] }
+  >();
+  for (const [index, band] of bands.entries()) {
+    for (const item of band.items) {
+      const id = item.customerId ?? item.invoiceId;
+      const customer = customers.get(id) ?? {
+        id,
+        name:
+          item.customerName ??
+          item.invoiceNumber ??
+          t("receivablesAging.response.invoiceId"),
+        bands: [0, 0, 0, 0, 0],
+        total: 0,
+        items: [],
+      };
+      const cents = Math.round(item.amount * 100);
+      customer.bands[index] += cents;
+      customer.total += cents;
+      customer.items.push(item);
+      customers.set(id, customer);
+    }
+  }
+  const ordered = [...customers.values()].toSorted(
+    (a, b) => b.total - a.total || a.name.localeCompare(b.name, locale),
+  );
 
-  const handleViewInvoice =
-    (invoiceId: string) =>
-    (e: ButtonMouseEvent): void => {
-      e.stopPropagation();
-      navigation.push(invoiceGetDefinitions.GET, {
-        urlPathParams: { invoiceId },
-      });
-    };
-
-  const handleNavProfitLoss = (): void => {
-    void (async (): Promise<void> => {
-      const def = await import("../profit-loss/definition");
-      navigation.push(def.default.GET, {});
-    })();
+  const denomination = data?.reportCurrency;
+  const money = (amount: number): string =>
+    denomination ? formatMoney(amount, denomination, locale) : "";
+  const openInvoice = (id: string): void => {
+    void import("@/payment/invoice/[invoiceId]/get/definition").then((mod) =>
+      navigation.push(mod.default.GET, { urlPathParams: { invoiceId: id } }),
+    );
   };
-
-  const handleNavBalanceSheet = (): void => {
-    void (async (): Promise<void> => {
-      const def = await import("../balance-sheet/definition");
-      navigation.push(def.default.GET, {});
-    })();
-  };
-
-  const handleNavTrialBalance = (): void => {
-    void (async (): Promise<void> => {
-      const def = await import("../trial-balance/definition");
-      navigation.push(def.default.GET, {});
-    })();
-  };
-
-  const handleNavTaxReport = (): void => {
-    void (async (): Promise<void> => {
-      const def = await import("../tax-report/definition");
-      navigation.push(def.default.GET, {});
-    })();
-  };
-
-  const buckets: BucketConfig[] = data
-    ? [
-        {
-          label: t("receivablesAging.response.current"),
-          items: data.bucketsCurrentItems ?? [],
-          total: data.totalsCurrent ?? 0,
-          colorClass: "text-emerald-600 dark:text-emerald-400",
-          headerClass:
-            "bg-green-50 dark:bg-green-950/30 text-green-800 dark:text-green-300",
-        },
-        {
-          label: t("receivablesAging.response.days1to30"),
-          items: data.bucketsDays1to30Items ?? [],
-          total: data.totalsDays1to30 ?? 0,
-          colorClass: "text-yellow-600 dark:text-yellow-400",
-          headerClass:
-            "bg-yellow-50 dark:bg-yellow-950/30 text-yellow-800 dark:text-yellow-300",
-        },
-        {
-          label: t("receivablesAging.response.days31to60"),
-          items: data.bucketsDays31to60Items ?? [],
-          total: data.totalsDays31to60 ?? 0,
-          colorClass: "text-orange-600 dark:text-orange-400",
-          headerClass:
-            "bg-orange-50 dark:bg-orange-950/30 text-orange-800 dark:text-orange-300",
-        },
-        {
-          label: t("receivablesAging.response.days61to90"),
-          items: data.bucketsDays61to90Items ?? [],
-          total: data.totalsDays61to90 ?? 0,
-          colorClass: "text-red-600 dark:text-red-400",
-          headerClass:
-            "bg-red-50 dark:bg-red-950/30 text-red-800 dark:text-red-300",
-        },
-        {
-          label: t("receivablesAging.response.over90"),
-          items: data.bucketsOver90Items ?? [],
-          total: data.totalsOver90 ?? 0,
-          colorClass: "text-red-800 dark:text-red-300",
-          headerClass:
-            "bg-red-100 dark:bg-red-900/40 text-red-900 dark:text-red-200",
-        },
-      ]
-    : [];
-
-  return (
-    <Div className="flex flex-col gap-4">
-      <Div className="flex items-center justify-between gap-3 flex-wrap">
-        <SubmitButtonWidget<typeof definition.GET>
-          field={{
-            size: "sm",
-            variant: "default",
-            text: "reports.widget.run" as const,
-            loadingText: "reports.widget.running" as const,
-          }}
+  const toggleCustomer = (id: string): void =>
+    setExpanded((previous) => (previous === id ? undefined : id));
+  const invoices = (items: Item[]): JSX.Element => (
+    <Div className="flex flex-col gap-1">
+      {items.map((item) => (
+        <ListItem
+          key={item.invoiceId}
+          className="border-0"
+          title={item.invoiceNumber ?? t("receivablesAging.response.invoiceId")}
+          subtitle={
+            item.dueDate
+              ? `${t("receivablesAging.response.dueDate")} ${formatDocDate(item.dueDate, locale)}`
+              : undefined
+          }
+          meta={<Span className="tabular-nums">{money(item.amount)}</Span>}
+          onClick={interactive ? () => openInvoice(item.invoiceId) : undefined}
         />
-        <Div className="flex gap-1 flex-wrap">
-          <Button size="sm" variant="ghost" onClick={handleNavProfitLoss}>
-            {t("reports.nav.profitLoss")}
-          </Button>
-          <Button size="sm" variant="ghost" onClick={handleNavBalanceSheet}>
-            {t("reports.nav.balanceSheet")}
-          </Button>
-          <Button size="sm" variant="ghost" onClick={handleNavTrialBalance}>
-            {t("reports.nav.trialBalance")}
-          </Button>
-          <Button size="sm" variant="ghost" onClick={handleNavTaxReport}>
-            {t("reports.nav.taxReport")}
-          </Button>
-        </Div>
-      </Div>
-
-      {data?.bucketsCurrentItems !== undefined ? (
-        <Div className="flex flex-col gap-3">
-          {data.asOfDateResponse && (
-            <Span className="text-sm text-muted-foreground">
-              {t("receivablesAging.widget.asOf")}{" "}
-              {formatDate(data.asOfDateResponse)}
-            </Span>
+      ))}
+    </Div>
+  );
+  const reportMenu = interactive && (
+    <Select
+      value=""
+      onValueChange={(value: string) => {
+        const report = relatedReports.find((item) => item.label === value);
+        if (report) {
+          void report.load().then((mod) =>
+            navigation.push(mod.default.GET, {
+              data: {
+                companyId: reportCompanyId,
+              },
+            }),
+          );
+        }
+      }}
+    >
+      <SelectTrigger className="w-auto min-w-32">
+        <SelectValue placeholder={t("reports.switchReport")} />
+      </SelectTrigger>
+      <SelectContent>
+        {relatedReports.map((report) => (
+          <SelectItem key={report.label} value={report.label}>
+            {t(report.label)}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  );
+  const [today] = useState(() => new Date().toISOString().slice(0, 10));
+  const visibleDate = date || reportDate?.toISOString().slice(0, 10) || today;
+  return (
+    <WidgetShell layout="page">
+      <WidgetHeader
+        size="page"
+        title={t("receivablesAging.title")}
+        subtitle={t("receivablesAging.description")}
+        actions={reportMenu}
+      />
+      {showInputs && (
+        <Div className="flex flex-wrap items-end gap-3 rounded-lg border bg-card p-3">
+          {!isActiveCompany && (
+            <Div className="flex min-w-40 flex-col gap-1">
+              <Span className="text-sm font-medium">
+                {t("receivablesAging.companyId.label")}
+              </Span>
+              <DocumentScopePicker
+                kind="company"
+                required
+                value={reportCompanyId}
+                appliedLabel={
+                  data?.reportCompanyId === reportCompanyId
+                    ? data?.reportCompanyName
+                    : undefined
+                }
+                onSelect={(id) =>
+                  form.setValue("companyId", id, { shouldDirty: true })
+                }
+              />
+            </Div>
           )}
-
-          <Div className="grid grid-cols-5 gap-2 rounded-md border p-3 bg-muted/20">
-            {buckets.map((bucket) => (
-              <Div
-                key={bucket.label}
-                className="flex flex-col gap-0.5 text-center"
-              >
-                <Span
-                  className={`text-sm font-bold font-mono ${bucket.colorClass}`}
-                >
-                  {formatAmount(bucket.total)}
-                </Span>
-                <Span className="text-xs text-muted-foreground leading-tight">
-                  {bucket.label}
-                </Span>
-              </Div>
-            ))}
+          <Div className="min-w-28">
+            <Label htmlFor="aging-currency">
+              {t("receivablesAging.response.currency")}
+            </Label>
+            <Select
+              value={currency || denomination || ""}
+              onValueChange={(value: string) => {
+                const code = CurrenciesArr.find(
+                  (candidate) => candidate === value,
+                );
+                if (code) {
+                  form.setValue("currency", code, { shouldDirty: true });
+                }
+              }}
+            >
+              <SelectTrigger id="aging-currency">
+                <SelectValue
+                  placeholder={t("receivablesAging.response.currency")}
+                />
+              </SelectTrigger>
+              <SelectContent>
+                {CurrenciesArr.map((code) => (
+                  <SelectItem key={code} value={code}>
+                    {code}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </Div>
-
-          <Div className="flex items-center justify-between rounded-md border px-3 py-2 font-semibold text-sm">
-            <Span>{t("receivablesAging.widget.totalRow")}</Span>
-            <Span className="font-mono">
-              {formatAmount(data.totalsTotal ?? 0)}
-            </Span>
-          </Div>
-
-          {buckets.map((bucket) => (
-            <BucketSection
-              key={bucket.label}
-              bucket={bucket}
-              onViewInvoice={handleViewInvoice}
-              viewInvoiceLabel={t("receivablesAging.widget.viewInvoice")}
+          <Div className="flex w-44 flex-col gap-1">
+            <Label htmlFor="receivables-aging-date">
+              {t("receivablesAging.asOfDate.label")}
+            </Label>
+            <DatePicker
+              name="receivables-aging-date"
+              value={parseFormDate(visibleDate)}
+              onChange={(next) => {
+                const value = next
+                  ? [
+                      String(next.getFullYear()).padStart(4, "0"),
+                      String(next.getMonth() + 1).padStart(2, "0"),
+                      String(next.getDate()).padStart(2, "0"),
+                    ].join("-")
+                  : undefined;
+                form.setValue("asOfDate", value, { shouldDirty: true });
+              }}
             />
-          ))}
-        </Div>
-      ) : (
-        <Div className="text-center py-10 text-sm text-muted-foreground border border-dashed rounded-md">
-          {t("receivablesAging.widget.selectCompany")}
+          </Div>
+          <SubmitButtonWidget<typeof definition.GET>
+            field={{
+              text: "reports.widget.run",
+              loadingText: "reports.widget.running",
+              size: "sm",
+              className: "w-auto",
+            }}
+          />
         </Div>
       )}
-    </Div>
+      <FormAlertWidget field={{}} />
+      {ready && data && denomination && (
+        <>
+          <Div className="flex flex-wrap items-end justify-between gap-3">
+            <Div className="flex flex-col gap-1">
+              <Span className="text-sm text-muted-foreground">
+                {t("receivablesAging.widget.totalRow")} {denomination}
+              </Span>
+              <Span className="text-3xl font-semibold tabular-nums">
+                {money(data.totalsTotal)}
+              </Span>
+            </Div>
+            <Span className="text-sm text-muted-foreground">
+              {data.reportCompanyName}{" "}
+              {reportDate && formatDocDate(reportDate, locale)}
+            </Span>
+          </Div>
+          {ordered.length === 0 ? (
+            <EmptyBlock title={t("receivablesAging.widget.noData")} />
+          ) : (
+            <>
+              <RecordTable
+                label={t("receivablesAging.title")}
+                columns={[
+                  {
+                    id: "customer",
+                    label: t("receivablesAging.response.customerId"),
+                  },
+                  ...bands.map((band) => ({
+                    id: band.key,
+                    label: t(`receivablesAging.response.${band.key}`),
+                    numeric: true,
+                  })),
+                  {
+                    id: "total",
+                    label: t("receivablesAging.response.total"),
+                    numeric: true,
+                  },
+                ]}
+                rows={ordered.map((customer) => {
+                  const name = (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => toggleCustomer(customer.id)}
+                    >
+                      {customer.name}
+                    </Button>
+                  );
+                  const amounts = Object.fromEntries(
+                    bands.map((band, i) => [
+                      band.key,
+                      money(customer.bands[i] / 100),
+                    ]),
+                  );
+                  return {
+                    id: customer.id,
+                    cells: {
+                      customer: name,
+                      ...amounts,
+                      total: money(customer.total / 100),
+                    },
+                    expanded:
+                      expanded === customer.id
+                        ? invoices(customer.items)
+                        : undefined,
+                  };
+                })}
+                footer={{
+                  customer: t("receivablesAging.widget.totalRow"),
+                  ...Object.fromEntries(
+                    bands.map((band) => [band.key, money(band.total)]),
+                  ),
+                  total: money(data.totalsTotal),
+                }}
+                compact={
+                  <Div className="flex flex-col divide-y rounded-lg border bg-card">
+                    {ordered.map((customer) => (
+                      <Div key={customer.id}>
+                        <ListItem
+                          title={customer.name}
+                          meta={
+                            <Span className="font-medium tabular-nums">
+                              {money(customer.total / 100)}
+                            </Span>
+                          }
+                          subtitle={bands
+                            .flatMap((band, i) =>
+                              customer.bands[i]
+                                ? [
+                                    `${t(`receivablesAging.response.${band.key}`)} · ${money(customer.bands[i] / 100)}`,
+                                  ]
+                                : [],
+                            )
+                            .join(" / ")}
+                          onClick={() => toggleCustomer(customer.id)}
+                        />
+                        {(!interactive || expanded === customer.id) &&
+                          invoices(customer.items)}
+                      </Div>
+                    ))}
+                  </Div>
+                }
+              />
+            </>
+          )}
+        </>
+      )}
+      {!ready &&
+        response?.success !== false &&
+        !reportCompanyId &&
+        showInputs && (
+          <EmptyBlock title={t("receivablesAging.widget.selectCompany")} />
+        )}
+    </WidgetShell>
   );
 }

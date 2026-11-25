@@ -17,6 +17,8 @@ export const translations: typeof enTranslations = {
       invoiceId: "Creato Fattura ID",
     },
     errors: {
+      reconcile:
+        "La somma delle righe non coincide con il totale del preventivo. Duplica il preventivo e verifica la bozza.",
       unauthorized: {
         title: "Autenticazione richiesta",
         description: "Accedi per continuare",

@@ -54,6 +54,7 @@ export const translations: typeof enTranslations = {
       success: "Operación completada",
       message: "Mensaje",
       line: {
+        currency: "Divisa",
         title: "Detalles de la línea",
         subtitle: "Añadido el objeto de línea",
         id: "Línea ID",

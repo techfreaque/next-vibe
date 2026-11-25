@@ -5,7 +5,7 @@ export const translations: typeof enTranslations = {
     title: "Prehľad účtovníctva",
     titleShort: "Prehľad",
     description:
-      "Prehľad účtovníctva: otvorené obdobie, počty účtovných zápisov a rýchly prístup ku všetkým účtovným nástrojom.",
+      "Zobraziť neuhradené zostatky, hotovosť, zisk a aktuálne účtovné obdobie.",
     companyId: {
       label: "ID firmy",
       description: "Firma, ktorej prehľad sa má zobraziť",
@@ -24,7 +24,10 @@ export const translations: typeof enTranslations = {
       description: "Prehľad účtovníctva je pripravený.",
     },
     errors: {
-      unauthorized: { title: "Vyžaduje sa prihlásenie", description: "Vyžaduje sa prihlásenie" },
+      unauthorized: {
+        title: "Vyžaduje sa prihlásenie",
+        description: "Vyžaduje sa prihlásenie",
+      },
       validation: {
         title: "Neplatné údaje",
         description: "Skontrolujte zadané údaje.",
@@ -53,6 +56,15 @@ export const translations: typeof enTranslations = {
       },
     },
     widget: {
+      noPeriodHint: "Pred zaúčtovaním zápisov otvorte účtovné obdobie.",
+      zeroMetricsHint:
+        "Sumy sa aktualizujú po vystavení faktúr, schválení prijatých faktúr a zaúčtovaní transakcií.",
+      financialOverview: "Finančný prehľad",
+      openReceivables: "Neuhradené pohľadávky",
+      approvedPayables: "Schválené dodávateľské faktúry na úhradu",
+      cashBalance: "Pokladnica a bankové účty",
+      monthToDateProfit: "Zisk za tento mesiac",
+      needsAttention: "Na vybavenie",
       currentPeriod: "Aktuálne obdobie",
       noPeriod: "Nie je otvorené žiadne obdobie",
       createPeriod: "Vytvoriť obdobie",

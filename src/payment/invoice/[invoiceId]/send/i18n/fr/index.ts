@@ -7,13 +7,12 @@ export const translations: typeof enTranslations = {
     invoice: "facture",
   },
   post: {
-    title: "Envoyer la facture",
-    titleShort: "Envoyer la facture",
-    description:
-      "Marque un brouillon de facture comme envoyé : son statut passe à Ouverte",
+    title: "Émettre la facture",
+    titleShort: "Émettre la facture",
+    description: "Émettez le brouillon et comptabilisez la créance.",
     form: {
-      title: "Envoyer la facture",
-      description: "Envoie la facture au client",
+      title: "Émettre la facture",
+      description: "Un lien client sera disponible après émission.",
     },
     response: {
       success: "Facture envoyée",
@@ -21,6 +20,10 @@ export const translations: typeof enTranslations = {
       viewUrl: "URL de consultation client",
     },
     errors: {
+      invoiceLines:
+        "Ajoutez des lignes dont le total est positif avant d’émettre la facture.",
+      posting:
+        "Vérifiez le total de la facture, la devise de l’entreprise, la période comptable et les comptes d’imputation.",
       unauthorized: {
         title: "Non autorisé",
         description: "Authentification requise",
@@ -70,8 +73,8 @@ export const translations: typeof enTranslations = {
   },
   widget: {
     back: "Retour",
-    submit: "Envoyer la facture",
-    sent: "Facture envoyée",
+    submit: "Émettre la facture",
+    sent: "Facture émise",
     viewUrl: "Lien de consultation client",
   },
 };

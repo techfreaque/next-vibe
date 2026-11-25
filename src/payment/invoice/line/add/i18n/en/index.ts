@@ -17,6 +17,7 @@ export const translations = {
       success: "Line added",
       message: "Status message",
       line: {
+        currency: "Currency",
         title: "Line Details",
         subtitle: "Created invoice line",
         id: "Line ID",
@@ -111,7 +112,7 @@ export const translations = {
     searchPlaceholder: "Name or SKU…",
     searchButton: "Search",
     clearProduct: "Clear",
-    noProductResults: "No matches — enter manually below.",
+    noProductResults: "No matches. Enter the item details below.",
     orManual: "Or enter manually",
     multiplier: "×",
     taxLabel: "tax",

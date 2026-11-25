@@ -12,6 +12,7 @@ import {
   Methods,
   WidgetType,
 } from "next-vibe/core/definition/enums";
+import { CurrenciesArr } from "next-vibe/core/i18n/core/config";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
 import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
@@ -28,6 +29,7 @@ import {
   InvoiceStatusDB,
   InvoiceStatusOptions,
 } from "../../enum";
+import { OVERDUE_INVOICE_FILTER } from "./filters";
 import { scopedTranslation } from "./i18n";
 
 const InvoiceListWidget = lazyWidget(() =>
@@ -81,8 +83,11 @@ const { GET } = createEndpoint({
         description: "status.description" as const,
         placeholder: "status.placeholder" as const,
         columns: 6,
-        options: InvoiceStatusOptions,
-        schema: z.enum(InvoiceStatusDB).optional(),
+        options: [
+          { value: OVERDUE_INVOICE_FILTER, label: "widget.overdue" },
+          ...InvoiceStatusOptions,
+        ],
+        schema: z.enum([...InvoiceStatusDB, OVERDUE_INVOICE_FILTER]).optional(),
       }),
 
       customerId: requestField(scopedTranslation, {
@@ -141,6 +146,16 @@ const { GET } = createEndpoint({
         label: "companyId.label",
         schema: z.string().nullable(),
       }),
+      selectedCompanyCurrency: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z.enum(CurrenciesArr).nullable().optional(),
+      }),
+      canCreateInvoice: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z.boolean(),
+      }),
       selectedCompanyName: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         label: "companyId.label",
@@ -190,6 +205,11 @@ const { GET } = createEndpoint({
             customerId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               label: "get.response.customerId" as const,
+              schema: z.string().nullable(),
+            }),
+            customerName: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              label: "get.response.customerName",
               schema: z.string().nullable(),
             }),
             currency: responseField(scopedTranslation, {
@@ -255,7 +275,7 @@ const { GET } = createEndpoint({
   }),
 
   options: {
-    formOptions: { autoSubmit: false, persistForm: false },
+    formOptions: { autoSubmit: true, debounceMs: 300, persistForm: false },
   },
 
   errorTypes: {
@@ -325,6 +345,7 @@ const { GET } = createEndpoint({
         pageCount: 1,
         selectedCompanyId: "00000000-0000-0000-0000-000000000001",
         selectedCompanyName: "Harbour Ledger & Supply",
+        canCreateInvoice: true,
         invoices: [
           {
             id: "456e7890-e89b-12d3-a456-426614174000",
@@ -333,6 +354,7 @@ const { GET } = createEndpoint({
             invoiceNumber: "INV-1042",
             invoiceSequenceNumber: 1042,
             customerId: "00000000-0000-0000-0000-000000000003",
+            customerName: "Monika Kováčová",
             currency: "USD",
             status: InvoiceStatus.OPEN,
             amount: "325.00",
@@ -355,6 +377,7 @@ const { GET } = createEndpoint({
         pageCount: 2,
         selectedCompanyId: "00000000-0000-0000-0000-000000000001",
         selectedCompanyName: "Harbour Ledger & Supply",
+        canCreateInvoice: true,
         invoices: [
           {
             id: "456e7890-e89b-12d3-a456-426614174000",
@@ -363,6 +386,7 @@ const { GET } = createEndpoint({
             invoiceNumber: "INV-1042",
             invoiceSequenceNumber: 1042,
             customerId: "00000000-0000-0000-0000-000000000003",
+            customerName: "Monika Kováčová",
             currency: "USD",
             status: InvoiceStatus.OPEN,
             amount: "325.00",
@@ -385,6 +409,7 @@ const { GET } = createEndpoint({
         pageCount: 1,
         selectedCompanyId: "00000000-0000-0000-0000-000000000001",
         selectedCompanyName: "Harbour Ledger & Supply",
+        canCreateInvoice: true,
         invoices: [],
       },
     },

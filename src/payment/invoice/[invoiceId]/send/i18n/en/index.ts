@@ -5,12 +5,12 @@ export const translations = {
     invoice: "invoice",
   },
   post: {
-    title: "Send Invoice",
-    titleShort: "Send Invoice",
-    description: "Mark a draft invoice as sent — transitions status to Open",
+    title: "Issue Invoice",
+    titleShort: "Issue Invoice",
+    description: "Issue the draft and create its journal entry.",
     form: {
-      title: "Send Invoice",
-      description: "Sends the invoice to the customer",
+      title: "Issue Invoice",
+      description: "Create a customer view link after issuing.",
     },
     response: {
       success: "Invoice sent",
@@ -18,6 +18,9 @@ export const translations = {
       viewUrl: "Customer view URL",
     },
     errors: {
+      invoiceLines: "Add invoice lines with a positive total before issuing.",
+      posting:
+        "Check the invoice total, company currency, accounting period and posting accounts.",
       unauthorized: {
         title: "Unauthorized",
         description: "Authentication required",
@@ -67,8 +70,8 @@ export const translations = {
   },
   widget: {
     back: "Back",
-    submit: "Send Invoice",
-    sent: "Invoice sent",
+    submit: "Issue invoice",
+    sent: "Invoice issued",
     viewUrl: "Customer view link",
   },
 };

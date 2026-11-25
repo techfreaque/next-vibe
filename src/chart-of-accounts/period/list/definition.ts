@@ -22,7 +22,7 @@ import {
 } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
-import { PeriodStatusOptions } from "../../enum";
+import { PeriodStatusDB, PeriodStatusOptions } from "../../enum";
 import { scopedTranslation } from "./i18n";
 
 const CoaPeriodListWidgetLazy = lazyWidget(() =>
@@ -58,6 +58,14 @@ const { GET } = createEndpoint({
         columns: 12,
         schema: z.string().uuid().optional(),
       }),
+      status: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "get.response.status",
+        options: PeriodStatusOptions,
+        schema: z.enum(PeriodStatusDB).optional(),
+        hidden: true,
+      }),
       periods: responseArrayField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         columns: 12,
@@ -71,6 +79,12 @@ const { GET } = createEndpoint({
               type: WidgetType.TEXT,
               label: "get.response.id" as const,
               schema: z.string(),
+            }),
+            companyId: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              label: "get.companyId.label",
+              schema: z.string(),
+              hidden: true,
             }),
             name: responseField(scopedTranslation, {
               type: WidgetType.TEXT,

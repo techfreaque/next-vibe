@@ -4,6 +4,92 @@ export const translations: typeof enTranslations = {
   category: "Aide et documentation",
   tag: "Aide",
   uncategorized: "Autres",
+  erp: {
+    navigation: {
+      sales: "Ventes",
+      purchases: "Achats",
+      invoices: "Factures clients",
+      estimates: "Devis",
+      bills: "Factures fournisseurs",
+    },
+    overview: {
+      loading: "Chargement du tableau de bord de l’entreprise",
+      loadError: "Impossible de charger le tableau de bord de l’entreprise",
+    },
+    home: "Accueil",
+    title: "Espace comptabilité",
+    description:
+      "Configurez votre entreprise, gérez vos factures et préparez la clôture du mois.",
+    companies: "Gérer les entreprises",
+    activeDescription:
+      "Consultez vos comptes et préparez votre prochaine facture.",
+    newInvoice: "Nouvelle facture",
+    createCompany: "Configurer votre entreprise",
+    companySwitch: {
+      label: "Entreprise comptable",
+      select: "Sélectionner une entreprise",
+      current: "Entreprise actuelle : {{name}}",
+    },
+    workflows: "Tâches courantes",
+    sales: {
+      title: "Facturer un client",
+      description:
+        "Préparez un brouillon de facture ou ouvrez une facture existante pour enregistrer un paiement.",
+      primary: "Créer une facture client",
+      secondary: "Voir les factures clients",
+    },
+    expenses: {
+      title: "Saisir une facture fournisseur",
+      description:
+        "Enregistrez les sommes dues aux fournisseurs et suivez les règlements depuis la facture.",
+      primary: "Créer une facture fournisseur",
+      secondary: "Voir les factures fournisseurs",
+    },
+    receivables: {
+      title: "Suivre les impayés",
+      description: "Consultez les créances clients par ancienneté du retard.",
+      primary: "Voir les créances",
+    },
+    payables: {
+      title: "Vérifier les dettes fournisseurs",
+      description:
+        "Consultez les soldes ouverts et les factures à valider ou contestées.",
+      primary: "Voir les dettes fournisseurs",
+    },
+    bank: {
+      title: "Importer des opérations bancaires",
+      description:
+        "Importez un relevé CSV, puis vérifiez les opérations non rapprochées.",
+      primary: "Importer un relevé",
+      secondary: "Voir les opérations non rapprochées",
+    },
+    stock: {
+      title: "Contrôler les stocks",
+      description:
+        "Vérifiez les quantités en stock et repérez les articles à réapprovisionner.",
+      primary: "Ouvrir les stocks",
+    },
+    tax: {
+      title: "Vérifier la TVA",
+      description:
+        "Contrôlez les montants de TVA de la période avant de les déclarer.",
+      primary: "Ouvrir le rapport de TVA",
+    },
+    exports: {
+      title: "Contrôler et exporter le journal",
+      description:
+        "Vérifiez les anomalies ou téléchargez les écritures comptabilisées au format CSV.",
+      primary: "Contrôler les écritures",
+      secondary: "Ouvrir l’export du journal",
+    },
+    close: {
+      title: "Clôturer une période comptable",
+      description:
+        "Vérifiez la balance comptable avant de clôturer la période.",
+      primary: "Voir les périodes",
+      secondary: "Ouvrir la balance",
+    },
+  },
   catalog: {
     title: "Catalogue d’outils",
     searchLabel: "Rechercher dans le catalogue d’outils",

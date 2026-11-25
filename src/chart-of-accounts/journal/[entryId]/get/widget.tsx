@@ -5,7 +5,14 @@ import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
 import { Span } from "next-vibe/ui/components/span";
+import { WidgetHeader } from "next-vibe/ui/components/widget-header";
+import { WidgetShell } from "next-vibe/ui/components/widget-shell";
 import {
+  formatDocDate,
+  formatMoney,
+} from "next-vibe/unified-ui/_shared/format-money";
+import {
+  useWidgetLocale,
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetValue,
@@ -14,6 +21,11 @@ import { EntityPickerFieldWidget } from "next-vibe/unified-ui/widgets/form-field
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 import type { JSX } from "react";
 
+import { JournalEntryStatus, JournalSourceType, LineType } from "../../../enum";
+import {
+  journalAmountUnits,
+  journalLineType,
+} from "../../../shared/journal-validation";
 import type definition from "./definition";
 import type { CoaJournalEntryGetResponseOutput } from "./definition";
 
@@ -21,41 +33,34 @@ type JournalLine = NonNullable<
   CoaJournalEntryGetResponseOutput["result"]
 >["lines"][number];
 
-function formatMoney(n: number): string {
-  return new Intl.NumberFormat(undefined, {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(n);
-}
-
-function formatDate(d: Date | string): string {
-  if (d instanceof Date) {
-    return d.toLocaleDateString();
-  }
-  return String(d).slice(0, 10);
-}
-
 // Double-entry row: shows debit OR credit in the correct column
 function JournalLineRow({
   line,
   onAccountClick,
+  locale,
 }: {
   line: JournalLine;
+  locale: string;
   onAccountClick: (accountId: string) => void;
 }): JSX.Element {
-  const isDebit = line.lineType === "DEBIT";
+  const side = journalLineType(line.lineType);
+  const account = [line.accountCode, line.accountName]
+    .filter(Boolean)
+    .join(" ");
+  const display = formatMoney(line.amount, line.currency, locale);
   return (
-    <Div className="grid grid-cols-[1fr_9rem_9rem] gap-0 border-b last:border-b-0 hover:bg-muted/20">
+    <Div className="grid grid-cols-[minmax(0,1fr)_minmax(5.5rem,0.6fr)_minmax(5.5rem,0.6fr)] @md:grid-cols-[minmax(0,1fr)_10rem_10rem] gap-0 border-b last:border-b-0 hover:bg-muted/20">
       {/* Account identifier — code if available, else short UUID */}
-      <Div className="flex flex-col justify-center px-4 py-2 border-r gap-0.5">
-        <Span
-          className="text-xs font-mono text-primary underline cursor-pointer truncate block max-w-[12rem] hover:text-primary/70"
-          onClick={(): void => {
-            onAccountClick(line.accountId);
-          }}
+      <Div className="flex flex-col justify-center px-2 py-2 @md:px-4 border-r gap-0.5">
+        <Button
+          type="button"
+          variant="link"
+          size="sm"
+          className="h-auto justify-start p-0 text-left whitespace-normal"
+          onClick={() => onAccountClick(line.accountId)}
         >
-          {line.accountId}
-        </Span>
+          {account || line.accountId}
+        </Button>
         {line.lineDescription && (
           <Span className="text-xs text-muted-foreground truncate italic">
             {line.lineDescription}
@@ -64,19 +69,19 @@ function JournalLineRow({
       </Div>
 
       {/* Debit column */}
-      <Div className="flex items-center justify-end px-4 py-2 border-r">
-        {isDebit && (
-          <Span className="font-mono text-sm font-medium text-amber-600 dark:text-amber-400 tabular-nums">
-            {formatMoney(line.amount)}
+      <Div className="flex items-center justify-end px-2 py-2 @md:px-4 border-r">
+        {side === LineType.DEBIT && (
+          <Span className="font-mono text-sm font-medium tabular-nums">
+            {display}
           </Span>
         )}
       </Div>
 
       {/* Credit column */}
-      <Div className="flex items-center justify-end px-4 py-2">
-        {!isDebit && (
-          <Span className="font-mono text-sm font-medium text-emerald-600 dark:text-emerald-400 tabular-nums">
-            {formatMoney(line.amount)}
+      <Div className="flex items-center justify-end px-2 py-2 @md:px-4">
+        {side === LineType.CREDIT && (
+          <Span className="font-mono text-sm font-medium tabular-nums">
+            {display}
           </Span>
         )}
       </Div>
@@ -126,6 +131,7 @@ export function CoaJournalEntryGetWidget({
   const data = useWidgetValue<typeof definition.GET>();
   const navigation = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.GET>();
+  const locale = useWidgetLocale();
 
   const entry = data?.result;
 
@@ -144,9 +150,14 @@ export function CoaJournalEntryGetWidget({
     }
     void (async (): Promise<void> => {
       const def = await import("../post/definition");
+      const details = await import("./definition");
+      const entryId = entry.id;
       navigation.push(def.default.POST, {
-        data: { entryId: entry.id },
-        popNavigationOnSuccess: 1,
+        urlPathParams: { entryId },
+        replaceOnSuccess: {
+          endpoint: details.default.GET,
+          getUrlPathParams: () => ({ entryId }),
+        },
       });
     })();
   };
@@ -158,8 +169,7 @@ export function CoaJournalEntryGetWidget({
     void (async (): Promise<void> => {
       const def = await import("../reverse/definition");
       navigation.push(def.default.POST, {
-        data: { entryId: entry.id },
-        popNavigationOnSuccess: 1,
+        urlPathParams: { entryId: entry.id },
       });
     })();
   };
@@ -190,65 +200,75 @@ export function CoaJournalEntryGetWidget({
     );
   }
 
-  const totalDebits = entry.lines
-    .filter((l) => l.lineType === "DEBIT")
-    .reduce((s, l) => s + l.amount, 0);
-  const totalCredits = entry.lines
-    .filter((l) => l.lineType === "CREDIT")
-    .reduce((s, l) => s + l.amount, 0);
-  const isBalanced = Math.abs(totalDebits - totalCredits) < 0.01;
+  const totals = new Map<
+    string,
+    { debits: bigint; credits: bigint; valid: boolean }
+  >();
+  for (const line of entry.lines) {
+    const total = totals.get(line.currency) ?? {
+      debits: BigInt(0),
+      credits: BigInt(0),
+      valid: true,
+    };
+    const side = journalLineType(line.lineType);
+    const units = journalAmountUnits(line.amount);
+    if (units === null || side === null) {
+      total.valid = false;
+    } else if (side === LineType.DEBIT) {
+      total.debits += units;
+    } else {
+      total.credits += units;
+    }
+    totals.set(line.currency, total);
+  }
 
+  const status = Object.values(JournalEntryStatus).find(
+    (key) => key === entry.status || key.endsWith(`.${entry.status}`),
+  );
+  const source = Object.values(JournalSourceType).find(
+    (key) => key === entry.sourceType || key.endsWith(`.${entry.sourceType}`),
+  );
   const statusBadgeClass =
-    STATUS_BADGE_CLASS[entry.status] ?? "bg-muted text-muted-foreground";
+    STATUS_BADGE_CLASS[status?.split(".").at(-1) ?? ""] ??
+    "bg-muted text-muted-foreground";
   const sourceBadgeClass =
-    SOURCE_BADGE_CLASS[entry.sourceType] ?? "bg-muted text-muted-foreground";
+    SOURCE_BADGE_CLASS[source?.split(".").at(-1) ?? ""] ??
+    "bg-muted text-muted-foreground";
 
   return (
-    <Div className="flex flex-col gap-4">
-      {navigation.canGoBack && (
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={() => navigation.pop()}
-          className="self-start gap-1.5 -ml-1"
-        >
-          <ChevronLeft className="h-4 w-4" />
-          {t("journalEntryGet.widget.back")}
-        </Button>
-      )}
-      {/* Header card */}
-      <Div className="rounded-md border p-4 flex flex-col gap-3">
-        {/* Entry number, date, badges */}
+    <WidgetShell layout="page">
+      <WidgetHeader
+        size="page"
+        title={entry.entryNumber}
+        subtitle={entry.description}
+        titleAccessory={
+          status && (
+            <InlineBadge label={t(status)} colorClass={statusBadgeClass} />
+          )
+        }
+        backButton={
+          navigation.canGoBack && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => navigation.pop()}
+            >
+              <ChevronLeft className="h-4 w-4" />
+              {t("journalEntryGet.widget.back")}
+            </Button>
+          )
+        }
+      />
+      <Div className="flex flex-col gap-2">
         <Div className="flex flex-wrap items-center gap-2">
-          <Span className="font-mono text-sm font-bold text-foreground">
-            {entry.entryNumber}
-          </Span>
           <Span className="text-sm text-muted-foreground">
-            {formatDate(entry.date)}
+            {formatDocDate(entry.date, locale)}
           </Span>
-          <InlineBadge
-            label={t(
-              `enums.journalEntryStatus.${entry.status}` as Parameters<
-                typeof t
-              >[0],
-            )}
-            colorClass={statusBadgeClass}
-          />
-          <InlineBadge
-            label={t(
-              `enums.journalSourceType.${entry.sourceType}` as Parameters<
-                typeof t
-              >[0],
-            )}
-            colorClass={sourceBadgeClass}
-          />
+          {source && (
+            <InlineBadge label={t(source)} colorClass={sourceBadgeClass} />
+          )}
         </Div>
-
-        {/* Description */}
-        {entry.description && (
-          <Span className="text-base font-semibold">{entry.description}</Span>
-        )}
 
         {/* Memo */}
         {entry.memo && (
@@ -269,14 +289,14 @@ export function CoaJournalEntryGetWidget({
       {entry.lines.length > 0 && (
         <Div className="rounded-md border overflow-hidden">
           {/* Column headers */}
-          <Div className="grid grid-cols-[1fr_9rem_9rem] gap-0 bg-muted/50 border-b text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-            <Span className="px-4 py-2 border-r">
-              {t("journalEntryGet.response.accountId")}
+          <Div className="grid grid-cols-[minmax(0,1fr)_minmax(5.5rem,0.6fr)_minmax(5.5rem,0.6fr)] @md:grid-cols-[minmax(0,1fr)_10rem_10rem] gap-0 bg-muted/50 border-b text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+            <Span className="px-2 py-2 @md:px-4 border-r">
+              {t("journalCreate.widget.account")}
             </Span>
-            <Span className="px-4 py-2 text-right border-r text-amber-700 dark:text-amber-400">
+            <Span className="px-2 py-2 @md:px-4 text-right border-r">
               {t("enums.lineType.DEBIT")}
             </Span>
-            <Span className="px-4 py-2 text-right text-emerald-700 dark:text-emerald-400">
+            <Span className="px-2 py-2 @md:px-4 text-right">
               {t("enums.lineType.CREDIT")}
             </Span>
           </Div>
@@ -287,57 +307,69 @@ export function CoaJournalEntryGetWidget({
               key={line.lineId}
               line={line}
               onAccountClick={handleAccountClick}
+              locale={locale}
             />
           ))}
 
-          {/* Totals row — separator line */}
-          <Div className="grid grid-cols-[1fr_9rem_9rem] gap-0 border-t-2 bg-muted/30">
-            <Div className="px-4 py-2 border-r flex items-center gap-2">
-              <Span className="text-xs font-semibold">
-                {t("journalEntryGet.widget.totalDebits")} /{" "}
-                {t("journalEntryGet.widget.totalCredits")}
-              </Span>
-              {!isBalanced && (
-                <Badge variant="destructive" className="text-xs py-0">
-                  {t("journalEntryGet.widget.notBalancedLabel")}
-                </Badge>
-              )}
-              {isBalanced && (
-                <Badge
-                  variant="default"
-                  className="text-xs py-0 bg-emerald-600 dark:bg-emerald-700"
-                >
-                  {t("journalEntryGet.widget.balancedLabel")}
-                </Badge>
-              )}
-            </Div>
-            <Div className="px-4 py-2 flex items-center justify-end border-r">
-              <Span className="font-mono text-sm font-bold text-amber-600 dark:text-amber-400 tabular-nums">
-                {formatMoney(totalDebits)}
-              </Span>
-            </Div>
-            <Div className="px-4 py-2 flex items-center justify-end">
-              <Span className="font-mono text-sm font-bold text-emerald-600 dark:text-emerald-400 tabular-nums">
-                {formatMoney(totalCredits)}
-              </Span>
-            </Div>
-          </Div>
+          {[...totals].map(([currency, total]) => {
+            const balanced = total.valid && total.debits === total.credits;
+            return (
+              <Div
+                key={currency}
+                className="grid grid-cols-[minmax(0,1fr)_minmax(5.5rem,0.6fr)_minmax(5.5rem,0.6fr)] border-t-2 bg-muted/30 @md:grid-cols-[minmax(0,1fr)_10rem_10rem]"
+              >
+                <Div className="flex flex-wrap items-center gap-2 border-r px-2 py-2 @md:px-4">
+                  <Span className="text-xs font-semibold">{currency}</Span>
+                  <Badge
+                    variant={balanced ? "outline" : "destructive"}
+                    className="text-xs"
+                  >
+                    {balanced
+                      ? t("journalEntryGet.widget.balancedLabel")
+                      : t("journalEntryGet.widget.notBalancedLabel")}
+                  </Badge>
+                </Div>
+                <Div className="flex items-center justify-end border-r px-2 py-2 @md:px-4">
+                  <Span className="text-sm font-semibold tabular-nums">
+                    {formatMoney(
+                      Number(total.debits) / 10_000,
+                      currency,
+                      locale,
+                    )}
+                  </Span>
+                </Div>
+                <Div className="flex items-center justify-end px-2 py-2 @md:px-4">
+                  <Span className="text-sm font-semibold tabular-nums">
+                    {formatMoney(
+                      Number(total.credits) / 10_000,
+                      currency,
+                      locale,
+                    )}
+                  </Span>
+                </Div>
+              </Div>
+            );
+          })}
         </Div>
       )}
 
       {/* Action buttons */}
       <Div className="flex gap-2 flex-wrap">
-        {entry.status === "DRAFT" && (
+        {(entry.status === JournalEntryStatus.DRAFT ||
+          entry.status === "DRAFT") && (
           <Button variant="default" size="sm" onClick={handlePost}>
             {t("journalEntryGet.widget.postButton")}
           </Button>
         )}
-        {entry.status === "POSTED" && (
-          <Button variant="outline" size="sm" onClick={handleReverse}>
-            {t("journalEntryGet.widget.reverseButton")}
-          </Button>
-        )}
+        {(entry.status === JournalEntryStatus.POSTED ||
+          entry.status === "POSTED") &&
+          (entry.sourceType === JournalSourceType.MANUAL ||
+            entry.sourceType === "MANUAL") && (
+            <Button variant="outline" size="sm" onClick={handleReverse}>
+              {t("journalEntryGet.widget.reverseButton")}
+            </Button>
+          )}
       </Div>
-    </Div>
+    </WidgetShell>
   );
 }

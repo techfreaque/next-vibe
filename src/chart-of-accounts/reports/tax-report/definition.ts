@@ -24,6 +24,7 @@ import {
 import { z } from "zod";
 
 import { scopedTranslation } from "../../i18n";
+import { accountingDateSchema } from "../../shared/calendar-date";
 
 const TaxReportWidget = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.TaxReportWidget })),
@@ -51,11 +52,25 @@ const { GET } = createEndpoint({
     children: {
       companyId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
+        fieldType: FieldDataType.ENTITY_PICKER,
         label: "taxReport.companyId.label" as const,
         description: "taxReport.companyId.description" as const,
         placeholder: "taxReport.companyId.placeholder" as const,
-        schema: z.string().uuid(),
+        listEndpoint: async () =>
+          (await import("@/companies/list/definition")).default.GET,
+        labelField: "name",
+        schema: z.string().uuid().optional(),
+      }),
+      currency: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "reports.currency",
+        schema: z
+          .string()
+          .trim()
+          .toUpperCase()
+          .regex(/^(?:[A-Z]{3})?$/)
+          .optional(),
       }),
       from: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -63,7 +78,7 @@ const { GET } = createEndpoint({
         label: "taxReport.from.label" as const,
         description: "taxReport.from.description" as const,
         placeholder: "taxReport.from.placeholder" as const,
-        schema: z.string().date().optional(),
+        schema: accountingDateSchema.optional(),
       }),
       to: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -71,7 +86,23 @@ const { GET } = createEndpoint({
         label: "taxReport.to.label" as const,
         description: "taxReport.to.description" as const,
         placeholder: "taxReport.to.placeholder" as const,
-        schema: z.string().date().optional(),
+        schema: accountingDateSchema.optional(),
+      }),
+
+      reportCompanyId: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "taxReport.companyId.label",
+        schema: z.string(),
+      }),
+      reportCompanyName: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "taxReport.companyId.label",
+        schema: z.string(),
+      }),
+      reportCurrency: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "reports.currency",
+        schema: z.string(),
       }),
 
       fromResponse: responseField(scopedTranslation, {
@@ -176,6 +207,8 @@ const { GET } = createEndpoint({
     },
   },
 
+  options: { formOptions: { autoSubmit: true, debounceMs: 300 } },
+
   successTypes: {
     title: "taxReport.success.title" as const,
     description: "taxReport.success.description" as const,
@@ -184,13 +217,16 @@ const { GET } = createEndpoint({
   examples: {
     requests: {
       default: {
-        companyId: "00000000-0000-0000-0000-000000000001",
+        companyId: "00000000-0000-4000-8000-000000000001",
         from: "2026-01-01",
         to: "2026-12-31",
       },
     },
     responses: {
       default: {
+        reportCompanyId: "00000000-0000-4000-8000-000000000001",
+        reportCompanyName: "Example company",
+        reportCurrency: "EUR",
         fromResponse: "2026-01-01",
         toResponse: "2026-12-31",
         vatCollected: 0,

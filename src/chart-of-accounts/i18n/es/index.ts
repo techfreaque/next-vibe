@@ -284,7 +284,30 @@ export const translations: typeof enTranslations = {
     },
   },
   journalCreate: {
+    errorDate: "Elige una fecha dentro del periodo seleccionado.",
+    errorCurrency: "Usa la moneda contable de la empresa en todas las líneas.",
+    errorInvalidLine:
+      "Introduce un importe positivo en el debe o el haber con un máximo de cuatro decimales.",
+    errorAccount: "Selecciona una cuenta válida de esta empresa.",
     widget: {
+      lineDescription: "Descripción de la línea",
+      incomplete:
+        "Introduce un importe en el debe o en el haber de cada línea.",
+      offByLessThan: "Diferencia inferior a {{amount}}",
+      offBy: "Diferencia de {{amount}}",
+
+      details: "Datos del asiento",
+      saveDraft: "Guardar borrador",
+      addLine: "Añadir línea",
+      removeLine: "Quitar línea",
+      account: "Cuenta",
+      side: "Debe o haber",
+      amount: "Importe",
+      currency: "Moneda",
+      missingScope: "Elige una empresa antes de añadir líneas.",
+      noPeriods: "Esta empresa no tiene periodos contables abiertos.",
+      noAccounts: "Esta empresa no tiene cuentas activas que admitan apuntes.",
+
       back: "Atrás",
       viewEntryButton: "Ver Entrada",
       postNowButton: "Post Now",
@@ -299,12 +322,12 @@ export const translations: typeof enTranslations = {
     description:
       "Cree un diario manual de doble entrada. Los débitos totales deben igualar los créditos totales.",
     companyId: {
-      label: "Company ID",
+      label: "Empresa",
       description: "La empresa para esta entrada de revistas",
       placeholder: "Company UUID",
     },
     periodId: {
-      label: "Período ID",
+      label: "Periodo contable",
       description: "El período contable",
       placeholder: "Período UUID",
     },
@@ -362,6 +385,11 @@ export const translations: typeof enTranslations = {
     errorNotDraft: "Sólo las entradas de DRAFT pueden ser publicadas",
   },
   journalReverse: {
+    errorManaged: "Revierte este asiento desde su documento de origen.",
+    errorDate:
+      "La fecha de reversión debe ser igual o posterior a la del asiento original.",
+    errorNoPeriod:
+      "Abre un periodo contable que incluya la fecha de reversión.",
     widget: {
       backButton: "Volver a Diario",
       reversalCreated: "Entrada de inversión creada",
@@ -524,7 +552,13 @@ export const translations: typeof enTranslations = {
     },
   },
   reports: {
+    switchReport: "Informes",
+    currency: "Moneda",
+    mixedCurrency:
+      "Este periodo contiene asientos en varias monedas. Elige una moneda para el informe.",
     nav: {
+      ledgerTax: "IVA contabilizado",
+      payables: "Antigüedad de saldos a proveedores",
       profitLoss: "PL",
       balanceSheet: "Hoja de equilibrio",
       trialBalance: "Saldo de juicio",
@@ -532,6 +566,10 @@ export const translations: typeof enTranslations = {
       receivablesAging: "Envejecimientos",
     },
     widget: {
+      quickDates: "Cambiar fechas",
+      thisMonth: "Este mes",
+      previousMonth: "Mes anterior",
+      autoCurrency: "Automática",
       run: "Corre",
       running: "Corriendo...",
     },
@@ -646,6 +684,7 @@ export const translations: typeof enTranslations = {
       placeholder: "YYYY-MM-DD",
     },
     response: {
+      unclosedEarnings: "Resultado pendiente de cierre",
       asOfDate: "As of Date",
       assets: "Activos",
       totalAssets: "Total de activos",
@@ -700,41 +739,41 @@ export const translations: typeof enTranslations = {
     },
   },
   receivablesAging: {
+    currencies: { EUR: "EUR", USD: "USD", PLN: "PLN" },
     widget: {
-      asOf: "A",
-      noData: "No hay créditos pendientes.",
+      asOf: "Fecha de referencia",
+      noData: "No hay facturas pendientes en esta moneda.",
       totalRow: "Total",
       viewInvoice: "Vista",
-      selectCompany:
-        "Introduzca una empresa ID arriba y haga clic en Ejecutar para generar el informe de envejecimiento.",
+      selectCompany: "Elige una empresa para consultar el informe.",
     },
-    title: "Envejecimientos",
-    titleShort: "Envejecimientos",
-    description:
-      "Las facturas pendientes cuelgan por días atrasadas. Muestra exactamente dónde está atascado el dinero.",
+    title: "Facturas por cobrar",
+    titleShort: "Facturas por cobrar",
+    description: "Saldos pendientes por vencimiento y moneda.",
     companyId: {
-      label: "Company ID",
-      description: "Company to report on",
+      label: "Empresa",
+      description: "Elige la empresa cuyas facturas quieres consultar.",
       placeholder: "Company UUID",
     },
     asOfDate: {
-      label: "As of Date",
+      label: "Fecha de referencia",
       description:
-        "Fecha de referencia de envejecimiento. predeterminados a hoy",
+        "Esta fecha determina el tramo de atraso de los importes que siguen pendientes hoy.",
       placeholder: "YYYY-MM-DD",
     },
     response: {
-      asOfDate: "As of Date",
+      currency: "Moneda",
+      asOfDate: "Fecha de referencia",
       buckets: "Buckets",
-      current: "Corriente",
+      current: "Sin atraso",
       days1to30: "1 a 30 días",
       days31to60: "31 a 60 días",
       days61to90: "61–90 Días",
       over90: "Más de 90 días",
-      invoiceId: "Factura ID",
-      customerId: "Cliente ID",
+      invoiceId: "Factura",
+      customerId: "Cliente",
       amount: "Monto",
-      dueDate: "Fecha prevista",
+      dueDate: "Vencimiento",
       totals: "Totales",
       total: "Total",
     },

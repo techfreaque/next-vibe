@@ -6,6 +6,7 @@
 import { createEndpoint } from "next-vibe/core/definition/create-i18n";
 import {
   EndpointErrorTypes,
+  FieldDataType,
   LayoutType,
   Methods,
   WidgetType,
@@ -15,6 +16,7 @@ import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
 import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
 import {
   objectField,
+  requestField,
   responseArrayField,
   responseField,
 } from "next-vibe/unified-ui/_shared/utils-i18n";
@@ -45,6 +47,15 @@ const { GET } = createEndpoint({
     render: PosDashboardWidget,
     usage: { request: "data", response: true },
     children: {
+      companyId: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.ENTITY_PICKER,
+        label: "terminalCreate.post.companyId.label",
+        schema: z.uuid().optional(),
+        listEndpoint: async () =>
+          (await import("@/companies/list/definition")).default.GET,
+        labelField: "name",
+      }),
       terminalsTotal: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         label: "dashboard.get.response.terminalsTotal",
@@ -64,6 +75,13 @@ const { GET } = createEndpoint({
         type: WidgetType.TEXT,
         label: "dashboard.get.response.todayOrderCount",
         schema: z.number(),
+      }),
+      salesByCurrency: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "dashboard.get.response.todaySalesTotal",
+        schema: z
+          .array(z.object({ currency: z.string(), amount: z.number() }))
+          .optional(),
       }),
       todaySalesTotal: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
@@ -176,6 +194,7 @@ const { GET } = createEndpoint({
   },
 
   examples: {
+    requests: { default: {} },
     responses: {
       default: {
         terminalsTotal: 3,
@@ -183,6 +202,10 @@ const { GET } = createEndpoint({
         openSessionsCount: 1,
         todayOrderCount: 14,
         todaySalesTotal: 487.5,
+        salesByCurrency: [
+          { currency: "EUR", amount: 487.5 },
+          { currency: "USD", amount: 125.1251 },
+        ],
         currency: "EUR",
         terminals: [
           {

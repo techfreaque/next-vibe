@@ -3,7 +3,7 @@
  * Closes an open cashier session
  */
 
-import { and, eq, inArray, sum } from "drizzle-orm";
+import { and, eq, inArray, ne, sql } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
@@ -33,6 +33,7 @@ export class PosSessionCloseRepository {
   ): Promise<
     ResponseType<{
       result: {
+        currency: string;
         id: string;
         status: string;
         closedAt: Date | null;
@@ -69,12 +70,21 @@ export class PosSessionCloseRepository {
 
       // Verify user is a member of the terminal's company
       const [terminal] = await db
-        .select({ companyId: posTerminals.companyId })
+        .select({
+          companyId: posTerminals.companyId,
+          currency: posTerminals.currency,
+        })
         .from(posTerminals)
         .where(eq(posTerminals.id, session.terminalId))
         .limit(1);
 
-      if (terminal) {
+      if (!terminal) {
+        return fail({
+          message: t("sessionClose.post.errors.notFound.title"),
+          errorType: ErrorResponseTypes.NOT_FOUND,
+        });
+      }
+      {
         const authResult = await CompanyAuthRepository.requireMember(
           userId,
           terminal.companyId,
@@ -87,98 +97,142 @@ export class PosSessionCloseRepository {
         }
       }
 
-      if (session.status !== PosSessionStatus.OPEN) {
-        return fail({
-          message: t("sessionClose.post.errors.conflict.title"),
-          errorType: ErrorResponseTypes.CONFLICT,
-        });
-      }
-
-      // Fail if any orders in this session are still OPEN
-      const [openOrder] = await db
-        .select({ id: posOrders.id })
-        .from(posOrders)
-        .where(
-          and(
-            eq(posOrders.sessionId, details.sessionId),
-            eq(posOrders.status, PosOrderStatus.OPEN),
-          ),
-        )
-        .limit(1);
-
-      if (openOrder) {
-        return fail({
-          message: t("sessionClose.post.errors.conflict.title"),
-          errorType: ErrorResponseTypes.CONFLICT,
-        });
-      }
-
-      const closedAt = new Date();
-
-      const [updated] = await db
-        .update(posSessions)
-        .set({
-          status: PosSessionStatus.CLOSED,
-          closedAt,
-          closingFloat: details.closingFloat,
-        })
-        .where(eq(posSessions.id, details.sessionId))
-        .returning({
-          id: posSessions.id,
-          status: posSessions.status,
-          closedAt: posSessions.closedAt,
-          closingFloat: posSessions.closingFloat,
-        });
-
-      if (!updated) {
-        logger.error("Failed to close POS session");
-        return fail({
-          message: t("sessionClose.post.errors.server.title"),
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        });
-      }
-
-      // Compute reconciliation: sum CASH payments on COMPLETED orders in this session
-      const completedOrders = await db
-        .select({ id: posOrders.id })
-        .from(posOrders)
-        .where(
-          and(
-            eq(posOrders.sessionId, details.sessionId),
-            eq(posOrders.status, PosOrderStatus.COMPLETED),
-          ),
-        );
-
-      const orderCount = completedOrders.length;
-      const completedOrderIds = completedOrders.map((o) => o.id);
-
-      let cashSalesTotal = 0;
-
-      if (completedOrderIds.length > 0) {
-        const [cashRow] = await db
-          .select({ total: sum(posPayments.amount) })
-          .from(posPayments)
+      return await db.transaction(async (tx) => {
+        const [locked] = await tx
+          .select({
+            status: posSessions.status,
+            openingFloat: posSessions.openingFloat,
+          })
+          .from(posSessions)
           .where(
             and(
-              inArray(posPayments.orderId, completedOrderIds),
+              eq(posSessions.id, details.sessionId),
+              eq(posSessions.terminalId, session.terminalId),
+            ),
+          )
+          .for("update");
+        if (!locked || locked.status !== PosSessionStatus.OPEN) {
+          return fail({
+            message: t("sessionClose.post.errors.conflict.title"),
+            errorType: ErrorResponseTypes.CONFLICT,
+          });
+        }
+
+        // Fail if any orders in this session are still OPEN
+        const [openOrder] = await tx
+          .select({ id: posOrders.id })
+          .from(posOrders)
+          .where(
+            and(
+              eq(posOrders.sessionId, details.sessionId),
+              eq(posOrders.status, PosOrderStatus.OPEN),
+            ),
+          )
+          .limit(1);
+
+        if (openOrder) {
+          return fail({
+            message: t("sessionClose.post.errors.conflict.title"),
+            errorType: ErrorResponseTypes.CONFLICT,
+          });
+        }
+
+        const [foreignCash] = await tx
+          .select({ id: posOrders.id })
+          .from(posOrders)
+          .innerJoin(posPayments, eq(posPayments.orderId, posOrders.id))
+          .where(
+            and(
+              eq(posOrders.sessionId, details.sessionId),
+              eq(posOrders.status, PosOrderStatus.COMPLETED),
+              ne(posOrders.currency, terminal.currency),
               eq(posPayments.method, PosPaymentMethod.CASH),
             ),
+          )
+          .limit(1);
+        if (foreignCash) {
+          return fail({
+            message: t("sessionClose.post.mixedCash"),
+            errorType: ErrorResponseTypes.CONFLICT,
+          });
+        }
+
+        const closedAt = new Date();
+
+        const [updated] = await tx
+          .update(posSessions)
+          .set({
+            status: PosSessionStatus.CLOSED,
+            closedAt,
+            closingFloat: details.closingFloat,
+          })
+          .where(eq(posSessions.id, details.sessionId))
+          .returning({
+            id: posSessions.id,
+            status: posSessions.status,
+            closedAt: posSessions.closedAt,
+            closingFloat: posSessions.closingFloat,
+          });
+
+        if (!updated) {
+          logger.error("Failed to close POS session");
+          return fail({
+            message: t("sessionClose.post.errors.server.title"),
+            errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          });
+        }
+
+        // Compute reconciliation: sum CASH payments on COMPLETED orders in this session
+        const completedOrders = await tx
+          .select({ id: posOrders.id })
+          .from(posOrders)
+          .where(
+            and(
+              eq(posOrders.sessionId, details.sessionId),
+              eq(posOrders.status, PosOrderStatus.COMPLETED),
+            ),
           );
-        cashSalesTotal = Number(cashRow?.total ?? 0);
-      }
 
-      const openingFloat = session.openingFloat;
-      const expectedFloat = openingFloat + cashSalesTotal;
-      const variance = details.closingFloat - expectedFloat;
+        const orderCount = completedOrders.length;
+        const completedOrderIds = completedOrders.map((o) => o.id);
 
-      return success({
-        result: {
-          ...updated,
-          expectedFloat,
-          cashSalesTotal,
-          variance,
-          orderCount,
-        },
+        let cashSalesTotal = 0;
+
+        if (completedOrderIds.length > 0) {
+          const [cashRow] = await tx
+            .select({
+              total: sql<string>`sum(${posPayments.amount}-${posPayments.change})`,
+            })
+            .from(posPayments)
+            .where(
+              and(
+                inArray(posPayments.orderId, completedOrderIds),
+                eq(posPayments.method, PosPaymentMethod.CASH),
+              ),
+            );
+          cashSalesTotal = Number(cashRow?.total ?? 0);
+        }
+
+        const openingFloat = locked.openingFloat;
+        const expectedFloat =
+          (Math.round(openingFloat * 10_000) +
+            Math.round(cashSalesTotal * 10_000)) /
+          10_000;
+        const variance =
+          (Math.round(details.closingFloat * 10_000) -
+            Math.round(expectedFloat * 10_000)) /
+          10_000;
+
+        return success({
+          result: {
+            currency: terminal.currency,
+            ...updated,
+            expectedFloat,
+            cashSalesTotal,
+            variance,
+            orderCount,
+          },
+        });
       });
     } catch (error) {
       logger.error("Error closing POS session", parseError(error));

@@ -2,20 +2,29 @@
 
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
-import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
-import { Span } from "next-vibe/ui/components/span";
+import { SectionGroup } from "next-vibe/ui/components/section-group";
 import { P } from "next-vibe/ui/components/typography";
-import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
+import { WidgetHeader } from "next-vibe/ui/components/widget-header";
+import { WidgetShell } from "next-vibe/ui/components/widget-shell";
+import {
+  formatDocDate,
+  formatMoney,
+} from "next-vibe/unified-ui/_shared/format-money";
 import {
   useWidgetForm,
+  useWidgetIsInteractive,
+  useWidgetLocale,
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-field/widget";
+import { EntityPickerFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/entity-picker-field/widget";
+import { TextareaFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/textarea-field/widget";
 import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 import type { JSX } from "react";
+
+import { DocumentTextExportButton } from "@/finance/document-text-export";
 
 import type definition from "./definition";
 
@@ -24,85 +33,94 @@ export function InvoiceSendReminderWidget({
 }: {
   field: (typeof definition.POST)["fields"];
 }): JSX.Element {
-  const data = useWidgetValue<typeof definition.POST>();
-  const navigation = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.POST>();
+  const locale = useWidgetLocale();
   const form = useWidgetForm<typeof definition.POST>();
-
-  const handleViewInvoice = (): void => {
-    const invoiceId = form?.getValues("invoiceId") ?? "";
-    if (!invoiceId) {
-      navigation.pop();
-      return;
-    }
-    void (async (): Promise<void> => {
-      const def = await import("@/payment/invoice/[invoiceId]/get/definition");
-      navigation.push(def.default.GET, { urlPathParams: { invoiceId } });
-    })();
-  };
-
-  if (data?.success === true) {
-    return (
-      <Div className="flex flex-col gap-4 p-4 rounded-lg border bg-emerald-50/50 dark:bg-emerald-900/10 border-emerald-200 dark:border-emerald-800">
-        <Span className="text-xs font-semibold text-emerald-700 dark:text-emerald-400 uppercase tracking-wide">
-          {t("post.success.title")}
-        </Span>
-        <Span className="text-sm text-foreground">
-          {t("widget.reminderSent")}
-        </Span>
-        <Div className="flex gap-2">
-          <Button
-            type="button"
-            variant="default"
-            size="sm"
-            onClick={handleViewInvoice}
-          >
-            {t("widget.viewInvoice")}
-          </Button>
-          {navigation.canGoBack && (
+  const navigation = useWidgetNavigation();
+  const interactive = useWidgetIsInteractive();
+  const draft = useWidgetValue<typeof definition.POST>()?.draft;
+  const invoiceId = form.watch("invoiceId");
+  const draftText = draft
+    ? [
+        t("widget.subject", { number: draft.invoiceNumber }),
+        t("widget.body", {
+          amount: formatMoney(draft.amount, draft.currency, locale),
+          date: formatDocDate(draft.dueDate, locale),
+        }),
+        draft.note,
+        draft.issuerName,
+      ]
+        .filter(Boolean)
+        .join("\n\n")
+    : "";
+  return (
+    <WidgetShell layout="page">
+      <WidgetHeader
+        size="page"
+        title={t(draft ? "post.success.title" : "post.title")}
+        subtitle={t(draft ? "widget.reminderSent" : "post.description")}
+        backButton={
+          navigation.canGoBack && (
             <Button
               type="button"
-              variant="outline"
               size="sm"
+              variant="ghost"
               onClick={() => navigation.pop()}
             >
               {t("widget.back")}
             </Button>
-          )}
-        </Div>
-      </Div>
-    );
-  }
-
-  return (
-    <Div className="flex flex-col gap-4">
-      {navigation.canGoBack && (
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={() => navigation.pop()}
-          className="self-start gap-1.5 -ml-1"
-        >
-          <ChevronLeft className="h-4 w-4" />
-          {t("widget.back")}
-        </Button>
-      )}
-
-      <Div className="flex flex-col gap-1">
-        <Span className="text-base font-semibold">{t("post.title")}</Span>
-        <P className="text-sm text-muted-foreground">{t("post.description")}</P>
-      </Div>
-
-      <TextFieldWidget
-        fieldName="message"
-        field={withValue(field.children.message, undefined, null)}
+          )
+        }
       />
-
       <FormAlertWidget field={{}} />
-      <SubmitButtonWidget<typeof definition.POST>
-        field={{ text: "widget.submit" as const }}
-      />
-    </Div>
+      {draft ? (
+        <SectionGroup title={draft.invoiceNumber}>
+          <P className="whitespace-pre-wrap text-sm">{draftText}</P>
+          {interactive && (
+            <Div className="mt-3 flex flex-wrap gap-2">
+              <DocumentTextExportButton
+                filename={`reminder-${draft.invoiceNumber.replace(/[^a-zA-Z0-9._-]/gu, "_").slice(0, 100)}.txt`}
+                content={draftText}
+                mimeType="text/plain;charset=utf-8"
+                downloadLabel={t("widget.download")}
+                copyLabel={t("widget.copy")}
+                copiedLabel={t("widget.copied")}
+                copyErrorLabel={t("widget.copyFailed")}
+              />
+              {invoiceId && (
+                <Button
+                  size="sm"
+                  type="button"
+                  variant="outline"
+                  onClick={() =>
+                    void import("../get/definition").then((m) =>
+                      navigation.push(m.default.GET, {
+                        urlPathParams: { invoiceId },
+                      }),
+                    )
+                  }
+                >
+                  {t("widget.viewInvoice")}
+                </Button>
+              )}
+            </Div>
+          )}
+        </SectionGroup>
+      ) : (
+        <>
+          <EntityPickerFieldWidget
+            fieldName="invoiceId"
+            field={field.children.invoiceId}
+          />
+          <TextareaFieldWidget
+            fieldName="message"
+            field={field.children.message}
+          />
+          <SubmitButtonWidget<typeof definition.POST>
+            field={{ text: "widget.submit", className: "self-start" }}
+          />
+        </>
+      )}
+    </WidgetShell>
   );
 }

@@ -15,6 +15,7 @@ export const translations: typeof enTranslations = {
       success: "Sukces",
       message: "Komunikat statusu",
       line: {
+        currency: "Waluta",
         title: "Pozycja",
         subtitle: "Dodana pozycja",
         id: "ID pozycji",

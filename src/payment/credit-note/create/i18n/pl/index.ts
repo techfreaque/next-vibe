@@ -12,7 +12,7 @@ export const translations: typeof enTranslations = {
     title: "Utwórz notę kredytową",
     titleShort: "Utwórz notę",
     description:
-      "Utwórz notę kredytową powiązaną z oryginalną fakturą. Pełny kredyt odwraca wszystkie pozycje. Częściowy kredyt dotyczy podanych pozycji. Księguje wpis odwrotny: Wn Przychody, Ma Należności.",
+      "Wystaw pełną lub częściową korektę zaksięgowanej faktury. Skoryguje należność, przychód i VAT.",
     form: {
       title: "Utwórz notę kredytową",
       description: "Wystaw kredyt do istniejącej faktury",
@@ -35,6 +35,14 @@ export const translations: typeof enTranslations = {
       },
     },
     errors: {
+      creditLines:
+        "Wpisz dodatnie ilości i użyj stawek VAT z faktury pierwotnej.",
+      creditLimit:
+        "Korekta przekracza pozostałą kwotę netto, VAT lub brutto z faktury pierwotnej.",
+      originalPosting:
+        "Uzgodnij zapis księgowy faktury pierwotnej przed wystawieniem korekty.",
+      posting:
+        "Sprawdź walutę firmy, otwarty okres księgowy i użyte pierwotnie konta.",
       unauthorized: {
         title: "Brak autoryzacji",
         description: "Wymagana autoryzacja",

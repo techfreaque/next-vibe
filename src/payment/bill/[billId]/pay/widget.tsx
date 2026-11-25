@@ -78,6 +78,7 @@ export function BillPayWidget({
           />
           <DateFieldWidget
             fieldName="paidAt"
+            utcCalendarDay
             field={withValue(field.children.paidAt, undefined, null)}
           />
         </Div>

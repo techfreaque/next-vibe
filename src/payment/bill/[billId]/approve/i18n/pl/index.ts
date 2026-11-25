@@ -18,6 +18,12 @@ export const translations: typeof enTranslations = {
       "Zmienia status wersji roboczej lub otrzymanej faktury od dostawcy.",
     billId: { label: "ID faktury", description: "Faktura do zatwierdzenia" },
     errors: {
+      existingPosting:
+        "Sprawdź i uzgodnij istniejący zapis księgowy przed zatwierdzeniem tej faktury.",
+      billLines:
+        "Dodaj pozycje o dodatniej sumie i wybierz aktywne konta kosztów tej firmy.",
+      posting:
+        "Sprawdź kwoty faktury, walutę firmy, okres księgowy i konta księgowe.",
       validation: {
         title: "Błąd walidacji",
         description: "Nieprawidłowe ID faktury",
@@ -65,7 +71,7 @@ export const translations: typeof enTranslations = {
       submit: "Potwierdź zmianę statusu",
       confirmTitle: "Zatwierdzić tę fakturę?",
       confirmDescription:
-        "Szkic otrzyma status Otrzymana. Otrzymana faktura zostanie zatwierdzona. Jeśli księgowość jest skonfigurowana, powstanie zapis księgowy.",
+        "Szkic otrzyma status Otrzymana. Zatwierdzenie otrzymanej faktury tworzy zapis księgowy.",
       confirmButton: "Tak, zatwierdź",
       cancelButton: "Anuluj",
       approved: "Status faktury zmieniony",

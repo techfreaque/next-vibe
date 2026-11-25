@@ -288,6 +288,9 @@ import { Route as ApiLocaleChartOfAccountsLedgerAccountIdRouteImport } from './r
 import { Route as ApiLocaleChartOfAccountsPeriodCreateRouteImport } from './routes/api.$locale.chart-of-accounts.period.create'
 import { Route as ApiLocaleChartOfAccountsPeriodListRouteImport } from './routes/api.$locale.chart-of-accounts.period.list'
 import { Route as ApiLocaleChartOfAccountsReportsBalanceSheetRouteImport } from './routes/api.$locale.chart-of-accounts.reports.balance-sheet'
+import { Route as ApiLocaleChartOfAccountsReportsJournalExportRouteImport } from './routes/api.$locale.chart-of-accounts.reports.journal-export'
+import { Route as ApiLocaleChartOfAccountsReportsPayablesAgingRouteImport } from './routes/api.$locale.chart-of-accounts.reports.payables-aging'
+import { Route as ApiLocaleChartOfAccountsReportsPostingReviewRouteImport } from './routes/api.$locale.chart-of-accounts.reports.posting-review'
 import { Route as ApiLocaleChartOfAccountsReportsProfitLossRouteImport } from './routes/api.$locale.chart-of-accounts.reports.profit-loss'
 import { Route as ApiLocaleChartOfAccountsReportsReceivablesAgingRouteImport } from './routes/api.$locale.chart-of-accounts.reports.receivables-aging'
 import { Route as ApiLocaleChartOfAccountsReportsTaxReportRouteImport } from './routes/api.$locale.chart-of-accounts.reports.tax-report'
@@ -319,6 +322,10 @@ import { Route as ApiLocaleCreditsDataSourcesCreditsTransactionsCountRouteImport
 import { Route as ApiLocaleCreditsDataSourcesCreditsTransferVolumeRouteImport } from './routes/api.$locale.credits.data-sources.credits-transfer-volume'
 import { Route as ApiLocaleCreditsDataSourcesCreditsUsageWithFeatureRouteImport } from './routes/api.$locale.credits.data-sources.credits-usage-with-feature'
 import { Route as ApiLocaleCreditsDataSourcesCreditsWalletsTotalRouteImport } from './routes/api.$locale.credits.data-sources.credits-wallets-total'
+import { Route as ApiLocaleFinanceBankCandidatesRouteImport } from './routes/api.$locale.finance.bank.candidates'
+import { Route as ApiLocaleFinanceBankImportRouteImport } from './routes/api.$locale.finance.bank.import'
+import { Route as ApiLocaleFinanceBankListRouteImport } from './routes/api.$locale.finance.bank.list'
+import { Route as ApiLocaleFinanceBankMatchRouteImport } from './routes/api.$locale.finance.bank.match'
 import { Route as ApiLocaleFinanceDataSourcesFinanceSeriesRouteImport } from './routes/api.$locale.finance.data-sources.finance-series'
 import { Route as ApiLocaleInventoryStockAdjustRouteImport } from './routes/api.$locale.inventory.stock.adjust'
 import { Route as ApiLocaleInventoryStockIssueRouteImport } from './routes/api.$locale.inventory.stock.issue'
@@ -575,6 +582,7 @@ import { Route as ApiLocalePaymentInvoiceInvoiceIdDuplicateRouteImport } from '.
 import { Route as ApiLocalePaymentInvoiceInvoiceIdGetRouteImport } from './routes/api.$locale.payment.invoice.$invoiceId.get'
 import { Route as ApiLocalePaymentInvoiceInvoiceIdPublicViewRouteImport } from './routes/api.$locale.payment.invoice.$invoiceId.public-view'
 import { Route as ApiLocalePaymentInvoiceInvoiceIdRecordPaymentRouteImport } from './routes/api.$locale.payment.invoice.$invoiceId.record-payment'
+import { Route as ApiLocalePaymentInvoiceInvoiceIdReversePaymentRouteImport } from './routes/api.$locale.payment.invoice.$invoiceId.reverse-payment'
 import { Route as ApiLocalePaymentInvoiceInvoiceIdSendRouteImport } from './routes/api.$locale.payment.invoice.$invoiceId.send'
 import { Route as ApiLocalePaymentInvoiceInvoiceIdSendReminderRouteImport } from './routes/api.$locale.payment.invoice.$invoiceId.send-reminder'
 import { Route as ApiLocalePaymentInvoiceInvoiceIdVoidRouteImport } from './routes/api.$locale.payment.invoice.$invoiceId.void'
@@ -2359,6 +2367,24 @@ const ApiLocaleChartOfAccountsReportsBalanceSheetRoute =
     path: '/api/$locale/chart-of-accounts/reports/balance-sheet',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiLocaleChartOfAccountsReportsJournalExportRoute =
+  ApiLocaleChartOfAccountsReportsJournalExportRouteImport.update({
+    id: '/api/$locale/chart-of-accounts/reports/journal-export',
+    path: '/api/$locale/chart-of-accounts/reports/journal-export',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleChartOfAccountsReportsPayablesAgingRoute =
+  ApiLocaleChartOfAccountsReportsPayablesAgingRouteImport.update({
+    id: '/api/$locale/chart-of-accounts/reports/payables-aging',
+    path: '/api/$locale/chart-of-accounts/reports/payables-aging',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleChartOfAccountsReportsPostingReviewRoute =
+  ApiLocaleChartOfAccountsReportsPostingReviewRouteImport.update({
+    id: '/api/$locale/chart-of-accounts/reports/posting-review',
+    path: '/api/$locale/chart-of-accounts/reports/posting-review',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiLocaleChartOfAccountsReportsProfitLossRoute =
   ApiLocaleChartOfAccountsReportsProfitLossRouteImport.update({
     id: '/api/$locale/chart-of-accounts/reports/profit-loss',
@@ -2544,6 +2570,30 @@ const ApiLocaleCreditsDataSourcesCreditsWalletsTotalRoute =
     id: '/data-sources/credits-wallets-total',
     path: '/data-sources/credits-wallets-total',
     getParentRoute: () => ApiLocaleCreditsRoute,
+  } as any)
+const ApiLocaleFinanceBankCandidatesRoute =
+  ApiLocaleFinanceBankCandidatesRouteImport.update({
+    id: '/api/$locale/finance/bank/candidates',
+    path: '/api/$locale/finance/bank/candidates',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleFinanceBankImportRoute =
+  ApiLocaleFinanceBankImportRouteImport.update({
+    id: '/api/$locale/finance/bank/import',
+    path: '/api/$locale/finance/bank/import',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleFinanceBankListRoute =
+  ApiLocaleFinanceBankListRouteImport.update({
+    id: '/api/$locale/finance/bank/list',
+    path: '/api/$locale/finance/bank/list',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleFinanceBankMatchRoute =
+  ApiLocaleFinanceBankMatchRouteImport.update({
+    id: '/api/$locale/finance/bank/match',
+    path: '/api/$locale/finance/bank/match',
+    getParentRoute: () => rootRouteImport,
   } as any)
 const ApiLocaleFinanceDataSourcesFinanceSeriesRoute =
   ApiLocaleFinanceDataSourcesFinanceSeriesRouteImport.update({
@@ -4069,6 +4119,12 @@ const ApiLocalePaymentInvoiceInvoiceIdRecordPaymentRoute =
     path: '/$invoiceId/record-payment',
     getParentRoute: () => ApiLocalePaymentInvoiceRoute,
   } as any)
+const ApiLocalePaymentInvoiceInvoiceIdReversePaymentRoute =
+  ApiLocalePaymentInvoiceInvoiceIdReversePaymentRouteImport.update({
+    id: '/$invoiceId/reverse-payment',
+    path: '/$invoiceId/reverse-payment',
+    getParentRoute: () => ApiLocalePaymentInvoiceRoute,
+  } as any)
 const ApiLocalePaymentInvoiceInvoiceIdSendRoute =
   ApiLocalePaymentInvoiceInvoiceIdSendRouteImport.update({
     id: '/$invoiceId/send',
@@ -5532,6 +5588,9 @@ export interface FileRoutesByFullPath {
   '/api/$locale/chart-of-accounts/period/create': typeof ApiLocaleChartOfAccountsPeriodCreateRoute
   '/api/$locale/chart-of-accounts/period/list': typeof ApiLocaleChartOfAccountsPeriodListRoute
   '/api/$locale/chart-of-accounts/reports/balance-sheet': typeof ApiLocaleChartOfAccountsReportsBalanceSheetRoute
+  '/api/$locale/chart-of-accounts/reports/journal-export': typeof ApiLocaleChartOfAccountsReportsJournalExportRoute
+  '/api/$locale/chart-of-accounts/reports/payables-aging': typeof ApiLocaleChartOfAccountsReportsPayablesAgingRoute
+  '/api/$locale/chart-of-accounts/reports/posting-review': typeof ApiLocaleChartOfAccountsReportsPostingReviewRoute
   '/api/$locale/chart-of-accounts/reports/profit-loss': typeof ApiLocaleChartOfAccountsReportsProfitLossRoute
   '/api/$locale/chart-of-accounts/reports/receivables-aging': typeof ApiLocaleChartOfAccountsReportsReceivablesAgingRoute
   '/api/$locale/chart-of-accounts/reports/tax-report': typeof ApiLocaleChartOfAccountsReportsTaxReportRoute
@@ -5563,6 +5622,10 @@ export interface FileRoutesByFullPath {
   '/api/$locale/credits/data-sources/credits-transfer-volume': typeof ApiLocaleCreditsDataSourcesCreditsTransferVolumeRoute
   '/api/$locale/credits/data-sources/credits-usage-with-feature': typeof ApiLocaleCreditsDataSourcesCreditsUsageWithFeatureRoute
   '/api/$locale/credits/data-sources/credits-wallets-total': typeof ApiLocaleCreditsDataSourcesCreditsWalletsTotalRoute
+  '/api/$locale/finance/bank/candidates': typeof ApiLocaleFinanceBankCandidatesRoute
+  '/api/$locale/finance/bank/import': typeof ApiLocaleFinanceBankImportRoute
+  '/api/$locale/finance/bank/list': typeof ApiLocaleFinanceBankListRoute
+  '/api/$locale/finance/bank/match': typeof ApiLocaleFinanceBankMatchRoute
   '/api/$locale/finance/data-sources/finance-series': typeof ApiLocaleFinanceDataSourcesFinanceSeriesRoute
   '/api/$locale/inventory/stock/adjust': typeof ApiLocaleInventoryStockAdjustRoute
   '/api/$locale/inventory/stock/issue': typeof ApiLocaleInventoryStockIssueRoute
@@ -5883,6 +5946,7 @@ export interface FileRoutesByFullPath {
   '/api/$locale/payment/invoice/$invoiceId/get': typeof ApiLocalePaymentInvoiceInvoiceIdGetRoute
   '/api/$locale/payment/invoice/$invoiceId/public-view': typeof ApiLocalePaymentInvoiceInvoiceIdPublicViewRoute
   '/api/$locale/payment/invoice/$invoiceId/record-payment': typeof ApiLocalePaymentInvoiceInvoiceIdRecordPaymentRoute
+  '/api/$locale/payment/invoice/$invoiceId/reverse-payment': typeof ApiLocalePaymentInvoiceInvoiceIdReversePaymentRoute
   '/api/$locale/payment/invoice/$invoiceId/send': typeof ApiLocalePaymentInvoiceInvoiceIdSendRoute
   '/api/$locale/payment/invoice/$invoiceId/send-reminder': typeof ApiLocalePaymentInvoiceInvoiceIdSendReminderRoute
   '/api/$locale/payment/invoice/$invoiceId/void': typeof ApiLocalePaymentInvoiceInvoiceIdVoidRoute
@@ -6298,6 +6362,9 @@ export interface FileRoutesByTo {
   '/api/$locale/chart-of-accounts/period/create': typeof ApiLocaleChartOfAccountsPeriodCreateRoute
   '/api/$locale/chart-of-accounts/period/list': typeof ApiLocaleChartOfAccountsPeriodListRoute
   '/api/$locale/chart-of-accounts/reports/balance-sheet': typeof ApiLocaleChartOfAccountsReportsBalanceSheetRoute
+  '/api/$locale/chart-of-accounts/reports/journal-export': typeof ApiLocaleChartOfAccountsReportsJournalExportRoute
+  '/api/$locale/chart-of-accounts/reports/payables-aging': typeof ApiLocaleChartOfAccountsReportsPayablesAgingRoute
+  '/api/$locale/chart-of-accounts/reports/posting-review': typeof ApiLocaleChartOfAccountsReportsPostingReviewRoute
   '/api/$locale/chart-of-accounts/reports/profit-loss': typeof ApiLocaleChartOfAccountsReportsProfitLossRoute
   '/api/$locale/chart-of-accounts/reports/receivables-aging': typeof ApiLocaleChartOfAccountsReportsReceivablesAgingRoute
   '/api/$locale/chart-of-accounts/reports/tax-report': typeof ApiLocaleChartOfAccountsReportsTaxReportRoute
@@ -6329,6 +6396,10 @@ export interface FileRoutesByTo {
   '/api/$locale/credits/data-sources/credits-transfer-volume': typeof ApiLocaleCreditsDataSourcesCreditsTransferVolumeRoute
   '/api/$locale/credits/data-sources/credits-usage-with-feature': typeof ApiLocaleCreditsDataSourcesCreditsUsageWithFeatureRoute
   '/api/$locale/credits/data-sources/credits-wallets-total': typeof ApiLocaleCreditsDataSourcesCreditsWalletsTotalRoute
+  '/api/$locale/finance/bank/candidates': typeof ApiLocaleFinanceBankCandidatesRoute
+  '/api/$locale/finance/bank/import': typeof ApiLocaleFinanceBankImportRoute
+  '/api/$locale/finance/bank/list': typeof ApiLocaleFinanceBankListRoute
+  '/api/$locale/finance/bank/match': typeof ApiLocaleFinanceBankMatchRoute
   '/api/$locale/finance/data-sources/finance-series': typeof ApiLocaleFinanceDataSourcesFinanceSeriesRoute
   '/api/$locale/inventory/stock/adjust': typeof ApiLocaleInventoryStockAdjustRoute
   '/api/$locale/inventory/stock/issue': typeof ApiLocaleInventoryStockIssueRoute
@@ -6649,6 +6720,7 @@ export interface FileRoutesByTo {
   '/api/$locale/payment/invoice/$invoiceId/get': typeof ApiLocalePaymentInvoiceInvoiceIdGetRoute
   '/api/$locale/payment/invoice/$invoiceId/public-view': typeof ApiLocalePaymentInvoiceInvoiceIdPublicViewRoute
   '/api/$locale/payment/invoice/$invoiceId/record-payment': typeof ApiLocalePaymentInvoiceInvoiceIdRecordPaymentRoute
+  '/api/$locale/payment/invoice/$invoiceId/reverse-payment': typeof ApiLocalePaymentInvoiceInvoiceIdReversePaymentRoute
   '/api/$locale/payment/invoice/$invoiceId/send': typeof ApiLocalePaymentInvoiceInvoiceIdSendRoute
   '/api/$locale/payment/invoice/$invoiceId/send-reminder': typeof ApiLocalePaymentInvoiceInvoiceIdSendReminderRoute
   '/api/$locale/payment/invoice/$invoiceId/void': typeof ApiLocalePaymentInvoiceInvoiceIdVoidRoute
@@ -7073,6 +7145,9 @@ export interface FileRoutesById {
   '/api/$locale/chart-of-accounts/period/create': typeof ApiLocaleChartOfAccountsPeriodCreateRoute
   '/api/$locale/chart-of-accounts/period/list': typeof ApiLocaleChartOfAccountsPeriodListRoute
   '/api/$locale/chart-of-accounts/reports/balance-sheet': typeof ApiLocaleChartOfAccountsReportsBalanceSheetRoute
+  '/api/$locale/chart-of-accounts/reports/journal-export': typeof ApiLocaleChartOfAccountsReportsJournalExportRoute
+  '/api/$locale/chart-of-accounts/reports/payables-aging': typeof ApiLocaleChartOfAccountsReportsPayablesAgingRoute
+  '/api/$locale/chart-of-accounts/reports/posting-review': typeof ApiLocaleChartOfAccountsReportsPostingReviewRoute
   '/api/$locale/chart-of-accounts/reports/profit-loss': typeof ApiLocaleChartOfAccountsReportsProfitLossRoute
   '/api/$locale/chart-of-accounts/reports/receivables-aging': typeof ApiLocaleChartOfAccountsReportsReceivablesAgingRoute
   '/api/$locale/chart-of-accounts/reports/tax-report': typeof ApiLocaleChartOfAccountsReportsTaxReportRoute
@@ -7104,6 +7179,10 @@ export interface FileRoutesById {
   '/api/$locale/credits/data-sources/credits-transfer-volume': typeof ApiLocaleCreditsDataSourcesCreditsTransferVolumeRoute
   '/api/$locale/credits/data-sources/credits-usage-with-feature': typeof ApiLocaleCreditsDataSourcesCreditsUsageWithFeatureRoute
   '/api/$locale/credits/data-sources/credits-wallets-total': typeof ApiLocaleCreditsDataSourcesCreditsWalletsTotalRoute
+  '/api/$locale/finance/bank/candidates': typeof ApiLocaleFinanceBankCandidatesRoute
+  '/api/$locale/finance/bank/import': typeof ApiLocaleFinanceBankImportRoute
+  '/api/$locale/finance/bank/list': typeof ApiLocaleFinanceBankListRoute
+  '/api/$locale/finance/bank/match': typeof ApiLocaleFinanceBankMatchRoute
   '/api/$locale/finance/data-sources/finance-series': typeof ApiLocaleFinanceDataSourcesFinanceSeriesRoute
   '/api/$locale/inventory/stock/adjust': typeof ApiLocaleInventoryStockAdjustRoute
   '/api/$locale/inventory/stock/issue': typeof ApiLocaleInventoryStockIssueRoute
@@ -7424,6 +7503,7 @@ export interface FileRoutesById {
   '/api/$locale/payment/invoice/$invoiceId/get': typeof ApiLocalePaymentInvoiceInvoiceIdGetRoute
   '/api/$locale/payment/invoice/$invoiceId/public-view': typeof ApiLocalePaymentInvoiceInvoiceIdPublicViewRoute
   '/api/$locale/payment/invoice/$invoiceId/record-payment': typeof ApiLocalePaymentInvoiceInvoiceIdRecordPaymentRoute
+  '/api/$locale/payment/invoice/$invoiceId/reverse-payment': typeof ApiLocalePaymentInvoiceInvoiceIdReversePaymentRoute
   '/api/$locale/payment/invoice/$invoiceId/send': typeof ApiLocalePaymentInvoiceInvoiceIdSendRoute
   '/api/$locale/payment/invoice/$invoiceId/send-reminder': typeof ApiLocalePaymentInvoiceInvoiceIdSendReminderRoute
   '/api/$locale/payment/invoice/$invoiceId/void': typeof ApiLocalePaymentInvoiceInvoiceIdVoidRoute
@@ -7848,6 +7928,9 @@ export interface FileRouteTypes {
     | '/api/$locale/chart-of-accounts/period/create'
     | '/api/$locale/chart-of-accounts/period/list'
     | '/api/$locale/chart-of-accounts/reports/balance-sheet'
+    | '/api/$locale/chart-of-accounts/reports/journal-export'
+    | '/api/$locale/chart-of-accounts/reports/payables-aging'
+    | '/api/$locale/chart-of-accounts/reports/posting-review'
     | '/api/$locale/chart-of-accounts/reports/profit-loss'
     | '/api/$locale/chart-of-accounts/reports/receivables-aging'
     | '/api/$locale/chart-of-accounts/reports/tax-report'
@@ -7879,6 +7962,10 @@ export interface FileRouteTypes {
     | '/api/$locale/credits/data-sources/credits-transfer-volume'
     | '/api/$locale/credits/data-sources/credits-usage-with-feature'
     | '/api/$locale/credits/data-sources/credits-wallets-total'
+    | '/api/$locale/finance/bank/candidates'
+    | '/api/$locale/finance/bank/import'
+    | '/api/$locale/finance/bank/list'
+    | '/api/$locale/finance/bank/match'
     | '/api/$locale/finance/data-sources/finance-series'
     | '/api/$locale/inventory/stock/adjust'
     | '/api/$locale/inventory/stock/issue'
@@ -8199,6 +8286,7 @@ export interface FileRouteTypes {
     | '/api/$locale/payment/invoice/$invoiceId/get'
     | '/api/$locale/payment/invoice/$invoiceId/public-view'
     | '/api/$locale/payment/invoice/$invoiceId/record-payment'
+    | '/api/$locale/payment/invoice/$invoiceId/reverse-payment'
     | '/api/$locale/payment/invoice/$invoiceId/send'
     | '/api/$locale/payment/invoice/$invoiceId/send-reminder'
     | '/api/$locale/payment/invoice/$invoiceId/void'
@@ -8614,6 +8702,9 @@ export interface FileRouteTypes {
     | '/api/$locale/chart-of-accounts/period/create'
     | '/api/$locale/chart-of-accounts/period/list'
     | '/api/$locale/chart-of-accounts/reports/balance-sheet'
+    | '/api/$locale/chart-of-accounts/reports/journal-export'
+    | '/api/$locale/chart-of-accounts/reports/payables-aging'
+    | '/api/$locale/chart-of-accounts/reports/posting-review'
     | '/api/$locale/chart-of-accounts/reports/profit-loss'
     | '/api/$locale/chart-of-accounts/reports/receivables-aging'
     | '/api/$locale/chart-of-accounts/reports/tax-report'
@@ -8645,6 +8736,10 @@ export interface FileRouteTypes {
     | '/api/$locale/credits/data-sources/credits-transfer-volume'
     | '/api/$locale/credits/data-sources/credits-usage-with-feature'
     | '/api/$locale/credits/data-sources/credits-wallets-total'
+    | '/api/$locale/finance/bank/candidates'
+    | '/api/$locale/finance/bank/import'
+    | '/api/$locale/finance/bank/list'
+    | '/api/$locale/finance/bank/match'
     | '/api/$locale/finance/data-sources/finance-series'
     | '/api/$locale/inventory/stock/adjust'
     | '/api/$locale/inventory/stock/issue'
@@ -8965,6 +9060,7 @@ export interface FileRouteTypes {
     | '/api/$locale/payment/invoice/$invoiceId/get'
     | '/api/$locale/payment/invoice/$invoiceId/public-view'
     | '/api/$locale/payment/invoice/$invoiceId/record-payment'
+    | '/api/$locale/payment/invoice/$invoiceId/reverse-payment'
     | '/api/$locale/payment/invoice/$invoiceId/send'
     | '/api/$locale/payment/invoice/$invoiceId/send-reminder'
     | '/api/$locale/payment/invoice/$invoiceId/void'
@@ -9388,6 +9484,9 @@ export interface FileRouteTypes {
     | '/api/$locale/chart-of-accounts/period/create'
     | '/api/$locale/chart-of-accounts/period/list'
     | '/api/$locale/chart-of-accounts/reports/balance-sheet'
+    | '/api/$locale/chart-of-accounts/reports/journal-export'
+    | '/api/$locale/chart-of-accounts/reports/payables-aging'
+    | '/api/$locale/chart-of-accounts/reports/posting-review'
     | '/api/$locale/chart-of-accounts/reports/profit-loss'
     | '/api/$locale/chart-of-accounts/reports/receivables-aging'
     | '/api/$locale/chart-of-accounts/reports/tax-report'
@@ -9419,6 +9518,10 @@ export interface FileRouteTypes {
     | '/api/$locale/credits/data-sources/credits-transfer-volume'
     | '/api/$locale/credits/data-sources/credits-usage-with-feature'
     | '/api/$locale/credits/data-sources/credits-wallets-total'
+    | '/api/$locale/finance/bank/candidates'
+    | '/api/$locale/finance/bank/import'
+    | '/api/$locale/finance/bank/list'
+    | '/api/$locale/finance/bank/match'
     | '/api/$locale/finance/data-sources/finance-series'
     | '/api/$locale/inventory/stock/adjust'
     | '/api/$locale/inventory/stock/issue'
@@ -9739,6 +9842,7 @@ export interface FileRouteTypes {
     | '/api/$locale/payment/invoice/$invoiceId/get'
     | '/api/$locale/payment/invoice/$invoiceId/public-view'
     | '/api/$locale/payment/invoice/$invoiceId/record-payment'
+    | '/api/$locale/payment/invoice/$invoiceId/reverse-payment'
     | '/api/$locale/payment/invoice/$invoiceId/send'
     | '/api/$locale/payment/invoice/$invoiceId/send-reminder'
     | '/api/$locale/payment/invoice/$invoiceId/void'
@@ -10110,6 +10214,9 @@ export interface RootRouteChildren {
   ApiLocaleChartOfAccountsPeriodCreateRoute: typeof ApiLocaleChartOfAccountsPeriodCreateRoute
   ApiLocaleChartOfAccountsPeriodListRoute: typeof ApiLocaleChartOfAccountsPeriodListRoute
   ApiLocaleChartOfAccountsReportsBalanceSheetRoute: typeof ApiLocaleChartOfAccountsReportsBalanceSheetRoute
+  ApiLocaleChartOfAccountsReportsJournalExportRoute: typeof ApiLocaleChartOfAccountsReportsJournalExportRoute
+  ApiLocaleChartOfAccountsReportsPayablesAgingRoute: typeof ApiLocaleChartOfAccountsReportsPayablesAgingRoute
+  ApiLocaleChartOfAccountsReportsPostingReviewRoute: typeof ApiLocaleChartOfAccountsReportsPostingReviewRoute
   ApiLocaleChartOfAccountsReportsProfitLossRoute: typeof ApiLocaleChartOfAccountsReportsProfitLossRoute
   ApiLocaleChartOfAccountsReportsReceivablesAgingRoute: typeof ApiLocaleChartOfAccountsReportsReceivablesAgingRoute
   ApiLocaleChartOfAccountsReportsTaxReportRoute: typeof ApiLocaleChartOfAccountsReportsTaxReportRoute
@@ -10117,6 +10224,10 @@ export interface RootRouteChildren {
   ApiLocaleCompaniesCompanyIdGetRoute: typeof ApiLocaleCompaniesCompanyIdGetRoute
   ApiLocaleCompaniesCompanyIdOnboardRoute: typeof ApiLocaleCompaniesCompanyIdOnboardRoute
   ApiLocaleCompaniesCompanyIdUpdateRoute: typeof ApiLocaleCompaniesCompanyIdUpdateRoute
+  ApiLocaleFinanceBankCandidatesRoute: typeof ApiLocaleFinanceBankCandidatesRoute
+  ApiLocaleFinanceBankImportRoute: typeof ApiLocaleFinanceBankImportRoute
+  ApiLocaleFinanceBankListRoute: typeof ApiLocaleFinanceBankListRoute
+  ApiLocaleFinanceBankMatchRoute: typeof ApiLocaleFinanceBankMatchRoute
   ApiLocaleFinanceDataSourcesFinanceSeriesRoute: typeof ApiLocaleFinanceDataSourcesFinanceSeriesRoute
   ApiLocaleInventoryStockAdjustRoute: typeof ApiLocaleInventoryStockAdjustRoute
   ApiLocaleInventoryStockIssueRoute: typeof ApiLocaleInventoryStockIssueRoute
@@ -12370,6 +12481,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiLocaleChartOfAccountsReportsBalanceSheetRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/$locale/chart-of-accounts/reports/journal-export': {
+      id: '/api/$locale/chart-of-accounts/reports/journal-export'
+      path: '/api/$locale/chart-of-accounts/reports/journal-export'
+      fullPath: '/api/$locale/chart-of-accounts/reports/journal-export'
+      preLoaderRoute: typeof ApiLocaleChartOfAccountsReportsJournalExportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/chart-of-accounts/reports/payables-aging': {
+      id: '/api/$locale/chart-of-accounts/reports/payables-aging'
+      path: '/api/$locale/chart-of-accounts/reports/payables-aging'
+      fullPath: '/api/$locale/chart-of-accounts/reports/payables-aging'
+      preLoaderRoute: typeof ApiLocaleChartOfAccountsReportsPayablesAgingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/chart-of-accounts/reports/posting-review': {
+      id: '/api/$locale/chart-of-accounts/reports/posting-review'
+      path: '/api/$locale/chart-of-accounts/reports/posting-review'
+      fullPath: '/api/$locale/chart-of-accounts/reports/posting-review'
+      preLoaderRoute: typeof ApiLocaleChartOfAccountsReportsPostingReviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/$locale/chart-of-accounts/reports/profit-loss': {
       id: '/api/$locale/chart-of-accounts/reports/profit-loss'
       path: '/api/$locale/chart-of-accounts/reports/profit-loss'
@@ -12586,6 +12718,34 @@ declare module '@tanstack/react-router' {
       fullPath: '/api/$locale/credits/data-sources/credits-wallets-total'
       preLoaderRoute: typeof ApiLocaleCreditsDataSourcesCreditsWalletsTotalRouteImport
       parentRoute: typeof ApiLocaleCreditsRoute
+    }
+    '/api/$locale/finance/bank/candidates': {
+      id: '/api/$locale/finance/bank/candidates'
+      path: '/api/$locale/finance/bank/candidates'
+      fullPath: '/api/$locale/finance/bank/candidates'
+      preLoaderRoute: typeof ApiLocaleFinanceBankCandidatesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/finance/bank/import': {
+      id: '/api/$locale/finance/bank/import'
+      path: '/api/$locale/finance/bank/import'
+      fullPath: '/api/$locale/finance/bank/import'
+      preLoaderRoute: typeof ApiLocaleFinanceBankImportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/finance/bank/list': {
+      id: '/api/$locale/finance/bank/list'
+      path: '/api/$locale/finance/bank/list'
+      fullPath: '/api/$locale/finance/bank/list'
+      preLoaderRoute: typeof ApiLocaleFinanceBankListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/finance/bank/match': {
+      id: '/api/$locale/finance/bank/match'
+      path: '/api/$locale/finance/bank/match'
+      fullPath: '/api/$locale/finance/bank/match'
+      preLoaderRoute: typeof ApiLocaleFinanceBankMatchRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/api/$locale/finance/data-sources/finance-series': {
       id: '/api/$locale/finance/data-sources/finance-series'
@@ -14377,6 +14537,13 @@ declare module '@tanstack/react-router' {
       path: '/$invoiceId/record-payment'
       fullPath: '/api/$locale/payment/invoice/$invoiceId/record-payment'
       preLoaderRoute: typeof ApiLocalePaymentInvoiceInvoiceIdRecordPaymentRouteImport
+      parentRoute: typeof ApiLocalePaymentInvoiceRoute
+    }
+    '/api/$locale/payment/invoice/$invoiceId/reverse-payment': {
+      id: '/api/$locale/payment/invoice/$invoiceId/reverse-payment'
+      path: '/$invoiceId/reverse-payment'
+      fullPath: '/api/$locale/payment/invoice/$invoiceId/reverse-payment'
+      preLoaderRoute: typeof ApiLocalePaymentInvoiceInvoiceIdReversePaymentRouteImport
       parentRoute: typeof ApiLocalePaymentInvoiceRoute
     }
     '/api/$locale/payment/invoice/$invoiceId/send': {
@@ -16308,6 +16475,7 @@ interface ApiLocalePaymentInvoiceRouteChildren {
   ApiLocalePaymentInvoiceInvoiceIdGetRoute: typeof ApiLocalePaymentInvoiceInvoiceIdGetRoute
   ApiLocalePaymentInvoiceInvoiceIdPublicViewRoute: typeof ApiLocalePaymentInvoiceInvoiceIdPublicViewRoute
   ApiLocalePaymentInvoiceInvoiceIdRecordPaymentRoute: typeof ApiLocalePaymentInvoiceInvoiceIdRecordPaymentRoute
+  ApiLocalePaymentInvoiceInvoiceIdReversePaymentRoute: typeof ApiLocalePaymentInvoiceInvoiceIdReversePaymentRoute
   ApiLocalePaymentInvoiceInvoiceIdSendRoute: typeof ApiLocalePaymentInvoiceInvoiceIdSendRoute
   ApiLocalePaymentInvoiceInvoiceIdSendReminderRoute: typeof ApiLocalePaymentInvoiceInvoiceIdSendReminderRoute
   ApiLocalePaymentInvoiceInvoiceIdVoidRoute: typeof ApiLocalePaymentInvoiceInvoiceIdVoidRoute
@@ -16327,6 +16495,8 @@ const ApiLocalePaymentInvoiceRouteChildren: ApiLocalePaymentInvoiceRouteChildren
       ApiLocalePaymentInvoiceInvoiceIdPublicViewRoute,
     ApiLocalePaymentInvoiceInvoiceIdRecordPaymentRoute:
       ApiLocalePaymentInvoiceInvoiceIdRecordPaymentRoute,
+    ApiLocalePaymentInvoiceInvoiceIdReversePaymentRoute:
+      ApiLocalePaymentInvoiceInvoiceIdReversePaymentRoute,
     ApiLocalePaymentInvoiceInvoiceIdSendRoute:
       ApiLocalePaymentInvoiceInvoiceIdSendRoute,
     ApiLocalePaymentInvoiceInvoiceIdSendReminderRoute:
@@ -17467,6 +17637,12 @@ const rootRouteChildren: RootRouteChildren = {
     ApiLocaleChartOfAccountsPeriodListRoute,
   ApiLocaleChartOfAccountsReportsBalanceSheetRoute:
     ApiLocaleChartOfAccountsReportsBalanceSheetRoute,
+  ApiLocaleChartOfAccountsReportsJournalExportRoute:
+    ApiLocaleChartOfAccountsReportsJournalExportRoute,
+  ApiLocaleChartOfAccountsReportsPayablesAgingRoute:
+    ApiLocaleChartOfAccountsReportsPayablesAgingRoute,
+  ApiLocaleChartOfAccountsReportsPostingReviewRoute:
+    ApiLocaleChartOfAccountsReportsPostingReviewRoute,
   ApiLocaleChartOfAccountsReportsProfitLossRoute:
     ApiLocaleChartOfAccountsReportsProfitLossRoute,
   ApiLocaleChartOfAccountsReportsReceivablesAgingRoute:
@@ -17480,6 +17656,10 @@ const rootRouteChildren: RootRouteChildren = {
     ApiLocaleCompaniesCompanyIdOnboardRoute,
   ApiLocaleCompaniesCompanyIdUpdateRoute:
     ApiLocaleCompaniesCompanyIdUpdateRoute,
+  ApiLocaleFinanceBankCandidatesRoute: ApiLocaleFinanceBankCandidatesRoute,
+  ApiLocaleFinanceBankImportRoute: ApiLocaleFinanceBankImportRoute,
+  ApiLocaleFinanceBankListRoute: ApiLocaleFinanceBankListRoute,
+  ApiLocaleFinanceBankMatchRoute: ApiLocaleFinanceBankMatchRoute,
   ApiLocaleFinanceDataSourcesFinanceSeriesRoute:
     ApiLocaleFinanceDataSourcesFinanceSeriesRoute,
   ApiLocaleInventoryStockAdjustRoute: ApiLocaleInventoryStockAdjustRoute,

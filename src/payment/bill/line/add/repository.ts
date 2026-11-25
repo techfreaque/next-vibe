@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import { eq, sql } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
@@ -20,6 +20,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { CompanyMemberRole } from "@/companies/enum";
 import { CompanyAuthRepository } from "@/companies/repository";
+import { TaxCalculator } from "@/tax/calculator";
 
 import { paymentBillLines, paymentBills } from "../../../db";
 import { BillStatus } from "../../../enum";
@@ -39,13 +40,13 @@ export class BillLineAddRepository {
     const { t } = scopedTranslation.scopedT(locale);
 
     try {
-      const [bill] = await db
-        .select()
+      const [observedBill] = await db
+        .select({ companyId: paymentBills.companyId })
         .from(paymentBills)
         .where(eq(paymentBills.id, data.billId))
         .limit(1);
 
-      if (!bill) {
+      if (!observedBill) {
         return fail({
           message: t("post.errors.notFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
@@ -55,7 +56,7 @@ export class BillLineAddRepository {
       // Verify ACCOUNTANT+ membership
       const authResult = await CompanyAuthRepository.requireMember(
         userId,
-        bill.companyId,
+        observedBill.companyId,
         CompanyMemberRole.ACCOUNTANT,
         logger,
         locale,
@@ -64,97 +65,125 @@ export class BillLineAddRepository {
         return authResult;
       }
 
-      if (bill.status !== BillStatus.DRAFT) {
-        return fail({
-          message: t("post.errors.conflict.title"),
-          errorType: ErrorResponseTypes.CONFLICT,
-        });
-      }
+      return await db.transaction(async (tx) => {
+        const [bill] = await tx
+          .select()
+          .from(paymentBills)
+          .where(
+            and(
+              eq(paymentBills.id, data.billId),
+              eq(paymentBills.companyId, observedBill.companyId),
+            ),
+          )
+          .limit(1)
+          .for("update");
 
-      const quantity = data.quantity ?? 1;
-      const unitPrice = data.unitPrice;
-      const taxRate = data.taxRate ?? 0;
-      const taxAmount = quantity * unitPrice * taxRate;
-      const lineTotal = quantity * unitPrice + taxAmount;
+        if (!bill) {
+          return fail({
+            message: t("post.errors.notFound.title"),
+            errorType: ErrorResponseTypes.NOT_FOUND,
+          });
+        }
 
-      // Get current max sort order
-      const existingLines = await db
-        .select({ sortOrder: paymentBillLines.sortOrder })
-        .from(paymentBillLines)
-        .where(eq(paymentBillLines.billId, data.billId));
+        // Verify ACCOUNTANT+ membership
 
-      const maxSortOrder = existingLines.reduce(
-        (max, l) => Math.max(max, l.sortOrder ?? 0),
-        -1,
-      );
+        if (bill.status !== BillStatus.DRAFT) {
+          return fail({
+            message: t("post.errors.conflict.title"),
+            errorType: ErrorResponseTypes.CONFLICT,
+          });
+        }
 
-      const [line] = await db
-        .insert(paymentBillLines)
-        .values({
+        const quantity = TaxCalculator.roundToFour(data.quantity ?? 1);
+        const unitPrice = TaxCalculator.roundToFour(data.unitPrice);
+        const taxRate = TaxCalculator.roundToFour(data.taxRate ?? 0);
+        const { taxAmount, total: lineTotal } =
+          TaxCalculator.calculateLineItemTax({
+            unitPrice,
+            quantity,
+            taxRate,
+          });
+
+        // Get current max sort order
+        const existingLines = await tx
+          .select({ sortOrder: paymentBillLines.sortOrder })
+          .from(paymentBillLines)
+          .where(eq(paymentBillLines.billId, data.billId));
+
+        const maxSortOrder = existingLines.reduce(
+          (max, l) => Math.max(max, l.sortOrder ?? 0),
+          -1,
+        );
+
+        const [line] = await tx
+          .insert(paymentBillLines)
+          .values({
+            billId: data.billId,
+            description: data.description,
+            productId: data.productId ?? null,
+            quantity,
+            unitPrice,
+            taxRate,
+            taxAmount,
+            lineTotal,
+            expenseAccountId: data.expenseAccountId ?? null,
+            sortOrder: maxSortOrder + 1,
+          })
+          .returning();
+
+        if (!line) {
+          return fail({
+            message: t("post.errors.server.title"),
+            errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          });
+        }
+
+        // Update bill totals by summing all lines
+        await tx
+          .update(paymentBills)
+          .set({
+            subtotal: sql`(
+              SELECT SUM(line_total - tax_amount) FROM payment_bill_lines
+              WHERE bill_id = ${data.billId}
+            )`,
+            taxAmount: sql`(
+              SELECT SUM(tax_amount) FROM payment_bill_lines
+              WHERE bill_id = ${data.billId}
+            )`,
+            total: sql`(
+              SELECT SUM(line_total) FROM payment_bill_lines
+              WHERE bill_id = ${data.billId}
+            )`,
+            updatedAt: new Date(),
+          })
+          .where(eq(paymentBills.id, data.billId));
+
+        logger.debug("Bill line added", {
+          lineId: line.id,
           billId: data.billId,
-          description: data.description,
-          productId: data.productId ?? null,
-          quantity,
-          unitPrice,
-          taxRate,
-          taxAmount,
           lineTotal,
-          expenseAccountId: data.expenseAccountId ?? null,
-          sortOrder: maxSortOrder + 1,
-        })
-        .returning();
-
-      if (!line) {
-        return fail({
-          message: t("post.errors.server.title"),
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
         });
-      }
 
-      // Update bill totals by summing all lines
-      await db
-        .update(paymentBills)
-        .set({
-          subtotal: sql`(
-            SELECT SUM(line_total - tax_amount) FROM payment_bill_lines
-            WHERE bill_id = ${data.billId}
-          )`,
-          taxAmount: sql`(
-            SELECT SUM(tax_amount) FROM payment_bill_lines
-            WHERE bill_id = ${data.billId}
-          )`,
-          total: sql`(
-            SELECT SUM(line_total) FROM payment_bill_lines
-            WHERE bill_id = ${data.billId}
-          )`,
-          updatedAt: new Date(),
-        })
-        .where(eq(paymentBills.id, data.billId));
-
-      logger.debug("Bill line added", {
-        lineId: line.id,
-        billId: data.billId,
-        lineTotal,
-      });
-
-      return success({
-        success: true,
-        message: null,
-        line: {
-          id: line.id,
-          billId: line.billId,
-          description: line.description,
-          productId: line.productId,
-          quantity: line.quantity,
-          unitPrice: line.unitPrice,
-          taxRate: line.taxRate,
-          taxAmount: line.taxAmount,
-          lineTotal: line.lineTotal,
-          expenseAccountId: line.expenseAccountId,
-          sortOrder: line.sortOrder,
-          createdAt: line.createdAt,
-          updatedAt: line.updatedAt,
-        },
+        return success({
+          success: true,
+          message: null,
+          line: {
+            currency: bill.currency,
+            id: line.id,
+            billId: line.billId,
+            description: line.description,
+            productId: line.productId,
+            quantity: line.quantity,
+            unitPrice: line.unitPrice,
+            taxRate: line.taxRate,
+            taxAmount: line.taxAmount,
+            lineTotal: line.lineTotal,
+            expenseAccountId: line.expenseAccountId,
+            sortOrder: line.sortOrder,
+            createdAt: line.createdAt,
+            updatedAt: line.updatedAt,
+          },
+        });
       });
     } catch (error) {
       logger.error("Failed to add bill line", parseError(error));

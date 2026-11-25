@@ -5,6 +5,7 @@ import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { Span } from "next-vibe/ui/components/span";
 import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
+import { formatMoney } from "next-vibe/unified-ui/_shared/format-money";
 import {
   useWidgetForm,
   useWidgetLocale,
@@ -33,11 +34,7 @@ export function PosSessionCloseWidget({
   const locale = useWidgetLocale();
   const result = data?.result;
 
-  const fmt = (n: number): string =>
-    new Intl.NumberFormat(locale, {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(n);
+  const fmt = (n: number): string => formatMoney(n, result?.currency, locale);
 
   // Read sessionId from form for display purposes (no state needed)
   const sessionId = form?.getValues("details.sessionId") ?? "";
@@ -119,16 +116,17 @@ export function PosSessionCloseWidget({
           </Div>
 
           {/* Actual closing float */}
-          <Div className="flex items-center justify-between px-4 py-3">
-            <Span className="text-sm text-muted-foreground">
-              {t("sessionClose.post.widget.actualClosingFloat")}
-            </Span>
-            <Span className="text-sm font-mono tabular-nums">
-              {result.closingFloat !== null && result.closingFloat !== undefined
-                ? fmt(result.closingFloat)
-                : "—"}
-            </Span>
-          </Div>
+          {result.closingFloat !== null &&
+            result.closingFloat !== undefined && (
+              <Div className="flex items-center justify-between px-4 py-3">
+                <Span className="text-sm text-muted-foreground">
+                  {t("sessionClose.post.widget.actualClosingFloat")}
+                </Span>
+                <Span className="text-sm font-mono tabular-nums">
+                  {fmt(result.closingFloat)}
+                </Span>
+              </Div>
+            )}
 
           {/* Variance — prominent */}
           <Div className="flex items-center justify-between px-4 py-3 bg-muted/10">

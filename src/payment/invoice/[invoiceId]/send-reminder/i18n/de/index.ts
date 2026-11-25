@@ -8,16 +8,17 @@ export const translations: typeof enTranslations = {
     ar: "forderungen",
   },
   post: {
-    title: "Zahlungserinnerung senden",
-    titleShort: "Erinnerung senden",
+    title: "Zahlungserinnerung vorbereiten",
+    titleShort: "Erinnerung vorbereiten",
     description:
-      "Zahlungserinnerung für eine überfällige Rechnung senden. Rechnung muss offen und das Fälligkeitsdatum überschritten sein. Die Erinnerung wird als Kundennotiz protokolliert.",
+      "Erstellen Sie einen Entwurf mit dem offenen Betrag und einer optionalen Nachricht.",
     form: {
-      title: "Erinnerung senden",
-      description: "Kunden über ihre überfällige Zahlung benachrichtigen",
+      title: "Erinnerung vorbereiten",
+      description:
+        "Prüfen Sie den offenen Betrag, bevor Sie den Entwurf weitergeben.",
     },
     response: {
-      success: "Erinnerung gesendet",
+      success: "Erinnerungsentwurf bereit",
       message: "Statusmeldung",
     },
     errors: {
@@ -52,7 +53,7 @@ export const translations: typeof enTranslations = {
       conflict: {
         title: "Nicht überfällig",
         description:
-          "Erinnerungen können nur für offene, überfällige Rechnungen gesendet werden",
+          "Die Rechnung muss offen, unbezahlt oder teilbezahlt und bereits fällig sein.",
       },
       unsavedChanges: {
         title: "Ungespeicherte Änderungen",
@@ -60,8 +61,9 @@ export const translations: typeof enTranslations = {
       },
     },
     success: {
-      title: "Erfolg",
-      description: "Zahlungserinnerung gesendet und protokolliert",
+      title: "Erinnerungsentwurf bereit",
+      description:
+        "Im Rechnungsverlauf gespeichert. Die Erinnerung kann jetzt an den Kunden weitergegeben werden.",
     },
   },
   invoiceId: {
@@ -75,9 +77,16 @@ export const translations: typeof enTranslations = {
     placeholder: "Persönliche Notiz zur Erinnerung hinzufügen...",
   },
   widget: {
+    copy: "Erinnerung kopieren",
+    copied: "Erinnerung kopiert",
+    copyFailed: "Kopieren fehlgeschlagen. Erneut versuchen",
+    download: "Erinnerung herunterladen",
+    subject: "Zahlungserinnerung zur Rechnung {{number}}",
+    body: "Der offene Betrag beträgt {{amount}}. Die Zahlung war am {{date}} fällig.",
     back: "Zurück",
-    submit: "Erinnerung senden",
-    reminderSent: "Erinnerung gesendet. Der Kunde wurde benachrichtigt.",
+    submit: "Erinnerung vorbereiten",
+    reminderSent:
+      "Im Rechnungsverlauf gespeichert. Die Erinnerung kann jetzt an den Kunden weitergegeben werden.",
     viewInvoice: "Rechnung ansehen",
   },
 };

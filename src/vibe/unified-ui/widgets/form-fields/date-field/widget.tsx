@@ -39,9 +39,11 @@ import {
 } from "../../../_shared/use-widget-context";
 import { scopedTranslation as unifiedInterfaceScopedTranslation } from "../../../hooks/i18n";
 import { getTheme } from "../_shared/constants";
+import { parseFormDate } from "../_shared/date-value";
 import { renderPrefillDisplay } from "../_shared/prefill";
 import { getFieldStyleClassName } from "../_shared/styling";
 import { getFieldValidationState } from "../_shared/validation";
+import { pickerDateFromUtcDay, utcDayFromPickerDate } from "./calendar-date";
 import type { DateFieldWidgetConfig } from "./types";
 
 export function DateFieldWidget<
@@ -54,11 +56,12 @@ export function DateFieldWidget<
 >({
   field,
   fieldName,
+  utcCalendarDay = false,
 }: ReactFormFieldProps<
   TEndpoint,
   TUsage,
   DateFieldWidgetConfig<TKey, TSchema, TUsage>
->): JSX.Element {
+> & { utcCalendarDay?: boolean }): JSX.Element {
   const { t: tField } = useWidgetContext();
   const locale = useWidgetLocale();
   const form = useWidgetForm();
@@ -152,14 +155,30 @@ export function DateFieldWidget<
                 )
               ) : (
                 <DatePicker
-                  value={formField.value as Date | undefined}
-                  onChange={(date) => formField.onChange(date)}
+                  value={
+                    utcCalendarDay
+                      ? pickerDateFromUtcDay(formField.value)
+                      : parseFormDate(formField.value)
+                  }
+                  onChange={(date) =>
+                    formField.onChange(
+                      utcCalendarDay ? utcDayFromPickerDate(date) : date,
+                    )
+                  }
                   onBlur={formField.onBlur}
                   placeholder={
                     field.placeholder ? tField(field.placeholder) : undefined
                   }
-                  minDate={field.minDate}
-                  maxDate={field.maxDate}
+                  minDate={
+                    utcCalendarDay
+                      ? pickerDateFromUtcDay(field.minDate)
+                      : field.minDate
+                  }
+                  maxDate={
+                    utcCalendarDay
+                      ? pickerDateFromUtcDay(field.maxDate)
+                      : field.maxDate
+                  }
                   disabled={isDisabled || field.disabled || field.readonly}
                   className={styleClassName.inputClassName}
                   name={formField.name}

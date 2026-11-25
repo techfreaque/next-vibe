@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import { eq, sum } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
@@ -15,14 +15,16 @@ import {
   success,
 } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
-import { db } from "next-vibe/database";
 import type { EndpointLogger } from "next-vibe/logger/types";
-
-import { CompanyMemberRole } from "@/companies/enum";
-import { CompanyAuthRepository } from "@/companies/repository";
 
 import { purchaseOrderLines, purchaseOrders } from "../../../db";
 import { scopedTranslation } from "../../../i18n";
+import {
+  purchaseLineAmounts,
+  purchaseTotals,
+  validOrderReferences,
+  withDraftOrder,
+} from "../../draft";
 import type {
   OrderLineAddRequestOutput,
   OrderLineAddResponseOutput,
@@ -39,110 +41,87 @@ export class OrderLineAddRepository {
     const { t } = scopedTranslation.scopedT(locale);
 
     try {
-      const [po] = await db
-        .select()
-        .from(purchaseOrders)
-        .where(eq(purchaseOrders.id, poId))
-        .limit(1);
-
-      if (!po) {
-        return fail({
-          message: t("orderLineAdd.post.errors.notFound.title"),
-          errorType: ErrorResponseTypes.NOT_FOUND,
-        });
-      }
-
-      if (po.status !== "DRAFT") {
-        return fail({
-          message: t("orderLineAdd.post.errors.conflict.title"),
-          errorType: ErrorResponseTypes.CONFLICT,
-        });
-      }
-
-      const authResult = await CompanyAuthRepository.requireMember(
+      return await withDraftOrder(
+        poId,
         userId,
-        po.companyId,
-        CompanyMemberRole.MEMBER,
         logger,
         locale,
-      );
-      if (!authResult.success) {
-        return fail({
-          message: t("orderLineAdd.post.errors.forbidden.title"),
-          errorType: ErrorResponseTypes.FORBIDDEN,
-        });
-      }
-
-      const taxRate = data.taxRate ?? 0;
-      const taxAmount = data.quantity * data.unitPrice * taxRate;
-      const lineTotal = data.quantity * data.unitPrice * (1 + taxRate);
-
-      // Count existing lines for sort order
-      const existingLines = await db
-        .select({ id: purchaseOrderLines.id })
-        .from(purchaseOrderLines)
-        .where(eq(purchaseOrderLines.poId, poId));
-
-      const sortOrder = existingLines.length;
-
-      const [newLine] = await db
-        .insert(purchaseOrderLines)
-        .values({
-          poId,
-          productId: data.productId ?? null,
-          description: data.itemDescription,
-          quantity: data.quantity,
-          unitPrice: data.unitPrice,
-          taxRate,
-          taxAmount,
-          lineTotal,
-          sortOrder,
-        })
-        .returning({ id: purchaseOrderLines.id });
-
-      if (!newLine) {
-        return fail({
-          message: t("orderLineAdd.post.errors.server.title"),
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        });
-      }
-
-      // Recalculate PO totals from all lines
-      const totals = await db
-        .select({
-          subtotal: sum(purchaseOrderLines.lineTotal),
-          taxAmount: sum(purchaseOrderLines.taxAmount),
-        })
-        .from(purchaseOrderLines)
-        .where(eq(purchaseOrderLines.poId, poId));
-
-      const rawSubtotal = Number(totals[0]?.subtotal ?? 0);
-      const rawTaxAmount = Number(totals[0]?.taxAmount ?? 0);
-      // subtotal = line totals excluding tax = sum(qty * unitPrice)
-      const newSubtotal = rawSubtotal - rawTaxAmount;
-      const newTaxAmount = rawTaxAmount;
-      const newTotal = rawSubtotal;
-
-      await db
-        .update(purchaseOrders)
-        .set({
-          subtotal: newSubtotal,
-          taxAmount: newTaxAmount,
-          total: newTotal,
-          updatedAt: new Date(),
-        })
-        .where(eq(purchaseOrders.id, poId));
-
-      logger.info("Line added to purchase order", { poId, lineId: newLine.id });
-
-      return success({
-        result: {
-          lineId: newLine.id,
-          subtotal: newSubtotal,
-          taxAmount: newTaxAmount,
-          total: newTotal,
+        {
+          notFound: t("orderLineAdd.post.errors.notFound.title"),
+          conflict: t("orderLineAdd.post.errors.conflict.title"),
         },
-      });
+        async (tx, po) => {
+          const amounts = purchaseLineAmounts(data);
+          if (
+            !amounts ||
+            !(await validOrderReferences(tx, po.companyId, userId, {
+              productIds: data.productId ? [data.productId] : [],
+            }))
+          ) {
+            return fail({
+              message: t("orderLineAdd.post.errors.validation.title"),
+              errorType: ErrorResponseTypes.VALIDATION_ERROR,
+            });
+          }
+          const { taxAmount, lineTotal } = amounts;
+          const taxRate = data.taxRate ?? 0;
+          // Count existing lines for sort order
+          const existingLines = await tx
+            .select({ sortOrder: purchaseOrderLines.sortOrder })
+            .from(purchaseOrderLines)
+            .where(eq(purchaseOrderLines.poId, poId));
+
+          const sortOrder =
+            existingLines.reduce(
+              (highest, row) => Math.max(highest, row.sortOrder ?? 0),
+              -1,
+            ) + 1;
+
+          const [newLine] = await tx
+            .insert(purchaseOrderLines)
+            .values({
+              poId,
+              productId: data.productId ?? null,
+              description: data.itemDescription,
+              quantity: data.quantity,
+              unitPrice: data.unitPrice,
+              taxRate,
+              taxAmount,
+              lineTotal,
+              sortOrder,
+            })
+            .returning({ id: purchaseOrderLines.id });
+
+          if (!newLine) {
+            return fail({
+              message: t("orderLineAdd.post.errors.server.title"),
+              errorType: ErrorResponseTypes.INTERNAL_ERROR,
+            });
+          }
+
+          const totals = await purchaseTotals(tx, poId);
+          await tx
+            .update(purchaseOrders)
+            .set({
+              ...totals,
+              updatedAt: new Date(),
+            })
+            .where(eq(purchaseOrders.id, poId));
+
+          logger.info("Line added to purchase order", {
+            poId,
+            lineId: newLine.id,
+          });
+
+          return success({
+            result: {
+              currency: po.currency,
+              lineId: newLine.id,
+              ...totals,
+            },
+          });
+        },
+      );
     } catch (error) {
       logger.error("Failed to add line to PO", parseError(error));
       return fail({

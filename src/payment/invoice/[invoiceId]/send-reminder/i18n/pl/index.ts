@@ -8,16 +8,16 @@ export const translations: typeof enTranslations = {
     ar: "należności",
   },
   post: {
-    title: "Wyślij przypomnienie o płatności",
-    titleShort: "Wyślij przypomnienie",
+    title: "Przygotuj przypomnienie o płatności",
+    titleShort: "Przygotuj przypomnienie",
     description:
-      "Wyślij przypomnienie o płatności dla przeterminowanej faktury. Faktura musi być otwarta i po terminie płatności. Przypomnienie jest zapisywane jako notatka klienta.",
+      "Utwórz szkic przypomnienia z aktualną zaległością i opcjonalną wiadomością.",
     form: {
-      title: "Wyślij przypomnienie",
-      description: "Powiadom klienta o przeterminowanej płatności",
+      title: "Przygotuj przypomnienie",
+      description: "Sprawdź kwotę do zapłaty przed wysłaniem szkicu.",
     },
     response: {
-      success: "Przypomnienie wysłane",
+      success: "Szkic przypomnienia gotowy",
       message: "Komunikat statusu",
     },
     errors: {
@@ -52,7 +52,7 @@ export const translations: typeof enTranslations = {
       conflict: {
         title: "Nie przeterminowana",
         description:
-          "Przypomnienia można wysyłać tylko dla otwartych faktur po terminie płatności",
+          "Faktura musi być otwarta, po terminie i mieć dodatnie saldo.",
       },
       unsavedChanges: {
         title: "Niezapisane zmiany",
@@ -60,8 +60,9 @@ export const translations: typeof enTranslations = {
       },
     },
     success: {
-      title: "Sukces",
-      description: "Przypomnienie o płatności wysłane i zarejestrowane",
+      title: "Szkic przypomnienia gotowy",
+      description:
+        "Przypomnienie zapisano w historii faktury. Możesz przekazać je klientowi.",
     },
   },
   invoiceId: {
@@ -75,9 +76,16 @@ export const translations: typeof enTranslations = {
     placeholder: "Dodaj osobistą notatkę do przypomnienia...",
   },
   widget: {
+    copy: "Kopiuj przypomnienie",
+    copied: "Skopiowano przypomnienie",
+    copyFailed: "Nie udało się skopiować. Spróbuj ponownie",
+    download: "Pobierz przypomnienie",
+    subject: "Przypomnienie o płatności za fakturę {{number}}",
+    body: "Do zapłaty pozostało {{amount}}. Termin płatności: {{date}}.",
     back: "Wróć",
-    submit: "Wyślij przypomnienie",
-    reminderSent: "Przypomnienie wysłane. Klient został powiadomiony.",
+    submit: "Przygotuj przypomnienie",
+    reminderSent:
+      "Przypomnienie zapisano w historii faktury. Możesz przekazać je klientowi.",
     viewInvoice: "Zobacz fakturę",
   },
 };

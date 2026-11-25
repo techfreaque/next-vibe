@@ -88,10 +88,12 @@ export function CoaPeriodCreateWidget({
         />
         <Div className="grid grid-cols-2 gap-3">
           <DateFieldWidget
+            utcCalendarDay
             fieldName="startDate"
             field={withValue(field.children.startDate, undefined, null)}
           />
           <DateFieldWidget
+            utcCalendarDay
             fieldName="endDate"
             field={withValue(field.children.endDate, undefined, null)}
           />

@@ -44,6 +44,8 @@ import { getTheme } from "../_shared/constants";
 import { renderPrefillDisplay } from "../_shared/prefill";
 import { getFieldStyleClassName } from "../_shared/styling";
 import { getFieldValidationState } from "../_shared/validation";
+import { DecimalInput } from "./decimal-input";
+import type { DecimalPresentation } from "./decimal-value";
 import type { NumberFieldWidgetConfig } from "./types";
 
 /**
@@ -85,11 +87,16 @@ export function NumberFieldWidget<
 >({
   field,
   fieldName,
+  presentation,
+  currency,
 }: ReactFormFieldProps<
   TEndpoint,
   TUsage,
   NumberFieldWidgetConfig<TKey, TSchema, TUsage>
->): JSX.Element {
+> & {
+  presentation?: DecimalPresentation;
+  currency?: string | null;
+}): JSX.Element {
   const { t: tField } = useWidgetContext();
   const locale = useWidgetLocale();
   const form = useWidgetForm();
@@ -137,26 +144,28 @@ export function NumberFieldWidget<
                   {field.label && style === "asterisk" && isRequired && (
                     <Span className="text-info font-bold">*</Span>
                   )}
-                  {field.description && descriptionStyle === "tooltip" && (
-                    <TooltipProvider delayDuration={300}>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button
-                            type="button"
-                            className="cursor-help inline-flex"
-                            variant={"ghost"}
-                          >
-                            <Info className="h-4 w-4 text-muted-foreground hover:text-foreground transition-colors" />
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent className="max-w-[250px]">
-                          <Span className="text-sm">
-                            {tField(field.description)}
-                          </Span>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                  )}
+                  {!presentation &&
+                    field.description &&
+                    descriptionStyle === "tooltip" && (
+                      <TooltipProvider delayDuration={300}>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              type="button"
+                              className="cursor-help inline-flex"
+                              variant={"ghost"}
+                            >
+                              <Info className="h-4 w-4 text-muted-foreground hover:text-foreground transition-colors" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent className="max-w-[250px]">
+                            <Span className="text-sm">
+                              {tField(field.description)}
+                            </Span>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    )}
                 </FormLabel>
                 {style === "badge" && isRequired && (
                   <Badge
@@ -167,12 +176,14 @@ export function NumberFieldWidget<
                   </Badge>
                 )}
               </Div>
-              {field.description && descriptionStyle === "inline" && (
-                <Div className={styleClassName.inlineDescriptionClassName}>
-                  <Info className="h-3.5 w-3.5 flex-shrink-0 mt-0.5" />
-                  <Span>{tField(field.description)}</Span>
-                </Div>
-              )}
+              {!presentation &&
+                field.description &&
+                descriptionStyle === "inline" && (
+                  <Div className={styleClassName.inlineDescriptionClassName}>
+                    <Info className="h-3.5 w-3.5 flex-shrink-0 mt-0.5" />
+                    <Span>{tField(field.description)}</Span>
+                  </Div>
+                )}
             </Div>
 
             <FormControl>
@@ -185,6 +196,22 @@ export function NumberFieldWidget<
                   field.prefillDisplay,
                   tField,
                 )
+              ) : presentation ? (
+                <DecimalInput
+                  name={formField.name}
+                  aria-label={field.label && tField(field.label)}
+                  aria-invalid={fieldState.invalid}
+                  locale={locale}
+                  presentation={presentation}
+                  suffix={
+                    presentation === "percent" ? "%" : (currency ?? undefined)
+                  }
+                  value={formField.value}
+                  onChange={formField.onChange}
+                  onBlur={formField.onBlur}
+                  disabled={isDisabled || field.disabled || field.readonly}
+                  className={styleClassName.inputClassName}
+                />
               ) : (
                 <NumberInput
                   name={formField.name}

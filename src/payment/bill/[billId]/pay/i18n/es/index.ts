@@ -12,6 +12,12 @@ export const translations: typeof enTranslations = {
       description: "La cuenta para marcar como pago",
     },
     errors: {
+      approvalPosting:
+        "Registra el asiento de aprobación antes de pagar esta factura.",
+      paymentAccount:
+        "Elige una cuenta bancaria o de caja activa de esta empresa.",
+      paymentPosting:
+        "Revisa la fecha de pago, la moneda de la empresa y las cuentas de registro.",
       validation: {
         title: "Error de validación",
         description: "Entrada inválida",

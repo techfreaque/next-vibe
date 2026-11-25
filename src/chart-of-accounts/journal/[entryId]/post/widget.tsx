@@ -1,28 +1,38 @@
 "use client";
 
-import { Badge } from "next-vibe/ui/components/badge";
 import { Button } from "next-vibe/ui/components/button";
-import { Div } from "next-vibe/ui/components/div";
 import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
-import { Span } from "next-vibe/ui/components/span";
+import { ResultBanner } from "next-vibe/ui/components/result-banner";
+import { WidgetHeader } from "next-vibe/ui/components/widget-header";
+import { WidgetShell } from "next-vibe/ui/components/widget-shell";
 import {
+  useWidgetForm,
+  useWidgetIsInteractive,
   useWidgetNavigation,
+  useWidgetResponseOnly,
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
+import { EntityPickerFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/entity-picker-field/widget";
 import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 import type { JSX } from "react";
 
 import type definition from "./definition";
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export function CoaJournalPostWidget(_props: {
-  field: (typeof definition.POST)["fields"];
+export function CoaJournalPostWidget({
+  field: { children },
+}: {
+  field: typeof definition.POST.fields;
 }): JSX.Element {
   const data = useWidgetValue<typeof definition.POST>();
   const navigation = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.POST>();
+  const form = useWidgetForm<typeof definition.POST>();
+  const interactive = useWidgetIsInteractive();
+  const responseOnly = useWidgetResponseOnly();
+  const showActions = interactive && !responseOnly;
+  const entryId = form.watch("entryId");
 
   const handleViewList = (): void => {
     void (async (): Promise<void> => {
@@ -31,54 +41,75 @@ export function CoaJournalPostWidget(_props: {
     })();
   };
 
-  if (data?.posted !== undefined) {
-    return (
-      <Div className="flex flex-col gap-4">
-        <Div className="flex items-center gap-3 p-4 rounded-lg border bg-emerald-50/50 dark:bg-emerald-900/10 border-emerald-200 dark:border-emerald-800">
-          <Span className="text-sm font-medium flex-1">
-            {t("journalPost.success.description")}
-          </Span>
-          <Badge
-            variant={data.posted ? "default" : "destructive"}
-            className={`text-xs shrink-0 ${data.posted ? "bg-emerald-600 hover:bg-emerald-600 dark:bg-emerald-700" : ""}`}
-          >
-            {t("enums.journalEntryStatus.POSTED")}
-          </Badge>
-        </Div>
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          onClick={handleViewList}
-        >
-          {t("journalPost.widget.backButton")}
-        </Button>
-      </Div>
-    );
-  }
+  const viewEntry = (): void => {
+    if (!entryId) {
+      return;
+    }
+    void (async (): Promise<void> => {
+      const mod = await import("../get/definition");
+      navigation.push(mod.default.GET, { urlPathParams: { entryId } });
+    })();
+  };
 
   return (
-    <Div className="flex flex-col gap-4">
-      {navigation.canGoBack && (
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={() => navigation.pop()}
-          className="self-start gap-1.5 -ml-1"
-        >
-          <ChevronLeft className="h-4 w-4" />
-          {t("journalPost.widget.back")}
-        </Button>
-      )}
-
-      <Span className="text-base font-semibold">{t("journalPost.title")}</Span>
-      <Span className="text-sm text-muted-foreground">
-        {t("journalPost.description")}
-      </Span>
-
+    <WidgetShell layout="page">
+      <WidgetHeader
+        size="page"
+        title={t("journalPost.title")}
+        subtitle={data?.posted ? undefined : t("journalPost.description")}
+        backButton={
+          showActions &&
+          navigation.canGoBack && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => navigation.pop()}
+            >
+              <ChevronLeft className="h-4 w-4" />
+              {t("journalPost.widget.back")}
+            </Button>
+          )
+        }
+        actions={
+          showActions &&
+          !data?.posted &&
+          entryId && (
+            <SubmitButtonWidget<typeof definition.POST>
+              field={{ text: "journalPost.title" }}
+            />
+          )
+        }
+      />
       <FormAlertWidget field={{}} />
-      <SubmitButtonWidget<typeof definition.POST> field={{}} />
-    </Div>
+      {data?.posted && (
+        <ResultBanner
+          variant="success"
+          title={t("enums.journalEntryStatus.POSTED")}
+          message={t("journalPost.success.description")}
+        >
+          {showActions && (
+            <>
+              {entryId && (
+                <Button type="button" size="sm" onClick={viewEntry}>
+                  {t("journalCreate.widget.viewEntryButton")}
+                </Button>
+              )}
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleViewList}
+              >
+                {t("journalPost.widget.backButton")}
+              </Button>
+            </>
+          )}
+        </ResultBanner>
+      )}
+      {showActions && !entryId && (
+        <EntityPickerFieldWidget fieldName="entryId" field={children.entryId} />
+      )}
+    </WidgetShell>
   );
 }

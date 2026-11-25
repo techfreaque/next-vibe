@@ -25,19 +25,28 @@ export const translations: typeof enTranslations = {
         description: "Nie ste členom tejto firmy.",
       },
       conflict: { title: "Konflikt", description: "Konflikt údajov" },
-      server: { title: "Chyba servera", description: "Faktúry sa nepodarilo načítať." },
+      server: {
+        title: "Chyba servera",
+        description: "Faktúry sa nepodarilo načítať.",
+      },
       unknown: {
         title: "Neznáma chyba",
         description: "Nastala neočakávaná chyba",
       },
-      network: { title: "Chyba siete", description: "Skontrolujte pripojenie." },
+      network: {
+        title: "Chyba siete",
+        description: "Skontrolujte pripojenie.",
+      },
       notFound: { title: "Nenašlo sa", description: "Firma sa nenašla" },
       unsavedChanges: {
         title: "Neuložené zmeny",
         description: "Máte neuložené zmeny",
       },
     },
-    success: { title: "Faktúry boli načítané", description: "Prijaté faktúry boli načítané." },
+    success: {
+      title: "Faktúry boli načítané",
+      description: "Prijaté faktúry boli načítané.",
+    },
     response: {
       totalCount: "Spolu",
       id: "ID",
@@ -60,7 +69,7 @@ export const translations: typeof enTranslations = {
     label: "Hľadať doklady",
     description:
       "Vyhľadávajte podľa čísla faktúry, dodávateľa alebo ID. Filtrujte podľa firmy alebo stavu.",
-    placeholder: "Číslo faktúry, dodávateľ alebo ID",
+    placeholder: "Číslo faktúry alebo dodávateľ",
   },
   status: {
     label: "Stav",
@@ -68,7 +77,10 @@ export const translations: typeof enTranslations = {
     placeholder: "Všetky stavy",
   },
   page: { label: "Strana", description: "Číslo strany" },
-  pageSize: { label: "Počet na strane", description: "Počet výsledkov na strane" },
+  pageSize: {
+    label: "Počet na strane",
+    description: "Počet výsledkov na strane",
+  },
   enums: {
     billStatus: {
       DRAFT: "Koncept",
@@ -79,6 +91,7 @@ export const translations: typeof enTranslations = {
     },
   },
   widget: {
+    filters: "Filtre",
     pageCount: "Počet strán",
     back: "Späť",
     title: "Dodávateľské faktúry",

@@ -17,6 +17,7 @@ export const translations = {
       description: "Accounts per page (max 200)",
     },
     response: {
+      balance: "Balance",
       total: "Total",
       accounts: "Accounts",
       id: "ID",
@@ -75,6 +76,8 @@ export const translations = {
       description: "Chart of accounts retrieved successfully",
     },
     widget: {
+      debitSide: "Dr",
+      creditSide: "Cr",
       loading: "Loading accounts...",
       empty: "No accounts yet. Run setup to seed from a template.",
       createButton: "New Account",

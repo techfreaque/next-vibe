@@ -53,6 +53,10 @@ import type {
   HelpToolMetadataSerialized,
   HelpToolParameters,
 } from "./definition";
+import {
+  getErpNavigationAliases,
+  getErpWorkflowAliases,
+} from "./erp-workflows";
 import { scopedTranslation } from "./i18n";
 import { narrowPublicPins, resolveAgentPins } from "./repository/agent-pins";
 import {
@@ -271,7 +275,7 @@ export class HelpRepository {
       fr: () => import("@/generated/endpoints/meta/fr"),
       it: () => import("@/generated/endpoints/meta/it"),
       es: () => import("@/generated/endpoints/meta/es"),
-      sk: () => import("@/generated/endpoints/meta/en"),
+      sk: () => import("@/generated/endpoints/meta/sk"),
     };
     const endMetadataLoad = RunningTaskRegistry.beginPhase(
       `help:metadata-import:${language}`,
@@ -316,6 +320,13 @@ export class HelpRepository {
       isAdmin && isWebPlatform && !viewAsRole
         ? getRecordSearchTargets(CATEGORY_REGISTRY, webCatalog)
         : undefined;
+    const showErp = isAdmin && isWebPlatform && !viewAsRole && !data.instanceId;
+    const erpWorkflowAliases = showErp
+      ? getErpWorkflowAliases(webCatalog)
+      : undefined;
+    const erpNavigationAliases = showErp
+      ? getErpNavigationAliases(CATEGORY_REGISTRY, webCatalog)
+      : undefined;
     const catalogOverview =
       isAdmin && isWebPlatform && !viewAsRole
         ? getCatalogOverview(CATEGORY_REGISTRY, webCatalog)
@@ -733,6 +744,8 @@ export class HelpRepository {
       categories,
       webCategories: isWebPlatform ? buildCategories(webCatalog) : undefined,
       recordSearchTargets,
+      erpWorkflowAliases,
+      erpNavigationAliases,
       catalogOverview,
       hint:
         totalPages > 1

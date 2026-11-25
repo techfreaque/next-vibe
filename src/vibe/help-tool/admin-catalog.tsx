@@ -1,5 +1,11 @@
 "use client";
 
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "next-vibe/ui/components/accordion";
 import { Badge } from "next-vibe/ui/components/badge";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
@@ -15,6 +21,7 @@ import { H1, H2, P } from "next-vibe/ui/components/typography";
 import type { JSX, ReactNode } from "react";
 import { useState } from "react";
 
+import type { WorkspaceCompany } from "@/companies/_shared/workspace-company";
 import { ADMIN_GROUPS } from "@/generated/categories/registry";
 
 import type { CountryLanguage } from "../core/i18n/core/config";
@@ -28,22 +35,13 @@ import type {
   HelpGetResponseOutput,
   HelpToolMetadataSerialized,
 } from "./definition";
+import { ErpCatalogIntro, ErpCatalogWorkflows } from "./erp-catalog";
 import type { HelpT } from "./i18n";
+import { localizedLabel } from "./localized-label";
 
 type CategorySummary = NonNullable<
   HelpGetResponseOutput["webCategories"]
 >[number];
-
-export function localizedLabel(
-  labels: Record<string, string>,
-  locale: string,
-): string | undefined {
-  const language = `${locale.split("-")[0]}-`;
-  return (
-    labels[locale] ??
-    Object.entries(labels).find(([key]) => key.startsWith(language))?.[1]
-  );
-}
 
 function categoryLabel(
   key: string,
@@ -110,6 +108,10 @@ export function AdminCatalog({
   search,
   layoutControls,
   recordSearchTargets,
+  erpWorkflowAliases,
+  activeCompany,
+  hasNoCompany,
+  accountingOverview,
   overview,
   loading,
   error,
@@ -135,7 +137,11 @@ export function AdminCatalog({
   recordSearchTargets: NonNullable<
     HelpGetResponseOutput["recordSearchTargets"]
   >;
-  /** Business overview report shown first at the catalog root. */
+  erpWorkflowAliases?: readonly string[];
+  activeCompany?: WorkspaceCompany;
+  hasNoCompany: boolean;
+  accountingOverview?: ReactNode;
+  /** Business overview report on the catalog root. */
   overview?: ReactNode;
   loading: boolean;
   error?: string;
@@ -173,11 +179,26 @@ export function AdminCatalog({
     groups.set(group, items);
   }
 
-  const showOverview = !!overview && !activeCategory && !isSearching;
+  const isCatalogRoot = !activeCategory && !isSearching;
+  const erpAvailable =
+    isCatalogRoot && erpWorkflowAliases?.length
+      ? new Set(erpWorkflowAliases)
+      : undefined;
+  const showOverview = !!overview && isCatalogRoot;
+  const showOverviewFirst = showOverview && !erpAvailable;
 
   return (
-    <Div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 pb-8 pt-6 sm:px-8">
-      {showOverview && (
+    <Div className="@container mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 pb-8 pt-6 sm:px-8">
+      {erpAvailable && (
+        <ErpCatalogIntro
+          available={erpAvailable}
+          t={t}
+          onOpenTool={onOpenTool}
+          hasActiveCompany={!!activeCompany}
+          hasNoCompany={hasNoCompany}
+        />
+      )}
+      {showOverviewFirst && (
         <Div className="flex flex-col gap-3">
           <Div className="flex flex-wrap items-center justify-between gap-3">
             <H1 className="min-w-0 break-words text-2xl font-semibold sm:text-3xl">
@@ -188,34 +209,62 @@ export function AdminCatalog({
           {overview}
         </Div>
       )}
-      <Div className="flex flex-col gap-3">
-        {activeLabel && (
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            className="self-start gap-1 -ml-2"
-            onClick={() => onSelectCategory()}
-          >
-            <ChevronRight className="size-4 rotate-180" />
-            {t("catalog.title")}
-          </Button>
-        )}
-        {showOverview ? (
-          <H2 className="min-w-0 break-words pt-2 text-lg font-semibold">
+      {!erpAvailable && (
+        <Div className="flex flex-col gap-3">
+          {activeLabel && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="self-start gap-1 -ml-2"
+              onClick={() => onSelectCategory()}
+            >
+              <ChevronRight className="size-4 rotate-180" />
+              {t("catalog.title")}
+            </Button>
+          )}
+          {showOverviewFirst ? (
+            <H2 className="min-w-0 break-words pt-2 text-lg font-semibold">
+              {t("catalog.allTools")}
+            </H2>
+          ) : (
+            <Div className="flex flex-wrap items-center justify-between gap-3">
+              <H1 className="min-w-0 break-words text-2xl font-semibold sm:text-3xl">
+                {activeLabel ?? t("catalog.title")}
+              </H1>
+              {layoutControls}
+            </Div>
+          )}
+        </Div>
+      )}
+      {erpAvailable && accountingOverview}
+      {erpAvailable && (
+        <ErpCatalogWorkflows
+          available={erpAvailable}
+          t={t}
+          onOpenTool={onOpenTool}
+        />
+      )}
+      {erpAvailable && showOverview && (
+        <Accordion collapsible className="rounded-lg border bg-card px-4">
+          <AccordionItem value="overview" className="border-0">
+            <AccordionTrigger className="min-h-11 py-3 text-start font-semibold">
+              {t("catalog.overview")}
+            </AccordionTrigger>
+            <AccordionContent className="pb-4">{overview}</AccordionContent>
+          </AccordionItem>
+        </Accordion>
+      )}
+      {erpAvailable && (
+        <Div className="flex flex-wrap items-start justify-between gap-2">
+          <H2 className="min-w-0 break-words border-0 pb-0 text-lg font-semibold">
             {t("catalog.allTools")}
           </H2>
-        ) : (
-          <Div className="flex flex-wrap items-center justify-between gap-3">
-            <H1 className="min-w-0 break-words text-2xl font-semibold sm:text-3xl">
-              {activeLabel ?? t("catalog.title")}
-            </H1>
-            {layoutControls}
-          </Div>
-        )}
-        {search}
-      </Div>
-      {!activeCategory && !isSearching && recordSearchTargets.length > 0 && (
+          {layoutControls}
+        </Div>
+      )}
+      <Div key="catalog-search">{search}</Div>
+      {isCatalogRoot && recordSearchTargets.length > 0 && (
         <RecordSearch
           targets={recordSearchTargets}
           onSearch={onRecordSearch}

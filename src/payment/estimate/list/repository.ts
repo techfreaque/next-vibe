@@ -139,13 +139,16 @@ export class EstimateListRepository {
         page: pagination.currentPage,
       });
 
+      const selectedCompanyId =
+        data.companyId ??
+        (selectedCompanies.length === 1 ? selectedCompanies[0]?.id : undefined);
       return success({
         total,
         ...pagination,
         hasFilters,
-        selectedCompanyId: data.companyId ?? null,
-        selectedCompanyName: data.companyId
-          ? (companyNames.get(data.companyId) ?? null)
+        selectedCompanyId: selectedCompanyId ?? null,
+        selectedCompanyName: selectedCompanyId
+          ? (companyNames.get(selectedCompanyId) ?? null)
           : null,
         estimates: rows.map((e) => ({
           id: e.id,

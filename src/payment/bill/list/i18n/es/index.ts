@@ -69,7 +69,7 @@ export const translations: typeof enTranslations = {
     label: "Documentos de búsqueda",
     description:
       "Cuentas de búsqueda pagadas por número de factura, nombre del proveedor o factura ID, y filtro por compañía o estado.",
-    placeholder: "Número de factura, proveedor o ID",
+    placeholder: "Número de factura o proveedor",
   },
   status: {
     label: "Situación",
@@ -88,6 +88,7 @@ export const translations: typeof enTranslations = {
     },
   },
   widget: {
+    filters: "Filtros",
     pageCount: "Páginas totales",
     back: "Atrás",
     title: "Proveedor de cuentas",

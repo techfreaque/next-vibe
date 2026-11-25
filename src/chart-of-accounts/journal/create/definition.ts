@@ -24,6 +24,7 @@ import { z } from "zod";
 
 import { LineTypeOptions } from "../../enum";
 import { scopedTranslation } from "../../i18n";
+import { accountingDateSchema } from "../../shared/calendar-date";
 
 const CoaJournalCreateWidgetLazy = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.CoaJournalCreateWidget })),
@@ -50,12 +51,15 @@ const { POST } = createEndpoint({
     children: {
       companyId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
+        fieldType: FieldDataType.ENTITY_PICKER,
         label: "journalCreate.companyId.label" as const,
         description: "journalCreate.companyId.description" as const,
         placeholder: "journalCreate.companyId.placeholder" as const,
         columns: 12,
         schema: z.string().uuid(),
+        listEndpoint: async () =>
+          (await import("@/companies/list/definition")).default.GET,
+        labelField: "name",
       }),
       periodId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -73,7 +77,7 @@ const { POST } = createEndpoint({
         description: "journalCreate.date.description" as const,
         placeholder: "journalCreate.date.placeholder" as const,
         columns: 6,
-        schema: z.string(),
+        schema: accountingDateSchema,
       }),
       description: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -107,16 +111,14 @@ const { POST } = createEndpoint({
             accountId: requestField(scopedTranslation, {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.TEXT,
-              label: "journalCreate.companyId.label" as const,
-              description: "journalCreate.companyId.description" as const,
-              placeholder: "journalCreate.companyId.placeholder" as const,
+              label: "journalCreate.widget.account",
               columns: 4,
               schema: z.string().uuid(),
             }),
             type: requestField(scopedTranslation, {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.SELECT,
-              label: "journalCreate.lines.label" as const,
+              label: "journalCreate.widget.side",
               columns: 4,
               options: LineTypeOptions,
               schema: z.string(),
@@ -124,16 +126,16 @@ const { POST } = createEndpoint({
             amount: requestField(scopedTranslation, {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.NUMBER,
-              label: "journalCreate.lines.label" as const,
+              label: "journalCreate.widget.amount",
               columns: 2,
               schema: z.number().positive(),
             }),
             currency: requestField(scopedTranslation, {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.TEXT,
-              label: "journalCreate.lines.label" as const,
+              label: "journalCreate.widget.currency",
               columns: 2,
-              schema: z.string().length(3),
+              schema: z.string().length(3).optional(),
             }),
             description: requestField(scopedTranslation, {
               type: WidgetType.FORM_FIELD,
@@ -209,19 +211,19 @@ const { POST } = createEndpoint({
   examples: {
     requests: {
       default: {
-        companyId: "00000000-0000-0000-0000-000000000001",
-        periodId: "00000000-0000-0000-0000-000000000010",
+        companyId: "00000000-0000-4000-8000-000000000001",
+        periodId: "00000000-0000-4000-8000-000000000010",
         date: "2026-01-31",
         description: "Monthly rent payment",
         lines: [
           {
-            accountId: "00000000-0000-0000-0000-000000000020",
+            accountId: "00000000-0000-4000-8000-000000000020",
             type: "DEBIT",
             amount: 1000,
             currency: "EUR",
           },
           {
-            accountId: "00000000-0000-0000-0000-000000000021",
+            accountId: "00000000-0000-4000-8000-000000000021",
             type: "CREDIT",
             amount: 1000,
             currency: "EUR",
@@ -231,7 +233,7 @@ const { POST } = createEndpoint({
     },
     responses: {
       default: {
-        id: "00000000-0000-0000-0000-000000000030",
+        id: "00000000-0000-4000-8000-000000000030",
         entryNumber: "JE-2026-0001",
       },
     },

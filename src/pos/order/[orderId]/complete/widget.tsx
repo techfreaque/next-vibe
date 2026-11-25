@@ -5,6 +5,7 @@ import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
 import { Span } from "next-vibe/ui/components/span";
+import { formatMoney } from "next-vibe/unified-ui/_shared/format-money";
 import {
   useWidgetLocale,
   useWidgetNavigation,
@@ -68,10 +69,7 @@ export function PosOrderCompleteWidget(
               {t("orderComplete.post.response.total")}
             </Span>
             <Span className="text-xl font-mono font-bold tabular-nums">
-              {new Intl.NumberFormat(locale, {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              }).format(result.total)}
+              {formatMoney(result.total, result?.currency, locale)}
             </Span>
           </Div>
         </Div>

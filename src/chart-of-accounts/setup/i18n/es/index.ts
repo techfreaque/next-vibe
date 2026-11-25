@@ -3,30 +3,29 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   enums: {
     country: {
-      AT: "AT. ÖKR",
-      DE: "DE. SKR03",
-      XX: "XX. IFRS Genérico",
+      AT: "Austria (ÖKR)",
+      DE: "Alemania (SKR03)",
+      XX: "Plantilla NIIF genérica",
     },
   },
   post: {
-    title: "Inicializar el Gráfico de Cuentas",
-    titleShort: "Configuración inicial",
+    title: "Configura el plan contable",
+    titleShort: "Configura el plan contable",
     description:
-      "Configurar el diagrama de cuentas de una empresa de una plantilla específica para cada país. Idempotent. seguro para ejecutar múltiples veces.",
+      "Completa las cuentas de tu empresa a partir de una plantilla estándar.",
     companyId: {
-      label: "Company ID",
-      description: "La empresa para inicializar el gráfico de cuentas para",
-      placeholder: "Entrar en la empresa UUID",
+      label: "Empresa",
+      description: "Elige la empresa que quieras configurar.",
+      placeholder: "Elige una empresa",
     },
     country: {
-      label: "País",
-      description:
-        "Estándar de uso para el país (AT = ÖKR, DE = SKR03, XX = IFRS Genérico)",
-      placeholder: "Seleccionar país",
+      label: "Plantilla contable",
+      description: "Elige la estructura de cuentas que quieras añadir.",
+      placeholder: "Elige una plantilla",
     },
     response: {
-      created: "Contabilidad creada",
-      skipped: "Cuentas desaparecidas (ya existían)",
+      created: "Cuentas creadas",
+      skipped: "Cuentas conservadas",
     },
     errors: {
       unauthorized: {
@@ -36,7 +35,7 @@ export const translations: typeof enTranslations = {
       },
       validation: {
         title: "Error de validación",
-        description: "Entrada inválida. compañía de verificación ID y país",
+        description: "Comprueba la empresa y la plantilla contable.",
       },
       forbidden: {
         title: "Acceso denegado",
@@ -45,15 +44,16 @@ export const translations: typeof enTranslations = {
       },
       server: {
         title: "Error del servidor",
-        description: "La configuración falló, por favor inténtelo de nuevo",
+        description: "Intenta aplicar de nuevo la plantilla.",
       },
       unknown: {
         title: "Error desconocido",
         description: "Ocurrió un error inesperado",
       },
       conflict: {
-        title: "Ya se inicia",
-        description: "Esta compañía ya tiene un gráfico de cuentas",
+        title: "Revisa la configuración",
+        description:
+          "Actualiza las cuentas de la empresa antes de aplicar la plantilla.",
       },
       network: {
         title: "Error de red",
@@ -70,11 +70,22 @@ export const translations: typeof enTranslations = {
       },
     },
     success: {
-      title: "Cargo de Cuentas Listos",
-      description: "Todas las cuentas han sido creadas para la empresa",
+      title: "Plan contable listo",
+      description:
+        "Se ha aplicado la plantilla. Revisa las cuentas añadidas y las que se conservan.",
     },
     widget: {
-      viewAccounts: "Ver Lista de Cuentas",
+      review: "Revisa la configuración",
+      previewLoading: "Buscando cuentas existentes…",
+      previewFailed: "El número de cuentas existentes no está disponible.",
+      existing: "Cuentas existentes: {{count}}.",
+      empty: "Esta empresa todavía no tiene cuentas contables.",
+      consequences:
+        "La configuración añade los códigos de la plantilla que falten en la empresa y conserva los datos existentes.",
+      submit: "Añadir cuentas de la plantilla",
+      back: "Volver",
+      viewAccounts: "Abrir el plan contable",
+      viewPeriods: "Ver periodos contables",
     },
   },
   title: "Cargo de configuración de cuentas",

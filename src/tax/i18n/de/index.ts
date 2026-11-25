@@ -118,7 +118,7 @@ export const translations: typeof enTranslations = {
         empty:
           "Keine Steuersätze konfiguriert. Legen Sie Ihren ersten Satz an.",
         emptySetup:
-          "Keine Steuersätze angelegt. Jede Rechnung braucht einen Steuersatz — jetzt konfigurieren.",
+          "Legen Sie die Steuersätze an, die Ihr Unternehmen für Rechnungen verwendet.",
         columnRate: "Steuersatz",
         columnTypeRateActions: "Typ / Satz / Status",
         backToCatalog: "← Produkte",
@@ -352,14 +352,28 @@ export const translations: typeof enTranslations = {
   },
 
   report: {
-    title: "Steuerbericht",
-    titleShort: "Steuerbericht",
-    description: "Erhobene Steuern nach Satz und Zeitraum",
+    title: "Steuern nach Satz",
+    titleShort: "Steuern nach Satz",
+    description:
+      "Prüfen Sie die erfasste Steuer auf Ausgangsrechnungen, Gutschriften, Eingangsrechnungen und Kassenverkäufen.",
     widget: {
-      columnRate: "Satz",
-      total: "Gesamt",
-      empty: "Keine Steuerdaten für diesen Zeitraum gefunden.",
+      scope:
+        "Für Ausgangsrechnungen gilt das verknüpfte Buchungsdatum oder das Erstellungsdatum. Für Eingangsrechnungen gilt das Belegdatum. Kassenverkäufe zählen am Abschlusstag (UTC), wenn die Position einen positiven Steuersatz oder einen Steuerbetrag hat. Bei einem gemeinsamen Buchungssatz zählt die ausgestellte Rechnung.",
+      empty: "Keine Belegpositionen entsprechen diesen Filtern.",
+      range: "{{from}} bis {{to}}",
+      total: "Summe",
+      previousMonth: "Vormonat anzeigen",
+      unknownRate: "Steuersatz nicht ermittelbar",
+      run: "Bericht erstellen",
+      running: "Bericht wird erstellt…",
+      selectCompany: "Wählen Sie das Unternehmen für diesen Bericht.",
     },
+    currency: {
+      label: "Währung",
+      placeholder: "Unternehmenswährung",
+      description: "Standardmäßig gilt die Unternehmenswährung.",
+    },
+    currencies: { EUR: "EUR", PLN: "PLN", USD: "USD" },
     companyId: {
       label: "Unternehmen",
       description: "Unternehmen, für das der Bericht erstellt wird",
@@ -368,21 +382,20 @@ export const translations: typeof enTranslations = {
     dateFrom: {
       label: "Von",
       description: "Startdatum des Berichtszeitraums",
-      placeholder: "2024-01-01",
+      placeholder: "Anfang dieses Monats",
     },
     dateTo: {
       label: "Bis",
       description: "Enddatum des Berichtszeitraums",
-      placeholder: "2024-12-31",
+      placeholder: "Heute",
     },
     response: {
       rows: "Berichtszeilen",
       row: {
-        taxRateCode: "Steuersatz-Kürzel",
-        taxRateName: "Steuersatz-Name",
+        direction: "Belegart",
+        rate: "Steuersatz",
         taxableAmount: "Steuerbasis",
         taxAmount: "Steuerbetrag",
-        period: "Zeitraum",
       },
     },
     success: {
@@ -392,7 +405,7 @@ export const translations: typeof enTranslations = {
     errors: {
       validation: {
         title: "Validierungsfehler",
-        description: "Bitte prüfen Sie Ihre Eingaben",
+        description: "Das Enddatum darf nicht vor dem Startdatum liegen.",
       },
       unauthorized: {
         title: "Nicht autorisiert",
@@ -430,6 +443,12 @@ export const translations: typeof enTranslations = {
   },
 
   enums: {
+    reportDirection: {
+      posSales: "Kassenverkäufe",
+      sales: "Ausgangsrechnungen",
+      creditNotes: "Ausgangsgutschriften",
+      purchases: "Eingangsrechnungen",
+    },
     taxType: {
       vat: "MwSt.",
       gst: "GST",

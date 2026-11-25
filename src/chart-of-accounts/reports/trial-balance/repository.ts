@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import { and, eq, lte, sql } from "drizzle-orm";
+import { and, eq, inArray, lt, sql } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
@@ -21,8 +21,13 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import { CompanyAuthRepository } from "@/companies/repository";
 
 import { accountNodes, journalEntries, journalEntryLines } from "../../db";
-import { AccountType, JournalEntryStatus, LineType } from "../../enum";
+import { AccountType, ledgerEntryStatuses, LineType } from "../../enum";
 import { scopedTranslation } from "../../i18n";
+import { nextAccountingDay } from "../../shared/journal-validation";
+import {
+  findLedgerReportCompany,
+  resolveLedgerReportCurrency,
+} from "../../shared/report-currency";
 import type { TrialBalanceRequestOutput } from "./definition";
 
 interface AccountRow {
@@ -48,6 +53,9 @@ export class TrialBalanceRepository {
     locale: CountryLanguage,
   ): Promise<
     ResponseType<{
+      reportCompanyId: string;
+      reportCompanyName: string;
+      reportCurrency: string;
       asOfDateResponse: string;
       accounts: AccountRow[];
       totalDebits: number;
@@ -57,27 +65,38 @@ export class TrialBalanceRepository {
   > {
     const { t } = scopedTranslation.scopedT(locale);
 
-    const authResult = await CompanyAuthRepository.requireMember(
-      user.id,
-      data.companyId,
-      null,
-      logger,
-      locale,
-    );
-    if (!authResult.success) {
-      return authResult;
+    if (data.companyId) {
+      const authResult = await CompanyAuthRepository.requireMember(
+        user.id,
+        data.companyId,
+        null,
+        logger,
+        locale,
+      );
+      if (!authResult.success) {
+        return authResult;
+      }
     }
 
     try {
+      const company = await findLedgerReportCompany(user.id, data.companyId);
+      if (!company) {
+        return fail({
+          message: t("trialBalance.widget.selectCompany"),
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+        });
+      }
+
       const asOfDate = data.asOfDate ? new Date(data.asOfDate) : new Date();
 
       const asOfDateStr = asOfDate.toISOString().slice(0, 10);
 
       // Build conditions for journal entries
       const entryConditions = [
-        eq(journalEntries.companyId, data.companyId),
-        eq(journalEntries.status, JournalEntryStatus.POSTED),
-        lte(journalEntries.date, asOfDate),
+        eq(journalEntries.companyId, company.id),
+        eq(accountNodes.companyId, company.id),
+        inArray(journalEntries.status, ledgerEntryStatuses),
+        lt(journalEntries.date, nextAccountingDay(asOfDate)),
       ];
 
       if (data.periodId) {
@@ -85,14 +104,27 @@ export class TrialBalanceRepository {
       }
 
       // Aggregate debit and credit totals per account
+      const reportCurrency = await resolveLedgerReportCurrency(
+        company.currency,
+        entryConditions,
+        data.currency,
+      );
+      if (!reportCurrency) {
+        return fail({
+          message: t("reports.mixedCurrency"),
+          errorType: ErrorResponseTypes.CONFLICT,
+        });
+      }
+      entryConditions.push(eq(journalEntryLines.currency, reportCurrency));
+
       const rows = await db
         .select({
           accountId: journalEntryLines.accountId,
           code: accountNodes.code,
           name: accountNodes.name,
           type: accountNodes.type,
-          debitTotal: sql<number>`coalesce(sum(case when ${journalEntryLines.type} = ${LineType.DEBIT} then ${journalEntryLines.amount} else 0 end), 0)`,
-          creditTotal: sql<number>`coalesce(sum(case when ${journalEntryLines.type} = ${LineType.CREDIT} then ${journalEntryLines.amount} else 0 end), 0)`,
+          debitUnits: sql<string>`(sum(case when ${journalEntryLines.type} = ${LineType.DEBIT} then ${journalEntryLines.amount} else 0 end) * 10000)::numeric(30, 0)`,
+          creditUnits: sql<string>`(sum(case when ${journalEntryLines.type} = ${LineType.CREDIT} then ${journalEntryLines.amount} else 0 end) * 10000)::numeric(30, 0)`,
         })
         .from(journalEntryLines)
         .innerJoin(
@@ -112,29 +144,36 @@ export class TrialBalanceRepository {
         )
         .orderBy(accountNodes.code);
 
+      let totalDebitUnits = BigInt(0);
+      let totalCreditUnits = BigInt(0);
       const accounts: AccountRow[] = rows.map((r) => {
-        const debitTotal = Number(r.debitTotal);
-        const creditTotal = Number(r.creditTotal);
+        const debitUnits = BigInt(r.debitUnits);
+        const creditUnits = BigInt(r.creditUnits);
+        totalDebitUnits += debitUnits;
+        totalCreditUnits += creditUnits;
         const balance = DEBIT_NORMAL_TYPES.has(r.type)
-          ? debitTotal - creditTotal
-          : creditTotal - debitTotal;
+          ? debitUnits - creditUnits
+          : creditUnits - debitUnits;
 
         return {
           accountId: r.accountId,
           code: r.code,
           name: r.name,
           type: r.type,
-          debitTotal,
-          creditTotal,
-          balance,
+          debitTotal: Number(debitUnits) / 10_000,
+          creditTotal: Number(creditUnits) / 10_000,
+          balance: Number(balance) / 10_000,
         };
       });
 
-      const totalDebits = accounts.reduce((sum, a) => sum + a.debitTotal, 0);
-      const totalCredits = accounts.reduce((sum, a) => sum + a.creditTotal, 0);
-      const isBalanced = Math.abs(totalDebits - totalCredits) < 0.0001;
+      const totalDebits = Number(totalDebitUnits) / 10_000;
+      const totalCredits = Number(totalCreditUnits) / 10_000;
+      const isBalanced = totalDebitUnits === totalCreditUnits;
 
       return success({
+        reportCompanyId: company.id,
+        reportCompanyName: company.name,
+        reportCurrency,
         asOfDateResponse: asOfDateStr,
         accounts,
         totalDebits,

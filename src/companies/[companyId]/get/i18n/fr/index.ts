@@ -71,6 +71,7 @@ export const translations: typeof enTranslations = {
       description: "Détails de l'entreprise récupérés",
     },
     widget: {
+      setupAccounting: "Configurer la comptabilité",
       back: "Retour",
       loading: "Chargement de l'entreprise...",
       edit: "Modifier",

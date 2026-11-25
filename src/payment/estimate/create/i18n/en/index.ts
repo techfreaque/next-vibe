@@ -82,6 +82,16 @@ export const translations = {
       description: "Estimate created in draft status",
     },
     widget: {
+      otherRate: "Other rate",
+      item: "Description",
+      quantity: "Quantity",
+      price: "Unit price",
+      vatRate: "VAT %",
+      add: "Add line",
+      remove: "Remove line",
+      empty: "Add the goods or services you are quoting.",
+      summary: "Summary",
+
       back: "Back",
       submit: "Create Estimate",
       viewButton: "View Estimate",
@@ -108,9 +118,10 @@ export const translations = {
     placeholder: "Enter customer name",
   },
   currency: {
+    code: "{{code}}",
     label: "Currency",
     description: "Estimate currency",
-    placeholder: "EUR",
+    placeholder: "Company currency",
   },
   validUntil: {
     label: "Valid Until",

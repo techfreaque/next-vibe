@@ -6,6 +6,7 @@ import { BookOpen } from "next-vibe/ui/components/icons/BookOpen";
 import { Span } from "next-vibe/ui/components/span";
 import { usePickerCallback } from "next-vibe/unified-ui/_shared/picker-context";
 import {
+  useWidgetForm,
   useWidgetNavigation,
   useWidgetOnSubmit,
   useWidgetTranslation,
@@ -123,6 +124,7 @@ export function CoaJournalListWidget(
   },
 ): JSX.Element {
   const data = useWidgetValue<typeof definition.GET>();
+  const form = useWidgetForm<typeof definition.GET>();
   const navigation = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.GET>();
   const onSubmit = useWidgetOnSubmit();
@@ -164,7 +166,11 @@ export function CoaJournalListWidget(
   const handleCreate = (): void => {
     void (async (): Promise<void> => {
       const def = await import("../create/definition");
-      navigation.push(def.default.POST, {});
+      const companyId = form.getValues("companyId");
+      const periodId = form.getValues("periodId");
+      navigation.push(def.default.POST, {
+        data: companyId ? { companyId, periodId } : undefined,
+      });
     })();
   };
 

@@ -5,7 +5,7 @@ export const translations: typeof enTranslations = {
     title: "Przegląd księgowości",
     titleShort: "Przegląd",
     description:
-      "Stan ksiąg rachunkowych — otwarty okres, liczba zapisów i szybka nawigacja do wszystkich narzędzi księgowych.",
+      "Sprawdź należności, zobowiązania, stan środków, zysk i bieżący okres księgowy.",
     companyId: {
       label: "ID firmy",
       description: "Firma, dla której ładowany jest przegląd",
@@ -56,6 +56,15 @@ export const translations: typeof enTranslations = {
       },
     },
     widget: {
+      noPeriodHint: "Otwórz okres księgowy przed księgowaniem zapisów.",
+      zeroMetricsHint:
+        "Kwoty aktualizują się po wystawieniu faktur, zatwierdzeniu faktur zakupu i zaksięgowaniu operacji.",
+      financialOverview: "Przegląd finansów",
+      openReceivables: "Należności od klientów",
+      approvedPayables: "Zatwierdzone faktury do zapłaty",
+      cashBalance: "Kasa i rachunki bankowe",
+      monthToDateProfit: "Zysk w tym miesiącu",
+      needsAttention: "Wymaga uwagi",
       currentPeriod: "Bieżący okres",
       noPeriod: "Brak otwartego okresu",
       createPeriod: "Utwórz okres",

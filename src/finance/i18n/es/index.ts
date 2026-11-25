@@ -13,6 +13,10 @@ export const translations: typeof enTranslations = {
   },
   category: "Finanzas",
   documents: {
+    clearCompany: "Quitar filtro de empresa",
+    clearCustomer: "Quitar filtro de cliente",
+    pageTotals: "Totales · {{currency}}",
+    pageDocumentCount: "Documentos en esta página: {{count}}",
     search: "Documentos de búsqueda",
     matches: "Documentos coincidentes ({{count}})",
     emptyTitle: "Ningún documento coincide con estos filtros",

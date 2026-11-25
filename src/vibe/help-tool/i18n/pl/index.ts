@@ -4,6 +4,90 @@ export const translations: typeof enTranslations = {
   category: "Pomoc i Dokumentacja",
   tag: "Pomoc",
   uncategorized: "Inne",
+  erp: {
+    navigation: {
+      sales: "Sprzedaż",
+      purchases: "Zakupy",
+      invoices: "Faktury sprzedaży",
+      estimates: "Oferty",
+      bills: "Faktury zakupu",
+    },
+    overview: {
+      loading: "Ładowanie podsumowania firmy",
+      loadError: "Nie udało się wczytać podsumowania firmy",
+    },
+    home: "Strona główna",
+    title: "Centrum księgowości",
+    description:
+      "Skonfiguruj firmę, zarządzaj fakturami i przygotuj księgi do zamknięcia miesiąca.",
+    companies: "Zarządzaj firmami",
+    activeDescription: "Sprawdź księgi i przygotuj kolejną fakturę.",
+    newInvoice: "Nowa faktura",
+    createCompany: "Skonfiguruj firmę",
+    companySwitch: {
+      label: "Firma w księgowości",
+      select: "Wybierz firmę",
+      current: "Bieżąca firma: {{name}}",
+    },
+    workflows: "Najczęstsze zadania",
+    sales: {
+      title: "Wystaw fakturę klientowi",
+      description:
+        "Utwórz szkic faktury lub otwórz istniejącą, aby zarejestrować wpłatę.",
+      primary: "Utwórz fakturę",
+      secondary: "Wyświetl faktury",
+    },
+    expenses: {
+      title: "Zaksięguj fakturę od dostawcy",
+      description:
+        "Zarejestruj zobowiązanie i śledź jego spłatę w szczegółach faktury.",
+      primary: "Dodaj fakturę zakupu",
+      secondary: "Wyświetl faktury zakupu",
+    },
+    receivables: {
+      title: "Sprawdź należności",
+      description: "Zobacz niezapłacone kwoty według liczby dni po terminie.",
+      primary: "Wyświetl należności",
+    },
+    payables: {
+      title: "Sprawdź zobowiązania wobec dostawców",
+      description:
+        "Zobacz otwarte kwoty, faktury do zatwierdzenia i faktury sporne.",
+      primary: "Wyświetl zobowiązania",
+    },
+    bank: {
+      title: "Zaimportuj wyciąg bankowy",
+      description:
+        "Zaimportuj wyciąg CSV i sprawdź transakcje bez dopasowania.",
+      primary: "Importuj wyciąg",
+      secondary: "Wyświetl niedopasowane transakcje",
+    },
+    stock: {
+      title: "Sprawdź stany magazynowe",
+      description: "Zobacz, czego jest pod dostatkiem, a co trzeba uzupełnić.",
+      primary: "Otwórz magazyn",
+    },
+    tax: {
+      title: "Sprawdź VAT",
+      description:
+        "Sprawdź kwoty podatku za dany okres przed wysłaniem deklaracji.",
+      primary: "Otwórz raport podatkowy",
+    },
+    exports: {
+      title: "Sprawdź i wyeksportuj dziennik",
+      description:
+        "Sprawdź niezgodności księgowań albo pobierz zaksięgowane zapisy w pliku CSV.",
+      primary: "Sprawdź księgowania",
+      secondary: "Otwórz eksport dziennika",
+    },
+    close: {
+      title: "Zamknij okres księgowy",
+      description:
+        "Przed zamknięciem okresu sprawdź zestawienie obrotów i sald.",
+      primary: "Wyświetl okresy",
+      secondary: "Otwórz zestawienie obrotów i sald",
+    },
+  },
   catalog: {
     title: "Katalog narzędzi",
     searchLabel: "Przeszukaj katalog narzędzi",

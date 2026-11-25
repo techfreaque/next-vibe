@@ -6,9 +6,8 @@
 
 import "server-only";
 
-import { eq, max } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { CurrenciesArr } from "next-vibe/core/i18n/core/config";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
@@ -20,8 +19,9 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { CompanyMemberRole } from "@/companies/enum";
-import { CompanyAuthRepository } from "@/companies/repository";
+import { lockLedgerCompany } from "@/chart-of-accounts/shared/ledger-write";
+import { getDocumentAccess } from "@/finance/document-company-scope";
+import { nextCompanyInvoiceSequence } from "@/finance/document-number";
 
 import {
   paymentEstimateLines,
@@ -59,114 +59,144 @@ export class EstimateConvertToInvoiceRepository {
         });
       }
 
-      const authResult = await CompanyAuthRepository.requireMember(
-        userId,
-        estimate.companyId,
-        CompanyMemberRole.ACCOUNTANT,
-        logger,
-        locale,
-      );
-      if (!authResult.success) {
-        return authResult;
-      }
-
-      const allowedStatuses = [EstimateStatus.SENT, EstimateStatus.ACCEPTED];
-      if (
-        !allowedStatuses.includes(
-          estimate.status as (typeof allowedStatuses)[number],
-        )
-      ) {
-        return fail({
-          message: t("post.errors.conflict.title"),
-          errorType: ErrorResponseTypes.CONFLICT,
-        });
-      }
-
-      // Generate invoice sequence number
-      const [{ value: maxSeq }] = await db
-        .select({ value: max(paymentInvoices.invoiceSequenceNumber) })
-        .from(paymentInvoices)
-        .where(eq(paymentInvoices.companyId, estimate.companyId));
-
-      const nextSeq = (maxSeq ?? 0) + 1;
-      const arInvoiceId = `AR-${estimate.companyId.slice(0, 8)}-${String(nextSeq).padStart(6, "0")}`;
-
-      // Validate currency against allowed values; fall back to EUR
-      const rawCurrency = estimate.currency;
-      const currency = (CurrenciesArr as readonly string[]).includes(
-        rawCurrency,
-      )
-        ? (rawCurrency as (typeof CurrenciesArr)[number])
-        : "EUR";
-
-      // Create invoice from estimate
-      const [invoice] = await db
-        .insert(paymentInvoices)
-        .values({
+      return await db.transaction(async (tx) => {
+        await lockLedgerCompany(tx, estimate.companyId);
+        const access = await getDocumentAccess(
           userId,
-          companyId: estimate.companyId,
-          providerInvoiceId: arInvoiceId,
-          invoiceSequenceNumber: nextSeq,
-          currency,
-          status: InvoiceStatus.DRAFT,
-          amount: String(estimate.total),
-          notes: estimate.notes ?? null,
-          metadata: estimate.customerId
-            ? { customerId: estimate.customerId }
-            : null,
-        })
-        .returning();
-
-      if (!invoice) {
-        return fail({
-          message: t("post.errors.server.title"),
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        });
-      }
-
-      // Copy estimate lines to invoice lines
-      const estimateLineRows = await db
-        .select()
-        .from(paymentEstimateLines)
-        .where(eq(paymentEstimateLines.estimateId, estimate.id))
-        .orderBy(paymentEstimateLines.sortOrder);
-
-      if (estimateLineRows.length > 0) {
-        await db.insert(paymentInvoiceLines).values(
-          estimateLineRows.map((l) => ({
-            invoiceId: invoice.id,
-            description: l.description,
-            productId: l.productId ?? null,
-            quantity: l.quantity,
-            unitPrice: l.unitPrice,
-            taxRate: l.taxRate,
-            taxAmount: l.taxAmount,
-            lineTotal: l.lineTotal,
-            sortOrder: l.sortOrder ?? 0,
-          })),
+          { companyId: estimate.companyId },
+          tx,
         );
-      }
+        if (!access?.canManage) {
+          return fail({
+            message: t("post.errors.forbidden.title"),
+            errorType: ErrorResponseTypes.FORBIDDEN,
+          });
+        }
+        const [lockedEstimate] = await tx
+          .select()
+          .from(paymentEstimates)
+          .where(
+            and(
+              eq(paymentEstimates.id, urlPathParams.estimateId),
+              eq(paymentEstimates.companyId, estimate.companyId),
+            ),
+          )
+          .limit(1)
+          .for("update");
+        if (
+          !lockedEstimate ||
+          lockedEstimate.invoiceId ||
+          (lockedEstimate.status !== EstimateStatus.SENT &&
+            lockedEstimate.status !== EstimateStatus.ACCEPTED)
+        ) {
+          return fail({
+            message: t("post.errors.conflict.title"),
+            errorType: ErrorResponseTypes.CONFLICT,
+          });
+        }
 
-      // Mark estimate as CONVERTED and set invoiceId
-      await db
-        .update(paymentEstimates)
-        .set({
-          status: EstimateStatus.CONVERTED,
+        // Copy estimate lines to invoice lines
+        const estimateLineRows = await tx
+          .select()
+          .from(paymentEstimateLines)
+          .where(eq(paymentEstimateLines.estimateId, lockedEstimate.id))
+          .orderBy(paymentEstimateLines.sortOrder);
+
+        const grossUnits = estimateLineRows.reduce(
+          (sum, line) => sum + Math.round(line.lineTotal * 10_000),
+          0,
+        );
+        const cents = Math.round(grossUnits / 100);
+        if (
+          !Number.isSafeInteger(grossUnits) ||
+          cents < 0 ||
+          cents > 9_999_999_999 ||
+          cents !== Math.round(Math.round(lockedEstimate.total * 10_000) / 100)
+        ) {
+          return fail({
+            message: t("post.errors.reconcile"),
+            errorType: ErrorResponseTypes.CONFLICT,
+          });
+        }
+        const nextSeq = await nextCompanyInvoiceSequence(
+          tx,
+          lockedEstimate.companyId,
+        );
+        const arInvoiceId = `AR-${lockedEstimate.companyId.slice(0, 8)}-${String(nextSeq).padStart(6, "0")}`;
+        const currency = lockedEstimate.currency;
+
+        // Create invoice from estimate
+        const [invoice] = await tx
+          .insert(paymentInvoices)
+          .values({
+            userId,
+            companyId: lockedEstimate.companyId,
+            providerInvoiceId: arInvoiceId,
+            invoiceSequenceNumber: nextSeq,
+            currency,
+            status: InvoiceStatus.DRAFT,
+            amount: (cents / 100).toFixed(2),
+            notes: lockedEstimate.notes ?? null,
+            metadata: {
+              estimateId: lockedEstimate.id,
+              estimateNumber: lockedEstimate.estimateNumber,
+              ...(lockedEstimate.customerId
+                ? { customerId: lockedEstimate.customerId }
+                : {}),
+              ...(lockedEstimate.customerName
+                ? { customerName: lockedEstimate.customerName }
+                : {}),
+              ...(lockedEstimate.customerEmail
+                ? { customerEmail: lockedEstimate.customerEmail }
+                : {}),
+            },
+          })
+          .returning();
+
+        if (!invoice) {
+          return fail({
+            message: t("post.errors.server.title"),
+            errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          });
+        }
+
+        if (estimateLineRows.length > 0) {
+          await tx.insert(paymentInvoiceLines).values(
+            estimateLineRows.map((l) => ({
+              invoiceId: invoice.id,
+              description: l.description,
+              productId: l.productId ?? null,
+              quantity: l.quantity,
+              unitPrice: l.unitPrice,
+              taxRate: l.taxRate,
+              taxAmount: l.taxAmount,
+              lineTotal: l.lineTotal,
+              sortOrder: l.sortOrder ?? 0,
+            })),
+          );
+        }
+
+        // Mark estimate as CONVERTED and set invoiceId
+        await tx
+          .update(paymentEstimates)
+          .set({
+            status: EstimateStatus.CONVERTED,
+            invoiceId: invoice.id,
+            updatedAt: new Date(),
+          })
+          .where(eq(paymentEstimates.id, urlPathParams.estimateId));
+
+        logger.info("Estimate converted to invoice", {
+          estimateId: urlPathParams.estimateId,
           invoiceId: invoice.id,
-          updatedAt: new Date(),
-        })
-        .where(eq(paymentEstimates.id, urlPathParams.estimateId));
+          companyId: lockedEstimate.companyId,
+        });
 
-      logger.info("Estimate converted to invoice", {
-        estimateId: urlPathParams.estimateId,
-        invoiceId: invoice.id,
-        companyId: estimate.companyId,
-      });
-
-      return success({
-        success: true,
-        message: null,
-        invoiceId: invoice.id,
+        return success({
+          success: true,
+          message: null,
+          invoiceId: invoice.id,
+        });
       });
     } catch (error) {
       const parsed = parseError(error);

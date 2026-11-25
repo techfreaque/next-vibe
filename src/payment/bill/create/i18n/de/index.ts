@@ -16,14 +16,23 @@ export const translations: typeof enTranslations = {
     },
   },
   post: {
-    title: "Eingangsrechnung erfassen",
-    titleShort: "Rechnung erstellen",
-    description: "Lieferantenrechnung im System erfassen",
+    title: "Neue Lieferantenrechnung",
+    titleShort: "Neue Lieferantenrechnung",
+    description:
+      "Erfassen Sie Lieferant und Positionen und speichern Sie den Entwurf.",
     form: {
       title: "Neue Lieferantenrechnung",
       description: "Rechnungsdaten des Lieferanten eingeben",
     },
     errors: {
+      vendor: "Wählen Sie einen aktiven Lieferanten dieses Unternehmens.",
+      supplier:
+        "Geben Sie einen Lieferantennamen ein oder wählen Sie einen Lieferanten aus.",
+      dates: "Geben Sie gültige Rechnungs- und Fälligkeitsdaten ein.",
+      amounts: "Prüfen Sie die Positionen und den zulässigen Rechnungsbetrag.",
+      expenseAccount:
+        "Wählen Sie ein aktives Aufwandskonto dieses Unternehmens.",
+
       validation: {
         title: "Validierungsfehler",
         description: "Felder prüfen und erneut versuchen",
@@ -39,7 +48,8 @@ export const translations: typeof enTranslations = {
       conflict: { title: "Konflikt", description: "Datenkonflikt" },
       server: {
         title: "Serverfehler",
-        description: "Rechnung konnte nicht erstellt werden — erneut versuchen",
+        description:
+          "Rechnung konnte nicht erstellt werden. Bitte versuchen Sie es erneut.",
       },
       unknown: {
         title: "Unbekannter Fehler",
@@ -63,8 +73,33 @@ export const translations: typeof enTranslations = {
       description: "Lieferantenrechnung erfolgreich gespeichert",
     },
     widget: {
+      supplier: "Lieferant",
+      dates: "Rechnungsdaten und Währung",
+      items: "Positionen",
+      itemsDescription:
+        "Optionale Positionen. Geben Sie den Steuersatz als Dezimalzahl von 0 bis 1 an.",
+      itemsHint: "Fügen Sie die berechneten Waren oder Leistungen hinzu.",
+      item: "Beschreibung",
+      quantity: "Menge",
+      unitPrice: "Einzelpreis",
+      manualTaxRate: "Anderer Satz",
+      taxRate: "USt. %",
+      lineTotal: "Positionssumme",
+      addItem: "Position hinzufügen",
+      removeItem: "Position entfernen",
+      itemError: "Prüfen Sie Beschreibung, Menge, Preis und USt.-Satz.",
+      summary: "Rechnungsübersicht",
+      net: "Netto",
+      tax: "Umsatzsteuer",
+      total: "Gesamt",
+      chooseVendor: "Lieferanten auswählen",
+      vendorSource: "Aus dem Lieferantenverzeichnis",
+      terms: "Zahlungsziel des Lieferanten übernehmen",
+      manualVendor: "Lieferanten manuell eingeben",
+      selectCompanyFirst: "Wählen Sie zuerst ein Unternehmen aus.",
+
       back: "Zurück",
-      submit: "Rechnung erfassen",
+      submit: "Entwurf speichern",
       viewButton: "Rechnung ansehen",
       addAnotherButton: "Weitere erfassen",
     },
@@ -89,6 +124,10 @@ export const translations: typeof enTranslations = {
     description: "Das Unternehmen, das diese Rechnung erhält",
     placeholder: "Unternehmens-UUID",
   },
+  vendorId: {
+    label: "Lieferanten auswählen",
+    description: "Aus dem Lieferantenverzeichnis",
+  },
   supplierName: {
     label: "Lieferantenname",
     description: "Name des Lieferanten, der diese Rechnung geschickt hat",
@@ -107,14 +146,15 @@ export const translations: typeof enTranslations = {
   billDate: {
     label: "Rechnungsdatum",
     description: "Datum der Rechnungsstellung",
-    placeholder: "2024-01-01",
+    placeholder: "Rechnungsdatum auswählen",
   },
   dueDate: {
     label: "Fälligkeitsdatum",
     description: "Zahlungsfrist",
-    placeholder: "2024-01-31",
+    placeholder: "Fälligkeitsdatum auswählen",
   },
   currency: {
+    code: "{{code}}",
     label: "Währung",
     description: "Rechnungswährung",
     placeholder: "EUR",

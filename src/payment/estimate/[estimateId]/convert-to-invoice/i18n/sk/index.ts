@@ -17,6 +17,8 @@ export const translations: typeof enTranslations = {
       invoiceId: "ID vytvorenej faktúry",
     },
     errors: {
+      reconcile:
+        "Uložené položky sa nezhodujú s celkovou sumou ponuky. Skopírujte ponuku a údaje v koncepte skontrolujte a opravte.",
       unauthorized: {
         title: "Vyžaduje sa prihlásenie",
         description: "Prihláste sa.",
@@ -25,7 +27,10 @@ export const translations: typeof enTranslations = {
         title: "Neplatné údaje",
         description: "Skontrolujte zadané údaje.",
       },
-      server: { title: "Chyba servera", description: "Nastala interná chyba servera." },
+      server: {
+        title: "Chyba servera",
+        description: "Nastala interná chyba servera.",
+      },
       unknown: {
         title: "Neznáma chyba",
         description: "Nastala neznáma chyba.",
@@ -34,20 +39,33 @@ export const translations: typeof enTranslations = {
         title: "Chyba siete",
         description: "Skontrolujte pripojenie.",
       },
-      forbidden: { title: "Prístup zamietnutý", description: "Nemáte potrebné oprávnenie." },
-      notFound: { title: "Nenašlo sa", description: "Cenová ponuka sa nenašla" },
+      forbidden: {
+        title: "Prístup zamietnutý",
+        description: "Nemáte potrebné oprávnenie.",
+      },
+      notFound: {
+        title: "Nenašlo sa",
+        description: "Cenová ponuka sa nenašla",
+      },
       conflict: {
         title: "Konflikt",
-        description: "Faktúru možno vytvoriť iba z cenovej ponuky v stave SENT alebo ACCEPTED.",
+        description:
+          "Faktúru možno vytvoriť iba z cenovej ponuky v stave SENT alebo ACCEPTED.",
       },
       unsavedChanges: {
         title: "Neuložené zmeny",
         description: "Máte neuložené zmeny.",
       },
     },
-    success: { title: "Úspech", description: "Z cenovej ponuky sa vytvorila faktúra" },
+    success: {
+      title: "Úspech",
+      description: "Z cenovej ponuky sa vytvorila faktúra",
+    },
   },
-  estimateId: { label: "ID cenovej ponuky", description: "Cenová ponuka, z ktorej chcete vystaviť faktúru" },
+  estimateId: {
+    label: "ID cenovej ponuky",
+    description: "Cenová ponuka, z ktorej chcete vystaviť faktúru",
+  },
   widget: {
     back: "Späť",
     submit: "Vytvoriť faktúru",

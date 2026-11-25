@@ -3,31 +3,29 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   enums: {
     country: {
-      AT: "AT (ÖKR)",
-      DE: "DE (SKR03)",
-      XX: "XX (IFRS générique)",
+      AT: "Autriche (ÖKR)",
+      DE: "Allemagne (SKR03)",
+      XX: "Modèle IFRS générique",
     },
   },
   post: {
-    title: "Initialiser le plan comptable",
-    titleShort: "Configuration",
+    title: "Configurer le plan comptable",
+    titleShort: "Configurer le plan comptable",
     description:
-      "Créez le plan comptable d'une entreprise à partir d'un modèle propre à un pays. Idempotent : vous pouvez le relancer sans risque.",
+      "Complétez les comptes de votre entreprise à partir d’un modèle standard.",
     companyId: {
-      label: "ID de l'entreprise",
-      description:
-        "L'entreprise dont vous voulez initialiser le plan comptable",
-      placeholder: "Saisissez l'UUID de l'entreprise",
+      label: "Entreprise",
+      description: "Choisissez l’entreprise à configurer.",
+      placeholder: "Choisir une entreprise",
     },
     country: {
-      label: "Pays",
-      description:
-        "Référentiel national à utiliser (AT = ÖKR, DE = SKR03, XX = IFRS générique)",
-      placeholder: "Choisir un pays",
+      label: "Modèle de plan comptable",
+      description: "Choisissez la structure des comptes à ajouter.",
+      placeholder: "Choisir un modèle",
     },
     response: {
       created: "Comptes créés",
-      skipped: "Comptes ignorés (déjà existants)",
+      skipped: "Comptes conservés",
     },
     errors: {
       unauthorized: {
@@ -37,7 +35,7 @@ export const translations: typeof enTranslations = {
       },
       validation: {
         title: "Erreur de validation",
-        description: "Saisie invalide : vérifiez l'ID d'entreprise et le pays",
+        description: "Vérifiez l’entreprise et le modèle de plan comptable.",
       },
       forbidden: {
         title: "Accès refusé",
@@ -46,15 +44,16 @@ export const translations: typeof enTranslations = {
       },
       server: {
         title: "Erreur serveur",
-        description: "La configuration a échoué. Veuillez réessayer",
+        description: "Réessayez d’appliquer le modèle.",
       },
       unknown: {
         title: "Erreur inconnue",
         description: "Une erreur inattendue s'est produite",
       },
       conflict: {
-        title: "Déjà initialisé",
-        description: "Cette entreprise a déjà un plan comptable",
+        title: "Vérifier la configuration",
+        description:
+          "Actualisez les comptes de l’entreprise avant d’appliquer le modèle.",
       },
       network: {
         title: "Erreur réseau",
@@ -71,10 +70,21 @@ export const translations: typeof enTranslations = {
     },
     success: {
       title: "Plan comptable prêt",
-      description: "Tous les comptes de l'entreprise ont été créés",
+      description:
+        "Le modèle a été appliqué. Consultez les comptes ajoutés et conservés.",
     },
     widget: {
-      viewAccounts: "Voir la liste des comptes",
+      review: "Vérifier la configuration",
+      previewLoading: "Recherche des comptes existants…",
+      previewFailed: "Le nombre de comptes existants est indisponible.",
+      existing: "Comptes existants : {{count}}.",
+      empty: "Cette entreprise ne possède pas encore de comptes.",
+      consequences:
+        "La configuration ajoute les codes de compte manquants du modèle et préserve les données existantes.",
+      submit: "Ajouter les comptes du modèle",
+      back: "Retour",
+      viewAccounts: "Ouvrir le plan comptable",
+      viewPeriods: "Voir les périodes comptables",
     },
   },
   title: "Configuration du plan comptable",

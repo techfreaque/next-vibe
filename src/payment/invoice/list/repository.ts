@@ -5,9 +5,9 @@
 
 import "server-only";
 
-import { and, count, eq, ilike, inArray, or, sql } from "drizzle-orm";
+import { and, count, desc, eq, ilike, inArray, lt, or, sql } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { defaultLocale } from "next-vibe/core/i18n/core/config";
+import { CurrenciesArr, defaultLocale } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
   fail,
@@ -16,11 +16,15 @@ import {
 } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
+import { users } from "next-vibe/identity/user/db";
 import type { EndpointLogger } from "next-vibe/logger/types";
+import { z } from "zod";
 
-import { CompanyMemberRole } from "@/companies/enum";
-import { CompanyAuthRepository } from "@/companies/repository";
-import { getDocumentCompanies } from "@/finance/document-company-scope";
+import { getInvoiceOpenBalanceParts } from "@/finance/document-balance";
+import {
+  canManageDocumentsInCompanySelection,
+  getDocumentCompanies,
+} from "@/finance/document-company-scope";
 import { documentPage, documentSearchPattern } from "@/finance/document-list";
 
 import { paymentInvoiceLines, paymentInvoices } from "../../db";
@@ -29,6 +33,7 @@ import type {
   InvoiceListRequestOutput,
   InvoiceListResponseOutput,
 } from "./definition";
+import { OVERDUE_INVOICE_FILTER } from "./filters";
 import { scopedTranslation } from "./i18n";
 
 export class InvoiceListRepository {
@@ -41,19 +46,6 @@ export class InvoiceListRepository {
     const { t } = scopedTranslation.scopedT(locale);
 
     try {
-      if (data.companyId) {
-        const authResult = await CompanyAuthRepository.requireMember(
-          userId,
-          data.companyId,
-          CompanyMemberRole.VIEWER,
-          logger,
-          locale,
-        );
-        if (!authResult.success) {
-          return authResult;
-        }
-      }
-
       const selectedCompanies = await getDocumentCompanies(
         userId,
         data.companyId,
@@ -79,18 +71,48 @@ export class InvoiceListRepository {
           hasFilters,
           selectedCompanyId: null,
           selectedCompanyName: null,
+          canCreateInvoice: false,
         });
       }
 
       const pattern = data.search
         ? documentSearchPattern(data.search)
         : undefined;
+      const overdueOnly = data.status === OVERDUE_INVOICE_FILTER;
+      const today = new Date();
+      today.setUTCHours(0, 0, 0, 0);
+
+      const {
+        payments,
+        credits,
+        paymentJoin,
+        creditJoin,
+        amountPaid: paymentSum,
+        openAmount,
+      } = getInvoiceOpenBalanceParts(db, data.companyId);
+      const customerId = sql<string | null>`case
+        when jsonb_typeof(${paymentInvoices.metadata}->'customerId') = 'string'
+        then ${paymentInvoices.metadata}->>'customerId'
+      end`;
+      const customerSnapshot = sql<string | null>`case
+        when jsonb_typeof(${paymentInvoices.metadata}->'customerName') = 'string'
+        then nullif(btrim(${paymentInvoices.metadata}->>'customerName'), '')
+      end`;
+      const linkedCustomerName = sql<
+        string | null
+      >`coalesce(nullif(btrim(${users.publicName}), ''), nullif(btrim(${users.privateName}), ''))`;
+      const customerJoin = sql`${users.id}::text = ${customerId}`;
+      const selectedStatus =
+        data.status === OVERDUE_INVOICE_FILTER
+          ? InvoiceStatus.OPEN
+          : data.status;
       const where = and(
         inArray(paymentInvoices.companyId, [...companyNames.keys()]),
-        data.status ? eq(paymentInvoices.status, data.status) : undefined,
-        data.customerId
-          ? sql`${paymentInvoices.metadata}->>'customerId' = ${data.customerId}`
+        selectedStatus ? eq(paymentInvoices.status, selectedStatus) : undefined,
+        overdueOnly
+          ? and(lt(paymentInvoices.dueDate, today), sql`${openAmount} > 0`)
           : undefined,
+        data.customerId ? sql`${customerId} = ${data.customerId}` : undefined,
         pattern
           ? or(
               ilike(paymentInvoices.invoiceNumber, pattern),
@@ -103,14 +125,24 @@ export class InvoiceListRepository {
                 pattern,
               ),
               ilike(sql`${paymentInvoices.id}::text`, pattern),
-              ilike(sql`${paymentInvoices.metadata}->>'customerId'`, pattern),
+              ilike(customerId, pattern),
+              ilike(linkedCustomerName, pattern),
+              ilike(customerSnapshot, pattern),
             )
           : undefined,
       );
-      const [{ value: total }] = await db
+
+      const countRows = db
         .select({ value: count() })
         .from(paymentInvoices)
-        .where(where);
+        .$dynamic();
+      if (pattern) {
+        countRows.leftJoin(users, customerJoin);
+      }
+      if (overdueOnly) {
+        countRows.leftJoin(payments, paymentJoin).leftJoin(credits, creditJoin);
+      }
+      const [{ value: total }] = await countRows.where(where);
       const pagination = documentPage(total, data.page, pageSize);
       const offset = (pagination.currentPage - 1) * pageSize;
 
@@ -120,21 +152,26 @@ export class InvoiceListRepository {
           companyId: paymentInvoices.companyId,
           invoiceNumber: paymentInvoices.invoiceNumber,
           invoiceSequenceNumber: paymentInvoices.invoiceSequenceNumber,
-          customerId: sql<string | null>`case
-            when jsonb_typeof(${paymentInvoices.metadata}->'customerId') = 'string'
-            then ${paymentInvoices.metadata}->>'customerId'
-          end`,
+          customerId,
+          customerName: sql<
+            string | null
+          >`coalesce(${linkedCustomerName}, ${customerSnapshot})`,
           currency: paymentInvoices.currency,
           status: paymentInvoices.status,
           amount: paymentInvoices.amount,
+          recordedPayments: paymentSum,
+          openAmount,
           dueDate: paymentInvoices.dueDate,
           notes: paymentInvoices.notes,
           createdAt: paymentInvoices.createdAt,
           updatedAt: paymentInvoices.updatedAt,
         })
         .from(paymentInvoices)
+        .leftJoin(payments, paymentJoin)
+        .leftJoin(credits, creditJoin)
+        .leftJoin(users, customerJoin)
         .where(where)
-        .orderBy(paymentInvoices.createdAt, paymentInvoices.id)
+        .orderBy(desc(paymentInvoices.createdAt), desc(paymentInvoices.id))
         .limit(pageSize)
         .offset(offset);
 
@@ -148,33 +185,54 @@ export class InvoiceListRepository {
               .where(inArray(paymentInvoiceLines.invoiceId, invoiceIds))
               .groupBy(paymentInvoiceLines.invoiceId);
       const lineCounts = new Map(counts.map(({ id, value }) => [id, value]));
-      const now = new Date();
-      const invoiceList = rows.map((row) => {
-        const totalAmount = Number(row.amount);
-        const amountPaid = row.status === InvoiceStatus.PAID ? totalAmount : 0;
-        const isOverdue =
-          row.status === InvoiceStatus.OPEN &&
-          row.dueDate !== null &&
-          row.dueDate < now;
+      const invoiceList = rows.map(
+        ({ recordedPayments, openAmount: balance, ...row }) => {
+          const totalAmount = Number(row.amount);
+          const amountPaid =
+            row.status === InvoiceStatus.PAID && Number(recordedPayments) === 0
+              ? Math.max(0, totalAmount)
+              : Number(recordedPayments);
+          const amountDue =
+            row.status === InvoiceStatus.OPEN ? Number(balance) : 0;
+          const isOverdue =
+            amountDue > 0 && row.dueDate !== null && row.dueDate < today;
 
-        return {
-          ...row,
-          companyName: companyNames.get(row.companyId ?? "") ?? null,
-          lineCount: lineCounts.get(row.id) ?? 0,
-          amountPaid,
-          amountDue: Math.max(0, totalAmount - amountPaid),
-          isOverdue,
-        };
-      });
+          return {
+            ...row,
+            companyName: companyNames.get(row.companyId ?? "") ?? null,
+            lineCount: lineCounts.get(row.id) ?? 0,
+            amountPaid,
+            amountDue,
+            isOverdue,
+          };
+        },
+      );
 
+      const selectedCompanyId =
+        data.companyId ??
+        (selectedCompanies.length === 1 ? selectedCompanies[0]?.id : undefined);
+      const selectedCompany = selectedCompanies.find(
+        (company) => company.id === selectedCompanyId,
+      );
+      const selectedCompanyCurrency = z
+        .enum(CurrenciesArr)
+        .safeParse(selectedCompany?.currency);
+      const canCreateInvoice = await canManageDocumentsInCompanySelection(
+        userId,
+        selectedCompanyId,
+      );
       return success({
         total,
         ...pagination,
         hasFilters,
-        selectedCompanyId: data.companyId ?? null,
-        selectedCompanyName: data.companyId
-          ? (companyNames.get(data.companyId) ?? null)
+        selectedCompanyId: selectedCompanyId ?? null,
+        selectedCompanyCurrency: selectedCompanyCurrency.success
+          ? selectedCompanyCurrency.data
           : null,
+        selectedCompanyName: selectedCompanyId
+          ? (companyNames.get(selectedCompanyId) ?? null)
+          : null,
+        canCreateInvoice,
         invoices: invoiceList,
       });
     } catch (error) {

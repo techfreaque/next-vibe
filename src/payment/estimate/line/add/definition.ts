@@ -144,6 +144,11 @@ const { POST } = createEndpoint({
         columns: 12,
         usage: { response: true },
         children: {
+          currency: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            label: "post.response.line.currency",
+            schema: z.string().optional(),
+          }),
           id: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             label: "post.response.line.id" as const,

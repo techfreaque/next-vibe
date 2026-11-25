@@ -6,7 +6,13 @@ import { Input } from "next-vibe/ui/components/input";
 import { Span } from "next-vibe/ui/components/span";
 import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
 import {
+  formatMoney,
+  formatPercent,
+} from "next-vibe/unified-ui/_shared/format-money";
+import {
   useWidgetForm,
+  useWidgetIsInteractive,
+  useWidgetLocale,
   useWidgetLogger,
   useWidgetNavigation,
   useWidgetTranslation,
@@ -14,14 +20,18 @@ import {
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { useApiQuery } from "next-vibe/unified-ui/hooks/use-api-query";
+import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
 import { NumberFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/number-field/widget";
 import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-field/widget";
 import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
+import { useMemo } from "react";
 import { type JSX, useState } from "react";
 
+import { calculateInvoiceLine } from "@/payment/invoice/line/amounts";
 import productLookupEndpoint from "@/pos/product-lookup/definition";
 
+import detailDefinition from "../../[estimateId]/get/definition";
 import type definition from "./definition";
 
 interface ProductSearchResult {
@@ -34,12 +44,6 @@ interface ProductSearchResult {
   unit: string | null;
 }
 
-const fmt = (n: number): string =>
-  new Intl.NumberFormat(undefined, {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(n);
-
 export function EstimateLineAddWidget({
   field,
 }: {
@@ -47,11 +51,33 @@ export function EstimateLineAddWidget({
 }): JSX.Element {
   const data = useWidgetValue<typeof definition.POST>();
   const navigation = useWidgetNavigation();
+  const locale = useWidgetLocale();
   const t = useWidgetTranslation<typeof definition.POST>();
   const form = useWidgetForm<typeof definition.POST>();
   const user = useWidgetUser();
   const logger = useWidgetLogger();
   const line = data?.line;
+  const documentId = form.watch("estimateId");
+  const interactive = useWidgetIsInteractive();
+  const detailOptions = useMemo(
+    () => ({
+      read: {
+        urlPathParams: { estimateId: documentId ?? "" },
+        queryOptions: { enabled: interactive && !!documentId && !line },
+      },
+    }),
+    [documentId, interactive, line],
+  );
+  const loadedDetail = useEndpoint(
+    detailDefinition,
+    detailOptions,
+    logger,
+    user,
+  ).read?.data;
+  const detail = loadedDetail?.id === documentId ? loadedDetail : undefined;
+  const denomination = line?.currency ?? detail?.currency;
+  const fmt = (amount: number): string =>
+    formatMoney(amount, denomination, locale);
 
   const [selectedProduct, setSelectedProduct] =
     useState<ProductSearchResult | null>(null);
@@ -62,16 +88,20 @@ export function EstimateLineAddWidget({
   // Typed, cached product search via the pos/product-lookup endpoint.
   const productSearch = useApiQuery({
     endpoint: productLookupEndpoint.GET,
-    requestData: { query: submittedQuery, companyId: undefined },
+    requestData: {
+      query: submittedQuery,
+      companyId: detail?.companyId ?? undefined,
+    },
     logger,
     user,
     options: {
-      enabled: submittedQuery.trim().length > 0,
-      queryKey: `product-lookup:${submittedQuery}`,
+      enabled: !!detail && submittedQuery.trim().length > 0,
+      queryKey: `product-lookup:${detail?.companyId ?? ""}:${submittedQuery}`,
     },
   });
-  const searchResults: ProductSearchResult[] =
-    productSearch.data?.products ?? [];
+  const searchResults: ProductSearchResult[] = (
+    productSearch.data?.products ?? []
+  ).filter((product) => product.currency === denomination);
   const isSearching = productSearch.isFetching;
   const hasSearched = submittedQuery.trim().length > 0 && !isSearching;
 
@@ -81,9 +111,11 @@ export function EstimateLineAddWidget({
   const taxRate = Number(form?.watch("taxRate") ?? 0);
   const description = String(form?.watch("description") ?? "");
 
-  const lineSubtotal = qty * unitPrice;
-  const taxAmount = lineSubtotal * taxRate;
-  const lineTotal = lineSubtotal + taxAmount;
+  const { lineTotal } = calculateInvoiceLine({
+    quantity: qty,
+    unitPrice,
+    taxRate,
+  });
 
   const handleProductSearch = (): void => {
     if (!searchQuery.trim()) {
@@ -168,7 +200,7 @@ export function EstimateLineAddWidget({
         <Div className="rounded-lg border overflow-hidden divide-y">
           <Div className="flex items-center justify-between px-4 py-3 bg-muted/30">
             <Span className="text-sm font-medium">{line.description}</Span>
-            <Span className="text-sm font-mono font-bold tabular-nums">
+            <Span className="text-sm font-semibold tabular-nums">
               {fmt(line.lineTotal)}
             </Span>
           </Div>
@@ -178,12 +210,10 @@ export function EstimateLineAddWidget({
               {line.taxRate !== null &&
               line.taxRate !== undefined &&
               line.taxRate > 0
-                ? ` + ${(line.taxRate * 100).toFixed(0)}% ${t("widget.taxLabel")}`
+                ? ` + ${formatPercent(line.taxRate, locale)} ${t("widget.taxLabel")}`
                 : ""}
             </Span>
-            <Span className="text-sm font-mono tabular-nums">
-              {fmt(line.lineTotal)}
-            </Span>
+            <Span className="text-sm tabular-nums">{fmt(line.lineTotal)}</Span>
           </Div>
         </Div>
 
@@ -220,7 +250,7 @@ export function EstimateLineAddWidget({
 
       {/* Product search section */}
       <Div className="flex flex-col gap-2">
-        <Span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+        <Span className="text-sm font-medium text-foreground">
           {t("widget.searchProduct")}
         </Span>
 
@@ -238,7 +268,11 @@ export function EstimateLineAddWidget({
                   </Span>
                 ) : null}
                 <Span className="text-xs text-muted-foreground">
-                  {fmt(selectedProduct.basePrice)} {selectedProduct.currency}
+                  {formatMoney(
+                    selectedProduct.basePrice,
+                    selectedProduct.currency,
+                    locale,
+                  )}
                 </Span>
               </Div>
             </Div>
@@ -301,9 +335,8 @@ export function EstimateLineAddWidget({
                         </Span>
                       ) : null}
                     </Div>
-                    <Span className="text-sm font-mono tabular-nums ml-3 shrink-0">
-                      {fmt(product.basePrice)}{" "}
-                      <Span className="text-xs">{product.currency}</Span>
+                    <Span className="text-sm tabular-nums ml-3 shrink-0">
+                      {formatMoney(product.basePrice, product.currency, locale)}
                     </Span>
                   </Button>
                 ))}
@@ -335,15 +368,19 @@ export function EstimateLineAddWidget({
         <Div className="grid grid-cols-2 gap-3">
           <NumberFieldWidget
             fieldName="quantity"
+            presentation="quantity"
             field={withValue(field.children.quantity, undefined, null)}
           />
           <NumberFieldWidget
             fieldName="unitPrice"
+            presentation="money"
+            currency={denomination}
             field={withValue(field.children.unitPrice, undefined, null)}
           />
         </Div>
         <NumberFieldWidget
           fieldName="taxRate"
+          presentation="percent"
           field={withValue(field.children.taxRate, undefined, null)}
         />
       </Div>
@@ -353,17 +390,17 @@ export function EstimateLineAddWidget({
         <Div className="rounded-lg border bg-muted/20 px-4 py-3 flex items-center justify-between">
           <Div className="flex flex-col gap-0.5">
             <Span className="text-xs text-muted-foreground">
-              {description ? `"${description}" — ` : ""}
+              {description ? `${description} · ` : ""}
               {qty} {t("widget.multiplier")} {fmt(unitPrice)}
               {taxRate > 0
-                ? ` + ${(taxRate * 100).toFixed(0)}% ${t("widget.taxLabel")}`
+                ? ` + ${formatPercent(taxRate, locale)} ${t("widget.taxLabel")}`
                 : ""}
             </Span>
             <Span className="text-xs text-muted-foreground">
               {t("widget.linePreview")}
             </Span>
           </Div>
-          <Span className="text-base font-mono font-bold tabular-nums">
+          <Span className="text-base font-semibold tabular-nums">
             {fmt(lineTotal)}
           </Span>
         </Div>

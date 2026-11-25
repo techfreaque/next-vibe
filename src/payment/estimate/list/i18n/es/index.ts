@@ -107,6 +107,7 @@ export const translations: typeof enTranslations = {
     description: "Elementos por página",
   },
   widget: {
+    filters: "Filtros",
     pageCount: "Páginas totales",
     back: "Atrás",
     title: "Estimaciones de ventas",

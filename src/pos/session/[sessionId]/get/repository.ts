@@ -30,6 +30,7 @@ export class PosSessionGetRepository {
   ): Promise<
     ResponseType<{
       result: {
+        currency: string;
         id: string;
         terminalId: string;
         cashierUserId: string;
@@ -68,12 +69,21 @@ export class PosSessionGetRepository {
 
       // Verify user is a member of the terminal's company
       const [terminal] = await db
-        .select({ companyId: posTerminals.companyId })
+        .select({
+          companyId: posTerminals.companyId,
+          currency: posTerminals.currency,
+        })
         .from(posTerminals)
         .where(eq(posTerminals.id, session.terminalId))
         .limit(1);
 
-      if (terminal) {
+      if (!terminal) {
+        return fail({
+          message: t("sessionGet.get.errors.notFound.title"),
+          errorType: ErrorResponseTypes.NOT_FOUND,
+        });
+      }
+      {
         const authResult = await CompanyAuthRepository.requireMember(
           userId,
           terminal.companyId,
@@ -86,7 +96,7 @@ export class PosSessionGetRepository {
         }
       }
 
-      return success({ result: session });
+      return success({ result: { ...session, currency: terminal.currency } });
     } catch (error) {
       logger.error("Error getting POS session", parseError(error));
       return fail({

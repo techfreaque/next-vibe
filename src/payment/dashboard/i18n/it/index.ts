@@ -80,6 +80,7 @@ export const translations: typeof enTranslations = {
     placeholder: "Entra in azienda ID",
   },
   widget: {
+    unnumberedInvoice: "Fattura senza numero",
     subtitle:
       "Fatture, preventivi e bollette che emetti. I pagamenti con carta e cripto sono nelle transazioni di pagamento.",
     estimatesSent: "Preventivi inviati",

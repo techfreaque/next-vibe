@@ -17,6 +17,8 @@ export const translations: typeof enTranslations = {
       invoiceId: "Erstellte Rechnungs-ID",
     },
     errors: {
+      reconcile:
+        "Die Positionen stimmen nicht mit der Angebotssumme überein. Duplizieren Sie das Angebot und prüfen Sie den neuen Entwurf.",
       unauthorized: {
         title: "Nicht autorisiert",
         description: "Authentifizierung erforderlich",

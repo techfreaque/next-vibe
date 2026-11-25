@@ -17,7 +17,8 @@ import { NumberFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/numb
 import { SelectFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/select-field/widget";
 import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
-import type { JSX } from "react";
+import { type JSX, useEffect, useRef } from "react";
+import { v4 as uuidv4 } from "uuid";
 
 import type definition from "./definition";
 
@@ -30,6 +31,16 @@ export function InvoiceRecordPaymentWidget({
   const navigation = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.POST>();
   const form = useWidgetForm<typeof definition.POST>();
+
+  const receiptKey = form.watch("receiptKey");
+  const generatedReceiptKey = useRef<string | undefined>(undefined);
+
+  useEffect(() => {
+    if (!receiptKey && !data?.success) {
+      generatedReceiptKey.current ??= uuidv4();
+      form.setValue("receiptKey", generatedReceiptKey.current);
+    }
+  }, [data?.success, form, receiptKey]);
 
   const handleViewInvoice = (): void => {
     const invoiceId = form?.getValues("invoiceId") ?? "";
@@ -107,6 +118,7 @@ export function InvoiceRecordPaymentWidget({
         <Div className="grid grid-cols-2 gap-3">
           <DateFieldWidget
             fieldName="paidAt"
+            utcCalendarDay
             field={withValue(field.children.paidAt, undefined, null)}
           />
           <EntityPickerFieldWidget

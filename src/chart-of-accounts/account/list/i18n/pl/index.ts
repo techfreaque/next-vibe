@@ -19,6 +19,7 @@ export const translations: typeof enTranslations = {
       description: "Konta na stronie (max 200)",
     },
     response: {
+      balance: "Saldo",
       total: "Łącznie",
       accounts: "Konta",
       id: "ID",
@@ -77,6 +78,8 @@ export const translations: typeof enTranslations = {
       description: "Plan kont pobrany pomyślnie",
     },
     widget: {
+      debitSide: "Wn",
+      creditSide: "Ma",
       loading: "Ładowanie kont...",
       empty: "Brak kont. Uruchom konfigurację, aby wczytać dane z szablonu.",
       createButton: "Nowe konto",

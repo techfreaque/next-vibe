@@ -211,7 +211,7 @@ const { GET } = createEndpoint({
   }),
 
   options: {
-    formOptions: { autoSubmit: false, persistForm: false },
+    formOptions: { autoSubmit: true, debounceMs: 300, persistForm: false },
   },
 
   errorTypes: {

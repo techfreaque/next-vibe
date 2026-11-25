@@ -43,6 +43,8 @@ export const translations = {
       description: "The accounting period has been closed",
     },
     widget: {
+      closeNamed: "Close {{name}}",
+      draftCount: "Draft journal entries",
       closedLabel: "Closed",
       failedLabel: "Failed",
       confirmTitle: "Close Accounting Period?",

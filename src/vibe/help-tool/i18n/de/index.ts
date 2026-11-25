@@ -4,6 +4,92 @@ export const translations: typeof enTranslations = {
   category: "Hilfe & Dokumentation",
   tag: "Hilfe",
   uncategorized: "Sonstige",
+  erp: {
+    navigation: {
+      sales: "Verkauf",
+      purchases: "Einkauf",
+      invoices: "Ausgangsrechnungen",
+      estimates: "Angebote",
+      bills: "Eingangsrechnungen",
+    },
+    overview: {
+      loading: "Unternehmensübersicht wird geladen",
+      loadError: "Die Unternehmensübersicht konnte nicht geladen werden",
+    },
+    home: "Startseite",
+    title: "Buchhaltung",
+    description:
+      "Richte dein Unternehmen ein, verwalte Rechnungen und bereite den Monatsabschluss vor.",
+    companies: "Unternehmen verwalten",
+    activeDescription:
+      "Prüfe deine Buchhaltung und lege die nächste Rechnung an.",
+    newInvoice: "Neue Rechnung",
+    createCompany: "Unternehmen einrichten",
+    companySwitch: {
+      label: "Unternehmen für die Buchhaltung",
+      select: "Unternehmen auswählen",
+      current: "Aktuelles Unternehmen: {{name}}",
+    },
+    workflows: "Häufige Aufgaben",
+    sales: {
+      title: "Kundenrechnung erstellen",
+      description:
+        "Lege einen Rechnungsentwurf an oder erfasse eine Zahlung in einer bestehenden Rechnung.",
+      primary: "Rechnung erstellen",
+      secondary: "Rechnungen ansehen",
+    },
+    expenses: {
+      title: "Lieferantenrechnung erfassen",
+      description:
+        "Erfasse Verbindlichkeiten und verfolge Zahlungen direkt in der Rechnung.",
+      primary: "Eingangsrechnung erfassen",
+      secondary: "Eingangsrechnungen ansehen",
+    },
+    receivables: {
+      title: "Offene Forderungen prüfen",
+      description:
+        "Sieh, welche Kundenbeträge offen sind und seit wann sie überfällig sind.",
+      primary: "Forderungen ansehen",
+    },
+    payables: {
+      title: "Offene Lieferantenposten prüfen",
+      description:
+        "Sieh offene Beträge, anstehende Freigaben und strittige Rechnungen.",
+      primary: "Lieferantenposten ansehen",
+    },
+    bank: {
+      title: "Bankumsätze importieren",
+      description:
+        "Importiere einen CSV-Kontoauszug und prüfe noch nicht zugeordnete Umsätze.",
+      primary: "Kontoauszug importieren",
+      secondary: "Nicht zugeordnete Umsätze ansehen",
+    },
+    stock: {
+      title: "Lagerbestand prüfen",
+      description:
+        "Sieh, was auf Lager ist und welche Artikel du nachbestellen musst.",
+      primary: "Lager öffnen",
+    },
+    tax: {
+      title: "Umsatzsteuer prüfen",
+      description:
+        "Prüfe die Steuerbeträge für den Meldezeitraum vor der Abgabe.",
+      primary: "Steuerbericht öffnen",
+    },
+    exports: {
+      title: "Buchungsjournal prüfen und exportieren",
+      description:
+        "Prüfe auffällige Buchungen oder lade gebuchte Einträge als CSV herunter.",
+      primary: "Buchungen prüfen",
+      secondary: "Journalexport öffnen",
+    },
+    close: {
+      title: "Buchungsperiode abschließen",
+      description: "Prüfe die Summen- und Saldenliste vor dem Abschluss.",
+      primary: "Buchungsperioden ansehen",
+      secondary: "Summen- und Saldenliste öffnen",
+    },
+  },
   catalog: {
     title: "Toolkatalog",
     searchLabel: "Toolkatalog durchsuchen",

@@ -80,6 +80,7 @@ export const translations: typeof enTranslations = {
     placeholder: "Saisissez l'ID de l'entreprise",
   },
   widget: {
+    unnumberedInvoice: "Facture sans numéro",
     subtitle:
       "Factures, devis et factures fournisseurs que vous émettez. Les paiements carte et crypto sont dans les transactions de paiement.",
     estimatesSent: "Devis envoyés",

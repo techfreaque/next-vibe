@@ -180,7 +180,7 @@ export const translations: typeof enTranslations = {
         server: {
           title: "Serverfehler",
           description:
-            "Terminal konnte nicht erstellt werden — erneut versuchen",
+            "Terminal konnte nicht erstellt werden. Bitte versuchen Sie es erneut.",
         },
         unknown: {
           title: "Unbekannter Fehler",
@@ -367,6 +367,8 @@ export const translations: typeof enTranslations = {
 
   sessionClose: {
     post: {
+      mixedCash:
+        "Barzahlungen in einer anderen Währung müssen vor dem Kassenabschluss abgestimmt werden.",
       title: "Sitzung schließen",
       titleShort: "Sitzung schließen",
       description: "Kassensitzung schließen und Abschlussbestand erfassen.",
@@ -613,7 +615,8 @@ export const translations: typeof enTranslations = {
         selectedProduct: "Ausgewähltes Produkt",
         clearProduct: "Löschen",
         searchButton: "Suchen",
-        noProductResults: "Keine Treffer — unten manuell eingeben.",
+        noProductResults:
+          "Keine Treffer. Geben Sie die Artikeldaten unten ein.",
       },
       orderId: {
         label: "Bestellungs-ID",
@@ -700,13 +703,14 @@ export const translations: typeof enTranslations = {
       titleShort: "Artikel entfernen",
       description: "Artikel aus einer offenen Bestellung entfernen.",
       widget: {
+        chooseLine: "Position auswählen",
         backToOrder: "Zurück zur Bestellung",
       },
       orderId: {
-        label: "Bestellungs-ID",
+        label: "Bestellung",
         description: "Bestellung, aus der der Artikel entfernt wird",
       },
-      itemId: { label: "Artikel-ID", description: "Zu entfernender Artikel" },
+      itemId: { label: "Position", description: "Zu entfernender Artikel" },
       errors: {
         validation: {
           title: "Validierungsfehler",
@@ -832,10 +836,13 @@ export const translations: typeof enTranslations = {
       titleShort: "Auftrag stornieren",
       description: "Offene Bestellung stornieren. Nicht rückgängig zu machen.",
       widget: {
+        tendered:
+          "Die Zahlung wurde bereits erfasst. Bestellung und Positionen sind für Änderungen gesperrt.",
+        closed: "Diese Bestellung ist abgeschlossen.",
         backToList: "Zurück zur Bestellliste",
       },
       orderId: {
-        label: "Bestellungs-ID",
+        label: "Bestellung",
         description: "Zu stornierende Bestellung",
       },
       errors: {
@@ -902,7 +909,7 @@ export const translations: typeof enTranslations = {
         fullyPaid: "Vollständig bezahlt",
         qtyTimesPrice: "×",
         loading: "Auftrag wird geladen...",
-        noItems: "Noch keine Artikel — ersten Artikel hinzufügen.",
+        noItems: "Fügen Sie den ersten Artikel hinzu.",
         viewJournalEntry: "Buchungssatz ansehen",
         voidedStamp: "STORNIERT",
         completedReadOnly:
@@ -1073,7 +1080,8 @@ export const translations: typeof enTranslations = {
       description:
         "Katalogprodukte nach Name oder Artikel-Nr. für die Kasse suchen.",
       widget: {
-        noResults: "Keine Produkte gefunden — andere Suche versuchen.",
+        noResults:
+          "Keine Produkte gefunden. Versuchen Sie einen anderen Suchbegriff.",
         tax: "Steuer",
         back: "Zurück",
       },

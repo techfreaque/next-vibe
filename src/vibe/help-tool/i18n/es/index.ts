@@ -4,6 +4,92 @@ export const translations: typeof enTranslations = {
   category: "Ayudar a la documentación",
   tag: "Ayuda",
   uncategorized: "Otro",
+  erp: {
+    navigation: {
+      sales: "Ventas",
+      purchases: "Compras",
+      invoices: "Facturas de venta",
+      estimates: "Presupuestos",
+      bills: "Facturas de proveedores",
+    },
+    overview: {
+      loading: "Cargando el resumen de la empresa",
+      loadError: "No se pudo cargar el resumen de la empresa",
+    },
+    home: "Inicio",
+    title: "Área de contabilidad",
+    description:
+      "Configura tu empresa, gestiona las facturas y prepara los libros para el cierre de mes.",
+    companies: "Gestionar empresas",
+    activeDescription: "Revisa tus libros y prepara la próxima factura.",
+    newInvoice: "Nueva factura",
+    createCompany: "Configura tu empresa",
+    companySwitch: {
+      label: "Empresa de contabilidad",
+      select: "Seleccionar empresa",
+      current: "Empresa actual: {{name}}",
+    },
+    workflows: "Tareas frecuentes",
+    sales: {
+      title: "Facturar a un cliente",
+      description:
+        "Prepara un borrador de factura o abre una factura existente para registrar un cobro.",
+      primary: "Crear factura de venta",
+      secondary: "Ver facturas de venta",
+    },
+    expenses: {
+      title: "Registrar una factura de proveedor",
+      description:
+        "Registra las deudas con proveedores y controla los pagos desde cada factura.",
+      primary: "Crear factura de compra",
+      secondary: "Ver facturas de compra",
+    },
+    receivables: {
+      title: "Consultar cobros pendientes",
+      description:
+        "Consulta cuánto te deben tus clientes y cuántos días han pasado desde el vencimiento.",
+      primary: "Ver cuentas por cobrar",
+    },
+    payables: {
+      title: "Consulta cuánto debes a proveedores",
+      description:
+        "Consulta los saldos pendientes y las facturas por aprobar o en disputa.",
+      primary: "Ver cuentas por pagar",
+    },
+    bank: {
+      title: "Importar movimientos bancarios",
+      description:
+        "Importa un extracto CSV y revisa los movimientos sin conciliar.",
+      primary: "Importar extracto bancario",
+      secondary: "Ver movimientos sin conciliar",
+    },
+    stock: {
+      title: "Consultar existencias",
+      description:
+        "Revisa el stock e identifica qué artículos necesitas reponer.",
+      primary: "Abrir inventario",
+    },
+    tax: {
+      title: "Revisar el IVA",
+      description:
+        "Comprueba los importes del periodo antes de presentar la declaración.",
+      primary: "Abrir informe de IVA",
+    },
+    exports: {
+      title: "Revisar y exportar el diario",
+      description:
+        "Revisa las incidencias o descarga los asientos contabilizados en CSV.",
+      primary: "Revisar asientos",
+      secondary: "Abrir exportación del diario",
+    },
+    close: {
+      title: "Cerrar un periodo contable",
+      description:
+        "Revisa el balance de comprobación antes de cerrar el periodo.",
+      primary: "Ver periodos",
+      secondary: "Abrir balance de comprobación",
+    },
+  },
   catalog: {
     title: "Catálogo de herramientas",
     searchLabel: "Buscar en el catálogo de herramientas",

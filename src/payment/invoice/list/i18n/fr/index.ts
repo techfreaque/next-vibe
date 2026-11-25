@@ -16,6 +16,7 @@ export const translations: typeof enTranslations = {
       description: "Filtrez la liste des factures",
     },
     response: {
+      customerName: "Client",
       total: "Total",
       invoices: "Factures",
       id: "ID de facture",
@@ -93,12 +94,13 @@ export const translations: typeof enTranslations = {
   search: {
     label: "Rechercher des documents",
     description:
-      "Recherchez par numéro de document, identifiant de facture ou de client. Filtrez par entreprise ou statut.",
-    placeholder: "Numéro de document ou identifiant",
+      "Recherchez par numéro de facture, nom du client ou identifiant.",
+    placeholder: "Numéro de facture ou client",
   },
   status: {
     label: "Statut",
-    description: "Filtrer par statut de facture",
+    description:
+      "Filtrez par état ou affichez les factures en retard avec un solde à régler.",
     placeholder: "Tous les statuts",
   },
   customerId: {
@@ -115,6 +117,8 @@ export const translations: typeof enTranslations = {
     description: "Résultats par page",
   },
   widget: {
+    filters: "Filtres",
+    partlyPaid: "Partiellement réglée",
     pageCount: "Nombre de pages",
     title: "Factures clients",
     newInvoice: "Nouvelle facture",

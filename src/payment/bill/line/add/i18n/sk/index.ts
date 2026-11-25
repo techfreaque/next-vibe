@@ -27,12 +27,18 @@ export const translations: typeof enTranslations = {
         title: "Faktúru nemožno upraviť",
         description: "Položky možno pridať len do konceptu prijatej faktúry.",
       },
-      server: { title: "Chyba servera", description: "Položku sa nepodarilo pridať." },
+      server: {
+        title: "Chyba servera",
+        description: "Položku sa nepodarilo pridať.",
+      },
       unknown: {
         title: "Neznáma chyba",
         description: "Nastala neočakávaná chyba",
       },
-      network: { title: "Chyba siete", description: "Skontrolujte pripojenie." },
+      network: {
+        title: "Chyba siete",
+        description: "Skontrolujte pripojenie.",
+      },
       notFound: {
         title: "Faktúra sa nenašla",
         description: "Faktúra neexistuje.",
@@ -50,6 +56,7 @@ export const translations: typeof enTranslations = {
       success: "Úspech",
       message: "Správa",
       line: {
+        currency: "Mena",
         title: "Údaje položky",
         subtitle: "Pridaná položka",
         id: "ID položky",

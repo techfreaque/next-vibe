@@ -21,6 +21,12 @@ export const translations: typeof enTranslations = {
       description: "Die zu genehmigende Rechnung",
     },
     errors: {
+      existingPosting:
+        "Klären Sie die bestehende Buchung für diese Rechnung vor der Freigabe.",
+      billLines:
+        "Fügen Sie Rechnungspositionen mit einem positiven Gesamtbetrag hinzu und verwenden Sie aktive Aufwandskonten dieses Unternehmens.",
+      posting:
+        "Prüfen Sie Rechnungsbeträge, Unternehmenswährung, Buchungsperiode und Buchungskonten.",
       validation: {
         title: "Validierungsfehler",
         description: "Ungültige Rechnungs-ID",
@@ -68,7 +74,7 @@ export const translations: typeof enTranslations = {
       submit: "Statusänderung bestätigen",
       confirmTitle: "Rechnung genehmigen?",
       confirmDescription:
-        "Ein Entwurf wechselt zu Erhalten. Eine erhaltene Rechnung wird freigegeben. Wenn die Buchhaltung eingerichtet ist, wird ein Buchungssatz erstellt.",
+        "Ein Entwurf wechselt auf Eingegangen. Bei der Freigabe einer eingegangenen Rechnung wird die Buchung erstellt.",
       confirmButton: "Ja, genehmigen",
       cancelButton: "Abbrechen",
       approved: "Rechnungsstatus aktualisiert",

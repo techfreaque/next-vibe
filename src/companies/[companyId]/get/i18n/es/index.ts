@@ -70,6 +70,7 @@ export const translations: typeof enTranslations = {
       description: "Datos de la compañía recuperados",
     },
     widget: {
+      setupAccounting: "Configurar la contabilidad",
       back: "Atrás",
       loading: "Compañía de carga...",
       edit: "Editar",

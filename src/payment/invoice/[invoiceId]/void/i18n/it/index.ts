@@ -21,6 +21,10 @@ export const translations: typeof enTranslations = {
       message: "Messaggio di stato",
     },
     errors: {
+      appliedPayments:
+        "Una fattura con pagamenti o note di credito applicati non può essere annullata.",
+      reversalPosting:
+        "Prima di annullare, controlla la scrittura originale e verifica che il periodo contabile sia aperto.",
       unauthorized: {
         title: "Autenticazione richiesta",
         description: "Accedi per continuare",

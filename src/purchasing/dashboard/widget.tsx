@@ -2,9 +2,22 @@
 
 import { Button, type ButtonMouseEvent } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
-import { Loader2 } from "next-vibe/ui/components/icons/Loader2";
+import { ListItem } from "next-vibe/ui/components/list-item";
+import { LoadingBlock } from "next-vibe/ui/components/loading-block";
+import { MetricCard } from "next-vibe/ui/components/metric-card";
+import { MetricGrid } from "next-vibe/ui/components/metric-grid";
+import { RecordTable } from "next-vibe/ui/components/record-table";
 import { Span } from "next-vibe/ui/components/span";
+import { WidgetHeader } from "next-vibe/ui/components/widget-header";
+import { WidgetShell } from "next-vibe/ui/components/widget-shell";
 import {
+  formatDocDate,
+  formatMoney,
+} from "next-vibe/unified-ui/_shared/format-money";
+import {
+  useWidgetForm,
+  useWidgetIsInteractive,
+  useWidgetLocale,
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetValue,
@@ -13,38 +26,11 @@ import type { JSX } from "react";
 
 import type definition from "./definition";
 
-interface KpiCardProps {
-  label: string;
-  value: number;
-  highlight?: "amber" | "red" | "emerald" | "blue";
-}
-
-function KpiCard({ label, value, highlight }: KpiCardProps): JSX.Element {
-  const colorMap: Record<string, string> = {
-    amber: "text-amber-600 dark:text-amber-400",
-    red: "text-red-600 dark:text-red-400",
-    emerald: "text-emerald-600 dark:text-emerald-400",
-    blue: "text-blue-600 dark:text-blue-400",
-  };
-  const valueClass = highlight
-    ? (colorMap[highlight] ?? "text-foreground")
-    : "text-foreground";
-
-  return (
-    <Div className="flex flex-col gap-1 rounded-lg border bg-card px-5 py-4 flex-1 min-w-[120px]">
-      <Span className={`text-2xl font-bold tabular-nums ${valueClass}`}>
-        {value}
-      </Span>
-      <Span className="text-xs text-muted-foreground">{label}</Span>
-    </Div>
-  );
-}
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export function PurchasingDashboardWidget(_props: {
-  field: (typeof definition.GET)["fields"];
-}): JSX.Element {
+export function PurchasingDashboardWidget(): JSX.Element {
   const data = useWidgetValue<typeof definition.GET>();
+  const locale = useWidgetLocale();
+  const interactive = useWidgetIsInteractive();
+  const companyId = useWidgetForm<typeof definition.GET>().watch("companyId");
   const navigation = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.GET>();
 
@@ -56,6 +42,7 @@ export function PurchasingDashboardWidget(_props: {
         import("../order/[poId]/get/definition"),
       ]);
       navigation.push(createDef.default.POST, {
+        data: { companyId },
         replaceOnSuccess: {
           endpoint: getDef.default.GET,
           getUrlPathParams: (responseData) => ({
@@ -70,7 +57,7 @@ export function PurchasingDashboardWidget(_props: {
     e.stopPropagation();
     void (async (): Promise<void> => {
       const def = await import("../order/list/definition");
-      navigation.push(def.default.GET, {});
+      navigation.push(def.default.GET, { data: { companyId } });
     })();
   };
 
@@ -78,7 +65,7 @@ export function PurchasingDashboardWidget(_props: {
     e.stopPropagation();
     void (async (): Promise<void> => {
       const def = await import("../vendor/list/definition");
-      navigation.push(def.default.GET, {});
+      navigation.push(def.default.GET, { data: { companyId } });
     })();
   };
 
@@ -90,6 +77,7 @@ export function PurchasingDashboardWidget(_props: {
         import("../vendor/[vendorId]/get/definition"),
       ]);
       navigation.push(createDef.default.POST, {
+        data: { companyId },
         replaceOnSuccess: {
           endpoint: getDef.default.GET,
           getUrlPathParams: (responseData) => ({
@@ -100,66 +88,152 @@ export function PurchasingDashboardWidget(_props: {
     })();
   };
 
-  if (data === undefined) {
-    return (
-      <Div className="max-w-2xl mx-auto w-full px-4 pt-8 pb-6 flex items-center justify-center py-12 text-muted-foreground">
-        <Loader2 className="h-5 w-5 animate-spin mr-2" />
-        <Span className="text-sm">{t("dashboard.get.widget.loading")}</Span>
-      </Div>
-    );
+  if (!data) {
+    return <LoadingBlock message={t("dashboard.get.widget.loading")} />;
   }
-
+  const expectedDate = (
+    date: string | null,
+    overdue?: boolean,
+  ): JSX.Element | null =>
+    date ? (
+      <Span className={overdue ? "font-medium text-destructive" : undefined}>
+        {formatDocDate(date, locale)}
+      </Span>
+    ) : null;
   const dueCount = data.dueThisWeekCount;
-  const warningText =
-    dueCount === 1
-      ? t("dashboard.get.widget.warningDueThisWeek").replace(
-          "{{count}}",
-          String(dueCount),
-        )
-      : t("dashboard.get.widget.warningDueThisWeekPlural").replace(
-          "{{count}}",
-          String(dueCount),
-        );
-
+  const openOrder = (poId: string): void => {
+    void import("../order/[poId]/get/definition").then((mod) =>
+      navigation.push(mod.default.GET, { urlPathParams: { poId } }),
+    );
+  };
   return (
-    <Div className="max-w-2xl mx-auto w-full px-4 pt-8 pb-6 flex flex-col gap-6">
-      {/* KPI row */}
-      <Div className="flex flex-wrap gap-3">
-        <KpiCard
+    <WidgetShell layout="page">
+      <WidgetHeader
+        size="page"
+        title={t("dashboard.get.title")}
+        subtitle={t("dashboard.get.description")}
+        actions={
+          <Button type="button" size="sm" onClick={handleNewPo}>
+            {t("dashboard.get.widget.navNewPo")}
+          </Button>
+        }
+      />
+      <MetricGrid columns={4}>
+        <MetricCard
           label={t("dashboard.get.widget.kpiDraft")}
           value={data.draftCount}
-          highlight="blue"
         />
-        <KpiCard
+        <MetricCard
           label={t("dashboard.get.widget.kpiConfirmed")}
           value={data.confirmedCount}
-          highlight="emerald"
         />
-        <KpiCard
+        <MetricCard
           label={t("dashboard.get.widget.kpiAwaitingReceipt")}
           value={data.awaitingReceiptCount}
-          highlight="amber"
+          variant={data.overdueDeliveryCount ? "warning" : "default"}
         />
-        <KpiCard
+        <MetricCard
           label={t("dashboard.get.widget.kpiActiveVendors")}
           value={data.activeVendorCount}
         />
-      </Div>
-
-      {/* Due this week warning */}
-      {dueCount > 0 ? (
-        <Div className="flex items-center gap-3 rounded-lg border border-amber-300 bg-amber-50 dark:border-amber-800 dark:bg-amber-950/30 px-4 py-3">
-          <Span className="text-sm font-medium text-amber-700 dark:text-amber-400">
-            {warningText}
-          </Span>
+      </MetricGrid>
+      {data.moneyByCurrency?.map((row) => (
+        <Div
+          key={row.currency}
+          className="grid gap-3 rounded-lg border bg-card p-4 @md:grid-cols-2"
+        >
+          <MetricCard
+            label={`${t("dashboard.get.widget.openValue")} · ${row.currency}`}
+            value={formatMoney(row.openValue, row.currency, locale)}
+          />
+          <MetricCard
+            label={`${t("dashboard.get.widget.settledBills")} · ${row.currency}`}
+            value={formatMoney(row.settledBills, row.currency, locale)}
+          />
         </Div>
-      ) : null}
-
+      ))}
+      {data.deliveries && (
+        <Div className="flex flex-col gap-2">
+          <Div className="flex flex-wrap items-center justify-between gap-2">
+            <Span className="text-lg font-semibold">
+              {t("dashboard.get.widget.deliveries")}
+            </Span>
+            {Boolean(data.overdueDeliveryCount) && (
+              <Span className="text-sm font-medium text-destructive">{`${t("dashboard.get.widget.overdue")} · ${data.overdueDeliveryCount}`}</Span>
+            )}
+            {dueCount > 0 && (
+              <Span className="text-sm font-medium text-warning">
+                {`${t("dashboard.get.widget.dueSeven")} · ${dueCount}`}
+              </Span>
+            )}
+          </Div>
+          {data.deliveries.length === 0 ? (
+            <Span className="text-sm text-muted-foreground">
+              {t("dashboard.get.widget.noDeliveries")}
+            </Span>
+          ) : (
+            <RecordTable
+              label={t("dashboard.get.widget.deliveries")}
+              columns={[
+                { id: "order", label: t("dashboard.get.widget.order") },
+                { id: "supplier", label: t("dashboard.get.widget.supplier") },
+                { id: "date", label: t("dashboard.get.widget.expected") },
+                {
+                  id: "total",
+                  label: t("dashboard.get.widget.orderTotal"),
+                  numeric: true,
+                },
+              ]}
+              rows={data.deliveries.map((row) => ({
+                id: row.id,
+                cells: {
+                  order: interactive ? (
+                    <Button
+                      size="sm"
+                      type="button"
+                      variant="ghost"
+                      onClick={() => openOrder(row.id)}
+                    >
+                      {row.number}
+                    </Button>
+                  ) : (
+                    row.number
+                  ),
+                  supplier: row.supplier,
+                  date: expectedDate(row.expected, row.overdue),
+                  total: formatMoney(row.total, row.currency, locale),
+                },
+              }))}
+              compact={
+                <Div className="divide-y rounded-lg border bg-card">
+                  {data.deliveries.map((row) => (
+                    <ListItem
+                      key={row.id}
+                      title={row.number}
+                      subtitle={[
+                        row.supplier,
+                        row.expected && formatDocDate(row.expected, locale),
+                      ]
+                        .filter(Boolean)
+                        .join(" · ")}
+                      meta={
+                        <Span className="tabular-nums">
+                          {formatMoney(row.total, row.currency, locale)}
+                        </Span>
+                      }
+                      onClick={
+                        interactive ? () => openOrder(row.id) : undefined
+                      }
+                    />
+                  ))}
+                </Div>
+              }
+            />
+          )}
+        </Div>
+      )}
       {/* Quick nav */}
       <Div className="flex flex-wrap gap-2">
-        <Button type="button" size="sm" variant="default" onClick={handleNewPo}>
-          {t("dashboard.get.widget.navNewPo")}
-        </Button>
         <Button
           type="button"
           size="sm"
@@ -185,6 +259,6 @@ export function PurchasingDashboardWidget(_props: {
           {t("dashboard.get.widget.navNewVendor")}
         </Button>
       </Div>
-    </Div>
+    </WidgetShell>
   );
 }

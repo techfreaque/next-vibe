@@ -5,7 +5,7 @@ export const translations: typeof enTranslations = {
     title: "Contabilidad Dashboard",
     titleShort: "Dashboard",
     description:
-      "Resúmenes de su estado contable: período abierto, cuenta de entrada y navegación rápida a todas las herramientas contables.",
+      "Consulta los saldos pendientes, la tesorería, el resultado y el período contable actual.",
     companyId: {
       label: "Company ID",
       description: "Compañía para cargar el tablero de mando",
@@ -59,6 +59,15 @@ export const translations: typeof enTranslations = {
       },
     },
     widget: {
+      noPeriodHint: "Abra un periodo contable antes de contabilizar asientos.",
+      zeroMetricsHint:
+        "Las cifras se actualizan al emitir facturas, aprobar facturas de proveedores y contabilizar operaciones.",
+      financialOverview: "Resumen financiero",
+      openReceivables: "Pendiente de cobro",
+      approvedPayables: "Facturas de proveedores aprobadas por pagar",
+      cashBalance: "Caja y bancos",
+      monthToDateProfit: "Resultado del mes",
+      needsAttention: "Requiere atención",
       currentPeriod: "Período actual",
       noPeriod: "No hay período abierto",
       createPeriod: "Crear período",

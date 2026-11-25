@@ -154,7 +154,12 @@ export type InputProps<
   onKeyDown?: (e: InputKeyboardEvent<T>) => void;
   autoCapitalize?: "none" | "sentences" | "words" | "characters";
   secureTextEntry?: boolean;
-  keyboardType?: "default" | "numeric" | "email-address" | "phone-pad";
+  keyboardType?:
+    | "default"
+    | "decimal-pad"
+    | "numeric"
+    | "email-address"
+    | "phone-pad";
   editable?: boolean;
   name?: string;
   id?: string;
@@ -166,6 +171,7 @@ export type InputProps<
 const keyboardInputModes = {
   default: undefined,
   numeric: "numeric",
+  "decimal-pad": "decimal",
   "email-address": "email",
   "phone-pad": "tel",
 } satisfies Record<

@@ -15,6 +15,9 @@ import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
 import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
 import type { JSX } from "react";
 
+import type { WorkspaceCompany } from "@/companies/_shared/workspace-company";
+import { WorkspaceCompanyProvider } from "@/companies/_shared/workspace-company-context";
+
 import { parseToolsInitialState } from "./initial-state";
 
 export function ToolsPageClient({
@@ -22,12 +25,16 @@ export function ToolsPageClient({
   user,
   platform,
   initialHelpData,
+  workspaceCompanies,
+  workspaceCompanyId,
   serverState,
 }: {
   locale: CountryLanguage;
   user: JwtPayloadType;
   platform: Platform;
   initialHelpData?: HelpGetResponseOutput | null;
+  workspaceCompanies: readonly WorkspaceCompany[] | null;
+  workspaceCompanyId?: string;
   serverState: Partial<HelpGetRequestInput>;
 }): JSX.Element {
   const searchParams = useSearchParams();
@@ -59,16 +66,23 @@ export function ToolsPageClient({
 
   return (
     <Div className="flex flex-col h-dvh w-full min-w-0">
-      <EndpointsPage
-        logger={logger}
-        endpoint={helpDefinitions}
-        locale={locale}
-        user={user}
-        platform={platform}
-        endpointInstance={endpointInstance}
-        endpointOptions={endpointOptions}
-        className="flex flex-col flex-1 min-h-0 w-full"
-      />
+      <WorkspaceCompanyProvider
+        key={user.isPublic ? user.leadId : user.id}
+        userId={user.isPublic ? undefined : user.id}
+        companies={workspaceCompanies}
+        initialCompanyId={workspaceCompanyId}
+      >
+        <EndpointsPage
+          logger={logger}
+          endpoint={helpDefinitions}
+          locale={locale}
+          user={user}
+          platform={platform}
+          endpointInstance={endpointInstance}
+          endpointOptions={endpointOptions}
+          className="flex flex-col flex-1 min-h-0 w-full"
+        />
+      </WorkspaceCompanyProvider>
     </Div>
   );
 }

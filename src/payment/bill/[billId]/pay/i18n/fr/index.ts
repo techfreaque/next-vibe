@@ -16,6 +16,12 @@ export const translations: typeof enTranslations = {
       description: "La facture à marquer comme payée",
     },
     errors: {
+      approvalPosting:
+        "L’écriture de validation doit être comptabilisée avant de régler cette facture.",
+      paymentAccount:
+        "Sélectionnez un compte bancaire ou de caisse actif de cette entreprise.",
+      paymentPosting:
+        "Vérifiez la date de règlement, la devise de l’entreprise et les comptes d’imputation.",
       validation: {
         title: "Erreur de validation",
         description: "Saisie invalide",
