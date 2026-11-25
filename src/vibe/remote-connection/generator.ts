@@ -147,23 +147,10 @@ class RemoteCapabilitiesGenerator {
           maxFilteredCount = roleEndpoints.length;
         }
 
-        // Zod getters can read the local timezone while fields are serialized.
-        // Use UTC for snapshots and restore the process setting before any await.
-        const previousTimezone = process.env["TZ"];
-        let capabilities: RemoteToolCapability[];
-        process.env["TZ"] = "UTC";
-        try {
-          capabilities = RemoteCapabilitiesGenerator.serializeForLocaleRole(
-            roleEndpoints,
-            locale,
-          );
-        } finally {
-          if (previousTimezone === undefined) {
-            delete process.env["TZ"];
-          } else {
-            process.env["TZ"] = previousTimezone;
-          }
-        }
+        const capabilities = RemoteCapabilitiesGenerator.serializeForLocaleRole(
+          roleEndpoints,
+          locale,
+        );
 
         const outputFile = join(localeDir, `${roleName}.json`);
         const content =
@@ -389,7 +376,7 @@ class RemoteCapabilitiesGenerator {
         // then walk the result and resolve all translatable string values.
         const fields = RemoteCapabilitiesGenerator.translateFieldStrings(
           JSON.parse(
-            JSON.stringify(definition.fields ?? {}),
+            RemoteCapabilitiesGenerator.serializeFields(definition.fields),
           ) as RemoteToolCapability["fields"],
           t,
         );
@@ -415,6 +402,47 @@ class RemoteCapabilitiesGenerator {
     }
 
     return capabilities;
+  }
+
+  /**
+   * Serialize endpoint fields to JSON. JSON.stringify drops function refs
+   * (render, execute, etc.).
+   *
+   * Zod default/prefault defs expose `defaultValue` as an enumerable getter
+   * that invokes the default function on every read, and zod gives no way to
+   * tell a static default from a `.default(fn)` one. Serializing it would run
+   * functions such as `Intl.DateTimeFormat().resolvedOptions().timeZone` at
+   * generation time and bake the generating machine's state into committed
+   * output and the version hash. So the getter is never read: those defs are
+   * emitted without `defaultValue`. Nothing on the receiving side reads it
+   * (see extractParametersFromCapabilityFields); the owning instance applies
+   * its own defaults when it executes the tool.
+   */
+  private static serializeFields(
+    fields: CreateApiEndpointAny["fields"],
+  ): string {
+    return JSON.stringify(fields ?? {}, (key, value) => {
+      // The root is the fields tree itself, never a zod def.
+      if (
+        key === "" ||
+        value === null ||
+        typeof value !== "object" ||
+        !Object.hasOwn(value, "defaultValue") ||
+        !Object.hasOwn(value, "innerType")
+      ) {
+        return value;
+      }
+      const type = Reflect.get(value, "type");
+      if (type !== "default" && type !== "prefault") {
+        return value;
+      }
+      // Copy own keys without touching the defaultValue getter.
+      return Object.fromEntries(
+        Object.keys(value)
+          .filter((prop) => prop !== "defaultValue")
+          .map((prop) => [prop, Reflect.get(value, prop)]),
+      );
+    });
   }
 
   /**

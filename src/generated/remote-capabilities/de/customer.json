@@ -108,8 +108,7 @@
                   "subject.partnership",
                   "subject.other"
                 ]
-              },
-              "defaultValue": "subject.helpSupport"
+              }
             },
             "type": "default"
           },
@@ -1830,8 +1829,7 @@
                       }
                     },
                     "type": "optional"
-                  },
-                  "defaultValue": 1
+                  }
                 },
                 "type": "default"
               },
@@ -1860,8 +1858,7 @@
                       }
                     },
                     "type": "optional"
-                  },
-                  "defaultValue": 50
+                  }
                 },
                 "type": "default"
               },
@@ -1951,8 +1948,7 @@
                 },
                 "type": "number",
                 "isFinite": true
-              },
-              "defaultValue": 1
+              }
             },
             "type": "default"
           },
@@ -1982,8 +1978,7 @@
                   "credit_pack": "credit_pack"
                 },
                 "options": ["credit_pack"]
-              },
-              "defaultValue": "credit_pack"
+              }
             },
             "type": "default"
           },
@@ -2018,8 +2013,7 @@
                   "enums.paymentProvider.stripe",
                   "enums.paymentProvider.nowpayments"
                 ]
-              },
-              "defaultValue": "enums.paymentProvider.stripe"
+              }
             },
             "type": "default"
           },
@@ -2788,8 +2782,7 @@
                   }
                 },
                 "type": "optional"
-              },
-              "defaultValue": true
+              }
             },
             "type": "default"
           },
@@ -3059,8 +3052,7 @@
                   }
                 },
                 "type": "optional"
-              },
-              "defaultValue": true
+              }
             },
             "type": "default"
           },
@@ -3318,8 +3310,7 @@
                   }
                 },
                 "type": "optional"
-              },
-              "defaultValue": true
+              }
             },
             "type": "default"
           },
@@ -3512,8 +3503,7 @@
                   }
                 },
                 "type": "optional"
-              },
-              "defaultValue": true
+              }
             },
             "type": "default"
           },
@@ -3765,8 +3755,7 @@
                   }
                 },
                 "type": "optional"
-              },
-              "defaultValue": true
+              }
             },
             "type": "default"
           },
@@ -3954,8 +3943,7 @@
                   }
                 },
                 "type": "optional"
-              },
-              "defaultValue": true
+              }
             },
             "type": "default"
           },
@@ -4184,8 +4172,7 @@
                   }
                 },
                 "type": "optional"
-              },
-              "defaultValue": true
+              }
             },
             "type": "default"
           },
@@ -4396,8 +4383,7 @@
                   }
                 },
                 "type": "optional"
-              },
-              "defaultValue": true
+              }
             },
             "type": "default"
           },
@@ -4631,8 +4617,7 @@
                   }
                 },
                 "type": "optional"
-              },
-              "defaultValue": true
+              }
             },
             "type": "default"
           },
@@ -4825,8 +4810,7 @@
                   }
                 },
                 "type": "optional"
-              },
-              "defaultValue": true
+              }
             },
             "type": "default"
           },
@@ -5010,8 +4994,7 @@
                   }
                 },
                 "type": "optional"
-              },
-              "defaultValue": true
+              }
             },
             "type": "default"
           },
@@ -5283,8 +5266,7 @@
                   }
                 },
                 "type": "optional"
-              },
-              "defaultValue": true
+              }
             },
             "type": "default"
           },
@@ -5554,8 +5536,7 @@
                   }
                 },
                 "type": "optional"
-              },
-              "defaultValue": true
+              }
             },
             "type": "default"
           },
@@ -5784,8 +5765,7 @@
                   }
                 },
                 "type": "optional"
-              },
-              "defaultValue": true
+              }
             },
             "type": "default"
           },
@@ -5965,8 +5945,7 @@
                   }
                 },
                 "type": "optional"
-              },
-              "defaultValue": true
+              }
             },
             "type": "default"
           },
@@ -6200,8 +6179,7 @@
                   }
                 },
                 "type": "optional"
-              },
-              "defaultValue": true
+              }
             },
             "type": "default"
           },
@@ -6471,8 +6449,7 @@
                   }
                 },
                 "type": "optional"
-              },
-              "defaultValue": true
+              }
             },
             "type": "default"
           },
@@ -6683,8 +6660,7 @@
                   }
                 },
                 "type": "optional"
-              },
-              "defaultValue": true
+              }
             },
             "type": "default"
           },
@@ -6895,8 +6871,7 @@
                   }
                 },
                 "type": "optional"
-              },
-              "defaultValue": true
+              }
             },
             "type": "default"
           },
@@ -7125,8 +7100,7 @@
                   }
                 },
                 "type": "optional"
-              },
-              "defaultValue": true
+              }
             },
             "type": "default"
           },
@@ -8531,8 +8505,7 @@
                       }
                     },
                     "type": "optional"
-                  },
-                  "defaultValue": 1
+                  }
                 },
                 "type": "default"
               },
@@ -8561,8 +8534,7 @@
                       }
                     },
                     "type": "optional"
-                  },
-                  "defaultValue": 50
+                  }
                 },
                 "type": "default"
               },
@@ -8870,8 +8842,7 @@
                   "YEARLY": "enums.billing.yearly"
                 },
                 "options": ["enums.billing.monthly", "enums.billing.yearly"]
-              },
-              "defaultValue": "enums.billing.monthly"
+              }
             },
             "type": "default"
           },
@@ -8917,8 +8888,7 @@
                   "enums.paymentProvider.stripe",
                   "enums.paymentProvider.nowpayments"
                 ]
-              },
-              "defaultValue": "enums.paymentProvider.stripe"
+              }
             },
             "type": "default"
           },
@@ -10802,8 +10772,7 @@
                   "checks": [{}, {}]
                 },
                 "type": "string"
-              },
-              "defaultValue": "/"
+              }
             },
             "type": "default"
           },
@@ -11590,8 +11559,7 @@
                   "type": "boolean"
                 },
                 "type": "boolean"
-              },
-              "defaultValue": true
+              }
             },
             "type": "default"
           },
@@ -11722,8 +11690,7 @@
                   "enums.plan.pro",
                   "enums.plan.ultra"
                 ]
-              },
-              "defaultValue": "enums.plan.subscription"
+              }
             },
             "type": "default"
           },
@@ -11764,8 +11731,7 @@
                   "YEARLY": "enums.billing.yearly"
                 },
                 "options": ["enums.billing.monthly", "enums.billing.yearly"]
-              },
-              "defaultValue": "enums.billing.monthly"
+              }
             },
             "type": "default"
           },
@@ -11809,8 +11775,7 @@
                   "enums.paymentProvider.stripe",
                   "enums.paymentProvider.nowpayments"
                 ]
-              },
-              "defaultValue": "enums.paymentProvider.stripe"
+              }
             },
             "type": "default"
           },
@@ -14779,8 +14744,7 @@
                   "checks": [{}]
                 },
                 "type": "string"
-              },
-              "defaultValue": "Default"
+              }
             },
             "type": "default"
           },
@@ -15211,8 +15175,7 @@
                   "type": "boolean"
                 },
                 "type": "boolean"
-              },
-              "defaultValue": false
+              }
             },
             "type": "default"
           },
@@ -15235,8 +15198,7 @@
                   "type": "boolean"
                 },
                 "type": "boolean"
-              },
-              "defaultValue": false
+              }
             },
             "type": "default"
           },
@@ -21916,8 +21878,7 @@
                         },
                         "type": "lazy"
                       }
-                    },
-                    "defaultValue": {}
+                    }
                   },
                   "type": "default"
                 },
@@ -21979,8 +21940,7 @@
                         "type": "boolean"
                       },
                       "type": "boolean"
-                    },
-                    "defaultValue": false
+                    }
                   },
                   "type": "default"
                 },
@@ -22042,8 +22002,7 @@
                         "type": "boolean"
                       },
                       "type": "boolean"
-                    },
-                    "defaultValue": false
+                    }
                   },
                   "type": "default"
                 },
@@ -22088,8 +22047,7 @@
                 },
                 "type": "number",
                 "isFinite": true
-              },
-              "defaultValue": 150
+              }
             },
             "type": "default"
           },
@@ -22324,8 +22282,7 @@
                   "cron",
                   "remote"
                 ]
-              },
-              "defaultValue": "cron"
+              }
             },
             "type": "default"
           },
@@ -22514,8 +22471,7 @@
                   "type": "boolean"
                 },
                 "type": "boolean"
-              },
-              "defaultValue": false
+              }
             },
             "type": "default"
           },
@@ -22901,8 +22857,7 @@
                   "cron",
                   "remote"
                 ]
-              },
-              "defaultValue": "private"
+              }
             },
             "type": "default"
           },
@@ -35458,8 +35413,7 @@
                     }
                   }
                 ]
-              },
-              "defaultValue": "sortMode.hot"
+              }
             },
             "type": "default"
           },
@@ -35491,8 +35445,7 @@
                   }
                 },
                 "type": "optional"
-              },
-              "defaultValue": 1
+              }
             },
             "type": "default"
           },
@@ -35524,8 +35477,7 @@
                   }
                 },
                 "type": "optional"
-              },
-              "defaultValue": 20
+              }
             },
             "type": "default"
           },
@@ -44690,8 +44642,7 @@
                   }
                 },
                 "type": "optional"
-              },
-              "defaultValue": "user"
+              }
             },
             "type": "default"
           },
@@ -46855,8 +46806,7 @@
                       }
                     },
                     "type": "optional"
-                  },
-                  "defaultValue": 1
+                  }
                 },
                 "type": "default"
               },
@@ -46887,8 +46837,7 @@
                       }
                     },
                     "type": "optional"
-                  },
-                  "defaultValue": 20
+                  }
                 },
                 "type": "default"
               },
@@ -49624,8 +49573,7 @@
                   "type": "boolean"
                 },
                 "type": "boolean"
-              },
-              "defaultValue": false
+              }
             },
             "type": "default"
           },
@@ -49648,8 +49596,7 @@
                   "type": "boolean"
                 },
                 "type": "boolean"
-              },
-              "defaultValue": false
+              }
             },
             "type": "default"
           },
@@ -49845,8 +49792,7 @@
                   "type": "boolean"
                 },
                 "type": "boolean"
-              },
-              "defaultValue": false
+              }
             },
             "type": "default"
           },
@@ -49869,8 +49815,7 @@
                   "type": "boolean"
                 },
                 "type": "boolean"
-              },
-              "defaultValue": false
+              }
             },
             "type": "default"
           },
@@ -50296,8 +50241,7 @@
                   }
                 },
                 "type": "optional"
-              },
-              "defaultValue": 1
+              }
             },
             "type": "default"
           },
@@ -50329,8 +50273,7 @@
                   }
                 },
                 "type": "optional"
-              },
-              "defaultValue": 20
+              }
             },
             "type": "default"
           },
@@ -50403,8 +50346,7 @@
                   "incognito",
                   "remote"
                 ]
-              },
-              "defaultValue": "private"
+              }
             },
             "type": "default"
           },
@@ -51736,8 +51678,7 @@
                   }
                 },
                 "type": "optional"
-              },
-              "defaultValue": "New Chat"
+              }
             },
             "type": "default"
           },
@@ -53192,8 +53133,7 @@
                       }
                     },
                     "type": "optional"
-                  },
-                  "defaultValue": 1
+                  }
                 },
                 "type": "default"
               },
@@ -53224,8 +53164,7 @@
                       }
                     },
                     "type": "optional"
-                  },
-                  "defaultValue": 10
+                  }
                 },
                 "type": "default"
               },
@@ -53603,8 +53542,7 @@
                       }
                     },
                     "type": "optional"
-                  },
-                  "defaultValue": 1
+                  }
                 },
                 "type": "default"
               },
@@ -53636,8 +53574,7 @@
                       }
                     },
                     "type": "optional"
-                  },
-                  "defaultValue": 20
+                  }
                 },
                 "type": "default"
               },
@@ -53687,8 +53624,7 @@
                   }
                 },
                 "type": "optional"
-              },
-              "defaultValue": "relevance"
+              }
             },
             "type": "default"
           },
@@ -53716,8 +53652,7 @@
                   }
                 },
                 "type": "optional"
-              },
-              "defaultValue": false
+              }
             },
             "type": "default"
           },
@@ -53986,8 +53921,7 @@
                   }
                 },
                 "type": "optional"
-              },
-              "defaultValue": false
+              }
             },
             "type": "default"
           },
@@ -54433,8 +54367,7 @@
                   }
                 },
                 "type": "optional"
-              },
-              "defaultValue": "/"
+              }
             },
             "type": "default"
           },
@@ -54828,8 +54761,7 @@
                   }
                 },
                 "type": "optional"
-              },
-              "defaultValue": true
+              }
             },
             "type": "default"
           },
@@ -55331,8 +55263,7 @@
                   }
                 },
                 "type": "optional"
-              },
-              "defaultValue": "/"
+              }
             },
             "type": "default"
           },
@@ -55377,8 +55308,7 @@
                   }
                 },
                 "type": "optional"
-              },
-              "defaultValue": 20
+              }
             },
             "type": "default"
           },
@@ -55677,8 +55607,7 @@
                   }
                 },
                 "type": "optional"
-              },
-              "defaultValue": "/"
+              }
             },
             "type": "default"
           },
@@ -55723,8 +55652,7 @@
                   }
                 },
                 "type": "optional"
-              },
-              "defaultValue": 5
+              }
             },
             "type": "default"
           },
@@ -55857,8 +55785,7 @@
                   }
                 },
                 "type": "optional"
-              },
-              "defaultValue": true
+              }
             },
             "type": "default"
           },
@@ -56899,8 +56826,7 @@
                   "post.size.landscape1792",
                   "post.size.portrait1792"
                 ]
-              },
-              "defaultValue": "post.size.square1024"
+              }
             },
             "type": "default"
           },
@@ -56943,8 +56869,7 @@
                   "HD": "post.quality.hd"
                 },
                 "options": ["post.quality.standard", "post.quality.hd"]
-              },
-              "defaultValue": "post.quality.standard"
+              }
             },
             "type": "default"
           },
@@ -57699,8 +57624,7 @@
                       }
                     },
                     "type": "optional"
-                  },
-                  "defaultValue": 1
+                  }
                 },
                 "type": "default"
               },
@@ -57729,8 +57653,7 @@
                       }
                     },
                     "type": "optional"
-                  },
-                  "defaultValue": 50
+                  }
                 },
                 "type": "default"
               },
@@ -58909,8 +58832,7 @@
                   "post.duration.medium",
                   "post.duration.long"
                 ]
-              },
-              "defaultValue": "post.duration.short"
+              }
             },
             "type": "default"
           },
@@ -60798,8 +60720,7 @@
                                 "type": "boolean"
                               },
                               "type": "boolean"
-                            },
-                            "defaultValue": false
+                            }
                           },
                           "type": "default"
                         }
@@ -60827,8 +60748,7 @@
                               "type": "boolean"
                             },
                             "type": "boolean"
-                          },
-                          "defaultValue": false
+                          }
                         },
                         "type": "default"
                       }
@@ -60872,8 +60792,7 @@
                                 "type": "boolean"
                               },
                               "type": "boolean"
-                            },
-                            "defaultValue": false
+                            }
                           },
                           "type": "default"
                         }
@@ -60901,8 +60820,7 @@
                               "type": "boolean"
                             },
                             "type": "boolean"
-                          },
-                          "defaultValue": false
+                          }
                         },
                         "type": "default"
                       }
@@ -127764,8 +127682,7 @@
                                     "type": "boolean"
                                   },
                                   "type": "boolean"
-                                },
-                                "defaultValue": false
+                                }
                               },
                               "type": "default"
                             }
@@ -127793,8 +127710,7 @@
                                   "type": "boolean"
                                 },
                                 "type": "boolean"
-                              },
-                              "defaultValue": false
+                              }
                             },
                             "type": "default"
                           }
@@ -127846,8 +127762,7 @@
                                     "type": "boolean"
                                   },
                                   "type": "boolean"
-                                },
-                                "defaultValue": false
+                                }
                               },
                               "type": "default"
                             }
@@ -127875,8 +127790,7 @@
                                   "type": "boolean"
                                 },
                                 "type": "boolean"
-                              },
-                              "defaultValue": false
+                              }
                             },
                             "type": "default"
                           }
@@ -128879,8 +128793,7 @@
                   "enums.voteDirection.up",
                   "enums.voteDirection.down"
                 ]
-              },
-              "defaultValue": "enums.voteDirection.up"
+              }
             },
             "type": "default"
           },
@@ -129146,8 +129059,7 @@
                   "type": "string"
                 },
                 "type": "string"
-              },
-              "defaultValue": "sparkles"
+              }
             },
             "type": "default"
           },
@@ -171429,8 +171341,7 @@
                                     "type": "boolean"
                                   },
                                   "type": "boolean"
-                                },
-                                "defaultValue": false
+                                }
                               },
                               "type": "default"
                             }
@@ -171458,8 +171369,7 @@
                                   "type": "boolean"
                                 },
                                 "type": "boolean"
-                              },
-                              "defaultValue": false
+                              }
                             },
                             "type": "default"
                           }
@@ -171511,8 +171421,7 @@
                                     "type": "boolean"
                                   },
                                   "type": "boolean"
-                                },
-                                "defaultValue": false
+                                }
                               },
                               "type": "default"
                             }
@@ -171540,8 +171449,7 @@
                                   "type": "boolean"
                                 },
                                 "type": "boolean"
-                              },
-                              "defaultValue": false
+                              }
                             },
                             "type": "default"
                           }
@@ -171943,8 +171851,7 @@
                   "enums.source.community",
                   "enums.source.my"
                 ]
-              },
-              "defaultValue": "enums.source.builtIn"
+              }
             },
             "type": "default"
           },
@@ -193193,8 +193100,7 @@
                                             "type": "boolean"
                                           },
                                           "type": "boolean"
-                                        },
-                                        "defaultValue": false
+                                        }
                                       },
                                       "type": "default"
                                     }
@@ -193222,8 +193128,7 @@
                                           "type": "boolean"
                                         },
                                         "type": "boolean"
-                                      },
-                                      "defaultValue": false
+                                      }
                                     },
                                     "type": "default"
                                   }
@@ -193275,8 +193180,7 @@
                                             "type": "boolean"
                                           },
                                           "type": "boolean"
-                                        },
-                                        "defaultValue": false
+                                        }
                                       },
                                       "type": "default"
                                     }
@@ -193304,8 +193208,7 @@
                                           "type": "boolean"
                                         },
                                         "type": "boolean"
-                                      },
-                                      "defaultValue": false
+                                      }
                                     },
                                     "type": "default"
                                   }
@@ -193357,8 +193260,7 @@
                                             "type": "boolean"
                                           },
                                           "type": "boolean"
-                                        },
-                                        "defaultValue": false
+                                        }
                                       },
                                       "type": "default"
                                     }
@@ -193386,8 +193288,7 @@
                                           "type": "boolean"
                                         },
                                         "type": "boolean"
-                                      },
-                                      "defaultValue": false
+                                      }
                                     },
                                     "type": "default"
                                   }
@@ -208394,8 +208295,7 @@
                                             "type": "boolean"
                                           },
                                           "type": "boolean"
-                                        },
-                                        "defaultValue": false
+                                        }
                                       },
                                       "type": "default"
                                     }
@@ -208423,8 +208323,7 @@
                                           "type": "boolean"
                                         },
                                         "type": "boolean"
-                                      },
-                                      "defaultValue": false
+                                      }
                                     },
                                     "type": "default"
                                   }
@@ -208466,8 +208365,7 @@
                                             "type": "boolean"
                                           },
                                           "type": "boolean"
-                                        },
-                                        "defaultValue": false
+                                        }
                                       },
                                       "type": "default"
                                     }
@@ -208495,8 +208393,7 @@
                                           "type": "boolean"
                                         },
                                         "type": "boolean"
-                                      },
-                                      "defaultValue": false
+                                      }
                                     },
                                     "type": "default"
                                   }
@@ -208538,8 +208435,7 @@
                                             "type": "boolean"
                                           },
                                           "type": "boolean"
-                                        },
-                                        "defaultValue": false
+                                        }
                                       },
                                       "type": "default"
                                     }
@@ -208567,8 +208463,7 @@
                                           "type": "boolean"
                                         },
                                         "type": "boolean"
-                                      },
-                                      "defaultValue": false
+                                      }
                                     },
                                     "type": "default"
                                   }
@@ -223418,8 +223313,7 @@
                                             "type": "boolean"
                                           },
                                           "type": "boolean"
-                                        },
-                                        "defaultValue": false
+                                        }
                                       },
                                       "type": "default"
                                     }
@@ -223447,8 +223341,7 @@
                                           "type": "boolean"
                                         },
                                         "type": "boolean"
-                                      },
-                                      "defaultValue": false
+                                      }
                                     },
                                     "type": "default"
                                   }
@@ -223490,8 +223383,7 @@
                                             "type": "boolean"
                                           },
                                           "type": "boolean"
-                                        },
-                                        "defaultValue": false
+                                        }
                                       },
                                       "type": "default"
                                     }
@@ -223519,8 +223411,7 @@
                                           "type": "boolean"
                                         },
                                         "type": "boolean"
-                                      },
-                                      "defaultValue": false
+                                      }
                                     },
                                     "type": "default"
                                   }
@@ -223562,8 +223453,7 @@
                                             "type": "boolean"
                                           },
                                           "type": "boolean"
-                                        },
-                                        "defaultValue": false
+                                        }
                                       },
                                       "type": "default"
                                     }
@@ -223591,8 +223481,7 @@
                                           "type": "boolean"
                                         },
                                         "type": "boolean"
-                                      },
-                                      "defaultValue": false
+                                      }
                                     },
                                     "type": "default"
                                   }
@@ -245756,8 +245645,7 @@
                                 "type": "boolean"
                               },
                               "type": "boolean"
-                            },
-                            "defaultValue": false
+                            }
                           },
                           "type": "default"
                         }
@@ -245785,8 +245673,7 @@
                               "type": "boolean"
                             },
                             "type": "boolean"
-                          },
-                          "defaultValue": false
+                          }
                         },
                         "type": "default"
                       }
@@ -245830,8 +245717,7 @@
                                 "type": "boolean"
                               },
                               "type": "boolean"
-                            },
-                            "defaultValue": false
+                            }
                           },
                           "type": "default"
                         }
@@ -245859,8 +245745,7 @@
                               "type": "boolean"
                             },
                             "type": "boolean"
-                          },
-                          "defaultValue": false
+                          }
                         },
                         "type": "default"
                       }
@@ -245904,8 +245789,7 @@
                                 "type": "boolean"
                               },
                               "type": "boolean"
-                            },
-                            "defaultValue": false
+                            }
                           },
                           "type": "default"
                         }
@@ -245933,8 +245817,7 @@
                               "type": "boolean"
                             },
                             "type": "boolean"
-                          },
-                          "defaultValue": false
+                          }
                         },
                         "type": "default"
                       }
@@ -265981,8 +265864,7 @@
                                     "type": "boolean"
                                   },
                                   "type": "boolean"
-                                },
-                                "defaultValue": false
+                                }
                               },
                               "type": "default"
                             }
@@ -266010,8 +265892,7 @@
                                   "type": "boolean"
                                 },
                                 "type": "boolean"
-                              },
-                              "defaultValue": false
+                              }
                             },
                             "type": "default"
                           }
@@ -266063,8 +265944,7 @@
                                     "type": "boolean"
                                   },
                                   "type": "boolean"
-                                },
-                                "defaultValue": false
+                                }
                               },
                               "type": "default"
                             }
@@ -266092,8 +265972,7 @@
                                   "type": "boolean"
                                 },
                                 "type": "boolean"
-                              },
-                              "defaultValue": false
+                              }
                             },
                             "type": "default"
                           }
@@ -266145,8 +266024,7 @@
                                     "type": "boolean"
                                   },
                                   "type": "boolean"
-                                },
-                                "defaultValue": false
+                                }
                               },
                               "type": "default"
                             }
@@ -266174,8 +266052,7 @@
                                   "type": "boolean"
                                 },
                                 "type": "boolean"
-                              },
-                              "defaultValue": false
+                              }
                             },
                             "type": "default"
                           }
@@ -283707,8 +283584,7 @@
                                     "type": "boolean"
                                   },
                                   "type": "boolean"
-                                },
-                                "defaultValue": false
+                                }
                               },
                               "type": "default"
                             }
@@ -283736,8 +283612,7 @@
                                   "type": "boolean"
                                 },
                                 "type": "boolean"
-                              },
-                              "defaultValue": false
+                              }
                             },
                             "type": "default"
                           }
@@ -283789,8 +283664,7 @@
                                     "type": "boolean"
                                   },
                                   "type": "boolean"
-                                },
-                                "defaultValue": false
+                                }
                               },
                               "type": "default"
                             }
@@ -283818,8 +283692,7 @@
                                   "type": "boolean"
                                 },
                                 "type": "boolean"
-                              },
-                              "defaultValue": false
+                              }
                             },
                             "type": "default"
                           }
@@ -284932,8 +284805,7 @@
                   "enums.visibility.unlisted",
                   "enums.visibility.public"
                 ]
-              },
-              "defaultValue": "enums.visibility.private"
+              }
             },
             "type": "default"
           },
@@ -285255,8 +285127,7 @@
                   "enums.visibility.unlisted",
                   "enums.visibility.public"
                 ]
-              },
-              "defaultValue": "enums.visibility.private"
+              }
             },
             "type": "default"
           },
@@ -285739,8 +285610,7 @@
                 },
                 "type": "number",
                 "isFinite": true
-              },
-              "defaultValue": 5
+              }
             },
             "type": "default"
           },
@@ -286194,8 +286064,7 @@
                   }
                 },
                 "type": "optional"
-              },
-              "defaultValue": 5
+              }
             },
             "type": "default"
           },
@@ -286224,8 +286093,7 @@
                   }
                 },
                 "type": "optional"
-              },
-              "defaultValue": false
+              }
             },
             "type": "default"
           },
@@ -286495,8 +286363,7 @@
                   }
                 },
                 "type": "optional"
-              },
-              "defaultValue": "enums.provider.BRAVE"
+              }
             },
             "type": "default"
           },
@@ -286528,8 +286395,7 @@
                   }
                 },
                 "type": "optional"
-              },
-              "defaultValue": 5
+              }
             },
             "type": "default"
           },
@@ -286558,8 +286424,7 @@
                   }
                 },
                 "type": "optional"
-              },
-              "defaultValue": false
+              }
             },
             "type": "default"
           },
@@ -287368,8 +287233,7 @@
                   },
                   "type": "lazy"
                 }
-              },
-              "defaultValue": {}
+              }
             },
             "type": "default"
           },
@@ -287454,8 +287318,7 @@
                   }
                 },
                 "type": "optional"
-              },
-              "defaultValue": "wait"
+              }
             },
             "type": "default"
           },
@@ -290103,8 +289966,7 @@
                             "type": "boolean"
                           },
                           "type": "boolean"
-                        },
-                        "defaultValue": true
+                        }
                       },
                       "type": "default"
                     },
@@ -290116,8 +289978,7 @@
                             "type": "boolean"
                           },
                           "type": "boolean"
-                        },
-                        "defaultValue": true
+                        }
                       },
                       "type": "default"
                     },
@@ -290129,8 +289990,7 @@
                             "type": "boolean"
                           },
                           "type": "boolean"
-                        },
-                        "defaultValue": true
+                        }
                       },
                       "type": "default"
                     },
@@ -290142,8 +290002,7 @@
                             "type": "boolean"
                           },
                           "type": "boolean"
-                        },
-                        "defaultValue": true
+                        }
                       },
                       "type": "default"
                     },
@@ -290155,8 +290014,7 @@
                             "type": "boolean"
                           },
                           "type": "boolean"
-                        },
-                        "defaultValue": false
+                        }
                       },
                       "type": "default"
                     }
@@ -290418,8 +290276,7 @@
                         "type": "boolean"
                       },
                       "type": "boolean"
-                    },
-                    "defaultValue": true
+                    }
                   },
                   "type": "default"
                 },
@@ -290431,8 +290288,7 @@
                         "type": "boolean"
                       },
                       "type": "boolean"
-                    },
-                    "defaultValue": true
+                    }
                   },
                   "type": "default"
                 },
@@ -290444,8 +290300,7 @@
                         "type": "boolean"
                       },
                       "type": "boolean"
-                    },
-                    "defaultValue": true
+                    }
                   },
                   "type": "default"
                 },
@@ -290457,8 +290312,7 @@
                         "type": "boolean"
                       },
                       "type": "boolean"
-                    },
-                    "defaultValue": true
+                    }
                   },
                   "type": "default"
                 },
@@ -290470,8 +290324,7 @@
                         "type": "boolean"
                       },
                       "type": "boolean"
-                    },
-                    "defaultValue": false
+                    }
                   },
                   "type": "default"
                 }
@@ -290656,8 +290509,7 @@
                             "type": "boolean"
                           },
                           "type": "boolean"
-                        },
-                        "defaultValue": true
+                        }
                       },
                       "type": "default"
                     },
@@ -290669,8 +290521,7 @@
                             "type": "boolean"
                           },
                           "type": "boolean"
-                        },
-                        "defaultValue": true
+                        }
                       },
                       "type": "default"
                     },
@@ -290682,8 +290533,7 @@
                             "type": "boolean"
                           },
                           "type": "boolean"
-                        },
-                        "defaultValue": true
+                        }
                       },
                       "type": "default"
                     },
@@ -290695,8 +290545,7 @@
                             "type": "boolean"
                           },
                           "type": "boolean"
-                        },
-                        "defaultValue": true
+                        }
                       },
                       "type": "default"
                     },
@@ -290708,8 +290557,7 @@
                             "type": "boolean"
                           },
                           "type": "boolean"
-                        },
-                        "defaultValue": false
+                        }
                       },
                       "type": "default"
                     }
@@ -290963,8 +290811,7 @@
                       "analytics.range.allTime",
                       "analytics.range.custom"
                     ]
-                  },
-                  "defaultValue": "analytics.range.last30Days"
+                  }
                 },
                 "type": "default"
               }
@@ -291029,8 +290876,7 @@
                       "analytics.granularity.week",
                       "analytics.granularity.month"
                     ]
-                  },
-                  "defaultValue": "analytics.granularity.auto"
+                  }
                 },
                 "type": "default"
               }
@@ -291723,8 +291569,7 @@
                                             "type": "boolean"
                                           },
                                           "type": "boolean"
-                                        },
-                                        "defaultValue": true
+                                        }
                                       },
                                       "type": "default"
                                     },
@@ -291736,8 +291581,7 @@
                                             "type": "boolean"
                                           },
                                           "type": "boolean"
-                                        },
-                                        "defaultValue": true
+                                        }
                                       },
                                       "type": "default"
                                     },
@@ -291749,8 +291593,7 @@
                                             "type": "boolean"
                                           },
                                           "type": "boolean"
-                                        },
-                                        "defaultValue": true
+                                        }
                                       },
                                       "type": "default"
                                     },
@@ -291762,8 +291605,7 @@
                                             "type": "boolean"
                                           },
                                           "type": "boolean"
-                                        },
-                                        "defaultValue": true
+                                        }
                                       },
                                       "type": "default"
                                     },
@@ -291775,8 +291617,7 @@
                                             "type": "boolean"
                                           },
                                           "type": "boolean"
-                                        },
-                                        "defaultValue": false
+                                        }
                                       },
                                       "type": "default"
                                     }
@@ -292271,8 +292112,7 @@
                                           "type": "boolean"
                                         },
                                         "type": "boolean"
-                                      },
-                                      "defaultValue": true
+                                      }
                                     },
                                     "type": "default"
                                   },
@@ -292284,8 +292124,7 @@
                                           "type": "boolean"
                                         },
                                         "type": "boolean"
-                                      },
-                                      "defaultValue": true
+                                      }
                                     },
                                     "type": "default"
                                   },
@@ -292297,8 +292136,7 @@
                                           "type": "boolean"
                                         },
                                         "type": "boolean"
-                                      },
-                                      "defaultValue": true
+                                      }
                                     },
                                     "type": "default"
                                   },
@@ -292310,8 +292148,7 @@
                                           "type": "boolean"
                                         },
                                         "type": "boolean"
-                                      },
-                                      "defaultValue": true
+                                      }
                                     },
                                     "type": "default"
                                   },
@@ -292323,8 +292160,7 @@
                                           "type": "boolean"
                                         },
                                         "type": "boolean"
-                                      },
-                                      "defaultValue": false
+                                      }
                                     },
                                     "type": "default"
                                   }
@@ -293475,8 +293311,7 @@
                   }
                 },
                 "type": "optional"
-              },
-              "defaultValue": true
+              }
             },
             "type": "default"
           },

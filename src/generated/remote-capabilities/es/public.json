@@ -108,8 +108,7 @@
                   "subject.partnership",
                   "subject.other"
                 ]
-              },
-              "defaultValue": "subject.helpSupport"
+              }
             },
             "type": "default"
           },
@@ -1830,8 +1829,7 @@
                       }
                     },
                     "type": "optional"
-                  },
-                  "defaultValue": 1
+                  }
                 },
                 "type": "default"
               },
@@ -1860,8 +1858,7 @@
                       }
                     },
                     "type": "optional"
-                  },
-                  "defaultValue": 50
+                  }
                 },
                 "type": "default"
               },
@@ -10573,8 +10570,7 @@
                         },
                         "type": "lazy"
                       }
-                    },
-                    "defaultValue": {}
+                    }
                   },
                   "type": "default"
                 },
@@ -10636,8 +10632,7 @@
                         "type": "boolean"
                       },
                       "type": "boolean"
-                    },
-                    "defaultValue": false
+                    }
                   },
                   "type": "default"
                 },
@@ -10699,8 +10694,7 @@
                         "type": "boolean"
                       },
                       "type": "boolean"
-                    },
-                    "defaultValue": false
+                    }
                   },
                   "type": "default"
                 },
@@ -10745,8 +10739,7 @@
                 },
                 "type": "number",
                 "isFinite": true
-              },
-              "defaultValue": 150
+              }
             },
             "type": "default"
           },
@@ -10981,8 +10974,7 @@
                   "cron",
                   "remote"
                 ]
-              },
-              "defaultValue": "cron"
+              }
             },
             "type": "default"
           },
@@ -11171,8 +11163,7 @@
                   "type": "boolean"
                 },
                 "type": "boolean"
-              },
-              "defaultValue": false
+              }
             },
             "type": "default"
           },
@@ -11558,8 +11549,7 @@
                   "cron",
                   "remote"
                 ]
-              },
-              "defaultValue": "private"
+              }
             },
             "type": "default"
           },
@@ -19568,8 +19558,7 @@
                     }
                   }
                 ]
-              },
-              "defaultValue": "sortMode.hot"
+              }
             },
             "type": "default"
           },
@@ -19601,8 +19590,7 @@
                   }
                 },
                 "type": "optional"
-              },
-              "defaultValue": 1
+              }
             },
             "type": "default"
           },
@@ -19634,8 +19622,7 @@
                   }
                 },
                 "type": "optional"
-              },
-              "defaultValue": 20
+              }
             },
             "type": "default"
           },
@@ -25978,8 +25965,7 @@
                   }
                 },
                 "type": "optional"
-              },
-              "defaultValue": "user"
+              }
             },
             "type": "default"
           },
@@ -28331,8 +28317,7 @@
                   }
                 },
                 "type": "optional"
-              },
-              "defaultValue": 1
+              }
             },
             "type": "default"
           },
@@ -28364,8 +28349,7 @@
                   }
                 },
                 "type": "optional"
-              },
-              "defaultValue": 20
+              }
             },
             "type": "default"
           },
@@ -28438,8 +28422,7 @@
                   "incognito",
                   "remote"
                 ]
-              },
-              "defaultValue": "private"
+              }
             },
             "type": "default"
           },
@@ -30843,8 +30826,7 @@
                   "post.size.landscape1792",
                   "post.size.portrait1792"
                 ]
-              },
-              "defaultValue": "post.size.square1024"
+              }
             },
             "type": "default"
           },
@@ -30887,8 +30869,7 @@
                   "HD": "post.quality.hd"
                 },
                 "options": ["post.quality.standard", "post.quality.hd"]
-              },
-              "defaultValue": "post.quality.standard"
+              }
             },
             "type": "default"
           },
@@ -31643,8 +31624,7 @@
                       }
                     },
                     "type": "optional"
-                  },
-                  "defaultValue": 1
+                  }
                 },
                 "type": "default"
               },
@@ -31673,8 +31653,7 @@
                       }
                     },
                     "type": "optional"
-                  },
-                  "defaultValue": 50
+                  }
                 },
                 "type": "default"
               },
@@ -32853,8 +32832,7 @@
                   "post.duration.medium",
                   "post.duration.long"
                 ]
-              },
-              "defaultValue": "post.duration.short"
+              }
             },
             "type": "default"
           },
@@ -34742,8 +34720,7 @@
                                 "type": "boolean"
                               },
                               "type": "boolean"
-                            },
-                            "defaultValue": false
+                            }
                           },
                           "type": "default"
                         }
@@ -34771,8 +34748,7 @@
                               "type": "boolean"
                             },
                             "type": "boolean"
-                          },
-                          "defaultValue": false
+                          }
                         },
                         "type": "default"
                       }
@@ -34816,8 +34792,7 @@
                                 "type": "boolean"
                               },
                               "type": "boolean"
-                            },
-                            "defaultValue": false
+                            }
                           },
                           "type": "default"
                         }
@@ -34845,8 +34820,7 @@
                               "type": "boolean"
                             },
                             "type": "boolean"
-                          },
-                          "defaultValue": false
+                          }
                         },
                         "type": "default"
                       }
@@ -72217,8 +72191,7 @@
                   "enums.source.community",
                   "enums.source.my"
                 ]
-              },
-              "defaultValue": "enums.source.builtIn"
+              }
             },
             "type": "default"
           },
@@ -73627,8 +73600,7 @@
                 },
                 "type": "number",
                 "isFinite": true
-              },
-              "defaultValue": 5
+              }
             },
             "type": "default"
           },
@@ -74082,8 +74054,7 @@
                   }
                 },
                 "type": "optional"
-              },
-              "defaultValue": 5
+              }
             },
             "type": "default"
           },
@@ -74112,8 +74083,7 @@
                   }
                 },
                 "type": "optional"
-              },
-              "defaultValue": false
+              }
             },
             "type": "default"
           },
@@ -74383,8 +74353,7 @@
                   }
                 },
                 "type": "optional"
-              },
-              "defaultValue": "enums.provider.BRAVE"
+              }
             },
             "type": "default"
           },
@@ -74416,8 +74385,7 @@
                   }
                 },
                 "type": "optional"
-              },
-              "defaultValue": 5
+              }
             },
             "type": "default"
           },
@@ -74446,8 +74414,7 @@
                   }
                 },
                 "type": "optional"
-              },
-              "defaultValue": false
+              }
             },
             "type": "default"
           },
@@ -74906,8 +74873,7 @@
                   },
                   "type": "lazy"
                 }
-              },
-              "defaultValue": {}
+              }
             },
             "type": "default"
           },
@@ -74992,8 +74958,7 @@
                   }
                 },
                 "type": "optional"
-              },
-              "defaultValue": "wait"
+              }
             },
             "type": "default"
           },
