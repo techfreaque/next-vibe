@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as LlmsFullDottxtRouteImport } from './routes/llms-full[.]txt'
 import { Route as LlmsDottxtRouteImport } from './routes/llms[.]txt'
+import { Route as ModelsChangelogDotxmlRouteImport } from './routes/models-changelog[.]xml'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as LocaleIndexRouteImport } from './routes/$locale.index'
 import { Route as LocaleSplatRouteImport } from './routes/$locale.$'
@@ -53,6 +54,7 @@ import { Route as LocaleCreatorUserIdIndexRouteImport } from './routes/$locale.c
 import { Route as LocaleDocsApiIndexRouteImport } from './routes/$locale.docs.api.index'
 import { Route as LocaleInvoiceInvoiceIdIndexRouteImport } from './routes/$locale.invoice.$invoiceId.index'
 import { Route as LocaleModelsModelIdIndexRouteImport } from './routes/$locale.models.$modelId.index'
+import { Route as LocaleModelsChangelogIndexRouteImport } from './routes/$locale.models.changelog.index'
 import { Route as LocaleSharedTokenIndexRouteImport } from './routes/$locale.shared.$token.index'
 import { Route as LocaleSkillSkillIdIndexRouteImport } from './routes/$locale.skill.$skillId.index'
 import { Route as LocaleStoryAbliteratedAiChatIndexRouteImport } from './routes/$locale.story.abliterated-ai-chat.index'
@@ -787,6 +789,11 @@ const LlmsDottxtRoute = LlmsDottxtRouteImport.update({
   path: '/llms.txt',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ModelsChangelogDotxmlRoute = ModelsChangelogDotxmlRouteImport.update({
+  id: '/models-changelog.xml',
+  path: '/models-changelog.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
@@ -993,6 +1000,12 @@ const LocaleModelsModelIdIndexRoute =
   LocaleModelsModelIdIndexRouteImport.update({
     id: '/$modelId/',
     path: '/$modelId/',
+    getParentRoute: () => LocaleModelsRoute,
+  } as any)
+const LocaleModelsChangelogIndexRoute =
+  LocaleModelsChangelogIndexRouteImport.update({
+    id: '/changelog/',
+    path: '/changelog/',
     getParentRoute: () => LocaleModelsRoute,
   } as any)
 const LocaleSharedTokenIndexRoute = LocaleSharedTokenIndexRouteImport.update({
@@ -5260,6 +5273,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/llms-full.txt': typeof LlmsFullDottxtRoute
   '/llms.txt': typeof LlmsDottxtRoute
+  '/models-changelog.xml': typeof ModelsChangelogDotxmlRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/$locale/$': typeof LocaleSplatRoute
   '/$locale/create': typeof LocaleCreateRouteWithChildren
@@ -5410,6 +5424,7 @@ export interface FileRoutesByFullPath {
   '/$locale/docs/api/': typeof LocaleDocsApiIndexRoute
   '/$locale/invoice/$invoiceId/': typeof LocaleInvoiceInvoiceIdIndexRoute
   '/$locale/models/$modelId/': typeof LocaleModelsModelIdIndexRoute
+  '/$locale/models/changelog/': typeof LocaleModelsChangelogIndexRoute
   '/$locale/shared/$token/': typeof LocaleSharedTokenIndexRoute
   '/$locale/skill/$skillId/': typeof LocaleSkillSkillIdIndexRoute
   '/$locale/story/abliterated-ai-chat/': typeof LocaleStoryAbliteratedAiChatIndexRoute
@@ -6023,6 +6038,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/llms-full.txt': typeof LlmsFullDottxtRoute
   '/llms.txt': typeof LlmsDottxtRoute
+  '/models-changelog.xml': typeof ModelsChangelogDotxmlRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/$locale/$': typeof LocaleSplatRoute
   '/$locale/docs': typeof LocaleDocsRouteWithChildren
@@ -6166,6 +6182,7 @@ export interface FileRoutesByTo {
   '/$locale/docs/api': typeof LocaleDocsApiIndexRoute
   '/$locale/invoice/$invoiceId': typeof LocaleInvoiceInvoiceIdIndexRoute
   '/$locale/models/$modelId': typeof LocaleModelsModelIdIndexRoute
+  '/$locale/models/changelog': typeof LocaleModelsChangelogIndexRoute
   '/$locale/shared/$token': typeof LocaleSharedTokenIndexRoute
   '/$locale/skill/$skillId': typeof LocaleSkillSkillIdIndexRoute
   '/$locale/story/abliterated-ai-chat': typeof LocaleStoryAbliteratedAiChatIndexRoute
@@ -6780,6 +6797,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/llms-full.txt': typeof LlmsFullDottxtRoute
   '/llms.txt': typeof LlmsDottxtRoute
+  '/models-changelog.xml': typeof ModelsChangelogDotxmlRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/$locale/$': typeof LocaleSplatRoute
   '/$locale/create': typeof LocaleCreateRouteWithChildren
@@ -6931,6 +6949,7 @@ export interface FileRoutesById {
   '/$locale/docs/api/': typeof LocaleDocsApiIndexRoute
   '/$locale/invoice/$invoiceId/': typeof LocaleInvoiceInvoiceIdIndexRoute
   '/$locale/models/$modelId/': typeof LocaleModelsModelIdIndexRoute
+  '/$locale/models/changelog/': typeof LocaleModelsChangelogIndexRoute
   '/$locale/shared/$token/': typeof LocaleSharedTokenIndexRoute
   '/$locale/skill/$skillId/': typeof LocaleSkillSkillIdIndexRoute
   '/$locale/story/abliterated-ai-chat/': typeof LocaleStoryAbliteratedAiChatIndexRoute
@@ -7546,6 +7565,7 @@ export interface FileRouteTypes {
     | '/'
     | '/llms-full.txt'
     | '/llms.txt'
+    | '/models-changelog.xml'
     | '/sitemap.xml'
     | '/$locale/$'
     | '/$locale/create'
@@ -7696,6 +7716,7 @@ export interface FileRouteTypes {
     | '/$locale/docs/api/'
     | '/$locale/invoice/$invoiceId/'
     | '/$locale/models/$modelId/'
+    | '/$locale/models/changelog/'
     | '/$locale/shared/$token/'
     | '/$locale/skill/$skillId/'
     | '/$locale/story/abliterated-ai-chat/'
@@ -8309,6 +8330,7 @@ export interface FileRouteTypes {
     | '/'
     | '/llms-full.txt'
     | '/llms.txt'
+    | '/models-changelog.xml'
     | '/sitemap.xml'
     | '/$locale/$'
     | '/$locale/docs'
@@ -8452,6 +8474,7 @@ export interface FileRouteTypes {
     | '/$locale/docs/api'
     | '/$locale/invoice/$invoiceId'
     | '/$locale/models/$modelId'
+    | '/$locale/models/changelog'
     | '/$locale/shared/$token'
     | '/$locale/skill/$skillId'
     | '/$locale/story/abliterated-ai-chat'
@@ -9065,6 +9088,7 @@ export interface FileRouteTypes {
     | '/'
     | '/llms-full.txt'
     | '/llms.txt'
+    | '/models-changelog.xml'
     | '/sitemap.xml'
     | '/$locale/$'
     | '/$locale/create'
@@ -9216,6 +9240,7 @@ export interface FileRouteTypes {
     | '/$locale/docs/api/'
     | '/$locale/invoice/$invoiceId/'
     | '/$locale/models/$modelId/'
+    | '/$locale/models/changelog/'
     | '/$locale/shared/$token/'
     | '/$locale/skill/$skillId/'
     | '/$locale/story/abliterated-ai-chat/'
@@ -9830,6 +9855,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   LlmsFullDottxtRoute: typeof LlmsFullDottxtRoute
   LlmsDottxtRoute: typeof LlmsDottxtRoute
+  ModelsChangelogDotxmlRoute: typeof ModelsChangelogDotxmlRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   LocaleSplatRoute: typeof LocaleSplatRoute
   LocaleCreateRoute: typeof LocaleCreateRouteWithChildren
@@ -10311,6 +10337,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LlmsDottxtRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/models-changelog.xml': {
+      id: '/models-changelog.xml'
+      path: '/models-changelog.xml'
+      fullPath: '/models-changelog.xml'
+      preLoaderRoute: typeof ModelsChangelogDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sitemap.xml': {
       id: '/sitemap.xml'
       path: '/sitemap.xml'
@@ -10596,6 +10629,13 @@ declare module '@tanstack/react-router' {
       path: '/$modelId'
       fullPath: '/$locale/models/$modelId/'
       preLoaderRoute: typeof LocaleModelsModelIdIndexRouteImport
+      parentRoute: typeof LocaleModelsRoute
+    }
+    '/$locale/models/changelog/': {
+      id: '/$locale/models/changelog/'
+      path: '/changelog'
+      fullPath: '/$locale/models/changelog/'
+      preLoaderRoute: typeof LocaleModelsChangelogIndexRouteImport
       parentRoute: typeof LocaleModelsRoute
     }
     '/$locale/shared/$token/': {
@@ -15668,12 +15708,14 @@ const LocaleHelpRouteWithChildren = LocaleHelpRoute._addFileChildren(
 interface LocaleModelsRouteChildren {
   LocaleModelsIndexRoute: typeof LocaleModelsIndexRoute
   LocaleModelsModelIdIndexRoute: typeof LocaleModelsModelIdIndexRoute
+  LocaleModelsChangelogIndexRoute: typeof LocaleModelsChangelogIndexRoute
   LocaleModelsCompareABIndexRoute: typeof LocaleModelsCompareABIndexRoute
 }
 
 const LocaleModelsRouteChildren: LocaleModelsRouteChildren = {
   LocaleModelsIndexRoute: LocaleModelsIndexRoute,
   LocaleModelsModelIdIndexRoute: LocaleModelsModelIdIndexRoute,
+  LocaleModelsChangelogIndexRoute: LocaleModelsChangelogIndexRoute,
   LocaleModelsCompareABIndexRoute: LocaleModelsCompareABIndexRoute,
 }
 
@@ -17054,6 +17096,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   LlmsFullDottxtRoute: LlmsFullDottxtRoute,
   LlmsDottxtRoute: LlmsDottxtRoute,
+  ModelsChangelogDotxmlRoute: ModelsChangelogDotxmlRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   LocaleSplatRoute: LocaleSplatRoute,
   LocaleCreateRoute: LocaleCreateRouteWithChildren,

@@ -20,6 +20,10 @@ import { configScopedTranslation } from "@/env/i18n";
 
 import { CREATE_KINDS } from "../../create/_shared/create-kinds";
 import {
+  latestModelChangelogDate,
+  MODEL_CHANGELOG_PATH,
+} from "../../models/_shared/model-changelog";
+import {
   canonicalComparisonPath,
   listModelFacts,
   suggestComparisons,
@@ -96,6 +100,11 @@ export function collectSitemapEntries(
   }
 
   entries.push(...listCompareEntries());
+
+  entries.push({
+    path: MODEL_CHANGELOG_PATH,
+    lastmod: latestModelChangelogDate(),
+  });
 
   const seenSkills = new Set<string>();
   for (const skill of skillPages) {

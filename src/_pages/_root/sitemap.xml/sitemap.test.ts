@@ -82,7 +82,9 @@ describe("sitemap.xml", () => {
 
     const compare = pathsUnder(urls, "/models/compare/");
     const modelPages = pathsUnder(urls, "/models/").filter(
-      (url) => !url.includes("/models/compare/"),
+      (url) =>
+        !url.includes("/models/compare/") &&
+        !url.endsWith("/models/changelog"),
     );
     expect(modelPages.length).toBe((chat.length + media.length) * n);
     expect(compare.length).toBeGreaterThan(0);
@@ -96,6 +98,7 @@ describe("sitemap.xml", () => {
       expect(urls).toContain(`${BASE}/${locale}/models/${chat[0]?.slug}`);
       expect(urls).toContain(`${BASE}/${locale}/models/${media[0]?.slug}`);
       expect(urls).toContain(`${BASE}/${locale}/skill/community-skill`);
+      expect(urls).toContain(`${BASE}/${locale}/models/changelog`);
     }
     expect(new Set(urls).size).toBe(urls.length);
     expect(urls.length).toBeGreaterThan(SITEMAP_STATIC_PATHS.length * n);
@@ -106,7 +109,9 @@ describe("sitemap.xml", () => {
     const response = await rootRoute.GET();
     expect(response.status).toBe(200);
     const xml = await response.text();
-    const modelLocs = locs(xml).filter((url) => url.includes("/models/"));
+    const modelLocs = locs(xml).filter(
+      (url) => url.includes("/models/") && !url.endsWith("/models/changelog"),
+    );
     const skillLocs = locs(xml).filter((url) => url.includes("/skill/"));
     expect(skillLocs.length).toBeGreaterThan(0);
     if (listModelFacts(availability).length > 0) {

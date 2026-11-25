@@ -17,6 +17,10 @@ import { getBlogPostCard } from "../../story/blog/posts-cards";
 import type { BlogPostSlug } from "../../story/blog/posts-meta";
 import { scopedTranslation } from "../i18n";
 import {
+  buildModelHistoryView,
+  type ModelHistoryView,
+} from "./model-changelog";
+import {
   compareFaq,
   type CompareLink,
   compareReadMore,
@@ -154,6 +158,8 @@ function landingLink(
 
 export interface ModelPageSeo {
   seo: ModelSeoContent;
+  /** "What changed": dated changelog entries for this model. */
+  history: ModelHistoryView;
   /** Service + BreadcrumbList JSON-LD. */
   structuredData: JsonLdNode;
 }
@@ -180,6 +186,7 @@ export function buildChatModelPageSeo(
         ...blogLinks(chatModelBlogSlugs(facts), locale),
       ],
     },
+    history: buildModelHistoryView(locale, "text", facts.slug, availability),
     structuredData: buildChatModelStructuredData(
       facts,
       locale,
@@ -203,6 +210,12 @@ export function buildMediaModelPageSeo(
       faq: mediaModelFaq(facts, locale),
       blog: blogLinks(mediaModelBlogSlugs(facts), locale),
     },
+    history: buildModelHistoryView(
+      locale,
+      facts.type,
+      facts.slug,
+      availability,
+    ),
     structuredData: buildMediaModelStructuredData(
       facts,
       locale,

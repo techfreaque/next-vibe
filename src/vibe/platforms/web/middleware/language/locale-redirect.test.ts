@@ -146,6 +146,29 @@ describe("middleware locale redirect", () => {
     );
   });
 
+  it("passes the model changelog feed through to the root handler", async () => {
+    const res = await middleware(
+      request("/models-changelog.xml?locale=de-DE"),
+      options,
+    );
+    expect(res.headers.get("x-middleware-next")).toBe("1");
+    expect(res.headers.get("location")).toBeNull();
+  });
+
+  it("locale-redirects paths resembling the feed", async () => {
+    for (const path of [
+      "/models-changelogXxml",
+      "/models-changelog.xml/child",
+      "/user/models-changelog.xml",
+    ]) {
+      const res = await middleware(request(path), options);
+      expect(res.status).toBe(307);
+      expect(res.headers.get("location")).toBe(
+        `http://localhost:3000/en-GLOBAL${path}`,
+      );
+    }
+  });
+
   it("never locale-redirects static paths", async () => {
     for (const path of [
       "/llms.txt",

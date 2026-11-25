@@ -124,6 +124,11 @@ export async function middleware(
     );
   }
 
+  // The public RSS handler selects its locale from the query string.
+  if (path === "/models-changelog.xml") {
+    return NextResponseClass.next();
+  }
+
   // Skip for static files — Next.js serves these directly.
   // For bare-root paths with a file extension (e.g. /favicon.png, /logo.jpg) that
   // have no locale prefix, return 404 immediately: they matched the [locale] catch-all

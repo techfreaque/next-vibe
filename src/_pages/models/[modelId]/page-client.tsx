@@ -29,8 +29,14 @@ import { scopedTranslation } from "../i18n";
 import { MediaModelPageClient } from "./media-page-client";
 import type { ChatModelPageData, MediaModelPageData } from "./page";
 
-type ChatModelClientData = Omit<ChatModelPageData, "seo" | "structuredData">;
-type MediaModelClientData = Omit<MediaModelPageData, "seo" | "structuredData">;
+type ChatModelClientData = Omit<
+  ChatModelPageData,
+  "seo" | "history" | "structuredData"
+>;
+type MediaModelClientData = Omit<
+  MediaModelPageData,
+  "seo" | "history" | "structuredData"
+>;
 
 /**
  * `sections`: the server-rendered best for / price per plan / nearest models /

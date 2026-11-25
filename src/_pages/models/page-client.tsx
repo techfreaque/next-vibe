@@ -5,10 +5,17 @@ import { Div } from "next-vibe/ui/components/div";
 import { Search } from "next-vibe/ui/components/icons/Search";
 import { Input } from "next-vibe/ui/components/input";
 import { Label } from "next-vibe/ui/components/label";
+import { Span } from "next-vibe/ui/components/span";
 import type { JSX, ReactNode } from "react";
 import { useMemo, useState } from "react";
 
-import { CONTAINER, Cta, CtaBand, PageHero } from "../story/_shared/marketing";
+import {
+  CardLink,
+  CONTAINER,
+  Cta,
+  CtaBand,
+  PageHero,
+} from "../story/_shared/marketing";
 import { ModelCatalog } from "./_shared/model-catalog";
 import {
   CATALOG_TYPE_ORDER,
@@ -16,6 +23,8 @@ import {
   type CatalogType,
   listAllCatalogEntries,
 } from "./_shared/model-catalog-entries";
+import { MODEL_CHANGELOG_PATH } from "./_shared/model-changelog-paths";
+import { scopedTranslation as changelogTranslation } from "./changelog/i18n";
 import { scopedTranslation } from "./i18n";
 import type { ModelsIndexPageData } from "./page";
 
@@ -47,6 +56,7 @@ export function ModelsIndexClient({
   directorySection: ReactNode;
 }): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
+  const { t: changelogT } = changelogTranslation.scopedT(locale);
   const [query, setQuery] = useState("");
 
   // Only models whose provider API key is configured on this instance.
@@ -95,6 +105,13 @@ export function ModelsIndexClient({
               autoComplete="off"
               className="h-12 bg-card pl-10 text-base"
             />
+          </Div>
+          <Div className="mt-3 flex flex-wrap items-center gap-x-3 text-sm text-muted-foreground">
+            <CardLink
+              href={`/${locale}${MODEL_CHANGELOG_PATH}`}
+              label={changelogT("index.link")}
+            />
+            <Span>{changelogT("index.hint")}</Span>
           </Div>
         </Div>
       </PageHero>

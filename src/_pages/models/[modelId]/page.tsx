@@ -22,6 +22,8 @@ import type { JSX } from "react";
 
 import { configScopedTranslation } from "@/env/i18n";
 
+import type { ModelHistoryView } from "../_shared/model-changelog";
+import { ModelHistorySection } from "../_shared/model-changelog-ui";
 import {
   buildPickerModels,
   type ModelFacts,
@@ -101,6 +103,7 @@ export interface ChatModelPageData {
   pickerModels: PickerModel[];
   refusal: ModelStatsResponseOutput | null;
   seo: ModelSeoContent;
+  history: ModelHistoryView;
   /** Service + BreadcrumbList JSON-LD. */
   structuredData: JsonLdNode;
 }
@@ -111,6 +114,7 @@ export interface MediaModelPageData {
   facts: MediaModelFacts;
   description: string;
   seo: ModelSeoContent;
+  history: ModelHistoryView;
   structuredData: JsonLdNode;
 }
 
@@ -156,18 +160,25 @@ export async function tanstackLoader({
 }
 
 export function TanstackPage(data: ModelPageData): JSX.Element {
-  const { structuredData, seo, ...clientData } = data;
+  const { structuredData, seo, history, ...clientData } = data;
   return (
     <>
       <JsonLd id="model-structured-data" data={structuredData} />
       <ModelPageClient
         {...clientData}
         sections={
-          <ModelSeoSections
-            locale={data.locale}
-            model={data.facts.name}
-            content={seo}
-          />
+          <>
+            <ModelSeoSections
+              locale={data.locale}
+              model={data.facts.name}
+              content={seo}
+            />
+            <ModelHistorySection
+              locale={data.locale}
+              model={data.facts.name}
+              history={history}
+            />
+          </>
         }
       />
     </>
