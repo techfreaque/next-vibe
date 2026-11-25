@@ -12,6 +12,7 @@ import "server-only";
 
 import type { ModelMessage, streamText as aiStreamText } from "ai";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translation";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import type { CoreTool } from "next-vibe/platforms/ai/tools-loader";
@@ -58,6 +59,7 @@ export interface StreamLoopParams {
    * minus what the turn already spent (core/output-cost-cap.ts).
    */
   creditBalance: number;
+  dailyLimitMessage?: TranslatedKeyType;
   /** Flat pre-check cost of the model (0 = free model: never capped). */
   modelCost: number;
   /** Saved chat limit on tool-call rounds. */

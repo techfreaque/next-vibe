@@ -30,13 +30,13 @@ class TestSocket extends EventTarget {
     this.dispatchEvent(new Event("open"));
   }
 
-  drop(code: number, reason: string): void {
+  drop(code: number, reason: string, wasClean = false): void {
     this.readyState = TestSocket.CLOSED;
     this.dispatchEvent(
       Object.assign(new Event("close"), {
         code,
         reason,
-        wasClean: false,
+        wasClean,
       }),
     );
   }
@@ -57,7 +57,9 @@ it("reports quick reconnects and times out hidden, offline drops", async () => {
   const logger: EndpointLogger = {
     isDebugEnabled: false,
     debug: () => undefined,
-    info: (message, context) => { info.push({ message, context }); },
+    info: (message, context) => {
+      info.push({ message, context });
+    },
     warn: (message, context) => {
       warnings.push({ message, context });
     },
@@ -95,10 +97,14 @@ it("reports quick reconnects and times out hidden, offline drops", async () => {
     TestSocket.sockets[1]?.open();
     const firstSocketUrl = TestSocket.sockets[0]?.url ?? "";
     expect(new URL(firstSocketUrl).searchParams.has("retry")).toBe(false);
-    expect(new URL(TestSocket.sockets[1]?.url ?? "").searchParams.get("retry")).toBe("1");
+    expect(
+      new URL(TestSocket.sockets[1]?.url ?? "").searchParams.get("retry"),
+    ).toBe("1");
     expect(errors).toHaveLength(0);
     expect(warnings).toHaveLength(0);
-    expect(new URL(TestSocket.sockets[1]?.url ?? "").searchParams.get("restart")).toBe("1");
+    expect(
+      new URL(TestSocket.sockets[1]?.url ?? "").searchParams.get("restart"),
+    ).toBe("1");
     expect(info).toMatchObject([
       {
         message: "[WS Client] Planned reconnect after server restart",
@@ -140,12 +146,14 @@ it("reports quick reconnects and times out hidden, offline drops", async () => {
         reason: "offline",
         attempts: 2,
         failedHandshakesDuringDrop: 1,
-        lastFailedHandshakeRequestId: new URL(TestSocket.sockets[2]?.url ?? "").searchParams.get(
-          "requestId",
-        ),
+        lastFailedHandshakeRequestId: new URL(
+          TestSocket.sockets[2]?.url ?? "",
+        ).searchParams.get("requestId"),
         lastFailedHandshakeMs: 0,
         lastFailedHandshakeCode: 1006,
-        pendingHandshakeRequestId: new URL(TestSocket.sockets[3]?.url ?? "").searchParams.get("requestId"),
+        pendingHandshakeRequestId: new URL(
+          TestSocket.sockets[3]?.url ?? "",
+        ).searchParams.get("requestId"),
         pendingHandshakeMs: 17_000,
         retryScheduled: false,
         msSinceVisibilityChange: 0,
@@ -201,9 +209,9 @@ it("reports quick reconnects and times out hidden, offline drops", async () => {
       context: {
         noticeableDownMs: 121_000,
         offlineMs: 181_000,
-        reconnectRequestId: new URL(recoveredSocket?.url ?? "").searchParams.get(
-          "requestId",
-        ),
+        reconnectRequestId: new URL(
+          recoveredSocket?.url ?? "",
+        ).searchParams.get("requestId"),
         reconnectHandshakeMs: 0,
       },
     });
@@ -267,9 +275,10 @@ it("reports quick reconnects and times out hidden, offline drops", async () => {
     TestSocket.sockets.at(-1)?.drop(1012, "server-draining");
     jest.advanceTimersByTime(500);
     const stalled = TestSocket.sockets.at(-1);
-    jest.advanceTimersByTime(15_000);
+    jest.advanceTimersByTime(5_000);
     expect(stalled?.closeRequest).toEqual({
-      code: 4003, reason: "reconnect-handshake-timeout",
+      code: 4003,
+      reason: "reconnect-handshake-timeout",
     });
     stalled?.drop(1006, "");
     jest.advanceTimersByTime(2_000);
@@ -277,8 +286,27 @@ it("reports quick reconnects and times out hidden, offline drops", async () => {
     TestSocket.sockets.at(-1)?.open();
     expect(errors.at(-1)).toMatchObject({
       message: "[WS Client] Connection lost",
-      context: { plannedRestart: true, failedHandshakesDuringDrop: 1,
-        lastFailedHandshakeContext: { timedOut: true }, recovered: true },
+      context: {
+        plannedRestart: true,
+        failedHandshakesDuringDrop: 1,
+        lastFailedHandshakeContext: { timedOut: true },
+        recovered: true,
+      },
+    });
+
+    // This foreground close happens independently of the earlier network change.
+    jest.advanceTimersByTime(16_000);
+    const goingAway = TestSocket.sockets.at(-1);
+    goingAway?.drop(1001, "", true);
+    jest.advanceTimersByTime(500);
+    expect(TestSocket.sockets.at(-1)).not.toBe(goingAway);
+    TestSocket.sockets.at(-1)?.open();
+    expect(errors.at(-1)).toMatchObject({
+      context: {
+        dropCause: "going-away",
+        plannedRestart: false,
+        recovered: true,
+      },
     });
 
     TestSocket.sockets.at(-1)?.drop(1001, "going away");
@@ -298,7 +326,9 @@ it("reports quick reconnects and times out hidden, offline drops", async () => {
     fakeWindow.dispatchEvent(new Event("pagehide"));
     fakeWindow.dispatchEvent(new Event("pageshow"));
     const firstUpgrade = TestSocket.sockets.at(-1);
-    expect(new URL(firstUpgrade?.url ?? "").searchParams.has("retry")).toBe(false);
+    expect(new URL(firstUpgrade?.url ?? "").searchParams.has("retry")).toBe(
+      false,
+    );
     jest.advanceTimersByTime(15_000);
     expect(firstUpgrade?.closeRequest?.code).toBe(4003);
     firstUpgrade?.drop(1006, "");
@@ -306,7 +336,11 @@ it("reports quick reconnects and times out hidden, offline drops", async () => {
     TestSocket.sockets.at(-1)?.open();
     expect(errors.at(-1)).toMatchObject({
       message: "[WS Client] Connection lost",
-      context: { handshakeTimedOut: true, connectedForMs: null, recovered: true },
+      context: {
+        handshakeTimedOut: true,
+        connectedForMs: null,
+        recovered: true,
+      },
     });
   } finally {
     jest.useRealTimers();

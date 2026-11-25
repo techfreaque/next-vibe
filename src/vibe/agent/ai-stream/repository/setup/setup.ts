@@ -8,6 +8,7 @@ import "server-only";
 import type { ModelMessage } from "ai";
 import { and, eq, sql } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translation";
 import {
   ErrorResponseTypes,
   fail,
@@ -81,7 +82,7 @@ import {
   type BridgeContext,
   ModalityResolver,
 } from "../core/modality-resolver";
-import { computeOutputCap } from "../core/output-cost-cap";
+import { canFundCompaction, computeOutputCap } from "../core/output-cost-cap";
 import { AbortControllerSetup } from "../core/stream";
 import { StreamControl } from "../core/stream-control";
 import { transitionStreamingState } from "../core/streaming-state";
@@ -430,6 +431,7 @@ export interface StreamSetupResult {
   modelCost: number;
   /** Spendable credits (free + paid) at validation time */
   creditBalance: number;
+  dailyLimitMessage?: TranslatedKeyType;
   effectiveThreadId: string | null | undefined;
   effectiveParentMessageId: string | null | undefined;
   effectiveContent: string;
@@ -722,6 +724,7 @@ export async function setupAiStream(params: {
     effectiveLeadId,
     modelCost,
     balance: creditBalance,
+    dailyLimitMessage,
   } = modelCreditResult.data;
 
   // Process operation and handle audio transcription
@@ -904,12 +907,18 @@ export async function setupAiStream(params: {
 
   // Resolve effective compact trigger: favorite → skill → global default
   // Always capped at min(configured, floor(contextWindow * COMPACT_TRIGGER_PERCENTAGE))
-  const effectiveCompactTrigger = resolveEffectiveCompactTrigger({
+  const effectiveCompactTrigger = canFundCompaction(
     modelConfig,
-    favorite: resolvedFavoriteConfig,
-    customSkill: customSkillConfig,
-    skill: data.skill,
-  });
+    modelCost,
+    creditBalance,
+  )
+    ? resolveEffectiveCompactTrigger({
+        modelConfig,
+        favorite: resolvedFavoriteConfig,
+        customSkill: customSkillConfig,
+        skill: data.skill,
+      })
+    : Number.MAX_SAFE_INTEGER;
 
   logger.debug("[Setup] Effective compact trigger resolved", {
     effectiveCompactTrigger,
@@ -1333,10 +1342,12 @@ export async function setupAiStream(params: {
       }
     }
     return fail({
-      message: aiStreamT("route.errors.insufficientCredits", {
-        cost: formatCreditAmount(requiredCredits, locale),
-        balance: formatCreditAmount(creditBalance, locale),
-      }),
+      message:
+        dailyLimitMessage ??
+        aiStreamT("route.errors.insufficientCredits", {
+          cost: formatCreditAmount(requiredCredits, locale),
+          balance: formatCreditAmount(creditBalance, locale),
+        }),
       errorType: ErrorResponseTypes.PAYMENT_REQUIRED,
     });
   }
@@ -1446,6 +1457,7 @@ export async function setupAiStream(params: {
       isIncognito,
       modelCost,
       creditBalance,
+      dailyLimitMessage,
       effectiveThreadId,
       effectiveParentMessageId,
       effectiveContent,

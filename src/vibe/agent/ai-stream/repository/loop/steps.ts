@@ -14,9 +14,11 @@ import {
   calculateCreditCost,
   upstreamCostToCredits,
 } from "../../../models/models";
+import { truncateToContextWindow } from "../context/token-budget";
 import { AbortReason, StreamAbortError } from "../core/constants";
 import { buildSseMessageRow } from "../core/db-writer/sse-row";
 import { splitInlineThink } from "../core/inline-think-splitter";
+import { canFundCompaction } from "../core/output-cost-cap";
 import { QueueRegistry } from "../core/stream";
 import { estimateInputTokens } from "../core/token-estimator";
 import { injectPendingWakeUpResults } from "../revival/revival";
@@ -373,6 +375,23 @@ async function performMidStreamCompacting(
 
   if (effectiveInputTokens < state.p.midStreamCompactingThreshold) {
     return stepMessages;
+  }
+
+  const { modelConfig, modelCost, creditBalance, tools, systemPrompt } =
+    state.p;
+  const remaining =
+    creditBalance -
+    ctx.dbWriter.totalCreditsDeducted -
+    TokenAccumulator.spentCredits(ctx, modelConfig);
+  if (!canFundCompaction(modelConfig, modelCost, remaining)) {
+    return truncateToContextWindow(
+      stepMessages,
+      modelConfig.contextWindow,
+      logger,
+      systemPrompt,
+      tools,
+      modelConfig.id,
+    );
   }
 
   logger.debug("[prepareStep] Mid-stream compacting threshold reached", {

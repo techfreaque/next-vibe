@@ -9,6 +9,7 @@ import type { JSONValue } from "ai";
 import { and, eq, sql } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
+  type ErrorResponseType,
   ErrorResponseTypes,
   fail,
   failInline,
@@ -1056,7 +1057,17 @@ export class AiStreamRepository {
           );
         })();
       }
-      await emitSetupError({ setupResult, data, user, logger, cronTaskId });
+      // The initiating composer renders the synchronous 402 with its
+      // recovery actions. Broadcasting it as a message creates a second
+      // credit card in this thread and in every other open tab.
+      if (
+        !isPersonTurn ||
+        !request ||
+        cronTaskId ||
+        errorCode !== ErrorResponseTypes.PAYMENT_REQUIRED.errorCode
+      ) {
+        await emitSetupError({ setupResult, data, user, logger, cronTaskId });
+      }
       return setupResult;
     }
 
@@ -1064,6 +1075,7 @@ export class AiStreamRepository {
       isIncognito,
       modelCost,
       creditBalance,
+      dailyLimitMessage,
       effectiveParentMessageId,
       effectiveContent,
       effectiveRole,
@@ -1159,6 +1171,7 @@ export class AiStreamRepository {
     let capturedLastAiMessageContent: string | null = null;
     let capturedLastGeneratedMediaUrl: string | null = null;
     let capturedProviderErrorText: string | null = null;
+    const preparedRequest: { refusal?: ErrorResponseType } = {};
     let capturedTotalCreditsDeducted = 0;
     const capturedPinnedToolCount = tools ? Object.keys(tools).length : 0;
     // Set to true when prepareStep injects a queued message mid-stream.
@@ -1758,7 +1771,7 @@ export class AiStreamRepository {
             modelId: data.model,
           });
 
-          await new StreamLoop({
+          const refusal = await new StreamLoop({
             provider,
             modelConfig,
             messages,
@@ -1782,6 +1795,7 @@ export class AiStreamRepository {
             t: aiStreamT,
             toolExecutionContext,
             creditBalance,
+            dailyLimitMessage,
             modelCost,
             maxToolCalls,
             turnStepLimit,
@@ -1801,6 +1815,11 @@ export class AiStreamRepository {
               t: aiStreamT,
             },
           }).run();
+
+          if (refusal) {
+            preparedRequest.refusal = refusal;
+            return;
+          }
 
           // After stream completes, capture the last assistant message ID from the writer.
           // In a tool loop there can be multiple assistant messages; lastAssistantMessageId
@@ -2075,6 +2094,9 @@ export class AiStreamRepository {
         })();
         trackActiveRun(headlessRun);
         await headlessRun;
+        if (preparedRequest.refusal) {
+          return preparedRequest.refusal;
+        }
 
         logger.debug("[AI Stream] Headless execution complete", {
           threadId: threadResultThreadId,

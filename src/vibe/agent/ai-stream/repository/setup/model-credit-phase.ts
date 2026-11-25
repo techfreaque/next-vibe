@@ -5,6 +5,7 @@
 import "server-only";
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translation";
 import {
   ErrorResponseTypes,
   fail,
@@ -32,6 +33,7 @@ interface ModelCreditPhaseResult {
   modelCost: number;
   /** Spendable credits at validation time (free + paid) */
   balance: number;
+  dailyLimitMessage?: TranslatedKeyType;
 }
 
 /**
@@ -193,10 +195,9 @@ export async function runModelCreditPhase(params: {
     return creditValidation;
   }
 
-  const { effectiveLeadId, modelCost, balance } = creditValidation.data;
   return {
     success: true,
-    data: { modelConfig, effectiveLeadId, modelCost, balance },
+    data: { modelConfig, ...creditValidation.data },
   };
 }
 /**

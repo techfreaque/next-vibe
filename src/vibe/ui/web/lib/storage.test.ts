@@ -3,8 +3,8 @@ import { afterEach, beforeEach, describe, expect, it } from "bun:test";
 import type { EndpointLogger, LoggerMetadata } from "../../../logger/types";
 import {
   createLargeStorage,
-  type LargeStoreBackend,
   getLocalItem,
+  type LargeStoreBackend,
   type LargeStoreResult,
   removeLocalItem,
   resetQuotaOverflowForTests,
@@ -67,13 +67,14 @@ class FakeLocalStorage {
   }
 }
 
+const ok = <T>(value: T): Promise<LargeStoreResult<T>> =>
+  Promise.resolve({ ok: true, value });
+
 function createMemoryBackend(failPut = false): {
   backend: LargeStoreBackend;
   data: Map<string, string>;
 } {
   const data = new Map<string, string>();
-  const ok = <T>(value: T): Promise<LargeStoreResult<T>> =>
-    Promise.resolve({ ok: true, value });
   return {
     data,
     backend: {
@@ -188,7 +189,7 @@ describe("largeStorage (IndexedDB with localStorage migration)", () => {
     local.items.set("incognito_messages", "[legacy]");
     installLocalStorage(local);
     const { backend } = createMemoryBackend();
-    backend.get = () =>
+    backend.get = (): ReturnType<LargeStoreBackend["get"]> =>
       Promise.resolve({
         ok: false,
         error: "QuotaExceededError",
@@ -209,6 +210,29 @@ describe("largeStorage (IndexedDB with localStorage migration)", () => {
       indexedDbStage: "open-request",
       fallbackValueFound: false,
     });
+  });
+
+  it("recovers an inactive read transaction without losing the stored value", async () => {
+    installLocalStorage(new FakeLocalStorage());
+    const { backend, data } = createMemoryBackend();
+    data.set("incognito_threads", "[saved]");
+    const read = backend.get;
+    let attempts = 0;
+    backend.get = async (key): ReturnType<LargeStoreBackend["get"]> => {
+      attempts++;
+      return attempts === 1
+        ? {
+            ok: false,
+            error:
+              "Attempt to get a record from database without an in-progress transaction",
+            stage: "read-request",
+          }
+        : read(key);
+    };
+    const store = createLargeStorage(() => backend);
+    expect(await store.getItem("incognito_threads", logger)).toBe("[saved]");
+    expect(attempts).toBe(2);
+    expect(calls).toHaveLength(0);
   });
 
   it("removes the key from both stores", async () => {

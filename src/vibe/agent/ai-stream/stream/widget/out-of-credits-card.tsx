@@ -36,6 +36,8 @@ import { useSubscription } from "@/subscription/hooks";
 import { isLivePlan } from "@/subscription/plan-offers";
 import { VerifyEmailCreditsPrompt } from "@/user/public/verify-email/credits-prompt";
 
+import { useModelSelectorState } from "../../../chat/model-selector-state";
+import { scopedTranslation as consentMessages } from "../../../models/uncensored-consent/i18n";
 import { useAIStreamStore } from "../hooks/store";
 import { scopedTranslation } from "../i18n";
 
@@ -116,6 +118,20 @@ export function OutOfCreditsCard({
           <P aria-live="polite" className="mb-2 text-sm font-medium">
             {refusalMessage}
           </P>
+        )}
+        {variant === "composer" && onDismiss && !reason && (
+          <Button
+            type="button"
+            variant="link"
+            size="unset"
+            className="mb-2 h-auto p-0 text-sm"
+            onClick={(): void => {
+              onDismiss();
+              useModelSelectorState.getState().setModelSelectorOpen(true);
+            }}
+          >
+            {consentMessages.scopedT(locale).t("dialog.pickAnother")}
+          </Button>
         )}
         {reason ? (
           <Div className="flex flex-col items-start gap-2">

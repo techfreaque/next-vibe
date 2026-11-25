@@ -1,13 +1,9 @@
-import { afterEach, expect, it, mock, spyOn } from "bun:test";
 import { tool } from "ai";
+import { afterEach, expect, it, type Mock, mock, spyOn } from "bun:test";
 import {
   DefaultFolderId,
   rootlessToolExecutionContext,
 } from "next-vibe/core/execution-context";
-import type { JWTPublicPayloadType } from "next-vibe/identity/auth/types";
-import { UserPermissionRole } from "next-vibe/identity/roles/enum";
-import { createEndpointLogger } from "next-vibe/logger/server";
-import { z } from "zod";
 import {
   ErrorResponseTypes,
   success,
@@ -15,8 +11,12 @@ import {
 import type { WidgetData } from "next-vibe/core/utils/json";
 import executeToolDefinition from "next-vibe/execute-tool/definition";
 import { RouteExecuteRepository } from "next-vibe/execute-tool/repository";
+import type { JWTPublicPayloadType } from "next-vibe/identity/auth/types";
+import { UserPermissionRole } from "next-vibe/identity/roles/enum";
+import { createEndpointLogger } from "next-vibe/logger/server";
 import { createToolFromEndpoint } from "next-vibe/platforms/ai/tools-loader";
 import { Platform } from "next-vibe/platforms/platforms";
+import { z } from "zod";
 
 import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
 import { getRouteHandler } from "@/generated/routes/handlers";
@@ -43,6 +43,19 @@ import { StreamLoop } from "./loop";
 const locale = "en-US";
 const { t } = scopedTranslation.scopedT(locale);
 
+type Writer = stream.ToolExecutionContextImpl["dbWriter"];
+interface ToolLoopFixture {
+  loop: StreamLoop;
+  replay: Mock<
+    (url: RequestInfo | URL, init?: RequestInit) => Promise<Response>
+  >;
+  execute: Mock<() => Promise<string>>;
+  notice: Mock<Writer["emitErrorMessage"]>;
+  deduction: Mock<Writer["deductAndEmitCredits"]>;
+  settled: Mock<typeof stream.clearStreamingState>;
+  requestBodies: string[];
+}
+
 function makeToolLoop(params: {
   turnStepLimit?: number;
   creditBalance: number;
@@ -51,7 +64,7 @@ function makeToolLoop(params: {
   toolFinishReason?: "stop" | "tool_calls";
   model?: ChatModelId;
   modelCost?: number;
-}) {
+}): ToolLoopFixture {
   const logger = createEndpointLogger(false, locale);
   const threadId = crypto.randomUUID();
   const model = params.model ?? ChatModelId.GROK_4_7;
@@ -71,8 +84,12 @@ function makeToolLoop(params: {
     logger,
     creditsT: creditsScopedTranslation.scopedT(locale).t,
     locale,
-    wsEmit: () => ({ delivered: false, relayed: false, dropped: true }),
-    emitTitle: () => undefined,
+    wsEmit: (): ReturnType<stream.ToolExecutionContextImpl["wsEmit"]> => ({
+      delivered: false,
+      relayed: false,
+      dropped: true,
+    }),
+    emitTitle: (): void => undefined,
     streamRunId: undefined,
     toolExecutionContext,
   });
@@ -91,10 +108,8 @@ function makeToolLoop(params: {
   let step = 0;
   const requestBodies: string[] = [];
   const replay = mock(
-    async (
-      _url: RequestInfo | URL,
-      init?: RequestInit,
-    ): Promise<Response> => {
+    async (url: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
+      expect(String(url)).toContain("/chat/completions");
       if (typeof init?.body === "string") {
         requestBodies.push(init.body);
       }
@@ -150,8 +165,9 @@ function makeToolLoop(params: {
         },
       ];
       return new Response(
-        chunks.map((chunk) => `data: ${JSON.stringify(chunk)}\n\n`).join("") +
-          "data: [DONE]\n\n",
+        `${chunks
+          .map((chunk) => `data: ${JSON.stringify(chunk)}\n\n`)
+          .join("")}data: [DONE]\n\n`,
       );
     },
   );
@@ -212,7 +228,11 @@ const rename = {
 
 function makeRenameReplay(
   recording: NonNullable<Parameters<typeof makeToolLoop>[0]["recording"]>,
-) {
+): ToolLoopFixture & {
+  dispatch: Mock<typeof RouteExecuteRepository.execute>;
+  stored: Mock<Writer["emitToolResult"]>;
+  warnings: Mock<StreamLoop["p"]["logger"]["warn"]>;
+} {
   const replay = makeToolLoop({ creditBalance: 100_000, recording });
   const p = replay.loop.p;
   p.user = {
@@ -439,6 +459,64 @@ it.each([
     expect(settled).toHaveBeenCalledTimes(1);
   },
 );
+
+it("prices the tool output sent to Kimi when the executor returns a large payload", async () => {
+  const { loop, replay, requestBodies } = makeToolLoop({
+    model: ChatModelId.KIMI_K3,
+    creditBalance: 39.4,
+    finalAnswerAfter: 2,
+  });
+  loop.p.tools = {
+    fixture_tool: tool({
+      inputSchema: z.object({}),
+      execute: async () => "x".repeat(1_550_000),
+      toModelOutput: () => ({ type: "text", value: "Image ready." }),
+    }),
+  };
+  await loop.run();
+  expect(replay).toHaveBeenCalledTimes(2);
+  expect(requestBodies[1]).toContain("Image ready.");
+  expect(requestBodies[1]?.length).toBeLessThan(10_000);
+});
+
+it("sends live execute-tool image data through the model's media transport", async () => {
+  const imageBytes = `/9j/${"A".repeat(1_550_000)}`;
+  const { loop, replay, requestBodies, dispatch } = makeRenameReplay([
+    { args: { toolName: "rename-thread", input: rename.input } },
+  ]);
+  loop.p.creditBalance = 39.4;
+  loop.p.model = ChatModelId.VENICE_UNCENSORED;
+  loop.p.modelConfig = getChatModelById(loop.p.model);
+  dispatch.mockResolvedValueOnce(
+    success({
+      result: {
+        type: "content",
+        value: [
+          { type: "image-data", data: imageBytes, mediaType: "image/jpeg" },
+          { type: "text", text: "Generated image." },
+        ],
+      },
+    }),
+  );
+  await loop.run();
+  expect(replay).toHaveBeenCalledTimes(2);
+  expect(requestBodies[1]).toContain("Generated image.");
+  expect(requestBodies[1]).not.toContain(imageBytes.slice(0, 200));
+});
+
+it("declines a 6.5-credit request before calling the model if preparation left 0.5", async () => {
+  const { loop, replay, deduction, notice } = makeToolLoop({
+    model: ChatModelId.UNCENSORED_LM_V1_2,
+    modelCost: 6.5,
+    creditBalance: 7,
+  });
+  loop.p.ctx.dbWriter.totalCreditsDeducted = 6.5;
+  const refusal = await loop.run();
+  expect(refusal?.errorType.errorCode).toBe(402);
+  expect(replay).not.toHaveBeenCalled();
+  expect(deduction).not.toHaveBeenCalled();
+  expect(notice).toHaveBeenCalledTimes(1);
+});
 
 it("validates limits in settings and both relay modes", () => {
   const settings = settingsDefinition.POST.requestSchema;

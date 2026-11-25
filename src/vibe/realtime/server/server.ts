@@ -935,6 +935,14 @@ export function startWebSocketServer(
             "[WS] Socket dropped without close frame",
             diagnosis.meta,
           );
+        } else if (code === 1001 && diagnosis) {
+          logger.info("[WS] Going-away close received", {
+            requestId: ws.data.requestId,
+            code,
+            connectedForMs: diagnosis.meta.connectedForMs,
+            lastPongAgeMs: diagnosis.meta.lastPongAgeMs,
+            channelCount: diagnosis.meta.channelCount,
+          });
         } else {
           logger.debug("[WS] Connection closed", { code });
         }

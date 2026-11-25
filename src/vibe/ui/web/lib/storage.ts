@@ -726,7 +726,21 @@ export function createLargeStorage(
       if (!backend) {
         return getLocalItem(key, logger);
       }
-      const stored = await backend.get(key);
+      let stored = await backend.get(key);
+      if (!stored.ok && stored.stage === "read-request") {
+        const error = stored.error;
+        if (
+          (error instanceof Error &&
+            error.name === "TransactionInactiveError") ||
+          /without an in-progress transaction/i.test(
+            typeof error === "string" ? error : error.message,
+          )
+        ) {
+          // Each get opens a new readonly transaction. The previous request
+          // never read the value, so retry once before consulting legacy data.
+          stored = await backend.get(key);
+        }
+      }
       if (!stored.ok) {
         const fallback = getLocalItem(key, logger);
         await reportIdb(

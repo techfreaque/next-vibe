@@ -22,6 +22,18 @@ function userMessage(tokens: number): ModelMessage {
   return { role: "user", content: "x".repeat(Math.round(tokens * 3.5)) };
 }
 
+const estimate = (
+  output: Extract<ModelMessage, { role: "tool" }>["content"][number] & {
+    type: "tool-result";
+  },
+): number =>
+  estimatePreflightInputTokens({
+    messages: [{ role: "tool", content: [output] }],
+    systemPrompt: "",
+    tools: undefined,
+    compactTrigger: NO_COMPACT,
+  });
+
 describe("worst-case input price", () => {
   it("kimi-k3 prices input at its most expensive endpoint, not the cheapest listed one", () => {
     expect(kimi.inputTokenCost).toBeLessThan(1);
@@ -35,7 +47,9 @@ describe("worst-case input price", () => {
 
   it("covers a full one-hour cache write on Claude routes", () => {
     const model = getChatModelById(ChatModelId.CLAUDE_SONNET_5_5);
-    expect(worstCaseInputTokenCost(model)).toBeGreaterThanOrEqual((model.inputTokenCost ?? 0) * 2);
+    expect(worstCaseInputTokenCost(model)).toBeGreaterThanOrEqual(
+      (model.inputTokenCost ?? 0) * 2,
+    );
   });
 
   it("1M input tokens at $4.50/M = 585 credits with the 30% markup", () => {
@@ -53,6 +67,30 @@ describe("prompt token estimate", () => {
       compactTrigger: NO_COMPACT,
     });
     expect(tokens).toBe(1000 + 1000 + 2000);
+  });
+
+  it("prices a structured tool image as vision input and inline JSON as text", () => {
+    const data = "A".repeat(1_540_000);
+    const call = {
+      type: "tool-result",
+      toolCallId: "image",
+      toolName: "generate_image",
+    } as const;
+    const vision = estimate({
+      ...call,
+      output: {
+        type: "content",
+        value: [
+          { type: "image-data", data, mediaType: "image/png" },
+          { type: "text", text: "Image generated." },
+        ],
+      },
+    });
+    expect(vision).toBeGreaterThan(400);
+    expect(vision).toBeLessThan(500);
+    expect(
+      estimate({ ...call, output: { type: "json", value: { data } } }),
+    ).toBeGreaterThan(600_000);
   });
 
   it("history past the compact trigger is summarised; the newest message counts in full", () => {

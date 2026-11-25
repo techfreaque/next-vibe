@@ -3,6 +3,8 @@
  * per-lead / per-IP sub-caps. Requires the dev DB (same as other repository tests).
  */
 
+import assert from "node:assert/strict";
+
 import { eq, inArray } from "drizzle-orm";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { db } from "next-vibe/database";
@@ -27,9 +29,7 @@ function lead(tag: string): string {
 async function setRow(
   patch: Partial<typeof publicFreeTierDailyCap.$inferInsert>,
 ): Promise<void> {
-  if (!saved) {
-    throw new Error("cap row missing");
-  }
+  assert(saved, "cap row missing");
   await db
     .update(publicFreeTierDailyCap)
     .set({ lastResetAt: new Date(), ...patch })
@@ -84,7 +84,12 @@ describe("PublicCapRepository", () => {
   it("rejects all requests once the cap is reached", async () => {
     await setRow({ spendToday: 100, capAmount: 100 });
     const res = await PublicCapRepository.gate(
-      { leadId: lead("a"), ipAddress: undefined, expectedCost: 0.1, model: "m" },
+      {
+        leadId: lead("a"),
+        ipAddress: undefined,
+        expectedCost: 0.1,
+        model: "m",
+      },
       logger,
       defaultLocale,
     );
@@ -100,7 +105,12 @@ describe("PublicCapRepository", () => {
     );
     expect(res.success).toBe(false);
     const ok = await PublicCapRepository.gate(
-      { leadId: lead("c"), ipAddress: undefined, expectedCost: 0.5, model: "m" },
+      {
+        leadId: lead("c"),
+        ipAddress: undefined,
+        expectedCost: 0.5,
+        model: "m",
+      },
       logger,
       defaultLocale,
     );
@@ -126,8 +136,28 @@ describe("PublicCapRepository", () => {
     expect(fine.success).toBe(true);
   });
 
+  it("limits a free model turn to the remaining personal allowance", async () => {
+    await setRow({ spendToday: 0, capAmount: 1000, perLeadCap: 70 });
+    const id = lead("remaining");
+    await PublicCapRepository.incrementSpend(68.1, logger, { leadId: id });
+    const gate = await PublicCapRepository.gate(
+      { leadId: id, ipAddress: undefined, expectedCost: 1, model: "fixture" },
+      logger,
+      defaultLocale,
+    );
+    expect(gate.success).toBe(true);
+    if (gate.success) {
+      expect(gate.data.remaining).toBeCloseTo(1.9, 6);
+    }
+  });
+
   it("per-IP sub-cap blocks across different leads on one IP", async () => {
-    await setRow({ spendToday: 0, capAmount: 1000, perLeadCap: 100, perIpCap: 5 });
+    await setRow({
+      spendToday: 0,
+      capAmount: 1000,
+      perLeadCap: 100,
+      perIpCap: 5,
+    });
     const ip = `203.0.113.${Math.floor(Math.random() * 250)}`;
     testIpHashes.push(PublicCapRepository.hashIp(ip));
     await PublicCapRepository.incrementSpend(5, logger, {
@@ -143,16 +173,24 @@ describe("PublicCapRepository", () => {
   });
 
   it("fails closed when the cap table is unreadable", async () => {
-    await setRow({ spendToday: 0, capAmount: 1000, perLeadCap: 20, perIpCap: 40 });
+    await setRow({
+      spendToday: 0,
+      capAmount: 1000,
+      perLeadCap: 20,
+      perIpCap: 40,
+    });
     // Force a read error: an unparseable spender key query is not possible, so
     // simulate by stubbing the DB read.
     const original = db.select.bind(db);
-    db.select = ((): never => {
-      throw new Error("db down");
-    }) as typeof db.select;
+    db.select = (): never => assert.fail("db down");
     try {
       const res = await PublicCapRepository.gate(
-        { leadId: lead("x"), ipAddress: undefined, expectedCost: 1, model: "m" },
+        {
+          leadId: lead("x"),
+          ipAddress: undefined,
+          expectedCost: 1,
+          model: "m",
+        },
         logger,
         defaultLocale,
       );

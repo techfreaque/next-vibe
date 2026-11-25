@@ -10,6 +10,7 @@ import { ChatModelId, getChatModelById } from "../../models";
 import { worstCaseInputCredits } from "./input-cost-gate";
 import {
   affordableOutputTokens,
+  canFundCompaction,
   computeOutputCap,
   MIN_AFFORDABLE_OUTPUT_TOKENS,
   MIN_AFFORDABLE_REASONING_OUTPUT_TOKENS,
@@ -99,6 +100,17 @@ describe("computeOutputCap", () => {
     );
   });
 
+  it("refuses unpaid input even when the prompt fills the context window", () => {
+    expect(
+      computeOutputCap({
+        model: kimi,
+        modelCost: 2.5,
+        remainingCredits: 20,
+        inputTokens: kimi.contextWindow,
+      }).kind,
+    ).toBe("unaffordable");
+  });
+
   it("an empty wallet is unaffordable", () => {
     expect(
       computeOutputCap({
@@ -108,6 +120,11 @@ describe("computeOutputCap", () => {
         inputTokens: 1_000,
       }).kind,
     ).toBe("unaffordable");
+  });
+
+  it("reserves the answer fee before spending on a flat-priced summary", () => {
+    expect(canFundCompaction(flat, 6.5, 7)).toBe(false);
+    expect(canFundCompaction(flat, 6.5, 13)).toBe(true);
   });
 
   it("flat-priced models require the full fee and leave output uncapped", () => {

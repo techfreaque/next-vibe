@@ -240,12 +240,15 @@ export async function prepareV1Call(
       ok: false,
       error: v1Error(
         402,
-        t("openai.insufficientCredits", {
-          cost: formatCreditAmount(outputCap.requiredCredits, locale),
-          balance: formatCreditAmount(preflightResult.balance, locale),
-        }),
+        preflightResult.dailyLimitMessage ??
+          t("openai.insufficientCredits", {
+            cost: formatCreditAmount(outputCap.requiredCredits, locale),
+            balance: formatCreditAmount(preflightResult.balance, locale),
+          }),
         "insufficient_quota",
-        "insufficient_credits",
+        preflightResult.dailyLimitMessage
+          ? "free_tier_cap_reached"
+          : "insufficient_credits",
       ),
     };
   }
@@ -307,7 +310,9 @@ async function preflight(params: {
   locale: CountryLanguage;
   logger: EndpointLogger;
   t: V1T;
-}): Promise<{ error: V1Error } | { balance: number }> {
+}): Promise<
+  { error: V1Error } | { balance: number; dailyLimitMessage?: string }
+> {
   const { user, model, estimatedCost, ip, locale, logger, t } = params;
   const { t: creditsT } = creditsScopedTranslation.scopedT(locale);
   const validation = await creditValidator.validateUserCredits(
@@ -380,7 +385,13 @@ async function preflight(params: {
       ),
     };
   }
-  return { balance: eligible.data };
+  return {
+    balance: Math.min(eligible.data, cap.data?.remaining ?? eligible.data),
+    dailyLimitMessage:
+      cap.data && cap.data.remaining < eligible.data
+        ? cap.data.limitMessage
+        : undefined,
+  };
 }
 
 async function bill(params: {

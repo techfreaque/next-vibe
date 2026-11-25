@@ -104,6 +104,8 @@ const DROP_REPORT_AFTER_MS = 20_000;
 const DROP_CHECK_INTERVAL_MS = 5_000;
 /** Bound a foreground browser upgrade, including the first connection. */
 const HANDSHAKE_TIMEOUT_MS = 15_000;
+/** A drained node has a serving peer. Retry one slow foreground upgrade early. */
+const FIRST_RESTART_HANDSHAKE_MS = 5_000;
 /** Retry an exhausted connection slowly while the tab is visible and online. */
 const RECONNECT_COOLDOWN_MS = 60_000;
 const MAX_FAST_RECONNECT_ATTEMPTS = 6;
@@ -245,7 +247,7 @@ function reportDrop(
   const seamless =
     plannedRestart &&
     dropReportTrigger === "reconnected" &&
-    currentNoticeableDownMs() < DROP_REPORT_AFTER_MS &&
+    currentNoticeableDownMs() < FIRST_RESTART_HANDSHAKE_MS &&
     failedHandshakesDuringDrop === 0;
   const log = seamless ? logger.info : logger.error;
   log(
@@ -657,8 +659,13 @@ function connect(logger: EndpointLogger): void {
     // Events emitted during the gap are replayed on resubscribe (bounded
     // buffer); an older gap makes the channel refetch.
     // Otherwise exponential backoff: 1s, 2s, 4s, 8s, 16s, 30s.
+    // A going-away close is also immediately retryable while the document
+    // is still active. pagehide cancels the retry on an actual navigation.
+    const fastClose =
+      event.code === WS_SERVICE_RESTART_CODE ||
+      (event.code === 1001 && event.wasClean && isTabVisible() && isOnline());
     const delay =
-      event.code === WS_SERVICE_RESTART_CODE && reconnectAttempts === 0
+      fastClose && reconnectAttempts === 0
         ? 100 + Math.floor(Math.random() * 400)
         : Math.min(1000 * Math.pow(2, reconnectAttempts), 30000);
     reconnectAttempts++;
@@ -694,7 +701,12 @@ function refreshHandshakeDeadline(): void {
   ) {
     return;
   }
-  const remaining = handshake.startedAt + HANDSHAKE_TIMEOUT_MS - Date.now();
+  const timeout =
+    pendingDrop?.code === WS_SERVICE_RESTART_CODE &&
+    failedHandshakesDuringDrop === 0
+      ? FIRST_RESTART_HANDSHAKE_MS
+      : HANDSHAKE_TIMEOUT_MS;
+  const remaining = handshake.startedAt + timeout - Date.now();
   handshakeTimer = setTimeout(
     () => {
       handshakeTimer = null;

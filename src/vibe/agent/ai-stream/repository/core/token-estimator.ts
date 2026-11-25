@@ -173,16 +173,43 @@ export function estimateInputTokens(
       return sum + Math.ceil(content.length / 3.5);
     }
     if (Array.isArray(content)) {
-      const text = content
-        .map((p) =>
-          p.type === "text"
-            ? (p.text ?? "")
-            : p.type === "tool-call" || p.type === "tool-result"
-              ? JSON.stringify(p)
-              : "",
-        )
-        .join(" ");
-      return sum + Math.ceil(text.length / 2.5);
+      // A structured image is billed as vision input. A base64 string in
+      // ordinary JSON or text is still sent as text and must be counted.
+      let characters = 0;
+      let imageTokens = 0;
+      for (const part of content) {
+        if (part.type === "image") {
+          imageTokens += 400;
+        } else if (
+          part.type === "tool-result" &&
+          part.output.type === "content"
+        ) {
+          characters += part.toolName.length + part.toolCallId.length;
+          for (const item of part.output.value) {
+            if (
+              item.type === "image-data" ||
+              (item.type === "file-data" &&
+                item.mediaType.startsWith("image/")) ||
+              (item.type === "file" &&
+                item.mediaType.startsWith("image/") &&
+                item.data.type === "data")
+            ) {
+              imageTokens += 400;
+            } else {
+              characters += JSON.stringify(item).length;
+            }
+          }
+        } else if (part.type === "text" || part.type === "reasoning") {
+          characters += part.text.length;
+        } else if (part.type === "tool-call" || part.type === "tool-result") {
+          characters += JSON.stringify(part).length;
+        }
+      }
+      return (
+        sum +
+        imageTokens +
+        Math.ceil((characters + Math.max(0, content.length - 1)) / 2.5)
+      );
     }
     return sum;
   }, 0);

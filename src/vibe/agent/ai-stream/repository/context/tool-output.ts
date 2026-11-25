@@ -10,6 +10,7 @@ import type { ContentBlock } from "next-vibe/core/route/response.schema";
 import type { WidgetData } from "next-vibe/core/utils/json";
 import { EXECUTE_TOOL_ALIAS } from "next-vibe/execute-tool/constants";
 import type { EndpointLogger } from "next-vibe/logger/types";
+import { z } from "zod";
 
 import { mediaMarkdownLink } from "../../../chat/storage/storage-url";
 import { fetchStorageFileAsBase64 } from "../../../chat/storage/url-utils";
@@ -144,6 +145,93 @@ type ShapedToolResultOutput =
         | { type: "image-data"; data: string; mediaType: string }
       >;
     };
+
+const toolJson = z.json();
+const liveMediaParts = z.array(
+  z.discriminatedUnion("type", [
+    z.object({
+      type: z.literal("image-data"),
+      data: z.string(),
+      mediaType: z.string(),
+    }),
+    z.object({ type: z.literal("text"), text: z.string() }),
+  ]),
+);
+
+function isResultRecord(
+  value: WidgetData,
+): value is Record<string, WidgetData> {
+  return (
+    value !== null &&
+    typeof value === "object" &&
+    !Array.isArray(value) &&
+    !(value instanceof Date)
+  );
+}
+
+/**
+ * The executor can nest an already-shaped screenshot in its result envelope.
+ * Without toModelOutput, the SDK wraps that envelope in JSON and sends every
+ * byte as text. Apply the history media rules to inline live results only.
+ */
+export async function liveExecuteToolOutput(
+  result: WidgetData,
+  model: ChatModelOption,
+  logger: EndpointLogger,
+): Promise<ShapedToolResultOutput | { type: "text"; value: string }> {
+  if (typeof result === "string") {
+    return { type: "text", value: result };
+  }
+  if (isResultRecord(result)) {
+    const inner = isResultRecord(result.result) ? result.result : result;
+    const file = inner.file ?? inner.imageUrl;
+    const content =
+      inner.type === "content" && liveMediaParts.safeParse(inner.value);
+    if (
+      (content &&
+        content.success &&
+        content.data.some((part) => part.type === "image-data")) ||
+      (typeof file === "string" && file.startsWith("data:image/"))
+    ) {
+      // Pass only the selected payload. External URLs never need downloading
+      // to normalize an inline result.
+      const shaped = await buildToolResultOutput(
+        logger,
+        inner,
+        undefined,
+        model,
+      );
+      if (inner !== result) {
+        const envelope = Object.fromEntries(
+          Object.entries(result).filter(([key]) => key !== "result"),
+        );
+        if (Object.keys(envelope).length > 0) {
+          if (shaped.type === "content") {
+            return {
+              type: "content",
+              value: [
+                ...shaped.value,
+                { type: "text", text: JSON.stringify(envelope) },
+              ],
+            };
+          }
+          return {
+            type: "json",
+            value: toolJson.parse(
+              JSON.parse(JSON.stringify({ ...envelope, result: shaped.value })),
+            ),
+          };
+        }
+      }
+      return shaped;
+    }
+  }
+  // Match the SDK's ordinary JSON result, including Date and undefined.
+  return {
+    type: "json",
+    value: toolJson.parse(JSON.parse(JSON.stringify(result ?? null))),
+  };
+}
 
 /**
  * Build tool result output, detecting ContentResponse to pass images to the AI model

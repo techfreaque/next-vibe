@@ -165,7 +165,10 @@ import type {
 } from "./history/definition";
 import type { CreditsT } from "./i18n";
 import { guestPoolLeadIdsSql, userPoolLeadIdsSql } from "./pool-members";
-import { PublicCapRepository } from "./public-cap/repository";
+import {
+  type PublicCapAllowance,
+  PublicCapRepository,
+} from "./public-cap/repository";
 
 export interface CreditIdentifier {
   userId?: string;
@@ -5264,9 +5267,9 @@ export class CreditRepository {
     logger: EndpointLogger,
     t: CreditsT,
     locale: CountryLanguage,
-  ): Promise<ResponseType<void>> {
+  ): Promise<ResponseType<PublicCapAllowance | null>> {
     if (expectedCost <= 0) {
-      return success(undefined);
+      return success(null);
     }
     const poolResult =
       !user.isPublic && user.id
@@ -5275,7 +5278,7 @@ export class CreditRepository {
           ? await CreditRepository.getLeadPool(user.leadId, logger, t, locale)
           : undefined;
     if (!poolResult) {
-      return success(undefined);
+      return success(null);
     }
     if (!poolResult.success) {
       // Cannot tell whether this is a free pool: fail closed.
@@ -5289,7 +5292,7 @@ export class CreditRepository {
       (pool.userWallet?.balance ?? 0) === 0 &&
       pool.leadWallets.every((w) => w.balance === 0);
     if (!isFreeTierPool) {
-      return success(undefined);
+      return success(null);
     }
     return PublicCapRepository.gate(
       { leadId: user.leadId, ipAddress, expectedCost, model },

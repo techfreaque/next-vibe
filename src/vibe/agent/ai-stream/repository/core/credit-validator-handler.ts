@@ -1,6 +1,7 @@
 import "server-only";
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translation";
 import {
   ErrorResponseTypes,
   fail,
@@ -37,6 +38,7 @@ export class CreditValidatorHandler {
       modelCost: number;
       /** Spendable credits at validation time (free + paid) */
       balance: number;
+      dailyLimitMessage?: TranslatedKeyType;
     }>
   > {
     const { user, ipAddress, modelInfo, locale, logger, t } = params;
@@ -174,7 +176,14 @@ export class CreditValidatorHandler {
       data: {
         effectiveLeadId,
         modelCost,
-        balance: eligible.data,
+        balance: Math.min(
+          eligible.data,
+          capGate.data?.remaining ?? eligible.data,
+        ),
+        dailyLimitMessage:
+          capGate.data && capGate.data.remaining < eligible.data
+            ? capGate.data.limitMessage
+            : undefined,
       },
     };
   }

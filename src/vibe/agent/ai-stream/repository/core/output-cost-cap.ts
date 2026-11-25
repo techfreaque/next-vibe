@@ -100,6 +100,18 @@ export function affordableOutputTokens(
   return Math.floor((usd / perMillion) * 1_000_000);
 }
 
+/** A flat-priced summary and the answer each incur a full request fee. */
+export function canFundCompaction(
+  model: ChatModelOption,
+  modelCost: number,
+  remainingCredits: number,
+): boolean {
+  return (
+    typeof model.creditCost !== "number" ||
+    remainingCredits + 1e-9 >= 2 * modelCost
+  );
+}
+
 export type OutputCap =
   /** The wallet covers any output the model can produce: pass nothing. */
   | { kind: "uncapped" }
@@ -141,7 +153,7 @@ export function computeOutputCap(params: {
   );
   // The model can never write more than the context window leaves.
   const maxPossibleOutput = Math.max(0, model.contextWindow - inputTokens);
-  if (affordable >= maxPossibleOutput) {
+  if (remainingCredits >= inputCredits && affordable >= maxPossibleOutput) {
     return { kind: "uncapped" };
   }
   const minOutput = minAffordableOutputTokens(model);

@@ -38,11 +38,20 @@ import {
   streamText as aiStreamText,
 } from "ai";
 import { errorResponseSchema } from "next-vibe/core/route/error-response.schema";
-import { ErrorResponseTypes } from "next-vibe/core/route/response.schema";
+import {
+  type ErrorResponseType,
+  ErrorResponseTypes,
+  fail,
+} from "next-vibe/core/route/response.schema";
 import type { WidgetData } from "next-vibe/core/utils/json";
 import { WidgetDataSchema } from "next-vibe/core/utils/json";
-import { CallbackMode } from "next-vibe/execute-tool/constants";
+import {
+  CallbackMode,
+  EXECUTE_TOOL_ALIAS,
+} from "next-vibe/execute-tool/constants";
 import { z } from "zod";
+
+import { formatCreditAmount } from "@/products/credit-money";
 
 import { DEFAULT_TURN_STEP_LIMIT } from "../../../chat/settings/constants";
 import { ApiProvider, calculateCreditCost } from "../../../models/models";
@@ -52,7 +61,12 @@ import {
   garbledRetryMarkerSchema,
   UPSTREAM_BODY_READ_RETRY_RULE,
 } from "../../providers/openrouter/garbled-guard";
-import { AbortReason, StreamAbortError } from "../core/constants";
+import { liveExecuteToolOutput } from "../context/tool-output";
+import {
+  AbortReason,
+  StreamAbortError,
+  StreamErrorType,
+} from "../core/constants";
 import type { InlineThinkEvent } from "../core/inline-think-splitter";
 import {
   computeOutputCap,
@@ -200,11 +214,12 @@ export class StreamLoop implements StreamLoopState {
       ctx.lastStepInputTokens,
       this.estimateStepInput([...this.lastPromptMessages]),
     );
-    const toolResultTokens = Math.ceil(
-      JSON.stringify(lastStep.toolResults).length / 2.5,
-    );
+    // The SDK appends response.messages to the next prompt. Raw tool
+    // results include executor-only data, and billed reasoning need not be
+    // replayed. Price the messages after the SDK's toModelOutput conversion.
     const nextInputTokens =
-      lastPrompt + (lastStep.usage.outputTokens ?? 0) + toolResultTokens;
+      lastPrompt +
+      estimateInputTokens(lastStep.response.messages, "", undefined);
     const remainingCredits = this.remainingCredits();
     const cap = computeOutputCap({
       model: modelConfig,
@@ -263,7 +278,54 @@ export class StreamLoop implements StreamLoopState {
    * Deregistration is in `finally`, so it fires on completion, abort and error
    * alike.
    */
-  async run(): Promise<void> {
+  async run(): Promise<ErrorResponseType | void> {
+    // Compaction and attachment bridges can spend credits after setup. Recheck
+    // before dispatch so a short wallet never buys just the model's minimum.
+    const {
+      modelConfig,
+      modelCost,
+      ctx,
+      threadId,
+      user,
+      locale,
+      t,
+      dailyLimitMessage,
+    } = this.p;
+    const remainingCredits = this.remainingCredits();
+    const cap = computeOutputCap({
+      model: modelConfig,
+      modelCost,
+      remainingCredits,
+      inputTokens: this.estimateStepInput(this.p.messages),
+    });
+    if (cap.kind === "unaffordable") {
+      const message =
+        dailyLimitMessage ??
+        t("route.errors.insufficientCredits", {
+          cost: formatCreditAmount(cap.requiredCredits, locale),
+          balance: formatCreditAmount(Math.max(0, remainingCredits), locale),
+        });
+      const error = fail({
+        message,
+        errorType: ErrorResponseTypes.PAYMENT_REQUIRED,
+      });
+      this.p.logger.warn("[AI Stream] Balance refused prepared model request", {
+        model: modelConfig.id,
+        requiredCredits: cap.requiredCredits,
+        remainingCredits,
+        preparationCredits: ctx.dbWriter.totalCreditsDeducted,
+      });
+      await ctx.dbWriter.emitErrorMessage({
+        threadId,
+        user,
+        content: message,
+        error,
+        errorType: StreamErrorType.STREAM_ERROR,
+        parentId: ctx.lastParentId,
+        sequenceId: ctx.lastSequenceId,
+      });
+      return error;
+    }
     const drainable: DrainableLoop = {
       abort: (reason: string): void => {
         if (!this.p.streamAbortController.signal.aborted) {
@@ -301,7 +363,18 @@ export class StreamLoop implements StreamLoopState {
     // Revival turns are TEXT-ONLY BY CONTRACT (see prepareStep): tools stay
     // loaded (a queued user message may arrive mid-revival and turn the stream
     // into a real turn), but the ack steps run with toolChoice:"none".
-    const tools = loadedTools;
+    const executeTool = loadedTools?.[EXECUTE_TOOL_ALIAS];
+    const tools: ToolSet | undefined =
+      executeTool && !executeTool.toModelOutput
+        ? {
+            ...loadedTools,
+            [EXECUTE_TOOL_ALIAS]: {
+              ...executeTool,
+              toModelOutput: ({ output }: { output: WidgetData }) =>
+                liveExecuteToolOutput(output, modelConfig, logger),
+            },
+          }
+        : loadedTools;
 
     const systemWithCacheControl = systemPrompt
       ? [

@@ -415,6 +415,7 @@ export async function complete(
   const budgetMessageKey = ctx.creditBudgetStopped
     ? "errors.insufficientCredits"
     : "errors.creditBudgetReached";
+  const budgetMessage = state.p.dailyLimitMessage ?? t(budgetMessageKey);
   const usage = {
     inputTokens: finalInputTokens,
     outputTokens: finalOutputTokens,
@@ -527,10 +528,10 @@ export async function complete(
         threadId,
         errorType: StreamErrorType.STREAM_ERROR,
         error: fail({
-          message: t(budgetMessageKey),
+          message: budgetMessage,
           errorType: ErrorResponseTypes.PAYMENT_REQUIRED,
         }),
-        content: t(budgetMessageKey),
+        content: budgetMessage,
         parentId: ctx.lastParentId,
         sequenceId: ctx.lastSequenceId,
         user,
@@ -637,11 +638,13 @@ export async function complete(
           : actualCreditCost > 0
             ? "errors.emptyAnswer"
             : "errors.noResponse";
+      const emptyMessage =
+        emptyKey === budgetMessageKey ? budgetMessage : t(emptyKey);
       await ctx.dbWriter.emitErrorMessage({
         threadId,
         errorType: StreamErrorType.STREAM_ERROR,
         error: fail({
-          message: t(emptyKey),
+          message: emptyMessage,
           errorType:
             emptyKey === "errors.creditBudgetReached" ||
             emptyKey === "errors.insufficientCredits"
@@ -650,7 +653,7 @@ export async function complete(
                 ? ErrorResponseTypes.EXTERNAL_SERVICE_ERROR
                 : ErrorResponseTypes.INTERNAL_ERROR,
         }),
-        content: t(emptyKey),
+        content: emptyMessage,
         parentId: ctx.lastParentId,
         sequenceId: ctx.lastSequenceId,
         user,

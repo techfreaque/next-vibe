@@ -23,6 +23,7 @@ export type WsDropCause =
   | "background-suspended"
   | "background-tab"
   | "detected-on-resume"
+  | "going-away"
   | "server-close"
   | "silent-drop";
 
@@ -68,6 +69,9 @@ export function classifyWsDrop(drop: WsDropEvidence): WsDropCause {
     // The socket died while the tab was hidden; the browser only surfaced
     // the close once the tab came back.
     return "detected-on-resume";
+  }
+  if (drop.wasClean && drop.code === 1001) {
+    return "going-away";
   }
   if (drop.wasClean) {
     return "server-close";

@@ -2,8 +2,9 @@ import "server-only";
 
 import { createHash } from "node:crypto";
 
-import { desc, eq, sql } from "drizzle-orm";
+import { and, desc, eq, or, sql } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translation";
 import {
   ErrorResponseTypes,
   fail,
@@ -34,6 +35,11 @@ export type PublicCapEventKind =
   | "fail-closed"
   | "threshold-80"
   | "threshold-100";
+
+export interface PublicCapAllowance {
+  remaining: number;
+  limitMessage: TranslatedKeyType;
+}
 
 export interface PublicCapGateParams {
   leadId: string | undefined;
@@ -360,7 +366,7 @@ export class PublicCapRepository {
     params: PublicCapGateParams,
     logger: EndpointLogger,
     locale: CountryLanguage,
-  ): Promise<ResponseType<void>> {
+  ): Promise<ResponseType<PublicCapAllowance>> {
     const { t } = scopedTranslation.scopedT(locale);
     const { leadId, ipAddress, expectedCost, model } = params;
     const ipHash = ipAddress
@@ -374,11 +380,17 @@ export class PublicCapRepository {
         .set({ spendToday: 0, lastResetAt: new Date(), updatedAt: new Date() })
         .where(sql`${publicFreeTierDailyCap.lastResetAt} < ${startOfToday}`);
 
-      const [row] = await db.select().from(publicFreeTierDailyCap).limit(1);
-      if (!row) {
-        // No row yet means no spend yet - allow (first-ever call seeds on increment)
-        return success(undefined);
+      const [stored] = await db.select().from(publicFreeTierDailyCap).limit(1);
+      const rowResult = stored
+        ? success(stored)
+        : await this.getOrCreateRow(logger, t);
+      if (!rowResult.success) {
+        return fail({
+          message: t("repository.capUnavailable"),
+          errorType: ErrorResponseTypes.PAYMENT_REQUIRED,
+        });
       }
+      const row = rowResult.data;
 
       const base = {
         leadId,
@@ -416,7 +428,25 @@ export class PublicCapRepository {
       const spenders = await db
         .select()
         .from(publicCapSpenders)
-        .where(eq(publicCapSpenders.day, day));
+        .where(
+          and(
+            eq(publicCapSpenders.day, day),
+            or(
+              leadId
+                ? and(
+                    eq(publicCapSpenders.kind, "lead"),
+                    eq(publicCapSpenders.key, leadId),
+                  )
+                : undefined,
+              ipHash
+                ? and(
+                    eq(publicCapSpenders.kind, "ip"),
+                    eq(publicCapSpenders.key, ipHash),
+                  )
+                : undefined,
+            ),
+          ),
+        );
       const leadSpend =
         spenders.find((s) => s.kind === "lead" && s.key === leadId)?.spend ?? 0;
       const ipSpend =
@@ -455,7 +485,19 @@ export class PublicCapRepository {
         });
       }
 
-      return success(undefined);
+      const poolRemaining = row.capAmount - row.spendToday;
+      const remaining = Math.min(
+        poolRemaining,
+        leadId ? row.perLeadCap - leadSpend : poolRemaining,
+        ipHash ? row.perIpCap - ipSpend : poolRemaining,
+      );
+      return success({
+        remaining,
+        limitMessage:
+          remaining === poolRemaining
+            ? t("repository.capExceeded")
+            : t("repository.leadCapExceeded"),
+      });
     } catch (error) {
       // FAIL CLOSED: never allow unbounded free spend because the cap is unreadable.
       logger.error(
