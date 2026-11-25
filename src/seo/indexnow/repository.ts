@@ -28,6 +28,7 @@ import { configScopedTranslation } from "@/env/i18n";
 
 import {
   INDEXNOW_ENDPOINT,
+  INDEXNOW_FINGERPRINT_SLICE,
   INDEXNOW_KEY,
   INDEXNOW_KV_KEY,
   INDEXNOW_MAX_URLS_PER_REQUEST,
@@ -39,13 +40,14 @@ import type {
 } from "./definition";
 import {
   chunk,
-  fingerprintUrl,
+  fingerprintUrls,
   parseFingerprints,
   pendingUrls,
   serializeFingerprints,
 } from "./diff";
 import { IndexNowStatus } from "./enum";
 import type { IndexNowT } from "./i18n";
+import { checkIndexNowKey, indexNowKeyUrl } from "./key-check";
 
 interface BatchResult {
   ok: boolean;
@@ -92,7 +94,7 @@ async function submitBatch(
       body: JSON.stringify({
         host,
         key: INDEXNOW_KEY,
-        keyLocation: `${baseUrl}/${INDEXNOW_KEY}.txt`,
+        keyLocation: indexNowKeyUrl(baseUrl),
         urlList: batch.map(({ url }) => url),
       }),
       signal: AbortSignal.timeout(INDEXNOW_REQUEST_TIMEOUT_MS),
@@ -118,9 +120,15 @@ export class IndexNowRepository {
 
       const { availability, skillPages } = await loadSitemapInputs(logger);
       const urls = listSitemapUrls(availability, skillPages, baseUrl);
-      const current = new Set(urls.map(fingerprintUrl));
+      // Hashing every sitemap URL in one go stalled the event loop (~380 ms
+      // on prod); fingerprintUrls yields between slices.
+      const fingerprints = await fingerprintUrls(
+        urls,
+        INDEXNOW_FINGERPRINT_SLICE,
+      );
+      const current = new Set(fingerprints);
       const previous = await readSubmitted();
-      const pending = pendingUrls(urls, previous, data.force);
+      const pending = pendingUrls(urls, previous, data.force, fingerprints);
 
       const base = {
         host,
@@ -149,6 +157,25 @@ export class IndexNowRepository {
         return success({ ...base, status, submittedUrls: 0, requests: 0 });
       }
 
+      // The search engines verify the key file first and reject everything
+      // when it redirects or is missing: check it ourselves before sending.
+      const keyCheck = await checkIndexNowKey(baseUrl);
+      if (!keyCheck.ok) {
+        logger.error("IndexNow: key file unreachable, submission skipped", {
+          ...base,
+          keyUrl: keyCheck.keyUrl,
+          httpStatus: keyCheck.status,
+          location: keyCheck.location,
+          finalUrl: keyCheck.finalUrl,
+          contentType: keyCheck.contentType,
+          body: keyCheck.body,
+        });
+        return fail({
+          message: t("post.errors.keyUnreachable.description"),
+          errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+        });
+      }
+
       // Keep only fingerprints still in the sitemap, so the row stays small.
       const submitted = new Set(
         [...previous].filter((fingerprint) => current.has(fingerprint)),
@@ -165,8 +192,11 @@ export class IndexNowRepository {
           break;
         }
         submittedUrls += batch.length;
-        for (const entry of batch) {
-          submitted.add(fingerprintUrl(entry));
+        for (const fingerprint of await fingerprintUrls(
+          batch,
+          INDEXNOW_FINGERPRINT_SLICE,
+        )) {
+          submitted.add(fingerprint);
         }
         logger.info("IndexNow: batch accepted", {
           host,

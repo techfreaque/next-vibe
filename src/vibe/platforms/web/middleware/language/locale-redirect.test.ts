@@ -8,6 +8,8 @@
 import { describe, expect, it } from "bun:test";
 import { NextRequest } from "next-vibe/ui/lib/request";
 
+import { INDEXNOW_KEY_PATH } from "@/seo/indexnow/constants";
+
 import { languageConfig } from "../../../../core/i18n";
 import type { CountryLanguage } from "../../../../core/i18n/core/config";
 import { middleware } from "../index";
@@ -175,6 +177,7 @@ describe("middleware locale redirect", () => {
       "/llms-full.txt",
       "/robots.txt",
       "/sitemap.xml",
+      INDEXNOW_KEY_PATH,
       "/_next/static/chunk.js",
     ]) {
       const res = await middleware(request(path), options);

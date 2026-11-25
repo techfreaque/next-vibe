@@ -6,6 +6,10 @@
 
 import { beforeAll, describe, expect, it, mock } from "bun:test";
 
+import {
+  CLIENT_LOG_FINGERPRINT_IGNORE_KEYS,
+  FOREIGN_SOURCE_FINGERPRINT_IGNORE_KEYS,
+} from "./error-monitor/client-log/constants";
 import type { LoggerMetadata } from "./types";
 
 interface UpsertedRow {
@@ -181,6 +185,52 @@ describe("persistErrorLog", () => {
     await settle(50);
     expect(fingerprintsFor("split status").size).toBe(2);
     expect(fingerprintsFor("split endpoint").size).toBe(2);
+  });
+
+  it("groups foreign-source client errors across routes, keeps route in metadata", async () => {
+    const message =
+      "[client] Uncaught error [injected-global: __firefox__]: Can't find variable: __firefox__";
+    for (const route of ["/en-US", "/de-DE/threads", "/pl-PL/story"]) {
+      persistErrorLog(
+        "error",
+        message,
+        undefined,
+        [
+          {
+            source: "window.onerror",
+            file: route,
+            line: 1,
+            column: 12,
+            errorSource: "injected-global",
+            injectedGlobal: "__firefox__",
+          },
+          { platform: "web", route },
+        ],
+        "en-US",
+        { fingerprintIgnoreKeys: FOREIGN_SOURCE_FINGERPRINT_IGNORE_KEYS },
+      );
+    }
+    await settle(1300);
+    const rows = upserts.filter((r) => r.message === message);
+    expect(new Set(rows.map((r) => r.fingerprint)).size).toBe(1);
+    expect(occurrencesFor(message)).toBe(3);
+    expect(JSON.stringify(rows[0]?.metadata)).toContain('"route"');
+  });
+
+  it("keeps our own client errors split per route", async () => {
+    const message = "[client] Uncaught error: our split";
+    for (const route of ["/en-US", "/de-DE/threads"]) {
+      persistErrorLog(
+        "error",
+        message,
+        undefined,
+        [{ errorSource: "our-bundle" }, { route }],
+        "en-US",
+        { fingerprintIgnoreKeys: CLIENT_LOG_FINGERPRINT_IGNORE_KEYS },
+      );
+    }
+    await settle(50);
+    expect(fingerprintsFor(message).size).toBe(2);
   });
 
   it("normalizes per-occurrence parts but keeps the shape", () => {

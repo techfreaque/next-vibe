@@ -36,15 +36,46 @@ export function serializeFingerprints(fingerprints: Iterable<string>): string {
   return JSON.stringify([...fingerprints].toSorted());
 }
 
-/** Entries whose fingerprint was never submitted (all of them with `force`). */
+/**
+ * Fingerprints of all entries, in order. Yields to the event loop after every
+ * `sliceSize` hashes so a large sitemap never blocks the server in one go.
+ */
+export async function fingerprintUrls(
+  urls: readonly SitemapUrl[],
+  sliceSize: number,
+): Promise<string[]> {
+  const fingerprints: string[] = [];
+  for (let index = 0; index < urls.length; index++) {
+    if (index > 0 && index % sliceSize === 0) {
+      await new Promise<void>((resolve) => {
+        setImmediate(resolve);
+      });
+    }
+    const entry = urls[index];
+    if (entry) {
+      fingerprints.push(fingerprintUrl(entry));
+    }
+  }
+  return fingerprints;
+}
+
+/**
+ * Entries whose fingerprint was never submitted (all of them with `force`).
+ * Pass `fingerprints` (same order as `urls`) to reuse precomputed hashes.
+ */
 export function pendingUrls(
   urls: readonly SitemapUrl[],
   submitted: ReadonlySet<string>,
   force: boolean,
+  fingerprints?: readonly string[],
 ): SitemapUrl[] {
-  return force
-    ? [...urls]
-    : urls.filter((entry) => !submitted.has(fingerprintUrl(entry)));
+  if (force) {
+    return [...urls];
+  }
+  return urls.filter(
+    (entry, index) =>
+      !submitted.has(fingerprints?.[index] ?? fingerprintUrl(entry)),
+  );
 }
 
 export function chunk<T>(items: readonly T[], size: number): T[][] {

@@ -2,14 +2,16 @@ import { describe, expect, it } from "bun:test";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
-import { INDEXNOW_KEY } from "./constants";
+import { INDEXNOW_KEY, INDEXNOW_KEY_PATH } from "./constants";
 import {
   chunk,
   fingerprintUrl,
+  fingerprintUrls,
   parseFingerprints,
   pendingUrls,
   serializeFingerprints,
 } from "./diff";
+import { checkIndexNowKey } from "./key-check";
 
 const urls = [
   { url: "https://unbottled.ai/en-US/story", lastmod: null },
@@ -64,5 +66,105 @@ describe("IndexNow diff", () => {
     expect(chunk(items, 10_000).map((batch) => batch.length)).toEqual([
       10_000, 10_000, 5001,
     ]);
+  });
+});
+
+describe("IndexNow fingerprint slicing", () => {
+  const many = Array.from({ length: 1234 }, (_, index) => ({
+    url: `https://unbottled.ai/en-US/page-${index}`,
+    lastmod: index % 3 === 0 ? "2026-11-25" : null,
+  }));
+
+  it("matches the synchronous fingerprints in order", async () => {
+    expect(await fingerprintUrls(many, 250)).toEqual(many.map(fingerprintUrl));
+  });
+
+  it("yields to the event loop between slices", async () => {
+    let ticks = 0;
+    const timer = setInterval(() => {
+      ticks++;
+    }, 0);
+    const yielded = await new Promise<boolean>((resolve) => {
+      setImmediate(() => {
+        ticks = 0;
+        void fingerprintUrls(many, 50).then(() => resolve(ticks > 0));
+      });
+    });
+    clearInterval(timer);
+    expect(yielded).toBe(true);
+  });
+
+  it("reuses precomputed fingerprints in pendingUrls", async () => {
+    const fingerprints = await fingerprintUrls(urls, 2);
+    const submitted = new Set([fingerprints[0] ?? ""]);
+    expect(pendingUrls(urls, submitted, false, fingerprints)).toEqual(
+      pendingUrls(urls, submitted, false),
+    );
+  });
+});
+
+describe("IndexNow key preflight", () => {
+  function serve(
+    handler: (request: Request) => Response,
+  ): ReturnType<typeof Bun.serve> {
+    return Bun.serve({ port: 0, fetch: handler });
+  }
+
+  it("passes when the key file answers 200 with the key", async () => {
+    const server = serve((request) =>
+      new URL(request.url).pathname === INDEXNOW_KEY_PATH
+        ? new Response(`${INDEXNOW_KEY}\n`, {
+            headers: { "content-type": "text/plain; charset=utf-8" },
+          })
+        : new Response("missing", { status: 404 }),
+    );
+    try {
+      const result = await checkIndexNowKey(`${server.url.origin}/`);
+      expect(result.ok).toBe(true);
+      expect(result.status).toBe(200);
+      expect(result.keyUrl).toBe(`${server.url.origin}${INDEXNOW_KEY_PATH}`);
+    } finally {
+      void server.stop(true);
+    }
+  });
+
+  it("fails on a locale redirect and reports the location", async () => {
+    const server = serve(
+      () =>
+        new Response(null, {
+          status: 307,
+          headers: { location: `/en-GLOBAL${INDEXNOW_KEY_PATH}` },
+        }),
+    );
+    try {
+      const result = await checkIndexNowKey(server.url.origin);
+      expect(result.ok).toBe(false);
+      expect(result.status).toBe(307);
+      expect(result.location).toBe(`/en-GLOBAL${INDEXNOW_KEY_PATH}`);
+    } finally {
+      void server.stop(true);
+    }
+  });
+
+  it("fails on a 200 with the wrong body", async () => {
+    const server = serve(
+      () =>
+        new Response("<html></html>", {
+          headers: { "content-type": "text/html" },
+        }),
+    );
+    try {
+      const result = await checkIndexNowKey(server.url.origin);
+      expect(result.ok).toBe(false);
+      expect(result.contentType).toBe("text/html");
+    } finally {
+      void server.stop(true);
+    }
+  });
+
+  it("fails without throwing when the host is unreachable", async () => {
+    const result = await checkIndexNowKey("http://127.0.0.1:1");
+    expect(result.ok).toBe(false);
+    expect(result.status).toBeNull();
   });
 });

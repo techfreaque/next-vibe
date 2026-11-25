@@ -74,6 +74,10 @@ export function SignupConfirmationStep({
   const hasStatus = useRef(false);
   const revision = useRef(0);
   const fired = useRef(false);
+  // Set once the server says this signup is gone (404) or a link failed:
+  // further status polls can only repeat the same error (prod 2026-11-25:
+  // 3-4 identical "This signup has expired" 404s per stale confirm page).
+  const unavailableRef = useRef(false);
   const focusedBounce = useRef(false);
   const addressActionsRef = useRef<HTMLDivElement>(null);
   const run = useCallback(
@@ -115,6 +119,7 @@ export function SignupConfirmationStep({
             response.errorType.errorCode === 404 ||
             data.token !== undefined
           ) {
+            unavailableRef.current = true;
             setUnavailable(true);
           }
           return;
@@ -157,6 +162,10 @@ export function SignupConfirmationStep({
       // and failed as "Failed to fetch" while the person read the email
       // (prod 2026-11-25, 7 transport failures with visibilityAtStart hidden).
       const poll = setInterval(() => {
+        if (unavailableRef.current) {
+          clearInterval(poll);
+          return;
+        }
         if (getVisibilityState() !== "hidden") {
           void run({ pendingId }, true);
         }
@@ -164,7 +173,7 @@ export function SignupConfirmationStep({
       const removeVisibilityListener = addDocumentListener(
         "visibilitychange",
         () => {
-          if (getVisibilityState() === "visible") {
+          if (!unavailableRef.current && getVisibilityState() === "visible") {
             void run({ pendingId }, true);
           }
         },

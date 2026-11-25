@@ -49,6 +49,11 @@ export const translations: typeof enTranslations = {
         description: "Coś poszło nie tak podczas wysyłania adresów.",
       },
       validation: { title: "Błędne dane", description: "Sprawdź opcje." },
+      keyUnreachable: {
+        title: "Plik klucza niedostępny",
+        description:
+          "Plik klucza IndexNow w katalogu głównym strony nie zwrócił 200 z kluczem, więc nic nie wysłano. Sprawdź log serwera.",
+      },
       network: {
         title: "IndexNow nie odpowiada",
         description:

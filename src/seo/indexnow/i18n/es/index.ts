@@ -52,6 +52,11 @@ export const translations: typeof enTranslations = {
         title: "Datos no válidos",
         description: "Revisa las opciones.",
       },
+      keyUnreachable: {
+        title: "Archivo de clave inaccesible",
+        description:
+          "El archivo de clave de IndexNow en la raíz del sitio no respondió 200 con la clave, así que no se envió nada. Revisa el log del servidor.",
+      },
       network: {
         title: "IndexNow no responde",
         description:

@@ -36,6 +36,7 @@ import type { LanguageMiddlewareOptions } from "./language/index";
 import { buildLocaleRedirectPath, detectLocale } from "./language/index";
 import {
   extractLocaleFromPath,
+  isPublicRootDocumentPath,
   shouldSkipPath,
   V1_API_PATH_REGEX,
 } from "./utils";
@@ -104,6 +105,11 @@ export async function middleware(
 ): Promise<NextResponse> {
   const path = request.nextUrl.pathname;
 
+  // Public root documents have their own handlers and need no locale or lead.
+  if (isPublicRootDocumentPath(path)) {
+    return NextResponseClass.next();
+  }
+
   // Reconstruct the public origin from proxy headers so redirects in TanStack
   // dev mode point to port 3000 (proxy) rather than port 3100 (internal Vite).
   const forwardedHost = request.headers.get("x-forwarded-host");
@@ -122,11 +128,6 @@ export async function middleware(
       new URL(`${repairedFilePath}${request.nextUrl.search}`, publicOrigin),
       308,
     );
-  }
-
-  // The public RSS handler selects its locale from the query string.
-  if (path === "/models-changelog.xml") {
-    return NextResponseClass.next();
   }
 
   // Skip for static files — Next.js serves these directly.

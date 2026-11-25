@@ -11,10 +11,12 @@ import { success } from "../../../core/route/response.schema";
 import type { JwtPayloadType } from "../../../identity/auth/types";
 import { persistErrorLog } from "../../db-persist";
 import { isFileLoggingEnabled } from "../../debug";
+import { isForeignErrorSource } from "../../error-source";
 import { clientFileLog } from "../../file";
 import {
   CLIENT_LOG_FINGERPRINT_IGNORE_KEYS,
   CLIENT_LOG_OCCURRENCES_KEY,
+  FOREIGN_SOURCE_FINGERPRINT_IGNORE_KEYS,
 } from "./constants";
 import type {
   ClientLogRequestOutput,
@@ -113,7 +115,13 @@ export class ClientLogRepository {
         findString(data.metadata, "errorStack") ??
         findString(data.metadata, "componentStack"),
       errorType: findString(data.metadata, "errorName"),
-      fingerprintIgnoreKeys: CLIENT_LOG_FINGERPRINT_IGNORE_KEYS,
+      // Injected/extension/opaque errors group across routes (route stays
+      // in metadata); everything else keeps its per-route rows.
+      fingerprintIgnoreKeys: isForeignErrorSource(
+        findString(data.metadata, "errorSource"),
+      )
+        ? FOREIGN_SOURCE_FINGERPRINT_IGNORE_KEYS
+        : CLIENT_LOG_FINGERPRINT_IGNORE_KEYS,
     });
 
     if (isFileLoggingEnabled()) {

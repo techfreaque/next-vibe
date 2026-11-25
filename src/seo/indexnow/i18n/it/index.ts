@@ -52,6 +52,11 @@ export const translations: typeof enTranslations = {
         title: "Dati non validi",
         description: "Controlla le opzioni.",
       },
+      keyUnreachable: {
+        title: "File della chiave irraggiungibile",
+        description:
+          "Il file della chiave IndexNow nella root del sito non ha risposto 200 con la chiave, quindi non è stato inviato nulla. Controlla il log del server.",
+      },
       network: {
         title: "IndexNow non raggiungibile",
         description:

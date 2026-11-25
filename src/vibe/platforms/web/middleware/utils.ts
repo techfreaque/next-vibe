@@ -5,6 +5,7 @@
  */
 
 import { AUTH_TOKEN_COOKIE_NAME, LEAD_ID_COOKIE_NAME } from "@/env/constants";
+import { INDEXNOW_KEY_PATH } from "@/seo/indexnow/constants";
 
 /** Make identities set by middleware visible to the render of this request. */
 export function applyResponseIdentityCookies(
@@ -36,6 +37,19 @@ export function applyResponseIdentityCookies(
   );
 }
 
+export function isPublicRootDocumentPath(path: string): boolean {
+  return (
+    path === "/robots.txt" ||
+    path === "/llms.txt" ||
+    path === "/llms-full.txt" ||
+    path === "/models-changelog.xml" ||
+    path === "/sitemap.xml" ||
+    // IndexNow ownership key (public/<key>.txt): search engines fetch it at
+    // the root and reject the submission on a locale redirect.
+    path === INDEXNOW_KEY_PATH
+  );
+}
+
 /**
  * Check if a path should be skipped by middleware
  * @param path The request path
@@ -50,10 +64,7 @@ export function shouldSkipPath(path: string): boolean {
     path.match(/\.(ico|png|jpg|jpeg|svg|css|js|woff|woff2|ttf|eot)$/) !==
       null ||
     path === "/favicon.ico" ||
-    path === "/robots.txt" ||
-    path === "/llms.txt" ||
-    path === "/llms-full.txt" ||
-    path === "/sitemap.xml" ||
+    isPublicRootDocumentPath(path) ||
     path.endsWith("/sitemap.xml") ||
     path.endsWith("/sitemap.xml.gz") ||
     path.includes("/sitemap-") ||

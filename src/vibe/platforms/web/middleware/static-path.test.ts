@@ -9,6 +9,7 @@ import { describe, expect, it } from "bun:test";
 import { NextRequest } from "next-vibe/ui/lib/request";
 
 import { AUTH_TOKEN_COOKIE_NAME, LEAD_ID_COOKIE_NAME } from "@/env/constants";
+import { INDEXNOW_KEY_PATH } from "@/seo/indexnow/constants";
 
 import { coreEnv } from "../../../core/env";
 import { Environment } from "../../../env/env-util";
@@ -48,6 +49,17 @@ describe("middleware static-file shortcut", () => {
     expect((await statusFor("/en-US/files/thread/image.png")).passthrough).toBe(
       true,
     );
+  });
+
+  it.each([
+    "/robots.txt",
+    "/llms.txt",
+    "/llms-full.txt",
+    "/sitemap.xml",
+    "/models-changelog.xml?locale=de-DE",
+    INDEXNOW_KEY_PATH,
+  ])("passes %s through to its public root handler", async (path) => {
+    expect(await statusFor(path)).toEqual({ status: 200, passthrough: true });
   });
 
   it("still 404s bare-root files with no static match", async () => {

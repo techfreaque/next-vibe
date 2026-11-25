@@ -72,6 +72,18 @@ export async function patchRuntimeEnvPlaceholders(
     return;
   }
 
+  const valueBySentinel = new Map(
+    replacements.map(({ sentinel, value }) => [sentinel, value]),
+  );
+  const sentinelPattern = new RegExp(
+    replacements
+      .map(({ sentinel }) => sentinel)
+      .toSorted((a, b) => b.length - a.length)
+      .map((sentinel) => sentinel.replaceAll(/[.*+?^${}()|[\]\\]/g, "\\$&"))
+      .join("|"),
+    "g",
+  );
+
   const startedAt = Date.now();
   const files: string[] = [];
   await walkJsFiles(NEXT_BUILD_DIR, files);
@@ -91,14 +103,23 @@ export async function patchRuntimeEnvPlaceholders(
       return;
     }
 
+    // One regex pass per file. Per-key split/join over large chunks still
+    // held the loop for 249 ms on the first async deploy (prod 2026-11-25
+    // 09:49, hot frame runtime-env-patch.ts:97 "join" x165).
     let changed = false;
-    for (const { sentinel, value } of replacements) {
-      if (content.includes(sentinel)) {
-        content = content.split(sentinel).join(value);
-        changed = true;
-        patchedTokens++;
+    content = content.replace(sentinelPattern, (sentinel) => {
+      const value = valueBySentinel.get(sentinel);
+      if (value === undefined) {
+        return sentinel;
       }
-    }
+      changed = true;
+      patchedTokens++;
+      return value;
+    });
+    // Let queued requests run between patched files.
+    await new Promise<void>((resolve) => {
+      setImmediate(resolve);
+    });
 
     if (changed) {
       try {

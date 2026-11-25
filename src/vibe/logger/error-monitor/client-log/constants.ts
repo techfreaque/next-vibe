@@ -112,3 +112,32 @@ export const CLIENT_LOG_FINGERPRINT_IGNORE_KEYS: ReadonlySet<string> = new Set([
   "reloadRequestedAt",
   "reloadTimerElapsedMs",
 ]);
+
+/**
+ * Route/page-specific metadata that additionally leaves the fingerprint when
+ * the client attributed an error to a foreign source (`errorSource` in
+ * FOREIGN_ERROR_SOURCES: injected-global, browser-extension,
+ * opaque-cross-origin). One injected script failing on 6 routes is one row,
+ * not 6. The row still stores every key (route included).
+ */
+export const FOREIGN_SOURCE_FINGERPRINT_IGNORE_KEYS: ReadonlySet<string> =
+  new Set([
+    ...CLIENT_LOG_FINGERPRINT_IGNORE_KEYS,
+    "route",
+    "file",
+    "line",
+    "column",
+    "topFrameUrl",
+    "pageBuildId",
+    "fromPageDocument",
+    "fromNavigationDocument",
+    "documentNavigationPath",
+    "documentNavigationType",
+    "documentEdgeTimingNode",
+    "documentProxyTimingStage",
+    "crossOriginScripts",
+    "translatedClass",
+    "extensionMarkers",
+    "googleSearchApp",
+    "browserAutomation",
+  ]);

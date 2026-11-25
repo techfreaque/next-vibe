@@ -8,6 +8,18 @@
 /** Ownership key. Must equal the content of `public/<key>.txt`. */
 export const INDEXNOW_KEY = "01f1870b643faddd5126fee5a4771138";
 
+/**
+ * Root path of the key file. The web middleware passes it through untouched
+ * (no locale redirect), so it is served from public/ as 200 text/plain.
+ */
+export const INDEXNOW_KEY_PATH = `/${INDEXNOW_KEY}.txt`;
+
+/** Timeout for the key reachability check before each submission. */
+export const INDEXNOW_KEY_CHECK_TIMEOUT_MS = 10_000;
+
+/** URLs fingerprinted per synchronous slice before yielding the event loop. */
+export const INDEXNOW_FINGERPRINT_SLICE = 250;
+
 /** Shared endpoint; it forwards to every participating search engine. */
 export const INDEXNOW_ENDPOINT = "https://api.indexnow.org/indexnow";
 

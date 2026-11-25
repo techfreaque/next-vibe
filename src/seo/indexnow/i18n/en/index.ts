@@ -50,6 +50,11 @@ export const translations = {
         title: "Invalid input",
         description: "Check the submitted options.",
       },
+      keyUnreachable: {
+        title: "Key file unreachable",
+        description:
+          "The IndexNow key file at the site root did not answer 200 with the key, so nothing was sent. Check the server log.",
+      },
       network: {
         title: "IndexNow unreachable",
         description:

@@ -21,6 +21,8 @@ import {
   observeChunkReloadOutcome,
 } from "./chunk-reload";
 import { claimErrorReport } from "./client-context";
+import type { ErrorSourceResult } from "./error-source";
+import { classifyErrorSource, errorSourceTag } from "./error-source";
 import {
   describeUrl,
   navigationTimingEvidence,
@@ -69,6 +71,42 @@ function extensionOrigin(stack: string | undefined): string | null {
       stack ?? "",
     );
   return match?.[1] ?? null;
+}
+
+/**
+ * Where an uncaught error came from (our bundle, an extension, a script an
+ * in-app browser injected, ...). Never used to drop a report: it tags the
+ * message and metadata, and the server groups foreign classes across routes.
+ */
+function attributeErrorSource(input: {
+  message: string;
+  filename?: string;
+  lineno?: number;
+  stack?: string;
+}): ErrorSourceResult {
+  return classifyErrorSource({
+    ...input,
+    pageOrigin: getCurrentOrigin(),
+    pageUrl: getCurrentUrl(),
+  });
+}
+
+/** Metadata fields + tagged message prefix for an attributed error. */
+function sourceReport(
+  prefix: string,
+  message: string,
+  source: ErrorSourceResult,
+): { text: string; meta: Record<string, string | null> } {
+  const tag = errorSourceTag(source);
+  return {
+    text: `${prefix}${tag ? ` ${tag}` : ""}: ${message}`,
+    meta: {
+      errorSource: source.errorSource,
+      injectedGlobal: source.injectedGlobal,
+      injectedBy: source.injectedBy,
+      topFrameUrl: describeUrl(source.topFrameUrl) ?? source.extensionOrigin,
+    },
+  };
 }
 
 /** URL scheme of an element source ("https:", "chrome-extension:", "data:", ...). */
@@ -207,8 +245,19 @@ function handleWindowError(logger: EndpointLogger, event: Event): void {
       fromPageDocument || fromNavigationDocument || error.name === "RangeError"
         ? getDomEnvironmentHints()
         : null;
-    logger.error(`Uncaught error: ${error.message}`, error, {
+    const report = sourceReport(
+      "Uncaught error",
+      error.message,
+      attributeErrorSource({
+        message: error.message,
+        filename: event.filename,
+        lineno: event.lineno,
+        stack: error.stack,
+      }),
+    );
+    logger.error(report.text, error, {
       ...context,
+      ...report.meta,
       extensionOrigin: extensionOrigin(error.stack),
       ...(dom
         ? {
@@ -226,8 +275,18 @@ function handleWindowError(logger: EndpointLogger, event: Event): void {
   // embed), never our bundle: our chunks are same-origin and report in full.
   const opaqueCrossOrigin = !event.filename && event.lineno === 0;
   const message = event.message || "unknown";
-  logger.error(`Uncaught error: ${message}`, {
+  const report = sourceReport(
+    "Uncaught error",
+    message,
+    attributeErrorSource({
+      message,
+      filename: event.filename,
+      lineno: event.lineno,
+    }),
+  );
+  logger.error(report.text, {
     ...context,
+    ...report.meta,
     opaqueCrossOrigin,
     // Which cross-origin scripts this page ran: the opaque error came from
     // one of them (or from an extension when the list is empty)
@@ -324,8 +383,14 @@ function handleUnhandledRejection(
       });
       return;
     }
-    logger.error(`Unhandled promise rejection: ${reason.message}`, reason, {
+    const report = sourceReport(
+      "Unhandled promise rejection",
+      reason.message,
+      attributeErrorSource({ message: reason.message, stack: reason.stack }),
+    );
+    logger.error(report.text, reason, {
       source: "unhandledrejection",
+      ...report.meta,
       extensionOrigin: extensionOrigin(reason.stack),
     });
     return;

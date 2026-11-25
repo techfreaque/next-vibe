@@ -52,6 +52,11 @@ export const translations: typeof enTranslations = {
         title: "Ungültige Eingabe",
         description: "Prüfe die Optionen.",
       },
+      keyUnreachable: {
+        title: "Schlüsseldatei nicht erreichbar",
+        description:
+          "Die IndexNow-Schlüsseldatei im Website-Root lieferte nicht 200 mit dem Schlüssel. Nichts gesendet. Server-Log prüfen.",
+      },
       network: {
         title: "IndexNow nicht erreichbar",
         description:

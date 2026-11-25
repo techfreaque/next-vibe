@@ -52,6 +52,11 @@ export const translations: typeof enTranslations = {
         title: "Saisie invalide",
         description: "Vérifiez les options.",
       },
+      keyUnreachable: {
+        title: "Fichier de clé inaccessible",
+        description:
+          "Le fichier de clé IndexNow à la racine du site n'a pas répondu 200 avec la clé, rien n'a été envoyé. Vérifie le log du serveur.",
+      },
       network: {
         title: "IndexNow injoignable",
         description:
