@@ -219,18 +219,17 @@ export class ChatFileRepository {
         return { buffer: Buffer.from(""), contentType: "text/plain" };
       }
       const storage = getStorageAdapter();
-      const base64 = await storage.readFileAsBase64(fileId, data.threadId);
-      if (!base64) {
+      const file = await storage.readFileBytes(fileId, data.threadId);
+      if (!file) {
         logger.error("File not found in object storage", {
           threadId: data.threadId,
           filename: data.filename,
         });
         return { buffer: Buffer.from(""), contentType: "text/plain" };
       }
-      const metadata = await storage.getFileMetadata(fileId, data.threadId);
       return {
-        buffer: Buffer.from(base64, "base64"),
-        contentType: metadata?.mimeType ?? "application/octet-stream",
+        buffer: file.bytes,
+        contentType: file.metadata.mimeType ?? "application/octet-stream",
       };
     }
 

@@ -291,29 +291,28 @@ export class LocalStorageAdapter implements StorageAdapter {
     fileId: string,
     threadId: string,
   ): Promise<string | null> {
+    const file = await this.readFileBytes(fileId, threadId);
+    return file ? file.bytes.toString("base64") : null;
+  }
+
+  async readFileBytes(
+    fileId: string,
+    threadId: string,
+  ): Promise<{ bytes: Buffer; metadata: FileMetadata } | null> {
     if (agentEnv.CHAT_STORAGE_TYPE !== "filesystem") {
       return null;
     }
 
-    try {
-      // Get metadata to find the stored filename
-      const metadataPath = path.join(
-        agentEnv.CHAT_STORAGE_PATH,
-        threadId,
-        ".metadata",
-        `${fileId}.json`,
-      );
-      const metadataContent = await fs.readFile(metadataPath, "utf-8");
-      const metadata = JSON.parse(metadataContent) as FileMetadata;
+    const metadata = await this.readThreadMetadata(threadId, fileId);
+    if (!metadata) {
+      return null;
+    }
 
-      // Read the file
-      const filePath = path.join(
-        agentEnv.CHAT_STORAGE_PATH,
-        threadId,
-        metadata.filename,
+    try {
+      const bytes = await fs.readFile(
+        path.join(agentEnv.CHAT_STORAGE_PATH, threadId, metadata.filename),
       );
-      const buffer = await fs.readFile(filePath);
-      return buffer.toString("base64");
+      return { bytes, metadata };
     } catch {
       // File doesn't exist or couldn't be read
       return null;

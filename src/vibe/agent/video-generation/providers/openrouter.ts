@@ -269,6 +269,7 @@ export async function generateVideoWithOpenRouter(params: {
     // with the submit response and advance it each poll, so a recorded run replays
     // instantly instead of sleeping the full real interval every attempt.
     let lastResponse: Response = submitRes;
+    const pollStartedAt = Date.now();
     for (let attempt = 0; attempt < MAX_POLL_ATTEMPTS; attempt++) {
       await pollDelay(POLL_INTERVAL_MS, lastResponse);
 
@@ -321,6 +322,12 @@ export async function generateVideoWithOpenRouter(params: {
         logger.error("[OpenRouter Video] Job terminal failure", {
           status: statusData.status,
           error: statusData.error,
+          // Which upstream model failed and after how long (outage vs. a
+          // model-specific rejection); the user is not charged on this path.
+          providerModel,
+          jobId,
+          pollAttempts: attempt + 1,
+          elapsedMs: Date.now() - pollStartedAt,
         });
         return fail({
           message: statusData.error

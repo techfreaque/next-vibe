@@ -86,6 +86,16 @@ export interface StorageAdapter {
   readFileAsBase64(fileId: string, threadId: string): Promise<string | null>;
 
   /**
+   * Read a file's raw bytes plus its metadata with one metadata lookup.
+   * Used to serve files: no base64 round trip on the event loop (a video was
+   * encoded to base64 and decoded back per request, prod lag 2026-11-25).
+   */
+  readFileBytes(
+    fileId: string,
+    threadId: string,
+  ): Promise<{ bytes: Buffer; metadata: FileMetadata } | null>;
+
+  /**
    * List all file metadata entries within a given threadId namespace.
    * Used for cleanup tasks that need to enumerate files without knowing their IDs.
    */

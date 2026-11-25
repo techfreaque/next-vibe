@@ -315,42 +315,45 @@ export class S3StorageAdapter implements StorageAdapter {
     fileId: string,
     threadId: string,
   ): Promise<string | null> {
+    const file = await this.readFileBytes(fileId, threadId);
+    return file ? file.bytes.toString("base64") : null;
+  }
+
+  async readFileBytes(
+    fileId: string,
+    threadId: string,
+  ): Promise<{ bytes: Buffer; metadata: FileMetadata } | null> {
     if (agentEnv.CHAT_STORAGE_TYPE !== "s3") {
       return null;
     }
 
+    const metadata = await this.readMetadataObject(
+      `chat-attachments/${threadId}/.metadata/${fileId}.json`,
+    );
+    if (!metadata) {
+      return null;
+    }
+
     try {
-      // Get metadata to find the stored filename
-      const metadataKey = `chat-attachments/${threadId}/.metadata/${fileId}.json`;
-      const metadataCommand = new GetObjectCommand({
-        Bucket: this.bucket,
-        Key: metadataKey,
-      });
-
-      const metadataResult = await this.client.send(metadataCommand);
-      const metadataBody = await metadataResult.Body?.transformToString();
-
-      if (!metadataBody) {
+      const fileResult = await this.client.send(
+        new GetObjectCommand({
+          Bucket: this.bucket,
+          Key: `chat-attachments/${threadId}/${metadata.filename}`,
+        }),
+      );
+      const fileBytes = await fileResult.Body?.transformToByteArray();
+      if (!fileBytes) {
         return null;
       }
-
-      const metadata = JSON.parse(metadataBody) as FileMetadata;
-
-      // Read the file
-      const fileKey = `chat-attachments/${threadId}/${metadata.filename}`;
-      const fileCommand = new GetObjectCommand({
-        Bucket: this.bucket,
-        Key: fileKey,
-      });
-
-      const fileResult = await this.client.send(fileCommand);
-      const fileBuffer = await fileResult.Body?.transformToByteArray();
-
-      if (!fileBuffer) {
-        return null;
-      }
-
-      return Buffer.from(fileBuffer).toString("base64");
+      // Wrap the received bytes without copying them.
+      return {
+        bytes: Buffer.from(
+          fileBytes.buffer,
+          fileBytes.byteOffset,
+          fileBytes.byteLength,
+        ),
+        metadata,
+      };
     } catch {
       // File doesn't exist or couldn't be read
       return null;

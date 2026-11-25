@@ -25,6 +25,13 @@ import {
 } from "./response.schema";
 
 /**
+ * Built once: z.enum over every CountryLanguage is costly to construct, and
+ * building it per request showed up as event-loop lag in prod profiles
+ * (validateLocale < ZodEnum init, 2026-11-25).
+ */
+const localeSchema = z.enum(CountryLanguageValues).optional();
+
+/**
  * Validate locale using the standard schema
  */
 export function validateLocale(
@@ -34,7 +41,7 @@ export function validateLocale(
 ): ResponseType<CountryLanguage> {
   const localeValidation = validateData(
     locale,
-    z.enum(CountryLanguageValues).optional(),
+    localeSchema,
     logger,
     platform,
     "locale-validation",

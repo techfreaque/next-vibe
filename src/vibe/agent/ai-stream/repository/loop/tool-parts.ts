@@ -939,6 +939,10 @@ async function executeFallbackTool(
         "[AI Stream] Fallback tool execution failed",
         {
           toolName,
+          threadId: state.p.threadId,
+          // A tool still dispatched after the user cancelled means the cancel
+          // did not stop the loop (pairs with the client's cancel timeout).
+          streamAborted: state.p.streamAbortController.signal.aborted,
           error: result.message,
           errorKey: result.errorType.errorKey,
           errorCode: result.errorType.errorCode,
@@ -948,6 +952,9 @@ async function executeFallbackTool(
             count: Object.keys(state.p.tools ?? {}).length,
           },
           argsShape: describeToolArgShape(args),
+          // Top-level key names only (never values): shows whether the model
+          // sent a field under another name (repairable) or left it out.
+          argKeys: Object.keys(rawArgs).slice(0, 12).join(", "),
           dispatchedArgsShape: describeToolArgShape(inputArgs),
           executeToolTargetShape:
             toolName === EXECUTE_TOOL_ALIAS
