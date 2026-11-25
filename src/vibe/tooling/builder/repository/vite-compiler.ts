@@ -1615,6 +1615,7 @@ class ViteCompiler {
       // Keys are import specifiers, values are paths relative to ROOT_DIR.
       const moduleAliases = fileConfig.viteOptions?.moduleAliases ?? {};
       const watchRoot = ROOT_DIR.replaceAll("\\", "/");
+      const sourceWatchPrefix = `${srcDir.replaceAll("\\", "/")}/`;
       const tanstackSource = resolve(ROOT_DIR, srcDirectory).replaceAll(
         "\\",
         "/",
@@ -2603,8 +2604,9 @@ if (typeof import.meta.hot !== 'undefined' && import.meta.hot) {
                 directoryPath.includes("/fixtures/") ||
                 // Atomic source writes publish the actual file with a rename.
                 /\.tmp\.\d+\.[a-f\d]+$/.test(filePath) ||
-                // GNU sed uses an extensionless scratch file beside the locale source.
-                /\/i18n\/[^/]+\/sed[a-zA-Z0-9]{6}$/.test(filePath) ||
+                // GNU sed creates an extensionless scratch file beside the edited source.
+                (filePath.startsWith(sourceWatchPrefix) &&
+                  /\/sed[a-zA-Z0-9]{6}$/.test(filePath)) ||
                 filePath.endsWith(".test.ts") ||
                 filePath.endsWith(".test.tsx") ||
                 filePath.endsWith(".spec.ts") ||

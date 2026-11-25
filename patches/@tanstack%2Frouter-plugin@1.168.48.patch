@@ -108,12 +108,13 @@ diff --git a/dist/esm/core/code-splitter/compilers.js b/dist/esm/core/code-split
  	const refsByGroup = /* @__PURE__ */ new Map();
  	for (const prop of routeOptions.properties) {
  		if (!t.isObjectProperty(prop)) continue;
-@@ -180,8 +186,24 @@
+@@ -180,9 +186,25 @@
  		return true;
  	});
  }
 -function compileCodeSplitReferenceRoute(opts) {
 -	const ast = parseAst(opts);
+-	const refIdents = findReferencedIdentifiers(ast);
 +function findDirectFileRoute(program) {
 +	const index = program.body.findIndex((statement) => {
 +		if (!t.isExportNamedDeclaration(statement) || !t.isVariableDeclaration(statement.declaration)) return false;
@@ -132,9 +133,10 @@ diff --git a/dist/esm/core/code-splitter/compilers.js b/dist/esm/core/code-split
 +	return factories === 1 ? index : -1;
 +}
 +function compileCodeSplitReferenceRoute(opts, ast = parseAst(opts), optimizeTraversal = false) {
- 	const refIdents = findReferencedIdentifiers(ast);
++	const refIdents = findReferencedIdentifiers(ast, optimizeTraversal);
  	const knownExportedIdents = /* @__PURE__ */ new Set();
  	function findIndexForSplitNode(str) {
+ 		return opts.codeSplitGroupings.findIndex((group) => group.includes(str));
 @@ -207,9 +229,17 @@
  		* `import '../shared/imported'`
  		*/
