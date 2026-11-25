@@ -439,10 +439,20 @@ export function FavoriteEditContainer({
   };
 
   const handleUseThisFavorite = async (): Promise<void> => {
-    const activatingFavoriteId = navigation.current?.params?.urlPathParams?.id;
+    // The navigation entry carries the id when the favorite was opened via
+    // navigation.push; an inline render (EndpointsPage, chat-side panel) has
+    // no such entry, so fall back to the id the form itself was loaded with.
+    // Prod 2026-11-25: "Use this" did nothing 4x on a mobile chat page.
+    const navigationFavoriteId = navigation.current?.params?.urlPathParams?.id;
+    const activatingFavoriteId = navigationFavoriteId || favoriteId;
 
     if (!activatingFavoriteId) {
-      logger.error("Cannot activate favorite - missing favorite ID");
+      logger.error("Cannot activate favorite - missing favorite ID", {
+        hasNavigationEntry: navigation.current !== null,
+        navigationHasUrlPathParams:
+          navigation.current?.params?.urlPathParams !== undefined,
+        formHasId: Boolean(favoriteId),
+      });
       return;
     }
 
@@ -583,6 +593,7 @@ export function FavoriteEditContainer({
                 user={user}
                 availability={availability}
                 isSubmitting={isSubmitting}
+                formFavoriteId={favoriteId}
                 t={t}
               />
             )}
@@ -1510,6 +1521,7 @@ function SaveAndUseButton({
   user,
   availability,
   isSubmitting,
+  formFavoriteId,
   t,
 }: {
   form: ReturnType<typeof useWidgetForm>;
@@ -1519,6 +1531,8 @@ function SaveAndUseButton({
   user: ReturnType<typeof useWidgetUser>;
   availability: AgentEnvAvailability;
   isSubmitting: boolean | undefined;
+  /** The id the edit form was loaded with (fallback for inline renders). */
+  formFavoriteId: string | undefined;
   t: ReturnType<typeof useWidgetTranslation<typeof definitionPatch.PATCH>>;
 }): JSX.Element {
   const [isActivating, setIsActivating] = useState(false);
@@ -1539,10 +1553,18 @@ function SaveAndUseButton({
       // After successful save, activate the favorite
       setIsActivating(true);
       try {
-        const favoriteId = navigation?.current?.params?.urlPathParams?.id as
-          | string
-          | undefined;
+        // Same fallback as "Use this": an inline render (EndpointsPage,
+        // chat-side panel) has no navigation entry carrying the id.
+        const favoriteId =
+          navigation?.current?.params?.urlPathParams?.id || formFavoriteId;
         if (!favoriteId) {
+          logger.error(
+            "Cannot save and activate favorite - missing favorite ID",
+            {
+              hasNavigationEntry: navigation?.current !== null,
+              formHasId: Boolean(formFavoriteId),
+            },
+          );
           return;
         }
 

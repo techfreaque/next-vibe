@@ -563,6 +563,8 @@ export const translations: typeof enTranslations = {
       "Das Modell hat ohne Antwort beendet. Berechnet wurden nur die Kosten des Anbieters, keine Plattformgebühr. Versuchen Sie es erneut oder wählen Sie ein anderes Modell.",
     contentFiltered:
       "Diese Antwort wurde vom Inhaltsfilter des Anbieters blockiert. Versuche ein anderes Modell.",
+    contextTooLong:
+      "Zu lang für das Kontextfenster dieses Modells. Kürze deine Nachricht, starte einen neuen Chat oder wähle ein Modell mit größerem Kontextfenster.",
     imageTooLarge:
       "Das Bild ist für dieses Modell zu groß. Verkleinere es und sende es erneut.",
     malformedToolCall:

@@ -575,6 +575,8 @@ export const translations = {
       "The model ended without writing an answer. You paid only what the provider charged, no platform fee. Try again or pick another model.",
     contentFiltered:
       "This response was blocked by the provider's content filter. Try a different model.",
+    contextTooLong:
+      "Too long for this model's context window. Shorten your message, start a new chat, or pick a model with a larger context window.",
     imageTooLarge:
       "This image exceeds the model’s size limit. Send a smaller image and try again.",
     malformedToolCall:

@@ -555,6 +555,8 @@ export const translations: typeof enTranslations = {
       "Model zakończył bez odpowiedzi. Płacisz tylko koszt dostawcy, bez opłaty platformy. Spróbuj ponownie albo wybierz inny model.",
     contentFiltered:
       "Ta odpowiedź została zablokowana przez filtr treści dostawcy. Spróbuj innego modelu.",
+    contextTooLong:
+      "Za długie dla okna kontekstu tego modelu. Skróć wiadomość, zacznij nowy czat albo wybierz model z większym oknem kontekstu.",
     imageTooLarge:
       "Ten obraz jest za duży dla tego modelu. Zmniejsz go i wyślij ponownie.",
     malformedToolCall:

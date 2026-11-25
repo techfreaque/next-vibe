@@ -290,12 +290,32 @@ export async function consumeSignupChallenge(
 ): Promise<ResponseType<{ pending: PendingSignup; userId: string }>> {
   const invalid = (
     reason: SignupChallengeRejectReasonValue,
+    row?: Pick<PendingSignup, "attempts" | "sentAt" | "deliveryFailed">,
   ): ErrorResponseType => {
-    // No email, code or token: only what tells the cases apart.
+    // No email, code or token: only what tells the cases apart. For a wrong
+    // code: its shape (a pasted space or a 5-digit typo vs a stale code from
+    // an earlier email), the attempt number and how old the current code is
+    // (prod 2026-11-25: 6 rejected confirms in a row, cause unknowable).
+    const entered = proof.code?.trim();
     logger.warn("Signup confirmation challenge rejected", {
       reason,
       challengeType: proof.token ? "link" : "code",
       hasPendingId: Boolean(proof.pendingId),
+      enteredCodeLength: proof.code?.length ?? null,
+      enteredCodeShape:
+        entered === undefined
+          ? null
+          : /^\d{6}$/.test(entered)
+            ? entered === proof.code
+              ? "six-digits"
+              : "six-digits-padded"
+            : /^\d+$/.test(entered)
+              ? "wrong-digit-count"
+              : "non-digit",
+      attemptNumber: row ? row.attempts + 1 : null,
+      codeAgeMs:
+        row?.sentAt instanceof Date ? Date.now() - row.sentAt.getTime() : null,
+      codeDeliveryFailed: row?.deliveryFailed ?? null,
     });
     return fail({
       message: t("confirmation.invalid"),
@@ -332,7 +352,7 @@ export async function consumeSignupChallenge(
         return invalid(SignupChallengeRejectReason.MISSING);
       }
       if (row.attempts >= MAX_GUESSES) {
-        return invalid(SignupChallengeRejectReason.EXHAUSTED);
+        return invalid(SignupChallengeRejectReason.EXHAUSTED, row);
       }
       if (
         !timingSafeEqual(
@@ -350,7 +370,7 @@ export async function consumeSignupChallenge(
               lt(pendingSignups.attempts, MAX_GUESSES),
             ),
           );
-        return invalid(SignupChallengeRejectReason.MISMATCH);
+        return invalid(SignupChallengeRejectReason.MISMATCH, row);
       }
     }
     const subnet = ipSubnetKey(row.signupIp);

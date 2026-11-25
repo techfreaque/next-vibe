@@ -62,6 +62,13 @@ export class S3StorageAdapter implements StorageAdapter {
         },
       { step: "deserialize", name: "traceS3Lag" },
     );
+    // The SDK's logger middleware walks every response through the schema
+    // sensitive-field filter even with the default no-op logger (it calls
+    // NoOpLogger.info with the filtered output). Profiled as the hot frame
+    // of 1.3-1.9 s event-loop stalls during guest-media-cleanup on prod
+    // (2026-11-25 06:00 UTC, ~1,900 List/Get calls). No logger is configured
+    // here, so the middleware only burns CPU.
+    this.client.middlewareStack.remove("loggerMiddleware");
   }
 
   async uploadFile(

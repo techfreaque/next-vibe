@@ -4,20 +4,31 @@
  * NEXT_PUBLIC_* values from this container's actual runtime environment.
  */
 
-import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync } from "node:fs";
+import { readdir, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 
 import type { EndpointLogger } from "../../../logger/types";
-import { runtimeEnvPlaceholder } from "../../cli/runtime/runtime-env-placeholders";
+import {
+  RUNTIME_ENV_SENTINEL_PREFIX,
+  runtimeEnvPlaceholder,
+} from "../../cli/runtime/runtime-env-placeholders";
 
 const NEXT_BUILD_DIR = ".next-prod";
 /** Persisted webpack/RSC incremental cache - build intermediates, never served */
 const SKIP_DIRS = new Set(["cache"]);
+/**
+ * Files read in parallel. The scan used to be readFileSync over ~2,500
+ * bundle files: on a cold container overlayfs that blocked the event loop
+ * for 11.9 s right after boot (prod CRITICAL lag, 2026-11-25 03:59 UTC),
+ * freezing the Bun proxy and WS server that already run in this process.
+ */
+const READ_CONCURRENCY = 16;
 
-function walkJsFiles(dir: string, out: string[]): void {
+async function walkJsFiles(dir: string, out: string[]): Promise<void> {
   let entries;
   try {
-    entries = readdirSync(dir, { withFileTypes: true });
+    entries = await readdir(dir, { withFileTypes: true });
   } catch {
     return;
   }
@@ -26,7 +37,7 @@ function walkJsFiles(dir: string, out: string[]): void {
       if (SKIP_DIRS.has(entry.name)) {
         continue;
       }
-      walkJsFiles(join(dir, entry.name), out);
+      await walkJsFiles(join(dir, entry.name), out);
     } else if (entry.isFile() && entry.name.endsWith(".js")) {
       out.push(join(dir, entry.name));
     }
@@ -41,8 +52,11 @@ function walkJsFiles(dir: string, out: string[]): void {
  * Silent no-op when no sentinels are present (local/dev/Hermes builds bake
  * real values directly and never see this token) - safe to call
  * unconditionally on every `vibe start`, including supervisor restarts.
+ * Uses async fs with bounded concurrency so the event loop stays responsive.
  */
-export function patchRuntimeEnvPlaceholders(logger: EndpointLogger): void {
+export async function patchRuntimeEnvPlaceholders(
+  logger: EndpointLogger,
+): Promise<void> {
   if (!existsSync(NEXT_BUILD_DIR)) {
     return;
   }
@@ -58,18 +72,23 @@ export function patchRuntimeEnvPlaceholders(logger: EndpointLogger): void {
     return;
   }
 
+  const startedAt = Date.now();
   const files: string[] = [];
-  walkJsFiles(NEXT_BUILD_DIR, files);
+  await walkJsFiles(NEXT_BUILD_DIR, files);
 
   let patchedFiles = 0;
   let patchedTokens = 0;
 
-  for (const file of files) {
+  const patchFile = async (file: string): Promise<void> => {
     let content: string;
     try {
-      content = readFileSync(file, "utf-8");
+      content = await readFile(file, "utf-8");
     } catch {
-      continue;
+      return;
+    }
+    // One prefix scan rules out the vast majority of files cheaply.
+    if (!content.includes(RUNTIME_ENV_SENTINEL_PREFIX)) {
+      return;
     }
 
     let changed = false;
@@ -83,7 +102,7 @@ export function patchRuntimeEnvPlaceholders(logger: EndpointLogger): void {
 
     if (changed) {
       try {
-        writeFileSync(file, content, "utf-8");
+        await writeFile(file, content, "utf-8");
         patchedFiles++;
       } catch (error) {
         logger.warn("[RuntimeEnvPatch] Failed to write patched file", {
@@ -92,15 +111,32 @@ export function patchRuntimeEnvPlaceholders(logger: EndpointLogger): void {
         });
       }
     }
-  }
+  };
 
+  let next = 0;
+  const worker = async (): Promise<void> => {
+    while (next < files.length) {
+      const file = files[next];
+      next++;
+      if (file !== undefined) {
+        await patchFile(file);
+      }
+    }
+  };
+  await Promise.all(
+    Array.from({ length: Math.min(READ_CONCURRENCY, files.length) }, worker),
+  );
+
+  const durationMs = Date.now() - startedAt;
   if (patchedFiles > 0) {
     logger.info(
       `[RuntimeEnvPatch] Patched ${patchedTokens} runtime env placeholder occurrence(s) across ${patchedFiles} file(s)`,
+      { scannedFiles: files.length, durationMs },
     );
   } else {
     logger.debug(
       "[RuntimeEnvPatch] No runtime env placeholders found in build output - skipped",
+      { scannedFiles: files.length, durationMs },
     );
   }
 }

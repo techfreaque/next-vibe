@@ -59,6 +59,15 @@ describe("providerErrorTranslationKey", () => {
     ).toBe("errors.malformedToolCall");
   });
 
+  it("a context-length overflow tells the user to shorten or switch model", () => {
+    // Parasail via Uncensored LM, prod 2026-11-25 (248k-char pasted message)
+    expect(
+      providerErrorTranslationKey(
+        'Parasail API error: 400 - {"error":{"message":"This model\'s maximum context length is 65536 tokens. However, you requested 1000 output tokens and your prompt contains at least 64537 input tokens, for a total of at least 65537 tokens. Please reduce the length of the input prompt or the number of requested output tokens. (parameter=input_tokens, value=64537)","type":"BadRequestError","param":"input_tokens","code":400}}',
+      ),
+    ).toBe("errors.contextTooLong");
+  });
+
   it("unknown or missing provider errors fall back to the caller's message", () => {
     expect(providerErrorTranslationKey(null)).toBeNull();
     expect(

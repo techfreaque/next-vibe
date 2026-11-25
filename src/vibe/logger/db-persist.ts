@@ -73,6 +73,13 @@ function errorDiagnostics(error: Error): LoggerMetadata[] {
           : undefined;
     chain.push({
       name: current.constructor.name,
+      // The top error's message is the row message; a cause's message is
+      // otherwise lost when the top message is long (a Drizzle "Failed
+      // query: select ..." hid "Query read timeout" on prod, 2026-11-25).
+      message:
+        chain.length > 0 && current.message
+          ? truncate(sanitizeLogText(current.message), 200)
+          : undefined,
       code:
         "code" in current &&
         typeof current.code === "string" &&

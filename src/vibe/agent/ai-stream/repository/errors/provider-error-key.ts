@@ -9,6 +9,7 @@
  */
 
 import type { AiStreamTranslationKey } from "../../stream/i18n";
+import { isContextOverflowText } from "../loop/prompt-size";
 
 const CONTENT_FILTER_PATTERN =
   /inappropriate content|content.?filter|content.?policy|moderation|flagged/i;
@@ -41,6 +42,13 @@ export function providerErrorTranslationKey(
     )
   ) {
     return "errors.imageTooLarge";
+  }
+  // "maximum context length is 65536 tokens ... your prompt contains at least
+  // 64537 input tokens" (prod 2026-11-25, a 248k-char pasted message on
+  // Uncensored LM): truncation never drops the current user message, so only
+  // the user can fix it. Used to read "The AI did not generate a response".
+  if (isContextOverflowText(providerErrorText)) {
+    return "errors.contextTooLong";
   }
   if (MALFORMED_TOOL_CALL_PATTERN.test(providerErrorText)) {
     return "errors.malformedToolCall";

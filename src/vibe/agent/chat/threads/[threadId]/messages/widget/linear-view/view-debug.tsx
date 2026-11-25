@@ -102,13 +102,19 @@ export const DebugLinearMessageView = React.memo(
     // message must belong to THIS thread: right after navigating, `messages`
     // can still hold the previous thread's list while `threadId` already
     // points at the next one (e.g. a background sub-agent thread opened from
-    // its parent before its first turn persisted), which also 404'd.
+    // its parent before its first turn persisted), which also 404'd. The
+    // optimistic assistant placeholder added on send does not count: it
+    // appears before the server has inserted the thread (prod 404s at
+    // 2026-11-25 03:41 and 04:32 fired ~0.5 s before the thread row existed).
     const hasServerThread =
       threadId !== null &&
       threadId !== NEW_MESSAGE_ID &&
       rootFolderId !== DefaultFolderId.INCOGNITO &&
       messages.some(
-        (m) => m.role === ChatMessageRole.ASSISTANT && m.threadId === threadId,
+        (m) =>
+          m.role === ChatMessageRole.ASSISTANT &&
+          m.threadId === threadId &&
+          !m.metadata?.isOptimistic,
       );
     const debugThreadId = hasServerThread ? threadId : undefined;
 

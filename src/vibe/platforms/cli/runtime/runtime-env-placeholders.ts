@@ -17,7 +17,8 @@
  * NEXT_PUBLIC_ in process.env - only the sentinel format itself needs to
  * stay in sync, which is why it lives here.
  */
-const SENTINEL_PREFIX = "__VIBE_RUNTIME_ENV_";
+export const RUNTIME_ENV_SENTINEL_PREFIX = "__VIBE_RUNTIME_ENV_";
+const SENTINEL_PREFIX = RUNTIME_ENV_SENTINEL_PREFIX;
 
 export function runtimeEnvPlaceholder(key: string): string {
   return `${SENTINEL_PREFIX}${key}__`;

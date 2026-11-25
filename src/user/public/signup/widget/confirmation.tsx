@@ -15,6 +15,7 @@ import { Mail } from "next-vibe/ui/components/icons/Mail";
 import { Input } from "next-vibe/ui/components/input";
 import { Label } from "next-vibe/ui/components/label";
 import { Link } from "next-vibe/ui/components/link";
+import { addDocumentListener, getVisibilityState } from "next-vibe/ui/lib/dom";
 import { getCurrentUrl, replaceUrl } from "next-vibe/ui/lib/location";
 import {
   useWidgetLocale,
@@ -151,12 +152,27 @@ export function SignupConfirmationStep({
       const initial = setTimeout(() => {
         void run({ pendingId }, true);
       }, 0);
+      // Poll only while the tab is visible and refresh on return. Hidden
+      // tabs get throttled or frozen: their status checks hung for 15-67 s
+      // and failed as "Failed to fetch" while the person read the email
+      // (prod 2026-11-25, 7 transport failures with visibilityAtStart hidden).
       const poll = setInterval(() => {
-        void run({ pendingId }, true);
+        if (getVisibilityState() !== "hidden") {
+          void run({ pendingId }, true);
+        }
       }, 15000);
+      const removeVisibilityListener = addDocumentListener(
+        "visibilitychange",
+        () => {
+          if (getVisibilityState() === "visible") {
+            void run({ pendingId }, true);
+          }
+        },
+      );
       return (): void => {
         clearTimeout(initial);
         clearInterval(poll);
+        removeVisibilityListener();
       };
     }
     return undefined;

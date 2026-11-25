@@ -242,13 +242,21 @@ it("logs why a confirmation proof was refused, never what was sent", async () =>
   ).toBe(1);
 
   expect(warnings).toHaveLength(4);
+  const allowed = new Set([
+    "challengeType",
+    "hasPendingId",
+    "reason",
+    // Shape of a typed code, never the code itself.
+    "enteredCodeShape",
+    "codeDeliveryFailed",
+  ]);
   for (const warning of warnings) {
-    expect(Object.keys(warning).toSorted()).toEqual([
-      "challengeType",
-      "hasPendingId",
-      "reason",
-    ]);
+    for (const key of Object.keys(warning)) {
+      expect(allowed.has(key)).toBe(true);
+    }
+    expect(Object.values(warning)).not.toContain("123456");
   }
+  expect(warnings.at(-1)?.enteredCodeShape).toBe("six-digits");
 });
 
 it("distinguishes resend cooldown from hourly budgets without consuming more sends", async () => {

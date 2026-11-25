@@ -34,6 +34,16 @@ import {
 // eslint-disable-next-line i18next/no-literal-string
 const USE_NATIVE_TOOLS = false;
 
+/**
+ * Output budget sent when the AI SDK sets none (it only does when the wallet
+ * caps the step). Without it the upstream applies its own default of 1,000
+ * tokens: prod 2026-11-25 06:00 a reply stopped at finishReason=length after
+ * ~3,300 chars, cutting its tool call mid-markup ("Tool-call markup did not
+ * parse"); the 03:45 context-overflow error confirmed "you requested 1000
+ * output tokens". Matches the 4,096 tokens truncation reserves for output.
+ */
+const DEFAULT_MAX_OUTPUT_TOKENS = 4096;
+
 const providerErrorEnvelope = z.object({
   error: z.object({
     type: z.literal("invalid_request_error"),
@@ -107,6 +117,7 @@ export function createUncensoredAI(
     }
 
     const parsedBody = JSON.parse(init.body as string) as OpenAIRequestBody;
+    parsedBody.max_tokens ??= DEFAULT_MAX_OUTPUT_TOKENS;
 
     let bodyString: string;
 

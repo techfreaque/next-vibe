@@ -163,22 +163,25 @@ function providerFailure(
   t: ImageGenerationT,
 ): ResponseType<never> {
   const kind = classifyImageProviderError(message);
+  // The templates add their own sentence break after {{error}}; a provider
+  // reason ending in "." rendered as "moderation.. This is a refusal".
+  const reason = message.replace(/[.\s]+$/u, "");
   if (kind === ImageProviderFailureKind.CONTENT_POLICY) {
     return fail({
-      message: t("post.errors.contentRejected", { error: message }),
+      message: t("post.errors.contentRejected", { error: reason }),
       errorType: ErrorResponseTypes.BAD_REQUEST,
     });
   }
   if (kind === ImageProviderFailureKind.OUTAGE) {
     return fail({
-      message: t("post.errors.providerOutage", { error: message }),
+      message: t("post.errors.providerOutage", { error: reason }),
       errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
     });
   }
   return fail({
     // Carry the provider's reason: a bare "failed" left users and the AI
     // guessing.
-    message: t("post.errors.generationFailedWithReason", { error: message }),
+    message: t("post.errors.generationFailedWithReason", { error: reason }),
     errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
   });
 }

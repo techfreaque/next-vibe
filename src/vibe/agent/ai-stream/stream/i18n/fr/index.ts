@@ -584,6 +584,8 @@ export const translations: typeof enTranslations = {
       "Le modèle s'est arrêté sans écrire de réponse. Vous n'avez payé que ce que le fournisseur a facturé, sans frais de plateforme. Réessayez ou choisissez un autre modèle.",
     contentFiltered:
       "Cette réponse a été bloquée par le filtre de contenu du fournisseur. Essayez un autre modèle.",
+    contextTooLong:
+      "Trop long pour la fenêtre de contexte de ce modèle. Raccourcissez votre message, lancez un nouveau chat ou choisissez un modèle avec une fenêtre de contexte plus grande.",
     imageTooLarge:
       "L’image dépasse la taille acceptée par le modèle. Réduisez sa taille et renvoyez-la.",
     malformedToolCall:

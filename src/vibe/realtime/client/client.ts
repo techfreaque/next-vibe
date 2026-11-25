@@ -47,6 +47,7 @@ import type {
   WsWireMessage,
 } from "../core/types";
 import { parseWsClientFrame } from "../core/types";
+import { classifyWsDrop, WS_SERVICE_RESTART_CODE } from "./drop-cause";
 
 /**
  * Internal wire handler — accepts wire-protocol data (WsWireMessage["data"]).
@@ -93,7 +94,6 @@ interface ChannelState {
 }
 
 /** RFC 6455 close code the server sends on a restart or deploy drain. */
-const WS_SERVICE_RESTART_CODE = 1012;
 /** Our own close code: the tab's identity changed, reconnect with new cookies. */
 const WS_IDENTITY_CHANGED_CODE = 4001;
 /** How long the new socket waits before resubscribing pre-switch channels. */
@@ -241,6 +241,9 @@ function reportDrop(
       ...pendingDrop,
       ...recovery,
       plannedRestart,
+      dropCause: pendingDrop
+        ? classifyWsDrop({ ...pendingDrop, maxReconnectTimerOverrunMs })
+        : null,
       offlineMs: Date.now() - disconnectedAt,
       noticeableDownMs: currentNoticeableDownMs(),
       attempts: dropReconnectCount,
@@ -315,6 +318,9 @@ function handleOpen(
           ...pendingDrop,
           ...recovery,
           plannedRestart,
+          dropCause: pendingDrop
+            ? classifyWsDrop({ ...pendingDrop, maxReconnectTimerOverrunMs })
+            : null,
           attempts: dropReconnectCount,
           failedHandshakesDuringDrop,
           lastFailedHandshakeRequestId,

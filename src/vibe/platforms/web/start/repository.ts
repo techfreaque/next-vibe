@@ -1549,7 +1549,7 @@ export class ServerStartRepository {
     // Next.js starts serving. TanStack inlines NEXT_PUBLIC_APP_URL via
     // Vite's `define` at build time instead - no sentinel involved there.
     if (data.framework !== ServerFramework.TANSTACK) {
-      patchRuntimeEnvPlaceholders(logger);
+      await patchRuntimeEnvPlaceholders(logger);
     }
 
     if (data.framework === ServerFramework.TANSTACK) {

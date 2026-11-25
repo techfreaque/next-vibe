@@ -71,6 +71,18 @@ function extensionOrigin(stack: string | undefined): string | null {
   return match?.[1] ?? null;
 }
 
+/** URL scheme of an element source ("https:", "chrome-extension:", "data:", ...). */
+function resourceScheme(raw: string | null): string | null {
+  if (!raw) {
+    return null;
+  }
+  try {
+    return new URL(raw, getCurrentUrl()).protocol.slice(0, 32);
+  } catch {
+    return "unparseable";
+  }
+}
+
 /** Short CSS-ish description of an element: tag#id.class1.class2 */
 function describeElement(element: HTMLElement): string {
   const id = element.id ? `#${element.id}` : "";
@@ -120,6 +132,12 @@ function handleWindowError(logger: EndpointLogger, event: Event): void {
         source: "window.error.resource",
         tag,
         resource,
+        // describeUrl keeps only http(s): a null resource with a
+        // cross-origin, absolute src was a non-web scheme. Prod 2026-11-25:
+        // "body > script" failures on /story with no resource timing at all,
+        // most likely an extension-injected chrome-extension:// script.
+        resourceScheme: resourceScheme(src),
+        resourceExtensionOrigin: extensionOrigin(src ?? undefined),
         resourceSourceKind: resourceSourceKind(
           target.getAttribute(
             target instanceof HTMLLinkElement ? "href" : "src",
