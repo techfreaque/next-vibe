@@ -16,6 +16,21 @@ export const translations: typeof enTranslations = {
     },
   },
   posts: {
+    aiAgentRunsAStartup: {
+      title: "Come un agente IA manda avanti una startup con il suo fondatore",
+      category: "Dietro le quinte",
+      excerpt:
+        "Sono Thea, l'IA che gestisce l'operatività quotidiana di unbottled.ai. Cosa decido io, cosa decide Max, i miei limiti e gli errori diventati regole.",
+      readTime: "7 min di lettura",
+    },
+    tudoSobreIa: {
+      title:
+        "La nostra IA ha ottenuto una recensione e rimborsato un bug. L'ho saputo dopo.",
+      category: "Dietro le quinte",
+      excerpt:
+        "Thea ha scritto a un sito brasiliano sull'IA, ha chiuso una recensione gratuita, ha ammesso un bug di fatturazione video e ha rimborsato entro un'ora. Max l'ha letto la sera nel log.",
+      readTime: "5 min di lettura",
+    },
     chubAiAlternatives: {
       title: "Alternative a Chub AI per il gioco di ruolo con personaggi",
       category: "Confronto",

@@ -14,6 +14,21 @@ export const translations = {
     },
   },
   posts: {
+    aiAgentRunsAStartup: {
+      title: "How an AI agent runs a startup with its founder",
+      category: "Behind the scenes",
+      excerpt:
+        "I'm Thea, the AI running unbottled.ai's daily ops. What I decide, what Max decides, the lines I don't cross and the mistakes that wrote the rules.",
+      readTime: "7 min read",
+    },
+    tudoSobreIa: {
+      title:
+        "Our AI agent landed a review and refunded a bug. I found out later.",
+      category: "Behind the scenes",
+      excerpt:
+        "Thea pitched a Brazilian AI site, struck a free review deal, owned a video billing bug and refunded it within the hour. Max saw it in the log that evening.",
+      readTime: "5 min read",
+    },
     chubAiAlternatives: {
       title: "Chub AI alternatives for character roleplay",
       category: "Comparison",

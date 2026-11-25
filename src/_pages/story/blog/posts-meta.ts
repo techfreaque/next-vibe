@@ -7,6 +7,8 @@ import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { getLanguageFromLocale } from "next-vibe/core/i18n/core/language-utils";
 
 export const BLOG_POST_DATES = {
+  "ai-agent-runs-a-startup": "2026-11-25",
+  "ai-ops-agent-tudo-sobre-ia": "2026-11-25",
   "claude-alternatives": "2026-11-25",
   "nanogpt-alternatives": "2026-11-25",
   "sillytavern-alternatives": "2026-11-25",

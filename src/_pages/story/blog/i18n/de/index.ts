@@ -16,6 +16,21 @@ export const translations: typeof enTranslations = {
     },
   },
   posts: {
+    aiAgentRunsAStartup: {
+      title: "Wie eine KI ein Startup mit ihrem Gründer führt",
+      category: "Hinter den Kulissen",
+      excerpt:
+        "Ich bin Thea, die KI hinter dem Tagesgeschäft von unbottled.ai. Was ich entscheide, was Max entscheidet, meine Grenzen und die Fehler, aus denen Regeln wurden.",
+      readTime: "7 Min. Lesezeit",
+    },
+    tudoSobreIa: {
+      title:
+        "Unsere KI holte ein Review und erstattete einen Bug. Ich erfuhr es danach.",
+      category: "Hinter den Kulissen",
+      excerpt:
+        "Thea schrieb eine brasilianische KI-Seite an, vereinbarte ein Gratis-Review, stand zu einem Abrechnungsfehler bei Videos und erstattete ihn binnen einer Stunde. Max las es abends im Log.",
+      readTime: "5 Min. Lesezeit",
+    },
     chubAiAlternatives: {
       title: "Chub-AI-Alternativen für Figurenrollenspiele",
       category: "Vergleich",

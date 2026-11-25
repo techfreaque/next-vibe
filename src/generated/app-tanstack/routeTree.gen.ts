@@ -189,8 +189,10 @@ import { Route as ApiLocaleV1VideosRouteImport } from './routes/api.$locale.v1.v
 import { Route as ApiLocaleVibeExecuteToolRouteImport } from './routes/api.$locale.vibe.execute-tool'
 import { Route as ApiLocaleVibeHelpToolRouteImport } from './routes/api.$locale.vibe.help-tool'
 import { Route as LocaleStoryBlogAbliteratedVsUncensoredModelsIndexRouteImport } from './routes/$locale.story.blog.abliterated-vs-uncensored-models.index'
+import { Route as LocaleStoryBlogAiAgentRunsAStartupIndexRouteImport } from './routes/$locale.story.blog.ai-agent-runs-a-startup.index'
 import { Route as LocaleStoryBlogAiChatNoSignUpIndexRouteImport } from './routes/$locale.story.blog.ai-chat-no-sign-up.index'
 import { Route as LocaleStoryBlogAiMusicAndVoiceGeneratorsIndexRouteImport } from './routes/$locale.story.blog.ai-music-and-voice-generators.index'
+import { Route as LocaleStoryBlogAiOpsAgentTudoSobreIaIndexRouteImport } from './routes/$locale.story.blog.ai-ops-agent-tudo-sobre-ia.index'
 import { Route as LocaleStoryBlogAiRoleplayWithoutFilterIndexRouteImport } from './routes/$locale.story.blog.ai-roleplay-without-filter.index'
 import { Route as LocaleStoryBlogAiVideoGeneratorsComparedIndexRouteImport } from './routes/$locale.story.blog.ai-video-generators-compared.index'
 import { Route as LocaleStoryBlogBestUncensoredLlmIndexRouteImport } from './routes/$locale.story.blog.best-uncensored-llm.index'
@@ -1763,6 +1765,12 @@ const LocaleStoryBlogAbliteratedVsUncensoredModelsIndexRoute =
     path: '/blog/abliterated-vs-uncensored-models/',
     getParentRoute: () => LocaleStoryRoute,
   } as any)
+const LocaleStoryBlogAiAgentRunsAStartupIndexRoute =
+  LocaleStoryBlogAiAgentRunsAStartupIndexRouteImport.update({
+    id: '/blog/ai-agent-runs-a-startup/',
+    path: '/blog/ai-agent-runs-a-startup/',
+    getParentRoute: () => LocaleStoryRoute,
+  } as any)
 const LocaleStoryBlogAiChatNoSignUpIndexRoute =
   LocaleStoryBlogAiChatNoSignUpIndexRouteImport.update({
     id: '/blog/ai-chat-no-sign-up/',
@@ -1773,6 +1781,12 @@ const LocaleStoryBlogAiMusicAndVoiceGeneratorsIndexRoute =
   LocaleStoryBlogAiMusicAndVoiceGeneratorsIndexRouteImport.update({
     id: '/blog/ai-music-and-voice-generators/',
     path: '/blog/ai-music-and-voice-generators/',
+    getParentRoute: () => LocaleStoryRoute,
+  } as any)
+const LocaleStoryBlogAiOpsAgentTudoSobreIaIndexRoute =
+  LocaleStoryBlogAiOpsAgentTudoSobreIaIndexRouteImport.update({
+    id: '/blog/ai-ops-agent-tudo-sobre-ia/',
+    path: '/blog/ai-ops-agent-tudo-sobre-ia/',
     getParentRoute: () => LocaleStoryRoute,
   } as any)
 const LocaleStoryBlogAiRoleplayWithoutFilterIndexRoute =
@@ -5763,8 +5777,10 @@ export interface FileRoutesByFullPath {
   '/api/$locale/vibe/remote-connection/sync': typeof ApiLocaleVibeRemoteConnectionSyncRouteWithChildren
   '/api/$locale/vibe/tasks/execute': typeof ApiLocaleVibeTasksExecuteRoute
   '/$locale/story/blog/abliterated-vs-uncensored-models/': typeof LocaleStoryBlogAbliteratedVsUncensoredModelsIndexRoute
+  '/$locale/story/blog/ai-agent-runs-a-startup/': typeof LocaleStoryBlogAiAgentRunsAStartupIndexRoute
   '/$locale/story/blog/ai-chat-no-sign-up/': typeof LocaleStoryBlogAiChatNoSignUpIndexRoute
   '/$locale/story/blog/ai-music-and-voice-generators/': typeof LocaleStoryBlogAiMusicAndVoiceGeneratorsIndexRoute
+  '/$locale/story/blog/ai-ops-agent-tudo-sobre-ia/': typeof LocaleStoryBlogAiOpsAgentTudoSobreIaIndexRoute
   '/$locale/story/blog/ai-roleplay-without-filter/': typeof LocaleStoryBlogAiRoleplayWithoutFilterIndexRoute
   '/$locale/story/blog/ai-video-generators-compared/': typeof LocaleStoryBlogAiVideoGeneratorsComparedIndexRoute
   '/$locale/story/blog/best-uncensored-llm/': typeof LocaleStoryBlogBestUncensoredLlmIndexRoute
@@ -6527,8 +6543,10 @@ export interface FileRoutesByTo {
   '/api/$locale/vibe/remote-connection/sync': typeof ApiLocaleVibeRemoteConnectionSyncRouteWithChildren
   '/api/$locale/vibe/tasks/execute': typeof ApiLocaleVibeTasksExecuteRoute
   '/$locale/story/blog/abliterated-vs-uncensored-models': typeof LocaleStoryBlogAbliteratedVsUncensoredModelsIndexRoute
+  '/$locale/story/blog/ai-agent-runs-a-startup': typeof LocaleStoryBlogAiAgentRunsAStartupIndexRoute
   '/$locale/story/blog/ai-chat-no-sign-up': typeof LocaleStoryBlogAiChatNoSignUpIndexRoute
   '/$locale/story/blog/ai-music-and-voice-generators': typeof LocaleStoryBlogAiMusicAndVoiceGeneratorsIndexRoute
+  '/$locale/story/blog/ai-ops-agent-tudo-sobre-ia': typeof LocaleStoryBlogAiOpsAgentTudoSobreIaIndexRoute
   '/$locale/story/blog/ai-roleplay-without-filter': typeof LocaleStoryBlogAiRoleplayWithoutFilterIndexRoute
   '/$locale/story/blog/ai-video-generators-compared': typeof LocaleStoryBlogAiVideoGeneratorsComparedIndexRoute
   '/$locale/story/blog/best-uncensored-llm': typeof LocaleStoryBlogBestUncensoredLlmIndexRoute
@@ -7300,8 +7318,10 @@ export interface FileRoutesById {
   '/api/$locale/vibe/remote-connection/sync': typeof ApiLocaleVibeRemoteConnectionSyncRouteWithChildren
   '/api/$locale/vibe/tasks/execute': typeof ApiLocaleVibeTasksExecuteRoute
   '/$locale/story/blog/abliterated-vs-uncensored-models/': typeof LocaleStoryBlogAbliteratedVsUncensoredModelsIndexRoute
+  '/$locale/story/blog/ai-agent-runs-a-startup/': typeof LocaleStoryBlogAiAgentRunsAStartupIndexRoute
   '/$locale/story/blog/ai-chat-no-sign-up/': typeof LocaleStoryBlogAiChatNoSignUpIndexRoute
   '/$locale/story/blog/ai-music-and-voice-generators/': typeof LocaleStoryBlogAiMusicAndVoiceGeneratorsIndexRoute
+  '/$locale/story/blog/ai-ops-agent-tudo-sobre-ia/': typeof LocaleStoryBlogAiOpsAgentTudoSobreIaIndexRoute
   '/$locale/story/blog/ai-roleplay-without-filter/': typeof LocaleStoryBlogAiRoleplayWithoutFilterIndexRoute
   '/$locale/story/blog/ai-video-generators-compared/': typeof LocaleStoryBlogAiVideoGeneratorsComparedIndexRoute
   '/$locale/story/blog/best-uncensored-llm/': typeof LocaleStoryBlogBestUncensoredLlmIndexRoute
@@ -8073,8 +8093,10 @@ export interface FileRouteTypes {
     | '/api/$locale/vibe/remote-connection/sync'
     | '/api/$locale/vibe/tasks/execute'
     | '/$locale/story/blog/abliterated-vs-uncensored-models/'
+    | '/$locale/story/blog/ai-agent-runs-a-startup/'
     | '/$locale/story/blog/ai-chat-no-sign-up/'
     | '/$locale/story/blog/ai-music-and-voice-generators/'
+    | '/$locale/story/blog/ai-ops-agent-tudo-sobre-ia/'
     | '/$locale/story/blog/ai-roleplay-without-filter/'
     | '/$locale/story/blog/ai-video-generators-compared/'
     | '/$locale/story/blog/best-uncensored-llm/'
@@ -8837,8 +8859,10 @@ export interface FileRouteTypes {
     | '/api/$locale/vibe/remote-connection/sync'
     | '/api/$locale/vibe/tasks/execute'
     | '/$locale/story/blog/abliterated-vs-uncensored-models'
+    | '/$locale/story/blog/ai-agent-runs-a-startup'
     | '/$locale/story/blog/ai-chat-no-sign-up'
     | '/$locale/story/blog/ai-music-and-voice-generators'
+    | '/$locale/story/blog/ai-ops-agent-tudo-sobre-ia'
     | '/$locale/story/blog/ai-roleplay-without-filter'
     | '/$locale/story/blog/ai-video-generators-compared'
     | '/$locale/story/blog/best-uncensored-llm'
@@ -9609,8 +9633,10 @@ export interface FileRouteTypes {
     | '/api/$locale/vibe/remote-connection/sync'
     | '/api/$locale/vibe/tasks/execute'
     | '/$locale/story/blog/abliterated-vs-uncensored-models/'
+    | '/$locale/story/blog/ai-agent-runs-a-startup/'
     | '/$locale/story/blog/ai-chat-no-sign-up/'
     | '/$locale/story/blog/ai-music-and-voice-generators/'
+    | '/$locale/story/blog/ai-ops-agent-tudo-sobre-ia/'
     | '/$locale/story/blog/ai-roleplay-without-filter/'
     | '/$locale/story/blog/ai-video-generators-compared/'
     | '/$locale/story/blog/best-uncensored-llm/'
@@ -11651,6 +11677,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LocaleStoryBlogAbliteratedVsUncensoredModelsIndexRouteImport
       parentRoute: typeof LocaleStoryRoute
     }
+    '/$locale/story/blog/ai-agent-runs-a-startup/': {
+      id: '/$locale/story/blog/ai-agent-runs-a-startup/'
+      path: '/blog/ai-agent-runs-a-startup'
+      fullPath: '/$locale/story/blog/ai-agent-runs-a-startup/'
+      preLoaderRoute: typeof LocaleStoryBlogAiAgentRunsAStartupIndexRouteImport
+      parentRoute: typeof LocaleStoryRoute
+    }
     '/$locale/story/blog/ai-chat-no-sign-up/': {
       id: '/$locale/story/blog/ai-chat-no-sign-up/'
       path: '/blog/ai-chat-no-sign-up'
@@ -11663,6 +11696,13 @@ declare module '@tanstack/react-router' {
       path: '/blog/ai-music-and-voice-generators'
       fullPath: '/$locale/story/blog/ai-music-and-voice-generators/'
       preLoaderRoute: typeof LocaleStoryBlogAiMusicAndVoiceGeneratorsIndexRouteImport
+      parentRoute: typeof LocaleStoryRoute
+    }
+    '/$locale/story/blog/ai-ops-agent-tudo-sobre-ia/': {
+      id: '/$locale/story/blog/ai-ops-agent-tudo-sobre-ia/'
+      path: '/blog/ai-ops-agent-tudo-sobre-ia'
+      fullPath: '/$locale/story/blog/ai-ops-agent-tudo-sobre-ia/'
+      preLoaderRoute: typeof LocaleStoryBlogAiOpsAgentTudoSobreIaIndexRouteImport
       parentRoute: typeof LocaleStoryRoute
     }
     '/$locale/story/blog/ai-roleplay-without-filter/': {
@@ -15859,8 +15899,10 @@ interface LocaleStoryRouteChildren {
   LocaleStoryTermsOfServiceIndexRoute: typeof LocaleStoryTermsOfServiceIndexRoute
   LocaleStoryUncensoredAiIndexRoute: typeof LocaleStoryUncensoredAiIndexRoute
   LocaleStoryBlogAbliteratedVsUncensoredModelsIndexRoute: typeof LocaleStoryBlogAbliteratedVsUncensoredModelsIndexRoute
+  LocaleStoryBlogAiAgentRunsAStartupIndexRoute: typeof LocaleStoryBlogAiAgentRunsAStartupIndexRoute
   LocaleStoryBlogAiChatNoSignUpIndexRoute: typeof LocaleStoryBlogAiChatNoSignUpIndexRoute
   LocaleStoryBlogAiMusicAndVoiceGeneratorsIndexRoute: typeof LocaleStoryBlogAiMusicAndVoiceGeneratorsIndexRoute
+  LocaleStoryBlogAiOpsAgentTudoSobreIaIndexRoute: typeof LocaleStoryBlogAiOpsAgentTudoSobreIaIndexRoute
   LocaleStoryBlogAiRoleplayWithoutFilterIndexRoute: typeof LocaleStoryBlogAiRoleplayWithoutFilterIndexRoute
   LocaleStoryBlogAiVideoGeneratorsComparedIndexRoute: typeof LocaleStoryBlogAiVideoGeneratorsComparedIndexRoute
   LocaleStoryBlogBestUncensoredLlmIndexRoute: typeof LocaleStoryBlogBestUncensoredLlmIndexRoute
@@ -15943,10 +15985,14 @@ const LocaleStoryRouteChildren: LocaleStoryRouteChildren = {
   LocaleStoryUncensoredAiIndexRoute: LocaleStoryUncensoredAiIndexRoute,
   LocaleStoryBlogAbliteratedVsUncensoredModelsIndexRoute:
     LocaleStoryBlogAbliteratedVsUncensoredModelsIndexRoute,
+  LocaleStoryBlogAiAgentRunsAStartupIndexRoute:
+    LocaleStoryBlogAiAgentRunsAStartupIndexRoute,
   LocaleStoryBlogAiChatNoSignUpIndexRoute:
     LocaleStoryBlogAiChatNoSignUpIndexRoute,
   LocaleStoryBlogAiMusicAndVoiceGeneratorsIndexRoute:
     LocaleStoryBlogAiMusicAndVoiceGeneratorsIndexRoute,
+  LocaleStoryBlogAiOpsAgentTudoSobreIaIndexRoute:
+    LocaleStoryBlogAiOpsAgentTudoSobreIaIndexRoute,
   LocaleStoryBlogAiRoleplayWithoutFilterIndexRoute:
     LocaleStoryBlogAiRoleplayWithoutFilterIndexRoute,
   LocaleStoryBlogAiVideoGeneratorsComparedIndexRoute:

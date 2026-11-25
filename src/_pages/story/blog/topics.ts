@@ -22,6 +22,8 @@ export type BlogTopic = (typeof BLOG_TOPICS)[number];
 
 /** Section of each post on the blog index. Exhaustive: a new post needs one. */
 export const POST_TOPICS: Record<BlogPostSlug, BlogTopic> = {
+  "ai-agent-runs-a-startup": "updates",
+  "ai-ops-agent-tudo-sobre-ia": "updates",
   "claude-alternatives": "uncensored",
   "nanogpt-alternatives": "uncensored",
   "sillytavern-alternatives": "uncensored",
@@ -133,6 +135,22 @@ interface RelatedGuideSet {
 
 /** Curated hub + siblings. Posts not listed fall back to their topic. */
 const CURATED_RELATED: Partial<Record<BlogPostSlug, RelatedGuideSet>> = {
+  "ai-agent-runs-a-startup": {
+    hub: null,
+    related: [
+      "hermes-thea-two-way-remote",
+      "type-checker-made-ai-stop-lying",
+      "e2e-tests-found-real-bugs",
+    ],
+  },
+  "ai-ops-agent-tudo-sobre-ia": {
+    hub: null,
+    related: [
+      "ai-video-generators-compared",
+      "hermes-thea-two-way-remote",
+      "e2e-tests-found-real-bugs",
+    ],
+  },
   "chub-ai-alternatives": {
     hub: "uncensored",
     related: [
