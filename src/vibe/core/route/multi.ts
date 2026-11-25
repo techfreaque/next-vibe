@@ -32,6 +32,8 @@ export type EndpointDefinitionsConstraint = {
  */
 export type EndpointHandlerConfig<T extends EndpointDefinitionsConstraint> = {
   endpoint: T;
+  /** Expose HEAD through the GET endpoint with its original request method. */
+  headFromGet?: Methods.GET extends keyof T ? true : never;
 } & {
   [K in Methods]?: K extends keyof T
     ? T[K] extends CreateApiEndpointAny
@@ -77,6 +79,12 @@ type EndpointsHandlerReturn<T extends EndpointDefinitionsConstraint> = {
     : never;
 } & {
   tools: ToolsObject<T>;
+  HEAD?: (
+    request: NextRequest,
+    context: {
+      params: Promise<Record<string, string> & { locale: CountryLanguage }>;
+    },
+  ) => Promise<Response>;
 };
 
 /**
@@ -92,7 +100,7 @@ type EndpointsHandlerReturn<T extends EndpointDefinitionsConstraint> = {
 export function endpointsHandler<const T extends EndpointDefinitionsConstraint>(
   config: EndpointHandlerConfig<T>,
 ): EndpointsHandlerReturn<T> {
-  const { endpoint: definitions, ...methodConfigs } = config;
+  const { endpoint: definitions, headFromGet, ...methodConfigs } = config;
 
   // Build the result object dynamically with flexible typing
   // We construct the result object gradually and assert the final type at return
@@ -126,6 +134,16 @@ export function endpointsHandler<const T extends EndpointDefinitionsConstraint>(
         fieldDefaults: methodConfig.fieldDefaults,
       });
       result[Methods.GET] = handler[Methods.GET];
+      if (headFromGet) {
+        result.HEAD = async (request, context): Promise<Response> => {
+          const response = await handler[Methods.GET](request, context);
+          if (!response.body) {
+            return response;
+          }
+          await response.body.cancel();
+          return new Response(null, response);
+        };
+      }
       result.tools[Methods.GET] = handler.tools[Methods.GET];
       // typeof-function narrows out ChannelResolverField's compile-time
       // MissingChannelDeclaration brand (an object sentinel that no real value

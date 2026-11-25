@@ -44,6 +44,7 @@ import { wrapErrorResponse, wrapSuccessResponse } from "./next-response";
 import {
   ErrorResponseTypes,
   fail,
+  fileResponseSecurityHeaders,
   isContentResponse,
   isFileResponse,
   isStreamingResponse,
@@ -60,24 +61,7 @@ function countCookies(cookieHeader: string | null, name: string): number {
     .filter((part) => part.trim().startsWith(`${name}=`)).length;
 }
 
-/**
- * File responses carry user uploads (chat attachments, avatars) on our own
- * origin. An SVG/HTML/XML file opened directly would run its script as
- * unbottled.ai (stored XSS that also reads the csrf cookie), so active types
- * get an opaque-origin sandbox; nothing gets MIME-sniffed into one.
- */
-const ACTIVE_CONTENT_TYPE_PATTERN = /svg|html|xml|javascript/i;
-export function fileResponseSecurityHeaders(
-  contentType: string,
-): Record<string, string> {
-  const headers: Record<string, string> = {
-    "X-Content-Type-Options": "nosniff",
-  };
-  if (ACTIVE_CONTENT_TYPE_PATTERN.test(contentType)) {
-    headers["Content-Security-Policy"] = "sandbox";
-  }
-  return headers;
-}
+export { fileResponseSecurityHeaders } from "./response.schema";
 
 /** Client-minted ids are uuids; accept any short token, never arbitrary text. */
 const REQUEST_ID_PATTERN = /^[A-Za-z0-9_-]{8,64}$/;

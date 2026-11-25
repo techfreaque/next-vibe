@@ -15,7 +15,12 @@ import { v4 as uuidv4 } from "uuid";
 
 import { RunningTaskRegistry } from "../../../tasks/watchdog/registry";
 import { agentEnv } from "../../env";
-import type { FileMetadata, StorageAdapter } from "./index";
+import type {
+  ByteRange,
+  FileMetadata,
+  StorageAdapter,
+  StoredFileContent,
+} from "./index";
 import { buildStorageFileUrl } from "./url-utils";
 
 // S3 SDK XML parsing runs on the application thread. Large listings
@@ -356,6 +361,63 @@ export class S3StorageAdapter implements StorageAdapter {
       };
     } catch {
       // File doesn't exist or couldn't be read
+      return null;
+    }
+  }
+
+  async getFileSize(
+    threadId: string,
+    filename: string,
+  ): Promise<number | null> {
+    if (agentEnv.CHAT_STORAGE_TYPE !== "s3") {
+      return null;
+    }
+    try {
+      const result = await this.client.send(
+        new HeadObjectCommand({
+          Bucket: this.bucket,
+          Key: `chat-attachments/${threadId}/${filename}`,
+        }),
+      );
+      return result.ContentLength ?? null;
+    } catch {
+      return null;
+    }
+  }
+
+  async readFileContent(
+    threadId: string,
+    filename: string,
+    range?: ByteRange,
+  ): Promise<StoredFileContent | null> {
+    if (agentEnv.CHAT_STORAGE_TYPE !== "s3") {
+      return null;
+    }
+    try {
+      const result = await this.client.send(
+        new GetObjectCommand({
+          Bucket: this.bucket,
+          Key: `chat-attachments/${threadId}/${filename}`,
+          Range: range ? `bytes=${range.start}-${range.end}` : undefined,
+        }),
+      );
+      if (!result.Body) {
+        return null;
+      }
+      const body = result.Body.transformToWebStream();
+      if (
+        result.ContentLength === undefined ||
+        (range &&
+          (!result.ContentRange?.startsWith(
+            `bytes ${range.start}-${range.end}/`,
+          ) ||
+            result.ContentLength !== range.end - range.start + 1))
+      ) {
+        await body.cancel();
+        return null;
+      }
+      return { body, length: result.ContentLength };
+    } catch {
       return null;
     }
   }

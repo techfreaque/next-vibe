@@ -9,17 +9,19 @@ import { endpointsHandler } from "next-vibe/core/route/multi";
 import definitions from "./definition";
 import { ChatFileRepository } from "./repository";
 
-export const { GET, tools } = endpointsHandler({
+export const { GET, HEAD, tools } = endpointsHandler({
+  headFromGet: true,
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined,
-    handler: ({ urlPathParams, user, logger, t, locale }) =>
+    handler: ({ urlPathParams, user, logger, t, locale, request }) =>
       ChatFileRepository.getFileResponse(
         urlPathParams,
         user,
         logger,
         t,
         locale,
+        request,
       ),
   },
 });

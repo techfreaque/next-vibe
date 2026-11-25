@@ -6,7 +6,8 @@ import { endpointsHandler } from "next-vibe/core/route/multi";
 import { V1VideosRepository } from "../../repository";
 import v1VideoContentEndpoints from "./definition";
 
-export const { GET, tools } = endpointsHandler({
+export const { GET, HEAD, tools } = endpointsHandler({
+  headFromGet: true,
   endpoint: v1VideoContentEndpoints,
   [Methods.GET]: {
     email: undefined,

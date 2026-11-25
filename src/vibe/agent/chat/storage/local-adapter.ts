@@ -5,12 +5,18 @@
 
 import fs from "node:fs/promises";
 import path from "node:path";
+import { Readable } from "node:stream";
 
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { v4 as uuidv4 } from "uuid";
 
 import { agentEnv } from "../../env";
-import type { FileMetadata, StorageAdapter } from "./index";
+import type {
+  ByteRange,
+  FileMetadata,
+  StorageAdapter,
+  StoredFileContent,
+} from "./index";
 import { buildStorageFileUrl } from "./url-utils";
 
 export class LocalStorageAdapter implements StorageAdapter {
@@ -317,6 +323,75 @@ export class LocalStorageAdapter implements StorageAdapter {
       // File doesn't exist or couldn't be read
       return null;
     }
+  }
+
+  private resolveFilePath(threadId: string, filename: string): string | null {
+    if (
+      agentEnv.CHAT_STORAGE_TYPE !== "filesystem" ||
+      !agentEnv.CHAT_STORAGE_PATH
+    ) {
+      return null;
+    }
+    const basePath = agentEnv.CHAT_STORAGE_PATH;
+    const filePath = path.join(basePath, threadId, filename);
+    const relative = path.relative(basePath, filePath);
+    return relative === ".." ||
+      relative.startsWith(`..${path.sep}`) ||
+      path.isAbsolute(relative)
+      ? null
+      : filePath;
+  }
+
+  private async statFile(filePath: string): Promise<number | null> {
+    try {
+      const stat = await fs.stat(filePath);
+      return stat.isFile() ? stat.size : null;
+    } catch {
+      return null;
+    }
+  }
+
+  async getFileSize(
+    threadId: string,
+    filename: string,
+  ): Promise<number | null> {
+    const filePath = this.resolveFilePath(threadId, filename);
+    return filePath === null ? null : this.statFile(filePath);
+  }
+
+  async readFileContent(
+    threadId: string,
+    filename: string,
+    range?: ByteRange,
+  ): Promise<StoredFileContent | null> {
+    const filePath = this.resolveFilePath(threadId, filename);
+    if (filePath === null) {
+      return null;
+    }
+    const handle = await fs.open(filePath, "r").catch(() => null);
+    if (!handle) {
+      return null;
+    }
+    try {
+      const stat = await handle.stat();
+      if (stat.isFile() && (!range || range.end < stat.size)) {
+        // The stream owns the descriptor and closes it on EOF or cancellation.
+        const stream = handle.createReadStream(range);
+        const body = Readable.toWeb(stream, { strategy: { highWaterMark: 1 } });
+        if (body instanceof ReadableStream) {
+          return {
+            body,
+            length: range ? range.end - range.start + 1 : stat.size,
+          };
+        }
+        stream.destroy();
+        return null;
+      }
+    } catch {
+      // File couldn't be read.
+    }
+    await handle.close();
+    return null;
   }
 
   async listFilesByThread(

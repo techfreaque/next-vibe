@@ -192,6 +192,19 @@ export interface FileResponse {
   headers?: Record<string, string>;
 }
 
+/** Prevent uploaded files from executing script in the application's origin. */
+export function fileResponseSecurityHeaders(
+  contentType: string,
+): Record<string, string> {
+  const headers: Record<string, string> = {
+    "X-Content-Type-Options": "nosniff",
+  };
+  if (/svg|html|xml|javascript/i.test(contentType)) {
+    headers["Content-Security-Policy"] = "sandbox";
+  }
+  return headers;
+}
+
 /**
  * A content block within a ContentResponse.
  * Follows the MCP content block specification.

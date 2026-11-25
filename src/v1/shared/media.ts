@@ -11,6 +11,7 @@ import "server-only";
 
 import { createHmac, timingSafeEqual } from "node:crypto";
 
+import type { StoredFileSource } from "next-vibe/agent/chat/storage/file-response";
 import { getStorageAdapter } from "next-vibe/agent/chat/storage/index";
 import { parseStorageFileRef } from "next-vibe/agent/chat/storage/storage-url";
 import { mimeFromUrl } from "next-vibe/agent/chat/storage/url-utils";
@@ -156,6 +157,29 @@ export function signedMediaUrl(
   const expires = nowSeconds + V1_MEDIA_URL_TTL_SECONDS;
   const sig = signMediaPath(ref.threadId, ref.filename, expires);
   return `${buildPublicOrigin(request)}/api/${MEDIA_URL_LOCALE}/v1/media/${ref.threadId}/${ref.filename}?expires=${String(expires)}&sig=${sig}`;
+}
+
+/** Resolve a stored file after the caller has verified access to it. */
+export async function getStoredMediaSource(
+  threadId: string,
+  filename: string,
+): Promise<StoredFileSource | null> {
+  const fileId = filename.split(".")[0];
+  if (!fileId) {
+    return null;
+  }
+  const metadata = await getStorageAdapter().getFileMetadata(fileId, threadId);
+  if (!metadata) {
+    return null;
+  }
+  return {
+    threadId,
+    filename: metadata.filename,
+    contentType:
+      !metadata.mimeType || metadata.mimeType === "application/octet-stream"
+        ? mimeFromUrl(filename)
+        : metadata.mimeType,
+  };
 }
 
 /**

@@ -6,6 +6,8 @@
 
 import "server-only";
 
+import { serveStoredFile } from "next-vibe/agent/chat/storage/file-response";
+import { parseStorageFileRef } from "next-vibe/agent/chat/storage/storage-url";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   createStreamingResponse,
@@ -18,7 +20,7 @@ import type { V1MediaJobKind } from "../db";
 import type { V1T } from "../i18n";
 import { v1Error } from "./errors";
 import { gateApiKeyRequest } from "./gate";
-import { readStoredMediaUrl } from "./media";
+import { getStoredMediaSource } from "./media";
 import { findMediaJob, mediaJobObject } from "./media-jobs";
 import { openAiErrorResponse, openAiJson } from "./openai";
 
@@ -44,7 +46,13 @@ export class V1MediaJobsRepository {
     const job = await findMediaJob(id, kind, gate.user.id, t);
     if (!job) {
       return openAiErrorResponse(
-        v1Error(404, t("media.errors.jobNotFound", { kind, id }), "not_found_error", "not_found", "id"),
+        v1Error(
+          404,
+          t("media.errors.jobNotFound", { kind, id }),
+          "not_found_error",
+          "not_found",
+          "id",
+        ),
       );
     }
     return openAiJson(mediaJobObject(job, request));
@@ -61,7 +69,13 @@ export class V1MediaJobsRepository {
     const job = await findMediaJob(id, kind, gate.user.id, t);
     if (!job) {
       return openAiErrorResponse(
-        v1Error(404, t("media.errors.jobNotFound", { kind, id }), "not_found_error", "not_found", "id"),
+        v1Error(
+          404,
+          t("media.errors.jobNotFound", { kind, id }),
+          "not_found_error",
+          "not_found",
+          "id",
+        ),
       );
     }
     if (job.status !== "completed" || !job.resultUrl) {
@@ -75,31 +89,38 @@ export class V1MediaJobsRepository {
         ),
       );
     }
-    const file = await readStoredMediaUrl(job.resultUrl);
-    if (!file && /^https?:\/\//.test(job.resultUrl)) {
+    const ref = parseStorageFileRef(job.resultUrl);
+    const source =
+      ref && (await getStoredMediaSource(ref.threadId, ref.filename));
+    const mimeSubtype = source?.contentType.split("/")[1];
+    const response =
+      source &&
+      (await serveStoredFile(source, request, {
+        "Content-Disposition": `attachment; filename="${job.id}.${mimeSubtype === "mpeg" ? "mp3" : (mimeSubtype ?? "bin")}"`,
+      }));
+    if (!response && /^https?:\/\//.test(job.resultUrl)) {
       // Generated on a remote instance: its own URL serves the file.
       return createStreamingResponse(
-        new Response(null, { status: 302, headers: { Location: job.resultUrl } }),
+        new Response(null, {
+          status: 302,
+          headers: { Location: job.resultUrl },
+        }),
       );
     }
-    if (!file) {
+    if (!response) {
       logger.error("[v1/media-jobs] Finished file missing from storage", {
         jobId: job.id,
         resultUrl: job.resultUrl,
       });
       return openAiErrorResponse(
-        v1Error(404, t("media.errors.mediaNotFound"), "not_found_error", "file_not_found"),
+        v1Error(
+          404,
+          t("media.errors.mediaNotFound"),
+          "not_found_error",
+          "file_not_found",
+        ),
       );
     }
-    return createStreamingResponse(
-      new Response(new Uint8Array(file.buffer), {
-        status: 200,
-        headers: {
-          "Content-Type": file.mimeType,
-          "Content-Length": String(file.buffer.length),
-          "Content-Disposition": `attachment; filename="${job.id}.${file.mimeType.split("/")[1] === "mpeg" ? "mp3" : (file.mimeType.split("/")[1] ?? "bin")}"`,
-        },
-      }),
-    );
+    return createStreamingResponse(response);
   }
 }

@@ -10,8 +10,11 @@ import { eq } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   createFileResponse,
+  createStreamingResponse,
+  type ErrorResponseType,
   ErrorResponseTypes,
   fail,
+  fileResponseSecurityHeaders,
   type HandlerResponse,
 } from "next-vibe/core/route/response.schema";
 import { db } from "next-vibe/database";
@@ -22,6 +25,10 @@ import { agentEnv } from "../../../../../env";
 import { SKILL_AVATAR_STORAGE_NAMESPACE } from "../../../../../skills/constants";
 import { chatFolders, chatThreads } from "../../../../db";
 import { canViewThread } from "../../../../permissions/permissions";
+import {
+  serveStoredFile,
+  type StoredFileSource,
+} from "../../../../storage/file-response";
 import type { FileMetadata } from "../../../../storage/index";
 import { getStorageAdapter } from "../../../../storage/index";
 import { isStorageFileOwner } from "../../../../storage/url-utils";
@@ -83,12 +90,13 @@ export class ChatFileRepository {
     return getStorageAdapter().getFileMetadata(fileId, threadId);
   }
 
-  static async getFile(
+  static async getFileSource(
     data: ChatFileUrlVariablesOutput,
     user: JwtPayloadType | undefined,
     logger: EndpointLogger,
     locale: CountryLanguage,
-  ): Promise<{ buffer: Buffer; contentType: string }> {
+  ): Promise<StoredFileSource | null> {
+    let fileMetadata: FileMetadata | null = null;
     // Check thread access permissions
     try {
       // Get thread
@@ -102,10 +110,7 @@ export class ChatFileRepository {
       // Note: user can be a public user (isPublic=true) or authenticated user
       if (!user) {
         logger.error("User object not provided for file access");
-        return {
-          buffer: Buffer.from(""),
-          contentType: "text/plain",
-        };
+        return null;
       }
 
       if (!thread) {
@@ -113,7 +118,7 @@ export class ChatFileRepository {
         // runs. Incognito/guest files carry the owning leadId (the same browser
         // keeps access whether logged in or not); a logged-in user's
         // standalone generations carry their user id.
-        const fileMetadata = await ChatFileRepository.resolveFileMetadata(
+        fileMetadata = await ChatFileRepository.resolveFileMetadata(
           data.threadId,
           data.filename,
         );
@@ -129,10 +134,7 @@ export class ChatFileRepository {
               filename: data.filename,
             },
           );
-          return {
-            buffer: Buffer.from(""),
-            contentType: "text/plain",
-          };
+          return null;
         }
         // Imported character avatars are public-read (copies of images the
         // source platform shows publicly; public skills show them to everyone).
@@ -154,10 +156,7 @@ export class ChatFileRepository {
             threadId: data.threadId,
             filename: data.filename,
           });
-          return {
-            buffer: Buffer.from(""),
-            contentType: "text/plain",
-          };
+          return null;
         }
       } else {
         // Get folder for permission check
@@ -188,10 +187,7 @@ export class ChatFileRepository {
             threadRootFolderId: thread.rootFolderId,
             filename: data.filename,
           });
-          return {
-            buffer: Buffer.from(""),
-            contentType: "text/plain",
-          };
+          return null;
         }
       }
 
@@ -205,94 +201,94 @@ export class ChatFileRepository {
         error: error instanceof Error ? error.message : String(error),
         threadId: data.threadId,
       });
-      return {
-        buffer: Buffer.from(""),
-        contentType: "text/plain",
-      };
+      return null;
     }
 
-    // S3/MinIO: read bytes through the storage adapter (object store). The app
-    // proxies the file so the bucket can stay internal-only (no public URL).
-    if (agentEnv.CHAT_STORAGE_TYPE !== "filesystem") {
-      const fileId = data.filename.split(".")[0];
-      if (!fileId) {
-        return { buffer: Buffer.from(""), contentType: "text/plain" };
+    fileMetadata ??= await ChatFileRepository.resolveFileMetadata(
+      data.threadId,
+      data.filename,
+    );
+    if (agentEnv.CHAT_STORAGE_TYPE === "filesystem") {
+      // Older thread attachments can still be served without a sidecar.
+      return {
+        threadId: data.threadId,
+        filename: data.filename,
+        contentType: fileMetadata?.mimeType ?? "application/octet-stream",
+      };
+    }
+    return (
+      fileMetadata && {
+        threadId: data.threadId,
+        filename: fileMetadata.filename,
+        contentType: fileMetadata.mimeType || "application/octet-stream",
       }
-      const storage = getStorageAdapter();
-      const file = await storage.readFileBytes(fileId, data.threadId);
-      if (!file) {
-        logger.error("File not found in object storage", {
-          threadId: data.threadId,
-          filename: data.filename,
-        });
-        return { buffer: Buffer.from(""), contentType: "text/plain" };
-      }
-      return {
-        buffer: file.bytes,
-        contentType: file.metadata.mimeType ?? "application/octet-stream",
-      };
-    }
+    );
+  }
 
-    const basePath = agentEnv.CHAT_STORAGE_PATH;
-
-    if (!basePath || typeof basePath !== "string") {
-      logger.error("CHAT_STORAGE_PATH not configured or invalid", {
-        basePath,
-        type: typeof basePath,
-      });
-      return {
-        buffer: Buffer.from(""),
-        contentType: "text/plain",
-      };
-    }
-
-    const filePath = path.join(basePath, data.threadId, data.filename);
-
-    // Security check: ensure the resolved path is within basePath
-    const resolvedPath = path.resolve(filePath);
-    const resolvedBasePath = path.resolve(basePath);
-
-    if (!resolvedPath.startsWith(resolvedBasePath)) {
-      logger.error("Invalid file path attempted", { filePath });
-      return {
-        buffer: Buffer.from(""),
-        contentType: "text/plain",
-      };
-    }
-
+  static async getFile(
+    data: ChatFileUrlVariablesOutput,
+    user: JwtPayloadType | undefined,
+    logger: EndpointLogger,
+    locale: CountryLanguage,
+  ): Promise<{ buffer: Buffer; contentType: string }> {
+    const source = await ChatFileRepository.getFileSource(
+      data,
+      user,
+      logger,
+      locale,
+    );
     try {
-      // Read file
-      const fileBuffer = await fs.readFile(filePath);
-
-      // Get metadata to determine content type
-      const fileMetadata = await ChatFileRepository.readFileMetadata(
-        data.threadId,
-        data.filename,
-      );
-      const contentType = fileMetadata?.mimeType ?? "application/octet-stream";
-
-      return {
-        buffer: fileBuffer,
-        contentType,
-      };
+      if (source) {
+        const file = await getStorageAdapter().readFileContent(
+          source.threadId,
+          source.filename,
+        );
+        if (file) {
+          return {
+            buffer: Buffer.from(await new Response(file.body).arrayBuffer()),
+            contentType: source.contentType,
+          };
+        }
+      }
     } catch (error) {
       logger.error("File not found", {
         errorMessage: error instanceof Error ? error.message : String(error),
-        filePath,
+        threadId: data.threadId,
+        filename: data.filename,
       });
-      return {
-        buffer: Buffer.from(""),
-        contentType: "text/plain",
-      };
     }
+    return { buffer: Buffer.alloc(0), contentType: "text/plain" };
   }
+
   static async getFileResponse(
     urlPathParams: ChatFileUrlVariablesOutput,
     user: JwtPayloadType | undefined,
     logger: EndpointLogger,
     t: ChatFileT,
     locale: CountryLanguage,
+    request?: Request,
   ): Promise<HandlerResponse<ChatFileResponseOutput>> {
+    const headers = { "Cache-Control": "private, max-age=31536000, immutable" };
+    const notFound = (): ErrorResponseType =>
+      fail({
+        message: t("get.errors.notFound.title"),
+        errorType: ErrorResponseTypes.NOT_FOUND,
+      });
+    if (request) {
+      const source = await ChatFileRepository.getFileSource(
+        urlPathParams,
+        user,
+        logger,
+        locale,
+      );
+      const response =
+        source &&
+        (await serveStoredFile(source, request, {
+          ...headers,
+          ...fileResponseSecurityHeaders(source.contentType),
+        }));
+      return response ? createStreamingResponse(response) : notFound();
+    }
     const result = await ChatFileRepository.getFile(
       urlPathParams,
       user,
@@ -301,15 +297,11 @@ export class ChatFileRepository {
     );
 
     if (result.buffer.length === 0) {
-      return fail({
-        message: t("get.errors.notFound.title"),
-        errorType: ErrorResponseTypes.NOT_FOUND,
-      });
+      return notFound();
     }
 
     return createFileResponse(result.buffer, result.contentType, {
-      // private: files are access-checked per viewer — a shared cache must never serve them to someone else
-      "Cache-Control": "private, max-age=31536000, immutable",
+      ...headers,
       "Content-Length": String(result.buffer.length),
       "Accept-Ranges": "bytes",
     });

@@ -7,6 +7,16 @@ import { agentEnv } from "../../env";
 import { LocalStorageAdapter } from "./local-adapter";
 import { S3StorageAdapter } from "./s3-adapter";
 
+export interface ByteRange {
+  start: number;
+  end: number;
+}
+
+export interface StoredFileContent {
+  body: ReadableStream<Uint8Array<ArrayBuffer>>;
+  length: number;
+}
+
 // ─── File Storage Types ───────────────────────────────────────────────────────
 
 export interface FileMetadata {
@@ -94,6 +104,16 @@ export interface StorageAdapter {
     fileId: string,
     threadId: string,
   ): Promise<{ bytes: Buffer; metadata: FileMetadata } | null>;
+
+  /** Size of the stored bytes, without opening a response body. */
+  getFileSize(threadId: string, filename: string): Promise<number | null>;
+
+  /** Open the stored bytes by filename, optionally for an inclusive byte range. */
+  readFileContent(
+    threadId: string,
+    filename: string,
+    range?: ByteRange,
+  ): Promise<StoredFileContent | null>;
 
   /**
    * List all file metadata entries within a given threadId namespace.

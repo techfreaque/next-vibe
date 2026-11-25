@@ -6,7 +6,8 @@ import { endpointsHandler } from "next-vibe/core/route/multi";
 import v1MediaFileEndpoints from "./definition";
 import { V1MediaFileRepository } from "./repository";
 
-export const { GET, tools } = endpointsHandler({
+export const { GET, HEAD, tools } = endpointsHandler({
+  headFromGet: true,
   endpoint: v1MediaFileEndpoints,
   [Methods.GET]: {
     email: undefined,
