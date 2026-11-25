@@ -131,6 +131,19 @@ export const translations: typeof enTranslations = {
       body: "Neue Nutzer testen den Chat ohne Karte. Leichtes Ja für deine Community, leichte Conversion für dich. Für Entwickler: Die API braucht einen beliebigen Tarif, ab {{subPrice}} im Monat.",
     },
   },
+  press: {
+    label: "Getestet von",
+    title: "Im echten Projekt geprüft",
+    intro:
+      "Unabhängige Redaktionen haben uns mit einem echten Projekt getestet und ihr Ergebnis veröffentlicht.",
+    items: {
+      tudoSobreIa: {
+        meta: "Brasilien · November 2026",
+        body: "Maskottchen und 50-Sekunden-Film mit unseren Bild-, Video-, Stimm- und Musikmodellen gebaut. Urteil: lohnt sich für Creator.",
+        link: "Zum Test (auf Portugiesisch)",
+      },
+    },
+  },
   faq: {
     label: "FAQ",
     title: "Was Partner fragen",

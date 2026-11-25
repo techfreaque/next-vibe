@@ -127,6 +127,18 @@ export const translations = {
       body: "New users try the chat without a card. Easy yes for your audience, easy conversion for you. Developers: the API needs any plan, from {{subPrice}} a month.",
     },
   },
+  press: {
+    label: "Reviewed by",
+    title: "Tested on a real project",
+    intro: "Independent outlets put us to work and published what they found.",
+    items: {
+      tudoSobreIa: {
+        meta: "Brazil · November 2026",
+        body: "Built their mascot and a 50-second film with our image, video, voice and music models. Verdict: worth it for creators.",
+        link: "Read the review (Portuguese)",
+      },
+    },
+  },
   faq: {
     label: "FAQ",
     title: "Questions partners ask",

@@ -132,6 +132,19 @@ export const translations: typeof enTranslations = {
       body: "Les nouveaux utilisateurs essaient le chat sans carte bancaire. Un oui facile pour votre audience, une conversion facile pour vous. Développeurs : l'API nécessite n'importe quelle formule, dès {{subPrice}} par mois.",
     },
   },
+  press: {
+    label: "Testé par",
+    title: "Mis à l'épreuve sur un vrai projet",
+    intro:
+      "Des médias indépendants nous ont confié un vrai projet et ont publié leurs résultats.",
+    items: {
+      tudoSobreIa: {
+        meta: "Brésil · novembre 2026",
+        body: "Leur mascotte et un film de 50 secondes, créés avec nos modèles d'image, de vidéo, de voix et de musique. Verdict : ça vaut le coup pour les créateurs.",
+        link: "Lire le test (en portugais)",
+      },
+    },
+  },
   faq: {
     label: "FAQ",
     title: "Les questions des partenaires",

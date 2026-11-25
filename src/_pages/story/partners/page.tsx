@@ -6,14 +6,17 @@ import { Details } from "next-vibe/ui/components/details";
 import { Div } from "next-vibe/ui/components/div";
 import { BookOpen } from "next-vibe/ui/components/icons/BookOpen";
 import { ChevronDown } from "next-vibe/ui/components/icons/ChevronDown";
+import { ExternalLink as ExternalLinkIcon } from "next-vibe/ui/components/icons/ExternalLink";
 import { Layers } from "next-vibe/ui/components/icons/Layers";
 import { Mail } from "next-vibe/ui/components/icons/Mail";
 import { MessageSquare } from "next-vibe/ui/components/icons/MessageSquare";
+import { Newspaper } from "next-vibe/ui/components/icons/Newspaper";
 import { Shield } from "next-vibe/ui/components/icons/Shield";
 import { Sparkles } from "next-vibe/ui/components/icons/Sparkles";
 import { TrendingUp } from "next-vibe/ui/components/icons/TrendingUp";
 import { Video } from "next-vibe/ui/components/icons/Video";
 import { JsonLd } from "next-vibe/ui/components/json-ld";
+import { ExternalLink } from "next-vibe/ui/components/link";
 import { Span } from "next-vibe/ui/components/span";
 import { Summary } from "next-vibe/ui/components/summary";
 import { P } from "next-vibe/ui/components/typography";
@@ -52,6 +55,18 @@ const TERM_ROWS = [
   "minimum",
   "second",
   "tracking",
+] as const;
+
+/**
+ * Independent reviews of the platform. Reciprocal arrangements (free review in
+ * exchange for a link from this page) get rel="sponsored".
+ */
+const PRESS_REVIEWS = [
+  {
+    id: "tudoSobreIa",
+    name: "Tudo Sobre IA",
+    url: "https://tudosobreia.com.br/teste-unbottled-ai/",
+  },
 ] as const;
 
 const FAQ_IDS = [
@@ -233,7 +248,38 @@ export function TanstackPage({ locale }: PartnersPageData): JSX.Element {
         </FeatureGrid>
       </PageSection>
 
-      <PageSection label={t("faq.label")} title={t("faq.title")}>
+      <PageSection
+        id="press"
+        label={t("press.label")}
+        title={t("press.title")}
+        intro={t("press.intro")}
+      >
+        <FeatureGrid columns={2}>
+          {PRESS_REVIEWS.map((review) => (
+            <FeatureCard
+              key={review.id}
+              icon={Newspaper}
+              label={t(`press.items.${review.id}.meta`)}
+              title={review.name}
+              footer={
+                <ExternalLink
+                  href={review.url}
+                  target="_blank"
+                  rel="sponsored noopener"
+                  className="inline-flex min-h-11 items-center gap-1.5 text-sm font-medium text-primary underline-offset-4 hover:underline"
+                >
+                  {t(`press.items.${review.id}.link`)}
+                  <ExternalLinkIcon className="h-4 w-4" />
+                </ExternalLink>
+              }
+            >
+              {t(`press.items.${review.id}.body`)}
+            </FeatureCard>
+          ))}
+        </FeatureGrid>
+      </PageSection>
+
+      <PageSection tone="muted" label={t("faq.label")} title={t("faq.title")}>
         <JsonLd
           id="faq-structured-data"
           data={buildFaqStructuredData(

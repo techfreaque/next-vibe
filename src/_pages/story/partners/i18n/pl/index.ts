@@ -130,6 +130,19 @@ export const translations: typeof enTranslations = {
       body: "Nowi użytkownicy testują czat bez karty. Łatwe tak dla twoich odbiorców, łatwa konwersja dla ciebie. Dla programistów: API wymaga dowolnego planu, od {{subPrice}} miesięcznie.",
     },
   },
+  press: {
+    label: "Testowali nas",
+    title: "Sprawdzone w prawdziwym projekcie",
+    intro:
+      "Niezależne redakcje dały nam prawdziwe zadanie i opublikowały wyniki.",
+    items: {
+      tudoSobreIa: {
+        meta: "Brazylia · listopad 2026",
+        body: "Stworzyli maskotkę i 50-sekundowy film naszymi modelami obrazu, wideo, głosu i muzyki. Werdykt: warto, jeśli tworzysz treści.",
+        link: "Przeczytaj recenzję (po portugalsku)",
+      },
+    },
+  },
   faq: {
     label: "FAQ",
     title: "Pytania partnerów",

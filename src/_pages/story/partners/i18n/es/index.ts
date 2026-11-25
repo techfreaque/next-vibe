@@ -130,6 +130,19 @@ export const translations: typeof enTranslations = {
       body: "Los nuevos usuarios prueban el chat sin una tarjeta. Fácil si para tu audiencia, fácil conversión para ti. Desarrolladores: el API necesita cualquier plan, desde {{subPrice}} al mes.",
     },
   },
+  press: {
+    label: "Nos han probado",
+    title: "A prueba en un proyecto real",
+    intro:
+      "Medios independientes nos pusieron a trabajar y publicaron lo que encontraron.",
+    items: {
+      tudoSobreIa: {
+        meta: "Brasil · noviembre 2026",
+        body: "Crearon su mascota y un vídeo de 50 segundos con nuestros modelos de imagen, vídeo, voz y música. Veredicto: merece la pena para creadores.",
+        link: "Leer la reseña (en portugués)",
+      },
+    },
+  },
   faq: {
     label: "FAQ",
     title: "Preguntas que los socios hacen",
