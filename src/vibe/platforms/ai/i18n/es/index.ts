@@ -71,6 +71,10 @@ export const translations: typeof enTranslations = {
           description: "La instancia remota rechazó o fracasó la llamada",
           detail: 'Herramienta remota " {{toolName}}" falló: {{message}}',
         },
+        resultChannelLost: {
+          detail:
+            'No hay ningún servidor local en {{hubUrl}} para recibir el resultado de "{{toolName}}" desde {{instanceId}} ({{detail}}). Inícialo primero (`vibe dev`, o `vibe --hermes dev` para Hermes) y vuelve a intentarlo.',
+        },
         server: {
           title: "Error de ejecución",
           description: "La ruta de destino encontró un error del servidor",

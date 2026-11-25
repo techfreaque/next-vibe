@@ -69,6 +69,10 @@ export const translations: typeof enTranslations = {
             "Die Remote-Instanz hat den Aufruf abgelehnt oder er ist fehlgeschlagen",
           detail: 'Remote-Tool "{{toolName}}" fehlgeschlagen: {{message}}',
         },
+        resultChannelLost: {
+          detail:
+            'Kein lokaler Server unter {{hubUrl}}, der das Ergebnis von "{{toolName}}" von {{instanceId}} empfangen kann ({{detail}}). Starte ihn zuerst (`vibe dev`, für Hermes `vibe --hermes dev`) und versuche es erneut.',
+        },
         server: {
           title: "Ausführungsfehler",
           description: "Die Zielroute hat einen Serverfehler gemeldet",

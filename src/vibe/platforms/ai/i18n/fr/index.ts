@@ -69,6 +69,10 @@ export const translations: typeof enTranslations = {
           description: "L'instance distante a rejeté l'appel ou a échoué",
           detail: 'Échec de l\'outil distant "{{toolName}}" : {{message}}',
         },
+        resultChannelLost: {
+          detail:
+            'Aucun serveur local sur {{hubUrl}} pour recevoir le résultat de "{{toolName}}" depuis {{instanceId}} ({{detail}}). Démarre-le d\'abord (`vibe dev`, ou `vibe --hermes dev` pour Hermes), puis réessaie.',
+        },
         server: {
           title: "Erreur d'exécution",
           description: "La route cible a rencontré une erreur serveur",

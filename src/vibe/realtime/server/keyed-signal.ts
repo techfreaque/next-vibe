@@ -195,6 +195,30 @@ function closeWsWhenReady(socket: WebSocket): void {
 export interface KeyedSignalSubscription<T> {
   signal: Promise<T>;
   cancel: () => void;
+  /**
+   * Resolves (never rejects) with a reason once the subscription can NO LONGER
+   * deliver `signal`: the local hub is unreachable (nothing listens on its
+   * port, so the very first connect closed before it opened), there is no hub
+   * URL, or every re-subscribe after a hub close failed. Never resolves on the
+   * in-process path or after `cancel`. Blocking waiters race it to fail fast
+   * instead of hanging until their timeout; retries continue until `cancel`.
+   */
+  lost: Promise<KeyedSignalLoss>;
+  /**
+   * Resolves once the subscription can receive: immediately on the in-process
+   * path, on the hub socket's `open` (its subscribe frame is sent right then)
+   * cross-process. Never rejects; stays pending when the hub is unreachable
+   * (race it against `lost`).
+   */
+  ready: Promise<void>;
+}
+
+/** Why a keyed-signal subscription can no longer deliver. */
+export interface KeyedSignalLoss {
+  reason: "no-hub-url" | "hub-unreachable" | "resubscribe-exhausted";
+  /** The local hub WS URL the subscription targeted (null: none configured). */
+  hubUrl: string | null;
+  detail: string;
 }
 
 export const KeyedRemoteSignal = {
@@ -222,6 +246,29 @@ export const KeyedRemoteSignal = {
     let tornDown = false;
     let ws: WebSocket | null = null;
     let unsubAdapter: (() => void) | null = null;
+    // Set once any hub socket of this subscription reached `open`: a socket
+    // that closes before EVER opening means nothing listens on the hub port.
+    let everOpened = false;
+    let resolveReady: (() => void) | null = null;
+    const ready = new Promise<void>((resolve) => {
+      resolveReady = resolve;
+    });
+    const markReady = (): void => {
+      resolveReady?.();
+    };
+    // Cleared once reported: `lost` resolves at most once.
+    let resolveLost: ((loss: KeyedSignalLoss) => void) | null = null;
+    const lost = new Promise<KeyedSignalLoss>((resolve) => {
+      resolveLost = resolve;
+    });
+    const reportLost = (loss: KeyedSignalLoss): void => {
+      const resolveOnce = resolveLost;
+      if (!resolveOnce || settled || tornDown) {
+        return;
+      }
+      resolveLost = null;
+      resolveOnce(loss);
+    };
 
     const cancel = (): void => {
       if (settled) {
@@ -262,6 +309,7 @@ export const KeyedRemoteSignal = {
           },
         );
         unsubAdapter = (): void => getPubSubAdapter().unsubscribe(channel);
+        markReady();
         return;
       }
 
@@ -276,6 +324,11 @@ export const KeyedRemoteSignal = {
           "[KeyedRemoteSignal] subscribe: no wsBase - NEXT_PUBLIC_APP_URL unset, signal will never resolve",
           { channel },
         );
+        reportLost({
+          reason: "no-hub-url",
+          hubUrl: null,
+          detail: "NEXT_PUBLIC_APP_URL unset",
+        });
         return;
       }
       // A hub close while the signal is still pending (deploy drain closes
@@ -291,6 +344,11 @@ export const KeyedRemoteSignal = {
             "[KeyedRemoteSignal] hub subscription lost - signal can no longer arrive",
             { channel, wsBase, why, attempts: attempt - 1 },
           );
+          reportLost({
+            reason: "resubscribe-exhausted",
+            hubUrl: wsBase,
+            detail: why,
+          });
           return;
         }
         logger.debug("[KeyedRemoteSignal] re-subscribing to the hub", {
@@ -316,6 +374,11 @@ export const KeyedRemoteSignal = {
               channel,
               error,
             });
+            reportLost({
+              reason: "hub-unreachable",
+              hubUrl: wsBase,
+              detail: error,
+            });
             return;
           }
           resubscribeLater(attempt + 1, `open failed: ${error}`);
@@ -326,6 +389,11 @@ export const KeyedRemoteSignal = {
             "[KeyedRemoteSignal] hub subscription lost - no hub WS on re-subscribe",
             { channel, wsBase, attempt },
           );
+          reportLost({
+            reason: "resubscribe-exhausted",
+            hubUrl: wsBase,
+            detail: "no hub WS on re-subscribe",
+          });
           return;
         }
         if (settled || !opened) {
@@ -338,6 +406,15 @@ export const KeyedRemoteSignal = {
             "[KeyedRemoteSignal] subscribe: settled before WS opened or openHubWs returned null",
             { channel, settled, hasOpened: !!opened },
           );
+          if (!opened) {
+            // No socket at all (self-JWT signing failed / construction threw):
+            // nothing will ever deliver. No-op when already settled.
+            reportLost({
+              reason: "hub-unreachable",
+              hubUrl: wsBase,
+              detail: "no hub WS could be created",
+            });
+          }
           tornDown = true;
           if (opened) {
             closeWsWhenReady(opened);
@@ -346,6 +423,7 @@ export const KeyedRemoteSignal = {
         }
         ws = opened;
         ws.addEventListener("open", () => {
+          everOpened = true;
           logger.debug("[KeyedRemoteSignal] hub WS open - sending subscribe", {
             channel,
           });
@@ -356,6 +434,7 @@ export const KeyedRemoteSignal = {
               locale: defaultLocale,
             }),
           );
+          markReady();
         });
         ws.addEventListener("error", (event) => {
           // String(ErrorEvent) is just "[object ErrorEvent]" - pull the real fields
@@ -374,7 +453,12 @@ export const KeyedRemoteSignal = {
             // The exact loopback URL this socket targeted, so a port/host
             // mismatch is visible in the log without re-deriving it by hand.
             wsBase,
-            error: detail.message ?? detail.error?.message ?? event.type,
+            // Bun's message embeds the full URL: never log the self-JWT.
+            error: (
+              detail.message ??
+              detail.error?.message ??
+              event.type
+            ).replace(/token=[^&\s']+/g, "token=***"),
           };
           if (tornDown) {
             logger.debug("[KeyedRemoteSignal] hub WS error", errorInfo);
@@ -405,10 +489,18 @@ export const KeyedRemoteSignal = {
             closeInfo,
           );
           ws = null;
-          resubscribeLater(
-            attempt + 1,
-            `closed ${String(event.code)} ${event.reason}`,
-          );
+          const why = `closed ${String(event.code)} ${event.reason}`;
+          // Closed before any socket of this subscription ever opened: the hub
+          // is not running (connection refused). Report it now so a blocking
+          // waiter fails fast; the bounded retries still run until cancel.
+          if (!everOpened) {
+            reportLost({
+              reason: "hub-unreachable",
+              hubUrl: wsBase,
+              detail: why,
+            });
+          }
+          resubscribeLater(attempt + 1, why);
         });
         ws.addEventListener("message", (event: MessageEvent) => {
           const raw =
@@ -451,7 +543,7 @@ export const KeyedRemoteSignal = {
       void connectHub(0);
     });
 
-    return { signal, cancel };
+    return { signal, cancel, lost, ready };
   },
 
   /**

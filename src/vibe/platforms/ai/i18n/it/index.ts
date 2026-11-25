@@ -71,6 +71,10 @@ export const translations: typeof enTranslations = {
           description: "L'istanza remota ha respinto o fallito la chiamata",
           detail: 'Strumento remoto " {{toolName}} " fallito: {{message}}',
         },
+        resultChannelLost: {
+          detail:
+            'Nessun server locale su {{hubUrl}} per ricevere il risultato di "{{toolName}}" da {{instanceId}} ({{detail}}). Avvialo prima (`vibe dev`, oppure `vibe --hermes dev` per Hermes) e riprova.',
+        },
         server: {
           title: "Errore di esecuzione",
           description:

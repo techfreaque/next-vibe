@@ -24,11 +24,13 @@ import { getPreferredName } from "../../core/core-utils/path";
 import {
   ErrorResponseTypes,
   fail,
+  type ResponseType,
   success,
 } from "../../core/route/response.schema";
 import type { WidgetData } from "../../core/utils/json";
 import { db } from "../../database";
-import { Platform } from "../../platforms/platforms";
+import { isCliPlatform, Platform } from "../../platforms/platforms";
+import type { KeyedSignalLoss } from "../../realtime/server/keyed-signal";
 import type { RemoteConnInfo } from "../../remote-connection/types";
 import { CronTaskStatus } from "../../tasks/enum";
 import {
@@ -63,6 +65,49 @@ export class RemoteDispatch {
   private static readonly NO_TIMEOUT_INLINE_MS = 24 * 60 * 60 * 1000;
   /** Deadline backstop for the requester-local pending call. */
   private static readonly PENDING_CALL_DEADLINE_MS = 15 * 60 * 1000;
+  /**
+   * Inline WAIT cap for a CLI caller on a tool declaring timeoutMs: 0. A
+   * terminal must not block for a day: past this the call upgrades like any
+   * timed-out WAIT and the CLI prints the task id (the job keeps running).
+   */
+  private static readonly CLI_MAX_INLINE_MS = 30 * 60 * 1000;
+  /**
+   * How long the result subscription gets to reach the local hub before the
+   * request is sent. Only bounds a hub that accepts TCP but never upgrades; a
+   * hub that is down fails in milliseconds via `lost`.
+   */
+  private static readonly RESULT_CHANNEL_READY_MS = 5000;
+
+  /** The fail() for a result subscription that can no longer deliver. */
+  private static resultChannelLostFail(params: {
+    loss: KeyedSignalLoss;
+    toolName: string;
+    instanceId: string;
+    callId: string;
+    stage: "before-dispatch" | "awaiting-result";
+    t: RouteExecuteDispatchContext["t"];
+    logger: RouteExecuteDispatchContext["logger"];
+  }): ResponseType<never> {
+    const { loss, toolName, instanceId, callId, stage, t, logger } = params;
+    logger.error("[RouteExecute] Remote result channel unavailable", {
+      toolName,
+      instanceId,
+      callId,
+      stage,
+      reason: loss.reason,
+      hubUrl: loss.hubUrl,
+      detail: loss.detail,
+    });
+    return fail({
+      message: t("executeTool.post.errors.resultChannelLost.detail", {
+        hubUrl: loss.hubUrl ?? "-",
+        toolName,
+        instanceId,
+        detail: loss.reason,
+      }),
+      errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+    });
+  }
 
   /**
    * Run the remote dispatch path. `ctx.toolName` is the post-prefix name; this
@@ -676,6 +721,39 @@ export class RemoteDispatch {
     // never fire). Same definition-derived channel as ControlSignals.
     const resultSub = ResultSignals.subscribe(callId, user, logger);
 
+    // The result can only arrive through that subscription. When the local hub
+    // is down (e.g. `vibe --hermes --thea <tool>` with Hermes dev stopped) it
+    // never can: fail BEFORE the request runs a job whose result is lost,
+    // instead of waiting out the inline timeout (up to a day for timeoutMs: 0).
+    let readyTimer: ReturnType<typeof setTimeout> | undefined;
+    const preflightLoss = await Promise.race([
+      resultSub.ready.then(() => null),
+      resultSub.lost,
+      new Promise<null>((resolve) => {
+        readyTimer = setTimeout(
+          () => resolve(null),
+          RemoteDispatch.RESULT_CHANNEL_READY_MS,
+        );
+      }),
+    ]);
+    clearTimeout(readyTimer);
+    if (preflightLoss) {
+      resultSub.cancel();
+      PendingCalls.discard(callId);
+      return {
+        kind: "return",
+        value: RemoteDispatch.resultChannelLostFail({
+          loss: preflightLoss,
+          toolName,
+          instanceId,
+          callId,
+          stage: "before-dispatch",
+          t,
+          logger,
+        }),
+      };
+    }
+
     await emitToolRequest({
       callId,
       targetInstanceId: instanceId,
@@ -694,9 +772,12 @@ export class RemoteDispatch {
 
     // Inline timeout from the tool definition (0 = no timeout).
     const definedTimeoutMs = dispatchToolDef?.timeoutMs;
+    const unboundedInlineMs = isCliPlatform(platform)
+      ? RemoteDispatch.CLI_MAX_INLINE_MS
+      : RemoteDispatch.NO_TIMEOUT_INLINE_MS;
     const inlineTimeoutMs =
       definedTimeoutMs === 0
-        ? RemoteDispatch.NO_TIMEOUT_INLINE_MS
+        ? unboundedInlineMs
         : (definedTimeoutMs ?? RemoteDispatch.DEFAULT_INLINE_TIMEOUT_MS);
 
     // Block on the result via the ONE KeyedRemoteSignal subscription opened
@@ -712,12 +793,28 @@ export class RemoteDispatch {
     const resultSignal: Promise<PendingCallResult> = resultSub.signal.then(
       (s) => ({ status: s.status, output: s.output }),
     );
-    const inlineResult: PendingCallResult | null = await Promise.race([
-      resultSignal,
-      timeoutSignal,
-    ]);
+    // The hub went away mid-wait and every re-subscribe failed: the result can
+    // no longer arrive here, so stop waiting.
+    const lostSignal = resultSub.lost.then((loss) => ({ loss }));
+    const raced = await Promise.race([resultSignal, timeoutSignal, lostSignal]);
     clearTimeout(inlineTimer);
     resultSub.cancel();
+    if (raced !== null && "loss" in raced) {
+      PendingCalls.discard(callId);
+      return {
+        kind: "return",
+        value: RemoteDispatch.resultChannelLostFail({
+          loss: raced.loss,
+          toolName,
+          instanceId,
+          callId,
+          stage: "awaiting-result",
+          t,
+          logger,
+        }),
+      };
+    }
+    const inlineResult: PendingCallResult | null = raced;
 
     if (!inlineResult) {
       // WAIT → wakeUp auto-upgrade: the tool is still running on the remote.

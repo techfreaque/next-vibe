@@ -81,6 +81,7 @@ import {
   truncateToContextWindow,
 } from "./context/token-budget";
 import { AbortReason, StreamAbortError } from "./core/constants";
+import { LocalStreamRuns } from "./core/local-stream-runs";
 import { resolveModelSkill } from "./core/modality-resolver";
 import {
   clearStreamingState,
@@ -1955,6 +1956,17 @@ export class AiStreamRepository {
       // processing. Queue draining runs for EVERY turn regardless of how it was
       // invoked — processNextQueuedMessage is a no-op when nothing is queued, so
       // a message queued against an ai-run/revival thread is never dropped.
+      // Process-local run handle for the cancel path (core/local-stream-runs):
+      // lets a cancel abort this run directly and tell whether it finalized.
+      // Deregistered only after finalizeStream (i.e. after stream-finished).
+      const registerLocalRun = (): (() => void) =>
+        LocalStreamRuns.register({
+          threadId: threadResultThreadId,
+          runId: toolExecutionContext.streamRunId ?? null,
+          ownerKey: user.isPublic ? user.leadId : user.id,
+          controller: streamAbortController,
+        });
+
       const finalizeStream = async (): Promise<void> => {
         // Cancel any pending stream timeout timer (e.g. wakeUp mode where AI
         // writes a "task fired" response and the loop ends naturally before the
@@ -2114,11 +2126,16 @@ export class AiStreamRepository {
         // (relay receiver, cron, ai-run) treats the return as "thread settled".
         // Tracked for the deploy drain (loop/active-loops.ts): a cron or relay
         // run is a run in flight until it has finalized, same as interactive.
+        const deregisterLocalRun = registerLocalRun();
         const headlessRun = (async (): Promise<void> => {
           try {
             await runStream();
           } finally {
-            await finalizeStream();
+            try {
+              await finalizeStream();
+            } finally {
+              deregisterLocalRun();
+            }
           }
         })();
         trackActiveRun(headlessRun);
@@ -2148,6 +2165,7 @@ export class AiStreamRepository {
       // with threadId. The finally guarantees finalization even on crashes.
       // The whole chain (loop + finalization) is tracked so a deploy drain
       // waits for the turn to settle, not just for the loop to end.
+      const deregisterLocalRun = registerLocalRun();
       const interactiveRun = runStream()
         .catch((error) => {
           const msg = error instanceof Error ? error.message : String(error);
@@ -2173,7 +2191,8 @@ export class AiStreamRepository {
               user,
             });
           }),
-        );
+        )
+        .finally(deregisterLocalRun);
       trackActiveRun(interactiveRun);
 
       logger.debug("[AI Stream] Interactive stream started (fire-and-forget)", {

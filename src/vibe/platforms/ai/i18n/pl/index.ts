@@ -69,6 +69,10 @@ export const translations: typeof enTranslations = {
             "Zdalna instancja odrzuciła wywołanie lub zakończyło się błędem",
           detail: 'Zdalne narzędzie "{{toolName}}" zawiodło: {{message}}',
         },
+        resultChannelLost: {
+          detail:
+            'Brak lokalnego serwera pod {{hubUrl}}, który odbierze wynik "{{toolName}}" z {{instanceId}} ({{detail}}). Najpierw go uruchom (`vibe dev`, dla Hermesa `vibe --hermes dev`) i spróbuj ponownie.',
+        },
         server: {
           title: "Błąd wykonania",
           description: "Docelowa trasa napotkała błąd serwera",

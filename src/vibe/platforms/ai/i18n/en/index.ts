@@ -68,6 +68,10 @@ export const translations = {
           description: "The remote instance rejected or failed the call",
           detail: 'Remote tool "{{toolName}}" failed: {{message}}',
         },
+        resultChannelLost: {
+          detail:
+            'No local server at {{hubUrl}} to receive the result of "{{toolName}}" from {{instanceId}} ({{detail}}). Start it first (`vibe dev`, or `vibe --hermes dev` for Hermes), then retry.',
+        },
         server: {
           title: "Execution Error",
           description: "The target route encountered a server error",

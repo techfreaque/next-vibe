@@ -21,7 +21,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import { cronTasks } from "next-vibe/tasks/cron/db";
 import { CronTaskStatus } from "next-vibe/tasks/enum";
 
-import type { DefaultFolderId } from "../../../core/execution-context";
+import { DefaultFolderId } from "../../../core/execution-context";
 import { chatMessages, chatThreads } from "../../chat/db";
 import { ChatMessageRole, ThreadStreamingState } from "../../chat/enum";
 import { createMessagesEmitter } from "../../chat/threads/[threadId]/messages/emitter";
@@ -32,16 +32,16 @@ import {
   clearStreamingState,
   setStreamingStateAborting,
 } from "../repository/core/stream";
-import { StreamControl } from "../repository/core/stream-control";
+import {
+  cancelIncognitoStream,
+  deliverStreamCancel,
+  ORPHAN_REAP_DELAY_MS,
+} from "./cancel-signal";
 import type {
   AiStreamCancelPostRequestOutput,
   AiStreamCancelPostResponseOutput,
 } from "./definition";
 import type { AiStreamCancelT } from "./i18n";
-
-/** How long a cancelled stream gets to finalize itself before the cancel
- *  path treats it as orphaned. Below the client's 15s safety timeout. */
-const ORPHAN_REAP_DELAY_MS = 8000;
 
 export class cancelRepository {
   /**
@@ -161,11 +161,23 @@ export class cancelRepository {
 
       if (!thread) {
         // Incognito (client-only) threads are never written to DB. The threadId
-        // itself is the ownership proof. Deliver a cancel on the thread's control
-        // channel — the running stream (this process, or another via the redis
-        // bus) aborts itself. Fire-and-forget: no live stream simply has no reactor.
-        StreamControl.deliver(threadId, "cancel", user, logger);
-        logger.info("[Cancel] Incognito cancel signal delivered", { threadId });
+        // itself is the ownership proof. Same delivery as a stored thread (hub
+        // signal + direct abort of a local run), and the same fallback: if the
+        // run has not finalized after the reap delay, emit the stream-finished
+        // the client waits for. No row = the local run registry is the truth.
+        cancelIncognitoStream({
+          threadId,
+          user,
+          logger,
+          emitFinished: () => {
+            createMessagesEmitter(logger, user, {
+              threadId,
+              rootFolderId: DefaultFolderId.INCOGNITO,
+            })("stream-finished", {
+              responseData: { streamingState: ThreadStreamingState.IDLE },
+            });
+          },
+        });
         return success({ cancelled: true });
       }
 
@@ -197,7 +209,7 @@ export class cancelRepository {
       const isWaiting = thread.streamingState === ThreadStreamingState.WAITING;
 
       if (isStreaming) {
-        StreamControl.deliver(threadId, "cancel", user, logger);
+        deliverStreamCancel(threadId, user, logger);
       }
 
       // Mark as aborting in DB (gives cross-process visibility + frontend feedback)
