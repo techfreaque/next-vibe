@@ -307,6 +307,7 @@ import { Route as ApiLocaleCreditsDataSourcesCreditsPacksCreatedRouteImport } fr
 import { Route as ApiLocaleCreditsDataSourcesCreditsPurchasedRouteImport } from './routes/api.$locale.credits.data-sources.credits-purchased'
 import { Route as ApiLocaleCreditsDataSourcesCreditsRefundedRouteImport } from './routes/api.$locale.credits.data-sources.credits-refunded'
 import { Route as ApiLocaleCreditsDataSourcesCreditsSpentByLeadsRouteImport } from './routes/api.$locale.credits.data-sources.credits-spent-by-leads'
+import { Route as ApiLocaleCreditsDataSourcesCreditsSpentBySourceRouteImport } from './routes/api.$locale.credits.data-sources.credits-spent-by-source'
 import { Route as ApiLocaleCreditsDataSourcesCreditsSpentByUsersRouteImport } from './routes/api.$locale.credits.data-sources.credits-spent-by-users'
 import { Route as ApiLocaleCreditsDataSourcesCreditsSpentTotalRouteImport } from './routes/api.$locale.credits.data-sources.credits-spent-total'
 import { Route as ApiLocaleCreditsDataSourcesCreditsSubscriptionRevenueRouteImport } from './routes/api.$locale.credits.data-sources.credits-subscription-revenue'
@@ -2464,6 +2465,12 @@ const ApiLocaleCreditsDataSourcesCreditsSpentByLeadsRoute =
   ApiLocaleCreditsDataSourcesCreditsSpentByLeadsRouteImport.update({
     id: '/data-sources/credits-spent-by-leads',
     path: '/data-sources/credits-spent-by-leads',
+    getParentRoute: () => ApiLocaleCreditsRoute,
+  } as any)
+const ApiLocaleCreditsDataSourcesCreditsSpentBySourceRoute =
+  ApiLocaleCreditsDataSourcesCreditsSpentBySourceRouteImport.update({
+    id: '/data-sources/credits-spent-by-source',
+    path: '/data-sources/credits-spent-by-source',
     getParentRoute: () => ApiLocaleCreditsRoute,
   } as any)
 const ApiLocaleCreditsDataSourcesCreditsSpentByUsersRoute =
@@ -5506,6 +5513,7 @@ export interface FileRoutesByFullPath {
   '/api/$locale/credits/data-sources/credits-purchased': typeof ApiLocaleCreditsDataSourcesCreditsPurchasedRoute
   '/api/$locale/credits/data-sources/credits-refunded': typeof ApiLocaleCreditsDataSourcesCreditsRefundedRoute
   '/api/$locale/credits/data-sources/credits-spent-by-leads': typeof ApiLocaleCreditsDataSourcesCreditsSpentByLeadsRoute
+  '/api/$locale/credits/data-sources/credits-spent-by-source': typeof ApiLocaleCreditsDataSourcesCreditsSpentBySourceRoute
   '/api/$locale/credits/data-sources/credits-spent-by-users': typeof ApiLocaleCreditsDataSourcesCreditsSpentByUsersRoute
   '/api/$locale/credits/data-sources/credits-spent-total': typeof ApiLocaleCreditsDataSourcesCreditsSpentTotalRoute
   '/api/$locale/credits/data-sources/credits-subscription-revenue': typeof ApiLocaleCreditsDataSourcesCreditsSubscriptionRevenueRoute
@@ -6265,6 +6273,7 @@ export interface FileRoutesByTo {
   '/api/$locale/credits/data-sources/credits-purchased': typeof ApiLocaleCreditsDataSourcesCreditsPurchasedRoute
   '/api/$locale/credits/data-sources/credits-refunded': typeof ApiLocaleCreditsDataSourcesCreditsRefundedRoute
   '/api/$locale/credits/data-sources/credits-spent-by-leads': typeof ApiLocaleCreditsDataSourcesCreditsSpentByLeadsRoute
+  '/api/$locale/credits/data-sources/credits-spent-by-source': typeof ApiLocaleCreditsDataSourcesCreditsSpentBySourceRoute
   '/api/$locale/credits/data-sources/credits-spent-by-users': typeof ApiLocaleCreditsDataSourcesCreditsSpentByUsersRoute
   '/api/$locale/credits/data-sources/credits-spent-total': typeof ApiLocaleCreditsDataSourcesCreditsSpentTotalRoute
   '/api/$locale/credits/data-sources/credits-subscription-revenue': typeof ApiLocaleCreditsDataSourcesCreditsSubscriptionRevenueRoute
@@ -7033,6 +7042,7 @@ export interface FileRoutesById {
   '/api/$locale/credits/data-sources/credits-purchased': typeof ApiLocaleCreditsDataSourcesCreditsPurchasedRoute
   '/api/$locale/credits/data-sources/credits-refunded': typeof ApiLocaleCreditsDataSourcesCreditsRefundedRoute
   '/api/$locale/credits/data-sources/credits-spent-by-leads': typeof ApiLocaleCreditsDataSourcesCreditsSpentByLeadsRoute
+  '/api/$locale/credits/data-sources/credits-spent-by-source': typeof ApiLocaleCreditsDataSourcesCreditsSpentBySourceRoute
   '/api/$locale/credits/data-sources/credits-spent-by-users': typeof ApiLocaleCreditsDataSourcesCreditsSpentByUsersRoute
   '/api/$locale/credits/data-sources/credits-spent-total': typeof ApiLocaleCreditsDataSourcesCreditsSpentTotalRoute
   '/api/$locale/credits/data-sources/credits-subscription-revenue': typeof ApiLocaleCreditsDataSourcesCreditsSubscriptionRevenueRoute
@@ -7801,6 +7811,7 @@ export interface FileRouteTypes {
     | '/api/$locale/credits/data-sources/credits-purchased'
     | '/api/$locale/credits/data-sources/credits-refunded'
     | '/api/$locale/credits/data-sources/credits-spent-by-leads'
+    | '/api/$locale/credits/data-sources/credits-spent-by-source'
     | '/api/$locale/credits/data-sources/credits-spent-by-users'
     | '/api/$locale/credits/data-sources/credits-spent-total'
     | '/api/$locale/credits/data-sources/credits-subscription-revenue'
@@ -8560,6 +8571,7 @@ export interface FileRouteTypes {
     | '/api/$locale/credits/data-sources/credits-purchased'
     | '/api/$locale/credits/data-sources/credits-refunded'
     | '/api/$locale/credits/data-sources/credits-spent-by-leads'
+    | '/api/$locale/credits/data-sources/credits-spent-by-source'
     | '/api/$locale/credits/data-sources/credits-spent-by-users'
     | '/api/$locale/credits/data-sources/credits-spent-total'
     | '/api/$locale/credits/data-sources/credits-subscription-revenue'
@@ -9327,6 +9339,7 @@ export interface FileRouteTypes {
     | '/api/$locale/credits/data-sources/credits-purchased'
     | '/api/$locale/credits/data-sources/credits-refunded'
     | '/api/$locale/credits/data-sources/credits-spent-by-leads'
+    | '/api/$locale/credits/data-sources/credits-spent-by-source'
     | '/api/$locale/credits/data-sources/credits-spent-by-users'
     | '/api/$locale/credits/data-sources/credits-spent-total'
     | '/api/$locale/credits/data-sources/credits-subscription-revenue'
@@ -12413,6 +12426,13 @@ declare module '@tanstack/react-router' {
       path: '/data-sources/credits-spent-by-leads'
       fullPath: '/api/$locale/credits/data-sources/credits-spent-by-leads'
       preLoaderRoute: typeof ApiLocaleCreditsDataSourcesCreditsSpentByLeadsRouteImport
+      parentRoute: typeof ApiLocaleCreditsRoute
+    }
+    '/api/$locale/credits/data-sources/credits-spent-by-source': {
+      id: '/api/$locale/credits/data-sources/credits-spent-by-source'
+      path: '/data-sources/credits-spent-by-source'
+      fullPath: '/api/$locale/credits/data-sources/credits-spent-by-source'
+      preLoaderRoute: typeof ApiLocaleCreditsDataSourcesCreditsSpentBySourceRouteImport
       parentRoute: typeof ApiLocaleCreditsRoute
     }
     '/api/$locale/credits/data-sources/credits-spent-by-users': {
@@ -16088,6 +16108,7 @@ interface ApiLocaleCreditsRouteChildren {
   ApiLocaleCreditsDataSourcesCreditsPurchasedRoute: typeof ApiLocaleCreditsDataSourcesCreditsPurchasedRoute
   ApiLocaleCreditsDataSourcesCreditsRefundedRoute: typeof ApiLocaleCreditsDataSourcesCreditsRefundedRoute
   ApiLocaleCreditsDataSourcesCreditsSpentByLeadsRoute: typeof ApiLocaleCreditsDataSourcesCreditsSpentByLeadsRoute
+  ApiLocaleCreditsDataSourcesCreditsSpentBySourceRoute: typeof ApiLocaleCreditsDataSourcesCreditsSpentBySourceRoute
   ApiLocaleCreditsDataSourcesCreditsSpentByUsersRoute: typeof ApiLocaleCreditsDataSourcesCreditsSpentByUsersRoute
   ApiLocaleCreditsDataSourcesCreditsSpentTotalRoute: typeof ApiLocaleCreditsDataSourcesCreditsSpentTotalRoute
   ApiLocaleCreditsDataSourcesCreditsSubscriptionRevenueRoute: typeof ApiLocaleCreditsDataSourcesCreditsSubscriptionRevenueRoute
@@ -16130,6 +16151,8 @@ const ApiLocaleCreditsRouteChildren: ApiLocaleCreditsRouteChildren = {
     ApiLocaleCreditsDataSourcesCreditsRefundedRoute,
   ApiLocaleCreditsDataSourcesCreditsSpentByLeadsRoute:
     ApiLocaleCreditsDataSourcesCreditsSpentByLeadsRoute,
+  ApiLocaleCreditsDataSourcesCreditsSpentBySourceRoute:
+    ApiLocaleCreditsDataSourcesCreditsSpentBySourceRoute,
   ApiLocaleCreditsDataSourcesCreditsSpentByUsersRoute:
     ApiLocaleCreditsDataSourcesCreditsSpentByUsersRoute,
   ApiLocaleCreditsDataSourcesCreditsSpentTotalRoute:

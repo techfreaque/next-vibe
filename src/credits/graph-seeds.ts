@@ -28,8 +28,9 @@ import { CREDITS_FREE_TIER_SPEND_ALIAS } from "./data-sources/credits-free-tier-
 import { CREDITS_PACKS_CREATED_ALIAS } from "./data-sources/credits-packs-created/constants";
 import { CREDITS_PURCHASED_ALIAS } from "./data-sources/credits-purchased/constants";
 import { CREDITS_REFUNDED_ALIAS } from "./data-sources/credits-refunded/constants";
-import { CREDITS_SPENT_BY_LEADS_ALIAS } from "./data-sources/credits-spent-by-leads/constants";
-import { CREDITS_SPENT_BY_USERS_ALIAS } from "./data-sources/credits-spent-by-users/constants";
+import { CREDITS_SPENT_BY_SOURCE_ALIAS } from "./data-sources/credits-spent-by-source/constants";
+import type { UsageSourceValue } from "./data-sources/credits-spent-by-source/enum";
+import { UsageSource } from "./data-sources/credits-spent-by-source/enum";
 import { CREDITS_SPENT_TOTAL_ALIAS } from "./data-sources/credits-spent-total/constants";
 import { CREDITS_SUBSCRIPTION_REVENUE_ALIAS } from "./data-sources/credits-subscription-revenue/constants";
 import { CREDITS_TRANSACTIONS_COUNT_ALIAS } from "./data-sources/credits-transactions-count/constants";
@@ -46,6 +47,7 @@ const ORANGE = "#ea580c";
 const PURPLE = "#9333ea";
 const CYAN = "#0891b2";
 const AMBER = "#ca8a04";
+const SLATE = "#64748b";
 
 // ─── Credit Economy Overview ──────────────────────────────────────────────────
 
@@ -267,33 +269,41 @@ const creditRevenueHealthConfig: GraphConfig = {
 
 // ─── Free Tier vs Paid Usage ──────────────────────────────────────────────────
 
+/** One pane-0 node per usage source; the sources add up to all_spend_total. */
+const spendBySource = (
+  source: typeof UsageSourceValue,
+  color: string,
+): GraphConfig["nodes"][string] => ({
+  endpointPath: CREDITS_SPENT_BY_SOURCE_ALIAS,
+  params: { source },
+  pane: 0,
+  color,
+});
+
 const creditTierUsageConfig: GraphConfig = {
   nodes: {
-    all_spend_users: {
-      endpointPath: CREDITS_SPENT_BY_USERS_ALIAS,
-      pane: 0,
-      color: BLUE,
-    },
-    all_spend_leads: {
-      endpointPath: CREDITS_SPENT_BY_LEADS_ALIAS,
-      pane: 0,
-      color: ORANGE,
-    },
+    // Pane 0 = ALL spend split by who spent it and which credits paid
+    spend_public: spendBySource(UsageSource.PUBLIC, ORANGE),
+    spend_users_free: spendBySource(UsageSource.USERS_FREE, CYAN),
+    spend_paid: spendBySource(UsageSource.PAID, BLUE),
+    spend_gifted: spendBySource(UsageSource.GIFTED, PURPLE),
+    spend_internal: spendBySource(UsageSource.INTERNAL, AMBER),
+    spend_unattributed: spendBySource(UsageSource.UNATTRIBUTED, SLATE),
     all_spend_total: {
       endpointPath: CREDITS_SPENT_TOTAL_ALIAS,
       pane: 0,
       color: GREEN,
-    },
-    free_grants_issued: {
-      endpointPath: CREDITS_FREE_GRANTS_ALIAS,
-      pane: 0,
-      color: CYAN,
     },
     // Pane 1 = free-tier only (same axis as the public daily cap, local-midnight days)
     free_tier_spend_cap_axis: {
       endpointPath: CREDITS_FREE_TIER_SPEND_ALIAS,
       pane: 1,
       color: RED,
+    },
+    free_grants_issued: {
+      endpointPath: CREDITS_FREE_GRANTS_ALIAS,
+      pane: 1,
+      color: CYAN,
     },
     // Pane 2 = free allowance used month-to-date (0..1)
     free_allowance_used_mtd: {
@@ -302,18 +312,19 @@ const creditTierUsageConfig: GraphConfig = {
       color: AMBER,
     },
 
-    user_share: {
+    // Pane 3 = share of all spend
+    paid_share: {
       endpointPath: TRANSFORMER_RATIO_ALIAS,
       pane: 3,
       color: BLUE,
     },
-    lead_share: {
+    public_share: {
       endpointPath: TRANSFORMER_RATIO_ALIAS,
       pane: 3,
       color: ORANGE,
     },
 
-    eval_lead_dominance: {
+    eval_public_dominance: {
       endpointPath: EVALUATOR_THRESHOLD_ALIAS,
       resolution: GraphResolution.ONE_DAY,
       params: { op: ">", value: 0.6 },
@@ -325,10 +336,10 @@ const creditTierUsageConfig: GraphConfig = {
       params: { op: ">", value: 0.8 },
       visible: false,
     },
-    eval_user_spend_drop: {
+    eval_paid_share_drop: {
       endpointPath: EVALUATOR_THRESHOLD_ALIAS,
       resolution: GraphResolution.ONE_WEEK,
-      params: { op: "<", value: 0.4 },
+      params: { op: "<", value: 0.1 },
       visible: false,
     },
 
@@ -346,29 +357,33 @@ const creditTierUsageConfig: GraphConfig = {
   },
 
   edges: [
-    { from: "all_spend_users", to: "user_share", toHandle: "a" },
-    { from: "all_spend_total", to: "user_share", toHandle: "b" },
-    { from: "all_spend_leads", to: "lead_share", toHandle: "a" },
-    { from: "all_spend_total", to: "lead_share", toHandle: "b" },
-    { from: "lead_share", to: "eval_lead_dominance" },
+    { from: "spend_paid", to: "paid_share", toHandle: "a" },
+    { from: "all_spend_total", to: "paid_share", toHandle: "b" },
+    { from: "spend_public", to: "public_share", toHandle: "a" },
+    { from: "all_spend_total", to: "public_share", toHandle: "b" },
+    { from: "public_share", to: "eval_public_dominance" },
     { from: "free_allowance_used_mtd", to: "eval_pool_exhaustion" },
-    { from: "user_share", to: "eval_user_spend_drop" },
+    { from: "paid_share", to: "eval_paid_share_drop" },
     { from: "eval_pool_exhaustion", to: "action_notify_pool_exhaustion" },
   ],
 
   positions: {
-    all_spend_users: { x: 0, y: 0 },
-    all_spend_leads: { x: 0, y: 120 },
-    all_spend_total: { x: 0, y: 240 },
-    free_grants_issued: { x: 0, y: 360 },
-    free_tier_spend_cap_axis: { x: 0, y: 480 },
-    free_allowance_used_mtd: { x: 0, y: 600 },
-    user_share: { x: 300, y: 0 },
-    lead_share: { x: 300, y: 120 },
-    eval_lead_dominance: { x: 600, y: 120 },
-    eval_pool_exhaustion: { x: 600, y: 600 },
-    eval_user_spend_drop: { x: 600, y: 0 },
-    action_notify_pool_exhaustion: { x: 900, y: 600 },
+    spend_public: { x: 0, y: 0 },
+    spend_users_free: { x: 0, y: 120 },
+    spend_paid: { x: 0, y: 240 },
+    spend_gifted: { x: 0, y: 360 },
+    spend_internal: { x: 0, y: 480 },
+    spend_unattributed: { x: 0, y: 600 },
+    all_spend_total: { x: 0, y: 720 },
+    free_tier_spend_cap_axis: { x: 0, y: 840 },
+    free_grants_issued: { x: 0, y: 960 },
+    free_allowance_used_mtd: { x: 0, y: 1080 },
+    paid_share: { x: 300, y: 240 },
+    public_share: { x: 300, y: 0 },
+    eval_public_dominance: { x: 600, y: 0 },
+    eval_paid_share_drop: { x: 600, y: 240 },
+    eval_pool_exhaustion: { x: 600, y: 1080 },
+    action_notify_pool_exhaustion: { x: 900, y: 1080 },
   },
 
   trigger: { type: "cron", schedule: "0 */6 * * *" },
@@ -712,7 +727,7 @@ export const graphSeeds: GraphSeedEntry[] = [
     slug: "credit-tier-usage",
     name: "Free vs Paid Usage",
     description:
-      "Pane 0: ALL spend (paid + free) split leads / users / total. Pane 1: free-tier spend only - mirrors the public cap's Spent Today (server-local midnight days). Pane 2: free allowance used month-to-date (consumed / granted, 0-1). Pane 3: user vs lead share of all spend. Alerts on free-tier saturation and user disengagement.",
+      "Pane 0: ALL spend split by source of the credits spent: public (guests on the free allowance), users free (signed-in free credits + referral credits), paid (subscription + purchased packs), gifted (admin grants: testers, creators, goodwill), internal (admin accounts), unattributed (historic pack debits with no derivable bucket); the sources add up to all spend. Pane 1: free-tier spend (mirrors the public cap, server-local midnight days) and free grants issued. Pane 2: free allowance used month-to-date (0-1). Pane 3: paid and public share of all spend. Alerts on free-tier saturation.",
     config: creditTierUsageConfig,
   },
   {

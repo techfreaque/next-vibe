@@ -77903,6 +77903,1181 @@
     "credits": 0
   },
   {
+    "toolName": "credits-spent-by-source",
+    "title": "Wydane kredyty wg źródła",
+    "titleShort": "Zużycie wg źródła",
+    "description": "Wydane kredyty podzielone według tego, kto je wydał i jakie kredyty za to zapłaciły: publiczne (goście), darmowe użytkowników, płatne, podarowane, wewnętrzne, nieprzypisane. Źródła sumują się do całego zużycia.",
+    "fields": {
+      "noFormElement": true,
+      "usage": {
+        "request": "data",
+        "response": true
+      },
+      "children": {
+        "resolution": {
+          "type": "form_field",
+          "fieldType": "select",
+          "label": "Rozdzielczość",
+          "description": "Przedział obliczeń",
+          "schema": {
+            "def": {
+              "type": "default",
+              "innerType": {
+                "def": {
+                  "type": "enum",
+                  "entries": {
+                    "enums.resolution.1m": "enums.resolution.1m",
+                    "enums.resolution.3m": "enums.resolution.3m",
+                    "enums.resolution.5m": "enums.resolution.5m",
+                    "enums.resolution.15m": "enums.resolution.15m",
+                    "enums.resolution.30m": "enums.resolution.30m",
+                    "enums.resolution.1h": "enums.resolution.1h",
+                    "enums.resolution.4h": "enums.resolution.4h",
+                    "enums.resolution.1d": "enums.resolution.1d",
+                    "enums.resolution.1w": "enums.resolution.1w",
+                    "enums.resolution.1M": "enums.resolution.1M"
+                  }
+                },
+                "type": "enum",
+                "enum": {
+                  "enums.resolution.1m": "enums.resolution.1m",
+                  "enums.resolution.3m": "enums.resolution.3m",
+                  "enums.resolution.5m": "enums.resolution.5m",
+                  "enums.resolution.15m": "enums.resolution.15m",
+                  "enums.resolution.30m": "enums.resolution.30m",
+                  "enums.resolution.1h": "enums.resolution.1h",
+                  "enums.resolution.4h": "enums.resolution.4h",
+                  "enums.resolution.1d": "enums.resolution.1d",
+                  "enums.resolution.1w": "enums.resolution.1w",
+                  "enums.resolution.1M": "enums.resolution.1M"
+                },
+                "options": [
+                  "enums.resolution.1m",
+                  "enums.resolution.3m",
+                  "enums.resolution.5m",
+                  "enums.resolution.15m",
+                  "enums.resolution.30m",
+                  "enums.resolution.1h",
+                  "enums.resolution.4h",
+                  "enums.resolution.1d",
+                  "enums.resolution.1w",
+                  "enums.resolution.1M"
+                ]
+              }
+            },
+            "type": "default"
+          },
+          "options": [
+            {
+              "value": "enums.resolution.1m",
+              "label": "enums.resolution.1m"
+            },
+            {
+              "value": "enums.resolution.3m",
+              "label": "enums.resolution.3m"
+            },
+            {
+              "value": "enums.resolution.5m",
+              "label": "enums.resolution.5m"
+            },
+            {
+              "value": "enums.resolution.15m",
+              "label": "enums.resolution.15m"
+            },
+            {
+              "value": "enums.resolution.30m",
+              "label": "enums.resolution.30m"
+            },
+            {
+              "value": "enums.resolution.1h",
+              "label": "enums.resolution.1h"
+            },
+            {
+              "value": "enums.resolution.4h",
+              "label": "enums.resolution.4h"
+            },
+            {
+              "value": "enums.resolution.1d",
+              "label": "enums.resolution.1d"
+            },
+            {
+              "value": "enums.resolution.1w",
+              "label": "enums.resolution.1w"
+            },
+            {
+              "value": "enums.resolution.1M",
+              "label": "enums.resolution.1M"
+            }
+          ],
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "range": {
+          "type": "form_field",
+          "fieldType": "date_range",
+          "label": "Zakres",
+          "description": "Zakres czasu zapytania",
+          "schema": {
+            "def": {
+              "type": "object",
+              "shape": {
+                "from": {
+                  "def": {
+                    "type": "pipe",
+                    "in": {
+                      "def": {
+                        "type": "union",
+                        "options": [
+                          {
+                            "def": {
+                              "type": "string"
+                            },
+                            "type": "string"
+                          },
+                          {
+                            "def": {
+                              "type": "date"
+                            },
+                            "type": "date"
+                          },
+                          {
+                            "def": {
+                              "type": "number",
+                              "coerce": true,
+                              "checks": []
+                            },
+                            "type": "number",
+                            "isFinite": true
+                          }
+                        ]
+                      },
+                      "type": "union",
+                      "options": [
+                        {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string"
+                        },
+                        {
+                          "def": {
+                            "type": "date"
+                          },
+                          "type": "date"
+                        },
+                        {
+                          "def": {
+                            "type": "number",
+                            "coerce": true,
+                            "checks": []
+                          },
+                          "type": "number",
+                          "isFinite": true
+                        }
+                      ]
+                    },
+                    "out": {
+                      "def": {
+                        "type": "transform"
+                      },
+                      "type": "transform"
+                    }
+                  },
+                  "type": "pipe",
+                  "in": {
+                    "def": {
+                      "type": "union",
+                      "options": [
+                        {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string"
+                        },
+                        {
+                          "def": {
+                            "type": "date"
+                          },
+                          "type": "date"
+                        },
+                        {
+                          "def": {
+                            "type": "number",
+                            "coerce": true,
+                            "checks": []
+                          },
+                          "type": "number",
+                          "isFinite": true
+                        }
+                      ]
+                    },
+                    "type": "union",
+                    "options": [
+                      {
+                        "def": {
+                          "type": "string"
+                        },
+                        "type": "string"
+                      },
+                      {
+                        "def": {
+                          "type": "date"
+                        },
+                        "type": "date"
+                      },
+                      {
+                        "def": {
+                          "type": "number",
+                          "coerce": true,
+                          "checks": []
+                        },
+                        "type": "number",
+                        "isFinite": true
+                      }
+                    ]
+                  },
+                  "out": {
+                    "def": {
+                      "type": "transform"
+                    },
+                    "type": "transform"
+                  }
+                },
+                "to": {
+                  "def": {
+                    "type": "pipe",
+                    "in": {
+                      "def": {
+                        "type": "union",
+                        "options": [
+                          {
+                            "def": {
+                              "type": "string"
+                            },
+                            "type": "string"
+                          },
+                          {
+                            "def": {
+                              "type": "date"
+                            },
+                            "type": "date"
+                          },
+                          {
+                            "def": {
+                              "type": "number",
+                              "coerce": true,
+                              "checks": []
+                            },
+                            "type": "number",
+                            "isFinite": true
+                          }
+                        ]
+                      },
+                      "type": "union",
+                      "options": [
+                        {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string"
+                        },
+                        {
+                          "def": {
+                            "type": "date"
+                          },
+                          "type": "date"
+                        },
+                        {
+                          "def": {
+                            "type": "number",
+                            "coerce": true,
+                            "checks": []
+                          },
+                          "type": "number",
+                          "isFinite": true
+                        }
+                      ]
+                    },
+                    "out": {
+                      "def": {
+                        "type": "transform"
+                      },
+                      "type": "transform"
+                    }
+                  },
+                  "type": "pipe",
+                  "in": {
+                    "def": {
+                      "type": "union",
+                      "options": [
+                        {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string"
+                        },
+                        {
+                          "def": {
+                            "type": "date"
+                          },
+                          "type": "date"
+                        },
+                        {
+                          "def": {
+                            "type": "number",
+                            "coerce": true,
+                            "checks": []
+                          },
+                          "type": "number",
+                          "isFinite": true
+                        }
+                      ]
+                    },
+                    "type": "union",
+                    "options": [
+                      {
+                        "def": {
+                          "type": "string"
+                        },
+                        "type": "string"
+                      },
+                      {
+                        "def": {
+                          "type": "date"
+                        },
+                        "type": "date"
+                      },
+                      {
+                        "def": {
+                          "type": "number",
+                          "coerce": true,
+                          "checks": []
+                        },
+                        "type": "number",
+                        "isFinite": true
+                      }
+                    ]
+                  },
+                  "out": {
+                    "def": {
+                      "type": "transform"
+                    },
+                    "type": "transform"
+                  }
+                }
+              }
+            },
+            "type": "object"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "lookback": {
+          "type": "form_field",
+          "fieldType": "int",
+          "label": "Wstecz",
+          "description": "Dodatkowe słupki przed początkiem zakresu",
+          "schema": {
+            "def": {
+              "type": "default",
+              "innerType": {
+                "def": {
+                  "type": "number",
+                  "checks": [
+                    {
+                      "def": {
+                        "type": "number",
+                        "check": "number_format",
+                        "abort": false,
+                        "format": "safeint"
+                      },
+                      "type": "number",
+                      "isFinite": true
+                    },
+                    {}
+                  ]
+                },
+                "type": "number",
+                "isFinite": true
+              }
+            },
+            "type": "default"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "source": {
+          "type": "form_field",
+          "fieldType": "select",
+          "label": "Źródło",
+          "description": "Które kredyty liczyć: publiczni goście, darmowe kredyty zalogowanych, płatne (subskrypcja + pakiety), podarowane (przyznane przez admina), wewnętrzne (konta adminów) lub nieprzypisana historia",
+          "options": [
+            {
+              "value": "enums.source.public",
+              "label": "enums.source.public"
+            },
+            {
+              "value": "enums.source.usersFree",
+              "label": "enums.source.usersFree"
+            },
+            {
+              "value": "enums.source.paid",
+              "label": "enums.source.paid"
+            },
+            {
+              "value": "enums.source.gifted",
+              "label": "enums.source.gifted"
+            },
+            {
+              "value": "enums.source.internal",
+              "label": "enums.source.internal"
+            },
+            {
+              "value": "enums.source.unattributed",
+              "label": "enums.source.unattributed"
+            }
+          ],
+          "schema": {
+            "def": {
+              "type": "default",
+              "innerType": {
+                "def": {
+                  "type": "enum",
+                  "entries": {
+                    "PUBLIC": "enums.source.public",
+                    "USERS_FREE": "enums.source.usersFree",
+                    "PAID": "enums.source.paid",
+                    "GIFTED": "enums.source.gifted",
+                    "INTERNAL": "enums.source.internal",
+                    "UNATTRIBUTED": "enums.source.unattributed"
+                  }
+                },
+                "type": "enum",
+                "enum": {
+                  "PUBLIC": "enums.source.public",
+                  "USERS_FREE": "enums.source.usersFree",
+                  "PAID": "enums.source.paid",
+                  "GIFTED": "enums.source.gifted",
+                  "INTERNAL": "enums.source.internal",
+                  "UNATTRIBUTED": "enums.source.unattributed"
+                },
+                "options": [
+                  "enums.source.public",
+                  "enums.source.usersFree",
+                  "enums.source.paid",
+                  "enums.source.gifted",
+                  "enums.source.internal",
+                  "enums.source.unattributed"
+                ]
+              }
+            },
+            "type": "default"
+          },
+          "columns": 6,
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "result": {
+          "type": "form_field",
+          "fieldType": "time_series",
+          "label": "Wydane kredyty",
+          "description": "Wyjściowy szereg czasowy",
+          "schema": {
+            "def": {
+              "type": "array",
+              "element": {
+                "def": {
+                  "type": "object",
+                  "shape": {
+                    "timestamp": {
+                      "def": {
+                        "type": "pipe",
+                        "in": {
+                          "def": {
+                            "type": "union",
+                            "options": [
+                              {
+                                "def": {
+                                  "type": "string"
+                                },
+                                "type": "string"
+                              },
+                              {
+                                "def": {
+                                  "type": "date"
+                                },
+                                "type": "date"
+                              },
+                              {
+                                "def": {
+                                  "type": "number",
+                                  "coerce": true,
+                                  "checks": []
+                                },
+                                "type": "number",
+                                "isFinite": true
+                              }
+                            ]
+                          },
+                          "type": "union",
+                          "options": [
+                            {
+                              "def": {
+                                "type": "string"
+                              },
+                              "type": "string"
+                            },
+                            {
+                              "def": {
+                                "type": "date"
+                              },
+                              "type": "date"
+                            },
+                            {
+                              "def": {
+                                "type": "number",
+                                "coerce": true,
+                                "checks": []
+                              },
+                              "type": "number",
+                              "isFinite": true
+                            }
+                          ]
+                        },
+                        "out": {
+                          "def": {
+                            "type": "transform"
+                          },
+                          "type": "transform"
+                        }
+                      },
+                      "type": "pipe",
+                      "in": {
+                        "def": {
+                          "type": "union",
+                          "options": [
+                            {
+                              "def": {
+                                "type": "string"
+                              },
+                              "type": "string"
+                            },
+                            {
+                              "def": {
+                                "type": "date"
+                              },
+                              "type": "date"
+                            },
+                            {
+                              "def": {
+                                "type": "number",
+                                "coerce": true,
+                                "checks": []
+                              },
+                              "type": "number",
+                              "isFinite": true
+                            }
+                          ]
+                        },
+                        "type": "union",
+                        "options": [
+                          {
+                            "def": {
+                              "type": "string"
+                            },
+                            "type": "string"
+                          },
+                          {
+                            "def": {
+                              "type": "date"
+                            },
+                            "type": "date"
+                          },
+                          {
+                            "def": {
+                              "type": "number",
+                              "coerce": true,
+                              "checks": []
+                            },
+                            "type": "number",
+                            "isFinite": true
+                          }
+                        ]
+                      },
+                      "out": {
+                        "def": {
+                          "type": "transform"
+                        },
+                        "type": "transform"
+                      }
+                    },
+                    "value": {
+                      "def": {
+                        "type": "number",
+                        "checks": []
+                      },
+                      "type": "number",
+                      "isFinite": true
+                    },
+                    "meta": {
+                      "def": {
+                        "type": "optional",
+                        "innerType": {
+                          "def": {
+                            "type": "record",
+                            "keyType": {
+                              "def": {
+                                "type": "string"
+                              },
+                              "type": "string"
+                            },
+                            "valueType": {
+                              "def": {
+                                "type": "union",
+                                "options": [
+                                  {
+                                    "def": {
+                                      "type": "string"
+                                    },
+                                    "type": "string"
+                                  },
+                                  {
+                                    "def": {
+                                      "type": "number",
+                                      "checks": []
+                                    },
+                                    "type": "number",
+                                    "isFinite": true
+                                  },
+                                  {
+                                    "def": {
+                                      "type": "boolean"
+                                    },
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "def": {
+                                      "type": "null"
+                                    },
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "type": "union",
+                              "options": [
+                                {
+                                  "def": {
+                                    "type": "string"
+                                  },
+                                  "type": "string"
+                                },
+                                {
+                                  "def": {
+                                    "type": "number",
+                                    "checks": []
+                                  },
+                                  "type": "number",
+                                  "isFinite": true
+                                },
+                                {
+                                  "def": {
+                                    "type": "boolean"
+                                  },
+                                  "type": "boolean"
+                                },
+                                {
+                                  "def": {
+                                    "type": "null"
+                                  },
+                                  "type": "null"
+                                }
+                              ]
+                            }
+                          },
+                          "type": "record",
+                          "keyType": {
+                            "def": {
+                              "type": "string"
+                            },
+                            "type": "string"
+                          },
+                          "valueType": {
+                            "def": {
+                              "type": "union",
+                              "options": [
+                                {
+                                  "def": {
+                                    "type": "string"
+                                  },
+                                  "type": "string"
+                                },
+                                {
+                                  "def": {
+                                    "type": "number",
+                                    "checks": []
+                                  },
+                                  "type": "number",
+                                  "isFinite": true
+                                },
+                                {
+                                  "def": {
+                                    "type": "boolean"
+                                  },
+                                  "type": "boolean"
+                                },
+                                {
+                                  "def": {
+                                    "type": "null"
+                                  },
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "type": "union",
+                            "options": [
+                              {
+                                "def": {
+                                  "type": "string"
+                                },
+                                "type": "string"
+                              },
+                              {
+                                "def": {
+                                  "type": "number",
+                                  "checks": []
+                                },
+                                "type": "number",
+                                "isFinite": true
+                              },
+                              {
+                                "def": {
+                                  "type": "boolean"
+                                },
+                                "type": "boolean"
+                              },
+                              {
+                                "def": {
+                                  "type": "null"
+                                },
+                                "type": "null"
+                              }
+                            ]
+                          }
+                        }
+                      },
+                      "type": "optional"
+                    }
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "type": "array",
+            "element": {
+              "def": {
+                "type": "object",
+                "shape": {
+                  "timestamp": {
+                    "def": {
+                      "type": "pipe",
+                      "in": {
+                        "def": {
+                          "type": "union",
+                          "options": [
+                            {
+                              "def": {
+                                "type": "string"
+                              },
+                              "type": "string"
+                            },
+                            {
+                              "def": {
+                                "type": "date"
+                              },
+                              "type": "date"
+                            },
+                            {
+                              "def": {
+                                "type": "number",
+                                "coerce": true,
+                                "checks": []
+                              },
+                              "type": "number",
+                              "isFinite": true
+                            }
+                          ]
+                        },
+                        "type": "union",
+                        "options": [
+                          {
+                            "def": {
+                              "type": "string"
+                            },
+                            "type": "string"
+                          },
+                          {
+                            "def": {
+                              "type": "date"
+                            },
+                            "type": "date"
+                          },
+                          {
+                            "def": {
+                              "type": "number",
+                              "coerce": true,
+                              "checks": []
+                            },
+                            "type": "number",
+                            "isFinite": true
+                          }
+                        ]
+                      },
+                      "out": {
+                        "def": {
+                          "type": "transform"
+                        },
+                        "type": "transform"
+                      }
+                    },
+                    "type": "pipe",
+                    "in": {
+                      "def": {
+                        "type": "union",
+                        "options": [
+                          {
+                            "def": {
+                              "type": "string"
+                            },
+                            "type": "string"
+                          },
+                          {
+                            "def": {
+                              "type": "date"
+                            },
+                            "type": "date"
+                          },
+                          {
+                            "def": {
+                              "type": "number",
+                              "coerce": true,
+                              "checks": []
+                            },
+                            "type": "number",
+                            "isFinite": true
+                          }
+                        ]
+                      },
+                      "type": "union",
+                      "options": [
+                        {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string"
+                        },
+                        {
+                          "def": {
+                            "type": "date"
+                          },
+                          "type": "date"
+                        },
+                        {
+                          "def": {
+                            "type": "number",
+                            "coerce": true,
+                            "checks": []
+                          },
+                          "type": "number",
+                          "isFinite": true
+                        }
+                      ]
+                    },
+                    "out": {
+                      "def": {
+                        "type": "transform"
+                      },
+                      "type": "transform"
+                    }
+                  },
+                  "value": {
+                    "def": {
+                      "type": "number",
+                      "checks": []
+                    },
+                    "type": "number",
+                    "isFinite": true
+                  },
+                  "meta": {
+                    "def": {
+                      "type": "optional",
+                      "innerType": {
+                        "def": {
+                          "type": "record",
+                          "keyType": {
+                            "def": {
+                              "type": "string"
+                            },
+                            "type": "string"
+                          },
+                          "valueType": {
+                            "def": {
+                              "type": "union",
+                              "options": [
+                                {
+                                  "def": {
+                                    "type": "string"
+                                  },
+                                  "type": "string"
+                                },
+                                {
+                                  "def": {
+                                    "type": "number",
+                                    "checks": []
+                                  },
+                                  "type": "number",
+                                  "isFinite": true
+                                },
+                                {
+                                  "def": {
+                                    "type": "boolean"
+                                  },
+                                  "type": "boolean"
+                                },
+                                {
+                                  "def": {
+                                    "type": "null"
+                                  },
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "type": "union",
+                            "options": [
+                              {
+                                "def": {
+                                  "type": "string"
+                                },
+                                "type": "string"
+                              },
+                              {
+                                "def": {
+                                  "type": "number",
+                                  "checks": []
+                                },
+                                "type": "number",
+                                "isFinite": true
+                              },
+                              {
+                                "def": {
+                                  "type": "boolean"
+                                },
+                                "type": "boolean"
+                              },
+                              {
+                                "def": {
+                                  "type": "null"
+                                },
+                                "type": "null"
+                              }
+                            ]
+                          }
+                        },
+                        "type": "record",
+                        "keyType": {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string"
+                        },
+                        "valueType": {
+                          "def": {
+                            "type": "union",
+                            "options": [
+                              {
+                                "def": {
+                                  "type": "string"
+                                },
+                                "type": "string"
+                              },
+                              {
+                                "def": {
+                                  "type": "number",
+                                  "checks": []
+                                },
+                                "type": "number",
+                                "isFinite": true
+                              },
+                              {
+                                "def": {
+                                  "type": "boolean"
+                                },
+                                "type": "boolean"
+                              },
+                              {
+                                "def": {
+                                  "type": "null"
+                                },
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "type": "union",
+                          "options": [
+                            {
+                              "def": {
+                                "type": "string"
+                              },
+                              "type": "string"
+                            },
+                            {
+                              "def": {
+                                "type": "number",
+                                "checks": []
+                              },
+                              "type": "number",
+                              "isFinite": true
+                            },
+                            {
+                              "def": {
+                                "type": "boolean"
+                              },
+                              "type": "boolean"
+                            },
+                            {
+                              "def": {
+                                "type": "null"
+                              },
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      }
+                    },
+                    "type": "optional"
+                  }
+                }
+              },
+              "type": "object"
+            }
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "meta": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "Meta",
+          "description": "Metadane wykonania węzła",
+          "schema": {
+            "def": {
+              "type": "object",
+              "shape": {
+                "actualResolution": {
+                  "def": {
+                    "type": "enum",
+                    "entries": {
+                      "enums.resolution.1m": "enums.resolution.1m",
+                      "enums.resolution.3m": "enums.resolution.3m",
+                      "enums.resolution.5m": "enums.resolution.5m",
+                      "enums.resolution.15m": "enums.resolution.15m",
+                      "enums.resolution.30m": "enums.resolution.30m",
+                      "enums.resolution.1h": "enums.resolution.1h",
+                      "enums.resolution.4h": "enums.resolution.4h",
+                      "enums.resolution.1d": "enums.resolution.1d",
+                      "enums.resolution.1w": "enums.resolution.1w",
+                      "enums.resolution.1M": "enums.resolution.1M"
+                    }
+                  },
+                  "type": "enum",
+                  "enum": {
+                    "enums.resolution.1m": "enums.resolution.1m",
+                    "enums.resolution.3m": "enums.resolution.3m",
+                    "enums.resolution.5m": "enums.resolution.5m",
+                    "enums.resolution.15m": "enums.resolution.15m",
+                    "enums.resolution.30m": "enums.resolution.30m",
+                    "enums.resolution.1h": "enums.resolution.1h",
+                    "enums.resolution.4h": "enums.resolution.4h",
+                    "enums.resolution.1d": "enums.resolution.1d",
+                    "enums.resolution.1w": "enums.resolution.1w",
+                    "enums.resolution.1M": "enums.resolution.1M"
+                  },
+                  "options": [
+                    "enums.resolution.1m",
+                    "enums.resolution.3m",
+                    "enums.resolution.5m",
+                    "enums.resolution.15m",
+                    "enums.resolution.30m",
+                    "enums.resolution.1h",
+                    "enums.resolution.4h",
+                    "enums.resolution.1d",
+                    "enums.resolution.1w",
+                    "enums.resolution.1M"
+                  ]
+                },
+                "lookbackUsed": {
+                  "def": {
+                    "type": "number",
+                    "checks": [
+                      {
+                        "def": {
+                          "type": "number",
+                          "check": "number_format",
+                          "abort": false,
+                          "format": "safeint"
+                        },
+                        "type": "number",
+                        "isFinite": true
+                      },
+                      {}
+                    ]
+                  },
+                  "type": "number",
+                  "isFinite": true
+                },
+                "sparse": {
+                  "def": {
+                    "type": "optional",
+                    "innerType": {
+                      "def": {
+                        "type": "boolean"
+                      },
+                      "type": "boolean"
+                    }
+                  },
+                  "type": "optional"
+                }
+              }
+            },
+            "type": "object"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        }
+      },
+      "type": "custom-widget",
+      "schemaType": "object"
+    },
+    "executionMode": "via-execute-route",
+    "isAsync": true,
+    "instanceId": "local",
+    "category": "analytics",
+    "tags": ["vibe-sense"],
+    "aliases": ["credits-spent-by-source"],
+    "credits": 0
+  },
+  {
     "toolName": "credits-spent-by-users",
     "title": "Całe wydatki użytkowników (płatne + darmowe)",
     "titleShort": "Użytkownicy: całość",
