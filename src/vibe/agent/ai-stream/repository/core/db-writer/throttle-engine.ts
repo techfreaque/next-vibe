@@ -39,27 +39,37 @@ export class ThrottleEngine {
     }
     void (async (): Promise<void> => {
       try {
-        // Find all queued messages in this thread
-        const queued = await db
-          .select({ id: chatMessages.id, metadata: chatMessages.metadata })
-          .from(chatMessages)
-          .where(
-            sql`${chatMessages.threadId} = ${threadId}
-              AND ${chatMessages.role} = 'user'
-              AND ${chatMessages.metadata}->>'isQueued' = 'true'`,
-          );
-        if (queued.length === 0) {
-          return;
-        }
         const now = new Date();
-        await db
+        // Never move a queued message under its own descendant: when the user
+        // replies UNDER a still-queued message, the new stream's frontier
+        // descends from it, and re-parenting it there closes a parentId cycle
+        // (prod 2026-11-25: the cyclic thread pinned the renderer at 100% CPU).
+        // Exclude newParentId and every ancestor of it (cycle-safe walk).
+        const queued = await db
           .update(chatMessages)
           .set({ parentId: newParentId, updatedAt: now })
           .where(
             sql`${chatMessages.threadId} = ${threadId}
               AND ${chatMessages.role} = 'user'
-              AND ${chatMessages.metadata}->>'isQueued' = 'true'`,
-          );
+              AND ${chatMessages.metadata}->>'isQueued' = 'true'
+              AND ${chatMessages.id} NOT IN (
+                WITH RECURSIVE frontier_ancestors AS (
+                  SELECT id, parent_id, ARRAY[id] AS visited, 0 AS depth
+                  FROM chat_messages
+                  WHERE id = ${newParentId}
+                  UNION ALL
+                  SELECT m.id, m.parent_id, fa.visited || m.id, fa.depth + 1
+                  FROM chat_messages m
+                  INNER JOIN frontier_ancestors fa ON m.id = fa.parent_id
+                  WHERE m.id != ALL(fa.visited) AND fa.depth < 10000
+                )
+                SELECT id FROM frontier_ancestors
+              )`,
+          )
+          .returning({ id: chatMessages.id, metadata: chatMessages.metadata });
+        if (queued.length === 0) {
+          return;
+        }
         // Emit SSE for each queued message so the client tracks live
         for (const q of queued) {
           this.deps.wsEmit("message-created", {

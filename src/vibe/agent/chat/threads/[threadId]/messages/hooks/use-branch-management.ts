@@ -47,7 +47,7 @@ const EMPTY_BRANCH_INDICES: Record<string, number> = {};
  * Derive branchIndices by walking UP from leafMessageId through loaded messages.
  * For each node, find its index among its siblings (sorted by createdAt).
  */
-function deriveBranchIndices(
+export function deriveBranchIndices(
   messages: ChatMessage[],
   leafMessageId: string | null,
 ): Record<string, number> {
@@ -77,9 +77,12 @@ function deriveBranchIndices(
 
   const indices: Record<string, number> = {};
 
-  // Walk up from leaf
+  // Walk up from leaf. `visited` stops a corrupt parentId cycle: without it a
+  // cyclic thread pins the SSR renderer at 100% CPU forever.
+  const visited = new Set<string>();
   let currentId: string | null = leafMessageId;
-  while (currentId) {
+  while (currentId && !visited.has(currentId)) {
+    visited.add(currentId);
     const msg = byId.get(currentId);
     if (!msg) {
       break;

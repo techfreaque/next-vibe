@@ -59,8 +59,11 @@ export async function fetchBranchMessages(params: {
     // Start from parentMessageId (the message the new user message will reply to)
     // Walk up the chain INCLUDING this message
     let currentId: string | null = parentMessageId;
+    // A corrupt parentId cycle must end the walk instead of looping forever.
+    const visited = new Set<string>();
 
-    while (currentId) {
+    while (currentId && !visited.has(currentId)) {
+      visited.add(currentId);
       const msg = messageMap.get(currentId);
       if (!msg) {
         break;

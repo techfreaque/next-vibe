@@ -121,8 +121,11 @@ export class MessagePathRepositoryClient {
       // so we walk all the way to root)
       const ancestorChain: ChatMessage[] = [];
       let currentId: string | null = leafId;
+      // A corrupt parentId cycle must end the walk instead of looping forever.
+      const visited = new Set<string>();
 
-      while (currentId) {
+      while (currentId && !visited.has(currentId)) {
+        visited.add(currentId);
         const msg = byId.get(currentId);
         if (!msg) {
           break;

@@ -94,8 +94,12 @@ export function buildMessagePath(
   // the ancestry chain has gaps - it doesn't require a fully-connected tree from root to leaf.
   if (leafMessageId && messageIds.has(leafMessageId)) {
     const reversePath: ChatMessage[] = [];
+    // `onPath` guards every walk below: a corrupt parentId cycle in stored
+    // messages must end the walk, never spin the renderer forever.
+    const onPath = new Set<string>();
     let cur: string | null = leafMessageId;
-    while (cur && messageIds.has(cur)) {
+    while (cur && messageIds.has(cur) && !onPath.has(cur)) {
+      onPath.add(cur);
       const msg = byId.get(cur);
       if (!msg) {
         break;
@@ -119,6 +123,10 @@ export function buildMessagePath(
         realChildren.length > 0
           ? realChildren[realChildren.length - 1]!
           : children[children.length - 1]!;
+      if (onPath.has(child.id)) {
+        break;
+      }
+      onPath.add(child.id);
       reversePath.push(child);
       downCur = child.id;
     }
@@ -175,6 +183,7 @@ export function buildMessagePath(
   > = {};
 
   let currentMessage: ChatMessage | undefined;
+  const visited = new Set<string>();
   if (rootMessages.length > 1 && isRealBranch(rootMessages)) {
     // Default to last (most recent) branch when no explicit index is stored
     const rootBranchIndex =
@@ -192,7 +201,8 @@ export function buildMessagePath(
     currentMessage = rootMessages[0];
   }
 
-  while (currentMessage) {
+  while (currentMessage && !visited.has(currentMessage.id)) {
+    visited.add(currentMessage.id);
     path.push(currentMessage);
 
     const children = childrenMap.get(currentMessage.id);
