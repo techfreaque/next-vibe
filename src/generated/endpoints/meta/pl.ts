@@ -24629,6 +24629,17 @@ export const endpointsMeta: EndpointMeta[] = [
                 legacy: false,
               },
             ],
+            observedCostGaps: [
+              {
+                modelId: "claude-haiku-5.5",
+                apiProvider: "claude-code",
+                providerModel: "claude-haiku-5-5",
+                samples: 32,
+                medianRatio: 2.26,
+                listedUsd: 0.1812,
+                observedUsd: 0.4095,
+              },
+            ],
             sources: [
               { source: "openrouter", ok: true, modelCount: 674, error: null },
             ],
@@ -24726,6 +24737,17 @@ export const endpointsMeta: EndpointMeta[] = [
                 providerModel: "openai/gpt-5-image-mini",
                 expiresAt: "2026-12-01",
                 legacy: false,
+              },
+            ],
+            observedCostGaps: [
+              {
+                modelId: "claude-haiku-5.5",
+                apiProvider: "claude-code",
+                providerModel: "claude-haiku-5-5",
+                samples: 32,
+                medianRatio: 2.26,
+                listedUsd: 0.1812,
+                observedUsd: 0.4095,
               },
             ],
             sources: [

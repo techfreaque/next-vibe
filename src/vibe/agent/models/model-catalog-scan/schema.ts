@@ -47,6 +47,26 @@ export const catalogPriceChangeSchema = z.object({
 });
 export type CatalogPriceChange = z.infer<typeof catalogPriceChangeSchema>;
 
+/**
+ * A model whose listed token price is below what its turns really cost
+ * (median of single-step turns, rounding removed).
+ */
+export const catalogObservedCostGapSchema = z.object({
+  modelId: z.string(),
+  /** Listed price compared against: the model's first non-relay provider */
+  apiProvider: z.string(),
+  providerModel: z.string(),
+  samples: z.number(),
+  /** Median observed / listed cost per turn */
+  medianRatio: z.number(),
+  /** Sum over the samples, USD before markup */
+  listedUsd: z.number(),
+  observedUsd: z.number(),
+});
+export type CatalogObservedCostGap = z.infer<
+  typeof catalogObservedCostGapSchema
+>;
+
 /** One of our provider entries whose id is gone from the provider's list. */
 export const catalogMissingModelSchema = z.object({
   modelId: z.string(),
@@ -81,6 +101,8 @@ export const catalogReportSchema = z.object({
   priceChanges: z.array(catalogPriceChangeSchema),
   missingUpstream: z.array(catalogMissingModelSchema),
   deprecations: z.array(catalogDeprecationSchema),
+  /** Absent on reports stored before 2026-11-25 */
+  observedCostGaps: z.array(catalogObservedCostGapSchema).optional(),
   sources: z.array(catalogSourceStatusSchema),
 });
 export type CatalogReport = z.infer<typeof catalogReportSchema>;

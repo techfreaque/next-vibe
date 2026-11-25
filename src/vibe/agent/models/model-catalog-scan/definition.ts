@@ -133,6 +133,17 @@ const exampleReport: CatalogReport = {
       legacy: false,
     },
   ],
+  observedCostGaps: [
+    {
+      modelId: "claude-haiku-5.5",
+      apiProvider: "claude-code",
+      providerModel: "claude-haiku-5-5",
+      samples: 32,
+      medianRatio: 2.26,
+      listedUsd: 0.1812,
+      observedUsd: 0.4095,
+    },
+  ],
   sources: [{ source: "openrouter", ok: true, modelCount: 674, error: null }],
 };
 

@@ -2670,8 +2670,8 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "minimax/minimax-m2.7",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.21, // updated: 2026-11-07 from openrouter-api
-        outputTokenCost: 0.84, // updated: 2026-11-07 from openrouter-api
+        inputTokenCost: 0.6, // updated: 2026-11-25 from openrouter-api
+        outputTokenCost: 1.8, // updated: 2026-11-25 from openrouter-api
         cacheReadTokenCost: 0.05, // updated: 2026-11-15 from openrouter-api
       },
       {
@@ -3154,9 +3154,9 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "deepseek/deepseek-v4-pro",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.9, // updated: 2026-11-15 from openrouter-api
-        outputTokenCost: 1.5, // updated: 2026-11-15 from openrouter-api
-        cacheReadTokenCost: 0.25, // updated: 2026-11-15 from openrouter-api
+        inputTokenCost: 0.6373, // updated: 2026-11-25 from openrouter-endpoints
+        outputTokenCost: 1.5722, // updated: 2026-11-25 from openrouter-endpoints
+        cacheReadTokenCost: 0.21, // updated: 2026-11-25 from openrouter-endpoints
       },
       {
         id: ChatModelId.DEEPSEEK_V4_PRO,

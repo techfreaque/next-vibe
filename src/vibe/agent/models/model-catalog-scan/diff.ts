@@ -4,6 +4,11 @@
  * returns the report. Unit-tested in diff.test.ts.
  */
 
+import {
+  CREDIT_VALUE_USD,
+  STANDARD_MARKUP_PERCENTAGE,
+} from "@/products/constants";
+
 import { chatModelDefinitions } from "../../ai-stream/models";
 import { imageGenModelDefinitions } from "../../image-generation/models";
 import { musicGenModelDefinitions } from "../../music-generation/models";
@@ -12,10 +17,18 @@ import { ttsModelDefinitions } from "../../text-to-speech/models";
 import { videoGenModelDefinitions } from "../../video-generation/models";
 import { ModelUtility } from "../enum";
 import type { PriceUpdate } from "../model-prices/providers/base";
-import type { ModelDefinition, ModelProviderConfig } from "../models";
-import { ApiProvider } from "../models";
+import type {
+  ModelDefinition,
+  ModelProviderConfig,
+  ModelProviderConfigTokenBased,
+} from "../models";
+import { ApiProvider, calculateTokenCostUsd } from "../models";
 import {
   EMAIL_SECTION_LIMIT,
+  OBSERVED_COST_GAP_RATIO,
+  OBSERVED_COST_MIN_CREDITS,
+  OBSERVED_COST_MIN_SAMPLES,
+  OBSERVED_COST_ROUNDING_CREDITS,
   PRICE_CHANGE_SUSPECT_PERCENT,
   PRICE_CHANGE_THRESHOLD_PERCENT,
 } from "./constants";
@@ -23,6 +36,7 @@ import type {
   CatalogDeprecation,
   CatalogMissingModel,
   CatalogNewModel,
+  CatalogObservedCostGap,
   CatalogPriceChange,
   CatalogReport,
 } from "./schema";
@@ -354,7 +368,140 @@ export function findPriceChanges(
   );
 }
 
+// ── Observed cost vs listed price ───────────────────────────────────────────
+
+/** One finished assistant turn as stored (message metadata). */
+export interface ObservedCostSample {
+  modelId: string;
+  promptTokens: number;
+  completionTokens: number;
+  cachedInputTokens: number;
+  cacheWriteTokens: number;
+  /** Credits the turn was charged (upstream cost x markup, or listed price) */
+  creditCost: number;
+}
+
+function median(values: readonly number[]): number {
+  const sorted = values.toSorted((a, b) => a - b);
+  const mid = Math.floor(sorted.length / 2);
+  return sorted.length % 2 === 1
+    ? (sorted[mid] ?? 0)
+    : ((sorted[mid - 1] ?? 0) + (sorted[mid] ?? 0)) / 2;
+}
+
+function round4(value: number): number {
+  return Math.round(value * 10_000) / 10_000;
+}
+
+/** The token-priced config a model's fallback and estimates bill with. */
+function listedTokenConfig(
+  refs: readonly CatalogProviderRef[],
+  modelId: string,
+): (CatalogProviderRef & { config: ModelProviderConfigTokenBased }) | null {
+  for (const ref of refs) {
+    const { config } = ref;
+    if (
+      ref.role === "chat" &&
+      ref.modelId === modelId &&
+      // The relay provider resells our own price: never the upstream truth.
+      ref.apiProvider !== ApiProvider.UNBOTTLED &&
+      typeof config.creditCost === "function" &&
+      typeof config.inputTokenCost === "number" &&
+      typeof config.outputTokenCost === "number"
+    ) {
+      return { ...ref, config };
+    }
+  }
+  return null;
+}
+
+/**
+ * Chat models whose turns cost more than their listed token price says.
+ * Only turns that look single-step are used: message metadata keeps the LAST
+ * step's prompt tokens but the whole turn's charge, so multi-step turns
+ * (cached tokens above the prompt) would overstate the gap. The charge is
+ * taken back to USD without markup and minus the 0.1-credit round-up, so a
+ * model priced exactly right reads as <= 1.
+ */
+export function findObservedCostGaps(
+  samples: readonly ObservedCostSample[],
+  refs: readonly CatalogProviderRef[],
+): CatalogObservedCostGap[] {
+  const byModel = new Map<
+    string,
+    { ratios: number[]; listedUsd: number; observedUsd: number }
+  >();
+  const configs = new Map<string, ReturnType<typeof listedTokenConfig>>();
+  for (const sample of samples) {
+    if (
+      sample.promptTokens <= 0 ||
+      sample.creditCost < OBSERVED_COST_MIN_CREDITS ||
+      sample.cachedInputTokens + sample.cacheWriteTokens > sample.promptTokens
+    ) {
+      continue;
+    }
+    if (!configs.has(sample.modelId)) {
+      configs.set(sample.modelId, listedTokenConfig(refs, sample.modelId));
+    }
+    const ref = configs.get(sample.modelId);
+    if (!ref) {
+      continue;
+    }
+    const listedUsd = calculateTokenCostUsd(
+      ref.config,
+      sample.promptTokens,
+      sample.completionTokens,
+      sample.cachedInputTokens,
+      sample.cacheWriteTokens,
+    );
+    if (listedUsd <= 0) {
+      continue;
+    }
+    const observedUsd =
+      ((sample.creditCost - OBSERVED_COST_ROUNDING_CREDITS) *
+        CREDIT_VALUE_USD) /
+      (1 + STANDARD_MARKUP_PERCENTAGE);
+    const entry = byModel.get(sample.modelId) ?? {
+      ratios: [],
+      listedUsd: 0,
+      observedUsd: 0,
+    };
+    entry.ratios.push(observedUsd / listedUsd);
+    entry.listedUsd += listedUsd;
+    entry.observedUsd += observedUsd;
+    byModel.set(sample.modelId, entry);
+  }
+
+  const result: CatalogObservedCostGap[] = [];
+  for (const [modelId, entry] of byModel) {
+    const ref = configs.get(modelId);
+    const medianRatio = median(entry.ratios);
+    if (
+      !ref ||
+      entry.ratios.length < OBSERVED_COST_MIN_SAMPLES ||
+      medianRatio < OBSERVED_COST_GAP_RATIO
+    ) {
+      continue;
+    }
+    result.push({
+      modelId,
+      apiProvider: ref.apiProvider,
+      providerModel: ref.providerModel,
+      samples: entry.ratios.length,
+      medianRatio: Math.round(medianRatio * 100) / 100,
+      listedUsd: round4(entry.listedUsd),
+      observedUsd: round4(entry.observedUsd),
+    });
+  }
+  return result.toSorted((a, b) => b.medianRatio - a.medianRatio);
+}
+
 // ── Report text (email body + CLI/AI readable output) ──────────────────────
+
+/** A live price above our listed one: we bill below cost until it is fixed. */
+export function isUnderPriced(change: CatalogPriceChange): boolean {
+  return change.field !== "contextWindow" && change.newValue > change.oldValue;
+}
 
 function formatPrice(value: number | null): string {
   return value === null ? "?" : `$${value}`;
@@ -381,7 +528,10 @@ export function composeReportText(
   const day = scannedAt.toISOString().slice(0, 10);
   const uncensored = report.newModels.filter((m) => m.uncensored);
   const failedSources = report.sources.filter((s) => !s.ok);
-  const subject = `[unbottled] Model catalog scan ${day}: ${report.newModels.length} new, ${report.priceChanges.length} price changes, ${report.missingUpstream.length} gone`;
+  const costGaps = report.observedCostGaps ?? [];
+  const underPriced =
+    report.priceChanges.filter(isUnderPriced).length + costGaps.length;
+  const subject = `[unbottled] Model catalog scan ${day}: ${report.newModels.length} new, ${report.priceChanges.length} price changes${underPriced > 0 ? ` (${underPriced} UNDER-PRICED)` : ""}, ${report.missingUpstream.length} gone`;
 
   const lines: string[] = [
     `Model catalog scan ${scannedAt.toISOString()}`,
@@ -398,7 +548,14 @@ export function composeReportText(
     ...capped(
       report.priceChanges,
       (c) =>
-        `  ${c.suspect ? "[suspect, check fetcher] " : ""}${c.modelId} ${c.apiProvider} ${c.providerModel} ${c.field}: ${c.oldValue} -> ${c.newValue} (${c.changePercent > 0 ? "+" : ""}${c.changePercent}%)`,
+        `  ${c.suspect ? "[suspect, check fetcher] " : ""}${isUnderPriced(c) ? "[UNDER-PRICED, listed below live] " : ""}${c.modelId} ${c.apiProvider} ${c.providerModel} ${c.field}: ${c.oldValue} -> ${c.newValue} (${c.changePercent > 0 ? "+" : ""}${c.changePercent}%)`,
+    ),
+    "",
+    `LISTED BELOW OBSERVED COST (${costGaps.length}, median of single-step turns >= ${OBSERVED_COST_GAP_RATIO}x listed)`,
+    ...capped(
+      costGaps,
+      (g) =>
+        `  [UNDER-PRICED] ${g.modelId} ${g.apiProvider} ${g.providerModel}: turns cost ${g.medianRatio}x the listed price (${g.samples} turns, listed $${g.listedUsd}, observed $${g.observedUsd})`,
     ),
     "",
     `GONE UPSTREAM (${report.missingUpstream.length})`,

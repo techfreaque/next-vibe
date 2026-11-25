@@ -13,7 +13,10 @@ import {
   findDeprecations,
   findMissingUpstream,
   findNewModels,
+  findObservedCostGaps,
   findPriceChanges,
+  isUnderPriced,
+  type ObservedCostSample,
 } from "./diff";
 import type { UpstreamListing, UpstreamModel } from "./sources";
 
@@ -297,5 +300,132 @@ describe("catalog + report text", () => {
     expect(text.subject).toContain("2026-11-13");
     expect(text.subject).toContain("0 new");
     expect(text.body).not.toContain("—");
+  });
+});
+
+describe("findObservedCostGaps", () => {
+  // Listed $1 in / $2 out per 1M. 100k prompt + 50k completion = $0.2 listed.
+  const refs = [ref("a/model"), ref("b/model")];
+
+  /** A turn charged `ratio` x listed, as the stored credit charge. */
+  function turn(
+    modelId: string,
+    ratio: number,
+    overrides: Partial<ObservedCostSample> = {},
+  ): ObservedCostSample {
+    const listedUsd = 0.2;
+    return {
+      modelId,
+      promptTokens: 100_000,
+      completionTokens: 50_000,
+      cachedInputTokens: 0,
+      cacheWriteTokens: 0,
+      // observed USD = (credits - 0.1) * 0.01 / 1.3
+      creditCost: (listedUsd * ratio * 1.3) / 0.01 + 0.1,
+      ...overrides,
+    };
+  }
+
+  it("reports a model whose turns cost more than its listed price", () => {
+    const samples = [
+      ...Array.from({ length: 12 }, () => turn("ours-a/model", 2.4)),
+      ...Array.from({ length: 12 }, () => turn("ours-b/model", 1)),
+    ];
+    const result = findObservedCostGaps(samples, refs);
+    expect(result).toHaveLength(1);
+    expect(result[0]?.modelId).toBe("ours-a/model");
+    expect(result[0]?.medianRatio).toBe(2.4);
+    expect(result[0]?.samples).toBe(12);
+  });
+
+  it("needs enough samples and ignores multi-step and tiny turns", () => {
+    const samples = [
+      ...Array.from({ length: 9 }, () => turn("ours-a/model", 3)),
+      // Cached above the last step's prompt: a multi-step turn.
+      ...Array.from({ length: 5 }, () =>
+        turn("ours-a/model", 3, { cachedInputTokens: 200_000 }),
+      ),
+      ...Array.from({ length: 5 }, () =>
+        turn("ours-a/model", 3, { creditCost: 0.3 }),
+      ),
+    ];
+    expect(findObservedCostGaps(samples, refs)).toEqual([]);
+  });
+
+  it("skips relay-only and flat-priced models", () => {
+    const relay = ref("relay/model", {
+      apiProvider: ApiProvider.UNBOTTLED,
+      config: {
+        id: ChatModelId.GLM_5_3,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "relay/model",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 1,
+        outputTokenCost: 2,
+      },
+    });
+    const flat = ref("flat/model", {
+      config: {
+        id: ChatModelId.GLM_5_3,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "flat/model",
+        creditCost: 5,
+      },
+    });
+    const samples = [
+      ...Array.from({ length: 12 }, () => turn("ours-relay/model", 3)),
+      ...Array.from({ length: 12 }, () => turn("ours-flat/model", 3)),
+    ];
+    expect(findObservedCostGaps(samples, [relay, flat])).toEqual([]);
+  });
+});
+
+describe("under-priced markers", () => {
+  it("flags a live price above the listed one", () => {
+    const change = {
+      modelId: "m",
+      apiProvider: "openrouter",
+      providerModel: "a/model",
+      field: "inputTokenCost",
+      oldValue: 1.25,
+      newValue: 3,
+      changePercent: 140,
+      suspect: false,
+      source: "nano-gpt-api",
+    };
+    expect(isUnderPriced(change)).toBe(true);
+    expect(isUnderPriced({ ...change, oldValue: 3, newValue: 1.25 })).toBe(
+      false,
+    );
+    expect(
+      isUnderPriced({ ...change, field: "contextWindow", newValue: 9 }),
+    ).toBe(false);
+
+    const text = composeReportText(
+      {
+        newSince: "2026-11-07T00:00:00.000Z",
+        newModels: [],
+        priceChanges: [change],
+        missingUpstream: [],
+        deprecations: [],
+        observedCostGaps: [
+          {
+            modelId: "g",
+            apiProvider: "nano-gpt",
+            providerModel: "z/g",
+            samples: 20,
+            medianRatio: 2.4,
+            listedUsd: 1,
+            observedUsd: 2.4,
+          },
+        ],
+        sources: [],
+      },
+      new Date("2026-11-25T06:40:00Z"),
+    );
+    expect(text.subject).toContain("2 UNDER-PRICED");
+    expect(text.body).toContain("[UNDER-PRICED, listed below live] m");
+    expect(text.body).toContain("LISTED BELOW OBSERVED COST (1");
+    expect(text.body).toContain("2.4x the listed price");
   });
 });

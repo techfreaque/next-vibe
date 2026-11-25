@@ -30,6 +30,29 @@ export const PRICE_CHANGE_THRESHOLD_PERCENT = 1;
  */
 export const PRICE_CHANGE_SUSPECT_PERCENT = 500;
 
+/**
+ * Observed-cost check: what assistant turns REALLY cost (upstream cost x
+ * markup, stored as the message creditCost) vs what the listed token prices
+ * say for the same tokens. Catches listed prices below the real upstream
+ * cost, which the no-cost-reported fallback and pre-flight estimates bill.
+ */
+export const OBSERVED_COST_WINDOW_DAYS = 14;
+
+/** Rows read per scan (newest first), so a busy prod DB stays cheap. */
+export const OBSERVED_COST_MAX_ROWS = 20_000;
+
+/** A model needs this many usable turns before a gap is reported. */
+export const OBSERVED_COST_MIN_SAMPLES = 10;
+
+/** Turns cheaper than this are dominated by the 0.1-credit rounding. */
+export const OBSERVED_COST_MIN_CREDITS = 0.5;
+
+/** Charges round UP to this step; subtracted so rounding never reads as a gap. */
+export const OBSERVED_COST_ROUNDING_CREDITS = 0.1;
+
+/** Median observed/listed ratio from which a model is reported. */
+export const OBSERVED_COST_GAP_RATIO = 1.15;
+
 /** Per-fetcher timeout so one hanging provider never stalls the scan. */
 export const SOURCE_TIMEOUT_MS = 60_000;
 

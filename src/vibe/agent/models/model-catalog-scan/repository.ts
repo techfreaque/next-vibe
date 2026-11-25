@@ -7,7 +7,7 @@
 
 import "server-only";
 
-import { desc, eq } from "drizzle-orm";
+import { and, desc, eq, gte, isNotNull, sql } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
@@ -22,6 +22,8 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import { CampaignType } from "@/messenger/accounts/enum";
 import { EmailSendingRepository } from "@/messenger/providers/email/smtp-client/email-sending/repository";
 
+import { chatMessages } from "../../chat/db";
+import { ChatMessageRole } from "../../chat/enum";
 import type {
   PriceFetcher,
   ProviderPriceResult,
@@ -46,6 +48,8 @@ import {
   HISTORY_LIMIT,
   LOOKBACK_MARGIN_HOURS,
   MODEL_CATALOG_REPORT_RECIPIENTS,
+  OBSERVED_COST_MAX_ROWS,
+  OBSERVED_COST_WINDOW_DAYS,
   SCAN_INTERVAL_DAYS,
   SCAN_INTERVAL_GRACE_HOURS,
   SOURCE_TIMEOUT_MS,
@@ -62,7 +66,9 @@ import {
   findDeprecations,
   findMissingUpstream,
   findNewModels,
+  findObservedCostGaps,
   findPriceChanges,
+  type ObservedCostSample,
 } from "./diff";
 import type { ModelCatalogScanT } from "./i18n";
 import { ModelCatalogScanEmail } from "./report-email";
@@ -125,6 +131,60 @@ async function runFetcher(
     return failed(parseError(error).message);
   } finally {
     clearTimeout(timer);
+  }
+}
+
+function finiteOrZero(value: number | undefined): number {
+  return typeof value === "number" && Number.isFinite(value) ? value : 0;
+}
+
+/**
+ * Recent assistant turns with their tokens and charge, for the observed-cost
+ * check. Incognito turns are never stored server-side, so this covers stored
+ * threads only. A failed read only drops that section, never the scan.
+ */
+async function loadObservedCostSamples(
+  now: Date,
+  logger: EndpointLogger,
+): Promise<ObservedCostSample[]> {
+  try {
+    const rows = await db
+      .select({ model: chatMessages.model, metadata: chatMessages.metadata })
+      .from(chatMessages)
+      .where(
+        and(
+          eq(chatMessages.role, ChatMessageRole.ASSISTANT),
+          isNotNull(chatMessages.model),
+          gte(
+            chatMessages.createdAt,
+            new Date(now.getTime() - OBSERVED_COST_WINDOW_DAYS * DAY_MS),
+          ),
+          sql`${chatMessages.metadata} ? 'creditCost'`,
+          sql`${chatMessages.metadata} ? 'promptTokens'`,
+        ),
+      )
+      .orderBy(desc(chatMessages.createdAt))
+      .limit(OBSERVED_COST_MAX_ROWS);
+    return rows.flatMap((row): ObservedCostSample[] =>
+      row.model && row.metadata
+        ? [
+            {
+              modelId: row.model,
+              promptTokens: finiteOrZero(row.metadata.promptTokens),
+              completionTokens: finiteOrZero(row.metadata.completionTokens),
+              cachedInputTokens: finiteOrZero(row.metadata.cachedInputTokens),
+              cacheWriteTokens: finiteOrZero(row.metadata.cacheWriteTokens),
+              creditCost: finiteOrZero(row.metadata.creditCost),
+            },
+          ]
+        : [],
+    );
+  } catch (error) {
+    logger.error(
+      "Model catalog scan: observed-cost samples failed",
+      parseError(error),
+    );
+    return [];
   }
 }
 
@@ -210,11 +270,12 @@ export class ModelCatalogScanRepository {
           )
         : new Date(now.getTime() - FIRST_SCAN_LOOKBACK_DAYS * DAY_MS);
 
-      const [listings, priceResults] = await Promise.all([
+      const [listings, priceResults, costSamples] = await Promise.all([
         fetchUpstreamListings(logger),
         Promise.all(
           createPriceFetchers().map((fetcher) => runFetcher(fetcher, logger)),
         ),
+        loadObservedCostSamples(now, logger),
       ]);
 
       const refs = collectCatalogRefs();
@@ -241,6 +302,7 @@ export class ModelCatalogScanRepository {
         ),
         missingUpstream: findMissingUpstream(listings, refs),
         deprecations: findDeprecations(listings, refs),
+        observedCostGaps: findObservedCostGaps(costSamples, refs),
         sources,
       };
 
@@ -314,6 +376,7 @@ export class ModelCatalogScanRepository {
         priceChanges: report.priceChanges.length,
         missingUpstream: report.missingUpstream.length,
         deprecations: report.deprecations.length,
+        observedCostGaps: report.observedCostGaps?.length ?? 0,
       });
 
       return success({
