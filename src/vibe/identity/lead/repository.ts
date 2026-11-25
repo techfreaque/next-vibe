@@ -32,6 +32,7 @@ import {
 import { parseError } from "../../core/utils/parse-error";
 import { sanitizeLeadUrlMetadata } from "../../core/utils/telemetry-url";
 import { db, describeAppPoolCheckouts, rawPool } from "../../database";
+import { databaseFailureDiagnostics } from "../../database/error-diagnostics";
 import { withTransaction } from "../../database/utils/repository-helpers";
 import type { EndpointLogger } from "../../logger/types";
 import { users } from "../user/db";
@@ -1039,6 +1040,7 @@ export class LeadsRepository {
     t: LeadsT,
   ): Promise<ResponseType<LeadDetailResponse>> {
     let stage = "write-lead";
+    const startedAt = performance.now();
     try {
       logger.debug("Updating lead (internal)", {
         id,
@@ -1087,16 +1089,13 @@ export class LeadsRepository {
       return success(LeadsRepository.formatLeadDetailResponse(updatedLead));
     } catch (error) {
       const parsed = parseError(error);
-      const cause = parsed.cause instanceof Error ? parsed.cause : parsed;
       logger.error("Error updating lead (internal)", parsed, {
+        ...databaseFailureDiagnostics(error instanceof Error ? error : parsed),
         stage,
         fields: Object.keys(data).toSorted().join(","),
-        databaseCode:
-          "code" in cause &&
-          typeof cause.code === "string" &&
-          /^[0-9A-Z]{5}$/.test(cause.code)
-            ? cause.code
-            : null,
+        elapsedMs: Math.round(performance.now() - startedAt),
+        poolTotal: rawPool.totalCount,
+        poolIdle: rawPool.idleCount,
         poolWaiting: rawPool.waitingCount,
         poolCheckouts: describeAppPoolCheckouts(),
       });

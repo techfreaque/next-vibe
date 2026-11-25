@@ -145,6 +145,15 @@ http://:{s1_ingress} {{
             assert response.status == 200 and response.getheader("X-HA-Upstream") == local_app, (response.status, response.getheaders(), body, own.calls, peer.calls)
             assert json.loads(body) == ["POST", "/checkout?q=12", "signed-payload", "fixture=1"]
             assert own.calls == [("POST", "/checkout?q=12")] and not peer.calls
+            own.ready, own.failure_status, own.reason = False, 503, "v1-renderer-not-listening"
+            own.calls.clear()
+            response, body = request("/checkout?renderer-starting", "POST", "signed-once")
+            assert response.status == 200 and json.loads(body) == ["POST", "/checkout?renderer-starting", "signed-once", "fixture=1"]
+            assert not own.calls and peer.calls == [("POST", "/checkout?renderer-starting")]
+            own.ready = True
+            peer.calls.clear()
+            # Allow the active health check to clear the deliberate rejection.
+            time.sleep(2.2)
             for status, reason, disconnected in [
                 (404, None, False), (503, None, False),
                 (503, "v1-renderer-unavailable", False), (503, "v1-unknown", False),

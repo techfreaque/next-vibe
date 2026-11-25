@@ -570,6 +570,7 @@ export class LeadTrackingRepository {
             }
 
             // Update lead status
+            const writeStartedAt = performance.now();
             const updateResult = await LeadsRepository.updateLeadInternal(
               leadId,
               {
@@ -589,6 +590,7 @@ export class LeadTrackingRepository {
                 error: updateResult.message,
                 errorKey: updateResult.errorType.errorKey,
                 errorCode: updateResult.errorType.errorCode,
+                writeElapsedMs: Math.round(performance.now() - writeStartedAt),
               });
               return fail({
                 message: t("tracking.errors.default"),

@@ -92,14 +92,14 @@ describe("threadSchedulerDelta", () => {
     ).toBeUndefined();
   });
 
-  it("samples the calling thread when Linux exposes schedstat", () => {
-    const before = readThreadSchedulerSample();
+  it("samples the main thread when Linux exposes schedstat", async () => {
+    const before = await readThreadSchedulerSample();
     if (before) {
       const target = performance.now() + 10;
       while (performance.now() < target) {
         // Burn CPU on the calling thread.
       }
-      const delta = threadSchedulerDelta(before, readThreadSchedulerSample());
+      const delta = threadSchedulerDelta(before, await readThreadSchedulerSample());
       expect(delta?.stallThreadCpuMs).toBeGreaterThan(0);
     }
   });

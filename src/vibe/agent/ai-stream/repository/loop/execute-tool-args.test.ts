@@ -100,6 +100,16 @@ describe("normalizeExecuteToolArgs", () => {
     expect(normalizeExecuteToolArgs(args)).toEqual(args);
   });
 
+  it("parses a standalone JSON code block as wrapper input", () => {
+    expect(normalizeExecuteToolArgs({
+      toolName: "rename-thread",
+      input: '```json\n{"title":"Example"}\n```',
+    })).toEqual({
+      toolName: "rename-thread",
+      input: { title: "Example" },
+    });
+  });
+
   it("unwraps a nested call whose inner input is a JSON string", () => {
     expect(
       normalizeExecuteToolArgs({

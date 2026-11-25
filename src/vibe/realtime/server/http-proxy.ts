@@ -25,7 +25,11 @@ import { sanitizeRoutePath } from "../../logger/client-context";
 import type { EndpointLogger } from "../../logger/types";
 import { mintRequestId } from "../../logger/with-log-context";
 import { serverSystemEnv } from "../../platforms/web/env";
-import { proxyTimingHeader, readProxyTimingHeader } from "../core/proxy-timing";
+import {
+  proxyTimingHeader,
+  readLeadFailureTimingHeader,
+  readProxyTimingHeader,
+} from "../core/proxy-timing";
 import { databaseAdmission, databaseUnavailable } from "./database-admission";
 import { PROXY_LOADING_HTML } from "./proxy-loading-page";
 
@@ -270,6 +274,11 @@ export async function handleHttpProxy(
               method: req.method,
               status,
               contentType: responseContentType,
+              leadFailurePhase: readLeadFailureTimingHeader(
+                typeof proxyRes.headers["server-timing"] === "string"
+                  ? proxyRes.headers["server-timing"]
+                  : null,
+              ),
               elapsedMs: lastUpstreamOkAt - proxyStartMs,
               previousUpstreamResponseAgeMs:
                 previousUpstreamResponseAt > 0

@@ -66,7 +66,13 @@ import {
   describeSubscribeIdentity,
   isRequestedUidLinkedLead,
 } from "./ws-channel-auth";
-import { diagnoseWsClose, WS_IDLE_TIMEOUT_SECONDS } from "./ws-keepalive";
+import {
+  diagnoseWsClose,
+  WS_HEARTBEAT_TIMEOUT_CODE,
+  WS_HEARTBEAT_TIMEOUT_REASON,
+  WS_IDLE_TIMEOUT_SECONDS,
+  WS_PING_INTERVAL_MS,
+} from "./ws-keepalive";
 
 // ============================================================================
 // CHANNEL REGISTRY (singleton)
@@ -116,9 +122,6 @@ function isLoopbackAddress(addr: string): boolean {
     addr.startsWith("127.")
   );
 }
-
-/** Set to true during shutdown to suppress expected proxy errors */
-let shuttingDown = false;
 
 /** RFC 6455 1012 "Service Restart": sent to every client on a clean stop. */
 const WS_SERVER_RESTART_CODE = 1012;
@@ -430,6 +433,10 @@ export function startWebSocketServer(
   // so Chrome's localhost→[::1] resolution works alongside IPv4 curl/fetch.
   const { port, logger, hostname = "::" } = options;
   const nextPort = options.appPort ?? port + NEXT_PORT_OFFSET;
+  let shuttingDown = false;
+  const heartbeatSockets = new Set<
+    ServerWebSocket<WsConnectionDataWithProxy>
+  >();
 
   const server = Bun.serve<WsConnectionDataWithProxy>({
     port,
@@ -688,11 +695,10 @@ export function startWebSocketServer(
     },
 
     websocket: {
-      // Explicit keepalive (see ws-keepalive.ts): Bun's default 120 s left an
-      // idle socket silent for ~104 s, so 60 s middlebox idle limits on the
-      // client's network cut it with 1006 in a reconnect loop.
-      idleTimeout: WS_IDLE_TIMEOUT_SECONDS,
-      sendPings: true,
+      // The timer below enforces the inbound deadline. Bun's native ping
+      // writes refresh its idle timer.
+      idleTimeout: 255,
+      sendPings: false,
 
       pong(ws): void {
         ws.data.lastInboundAt = Date.now();
@@ -700,8 +706,13 @@ export function startWebSocketServer(
         ws.data.lastInboundFrame = "pong";
         ws.data.pongCount++;
       },
+      ping(ws): void {
+        ws.data.lastInboundAt = Date.now();
+        ws.data.lastInboundFrame = "ping";
+      },
 
       open(ws): void {
+        heartbeatSockets.add(ws);
         // Proxy connection - wire up upstream → browser bridging
         if (ws.data.proxyWs) {
           const upstream = ws.data.proxyWs;
@@ -745,6 +756,7 @@ export function startWebSocketServer(
       },
 
       async message(ws, raw): Promise<void> {
+        ws.data.lastInboundAt = Date.now();
         // Proxy connection - forward browser → upstream
         if (ws.data.proxyWs) {
           try {
@@ -755,7 +767,6 @@ export function startWebSocketServer(
           return;
         }
         // Normal /ws connection
-        ws.data.lastInboundAt = Date.now();
         try {
           const rawStr =
             typeof raw === "string" ? raw : new TextDecoder().decode(raw);
@@ -861,6 +872,7 @@ export function startWebSocketServer(
       },
 
       close(ws, code, reason): void {
+        heartbeatSockets.delete(ws);
         // Proxy connection - close upstream
         if (ws.data.proxyWs) {
           ws.data.proxyWs.close();
@@ -883,9 +895,9 @@ export function startWebSocketServer(
           // A reasonless 1006 can indicate an idle timeout or a network drop.
           // Keep that distinction and correlate with the browser close log.
           logger.warn(
-            diagnosis.meta.idleEvidence === "bun-close-reason"
-              ? "[WS] Closed idle socket - client stopped answering pings"
-              : "[WS] Socket closed after inactivity without a close reason",
+            diagnosis.meta.idleEvidence === "silent-window"
+              ? "[WS] Socket closed after inactivity without a close reason"
+              : "[WS] Closed idle socket - client stopped answering pings",
             diagnosis.meta,
           );
         } else if (diagnosis?.kind === "dropped") {
@@ -919,11 +931,30 @@ export function startWebSocketServer(
   const replayTouchTimer = setInterval(() => {
     getPubSubAdapter().touchReplay([...channels.keys()]);
   }, REPLAY_TOUCH_INTERVAL_MS);
+  const heartbeatTimer = setInterval(() => {
+    const now = Date.now();
+    for (const ws of heartbeatSockets) {
+      if (
+        ws.data.lastPingAt !== undefined &&
+        now - ws.data.lastInboundAt >= WS_IDLE_TIMEOUT_SECONDS * 1000
+      ) {
+        ws.close(WS_HEARTBEAT_TIMEOUT_CODE, WS_HEARTBEAT_TIMEOUT_REASON);
+        continue;
+      }
+      const result = ws.ping("vibe");
+      if (result !== 0) {
+        ws.data.lastPingAt = now;
+        ws.data.pingCount = (ws.data.pingCount ?? 0) + 1;
+        ws.data.lastPingBackpressured = result < 0;
+      }
+    }
+  }, WS_PING_INTERVAL_MS);
 
   return {
     stop: (): void => {
       shuttingDown = true;
       clearInterval(replayTouchTimer);
+      clearInterval(heartbeatTimer);
       clearLocalBroadcast();
       // Close every client socket with 1012 "Service Restart" + a reason
       // first, so the browser's "[WS Client] Connection lost" row says the

@@ -65,6 +65,23 @@ function sse(events: string[]): Response {
   );
 }
 
+function interruptedSse(events: string[]): Response {
+  const chunks = events.values();
+  return new Response(
+    new ReadableStream<Uint8Array>({
+      pull(controller): void {
+        const next = chunks.next();
+        if (next.done) {
+          controller.error(new Error("fixture upstream body interrupted"));
+          return;
+        }
+        controller.enqueue(encoder.encode(next.value));
+      },
+    }),
+    { headers: { "content-type": "text/event-stream" } },
+  );
+}
+
 /** Words → content chunks of a few chars, like a real stream. */
 function words(provider: string, text: string): string[] {
   return (text.match(/[\s\S]{1,6}/gu) ?? []).map((part) =>
@@ -258,6 +275,28 @@ describe("garbled guard: non-streaming (/v1 generate)", () => {
 });
 
 describe("garbled guard through the real OpenRouter provider", () => {
+  it("retries an interrupted HTTP 200 stream on a different host", async () => {
+    const upstream = fakeFetch([
+      () => interruptedSse(words("BadHost", CLEAN_ANSWER)),
+      () => sse([chunk("Wafer", { content: "Recovered answer." }), finish("Wafer")]),
+    ]);
+    const text = await run(upstream, true);
+    expect(text).toContain('"rule":"upstream-body-read"');
+    expect(text).toContain("Recovered answer.");
+    expect(upstream.bodies[1]?.["provider"]).toEqual({
+      sort: "price",
+      allow_fallbacks: true,
+      ignore: ["BadHost"],
+    });
+  });
+
+  it("leaves an interrupted stream visible without retrying an emitted tool call", async () => {
+    const tool = 'data: {"provider":"BadHost","choices":[{"delta":{"tool_calls":[{}]}}]}\n\n';
+    const upstream = fakeFetch([() => interruptedSse([tool])]);
+    await expect(run(upstream, true)).rejects.toThrow("fixture upstream body interrupted");
+    expect(upstream.bodies).toHaveLength(1);
+  });
+
   it("SDK sees the retry; the marker arrives as a raw part", async () => {
     const bad = [
       ...words("BadHost", CLEAN_ANSWER),
@@ -269,7 +308,7 @@ describe("garbled guard through the real OpenRouter provider", () => {
 
     const provider = createOpenRouter({
       apiKey: "test",
-      fetch: async (url, init) => {
+      fetch: Object.assign(async (url: string | URL | Request, init?: RequestInit) => {
         const headers = new Headers(init?.headers);
         const replace = headers.get(GARBLED_REPLACE_HEADER) === "1";
         headers.delete(GARBLED_REPLACE_HEADER);
@@ -281,7 +320,7 @@ describe("garbled guard through the real OpenRouter provider", () => {
           serialize: (b) => JSON.stringify(b),
           replaceAfterRelease: replace,
         });
-      },
+      }, { preconnect: fetch.preconnect }),
     });
     const result = streamText({
       model: provider.chat("deepseek/deepseek-v4.1-flash-1017"),

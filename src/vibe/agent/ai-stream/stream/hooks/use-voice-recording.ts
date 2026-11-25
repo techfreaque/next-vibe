@@ -128,6 +128,8 @@ export function useVoiceRecording({
         permissionState: details?.permissionState ?? null,
         audioInputCount: details?.audioInputCount ?? null,
         isSecureContext: details?.isSecureContext ?? null,
+        promptDismissed: details?.promptDismissed ?? null,
+        requestDurationMs: details?.requestDurationMs ?? null,
       });
     },
     [logger],

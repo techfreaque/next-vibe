@@ -136,28 +136,18 @@ export function ErrorMessageBubble({
         structuredErrorKey,
         streamErrorKey: message.metadata?.streamError?.key,
         streamErrorStatus: message.metadata?.streamError?.status,
+        followsPartialAnswer: followsPartialAnswer(message, messages),
+        presentedErrorCode:
+          message.metadata?.streamError?.status ??
+          structuredErrorCode ??
+          message.errorCode,
         errorPayloadFormat: structuredErrorKey ? "structured" : "plain",
         localOnly: message.metadata?.isLocalOnly === true,
         errorText: errorText.slice(0, 300),
         ageMs,
       },
     );
-  }, [
-    logger,
-    message.id,
-    message.createdAt,
-    message.threadId,
-    message.parentId,
-    message.model,
-    message.skill,
-    message.errorType,
-    message.errorCode,
-    message.metadata?.isLocalOnly,
-    message.metadata?.streamError?.key,
-    message.metadata?.streamError?.status,
-    message.content,
-    rootFolderId,
-  ]);
+  }, [logger, message, messages, rootFolderId]);
 
   // The turn that failed: nearest user message up the parent chain. Retry
   // re-sends it through the same op as the user-message retry button.

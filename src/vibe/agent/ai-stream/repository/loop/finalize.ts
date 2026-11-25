@@ -320,11 +320,13 @@ export async function complete(
     streamResult.warnings,
   ]);
 
+  const providerErrorText = state.p.ctx.lastProviderErrorText;
+  const providerFailed = finishReason === "error" || providerErrorText !== null;
+  const providerKey = providerErrorTranslationKey(providerErrorText);
   if (finishReason === "error") {
     // The provider's error part (if any) was already logged where it arrived,
     // classified transient (warn) vs real (error). Only a finishReason=error
     // with NO error part is unexplained - that one stays an error.
-    const providerErrorText = state.p.ctx.lastProviderErrorText;
     const rawFinishReason = await Promise.resolve(
       streamResult.rawFinishReason,
     ).catch(() => null);
@@ -339,7 +341,7 @@ export async function complete(
             ? rawFinishReason
             : null,
         providerErrorPartReceived: providerErrorText !== null,
-        providerFailureKey: providerErrorTranslationKey(providerErrorText),
+        providerFailureKey: providerKey,
         apiProvider: modelConfig.apiProvider,
         providerModel: modelConfig.providerModel,
         offeredToolCount: Object.keys(state.p.tools ?? {}).length,
@@ -385,6 +387,9 @@ export async function complete(
   // DB write ordering:
   //   content flush → token metadata → credit deduction
   const { ctx, ttsHandler, user, t } = state.p;
+  const budgetMessageKey = ctx.creditBudgetStopped
+    ? "errors.insufficientCredits"
+    : "errors.creditBudgetReached";
   const usage = {
     inputTokens: finalInputTokens,
     outputTokens: finalOutputTokens,
@@ -470,10 +475,11 @@ export async function complete(
     // some providers report "stop" (not "length") when max_tokens runs out
     // mid-reasoning (prod 2026-11-17, deepseek-v4-pro guests).
     const budgetCut =
-      ctx.creditBudgetStopped ||
-      (ctx.creditBudgetCapped &&
-        (finishReason === "length" ||
-          (isEmptyAnswer && finishReason !== "content-filter")));
+      !providerFailed &&
+      finishReason !== "content-filter" &&
+      (ctx.creditBudgetStopped ||
+        (ctx.creditBudgetCapped &&
+          (finishReason === "length" || isEmptyAnswer)));
     if (budgetCut) {
       logger.warn("[AI Stream] Turn cut short by the remaining balance", {
         threadId,
@@ -496,57 +502,46 @@ export async function complete(
         threadId,
         errorType: StreamErrorType.STREAM_ERROR,
         error: fail({
-          message: t("errors.creditBudgetReached"),
+          message: t(budgetMessageKey),
           errorType: ErrorResponseTypes.PAYMENT_REQUIRED,
         }),
-        content: t("errors.creditBudgetReached"),
+        content: t(budgetMessageKey),
         parentId: ctx.lastParentId,
         sequenceId: ctx.lastSequenceId,
         user,
       });
-    } else if (isEmptyAnswer && finishReason !== "content-filter") {
+    } else if (
+      (isEmptyAnswer || providerFailed) &&
+      finishReason !== "content-filter"
+    ) {
       // The turn created a message but never answered (reasoning-only, or
       // tool calls with no reply): without this the user sees a
       // blank/thinking-only bubble with a charge. content-filter already
       // showed its own message.
-      const [rawFinishReason, toolCalls] = await Promise.all([
-        streamResult.rawFinishReason,
-        streamResult.toolCalls,
-      ]);
-      logger.warn("[AI Stream] Turn ended without answer text", {
-        threadId,
-        model,
-        apiProvider: modelConfig.apiProvider,
-        providerModel: modelConfig.providerModel,
-        finishReason: finishReason ?? null,
-        rawFinishReason: rawFinishReason ?? null,
-        offeredToolCount: Object.keys(state.p.tools ?? {}).length,
-        finalStepToolCallCount: toolCalls.length,
-        steps: ctx.tokenStepCount,
-        outputTokens: usage.outputTokens,
-        reasoningTokens,
-        creditCost: actualCreditCost,
-        creditCostBeforeMarkupWaiver: fullCreditCost,
-      });
-      await ctx.dbWriter.emitErrorMessage({
-        threadId,
-        errorType: StreamErrorType.STREAM_ERROR,
-        error: fail({
-          message: t("errors.emptyAnswer"),
-          errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-        }),
-        content: t("errors.emptyAnswer"),
-        parentId: ctx.lastParentId,
-        sequenceId: ctx.lastSequenceId,
-        user,
-      });
-    } else if (finishReason === "error") {
-      // The provider failed mid-answer (e.g. NanoGPT "final tool call was
-      // malformed"): the partial reply stays, but without a note it reads as
-      // a finished answer that just stops. Say it broke off, and why if known.
-      const errorKey =
-        providerErrorTranslationKey(ctx.lastProviderErrorText) ??
-        "errors.streamError";
+      if (isEmptyAnswer) {
+        const [rawFinishReason, toolCalls] = await Promise.all([
+          streamResult.rawFinishReason,
+          streamResult.toolCalls,
+        ]);
+        logger.warn("[AI Stream] Turn ended without answer text", {
+          threadId,
+          model,
+          apiProvider: modelConfig.apiProvider,
+          providerModel: modelConfig.providerModel,
+          finishReason: finishReason ?? null,
+          rawFinishReason: rawFinishReason ?? null,
+          offeredToolCount: Object.keys(state.p.tools ?? {}).length,
+          finalStepToolCallCount: toolCalls.length,
+          steps: ctx.tokenStepCount,
+          outputTokens: usage.outputTokens,
+          reasoningTokens,
+          creditCost: actualCreditCost,
+          creditCostBeforeMarkupWaiver: fullCreditCost,
+        });
+      }
+      const errorKey = providerFailed
+        ? (providerKey ?? "errors.streamError")
+        : "errors.emptyAnswer";
       await ctx.dbWriter.emitErrorMessage({
         threadId,
         errorType: StreamErrorType.STREAM_ERROR,
@@ -604,26 +599,23 @@ export async function complete(
     // A content filter already emitted its specific error above. All other
     // empty streams need a visible explanation, including balance caps.
     if (finishReason !== "content-filter") {
-      const providerKey =
-        finishReason === "error"
-          ? providerErrorTranslationKey(ctx.lastProviderErrorText)
-          : null;
-      const emptyKey =
-        providerKey ??
-        (ctx.creditBudgetCapped
-          ? "errors.creditBudgetReached"
+      const emptyKey = providerFailed
+        ? (providerKey ?? "errors.streamError")
+        : ctx.creditBudgetStopped || ctx.creditBudgetCapped
+          ? budgetMessageKey
           : actualCreditCost > 0
             ? "errors.emptyAnswer"
-            : "errors.noResponse");
+            : "errors.noResponse";
       await ctx.dbWriter.emitErrorMessage({
         threadId,
         errorType: StreamErrorType.STREAM_ERROR,
         error: fail({
           message: t(emptyKey),
           errorType:
-            emptyKey === "errors.creditBudgetReached"
+            emptyKey === "errors.creditBudgetReached" ||
+            emptyKey === "errors.insufficientCredits"
               ? ErrorResponseTypes.PAYMENT_REQUIRED
-              : providerKey
+              : providerFailed
                 ? ErrorResponseTypes.EXTERNAL_SERVICE_ERROR
                 : ErrorResponseTypes.INTERNAL_ERROR,
         }),

@@ -38,6 +38,7 @@ import {
   markDegradedPublicDocument,
 } from "../../../platforms/web/middleware/public-document";
 import { shouldSkipPath } from "../../../platforms/web/middleware/utils";
+import { leadFailureTimingHeader } from "../../../realtime/core/proxy-timing";
 import {
   GUEST_LEAD_DB_BUDGET_MS,
   GuestLeadDatabaseDeadlineError,
@@ -254,6 +255,7 @@ export function leadFailureResponse(
       status,
       headers: {
         "Cache-Control": "no-store",
+        "Server-Timing": leadFailureTimingHeader(creationStage ?? "lookup"),
         ...(status === 503 ? { "Retry-After": "5" } : {}),
       },
     },
@@ -272,10 +274,15 @@ export async function recordAttributionWithinBudget(
       deadlineMs,
     );
   } catch (error) {
-    logger.error(
-      "Guest attribution failed in middleware",
-      databaseFailureDiagnostics(parseError(error)),
-    );
+    const requestId = request.headers.get(REQUEST_ID_HEADER_NAME);
+    logger.error("Guest attribution failed in middleware", {
+      ...databaseFailureDiagnostics(parseError(error)),
+      method: request.method,
+      path: sanitizeRoutePath(request.nextUrl.pathname),
+      requestId:
+        requestId && UUID_REGEX.test(requestId) ? requestId : undefined,
+      budgetOverrunMs: Math.max(0, Math.round(performance.now() - deadlineMs)),
+    });
   }
 }
 

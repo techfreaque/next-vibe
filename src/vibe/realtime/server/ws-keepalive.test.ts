@@ -8,7 +8,13 @@ import { describe, expect, it } from "bun:test";
 
 import { UserPermissionRole } from "../../identity/roles/enum";
 import type { WsConnectionData } from "../core/types";
-import { diagnoseWsClose, WS_IDLE_TIMEOUT_SECONDS } from "./ws-keepalive";
+import {
+  diagnoseWsClose,
+  WS_HEARTBEAT_TIMEOUT_CODE,
+  WS_HEARTBEAT_TIMEOUT_REASON,
+  WS_IDLE_TIMEOUT_SECONDS,
+  WS_PING_INTERVAL_MS,
+} from "./ws-keepalive";
 
 const NOW = 1_000_000_000;
 
@@ -33,14 +39,20 @@ function socketData(
 
 describe("WS keepalive", () => {
   it("pings well inside a 60 s middlebox idle limit", () => {
-    // Bun pings 16 s before idleTimeout; the wire must never be silent 60 s.
-    expect(WS_IDLE_TIMEOUT_SECONDS - 16).toBeLessThan(30);
-    expect(WS_IDLE_TIMEOUT_SECONDS).toBeLessThan(60);
+    expect(WS_PING_INTERVAL_MS).toBeLessThan(30_000);
+    expect(WS_IDLE_TIMEOUT_SECONDS * 1000).toBeGreaterThan(3 * WS_PING_INTERVAL_MS);
   });
 
   it("reports Bun's inactivity close as idle-timeout with measurements", () => {
     const d = diagnoseWsClose(
-      { ...socketData(125_000, 40_000, 3), lastPongAt: NOW - 45_000, lastInboundFrame: "subscribe" },
+      {
+        ...socketData(125_000, 75_000, 3),
+        lastPongAt: NOW - 80_000,
+        lastPingAt: NOW - 10_000,
+        pingCount: 6,
+        lastPingBackpressured: false,
+        lastInboundFrame: "subscribe",
+      },
       1006,
       "WebSocket timed out from inactivity",
       NOW,
@@ -52,9 +64,12 @@ describe("WS keepalive", () => {
       reason: "WebSocket timed out from inactivity",
       idleEvidence: "bun-close-reason",
       connectedForMs: 125_000,
-      sinceLastInboundMs: 40_000,
+      sinceLastInboundMs: 75_000,
       pongCount: 3,
-      lastPongAgeMs: 45_000,
+      pingCount: 6,
+      lastPingAgeMs: 10_000,
+      lastPingBackpressured: false,
+      lastPongAgeMs: 80_000,
       idleTimeoutMs: WS_IDLE_TIMEOUT_SECONDS * 1000,
       inboundActivity: "answered-ping",
       lastInboundFrame: "subscribe",
@@ -69,6 +84,17 @@ describe("WS keepalive", () => {
     expect(d.kind).toBe("idle-timeout");
     expect(d.meta.idleEvidence).toBe("silent-window");
     expect(d.meta.inboundActivity).toBe("application-traffic");
+  });
+
+  it("identifies an explicit heartbeat close", () => {
+    const d = diagnoseWsClose(
+      socketData(90_000, 80_000, 2),
+      WS_HEARTBEAT_TIMEOUT_CODE,
+      WS_HEARTBEAT_TIMEOUT_REASON,
+      NOW,
+    );
+    expect(d.kind).toBe("idle-timeout");
+    expect(d.meta.idleEvidence).toBe("heartbeat-timeout");
   });
 
   it("identifies a socket that never sent application frames or a pong", () => {

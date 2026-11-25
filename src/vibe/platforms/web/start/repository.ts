@@ -66,6 +66,7 @@ import { resolveLogTarget } from "../../../logger/log-target";
 import type { EndpointLogger } from "../../../logger/types";
 import { takeWsActivitySummary } from "../../../realtime/server/activity";
 import { summarizeRecentRequests } from "../../../realtime/server/http-proxy";
+import { TASK_WATCHDOG_SWEEP_ALIAS } from "../../../tasks/watchdog/constants";
 import { PhaseProfiler } from "../../../tasks/watchdog/phase-profiler";
 import { ServerFramework } from "../enum";
 import {
@@ -292,7 +293,7 @@ export class ServerStartRepository {
   private static nextRestartCount = 0;
   /** When the internal Next.js server stopped answering (self-heal escalation). */
   private static nextUptime = new NextUptimeTracker();
-  private static lateReadinessPolling = false;
+  private static lateReadinessProcess: ChildProcess | null = null;
   private static taskRunnerRestartCount = 0;
   /** The supervised child process (only set in supervisor mode) */
   private static supervisedChild: ChildProcess | null = null;
@@ -803,16 +804,40 @@ export class ServerStartRepository {
       // The histogram and ticker sample on different schedules. Capture
       // nearby ticker delays so borderline warnings can include a profile.
       const stallCaptureMs = EL_LAG_WARN_MS - STALL_TICK_MS;
-      let lastSchedulerSample = readThreadSchedulerSample();
+      interface SchedulerSample {
+        counters: Awaited<ReturnType<typeof readThreadSchedulerSample>>;
+        readStartedAt: number;
+        readElapsedMs: number;
+      }
+      let lastSchedulerSample: SchedulerSample | undefined;
+      let schedulerRead: Promise<SchedulerSample> | undefined;
+      const sampleScheduler = (): Promise<SchedulerSample> => {
+        if (schedulerRead) {
+          return schedulerRead;
+        }
+        const readStartedAt = performance.now();
+        schedulerRead = readThreadSchedulerSample().then((counters) => {
+          const readElapsedMs = performance.now() - readStartedAt;
+          lastSchedulerSample = { counters, readStartedAt, readElapsedMs };
+          maxSchedulerSampleMs = Math.max(maxSchedulerSampleMs, readElapsedMs);
+          schedulerRead = undefined;
+          return lastSchedulerSample;
+        });
+        return schedulerRead;
+      };
       let lastTickAt = performance.now();
       let maxTickerDelayMs = 0;
       let maxSchedulerSampleMs = 0;
+      void sampleScheduler();
       let tickerSamples = 0;
       let worstStall: {
         ms: number;
         startedAt: number;
         endedAt: number;
-        scheduler: ReturnType<typeof threadSchedulerDelta>;
+        scheduler: Promise<{
+          counters: ReturnType<typeof threadSchedulerDelta>;
+          sampleIntervalMs: number | undefined;
+        }>;
         runningTasks: string[];
         taskTimings: string;
         taskOverlaps: { label: string; overlapMs: number }[];
@@ -826,14 +851,7 @@ export class ServerStartRepository {
         maxTickerDelayMs = Math.max(maxTickerDelayMs, stallMs);
         tickerSamples++;
         const previousSchedulerSample = lastSchedulerSample;
-        if (previousSchedulerSample) {
-          const sampleStartedAt = performance.now();
-          lastSchedulerSample = readThreadSchedulerSample();
-          maxSchedulerSampleMs = Math.max(
-            maxSchedulerSampleMs,
-            performance.now() - sampleStartedAt,
-          );
-        }
+        const nextSchedulerSample = sampleScheduler();
         if (stallMs >= stallCaptureMs && stallMs > (worstStall?.ms ?? 0)) {
           const endedAt = Date.now();
           const startedAt = endedAt - stallMs;
@@ -847,10 +865,23 @@ export class ServerStartRepository {
             ms: stallMs,
             startedAt,
             endedAt,
-            scheduler: threadSchedulerDelta(
-              previousSchedulerSample,
-              lastSchedulerSample,
-            ),
+            scheduler: nextSchedulerSample.then((sample) => ({
+              counters:
+                previousSchedulerSample &&
+                previousSchedulerSample.readElapsedMs < STALL_TICK_MS &&
+                sample.readStartedAt >= now &&
+                sample.readElapsedMs < STALL_TICK_MS
+                  ? threadSchedulerDelta(
+                      previousSchedulerSample.counters,
+                      sample.counters,
+                    )
+                  : undefined,
+              sampleIntervalMs:
+                previousSchedulerSample &&
+                Math.round(
+                  sample.readStartedAt - previousSchedulerSample.readStartedAt,
+                ),
+            })),
             runningTasks: probed?.labels ?? [],
             taskTimings: probed?.timings ?? "",
             taskOverlaps: probed?.overlaps ?? [],
@@ -905,18 +936,27 @@ export class ServerStartRepository {
               lastRusage.involuntaryContextSwitches,
           };
           lastRusage = rusage;
-          const cpuPressure = readCpuPressureSample();
-          const windowCpuPressure = cpuPressureWindow(
+          const [
+            cpuPressure,
+            previousCpuPressure,
+            cpuThrottle,
+            previousCpuThrottle,
+          ] = await Promise.all([
+            readCpuPressureSample(),
             lastCpuPressure,
+            readCpuThrottleSample(),
+            lastCpuThrottle,
+          ]);
+          const windowCpuPressure = cpuPressureWindow(
+            previousCpuPressure,
             cpuPressure,
           );
-          lastCpuPressure = cpuPressure;
-          const cpuThrottle = readCpuThrottleSample();
+          lastCpuPressure = Promise.resolve(cpuPressure);
           const windowCpuThrottle = cpuThrottleWindow(
-            lastCpuThrottle,
+            previousCpuThrottle,
             cpuThrottle,
           );
-          lastCpuThrottle = cpuThrottle;
+          lastCpuThrottle = Promise.resolve(cpuThrottle);
 
           const uptime2 = Math.floor(process.uptime());
           const mem = process.memoryUsage();
@@ -929,6 +969,7 @@ export class ServerStartRepository {
             tickerSamples,
             maxTickerDelayMs: Math.round(maxTickerDelayMs),
             maxSchedulerSampleMs: Math.round(maxSchedulerSampleMs),
+            schedulerReadMode: "async",
             tickerCaptureThresholdMs: stallCaptureMs,
             lagWindowStartedAt: new Date(windowStartedAt).toISOString(),
             lagWindowEndedAt: new Date(windowEndedAt).toISOString(),
@@ -939,6 +980,7 @@ export class ServerStartRepository {
           if (stall) {
             await PhaseProfiler.flush(stall.startedAt);
           }
+          const scheduler = await stall?.scheduler;
           const stallProfile = stall
             ? describeStallProfile(stall.ms, stall.startedAt)
             : {
@@ -970,13 +1012,11 @@ export class ServerStartRepository {
             stallMs: stall ? Math.round(stall.ms) : undefined,
             // Main-thread CPU and runnable wait between the delayed ticker's
             // callbacks. Process CPU below covers all threads over five seconds.
-            ...stall?.scheduler,
-            schedulerSampleIntervalMs: stall
-              ? Math.round(stall.ms + STALL_TICK_MS)
-              : undefined,
+            ...scheduler?.counters,
+            schedulerSampleIntervalMs: scheduler?.sampleIntervalMs,
             schedulerEvidence: stall
               ? describeSchedulerEvidence(
-                  stall.scheduler,
+                  scheduler?.counters,
                   stall.ms,
                   STALL_TICK_MS,
                 )
@@ -1457,7 +1497,26 @@ export class ServerStartRepository {
       logger.vibe(formatSkip("Database setup skipped"));
     }
 
-    // Start task runner if enabled (non-blocking - fires before Next.js)
+    // Load the watchdog's cold module graph before starting either listener.
+    // The first pulse otherwise imports it while the renderer is booting.
+    if (runTasks && runNext && data.framework !== ServerFramework.TANSTACK) {
+      ServerStartRepository.startHealthSnapshot(logger);
+      try {
+        const { getRouteHandler } = await import("@/generated/routes/handlers");
+        await getRouteHandler(TASK_WATCHDOG_SWEEP_ALIAS);
+        await new Promise<void>((resolve) => {
+          setImmediate(resolve);
+        });
+        const { getEndpoint } = await import("@/generated/endpoints/endpoint");
+        await getEndpoint(TASK_WATCHDOG_SWEEP_ALIAS);
+      } catch (error) {
+        logger.error("Failed to preload the task watchdog at startup", {
+          error: parseError(error).message,
+        });
+      }
+    }
+
+    // Start task runner if enabled.
     if (runTasks) {
       void ServerStartRepository.startTaskRunnerIfEnabled(
         user,
@@ -1939,6 +1998,15 @@ export class ServerStartRepository {
         });
       }
       const formatNextjs = createNextjsFormatter(nextPort, port);
+      let proxyStarted = false;
+      const openProxy = async (): Promise<void> => {
+        if (proxyStarted || ServerStartRepository.nextServerShuttingDown) {
+          return;
+        }
+        const wsHandle = await startWebProxy({ port: wsPort, logger });
+        ServerStartRepository.wsServerHandle = wsHandle ?? null;
+        proxyStarted = true;
+      };
 
       /** Spawn Next.js, wire stdio, register exit→restart handler. Returns the child process. */
       const spawnNextProcess = (): ChildProcess => {
@@ -2098,17 +2166,35 @@ export class ServerStartRepository {
               `http://127.0.0.1:${nextPort}`,
               60000,
               logger,
-            ).then((up) => {
-              if (up) {
-                // Reset restart counter only on a real recovery
-                ServerStartRepository.nextRestartCount = 0;
-                ServerStartRepository.nextUptime.markUp();
-                logger.info("Next.js recovered successfully");
-              } else {
-                ServerStartRepository.trackLateNextReadiness(nextPort, logger);
-              }
-              return undefined;
-            });
+            )
+              .then(async (up) => {
+                if (ServerStartRepository.nextServerProcess !== newProc) {
+                  return undefined;
+                }
+                if (up) {
+                  // Reset restart counter only on a real recovery
+                  ServerStartRepository.nextRestartCount = 0;
+                  ServerStartRepository.nextUptime.markUp();
+                  await openProxy();
+                  logger.info("Next.js recovered successfully");
+                } else {
+                  ServerStartRepository.trackLateNextReadiness(
+                    newProc,
+                    nextPort,
+                    logger,
+                    openProxy,
+                  );
+                }
+                return undefined;
+              })
+              .catch((error) => {
+                logger.error(
+                  "Failed to open the proxy after Next.js recovered",
+                  {
+                    error: parseError(error).message,
+                  },
+                );
+              });
           }, delay);
         });
 
@@ -2118,10 +2204,6 @@ export class ServerStartRepository {
       const nextProcess = spawnNextProcess();
       ServerStartRepository.nextServerProcess = nextProcess;
       addPidToFile(VIBE_START_PID_FILE, nextProcess.pid ?? 0);
-
-      // --- Start WS server (proxy or sidecar depending on mode) ---
-      const wsHandle = await startWebProxy({ port: wsPort, logger });
-      ServerStartRepository.wsServerHandle = wsHandle ?? null;
 
       // Deploy drain status of THIS process (WS hub + in-process task runner);
       // the Next child reports its AI loops itself (src/instrumentation.ts).
@@ -2139,10 +2221,16 @@ export class ServerStartRepository {
         30000,
         logger,
       );
-      if (nextUp) {
+      if (nextUp && ServerStartRepository.nextServerProcess === nextProcess) {
         ServerStartRepository.nextUptime.markUp();
-      } else {
-        ServerStartRepository.trackLateNextReadiness(nextPort, logger);
+        await openProxy();
+      } else if (ServerStartRepository.nextServerProcess === nextProcess) {
+        ServerStartRepository.trackLateNextReadiness(
+          nextProcess,
+          nextPort,
+          logger,
+          openProxy,
+        );
       }
 
       return success(undefined);
@@ -2166,26 +2254,37 @@ export class ServerStartRepository {
    * later crash would look like a long outage and escalate at once).
    */
   private static trackLateNextReadiness(
+    proc: ChildProcess,
     nextPort: number,
     logger: EndpointLogger,
+    onReady: () => Promise<void>,
   ): void {
     ServerStartRepository.nextUptime.markDown(Date.now());
-    if (ServerStartRepository.lateReadinessPolling) {
+    if (ServerStartRepository.lateReadinessProcess === proc) {
       return;
     }
-    ServerStartRepository.lateReadinessPolling = true;
+    ServerStartRepository.lateReadinessProcess = proc;
     void ServerStartRepository.waitForNextServer(
       `http://127.0.0.1:${nextPort}`,
       NEXT_DOWN_ESCALATE_MS,
       logger,
-    ).then((up) => {
-      ServerStartRepository.lateReadinessPolling = false;
-      if (up) {
-        ServerStartRepository.nextUptime.markUp();
-        logger.info("Next.js answered after a slow start");
-      }
-      return undefined;
-    });
+    )
+      .then(async (up) => {
+        if (ServerStartRepository.lateReadinessProcess === proc) {
+          ServerStartRepository.lateReadinessProcess = null;
+        }
+        if (up && ServerStartRepository.nextServerProcess === proc) {
+          ServerStartRepository.nextUptime.markUp();
+          await onReady();
+          logger.info("Next.js answered after a slow start");
+        }
+        return undefined;
+      })
+      .catch((error) => {
+        logger.error("Failed to open the proxy after a slow Next.js start", {
+          error: parseError(error).message,
+        });
+      });
   }
 
   private static async waitForNextServer(
@@ -2199,12 +2298,12 @@ export class ServerStartRepository {
     while (Date.now() - start < timeoutMs) {
       try {
         // oxlint-disable-next-line restricted/no-raw-fetch -- server-liveness probe (waits for the just-started server to accept requests)
-        const response = await fetch(url, {
+        const response = await fetch(`${url}/robots.txt`, {
           method: "HEAD",
           // A wedged listener must not stall the poll loop past the timeout.
           signal: AbortSignal.timeout(5000),
         });
-        if (response.ok || response.status === 404) {
+        if (response.status === 200) {
           return true;
         }
       } catch {

@@ -21,7 +21,11 @@ import { StreamLoop } from "./loop";
 
 afterEach(() => mock.restore());
 
-it("shows one error for a content-filtered stream with no text", async () => {
+it.each([
+  ["content filter", "content_filter", false, null, "errors.contentFiltered"],
+  ["provider failure with a balance cap", "stop", true, "Failed to process successful response 200", "errors.streamError"],
+  ["balance cap exhaustion", "length", true, null, "errors.creditBudgetReached"],
+] as const)("shows one error for %s with no text", async (_name, finishReason, creditBudgetCapped, providerError, errorKey) => {
   const logger = createEndpointLogger(false, defaultLocale);
   const { t } = scopedTranslation.scopedT(defaultLocale);
   const threadId = crypto.randomUUID();
@@ -47,6 +51,8 @@ it("shows one error for a content-filtered stream with no text", async () => {
     streamRunId: undefined,
     toolExecutionContext,
   });
+  ctx.creditBudgetCapped = creditBudgetCapped;
+  ctx.lastProviderErrorText = providerError;
   spyOn(stream, "clearStreamingState").mockResolvedValue({
     state: ThreadStreamingState.IDLE,
     updatedAt: new Date(),
@@ -58,7 +64,7 @@ it("shows one error for a content-filtered stream with no text", async () => {
   spyOn(ctx.dbWriter, "deductAndEmitCredits").mockResolvedValue(undefined);
   const chunk = {
     id: "filter-fixture",
-    choices: [{ index: 0, delta: {}, finish_reason: "content_filter" }],
+    choices: [{ index: 0, delta: {}, finish_reason: finishReason }],
     usage: { prompt_tokens: 10, completion_tokens: 3 },
   };
   const provider = createNanoGPT(
@@ -111,7 +117,7 @@ it("shows one error for a content-filtered stream with no text", async () => {
 
   expect(reportedError).toHaveBeenCalledTimes(1);
   expect(reportedError).toHaveBeenCalledWith(
-    expect.objectContaining({ content: t("errors.contentFiltered") }),
+    expect.objectContaining({ content: t(errorKey) }),
   );
   expect(done).toHaveBeenCalledTimes(1);
 });

@@ -12,7 +12,13 @@ type LeadDatabasePhase =
   | "lookup"
   | "begin"
   | "provision"
+  | LeadProvisionStep
   | "commit";
+
+export type LeadProvisionStep =
+  | "find-reusable-guest"
+  | "insert-guest"
+  | "link-guest-pool";
 
 export class GuestLeadDatabaseDeadlineError extends Error {
   readonly poolTotal: number | undefined;
@@ -116,7 +122,10 @@ export function withLeadLookupDeadline<T>(
 export function withLeadDatabaseDeadline<T>(
   pool: Pool | null,
   deadlineMs: number,
-  work: (db: NodePgDatabase<Record<string, never>>) => Promise<T>,
+  work: (
+    db: NodePgDatabase<Record<string, never>>,
+    setStep: (step: LeadProvisionStep) => void,
+  ) => Promise<T>,
 ): Promise<T> {
   return withBoundedCheckout(
     pool,
@@ -135,6 +144,7 @@ export function withLeadDatabaseDeadline<T>(
       setPhase("provision");
       const result = await work(
         drizzle(client, { logger: pgDiagnosticQueryLogger }),
+        setPhase,
       );
       if (performance.now() >= deadline) {
         return Promise.reject(

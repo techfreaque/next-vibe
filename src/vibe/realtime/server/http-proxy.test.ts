@@ -36,7 +36,10 @@ beforeAll(() => {
       if (path === "/api/en-US/unavailable") {
         return new Response("Service Unavailable", {
           status: 503,
-          headers: { "Retry-After": "5" },
+          headers: {
+            "Retry-After": "5",
+            "Server-Timing": 'vibe-lead;desc="provision"',
+          },
         });
       }
       if (path === "/api/en-US/unmatched") {
@@ -233,6 +236,7 @@ it("records a serving upstream's retry interval on a 503", async () => {
     expect.objectContaining({
       status: 503,
       retryAfterSeconds: 5,
+      leadFailurePhase: "provision",
       previousUpstreamResponseAgeMs: expect.any(Number),
     }),
   );

@@ -288,9 +288,12 @@ export interface WsConnectionData {
    * which separates "client stopped answering pings" from a cut mid-traffic.
    */
   lastInboundAt: number;
-  lastInboundFrame?: WsClientMessage["type"] | "pong" | "malformed";
+  lastInboundFrame?: WsClientMessage["type"] | "ping" | "pong" | "malformed";
   /** Pongs received on this socket (0 = no ping was ever answered). */
   pongCount: number;
+  pingCount?: number;
+  lastPingAt?: number;
+  lastPingBackpressured?: boolean;
   lastPongAt?: number;
   /**
    * Set only for reverse-ws connector sockets (local → cloud outbound WS).

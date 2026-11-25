@@ -230,27 +230,36 @@ function reportDrop(
   }
   dropReported = true;
   stopDropCheck();
-  logger.error("[WS Client] Connection lost", {
-    ...pendingDrop,
-    ...recovery,
-    offlineMs: Date.now() - disconnectedAt,
-    noticeableDownMs: currentNoticeableDownMs(),
-    attempts: dropReconnectCount,
-    failedHandshakesDuringDrop,
-    lastFailedHandshakeRequestId,
-    lastFailedHandshakeMs,
-    lastFailedHandshakeCode,
-    lastFailedHandshakeContext,
-    maxReconnectTimerOverrunMs,
-    reconnectPaused,
-    pendingHandshakeRequestId: pendingHandshake?.requestId ?? null,
-    pendingHandshakeMs: pendingHandshake
-      ? Date.now() - pendingHandshake.startedAt
-      : null,
-    retryScheduled: reconnectTimer !== null,
-    recovered: dropReportTrigger === "reconnected",
-    dropReportTrigger,
-  });
+  const plannedRestart = pendingDrop?.code === WS_SERVICE_RESTART_CODE;
+  logger.error(
+    plannedRestart &&
+      dropReportTrigger !== "deadline" &&
+      failedHandshakesDuringDrop === 0
+      ? "[WS Client] Planned reconnect after server restart"
+      : "[WS Client] Connection lost",
+    {
+      ...pendingDrop,
+      ...recovery,
+      plannedRestart,
+      offlineMs: Date.now() - disconnectedAt,
+      noticeableDownMs: currentNoticeableDownMs(),
+      attempts: dropReconnectCount,
+      failedHandshakesDuringDrop,
+      lastFailedHandshakeRequestId,
+      lastFailedHandshakeMs,
+      lastFailedHandshakeCode,
+      lastFailedHandshakeContext,
+      maxReconnectTimerOverrunMs,
+      reconnectPaused,
+      pendingHandshakeRequestId: pendingHandshake?.requestId ?? null,
+      pendingHandshakeMs: pendingHandshake
+        ? Date.now() - pendingHandshake.startedAt
+        : null,
+      retryScheduled: reconnectTimer !== null,
+      recovered: dropReportTrigger === "reconnected",
+      dropReportTrigger,
+    },
+  );
 }
 
 function startDropCheck(logger: EndpointLogger): void {
@@ -297,21 +306,28 @@ function handleOpen(
       reconnectHandshakeMs: openedAt - connectStartedAt,
     };
     if (dropReported) {
-      logger.warn("[WS Client] Reconnected after disconnect", {
-        ...pendingDrop,
-        ...recovery,
-        attempts: dropReconnectCount,
-        failedHandshakesDuringDrop,
-        lastFailedHandshakeRequestId,
-        lastFailedHandshakeMs,
-        lastFailedHandshakeCode,
-        lastFailedHandshakeContext,
-        maxReconnectTimerOverrunMs,
-        offlineMs: Date.now() - disconnectedAt,
-        noticeableDownMs: currentNoticeableDownMs(),
-        channelCount: channels.size,
-        recovered: true,
-      });
+      const plannedRestart = pendingDrop?.code === WS_SERVICE_RESTART_CODE;
+      logger.warn(
+        plannedRestart
+          ? "[WS Client] Reconnected after server restart"
+          : "[WS Client] Reconnected after disconnect",
+        {
+          ...pendingDrop,
+          ...recovery,
+          plannedRestart,
+          attempts: dropReconnectCount,
+          failedHandshakesDuringDrop,
+          lastFailedHandshakeRequestId,
+          lastFailedHandshakeMs,
+          lastFailedHandshakeCode,
+          lastFailedHandshakeContext,
+          maxReconnectTimerOverrunMs,
+          offlineMs: Date.now() - disconnectedAt,
+          noticeableDownMs: currentNoticeableDownMs(),
+          channelCount: channels.size,
+          recovered: true,
+        },
+      );
     } else {
       reportDrop(logger, "reconnected", recovery);
     }

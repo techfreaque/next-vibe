@@ -43,7 +43,9 @@ import { CallbackMode } from "next-vibe/execute-tool/constants";
 import { ApiProvider, calculateCreditCost } from "../../../models/models";
 import {
   GARBLED_REPLACE_HEADER,
+  GARBLED_RETRY_MARKER_KEY,
   garbledRetryMarkerSchema,
+  UPSTREAM_BODY_READ_RETRY_RULE,
 } from "../../providers/openrouter/garbled-guard";
 import {
   AbortReason,
@@ -105,8 +107,8 @@ export class StreamLoop implements StreamLoopState {
   constructor(readonly p: StreamLoopParams) {}
 
   /**
-   * Assistant state at the current step's start, restored when a garbled
-   * OpenRouter attempt is replaced by its retry (see onGarbledRetry).
+   * Assistant state at the current step's start, restored when an
+   * OpenRouter attempt is replaced by its retry.
    */
   private stepStart: { content: string; messageId: string | null } = {
     content: "",
@@ -573,8 +575,9 @@ export class StreamLoop implements StreamLoopState {
     // Raw provider chunks (OpenRouter only): nothing but the garbled-retry
     // marker is acted on; they must not reach the inline-think flush below.
     if (part.type === "raw") {
-      if (garbledRetryMarkerSchema.safeParse(part.rawValue).success) {
-        this.onGarbledRetry();
+      const retry = garbledRetryMarkerSchema.safeParse(part.rawValue);
+      if (retry.success) {
+        this.onProviderRetry(retry.data[GARBLED_RETRY_MARKER_KEY].rule);
       }
       return { shouldAbort: false };
     }
@@ -938,20 +941,21 @@ export class StreamLoop implements StreamLoopState {
 
     if (part.type === "error") {
       const rawError = "error" in part ? part.error : undefined;
+      const upstreamError = APICallError.isInstance(rawError) ? rawError : null;
       // The AI SDK often surfaces only the human-readable `message`, burying the
       // HTTP status and the provider's own error-type (e.g. OpenRouter's
       // `{ code: 502, metadata: { error_type: "provider_unavailable" } }`) in
       // sibling fields. Fold the structured fields into the text so the
       // transient classifier below sees the `502` / `provider_unavailable`
       // signal and treats the outage as the transient upstream failure it is.
-      const errorText = APICallError.isInstance(rawError)
+      const errorText = upstreamError
         ? [
-            rawError.message,
-            rawError.statusCode === undefined
+            upstreamError.message,
+            upstreamError.statusCode === undefined
               ? ""
-              : String(rawError.statusCode),
-            typeof rawError.responseBody === "string"
-              ? rawError.responseBody
+              : String(upstreamError.statusCode),
+            typeof upstreamError.responseBody === "string"
+              ? upstreamError.responseBody
               : "",
           ]
             .filter(Boolean)
@@ -986,9 +990,14 @@ export class StreamLoop implements StreamLoopState {
           this.lastPromptStep > 0
             ? summarizePromptToolHistory(this.p.messages)
             : undefined,
-        upstreamStatus: APICallError.isInstance(rawError)
-          ? rawError.statusCode
-          : undefined,
+        upstreamStatus: upstreamError?.statusCode,
+        upstreamCauseName:
+          upstreamError?.cause instanceof Error
+            ? upstreamError.cause.name
+            : null,
+        upstreamContentType: upstreamError?.responseHeaders?.["content-type"],
+        upstreamResponseBytes: upstreamError?.responseBody?.length,
+        completedTokenSteps: this.p.ctx.tokenStepCount,
         upstreamReason: providerErrorTranslationKey(errorText),
         model,
         apiProvider: this.p.modelConfig.apiProvider,
@@ -1045,14 +1054,14 @@ export class StreamLoop implements StreamLoopState {
   }
 
   /**
-   * The garbled-output guard threw away this step's provider attempt (text
-   * was already shown) and the retry on another host follows. Drop what the
+   * A provider attempt failed after text was shown and the retry on another
+   * host follows. Drop what the
    * attempt added to the assistant message and show the step-start content
    * again; the retry's parts then stream in on top. Provider reasoning that
    * was still open stays open (the retry continues it without a new
    * reasoning-start); after text started the provider drops retry reasoning.
    */
-  private onGarbledRetry(): void {
+  private onProviderRetry(rule: string): void {
     const { ctx, logger } = this.p;
     // Discard a half-parsed inline <think> of the dropped attempt.
     ctx.inlineThink.flush();
@@ -1069,10 +1078,15 @@ export class StreamLoop implements StreamLoopState {
     ctx.isInReasoningBlock = providerReasoningOpen;
     ctx.lastEstimatedTokenEmitLength = 0;
     ctx.dbWriter.emitContentReplaced(messageId, ctx.currentAssistantContent);
-    logger.info("[AI Stream] Garbled provider attempt replaced by retry", {
-      messageId,
-      keptChars: ctx.currentAssistantContent.length,
-    });
+    logger.info(
+      rule === UPSTREAM_BODY_READ_RETRY_RULE
+        ? "[AI Stream] Interrupted provider attempt replaced by retry"
+        : "[AI Stream] Garbled provider attempt replaced by retry",
+      {
+        messageId,
+        keptChars: ctx.currentAssistantContent.length,
+      },
+    );
   }
 
   /** Dispatch the events the inline <think> splitter resolved. */

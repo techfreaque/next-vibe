@@ -54,11 +54,15 @@ function isKnownCallbackMode(value: WidgetData): boolean {
 
 /** A JSON-encoded object string as a record; null when it is anything else. */
 function parseRecordString(value: string): ArgsRecord | null {
-  if (!value.trim().startsWith("{")) {
+  const trimmed = value.trim();
+  const json =
+    /^```(?:json)?\s*\r?\n([\s\S]*?)\r?\n```$/i.exec(trimmed)?.[1]?.trim() ??
+    trimmed;
+  if (!json.startsWith("{")) {
     return null;
   }
   try {
-    const parsed: WidgetData = JSON.parse(value);
+    const parsed: WidgetData = JSON.parse(json);
     return isRecord(parsed) ? parsed : null;
   } catch {
     // Not valid JSON (truncated, or garbage like `<arg_value>`): leave it,

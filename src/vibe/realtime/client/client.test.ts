@@ -97,7 +97,7 @@ it("reports quick reconnects and times out hidden, offline drops", async () => {
     expect(new URL(TestSocket.sockets[1]?.url ?? "").searchParams.get("retry")).toBe("1");
     expect(errors).toMatchObject([
       {
-        message: "[WS Client] Connection lost",
+        message: "[WS Client] Planned reconnect after server restart",
         context: {
           requestId: new URL(firstSocketUrl).searchParams.get("requestId"),
           closedAtMs: expect.any(Number),
@@ -106,6 +106,7 @@ it("reports quick reconnects and times out hidden, offline drops", async () => {
           ).searchParams.get("requestId"),
           code: 1012,
           reason: "server drain",
+          plannedRestart: true,
           attempts: 1,
           failedHandshakesDuringDrop: 0,
           maxReconnectTimerOverrunMs: 0,

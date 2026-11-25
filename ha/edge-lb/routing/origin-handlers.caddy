@@ -28,6 +28,13 @@ handle /_ha/admit {
 		handle_response @database_down {
 			copy_response
 		}
+		@renderer_starting {
+			status 503
+			header X-HA-Readiness v1-renderer-not-listening
+		}
+		handle_response @renderer_starting {
+			copy_response
+		}
 		@ready status 200
 		handle_response @ready {
 			copy_response

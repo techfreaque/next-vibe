@@ -31,6 +31,8 @@ export interface SttErrorDetails {
   permissionState?: string | null;
   audioInputCount?: number | null;
   isSecureContext?: boolean;
+  promptDismissed?: boolean;
+  requestDurationMs?: number;
 }
 
 interface UseEdenAISpeechOptions {
@@ -486,6 +488,10 @@ export function useEdenAISpeech({
         // "No microphone found".
         const errorName = micResult.errorName ?? "UnknownError";
         const diagnostics = await getMicrophoneDiagnostics();
+        const promptDismissed =
+          (errorName === "NotAllowedError" ||
+            errorName === "PermissionDeniedError") &&
+          /dismissed/i.test(micResult.errorMessage ?? "");
         logger.warn("STT: Microphone stream unavailable", {
           operation: "startRecording",
           errorName,
@@ -496,6 +502,7 @@ export function useEdenAISpeech({
           isSecureContext: diagnostics.isSecureContext,
           hasMediaDevices: diagnostics.hasMediaDevices,
           isEmbeddedDocument: diagnostics.isEmbeddedDocument,
+          promptDismissed,
           durationMs,
         });
         const errorMsg = getMicrophoneErrorMessage(errorName, t, {
@@ -508,6 +515,8 @@ export function useEdenAISpeech({
           permissionState: diagnostics.permissionState,
           audioInputCount: diagnostics.audioInputCount,
           isSecureContext: diagnostics.isSecureContext,
+          promptDismissed,
+          requestDurationMs: durationMs,
         });
         return;
       }

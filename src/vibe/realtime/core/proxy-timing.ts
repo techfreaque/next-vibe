@@ -1,6 +1,25 @@
 export const PROXY_TIMING_METRIC = "vibe-proxy";
 export const EDGE_TIMING_METRIC = "vibe-edge";
 export const EDGE_REQUEST_TIMING_METRIC = "vibe-edge-request";
+const LEAD_TIMING_METRIC = "vibe-lead";
+
+type LeadFailurePhase = "lookup" | "crawler-policy" | "geo" | "provision";
+
+export function leadFailureTimingHeader(phase: LeadFailurePhase): string {
+  return `${LEAD_TIMING_METRIC};desc="${phase}"`;
+}
+
+export function readLeadFailureTimingHeader(
+  header: string | null,
+): LeadFailurePhase | null {
+  const phase = readTimingDescription(header, LEAD_TIMING_METRIC);
+  return phase === "lookup" ||
+    phase === "crawler-policy" ||
+    phase === "geo" ||
+    phase === "provision"
+    ? phase
+    : null;
+}
 
 export type ProxyTimingStage =
   | "upstream-response"

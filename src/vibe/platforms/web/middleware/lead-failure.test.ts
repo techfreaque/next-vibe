@@ -124,6 +124,9 @@ it("limits public fallback to anonymous read-only documents and keeps real DB er
     expect(response.headers.get("Retry-After")).toBe(
       status === 503 ? "5" : null,
     );
+    expect(response.headers.get("Server-Timing")).toBe(
+      status === 200 ? null : 'vibe-lead;desc="provision"',
+    );
     expect(response.headers.get("Cache-Control")).toBe(
       status === 200 ? "private, no-store" : "no-store",
     );

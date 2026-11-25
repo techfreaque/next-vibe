@@ -12,6 +12,7 @@ import { databaseFailureDiagnostics } from "../../database/error-diagnostics";
 import { Environment } from "../../env/env-util";
 import type { EndpointLogger } from "../../logger/types";
 import {
+  type LeadProvisionStep,
   withLeadDatabaseDeadline,
   withLeadLookupDeadline,
 } from "./database-deadline";
@@ -78,8 +79,15 @@ export function createAnonymousLead(
   if (deadlineMs === undefined) {
     return provisionAnonymousLead(db, clientInfo, locale, logger, false);
   }
-  return withLeadDatabaseDeadline(pool, deadlineMs, (connection) =>
-    provisionAnonymousLead(connection, clientInfo, locale, logger, true),
+  return withLeadDatabaseDeadline(pool, deadlineMs, (connection, setStep) =>
+    provisionAnonymousLead(
+      connection,
+      clientInfo,
+      locale,
+      logger,
+      true,
+      setStep,
+    ),
   );
 }
 
@@ -89,6 +97,7 @@ async function provisionAnonymousLead(
   locale: CountryLanguage,
   logger: EndpointLogger,
   transactional: boolean,
+  setStep?: (step: LeadProvisionStep) => void,
 ): Promise<string> {
   const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
 
@@ -96,12 +105,15 @@ async function provisionAnonymousLead(
     eq(leads.status, LeadStatus.WEBSITE_USER),
     eq(leads.source, LeadSource.WEBSITE),
     isNull(leads.email),
+    // Match the guest IP index predicate and leave account-linked leads alone.
+    isNull(leads.convertedUserId),
     sql`${leads.createdAt} > ${fiveMinutesAgo}`,
   ];
 
   if (clientInfo.ipAddress) {
     conditions.push(
       sql`${leads.metadata}->>'ipAddress' = ${clientInfo.ipAddress}`,
+      sql`GREATEST(${leads.createdAt}, ${leads.updatedAt}) > ${fiveMinutesAgo}`,
     );
   }
 
@@ -111,6 +123,7 @@ async function provisionAnonymousLead(
     );
   }
 
+  setStep?.("find-reusable-guest");
   const [existingLead] = await connection
     .select({ id: leads.id })
     .from(leads)
@@ -129,6 +142,7 @@ async function provisionAnonymousLead(
     ? parseLeadUserAgent(clientInfo.userAgent)
     : null;
 
+  setStep?.("insert-guest");
   const [newLead] = await connection
     .insert(leads)
     .values({
@@ -165,6 +179,7 @@ async function provisionAnonymousLead(
   // Credit wallet is created lazily on first balance check — no eager init needed here.
 
   if (clientInfo.ipAddress) {
+    setStep?.("link-guest-pool");
     await linkLeadsByIp(
       connection,
       newLead.id,

@@ -1,26 +1,17 @@
 /**
  * WebSocket keepalive settings + close diagnostics for the /ws server.
  *
- * Why the keepalive is short: Bun pings an idle socket 16 s before
- * `idleTimeout` expires and closes it if no pong arrives in those 16 s. With
- * Bun's default (120 s) an idle socket carried NO bytes for ~104 s. Proxies,
- * VPNs, corporate filters and NAT boxes on the client's network commonly cut
- * TCP streams that are silent for 60 s, so idle tabs (typically hidden ones,
- * with no chat traffic) dropped with 1006 every minute and reconnected in a
- * loop (prod 2026-11-16: "[WS Client] Connection lost" 1006, connectedForMs
- * ~59.5 s, sinceLastFrameMs null). Measured identical on Bun 1.3.3 and
- * 1.3.14, so not a runtime regression.
- *
- * 40 s puts a ping on the wire after 24 s of silence, well inside any 60 s
- * (and most 30 s) middlebox idle limit. Browsers answer pings in the network
- * stack, so hidden or throttled tabs still pong; a client that stops answering
- * is closed 16 s after the ping (40 s silence in total).
+ * Start pings well inside the shortest observed network idle window. Keep
+ * the disconnect deadline independent so a single missed pong can recover.
+ * Browsers answer protocol pings in the network stack, including hidden tabs.
  */
 
 import type { WsConnectionData } from "../core/types";
 
-/** Bun `websocket.idleTimeout` (seconds). Ping goes out 16 s before it. */
-export const WS_IDLE_TIMEOUT_SECONDS = 40;
+export const WS_PING_INTERVAL_MS = 20_000;
+export const WS_IDLE_TIMEOUT_SECONDS = 75;
+export const WS_HEARTBEAT_TIMEOUT_CODE = 4002;
+export const WS_HEARTBEAT_TIMEOUT_REASON = "heartbeat-timeout";
 
 /** Reason Bun passes to `close()` when it closes a socket for inactivity. */
 const BUN_IDLE_CLOSE_REASON = "WebSocket timed out from inactivity";
@@ -46,10 +37,17 @@ export interface WsCloseDiagnosis {
     requestId?: string;
     code: number;
     reason: string;
-    idleEvidence: "bun-close-reason" | "silent-window" | null;
+    idleEvidence:
+      | "heartbeat-timeout"
+      | "bun-close-reason"
+      | "silent-window"
+      | null;
     connectedForMs: number;
     sinceLastInboundMs: number;
     pongCount: number;
+    pingCount: number;
+    lastPingAgeMs: number | null;
+    lastPingBackpressured: boolean | null;
     lastPongAgeMs: number | null;
     idleTimeoutMs: number;
     lastInboundFrame: NonNullable<WsConnectionData["lastInboundFrame"]> | null;
@@ -69,13 +67,15 @@ export function diagnoseWsClose(
 ): WsCloseDiagnosis {
   const sinceLastInboundMs = now - data.lastInboundAt;
   const idleEvidence =
-    reason === BUN_IDLE_CLOSE_REASON
-      ? "bun-close-reason"
-      : code === 1006 &&
-          reason.length === 0 &&
-          sinceLastInboundMs >= (WS_IDLE_TIMEOUT_SECONDS - 1) * 1000
-        ? "silent-window"
-        : null;
+    reason === WS_HEARTBEAT_TIMEOUT_REASON
+      ? "heartbeat-timeout"
+      : reason === BUN_IDLE_CLOSE_REASON
+        ? "bun-close-reason"
+        : code === 1006 &&
+            reason.length === 0 &&
+            sinceLastInboundMs >= 2 * WS_PING_INTERVAL_MS - 1_000
+          ? "silent-window"
+          : null;
   const kind = idleEvidence
     ? "idle-timeout"
     : QUIET_CLOSE_CODES.has(code)
@@ -91,6 +91,10 @@ export function diagnoseWsClose(
       connectedForMs: now - data.connectedAt,
       sinceLastInboundMs,
       pongCount: data.pongCount,
+      pingCount: data.pingCount ?? 0,
+      lastPingAgeMs:
+        data.lastPingAt === undefined ? null : now - data.lastPingAt,
+      lastPingBackpressured: data.lastPingBackpressured ?? null,
       lastPongAgeMs:
         data.lastPongAt === undefined ? null : now - data.lastPongAt,
       idleTimeoutMs: WS_IDLE_TIMEOUT_SECONDS * 1000,

@@ -111,6 +111,12 @@ export class CortexWriteRepository {
           mountPrefix,
         );
         if (!result) {
+          logger.error("Cortex virtual write returned no result", {
+            endpoint: "cortex-write",
+            mount: mountPrefix,
+            pathDepth: path.split("/").length - 1,
+            relayed,
+          });
           return fail({
             message: t("post.errors.server.title"),
             errorType: ErrorResponseTypes.INTERNAL_ERROR,

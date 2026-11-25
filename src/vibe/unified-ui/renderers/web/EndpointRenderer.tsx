@@ -262,6 +262,14 @@ export function EndpointRenderer<TEndpoint extends CreateApiEndpointAny>({
   // Wrap onSubmit for widgets - widgets trigger submission without data parameter
   const handleWidgetSubmit = useCallback((): void => {
     if (onSubmit) {
+      const focused = globalThis.document?.activeElement;
+      const activationControl =
+        focused &&
+        (focused.localName === "button" || focused.localName === "input") &&
+        "type" in focused &&
+        typeof focused.type === "string"
+          ? `${focused.localName}:${focused.type}`
+          : (focused?.localName ?? null);
       void form.handleSubmit(
         (values) => {
           blockedSubmitState.current = {
@@ -305,6 +313,7 @@ export function EndpointRenderer<TEndpoint extends CreateApiEndpointAny>({
           const context = {
             endpoint: endpointKey,
             alias: endpoint.aliases?.[0] ?? null,
+            activationControl,
             firstInvalidField: firstInvalidField ?? null,
             firstInvalidFieldHasFocusTarget:
               typeof fieldRef === "object" &&

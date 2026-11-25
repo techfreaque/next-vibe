@@ -1,18 +1,22 @@
-import { readFileSync } from "node:fs";
+import { readFile } from "node:fs/promises";
 
 interface ThreadSchedulerSample {
   cpuNs: number;
   runQueueNs: number;
 }
 
-export function readThreadSchedulerSample(): ThreadSchedulerSample | undefined {
+export async function readThreadSchedulerSample(): Promise<
+  ThreadSchedulerSample | undefined
+> {
   if (process.platform !== "linux") {
     return undefined;
   }
   try {
-    // thread-self refers to the calling thread. Bun's process.cpuUsage()
-    // includes worker threads and cannot tell whether the loop was scheduled.
-    const stat = readFileSync("/proc/thread-self/schedstat", "utf8");
+    // Pin the read to the main thread regardless of which thread does the I/O.
+    const stat = await readFile(
+      `/proc/self/task/${process.pid}/schedstat`,
+      "utf8",
+    );
     const [cpuNs, runQueueNs, timeslices] = stat
       .trim()
       .split(/\s+/)
@@ -83,10 +87,10 @@ export function describeSchedulerEvidence(
   return "no-dominant-scheduler-counter";
 }
 
-function readCpuPressureTotal(path: string): number | undefined {
+async function readCpuPressureTotal(path: string): Promise<number | undefined> {
   try {
     const total = /^some [^\n]*\btotal=(\d+)/m.exec(
-      readFileSync(path, "utf8"),
+      await readFile(path, "utf8"),
     )?.[1];
     if (total !== undefined && Number.isSafeInteger(Number(total))) {
       return Number(total);
@@ -97,17 +101,20 @@ function readCpuPressureTotal(path: string): number | undefined {
   return undefined;
 }
 
-export function readCpuPressureSample():
+export async function readCpuPressureSample(): Promise<
   | {
       host?: number;
       cgroup?: number;
     }
-  | undefined {
+  | undefined
+> {
   if (process.platform !== "linux") {
     return undefined;
   }
-  const host = readCpuPressureTotal("/proc/pressure/cpu");
-  const cgroup = readCpuPressureTotal("/sys/fs/cgroup/cpu.pressure");
+  const [host, cgroup] = await Promise.all([
+    readCpuPressureTotal("/proc/pressure/cpu"),
+    readCpuPressureTotal("/sys/fs/cgroup/cpu.pressure"),
+  ]);
   return host === undefined && cgroup === undefined
     ? undefined
     : { host, cgroup };
@@ -121,8 +128,8 @@ function pressureDeltaMs(before?: number, after?: number): number | undefined {
 
 /** Time in the five-second lag window with at least one runnable task waiting. */
 export function cpuPressureWindow(
-  before: ReturnType<typeof readCpuPressureSample>,
-  after: ReturnType<typeof readCpuPressureSample>,
+  before: Awaited<ReturnType<typeof readCpuPressureSample>>,
+  after: Awaited<ReturnType<typeof readCpuPressureSample>>,
 ): { hostSomeMs?: number; cgroupSomeMs?: number } | undefined {
   const hostSomeMs = pressureDeltaMs(before?.host, after?.host);
   const cgroupSomeMs = pressureDeltaMs(before?.cgroup, after?.cgroup);
@@ -137,12 +144,14 @@ interface CpuThrottleSample {
 }
 
 /** Read the cgroup v2 CPU quota counters when Docker exposes them. */
-export function readCpuThrottleSample(): CpuThrottleSample | undefined {
+export async function readCpuThrottleSample(): Promise<
+  CpuThrottleSample | undefined
+> {
   if (process.platform !== "linux") {
     return undefined;
   }
   try {
-    const stat = readFileSync("/sys/fs/cgroup/cpu.stat", "utf8");
+    const stat = await readFile("/sys/fs/cgroup/cpu.stat", "utf8");
     const periods = /^nr_throttled (\d+)$/m.exec(stat)?.[1];
     const microseconds = /^throttled_usec (\d+)$/m.exec(stat)?.[1];
     if (periods !== undefined && microseconds !== undefined) {

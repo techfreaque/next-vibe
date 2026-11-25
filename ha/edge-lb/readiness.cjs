@@ -30,17 +30,19 @@ function localAppAnswers() {
   return new Promise((resolve) => {
     const req = get("http://127.0.0.1:3000/robots.txt", (res) => {
       res.resume();
-      resolve(res.statusCode === 200);
+      resolve(res.statusCode === 200 ? "ready" : "unavailable");
     });
     const timer = setTimeout(() => {
-      resolve(false);
+      resolve("unavailable");
       req.destroy();
     }, 850);
     req.once("close", () => {
       clearTimeout(timer);
-      resolve(false);
+      resolve("unavailable");
     });
-    req.once("error", () => resolve(false));
+    req.once("error", (error) => {
+      resolve(error.code === "ECONNREFUSED" ? "not-listening" : "unavailable");
+    });
   });
 }
 async function databaseAnswers() {
@@ -65,9 +67,11 @@ async function sample() {
   sampledAt = performance.now();
   result = !db
     ? "v1-db-unavailable"
-    : app
+    : app === "ready"
       ? "v1-ready"
-      : "v1-renderer-unavailable";
+      : app === "not-listening"
+        ? "v1-renderer-not-listening"
+        : "v1-renderer-unavailable";
   const status = `db=${db} app=${app}`;
   if (status !== lastStatus) {
     process.stdout.write(`${new Date().toISOString()} ${status}\n`);

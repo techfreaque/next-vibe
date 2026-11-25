@@ -27,6 +27,10 @@ async function run() {
   await new Promise((resolve) => {
     renderer.listen(0, "127.0.0.1", resolve);
   });
+  const rendererPort = renderer.address().port;
+  await new Promise((resolve) => {
+    renderer.close(resolve);
+  });
   let companion;
   const get = http.get;
   const modules = {
@@ -35,7 +39,7 @@ async function run() {
       get: (path, cb) => {
         assert.equal(path, "http://127.0.0.1:3000/robots.txt");
         return get(
-          `http://127.0.0.1:${renderer.address().port}/robots.txt`,
+          `http://127.0.0.1:${rendererPort}/robots.txt`,
           cb,
         );
       },
@@ -86,6 +90,10 @@ async function run() {
         );
       }).once("error", reject);
     });
+  await until(() => state(503, "v1-renderer-not-listening"));
+  await new Promise((resolve) => {
+    renderer.listen(rendererPort, "127.0.0.1", resolve);
+  });
   await until(() => state(503, "v1-renderer-unavailable"));
   rendererReady = true;
   await until(() => state(200, "v1-ready"));
@@ -131,7 +139,7 @@ async function run() {
   writable = true;
   await until(async () => !(await databaseAdmission(true)).aborted);
   process.stdout.write(
-    "PASS cold renderer timeout, warm recovery, DB rejection, missing/legacy/timed-out companion, strict readiness and recovery\n",
+    "PASS renderer not listening, cold renderer timeout, warm recovery, DB rejection, missing/legacy/timed-out companion, strict readiness and recovery\n",
   );
 }
 

@@ -30,6 +30,7 @@
 
 import "server-only";
 
+import { parseError } from "next-vibe/core/utils/parse-error";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { z } from "zod";
 
@@ -40,6 +41,7 @@ import {
 } from "./garbled-detector";
 import {
   isChatCompletionBody,
+  isJsonRecord,
   type JsonRecord,
   withIgnoredProvider,
 } from "./routing";
@@ -59,6 +61,7 @@ export const GARBLED_REPLACE_HEADER = "x-unbottled-garbled-replace";
 
 /** Field of the synthetic chunk that tells the chat loop to drop the partial answer. */
 export const GARBLED_RETRY_MARKER_KEY = "unbottled_garbled_retry";
+export const UPSTREAM_BODY_READ_RETRY_RULE = "upstream-body-read";
 
 export type FetchFn = (
   url: string | Request | URL,
@@ -370,6 +373,11 @@ async function* guardStream(
   let initialHoldDone = false;
   let textForwarded = false;
   let toolCallForwarded = false;
+  let terminalForwarded = false;
+  const providerPreferences = body["provider"];
+  const allowFallback =
+    !isJsonRecord(providerPreferences) ||
+    providerPreferences["allow_fallbacks"] !== false;
   let monitoring = true;
   let host: string | undefined;
 
@@ -388,94 +396,151 @@ async function* guardStream(
     }
   }
 
-  for await (const raw of readSseEvents(first)) {
-    const info = parseSseEvent(raw);
-    host = info.provider ?? host;
-    if (!monitoring) {
-      yield raw;
-      continue;
-    }
-
-    let verdict: GarbledVerdict = info.reasoning
-      ? detector.push("reasoning", info.reasoning)
-      : { garbled: false };
-    if (!verdict.garbled && info.text) {
-      verdict = detector.push("text", info.text);
-    }
-
-    if (verdict.garbled) {
-      const canRetry =
-        host !== undefined &&
-        !toolCallForwarded &&
-        (!textForwarded || opts.replaceAfterRelease);
-      if (host !== undefined && canRetry) {
-        logGarbled(
-          opts.logger,
-          "[OpenRouter] Garbled output detected - retrying on another host",
-          verdict,
-          { host, model, stage: textForwarded ? "after-release" : "held" },
-        );
-        attempt.abort();
-        held = [];
-        if (textForwarded) {
-          yield markerEvent(verdict.rule, host);
+  const events = readSseEvents(first);
+  try {
+    while (true) {
+      const next = await events.next().catch((error) => ({
+        error: error instanceof Error ? error : parseError(error),
+      }));
+      if ("error" in next) {
+        if (attempt.signal.aborted) {
+          return Promise.reject(next.error);
         }
-        const retry = await retryOnOtherHost(url, init, body, host, opts);
-        yield* retryEvents(
-          retry,
-          new GarbledOutputDetector(prompt),
-          opts,
+        const canRetry =
+          allowFallback &&
+          host !== undefined &&
+          !toolCallForwarded &&
+          !terminalForwarded &&
+          (!textForwarded || opts.replaceAfterRelease);
+        opts.logger.error("[OpenRouter] Upstream response body read failed", {
           model,
-        );
-        return;
-      }
-      logGarbled(
-        opts.logger,
-        "[OpenRouter] Garbled output detected - cannot recover, passing through",
-        verdict,
-        {
           host,
-          model,
-          stage: toolCallForwarded
-            ? "after-tool-call"
-            : textForwarded
-              ? "after-release"
-              : "no-host",
-        },
-      );
-      monitoring = false;
-      yield* release(true);
-      yield raw;
-      continue;
-    }
-
-    const chars = info.text.length + info.reasoning.length;
-    held.push({ raw, chars });
-    heldChars += chars;
-    if (chars > 0 && holdStartedAt === undefined) {
-      holdStartedAt = Date.now();
-    }
-
-    if (info.toolCall || info.terminal) {
-      yield* release(true);
-      if (info.toolCall) {
-        toolCallForwarded = true;
+          errorName: next.error.name,
+          errorCode:
+            "code" in next.error && typeof next.error.code === "string"
+              ? next.error.code
+              : null,
+          textForwarded,
+          toolCallForwarded,
+          terminalForwarded,
+          retrying: canRetry,
+        });
+        if (host !== undefined && canRetry) {
+          attempt.abort();
+          if (textForwarded) {
+            yield markerEvent(UPSTREAM_BODY_READ_RETRY_RULE, host);
+          }
+          const retry = await retryOnOtherHost(url, init, body, host, opts);
+          yield* retryEvents(
+            retry,
+            new GarbledOutputDetector(prompt),
+            opts,
+            model,
+          );
+          return;
+        }
+        yield* release(true);
+        return Promise.reject(next.error);
       }
-      continue;
-    }
-
-    if (!initialHoldDone) {
-      const heldTooLong =
-        holdStartedAt !== undefined &&
-        Date.now() - holdStartedAt > MAX_INITIAL_HOLD_MS;
-      if (heldChars < INITIAL_HOLD_CHARS && !heldTooLong) {
+      if (next.done) {
+        break;
+      }
+      const raw = next.value;
+      const info = parseSseEvent(raw);
+      host = info.provider ?? host;
+      if (!monitoring) {
+        textForwarded ||= info.text !== "" || info.reasoning !== "";
+        toolCallForwarded ||= info.toolCall;
+        terminalForwarded ||= info.terminal;
+        yield raw;
         continue;
       }
-      initialHoldDone = true;
+
+      let verdict: GarbledVerdict = info.reasoning
+        ? detector.push("reasoning", info.reasoning)
+        : { garbled: false };
+      if (!verdict.garbled && info.text) {
+        verdict = detector.push("text", info.text);
+      }
+
+      if (verdict.garbled) {
+        const canRetry =
+          host !== undefined &&
+          !toolCallForwarded &&
+          (!textForwarded || opts.replaceAfterRelease);
+        if (host !== undefined && canRetry) {
+          logGarbled(
+            opts.logger,
+            "[OpenRouter] Garbled output detected - retrying on another host",
+            verdict,
+            { host, model, stage: textForwarded ? "after-release" : "held" },
+          );
+          attempt.abort();
+          held = [];
+          if (textForwarded) {
+            yield markerEvent(verdict.rule, host);
+          }
+          const retry = await retryOnOtherHost(url, init, body, host, opts);
+          yield* retryEvents(
+            retry,
+            new GarbledOutputDetector(prompt),
+            opts,
+            model,
+          );
+          return;
+        }
+        logGarbled(
+          opts.logger,
+          "[OpenRouter] Garbled output detected - cannot recover, passing through",
+          verdict,
+          {
+            host,
+            model,
+            stage: toolCallForwarded
+              ? "after-tool-call"
+              : textForwarded
+                ? "after-release"
+                : "no-host",
+          },
+        );
+        monitoring = false;
+        yield* release(true);
+        textForwarded ||= info.text !== "" || info.reasoning !== "";
+        toolCallForwarded ||= info.toolCall;
+        terminalForwarded ||= info.terminal;
+        yield raw;
+        continue;
+      }
+
+      const chars = info.text.length + info.reasoning.length;
+      held.push({ raw, chars });
+      heldChars += chars;
+      if (chars > 0 && holdStartedAt === undefined) {
+        holdStartedAt = Date.now();
+      }
+
+      if (info.toolCall || info.terminal) {
+        toolCallForwarded ||= info.toolCall;
+        terminalForwarded ||= info.terminal;
+        yield* release(true);
+        continue;
+      }
+
+      if (!initialHoldDone) {
+        const heldTooLong =
+          holdStartedAt !== undefined &&
+          Date.now() - holdStartedAt > MAX_INITIAL_HOLD_MS;
+        if (heldChars < INITIAL_HOLD_CHARS && !heldTooLong) {
+          continue;
+        }
+        initialHoldDone = true;
+      }
+      yield* release(false);
     }
-    yield* release(false);
+    yield* release(true);
+  } finally {
+    await events.return(undefined);
   }
-  yield* release(true);
 }
 
 /**
