@@ -154,6 +154,20 @@ export const FEATURED_ON_BADGES: readonly FeaturedOnBadge[] = [
     height: 331,
   },
   {
+    // Free launch (scheduled week of 2027-03-08) publishes only while this
+    // badge link is on the site; their checker fetches https://unbottled.ai.
+    kind: "image",
+    slug: "scrolllaunch",
+    name: "ScrollLaunch",
+    href: "https://www.scrolllaunch.com/products/unbottled-ai?ref=badge",
+    rel: "noopener",
+    img: "/images/badges/scrolllaunch-light.svg",
+    imgDark: "/images/badges/scrolllaunch-dark.svg",
+    alt: "unbottled.ai - Featured on ScrollLaunch",
+    width: 220,
+    height: 48,
+  },
+  {
     kind: "text",
     slug: "aitooltrek",
     name: "AI Tool Trek",
