@@ -60,7 +60,7 @@ export const translations: typeof enTranslations = {
   },
   code: {
     copy: "Copiar",
-    wrap: "Líneas de trampa",
+    wrap: "Ajustar líneas",
     copied: "Copiado",
     request: "Solicitud",
     response: "Respuesta",

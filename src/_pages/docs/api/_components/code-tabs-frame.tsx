@@ -136,13 +136,13 @@ export function CodeTabsFrame({
       )}
     >
       <Div className="flex min-h-11 items-center justify-between gap-2 border-b border-white/10 bg-slate-900 py-1 pr-1.5 pl-3">
-        <Div className="relative flex min-w-0 flex-1">
-          <Div className="flex min-w-0 flex-1 items-center gap-2 overflow-x-auto pr-6 [scrollbar-width:none]">
+        <Div className="flex min-w-0 flex-1">
+          {/* Tabs wrap to a second row on narrow screens: never clipped */}
+          <Div className="flex min-w-0 flex-1 flex-wrap items-center gap-2">
             {title !== undefined && (
               <Span
                 className={cn(
-                  "shrink-0 font-mono text-[11px] font-medium uppercase tracking-wider text-slate-400",
-                  showTabs && "hidden sm:inline",
+                  "min-w-0 font-mono text-[11px] font-medium uppercase tracking-wider text-slate-400",
                 )}
               >
                 {title}
@@ -151,7 +151,7 @@ export function CodeTabsFrame({
             {showTabs && (
               <Div
                 role="tablist"
-                className="flex shrink-0 items-center gap-0.5"
+                className="flex min-w-0 flex-wrap items-center gap-0.5"
               >
                 {tabs.map((tab, index) => (
                   <Button
@@ -180,7 +180,6 @@ export function CodeTabsFrame({
               </Span>
             )}
           </Div>
-          <Span className="pointer-events-none absolute inset-y-0 right-0 w-6 bg-gradient-to-l from-slate-900 to-transparent" />
         </Div>
         <Div className="flex shrink-0 items-center gap-0.5">
           <Button

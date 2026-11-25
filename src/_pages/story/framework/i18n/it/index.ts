@@ -2,227 +2,268 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title: "Framework next-vibe: una definizione per ogni interfaccia",
+    title: "Sviluppatori: framework next-vibe, API IA senza censura, MCP",
     description:
-      "Framework TypeScript open source. Un file definition.ts genera un’interfaccia web, un comando CLI, uno strumento MCP, una schermata nativa, uno strumento IA e un cron job. Include un’API ospitata compatibile con OpenAI e Anthropic.",
-    category: "Framework",
-    imageAlt: "Framework next-vibe per sviluppatori",
+      "Scrivi un endpoint e ottieni interfaccia web, comando CLI, strumento MCP e strumento IA. Open source. Clona, installa, avvia. In più un'unica API compatibile con OpenAI e Anthropic per modelli mainstream e senza censura.",
+    category: "Sviluppatori",
+    imageAlt: "unbottled.ai per sviluppatori: API, MCP e self-hosting",
     keywords:
-      "next-vibe, TypeScript quadro, MCP server, CLI, AI strumenti, Zod, Drizzle, OpenAI compatibile API",
+      "API IA senza censura, API compatibile OpenAI, API compatibile Anthropic, API modelli abliterated, API UncensoredLM, server MCP, IA self-hosted, next-vibe",
   },
   hero: {
-    eyebrow: "Open source · MIT + GPL v3",
-    title: "Un solo file definition.ts.",
-    titleAccent: "Per ogni interfaccia.",
+    eyebrow: "Per sviluppatori",
+    title: "Un solo definition.ts.",
+    titleAccent: "Ogni interfaccia.",
     subtitle:
-      "In next-vibe, una definizione di endpoint genera un’interfaccia web, un comando CLI, uno strumento MCP, una schermata nativa, uno strumento IA, un cron job e altre sette interfacce. Stesse regole di convalida e stessi tipi, senza codice di raccordo.",
-    ctaQuickstart: "Eseguilo in quattro comandi",
-    ctaGithub: "Visualizza su GitHub",
-    stat1Label: "endpoint digitati in questo repo",
-    stat2Label: "interfacce per endpoint",
-    stat3Label: "lingue per stringa",
-    stat4Label: "definizione per caratteristica",
-  },
-  example: {
-    eyebrow: "Un vero e proprio endpoint",
-    title: "Segui il modulo di contatto.",
-    intro:
-      "Il punto finale di contatto dal repo, vivere in fondo a questa pagina. Due file da leggere. Sei delle sue tredici superfici sottostanti.",
-    source: "Leggi la fonte completa su GitHub",
-    live: "Prova la forma live",
-    becomes: "Che cosa diventa",
-    more: "Più di sette",
-    moreSurfaces: {
-      webApi: "REST API",
-      websocket: "Eventi WebSocket",
-      electron: "App Electron",
-      adminPanel: "Pannello di amministrazione",
-      vibeFrame: "widget incorporabile",
-      remoteSkill: "Capacità dell'agente",
-      vibeBoard: "Nodo di analisi",
-    },
-    surfaces: {
-      web: {
-        title: "Web UI",
-        body: "Il modulo in fondo a questa pagina. I campi, la convalida e l'avviso di successo provengono dalla definizione.",
-      },
-      cli: {
-        title: "comando CLI",
-        body: "vibe contact-form. Un flag per campo e istruzioni con esempi già inclusi.",
-      },
-      mcp: {
-        title: "Strumento MCP",
-        body: "Qualsiasi client MCP può chiamare contact-form tramite vibe mcp. Lo schema di input arriva direttamente da Zod.",
-      },
-      ai: {
-        title: "Strumento AI",
-        body: "I modelli possono chiamarlo. requiresConfirmation fa approvare l'utente prima di inviare.",
-      },
-      native: {
-        title: "Schermo nativo",
-        body: "L'app Expo rende lo stesso widget con input nativi.",
-      },
-      cron: {
-        title: "Lavoro Cron",
-        body: "Ogni endpoint puo' funzionare con un programma. Stesso manubrio, nessun secondo percorso di codice.",
-      },
-    },
-    callsTitle: "Quattro modi per",
-    callsBody:
-      "Invocazioni vere. Le chiamate CLI, MCP e AI hanno colpito il contatto del gestore sopra. La scheda Cron è un vero e proprio compito programmato dal repo.",
-  },
-  pattern: {
-    eyebrow: "Il modello",
-    title: "Una caratteristica è una cartella.",
-    subtitle:
-      "definition.ts e route.ts sono obbligatori. Widget, email, tabella e traduzioni stanno nella stessa cartella. Non devi aggiornare un registro centrale.",
-    deleteLine:
-      "Elimina la cartella ed esegui vibe gen. La funzionalità sparisce da tutte le interfacce in una volta.",
-  },
-  hood: {
-    eyebrow: "Sotto il cofano",
-    title: "Parti di bordatura, una volta.",
-    intro:
-      "Il framework possiede la validazione, auth, logging, i18n e in tempo reale. La tua cartella possiede la logica aziendale.",
-    platform: {
-      title: "Ruoli e piattaforme marcatori",
-      body: "allowedRoles decide chi può chiamare un endpoint. I marcatori della piattaforma decidono dove si presenta: AI_TOOL_OFF lo nasconde dai modelli, PRODUCTION_OFF lo tiene fuori produzione. Controllato su ogni superficie.",
-    },
-    data: {
-      title: "Zod, Drizzle, PostgreSQL",
-      body: "Zod convalida input e output e genera lo schema di ogni strumento. I repository gestiscono la persistenza con Drizzle. Le migrazioni sono nel repository. L’impostazione predefinita usa PGlite integrato, senza Docker. Se ti serve un Postgres completo, impostalo in DATABASE_URL.",
-    },
-    realtime: {
-      title: "Tempo reale digitato",
-      body: "Gli endpoint dichiarano gli schemi degli eventi e gli ambiti dei canali. I client ricevono via WebSocket i token in streaming e l’avanzamento delle attività. Il sistema pub/sub gira nello stesso processo o su Redis.",
-    },
-    remote: {
-      title: "Esempi collegati",
-      body: "Le istanze si connettono l'un l'altro, eseguono strumenti su un pari e sincronizzano i dati che permettono. Ogni lato fa rispettare le proprie autorizzazioni. Questo è il modo in cui un'installazione self-hosted utilizza i modelli unbottled.ai.",
+      "next-vibe è il framework TypeScript open source dietro {{appName}}. Scrivi un endpoint e ottieni interfaccia web, comando CLI, strumento MCP, strumento IA e altro. Stessa validazione, stessi tipi, zero codice di raccordo.",
+    ctaFramework: "Guarda il pattern",
+    ctaKeys: "Usa l'API",
+    stats: {
+      endpoints: "endpoint tipizzati nel repo",
+      surfaces: "interfacce da una definizione",
+      languages: "lingue, ogni testo tradotto",
+      models: "modelli di chat, una chiave API",
     },
   },
-  typescript: {
-    title: "Niente any, unknown o throw.",
-    subtitle:
-      "I tipi corrispondono dall’input all’output. vibe check lo verifica prima di ogni rilascio.",
-    patterns: {
-      any: {
-        name: "Niente any",
-        description:
-          "Dichiara l’interfaccia che usi. Se ti serve any, c’è una lacuna nell’architettura.",
-      },
-      unknown: {
-        name: "Niente unknown",
-        description:
-          "Vale la stessa regola. unknown rimanda il problema di any a un altro punto del codice.",
-      },
-      object: {
-        name: "Niente object generico",
-        description:
-          "Definisci la struttura che ti aspetti. object non la specifica.",
-      },
-      asX: {
-        name: "Niente as X",
-        description:
-          "I cast mentono al compilatore. Fissare i tipi alla fonte invece.",
-      },
-      throwStatements: {
-        name: "no but",
-        description:
-          "Rispondere a ResponseType <T> tramite successo (dati) o fail({ messaggio, errorType }). Gli errori sono dati.",
-      },
-      hardcodedStrings: {
-        name: "nessuna stringa grezza",
-        description:
-          "Ogni stringa di interfaccia utente è una chiave di traduzione. L'interiore cattura i letterali.",
-      },
+  paths: {
+    api: {
+      label: "Chiama l'API",
+      title: "{{modelCount}} modelli con una sola chiave",
+      body: "Il tuo codice OpenAI o Anthropic, la nostra base URL. Modelli mainstream e senza censura con la stessa chiave.",
+      link: "Quickstart",
     },
-    vibeCheck:
-      "vibe check esegue Oxlint, ESLint e il controllo TypeScript in parallelo. Il rilascio richiede zero errori.",
+    selfHost: {
+      label: "Self-hosting",
+      title: "Fai girare l'intera piattaforma",
+      body: "Open source. Clona, installa, avvia. Al resto pensa il browser.",
+      link: "Installala",
+    },
+    framework: {
+      label: "Costruisci sopra",
+      title: "Una definizione, ogni interfaccia",
+      body: "Scrivi un endpoint una volta. Ottieni interfaccia web, comando CLI, strumento MCP, strumento IA e altro.",
+      link: "Guarda il pattern",
+    },
   },
   quickstart: {
     eyebrow: "Quickstart",
-    title: "Quattro comandi. Poi apri il browser.",
+    title: "Prima risposta in tre passi.",
     intro:
-      "Da solo, installa, inizia. Una procedura guidata di configurazione gestisce il login dell'amministratore e il tuo provider AI. Nessun file di configurazione da modificare.",
-    selfHost: "Guida self-hosting",
-    docs: "Docs modello su GitHub",
+      "L'API parla OpenAI Chat Completions e Responses, e Anthropic Messages. Il tuo codice gira qui con tre modifiche: la base URL, la chiave e un id modello da `GET /v1/models`.",
+    step1: {
+      title: "Sblocca l'API e crea una chiave",
+      description:
+        "Qualsiasi piano da {{subPrice}} al mese la sblocca. Poi apri le chiavi API, dai un nome alla chiave e copiala. La vedi una volta sola.",
+      ctaPlans: "Vedi i piani",
+      ctaKeys: "Apri le chiavi API",
+    },
+    step2: {
+      title: "Punta il tuo client su di noi",
+      description:
+        "I client OpenAI usano il primo URL. Claude Code e gli SDK Anthropic usano il secondo.",
+      baseUrl: "Base URL OpenAI",
+      baseUrlNote:
+        "Nel percorso va bene qualsiasi locale. Cambia solo la lingua dei messaggi di errore.",
+      anthropicBaseUrl: "Base URL Anthropic",
+      anthropicNote:
+        "Niente `/v1` alla fine: i client Anthropic aggiungono `/v1/messages` da soli.",
+    },
+    step3: {
+      title: "Invia una richiesta",
+      description:
+        "Inserisci la tua chiave e lancia la richiesta. `{{model}}` è un id di modello. `GET /v1/models` elenca tutti gli id che la tua chiave può chiamare.",
+      response: "Risposta di esempio",
+    },
+    agents: {
+      title: "Gli agenti di coding funzionano subito",
+      body: "Configurazioni testate, da copiare e incollare:",
+      link: "Configurazioni per agenti di coding",
+    },
+    reference: "Riferimento API completo",
   },
-  api: {
-    eyebrow: "Hosting API",
-    title: "Oppure chiama semplicemente {{appName}} API.",
+  pricing: {
+    eyebrow: "Prezzi",
+    title: "Un piano la sblocca. Paghi a chiamata, in crediti.",
     intro:
-      "Non è necessario installare. OpenAI e Anthropic compatibili: mantieni il tuo SDK, cambia la base URL e la chiave.",
-    endpoints: {
-      chat: "OpenAI Chat Completions",
-      responses: "OpenAI Responses",
-      messages: "Anthropic Messages",
-      models: "Elenco modelli con prezzi",
+      "Le stesse tariffe dell'app di chat. Nessun sovrapprezzo per l'API, nessun costo per utente, un solo saldo.",
+    unlockTitle: "Sblocca l'API",
+    unlockPlan: "Qualsiasi piano, da {{subPrice}} al mese",
+    unlockGrant: "Crediti assegnati dal nostro team, come i crediti per tester",
+    neverTitle: "Non la sblocca mai",
+    never:
+      "Il piano gratuito: quota mensile, bonus di registrazione e newsletter, guadagni da referral. Senza un piano o crediti assegnati, ogni chiamata `/v1` risponde 402 `paid_plan_required`.",
+    billTitle: "Come si paga una chiamata",
+    bill: "Costo del provider più il nostro ricarico, in crediti. `GET /v1/models` mostra per ogni modello i crediti per milione di token in input e in output. Ogni risposta riporta `usage.credits_charged`; in streaming serve `stream_options.include_usage`.",
+    topup:
+      "Ne vuoi di più? Gli abbonati ricaricano con pacchetti di crediti da {{packPrice}}. I crediti dei pacchetti non scadono mai.",
+    facts: {
+      credit: "1 credito = 1 centesimo di dollaro",
+      rate: "{{rate}} richieste al minuto per chiave",
+      keys: "Fino a {{maxKeys}} chiavi per account",
+      preflight: "Crediti insufficienti: 402 prima che parta qualsiasi cosa",
     },
-    access:
-      "Modelli {{modelCount}} dietro una chiave, fatturati in crediti {{appName}}. Le chiavi API si sbloccano con qualsiasi abbonamento o pacchetto di credito.",
-    docs: "Leggi i documenti API",
-    keys: "Creare una chiave API",
+    modelsTitle: "Ogni prezzo arriva dall'API stessa",
+    modelsResponse: "Risposta di esempio",
   },
-  examples: {
-    eyebrow: "In questo repo",
-    title: "Non solo chat AI.",
-    subtitle:
-      "Interi domini aziendali spediscono in questo repo, ciascuno costruito sullo stesso modello.",
-    items: {
-      aiPlatform: {
-        label: "Piattaforma AI",
-        title: "{{appName}}",
-        body: "Modelli {{modelCount}}, chat, memoria, agenti, fatturazione e MCP. Questa esatta base di codice, in produzione.",
+  uncensored: {
+    eyebrow: "Modelli senza censura",
+    title: "Due modi di essere senza censura. Entrambi sull'API.",
+    intro:
+      "Quasi tutta l'IA senza censura è un modello mainstream con i rifiuti tagliati o eliminati con l'addestramento. Noi offriamo quelli, più uno addestrato in modo diverso fin dall'inizio. Scegli a ogni richiesta con l'id del modello.",
+    abliterated: {
+      label: "Abliterated e fine-tuned",
+      title: "Modelli mainstream che smettono di schivare",
+      body: "Rifiuti tagliati dai pesi o eliminati con l'addestramento. Stesse conoscenze, risposte dirette.",
+    },
+    worldview: {
+      label: "Davvero senza censura",
+      title: "Un modello con una sua visione del mondo",
+      body: "{{model}} è addestrato su libri e documenti banditi dall'internet mainstream: il risultato è un modello con opinioni politiche controcorrente.",
+    },
+    more: "+{{count}} altri",
+    consent:
+      "Conferma una volta di avere 18 anni o più nella pagina delle chiavi API. Fino ad allora i modelli senza censura rispondono 403 `uncensored_consent_required` e non viene addebitato nulla.",
+    allModels: "Tutti i modelli senza censura",
+    catalog: "Sfoglia il catalogo dei modelli",
+  },
+  mcp: {
+    eyebrow: "MCP e CLI",
+    title: "Il tuo agente conosce già la tua app.",
+    intro:
+      "`bun i` scrive la configurazione MCP per Claude Code, Cursor, VS Code, OpenCode e Codex. Apri il repo nel tuo agente e gli strumenti sono già lì.",
+    points: {
+      stdio: "MCP via stdio. Nessun server in più, nessuna porta.",
+      roles:
+        "Stessi ruoli e stessa validazione dell'interfaccia web. I modelli arrivano solo dove il tuo ruolo lo consente.",
+      connect:
+        "Collega l'installazione al tuo account {{appName}} e i suoi agenti girano sui nostri modelli.",
+      help: "Ogni comando si documenta da solo: `vibe <command> --help`.",
+    },
+    configNote:
+      "La voce `atlas` che scrive `bun i`, accorciata. Il file vero contiene anche un server `hermes` e usa il percorso del tuo clone.",
+  },
+  selfHost: {
+    eyebrow: "Self-hosting",
+    title: "Fai girare tutto da te.",
+    intro:
+      "La piattaforma dietro {{appName}} è open source. Clona, installa, avvia. Poi ci pensa il browser. Niente Docker, niente file di configurazione.",
+    terminal: "Terminale",
+    db: "Postgres integrato (PGlite) di default. Quando non ti basta più, punta `DATABASE_URL` sul tuo Postgres.",
+    guide: "Guida al self-hosting",
+    github: "Codice su GitHub",
+  },
+  framework: {
+    eyebrow: "Il framework",
+    title: "Segui un endpoint.",
+    intro:
+      "Il modulo di contatto di questo repo, accorciato ma reale. Una sola definizione diventa interfaccia web, comando CLI, strumento MCP, schermata nativa, strumento IA e cron job. Il modulo vero lo trovi in fondo a questa pagina.",
+    tabAdd: "Aggiungi il tuo",
+    call: {
+      title: "Chiamalo",
+      cli: "CLI",
+      mcp: "MCP",
+      ai: "Strumento IA",
+      cron: "Cron",
+    },
+    becomes: "Il modulo di contatto diventa",
+    more: "Più altre {{count}} interfacce",
+    source: "Sorgente completo su GitHub",
+    live: "Provalo dal vivo qui sotto",
+    docs: "Documentazione dei pattern su GitHub",
+    deleteLine:
+      "Una funzionalità è una cartella. Cancellala, lancia `vibe gen` e sparisce da tutte le interfacce in un colpo solo.",
+    moreSurfaces: {
+      webApi: "REST API",
+      websocket: "Eventi WebSocket",
+      adminPanel: "Pannello di amministrazione",
+      vibeFrame: "Widget incorporabile",
+    },
+    surfaces: {
+      web: {
+        title: "Interfaccia web",
+        body: "Il modulo in fondo a questa pagina. Campi, validazione e messaggio di conferma arrivano dalla definizione.",
       },
-      commerce: {
-        label: "Commercio",
-        title: "Prodotti e punto vendita",
-        body: "Prodotti, punto vendita, inventario e acquisto.",
+      cli: {
+        title: "Comando CLI",
+        body: "`vibe contact-form`, un flag per campo, help già incluso.",
       },
-      finance: {
-        label: "Finanza",
-        title: "Contabilità e pagamenti",
-        body: "Grafico di conti, tassi fiscali, fatture, pagamenti Stripe e cripto.",
+      mcp: {
+        title: "Strumento MCP",
+        body: "Gli agenti lo raggiungono tramite `vibe mcp` con lo strumento `execute-tool`. Lo schema di input arriva dritto da Zod.",
       },
-      crm: {
-        label: "CRM",
-        title: "Contatto e messaggistica",
-        body: "Contatto, newsletter, casella di posta elettronica e SMS.",
+      ai: {
+        title: "Strumento IA",
+        body: "I modelli possono chiamarlo. Con `requiresConfirmation` l'utente deve approvare prima.",
+      },
+      native: {
+        title: "Schermata nativa",
+        body: "L'app Expo mostra lo stesso widget con input nativi. Beta.",
+      },
+      cron: {
+        title: "Cron job",
+        body: "Ogni endpoint può girare a orari programmati. Stesso handler, nessun secondo percorso di codice.",
+      },
+    },
+    maturity: {
+      stable: {
+        title: "In produzione",
+        body: "{{appName}} gira su questo codice: web, CLI, MCP, strumenti IA, cron, realtime, pagamenti.",
+      },
+      beta: {
+        title: "Beta",
+        body: "Schermate React Native, sincronizzazione tra istanze e skill remote funzionano, ma con qualche spigolo.",
+      },
+      churn: {
+        title: "Aspettati cambiamenti",
+        body: "Un solo team, che va veloce. Ancora niente semver e la documentazione resta indietro rispetto al codice. Fissa un commit o fai un fork.",
       },
     },
   },
-  maturity: {
-    eyebrow: "Stato onesto",
-    title: "Che navi oggi.",
-    stable: {
-      title: "In produzione",
-      body: "{{appName}} funziona su questo codebase: web, CLI, MCP, strumenti AI, cron, in tempo reale, pagamenti. La produzione si basa su Next.js. Di default per lo sviluppo locale a TanStack Start e Vite.",
+  faq: {
+    title: "Le domande degli sviluppatori",
+    free: {
+      q: "Esiste un piano API gratuito?",
+      a: "No. L'API si sblocca con qualsiasi piano, da {{subPrice}} al mese, oppure con crediti assegnati dal nostro team. La quota gratuita della chat non la sblocca.",
     },
-    beta: {
-      title: "Beta",
-      body: "Ripristinare schermi nativi, sincronizzazione istanza-instance e competenze remote funzionano, con bordi grezzi.",
+    sdks: {
+      q: "Quali SDK e strumenti funzionano?",
+      a: "Gli SDK ufficiali di OpenAI e Anthropic, qualsiasi libreria compatibile con OpenAI e agenti di coding come Claude Code, Codex CLI, OpenCode, Aider, Cline e Continue. Cambi la base URL e la chiave.",
     },
-    honest: {
-      title: "Attesa di mandrino",
-      body: "Una squadra, che si muove in fretta, giudicata. Ancora niente semver, e i documenti seguono il codice. Perdere un commit o fork esso.",
+    price: {
+      q: "Quanto costa una chiamata?",
+      a: "In crediti. Un credito vale un centesimo di dollaro. Ogni modello ha una tariffa in crediti per milione di token in input e in output, elencata in `GET /v1/models`. Ogni risposta riporta `usage.credits_charged` (in streaming con `stream_options.include_usage`), così sai sempre quanto ti è costata una chiamata.",
+    },
+    uncensored: {
+      q: "Posso chiamare i modelli senza censura via API?",
+      a: "Sì. Conferma una volta nella pagina delle chiavi API di avere almeno 18 anni, poi li chiami come qualsiasi altro modello. I modelli abliterated e UncensoredLM usano gli stessi endpoint.",
+    },
+    media: {
+      q: "Anche immagini, voce, video e musica?",
+      a: "Stessa chiave. `/v1/images`, `/v1/audio`, `/v1/videos` e `/v1/music` seguono i formati OpenAI dove esistono. Il riferimento API copre ogni endpoint.",
+    },
+    limits: {
+      q: "Quali sono i limiti di frequenza?",
+      a: "{{rate}} richieste al minuto per chiave di default. Oltre il limite ricevi HTTP 429 con un header `Retry-After`. Ti serve più throughput? Usa il modulo di contatto qui sotto.",
+    },
+    selfHost: {
+      q: "Il self-hosting è gratis?",
+      a: "Sì. Il codice è open source: MIT per l'app, GPL v3 per il framework. Usa le tue chiavi dei provider, oppure collega l'installazione al tuo account {{appName}} e paghi solo quello che usi.",
+    },
+    docker: {
+      q: "Mi servono Docker o un server di database?",
+      a: "No. Il database di default è Postgres integrato (PGlite). Più avanti passi a un Postgres completo cambiando `DATABASE_URL`.",
     },
   },
   contact: {
-    eyebrow: "Il punto finale, dal vivo",
-    title: "Domande, o costruire qualcosa di grosso?",
+    eyebrow: "L'endpoint, dal vivo",
+    title: "Domande, o stai costruendo qualcosa di grosso?",
     description:
-      "Setup, integrazioni personalizzate, recensione architettura. Questa forma è il punto finale di contatto dalla parte superiore della pagina, reso dal quadro.",
+      "Configurazione, integrazioni su misura, revisione dell'architettura. Ti risponde il team che l'ha costruito. Questo modulo è l'endpoint di contatto della sezione sul framework.",
   },
   code: {
     copy: "Copia",
-    copied: "Affrontato",
-    wrap: "WORD",
-    terminal: "Terminal",
-    cli: "CLI",
-    mcp: "MCP",
-    ai: "Strumento AI",
-    cron: "Cron",
-    anthropic: "Anthropic (curl)",
+    copied: "Copiato",
+    wrap: "A capo",
+    anthropic: "Anthropic",
   },
 };

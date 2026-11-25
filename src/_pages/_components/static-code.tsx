@@ -35,6 +35,9 @@ function StaticHighlighter({
     <SyntaxHighlighter
       language={language}
       useInlineStyles={false}
+      // Without this the library still inlines its default light theme on
+      // <code> (black text, white text-shadow): ghost text on dark blocks.
+      codeTagProps={{ className: `language-${language}` }}
       customStyle={{
         margin: 0,
         padding: PADDING[layout],

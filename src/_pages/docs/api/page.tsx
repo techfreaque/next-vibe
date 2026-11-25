@@ -57,16 +57,18 @@ import {
 import { Callout, Cta } from "../../story/_shared/marketing";
 import { GuideCardGrid } from "../../story/blog/guide-links";
 import type { BlogPostSlug } from "../../story/blog/posts-meta";
-import { type CodeTab, CodeTabs, CopyButton } from "./_components/code-tabs";
+import { type CodeTab, CodeTabs } from "./_components/code-tabs";
 import {
   autoCode,
   Bullets,
   DocSection,
   DocTable,
   Prose,
+  QuickStep,
   renderRich,
   ResponseExample,
   SubBlock,
+  UrlRow,
 } from "./_components/doc-blocks";
 import { DocsMobileToc, DocsToc, type TocGroup } from "./_components/docs-toc";
 import { PanelTabs } from "./_components/panel-tabs";
@@ -198,101 +200,6 @@ const text = (label: string, code: string): CodeTab => ({
   language: "text",
   code,
 });
-
-/** Numbered quickstart step with a vertical rail. */
-function QuickStep({
-  n,
-  title,
-  description,
-  last = false,
-  children,
-}: {
-  n: number;
-  title: string;
-  description: string;
-  last?: boolean;
-  children: JSX.Element;
-}): JSX.Element {
-  return (
-    <Div className="relative flex gap-4 sm:gap-5">
-      <Div className="flex flex-col items-center">
-        <Span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-semibold text-primary-foreground shadow-sm">
-          {n}
-        </Span>
-        {!last && <Span className="mt-2 w-px flex-1 bg-border" />}
-      </Div>
-      <Div
-        className={`flex min-w-0 flex-1 flex-col gap-3 ${last ? "" : "pb-10"}`}
-      >
-        <Div className="flex flex-col gap-1 pt-1">
-          <Span className="text-base font-semibold text-foreground">
-            {title}
-          </Span>
-          <P className="m-0 text-[15px] leading-relaxed text-muted-foreground">
-            {renderRich(description)}
-          </P>
-        </Div>
-        {children}
-      </Div>
-    </Div>
-  );
-}
-
-/** Label + monospace value + copy action, for base URLs. */
-function UrlRow({
-  label,
-  value,
-  note,
-  copyLabel,
-  copiedLabel,
-  small = false,
-}: {
-  label: string;
-  value: string;
-  note?: string;
-  copyLabel: string;
-  copiedLabel: string;
-  wrapLabel?: string;
-  /** Smaller type, for the narrow hero card. */
-  small?: boolean;
-}): JSX.Element {
-  return (
-    <Div className="flex min-w-0 flex-col gap-1.5">
-      <Span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-        {label}
-      </Span>
-      <Div className="relative min-w-0 rounded-lg border border-border bg-card py-1 pl-3">
-        <Span
-          className={`block min-w-0 py-1.5 pr-12 font-mono text-foreground sm:pr-24 ${small ? "text-[12px]" : "text-[13px]"}`}
-        >
-          {/* Each "segment/" is an inline-block: lines break only between
-              path segments, and copied text has no invisible characters */}
-          {value.split(/(?<=\/)/).map((segment, index) => (
-            <Span
-              key={`${index}-${segment}`}
-              className="inline-block whitespace-nowrap"
-            >
-              {segment}
-            </Span>
-          ))}
-        </Span>
-        <CopyButton
-          text={value}
-          copyLabel={copyLabel}
-          copiedLabel={copiedLabel}
-          tone="light"
-          compact
-          className="absolute top-1 right-1"
-        />
-      </Div>
-      {note !== undefined && (
-        <P className="m-0 text-xs leading-relaxed text-muted-foreground">
-          {renderRich(note)}
-        </P>
-      )}
-    </Div>
-  );
-}
 
 export function TanstackPage({
   locale,

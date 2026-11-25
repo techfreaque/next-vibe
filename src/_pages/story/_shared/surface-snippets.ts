@@ -1,6 +1,7 @@
 /**
  * Real, trimmed code used on the developer page.
- * Sources: src/contact/{definition,route}.ts, src/credits/expire/task.ts.
+ * Sources: src/contact/{definition,repository,route}.ts,
+ * src/credits/expire/task.ts.
  * Keep in sync with those files.
  */
 
@@ -12,8 +13,10 @@ const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["contact"],
   aliases: ["contact-form"],
-  requiresConfirmation: true, // AI callers must ask the user first
-  allowedRoles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN],
+  // AI callers must ask the user first
+  requiresConfirmation: true,
+  allowedRoles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN /* , ... */],
+  // title, description, category, icon, tags: required too
 
   fields: customWidgetObject({
     render: ContactFormWidget, // one widget, every surface
@@ -26,6 +29,7 @@ const { POST } = createEndpoint({
         label: "form.fields.name.label",
       }),
       message: requestField(scopedTranslation, {
+        // real file: superRefine, lets "" through to the repository check
         schema: z.string().min(10),
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXTAREA,
@@ -43,7 +47,48 @@ const { POST } = createEndpoint({
   examples: { /* typed request + response samples */ },
 });`;
 
-export const CONTACT_ROUTE = `// src/contact/route.ts (complete)
+export const CONTACT_REPOSITORY = `// src/contact/repository.ts (trimmed)
+export class ContactRepository {
+  static async submitContactForm(
+    data: ContactRequest, // typed from the definition
+    user: JwtPayloadType,
+    locale: CountryLanguage,
+    logger: EndpointLogger,
+    t: ContactT,
+  ): Promise<ResponseType<ContactResponse>> {
+    if (isContactMessageEmpty(data.message)) {
+      return fail({ // no throw, anywhere
+        message: t("errors.validation.messageEmpty"),
+        errorType: ErrorResponseTypes.VALIDATION_ERROR,
+      });
+    }
+    const [contact] = await db
+      .insert(contacts) // Drizzle table from ./db.ts
+      .values({
+        name: data.name,
+        email: data.email ?? null,
+        subject: data.subject,
+        message: data.message,
+        status: ContactStatus.NEW,
+      })
+      .returning();
+    if (!contact) {
+      return fail({
+        message: t("errors.repositoryCreateFailedForEmail", {
+          email: data.email ?? "unknown",
+        }),
+        errorType: ErrorResponseTypes.DATABASE_ERROR,
+      });
+    }
+    return success({
+      success: t("response.success"),
+      messageId: contact.id,
+      status: [ContactStatus.NEW],
+    });
+  }
+}`;
+
+export const CONTACT_ROUTE = `// src/contact/route.ts (imports omitted)
 export const { POST, tools } = endpointsHandler({
   endpoint: contactEndpoints,
   [Methods.POST]: {
@@ -64,17 +109,38 @@ export const SURFACE_CLI = `$ vibe contact-form \\
 # flags come from the Zod fields
 # vibe contact-form --help prints them, with examples`;
 
-export const SURFACE_MCP = `// .mcp.json - Claude, Cursor, any MCP client
-{
+/** What `bun i` writes to .mcp.json (Claude Code), shape from mcp.template.json. */
+export const SURFACE_MCP = `{
   "mcpServers": {
-    "my-app": { "command": "vibe", "args": ["mcp"] }
+    "atlas": {
+      "command": "bun",
+      "args": [
+        "--preload",
+        "<repo>/src/vibe/platforms/cli/runtime/env-preload.ts",
+        "<repo>/src/vibe/platforms/cli/vibe-runtime.ts",
+        "mcp"
+      ],
+      "env": { "PROJECT_ROOT": "<repo>" }
+    }
   }
-}
+}`;
 
-// the client discovers and calls it:
-execute-tool {
-  "toolName": "contact-form",
-  "input": { "name": "Ada", "message": "Self-host for 40 people?" }
+/** The MCP tools/call an agent sends: endpoints run through `execute-tool`. */
+export const SURFACE_MCP_CALL = `{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "tools/call",
+  "params": {
+    "name": "execute-tool",
+    "arguments": {
+      "toolName": "contact-form",
+      "input": {
+        "name": "Ada Lovelace",
+        "email": "ada@example.com",
+        "message": "Can we self-host this for a team of 40?"
+      }
+    }
+  }
 }`;
 
 export const SURFACE_AI = `// Same definition, offered to the model as a tool.
@@ -85,7 +151,8 @@ model: contact-form({ name: "Ada", message: "Do you do on-prem?" })
        -> requiresConfirmation: the user approves before it sends
 tool:  { success: "Thank you for contacting us! ...", messageId: "..." }`;
 
-export const SURFACE_CRON = `// src/credits/expire/task.ts - any endpoint, on a schedule
+export const SURFACE_CRON = `// src/credits/expire/task.ts (trimmed)
+// any endpoint, on a schedule
 const creditExpirationTask = createCronTask(
   creditExpirationTaskDefinition.POST,
   tools.POST, // the same handler the web, CLI and MCP call
@@ -100,18 +167,24 @@ const creditExpirationTask = createCronTask(
   },
 );`;
 
-export const FEATURE_TREE = `src/contact/
+export const FEATURE_TREE = `src/contact/          (trimmed)
 ├── definition.ts   # fields, Zod, roles, errors
 ├── repository.ts   # logic, returns success/fail
 ├── route.ts        # definition -> repository
 ├── widget.tsx      # UI for every surface
 ├── email.tsx       # confirmation emails
 ├── db.ts           # Drizzle table
-└── i18n/           # en, de, pl, fr`;
+├── i18n/           # en, de, pl, fr, es, it
+└── ...             # enums, SMS, tests`;
 
 export const SURFACE_ADD = `mkdir -p src/my-feature
-# definition.ts, repository.ts, route.ts
+# add definition.ts, repository.ts, route.ts
 
-vibe gen                    # registers every surface
-vibe check src/my-feature   # 0 errors or not done
-vibe my-feature --help      # live in the CLI`;
+# register every surface
+vibe gen
+
+# 0 errors or not done
+vibe check src/my-feature
+
+# live in the CLI
+vibe my-feature --help`;
