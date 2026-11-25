@@ -210,20 +210,15 @@ services:
         condition: service_healthy
       minio-init:
         condition: service_completed_successfully
-    # Host ports parameterized so a second vibe site on the same box binds
-    # DISTINCT ports (unbottled: 3100/4100) and never collides with the first
-    # site's 3000/4000. Defaults keep Server 1 EXACTLY as before.
-    #
-    # IMPORTANT — host port MUST equal container port here. The app derives its
-    # OWN listen port from NEXT_PUBLIC_APP_URL's port (vibe start: "port = URL
-    # port, else 3000"), and in direct mode (VIBE_DISABLE_PROXY=true) the WS
-    # sidecar listens on that port + 1000. So a co-located instance sets
-    # NEXT_PUBLIC_APP_URL=...:3100 → the container listens on 3100 (HTTP) + 4100
-    # (WS), and the mapping must target those same container ports, not 3000/4000.
-    # Keep APP_WS_HOST_PORT = APP_HOST_PORT + 1000.
+    # Direct mode derives HTTP's listen port from NEXT_PUBLIC_APP_URL
+    # (default 3000) and starts its WebSocket sidecar on that port + 1000.
+    # Set APP_HOST_PORT and APP_WS_HOST_PORT to those ports for co-located sites.
     ports:
       - "${APP_HOST_PORT:-3000}:${APP_HOST_PORT:-3000}"
-      - "${APP_WS_HOST_PORT:-4000}:${APP_WS_HOST_PORT:-4000}"
+      # On HA S1, set VIBE_DISABLE_PROXY=false and HA_DB_ADMISSION=true in
+      # .env. Both protocols use Bun on 3000. APP_WS_PUBLISH=10.88.0.1:4000:3000
+      # keeps the old WireGuard WebSocket address usable during rollback.
+      - "${APP_WS_PUBLISH:-${APP_WS_HOST_PORT:-4000}:${APP_WS_HOST_PORT:-4000}}"
     networks:
       - app-network
       - caddy_internal

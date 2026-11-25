@@ -11,7 +11,7 @@
 # Both local listeners bind loopback inside Caddy. The remote lane uses
 # verified HTTPS to the peer's public IP and can survive a WireGuard outage.
 http://:19381 {
-	import /data/ha-routing/origin.caddy next-vibe-app:3000 next-vibe-app:4000 next-vibe-app:3099 disabled
+	import /data/ha-routing/origin.caddy next-vibe-app:3000 next-vibe-app:3000 next-vibe-app:3099 disabled
 }
 http://:19382 {
 	import /data/ha-routing/peer.caddy 179.198.214.41

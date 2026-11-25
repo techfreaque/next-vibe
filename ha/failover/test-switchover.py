@@ -164,6 +164,39 @@ fence_self && fence_proof
 
 
 class CutTests(unittest.TestCase):
+    def test_preflight_checks_helper_database_and_live_counter(self):
+        cut = load(BASE / "q104-cut.py")
+        for node, role, recovery in [("s1", "primary", "f"), ("s2", "standby", "t")]:
+            state = f"node={node} role={role} pg={role} ts=123"
+            for reply, db, counter, ok in [
+                (state, recovery, 2, True), (state.replace("pg=" + role, "pg=down"), recovery, 0, False),
+                (state.replace("role=" + role, "role=fenced"), recovery, 0, False),
+                (state.replace(node, "other"), recovery, 0, False), ("", recovery, 0, False),
+                (state, "t" if recovery == "f" else "f", 0, False),
+                (state, recovery, None, False), (state, recovery, -1, False),
+            ]:
+                with self.subTest(node=node, reply=reply, db=db, counter=counter), \
+                     patch.object(cut, "ssh", return_value=reply) as helper, \
+                     patch.object(cut, "sql", return_value=db), \
+                     patch.object(cut, "upstream_counts", return_value={cut.APP[node]: counter}):
+                    if ok:
+                        self.assertIn(cut.APP[node], cut.preflight(node))
+                    else:
+                        with self.assertRaises(RuntimeError):
+                            cut.preflight(node)
+                    helper.assert_called_once_with(node, "SSH_ORIGINAL_COMMAND=state /usr/local/sbin/ha-peer-cmd")
+
+    def test_s1_requires_idle_shared_port_and_checks_lingering_sidecar(self):
+        cut = load(BASE / "q104-cut.py")
+        for shared, sidecar, expected in [
+            (0, None, True), (None, 0, False), (1, None, False),
+            (0, 1, False), (0, 0, True),
+        ]:
+            rows = [{"address": f"next-vibe-app:{port}", "num_requests": count}
+                    for port, count in [(3000, shared), (4000, sidecar)] if count is not None]
+            with self.subTest(shared=shared, sidecar=sidecar), patch.object(cut, "ssh", return_value=json.dumps(rows)):
+                self.assertEqual(cut.idle("s1"), expected)
+
     def test_drain_needs_both_fresh_idle_roles_and_closed_sockets(self):
         cut = load(BASE / "q104-cut.py")
         now = datetime.datetime.now(datetime.timezone.utc)
@@ -189,6 +222,11 @@ class CutTests(unittest.TestCase):
             calls.append((node, command))
             if "fence-local" in command and failure == "fence":
                 raise RuntimeError("fixture fence failure")
+            if command == "SSH_ORIGINAL_COMMAND=state /usr/local/sbin/ha-peer-cmd":
+                role = "primary" if node == "s1" else "standby"
+                return f"node={node} role={role} pg={role} ts=123"
+            if "/reverse_proxy/upstreams" in command:
+                return json.dumps([{"address": cut.APP[node], "num_requests": 0}])
             return ""
         def sql(node, query):
             if "prepared" in query:
