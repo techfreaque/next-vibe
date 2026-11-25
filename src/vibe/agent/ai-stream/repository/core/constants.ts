@@ -4,12 +4,6 @@
  */
 
 /**
- * Maximum number of tool calls allowed in a single streaming session
- * Used internally by the streaming system, not exposed to the model
- */
-export const MAX_TOOL_CALLS = 150;
-
-/**
  * Default token threshold for triggering history compacting.
  * When estimated input tokens exceed this, older messages are summarized before the next AI call.
  * Overridable per skill or favorite (cascade: favorite → skill → this default).
@@ -37,6 +31,7 @@ export enum StreamErrorType {
   TIMEOUT_ERROR = "TIMEOUT_ERROR",
   /** User explicitly cancelled the generation - shown as a neutral "stopped" indicator */
   STREAM_INTERRUPTED = "STREAM_INTERRUPTED",
+  TURN_STEP_LIMIT = "TURN_STEP_LIMIT",
 }
 
 /**
@@ -79,18 +74,10 @@ export enum AbortReason {
  */
 export class StreamAbortError extends Error {
   readonly reason: AbortReason;
-  /**
-   * STREAM_TIMEOUT from the turn's overall duration limit (seconds). Unset for
-   * the other STREAM_TIMEOUT sources (first-part watchdog, remote-result wait),
-   * so only a turn that really ran out of time says "time limit, continue".
-   */
-  readonly maxDurationSeconds: number | undefined;
-
-  constructor(reason: AbortReason, options?: { maxDurationSeconds?: number }) {
+  constructor(reason: AbortReason) {
     super(reason);
     this.name = "AbortError";
     this.reason = reason;
-    this.maxDurationSeconds = options?.maxDurationSeconds;
   }
 
   get isToolPause(): boolean {

@@ -118,6 +118,12 @@ export const translations: typeof enTranslations = {
       tools: "Tools",
       toolsInherited: "geerbt",
     },
+    turnStepLimit: {
+      save: "Speichern",
+      label: "Schritte pro Antwort",
+      description:
+        "So viele Runden mit Werkzeugaufrufen darf die KI ausführen, bevor sie pausiert. Wähle 5 bis 500.",
+    },
     searchProvider: {
       label: "Suchanbieter",
       description:

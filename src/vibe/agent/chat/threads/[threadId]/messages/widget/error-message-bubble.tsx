@@ -1,5 +1,6 @@
 "use client";
 
+import { endpointToUrlSegment } from "next-vibe/core/core-utils/path";
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
 import type { DefaultFolderId } from "next-vibe/core/execution-context";
 import { useTranslation } from "next-vibe/core/i18n/core/client";
@@ -12,11 +13,13 @@ import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { AlertCircle } from "next-vibe/ui/components/icons/AlertCircle";
 import { CheckCircle2 } from "next-vibe/ui/components/icons/CheckCircle2";
+import { PauseCircle } from "next-vibe/ui/components/icons/PauseCircle";
 import { Play } from "next-vibe/ui/components/icons/Play";
 import { RotateCcw } from "next-vibe/ui/components/icons/RotateCcw";
 import { Sparkles } from "next-vibe/ui/components/icons/Sparkles";
 import { StopCircle } from "next-vibe/ui/components/icons/StopCircle";
 import { Trash2 } from "next-vibe/ui/components/icons/Trash2";
+import { Link } from "next-vibe/ui/components/link";
 import { Span } from "next-vibe/ui/components/span";
 import { useTouchDevice } from "next-vibe/ui/hooks/use-touch-device";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
@@ -35,9 +38,11 @@ import { creditPolicyReason } from "@/credits/anti-farming/reason";
 import { useUser } from "@/user/private/me/hooks";
 
 import { StreamErrorType } from "../../../../../ai-stream/repository/core/constants";
+import { scopedTranslation as streamScopedTranslation } from "../../../../../ai-stream/stream/i18n";
 import { OutOfCreditsCard } from "../../../../../ai-stream/stream/widget/out-of-credits-card";
 import type { ChatMessage } from "../../../../db";
 import { useModelSelectorState } from "../../../../model-selector-state";
+import chatSettingsDefinition from "../../../../settings/definition";
 import { scopedTranslation } from "../i18n";
 import { CopyButton } from "./copy-button";
 import { useMessageGroupName } from "./embedded-context";
@@ -67,6 +72,8 @@ export function ErrorMessageBubble({
 }: ErrorMessageBubbleProps): JSX.Element {
   const { locale } = useTranslation();
   const { t: ts } = scopedTranslation.scopedT(locale);
+  const { t: streamT } = streamScopedTranslation.scopedT(locale);
+  const isStepLimit = message.errorType === StreamErrorType.TURN_STEP_LIMIT;
   // `errorType.errorKey` is keyed to the framework's own shared scope, not the
   // app's, so it has to be rendered by that scope's translator.
   const { t: vibeT } = vibeScopedTranslation.scopedT(locale);
@@ -91,6 +98,7 @@ export function ErrorMessageBubble({
   useEffect(() => {
     // STREAM_INTERRUPTED = user pressed stop - a user-initiated cancel, not a fault
     if (
+      isStepLimit ||
       reportedErrorMessageIds.has(message.id) ||
       message.errorType === StreamErrorType.STREAM_INTERRUPTED
     ) {
@@ -147,7 +155,7 @@ export function ErrorMessageBubble({
         ageMs,
       },
     );
-  }, [logger, message, messages, rootFolderId]);
+  }, [isStepLimit, logger, message, messages, rootFolderId]);
 
   // The turn that failed: nearest user message up the parent chain. Retry
   // re-sends it through the same op as the user-message retry button.
@@ -170,6 +178,42 @@ export function ErrorMessageBubble({
       void continueAfterError(message.id);
     }
   };
+
+  if (isStepLimit) {
+    const steps = message.metadata?.turnStepLimit;
+    return (
+      <Div className="flex items-start gap-2 rounded-2xl border border-border/40 bg-muted/40 px-4 py-2.5 text-muted-foreground">
+        <PauseCircle className="mt-0.5 h-4 w-4 shrink-0" />
+        <Div className="flex flex-col gap-1">
+          <Span className="text-sm">
+            {steps === undefined
+              ? message.content
+              : streamT("info.turnStepLimit", { steps: steps.toString() })}
+          </Span>
+          {!user.isPublic && (
+            <Link
+              href={`/${locale}/tools/${endpointToUrlSegment(chatSettingsDefinition.GET)}`}
+              className="text-sm text-primary underline underline-offset-2"
+            >
+              {streamT("info.raiseTurnStepLimit")}
+            </Link>
+          )}
+        </Div>
+        {continueAfterError && (
+          <Button
+            type="button"
+            size="sm"
+            variant="ghost"
+            className="h-7 shrink-0 gap-1.5 px-2"
+            onClick={handleContinue}
+          >
+            <Play className="h-3.5 w-3.5" />
+            {ts("errorActions.continue")}
+          </Button>
+        )}
+      </Div>
+    );
+  }
 
   // Stopped streams (user stop, server restart mid-answer) get a compact
   // "stopped" indicator with a retry, not an error bubble

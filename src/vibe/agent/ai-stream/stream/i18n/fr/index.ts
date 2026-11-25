@@ -106,7 +106,7 @@ export const translations: typeof enTranslations = {
         maxTurns: {
           label: "Tours max",
           description:
-            "Nombre maximal de tours agentiques (cycles d'appels d'outils) avant l'arrêt. Par défaut : illimité. Mettez 1 pour un seul prompt + réponse sans appel d'outil.",
+            "Nombre maximal d’étapes du modèle pour cette exécution. Laissez vide pour utiliser la limite des paramètres du chat.",
         },
         appendThreadId: {
           label: "ID du fil (continuer)",
@@ -559,8 +559,9 @@ export const translations: typeof enTranslations = {
       "Arrêté : cette tâche en arrière-plan a atteint son plafond de crédits. Relevez le plafond dans Task Budget Caps pour la laisser continuer.",
     taskWatchdog:
       "Arrêté : le chien de garde des tâches a stoppé cette exécution, qui a dépassé sa limite de durée, de tours ou d'appels d'outils.",
-    streamTimeLimit:
-      "Arrêté : cette réponse a atteint la limite de {{minutes}} minutes. Tout ce qui a été écrit est enregistré. Cliquez sur Continuer pour reprendre là où elle s'est arrêtée.",
+    turnStepLimit:
+      "L’IA a fait une pause après {{steps}} étapes. Écrivez « Continue » pour reprendre là où elle en était.",
+    raiseTurnStepLimit: "Augmenter la limite dans les paramètres du chat",
   },
   errors: {
     toolExecutionError:
@@ -575,8 +576,7 @@ export const translations: typeof enTranslations = {
       "Un outil tourne encore en arrière-plan. Attendez qu'il se termine avant de continuer.",
     streamProcessingError:
       "Impossible de traiter la réponse de l'IA. Veuillez réessayer.",
-    timeout:
-      "L'IA a mis trop de temps à répondre (délai dépassé après {{maxDuration}} secondes). Réessayez avec un message plus court.",
+    timeout: "L’IA a cessé de répondre. Réessayez.",
     noResponse: "L'IA n'a généré aucune réponse. Veuillez réessayer.",
     creditBudgetReached:
       "Crédits épuisés. La réponse s'arrête là où votre solde s'est vidé. Rechargez pour continuer.",

@@ -36,7 +36,6 @@ import { z } from "zod";
 import { DefaultFolderId } from "../../../core/execution-context";
 import { SKILL_CREATOR_ID } from "../../skills/constants";
 import { ChatModelId, ChatModelIdOptions, getChatModelById } from "../models";
-import { MAX_TOOL_CALLS } from "../repository/core/constants";
 import { scopedTranslation } from "../stream/i18n";
 import { AI_RUN_ALIAS } from "./constants";
 const AiRunWidget = lazyWidget(() =>
@@ -295,7 +294,7 @@ const { POST } = createEndpoint({
         label: "run.post.fields.maxTurns.label",
         description: "run.post.fields.maxTurns.description",
         columns: 6,
-        schema: z.coerce.number().int().positive().default(MAX_TOOL_CALLS),
+        schema: z.coerce.number().int().positive().optional(),
       }),
 
       // ── Thread persistence ───────────────────────────────────────────────

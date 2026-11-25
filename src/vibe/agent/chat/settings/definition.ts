@@ -26,6 +26,8 @@ import { ViewMode, ViewModeDB, ViewModeOptions } from "../enum";
 import {
   CHAT_SETTINGS_GET_ALIAS,
   CHAT_SETTINGS_UPDATE_ALIAS,
+  DEFAULT_TURN_STEP_LIMIT,
+  turnStepLimitSchema,
 } from "./constants";
 import { scopedTranslation } from "./i18n";
 
@@ -87,6 +89,12 @@ const { GET } = createEndpoint({
         type: WidgetType.TEXT,
         hidden: true,
         schema: z.enum(ViewModeDB),
+      }),
+
+      turnStepLimit: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: turnStepLimitSchema.default(DEFAULT_TURN_STEP_LIMIT),
       }),
 
       // Preferred web search provider. null = auto-detect
@@ -263,6 +271,7 @@ const { GET } = createEndpoint({
         viewMode: ViewMode.LINEAR,
         searchProvider: null,
         codingAgent: null,
+        turnStepLimit: DEFAULT_TURN_STEP_LIMIT,
         dreamerEnabled: false,
         dreamerFavoriteId: null,
         dreamerSchedule: "0 2 * * *",
@@ -351,6 +360,13 @@ const { POST } = createEndpoint({
         options: ViewModeOptions,
         columns: 6,
         schema: z.enum(ViewModeDB).optional(),
+      }),
+      turnStepLimit: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label: "post.turnStepLimit.label",
+        description: "post.turnStepLimit.description",
+        schema: turnStepLimitSchema.optional(),
       }),
       // Preferred web search provider. null = auto-detect
       searchProvider: requestField(scopedTranslation, {

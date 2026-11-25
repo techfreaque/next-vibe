@@ -384,7 +384,7 @@ const AI_RUN_PARAMS_TABLE = `
 | \`model\` | \`string\` | - | Model ID (e.g. \`claude-sonnet-4-6\`). Skill may have a preferred model |
 | \`instructions\` | \`string\` | - | Extra system-level instructions appended after the skill's system prompt |
 | \`availableTools\` | \`array\` | - | Restrict which tools the AI may call. Omit to use the skill's full tool set |
-| \`maxTurns\` | \`number\` | - | Max agentic turns before stopping. Omit for no limit |
+| \`maxTurns\` | \`number\` | - | Max model steps for this run. Omit to use the Chat Settings limit |
 | \`preCalls\` | \`array\` | - | Endpoints to call before the prompt - results are injected as context |
 | \`rootFolderId\` | \`string\` | - | Where to store the thread: \`"cron"\` (persisted), \`"incognito"\` (no persistence), \`"private"\`, \`"public"\` |
 | \`appendThreadId\` | \`string\` | - | UUID of an existing thread to continue |

@@ -60,7 +60,9 @@ export interface StreamLoopParams {
   creditBalance: number;
   /** Flat pre-check cost of the model (0 = free model: never capped). */
   modelCost: number;
-  /** Cap on tool-call rounds for this stream (ai-run maxTurns). Defaults to MAX_TOOL_CALLS. */
+  /** Saved chat limit on tool-call rounds. */
+  turnStepLimit?: number;
+  /** Explicit ai-run maxTurns override, including its final answer step. */
   maxToolCalls?: number;
   imageSize?: string;
   imageQuality?: string;

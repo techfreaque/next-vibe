@@ -14,11 +14,7 @@ import {
   calculateCreditCost,
   upstreamCostToCredits,
 } from "../../../models/models";
-import {
-  AbortReason,
-  MAX_TOOL_CALLS,
-  StreamAbortError,
-} from "../core/constants";
+import { AbortReason, StreamAbortError } from "../core/constants";
 import { buildSseMessageRow } from "../core/db-writer/sse-row";
 import { QueueRegistry } from "../core/stream";
 import { estimateInputTokens } from "../core/token-estimator";
@@ -219,15 +215,16 @@ export async function prepareStep(
   stepMessages: ModelMessage[],
   stepNumber: number,
 ): Promise<{ messages?: ModelMessage[]; toolChoice?: "none" }> {
-  // Final permitted step (stepCountIs stops AFTER it): force a text-only
+  // Explicit ai-run maxTurns reserves its final step for a text-only
   // turn so every stream ends with an assistant answer, never on a dangling
   // tool result. Without this, a sub-agent that hits its maxToolCalls cap
   // mid-tool-loop returns an empty final message to ai-run and the parent
   // model flounders hunting for the missing result. toolChoice alone is not
   // enough — a model that still wants a tool emits its tool-call syntax as
   // raw text — so the wrap-up instruction is injected alongside it.
-  const cap = state.p.maxToolCalls ?? MAX_TOOL_CALLS;
-  const isFinalStep = stepNumber >= cap - 1 && stepNumber > 0;
+  const cap = state.p.maxToolCalls;
+  const isFinalStep =
+    cap !== undefined && stepNumber === cap - 1 && stepNumber > 0;
   // Revival streams get NO special clamp: the completed tool call + result
   // are in the history, and a model with well-formed state continues its
   // task from there — including further tool calls for long-running work.
@@ -316,6 +313,7 @@ export async function prepareStep(
     // user turn — lift the revival text-only constraint (keep only the
     // final-step guard).
     state.p.ctx.queuedMessageInjected = true;
+    state.p.ctx.turnStepOffset = stepNumber;
     return {
       ...injected,
       ...(injected.messages

@@ -10714,11 +10714,11 @@
           "type": "form_field",
           "fieldType": "number",
           "label": "Maks. tury",
-          "description": "Maksymalna liczba tur agencji (cykli wywołań narzędzi) przed zatrzymaniem. Domyślnie: bez limitu. Ustaw na 1 dla pojedynczego promptu+odpowiedzi bez wywołań narzędzi.",
+          "description": "Maksymalna liczba kroków modelu w tym uruchomieniu. Puste pole oznacza limit z ustawień czatu.",
           "columns": 6,
           "schema": {
             "def": {
-              "type": "default",
+              "type": "optional",
               "innerType": {
                 "def": {
                   "type": "number",
@@ -10741,7 +10741,7 @@
                 "isFinite": true
               }
             },
-            "type": "default"
+            "type": "optional"
           },
           "usage": {
             "request": "data"

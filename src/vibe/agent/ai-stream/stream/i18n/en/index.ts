@@ -102,7 +102,7 @@ export const translations = {
         maxTurns: {
           label: "Max Turns",
           description:
-            "Maximum agentic turns (tool-call cycles) before stopping. Default: unlimited. Set to 1 for a single prompt+response with no tool calls.",
+            "Maximum model steps for this run. Leave blank to use the limit in Chat Settings.",
         },
         appendThreadId: {
           label: "Thread ID (continue)",
@@ -551,8 +551,9 @@ export const translations = {
       "Stopped: this background task reached its credit cap. Raise the cap in Task Budget Caps to let it continue.",
     taskWatchdog:
       "Stopped: the task watchdog ended this run because it exceeded its time, turn or tool-call limit.",
-    streamTimeLimit:
-      "Stopped: this reply hit the {{minutes}} minute limit. Everything written so far is saved. Press Continue to pick up where it left off.",
+    turnStepLimit:
+      "The AI paused after {{steps}} steps. Type “continue” to pick up where it left off.",
+    raiseTurnStepLimit: "Raise the step limit in Chat Settings",
   },
   errors: {
     toolExecutionError: "A tool failed to execute properly. Please try again.",
@@ -566,8 +567,7 @@ export const translations = {
       "A tool is still running in the background. Please wait for it to complete before continuing.",
     streamProcessingError:
       "Failed to process the AI response. Please try again.",
-    timeout:
-      "The AI took too long to respond (timeout after {{maxDuration}} seconds). Please try again with a shorter message.",
+    timeout: "The AI stopped responding. Try again.",
     noResponse: "The AI did not generate a response. Please try again.",
     creditBudgetReached:
       "Out of credits. The reply stopped where your balance ran out. Top up to keep going.",

@@ -29,6 +29,7 @@ import { rootFolderIdOptions } from "../../chat/config";
 import { AGENT_MESSAGE_LENGTH } from "../../chat/constants";
 import { ChatMessageRole } from "../../chat/enum";
 import { messageHistoryTolerantSchema } from "../../chat/message-schema";
+import { turnStepLimitSchema } from "../../chat/settings/constants";
 import { imageGenModelSelectionSchema } from "../../image-generation/models";
 import { musicGenModelSelectionSchema } from "../../music-generation/models";
 import { sttModelSelectionSchema } from "../../speech-to-text/models";
@@ -478,6 +479,8 @@ const { POST } = createEndpoint({
             z.object({
               mode: z.literal("inference-provider"),
               instanceId: z.string(),
+              turnStepLimit: turnStepLimitSchema.optional(),
+              maxToolCalls: z.number().int().positive().optional(),
               tools: z
                 .array(
                   z.object({
@@ -500,6 +503,8 @@ const { POST } = createEndpoint({
             z.object({
               mode: z.literal("relay"),
               instanceId: z.string(),
+              turnStepLimit: turnStepLimitSchema.optional(),
+              maxToolCalls: z.number().int().positive().optional(),
               /** The CONNECTION's thread mirroring policy — 'off' keeps the
                *  executor's landing transient (no persisted copy). */
               threadMirrorMode: z.enum(["both", "off"]),

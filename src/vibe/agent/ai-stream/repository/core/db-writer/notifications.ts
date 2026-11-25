@@ -153,6 +153,7 @@ export async function emitErrorMessage(
     sequenceId: string | null;
     user: JwtPayloadType;
     content?: TranslatedKeyType;
+    turnStepLimit?: number;
     /** Skip DB write regardless of incognito mode (e.g. credit errors) */
     skipDb?: boolean;
   },
@@ -193,7 +194,7 @@ export async function emitErrorMessage(
           sequenceId: sequenceId ?? null,
           authorId: user.id ?? null,
           errorType: errorType ?? null,
-          metadata: { streamError },
+          metadata: { streamError, turnStepLimit: params.turnStepLimit },
         }),
       ],
     },
@@ -223,6 +224,7 @@ export async function emitErrorMessage(
       content: serializedError,
       errorType,
       streamError,
+      turnStepLimit: params.turnStepLimit,
       parentId,
       user,
       sequenceId,

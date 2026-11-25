@@ -32,6 +32,7 @@ import { Moon } from "next-vibe/ui/components/icons/Moon";
 import { Play } from "next-vibe/ui/components/icons/Play";
 import { RotateCcw } from "next-vibe/ui/components/icons/RotateCcw";
 import { Settings } from "next-vibe/ui/components/icons/Settings";
+import { Input } from "next-vibe/ui/components/input";
 import { Link } from "next-vibe/ui/components/link";
 import {
   Select,
@@ -93,6 +94,7 @@ import { pickSkillVariant } from "../../skills/pick-variant";
 import { SearchProvider, SearchProviderOptions } from "../../web-search/enum";
 import { scopedTranslation as searchScopedTranslation } from "../../web-search/i18n";
 import { parseSkillId } from "../slugify";
+import { turnStepLimitSchema } from "./constants";
 import type definition from "./definition";
 import type { ChatSettingsUpdateRequestOutput } from "./definition";
 import { useChatSettings } from "./hooks";
@@ -1210,6 +1212,7 @@ export function ChatSettingsWidget({
 
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [stepLimitDraft, setStepLimitDraft] = useState<string | null>(null);
 
   // Every save goes through here: a failed save rolls the cache back (hook)
   // and shows the reason, never a silent "on".
@@ -1329,6 +1332,10 @@ export function ChatSettingsWidget({
     );
   }
 
+  const stepLimit = turnStepLimitSchema.safeParse(
+    Number(stepLimitDraft ?? settings.turnStepLimit),
+  );
+
   return (
     <Div className="flex flex-col gap-4 p-4">
       {/* Header */}
@@ -1341,6 +1348,43 @@ export function ChatSettingsWidget({
         )}
       </Div>
       {saveError && <ErrorNote message={saveError} />}
+
+      {!user.isPublic && (
+        <SettingsSection
+          icon={<Bot className="h-4 w-4 text-primary" />}
+          title={t("post.turnStepLimit.label")}
+          description={t("post.turnStepLimit.description")}
+        >
+          <Div className="flex items-center gap-2">
+            <Input
+              type="text"
+              keyboardType="numeric"
+              value={stepLimitDraft ?? settings.turnStepLimit.toString()}
+              aria-label={t("post.turnStepLimit.label")}
+              aria-invalid={!stepLimit.success}
+              className="w-20"
+              onChangeText={setStepLimitDraft}
+            />
+            <Button
+              type="button"
+              size="sm"
+              disabled={
+                isSaving ||
+                !stepLimit.success ||
+                stepLimit.data === settings.turnStepLimit
+              }
+              onClick={() => {
+                if (stepLimit.success) {
+                  setStepLimitDraft(null);
+                  void handleUpdate({ turnStepLimit: stepLimit.data });
+                }
+              }}
+            >
+              {t("post.turnStepLimit.save")}
+            </Button>
+          </Div>
+        </SettingsSection>
+      )}
 
       {/* Search Provider */}
       <SettingsSection

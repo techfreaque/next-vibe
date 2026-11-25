@@ -22022,11 +22022,11 @@
           "type": "form_field",
           "fieldType": "number",
           "label": "Max. Runden",
-          "description": "Maximale agentische Runden (Tool-Aufruf-Zyklen) vor dem Stopp. Standard: unbegrenzt. Auf 1 setzen für einzelnen Prompt+Antwort ohne Tool-Aufrufe.",
+          "description": "Maximale Anzahl an Modellschritten für diesen Lauf. Ohne Angabe gilt das Limit aus den Chat-Einstellungen.",
           "columns": 6,
           "schema": {
             "def": {
-              "type": "default",
+              "type": "optional",
               "innerType": {
                 "def": {
                   "type": "number",
@@ -22049,7 +22049,7 @@
                 "isFinite": true
               }
             },
-            "type": "default"
+            "type": "optional"
           },
           "usage": {
             "request": "data"
@@ -37023,6 +37023,41 @@
           },
           "schemaType": "primitive"
         },
+        "turnStepLimit": {
+          "type": "text",
+          "hidden": true,
+          "schema": {
+            "def": {
+              "type": "default",
+              "innerType": {
+                "def": {
+                  "type": "number",
+                  "checks": [
+                    {
+                      "def": {
+                        "type": "number",
+                        "check": "number_format",
+                        "abort": false,
+                        "format": "safeint"
+                      },
+                      "type": "number",
+                      "isFinite": true
+                    },
+                    {},
+                    {}
+                  ]
+                },
+                "type": "number",
+                "isFinite": true
+              }
+            },
+            "type": "default"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
         "searchProvider": {
           "type": "text",
           "hidden": true,
@@ -38614,6 +38649,43 @@
                   "enums.viewMode.flat",
                   "enums.viewMode.debug"
                 ]
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "turnStepLimit": {
+          "type": "form_field",
+          "fieldType": "number",
+          "label": "Schritte pro Antwort",
+          "description": "So viele Runden mit Werkzeugaufrufen darf die KI ausführen, bevor sie pausiert. Wähle 5 bis 500.",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "number",
+                  "checks": [
+                    {
+                      "def": {
+                        "type": "number",
+                        "check": "number_format",
+                        "abort": false,
+                        "format": "safeint"
+                      },
+                      "type": "number",
+                      "isFinite": true
+                    },
+                    {},
+                    {}
+                  ]
+                },
+                "type": "number",
+                "isFinite": true
               }
             },
             "type": "optional"

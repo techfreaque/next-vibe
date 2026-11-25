@@ -121,6 +121,12 @@ export const translations: typeof enTranslations = {
       tools: "Outils",
       toolsInherited: "hérité",
     },
+    turnStepLimit: {
+      save: "Enregistrer",
+      label: "Étapes par réponse",
+      description:
+        "Nombre de cycles d’appels d’outils avant que l’IA fasse une pause. Choisissez entre 5 et 500.",
+    },
     searchProvider: {
       label: "Moteur de recherche",
       description:

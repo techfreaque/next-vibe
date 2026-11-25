@@ -116,6 +116,12 @@ export const translations = {
       tools: "Tools",
       toolsInherited: "inherited",
     },
+    turnStepLimit: {
+      save: "Save",
+      label: "Steps per turn",
+      description:
+        "How many tool-call rounds the AI can run before it pauses. Choose from 5 to 500.",
+    },
     searchProvider: {
       label: "Search Provider",
       description:

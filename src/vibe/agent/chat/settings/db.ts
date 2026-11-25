@@ -4,7 +4,7 @@
  */
 
 import { relations } from "drizzle-orm";
-import { jsonb, pgTable, timestamp, uuid } from "drizzle-orm/pg-core";
+import { integer, jsonb, pgTable, timestamp, uuid } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { users } from "next-vibe/identity/user/db";
 import type { z } from "zod";
@@ -38,6 +38,8 @@ export const chatSettings = pgTable("chat_settings", {
 
   // UI preferences - only store if different from default
   viewMode: jsonb("view_mode").$type<typeof ViewModeValue>(),
+
+  turnStepLimit: integer("turn_step_limit"),
 
   // Preferred web search provider. null = auto-detect (cheapest available)
   searchProvider: jsonb("search_provider").$type<SearchProviderValue | null>(),

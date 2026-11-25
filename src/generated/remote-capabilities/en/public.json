@@ -10714,11 +10714,11 @@
           "type": "form_field",
           "fieldType": "number",
           "label": "Max Turns",
-          "description": "Maximum agentic turns (tool-call cycles) before stopping. Default: unlimited. Set to 1 for a single prompt+response with no tool calls.",
+          "description": "Maximum model steps for this run. Leave blank to use the limit in Chat Settings.",
           "columns": 6,
           "schema": {
             "def": {
-              "type": "default",
+              "type": "optional",
               "innerType": {
                 "def": {
                   "type": "number",
@@ -10741,7 +10741,7 @@
                 "isFinite": true
               }
             },
-            "type": "default"
+            "type": "optional"
           },
           "usage": {
             "request": "data"

@@ -22022,11 +22022,11 @@
           "type": "form_field",
           "fieldType": "number",
           "label": "Max Turns",
-          "description": "Máximas curvas de agente (ciclos de peaje) antes de parar. Default: ilimitado. Set a 1 para una sola respuesta rápida sin llamadas de herramienta.",
+          "description": "Número máximo de pasos del modelo en esta ejecución. Déjalo en blanco para usar el límite de los ajustes del chat.",
           "columns": 6,
           "schema": {
             "def": {
-              "type": "default",
+              "type": "optional",
               "innerType": {
                 "def": {
                   "type": "number",
@@ -22049,7 +22049,7 @@
                 "isFinite": true
               }
             },
-            "type": "default"
+            "type": "optional"
           },
           "usage": {
             "request": "data"
@@ -37023,6 +37023,41 @@
           },
           "schemaType": "primitive"
         },
+        "turnStepLimit": {
+          "type": "text",
+          "hidden": true,
+          "schema": {
+            "def": {
+              "type": "default",
+              "innerType": {
+                "def": {
+                  "type": "number",
+                  "checks": [
+                    {
+                      "def": {
+                        "type": "number",
+                        "check": "number_format",
+                        "abort": false,
+                        "format": "safeint"
+                      },
+                      "type": "number",
+                      "isFinite": true
+                    },
+                    {},
+                    {}
+                  ]
+                },
+                "type": "number",
+                "isFinite": true
+              }
+            },
+            "type": "default"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
         "searchProvider": {
           "type": "text",
           "hidden": true,
@@ -38614,6 +38649,43 @@
                   "enums.viewMode.flat",
                   "enums.viewMode.debug"
                 ]
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "turnStepLimit": {
+          "type": "form_field",
+          "fieldType": "number",
+          "label": "Pasos por respuesta",
+          "description": "Número de rondas de llamadas a herramientas antes de que la IA haga una pausa. Elige entre 5 y 500.",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "number",
+                  "checks": [
+                    {
+                      "def": {
+                        "type": "number",
+                        "check": "number_format",
+                        "abort": false,
+                        "format": "safeint"
+                      },
+                      "type": "number",
+                      "isFinite": true
+                    },
+                    {},
+                    {}
+                  ]
+                },
+                "type": "number",
+                "isFinite": true
               }
             },
             "type": "optional"

@@ -22022,11 +22022,11 @@
           "type": "form_field",
           "fieldType": "number",
           "label": "Max Turns",
-          "description": "Maximum agentic turns (tool-call cycles) before stopping. Default: unlimited. Set to 1 for a single prompt+response with no tool calls.",
+          "description": "Maximum model steps for this run. Leave blank to use the limit in Chat Settings.",
           "columns": 6,
           "schema": {
             "def": {
-              "type": "default",
+              "type": "optional",
               "innerType": {
                 "def": {
                   "type": "number",
@@ -22049,7 +22049,7 @@
                 "isFinite": true
               }
             },
-            "type": "default"
+            "type": "optional"
           },
           "usage": {
             "request": "data"
@@ -37023,6 +37023,41 @@
           },
           "schemaType": "primitive"
         },
+        "turnStepLimit": {
+          "type": "text",
+          "hidden": true,
+          "schema": {
+            "def": {
+              "type": "default",
+              "innerType": {
+                "def": {
+                  "type": "number",
+                  "checks": [
+                    {
+                      "def": {
+                        "type": "number",
+                        "check": "number_format",
+                        "abort": false,
+                        "format": "safeint"
+                      },
+                      "type": "number",
+                      "isFinite": true
+                    },
+                    {},
+                    {}
+                  ]
+                },
+                "type": "number",
+                "isFinite": true
+              }
+            },
+            "type": "default"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
         "searchProvider": {
           "type": "text",
           "hidden": true,
@@ -38614,6 +38649,43 @@
                   "enums.viewMode.flat",
                   "enums.viewMode.debug"
                 ]
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "turnStepLimit": {
+          "type": "form_field",
+          "fieldType": "number",
+          "label": "Steps per turn",
+          "description": "How many tool-call rounds the AI can run before it pauses. Choose from 5 to 500.",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "number",
+                  "checks": [
+                    {
+                      "def": {
+                        "type": "number",
+                        "check": "number_format",
+                        "abort": false,
+                        "format": "safeint"
+                      },
+                      "type": "number",
+                      "isFinite": true
+                    },
+                    {},
+                    {}
+                  ]
+                },
+                "type": "number",
+                "isFinite": true
               }
             },
             "type": "optional"

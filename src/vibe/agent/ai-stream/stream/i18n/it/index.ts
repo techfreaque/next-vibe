@@ -106,7 +106,7 @@ export const translations: typeof enTranslations = {
         maxTurns: {
           label: "Max gira",
           description:
-            "Massime curve di agentic (ciclo dello strumento) prima di fermarsi. Default: illimitato. Impostare a 1 per un singolo prompt + risposta senza chiamate.",
+            "Numero massimo di passaggi del modello per questa esecuzione. Lascia vuoto per usare il limite delle impostazioni della chat.",
         },
         appendThreadId: {
           label: "Filo ID (continua)",
@@ -562,8 +562,9 @@ export const translations: typeof enTranslations = {
       "Stopped: questo compito di sfondo ha raggiunto il suo tappo di credito. Alzare il berretto in Task Budget Caps per lasciare che continui.",
     taskWatchdog:
       "Fermato: il task watchdog ha concluso questa corsa perché ha superato il suo tempo, turno o limite di chiamata strumento.",
-    streamTimeLimit:
-      "Interrotta: questa risposta ha raggiunto il limite di {{minutes}} minuti. Tutto ciò che è stato scritto è salvato. Premi Continua per riprendere da lì.",
+    turnStepLimit:
+      "L’IA si è fermata dopo {{steps}} passaggi. Scrivi «Continua» per riprendere da dove si era fermata.",
+    raiseTurnStepLimit: "Aumenta il limite nelle impostazioni della chat",
   },
   errors: {
     toolExecutionError:
@@ -580,8 +581,7 @@ export const translations: typeof enTranslations = {
       "Uno strumento è ancora in esecuzione in background. Si prega di aspettare che si completa prima di continuare.",
     streamProcessingError:
       "Non è riuscito a elaborare la risposta AI. Per favore, riprovate.",
-    timeout:
-      "Lo AI ha impiegato troppo tempo per rispondere (tempo dopo i secondi {{maxDuration}}). Si prega di riprovare con un messaggio più breve.",
+    timeout: "L’IA ha smesso di rispondere. Riprova.",
     noResponse: "Lo AI non ha generato una risposta. Per favore, riprovate.",
     creditBudgetReached:
       "Crediti esauriti. La risposta si è interrotta quando hai finito i crediti. Ricarica per continuare.",

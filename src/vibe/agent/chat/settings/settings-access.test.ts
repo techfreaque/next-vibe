@@ -18,8 +18,10 @@ import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { Platform } from "next-vibe/platforms/platforms";
 import { resolveTestAdminUser } from "next-vibe/tooling/testing/testing-suite/resolve-test-user";
 import { sendTestRequest } from "next-vibe/tooling/testing/testing-suite/send-test-request";
+import { createTestUser, deleteTestUser } from "next-vibe/tooling/testing/testing-suite/test-users";
 import { beforeAll, describe, expect, it } from "vitest";
 
+import { DEFAULT_TURN_STEP_LIMIT } from "./constants";
 import definitions from "./definition";
 
 const TEST_TIMEOUT = 60_000;
@@ -128,4 +130,60 @@ describe("chat-settings server access", () => {
     },
     TEST_TIMEOUT,
   );
+  it(
+    "saves a per-user turn step limit and keeps it across other settings updates",
+    async () => {
+      const customer = await createTestUser(
+        `q87-step-limit-${crypto.randomUUID()}@example.com`,
+        "Turn step limit test",
+      );
+      expect(customer.success).toBe(true);
+      if (!customer.success) {
+        return;
+      }
+
+      const { user } = customer.data;
+      try {
+        const before = await sendTestRequest({
+          endpoint: definitions.GET,
+          user,
+          toolExecutionContext: undefined,
+        });
+        expect(before).toMatchObject({
+          success: true,
+          data: { turnStepLimit: DEFAULT_TURN_STEP_LIMIT },
+        });
+
+        const update = await sendTestRequest({
+          endpoint: definitions.POST,
+          data: { turnStepLimit: 75 },
+          user,
+          toolExecutionContext: undefined,
+        });
+        expect(update.success).toBe(true);
+
+        const otherUpdate = await sendTestRequest({
+          endpoint: definitions.POST,
+          data: { ttsAutoplay: true },
+          user,
+          toolExecutionContext: undefined,
+        });
+        expect(otherUpdate.success).toBe(true);
+
+        const after = await sendTestRequest({
+          endpoint: definitions.GET,
+          user,
+          toolExecutionContext: undefined,
+        });
+        expect(after).toMatchObject({
+          success: true,
+          data: { turnStepLimit: 75, ttsAutoplay: true },
+        });
+      } finally {
+        await deleteTestUser(user.id);
+      }
+    },
+    TEST_TIMEOUT,
+  );
+
 });

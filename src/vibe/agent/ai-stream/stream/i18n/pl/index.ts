@@ -105,7 +105,7 @@ export const translations: typeof enTranslations = {
         maxTurns: {
           label: "Maks. tury",
           description:
-            "Maksymalna liczba tur agencji (cykli wywołań narzędzi) przed zatrzymaniem. Domyślnie: bez limitu. Ustaw na 1 dla pojedynczego promptu+odpowiedzi bez wywołań narzędzi.",
+            "Maksymalna liczba kroków modelu w tym uruchomieniu. Puste pole oznacza limit z ustawień czatu.",
         },
         appendThreadId: {
           label: "ID wątku (kontynuuj)",
@@ -546,8 +546,7 @@ export const translations: typeof enTranslations = {
     streamError: "Odpowiedź AI nie mogła zostać ukończona. Spróbuj ponownie.",
     streamProcessingError:
       "Nie udało się przetworzyć odpowiedzi AI. Spróbuj ponownie.",
-    timeout:
-      "AI zajęło zbyt dużo czasu na odpowiedź (przekroczono limit po {{maxDuration}} sekundach). Spróbuj ponownie z krótszą wiadomością.",
+    timeout: "AI przestała odpowiadać. Spróbuj ponownie.",
     noResponse: "AI nie wygenerowało odpowiedzi. Spróbuj ponownie.",
     creditBudgetReached:
       "Kredyty się skończyły. Odpowiedź urwała się tam, gdzie zabrakło salda. Doładuj konto, żeby kontynuować.",
@@ -592,8 +591,9 @@ export const translations: typeof enTranslations = {
       "Zatrzymano: to zadanie w tle osiągnęło limit kredytów. Podnieś limit w Limitach budżetu zadań, aby mogło działać dalej.",
     taskWatchdog:
       "Zatrzymano: strażnik zadań zakończył to uruchomienie, bo przekroczyło limit czasu, tur lub wywołań narzędzi.",
-    streamTimeLimit:
-      "Zatrzymano: ta odpowiedź przekroczyła limit {{minutes}} minut. Wszystko, co już powstało, jest zapisane. Kliknij „Kontynuuj”, a model ruszy dokładnie od tego miejsca.",
+    turnStepLimit:
+      "AI zrobiła przerwę po {{steps}} krokach. Wpisz „Kontynuuj”, by wrócić do tego miejsca.",
+    raiseTurnStepLimit: "Zwiększ limit kroków w ustawieniach czatu",
   },
   headless: {
     errors: {

@@ -40,6 +40,7 @@ import type { WidgetData } from "next-vibe/core/utils/json";
 import { WidgetDataSchema } from "next-vibe/core/utils/json";
 import { CallbackMode } from "next-vibe/execute-tool/constants";
 
+import { DEFAULT_TURN_STEP_LIMIT } from "../../../chat/settings/constants";
 import { ApiProvider, calculateCreditCost } from "../../../models/models";
 import {
   GARBLED_REPLACE_HEADER,
@@ -47,11 +48,7 @@ import {
   garbledRetryMarkerSchema,
   UPSTREAM_BODY_READ_RETRY_RULE,
 } from "../../providers/openrouter/garbled-guard";
-import {
-  AbortReason,
-  MAX_TOOL_CALLS,
-  StreamAbortError,
-} from "../core/constants";
+import { AbortReason, StreamAbortError } from "../core/constants";
 import type { InlineThinkEvent } from "../core/inline-think-splitter";
 import {
   computeOutputCap,
@@ -210,7 +207,15 @@ export class StreamLoop implements StreamLoopState {
       remainingCredits,
       inputTokens: nextInputTokens,
     });
-    if (cap.kind !== "unaffordable") {
+    const requiredCredits =
+      cap.kind === "unaffordable"
+        ? cap.requiredCredits
+        : typeof modelConfig.creditCost === "number" &&
+            modelCost > 0 &&
+            remainingCredits < modelCost
+          ? modelCost
+          : null;
+    if (requiredCredits === null) {
       return false;
     }
     ctx.creditBudgetStopped = true;
@@ -221,7 +226,7 @@ export class StreamLoop implements StreamLoopState {
       steps: steps.length,
       remainingCredits,
       nextInputTokens,
-      requiredCredits: cap.requiredCredits,
+      requiredCredits,
     });
     return true;
   }
@@ -384,7 +389,17 @@ export class StreamLoop implements StreamLoopState {
         ? {
             tools,
             stopWhen: [
-              stepCountIs(this.p.maxToolCalls ?? MAX_TOOL_CALLS),
+              this.p.maxToolCalls === undefined
+                ? ({ steps }): boolean => {
+                    const limit =
+                      this.p.turnStepLimit ?? DEFAULT_TURN_STEP_LIMIT;
+                    if (steps.length - ctx.turnStepOffset < limit) {
+                      return false;
+                    }
+                    ctx.reachedTurnStepLimit = limit;
+                    return true;
+                  }
+                : stepCountIs(this.p.maxToolCalls),
               // endLoop / approve / wait: stop before the next AI turn starts.
               // The current step (tool calls + results) finishes naturally;
               // this predicate prevents the AI SDK from making another API

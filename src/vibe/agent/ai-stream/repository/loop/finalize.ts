@@ -387,6 +387,13 @@ export async function complete(
   // DB write ordering:
   //   content flush → token metadata → credit deduction
   const { ctx, ttsHandler, user, t } = state.p;
+  const pausedAt =
+    !providerFailed &&
+    finishReason !== "content-filter" &&
+    !ctx.creditBudgetStopped &&
+    !(ctx.creditBudgetCapped && finishReason === "length")
+      ? ctx.reachedTurnStepLimit
+      : null;
   const budgetMessageKey = ctx.creditBudgetStopped
     ? "errors.insufficientCredits"
     : "errors.creditBudgetReached";
@@ -479,7 +486,7 @@ export async function complete(
       finishReason !== "content-filter" &&
       (ctx.creditBudgetStopped ||
         (ctx.creditBudgetCapped &&
-          (finishReason === "length" || isEmptyAnswer)));
+          (finishReason === "length" || (isEmptyAnswer && pausedAt === null))));
     if (budgetCut) {
       logger.warn("[AI Stream] Turn cut short by the remaining balance", {
         threadId,
@@ -511,6 +518,7 @@ export async function complete(
         user,
       });
     } else if (
+      pausedAt === null &&
       (isEmptyAnswer || providerFailed) &&
       finishReason !== "content-filter"
     ) {
@@ -579,7 +587,12 @@ export async function complete(
       outputCapped: ctx.creditBudgetCapped,
       loopStopped: ctx.creditBudgetStopped,
     };
-    if (explained) {
+    if (pausedAt !== null) {
+      logger.debug(
+        "[AI Stream] Paused after tool rounds without assistant text",
+        emptyStreamMeta,
+      );
+    } else if (explained) {
       logger.warn(
         "[AI Stream] Provider returned empty stream - no assistant message created",
         emptyStreamMeta,
@@ -598,7 +611,7 @@ export async function complete(
     });
     // A content filter already emitted its specific error above. All other
     // empty streams need a visible explanation, including balance caps.
-    if (finishReason !== "content-filter") {
+    if (finishReason !== "content-filter" && pausedAt === null) {
       const emptyKey = providerFailed
         ? (providerKey ?? "errors.streamError")
         : ctx.creditBudgetStopped || ctx.creditBudgetCapped
@@ -625,6 +638,23 @@ export async function complete(
         user,
       });
     }
+  }
+
+  if (pausedAt !== null) {
+    const content = t("info.turnStepLimit", { steps: pausedAt.toString() });
+    await ctx.dbWriter.emitErrorMessage({
+      threadId,
+      errorType: StreamErrorType.TURN_STEP_LIMIT,
+      error: fail({
+        message: content,
+        errorType: ErrorResponseTypes.VALIDATION_ERROR,
+      }),
+      content,
+      turnStepLimit: pausedAt,
+      parentId: ctx.lastParentId,
+      sequenceId: ctx.lastSequenceId,
+      user,
+    });
   }
 
   logger.debug("[AI Stream] Stream completed", {

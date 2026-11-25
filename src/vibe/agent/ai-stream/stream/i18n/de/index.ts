@@ -104,7 +104,7 @@ export const translations: typeof enTranslations = {
         maxTurns: {
           label: "Max. Runden",
           description:
-            "Maximale agentische Runden (Tool-Aufruf-Zyklen) vor dem Stopp. Standard: unbegrenzt. Auf 1 setzen für einzelnen Prompt+Antwort ohne Tool-Aufrufe.",
+            "Maximale Anzahl an Modellschritten für diesen Lauf. Ohne Angabe gilt das Limit aus den Chat-Einstellungen.",
         },
         appendThreadId: {
           label: "Thread-ID (fortsetzen)",
@@ -553,8 +553,7 @@ export const translations: typeof enTranslations = {
       "Die KI-Antwort konnte nicht vollständig verarbeitet werden. Bitte versuchen Sie es erneut.",
     streamProcessingError:
       "Fehler beim Verarbeiten der KI-Antwort. Bitte versuchen Sie es erneut.",
-    timeout:
-      "Die KI brauchte zu lange für eine Antwort (Zeitüberschreitung nach {{maxDuration}} Sekunden). Bitte versuchen Sie es mit einer kürzeren Nachricht erneut.",
+    timeout: "Die KI antwortet nicht mehr. Versuch es erneut.",
     noResponse:
       "Die KI hat keine Antwort generiert. Bitte versuchen Sie es erneut.",
     creditBudgetReached:
@@ -600,8 +599,9 @@ export const translations: typeof enTranslations = {
       "Gestoppt: Dieser Hintergrund-Task hat sein Credit-Limit erreicht. Erhöhen Sie das Limit unter Task-Budgetgrenzen, damit er weiterläuft.",
     taskWatchdog:
       "Gestoppt: Der Task-Wächter hat diesen Lauf beendet, weil er sein Zeit-, Runden- oder Tool-Aufruf-Limit überschritten hat.",
-    streamTimeLimit:
-      "Gestoppt: Diese Antwort hat das Limit von {{minutes}} Minuten erreicht. Alles bisher Geschriebene ist gespeichert. Mit „Weiter“ geht es genau dort weiter.",
+    turnStepLimit:
+      "Die KI hat nach {{steps}} Schritten pausiert. Schreib „Mach weiter“, um an dieser Stelle fortzufahren.",
+    raiseTurnStepLimit: "Schrittlimit in den Chat-Einstellungen erhöhen",
   },
   headless: {
     errors: {

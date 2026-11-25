@@ -259,15 +259,13 @@ export class StreamErrorCatchHandler {
   static async handleError(params: {
     error: Error | JSONValue;
     ctx: ToolExecutionContextImpl;
-    maxDuration: number;
     model: ChatModelId;
     threadId: string;
     user: JwtPayloadType;
     logger: EndpointLogger;
     t: AiStreamT;
   }): Promise<void> {
-    const { error, ctx, maxDuration, model, threadId, user, logger, t } =
-      params;
+    const { error, ctx, model, threadId, user, logger, t } = params;
 
     // Note: Abort errors are handled inline in loop.ts.
     // This handler only receives non-abort errors.
@@ -279,7 +277,6 @@ export class StreamErrorCatchHandler {
         error.reason === AbortReason.STREAM_TIMEOUT
       ) {
         await TimeoutErrorHandler.handleTimeout({
-          maxDuration,
           model,
           threadId,
           user,
@@ -641,25 +638,6 @@ export class AbortErrorHandler {
             user,
           });
 
-          if (
-            streamAbort?.reason === AbortReason.STREAM_TIMEOUT &&
-            streamAbort.maxDurationSeconds !== undefined
-          ) {
-            // Was silent before: a 15-minute answer cut off left no trace.
-            logger.warn("[AI Stream] Turn hit the overall time limit", {
-              threadId,
-              model,
-              maxDurationSeconds: streamAbort.maxDurationSeconds,
-              timeoutProgress: {
-                firstPartReceived: ctx.streamStartTime !== null,
-                completedSteps: ctx.tokenStepCount,
-                pendingTools: ctx.pendingToolMessages.size,
-                hadAnswerText: ctx.turnHasAnswerText,
-              },
-              partialContentLength: ctx.currentAssistantContent.length,
-            });
-          }
-
           logger.debug("[AI Stream] Emitted interruption error message", {
             isIncognito,
             hasPartialContent: !!ctx.currentAssistantMessageId,
@@ -847,7 +825,6 @@ export class TimeoutErrorHandler {
    * Handle stream timeout error
    */
   static async handleTimeout(params: {
-    maxDuration: number;
     model: string;
     threadId: string;
     user: JwtPayloadType;
@@ -858,7 +835,6 @@ export class TimeoutErrorHandler {
     t: AiStreamT;
   }): Promise<void> {
     const {
-      maxDuration,
       model,
       threadId,
       user,
@@ -871,7 +847,6 @@ export class TimeoutErrorHandler {
 
     logger.error("[AI Stream] Stream timed out", {
       message: "Stream timeout",
-      maxDuration: `${maxDuration} seconds`,
       model,
       threadId,
       userId: user.isPublic ? null : user.id,
@@ -879,7 +854,7 @@ export class TimeoutErrorHandler {
     });
 
     const timeoutError = fail({
-      message: t("errors.timeout", { maxDuration: maxDuration.toString() }),
+      message: t("errors.timeout"),
       errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
     });
 

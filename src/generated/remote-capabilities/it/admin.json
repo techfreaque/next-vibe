@@ -330998,11 +330998,11 @@
           "type": "form_field",
           "fieldType": "number",
           "label": "Max gira",
-          "description": "Massime curve di agentic (ciclo dello strumento) prima di fermarsi. Default: illimitato. Impostare a 1 per un singolo prompt + risposta senza chiamate.",
+          "description": "Numero massimo di passaggi del modello per questa esecuzione. Lascia vuoto per usare il limite delle impostazioni della chat.",
           "columns": 6,
           "schema": {
             "def": {
-              "type": "default",
+              "type": "optional",
               "innerType": {
                 "def": {
                   "type": "number",
@@ -331025,7 +331025,7 @@
                 "isFinite": true
               }
             },
-            "type": "default"
+            "type": "optional"
           },
           "usage": {
             "request": "data"
@@ -361520,6 +361520,41 @@
           },
           "schemaType": "primitive"
         },
+        "turnStepLimit": {
+          "type": "text",
+          "hidden": true,
+          "schema": {
+            "def": {
+              "type": "default",
+              "innerType": {
+                "def": {
+                  "type": "number",
+                  "checks": [
+                    {
+                      "def": {
+                        "type": "number",
+                        "check": "number_format",
+                        "abort": false,
+                        "format": "safeint"
+                      },
+                      "type": "number",
+                      "isFinite": true
+                    },
+                    {},
+                    {}
+                  ]
+                },
+                "type": "number",
+                "isFinite": true
+              }
+            },
+            "type": "default"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
         "searchProvider": {
           "type": "text",
           "hidden": true,
@@ -363111,6 +363146,43 @@
                   "enums.viewMode.flat",
                   "enums.viewMode.debug"
                 ]
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "turnStepLimit": {
+          "type": "form_field",
+          "fieldType": "number",
+          "label": "Passaggi per risposta",
+          "description": "Numero di cicli di chiamate agli strumenti prima che l’IA si fermi. Scegli da 5 a 500.",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "number",
+                  "checks": [
+                    {
+                      "def": {
+                        "type": "number",
+                        "check": "number_format",
+                        "abort": false,
+                        "format": "safeint"
+                      },
+                      "type": "number",
+                      "isFinite": true
+                    },
+                    {},
+                    {}
+                  ]
+                },
+                "type": "number",
+                "isFinite": true
               }
             },
             "type": "optional"

@@ -525,6 +525,8 @@ export async function runWsProviderStream(params: {
       awaitResult: true,
       // The receiver loop mirrors a live session — confirmation gates apply.
       relayReceiver: true,
+      turnStepLimitOverride: ctx.turnStepLimit,
+      maxToolCalls: ctx.maxToolCalls,
       // The executor's copy is FOREIGN-ORIGIN: owned by the caller, placed at
       // REMOTE/<caller>/<folderPath>, loop local (it runs right here).
       ...(isRelayPersist ? { originInstanceId: callerInstanceId } : {}),

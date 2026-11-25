@@ -23,6 +23,7 @@ import { DEFAULT_SKILLS } from "../../skills/config";
 import { pickSkillVariant } from "../../skills/pick-variant";
 import { ViewMode } from "../enum";
 import { isSkillVariantId, parseSkillId } from "../slugify";
+import { DEFAULT_TURN_STEP_LIMIT } from "./constants";
 import type {
   ChatSettingsGetResponseOutput,
   ChatSettingsUpdateRequestOutput,
@@ -106,6 +107,7 @@ export class ChatSettingsRepositoryClient {
       viewMode: ViewMode.LINEAR,
       searchProvider: null,
       codingAgent: null,
+      turnStepLimit: DEFAULT_TURN_STEP_LIMIT,
       dreamerEnabled: false,
       dreamerFavoriteId: null,
       dreamerSchedule: DREAM_DEFAULT_SCHEDULE,
@@ -170,6 +172,7 @@ export class ChatSettingsRepositoryClient {
           "codingAgent" in overrides
             ? overrides.codingAgent
             : defaults.codingAgent,
+        turnStepLimit: defaults.turnStepLimit,
         dreamerEnabled: overrides.dreamerEnabled ?? defaults.dreamerEnabled,
         dreamerFavoriteId:
           "dreamerFavoriteId" in overrides
@@ -335,6 +338,7 @@ export class ChatSettingsRepositoryClient {
         updates.codingAgent !== undefined
           ? updates.codingAgent
           : current.codingAgent,
+      turnStepLimit: current.turnStepLimit,
       dreamerEnabled:
         updates.dreamerEnabled !== undefined
           ? updates.dreamerEnabled

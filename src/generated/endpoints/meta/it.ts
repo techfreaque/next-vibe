@@ -22126,6 +22126,7 @@ export const endpointsMeta: EndpointMeta[] = [
           viewMode: "enums.viewMode.linear",
           searchProvider: null,
           codingAgent: null,
+          turnStepLimit: 50,
           dreamerEnabled: false,
           dreamerFavoriteId: null,
           dreamerSchedule: "0 2 * * *",

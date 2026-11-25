@@ -105,7 +105,7 @@ export const translations: typeof enTranslations = {
         maxTurns: {
           label: "Max Turns",
           description:
-            "Máximas curvas de agente (ciclos de peaje) antes de parar. Default: ilimitado. Set a 1 para una sola respuesta rápida sin llamadas de herramienta.",
+            "Número máximo de pasos del modelo en esta ejecución. Déjalo en blanco para usar el límite de los ajustes del chat.",
         },
         appendThreadId: {
           label: "Thread ID (continue)",
@@ -559,8 +559,9 @@ export const translations: typeof enTranslations = {
       "Detenido: esta tarea de fondo alcanzó su límite de crédito. Aumente la tapa en los Caps de Presupuesto de Tareas para permitir que continúe.",
     taskWatchdog:
       "Se detuvo: el reloj de tarea terminó esta carrera porque superó su tiempo, su turno o límite de llamada de herramientas.",
-    streamTimeLimit:
-      "Detenido: esta respuesta alcanzó el límite de {{minutes}} minutos. Todo lo escrito hasta ahora está guardado. Pulsa Continuar para seguir desde ahí.",
+    turnStepLimit:
+      "La IA hizo una pausa tras {{steps}} pasos. Escribe «Continúa» para retomar desde ahí.",
+    raiseTurnStepLimit: "Sube el límite de pasos en los ajustes del chat",
   },
   errors: {
     toolExecutionError:
@@ -577,8 +578,7 @@ export const translations: typeof enTranslations = {
       "Una herramienta sigue funcionando en el fondo. Por favor, espere a que se complete antes de continuar.",
     streamProcessingError:
       "Falló en procesar la respuesta AI. Por favor, inténtalo de nuevo.",
-    timeout:
-      "El AI tomó demasiado tiempo para responder (tiempo después de los segundos del {{maxDuration}}). Por favor, intente de nuevo con un mensaje más corto.",
+    timeout: "La IA dejó de responder. Inténtalo de nuevo.",
     noResponse: "El AI no generó una respuesta. Por favor, inténtalo de nuevo.",
     creditBudgetReached:
       "Se agotaron los créditos. La respuesta se interrumpió cuando se agotó el saldo. Recarga para continuar.",

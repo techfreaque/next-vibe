@@ -117,6 +117,12 @@ export const translations: typeof enTranslations = {
       tools: "Herramientas",
       toolsInherited: "heredadas",
     },
+    turnStepLimit: {
+      save: "Guardar",
+      label: "Pasos por respuesta",
+      description:
+        "Número de rondas de llamadas a herramientas antes de que la IA haga una pausa. Elige entre 5 y 500.",
+    },
     searchProvider: {
       label: "Motor de búsqueda",
       description:

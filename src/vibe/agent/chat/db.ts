@@ -204,6 +204,7 @@ export type MessageMetadata = {
   finishReason?: string;
   streamingTime?: number;
   streamError?: { key: string; status: number };
+  turnStepLimit?: number;
 
   // Reasoning metadata (for ASSISTANT messages with reasoning)
   isReasoning?: boolean;

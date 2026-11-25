@@ -29,7 +29,6 @@ import {
 import { ThreadStreamingState } from "../../../chat/enum";
 import type { MessagesWsEmit } from "../../../chat/threads/[threadId]/messages/emitter";
 import type { WakeUpPayload } from "../revival/revival";
-import { AbortReason, StreamAbortError } from "./constants";
 import { InlineThinkSplitter } from "./inline-think-splitter";
 import { type EmitThreadTitleFn, MessageDbWriter } from "./message-db-writer";
 import { registerOwnedRun, releaseOwnedRun } from "./run-heartbeat";
@@ -147,6 +146,10 @@ export class ToolExecutionContextImpl {
   creditBudgetCapped = false;
   /** stopWhen ended the tool loop: the wallet cannot pay another step. */
   creditBudgetStopped = false;
+  /** The SDK would have started another tool round at this limit. */
+  reachedTurnStepLimit: number | null = null;
+  /** Completed SDK steps before a queued user message started a new turn. */
+  turnStepOffset = 0;
   /** Input estimate for the refused step, when the budget ended the loop. */
   creditBudgetNextInputTokens: number | null = null;
 
@@ -799,34 +802,15 @@ export async function resetStreamingToIdle(
 }
 
 /**
- * AbortControllerSetup - Sets up abort controllers for stream timeout and client disconnect
+ * Sets up a stream controller that follows parent cancellation.
  */
 export class AbortControllerSetup {
   /**
-   * Create abort controller with timeout handling.
-   * When parentSignal is provided (headless sub-streams), abort propagates from parent.
+   * A page refresh must leave the stream running. Headless sub-streams
+   * follow the parent stream's abort signal.
    */
-  static setupAbortController(params: {
-    maxDuration: number;
-    parentSignal?: AbortSignal;
-  }): AbortController {
-    const { maxDuration, parentSignal } = params;
-
-    // Create abort controller for this stream - combines request signal with timeout
+  static setupAbortController(parentSignal?: AbortSignal): AbortController {
     const streamAbortController = new AbortController();
-    const timeoutAbortController = AbortSignal.timeout(maxDuration * 1000);
-
-    // Abort our controller when timeout fires
-    const timeoutAbortHandler = (): void => {
-      streamAbortController.abort(
-        new StreamAbortError(AbortReason.STREAM_TIMEOUT, {
-          maxDurationSeconds: maxDuration,
-        }),
-      );
-    };
-    timeoutAbortController.addEventListener("abort", timeoutAbortHandler, {
-      once: true,
-    });
 
     // Propagate parent cancellation (e.g. parent AI stream cancelled while sub-agent runs)
     if (parentSignal) {
@@ -842,9 +826,6 @@ export class AbortControllerSetup {
         );
       }
     }
-
-    // Stream survives page refresh - no request.signal linkage.
-    // Streams are only cancelled via the cancel endpoint or timeout.
 
     return streamAbortController;
   }

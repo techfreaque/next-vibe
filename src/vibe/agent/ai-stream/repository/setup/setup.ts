@@ -565,7 +565,6 @@ export async function setupAiStream(params: {
   leadId: string;
   ipAddress: string | undefined;
   aiStreamT: AiStreamT;
-  maxDuration: number;
   request: NextRequest | undefined;
   extraInstructions: string | undefined;
   excludeMemories: boolean | undefined;
@@ -662,10 +661,9 @@ export async function setupAiStream(params: {
   });
 
   // Create abort controller early so signal is available for confirmations and toolExecutionContext
-  const streamAbortController = AbortControllerSetup.setupAbortController({
-    maxDuration: params.maxDuration,
-    parentSignal: params.parentAbortSignal,
-  });
+  const streamAbortController = AbortControllerSetup.setupAbortController(
+    params.parentAbortSignal,
+  );
 
   // ── Load favorite ONCE for all downstream resolution
   const resolvedFavoriteConfig = await loadFavoriteOnce(

@@ -106,6 +106,8 @@ export interface RelayBranchParams {
   leadId: string;
   ipAddress: string | undefined;
   headless: boolean;
+  turnStepLimit: number;
+  maxToolCalls?: number;
   aiStreamT: AiStreamT;
   subAgentDepth: number;
 }
@@ -131,6 +133,8 @@ export async function runRelayBranch(
     leadId,
     ipAddress,
     headless,
+    turnStepLimit,
+    maxToolCalls,
     aiStreamT,
     subAgentDepth,
   } = params;
@@ -533,7 +537,11 @@ export async function runRelayBranch(
       toolConfirmations: relayToolConfirmations,
       attachments: relayAttachments,
       messageHistory: relayMessageHistory,
-      executionContext: relayExecutionContext,
+      executionContext: {
+        ...relayExecutionContext,
+        turnStepLimit,
+        maxToolCalls,
+      },
     },
   });
 

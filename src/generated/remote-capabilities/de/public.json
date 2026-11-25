@@ -10714,11 +10714,11 @@
           "type": "form_field",
           "fieldType": "number",
           "label": "Max. Runden",
-          "description": "Maximale agentische Runden (Tool-Aufruf-Zyklen) vor dem Stopp. Standard: unbegrenzt. Auf 1 setzen für einzelnen Prompt+Antwort ohne Tool-Aufrufe.",
+          "description": "Maximale Anzahl an Modellschritten für diesen Lauf. Ohne Angabe gilt das Limit aus den Chat-Einstellungen.",
           "columns": 6,
           "schema": {
             "def": {
-              "type": "default",
+              "type": "optional",
               "innerType": {
                 "def": {
                   "type": "number",
@@ -10741,7 +10741,7 @@
                 "isFinite": true
               }
             },
-            "type": "default"
+            "type": "optional"
           },
           "usage": {
             "request": "data"

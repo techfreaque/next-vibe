@@ -117,6 +117,12 @@ export const translations: typeof enTranslations = {
       tools: "Narzędzia",
       toolsInherited: "odziedziczone",
     },
+    turnStepLimit: {
+      save: "Zapisz",
+      label: "Kroki na odpowiedź",
+      description:
+        "Wybierz, po ilu rundach wywołań narzędzi AI ma się zatrzymać. Zakres: od 5 do 500.",
+    },
     searchProvider: {
       label: "Dostawca wyszukiwania",
       description:

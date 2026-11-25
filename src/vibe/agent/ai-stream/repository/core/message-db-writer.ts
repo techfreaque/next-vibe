@@ -564,6 +564,7 @@ export class MessageDbWriter {
     sequenceId: string | null;
     user: JwtPayloadType;
     content?: TranslatedKeyType;
+    turnStepLimit?: number;
     /** Skip DB write regardless of incognito mode (e.g. credit errors) */
     skipDb?: boolean;
   }): Promise<void> {

@@ -186,6 +186,7 @@ export class ChatSettingsRepository {
         viewMode: setting.viewMode ?? defaults.viewMode,
         searchProvider: setting.searchProvider ?? defaults.searchProvider,
         codingAgent: setting.codingAgent ?? defaults.codingAgent,
+        turnStepLimit: setting.turnStepLimit ?? defaults.turnStepLimit,
         dreamerEnabled: setting.dreamerEnabled ?? false,
         dreamerFavoriteId: setting.dreamerFavoriteId ?? null,
         dreamerSchedule: setting.dreamerSchedule ?? DREAM_DEFAULT_SCHEDULE,
@@ -305,6 +306,7 @@ export class ChatSettingsRepository {
                 : undefined,
             codingAgent:
               data.codingAgent !== undefined ? data.codingAgent : undefined,
+            turnStepLimit: data.turnStepLimit,
             dreamerEnabled:
               data.dreamerEnabled !== undefined
                 ? data.dreamerEnabled
@@ -391,6 +393,7 @@ export class ChatSettingsRepository {
               data.searchProvider !== undefined ? data.searchProvider : null,
             codingAgent:
               data.codingAgent !== undefined ? data.codingAgent : null,
+            turnStepLimit: data.turnStepLimit ?? null,
             dreamerEnabled:
               data.dreamerEnabled !== undefined ? data.dreamerEnabled : null,
             dreamerFavoriteId:

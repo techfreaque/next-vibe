@@ -42,6 +42,8 @@ import {
 } from "../../chat/enum";
 import { createFolderContentsEmitter } from "../../chat/folder-contents/[rootFolderId]/emitter";
 import { scopedTranslation as chatScopedTranslation } from "../../chat/i18n";
+import { DEFAULT_TURN_STEP_LIMIT } from "../../chat/settings/constants";
+import { chatSettings } from "../../chat/settings/db";
 import { isSkillVariantId, isUuid, parseSkillId } from "../../chat/slugify";
 import {
   createMessagesEmitter,
@@ -184,11 +186,10 @@ export interface CreateAiStreamParams {
     toolId: string;
     requiresConfirmation: boolean;
   }> | null;
-  /**
-   * Cap on agent-loop tool-call rounds for THIS stream (ai-run maxTurns).
-   * Defaults to MAX_TOOL_CALLS when omitted.
-   */
+  /** Explicit ai-run maxTurns override, including its final answer step. */
   maxToolCalls?: number;
+  /** Caller preference forwarded by the relay receiver. */
+  turnStepLimitOverride?: number;
   /**
    * Headless-adapter intake: inject preCalls as thread messages and derive
    * the effective operation/parent/userMessageId from thread state before
@@ -242,11 +243,6 @@ export interface CreateAiStreamParams {
 }
 
 export class AiStreamRepository {
-  /**
-   * Maximum duration for streaming responses (in seconds)
-   */
-  private static readonly maxDuration = 900; // 15 minutes for multi-step tool calling
-
   /**
    * Extract user identifiers from request
    */
@@ -819,6 +815,7 @@ export class AiStreamRepository {
     parentAbortSignal,
     confirmationOverridesOverride,
     maxToolCalls,
+    turnStepLimitOverride,
     headlessIntake,
     onThreadCreated,
     deferredWakeUpPayload,
@@ -1012,6 +1009,21 @@ export class AiStreamRepository {
     // NEVER for receiver loops (relayReceiver): the executor IS the loop
     // location — its copy carries loop_instance_id NULL by construction.
     // ================================================================
+    const [turnSettings] =
+      userId &&
+      turnStepLimitOverride === undefined &&
+      maxToolCalls === undefined
+        ? await db
+            .select({ turnStepLimit: chatSettings.turnStepLimit })
+            .from(chatSettings)
+            .where(eq(chatSettings.userId, userId))
+            .limit(1)
+        : [];
+    const turnStepLimit =
+      turnStepLimitOverride ??
+      turnSettings?.turnStepLimit ??
+      DEFAULT_TURN_STEP_LIMIT;
+
     if (!relayReceiver) {
       const relayResult = await runRelayBranch({
         data,
@@ -1022,6 +1034,8 @@ export class AiStreamRepository {
         leadId,
         ipAddress,
         headless: awaitResult,
+        maxToolCalls,
+        turnStepLimit,
         aiStreamT,
         subAgentDepth,
       });
@@ -1063,7 +1077,6 @@ export class AiStreamRepository {
       leadId,
       ipAddress,
       aiStreamT,
-      maxDuration: AiStreamRepository.maxDuration,
       request,
       headless: awaitResult,
       allowGuestBackgroundCreation,
@@ -1856,6 +1869,7 @@ export class AiStreamRepository {
             creditBalance,
             modelCost,
             maxToolCalls,
+            turnStepLimit,
             imageSize: data.imageSize ?? undefined,
             imageQuality: data.imageQuality ?? undefined,
             musicDuration: data.musicDuration ?? undefined,
@@ -1937,7 +1951,6 @@ export class AiStreamRepository {
             await StreamErrorCatchHandler.handleError({
               error: error as Error | JSONValue,
               ctx,
-              maxDuration: AiStreamRepository.maxDuration,
               model: data.model,
               threadId: threadResultThreadId,
               user,

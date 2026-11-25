@@ -532,6 +532,7 @@ export class MessagesRepository {
     errorType: string;
     errorDetails?: Record<string, string | number | boolean | null>;
     streamError?: { key: string; status: number };
+    turnStepLimit?: number;
     sequenceId?: string | null;
     logger: EndpointLogger;
   }): Promise<void> {
@@ -551,6 +552,9 @@ export class MessagesRepository {
     }
     if (params.streamError) {
       metadata.streamError = params.streamError;
+    }
+    if (params.turnStepLimit !== undefined) {
+      metadata.turnStepLimit = params.turnStepLimit;
     }
 
     await db.insert(chatMessages).values({

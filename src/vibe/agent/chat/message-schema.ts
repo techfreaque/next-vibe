@@ -143,6 +143,7 @@ export const messageMetadataSchema: z.ZodType<MessageMetadata> = z.object({
   finishReason: tolerant(z.string()),
   streamingTime: tolerant(z.number()),
   streamError: tolerant(z.object({ key: z.string(), status: z.number() })),
+  turnStepLimit: tolerant(z.number().int().positive()),
 
   // Streaming / reasoning flags
   isReasoning: tolerant(z.boolean()),
