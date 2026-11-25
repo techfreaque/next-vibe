@@ -104,10 +104,10 @@ health_wait() {
 #    already out of rotation; wait for its in-flight AI runs / tasks, then move
 #    its WebSocket clients to the peer, before the recreate.
 if [ "${HA_DRAIN_WAIT:-0}" = "1" ]; then
-  if [ -f scripts/ha-node-drain.sh ]; then
-    bash scripts/ha-node-drain.sh app-wait || log "WARN: drain wait failed, recreating anyway (SIGTERM drain covers in-flight work)"
-  else
-    log "WARN: HA_DRAIN_WAIT=1 but scripts/ha-node-drain.sh is missing, recreating without the wait"
+  if ! bash scripts/ha-node-drain.sh app-wait; then
+    bash scripts/ha-node-drain.sh app-undrain || true
+    echo "Drain did not complete; keeping the running app." >&2
+    exit 1
   fi
 fi
 archive_logs

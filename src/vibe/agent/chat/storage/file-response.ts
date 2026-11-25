@@ -5,6 +5,7 @@ export interface StoredFileSource {
   threadId: string;
   filename: string;
   contentType: string;
+  inlineBytes?: Uint8Array<ArrayBuffer>;
 }
 
 function resolveByteRange(
@@ -29,7 +30,7 @@ function resolveByteRange(
 }
 
 export async function serveStoredFile(
-  { threadId, filename, contentType }: StoredFileSource,
+  { threadId, filename, contentType, inlineBytes }: StoredFileSource,
   request: Request | undefined,
   extraHeaders: Record<string, string>,
 ): Promise<Response | null> {
@@ -49,7 +50,9 @@ export async function serveStoredFile(
     (rangeHeader && /^bytes=(\d*)-(\d*)$/i.exec(rangeHeader)) || [];
   let range: ByteRange | undefined;
   if (head || first || last) {
-    const size = await storage.getFileSize(threadId, filename);
+    const size =
+      inlineBytes?.byteLength ??
+      (await storage.getFileSize(threadId, filename));
     if (size === null) {
       return null;
     }
@@ -69,6 +72,13 @@ export async function serveStoredFile(
     }
   }
 
+  if (inlineBytes) {
+    const bytes = range
+      ? inlineBytes.subarray(range.start, range.end + 1)
+      : inlineBytes;
+    headers.set("Content-Length", String(bytes.byteLength));
+    return new Response(bytes, { status: range ? 206 : 200, headers });
+  }
   const file = await storage.readFileContent(threadId, filename, range);
   if (!file) {
     return null;

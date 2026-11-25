@@ -281,6 +281,7 @@ class FetchUrlService {
   async fetchUrl(
     url: string,
     fetchImpl: typeof globalThis.fetch,
+    logger?: EndpointLogger,
   ): Promise<FetchResult<FetchUrlResult>> {
     const validateResult = this.validateUrl(url);
     if (!validateResult.ok) {
@@ -311,6 +312,7 @@ class FetchUrlService {
       url,
       controller.signal,
       fetchImpl,
+      logger,
     );
     clearTimeout(timeoutId);
 
@@ -386,6 +388,36 @@ class FetchUrlService {
     url: string,
     signal: AbortSignal,
     fetchImpl: typeof globalThis.fetch,
+    logger?: EndpointLogger,
+  ): Promise<FetchResult<ScrappeyResponse>> {
+    const first = await this.requestScrappey(url, signal, fetchImpl);
+    // A complete 5xx with an explicitly unverified solution and no target
+    // status gives no page to return. Try this read once within its original
+    // deadline. A reported target refusal must be passed back to the caller.
+    if (
+      first.ok ||
+      first.upstreamStatus === undefined ||
+      first.upstreamStatus < 500 ||
+      first.solutionVerified !== false ||
+      first.targetStatusCode !== undefined ||
+      first.proxyBodyRead !== "complete" ||
+      (first.proxyElapsedMs ?? this.TIMEOUT) >= this.TIMEOUT / 2 ||
+      signal.aborted
+    ) {
+      return first;
+    }
+    logger?.warn("Retrying URL fetch after unverified scraper response", {
+      upstreamStatus: first.upstreamStatus,
+      proxyElapsedMs: first.proxyElapsedMs,
+      solutionVerified: first.solutionVerified,
+    });
+    return this.requestScrappey(url, signal, fetchImpl);
+  }
+
+  private async requestScrappey(
+    url: string,
+    signal: AbortSignal,
+    fetchImpl: typeof globalThis.fetch,
   ): Promise<FetchResult<ScrappeyResponse>> {
     const apiUrl = `${this.SCRAPPEY_API_URL}?key=${agentEnv.SCRAPPEY_API_KEY}`;
     const proxyStartedAt = performance.now();
@@ -406,9 +438,8 @@ class FetchUrlService {
       upstreamStatus = response.status;
 
       if (!response.ok) {
-        // Scrappey's body names the reason (blocked, login wall, proxy
-        // failure); the status line alone ("500 Internal Server Error") left
-        // every failed fetch undiagnosable.
+        // Error bodies can contain the proxy IP and location or the scraped
+        // page itself. Only report validated outcome fields.
         let proxyBodyRead: "complete" | "deadline" | "stream-error" =
           "complete";
         const raw = await response.text().catch(() => {
@@ -423,11 +454,18 @@ class FetchUrlService {
             // The upstream can return malformed JSON or truncate its error page.
           }
         }
-        const detail = raw.replaceAll(/\s+/g, " ").trim().slice(0, 300);
+        const targetStatus = statusEvidence?.solution?.statusCode;
+        const target = targetStatus
+          ? `Target HTTP ${targetStatus}.`
+          : "No target HTTP status reported.";
+        const verification =
+          statusEvidence?.solution?.verified === false
+            ? " Scraper solution unverified."
+            : "";
         return {
           ok: false,
           // eslint-disable-next-line i18next/no-literal-string
-          error: `Scrappey API error: ${response.status} ${response.statusText}${detail ? ` - ${detail}` : ""}`,
+          error: `Scrappey HTTP ${response.status}. ${target}${verification}`,
           upstreamStatus: response.status,
           proxyElapsedMs: Math.round(performance.now() - proxyStartedAt),
           deadlineFired: signal.aborted,
@@ -599,6 +637,7 @@ export class FetchUrlContentRepository {
     const result = await fetchService.fetchUrl(
       url,
       createFixtureFetch(toolExecutionContext, logger),
+      logger,
     );
 
     if (!result.ok) {

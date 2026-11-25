@@ -64,6 +64,14 @@ async function fakeOpenRouterFetch(
 }
 
 describe("StreamAbortError", () => {
+  it("recognizes another bundle's marked abort and leaves plain provider aborts alone", () => {
+    const local = new StreamAbortError(AbortReason.USER_CANCELLED);
+    const other = Object.assign(new Error(local.message), local);
+    expect(other instanceof StreamAbortError).toBe(false);
+    expect(isStreamAbort(other)).toBe(true);
+    expect(isStreamAbort(Object.assign(new Error("cancel"), {name: "AbortError"}))).toBe(false);
+  });
+
   it("is recognised as an abort by the AI SDK", () => {
     const err = new StreamAbortError(AbortReason.USER_CANCELLED);
     expect(isAbortError(err)).toBe(true);

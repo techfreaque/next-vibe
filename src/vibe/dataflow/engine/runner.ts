@@ -12,6 +12,7 @@
 import "server-only";
 
 import { defaultLocale } from "../../core/i18n/core/config";
+import { parseError } from "../../core/utils/parse-error";
 import { createEndpointLogger } from "../../logger/server";
 import { GraphResolution, RunStatus } from "../enum";
 import type { GraphNodeConfig } from "../graph/schema";
@@ -147,101 +148,152 @@ export async function runGraph(
   if (!backtestRunId && !readOnly) {
     try {
       runId = await createRun(graphId, graphId);
-    } catch {
-      // Non-fatal - run tracking failure shouldn't block execution
+    } catch (error) {
+      logger.error("[sense] Could not record graph start", parseError(error), {
+        graphId,
+      });
     }
   }
 
-  // Pre-compute extended fetch ranges for source nodes based on downstream lookbacks
-  const graphResolution = options?.displayResolution ?? config.resolution;
-  const nodeRanges = computeNodeRanges(config, range, graphResolution);
-
-  const ctx: ExecutionContext = {
-    requestedRange: range,
-    nodeRanges,
-    graphId,
-    graphSlug: options?.graphSlug,
-    graphNodes: config.nodes,
-    graphEdges: config.edges,
-    resolvedSeries: new Map(),
-    resolvedSignals: new Map(),
-    nodeResolutions: new Map(),
-    graphResolution,
-    logger,
-    backtestRunId,
-    readOnly,
-    displayResolution: options?.displayResolution,
-  };
-
-  const errors: Array<{ nodeId: string; error: string }> = [];
-
-  // Get topological execution order
-  const { order: executionOrder, cycleNodes } = resolveExecutionOrder(config);
-
-  if (cycleNodes.length > 0) {
-    if (runId) {
-      await completeRun(runId, RunStatus.FAILED, 1, 0).catch(() => undefined);
+  const finishRun = async (
+    status: typeof RunStatus.FAILED | typeof RunStatus.COMPLETED,
+    errorCount: number,
+    nodeCount: number,
+  ): Promise<string | null> => {
+    if (!runId) {
+      return null;
     }
+    try {
+      await completeRun(runId, status, errorCount, nodeCount);
+    } catch {
+      // The update is guarded by the running status, including when the first
+      // commit succeeded but its acknowledgement was lost.
+      try {
+        await completeRun(runId, status, errorCount, nodeCount);
+      } catch (error) {
+        const failure = parseError(error);
+        logger.error("[sense] Could not finalize graph run", failure, {
+          graphId,
+          runId,
+          status,
+        });
+        return failure.message;
+      }
+    }
+    return null;
+  };
+  try {
+    // Pre-compute extended fetch ranges for source nodes based on downstream lookbacks
+    const graphResolution = options?.displayResolution ?? config.resolution;
+    const nodeRanges = computeNodeRanges(config, range, graphResolution);
+
+    const ctx: ExecutionContext = {
+      requestedRange: range,
+      nodeRanges,
+      graphId,
+      graphSlug: options?.graphSlug,
+      graphNodes: config.nodes,
+      graphEdges: config.edges,
+      resolvedSeries: new Map(),
+      resolvedSignals: new Map(),
+      unavailableNodes: new Set(),
+      nodeResolutions: new Map(),
+      graphResolution,
+      logger,
+      backtestRunId,
+      readOnly,
+      displayResolution: options?.displayResolution,
+    };
+
+    const errors: Array<{ nodeId: string; error: string }> = [];
+
+    // Get topological execution order
+    const { order: executionOrder, cycleNodes } = resolveExecutionOrder(config);
+
+    if (cycleNodes.length > 0) {
+      await finishRun(RunStatus.FAILED, 1, 0);
+      return {
+        series: ctx.resolvedSeries,
+        signals: ctx.resolvedSignals,
+        errors: [
+          {
+            nodeId: "graph",
+            error: `Cycle detected - nodes involved: ${cycleNodes.join(", ")}`,
+          },
+        ],
+        runId,
+        skippedChartOnly: 0,
+      };
+    }
+
+    // In scheduled cron mode (not readOnly, not backtest), skip chart-only nodes.
+    // Chart-only nodes have no path to any evaluator or endpoint sink - they exist
+    // purely for on-demand charting and will be computed when readOnly: true.
+    // This avoids unnecessary DB queries on every cron tick for display-only data.
+    const isCronMode = !readOnly && !backtestRunId;
+    const sinkReachable = isCronMode ? getSinkReachableNodeIds(config) : null;
+
+    // Execute nodes in order
+    let nodeCount = 0;
+    let skippedChartOnly = 0;
+    for (const nodeId of executionOrder) {
+      const nodeConfig = config.nodes[nodeId];
+      if (!nodeConfig) {
+        continue;
+      }
+
+      // Skip chart-only nodes during cron runs
+      if (sinkReachable !== null && !sinkReachable.has(nodeId)) {
+        skippedChartOnly++;
+        continue;
+      }
+
+      try {
+        const failure = await executeNode(nodeId, nodeConfig, ctx);
+        if (!failure) {
+          nodeCount++;
+        } else {
+          ctx.unavailableNodes.add(nodeId);
+          if ("error" in failure) {
+            errors.push({ nodeId, error: failure.error });
+          }
+        }
+      } catch (err) {
+        errors.push({ nodeId, error: String(err) });
+        ctx.unavailableNodes.add(nodeId);
+        // Continue with remaining nodes - partial results are useful
+      }
+    }
+
+    // skippedChartOnly is tracked for debugging but not surfaced as errors
+
+    // Complete the run record
+    const status = errors.length > 0 ? RunStatus.FAILED : RunStatus.COMPLETED;
+    const writeError = await finishRun(status, errors.length, nodeCount);
+    if (writeError) {
+      errors.push({ nodeId: "graph", error: writeError });
+    }
+
     return {
       series: ctx.resolvedSeries,
       signals: ctx.resolvedSignals,
-      errors: [
-        {
-          nodeId: "graph",
-          error: `Cycle detected - nodes involved: ${cycleNodes.join(", ")}`,
-        },
-      ],
+      errors,
+      runId,
+      skippedChartOnly,
+    };
+  } catch (error) {
+    const failure = parseError(error);
+    logger.error("[sense] Graph run could not finish", failure, {
+      graphId,
+      runId,
+    });
+    await finishRun(RunStatus.FAILED, 1, 0);
+    return {
+      series: new Map(),
+      signals: new Map(),
+      errors: [{ nodeId: "graph", error: failure.message }],
       runId,
       skippedChartOnly: 0,
     };
   }
-
-  // In scheduled cron mode (not readOnly, not backtest), skip chart-only nodes.
-  // Chart-only nodes have no path to any evaluator or endpoint sink - they exist
-  // purely for on-demand charting and will be computed when readOnly: true.
-  // This avoids unnecessary DB queries on every cron tick for display-only data.
-  const isCronMode = !readOnly && !backtestRunId;
-  const sinkReachable = isCronMode ? getSinkReachableNodeIds(config) : null;
-
-  // Execute nodes in order
-  let nodeCount = 0;
-  let skippedChartOnly = 0;
-  for (const nodeId of executionOrder) {
-    const nodeConfig = config.nodes[nodeId];
-    if (!nodeConfig) {
-      continue;
-    }
-
-    // Skip chart-only nodes during cron runs
-    if (sinkReachable !== null && !sinkReachable.has(nodeId)) {
-      skippedChartOnly++;
-      continue;
-    }
-
-    try {
-      await executeNode(nodeId, nodeConfig, ctx);
-      nodeCount++;
-    } catch (err) {
-      errors.push({ nodeId, error: String(err) });
-      // Continue with remaining nodes - partial results are useful
-    }
-  }
-
-  // skippedChartOnly is tracked for debugging but not surfaced as errors
-
-  // Complete the run record
-  if (runId) {
-    const status = errors.length > 0 ? RunStatus.FAILED : RunStatus.COMPLETED;
-    await completeRun(runId, status, errors.length, nodeCount).catch(
-      () => undefined,
-    );
-  }
-
-  return {
-    series: ctx.resolvedSeries,
-    signals: ctx.resolvedSignals,
-    errors,
-    runId,
-    skippedChartOnly,
-  };
 }

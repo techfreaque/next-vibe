@@ -210,10 +210,12 @@ interface GetOrCreateLeadByIpResult {
   credits: number;
 }
 interface DeductCreditsResult {
-  partial?: boolean;
+  partial: boolean;
+  deducted: number;
 }
 interface DeductForModelResult {
   messageId?: string;
+  deducted?: number;
   partialDeduction?: boolean;
 }
 interface AddReferralBonusResult {
@@ -2922,7 +2924,7 @@ export class CreditRepository {
       let modelShadowCredits = 0;
       let clusterLimited = false;
       let availableForFullCharge = 0;
-      const onInsufficientCredits = (): ResponseType<{ partial: boolean }> => {
+      const onInsufficientCredits = (): ResponseType<DeductCreditsResult> => {
         logger.warn("Insufficient credits for tool/endpoint", {
           requested: amount,
           available: availableForFullCharge,
@@ -2947,7 +2949,7 @@ export class CreditRepository {
       };
       const deductFromWallets = async (
         tx: Parameters<Parameters<typeof db.transaction>[0]>[0],
-      ): Promise<ResponseType<{ partial: boolean }>> => {
+      ): Promise<ResponseType<DeductCreditsResult>> => {
         let remaining = amount;
         // One provider call can debit several wallets, packs and free buckets.
         // Attribute its indivisible cache counts once, inside the same transaction.
@@ -3439,14 +3441,14 @@ export class CreditRepository {
               feature,
             });
             // Return partial flag so callers can propagate it
-            return success({ partial: true });
+            return success({ partial: true, deducted: amount - remaining });
           }
           // Tools and endpoints require a full charge. Undo every debit.
           availableForFullCharge = amount - remaining;
           tx.rollback();
         }
 
-        return success({ partial: false });
+        return success({ partial: false, deducted: amount });
       };
       const result = await withTransaction(
         logger,
@@ -3500,7 +3502,7 @@ export class CreditRepository {
         });
       }
 
-      return success({ partial: result.data.partial });
+      return success(result.data);
     } catch (error) {
       logger.error("Failed to deduct credits", parseError(error), {
         ...identifier,
@@ -4628,7 +4630,10 @@ export class CreditRepository {
       });
 
       CreditRepository.emitBalanceUpdate(user, logger, t, locale);
-      return success({ messageId: creditMessageId });
+      return success({
+        messageId: creditMessageId,
+        deducted: result.data.deducted,
+      });
     } catch (error) {
       logger.error(`Error deducting credits for ${feature}`, {
         error: error instanceof Error ? error.message : String(error),
@@ -4913,7 +4918,11 @@ export class CreditRepository {
       });
 
       CreditRepository.emitBalanceUpdate(user, logger, t, locale);
-      return success({ messageId: creditMessageId, partialDeduction });
+      return success({
+        messageId: creditMessageId,
+        partialDeduction,
+        deducted: result.data.deducted,
+      });
     } catch (error) {
       logger.error(`Error deducting credits for model`, {
         error: error instanceof Error ? error.message : String(error),

@@ -138,7 +138,9 @@ export async function deductAndEmitCredits(
   }
 
   if (deductResult.success) {
-    w.totalCreditsDeducted += params.amount;
+    // Model usage can settle for less than the quoted step when the wallet empties.
+    const deducted = deductResult.data?.deducted ?? params.amount;
+    w.totalCreditsDeducted += deducted;
     await guardTaskStep(w, params);
     return;
   }

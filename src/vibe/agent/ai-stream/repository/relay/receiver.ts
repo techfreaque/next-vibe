@@ -558,7 +558,7 @@ export async function runWsProviderStream(params: {
       messageId: result.data.lastAiMessageId ?? "",
       responseThreadId: result.data.threadId ?? threadId,
       totalTokens: undefined,
-      finishReason: undefined,
+      finishReason: result.data.providerErrorText ? "error" : undefined,
       lastAiMessageContent: result.data.lastAiMessageContent ?? null,
       lastGeneratedMediaUrl: result.data.lastGeneratedMediaUrl ?? null,
       totalCreditsDeducted: result.data.totalCreditsDeducted,

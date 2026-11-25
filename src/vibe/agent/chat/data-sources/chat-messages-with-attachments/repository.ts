@@ -46,7 +46,8 @@ export class QueryChatMessagesWithAttachmentsRepository {
       .where(
         and(
           humanChatMessage,
-          sql`${chatMessages.metadata}->>'attachments' IS NOT NULL AND jsonb_array_length((${chatMessages.metadata}->'attachments')::jsonb) > 0`,
+          // Check the binary JSON array size without serializing file payloads to text.
+          sql`${chatMessages.metadata} @? 'strict $.attachments ? (@.type() == "array" && @.size() > 0)'`,
           gte(chatMessages.createdAt, range.from),
           lte(chatMessages.createdAt, range.to),
         ),

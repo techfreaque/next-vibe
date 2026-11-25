@@ -40,10 +40,7 @@ interface SchedulerResult {
 export async function runDueGraphs(
   logger: EndpointLogger,
 ): Promise<SchedulerResult> {
-  const reaped = await reapStaleRuns(STALE_RUN_AGE_MS);
-  if (reaped > 0) {
-    logger.warn(formatSense(`Marked ${reaped} stale graph runs as failed`));
-  }
+  await reapStaleRuns(STALE_RUN_AGE_MS, logger);
 
   // Find all active, non-archived graphs with cron triggers
   const graphs = await db
@@ -65,7 +62,6 @@ export async function runDueGraphs(
   let executed = 0;
   const errors: SchedulerResult["errors"] = [];
   const startTime = Date.now();
-  const ran: string[] = [];
 
   for (const graph of scheduledGraphs) {
     try {
@@ -86,10 +82,22 @@ export async function runDueGraphs(
       const from = lastRun?.finishedAt ?? lastRun?.startedAt ?? dayAgo(now);
 
       logger.debug(`[sense] Running graph ${graph.slug} (${graph.id})`);
-      await runGraph(graph.id, config, { from, to: now }, undefined, {
-        graphSlug: graph.slug,
-      });
-      ran.push(graph.slug);
+      const result = await runGraph(
+        graph.id,
+        config,
+        { from, to: now },
+        undefined,
+        {
+          graphSlug: graph.slug,
+        },
+      );
+      for (const failure of result.errors) {
+        errors.push({
+          graphId: graph.id,
+          slug: graph.slug,
+          error: `${failure.nodeId}: ${failure.error}`,
+        });
+      }
       executed++;
     } catch (error) {
       const msg = error instanceof Error ? error.message : String(error);

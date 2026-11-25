@@ -127,6 +127,7 @@ export async function generateWithVenice(params: {
       providerModel,
       prompt,
       inputMediaUrl,
+      aspectRatio,
       logger,
       locale,
       fetchImpl,
@@ -244,12 +245,20 @@ async function editWithVenice(params: {
   providerModel: string;
   prompt: string;
   inputMediaUrl: string;
+  aspectRatio?: string;
   logger: EndpointLogger;
   locale: CountryLanguage;
   fetchImpl: typeof globalThis.fetch;
 }): Promise<ResponseType<{ imageUrl: string }>> {
-  const { providerModel, prompt, inputMediaUrl, logger, locale, fetchImpl } =
-    params;
+  const {
+    providerModel,
+    prompt,
+    inputMediaUrl,
+    aspectRatio,
+    logger,
+    locale,
+    fetchImpl,
+  } = params;
   const { t } = scopedTranslation.scopedT(locale);
 
   logger.debug("[Venice Images] Editing image", {
@@ -297,6 +306,7 @@ async function editWithVenice(params: {
         model: providerModel,
         prompt,
         image: refBase64,
+        aspect_ratio: aspectRatio,
         safe_mode: false,
         output_format: "webp",
       }),

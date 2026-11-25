@@ -10,6 +10,8 @@ import "server-only";
 import { and, desc, eq, isNull, lt, sql } from "drizzle-orm";
 
 import { db } from "../../database";
+import { formatSense } from "../../logger/formatters";
+import type { EndpointLogger } from "../../logger/types";
 import { pipelineRuns } from "../db";
 import { RunStatus, type RunStatusType } from "../enum";
 
@@ -64,7 +66,10 @@ export async function completeRun(
 }
 
 /** Fail abandoned runs without overwriting runs that have already finished. */
-export async function reapStaleRuns(maxAgeMs: number): Promise<number> {
+export async function reapStaleRuns(
+  maxAgeMs: number,
+  logger?: EndpointLogger,
+): Promise<number> {
   const finishedAt = new Date();
   const cutoff = new Date(finishedAt.getTime() - maxAgeMs);
   const rows = await db
@@ -81,7 +86,23 @@ export async function reapStaleRuns(maxAgeMs: number): Promise<number> {
         lt(pipelineRuns.startedAt, cutoff),
       ),
     )
-    .returning({ id: pipelineRuns.id });
+    .returning({
+      runId: pipelineRuns.id,
+      graphId: pipelineRuns.graphId,
+      startedAt: pipelineRuns.startedAt,
+    });
+  if (rows.length > 0) {
+    logger?.warn(formatSense("Recovered unfinished graph runs"), {
+      count: rows.length,
+      staleAfterMs: maxAgeMs,
+      runs: rows.slice(0, 10).map(({ runId, graphId, startedAt }) => ({
+        runId,
+        graphId,
+        startedAt: startedAt.toISOString(),
+      })),
+    });
+  }
+
   return rows.length;
 }
 

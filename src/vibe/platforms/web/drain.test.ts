@@ -21,7 +21,7 @@ import {
   drainActiveLoops,
   trackActiveRun,
 } from "../../agent/ai-stream/repository/loop/active-loops";
-import { startDrainWatcher } from "./drain";
+import { isWebSocketDrainActive, startDrainWatcher } from "./drain";
 
 const dirs: string[] = [];
 const stops: Array<() => void> = [];
@@ -100,10 +100,12 @@ describe("drain watcher", () => {
     writeFileSync(join(dir, "request"), "test");
     await sleep(60);
     expect(closeCalls).toBe(0);
+    expect(isWebSocketDrainActive()).toBe(false);
 
     writeFileSync(join(dir, "ws-close"), "test");
     await sleep(120);
     expect(closeCalls).toBe(1);
+    expect(isWebSocketDrainActive()).toBe(true);
     const status = join(dir, "status-server.json");
     expect(
       (JSON.parse(readFileSync(status, "utf8")) as { wsClosed: boolean })
@@ -113,6 +115,7 @@ describe("drain watcher", () => {
     rmSync(join(dir, "request"));
     await sleep(80);
     expect(existsSync(status)).toBe(false);
+    expect(isWebSocketDrainActive()).toBe(false);
   });
 });
 

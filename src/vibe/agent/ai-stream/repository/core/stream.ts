@@ -157,6 +157,8 @@ export class ToolExecutionContextImpl {
    *  transient/real, where it arrived). finalize uses it to avoid re-logging a
    *  finishReason=error that carries no detail of its own. */
   lastProviderErrorText: string | null = null;
+  /** Terminal provider failure, including a finish with no separate error part. */
+  providerFailureFinishReason: "error" | "content-filter" | null = null;
 
   /** Set to true when prepareStep injects a queued message mid-stream.
    *  Prevents processNextQueuedMessage from double-processing in the finally block. */

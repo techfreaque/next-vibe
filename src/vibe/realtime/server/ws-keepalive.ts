@@ -73,7 +73,7 @@ export function diagnoseWsClose(
         ? "bun-close-reason"
         : code === 1006 &&
             reason.length === 0 &&
-            sinceLastInboundMs >= 2 * WS_PING_INTERVAL_MS - 1_000
+            sinceLastInboundMs >= WS_IDLE_TIMEOUT_SECONDS * 1000
           ? "silent-window"
           : null;
   const kind = idleEvidence

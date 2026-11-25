@@ -223,6 +223,7 @@ app_busy() {
 import json, sys, datetime
 now = datetime.datetime.now(datetime.timezone.utc)
 busy, ws, fresh, parts = 0, 0, 0, []
+hub_drained = False
 for line in sys.stdin:
     line = line.strip()
     if not line:
@@ -235,7 +236,10 @@ for line in sys.stdin:
     if (now - at).total_seconds() > 10:
         continue
     fresh += 1
-    for k, v in s.get("counts", {}).items():
+    counts = s.get("counts", {})
+    if s.get("role") == "server" and s.get("wsClosed") is True and counts.get("wsClients") == 0:
+        hub_drained = True
+    for k, v in counts.items():
         if k.startswith("ws"):
             if k == "wsClients":
                 ws += v
@@ -244,7 +248,7 @@ for line in sys.stdin:
         if v:
             parts.append("%s.%s=%s" % (s["role"], k, v))
 if fresh:
-    print(busy, ws, fresh, " ".join(parts) or "idle")
+    print(busy, ws, int(hub_drained), " ".join(parts) or "idle")
 '
 }
 
@@ -264,13 +268,14 @@ cmd_app_wait() {
     die "cannot write the drain request into $APP"
   log "app: drain requested in $APP (timeout ${DRAIN_TIMEOUT}s, stable ${DRAIN_STABLE}s)"
 
-  local start now zero_since="" mode="" snapshot="" line busy ws last_log=0
+  local start now zero_since="" mode="" snapshot="" line busy ws last_log=0 saw_status=0
   start="$(date +%s)"
   while :; do
     now="$(date +%s)"
     line="$(app_busy || true)"
     if [ -n "$line" ]; then
       mode=app
+      saw_status=1
       read -r busy ws _ parts <<<"$line"
     elif [ -z "$mode" ] && [ $((now - start)) -lt 10 ]; then
       sleep 2; continue
@@ -308,16 +313,24 @@ cmd_app_wait() {
 
   # Work done: move the WebSocket clients to the peer now, while this app is
   # still up (a recreate would drop them with a bare 1006 instead).
-  app_exec "date -u +%FT%TZ > $APP_DRAIN_DIR/ws-close" || true
-  local i
+  app_exec "date -u +%FT%TZ > $APP_DRAIN_DIR/ws-close" || die "cannot request WebSocket migration"
+  if [ "$saw_status" = 0 ] && ! app_exec "test -f /app/src/vibe/platforms/web/drain.ts"; then
+    log "legacy drain: no app status available to confirm WebSocket migration"
+    sleep "$WS_GRACE"
+    return 0
+  fi
+  local i hub_drained
   for i in $(seq 1 "$WS_GRACE"); do
     sleep 1
     line="$(app_busy || true)"
-    [ -n "$line" ] || break
-    read -r busy ws _ parts <<<"$line"
-    [ "$ws" = 0 ] && break
+    [ -n "$line" ] || continue
+    read -r busy ws hub_drained parts <<<"$line"
+    if [ "$hub_drained" = 1 ]; then
+      log "app: WS hub acknowledged the 1012 sweep and has zero clients"
+      return 0
+    fi
   done
-  log "app: WebSocket clients closed with 1012 (left: ${ws:-?}); ready for recreate"
+  die "WS hub did not confirm the 1012 sweep and zero clients in ${WS_GRACE}s (last count: ${ws:-unknown})"
 }
 
 cmd_app_undrain() {
@@ -329,6 +342,7 @@ verb="${1:-status}"; shift || true
 case "$verb" in
 status) cmd_status ;;
 preflight) cmd_preflight "${1:?node}" ;;
+stage-assets) python3 scripts/ha-stage-next-assets.py "$APP" "${1:?release image}" "$(dirname "$CADDY_DRAIN_DIR")" ;;
 edge-on) cmd_edge_on "${1:?node}" ;;
 edge-off) cmd_edge_off "${1:?node}" "${2:-}" ;;
 swap) cmd_swap "${1:?from node}" "${2:?to node}" ;;
@@ -336,5 +350,5 @@ local-probe) local_probe && echo ok || { echo fail; exit 1; } ;;
 app-wait) cmd_app_wait ;;
 app-undrain) cmd_app_undrain ;;
 probe) probe "${1:?node}" && echo ok || { echo fail; exit 1; } ;;
-*) die "usage: $0 status|preflight <node>|edge-on <node>|edge-off <node> [--wait]|swap <from> <to>|app-wait|app-undrain|probe <node>|local-probe" ;;
+*) die "usage: $0 status|preflight <node>|stage-assets <image>|edge-on <node>|edge-off <node> [--wait]|swap <from> <to>|app-wait|app-undrain|probe <node>|local-probe" ;;
 esac

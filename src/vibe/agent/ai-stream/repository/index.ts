@@ -34,7 +34,7 @@ import {
   makeHeadlessContext,
 } from "../../../core/execution-context";
 import { remoteConnections } from "../../../remote-connection/db";
-import { chatMessages, chatThreads, type ToolCall } from "../../chat/db";
+import type { ToolCall } from "../../chat/db";
 import {
   ChatMessageRole,
   ThreadStatus,
@@ -63,7 +63,6 @@ import {
   type FavoriteConfig,
 } from "../../skills/favorites/db";
 import { SkillsRepository } from "../../skills/repository";
-import { stripThinkTags } from "../../text-to-speech/content-processing";
 import type { VideoGenModelSelection } from "../../video-generation/models";
 import { getChatModelById } from "../models";
 import type {
@@ -109,6 +108,7 @@ import {
   subscribeWakeUpSignal,
   type WakeUpPayload,
 } from "./revival/revival";
+import { shapeRunResult } from "./run-result";
 import {
   type HeadlessIntake,
   type HeadlessPreCall,
@@ -674,7 +674,8 @@ export class AiStreamRepository {
         return streamResult;
       }
 
-      return AiStreamRepository.shapeRunResult({
+      return shapeRunResult({
+        t: aiStreamT,
         headlessResult: streamResult.data,
         isIncognito,
         headlessThreadMode,
@@ -689,95 +690,6 @@ export class AiStreamRepository {
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
-  }
-
-  /**
-   * Shape the headless turn result into the ai-run response: read the last
-   * assistant message + tokens from the DB (in-memory content for incognito),
-   * strip think-tags, fetch thread metadata, and attach the pre-call summary.
-   */
-  private static async shapeRunResult(params: {
-    headlessResult: HeadlessAiStreamResult;
-    isIncognito: boolean;
-    headlessThreadMode: "none" | "new" | "append";
-    preCallResults: Array<{
-      routeId: string;
-      success: boolean;
-      error?: string;
-    }>;
-    logger: EndpointLogger;
-  }): Promise<ResponseType<AiStreamRunPostResponseOutput>> {
-    const {
-      headlessResult,
-      isIncognito,
-      headlessThreadMode,
-      preCallResults,
-      logger,
-    } = params;
-    const { lastAiMessageId, threadId, lastAiMessageContent } = headlessResult;
-
-    // Incognito → messages aren't persisted; use in-memory content directly.
-    // Persistent modes → DB read also provides token metadata.
-    let rawText: string | null = lastAiMessageContent ?? null;
-    let promptTokens: number | null = null;
-    let completionTokens: number | null = null;
-    let creditCost: number | null = null;
-
-    if (!isIncognito) {
-      const [aiMessage] = await db
-        .select({
-          content: chatMessages.content,
-          metadata: chatMessages.metadata,
-        })
-        .from(chatMessages)
-        .where(eq(chatMessages.id, lastAiMessageId))
-        .limit(1);
-
-      rawText = aiMessage?.content ?? rawText;
-      promptTokens = aiMessage?.metadata?.promptTokens ?? null;
-      completionTokens = aiMessage?.metadata?.completionTokens ?? null;
-      creditCost = aiMessage?.metadata?.creditCost ?? null;
-    }
-
-    const text = rawText ? stripThinkTags(rawText) : null;
-    const resultThreadId =
-      (headlessThreadMode !== "none" ? threadId : null) ?? null;
-
-    let threadTitle: string | null = null;
-    let threadCreatedAt: string | null = null;
-    if (resultThreadId) {
-      const [thread] = await db
-        .select({ title: chatThreads.title, createdAt: chatThreads.createdAt })
-        .from(chatThreads)
-        .where(eq(chatThreads.id, resultThreadId))
-        .limit(1);
-      threadTitle = thread?.title ?? null;
-      threadCreatedAt = thread?.createdAt?.toISOString() ?? null;
-    }
-
-    logger.debug("[AiStreamRun] Complete", {
-      lastAiMessageId,
-      threadId: resultThreadId,
-      textLength: text?.length ?? 0,
-      promptTokens,
-      completionTokens,
-    });
-
-    return success({
-      text,
-      threadId: resultThreadId,
-      lastAiMessageId: headlessThreadMode !== "none" ? lastAiMessageId : null,
-      threadTitle,
-      threadCreatedAt,
-      promptTokens,
-      completionTokens,
-      creditCost,
-      preCallResults: preCallResults.map((r) => ({
-        routeId: r.routeId,
-        success: r.success,
-        error: r.error ?? null,
-      })),
-    });
   }
 
   /** Headless overload - returns structured result with threadId + lastAiMessageId */
@@ -1689,6 +1601,9 @@ export class AiStreamRepository {
 
             // Check if compacting failed
             if (!compactingResult.success) {
+              capturedProviderErrorText = aiStreamT(
+                "errors.compactingStreamError",
+              );
               logger.error("[AI Stream] Compacting failed, stopping stream", {
                 compactingMessageId: compactingResult.compactingMessageId,
                 threadId: threadResultThreadId,
@@ -1891,30 +1806,20 @@ export class AiStreamRepository {
           // In a tool loop there can be multiple assistant messages; lastAssistantMessageId
           // on the writer is updated on every write so it always holds the final one.
           capturedQueueInjected = ctx.queueInjectedInStream;
-          // Capture the provider error-part text (if the stream hit an upstream
-          // error) regardless of whether an assistant message was written, so
-          // headless callers can surface the real cause (e.g. a transient
-          // provider_unavailable outage) instead of a generic failure.
-          capturedProviderErrorText = ctx.lastProviderErrorText;
-          if (ctx.dbWriter.lastAssistantMessageId) {
-            capturedLastAiMessageId = ctx.dbWriter.lastAssistantMessageId;
-            capturedLastAiMessageContent = ctx.dbWriter.lastAssistantContent;
-            capturedLastGeneratedMediaUrl = ctx.dbWriter.lastGeneratedMediaUrl;
-            capturedTotalCreditsDeducted = ctx.dbWriter.totalCreditsDeducted;
-          } else if (awaitResult) {
+          if (!ctx.dbWriter.lastAssistantMessageId && awaitResult) {
             // No assistant message was written - the stream errored before the
             // first emit. The pre-generated aiMessageId never reached the DB,
             // and callers chain follow-up messages off lastAiMessageId - a
             // phantom id would force the parent-not-committed fallback on the
             // next message. Resolve to the thread's newest committed message.
-            const lastCommitted =
-              await findLatestThreadMessage(threadResultThreadId);
+            const lastCommitted = isIncognito
+              ? null
+              : await findLatestThreadMessage(threadResultThreadId);
             if (lastCommitted) {
               capturedLastAiMessageId = lastCommitted.id;
             }
             logger.warn(
-              "[AI Stream] Headless stream completed with no assistant message written - " +
-                "lastAiMessageId resolved to the thread's newest committed message",
+              "[AI Stream] Headless stream completed with no assistant message written",
               {
                 aiMessageId,
                 resolvedLastAiMessageId: lastCommitted?.id ?? null,
@@ -1922,7 +1827,8 @@ export class AiStreamRepository {
                 // Why nothing was written: the upstream error part (if any)
                 // plus which model/provider produced it, and the caller chain
                 // (parentThreadId = the thread whose tool spawned this run).
-                providerError: ctx.lastProviderErrorText,
+                providerError:
+                  ctx.lastProviderErrorText ?? ctx.providerFailureFinishReason,
                 model: data.model,
                 apiProvider: modelConfig.apiProvider,
                 providerModel: modelConfig.providerModel,
@@ -1948,6 +1854,7 @@ export class AiStreamRepository {
               },
             );
           } else {
+            capturedProviderErrorText = parseError(error).message;
             await StreamErrorCatchHandler.handleError({
               error: error as Error | JSONValue,
               ctx,
@@ -1957,6 +1864,21 @@ export class AiStreamRepository {
               logger,
               t: aiStreamT,
             });
+          }
+        } finally {
+          // Compaction, tool steps and finalization all charge this run's writer.
+          // Capture even when the provider returned before an assistant row existed.
+          capturedTotalCreditsDeducted = ctx.dbWriter.totalCreditsDeducted;
+          capturedProviderErrorText =
+            ctx.lastProviderErrorText ??
+            capturedProviderErrorText ??
+            ctx.providerFailureFinishReason;
+          if (ctx.dbWriter.lastAssistantMessageId) {
+            capturedLastAiMessageId = ctx.dbWriter.lastAssistantMessageId;
+            capturedLastAiMessageContent =
+              ctx.dbWriter.lastAssistantContent ??
+              (ctx.currentAssistantContent || null);
+            capturedLastGeneratedMediaUrl = ctx.dbWriter.lastGeneratedMediaUrl;
           }
         }
       };

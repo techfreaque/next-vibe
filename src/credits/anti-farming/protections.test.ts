@@ -210,7 +210,7 @@ it("shares a single allowance by IPv6 /48 or fingerprint across wallets and char
   const charge = await spend(c, 2);
   expect(charge).toMatchObject({
     success: true,
-    data: { partialDeduction: true },
+    data: { partialDeduction: true, deducted: 1 },
   });
   expect((await rows(c.leadId))[0]).toMatchObject({
     amount: -1,

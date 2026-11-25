@@ -23,7 +23,7 @@ beforeAll(async () => {
   await pg.exec(`
     CREATE TABLE chat_threads (id uuid PRIMARY KEY, user_id uuid, title text);
     CREATE TABLE chat_messages (
-      thread_id uuid, metadata jsonb, content text, created_at timestamp
+      thread_id uuid, metadata jsonb, content text, created_at timestamp, role text DEFAULT 'user'
     );
   `);
   await pg.query("INSERT INTO chat_threads VALUES ($1, $2, 'Sample thread')", [
@@ -90,4 +90,57 @@ it("lists legacy and hosted uploads using attachment summaries", async () => {
   expect(queries.at(-1)).toContain('left("chat_messages"."content"');
   const hosted = await readUploadPath(owner, `${path}/hosted-pdf.md`);
   expect(hosted?.content).toContain("https://example.com/hosted.pdf");
+});
+
+it("resolves an owned inline WebP from its virtual path and serves only its user attachment bytes", async () => {
+  const { readUploadPath, resolveUploadAttachmentUrl } =
+    await import("./uploads");
+  const { readInlineThreadImage } =
+    await import("../../chat/storage/inline-image");
+  const { serveStoredFile } = await import("../../chat/storage/file-response");
+  const { buildStorageFilePath } =
+    await import("../../chat/storage/storage-url");
+  const filename = "12345678-1234-4321-abcd-123456789012.webp";
+  const path = `/uploads/images/sample-thread-${threadId}/${filename}.md`;
+  const bytes = Buffer.from("RIFF0000WEBPfixture");
+  const attachment = {
+    filename,
+    mimeType: "image/webp",
+    url: "",
+    data: bytes.toString("base64"),
+    size: bytes.length,
+  };
+  await pg.query(
+    "INSERT INTO chat_messages (thread_id,role,metadata) VALUES ($1, 'tool', $2)",
+    [threadId, JSON.stringify({ attachments: [attachment] })],
+  );
+  expect(await readInlineThreadImage(threadId, filename)).toBeNull();
+  expect(await resolveUploadAttachmentUrl(owner, path)).toBeNull();
+  await pg.query(
+    "INSERT INTO chat_messages (thread_id,role,metadata,created_at) VALUES ($1, 'user', $2, now())",
+    [threadId, JSON.stringify({ attachments: [attachment] })],
+  );
+  expect(await resolveUploadAttachmentUrl(otherUser, path)).toBeNull();
+  expect(await resolveUploadAttachmentUrl(owner, path)).toBe(
+    buildStorageFilePath(threadId, filename),
+  );
+  const markdown = await readUploadPath(owner, path);
+  expect(markdown?.content).toContain(buildStorageFilePath(threadId, filename));
+  expect(markdown?.content).not.toContain(attachment.data);
+  expect(await readInlineThreadImage(otherUser, filename)).toBeNull();
+  const source = await readInlineThreadImage(threadId, filename);
+  expect(source?.contentType).toBe("image/webp");
+  if (!source) return;
+  const response = await serveStoredFile(
+    source,
+    new Request("https://fixture.invalid", {
+      headers: { Range: "bytes=8-11" },
+    }),
+    {},
+  );
+  expect(response?.status).toBe(206);
+  expect(response?.headers.get("Content-Range")).toBe(
+    `bytes 8-11/${bytes.length}`,
+  );
+  expect(await response?.text()).toBe("WEBP");
 });

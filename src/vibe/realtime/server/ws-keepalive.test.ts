@@ -80,7 +80,7 @@ describe("WS keepalive", () => {
   });
 
   it("treats a reasonless 1006 after a full idle window as idle-timeout", () => {
-    const d = diagnoseWsClose(socketData(90_000, 40_500, 0), 1006, "", NOW);
+    const d = diagnoseWsClose(socketData(90_000, 75_000, 0), 1006, "", NOW);
     expect(d.kind).toBe("idle-timeout");
     expect(d.meta.idleEvidence).toBe("silent-window");
     expect(d.meta.inboundActivity).toBe("application-traffic");
@@ -104,7 +104,7 @@ describe("WS keepalive", () => {
 
   it("reports a 1006 cut mid-window as a drop", () => {
     expect(
-      diagnoseWsClose(socketData(59_500, 5_000, 2), 1006, "", NOW).kind,
+      diagnoseWsClose(socketData(59_500, 39_337, 2), 1006, "", NOW).kind,
     ).toBe("dropped");
   });
 

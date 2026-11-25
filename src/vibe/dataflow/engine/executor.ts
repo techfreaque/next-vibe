@@ -10,6 +10,7 @@ import "server-only";
 import { makeHeadlessContext } from "next-vibe/core/execution-context";
 
 import { defaultLocale } from "../../core/i18n/core/config";
+import type { ResponseType } from "../../core/route/response.schema";
 import type { WidgetData } from "../../core/utils/json";
 import { RouteExecutionExecutor } from "../../execute-tool/repository/core";
 import type { JwtPayloadType } from "../../identity/auth/types";
@@ -66,6 +67,7 @@ export interface ExecutionContext {
    */
   resolvedSeries: Map<string, DataPoint[]>;
   resolvedSignals: Map<string, SignalEvent[]>;
+  unavailableNodes: Set<string>;
   nodeResolutions: Map<string, Resolution>;
   graphResolution?: Resolution;
   backtestRunId?: string;
@@ -83,7 +85,7 @@ export async function executeNode(
   nodeId: string,
   nodeConfig: GraphNodeConfig,
   ctx: ExecutionContext,
-): Promise<void> {
+): Promise<{ error: string } | { blocked: true } | undefined> {
   const { requestedRange, graphId, readOnly } = ctx;
   const resolution =
     nodeConfig.resolution ?? ctx.graphResolution ?? GraphResolution.ONE_DAY;
@@ -135,6 +137,16 @@ export async function executeNode(
     }
   }
 
+  if (
+    incomingEdges.some(
+      (edge) =>
+        ctx.unavailableNodes.has(edge.from) &&
+        !((edge.toHandle ?? "source") in inputs),
+    )
+  ) {
+    return { blocked: true };
+  }
+
   // If this node expects upstream series (has incoming edges) but none resolved,
   // skip execution - calling the endpoint with missing source would fail validation.
   if (incomingEdges.length > 0 && !("source" in inputs)) {
@@ -154,15 +166,16 @@ export async function executeNode(
     });
     return;
   }
-  const response = await callEndpoint(
+  const result = await callEndpoint(
     nodeConfig.endpointPath,
     inputs,
     nodeId,
     ctx,
   );
-  if (response === null) {
-    return;
+  if (!result.success) {
+    return { error: result.message };
   }
+  const response = result.data;
 
   // Extract result series from response
   const outputField = nodeConfig.outputField ?? "result";
@@ -264,6 +277,7 @@ export async function executeNode(
       );
     }
   }
+  return undefined;
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -328,7 +342,7 @@ async function callEndpoint(
   input: Record<string, MappedValue>,
   nodeId: string,
   ctx: ExecutionContext,
-): Promise<Record<string, WidgetData> | null> {
+): Promise<ResponseType<Record<string, WidgetData>>> {
   const { logger } = ctx;
   const toolName = endpointId;
 
@@ -350,7 +364,7 @@ async function callEndpoint(
   });
 
   if (result.success) {
-    return result.data;
+    return result;
   }
 
   logger.error(`[vibe-sense] Endpoint call failed: ${toolName}`, {
@@ -369,7 +383,7 @@ async function callEndpoint(
     inputKeys: Object.keys(data).join(", "),
     inputSample: JSON.stringify(data).slice(0, 500),
   });
-  return null;
+  return result;
 }
 
 function coerce(val: MappedValue): WidgetData {

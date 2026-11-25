@@ -102,13 +102,20 @@ const IDENTITY_RESUBSCRIBE_GRACE_MS = 3_000;
 const DROP_REPORT_AFTER_MS = 20_000;
 /** How often to check whether an open outage is due to be reported. */
 const DROP_CHECK_INTERVAL_MS = 5_000;
+/** Bound a foreground browser upgrade, including the first connection. */
+const HANDSHAKE_TIMEOUT_MS = 15_000;
 /** Retry an exhausted connection slowly while the tab is visible and online. */
 const RECONNECT_COOLDOWN_MS = 60_000;
 const MAX_FAST_RECONNECT_ATTEMPTS = 6;
 
 // Shared connection state
 let sharedWs: WebSocket | null = null;
-let pendingHandshake: { requestId: string; startedAt: number } | null = null;
+let pendingHandshake: {
+  requestId: string;
+  startedAt: number;
+  timedOut: boolean;
+} | null = null;
+let handshakeTimer: ReturnType<typeof setTimeout> | null = null;
 let reconnectAttempts = 0;
 // Once fast retries run out, an active tab retries at a slower rate.
 let reconnectPaused = false;
@@ -153,6 +160,7 @@ interface DropInfo {
   /** null = the socket never opened (handshake/upgrade failed) */
   connectedForMs: number | null;
   handshakeMs: number;
+  handshakeTimedOut: boolean;
   handshakeContext: ReturnType<typeof readHandshakeContext>;
   acknowledgedChannels: number;
   sinceLastFrameMs: number | null;
@@ -169,8 +177,11 @@ let failedHandshakesDuringDrop = 0;
 let lastFailedHandshakeRequestId: string | null = null;
 let lastFailedHandshakeMs: number | null = null;
 let lastFailedHandshakeCode: number | null = null;
-let lastFailedHandshakeContext: ReturnType<typeof readHandshakeContext> | null =
-  null;
+let lastFailedHandshakeContext:
+  | (ReturnType<typeof readHandshakeContext> & {
+      timedOut: boolean;
+    })
+  | null = null;
 let maxReconnectTimerOverrunMs = 0;
 let noticeableDownMs = 0;
 let noticeableSince: number | null = null;
@@ -231,10 +242,14 @@ function reportDrop(
   dropReported = true;
   stopDropCheck();
   const plannedRestart = pendingDrop?.code === WS_SERVICE_RESTART_CODE;
-  logger.error(
+  const seamless =
     plannedRestart &&
-      dropReportTrigger !== "deadline" &&
-      failedHandshakesDuringDrop === 0
+    dropReportTrigger === "reconnected" &&
+    currentNoticeableDownMs() < DROP_REPORT_AFTER_MS &&
+    failedHandshakesDuringDrop === 0;
+  const log = seamless ? logger.info : logger.error;
+  log(
+    seamless
       ? "[WS Client] Planned reconnect after server restart"
       : "[WS Client] Connection lost",
     {
@@ -492,14 +507,21 @@ function connect(logger: EndpointLogger): void {
   const protocol = getCurrentProtocol() === "https:" ? "wss:" : "ws:";
   const requestId = mintRequestId();
   const retry = pendingDrop === null ? "" : "&retry=1";
-  const url = `${protocol}//${getCurrentHost()}/ws?requestId=${requestId}${retry}`;
+  const restart =
+    pendingDrop?.code === WS_SERVICE_RESTART_CODE ? "&restart=1" : "";
+  const url = `${protocol}//${getCurrentHost()}/ws?requestId=${requestId}${retry}${restart}`;
 
   lastLogger = logger;
   const connectStartedAt = Date.now();
   const handshakeContext = readHandshakeContext();
   const ws = new WebSocket(url);
   sharedWs = ws;
-  pendingHandshake = { requestId, startedAt: connectStartedAt };
+  pendingHandshake = {
+    requestId,
+    startedAt: connectStartedAt,
+    timedOut: false,
+  };
+  refreshHandshakeDeadline();
   if (pendingDrop !== null) {
     dropReconnectCount++;
   }
@@ -539,8 +561,10 @@ function connect(logger: EndpointLogger): void {
     if (sharedWs !== ws) {
       return; // replaced on purpose (identity change); the new socket owns state
     }
+    const timedOut = pendingHandshake?.timedOut ?? false;
     sharedWs = null;
     pendingHandshake = null;
+    refreshHandshakeDeadline();
     const closedAt = Date.now();
     const socketOpenedAt = openedAt;
     const socketLastFrameAt = lastFrameAt;
@@ -554,7 +578,7 @@ function connect(logger: EndpointLogger): void {
       lastFailedHandshakeRequestId = requestId;
       lastFailedHandshakeMs = closedAt - connectStartedAt;
       lastFailedHandshakeCode = event.code;
-      lastFailedHandshakeContext = handshakeContext;
+      lastFailedHandshakeContext = { ...handshakeContext, timedOut };
     }
     // Keep the first close of the episode. Recovery, the report timer, or
     // pagehide reports it once, even when several reconnects fail.
@@ -576,6 +600,7 @@ function connect(logger: EndpointLogger): void {
         connectedForMs:
           socketOpenedAt === null ? null : closedAt - socketOpenedAt,
         handshakeMs: (socketOpenedAt ?? closedAt) - connectStartedAt,
+        handshakeTimedOut: timedOut,
         handshakeContext,
         acknowledgedChannels:
           socketOpenedAt === null
@@ -643,12 +668,48 @@ function connect(logger: EndpointLogger): void {
   ws.addEventListener("open", () => {
     if (sharedWs === ws) {
       pendingHandshake = null;
+      refreshHandshakeDeadline();
       handleOpen(logger, requestId, connectStartedAt);
     }
   });
   ws.addEventListener("message", handleMessage);
   ws.addEventListener("close", handleClose);
   // onerror is followed by onclose, which triggers reconnect.
+}
+
+function refreshHandshakeDeadline(): void {
+  if (handshakeTimer !== null) {
+    clearTimeout(handshakeTimer);
+    handshakeTimer = null;
+  }
+  const ws = sharedWs;
+  const handshake = pendingHandshake;
+  if (
+    !ws ||
+    !handshake ||
+    handshake.timedOut ||
+    !isTabVisible() ||
+    !isOnline() ||
+    pageUnloading
+  ) {
+    return;
+  }
+  const remaining = handshake.startedAt + HANDSHAKE_TIMEOUT_MS - Date.now();
+  handshakeTimer = setTimeout(
+    () => {
+      handshakeTimer = null;
+      if (
+        sharedWs === ws &&
+        ws.readyState === WebSocket.CONNECTING &&
+        isTabVisible() &&
+        isOnline()
+      ) {
+        handshake.timedOut = true;
+        ws.close(4003, "reconnect-handshake-timeout");
+      }
+    },
+    Math.max(0, remaining),
+  );
 }
 
 function resumeReconnect(): void {
@@ -680,6 +741,7 @@ if (typeof document !== "undefined") {
     const socket = sharedWs;
     sharedWs = null;
     pendingHandshake = null;
+    refreshHandshakeDeadline();
     openedAt = null;
     lastFrameAt = null;
     socket?.close(1000, "pagehide");
@@ -687,25 +749,25 @@ if (typeof document !== "undefined") {
   addWindowListener("pageshow", () => {
     pageUnloading = false;
     updateDropVisibility();
+    refreshHandshakeDeadline();
     resumeReconnect();
   });
   addDocumentListener("visibilitychange", () => {
     lastVisibilityChangeAt = Date.now();
     updateDropVisibility();
-    if (reconnectPaused || reconnectTimer === null) {
-      resumeReconnect();
-    }
+    refreshHandshakeDeadline();
+    resumeReconnect();
   });
   addWindowListener("online", () => {
     lastNetworkChangeAt = Date.now();
     updateDropVisibility();
-    if (reconnectPaused || reconnectTimer === null) {
-      resumeReconnect();
-    }
+    refreshHandshakeDeadline();
+    resumeReconnect();
   });
   addWindowListener("offline", () => {
     lastNetworkChangeAt = Date.now();
     updateDropVisibility();
+    refreshHandshakeDeadline();
   });
 }
 
@@ -877,6 +939,7 @@ export function reconnectForIdentityChange(logger: EndpointLogger): void {
   }
   sharedWs = null;
   pendingHandshake = null;
+  refreshHandshakeDeadline();
   openedAt = null;
   lastFrameAt = null;
   reconnectAttempts = 0;

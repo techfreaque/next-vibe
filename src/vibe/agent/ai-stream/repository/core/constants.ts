@@ -63,9 +63,11 @@ export enum AbortReason {
   SERVER_SHUTDOWN = "server_shutdown",
 }
 
+const streamAbortMarker = Symbol.for("next-vibe.agent.StreamAbortError");
+
 /**
  * Typed error for stream aborts - no string matching needed.
- * Use `instanceof StreamAbortError` to check, then `.reason` for the enum.
+ * Use `isStreamAbort` to check, then `.reason` for the enum.
  *
  * `name` is "AbortError" on purpose: the AI SDK and provider packages detect
  * aborts by name (`isAbortError`). Any other name makes them wrap our cancel
@@ -73,6 +75,7 @@ export enum AbortReason {
  * error path instead of the clean abort path.
  */
 export class StreamAbortError extends Error {
+  readonly [streamAbortMarker] = true;
   readonly reason: AbortReason;
   constructor(reason: AbortReason) {
     super(reason);
@@ -96,5 +99,12 @@ export class StreamAbortError extends Error {
  * Check if an error is a graceful stream abort.
  */
 export function isStreamAbort(error: Error): error is StreamAbortError {
-  return error instanceof StreamAbortError;
+  // Cancellation crosses Next.js bundle layers sharing one run registry. Each
+  // layer can have its own constructor but shares the process symbol registry.
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    streamAbortMarker in error &&
+    error[streamAbortMarker] === true
+  );
 }

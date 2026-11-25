@@ -31,6 +31,7 @@ import {
   bucketSql,
   inPreviousWindowSql,
   inWindowSql,
+  utcSql,
 } from "next-vibe/unified-ui/analytics/window-sql";
 import type { QueryResultRow } from "pg";
 
@@ -384,26 +385,24 @@ export async function computeSignupsByChannel(
   const { rows } = await db.execute<
     QueryResultRow & { key: string; signups: number }
   >(sql`
-    WITH ${segmentCte(win, {})},
-    first_signup AS (
-      SELECT DISTINCT ON (f.user_id) f.user_id, f.signed_up_at,
-        ${dimensionColumn(LeadDimension.CHANNEL_TYPE)} AS key
-      FROM seg f WHERE f.user_id IS NOT NULL
-      ORDER BY f.user_id, f.signed_up_at, f.created_at
+    WITH first_signup AS (
+      SELECT DISTINCT ON (u.id) u.id, j.first_channel_type AS channel_type
+      FROM leads l
+      LEFT JOIN growth_journeys j ON j.lead_id = l.id
+      JOIN users u ON u.id = coalesce(j.user_id, l.converted_user_id)
+      WHERE ${inWindowSql(sql`u.created_at`, win)} AND l.created_at < ${utcSql(win.to)}
+      ORDER BY u.id, l.created_at, l.id
+    ), counts AS (
+      SELECT ${dimensionColumn(LeadDimension.CHANNEL_TYPE)} AS key, count(*) AS n
+      FROM first_signup f GROUP BY 1
+      UNION ALL
+      SELECT ${LeadChannelFilter.UNATTRIBUTED}, count(*)
+      FROM ${UNLINKED_USERS} AND ${inWindowSql(sql`u.created_at`, win)}
+      HAVING count(*) > 0
     )
-    SELECT key, count(*)::int AS signups FROM first_signup
-    WHERE ${inWindowSql(sql`signed_up_at`, win)}
-    GROUP BY key
+    SELECT key, sum(n)::int AS signups FROM counts GROUP BY key
   `);
-  const result = new Map(rows.map((row) => [row.key, row.signups]));
-  const unlinked = await unlinkedSignups(win);
-  if (unlinked.current > 0) {
-    result.set(
-      LeadChannelFilter.UNATTRIBUTED,
-      (result.get(LeadChannelFilter.UNATTRIBUTED) ?? 0) + unlinked.current,
-    );
-  }
-  return result;
+  return new Map(rows.map((row) => [row.key, row.signups]));
 }
 
 /** Earliest tracked visit / journey (tells the operator what the data covers). */

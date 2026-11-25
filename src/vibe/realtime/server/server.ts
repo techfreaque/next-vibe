@@ -36,6 +36,7 @@ import { parseError } from "../../core/utils/parse-error";
 import type { JwtPayloadType } from "../../identity/auth/types";
 import { UserPermissionRole } from "../../identity/roles/enum";
 import type { EndpointLogger } from "../../logger/types";
+import { isWebSocketDrainActive } from "../../platforms/web/drain";
 import {
   clearLocalBroadcast,
   registerLocalBroadcast,
@@ -580,8 +581,15 @@ export function startWebSocketServer(
           requestId && url.searchParams.get("retry") === "1"
             ? Date.now()
             : undefined;
+        const clientReportedDropCause =
+          url.searchParams.get("restart") === "1"
+            ? "server-restart"
+            : undefined;
         if (retryStartedAt !== undefined) {
-          logger.info("[WS] Reconnect handshake reached server", { requestId });
+          logger.info("[WS] Reconnect handshake reached server", {
+            requestId,
+            clientReportedDropCause,
+          });
         }
         const auth = await authenticateWsRequest(req, logger);
 
@@ -650,6 +658,17 @@ export function startWebSocketServer(
           }
         }
 
+        // Auth and channel checks can finish after the drain swept the hub.
+        // Let the ingress retry this upgrade on the serving peer.
+        if (isWebSocketDrainActive()) {
+          logger.info("[WS] Upgrade returned to ingress during deploy drain", {
+            requestId,
+          });
+          return new Response("Server draining", {
+            status: 503,
+            headers: { "Retry-After": "1" },
+          });
+        }
         const connectorInstanceId =
           url.searchParams.get("connectorInstanceId") ?? undefined;
 
@@ -679,6 +698,7 @@ export function startWebSocketServer(
           logger.info("[WS] Reconnect handshake upgraded", {
             requestId,
             elapsedMs: Date.now() - retryStartedAt,
+            clientReportedDropCause,
           });
         }
 
@@ -740,6 +760,10 @@ export function startWebSocketServer(
         // Normal /ws connection - register initial channels from query param
         recordWsOpen();
         wsClients.add(ws as ServerWebSocket<WsConnectionData>);
+        if (isWebSocketDrainActive()) {
+          ws.close(WS_SERVER_RESTART_CODE, WS_SERVER_DRAIN_REASON);
+          return;
+        }
         const initialChannels = [...ws.data.channels];
         // Clear first since subscribeToChannel() re-adds them
         ws.data.channels.clear();

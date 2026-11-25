@@ -369,6 +369,10 @@ export async function complete(
     );
   }
 
+  if (finishReason === "error" || finishReason === "content-filter") {
+    state.p.ctx.providerFailureFinishReason = finishReason;
+  }
+
   if (finishReason === "content-filter") {
     logger.warn("[AI Stream] Provider content filter triggered", {
       model,

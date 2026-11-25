@@ -36,6 +36,7 @@ import { useSubscription } from "@/subscription/hooks";
 import { isLivePlan } from "@/subscription/plan-offers";
 import { VerifyEmailCreditsPrompt } from "@/user/public/verify-email/credits-prompt";
 
+import { useAIStreamStore } from "../hooks/store";
 import { scopedTranslation } from "../i18n";
 
 interface OutOfCreditsCardProps {
@@ -82,6 +83,10 @@ export function OutOfCreditsCard({
 }: OutOfCreditsCardProps): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
 
+  const refusalMessage = useAIStreamStore((state) =>
+    variant === "composer" ? state.creditRefusalMessage : undefined,
+  );
+
   return (
     <Div
       data-testid="out-of-credits-card"
@@ -107,6 +112,11 @@ export function OutOfCreditsCard({
         </Button>
       )}
       <Div className={cn(onDismiss && "pr-8")}>
+        {refusalMessage && !reason && (
+          <P aria-live="polite" className="mb-2 text-sm font-medium">
+            {refusalMessage}
+          </P>
+        )}
         {reason ? (
           <Div className="flex flex-col items-start gap-2">
             <P>{frameworkMessages.scopedT(locale).t(reason)}</P>

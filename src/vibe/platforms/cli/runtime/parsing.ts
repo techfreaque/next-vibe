@@ -95,7 +95,12 @@ export class CliInputParser {
     const keys = path.split(".").map((s) => this.kebabToCamelCase(s));
 
     const firstKey = keys[0];
-    if (firstKey === undefined) {
+    if (
+      firstKey === undefined ||
+      keys.some((key) =>
+        ["__proto__", "prototype", "constructor"].includes(key),
+      )
+    ) {
       return;
     }
     if (keys.length === 1) {
@@ -727,13 +732,20 @@ export class CliInputParser {
     return value;
   }
 
-  /**
-   * A JSON-object string for a record/object field becomes that object; any
-   * other value is left for the schema to judge.
-   */
-  private static parseJsonObjectValue(value: WidgetData): WidgetData {
-    if (typeof value !== "string" || !value.trim().startsWith("{")) {
-      return value;
+  /** Preserve literal text, and decode structured flags before local or remote dispatch. */
+  private static normalizeNamedValue(
+    value: WidgetData,
+    field: z.ZodType | undefined,
+  ): WidgetData {
+    if (
+      !field ||
+      typeof value !== "string" ||
+      !(
+        value.trimStart().startsWith("{") || value.trimStart().startsWith("[")
+      ) ||
+      field.safeParse(value).success
+    ) {
+      return this.normalizeCliValue(value);
     }
     try {
       const parsed = WidgetDataSchema.safeParse(JSON.parse(value));
@@ -773,24 +785,19 @@ export class CliInputParser {
       "preview",
     ]);
 
-    // Record/object fields given as one JSON flag (`--taskInput='{"a":1}'`)
-    // arrive as a string; the schema wants the object (2026-11-17: cron PUT
-    // over --remote failed "taskInput: expected record, received string").
-    const jsonFieldNames = new Set([
-      ...this.buildFieldNamesOfType(endpoint, "record"),
-      ...this.buildFieldNamesOfType(endpoint, "object"),
-    ]);
+    const schema = endpoint?.requestSchema;
+    const shape = schema instanceof z.ZodObject ? schema.shape : undefined;
 
     for (const [key, value] of Object.entries(expandedNamedArgs)) {
       if (CLI_LEVEL_OPTIONS.has(key)) {
         continue;
       }
 
-      // Convert string boolean values to actual booleans (arrays pass through).
-      // Cast is safe - Zod strips incompatible shapes at final parse.
-      const normalizedValue = jsonFieldNames.has(key)
-        ? this.parseJsonObjectValue(value)
-        : this.normalizeCliValue(value);
+      const field = shape?.[this.kebabToCamelCase(key)];
+      const normalizedValue = this.normalizeNamedValue(
+        value,
+        field instanceof z.ZodType ? field : undefined,
+      );
 
       // Use setNestedValue to expand dot-notation keys (e.g. response.output → { response: { output } })
       if (key.includes(".")) {
@@ -807,6 +814,26 @@ export class CliInputParser {
       } else {
         const camelCaseKey = this.kebabToCamelCase(key);
         data[camelCaseKey] = normalizedValue;
+      }
+    }
+
+    // --availableTools.0.toolId describes a list entry. JavaScript enumerates
+    // integer keys in order, so gaps and mixed object keys stay invalid.
+    for (const [key, value] of Object.entries(data)) {
+      if (
+        value &&
+        typeof value === "object" &&
+        !Array.isArray(value) &&
+        !(value instanceof Date) &&
+        this.resolveZodType(shape?.[key]) === "array"
+      ) {
+        const entries = Object.entries(value);
+        if (
+          entries.length &&
+          entries.every(([index], i) => index === String(i))
+        ) {
+          data[key] = entries.map(([, entry]) => entry);
+        }
       }
     }
 

@@ -1,5 +1,5 @@
 import { PGlite } from "@electric-sql/pglite";
-import { afterAll, beforeAll, expect, it, mock, setSystemTime } from "bun:test";
+import { afterAll, beforeAll, expect, it, mock, setSystemTime, spyOn } from "bun:test";
 import { drizzle } from "drizzle-orm/pglite";
 
 import { defaultLocale } from "../../core/i18n/core/config";
@@ -89,6 +89,7 @@ it("reaps stale graph runs and schedules the newly unblocked graph", async () =>
     },
   ]);
 
+  const warning = spyOn(logger, "warn");
   setSystemTime(now);
   try {
     expect(await runDueGraphs(logger)).toEqual({
@@ -96,8 +97,12 @@ it("reaps stale graph runs and schedules the newly unblocked graph", async () =>
       graphsExecuted: 1,
       errors: [],
     });
+    expect(warning).toHaveBeenCalledWith(expect.stringContaining("unfinished graph runs"), expect.objectContaining({
+      count: 1, runs: [{ runId: staleRun, graphId: staleGraph, startedAt: staleStart.toISOString() }],
+    }));
     await completeRun(staleRun, RunStatus.COMPLETED, 0, 5);
   } finally {
+    warning.mockRestore();
     setSystemTime();
   }
 
@@ -121,4 +126,38 @@ it("reaps stale graph runs and schedules the newly unblocked graph", async () =>
   expect(
     rows.find(({ id, graphId }) => id !== staleRun && graphId === staleGraph),
   ).toMatchObject({ status: RunStatus.COMPLETED, errorCount: 0 });
+});
+
+it("retries an interrupted terminal write and reports a failed graph to the scheduler", async () => {
+  const { runDueGraphs } = await import("./scheduler");
+  const runs = await import("../store/runs");
+  const graphId = crypto.randomUUID();
+  await db.update(pipelineGraphs).set({ isActive: false });
+  await db.insert(pipelineGraphs).values({
+    id: graphId,
+    slug: "cycle-fixture",
+    name: "Cycle",
+    ownerType: GraphOwnerType.SYSTEM,
+    config: {
+      trigger: { type: "cron", schedule: "*/5 * * * *" },
+      nodes: {
+        first: { endpointPath: "trend", persist: "never" },
+        second: { endpointPath: "trend", persist: "never" },
+      },
+      edges: [{ from: "first", to: "second" }, { from: "second", to: "first" }],
+    },
+  });
+  const completion = spyOn(runs, "completeRun").mockRejectedValueOnce(new Error("interrupted write"));
+  try {
+    const result = await runDueGraphs(createEndpointLogger(false, defaultLocale));
+    expect(result.errors).toContainEqual({
+      graphId, slug: "cycle-fixture", error: expect.stringContaining("Cycle detected"),
+    });
+    expect(await runs.getLatestRun(graphId)).toMatchObject({
+      status: RunStatus.FAILED, finishedAt: expect.any(Date),
+    });
+    expect(completion).toHaveBeenCalledTimes(2);
+  } finally {
+    completion.mockRestore();
+  }
 });

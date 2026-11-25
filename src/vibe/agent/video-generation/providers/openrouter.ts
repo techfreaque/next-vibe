@@ -1,6 +1,7 @@
 import "server-only";
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { MAX_UPLOAD_BYTES } from "next-vibe/core/route/body-limit";
 import {
   ErrorResponseTypes,
   fail,
@@ -11,15 +12,22 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { agentEnv } from "../../env";
+import { parseBase64DataUri } from "../../shared/media-generation";
 import { pollDelay } from "../../shared/poll-delay";
 import { scopedTranslation } from "../i18n";
+
+type VideoProviderError = string | { message?: string; code?: number } | null;
+
+function providerErrorMessage(error?: VideoProviderError): string | undefined {
+  return typeof error === "string" ? error : error?.message;
+}
 
 interface OpenRouterVideoSubmitResponse {
   id: string;
   polling_url: string;
   status: string;
   generation_id?: string;
-  error?: string | null;
+  error?: VideoProviderError;
   unsigned_urls?: string[];
   usage?: { cost?: number; is_byok?: boolean };
 }
@@ -52,6 +60,15 @@ type FrameImageRole = "first" | "last" | "reference";
  * .mp4/.webm/.mov → video, audio files → audio, everything else → image.
  */
 function detectMediaKind(url: string): "image_url" | "audio_url" | "video_url" {
+  if (url.startsWith("data:video/")) {
+    return "video_url";
+  }
+  if (url.startsWith("data:audio/")) {
+    return "audio_url";
+  }
+  if (url.startsWith("data:")) {
+    return "image_url";
+  }
   const clean = url.split("?")[0]?.split("#")[0]?.toLowerCase() ?? "";
   if (/\.(mp4|webm|mov)$/.test(clean)) {
     return "video_url";
@@ -60,6 +77,39 @@ function detectMediaKind(url: string): "image_url" | "audio_url" | "video_url" {
     return "audio_url";
   }
   return "image_url";
+}
+
+// Private generated images reach the provider as inline WebP. Some video
+// models only accept PNG or JPEG for bookends. Preserve alpha and dimensions.
+async function prepareFrameImage(
+  url: string,
+  logger: EndpointLogger,
+): Promise<string> {
+  if (!url.startsWith("data:image/webp;")) {
+    return url;
+  }
+  const inline = parseBase64DataUri(url);
+  if (!inline || inline.base64.length > Math.ceil(MAX_UPLOAD_BYTES / 3) * 4) {
+    return url;
+  }
+  try {
+    const { default: sharp } = await import("sharp");
+    const png = await sharp(Buffer.from(inline.base64, "base64"), {
+      limitInputPixels: 16_777_216,
+    })
+      .autoOrient()
+      .png()
+      .toBuffer();
+    if (png.length <= MAX_UPLOAD_BYTES) {
+      return `data:image/png;base64,${png.toString("base64")}`;
+    }
+  } catch (error) {
+    logger.warn("[OpenRouter Video] WebP frame conversion failed", {
+      reason: parseError(error).message,
+    });
+  }
+  // A model which accepts the original can still handle the request.
+  return url;
 }
 
 interface OpenRouterVideoStatusResponse {
@@ -73,7 +123,7 @@ interface OpenRouterVideoStatusResponse {
     | "cancelled"
     | "expired";
   generation_id?: string;
-  error?: string | null;
+  error?: VideoProviderError;
   unsigned_urls?: string[];
   usage?: { cost?: number; is_byok?: boolean };
 }
@@ -169,7 +219,12 @@ export async function generateVideoWithOpenRouter(params: {
     OpenRouterVideoRequestBody["input_references"]
   > = [];
   for (const frame of frameReferences ?? []) {
-    const url = frame.url;
+    const isBookend =
+      frame.role === "first" ||
+      (frame.role === "last" && supportedFrameImages?.includes("last_frame"));
+    const url = isBookend
+      ? await prepareFrameImage(frame.url, logger)
+      : frame.url;
     if (frame.role === "first") {
       frameImageParts.push({
         type: "image_url",
@@ -244,13 +299,17 @@ export async function generateVideoWithOpenRouter(params: {
     }
 
     if (!submitRes.ok || submitData.error) {
+      const reason = providerErrorMessage(submitData.error);
       logger.error("[OpenRouter Video] Submit failed", {
         status: submitRes.status,
-        error: submitData.error ?? submitText.slice(0, 200),
+        error: reason ?? submitText.slice(0, 200),
+        providerModel,
+        frameCount: frameImageParts.length,
+        referenceCount: inputReferenceParts.length,
       });
       return fail({
-        message: submitData.error
-          ? t("post.errors.providerError", { error: submitData.error })
+        message: reason
+          ? t("post.errors.providerError", { error: reason })
           : t("post.errors.providerHttpError", {
               status: String(submitRes.status),
               body: submitText.slice(0, 200),
@@ -319,9 +378,10 @@ export async function generateVideoWithOpenRouter(params: {
         statusData.status === "cancelled" ||
         statusData.status === "expired"
       ) {
+        const reason = providerErrorMessage(statusData.error);
         logger.error("[OpenRouter Video] Job terminal failure", {
           status: statusData.status,
-          error: statusData.error,
+          error: reason,
           // Which upstream model failed and after how long (outage vs. a
           // model-specific rejection); the user is not charged on this path.
           providerModel,
@@ -330,8 +390,8 @@ export async function generateVideoWithOpenRouter(params: {
           elapsedMs: Date.now() - pollStartedAt,
         });
         return fail({
-          message: statusData.error
-            ? t("post.errors.providerError", { error: statusData.error })
+          message: reason
+            ? t("post.errors.providerError", { error: reason })
             : t("post.errors.jobFailedStatus", { status: statusData.status }),
           errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
         });

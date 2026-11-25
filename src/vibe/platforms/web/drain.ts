@@ -47,6 +47,12 @@ export type DrainCounts = Record<string, number>;
 
 /** Set by {@link markShuttingDown}: this process is going down (SIGTERM). */
 let shuttingDown = false;
+let wsDrainActive = false;
+
+/** The local WS hub has started moving its clients to the serving peer. */
+export function isWebSocketDrainActive(): boolean {
+  return wsDrainActive;
+}
 
 /**
  * True while the deploy script has asked this node to drain, or while this
@@ -119,6 +125,9 @@ export function startDrainWatcher(options: {
         if (draining) {
           draining = false;
           wsClosed = false;
+          if (role === "server") {
+            wsDrainActive = false;
+          }
           rmSync(statusFile(dir, role), { force: true });
         }
         return;
@@ -128,8 +137,11 @@ export function startDrainWatcher(options: {
         onDrainStart?.();
       }
       if (onWsClose && !wsClosed && existsSync(wsCloseFile)) {
-        wsClosed = true;
         onWsClose();
+        wsClosed = true;
+        if (role === "server") {
+          wsDrainActive = true;
+        }
       }
       writeStatus(dir, role, counts(), wsClosed);
     } catch {
@@ -141,5 +153,8 @@ export function startDrainWatcher(options: {
   const timer = setInterval(tick, options.intervalMs ?? 1000);
   return (): void => {
     clearInterval(timer);
+    if (role === "server") {
+      wsDrainActive = false;
+    }
   };
 }

@@ -81,7 +81,7 @@ route {
 	# Only release assets explicitly staged from the same image on both edges.
 	@asset {
 		method GET HEAD
-		path_regexp ^/_next/static/(chunks|css)/([a-zA-Z0-9_~-]+/)*[a-zA-Z0-9_~-]*[0-9a-f]{8,}[a-zA-Z0-9_~-]*\.(js|css)$
+		path_regexp ^/_next/static/((chunks|css)/([a-zA-Z0-9_~-]+/)*[a-zA-Z0-9_.~-]*[0-9a-f]{8,}[a-zA-Z0-9_.~-]*\.(js|css)|chunks/locales/[a-zA-Z0-9_-]{8,}/[0-9]+\.js)$
 		file {
 			root /data/ha-public
 		}

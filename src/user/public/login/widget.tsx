@@ -47,6 +47,8 @@ import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-a
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import { suggestSignupEmail } from "../signup/email-suggestion";
+import { scopedTranslation as signupTranslation } from "../signup/i18n";
 import { authPageHref, CALLBACK_URL_PARAM } from "./callback-url";
 import type definition from "./definition";
 
@@ -309,6 +311,8 @@ export function LoginFormContainer({
     );
   }
 
+  const suggestedEmail = suggestSignupEmail(form?.watch("email") ?? "");
+
   return (
     <Card className="rounded-xl shadow-sm">
       <CardHeader className="gap-1.5 p-6 pb-2 text-center sm:p-8 sm:pb-2">
@@ -317,6 +321,23 @@ export function LoginFormContainer({
       </CardHeader>
       <CardContent className="flex flex-col gap-5 p-6 pt-4 sm:p-8 sm:pt-4">
         <EmailFieldWidget fieldName="email" field={children.email} />
+        {suggestedEmail && (
+          <Button
+            type="button"
+            variant="link"
+            className="h-auto justify-start p-0"
+            onClick={() =>
+              form?.setValue("email", suggestedEmail, {
+                shouldDirty: true,
+                shouldValidate: true,
+              })
+            }
+          >
+            {signupTranslation
+              .scopedT(locale)
+              .t("confirmation.suggestion", { email: suggestedEmail })}
+          </Button>
+        )}
         <PasswordFieldWidget fieldName="password" field={children.password} />
         <BooleanFieldWidget
           fieldName="rememberMe"

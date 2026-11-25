@@ -10,6 +10,9 @@ import { and, desc, eq, sql } from "drizzle-orm";
 import { db } from "next-vibe/database";
 
 import { chatMessages, chatThreads } from "../../chat/db";
+import { ChatMessageRole } from "../../chat/enum";
+import { isInlineImageFilename } from "../../chat/storage/inline-image";
+import { buildStorageFilePath } from "../../chat/storage/storage-url";
 import type { VirtualListEntry, VirtualReadResult } from "./resolver";
 
 const TYPE_FOLDERS = [
@@ -72,7 +75,7 @@ function slugify(value: string): string {
 }
 
 interface AttachmentRow {
-  /** Public download URL (may be empty for base64-embedded uploads) */
+  /** Hosted or authorized download URL, when available. */
   url: string;
   filename: string;
   mimeType: string;
@@ -103,6 +106,7 @@ const MESSAGE_CONTEXT_LIMIT = 1000;
 async function loadUserAttachments(
   userId: string,
   includeMessageContext = false,
+  threadId?: string,
 ): Promise<AttachmentRow[]> {
   const rows = await db
     .select({
@@ -125,6 +129,7 @@ async function loadUserAttachments(
             string | null
           >`left(${chatMessages.content}, ${MESSAGE_CONTEXT_LIMIT})`
         : sql<null>`NULL`,
+      role: chatMessages.role,
       createdAt: chatMessages.createdAt,
       threadId: chatMessages.threadId,
       threadTitle: chatThreads.title,
@@ -134,6 +139,7 @@ async function loadUserAttachments(
     .where(
       and(
         eq(chatThreads.userId, userId),
+        threadId ? eq(chatMessages.threadId, threadId) : undefined,
         sql`jsonb_typeof(${chatMessages.metadata}->'attachments') = 'array'`,
         sql`${chatMessages.metadata}->'attachments' <> '[]'::jsonb`,
       ),
@@ -156,7 +162,13 @@ async function loadUserAttachments(
         continue;
       }
       attachments.push({
-        url,
+        url:
+          !url &&
+          row.role === ChatMessageRole.USER &&
+          att.filename &&
+          isInlineImageFilename(att.filename)
+            ? buildStorageFilePath(row.threadId, att.filename)
+            : url,
         filename,
         mimeType: att.mimeType ?? att.type ?? "application/octet-stream",
         size: att.size ?? 0,
@@ -233,7 +245,7 @@ async function findUploadAttachment(
   const threadId = threadIdMatch[1];
 
   // Load attachments for this thread
-  const allAttachments = await loadUserAttachments(userId, true);
+  const allAttachments = await loadUserAttachments(userId, true, threadId);
   const threadAttachments = allAttachments.filter(
     (a) =>
       a.threadId === threadId && getMimeTypeFolder(a.mimeType) === typeFolder,
@@ -241,12 +253,12 @@ async function findUploadAttachment(
 
   // Find the specific file by normalized filename
   const targetFilename = filenameSegment.replace(/\.md$/, "");
-  const attachment = threadAttachments.find(
+  const matches = threadAttachments.filter(
     (a) =>
       slugify(a.filename) === targetFilename || a.filename === targetFilename,
   );
 
-  return attachment ?? null;
+  return matches.find((attachment) => attachment.url) ?? matches[0] ?? null;
 }
 
 async function renderUploadAttachment(
@@ -372,7 +384,7 @@ export async function listUploadPath(
     }
     const threadId = threadIdMatch[1];
 
-    const allAttachments = await loadUserAttachments(userId);
+    const allAttachments = await loadUserAttachments(userId, false, threadId);
     const threadAttachments = allAttachments.filter(
       (a) =>
         a.threadId === threadId && getMimeTypeFolder(a.mimeType) === typeFolder,

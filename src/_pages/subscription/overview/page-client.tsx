@@ -12,6 +12,7 @@ import {
 import { Container } from "next-vibe/ui/components/container";
 import { CheckCircle } from "next-vibe/ui/components/icons/CheckCircle";
 import { XCircle } from "next-vibe/ui/components/icons/XCircle";
+import { Link } from "next-vibe/ui/components/link";
 import { H1 } from "next-vibe/ui/components/typography";
 import { useLogger } from "next-vibe/ui/hooks/use-logger";
 import { useRouter, useSearchParams } from "next-vibe/ui/hooks/use-navigation";
@@ -81,6 +82,18 @@ function PaymentResultBanner({
       </AlertTitle>
       <AlertDescription>
         {t(`subscription.payment.${paymentStatus}.${paymentType}`)}
+        {!isSuccess && (
+          <Link
+            href={`/${locale}/subscription/buy`}
+            className="mt-2 block w-fit font-medium underline"
+          >
+            {t(
+              paymentType === "credits"
+                ? "subscription.tabs.buy"
+                : "subscription.tabs.plans",
+            )}
+          </Link>
+        )}
       </AlertDescription>
     </Alert>
   );

@@ -30,6 +30,20 @@ import type {
   ResolveTargetParams,
 } from "./types";
 
+// Routing never consumes the capabilities manifest or any sync cursors.
+const routingColumns = {
+  instanceId: remoteConnections.instanceId,
+  remoteUrl: remoteConnections.remoteUrl,
+  token: remoteConnections.token,
+  leadId: remoteConnections.leadId,
+  transportMode: remoteConnections.transportMode,
+  remoteTransportMode: remoteConnections.remoteTransportMode,
+  isReverseEntry: remoteConnections.isReverseEntry,
+  forceSystemProvider: remoteConnections.forceSystemProvider,
+  isInferenceProvider: remoteConnections.isInferenceProvider,
+};
+type RoutingRow = Pick<RemoteConnectionRow, keyof typeof routingColumns>;
+
 export class ExecuteToolRouting {
   /** Call after any connection create/update/delete. */
   static invalidateUnbottledCache(): void {
@@ -176,9 +190,9 @@ export class ExecuteToolRouting {
 
   private static async loadActiveConnections(
     userId: string,
-  ): Promise<RemoteConnectionRow[]> {
+  ): Promise<RoutingRow[]> {
     const rows = await db
-      .select()
+      .select(routingColumns)
       .from(remoteConnections)
       .where(
         and(
@@ -199,7 +213,7 @@ export class ExecuteToolRouting {
   }
 
   private static toTarget(
-    row: RemoteConnectionRow,
+    row: RoutingRow,
     useRemoteContext = false,
   ): RemoteTarget {
     return {

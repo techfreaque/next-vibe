@@ -316,7 +316,10 @@ export function useAIStream(): UseAIStreamReturn {
           }
           useAIStreamStore
             .getState()
-            .setCreditRefusal(creditPolicyReason(errorType.errorKey) ?? true);
+            .setCreditRefusal(
+              creditPolicyReason(errorType.errorKey) ?? true,
+              result.message,
+            );
           return false;
         }
         toast({

@@ -3,13 +3,18 @@ import { afterAll, beforeAll, expect, mock, test } from "bun:test";
 import { asc, eq, inArray } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/pglite";
 
+import { notifications } from "@/notifications/db";
+import { NotificationType } from "@/notifications/enum";
+
+import { AI_RUN_ALIAS } from "../../agent/ai-stream/run/constants";
+import { scopedTranslation as streamTranslation } from "../../agent/ai-stream/stream/i18n";
 import { defaultLocale } from "../../core/i18n/core/config";
 import { success } from "../../core/route/response.schema";
 import type { JwtPrivatePayloadType } from "../../identity/auth/types";
 import { UserPermissionRole } from "../../identity/roles/enum";
 import { createEndpointLogger } from "../../logger/server";
 import { cronTaskExecutions, cronTasks } from "../cron/db";
-import { CronTaskPriority, CronTaskStatus, TaskCategory } from "../enum";
+import { CronTaskPriority, CronTaskStatus, TaskCategory, TaskOutputMode } from "../enum";
 import { TASK_WATCHDOG_SELF_ID } from "../watchdog/config";
 import { TASK_WATCHDOG_SWEEP_ALIAS } from "../watchdog/constants";
 
@@ -23,6 +28,23 @@ const admin: JwtPrivatePayloadType = {
   roles: [UserPermissionRole.ADMIN],
 };
 const sweep = mock(async () => success({ checked: 0, cancelled: 0 }));
+async function failedForumRun() {
+  const { shapeRunResult } = await import("../../agent/ai-stream/repository/run-result");
+  return shapeRunResult({
+    headlessResult: {
+      lastAiMessageId: "fixture",
+      lastAiMessageContent: null,
+      providerErrorText: "malformed tool call data that could not be repaired",
+      totalCreditsDeducted: 2,
+      pinnedToolCount: 0,
+    },
+    isIncognito: true,
+    headlessThreadMode: "none",
+    preCallResults: [],
+    logger,
+    t: streamTranslation.scopedT(defaultLocale).t,
+  });
+}
 
 mock.module("../../database", () => ({ db }));
 mock.module("../../identity/auth/repository", () => ({
@@ -32,11 +54,29 @@ mock.module("../cron/resolve-task-user", () => ({
   resolveTaskOwnerUser: async () => ({ user: admin, locale: defaultLocale }),
 }));
 mock.module("@/generated/routes/handlers", () => ({
-  getRouteHandler: async () => sweep,
+  getRouteHandler: async (path: string) => path === AI_RUN_ALIAS ? failedForumRun : sweep,
 }));
 
 beforeAll(async () => {
   await pg.exec(`
+    CREATE TABLE pulse_health (
+      id uuid PRIMARY KEY DEFAULT gen_random_uuid(), status text, last_pulse_at timestamp,
+      consecutive_failures integer DEFAULT 0, avg_execution_time_ms integer, success_rate integer,
+      total_executions integer DEFAULT 0, total_successes integer DEFAULT 0,
+      total_failures integer DEFAULT 0, metadata jsonb, alerts_sent integer DEFAULT 0,
+      last_alert_at timestamp, is_maintenance_mode boolean DEFAULT false,
+      created_at timestamp DEFAULT now(), updated_at timestamp DEFAULT now()
+    );
+    CREATE TABLE task_incidents (
+      id uuid PRIMARY KEY DEFAULT gen_random_uuid(), task_id text, task_name text, type text,
+      reason text, metadata jsonb, created_at timestamp DEFAULT now(), resolved_at timestamp
+    );
+    CREATE TABLE users (id uuid PRIMARY KEY, locale text);
+    CREATE TABLE notifications (
+      id uuid PRIMARY KEY DEFAULT gen_random_uuid(), user_id uuid, type text, title text,
+      body text, link text, read boolean DEFAULT false, dedupe_key text,
+      metadata jsonb, created_at timestamp DEFAULT now(), UNIQUE(user_id, dedupe_key)
+    );
     CREATE TABLE cron_tasks (
       id text PRIMARY KEY, short_id text, route_id text, display_name text,
       description text, version text DEFAULT '1.0.0', category text, schedule text,
@@ -60,6 +100,7 @@ beforeAll(async () => {
       executed_by_instance text, triggered_by text, environment text, created_at timestamp DEFAULT now()
     );
   `);
+  await pg.query("INSERT INTO users (id, locale) VALUES ($1, $2)", [admin.id, defaultLocale]);
 });
 
 afterAll(async () => {
@@ -246,4 +287,41 @@ test("seeding the replacement disables the legacy cleanup and keeps its history"
     .from(cronTaskExecutions)
     .where(eq(cronTaskExecutions.taskId, retiredTaskId));
   expect(history).toEqual([{ taskId: retiredTaskId }]);
+});
+
+test("scheduled ai-run records an empty provider error and notifies the owner once per failed run", async () => {
+  const { PulseHealthRepository } = await import("./repository");
+  const taskId = "fixture-forum-host";
+  await db.insert(cronTasks).values({
+    id: taskId,
+    shortId: taskId,
+    routeId: AI_RUN_ALIAS,
+    displayName: "Forum host fixture",
+    category: TaskCategory.MONITORING,
+    priority: CronTaskPriority.CRITICAL,
+    schedule: "* * * * *",
+    userId: admin.id,
+    outputMode: TaskOutputMode.NOTIFY_ON_FAILURE,
+    taskInput: { prompt: "fixture", rootFolderId: "incognito" },
+  });
+  const pulse = () => PulseHealthRepository.executePulse(
+    { force: true, taskNames: [AI_RUN_ALIAS], systemLocale: defaultLocale }, logger, defaultLocale,
+  );
+  for (let run = 0; run < 2; run++) {
+    const result = await pulse();
+    expect(result.success && result.data.summary.tasksFailed).toEqual([taskId]);
+  }
+  const history = await db.select().from(cronTaskExecutions).where(eq(cronTaskExecutions.taskId, taskId));
+  expect(history).toHaveLength(2);
+  for (const execution of history) {
+    expect(execution).toMatchObject({ status: CronTaskStatus.FAILED, result: null, error: { success: false } });
+  }
+  const bell = await db.select().from(notifications).where(eq(notifications.userId, admin.id));
+  expect(bell).toHaveLength(2);
+  expect(new Set(bell.map((row) => row.dedupeKey)).size).toBe(2);
+  expect(bell[0]).toMatchObject({ type: NotificationType.TASK_FAILED, link: `/tools/cron-history?taskId=${taskId}` });
+  await db.update(cronTasks).set({ outputMode: TaskOutputMode.STORE_ONLY }).where(eq(cronTasks.id, taskId));
+  const silent = await pulse();
+  expect(silent.success && silent.data.summary.tasksFailed).toEqual([taskId]);
+  expect(await db.select().from(notifications).where(eq(notifications.userId, admin.id))).toHaveLength(2);
 });

@@ -25,6 +25,7 @@
 import "server-only";
 
 import type { EndpointLogger } from "../../logger/types";
+import { realtimeEnv } from "../../realtime/server/env";
 import { serverSystemEnv } from "./env";
 
 /**
@@ -91,6 +92,10 @@ export async function startWebProxy({
   logger: EndpointLogger;
 }): Promise<WebProxyHandle | undefined> {
   const { startWebSocketServer } = await import("../../realtime/server/server");
+  // Pay the cold ioredis module cost before the proxy accepts traffic.
+  if (realtimeEnv.WS_PUBSUB_TYPE === "redis" && realtimeEnv.REDIS_URL) {
+    await import("ioredis");
+  }
   return startWebSocketServer({
     port,
     appPort,

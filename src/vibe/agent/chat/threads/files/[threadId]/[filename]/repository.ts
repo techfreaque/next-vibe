@@ -31,6 +31,7 @@ import {
 } from "../../../../storage/file-response";
 import type { FileMetadata } from "../../../../storage/index";
 import { getStorageAdapter } from "../../../../storage/index";
+import { readInlineThreadImage } from "../../../../storage/inline-image";
 import { isStorageFileOwner } from "../../../../storage/url-utils";
 import type { ChatFileResponseOutput } from "./definition";
 import type { ChatFileUrlVariablesOutput } from "./definition";
@@ -97,6 +98,7 @@ export class ChatFileRepository {
     locale: CountryLanguage,
   ): Promise<StoredFileSource | null> {
     let fileMetadata: FileMetadata | null = null;
+    let authorizedThread = false;
     // Check thread access permissions
     try {
       // Get thread
@@ -189,6 +191,7 @@ export class ChatFileRepository {
           });
           return null;
         }
+        authorizedThread = true;
       }
 
       logger.debug("File access granted", {
@@ -208,6 +211,12 @@ export class ChatFileRepository {
       data.threadId,
       data.filename,
     );
+    if (!fileMetadata && authorizedThread) {
+      const inline = await readInlineThreadImage(data.threadId, data.filename);
+      if (inline) {
+        return inline;
+      }
+    }
     if (agentEnv.CHAT_STORAGE_TYPE === "filesystem") {
       // Older thread attachments can still be served without a sidecar.
       return {
@@ -238,6 +247,12 @@ export class ChatFileRepository {
       locale,
     );
     try {
+      if (source?.inlineBytes) {
+        return {
+          buffer: Buffer.from(source.inlineBytes),
+          contentType: source.contentType,
+        };
+      }
       if (source) {
         const file = await getStorageAdapter().readFileContent(
           source.threadId,

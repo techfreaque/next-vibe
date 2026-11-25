@@ -51,6 +51,7 @@ import {
 
 /** Node-local drain helper, shipped from the commit to both HA boxes. */
 const DRAIN_SCRIPT = "scripts/ha-node-drain.sh";
+const STAGE_ASSETS_SCRIPT = "scripts/ha-stage-next-assets.py";
 const EDGE_CANARY_SCRIPT = "scripts/ha-edge-canary.sh";
 
 /** One HA box as the drain orchestration reaches it. */
@@ -379,6 +380,7 @@ export class ImagePushRepository {
               secondaryTransfer,
               contextDir,
               shortSha,
+              refs[0] ?? "",
               data.drainTimeout,
               logger,
               t,
@@ -1031,6 +1033,7 @@ export class ImagePushRepository {
     secondaryTransfer: ResponseType<void> | undefined,
     contextDir: string,
     shortSha: string,
+    candidateImage: string,
     timeout: number,
     logger: EndpointLogger,
     t: ImagePushT,
@@ -1072,6 +1075,7 @@ export class ImagePushRepository {
         box.projectDir,
         contextDir,
         [
+          { from: STAGE_ASSETS_SCRIPT, to: STAGE_ASSETS_SCRIPT },
           { from: EDGE_CANARY_SCRIPT, to: EDGE_CANARY_SCRIPT },
           { from: DRAIN_SCRIPT, to: DRAIN_SCRIPT },
         ],
@@ -1093,6 +1097,18 @@ export class ImagePushRepository {
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
           cause: pre,
         });
+      }
+    }
+    if (existsSync(join(contextDir, STAGE_ASSETS_SCRIPT))) {
+      for (const box of [plan.s1, plan.s2]) {
+        const staged = await ImagePushRepository.drainStep(
+          box,
+          `stage-assets ${ImagePushRepository.shellQuote(candidateImage)}`,
+          t,
+        );
+        if (!staged.success) {
+          return staged;
+        }
       }
     }
     logger.info(

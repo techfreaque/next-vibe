@@ -7,6 +7,9 @@
 import { and, desc, eq, gt, inArray, isNull, sql } from "drizzle-orm";
 import { DefaultFolderId } from "next-vibe/core/execution-context";
 
+import { NotificationType } from "@/notifications/enum";
+import { NotificationsRepository } from "@/notifications/repository";
+
 import { getFullPath } from "../../core/core-utils/path";
 import type { CountryLanguage } from "../../core/i18n/core/config";
 import type { ResponseType } from "../../core/route/response.schema";
@@ -45,6 +48,7 @@ import {
   getPriorityWeight,
   PulseExecutionStatus,
   PulseHealthStatus,
+  TaskOutputMode,
 } from "../enum";
 import {
   scopedTranslation,
@@ -456,6 +460,40 @@ export class PulseHealthRepository {
               : undefined,
           );
 
+          const notifyOwner = async (
+            status: typeof CronTaskStatusValue,
+            name: string,
+          ): Promise<void> => {
+            const failed =
+              status === CronTaskStatus.FAILED ||
+              status === CronTaskStatus.TIMEOUT ||
+              status === CronTaskStatus.ERROR;
+            const enabled =
+              dbTask.outputMode === TaskOutputMode.NOTIFY_ALWAYS ||
+              (failed &&
+                dbTask.outputMode === TaskOutputMode.NOTIFY_ON_FAILURE);
+            if (
+              !dbTask.userId ||
+              !enabled ||
+              (!failed && status !== CronTaskStatus.COMPLETED)
+            ) {
+              return;
+            }
+            await NotificationsRepository.notify(
+              {
+                userId: dbTask.userId,
+                type: failed
+                  ? NotificationType.TASK_FAILED
+                  : NotificationType.TASK_COMPLETE,
+                params: { name },
+                link: `/tools/cron-history?taskId=${encodeURIComponent(dbTask.id)}`,
+                dedupeKey: `cron:${dbTask.id}:${claimed.claimedAt.toISOString()}`,
+                metadata: { taskId: dbTask.id, status },
+              },
+              logger,
+            );
+          };
+
           if (dbTask.runOnce) {
             logger.debug(
               `[run-once] Task "${dbTask.displayName}" disabled before execution`,
@@ -509,6 +547,7 @@ export class PulseHealthRepository {
                 updatedAt: new Date(),
               })
               .where(claimFilter);
+            await notifyOwner(CronTaskStatus.FAILED, dbTask.displayName);
             continue;
           }
 
@@ -570,6 +609,7 @@ export class PulseHealthRepository {
                 updatedAt: new Date(),
               })
               .where(claimFilter);
+            await notifyOwner(CronTaskStatus.FAILED, resolvedTaskName);
             const { emitTaskList, emitTaskQueue } = createTaskEmitters(
               logger,
               cronUser,
@@ -934,6 +974,7 @@ export class PulseHealthRepository {
                   updatedAt: new Date(),
                 })
                 .where(claimFilter);
+              await notifyOwner(finalStatus, resolvedTaskName);
 
               // Emit task-updated (final status) to WS subscribers
               {
@@ -982,6 +1023,7 @@ export class PulseHealthRepository {
                   updatedAt: new Date(),
                 })
                 .where(claimFilter);
+              await notifyOwner(CronTaskStatus.FAILED, resolvedTaskName);
 
               // Emit task-updated (FAILED) to WS subscribers
               {

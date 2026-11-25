@@ -1,5 +1,6 @@
 "use client";
 
+import { ErrorResponseTypes } from "next-vibe/core/route/response.schema";
 import { broadcastAuthChange } from "next-vibe/identity/auth/tab-sync";
 import { Platform } from "next-vibe/platforms/platforms";
 import { Button } from "next-vibe/ui/components/button";
@@ -107,6 +108,15 @@ export function SignupConfirmationStep({
           return;
         }
         if (!response.success) {
+          if (
+            data.code &&
+            response.errorType.errorKey ===
+              ErrorResponseTypes.INVALID_TOKEN_ERROR.errorKey
+          ) {
+            // Do not burn another guess on the same rejected proof. Keep a
+            // newer edit if the user typed while the request was in flight.
+            setCode((current) => (current === data.code ? "" : current));
+          }
           if (
             !background ||
             !hasStatus.current ||
@@ -270,7 +280,7 @@ export function SignupConfirmationStep({
                 type={editing ? "email" : "text"}
                 autoComplete={editing ? "email" : "one-time-code"}
                 keyboardType={editing ? "email-address" : "numeric"}
-                maxLength={editing ? 254 : 6}
+                maxLength={editing ? 254 : undefined}
                 className={
                   editing
                     ? "h-12"

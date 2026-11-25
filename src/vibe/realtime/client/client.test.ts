@@ -52,11 +52,12 @@ it("reports quick reconnects and times out hidden, offline drops", async () => {
   });
   const onlineDescriptor = Object.getOwnPropertyDescriptor(navigator, "onLine");
   const errors: LoggerMetadata[] = [];
+  const info: LoggerMetadata[] = [];
   const warnings: LoggerMetadata[] = [];
   const logger: EndpointLogger = {
     isDebugEnabled: false,
     debug: () => undefined,
-    info: () => undefined,
+    info: (message, context) => { info.push({ message, context }); },
     warn: (message, context) => {
       warnings.push({ message, context });
     },
@@ -95,7 +96,10 @@ it("reports quick reconnects and times out hidden, offline drops", async () => {
     const firstSocketUrl = TestSocket.sockets[0]?.url ?? "";
     expect(new URL(firstSocketUrl).searchParams.has("retry")).toBe(false);
     expect(new URL(TestSocket.sockets[1]?.url ?? "").searchParams.get("retry")).toBe("1");
-    expect(errors).toMatchObject([
+    expect(errors).toHaveLength(0);
+    expect(warnings).toHaveLength(0);
+    expect(new URL(TestSocket.sockets[1]?.url ?? "").searchParams.get("restart")).toBe("1");
+    expect(info).toMatchObject([
       {
         message: "[WS Client] Planned reconnect after server restart",
         context: {
@@ -107,6 +111,7 @@ it("reports quick reconnects and times out hidden, offline drops", async () => {
           code: 1012,
           reason: "server drain",
           plannedRestart: true,
+          dropCause: "server-restart",
           attempts: 1,
           failedHandshakesDuringDrop: 0,
           maxReconnectTimerOverrunMs: 0,
@@ -128,7 +133,7 @@ it("reports quick reconnects and times out hidden, offline drops", async () => {
     jest.advanceTimersByTime(1000);
     TestSocket.sockets[2]?.drop(1006, "retry failed");
     jest.advanceTimersByTime(19_000);
-    expect(errors[1]).toMatchObject({
+    expect(errors[0]).toMatchObject({
       message: "[WS Client] Connection lost",
       context: {
         code: 1006,
@@ -153,7 +158,7 @@ it("reports quick reconnects and times out hidden, offline drops", async () => {
       },
     });
     TestSocket.sockets[3]?.open();
-    expect(errors).toHaveLength(2);
+    expect(errors).toHaveLength(1);
 
     Object.defineProperty(navigator, "onLine", { value: true });
     fakeWindow.dispatchEvent(new Event("online"));
@@ -164,8 +169,8 @@ it("reports quick reconnects and times out hidden, offline drops", async () => {
       jest.advanceTimersByTime(delay);
       TestSocket.sockets.at(-1)?.drop(1006, "retry failed");
     }
-    expect(errors).toHaveLength(4);
-    expect(errors[3]).toMatchObject({
+    expect(errors).toHaveLength(3);
+    expect(errors[2]).toMatchObject({
       message: "[WS Client] Fast reconnect attempts exhausted",
       context: {
         attempts: 6,
@@ -180,7 +185,7 @@ it("reports quick reconnects and times out hidden, offline drops", async () => {
     jest.advanceTimersByTime(1);
     expect(TestSocket.sockets).toHaveLength(exhaustedSocketCount + 1);
     TestSocket.sockets.at(-1)?.drop(1006, "retry failed");
-    expect(errors).toHaveLength(4);
+    expect(errors).toHaveLength(3);
 
     Object.defineProperty(navigator, "onLine", { value: false });
     fakeWindow.dispatchEvent(new Event("offline"));
@@ -246,7 +251,35 @@ it("reports quick reconnects and times out hidden, offline drops", async () => {
         since: 42,
       }),
     );
-    expect(errors).toHaveLength(4);
+    expect(errors).toHaveLength(3);
+
+    fakeDocument.visibilityState = "hidden";
+    fakeDocument.dispatchEvent(new Event("visibilitychange"));
+    restoredSocket?.drop(1006, "");
+    const beforeResume = TestSocket.sockets.length;
+    fakeDocument.visibilityState = "visible";
+    fakeDocument.dispatchEvent(new Event("visibilitychange"));
+    expect(TestSocket.sockets).toHaveLength(beforeResume + 1);
+    TestSocket.sockets.at(-1)?.open();
+    jest.advanceTimersByTime(1000);
+    expect(TestSocket.sockets).toHaveLength(beforeResume + 1);
+
+    TestSocket.sockets.at(-1)?.drop(1012, "server-draining");
+    jest.advanceTimersByTime(500);
+    const stalled = TestSocket.sockets.at(-1);
+    jest.advanceTimersByTime(15_000);
+    expect(stalled?.closeRequest).toEqual({
+      code: 4003, reason: "reconnect-handshake-timeout",
+    });
+    stalled?.drop(1006, "");
+    jest.advanceTimersByTime(2_000);
+    expect(TestSocket.sockets.at(-1)).not.toBe(stalled);
+    TestSocket.sockets.at(-1)?.open();
+    expect(errors.at(-1)).toMatchObject({
+      message: "[WS Client] Connection lost",
+      context: { plannedRestart: true, failedHandshakesDuringDrop: 1,
+        lastFailedHandshakeContext: { timedOut: true }, recovered: true },
+    });
 
     TestSocket.sockets.at(-1)?.drop(1001, "going away");
     fakeWindow.dispatchEvent(new Event("pagehide"));
@@ -258,6 +291,22 @@ it("reports quick reconnects and times out hidden, offline drops", async () => {
         recovered: false,
         dropReportTrigger: "pagehide",
       },
+    });
+    // The first upgrade on a restored page can stall before any drop exists.
+    fakeWindow.dispatchEvent(new Event("pageshow"));
+    TestSocket.sockets.at(-1)?.open();
+    fakeWindow.dispatchEvent(new Event("pagehide"));
+    fakeWindow.dispatchEvent(new Event("pageshow"));
+    const firstUpgrade = TestSocket.sockets.at(-1);
+    expect(new URL(firstUpgrade?.url ?? "").searchParams.has("retry")).toBe(false);
+    jest.advanceTimersByTime(15_000);
+    expect(firstUpgrade?.closeRequest?.code).toBe(4003);
+    firstUpgrade?.drop(1006, "");
+    jest.advanceTimersByTime(1_000);
+    TestSocket.sockets.at(-1)?.open();
+    expect(errors.at(-1)).toMatchObject({
+      message: "[WS Client] Connection lost",
+      context: { handshakeTimedOut: true, connectedForMs: null, recovered: true },
     });
   } finally {
     jest.useRealTimers();

@@ -100,10 +100,10 @@ archive_app_logs() {
 # its in-flight AI runs / tasks to finish and move its WebSocket clients to
 # the peer before the recreate. HA_DRAIN_TIMEOUT bounds the wait (seconds).
 if [ "${HA_DRAIN_WAIT:-0}" = "1" ]; then
-  if [ -f scripts/ha-node-drain.sh ]; then
-    bash scripts/ha-node-drain.sh app-wait || echo "WARN: drain wait failed, recreating anyway (SIGTERM drain covers in-flight work)"
-  else
-    echo "WARN: HA_DRAIN_WAIT=1 but scripts/ha-node-drain.sh is missing, recreating without the wait"
+  if ! bash scripts/ha-node-drain.sh app-wait; then
+    bash scripts/ha-node-drain.sh app-undrain || true
+    echo "Drain did not complete; keeping the running app." >&2
+    exit 1
   fi
 fi
 

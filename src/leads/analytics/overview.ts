@@ -33,18 +33,19 @@ import { CheckoutMode, PaymentStatus } from "@/payment/enum";
 
 import { computeFlaggedSummary, DEFAULT_MIN_LEADS } from "./abuse/repository";
 import {
-  computeAcquisitionBreakdown,
   computeAcquisitionCore,
   computeSignupsByChannel,
 } from "./acquisition/repository";
 import {
   AbuseGroupBy,
+  BotFamily,
   CHANNEL_TYPE_TO_FILTER,
   LeadChannelFilter,
   LeadDimension,
   TrafficFilter,
 } from "./enum";
 import { scopedTranslation } from "./i18n";
+import { dimensionColumn, leadFactsSql } from "./segment-sql";
 
 export interface AcquisitionOverview {
   kpis: {
@@ -133,20 +134,31 @@ async function paymentsByChannel(
   );
 }
 
+/** The overview needs only new human leads per channel. Count that cohort
+ * directly so the visits and revenue breakdown does not run a second time. */
+async function newHumanLeadsByChannel(
+  win: AnalyticsWindow,
+): Promise<Map<string, number>> {
+  const { rows } = await db.execute<
+    QueryResultRow & { key: string; leads: number }
+  >(sql`
+    SELECT ${dimensionColumn(LeadDimension.CHANNEL_TYPE)} AS key, count(*)::int AS leads
+    FROM (${leadFactsSql(inWindowSql(sql`l.created_at`, win))}) f
+    WHERE f.bot_family = ${BotFamily.HUMAN}
+    GROUP BY 1
+  `);
+  return new Map(rows.map((row) => [row.key, row.leads]));
+}
+
 export async function getAcquisitionOverview(
   win: AnalyticsWindow,
   logger: EndpointLogger,
   locale: CountryLanguage,
 ): Promise<ResponseType<AcquisitionOverview>> {
   try {
-    const [core, sources, signups, money, abuse] = await Promise.all([
+    const [core, humanLeads, signups, money, abuse] = await Promise.all([
       computeAcquisitionCore(win, {}),
-      computeAcquisitionBreakdown(
-        win,
-        { traffic: TrafficFilter.HUMANS },
-        LeadDimension.CHANNEL_TYPE,
-        10,
-      ),
+      newHumanLeadsByChannel(win),
       computeSignupsByChannel(win),
       paymentsByChannel(win),
       // Crawler ranges (Meta, Bing, ...) are counted as bots above; the
@@ -158,12 +170,6 @@ export async function getAcquisitionOverview(
         DEFAULT_MIN_LEADS,
       ),
     ]);
-    const humanLeads = new Map(
-      sources.map((row) => [
-        row.key ?? LeadChannelFilter.UNATTRIBUTED,
-        row.metrics.leads ?? 0,
-      ]),
-    );
     const keys = Object.values(LeadChannelFilter).filter(
       (key) => key !== LeadChannelFilter.ALL,
     );

@@ -41,7 +41,11 @@ interface AIStreamState {
    * in a sign-up / top-up card until dismissed or the next send succeeds.
    */
   creditRefusal: boolean | CreditPolicyReason;
-  setCreditRefusal: (value: boolean | CreditPolicyReason) => void;
+  creditRefusalMessage?: string;
+  setCreditRefusal: (
+    value: boolean | CreditPolicyReason,
+    message?: string,
+  ) => void;
 
   isAborting: (threadId: string) => boolean;
   setAborting: (threadId: string, value: boolean) => void;
@@ -63,10 +67,11 @@ export const useAIStreamStore = create<AIStreamState>((set, get) => ({
   incognitoStreams: new Set<string>(),
   creditRefusal: false,
 
-  setCreditRefusal: (value: boolean | CreditPolicyReason): void =>
-    set((state) =>
-      state.creditRefusal === value ? state : { creditRefusal: value },
-    ),
+  setCreditRefusal: (value, message): void =>
+    set({
+      creditRefusal: value,
+      creditRefusalMessage: value ? message : undefined,
+    }),
 
   isAborting: (threadId: string): boolean =>
     get().abortingThreads.has(threadId),
@@ -130,5 +135,6 @@ export const useAIStreamStore = create<AIStreamState>((set, get) => ({
       pendingThreads: new Set<string>(),
       incognitoStreams: new Set<string>(),
       creditRefusal: false,
+      creditRefusalMessage: undefined,
     }),
 }));
