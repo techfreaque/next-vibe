@@ -55,7 +55,7 @@ import { ErrorMessageBubble } from "./error-message-bubble";
 import { FileAttachments } from "./file-attachments";
 import { LoadingIndicator } from "./loading-indicator";
 import { MessageAuthorInfo } from "./message-author";
-import type { MessageGroup } from "./message-grouping";
+import { type MessageGroup, sumGroupCreditCost } from "./message-grouping";
 import { type ToolDecision, ToolDisplay } from "./tool-display";
 
 interface GroupedAssistantMessageProps {
@@ -1097,11 +1097,9 @@ export const GroupedAssistantMessage = memo(function GroupedAssistantMessage({
     let totalCompletionTokens = 0;
     let totalCachedInputTokens = 0;
     let totalCacheWriteTokens = 0;
-    let totalCreditCost = 0;
     let totalStreamingTime = 0;
     let timeToFirstToken: number | null = null;
     let hasAnyTokens = false;
-    let hasAnyCreditCost = false;
     let hasAnyStreamingTime = false;
 
     for (const msg of allMessages) {
@@ -1124,10 +1122,6 @@ export const GroupedAssistantMessage = memo(function GroupedAssistantMessage({
       if (msg.metadata?.cacheWriteTokens) {
         totalCacheWriteTokens += msg.metadata.cacheWriteTokens;
       }
-      if (msg.metadata?.creditCost !== undefined) {
-        totalCreditCost += msg.metadata.creditCost;
-        hasAnyCreditCost = true;
-      }
       // TTFT is only meaningful for the first message in the sequence
       if (timeToFirstToken === null && msg.metadata?.timeToFirstToken) {
         timeToFirstToken = msg.metadata.timeToFirstToken;
@@ -1146,8 +1140,7 @@ export const GroupedAssistantMessage = memo(function GroupedAssistantMessage({
         totalCachedInputTokens > 0 ? totalCachedInputTokens : null,
       cacheWriteTokens:
         totalCacheWriteTokens > 0 ? totalCacheWriteTokens : null,
-      // Server-computed credit cost (preferred - accounts for cache pricing correctly)
-      creditCost: hasAnyCreditCost ? totalCreditCost : null,
+      creditCost: sumGroupCreditCost(allMessages),
       timeToFirstToken,
       streamingTime: hasAnyStreamingTime ? totalStreamingTime : null,
     };

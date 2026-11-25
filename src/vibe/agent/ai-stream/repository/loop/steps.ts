@@ -703,7 +703,12 @@ export function onStepFinish(
   // completion writes the cumulative total to DB.
   const stepAssistantMessageId =
     ctx.currentAssistantMessageId ?? ctx.lastAssistantMessageId;
-  if (stepAssistantMessageId && (inputTokens > 0 || outputTokens > 0)) {
+  if (
+    stepAssistantMessageId &&
+    (inputTokens > 0 ||
+      outputTokens > 0 ||
+      typeof modelConfig.creditCost === "number")
+  ) {
     // Actual-cost models show the step's real cost; others the token price
     // (full input: calculateCreditCost subtracts the cached part itself).
     const stepCreditCost =
@@ -730,7 +735,7 @@ export function onStepFinish(
       timeToFirstToken: null,
       streamingTime: null,
       finishReason: stepResult.finishReason ?? null,
-      creditCost: stepCreditCost,
+      stepCreditCost,
     });
   }
 }

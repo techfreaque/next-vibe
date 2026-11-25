@@ -12,6 +12,7 @@ import type { JSONValue, ProviderMetadata } from "ai";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import type { UsageUpstreamCost } from "@/credits/db";
+import { CREDIT_VALUE_USD } from "@/products/constants";
 
 import {
   ApiProvider,
@@ -78,7 +79,7 @@ export interface TurnCharge {
 }
 
 /**
- * Token-priced models whose provider reports the REAL charge of every call:
+ * Providers that report the real charge of a call:
  * OpenRouter (`usage.cost`; it load-balances a model across endpoints up to
  * ~5x pricier than the cheapest one we list), NanoGPT (`usage.cost` /
  * `x_nanogpt_pricing`) and Venice (`cost.usd`). The NanoGPT and Venice
@@ -97,16 +98,12 @@ export type UpstreamBilledModel = ChatModelOption | ModelOptionTokenBased;
 
 /**
  * Models billed by the provider's REAL per-step cost x markup instead of the
- * listed token price (see UPSTREAM_COST_PROVIDERS). Other providers return no
- * reliable cost. Media / per-message priced models keep their fixed price.
+ * listed price when the provider reports one (see UPSTREAM_COST_PROVIDERS).
  */
 export function billsUpstreamCost(
-  modelConfig: Pick<ChatModelOption, "apiProvider" | "creditCost">,
+  modelConfig: Pick<ChatModelOption, "apiProvider">,
 ): boolean {
-  return (
-    UPSTREAM_COST_PROVIDERS.has(modelConfig.apiProvider) &&
-    typeof modelConfig.creditCost === "function"
-  );
+  return UPSTREAM_COST_PROVIDERS.has(modelConfig.apiProvider);
 }
 
 /**
@@ -363,7 +360,7 @@ export class TokenAccumulator {
   /**
    * Record one finished step's REAL upstream cost (actual-cost models only).
    * A step without a reported cost (stream cut, provider omitted it) falls
-   * back to its listed token price and logs a warning, so finance can see
+   * back to its listed price and logs a warning, so finance can see
    * how often that happens. Call once per finished step, next to accumulate().
    */
   static recordUpstreamCost(
@@ -389,24 +386,28 @@ export class TokenAccumulator {
       }
       return;
     }
-    const fallbackUsd = calculateTokenCostUsd(
-      modelConfig,
-      step.inputTokens,
-      step.outputTokens,
-      step.cachedInputTokens,
-      step.cacheWriteTokens,
-      step.imageOutputTokens ?? 0,
-      step.hourWriteTokens ?? 0,
-      step.requestStartedAt,
-      step.promptCountKnown,
-    );
+    const flatCost = modelConfig.creditCost;
+    const fallbackUsd =
+      typeof flatCost === "number"
+        ? flatCost * CREDIT_VALUE_USD
+        : calculateTokenCostUsd(
+            modelConfig,
+            step.inputTokens,
+            step.outputTokens,
+            step.cachedInputTokens,
+            step.cacheWriteTokens,
+            step.imageOutputTokens ?? 0,
+            step.hourWriteTokens ?? 0,
+            step.requestStartedAt,
+            step.promptCountKnown,
+          );
     ctx.upstreamFallbackCostUsd += fallbackUsd;
     ctx.upstreamCostMissingSteps += 1;
     if (!usesInvoice) {
       return;
     }
     logger.warn(
-      "[AI Stream] Upstream cost missing for step - billing listed token price",
+      `[AI Stream] Upstream cost missing for step - billing listed ${typeof flatCost === "number" ? "request" : "token"} price`,
       {
         model: modelConfig.id,
         apiProvider: modelConfig.apiProvider,
@@ -425,7 +426,7 @@ export class TokenAccumulator {
               ? "cost-invalid"
               : "cost-field-missing",
         // No tokens at all = the step failed upstream before any usage (its
-        // error part is logged separately); nothing is billed for it.
+        // error part is logged separately). Flat pricing may omit usage.
         emptyStep: step.inputTokens === 0 && step.outputTokens === 0,
       },
     );
@@ -435,7 +436,8 @@ export class TokenAccumulator {
    * What the accumulated finished steps are charged. Actual-cost models with
    * at least one costed step: (real cost + fallback token cost of uncosted
    * steps) x markup, ceil to 0.1 credit. Everything else (other providers,
-   * or no step reported a cost at all): the listed token price, unchanged.
+   * or no step reported a cost at all): listed token rates or one flat
+   * charge per finished request.
    */
   static resolveCharge(
     ctx: TokenCounters,
@@ -454,6 +456,16 @@ export class TokenAccumulator {
           billingBasis:
             ctx.upstreamCostMissingSteps > 0 ? "mixed" : "upstream_cost",
         },
+      };
+    }
+    if (typeof modelConfig.creditCost === "number") {
+      return {
+        // Standalone calls and streams without tools resolve one request
+        // without running the step accumulator.
+        credits:
+          calculateCreditCost(modelConfig, 0, 0) *
+          Math.max(1, ctx.tokenStepCount),
+        upstreamCost: undefined,
       };
     }
     if (ctx.upstreamCostMissingSteps > 0) {
@@ -541,7 +553,7 @@ export class TokenAccumulator {
    * every finished step on the floor (a new thread's first turn ends with
    * rename-thread + endLoop, so it was never billed). null when no step
    * finished or the turn was already billed. Token counts can be all zero for
-   * per-message priced models; calculateCreditCost still charges them.
+   * flat-priced requests; resolveCharge still charges them.
    */
   static unbilledCompletedSteps(ctx: TokenCounters): BillableTokens | null {
     if (ctx.tokensBilled) {

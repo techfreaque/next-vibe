@@ -10,6 +10,7 @@ import {
   estimateTurnCredits,
   getEstimatedImageOutputTokens,
   getModelPrice,
+  isModelOptionTokenBased,
   resolveMediaCharge,
   roundMediaCost,
   upstreamCostToCredits,
@@ -133,6 +134,33 @@ describe("calculateCreditCost cache handling", () => {
 });
 
 describe("TokenAccumulator multi-step billing", () => {
+  it("charges one flat fee for every completed request, even without token usage", () => {
+    const model = getChatModelById(ChatModelId.UNCENSORED_LM_V1_2);
+    const ctx = freshCounters();
+    const step = {
+      inputTokens: 0,
+      outputTokens: 0,
+      cachedInputTokens: 0,
+      cacheWriteTokens: 0,
+    };
+
+    expect(TokenAccumulator.spentCredits(ctx, model)).toBe(0);
+    for (const requests of [1, 2, 3]) {
+      TokenAccumulator.accumulate(ctx, step);
+      expect(TokenAccumulator.spentCredits(ctx, model)).toBe(requests * 6.5);
+    }
+    const completed = TokenAccumulator.unbilledCompletedSteps(ctx);
+    expect(completed).not.toBeNull();
+    if (completed) {
+      expect(TokenAccumulator.resolveCharge(ctx, model, completed).credits).toBe(
+        19.5,
+      );
+    }
+    expect(
+      TokenAccumulator.chargeSingleCall(model, step, undefined, logger).credits,
+    ).toBe(6.5);
+  });
+
   it("finalize + full-input call bills every step exactly once", () => {
     const ctx = freshCounters();
     for (const step of STEPS) {
@@ -405,6 +433,29 @@ describe("TokenAccumulator actual upstream cost billing", () => {
     expect(charge.credits).toBe(upstreamCostToCredits(0.09 + step2Usd));
     expect(charge.upstreamCost?.billingBasis).toBe("mixed");
     expect(charge.upstreamCost?.fallbackCostUsd).toBeCloseTo(step2Usd, 12);
+  });
+
+  it("uses the reported price of a flat request and the flat fee for missing cost", () => {
+    const flat = getChatModelById(ChatModelId.UNCENSORED_LM_V1_2);
+    expect(typeof flat.creditCost).toBe("number");
+    if (isModelOptionTokenBased(flat)) {
+      return;
+    }
+    const model: ChatModelOption = {
+      ...flat,
+      apiProvider: ApiProvider.OPENROUTER,
+      creditCost: 5,
+    };
+    const ctx = freshCounters();
+    runSteps(ctx, model, [0.02, null, 0]);
+    const charge = TokenAccumulator.resolveCharge(ctx, model, FIRST_STEP);
+    expect(charge.credits).toBe(9.1);
+    expect(charge.upstreamCost).toEqual({
+      upstreamCostUsd: 0.02,
+      fallbackCostUsd: 0.05,
+      upstreamProvider: "Parasail",
+      billingBasis: "mixed",
+    });
   });
 
   it("uses the plain token price when no step reported a cost", () => {

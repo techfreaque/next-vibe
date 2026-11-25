@@ -237,7 +237,7 @@ export class ToolExecutionContextImpl {
    *  so the two can never both charge the same steps. */
   tokensBilled = false;
   /** Steps that reported finishing (onStepFinish), even with empty usage:
-   *  per-message priced models report no tokens but still cost per turn. */
+   *  flat-priced models can report no tokens and still cost per request. */
   tokenStepCount = 0;
   /** Sum of the REAL upstream USD cost the provider reported per finished
    *  step (OpenRouter usage.cost). Billed instead of listed token prices. */

@@ -140,6 +140,7 @@ export const messageMetadataSchema: z.ZodType<MessageMetadata> = z.object({
   cacheWriteTokens: tolerant(z.number()),
   timeToFirstToken: tolerant(z.number()),
   creditCost: tolerant(z.number()),
+  stepCreditCost: tolerant(z.number()),
   finishReason: tolerant(z.string()),
   streamingTime: tolerant(z.number()),
   streamError: tolerant(z.object({ key: z.string(), status: z.number() })),

@@ -110,15 +110,15 @@ describe("computeOutputCap", () => {
     ).toBe("unaffordable");
   });
 
-  it("flat-priced models are never capped", () => {
-    expect(
-      computeOutputCap({
-        model: flat,
-        modelCost: 5,
-        remainingCredits: 5,
-        inputTokens: 50_000,
-      }).kind,
-    ).toBe("uncapped");
+  it("flat-priced models require the full fee and leave output uncapped", () => {
+    const params = { model: flat, modelCost: 6.5, inputTokens: 50_000 };
+    expect(computeOutputCap({ ...params, remainingCredits: 6.5 })).toEqual({
+      kind: "uncapped",
+    });
+    expect(computeOutputCap({ ...params, remainingCredits: 6.49 })).toEqual({
+      kind: "unaffordable",
+      requiredCredits: 6.5,
+    });
   });
 
   it("free models (flat cost 0) are never capped", () => {

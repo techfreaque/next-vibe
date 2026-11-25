@@ -107,7 +107,7 @@ export function abortReasonAsError(
  */
 export async function billCompletedSteps(
   state: StreamLoopState,
-): Promise<void> {
+): Promise<{ messageId: string | null; creditCost: number } | null> {
   const { ctx, modelConfig, model, user, logger } = state.p;
   // The AI SDK enqueues the finish-step part BEFORE it awaits onStepFinish
   // (where the counters are accumulated). A park-abort fires from the
@@ -118,7 +118,7 @@ export async function billCompletedSteps(
   });
   const steps = TokenAccumulator.unbilledCompletedSteps(ctx);
   if (!steps) {
-    return;
+    return null;
   }
   ctx.tokensBilled = true;
   const { credits: creditCost, upstreamCost } = TokenAccumulator.resolveCharge(
@@ -134,13 +134,21 @@ export async function billCompletedSteps(
   });
   const messageId = ctx.lastAssistantMessageId ?? ctx.currentAssistantMessageId;
   if (messageId) {
-    await ctx.dbWriter.writeTokenMetadataOnly(messageId, {
+    const metadata = {
       promptTokens: ctx.tokenLastInput,
       completionTokens: steps.outputTokens,
       finishReason: null,
       cachedInputTokens: steps.cachedInputTokens,
       cacheWriteTokens: steps.cacheWriteTokens,
       creditCost,
+    };
+    await ctx.dbWriter.writeTokenMetadataOnly(messageId, metadata);
+    ctx.dbWriter.emitTokensUpdated({
+      ...metadata,
+      messageId,
+      totalTokens: steps.inputTokens + steps.outputTokens,
+      timeToFirstToken: null,
+      streamingTime: null,
     });
   }
   await ctx.dbWriter.deductAndEmitCredits({
@@ -156,6 +164,7 @@ export async function billCompletedSteps(
     upstreamCost,
     apiProvider: modelConfig.apiProvider,
   });
+  return { messageId, creditCost };
 }
 
 /** ONE abort-handler invocation shared by the pump-return and catch paths
@@ -165,11 +174,12 @@ export async function runAbortHandler(
   state: StreamLoopState,
   error: Error,
 ): Promise<{ wasHandled: boolean }> {
-  await billCompletedSteps(state);
+  const completedCharge = await billCompletedSteps(state);
   const { AbortErrorHandler } = await import("../errors/errors");
   return AbortErrorHandler.handleAbortError({
     error,
     ctx: state.p.ctx,
+    completedCharge,
     logger: state.p.logger,
     threadId: state.p.threadId,
     isIncognito: state.p.isIncognito,
@@ -255,7 +265,7 @@ export async function complete(
   // itself. Passing the already-uncached count subtracted cached twice: cache
   // hits were billed below zero and long cached tool loops went negative
   // (deductAndEmitCredits skips amount <= 0, so the whole turn was free).
-  // Actual-cost models (OpenRouter) bill the summed real per-step cost.
+  // Actual-cost models bill the summed real per-step cost.
   const { credits: fullCreditCost, upstreamCost } =
     TokenAccumulator.resolveCharge(state.p.ctx, modelConfig, {
       inputTokens: finalUncachedInputTokens + finalCachedInputTokens,
@@ -290,7 +300,11 @@ export async function complete(
     upstreamCostUsd: upstreamCost?.upstreamCostUsd ?? null,
     fallbackCostUsd: upstreamCost?.fallbackCostUsd ?? null,
     upstreamProvider: upstreamCost?.upstreamProvider ?? null,
-    billingBasis: upstreamCost?.billingBasis ?? "token_price",
+    billingBasis:
+      upstreamCost?.billingBasis ??
+      (typeof modelConfig.creditCost === "number"
+        ? "request_price"
+        : "token_price"),
     steps: state.p.ctx.tokenStepCount,
     imageOutputTokens: finalImageOutputTokens,
   });

@@ -328,6 +328,7 @@ export class AbortErrorHandler {
   static async handleAbortError(params: {
     error: Error;
     ctx: ToolExecutionContextImpl;
+    completedCharge: { messageId: string | null; creditCost: number } | null;
     logger: EndpointLogger;
     threadId: string;
     isIncognito: boolean;
@@ -344,6 +345,7 @@ export class AbortErrorHandler {
     const {
       error,
       ctx,
+      completedCharge,
       logger,
       threadId,
       isIncognito,
@@ -515,20 +517,6 @@ export class AbortErrorHandler {
               messageId: partialMessageId,
               totalTokens,
             });
-
-            // Emit TOKENS_UPDATED for credit accounting
-            ctx.dbWriter.emitTokensUpdated({
-              messageId: partialMessageId,
-              promptTokens: tokenEstimate.promptTokens,
-              completionTokens,
-              totalTokens,
-              cachedInputTokens: 0,
-              cacheWriteTokens: 0,
-              timeToFirstToken: null,
-              streamingTime: null,
-              finishReason: "stop",
-              creditCost: modelCreditCost,
-            });
           } else {
             // Incognito: emit CONTENT_DONE SSE only (no DB write) so frontend cache is updated
             ctx.dbWriter.emitContentDoneRaw({
@@ -536,6 +524,35 @@ export class AbortErrorHandler {
               content: ctx.currentAssistantContent,
               totalTokens: null,
               finishReason: "stop",
+            });
+          }
+
+          const chargeMessageId =
+            partialMessageId ?? ctx.lastAssistantMessageId;
+          if (chargeMessageId) {
+            const creditCost =
+              modelCreditCost +
+              (completedCharge?.messageId === chargeMessageId
+                ? completedCharge.creditCost
+                : 0);
+            const metadata = {
+              promptTokens: tokenEstimate.promptTokens,
+              completionTokens,
+              finishReason: "stop",
+              cachedInputTokens: 0,
+              cacheWriteTokens: 0,
+              creditCost,
+            };
+            await ctx.dbWriter.writeTokenMetadataOnly(
+              chargeMessageId,
+              metadata,
+            );
+            ctx.dbWriter.emitTokensUpdated({
+              ...metadata,
+              messageId: chargeMessageId,
+              totalTokens,
+              timeToFirstToken: null,
+              streamingTime: null,
             });
           }
 

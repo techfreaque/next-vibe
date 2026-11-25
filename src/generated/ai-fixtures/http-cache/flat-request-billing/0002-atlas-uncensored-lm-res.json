@@ -1,0 +1,11 @@
+{
+  "type": "sse",
+  "url": "https://mkstqjtsujvcaobdksxs.functions.supabase.co/functions/v1/uncensoredlm-api",
+  "status": 200,
+  "headers": { "content-type": "text/event-stream" },
+  "events": [
+    "data: {\"id\":\"fixture-2\",\"model\":\"uncensored-lm\",\"choices\":[{\"index\":0,\"delta\":{\"role\":\"assistant\",\"content\":\"The lookup is complete.\"},\"finish_reason\":null}]}",
+    "data: {\"id\":\"fixture-2\",\"model\":\"uncensored-lm\",\"choices\":[{\"index\":0,\"delta\":{},\"finish_reason\":\"stop\"}]}",
+    "data: [DONE]"
+  ]
+}

@@ -196,7 +196,8 @@ export class MessageDbWriter {
     timeToFirstToken: number | null;
     streamingTime: number | null;
     finishReason: string | null;
-    creditCost: number;
+    creditCost?: number;
+    stepCreditCost?: number;
   }): void {
     textWrites.emitTokensUpdated(this, params);
   }

@@ -10,8 +10,8 @@
  * converted to tokens at the model's output price (reasoning tokens bill as
  * output). The result is passed to the AI SDK as maxOutputTokens. A wallet
  * that can pay the full context window of output is not capped at all, so
- * normal paid balances see no change. Flat-priced and free models are never
- * capped (their price does not depend on output length).
+ * normal paid balances see no change. For flat-priced models, the wallet
+ * must cover the full request, regardless of output length.
  */
 
 import {
@@ -105,7 +105,7 @@ export type OutputCap =
   | { kind: "uncapped" }
   /** Pass maxOutputTokens to the model call. */
   | { kind: "capped"; maxOutputTokens: number }
-  /** Input + the minimum output exceed the wallet. */
+  /** The wallet cannot cover the request or its minimum token budget. */
   | { kind: "unaffordable"; requiredCredits: number };
 
 /**
@@ -121,8 +121,16 @@ export function computeOutputCap(params: {
   inputTokens: number;
 }): OutputCap {
   const { model, modelCost, remainingCredits, inputTokens } = params;
+  if (modelCost === 0) {
+    return { kind: "uncapped" };
+  }
+  if (typeof model.creditCost === "number") {
+    return remainingCredits + 1e-9 >= modelCost
+      ? { kind: "uncapped" }
+      : { kind: "unaffordable", requiredCredits: modelCost };
+  }
   const outputPrice = worstCaseOutputTokenCost(model, inputTokens);
-  if (modelCost === 0 || outputPrice === null || outputPrice <= 0) {
+  if (outputPrice === null || outputPrice <= 0) {
     return { kind: "uncapped" };
   }
   const inputCredits = worstCaseInputCredits(model, inputTokens);

@@ -3,7 +3,20 @@
  * Groups messages that are part of the same AI response sequence
  */
 
-import type { ChatMessage } from "../../../../db";
+import type { ChatMessage, MessageMetadata } from "../../../../db";
+
+/** Sum settled charges. Live step estimates are already included at settlement. */
+export function sumGroupCreditCost(
+  messages: ReadonlyArray<{ metadata?: MessageMetadata | null }>,
+): number | null {
+  let total: number | null = null;
+  for (const { metadata } of messages) {
+    if (metadata?.creditCost !== undefined) {
+      total = (total ?? 0) + metadata.creditCost;
+    }
+  }
+  return total;
+}
 
 /**
  * Grouped message sequence

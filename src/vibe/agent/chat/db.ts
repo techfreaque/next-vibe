@@ -201,6 +201,8 @@ export type MessageMetadata = {
   cacheWriteTokens?: number;
   timeToFirstToken?: number;
   creditCost?: number;
+  /** Cost estimate for an individual model step during streaming. */
+  stepCreditCost?: number;
   finishReason?: string;
   streamingTime?: number;
   streamError?: { key: string; status: number };

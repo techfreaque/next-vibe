@@ -283,7 +283,8 @@ export function emitTokensUpdated(
     timeToFirstToken: number | null;
     streamingTime: number | null;
     finishReason: string | null;
-    creditCost: number;
+    creditCost?: number;
+    stepCreditCost?: number;
   },
 ): void {
   w.deps.wsEmit("tokens-updated", {
@@ -301,11 +302,8 @@ export function emitTokensUpdated(
               params.cacheWriteTokens > 0 ? params.cacheWriteTokens : undefined,
             timeToFirstToken: params.timeToFirstToken ?? undefined,
             streamingTime: params.streamingTime ?? undefined,
-            // Zero carries no information and CLOBBERS: the final cumulative
-            // emit (real cost) and a trailing per-step emit (cheap step → 0)
-            // race on the same message; appliers jsonb-merge, so an explicit
-            // 0 overwrites the real value while `undefined` preserves it.
-            creditCost: params.creditCost > 0 ? params.creditCost : undefined,
+            creditCost: params.creditCost,
+            stepCreditCost: params.stepCreditCost,
             finishReason: params.finishReason ?? undefined,
           },
         },
