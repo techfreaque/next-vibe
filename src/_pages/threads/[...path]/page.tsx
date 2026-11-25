@@ -167,15 +167,8 @@ export async function tanstackLoader({
       locale,
       user: null,
       platform: Platform.NEXT_PAGE,
-      creditsToUse: {
-        total: 0,
-        expiring: 0,
-        permanent: 0,
-        earned: 0,
-        free: 0,
-        expiresAt: null,
-        capacity: 20,
-      },
+      // Unknown, never a fake 0 (a seeded 0 renders the out-of-credits card)
+      creditsToUse: undefined,
       initialRootFolderId: DefaultFolderId.PRIVATE,
       initialSubFolderId: null,
       initialThreadId: null,
