@@ -6,7 +6,7 @@ export const translations: typeof enTranslations = {
     title: "Einzigartige Chat-Benutzer",
     titleShort: "Eindeutige Nutzer",
     description:
-      "Eindeutige Benutzer, die Nachrichten pro Auflösungs-Bucket gesendet haben",
+      "Verschiedene angemeldete Konten mit einer Nachricht in einem gespeicherten Chat pro Bucket. Gäste und Inkognito: siehe KI-Nutzer. Nur menschliche Chats: ohne Hintergrund-Agenten-Threads, Remote-Kopien und Admin-Konten; Inkognito-Chats werden nie gespeichert.",
     fields: {
       resolution: { label: "Auflösung", description: "Berechnungszeitrahmen" },
       range: { label: "Bereich", description: "Abzufragender Zeitraum" },

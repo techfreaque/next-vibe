@@ -81,6 +81,14 @@ const { POST } = createEndpoint({
         schema: z.enum(CurrenciesArr).default("EUR"),
         columns: 6,
       }),
+      convertToUsd: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "dataSources.fields.convertToUsd.label",
+        description: "dataSources.fields.convertToUsd.description",
+        schema: z.boolean().default(false),
+        columns: 12,
+      }),
       result: timeSeriesResponseField(scopedTranslation, {
         label: "dataSources.channelSpend.post.fields.result.label",
         description: "dataSources.channelSpend.post.fields.result.description",

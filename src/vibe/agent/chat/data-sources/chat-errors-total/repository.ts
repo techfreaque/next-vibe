@@ -22,6 +22,7 @@ import { fillGaps } from "next-vibe/dataflow/shared/range";
 
 import { chatMessages } from "../../db";
 import { ChatMessageRole } from "../../enum";
+import { humanChatMessage } from "../human-chat-sql";
 
 export class QueryChatErrorsTotalRepository {
   static async queryChatErrorsTotal(data: {
@@ -45,6 +46,7 @@ export class QueryChatErrorsTotalRepository {
       .from(chatMessages)
       .where(
         and(
+          humanChatMessage,
           eq(chatMessages.role, ChatMessageRole.ERROR),
           gte(chatMessages.createdAt, range.from),
           lte(chatMessages.createdAt, range.to),

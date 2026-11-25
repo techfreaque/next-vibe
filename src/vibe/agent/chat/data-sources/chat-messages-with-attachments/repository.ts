@@ -21,6 +21,7 @@ import { resolutionBucketExpr } from "next-vibe/dataflow/shared/query-utils";
 import { fillGaps } from "next-vibe/dataflow/shared/range";
 
 import { chatMessages } from "../../db";
+import { humanChatMessage } from "../human-chat-sql";
 
 export class QueryChatMessagesWithAttachmentsRepository {
   static async queryChatMessagesWithAttachments(data: {
@@ -44,6 +45,7 @@ export class QueryChatMessagesWithAttachmentsRepository {
       .from(chatMessages)
       .where(
         and(
+          humanChatMessage,
           sql`${chatMessages.metadata}->>'attachments' IS NOT NULL AND jsonb_array_length((${chatMessages.metadata}->'attachments')::jsonb) > 0`,
           gte(chatMessages.createdAt, range.from),
           lte(chatMessages.createdAt, range.to),

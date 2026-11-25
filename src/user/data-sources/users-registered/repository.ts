@@ -1,12 +1,13 @@
 /**
  * Users Registered - Repository
  * Server-only. DB access.
- * Counts new user registrations per resolution bucket.
+ * Counts new user registrations per resolution bucket, optionally only the
+ * ones whose email is confirmed.
  */
 
 import "server-only";
 
-import { and, count, gte, lte, sql } from "drizzle-orm";
+import { and, count, eq, gte, lte, sql } from "drizzle-orm";
 import {
   type ResponseType,
   success,
@@ -26,6 +27,8 @@ export class QueryUsersRegisteredRepository {
     resolution: Resolution;
     range: TimeRange;
     lookback?: number;
+    /** Only accounts whose email is confirmed (signup cohort, current state). */
+    emailConfirmedOnly?: boolean;
   }): Promise<
     ResponseType<{
       result: DataPoint[];
@@ -40,7 +43,11 @@ export class QueryUsersRegisteredRepository {
       })
       .from(users)
       .where(
-        and(gte(users.createdAt, range.from), lte(users.createdAt, range.to)),
+        and(
+          gte(users.createdAt, range.from),
+          lte(users.createdAt, range.to),
+          data.emailConfirmedOnly ? eq(users.emailVerified, true) : undefined,
+        ),
       )
       .groupBy(sql`1`)
       .orderBy(sql`1`);

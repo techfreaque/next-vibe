@@ -4,7 +4,12 @@
  */
 
 import { createEndpoint } from "next-vibe/core/definition/create-i18n";
-import { EndpointErrorTypes, Methods } from "next-vibe/core/definition/enums";
+import {
+  EndpointErrorTypes,
+  FieldDataType,
+  Methods,
+  WidgetType,
+} from "next-vibe/core/definition/enums";
 import {
   lookbackRequestField,
   nodeMetaResponseField,
@@ -15,8 +20,11 @@ import {
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
 import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
+import { requestField } from "next-vibe/unified-ui/_shared/utils-i18n";
+import { z } from "zod";
 
 import { CREDITS_PURCHASED_ALIAS } from "./constants";
+import { CreditIssueKind, CreditIssueKindOptions } from "./enum";
 import { scopedTranslation } from "./i18n";
 const CreditsPurchasedWidget = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.CreditsPurchasedWidget })),
@@ -52,6 +60,15 @@ const { POST } = createEndpoint({
       lookback: lookbackRequestField(scopedTranslation, {
         label: "post.fields.lookback.label",
         description: "post.fields.lookback.description",
+      }),
+      kind: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "post.fields.kind.label",
+        description: "post.fields.kind.description",
+        options: CreditIssueKindOptions,
+        schema: z.enum(CreditIssueKind).default(CreditIssueKind.PAID),
+        columns: 6,
       }),
       result: timeSeriesResponseField(scopedTranslation, {
         label: "post.fields.result.label",
@@ -110,6 +127,7 @@ const { POST } = createEndpoint({
     requests: {
       default: {
         range: { from: new Date("2024-01-01"), to: new Date("2024-01-31") },
+        kind: CreditIssueKind.PAID,
       },
     },
     responses: {

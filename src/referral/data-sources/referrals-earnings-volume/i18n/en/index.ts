@@ -1,9 +1,10 @@
 export const translations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
-    title: "Referral Earnings Volume",
-    titleShort: "Earnings Volume",
-    description: "Sum of referral earnings in cents per resolution bucket",
+    title: "Referral Commissions (USD)",
+    titleShort: "Commissions",
+    description:
+      "Referral commissions earned per bucket in USD (1 earned credit = $0.01), all levels, canceled ones excluded",
     fields: {
       resolution: { label: "Resolution", description: "Computation timeframe" },
       range: { label: "Range", description: "Time range to query" },

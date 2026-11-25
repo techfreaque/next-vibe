@@ -3,10 +3,10 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
-    title: "Volúmen de aprendizajes de referencia",
-    titleShort: "Volumen de los aprendizajes",
+    title: "Comisiones de referidos (USD)",
+    titleShort: "Comisiones",
     description:
-      "Insuficiencia de los ingresos por remisión en centavos por cubo de resolución",
+      "Comisiones de referidos generadas por intervalo en USD (1 crédito = 0,01 $), todos los niveles, sin las canceladas",
     fields: {
       resolution: { label: "Resolución", description: "Plazo de cálculo" },
       range: {

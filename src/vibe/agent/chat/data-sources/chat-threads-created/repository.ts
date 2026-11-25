@@ -21,6 +21,7 @@ import { resolutionBucketExpr } from "next-vibe/dataflow/shared/query-utils";
 import { fillGaps } from "next-vibe/dataflow/shared/range";
 
 import { chatThreads } from "../../db";
+import { humanChatThread } from "../human-chat-sql";
 
 export class QueryChatThreadsCreatedRepository {
   static async queryChatThreadsCreated(data: {
@@ -44,6 +45,7 @@ export class QueryChatThreadsCreatedRepository {
       .from(chatThreads)
       .where(
         and(
+          humanChatThread,
           gte(chatThreads.createdAt, range.from),
           lte(chatThreads.createdAt, range.to),
         ),

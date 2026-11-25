@@ -295,6 +295,7 @@ import { Route as ApiLocaleCompaniesCompanyIdOnboardRouteImport } from './routes
 import { Route as ApiLocaleCompaniesCompanyIdUpdateRouteImport } from './routes/api.$locale.companies.$companyId.update'
 import { Route as ApiLocaleCreditsAnalyticsUsageRouteImport } from './routes/api.$locale.credits.analytics.usage'
 import { Route as ApiLocaleCreditsAntiFarmingReportRouteImport } from './routes/api.$locale.credits.anti-farming.report'
+import { Route as ApiLocaleCreditsDataSourcesCreditsActiveSpendersRouteImport } from './routes/api.$locale.credits.data-sources.credits-active-spenders'
 import { Route as ApiLocaleCreditsDataSourcesCreditsAvgTransactionRouteImport } from './routes/api.$locale.credits.data-sources.credits-avg-transaction'
 import { Route as ApiLocaleCreditsDataSourcesCreditsBalanceTotalRouteImport } from './routes/api.$locale.credits.data-sources.credits-balance-total'
 import { Route as ApiLocaleCreditsDataSourcesCreditsEarnedRouteImport } from './routes/api.$locale.credits.data-sources.credits-earned'
@@ -307,6 +308,7 @@ import { Route as ApiLocaleCreditsDataSourcesCreditsPacksCreatedRouteImport } fr
 import { Route as ApiLocaleCreditsDataSourcesCreditsPurchasedRouteImport } from './routes/api.$locale.credits.data-sources.credits-purchased'
 import { Route as ApiLocaleCreditsDataSourcesCreditsRefundedRouteImport } from './routes/api.$locale.credits.data-sources.credits-refunded'
 import { Route as ApiLocaleCreditsDataSourcesCreditsSpentByLeadsRouteImport } from './routes/api.$locale.credits.data-sources.credits-spent-by-leads'
+import { Route as ApiLocaleCreditsDataSourcesCreditsSpentByModelRouteImport } from './routes/api.$locale.credits.data-sources.credits-spent-by-model'
 import { Route as ApiLocaleCreditsDataSourcesCreditsSpentBySourceRouteImport } from './routes/api.$locale.credits.data-sources.credits-spent-by-source'
 import { Route as ApiLocaleCreditsDataSourcesCreditsSpentByUsersRouteImport } from './routes/api.$locale.credits.data-sources.credits-spent-by-users'
 import { Route as ApiLocaleCreditsDataSourcesCreditsSpentTotalRouteImport } from './routes/api.$locale.credits.data-sources.credits-spent-total'
@@ -365,6 +367,7 @@ import { Route as ApiLocaleLeadsDataSourcesLeadsEmailOpensRouteImport } from './
 import { Route as ApiLocaleLeadsDataSourcesLeadsEmailsSentRouteImport } from './routes/api.$locale.leads.data-sources.leads-emails-sent'
 import { Route as ApiLocaleLeadsDataSourcesLeadsEngagementsRouteImport } from './routes/api.$locale.leads.data-sources.leads-engagements'
 import { Route as ApiLocaleLeadsDataSourcesLeadsFormSubmitsRouteImport } from './routes/api.$locale.leads.data-sources.leads-form-submits'
+import { Route as ApiLocaleLeadsDataSourcesLeadsFunnelStageRouteImport } from './routes/api.$locale.leads.data-sources.leads-funnel-stage'
 import { Route as ApiLocaleLeadsDataSourcesLeadsInContactRouteImport } from './routes/api.$locale.leads.data-sources.leads-in-contact'
 import { Route as ApiLocaleLeadsDataSourcesLeadsNewsletterSubscribersRouteImport } from './routes/api.$locale.leads.data-sources.leads-newsletter-subscribers'
 import { Route as ApiLocaleLeadsDataSourcesLeadsUnsubscribedRouteImport } from './routes/api.$locale.leads.data-sources.leads-unsubscribed'
@@ -414,11 +417,13 @@ import { Route as ApiLocalePaymentAnalyticsRevenueRouteImport } from './routes/a
 import { Route as ApiLocalePaymentBillCreateRouteImport } from './routes/api.$locale.payment.bill.create'
 import { Route as ApiLocalePaymentBillListRouteImport } from './routes/api.$locale.payment.bill.list'
 import { Route as ApiLocalePaymentCreditNoteCreateRouteImport } from './routes/api.$locale.payment.credit-note.create'
+import { Route as ApiLocalePaymentDataSourcesPaymentsCheckoutsRouteImport } from './routes/api.$locale.payment.data-sources.payments-checkouts'
 import { Route as ApiLocalePaymentDataSourcesPaymentsCountRouteImport } from './routes/api.$locale.payment.data-sources.payments-count'
 import { Route as ApiLocalePaymentDataSourcesPaymentsDisputesCountRouteImport } from './routes/api.$locale.payment.data-sources.payments-disputes-count'
 import { Route as ApiLocalePaymentDataSourcesPaymentsFailedRouteImport } from './routes/api.$locale.payment.data-sources.payments-failed'
 import { Route as ApiLocalePaymentDataSourcesPaymentsInvoicesPaidRouteImport } from './routes/api.$locale.payment.data-sources.payments-invoices-paid'
 import { Route as ApiLocalePaymentDataSourcesPaymentsMethodsAddedRouteImport } from './routes/api.$locale.payment.data-sources.payments-methods-added'
+import { Route as ApiLocalePaymentDataSourcesPaymentsNewCustomersRouteImport } from './routes/api.$locale.payment.data-sources.payments-new-customers'
 import { Route as ApiLocalePaymentDataSourcesPaymentsRefundCountRouteImport } from './routes/api.$locale.payment.data-sources.payments-refund-count'
 import { Route as ApiLocalePaymentDataSourcesPaymentsRefundVolumeRouteImport } from './routes/api.$locale.payment.data-sources.payments-refund-volume'
 import { Route as ApiLocalePaymentDataSourcesPaymentsRevenueRouteImport } from './routes/api.$locale.payment.data-sources.payments-revenue'
@@ -466,6 +471,7 @@ import { Route as ApiLocaleSubscriptionAdminSyncStripeRouteImport } from './rout
 import { Route as ApiLocaleSubscriptionDataSourcesSubscriptionsActiveRouteImport } from './routes/api.$locale.subscription.data-sources.subscriptions-active'
 import { Route as ApiLocaleSubscriptionDataSourcesSubscriptionsCancelledRouteImport } from './routes/api.$locale.subscription.data-sources.subscriptions-cancelled'
 import { Route as ApiLocaleSubscriptionDataSourcesSubscriptionsChurnedRouteImport } from './routes/api.$locale.subscription.data-sources.subscriptions-churned'
+import { Route as ApiLocaleSubscriptionDataSourcesSubscriptionsMrrRouteImport } from './routes/api.$locale.subscription.data-sources.subscriptions-mrr'
 import { Route as ApiLocaleSubscriptionDataSourcesSubscriptionsNewRouteImport } from './routes/api.$locale.subscription.data-sources.subscriptions-new'
 import { Route as ApiLocaleSubscriptionDataSourcesSubscriptionsPaymentFailedRouteImport } from './routes/api.$locale.subscription.data-sources.subscriptions-payment-failed'
 import { Route as ApiLocaleSubscriptionDataSourcesSubscriptionsTrialingRouteImport } from './routes/api.$locale.subscription.data-sources.subscriptions-trialing'
@@ -741,9 +747,7 @@ import { Route as ApiLocaleVibeDataflowGraphsIdEditRouteImport } from './routes/
 import { Route as ApiLocaleVibeDataflowGraphsIdPromoteRouteImport } from './routes/api.$locale.vibe.dataflow.graphs.$id.promote'
 import { Route as ApiLocaleVibeDataflowGraphsIdTriggerRouteImport } from './routes/api.$locale.vibe.dataflow.graphs.$id.trigger'
 import { Route as ApiLocaleVibeDataflowGraphsIdVersionsRouteImport } from './routes/api.$locale.vibe.dataflow.graphs.$id.versions'
-import { Route as ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsErrorsRouteImport } from './routes/api.$locale.vibe.logger.error-monitor.data-sources.error-logs-errors'
-import { Route as ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsTotalRouteImport } from './routes/api.$locale.vibe.logger.error-monitor.data-sources.error-logs-total'
-import { Route as ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsWarningsRouteImport } from './routes/api.$locale.vibe.logger.error-monitor.data-sources.error-logs-warnings'
+import { Route as ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsSeriesRouteImport } from './routes/api.$locale.vibe.logger.error-monitor.data-sources.error-logs-series'
 import { Route as ApiLocaleVibePlatformsAiSkillsCharacterSkillRouteImport } from './routes/api.$locale.vibe.platforms.ai.skills.$characterSkill'
 import { Route as ApiLocaleVibeTasksWatchdogDataSourcesTaskHealthRouteImport } from './routes/api.$locale.vibe.tasks.watchdog.data-sources.task-health'
 import { Route as ApiLocaleVibeToolingInfraClusterInitRouteImport } from './routes/api.$locale.vibe.tooling.infra.cluster.init'
@@ -2395,6 +2399,12 @@ const ApiLocaleCreditsAntiFarmingReportRoute =
     path: '/anti-farming/report',
     getParentRoute: () => ApiLocaleCreditsRoute,
   } as any)
+const ApiLocaleCreditsDataSourcesCreditsActiveSpendersRoute =
+  ApiLocaleCreditsDataSourcesCreditsActiveSpendersRouteImport.update({
+    id: '/data-sources/credits-active-spenders',
+    path: '/data-sources/credits-active-spenders',
+    getParentRoute: () => ApiLocaleCreditsRoute,
+  } as any)
 const ApiLocaleCreditsDataSourcesCreditsAvgTransactionRoute =
   ApiLocaleCreditsDataSourcesCreditsAvgTransactionRouteImport.update({
     id: '/data-sources/credits-avg-transaction',
@@ -2465,6 +2475,12 @@ const ApiLocaleCreditsDataSourcesCreditsSpentByLeadsRoute =
   ApiLocaleCreditsDataSourcesCreditsSpentByLeadsRouteImport.update({
     id: '/data-sources/credits-spent-by-leads',
     path: '/data-sources/credits-spent-by-leads',
+    getParentRoute: () => ApiLocaleCreditsRoute,
+  } as any)
+const ApiLocaleCreditsDataSourcesCreditsSpentByModelRoute =
+  ApiLocaleCreditsDataSourcesCreditsSpentByModelRouteImport.update({
+    id: '/data-sources/credits-spent-by-model',
+    path: '/data-sources/credits-spent-by-model',
     getParentRoute: () => ApiLocaleCreditsRoute,
   } as any)
 const ApiLocaleCreditsDataSourcesCreditsSpentBySourceRoute =
@@ -2815,6 +2831,12 @@ const ApiLocaleLeadsDataSourcesLeadsFormSubmitsRoute =
     path: '/api/$locale/leads/data-sources/leads-form-submits',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiLocaleLeadsDataSourcesLeadsFunnelStageRoute =
+  ApiLocaleLeadsDataSourcesLeadsFunnelStageRouteImport.update({
+    id: '/api/$locale/leads/data-sources/leads-funnel-stage',
+    path: '/api/$locale/leads/data-sources/leads-funnel-stage',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiLocaleLeadsDataSourcesLeadsInContactRoute =
   ApiLocaleLeadsDataSourcesLeadsInContactRouteImport.update({
     id: '/api/$locale/leads/data-sources/leads-in-contact',
@@ -3108,6 +3130,12 @@ const ApiLocalePaymentCreditNoteCreateRoute =
     path: '/credit-note/create',
     getParentRoute: () => ApiLocalePaymentRoute,
   } as any)
+const ApiLocalePaymentDataSourcesPaymentsCheckoutsRoute =
+  ApiLocalePaymentDataSourcesPaymentsCheckoutsRouteImport.update({
+    id: '/data-sources/payments-checkouts',
+    path: '/data-sources/payments-checkouts',
+    getParentRoute: () => ApiLocalePaymentRoute,
+  } as any)
 const ApiLocalePaymentDataSourcesPaymentsCountRoute =
   ApiLocalePaymentDataSourcesPaymentsCountRouteImport.update({
     id: '/data-sources/payments-count',
@@ -3136,6 +3164,12 @@ const ApiLocalePaymentDataSourcesPaymentsMethodsAddedRoute =
   ApiLocalePaymentDataSourcesPaymentsMethodsAddedRouteImport.update({
     id: '/data-sources/payments-methods-added',
     path: '/data-sources/payments-methods-added',
+    getParentRoute: () => ApiLocalePaymentRoute,
+  } as any)
+const ApiLocalePaymentDataSourcesPaymentsNewCustomersRoute =
+  ApiLocalePaymentDataSourcesPaymentsNewCustomersRouteImport.update({
+    id: '/data-sources/payments-new-customers',
+    path: '/data-sources/payments-new-customers',
     getParentRoute: () => ApiLocalePaymentRoute,
   } as any)
 const ApiLocalePaymentDataSourcesPaymentsRefundCountRoute =
@@ -3415,6 +3449,12 @@ const ApiLocaleSubscriptionDataSourcesSubscriptionsChurnedRoute =
   ApiLocaleSubscriptionDataSourcesSubscriptionsChurnedRouteImport.update({
     id: '/data-sources/subscriptions-churned',
     path: '/data-sources/subscriptions-churned',
+    getParentRoute: () => ApiLocaleSubscriptionRoute,
+  } as any)
+const ApiLocaleSubscriptionDataSourcesSubscriptionsMrrRoute =
+  ApiLocaleSubscriptionDataSourcesSubscriptionsMrrRouteImport.update({
+    id: '/data-sources/subscriptions-mrr',
+    path: '/data-sources/subscriptions-mrr',
     getParentRoute: () => ApiLocaleSubscriptionRoute,
   } as any)
 const ApiLocaleSubscriptionDataSourcesSubscriptionsNewRoute =
@@ -5061,26 +5101,12 @@ const ApiLocaleVibeDataflowGraphsIdVersionsRoute =
     path: '/$id/versions',
     getParentRoute: () => ApiLocaleVibeDataflowGraphsRoute,
   } as any)
-const ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsErrorsRoute =
-  ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsErrorsRouteImport.update({
-    id: '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-errors',
-    path: '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-errors',
+const ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsSeriesRoute =
+  ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsSeriesRouteImport.update({
+    id: '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-series',
+    path: '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-series',
     getParentRoute: () => rootRouteImport,
   } as any)
-const ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsTotalRoute =
-  ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsTotalRouteImport.update({
-    id: '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-total',
-    path: '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-total',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsWarningsRoute =
-  ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsWarningsRouteImport.update(
-    {
-      id: '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-warnings',
-      path: '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-warnings',
-      getParentRoute: () => rootRouteImport,
-    } as any,
-  )
 const ApiLocaleVibePlatformsAiSkillsCharacterSkillRoute =
   ApiLocaleVibePlatformsAiSkillsCharacterSkillRouteImport.update({
     id: '/api/$locale/vibe/platforms/ai/skills/$characterSkill',
@@ -5501,6 +5527,7 @@ export interface FileRoutesByFullPath {
   '/api/$locale/companies/$companyId/update': typeof ApiLocaleCompaniesCompanyIdUpdateRoute
   '/api/$locale/credits/analytics/usage': typeof ApiLocaleCreditsAnalyticsUsageRoute
   '/api/$locale/credits/anti-farming/report': typeof ApiLocaleCreditsAntiFarmingReportRoute
+  '/api/$locale/credits/data-sources/credits-active-spenders': typeof ApiLocaleCreditsDataSourcesCreditsActiveSpendersRoute
   '/api/$locale/credits/data-sources/credits-avg-transaction': typeof ApiLocaleCreditsDataSourcesCreditsAvgTransactionRoute
   '/api/$locale/credits/data-sources/credits-balance-total': typeof ApiLocaleCreditsDataSourcesCreditsBalanceTotalRoute
   '/api/$locale/credits/data-sources/credits-earned': typeof ApiLocaleCreditsDataSourcesCreditsEarnedRoute
@@ -5513,6 +5540,7 @@ export interface FileRoutesByFullPath {
   '/api/$locale/credits/data-sources/credits-purchased': typeof ApiLocaleCreditsDataSourcesCreditsPurchasedRoute
   '/api/$locale/credits/data-sources/credits-refunded': typeof ApiLocaleCreditsDataSourcesCreditsRefundedRoute
   '/api/$locale/credits/data-sources/credits-spent-by-leads': typeof ApiLocaleCreditsDataSourcesCreditsSpentByLeadsRoute
+  '/api/$locale/credits/data-sources/credits-spent-by-model': typeof ApiLocaleCreditsDataSourcesCreditsSpentByModelRoute
   '/api/$locale/credits/data-sources/credits-spent-by-source': typeof ApiLocaleCreditsDataSourcesCreditsSpentBySourceRoute
   '/api/$locale/credits/data-sources/credits-spent-by-users': typeof ApiLocaleCreditsDataSourcesCreditsSpentByUsersRoute
   '/api/$locale/credits/data-sources/credits-spent-total': typeof ApiLocaleCreditsDataSourcesCreditsSpentTotalRoute
@@ -5571,6 +5599,7 @@ export interface FileRoutesByFullPath {
   '/api/$locale/leads/data-sources/leads-emails-sent': typeof ApiLocaleLeadsDataSourcesLeadsEmailsSentRoute
   '/api/$locale/leads/data-sources/leads-engagements': typeof ApiLocaleLeadsDataSourcesLeadsEngagementsRoute
   '/api/$locale/leads/data-sources/leads-form-submits': typeof ApiLocaleLeadsDataSourcesLeadsFormSubmitsRoute
+  '/api/$locale/leads/data-sources/leads-funnel-stage': typeof ApiLocaleLeadsDataSourcesLeadsFunnelStageRoute
   '/api/$locale/leads/data-sources/leads-in-contact': typeof ApiLocaleLeadsDataSourcesLeadsInContactRoute
   '/api/$locale/leads/data-sources/leads-newsletter-subscribers': typeof ApiLocaleLeadsDataSourcesLeadsNewsletterSubscribersRoute
   '/api/$locale/leads/data-sources/leads-unsubscribed': typeof ApiLocaleLeadsDataSourcesLeadsUnsubscribedRoute
@@ -5620,11 +5649,13 @@ export interface FileRoutesByFullPath {
   '/api/$locale/payment/bill/create': typeof ApiLocalePaymentBillCreateRoute
   '/api/$locale/payment/bill/list': typeof ApiLocalePaymentBillListRoute
   '/api/$locale/payment/credit-note/create': typeof ApiLocalePaymentCreditNoteCreateRoute
+  '/api/$locale/payment/data-sources/payments-checkouts': typeof ApiLocalePaymentDataSourcesPaymentsCheckoutsRoute
   '/api/$locale/payment/data-sources/payments-count': typeof ApiLocalePaymentDataSourcesPaymentsCountRoute
   '/api/$locale/payment/data-sources/payments-disputes-count': typeof ApiLocalePaymentDataSourcesPaymentsDisputesCountRoute
   '/api/$locale/payment/data-sources/payments-failed': typeof ApiLocalePaymentDataSourcesPaymentsFailedRoute
   '/api/$locale/payment/data-sources/payments-invoices-paid': typeof ApiLocalePaymentDataSourcesPaymentsInvoicesPaidRoute
   '/api/$locale/payment/data-sources/payments-methods-added': typeof ApiLocalePaymentDataSourcesPaymentsMethodsAddedRoute
+  '/api/$locale/payment/data-sources/payments-new-customers': typeof ApiLocalePaymentDataSourcesPaymentsNewCustomersRoute
   '/api/$locale/payment/data-sources/payments-refund-count': typeof ApiLocalePaymentDataSourcesPaymentsRefundCountRoute
   '/api/$locale/payment/data-sources/payments-refund-volume': typeof ApiLocalePaymentDataSourcesPaymentsRefundVolumeRoute
   '/api/$locale/payment/data-sources/payments-revenue': typeof ApiLocalePaymentDataSourcesPaymentsRevenueRoute
@@ -5672,6 +5703,7 @@ export interface FileRoutesByFullPath {
   '/api/$locale/subscription/data-sources/subscriptions-active': typeof ApiLocaleSubscriptionDataSourcesSubscriptionsActiveRoute
   '/api/$locale/subscription/data-sources/subscriptions-cancelled': typeof ApiLocaleSubscriptionDataSourcesSubscriptionsCancelledRoute
   '/api/$locale/subscription/data-sources/subscriptions-churned': typeof ApiLocaleSubscriptionDataSourcesSubscriptionsChurnedRoute
+  '/api/$locale/subscription/data-sources/subscriptions-mrr': typeof ApiLocaleSubscriptionDataSourcesSubscriptionsMrrRoute
   '/api/$locale/subscription/data-sources/subscriptions-new': typeof ApiLocaleSubscriptionDataSourcesSubscriptionsNewRoute
   '/api/$locale/subscription/data-sources/subscriptions-payment-failed': typeof ApiLocaleSubscriptionDataSourcesSubscriptionsPaymentFailedRoute
   '/api/$locale/subscription/data-sources/subscriptions-trialing': typeof ApiLocaleSubscriptionDataSourcesSubscriptionsTrialingRoute
@@ -6014,9 +6046,7 @@ export interface FileRoutesByFullPath {
   '/api/$locale/vibe/dataflow/graphs/$id/promote': typeof ApiLocaleVibeDataflowGraphsIdPromoteRoute
   '/api/$locale/vibe/dataflow/graphs/$id/trigger': typeof ApiLocaleVibeDataflowGraphsIdTriggerRoute
   '/api/$locale/vibe/dataflow/graphs/$id/versions': typeof ApiLocaleVibeDataflowGraphsIdVersionsRoute
-  '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-errors': typeof ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsErrorsRoute
-  '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-total': typeof ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsTotalRoute
-  '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-warnings': typeof ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsWarningsRoute
+  '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-series': typeof ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsSeriesRoute
   '/api/$locale/vibe/platforms/ai/skills/$characterSkill': typeof ApiLocaleVibePlatformsAiSkillsCharacterSkillRoute
   '/api/$locale/vibe/tasks/watchdog/data-sources/task-health': typeof ApiLocaleVibeTasksWatchdogDataSourcesTaskHealthRoute
   '/api/$locale/vibe/tooling/infra/cluster/init': typeof ApiLocaleVibeToolingInfraClusterInitRoute
@@ -6261,6 +6291,7 @@ export interface FileRoutesByTo {
   '/api/$locale/companies/$companyId/update': typeof ApiLocaleCompaniesCompanyIdUpdateRoute
   '/api/$locale/credits/analytics/usage': typeof ApiLocaleCreditsAnalyticsUsageRoute
   '/api/$locale/credits/anti-farming/report': typeof ApiLocaleCreditsAntiFarmingReportRoute
+  '/api/$locale/credits/data-sources/credits-active-spenders': typeof ApiLocaleCreditsDataSourcesCreditsActiveSpendersRoute
   '/api/$locale/credits/data-sources/credits-avg-transaction': typeof ApiLocaleCreditsDataSourcesCreditsAvgTransactionRoute
   '/api/$locale/credits/data-sources/credits-balance-total': typeof ApiLocaleCreditsDataSourcesCreditsBalanceTotalRoute
   '/api/$locale/credits/data-sources/credits-earned': typeof ApiLocaleCreditsDataSourcesCreditsEarnedRoute
@@ -6273,6 +6304,7 @@ export interface FileRoutesByTo {
   '/api/$locale/credits/data-sources/credits-purchased': typeof ApiLocaleCreditsDataSourcesCreditsPurchasedRoute
   '/api/$locale/credits/data-sources/credits-refunded': typeof ApiLocaleCreditsDataSourcesCreditsRefundedRoute
   '/api/$locale/credits/data-sources/credits-spent-by-leads': typeof ApiLocaleCreditsDataSourcesCreditsSpentByLeadsRoute
+  '/api/$locale/credits/data-sources/credits-spent-by-model': typeof ApiLocaleCreditsDataSourcesCreditsSpentByModelRoute
   '/api/$locale/credits/data-sources/credits-spent-by-source': typeof ApiLocaleCreditsDataSourcesCreditsSpentBySourceRoute
   '/api/$locale/credits/data-sources/credits-spent-by-users': typeof ApiLocaleCreditsDataSourcesCreditsSpentByUsersRoute
   '/api/$locale/credits/data-sources/credits-spent-total': typeof ApiLocaleCreditsDataSourcesCreditsSpentTotalRoute
@@ -6331,6 +6363,7 @@ export interface FileRoutesByTo {
   '/api/$locale/leads/data-sources/leads-emails-sent': typeof ApiLocaleLeadsDataSourcesLeadsEmailsSentRoute
   '/api/$locale/leads/data-sources/leads-engagements': typeof ApiLocaleLeadsDataSourcesLeadsEngagementsRoute
   '/api/$locale/leads/data-sources/leads-form-submits': typeof ApiLocaleLeadsDataSourcesLeadsFormSubmitsRoute
+  '/api/$locale/leads/data-sources/leads-funnel-stage': typeof ApiLocaleLeadsDataSourcesLeadsFunnelStageRoute
   '/api/$locale/leads/data-sources/leads-in-contact': typeof ApiLocaleLeadsDataSourcesLeadsInContactRoute
   '/api/$locale/leads/data-sources/leads-newsletter-subscribers': typeof ApiLocaleLeadsDataSourcesLeadsNewsletterSubscribersRoute
   '/api/$locale/leads/data-sources/leads-unsubscribed': typeof ApiLocaleLeadsDataSourcesLeadsUnsubscribedRoute
@@ -6380,11 +6413,13 @@ export interface FileRoutesByTo {
   '/api/$locale/payment/bill/create': typeof ApiLocalePaymentBillCreateRoute
   '/api/$locale/payment/bill/list': typeof ApiLocalePaymentBillListRoute
   '/api/$locale/payment/credit-note/create': typeof ApiLocalePaymentCreditNoteCreateRoute
+  '/api/$locale/payment/data-sources/payments-checkouts': typeof ApiLocalePaymentDataSourcesPaymentsCheckoutsRoute
   '/api/$locale/payment/data-sources/payments-count': typeof ApiLocalePaymentDataSourcesPaymentsCountRoute
   '/api/$locale/payment/data-sources/payments-disputes-count': typeof ApiLocalePaymentDataSourcesPaymentsDisputesCountRoute
   '/api/$locale/payment/data-sources/payments-failed': typeof ApiLocalePaymentDataSourcesPaymentsFailedRoute
   '/api/$locale/payment/data-sources/payments-invoices-paid': typeof ApiLocalePaymentDataSourcesPaymentsInvoicesPaidRoute
   '/api/$locale/payment/data-sources/payments-methods-added': typeof ApiLocalePaymentDataSourcesPaymentsMethodsAddedRoute
+  '/api/$locale/payment/data-sources/payments-new-customers': typeof ApiLocalePaymentDataSourcesPaymentsNewCustomersRoute
   '/api/$locale/payment/data-sources/payments-refund-count': typeof ApiLocalePaymentDataSourcesPaymentsRefundCountRoute
   '/api/$locale/payment/data-sources/payments-refund-volume': typeof ApiLocalePaymentDataSourcesPaymentsRefundVolumeRoute
   '/api/$locale/payment/data-sources/payments-revenue': typeof ApiLocalePaymentDataSourcesPaymentsRevenueRoute
@@ -6432,6 +6467,7 @@ export interface FileRoutesByTo {
   '/api/$locale/subscription/data-sources/subscriptions-active': typeof ApiLocaleSubscriptionDataSourcesSubscriptionsActiveRoute
   '/api/$locale/subscription/data-sources/subscriptions-cancelled': typeof ApiLocaleSubscriptionDataSourcesSubscriptionsCancelledRoute
   '/api/$locale/subscription/data-sources/subscriptions-churned': typeof ApiLocaleSubscriptionDataSourcesSubscriptionsChurnedRoute
+  '/api/$locale/subscription/data-sources/subscriptions-mrr': typeof ApiLocaleSubscriptionDataSourcesSubscriptionsMrrRoute
   '/api/$locale/subscription/data-sources/subscriptions-new': typeof ApiLocaleSubscriptionDataSourcesSubscriptionsNewRoute
   '/api/$locale/subscription/data-sources/subscriptions-payment-failed': typeof ApiLocaleSubscriptionDataSourcesSubscriptionsPaymentFailedRoute
   '/api/$locale/subscription/data-sources/subscriptions-trialing': typeof ApiLocaleSubscriptionDataSourcesSubscriptionsTrialingRoute
@@ -6774,9 +6810,7 @@ export interface FileRoutesByTo {
   '/api/$locale/vibe/dataflow/graphs/$id/promote': typeof ApiLocaleVibeDataflowGraphsIdPromoteRoute
   '/api/$locale/vibe/dataflow/graphs/$id/trigger': typeof ApiLocaleVibeDataflowGraphsIdTriggerRoute
   '/api/$locale/vibe/dataflow/graphs/$id/versions': typeof ApiLocaleVibeDataflowGraphsIdVersionsRoute
-  '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-errors': typeof ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsErrorsRoute
-  '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-total': typeof ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsTotalRoute
-  '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-warnings': typeof ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsWarningsRoute
+  '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-series': typeof ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsSeriesRoute
   '/api/$locale/vibe/platforms/ai/skills/$characterSkill': typeof ApiLocaleVibePlatformsAiSkillsCharacterSkillRoute
   '/api/$locale/vibe/tasks/watchdog/data-sources/task-health': typeof ApiLocaleVibeTasksWatchdogDataSourcesTaskHealthRoute
   '/api/$locale/vibe/tooling/infra/cluster/init': typeof ApiLocaleVibeToolingInfraClusterInitRoute
@@ -7030,6 +7064,7 @@ export interface FileRoutesById {
   '/api/$locale/companies/$companyId/update': typeof ApiLocaleCompaniesCompanyIdUpdateRoute
   '/api/$locale/credits/analytics/usage': typeof ApiLocaleCreditsAnalyticsUsageRoute
   '/api/$locale/credits/anti-farming/report': typeof ApiLocaleCreditsAntiFarmingReportRoute
+  '/api/$locale/credits/data-sources/credits-active-spenders': typeof ApiLocaleCreditsDataSourcesCreditsActiveSpendersRoute
   '/api/$locale/credits/data-sources/credits-avg-transaction': typeof ApiLocaleCreditsDataSourcesCreditsAvgTransactionRoute
   '/api/$locale/credits/data-sources/credits-balance-total': typeof ApiLocaleCreditsDataSourcesCreditsBalanceTotalRoute
   '/api/$locale/credits/data-sources/credits-earned': typeof ApiLocaleCreditsDataSourcesCreditsEarnedRoute
@@ -7042,6 +7077,7 @@ export interface FileRoutesById {
   '/api/$locale/credits/data-sources/credits-purchased': typeof ApiLocaleCreditsDataSourcesCreditsPurchasedRoute
   '/api/$locale/credits/data-sources/credits-refunded': typeof ApiLocaleCreditsDataSourcesCreditsRefundedRoute
   '/api/$locale/credits/data-sources/credits-spent-by-leads': typeof ApiLocaleCreditsDataSourcesCreditsSpentByLeadsRoute
+  '/api/$locale/credits/data-sources/credits-spent-by-model': typeof ApiLocaleCreditsDataSourcesCreditsSpentByModelRoute
   '/api/$locale/credits/data-sources/credits-spent-by-source': typeof ApiLocaleCreditsDataSourcesCreditsSpentBySourceRoute
   '/api/$locale/credits/data-sources/credits-spent-by-users': typeof ApiLocaleCreditsDataSourcesCreditsSpentByUsersRoute
   '/api/$locale/credits/data-sources/credits-spent-total': typeof ApiLocaleCreditsDataSourcesCreditsSpentTotalRoute
@@ -7100,6 +7136,7 @@ export interface FileRoutesById {
   '/api/$locale/leads/data-sources/leads-emails-sent': typeof ApiLocaleLeadsDataSourcesLeadsEmailsSentRoute
   '/api/$locale/leads/data-sources/leads-engagements': typeof ApiLocaleLeadsDataSourcesLeadsEngagementsRoute
   '/api/$locale/leads/data-sources/leads-form-submits': typeof ApiLocaleLeadsDataSourcesLeadsFormSubmitsRoute
+  '/api/$locale/leads/data-sources/leads-funnel-stage': typeof ApiLocaleLeadsDataSourcesLeadsFunnelStageRoute
   '/api/$locale/leads/data-sources/leads-in-contact': typeof ApiLocaleLeadsDataSourcesLeadsInContactRoute
   '/api/$locale/leads/data-sources/leads-newsletter-subscribers': typeof ApiLocaleLeadsDataSourcesLeadsNewsletterSubscribersRoute
   '/api/$locale/leads/data-sources/leads-unsubscribed': typeof ApiLocaleLeadsDataSourcesLeadsUnsubscribedRoute
@@ -7149,11 +7186,13 @@ export interface FileRoutesById {
   '/api/$locale/payment/bill/create': typeof ApiLocalePaymentBillCreateRoute
   '/api/$locale/payment/bill/list': typeof ApiLocalePaymentBillListRoute
   '/api/$locale/payment/credit-note/create': typeof ApiLocalePaymentCreditNoteCreateRoute
+  '/api/$locale/payment/data-sources/payments-checkouts': typeof ApiLocalePaymentDataSourcesPaymentsCheckoutsRoute
   '/api/$locale/payment/data-sources/payments-count': typeof ApiLocalePaymentDataSourcesPaymentsCountRoute
   '/api/$locale/payment/data-sources/payments-disputes-count': typeof ApiLocalePaymentDataSourcesPaymentsDisputesCountRoute
   '/api/$locale/payment/data-sources/payments-failed': typeof ApiLocalePaymentDataSourcesPaymentsFailedRoute
   '/api/$locale/payment/data-sources/payments-invoices-paid': typeof ApiLocalePaymentDataSourcesPaymentsInvoicesPaidRoute
   '/api/$locale/payment/data-sources/payments-methods-added': typeof ApiLocalePaymentDataSourcesPaymentsMethodsAddedRoute
+  '/api/$locale/payment/data-sources/payments-new-customers': typeof ApiLocalePaymentDataSourcesPaymentsNewCustomersRoute
   '/api/$locale/payment/data-sources/payments-refund-count': typeof ApiLocalePaymentDataSourcesPaymentsRefundCountRoute
   '/api/$locale/payment/data-sources/payments-refund-volume': typeof ApiLocalePaymentDataSourcesPaymentsRefundVolumeRoute
   '/api/$locale/payment/data-sources/payments-revenue': typeof ApiLocalePaymentDataSourcesPaymentsRevenueRoute
@@ -7201,6 +7240,7 @@ export interface FileRoutesById {
   '/api/$locale/subscription/data-sources/subscriptions-active': typeof ApiLocaleSubscriptionDataSourcesSubscriptionsActiveRoute
   '/api/$locale/subscription/data-sources/subscriptions-cancelled': typeof ApiLocaleSubscriptionDataSourcesSubscriptionsCancelledRoute
   '/api/$locale/subscription/data-sources/subscriptions-churned': typeof ApiLocaleSubscriptionDataSourcesSubscriptionsChurnedRoute
+  '/api/$locale/subscription/data-sources/subscriptions-mrr': typeof ApiLocaleSubscriptionDataSourcesSubscriptionsMrrRoute
   '/api/$locale/subscription/data-sources/subscriptions-new': typeof ApiLocaleSubscriptionDataSourcesSubscriptionsNewRoute
   '/api/$locale/subscription/data-sources/subscriptions-payment-failed': typeof ApiLocaleSubscriptionDataSourcesSubscriptionsPaymentFailedRoute
   '/api/$locale/subscription/data-sources/subscriptions-trialing': typeof ApiLocaleSubscriptionDataSourcesSubscriptionsTrialingRoute
@@ -7543,9 +7583,7 @@ export interface FileRoutesById {
   '/api/$locale/vibe/dataflow/graphs/$id/promote': typeof ApiLocaleVibeDataflowGraphsIdPromoteRoute
   '/api/$locale/vibe/dataflow/graphs/$id/trigger': typeof ApiLocaleVibeDataflowGraphsIdTriggerRoute
   '/api/$locale/vibe/dataflow/graphs/$id/versions': typeof ApiLocaleVibeDataflowGraphsIdVersionsRoute
-  '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-errors': typeof ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsErrorsRoute
-  '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-total': typeof ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsTotalRoute
-  '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-warnings': typeof ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsWarningsRoute
+  '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-series': typeof ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsSeriesRoute
   '/api/$locale/vibe/platforms/ai/skills/$characterSkill': typeof ApiLocaleVibePlatformsAiSkillsCharacterSkillRoute
   '/api/$locale/vibe/tasks/watchdog/data-sources/task-health': typeof ApiLocaleVibeTasksWatchdogDataSourcesTaskHealthRoute
   '/api/$locale/vibe/tooling/infra/cluster/init': typeof ApiLocaleVibeToolingInfraClusterInitRoute
@@ -7799,6 +7837,7 @@ export interface FileRouteTypes {
     | '/api/$locale/companies/$companyId/update'
     | '/api/$locale/credits/analytics/usage'
     | '/api/$locale/credits/anti-farming/report'
+    | '/api/$locale/credits/data-sources/credits-active-spenders'
     | '/api/$locale/credits/data-sources/credits-avg-transaction'
     | '/api/$locale/credits/data-sources/credits-balance-total'
     | '/api/$locale/credits/data-sources/credits-earned'
@@ -7811,6 +7850,7 @@ export interface FileRouteTypes {
     | '/api/$locale/credits/data-sources/credits-purchased'
     | '/api/$locale/credits/data-sources/credits-refunded'
     | '/api/$locale/credits/data-sources/credits-spent-by-leads'
+    | '/api/$locale/credits/data-sources/credits-spent-by-model'
     | '/api/$locale/credits/data-sources/credits-spent-by-source'
     | '/api/$locale/credits/data-sources/credits-spent-by-users'
     | '/api/$locale/credits/data-sources/credits-spent-total'
@@ -7869,6 +7909,7 @@ export interface FileRouteTypes {
     | '/api/$locale/leads/data-sources/leads-emails-sent'
     | '/api/$locale/leads/data-sources/leads-engagements'
     | '/api/$locale/leads/data-sources/leads-form-submits'
+    | '/api/$locale/leads/data-sources/leads-funnel-stage'
     | '/api/$locale/leads/data-sources/leads-in-contact'
     | '/api/$locale/leads/data-sources/leads-newsletter-subscribers'
     | '/api/$locale/leads/data-sources/leads-unsubscribed'
@@ -7918,11 +7959,13 @@ export interface FileRouteTypes {
     | '/api/$locale/payment/bill/create'
     | '/api/$locale/payment/bill/list'
     | '/api/$locale/payment/credit-note/create'
+    | '/api/$locale/payment/data-sources/payments-checkouts'
     | '/api/$locale/payment/data-sources/payments-count'
     | '/api/$locale/payment/data-sources/payments-disputes-count'
     | '/api/$locale/payment/data-sources/payments-failed'
     | '/api/$locale/payment/data-sources/payments-invoices-paid'
     | '/api/$locale/payment/data-sources/payments-methods-added'
+    | '/api/$locale/payment/data-sources/payments-new-customers'
     | '/api/$locale/payment/data-sources/payments-refund-count'
     | '/api/$locale/payment/data-sources/payments-refund-volume'
     | '/api/$locale/payment/data-sources/payments-revenue'
@@ -7970,6 +8013,7 @@ export interface FileRouteTypes {
     | '/api/$locale/subscription/data-sources/subscriptions-active'
     | '/api/$locale/subscription/data-sources/subscriptions-cancelled'
     | '/api/$locale/subscription/data-sources/subscriptions-churned'
+    | '/api/$locale/subscription/data-sources/subscriptions-mrr'
     | '/api/$locale/subscription/data-sources/subscriptions-new'
     | '/api/$locale/subscription/data-sources/subscriptions-payment-failed'
     | '/api/$locale/subscription/data-sources/subscriptions-trialing'
@@ -8312,9 +8356,7 @@ export interface FileRouteTypes {
     | '/api/$locale/vibe/dataflow/graphs/$id/promote'
     | '/api/$locale/vibe/dataflow/graphs/$id/trigger'
     | '/api/$locale/vibe/dataflow/graphs/$id/versions'
-    | '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-errors'
-    | '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-total'
-    | '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-warnings'
+    | '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-series'
     | '/api/$locale/vibe/platforms/ai/skills/$characterSkill'
     | '/api/$locale/vibe/tasks/watchdog/data-sources/task-health'
     | '/api/$locale/vibe/tooling/infra/cluster/init'
@@ -8559,6 +8601,7 @@ export interface FileRouteTypes {
     | '/api/$locale/companies/$companyId/update'
     | '/api/$locale/credits/analytics/usage'
     | '/api/$locale/credits/anti-farming/report'
+    | '/api/$locale/credits/data-sources/credits-active-spenders'
     | '/api/$locale/credits/data-sources/credits-avg-transaction'
     | '/api/$locale/credits/data-sources/credits-balance-total'
     | '/api/$locale/credits/data-sources/credits-earned'
@@ -8571,6 +8614,7 @@ export interface FileRouteTypes {
     | '/api/$locale/credits/data-sources/credits-purchased'
     | '/api/$locale/credits/data-sources/credits-refunded'
     | '/api/$locale/credits/data-sources/credits-spent-by-leads'
+    | '/api/$locale/credits/data-sources/credits-spent-by-model'
     | '/api/$locale/credits/data-sources/credits-spent-by-source'
     | '/api/$locale/credits/data-sources/credits-spent-by-users'
     | '/api/$locale/credits/data-sources/credits-spent-total'
@@ -8629,6 +8673,7 @@ export interface FileRouteTypes {
     | '/api/$locale/leads/data-sources/leads-emails-sent'
     | '/api/$locale/leads/data-sources/leads-engagements'
     | '/api/$locale/leads/data-sources/leads-form-submits'
+    | '/api/$locale/leads/data-sources/leads-funnel-stage'
     | '/api/$locale/leads/data-sources/leads-in-contact'
     | '/api/$locale/leads/data-sources/leads-newsletter-subscribers'
     | '/api/$locale/leads/data-sources/leads-unsubscribed'
@@ -8678,11 +8723,13 @@ export interface FileRouteTypes {
     | '/api/$locale/payment/bill/create'
     | '/api/$locale/payment/bill/list'
     | '/api/$locale/payment/credit-note/create'
+    | '/api/$locale/payment/data-sources/payments-checkouts'
     | '/api/$locale/payment/data-sources/payments-count'
     | '/api/$locale/payment/data-sources/payments-disputes-count'
     | '/api/$locale/payment/data-sources/payments-failed'
     | '/api/$locale/payment/data-sources/payments-invoices-paid'
     | '/api/$locale/payment/data-sources/payments-methods-added'
+    | '/api/$locale/payment/data-sources/payments-new-customers'
     | '/api/$locale/payment/data-sources/payments-refund-count'
     | '/api/$locale/payment/data-sources/payments-refund-volume'
     | '/api/$locale/payment/data-sources/payments-revenue'
@@ -8730,6 +8777,7 @@ export interface FileRouteTypes {
     | '/api/$locale/subscription/data-sources/subscriptions-active'
     | '/api/$locale/subscription/data-sources/subscriptions-cancelled'
     | '/api/$locale/subscription/data-sources/subscriptions-churned'
+    | '/api/$locale/subscription/data-sources/subscriptions-mrr'
     | '/api/$locale/subscription/data-sources/subscriptions-new'
     | '/api/$locale/subscription/data-sources/subscriptions-payment-failed'
     | '/api/$locale/subscription/data-sources/subscriptions-trialing'
@@ -9072,9 +9120,7 @@ export interface FileRouteTypes {
     | '/api/$locale/vibe/dataflow/graphs/$id/promote'
     | '/api/$locale/vibe/dataflow/graphs/$id/trigger'
     | '/api/$locale/vibe/dataflow/graphs/$id/versions'
-    | '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-errors'
-    | '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-total'
-    | '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-warnings'
+    | '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-series'
     | '/api/$locale/vibe/platforms/ai/skills/$characterSkill'
     | '/api/$locale/vibe/tasks/watchdog/data-sources/task-health'
     | '/api/$locale/vibe/tooling/infra/cluster/init'
@@ -9327,6 +9373,7 @@ export interface FileRouteTypes {
     | '/api/$locale/companies/$companyId/update'
     | '/api/$locale/credits/analytics/usage'
     | '/api/$locale/credits/anti-farming/report'
+    | '/api/$locale/credits/data-sources/credits-active-spenders'
     | '/api/$locale/credits/data-sources/credits-avg-transaction'
     | '/api/$locale/credits/data-sources/credits-balance-total'
     | '/api/$locale/credits/data-sources/credits-earned'
@@ -9339,6 +9386,7 @@ export interface FileRouteTypes {
     | '/api/$locale/credits/data-sources/credits-purchased'
     | '/api/$locale/credits/data-sources/credits-refunded'
     | '/api/$locale/credits/data-sources/credits-spent-by-leads'
+    | '/api/$locale/credits/data-sources/credits-spent-by-model'
     | '/api/$locale/credits/data-sources/credits-spent-by-source'
     | '/api/$locale/credits/data-sources/credits-spent-by-users'
     | '/api/$locale/credits/data-sources/credits-spent-total'
@@ -9397,6 +9445,7 @@ export interface FileRouteTypes {
     | '/api/$locale/leads/data-sources/leads-emails-sent'
     | '/api/$locale/leads/data-sources/leads-engagements'
     | '/api/$locale/leads/data-sources/leads-form-submits'
+    | '/api/$locale/leads/data-sources/leads-funnel-stage'
     | '/api/$locale/leads/data-sources/leads-in-contact'
     | '/api/$locale/leads/data-sources/leads-newsletter-subscribers'
     | '/api/$locale/leads/data-sources/leads-unsubscribed'
@@ -9446,11 +9495,13 @@ export interface FileRouteTypes {
     | '/api/$locale/payment/bill/create'
     | '/api/$locale/payment/bill/list'
     | '/api/$locale/payment/credit-note/create'
+    | '/api/$locale/payment/data-sources/payments-checkouts'
     | '/api/$locale/payment/data-sources/payments-count'
     | '/api/$locale/payment/data-sources/payments-disputes-count'
     | '/api/$locale/payment/data-sources/payments-failed'
     | '/api/$locale/payment/data-sources/payments-invoices-paid'
     | '/api/$locale/payment/data-sources/payments-methods-added'
+    | '/api/$locale/payment/data-sources/payments-new-customers'
     | '/api/$locale/payment/data-sources/payments-refund-count'
     | '/api/$locale/payment/data-sources/payments-refund-volume'
     | '/api/$locale/payment/data-sources/payments-revenue'
@@ -9498,6 +9549,7 @@ export interface FileRouteTypes {
     | '/api/$locale/subscription/data-sources/subscriptions-active'
     | '/api/$locale/subscription/data-sources/subscriptions-cancelled'
     | '/api/$locale/subscription/data-sources/subscriptions-churned'
+    | '/api/$locale/subscription/data-sources/subscriptions-mrr'
     | '/api/$locale/subscription/data-sources/subscriptions-new'
     | '/api/$locale/subscription/data-sources/subscriptions-payment-failed'
     | '/api/$locale/subscription/data-sources/subscriptions-trialing'
@@ -9840,9 +9892,7 @@ export interface FileRouteTypes {
     | '/api/$locale/vibe/dataflow/graphs/$id/promote'
     | '/api/$locale/vibe/dataflow/graphs/$id/trigger'
     | '/api/$locale/vibe/dataflow/graphs/$id/versions'
-    | '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-errors'
-    | '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-total'
-    | '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-warnings'
+    | '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-series'
     | '/api/$locale/vibe/platforms/ai/skills/$characterSkill'
     | '/api/$locale/vibe/tasks/watchdog/data-sources/task-health'
     | '/api/$locale/vibe/tooling/infra/cluster/init'
@@ -10091,6 +10141,7 @@ export interface RootRouteChildren {
   ApiLocaleLeadsDataSourcesLeadsEmailsSentRoute: typeof ApiLocaleLeadsDataSourcesLeadsEmailsSentRoute
   ApiLocaleLeadsDataSourcesLeadsEngagementsRoute: typeof ApiLocaleLeadsDataSourcesLeadsEngagementsRoute
   ApiLocaleLeadsDataSourcesLeadsFormSubmitsRoute: typeof ApiLocaleLeadsDataSourcesLeadsFormSubmitsRoute
+  ApiLocaleLeadsDataSourcesLeadsFunnelStageRoute: typeof ApiLocaleLeadsDataSourcesLeadsFunnelStageRoute
   ApiLocaleLeadsDataSourcesLeadsInContactRoute: typeof ApiLocaleLeadsDataSourcesLeadsInContactRoute
   ApiLocaleLeadsDataSourcesLeadsNewsletterSubscribersRoute: typeof ApiLocaleLeadsDataSourcesLeadsNewsletterSubscribersRoute
   ApiLocaleLeadsDataSourcesLeadsUnsubscribedRoute: typeof ApiLocaleLeadsDataSourcesLeadsUnsubscribedRoute
@@ -10322,9 +10373,7 @@ export interface RootRouteChildren {
   ApiLocaleVibeAgentChatStorageGuestMediaCleanupRoute: typeof ApiLocaleVibeAgentChatStorageGuestMediaCleanupRoute
   ApiLocaleVibeAgentCortexEmbeddingsBackfillRoute: typeof ApiLocaleVibeAgentCortexEmbeddingsBackfillRoute
   ApiLocaleVibeAgentRefusalIndexModelModelIdRoute: typeof ApiLocaleVibeAgentRefusalIndexModelModelIdRoute
-  ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsErrorsRoute: typeof ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsErrorsRoute
-  ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsTotalRoute: typeof ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsTotalRoute
-  ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsWarningsRoute: typeof ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsWarningsRoute
+  ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsSeriesRoute: typeof ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsSeriesRoute
   ApiLocaleVibePlatformsAiSkillsCharacterSkillRoute: typeof ApiLocaleVibePlatformsAiSkillsCharacterSkillRoute
   ApiLocaleVibeTasksWatchdogDataSourcesTaskHealthRoute: typeof ApiLocaleVibeTasksWatchdogDataSourcesTaskHealthRoute
   ApiLocaleVibeToolingInfraClusterInitRoute: typeof ApiLocaleVibeToolingInfraClusterInitRoute
@@ -12344,6 +12393,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiLocaleCreditsAntiFarmingReportRouteImport
       parentRoute: typeof ApiLocaleCreditsRoute
     }
+    '/api/$locale/credits/data-sources/credits-active-spenders': {
+      id: '/api/$locale/credits/data-sources/credits-active-spenders'
+      path: '/data-sources/credits-active-spenders'
+      fullPath: '/api/$locale/credits/data-sources/credits-active-spenders'
+      preLoaderRoute: typeof ApiLocaleCreditsDataSourcesCreditsActiveSpendersRouteImport
+      parentRoute: typeof ApiLocaleCreditsRoute
+    }
     '/api/$locale/credits/data-sources/credits-avg-transaction': {
       id: '/api/$locale/credits/data-sources/credits-avg-transaction'
       path: '/data-sources/credits-avg-transaction'
@@ -12426,6 +12482,13 @@ declare module '@tanstack/react-router' {
       path: '/data-sources/credits-spent-by-leads'
       fullPath: '/api/$locale/credits/data-sources/credits-spent-by-leads'
       preLoaderRoute: typeof ApiLocaleCreditsDataSourcesCreditsSpentByLeadsRouteImport
+      parentRoute: typeof ApiLocaleCreditsRoute
+    }
+    '/api/$locale/credits/data-sources/credits-spent-by-model': {
+      id: '/api/$locale/credits/data-sources/credits-spent-by-model'
+      path: '/data-sources/credits-spent-by-model'
+      fullPath: '/api/$locale/credits/data-sources/credits-spent-by-model'
+      preLoaderRoute: typeof ApiLocaleCreditsDataSourcesCreditsSpentByModelRouteImport
       parentRoute: typeof ApiLocaleCreditsRoute
     }
     '/api/$locale/credits/data-sources/credits-spent-by-source': {
@@ -12834,6 +12897,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiLocaleLeadsDataSourcesLeadsFormSubmitsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/$locale/leads/data-sources/leads-funnel-stage': {
+      id: '/api/$locale/leads/data-sources/leads-funnel-stage'
+      path: '/api/$locale/leads/data-sources/leads-funnel-stage'
+      fullPath: '/api/$locale/leads/data-sources/leads-funnel-stage'
+      preLoaderRoute: typeof ApiLocaleLeadsDataSourcesLeadsFunnelStageRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/$locale/leads/data-sources/leads-in-contact': {
       id: '/api/$locale/leads/data-sources/leads-in-contact'
       path: '/api/$locale/leads/data-sources/leads-in-contact'
@@ -13177,6 +13247,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiLocalePaymentCreditNoteCreateRouteImport
       parentRoute: typeof ApiLocalePaymentRoute
     }
+    '/api/$locale/payment/data-sources/payments-checkouts': {
+      id: '/api/$locale/payment/data-sources/payments-checkouts'
+      path: '/data-sources/payments-checkouts'
+      fullPath: '/api/$locale/payment/data-sources/payments-checkouts'
+      preLoaderRoute: typeof ApiLocalePaymentDataSourcesPaymentsCheckoutsRouteImport
+      parentRoute: typeof ApiLocalePaymentRoute
+    }
     '/api/$locale/payment/data-sources/payments-count': {
       id: '/api/$locale/payment/data-sources/payments-count'
       path: '/data-sources/payments-count'
@@ -13210,6 +13287,13 @@ declare module '@tanstack/react-router' {
       path: '/data-sources/payments-methods-added'
       fullPath: '/api/$locale/payment/data-sources/payments-methods-added'
       preLoaderRoute: typeof ApiLocalePaymentDataSourcesPaymentsMethodsAddedRouteImport
+      parentRoute: typeof ApiLocalePaymentRoute
+    }
+    '/api/$locale/payment/data-sources/payments-new-customers': {
+      id: '/api/$locale/payment/data-sources/payments-new-customers'
+      path: '/data-sources/payments-new-customers'
+      fullPath: '/api/$locale/payment/data-sources/payments-new-customers'
+      preLoaderRoute: typeof ApiLocalePaymentDataSourcesPaymentsNewCustomersRouteImport
       parentRoute: typeof ApiLocalePaymentRoute
     }
     '/api/$locale/payment/data-sources/payments-refund-count': {
@@ -13539,6 +13623,13 @@ declare module '@tanstack/react-router' {
       path: '/data-sources/subscriptions-churned'
       fullPath: '/api/$locale/subscription/data-sources/subscriptions-churned'
       preLoaderRoute: typeof ApiLocaleSubscriptionDataSourcesSubscriptionsChurnedRouteImport
+      parentRoute: typeof ApiLocaleSubscriptionRoute
+    }
+    '/api/$locale/subscription/data-sources/subscriptions-mrr': {
+      id: '/api/$locale/subscription/data-sources/subscriptions-mrr'
+      path: '/data-sources/subscriptions-mrr'
+      fullPath: '/api/$locale/subscription/data-sources/subscriptions-mrr'
+      preLoaderRoute: typeof ApiLocaleSubscriptionDataSourcesSubscriptionsMrrRouteImport
       parentRoute: typeof ApiLocaleSubscriptionRoute
     }
     '/api/$locale/subscription/data-sources/subscriptions-new': {
@@ -15466,25 +15557,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiLocaleVibeDataflowGraphsIdVersionsRouteImport
       parentRoute: typeof ApiLocaleVibeDataflowGraphsRoute
     }
-    '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-errors': {
-      id: '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-errors'
-      path: '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-errors'
-      fullPath: '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-errors'
-      preLoaderRoute: typeof ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsErrorsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-total': {
-      id: '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-total'
-      path: '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-total'
-      fullPath: '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-total'
-      preLoaderRoute: typeof ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsTotalRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-warnings': {
-      id: '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-warnings'
-      path: '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-warnings'
-      fullPath: '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-warnings'
-      preLoaderRoute: typeof ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsWarningsRouteImport
+    '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-series': {
+      id: '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-series'
+      path: '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-series'
+      fullPath: '/api/$locale/vibe/logger/error-monitor/data-sources/error-logs-series'
+      preLoaderRoute: typeof ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsSeriesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/$locale/vibe/platforms/ai/skills/$characterSkill': {
@@ -16096,6 +16173,7 @@ interface ApiLocaleCreditsRouteChildren {
   ApiLocaleCreditsPurchaseRoute: typeof ApiLocaleCreditsPurchaseRoute
   ApiLocaleCreditsAnalyticsUsageRoute: typeof ApiLocaleCreditsAnalyticsUsageRoute
   ApiLocaleCreditsAntiFarmingReportRoute: typeof ApiLocaleCreditsAntiFarmingReportRoute
+  ApiLocaleCreditsDataSourcesCreditsActiveSpendersRoute: typeof ApiLocaleCreditsDataSourcesCreditsActiveSpendersRoute
   ApiLocaleCreditsDataSourcesCreditsAvgTransactionRoute: typeof ApiLocaleCreditsDataSourcesCreditsAvgTransactionRoute
   ApiLocaleCreditsDataSourcesCreditsBalanceTotalRoute: typeof ApiLocaleCreditsDataSourcesCreditsBalanceTotalRoute
   ApiLocaleCreditsDataSourcesCreditsEarnedRoute: typeof ApiLocaleCreditsDataSourcesCreditsEarnedRoute
@@ -16108,6 +16186,7 @@ interface ApiLocaleCreditsRouteChildren {
   ApiLocaleCreditsDataSourcesCreditsPurchasedRoute: typeof ApiLocaleCreditsDataSourcesCreditsPurchasedRoute
   ApiLocaleCreditsDataSourcesCreditsRefundedRoute: typeof ApiLocaleCreditsDataSourcesCreditsRefundedRoute
   ApiLocaleCreditsDataSourcesCreditsSpentByLeadsRoute: typeof ApiLocaleCreditsDataSourcesCreditsSpentByLeadsRoute
+  ApiLocaleCreditsDataSourcesCreditsSpentByModelRoute: typeof ApiLocaleCreditsDataSourcesCreditsSpentByModelRoute
   ApiLocaleCreditsDataSourcesCreditsSpentBySourceRoute: typeof ApiLocaleCreditsDataSourcesCreditsSpentBySourceRoute
   ApiLocaleCreditsDataSourcesCreditsSpentByUsersRoute: typeof ApiLocaleCreditsDataSourcesCreditsSpentByUsersRoute
   ApiLocaleCreditsDataSourcesCreditsSpentTotalRoute: typeof ApiLocaleCreditsDataSourcesCreditsSpentTotalRoute
@@ -16127,6 +16206,8 @@ const ApiLocaleCreditsRouteChildren: ApiLocaleCreditsRouteChildren = {
   ApiLocaleCreditsAnalyticsUsageRoute: ApiLocaleCreditsAnalyticsUsageRoute,
   ApiLocaleCreditsAntiFarmingReportRoute:
     ApiLocaleCreditsAntiFarmingReportRoute,
+  ApiLocaleCreditsDataSourcesCreditsActiveSpendersRoute:
+    ApiLocaleCreditsDataSourcesCreditsActiveSpendersRoute,
   ApiLocaleCreditsDataSourcesCreditsAvgTransactionRoute:
     ApiLocaleCreditsDataSourcesCreditsAvgTransactionRoute,
   ApiLocaleCreditsDataSourcesCreditsBalanceTotalRoute:
@@ -16151,6 +16232,8 @@ const ApiLocaleCreditsRouteChildren: ApiLocaleCreditsRouteChildren = {
     ApiLocaleCreditsDataSourcesCreditsRefundedRoute,
   ApiLocaleCreditsDataSourcesCreditsSpentByLeadsRoute:
     ApiLocaleCreditsDataSourcesCreditsSpentByLeadsRoute,
+  ApiLocaleCreditsDataSourcesCreditsSpentByModelRoute:
+    ApiLocaleCreditsDataSourcesCreditsSpentByModelRoute,
   ApiLocaleCreditsDataSourcesCreditsSpentBySourceRoute:
     ApiLocaleCreditsDataSourcesCreditsSpentBySourceRoute,
   ApiLocaleCreditsDataSourcesCreditsSpentByUsersRoute:
@@ -16226,11 +16309,13 @@ interface ApiLocalePaymentRouteChildren {
   ApiLocalePaymentBillCreateRoute: typeof ApiLocalePaymentBillCreateRoute
   ApiLocalePaymentBillListRoute: typeof ApiLocalePaymentBillListRoute
   ApiLocalePaymentCreditNoteCreateRoute: typeof ApiLocalePaymentCreditNoteCreateRoute
+  ApiLocalePaymentDataSourcesPaymentsCheckoutsRoute: typeof ApiLocalePaymentDataSourcesPaymentsCheckoutsRoute
   ApiLocalePaymentDataSourcesPaymentsCountRoute: typeof ApiLocalePaymentDataSourcesPaymentsCountRoute
   ApiLocalePaymentDataSourcesPaymentsDisputesCountRoute: typeof ApiLocalePaymentDataSourcesPaymentsDisputesCountRoute
   ApiLocalePaymentDataSourcesPaymentsFailedRoute: typeof ApiLocalePaymentDataSourcesPaymentsFailedRoute
   ApiLocalePaymentDataSourcesPaymentsInvoicesPaidRoute: typeof ApiLocalePaymentDataSourcesPaymentsInvoicesPaidRoute
   ApiLocalePaymentDataSourcesPaymentsMethodsAddedRoute: typeof ApiLocalePaymentDataSourcesPaymentsMethodsAddedRoute
+  ApiLocalePaymentDataSourcesPaymentsNewCustomersRoute: typeof ApiLocalePaymentDataSourcesPaymentsNewCustomersRoute
   ApiLocalePaymentDataSourcesPaymentsRefundCountRoute: typeof ApiLocalePaymentDataSourcesPaymentsRefundCountRoute
   ApiLocalePaymentDataSourcesPaymentsRefundVolumeRoute: typeof ApiLocalePaymentDataSourcesPaymentsRefundVolumeRoute
   ApiLocalePaymentDataSourcesPaymentsRevenueRoute: typeof ApiLocalePaymentDataSourcesPaymentsRevenueRoute
@@ -16264,6 +16349,8 @@ const ApiLocalePaymentRouteChildren: ApiLocalePaymentRouteChildren = {
   ApiLocalePaymentBillCreateRoute: ApiLocalePaymentBillCreateRoute,
   ApiLocalePaymentBillListRoute: ApiLocalePaymentBillListRoute,
   ApiLocalePaymentCreditNoteCreateRoute: ApiLocalePaymentCreditNoteCreateRoute,
+  ApiLocalePaymentDataSourcesPaymentsCheckoutsRoute:
+    ApiLocalePaymentDataSourcesPaymentsCheckoutsRoute,
   ApiLocalePaymentDataSourcesPaymentsCountRoute:
     ApiLocalePaymentDataSourcesPaymentsCountRoute,
   ApiLocalePaymentDataSourcesPaymentsDisputesCountRoute:
@@ -16274,6 +16361,8 @@ const ApiLocalePaymentRouteChildren: ApiLocalePaymentRouteChildren = {
     ApiLocalePaymentDataSourcesPaymentsInvoicesPaidRoute,
   ApiLocalePaymentDataSourcesPaymentsMethodsAddedRoute:
     ApiLocalePaymentDataSourcesPaymentsMethodsAddedRoute,
+  ApiLocalePaymentDataSourcesPaymentsNewCustomersRoute:
+    ApiLocalePaymentDataSourcesPaymentsNewCustomersRoute,
   ApiLocalePaymentDataSourcesPaymentsRefundCountRoute:
     ApiLocalePaymentDataSourcesPaymentsRefundCountRoute,
   ApiLocalePaymentDataSourcesPaymentsRefundVolumeRoute:
@@ -16392,6 +16481,7 @@ interface ApiLocaleSubscriptionRouteChildren {
   ApiLocaleSubscriptionDataSourcesSubscriptionsActiveRoute: typeof ApiLocaleSubscriptionDataSourcesSubscriptionsActiveRoute
   ApiLocaleSubscriptionDataSourcesSubscriptionsCancelledRoute: typeof ApiLocaleSubscriptionDataSourcesSubscriptionsCancelledRoute
   ApiLocaleSubscriptionDataSourcesSubscriptionsChurnedRoute: typeof ApiLocaleSubscriptionDataSourcesSubscriptionsChurnedRoute
+  ApiLocaleSubscriptionDataSourcesSubscriptionsMrrRoute: typeof ApiLocaleSubscriptionDataSourcesSubscriptionsMrrRoute
   ApiLocaleSubscriptionDataSourcesSubscriptionsNewRoute: typeof ApiLocaleSubscriptionDataSourcesSubscriptionsNewRoute
   ApiLocaleSubscriptionDataSourcesSubscriptionsPaymentFailedRoute: typeof ApiLocaleSubscriptionDataSourcesSubscriptionsPaymentFailedRoute
   ApiLocaleSubscriptionDataSourcesSubscriptionsTrialingRoute: typeof ApiLocaleSubscriptionDataSourcesSubscriptionsTrialingRoute
@@ -16420,6 +16510,8 @@ const ApiLocaleSubscriptionRouteChildren: ApiLocaleSubscriptionRouteChildren = {
     ApiLocaleSubscriptionDataSourcesSubscriptionsCancelledRoute,
   ApiLocaleSubscriptionDataSourcesSubscriptionsChurnedRoute:
     ApiLocaleSubscriptionDataSourcesSubscriptionsChurnedRoute,
+  ApiLocaleSubscriptionDataSourcesSubscriptionsMrrRoute:
+    ApiLocaleSubscriptionDataSourcesSubscriptionsMrrRoute,
   ApiLocaleSubscriptionDataSourcesSubscriptionsNewRoute:
     ApiLocaleSubscriptionDataSourcesSubscriptionsNewRoute,
   ApiLocaleSubscriptionDataSourcesSubscriptionsPaymentFailedRoute:
@@ -17429,6 +17521,8 @@ const rootRouteChildren: RootRouteChildren = {
     ApiLocaleLeadsDataSourcesLeadsEngagementsRoute,
   ApiLocaleLeadsDataSourcesLeadsFormSubmitsRoute:
     ApiLocaleLeadsDataSourcesLeadsFormSubmitsRoute,
+  ApiLocaleLeadsDataSourcesLeadsFunnelStageRoute:
+    ApiLocaleLeadsDataSourcesLeadsFunnelStageRoute,
   ApiLocaleLeadsDataSourcesLeadsInContactRoute:
     ApiLocaleLeadsDataSourcesLeadsInContactRoute,
   ApiLocaleLeadsDataSourcesLeadsNewsletterSubscribersRoute:
@@ -17782,12 +17876,8 @@ const rootRouteChildren: RootRouteChildren = {
     ApiLocaleVibeAgentCortexEmbeddingsBackfillRoute,
   ApiLocaleVibeAgentRefusalIndexModelModelIdRoute:
     ApiLocaleVibeAgentRefusalIndexModelModelIdRoute,
-  ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsErrorsRoute:
-    ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsErrorsRoute,
-  ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsTotalRoute:
-    ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsTotalRoute,
-  ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsWarningsRoute:
-    ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsWarningsRoute,
+  ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsSeriesRoute:
+    ApiLocaleVibeLoggerErrorMonitorDataSourcesErrorLogsSeriesRoute,
   ApiLocaleVibePlatformsAiSkillsCharacterSkillRoute:
     ApiLocaleVibePlatformsAiSkillsCharacterSkillRoute,
   ApiLocaleVibeTasksWatchdogDataSourcesTaskHealthRoute:

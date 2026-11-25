@@ -5,7 +5,8 @@ export const translations: typeof enTranslations = {
   post: {
     title: "Exécutions cron échouées",
     titleShort: "Cron échouées",
-    description: "Exécutions cron échouées par intervalle de résolution",
+    description:
+      "Exécutions cron échouées, en erreur ou expirées par intervalle de résolution",
     fields: {
       resolution: { label: "Résolution", description: "Intervalle de calcul" },
       range: { label: "Plage", description: "Plage temporelle à interroger" },

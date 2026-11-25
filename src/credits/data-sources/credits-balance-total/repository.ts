@@ -1,12 +1,19 @@
 /**
  * Credits Balance Total - Repository
  * Server-only. DB access.
- * Snapshot: sum of all user wallet balances per resolution bucket.
+ *
+ * Outstanding credits in signed-in user wallets at the END of each bucket,
+ * rebuilt from the ledger: every balance change is a credit_transactions row,
+ * so balance(t) = sum(amount) of the wallet's rows up to t (prod: ledger sum
+ * matches credit_wallets.balance to within a few credits).
+ * Lead (guest) wallets are left out: their monthly free allowance lapses
+ * without a ledger row, so a ledger sum would only grow.
+ * Unit: credits (paid, gifted and free credits still unspent).
  */
 
 import "server-only";
 
-import { and, isNotNull, lt, sum } from "drizzle-orm";
+import { and, eq, gte, isNotNull, lt, lte, sql, sum } from "drizzle-orm";
 import {
   type ResponseType,
   success,
@@ -17,10 +24,10 @@ import type {
   Resolution,
   TimeRange,
 } from "next-vibe/dataflow/shared/fields";
-import { RESOLUTION_MS } from "next-vibe/dataflow/shared/fields";
+import { resolutionBucketExpr } from "next-vibe/dataflow/shared/query-utils";
 import { fillGaps } from "next-vibe/dataflow/shared/range";
 
-import { creditWallets } from "../../db";
+import { creditTransactions, creditWallets } from "../../db";
 
 export class QueryCreditsBalanceTotalRepository {
   static async queryCreditsBalanceTotal(data: {
@@ -34,29 +41,62 @@ export class QueryCreditsBalanceTotalRepository {
     }>
   > {
     const { resolution, range, lookback } = data;
-    const stepMs = RESOLUTION_MS[resolution];
-    const points: DataPoint[] = [];
+    const bucket = resolutionBucketExpr(
+      resolution,
+      creditTransactions.createdAt,
+    );
+    const firstBucket =
+      fillGaps([], range, resolution)[0]?.timestamp ?? range.from;
 
-    let ts = range.from.getTime();
-    while (ts <= range.to.getTime()) {
-      const bucket = new Date(ts);
-      const next = new Date(ts + stepMs);
-
-      const [row] = await db
-        .select({ total: sum(creditWallets.balance) })
-        .from(creditWallets)
+    const [baselineRows, deltaRows] = await Promise.all([
+      db
+        .select({ total: sum(creditTransactions.amount) })
+        .from(creditTransactions)
+        .innerJoin(
+          creditWallets,
+          eq(creditWallets.id, creditTransactions.walletId),
+        )
         .where(
           and(
-            lt(creditWallets.createdAt, next),
             isNotNull(creditWallets.userId),
+            lt(creditTransactions.createdAt, firstBucket),
           ),
-        );
+        ),
+      db
+        .select({
+          bucket: bucket.as("bucket"),
+          total: sum(creditTransactions.amount),
+        })
+        .from(creditTransactions)
+        .innerJoin(
+          creditWallets,
+          eq(creditWallets.id, creditTransactions.walletId),
+        )
+        .where(
+          and(
+            isNotNull(creditWallets.userId),
+            gte(creditTransactions.createdAt, firstBucket),
+            lte(creditTransactions.createdAt, range.to),
+          ),
+        )
+        .groupBy(sql`1`)
+        .orderBy(sql`1`),
+    ]);
 
-      points.push({ timestamp: bucket, value: Number(row?.total ?? 0) });
-      ts += stepMs;
-    }
+    const deltas = fillGaps(
+      deltaRows.map((r): DataPoint => ({
+        timestamp: new Date(r.bucket),
+        value: Number(r.total ?? 0),
+      })),
+      range,
+      resolution,
+    );
+    let running = Number(baselineRows[0]?.total ?? 0);
+    const result = deltas.map((p): DataPoint => {
+      running += p.value;
+      return { timestamp: p.timestamp, value: Math.round(running) };
+    });
 
-    const result = fillGaps(points, range, resolution);
     return success({
       result,
       meta: {

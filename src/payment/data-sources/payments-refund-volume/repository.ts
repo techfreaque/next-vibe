@@ -1,12 +1,13 @@
 /**
  * Payments Refund Volume - Repository
  * Server-only. DB access.
- * Sum of refund amounts per resolution bucket.
+ * Succeeded refunds per bucket in approx. USD (static FX, money-sql.ts),
+ * admin accounts excluded.
  */
 
 import "server-only";
 
-import { and, gte, lte, sql, sum } from "drizzle-orm";
+import { sql } from "drizzle-orm";
 import {
   type ResponseType,
   success,
@@ -19,8 +20,10 @@ import type {
 } from "next-vibe/dataflow/shared/fields";
 import { resolutionBucketExpr } from "next-vibe/dataflow/shared/query-utils";
 import { fillGaps } from "next-vibe/dataflow/shared/range";
+import type { QueryResultRow } from "pg";
 
-import { paymentRefunds } from "../../db";
+import { notInternalUserSql, usdSql, utcTs } from "../../analytics/money-sql";
+import { RefundStatus } from "../../enum";
 
 export class QueryPaymentsRefundVolumeRepository {
   static async queryPaymentsRefundVolume(data: {
@@ -34,32 +37,26 @@ export class QueryPaymentsRefundVolumeRepository {
     }>
   > {
     const { resolution, range, lookback } = data;
-    const rows = await db
-      .select({
-        bucket: resolutionBucketExpr(resolution, paymentRefunds.createdAt).as(
-          "bucket",
-        ),
-        total: sum(paymentRefunds.amount),
-      })
-      .from(paymentRefunds)
-      .where(
-        and(
-          gte(paymentRefunds.createdAt, range.from),
-          lte(paymentRefunds.createdAt, range.to),
-        ),
-      )
-      .groupBy(sql`1`)
-      .orderBy(sql`1`);
+    const result = await db.execute<
+      QueryResultRow & { bucket: string; value: string | number | null }
+    >(sql`
+      SELECT ${resolutionBucketExpr(resolution, sql`r.created_at`)} AS bucket,
+        sum(${usdSql("r.amount", "r.currency")}) AS value
+      FROM payment_refunds r
+      WHERE r.status = ${RefundStatus.SUCCEEDED}
+        AND ${notInternalUserSql("r.user_id")}
+        AND r.created_at >= ${utcTs(range.from)}
+        AND r.created_at <= ${utcTs(range.to)}
+      GROUP BY 1 ORDER BY 1`);
 
-    const raw = rows.map((r): DataPoint => ({
+    const raw = result.rows.map((r): DataPoint => ({
       timestamp: new Date(r.bucket),
-      value: Number(r.total ?? 0),
+      value: Math.round(Number(r.value ?? 0) * 100) / 100,
     }));
-    const result = fillGaps(raw, range, resolution);
     return success({
-      result,
+      result: fillGaps(raw, range, resolution),
       meta: {
-        actualResolution: resolution ?? "enums.resolution.1d",
+        actualResolution: resolution,
         lookbackUsed: lookback ?? 0,
       },
     });

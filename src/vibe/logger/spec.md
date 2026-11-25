@@ -75,4 +75,4 @@ last-seen `createdAt`. Message/stack are truncated on write (`MAX_MESSAGE_LENGTH
 - **`cleanup/`** — daily cron task (`task.ts`, registered with the
   [task system](../unified-interface/tasks/spec.md)). Two-stage prune: delete rows older than
   `RETENTION_DAYS` (180), then if the table still exceeds `MAX_ROWS` (100K), delete the oldest excess.
-- **`data-sources/`** — `error-logs-total` / `error-logs-errors` / `error-logs-warnings` counts.
+- **`data-sources/`** provides `error-logs-series`. It reports occurrences and classes seen from `error_log_daily`, new classes, and the open backlog. Each series supports a level filter.

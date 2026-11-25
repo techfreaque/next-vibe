@@ -3,10 +3,10 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
-    titleShort: "Łączne saldo",
-    title: "Łączne saldo kredytów",
+    titleShort: "Niewydane kredyty",
+    title: "Niewydane kredyty użytkowników",
     description:
-      "Migawka całkowitych sald portfeli użytkowników na przedział rozdzielczości",
+      "Niewydane kredyty w portfelach zalogowanych użytkowników na koniec każdego przedziału (płatne, podarowane i darmowe), odtworzone z księgi kredytów. W kredytach. Bez portfeli gości.",
     fields: {
       resolution: {
         label: "Rozdzielczość",
@@ -17,7 +17,10 @@ export const translations: typeof enTranslations = {
         label: "Cofnięcie",
         description: "Dodatkowe słupki przed początkiem zakresu",
       },
-      result: { label: "Łączne saldo", description: "Wyjściowa seria czasowa" },
+      result: {
+        label: "Niewydane kredyty",
+        description: "Wyjściowa seria czasowa",
+      },
       meta: { label: "Meta", description: "Metadane wykonania węzła" },
     },
     success: {

@@ -1,12 +1,13 @@
 /**
  * Credits Wallets Total - Repository
  * Server-only. DB access.
- * Snapshot: count of total credit wallets per resolution bucket.
+ * Credit wallets in existence at the end of each bucket (users + guest leads):
+ * wallets created before the first bucket plus a running count per bucket.
  */
 
 import "server-only";
 
-import { count, lt } from "drizzle-orm";
+import { and, count, gte, lt, lte, sql } from "drizzle-orm";
 import {
   type ResponseType,
   success,
@@ -17,7 +18,7 @@ import type {
   Resolution,
   TimeRange,
 } from "next-vibe/dataflow/shared/fields";
-import { RESOLUTION_MS } from "next-vibe/dataflow/shared/fields";
+import { resolutionBucketExpr } from "next-vibe/dataflow/shared/query-utils";
 import { fillGaps } from "next-vibe/dataflow/shared/range";
 
 import { creditWallets } from "../../db";
@@ -34,24 +35,45 @@ export class QueryCreditsWalletsTotalRepository {
     }>
   > {
     const { resolution, range, lookback } = data;
-    const stepMs = RESOLUTION_MS[resolution];
-    const points: DataPoint[] = [];
+    const firstBucket =
+      fillGaps([], range, resolution)[0]?.timestamp ?? range.from;
 
-    let ts = range.from.getTime();
-    while (ts <= range.to.getTime()) {
-      const bucket = new Date(ts);
-      const next = new Date(ts + stepMs);
-
-      const [row] = await db
+    const [baselineRows, createdRows] = await Promise.all([
+      db
         .select({ total: count() })
         .from(creditWallets)
-        .where(lt(creditWallets.createdAt, next));
+        .where(lt(creditWallets.createdAt, firstBucket)),
+      db
+        .select({
+          bucket: resolutionBucketExpr(resolution, creditWallets.createdAt).as(
+            "bucket",
+          ),
+          total: count(),
+        })
+        .from(creditWallets)
+        .where(
+          and(
+            gte(creditWallets.createdAt, firstBucket),
+            lte(creditWallets.createdAt, range.to),
+          ),
+        )
+        .groupBy(sql`1`)
+        .orderBy(sql`1`),
+    ]);
 
-      points.push({ timestamp: bucket, value: Number(row?.total ?? 0) });
-      ts += stepMs;
-    }
+    let running = Number(baselineRows[0]?.total ?? 0);
+    const result = fillGaps(
+      createdRows.map((r): DataPoint => ({
+        timestamp: new Date(r.bucket),
+        value: Number(r.total ?? 0),
+      })),
+      range,
+      resolution,
+    ).map((p): DataPoint => {
+      running += p.value;
+      return { timestamp: p.timestamp, value: running };
+    });
 
-    const result = fillGaps(points, range, resolution);
     return success({
       result,
       meta: {

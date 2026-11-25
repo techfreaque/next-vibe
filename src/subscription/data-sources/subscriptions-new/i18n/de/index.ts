@@ -1,27 +1,39 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
-  tags: { vibeSense: "vibe-sense" },
+  tags: {
+    vibeSense: "vibe-sense",
+  },
   post: {
-    title: "Neue Abonnements",
+    title: "Neue Abos",
     titleShort: "Neue Abos",
-    description: "Neu erstellte Abonnements pro Auflösungs-Bucket",
+    description:
+      "Pro Zeitraum gestartete Abos. Ohne unvollständige Checkouts und Admin-Konten.",
     fields: {
-      resolution: { label: "Auflösung", description: "Berechnungszeitrahmen" },
-      range: { label: "Bereich", description: "Abzufragender Zeitraum" },
+      resolution: {
+        label: "Auflösung",
+        description: "Berechnungszeitrahmen",
+      },
+      range: {
+        label: "Bereich",
+        description: "Abzufragender Zeitraum",
+      },
       lookback: {
         label: "Rückblick",
         description: "Extra Balken vor Bereichsstart",
       },
       result: {
-        label: "Neue Abonnements",
+        label: "Neue Abos",
         description: "Ausgabe-Zeitreihe",
       },
-      meta: { label: "Meta", description: "Knotenausführungsmetadaten" },
+      meta: {
+        label: "Meta",
+        description: "Knotenausführungsmetadaten",
+      },
     },
     success: {
-      title: "Neue Abonnements berechnet",
-      description: "Neue Abonnements-Reihe zurückgegeben",
+      title: "Neue Abos berechnet",
+      description: "Reihe neuer Abos zurückgegeben",
     },
     errors: {
       unauthorized: {
@@ -32,7 +44,10 @@ export const translations: typeof enTranslations = {
         title: "Verboten",
         description: "Administratorzugang erforderlich",
       },
-      server: { title: "Serverfehler", description: "Abfrage fehlgeschlagen" },
+      server: {
+        title: "Serverfehler",
+        description: "Abfrage fehlgeschlagen",
+      },
       unknown: {
         title: "Unbekannter Fehler",
         description: "Ein unerwarteter Fehler ist aufgetreten",
@@ -41,8 +56,14 @@ export const translations: typeof enTranslations = {
         title: "Validierungsfehler",
         description: "Ungültige Anfrageparameter",
       },
-      notFound: { title: "Nicht gefunden", description: "Nicht gefunden" },
-      conflict: { title: "Konflikt", description: "Konflikt" },
+      notFound: {
+        title: "Nicht gefunden",
+        description: "Nicht gefunden",
+      },
+      conflict: {
+        title: "Konflikt",
+        description: "Konflikt",
+      },
       network: {
         title: "Netzwerkfehler",
         description: "Netzwerkanfrage fehlgeschlagen",

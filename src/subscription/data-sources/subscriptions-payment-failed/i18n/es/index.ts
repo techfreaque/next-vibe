@@ -1,13 +1,19 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
-  tags: { vibeSense: "vibe-sense" },
+  tags: {
+    vibeSense: "vibe-sense",
+  },
   post: {
-    title: "Suscripciones Pago fallado",
-    titleShort: "Pago fallado",
-    description: "Suscripciones con pagos fallidos por cubo de resolución",
+    title: "Renovaciones fallidas",
+    titleShort: "Renov. fallidas",
+    description:
+      "Suscripciones con cobro de renovación fallido por periodo (una por suscripción). Sin checkouts incompletos ni cuentas admin.",
     fields: {
-      resolution: { label: "Resolución", description: "Plazo de cálculo" },
+      resolution: {
+        label: "Resolución",
+        description: "Plazo de cálculo",
+      },
       range: {
         label: "Rango",
         description: "Rango de tiempo para la consulta",
@@ -17,14 +23,17 @@ export const translations: typeof enTranslations = {
         description: "Barras extra antes de empezar el rango",
       },
       result: {
-        label: "Suscripciones Pago fallado",
+        label: "Renovaciones fallidas",
         description: "Serie de tiempo de producción",
       },
-      meta: { label: "Meta", description: "Metadatos de ejecución de nodos" },
+      meta: {
+        label: "Meta",
+        description: "Metadatos de ejecución de nodos",
+      },
     },
     success: {
-      title: "Suscripciones Pago defectuoso calculado",
-      description: "Suscripciones Pago Failed series devueltos",
+      title: "Renovaciones fallidas calculadas",
+      description: "Serie de renovaciones fallidas devuelta",
     },
     errors: {
       unauthorized: {
@@ -51,7 +60,10 @@ export const translations: typeof enTranslations = {
         title: "Cuenta o sesión no encontradas",
         description: "Cuenta o sesión no encontradas",
       },
-      conflict: { title: "Conflicto", description: "Conflicto" },
+      conflict: {
+        title: "Conflicto",
+        description: "Conflicto",
+      },
       network: {
         title: "Error de red",
         description: "Solicitud de red falló",

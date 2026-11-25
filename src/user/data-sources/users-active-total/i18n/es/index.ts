@@ -6,7 +6,7 @@ export const translations: typeof enTranslations = {
     title: "Usuarios Active Total",
     titleShort: "Usuarios activos",
     description:
-      "Cuenta de usuarios activos, no-baneados, verificados por correo electrónico por cubo de resolución",
+      "Número de cuentas activas y no bloqueadas (acumulado) por intervalo",
     fields: {
       resolution: { label: "Resolución", description: "Plazo de cálculo" },
       range: {

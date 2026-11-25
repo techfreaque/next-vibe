@@ -13,6 +13,11 @@ export const translations: typeof enTranslations = {
         label: "Rückblick",
         description: "Extra Balken vor Bereichsstart",
       },
+      emailConfirmedOnly: {
+        label: "Nur bestätigte E-Mail",
+        description:
+          "Zählt nur Registrierungen, deren E-Mail inzwischen bestätigt ist",
+      },
       result: {
         label: "Registrierte Nutzer",
         description: "Ausgabe-Zeitreihe",

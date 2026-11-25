@@ -7,7 +7,6 @@
 
 /* eslint-disable i18next/no-literal-string */
 
-import { GraphResolution } from "next-vibe/dataflow/enum";
 import type {
   GraphConfig,
   GraphSeedEntry,
@@ -15,15 +14,14 @@ import type {
 import { COMPLETE_TASK_ALIAS } from "next-vibe/execute-tool/complete/constants";
 
 import { EVALUATOR_THRESHOLD_ALIAS } from "../analytics/evaluators/threshold/constants";
-import { EMA_ALIAS } from "../analytics/indicators/ema/constants";
-import { WINDOW_AVG_ALIAS } from "../analytics/indicators/window-avg/constants";
+import { WINDOW_SUM_ALIAS } from "../analytics/indicators/window-sum/constants";
 import { TRANSFORMER_RATIO_ALIAS } from "../analytics/transformers/ratio/constants";
 import { SUBSCRIPTIONS_ACTIVE_ALIAS } from "./data-sources/subscriptions-active/constants";
 import { SUBSCRIPTIONS_CANCELLED_ALIAS } from "./data-sources/subscriptions-cancelled/constants";
 import { SUBSCRIPTIONS_CHURNED_ALIAS } from "./data-sources/subscriptions-churned/constants";
+import { SUBSCRIPTIONS_MRR_ALIAS } from "./data-sources/subscriptions-mrr/constants";
 import { SUBSCRIPTIONS_NEW_ALIAS } from "./data-sources/subscriptions-new/constants";
 import { SUBSCRIPTIONS_PAYMENT_FAILED_ALIAS } from "./data-sources/subscriptions-payment-failed/constants";
-import { SUBSCRIPTIONS_TRIALING_ALIAS } from "./data-sources/subscriptions-trialing/constants";
 
 // ─── Color palette ──────────────────────────────────────────────────────────
 
@@ -31,65 +29,62 @@ const BLUE = "#2563eb";
 const GREEN = "#16a34a";
 const RED = "#ef4444";
 const ORANGE = "#ea580c";
-const PURPLE = "#9333ea";
+
+/** A few subscription events per month: trends and alerts use 30 days. */
+const MONTH = 30;
 
 // ─── Subscription Lifecycle ─────────────────────────────────────────────────
+// Counts only, admin accounts and incomplete checkouts excluded. A
+// cancellation is the request; churn is the day access actually ended.
 
 const subscriptionLifecycleConfig: GraphConfig = {
   nodes: {
-    subs_new: {
+    // ── Pane 0: daily events ──
+    new_subscriptions: {
       endpointPath: SUBSCRIPTIONS_NEW_ALIAS,
       pane: 0,
       color: GREEN,
     },
-    subs_cancelled: {
+    cancellations: {
       endpointPath: SUBSCRIPTIONS_CANCELLED_ALIAS,
-      pane: 0,
-      color: RED,
-    },
-    subs_churned: {
-      endpointPath: SUBSCRIPTIONS_CHURNED_ALIAS,
       pane: 0,
       color: ORANGE,
     },
-    subs_trialing: {
-      endpointPath: SUBSCRIPTIONS_TRIALING_ALIAS,
-      pane: 0,
-      color: PURPLE,
-    },
-
-    new_ema7: {
-      endpointPath: EMA_ALIAS,
-      params: { period: 7 },
-      pane: 0,
-      color: GREEN,
-    },
-    cancelled_ema7: {
-      endpointPath: EMA_ALIAS,
-      params: { period: 7 },
+    churned: {
+      endpointPath: SUBSCRIPTIONS_CHURNED_ALIAS,
       pane: 0,
       color: RED,
     },
 
-    churn_vs_new: {
-      endpointPath: TRANSFORMER_RATIO_ALIAS,
+    // ── Pane 1: rolling 30-day totals ──
+    new_subscriptions_30d: {
+      endpointPath: WINDOW_SUM_ALIAS,
+      params: { size: MONTH },
       pane: 1,
-      color: PURPLE,
+      color: GREEN,
+    },
+    cancellations_30d: {
+      endpointPath: WINDOW_SUM_ALIAS,
+      params: { size: MONTH },
+      pane: 1,
+      color: ORANGE,
+    },
+    churned_30d: {
+      endpointPath: WINDOW_SUM_ALIAS,
+      params: { size: MONTH },
+      pane: 1,
+      color: RED,
     },
 
+    churned_per_new_30d: {
+      endpointPath: TRANSFORMER_RATIO_ALIAS,
+      visible: false,
+    },
     eval_churn_exceeds_new: {
       endpointPath: EVALUATOR_THRESHOLD_ALIAS,
-      resolution: GraphResolution.ONE_WEEK,
       params: { op: ">", value: 1 },
       visible: false,
     },
-    eval_no_new_subs: {
-      endpointPath: EVALUATOR_THRESHOLD_ALIAS,
-      resolution: GraphResolution.ONE_DAY,
-      params: { op: "<", value: 1 },
-      visible: false,
-    },
-
     action_notify_churn_crisis: {
       endpointPath: COMPLETE_TASK_ALIAS,
       persist: "never",
@@ -98,87 +93,81 @@ const subscriptionLifecycleConfig: GraphConfig = {
         taskId: "vibe-sense-alert",
         status: "status.completed",
         summary:
-          "ALERT: Churn-to-new subscription ratio exceeded 1.0 over 7 days. More subscribers are leaving than joining. Investigate cancellation reasons and consider retention campaigns.",
+          "ALERT: More subscriptions ended than started over the last 30 days. The subscriber base is shrinking. Check cancellation reasons and failed renewals.",
       },
     },
   },
 
   edges: [
-    { from: "subs_new", to: "new_ema7" },
-    { from: "subs_cancelled", to: "cancelled_ema7" },
-    { from: "subs_churned", to: "churn_vs_new", toHandle: "a" },
-    { from: "subs_new", to: "churn_vs_new", toHandle: "b" },
-    { from: "churn_vs_new", to: "eval_churn_exceeds_new" },
-    { from: "new_ema7", to: "eval_no_new_subs" },
+    { from: "new_subscriptions", to: "new_subscriptions_30d" },
+    { from: "cancellations", to: "cancellations_30d" },
+    { from: "churned", to: "churned_30d" },
+    { from: "churned_30d", to: "churned_per_new_30d", toHandle: "a" },
+    { from: "new_subscriptions_30d", to: "churned_per_new_30d", toHandle: "b" },
+    { from: "churned_per_new_30d", to: "eval_churn_exceeds_new" },
     { from: "eval_churn_exceeds_new", to: "action_notify_churn_crisis" },
   ],
 
   positions: {
-    subs_new: { x: 0, y: 0 },
-    subs_cancelled: { x: 0, y: 120 },
-    subs_churned: { x: 0, y: 240 },
-    subs_trialing: { x: 0, y: 360 },
-    new_ema7: { x: 300, y: 0 },
-    cancelled_ema7: { x: 300, y: 120 },
-    churn_vs_new: { x: 300, y: 240 },
-    eval_churn_exceeds_new: { x: 600, y: 240 },
-    eval_no_new_subs: { x: 600, y: 0 },
-    action_notify_churn_crisis: { x: 900, y: 240 },
+    new_subscriptions: { x: 0, y: 0 },
+    cancellations: { x: 0, y: 120 },
+    churned: { x: 0, y: 240 },
+    new_subscriptions_30d: { x: 300, y: 0 },
+    cancellations_30d: { x: 300, y: 120 },
+    churned_30d: { x: 300, y: 240 },
+    churned_per_new_30d: { x: 560, y: 120 },
+    eval_churn_exceeds_new: { x: 800, y: 120 },
+    action_notify_churn_crisis: { x: 1060, y: 120 },
   },
 
   trigger: { type: "cron", schedule: "0 */6 * * *" },
 };
 
 // ─── Subscription Health ────────────────────────────────────────────────────
+// Snapshot of the paying base at the end of each day plus failed renewals.
 
 const subscriptionHealthConfig: GraphConfig = {
   nodes: {
-    subs_active: {
+    // ── Pane 0: active subscriptions (count) ──
+    active_subscriptions: {
       endpointPath: SUBSCRIPTIONS_ACTIVE_ALIAS,
       pane: 0,
       color: BLUE,
     },
-    subs_trialing: {
-      endpointPath: SUBSCRIPTIONS_TRIALING_ALIAS,
-      pane: 0,
-      color: PURPLE,
-    },
-    subs_payment_failed: {
-      endpointPath: SUBSCRIPTIONS_PAYMENT_FAILED_ALIAS,
-      pane: 0,
-      color: RED,
-    },
-    subs_new: {
-      endpointPath: SUBSCRIPTIONS_NEW_ALIAS,
-      pane: 0,
+
+    // ── Pane 1: MRR (USD) ──
+    mrr_usd: {
+      endpointPath: SUBSCRIPTIONS_MRR_ALIAS,
+      pane: 1,
       color: GREEN,
     },
 
-    trial_to_active: {
-      endpointPath: TRANSFORMER_RATIO_ALIAS,
-      pane: 1,
-      color: PURPLE,
-    },
-    payment_fail_rate: {
-      endpointPath: TRANSFORMER_RATIO_ALIAS,
-      pane: 1,
+    // ── Pane 2: failed renewal charges (count) ──
+    failed_renewals: {
+      endpointPath: SUBSCRIPTIONS_PAYMENT_FAILED_ALIAS,
+      pane: 2,
       color: RED,
     },
-    payment_fail_w7: {
-      endpointPath: WINDOW_AVG_ALIAS,
-      params: { size: 7 },
-      pane: 1,
+    failed_renewals_30d: {
+      endpointPath: WINDOW_SUM_ALIAS,
+      params: { size: MONTH },
+      pane: 2,
+      color: ORANGE,
+    },
+
+    // ── Pane 3: failed renewals in 30 days per active subscription (0..1) ──
+    failed_renewal_rate_30d: {
+      endpointPath: TRANSFORMER_RATIO_ALIAS,
+      pane: 3,
       color: RED,
     },
 
-    eval_high_payment_failure: {
+    eval_high_renewal_failure: {
       endpointPath: EVALUATOR_THRESHOLD_ALIAS,
-      resolution: GraphResolution.ONE_WEEK,
       params: { op: ">", value: 0.1 },
       visible: false,
     },
-
-    action_notify_payment_failures: {
+    action_notify_renewal_failures: {
       endpointPath: COMPLETE_TASK_ALIAS,
       persist: "never",
       visible: false,
@@ -186,31 +175,35 @@ const subscriptionHealthConfig: GraphConfig = {
         taskId: "vibe-sense-alert",
         status: "status.completed",
         summary:
-          "ALERT: Subscription payment failure rate exceeded 10% (7-day avg). Possible billing system issue, expired cards, or payment provider problems. Review failed payment logs.",
+          "ALERT: Failed renewal charges in the last 30 days exceed 10% of active subscriptions. Check Stripe dunning, expired cards and the renewal webhook.",
       },
     },
   },
 
   edges: [
-    { from: "subs_trialing", to: "trial_to_active", toHandle: "a" },
-    { from: "subs_active", to: "trial_to_active", toHandle: "b" },
-    { from: "subs_payment_failed", to: "payment_fail_rate", toHandle: "a" },
-    { from: "subs_active", to: "payment_fail_rate", toHandle: "b" },
-    { from: "payment_fail_rate", to: "payment_fail_w7" },
-    { from: "payment_fail_w7", to: "eval_high_payment_failure" },
-    { from: "eval_high_payment_failure", to: "action_notify_payment_failures" },
+    { from: "failed_renewals", to: "failed_renewals_30d" },
+    {
+      from: "failed_renewals_30d",
+      to: "failed_renewal_rate_30d",
+      toHandle: "a",
+    },
+    {
+      from: "active_subscriptions",
+      to: "failed_renewal_rate_30d",
+      toHandle: "b",
+    },
+    { from: "failed_renewal_rate_30d", to: "eval_high_renewal_failure" },
+    { from: "eval_high_renewal_failure", to: "action_notify_renewal_failures" },
   ],
 
   positions: {
-    subs_active: { x: 0, y: 0 },
-    subs_trialing: { x: 0, y: 120 },
-    subs_payment_failed: { x: 0, y: 240 },
-    subs_new: { x: 0, y: 360 },
-    trial_to_active: { x: 300, y: 60 },
-    payment_fail_rate: { x: 300, y: 240 },
-    payment_fail_w7: { x: 560, y: 240 },
-    eval_high_payment_failure: { x: 800, y: 240 },
-    action_notify_payment_failures: { x: 1060, y: 240 },
+    active_subscriptions: { x: 0, y: 0 },
+    mrr_usd: { x: 0, y: 120 },
+    failed_renewals: { x: 0, y: 240 },
+    failed_renewals_30d: { x: 300, y: 240 },
+    failed_renewal_rate_30d: { x: 560, y: 120 },
+    eval_high_renewal_failure: { x: 800, y: 120 },
+    action_notify_renewal_failures: { x: 1060, y: 120 },
   },
 
   trigger: { type: "cron", schedule: "0 0 * * *" },
@@ -223,14 +216,14 @@ export const graphSeeds: GraphSeedEntry[] = [
     slug: "subscription-lifecycle",
     name: "Subscription Lifecycle",
     description:
-      "Tracks new subscriptions vs cancellations vs churn. 7-day EMA smoothing with churn ratio. Alerts when churn exceeds new signups.",
+      "Subscriptions started, cancellations requested and subscriptions that actually ended, per day and as rolling 30-day totals. Admin accounts and incomplete checkouts excluded. Alerts when more subscriptions ended than started over 30 days.",
     config: subscriptionLifecycleConfig,
   },
   {
     slug: "subscription-health",
     name: "Subscription Health",
     description:
-      "Daily snapshot of active subscriptions, trial-to-active conversion, and payment failure rates. Alerts on payment system degradation.",
+      "Active subscriptions and MRR (approx. USD, yearly plans as 1/12) at the end of each day, plus failed renewal charges and their 30-day rate per active subscription. Admin accounts excluded. Alerts when failed renewals pass 10% of the base.",
     config: subscriptionHealthConfig,
   },
 ];

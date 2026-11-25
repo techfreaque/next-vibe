@@ -3,10 +3,10 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
-    title: "Wolumen zarobków z poleceń",
-    titleShort: "Wolumen zarobków",
+    title: "Prowizje z poleceń (USD)",
+    titleShort: "Prowizje",
     description:
-      "Suma zarobków z poleceń w centach na przedział rozdzielczości",
+      "Prowizje z poleceń w każdym przedziale w USD (1 kredyt = 0,01 $), wszystkie poziomy, bez anulowanych",
     fields: {
       resolution: {
         label: "Rozdzielczość",

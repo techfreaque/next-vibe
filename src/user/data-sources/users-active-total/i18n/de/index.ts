@@ -6,7 +6,7 @@ export const translations: typeof enTranslations = {
     title: "Aktive Nutzer insgesamt",
     titleShort: "Aktive Nutzer",
     description:
-      "Anzahl aktiver, nicht gesperrter und e-mail-verifizierter Nutzer pro Zeitfenster",
+      "Anzahl aktiver, nicht gesperrter Konten (kumuliert) pro Zeitfenster",
     fields: {
       resolution: { label: "Auflösung", description: "Berechnungszeitrahmen" },
       range: { label: "Bereich", description: "Abzufragender Zeitraum" },

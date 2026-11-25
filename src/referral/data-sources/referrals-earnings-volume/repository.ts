@@ -1,12 +1,12 @@
 /**
  * Referral Earnings Volume - Repository
  * Server-only. DB access.
- * Sum of referral earnings in cents per resolution bucket.
+ * Referral commissions per resolution bucket in USD (canceled excluded).
  */
 
 import "server-only";
 
-import { and, gte, lte, sql, sum } from "drizzle-orm";
+import { and, gte, lte, ne, sql, sum } from "drizzle-orm";
 import {
   type ResponseType,
   success,
@@ -21,6 +21,7 @@ import { resolutionBucketExpr } from "next-vibe/dataflow/shared/query-utils";
 import { fillGaps } from "next-vibe/dataflow/shared/range";
 
 import { referralEarnings } from "../../db";
+import { ReferralEarningStatus } from "../../enum";
 
 export class QueryReferralsEarningsVolumeRepository {
   static async queryReferralsEarningsVolume(data: {
@@ -46,6 +47,7 @@ export class QueryReferralsEarningsVolumeRepository {
         and(
           gte(referralEarnings.createdAt, range.from),
           lte(referralEarnings.createdAt, range.to),
+          ne(referralEarnings.status, ReferralEarningStatus.CANCELED),
         ),
       )
       .groupBy(sql`1`)
@@ -53,7 +55,8 @@ export class QueryReferralsEarningsVolumeRepository {
 
     const raw = rows.map((r): DataPoint => ({
       timestamp: new Date(r.bucket),
-      value: Number(r.total ?? 0),
+      // amount_cents is earned credits, 1 credit = 1 USD cent
+      value: Number(r.total ?? 0) / 100,
     }));
     const result = fillGaps(raw, range, resolution);
     return success({

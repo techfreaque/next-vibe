@@ -3,10 +3,10 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
-    titleShort: "Total",
-    title: "Saldo de Crédito Total",
+    titleShort: "Créditos pendientes",
+    title: "Créditos de usuarios sin gastar",
     description:
-      "Captura de los saldos totales de la cartera de usuarios por cubo de resolución",
+      "Créditos sin gastar en las carteras de usuarios registrados al final de cada intervalo (pagados, regalados y gratuitos), reconstruidos desde el registro de créditos. En créditos. Sin carteras de invitados.",
     fields: {
       resolution: { label: "Resolución", description: "Plazo de cálculo" },
       range: {
@@ -17,7 +17,10 @@ export const translations: typeof enTranslations = {
         label: "Mira atrás.",
         description: "Barras extra antes de empezar el rango",
       },
-      result: { label: "Total", description: "Serie de tiempo de producción" },
+      result: {
+        label: "Créditos sin gastar",
+        description: "Serie de tiempo de producción",
+      },
       meta: { label: "Meta", description: "Metadatos de ejecución de nodos" },
     },
     success: {

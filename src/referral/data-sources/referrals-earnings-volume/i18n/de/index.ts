@@ -3,10 +3,10 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
-    title: "Empfehlungsverdienste",
-    titleShort: "Verdienste",
+    title: "Empfehlungsprovisionen (USD)",
+    titleShort: "Provisionen",
     description:
-      "Summe der Empfehlungsverdienste in Cent pro Auflösungs-Bucket",
+      "Verdiente Empfehlungsprovisionen pro Zeitfenster in USD (1 Credit = 0,01 $), alle Stufen, stornierte ausgenommen",
     fields: {
       resolution: { label: "Auflösung", description: "Berechnungszeitrahmen" },
       range: { label: "Bereich", description: "Abzufragender Zeitraum" },

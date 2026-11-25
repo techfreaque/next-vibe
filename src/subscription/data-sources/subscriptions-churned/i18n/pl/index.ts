@@ -1,31 +1,39 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
-  tags: { vibeSense: "vibe-sense" },
+  tags: {
+    vibeSense: "vibe-sense",
+  },
   post: {
-    title: "Utracone subskrypcje",
-    titleShort: "Utracone",
+    title: "Zakończone subskrypcje",
+    titleShort: "Zakończone",
     description:
-      "Utracone subskrypcje (zakończone) na przedział rozdzielczości",
+      "Subskrypcje zakończone w okresie (dostęp wygasł). Bez niedokończonych checkoutów i kont adminów.",
     fields: {
       resolution: {
         label: "Rozdzielczość",
         description: "Ramy czasowe obliczeń",
       },
-      range: { label: "Zakres", description: "Zakres czasu do zapytania" },
+      range: {
+        label: "Zakres",
+        description: "Zakres czasu do zapytania",
+      },
       lookback: {
         label: "Cofnięcie",
         description: "Dodatkowe słupki przed początkiem zakresu",
       },
       result: {
-        label: "Utracone subskrypcje",
+        label: "Zakończone subskrypcje",
         description: "Wyjściowa seria czasowa",
       },
-      meta: { label: "Meta", description: "Metadane wykonania węzła" },
+      meta: {
+        label: "Meta",
+        description: "Metadane wykonania węzła",
+      },
     },
     success: {
-      title: "Utracone subskrypcje obliczone",
-      description: "Seria utraconych subskrypcji zwrócona",
+      title: "Obliczono zakończone subskrypcje",
+      description: "Zwrócono serię zakończonych subskrypcji",
     },
     errors: {
       unauthorized: {
@@ -48,8 +56,14 @@ export const translations: typeof enTranslations = {
         title: "Walidacja nie powiodła się",
         description: "Nieprawidłowe parametry żądania",
       },
-      notFound: { title: "Nie znaleziono", description: "Nie znaleziono" },
-      conflict: { title: "Konflikt", description: "Konflikt" },
+      notFound: {
+        title: "Nie znaleziono",
+        description: "Nie znaleziono",
+      },
+      conflict: {
+        title: "Konflikt",
+        description: "Konflikt",
+      },
       network: {
         title: "Błąd sieci",
         description: "Żądanie sieciowe nie powiodło się",

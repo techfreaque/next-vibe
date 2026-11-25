@@ -1,14 +1,33 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
-  tags: { vibeSense: "vibe-sense" },
+  tags: {
+    vibeSense: "vibe-sense",
+  },
+  enums: {
+    kind: {
+      all: "Tutto",
+      pack: "Pacchetti di crediti",
+      subscription: "Abbonamenti (nuovi + rinnovi)",
+      newSubscription: "Nuovi abbonamenti",
+      renewal: "Rinnovi",
+    },
+    provider: {
+      all: "Tutti i gestori",
+      stripe: "Stripe",
+      nowpayments: "NOWPayments",
+    },
+  },
   post: {
-    title: "Entrate di pagamento",
-    titleShort: "Entrate",
+    title: "Ricavi (USD)",
+    titleShort: "Ricavi",
     description:
-      "Somma degli importi di pagamento completati per benna di risoluzione",
+      "Denaro incassato per periodo, in USD circa (EUR e PLN a tassi fissi). Pagamenti riusciti e poi rimborsati, account admin esclusi. Filtra per prodotto e per gestore.",
     fields: {
-      resolution: { label: "Risoluzione", description: "Tempo di calcolo" },
+      resolution: {
+        label: "Risoluzione",
+        description: "Tempo di calcolo",
+      },
       range: {
         label: "Gamma di intervallo",
         description: "Intervallo di tempo per query",
@@ -17,12 +36,27 @@ export const translations: typeof enTranslations = {
         label: "Lookback",
         description: "Barre extra prima dell'inizio della gamma",
       },
-      result: { label: "Entrate", description: "Serie di tempo di uscita" },
-      meta: { label: "Meta", description: "metadati di esecuzione del nodo" },
+      result: {
+        label: "Ricavi (USD)",
+        description: "Serie di tempo di uscita",
+      },
+      meta: {
+        label: "Meta",
+        description: "metadati di esecuzione del nodo",
+      },
+      kind: {
+        label: "Pagato per",
+        description:
+          "Pacchetti di crediti, abbonamenti (nuovi + rinnovi) o uno dei due",
+      },
+      provider: {
+        label: "Gestore pagamenti",
+        description: "Stripe, NOWPayments o entrambi",
+      },
     },
     success: {
-      title: "Pagamenti Entrate calcolato",
-      description: "Pagamenti Vendite serie restituita",
+      title: "Ricavi calcolati",
+      description: "Serie dei ricavi restituita",
     },
     errors: {
       unauthorized: {
@@ -33,7 +67,10 @@ export const translations: typeof enTranslations = {
         title: "Accesso negato",
         description: "Accesso all'amministratore richiesto",
       },
-      server: { title: "Errore del server", description: "Query fallito" },
+      server: {
+        title: "Errore del server",
+        description: "Query fallito",
+      },
       unknown: {
         title: "Errore sconosciuto",
         description: "Si è verificato un errore imprevisto",
@@ -46,7 +83,10 @@ export const translations: typeof enTranslations = {
         title: "Account o sessione non trovati",
         description: "Account o sessione non trovati",
       },
-      conflict: { title: "Conflitto", description: "Conflitto" },
+      conflict: {
+        title: "Conflitto",
+        description: "Conflitto",
+      },
       network: {
         title: "Errore di rete",
         description: "La richiesta di rete è fallita",

@@ -5,7 +5,8 @@ export const translations: typeof enTranslations = {
   post: {
     title: "Aktywne wątki czatu łącznie",
     titleShort: "Aktywne wątki",
-    description: "Migawka aktywnych wątków czatu na przedział rozdzielczości",
+    description:
+      "Unikalne wątki czatu z co najmniej jedną wiadomością użytkownika w przedziale. Tylko czaty ludzi: bez wątków agentów w tle, kopii zdalnych i kont adminów; czaty incognito nigdy nie są zapisywane.",
     fields: {
       resolution: {
         label: "Rozdzielczość",

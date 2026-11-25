@@ -4,11 +4,19 @@ export const translations: typeof enTranslations = {
   tags: {
     vibeSense: "vibe-sense",
   },
+  enums: {
+    kind: {
+      paid: "Payés (packs + abonnements)",
+      packs: "Packs payés",
+      subscriptions: "Crédits d'abonnement",
+      gifted: "Offerts (admin)",
+    },
+  },
   post: {
-    titleShort: "Crédits achetés",
-    title: "Crédits achetés",
+    titleShort: "Crédits émis",
+    title: "Crédits émis (payés, offerts)",
     description:
-      "Somme des montants des transactions d'achat et d'abonnement par intervalle de résolution",
+      "Crédits ajoutés aux portefeuilles par période, en crédits (pas en argent) : packs payés et crédits d'abonnement issus de vrais paiements, ou crédits offerts par un admin (testeurs, créateurs, gestes commerciaux).",
     fields: {
       resolution: {
         label: "Résolution",
@@ -22,8 +30,13 @@ export const translations: typeof enTranslations = {
         label: "Historique",
         description: "Barres supplémentaires avant le début de la période",
       },
+      kind: {
+        label: "Type",
+        description:
+          "Crédits à compter : packs payés + abonnements, packs seuls, abonnements seuls, ou crédits offerts par un admin",
+      },
       result: {
-        label: "Crédits achetés",
+        label: "Crédits émis",
         description: "Série temporelle en sortie",
       },
       meta: {

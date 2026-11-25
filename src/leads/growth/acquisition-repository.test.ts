@@ -146,6 +146,41 @@ test("keeps measured referral visits, signup credit and paid activity separate",
   }
 });
 
+test("per-source split adds up to the unfiltered series", async () => {
+  const { AcquisitionRepository } = await import("./acquisition-repository");
+  for (const metric of [
+    AcquisitionMetric.VISITS,
+    AcquisitionMetric.SIGNUPS,
+    AcquisitionMetric.PAYERS,
+  ]) {
+    const total = await AcquisitionRepository.series({
+      range,
+      resolution: GraphResolution.ONE_DAY,
+      filters: {},
+      currency: "EUR",
+      metric,
+    });
+    const rows = await AcquisitionRepository.seriesBySource({
+      range,
+      resolution: GraphResolution.ONE_DAY,
+      currency: "EUR",
+      metric,
+    });
+    expect(rows.reduce((sum, row) => sum + Number(row.value), 0)).toBe(
+      total.reduce((sum, point) => sum + point.value, 0),
+    );
+  }
+  const signups = await AcquisitionRepository.seriesBySource({
+    range,
+    resolution: GraphResolution.ONE_DAY,
+    currency: "EUR",
+    metric: AcquisitionMetric.SIGNUPS,
+  });
+  expect(signups).toEqual([
+    expect.objectContaining({ sourceType: AcquisitionSource.CREATOR, value: 1 }),
+  ]);
+});
+
 test("cohort conversion counts each first visit and excludes signup-only referral credit", async () => {
   const { QueryReferralsConversionRateRepository } =
     await import("@/referral/data-sources/referrals-conversion-rate/repository");

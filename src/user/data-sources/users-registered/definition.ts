@@ -4,7 +4,12 @@
  */
 
 import { createEndpoint } from "next-vibe/core/definition/create-i18n";
-import { EndpointErrorTypes, Methods } from "next-vibe/core/definition/enums";
+import {
+  EndpointErrorTypes,
+  FieldDataType,
+  Methods,
+  WidgetType,
+} from "next-vibe/core/definition/enums";
 import {
   lookbackRequestField,
   nodeMetaResponseField,
@@ -15,6 +20,8 @@ import {
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
 import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
+import { requestField } from "next-vibe/unified-ui/_shared/utils-i18n";
+import { z } from "zod";
 
 import { USERS_REGISTERED_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
@@ -52,6 +59,13 @@ const { POST } = createEndpoint({
       lookback: lookbackRequestField(scopedTranslation, {
         label: "post.fields.lookback.label",
         description: "post.fields.lookback.description",
+      }),
+      emailConfirmedOnly: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "post.fields.emailConfirmedOnly.label",
+        description: "post.fields.emailConfirmedOnly.description",
+        schema: z.boolean().default(false),
       }),
       result: timeSeriesResponseField(scopedTranslation, {
         label: "post.fields.result.label",

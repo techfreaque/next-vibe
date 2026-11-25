@@ -16,8 +16,8 @@ import { COMPLETE_TASK_ALIAS } from "next-vibe/execute-tool/complete/constants";
 
 import { EVALUATOR_THRESHOLD_ALIAS } from "../analytics/evaluators/threshold/constants";
 import { EMA_ALIAS } from "../analytics/indicators/ema/constants";
-import { TRANSFORMER_RATIO_ALIAS } from "../analytics/transformers/ratio/constants";
 import { REFERRALS_CODES_CREATED_ALIAS } from "./data-sources/referrals-codes-created/constants";
+import { REFERRALS_CONVERSION_RATE_ALIAS } from "./data-sources/referrals-conversion-rate/constants";
 import { REFERRALS_EARNINGS_VOLUME_ALIAS } from "./data-sources/referrals-earnings-volume/constants";
 import { REFERRALS_LEAD_CLICKS_ALIAS } from "./data-sources/referrals-lead-clicks/constants";
 import { REFERRALS_PAYOUTS_ALIAS } from "./data-sources/referrals-payouts/constants";
@@ -36,12 +36,13 @@ const AMBER = "#ca8a04";
 
 const referralProgramHealthConfig: GraphConfig = {
   nodes: {
-    lead_clicks: {
+    // ── Pane 0: counts per day ──
+    referral_link_visits: {
       endpointPath: REFERRALS_LEAD_CLICKS_ALIAS,
       pane: 0,
       color: BLUE,
     },
-    signups: {
+    referral_signups: {
       endpointPath: REFERRALS_SIGNUPS_ALIAS,
       pane: 0,
       color: GREEN,
@@ -51,41 +52,32 @@ const referralProgramHealthConfig: GraphConfig = {
       pane: 0,
       color: CYAN,
     },
-    earnings: {
-      endpointPath: REFERRALS_EARNINGS_VOLUME_ALIAS,
-      pane: 0,
-      color: AMBER,
-    },
-    payouts: {
+    payout_requests: {
       endpointPath: REFERRALS_PAYOUTS_ALIAS,
       pane: 0,
       color: ORANGE,
     },
-
-    signups_ema7: {
+    referral_signups_ema7: {
       endpointPath: EMA_ALIAS,
       params: { period: 7 },
       pane: 0,
       color: GREEN,
     },
 
-    click_to_signup: {
-      endpointPath: TRANSFORMER_RATIO_ALIAS,
+    // ── Pane 1: % of first referral visits (by visit day) that signed up ──
+    visit_to_signup_pct: {
+      endpointPath: REFERRALS_CONVERSION_RATE_ALIAS,
       pane: 1,
       color: PURPLE,
     },
-    payout_to_earnings: {
-      endpointPath: TRANSFORMER_RATIO_ALIAS,
-      pane: 1,
-      color: ORANGE,
+
+    // ── Pane 2: commissions earned, USD ──
+    commissions_usd: {
+      endpointPath: REFERRALS_EARNINGS_VOLUME_ALIAS,
+      pane: 2,
+      color: AMBER,
     },
 
-    eval_low_conversion: {
-      endpointPath: EVALUATOR_THRESHOLD_ALIAS,
-      resolution: GraphResolution.ONE_WEEK,
-      params: { op: "<", value: 0.05 },
-      visible: false,
-    },
     eval_no_referrals: {
       endpointPath: EVALUATOR_THRESHOLD_ALIAS,
       resolution: GraphResolution.ONE_WEEK,
@@ -107,26 +99,19 @@ const referralProgramHealthConfig: GraphConfig = {
   },
 
   edges: [
-    { from: "signups", to: "signups_ema7" },
-    { from: "signups", to: "click_to_signup", toHandle: "a" },
-    { from: "lead_clicks", to: "click_to_signup", toHandle: "b" },
-    { from: "payouts", to: "payout_to_earnings", toHandle: "a" },
-    { from: "earnings", to: "payout_to_earnings", toHandle: "b" },
-    { from: "click_to_signup", to: "eval_low_conversion" },
-    { from: "signups_ema7", to: "eval_no_referrals" },
+    { from: "referral_signups", to: "referral_signups_ema7" },
+    { from: "referral_signups", to: "eval_no_referrals" },
     { from: "eval_no_referrals", to: "action_notify_dead_referral" },
   ],
 
   positions: {
-    lead_clicks: { x: 0, y: 0 },
-    signups: { x: 0, y: 120 },
+    referral_link_visits: { x: 0, y: 0 },
+    referral_signups: { x: 0, y: 120 },
     codes_created: { x: 0, y: 240 },
-    earnings: { x: 0, y: 360 },
-    payouts: { x: 0, y: 480 },
-    signups_ema7: { x: 300, y: 120 },
-    click_to_signup: { x: 300, y: 60 },
-    payout_to_earnings: { x: 300, y: 420 },
-    eval_low_conversion: { x: 600, y: 60 },
+    payout_requests: { x: 0, y: 360 },
+    visit_to_signup_pct: { x: 0, y: 480 },
+    commissions_usd: { x: 0, y: 600 },
+    referral_signups_ema7: { x: 300, y: 120 },
     eval_no_referrals: { x: 600, y: 120 },
     action_notify_dead_referral: { x: 900, y: 120 },
   },
@@ -141,7 +126,7 @@ export const graphSeeds: GraphSeedEntry[] = [
     slug: "referral-program-health",
     name: "Referral Program Health",
     description:
-      "Tracks referral click-to-signup conversion, earnings volume, payout ratios, and code creation. Alerts when the referral funnel stalls.",
+      "Referral and creator links per day: visits on a referral link, signups credited to a code, codes created and payout requests; the share of first referral visits that signed up (by visit day, recent days still filling in); commissions earned in USD. Alerts after a week with no referral signup.",
     config: referralProgramHealthConfig,
   },
 ];

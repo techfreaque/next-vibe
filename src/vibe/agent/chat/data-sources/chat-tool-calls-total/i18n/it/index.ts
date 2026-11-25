@@ -6,7 +6,7 @@ export const translations: typeof enTranslations = {
     title: "Totale chiamate agli strumenti in chat",
     titleShort: "Chiamate agli strumenti",
     description:
-      "Numero totale di messaggi con chiamate agli strumenti per intervallo",
+      "Numero totale di messaggi con chiamate agli strumenti per intervallo. Solo chat umane: esclusi thread di agenti in background, copie remote e account admin; le chat in incognito non vengono mai salvate.",
     fields: {
       resolution: {
         label: "Risoluzione",

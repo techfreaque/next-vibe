@@ -6,7 +6,7 @@ export const translations: typeof enTranslations = {
     title: "Messages du chat envoyés par l'IA",
     titleShort: "Messages de l'IA",
     description:
-      "Nombre de messages de l'assistant IA par intervalle de résolution",
+      "Nombre de messages de l'assistant IA par intervalle de résolution. Chats humains uniquement : sans fils d'agents en arrière-plan, copies distantes ni comptes admin ; les chats incognito ne sont jamais stockés.",
     fields: {
       resolution: { label: "Résolution", description: "Intervalle de calcul" },
       range: { label: "Période", description: "Période à interroger" },

@@ -9,8 +9,11 @@
 import "server-only";
 
 import { type SQL, sql } from "drizzle-orm";
+import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 
 import { FINANCE_CONFIG } from "@/finance/config";
+
+import { CheckoutMode, PaymentStatus } from "../enum";
 
 /** Static rates shown next to every USD total so the conversion is visible. */
 export const REVENUE_FX_RATES: ReadonlyArray<{
@@ -36,4 +39,32 @@ export function usdSql(amount: string, currency: string): SQL {
 /** Timestamp literal comparable with UTC timestamp-without-time-zone columns. */
 export function utcTs(date: Date): SQL {
   return sql`(${date.toISOString()}::timestamptz AT TIME ZONE 'UTC')`;
+}
+
+/**
+ * What a payment row paid for: 'pack', 'renewal' or 'newSubscription'.
+ * metadata.type is written on every checkout; mode is the fallback for rows
+ * without it (a NOWPayments subscription runs in PAYMENT mode, so mode alone
+ * would file it as a pack).
+ */
+export function paymentKindSql(alias: string): SQL {
+  return sql.raw(`(CASE
+    WHEN ${alias}.metadata->>'type' = 'subscription_renewal' THEN 'renewal'
+    WHEN ${alias}.metadata->>'type' = 'subscription' THEN 'newSubscription'
+    WHEN ${alias}.metadata->>'type' = 'credit_pack' THEN 'pack'
+    WHEN ${alias}.mode = '${CheckoutMode.PAYMENT}' THEN 'pack'
+    ELSE 'newSubscription'
+  END)`);
+}
+
+/** Collected payment: succeeded, or refunded later (it was paid first). */
+export function paidStatusSql(alias: string): SQL {
+  return sql.raw(
+    `${alias}.status IN ('${PaymentStatus.SUCCEEDED}', '${PaymentStatus.REFUNDED}')`,
+  );
+}
+
+/** `column` is not an admin (internal/test) account. */
+export function notInternalUserSql(column: string): SQL {
+  return sql`${sql.raw(column)} NOT IN (SELECT user_id FROM user_roles WHERE role = ${UserPermissionRole.ADMIN})`;
 }

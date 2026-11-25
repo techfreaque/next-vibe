@@ -1,9 +1,10 @@
 export const translations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
-    titleShort: "Balance Total",
-    title: "Credits Balance Total",
-    description: "Snapshot of total user wallet balances per resolution bucket",
+    titleShort: "Outstanding Credits",
+    title: "Outstanding User Credits",
+    description:
+      "Unspent credits in signed-in user wallets at the end of each bucket (paid, gifted and free), rebuilt from the credit ledger. In credits. Guest wallets excluded.",
     fields: {
       resolution: { label: "Resolution", description: "Computation timeframe" },
       range: { label: "Range", description: "Time range to query" },
@@ -11,7 +12,10 @@ export const translations = {
         label: "Lookback",
         description: "Extra bars before range start",
       },
-      result: { label: "Balance Total", description: "Output time series" },
+      result: {
+        label: "Outstanding Credits",
+        description: "Output time series",
+      },
       meta: { label: "Meta", description: "Node execution metadata" },
     },
     success: {

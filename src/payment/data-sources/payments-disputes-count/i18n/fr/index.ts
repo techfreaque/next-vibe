@@ -1,27 +1,39 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
-  tags: { vibeSense: "vibe-sense" },
+  tags: {
+    vibeSense: "vibe-sense",
+  },
   post: {
-    title: "Nombre de litiges de paiement",
+    title: "Litiges",
     titleShort: "Litiges",
-    description: "Nombre de litiges de paiement par intervalle de résolution",
+    description:
+      "Rétrofacturations ouvertes par période. Comptes admin exclus.",
     fields: {
-      resolution: { label: "Résolution", description: "Intervalle de calcul" },
-      range: { label: "Période", description: "Période à interroger" },
+      resolution: {
+        label: "Résolution",
+        description: "Intervalle de calcul",
+      },
+      range: {
+        label: "Période",
+        description: "Période à interroger",
+      },
       lookback: {
         label: "Historique",
         description: "Barres supplémentaires avant le début de la période",
       },
       result: {
-        label: "Nombre de litiges",
+        label: "Litiges",
         description: "Série temporelle en sortie",
       },
-      meta: { label: "Méta", description: "Métadonnées d'exécution du nœud" },
+      meta: {
+        label: "Méta",
+        description: "Métadonnées d'exécution du nœud",
+      },
     },
     success: {
-      title: "Données des litiges de paiement",
-      description: "Série des litiges de paiement renvoyée",
+      title: "Litiges calculés",
+      description: "Série des litiges renvoyée",
     },
     errors: {
       unauthorized: {
@@ -32,7 +44,10 @@ export const translations: typeof enTranslations = {
         title: "Accès interdit",
         description: "Accès administrateur requis",
       },
-      server: { title: "Erreur serveur", description: "La requête a échoué" },
+      server: {
+        title: "Erreur serveur",
+        description: "La requête a échoué",
+      },
       unknown: {
         title: "Erreur inconnue",
         description: "Une erreur inattendue s'est produite",
@@ -41,8 +56,14 @@ export const translations: typeof enTranslations = {
         title: "Échec de la validation",
         description: "Paramètres de requête invalides",
       },
-      notFound: { title: "Introuvable", description: "Introuvable" },
-      conflict: { title: "Conflit", description: "Conflit" },
+      notFound: {
+        title: "Introuvable",
+        description: "Introuvable",
+      },
+      conflict: {
+        title: "Conflit",
+        description: "Conflit",
+      },
       network: {
         title: "Erreur réseau",
         description: "La requête réseau a échoué",

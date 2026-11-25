@@ -1,13 +1,19 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
-  tags: { vibeSense: "vibe-sense" },
+  tags: {
+    vibeSense: "vibe-sense",
+  },
   post: {
-    title: "Abbonamenti Pagamento non corretto",
-    titleShort: "Pagamento non corretto",
-    description: "Abbonamenti con pagamenti falliti per benne di risoluzione",
+    title: "Rinnovi falliti",
+    titleShort: "Rinnovi falliti",
+    description:
+      "Abbonamenti con addebito di rinnovo fallito per periodo (uno per abbonamento). Checkout incompleti e account admin esclusi.",
     fields: {
-      resolution: { label: "Risoluzione", description: "Tempo di calcolo" },
+      resolution: {
+        label: "Risoluzione",
+        description: "Tempo di calcolo",
+      },
       range: {
         label: "Gamma di intervallo",
         description: "Intervallo di tempo per query",
@@ -17,14 +23,17 @@ export const translations: typeof enTranslations = {
         description: "Barre extra prima dell'inizio della gamma",
       },
       result: {
-        label: "Abbonamenti Pagamento non corretto",
+        label: "Rinnovi falliti",
         description: "Serie di tempo di uscita",
       },
-      meta: { label: "Meta", description: "metadati di esecuzione del nodo" },
+      meta: {
+        label: "Meta",
+        description: "metadati di esecuzione del nodo",
+      },
     },
     success: {
-      title: "Abbonamenti Pagamento Non calcolato",
-      description: "Abbonamenti Pagamento Serie non riuscita restituita",
+      title: "Rinnovi falliti calcolati",
+      description: "Serie dei rinnovi falliti restituita",
     },
     errors: {
       unauthorized: {
@@ -35,7 +44,10 @@ export const translations: typeof enTranslations = {
         title: "Accesso negato",
         description: "Accesso all'amministratore richiesto",
       },
-      server: { title: "Errore del server", description: "Query fallito" },
+      server: {
+        title: "Errore del server",
+        description: "Query fallito",
+      },
       unknown: {
         title: "Errore sconosciuto",
         description: "Si è verificato un errore imprevisto",
@@ -48,7 +60,10 @@ export const translations: typeof enTranslations = {
         title: "Account o sessione non trovati",
         description: "Account o sessione non trovati",
       },
-      conflict: { title: "Conflitto", description: "Conflitto" },
+      conflict: {
+        title: "Conflitto",
+        description: "Conflitto",
+      },
       network: {
         title: "Errore di rete",
         description: "La richiesta di rete è fallita",

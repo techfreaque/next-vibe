@@ -1,12 +1,13 @@
 /**
  * Subscriptions New - Repository
  * Server-only. DB access.
- * Count of new subscriptions created per resolution bucket.
+ * Subscriptions started per bucket (created_at). Incomplete checkouts and
+ * admin accounts excluded.
  */
 
 import "server-only";
 
-import { and, count, gte, lte, sql } from "drizzle-orm";
+import { sql } from "drizzle-orm";
 import {
   type ResponseType,
   success,
@@ -19,8 +20,9 @@ import type {
 } from "next-vibe/dataflow/shared/fields";
 import { resolutionBucketExpr } from "next-vibe/dataflow/shared/query-utils";
 import { fillGaps } from "next-vibe/dataflow/shared/range";
+import type { QueryResultRow } from "pg";
 
-import { subscriptions } from "../../db";
+import { COUNTED_SUBSCRIPTION_SQL, tzSql } from "../../series-sql";
 
 export class QuerySubscriptionsNewRepository {
   static async querySubscriptionsNew(data: {
@@ -34,32 +36,25 @@ export class QuerySubscriptionsNewRepository {
     }>
   > {
     const { resolution, range, lookback } = data;
-    const rows = await db
-      .select({
-        bucket: resolutionBucketExpr(resolution, subscriptions.createdAt).as(
-          "bucket",
-        ),
-        total: count(),
-      })
-      .from(subscriptions)
-      .where(
-        and(
-          gte(subscriptions.createdAt, range.from),
-          lte(subscriptions.createdAt, range.to),
-        ),
-      )
-      .groupBy(sql`1`)
-      .orderBy(sql`1`);
+    const result = await db.execute<
+      QueryResultRow & { bucket: string; value: string | number }
+    >(sql`
+      SELECT ${resolutionBucketExpr(resolution, sql`s.created_at`)} AS bucket,
+        count(*) AS value
+      FROM subscriptions s
+      WHERE ${COUNTED_SUBSCRIPTION_SQL}
+        AND s.created_at >= ${tzSql(range.from)}
+        AND s.created_at <= ${tzSql(range.to)}
+      GROUP BY 1 ORDER BY 1`);
 
-    const raw = rows.map((r): DataPoint => ({
+    const raw = result.rows.map((r): DataPoint => ({
       timestamp: new Date(r.bucket),
-      value: Number(r.total ?? 0),
+      value: Number(r.value),
     }));
-    const result = fillGaps(raw, range, resolution);
     return success({
-      result,
+      result: fillGaps(raw, range, resolution),
       meta: {
-        actualResolution: resolution ?? "enums.resolution.1d",
+        actualResolution: resolution,
         lookbackUsed: lookback ?? 0,
       },
     });

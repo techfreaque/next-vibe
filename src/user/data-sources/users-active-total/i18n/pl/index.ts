@@ -6,7 +6,7 @@ export const translations: typeof enTranslations = {
     title: "Aktywni użytkownicy łącznie",
     titleShort: "Aktywni użytkownicy",
     description:
-      "Liczba aktywnych, niezablokowanych, zweryfikowanych e-mailowo użytkowników na przedział czasu",
+      "Liczba aktywnych, niezablokowanych kont (narastająco) w każdym przedziale",
     fields: {
       resolution: {
         label: "Rozdzielczość",

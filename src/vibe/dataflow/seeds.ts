@@ -10,7 +10,7 @@
 
 import "server-only";
 
-import { and, eq } from "drizzle-orm";
+import { and, eq, isNull, notInArray } from "drizzle-orm";
 
 import { allGraphSeeds } from "@/generated/dataflow/graph-seeds-index";
 
@@ -69,9 +69,49 @@ async function ensureSeedGraphs(logger: EndpointLogger): Promise<void> {
     }
   }
 
+  const archived = await archiveRetiredSeedGraphs(logger);
+
   logger.info(
-    `📊 ${maybeColorize(`${semantic.sense}${allGraphSeeds.length} vibe sense graphs ready${created > 0 ? ` (${String(created)} new)` : ""}`, semantic.sense)}`,
+    `📊 ${maybeColorize(`${semantic.sense}${allGraphSeeds.length} vibe sense graphs ready${created > 0 ? ` (${String(created)} new)` : ""}${archived > 0 ? ` (${String(archived)} retired)` : ""}`, semantic.sense)}`,
   );
+}
+
+/**
+ * Archive system graphs whose seed no longer exists. A removed or renamed seed
+ * otherwise stays listed forever with its old config, which the engine can no
+ * longer run ("No data in this range"). Archive is a soft delete: rows and
+ * datapoints stay. Admin/user branches are never touched.
+ */
+async function archiveRetiredSeedGraphs(
+  logger: EndpointLogger,
+): Promise<number> {
+  const seedSlugs = allGraphSeeds.map((seed) => seed.slug);
+  // An empty seed index means a broken build, not "retire everything".
+  if (seedSlugs.length === 0) {
+    return 0;
+  }
+  try {
+    const retired = await db
+      .update(pipelineGraphs)
+      .set({ archivedAt: new Date(), isActive: false })
+      .where(
+        and(
+          eq(pipelineGraphs.ownerType, GraphOwnerType.SYSTEM),
+          isNull(pipelineGraphs.archivedAt),
+          notInArray(pipelineGraphs.slug, seedSlugs),
+        ),
+      )
+      .returning({ slug: pipelineGraphs.slug });
+    if (retired.length > 0) {
+      logger.info(
+        `Retired vibe sense graphs without a seed: ${retired.map((row) => row.slug).join(", ")}`,
+      );
+    }
+    return retired.length;
+  } catch (error) {
+    logger.error("Failed to retire old seed graphs", parseError(error));
+    return 0;
+  }
 }
 
 export async function dev(logger: EndpointLogger): Promise<void> {

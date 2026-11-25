@@ -5,7 +5,8 @@ export const translations: typeof enTranslations = {
   post: {
     title: "Mensajes de chat de usuarios",
     titleShort: "Mensajes de usuarios",
-    description: "Número de mensajes enviados por usuarios por intervalo",
+    description:
+      "Número de mensajes enviados por usuarios por intervalo. Solo chats humanos: sin hilos de agentes en segundo plano, copias remotas ni cuentas admin; los chats de incógnito nunca se guardan.",
     fields: {
       resolution: { label: "Resolución", description: "Intervalo de cálculo" },
       range: { label: "Período", description: "Período que se va a consultar" },

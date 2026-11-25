@@ -1,12 +1,13 @@
 /**
  * Payments Count - Repository
  * Server-only. DB access.
- * Count of completed payment transactions per resolution bucket.
+ * Collected payments per bucket (packs, new subscriptions and renewals):
+ * succeeded or later-refunded, no setup sessions, no admin accounts.
  */
 
 import "server-only";
 
-import { and, count, eq, gte, lte, sql } from "drizzle-orm";
+import { sql } from "drizzle-orm";
 import {
   type ResponseType,
   success,
@@ -19,9 +20,14 @@ import type {
 } from "next-vibe/dataflow/shared/fields";
 import { resolutionBucketExpr } from "next-vibe/dataflow/shared/query-utils";
 import { fillGaps } from "next-vibe/dataflow/shared/range";
+import type { QueryResultRow } from "pg";
 
-import { paymentTransactions } from "../../db";
-import { PaymentStatus } from "../../enum";
+import {
+  notInternalUserSql,
+  paidStatusSql,
+  utcTs,
+} from "../../analytics/money-sql";
+import { CheckoutMode } from "../../enum";
 
 export class QueryPaymentsCountRepository {
   static async queryPaymentsCount(data: {
@@ -35,34 +41,27 @@ export class QueryPaymentsCountRepository {
     }>
   > {
     const { resolution, range, lookback } = data;
-    const rows = await db
-      .select({
-        bucket: resolutionBucketExpr(
-          resolution,
-          paymentTransactions.createdAt,
-        ).as("bucket"),
-        cnt: count(),
-      })
-      .from(paymentTransactions)
-      .where(
-        and(
-          eq(paymentTransactions.status, PaymentStatus.SUCCEEDED),
-          gte(paymentTransactions.createdAt, range.from),
-          lte(paymentTransactions.createdAt, range.to),
-        ),
-      )
-      .groupBy(sql`1`)
-      .orderBy(sql`1`);
+    const result = await db.execute<
+      QueryResultRow & { bucket: string; value: string | number | null }
+    >(sql`
+      SELECT ${resolutionBucketExpr(resolution, sql`pt.created_at`)} AS bucket,
+        count(*) AS value
+      FROM payment_transactions pt
+      WHERE ${paidStatusSql("pt")}
+        AND pt.mode <> ${CheckoutMode.SETUP}
+        AND ${notInternalUserSql("pt.user_id")}
+        AND pt.created_at >= ${utcTs(range.from)}
+        AND pt.created_at <= ${utcTs(range.to)}
+      GROUP BY 1 ORDER BY 1`);
 
-    const raw = rows.map((r): DataPoint => ({
+    const raw = result.rows.map((r): DataPoint => ({
       timestamp: new Date(r.bucket),
-      value: Number(r.cnt),
+      value: Math.round(Number(r.value ?? 0) * 100) / 100,
     }));
-    const result = fillGaps(raw, range, resolution);
     return success({
-      result,
+      result: fillGaps(raw, range, resolution),
       meta: {
-        actualResolution: resolution ?? "enums.resolution.1d",
+        actualResolution: resolution,
         lookbackUsed: lookback ?? 0,
       },
     });

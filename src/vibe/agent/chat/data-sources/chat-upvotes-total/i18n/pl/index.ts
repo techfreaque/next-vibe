@@ -5,7 +5,8 @@ export const translations: typeof enTranslations = {
   post: {
     title: "Głosy za w czacie łącznie",
     titleShort: "Pozytywne",
-    description: "Suma głosów za na wiadomości na przedział rozdzielczości",
+    description:
+      "Suma głosów za na wiadomości na przedział rozdzielczości. Tylko czaty ludzi: bez wątków agentów w tle, kopii zdalnych i kont adminów; czaty incognito nigdy nie są zapisywane.",
     fields: {
       resolution: {
         label: "Rozdzielczość",

@@ -5,7 +5,8 @@ export const translations: typeof enTranslations = {
   post: {
     title: "Nieudane wykonania cron",
     titleShort: "Cron nieudany",
-    description: "Nieudane wykonania cron na przedział rozdzielczości",
+    description:
+      "Nieudane, błędne i przekroczone czasowo wykonania cron na przedział rozdzielczości",
     fields: {
       resolution: {
         label: "Rozdzielczość",

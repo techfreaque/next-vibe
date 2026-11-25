@@ -4,7 +4,8 @@ export const translations: typeof enTranslations = {
   post: {
     title: "Utworzone wątki czatu",
     titleShort: "Nowe wątki",
-    description: "Liczba nowych wątków czatu na przedział rozdzielczości",
+    description:
+      "Liczba nowych wątków czatu na przedział rozdzielczości. Tylko czaty ludzi: bez wątków agentów w tle, kopii zdalnych i kont adminów; czaty incognito nigdy nie są zapisywane.",
     fields: {
       resolution: {
         label: "Rozdzielczość",

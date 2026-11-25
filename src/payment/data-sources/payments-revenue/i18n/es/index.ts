@@ -1,14 +1,33 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
-  tags: { vibeSense: "vibe-sense" },
+  tags: {
+    vibeSense: "vibe-sense",
+  },
+  enums: {
+    kind: {
+      all: "Todo",
+      pack: "Paquetes de créditos",
+      subscription: "Suscripciones (nuevas + renovaciones)",
+      newSubscription: "Nuevas suscripciones",
+      renewal: "Renovaciones",
+    },
+    provider: {
+      all: "Todas las pasarelas",
+      stripe: "Stripe",
+      nowpayments: "NOWPayments",
+    },
+  },
   post: {
-    title: "Pagos Ingresos",
+    title: "Ingresos (USD)",
     titleShort: "Ingresos",
     description:
-      "Suma de los importes de pago completados por cubo de resolución",
+      "Dinero cobrado por periodo, en USD aprox. (EUR y PLN a tipos fijos). Pagos exitosos y reembolsados después, sin cuentas admin. Filtra por producto y por pasarela.",
     fields: {
-      resolution: { label: "Resolución", description: "Plazo de cálculo" },
+      resolution: {
+        label: "Resolución",
+        description: "Plazo de cálculo",
+      },
       range: {
         label: "Rango",
         description: "Rango de tiempo para la consulta",
@@ -18,14 +37,26 @@ export const translations: typeof enTranslations = {
         description: "Barras extra antes de empezar el rango",
       },
       result: {
-        label: "Ingresos",
+        label: "Ingresos (USD)",
         description: "Serie de tiempo de producción",
       },
-      meta: { label: "Meta", description: "Metadatos de ejecución de nodos" },
+      meta: {
+        label: "Meta",
+        description: "Metadatos de ejecución de nodos",
+      },
+      kind: {
+        label: "Pagado por",
+        description:
+          "Paquetes de créditos, suscripciones (nuevas + renovaciones) o uno de ellos",
+      },
+      provider: {
+        label: "Pasarela de pago",
+        description: "Stripe, NOWPayments o ambas",
+      },
     },
     success: {
-      title: "Pagos Ingresos computados",
-      description: "Pagos Serie de ingresos devueltos",
+      title: "Ingresos calculados",
+      description: "Serie de ingresos devuelta",
     },
     errors: {
       unauthorized: {
@@ -52,7 +83,10 @@ export const translations: typeof enTranslations = {
         title: "Cuenta o sesión no encontradas",
         description: "Cuenta o sesión no encontradas",
       },
-      conflict: { title: "Conflicto", description: "Conflicto" },
+      conflict: {
+        title: "Conflicto",
+        description: "Conflicto",
+      },
       network: {
         title: "Error de red",
         description: "Solicitud de red falló",

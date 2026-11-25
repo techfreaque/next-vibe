@@ -1,13 +1,19 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
-  tags: { vibeSense: "vibe-sense" },
+  tags: {
+    vibeSense: "vibe-sense",
+  },
   post: {
     title: "Suscripciones activas",
-    titleShort: "Subsidios activos",
-    description: "Captura de suscripciones activas por cubo de resolución",
+    titleShort: "Activas",
+    description:
+      "Suscripciones en curso al final de cada periodo: iniciadas antes y aún sin terminar (las atrasadas cuentan hasta que terminan). Sin checkouts incompletos ni cuentas admin.",
     fields: {
-      resolution: { label: "Resolución", description: "Plazo de cálculo" },
+      resolution: {
+        label: "Resolución",
+        description: "Plazo de cálculo",
+      },
       range: {
         label: "Rango",
         description: "Rango de tiempo para la consulta",
@@ -20,11 +26,14 @@ export const translations: typeof enTranslations = {
         label: "Suscripciones activas",
         description: "Serie de tiempo de producción",
       },
-      meta: { label: "Meta", description: "Metadatos de ejecución de nodos" },
+      meta: {
+        label: "Meta",
+        description: "Metadatos de ejecución de nodos",
+      },
     },
     success: {
-      title: "Suscripciones Computadas activas",
-      description: "Suscripciones Serie activa devuelta",
+      title: "Suscripciones activas calculadas",
+      description: "Serie de suscripciones activas devuelta",
     },
     errors: {
       unauthorized: {
@@ -51,7 +60,10 @@ export const translations: typeof enTranslations = {
         title: "Cuenta o sesión no encontradas",
         description: "Cuenta o sesión no encontradas",
       },
-      conflict: { title: "Conflicto", description: "Conflicto" },
+      conflict: {
+        title: "Conflicto",
+        description: "Conflicto",
+      },
       network: {
         title: "Error de red",
         description: "Solicitud de red falló",

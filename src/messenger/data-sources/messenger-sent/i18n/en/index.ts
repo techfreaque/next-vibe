@@ -1,5 +1,16 @@
 export const translations = {
   tags: { vibeSense: "vibe-sense" },
+  enums: {
+    messageType: {
+      all: "All types",
+      system: "System",
+      transactional: "Transactional",
+      notification: "Notification",
+      marketing: "Marketing",
+      leadCampaign: "Lead campaign",
+      userCommunication: "User message",
+    },
+  },
   post: {
     title: "Messages Sent",
     titleShort: "Sent Msgs",
@@ -10,6 +21,10 @@ export const translations = {
       lookback: {
         label: "Lookback",
         description: "Extra bars before range start",
+      },
+      messageType: {
+        label: "Message type",
+        description: "Count all sent messages or only one type",
       },
       result: { label: "Messages Sent", description: "Output time series" },
       meta: { label: "Meta", description: "Node execution metadata" },

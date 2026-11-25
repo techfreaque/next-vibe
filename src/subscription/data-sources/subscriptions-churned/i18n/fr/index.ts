@@ -5,9 +5,10 @@ export const translations: typeof enTranslations = {
     vibeSense: "vibe-sense",
   },
   post: {
-    title: "Abonnements perdus",
-    titleShort: "Perdus (churn)",
-    description: "Abonnements perdus (terminés) par intervalle de résolution",
+    title: "Abonnements terminés",
+    titleShort: "Terminés",
+    description:
+      "Abonnements terminés par période (accès coupé). Paiements incomplets et comptes admin exclus.",
     fields: {
       resolution: {
         label: "Résolution",
@@ -22,7 +23,7 @@ export const translations: typeof enTranslations = {
         description: "Barres supplémentaires avant le début de la période",
       },
       result: {
-        label: "Abonnements perdus",
+        label: "Abonnements terminés",
         description: "Série temporelle en sortie",
       },
       meta: {
@@ -31,8 +32,8 @@ export const translations: typeof enTranslations = {
       },
     },
     success: {
-      title: "Abonnements perdus : calcul terminé",
-      description: "Série « Abonnements perdus » renvoyée",
+      title: "Abonnements terminés calculés",
+      description: "Série des abonnements terminés renvoyée",
     },
     errors: {
       unauthorized: {

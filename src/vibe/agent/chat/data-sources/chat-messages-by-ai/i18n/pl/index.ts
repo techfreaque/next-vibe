@@ -4,7 +4,8 @@ export const translations: typeof enTranslations = {
   post: {
     title: "Wiadomości czatu od AI",
     titleShort: "Wiadomości AI",
-    description: "Liczba wiadomości asystenta AI na przedział rozdzielczości",
+    description:
+      "Liczba wiadomości asystenta AI na przedział rozdzielczości. Tylko czaty ludzi: bez wątków agentów w tle, kopii zdalnych i kont adminów; czaty incognito nigdy nie są zapisywane.",
     fields: {
       resolution: {
         label: "Rozdzielczość",

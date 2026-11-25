@@ -5,7 +5,8 @@ export const translations: typeof enTranslations = {
   post: {
     title: "Totale voti negativi in chat",
     titleShort: "Voti negativi",
-    description: "Somma dei voti negativi sui messaggi per intervallo",
+    description:
+      "Somma dei voti negativi sui messaggi per intervallo. Solo chat umane: esclusi thread di agenti in background, copie remote e account admin; le chat in incognito non vengono mai salvate.",
     fields: {
       resolution: {
         label: "Risoluzione",

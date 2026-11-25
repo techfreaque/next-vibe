@@ -5,7 +5,8 @@ export const translations: typeof enTranslations = {
   post: {
     title: "Usuarios únicos en el chat",
     titleShort: "Usuarios únicos",
-    description: "Usuarios distintos que enviaron mensajes por intervalo",
+    description:
+      "Cuentas registradas distintas que enviaron un mensaje en un chat guardado por intervalo. Invitados e incógnito: ver Usuarios de IA. Solo chats humanos: sin hilos de agentes en segundo plano, copias remotas ni cuentas admin; los chats de incógnito nunca se guardan.",
     fields: {
       resolution: { label: "Resolución", description: "Intervalo de cálculo" },
       range: { label: "Período", description: "Período que se va a consultar" },

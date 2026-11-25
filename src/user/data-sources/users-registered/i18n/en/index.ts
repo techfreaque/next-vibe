@@ -11,6 +11,10 @@ export const translations = {
         label: "Lookback",
         description: "Extra bars before range start",
       },
+      emailConfirmedOnly: {
+        label: "Email confirmed only",
+        description: "Only count signups whose email is confirmed today",
+      },
       result: { label: "Registered Users", description: "Output time series" },
       meta: { label: "Meta", description: "Node execution metadata" },
     },

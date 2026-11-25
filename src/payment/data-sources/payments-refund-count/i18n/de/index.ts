@@ -1,24 +1,39 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
-  tags: { vibeSense: "vibe-sense" },
+  tags: {
+    vibeSense: "vibe-sense",
+  },
   post: {
-    title: "Erstattungsanzahl",
+    title: "Anzahl Erstattungen",
     titleShort: "Erstattungen",
-    description: "Anzahl der Erstattungen pro Auflösungs-Bucket",
+    description:
+      "Anzahl erfolgreicher Erstattungen pro Zeitraum. Ohne Admin-Konten.",
     fields: {
-      resolution: { label: "Auflösung", description: "Berechnungszeitrahmen" },
-      range: { label: "Bereich", description: "Abzufragender Zeitraum" },
+      resolution: {
+        label: "Auflösung",
+        description: "Berechnungszeitrahmen",
+      },
+      range: {
+        label: "Bereich",
+        description: "Abzufragender Zeitraum",
+      },
       lookback: {
         label: "Rückblick",
         description: "Extra Balken vor Bereichsstart",
       },
-      result: { label: "Erstattungsanzahl", description: "Ausgabe-Zeitreihe" },
-      meta: { label: "Meta", description: "Knotenausführungsmetadaten" },
+      result: {
+        label: "Erstattungen",
+        description: "Ausgabe-Zeitreihe",
+      },
+      meta: {
+        label: "Meta",
+        description: "Knotenausführungsmetadaten",
+      },
     },
     success: {
-      title: "Erstattungsanzahl berechnet",
-      description: "Erstattungsanzahl-Reihe zurückgegeben",
+      title: "Anzahl Erstattungen berechnet",
+      description: "Reihe der Erstattungsanzahl zurückgegeben",
     },
     errors: {
       unauthorized: {
@@ -29,7 +44,10 @@ export const translations: typeof enTranslations = {
         title: "Verboten",
         description: "Administratorzugang erforderlich",
       },
-      server: { title: "Serverfehler", description: "Abfrage fehlgeschlagen" },
+      server: {
+        title: "Serverfehler",
+        description: "Abfrage fehlgeschlagen",
+      },
       unknown: {
         title: "Unbekannter Fehler",
         description: "Ein unerwarteter Fehler ist aufgetreten",
@@ -38,8 +56,14 @@ export const translations: typeof enTranslations = {
         title: "Validierungsfehler",
         description: "Ungültige Anfrageparameter",
       },
-      notFound: { title: "Nicht gefunden", description: "Nicht gefunden" },
-      conflict: { title: "Konflikt", description: "Konflikt" },
+      notFound: {
+        title: "Nicht gefunden",
+        description: "Nicht gefunden",
+      },
+      conflict: {
+        title: "Konflikt",
+        description: "Konflikt",
+      },
       network: {
         title: "Netzwerkfehler",
         description: "Netzwerkanfrage fehlgeschlagen",

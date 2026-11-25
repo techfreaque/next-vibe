@@ -4,7 +4,12 @@
  */
 
 import { createEndpoint } from "next-vibe/core/definition/create-i18n";
-import { EndpointErrorTypes, Methods } from "next-vibe/core/definition/enums";
+import {
+  EndpointErrorTypes,
+  FieldDataType,
+  Methods,
+  WidgetType,
+} from "next-vibe/core/definition/enums";
 import {
   lookbackRequestField,
   nodeMetaResponseField,
@@ -15,8 +20,16 @@ import {
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
 import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
+import { requestField } from "next-vibe/unified-ui/_shared/utils-i18n";
+import { z } from "zod";
 
 import { PAYMENTS_REVENUE_ALIAS } from "./constants";
+import {
+  RevenueSeriesKind,
+  RevenueSeriesKindOptions,
+  RevenueSeriesProvider,
+  RevenueSeriesProviderOptions,
+} from "./enum";
 import { scopedTranslation } from "./i18n";
 const PaymentsRevenueWidget = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.PaymentsRevenueWidget })),
@@ -52,6 +65,26 @@ const { POST } = createEndpoint({
       lookback: lookbackRequestField(scopedTranslation, {
         label: "post.fields.lookback.label",
         description: "post.fields.lookback.description",
+      }),
+      kind: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "post.fields.kind.label",
+        description: "post.fields.kind.description",
+        options: RevenueSeriesKindOptions,
+        schema: z.enum(RevenueSeriesKind).default(RevenueSeriesKind.ALL),
+        columns: 6,
+      }),
+      provider: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "post.fields.provider.label",
+        description: "post.fields.provider.description",
+        options: RevenueSeriesProviderOptions,
+        schema: z
+          .enum(RevenueSeriesProvider)
+          .default(RevenueSeriesProvider.ALL),
+        columns: 6,
       }),
       result: timeSeriesResponseField(scopedTranslation, {
         label: "post.fields.result.label",
@@ -109,7 +142,9 @@ const { POST } = createEndpoint({
   examples: {
     requests: {
       default: {
-        range: { from: new Date("2024-01-01"), to: new Date("2024-01-31") },
+        range: { from: new Date("2026-11-01"), to: new Date("2026-11-30") },
+        kind: RevenueSeriesKind.SUBSCRIPTION,
+        provider: RevenueSeriesProvider.STRIPE,
       },
     },
     responses: {

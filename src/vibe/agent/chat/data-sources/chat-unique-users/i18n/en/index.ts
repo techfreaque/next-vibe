@@ -3,7 +3,8 @@ export const translations = {
   post: {
     title: "Chat Unique Users",
     titleShort: "Unique Users",
-    description: "Distinct users who sent messages per resolution bucket",
+    description:
+      "Distinct signed-in accounts that sent a message in a stored chat per bucket. Guests and incognito use: see People Using AI. Human chats only: background agent threads, remote copies and admin accounts excluded; incognito chats are never stored.",
     fields: {
       resolution: { label: "Resolution", description: "Computation timeframe" },
       range: { label: "Range", description: "Time range to query" },

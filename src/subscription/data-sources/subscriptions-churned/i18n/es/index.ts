@@ -1,14 +1,19 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
-  tags: { vibeSense: "vibe-sense" },
+  tags: {
+    vibeSense: "vibe-sense",
+  },
   post: {
-    title: "Suscripciones recortadas",
-    titleShort: "Churned",
+    title: "Suscripciones terminadas",
+    titleShort: "Terminadas",
     description:
-      "Suscripciones recortadas (recomendadas) por cubo de resolución",
+      "Suscripciones que terminaron por periodo (acceso cerrado). Sin checkouts incompletos ni cuentas admin.",
     fields: {
-      resolution: { label: "Resolución", description: "Plazo de cálculo" },
+      resolution: {
+        label: "Resolución",
+        description: "Plazo de cálculo",
+      },
       range: {
         label: "Rango",
         description: "Rango de tiempo para la consulta",
@@ -18,14 +23,17 @@ export const translations: typeof enTranslations = {
         description: "Barras extra antes de empezar el rango",
       },
       result: {
-        label: "Suscripciones recortadas",
+        label: "Suscripciones terminadas",
         description: "Serie de tiempo de producción",
       },
-      meta: { label: "Meta", description: "Metadatos de ejecución de nodos" },
+      meta: {
+        label: "Meta",
+        description: "Metadatos de ejecución de nodos",
+      },
     },
     success: {
-      title: "Suscripciones computadas en rejas",
-      description: "Suscripciones La serie Churned regresó",
+      title: "Suscripciones terminadas calculadas",
+      description: "Serie de suscripciones terminadas devuelta",
     },
     errors: {
       unauthorized: {
@@ -52,7 +60,10 @@ export const translations: typeof enTranslations = {
         title: "Cuenta o sesión no encontradas",
         description: "Cuenta o sesión no encontradas",
       },
-      conflict: { title: "Conflicto", description: "Conflicto" },
+      conflict: {
+        title: "Conflicto",
+        description: "Conflicto",
+      },
       network: {
         title: "Error de red",
         description: "Solicitud de red falló",

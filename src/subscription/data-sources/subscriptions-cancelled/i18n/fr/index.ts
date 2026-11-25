@@ -5,9 +5,10 @@ export const translations: typeof enTranslations = {
     vibeSense: "vibe-sense",
   },
   post: {
-    title: "Abonnements annulés",
-    titleShort: "Annulés",
-    description: "Abonnements annulés par intervalle de résolution",
+    title: "Résiliations",
+    titleShort: "Résiliations",
+    description:
+      "Résiliations demandées par période. L'accès peut durer jusqu'à la fin de la période payée (voir terminés). Paiements incomplets et comptes admin exclus.",
     fields: {
       resolution: {
         label: "Résolution",
@@ -22,7 +23,7 @@ export const translations: typeof enTranslations = {
         description: "Barres supplémentaires avant le début de la période",
       },
       result: {
-        label: "Abonnements annulés",
+        label: "Résiliations",
         description: "Série temporelle en sortie",
       },
       meta: {
@@ -31,8 +32,8 @@ export const translations: typeof enTranslations = {
       },
     },
     success: {
-      title: "Abonnements annulés : calcul terminé",
-      description: "Série « Abonnements annulés » renvoyée",
+      title: "Résiliations calculées",
+      description: "Série des résiliations renvoyée",
     },
     errors: {
       unauthorized: {

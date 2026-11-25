@@ -6,7 +6,7 @@ export const translations: typeof enTranslations = {
     title: "Utilisateurs uniques du chat",
     titleShort: "Utilisateurs uniques",
     description:
-      "Utilisateurs distincts ayant envoyé des messages par intervalle de résolution",
+      "Comptes connectés distincts ayant envoyé un message dans un chat stocké par période. Invités et incognito : voir Utilisateurs IA. Chats humains uniquement : sans fils d'agents en arrière-plan, copies distantes ni comptes admin ; les chats incognito ne sont jamais stockés.",
     fields: {
       resolution: { label: "Résolution", description: "Intervalle de calcul" },
       range: { label: "Période", description: "Période à interroger" },

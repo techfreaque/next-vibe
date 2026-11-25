@@ -13,6 +13,8 @@ import { fillGaps } from "next-vibe/dataflow/shared/range";
 import type { QueryResultRow } from "pg";
 import type { z } from "zod";
 
+import { isBotFamilySql } from "@/leads/analytics/bot-sql";
+import { leadFactsSql } from "@/leads/analytics/segment-sql";
 import { PaymentStatus } from "@/payment/enum";
 
 import type {
@@ -92,16 +94,19 @@ const acquiredUsers = sql`
   LEFT JOIN growth_journeys j ON j.user_id = u.id
   LEFT JOIN LATERAL (
     SELECT link.lead_id FROM user_lead_links link
-    WHERE link.user_id = u.id AND link.link_reason = 'signup'
+    WHERE j.lead_id IS NULL AND link.user_id = u.id AND link.link_reason = 'signup'
     ORDER BY link.linked_at, link.lead_id
     LIMIT 1
-  ) signup ON j.lead_id IS NULL
+  ) signup ON true
   LEFT JOIN LATERAL (
+    -- The outer-only conditions sit inside the subquery so Postgres skips
+    -- the (unindexed) leads scan for every account that already has a lead.
     SELECT l.id FROM leads l
-    WHERE l.converted_user_id = u.id AND l.signed_up_at IS NOT NULL
+    WHERE j.lead_id IS NULL AND signup.lead_id IS NULL
+      AND l.converted_user_id = u.id AND l.signed_up_at IS NOT NULL
     ORDER BY l.created_at, l.id
     LIMIT 1
-  ) legacy ON j.lead_id IS NULL AND signup.lead_id IS NULL
+  ) legacy ON true
 `;
 
 // Recorded live stamps also cover incognito, where message history is absent.
@@ -191,7 +196,20 @@ function between(column: SQL, range: TimeRange): SQL {
   return sql`${column} BETWEEN ${range.from.toISOString()}::timestamp AND ${range.to.toISOString()}::timestamp`;
 }
 
-function visitEvents(range: TimeRange): SQL {
+/**
+ * Visits whose lead is a known bot, with the Leads funnel's bot rule (user
+ * agent families plus the Chrome 131 Google-referrer crawler).
+ */
+function botVisitLeads(range: TimeRange): SQL {
+  return sql`
+    SELECT f.id FROM (${leadFactsSql(
+      sql`l.id IN (SELECT lead_id FROM growth_visits WHERE ${between(sql`visited_at`, range)})`,
+    )}) f
+    WHERE ${isBotFamilySql(sql`f.bot_family`)}
+  `;
+}
+
+function visitEvents(range: TimeRange, excludeBots = false): SQL {
   return sql`
     SELECT ${AcquisitionMetric.VISITS}::text AS metric, a.visited_at AS happened_at,
       ${sourceType(sql`true`)} AS source_type, a.source, a.medium, a.campaign,
@@ -199,6 +217,7 @@ function visitEvents(range: TimeRange): SQL {
     FROM growth_visits a
     ${codeJoin}
     WHERE ${between(sql`a.visited_at`, range)}
+    ${excludeBots ? sql`AND a.lead_id NOT IN (${botVisitLeads(range)})` : sql``}
   `;
 }
 
@@ -256,6 +275,47 @@ function acquisitionEvents(range: TimeRange, currency: Currencies): SQL {
       ${sql.join([visitEvents(range), ...Object.values(leadEvents(range, currency))], sql` UNION ALL `)}
     )
   `;
+}
+
+interface SeriesQuery {
+  range: TimeRange;
+  resolution: Resolution;
+  filters: AcquisitionFilters;
+  currency: Currencies;
+  metric: AcquisitionMetric;
+  /** Visits only: drop visits of known bot leads (Leads funnel rule). */
+  excludeBots?: boolean;
+}
+
+type SourceBucketRow = QueryResultRow & {
+  bucket: string;
+  sourceType: string;
+  value: number;
+};
+
+const SHARE_MS = 15_000;
+const sharedSourceRows = new Map<
+  string,
+  { at: number; rows: Promise<SourceBucketRow[]> }
+>();
+
+/** `WITH ... events(...) AS (...)` for one metric, ready for a SELECT. */
+function seriesEvents(data: SeriesQuery): SQL {
+  const { metric } = data;
+  const visitsOnly = metric === AcquisitionMetric.VISITS;
+  const events =
+    metric === AcquisitionMetric.VISITS
+      ? visitEvents(data.range, data.excludeBots === true)
+      : leadEvents(data.range, data.currency)[metric];
+  const includeChats = metric === AcquisitionMetric.FIRST_CHATS;
+  const context = visitsOnly
+    ? sql``
+    : sql`acquired_users AS (${acquiredUsers}),
+        historical_chats AS (${historicalChats}),
+        lead_sources AS (${leadSources(sql``, includeChats)}),
+        account_sources AS (${accountSources}),
+        payments AS (${succeededPayments}),`;
+  return sql`WITH ${context} events(metric, happened_at, source_type, source, medium, campaign, referrer_host, ref_code, value) AS (${events})`;
 }
 
 export class AcquisitionRepository {
@@ -321,31 +381,11 @@ export class AcquisitionRepository {
     return new Map(rows.map((row) => [row.refCode, row]));
   }
 
-  static async series(data: {
-    range: TimeRange;
-    resolution: Resolution;
-    filters: AcquisitionFilters;
-    currency: Currencies;
-    metric: AcquisitionMetric;
-  }): Promise<DataPoint[]> {
-    const { metric } = data;
-    const visitsOnly = metric === AcquisitionMetric.VISITS;
-    const events =
-      metric === AcquisitionMetric.VISITS
-        ? visitEvents(data.range)
-        : leadEvents(data.range, data.currency)[metric];
-    const includeChats = metric === AcquisitionMetric.FIRST_CHATS;
-    const context = visitsOnly
-      ? sql``
-      : sql`acquired_users AS (${acquiredUsers}),
-          historical_chats AS (${historicalChats}),
-          lead_sources AS (${leadSources(sql``, includeChats)}),
-          account_sources AS (${accountSources}),
-          payments AS (${succeededPayments}),`;
+  static async series(data: SeriesQuery): Promise<DataPoint[]> {
     const { rows } = await db.execute<
       QueryResultRow & { bucket: string; value: number }
     >(sql`
-      WITH ${context} events(metric, happened_at, source_type, source, medium, campaign, referrer_host, ref_code, value) AS (${events})
+      ${seriesEvents(data)}
       SELECT ${resolutionBucketExpr(data.resolution, sql`happened_at`)} AS bucket,
         sum(value)::float8 AS value
       FROM events ${filterConditions(data.filters)}
@@ -356,6 +396,49 @@ export class AcquisitionRepository {
       data.range,
       data.resolution,
     );
+  }
+
+  /**
+   * One metric split by source type in a single scan: a graph with one node
+   * per source asks for the same split several times, so the scan is shared
+   * for a few seconds instead of re-running the attribution joins per node.
+   */
+  static seriesBySource(
+    data: Omit<SeriesQuery, "filters">,
+  ): Promise<SourceBucketRow[]> {
+    const key = [
+      data.metric,
+      data.resolution,
+      data.currency,
+      data.excludeBots === true,
+      data.range.from.toISOString(),
+      data.range.to.toISOString(),
+    ].join("|");
+    const now = Date.now();
+    for (const [k, entry] of sharedSourceRows) {
+      if (now - entry.at > SHARE_MS) {
+        sharedSourceRows.delete(k);
+      }
+    }
+    const hit = sharedSourceRows.get(key);
+    if (hit) {
+      return hit.rows;
+    }
+    const rows = db
+      .execute<SourceBucketRow>(
+        sql`
+          ${seriesEvents({ ...data, filters: {} })}
+          SELECT ${resolutionBucketExpr(data.resolution, sql`happened_at`)} AS bucket,
+            source_type AS "sourceType", sum(value)::float8 AS value
+          FROM events
+          GROUP BY 1, 2 ORDER BY 1, 2
+        `,
+      )
+      .then((result) => result.rows);
+    // A failed scan must not be served to the next caller.
+    rows.catch(() => sharedSourceRows.delete(key));
+    sharedSourceRows.set(key, { at: now, rows });
+    return rows;
   }
 
   static matchingLeadIds(filters: AcquisitionFilters): SQL {

@@ -3,10 +3,10 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
-    title: "Volume di orecchio referral",
-    titleShort: "Guadagni Volume",
+    title: "Commissioni referral (USD)",
+    titleShort: "Commissioni",
     description:
-      "Somma dei guadagni di riferimento in centesimi per benna di risoluzione",
+      "Commissioni referral maturate per intervallo in USD (1 credito = 0,01 $), tutti i livelli, annullate escluse",
     fields: {
       resolution: { label: "Risoluzione", description: "Tempo di calcolo" },
       range: {

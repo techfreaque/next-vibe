@@ -4,7 +4,8 @@ export const translations: typeof enTranslations = {
   post: {
     title: "Chat-Nachrichten von KI",
     titleShort: "KI-Nachrichten",
-    description: "Anzahl der KI-Assistenten-Nachrichten pro Auflösungs-Bucket",
+    description:
+      "Anzahl der KI-Assistenten-Nachrichten pro Auflösungs-Bucket. Nur menschliche Chats: ohne Hintergrund-Agenten-Threads, Remote-Kopien und Admin-Konten; Inkognito-Chats werden nie gespeichert.",
     fields: {
       resolution: { label: "Auflösung", description: "Berechnungszeitrahmen" },
       range: { label: "Bereich", description: "Abzufragender Zeitraum" },

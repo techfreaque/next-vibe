@@ -1,7 +1,7 @@
 /**
  * Users Active Total - Repository
  * Server-only. DB access.
- * Snapshot: count of active, non-banned, email-verified users per resolution bucket.
+ * Snapshot: count of active, non-banned accounts per resolution bucket.
  */
 
 import "server-only";
@@ -49,7 +49,6 @@ export class QueryUsersActiveTotalRepository {
             lt(users.createdAt, next),
             eq(users.isActive, true),
             eq(users.isBanned, false),
-            eq(users.emailVerified, true),
           ),
         );
 

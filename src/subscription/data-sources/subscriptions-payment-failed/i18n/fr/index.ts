@@ -5,10 +5,10 @@ export const translations: typeof enTranslations = {
     vibeSense: "vibe-sense",
   },
   post: {
-    title: "Abonnements en échec de paiement",
-    titleShort: "Paiement échoué",
+    title: "Renouvellements échoués",
+    titleShort: "Renouv. échoués",
     description:
-      "Abonnements avec paiement échoué par intervalle de résolution",
+      "Abonnements dont le paiement de renouvellement a échoué, par période (un par abonnement). Paiements incomplets et comptes admin exclus.",
     fields: {
       resolution: {
         label: "Résolution",
@@ -23,7 +23,7 @@ export const translations: typeof enTranslations = {
         description: "Barres supplémentaires avant le début de la période",
       },
       result: {
-        label: "Abonnements en échec de paiement",
+        label: "Renouvellements échoués",
         description: "Série temporelle en sortie",
       },
       meta: {
@@ -32,8 +32,8 @@ export const translations: typeof enTranslations = {
       },
     },
     success: {
-      title: "Abonnements en échec de paiement : calcul terminé",
-      description: "Série « Abonnements en échec de paiement » renvoyée",
+      title: "Renouvellements échoués calculés",
+      description: "Série des renouvellements échoués renvoyée",
     },
     errors: {
       unauthorized: {

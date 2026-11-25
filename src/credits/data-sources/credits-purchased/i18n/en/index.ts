@@ -1,10 +1,18 @@
 export const translations = {
   tags: { vibeSense: "vibe-sense" },
+  enums: {
+    kind: {
+      paid: "Paid (packs + subscriptions)",
+      packs: "Paid packs",
+      subscriptions: "Subscription credits",
+      gifted: "Gifted (admin grants)",
+    },
+  },
   post: {
-    titleShort: "Credits Purchased",
-    title: "Credits Purchased",
+    titleShort: "Credits Issued",
+    title: "Credits Issued (paid, gifted)",
     description:
-      "Sum of purchase and subscription transaction amounts per resolution bucket",
+      "Credits added to wallets per bucket, in credits (not money): paid packs and subscription credits from real checkouts, or gifted admin grants (testers, creators, goodwill).",
     fields: {
       resolution: { label: "Resolution", description: "Computation timeframe" },
       range: { label: "Range", description: "Time range to query" },
@@ -12,7 +20,15 @@ export const translations = {
         label: "Lookback",
         description: "Extra bars before range start",
       },
-      result: { label: "Credits Purchased", description: "Output time series" },
+      kind: {
+        label: "Kind",
+        description:
+          "Which grants to count: paid packs + subscriptions, packs only, subscriptions only, or gifted admin grants",
+      },
+      result: {
+        label: "Credits Issued",
+        description: "Output time series",
+      },
       meta: { label: "Meta", description: "Node execution metadata" },
     },
     success: {

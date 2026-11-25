@@ -22,6 +22,7 @@ import { fillGaps } from "next-vibe/dataflow/shared/range";
 
 import { chatMessages } from "../../db";
 import { ChatMessageRole } from "../../enum";
+import { humanChatMessage } from "../human-chat-sql";
 
 export class QueryChatUniqueUsersRepository {
   static async queryChatUniqueUsers(data: {
@@ -45,6 +46,7 @@ export class QueryChatUniqueUsersRepository {
       .from(chatMessages)
       .where(
         and(
+          humanChatMessage,
           eq(chatMessages.role, ChatMessageRole.USER),
           isNotNull(chatMessages.authorId),
           gte(chatMessages.createdAt, range.from),

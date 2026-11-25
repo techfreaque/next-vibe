@@ -1,12 +1,14 @@
 /**
  * Subscriptions Payment Failed - Repository
  * Server-only. DB access.
- * Count of subscriptions with failed payments per resolution bucket (grouped by paymentFailedAt).
+ * Subscriptions with a failed renewal charge, bucketed by payment_failed_at
+ * (one stamp per subscription, so a repeat failure is not counted twice).
+ * Incomplete checkouts and admin accounts excluded.
  */
 
 import "server-only";
 
-import { and, count, gte, isNotNull, lte, sql } from "drizzle-orm";
+import { sql } from "drizzle-orm";
 import {
   type ResponseType,
   success,
@@ -19,8 +21,9 @@ import type {
 } from "next-vibe/dataflow/shared/fields";
 import { resolutionBucketExpr } from "next-vibe/dataflow/shared/query-utils";
 import { fillGaps } from "next-vibe/dataflow/shared/range";
+import type { QueryResultRow } from "pg";
 
-import { subscriptions } from "../../db";
+import { COUNTED_SUBSCRIPTION_SQL, tzSql } from "../../series-sql";
 
 export class QuerySubscriptionsPaymentFailedRepository {
   static async querySubscriptionsPaymentFailed(data: {
@@ -34,34 +37,25 @@ export class QuerySubscriptionsPaymentFailedRepository {
     }>
   > {
     const { resolution, range, lookback } = data;
-    const rows = await db
-      .select({
-        bucket: resolutionBucketExpr(
-          resolution,
-          subscriptions.paymentFailedAt,
-        ).as("bucket"),
-        total: count(),
-      })
-      .from(subscriptions)
-      .where(
-        and(
-          isNotNull(subscriptions.paymentFailedAt),
-          gte(subscriptions.paymentFailedAt, range.from),
-          lte(subscriptions.paymentFailedAt, range.to),
-        ),
-      )
-      .groupBy(sql`1`)
-      .orderBy(sql`1`);
+    const result = await db.execute<
+      QueryResultRow & { bucket: string; value: string | number }
+    >(sql`
+      SELECT ${resolutionBucketExpr(resolution, sql`s.payment_failed_at`)} AS bucket,
+        count(*) AS value
+      FROM subscriptions s
+      WHERE ${COUNTED_SUBSCRIPTION_SQL}
+        AND s.payment_failed_at >= ${tzSql(range.from)}
+        AND s.payment_failed_at <= ${tzSql(range.to)}
+      GROUP BY 1 ORDER BY 1`);
 
-    const raw = rows.map((r): DataPoint => ({
+    const raw = result.rows.map((r): DataPoint => ({
       timestamp: new Date(r.bucket),
-      value: Number(r.total ?? 0),
+      value: Number(r.value),
     }));
-    const result = fillGaps(raw, range, resolution);
     return success({
-      result,
+      result: fillGaps(raw, range, resolution),
       meta: {
-        actualResolution: resolution ?? "enums.resolution.1d",
+        actualResolution: resolution,
         lookbackUsed: lookback ?? 0,
       },
     });

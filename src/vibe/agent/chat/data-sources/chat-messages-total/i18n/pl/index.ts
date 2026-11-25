@@ -5,7 +5,8 @@ export const translations: typeof enTranslations = {
   post: {
     title: "Wiadomości czatu łącznie",
     titleShort: "Wiadomości łącznie",
-    description: "Łączna liczba wiadomości czatu na przedział rozdzielczości",
+    description:
+      "Łączna liczba wiadomości czatu na przedział rozdzielczości. Tylko czaty ludzi: bez wątków agentów w tle, kopii zdalnych i kont adminów; czaty incognito nigdy nie są zapisywane.",
     fields: {
       resolution: {
         label: "Rozdzielczość",

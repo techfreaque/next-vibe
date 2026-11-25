@@ -4,8 +4,8 @@
  * Definitions (the widget hints repeat them):
  * - Paid payment: payment_transactions with status SUCCEEDED or REFUNDED (a
  *   refunded payment was collected first; the refund is subtracted in net).
- * - Kind: checkout mode PAYMENT = credit pack; SUBSCRIPTION with
- *   metadata.type = subscription_renewal = renewal; other SUBSCRIPTION = new.
+ * - Kind: metadata.type (credit_pack / subscription / subscription_renewal),
+ *   checkout mode as fallback (paymentKindSql in money-sql.ts).
  * - Gross = paid amounts; net = gross minus succeeded refunds dated in the win.
  * - All money is approx. USD at static FX rates (money-sql.ts).
  * - Active subscription at T: created before T, not incomplete, and not ended
@@ -29,7 +29,6 @@ import {
 } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
-import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import type { BreakdownRow, Kpi } from "next-vibe/unified-ui/analytics/schema";
 import {
@@ -42,6 +41,7 @@ import { bucketSql } from "next-vibe/unified-ui/analytics/window-sql";
 import type { QueryResultRow } from "pg";
 
 import { BillingInterval, SubscriptionStatus } from "@/subscription/enum";
+import { SUB_END_SQL } from "@/subscription/series-sql";
 
 import {
   CheckoutMode,
@@ -49,7 +49,13 @@ import {
   PaymentStatus,
   RefundStatus,
 } from "../../enum";
-import { REVENUE_FX_RATES, usdSql, utcTs } from "../money-sql";
+import {
+  notInternalUserSql,
+  paymentKindSql,
+  REVENUE_FX_RATES,
+  usdSql,
+  utcTs,
+} from "../money-sql";
 import {
   recentPaymentSchema,
   type RevenueReportRequestOutput,
@@ -104,9 +110,7 @@ export interface RevenueFilters {
 }
 
 function internalUserFilter(column: string, includeInternal: boolean): SQL {
-  return includeInternal
-    ? sql``
-    : sql`AND ${sql.raw(column)} NOT IN (SELECT user_id FROM user_roles WHERE role = ${UserPermissionRole.ADMIN})`;
+  return includeInternal ? sql`` : sql`AND ${notInternalUserSql(column)}`;
 }
 
 /**
@@ -122,11 +126,7 @@ function paymentsCte(filters: RevenueFilters): SQL {
           pt.id, pt.user_id, pt.amount::numeric AS amount, pt.currency,
           pt.status, pt.provider, pt.mode, pt.created_at AS at,
           ${usdSql("pt.amount", "pt.currency")} AS usd,
-          CASE
-            WHEN pt.mode = ${CheckoutMode.PAYMENT} THEN 'pack'
-            WHEN pt.metadata->>'type' = 'subscription_renewal' THEN 'renewal'
-            ELSE 'newSubscription'
-          END AS kind,
+          ${paymentKindSql("pt")} AS kind,
           COALESCE(NULLIF(pt.metadata->>'planId', ''), s.plan_id) AS plan,
           NULLIF(pt.metadata->>'productId', '') AS product,
           s.id AS sub_id,
@@ -154,9 +154,7 @@ function subsFilter(filters: RevenueFilters): SQL {
 }
 
 /** When a subscription stopped counting (null = still running). */
-const SUB_END = sql.raw(
-  `COALESCE(s.ended_at, CASE WHEN s.status = '${SubscriptionStatus.CANCELED}' THEN COALESCE(s.canceled_at, s.updated_at) END)`,
-);
+const SUB_END = SUB_END_SQL;
 
 function tz(date: Date): SQL {
   return sql`${date.toISOString()}::timestamptz`;

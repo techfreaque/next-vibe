@@ -17,6 +17,10 @@ export const translations: typeof enTranslations = {
         label: "Lookback",
         description: "Barre extra prima dell'inizio della gamma",
       },
+      emailConfirmedOnly: {
+        label: "Solo e-mail confermata",
+        description: "Conta solo le registrazioni con e-mail già confermata",
+      },
       result: {
         label: "Utenti registrati",
         description: "Serie di tempo di uscita",

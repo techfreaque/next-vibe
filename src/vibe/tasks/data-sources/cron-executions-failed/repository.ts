@@ -1,12 +1,13 @@
 /**
  * Cron Executions Failed - Repository
  * Server-only. DB access.
- * Count of failed cron task executions per resolution bucket.
+ * Count of failed cron task executions per resolution bucket: failed,
+ * errored and timed-out runs (a timeout is a failure, not a success).
  */
 
 import "server-only";
 
-import { and, count, eq, gte, lte, sql } from "drizzle-orm";
+import { and, count, gte, inArray, lte, sql } from "drizzle-orm";
 
 import {
   type ResponseType,
@@ -21,6 +22,7 @@ import type {
 import { resolutionBucketExpr } from "../../../dataflow/shared/query-utils";
 import { fillGaps } from "../../../dataflow/shared/range";
 import { cronTaskExecutions } from "../../cron/db";
+import { CronTaskStatus } from "../../enum";
 
 export class QueryCronExecutionsFailedRepository {
   static async queryCronExecutionsFailed(data: {
@@ -45,7 +47,11 @@ export class QueryCronExecutionsFailedRepository {
       .from(cronTaskExecutions)
       .where(
         and(
-          eq(cronTaskExecutions.status, "status.failed"),
+          inArray(cronTaskExecutions.status, [
+            CronTaskStatus.FAILED,
+            CronTaskStatus.ERROR,
+            CronTaskStatus.TIMEOUT,
+          ]),
           gte(cronTaskExecutions.startedAt, range.from),
           lte(cronTaskExecutions.startedAt, range.to),
         ),

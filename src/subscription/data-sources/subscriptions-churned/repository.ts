@@ -1,12 +1,14 @@
 /**
  * Subscriptions Churned - Repository
  * Server-only. DB access.
- * Count of churned (ended) subscriptions per resolution bucket (grouped by endedAt).
+ * Subscriptions that ENDED per bucket (access stopped): ended_at, or the
+ * cancel date for canceled rows without it. Same rule as the Revenue report.
+ * Incomplete checkouts and admin accounts excluded.
  */
 
 import "server-only";
 
-import { and, count, gte, isNotNull, lte, sql } from "drizzle-orm";
+import { sql } from "drizzle-orm";
 import {
   type ResponseType,
   success,
@@ -19,8 +21,9 @@ import type {
 } from "next-vibe/dataflow/shared/fields";
 import { resolutionBucketExpr } from "next-vibe/dataflow/shared/query-utils";
 import { fillGaps } from "next-vibe/dataflow/shared/range";
+import type { QueryResultRow } from "pg";
 
-import { subscriptions } from "../../db";
+import { COUNTED_SUBSCRIPTION_SQL, SUB_END_SQL, tzSql } from "../../series-sql";
 
 export class QuerySubscriptionsChurnedRepository {
   static async querySubscriptionsChurned(data: {
@@ -34,33 +37,25 @@ export class QuerySubscriptionsChurnedRepository {
     }>
   > {
     const { resolution, range, lookback } = data;
-    const rows = await db
-      .select({
-        bucket: resolutionBucketExpr(resolution, subscriptions.endedAt).as(
-          "bucket",
-        ),
-        total: count(),
-      })
-      .from(subscriptions)
-      .where(
-        and(
-          isNotNull(subscriptions.endedAt),
-          gte(subscriptions.endedAt, range.from),
-          lte(subscriptions.endedAt, range.to),
-        ),
-      )
-      .groupBy(sql`1`)
-      .orderBy(sql`1`);
+    const result = await db.execute<
+      QueryResultRow & { bucket: string; value: string | number }
+    >(sql`
+      SELECT ${resolutionBucketExpr(resolution, SUB_END_SQL)} AS bucket,
+        count(*) AS value
+      FROM subscriptions s
+      WHERE ${COUNTED_SUBSCRIPTION_SQL}
+        AND ${SUB_END_SQL} >= ${tzSql(range.from)}
+        AND ${SUB_END_SQL} <= ${tzSql(range.to)}
+      GROUP BY 1 ORDER BY 1`);
 
-    const raw = rows.map((r): DataPoint => ({
+    const raw = result.rows.map((r): DataPoint => ({
       timestamp: new Date(r.bucket),
-      value: Number(r.total ?? 0),
+      value: Number(r.value),
     }));
-    const result = fillGaps(raw, range, resolution);
     return success({
-      result,
+      result: fillGaps(raw, range, resolution),
       meta: {
-        actualResolution: resolution ?? "enums.resolution.1d",
+        actualResolution: resolution,
         lookbackUsed: lookback ?? 0,
       },
     });

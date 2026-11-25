@@ -5,7 +5,7 @@ export const translations: typeof enTranslations = {
     title: "Wywołania narzędzi czatu łącznie",
     titleShort: "Wywołania narzędzi",
     description:
-      "Łączna liczba wiadomości z wywołaniami narzędzi na przedział rozdzielczości",
+      "Łączna liczba wiadomości z wywołaniami narzędzi na przedział rozdzielczości. Tylko czaty ludzi: bez wątków agentów w tle, kopii zdalnych i kont adminów; czaty incognito nigdy nie są zapisywane.",
     fields: {
       resolution: {
         label: "Rozdzielczość",

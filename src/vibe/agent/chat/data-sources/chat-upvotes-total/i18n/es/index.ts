@@ -5,7 +5,8 @@ export const translations: typeof enTranslations = {
   post: {
     title: "Total de votos positivos en el chat",
     titleShort: "Votos positivos",
-    description: "Suma de votos positivos en mensajes por intervalo",
+    description:
+      "Suma de votos positivos en mensajes por intervalo. Solo chats humanos: sin hilos de agentes en segundo plano, copias remotas ni cuentas admin; los chats de incógnito nunca se guardan.",
     fields: {
       resolution: { label: "Resolución", description: "Intervalo de cálculo" },
       range: { label: "Período", description: "Período que se va a consultar" },

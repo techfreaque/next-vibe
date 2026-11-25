@@ -6,9 +6,9 @@ export const translations: typeof enTranslations = {
   },
   post: {
     title: "Abonnements actifs",
-    titleShort: "Abos actifs",
+    titleShort: "Actifs",
     description:
-      "Instantané des abonnements actifs par intervalle de résolution",
+      "Abonnements en cours à la fin de chaque période : commencés avant, pas encore terminés (en retard de paiement compris jusqu'à la fin). Paiements incomplets et comptes admin exclus.",
     fields: {
       resolution: {
         label: "Résolution",
@@ -32,8 +32,8 @@ export const translations: typeof enTranslations = {
       },
     },
     success: {
-      title: "Abonnements actifs : calcul terminé",
-      description: "Série « Abonnements actifs » renvoyée",
+      title: "Abonnements actifs calculés",
+      description: "Série des abonnements actifs renvoyée",
     },
     errors: {
       unauthorized: {

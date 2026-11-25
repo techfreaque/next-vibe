@@ -5,8 +5,7 @@ export const translations: typeof enTranslations = {
   post: {
     title: "Utilisateurs actifs (total)",
     titleShort: "Utilisateurs actifs",
-    description:
-      "Nombre d'utilisateurs actifs, non bannis et à l'e-mail vérifié par intervalle de résolution",
+    description: "Nombre de comptes actifs non bannis (cumulé) par intervalle",
     fields: {
       resolution: { label: "Résolution", description: "Intervalle de calcul" },
       range: { label: "Période", description: "Période à interroger" },

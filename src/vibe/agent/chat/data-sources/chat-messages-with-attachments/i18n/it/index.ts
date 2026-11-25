@@ -5,7 +5,8 @@ export const translations: typeof enTranslations = {
   post: {
     title: "Messaggi di chat con allegati",
     titleShort: "Allegati",
-    description: "Messaggi con allegati per intervallo",
+    description:
+      "Messaggi con allegati per intervallo. Solo chat umane: esclusi thread di agenti in background, copie remote e account admin; le chat in incognito non vengono mai salvate.",
     fields: {
       resolution: {
         label: "Risoluzione",

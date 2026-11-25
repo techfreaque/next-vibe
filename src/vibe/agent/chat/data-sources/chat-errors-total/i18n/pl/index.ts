@@ -6,7 +6,7 @@ export const translations: typeof enTranslations = {
     title: "Błędy czatu łącznie",
     titleShort: "Błędy chatu",
     description:
-      "Liczba wiadomości o błędach w czacie na przedział rozdzielczości",
+      "Liczba wiadomości o błędach w czacie na przedział rozdzielczości. Tylko czaty ludzi: bez wątków agentów w tle, kopii zdalnych i kont adminów; czaty incognito nigdy nie są zapisywane.",
     fields: {
       resolution: {
         label: "Rozdzielczość",

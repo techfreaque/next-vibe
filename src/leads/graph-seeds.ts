@@ -14,23 +14,18 @@ import type {
 } from "next-vibe/dataflow/graph/types";
 
 import { EVALUATOR_THRESHOLD_ALIAS } from "../analytics/evaluators/threshold/constants";
-import { EMA_ALIAS } from "../analytics/indicators/ema/constants";
 import { WINDOW_AVG_ALIAS } from "../analytics/indicators/window-avg/constants";
+import { WINDOW_SUM_ALIAS } from "../analytics/indicators/window-sum/constants";
 import { TRANSFORMER_RATIO_ALIAS } from "../analytics/transformers/ratio/constants";
-import { LEADS_ACTIVE_ALIAS } from "./data-sources/leads-active/constants";
 import { LEADS_BOUNCED_ALIAS } from "./data-sources/leads-bounced/constants";
-import { LEADS_CAMPAIGN_RUNNING_ALIAS } from "./data-sources/leads-campaign-running/constants";
-import { LEADS_CONVERTED_ALIAS } from "./data-sources/leads-converted/constants";
-import { LEADS_CREATED_ALIAS } from "./data-sources/leads-created/constants";
 import { LEADS_EMAIL_CLICKS_ALIAS } from "./data-sources/leads-email-clicks/constants";
 import { LEADS_EMAIL_OPENS_ALIAS } from "./data-sources/leads-email-opens/constants";
 import { LEADS_EMAILS_SENT_ALIAS } from "./data-sources/leads-emails-sent/constants";
 import { LEADS_ENGAGEMENTS_ALIAS } from "./data-sources/leads-engagements/constants";
 import { LEADS_FORM_SUBMITS_ALIAS } from "./data-sources/leads-form-submits/constants";
-import { LEADS_IN_CONTACT_ALIAS } from "./data-sources/leads-in-contact/constants";
-import { LEADS_NEWSLETTER_SUBSCRIBERS_ALIAS } from "./data-sources/leads-newsletter-subscribers/constants";
+import { LEADS_FUNNEL_STAGE_ALIAS } from "./data-sources/leads-funnel-stage/constants";
+import { LeadFunnelStage } from "./data-sources/leads-funnel-stage/enum";
 import { LEADS_UNSUBSCRIBED_ALIAS } from "./data-sources/leads-unsubscribed/constants";
-import { LEADS_WEBSITE_USERS_ALIAS } from "./data-sources/leads-website-users/constants";
 import { LEADS_WEBSITE_VISITS_ALIAS } from "./data-sources/leads-website-visits/constants";
 
 // ─── Color palette ──────────────────────────────────────────────────────────
@@ -44,82 +39,134 @@ const CYAN = "#0891b2";
 const AMBER = "#ca8a04";
 const PINK = "#be185d";
 
-// ─── Lead Acquisition Funnel ──────────────────────────────────────────────────
+// ─── Lead Funnel ──────────────────────────────────────────────────────────────
 
-const leadAcquisitionFunnelConfig: GraphConfig = {
+/** Rolling window for stage conversion - smooths daily noise. */
+const FUNNEL_RATE_WINDOW = 7;
+
+/**
+ * Leads created per day and how far that cohort got. Same numbers as the
+ * Leads funnel report: bots excluded after "all leads", people counted once.
+ */
+const leadFunnelConfig: GraphConfig = {
   nodes: {
-    leads_created: {
-      endpointPath: LEADS_CREATED_ALIAS,
+    // ── Pane 0: top of the funnel ──
+    all_leads: {
+      endpointPath: LEADS_FUNNEL_STAGE_ALIAS,
+      params: { stage: LeadFunnelStage.LEADS },
+      pane: 0,
+      color: AMBER,
+      // Bots dwarf humans: own axis so the human lines stay readable.
+      scale: "left",
+    },
+    humans: {
+      endpointPath: LEADS_FUNNEL_STAGE_ALIAS,
+      params: { stage: LeadFunnelStage.HUMANS },
       pane: 0,
       color: BLUE,
+      scale: "right",
     },
-    leads_converted: {
-      endpointPath: LEADS_CONVERTED_ALIAS,
-      pane: 0,
-      color: GREEN,
-    },
-    leads_bounced: {
-      endpointPath: LEADS_BOUNCED_ALIAS,
-      pane: 0,
-      color: RED,
-    },
-    leads_active: {
-      endpointPath: LEADS_ACTIVE_ALIAS,
+    chatted: {
+      endpointPath: LEADS_FUNNEL_STAGE_ALIAS,
+      params: { stage: LeadFunnelStage.FIRST_CHATS },
       pane: 0,
       color: CYAN,
-    },
-    leads_created_ema7: {
-      endpointPath: EMA_ALIAS,
-      params: { period: 7 },
-      pane: 0,
-      color: BLUE,
+      scale: "right",
     },
 
-    conversion_rate: {
-      endpointPath: TRANSFORMER_RATIO_ALIAS,
+    // ── Pane 1: accounts ──
+    signed_up: {
+      endpointPath: LEADS_FUNNEL_STAGE_ALIAS,
+      params: { stage: LeadFunnelStage.SIGNUPS },
       pane: 1,
       color: PURPLE,
+      scale: "right",
+    },
+    email_confirmed: {
+      endpointPath: LEADS_FUNNEL_STAGE_ALIAS,
+      params: { stage: LeadFunnelStage.EMAIL_CONFIRMED },
+      pane: 1,
+      color: PINK,
+      scale: "right",
+    },
+    paid: {
+      endpointPath: LEADS_FUNNEL_STAGE_ALIAS,
+      params: { stage: LeadFunnelStage.PAYERS },
+      pane: 1,
+      color: GREEN,
+      scale: "right",
     },
 
-    eval_lead_drop: {
-      endpointPath: EVALUATOR_THRESHOLD_ALIAS,
-      resolution: GraphResolution.ONE_WEEK,
-      params: { op: "<", value: 0.7 },
+    // ── Rolling sums feeding the rates ──
+    humans_7d: {
+      endpointPath: WINDOW_SUM_ALIAS,
+      params: { size: FUNNEL_RATE_WINDOW },
       visible: false,
     },
-    eval_zero_leads: {
-      endpointPath: EVALUATOR_THRESHOLD_ALIAS,
-      resolution: GraphResolution.ONE_DAY,
-      params: { op: "<", value: 1 },
+    chatted_7d: {
+      endpointPath: WINDOW_SUM_ALIAS,
+      params: { size: FUNNEL_RATE_WINDOW },
       visible: false,
     },
-    eval_low_conversion: {
-      endpointPath: EVALUATOR_THRESHOLD_ALIAS,
-      resolution: GraphResolution.ONE_WEEK,
-      params: { op: "<", value: 0.05 },
+    signed_up_7d: {
+      endpointPath: WINDOW_SUM_ALIAS,
+      params: { size: FUNNEL_RATE_WINDOW },
       visible: false,
+    },
+    paid_7d: {
+      endpointPath: WINDOW_SUM_ALIAS,
+      params: { size: FUNNEL_RATE_WINDOW },
+      visible: false,
+    },
+
+    // ── Pane 2: 7-day stage conversion ──
+    chat_rate: {
+      endpointPath: TRANSFORMER_RATIO_ALIAS,
+      pane: 2,
+      color: CYAN,
+      scale: "right",
+    },
+    signup_rate: {
+      endpointPath: TRANSFORMER_RATIO_ALIAS,
+      pane: 2,
+      color: PURPLE,
+      scale: "right",
+    },
+    pay_rate: {
+      endpointPath: TRANSFORMER_RATIO_ALIAS,
+      pane: 2,
+      color: GREEN,
+      scale: "right",
     },
   },
 
   edges: [
-    { from: "leads_converted", to: "conversion_rate", toHandle: "a" },
-    { from: "leads_created", to: "conversion_rate", toHandle: "b" },
-    { from: "leads_created", to: "leads_created_ema7" },
-    { from: "leads_created_ema7", to: "eval_lead_drop" },
-    { from: "leads_created", to: "eval_zero_leads" },
-    { from: "conversion_rate", to: "eval_low_conversion" },
+    { from: "humans", to: "humans_7d" },
+    { from: "chatted", to: "chatted_7d" },
+    { from: "signed_up", to: "signed_up_7d" },
+    { from: "paid", to: "paid_7d" },
+    { from: "chatted_7d", to: "chat_rate", toHandle: "a" },
+    { from: "humans_7d", to: "chat_rate", toHandle: "b" },
+    { from: "signed_up_7d", to: "signup_rate", toHandle: "a" },
+    { from: "humans_7d", to: "signup_rate", toHandle: "b" },
+    { from: "paid_7d", to: "pay_rate", toHandle: "a" },
+    { from: "signed_up_7d", to: "pay_rate", toHandle: "b" },
   ],
 
   positions: {
-    leads_created: { x: 0, y: 0 },
-    leads_converted: { x: 0, y: 120 },
-    leads_bounced: { x: 0, y: 240 },
-    leads_active: { x: 0, y: 360 },
-    leads_created_ema7: { x: 300, y: 0 },
-    conversion_rate: { x: 300, y: 120 },
-    eval_lead_drop: { x: 600, y: 0 },
-    eval_zero_leads: { x: 600, y: 120 },
-    eval_low_conversion: { x: 600, y: 240 },
+    all_leads: { x: 0, y: 0 },
+    humans: { x: 0, y: 120 },
+    chatted: { x: 0, y: 240 },
+    signed_up: { x: 0, y: 360 },
+    email_confirmed: { x: 0, y: 480 },
+    paid: { x: 0, y: 600 },
+    humans_7d: { x: 300, y: 120 },
+    chatted_7d: { x: 300, y: 240 },
+    signed_up_7d: { x: 300, y: 360 },
+    paid_7d: { x: 300, y: 600 },
+    chat_rate: { x: 600, y: 180 },
+    signup_rate: { x: 600, y: 300 },
+    pay_rate: { x: 600, y: 480 },
   },
 
   trigger: { type: "cron", schedule: "0 */6 * * *" },
@@ -236,94 +283,15 @@ const emailCampaignPerformanceConfig: GraphConfig = {
   trigger: { type: "cron", schedule: "0 */6 * * *" },
 };
 
-// ─── Lead Pipeline Status ─────────────────────────────────────────────────────
+// ─── Lead Engagement ──────────────────────────────────────────────────────────
 
-const leadPipelineStatusConfig: GraphConfig = {
+/**
+ * Raw tracking events (bots included): the job of this graph is to show the
+ * tracking pipeline is alive, not to count people (Lead Funnel does that).
+ */
+const leadEngagementConfig: GraphConfig = {
   nodes: {
-    leads_active: {
-      endpointPath: LEADS_ACTIVE_ALIAS,
-      pane: 0,
-      color: BLUE,
-    },
-    leads_campaign_running: {
-      endpointPath: LEADS_CAMPAIGN_RUNNING_ALIAS,
-      pane: 0,
-      color: GREEN,
-    },
-    leads_newsletter_subscribers: {
-      endpointPath: LEADS_NEWSLETTER_SUBSCRIBERS_ALIAS,
-      pane: 0,
-      color: PURPLE,
-    },
-    leads_website_users: {
-      endpointPath: LEADS_WEBSITE_USERS_ALIAS,
-      pane: 0,
-      color: CYAN,
-    },
-    leads_in_contact: {
-      endpointPath: LEADS_IN_CONTACT_ALIAS,
-      pane: 0,
-      color: AMBER,
-    },
-
-    campaign_coverage: {
-      endpointPath: TRANSFORMER_RATIO_ALIAS,
-      pane: 1,
-      color: GREEN,
-    },
-    subscriber_depth: {
-      endpointPath: TRANSFORMER_RATIO_ALIAS,
-      pane: 1,
-      color: PURPLE,
-    },
-
-    eval_low_campaign_coverage: {
-      endpointPath: EVALUATOR_THRESHOLD_ALIAS,
-      resolution: GraphResolution.ONE_WEEK,
-      params: { op: "<", value: 0.3 },
-      visible: false,
-    },
-    eval_active_leads_drop: {
-      endpointPath: EVALUATOR_THRESHOLD_ALIAS,
-      resolution: GraphResolution.ONE_WEEK,
-      params: { op: "<", value: 10 },
-      visible: false,
-    },
-  },
-
-  edges: [
-    { from: "leads_campaign_running", to: "campaign_coverage", toHandle: "a" },
-    { from: "leads_active", to: "campaign_coverage", toHandle: "b" },
-    {
-      from: "leads_newsletter_subscribers",
-      to: "subscriber_depth",
-      toHandle: "a",
-    },
-    { from: "leads_active", to: "subscriber_depth", toHandle: "b" },
-    { from: "campaign_coverage", to: "eval_low_campaign_coverage" },
-    { from: "leads_active", to: "eval_active_leads_drop" },
-  ],
-
-  positions: {
-    leads_active: { x: 0, y: 0 },
-    leads_campaign_running: { x: 0, y: 120 },
-    leads_newsletter_subscribers: { x: 0, y: 240 },
-    leads_website_users: { x: 0, y: 360 },
-    leads_in_contact: { x: 0, y: 480 },
-    campaign_coverage: { x: 300, y: 60 },
-    subscriber_depth: { x: 300, y: 200 },
-    eval_low_campaign_coverage: { x: 600, y: 60 },
-    eval_active_leads_drop: { x: 600, y: 200 },
-  },
-
-  trigger: { type: "cron", schedule: "0 0 * * *" },
-};
-
-// ─── Lead Engagement Real-Time ────────────────────────────────────────────────
-
-const leadEngagementRealTimeConfig: GraphConfig = {
-  nodes: {
-    engagements: {
+    all_events: {
       endpointPath: LEADS_ENGAGEMENTS_ALIAS,
       pane: 0,
       color: BLUE,
@@ -333,36 +301,19 @@ const leadEngagementRealTimeConfig: GraphConfig = {
       pane: 0,
       color: GREEN,
     },
-    form_submits: {
+    form_and_onboarding_events: {
       endpointPath: LEADS_FORM_SUBMITS_ALIAS,
       pane: 0,
       color: PURPLE,
     },
-    email_opens: {
-      endpointPath: LEADS_EMAIL_OPENS_ALIAS,
-      pane: 0,
-      color: CYAN,
-    },
-    email_clicks: {
-      endpointPath: LEADS_EMAIL_CLICKS_ALIAS,
-      pane: 0,
-      color: PINK,
-    },
-
-    engagement_velocity: {
+    website_visits_7d_avg: {
       endpointPath: WINDOW_AVG_ALIAS,
-      params: { size: 60 },
-      pane: 1,
+      params: { size: 7 },
+      pane: 0,
       color: AMBER,
     },
 
-    eval_engagement_spike: {
-      endpointPath: EVALUATOR_THRESHOLD_ALIAS,
-      resolution: GraphResolution.ONE_HOUR,
-      params: { op: ">", value: 50 },
-      visible: false,
-    },
-    eval_engagement_dead: {
+    eval_tracking_dead: {
       endpointPath: EVALUATOR_THRESHOLD_ALIAS,
       resolution: GraphResolution.ONE_DAY,
       params: { op: "<", value: 1 },
@@ -371,54 +322,43 @@ const leadEngagementRealTimeConfig: GraphConfig = {
   },
 
   edges: [
-    { from: "engagements", to: "engagement_velocity" },
-    { from: "engagement_velocity", to: "eval_engagement_spike" },
-    { from: "engagement_velocity", to: "eval_engagement_dead" },
+    { from: "website_visits", to: "website_visits_7d_avg" },
+    { from: "website_visits", to: "eval_tracking_dead" },
   ],
 
   positions: {
-    engagements: { x: 0, y: 0 },
+    all_events: { x: 0, y: 0 },
     website_visits: { x: 0, y: 120 },
-    form_submits: { x: 0, y: 240 },
-    email_opens: { x: 0, y: 360 },
-    email_clicks: { x: 0, y: 480 },
-    engagement_velocity: { x: 300, y: 0 },
-    eval_engagement_spike: { x: 600, y: 0 },
-    eval_engagement_dead: { x: 600, y: 120 },
+    form_and_onboarding_events: { x: 0, y: 240 },
+    website_visits_7d_avg: { x: 300, y: 120 },
+    eval_tracking_dead: { x: 600, y: 120 },
   },
 
-  trigger: { type: "cron", schedule: "*/15 * * * *" },
+  trigger: { type: "cron", schedule: "0 */6 * * *" },
 };
 
 // ─── Exports ──────────────────────────────────────────────────────────────────
 
 export const graphSeeds: GraphSeedEntry[] = [
   {
-    slug: "lead-acquisition-funnel",
-    name: "Lead Acquisition Funnel",
+    slug: "lead-funnel",
+    name: "Lead Funnel",
     description:
-      "Tracks lead creation velocity, conversion rates, and acquisition health. Alerts on volume drops and conversion collapses.",
-    config: leadAcquisitionFunnelConfig,
+      "Leads created per day and how far they got: human, chatted, signed up, email confirmed, paid. Bots excluded after the first line, people counted once. Matches the Leads funnel report.",
+    config: leadFunnelConfig,
   },
   {
     slug: "email-campaign-performance",
     name: "Email Campaign Performance",
     description:
-      "Monitors open rates, click rates, bounce rates, and unsubscribe rates across all campaigns. Alerts on bounce spikes and engagement drops.",
+      "Lead campaign emails sent, opened and clicked per day, with lead bounces and unsubscribes, and open/click/bounce/unsubscribe rates per email sent. Reads zero while the campaign dispatcher is off. Alerts on bounce and unsubscribe spikes.",
     config: emailCampaignPerformanceConfig,
   },
   {
-    slug: "lead-pipeline-status",
-    name: "Lead Pipeline Status",
-    description:
-      "Daily snapshot of lead pipeline health: active leads, campaign coverage, newsletter subscribers, and website users.",
-    config: leadPipelineStatusConfig,
-  },
-  {
     slug: "lead-engagement-realtime",
-    name: "Lead Engagement Real-Time",
+    name: "Lead Engagement",
     description:
-      "15-minute engagement tracking: website visits, form submits, email interactions. Alerts on spikes and dead periods.",
-    config: leadEngagementRealTimeConfig,
+      "Raw tracking events per day, bots included: all lead engagements, website visit events and form/onboarding events. Alerts when a whole day records no website visit (tracking broken). For people, use Lead Funnel.",
+    config: leadEngagementConfig,
   },
 ];

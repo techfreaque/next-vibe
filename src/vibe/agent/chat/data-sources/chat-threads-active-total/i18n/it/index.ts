@@ -6,7 +6,7 @@ export const translations: typeof enTranslations = {
     title: "Totale conversazioni attive",
     titleShort: "Conversazioni attive",
     description:
-      "Totale delle conversazioni attive rilevato in ogni intervallo",
+      "Thread di chat distinti con almeno un messaggio utente nell'intervallo. Solo chat umane: esclusi thread di agenti in background, copie remote e account admin; le chat in incognito non vengono mai salvate.",
     fields: {
       resolution: {
         label: "Risoluzione",

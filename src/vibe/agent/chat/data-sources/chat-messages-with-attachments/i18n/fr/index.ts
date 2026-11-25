@@ -6,7 +6,7 @@ export const translations: typeof enTranslations = {
     title: "Messages du chat avec pièces jointes",
     titleShort: "Pièces jointes",
     description:
-      "Messages contenant des fichiers joints par intervalle de résolution",
+      "Messages contenant des fichiers joints par intervalle de résolution. Chats humains uniquement : sans fils d'agents en arrière-plan, copies distantes ni comptes admin ; les chats incognito ne sont jamais stockés.",
     fields: {
       resolution: { label: "Résolution", description: "Intervalle de calcul" },
       range: { label: "Période", description: "Période à interroger" },

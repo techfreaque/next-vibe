@@ -6,7 +6,7 @@ export const translations: typeof enTranslations = {
     title: "Aktive Chat-Threads Gesamt",
     titleShort: "Aktive Threads",
     description:
-      "Momentaufnahme der aktiven Chat-Threads pro Auflösungs-Bucket",
+      "Verschiedene Chat-Threads mit mindestens einer Nutzernachricht im Bucket. Nur menschliche Chats: ohne Hintergrund-Agenten-Threads, Remote-Kopien und Admin-Konten; Inkognito-Chats werden nie gespeichert.",
     fields: {
       resolution: { label: "Auflösung", description: "Berechnungszeitrahmen" },
       range: { label: "Bereich", description: "Abzufragender Zeitraum" },

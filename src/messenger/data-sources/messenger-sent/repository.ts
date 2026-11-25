@@ -6,7 +6,7 @@
 
 import "server-only";
 
-import { and, count, gte, isNotNull, lte, sql } from "drizzle-orm";
+import { and, count, eq, gte, isNotNull, lte, sql } from "drizzle-orm";
 import {
   type ResponseType,
   success,
@@ -21,12 +21,14 @@ import { resolutionBucketExpr } from "next-vibe/dataflow/shared/query-utils";
 import { fillGaps } from "next-vibe/dataflow/shared/range";
 
 import { emails } from "../../messages/db";
+import { SENT_MESSAGE_TYPE, type SentMessageTypeFilterValue } from "./enum";
 
 export class QueryMessengerSentRepository {
   static async queryMessengerSent(data: {
     resolution: Resolution;
     range: TimeRange;
     lookback?: number;
+    messageType?: typeof SentMessageTypeFilterValue;
   }): Promise<
     ResponseType<{
       result: DataPoint[];
@@ -34,6 +36,9 @@ export class QueryMessengerSentRepository {
     }>
   > {
     const { resolution, range, lookback } = data;
+    const messageType = data.messageType
+      ? SENT_MESSAGE_TYPE[data.messageType]
+      : null;
     const rows = await db
       .select({
         bucket: resolutionBucketExpr(resolution, emails.sentAt).as("bucket"),
@@ -45,6 +50,7 @@ export class QueryMessengerSentRepository {
           isNotNull(emails.sentAt),
           gte(emails.sentAt, range.from),
           lte(emails.sentAt, range.to),
+          messageType ? eq(emails.type, messageType) : undefined,
         ),
       )
       .groupBy(sql`1`)

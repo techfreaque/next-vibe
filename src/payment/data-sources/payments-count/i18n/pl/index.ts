@@ -1,28 +1,39 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
-  tags: { vibeSense: "vibe-sense" },
+  tags: {
+    vibeSense: "vibe-sense",
+  },
   post: {
-    title: "Liczba płatności",
-    titleShort: "Liczba płatności",
+    title: "Opłacone płatności",
+    titleShort: "Opłacone",
     description:
-      "Liczba zrealizowanych transakcji płatniczych na przedział rozdzielczości",
+      "Pobrane płatności w okresie: pakiety, nowe subskrypcje i odnowienia. Udane lub później zwrócone, bez kont adminów.",
     fields: {
       resolution: {
         label: "Rozdzielczość",
         description: "Ramy czasowe obliczeń",
       },
-      range: { label: "Zakres", description: "Zakres czasu do zapytania" },
+      range: {
+        label: "Zakres",
+        description: "Zakres czasu do zapytania",
+      },
       lookback: {
         label: "Cofnięcie",
         description: "Dodatkowe słupki przed początkiem zakresu",
       },
-      result: { label: "Liczba", description: "Wyjściowa seria czasowa" },
-      meta: { label: "Meta", description: "Metadane wykonania węzła" },
+      result: {
+        label: "Opłacone płatności",
+        description: "Wyjściowa seria czasowa",
+      },
+      meta: {
+        label: "Meta",
+        description: "Metadane wykonania węzła",
+      },
     },
     success: {
-      title: "Liczba płatności obliczona",
-      description: "Seria liczby płatności zwrócona",
+      title: "Obliczono opłacone płatności",
+      description: "Zwrócono serię opłaconych płatności",
     },
     errors: {
       unauthorized: {
@@ -45,8 +56,14 @@ export const translations: typeof enTranslations = {
         title: "Walidacja nie powiodła się",
         description: "Nieprawidłowe parametry żądania",
       },
-      notFound: { title: "Nie znaleziono", description: "Nie znaleziono" },
-      conflict: { title: "Konflikt", description: "Konflikt" },
+      notFound: {
+        title: "Nie znaleziono",
+        description: "Nie znaleziono",
+      },
+      conflict: {
+        title: "Konflikt",
+        description: "Konflikt",
+      },
       network: {
         title: "Błąd sieci",
         description: "Żądanie sieciowe nie powiodło się",

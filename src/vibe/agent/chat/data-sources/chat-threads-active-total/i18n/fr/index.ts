@@ -6,7 +6,7 @@ export const translations: typeof enTranslations = {
     title: "Total des fils actifs",
     titleShort: "Fils actifs",
     description:
-      "Instantané du nombre total de fils de discussion actifs par intervalle de résolution",
+      "Fils de discussion distincts ayant reçu au moins un message utilisateur dans la période. Chats humains uniquement : sans fils d'agents en arrière-plan, copies distantes ni comptes admin ; les chats incognito ne sont jamais stockés.",
     fields: {
       resolution: { label: "Résolution", description: "Intervalle de calcul" },
       range: { label: "Période", description: "Période à interroger" },

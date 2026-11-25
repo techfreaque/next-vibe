@@ -6,7 +6,7 @@ export const translations: typeof enTranslations = {
     title: "Total des votes positifs du chat",
     titleShort: "Votes positifs",
     description:
-      "Somme des votes positifs sur les messages par intervalle de résolution",
+      "Somme des votes positifs sur les messages par intervalle de résolution. Chats humains uniquement : sans fils d'agents en arrière-plan, copies distantes ni comptes admin ; les chats incognito ne sont jamais stockés.",
     fields: {
       resolution: { label: "Résolution", description: "Intervalle de calcul" },
       range: { label: "Période", description: "Période à interroger" },

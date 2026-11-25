@@ -5,7 +5,8 @@ export const translations: typeof enTranslations = {
   post: {
     title: "Mensajes de chat con archivos adjuntos",
     titleShort: "Archivos adjuntos",
-    description: "Mensajes con archivos adjuntos por intervalo",
+    description:
+      "Mensajes con archivos adjuntos por intervalo. Solo chats humanos: sin hilos de agentes en segundo plano, copias remotas ni cuentas admin; los chats de incógnito nunca se guardan.",
     fields: {
       resolution: { label: "Resolución", description: "Intervalo de cálculo" },
       range: { label: "Período", description: "Período que se va a consultar" },

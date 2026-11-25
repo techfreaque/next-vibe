@@ -5,7 +5,8 @@ export const translations: typeof enTranslations = {
   post: {
     title: "Ejecuciones fallidas de cron",
     titleShort: "Cron fallidas",
-    description: "Ejecuciones fallidas de cron por intervalo",
+    description:
+      "Ejecuciones de cron fallidas, con error o agotadas por intervalo",
     fields: {
       resolution: { label: "Resolución", description: "Intervalo de cálculo" },
       range: { label: "Período", description: "Período que se va a consultar" },

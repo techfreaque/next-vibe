@@ -4,7 +4,8 @@ export const translations: typeof enTranslations = {
   post: {
     title: "Erstellte Chat-Threads",
     titleShort: "Neue Threads",
-    description: "Anzahl neuer Chat-Threads pro Auflösungs-Bucket",
+    description:
+      "Anzahl neuer Chat-Threads pro Auflösungs-Bucket. Nur menschliche Chats: ohne Hintergrund-Agenten-Threads, Remote-Kopien und Admin-Konten; Inkognito-Chats werden nie gespeichert.",
     fields: {
       resolution: { label: "Auflösung", description: "Berechnungszeitrahmen" },
       range: { label: "Bereich", description: "Abzufragender Zeitraum" },

@@ -19,6 +19,8 @@ import type {
 } from "next-vibe/dataflow/shared/fields";
 import { fillGaps } from "next-vibe/dataflow/shared/range";
 
+import { paidMinorToUsdCents } from "@/referral/commission";
+
 import { growthChannelSpend } from "../../db";
 import { distributeSpend } from "../../funnel";
 
@@ -29,6 +31,7 @@ export class GrowthChannelSpendRepository {
     lookback?: number;
     channel: string;
     currency: (typeof CurrenciesArr)[number];
+    convertToUsd: boolean;
   }): Promise<
     ResponseType<{
       result: DataPoint[];
@@ -37,11 +40,13 @@ export class GrowthChannelSpendRepository {
   > {
     const { resolution, range, lookback } = data;
     const conditions: SQL[] = [
-      eq(growthChannelSpend.currency, data.currency),
       // Period overlaps the range
       lte(growthChannelSpend.periodStart, range.to),
       gte(growthChannelSpend.periodEnd, range.from),
     ];
+    if (!data.convertToUsd) {
+      conditions.push(eq(growthChannelSpend.currency, data.currency));
+    }
     const channel = data.channel.trim();
     if (channel.length > 0) {
       conditions.push(eq(growthChannelSpend.channel, channel));
@@ -51,13 +56,25 @@ export class GrowthChannelSpendRepository {
         periodStart: growthChannelSpend.periodStart,
         periodEnd: growthChannelSpend.periodEnd,
         amountCents: growthChannelSpend.amountCents,
+        currency: growthChannelSpend.currency,
       })
       .from(growthChannelSpend)
       .where(and(...conditions));
+    // USD mode: every entry at the finance FX table rate; a currency the
+    // table does not know is left out rather than guessed.
+    const periods = data.convertToUsd
+      ? rows.flatMap((row) => {
+          const amountCents = paidMinorToUsdCents(
+            row.amountCents,
+            row.currency,
+          );
+          return amountCents === null ? [] : [{ ...row, amountCents }];
+        })
+      : rows;
 
     return success({
       result: fillGaps(
-        distributeSpend(rows, range, resolution),
+        distributeSpend(periods, range, resolution),
         range,
         resolution,
       ),

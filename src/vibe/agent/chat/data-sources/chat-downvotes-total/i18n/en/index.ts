@@ -3,7 +3,8 @@ export const translations = {
   post: {
     title: "Chat Downvotes Total",
     titleShort: "Downvotes",
-    description: "Sum of message downvotes per resolution bucket",
+    description:
+      "Sum of message downvotes per resolution bucket. Human chats only: background agent threads, remote copies and admin accounts excluded; incognito chats are never stored.",
     fields: {
       resolution: { label: "Resolution", description: "Computation timeframe" },
       range: { label: "Range", description: "Time range to query" },

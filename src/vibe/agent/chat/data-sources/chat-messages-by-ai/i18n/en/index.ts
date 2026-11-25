@@ -3,7 +3,8 @@ export const translations = {
   post: {
     title: "Chat Messages By AI",
     titleShort: "AI Messages",
-    description: "Count of AI assistant messages per resolution bucket",
+    description:
+      "Count of AI assistant messages per resolution bucket. Human chats only: background agent threads, remote copies and admin accounts excluded; incognito chats are never stored.",
     fields: {
       resolution: { label: "Resolution", description: "Computation timeframe" },
       range: { label: "Range", description: "Time range to query" },

@@ -5,10 +5,10 @@ export const translations: typeof enTranslations = {
     vibeSense: "vibe-sense",
   },
   post: {
-    titleShort: "Solde total",
-    title: "Solde total des crédits",
+    titleShort: "Crédits en circulation",
+    title: "Crédits utilisateurs non dépensés",
     description:
-      "Instantané du solde total des portefeuilles utilisateurs par intervalle de résolution",
+      "Crédits non dépensés dans les portefeuilles des utilisateurs connectés à la fin de chaque période (payés, offerts et gratuits), reconstitués depuis le registre des crédits. En crédits. Portefeuilles invités exclus.",
     fields: {
       resolution: {
         label: "Résolution",
@@ -23,7 +23,7 @@ export const translations: typeof enTranslations = {
         description: "Barres supplémentaires avant le début de la période",
       },
       result: {
-        label: "Solde total",
+        label: "Crédits non dépensés",
         description: "Série temporelle en sortie",
       },
       meta: {

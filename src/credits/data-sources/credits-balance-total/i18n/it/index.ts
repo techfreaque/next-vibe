@@ -3,10 +3,10 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
-    titleShort: "Bilancio totale",
-    title: "Credits Balance Totale",
+    titleShort: "Crediti in sospeso",
+    title: "Crediti utente non spesi",
     description:
-      "Esaminare i bilanciamenti totali del portafoglio utente per benna di risoluzione",
+      "Crediti non spesi nei portafogli degli utenti registrati alla fine di ogni intervallo (pagati, regalati e gratuiti), ricostruiti dal registro crediti. In crediti. Portafogli ospite esclusi.",
     fields: {
       resolution: { label: "Risoluzione", description: "Tempo di calcolo" },
       range: {
@@ -18,7 +18,7 @@ export const translations: typeof enTranslations = {
         description: "Barre extra prima dell'inizio della gamma",
       },
       result: {
-        label: "Bilancio totale",
+        label: "Crediti non spesi",
         description: "Serie di tempo di uscita",
       },
       meta: { label: "Meta", description: "metadati di esecuzione del nodo" },

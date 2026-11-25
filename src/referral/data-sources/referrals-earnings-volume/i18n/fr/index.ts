@@ -5,10 +5,10 @@ export const translations: typeof enTranslations = {
     vibeSense: "vibe-sense",
   },
   post: {
-    title: "Volume des gains de parrainage",
-    titleShort: "Volume des gains",
+    title: "Commissions de parrainage (USD)",
+    titleShort: "Commissions",
     description:
-      "Somme des gains de parrainage en centimes par intervalle de résolution",
+      "Commissions de parrainage gagnées par intervalle en USD (1 crédit = 0,01 $), tous niveaux, annulées exclues",
     fields: {
       resolution: {
         label: "Résolution",

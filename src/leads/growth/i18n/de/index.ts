@@ -32,6 +32,9 @@ export const translations: typeof enTranslations = {
       refCode: "Empfehlungscode",
       currency: "Umsatzwährung",
       metric: "Kennzahl",
+      excludeBots: "Bots ausschließen",
+      excludeBotsDescription:
+        "Nur Besuche: Besuche bekannter Bot- und Crawler-Leads fallen weg, gleiche Regel wie im Lead-Funnel.",
     },
     series: "Lead-Gewinnung im Zeitverlauf",
     empty: "Keine Aktivitäten in diesem Zeitraum.",
@@ -267,6 +270,11 @@ export const translations: typeof enTranslations = {
       currency: {
         label: "Währung",
         description: "Nur Ausgaben in dieser Währung werden summiert",
+      },
+      convertToUsd: {
+        label: "Alle Währungen in USD",
+        description:
+          "Summiert jede Währung, umgerechnet in USD zum Kurs der Finanz-FX-Tabelle. Der Währungsfilter wird ignoriert.",
       },
     },
     funnelStep: {

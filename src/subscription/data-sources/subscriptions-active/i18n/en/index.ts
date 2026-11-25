@@ -1,33 +1,51 @@
 export const translations = {
-  tags: { vibeSense: "vibe-sense" },
+  tags: {
+    vibeSense: "vibe-sense",
+  },
   post: {
-    title: "Subscriptions Active",
+    title: "Active Subscriptions",
     titleShort: "Active Subs",
-    description: "Snapshot of active subscriptions per resolution bucket",
+    description:
+      "Subscriptions running at the end of each bucket: started before, not ended yet (past due still counts until it ends). Incomplete checkouts and admin accounts excluded.",
     fields: {
-      resolution: { label: "Resolution", description: "Computation timeframe" },
-      range: { label: "Range", description: "Time range to query" },
+      resolution: {
+        label: "Resolution",
+        description: "Computation timeframe",
+      },
+      range: {
+        label: "Range",
+        description: "Time range to query",
+      },
       lookback: {
         label: "Lookback",
         description: "Extra bars before range start",
       },
       result: {
-        label: "Subscriptions Active",
+        label: "Active subscriptions",
         description: "Output time series",
       },
-      meta: { label: "Meta", description: "Node execution metadata" },
+      meta: {
+        label: "Meta",
+        description: "Node execution metadata",
+      },
     },
     success: {
-      title: "Subscriptions Active computed",
-      description: "Subscriptions Active series returned",
+      title: "Active subscriptions computed",
+      description: "Active subscriptions series returned",
     },
     errors: {
       unauthorized: {
         title: "Unauthorized",
         description: "Authentication required",
       },
-      forbidden: { title: "Forbidden", description: "Admin access required" },
-      server: { title: "Server error", description: "Query failed" },
+      forbidden: {
+        title: "Forbidden",
+        description: "Admin access required",
+      },
+      server: {
+        title: "Server error",
+        description: "Query failed",
+      },
       unknown: {
         title: "Unknown error",
         description: "An unexpected error occurred",
@@ -36,8 +54,14 @@ export const translations = {
         title: "Validation failed",
         description: "Invalid request parameters",
       },
-      notFound: { title: "Not found", description: "Not found" },
-      conflict: { title: "Conflict", description: "Conflict" },
+      notFound: {
+        title: "Not found",
+        description: "Not found",
+      },
+      conflict: {
+        title: "Conflict",
+        description: "Conflict",
+      },
       network: {
         title: "Network error",
         description: "Network request failed",

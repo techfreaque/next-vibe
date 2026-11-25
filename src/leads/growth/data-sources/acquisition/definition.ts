@@ -75,6 +75,13 @@ const { POST } = createEndpoint({
         schema: z.enum(AcquisitionMetric).default(AcquisitionMetric.VISITS),
       }),
       ...acquisitionFilterFields,
+      excludeBots: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "acquisition.fields.excludeBots",
+        description: "acquisition.fields.excludeBotsDescription",
+        schema: z.boolean().default(false),
+      }),
       currency: acquisitionCurrencyField,
       result: timeSeriesResponseField(scopedTranslation, {
         label: "acquisition.series",

@@ -32,6 +32,9 @@ export const translations: typeof enTranslations = {
       refCode: "Codice referral",
       currency: "Valuta dei ricavi",
       metric: "Metrica",
+      excludeBots: "Escludi i bot",
+      excludeBotsDescription:
+        "Solo visite: esclude le visite di lead bot e crawler noti, stessa regola del funnel dei lead.",
     },
     series: "Acquisizione contatti nel tempo",
     empty: "Nessuna attività nel periodo.",
@@ -274,6 +277,11 @@ export const translations: typeof enTranslations = {
       currency: {
         label: "Valuta",
         description: "Solo la spesa inserita in questa valuta è riassunta",
+      },
+      convertToUsd: {
+        label: "Tutte le valute in USD",
+        description:
+          "Somma ogni valuta convertita in USD al cambio della tabella FX finanza. Ignora il filtro valuta.",
       },
     },
     funnelStep: {

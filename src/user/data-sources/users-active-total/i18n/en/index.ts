@@ -4,7 +4,7 @@ export const translations = {
     title: "Users Active Total",
     titleShort: "Active Users",
     description:
-      "Count of active, non-banned, email-verified users per resolution bucket",
+      "Count of active, non-banned accounts (cumulative) per resolution bucket",
     fields: {
       resolution: { label: "Resolution", description: "Computation timeframe" },
       range: { label: "Range", description: "Time range to query" },

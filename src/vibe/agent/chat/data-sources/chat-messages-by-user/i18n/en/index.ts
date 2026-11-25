@@ -3,7 +3,8 @@ export const translations = {
   post: {
     title: "Chat Messages By User",
     titleShort: "User Messages",
-    description: "Count of user-sent chat messages per resolution bucket",
+    description:
+      "Count of user-sent chat messages per resolution bucket. Human chats only: background agent threads, remote copies and admin accounts excluded; incognito chats are never stored.",
     fields: {
       resolution: { label: "Resolution", description: "Computation timeframe" },
       range: { label: "Range", description: "Time range to query" },

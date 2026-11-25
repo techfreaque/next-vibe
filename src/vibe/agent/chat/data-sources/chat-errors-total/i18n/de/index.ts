@@ -5,7 +5,8 @@ export const translations: typeof enTranslations = {
   post: {
     title: "Chat-Fehler Gesamt",
     titleShort: "Chat-Fehler",
-    description: "Anzahl der Fehlermeldungen im Chat pro Auflösungs-Bucket",
+    description:
+      "Anzahl der Fehlermeldungen im Chat pro Auflösungs-Bucket. Nur menschliche Chats: ohne Hintergrund-Agenten-Threads, Remote-Kopien und Admin-Konten; Inkognito-Chats werden nie gespeichert.",
     fields: {
       resolution: {
         label: "Auflösung",

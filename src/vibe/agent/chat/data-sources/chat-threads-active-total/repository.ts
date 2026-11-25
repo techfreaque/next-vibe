@@ -1,12 +1,14 @@
 /**
  * Chat Threads Active Total - Repository
  * Server-only. DB access.
- * Snapshot: count of active (non-archived) threads per resolution bucket.
+ * Active threads per bucket: distinct human chat threads (see human-chat-sql)
+ * that received at least one user message in the bucket. Before 2026-11-25
+ * this was a running count of every non-deleted thread ever created.
  */
 
 import "server-only";
 
-import { and, count, eq, lt, not } from "drizzle-orm";
+import { and, countDistinct, eq, gte, lte, sql } from "drizzle-orm";
 import {
   type ResponseType,
   success,
@@ -17,11 +19,12 @@ import type {
   Resolution,
   TimeRange,
 } from "next-vibe/dataflow/shared/fields";
-import { RESOLUTION_MS } from "next-vibe/dataflow/shared/fields";
+import { resolutionBucketExpr } from "next-vibe/dataflow/shared/query-utils";
 import { fillGaps } from "next-vibe/dataflow/shared/range";
 
-import { chatThreads } from "../../db";
-import { ThreadStatus } from "../../enum";
+import { chatMessages } from "../../db";
+import { ChatMessageRole } from "../../enum";
+import { humanChatMessage } from "../human-chat-sql";
 
 export class QueryChatThreadsActiveTotalRepository {
   static async queryChatThreadsActiveTotal(data: {
@@ -35,31 +38,33 @@ export class QueryChatThreadsActiveTotalRepository {
     }>
   > {
     const { resolution, range, lookback } = data;
-    const stepMs = RESOLUTION_MS[resolution];
-    const points: DataPoint[] = [];
 
-    let ts = range.from.getTime();
-    while (ts <= range.to.getTime()) {
-      const bucket = new Date(ts);
-      const next = new Date(ts + stepMs);
+    const rows = await db
+      .select({
+        bucket: resolutionBucketExpr(resolution, chatMessages.createdAt).as(
+          "bucket",
+        ),
+        cnt: countDistinct(chatMessages.threadId),
+      })
+      .from(chatMessages)
+      .where(
+        and(
+          humanChatMessage,
+          eq(chatMessages.role, ChatMessageRole.USER),
+          gte(chatMessages.createdAt, range.from),
+          lte(chatMessages.createdAt, range.to),
+        ),
+      )
+      .groupBy(sql`1`)
+      .orderBy(sql`1`);
 
-      const [row] = await db
-        .select({ total: count() })
-        .from(chatThreads)
-        .where(
-          and(
-            lt(chatThreads.createdAt, next),
-            not(eq(chatThreads.status, ThreadStatus.DELETED)),
-          ),
-        );
+    const raw = rows.map((r): DataPoint => ({
+      timestamp: new Date(r.bucket),
+      value: Number(r.cnt ?? 0),
+    }));
 
-      points.push({ timestamp: bucket, value: Number(row?.total ?? 0) });
-      ts += stepMs;
-    }
-
-    const result = fillGaps(points, range, resolution);
     return success({
-      result,
+      result: fillGaps(raw, range, resolution),
       meta: {
         actualResolution: resolution ?? "enums.resolution.1d",
         lookbackUsed: lookback ?? 0,

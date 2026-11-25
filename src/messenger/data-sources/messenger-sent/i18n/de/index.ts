@@ -2,6 +2,17 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
+  enums: {
+    messageType: {
+      all: "Alle Typen",
+      system: "System",
+      transactional: "Transaktional",
+      notification: "Benachrichtigung",
+      marketing: "Marketing",
+      leadCampaign: "Lead-Kampagne",
+      userCommunication: "Nutzernachricht",
+    },
+  },
   post: {
     title: "Gesendete Nachrichten",
     titleShort: "Gesendet",
@@ -12,6 +23,10 @@ export const translations: typeof enTranslations = {
       lookback: {
         label: "Rückblick",
         description: "Extra Balken vor Bereichsstart",
+      },
+      messageType: {
+        label: "Nachrichtentyp",
+        description: "Alle gesendeten Nachrichten oder nur einen Typ zählen",
       },
       result: {
         label: "Gesendete Nachrichten",

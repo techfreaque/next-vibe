@@ -22,6 +22,7 @@ import { fillGaps } from "next-vibe/dataflow/shared/range";
 
 import { chatMessages } from "../../db";
 import { ChatMessageRole } from "../../enum";
+import { humanChatMessage } from "../human-chat-sql";
 
 export class QueryChatMessagesByAiRepository {
   static async queryChatMessagesByAi(data: {
@@ -45,6 +46,7 @@ export class QueryChatMessagesByAiRepository {
       .from(chatMessages)
       .where(
         and(
+          humanChatMessage,
           eq(chatMessages.role, ChatMessageRole.ASSISTANT),
           gte(chatMessages.createdAt, range.from),
           lte(chatMessages.createdAt, range.to),

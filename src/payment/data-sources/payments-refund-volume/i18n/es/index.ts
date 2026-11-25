@@ -1,13 +1,19 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
-  tags: { vibeSense: "vibe-sense" },
+  tags: {
+    vibeSense: "vibe-sense",
+  },
   post: {
-    title: "Pagos Reembolso Volumen",
-    titleShort: "Volumen de reembolso",
-    description: "Suma de importes de reembolso por cubo de resolución",
+    title: "Reembolsos (USD)",
+    titleShort: "Reembolsos",
+    description:
+      "Reembolsos exitosos por periodo en USD aprox. (EUR y PLN a tipos fijos). Sin cuentas admin.",
     fields: {
-      resolution: { label: "Resolución", description: "Plazo de cálculo" },
+      resolution: {
+        label: "Resolución",
+        description: "Plazo de cálculo",
+      },
       range: {
         label: "Rango",
         description: "Rango de tiempo para la consulta",
@@ -17,14 +23,17 @@ export const translations: typeof enTranslations = {
         description: "Barras extra antes de empezar el rango",
       },
       result: {
-        label: "Volumen de reembolso",
+        label: "Reembolsos (USD)",
         description: "Serie de tiempo de producción",
       },
-      meta: { label: "Meta", description: "Metadatos de ejecución de nodos" },
+      meta: {
+        label: "Meta",
+        description: "Metadatos de ejecución de nodos",
+      },
     },
     success: {
-      title: "Pagos Reembolso Volumen calculado",
-      description: "Pagos Reembolso serie Volumen devuelto",
+      title: "Reembolsos calculados",
+      description: "Serie de reembolsos devuelta",
     },
     errors: {
       unauthorized: {
@@ -51,7 +60,10 @@ export const translations: typeof enTranslations = {
         title: "Cuenta o sesión no encontradas",
         description: "Cuenta o sesión no encontradas",
       },
-      conflict: { title: "Conflicto", description: "Conflicto" },
+      conflict: {
+        title: "Conflicto",
+        description: "Conflicto",
+      },
       network: {
         title: "Error de red",
         description: "Solicitud de red falló",

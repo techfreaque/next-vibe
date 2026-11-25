@@ -6,7 +6,7 @@ export const translations: typeof enTranslations = {
     title: "Total des messages du chat",
     titleShort: "Total des messages",
     description:
-      "Nombre total de messages du chat par intervalle de résolution",
+      "Nombre total de messages du chat par intervalle de résolution. Chats humains uniquement : sans fils d'agents en arrière-plan, copies distantes ni comptes admin ; les chats incognito ne sont jamais stockés.",
     fields: {
       resolution: { label: "Résolution", description: "Intervalle de calcul" },
       range: { label: "Période", description: "Période à interroger" },

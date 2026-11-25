@@ -5,7 +5,8 @@ export const translations: typeof enTranslations = {
   post: {
     title: "Fehlgeschlagene Cron-Ausführungen",
     titleShort: "Cron fehlgeschlagen",
-    description: "Fehlgeschlagene Cron-Ausführungen pro Auflösungs-Bucket",
+    description:
+      "Fehlgeschlagene, fehlerhafte und abgelaufene Cron-Ausführungen pro Auflösungs-Bucket",
     fields: {
       resolution: { label: "Auflösung", description: "Berechnungszeitrahmen" },
       range: { label: "Bereich", description: "Abzufragender Zeitraum" },

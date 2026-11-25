@@ -32,6 +32,9 @@ export const translations: typeof enTranslations = {
       refCode: "Kod polecenia",
       currency: "Waluta przychodu",
       metric: "Wskaźnik",
+      excludeBots: "Bez botów",
+      excludeBotsDescription:
+        "Tylko wizyty: pomija wizyty znanych botów i crawlerów, ta sama reguła co w lejku leadów.",
     },
     series: "Pozyskiwanie kontaktów w czasie",
     empty: "Brak aktywności w tym okresie.",
@@ -269,6 +272,11 @@ export const translations: typeof enTranslations = {
       currency: {
         label: "Waluta",
         description: "Sumowane są tylko wydatki w tej walucie",
+      },
+      convertToUsd: {
+        label: "Wszystkie waluty w USD",
+        description:
+          "Sumuje każdą walutę po przeliczeniu na USD według kursu z tabeli FX finansów. Pomija filtr waluty.",
       },
     },
     funnelStep: {

@@ -16,8 +16,15 @@ import { COMPLETE_TASK_ALIAS } from "next-vibe/execute-tool/complete/constants";
 
 import { EVALUATOR_THRESHOLD_ALIAS } from "../analytics/evaluators/threshold/constants";
 import { EMA_ALIAS } from "../analytics/indicators/ema/constants";
+import { WINDOW_SUM_ALIAS } from "../analytics/indicators/window-sum/constants";
 import { TRANSFORMER_RATIO_ALIAS } from "../analytics/transformers/ratio/constants";
-import { CREDITS_AVG_TRANSACTION_ALIAS } from "./data-sources/credits-avg-transaction/constants";
+import { FINANCE_SERIES_ALIAS } from "../finance/constants";
+import { FinanceMetric } from "../finance/enum";
+import { PAYMENTS_REVENUE_ALIAS } from "../payment/data-sources/payments-revenue/constants";
+import {
+  RevenueSeriesKind,
+  type RevenueSeriesKindValue,
+} from "../payment/data-sources/payments-revenue/enum";
 import { CREDITS_BALANCE_TOTAL_ALIAS } from "./data-sources/credits-balance-total/constants";
 import { CREDITS_EARNED_ALIAS } from "./data-sources/credits-earned/constants";
 import { CREDITS_EXPIRED_ALIAS } from "./data-sources/credits-expired/constants";
@@ -25,18 +32,20 @@ import { CREDITS_FARMING_BLOCKED_ALIAS } from "./data-sources/credits-farming-bl
 import { CREDITS_FREE_GRANTS_ALIAS } from "./data-sources/credits-free-grants/constants";
 import { CREDITS_FREE_POOL_UTILIZATION_ALIAS } from "./data-sources/credits-free-pool-utilization/constants";
 import { CREDITS_FREE_TIER_SPEND_ALIAS } from "./data-sources/credits-free-tier-spend/constants";
-import { CREDITS_PACKS_CREATED_ALIAS } from "./data-sources/credits-packs-created/constants";
 import { CREDITS_PURCHASED_ALIAS } from "./data-sources/credits-purchased/constants";
-import { CREDITS_REFUNDED_ALIAS } from "./data-sources/credits-refunded/constants";
+import {
+  CreditIssueKind,
+  type CreditIssueKindValue,
+} from "./data-sources/credits-purchased/enum";
+import { CREDITS_SPENT_BY_MODEL_ALIAS } from "./data-sources/credits-spent-by-model/constants";
+import {
+  ModelSpendGroup,
+  type ModelSpendGroupValue,
+} from "./data-sources/credits-spent-by-model/enum";
 import { CREDITS_SPENT_BY_SOURCE_ALIAS } from "./data-sources/credits-spent-by-source/constants";
 import type { UsageSourceValue } from "./data-sources/credits-spent-by-source/enum";
 import { UsageSource } from "./data-sources/credits-spent-by-source/enum";
 import { CREDITS_SPENT_TOTAL_ALIAS } from "./data-sources/credits-spent-total/constants";
-import { CREDITS_SUBSCRIPTION_REVENUE_ALIAS } from "./data-sources/credits-subscription-revenue/constants";
-import { CREDITS_TRANSACTIONS_COUNT_ALIAS } from "./data-sources/credits-transactions-count/constants";
-import { CREDITS_TRANSFER_VOLUME_ALIAS } from "./data-sources/credits-transfer-volume/constants";
-import { CREDITS_USAGE_WITH_FEATURE_ALIAS } from "./data-sources/credits-usage-with-feature/constants";
-import { CREDITS_WALLETS_TOTAL_ALIAS } from "./data-sources/credits-wallets-total/constants";
 
 // ─── Color palette (consistent across graphs) ──────────────────────────────
 
@@ -48,64 +57,80 @@ const PURPLE = "#9333ea";
 const CYAN = "#0891b2";
 const AMBER = "#ca8a04";
 const SLATE = "#64748b";
+const PINK = "#db2777";
+const TEAL = "#0d9488";
 
 // ─── Credit Economy Overview ──────────────────────────────────────────────────
+// Credits in vs credits out, in CREDITS (money: Revenue Health / Finance).
+// Free allowance grants live in Free vs Paid Usage (they dwarf this scale).
+
+const creditIssued = (
+  kind: typeof CreditIssueKindValue,
+  color: string,
+): GraphConfig["nodes"][string] => ({
+  endpointPath: CREDITS_PURCHASED_ALIAS,
+  params: { kind },
+  pane: 0,
+  color,
+  scale: "right",
+});
 
 const creditEconomyOverviewConfig: GraphConfig = {
   nodes: {
-    spent_total: {
+    // Pane 0 = credit flows per bucket (credits)
+    pack_credits_sold: creditIssued(CreditIssueKind.PACKS, GREEN),
+    subscription_credits_issued: creditIssued(
+      CreditIssueKind.SUBSCRIPTIONS,
+      BLUE,
+    ),
+    gifted_credits_admin: creditIssued(CreditIssueKind.GIFTED, PURPLE),
+    referral_credits_earned: {
+      endpointPath: CREDITS_EARNED_ALIAS,
+      pane: 0,
+      color: CYAN,
+      scale: "right",
+    },
+    credits_spent_all: {
       endpointPath: CREDITS_SPENT_TOTAL_ALIAS,
       pane: 0,
-      color: BLUE,
-    },
-    purchased: {
-      endpointPath: CREDITS_PURCHASED_ALIAS,
-      pane: 0,
-      color: GREEN,
-    },
-    expired: {
-      endpointPath: CREDITS_EXPIRED_ALIAS,
-      pane: 0,
       color: RED,
+      scale: "right",
     },
-    free_grants: {
-      endpointPath: CREDITS_FREE_GRANTS_ALIAS,
+    credits_spent_all_ema7: {
+      endpointPath: EMA_ALIAS,
+      params: { period: 7 },
       pane: 0,
       color: ORANGE,
+      scale: "right",
     },
-    spent_total_ema7: {
-      endpointPath: EMA_ALIAS,
-      params: { period: 7 },
+    credits_expired: {
+      endpointPath: CREDITS_EXPIRED_ALIAS,
       pane: 0,
-      color: BLUE,
-    },
-    purchased_ema7: {
-      endpointPath: EMA_ALIAS,
-      params: { period: 7 },
-      pane: 0,
-      color: GREEN,
+      color: SLATE,
+      scale: "right",
     },
 
-    burn_vs_earn: {
-      endpointPath: TRANSFORMER_RATIO_ALIAS,
+    // Pane 1 = stock: unspent credits in user wallets (credits)
+    outstanding_user_credits: {
+      endpointPath: CREDITS_BALANCE_TOTAL_ALIAS,
       pane: 1,
-      color: PURPLE,
+      color: AMBER,
+      scale: "right",
     },
 
-    eval_high_burn: {
-      endpointPath: EVALUATOR_THRESHOLD_ALIAS,
-      resolution: GraphResolution.ONE_WEEK,
-      params: { op: ">", value: 2 },
+    // Alert input: paid credits (packs + subscriptions) per week
+    paid_credits_issued: {
+      endpointPath: CREDITS_PURCHASED_ALIAS,
+      params: { kind: CreditIssueKind.PAID },
       visible: false,
     },
-    eval_no_purchases: {
+    eval_no_paid_credits: {
       endpointPath: EVALUATOR_THRESHOLD_ALIAS,
       resolution: GraphResolution.ONE_WEEK,
       params: { op: "<", value: 1 },
       visible: false,
     },
-
-    action_notify_high_burn: {
+    action_notify_no_paid_credits: {
       endpointPath: COMPLETE_TASK_ALIAS,
       persist: "never",
       visible: false,
@@ -113,155 +138,124 @@ const creditEconomyOverviewConfig: GraphConfig = {
         taskId: "vibe-sense-alert",
         status: "status.completed",
         summary:
-          "ALERT: Credit burn rate exceeded 2x purchases. Spending is outpacing revenue. Review AI cost structure immediately.",
-      },
-    },
-
-    action_notify_no_purchases: {
-      endpointPath: COMPLETE_TASK_ALIAS,
-      persist: "never",
-      visible: false,
-      params: {
-        taskId: "vibe-sense-alert",
-        status: "status.completed",
-        summary:
-          "ALERT: Zero credit purchases detected for 7-day EMA. Revenue has stalled. Consider win-back campaign or pricing review.",
+          "ALERT: No paid credits issued this week (no pack sold, no subscription credited). Check checkout health and subscription renewals.",
       },
     },
   },
 
   edges: [
-    { from: "spent_total", to: "burn_vs_earn", toHandle: "a" },
-    { from: "purchased", to: "burn_vs_earn", toHandle: "b" },
-    { from: "spent_total", to: "spent_total_ema7" },
-    { from: "purchased", to: "purchased_ema7" },
-    { from: "burn_vs_earn", to: "eval_high_burn" },
-    { from: "purchased_ema7", to: "eval_no_purchases" },
-    { from: "eval_high_burn", to: "action_notify_high_burn" },
-    { from: "eval_no_purchases", to: "action_notify_no_purchases" },
+    { from: "credits_spent_all", to: "credits_spent_all_ema7" },
+    { from: "paid_credits_issued", to: "eval_no_paid_credits" },
+    { from: "eval_no_paid_credits", to: "action_notify_no_paid_credits" },
   ],
 
   positions: {
-    spent_total: { x: 0, y: 0 },
-    purchased: { x: 0, y: 120 },
-    expired: { x: 0, y: 240 },
-    free_grants: { x: 0, y: 360 },
-    spent_total_ema7: { x: 300, y: 0 },
-    purchased_ema7: { x: 300, y: 120 },
-    burn_vs_earn: { x: 300, y: 60 },
-    eval_high_burn: { x: 600, y: 60 },
-    eval_no_purchases: { x: 600, y: 120 },
-    action_notify_high_burn: { x: 900, y: 60 },
-    action_notify_no_purchases: { x: 900, y: 120 },
+    pack_credits_sold: { x: 0, y: 0 },
+    subscription_credits_issued: { x: 0, y: 120 },
+    gifted_credits_admin: { x: 0, y: 240 },
+    referral_credits_earned: { x: 0, y: 360 },
+    credits_spent_all: { x: 0, y: 480 },
+    credits_expired: { x: 0, y: 600 },
+    outstanding_user_credits: { x: 0, y: 720 },
+    paid_credits_issued: { x: 0, y: 840 },
+    credits_spent_all_ema7: { x: 300, y: 480 },
+    eval_no_paid_credits: { x: 300, y: 840 },
+    action_notify_no_paid_credits: { x: 600, y: 840 },
   },
 
   trigger: { type: "cron", schedule: "0 */6 * * *" },
 };
 
 // ─── Revenue Health ───────────────────────────────────────────────────────────
+// Money view of the credit economy, in USD: what was sold (by product) vs what
+// paid credits earned when consumed. Cash by processor, refunds, provider cost
+// and margins: Finance. Totals, payment counts, failures: Revenue & Payments.
+
+const salesUsd = (
+  kind: typeof RevenueSeriesKindValue,
+  pane: number,
+  color: string,
+  visible = true,
+): GraphConfig["nodes"][string] => ({
+  endpointPath: PAYMENTS_REVENUE_ALIAS,
+  params: { kind },
+  pane,
+  color,
+  scale: "right",
+  visible,
+});
+
+const sum30 = (color: string, pane: number): GraphConfig["nodes"][string] => ({
+  endpointPath: WINDOW_SUM_ALIAS,
+  params: { size: 30 },
+  pane,
+  color,
+  scale: "right",
+});
 
 const creditRevenueHealthConfig: GraphConfig = {
   nodes: {
-    purchased: {
-      endpointPath: CREDITS_PURCHASED_ALIAS,
-      pane: 0,
-      color: GREEN,
-    },
-    subscription_revenue: {
-      endpointPath: CREDITS_SUBSCRIPTION_REVENUE_ALIAS,
-      pane: 0,
-      color: BLUE,
-    },
-    earned: {
-      endpointPath: CREDITS_EARNED_ALIAS,
-      pane: 0,
-      color: CYAN,
-    },
-    refunded: {
-      endpointPath: CREDITS_REFUNDED_ALIAS,
-      pane: 0,
-      color: RED,
-    },
-    purchased_ema7: {
-      endpointPath: EMA_ALIAS,
-      params: { period: 7 },
-      pane: 0,
-      color: GREEN,
-    },
-
-    net_revenue_ratio: {
-      endpointPath: TRANSFORMER_RATIO_ALIAS,
-      pane: 1,
-      color: PURPLE,
-    },
-    subscription_share: {
-      endpointPath: TRANSFORMER_RATIO_ALIAS,
-      pane: 1,
-      color: AMBER,
-    },
-
-    eval_purchase_drop: {
-      endpointPath: EVALUATOR_THRESHOLD_ALIAS,
-      resolution: GraphResolution.ONE_WEEK,
-      params: { op: "<", value: 10 },
-      visible: false,
-    },
-    eval_refund_spike: {
-      endpointPath: EVALUATOR_THRESHOLD_ALIAS,
+    // Pane 0 = USD per day
+    subscription_sales_usd: salesUsd(RevenueSeriesKind.SUBSCRIPTION, 0, BLUE),
+    pack_sales_usd: salesUsd(RevenueSeriesKind.PACK, 0, GREEN),
+    paid_credit_earnings_usd: {
+      endpointPath: FINANCE_SERIES_ALIAS,
       resolution: GraphResolution.ONE_DAY,
-      params: { op: ">", value: 0.2 },
-      visible: false,
+      params: { metric: FinanceMetric.EARNED },
+      pane: 0,
+      color: AMBER,
+      scale: "right",
     },
+    all_sales_usd: salesUsd(RevenueSeriesKind.ALL, 0, SLATE, false),
 
-    action_notify_purchase_drop: {
-      endpointPath: COMPLETE_TASK_ALIAS,
-      persist: "never",
-      visible: false,
-      params: {
-        taskId: "vibe-sense-alert",
-        status: "status.completed",
-        summary:
-          "ALERT: Credit purchase volume dropped below 10/week (7-day EMA). Revenue is declining. Investigate churn and consider re-engagement actions.",
-      },
+    // Pane 1 = USD, trailing 30 days (no single-day noise)
+    sales_usd_30d: sum30(GREEN, 1),
+    paid_credit_earnings_usd_30d: sum30(AMBER, 1),
+    subscription_sales_usd_30d: sum30(BLUE, 1),
+
+    // Pane 2 = shares over the trailing 30 days (0..1, >1 = earning down prepaid balances)
+    recurring_share_30d: {
+      endpointPath: TRANSFORMER_RATIO_ALIAS,
+      pane: 2,
+      color: BLUE,
+      scale: "right",
     },
-
-    action_notify_refund_spike: {
-      endpointPath: COMPLETE_TASK_ALIAS,
-      persist: "never",
-      visible: false,
-      params: {
-        taskId: "vibe-sense-alert",
-        status: "status.completed",
-        summary:
-          "ALERT: Refund-to-purchase ratio exceeded 20% today. Possible fraud, billing issue, or product dissatisfaction. Review recent transactions.",
-      },
+    earnings_to_sales_30d: {
+      endpointPath: TRANSFORMER_RATIO_ALIAS,
+      pane: 2,
+      color: AMBER,
+      scale: "right",
     },
   },
 
   edges: [
-    { from: "refunded", to: "net_revenue_ratio", toHandle: "a" },
-    { from: "purchased", to: "net_revenue_ratio", toHandle: "b" },
-    { from: "subscription_revenue", to: "subscription_share", toHandle: "a" },
-    { from: "purchased", to: "subscription_share", toHandle: "b" },
-    { from: "purchased", to: "purchased_ema7" },
-    { from: "purchased_ema7", to: "eval_purchase_drop" },
-    { from: "net_revenue_ratio", to: "eval_refund_spike" },
-    { from: "eval_purchase_drop", to: "action_notify_purchase_drop" },
-    { from: "eval_refund_spike", to: "action_notify_refund_spike" },
+    { from: "all_sales_usd", to: "sales_usd_30d" },
+    { from: "paid_credit_earnings_usd", to: "paid_credit_earnings_usd_30d" },
+    { from: "subscription_sales_usd", to: "subscription_sales_usd_30d" },
+    {
+      from: "subscription_sales_usd_30d",
+      to: "recurring_share_30d",
+      toHandle: "a",
+    },
+    { from: "sales_usd_30d", to: "recurring_share_30d", toHandle: "b" },
+    {
+      from: "paid_credit_earnings_usd_30d",
+      to: "earnings_to_sales_30d",
+      toHandle: "a",
+    },
+    { from: "sales_usd_30d", to: "earnings_to_sales_30d", toHandle: "b" },
   ],
 
   positions: {
-    purchased: { x: 0, y: 0 },
-    subscription_revenue: { x: 0, y: 120 },
-    earned: { x: 0, y: 240 },
-    refunded: { x: 0, y: 360 },
-    purchased_ema7: { x: 300, y: 0 },
-    net_revenue_ratio: { x: 300, y: 180 },
-    subscription_share: { x: 300, y: 60 },
-    eval_purchase_drop: { x: 600, y: 0 },
-    eval_refund_spike: { x: 600, y: 180 },
-    action_notify_purchase_drop: { x: 900, y: 0 },
-    action_notify_refund_spike: { x: 900, y: 180 },
+    subscription_sales_usd: { x: 0, y: 0 },
+    pack_sales_usd: { x: 0, y: 120 },
+    paid_credit_earnings_usd: { x: 0, y: 240 },
+    all_sales_usd: { x: 0, y: 360 },
+    subscription_sales_usd_30d: { x: 300, y: 0 },
+    paid_credit_earnings_usd_30d: { x: 300, y: 240 },
+    sales_usd_30d: { x: 300, y: 360 },
+    recurring_share_30d: { x: 600, y: 120 },
+    earnings_to_sales_30d: { x: 600, y: 300 },
   },
 
   trigger: { type: "cron", schedule: "0 */6 * * *" },
@@ -389,268 +383,56 @@ const creditTierUsageConfig: GraphConfig = {
   trigger: { type: "cron", schedule: "0 */6 * * *" },
 };
 
-// ─── Credit Supply Health ─────────────────────────────────────────────────────
+// ─── AI Spend by Model ────────────────────────────────────────────────────────
+// Where credits go, by model family. Credits, every spender (groups add up to
+// all spend). Provider cost and margin per provider: Finance.
 
-const creditSupplyHealthConfig: GraphConfig = {
-  nodes: {
-    balance_total: {
-      endpointPath: CREDITS_BALANCE_TOTAL_ALIAS,
-      pane: 0,
-      color: BLUE,
-    },
-    expired: {
-      endpointPath: CREDITS_EXPIRED_ALIAS,
-      pane: 0,
-      color: RED,
-    },
-    free_grants: {
-      endpointPath: CREDITS_FREE_GRANTS_ALIAS,
-      pane: 0,
-      color: ORANGE,
-    },
-    transfer_volume: {
-      endpointPath: CREDITS_TRANSFER_VOLUME_ALIAS,
-      pane: 0,
-      color: CYAN,
-    },
-    spent_total: {
-      endpointPath: CREDITS_SPENT_TOTAL_ALIAS,
-      pane: 0,
-      color: GREEN,
-    },
-    spent_total_ema7: {
-      endpointPath: EMA_ALIAS,
-      params: { period: 7 },
-      pane: 0,
-      color: GREEN,
-    },
+const spendByModel = (
+  group: typeof ModelSpendGroupValue,
+  pane: number,
+  color: string,
+): GraphConfig["nodes"][string] => ({
+  endpointPath: CREDITS_SPENT_BY_MODEL_ALIAS,
+  params: { group },
+  pane,
+  color,
+  scale: "right",
+});
 
-    free_grant_to_spend: {
-      endpointPath: TRANSFORMER_RATIO_ALIAS,
-      pane: 1,
-      color: PURPLE,
-    },
+const MODEL_SPEND_NODES: ReadonlyArray<
+  [string, typeof ModelSpendGroupValue, number, string]
+> = [
+  // Pane 0 = chat models by maker
+  ["chat_uncensored_lm", ModelSpendGroup.UNCENSORED_AI, 0, RED],
+  ["chat_glm_zai", ModelSpendGroup.ZAI, 0, BLUE],
+  ["chat_kimi_moonshot", ModelSpendGroup.MOONSHOT, 0, GREEN],
+  ["chat_deepseek", ModelSpendGroup.DEEPSEEK, 0, CYAN],
+  ["chat_venice", ModelSpendGroup.VENICE, 0, ORANGE],
+  ["chat_grok_xai", ModelSpendGroup.XAI, 0, SLATE],
+  ["chat_claude_anthropic", ModelSpendGroup.ANTHROPIC, 0, AMBER],
+  ["chat_gpt_openai", ModelSpendGroup.OPENAI, 0, PURPLE],
+  ["chat_gemini_google", ModelSpendGroup.GOOGLE, 0, PINK],
+  ["chat_other", ModelSpendGroup.OTHER_CHAT, 0, TEAL],
+  // Pane 1 = media, voice and tools
+  ["image_generation", ModelSpendGroup.IMAGE, 1, PURPLE],
+  ["video_generation", ModelSpendGroup.VIDEO, 1, RED],
+  ["music_generation", ModelSpendGroup.MUSIC, 1, GREEN],
+  ["voice_tts_stt", ModelSpendGroup.VOICE, 1, CYAN],
+  ["tools_search_fetch_memory", ModelSpendGroup.TOOLS, 1, AMBER],
+  ["unattributed", ModelSpendGroup.UNATTRIBUTED, 1, SLATE],
+];
 
-    eval_balance_drop: {
-      endpointPath: EVALUATOR_THRESHOLD_ALIAS,
-      resolution: GraphResolution.ONE_DAY,
-      params: { op: "<", value: 100 },
-      visible: false,
-    },
-    eval_expiry_spike: {
-      endpointPath: EVALUATOR_THRESHOLD_ALIAS,
-      resolution: GraphResolution.ONE_DAY,
-      params: { op: ">", value: 50 },
-      visible: false,
-    },
-    eval_high_free_ratio: {
-      endpointPath: EVALUATOR_THRESHOLD_ALIAS,
-      resolution: GraphResolution.ONE_WEEK,
-      params: { op: ">", value: 3 },
-      visible: false,
-    },
-  },
-
-  edges: [
-    { from: "free_grants", to: "free_grant_to_spend", toHandle: "a" },
-    { from: "spent_total", to: "spent_total_ema7" },
-    { from: "spent_total_ema7", to: "free_grant_to_spend", toHandle: "b" },
-    { from: "balance_total", to: "eval_balance_drop" },
-    { from: "expired", to: "eval_expiry_spike" },
-    { from: "free_grant_to_spend", to: "eval_high_free_ratio" },
-  ],
-
-  positions: {
-    balance_total: { x: 0, y: 0 },
-    expired: { x: 0, y: 120 },
-    free_grants: { x: 0, y: 240 },
-    transfer_volume: { x: 0, y: 360 },
-    spent_total: { x: 0, y: 480 },
-    spent_total_ema7: { x: 300, y: 480 },
-    free_grant_to_spend: { x: 560, y: 300 },
-    eval_balance_drop: { x: 600, y: 0 },
-    eval_expiry_spike: { x: 600, y: 120 },
-    eval_high_free_ratio: { x: 800, y: 300 },
-  },
-
-  trigger: { type: "cron", schedule: "0 */6 * * *" },
-};
-
-// ─── Credit Transaction Analytics ─────────────────────────────────────────────
-
-const creditTransactionAnalyticsConfig: GraphConfig = {
-  nodes: {
-    transactions_count: {
-      endpointPath: CREDITS_TRANSACTIONS_COUNT_ALIAS,
-      pane: 0,
-      color: BLUE,
-    },
-    avg_transaction: {
-      endpointPath: CREDITS_AVG_TRANSACTION_ALIAS,
-      pane: 0,
-      color: GREEN,
-    },
-    wallets_total: {
-      endpointPath: CREDITS_WALLETS_TOTAL_ALIAS,
-      pane: 0,
-      color: CYAN,
-    },
-    usage_with_feature: {
-      endpointPath: CREDITS_USAGE_WITH_FEATURE_ALIAS,
-      pane: 0,
-      color: PURPLE,
-    },
-
-    transactions_ema7: {
-      endpointPath: EMA_ALIAS,
-      params: { period: 7 },
-      pane: 0,
-      color: BLUE,
-    },
-    avg_tx_ema7: {
-      endpointPath: EMA_ALIAS,
-      params: { period: 7 },
-      pane: 0,
-      color: GREEN,
-    },
-
-    feature_usage_share: {
-      endpointPath: TRANSFORMER_RATIO_ALIAS,
-      pane: 1,
-      color: PURPLE,
-    },
-
-    eval_tx_volume_drop: {
-      endpointPath: EVALUATOR_THRESHOLD_ALIAS,
-      resolution: GraphResolution.ONE_WEEK,
-      params: { op: "<", value: 10 },
-      visible: false,
-    },
-    eval_avg_tx_spike: {
-      endpointPath: EVALUATOR_THRESHOLD_ALIAS,
-      resolution: GraphResolution.ONE_DAY,
-      params: { op: ">", value: 1000 },
-      visible: false,
-    },
-  },
-
-  edges: [
-    { from: "transactions_count", to: "transactions_ema7" },
-    { from: "avg_transaction", to: "avg_tx_ema7" },
-    { from: "usage_with_feature", to: "feature_usage_share", toHandle: "a" },
-    { from: "transactions_count", to: "feature_usage_share", toHandle: "b" },
-    { from: "transactions_ema7", to: "eval_tx_volume_drop" },
-    { from: "avg_tx_ema7", to: "eval_avg_tx_spike" },
-  ],
-
-  positions: {
-    transactions_count: { x: 0, y: 0 },
-    avg_transaction: { x: 0, y: 120 },
-    wallets_total: { x: 0, y: 240 },
-    usage_with_feature: { x: 0, y: 360 },
-    transactions_ema7: { x: 300, y: 0 },
-    avg_tx_ema7: { x: 300, y: 120 },
-    feature_usage_share: { x: 300, y: 360 },
-    eval_tx_volume_drop: { x: 600, y: 0 },
-    eval_avg_tx_spike: { x: 600, y: 120 },
-  },
-
-  trigger: { type: "cron", schedule: "0 */6 * * *" },
-};
-
-// ─── Pack & Supply Analytics ──────────────────────────────────────────────────
-
-const packSupplyAnalyticsConfig: GraphConfig = {
-  nodes: {
-    packs_created: {
-      endpointPath: CREDITS_PACKS_CREATED_ALIAS,
-      pane: 0,
-      color: BLUE,
-    },
-    purchased: {
-      endpointPath: CREDITS_PURCHASED_ALIAS,
-      pane: 0,
-      color: GREEN,
-    },
-    wallets_total: {
-      endpointPath: CREDITS_WALLETS_TOTAL_ALIAS,
-      pane: 0,
-      color: CYAN,
-    },
-    balance_total: {
-      endpointPath: CREDITS_BALANCE_TOTAL_ALIAS,
-      pane: 0,
-      color: PURPLE,
-    },
-
-    packs_ema7: {
-      endpointPath: EMA_ALIAS,
-      params: { period: 7 },
-      pane: 0,
-      color: BLUE,
-    },
-
-    packs_per_wallet: {
-      endpointPath: TRANSFORMER_RATIO_ALIAS,
-      pane: 1,
-      color: AMBER,
-    },
-    purchase_per_pack: {
-      endpointPath: TRANSFORMER_RATIO_ALIAS,
-      pane: 1,
-      color: GREEN,
-    },
-
-    eval_no_packs: {
-      endpointPath: EVALUATOR_THRESHOLD_ALIAS,
-      resolution: GraphResolution.ONE_WEEK,
-      params: { op: "<", value: 1 },
-      visible: false,
-    },
-    eval_low_pack_conversion: {
-      endpointPath: EVALUATOR_THRESHOLD_ALIAS,
-      resolution: GraphResolution.ONE_WEEK,
-      params: { op: "<", value: 0.1 },
-      visible: false,
-    },
-
-    action_notify_no_packs: {
-      endpointPath: COMPLETE_TASK_ALIAS,
-      persist: "never",
-      visible: false,
-      params: {
-        taskId: "vibe-sense-alert",
-        status: "status.completed",
-        summary:
-          "ALERT: No new credit packs created in the past week. Pack catalog may be stale or pricing unattractive. Review pack offerings and promotion strategy.",
-      },
-    },
-  },
-
-  edges: [
-    { from: "packs_created", to: "packs_ema7" },
-    { from: "packs_created", to: "packs_per_wallet", toHandle: "a" },
-    { from: "wallets_total", to: "packs_per_wallet", toHandle: "b" },
-    { from: "purchased", to: "purchase_per_pack", toHandle: "a" },
-    { from: "packs_created", to: "purchase_per_pack", toHandle: "b" },
-    { from: "packs_ema7", to: "eval_no_packs" },
-    { from: "purchase_per_pack", to: "eval_low_pack_conversion" },
-    { from: "eval_no_packs", to: "action_notify_no_packs" },
-  ],
-
-  positions: {
-    packs_created: { x: 0, y: 0 },
-    purchased: { x: 0, y: 120 },
-    wallets_total: { x: 0, y: 240 },
-    balance_total: { x: 0, y: 360 },
-    packs_ema7: { x: 300, y: 0 },
-    packs_per_wallet: { x: 300, y: 120 },
-    purchase_per_pack: { x: 300, y: 240 },
-    eval_no_packs: { x: 600, y: 0 },
-    eval_low_pack_conversion: { x: 600, y: 240 },
-    action_notify_no_packs: { x: 900, y: 0 },
-  },
-
+const aiSpendByModelConfig: GraphConfig = {
+  nodes: Object.fromEntries(
+    MODEL_SPEND_NODES.map(([id, group, pane, color]) => [
+      id,
+      spendByModel(group, pane, color),
+    ]),
+  ),
+  edges: [],
+  positions: Object.fromEntries(
+    MODEL_SPEND_NODES.map(([id], index) => [id, { x: 0, y: index * 120 }]),
+  ),
   trigger: { type: "cron", schedule: "0 */6 * * *" },
 };
 
@@ -711,16 +493,16 @@ const freeCreditFarmingConfig: GraphConfig = {
 export const graphSeeds: GraphSeedEntry[] = [
   {
     slug: "credit-economy-overview",
-    name: "Credit Economy Overview",
+    name: "Credit Economy",
     description:
-      "Tracks total credit burn vs purchases vs expiry. Alerts when spending outpaces buying or purchases stall.",
+      "Credits in vs credits out, in credits (not money). Pane 0: pack credits sold, subscription credits issued, gifted admin credits, referral credits earned, all credits spent (+7-day EMA), credits expired. Pane 1: unspent credits in signed-in user wallets. Alerts when a week passes without paid credits. Free allowance grants: Free vs Paid Usage.",
     config: creditEconomyOverviewConfig,
   },
   {
     slug: "credit-revenue-health",
     name: "Revenue Health",
     description:
-      "Tracks credit purchases, subscription revenue, refunds, and net revenue ratio. Alerts on purchase drops and refund spikes.",
+      "Money side of the credit economy, in USD (approx., static FX; admin accounts excluded). Pane 0: subscription and pack sales per day, and what paid credits earned when consumed. Pane 1: the same over a trailing 30 days. Pane 2: recurring share of sales and earnings-to-sales ratio over 30 days. Cash by processor, refunds, provider cost and margins: Finance. Payment counts and failures: Revenue & Payments.",
     config: creditRevenueHealthConfig,
   },
   {
@@ -731,25 +513,11 @@ export const graphSeeds: GraphSeedEntry[] = [
     config: creditTierUsageConfig,
   },
   {
-    slug: "credit-supply-health",
-    name: "Credit Supply Health",
+    slug: "ai-spend-by-model",
+    name: "AI Spend by Model",
     description:
-      "Monitors total balance, expiry events, free grant volume, and transfer activity. Alerts on balance drops and expiry spikes.",
-    config: creditSupplyHealthConfig,
-  },
-  {
-    slug: "credit-transaction-analytics",
-    name: "Credit Transaction Analytics",
-    description:
-      "Tracks transaction volume, average transaction size, wallet count, and feature-attributed usage. Alerts on volume drops and unusual transaction sizes.",
-    config: creditTransactionAnalyticsConfig,
-  },
-  {
-    slug: "pack-supply-analytics",
-    name: "Pack & Supply Analytics",
-    description:
-      "Tracks credit pack creation velocity, packs per wallet, and purchase-per-pack conversion. Alerts when pack creation stalls or conversion drops.",
-    config: packSupplyAnalyticsConfig,
+      "Credits spent per day by model family, every spender included so the groups add up to all spend. Pane 0: chat models by maker (Uncensored LM, GLM, Kimi, DeepSeek, Venice, Grok, Claude, GPT, Gemini, other). Pane 1: image, video, music, voice, tools (search, fetch, memory), unattributed. In credits; provider cost and margin per provider: Finance.",
+    config: aiSpendByModelConfig,
   },
   {
     slug: "free-credit-farming",

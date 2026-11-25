@@ -6,7 +6,7 @@ export const translations: typeof enTranslations = {
     title: "Wiadomości czatu z załącznikami",
     titleShort: "Załączniki",
     description:
-      "Wiadomości zawierające załączniki plików na przedział rozdzielczości",
+      "Wiadomości zawierające załączniki plików na przedział rozdzielczości. Tylko czaty ludzi: bez wątków agentów w tle, kopii zdalnych i kont adminów; czaty incognito nigdy nie są zapisywane.",
     fields: {
       resolution: {
         label: "Rozdzielczość",

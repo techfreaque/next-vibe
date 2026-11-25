@@ -1,12 +1,14 @@
 /**
  * Subscriptions Active - Repository
  * Server-only. DB access.
- * Snapshot: count of active subscriptions per resolution bucket.
+ * Snapshot: subscriptions running at the END of each bucket (created before,
+ * not ended yet; past-due still counts until it ends). Same rule as the
+ * Revenue report. Incomplete checkouts and admin accounts excluded.
  */
 
 import "server-only";
 
-import { and, count, eq, lt } from "drizzle-orm";
+import { sql } from "drizzle-orm";
 import {
   type ResponseType,
   success,
@@ -17,11 +19,15 @@ import type {
   Resolution,
   TimeRange,
 } from "next-vibe/dataflow/shared/fields";
-import { RESOLUTION_MS } from "next-vibe/dataflow/shared/fields";
-import { fillGaps } from "next-vibe/dataflow/shared/range";
+import type { QueryResultRow } from "pg";
 
-import { subscriptions } from "../../db";
-import { SubscriptionStatus } from "../../enum";
+import {
+  bucketEnds,
+  bucketEndsValuesSql,
+  COUNTED_SUBSCRIPTION_SQL,
+  snapshotPoints,
+  SUB_END_SQL,
+} from "../../series-sql";
 
 export class QuerySubscriptionsActiveRepository {
   static async querySubscriptionsActive(data: {
@@ -35,33 +41,28 @@ export class QuerySubscriptionsActiveRepository {
     }>
   > {
     const { resolution, range, lookback } = data;
-    const stepMs = RESOLUTION_MS[resolution];
-    const points: DataPoint[] = [];
-
-    let ts = range.from.getTime();
-    while (ts <= range.to.getTime()) {
-      const bucket = new Date(ts);
-      const next = new Date(ts + stepMs);
-
-      const [row] = await db
-        .select({ total: count() })
-        .from(subscriptions)
-        .where(
-          and(
-            eq(subscriptions.status, SubscriptionStatus.ACTIVE),
-            lt(subscriptions.createdAt, next),
-          ),
-        );
-
-      points.push({ timestamp: bucket, value: Number(row?.total ?? 0) });
-      ts += stepMs;
+    const ends = bucketEnds(range, resolution);
+    if (ends.length === 0) {
+      return success({
+        result: [],
+        meta: { actualResolution: resolution, lookbackUsed: lookback ?? 0 },
+      });
     }
+    const result = await db.execute<
+      QueryResultRow & { bucket: string; value: string | number | null }
+    >(sql`
+      SELECT v.bucket, count(s.id) AS value
+      FROM ${bucketEndsValuesSql(ends)}
+      LEFT JOIN subscriptions s
+        ON ${COUNTED_SUBSCRIPTION_SQL}
+        AND s.created_at < v.e
+        AND (${SUB_END_SQL} IS NULL OR ${SUB_END_SQL} >= v.e)
+      GROUP BY v.bucket`);
 
-    const result = fillGaps(points, range, resolution);
     return success({
-      result,
+      result: snapshotPoints(ends, result.rows),
       meta: {
-        actualResolution: resolution ?? "enums.resolution.1d",
+        actualResolution: resolution,
         lookbackUsed: lookback ?? 0,
       },
     });

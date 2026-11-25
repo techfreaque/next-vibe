@@ -5,7 +5,8 @@ export const translations: typeof enTranslations = {
   post: {
     title: "Conversazioni create",
     titleShort: "Nuove conversazioni",
-    description: "Numero di nuove conversazioni per intervallo",
+    description:
+      "Numero di nuove conversazioni per intervallo. Solo chat umane: esclusi thread di agenti in background, copie remote e account admin; le chat in incognito non vengono mai salvate.",
     fields: {
       resolution: {
         label: "Risoluzione",

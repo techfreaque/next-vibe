@@ -16,6 +16,11 @@ export const translations: typeof enTranslations = {
         label: "Wsteczne spojrzenie",
         description: "Dodatkowe słupki przed początkiem zakresu",
       },
+      emailConfirmedOnly: {
+        label: "Tylko potwierdzony e-mail",
+        description:
+          "Liczy tylko rejestracje z już potwierdzonym adresem e-mail",
+      },
       result: {
         label: "Zarejestrowani użytkownicy",
         description: "Wyjściowa seria czasowa",

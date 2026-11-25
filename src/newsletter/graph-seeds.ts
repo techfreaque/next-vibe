@@ -142,7 +142,7 @@ export const graphSeeds: GraphSeedEntry[] = [
     slug: "newsletter-engagement",
     name: "Newsletter Engagement",
     description:
-      "Tracks newsletter subscriber growth vs churn, campaign send frequency, and events per campaign. Alerts when unsubscribes exceed new subscriptions.",
+      "New newsletter subscriptions vs unsubscribes per day (7-day EMAs), churn ratio, campaigns sent and tracked events per campaign. Campaigns and events read zero while the campaign dispatcher is off. Alerts when unsubscribes outpace new subscriptions for a week.",
     config: newsletterEngagementConfig,
   },
 ];

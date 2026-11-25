@@ -5,7 +5,8 @@ export const translations: typeof enTranslations = {
   post: {
     title: "Chat-Nachrichten Gesamt",
     titleShort: "Nachrichten gesamt",
-    description: "Gesamtzahl der Chat-Nachrichten pro Auflösungs-Bucket",
+    description:
+      "Gesamtzahl der Chat-Nachrichten pro Auflösungs-Bucket. Nur menschliche Chats: ohne Hintergrund-Agenten-Threads, Remote-Kopien und Admin-Konten; Inkognito-Chats werden nie gespeichert.",
     fields: {
       resolution: {
         label: "Auflösung",

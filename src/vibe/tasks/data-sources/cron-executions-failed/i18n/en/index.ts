@@ -3,7 +3,8 @@ export const translations = {
   post: {
     title: "Cron Executions Failed",
     titleShort: "Cron Failed",
-    description: "Failed cron executions per resolution bucket",
+    description:
+      "Failed, errored and timed-out cron executions per resolution bucket",
     fields: {
       resolution: { label: "Resolution", description: "Computation timeframe" },
       range: { label: "Range", description: "Time range to query" },

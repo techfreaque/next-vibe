@@ -77,8 +77,9 @@ export const FUNNEL_STEPS = [
  * Steps after "humans" only count leads that are not known bots (browser user
  * agent, or none recorded). Unknown stays in: many signup leads were written
  * without a user agent, and dropping them would hide real signups and payers.
+ * Shared with the Lead Funnel vibe sense data source so both agree.
  */
-function stepCounts(prefix: SQL): SQL {
+export function stepCounts(prefix: SQL): SQL {
   const human = notBotFamilySql(sql`${prefix}bot_family`);
   const converted = sql`(${prefix}user_id IS NOT NULL AND ${prefix}signed_up_at >= ${prefix}created_at - interval '10 minutes')`;
   const account = sql`CASE WHEN ${converted} THEN ${prefix}user_id END`;
@@ -96,7 +97,7 @@ function stepCounts(prefix: SQL): SQL {
 /** The lead's account was created at or after the lead (a conversion). */
 const CONVERTED = sql`(user_id IS NOT NULL AND signed_up_at >= created_at - interval '10 minutes')`;
 
-type StepRow = Record<(typeof FUNNEL_STEPS)[number], number>;
+export type StepRow = Record<(typeof FUNNEL_STEPS)[number], number>;
 
 /** Signup confirmation steps (signup_events), distinct leads per step. */
 export const SIGNUP_STEPS = [

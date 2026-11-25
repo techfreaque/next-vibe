@@ -30,6 +30,9 @@ export const translations = {
       refCode: "Referral code",
       currency: "Revenue currency",
       metric: "Metric",
+      excludeBots: "Exclude bots",
+      excludeBotsDescription:
+        "Visits only: drop visits from known bot and crawler leads, same rule as the Leads funnel.",
     },
     series: "Lead acquisition over time",
     empty: "No acquisition activity in this period.",
@@ -264,6 +267,11 @@ export const translations = {
       currency: {
         label: "Currency",
         description: "Only spend entered in this currency is summed",
+      },
+      convertToUsd: {
+        label: "All currencies in USD",
+        description:
+          "Sum every currency converted to USD at the finance FX table rate. Ignores the currency filter.",
       },
     },
     funnelStep: {

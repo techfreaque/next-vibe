@@ -17,6 +17,10 @@ export const translations: typeof enTranslations = {
         label: "Mira atrás.",
         description: "Barras extra antes de empezar el rango",
       },
+      emailConfirmedOnly: {
+        label: "Solo correo confirmado",
+        description: "Cuenta solo los registros cuyo correo ya está confirmado",
+      },
       result: {
         label: "Usuarios registrados",
         description: "Serie de tiempo de producción",

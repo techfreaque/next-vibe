@@ -32,6 +32,9 @@ export const translations: typeof enTranslations = {
       refCode: "Code de parrainage",
       currency: "Devise du chiffre d’affaires",
       metric: "Indicateur",
+      excludeBots: "Exclure les bots",
+      excludeBotsDescription:
+        "Visites uniquement : retire les visites des leads bots et crawlers connus, même règle que l’entonnoir des leads.",
     },
     series: "Acquisition de contacts dans le temps",
     empty: "Aucune activité sur cette période.",
@@ -272,6 +275,11 @@ export const translations: typeof enTranslations = {
         label: "Devise",
         description:
           "Seules les dépenses saisies dans cette devise sont additionnées",
+      },
+      convertToUsd: {
+        label: "Toutes les devises en USD",
+        description:
+          "Additionne chaque devise convertie en USD au taux de la table FX finance. Ignore le filtre de devise.",
       },
     },
     funnelStep: {

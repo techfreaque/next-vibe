@@ -2,11 +2,19 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
+  enums: {
+    kind: {
+      paid: "Pagados (paquetes + suscripciones)",
+      packs: "Paquetes pagados",
+      subscriptions: "Créditos de suscripción",
+      gifted: "Regalados (admin)",
+    },
+  },
   post: {
-    titleShort: "Créditos adquiridos",
-    title: "Créditos adquiridos",
+    titleShort: "Créditos emitidos",
+    title: "Créditos emitidos (pagados, regalados)",
     description:
-      "Suma de las transacciones de compra y suscripción por cubo de resolución",
+      "Créditos añadidos a las carteras por intervalo, en créditos (no dinero): paquetes pagados y créditos de suscripción de pagos reales, o créditos regalados por un admin (testers, creadores, compensaciones).",
     fields: {
       resolution: { label: "Resolución", description: "Plazo de cálculo" },
       range: {
@@ -17,8 +25,13 @@ export const translations: typeof enTranslations = {
         label: "Mira atrás.",
         description: "Barras extra antes de empezar el rango",
       },
+      kind: {
+        label: "Tipo",
+        description:
+          "Qué contar: paquetes pagados + suscripciones, solo paquetes, solo suscripciones o créditos regalados por un admin",
+      },
       result: {
-        label: "Créditos adquiridos",
+        label: "Créditos emitidos",
         description: "Serie de tiempo de producción",
       },
       meta: { label: "Meta", description: "Metadatos de ejecución de nodos" },

@@ -14,6 +14,11 @@ export const translations: typeof enTranslations = {
         label: "Historique",
         description: "Barres supplémentaires avant le début de la période",
       },
+      emailConfirmedOnly: {
+        label: "E-mail confirmé uniquement",
+        description:
+          "Ne compte que les inscriptions dont l’e-mail est confirmé à ce jour",
+      },
       result: {
         label: "Utilisateurs inscrits",
         description: "Série temporelle en sortie",

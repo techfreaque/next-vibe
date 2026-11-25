@@ -18,7 +18,6 @@ import { EVALUATOR_THRESHOLD_ALIAS } from "../analytics/evaluators/threshold/con
 import { EMA_ALIAS } from "../analytics/indicators/ema/constants";
 import { WINDOW_AVG_ALIAS } from "../analytics/indicators/window-avg/constants";
 import { TRANSFORMER_RATIO_ALIAS } from "../analytics/transformers/ratio/constants";
-import { LEADS_CREATED_ALIAS } from "../leads/data-sources/leads-created/constants";
 import { USERS_ACTIVE_TOTAL_ALIAS } from "./data-sources/users-active-total/constants";
 import { USERS_BANNED_ALIAS } from "./data-sources/users-banned/constants";
 import { USERS_EMAIL_VERIFIED_ALIAS } from "./data-sources/users-email-verified/constants";
@@ -43,37 +42,37 @@ const AMBER = "#ca8a04";
 
 const userGrowthConfig: GraphConfig = {
   nodes: {
-    users_registered: {
+    // ── Pane 0: signups per day ──
+    signups: {
       endpointPath: USERS_REGISTERED_ALIAS,
       pane: 0,
       color: BLUE,
     },
-    users_active_total: {
-      endpointPath: USERS_ACTIVE_TOTAL_ALIAS,
+    signups_email_confirmed: {
+      endpointPath: USERS_REGISTERED_ALIAS,
+      params: { emailConfirmedOnly: true },
       pane: 0,
       color: GREEN,
     },
-    users_banned: {
-      endpointPath: USERS_BANNED_ALIAS,
-      pane: 0,
-      color: RED,
-    },
-    leads_created: {
-      endpointPath: LEADS_CREATED_ALIAS,
-      pane: 0,
-      color: CYAN,
-    },
-    registrations_ema7: {
+    signups_ema7: {
       endpointPath: EMA_ALIAS,
       params: { period: 7 },
       pane: 0,
-      color: BLUE,
+      color: CYAN,
     },
 
-    lead_to_user_ratio: {
-      endpointPath: TRANSFORMER_RATIO_ALIAS,
+    // ── Pane 1: total accounts that can sign in ──
+    accounts_active: {
+      endpointPath: USERS_ACTIVE_TOTAL_ALIAS,
       pane: 1,
       color: PURPLE,
+    },
+
+    // ── Pane 2: share of each signup day that confirmed its email ──
+    email_confirmed_share: {
+      endpointPath: TRANSFORMER_RATIO_ALIAS,
+      pane: 2,
+      color: GREEN,
     },
 
     eval_slow_growth: {
@@ -82,45 +81,34 @@ const userGrowthConfig: GraphConfig = {
       params: { op: "<", value: 5 },
       visible: false,
     },
-    eval_ban_spike: {
+    eval_low_email_confirm: {
       endpointPath: EVALUATOR_THRESHOLD_ALIAS,
-      resolution: GraphResolution.ONE_DAY,
-      params: { op: ">", value: 5 },
+      resolution: GraphResolution.ONE_WEEK,
+      params: { op: "<", value: 0.8 },
       visible: false,
-    },
-
-    action_notify_ban_spike: {
-      endpointPath: COMPLETE_TASK_ALIAS,
-      persist: "never",
-      visible: false,
-      params: {
-        taskId: "vibe-sense-alert",
-        status: "status.completed",
-        summary:
-          "ALERT: More than 5 users banned today. Possible coordinated abuse or signup fraud. Review recent ban activity and check for patterns.",
-      },
     },
   },
 
   edges: [
-    { from: "users_registered", to: "lead_to_user_ratio", toHandle: "a" },
-    { from: "leads_created", to: "lead_to_user_ratio", toHandle: "b" },
-    { from: "users_registered", to: "registrations_ema7" },
-    { from: "registrations_ema7", to: "eval_slow_growth" },
-    { from: "users_banned", to: "eval_ban_spike" },
-    { from: "eval_ban_spike", to: "action_notify_ban_spike" },
+    { from: "signups", to: "signups_ema7" },
+    {
+      from: "signups_email_confirmed",
+      to: "email_confirmed_share",
+      toHandle: "a",
+    },
+    { from: "signups", to: "email_confirmed_share", toHandle: "b" },
+    { from: "signups_ema7", to: "eval_slow_growth" },
+    { from: "email_confirmed_share", to: "eval_low_email_confirm" },
   ],
 
   positions: {
-    users_registered: { x: 0, y: 0 },
-    users_active_total: { x: 0, y: 120 },
-    users_banned: { x: 0, y: 240 },
-    leads_created: { x: 0, y: 360 },
-    registrations_ema7: { x: 300, y: 0 },
-    lead_to_user_ratio: { x: 300, y: 240 },
+    signups: { x: 0, y: 0 },
+    signups_email_confirmed: { x: 0, y: 120 },
+    accounts_active: { x: 0, y: 240 },
+    signups_ema7: { x: 300, y: 0 },
+    email_confirmed_share: { x: 300, y: 120 },
     eval_slow_growth: { x: 600, y: 0 },
-    eval_ban_spike: { x: 600, y: 240 },
-    action_notify_ban_spike: { x: 900, y: 240 },
+    eval_low_email_confirm: { x: 600, y: 120 },
   },
 
   trigger: { type: "cron", schedule: "0 */6 * * *" },
@@ -128,72 +116,90 @@ const userGrowthConfig: GraphConfig = {
 
 // ─── User Quality & Trust ─────────────────────────────────────────────────────
 
+/** Cumulative account base: every series counts accounts created up to the bar. */
 const userQualityTrustConfig: GraphConfig = {
   nodes: {
-    users_active_total: {
+    accounts_active: {
       endpointPath: USERS_ACTIVE_TOTAL_ALIAS,
       pane: 0,
       color: BLUE,
     },
-    users_email_verified: {
+    accounts_email_confirmed: {
       endpointPath: USERS_EMAIL_VERIFIED_ALIAS,
       pane: 0,
       color: GREEN,
     },
-    users_two_fa: {
-      endpointPath: USERS_TWO_FA_ENABLED_ALIAS,
+    accounts_marketing_opt_in: {
+      endpointPath: USERS_MARKETING_CONSENT_ALIAS,
       pane: 0,
-      color: AMBER,
+      color: CYAN,
     },
-    users_with_stripe: {
+    accounts_with_stripe_customer: {
       endpointPath: USERS_WITH_STRIPE_ALIAS,
       pane: 0,
       color: ORANGE,
     },
+    accounts_2fa: {
+      endpointPath: USERS_TWO_FA_ENABLED_ALIAS,
+      pane: 0,
+      color: AMBER,
+    },
 
-    email_verified_rate: {
+    email_confirmed_share: {
       endpointPath: TRANSFORMER_RATIO_ALIAS,
       pane: 1,
       color: GREEN,
     },
-    paying_rate: {
+    marketing_opt_in_share: {
+      endpointPath: TRANSFORMER_RATIO_ALIAS,
+      pane: 1,
+      color: CYAN,
+    },
+    stripe_customer_share: {
       endpointPath: TRANSFORMER_RATIO_ALIAS,
       pane: 1,
       color: ORANGE,
     },
-    two_fa_rate: {
+    two_fa_share: {
       endpointPath: TRANSFORMER_RATIO_ALIAS,
       pane: 1,
       color: AMBER,
     },
-
-    eval_low_email_verify: {
-      endpointPath: EVALUATOR_THRESHOLD_ALIAS,
-      resolution: GraphResolution.ONE_WEEK,
-      params: { op: "<", value: 0.5 },
-      visible: false,
-    },
   },
 
   edges: [
-    { from: "users_email_verified", to: "email_verified_rate", toHandle: "a" },
-    { from: "users_active_total", to: "email_verified_rate", toHandle: "b" },
-    { from: "users_with_stripe", to: "paying_rate", toHandle: "a" },
-    { from: "users_active_total", to: "paying_rate", toHandle: "b" },
-    { from: "users_two_fa", to: "two_fa_rate", toHandle: "a" },
-    { from: "users_active_total", to: "two_fa_rate", toHandle: "b" },
-    { from: "email_verified_rate", to: "eval_low_email_verify" },
+    {
+      from: "accounts_email_confirmed",
+      to: "email_confirmed_share",
+      toHandle: "a",
+    },
+    { from: "accounts_active", to: "email_confirmed_share", toHandle: "b" },
+    {
+      from: "accounts_marketing_opt_in",
+      to: "marketing_opt_in_share",
+      toHandle: "a",
+    },
+    { from: "accounts_active", to: "marketing_opt_in_share", toHandle: "b" },
+    {
+      from: "accounts_with_stripe_customer",
+      to: "stripe_customer_share",
+      toHandle: "a",
+    },
+    { from: "accounts_active", to: "stripe_customer_share", toHandle: "b" },
+    { from: "accounts_2fa", to: "two_fa_share", toHandle: "a" },
+    { from: "accounts_active", to: "two_fa_share", toHandle: "b" },
   ],
 
   positions: {
-    users_active_total: { x: 0, y: 0 },
-    users_email_verified: { x: 0, y: 120 },
-    users_two_fa: { x: 0, y: 360 },
-    users_with_stripe: { x: 0, y: 480 },
-    email_verified_rate: { x: 300, y: 60 },
-    paying_rate: { x: 300, y: 240 },
-    two_fa_rate: { x: 300, y: 400 },
-    eval_low_email_verify: { x: 600, y: 60 },
+    accounts_active: { x: 0, y: 0 },
+    accounts_email_confirmed: { x: 0, y: 120 },
+    accounts_marketing_opt_in: { x: 0, y: 240 },
+    accounts_with_stripe_customer: { x: 0, y: 360 },
+    accounts_2fa: { x: 0, y: 480 },
+    email_confirmed_share: { x: 300, y: 60 },
+    marketing_opt_in_share: { x: 300, y: 180 },
+    stripe_customer_share: { x: 300, y: 300 },
+    two_fa_share: { x: 300, y: 420 },
   },
 
   trigger: { type: "cron", schedule: "0 0 * * *" },
@@ -201,9 +207,12 @@ const userQualityTrustConfig: GraphConfig = {
 
 // ─── Security & Login Monitoring ─────────────────────────────────────────────
 
+/** Failed logins in one hour that count as an attack, not typos (normal: ~1/h). */
+const FAILED_LOGINS_PER_HOUR_ALERT = 30;
+
 const securityLoginMonitoringConfig: GraphConfig = {
   nodes: {
-    login_total: {
+    login_attempts: {
       endpointPath: USERS_LOGIN_ATTEMPTS_TOTAL_ALIAS,
       pane: 0,
       color: BLUE,
@@ -213,7 +222,7 @@ const securityLoginMonitoringConfig: GraphConfig = {
       pane: 0,
       color: RED,
     },
-    users_banned: {
+    banned_accounts_updated: {
       endpointPath: USERS_BANNED_ALIAS,
       pane: 0,
       color: ORANGE,
@@ -224,29 +233,19 @@ const securityLoginMonitoringConfig: GraphConfig = {
       pane: 1,
       color: RED,
     },
-    failure_rate_w15: {
+    failure_rate_7_bar_avg: {
       endpointPath: WINDOW_AVG_ALIAS,
-      params: { size: 15 },
-      pane: 1,
-      color: RED,
-    },
-    failed_w15: {
-      endpointPath: WINDOW_AVG_ALIAS,
-      params: { size: 15 },
+      params: { size: 7 },
       pane: 1,
       color: PURPLE,
     },
 
-    eval_high_failure_rate: {
+    // Absolute volume, not the failure rate: with a handful of logins a day,
+    // one typo is a 100% failure rate.
+    eval_failed_flood: {
       endpointPath: EVALUATOR_THRESHOLD_ALIAS,
       resolution: GraphResolution.ONE_HOUR,
-      params: { op: ">", value: 0.5 },
-      visible: false,
-    },
-    eval_failed_spike: {
-      endpointPath: EVALUATOR_THRESHOLD_ALIAS,
-      resolution: GraphResolution.ONE_HOUR,
-      params: { op: ">", value: 100 },
+      params: { op: ">", value: FAILED_LOGINS_PER_HOUR_ALERT },
       visible: false,
     },
     eval_ban_spike: {
@@ -256,18 +255,6 @@ const securityLoginMonitoringConfig: GraphConfig = {
       visible: false,
     },
 
-    action_notify_credential_stuffing: {
-      endpointPath: COMPLETE_TASK_ALIAS,
-      persist: "never",
-      visible: false,
-      params: {
-        taskId: "vibe-sense-alert",
-        status: "status.completed",
-        summary:
-          "SECURITY ALERT: Sustained login failure rate >50% over 15-minute window. Possible credential stuffing or brute-force attack in progress. Check IP rate limiting and consider temporary lockdown.",
-      },
-    },
-
     action_notify_login_flood: {
       endpointPath: COMPLETE_TASK_ALIAS,
       persist: "never",
@@ -275,143 +262,32 @@ const securityLoginMonitoringConfig: GraphConfig = {
       params: {
         taskId: "vibe-sense-alert",
         status: "status.completed",
-        summary:
-          "SECURITY ALERT: Login attempt flood detected - >100 failed attempts per minute (15-min avg). High-volume brute-force attack. Review IP blocklist and WAF rules immediately.",
+        summary: `SECURITY ALERT: more than ${FAILED_LOGINS_PER_HOUR_ALERT} failed logins in one hour. Possible brute-force or credential stuffing. Check login_attempts by IP and the rate limits.`,
       },
     },
   },
 
   edges: [
     { from: "login_failed", to: "failure_rate", toHandle: "a" },
-    { from: "login_total", to: "failure_rate", toHandle: "b" },
-    { from: "failure_rate", to: "failure_rate_w15" },
-    { from: "login_failed", to: "failed_w15" },
-    { from: "failure_rate_w15", to: "eval_high_failure_rate" },
-    { from: "failed_w15", to: "eval_failed_spike" },
-    { from: "users_banned", to: "eval_ban_spike" },
-    { from: "eval_high_failure_rate", to: "action_notify_credential_stuffing" },
-    { from: "eval_failed_spike", to: "action_notify_login_flood" },
+    { from: "login_attempts", to: "failure_rate", toHandle: "b" },
+    { from: "failure_rate", to: "failure_rate_7_bar_avg" },
+    { from: "login_failed", to: "eval_failed_flood" },
+    { from: "banned_accounts_updated", to: "eval_ban_spike" },
+    { from: "eval_failed_flood", to: "action_notify_login_flood" },
   ],
 
   positions: {
-    login_total: { x: 0, y: 0 },
+    login_attempts: { x: 0, y: 0 },
     login_failed: { x: 0, y: 120 },
-    users_banned: { x: 0, y: 240 },
+    banned_accounts_updated: { x: 0, y: 240 },
     failure_rate: { x: 300, y: 60 },
-    failure_rate_w15: { x: 560, y: 60 },
-    failed_w15: { x: 300, y: 180 },
-    eval_high_failure_rate: { x: 800, y: 60 },
-    eval_failed_spike: { x: 800, y: 180 },
-    eval_ban_spike: { x: 600, y: 240 },
-    action_notify_credential_stuffing: { x: 1060, y: 60 },
-    action_notify_login_flood: { x: 1060, y: 180 },
+    failure_rate_7_bar_avg: { x: 560, y: 60 },
+    eval_failed_flood: { x: 300, y: 180 },
+    eval_ban_spike: { x: 300, y: 300 },
+    action_notify_login_flood: { x: 600, y: 180 },
   },
 
   trigger: { type: "cron", schedule: "*/15 * * * *" },
-};
-
-// ─── Marketing & Conversion Funnel ───────────────────────────────────────────
-
-const marketingConversionFunnelConfig: GraphConfig = {
-  nodes: {
-    leads_created: {
-      endpointPath: LEADS_CREATED_ALIAS,
-      pane: 0,
-      color: CYAN,
-    },
-    users_registered: {
-      endpointPath: USERS_REGISTERED_ALIAS,
-      pane: 0,
-      color: BLUE,
-    },
-    marketing_consent: {
-      endpointPath: USERS_MARKETING_CONSENT_ALIAS,
-      pane: 0,
-      color: GREEN,
-    },
-    users_with_stripe: {
-      endpointPath: USERS_WITH_STRIPE_ALIAS,
-      pane: 0,
-      color: AMBER,
-    },
-
-    marketing_consent_ema7: {
-      endpointPath: EMA_ALIAS,
-      params: { period: 7 },
-      pane: 0,
-      color: GREEN,
-    },
-
-    lead_to_user_rate: {
-      endpointPath: TRANSFORMER_RATIO_ALIAS,
-      pane: 1,
-      color: BLUE,
-    },
-    marketing_opt_in_rate: {
-      endpointPath: TRANSFORMER_RATIO_ALIAS,
-      pane: 1,
-      color: GREEN,
-    },
-    user_to_paying_rate: {
-      endpointPath: TRANSFORMER_RATIO_ALIAS,
-      pane: 1,
-      color: AMBER,
-    },
-
-    eval_low_conversion: {
-      endpointPath: EVALUATOR_THRESHOLD_ALIAS,
-      resolution: GraphResolution.ONE_WEEK,
-      params: { op: "<", value: 0.1 },
-      visible: false,
-    },
-    eval_low_marketing_opt_in: {
-      endpointPath: EVALUATOR_THRESHOLD_ALIAS,
-      resolution: GraphResolution.ONE_WEEK,
-      params: { op: "<", value: 0.2 },
-      visible: false,
-    },
-
-    action_notify_low_conversion: {
-      endpointPath: COMPLETE_TASK_ALIAS,
-      persist: "never",
-      visible: false,
-      params: {
-        taskId: "vibe-sense-alert",
-        status: "status.completed",
-        summary:
-          "ALERT: Lead-to-user conversion rate dropped below 10% (weekly). Registration funnel is leaking. Review onboarding flow, sign-up friction, and landing page effectiveness.",
-      },
-    },
-  },
-
-  edges: [
-    { from: "users_registered", to: "lead_to_user_rate", toHandle: "a" },
-    { from: "leads_created", to: "lead_to_user_rate", toHandle: "b" },
-    { from: "marketing_consent", to: "marketing_opt_in_rate", toHandle: "a" },
-    { from: "users_registered", to: "marketing_opt_in_rate", toHandle: "b" },
-    { from: "users_with_stripe", to: "user_to_paying_rate", toHandle: "a" },
-    { from: "users_registered", to: "user_to_paying_rate", toHandle: "b" },
-    { from: "marketing_consent", to: "marketing_consent_ema7" },
-    { from: "lead_to_user_rate", to: "eval_low_conversion" },
-    { from: "marketing_opt_in_rate", to: "eval_low_marketing_opt_in" },
-    { from: "eval_low_conversion", to: "action_notify_low_conversion" },
-  ],
-
-  positions: {
-    leads_created: { x: 0, y: 0 },
-    users_registered: { x: 0, y: 120 },
-    marketing_consent: { x: 0, y: 240 },
-    users_with_stripe: { x: 0, y: 360 },
-    marketing_consent_ema7: { x: 300, y: 240 },
-    lead_to_user_rate: { x: 300, y: 60 },
-    marketing_opt_in_rate: { x: 300, y: 180 },
-    user_to_paying_rate: { x: 300, y: 360 },
-    eval_low_conversion: { x: 600, y: 60 },
-    eval_low_marketing_opt_in: { x: 600, y: 180 },
-    action_notify_low_conversion: { x: 900, y: 60 },
-  },
-
-  trigger: { type: "cron", schedule: "0 */6 * * *" },
 };
 
 // ─── Exports ──────────────────────────────────────────────────────────────────
@@ -421,28 +297,21 @@ export const graphSeeds: GraphSeedEntry[] = [
     slug: "user-growth",
     name: "User Growth",
     description:
-      "Tracks user registration velocity, active user base, and lead-to-user conversion ratio.",
+      "Signups per day and how many confirmed their email, the 7-day signup trend and the total of active accounts. Alerts when weekly signups average under 5 a day or under 80% of a week's signups confirm their email.",
     config: userGrowthConfig,
   },
   {
     slug: "user-quality-trust",
     name: "User Quality & Trust",
     description:
-      "Daily snapshot of user quality metrics: email verification rate, paying user rate, 2FA adoption. Alerts when verification drops.",
+      "Account base over time (cumulative): active accounts and how many have a confirmed email, marketing opt-in, a Stripe customer record (started a card checkout, not necessarily paid) and 2FA, plus each as a share of active accounts.",
     config: userQualityTrustConfig,
   },
   {
     slug: "security-login-monitoring",
     name: "Security & Login Monitoring",
     description:
-      "15-minute security watch: login failure rate, brute-force detection, ban spikes. Critical for early attack response.",
+      "Login attempts and failures, failure rate, and banned accounts (counted on the day the banned account was last updated). Checked every 15 minutes: alerts on more than 30 failed logins in an hour and on more than 10 banned accounts in a day.",
     config: securityLoginMonitoringConfig,
-  },
-  {
-    slug: "marketing-conversion-funnel",
-    name: "Marketing & Conversion Funnel",
-    description:
-      "Tracks lead-to-user conversion, marketing consent opt-in rate, and user-to-paying conversion. Alerts on low conversion and declining marketing opt-in.",
-    config: marketingConversionFunnelConfig,
   },
 ];

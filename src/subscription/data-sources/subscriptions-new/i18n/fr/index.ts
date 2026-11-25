@@ -6,8 +6,9 @@ export const translations: typeof enTranslations = {
   },
   post: {
     title: "Nouveaux abonnements",
-    titleShort: "Nouveaux abos",
-    description: "Nouveaux abonnements créés par intervalle de résolution",
+    titleShort: "Nouveaux",
+    description:
+      "Abonnements commencés par période. Paiements incomplets et comptes admin exclus.",
     fields: {
       resolution: {
         label: "Résolution",
@@ -31,8 +32,8 @@ export const translations: typeof enTranslations = {
       },
     },
     success: {
-      title: "Nouveaux abonnements : calcul terminé",
-      description: "Série « Nouveaux abonnements » renvoyée",
+      title: "Nouveaux abonnements calculés",
+      description: "Série des nouveaux abonnements renvoyée",
     },
     errors: {
       unauthorized: {

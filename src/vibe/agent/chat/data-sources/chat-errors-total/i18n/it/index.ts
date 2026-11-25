@@ -5,7 +5,8 @@ export const translations: typeof enTranslations = {
   post: {
     title: "Totale errori in chat",
     titleShort: "Errori in chat",
-    description: "Numero di messaggi di errore in chat per intervallo",
+    description:
+      "Numero di messaggi di errore in chat per intervallo. Solo chat umane: esclusi thread di agenti in background, copie remote e account admin; le chat in incognito non vengono mai salvate.",
     fields: {
       resolution: {
         label: "Risoluzione",

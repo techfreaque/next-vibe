@@ -6,7 +6,7 @@ export const translations: typeof enTranslations = {
     title: "Unikalni użytkownicy czatu",
     titleShort: "Unikalni użytkownicy",
     description:
-      "Unikalni użytkownicy, którzy wysłali wiadomości na przedział rozdzielczości",
+      "Unikalne zalogowane konta, które wysłały wiadomość w zapisanym czacie w przedziale. Goście i incognito: zobacz Użytkownicy AI. Tylko czaty ludzi: bez wątków agentów w tle, kopii zdalnych i kont adminów; czaty incognito nigdy nie są zapisywane.",
     fields: {
       resolution: {
         label: "Rozdzielczość",
