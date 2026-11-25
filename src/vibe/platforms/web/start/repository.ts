@@ -23,6 +23,7 @@ import {
 } from "node:fs";
 import { loadavg } from "node:os";
 import { monitorEventLoopDelay } from "node:perf_hooks";
+import { setTimeout as waitForTimer } from "node:timers/promises";
 
 import { coreEnv } from "../../../core/env";
 import type { CountryLanguage } from "../../../core/i18n/core/config";
@@ -272,6 +273,7 @@ function describeStallProfile(
 
 export class ServerStartRepository {
   private static taskRunnerStarted = false;
+  private static emailRendererWarmupScheduled = false;
   /** Set once the in-process task runner is loaded; the lag monitor reads it. */
   private static runningTasksProbe:
     | ((
@@ -1285,6 +1287,32 @@ export class ServerStartRepository {
     }
   }
 
+  private static scheduleEmailRendererWarmup(logger: EndpointLogger): void {
+    if (ServerStartRepository.emailRendererWarmupScheduled) {
+      return;
+    }
+    ServerStartRepository.emailRendererWarmupScheduled = true;
+
+    // Give startup callbacks a turn before loading React's server renderer.
+    // A render is needed because React Email imports it lazily.
+    void waitForTimer(1000, undefined, { ref: false })
+      .then(async () => {
+        if (ServerStartRepository.nextServerShuttingDown) {
+          return undefined;
+        }
+        const [{ render }, { createElement }] = await Promise.all([
+          import("@react-email/render"),
+          import("react"),
+        ]);
+        return render(createElement("div"));
+      })
+      .catch((error) => {
+        logger.warn("Email renderer warmup failed", {
+          error: parseError(error).message,
+        });
+      });
+  }
+
   private static async startTaskRunnerIfEnabled(
     user: JwtPayloadType,
     locale: CountryLanguage,
@@ -1517,20 +1545,30 @@ export class ServerStartRepository {
     }
 
     // Start task runner if enabled.
-    if (runTasks) {
-      void ServerStartRepository.startTaskRunnerIfEnabled(
-        user,
-        locale,
-        logger,
-        data.framework !== ServerFramework.TANSTACK,
-      );
-    } else {
+    const taskRunnerStartup = runTasks
+      ? ServerStartRepository.startTaskRunnerIfEnabled(
+          user,
+          locale,
+          logger,
+          data.framework !== ServerFramework.TANSTACK,
+        )
+      : undefined;
+    if (!runTasks) {
       logger.vibe(formatSkip("Task runner skipped"));
     }
+    const onServerReady = (): void => {
+      void taskRunnerStartup?.then(() => {
+        if (ServerStartRepository.taskRunnerStarted) {
+          ServerStartRepository.scheduleEmailRendererWarmup(logger);
+        }
+        return undefined;
+      });
+    };
 
     // Start Next.js / TanStack and wait forever
     if (!runNext) {
       logger.vibe(formatSkip("Next.js server skipped"));
+      onServerReady();
       // Replace early exit handler with graceful shutdown
       process.off("SIGINT", ServerStartRepository.earlyExitOnInt);
       process.off("SIGTERM", ServerStartRepository.earlyExitOnTerm);
@@ -1559,7 +1597,9 @@ export class ServerStartRepository {
           logger,
           t,
         );
-        if (!tanstackResult.success) {
+        if (tanstackResult.success) {
+          onServerReady();
+        } else {
           logger.vibe(
             formatError(
               `TanStack start failed: ${tanstackResult.message ?? "unknown error"}`,
@@ -1580,6 +1620,7 @@ export class ServerStartRepository {
           logger,
           t,
           data.profile,
+          onServerReady,
         );
         if (!nextServerResult.success) {
           logger.vibe(
@@ -1641,7 +1682,13 @@ export class ServerStartRepository {
 
       ServerStartRepository.nextRestartCount = 0;
 
-      ServerStartRepository.startNextServer(port, logger, t, data.profile)
+      ServerStartRepository.startNextServer(
+        port,
+        logger,
+        t,
+        data.profile,
+        onServerReady,
+      )
         .then((result) => {
           // New process is up - allow auto-restart to work again if it crashes
           ServerStartRepository.nextServerRestarting = false;
@@ -1944,6 +1991,7 @@ export class ServerStartRepository {
     logger: EndpointLogger,
     t: ServerStartT,
     profile = false,
+    onReady?: () => void,
   ): Promise<ResponseType<void>> {
     try {
       // Port layout and the Bun proxy itself live behind ../proxy — see that
@@ -2006,6 +2054,7 @@ export class ServerStartRepository {
         const wsHandle = await startWebProxy({ port: wsPort, logger });
         ServerStartRepository.wsServerHandle = wsHandle ?? null;
         proxyStarted = true;
+        onReady?.();
       };
 
       /** Spawn Next.js, wire stdio, register exit→restart handler. Returns the child process. */

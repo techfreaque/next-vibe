@@ -12,6 +12,8 @@
 
 import "server-only";
 
+import { setImmediate as yieldToEventLoop } from "node:timers/promises";
+
 import { and, eq, gte, lt, notExists, sql } from "drizzle-orm";
 import {
   ErrorResponseTypes,
@@ -92,7 +94,11 @@ export class SignupReminderRepository {
       let sent = 0;
       let skipped = 0;
       let failed = 0;
-      for (const row of due) {
+      for (const [index, row] of due.entries()) {
+        // Rendering can stay on the JS thread across resolved promises.
+        if (index > 0) {
+          await yieldToEventLoop();
+        }
         // Persist the claim before touching the mail provider. A delivery
         // attempt with an unknown outcome must remain claimed after a restart.
         const [claim] = await db
