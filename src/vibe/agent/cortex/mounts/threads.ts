@@ -16,6 +16,7 @@ import {
   chatThreads,
 } from "../../chat/db";
 import { ChatMessageRole } from "../../chat/enum";
+import { isUuid } from "../../chat/slugify";
 import type { VirtualListEntry, VirtualReadResult } from "./resolver";
 
 const ROOT_FOLDERS: readonly DefaultFolderId[] = [
@@ -248,6 +249,9 @@ export async function listThreadPath(
     }
     const rootFolderId = segments[1];
     const folderId = segments[2];
+    if (!isUuid(folderId)) {
+      return [];
+    }
 
     // Get threads in this folder
     const threads = await db
