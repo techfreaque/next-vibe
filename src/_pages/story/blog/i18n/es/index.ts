@@ -16,6 +16,41 @@ export const translations: typeof enTranslations = {
     },
   },
   posts: {
+    chubAiAlternatives: {
+      title: "Alternativas a Chub AI para rol con personajes",
+      category: "Comparativa",
+      excerpt:
+        "Chub pasó a cobrar solo en cripto y limitó el chat gratis. Adónde llevar tus fichas de personaje, con precios, filtros, lorebooks y apps móviles comprobados en cada web.",
+      readTime: "9 min de lectura",
+    },
+    crushOnAiAlternatives: {
+      title: "Alternativas a CrushOn AI para chat adulto con personajes",
+      category: "Comparativa",
+      excerpt:
+        "Cinco planes de créditos de hasta 199,99 USD al mes es mucho. Compara alternativas a CrushOn en precio, verificación de edad, memoria y privacidad.",
+      readTime: "9 min de lectura",
+    },
+    sillyTavernAlternatives: {
+      title: "Alternativas a SillyTavern sin configuración",
+      category: "Comparativa",
+      excerpt:
+        "Desde interfaces de código abierto con las mismas fichas hasta chats alojados que funcionan en iPhone. Qué pide, cuesta y permite cada alternativa a SillyTavern.",
+      readTime: "9 min de lectura",
+    },
+    nanoGptAlternatives: {
+      title: "Alternativas a NanoGPT con pago por uso y modelos sin censura",
+      category: "Comparativa",
+      excerpt:
+        "PRO se limitó y se encareció, y varios proveedores intermedios filtraron prompts. Compara alternativas a NanoGPT en cobro, modelos sin censura, privacidad y API.",
+      readTime: "9 min de lectura",
+    },
+    claudeAlternatives: {
+      title: "Alternativas a Claude, con y sin filtros",
+      category: "Comparativa",
+      excerpt:
+        "Asistentes convencionales para cuando Claude llega al límite, modelos sin censura para lo que rechaza. Precios, filtros y privacidad, comprobados en cada web.",
+      readTime: "10 min de lectura",
+    },
     poeAlternatives: {
       title: "8 alternativas a Poe para distintos presupuestos",
       category: "Comparativa",

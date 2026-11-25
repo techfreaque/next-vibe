@@ -36,6 +36,7 @@ export const translations: typeof enTranslations = {
     license: "Licence et coût des modèles",
     unlisted: "Voir le fournisseur",
     fixedAccess: "Accès prépayé de 30 jours",
+    byoApi: "Appli gratuite, vous payez le fournisseur du modèle",
   },
   filter: {
     permissive: "Le service annonce moins de refus",
@@ -58,6 +59,7 @@ export const translations: typeof enTranslations = {
     configurable: "Selon le déploiement et les journaux",
     localOption: "Sur l’appareil avec un modèle local",
     upstream: "Selon le fournisseur du modèle",
+    noLogs: "Le fournisseur déclare ne garder aucun journal des requêtes",
   },
   api: {
     separate: "API vendue séparément",
@@ -143,7 +145,7 @@ export const translations: typeof enTranslations = {
     kimi: "L’assistant de Moonshot propose les modèles Kimi et des outils de programmation. Les limites du service dépendent du forfait.",
     spicychat:
       "Les personnages de la communauté sont accessibles gratuitement. Les forfaits payants donnent plus de capacité et de fonctions.",
-    chub: "Parcourez les fiches de personnages et les recueils d’univers ou branchez votre moteur. Celui-ci peut changer les coûts et la confidentialité.",
+    chub: "Immense bibliothèque de fiches de personnages et de lorebooks. Ses propres modèles exigent l’abonnement Mars. La voie gratuite : un petit quota quotidien ou votre propre moteur.",
     dreamgen:
       "Dirigez les scènes et jouez avec plusieurs personnages. Les limites dépendent du forfait et du modèle.",
     novelai:
@@ -210,6 +212,28 @@ export const translations: typeof enTranslations = {
       "Répartit les appels entre fournisseurs avec des clés de secours. Vérifiez le routage et les journaux à la configuration.",
     sandbase:
       "Réunit les appels aux modèles, les données web et les bacs à sable de code derrière une API. Les appels gratuits sont limités par jour.",
+    risuAi:
+      "Client open source de chat avec des personnages : lorebooks, chats de groupe, images d’émotion et synthèse vocale. Vous fournissez et payez l’API du modèle.",
+    agnai:
+      "Client de jeu de rôle hébergé ou auto-hébergé, avec chats de groupe multi-utilisateurs et lorebooks. Les prix de l’offre hébergée ne sont pas publics.",
+    koboldCpp:
+      "Moteur local en un seul fichier pour les modèles GGUF, avec interface de chat intégrée et API compatible OpenAI. Sans votre propre GPU, vous faites la queue sur l’AI Horde, gérée par des bénévoles.",
+    talemate:
+      "Moteur de jeu de rôle multi-agents avec narrateur, metteur en scène et suivi de l’état du monde. Un outil à installer soi-même, pour utilisateurs avancés.",
+    featherless:
+      "Accès mensuel forfaitaire à des milliers de modèles ouverts, fine-tunes non censurés compris, avec une seule clé d’API. L’offre Chat plafonne le contexte et les requêtes parallèles.",
+    arliAi:
+      "Abonnements à tokens illimités pour des modèles ouverts et débridés, plus des images. Les offres moins chères n’autorisent qu’une requête à la fois.",
+    infermatic:
+      "Abonnements mensuels pour une petite sélection de modèles de texte non censurés, avec une promesse d’absence de journaux. L’offre gratuite a un seul modèle et pas d’API.",
+    chutes:
+      "Inférence décentralisée payée au token pour le texte, les images, la vidéo et l’audio. Pas d’offre gratuite.",
+    kagi: "Assistant multi-modèles inclus avec la recherche Kagi. Les fils s’effacent après 24 heures par défaut, et les modèles phares exigent l’offre la plus haute.",
+    huggingChat:
+      "Chat avec des modèles ouverts via un routeur automatique. Le code du chat est open source, et l’inférence se facture en crédits Hugging Face.",
+    zai: "Le chat de Zhipu pour ses modèles GLM, avec une API séparée. Sa politique de confidentialité mentionne le contenu des messages pour l’entraînement des modèles.",
+    ourDream:
+      "Créateur de compagnons adultes avec chat, images et vidéo. Les médias consomment des pièces qu’on ne peut acheter qu’avec un abonnement actif.",
   },
   articles: {
     "nofiltergpt-alternatives": {
@@ -261,6 +285,32 @@ export const translations: typeof enTranslations = {
         "Quelles alternatives remplacent la recherche et les fonctions créatives de Grok ?",
       answer:
         "Perplexity fournit des réponses web avec des sources. Gemini propose Deep Research et la vidéo selon le forfait. Venice et {{appName}} combinent choix de modèles et génération de médias. Gardez Grok si la recherche de publications sur X dans le même chat est essentielle à votre travail.",
+    },
+    "chub-ai-alternatives": {
+      question: "Puis-je garder mes fiches de personnages Chub ailleurs ?",
+      answer:
+        "Oui. Les fiches Chub se téléchargent en PNG ou en JSON au format de fiche V2, et SillyTavern, RisuAI et Agnaistic les importent directement. {{appName}} transforme un personnage en compétence avec laquelle vous discutez sur n’importe quel modèle. Les lorebooks passent tels quels vers SillyTavern et RisuAI.",
+    },
+    "crushon-ai-alternatives": {
+      question: "Quelle alternative à CrushOn a le coût le plus prévisible ?",
+      answer:
+        "Les forfaits fixes : Kindroid, Nomi et SpicyChat facturent un seul prix mensuel. Le paiement à l’usage : {{appName}} et NanoGPT facturent au message, donc un mois calme coûte moins cher. Faire tourner un modèle sur votre propre PC avec SillyTavern et KoboldCpp ne coûte rien une fois le matériel acheté.",
+    },
+    "sillytavern-alternatives": {
+      question: "Existe-t-il une alternative à SillyTavern sans installation ?",
+      answer:
+        "Oui. Janitor AI, Chub et Character Tavern tournent dans le navigateur avec des personnages intégrés. RisuAI a aussi une version web. {{appName}} fonctionne dans n’importe quel navigateur, iPhone compris, avec des modèles déjà connectés : aucune clé d’API à configurer.",
+    },
+    "nanogpt-alternatives": {
+      question:
+        "Quelle alternative à NanoGPT convient aux modèles ouverts à forfait ?",
+      answer:
+        "Featherless, Arli AI et Infermatic vendent des abonnements mensuels pour des modèles ouverts et non censurés, avec des limites de contexte ou de requêtes parallèles. OpenRouter et Chutes facturent au token. {{appName}} facture au message sur un seul solde, pour les modèles non censurés, ouverts et grand public.",
+    },
+    "claude-alternatives": {
+      question: "Quelle alternative à Claude écrit le mieux les textes longs ?",
+      answer:
+        "GPT et Gemini s’en approchent le plus pour l’écriture structurée. Kimi et GLM sont de solides modèles ouverts qui refusent moins. Pour la fiction que Claude refuse, prenez un modèle non censuré comme GLM 5.3 Uncensored ou UncensoredLM sur {{appName}}, et gardez Claude dans le même fil pour les retouches.",
     },
   },
 };

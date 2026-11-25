@@ -63,6 +63,8 @@ const OTHER_GUIDES = [
   "gab-ai-alternatives",
   "character-ai-alternatives",
   "janitor-ai-alternatives",
+  "nanogpt-alternatives",
+  "claude-alternatives",
 ] as const;
 
 export function MultiModelArticle({

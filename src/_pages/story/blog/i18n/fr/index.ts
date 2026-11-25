@@ -16,6 +16,42 @@ export const translations: typeof enTranslations = {
     },
   },
   posts: {
+    chubAiAlternatives: {
+      title: "Alternatives à Chub AI pour le jeu de rôle",
+      category: "Comparatif",
+      excerpt:
+        "Chub ne prend plus que la crypto et plafonne le chat gratuit. Où emmener vos fiches de personnage, avec prix, filtres, lorebooks et applis mobiles vérifiés sur chaque site.",
+      readTime: "9 min de lecture",
+    },
+    crushOnAiAlternatives: {
+      title: "Alternatives à CrushOn AI pour le chat adulte",
+      category: "Comparatif",
+      excerpt:
+        "Cinq paliers de crédits jusqu’à $199.99 par mois, ça fait beaucoup. Comparez les alternatives à CrushOn : prix, vérification d’âge, mémoire et confidentialité.",
+      readTime: "9 min de lecture",
+    },
+    sillyTavernAlternatives: {
+      title: "Alternatives à SillyTavern, sans la configuration",
+      category: "Comparatif",
+      excerpt:
+        "Des interfaces open source qui lisent les mêmes fiches aux chats hébergés qui marchent sur iPhone. Ce que chaque alternative à SillyTavern exige, coûte et permet.",
+      readTime: "9 min de lecture",
+    },
+    nanoGptAlternatives: {
+      title:
+        "Alternatives à NanoGPT pour le paiement à l’usage et les modèles non censurés",
+      category: "Comparatif",
+      excerpt:
+        "PRO a été plafonné et augmenté, et des fournisseurs en amont ont laissé fuiter des prompts. Comparez les alternatives à NanoGPT : facturation, modèles non censurés, confidentialité et API.",
+      readTime: "9 min de lecture",
+    },
+    claudeAlternatives: {
+      title: "Alternatives à Claude, avec et sans filtre",
+      category: "Comparatif",
+      excerpt:
+        "Des assistants grand public pour quand Claude atteint sa limite, des modèles non censurés pour ce qu’il refuse. Prix, filtres et confidentialité, vérifiés sur chaque site.",
+      readTime: "10 min de lecture",
+    },
     poeAlternatives: {
       title: "8 alternatives à Poe pour différents budgets",
       category: "Comparatif",

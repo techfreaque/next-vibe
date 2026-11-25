@@ -16,6 +16,41 @@ export const translations: typeof enTranslations = {
     },
   },
   posts: {
+    chubAiAlternatives: {
+      title: "Chub-AI-Alternativen für Figurenrollenspiele",
+      category: "Vergleich",
+      excerpt:
+        "Chub nimmt nur noch Krypto und begrenzt den Gratis-Chat. Wohin mit deinen Figurenkarten: Preise, Filter, Lorebooks und Handy-Apps, auf jeder Seite geprüft.",
+      readTime: "9 Min. Lesezeit",
+    },
+    crushOnAiAlternatives: {
+      title: "CrushOn-AI-Alternativen für Figurenchat ab 18",
+      category: "Vergleich",
+      excerpt:
+        "Fünf Credit-Stufen bis $199.99 im Monat sind viel. CrushOn-Alternativen im Vergleich: Preis, Altersprüfung, Gedächtnis und Datenschutz.",
+      readTime: "9 Min. Lesezeit",
+    },
+    sillyTavernAlternatives: {
+      title: "SillyTavern-Alternativen ohne Einrichtung",
+      category: "Vergleich",
+      excerpt:
+        "Von Open-Source-Frontends mit denselben Karten bis zum gehosteten Chat, der auf dem iPhone läuft. Was jede SillyTavern-Alternative braucht, kostet und erlaubt.",
+      readTime: "9 Min. Lesezeit",
+    },
+    nanoGptAlternatives: {
+      title: "NanoGPT-Alternativen für Pay-per-Use und unzensierte Modelle",
+      category: "Vergleich",
+      excerpt:
+        "PRO wurde gedeckelt und teurer, vorgelagerte Anbieter haben Prompts geleakt. NanoGPT-Alternativen im Vergleich: Abrechnung, unzensierte Modelle, Datenschutz und API.",
+      readTime: "9 Min. Lesezeit",
+    },
+    claudeAlternatives: {
+      title: "Claude-Alternativen mit und ohne Filter",
+      category: "Vergleich",
+      excerpt:
+        "Mainstream-Assistenten für den Moment, in dem Claude ans Limit stößt, unzensierte Modelle für das, was es ablehnt. Preise, Filter und Datenschutz, auf jeder Seite geprüft.",
+      readTime: "10 Min. Lesezeit",
+    },
     poeAlternatives: {
       title: "8 Alternativen zu Poe für unterschiedliche Budgets",
       category: "Vergleich",

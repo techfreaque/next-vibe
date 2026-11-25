@@ -212,7 +212,7 @@ export const translations: typeof enTranslations = {
     nanoGpt: {
       what: "Aplikacja webowa i API w modelu płatności za użycie: modele tekstowe, obrazowe, wideo i audio. Subskrypcja niepotrzebna, opcjonalny plan na modele open.",
       pricingNote:
-        "Pierwsza wpłata od 0,10 USD w krypto lub 1 USD kartą. Następne wpłaty kartą od 5 USD. Doładujesz saldo po zalogowaniu. W przeglądarce jest jeden darmowy model. PRO obejmuje wybrane otwarte modele tekstowe i obrazowe do użytku osobistego. Claude, GPT, Gemini i Grok zużywają saldo.",
+        "Pierwsza wpłata od 0,10 USD w krypto lub 1 USD kartą. Następne wpłaty kartą od 5 USD. Doładujesz saldo po zalogowaniu. W przeglądarce jest jeden darmowy model. PRO (do maja 2026 kosztował 8 USD) obejmuje 60 mln tokenów wejściowych tygodniowo na wybranych otwartych modelach tekstowych oraz 100 obrazów dziennie, do użytku osobistego. Claude, GPT, Gemini i Grok zużywają saldo.",
       models:
         "Publiczne API modeli tekstowych zwróciło 596 wpisów. 38 identyfikatorów zawiera słowa uncensored, abliterated lub Dolphin. Przykłady to Venice Uncensored, GLM 5.3 Uncensored, DeepSeek V4.1 Flash Uncensored i wariant Kimi K3.1 Pro z usuniętą blokadą odmów.",
       filterShort: "Brak ogólnego zakazu NSFW, 18+",
@@ -220,12 +220,12 @@ export const translations: typeof enTranslations = {
         "Musisz mieć co najmniej 18 lat i móc zawrzeć umowę zgodnie z lokalnym prawem. Regulamin zabrania materiałów przedstawiających wykorzystywanie seksualne dzieci oraz intymnych lub seksualnych treści z rozpoznawalnymi osobami bez ich zgody, w tym deepfake’ów. Dostawcy mogą stosować własne ograniczenia.",
       privacyShort: "Historia domyślnie zostaje w przeglądarce",
       privacy:
-        "Historia domyślnie zostaje w przeglądarce, z opcjonalną synchronizacją z chmurą. Według NanoGPT standardowe przetwarzanie nie zapisuje treści wiadomości ani odpowiedzi. Dzienniki API i pamięć czatu są opcjonalne. Niektórzy dostawcy mogą przechowywać wiadomości lub użyć ich do treningu.",
+        "Historia domyślnie zostaje w przeglądarce, z opcjonalną synchronizacją z chmurą. Według NanoGPT standardowe przetwarzanie nie zapisuje treści wiadomości ani odpowiedzi. Dzienniki API i pamięć czatu są opcjonalne. Niektórzy dostawcy mogą przechowywać wiadomości lub użyć ich do treningu. W listopadzie 2026 NanoGPT ujawnił wycieki promptów u kilku dostawców i wyłączył te ścieżki.",
       apiShort: "",
       api: "API zgodne z OpenAI i formatem Anthropic Messages. x402 umożliwia płatności bez konta. Niektóre odpowiedzi nie podają ceny lub pokazują szacunek do czasu rozliczenia.",
       forWho:
         "Dla płacących za użycie i deweloperów, którzy chcą każdego modelu, płatności krypto i zero subskrypcji.",
-      pro1: "Ogromna lista modeli, ceny katalogowe, start od dziesięciu centów.",
+      pro1: "Ogromna lista modeli, w większości po cenach katalogowych, start od dziesięciu centów.",
       pro2: "Darmowy model w przeglądarce działa bez konta. Historia domyślnie zostaje w przeglądarce.",
       con1: "Darmowy plan to jeden model w przeglądarce.",
       con2: "Prywatność zależy od wybranej ścieżki dostawcy.",
@@ -332,7 +332,7 @@ export const translations: typeof enTranslations = {
         "Dla zaawansowanych, którzy przyjmą stromą krzywą nauki w zamian za pełną kontrolę nad promptami i postaciami.",
       pro1: "Maksimum kontroli: dowolny backend, dowolny prompt, bogate rozszerzenia.",
       pro2: "Darmowy, open source, nic nie opuszcza Twojego komputera poza tym, co wyślesz do API.",
-      con1: "Sam instalujesz, utrzymujesz i dostarczasz model.",
+      con1: "Sam instalujesz i utrzymujesz go (Node.js 20 lub nowszy), sam dostarczasz model, a na iPhone'a nie ma instalacji.",
       con2: "Stroma krzywa nauki, jak przyznaje sam projekt.",
     },
     characterAi: {
@@ -401,15 +401,15 @@ export const translations: typeof enTranslations = {
     crushOn: {
       what: "Strona z czatem NSFW z postaciami, z przełącznikiem Unfiltered i dostępem do zewnętrznych modeli rozliczanym w kredytach.",
       pricingNote:
-        "Publiczna oferta obejmuje bezpłatne rozmowy bez limitu na darmowych modelach i 100 kredytów miesięcznie na modele Pro. Roczne plany kosztują mniej. Dostęp do Ultra zależy od abonamentu i zużywa kredyty osobno od pakietów Pro.",
+        "Darmowo: rozmowy bez limitu na darmowych modelach z kolejką i 100 kredytów miesięcznie na modele Pro, bez modeli Ultra. Płatne plany dają od 2000 do 125 000 kredytów miesięcznie, a rozliczenie roczne jest tańsze. Nielimitowany czat na modelach Pro to osobny Chat Package.",
       models:
-        "Modele i limity kontekstu zależą od planu. Publiczny katalog CrushOn.AI wymienia w Ultra Claude Opus 4.7, GLM 5.3, Gemini 3.1 Pro i DeepSeek V4 Pro.",
+        "Modele i limity kontekstu zależą od planu. Publiczna lista modeli CrushOn.AI wymienia w Ultra Claude Opus 4.7 i 5.5, Claude Sonnet 4.6 oraz GLM od 5.1 do 5.3.",
       filterShort: "Przełącznik Unfiltered po weryfikacji wieku",
       filter:
         "Przełącznik Unfiltered odblokowuje tekst dla dorosłych po weryfikacji wieku: selfie lub dokument przez Didit, AgeGo albo płatność 0,99 USD. Zasady nadal zakazują dosłownych obrazów seksualnych, realistycznych obrazów prawdziwych osób, nieletnich i postaci „postarzonych”.",
       privacyShort: "Czaty mogą trenować modele",
       privacy:
-        "Polityka mówi, że treść czatów może służyć do trenowania jego modeli, bez powiązania z konkretnymi użytkownikami. Ciasteczka służą do retargetingu reklam.",
+        "Polityka mówi, że treść czatów może służyć do trenowania jego modeli, bez powiązania z konkretnymi użytkownikami. Jego strona SFW twierdzi coś odwrotnego. Ciasteczka służą do retargetingu reklam.",
       apiShort: "",
       api: "Brak publicznego API dla deweloperów.",
       forWho:

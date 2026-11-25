@@ -18,7 +18,7 @@ export const COMPARE_CHECKED_DATE = "2026-11-17";
 /** Day the comparison pages first shipped. */
 export const COMPARE_PUBLISHED_DATE = "2026-11-17";
 /** Latest re-check of any single platform (newest `checkedDate` below). */
-export const COMPARE_LATEST_CHECK_DATE = "2026-11-24";
+export const COMPARE_LATEST_CHECK_DATE = "2026-11-25";
 
 export const COMPARE_BASE_PATH = "/story/compare";
 export const COMPARE_HUB_PATH = `${COMPARE_BASE_PATH}/uncensored-ai-platforms`;
@@ -191,7 +191,7 @@ export const PLATFORMS: Record<PlatformKey, PlatformData> = {
     selfHost: false,
     media: { image: "yes", video: "yes", voice: "yes" },
     upstream: ApiProvider.NANO_GPT,
-    checkedDate: "2026-11-24",
+    checkedDate: "2026-11-25",
     sources: [
       { kind: "pricing", url: "https://nano-gpt.com/pricing" },
       { kind: "privacy", url: "https://nano-gpt.com/privacy" },
@@ -199,6 +199,10 @@ export const PLATFORMS: Record<PlatformKey, PlatformData> = {
       { kind: "api", url: "https://nano-gpt.com/api" },
       { kind: "models", url: "https://api.nano-gpt.com/api/v1/models" },
       { kind: "docs", url: "https://nano-gpt.com/llms-full.txt" },
+      {
+        kind: "blog",
+        url: "https://nano-gpt.com/blog/provider-security-notice-november-2026",
+      },
     ],
   },
   openRouter: {
@@ -347,7 +351,7 @@ export const PLATFORMS: Record<PlatformKey, PlatformData> = {
     selfHost: true,
     media: { image: "partial", video: "no", voice: "partial" },
     upstream: null,
-    checkedDate: "2026-11-24",
+    checkedDate: "2026-11-25",
     sources: [
       { kind: "docs", url: "https://docs.sillytavern.app/" },
       {
@@ -359,6 +363,10 @@ export const PLATFORMS: Record<PlatformKey, PlatformData> = {
         url: "https://docs.sillytavern.app/administration/config-yaml/",
       },
       { kind: "repo", url: "https://github.com/SillyTavern/SillyTavern" },
+      {
+        kind: "blog",
+        url: "https://github.com/SillyTavern/SillyTavern/releases",
+      },
     ],
   },
   characterAi: {
@@ -493,10 +501,12 @@ export const PLATFORMS: Record<PlatformKey, PlatformData> = {
     selfHost: false,
     media: { image: "no", video: "no", voice: "yes" },
     upstream: null,
-    // The public offer and help wiki were reviewed on 2026-11-24.
-    // The main site did not expose its current privacy policy and guidelines.
+    // Plans and tier limits re-read from the live pricing data on 2026-11-25.
+    // Yearly billing (from $58.88 for Standard) is cheaper than monthly.
+    checkedDate: "2026-11-25",
     sources: [
       { kind: "pricing", url: "https://crushon.ai/pricing" },
+      { kind: "help", url: "https://aiwiki.crushon.ai/wiki/FAQ" },
       { kind: "features", url: "https://chat.crushon.ai/" },
       { kind: "privacy", url: "https://crushon.ai/privacy-policy" },
       { kind: "guidelines", url: "https://crushon.ai/community-guidelines" },

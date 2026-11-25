@@ -34,6 +34,7 @@ export const translations = {
     license: "License plus model usage",
     unlisted: "See provider",
     fixedAccess: "Prepaid access for 30 days",
+    byoApi: "Free app, you pay the model provider",
   },
   filter: {
     permissive: "Advertises fewer refusals",
@@ -55,6 +56,7 @@ export const translations = {
     configurable: "Depends on deployment and logging",
     localOption: "On device with a local model",
     upstream: "Depends on upstream provider",
+    noLogs: "Provider says it keeps no prompt logs",
   },
   api: {
     separate: "Separate API product",
@@ -140,7 +142,7 @@ export const translations = {
     kimi: "Moonshot’s assistant offers Kimi models and coding workflows. Hosted usage depends on its plans.",
     spicychat:
       "Pick from community characters and start with free access. Paid tiers add capacity and features.",
-    chub: "Browse character cards and lorebooks or bring your own backend. Billing and privacy can change with that backend.",
+    chub: "Huge library of character cards and lorebooks. Its own models need the Mars plan, the free path is a small daily allowance or your own backend.",
     dreamgen:
       "Steer scenes and play with several characters. Usage limits depend on the plan and model.",
     novelai:
@@ -207,6 +209,28 @@ export const translations = {
       "Routes model calls across providers with key failover. Review routing and logging when you configure it.",
     sandbase:
       "Combines model calls, web data and code sandboxes in one API. Free calls have daily limits.",
+    risuAi:
+      "Open-source character chat client with lorebooks, group chats, emotion images and TTS. You bring and pay for the model API.",
+    agnai:
+      "Hosted or self-hosted roleplay client with multi-user group chats and lorebooks. Hosted plan prices are not public.",
+    koboldCpp:
+      "One-file local runner for GGUF models with a built-in chat UI and an OpenAI-compatible API. Without your own GPU you queue on the volunteer AI Horde.",
+    talemate:
+      "Multi-agent roleplay engine with a narrator, a director and world state tracking. A self-install tool for power users.",
+    featherless:
+      "Flat monthly access to thousands of open models, uncensored finetunes included, through one API key. The Chat plan caps context and parallel requests.",
+    arliAi:
+      "Unlimited-token plans for open and derestricted models plus images. Cheaper plans allow one request at a time.",
+    infermatic:
+      "Monthly plans for a small set of uncensored text models with a no-logs claim. The free plan has one model and no API.",
+    chutes:
+      "Decentralized pay-per-token inference for text, images, video and audio. No free tier.",
+    kagi: "Multi-model assistant bundled with Kagi search. Threads delete after 24 hours by default, and flagship models need the top plan.",
+    huggingChat:
+      "Chat with open models through an automatic router. The chat code is open source, and inference bills through Hugging Face credits.",
+    zai: "Zhipu's own chat for GLM models, with a separate API. Its privacy policy lists message content for model training.",
+    ourDream:
+      "Adult companion builder with chat, images and video. Media runs on coins you can only buy with an active plan.",
   },
   articles: {
     "nofiltergpt-alternatives": {
@@ -256,6 +280,31 @@ export const translations = {
         "Which alternatives replace Grok’s search and creative features?",
       answer:
         "Perplexity is built for cited web answers. Gemini offers Deep Research and video on eligible plans. Venice and {{appName}} combine a model picker with media generation. Keep Grok if searching posts on X from the same chat is central to your work.",
+    },
+    "chub-ai-alternatives": {
+      question: "Can I keep my Chub character cards somewhere else?",
+      answer:
+        "Yes. Chub cards download as PNG or JSON in the V2 card format, and SillyTavern, RisuAI and Agnaistic import them directly. {{appName}} turns a character into a skill you can chat with on any model. Lorebooks carry over to SillyTavern and RisuAI.",
+    },
+    "crushon-ai-alternatives": {
+      question: "Which CrushOn alternative has the most predictable cost?",
+      answer:
+        "Flat plans: Kindroid, Nomi and SpicyChat charge one monthly price. Pay as you go: {{appName}} and NanoGPT bill per message, so a quiet month costs less. Running a model on your own PC with SillyTavern and KoboldCpp costs nothing after the hardware.",
+    },
+    "sillytavern-alternatives": {
+      question: "Is there a SillyTavern alternative that needs no install?",
+      answer:
+        "Yes. Janitor AI, Chub and Character Tavern run in the browser with characters built in. RisuAI also has a web version. {{appName}} runs in any browser, iPhone included, with models already connected, so there is no API key to set up.",
+    },
+    "nanogpt-alternatives": {
+      question: "Which NanoGPT alternative suits flat-rate open models?",
+      answer:
+        "Featherless, Arli AI and Infermatic sell monthly plans for open and uncensored models, with limits on context or parallel requests. OpenRouter and Chutes bill per token. {{appName}} bills per message from one balance across uncensored, open and mainstream models.",
+    },
+    "claude-alternatives": {
+      question: "Which Claude alternative writes the best long-form text?",
+      answer:
+        "GPT and Gemini come closest for structured writing. Kimi and GLM are strong open models with fewer refusals. For fiction Claude refuses, use an uncensored model such as GLM 5.3 Uncensored or UncensoredLM on {{appName}}, and keep Claude in the same thread for edits.",
     },
   },
 };

@@ -212,7 +212,7 @@ export const translations: typeof enTranslations = {
     nanoGpt: {
       what: "Appli web et API à l'usage pour des modèles texte, image, vidéo et audio. Pas d'abonnement obligatoire, offre optionnelle pour les modèles open source.",
       pricingNote:
-        "Premier dépôt à partir de 0,10 USD en crypto ou 1 USD par carte, puis 5 USD par carte. La recharge demande une connexion. Le web propose un modèle gratuit. PRO couvre certains modèles de texte et d’image open source à usage personnel. Claude, GPT, Gemini et Grok sont débités du solde.",
+        "Premier dépôt à partir de 0,10 USD en crypto ou 1 USD par carte, puis 5 USD par carte. La recharge demande une connexion. Le web propose un modèle gratuit. PRO (8 USD jusqu’en mai 2026) couvre 60M tokens d’entrée par semaine sur certains modèles de texte open source, plus 100 images par jour, à usage personnel. Claude, GPT, Gemini et Grok sont débités du solde.",
       models:
         "L’API publique des modèles de texte renvoie 596 entrées, dont 38 avec uncensored, abliterated ou Dolphin dans leur identifiant. Exemples : Venice Uncensored, GLM 5.3 Uncensored, DeepSeek V4.1 Flash Uncensored et une variante de Kimi K3.1 Pro sans refus.",
       filterShort: "Pas d'interdiction globale du NSFW, 18+",
@@ -220,12 +220,12 @@ export const translations: typeof enTranslations = {
         "Tu dois avoir au moins 18 ans et l’âge légal pour conclure un contrat dans ton pays. Les conditions interdisent le matériel pédopornographique et les contenus intimes ou sexuellement explicites montrant des personnes identifiables sans leur consentement, y compris les deepfakes. Chaque fournisseur peut imposer ses propres restrictions.",
       privacyShort: "L’historique reste dans le navigateur par défaut",
       privacy:
-        "L’historique reste par défaut dans le navigateur, avec synchronisation dans le cloud en option. NanoGPT dit ne pas enregistrer les requêtes et réponses lors du traitement ordinaire. La journalisation de l’API et la mémoire du chat sont facultatives. Certains fournisseurs peuvent conserver les requêtes ou les utiliser pour l’entraînement.",
+        "L’historique reste par défaut dans le navigateur, avec synchronisation dans le cloud en option. NanoGPT dit ne pas enregistrer les requêtes et réponses lors du traitement ordinaire. La journalisation de l’API et la mémoire du chat sont facultatives. Certains fournisseurs peuvent conserver les requêtes ou les utiliser pour l’entraînement. En novembre 2026, NanoGPT a révélé des expositions de requêtes chez plusieurs fournisseurs en amont et a abandonné ces routes.",
       apiShort: "",
       api: "API compatible avec OpenAI et Anthropic Messages. Paiement sans compte via x402. Tant que la facturation est en cours, certaines réponses indiquent une estimation ou aucun prix.",
       forWho:
         "Les utilisateurs au paiement à l'usage et les développeurs qui veulent tous les modèles, le paiement en crypto et aucun abonnement.",
-      pro1: "Liste de modèles immense, prix catalogue, ticket d'entrée à dix centimes.",
+      pro1: "Liste de modèles immense, surtout au prix catalogue, ticket d'entrée à dix centimes.",
       pro2: "Le modèle web gratuit fonctionne sans compte. L’historique reste dans le navigateur par défaut.",
       con1: "L'offre gratuite se limite à un modèle sur le web.",
       con2: "La confidentialité dépend de la route de fournisseur choisie.",
@@ -332,7 +332,7 @@ export const translations: typeof enTranslations = {
         "Les utilisateurs avancés qui acceptent une courbe d'apprentissage raide en échange d'un contrôle total sur les prompts et les personnages.",
       pro1: "Contrôle maximal : n'importe quel backend, n'importe quel prompt, des extensions riches.",
       pro2: "Gratuit, open source, rien ne quitte votre machine hormis ce que vous envoyez à une API.",
-      con1: "Vous l'installez, vous l'entretenez, et vous fournissez le modèle vous-même.",
+      con1: "Vous l'installez et l'entretenez (Node.js 20 ou plus récent), vous fournissez le modèle vous-même, et il ne s'installe pas sur iPhone.",
       con2: "Courbe d'apprentissage raide, de l'aveu même du projet.",
     },
     characterAi: {
@@ -403,15 +403,15 @@ export const translations: typeof enTranslations = {
     crushOn: {
       what: "Site de chat NSFW avec personnages, un interrupteur Unfiltered et un accès aux modèles tiers décompté en crédits.",
       pricingNote:
-        "L’offre publique annonce des chats illimités sur les modèles gratuits et 100 crédits mensuels pour les modèles Pro. Les offres annuelles reviennent moins cher. L’accès Ultra dépend de l’abonnement et utilise des crédits séparément des packs Pro.",
+        "Gratuit : chats illimités sur des modèles gratuits avec file d’attente et 100 crédits mensuels pour les modèles Pro, sans modèles Ultra. Les offres payantes vont de 2 000 à 125 000 crédits par mois, et la facturation annuelle revient moins cher. Le chat illimité sur les modèles Pro est un Chat Package à part.",
       models:
-        "Les modèles et les limites de contexte dépendent de l’offre. Le catalogue de CrushOn.AI cite Claude Opus 4.7, GLM 5.3, Gemini 3.1 Pro et DeepSeek V4 Pro dans l’offre Ultra.",
+        "Les modèles et les limites de contexte dépendent de l’offre. La liste publique de modèles de CrushOn.AI cite Claude Opus 4.7 et 5.5, Claude Sonnet 4.6 et GLM 5.1 à 5.3 parmi les options Ultra.",
       filterShort: "Interrupteur Unfiltered après vérification d'âge",
       filter:
         "Un interrupteur Unfiltered débloque le texte pour adultes après vérification d'âge : selfie ou pièce d'identité via Didit, AgeGo, ou un paiement de 0,99 $. Ses règles interdisent quand même les images sexuelles explicites, les images réalistes de personnes réelles, les mineurs et les personnages vieillis artificiellement.",
       privacyShort: "Les chats peuvent entraîner ses modèles",
       privacy:
-        "Sa politique indique que le contenu des chats peut servir à entraîner ses modèles, sans lien avec des utilisateurs précis. Des cookies servent au reciblage publicitaire.",
+        "Sa politique indique que le contenu des chats peut servir à entraîner ses modèles, sans lien avec des utilisateurs précis. Son site SFW affirme le contraire. Des cookies servent au reciblage publicitaire.",
       apiShort: "",
       api: "Pas d'API publique pour développeurs.",
       forWho:

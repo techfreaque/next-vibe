@@ -22,6 +22,11 @@ export type BlogTopic = (typeof BLOG_TOPICS)[number];
 
 /** Section of each post on the blog index. Exhaustive: a new post needs one. */
 export const POST_TOPICS: Record<BlogPostSlug, BlogTopic> = {
+  "claude-alternatives": "uncensored",
+  "nanogpt-alternatives": "uncensored",
+  "sillytavern-alternatives": "uncensored",
+  "crushon-ai-alternatives": "uncensored",
+  "chub-ai-alternatives": "uncensored",
   "poe-alternatives": "developers",
   "typingmind-alternatives": "developers",
   "janitor-ai-alternatives": "uncensored",
@@ -91,9 +96,14 @@ export const HUB_GUIDES: Record<TopicHub, readonly BlogPostSlug[]> = {
     "unbiased-ai-chatbot",
     "uncensored-ai-writer",
     "ai-roleplay-without-filter",
+    "claude-alternatives",
     "janitor-ai-alternatives",
+    "chub-ai-alternatives",
+    "crushon-ai-alternatives",
+    "sillytavern-alternatives",
     "character-ai-alternatives",
     "venice-ai-alternatives",
+    "nanogpt-alternatives",
     "nofiltergpt-alternatives",
     "freedomgpt-alternatives",
     "gab-ai-alternatives",
@@ -123,6 +133,46 @@ interface RelatedGuideSet {
 
 /** Curated hub + siblings. Posts not listed fall back to their topic. */
 const CURATED_RELATED: Partial<Record<BlogPostSlug, RelatedGuideSet>> = {
+  "chub-ai-alternatives": {
+    hub: "uncensored",
+    related: [
+      "janitor-ai-alternatives",
+      "sillytavern-alternatives",
+      "ai-roleplay-without-filter",
+    ],
+  },
+  "crushon-ai-alternatives": {
+    hub: "uncensored",
+    related: [
+      "character-ai-alternatives",
+      "chub-ai-alternatives",
+      "ai-roleplay-without-filter",
+    ],
+  },
+  "sillytavern-alternatives": {
+    hub: "uncensored",
+    related: [
+      "chub-ai-alternatives",
+      "uncensored-llm-without-gpu",
+      "janitor-ai-alternatives",
+    ],
+  },
+  "nanogpt-alternatives": {
+    hub: "uncensored",
+    related: [
+      "openrouter-alternatives",
+      "venice-ai-alternatives",
+      "uncensored-llm-api",
+    ],
+  },
+  "claude-alternatives": {
+    hub: "uncensored",
+    related: [
+      "claude-without-filters",
+      "chatgpt-alternative-without-filters",
+      "grok-alternative",
+    ],
+  },
   "poe-alternatives": {
     hub: null,
     related: [

@@ -210,7 +210,7 @@ export const translations = {
     nanoGpt: {
       what: "Pay-as-you-go web app and API for text, image, video and audio models. No subscription needed, optional plan for open models.",
       pricingNote:
-        "First deposit: $0.10 in crypto or $1 by card, then $5 for card deposits. Sign in to add balance. The web has one free model. PRO covers selected open-source text and image models for personal use. Claude, GPT, Gemini and Grok draw from your balance.",
+        "First deposit: $0.10 in crypto or $1 by card, then $5 for card deposits. Sign in to add balance. The web has one free model. PRO (it was $8 until May 2026) covers 60M input tokens a week on selected open-source text models plus 100 images a day, for personal use. Claude, GPT, Gemini and Grok draw from your balance.",
       models:
         "The public text-model API returned 596 entries, 38 with IDs containing uncensored, abliterated or Dolphin. Examples include Venice Uncensored, GLM 5.3 Uncensored, DeepSeek V4.1 Flash Uncensored and a Kimi K3.1 Pro abliterated variant.",
       filterShort: "No blanket NSFW ban, 18+",
@@ -218,12 +218,12 @@ export const translations = {
         "You must be at least 18 and old enough to enter a contract where you live. The terms ban child sexual abuse material and non-consensual intimate or sexually explicit content depicting identifiable people, including deepfakes. Providers may apply their own restrictions.",
       privacyShort: "History stays in your browser by default",
       privacy:
-        "History stays in your browser by default, with optional cloud sync. NanoGPT says it does not log prompts and responses during normal inference. API content logging and chat memory are optional. Certain provider routes may retain prompts or use them for training.",
+        "History stays in your browser by default, with optional cloud sync. NanoGPT says it does not log prompts and responses during normal inference. API content logging and chat memory are optional. Certain provider routes may retain prompts or use them for training. In November 2026 NanoGPT disclosed prompt exposures at several upstream providers and dropped those routes.",
       apiShort: "",
       api: "OpenAI-compatible API with Anthropic Messages support and accountless x402 payments. Some responses omit the cost or show an estimate while billing is pending.",
       forWho:
         "Pay-per-use users and developers who want every model, crypto payments and no subscription.",
-      pro1: "Huge model list, list prices, entry from ten cents.",
+      pro1: "Huge model list, mostly at list price, entry from ten cents.",
       pro2: "The free web model needs no account. History stays in your browser by default.",
       con1: "Free tier is one model on the web.",
       con2: "Privacy depends on the provider route you pick.",
@@ -330,7 +330,7 @@ export const translations = {
         "Power users who accept a steep learning curve for full control over prompts and characters.",
       pro1: "Maximum control: any backend, any prompt, rich extensions.",
       pro2: "Free, open source, nothing leaves your machine except what you send to an API.",
-      con1: "You install and maintain it, and supply the model yourself.",
+      con1: "You install and maintain it (Node.js 20 or newer), supply the model yourself, and iPhone has no install.",
       con2: "Steep learning curve, by the project's own description.",
     },
     characterAi: {
@@ -399,15 +399,15 @@ export const translations = {
     crushOn: {
       what: "NSFW character chat site with an Unfiltered switch and credit-metered access to third-party models.",
       pricingNote:
-        "The public plan page lists unlimited chats on free models and 100 monthly credits for Pro models on the free tier. Annual prices are lower. Ultra access depends on the membership and uses credits separately from Pro packages.",
+        "Free: unlimited chats on queued free models and 100 monthly credits for Pro models, no Ultra models. Paid tiers run from 2,000 to 125,000 credits a month, and yearly billing is cheaper. Unlimited Pro-model chat is a separate Chat Package.",
       models:
-        "Models and context limits depend on the tier. CrushOn.AI’s public catalog names Claude Opus 4.7, GLM 5.3, Gemini 3.1 Pro and DeepSeek V4 Pro as Ultra options.",
+        "Models and context limits depend on the tier. CrushOn.AI’s public model list names Claude Opus 4.7 and 5.5, Claude Sonnet 4.6 and GLM 5.1 to 5.3 as Ultra options.",
       filterShort: "Unfiltered switch after an age check",
       filter:
         "An Unfiltered switch unlocks adult text after age verification: selfie or ID via Didit, AgeGo, or a $0.99 payment. Its guidelines still ban explicit sexual imagery, realistic images of real people, minors and aged-up characters.",
       privacyShort: "Chats may train its models",
       privacy:
-        "Its policy says chat content may be used to train its models, not linked to specific users. Cookies are used for retargeting ads.",
+        "Its policy says chat content may be used to train its models, not linked to specific users. Its SFW site claims the opposite. Cookies are used for retargeting ads.",
       apiShort: "",
       api: "No public developer API.",
       forWho: "Adults who want spicy character chat in a ready-made app.",

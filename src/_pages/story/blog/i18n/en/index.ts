@@ -14,6 +14,41 @@ export const translations = {
     },
   },
   posts: {
+    chubAiAlternatives: {
+      title: "Chub AI alternatives for character roleplay",
+      category: "Comparison",
+      excerpt:
+        "Chub went crypto-only and capped free chat. Where to take your character cards, with prices, filters, lorebooks and mobile apps checked on each site.",
+      readTime: "9 min read",
+    },
+    crushOnAiAlternatives: {
+      title: "CrushOn AI alternatives for adult character chat",
+      category: "Comparison",
+      excerpt:
+        "Five credit tiers up to $199.99 a month is a lot. Compare CrushOn alternatives on price, age checks, memory and privacy.",
+      readTime: "9 min read",
+    },
+    sillyTavernAlternatives: {
+      title: "SillyTavern alternatives without the setup",
+      category: "Comparison",
+      excerpt:
+        "From open-source frontends with the same cards to hosted chat that works on iPhone. What each SillyTavern alternative needs, costs and allows.",
+      readTime: "9 min read",
+    },
+    nanoGptAlternatives: {
+      title: "NanoGPT alternatives for pay-per-use and uncensored models",
+      category: "Comparison",
+      excerpt:
+        "PRO got capped and pricier, and upstream providers leaked prompts. Compare NanoGPT alternatives on billing, uncensored models, privacy and API.",
+      readTime: "9 min read",
+    },
+    claudeAlternatives: {
+      title: "Claude alternatives, with and without filters",
+      category: "Comparison",
+      excerpt:
+        "Mainstream assistants for when Claude hits its limit, uncensored models for what it refuses. Prices, filters and privacy, checked on each site.",
+      readTime: "10 min read",
+    },
     poeAlternatives: {
       title: "8 Poe alternatives for different budgets",
       category: "Comparison",

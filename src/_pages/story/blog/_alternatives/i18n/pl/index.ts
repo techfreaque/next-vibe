@@ -36,6 +36,7 @@ export const translations: typeof enTranslations = {
     license: "Licencja i koszty modeli",
     unlisted: "Sprawdź u dostawcy",
     fixedAccess: "Przedpłata za 30 dni",
+    byoApi: "Darmowa aplikacja, płacisz dostawcy modelu",
   },
   filter: {
     permissive: "Deklaruje mniej odmów",
@@ -57,6 +58,7 @@ export const translations: typeof enTranslations = {
     configurable: "Zależy od instalacji i logowania",
     localOption: "Na urządzeniu z modelem lokalnym",
     upstream: "Zależy od dostawcy modelu",
+    noLogs: "Według dostawcy prompty nie są zapisywane",
   },
   api: {
     separate: "Osobna usługa API",
@@ -142,7 +144,7 @@ export const translations: typeof enTranslations = {
     kimi: "Asystent Moonshot oferuje modele Kimi i narzędzia do programowania. Korzystanie z chmury zależy od planu.",
     spicychat:
       "Wybieraj postacie społeczności już w planie bezpłatnym. Płatne plany dają wyższe limity i dodatkowe funkcje.",
-    chub: "Przeglądaj karty postaci i opisy światów albo podłącz własny backend. Od niego mogą zależeć koszty i prywatność.",
+    chub: "Ogromna biblioteka kart postaci i lorebooków. Własne modele wymagają planu Mars, a darmowa ścieżka to mały dzienny limit albo własny backend.",
     dreamgen:
       "Kieruj scenami i graj z kilkoma postaciami. Limity zależą od planu i modelu.",
     novelai:
@@ -209,6 +211,28 @@ export const translations: typeof enTranslations = {
       "Przekazuje zapytania do różnych dostawców z awaryjnym przełączaniem kluczy. Sprawdź routing i logowanie w konfiguracji.",
     sandbase:
       "Łączy wywołania modeli, dane z sieci i izolowane środowiska kodu w jednym API. Bezpłatne zapytania mają dzienny limit.",
+    risuAi:
+      "Klient czatu z postaciami open source z lorebookami, czatami grupowymi, obrazami emocji i TTS. API modelu podłączasz i opłacasz sam.",
+    agnai:
+      "Klient do roleplayu w chmurze lub na własnym serwerze, z czatami grupowymi dla wielu osób i lorebookami. Ceny planów hostowanych nie są publiczne.",
+    koboldCpp:
+      "Jednoplikowe narzędzie do lokalnych modeli GGUF z wbudowanym czatem i API zgodnym z OpenAI. Bez własnego GPU czekasz w kolejce w wolontariackim AI Horde.",
+    talemate:
+      "Wieloagentowy silnik do roleplayu z narratorem, reżyserem i śledzeniem stanu świata. Narzędzie do samodzielnej instalacji dla zaawansowanych.",
+    featherless:
+      "Stały miesięczny dostęp do tysięcy otwartych modeli, w tym nieocenzurowanych finetune'ów, przez jeden klucz API. Plan Chat ogranicza kontekst i równoległe zapytania.",
+    arliAi:
+      "Plany bez limitu tokenów na modele otwarte i bez ograniczeń plus obrazy. Tańsze plany pozwalają na jedno zapytanie naraz.",
+    infermatic:
+      "Plany miesięczne na niewielki zestaw nieocenzurowanych modeli tekstowych, z deklaracją braku logów. Darmowy plan ma jeden model i nie ma API.",
+    chutes:
+      "Zdecentralizowana inferencja z płatnością za token: tekst, obrazy, wideo i audio. Bez darmowego planu.",
+    kagi: "Asystent z wieloma modelami w pakiecie z wyszukiwarką Kagi. Wątki domyślnie znikają po 24 godzinach, a flagowe modele wymagają najwyższego planu.",
+    huggingChat:
+      "Czat z modelami otwartymi przez automatyczny router. Kod czatu jest otwarty, a inferencja rozlicza się w kredytach Hugging Face.",
+    zai: "Własny czat Zhipu do modeli GLM, z osobnym API. Polityka prywatności wymienia treść wiadomości jako dane do trenowania modeli.",
+    ourDream:
+      "Kreator towarzyszy dla dorosłych z czatem, obrazami i wideo. Media działają na monetach, które kupisz tylko z aktywnym planem.",
   },
   articles: {
     "nofiltergpt-alternatives": {
@@ -260,6 +284,33 @@ export const translations: typeof enTranslations = {
         "Które alternatywy zastąpią wyszukiwarkę i funkcje kreatywne Groka?",
       answer:
         "Perplexity udziela odpowiedzi ze źródłami z sieci. Gemini oferuje Deep Research i wideo w odpowiednich planach. Venice i {{appName}} łączą wybór modeli z generowaniem multimediów. Zostań przy Groku, jeśli kluczowe jest przeszukiwanie wpisów z X w tym samym czacie.",
+    },
+    "chub-ai-alternatives": {
+      question: "Czy mogę trzymać swoje karty postaci z Chub gdzie indziej?",
+      answer:
+        "Tak. Karty z Chub pobierzesz jako PNG lub JSON w formacie kart V2, a SillyTavern, RisuAI i Agnaistic importują je bezpośrednio. {{appName}} zamienia postać w skill, z którym rozmawiasz na dowolnym modelu. Lorebooki przeniesiesz do SillyTavern i RisuAI.",
+    },
+    "crushon-ai-alternatives": {
+      question:
+        "Która alternatywa dla CrushOn ma najbardziej przewidywalny koszt?",
+      answer:
+        "Stałe plany: Kindroid, Nomi i SpicyChat biorą jedną miesięczną cenę. Płatność za użycie: {{appName}} i NanoGPT liczą za wiadomość, więc spokojniejszy miesiąc kosztuje mniej. Model na własnym komputerze z SillyTavern i KoboldCpp nic nie kosztuje poza sprzętem.",
+    },
+    "sillytavern-alternatives": {
+      question: "Czy jest alternatywa dla SillyTavern bez instalacji?",
+      answer:
+        "Tak. Janitor AI, Chub i Character Tavern działają w przeglądarce z gotowymi postaciami. RisuAI ma też wersję webową. {{appName}} działa w każdej przeglądarce, także na iPhonie, z już podłączonymi modelami, więc nie konfigurujesz żadnego klucza API.",
+    },
+    "nanogpt-alternatives": {
+      question:
+        "Która alternatywa dla NanoGPT pasuje do modeli otwartych w stałej cenie?",
+      answer:
+        "Featherless, Arli AI i Infermatic sprzedają plany miesięczne na modele otwarte i nieocenzurowane, z limitami kontekstu lub równoległych zapytań. OpenRouter i Chutes liczą za token. {{appName}} liczy za wiadomość z jednego salda dla modeli nieocenzurowanych, otwartych i z głównego nurtu.",
+    },
+    "claude-alternatives": {
+      question: "Która alternatywa dla Claude pisze najlepsze długie teksty?",
+      answer:
+        "GPT i Gemini są najbliżej przy tekstach o wyraźnej strukturze. Kimi i GLM to mocne modele otwarte z mniejszą liczbą odmów. Do fikcji, której Claude odmawia, użyj modelu bez cenzury, takiego jak GLM 5.3 Uncensored albo UncensoredLM na {{appName}}, a Claude zostaw w tym samym wątku do poprawek.",
     },
   },
 };

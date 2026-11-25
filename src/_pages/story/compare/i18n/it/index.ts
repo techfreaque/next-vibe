@@ -214,7 +214,7 @@ export const translations: typeof enTranslations = {
     nanoGpt: {
       what: "Chat web e API a consumo per testo, immagini, video e audio. Puoi abbonarti per usare i modelli aperti.",
       pricingNote:
-        "Prima ricarica da 0,10 USD in cripto o 1 USD con carta. Le successive con carta partono da 5 USD. Devi accedere per ricaricare. Sul web c’è un modello gratuito. PRO include alcuni modelli open source per testo e immagini per uso personale. Claude, GPT, Gemini e Grok si pagano dal saldo.",
+        "Prima ricarica da 0,10 USD in cripto o 1 USD con carta. Le successive con carta partono da 5 USD. Devi accedere per ricaricare. Sul web c’è un modello gratuito. PRO (costava 8 USD fino a maggio 2026) include 60M token in input a settimana su alcuni modelli di testo open source più 100 immagini al giorno, per uso personale. Claude, GPT, Gemini e Grok si pagano dal saldo.",
       models:
         "L’API pubblica di testo ha restituito 596 voci. In 38 casi l’ID contiene uncensored, abliterated o Dolphin. Tra gli esempi: Venice Uncensored, GLM 5.3 Uncensored, DeepSeek V4.1 Flash Uncensored e una variante di Kimi K3.1 Pro con i rifiuti rimossi.",
       filterShort:
@@ -223,12 +223,12 @@ export const translations: typeof enTranslations = {
         "Devi avere almeno 18 anni e l’età legale per stipulare un contratto nel tuo paese. Le condizioni vietano materiale pedopornografico e contenuti intimi o sessualmente espliciti con persone identificabili senza il loro consenso, compresi i deepfake. I fornitori possono imporre limiti propri.",
       privacyShort: "La cronologia resta nel browser di default",
       privacy:
-        "La cronologia resta nel browser di default. Puoi attivare la sincronizzazione nel cloud. NanoGPT dichiara di non registrare messaggi e risposte durante l’elaborazione ordinaria. Puoi attivare i log dell’API e la memoria della chat. Alcuni percorsi possono conservare i messaggi o usarli per l’addestramento.",
+        "La cronologia resta nel browser di default. Puoi attivare la sincronizzazione nel cloud. NanoGPT dichiara di non registrare messaggi e risposte durante l’elaborazione ordinaria. Puoi attivare i log dell’API e la memoria della chat. Alcuni percorsi possono conservare i messaggi o usarli per l’addestramento. A novembre 2026 NanoGPT ha reso note esposizioni di prompt presso diversi fornitori a monte e ha tolto quei percorsi.",
       apiShort: "",
       api: "API compatibile con OpenAI e Anthropic Messages. Con x402 paghi senza account. Mentre è in corso l’addebito, alcune risposte riportano un costo stimato o non lo indicano.",
       forWho:
         "Per chi vuole pagare a consumo, accedere a un catalogo ampio o ricaricare in criptovalute.",
-      pro1: "Catalogo ampio e ricariche da 0,10 USD.",
+      pro1: "Catalogo enorme, per lo più a prezzo di listino, e ricariche da 0,10 USD.",
       pro2: "Il modello web gratuito funziona senza account. La cronologia resta nel browser di default.",
       con1: "Gratis c’è un solo modello di chat sul web.",
       con2: "La privacy dipende dal fornitore scelto.",
@@ -338,7 +338,7 @@ export const translations: typeof enTranslations = {
         "Per chi vuole controllare prompt e personaggi e può dedicare tempo alla configurazione.",
       pro1: "Controllo su motore, prompt ed estensioni.",
       pro2: "Gratis e open source. Se usi un’API esterna, escono dal computer i dati che le invii.",
-      con1: "Installi e mantieni l’app. Devi anche collegare il modello.",
+      con1: "Installi e mantieni l’app (Node.js 20 o successivo), colleghi il modello da solo, e su iPhone non si installa.",
       con2: "Il progetto stesso avverte che ci vuole tempo per imparare a usarla.",
     },
     characterAi: {
@@ -412,15 +412,15 @@ export const translations: typeof enTranslations = {
     crushOn: {
       what: "Chat di ruolo per adulti con l’opzione Unfiltered. Usa crediti per accedere a modelli di altri fornitori.",
       pricingNote:
-        "L’offerta pubblica indica chat illimitate con i modelli gratuiti e 100 crediti al mese per i modelli Pro. I piani annuali costano meno. L’accesso Ultra dipende dall’abbonamento e usa crediti separati dai pacchetti Pro.",
+        "Gratis: chat illimitate sui modelli gratuiti con coda e 100 crediti al mese per i modelli Pro, nessun modello Ultra. I piani a pagamento vanno da 2.000 a 125.000 crediti al mese, e la fatturazione annuale costa meno. La chat illimitata sui modelli Pro è un Chat Package separato.",
       models:
-        "Modelli e limiti di contesto dipendono dal piano. Il catalogo pubblico di CrushOn.AI cita Claude Opus 4.7, GLM 5.3, Gemini 3.1 Pro e DeepSeek V4 Pro tra le opzioni Ultra.",
+        "Modelli e limiti di contesto dipendono dal piano. L’elenco pubblico dei modelli di CrushOn.AI cita Claude Opus 4.7 e 5.5, Claude Sonnet 4.6 e GLM da 5.1 a 5.3 tra le opzioni Ultra.",
       filterShort: "L’opzione Unfiltered si attiva dopo la verifica dell’età",
       filter:
         "Per attivare Unfiltered e sbloccare il testo per adulti, verifica l’età con un selfie o un documento tramite Didit o AgeGo, oppure paga 0,99 USD. Le regole vietano immagini sessualmente esplicite, immagini realistiche di persone reali, minori e personaggi minorenni rappresentati come adulti.",
       privacyShort: "Può usare le chat per addestrare i modelli",
       privacy:
-        "L’informativa prevede l’uso delle chat per addestrare i modelli senza associarle ai singoli utenti. Usa cookie per mostrarti di nuovo annunci mirati.",
+        "L’informativa prevede l’uso delle chat per addestrare i modelli senza associarle ai singoli utenti. Il suo sito SFW afferma il contrario. Usa cookie per mostrarti di nuovo annunci mirati.",
       apiShort: "",
       api: "Nessuna API pubblica per sviluppatori.",
       forWho:

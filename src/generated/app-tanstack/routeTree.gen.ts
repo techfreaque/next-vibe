@@ -194,7 +194,10 @@ import { Route as LocaleStoryBlogBestUncensoredLlmIndexRouteImport } from './rou
 import { Route as LocaleStoryBlogCharacterAiAlternativesIndexRouteImport } from './routes/$locale.story.blog.character-ai-alternatives.index'
 import { Route as LocaleStoryBlogChatgptAlternativeWithoutFiltersIndexRouteImport } from './routes/$locale.story.blog.chatgpt-alternative-without-filters.index'
 import { Route as LocaleStoryBlogChatgptJailbreakAlternativeIndexRouteImport } from './routes/$locale.story.blog.chatgpt-jailbreak-alternative.index'
+import { Route as LocaleStoryBlogChubAiAlternativesIndexRouteImport } from './routes/$locale.story.blog.chub-ai-alternatives.index'
+import { Route as LocaleStoryBlogClaudeAlternativesIndexRouteImport } from './routes/$locale.story.blog.claude-alternatives.index'
 import { Route as LocaleStoryBlogClaudeWithoutFiltersIndexRouteImport } from './routes/$locale.story.blog.claude-without-filters.index'
+import { Route as LocaleStoryBlogCrushonAiAlternativesIndexRouteImport } from './routes/$locale.story.blog.crushon-ai-alternatives.index'
 import { Route as LocaleStoryBlogDeadTradingBotToMonitoringEngineIndexRouteImport } from './routes/$locale.story.blog.dead-trading-bot-to-monitoring-engine.index'
 import { Route as LocaleStoryBlogDeepseekUncensoredIndexRouteImport } from './routes/$locale.story.blog.deepseek-uncensored.index'
 import { Route as LocaleStoryBlogE2eTestsFoundRealBugsIndexRouteImport } from './routes/$locale.story.blog.e2e-tests-found-real-bugs.index'
@@ -206,6 +209,7 @@ import { Route as LocaleStoryBlogHermesTheaTwoWayRemoteIndexRouteImport } from '
 import { Route as LocaleStoryBlogInteractiveCodingAgentIndexRouteImport } from './routes/$locale.story.blog.interactive-coding-agent.index'
 import { Route as LocaleStoryBlogJanitorAiAlternativesIndexRouteImport } from './routes/$locale.story.blog.janitor-ai-alternatives.index'
 import { Route as LocaleStoryBlogModelRefreshUncensoredProvidersIndexRouteImport } from './routes/$locale.story.blog.model-refresh-uncensored-providers.index'
+import { Route as LocaleStoryBlogNanogptAlternativesIndexRouteImport } from './routes/$locale.story.blog.nanogpt-alternatives.index'
 import { Route as LocaleStoryBlogNofiltergptAlternativesIndexRouteImport } from './routes/$locale.story.blog.nofiltergpt-alternatives.index'
 import { Route as LocaleStoryBlogOneCodebase13PlatformsIndexRouteImport } from './routes/$locale.story.blog.one-codebase-13-platforms.index'
 import { Route as LocaleStoryBlogOneEndpointEverySurfaceIndexRouteImport } from './routes/$locale.story.blog.one-endpoint-every-surface.index'
@@ -215,6 +219,7 @@ import { Route as LocaleStoryBlogPoeAlternativesIndexRouteImport } from './route
 import { Route as LocaleStoryBlogReferralForAffiliateProsIndexRouteImport } from './routes/$locale.story.blog.referral-for-affiliate-pros.index'
 import { Route as LocaleStoryBlogReferralForBeginnersIndexRouteImport } from './routes/$locale.story.blog.referral-for-beginners.index'
 import { Route as LocaleStoryBlogReferralForDevelopersIndexRouteImport } from './routes/$locale.story.blog.referral-for-developers.index'
+import { Route as LocaleStoryBlogSillytavernAlternativesIndexRouteImport } from './routes/$locale.story.blog.sillytavern-alternatives.index'
 import { Route as LocaleStoryBlogSkillSharingEconomyIndexRouteImport } from './routes/$locale.story.blog.skill-sharing-economy.index'
 import { Route as LocaleStoryBlogTypeCheckerMadeAiStopLyingIndexRouteImport } from './routes/$locale.story.blog.type-checker-made-ai-stop-lying.index'
 import { Route as LocaleStoryBlogTypingmindAlternativesIndexRouteImport } from './routes/$locale.story.blog.typingmind-alternatives.index'
@@ -1780,10 +1785,28 @@ const LocaleStoryBlogChatgptJailbreakAlternativeIndexRoute =
     path: '/blog/chatgpt-jailbreak-alternative/',
     getParentRoute: () => LocaleStoryRoute,
   } as any)
+const LocaleStoryBlogChubAiAlternativesIndexRoute =
+  LocaleStoryBlogChubAiAlternativesIndexRouteImport.update({
+    id: '/blog/chub-ai-alternatives/',
+    path: '/blog/chub-ai-alternatives/',
+    getParentRoute: () => LocaleStoryRoute,
+  } as any)
+const LocaleStoryBlogClaudeAlternativesIndexRoute =
+  LocaleStoryBlogClaudeAlternativesIndexRouteImport.update({
+    id: '/blog/claude-alternatives/',
+    path: '/blog/claude-alternatives/',
+    getParentRoute: () => LocaleStoryRoute,
+  } as any)
 const LocaleStoryBlogClaudeWithoutFiltersIndexRoute =
   LocaleStoryBlogClaudeWithoutFiltersIndexRouteImport.update({
     id: '/blog/claude-without-filters/',
     path: '/blog/claude-without-filters/',
+    getParentRoute: () => LocaleStoryRoute,
+  } as any)
+const LocaleStoryBlogCrushonAiAlternativesIndexRoute =
+  LocaleStoryBlogCrushonAiAlternativesIndexRouteImport.update({
+    id: '/blog/crushon-ai-alternatives/',
+    path: '/blog/crushon-ai-alternatives/',
     getParentRoute: () => LocaleStoryRoute,
   } as any)
 const LocaleStoryBlogDeadTradingBotToMonitoringEngineIndexRoute =
@@ -1852,6 +1875,12 @@ const LocaleStoryBlogModelRefreshUncensoredProvidersIndexRoute =
     path: '/blog/model-refresh-uncensored-providers/',
     getParentRoute: () => LocaleStoryRoute,
   } as any)
+const LocaleStoryBlogNanogptAlternativesIndexRoute =
+  LocaleStoryBlogNanogptAlternativesIndexRouteImport.update({
+    id: '/blog/nanogpt-alternatives/',
+    path: '/blog/nanogpt-alternatives/',
+    getParentRoute: () => LocaleStoryRoute,
+  } as any)
 const LocaleStoryBlogNofiltergptAlternativesIndexRoute =
   LocaleStoryBlogNofiltergptAlternativesIndexRouteImport.update({
     id: '/blog/nofiltergpt-alternatives/',
@@ -1904,6 +1933,12 @@ const LocaleStoryBlogReferralForDevelopersIndexRoute =
   LocaleStoryBlogReferralForDevelopersIndexRouteImport.update({
     id: '/blog/referral-for-developers/',
     path: '/blog/referral-for-developers/',
+    getParentRoute: () => LocaleStoryRoute,
+  } as any)
+const LocaleStoryBlogSillytavernAlternativesIndexRoute =
+  LocaleStoryBlogSillytavernAlternativesIndexRouteImport.update({
+    id: '/blog/sillytavern-alternatives/',
+    path: '/blog/sillytavern-alternatives/',
     getParentRoute: () => LocaleStoryRoute,
   } as any)
 const LocaleStoryBlogSkillSharingEconomyIndexRoute =
@@ -5660,7 +5695,10 @@ export interface FileRoutesByFullPath {
   '/$locale/story/blog/character-ai-alternatives/': typeof LocaleStoryBlogCharacterAiAlternativesIndexRoute
   '/$locale/story/blog/chatgpt-alternative-without-filters/': typeof LocaleStoryBlogChatgptAlternativeWithoutFiltersIndexRoute
   '/$locale/story/blog/chatgpt-jailbreak-alternative/': typeof LocaleStoryBlogChatgptJailbreakAlternativeIndexRoute
+  '/$locale/story/blog/chub-ai-alternatives/': typeof LocaleStoryBlogChubAiAlternativesIndexRoute
+  '/$locale/story/blog/claude-alternatives/': typeof LocaleStoryBlogClaudeAlternativesIndexRoute
   '/$locale/story/blog/claude-without-filters/': typeof LocaleStoryBlogClaudeWithoutFiltersIndexRoute
+  '/$locale/story/blog/crushon-ai-alternatives/': typeof LocaleStoryBlogCrushonAiAlternativesIndexRoute
   '/$locale/story/blog/dead-trading-bot-to-monitoring-engine/': typeof LocaleStoryBlogDeadTradingBotToMonitoringEngineIndexRoute
   '/$locale/story/blog/deepseek-uncensored/': typeof LocaleStoryBlogDeepseekUncensoredIndexRoute
   '/$locale/story/blog/e2e-tests-found-real-bugs/': typeof LocaleStoryBlogE2eTestsFoundRealBugsIndexRoute
@@ -5672,6 +5710,7 @@ export interface FileRoutesByFullPath {
   '/$locale/story/blog/interactive-coding-agent/': typeof LocaleStoryBlogInteractiveCodingAgentIndexRoute
   '/$locale/story/blog/janitor-ai-alternatives/': typeof LocaleStoryBlogJanitorAiAlternativesIndexRoute
   '/$locale/story/blog/model-refresh-uncensored-providers/': typeof LocaleStoryBlogModelRefreshUncensoredProvidersIndexRoute
+  '/$locale/story/blog/nanogpt-alternatives/': typeof LocaleStoryBlogNanogptAlternativesIndexRoute
   '/$locale/story/blog/nofiltergpt-alternatives/': typeof LocaleStoryBlogNofiltergptAlternativesIndexRoute
   '/$locale/story/blog/one-codebase-13-platforms/': typeof LocaleStoryBlogOneCodebase13PlatformsIndexRoute
   '/$locale/story/blog/one-endpoint-every-surface/': typeof LocaleStoryBlogOneEndpointEverySurfaceIndexRoute
@@ -5681,6 +5720,7 @@ export interface FileRoutesByFullPath {
   '/$locale/story/blog/referral-for-affiliate-pros/': typeof LocaleStoryBlogReferralForAffiliateProsIndexRoute
   '/$locale/story/blog/referral-for-beginners/': typeof LocaleStoryBlogReferralForBeginnersIndexRoute
   '/$locale/story/blog/referral-for-developers/': typeof LocaleStoryBlogReferralForDevelopersIndexRoute
+  '/$locale/story/blog/sillytavern-alternatives/': typeof LocaleStoryBlogSillytavernAlternativesIndexRoute
   '/$locale/story/blog/skill-sharing-economy/': typeof LocaleStoryBlogSkillSharingEconomyIndexRoute
   '/$locale/story/blog/type-checker-made-ai-stop-lying/': typeof LocaleStoryBlogTypeCheckerMadeAiStopLyingIndexRoute
   '/$locale/story/blog/typingmind-alternatives/': typeof LocaleStoryBlogTypingmindAlternativesIndexRoute
@@ -6409,7 +6449,10 @@ export interface FileRoutesByTo {
   '/$locale/story/blog/character-ai-alternatives': typeof LocaleStoryBlogCharacterAiAlternativesIndexRoute
   '/$locale/story/blog/chatgpt-alternative-without-filters': typeof LocaleStoryBlogChatgptAlternativeWithoutFiltersIndexRoute
   '/$locale/story/blog/chatgpt-jailbreak-alternative': typeof LocaleStoryBlogChatgptJailbreakAlternativeIndexRoute
+  '/$locale/story/blog/chub-ai-alternatives': typeof LocaleStoryBlogChubAiAlternativesIndexRoute
+  '/$locale/story/blog/claude-alternatives': typeof LocaleStoryBlogClaudeAlternativesIndexRoute
   '/$locale/story/blog/claude-without-filters': typeof LocaleStoryBlogClaudeWithoutFiltersIndexRoute
+  '/$locale/story/blog/crushon-ai-alternatives': typeof LocaleStoryBlogCrushonAiAlternativesIndexRoute
   '/$locale/story/blog/dead-trading-bot-to-monitoring-engine': typeof LocaleStoryBlogDeadTradingBotToMonitoringEngineIndexRoute
   '/$locale/story/blog/deepseek-uncensored': typeof LocaleStoryBlogDeepseekUncensoredIndexRoute
   '/$locale/story/blog/e2e-tests-found-real-bugs': typeof LocaleStoryBlogE2eTestsFoundRealBugsIndexRoute
@@ -6421,6 +6464,7 @@ export interface FileRoutesByTo {
   '/$locale/story/blog/interactive-coding-agent': typeof LocaleStoryBlogInteractiveCodingAgentIndexRoute
   '/$locale/story/blog/janitor-ai-alternatives': typeof LocaleStoryBlogJanitorAiAlternativesIndexRoute
   '/$locale/story/blog/model-refresh-uncensored-providers': typeof LocaleStoryBlogModelRefreshUncensoredProvidersIndexRoute
+  '/$locale/story/blog/nanogpt-alternatives': typeof LocaleStoryBlogNanogptAlternativesIndexRoute
   '/$locale/story/blog/nofiltergpt-alternatives': typeof LocaleStoryBlogNofiltergptAlternativesIndexRoute
   '/$locale/story/blog/one-codebase-13-platforms': typeof LocaleStoryBlogOneCodebase13PlatformsIndexRoute
   '/$locale/story/blog/one-endpoint-every-surface': typeof LocaleStoryBlogOneEndpointEverySurfaceIndexRoute
@@ -6430,6 +6474,7 @@ export interface FileRoutesByTo {
   '/$locale/story/blog/referral-for-affiliate-pros': typeof LocaleStoryBlogReferralForAffiliateProsIndexRoute
   '/$locale/story/blog/referral-for-beginners': typeof LocaleStoryBlogReferralForBeginnersIndexRoute
   '/$locale/story/blog/referral-for-developers': typeof LocaleStoryBlogReferralForDevelopersIndexRoute
+  '/$locale/story/blog/sillytavern-alternatives': typeof LocaleStoryBlogSillytavernAlternativesIndexRoute
   '/$locale/story/blog/skill-sharing-economy': typeof LocaleStoryBlogSkillSharingEconomyIndexRoute
   '/$locale/story/blog/type-checker-made-ai-stop-lying': typeof LocaleStoryBlogTypeCheckerMadeAiStopLyingIndexRoute
   '/$locale/story/blog/typingmind-alternatives': typeof LocaleStoryBlogTypingmindAlternativesIndexRoute
@@ -7167,7 +7212,10 @@ export interface FileRoutesById {
   '/$locale/story/blog/character-ai-alternatives/': typeof LocaleStoryBlogCharacterAiAlternativesIndexRoute
   '/$locale/story/blog/chatgpt-alternative-without-filters/': typeof LocaleStoryBlogChatgptAlternativeWithoutFiltersIndexRoute
   '/$locale/story/blog/chatgpt-jailbreak-alternative/': typeof LocaleStoryBlogChatgptJailbreakAlternativeIndexRoute
+  '/$locale/story/blog/chub-ai-alternatives/': typeof LocaleStoryBlogChubAiAlternativesIndexRoute
+  '/$locale/story/blog/claude-alternatives/': typeof LocaleStoryBlogClaudeAlternativesIndexRoute
   '/$locale/story/blog/claude-without-filters/': typeof LocaleStoryBlogClaudeWithoutFiltersIndexRoute
+  '/$locale/story/blog/crushon-ai-alternatives/': typeof LocaleStoryBlogCrushonAiAlternativesIndexRoute
   '/$locale/story/blog/dead-trading-bot-to-monitoring-engine/': typeof LocaleStoryBlogDeadTradingBotToMonitoringEngineIndexRoute
   '/$locale/story/blog/deepseek-uncensored/': typeof LocaleStoryBlogDeepseekUncensoredIndexRoute
   '/$locale/story/blog/e2e-tests-found-real-bugs/': typeof LocaleStoryBlogE2eTestsFoundRealBugsIndexRoute
@@ -7179,6 +7227,7 @@ export interface FileRoutesById {
   '/$locale/story/blog/interactive-coding-agent/': typeof LocaleStoryBlogInteractiveCodingAgentIndexRoute
   '/$locale/story/blog/janitor-ai-alternatives/': typeof LocaleStoryBlogJanitorAiAlternativesIndexRoute
   '/$locale/story/blog/model-refresh-uncensored-providers/': typeof LocaleStoryBlogModelRefreshUncensoredProvidersIndexRoute
+  '/$locale/story/blog/nanogpt-alternatives/': typeof LocaleStoryBlogNanogptAlternativesIndexRoute
   '/$locale/story/blog/nofiltergpt-alternatives/': typeof LocaleStoryBlogNofiltergptAlternativesIndexRoute
   '/$locale/story/blog/one-codebase-13-platforms/': typeof LocaleStoryBlogOneCodebase13PlatformsIndexRoute
   '/$locale/story/blog/one-endpoint-every-surface/': typeof LocaleStoryBlogOneEndpointEverySurfaceIndexRoute
@@ -7188,6 +7237,7 @@ export interface FileRoutesById {
   '/$locale/story/blog/referral-for-affiliate-pros/': typeof LocaleStoryBlogReferralForAffiliateProsIndexRoute
   '/$locale/story/blog/referral-for-beginners/': typeof LocaleStoryBlogReferralForBeginnersIndexRoute
   '/$locale/story/blog/referral-for-developers/': typeof LocaleStoryBlogReferralForDevelopersIndexRoute
+  '/$locale/story/blog/sillytavern-alternatives/': typeof LocaleStoryBlogSillytavernAlternativesIndexRoute
   '/$locale/story/blog/skill-sharing-economy/': typeof LocaleStoryBlogSkillSharingEconomyIndexRoute
   '/$locale/story/blog/type-checker-made-ai-stop-lying/': typeof LocaleStoryBlogTypeCheckerMadeAiStopLyingIndexRoute
   '/$locale/story/blog/typingmind-alternatives/': typeof LocaleStoryBlogTypingmindAlternativesIndexRoute
@@ -7925,7 +7975,10 @@ export interface FileRouteTypes {
     | '/$locale/story/blog/character-ai-alternatives/'
     | '/$locale/story/blog/chatgpt-alternative-without-filters/'
     | '/$locale/story/blog/chatgpt-jailbreak-alternative/'
+    | '/$locale/story/blog/chub-ai-alternatives/'
+    | '/$locale/story/blog/claude-alternatives/'
     | '/$locale/story/blog/claude-without-filters/'
+    | '/$locale/story/blog/crushon-ai-alternatives/'
     | '/$locale/story/blog/dead-trading-bot-to-monitoring-engine/'
     | '/$locale/story/blog/deepseek-uncensored/'
     | '/$locale/story/blog/e2e-tests-found-real-bugs/'
@@ -7937,6 +7990,7 @@ export interface FileRouteTypes {
     | '/$locale/story/blog/interactive-coding-agent/'
     | '/$locale/story/blog/janitor-ai-alternatives/'
     | '/$locale/story/blog/model-refresh-uncensored-providers/'
+    | '/$locale/story/blog/nanogpt-alternatives/'
     | '/$locale/story/blog/nofiltergpt-alternatives/'
     | '/$locale/story/blog/one-codebase-13-platforms/'
     | '/$locale/story/blog/one-endpoint-every-surface/'
@@ -7946,6 +8000,7 @@ export interface FileRouteTypes {
     | '/$locale/story/blog/referral-for-affiliate-pros/'
     | '/$locale/story/blog/referral-for-beginners/'
     | '/$locale/story/blog/referral-for-developers/'
+    | '/$locale/story/blog/sillytavern-alternatives/'
     | '/$locale/story/blog/skill-sharing-economy/'
     | '/$locale/story/blog/type-checker-made-ai-stop-lying/'
     | '/$locale/story/blog/typingmind-alternatives/'
@@ -8674,7 +8729,10 @@ export interface FileRouteTypes {
     | '/$locale/story/blog/character-ai-alternatives'
     | '/$locale/story/blog/chatgpt-alternative-without-filters'
     | '/$locale/story/blog/chatgpt-jailbreak-alternative'
+    | '/$locale/story/blog/chub-ai-alternatives'
+    | '/$locale/story/blog/claude-alternatives'
     | '/$locale/story/blog/claude-without-filters'
+    | '/$locale/story/blog/crushon-ai-alternatives'
     | '/$locale/story/blog/dead-trading-bot-to-monitoring-engine'
     | '/$locale/story/blog/deepseek-uncensored'
     | '/$locale/story/blog/e2e-tests-found-real-bugs'
@@ -8686,6 +8744,7 @@ export interface FileRouteTypes {
     | '/$locale/story/blog/interactive-coding-agent'
     | '/$locale/story/blog/janitor-ai-alternatives'
     | '/$locale/story/blog/model-refresh-uncensored-providers'
+    | '/$locale/story/blog/nanogpt-alternatives'
     | '/$locale/story/blog/nofiltergpt-alternatives'
     | '/$locale/story/blog/one-codebase-13-platforms'
     | '/$locale/story/blog/one-endpoint-every-surface'
@@ -8695,6 +8754,7 @@ export interface FileRouteTypes {
     | '/$locale/story/blog/referral-for-affiliate-pros'
     | '/$locale/story/blog/referral-for-beginners'
     | '/$locale/story/blog/referral-for-developers'
+    | '/$locale/story/blog/sillytavern-alternatives'
     | '/$locale/story/blog/skill-sharing-economy'
     | '/$locale/story/blog/type-checker-made-ai-stop-lying'
     | '/$locale/story/blog/typingmind-alternatives'
@@ -9431,7 +9491,10 @@ export interface FileRouteTypes {
     | '/$locale/story/blog/character-ai-alternatives/'
     | '/$locale/story/blog/chatgpt-alternative-without-filters/'
     | '/$locale/story/blog/chatgpt-jailbreak-alternative/'
+    | '/$locale/story/blog/chub-ai-alternatives/'
+    | '/$locale/story/blog/claude-alternatives/'
     | '/$locale/story/blog/claude-without-filters/'
+    | '/$locale/story/blog/crushon-ai-alternatives/'
     | '/$locale/story/blog/dead-trading-bot-to-monitoring-engine/'
     | '/$locale/story/blog/deepseek-uncensored/'
     | '/$locale/story/blog/e2e-tests-found-real-bugs/'
@@ -9443,6 +9506,7 @@ export interface FileRouteTypes {
     | '/$locale/story/blog/interactive-coding-agent/'
     | '/$locale/story/blog/janitor-ai-alternatives/'
     | '/$locale/story/blog/model-refresh-uncensored-providers/'
+    | '/$locale/story/blog/nanogpt-alternatives/'
     | '/$locale/story/blog/nofiltergpt-alternatives/'
     | '/$locale/story/blog/one-codebase-13-platforms/'
     | '/$locale/story/blog/one-endpoint-every-surface/'
@@ -9452,6 +9516,7 @@ export interface FileRouteTypes {
     | '/$locale/story/blog/referral-for-affiliate-pros/'
     | '/$locale/story/blog/referral-for-beginners/'
     | '/$locale/story/blog/referral-for-developers/'
+    | '/$locale/story/blog/sillytavern-alternatives/'
     | '/$locale/story/blog/skill-sharing-economy/'
     | '/$locale/story/blog/type-checker-made-ai-stop-lying/'
     | '/$locale/story/blog/typingmind-alternatives/'
@@ -11494,11 +11559,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LocaleStoryBlogChatgptJailbreakAlternativeIndexRouteImport
       parentRoute: typeof LocaleStoryRoute
     }
+    '/$locale/story/blog/chub-ai-alternatives/': {
+      id: '/$locale/story/blog/chub-ai-alternatives/'
+      path: '/blog/chub-ai-alternatives'
+      fullPath: '/$locale/story/blog/chub-ai-alternatives/'
+      preLoaderRoute: typeof LocaleStoryBlogChubAiAlternativesIndexRouteImport
+      parentRoute: typeof LocaleStoryRoute
+    }
+    '/$locale/story/blog/claude-alternatives/': {
+      id: '/$locale/story/blog/claude-alternatives/'
+      path: '/blog/claude-alternatives'
+      fullPath: '/$locale/story/blog/claude-alternatives/'
+      preLoaderRoute: typeof LocaleStoryBlogClaudeAlternativesIndexRouteImport
+      parentRoute: typeof LocaleStoryRoute
+    }
     '/$locale/story/blog/claude-without-filters/': {
       id: '/$locale/story/blog/claude-without-filters/'
       path: '/blog/claude-without-filters'
       fullPath: '/$locale/story/blog/claude-without-filters/'
       preLoaderRoute: typeof LocaleStoryBlogClaudeWithoutFiltersIndexRouteImport
+      parentRoute: typeof LocaleStoryRoute
+    }
+    '/$locale/story/blog/crushon-ai-alternatives/': {
+      id: '/$locale/story/blog/crushon-ai-alternatives/'
+      path: '/blog/crushon-ai-alternatives'
+      fullPath: '/$locale/story/blog/crushon-ai-alternatives/'
+      preLoaderRoute: typeof LocaleStoryBlogCrushonAiAlternativesIndexRouteImport
       parentRoute: typeof LocaleStoryRoute
     }
     '/$locale/story/blog/dead-trading-bot-to-monitoring-engine/': {
@@ -11578,6 +11664,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LocaleStoryBlogModelRefreshUncensoredProvidersIndexRouteImport
       parentRoute: typeof LocaleStoryRoute
     }
+    '/$locale/story/blog/nanogpt-alternatives/': {
+      id: '/$locale/story/blog/nanogpt-alternatives/'
+      path: '/blog/nanogpt-alternatives'
+      fullPath: '/$locale/story/blog/nanogpt-alternatives/'
+      preLoaderRoute: typeof LocaleStoryBlogNanogptAlternativesIndexRouteImport
+      parentRoute: typeof LocaleStoryRoute
+    }
     '/$locale/story/blog/nofiltergpt-alternatives/': {
       id: '/$locale/story/blog/nofiltergpt-alternatives/'
       path: '/blog/nofiltergpt-alternatives'
@@ -11639,6 +11732,13 @@ declare module '@tanstack/react-router' {
       path: '/blog/referral-for-developers'
       fullPath: '/$locale/story/blog/referral-for-developers/'
       preLoaderRoute: typeof LocaleStoryBlogReferralForDevelopersIndexRouteImport
+      parentRoute: typeof LocaleStoryRoute
+    }
+    '/$locale/story/blog/sillytavern-alternatives/': {
+      id: '/$locale/story/blog/sillytavern-alternatives/'
+      path: '/blog/sillytavern-alternatives'
+      fullPath: '/$locale/story/blog/sillytavern-alternatives/'
+      preLoaderRoute: typeof LocaleStoryBlogSillytavernAlternativesIndexRouteImport
       parentRoute: typeof LocaleStoryRoute
     }
     '/$locale/story/blog/skill-sharing-economy/': {
@@ -15568,7 +15668,10 @@ interface LocaleStoryRouteChildren {
   LocaleStoryBlogCharacterAiAlternativesIndexRoute: typeof LocaleStoryBlogCharacterAiAlternativesIndexRoute
   LocaleStoryBlogChatgptAlternativeWithoutFiltersIndexRoute: typeof LocaleStoryBlogChatgptAlternativeWithoutFiltersIndexRoute
   LocaleStoryBlogChatgptJailbreakAlternativeIndexRoute: typeof LocaleStoryBlogChatgptJailbreakAlternativeIndexRoute
+  LocaleStoryBlogChubAiAlternativesIndexRoute: typeof LocaleStoryBlogChubAiAlternativesIndexRoute
+  LocaleStoryBlogClaudeAlternativesIndexRoute: typeof LocaleStoryBlogClaudeAlternativesIndexRoute
   LocaleStoryBlogClaudeWithoutFiltersIndexRoute: typeof LocaleStoryBlogClaudeWithoutFiltersIndexRoute
+  LocaleStoryBlogCrushonAiAlternativesIndexRoute: typeof LocaleStoryBlogCrushonAiAlternativesIndexRoute
   LocaleStoryBlogDeadTradingBotToMonitoringEngineIndexRoute: typeof LocaleStoryBlogDeadTradingBotToMonitoringEngineIndexRoute
   LocaleStoryBlogDeepseekUncensoredIndexRoute: typeof LocaleStoryBlogDeepseekUncensoredIndexRoute
   LocaleStoryBlogE2eTestsFoundRealBugsIndexRoute: typeof LocaleStoryBlogE2eTestsFoundRealBugsIndexRoute
@@ -15580,6 +15683,7 @@ interface LocaleStoryRouteChildren {
   LocaleStoryBlogInteractiveCodingAgentIndexRoute: typeof LocaleStoryBlogInteractiveCodingAgentIndexRoute
   LocaleStoryBlogJanitorAiAlternativesIndexRoute: typeof LocaleStoryBlogJanitorAiAlternativesIndexRoute
   LocaleStoryBlogModelRefreshUncensoredProvidersIndexRoute: typeof LocaleStoryBlogModelRefreshUncensoredProvidersIndexRoute
+  LocaleStoryBlogNanogptAlternativesIndexRoute: typeof LocaleStoryBlogNanogptAlternativesIndexRoute
   LocaleStoryBlogNofiltergptAlternativesIndexRoute: typeof LocaleStoryBlogNofiltergptAlternativesIndexRoute
   LocaleStoryBlogOneCodebase13PlatformsIndexRoute: typeof LocaleStoryBlogOneCodebase13PlatformsIndexRoute
   LocaleStoryBlogOneEndpointEverySurfaceIndexRoute: typeof LocaleStoryBlogOneEndpointEverySurfaceIndexRoute
@@ -15589,6 +15693,7 @@ interface LocaleStoryRouteChildren {
   LocaleStoryBlogReferralForAffiliateProsIndexRoute: typeof LocaleStoryBlogReferralForAffiliateProsIndexRoute
   LocaleStoryBlogReferralForBeginnersIndexRoute: typeof LocaleStoryBlogReferralForBeginnersIndexRoute
   LocaleStoryBlogReferralForDevelopersIndexRoute: typeof LocaleStoryBlogReferralForDevelopersIndexRoute
+  LocaleStoryBlogSillytavernAlternativesIndexRoute: typeof LocaleStoryBlogSillytavernAlternativesIndexRoute
   LocaleStoryBlogSkillSharingEconomyIndexRoute: typeof LocaleStoryBlogSkillSharingEconomyIndexRoute
   LocaleStoryBlogTypeCheckerMadeAiStopLyingIndexRoute: typeof LocaleStoryBlogTypeCheckerMadeAiStopLyingIndexRoute
   LocaleStoryBlogTypingmindAlternativesIndexRoute: typeof LocaleStoryBlogTypingmindAlternativesIndexRoute
@@ -15655,8 +15760,14 @@ const LocaleStoryRouteChildren: LocaleStoryRouteChildren = {
     LocaleStoryBlogChatgptAlternativeWithoutFiltersIndexRoute,
   LocaleStoryBlogChatgptJailbreakAlternativeIndexRoute:
     LocaleStoryBlogChatgptJailbreakAlternativeIndexRoute,
+  LocaleStoryBlogChubAiAlternativesIndexRoute:
+    LocaleStoryBlogChubAiAlternativesIndexRoute,
+  LocaleStoryBlogClaudeAlternativesIndexRoute:
+    LocaleStoryBlogClaudeAlternativesIndexRoute,
   LocaleStoryBlogClaudeWithoutFiltersIndexRoute:
     LocaleStoryBlogClaudeWithoutFiltersIndexRoute,
+  LocaleStoryBlogCrushonAiAlternativesIndexRoute:
+    LocaleStoryBlogCrushonAiAlternativesIndexRoute,
   LocaleStoryBlogDeadTradingBotToMonitoringEngineIndexRoute:
     LocaleStoryBlogDeadTradingBotToMonitoringEngineIndexRoute,
   LocaleStoryBlogDeepseekUncensoredIndexRoute:
@@ -15679,6 +15790,8 @@ const LocaleStoryRouteChildren: LocaleStoryRouteChildren = {
     LocaleStoryBlogJanitorAiAlternativesIndexRoute,
   LocaleStoryBlogModelRefreshUncensoredProvidersIndexRoute:
     LocaleStoryBlogModelRefreshUncensoredProvidersIndexRoute,
+  LocaleStoryBlogNanogptAlternativesIndexRoute:
+    LocaleStoryBlogNanogptAlternativesIndexRoute,
   LocaleStoryBlogNofiltergptAlternativesIndexRoute:
     LocaleStoryBlogNofiltergptAlternativesIndexRoute,
   LocaleStoryBlogOneCodebase13PlatformsIndexRoute:
@@ -15697,6 +15810,8 @@ const LocaleStoryRouteChildren: LocaleStoryRouteChildren = {
     LocaleStoryBlogReferralForBeginnersIndexRoute,
   LocaleStoryBlogReferralForDevelopersIndexRoute:
     LocaleStoryBlogReferralForDevelopersIndexRoute,
+  LocaleStoryBlogSillytavernAlternativesIndexRoute:
+    LocaleStoryBlogSillytavernAlternativesIndexRoute,
   LocaleStoryBlogSkillSharingEconomyIndexRoute:
     LocaleStoryBlogSkillSharingEconomyIndexRoute,
   LocaleStoryBlogTypeCheckerMadeAiStopLyingIndexRoute:

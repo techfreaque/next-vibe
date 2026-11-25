@@ -44,6 +44,7 @@ import {
   StepList,
 } from "../../_shared/marketing";
 import type { UsParams } from "../../compare/_shared/us-facts";
+import { guideCards } from "../guide-links";
 import {
   type ComparePair,
   UncensoredModelTable,
@@ -339,6 +340,13 @@ export function TanstackPage({
             </Div>
           ))}
           <Div className="flex flex-col">
+            {guideCards(locale, ["claude-alternatives"]).map((card) => (
+              <CardLink
+                key={card.slug}
+                href={`/${locale}${card.path}`}
+                label={card.title}
+              />
+            ))}
             <CardLink
               href={`/${locale}/story/uncensored-ai`}
               label={t("faq.chatLink")}
