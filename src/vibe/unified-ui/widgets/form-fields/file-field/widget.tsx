@@ -152,6 +152,7 @@ export function FileFieldWidget<
                 )
               ) : (
                 <Input
+                  ref={formField.ref}
                   type="file"
                   onChange={(e) => {
                     const file = e.target.files?.[0];

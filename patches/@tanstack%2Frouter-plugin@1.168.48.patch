@@ -86,17 +86,19 @@ diff --git a/dist/esm/core/code-splitter/compilers.js b/dist/esm/core/code-split
  	const localModuleLevelBindings = /* @__PURE__ */ new Set();
  	for (const node of ast.program.body) collectLocalBindingsFromStatement(node, localModuleLevelBindings);
  	localModuleLevelBindings.delete("Route");
-@@ -110,10 +109,16 @@
+@@ -110,10 +109,17 @@
  	}
- 	if (!hasNonSplit && splitGroupsPresent.size < 2) return /* @__PURE__ */ new Set();
+-	if (!hasNonSplit && splitGroupsPresent.size < 2) return /* @__PURE__ */ new Set();
++	if (splitGroupsPresent.size === 0 || (!hasNonSplit && splitGroupsPresent.size < 2)) return /* @__PURE__ */ new Set();
  	const declMap = buildDeclarationMap(ast);
 -	const depGraph = buildDependencyGraph(declMap, localModuleLevelBindings);
++	// Detect bindings that depend on Route without scanning Route's own body.
++	declMap.delete("Route");
  	const allLocalBindings = new Set(localModuleLevelBindings);
  	allLocalBindings.add("Route");
  	const fullDepGraph = buildDependencyGraph(declMap, allLocalBindings);
 +	// Keep Route edges for cycle detection without walking the declarations twice.
 +	const depGraph = new Map(fullDepGraph);
-+	depGraph.delete("Route");
 +	for (const [name, dependencies] of depGraph) {
 +		if (!dependencies.has("Route")) continue;
 +		depGraph.set(name, new Set([...dependencies].filter((dependency) => dependency !== "Route")));
@@ -104,7 +106,7 @@ diff --git a/dist/esm/core/code-splitter/compilers.js b/dist/esm/core/code-split
  	const refsByGroup = /* @__PURE__ */ new Map();
  	for (const prop of routeOptions.properties) {
  		if (!t.isObjectProperty(prop)) continue;
-@@ -180,8 +185,7 @@
+@@ -180,8 +186,7 @@
  		return true;
  	});
  }
@@ -114,7 +116,7 @@ diff --git a/dist/esm/core/code-splitter/compilers.js b/dist/esm/core/code-split
  	const refIdents = findReferencedIdentifiers(ast);
  	const knownExportedIdents = /* @__PURE__ */ new Set();
  	function findIndexForSplitNode(str) {
-@@ -207,9 +211,17 @@
+@@ -207,9 +212,17 @@
  		* `import '../shared/imported'`
  		*/
  		const removableImportPaths = /* @__PURE__ */ new Set([]);
@@ -132,7 +134,7 @@ diff --git a/dist/esm/core/code-splitter/compilers.js b/dist/esm/core/code-split
  			createRouteFn = path.node.callee.name;
  			function babelHandleReference(routeOptions) {
  				const hasImportedOrDefinedIdentifier = (name) => {
-@@ -217,6 +229,8 @@
+@@ -217,6 +230,8 @@
  				};
  				const addRouteHmr = (insertionPath, routeOptions) => {
  					if (!opts.addHmr || hmrAdded) return;
@@ -141,7 +143,7 @@ diff --git a/dist/esm/core/code-splitter/compilers.js b/dist/esm/core/code-split
  					opts.compilerPlugins?.forEach((plugin) => {
  						if ((plugin.onAddHmr?.({
  							programPath,
-@@ -280,13 +294,14 @@
+@@ -280,13 +295,14 @@
  								const codeSplitGroup = [...new Set(opts.codeSplitGroupings[codeSplitGroupingByKey])];
  								if (!SPLIT_NODES_CONFIG.has(key)) return;
  								if (t.isBooleanLiteral(prop.value) || t.isNullLiteral(prop.value) || t.isIdentifier(prop.value) && prop.value.name === "undefined") return;
@@ -157,7 +159,7 @@ diff --git a/dist/esm/core/code-splitter/compilers.js b/dist/esm/core/code-split
  										if (existingImportPath) removableImportPaths.add(existingImportPath);
  										const isExported = hasExport(ast, value);
  										if (isExported) knownExportedIdents.add(value.name);
-@@ -322,7 +337,7 @@
+@@ -322,7 +338,7 @@
  									const value = prop.value;
  									let shouldSplit = true;
  									if (t.isIdentifier(value)) {
@@ -166,7 +168,7 @@ diff --git a/dist/esm/core/code-splitter/compilers.js b/dist/esm/core/code-split
  										if (existingImportPath) removableImportPaths.add(existingImportPath);
  										const isExported = hasExport(ast, value);
  										if (isExported) knownExportedIdents.add(value.name);
-@@ -337,7 +352,10 @@
+@@ -337,7 +353,10 @@
  								}
  							}
  						}
@@ -178,7 +180,7 @@ diff --git a/dist/esm/core/code-splitter/compilers.js b/dist/esm/core/code-split
  					});
  					addRouteHmr(insertionPath, routeOptions);
  				}
-@@ -375,6 +393,9 @@
+@@ -375,6 +394,9 @@
  				programPath.pushContainer("body", t.exportNamedDeclaration(null, reExportSpecifiers, t.stringLiteral(sharedModuleUrl)));
  			}
  		}
@@ -188,7 +190,7 @@ diff --git a/dist/esm/core/code-splitter/compilers.js b/dist/esm/core/code-split
  	} } });
  	if (!modified) return null;
  	deadCodeElimination(ast, refIdents);
-@@ -585,8 +606,7 @@
+@@ -585,8 +607,7 @@
  * This function should read get the options from by searching for the key `codeSplitGroupings`
  * on createFileRoute and return it's values if it exists, else return undefined
  */
@@ -198,7 +200,7 @@ diff --git a/dist/esm/core/code-splitter/compilers.js b/dist/esm/core/code-split
  	let codeSplitGroupings = void 0;
  	babel.traverse(ast, { Program: { enter(programPath) {
  		programPath.traverse({ CallExpression(path) {
-@@ -626,20 +646,13 @@
+@@ -626,20 +647,13 @@
  		"For the best optimization, these items should either have their export statements removed, or be imported from another location that is not a route file."
  	].join("\n");
  }
@@ -226,7 +228,7 @@ diff --git a/dist/esm/core/code-splitter/compilers.js b/dist/esm/core/code-split
  }
  function resolveIdentifier(path, node) {
  	if (t.isIdentifier(node)) {
-@@ -671,38 +684,22 @@
+@@ -671,38 +685,22 @@
  	}
  }
  function hasExport(ast, node) {

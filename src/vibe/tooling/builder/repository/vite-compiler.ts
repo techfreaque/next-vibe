@@ -48,6 +48,7 @@ import type { EndpointLogger } from "../../../logger/types";
 import type { BuildProfile, FileToCompile } from "../definition";
 import type { scopedTranslation } from "../i18n";
 import { PROFILE_DEFAULTS, ROOT_DIR } from "./constants";
+import { withDevClientEntryRecovery } from "./dev-client-entry-recovery";
 import { applyEnvFileChanges, snapshotEnvFile } from "./env-file-reload";
 import { outputFormatter } from "./output-formatter";
 
@@ -1741,26 +1742,10 @@ class ViteCompiler {
                 ) {
                   return;
                 }
-                // The virtual module sets up React Refresh before importing
-                // the entry. A rejected entry graph never runs client.tsx.
-                const entryImport = /\n(await import\("[^\n]+"\));?\s*$/;
-                if (!entryImport.test(code)) {
-                  return;
-                }
-                return {
-                  code: code.replace(
-                    entryImport,
-                    `\ntry { $1; } catch (error) {
-  try {
-    const { reportDevClientEntryError } = await import("next-vibe/logger/browser-startup-error");
-    reportDevClientEntryError(error instanceof Error ? error : new Error(String(error)));
-  } catch (reportError) {
-    console.error("[client] dev entry failed and recovery was unavailable:", error, reportError);
-  }
-}`,
-                  ),
-                  map: null,
-                };
+                const recoveredCode = withDevClientEntryRecovery(code);
+                return recoveredCode === undefined
+                  ? undefined
+                  : { code: recoveredCode, map: null };
               },
             },
           } satisfies PluginOption,

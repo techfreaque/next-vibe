@@ -35,17 +35,16 @@ import {
   readEdgeTimingNode,
 } from "../realtime/core/proxy-timing";
 import {
+  CHUNK_LOAD_ERROR_MESSAGE,
+  CHUNK_RELOAD_DELAY_MS,
+  CHUNK_RELOAD_KEY,
+  CHUNK_RELOAD_WINDOW_MS,
+} from "./chunk-reload-policy";
+import {
   chunkLoadDiagnostics,
   navigationTimingEvidence,
 } from "./resource-diagnostics";
 import type { EndpointLogger, ErrorLogLevel, LoggerMetadata } from "./types";
-
-/** sessionStorage key holding the last chunk-error reload (JSON). */
-const CHUNK_RELOAD_KEY = "vibe-chunk-reload";
-/** Minimum gap between automatic reloads in a tab. */
-const CHUNK_RELOAD_WINDOW_MS = 10 * 60_000;
-/** Lets pending log POSTs leave before the page goes away. */
-const CHUNK_RELOAD_DELAY_MS = 800;
 
 /** One reload per page, including when several chunks fail before it starts. */
 let pendingReloadAt: number | null = null;
@@ -89,15 +88,9 @@ export function isChunkLoadError(error: {
   name?: string;
   message?: string;
 }): boolean {
-  if (error.name === "ChunkLoadError") {
-    return true;
-  }
-  const message = error.message ?? "";
   return (
-    /Loading (CSS )?chunk .+ failed/i.test(message) ||
-    /Failed to fetch dynamically imported module/i.test(message) ||
-    /error loading dynamically imported module/i.test(message) ||
-    /Importing a module script failed/i.test(message)
+    error.name === "ChunkLoadError" ||
+    CHUNK_LOAD_ERROR_MESSAGE.test(error.message ?? "")
   );
 }
 
