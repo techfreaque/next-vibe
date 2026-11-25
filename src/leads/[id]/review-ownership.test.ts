@@ -11,6 +11,7 @@ import { NewsletterSubscriptionStatus } from "@/newsletter/enum";
 
 import definition, { type LeadGetResponseOutput } from "./definition";
 import { LeadAccountAssociation, LeadJourneyEvent } from "./enum";
+import type { LeadDetailRepository as LeadDetailRepositoryType } from "./repository";
 
 const pg = new PGlite();
 const db = drizzle(pg);
@@ -31,7 +32,7 @@ mock.module("next-vibe/identity/lead/repository", () => ({
   },
 }));
 
-let LeadDetailRepository: typeof import("./repository").LeadDetailRepository;
+let LeadDetailRepository: typeof LeadDetailRepositoryType;
 const logger = createEndpointLogger(false, defaultLocale);
 
 beforeAll(async () => {
@@ -40,7 +41,11 @@ beforeAll(async () => {
     CREATE TABLE leads (
       id uuid PRIMARY KEY, source text NOT NULL,
       converted_user_id uuid, converted_at timestamp,
-      uncensored_consent_at timestamp, uncensored_consent_version integer
+      uncensored_consent_at timestamp, uncensored_consent_version integer,
+      created_at timestamp, signed_up_at timestamp, geo_country text, country text,
+      email text, business_name text, device_type text, browser text, os text,
+      ip_address text, user_agent text, referral_code text,
+      metadata jsonb NOT NULL DEFAULT '{}'::jsonb
     );
     CREATE TABLE growth_journeys (
       lead_id uuid PRIMARY KEY, user_id uuid,
@@ -48,12 +53,20 @@ beforeAll(async () => {
       first_source text, first_campaign text,
       last_touch_at timestamp NOT NULL, last_channel text NOT NULL,
       last_source text, last_campaign text,
-      first_chat_at timestamp, first_paid_at timestamp
+      first_chat_at timestamp, first_paid_at timestamp, signed_up_at timestamp,
+      first_channel_type text, first_medium text, first_referrer_host text,
+      first_landing_path text, first_ref_code text
     );
     CREATE TABLE user_lead_links (
       lead_id uuid, user_id uuid, link_reason text NOT NULL, linked_at timestamp NOT NULL
     );
-    CREATE TABLE users (id uuid PRIMARY KEY, email text NOT NULL, public_name text NOT NULL);
+    CREATE TABLE users (
+      id uuid PRIMARY KEY, email text NOT NULL, public_name text NOT NULL,
+      created_at timestamp, email_verified boolean
+    );
+    CREATE TABLE chat_threads (lead_id uuid, user_id uuid, created_at timestamp);
+    CREATE TABLE payment_transactions (user_id uuid, amount numeric, status text, created_at timestamp);
+    CREATE TABLE credit_transactions (wallet_id uuid, type text, metadata jsonb);
     CREATE TABLE lead_engagements (
       id uuid, lead_id uuid, campaign_id uuid, timestamp timestamp, engagement_type text
     );
@@ -87,7 +100,7 @@ beforeAll(async () => {
     [related, linkedAccount, outside, outsideAccount, optOutAt],
   );
   await pg.query(
-    `INSERT INTO users VALUES
+    `INSERT INTO users (id, email, public_name) VALUES
      ($1, 'linked@example.invalid', 'Linked account'),
      ($2, 'converted@example.invalid', 'Conversion account'),
      ($3, 'attributed@example.invalid', 'Attribution account'),

@@ -33,12 +33,19 @@ const STREAM_CHANNEL = `user/${LEAD_ID}/ws-replay-test-stream`;
 
 // The DOM constructor type cannot supply cookies. Bun's test runtime accepts
 // headers so the fixture can send the current HttpOnly lead cookie at upgrade.
+let latestSocket: WebSocket | undefined;
 const LeadWebSocket = new Proxy(WebSocket, {
   construct(target, [url]: [string | URL], newTarget): WebSocket {
     const options: Bun.WebSocketOptions = {
       headers: { Cookie: `${LEAD_ID_COOKIE_NAME}=${LEAD_ID}` },
     };
-    return Reflect.construct(target, [url, options], newTarget);
+    const socket: WebSocket = Reflect.construct(
+      target,
+      [url, options],
+      newTarget,
+    );
+    latestSocket = socket;
+    return socket;
   },
 });
 
@@ -138,60 +145,75 @@ describe("WS reconnect catch-up (real client + real server)", () => {
       resyncs.push(received.length);
     });
 
-    // Socket open + subscribe acked (the ack creates the replay state).
-    await waitFor(
-      () =>
-        (server?.clientCount().clients ?? 0) === 1 &&
-        getLocalBroadcast()?.isChannelLive(STREAM_CHANNEL) === true,
-      5_000,
-    );
-    await delay(100);
-    expect(server?.clientCount().clients).toBe(1);
+    try {
+      // Socket open + subscribe acked (the ack creates the replay state).
+      await waitFor(
+        () =>
+          (server?.clientCount().clients ?? 0) === 1 &&
+          getLocalBroadcast()?.isChannelLive(STREAM_CHANNEL) === true,
+        5_000,
+      );
+      expect(server?.clientCount().clients).toBe(1);
 
-    const TOTAL = 300;
-    let next = 0;
-    const emitBurst = async (count: number): Promise<void> => {
-      for (let i = 0; i < count; i++) {
+      const TOTAL = 300;
+      let next = 0;
+      const publishToken = (): void => {
         // Nothing may be dropped by the presence gate while offline: the
         // channel's replay state keeps it live.
         expect(emitToken(next)).toBe(true);
         next++;
-        await delay(2);
+      };
+      const emitBurst = async (count: number): Promise<void> => {
+        for (let i = 0; i < count; i++) {
+          publishToken();
+          await delay(2);
+        }
+      };
+
+      await emitBurst(80);
+      await waitFor(() => received.length >= 40, 5_000);
+      expect(received.length).toBeGreaterThanOrEqual(40);
+
+      const drainedSocket = latestSocket;
+      expect(drainedSocket).toBeDefined();
+      if (!drainedSocket) {
+        return;
       }
-    };
+      const closed = Promise.withResolvers<number>();
+      drainedSocket.addEventListener(
+        "close",
+        (event) => closed.resolve(event.code),
+        { once: true },
+      );
+      expect(server?.closeClients()).toBe(1);
+      expect(await closed.promise).toBe(1012);
 
-    await emitBurst(80);
-    await waitFor(() => received.length >= 40, 5_000);
+      // Publish during the close event's microtask checkpoint, before the
+      // reconnect timer can run. The gap contains ten tokens at any CPU load.
+      expect(latestSocket).toBe(drainedSocket);
+      for (let i = 0; i < 10; i++) {
+        publishToken();
+      }
+      await waitFor(() => received.length >= next, 5_000);
+      expect(received.length).toBe(next);
 
-    // Deploy drain: the server closes every socket with 1012 mid-stream and
-    // keeps running; tokens keep flowing while the client is away.
-    expect(server?.closeClients()).toBe(1);
-    let emittedOffline = 0;
-    while ((server?.clientCount().clients ?? 0) === 0 && emittedOffline < 150) {
-      await emitBurst(1);
-      emittedOffline++;
+      await emitBurst(40);
+      // Hard swap mid-stream (what an identity change does): old socket closed,
+      // new one opened at once, events in between must still arrive.
+      client.reconnectForIdentityChange(logger);
+      await emitBurst(TOTAL - next);
+
+      await waitFor(() => received.length >= TOTAL, 10_000);
+      await delay(100);
+
+      expect(received.length).toBe(TOTAL);
+      expect(received).toEqual([...Array.from({ length: TOTAL }).keys()]);
+      // Every gap was inside the buffer: no refetch was needed.
+      expect(resyncs).toEqual([]);
+    } finally {
+      unResync();
+      unsubscribe();
     }
-    // Tokens really were published into the gap (100-500 ms reconnect).
-    expect(emittedOffline).toBeGreaterThan(5);
-
-    // The client is back; keep streaming.
-    await emitBurst(40);
-
-    // Hard swap mid-stream (what an identity change does): old socket closed,
-    // new one opened at once, events in between must still arrive.
-    client.reconnectForIdentityChange(logger);
-    await emitBurst(TOTAL - next);
-
-    await waitFor(() => received.length >= TOTAL, 10_000);
-    await delay(100);
-
-    expect(received.length).toBe(TOTAL);
-    expect(received).toEqual([...Array.from({ length: TOTAL }).keys()]);
-    // Every gap was inside the buffer: no refetch was needed.
-    expect(resyncs).toEqual([]);
-
-    unResync();
-    unsubscribe();
   }, 30_000);
 
   it("WS-REPLAY-2: a gap older than the buffer answers complete:false (client refetches)", async () => {

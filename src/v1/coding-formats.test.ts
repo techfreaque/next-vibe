@@ -16,6 +16,7 @@ import {
 import { getEnvAvailability } from "next-vibe/agent/env-availability";
 import { rootlessToolExecutionContext } from "next-vibe/core/execution-context";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
+import type { WidgetData } from "next-vibe/core/utils/json";
 import { db } from "next-vibe/database";
 import type {
   JwtPrivatePayloadType,
@@ -25,6 +26,7 @@ import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import { sendTestRequest } from "next-vibe/tooling/testing/testing-suite/send-test-request";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { z } from "zod";
 
 import { API_UNLOCK_PATH, getApiAccessPrices } from "@/api-keys/access";
 import { ApiKeyAuth } from "@/api-keys/auth";
@@ -44,6 +46,7 @@ import type { V1ResponsesPostRequestOutput } from "./responses/definition";
 import { V1ResponsesRepository } from "./responses/repository";
 import type { InferenceRequest, InferenceRunner } from "./shared/inference";
 import { listUserCallableModels } from "./shared/models";
+import { mockV1Providers } from "./test-providers";
 
 const logger = createEndpointLogger(false, defaultLocale);
 const { t } = scopedTranslation.scopedT(defaultLocale);
@@ -127,11 +130,15 @@ const readFileAnthropic = {
   input_schema: { type: "object", properties: { path: { type: "string" } }, required: ["path"] },
 };
 
-function v1Request(path: string, headers: Record<string, string>, body?: object): Request {
+function v1Request(
+  path: string,
+  headers: Record<string, string>,
+  body?: string,
+): Request {
   return new Request(`http://localhost/api/en-US/v1${path}`, {
     method: body ? "POST" : "GET",
     headers: { "Content-Type": "application/json", ...headers },
-    ...(body ? { body: JSON.stringify(body) } : {}),
+    body,
   });
 }
 
@@ -178,7 +185,7 @@ async function responsesCall(
   runner: InferenceRunner,
 ): Promise<Response> {
   const data = { input: "hi", ...body };
-  const request = v1Request("/responses", headers, data);
+  const request = v1Request("/responses", headers, JSON.stringify(data));
   const out = await V1ResponsesRepository.create({
     data,
     user: await authed(request),
@@ -202,7 +209,11 @@ async function messagesCall(
     messages: [{ role: "user", content: "hi" }],
     ...body,
   };
-  const request = v1Request("/messages", { "anthropic-version": "2023-06-01", ...headers }, data);
+  const request = v1Request(
+    "/messages",
+    { "anthropic-version": "2023-06-01", ...headers },
+    JSON.stringify(data),
+  );
   const out = await V1MessagesRepository.create({
     data,
     user: await authed(request),
@@ -218,7 +229,7 @@ async function messagesCall(
 
 interface SseEvent {
   type: string;
-  [key: string]: unknown;
+  [key: string]: WidgetData;
 }
 
 function sseEvents(text: string): SseEvent[] {
@@ -228,27 +239,38 @@ function sseEvents(text: string): SseEvent[] {
     .map((chunk) => JSON.parse(chunk.slice(chunk.indexOf("data: ") + 6)) as SseEvent);
 }
 
+function expectPaidGuidance(message: string): void {
+  const { subPrice } = getApiAccessPrices(defaultLocale);
+  expect(message).toContain(`any plan, from ${subPrice} a month`);
+  expect(message).toContain(
+    `http://localhost/${defaultLocale}/${API_UNLOCK_PATH}`,
+  );
+}
+
 describe("coding-agent formats", () => {
   let user: E2ECreditUser;
   let broke: E2ECreditUser;
   let free: E2ECreditUser;
+  let restoreProviders: (() => void) | undefined;
   let toolModelId = "";
   let claudeSonnetId: string | undefined;
 
   beforeAll(async () => {
+    restoreProviders = mockV1Providers();
     user = await createE2ECreditUser("v1-formats", 500);
     broke = await createE2ECreditUser("v1-formats-broke", 500);
     free = await createE2ECreditUser("v1-formats-free", 0);
     const models = listUserCallableModels(user.user, await getEnvAvailability());
     toolModelId = models.find((m) => m.supportsTools)?.id ?? "";
     claudeSonnetId = models.find((m) => /^claude-sonnet-\d/.test(m.id))?.id;
-  });
+  }, 60_000);
 
   afterAll(async () => {
-    await user.remove();
-    await broke.remove();
-    await free.remove();
-  });
+    restoreProviders?.();
+    await user?.remove();
+    await broke?.remove();
+    await free?.remove();
+  }, 60_000);
 
   it("a tool-capable model is servable in this environment", () => {
     expect(toolModelId).not.toBe("");
@@ -303,8 +325,14 @@ describe("coding-agent formats", () => {
         .map((e) => e["item"] as { type: string; call_id?: string; arguments?: string; encrypted_content?: string });
       expect(done.map((item) => item.type)).toEqual(["reasoning", "message", "function_call", "function_call"]);
       expect(done[0]?.encrypted_content?.startsWith("unb1.")).toBe(true);
-      expect(done[2]).toMatchObject({ call_id: "call_1", arguments: '{"path":"a.txt"}' });
-      expect((events.at(-1)?.["response"] as { usage: { total_tokens: number } }).usage.total_tokens).toBe(22_000);
+      expect(done[2]).toMatchObject({
+        call_id: "call_1",
+        arguments: '{"path":"a.txt"}',
+      });
+      const completed = z.object({
+        usage: z.object({ total_tokens: z.number() }),
+      }).parse(events.at(-1)?.["response"]);
+      expect(completed.usage.total_tokens).toBe(22_000);
       expect(before - (await balanceOf(user.user))).toBeGreaterThan(0);
     });
 
@@ -403,7 +431,13 @@ describe("coding-agent formats", () => {
         type: string;
         role: string;
         model: string;
-        content: Array<{ type: string; id?: string; input?: object; text?: string; signature?: string }>;
+        content: Array<{
+          type: string;
+          id?: string;
+          input?: WidgetData;
+          text?: string;
+          signature?: string;
+        }>;
         stop_reason: string;
         usage: { input_tokens: number; output_tokens: number; cache_read_input_tokens: number; credits_charged: number };
       };
@@ -499,9 +533,7 @@ describe("coding-agent formats", () => {
     });
 
     it("maps Claude Code's dated Claude ids to our Claude model", async () => {
-      if (!claudeSonnetId) {
-        return;
-      }
+      expect(claudeSonnetId).toBeDefined();
       const { key } = await createKey(user.user, "messages-claude-id");
       const res = await messagesCall({ "x-api-key": key }, { model: "claude-sonnet-4-5-20250929" }, textRunner);
       expect(res.status).toBe(200);
@@ -534,7 +566,11 @@ describe("coding-agent formats", () => {
       resetRateLimit(id);
       const before = await balanceOf(user.user);
       for (let i = 0; i < 3; i++) {
-        const request = v1Request("/messages/count_tokens", { "x-api-key": key }, {});
+        const request = v1Request(
+          "/messages/count_tokens",
+          { "x-api-key": key },
+          "{}",
+        );
         const out = await V1CountTokensRepository.count({
           data: {
             model: "claude-sonnet-4-5",
@@ -576,20 +612,19 @@ describe("coding-agent formats", () => {
     });
   });
   describe("402 paid_plan_required (free account)", () => {
-    function expectGuidance(message: string): void {
-      const { subPrice } = getApiAccessPrices(defaultLocale);
-      expect(message).toContain(`any plan, from ${subPrice} a month`);
-      expect(message).toContain(`http://localhost/${defaultLocale}/${API_UNLOCK_PATH}`);
-    }
-
     it("Responses format: OpenAI envelope, stable code, message says what to buy and where", async () => {
       resetPaidCache(free.user.id);
       const key = await legacyKey(free.user, "free-responses");
       const res = await responsesCall({ Authorization: `Bearer ${key}` }, { model: toolModelId }, textRunner);
       expect(res.status).toBe(402);
-      const body = (await res.json()) as { error: { code: string; type: string; message: string } };
-      expect(body.error).toMatchObject({ code: "paid_plan_required", type: "insufficient_quota" });
-      expectGuidance(body.error.message);
+      const body = (await res.json()) as {
+        error: { code: string; type: string; message: string };
+      };
+      expect(body.error).toMatchObject({
+        code: "paid_plan_required",
+        type: "insufficient_quota",
+      });
+      expectPaidGuidance(body.error.message);
     });
 
     it("Anthropic format: billing_error, no retry, message says what to buy and where", async () => {
@@ -598,9 +633,15 @@ describe("coding-agent formats", () => {
       const res = await messagesCall({ "x-api-key": key }, { model: toolModelId }, textRunner);
       expect(res.status).toBe(402);
       expect(res.headers.get("x-should-retry")).toBe("false");
-      const body = (await res.json()) as { type: string; error: { type: string; message: string } };
-      expect(body).toMatchObject({ type: "error", error: { type: "billing_error" } });
-      expectGuidance(body.error.message);
+      const body = (await res.json()) as {
+        type: string;
+        error: { type: string; message: string };
+      };
+      expect(body).toMatchObject({
+        type: "error",
+        error: { type: "billing_error" },
+      });
+      expectPaidGuidance(body.error.message);
     });
   });
 });

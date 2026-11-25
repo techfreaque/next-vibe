@@ -3,84 +3,122 @@
  * named by function, so the lag row says what blocked the loop.
  */
 
-import { describe, expect, it, mock } from "bun:test";
+import type { SamplingProfile, SamplingProfileStackFrame } from "bun:jsc";
+import * as jsc from "bun:jsc";
+import { describe, expect, it, mock, spyOn } from "bun:test";
 
 import { coreEnv } from "../../core/env";
 import { defaultLocale } from "../../core/i18n/core/config";
 import { Environment } from "../../env/env-util";
 import { createEndpointLogger } from "../../logger/server";
-import type { LoggerMetadata } from "../../logger/types";
+import type { EndpointLogger } from "../../logger/types";
 import { PhaseProfiler } from "./phase-profiler";
 
 function blockTheLoopForProfilerTest(ms: number): number {
-  const end = Date.now() + ms;
+  const end = performance.now() + ms;
   let acc = 0;
-  while (Date.now() < end) {
+  while (performance.now() < end) {
     acc += Math.sqrt(acc + 1);
   }
   return acc;
 }
 
+function fixtureSampler(streakMs: number): {
+  completeAtWindowEnd: () => Promise<void>;
+  restore: () => void;
+} {
+  const result = Promise.withResolvers<SamplingProfile>();
+  const sample = spyOn(jsc, "profile").mockReturnValueOnce(result.promise);
+  const frame: SamplingProfileStackFrame = {
+    sourceID: 1,
+    name: blockTheLoopForProfilerTest.name,
+    location: "",
+    sourceURL: import.meta.path,
+    line: 1,
+    column: 1,
+    category: "Baseline",
+    flags: 0,
+  };
+
+  return {
+    async completeAtWindowEnd(): Promise<void> {
+      const [call] = sample.mock.calls;
+      expect(call).toBeDefined();
+      await call[0]();
+      result.resolve({
+        functions: "",
+        bytecodes: "",
+        stackTraces: {
+          interval: 0.001,
+          sources: [{ sourceID: frame.sourceID, url: frame.sourceURL }],
+          traces: [
+            { timestamp: 0, frames: [] },
+            ...Array.from(Array<undefined>(streakMs).keys(), (index) => ({
+              timestamp: (50 + index) / 1000,
+              frames: [frame],
+            })),
+          ],
+        },
+      });
+    },
+    restore: (): void => sample.mockRestore(),
+  };
+}
+
 describe("PhaseProfiler", () => {
   it("names the function behind a stall that starts right after the phase", async () => {
-    const warn = mock((_message: string, ..._metadata: LoggerMetadata[]) => {});
+    const warn = mock<EndpointLogger["warn"]>();
     const logger = { ...createEndpointLogger(false, defaultLocale), warn };
-    const end = PhaseProfiler.hold("cron-post:test", logger);
-    // Let the sampler start (bun:jsc loads asynchronously)
-    await new Promise<void>((resolve) => {
-      setTimeout(resolve, 50);
-    });
-    end();
-    // The stall comes after the phase ended, inside the tail
-    const stallAt = Date.now();
-    blockTheLoopForProfilerTest(300);
-    // Tail (1.5 s) + summarizing
-    await new Promise<void>((resolve) => {
-      setTimeout(resolve, 2000);
-    });
+    const sampler = fixtureSampler(300);
+    try {
+      const end = PhaseProfiler.hold("cron-post:test", logger);
+      await Bun.sleep(50);
+      const sampling = sampler.completeAtWindowEnd();
+      end();
+      // The fixture's stall comes after the phase ended, inside the real tail.
+      const stallAt = Date.now();
+      await Bun.sleep(300);
+      const stallEndedAt = Date.now();
+      await sampling;
+      await PhaseProfiler.flush(stallAt);
 
-    const profile = PhaseProfiler.profileCovering(stallAt);
-    expect(profile).toBeDefined();
-    // Sampler gaps under a loaded box split the 300 ms block; naming is what counts
-    expect(profile?.streakMs).toBeGreaterThanOrEqual(150);
-    expect(profile?.hotFrames).toContain("blockTheLoopForProfilerTest");
-    expect(profile?.phases).toContain("cron-post:test");
-    expect(profile?.earliestStreakStartMs).toBeGreaterThanOrEqual(profile?.sessionStartedAt ?? 0);
-    expect(profile?.earliestStreakStartMs).toBeLessThanOrEqual(stallAt + 300);
-    expect(profile?.latestStreakEndMs).toBeGreaterThanOrEqual(stallAt);
-    expect(profile?.latestStreakEndMs).toBeLessThanOrEqual(profile?.sessionEndedAt ?? 0);
-    expect(profile?.totalSamples).toBeGreaterThan(0);
-    expect(profile?.windowSampleCount).toBeGreaterThanOrEqual(
-      profile?.totalSamples ?? 0,
-    );
-    expect(profile?.gcSamples).toBeLessThanOrEqual(profile?.totalSamples ?? 0);
-    if (
-      coreEnv.NODE_ENV !== Environment.DEVELOPMENT &&
-      profile &&
-      profile.streakMs >= 200
-    ) {
-      expect(warn).toHaveBeenCalledWith(
-        "[EventLoop] Stall profiled in a window with cron bookkeeping",
-        expect.objectContaining({
-          profileWindowStartedAt: new Date(profile.sessionStartedAt).toISOString(),
-          profileWindowEndedAt: new Date(profile.sessionEndedAt).toISOString(),
-        }),
+      const profile = PhaseProfiler.profileCovering(stallAt);
+      expect(profile).toBeDefined();
+      expect(profile?.streakMs).toBe(300);
+      expect(profile?.hotFrames).toContain("blockTheLoopForProfilerTest");
+      expect(profile?.phases).toContain("cron-post:test");
+      expect(profile?.sessionEndedAt).toBeGreaterThanOrEqual(stallEndedAt);
+      expect(profile?.earliestStreakStartMs).toBeGreaterThanOrEqual(
+        profile?.sessionStartedAt ?? 0,
       );
+      expect(profile?.earliestStreakStartMs).toBeLessThanOrEqual(stallEndedAt);
+      expect(profile?.latestStreakEndMs).toBeGreaterThanOrEqual(stallAt);
+      expect(profile?.latestStreakEndMs).toBeLessThanOrEqual(profile?.sessionEndedAt ?? 0);
+      expect(profile?.totalSamples).toBeGreaterThan(0);
+      expect(profile?.windowSampleCount).toBeGreaterThanOrEqual(profile?.totalSamples ?? 0);
+      expect(profile?.gcSamples).toBeLessThanOrEqual(profile?.totalSamples ?? 0);
+      if (coreEnv.NODE_ENV !== Environment.DEVELOPMENT && profile) {
+        expect(warn).toHaveBeenCalledWith(
+          "[EventLoop] Stall profiled in a window with cron bookkeeping",
+          expect.objectContaining({
+            profileWindowStartedAt: new Date(profile.sessionStartedAt).toISOString(),
+            profileWindowEndedAt: new Date(profile.sessionEndedAt).toISOString(),
+          }),
+        );
+      }
+    } finally {
+      sampler.restore();
     }
   });
 
   it("keeps short sampling windows available without reporting a cron stall", async () => {
-    const warn = mock((_message: string, ..._metadata: LoggerMetadata[]) => {});
+    const warn = mock<EndpointLogger["warn"]>();
     const logger = { ...createEndpointLogger(false, defaultLocale), warn };
     const end = PhaseProfiler.hold("cron-post:idle", logger);
     const idleAt = Date.now();
-    await new Promise<void>((resolve) => {
-      setTimeout(resolve, 100);
-    });
+    await Bun.sleep(100);
     end();
-    await new Promise<void>((resolve) => {
-      setTimeout(resolve, 1800);
-    });
+    await Bun.sleep(1800);
     const profile = PhaseProfiler.profileCovering(idleAt);
     expect(profile).toBeDefined();
     expect(profile?.streakMs).toBeLessThan(200);
@@ -90,51 +128,70 @@ describe("PhaseProfiler", () => {
   it.each([
     { busyMs: 300, logsStall: false },
     { busyMs: 900, logsStall: true },
-  ])("uses the high lag threshold for dev profile dumps ($busyMs ms busy)", async ({
-    busyMs,
-    logsStall,
-  }) => {
-    const previousEnv = coreEnv.NODE_ENV;
-    coreEnv.NODE_ENV = Environment.DEVELOPMENT;
-    const warn = mock((_message: string, ..._metadata: LoggerMetadata[]) => {});
-    const logger = { ...createEndpointLogger(false, defaultLocale), warn };
-    try {
-      const end = PhaseProfiler.hold("cron-post:dev", logger);
-      await Bun.sleep(50);
-      end();
-      const stallAt = Date.now();
-      blockTheLoopForProfilerTest(busyMs);
-      await PhaseProfiler.flush(stallAt);
+  ])(
+    "uses the high lag threshold for dev profile dumps ($busyMs ms busy)",
+    async ({ busyMs, logsStall }) => {
+      const previousEnv = coreEnv.NODE_ENV;
+      coreEnv.NODE_ENV = Environment.DEVELOPMENT;
+      const warn = mock<EndpointLogger["warn"]>();
+      const logger = { ...createEndpointLogger(false, defaultLocale), warn };
+      const sampler = fixtureSampler(busyMs);
+      try {
+        const end = PhaseProfiler.hold("cron-post:dev", logger);
+        await Bun.sleep(50);
+        const sampling = sampler.completeAtWindowEnd();
+        end();
+        const stallAt = Date.now();
+        await Bun.sleep(busyMs);
+        await PhaseProfiler.flush(stallAt);
+        await sampling;
 
-      const profile = PhaseProfiler.profileCovering(stallAt);
-      expect(profile?.hotFrames).toContain("blockTheLoopForProfilerTest");
-      expect(warn).toHaveBeenCalledTimes(logsStall ? 1 : 0);
-    } finally {
-      coreEnv.NODE_ENV = previousEnv;
-    }
-  });
+        const profile = PhaseProfiler.profileCovering(stallAt);
+        expect(profile?.streakMs).toBe(busyMs);
+        expect(profile?.hotFrames).toContain("blockTheLoopForProfilerTest");
+        expect(warn).toHaveBeenCalledTimes(logsStall ? 1 : 0);
+      } finally {
+        sampler.restore();
+        coreEnv.NODE_ENV = previousEnv;
+      }
+    },
+  );
 
   it("names a stall outside any phase in continuous mode", async () => {
     const logger = createEndpointLogger(false, defaultLocale);
+    const sampler = fixtureSampler(300);
     PhaseProfiler.startContinuous(logger);
     try {
-      // Let the sampler start (bun:jsc loads asynchronously)
-      await new Promise<void>((resolve) => {
-        setTimeout(resolve, 50);
-      });
+      await Bun.sleep(50);
+      const sampling = sampler.completeAtWindowEnd();
       const stallAt = Date.now();
-      blockTheLoopForProfilerTest(300);
-      // The lag monitor flushes right after it measured the stall
+      await Bun.sleep(300);
       await PhaseProfiler.flush(stallAt);
+      await sampling;
 
       const profile = PhaseProfiler.profileCovering(stallAt);
       expect(profile).toBeDefined();
-      // Sampler gaps under a loaded box split the 300 ms block; naming is what counts
-      expect(profile?.streakMs).toBeGreaterThanOrEqual(150);
+      expect(profile?.streakMs).toBe(300);
       expect(profile?.hotFrames).toContain("blockTheLoopForProfilerTest");
       expect(profile?.phases).toBe("");
-      // The next window starts on its own
       expect(PhaseProfiler.isContinuous()).toBe(true);
+    } finally {
+      PhaseProfiler.stopContinuous();
+      sampler.restore();
+    }
+  });
+
+  it("captures the real blocked stack with the Bun sampler", async () => {
+    const logger = createEndpointLogger(false, defaultLocale);
+    PhaseProfiler.startContinuous(logger);
+    try {
+      await Bun.sleep(50);
+      const stallAt = Date.now();
+      blockTheLoopForProfilerTest(300);
+      await PhaseProfiler.flush(stallAt);
+      expect(PhaseProfiler.profileCovering(stallAt)?.hotFrames).toContain(
+        "blockTheLoopForProfilerTest",
+      );
     } finally {
       PhaseProfiler.stopContinuous();
     }

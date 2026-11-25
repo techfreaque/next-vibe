@@ -19,17 +19,21 @@ import { DefaultFolderId } from "next-vibe/core/execution-context";
 import { ErrorResponseTypes } from "next-vibe/core/route/response.schema";
 import { db } from "next-vibe/database";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
-import { resolveTestAdminUser } from "next-vibe/tooling/testing/testing-suite/resolve-test-user";
 import { sendTestRequest } from "next-vibe/tooling/testing/testing-suite/send-test-request";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 
 import { DEFAULT_CHAT_MODEL_SELECTION } from "../../ai-stream/constants";
+import {
+  createE2ECreditUser,
+  type E2ECreditUser,
+} from "../../ai-stream/testing/e2e-credit-user";
 import { chatThreads } from "../../chat/db";
 import { ThreadStatus } from "../../chat/enum";
 import { customSkills } from "../../skills/db";
 import { SkillCategory, SkillOwnershipType } from "../../skills/enum";
 import { cortexNodes } from "../db";
 import { embedNodeNow } from "../embeddings/auto-embed";
+import * as embeddingService from "../embeddings/service";
 import { upsertVirtualNode } from "../embeddings/sync-virtual";
 import { CortexNodeType } from "../enum";
 import writeEndpoint from "../write/definition";
@@ -44,17 +48,15 @@ const SENTINEL = "zxq-unique-sentinel-9981";
 /** Unique slug for the materialized virtual skill row (content NULL contract). */
 const SKILL_SLUG = "cortex-search-test-skill-zxq";
 /**
- * Unique thread title token. It slugifies into the materialized /threads path,
- * so a keyword search for the token hits the index row by path even though its
- * stored content is NULL — the excerpt is then resolved live from the thread.
+ * The test embedding provider maps the thread path, title and search query to
+ * the same vector. The excerpt is resolved live from the source thread.
  */
 const THREAD_TOKEN = "zxqthreadtoken";
 const THREAD_TITLE = `Cortex Search ${THREAD_TOKEN} Thread`;
 
 /**
- * Search may run a vector branch (query-embedding generation hits the embedding
- * model) when the test DB already holds embeddings, so per-test timeouts must be
- * generous. Keyword/FTS assertions stay reliable regardless of which branch runs.
+ * Both search modes exercise the real database. The provider stub supplies
+ * embeddings only for the virtual thread so the native cases exercise FTS.
  */
 const SEARCH_TIMEOUT = 60000;
 
@@ -155,9 +157,8 @@ async function materializeVirtualThread(userId: string): Promise<void> {
       and(eq(cortexNodes.userId, userId), eq(cortexNodes.path, threadPath)),
     )
     .limit(1);
-  if (created) {
-    await embedNodeNow(created.id, threadPath, THREAD_TITLE);
-  }
+  expect(created).toBeDefined();
+  expect(await embedNodeNow(created.id, threadPath, THREAD_TITLE)).toBe(true);
 }
 
 /** Remove materialized skill + thread + their index rows. */
@@ -198,19 +199,36 @@ async function writeFile(path: string, content: string): Promise<void> {
 }
 
 describe("Cortex Search E2E", () => {
+  let account: E2ECreditUser | undefined;
+  let restoreEmbedding: (() => void) | undefined;
+
   beforeAll(async () => {
-    user = await resolveTestAdminUser();
-    await cleanup(user.id);
+    const embedding = Array<number>(embeddingService.EMBEDDING_DIMENSIONS).fill(0);
+    embedding[0] = 1;
+    const provider = vi.spyOn(embeddingService, "generateEmbeddingWithCost");
+    provider.mockImplementation((text) =>
+      Promise.resolve(
+        text.includes(THREAD_TOKEN) ? { embedding, costUsd: 0 } : null,
+      ),
+    );
+    restoreEmbedding = (): void => provider.mockRestore();
+    account = await createE2ECreditUser("cortex-search", 0);
+    user = account.user;
     await materializeVirtualSkill(user.id);
     await materializeVirtualThread(user.id);
-  });
+  }, SEARCH_TIMEOUT);
 
   afterAll(async () => {
-    if (user) {
-      await cleanup(user.id);
-      await deleteVirtualFixtures(user.id);
+    try {
+      if (account) {
+        await cleanup(account.user.id);
+        await deleteVirtualFixtures(account.user.id);
+        await account.remove();
+      }
+    } finally {
+      restoreEmbedding?.();
     }
-  });
+  }, SEARCH_TIMEOUT);
 
   it(
     "keyword search finds a freshly written file by a unique sentinel token",
@@ -537,8 +555,7 @@ describe("Cortex Search E2E", () => {
   it(
     "virtual-mount search (/threads) returns non-empty excerpts resolved live",
     async () => {
-      // beforeAll materialized + embedded a /threads index row whose path and
-      // embedding text carry the unique token, so a token search must return it.
+      // beforeAll embedded a /threads index row for the query's unique token.
       const res = await sendTestRequest({
         toolExecutionContext: undefined,
         endpoint: searchEndpoint.GET,
@@ -553,6 +570,7 @@ describe("Cortex Search E2E", () => {
         return;
       }
 
+      expect(res.data.searchMode).toBe("hybrid");
       // The fixture thread MUST surface — a missing result fails loudly rather
       // than skipping, surfacing a broken virtual-mount index or embed path.
       expect(
@@ -570,6 +588,7 @@ describe("Cortex Search E2E", () => {
         fixtureHit,
         `expected the fixture thread (${threadPath}) among /threads results`,
       ).toBeDefined();
+      expect(fixtureHit?.excerpt).toContain(THREAD_TITLE);
 
       // Even though stored content is NULL for virtual rows, excerpts are resolved
       // live from source via resolveExcerpts, so they must be non-empty.

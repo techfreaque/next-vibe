@@ -5,11 +5,9 @@
  *
  * Gating (auth, paid rule, rate limit, model availability), validation and the
  * job lifecycle run on the real code + real DB with injected generators (no
- * provider call). The "live" cases run the real tool repositories once per
- * endpoint with the cheapest model: their provider calls are recorded into
- * src/generated/ai-fixtures/http-cache/v1-media-<case>/ on the first run and
- * replayed after that, and they assert the billing ledger against the
- * provider's reported cost.
+ * provider call). The replay cases run the real tool repositories against
+ * src/generated/ai-fixtures/http-cache/v1-media-<case>/ and assert the billing
+ * ledger against the provider's recorded cost.
  */
 
 import { readdirSync, readFileSync } from "node:fs";
@@ -22,7 +20,9 @@ import {
 } from "next-vibe/agent/ai-stream/testing/e2e-credit-user";
 import { cacheDir } from "next-vibe/agent/ai-stream/testing/fetch-cache";
 import { seedFixtureThread } from "next-vibe/agent/ai-stream/testing/fixture-seed";
+import { fixtures } from "next-vibe/agent/ai-stream/testing/fixtures.db";
 import { getStorageAdapter } from "next-vibe/agent/chat/storage/index";
+import { agentEnv } from "next-vibe/agent/env";
 import { ImageGenModelId } from "next-vibe/agent/image-generation/models";
 import { resolveMediaCharge } from "next-vibe/agent/models/models";
 import { scopedTranslation as consentScopedTranslation } from "next-vibe/agent/models/uncensored-consent/i18n";
@@ -82,6 +82,7 @@ import {
   V1_MEDIA_URL_TTL_SECONDS,
   verifyMediaSignature,
 } from "./shared/media";
+import { mockV1Providers } from "./test-providers";
 import { mapVideoSize, V1VideosRepository } from "./videos/repository";
 
 const logger = createEndpointLogger(false, defaultLocale);
@@ -194,13 +195,6 @@ async function call(
 
 async function errorOf(response: Response): Promise<z.infer<typeof errorSchema>> {
   return errorSchema.parse(await response.json());
-}
-
-/** Fixture-scoped context: provider calls record once, replay after. */
-async function fixtureContext(prefix: string): Promise<ToolExecutionContext> {
-  const scope = crypto.randomUUID();
-  await seedFixtureThread(scope, prefix, false);
-  return { ...makeHeadlessContext(undefined, undefined, "UTC"), fixtureScopeId: scope };
 }
 
 /** Usage ledger rows of `user` since `since` (negative amounts). */
@@ -346,8 +340,37 @@ describe("OpenAI-compatible media API", () => {
   let aliceKey = "";
   let bobKey = "";
   let freeKey = "";
+  const scopes: string[] = [];
+  let restoreProviders: (() => void) | undefined;
+  const originalOpenRouterKey = agentEnv.OPENROUTER_API_KEY;
+  const originalEdenKey = agentEnv.EDEN_AI_API_KEY;
+  const originalNanoKey = agentEnv.NANO_GPT_API_KEY;
+  const originalReplayOnly = process.env["VIBE_FIXTURE_REPLAY_ONLY"];
+
+  async function fixtureContext(prefix: string): Promise<ToolExecutionContext> {
+    const scope = crypto.randomUUID();
+    scopes.push(scope);
+    await seedFixtureThread(scope, prefix, false);
+    return {
+      ...makeHeadlessContext(undefined, undefined, "UTC"),
+      fixtureScopeId: scope,
+    };
+  }
 
   beforeAll(async () => {
+    process.env["VIBE_FIXTURE_REPLAY_ONLY"] = "1";
+    agentEnv.OPENROUTER_API_KEY = "fixture-only";
+    agentEnv.EDEN_AI_API_KEY = "fixture-only";
+    agentEnv.NANO_GPT_API_KEY = "fixture-only";
+    restoreProviders = mockV1Providers({
+      voice: true,
+      uncensoredAI: true,
+      veniceAI: true,
+      nanoGPT: true,
+      modelsLab: true,
+      edenAiStt: true,
+      edenAiTts: true,
+    });
     alice = await createE2ECreditUser("v1-media-alice", 300);
     bob = await createE2ECreditUser("v1-media-bob", 300);
     free = await createE2ECreditUser("v1-media-free", 0);
@@ -365,10 +388,29 @@ describe("OpenAI-compatible media API", () => {
   }, 60_000);
 
   afterAll(async () => {
-    await db.delete(v1MediaJobs).where(eq(v1MediaJobs.userId, alice.user.id));
-    await alice.remove();
-    await bob.remove();
-    await free.remove();
+    try {
+      if (scopes.length > 0) {
+        await db.delete(fixtures).where(inArray(fixtures.threadId, scopes));
+      }
+      if (alice) {
+        await db
+          .delete(v1MediaJobs)
+          .where(eq(v1MediaJobs.userId, alice.user.id));
+        await alice.remove();
+      }
+      await bob?.remove();
+      await free?.remove();
+    } finally {
+      restoreProviders?.();
+      agentEnv.OPENROUTER_API_KEY = originalOpenRouterKey;
+      agentEnv.EDEN_AI_API_KEY = originalEdenKey;
+      agentEnv.NANO_GPT_API_KEY = originalNanoKey;
+      if (originalReplayOnly === undefined) {
+        delete process.env["VIBE_FIXTURE_REPLAY_ONLY"];
+      } else {
+        process.env["VIBE_FIXTURE_REPLAY_ONLY"] = originalReplayOnly;
+      }
+    }
   }, 60_000);
 
   describe("gate", () => {
@@ -674,9 +716,7 @@ describe("OpenAI-compatible media API", () => {
     });
   });
 
-  // ------------------------------------------------------------- live
-
-  describe("live (recorded once, replayed)", () => {
+  describe("provider recordings", () => {
     it("images/generations: cheapest model, url + b64, billed at the provider's real cost", async () => {
       const prefix = "v1-media-images-generations";
       const since = new Date();

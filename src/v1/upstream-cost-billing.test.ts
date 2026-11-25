@@ -7,10 +7,16 @@
  * spend); keys, auth, model resolution and the credit ledger are real.
  */
 
-import { z } from "zod";
 import type { ProviderMetadata } from "ai";
 import { and, eq, inArray } from "drizzle-orm";
-import { billsUpstreamCost, TokenAccumulator } from "next-vibe/agent/ai-stream/repository/loop/token-accumulator";
+import {
+  type ChatModelOption,
+  chatModelOptionsPool,
+} from "next-vibe/agent/ai-stream/models";
+import {
+  billsUpstreamCost,
+  TokenAccumulator,
+} from "next-vibe/agent/ai-stream/repository/loop/token-accumulator";
 import {
   createE2ECreditUser,
   type E2ECreditUser,
@@ -21,7 +27,6 @@ import {
   upstreamCostToCredits,
 } from "next-vibe/agent/models/models";
 import { isUncensoredContent } from "next-vibe/agent/models/uncensored-consent/constants";
-import { chatModelOptionsPool, type ChatModelOption } from "next-vibe/agent/ai-stream/models";
 import { rootlessToolExecutionContext } from "next-vibe/core/execution-context";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { db } from "next-vibe/database";
@@ -33,6 +38,7 @@ import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import { sendTestRequest } from "next-vibe/tooling/testing/testing-suite/send-test-request";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
+import { z } from "zod";
 
 import { ApiKeyAuth } from "@/api-keys/auth";
 import apiKeysEndpoints from "@/api-keys/definition";
@@ -45,10 +51,11 @@ import { V1ChatCompletionsRepository } from "./chat/completions/repository";
 import { scopedTranslation } from "./i18n";
 import { V1MessagesRepository } from "./messages/repository";
 import { V1ModelsRepository } from "./models/repository";
-import { chatTokenPricing } from "./shared/chat-pricing";
 import { V1ResponsesRepository } from "./responses/repository";
+import { chatTokenPricing } from "./shared/chat-pricing";
 import type { InferenceRunner, InferenceUsage } from "./shared/inference";
 import { listUserCallableModels } from "./shared/models";
+import { mockV1Providers } from "./test-providers";
 
 const logger = createEndpointLogger(false, defaultLocale);
 const { t } = scopedTranslation.scopedT(defaultLocale);
@@ -97,7 +104,7 @@ function anonymous(): JWTPublicPayloadType {
   return { isPublic: true, leadId: "", roles: [UserPermissionRole.PUBLIC] };
 }
 
-function v1Request(path: string, key: string, body: object): Request {
+function v1Request(path: string, key: string, body: string): Request {
   return new Request(`http://localhost/api/en-US/v1${path}`, {
     method: "POST",
     headers: {
@@ -105,7 +112,7 @@ function v1Request(path: string, key: string, body: object): Request {
       Authorization: `Bearer ${key}`,
       "anthropic-version": "2023-06-01",
     },
-    body: JSON.stringify(body),
+    body,
   });
 }
 
@@ -141,7 +148,7 @@ async function call(
       ...(stream ? { stream_options: { include_usage: true } } : {}),
       messages: [{ role: "user" as const, content: "hi" }],
     };
-    const request = v1Request("/chat/completions", key, data);
+    const request = v1Request("/chat/completions", key, JSON.stringify(data));
     const out = await V1ChatCompletionsRepository.complete({
       ...common,
       data,
@@ -152,7 +159,7 @@ async function call(
   }
   if (format === "responses") {
     const data = { model, stream, input: "hi", store: false };
-    const request = v1Request("/responses", key, data);
+    const request = v1Request("/responses", key, JSON.stringify(data));
     const out = await V1ResponsesRepository.create({
       ...common,
       data,
@@ -167,7 +174,7 @@ async function call(
     max_tokens: 1024,
     messages: [{ role: "user" as const, content: "hi" }],
   };
-  const request = v1Request("/messages", key, data);
+  const request = v1Request("/messages", key, JSON.stringify(data));
   const out = await V1MessagesRepository.create({
     ...common,
     data,
@@ -252,8 +259,10 @@ describe("/v1 bills OpenRouter models at real upstream cost", () => {
   let payer: E2ECreditUser;
   let key = "";
   let model: ChatModelOption | undefined;
+  let restoreProviders: (() => void) | undefined;
 
   beforeAll(async () => {
+    restoreProviders = mockV1Providers();
     payer = await createE2ECreditUser("v1-upstream-cost", 500);
     const models = listUserCallableModels(payer.user, await getEnvAvailability());
     model = models.find(
@@ -272,7 +281,8 @@ describe("/v1 bills OpenRouter models at real upstream cost", () => {
   });
 
   afterAll(async () => {
-    await payer.remove();
+    restoreProviders?.();
+    await payer?.remove();
   });
 
   it("an OpenRouter per-token model is servable in this environment", () => {
@@ -297,9 +307,16 @@ describe("/v1 bills OpenRouter models at real upstream cost", () => {
     const pricing = baseRates.extend({
       tiers: z.array(baseRates.extend({min_prompt_tokens: z.number().optional(), utc_start: z.number().optional(), utc_end: z.number().optional()})).optional(),
     });
-    const catalog = z.object({ data: z.array(z.object({ id: z.string(), pricing })) }).parse(await response.json());
-    const served = listUserCallableModels(payer.user, await getEnvAvailability());
-    expect(catalog.data.map(row => row.id).sort()).toEqual(served.map(row => row.id).sort());
+    const catalog = z
+      .object({ data: z.array(z.object({ id: z.string(), pricing })) })
+      .parse(await response.json());
+    const served = listUserCallableModels(
+      payer.user,
+      await getEnvAvailability(),
+    );
+    expect(catalog.data.map((row) => row.id).toSorted()).toEqual(
+      served.map((row) => row.id).toSorted(),
+    );
 
     function verify(option: ChatModelOption, listing: z.infer<typeof pricing>): void {
       const requestStartedAt = Date.UTC(2026, 10, 24, 12);

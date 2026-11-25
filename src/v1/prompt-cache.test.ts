@@ -4,6 +4,7 @@ import {
   chatModelOptionsPool,
 } from "next-vibe/agent/ai-stream/models";
 import * as fixtureTransport from "next-vibe/agent/ai-stream/testing/fetch-cache";
+import { agentEnv } from "next-vibe/agent/env";
 import { ApiProvider } from "next-vibe/agent/models/models";
 import { rootlessToolExecutionContext } from "next-vibe/core/execution-context";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
@@ -37,7 +38,9 @@ describe("public API prompt caching on the provider wire", () => {
       "createFixtureFetch",
     ).mockReturnValue(
       Object.assign(
-        (_input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
+        (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
+          const url = input instanceof Request ? input.url : String(input);
+          expect(new URL(url).pathname).toBe("/api/v1/chat/completions");
           bodies.push(typeof init?.body === "string" ? init.body : "");
           return Promise.resolve(
             Response.json({
@@ -69,7 +72,9 @@ describe("public API prompt caching on the provider wire", () => {
       ),
     );
     const marker = { type: "ephemeral", ttl: "1h" } as const;
+    const originalKey = agentEnv.OPENROUTER_API_KEY;
     try {
+      agentEnv.OPENROUTER_API_KEY = "fixture-only";
       for (const mode of ["blocks", "automatic", "top-level"]) {
         const useCache = mode === "blocks";
         const hint = useCache ? { cache_control: marker } : {};
@@ -166,6 +171,7 @@ describe("public API prompt caching on the provider wire", () => {
       });
       expect(bodies[1]).not.toContain('"cache_control"');
     } finally {
+      agentEnv.OPENROUTER_API_KEY = originalKey;
       transport.mockRestore();
     }
   });

@@ -40,15 +40,15 @@ import {
   GUEST_POOLS_PER_SUBNET_PER_DAY,
 } from "./config";
 import { antiFarmingEvents, freePoolClaims } from "./db";
-import { signupCarryoverGrantKey } from "./quota";
 import { ipPoolKey, ipSubnetKey } from "./ip";
+import { signupCarryoverGrantKey } from "./quota";
 
 const logger = createEndpointLogger(false, defaultLocale);
 const { t } = scopedTranslation.scopedT(defaultLocale);
 const { guest } = FREE_CREDIT_ALLOWANCE;
 const accountBase =
   FREE_CREDIT_ALLOWANCE.guest + FREE_CREDIT_ALLOWANCE.signedIn;
-// Signups send real emails over SMTP; well past bun's 5s default
+// Some scenarios create several accounts in a single test.
 const TIMEOUT_MS = 60_000;
 
 const createdLeadIds: string[] = [];
@@ -132,7 +132,7 @@ async function account(
   // (older accounts are grandfathered, see the cutoff case below)
   await db
     .update(users)
-    .set({ createdAt: postCutoff() })
+    .set({ createdAt: postCutoff(), emailVerified: verified })
     .where(eq(users.id, user.id));
   if (ip) {
     const linked = await db
@@ -149,13 +149,49 @@ async function account(
         ),
       );
   }
-  if (verified) {
-    await db
-      .update(users)
-      .set({ emailVerified: true })
-      .where(eq(users.id, user.id));
-  }
   return user;
+}
+
+async function carryRow(
+  userId: string,
+): Promise<{ amount: number; balanceAfter: number } | undefined> {
+  const [row] = await db
+    .select({
+      amount: creditTransactions.amount,
+      balanceAfter: creditTransactions.balanceAfter,
+    })
+    .from(creditTransactions)
+    .where(
+      sql`${creditTransactions.metadata}->>'grantKey' = ${signupCarryoverGrantKey(userId)}`,
+    );
+  return row;
+}
+
+/** Move the account to before the cutoff (no subnet budget for it) */
+async function preCutoff(userId: string): Promise<void> {
+  await db
+    .update(users)
+    .set({
+      createdAt: new Date(FREE_POOL_CLAIMS_START.getTime() - 86_400_000),
+    })
+    .where(eq(users.id, userId));
+}
+
+async function poolLeadWalletIds(userId: string): Promise<string[]> {
+  const linked = await db
+    .select({ leadId: userLeadLinks.leadId })
+    .from(userLeadLinks)
+    .where(eq(userLeadLinks.userId, userId));
+  const wallets = await db
+    .select({ id: creditWallets.id })
+    .from(creditWallets)
+    .where(
+      inArray(
+        creditWallets.leadId,
+        linked.map((l) => l.leadId),
+      ),
+    );
+  return wallets.map((w) => w.id);
 }
 
 let savedCapSpend: { id: string; spendToday: number } | undefined;
@@ -308,21 +344,6 @@ describe("accounts", () => {
     "chained signups from one browser: each guest spend counts once, carryovers never compound",
     async () => {
       const ip = `${freshNet()}.21`;
-      const carryRow = async (
-        userId: string,
-      ): Promise<{ amount: number; balanceAfter: number } | undefined> => {
-        const [row] = await db
-          .select({
-            amount: creditTransactions.amount,
-            balanceAfter: creditTransactions.balanceAfter,
-          })
-          .from(creditTransactions)
-          .where(
-            sql`${creditTransactions.metadata}->>'grantKey' = ${signupCarryoverGrantKey(userId)}`,
-          );
-        return row;
-      };
-
       const guestA = await visit(ip, "sweep-a");
       await spend(guestUser(guestA), 7);
       const first = await account("chain-1", ip);
@@ -445,33 +466,6 @@ describe("accounts", () => {
 });
 
 describe("grandfathered accounts", () => {
-  /** Move the account to before the cutoff (no subnet budget for it) */
-  async function preCutoff(userId: string): Promise<void> {
-    await db
-      .update(users)
-      .set({
-        createdAt: new Date(FREE_POOL_CLAIMS_START.getTime() - 86_400_000),
-      })
-      .where(eq(users.id, userId));
-  }
-
-  async function poolLeadWalletIds(userId: string): Promise<string[]> {
-    const linked = await db
-      .select({ leadId: userLeadLinks.leadId })
-      .from(userLeadLinks)
-      .where(eq(userLeadLinks.userId, userId));
-    const wallets = await db
-      .select({ id: creditWallets.id })
-      .from(creditWallets)
-      .where(
-        inArray(
-          creditWallets.leadId,
-          linked.map((l) => l.leadId),
-        ),
-      );
-    return wallets.map((w) => w.id);
-  }
-
   it(
     "created before the cutoff, unverified, no account tier this period: guest share + verify prompt",
     async () => {

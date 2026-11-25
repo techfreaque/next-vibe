@@ -45,6 +45,7 @@ import { scopedTranslation } from "./i18n";
 import { V1ModelsRepository } from "./models/repository";
 import type { InferenceRequest, InferenceRunner } from "./shared/inference";
 import { listUserChatModels } from "./shared/models";
+import { mockV1Providers } from "./test-providers";
 
 const logger = createEndpointLogger(false, defaultLocale);
 const { t } = scopedTranslation.scopedT(defaultLocale);
@@ -70,14 +71,18 @@ const fakeRunner: InferenceRunner = {
   },
 };
 
-function v1Request(path: string, bearer: string | undefined, body?: object): Request {
+function v1Request(
+  path: string,
+  bearer: string | undefined,
+  body?: string,
+): Request {
   return new Request(`http://localhost/api/en-US/v1${path}`, {
     method: body ? "POST" : "GET",
     headers: {
       ...(bearer ? { Authorization: `Bearer ${bearer}` } : {}),
       "Content-Type": "application/json",
     },
-    ...(body ? { body: JSON.stringify(body) } : {}),
+    body,
   });
 }
 
@@ -114,7 +119,7 @@ async function completionsCall(
   body: Partial<V1ChatCompletionsPostRequestOutput> & { model: string },
   runner: InferenceRunner = fakeRunner,
 ): Promise<Response> {
-  const request = v1Request("/chat/completions", bearer, body);
+  const request = v1Request("/chat/completions", bearer, JSON.stringify(body));
   const user = (await authed(request)) ?? ApiKeyAuthAnonymous();
   const out = await V1ChatCompletionsRepository.complete({
     data: {
@@ -150,8 +155,10 @@ describe("OpenAI-compatible API", () => {
   let toolModelId = "";
   let uncensoredModelId = "";
   let free: E2ECreditUser;
+  let restoreProviders: (() => void) | undefined;
 
   beforeAll(async () => {
+    restoreProviders = mockV1Providers({ uncensoredAI: true });
     alice = await createE2ECreditUser("v1-api-alice", 500);
     bob = await createE2ECreditUser("v1-api-bob", 500);
     const models = listUserChatModels(alice.user, await getEnvAvailability());
@@ -162,16 +169,19 @@ describe("OpenAI-compatible API", () => {
     uncensoredModelId =
       models.find((m) => isUncensoredContent(m.content))?.id ?? "";
     free = await createE2ECreditUser("v1-api-free", 0);
-  });
+  }, 60_000);
 
   afterAll(async () => {
-    await alice.remove();
-    await bob.remove();
-    await free.remove();
-  });
+    restoreProviders?.();
+    await alice?.remove();
+    await bob?.remove();
+    await free?.remove();
+  }, 60_000);
 
   it("a model is servable in this environment", () => {
     expect(modelId).not.toBe("");
+    expect(toolModelId).not.toBe("");
+    expect(uncensoredModelId).not.toBe("");
   });
 
   describe("key lifecycle", () => {
@@ -299,9 +309,12 @@ describe("OpenAI-compatible API", () => {
     it("503 + Retry-After (never 401) when the key lookup fails", async () => {
       const { key } = await createKey(alice.user, "lookup-timeout");
       const request = v1Request("/models", key);
-      const timedOut = (): Promise<undefined> =>
-        Promise.reject(new Error("timeout exceeded when trying to connect"));
-      const auth = await ApiKeyAuth.authenticateRequest(request, defaultLocale, logger, timedOut);
+      const auth = await ApiKeyAuth.authenticateRequest(
+        request,
+        defaultLocale,
+        logger,
+        () => Promise.reject(new Error("timeout exceeded when trying to connect")),
+      );
       expect(auth?.success && auth.data.isPublic).toBe(true);
       const out = await V1ModelsRepository.list(ApiKeyAuthAnonymous(), request, defaultLocale, t, logger);
       expect(out.response.status).toBe(503);
@@ -623,10 +636,6 @@ describe("OpenAI-compatible API", () => {
   });
   describe("uncensored-model consent", () => {
     it("403 uncensored_consent_required until the account consents, then 200", async () => {
-      if (!uncensoredModelId) {
-        // No uncensored provider key in this environment.
-        return;
-      }
       const { key } = await createKey(alice.user, "uncensored-consent");
       const refused = await completionsCall(key, { model: uncensoredModelId });
       expect(refused.status).toBe(403);

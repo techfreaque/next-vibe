@@ -53,7 +53,7 @@ describe("guest lead database deadline (local Postgres)", () => {
       expect(pool.idleCount).toBe(1);
       expect(pool.waitingCount).toBe(0);
     } finally {
-      if (!fixtureReleased) held.release();
+      if (!fixtureReleased) {held.release();}
       await pool.end();
     }
   });
@@ -121,6 +121,7 @@ describe("guest lead database deadline (local Postgres)", () => {
         },
       );
       expect(result?.lock).toBeGreaterThan(0);
+      expect(result?.lock).toBeLessThan(result?.statement ?? 0);
       expect(result?.statement).toBeLessThanOrEqual(1500);
       expect(
         (await observer.query(`SELECT id FROM ${table} WHERE id=1`)).rowCount,
@@ -138,8 +139,11 @@ describe("guest lead database deadline (local Postgres)", () => {
       await blocker.query(`INSERT INTO ${table} VALUES (2)`);
       const start = performance.now();
       await expect(
-        withLeadDatabaseDeadline(pool, start + 300, async (db) => {
+        withLeadDatabaseDeadline(pool, start + 1500, async (db) => {
           await db.execute(sql`INSERT INTO ${relation} VALUES (3)`);
+          // Give PostgreSQL a distinct deadline for this lock, so slow setup
+          // or an earlier write cannot race its error against the client timer.
+          await db.execute(sql`SET LOCAL lock_timeout = '50ms'`);
           await db.execute(sql`INSERT INTO ${relation} VALUES (2)`);
         }),
       ).rejects.toMatchObject({ cause: { code: "55P03" } });
@@ -182,7 +186,7 @@ describe("guest lead database deadline (local Postgres)", () => {
       sockets.add(upstream);
       downstream.pipe(upstream);
       upstream.on("data", (data: Buffer) => {
-        if (!dropReplies) downstream.write(data);
+        if (!dropReplies) {downstream.write(data);}
       });
       const close = (): void => {
         downstream.destroy();
@@ -230,9 +234,13 @@ describe("guest lead database deadline (local Postgres)", () => {
       ).toBe(0);
       expect(pool.idleCount).toBe(1);
     } finally {
-      for (const socket of sockets) socket.destroy();
+      for (const socket of sockets) {
+        socket.destroy();
+      }
       await pool.end();
-      await new Promise<void>((resolve) => proxy.close(() => resolve()));
+      await new Promise<void>((resolve) => {
+        proxy.close(() => resolve());
+      });
     }
   });
 });

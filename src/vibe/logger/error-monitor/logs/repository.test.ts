@@ -3,27 +3,30 @@ import { afterAll, beforeAll, expect, it, mock } from "bun:test";
 import { drizzle } from "drizzle-orm/pglite";
 
 import { defaultLocale } from "../../../core/i18n/core/config";
+import { AnalyticsRange } from "../../../unified-ui/analytics/enum";
 import { createEndpointLogger } from "../../server";
+import type { recordErrorLogDaily as RecordErrorLogDaily } from "../daily";
 import { errorLogs } from "../db";
 import { GET } from "./definition";
-import { AnalyticsRange } from "../../../unified-ui/analytics/enum";
 import {
   ErrorLogSourceFilter,
   ErrorLogStatusFilter,
   ErrorLogTrendSplit,
 } from "./enum";
 import { scopedTranslation } from "./i18n";
+import type { ErrorLogsRepository as ErrorLogsRepositoryType } from "./repository";
 
 const pg = new PGlite();
 const db = drizzle(pg);
 mock.module("../../../database", () => ({ db }));
 
-let ErrorLogsRepository: typeof import("./repository").ErrorLogsRepository;
-let recordErrorLogDaily: typeof import("../daily").recordErrorLogDaily;
+let ErrorLogsRepository: typeof ErrorLogsRepositoryType;
+let recordErrorLogDaily: typeof RecordErrorLogDaily;
 const { t } = scopedTranslation.scopedT(defaultLocale);
 const logger = createEndpointLogger(false, defaultLocale);
 const firstId = "8b6fa4b2-174a-438c-a664-478e9688c458";
-const lastSeen = new Date("2026-11-19T08:12:00.000Z");
+const lastSeen = new Date("2026-11-24T08:12:00.000Z");
+const clientFirstSeen = new Date("2026-11-23T08:00:00.000Z");
 
 beforeAll(async () => {
   ({ ErrorLogsRepository } = await import("./repository"));
@@ -56,6 +59,7 @@ beforeAll(async () => {
       id: firstId,
       message: "Could not read job settings",
       fingerprint: "6f7c1b82d9e1",
+      firstSeen: new Date("2026-11-19T08:00:00.000Z"),
       createdAt: lastSeen,
     },
     {
@@ -63,7 +67,7 @@ beforeAll(async () => {
       fingerprint: "aaaaaaaaaaaa",
       metadata: [{ route: "/en-US/threads/private/new" }],
       createdAt: lastSeen,
-      firstSeen: new Date("2026-11-10T08:00:00.000Z"),
+      firstSeen: clientFirstSeen,
     },
     {
       message: "Settings key job_% does not exist",
@@ -141,11 +145,18 @@ it("records daily occurrences with distinct users and charts them", async () => 
   const userA = "11111111-1111-4111-8111-111111111111";
   const userB = "22222222-2222-4222-8222-222222222222";
   const lead = "33333333-3333-4333-8333-333333333333";
+  // The backfilled lifetime total predates daily counting and stays excluded.
+  await recordErrorLogDaily({
+    fingerprint: "6f7c1b82d9e1",
+    occurrences: 100,
+    metadata: [],
+    at: new Date("2026-11-21T09:00:00.000Z"),
+  });
   await recordErrorLogDaily({
     fingerprint: "aaaaaaaaaaaa",
     occurrences: 2,
     metadata: [{ userId: userA, leadId: lead }],
-    at: new Date("2026-11-10T09:00:00.000Z"),
+    at: clientFirstSeen,
   });
   await recordErrorLogDaily({
     fingerprint: "aaaaaaaaaaaa",
@@ -184,7 +195,7 @@ it("records daily occurrences with distinct users and charts them", async () => 
     trend.series
       .find((s) => s.key === key)
       ?.values.reduce((a, b) => a + b, 0) ?? 0;
-  // "aaaa" first seen 11-10: its 2 hits that day are new, 3 later recurring
+  // The first two client hits are new, and the later hits are recurring.
   expect(total("new")).toBe(2);
   expect(total("recurring")).toBe(3 + 4);
   // ordered by hits in period
