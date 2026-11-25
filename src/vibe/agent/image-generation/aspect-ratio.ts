@@ -47,13 +47,14 @@ function ratioDistance(a: number, b: number): number {
 /** ModelsLab v6 image requests accept 256–1024 pixels in multiples of eight. */
 export function modelsLabImageDimensions(
   aspectRatio: string | undefined,
+  minSide = 256,
 ): { width: number; height: number } | undefined {
   const ratio = aspectRatio ? parseAspectRatio(aspectRatio) : null;
   if (ratio === null) {
     return undefined;
   }
   const shortSide = Math.max(
-    256,
+    minSide,
     Math.round(128 * Math.min(ratio, 1 / ratio)) * 8,
   );
   return ratio >= 1

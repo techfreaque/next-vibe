@@ -1813,8 +1813,8 @@ const llmImageGenModelOptions: ImageGenModelOption[] = (
         {
           id: ImageGenModelId.GEMINI_3_1_FLASH_IMAGE_PREVIEW,
           apiProvider: ApiProvider.MODELSLAB,
-          providerModel: "nano-banana",
-          creditCostPerImage: 4.6, // updated: 2026-04-04 from modelslab.com
+          providerModel: "gemini-3.1-t2i",
+          creditCostPerImage: 10, // updated: 2026-11-25 from modelslab.com
           supportedSizes: [],
           supportedQualities: [],
         } satisfies ModelProviderConfigImageBased,

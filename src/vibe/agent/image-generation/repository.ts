@@ -606,6 +606,7 @@ export class ImageGenerationRepository {
         logger,
         tCredits,
         { modelId: imageModel.id, apiProvider: imageModel.apiProvider },
+        generationResult.data.upstreamCostUsd,
       );
       if (!deductResult.success) {
         return deductResult;

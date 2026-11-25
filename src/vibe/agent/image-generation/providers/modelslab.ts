@@ -11,25 +11,94 @@ import {
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { Environment } from "next-vibe/env/env-util";
 import type { EndpointLogger } from "next-vibe/logger/types";
+import { z } from "zod";
 
 import { agentEnv } from "../../env";
 import { pollDelay } from "../../shared/poll-delay";
-import { modelsLabImageDimensions } from "../aspect-ratio";
+import { modelsLabImageDimensions, snapAspectRatio } from "../aspect-ratio";
 import { scopedTranslation } from "../i18n";
 
-interface ModelsLabImageResponse {
-  status: "success" | "processing" | "error";
-  id?: number;
-  output?: string[];
-  proxy_links?: string[];
-  fetch_result?: string;
-  eta?: number;
-  generationTime?: number;
-  message?: string;
+const modelsLabImageResponse = z.object({
+  status: z.string(),
+  id: z.union([z.number(), z.string()]).nullish(),
+  output: z
+    .union([
+      z.array(z.string()),
+      z.string().transform((url) => (url ? [url] : [])),
+    ])
+    .nullish(),
+  proxy_links: z.union([z.array(z.string()), z.string()]).nullish(),
+  generationTime: z.number().nullish(),
+  message: z.string().nullish().catch(null),
+  code: z.string().nullish(),
+  meta: z
+    .object({
+      model_id: z.string().nullish(),
+      width: z.union([z.number(), z.string()]).nullish(),
+      height: z.union([z.number(), z.string()]).nullish(),
+    })
+    .nullish()
+    .catch(null),
+});
+
+type ModelsLabImageResponse = z.infer<typeof modelsLabImageResponse>;
+
+interface ModelsLabImageModel {
+  text: string;
+  edit?: string;
+  size?: "pixels" | "ratio";
+  version?: "v6";
+  resolution?: "1K";
+  editRatios?: readonly string[];
 }
 
+const MODELSLAB_IMAGE_API = "https://modelslab.com/api";
+// The model catalog's per-model API examples specify each route and payload.
+// V6 remains the documented route for the Z Image and Flux 1.1 models.
+export const MODELSLAB_IMAGE_MODELS: ReadonlyMap<string, ModelsLabImageModel> =
+  new Map([
+    ["flux-pro-1.1", { text: "flux-pro-1.1", version: "v6", size: "pixels" }],
+    [
+      "flux-pro-1.1-ultra",
+      { text: "flux-pro-1.1-ultra", version: "v6", size: "pixels" },
+    ],
+    ["z-image-base", { text: "z-image-base", version: "v6", size: "pixels" }],
+    ["z-image-turbo", { text: "z-image-turbo", version: "v6", size: "pixels" }],
+    ["flux-2-max", { text: "flux-2-max", edit: "flux-2-max", size: "pixels" }],
+    ["flux-2-pro", { text: "flux-2-pro", edit: "flux-2-pro", size: "pixels" }],
+    [
+      "seedream-4.5",
+      {
+        text: "seedream-4.5",
+        edit: "seedream-4.5-i2i",
+        size: "ratio",
+        editRatios: ["1:1", "4:3", "16:9", "9:16", "3:2", "2:3", "21:9"],
+      },
+    ],
+    ["gen4_image", { text: "gen4_image", size: "ratio" }],
+    ["wan-2.7-t2i", { text: "wan-2.7-t2i" }],
+    [
+      "gemini-3.1-t2i",
+      {
+        text: "gemini-3.1-t2i",
+        edit: "gemini-3.1-i2i",
+        size: "ratio",
+        resolution: "1K",
+      },
+    ],
+    [
+      "nano-banana-pro",
+      {
+        text: "nano-banana-pro",
+        edit: "nano-banana-pro",
+        size: "ratio",
+        resolution: "1K",
+      },
+    ],
+  ]);
+
 const POLL_INTERVAL_MS = coreEnv.NODE_ENV === Environment.TEST ? 50 : 3000;
-const MAX_POLL_ATTEMPTS = 20;
+const MAX_POLL_ATTEMPTS = 40;
 
 export async function generateImageWithModelsLab(params: {
   providerModel: string;
@@ -54,37 +123,131 @@ export async function generateImageWithModelsLab(params: {
   } = params;
   const { t } = scopedTranslation.scopedT(locale);
 
-  if (!agentEnv.MODELSLAB_API_KEY) {
+  const key = agentEnv.MODELSLAB_API_KEY;
+  if (!key) {
     return fail({
       message: t("post.errors.apiKeyNotConfigured"),
       errorType: ErrorResponseTypes.BAD_REQUEST,
     });
   }
 
+  const spec = MODELSLAB_IMAGE_MODELS.get(providerModel);
+  if (!spec) {
+    logger.error("[ModelsLab Image] No API route configured", {
+      providerModel,
+    });
+    return fail({
+      message: t("post.errors.generationFailed"),
+      errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+    });
+  }
+  const modelId = inputMediaUrl ? spec.edit : spec.text;
+  if (!modelId) {
+    return fail({
+      message: t("post.errors.modelNoReferenceImage", { model: providerModel }),
+      errorType: ErrorResponseTypes.BAD_REQUEST,
+    });
+  }
+
+  const apiBase = `${MODELSLAB_IMAGE_API}/${spec.version ?? "v7"}/images`;
+  const endpoint = `${apiBase}/${spec.version === "v6" ? "text2img" : inputMediaUrl ? "image-to-image" : "text-to-image"}`;
+  const ratio = inputMediaUrl
+    ? snapAspectRatio(aspectRatio ?? "1:1", spec.editRatios)
+    : (aspectRatio ?? "1:1");
+  const dimensions = modelsLabImageDimensions(ratio, 512) ?? {
+    width: 1024,
+    height: 1024,
+  };
+  const startedAt = performance.now();
+
   logger.debug("[ModelsLab Image] Submitting generation request", {
     providerModel,
+    modelId,
+    endpoint,
     promptLength: prompt.length,
   });
 
+  const completed = (
+    response: ModelsLabImageResponse,
+  ): ResponseType<{ imageUrl: string }> => {
+    const reportedModel = response.meta?.model_id;
+    if (reportedModel && reportedModel !== modelId) {
+      logger.warn("[ModelsLab Image] Provider reported a different model", {
+        requestedModel: modelId,
+        reportedModel,
+      });
+      return fail({
+        message: t("post.errors.generationFailed"),
+        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+      });
+    }
+    const proxy = response.proxy_links;
+    const proxyUrl = typeof proxy === "string" ? proxy : proxy?.[0];
+    const imageUrl = proxyUrl || response.output?.[0];
+    if (!imageUrl) {
+      return fail({
+        message: t("post.errors.noImageUrl"),
+        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+      });
+    }
+    logger.debug("[ModelsLab Image] Image generated successfully", {
+      requestedModel: modelId,
+      reportedModel: reportedModel ?? null,
+      generationTime: response.generationTime ?? null,
+      width: response.meta?.width ?? null,
+      height: response.meta?.height ?? null,
+      latencyMs: Math.round(performance.now() - startedAt),
+    });
+    return success({ imageUrl });
+  };
+
   try {
-    // Use img2img endpoint when a reference image is provided
-    const endpoint = inputMediaUrl
-      ? "https://modelslab.com/api/v6/images/img2img"
-      : "https://modelslab.com/api/v6/images/text2img";
+    let referenceUrl = inputMediaUrl;
+    if (referenceUrl?.startsWith("data:")) {
+      // V7 validates each init_image entry as a URL. Stage browser uploads
+      // and private attachment bytes with ModelsLab's temporary upload API.
+      const uploadResponse = await fetchImpl(
+        `${MODELSLAB_IMAGE_API}/v6/base64_to_url`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ key, base64_string: referenceUrl }),
+          signal,
+        },
+      );
+      const uploaded = uploadResponse.ok
+        ? modelsLabImageResponse.safeParse(await uploadResponse.json())
+        : undefined;
+      const url =
+        uploaded?.success && uploaded.data.status === "success"
+          ? uploaded.data.output?.[0]
+          : undefined;
+      if (!url || !/^https?:\/\//.test(url)) {
+        logger.warn("[ModelsLab Image] Reference upload failed", {
+          status: uploadResponse.status,
+        });
+        return fail({
+          message: t("post.errors.referenceUnavailable"),
+          errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+        });
+      }
+      referenceUrl = url;
+    }
 
     const submitResponse = await fetchImpl(endpoint, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        key: agentEnv.MODELSLAB_API_KEY,
-        // eslint-disable-next-line i18next/no-literal-string
-        model_id: providerModel,
+        key,
+        model_id: modelId,
         prompt,
-        num_inference_steps: 30,
-        samples: 1,
-        ...(aspectRatio ? { aspect_ratio: aspectRatio } : {}),
-        ...modelsLabImageDimensions(aspectRatio),
-        ...(inputMediaUrl ? { init_image: inputMediaUrl } : {}),
+        ...(spec.version === "v6"
+          ? { num_inference_steps: 30, samples: 1 }
+          : {}),
+        ...(spec.size === "pixels" ? dimensions : {}),
+        ...(spec.size === "ratio" ? { aspect_ratio: ratio } : {}),
+        ...(spec.resolution ? { resolution: spec.resolution } : {}),
+        ...(referenceUrl ? { init_image: [referenceUrl] } : {}),
       }),
       signal,
     });
@@ -101,21 +264,19 @@ export async function generateImageWithModelsLab(params: {
       });
     }
 
-    const result = (await submitResponse.json()) as ModelsLabImageResponse;
+    const result = modelsLabImageResponse.parse(await submitResponse.json());
 
-    // Immediate success
-    const immediateUrl = result.proxy_links?.[0] ?? result.output?.[0];
-    if (result.status === "success" && immediateUrl) {
-      logger.debug("[ModelsLab Image] Image generated immediately");
-      return success({ imageUrl: immediateUrl });
+    if (result.status === "success") {
+      return completed(result);
     }
 
-    // Async processing - poll fetch_result URL
-    if (result.status === "processing" && result.fetch_result) {
-      const fetchUrl = result.fetch_result;
+    if (
+      result.status === "processing" &&
+      (typeof result.id === "number" || result.id)
+    ) {
+      const fetchUrl = `${apiBase}/fetch/${encodeURIComponent(result.id)}`;
       logger.debug("[ModelsLab Image] Request queued, polling", {
-        fetchUrl,
-        eta: result.eta,
+        id: result.id,
       });
 
       let lastResponse: Response = submitResponse;
@@ -131,7 +292,8 @@ export async function generateImageWithModelsLab(params: {
         const pollResponse = await fetchImpl(fetchUrl, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ key: agentEnv.MODELSLAB_API_KEY }),
+          body: JSON.stringify({ key }),
+          signal,
         });
         lastResponse = pollResponse;
 
@@ -143,18 +305,19 @@ export async function generateImageWithModelsLab(params: {
           continue;
         }
 
-        const pollResult =
-          (await pollResponse.json()) as ModelsLabImageResponse;
+        const pollResult = modelsLabImageResponse.parse(
+          await pollResponse.json(),
+        );
 
-        const pollUrl = pollResult.proxy_links?.[0] ?? pollResult.output?.[0];
-        if (pollResult.status === "success" && pollUrl) {
-          logger.debug("[ModelsLab Image] Image generated successfully");
-          return success({ imageUrl: pollUrl });
+        if (pollResult.status === "success") {
+          return completed(pollResult);
         }
 
-        if (pollResult.status === "error") {
+        if (pollResult.status !== "processing") {
           logger.warn("[ModelsLab Image] Generation failed while polling", {
             providerModel,
+            status: pollResult.status,
+            code: pollResult.code ?? null,
             message: pollResult.message ?? null,
             attempt: attempt + 1,
           });
@@ -167,11 +330,6 @@ export async function generateImageWithModelsLab(params: {
             errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
           });
         }
-
-        logger.debug("[ModelsLab Image] Still processing", {
-          attempt: attempt + 1,
-          eta: pollResult.eta,
-        });
       }
 
       return fail({
@@ -183,16 +341,23 @@ export async function generateImageWithModelsLab(params: {
     // Error response
     logger.warn("[ModelsLab Image] Provider rejected the request", {
       providerModel,
-      status: result.status ?? null,
+      status: result.status,
+      code: result.code ?? null,
       message: result.message ?? null,
     });
     return fail({
-      message: t("post.errors.externalServiceError", {
-        message: result.message ?? "Unknown error",
-      }),
+      message: result.message
+        ? t("post.errors.externalServiceError", { message: result.message })
+        : t("post.errors.generationFailed"),
       errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
     });
   } catch (error) {
+    if (signal?.aborted) {
+      return fail({
+        message: t("post.errors.requestAborted"),
+        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+      });
+    }
     const errorMessage = parseError(error).message;
     logger.error("[ModelsLab Image] Request failed", { error: errorMessage });
     return fail({
