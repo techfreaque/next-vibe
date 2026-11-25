@@ -774,9 +774,10 @@ export const videoGenModelDefinitions: Record<
         id: VideoGenModelId.LTX_2_3_PRO_I2V,
         apiProvider: ApiProvider.MODELSLAB,
         providerModel: "ltx-2-3-pro-i2v",
-        creditCostPerSecond: 9.6, // updated: 2026-11-09 from modelslab.com
+        creditCostPerSecond: 9.6, // updated: 2026-11-09 from modelslab.com (FHD base; sent as 1920x1080 when no resolution is picked)
         supportedFrameImages: ["first_frame"], // updated: 2026-11-13 from modelslab.com
         supportedResolutions: ["2K", "4K"], // updated: 2026-04-04 from modelslab.com
+        pricingByResolution: { "2K": 19.2, "4K": 38.4 }, // 2026-11-25 from modelslab.com ($0.096 FHD / $0.192 2K / $0.384 4K per s)
         minDurationSeconds: 6, // updated: 2026-04-04 from modelslab.com
         maxDurationSeconds: 10, // updated: 2026-04-04 from modelslab.com
         supportedDurations: ["6", "8", "10"], // updated: 2026-04-04 from modelslab.com
@@ -792,6 +793,7 @@ export const videoGenModelDefinitions: Record<
         maxDurationSeconds: 10,
         supportedDurations: ["6", "8", "10"],
         supportedResolutions: ["2K", "4K"],
+        pricingByResolution: { "2K": 24.96, "4K": 49.92 },
       },
     ],
     utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],

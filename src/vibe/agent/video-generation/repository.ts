@@ -56,6 +56,7 @@ import {
   videoGenModelOptions,
   type VideoGenModelSelection,
 } from "./models";
+import { billableVideoSeconds, readMp4DurationSeconds } from "./mp4-duration";
 import { generateVideoWithModelsLab } from "./providers/modelslab";
 import { generateVideoWithOpenRouter } from "./providers/openrouter";
 import { generateVideoWithUnbottled } from "./providers/unbottled";
@@ -452,11 +453,11 @@ export class VideoGenerationRepository {
 
     await onProgress?.("saving");
     const generated = generationResult.data;
-    const finalDurationSeconds = generated.durationSeconds ?? durationSeconds;
+    let finalDurationSeconds = generated.durationSeconds ?? durationSeconds;
     // Remote instance: what it charged (never marked up twice). Otherwise the
     // provider's real cost x markup when reported (OpenRouter usage.cost),
     // else the priced estimate.
-    const finalCreditCost =
+    let finalCreditCost =
       generated.creditCost ??
       chargeMediaGeneration({
         upstreamCostUsd: generated.upstreamCostUsd,
@@ -480,6 +481,8 @@ export class VideoGenerationRepository {
       : user.isPublic;
     // Provider URL fallback for a failed upload; byte results have none.
     let videoUrl: string | undefined = generated.videoUrl;
+    // Measured clip length (mp4 mvhd) of what was actually delivered.
+    let measuredSeconds: number | undefined;
     try {
       const storage = getStorageAdapter();
       let videoBuffer: Buffer;
@@ -504,6 +507,8 @@ export class VideoGenerationRepository {
         videoBuffer = Buffer.from(new Uint8Array(arrayBuf));
         ext = generated.videoUrl.includes("webm") ? "webm" : "mp4";
       }
+      measuredSeconds =
+        ext === "mp4" ? readMp4DurationSeconds(videoBuffer) : undefined;
       const uploadResult = await storage.uploadFile(videoBuffer, {
         filename: `generated-video-${Date.now()}.${ext}`,
         mimeType: `video/${ext}`,
@@ -529,6 +534,31 @@ export class VideoGenerationRepository {
         message: t("post.errors.storageFailed"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
+    }
+
+    // Never bill seconds that were not delivered: a clip measurably shorter
+    // than requested is billed at its real length (logged as an error so a
+    // provider param regression surfaces in the error log).
+    const billableSeconds = billableVideoSeconds(
+      finalDurationSeconds,
+      measuredSeconds,
+    );
+    if (billableSeconds < finalDurationSeconds) {
+      logger.error("[VideoGen] Delivered clip shorter than requested", {
+        model: videoModel.id,
+        provider: videoModel.apiProvider,
+        providerModel: videoModel.providerModel,
+        requestedSeconds: finalDurationSeconds,
+        measuredSeconds,
+        listedCredits: finalCreditCost,
+      });
+      if (videoModel.apiProvider !== ApiProvider.UNBOTTLED) {
+        finalCreditCost = Math.min(
+          finalCreditCost,
+          videoClipCredits(videoModel, billableSeconds, data.resolution),
+        );
+      }
+      finalDurationSeconds = billableSeconds;
     }
 
     if (videoModel.apiProvider !== ApiProvider.UNBOTTLED) {
