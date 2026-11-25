@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   title: "Abliterierte KI-Modelle: LLMs ohne Zensur online testen",
   metaTitle: "Abliterierte KI-Modelle ohne Zensur online testen | {{appName}}",
   description:
-    "Abliterierte LLMs ohne Verweigerung direkt im Browser testen, ohne GPU und ohne Anmeldung. Kontextfenster und Kosten vergleichen, gegen das Originalmodell antreten lassen.",
+    "Abliterierte LLMs ohne Verweigerung im Browser testen, ohne GPU und ohne Anmeldung. Kontext und Kosten vergleichen, gegen das Originalmodell antreten lassen.",
   keywords:
     "abliterierte KI, abliterierte Modelle, LLM ohne Zensur, KI-Modell ohne Filter, unzensiertes LLM, Abliteration, Open-Source-KI ohne Zensur",
   intro:
@@ -44,8 +44,21 @@ export const translations: typeof enTranslations = {
       q: "Kann ein abliteriertes Modell eine Anfrage noch ablehnen?",
       a: "Ja. Abliteration soll Ablehnungen seltener machen. Ob das gelingt, hängt vom Modell und von deiner Anfrage ab. Auch der Anbieter kann eigene Grenzen setzen.",
     },
+    gpu: {
+      q: "Brauche ich eine GPU für abliterierte Modelle?",
+      a: "Nein. Die Modelle hier laufen bei gehosteten Anbietern, du chattest im Browser auf jedem Gerät, auch am Handy. Wer abliterierte Gewichte selbst betreibt, braucht eine GPU mit genug Speicher für das ganze Modell.",
+    },
+    quality: {
+      q: "Macht Abliteration ein Modell schlechter?",
+      a: "Manchmal, leicht. Wer das Ablehnungsmuster entfernt, kann etwas Genauigkeit oder Befolgung von Anweisungen verlieren. Schick denselben Prompt an den abliterierten Build und an das Originalmodell und entscheide für deine Aufgabe.",
+    },
+    api: {
+      q: "Kann ich abliterierte Modelle per API nutzen?",
+      a: "Ja. Dieselben Modelle gibt es über eine OpenAI- und Anthropic-kompatible API, dein bestehendes SDK funktioniert also. API-Schlüssel brauchen einen bezahlten Plan. Gratis- und Bonus-Credits schalten sie nicht frei.",
+    },
   },
   guides: "Mehr über unzensierte KI",
+  apiGuide: "Unzensierte LLM-API: Modell-IDs, Preise und Code",
   allModels: "Alle unzensierten Chatmodelle ansehen",
   breadcrumb: "Abliterierte KI",
   guidesTitle: "Ratgeber zur Abliteration",

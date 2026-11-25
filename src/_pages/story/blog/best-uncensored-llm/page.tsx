@@ -42,7 +42,10 @@ import {
   ArticleSection,
 } from "../../_shared/article";
 import { Callout, CardLink, Cta } from "../../_shared/marketing";
-import { LINK_CLASS } from "../../compare/_shared/compare-ui";
+import {
+  CompareInlineLinks,
+  LINK_CLASS,
+} from "../../compare/_shared/compare-ui";
 import type { UsParams } from "../../compare/_shared/us-facts";
 import {
   type ComparePair,
@@ -448,6 +451,11 @@ export function TanstackPage({
             <CardLink
               href={`/${locale}/story/compare/uncensored-ai-platforms`}
               label={t("faq.platformsLink")}
+            />
+            <CompareInlineLinks
+              locale={locale}
+              versus={["venice", "nanoGpt", "uncensoredAi"]}
+              includeHub={false}
             />
           </Div>
         </ArticleSection>

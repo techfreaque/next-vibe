@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "DeepSeek non censuré : DeepSeek abliterated en ligne | {{appName}}",
     description:
-      "Où se cache vraiment la censure de DeepSeek, pourquoi changer d'hébergeur ne règle que la moitié du problème, et les versions non censurées de DeepSeek à utiliser dans le navigateur. Prix en direct, sans GPU, sans compte.",
+      "Où se cache la censure de DeepSeek, pourquoi un autre hébergeur ne règle que la moitié, et les versions non censurées à tester en ligne. Sans GPU, sans compte.",
     category: "Guide des modèles",
     imageAlt:
       "DeepSeek non censuré : DeepSeek d'origine à côté de ses versions abliterated",

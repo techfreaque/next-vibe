@@ -1,9 +1,8 @@
 export const translations = {
   meta: {
-    title:
-      "Uncensored AI Writer for Fiction: Dark Scenes, Long Drafts | {{appName}}",
+    title: "Uncensored AI Writer: Dark Fiction, Long Drafts | {{appName}}",
     description:
-      "An uncensored AI writer for novels, dark fiction and adult scenes. Which models write without softening, how many manuscript pages each one holds, and what a scene costs.",
+      "An uncensored AI writer for novels, dark fiction and adult scenes. Which models write without softening, how many pages each one holds, what a scene costs.",
     category: "Writing Guide",
     imageAlt: "An uncensored AI writer drafting a dark fiction scene",
     keywords:

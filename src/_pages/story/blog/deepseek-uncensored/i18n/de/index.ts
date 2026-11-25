@@ -2,10 +2,9 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title:
-      "DeepSeek unzensiert: Abliteriertes DeepSeek online nutzen | {{appName}}",
+    title: "DeepSeek unzensiert: abliteriertes DeepSeek online | {{appName}}",
     description:
-      "Wo DeepSeeks Zensur wirklich sitzt, warum ein anderer Host nur die Hälfte löst und welche unzensierten DeepSeek-Builds du direkt im Browser nutzt. Live-Preise, keine GPU, kein Konto.",
+      "Wo DeepSeeks Zensur wirklich sitzt, warum ein anderer Host nur die Hälfte löst und welche unzensierten Builds du sofort im Browser nutzt. Ohne GPU, ohne Konto.",
     category: "Modell-Guide",
     imageAlt:
       "DeepSeek unzensiert: Standard-DeepSeek neben seinen abliterierten Builds",

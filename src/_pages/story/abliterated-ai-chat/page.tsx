@@ -28,6 +28,8 @@ import { buildBreadcrumbTrail } from "../_shared/breadcrumbs";
 import { CardLink, Cta, PageHero, PageSection } from "../_shared/marketing";
 import { GuideCardGrid } from "../blog/guide-links";
 import { HUB_GUIDES, TOPIC_HUB_PATHS } from "../blog/topics";
+import { CompareInlineLinks } from "../compare/_shared/compare-ui";
+import { COMPARE_HUB_PATH } from "../compare/_shared/platforms";
 import { scopedTranslation as uncensoredScopedTranslation } from "../uncensored-ai/i18n";
 import { scopedTranslation } from "./i18n";
 
@@ -136,6 +138,9 @@ export function TanstackPage({
       }),
     },
     { question: t("faq.refusals.q"), answer: t("faq.refusals.a") },
+    { question: t("faq.gpu.q"), answer: t("faq.gpu.a") },
+    { question: t("faq.quality.q"), answer: t("faq.quality.a") },
+    { question: t("faq.api.q"), answer: t("faq.api.a") },
   ];
 
   return (
@@ -258,12 +263,21 @@ export function TanstackPage({
             label={t("allModels")}
           />
           <CardLink
-            href={`/${locale}/story/compare/uncensored-ai-platforms`}
+            href={`/${locale}${COMPARE_HUB_PATH}`}
             label={uncensoredT("compare")}
+          />
+          <CompareInlineLinks
+            locale={locale}
+            versus={["venice", "nanoGpt", "openRouter", "uncensoredAi"]}
+            includeHub={false}
           />
           <CardLink
             href={`/${locale}/story/refusal-index`}
             label={uncensoredT("benchmark")}
+          />
+          <CardLink
+            href={`/${locale}/story/blog/uncensored-llm-api`}
+            label={t("apiGuide")}
           />
         </Div>
       </PageSection>

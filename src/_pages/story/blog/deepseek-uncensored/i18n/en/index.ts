@@ -1,9 +1,8 @@
 export const translations = {
   meta: {
-    title:
-      "DeepSeek Uncensored: Chat With Abliterated DeepSeek Online | {{appName}}",
+    title: "DeepSeek Uncensored: Abliterated DeepSeek Online | {{appName}}",
     description:
-      "Where DeepSeek's censorship really sits, why hosting it elsewhere only fixes half of it, and the uncensored DeepSeek builds you can chat with in the browser. Live prices, no GPU, no account.",
+      "Where DeepSeek's censorship really sits, why another host fixes only half of it, and the uncensored DeepSeek builds you can chat with now. No GPU, no account.",
     category: "Model Guide",
     imageAlt:
       "DeepSeek uncensored: stock DeepSeek next to its abliterated builds",

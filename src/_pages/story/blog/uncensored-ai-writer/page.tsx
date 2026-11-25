@@ -44,7 +44,10 @@ import {
   Step,
   StepList,
 } from "../../_shared/marketing";
-import { LINK_CLASS } from "../../compare/_shared/compare-ui";
+import {
+  CompareInlineLinks,
+  LINK_CLASS,
+} from "../../compare/_shared/compare-ui";
 import type { UsParams } from "../../compare/_shared/us-facts";
 import {
   type ComparePair,
@@ -428,6 +431,10 @@ export function TanstackPage({
             <CardLink
               href={`/${locale}/story/uncensored-ai`}
               label={t("faq.chatLink")}
+            />
+            <CompareInlineLinks
+              locale={locale}
+              versus={["janitorAi", "characterAi", "venice"]}
             />
           </Div>
         </ArticleSection>

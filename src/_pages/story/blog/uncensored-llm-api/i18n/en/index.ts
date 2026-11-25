@@ -1,9 +1,8 @@
 export const translations = {
   meta: {
-    title:
-      "Uncensored LLM API: Abliterated Models, OpenAI Format | {{appName}}",
+    title: "Uncensored LLM API: Abliterated Models, OpenAI SDK | {{appName}}",
     description:
-      "An uncensored LLM API for abliterated and uncensored models. OpenAI and Anthropic compatible, model ids, context and prices per model, a working curl and Python example, limits and privacy.",
+      "Uncensored and abliterated models behind one OpenAI and Anthropic compatible API. Model ids, context, price per model, curl and Python examples, limits.",
     category: "Developer Guide",
     imageAlt: "Uncensored LLM API with OpenAI-compatible endpoints",
     keywords:

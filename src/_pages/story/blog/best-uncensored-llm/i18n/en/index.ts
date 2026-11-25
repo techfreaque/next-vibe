@@ -1,9 +1,8 @@
 export const translations = {
   meta: {
-    title:
-      "Best Uncensored LLM (2026): Picked by Job, Priced Live | {{appName}}",
+    title: "Best Uncensored LLM 2026: Picked by Job | {{appName}}",
     description:
-      "The best uncensored LLM for reasoning, everyday chat, coding, dark fiction, contrary views and images. GLM 5.3 Uncensored vs DeepSeek V4.1 Flash Uncensored, with live context and prices.",
+      "The best uncensored LLM for reasoning, chat, coding, dark fiction and contrary views. GLM 5.3 Uncensored vs DeepSeek V4.1 Flash Uncensored, live prices.",
     category: "Model Guide",
     imageAlt: "The best uncensored LLMs, ranked by job",
     keywords:

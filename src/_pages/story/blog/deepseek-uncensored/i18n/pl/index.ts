@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "DeepSeek bez cenzury: abliterowany DeepSeek online | {{appName}}",
     description:
-      "Gdzie naprawdę siedzi cenzura DeepSeeka, dlaczego inny hosting rozwiązuje tylko połowę problemu i z którymi nieocenzurowanymi buildami DeepSeeka pogadasz w przeglądarce. Ceny na żywo, bez GPU, bez konta.",
+      "Gdzie naprawdę siedzi cenzura DeepSeeka, czemu inny hosting to tylko połowa rozwiązania i z którymi buildami bez cenzury pogadasz od razu. Bez GPU, bez konta.",
     category: "Przewodnik po modelach",
     imageAlt:
       "DeepSeek bez cenzury: zwykły DeepSeek obok abliterowanych buildów",

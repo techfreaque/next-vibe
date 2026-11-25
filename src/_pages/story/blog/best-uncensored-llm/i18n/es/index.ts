@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "Mejor LLM sin censura 2026: elegido por tarea | {{appName}}",
     description:
-      "El mejor LLM sin censura para razonar, el día a día, programar, ficción oscura, opiniones contrarias e imágenes. GLM 5.3 Uncensored contra DeepSeek V4.1 Flash Uncensored, con contexto y precios en directo.",
+      "El mejor LLM sin censura para razonar, programar, ficción oscura y opiniones contrarias. GLM 5.3 Uncensored frente a DeepSeek V4.1 Flash Uncensored.",
     category: "Guía de modelos",
     imageAlt: "Los mejores LLM sin censura, ordenados por tarea",
     keywords:

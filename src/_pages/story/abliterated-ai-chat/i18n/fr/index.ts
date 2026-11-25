@@ -44,8 +44,21 @@ export const translations: typeof enTranslations = {
       q: "Un modèle abliterated peut-il encore refuser une demande ?",
       a: "Oui. L’ablitération vise à réduire les refus. Le résultat dépend toujours du modèle et de votre demande. Le fournisseur peut aussi imposer ses propres limites.",
     },
+    gpu: {
+      q: "Faut-il un GPU pour utiliser des modèles abliterated ?",
+      a: "Non. Les modèles tournent chez des fournisseurs hébergés : vous discutez dans le navigateur sur n’importe quel appareil, téléphone compris. Faire tourner vous-même des poids abliterated demande un GPU avec assez de mémoire pour tout le modèle.",
+    },
+    quality: {
+      q: "L’ablitération rend-elle un modèle moins bon ?",
+      a: "Parfois, un peu. Retirer le mécanisme de refus peut coûter un peu de précision ou de respect des consignes. Envoyez le même prompt à la version abliterated et au modèle d’origine, puis jugez pour votre tâche.",
+    },
+    api: {
+      q: "Puis-je utiliser des modèles abliterated via une API ?",
+      a: "Oui. Les mêmes modèles sont disponibles via une API compatible OpenAI et Anthropic : votre SDK actuel fonctionne. Les clés API exigent un abonnement payant. Les crédits gratuits et bonus ne les débloquent pas.",
+    },
   },
   guides: "Découvrir l’IA non censurée",
+  apiGuide: "API LLM non censurée : identifiants, prix et code",
   allModels: "Voir tous les modèles de chat non censurés",
   breadcrumb: "IA abliterated",
   guidesTitle: "Guides sur l’ablitération",

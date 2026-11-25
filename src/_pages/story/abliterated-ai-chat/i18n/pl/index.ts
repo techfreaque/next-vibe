@@ -44,8 +44,21 @@ export const translations: typeof enTranslations = {
       q: "Czy model abliterowany może odmówić odpowiedzi?",
       a: "Tak. Abliteracja ma ograniczać liczbę odmów. Wynik nadal zależy od modelu i treści polecenia. Dostawca też może stosować własne ograniczenia.",
     },
+    gpu: {
+      q: "Czy potrzebuję GPU, żeby używać modeli abliterowanych?",
+      a: "Nie. Modele działają u hostowanych dostawców, więc piszesz w przeglądarce na dowolnym urządzeniu, także na telefonie. Własne uruchomienie abliterowanych wag wymaga GPU z pamięcią na cały model.",
+    },
+    quality: {
+      q: "Czy abliteracja pogarsza model?",
+      a: "Czasem, odrobinę. Usunięcie wzorca odmów może kosztować trochę dokładności albo trzymania się poleceń. Wyślij ten sam prompt do wersji abliterowanej i do modelu bazowego, a potem oceń, co bardziej się opłaca przy twoim zadaniu.",
+    },
+    api: {
+      q: "Czy mogę używać modeli abliterowanych przez API?",
+      a: "Tak. Te same modele są dostępne przez API zgodne z OpenAI i Anthropic, więc twoje obecne SDK zadziała. Klucze API wymagają płatnego planu. Darmowe i bonusowe kredyty ich nie odblokowują.",
+    },
   },
   guides: "Poznaj AI bez cenzury",
+  apiGuide: "Nieocenzurowane API LLM: ID modeli, ceny i kod",
   allModels: "Zobacz wszystkie modele czatu bez cenzury",
   breadcrumb: "Abliterowana AI",
   guidesTitle: "Poradniki o abliteracji",

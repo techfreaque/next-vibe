@@ -36,6 +36,7 @@ import {
   ArticleSection,
 } from "../../_shared/article";
 import { Callout, CardLink, Cta } from "../../_shared/marketing";
+import { CompareInlineLinks } from "../../compare/_shared/compare-ui";
 import type { UsParams } from "../../compare/_shared/us-facts";
 import {
   type ComparePair,
@@ -329,6 +330,10 @@ export function TanstackPage({
             <CardLink
               href={`/${locale}/story/refusal-index`}
               label={t("faq.refusalLink")}
+            />
+            <CompareInlineLinks
+              locale={locale}
+              versus={["venice", "nanoGpt", "openRouter"]}
             />
           </Div>
         </ArticleSection>

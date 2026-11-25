@@ -2,10 +2,9 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title:
-      "Unzensierte LLM-API: abliterierte Modelle im OpenAI-Format | {{appName}}",
+    title: "Unzensierte LLM-API: abliterierte Modelle | {{appName}}",
     description:
-      "Eine unzensierte LLM-API für abliterierte und unzensierte Modelle. OpenAI- und Anthropic-kompatibel, Modell-IDs, Kontext und Preis pro Modell, ein lauffähiges curl- und Python-Beispiel, Limits und Datenschutz.",
+      "Unzensierte und abliterierte Modelle hinter einer OpenAI- und Anthropic-kompatiblen API. Modell-IDs, Kontext, Preis pro Modell, curl- und Python-Beispiel.",
     category: "Entwickler-Guide",
     imageAlt: "Unzensierte LLM-API mit OpenAI-kompatiblen Endpunkten",
     keywords:

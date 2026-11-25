@@ -44,8 +44,21 @@ export const translations: typeof enTranslations = {
       q: "Un modello abliterato può ancora rifiutare una richiesta?",
       a: "Sì. L'ablazione mira a ridurre i rifiuti. Il risultato dipende comunque dal modello e dalla richiesta. Anche il fornitore può imporre limiti propri.",
     },
+    gpu: {
+      q: "Serve una GPU per usare i modelli abliterati?",
+      a: "No. I modelli girano su provider in hosting, quindi chatti nel browser da qualsiasi dispositivo, telefono compreso. Far girare da te i pesi abliterati richiede una GPU con memoria sufficiente per l’intero modello.",
+    },
+    quality: {
+      q: "L’ablazione peggiora il modello?",
+      a: "A volte, di poco. Togliere il meccanismo di rifiuto può costare un po’ di precisione o di aderenza alle istruzioni. Manda lo stesso prompt alla versione abliterata e al modello originale, poi valuta per il tuo compito.",
+    },
+    api: {
+      q: "Posso usare i modelli abliterati via API?",
+      a: "Sì. Gli stessi modelli sono disponibili tramite un’API compatibile OpenAI e Anthropic, quindi il tuo SDK attuale funziona. Le chiavi API richiedono un piano a pagamento. I crediti gratuiti e bonus non le sbloccano.",
+    },
   },
   guides: "Esplora l'AI senza censura",
+  apiGuide: "API LLM senza censura: ID, prezzi e codice",
   allModels: "Vedi tutti i modelli di chat senza censura",
   breadcrumb: "AI abliterata",
   guidesTitle: "Guide sull'ablazione",

@@ -38,7 +38,8 @@ import { CardLink, Cta, PageHero, PageSection } from "../_shared/marketing";
 import { GuideCardGrid } from "../blog/guide-links";
 import { getBlogPostCard } from "../blog/posts-cards";
 import { HUB_GUIDES, TOPIC_HUB_PATHS } from "../blog/topics";
-import { COMPARE_HUB_PATH } from "../compare/_shared/platforms";
+import { CompareInlineLinks } from "../compare/_shared/compare-ui";
+import { COMPARE_HUB_PATH, VERSUS_KEYS } from "../compare/_shared/platforms";
 import { scopedTranslation } from "./i18n";
 
 export const revalidate = 3600;
@@ -317,6 +318,11 @@ export function TanstackPage({
           <CardLink
             href={`/${locale}${COMPARE_HUB_PATH}`}
             label={t("compare")}
+          />
+          <CompareInlineLinks
+            locale={locale}
+            versus={VERSUS_KEYS}
+            includeHub={false}
           />
           <CardLink
             href={`/${locale}/story/refusal-index`}
