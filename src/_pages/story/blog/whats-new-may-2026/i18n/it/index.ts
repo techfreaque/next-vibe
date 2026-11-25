@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "Cortex, Dreamer e Autopilot. Ora la tua IA ricorda.",
     description:
-      "Memoria persistente, riflessione notturna, esecuzione di sfondo. Più immagine-immagine-immagine, video, generazione musicale. E i crediti {{credits}}. un mese intero libero. per dirci che cosa è rotto.",
+      "Memoria persistente, riflessione notturna, esecuzione in background. In più image-to-image, video e musica. Segnala cosa non va e ricevi {{credits}} crediti.",
     category: "Aggiornamento del prodotto",
     imageAlt: "unbottled.ai: Aggiornamento prodotto maggio 2026",
     keywords:

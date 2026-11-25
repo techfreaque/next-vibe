@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "Wie mein toter Trading-Bot zur Monitoring-Engine wurde: next-vibe",
     description:
-      "Ich hab vor Jahren einen Trading-Bot aufgegeben. Dann wurde mir klar: Seine Architektur (DataSource, Indicator, Evaluator, Action) passt auf jedes Business. Also hab ich ihn in next-vibe neu gebaut.",
+      "Ich gab einen Trading-Bot auf. Dann merkte ich: Seine Architektur (DataSource, Indicator, Evaluator, Action) passt auf jedes Business. Neu gebaut in next-vibe.",
     category: "Vibe Sense",
     imageAlt: "Vibe Sense Monitoring-Pipeline: next-vibe",
     keywords:

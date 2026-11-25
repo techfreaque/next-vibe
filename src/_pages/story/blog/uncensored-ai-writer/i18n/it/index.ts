@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "IA senza censura per scrivere: storie senza filtri | {{appName}}",
     description:
-      "Un'IA senza censura per romanzi, narrativa dark e scene per adulti. Quali modelli scrivono senza addolcire, quante pagine di manoscritto ricorda ognuno e quanto costa una scena.",
+      "IA senza censura per romanzi, narrativa dark e scene per adulti. Quali modelli scrivono senza addolcire, quante pagine ricorda ognuno e quanto costa una scena.",
     category: "Guida alla scrittura",
     imageAlt: "Un'IA senza censura scrive una scena di narrativa dark",
     keywords:

@@ -2,10 +2,9 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title:
-      "Un robot a cliqué sur chaque bouton. Il a trouvé huit failles de sécurité.",
+    title: "Un robot a cliqué sur chaque bouton. Huit failles trouvées.",
     description:
-      "Nous avons construit un framework de tests de bout en bout qui pilote les vraies pages dans un vrai navigateur, et couvert chaque endpoint côté client. Voici ce qu'il a trouvé.",
+      "Notre framework de tests de bout en bout pilote les vraies pages dans un vrai navigateur et couvre chaque endpoint côté client. Voici ce qu'il a trouvé.",
     category: "Ingénierie",
     imageAlt:
       "Tests de bout en bout pilotant {{appName}} dans un vrai navigateur",

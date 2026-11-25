@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "Lo nuevo: seis meses en una página ({{appName}})",
     description:
-      "Parar significa parar. La voz funciona en iPhone. Tu AI corre a través de tus máquinas. El auto hospedaje no necesita Docker. Y un robot de prueba cerró ocho agujeros de seguridad. Todo desde mayo.",
+      "Parar es parar. La voz funciona en iPhone. Tu IA corre en todas tus máquinas. Autoalojamiento sin Docker. Un robot de pruebas cerró ocho fallos de seguridad.",
     category: "Actualización de productos",
     imageAlt: "{{appName}}: novedades de noviembre de 2026",
     keywords:

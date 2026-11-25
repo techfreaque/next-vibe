@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "Dwa sposoby na zarabianie. Nie musisz wybierać jednego.",
     description:
-      "Przystępny przewodnik po programie polecającym {{appName}}. Udostępnij link i zarabiaj 10%. Zbuduj skill i zarabiaj 5% pasywnie, nawet gdy inni go udostępniają. Bez doświadczenia.",
+      "Program polecający {{appName}} w prostych słowach. Udostępnij link, zarabiaj 10%. Zbuduj skill i zarabiaj 5% pasywnie, nawet gdy inni go udostępniają.",
     category: "Program polecający",
     imageAlt: "Osoba udostępniająca link i pasywnie zarabiająca pieniądze",
     keywords:

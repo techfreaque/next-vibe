@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "Chat AI gratis senza registrazione né email | {{appName}}",
     description:
-      "Chat AI gratis, senza registrazione e senza account su {{appName}}: crediti gratuiti ogni mese, modelli dai mainstream ai senza censura, cronologia in incognito salvata nel tuo browser. Cosa vuol dire anonimo qui, e cosa no.",
+      "Chat AI gratis senza registrazione su {{appName}}: crediti gratuiti ogni mese, modelli mainstream e senza censura, cronologia in incognito nel browser.",
     category: "Guida",
     imageAlt: "Una chat IA che parte senza modulo di registrazione",
     keywords:

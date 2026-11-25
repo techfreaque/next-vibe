@@ -5,7 +5,7 @@ export const translations: typeof enTranslations = {
     title: "Zarabiaj z {{appName}}: cykliczna prowizja z poleceń",
     category: "Zarabiaj",
     description:
-      "Polecaj {{appName}} i dostawaj {{directPct}} każdej płatności osób, które przyprowadzisz: co miesiąc, dopóki płacą. Opublikuj skill i dostawaj {{skillBonusPct}} od osób, które inni do niego przyprowadzą.",
+      "Polecaj {{appName}} i dostawaj {{directPct}} każdej płatności poleconych, dopóki płacą. Opublikuj skill i dostawaj {{skillBonusPct}} od osób, które przyprowadzą inni.",
     imageAlt: "Zarabiaj z {{appName}}",
     keywords:
       "{{appName}}, program poleceń, afiliacja, prowizja cykliczna, skille AI, dochód pasywny",

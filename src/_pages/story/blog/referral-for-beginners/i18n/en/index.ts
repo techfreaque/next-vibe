@@ -2,7 +2,7 @@ export const translations = {
   meta: {
     title: "Two ways to earn. You don't need to pick one.",
     description:
-      "A plain-language guide to the {{appName}} referral program. Share a link and earn 10%. Build a skill and earn 5% passively, even when others share it. No experience needed.",
+      "The {{appName}} referral program in plain words. Share a link, earn 10%. Build a skill, earn 5% passively, even when others share it. No experience needed.",
     category: "Affiliate Program",
     imageAlt: "A person sharing a link and earning money passively",
     keywords:

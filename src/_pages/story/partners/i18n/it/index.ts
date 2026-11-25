@@ -6,7 +6,7 @@ export const translations: typeof enTranslations = {
       "Programma partner {{appName}}: {{directPct}} ricorrente, senza tetto",
     category: "Partner",
     description:
-      "Creatori, newsletter e directory: guadagnare {{directPct}} di ogni acquisto da parte delle persone che invii a {{appName}}. Ripresa, nessun tappo, tracciato per collegamento. Pagato in crediti o BTC / USDC.",
+      "Creator, newsletter e directory: guadagna il {{directPct}} su ogni acquisto di chi porti su {{appName}}. Ricorrente, senza tetto, tracciato per link. Crediti o BTC/USDC.",
     imageAlt: "Programma partner {{appName}}",
     keywords:
       "{{appName}}, programma di affiliazione, programma partner, affiliato AI non censurato, commissione ricorrente, programma di creatore, sponsorizzazione newsletter",

@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "¿IA sin sesgo político? Ninguna es neutral | {{appName}}",
     description:
-      "La IA sin sesgo político no existe. Por qué ningún chatbot es neutral, cómo los modelos convencionales, abliterados y de opiniones contrarias enfocan la misma pregunta y cómo oír a todas las partes en un solo chat.",
+      "La IA sin sesgo político no existe. Por qué ningún chatbot es neutral y cómo los modelos convencionales, abliterados y contrarios enfocan la misma pregunta.",
     category: "Guía",
     imageAlt: "Una balanza que pesa las respuestas de varios chatbots de IA",
     keywords:

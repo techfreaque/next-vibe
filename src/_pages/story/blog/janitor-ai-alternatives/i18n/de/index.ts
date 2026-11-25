@@ -1,8 +1,7 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
-  title:
-    "Alternativen zu Janitor AI für Rollenspiele: Figuren, Gedächtnis und Preise",
+  title: "Janitor AI Alternativen fürs Rollenspiel: Gedächtnis, Preise",
   description:
     "Elf Alternativen für alle, deren Bot den Faden verliert oder ungefragt ihre Rolle übernimmt. Mit Preisen für Charakterchats, Lorebücher und KI-Begleiter.",
   keywords:

@@ -2,7 +2,7 @@ export const translations = {
   meta: {
     title: "What's new: six months in one page ({{appName}})",
     description:
-      "Stop means stop. Voice works on iPhone. Your AI runs across your machines. Self-hosting needs no Docker. And a test robot closed eight security holes. Everything since May.",
+      "Stop means stop. Voice works on iPhone. Your AI runs across your machines. Self-hosting without Docker. A test robot closed eight security holes. All since May.",
     category: "Product Update",
     imageAlt: "{{appName}}: November 2026 product update",
     keywords:

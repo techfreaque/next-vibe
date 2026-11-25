@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "AI bez cenzury za darmo: co naprawdę dostajesz (2026)",
     description:
-      "AI bez cenzury za darmo, sprawdzone: Venice, uncensored.ai, FreedomGPT, Gab AI, NanoGPT, OpenRouter, LM Studio, Ollama i {{appName}}. Limity, filtry, prywatność i haczyki.",
+      "AI bez cenzury za darmo, sprawdzone: Venice, uncensored.ai, FreedomGPT, Gab AI, NanoGPT, OpenRouter, LM Studio, Ollama i {{appName}}. Limity, filtry, haczyki.",
     category: "Poradnik",
     imageAlt: "Darmowe AI bez cenzury w porównaniu",
     keywords:

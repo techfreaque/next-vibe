@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "IA sans censure pour écrire : fiction sans filtre | {{appName}}",
     description:
-      "Une IA non censurée pour les romans, la fiction sombre et les scènes adultes. Quels modèles écrivent sans édulcorer, combien de pages de manuscrit chacun retient, et ce que coûte une scène.",
+      "IA non censurée pour romans, fiction sombre et scènes adultes. Quels modèles écrivent sans édulcorer, combien de pages chacun retient, et le prix d'une scène.",
     category: "Guide d'écriture",
     imageAlt: "Une IA sans censure écrit une scène de fiction sombre",
     keywords:

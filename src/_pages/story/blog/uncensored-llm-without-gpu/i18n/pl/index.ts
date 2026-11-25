@@ -2,9 +2,9 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title: "Nieocenzurowany LLM online: bez GPU, bez instalacji | {{appName}}",
+    title: "Nieocenzurowany LLM online: bez GPU i instalacji | {{appName}}",
     description:
-      "Nieocenzurowany LLM online, bez karty graficznej. Ile VRAM naprawdę potrzebują lokalne modele, które abliterowane i nieocenzurowane modele działają w przeglądarce i ile kosztuje jedna wiadomość.",
+      "Nieocenzurowany LLM online, bez karty graficznej. Ile VRAM potrzebują modele lokalne, które abliterowane działają w przeglądarce i ile kosztuje wiadomość.",
     category: "Przewodnik po modelach",
     imageAlt: "Nieocenzurowany LLM online, bez GPU",
     keywords:

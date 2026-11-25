@@ -1,8 +1,7 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
-  title:
-    "Alternatywy dla Janitor AI do odgrywania ról. Postacie, pamięć i ceny",
+  title: "Alternatywy dla Janitor AI do roleplayu: pamięć i ceny",
   description:
     "Jedenaście miejsc do pisania, gdy Janitor AI nie działa, gubi wątek albo dopisuje kwestie twojej postaci. Porównaj darmowe czaty, pamięć świata i ceny.",
   keywords:

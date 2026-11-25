@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "Alternativas a SillyTavern: rol con IA sin instalar nada (2026)",
     description:
-      "SillyTavern es gratis, pero pide Node.js, un motor de modelos y no se instala en iPhone. Compara {{appName}}, RisuAI, Agnaistic, KoboldCpp, Janitor AI, LM Studio y más.",
+      "SillyTavern es gratis, pero pide Node.js, un motor de modelos y no se instala en iPhone. Compara {{appName}}, RisuAI, Agnaistic, KoboldCpp, Janitor AI y más.",
     category: "Comparativa",
     imageAlt: "Alternativas a SillyTavern, alojadas y locales, comparadas",
     keywords:

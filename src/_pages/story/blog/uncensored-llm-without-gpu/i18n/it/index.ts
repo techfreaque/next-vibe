@@ -2,10 +2,9 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title:
-      "LLM senza censura online: niente GPU, niente installazione | {{appName}}",
+    title: "LLM senza censura online, senza GPU | {{appName}}",
     description:
-      "Usa un LLM senza censura online, senza scheda grafica. Quanta VRAM serve davvero ai modelli locali, quali modelli abliterated e senza censura girano nel browser e quanto costa un messaggio.",
+      "LLM senza censura online, senza scheda grafica. Quanta VRAM serve ai modelli locali, quali modelli abliterated girano nel browser e quanto costa un messaggio.",
     category: "Guida ai modelli",
     imageAlt: "Un LLM senza censura online, senza GPU",
     keywords:

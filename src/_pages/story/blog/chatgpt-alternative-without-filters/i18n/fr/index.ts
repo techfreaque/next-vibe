@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "ChatGPT sans filtre : l'alternative non censurée | {{appName}}",
     description:
-      "Comparez les alternatives à ChatGPT qui refusent moins de demandes, dont {{appName}}, Venice, NanoGPT et les applis locales. Modèles, limites et confidentialité.",
+      "Alternatives à ChatGPT qui refusent moins : {{appName}}, Venice, NanoGPT et les applis locales comparés. Modèles, limites et confidentialité.",
     category: "Guide",
     imageAlt: "{{appName}} : une alternative à ChatGPT sans filtre",
     keywords:

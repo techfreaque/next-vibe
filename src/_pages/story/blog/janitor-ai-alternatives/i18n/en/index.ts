@@ -1,7 +1,7 @@
 export const translations = {
-  title: "Janitor AI alternatives for roleplay: characters, memory and prices",
+  title: "Janitor AI alternatives for roleplay: memory and prices",
   description:
-    "Eleven ways to keep writing when Janitor AI goes down, loses the plot or speaks for your character. Compare free chat, lorebooks, model choice and companion plans.",
+    "Eleven ways to keep writing when Janitor AI goes down, loses the plot or speaks for your character. Compare free chat, lorebooks, models and companion plans.",
   keywords:
     "Janitor AI alternatives, sites like Janitor AI, free AI roleplay, character cards, AI companions",
   category: "Comparison",

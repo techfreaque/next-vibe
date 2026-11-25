@@ -2,10 +2,9 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title:
-      "Générateur de musique IA, voix et transcription sur un seul compte | {{appName}}",
+    title: "Générateur de musique IA, voix et transcription | {{appName}}",
     description:
-      "{{musicCount}} modèles de musique IA, {{voiceCount}} voix de synthèse vocale, {{sttCount}} modèles de transcription. Des alternatives à Suno avec les vrais prix par clip, par minute et par heure. Crédits gratuits pour commencer.",
+      "{{musicCount}} modèles de musique IA, {{voiceCount}} voix de synthèse, {{sttCount}} modèles de transcription. Alternatives à Suno, vrais prix par clip et par minute. Crédits offerts.",
     category: "Comparatif de modèles",
     imageAlt:
       "{{appName}} : modèles de musique, de voix et de transcription IA comparés",

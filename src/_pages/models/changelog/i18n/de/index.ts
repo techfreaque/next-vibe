@@ -3,10 +3,9 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   meta: {
     category: "KI-Modelle",
-    title:
-      "KI-Modell-Changelog: neue, abgelöste und neu bepreiste Modelle | {{appName}}",
+    title: "KI-Modell-Changelog: neu, abgelöst, neu bepreist | {{appName}}",
     description:
-      "Jede Modelländerung auf {{appName}} mit Datum: neue Modelle, abgelöste Modelle samt Nachfolger, Preisänderungen und Stufenwechsel. Direkt aus unserem Modellregister. Mit RSS-Feed.",
+      "Jede Modelländerung auf {{appName}} mit Datum: neue Modelle, abgelöste samt Nachfolger, Preis- und Stufenwechsel. Direkt aus dem Modellregister, mit RSS-Feed.",
     imageAlt: "Modell-Changelog auf {{appName}}",
     keywords:
       "KI-Modell-Changelog, neue KI-Modelle, LLM-Preisänderungen, abgekündigte KI-Modelle, unzensierte Modelle Updates, {{appName}}",

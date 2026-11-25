@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "Venice AI Alternativen: privat, unzensiert, verglichen (2026)",
     description:
-      "Venice AI im Vergleich mit {{appName}}, Maple, Proton Lumo, Duck.ai, NanoGPT und lokalen Apps. Wo Eingaben landen, welche Modelle weniger ablehnen und was extra kostet.",
+      "Venice AI im Vergleich mit {{appName}}, Maple, Proton Lumo, Duck.ai, NanoGPT und lokalen Apps. Wo Eingaben landen, wer weniger ablehnt, was extra kostet.",
     category: "Vergleich",
     imageAlt: "Venice AI Alternativen im direkten Vergleich",
     keywords:

@@ -8,7 +8,7 @@ export const translations: typeof enTranslations = {
     meta: {
       title: "Bitácora de next-vibe y {{appName}}",
       description:
-        "Las decisiones técnicas detrás de next-vibe y {{appName}}. Una arquitectura para varias interfaces, reglas de TypeScript, Vibe Sense y la historia de cómo construimos ambos.",
+        "Las decisiones técnicas detrás de next-vibe y {{appName}}: una arquitectura para varias interfaces, reglas de TypeScript, Vibe Sense y cómo construimos ambos.",
       category: "Blog",
       imageAlt: "Blog de next-vibe y {{appName}}",
       keywords:

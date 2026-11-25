@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "123 modèles. Des yeux, des oreilles, des mains. Un compagnon.",
     description:
-      "unbottled a reconstruit tout ce qui était bancal. 123 modèles qui voient, entendent, parlent, génèrent images, vidéos et musique, avec des compagnons qui savent vous contredire.",
+      "unbottled a reconstruit tout ce qui était bancal. 123 modèles qui voient, entendent, parlent et génèrent images, vidéos et musique, avec des compagnons francs.",
     category: "Mise à jour produit",
     imageAlt: "unbottled.ai : mise à jour produit d'avril 2026",
     keywords:

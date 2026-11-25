@@ -5,7 +5,7 @@ export const translations: typeof enTranslations = {
     title: "Gagnez avec {{appName}} : des revenus de parrainage récurrents",
     category: "Gagner",
     description:
-      "Partagez {{appName}} et touchez {{directPct}} de chaque paiement de vos filleuls. Chaque mois, tant qu'ils paient. Publiez une compétence et touchez {{skillBonusPct}} sur les utilisateurs que d'autres y amènent.",
+      "Partagez {{appName}} et touchez {{directPct}} de chaque paiement de vos filleuls, tant qu'ils paient. Publiez une compétence : {{skillBonusPct}} sur les autres apports.",
     imageAlt: "Gagnez avec {{appName}}",
     keywords:
       "{{appName}}, programme de parrainage, affiliation, commission récurrente, compétences IA, revenu passif",

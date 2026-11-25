@@ -5,7 +5,7 @@ export const translations: typeof enTranslations = {
     title: "Alternatywy dla Character.AI do odgrywania ról (2026)",
     category: "Odgrywanie ról z AI",
     description:
-      "Porównaj alternatywy dla Character.AI do odgrywania ról, pisania i rozmów z towarzyszem. W zestawieniu Janitor AI, SpicyChat, DreamGen, SillyTavern i {{appName}}.",
+      "Alternatywy dla Character.AI do odgrywania ról, pisania i rozmów z towarzyszem: Janitor AI, SpicyChat, DreamGen, SillyTavern i {{appName}} w porównaniu.",
     imageAlt:
       "Alternatywy dla Character.AI do odgrywania ról i rozmów z towarzyszem AI",
     keywords:

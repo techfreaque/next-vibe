@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "IA sans biais politique ? Aucune n'est neutre | {{appName}}",
     description:
-      "L'IA sans biais politique n'existe pas. Pourquoi aucun chatbot n'est neutre, comment les modèles grand public, abliterated et à contre-courant cadrent la même question, et comment entendre tous les camps dans un seul chat.",
+      "L'IA sans biais politique n'existe pas. Pourquoi aucun chatbot n'est neutre, et comment modèles grand public, abliterated et contraires cadrent une question.",
     category: "Guide",
     imageAlt: "Une balance qui pèse les réponses de plusieurs chatbots IA",
     keywords:

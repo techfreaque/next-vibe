@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "AI bez cenzury do pisania: fikcja bez filtrów | {{appName}}",
     description:
-      "AI bez cenzury do powieści, mrocznej fikcji i scen dla dorosłych. Które modele piszą bez łagodzenia, ile stron rękopisu pamięta każdy z nich i ile kosztuje jedna scena.",
+      "AI bez cenzury do powieści, mrocznej fikcji i scen dla dorosłych. Które modele piszą bez łagodzenia, ile stron rękopisu pamiętają i ile kosztuje scena.",
     category: "Poradnik pisarski",
     imageAlt: "Nieocenzurowana AI pisze mroczną scenę",
     keywords:

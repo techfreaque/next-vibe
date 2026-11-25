@@ -2,9 +2,9 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title: "Alternative a SillyTavern: gioco di ruolo senza configurare (2026)",
+    title: "Alternative a SillyTavern: gioco di ruolo senza installare",
     description:
-      "SillyTavern è gratuito ma richiede Node.js, un backend e su iPhone non si installa. Confronta {{appName}}, RisuAI, Agnaistic, KoboldCpp, Janitor AI, LM Studio e altri.",
+      "SillyTavern è gratuito ma richiede Node.js, un backend e su iPhone non si installa. Confronta {{appName}}, RisuAI, Agnaistic, KoboldCpp, Janitor AI e altri.",
     category: "Confronto",
     imageAlt: "Le alternative a SillyTavern, in hosting e locali, a confronto",
     keywords:

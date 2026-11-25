@@ -2,11 +2,10 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title:
-      "Programa de socios de {{appName}}: {{directPct}} recurrente, sin límite",
+    title: "Programa de socios {{appName}}: {{directPct}} recurrente",
     category: "Asociados",
     description:
-      "Creadoras, boletines y directorios: ganar {{directPct}} de cada compra de la gente que envía a {{appName}}. Corriendo, sin gorra, rastreado por enlace. Pagado en créditos o BTC / USDC.",
+      "Creadores, newsletters y directorios: gana el {{directPct}} de cada compra de quien envíes a {{appName}}. Recurrente, sin tope, medido por enlace. Créditos o BTC/USDC.",
     imageAlt: "{{appName}} Partner Program",
     keywords:
       "{{appName}}, programa de afiliados, programa de socios, afiliado AI no censurado, comisión recurrente, programa creador, patrocinador de newsletter",

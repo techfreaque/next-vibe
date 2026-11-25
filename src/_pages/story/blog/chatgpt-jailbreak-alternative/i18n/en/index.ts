@@ -1,7 +1,6 @@
 export const translations = {
   meta: {
-    title:
-      "ChatGPT Jailbreak Prompts Keep Breaking. Use This Instead | {{appName}}",
+    title: "ChatGPT Jailbreak Prompts Keep Breaking. Try This | {{appName}}",
     description:
       "Compare alternatives to ChatGPT jailbreak prompts, from {{appName}} and Venice to LM Studio and Ollama. See model choices, privacy and costs.",
     category: "Model Guide",

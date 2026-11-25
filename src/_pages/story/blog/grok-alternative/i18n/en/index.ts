@@ -1,6 +1,6 @@
 export const translations = {
   meta: {
-    title: "Grok Alternatives: Less Filter Than Grok, Same Chat | {{appName}}",
+    title: "Grok Alternatives: Less Filter, Same Chat | {{appName}}",
     description:
       "Compare Grok alternatives for web research, media and chat with fewer refusals. See how {{appName}}, Perplexity, Gemini, Venice and local apps fit.",
     category: "Comparison",

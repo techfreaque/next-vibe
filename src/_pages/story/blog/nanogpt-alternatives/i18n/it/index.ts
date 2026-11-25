@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "Alternative a NanoGPT: IA a consumo e senza censura (2026)",
     description:
-      "NanoGPT ha limitato PRO, alzato il prezzo e reso note esposizioni di dati presso alcuni fornitori. Confronta {{appName}}, OpenRouter, Venice, Featherless, Arli AI, Infermatic e altri.",
+      "NanoGPT ha limitato PRO, alzato il prezzo e rivelato fughe di dati dai fornitori. Confronta {{appName}}, OpenRouter, Venice, Featherless, Arli AI, Infermatic.",
     category: "Confronto",
     imageAlt: "Le alternative a NanoGPT per modelli a consumo e senza censura",
     keywords:

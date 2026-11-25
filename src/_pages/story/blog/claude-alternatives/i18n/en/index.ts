@@ -2,7 +2,7 @@ export const translations = {
   meta: {
     title: "Claude Alternatives: With and Without Filters (2026)",
     description:
-      "Claude hits usage limits and refuses fiction. Compare {{appName}}, ChatGPT, Gemini, Grok, DeepSeek, Kimi, Venice, NanoGPT, OpenRouter and local apps on price and filters.",
+      "Claude hits usage limits and refuses fiction. Compare {{appName}}, ChatGPT, Gemini, Grok, DeepSeek, Kimi, Venice, NanoGPT, OpenRouter on price and filters.",
     category: "Comparison",
     imageAlt: "Claude alternatives, with and without filters, compared",
     keywords:

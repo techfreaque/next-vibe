@@ -2,7 +2,7 @@ export const translations = {
   meta: {
     title: "The uncensored models, one by one: {{appName}}",
     description:
-      "Every uncensored AI model on unbottled.ai, model by model. Two kinds: mainstream models with the refusals cut out, and UncensoredLM, trained on banned books and documents. What each does well and where it falls short.",
+      "Every uncensored AI model on unbottled.ai: mainstream models with refusals cut out, and UncensoredLM, trained on banned books and documents. Strengths, limits.",
     category: "Model Guide",
     imageAlt: "{{appName}} uncensored model guide",
     keywords:

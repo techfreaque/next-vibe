@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "Modele niecenzurowane, jeden po drugim: {{appName}}",
     description:
-      "Każdy niecenzurowany model AI na unbottled.ai, jeden po drugim. Dwa rodzaje: modele z głównego nurtu z wyciętymi odmowami i UncensoredLM, trenowany na zakazanych książkach i dokumentach. W czym każdy jest dobry, a gdzie odpada.",
+      "Każdy model AI bez cenzury na unbottled.ai: modele mainstreamowe bez odmów i UncensoredLM, trenowany na zakazanych książkach. Mocne i słabe strony.",
     category: "Przewodnik po modelach",
     imageAlt: "{{appName}} przewodnik po modelach niecenzurowanych",
     keywords:

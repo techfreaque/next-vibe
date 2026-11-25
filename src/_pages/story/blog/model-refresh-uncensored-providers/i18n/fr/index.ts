@@ -2,10 +2,9 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title:
-      "Nouveaux modèles, nouveaux fournisseurs d'IA non censurée | {{appName}}",
+    title: "Nouveaux modèles et fournisseurs d'IA non censurée | {{appName}}",
     description:
-      "Claude 5.5, GPT-6, Gemini 4 Argon, Grok 4.7 et de nouveaux modèles open source. Plus NanoGPT, une gamme Venice élargie et les premiers modèles d'images non censurés.",
+      "Claude 5.5, GPT-6, Gemini 4 Argon, Grok 4.7 et de nouveaux modèles ouverts. Plus NanoGPT, plus de Venice et les premiers modèles d'images non censurés.",
     category: "Mise à jour des modèles",
     imageAlt: "{{appName}} : mise à jour des modèles, novembre 2026",
     keywords:

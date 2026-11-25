@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   title: "Modèles IA abliterated : des LLM sans censure à tester en ligne",
   metaTitle: "Modèles IA abliterated sans censure, en ligne | {{appName}}",
   description:
-    "Testez des LLM abliterated, sans refus, directement dans le navigateur, sans GPU ni inscription. Comparez contexte et coût, et confrontez-les au modèle d’origine.",
+    "Testez des LLM abliterated, sans refus, dans le navigateur, sans GPU ni inscription. Comparez contexte et coût, et confrontez-les au modèle d’origine.",
   keywords:
     "IA abliterated, modèle abliterated, LLM sans censure, LLM non censuré, modèle IA sans filtre, ablitération, IA open source sans censure",
   intro:

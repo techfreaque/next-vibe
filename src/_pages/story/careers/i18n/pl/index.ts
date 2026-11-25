@@ -5,7 +5,7 @@ export const translations: typeof enTranslations = {
     title: "Buduj z next-vibe: {{appName}}",
     category: "Deweloperzy",
     description:
-      "next-vibe zamienia każdy endpoint jednocześnie w formularz web, polecenie CLI, narzędzie MCP, ekran natywny i skill wywoływany przez AI. Zautomatyzuj wszystko, co człowiek może zrobić na komputerze.",
+      "next-vibe zamienia każdy endpoint w formularz web, polecenie CLI, narzędzie MCP, ekran natywny i skill dla AI. Automatyzuj całą pracę przy komputerze.",
     imageAlt: "Platforma deweloperska next-vibe: {{appName}}",
     keywords:
       "next-vibe, automatyzacja AI, platforma deweloperska, automatyzacja biznesu, integracja ERP, automatyzacja produkcji, {{appName}}",

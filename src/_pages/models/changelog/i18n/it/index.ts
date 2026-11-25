@@ -3,10 +3,9 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   meta: {
     category: "Modelli di IA",
-    title:
-      "Changelog dei modelli di IA: nuovi, dismessi e con nuovi prezzi | {{appName}}",
+    title: "Changelog modelli IA: nuovi, dismessi, prezzi | {{appName}}",
     description:
-      "Ogni modifica ai modelli su {{appName}}, con data: nuovi modelli, modelli dismessi e chi li sostituisce, variazioni di prezzo e cambi di livello. Presi direttamente dal nostro registro dei modelli. Con feed RSS.",
+      "Ogni modifica ai modelli su {{appName}}, con data: nuovi, dismessi e sostituti, variazioni di prezzo e livello. Dal nostro registro, con feed RSS.",
     imageAlt: "Changelog dei modelli su {{appName}}",
     keywords:
       "changelog modelli IA, nuovi modelli IA, prezzi LLM, modelli IA dismessi, aggiornamenti modelli senza censura, {{appName}}",

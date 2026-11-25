@@ -466,7 +466,7 @@ export const translations: typeof enTranslations = {
       title: "Unzensierte KI 2026: Die besten Plattformen im Vergleich",
       category: "Vergleich",
       description:
-        "{{count}} unzensierte KI-Plattformen im Vergleich: Venice, NanoGPT, Janitor AI, FreedomGPT, Kindroid, lokale Modelle und mehr. Preise, Filter, Datenschutz, API. Mit Quellen.",
+        "{{count}} unzensierte KI-Plattformen im Vergleich: Venice, NanoGPT, Janitor AI, FreedomGPT, Kindroid, lokale Modelle. Preise, Filter, Datenschutz, API. Mit Quellen.",
       imageAlt: "Unzensierte KI-Plattformen im direkten Vergleich",
       keywords:
         "unzensierte KI, KI ohne Filter, KI ohne Zensur, beste unzensierte KI, unzensierter KI-Chat, KI Chat ohne Filter, NSFW KI Chat, Venice AI Alternative, Character AI Alternative ohne Filter, Janitor AI Alternative, abliterierte Modelle, best uncensored AI, uncensored AI chat, unfiltered AI, Venice AI alternative, Venice.ai review, NanoGPT, Janitor AI alternative, Character AI alternative, FreedomGPT, Gab AI, uncensored.ai, Kindroid, Nomi, CrushOn AI, SillyTavern, Ollama uncensored, LM Studio uncensored, abliterated models, NSFW AI chat, {{appName}}",
@@ -678,7 +678,7 @@ export const translations: typeof enTranslations = {
       meta: {
         title: "Venice AI Alternative: {{appName}} vs Venice im Vergleich",
         description:
-          "{{appName}} vs Venice.ai: Preise, unzensierte Modelle, Mature Filter, Datenschutz und API im direkten Vergleich. Wir kaufen bei Venice ein und sagen genau, wer wo vorne liegt.",
+          "{{appName}} vs Venice.ai: Preise, unzensierte Modelle, Mature Filter, Datenschutz und API im Vergleich. Wir kaufen bei Venice ein und sagen, wer vorne liegt.",
         keywords:
           "Venice AI Alternative, Venice AI Erfahrungen, Venice AI Test, Venice AI Preise, Venice AI unzensiert, ist Venice AI unzensiert, unzensierte KI, KI ohne Filter, unzensierter KI-Chat, Venice AI alternative, Venice.ai vs, Venice AI review, Venice AI pricing, Venice Pro, Venice uncensored, Venice AI mature filter, Venice AI API, VVV DIEM, uncensored AI chat, {{appName}} vs Venice",
       },
@@ -755,7 +755,7 @@ export const translations: typeof enTranslations = {
       meta: {
         title: "Character AI Alternative ohne Filter: {{appName}}",
         description:
-          "{{appName}} vs Character.AI: Filter, Altersprüfung, Modelle, Datenschutz und Preis. Wann Character.AI die richtige Wahl ist und wann du eine unzensierte Alternative brauchst.",
+          "{{appName}} vs Character.AI: Filter, Altersprüfung, Modelle, Datenschutz, Preis. Wann Character.AI passt und wann du eine unzensierte Alternative brauchst.",
         keywords:
           "Character AI Alternative, Character AI Alternative ohne Filter, Character AI ohne Filter, Character AI Filter umgehen, Character AI NSFW, Character AI Altersverifizierung, KI Rollenspiel ohne Filter, NSFW KI Chat, unzensierte KI, Character AI alternative, Character AI alternative without filter, Character.AI filter, c.ai+ price, Character AI age verification, uncensored character AI, AI roleplay without filter, {{appName}} vs Character.AI",
       },
@@ -912,7 +912,7 @@ export const translations: typeof enTranslations = {
       meta: {
         title: "NanoGPT Alternative: {{appName}} vs NanoGPT im Vergleich",
         description:
-          "{{appName}} vs NanoGPT: Pay-as-you-go gegen Tarife, unzensierte und abliterierte Modelle, Datenschutz, API und Medien. Wir kaufen bei NanoGPT ein und sagen, wo es vorne liegt.",
+          "{{appName}} vs NanoGPT: Pay-as-you-go gegen Tarife, unzensierte und abliterierte Modelle, Datenschutz, API, Medien. Als NanoGPT-Kunde sagen wir, wo es führt.",
         keywords:
           "NanoGPT Alternative, NanoGPT Erfahrungen, NanoGPT Preise, NanoGPT unzensiert, unzensierte KI API, abliterierte Modelle, KI ohne Abo, unzensierte KI, KI ohne Filter, NanoGPT alternative, NanoGPT vs, nano-gpt review, NanoGPT pricing, NanoGPT PRO, NanoGPT uncensored, abliterated models API, pay as you go AI, uncensored AI API, {{appName}} vs NanoGPT",
       },
@@ -1066,7 +1066,7 @@ export const translations: typeof enTranslations = {
       meta: {
         title: "Gab AI Alternative: {{appName}} vs Gab AI (2026)",
         description:
-          "{{appName}} vs Gab AI: Arya, 214 Modelle, das Verbot sexueller Inhalte, Datenschutz, Credits und API im Vergleich. Wir kaufen bei Gab ein, also sagen wir, wo wer gewinnt.",
+          "{{appName}} vs Gab AI: Arya, 214 Modelle, Verbot sexueller Inhalte, Datenschutz, Credits und API. Wir kaufen bei Gab ein und sagen, wer wo gewinnt.",
         keywords:
           "Gab AI Alternative, Gab AI Erfahrungen, Gab AI Preise, Gab AI deutsch, Arya KI, konservative KI, KI ohne Zensur, unzensierte KI, Gab AI alternative, Gab AI vs, Gab AI review, Gab AI pricing, Gab AI Plus, Arya AI, Gab Arya, is Gab AI uncensored, Gab AI NSFW, Gab AI API, conservative AI chatbot, right-wing AI, uncensored AI chat, {{appName}} vs Gab AI",
       },

@@ -5,7 +5,7 @@ export const translations: typeof enTranslations = {
   title:
     "Partagez votre lien. Touchez {{directPct}} de chaque paiement. À vie.",
   description:
-    "Chaque personne inscrite via votre lien vous reverse {{directPct}} de chacun de ses paiements. Sans expiration, sans plafond. Publiez une compétence et touchez {{skillBonusPct}} sur les utilisateurs que d'autres lui apportent.",
+    "Chaque inscrit via votre lien vous reverse {{directPct}} de ses paiements. Sans expiration ni plafond. Publiez une compétence : {{skillBonusPct}} sur les autres apports.",
   tagline: "Parrainage et compétences",
 
   hero: {

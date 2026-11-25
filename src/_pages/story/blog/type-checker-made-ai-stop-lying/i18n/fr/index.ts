@@ -2,10 +2,9 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title:
-      "J'ai créé un vérificateur de types qui empêche l'IA de me mentir | next-vibe",
+    title: "Un vérificateur de types qui empêche l'IA de mentir | next-vibe",
     description:
-      "L'IA utilisera `any` pour échapper à une erreur de type. Elle ajoutera eslint-disable. Elle vous mentira. Voici comment nous avons réparé la boucle de feedback avec @next-vibe/checker.",
+      "L'IA met `any` pour fuir une erreur de type. Elle ajoute eslint-disable. Elle vous ment. Voici comment @next-vibe/checker a réparé la boucle de feedback.",
     category: "TypeScript",
     imageAlt: "Le vérificateur de types qui a empêché l'IA de mentir",
     keywords:

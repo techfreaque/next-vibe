@@ -9,7 +9,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "Umiejętności AI: gotowi specjaliści i postacie | {{appName}}",
     description:
-      "Programiści, pisarze, researcherzy, towarzysze i postacie bez cenzury. Każda umiejętność ma własny prompt, model i narzędzia. Wybierz i pisz albo zbuduj własną i zarabiaj, gdy inni z niej korzystają.",
+      "Programiści, pisarze, researcherzy, towarzysze i postacie bez cenzury. Każdy skill ma własny prompt, model i narzędzia. Wybierz albo zbuduj własny i zarabiaj.",
     category: "Umiejętności AI",
     imageAlt: "Umiejętności AI na {{appName}}",
     keywords:

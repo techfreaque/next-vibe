@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "Codex CLI et Claude Code avec tous les modèles | API {{appName}}",
     description:
-      "Codex CLI, Claude Code, OpenCode, Continue, Aider et Cline sur une seule clé {{appName}}. Claude, GPT, DeepSeek, GLM et modèles non censurés. Une URL de base, une commande par outil.",
+      "Codex CLI, Claude Code, OpenCode, Continue, Aider et Cline sur une clé {{appName}}. Claude, GPT, DeepSeek, GLM et modèles non censurés. Une URL de base.",
     category: "Guide développeur",
     imageAlt: "L'API {{appName}} dans les outils de code",
     keywords:

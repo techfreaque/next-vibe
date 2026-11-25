@@ -2,7 +2,7 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title: "Alternativa a OpenRouter | API de OpenAI y Anthropic | {{appName}}",
+    title: "Alternativa a OpenRouter: API OpenAI y Anthropic | {{appName}}",
     description:
       "Compara {{appName}} con OpenRouter. Usa tu SDK de OpenAI con una API para {{modelCount}} modelos de chat y {{mediaModelCount}} modelos multimedia.",
     category: "Guía para Desarrolladores",

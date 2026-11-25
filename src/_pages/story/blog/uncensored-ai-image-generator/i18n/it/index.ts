@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "Generatori di immagini IA senza censura e prezzi | {{appName}}",
     description:
-      "{{uncensoredCount}} non censurato AI generatori di immagini accanto a Flux, Seedream, GPT Image e Recraft: modelli {{modelCount}}, prezzo reale per immagine, senza sfocatura. Modifica anche le tue foto.",
+      "{{uncensoredCount}} generatori di immagini IA senza censura accanto a Flux, Seedream, GPT Image e Recraft: {{modelCount}} modelli, prezzo reale, niente sfocature.",
     category: "Comparazione del modello",
     imageAlt:
       "{{appName}}: generatori di immagini non censurati AI confrontati",

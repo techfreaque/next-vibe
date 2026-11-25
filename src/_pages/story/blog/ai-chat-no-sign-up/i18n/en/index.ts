@@ -2,7 +2,7 @@ export const translations = {
   meta: {
     title: "Free AI Chat With No Sign-Up: No Email, No Account | {{appName}}",
     description:
-      "Chat with {{appName}}'s AI models without an account: free monthly credits, mainstream to uncensored models, incognito history kept in your browser. What anonymous does and does not mean.",
+      "AI chat without an account on {{appName}}: free monthly credits, mainstream to uncensored models, incognito history in your browser. What anonymous means.",
     category: "Guide",
     imageAlt: "An AI chat that starts without a sign-up form",
     keywords:

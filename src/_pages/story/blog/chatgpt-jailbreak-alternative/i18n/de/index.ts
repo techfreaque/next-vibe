@@ -2,8 +2,7 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title:
-      "ChatGPT-Jailbreak funktioniert nicht mehr? Das hier schon | {{appName}}",
+    title: "ChatGPT-Jailbreak geht nicht mehr? Das hier schon | {{appName}}",
     description:
       "Alternativen zu ChatGPT-Jailbreak-Prompts im Vergleich: {{appName}}, Venice, LM Studio und Ollama. Mit Modellauswahl, Datenschutz und Kosten.",
     category: "Modell-Guide",

@@ -6,7 +6,7 @@ export const translations: typeof enTranslations = {
       "Program partnerski {{appName}}: {{directPct}} co miesiąc, bez limitu",
     category: "Partnerzy",
     description:
-      "Twórcy, newslettery i katalogi: {{directPct}} od każdego zakupu osób, które przyprowadzisz do {{appName}}. Cyklicznie, bez limitu, z pomiarem dla każdego linku. Wypłata w kredytach albo BTC/USDC.",
+      "Twórcy, newslettery, katalogi: {{directPct}} od każdego zakupu osób, które przyprowadzisz do {{appName}}. Cyklicznie, bez limitu. Kredyty lub BTC/USDC.",
     imageAlt: "Program partnerski {{appName}}",
     keywords:
       "{{appName}}, program afiliacyjny, program partnerski, afiliacja AI bez cenzury, prowizja cykliczna, program dla twórców, sponsoring newslettera",

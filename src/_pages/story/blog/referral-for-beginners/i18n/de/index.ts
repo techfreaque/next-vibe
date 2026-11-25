@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "Zwei Wege zum Verdienen. Du musst dich nicht entscheiden.",
     description:
-      "Ein verständlicher Leitfaden zum {{appName}}-Empfehlungsprogramm. Link teilen, 10 % verdienen. Skill bauen, 5 % passiv kassieren, auch wenn andere ihn teilen. Keine Vorkenntnisse nötig.",
+      "Das {{appName}}-Empfehlungsprogramm verständlich erklärt. Link teilen, 10 % verdienen. Skill bauen, 5 % passiv kassieren, auch wenn andere ihn teilen.",
     category: "Empfehlungsprogramm",
     imageAlt: "Eine Person teilt einen Link und verdient passiv Geld",
     keywords:

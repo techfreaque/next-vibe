@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "IA senza pregiudizi politici? Non esiste | {{appName}}",
     description:
-      "L'IA senza pregiudizi politici non esiste. Perché nessun chatbot è neutrale, come modelli mainstream, abliterated e controcorrente inquadrano la stessa domanda e come sentire tutte le parti in un'unica chat.",
+      "L'IA senza pregiudizi politici non esiste. Perché nessun chatbot è neutrale e come modelli mainstream, abliterated e controcorrente leggono la stessa domanda.",
     category: "Guida",
     imageAlt: "Una bilancia che pesa le risposte di diversi chatbot IA",
     keywords:

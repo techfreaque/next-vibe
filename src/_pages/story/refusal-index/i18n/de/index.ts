@@ -2,11 +2,10 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title:
-      "Verweigerungs-Index: Welche KI antwortet, welche blockt? | {{appName}}",
+    title: "Verweigerungs-Index: Welche KI antwortet, welche blockt?",
     category: "Verweigerungs-Index",
     description:
-      "Dieselben Fragen an jedes KI-Modell, jede Woche kommen neue dazu. Wir messen, wer antwortet, wer abschwächt und wer ablehnt, und legen die Methode offen. Offene Daten auf {{appName}}.",
+      "Dieselben Fragen an jedes KI-Modell, jede Woche neue. Wir messen, wer antwortet, wer abschwächt und wer ablehnt. Methode offen, Daten frei auf {{appName}}.",
     imageAlt: "Verweigerungs-Index: Ablehnungsraten von KI-Modellen",
     keywords:
       "{{appName}}, Verweigerungs-Index, KI Ablehnungsrate, unzensierte KI, KI-Zensur Benchmark, Modellvergleich",

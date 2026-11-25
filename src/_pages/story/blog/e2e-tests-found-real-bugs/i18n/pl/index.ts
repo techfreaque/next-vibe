@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "Robot kliknął każdy przycisk. Znalazł osiem luk bezpieczeństwa.",
     description:
-      "Zbudowaliśmy framework testów end-to-end, który obsługuje prawdziwe strony w prawdziwej przeglądarce i pokryliśmy każdy endpoint, z którego korzystają klienci. Oto co wyłapał.",
+      "Nasz framework testów end-to-end obsługuje prawdziwe strony w prawdziwej przeglądarce i pokrywa każdy endpoint klienta. Oto co wyłapał.",
     category: "Inżynieria",
     imageAlt:
       "Testy end-to-end sterujące {{appName}} w prawdziwej przeglądarce",

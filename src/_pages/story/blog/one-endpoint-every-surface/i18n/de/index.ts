@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "Ein Endpoint. Jede Oberfläche. (next-vibe)",
     description:
-      "Schreib eine definition.ts pro Feature. Es rendert als Webformular, CLI-Befehl, MCP-Tool, nativer Screen, Cron-Job gleichzeitig. Keine Duplikation. Typen durchgesetzt.",
+      "Eine definition.ts pro Feature. Daraus entstehen Webformular, CLI-Befehl, MCP-Tool, nativer Screen und Cron-Job zugleich. Keine Duplikate. Typsicher.",
     category: "Architektur",
     imageAlt:
       "next-vibe Unified-Surface-Architektur: ein Endpoint, jede Plattform",

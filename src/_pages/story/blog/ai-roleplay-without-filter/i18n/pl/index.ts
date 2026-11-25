@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "Roleplay AI bez cenzury: alternatywa dla Character.AI",
     description:
-      "Roleplay AI bez filtra na modelach bez cenzury. Mroczne sceny zostają mroczne, postacie trzymają się roli. Pamięć, prywatność, cena za odpowiedź. Start za darmo.",
+      "Roleplay AI bez filtra na modelach bez cenzury. Mroczne sceny zostają mroczne, postacie trzymają się roli. Pamięć, prywatność, cena. Start za darmo.",
     category: "Poradnik",
     imageAlt: "{{appName}}: roleplay AI bez filtra",
     keywords:

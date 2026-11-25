@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "Les modèles d'IA non censurés, un par un | {{appName}}",
     description:
-      "Tous les modèles d'IA non censurés d'unbottled.ai, modèle par modèle. Deux familles : des modèles grand public dont on a retiré les refus, et UncensoredLM, entraîné sur des livres et des documents bannis. Ce que chacun fait bien, et ses limites.",
+      "Tous les modèles d'IA non censurés d'unbottled.ai : modèles grand public sans refus, et UncensoredLM, entraîné sur des livres bannis. Forces et limites.",
     category: "Guide des modèles",
     imageAlt: "Guide des modèles non censurés de {{appName}}",
     keywords:

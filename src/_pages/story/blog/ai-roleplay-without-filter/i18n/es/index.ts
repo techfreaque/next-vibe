@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "Juego de rol con IA sin filtros: alternativa a Character.AI",
     description:
-      "Juego de roles AI sin filtrar en modelos no censurados. Las escenas oscuras permanecen oscuras, los personajes se quedan en carácter. Memoria, privacidad, precio por respuesta. Libre de empezar, sin cuenta.",
+      "Rol con IA sin filtro en modelos sin censura. Las escenas oscuras siguen oscuras, los personajes no se salen del papel. Memoria, privacidad, precio. Gratis.",
     category: "Guía",
     imageAlt: "{{appName}} : Juego de roles AI sin filtro",
     keywords:

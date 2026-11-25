@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "KI-Chat kostenlos ohne Anmeldung, ohne E-Mail | {{appName}}",
     description:
-      "Kostenloser KI-Chat ohne Anmeldung und ohne Registrierung auf {{appName}}: Gratis-Credits jeden Monat, Mainstream- bis unzensierte Modelle, Inkognito-Verlauf im Browser. Was anonym hier heißt und was nicht.",
+      "KI-Chat ohne Anmeldung auf {{appName}}: monatlich Gratis-Credits, Mainstream- bis unzensierte Modelle, Inkognito-Verlauf im Browser. Was anonym hier heißt.",
     category: "Ratgeber",
     imageAlt: "Ein KI-Chat, der ohne Anmeldeformular startet",
     keywords:

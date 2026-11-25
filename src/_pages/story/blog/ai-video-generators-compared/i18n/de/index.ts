@@ -2,8 +2,7 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title:
-      "Bester KI-Videogenerator: {{modelCount}} Modelle, Kling vs Seedance | {{appName}}",
+    title: "Bester KI-Videogenerator: Kling vs Seedance | {{appName}}",
     description:
       "{{modelCount}} KI-Videogeneratoren im Vergleich: Kling vs Seedance, Veo 3.1 vs Sora 2, Wan 3.0, Hailuo. Text und Bild zu Video, echte Preise, ohne Wasserzeichen.",
     category: "Modellvergleich",

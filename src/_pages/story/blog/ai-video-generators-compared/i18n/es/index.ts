@@ -2,10 +2,9 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title:
-      "{{modelCount}} generadores de video con IA: Kling, Seedance y más | {{appName}}",
+    title: "Generadores de vídeo con IA: Kling, Seedance y más | {{appName}}",
     description:
-      "Generadores de vídeo {{modelCount}} AI comparados: Kling vs Seedance, Veo 3.1 vs Sora 2, Wan 3.0, Hailuo. Texto e imagen a vídeo, precios reales, sin marca de agua de nosotros.",
+      "{{modelCount}} generadores de vídeo con IA comparados: Kling vs Seedance, Veo 3.1 vs Sora 2, Wan 3.0, Hailuo. Texto o imagen a vídeo, precios reales, sin marca de agua.",
     category: "Comparación de modelos",
     imageAlt: "{{appName}} : Generadores de vídeo AI comparados lado a lado",
     keywords:

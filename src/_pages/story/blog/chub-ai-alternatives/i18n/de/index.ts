@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "Chub AI Alternativen: Figurenchat, Lorebooks, Preise (2026)",
     description:
-      "Chub AI nimmt nur noch Krypto und begrenzt den Gratis-Chat. {{appName}}, Janitor AI, SillyTavern, RisuAI, SpicyChat, CrushOn und mehr im Vergleich: Preis, Filter, Handy, Gedächtnis.",
+      "Chub AI nimmt nur noch Krypto und deckelt den Gratis-Chat. {{appName}}, Janitor AI, SillyTavern, RisuAI, SpicyChat, CrushOn: Preis, Filter, Gedächtnis.",
     category: "Vergleich",
     imageAlt: "Chub AI Alternativen für Figurenrollenspiel im Vergleich",
     keywords:

@@ -2,10 +2,9 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title:
-      "Ein Roboter hat jeden Button geklickt. Er fand acht Sicherheitslücken.",
+    title: "Ein Roboter klickte jeden Button. Er fand acht Sicherheitslücken.",
     description:
-      "Wir haben ein End-to-End-Testframework gebaut, das die echten Seiten in einem echten Browser bedient und jeden kundenrelevanten Endpoint abgedeckt. Das hat es gefunden.",
+      "Unser End-to-End-Testframework bedient echte Seiten in einem echten Browser und deckt jeden kundenrelevanten Endpoint ab. Das hat es gefunden.",
     category: "Engineering",
     imageAlt: "End-to-End-Tests steuern {{appName}} in einem echten Browser",
     keywords:

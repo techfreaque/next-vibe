@@ -2,10 +2,9 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title:
-      "Alternatywy dla Groka: mniej filtrów niż Grok, ten sam czat | {{appName}}",
+    title: "Alternatywy dla Groka: mniej filtrów, ten sam czat | {{appName}}",
     description:
-      "Porównaj alternatywy dla Groka do researchu w sieci, multimediów i rozmów z mniejszą liczbą odmów. W zestawieniu {{appName}}, Perplexity, Gemini, Venice i aplikacje lokalne.",
+      "Alternatywy dla Groka do researchu w sieci, multimediów i rozmów z mniejszą liczbą odmów: {{appName}}, Perplexity, Gemini, Venice i aplikacje lokalne.",
     category: "Porównanie",
     imageAlt: "Grok obok alternatyw bez cenzury",
     keywords:

@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "Alternative a Chub AI: personaggi, lorebook e prezzi (2026)",
     description:
-      "Chub AI accetta solo crypto e ha limitato la chat gratuita. Confronta {{appName}}, Janitor AI, SillyTavern, RisuAI, SpicyChat, CrushOn e altri su prezzo, filtri, mobile e memoria.",
+      "Chub AI accetta solo crypto e limita la chat gratis. Confronta {{appName}}, Janitor AI, SillyTavern, RisuAI, SpicyChat, CrushOn: prezzo, filtri, memoria.",
     category: "Confronto",
     imageAlt:
       "Le alternative a Chub AI per il gioco di ruolo con personaggi, a confronto",

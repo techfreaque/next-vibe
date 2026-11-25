@@ -1,9 +1,9 @@
 export const translations = {
   meta: {
     category: "AI Models",
-    title: "AI model changelog: new, legacy and repriced models | {{appName}}",
+    title: "AI model changelog: new, legacy, repriced | {{appName}}",
     description:
-      "Every model change on {{appName}}, dated: new models, retired ones and what replaced them, price moves and tier changes. Pulled straight from our model registry. RSS feed included.",
+      "Every model change on {{appName}}, dated: new models, retired ones and their replacements, price and tier moves. Straight from our registry. RSS feed included.",
     imageAlt: "Model changelog on {{appName}}",
     keywords:
       "AI model changelog, new AI models, LLM price changes, deprecated AI models, uncensored model updates, {{appName}}",

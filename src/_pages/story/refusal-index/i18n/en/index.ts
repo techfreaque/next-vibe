@@ -1,10 +1,9 @@
 export const translations = {
   meta: {
-    title:
-      "Refusal Index: which AI models answer, hedge or refuse | {{appName}}",
+    title: "Refusal Index: which AI models answer or refuse | {{appName}}",
     category: "Refusal Index",
     description:
-      "The same questions to every AI model, with new ones every week. We measure who answers, who hedges and who refuses, and publish the method. Open data on {{appName}}.",
+      "The same questions to every AI model, new ones every week. Who answers, who hedges, who refuses. Method published, data open on {{appName}}.",
     imageAlt: "Refusal Index: AI model refusal rates",
     keywords:
       "{{appName}}, refusal index, AI refusal rate, uncensored AI, AI censorship benchmark, model comparison",

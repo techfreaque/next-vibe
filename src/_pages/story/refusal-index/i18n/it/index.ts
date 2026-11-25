@@ -2,11 +2,10 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title:
-      "Indice dei rifiuti: quali modelli rispondono, sviano o rifiutano | {{appName}}",
+    title: "Indice dei rifiuti: quali modelli IA rispondono | {{appName}}",
     category: "Indice dei rifiuti",
     description:
-      "Poniamo le stesse domande a ogni modello IA e ne aggiungiamo di nuove ogni settimana. Misuriamo chi risponde, chi svia e chi rifiuta, e pubblichiamo il metodo. Dati aperti su {{appName}}.",
+      "Le stesse domande a ogni modello IA, nuove ogni settimana. Chi risponde, chi svia, chi rifiuta. Metodo pubblico e dati aperti su {{appName}}.",
     imageAlt: "Indice dei rifiuti dei modelli IA",
     keywords:
       "{{appName}}, indice di rifiuto, tasso di rifiuto AI, non censura AI, AI benchmark, confronto modello",

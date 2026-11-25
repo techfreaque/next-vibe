@@ -2,10 +2,9 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   title: "IA sans censure : le chat IA sans filtre, dans votre navigateur",
-  metaTitle:
-    "IA sans censure : chat IA sans filtre, essai gratuit | {{appName}}",
+  metaTitle: "IA sans censure : chat sans filtre, essai gratuit | {{appName}}",
   description:
-    "Une IA non censurée, sans filtre et sans inscription. Modèles abliterated et vraiment non censurés dans le navigateur, crédits gratuits pour les invités. Comparez les coûts et lancez-vous.",
+    "IA non censurée, sans filtre ni inscription. Modèles abliterated et vraiment non censurés dans le navigateur, crédits offerts aux invités. Comparez les coûts.",
   keywords:
     "IA sans censure, IA non censurée, chat IA sans filtre, ChatGPT sans filtre, IA sans filtre gratuit, chatbot sans censure, IA sans limite, IA abliterated",
   intro:

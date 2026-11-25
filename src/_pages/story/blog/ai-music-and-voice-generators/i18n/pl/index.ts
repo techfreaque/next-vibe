@@ -2,10 +2,9 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title:
-      "Generator muzyki AI, głosy AI i transkrypcja na jednym koncie | {{appName}}",
+    title: "Generator muzyki AI, głosy i transkrypcja | {{appName}}",
     description:
-      "{{musicCount}} modeli muzyki AI, głosy AI do zamiany tekstu na mowę (łącznie {{voiceCount}}), {{sttCount}} modeli transkrypcji. Alternatywy dla Suno z prawdziwą ceną za klip, za minutę i za godzinę. Darmowe kredyty na start.",
+      "{{musicCount}} modeli muzyki AI, {{voiceCount}} głosów AI, {{sttCount}} modeli transkrypcji. Alternatywy dla Suno z prawdziwą ceną za klip i minutę. Darmowe kredyty na start.",
     category: "Porównanie modeli",
     imageAlt:
       "{{appName}}: modele muzyki, głosu i transkrypcji AI w porównaniu",

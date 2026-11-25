@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "LLM sin censura en línea: sin GPU, sin instalar | {{appName}}",
     description:
-      "Usa un LLM sin censura en línea, sin tarjeta gráfica. Cuánta VRAM necesitan de verdad los modelos locales, qué modelos abliterados y sin censura funcionan en el navegador y cuánto cuesta cada mensaje.",
+      "LLM sin censura en línea, sin tarjeta gráfica. La VRAM que piden los modelos locales, qué modelos abliterados van en el navegador y cuánto cuesta un mensaje.",
     category: "Guía de modelos",
     imageAlt: "Un LLM sin censura en línea, sin GPU",
     keywords:

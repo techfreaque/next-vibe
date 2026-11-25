@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "Co nowego: pół roku na jednej stronie ({{appName}})",
     description:
-      "Stop znaczy stop. Dyktowanie działa na iPhonie. Twoje AI pracuje na wszystkich Twoich komputerach. Self-hosting bez Dockera. A robot testowy zamknął osiem luk bezpieczeństwa. Wszystko od maja.",
+      "Stop znaczy stop. Dyktowanie działa na iPhonie. Twoje AI pracuje na wszystkich Twoich komputerach. Self-hosting bez Dockera. Robot testowy zamknął osiem luk.",
     category: "Aktualizacja produktu",
     imageAlt: "{{appName}}: aktualizacja produktu, listopad 2026",
     keywords:

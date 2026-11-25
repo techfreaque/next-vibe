@@ -5,7 +5,7 @@ export const translations: typeof enTranslations = {
     title: "Guadagna con {{appName}}: commissioni ricorrenti sugli inviti",
     category: "Earn",
     description:
-      "Condividere {{appName}} e guadagnare {{directPct}} di ogni pagamento che i vostri referrals fanno: ricorrenti, per tutto il tempo che pagano. Pubblicare una abilità e guadagnare {{skillBonusPct}} sugli utenti altri portare a esso.",
+      "Condividi {{appName}} e guadagna il {{directPct}} di ogni pagamento dei tuoi invitati, finché pagano. Pubblica una skill e guadagna il {{skillBonusPct}} su chi portano altri.",
     imageAlt: "Guadagna con {{appName}}",
     keywords:
       "{{appName}}, programma di riferimento, affiliazione, commissione ricorrente, AI competenze, reddito passivo",

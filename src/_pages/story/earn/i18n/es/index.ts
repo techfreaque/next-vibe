@@ -5,7 +5,7 @@ export const translations: typeof enTranslations = {
     title: "Gana con {{appName}}: comisiones recurrentes por referidos",
     category: "Earn",
     description:
-      "Compartir {{appName}} y ganar {{directPct}} de cada pago que hacen sus referencias: recurrente, por el tiempo que pagan. Publish a habilidad y ganar {{skillBonusPct}} en los usuarios que otros traen a ella.",
+      "Comparte {{appName}} y gana el {{directPct}} de cada pago de tus referidos mientras paguen. Publica una skill y gana el {{skillBonusPct}} de quien traigan otros.",
     imageAlt: "Ganar con {{appName}}",
     keywords:
       "{{appName}}, programa de remisión, afiliado, comisión recurrente, habilidades AI, ingresos pasivos",

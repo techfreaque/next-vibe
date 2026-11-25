@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "Un punto finale. (next-vibe)",
     description:
-      "Una definition.ts per funzione genera un modulo web, un comando CLI, uno strumento MCP, una schermata nativa e un job cron. Nessuna duplicazione. Tipi verificati.",
+      "Una definition.ts per funzione: modulo web, comando CLI, strumento MCP, schermata nativa e job cron. Nessuna duplicazione. Tipi verificati.",
     category: "Architettura",
     imageAlt:
       "Architettura unificata di next-vibe: un endpoint su tutte le piattaforme",

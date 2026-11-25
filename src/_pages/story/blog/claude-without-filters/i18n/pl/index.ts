@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "Claude bez filtrów: dlaczego odmawia i co działa | {{appName}}",
     description:
-      'Claude bez cenzury nie istnieje. Dlaczego Claude odmawia, czemu jailbreaki i fałszywe strony z "Claude bez cenzury" nie działają i co działa naprawdę: Claude plus modele bez cenzury w jednym wątku. Ceny na żywo.',
+      "Claude bez cenzury nie istnieje. Dlaczego Claude odmawia, czemu jailbreaki i fałszywe strony zawodzą i co działa: Claude plus modele bez cenzury w jednym wątku.",
     category: "Przewodnik po modelach",
     imageAlt: "Claude obok modeli bez cenzury w jednym czacie",
     keywords:

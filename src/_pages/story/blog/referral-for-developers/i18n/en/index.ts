@@ -2,7 +2,7 @@ export const translations = {
   meta: {
     title: "You built something with AI. Now earn from sharing it.",
     description:
-      "For developers: your GitHub READMEs, blog posts, and tutorials already have referral potential. Here's the math, including the skill bonus you earn when others share your skill.",
+      "For developers: your READMEs, blog posts and tutorials already carry referral potential. Here's the math, plus the skill bonus when others share your skill.",
     category: "Affiliate Program",
     imageAlt: "A developer's terminal with earnings stats alongside code",
     keywords:

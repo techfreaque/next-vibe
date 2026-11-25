@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "CrushOn AI Alternativen: Figurenchat für Erwachsene (2026)",
     description:
-      "CrushOn.AI verkauft fünf Credit-Stufen bis $199.99 im Monat und darf mit Ihren Chats trainieren. {{appName}}, Janitor AI, SpicyChat, Chub, Kindroid, Nomi und mehr im Vergleich.",
+      "CrushOn.AI verkauft fünf Credit-Stufen bis $199.99 im Monat und darf mit Ihren Chats trainieren. Vergleich: {{appName}}, Janitor AI, SpicyChat, Chub, Nomi.",
     category: "Vergleich",
     imageAlt: "CrushOn AI Alternativen für Figurenchat ab 18 im Vergleich",
     keywords:

@@ -2,7 +2,7 @@ export const translations = {
   meta: {
     title: "Cortex. Dreamer. Autopilot. Your AI remembers now.",
     description:
-      "Persistent memory, nightly reflection, and background execution. Plus image-to-image, video, and music generation. Tell us what’s broken and get {{credits}} credits, enough for a full month.",
+      "Persistent memory, nightly reflection, background execution. Plus image-to-image, video and music generation. Report what's broken, get {{credits}} credits.",
     category: "Product Update",
     imageAlt: "unbottled.ai: May 2026 product update",
     keywords:

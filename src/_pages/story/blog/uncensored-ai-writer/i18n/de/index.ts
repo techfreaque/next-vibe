@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "Unzensierte KI zum Schreiben: Romane ohne Filter | {{appName}}",
     description:
-      "Unzensierte KI für Romane, düstere Fiktion und Erwachsenenszenen. Welche Modelle ohne Weichzeichner schreiben, wie viele Manuskriptseiten jedes behält und was eine Szene kostet.",
+      "Unzensierte KI für Romane, düstere Fiktion und Erwachsenenszenen. Welche Modelle ungeschönt schreiben, wie viele Seiten sie behalten, was eine Szene kostet.",
     category: "Schreib-Guide",
     imageAlt: "Eine unzensierte KI schreibt eine düstere Romanszene",
     keywords:

@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "Was ist neu: sechs Monate auf einer Seite ({{appName}})",
     description:
-      "Stopp heißt Stopp. Spracheingabe läuft auf dem iPhone. Deine KI arbeitet über deine Rechner hinweg. Selbst hosten ohne Docker. Und ein Test-Roboter hat acht Sicherheitslücken geschlossen. Alles seit Mai.",
+      "Stopp heißt Stopp. Sprache auf dem iPhone. Deine KI läuft über all deine Rechner. Selbst hosten ohne Docker. Ein Test-Roboter schloss acht Sicherheitslücken.",
     category: "Produkt-Update",
     imageAlt: "{{appName}}: Produkt-Update November 2026",
     keywords:

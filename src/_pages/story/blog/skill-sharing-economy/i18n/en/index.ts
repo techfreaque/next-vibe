@@ -2,7 +2,7 @@ export const translations = {
   meta: {
     title: "Build a skill. Share the link. Earn every month.",
     description:
-      "{{appName}} skills are pre-configured AI setups you craft once and share anywhere. The share link positions you in the referral chain: earning 10% of every payment that user ever makes, plus 5% when others share your skill.",
+      "{{appName}} skills are AI setups you build once and share anywhere. Your link earns 10% of every payment that user makes, plus 5% when others share it.",
     category: "Skill Economy",
     imageAlt:
       "A person crafting AI skills and earning recurring income by sharing them",

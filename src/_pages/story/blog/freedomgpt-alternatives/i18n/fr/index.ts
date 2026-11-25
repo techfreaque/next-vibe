@@ -2,8 +2,7 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title:
-      "Alternatives à FreedomGPT : les apps d'IA sans censure comparées (2026)",
+    title: "Alternatives à FreedomGPT : IA sans censure comparées (2026)",
     description:
       "Comparez FreedomGPT à {{appName}}, Venice et Poe en ligne, ou à LM Studio, Ollama et Jan hors ligne. Tarifs, filtres et confidentialité.",
     category: "Comparatif",

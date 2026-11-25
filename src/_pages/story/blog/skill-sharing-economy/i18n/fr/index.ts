@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "Créez une compétence. Partagez le lien. Gagnez chaque mois.",
     description:
-      "Les compétences {{appName}} sont des configurations d'IA prêtes à l'emploi, créées une fois et partageables partout. Le lien de partage vous place dans la chaîne de parrainage : 10 % de chaque paiement de l'utilisateur, à vie, plus 5 % quand d'autres partagent votre compétence.",
+      "Les compétences {{appName}} : des configs IA créées une fois, partagées partout. Votre lien rapporte 10 % de chaque paiement, et 5 % via les autres.",
     category: "Économie des compétences",
     imageAlt:
       "Une personne qui crée des compétences d'IA et touche des revenus récurrents en les partageant",

@@ -18,7 +18,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "Investir dans {{appName}}",
     description:
-      "Tickets à partir de 5 000 $. Soutenez la plateforme d'IA open source construite sur next-vibe : {{modelCount}} modèles, en production, et c'est l'utilisateur qui règle le filtre.",
+      "Tickets dès 5 000 $. Soutenez la plateforme d'IA open source bâtie sur next-vibe : {{modelCount}} modèles, en production, et l'utilisateur règle le filtre.",
     category: "Investir",
     imageAlt: "Investir dans {{appName}}",
     keywords:

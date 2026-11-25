@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   title: "IA sin censura: chat de IA sin filtros en tu navegador",
   metaTitle: "IA sin censura: chat sin filtros, pruébalo gratis | {{appName}}",
   description:
-    "Una IA sin censura, sin filtros y sin registro. Modelos abliterados y realmente sin censura en el navegador, créditos gratis para visitantes. Compara costos y empieza a chatear.",
+    "IA sin censura, sin filtros ni registro. Modelos abliterados y de verdad sin censura en el navegador, créditos gratis para visitantes. Compara costes y chatea.",
   keywords:
     "IA sin censura, IA sin restricciones, ChatGPT sin censura, chat IA sin filtros, IA sin límites, chatbot sin censura, inteligencia artificial sin censura, IA abliterada",
   intro:

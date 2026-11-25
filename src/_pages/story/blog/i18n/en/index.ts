@@ -6,7 +6,7 @@ export const translations = {
     meta: {
       title: "Build Log: next-vibe & {{appName}}",
       description:
-        "Engineering deep dives into the decisions behind next-vibe and {{appName}}. Unified surfaces, TypeScript enforcement, Vibe Sense, and the story of building both.",
+        "Engineering deep dives behind next-vibe and {{appName}}: unified surfaces, TypeScript enforcement, Vibe Sense, and the story of building both.",
       category: "Blog",
       imageAlt: "next-vibe & {{appName}} Build Log",
       keywords:

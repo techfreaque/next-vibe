@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "Abliterierte und unzensierte KI-Modelle im Vergleich",
     description:
-      "Was verändert Abliteration an einem Sprachmodell? Erfahre, wie sie sich vom Fine-Tuning unterscheidet und wie du eine Variante mit ihrem Basismodell vergleichst.",
+      "Was verändert Abliteration an einem Sprachmodell? Der Unterschied zum Fine-Tuning und wie du eine Variante mit ihrem Basismodell vergleichst.",
     category: "Modell-Ratgeber",
     imageAlt: "Drei Arten unzensierter KI-Modelle, erklärt",
     keywords:

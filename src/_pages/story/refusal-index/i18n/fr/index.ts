@@ -2,11 +2,10 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title:
-      "Refusal Index : quels modèles d'IA répondent, esquivent ou refusent | {{appName}}",
+    title: "Refusal Index : quelles IA répondent ou refusent | {{appName}}",
     category: "Refusal Index",
     description:
-      "Les mêmes questions à chaque modèle d'IA, et de nouvelles chaque semaine. Nous mesurons qui répond, qui esquive et qui refuse, et nous publions la méthode. Données ouvertes sur {{appName}}.",
+      "Les mêmes questions à chaque modèle d'IA, de nouvelles chaque semaine. Qui répond, qui esquive, qui refuse. Méthode publiée, données ouvertes sur {{appName}}.",
     imageAlt: "Refusal Index : taux de refus des modèles d'IA",
     keywords:
       "{{appName}}, refusal index, taux de refus IA, IA non censurée, benchmark de censure IA, comparaison de modèles",

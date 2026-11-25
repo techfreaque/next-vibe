@@ -2,8 +2,7 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title:
-      "Indeks odmów: które modele AI odpowiadają, łagodzą albo odmawiają | {{appName}}",
+    title: "Indeks odmów: które modele AI odpowiadają | {{appName}}",
     category: "Indeks odmów",
     description:
       "Te same pytania do każdego modelu AI, co tydzień nowe. Mierzymy, kto odpowiada, kto łagodzi, a kto odmawia, i pokazujemy metodę. Otwarte dane na {{appName}}.",

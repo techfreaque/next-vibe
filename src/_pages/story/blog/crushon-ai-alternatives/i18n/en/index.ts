@@ -2,7 +2,7 @@ export const translations = {
   meta: {
     title: "CrushOn AI Alternatives: Adult Character Chat, Compared (2026)",
     description:
-      "CrushOn.AI sells five credit tiers up to $199.99 a month and may train on your chats. Compare {{appName}}, Janitor AI, SpicyChat, Chub, Kindroid, Nomi and more.",
+      "CrushOn.AI sells five credit tiers up to $199.99 a month and may train on your chats. Compare {{appName}}, Janitor AI, SpicyChat, Chub, Kindroid, Nomi.",
     category: "Comparison",
     imageAlt: "CrushOn AI alternatives for adult character chat, compared",
     keywords:

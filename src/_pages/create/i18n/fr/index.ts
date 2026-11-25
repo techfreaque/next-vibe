@@ -10,7 +10,7 @@ export const translations: typeof enTranslations = {
   hub: {
     metaTitle: "Studio média IA : images, vidéo, musique et voix",
     metaDescription:
-      "Générez des images, des clips vidéo, de la musique et des voix, ou transcrivez de l'audio. Modèles grand public et non censurés côte à côte. Vous payez au résultat.",
+      "Générez images, clips vidéo, musique et voix, ou transcrivez de l'audio. Modèles grand public et non censurés côte à côte. Vous payez au résultat.",
     keywords:
       "studio média IA, générateur d'images IA non censuré, générateur vidéo IA, générateur de musique IA, synthèse vocale, transcription audio",
     title: "Studio média",

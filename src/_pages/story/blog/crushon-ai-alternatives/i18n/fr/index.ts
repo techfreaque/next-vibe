@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "Alternatives à CrushOn AI : chat adulte avec personnages (2026)",
     description:
-      "CrushOn.AI vend cinq paliers de crédits jusqu'à $199.99 par mois et peut s'entraîner sur vos chats. Comparez {{appName}}, Janitor AI, SpicyChat, Chub, Kindroid, Nomi et d'autres.",
+      "CrushOn.AI vend cinq paliers jusqu'à $199.99 par mois et peut s'entraîner sur vos chats. Comparez {{appName}}, Janitor AI, SpicyChat, Chub, Kindroid, Nomi.",
     category: "Comparatif",
     imageAlt:
       "Les alternatives à CrushOn AI pour le chat adulte avec des personnages, comparées",

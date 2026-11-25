@@ -2,9 +2,9 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title: "Hermes und Thea: Remote-Threads in beide Richtungen ({{appName}})",
+    title: "Hermes und Thea: Remote-Threads in beide Richtungen",
     description:
-      "Deine lokale KI und deine Cloud-KI führen jetzt Threads füreinander aus: in beide Richtungen. Fehlt der Instanz, die den Turn übernimmt, der API-Key, holt sich der Aufrufer die Schleife zurück und bringt sie zu Ende.",
+      "Lokale KI und Cloud-KI führen jetzt Threads füreinander aus, in beide Richtungen. Kein API-Key auf der Instanz? Der Aufrufer holt die Schleife zurück.",
     category: "Hermes & Thea",
     imageAlt: "Hermes und Thea: zwei verbundene next-vibe-Instanzen",
     keywords:

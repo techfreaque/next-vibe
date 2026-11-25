@@ -2,7 +2,7 @@ export const translations = {
   meta: {
     title: "Your AI hands the job to Claude Code: {{appName}}",
     description:
-      "The coding-agent tool lets your AI delegate real code changes to Claude Code or OpenCode: headless, or as a live session in a real terminal window that reports back when it's done. Now across instances.",
+      "The coding-agent tool lets your AI hand real code changes to Claude Code or OpenCode: headless, or live in a terminal that reports back. Now across instances.",
     category: "Coding Agent",
     imageAlt: "Interactive coding agent: Claude Code in a terminal window",
     keywords:

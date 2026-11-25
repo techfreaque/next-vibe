@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "Cosa c'è di nuovo: sei mesi in una pagina ({{appName}})",
     description:
-      "Fermati significa fermarti. La voce funziona su iPhone. Il tuo AI scorre attraverso le tue macchine. L'auto-hosting non ha bisogno di Docker. E un robot di prova ha chiuso otto buchi di sicurezza. Tutto da maggio.",
+      "Stop vuol dire stop. La voce funziona su iPhone. La tua IA gira su tutte le tue macchine. Self-hosting senza Docker. Un robot di test ha chiuso otto falle.",
     category: "Aggiornamento del prodotto",
     imageAlt: "{{appName}}: aggiornamento di novembre 2026",
     keywords:

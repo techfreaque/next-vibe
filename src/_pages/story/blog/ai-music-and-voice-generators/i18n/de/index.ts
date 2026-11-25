@@ -2,10 +2,9 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title:
-      "KI-Musikgenerator, KI-Stimmen und Transkription in einem Account | {{appName}}",
+    title: "KI-Musikgenerator, KI-Stimmen und Transkription | {{appName}}",
     description:
-      "{{musicCount}} KI-Musikmodelle, {{voiceCount}} KI-Stimmen für Text zu Sprache, {{sttCount}} Transkriptionsmodelle. Suno-Alternativen mit echten Preisen pro Clip, pro Minute und pro Stunde. Gratis-Credits zum Start.",
+      "{{musicCount}} KI-Musikmodelle, {{voiceCount}} KI-Stimmen, {{sttCount}} Transkriptionsmodelle. Suno-Alternativen mit echten Preisen pro Clip und Minute. Gratis-Credits zum Start.",
     category: "Modellvergleich",
     imageAlt:
       "{{appName}}: KI-Musik, KI-Stimmen und Transkriptionsmodelle im Vergleich",

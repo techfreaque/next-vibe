@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "Bezstronna AI? Nie istnieje. Zapytaj kilka | {{appName}}",
     description:
-      "AI bez stronniczości politycznej nie istnieje. Dlaczego żaden chatbot nie jest neutralny, jak modele z głównego nurtu, abliterowane i z przeciwnymi poglądami ujmują to samo pytanie i jak usłyszeć każdą stronę w jednym czacie.",
+      "AI bez stronniczości nie istnieje. Dlaczego żaden chatbot nie jest neutralny, jak modele mainstreamowe, abliterowane i kontrariańskie ujmują to samo pytanie.",
     category: "Poradnik",
     imageAlt: "Waga, która waży odpowiedzi kilku chatbotów AI",
     keywords:

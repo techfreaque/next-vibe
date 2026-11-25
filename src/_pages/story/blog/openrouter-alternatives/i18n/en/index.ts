@@ -1,7 +1,6 @@
 export const translations = {
   meta: {
-    title:
-      "OpenRouter Alternatives With Uncensored Models (2026) | {{appName}}",
+    title: "OpenRouter Alternatives With Uncensored Models | {{appName}}",
     description:
       "Compare OpenRouter with Vercel AI Gateway, LiteLLM, Portkey, Cloudflare, NanoGPT and {{appName}}. See hosted fees, self-hosting, filters and privacy.",
     category: "Developer Guide",

@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "Due modi per guadagnare. Non devi sceglierne uno.",
     description:
-      "Una guida al programma referral di {{appName}}. Condividi un link e guadagna il 10%. Crea una skill e guadagna il 5% anche quando la condividono altri. Puoi iniziare senza esperienza.",
+      "Il programma referral di {{appName}} spiegato semplice. Condividi un link, guadagna il 10%. Crea una skill, guadagna il 5% anche quando la condividono altri.",
     category: "Programma di affiliazione",
     imageAlt:
       "Una persona che condivide un link e guadagna denaro passivamente",

@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "Alternatywy dla Claude: z filtrami i bez (2026)",
     description:
-      "Claude dobija do limitów i odmawia fikcji. Porównaj {{appName}}, ChatGPT, Gemini, Grok, DeepSeek, Kimi, Venice, NanoGPT, OpenRouter i aplikacje lokalne: cena i filtry.",
+      "Claude dobija do limitów i odmawia fikcji. Porównaj {{appName}}, ChatGPT, Gemini, Grok, DeepSeek, Kimi, Venice, NanoGPT, OpenRouter: cena i filtry.",
     category: "Porównanie",
     imageAlt: "Alternatywy dla Claude, z filtrami i bez, w porównaniu",
     keywords:

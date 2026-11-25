@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "Alternative a CrushOn AI: chat per adulti con personaggi (2026)",
     description:
-      "CrushOn.AI vende cinque piani di crediti fino a 199,99 USD al mese e può addestrare i modelli sulle tue chat. Confronta {{appName}}, Janitor AI, SpicyChat, Chub, Kindroid, Nomi e altri.",
+      "CrushOn.AI vende cinque piani fino a 199,99 USD al mese e può addestrarsi sulle tue chat. Confronta {{appName}}, Janitor AI, SpicyChat, Chub, Kindroid, Nomi.",
     category: "Confronto",
     imageAlt:
       "Le alternative a CrushOn AI per la chat per adulti con personaggi, a confronto",

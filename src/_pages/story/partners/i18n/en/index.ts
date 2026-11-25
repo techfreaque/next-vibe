@@ -3,7 +3,7 @@ export const translations = {
     title: "{{appName}} Partner Program: {{directPct}} recurring, no cap",
     category: "Partners",
     description:
-      "Creators, newsletters and directories: earn {{directPct}} of every purchase from the people you send to {{appName}}. Recurring, no cap, tracked per link. Paid in credits or BTC/USDC.",
+      "Creators, newsletters, directories: earn {{directPct}} of every purchase from people you send to {{appName}}. Recurring, no cap, tracked per link. Credits or BTC/USDC.",
     imageAlt: "{{appName}} Partner Program",
     keywords:
       "{{appName}}, affiliate program, partner program, uncensored AI affiliate, recurring commission, creator program, newsletter sponsorship",

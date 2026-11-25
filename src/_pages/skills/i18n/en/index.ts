@@ -7,7 +7,7 @@ export const translations = {
   meta: {
     title: "AI skills: ready-made specialists and characters | {{appName}}",
     description:
-      "Coders, writers, researchers, companions and uncensored characters. Each skill brings its own prompt, model and tools. Pick one and chat, or build your own and earn when others use it.",
+      "Coders, writers, researchers, companions and uncensored characters. Each skill brings its own prompt, model and tools. Chat with one, or build yours and earn.",
     category: "AI Skills",
     imageAlt: "AI skills on {{appName}}",
     keywords:

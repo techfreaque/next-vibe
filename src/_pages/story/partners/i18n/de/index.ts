@@ -6,7 +6,7 @@ export const translations: typeof enTranslations = {
       "{{appName}} Partnerprogramm: {{directPct}} wiederkehrend, ohne Limit",
     category: "Partner",
     description:
-      "Creator, Newsletter und Verzeichnisse: {{directPct}} jedes Kaufs der Nutzer, die du zu {{appName}} bringst. Wiederkehrend, ohne Limit, pro Link messbar. Auszahlung in Credits oder BTC/USDC.",
+      "Creator, Newsletter, Verzeichnisse: {{directPct}} jedes Kaufs deiner Nutzer auf {{appName}}. Wiederkehrend, ohne Limit, pro Link messbar. Credits oder BTC/USDC.",
     imageAlt: "{{appName}} Partnerprogramm",
     keywords:
       "{{appName}}, Affiliate-Programm, Partnerprogramm, unzensierte KI Affiliate, wiederkehrende Provision, Creator-Programm, Newsletter-Sponsoring",

@@ -2,10 +2,9 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   title: "AI senza censura: la chat senza filtri nel tuo browser",
-  metaTitle:
-    "AI senza censura: chat senza filtri, provala gratis | {{appName}}",
+  metaTitle: "AI senza censura: chat senza filtri, gratis | {{appName}}",
   description:
-    "Intelligenza artificiale senza censura, senza filtri e senza registrazione. Modelli abliterati e davvero senza censura nel browser, crediti gratuiti per gli ospiti. Confronta i costi e inizia subito.",
+    "AI senza censura, senza filtri né registrazione. Modelli abliterati e davvero senza censura nel browser, crediti gratis per gli ospiti. Confronta i costi.",
   keywords:
     "AI senza censura, IA senza censura, intelligenza artificiale senza censura, ChatGPT senza filtri, chat AI senza censura gratis, AI senza filtri, AI senza limiti, AI abliterata",
   intro:

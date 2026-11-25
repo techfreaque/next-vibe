@@ -2,8 +2,7 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   title: "AI bez cenzury: czat AI bez filtrów w przeglądarce",
-  metaTitle:
-    "AI bez cenzury: czat bez filtrów, wypróbuj za darmo | {{appName}}",
+  metaTitle: "AI bez cenzury: czat bez filtrów, za darmo | {{appName}}",
   description:
     "Czat AI bez cenzury i bez rejestracji. Modele abliterowane i naprawdę nieocenzurowane w przeglądarce, darmowe kredyty dla gości. Porównaj koszty i pisz od razu.",
   keywords:

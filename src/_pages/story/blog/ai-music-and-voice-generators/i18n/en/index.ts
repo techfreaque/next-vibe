@@ -1,9 +1,8 @@
 export const translations = {
   meta: {
-    title:
-      "AI Music Generator, Voices and Transcription in One Account | {{appName}}",
+    title: "AI Music Generator, Voices and Transcription | {{appName}}",
     description:
-      "{{musicCount}} AI music models, {{voiceCount}} text to speech voices, {{sttCount}} transcription models. Suno alternatives with real prices per clip, per minute and per hour. Free credits to start.",
+      "{{musicCount}} AI music models, {{voiceCount}} text to speech voices, {{sttCount}} transcription models. Suno alternatives with real prices per clip and minute. Free credits.",
     category: "Model Comparison",
     imageAlt: "{{appName}}: AI music, voice and transcription models compared",
     keywords:

@@ -1,7 +1,6 @@
 export const translations = {
   meta: {
-    title:
-      "Best AI Video Generator: {{modelCount}} Models, Kling vs Seedance | {{appName}}",
+    title: "Best AI Video Generator: Kling vs Seedance, Veo | {{appName}}",
     description:
       "{{modelCount}} AI video generators compared: Kling vs Seedance, Veo 3.1 vs Sora 2, Wan 3.0, Hailuo. Text and image to video, real prices, no watermark from us.",
     category: "Model Comparison",

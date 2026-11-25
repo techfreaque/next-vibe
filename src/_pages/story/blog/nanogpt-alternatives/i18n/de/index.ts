@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "NanoGPT Alternativen: Pay-per-Use und unzensierte KI (2026)",
     description:
-      "NanoGPT hat PRO gedeckelt, den Preis erhöht und Datenlecks bei Anbietern offengelegt. {{appName}}, OpenRouter, Venice, Featherless, Arli AI, Infermatic und mehr im Vergleich.",
+      "NanoGPT hat PRO gedeckelt, den Preis erhöht und Datenlecks bei Anbietern offengelegt. Vergleich: {{appName}}, OpenRouter, Venice, Featherless, Arli AI.",
     category: "Vergleich",
     imageAlt: "NanoGPT Alternativen für Pay-per-Use und unzensierte Modelle",
     keywords:

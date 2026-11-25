@@ -2,10 +2,9 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title:
-      "Alternative a Venice AI: private, senza censura, a confronto (2026)",
+    title: "Alternative a Venice AI: private e senza censura (2026)",
     description:
-      "Confronta Venice AI con {{appName}}, Maple, Proton Lumo, Duck.ai, NanoGPT e app locali. Scopri dove vengono elaborate le richieste, quali modelli rifiutano meno e cosa costa di più.",
+      "Venice AI a confronto con {{appName}}, Maple, Proton Lumo, Duck.ai, NanoGPT e app locali. Dove finiscono le richieste, chi rifiuta meno e cosa costa extra.",
     category: "Confronto",
     imageAlt: "Le alternative a Venice AI a confronto",
     keywords:

@@ -2,9 +2,9 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title: "Claude senza filtri: perché rifiuta e cosa funziona | {{appName}}",
+    title: "Claude senza filtri: perché rifiuta, cosa funziona | {{appName}}",
     description:
-      'Un Claude senza censura non esiste. Perché Claude rifiuta, perché i jailbreak e i finti siti "Claude senza censura" non reggono e cosa funziona: Claude più modelli senza censura nella stessa conversazione. Prezzi in tempo reale.',
+      "Claude senza censura non esiste. Perché rifiuta, perché jailbreak e siti falsi non reggono e cosa funziona: Claude più modelli senza censura nella stessa chat.",
     category: "Guida ai modelli",
     imageAlt: "Claude accanto a modelli senza censura nella stessa chat",
     keywords:

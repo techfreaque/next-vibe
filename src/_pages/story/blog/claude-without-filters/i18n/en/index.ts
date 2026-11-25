@@ -1,9 +1,8 @@
 export const translations = {
   meta: {
-    title:
-      "Claude Without Filters: Why It Refuses and What Works | {{appName}}",
+    title: "Claude Without Filters: Why It Refuses, What Works | {{appName}}",
     description:
-      "There is no uncensored Claude. Why Claude refuses, why jailbreaks and fake 'uncensored Claude' sites don't hold, and the setup that works: Claude plus uncensored models in one thread. Live prices.",
+      "There is no uncensored Claude. Why Claude refuses, why jailbreaks and fake 'uncensored Claude' sites fail, and what works: Claude plus uncensored models.",
     category: "Model Guide",
     imageAlt: "Claude next to uncensored models in one chat",
     keywords:

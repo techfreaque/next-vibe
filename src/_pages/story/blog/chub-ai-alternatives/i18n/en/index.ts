@@ -2,7 +2,7 @@ export const translations = {
   meta: {
     title: "Chub AI Alternatives: Character Chat, Lorebooks, Prices (2026)",
     description:
-      "Chub AI went crypto-only and capped free chat. Compare {{appName}}, Janitor AI, SillyTavern, RisuAI, SpicyChat, CrushOn and more on price, filters, mobile and memory.",
+      "Chub AI went crypto-only and capped free chat. Compare {{appName}}, Janitor AI, SillyTavern, RisuAI, SpicyChat, CrushOn: price, filters, mobile, memory.",
     category: "Comparison",
     imageAlt: "Chub AI alternatives for character roleplay, compared",
     keywords:

@@ -2,8 +2,7 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title:
-      "Alternativas a OpenRouter con modelos sin censura (2026) | {{appName}}",
+    title: "Alternativas a OpenRouter con modelos sin censura | {{appName}}",
     description:
       "Compara OpenRouter con Vercel AI Gateway, LiteLLM, Portkey, Cloudflare, NanoGPT y {{appName}}. Comisiones, alojamiento propio, filtros y privacidad.",
     category: "Guía para desarrolladores",

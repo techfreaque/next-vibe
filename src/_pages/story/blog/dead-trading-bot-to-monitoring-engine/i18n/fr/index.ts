@@ -2,16 +2,14 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title:
-      "Mon bot de trading abandonné est devenu un moteur de monitoring de plateforme | next-vibe",
+    title: "Mon bot de trading mort, devenu moteur de monitoring | next-vibe",
     description:
-      "J'ai abandonné un bot de trading il y a des années. Puis j'ai compris que son architecture (DataSource, Indicator, Evaluator, Action) s'applique à n'importe quelle activité. Alors je l'ai reconstruit dans next-vibe. Chaque nœud est un endpoint.",
+      "J'avais abandonné un bot de trading. Son architecture (DataSource, Indicator, Evaluator, Action) vaut pour toute activité. Je l'ai reconstruit dans next-vibe.",
     category: "Vibe Sense",
     imageAlt: "Pipeline de monitoring Vibe Sense, next-vibe",
     keywords:
       "vibe sense, monitoring, supervision, bot de trading, endpoints, EMA, pipeline, next-vibe, TypeScript",
-    ogTitle:
-      "Mon bot de trading abandonné est devenu un moteur de monitoring de plateforme",
+    ogTitle: "Mon bot de trading abandonné, devenu moteur de monitoring",
     ogDescription:
       "Le bot de trading avait la bonne architecture. C'est l'endroit où je l'avais construit qui n'allait pas.",
     twitterTitle:

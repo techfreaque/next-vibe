@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "La tua IA delega il lavoro a Claude Code: {{appName}}",
     description:
-      "Con coding-agent, la tua IA può delegare modifiche al codice a Claude Code o OpenCode. L’agente lavora in background o in un terminale che puoi seguire dal vivo e ti invia il risultato. Ora funziona anche tra istanze.",
+      "Con coding-agent la tua IA affida modifiche al codice a Claude Code o OpenCode: in background o dal vivo in un terminale che riferisce. Anche tra istanze.",
     category: "Agente di programmazione",
     imageAlt:
       "Agente di programmazione interattivo: Claude Code in una finestra del terminale",

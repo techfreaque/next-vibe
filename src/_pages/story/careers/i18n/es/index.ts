@@ -5,16 +5,16 @@ export const translations: typeof enTranslations = {
     title: "Construir con next-vibe: {{appName}}",
     category: "Desarrolladores",
     description:
-      "next-vibe convierte cualquier punto final en un formulario web, comando CLI, herramienta MCP, pantalla nativa, y AI: habilidad nominal simultáneamente. Automatizar cualquier cosa que un humano pueda hacer en una computadora.",
+      "next-vibe convierte cada endpoint en formulario web, comando CLI, herramienta MCP, pantalla nativa y skill para IA. Automatiza todo tu trabajo en el ordenador.",
     imageAlt: "next-vibe plataforma de desarrolladores: {{appName}}",
     keywords:
       "next-vibe, automatización AI, plataforma de desarrolladores, automatización de negocios, integración ERP, automatización de producción, {{appName}}",
     ogTitle: "Construir con next-vibe: {{appName}}",
     ogDescription:
-      "Una base de código. Cada superficie. Automatizar líneas de producción, sistemas ERP, flujos de trabajo de escritorio: cualquier cosa que un humano puede hacer en un ordenador.",
+      "Una base de código. Todas las superficies. Automatiza líneas de producción, ERP y flujos de escritorio: todo lo que una persona hace en un ordenador.",
     twitterTitle: "Construir con next-vibe: {{appName}}",
     twitterDescription:
-      "Una base de código. Cada superficie. Automatizar líneas de producción, sistemas ERP, flujos de trabajo de escritorio: cualquier cosa que un humano puede hacer en un ordenador.",
+      "Una base de código. Todas las superficies. Automatiza líneas de producción, ERP y flujos de escritorio: todo lo que una persona hace en un ordenador.",
   },
 
   hero: {

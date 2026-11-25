@@ -2,7 +2,7 @@ export const translations = {
   meta: {
     title: "Free Uncensored AI: What Each Free Tier Really Gives (2026)",
     description:
-      "Free uncensored AI, checked: Venice, uncensored.ai, FreedomGPT, Gab AI, NanoGPT, OpenRouter, LM Studio, Ollama and {{appName}}. Limits, filters, privacy and the catch.",
+      "Free uncensored AI, checked: Venice, uncensored.ai, FreedomGPT, Gab AI, NanoGPT, OpenRouter, LM Studio, Ollama, {{appName}}. Limits, filters, the catch.",
     category: "Guide",
     imageAlt: "Free uncensored AI options compared",
     keywords:

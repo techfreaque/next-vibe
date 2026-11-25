@@ -5,7 +5,7 @@ export const translations: typeof enTranslations = {
     title: "Verdienen mit {{appName}}: wiederkehrende Empfehlungsprovision",
     category: "Verdienen",
     description:
-      "Empfiehl {{appName}} und erhalte {{directPct}} jeder Zahlung deiner Empfehlungen: wiederkehrend, solange sie zahlen. Veröffentliche einen Skill und erhalte {{skillBonusPct}} auf Nutzer, die andere darüber bringen.",
+      "Empfiehl {{appName}} und erhalte {{directPct}} jeder Zahlung, solange deine Empfehlungen zahlen. Veröffentliche einen Skill: {{skillBonusPct}} auf weitere Nutzer.",
     imageAlt: "Verdienen mit {{appName}}",
     keywords:
       "{{appName}}, Empfehlungsprogramm, Affiliate, wiederkehrende Provision, KI-Skills, passives Einkommen",

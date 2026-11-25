@@ -2,7 +2,7 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title: "DeepSeek senza censura: DeepSeek abliterated online | {{appName}}",
+    title: "DeepSeek senza censura: abliterated online | {{appName}}",
     description:
       "Dove sta davvero la censura di DeepSeek, perché cambiare host risolve solo metà e quali build senza censura usare nel browser. Niente GPU, niente account.",
     category: "Guida ai modelli",

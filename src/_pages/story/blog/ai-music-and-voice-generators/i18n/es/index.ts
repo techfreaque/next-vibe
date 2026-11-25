@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "Música, voz y transcripción con IA | {{appName}}",
     description:
-      "Modelos de música {{musicCount}} AI, texto {{voiceCount}} a voces de discurso, modelos de transcripción {{sttCount}}. Suno alternativas con precios reales por clip, por minuto y por hora. Créditos gratis para empezar.",
+      "{{musicCount}} modelos de música con IA, {{voiceCount}} voces de texto a voz, {{sttCount}} modelos de transcripción. Alternativas a Suno, precios reales por clip y minuto. Créditos gratis.",
     category: "Comparación de modelos",
     imageAlt:
       "{{appName}} : Modelos de música, voz y transcripción AI comparados",

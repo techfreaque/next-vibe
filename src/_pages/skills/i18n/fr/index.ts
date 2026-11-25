@@ -7,10 +7,9 @@ export const translations: typeof enTranslations = {
   description:
     "Des spécialistes et des personnages prêts à l'emploi. Chaque skill a ses propres instructions, son modèle et ses outils. Choisissez-en un et lancez la conversation, ou créez le vôtre.",
   meta: {
-    title:
-      "Skills IA : spécialistes et personnages prêts à l'emploi | {{appName}}",
+    title: "Skills IA : spécialistes et personnages prêts | {{appName}}",
     description:
-      "Développeurs, auteurs, chercheurs, compagnons et personnages non censurés. Chaque skill apporte son prompt, son modèle et ses outils. Choisissez-en un et discutez, ou créez le vôtre et gagnez de l'argent quand d'autres l'utilisent.",
+      "Développeurs, auteurs, chercheurs, compagnons, personnages non censurés. Chaque skill a son prompt, son modèle, ses outils. Discutez, ou créez et gagnez.",
     category: "Skills IA",
     imageAlt: "Skills IA sur {{appName}}",
     keywords:

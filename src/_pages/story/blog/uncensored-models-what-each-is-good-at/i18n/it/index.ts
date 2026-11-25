@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "I modelli senza censura, uno per uno | {{appName}}",
     description:
-      "Tutti i modelli IA senza censura su unbottled.ai. Due tipi: modelli tradizionali modificati per togliere i rifiuti e UncensoredLM, addestrato su libri e documenti banditi. Scopri i punti di forza e i limiti di ciascuno.",
+      "Tutti i modelli IA senza censura su unbottled.ai: modelli mainstream senza rifiuti e UncensoredLM, addestrato su libri e documenti banditi. Pregi e limiti.",
     category: "Guida del modello",
     imageAlt: "Guida modello non censurata {{appName}}",
     keywords:

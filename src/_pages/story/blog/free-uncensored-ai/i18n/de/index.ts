@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "Unzensierte KI kostenlos: Was gratis wirklich bringt (2026)",
     description:
-      "Unzensierte KI kostenlos nutzen: Venice, uncensored.ai, FreedomGPT, Gab AI, NanoGPT, OpenRouter, LM Studio, Ollama und {{appName}} im Gratis-Check. Limits, Filter, Datenschutz, Haken.",
+      "Unzensierte KI kostenlos: Venice, uncensored.ai, FreedomGPT, Gab AI, NanoGPT, OpenRouter, LM Studio, Ollama und {{appName}} im Check. Limits, Filter, Haken.",
     category: "Ratgeber",
     imageAlt: "Kostenlose unzensierte KI im Vergleich",
     keywords:

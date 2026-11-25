@@ -748,8 +748,7 @@ export const translations = {
     },
     characterAi: {
       meta: {
-        title:
-          "Character.AI Alternative Without Filter: {{appName}} vs Character.AI",
+        title: "Character.AI Alternative Without Filter: {{appName}} vs C.AI",
         description:
           "{{appName}} vs Character.AI: filters, age checks, models, privacy and price. When Character.AI is the right call, and when you need an uncensored alternative.",
         keywords:

@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "Hermes i Thea: zdalne wątki w obie strony ({{appName}})",
     description:
-      "Twoje lokalne AI i Twoje AI w chmurze prowadzą teraz wątki za siebie nawzajem: w obie strony. Instancja przejmująca turę nie ma klucza API? Wywołujący odbiera pętlę i sam ją kończy.",
+      "Lokalne AI i AI w chmurze prowadzą teraz wątki za siebie nawzajem, w obie strony. Instancja nie ma klucza API? Wywołujący odbiera pętlę i sam ją kończy.",
     category: "Hermes i Thea",
     imageAlt: "Hermes i Thea: dwie połączone instancje next-vibe",
     keywords:

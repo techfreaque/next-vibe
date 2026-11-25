@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "Deux façons de gagner. Inutile de choisir.",
     description:
-      "Le programme de parrainage {{appName}} expliqué simplement. Partagez un lien et gagnez 10 %. Créez une compétence et gagnez 5 % en passif, même quand d'autres la partagent. Aucune expérience requise.",
+      "Le parrainage {{appName}} expliqué simplement. Partagez un lien, gagnez 10 %. Créez une compétence, gagnez 5 % en passif, même quand d'autres la partagent.",
     category: "Programme d'affiliation",
     imageAlt: "Une personne qui partage un lien et gagne de l'argent en passif",
     keywords:

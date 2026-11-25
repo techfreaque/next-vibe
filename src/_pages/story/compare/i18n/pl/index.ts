@@ -467,7 +467,7 @@ export const translations: typeof enTranslations = {
       title: "Najlepsze AI bez cenzury 2026: uczciwe porównanie",
       category: "Porównanie",
       description:
-        "{{count}} platform AI bez cenzury w porównaniu: Venice, NanoGPT, Janitor AI, FreedomGPT, Kindroid, lokalne modele i więcej. Ceny, filtry, prywatność, API. Ze źródłami.",
+        "{{count}} platform AI bez cenzury w porównaniu: Venice, NanoGPT, Janitor AI, FreedomGPT, Kindroid, modele lokalne. Ceny, filtry, prywatność, API. Ze źródłami.",
       imageAlt: "Platformy AI bez cenzury porównane obok siebie",
       keywords:
         "AI bez cenzury, najlepsze AI bez cenzury, czat AI bez cenzury, AI bez filtrów, sztuczna inteligencja bez cenzury, chatbot bez cenzury, NSFW AI czat, alternatywa dla Character AI, Venice AI alternatywa, Venice AI opinie, NanoGPT, Janitor AI po polsku, Janitor AI alternatywa, FreedomGPT, Gab AI, uncensored.ai, Kindroid, Nomi, CrushOn AI, SillyTavern, Ollama bez cenzury, LM Studio bez cenzury, modele abliterowane, best uncensored AI, uncensored AI chat, {{appName}}",
@@ -755,7 +755,7 @@ export const translations: typeof enTranslations = {
       meta: {
         title: "Alternatywa dla Character AI bez filtra: {{appName}}",
         description:
-          "{{appName}} vs Character.AI: filtry, weryfikacja wieku, modele, prywatność i cena. Kiedy Character.AI to dobry wybór, a kiedy potrzebujesz alternatywy bez cenzury.",
+          "{{appName}} vs Character.AI: filtry, weryfikacja wieku, modele, prywatność, cena. Kiedy Character.AI wystarczy, a kiedy potrzebujesz alternatywy bez cenzury.",
         keywords:
           "alternatywa dla Character AI, Character AI bez filtra, Character AI alternatywa bez cenzury, Character AI NSFW, Character AI filtr, Character AI weryfikacja wieku, c.ai+ cena, AI roleplay bez filtra, czat z postaciami bez cenzury, NSFW AI czat, Character AI alternative, Character AI alternative without filter, uncensored character AI, {{appName}} vs Character.AI",
       },
@@ -911,7 +911,7 @@ export const translations: typeof enTranslations = {
       meta: {
         title: "NanoGPT alternatywa: {{appName}} vs NanoGPT 2026",
         description:
-          "{{appName}} vs NanoGPT: płatność za użycie kontra plany, modele bez cenzury i abliterowane, prywatność, API i media. Kupujemy od NanoGPT i mówimy, gdzie wygrywa.",
+          "{{appName}} vs NanoGPT: płatność za użycie czy plany, modele bez cenzury i abliterowane, prywatność, API, media. Kupujemy od NanoGPT i mówimy, gdzie wygrywa.",
         keywords:
           "NanoGPT alternatywa, NanoGPT opinie, NanoGPT cena, NanoGPT bez cenzury, API AI bez cenzury, modele abliterowane API, AI płatność za użycie, AI bez cenzury, NanoGPT alternative, NanoGPT vs, nano-gpt review, NanoGPT pricing, NanoGPT PRO, NanoGPT uncensored, uncensored AI API, {{appName}} vs NanoGPT",
       },

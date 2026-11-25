@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "Neutrale KI? Gibt es nicht. Fragen Sie mehrere | {{appName}}",
     description:
-      "KI ohne politische Voreingenommenheit gibt es nicht. Warum kein Chatbot neutral ist, wie Mainstream-, abliterierte und gegenläufige Modelle dieselbe Frage rahmen und wie Sie alle Seiten in einem Chat hören.",
+      "Unvoreingenommene KI gibt es nicht. Warum kein Chatbot neutral ist und wie Mainstream-, abliterierte und gegenläufige Modelle dieselbe Frage rahmen.",
     category: "Ratgeber",
     imageAlt: "Eine Waage wiegt die Antworten mehrerer KI-Chatbots",
     keywords:

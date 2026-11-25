@@ -3,7 +3,7 @@ export const translations = {
     title: "Build with next-vibe: {{appName}}",
     category: "Developers",
     description:
-      "next-vibe turns any endpoint into a web form, CLI command, MCP tool, native screen, and AI-callable skill simultaneously. Automate anything a human can do on a computer.",
+      "next-vibe turns any endpoint into a web form, CLI command, MCP tool, native screen and AI-callable skill at once. Automate anything a human does on a computer.",
     imageAlt: "next-vibe developer platform: {{appName}}",
     keywords:
       "next-vibe, AI automation, developer platform, business automation, ERP integration, production automation, {{appName}}",

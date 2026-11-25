@@ -2,7 +2,7 @@ export const translations = {
   backToChat: "Back to Chat",
   title: "Share your link. Earn {{directPct}} of every payment. Forever.",
   description:
-    "Anyone who signs up through your link pays you {{directPct}} of every payment they make. No expiry, no cap. Publish a skill and earn {{skillBonusPct}} on users others bring to it.",
+    "Anyone who signs up via your link pays you {{directPct}} of every payment. No expiry, no cap. Publish a skill and earn {{skillBonusPct}} on users others bring.",
   tagline: "Referrals & Skills",
 
   hero: {

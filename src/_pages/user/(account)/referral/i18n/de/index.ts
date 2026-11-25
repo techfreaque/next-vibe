@@ -3,7 +3,7 @@ export const translations: typeof enTranslations = {
   backToChat: "Zurück zum Chat",
   title: "Link teilen. {{directPct}} von jeder Zahlung. Für immer.",
   description:
-    "Wer sich über deinen Link anmeldet, bringt dir {{directPct}} jeder Zahlung. Kein Ablaufdatum, keine Obergrenze. Veröffentlichst du einen Skill, bekommst du {{skillBonusPct}} auf Nutzer, die andere darüber bringen.",
+    "Wer sich über deinen Link anmeldet, bringt dir {{directPct}} jeder Zahlung. Ohne Ablauf, ohne Obergrenze. Dein Skill bringt {{skillBonusPct}} auf weitere Nutzer.",
   tagline: "Empfehlungen & Skills",
 
   hero: {

@@ -1,10 +1,9 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
-  title:
-    "Alternatives à Janitor AI pour le jeu de rôle : personnages, mémoire et tarifs",
+  title: "Alternatives à Janitor AI pour le jeu de rôle : mémoire, prix",
   description:
-    "Onze solutions pour poursuivre un récit quand Janitor AI est en panne, perd le fil ou parle à votre place. Comparez les offres gratuites, les fiches de personnages et les outils de mémoire.",
+    "Onze solutions quand Janitor AI tombe en panne, perd le fil ou parle à votre place. Comparez offres gratuites, fiches de personnages et outils de mémoire.",
   keywords:
     "alternatives à Janitor AI, jeu de rôle IA gratuit, fiches de personnages, compagnon IA",
   category: "Comparatif",

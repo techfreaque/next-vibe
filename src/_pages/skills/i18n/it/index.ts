@@ -9,7 +9,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "Skill AI: specialisti e personaggi pronti all'uso | {{appName}}",
     description:
-      "Programmatori, scrittori, ricercatori, compagni e personaggi senza censura. Ogni skill porta il suo prompt, il suo modello e i suoi strumenti. Scegline una e chatta, oppure crea la tua e guadagna quando altri la usano.",
+      "Programmatori, scrittori, ricercatori, compagni e personaggi senza censura. Ogni skill ha prompt, modello e strumenti suoi. Chatta o crea la tua e guadagna.",
     category: "Skill AI",
     imageAlt: "Skill AI su {{appName}}",
     keywords:

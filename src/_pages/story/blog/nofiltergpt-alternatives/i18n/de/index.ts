@@ -2,7 +2,7 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title: "NoFilterGPT Alternativen: unzensierte KI-Chats im Vergleich (2026)",
+    title: "NoFilterGPT Alternativen: unzensierte KI-Chats im Vergleich",
     description:
       "NoFilterGPT im Vergleich mit Venice, Unrestricted.chat, {{appName}} und lokalen Apps wie Ollama. Mit Modellauswahl, Gratislimits, Datenschutz und API.",
     category: "Vergleich",

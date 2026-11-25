@@ -2,7 +2,7 @@ export const translations = {
   meta: {
     title: "Uncensored LLM Online: No GPU, No Install | {{appName}}",
     description:
-      "Run an uncensored LLM online without a GPU. What local models really need in VRAM, which abliterated and uncensored models run in your browser, and what they cost per message.",
+      "Uncensored LLM online, no GPU. The VRAM local models really need, which abliterated and uncensored models run in your browser, and what each message costs.",
     category: "Model Guide",
     imageAlt: "An uncensored LLM running online, no GPU needed",
     keywords:

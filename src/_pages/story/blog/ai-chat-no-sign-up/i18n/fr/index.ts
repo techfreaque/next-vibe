@@ -2,10 +2,9 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title:
-      "Chat IA gratuit sans inscription : ni e-mail, ni compte | {{appName}}",
+    title: "Chat IA gratuit sans inscription ni compte | {{appName}}",
     description:
-      "Un chat IA gratuit, sans inscription et sans compte sur {{appName}} : crédits gratuits chaque mois, des modèles grand public aux non censurés, historique incognito gardé dans votre navigateur. Ce qu'anonyme veut dire, et ce qu'il ne veut pas dire.",
+      "Chat IA gratuit sans inscription sur {{appName}} : crédits offerts chaque mois, modèles grand public à non censurés, historique incognito dans le navigateur.",
     category: "Guide",
     imageAlt: "Un chat IA qui démarre sans formulaire d'inscription",
     keywords:

@@ -2,7 +2,7 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title: "Générateur d'images IA sans censure, prix par image | {{appName}}",
+    title: "Générateur d'images IA sans censure, prix par image",
     description:
       "{{uncensoredCount}} générateurs d'images IA sans censure à côté de Flux, Seedream, GPT Image et Recraft : {{modelCount}} modèles, vrai prix par image, aucun flou. Retouche incluse.",
     category: "Comparatif de modèles",

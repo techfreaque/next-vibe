@@ -2,7 +2,7 @@ export const translations = {
   meta: {
     title: "Unbiased AI Chatbot? None Is Neutral. Ask Several. | {{appName}}",
     description:
-      "Every AI chatbot leans. Why no model is politically neutral, how mainstream, abliterated and contrary models frame the same question, and how to hear every side in one chat.",
+      "Every AI chatbot leans. Why no model is politically neutral, how mainstream, abliterated and contrary models frame one question, and how to hear every side.",
     category: "Guide",
     imageAlt: "Scales weighing the answers of several AI chatbots",
     keywords:

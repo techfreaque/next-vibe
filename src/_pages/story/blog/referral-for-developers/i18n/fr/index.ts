@@ -2,10 +2,9 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title:
-      "Vous avez construit quelque chose avec l'IA. Gagnez en le partageant.",
+    title: "Vous avez construit avec l'IA ? Gagnez en le partageant",
     description:
-      "Pour les développeurs : vos READMEs GitHub, articles de blog et tutoriels ont déjà un potentiel de parrainage. Voici le calcul, bonus compétence (5 %) compris quand d'autres partagent votre compétence.",
+      "Développeurs : vos READMEs, articles et tutoriels ont déjà un potentiel de parrainage. Le calcul, bonus compétence de 5 % compris quand d'autres la partagent.",
     category: "Programme d'affiliation",
     imageAlt:
       "Le terminal d'un développeur avec des statistiques de gains à côté du code",

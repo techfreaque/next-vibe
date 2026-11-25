@@ -3,7 +3,7 @@ export const translations = {
     title: "Earn with {{appName}}: recurring referral income",
     category: "Earn",
     description:
-      "Share {{appName}} and earn {{directPct}} of every payment your referrals make: recurring, for as long as they pay. Publish a skill and earn {{skillBonusPct}} on users others bring to it.",
+      "Share {{appName}} and earn {{directPct}} of every payment your referrals make, for as long as they pay. Publish a skill, earn {{skillBonusPct}} on users others bring.",
     imageAlt: "Earn with {{appName}}",
     keywords:
       "{{appName}}, referral program, affiliate, recurring commission, AI skills, passive income",

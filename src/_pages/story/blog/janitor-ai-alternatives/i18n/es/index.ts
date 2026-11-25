@@ -3,7 +3,7 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   title: "Alternativas a Janitor AI para rol: personajes, memoria y precios",
   description:
-    "Once opciones para seguir escribiendo si Janitor AI deja de funcionar, pierde el hilo o habla por tu personaje. Compara chats gratis, fichas de personaje y planes de compañía.",
+    "Once opciones para seguir escribiendo si Janitor AI se cae, pierde el hilo o habla por tu personaje. Compara chats gratis, fichas de personaje y planes.",
   keywords:
     "alternativas a Janitor AI, chat de rol con IA gratis, fichas de personaje, compañeros de IA",
   category: "Comparativa",

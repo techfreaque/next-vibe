@@ -2,10 +2,9 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   title: "KI ohne Zensur: unzensierter KI-Chat im Browser",
-  metaTitle:
-    "KI ohne Zensur: unzensierter Chat, kostenlos testen | {{appName}}",
+  metaTitle: "KI ohne Zensur: unzensierter Chat, gratis testen | {{appName}}",
   description:
-    "Unzensierte KI ohne Filter und ohne Anmeldung. Abliterierte und echt unzensierte Modelle im Browser, Gratis-Credits für Gäste. Kosten vergleichen und sofort loschatten.",
+    "Unzensierte KI ohne Filter und ohne Anmeldung. Abliterierte und echt unzensierte Modelle im Browser, Gratis-Credits für Gäste. Kosten vergleichen, loschatten.",
   keywords:
     "KI ohne Zensur, unzensierte KI, KI ohne Filter, ChatGPT ohne Filter, KI ohne Einschränkungen, unzensierter KI-Chat, KI-Chatbot ohne Zensur, abliterierte KI",
   intro:

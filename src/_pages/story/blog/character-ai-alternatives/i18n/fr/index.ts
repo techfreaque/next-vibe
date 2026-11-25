@@ -5,7 +5,7 @@ export const translations: typeof enTranslations = {
     title: "Alternatives à Character.AI pour le jeu de rôle (2026)",
     category: "Jeu de rôle avec l’IA",
     description:
-      "Comparez les alternatives à Character.AI pour le jeu de rôle, la fiction et les compagnons IA, dont Janitor AI, SpicyChat, DreamGen, SillyTavern et {{appName}}.",
+      "Alternatives à Character.AI pour le jeu de rôle, la fiction et les compagnons IA : Janitor AI, SpicyChat, DreamGen, SillyTavern et {{appName}} comparés.",
     imageAlt:
       "Alternatives à Character.AI pour le jeu de rôle et les compagnons IA",
     keywords:

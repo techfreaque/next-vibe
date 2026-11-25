@@ -2,7 +2,7 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title: "DeepSeek non censuré : DeepSeek abliterated en ligne | {{appName}}",
+    title: "DeepSeek non censuré : abliterated en ligne | {{appName}}",
     description:
       "Où se cache la censure de DeepSeek, pourquoi un autre hébergeur ne règle que la moitié, et les versions non censurées à tester en ligne. Sans GPU, sans compte.",
     category: "Guide des modèles",

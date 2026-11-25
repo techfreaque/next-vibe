@@ -2,10 +2,9 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title:
-      "Hermes et Thea : des fils distants dans les deux sens | {{appName}}",
+    title: "Hermes et Thea : fils distants dans les deux sens | {{appName}}",
     description:
-      "Votre IA locale et votre IA dans le cloud exécutent désormais des fils l'une pour l'autre, dans les deux sens. Pas de clé API sur l'instance qui exécute le tour ? L'appelant reprend la boucle et la termine.",
+      "Votre IA locale et votre IA cloud exécutent des fils l'une pour l'autre. Pas de clé API sur l'instance ? L'appelant reprend la boucle et la termine.",
     category: "Hermes & Thea",
     imageAlt: "Hermes et Thea : deux instances next-vibe connectées",
     keywords:

@@ -2,9 +2,9 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title: "Generadores de imágenes con IA sin censura y precios | {{appName}}",
+    title: "Generadores de imágenes con IA sin censura | {{appName}}",
     description:
-      "{{uncensoredCount}} generadores de imagen AI sin censura junto a Flux, Seedream, GPT Imagen y Recraft: Modelos {{modelCount}}, precio real por imagen, sin borrón. Edita tus propias fotos también.",
+      "{{uncensoredCount}} generadores de imágenes con IA sin censura junto a Flux, Seedream, GPT Image y Recraft: {{modelCount}} modelos, precio real, sin desenfoque.",
     category: "Comparación de modelos",
     imageAlt: "{{appName}} : generadores de imagen AI sin censura comparados",
     keywords:

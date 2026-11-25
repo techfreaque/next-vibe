@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "Je suis affilié. Qu'est-ce qui change avec les abonnements IA ?",
     description:
-      "Pour les affiliés expérimentés : pourquoi le parrainage d'abonnements IA offre une meilleure rentabilité à long terme que la plupart des programmes d'affiliation que vous connaissez.",
+      "Pour les affiliés aguerris : pourquoi parrainer des abonnements IA rapporte plus sur la durée que la plupart des programmes d'affiliation que vous connaissez.",
     category: "Programme d'affiliation",
     imageAlt:
       "Un graphique montrant la croissance des revenus récurrents dans le temps",

@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "IA sans censure gratuite : ce que les offres donnent vraiment",
     description:
-      "IA sans censure gratuite, vérifiée : Venice, uncensored.ai, FreedomGPT, Gab AI, NanoGPT, OpenRouter, LM Studio, Ollama et {{appName}}. Limites, filtres, vie privée et pièges.",
+      "IA sans censure gratuite : Venice, uncensored.ai, FreedomGPT, Gab AI, NanoGPT, OpenRouter, LM Studio, Ollama et {{appName}} vérifiés. Limites, filtres, pièges.",
     category: "Guide",
     imageAlt: "Les IA sans censure gratuites comparées",
     keywords:

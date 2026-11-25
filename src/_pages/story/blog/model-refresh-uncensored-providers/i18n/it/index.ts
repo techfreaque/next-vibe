@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "Nuovi modelli e nuovi fornitori senza censura | {{appName}}",
     description:
-      "Claude 5.5, GPT-6, Gemini 4 Argon, Grok 4.7 e nuovi modelli aperti. Inoltre NanoGPT, una più grande formazione Venice e i primi modelli di immagine non censurati.",
+      "Claude 5.5, GPT-6, Gemini 4 Argon, Grok 4.7 e nuovi modelli aperti. In più NanoGPT, più modelli Venice e i primi modelli di immagini senza censura.",
     category: "Aggiornamento del modello",
     imageAlt: "Aggiornamento dei modelli di {{appName}} a novembre 2026",
     keywords:

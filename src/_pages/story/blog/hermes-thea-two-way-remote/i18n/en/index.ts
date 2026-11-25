@@ -2,7 +2,7 @@ export const translations = {
   meta: {
     title: "Hermes and Thea: two-way remote threads ({{appName}})",
     description:
-      "Your local AI and your cloud AI now run threads for each other in both directions. No API key on the instance that runs the turn? The caller takes the loop back and finishes it.",
+      "Your local AI and your cloud AI now run threads for each other, both ways. No API key where the turn runs? The caller takes the loop back and finishes it.",
     category: "Hermes & Thea",
     imageAlt: "Hermes and Thea: two connected next-vibe instances",
     keywords:

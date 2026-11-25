@@ -469,7 +469,7 @@ export const translations: typeof enTranslations = {
       title: "Meilleure IA sans censure 2026 : le comparatif honnête",
       category: "Comparatif",
       description:
-        "{{count}} plateformes d'IA sans censure comparées : Venice, NanoGPT, Janitor AI, FreedomGPT, Kindroid, modèles locaux et d'autres. Prix, filtres, confidentialité, API. Sources citées.",
+        "{{count}} plateformes d'IA sans censure comparées : Venice, NanoGPT, Janitor AI, FreedomGPT, Kindroid, modèles locaux. Prix, filtres, vie privée, API. Sources.",
       imageAlt: "Plateformes d'IA sans censure comparées côte à côte",
       keywords:
         "IA sans censure, meilleure IA sans censure, IA non censurée, chat IA sans filtre, IA sans filtre, IA NSFW, chat IA NSFW, alternative Venice AI, avis Venice.ai, NanoGPT, alternative à Janitor AI, Janitor AI alternative, alternative à Character AI, FreedomGPT, Gab AI, uncensored.ai, Kindroid, Nomi, CrushOn AI, SillyTavern, Ollama sans censure, LM Studio sans censure, modèles abliterated, best uncensored AI, uncensored AI chat, {{appName}}",
@@ -682,7 +682,7 @@ export const translations: typeof enTranslations = {
       meta: {
         title: "Alternative Venice AI : {{appName}} vs Venice, comparatif 2026",
         description:
-          "{{appName}} vs Venice.ai : prix, modèles non censurés, filtre adulte, confidentialité et API côte à côte. Nous achetons chez Venice, alors nous disons précisément où chacun gagne.",
+          "{{appName}} vs Venice.ai : prix, modèles non censurés, filtre adulte, confidentialité et API côte à côte. Nous achetons chez Venice et disons où chacun gagne.",
         keywords:
           "alternative Venice AI, alternative à Venice AI, Venice AI avis, Venice AI prix, Venice Pro, Venice sans censure, Venice AI est-elle sans censure, filtre adulte Venice AI, Venice AI API, VVV DIEM, chat IA sans censure, IA non censurée, Venice AI alternative, Venice.ai vs, {{appName}} vs Venice",
       },
@@ -759,7 +759,7 @@ export const translations: typeof enTranslations = {
       meta: {
         title: "Alternative à Character AI sans filtre : {{appName}} vs C.AI",
         description:
-          "{{appName}} vs Character.AI : filtres, vérification d'âge, modèles, confidentialité et prix. Quand Character.AI est le bon choix, et quand il vous faut une alternative sans censure.",
+          "{{appName}} vs Character.AI : filtres, vérification d'âge, modèles, confidentialité, prix. Quand Character.AI suffit, et quand passer à une IA sans censure.",
         keywords:
           "alternative à Character AI, alternative Character AI sans filtre, Character AI sans filtre, filtre Character.AI, prix c.ai+, Character AI NSFW, vérification d'âge Character AI, IA de personnages sans censure, jeu de rôle IA sans filtre, IA NSFW, Character AI alternative, {{appName}} vs Character.AI",
       },
@@ -836,7 +836,7 @@ export const translations: typeof enTranslations = {
       meta: {
         title: "Alternative à Janitor AI : {{appName}} vs Janitor AI (2026)",
         description:
-          "{{appName}} vs Janitor AI : JLLM contre {{modelCount}} modèles, limites de contexte, règles NSFW, proxys, confidentialité et prix. Points forts et faibles, sans détour, pour le jeu de rôle.",
+          "{{appName}} vs Janitor AI : JLLM contre {{modelCount}} modèles, contexte, règles NSFW, proxys, confidentialité et prix. Forces et faiblesses pour le jeu de rôle.",
         keywords:
           "alternative à Janitor AI, Janitor AI alternative, Janitor AI vs, JanitorAI, prix janitor+, JLLM, proxy Janitor AI, Janitor AI OpenRouter, limite de contexte Janitor AI, jeu de rôle IA NSFW, IA NSFW, IA de jeu de rôle sans censure, chat IA sans filtre, {{appName}} vs Janitor AI",
       },
@@ -916,7 +916,7 @@ export const translations: typeof enTranslations = {
         title:
           "Alternative à NanoGPT : {{appName}} vs NanoGPT, comparatif 2026",
         description:
-          "{{appName}} vs NanoGPT : paiement à l'usage ou offres, modèles non censurés et abliterated, confidentialité, API et médias. Nous achetons chez NanoGPT et disons où il gagne.",
+          "{{appName}} vs NanoGPT : paiement à l'usage ou offres, modèles non censurés et abliterated, vie privée, API, médias. Clients de NanoGPT, on dit où il gagne.",
         keywords:
           "alternative à NanoGPT, NanoGPT alternative, NanoGPT vs, nano-gpt avis, NanoGPT prix, NanoGPT PRO, NanoGPT sans censure, API modèles abliterated, IA paiement à l'usage, API IA sans censure, IA non censurée, {{appName}} vs NanoGPT",
       },
@@ -993,7 +993,7 @@ export const translations: typeof enTranslations = {
       meta: {
         title: "Alternative à FreedomGPT : {{appName}} vs FreedomGPT (2026)",
         description:
-          "{{appName}} vs FreedomGPT : Liberty et modèles sans censure, règles de contenu, confidentialité, crédits, API et open source. Des faits sourcés, des deux côtés.",
+          "{{appName}} vs FreedomGPT : Liberty et modèles sans censure, règles de contenu, confidentialité, crédits, API, open source. Des faits sourcés des deux côtés.",
         keywords:
           "alternative à FreedomGPT, FreedomGPT alternative, FreedomGPT vs, FreedomGPT avis, FreedomGPT prix, FreedomGPT Pro, modèle Liberty, FreedomGPT sans censure, IA sans censure, IA non censurée, alternative à ChatGPT sans censure, uncensored ChatGPT alternative, {{appName}} vs FreedomGPT",
       },
@@ -1072,7 +1072,7 @@ export const translations: typeof enTranslations = {
       meta: {
         title: "Alternative à Gab AI : {{appName}} vs Gab AI (2026)",
         description:
-          "{{appName}} vs Gab AI : Arya, 214 modèles, l'interdiction du contenu sexuel, confidentialité, crédits et API côte à côte. Nous achetons chez Gab, alors nous disons où chacun gagne.",
+          "{{appName}} vs Gab AI : Arya, 214 modèles, interdiction du contenu sexuel, confidentialité, crédits et API. Nous achetons chez Gab et disons où chacun gagne.",
         keywords:
           "alternative à Gab AI, Gab AI alternative, Gab AI vs, Gab AI avis, Gab AI prix, Gab AI Plus, Arya AI, Gab Arya, Gab AI sans censure, is Gab AI uncensored, Gab AI NSFW, Gab AI API, chatbot IA conservateur, IA de droite, IA sans censure, chat IA non censuré, {{appName}} vs Gab AI",
       },
@@ -1151,7 +1151,7 @@ export const translations: typeof enTranslations = {
       meta: {
         title: "Alternative à uncensored.ai : {{appName}} vs uncensored.ai",
         description:
-          "{{appName}} vs uncensored.ai : le même modèle UncensoredLM, une autre appli. Limites gratuites, prix de Pro, API, confidentialité et médias côte à côte, sources à l'appui.",
+          "{{appName}} vs uncensored.ai : le même UncensoredLM, une autre appli. Limites gratuites, prix de Pro, API, confidentialité et médias, sources citées.",
         keywords:
           "alternative à uncensored.ai, uncensored.ai alternative, uncensored.ai vs, uncensored.ai avis, uncensored.ai prix, uncensored.ai Pro, UncensoredLM, UncensoredAI v1.2, uncensored.ai API, uncensored.ai gratuit, chat IA sans censure, IA non censurée, uncensored AI chat, {{appName}} vs uncensored.ai",
       },
@@ -1226,10 +1226,9 @@ export const translations: typeof enTranslations = {
     },
     openRouter: {
       meta: {
-        title:
-          "Alternative à OpenRouter pour le chat : {{appName}} vs OpenRouter",
+        title: "Alternative à OpenRouter : {{appName}} vs OpenRouter",
         description:
-          "{{appName}} vs OpenRouter : une appli de chat prête à l'emploi face à un routeur d'API pour développeurs. Modèles non censurés, frais, confidentialité et API côte à côte, sources à l'appui.",
+          "{{appName}} vs OpenRouter : une appli de chat prête à l'emploi face à un routeur d'API. Modèles non censurés, frais, confidentialité et API, sources à l'appui.",
         keywords:
           "alternative à OpenRouter, OpenRouter alternative, OpenRouter vs, OpenRouter avis, OpenRouter prix, OpenRouter frais, OpenRouter sans censure, OpenRouter uncensored, modèles non censurés OpenRouter, OpenRouter appli de chat, OpenRouter modèles gratuits, API compatible OpenAI, API LLM sans censure, uncensored LLM API, {{appName}} vs OpenRouter",
       },

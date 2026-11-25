@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "Crea una habilidad. Comparte el enlace. Gana cada mes.",
     description:
-      "Las skills de {{appName}} son configuraciones de IA que preparas una vez y puedes compartir donde quieras. Ganas un 10% de cada pago de quien se registra por tu enlace y un 5% cuando otros comparten tu skill.",
+      "Las skills de {{appName}} son configuraciones de IA que creas una vez y compartes. Tu enlace gana un 10% de cada pago y un 5% si otros la comparten.",
     category: "Economía de habilidades",
     imageAlt:
       "Una persona que crea habilidades AI y gana ingresos recurrentes compartiendolas",

@@ -9,7 +9,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "KI-Skills: fertige Spezialisten und Charaktere | {{appName}}",
     description:
-      "Coder, Autoren, Rechercheure, Begleiter und unzensierte Charaktere. Jeder Skill bringt eigenen Prompt, eigenes Modell und eigene Tools mit. Auswählen und loschatten oder eigenen Skill bauen und an jeder Nutzung verdienen.",
+      "Coder, Autoren, Rechercheure, Begleiter, unzensierte Charaktere. Jeder Skill hat Prompt, Modell und Tools. Loschatten oder eigenen Skill bauen und verdienen.",
     category: "KI-Skills",
     imageAlt: "KI-Skills auf {{appName}}",
     keywords:
