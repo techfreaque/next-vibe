@@ -28,7 +28,14 @@ const logger = createEndpointLogger(false, defaultLocale);
 beforeAll(async () => {
   await pg.exec(`
     CREATE TABLE company_tax_regimes (company_id uuid NOT NULL, effective_from date NOT NULL, regime text NOT NULL, recorded_by uuid, recorded_at timestamp DEFAULT now(), PRIMARY KEY (company_id, effective_from));
-    CREATE TABLE companies (id uuid PRIMARY KEY, currency text, name text, is_active boolean NOT NULL DEFAULT true);
+    CREATE TABLE companies (id uuid PRIMARY KEY, currency text, name text, country text, is_active boolean NOT NULL DEFAULT true);
+    CREATE TABLE pos_fiscal_providers (
+      id uuid PRIMARY KEY DEFAULT gen_random_uuid(), company_id uuid NOT NULL UNIQUE,
+      adapter text NOT NULL, device_kind text NOT NULL DEFAULT 'enums.deviceKind.orp',
+      cash_register_code text NOT NULL, is_enabled boolean NOT NULL DEFAULT false,
+      certified_until date, settings jsonb NOT NULL DEFAULT '{}'::jsonb, created_by uuid,
+      created_at timestamp NOT NULL DEFAULT now(), updated_at timestamp NOT NULL DEFAULT now()
+    );
     CREATE TABLE company_members (id uuid, company_id uuid, user_id uuid, is_active boolean, role text,invited_by_user_id uuid,joined_at timestamp,created_at timestamp,updated_at timestamp);
     CREATE TABLE account_nodes (
       id uuid PRIMARY KEY, company_id uuid NOT NULL, code text NOT NULL,

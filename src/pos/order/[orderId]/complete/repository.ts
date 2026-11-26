@@ -30,6 +30,9 @@ import { getCompanyTaxRegime } from "@/tax/regime/policy";
 
 import { posOrders, posPayments } from "../../../db";
 import { PosOrderStatus, PosPaymentMethod } from "../../../enum";
+import { enqueueFiscalReceipt } from "../../../fiscal/enqueue";
+import { scopedTranslation as fiscalTranslation } from "../../../fiscal/i18n";
+import { requireFiscalProvider } from "../../../fiscal/policy";
 import { scopedTranslation } from "../../../i18n";
 import { withOpenOrder } from "../../open-order";
 import {
@@ -97,6 +100,16 @@ export class PosOrderCompleteRepository {
           if (regime.exempt && order.taxAmount !== 0) {
             return fail({
               message: regimeTranslation.scopedT(locale).t("saleConflict"),
+              errorType: ErrorResponseTypes.VALIDATION_ERROR,
+            });
+          }
+          // eKasa (SK): no sale without a certified fiscal cash register.
+          const fiscal = await requireFiscalProvider(tx, order.companyId);
+          if (fiscal.blocked) {
+            return fail({
+              message: fiscalTranslation
+                .scopedT(locale)
+                .t("block.ekasaRequired"),
               errorType: ErrorResponseTypes.VALIDATION_ERROR,
             });
           }
@@ -292,6 +305,14 @@ export class PosOrderCompleteRepository {
               updatedAt: new Date(),
             })
             .where(eq(posOrders.id, orderId));
+          if (fiscal.enqueue && fiscal.provider) {
+            await enqueueFiscalReceipt(tx, {
+              orderId,
+              companyId: order.companyId,
+              provider: fiscal.provider,
+              issuedAt: new Date(),
+            });
+          }
           return success({
             result: {
               currency: order.currency,
