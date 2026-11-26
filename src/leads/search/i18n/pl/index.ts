@@ -8,7 +8,7 @@ export const translations: typeof enTranslations = {
   },
   get: {
     title: "Szukaj leadów",
-    titleShort: "Szukaj leadów",
+    titleShort: "Szukaj po e-mailu lub nazwie",
     description: "Przeszukaj leady z filtrowaniem i stronicowaniem",
     form: {
       title: "Formularz wyszukiwania leadów",

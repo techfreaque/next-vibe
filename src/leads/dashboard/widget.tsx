@@ -3,6 +3,8 @@
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { EmptyBlock } from "next-vibe/ui/components/empty-block";
+import { Plus } from "next-vibe/ui/components/icons/Plus";
+import { Upload } from "next-vibe/ui/components/icons/Upload";
 import { Skeleton } from "next-vibe/ui/components/skeleton";
 import { WidgetHeader } from "next-vibe/ui/components/widget-header";
 import { WidgetShell } from "next-vibe/ui/components/widget-shell";
@@ -68,14 +70,18 @@ export function LeadsDashboardWidget(): JSX.Element {
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => open({ alias: "leads-list" })}
+                  className="gap-1.5"
+                  onClick={() => open({ alias: "leads_import_POST" })}
                 >
-                  {t("widget.allLeads")}
+                  <Upload className="size-4" />
+                  {t("widget.importLeads")}
                 </Button>
                 <Button
                   type="button"
+                  className="gap-1.5"
                   onClick={() => open({ alias: "leads_create_POST" })}
                 >
+                  <Plus className="size-4" />
                   {t("widget.newLead")}
                 </Button>
               </Div>
@@ -110,7 +116,6 @@ export function LeadsDashboardWidget(): JSX.Element {
             locale={locale}
             translate={(key, args) => t(key, args)}
             onOpen={interactive ? open : undefined}
-            sectionName={t("get.title")}
             attentionTitle={t("widget.attention")}
             clearLabel={t("widget.noAttention")}
             unavailable={t("widget.loading")}

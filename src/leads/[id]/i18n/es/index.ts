@@ -815,19 +815,32 @@ export const translations: typeof enTranslations = {
     copyIp: "IP",
     copyLinkedLeadId: "ID del contacto",
     copyUserId2: "usuario ID",
+    more: "Más",
+    copyLeadId: "Copiar ID del lead",
+    kpiFirstTouch: "Primer contacto",
+    kpiStage: "Etapa de campaña",
+    kpiEmails: "Emails abiertos",
+    kpiOpenRate: "{{percent}} % de apertura",
+    kpiAge: "Antigüedad",
+    kpiAgeValue: "{{count}} días",
+    kpiAgeHint: "Creado el {{date}}",
+    kpiCredits: "Créditos gratis usados",
+    kpiCreditsHint: "Consumidos en el plan gratis",
+    notTracked: "Sin datos",
     selectLead: "Select Lead",
   },
   delete: {
     title: "Eliminar contacto",
     titleShort: "Eliminar contacto",
-    description: "Elimina un contacto del sistema",
+    description:
+      "Elimina para siempre el contacto y su recorrido. No se puede deshacer.",
     container: {
       title: "Eliminar contacto",
       description:
         "¿Estás seguro de que quieres eliminar permanentemente esta pista?",
     },
     backButton: {
-      label: "Volver al contacto",
+      label: "Cancelar",
     },
     submitButton: {
       label: "Eliminar contacto",

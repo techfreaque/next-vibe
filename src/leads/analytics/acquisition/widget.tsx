@@ -144,8 +144,12 @@ export function AcquisitionReportWidget(): JSX.Element {
 
   if (!value) {
     return (
-      <WidgetShell>
-        <WidgetHeader title={t("get.title")} />
+      <WidgetShell layout="page">
+        <WidgetHeader
+          size="page"
+          title={t("get.title")}
+          subtitle={t("widget.pageSubtitle")}
+        />
         {toolbar}
         <LoadingBlock message={t("widget.loading")} />
       </WidgetShell>
@@ -195,8 +199,12 @@ export function AcquisitionReportWidget(): JSX.Element {
   ];
 
   return (
-    <WidgetShell>
-      <WidgetHeader title={t("get.title")} />
+    <WidgetShell layout="page">
+      <WidgetHeader
+        size="page"
+        title={t("get.title")}
+        subtitle={t("widget.pageSubtitle")}
+      />
       {toolbar}
       <SectionGroup
         title={t("widget.filtersTitle")}
@@ -208,7 +216,13 @@ export function AcquisitionReportWidget(): JSX.Element {
       </SectionGroup>
       {coverage.visitsSince ? (
         <Span className="text-xs text-muted-foreground">
-          {t("widget.coverage", { date: coverage.visitsSince })}
+          {t("widget.coverage", {
+            date: new Date(coverage.visitsSince).toLocaleDateString(locale, {
+              day: "numeric",
+              month: "short",
+              year: "numeric",
+            }),
+          })}
         </Span>
       ) : null}
 

@@ -815,18 +815,31 @@ export const translations: typeof enTranslations = {
     copyIp: "IP",
     copyLinkedLeadId: "ID du lead",
     copyUserId2: "ID utilisateur",
+    more: "Plus",
+    copyLeadId: "Copier l'ID du lead",
+    kpiFirstTouch: "Premier contact",
+    kpiStage: "Étape de campagne",
+    kpiEmails: "E-mails ouverts",
+    kpiOpenRate: "{{percent}} % d'ouverture",
+    kpiAge: "Âge du lead",
+    kpiAgeValue: "{{count}} jours",
+    kpiAgeHint: "Créé le {{date}}",
+    kpiCredits: "Crédits gratuits utilisés",
+    kpiCreditsHint: "Consommés sur l'offre gratuite",
+    notTracked: "Non suivi",
     selectLead: "Choisir un lead",
   },
   delete: {
     title: "Supprimer le lead",
     titleShort: "Supprimer le lead",
-    description: "Supprimer un lead du système",
+    description:
+      "Supprime définitivement ce lead et son parcours. Action irréversible.",
     container: {
       title: "Supprimer le lead",
       description: "Voulez-vous vraiment supprimer définitivement ce lead ?",
     },
     backButton: {
-      label: "Retour au lead",
+      label: "Annuler",
     },
     submitButton: {
       label: "Supprimer le lead",

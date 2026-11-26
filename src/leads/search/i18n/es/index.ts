@@ -8,7 +8,7 @@ export const translations: typeof enTranslations = {
   },
   get: {
     title: "Búsqueda de contactos",
-    titleShort: "Búsqueda de contactos",
+    titleShort: "Buscar por email o nombre",
     description: "Búsqueda conduce con filtrado y paginación",
     form: {
       title: "Formulario de búsqueda de contactos",

@@ -174,7 +174,7 @@ const { POST } = createEndpoint({
             placeholder: "post.country.placeholder",
             columns: 6,
             options: CountriesOptions,
-            schema: z.enum(Countries),
+            schema: z.enum(Countries, { error: "post.validation.country" }),
           }),
 
           language: requestField(scopedTranslation, {
@@ -185,7 +185,7 @@ const { POST } = createEndpoint({
             placeholder: "post.language.placeholder",
             columns: 6,
             options: LanguagesOptions,
-            schema: z.enum(Languages),
+            schema: z.enum(Languages, { error: "post.validation.language" }),
           }),
         },
       }),
@@ -206,7 +206,7 @@ const { POST } = createEndpoint({
             placeholder: "post.source.placeholder",
             columns: 12,
             options: LeadSourceOptions,
-            schema: z.enum(LeadSource),
+            schema: z.enum(LeadSource, { error: "post.validation.source" }),
           }),
 
           notes: requestField(scopedTranslation, {

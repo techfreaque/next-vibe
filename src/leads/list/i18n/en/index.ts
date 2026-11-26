@@ -105,7 +105,7 @@ export const translations = {
 
   get: {
     title: "Leads",
-    titleShort: "Lead List",
+    titleShort: "All leads",
     description: "Retrieve a paginated list of leads with filtering",
     createButton: {
       label: "Create Lead",
@@ -321,6 +321,17 @@ export const translations = {
     chatted: "Chatted",
     bot: "Bot",
     listFilters: "Filters and sorting",
+    anonymousLead: "Anonymous visitor",
+    leadCount: "{{count}} leads",
+    more: "More",
+    filters: "Filters",
+    colStatus: "Status",
+    colSource: "Source",
+    colCountry: "Country",
+    colVisits: "Visits",
+    openLead: "Open lead",
+    batchUpdate: "Batch update",
+    newLead: "New lead",
     analyticsFilters: "More filters",
     apply: "Apply",
   },

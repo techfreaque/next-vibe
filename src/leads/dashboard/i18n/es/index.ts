@@ -101,7 +101,7 @@ export const translations: typeof enTranslations = {
     quickActions: "Medidas rápidas",
     newLead: "Nuevo contacto",
     newLeadDesc: "Crear un nuevo contacto manualmente",
-    allLeads: "All Leads",
+    allLeads: "Todos los contactos",
     allLeadsDesc: "Explorar y filtrar todos los cables",
     campaignStats: "Estadísticas de campañas",
     campaignStatsDesc: "Analizar el rendimiento de la campaña",

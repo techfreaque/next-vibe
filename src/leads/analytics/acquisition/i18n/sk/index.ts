@@ -75,6 +75,8 @@ export const translations: typeof enTranslations = {
     botsSubtitle:
       "Indexovacie roboty, náhľady a skripty. Kliknutím na stĺpec zobrazíte príslušné kontakty.",
     loading: "Načítava sa prehľad akvizície…",
+    pageSubtitle:
+      "Odkiaľ leady prichádzajú a ako konvertujú. Kliknite na číslo a uvidíte jeho leady.",
     coverage:
       "Návštevy sledujeme od {{date}}. Staršie kontakty započítavame, ich návštevy však nemáme zaznamenané.",
     botShareHint: "{{percent}} nových kontaktov",

@@ -74,6 +74,8 @@ export const translations: typeof enTranslations = {
     botsSubtitle:
       "Crawler, Link-Vorschauen und Skripte. Klick auf einen Balken zeigt die Leads.",
     loading: "Akquise-Bericht wird geladen...",
+    pageSubtitle:
+      "Woher Leads kommen und wie sie konvertieren. Jede Zahl öffnet die passenden Leads.",
     coverage:
       "Besuche werden seit {{date}} erfasst. Ältere Leads zählen, nur ohne Besuche.",
     botShareHint: "{{percent}} der neuen Leads",

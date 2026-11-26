@@ -42,7 +42,6 @@ import {
   responseArrayOptionalField,
   responseField,
   submitButton,
-  widgetField,
 } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
@@ -88,12 +87,6 @@ const { DELETE } = createEndpoint({
     noCard: true,
     usage: { request: "urlPathParams" },
     children: {
-      title: widgetField(scopedTranslation, {
-        type: WidgetType.TITLE,
-        level: 5,
-        label: "delete.container.description",
-        usage: { request: "urlPathParams" },
-      }),
       // === URL PARAMETERS ===
       id: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,

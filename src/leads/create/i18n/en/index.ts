@@ -18,7 +18,7 @@ export const translations = {
   },
   widget: {
     headerLeadCreated: "Lead Created",
-    headerCreateLead: "Create Lead",
+    headerCreateLead: "New lead",
     subheaderFillDetails: "Fill in the details below",
     fallbackLeadName: "Lead",
     buttonCopyId: "Copy ID",
@@ -34,29 +34,34 @@ export const translations = {
       label: "Back to Leads",
     },
     submitButton: {
-      label: "Create Lead",
-      loadingText: "Creating Lead...",
+      label: "Create lead",
+      loadingText: "Creating lead...",
     },
     form: {
       title: "New Lead Form",
       description: "Enter lead information to create a new lead",
     },
+    validation: {
+      country: "Pick a country.",
+      language: "Pick a language.",
+      source: "Pick where this lead came from.",
+    },
     contactInfo: {
-      title: "Contact Information",
+      title: "Contact",
       description: "Primary contact details for the lead",
     },
     email: {
-      label: "Email Address",
+      label: "Email",
       description: "Primary email address for communication",
       placeholder: "john@example.com",
     },
     businessName: {
-      label: "Business Name",
+      label: "Business name",
       description: "Name of the company or business",
       placeholder: "Example Corp",
     },
     phone: {
-      label: "Phone Number",
+      label: "Phone",
       description: "Contact phone number with country code",
       placeholder: "+1234567890",
     },
@@ -66,7 +71,7 @@ export const translations = {
       placeholder: "https://example.com",
     },
     locationPreferences: {
-      title: "Location & Preferences",
+      title: "Location and language",
       description: "Geographic and language preferences",
     },
     country: {
@@ -80,11 +85,11 @@ export const translations = {
       placeholder: "Select a language",
     },
     leadDetails: {
-      title: "Lead Details",
+      title: "Source and notes",
       description: "Additional information about the lead",
     },
     source: {
-      label: "Lead Source",
+      label: "Source",
       description: "How the lead was acquired",
       placeholder: "Select source",
     },

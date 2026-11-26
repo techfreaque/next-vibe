@@ -122,7 +122,7 @@ export class LeadsDashboardRepository {
         statusBreakdown[row.status] = row.cnt;
       }
 
-      // Recent leads: last 5 created
+      // Recent leads: last 5 created with an email
       const recentLeadRows = await db
         .select({
           id: leads.id,
@@ -133,6 +133,10 @@ export class LeadsDashboardRepository {
           createdAt: leads.createdAt,
         })
         .from(leads)
+        // Anonymous visitors have no identity to show; list identified leads.
+        .where(
+          sql`(coalesce(trim(${leads.email}), '') <> '' or coalesce(trim(${leads.businessName}), '') <> '')`,
+        )
         .orderBy(desc(leads.createdAt))
         .limit(5);
 

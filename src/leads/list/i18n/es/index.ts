@@ -107,7 +107,7 @@ export const translations: typeof enTranslations = {
 
   get: {
     title: "Contactos",
-    titleShort: "Lista principal",
+    titleShort: "Todos los leads",
     description: "Recuperar una lista de pistas con filtro",
     createButton: {
       label: "Crear contacto",
@@ -327,6 +327,17 @@ export const translations: typeof enTranslations = {
     chatted: "Chateó",
     bot: "Bot",
     listFilters: "Filtros y orden",
+    anonymousLead: "Visitante anónimo",
+    leadCount: "{{count}} leads",
+    more: "Más",
+    filters: "Filtros",
+    colStatus: "Estado",
+    colSource: "Origen",
+    colCountry: "País",
+    colVisits: "Visitas",
+    openLead: "Abrir lead",
+    batchUpdate: "Edición masiva",
+    newLead: "Nuevo lead",
     analyticsFilters: "Más filtros",
     apply: "Aplicar",
   },

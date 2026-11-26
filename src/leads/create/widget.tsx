@@ -3,6 +3,7 @@
  */
 
 "use client";
+import { getLanguageAndCountryFromLocale } from "next-vibe/core/i18n/core/language-utils";
 import { LeadStatus } from "next-vibe/identity/lead/enum";
 import { scopedTranslation as leadsScopedTranslation } from "next-vibe/identity/lead/i18n";
 import { Button } from "next-vibe/ui/components/button";
@@ -16,6 +17,7 @@ import { copyToClipboard } from "next-vibe/ui/lib/clipboard";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
 import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
 import {
+  useWidgetForm,
   useWidgetLocale,
   useWidgetLogger,
   useWidgetNavigation,
@@ -31,7 +33,7 @@ import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-f
 import { TextareaFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/textarea-field/widget";
 import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/navigate-button/widget";
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback, useEffect, useRef } from "react";
 
 import type definition from "./definition";
 
@@ -58,6 +60,19 @@ export function LeadCreateContainer({
   const t = useWidgetTranslation<typeof definition.POST>();
   const logger = useWidgetLogger();
   const { t: leadsT } = leadsScopedTranslation.scopedT(locale);
+  const form = useWidgetForm<typeof definition.POST>();
+
+  // Smart default: the admin's own locale is the most likely country and
+  // language for a hand-entered lead. Never overwrite a choice.
+  useEffect(() => {
+    const { country, language } = getLanguageAndCountryFromLocale(locale);
+    if (!form.getValues("locationPreferences.country")) {
+      form.setValue("locationPreferences.country", country);
+    }
+    if (!form.getValues("locationPreferences.language")) {
+      form.setValue("locationPreferences.language", language);
+    }
+  }, [form, locale]);
 
   const createdLeadId = data?.lead?.summary?.id;
   const businessName = data?.lead?.summary?.businessName;
@@ -105,10 +120,14 @@ export function LeadCreateContainer({
   }, [createdLeadId, logger]);
 
   // Auto-navigate to lead detail on successful creation
+  // Navigate once per created lead; `navigate` changes identity on every
+  // stack update, which used to re-push the detail view in a loop.
+  const navigatedForRef = useRef<string | undefined>(undefined);
   useEffect(() => {
-    if (!createdLeadId) {
+    if (!createdLeadId || navigatedForRef.current === createdLeadId) {
       return;
     }
+    navigatedForRef.current = createdLeadId;
     void (async (): Promise<void> => {
       const leadDef = await import("@/leads/[id]/definition");
       navigate(leadDef.default.GET, { urlPathParams: { id: createdLeadId } });

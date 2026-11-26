@@ -43,6 +43,11 @@ export const translations: typeof enTranslations = {
       title: "Formulár nového kontaktu",
       description: "Zadajte údaje nového kontaktu",
     },
+    validation: {
+      country: "Vyberte krajinu.",
+      language: "Vyberte jazyk.",
+      source: "Vyberte, odkiaľ lead prišiel.",
+    },
     contactInfo: {
       title: "Kontaktné údaje",
       description: "Hlavné údaje na spojenie s kontaktom",

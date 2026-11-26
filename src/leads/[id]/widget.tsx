@@ -34,20 +34,26 @@ import { Badge } from "next-vibe/ui/components/badge";
 import { Button } from "next-vibe/ui/components/button";
 import { DetailField, DetailGrid } from "next-vibe/ui/components/detail-grid";
 import { Div } from "next-vibe/ui/components/div";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "next-vibe/ui/components/dropdown-menu";
 import { EmptyBlock } from "next-vibe/ui/components/empty-block";
-import { Activity } from "next-vibe/ui/components/icons/Activity";
 import { AlertCircle } from "next-vibe/ui/components/icons/AlertCircle";
 import { AlertTriangle } from "next-vibe/ui/components/icons/AlertTriangle";
 import { Check } from "next-vibe/ui/components/icons/Check";
 import { CheckCircle } from "next-vibe/ui/components/icons/CheckCircle";
+import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
 import { ChevronRight } from "next-vibe/ui/components/icons/ChevronRight";
-import { Clock } from "next-vibe/ui/components/icons/Clock";
 import { Copy } from "next-vibe/ui/components/icons/Copy";
 import { CreditCard } from "next-vibe/ui/components/icons/CreditCard";
 import { ExternalLink as ExternalLinkIcon } from "next-vibe/ui/components/icons/ExternalLink";
 import { Globe } from "next-vibe/ui/components/icons/Globe";
-import { Info } from "next-vibe/ui/components/icons/Info";
 import { Loader2 } from "next-vibe/ui/components/icons/Loader2";
+import { MoreHorizontal } from "next-vibe/ui/components/icons/MoreHorizontal";
 import { Pencil } from "next-vibe/ui/components/icons/Pencil";
 import { Phone } from "next-vibe/ui/components/icons/Phone";
 import { Save } from "next-vibe/ui/components/icons/Save";
@@ -57,10 +63,11 @@ import { Target } from "next-vibe/ui/components/icons/Target";
 import { Trash2 } from "next-vibe/ui/components/icons/Trash2";
 import { Input } from "next-vibe/ui/components/input";
 import { Label } from "next-vibe/ui/components/label";
+import { Li } from "next-vibe/ui/components/li";
 import { ExternalLink } from "next-vibe/ui/components/link";
-import { ListItem } from "next-vibe/ui/components/list-item";
 import { MetricCard } from "next-vibe/ui/components/metric-card";
 import { MetricGrid } from "next-vibe/ui/components/metric-grid";
+import { Ol } from "next-vibe/ui/components/ol";
 import { ProgressBlock } from "next-vibe/ui/components/progress-block";
 import { ResultBanner } from "next-vibe/ui/components/result-banner";
 import { SectionGroup } from "next-vibe/ui/components/section-group";
@@ -74,7 +81,6 @@ import {
 import { Separator } from "next-vibe/ui/components/separator";
 import { Span } from "next-vibe/ui/components/span";
 import { StatusPill } from "next-vibe/ui/components/status-pill";
-import { Strong } from "next-vibe/ui/components/strong";
 import {
   Tabs,
   TabsContent,
@@ -103,8 +109,10 @@ import {
   useWidgetNavigation,
   useWidgetOnSubmit,
   useWidgetTranslation,
+  useWidgetUser,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
+import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 
 import { configScopedTranslation } from "@/env/i18n";
@@ -112,7 +120,7 @@ import leadsListDefinitions from "@/leads/list/definition";
 import leadsSearchDefinitions from "@/leads/search/definition";
 import { scopedTranslation as newsletterI18n } from "@/newsletter/i18n";
 
-import { isBotFamily } from "../analytics/enum";
+import { isBotFamily, LeadChannelFilter } from "../analytics/enum";
 import {
   dimensionValueLabel,
   useLeadAnalyticsT,
@@ -322,6 +330,102 @@ function daysSince(date: Date | string | null | undefined): number | null {
   return Math.floor((Date.now() - d.getTime()) / (1000 * 60 * 60 * 24));
 }
 
+// ─── KPI row ──────────────────────────────────────────────────────────────────
+
+function LeadKpis({
+  data,
+  traffic,
+  locale,
+  t,
+  leadsT,
+}: {
+  data: NonNullable<LeadGetResponseOutput["lead"]>;
+  traffic: LeadGetResponseOutput["traffic"];
+  locale: CountryLanguage;
+  t: ReturnType<typeof useWidgetTranslation<typeof definition.GET>>;
+  leadsT: LeadsT;
+}): React.JSX.Element {
+  const st = useLeadAnalyticsT(locale);
+  const { campaignTracking, engagement, metadata } = data;
+  const sent = campaignTracking.emailsSent;
+  const opened = engagement.emailsOpened;
+  // An untracked first touch falls back to the recorded lead source.
+  const firstTouch = traffic
+    ? traffic.channel && traffic.channel !== "direct"
+      ? traffic.channel
+      : traffic.channelType &&
+          traffic.channelType !== LeadChannelFilter.UNATTRIBUTED
+        ? dimensionValueLabel(traffic.channelType, st)
+        : null
+    : null;
+  const firstTouchHint = traffic
+    ? traffic.referrerHost || traffic.landingPath || undefined
+    : undefined;
+  const createdAt = new Date(metadata.createdAt);
+  const ageDays = daysSince(createdAt);
+  return (
+    <MetricGrid columns={4}>
+      <MetricCard
+        label={t("widget.kpiFirstTouch")}
+        value={
+          firstTouch ??
+          (campaignTracking.source
+            ? leadsT(campaignTracking.source)
+            : t("widget.notTracked"))
+        }
+        description={
+          firstTouchHint ??
+          (firstTouch && campaignTracking.source
+            ? leadsT(campaignTracking.source)
+            : undefined)
+        }
+      />
+      <MetricCard
+        label={t("widget.kpiStage")}
+        value={
+          campaignTracking.currentCampaignStage
+            ? leadsT(campaignTracking.currentCampaignStage)
+            : t("widget.stageNotStarted")
+        }
+        description={
+          campaignTracking.lastEmailSentAt
+            ? `${t("widget.lastEmailLabel")} ${formatSimpleDate(campaignTracking.lastEmailSentAt, locale)}`
+            : undefined
+        }
+      />
+      <MetricCard
+        label={t("widget.kpiEmails")}
+        value={`${opened.toLocaleString(locale)} / ${sent.toLocaleString(locale)}`}
+        description={
+          sent > 0
+            ? t("widget.kpiOpenRate", {
+                percent: Math.round((opened / sent) * 100),
+              })
+            : undefined
+        }
+        variant={sent === 0 ? "muted" : "default"}
+      />
+      {traffic && traffic.freeCreditsBurned > 0 ? (
+        <MetricCard
+          label={t("widget.kpiCredits")}
+          value={traffic.freeCreditsBurned.toLocaleString(locale, {
+            maximumFractionDigits: 2,
+          })}
+          description={t("widget.kpiCreditsHint")}
+        />
+      ) : (
+        <MetricCard
+          label={t("widget.kpiAge")}
+          value={t("widget.kpiAgeValue", { count: ageDays ?? 0 })}
+          description={t("widget.kpiAgeHint", {
+            date: formatSimpleDate(createdAt, locale),
+          })}
+        />
+      )}
+    </MetricGrid>
+  );
+}
+
 // ─── Overview tab content ─────────────────────────────────────────────────────
 
 function OverviewTab({
@@ -329,18 +433,13 @@ function OverviewTab({
   locale,
   t,
   leadsT,
-  onSendTestEmail,
-  onViewInSearch,
 }: {
   data: NonNullable<LeadGetResponseOutput["lead"]>;
   locale: CountryLanguage;
   t: ReturnType<typeof useWidgetTranslation<typeof definition.GET>>;
   leadsT: LeadsT;
-  onSendTestEmail: () => void;
-  onViewInSearch: () => void;
 }): React.JSX.Element {
-  const { basicInfo, contactDetails, campaignTracking, engagement, metadata } =
-    data;
+  const { contactDetails, campaignTracking, engagement } = data;
 
   const openRate =
     campaignTracking.emailsSent > 0
@@ -358,85 +457,8 @@ function OverviewTab({
     engagement.emailsOpened > 0
       ? Math.round((engagement.emailsClicked / engagement.emailsOpened) * 100)
       : 0;
-  const leadAgeDays = daysSince(
-    metadata.createdAt instanceof Date
-      ? metadata.createdAt
-      : String(metadata.createdAt),
-  );
-  const daysSinceEngagement = daysSince(
-    engagement.lastEngagementAt instanceof Date
-      ? engagement.lastEngagementAt
-      : engagement.lastEngagementAt !== null &&
-          engagement.lastEngagementAt !== undefined
-        ? String(engagement.lastEngagementAt)
-        : null,
-  );
-
   return (
     <Div className="flex flex-col gap-4">
-      {/* Quick age & engagement bar */}
-      <Div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground rounded-lg border p-3">
-        {leadAgeDays !== null && (
-          <Div className="flex items-center gap-1">
-            <Clock className="h-3 w-3" />
-            <Span>
-              <Strong className="font-semibold text-foreground">
-                {leadAgeDays}
-              </Strong>{" "}
-              {t("widget.daysOld")}
-            </Span>
-          </Div>
-        )}
-        {daysSinceEngagement !== null && (
-          <Div className="flex items-center gap-1">
-            <Activity className="h-3 w-3" />
-            <Span>
-              {t("widget.lastEngaged")}{" "}
-              <Strong className="font-semibold text-foreground">
-                {daysSinceEngagement}d
-              </Strong>{" "}
-              {t("widget.ago")}
-            </Span>
-          </Div>
-        )}
-        {campaignTracking.emailJourneyVariant && (
-          <Div className="flex items-center gap-1">
-            <Info className="h-3 w-3" />
-            <Span>
-              {t("widget.variant")}{" "}
-              <Strong className="font-semibold text-foreground">
-                {leadsT(campaignTracking.emailJourneyVariant)}
-              </Strong>
-            </Span>
-          </Div>
-        )}
-      </Div>
-
-      {basicInfo.email && (
-        <Div className="flex flex-wrap gap-2 border-y py-2">
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={onViewInSearch}
-            className="gap-1.5"
-          >
-            <Search className="size-3.5" />
-            {t("widget.viewInSearch")}
-          </Button>
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={onSendTestEmail}
-            className="gap-1.5"
-          >
-            <Send className="size-3.5" />
-            {t("widget.sendTestEmail")}
-          </Button>
-        </Div>
-      )}
-
       {/* Campaign funnel */}
       <SectionGroup title={t("widget.campaignFunnel")}>
         <CampaignFunnel currentStage={campaignTracking.currentCampaignStage} />
@@ -762,24 +784,48 @@ function JourneyOverview({
       )}
       <SectionGroup title={t("journey.title")} subtitle={t("journey.subtitle")}>
         {review ? (
-          <Div className="flex min-w-0 flex-col gap-2">
-            {review.events.map((event) => (
-              <ListItem
+          <Ol className="flex min-w-0 flex-col">
+            {review.events.map((event, index) => (
+              <Li
                 key={event.id}
-                title={
-                  event.engagementType
-                    ? leadsT(event.engagementType)
-                    : t(event.kind)
-                }
-                subtitle={formatDate(new Date(event.date), locale, "PPp")}
-                meta={
-                  event.detail && (
-                    <Span className="break-all">{event.detail}</Span>
-                  )
-                }
-              />
+                className={cn(
+                  "relative ps-5",
+                  index < review.events.length - 1 && "pb-4",
+                )}
+              >
+                {index < review.events.length - 1 && (
+                  <Span
+                    aria-hidden="true"
+                    className="absolute start-[4px] top-4 bottom-0 w-px bg-border"
+                  />
+                )}
+                <Span
+                  aria-hidden="true"
+                  className={cn(
+                    "absolute start-0 top-1.5 size-2.5 rounded-full",
+                    index === review.events.length - 1
+                      ? "bg-primary"
+                      : "bg-muted-foreground/50",
+                  )}
+                />
+                <Div className="flex min-w-0 flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5">
+                  <Span className="text-sm font-medium">
+                    {event.engagementType
+                      ? leadsT(event.engagementType)
+                      : t(event.kind)}
+                  </Span>
+                  <Span className="whitespace-nowrap text-xs tabular-nums text-muted-foreground">
+                    {formatDate(new Date(event.date), locale, "PPp")}
+                  </Span>
+                </Div>
+                {event.detail && (
+                  <Span className="mt-0.5 block break-all text-xs text-muted-foreground">
+                    {event.detail}
+                  </Span>
+                )}
+              </Li>
             ))}
-          </Div>
+          </Ol>
         ) : (
           <EmptyBlock title={t("journey.unavailable")} className="py-3" />
         )}
@@ -1358,6 +1404,7 @@ export function LeadDetailContainer(): React.JSX.Element {
   const t = useWidgetTranslation<typeof definition.GET>();
   const leadsT = leadsScopedTranslation.scopedT(locale).t;
   const endpointMutations = useWidgetEndpointMutations();
+  const logger = useWidgetLogger();
   const [activeTab, setActiveTab] = useState("overview");
 
   const fieldValue = useWidgetValue<typeof definition.GET>();
@@ -1443,7 +1490,14 @@ export function LeadDetailContainer(): React.JSX.Element {
 
   const fallbackTitle = t("widget.leadFallbackTitle");
   const backButton = (
-    <Button type="button" variant="outline" size="sm" onClick={handleBack}>
+    <Button
+      type="button"
+      variant="ghost"
+      size="sm"
+      onClick={handleBack}
+      className="-ms-2 gap-1 text-muted-foreground"
+    >
+      <ChevronLeft className="size-4" />
       {t("widget.back")}
     </Button>
   );
@@ -1531,27 +1585,61 @@ export function LeadDetailContainer(): React.JSX.Element {
     data.linkedLeads.length +
     (fieldValue.review?.accountAssociations?.length ?? data.linkedUsers.length);
 
+  const title =
+    basicInfo.businessName?.trim() ||
+    basicInfo.contactName?.trim() ||
+    basicInfo.email?.trim() ||
+    fallbackTitle;
+
   const headerActions = (
-    <Div className="flex items-center gap-1">
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={handleEdit}
-        aria-label={t("widget.edit")}
-        className="gap-1"
-      >
-        <Pencil className="h-4 w-4" />
-        <Span className="hidden @sm:inline">{t("widget.edit")}</Span>
-      </Button>
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={handleDelete}
-        aria-label={t("widget.delete")}
-        className="gap-1 text-destructive hover:text-destructive"
-      >
-        <Trash2 className="h-4 w-4" />
-        <Span className="hidden @sm:inline">{t("widget.delete")}</Span>
+    <Div className="flex flex-wrap items-center gap-2">
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            aria-label={t("widget.more")}
+            className="gap-1.5"
+          >
+            <MoreHorizontal className="size-4" />
+            <Span className="hidden @sm:inline">{t("widget.more")}</Span>
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="min-w-52">
+          {basicInfo.email && (
+            <DropdownMenuItem onSelect={handleViewInSearch}>
+              <Search className="size-4" />
+              {t("widget.viewInSearch")}
+            </DropdownMenuItem>
+          )}
+          {basicInfo.email && (
+            <DropdownMenuItem onSelect={handleSendTestEmail}>
+              <Send className="size-4" />
+              {t("widget.sendTestEmail")}
+            </DropdownMenuItem>
+          )}
+          {leadId && (
+            <DropdownMenuItem
+              onSelect={() => void copyToClipboard(leadId, logger)}
+            >
+              <Copy className="size-4" />
+              {t("widget.copyLeadId")}
+            </DropdownMenuItem>
+          )}
+          <DropdownMenuSeparator />
+          <DropdownMenuItem
+            onSelect={handleDelete}
+            className="text-destructive focus:text-destructive"
+          >
+            <Trash2 className="size-4" />
+            {t("widget.delete")}
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+      <Button type="button" size="sm" onClick={handleEdit} className="gap-1.5">
+        <Pencil className="size-4" />
+        {t("widget.edit")}
       </Button>
     </Div>
   );
@@ -1559,14 +1647,9 @@ export function LeadDetailContainer(): React.JSX.Element {
   return (
     <AdminRecordDetail
       border={false}
-      title={
-        basicInfo.businessName?.trim() ||
-        basicInfo.contactName?.trim() ||
-        basicInfo.email?.trim() ||
-        fallbackTitle
-      }
+      title={title}
       subtitle={
-        basicInfo.email && basicInfo.email !== basicInfo.businessName
+        basicInfo.email && basicInfo.email.trim() !== title
           ? basicInfo.email
           : undefined
       }
@@ -1615,6 +1698,13 @@ export function LeadDetailContainer(): React.JSX.Element {
         </TabsList>
 
         <TabsContent value="overview" className="mt-4 flex flex-col gap-4">
+          <LeadKpis
+            data={data}
+            traffic={fieldValue.traffic}
+            locale={locale}
+            t={t}
+            leadsT={leadsT}
+          />
           <JourneyOverview
             lead={data}
             review={fieldValue.review}
@@ -1629,14 +1719,7 @@ export function LeadDetailContainer(): React.JSX.Element {
               t={t}
             />
           )}
-          <OverviewTab
-            data={data}
-            locale={locale}
-            t={t}
-            leadsT={leadsT}
-            onSendTestEmail={handleSendTestEmail}
-            onViewInSearch={handleViewInSearch}
-          />
+          <OverviewTab data={data} locale={locale} t={t} leadsT={leadsT} />
         </TabsContent>
 
         <TabsContent value="details" className="mt-4">
@@ -1696,7 +1779,8 @@ export function LeadEditContainer(): React.JSX.Element {
   const onSubmit = useWidgetOnSubmit();
   const isSubmitting = useWidgetIsSubmitting();
   const patchValue = useWidgetValue<typeof definition.PATCH>();
-  const [activeTab, setActiveTab] = useState("basic");
+  const logger = useWidgetLogger();
+  const user = useWidgetUser();
   const [submittedSuccessfully, setSubmittedSuccessfully] = useState(false);
 
   const leadId = form.watch("id");
@@ -1705,10 +1789,30 @@ export function LeadEditContainer(): React.JSX.Element {
   // When navigated with prefillFromGet: true, the GET response is passed as field.value
   // (typed as LeadPatchResponseOutput but at runtime contains { lead: { basicInfo: {...} } }).
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- patchValue contains GET response data at runtime when prefillFromGet: true
-  const fieldLead = (patchValue as Record<string, any>)
+  const prefilledLead = (patchValue as Record<string, any>)
     ?.lead as LeadGetResponseOutput["lead"];
+  // Opened directly (URL, palette): no GET data was handed over, load it here
+  // so the form never shows empty fields for an existing lead.
+  const currentId = navigation.current?.params?.urlPathParams?.id;
+  const targetId = leadId ?? currentId;
+  const leadRead = useEndpoint(
+    definition,
+    {
+      read: {
+        urlPathParams: { id: targetId ?? "" },
+        queryOptions: { enabled: !prefilledLead && Boolean(targetId) },
+      },
+    },
+    logger,
+    user,
+  ).read;
+  const fieldLead = prefilledLead ?? leadRead?.data?.lead;
+  const leadName =
+    fieldLead?.basicInfo.businessName?.trim() ||
+    fieldLead?.basicInfo.contactName?.trim() ||
+    fieldLead?.basicInfo.email?.trim() ||
+    undefined;
   const prefillAppliedRef = useRef<string | undefined>(undefined);
-  const nestedLeadId = fieldLead?.basicInfo?.id;
   useEffect(() => {
     if (!fieldLead?.basicInfo?.id) {
       return;
@@ -1798,19 +1902,6 @@ export function LeadEditContainer(): React.JSX.Element {
     }
   }, [navigation]);
 
-  const handleDelete = useCallback((): void => {
-    const currentId = navigation.current?.params?.urlPathParams?.id;
-    const id = leadId ?? nestedLeadId ?? currentId;
-    if (!id) {
-      return;
-    }
-    navigation.push(definition.DELETE, {
-      urlPathParams: { id },
-      renderInModal: true,
-      popNavigationOnSuccess: 1,
-    });
-  }, [navigation, leadId, nestedLeadId]);
-
   const wasSubmittingRef = useRef(false);
 
   const handleSubmit = useCallback((): void => {
@@ -1833,17 +1924,7 @@ export function LeadEditContainer(): React.JSX.Element {
   const showSuccess = submittedSuccessfully && !isSubmitting;
 
   const headerActions = (
-    <Div className="flex items-center gap-1">
-      <Button
-        type="button"
-        variant="ghost"
-        size="sm"
-        onClick={handleDelete}
-        className="gap-1 text-destructive hover:text-destructive"
-      >
-        <Trash2 className="h-4 w-4" />
-        <Span className="hidden @sm:inline">{t("widget.delete")}</Span>
-      </Button>
+    <Div className="flex items-center gap-2">
       <Button
         type="button"
         variant="default"
@@ -1865,18 +1946,22 @@ export function LeadEditContainer(): React.JSX.Element {
   );
 
   return (
-    <WidgetShell padding="none">
+    <WidgetShell layout="page">
       {/* Top action bar */}
-      <Div className="px-4 pt-4">
+      <Div>
         <WidgetHeader
+          size="page"
           title={t("patch.form.title")}
+          subtitle={leadName}
           backButton={
             <Button
               type="button"
-              variant="outline"
+              variant="ghost"
               size="sm"
               onClick={handleBack}
+              className="-ms-2 gap-1 text-muted-foreground"
             >
+              <ChevronLeft className="size-4" />
               {t("widget.back")}
             </Button>
           }
@@ -1884,7 +1969,7 @@ export function LeadEditContainer(): React.JSX.Element {
         />
       </Div>
 
-      <Div className="px-4 pt-4 pb-6 flex flex-col gap-4">
+      <Div className="flex flex-col gap-4 pb-6">
         {/* Success: show after actual PATCH submission completes */}
         {showSuccess && (
           <ResultBanner
@@ -1894,20 +1979,10 @@ export function LeadEditContainer(): React.JSX.Element {
           />
         )}
 
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="w-full grid grid-cols-3">
-            <TabsTrigger value="basic">{t("widget.tabBasic")}</TabsTrigger>
-            <TabsTrigger value="campaign">
-              {t("widget.tabCampaign")}
-            </TabsTrigger>
-            <TabsTrigger value="advanced">
-              {t("widget.tabAdvanced")}
-            </TabsTrigger>
-          </TabsList>
-
+        <Div className="flex flex-col gap-4">
           {/* Basic Info tab */}
-          <TabsContent value="basic" className="mt-4">
-            <SectionGroup title="">
+          <Div>
+            <SectionGroup title={t("widget.tabBasic")}>
               <Div className="grid grid-cols-1 @sm:grid-cols-2 gap-4">
                 <FormField label={t("patch.email.label")}>
                   <Input
@@ -2021,11 +2096,11 @@ export function LeadEditContainer(): React.JSX.Element {
                 </FormField>
               </Div>
             </SectionGroup>
-          </TabsContent>
+          </Div>
 
           {/* Campaign tab */}
-          <TabsContent value="campaign" className="mt-4">
-            <SectionGroup title="">
+          <Div>
+            <SectionGroup title={t("widget.tabCampaign")}>
               <Div className="grid grid-cols-1 @sm:grid-cols-2 gap-4">
                 <FormField label={t("patch.source.label")}>
                   <Select
@@ -2078,6 +2153,7 @@ export function LeadEditContainer(): React.JSX.Element {
                   </Select>
                 </FormField>
               </Div>
+              <Div className="mt-4" />
               <FormField label={t("patch.notes.label")}>
                 <Textarea
                   className="min-h-[80px]"
@@ -2087,11 +2163,15 @@ export function LeadEditContainer(): React.JSX.Element {
                 />
               </FormField>
             </SectionGroup>
-          </TabsContent>
+          </Div>
 
           {/* Advanced tab */}
-          <TabsContent value="advanced" className="mt-4">
-            <SectionGroup title="">
+          <Div>
+            <SectionGroup
+              title={t("widget.tabAdvanced")}
+              collapsible
+              defaultOpen={false}
+            >
               <Div className="flex flex-col gap-4">
                 <FormField label={t("patch.convertedUserId.label")}>
                   <Input
@@ -2148,8 +2228,8 @@ export function LeadEditContainer(): React.JSX.Element {
                 </FormField>
               </Div>
             </SectionGroup>
-          </TabsContent>
-        </Tabs>
+          </Div>
+        </Div>
 
         {/* Save button at bottom */}
         <Div className="flex justify-end gap-2 pt-2">

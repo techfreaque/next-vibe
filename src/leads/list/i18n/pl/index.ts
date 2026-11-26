@@ -107,7 +107,7 @@ export const translations: typeof enTranslations = {
 
   get: {
     title: "Leady",
-    titleShort: "Lista leadów",
+    titleShort: "Wszystkie leady",
     description: "Pobierz stronicowanychą listę leadów z filtrowaniem",
     createButton: {
       label: "Utwórz leada",
@@ -324,6 +324,17 @@ export const translations: typeof enTranslations = {
     chatted: "Czatował",
     bot: "Bot",
     listFilters: "Filtry i sortowanie",
+    anonymousLead: "Anonimowy odwiedzający",
+    leadCount: "{{count}} leadów",
+    more: "Więcej",
+    filters: "Filtry",
+    colStatus: "Status",
+    colSource: "Źródło",
+    colCountry: "Kraj",
+    colVisits: "Wizyty",
+    openLead: "Otwórz lead",
+    batchUpdate: "Edycja zbiorcza",
+    newLead: "Nowy lead",
     analyticsFilters: "Więcej filtrów",
     apply: "Zastosuj",
   },

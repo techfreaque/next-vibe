@@ -74,6 +74,8 @@ export const translations: typeof enTranslations = {
     botsSubtitle:
       "Rastreadores, vistas previas y scripts. Haz clic en una barra para ver sus prospectos.",
     loading: "Cargando informe de adquisición...",
+    pageSubtitle:
+      "De dónde vienen los leads y cómo convierten. Haz clic en un número para ver sus leads.",
     coverage:
       "Las visitas se registran desde el {{date}}. Los prospectos anteriores cuentan, pero sin visitas.",
     botShareHint: "{{percent}} de los prospectos nuevos",

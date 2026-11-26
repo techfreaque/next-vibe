@@ -107,7 +107,7 @@ export const translations: typeof enTranslations = {
 
   get: {
     title: "Kontakty",
-    titleShort: "Zoznam kontaktov",
+    titleShort: "Všetky leady",
     description: "Načíta zoznam kontaktov s filtrami a stránkovaním",
     createButton: {
       label: "Vytvoriť kontakt",
@@ -324,6 +324,17 @@ export const translations: typeof enTranslations = {
     chatted: "Prvý čet",
     bot: "Robot",
     listFilters: "Filtre a zoradenie",
+    anonymousLead: "Anonymný návštevník",
+    leadCount: "{{count}} leadov",
+    more: "Viac",
+    filters: "Filtre",
+    colStatus: "Stav",
+    colSource: "Zdroj",
+    colCountry: "Krajina",
+    colVisits: "Návštevy",
+    openLead: "Otvoriť lead",
+    batchUpdate: "Hromadná úprava",
+    newLead: "Nový lead",
     analyticsFilters: "Viac filtrov",
     apply: "Použiť",
   },

@@ -44,6 +44,11 @@ export const translations: typeof enTranslations = {
       description:
         "Lead-Informationen eingeben um einen neuen Lead zu erstellen",
     },
+    validation: {
+      country: "Wählen Sie ein Land.",
+      language: "Wählen Sie eine Sprache.",
+      source: "Wählen Sie, woher der Lead kommt.",
+    },
     contactInfo: {
       title: "Kontaktinformationen",
       description: "Primäre Kontaktdaten für den Lead",

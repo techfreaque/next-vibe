@@ -8,7 +8,7 @@ export const translations: typeof enTranslations = {
   },
   get: {
     title: "Vyhľadať kontakty",
-    titleShort: "Vyhľadať kontakty",
+    titleShort: "Hľadať podľa e-mailu alebo mena",
     description: "Vyhľadávať kontakty s filtrami a stránkovaním",
     form: {
       title: "Formulár na vyhľadávanie kontaktov",

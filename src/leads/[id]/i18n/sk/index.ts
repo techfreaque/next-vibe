@@ -811,18 +811,31 @@ export const translations: typeof enTranslations = {
     copyIp: "IP",
     copyLinkedLeadId: "ID kontaktu",
     copyUserId2: "ID používateľa",
+    more: "Viac",
+    copyLeadId: "Kopírovať ID leadu",
+    kpiFirstTouch: "Prvý kontakt",
+    kpiStage: "Fáza kampane",
+    kpiEmails: "Otvorené e-maily",
+    kpiOpenRate: "{{percent}} % otvorení",
+    kpiAge: "Vek leadu",
+    kpiAgeValue: "{{count}} dní",
+    kpiAgeHint: "Vytvorené {{date}}",
+    kpiCredits: "Minuté bezplatné kredity",
+    kpiCreditsHint: "Minuté v bezplatnom pláne",
+    notTracked: "Nesledované",
     selectLead: "Vybrať kontakt",
   },
   delete: {
     title: "Odstrániť kontakt",
     titleShort: "Odstrániť kontakt",
-    description: "Odstrániť kontakt zo systému",
+    description:
+      "Natrvalo odstráni kontakt aj jeho históriu. Nedá sa to vrátiť späť.",
     container: {
       title: "Odstrániť kontakt",
       description: "Naozaj chcete tento kontakt natrvalo odstrániť?",
     },
     backButton: {
-      label: "Späť na kontakt",
+      label: "Zrušiť",
     },
     submitButton: {
       label: "Odstrániť kontakt",

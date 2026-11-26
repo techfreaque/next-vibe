@@ -107,7 +107,7 @@ export const translations: typeof enTranslations = {
 
   get: {
     title: "Contatti",
-    titleShort: "Elenco dei lead",
+    titleShort: "Tutti i lead",
     description: "Recuperare un elenco impaginato di cavi con filtraggio",
     createButton: {
       label: "Crea contatto",
@@ -327,6 +327,17 @@ export const translations: typeof enTranslations = {
     chatted: "Ha chattato",
     bot: "Bot",
     listFilters: "Filtri e ordinamento",
+    anonymousLead: "Visitatore anonimo",
+    leadCount: "{{count}} lead",
+    more: "Altro",
+    filters: "Filtri",
+    colStatus: "Stato",
+    colSource: "Fonte",
+    colCountry: "Paese",
+    colVisits: "Visite",
+    openLead: "Apri lead",
+    batchUpdate: "Modifica multipla",
+    newLead: "Nuovo lead",
     analyticsFilters: "Altri filtri",
     apply: "Applica",
   },

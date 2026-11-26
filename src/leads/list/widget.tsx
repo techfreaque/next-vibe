@@ -5,11 +5,7 @@
 
 "use client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import {
-  formatCurrency,
-  formatSimpleDate,
-} from "next-vibe/core/i18n/core/localization-utils";
-import { objectEntries } from "next-vibe/core/utils/object";
+import { CountriesOptions } from "next-vibe/core/i18n/core/config";
 import {
   type LeadStatusFilter,
   type LeadStatusFilterValue,
@@ -21,28 +17,41 @@ import {
 import type { AnalyticsFilterChip } from "next-vibe/ui/components/analytics";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "next-vibe/ui/components/dropdown-menu";
 import { EmptyBlock } from "next-vibe/ui/components/empty-block";
 import { BarChart3 } from "next-vibe/ui/components/icons/BarChart3";
-import { ChevronDown } from "next-vibe/ui/components/icons/ChevronDown";
 import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
 import { ChevronRight } from "next-vibe/ui/components/icons/ChevronRight";
 import { Download } from "next-vibe/ui/components/icons/Download";
 import { GitBranch } from "next-vibe/ui/components/icons/GitBranch";
-import { Pencil } from "next-vibe/ui/components/icons/Pencil";
+import { MoreHorizontal } from "next-vibe/ui/components/icons/MoreHorizontal";
 import { Plus } from "next-vibe/ui/components/icons/Plus";
 import { RefreshCw } from "next-vibe/ui/components/icons/RefreshCw";
 import { Search } from "next-vibe/ui/components/icons/Search";
-import { Trash2 } from "next-vibe/ui/components/icons/Trash2";
+import { Sliders } from "next-vibe/ui/components/icons/Sliders";
 import { Upload } from "next-vibe/ui/components/icons/Upload";
+import { User } from "next-vibe/ui/components/icons/User";
 import { Users } from "next-vibe/ui/components/icons/Users";
 import { X } from "next-vibe/ui/components/icons/X";
-import { LoadingBlock } from "next-vibe/ui/components/loading-block";
 import { SectionGroup } from "next-vibe/ui/components/section-group";
+import { Skeleton } from "next-vibe/ui/components/skeleton";
 import { Span } from "next-vibe/ui/components/span";
 import { StatusPill } from "next-vibe/ui/components/status-pill";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "next-vibe/ui/components/table";
 import { WidgetHeader } from "next-vibe/ui/components/widget-header";
 import { WidgetShell } from "next-vibe/ui/components/widget-shell";
-import { useTouchDevice } from "next-vibe/ui/hooks/use-touch-device";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
 import { usePickerCallback } from "next-vibe/unified-ui/_shared/picker-context";
 import {
@@ -62,7 +71,7 @@ import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-f
 import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/navigate-button/widget";
 import React, { useCallback, useId, useMemo, useState } from "react";
 
-import { FunnelReach, isBotFamily } from "../analytics/enum";
+import { FunnelReach, isBotFamily, LeadChannelFilter } from "../analytics/enum";
 import { type LeadDrillFilters, SEGMENT_KEYS } from "../analytics/filters";
 import {
   dimensionValueLabel,
@@ -99,30 +108,6 @@ const STATUS_VARIANT: Record<string, PillVariant> = {
   "enums.leadStatus.invalid": "danger",
 };
 
-const STATUS_DOT_COLORS: Record<string, string> = {
-  "enums.leadStatus.new": "bg-info",
-  "enums.leadStatus.pending": "bg-warning",
-  "enums.leadStatus.campaignRunning": "bg-purple-500",
-  "enums.leadStatus.websiteUser": "bg-cyan-500",
-  "enums.leadStatus.newsletterSubscriber": "bg-indigo-500",
-  "enums.leadStatus.inContact": "bg-orange-500",
-  "enums.leadStatus.signedUp": "bg-teal-500",
-  "enums.leadStatus.subscriptionConfirmed": "bg-success",
-  "enums.leadStatus.unsubscribed": "bg-gray-400",
-  "enums.leadStatus.bounced": "bg-destructive",
-  "enums.leadStatus.invalid": "bg-destructive",
-};
-
-const CAMPAIGN_STAGE_VARIANT: Record<string, PillVariant> = {
-  "enums.emailCampaignStage.notStarted": "default",
-  "enums.emailCampaignStage.initial": "info",
-  "enums.emailCampaignStage.followup1": "info",
-  "enums.emailCampaignStage.followup2": "info",
-  "enums.emailCampaignStage.followup3": "info",
-  "enums.emailCampaignStage.nurture": "success",
-  "enums.emailCampaignStage.reactivation": "warning",
-};
-
 /** Status tab values for quick filtering */
 const STATUS_TAB_VALUES = [
   { labelKey: "widget.tabAll", value: null },
@@ -152,225 +137,219 @@ interface LeadRowProps {
   lead: Lead;
   locale: CountryLanguage;
   onView: (lead: Lead) => void;
-  onEdit: (lead: Lead) => void;
-  onDelete: (lead: Lead) => void;
   t: ReturnType<typeof useWidgetTranslation<typeof definition.GET>>;
   leadsT: ReturnType<typeof leadsScopedTranslation.scopedT>["t"];
   st: ReturnType<typeof useLeadAnalyticsT>;
-  isDrill: boolean;
-  isTouch: boolean;
   isPickerMode: boolean;
 }
 
-function LeadRow({
+/** Display name: business, contact, email, else an anonymous visitor label. */
+function leadName(
+  lead: Lead,
+  t: LeadRowProps["t"],
+): { name: string; anonymous: boolean } {
+  const name =
+    lead.businessName?.trim() || lead.contactName?.trim() || lead.email?.trim();
+  return name
+    ? { name, anonymous: false }
+    : { name: t("widget.anonymousLead"), anonymous: true };
+}
+
+/** Country label in the viewer's locale; GLOBAL (unknown) renders nothing. */
+function countryLabel(
+  code: string | null | undefined,
+  t: LeadRowProps["t"],
+): string | null {
+  if (!code || code === "GLOBAL") {
+    return null;
+  }
+  const option = CountriesOptions.find((entry) => entry.value === code);
+  return option ? t(option.label) : code;
+}
+
+/** One funnel pill that adds information beyond the lead status. */
+function FunnelPill({
+  lead,
+  t,
+}: {
+  lead: Lead;
+  t: LeadRowProps["t"];
+}): React.JSX.Element | null {
+  const triage = lead.triage;
+  if (triage?.paid) {
+    return <StatusPill status={t("widget.paid")} variant="success" />;
+  }
+  const statusSaysSignedUp =
+    lead.status === "enums.leadStatus.signedUp" ||
+    lead.status === "enums.leadStatus.subscriptionConfirmed";
+  if ((triage?.signedUp || lead.convertedUserId) && !statusSaysSignedUp) {
+    return <StatusPill status={t("widget.signedUp")} variant="success" />;
+  }
+  if (triage?.chatted && !triage.signedUp) {
+    return <StatusPill status={t("widget.chatted")} variant="info" />;
+  }
+  return null;
+}
+
+function LeadTableRow({
   lead,
   locale,
   onView,
-  onEdit,
-  onDelete,
   t,
   leadsT,
   st,
-  isDrill,
-  isTouch,
   isPickerMode,
 }: LeadRowProps): React.JSX.Element {
-  const isConverted = Boolean(lead.convertedUserId);
-  const acquisition = lead.acquisition;
   const triage = lead.triage;
   const isBot = triage ? isBotFamily(triage.botFamily) : false;
+  const { name, anonymous } = leadName(lead, t);
+  const secondary =
+    lead.email && lead.email !== name
+      ? lead.email
+      : triage?.landingPath || triage?.referrerHost || null;
+  const country = countryLabel(lead.country, t);
+  // Untracked first touch says nothing; only show a known channel.
   const origin = triage
     ? [
-        dimensionValueLabel(triage.channelType, st),
-        triage.channel && triage.channel !== "direct" ? triage.channel : null,
-        triage.source,
+        triage.channel && triage.channel !== "direct"
+          ? triage.channel
+          : triage.channelType &&
+              triage.channelType !== LeadChannelFilter.UNATTRIBUTED
+            ? dimensionValueLabel(triage.channelType, st)
+            : null,
         triage.referrerHost,
-        triage.landingPath,
       ].filter((part): part is string => Boolean(part))
     : [];
-  const client = triage
-    ? [
-        triage.geoCountry ? dimensionValueLabel(triage.geoCountry, st) : null,
-        dimensionValueLabel(triage.device, st),
-        triage.browser,
-        triage.os,
-        triage.ipPrefix,
-      ].filter((part): part is string => Boolean(part))
-    : [];
-  return (
-    <Div className="group relative flex min-w-0 flex-wrap items-center gap-3 p-3 rounded-lg border hover:bg-accent transition-colors">
-      {/* Avatar / Initials */}
-      <Div className="flex-shrink-0 w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-sm font-semibold text-primary">
-        {(lead.businessName ?? lead.email ?? "?").slice(0, 2).toUpperCase()}
-      </Div>
+  const visits = lead.acquisition?.visits ?? 0;
+  const created = lead.createdAt
+    ? new Date(lead.createdAt).toLocaleDateString(locale, {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+      })
+    : null;
+  const statusPill = lead.status ? (
+    <StatusPill
+      status={leadsT(lead.status)}
+      variant={STATUS_VARIANT[lead.status] ?? "default"}
+    />
+  ) : null;
 
-      {/* Main content */}
-      <Div className="flex-1 min-w-0">
-        <Div className="flex items-center gap-2 flex-wrap">
-          <Button
-            type="button"
-            variant="ghost"
-            onClick={() => onView(lead)}
-            className="h-auto min-w-0 max-w-full p-0 text-left font-semibold text-sm hover:bg-transparent hover:underline before:absolute before:inset-0 before:rounded-lg focus-visible:before:ring-2 focus-visible:before:ring-ring"
+  return (
+    <TableRow
+      className="cursor-pointer hover:bg-accent/50"
+      onClick={() => onView(lead)}
+    >
+      <TableCell className="whitespace-normal">
+        <Div className="flex min-w-0 items-center gap-3">
+          <Div
+            aria-hidden="true"
+            className={cn(
+              "flex size-8 shrink-0 items-center justify-center rounded-full text-xs font-semibold",
+              anonymous
+                ? "bg-muted text-muted-foreground"
+                : "bg-primary/10 text-primary",
+            )}
           >
-            <Span className="min-w-0 whitespace-normal [overflow-wrap:anywhere]">
-              {lead.businessName || lead.email || lead.id}
-            </Span>
-          </Button>
-          {lead.status && (
-            <StatusPill
-              status={leadsT(lead.status)}
-              variant={STATUS_VARIANT[lead.status] ?? "default"}
+            {anonymous ? <User className="size-4" /> : initials(name)}
+          </Div>
+          <Div className="min-w-0 flex-1">
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={(event) => {
+                event.stopPropagation();
+                onView(lead);
+              }}
+              aria-label={t("widget.openLead")}
+              className={cn(
+                "h-auto max-w-full justify-start p-0 text-left text-sm font-medium hover:bg-transparent hover:underline",
+                anonymous && "font-normal text-muted-foreground",
+              )}
+            >
+              <Span className="block min-w-0 truncate">{name}</Span>
+            </Button>
+            {secondary && (
+              <Span className="block min-w-0 text-xs text-muted-foreground [overflow-wrap:anywhere] @3xl:truncate">
+                {secondary}
+              </Span>
+            )}
+            {/* Compact (phone / narrow) summary line */}
+            <Div className="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground @3xl:hidden">
+              {statusPill}
+              <FunnelPill lead={lead} t={t} />
+              {isBot && triage && (
+                <StatusPill
+                  status={dimensionValueLabel(triage.botFamily, st)}
+                  variant="danger"
+                />
+              )}
+              {created && <Span className="tabular-nums">{created}</Span>}
+            </Div>
+          </Div>
+          {!isPickerMode && (
+            <ChevronRight
+              aria-hidden="true"
+              className="size-4 shrink-0 text-muted-foreground @3xl:hidden"
             />
           )}
-          {triage && (
+        </Div>
+      </TableCell>
+      <TableCell className="hidden @3xl:table-cell">
+        <Div className="flex flex-wrap items-center gap-1">
+          {statusPill}
+          <FunnelPill lead={lead} t={t} />
+        </Div>
+      </TableCell>
+      <TableCell className="hidden max-w-[220px] text-xs @3xl:table-cell">
+        <Span className="block truncate">
+          {lead.source ? leadsT(lead.source) : "-"}
+        </Span>
+        {origin.length > 0 && (
+          <Span className="block truncate text-muted-foreground">
+            {origin.join(" · ")}
+          </Span>
+        )}
+      </TableCell>
+      <TableCell className="hidden text-xs @3xl:table-cell">
+        {triage ? (
+          isBot ? (
             <StatusPill
               status={dimensionValueLabel(triage.botFamily, st)}
-              variant={isBot ? "danger" : "default"}
+              variant="danger"
             />
-          )}
-          {triage?.paid ? (
-            <StatusPill status={t("widget.paid")} variant="success" />
-          ) : triage?.signedUp ? (
-            <StatusPill status={t("widget.signedUp")} variant="success" />
-          ) : isConverted ? (
-            <StatusPill status={t("widget.converted")} variant="warning" />
-          ) : null}
-          {triage?.chatted && !triage.signedUp && (
-            <StatusPill status={t("widget.chatted")} variant="info" />
-          )}
-          {lead.linkedLeadsCount > 0 && (
-            <StatusPill
-              status={t("widget.linkedCount", { count: lead.linkedLeadsCount })}
-              variant="info"
-            />
-          )}
-          {lead.hasLinkedUser && (
-            <StatusPill status={t("widget.hasLinkedUser")} variant="info" />
-          )}
-          {!isDrill && lead.currentCampaignStage && (
-            <StatusPill
-              status={leadsT(lead.currentCampaignStage)}
-              variant={
-                CAMPAIGN_STAGE_VARIANT[lead.currentCampaignStage] ?? "default"
-              }
-            />
-          )}
-        </Div>
-        <Div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground mt-0.5">
-          {lead.email && (
-            <Span className="min-w-0 [overflow-wrap:anywhere]">
-              {lead.email}
+          ) : (
+            <Span className="text-muted-foreground">
+              {dimensionValueLabel(triage.botFamily, st)}
             </Span>
-          )}
-          {lead.country && (
-            <Span className="flex-shrink-0">{lead.country}</Span>
-          )}
-          {lead.source && (
-            <Span className="flex-shrink-0">{leadsT(lead.source)}</Span>
-          )}
-        </Div>
-        {origin.length > 0 && (
-          <Div className="mt-0.5 truncate text-xs text-foreground/80">
-            {origin.join(" · ")}
-          </Div>
+          )
+        ) : (
+          <Span className="text-muted-foreground">-</Span>
         )}
-        <Div className="mt-0.5 flex flex-wrap gap-x-3 text-xs text-muted-foreground tabular-nums">
-          {lead.createdAt && (
-            <Span>
-              {isDrill
-                ? `${new Date(lead.createdAt).toISOString().slice(0, 16).replace("T", " ")} UTC`
-                : formatSimpleDate(lead.createdAt, locale)}
-            </Span>
-          )}
-          {client.length > 0 && (
-            <Span className="truncate">{client.join(" · ")}</Span>
-          )}
-        </Div>
-      </Div>
-
-      {/* Stats */}
-      <Div className="hidden @md:flex flex-col items-end gap-1 flex-shrink-0 text-xs text-muted-foreground tabular-nums">
-        {acquisition && acquisition.revenue > 0 && (
-          <Span className="font-medium text-foreground">
-            {formatCurrency(acquisition.revenue, acquisition.currency, locale)}
-          </Span>
+      </TableCell>
+      <TableCell className="hidden whitespace-nowrap text-xs @3xl:table-cell">
+        {country ?? <Span className="text-muted-foreground">-</Span>}
+      </TableCell>
+      <TableCell
+        className={cn(
+          "hidden whitespace-nowrap text-right text-sm tabular-nums @3xl:table-cell",
+          visits === 0 && "text-muted-foreground",
         )}
-        {acquisition && acquisition.visits > 0 && (
-          <Span>
-            {st("leadAnalytics.metrics.visits")}:{" "}
-            {acquisition.visits.toLocaleString(locale)}
-          </Span>
-        )}
-        {!isDrill &&
-          lead.emailsSent !== null &&
-          lead.emailsSent !== undefined && (
-            <Span>
-              {t("widget.emailsSent", {
-                count: lead.emailsSent,
-              })}
-            </Span>
-          )}
-        {lead.emailsOpened !== null &&
-          lead.emailsOpened !== undefined &&
-          !isDrill &&
-          lead.emailsSent !== null &&
-          lead.emailsSent !== undefined && (
-            <Span>
-              {t("widget.openRate", {
-                percent:
-                  lead.emailsSent > 0
-                    ? Math.round((lead.emailsOpened / lead.emailsSent) * 100)
-                    : 0,
-              })}
-            </Span>
-          )}
-        {lead.emailsClicked !== null &&
-          lead.emailsClicked !== undefined &&
-          lead.emailsClicked > 0 && (
-            <Span>
-              {t("widget.clicks", {
-                count: lead.emailsClicked,
-              })}
-            </Span>
-          )}
-      </Div>
-
-      {/* Actions - hidden in picker mode */}
-      {!isPickerMode && (
-        <Div
-          className={cn(
-            "relative z-10 ms-auto flex-shrink-0 flex gap-0.5",
-            isTouch
-              ? "opacity-100"
-              : "opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity",
-          )}
-        >
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={() => onEdit(lead)}
-            title={t("widget.edit")}
-            aria-label={t("widget.edit")}
-          >
-            <Pencil className="h-4 w-4" />
-          </Button>
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            className="text-destructive hover:text-destructive"
-            onClick={() => onDelete(lead)}
-            title={t("widget.delete")}
-            aria-label={t("widget.delete")}
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
-        </Div>
-      )}
-    </Div>
+      >
+        {visits.toLocaleString(locale)}
+      </TableCell>
+      <TableCell className="hidden whitespace-nowrap text-right text-xs tabular-nums text-muted-foreground @3xl:table-cell">
+        {created ?? "-"}
+      </TableCell>
+    </TableRow>
   );
+}
+
+function initials(name: string): string {
+  const parts = name.split(/[\s@._-]+/).filter(Boolean);
+  const first = parts[0]?.[0] ?? "?";
+  const second = parts[1]?.[0] ?? "";
+  return `${first}${second}`.toUpperCase();
 }
 
 /** Dense one-line row for report drill-downs: who, what agent, from where. */
@@ -449,7 +428,6 @@ export function LeadsListContainer({
   const children = field.children;
   const { endpointMutations, response } = useWidgetContext();
   const locale = useWidgetLocale();
-  const isTouch = useTouchDevice();
   const t = useWidgetTranslation<typeof definition.GET>();
   const leadsT = leadsScopedTranslation.scopedT(locale).t;
   const st = useLeadAnalyticsT(locale);
@@ -546,49 +524,6 @@ export function LeadsListContainer({
       })();
     },
     [navigation, onPick],
-  );
-
-  const handleEdit = useCallback(
-    (lead: Lead): void => {
-      void (async (): Promise<void> => {
-        const leadDef = await import("@/leads/[id]/definition");
-        navigation.push(leadDef.default.PATCH, {
-          urlPathParams: { id: lead.id },
-          prefillFromGet: true,
-          getEndpoint: leadDef.default.GET,
-          data: {
-            email: lead.email ?? undefined,
-            businessName: lead.businessName ?? undefined,
-            contactName: lead.contactName ?? undefined,
-            status: lead.status ?? undefined,
-            phone: lead.phone ?? undefined,
-            website: lead.website ?? undefined,
-            country: lead.country ?? undefined,
-            language: lead.language ?? undefined,
-            source: lead.source ?? undefined,
-            notes: lead.notes ?? undefined,
-          },
-        });
-      })();
-    },
-    [navigation],
-  );
-
-  const handleDelete = useCallback(
-    (lead: Lead): void => {
-      void (async (): Promise<void> => {
-        const leadDef = await import("@/leads/[id]/definition");
-        navigation.push(leadDef.default.DELETE, {
-          urlPathParams: { id: lead.id },
-          renderInModal: true,
-          popNavigationOnSuccess: 1,
-          onSuccessCallback: () => {
-            endpointMutations?.read?.refetch?.();
-          },
-        });
-      })();
-    },
-    [navigation, endpointMutations],
   );
 
   const handleCreate = useCallback((): void => {
@@ -762,222 +697,230 @@ export function LeadsListContainer({
     handlePageChange(1);
   };
 
-  const headerActions = (
-    <Div className="flex items-center gap-1 flex-wrap">
-      {!isPickerMode && (
-        <>
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={handleStats}
-            title={t("widget.stats")}
-            aria-label={t("widget.stats")}
-            className="gap-1"
-          >
-            <BarChart3 className="h-4 w-4" />
-            <Span className="hidden @sm:inline">{t("widget.stats")}</Span>
-          </Button>
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={handleGraphs}
-            title={t("widget.graphs")}
-            aria-label={t("widget.graphs")}
-            className="gap-1"
-          >
-            <GitBranch className="h-4 w-4" />
-            <Span className="hidden @sm:inline">{t("widget.graphs")}</Span>
-          </Button>
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={handleSearch}
-            title={t("widget.search")}
-            aria-label={t("widget.search")}
-            className="gap-1"
-          >
-            <Search className="h-4 w-4" />
-            <Span className="hidden @sm:inline">{t("widget.search")}</Span>
-          </Button>
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={handleExport}
-            title={t("widget.export")}
-            aria-label={t("widget.export")}
-            className="gap-1"
-          >
-            <Download className="h-4 w-4" />
-            <Span className="hidden @sm:inline">{t("widget.export")}</Span>
-          </Button>
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={handleImport}
-            title={t("widget.import")}
-            aria-label={t("widget.import")}
-            className="gap-1"
-          >
-            <Upload className="h-4 w-4" />
-            <Span className="hidden @sm:inline">{t("widget.import")}</Span>
-          </Button>
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={handleBatchUpdate}
-            title={t("widget.batch")}
-            aria-label={t("widget.batch")}
-            className="gap-1"
-          >
-            <Users className="h-4 w-4" />
-            <Span className="hidden @sm:inline">{t("widget.batch")}</Span>
-          </Button>
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={handleRefresh}
-            title={t("widget.refresh")}
-            aria-label={t("widget.refresh")}
-          >
-            <RefreshCw className="h-4 w-4" />
-          </Button>
-          <Button
-            type="button"
-            variant="default"
-            size="sm"
-            onClick={handleCreate}
-            className="gap-1"
-          >
-            <Plus className="h-4 w-4" />
-            {t("get.createButton.label")}
-          </Button>
-        </>
-      )}
-    </Div>
-  );
+  const filterCount =
+    activeSources.length +
+    (form.watch("statusFilters.currentCampaignStage")?.length ?? 0) +
+    (form.watch("locationFilters.country")?.length ?? 0) +
+    (form.watch("locationFilters.language")?.length ?? 0);
 
-  return (
-    <WidgetShell padding="none">
-      {/* Header */}
-      <Div className="px-4 pt-4">
-        <WidgetHeader
-          size="page"
-          title={`${t("get.title")}${totalCount > 0 ? ` (${totalCount})` : ""}`}
-          backButton={<NavigateButtonWidget field={children.backButton} />}
-          actions={headerActions}
-        />
-      </Div>
+  const moreActions = [
+    {
+      key: "search",
+      label: t("widget.search"),
+      icon: Search,
+      run: handleSearch,
+    },
+    {
+      key: "stats",
+      label: t("widget.stats"),
+      icon: BarChart3,
+      run: handleStats,
+    },
+    {
+      key: "graphs",
+      label: t("widget.graphs"),
+      icon: GitBranch,
+      run: handleGraphs,
+    },
+    {
+      key: "batch",
+      label: t("widget.batchUpdate"),
+      icon: Users,
+      run: handleBatchUpdate,
+    },
+    {
+      key: "refresh",
+      label: t("widget.refresh"),
+      icon: RefreshCw,
+      run: handleRefresh,
+    },
+  ] as const;
 
-      <Div className="px-4 pt-2">
-        <TextFieldWidget
-          fieldName="statusFilters.search"
-          field={{
-            ...children.statusFilters.children.search,
-            description: undefined,
-          }}
-        />
-      </Div>
-      {!isPickerMode && (
-        <Div className="px-4 py-2 @md:hidden">
+  const headerActions = !isPickerMode ? (
+    <Div className="flex flex-wrap items-center gap-2">
+      <Button
+        type="button"
+        variant="outline"
+        size="sm"
+        onClick={handleImport}
+        aria-label={t("widget.import")}
+        className="gap-1.5"
+      >
+        <Upload className="size-4" />
+        <Span className="hidden @md:inline">{t("widget.import")}</Span>
+      </Button>
+      <Button
+        type="button"
+        variant="outline"
+        size="sm"
+        onClick={handleExport}
+        aria-label={t("widget.export")}
+        className="gap-1.5"
+      >
+        <Download className="size-4" />
+        <Span className="hidden @md:inline">{t("widget.export")}</Span>
+      </Button>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
           <Button
             type="button"
             variant="outline"
             size="sm"
-            aria-expanded={filtersOpen}
-            aria-controls={filtersId}
-            onClick={() => setFiltersOpen(!filtersOpen)}
+            aria-label={t("widget.more")}
+            className="gap-1.5"
           >
-            {t("widget.listFilters")}
-            <ChevronDown
-              className={cn("size-4", filtersOpen && "rotate-180")}
-              aria-hidden="true"
-            />
+            <MoreHorizontal className="size-4" />
+            <Span className="hidden @sm:inline">{t("widget.more")}</Span>
           </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="min-w-48">
+          {moreActions.map(({ key, label, icon: ActionIcon, run }) => (
+            <DropdownMenuItem key={key} onSelect={() => run()}>
+              <ActionIcon className="size-4" />
+              {label}
+            </DropdownMenuItem>
+          ))}
+        </DropdownMenuContent>
+      </DropdownMenu>
+      <Button
+        type="button"
+        size="sm"
+        onClick={handleCreate}
+        className="gap-1.5"
+      >
+        <Plus className="size-4" />
+        {t("widget.newLead")}
+      </Button>
+    </Div>
+  ) : undefined;
+
+  const selectAllStatuses = (): void => {
+    form.setValue("statusFilters.status", []);
+    form.setValue("paginationInfo.page", 1);
+    if (onSubmit) {
+      onSubmit();
+    }
+  };
+
+  return (
+    <WidgetShell layout="page">
+      <WidgetHeader
+        size="page"
+        title={t("get.title")}
+        subtitle={
+          totalCount > 0
+            ? t("widget.leadCount", {
+                count: totalCount.toLocaleString(locale),
+              })
+            : undefined
+        }
+        backButton={<NavigateButtonWidget field={children.backButton} />}
+        actions={headerActions}
+      />
+
+      {/* Status tabs */}
+      {!isPickerMode && (
+        <Div
+          role="tablist"
+          aria-label={t("get.title")}
+          className="-mx-1 flex items-end gap-1 overflow-x-auto border-b px-1"
+        >
+          {STATUS_TAB_VALUES.map((tab) => {
+            const isActive =
+              tab.value === null
+                ? activeStatuses.length === 0
+                : activeStatuses.includes(tab.value);
+            const count =
+              tab.value !== null
+                ? (statusCounts[tab.value] ?? 0)
+                : allStatusesCount;
+            return (
+              <Button
+                key={tab.value ?? "all"}
+                type="button"
+                role="tab"
+                aria-selected={isActive}
+                variant="ghost"
+                size="sm"
+                onClick={() =>
+                  tab.value === null
+                    ? selectAllStatuses()
+                    : handleToggleStatus(tab.value)
+                }
+                className={cn(
+                  "-mb-px h-10 shrink-0 gap-1.5 rounded-none border-b-2 px-3 text-sm font-medium hover:bg-transparent",
+                  isActive
+                    ? "border-primary text-foreground"
+                    : "border-transparent text-muted-foreground hover:text-foreground",
+                )}
+              >
+                {t(tab.labelKey)}
+                {widgetData && !isLoading && (
+                  <Span className="text-xs font-normal tabular-nums text-muted-foreground">
+                    {count.toLocaleString(locale)}
+                  </Span>
+                )}
+              </Button>
+            );
+          })}
         </Div>
       )}
-      <Div id={filtersId} className={cn(!filtersOpen && "hidden", "@md:block")}>
-        {/* Status quick-filter tabs — full mode only */}
-        {!isPickerMode && (
-          <Div className="flex items-center gap-1 px-4 pt-3 pb-1 flex-wrap">
-            {STATUS_TAB_VALUES.map((tab) => {
-              const isActive =
-                tab.value === null
-                  ? activeStatuses.length === 0
-                  : activeStatuses.includes(tab.value);
-              const count =
-                tab.value !== null
-                  ? (statusCounts[tab.value] ?? 0)
-                  : allStatusesCount;
-              return (
-                <Button
-                  key={tab.value ?? "all"}
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => {
-                    if (tab.value === null) {
-                      form.setValue("statusFilters.status", []);
-                      form.setValue("paginationInfo.page", 1);
-                      if (onSubmit) {
-                        onSubmit();
-                      }
-                    } else {
-                      handleToggleStatus(tab.value);
-                    }
-                  }}
-                  className={cn(
-                    "inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium transition-colors border",
-                    isActive
-                      ? "bg-primary text-primary-foreground border-primary"
-                      : "bg-transparent text-muted-foreground border-border hover:bg-accent hover:text-accent-foreground",
-                  )}
-                >
-                  {t(tab.labelKey)}
-                  {count > 0 && (
-                    <Span
-                      className={cn(
-                        "inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1 rounded-full text-[10px] font-semibold",
-                        isActive
-                          ? "bg-primary-foreground/20 text-primary-foreground"
-                          : "bg-muted text-muted-foreground",
-                      )}
-                    >
-                      {count}
-                    </Span>
-                  )}
-                </Button>
-              );
-            })}
-          </Div>
-        )}
 
-        <Div className="grid gap-2 px-4 pt-2 @sm:grid-cols-2 @md:grid-cols-3">
+      {/* Search + filters */}
+      <Div className="flex flex-col gap-3">
+        <Div className="flex items-center gap-2">
+          <Div className="min-w-0 flex-1 [&_label]:sr-only">
+            <TextFieldWidget
+              fieldName="statusFilters.search"
+              field={{
+                ...children.statusFilters.children.search,
+                description: undefined,
+              }}
+            />
+          </Div>
           {!isPickerMode && drillChips.length === 0 && (
-            <>
-              <MultiSelectFieldWidget
-                fieldName="statusFilters.source"
-                field={children.statusFilters.children.source}
-              />
-              <MultiSelectFieldWidget
-                fieldName="statusFilters.currentCampaignStage"
-                field={children.statusFilters.children.currentCampaignStage}
-              />
-              <MultiSelectFieldWidget
-                fieldName="locationFilters.country"
-                field={children.locationFilters.children.country}
-              />
-              <MultiSelectFieldWidget
-                fieldName="locationFilters.language"
-                field={children.locationFilters.children.language}
-              />
-              <CompactFieldHelpContext.Provider value>
+            <Button
+              type="button"
+              variant="outline"
+              aria-expanded={filtersOpen}
+              aria-controls={filtersId}
+              onClick={() => setFiltersOpen(!filtersOpen)}
+              className="h-10 shrink-0 gap-1.5"
+            >
+              <Sliders className="size-4" />
+              <Span className="hidden @sm:inline">{t("widget.filters")}</Span>
+              {filterCount > 0 && (
+                <Span className="rounded-full bg-primary px-1.5 text-xs tabular-nums text-primary-foreground">
+                  {filterCount}
+                </Span>
+              )}
+            </Button>
+          )}
+        </Div>
+
+        {!isPickerMode && drillChips.length === 0 && filtersOpen && (
+          <Div
+            id={filtersId}
+            className="flex flex-col gap-3 rounded-lg border bg-card p-4"
+          >
+            <CompactFieldHelpContext.Provider value>
+              <Div className="grid gap-3 @sm:grid-cols-2 @3xl:grid-cols-3">
+                <MultiSelectFieldWidget
+                  fieldName="statusFilters.source"
+                  field={children.statusFilters.children.source}
+                />
+                <MultiSelectFieldWidget
+                  fieldName="statusFilters.currentCampaignStage"
+                  field={children.statusFilters.children.currentCampaignStage}
+                />
+                <MultiSelectFieldWidget
+                  fieldName="locationFilters.country"
+                  field={children.locationFilters.children.country}
+                />
+                <MultiSelectFieldWidget
+                  fieldName="locationFilters.language"
+                  field={children.locationFilters.children.language}
+                />
                 <SelectFieldWidget
                   fieldName="sortingOptions.sortBy"
                   field={children.sortingOptions.children.sortBy}
@@ -986,13 +929,58 @@ export function LeadsListContainer({
                   fieldName="sortingOptions.sortOrder"
                   field={children.sortingOptions.children.sortOrder}
                 />
-              </CompactFieldHelpContext.Provider>
-            </>
-          )}
-        </Div>
+              </Div>
+            </CompactFieldHelpContext.Provider>
+            <SectionGroup
+              title={t("widget.analyticsFilters")}
+              collapsible
+              defaultOpen={false}
+            >
+              <AnalyticsFilterPanel
+                fields={ADVANCED_FILTER_FIELDS}
+                onApply={() => handlePageChange(1)}
+                applyLabel={t("widget.apply")}
+              >
+                <SegmentFilterInputs />
+                <Div className="grid grid-cols-1 gap-3 @sm:grid-cols-2 @lg:grid-cols-4">
+                  <TextFieldWidget
+                    fieldName="createdFrom"
+                    field={children.createdFrom}
+                  />
+                  <TextFieldWidget
+                    fieldName="createdTo"
+                    field={children.createdTo}
+                  />
+                  <SelectFieldWidget
+                    fieldName="reached"
+                    field={children.reached}
+                  />
+                </Div>
+                <Div className="border-t pt-3">
+                  <Span className="mb-2 block text-xs font-medium text-muted-foreground">
+                    {t("acquisition.title")}
+                  </Span>
+                  <AcquisitionFilterInputs />
+                </Div>
+              </AnalyticsFilterPanel>
+            </SectionGroup>
+            {hasActiveFilters && (
+              <Div className="flex justify-end">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={clearFilters}
+                >
+                  {t("widget.clearFilters")}
+                </Button>
+              </Div>
+            )}
+          </Div>
+        )}
 
         {!isPickerMode && drillChips.length > 0 && (
-          <Div className="px-4 pt-2">
+          <Div>
             <Div className="flex flex-wrap items-center gap-1.5 rounded-md border border-dashed bg-muted/30 px-2 py-1.5">
               <Span className="text-xs font-medium text-muted-foreground">
                 {t("widget.drillTitle")}
@@ -1038,169 +1026,121 @@ export function LeadsListContainer({
             )}
           </Div>
         )}
-
-        {!isPickerMode && (
-          <Div className="flex flex-col gap-2 px-4 py-2">
-            <SectionGroup
-              title={t("widget.analyticsFilters")}
-              collapsible
-              defaultOpen={false}
-            >
-              <AnalyticsFilterPanel
-                fields={ADVANCED_FILTER_FIELDS}
-                onApply={() => handlePageChange(1)}
-                applyLabel={t("widget.apply")}
-              >
-                <SegmentFilterInputs />
-                <Div className="grid grid-cols-1 gap-3 @sm:grid-cols-2 @lg:grid-cols-4">
-                  <TextFieldWidget
-                    fieldName="createdFrom"
-                    field={children.createdFrom}
-                  />
-                  <TextFieldWidget
-                    fieldName="createdTo"
-                    field={children.createdTo}
-                  />
-                  <SelectFieldWidget
-                    fieldName="reached"
-                    field={children.reached}
-                  />
-                </Div>
-                <Div className="border-t pt-3">
-                  <Span className="mb-2 block text-xs font-medium text-muted-foreground">
-                    {t("acquisition.title")}
-                  </Span>
-                  <AcquisitionFilterInputs />
-                </Div>
-              </AnalyticsFilterPanel>
-            </SectionGroup>
-          </Div>
-        )}
-
-        {/* Status breakdown subtitle — full mode only */}
-        {!isPickerMode &&
-          !isLoading &&
-          leads.length > 0 &&
-          drillChips.length === 0 && (
-            <Div className="px-4 pb-1 flex items-center gap-3 flex-wrap">
-              {objectEntries(statusCounts)
-                .toSorted(([, a], [, b]) => b - a)
-                .slice(0, 5)
-                .map(([status, count]) => {
-                  const filterKey = status.replace(
-                    "enums.leadStatus.",
-                    "enums.leadStatusFilter.",
-                  ) as (typeof LeadStatusFilter)[keyof typeof LeadStatusFilter];
-                  return (
-                    <Button
-                      key={status}
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleToggleStatus(status)}
-                      className={cn(
-                        "text-xs text-muted-foreground hover:text-foreground transition-colors",
-                        activeStatuses.includes(filterKey) &&
-                          "text-foreground font-medium",
-                      )}
-                    >
-                      <Span
-                        className={cn(
-                          "inline-block w-2 h-2 rounded-full mr-1",
-                          STATUS_DOT_COLORS[status] ?? "bg-gray-400",
-                        )}
-                      />
-                      {leadsT(status)}: {count}
-                    </Button>
-                  );
-                })}
-            </Div>
-          )}
       </Div>
 
       {/* Lead list */}
-      <Div className="px-4 pb-2 overflow-y-auto @md:max-h-[min(700px,calc(100dvh-320px))]">
-        {response?.success === false ? (
-          <EmptyBlock
-            title={t("get.errors.server.title")}
-            message={response.message}
-            action={{ label: t("widget.refresh"), onClick: handleRefresh }}
-          />
-        ) : isLoading || !widgetData ? (
-          <LoadingBlock />
-        ) : leads.length > 0 ? (
+      {response?.success === false ? (
+        <EmptyBlock
+          title={t("get.errors.server.title")}
+          message={response.message}
+          action={{ label: t("widget.refresh"), onClick: handleRefresh }}
+        />
+      ) : isLoading || !widgetData ? (
+        <Div className="flex flex-col gap-2">
+          {[0, 1, 2, 3, 4].map((row) => (
+            <Skeleton key={row} className="h-12 w-full" />
+          ))}
+        </Div>
+      ) : leads.length > 0 ? (
+        drillChips.length > 0 ? (
           <Div className="flex flex-col gap-2">
-            {drillChips.length > 0 && (
-              <Div className="hidden @3xl:grid grid-cols-[minmax(0,2.2fr)_minmax(0,1.3fr)_minmax(0,1.6fr)_minmax(0,1.4fr)_minmax(0,1fr)] gap-3 border-b px-3 pb-1.5 text-xs font-medium text-muted-foreground">
-                <Span>{t("widget.colLead")}</Span>
-                <Span>{t("widget.colAgent")}</Span>
-                <Span>{t("widget.colOrigin")}</Span>
-                <Span>{t("widget.colClient")}</Span>
-                <Span className="text-right">{t("widget.colCreated")}</Span>
-              </Div>
+            <Div className="hidden @3xl:grid grid-cols-[minmax(0,2.2fr)_minmax(0,1.3fr)_minmax(0,1.6fr)_minmax(0,1.4fr)_minmax(0,1fr)] gap-3 border-b px-3 pb-1.5 text-xs font-medium text-muted-foreground">
+              <Span>{t("widget.colLead")}</Span>
+              <Span>{t("widget.colAgent")}</Span>
+              <Span>{t("widget.colOrigin")}</Span>
+              <Span>{t("widget.colClient")}</Span>
+              <Span className="text-right">{t("widget.colCreated")}</Span>
+            </Div>
+            {leads.map((lead) => (
+              <DrillRow
+                key={lead.id}
+                lead={lead}
+                onView={handleView}
+                t={t}
+                st={st}
+              />
+            ))}
+          </Div>
+        ) : (
+          <Div
+            className={cn(
+              "min-w-0 rounded-lg border bg-card transition-opacity",
+              endpointMutations?.read?.isFetching && "opacity-60",
             )}
-            {drillChips.length > 0
-              ? leads.map((lead) => (
-                  <DrillRow
-                    key={lead.id}
-                    lead={lead}
-                    onView={handleView}
-                    t={t}
-                    st={st}
-                  />
-                ))
-              : leads.map((lead) => (
-                  <LeadRow
+          >
+            <Table scrollLabel={t("get.title")}>
+              <TableHeader className="bg-muted/30">
+                <TableRow>
+                  <TableHead>{t("widget.colLead")}</TableHead>
+                  <TableHead className="hidden @3xl:table-cell">
+                    {t("widget.colStatus")}
+                  </TableHead>
+                  <TableHead className="hidden @3xl:table-cell">
+                    {t("widget.colSource")}
+                  </TableHead>
+                  <TableHead className="hidden @3xl:table-cell">
+                    {t("widget.colAgent")}
+                  </TableHead>
+                  <TableHead className="hidden @3xl:table-cell">
+                    {t("widget.colCountry")}
+                  </TableHead>
+                  <TableHead className="hidden text-right @3xl:table-cell">
+                    {t("widget.colVisits")}
+                  </TableHead>
+                  <TableHead className="hidden text-right @3xl:table-cell">
+                    {t("widget.colCreated")}
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {leads.map((lead) => (
+                  <LeadTableRow
                     key={lead.id}
                     lead={lead}
                     locale={locale}
                     onView={handleView}
-                    onEdit={handleEdit}
-                    onDelete={handleDelete}
                     t={t}
                     leadsT={leadsT}
                     st={st}
-                    isDrill={drillChips.length > 0}
-                    isTouch={isTouch}
                     isPickerMode={isPickerMode}
                   />
                 ))}
+              </TableBody>
+            </Table>
           </Div>
-        ) : (
-          <EmptyBlock
-            title={
-              hasActiveFilters ? t("get.emptySearch") : t("get.emptyState")
-            }
-            action={
-              hasActiveFilters
-                ? { label: t("widget.clearFilters"), onClick: clearFilters }
-                : !isPickerMode
-                  ? {
-                      label: t("widget.addLead"),
-                      onClick: handleCreate,
-                    }
-                  : undefined
-            }
-          />
-        )}
-      </Div>
+        )
+      ) : (
+        <EmptyBlock
+          title={hasActiveFilters ? t("get.emptySearch") : t("get.emptyState")}
+          action={
+            hasActiveFilters
+              ? { label: t("widget.clearFilters"), onClick: clearFilters }
+              : !isPickerMode
+                ? {
+                    label: t("widget.addLead"),
+                    onClick: handleCreate,
+                  }
+                : undefined
+          }
+        />
+      )}
 
-      {/* Pagination footer — full mode only */}
+      {/* Pagination footer */}
       {!isPickerMode && totalPages > 1 && (
-        <Div className="flex items-center justify-between px-4 py-1 border-t text-sm text-muted-foreground">
-          <Span>
+        <Div className="flex items-center justify-between gap-2 text-sm text-muted-foreground">
+          <Span className="tabular-nums">
             {t("widget.pagination", {
-              page: currentPage,
-              totalPages,
-              total: totalCount,
+              page: currentPage.toLocaleString(locale),
+              totalPages: totalPages.toLocaleString(locale),
+              total: totalCount.toLocaleString(locale),
             })}
           </Span>
           <Div className="flex gap-1">
             <Button
               type="button"
-              variant="ghost"
+              variant="outline"
               size="sm"
-              className="min-h-11 min-w-11"
+              className="min-h-10 min-w-10"
               aria-label={t("acquisition.previous")}
               disabled={currentPage <= 1}
               onClick={() => handlePageChange(currentPage - 1)}
@@ -1209,9 +1149,9 @@ export function LeadsListContainer({
             </Button>
             <Button
               type="button"
-              variant="ghost"
+              variant="outline"
               size="sm"
-              className="min-h-11 min-w-11"
+              className="min-h-10 min-w-10"
               aria-label={t("acquisition.next")}
               disabled={currentPage >= totalPages}
               onClick={() => handlePageChange(currentPage + 1)}

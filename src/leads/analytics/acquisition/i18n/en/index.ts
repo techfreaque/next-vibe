@@ -56,6 +56,8 @@ export const translations = {
     botsTitle: "Bot leads",
     botsSubtitle: "Crawlers, previews and scripts. Click a bar for its leads.",
     loading: "Loading acquisition report...",
+    pageSubtitle:
+      "Where leads come from and how they convert. Click any number to open its leads.",
     coverage:
       "Visits are tracked since {{date}}. Older leads count, but without visits.",
     botShareHint: "{{percent}} of new leads",

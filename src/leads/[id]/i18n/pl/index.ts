@@ -808,18 +808,31 @@ export const translations: typeof enTranslations = {
     copyIp: "IP",
     copyLinkedLeadId: "ID leada",
     copyUserId2: "ID użytkownika",
+    more: "Więcej",
+    copyLeadId: "Kopiuj ID leada",
+    kpiFirstTouch: "Pierwszy kontakt",
+    kpiStage: "Etap kampanii",
+    kpiEmails: "Otwarte e-maile",
+    kpiOpenRate: "{{percent}}% otwarć",
+    kpiAge: "Wiek leada",
+    kpiAgeValue: "{{count}} dni",
+    kpiAgeHint: "Utworzono {{date}}",
+    kpiCredits: "Zużyte darmowe kredyty",
+    kpiCreditsHint: "Zużyte w darmowym planie",
+    notTracked: "Brak danych",
     selectLead: "Wybierz lead",
   },
   delete: {
     title: "Usuń leada",
     titleShort: "Usuń leada",
-    description: "Usuń leada z systemu",
+    description:
+      "Trwale usuwa leada i jego historię. Tej operacji nie można cofnąć.",
     container: {
       title: "Usuń leada",
       description: "Czy na pewno chcesz trwale usunąć tego leada?",
     },
     backButton: {
-      label: "Powrót do leada",
+      label: "Anuluj",
     },
     submitButton: {
       label: "Usuń leada",
