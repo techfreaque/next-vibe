@@ -4,6 +4,7 @@ import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
 import { Copy } from "next-vibe/ui/components/icons/Copy";
+import { ResultBanner } from "next-vibe/ui/components/result-banner";
 import { Span } from "next-vibe/ui/components/span";
 import { P } from "next-vibe/ui/components/typography";
 import { WidgetHeader } from "next-vibe/ui/components/widget-header";
@@ -17,6 +18,7 @@ import {
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
+import { AdminForm } from "next-vibe/unified-ui/widgets/containers/admin-form/widget";
 import { EmailFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/email-field/widget";
 import { EntityPickerFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/entity-picker-field/widget";
 import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
@@ -32,56 +34,54 @@ export function InvoiceSendWidget(_props: {
   const data = useWidgetValue<typeof definition.POST>();
   const navigation = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.POST>();
-  if (data?.success === true) {
-    return (
-      <Div className="flex flex-col gap-4 p-4 rounded-lg border bg-success/10 border-success/30">
-        <Span className="text-xs font-semibold text-success">
-          {t("post.success.title")}
-        </Span>
-        <Span className="text-sm font-medium text-foreground">
-          {t("widget.sent")}
-        </Span>
-        {data.viewUrl && <InvoiceShareLink viewUrl={data.viewUrl} />}
-        {navigation.canGoBack && (
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={() => navigation.pop()}
-            className="self-start"
-          >
-            {t("widget.back")}
-          </Button>
-        )}
-      </Div>
-    );
-  }
+  const sent = data?.success === true;
+
+  const backButton = navigation.canGoBack ? (
+    <Button
+      type="button"
+      variant="ghost"
+      size="sm"
+      onClick={() => navigation.pop()}
+    >
+      <ChevronLeft className="h-4 w-4" />
+      {t("widget.back")}
+    </Button>
+  ) : undefined;
 
   return (
-    <Div className="flex flex-col gap-4">
-      {navigation.canGoBack && (
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={() => navigation.pop()}
-          className="self-start gap-1.5 -ml-1"
+    <AdminForm
+      title={t("post.title")}
+      description={t("post.description")}
+      backButton={backButton}
+      primaryAction={
+        sent ? null : (
+          <SubmitButtonWidget<typeof definition.POST>
+            field={{ text: "widget.submit" }}
+          />
+        )
+      }
+    >
+      {sent ? (
+        <ResultBanner
+          variant="success"
+          title={t("post.success.title")}
+          message={t("widget.sent")}
         >
-          <ChevronLeft className="h-4 w-4" />
-          {t("widget.back")}
-        </Button>
-      )}
-
-      <Div className="flex flex-col gap-1">
-        <Span className="text-base font-semibold">{t("post.title")}</Span>
-        <P className="text-sm text-muted-foreground">{t("post.description")}</P>
-      </Div>
-
-      <FormAlertWidget field={{}} />
-      <SubmitButtonWidget<typeof definition.POST>
-        field={{ text: "widget.submit" as const }}
-      />
-    </Div>
+          {data.viewUrl && <InvoiceShareLink viewUrl={data.viewUrl} />}
+          {navigation.canGoBack && (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => navigation.pop()}
+              className="self-start"
+            >
+              {t("widget.back")}
+            </Button>
+          )}
+        </ResultBanner>
+      ) : null}
+    </AdminForm>
   );
 }
 
@@ -136,9 +136,26 @@ export function InvoiceShareWidget({
   const navigation = useWidgetNavigation();
   const interactive = useWidgetIsInteractive();
 
+  const backButton = navigation.canGoBack ? (
+    <Button
+      type="button"
+      variant="ghost"
+      size="sm"
+      onClick={() => navigation.pop()}
+    >
+      <ChevronLeft className="h-4 w-4" />
+      {t("widget.back")}
+    </Button>
+  ) : undefined;
+
   return (
-    <WidgetShell>
-      <WidgetHeader title={t("delivery.share")} subtitle={data?.number} />
+    <WidgetShell layout="page" className="mx-auto max-w-3xl">
+      <WidgetHeader
+        size="page"
+        title={t("delivery.share")}
+        subtitle={data?.number}
+        backButton={backButton}
+      />
       <FormAlertWidget field={{}} />
       {!data && interactive && (
         <EntityPickerFieldWidget
@@ -147,7 +164,7 @@ export function InvoiceShareWidget({
         />
       )}
       {data && (
-        <Div className="flex min-w-0 flex-col gap-4">
+        <Div className="flex min-w-0 flex-col gap-4 rounded-lg border bg-card p-4">
           <InvoiceShareLink viewUrl={data.viewUrl} />
           <Div className="flex min-w-0 flex-col gap-2 border-t pt-3">
             {data.recipient ? (
@@ -190,17 +207,6 @@ export function InvoiceShareWidget({
           </Div>
         </Div>
       )}
-      {navigation.canGoBack && (
-        <Button
-          type="button"
-          size="sm"
-          variant="outline"
-          className="self-start"
-          onClick={() => navigation.pop()}
-        >
-          {t("widget.back")}
-        </Button>
-      )}
     </WidgetShell>
   );
 }
@@ -219,18 +225,41 @@ export function InvoiceEmailWidget({
   const [recipientPrefilled] = useState(() =>
     Boolean(form.getValues("expectedRecipient")),
   );
+
+  const backButton = navigation.canGoBack ? (
+    <Button
+      type="button"
+      variant="ghost"
+      size="sm"
+      onClick={() => navigation.pop()}
+    >
+      <ChevronLeft className="h-4 w-4" />
+      {t("widget.back")}
+    </Button>
+  ) : undefined;
+
   return (
-    <WidgetShell>
-      <WidgetHeader
-        title={t("delivery.send")}
-        subtitle={!data ? t("delivery.confirmDescription") : undefined}
-      />
-      <FormAlertWidget field={{}} />
+    <AdminForm
+      title={t("delivery.send")}
+      description={!data ? t("delivery.confirmDescription") : undefined}
+      backButton={backButton}
+      primaryAction={
+        !data && interactive ? (
+          <SubmitButtonWidget<typeof definition.PATCH>
+            field={{ text: "delivery.send" }}
+          />
+        ) : null
+      }
+    >
       {data ? (
-        <P className="text-sm">{t(`delivery.states.${data.deliveryStatus}`)}</P>
+        <ResultBanner
+          variant="success"
+          title={t("delivery.send")}
+          message={t(`delivery.states.${data.deliveryStatus}`)}
+        />
       ) : (
         interactive && (
-          <Div className="flex flex-col gap-3">
+          <Div className="flex flex-col gap-4">
             <EntityPickerFieldWidget
               field={children.invoiceId}
               fieldName="invoiceId"
@@ -248,23 +277,9 @@ export function InvoiceEmailWidget({
                 fieldName="expectedRecipient"
               />
             )}
-            <SubmitButtonWidget<typeof definition.PATCH>
-              field={{ text: "delivery.send", className: "self-start" }}
-            />
           </Div>
         )
       )}
-      {navigation.canGoBack && (
-        <Button
-          type="button"
-          size="sm"
-          variant="outline"
-          className="self-start"
-          onClick={() => navigation.pop()}
-        >
-          {t("widget.back")}
-        </Button>
-      )}
-    </WidgetShell>
+    </AdminForm>
   );
 }

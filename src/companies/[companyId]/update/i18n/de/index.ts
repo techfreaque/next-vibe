@@ -88,7 +88,7 @@ export const translations: typeof enTranslations = {
       },
       server: {
         title: "Serverfehler",
-        description: "Etwas ist schiefgelaufen — bitte erneut versuchen",
+        description: "Etwas ist schiefgelaufen. Bitte erneut versuchen.",
       },
       unknown: {
         title: "Unbekannter Fehler",

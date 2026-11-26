@@ -373,7 +373,87 @@ export class AcquisitionRepository {
     const { rows } = await db.execute<
       QueryResultRow & SummaryRow & { refCode: string }
     >(sql`
-      WITH ${acquisitionEvents(range, currency)}
+      WITH target_codes AS (
+        SELECT id, code FROM referral_codes WHERE code IN (${codeList})
+      ),
+      credited_users AS (
+        SELECT DISTINCT ur.referred_user_id AS id
+        FROM user_referrals ur
+        JOIN target_codes tc ON tc.id = ur.referral_code_id
+      ),
+      target_lead_ids AS (
+        SELECT l.id FROM leads l WHERE l.referral_code IN (SELECT code FROM target_codes)
+        UNION
+        SELECT j.lead_id FROM growth_journeys j WHERE j.last_ref_code IN (SELECT code FROM target_codes)
+        UNION
+        SELECT v.lead_id FROM growth_visits v WHERE v.ref_code IN (SELECT code FROM target_codes)
+        UNION
+        SELECT lr.lead_id FROM lead_referrals lr JOIN target_codes tc ON tc.id = lr.referral_code_id
+        UNION
+        SELECT j.lead_id FROM growth_journeys j JOIN credited_users cu ON cu.id = j.user_id
+        UNION
+        SELECT link.lead_id FROM user_lead_links link JOIN credited_users cu ON cu.id = link.user_id WHERE link.link_reason = 'signup'
+        UNION
+        SELECT l.id FROM leads l JOIN credited_users cu ON cu.id = l.converted_user_id WHERE l.signed_up_at IS NOT NULL
+      ),
+      target_user_ids AS (
+        SELECT id FROM credited_users
+        UNION
+        SELECT j.user_id AS id FROM growth_journeys j JOIN target_lead_ids tl ON tl.id = j.lead_id WHERE j.user_id IS NOT NULL
+        UNION
+        SELECT link.user_id AS id FROM user_lead_links link JOIN target_lead_ids tl ON tl.id = link.lead_id WHERE link.link_reason = 'signup'
+        UNION
+        SELECT l.converted_user_id AS id FROM leads l JOIN target_lead_ids tl ON tl.id = l.id WHERE l.converted_user_id IS NOT NULL AND l.signed_up_at IS NOT NULL
+      ),
+      acquired_users AS (
+        SELECT u.id, u.created_at, coalesce(j.lead_id, signup.lead_id, legacy.id) AS lead_id
+        FROM users u
+        JOIN target_user_ids tu ON tu.id = u.id
+        LEFT JOIN growth_journeys j ON j.user_id = u.id
+        LEFT JOIN LATERAL (
+          SELECT link.lead_id FROM user_lead_links link
+          WHERE j.lead_id IS NULL AND link.user_id = u.id AND link.link_reason = 'signup'
+          ORDER BY link.linked_at, link.lead_id
+          LIMIT 1
+        ) signup ON true
+        LEFT JOIN LATERAL (
+          SELECT l.id FROM leads l
+          WHERE j.lead_id IS NULL AND signup.lead_id IS NULL
+            AND l.converted_user_id = u.id AND l.signed_up_at IS NOT NULL
+          ORDER BY l.created_at, l.id
+          LIMIT 1
+        ) legacy ON true
+      ),
+      historical_chats AS (
+        SELECT t.user_id, CASE WHEN t.user_id IS NULL THEN t.lead_id END AS lead_id,
+          min(m.created_at) AS first_chat_at
+        FROM chat_threads t JOIN chat_messages m ON m.thread_id = t.id
+        WHERE m.role = 'user' AND NOT m.is_ai
+          AND (
+            (t.user_id IS NOT NULL AND t.user_id IN (SELECT id FROM acquired_users) AND m.author_id = t.user_id::text)
+            OR (t.user_id IS NULL AND t.lead_id IS NOT NULL AND t.lead_id IN (SELECT id FROM target_lead_ids) AND m.author_id IS NULL)
+          )
+        GROUP BY 1, 2
+      ),
+      lead_sources AS (${leadSources(sql`WHERE l.id IN (SELECT id FROM target_lead_ids)`, true)}),
+      account_sources AS (${accountSources}),
+      payments AS (
+        SELECT user_id, currency, amount, created_at
+        FROM payment_transactions
+        WHERE status = ${PaymentStatus.SUCCEEDED} AND amount > 0
+          AND user_id IN (SELECT id FROM acquired_users)
+      ),
+      events AS (
+        SELECT ${AcquisitionMetric.VISITS}::text AS metric, a.visited_at AS happened_at,
+          ${sourceType(sql`true`)} AS source_type, a.source, a.medium, a.campaign,
+          a.referrer_host, c.code AS ref_code, 1::numeric AS value
+        FROM growth_visits a
+        ${codeJoin}
+        WHERE a.ref_code IN (${codeList})
+          AND ${between(sql`a.visited_at`, range)}
+        UNION ALL
+        ${sql.join(Object.values(leadEvents(range, currency)), sql` UNION ALL `)}
+      )
       SELECT ref_code AS "refCode", ${metricTotals}
       FROM events WHERE ref_code IN (${codeList})
       GROUP BY ref_code

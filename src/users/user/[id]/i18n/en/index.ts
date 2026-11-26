@@ -801,7 +801,7 @@ export const translations = {
           },
           internal: {
             title: "Internal error",
-            description: "Server error — try again",
+            description: "Server error. Try again.",
           },
           unknown: {
             title: "Unknown error",
@@ -895,7 +895,7 @@ export const translations = {
           },
           internal: {
             title: "Internal error",
-            description: "Server error — try again",
+            description: "Server error. Try again.",
           },
           unknown: {
             title: "Unknown error",
@@ -909,7 +909,7 @@ export const translations = {
         widget: {
           created: "Note created",
           noteId: "Note ID",
-          backToNotes: "Back to Notes",
+          backToNotes: "Back to notes",
         },
         response: {
           id: "Note ID",
@@ -977,7 +977,7 @@ export const translations = {
           },
           internal: {
             title: "Internal error",
-            description: "Server error — try again",
+            description: "Server error. Try again.",
           },
           unknown: {
             title: "Unknown error",
@@ -1018,7 +1018,7 @@ export const translations = {
         title: "Delete user note",
         titleShort: "Delete note",
         description:
-          "Delete a CRM note — only the author or an admin can do this",
+          "Delete a CRM note. Only the author or an admin can do this.",
         fields: {
           noteId: {
             label: "Note ID",
@@ -1057,7 +1057,7 @@ export const translations = {
           },
           internal: {
             title: "Internal error",
-            description: "Server error — try again",
+            description: "Server error. Try again.",
           },
           unknown: {
             title: "Unknown error",
@@ -1071,7 +1071,7 @@ export const translations = {
         widget: {
           warning: "This note will be permanently deleted.",
           deleted: "Note deleted.",
-          backToNotes: "Back to Notes",
+          backToNotes: "Back to notes",
         },
         response: {
           deleted: "Deleted",

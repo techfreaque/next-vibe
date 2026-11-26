@@ -124,7 +124,11 @@ const { POST } = createEndpoint({
 
       expenseAccountId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.UUID,
+        fieldType: FieldDataType.ENTITY_PICKER,
+        listEndpoint: async () =>
+          (await import("@/chart-of-accounts/account/list/definition")).default
+            .GET,
+        labelField: "name",
         label: "expenseAccountId.label" as const,
         description: "expenseAccountId.description" as const,
         placeholder: "expenseAccountId.placeholder" as const,

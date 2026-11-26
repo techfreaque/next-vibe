@@ -104,7 +104,7 @@ export const translations: typeof enTranslations = {
   expenseAccountId: {
     label: "Konto kosztowe",
     description: "Na jakie konto kosztowe ta pozycja zostanie zaksięgowana",
-    placeholder: "UUID konta",
+    placeholder: "Wybierz konto kosztowe",
   },
   widget: {
     submit: "Dodaj pozycję",

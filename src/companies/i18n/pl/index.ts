@@ -44,7 +44,7 @@ export const translations: typeof enTranslations = {
       },
       server: {
         title: "Błąd serwera",
-        description: "Coś poszło nie tak — spróbuj ponownie",
+        description: "Coś poszło nie tak. Spróbuj ponownie.",
       },
       patchNotFound: {
         title: "Firma nie znaleziona",
@@ -88,7 +88,7 @@ export const translations: typeof enTranslations = {
         conflict: { title: "Konflikt", description: "Konflikt danych" },
         server: {
           title: "Błąd serwera",
-          description: "Coś poszło nie tak — spróbuj ponownie",
+          description: "Coś poszło nie tak. Spróbuj ponownie.",
         },
         unknown: {
           title: "Nieznany błąd",
@@ -151,7 +151,7 @@ export const translations: typeof enTranslations = {
         },
         server: {
           title: "Błąd serwera",
-          description: "Coś poszło nie tak — spróbuj ponownie",
+          description: "Coś poszło nie tak. Spróbuj ponownie.",
         },
         unknown: {
           title: "Nieznany błąd",

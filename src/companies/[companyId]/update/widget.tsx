@@ -1,23 +1,24 @@
 "use client";
 
 import { Button } from "next-vibe/ui/components/button";
-import { Div } from "next-vibe/ui/components/div";
-import { Building } from "next-vibe/ui/components/icons/Building";
 import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
 import { ChevronRight } from "next-vibe/ui/components/icons/ChevronRight";
-import { Span } from "next-vibe/ui/components/span";
+import { ResultBanner } from "next-vibe/ui/components/result-banner";
 import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
 import {
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
+import {
+  AdminForm,
+  AdminFormSection,
+} from "next-vibe/unified-ui/widgets/containers/admin-form/widget";
 import { EmailFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/email-field/widget";
 import { PhoneFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/phone-field/widget";
 import { SelectFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/select-field/widget";
 import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-field/widget";
 import { UrlFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/url-field/widget";
-import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 import { type JSX } from "react";
 
@@ -31,6 +32,7 @@ export function CompanyUpdateWidget({
   const data = useWidgetValue<typeof definition.PATCH>();
   const navigation = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.PATCH>();
+  const saved = Boolean(data?.result?.id);
 
   const handleViewCompany = (): void => {
     if (!data?.result?.id) {
@@ -44,55 +46,47 @@ export function CompanyUpdateWidget({
     })();
   };
 
-  if (data?.result?.id) {
-    return (
-      <Div className="flex flex-col gap-6 p-4 rounded-lg border border-success/30 bg-success/5">
-        <Div className="flex items-start gap-3">
-          <Div className="h-10 w-10 rounded-full bg-success/15 flex items-center justify-center shrink-0">
-            <Building className="h-5 w-5 text-success" />
-          </Div>
-          <Div>
-            <Span className="text-base font-semibold block text-success">
-              {t("patch.success.title")}
-            </Span>
-            <Span className="text-sm text-muted-foreground block mt-0.5">
-              {data.result.name}
-            </Span>
-          </Div>
-        </Div>
-        <Div className="flex items-center gap-2">
-          <Button size="sm" onClick={handleViewCompany} className="gap-1.5">
+  const backButton = navigation.canGoBack ? (
+    <Button
+      type="button"
+      variant="ghost"
+      size="sm"
+      onClick={() => navigation.pop()}
+    >
+      <ChevronLeft className="h-4 w-4" />
+      {t("patch.widget.back")}
+    </Button>
+  ) : undefined;
+
+  return (
+    <AdminForm
+      title={t("patch.title")}
+      description={t("patch.description")}
+      backButton={backButton}
+      primaryAction={
+        saved ? null : (
+          <SubmitButtonWidget<typeof definition.PATCH> field={{}} />
+        )
+      }
+    >
+      {data?.result?.id ? (
+        <ResultBanner
+          variant="success"
+          title={t("patch.success.title")}
+          message={data.result.name}
+        >
+          <Button
+            type="button"
+            size="sm"
+            onClick={handleViewCompany}
+            className="gap-1.5"
+          >
             {t("patch.widget.viewCompany")}
             <ChevronRight className="h-3.5 w-3.5" />
           </Button>
-        </Div>
-      </Div>
-    );
-  }
-
-  return (
-    <Div className="flex flex-col gap-4">
-      {navigation.canGoBack && (
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={() => navigation.pop()}
-          className="self-start gap-1.5 -ml-1"
-        >
-          <ChevronLeft className="h-4 w-4" />
-          {t("patch.widget.back")}
-        </Button>
-      )}
-      <Div className="flex flex-col gap-1">
-        <Span className="text-lg font-semibold">{t("patch.title")}</Span>
-        <Span className="text-sm text-muted-foreground">
-          {t("patch.description")}
-        </Span>
-      </Div>
-
-      <Div className="flex flex-col gap-3">
-        <Div className="grid grid-cols-2 gap-3">
+        </ResultBanner>
+      ) : (
+        <AdminFormSection title={t("patch.title")} columns={2}>
           <TextFieldWidget
             fieldName="fields.name"
             field={withValue(
@@ -109,8 +103,6 @@ export function CompanyUpdateWidget({
               null,
             )}
           />
-        </Div>
-        <Div className="grid grid-cols-2 gap-3">
           <TextFieldWidget
             fieldName="fields.vatNumber"
             field={withValue(
@@ -127,8 +119,6 @@ export function CompanyUpdateWidget({
               null,
             )}
           />
-        </Div>
-        <Div className="grid grid-cols-2 gap-3">
           <TextFieldWidget
             fieldName="fields.currency"
             field={withValue(
@@ -145,8 +135,6 @@ export function CompanyUpdateWidget({
               null,
             )}
           />
-        </Div>
-        <Div className="grid grid-cols-2 gap-3">
           <PhoneFieldWidget
             fieldName="fields.phone"
             field={withValue(
@@ -163,11 +151,8 @@ export function CompanyUpdateWidget({
               null,
             )}
           />
-        </Div>
-      </Div>
-
-      <FormAlertWidget field={{}} />
-      <SubmitButtonWidget<typeof definition.PATCH> field={{}} />
-    </Div>
+        </AdminFormSection>
+      )}
+    </AdminForm>
   );
 }

@@ -1,6 +1,6 @@
 export const translations = {
   dashboard: {
-    title: "Accounting Dashboard",
+    title: "Accounting dashboard",
     titleShort: "Dashboard",
     description:
       "See outstanding balances, cash, profit and the current accounting period.",
@@ -18,13 +18,13 @@ export const translations = {
       currency: "Currency",
     },
     success: {
-      title: "Dashboard Loaded",
+      title: "Dashboard loaded",
       description: "Accounting overview retrieved",
     },
     errors: {
       unauthorized: { title: "Unauthorized", description: "Login required" },
       validation: {
-        title: "Validation Error",
+        title: "Validation error",
         description: "Check your inputs",
       },
       forbidden: {
@@ -32,21 +32,21 @@ export const translations = {
         description: "No access to this company",
       },
       server: {
-        title: "Server Error",
+        title: "Server error",
         description: "Could not load dashboard",
       },
       unknown: {
-        title: "Unknown Error",
+        title: "Unknown error",
         description: "An unexpected error occurred",
       },
       conflict: { title: "Conflict", description: "Data conflict" },
       network: {
-        title: "Network Error",
+        title: "Network error",
         description: "Could not reach the server",
       },
-      notFound: { title: "Not Found", description: "Company not found" },
+      notFound: { title: "Not found", description: "Company not found" },
       unsavedChanges: {
-        title: "Unsaved Changes",
+        title: "Unsaved changes",
         description: "You have unsaved changes",
       },
     },

@@ -10,7 +10,6 @@ import { Badge } from "next-vibe/ui/components/badge";
 import { Div } from "next-vibe/ui/components/div";
 import { SectionGroup } from "next-vibe/ui/components/section-group";
 import { Span } from "next-vibe/ui/components/span";
-import { P } from "next-vibe/ui/components/typography";
 import { WidgetHeader } from "next-vibe/ui/components/widget-header";
 import { WidgetShell } from "next-vibe/ui/components/widget-shell";
 import { formatMoney } from "next-vibe/unified-ui/_shared/format-money";
@@ -44,35 +43,41 @@ export function FinanceIngestContainer({
   const money = (amount: number): string => formatMoney(amount, "USD", locale);
 
   return (
-    <WidgetShell className="gap-4">
+    <WidgetShell layout="page" className="mx-auto max-w-3xl">
       <WidgetHeader
+        size="page"
         title={t("ingest.title")}
+        subtitle={t("ingest.widget.hint")}
         backButton={<NavigateButtonWidget field={children.backButton} />}
       />
-      <P className="text-sm text-muted-foreground">{t("ingest.widget.hint")}</P>
-      <Div className="grid grid-cols-3 items-end gap-3">
-        <SelectFieldWidget fieldName="scope" field={children.scope} />
-        <NumberFieldWidget fieldName="windowDays" field={children.windowDays} />
-        <BooleanFieldWidget fieldName="dryRun" field={children.dryRun} />
-      </Div>
-      <Div className="grid grid-cols-2 items-end gap-3">
-        <TextFieldWidget
-          fieldName="backfillFrom"
-          field={children.backfillFrom}
-        />
-        <TextFieldWidget fieldName="backfillTo" field={children.backfillTo} />
-      </Div>
-      <FormAlertWidget field={{}} />
-      <Div className="flex justify-end">
-        <SubmitButtonWidget<typeof definition.POST>
-          field={{
-            text: "ingest.widget.submit",
-            loadingText: "ingest.widget.submitting",
-            icon: "refresh-cw",
-            variant: "primary",
-            size: "sm",
-          }}
-        />
+      <Div className="flex flex-col gap-4 rounded-xl border bg-card p-5">
+        <Div className="grid grid-cols-1 items-end gap-3 @md:grid-cols-3">
+          <SelectFieldWidget fieldName="scope" field={children.scope} />
+          <NumberFieldWidget
+            fieldName="windowDays"
+            field={children.windowDays}
+          />
+          <BooleanFieldWidget fieldName="dryRun" field={children.dryRun} />
+        </Div>
+        <Div className="grid grid-cols-1 items-end gap-3 @md:grid-cols-2">
+          <TextFieldWidget
+            fieldName="backfillFrom"
+            field={children.backfillFrom}
+          />
+          <TextFieldWidget fieldName="backfillTo" field={children.backfillTo} />
+        </Div>
+        <FormAlertWidget field={{}} />
+        <Div className="flex justify-end">
+          <SubmitButtonWidget<typeof definition.POST>
+            field={{
+              text: "ingest.widget.submit",
+              loadingText: "ingest.widget.submitting",
+              icon: "refresh-cw",
+              variant: "primary",
+              size: "sm",
+            }}
+          />
+        </Div>
       </Div>
 
       {result !== null && result !== undefined && "sources" in result && (
@@ -87,8 +92,8 @@ export function FinanceIngestContainer({
             <Div className="flex flex-col gap-2">
               {result.sources.map((s) => (
                 <Div key={s.source} className="flex flex-col gap-0.5">
-                  <Div className="flex items-center justify-between gap-2">
-                    <Div className="flex items-center gap-2">
+                  <Div className="flex flex-wrap items-center justify-between gap-2">
+                    <Div className="flex flex-wrap items-center gap-2">
                       <Span className="text-sm font-semibold">
                         {t(s.source)}
                       </Span>
@@ -135,7 +140,7 @@ export function FinanceIngestContainer({
               {result.days.map((d) => (
                 <Div
                   key={d.day}
-                  className="flex items-center justify-between gap-2 text-sm tabular-nums"
+                  className="flex flex-wrap items-center justify-between gap-2 text-sm tabular-nums"
                 >
                   <Span className="font-medium">{d.day}</Span>
                   <Span className="text-muted-foreground">

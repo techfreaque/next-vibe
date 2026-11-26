@@ -3,7 +3,7 @@
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
-import { Span } from "next-vibe/ui/components/span";
+import { ResultBanner } from "next-vibe/ui/components/result-banner";
 import { P } from "next-vibe/ui/components/typography";
 import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
 import {
@@ -16,10 +16,10 @@ import {
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
+import { AdminForm } from "next-vibe/unified-ui/widgets/containers/admin-form/widget";
 import { BooleanFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/boolean-field/widget";
 import { EntityPickerFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/entity-picker-field/widget";
 import { NumberFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/number-field/widget";
-import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 import { useMemo, useState } from "react";
 import { type JSX } from "react";
@@ -64,137 +64,134 @@ export function BillApproveWidget({
     setExpanded(!expanded);
   };
 
-  if (data?.status !== undefined) {
-    return (
-      <Div className="flex flex-col gap-4 p-4 rounded-lg border bg-success/10 border-success/30">
-        <Span className="text-xs font-semibold text-success">
-          {t("post.success.title")}
-        </Span>
-        <Span className="text-sm font-medium text-foreground">
-          {t(data.status)}
-        </Span>
-        {navigation.canGoBack && (
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={() => navigation.pop()}
-            className="self-start"
-          >
-            {t("post.widget.back")}
-          </Button>
-        )}
-      </Div>
-    );
-  }
+  const backButton = navigation.canGoBack ? (
+    <Button
+      type="button"
+      variant="ghost"
+      size="sm"
+      onClick={() => navigation.pop()}
+    >
+      <ChevronLeft className="h-4 w-4" />
+      {t("post.widget.back")}
+    </Button>
+  ) : undefined;
 
   return (
-    <Div className="flex flex-col gap-4">
-      {navigation.canGoBack && (
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={() => navigation.pop()}
-          className="self-start gap-1.5 -ml-1"
+    <AdminForm
+      title={t("post.title")}
+      description={
+        bill
+          ? `${bill.supplierName} · ${bill.billNumber}`
+          : t("post.description")
+      }
+      backButton={backButton}
+      primaryAction={
+        data?.status !== undefined ? null : (
+          <SubmitButtonWidget<typeof definition.POST>
+            field={{
+              text:
+                bill?.status === BillStatus.DRAFT
+                  ? "receiveBill"
+                  : "post.widget.submit",
+            }}
+          />
+        )
+      }
+    >
+      {data?.status !== undefined ? (
+        <ResultBanner
+          variant="success"
+          title={t("post.success.title")}
+          message={t(data.status)}
         >
-          <ChevronLeft className="h-4 w-4" />
-          {t("post.widget.back")}
-        </Button>
-      )}
-
-      <Div className="flex flex-col gap-2">
-        <Span className="text-base font-semibold">{t("post.title")}</Span>
-        <P className="text-sm text-muted-foreground">{t("post.description")}</P>
-      </Div>
-
-      {!billId && (
-        <EntityPickerFieldWidget
-          fieldName="billId"
-          field={{ ...field.children.billId, hidden: false }}
-        />
-      )}
-      {bill && (
-        <P className="text-sm font-medium">
-          {`${bill.supplierName} · ${bill.billNumber}`}
-        </P>
-      )}
-      <Div className="rounded-md border border-warning/30 bg-warning/10 px-4 py-3">
-        <P className="text-sm text-warning">
-          {t("post.widget.confirmDescription")}
-        </P>
-      </Div>
-
-      {bill?.status === BillStatus.RECEIVED && (
-        <Div className="space-y-3">
-          {bill.bankSupplierDocument === "missing" && (
-            <>
-              <P className="text-sm text-muted-foreground">
-                {t("supplierDocument.missingHelp")}
-              </P>
-              <BooleanFieldWidget
-                fieldName="confirmNoSupplierDocument"
-                field={field.children.confirmNoSupplierDocument}
-              />
-            </>
+          {navigation.canGoBack && (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => navigation.pop()}
+            >
+              {t("post.widget.back")}
+            </Button>
           )}
-          {bill.possibleBankDuplicate && (
-            <BooleanFieldWidget
-              fieldName="confirmSeparateBankBill"
-              field={field.children.confirmSeparateBankBill}
+        </ResultBanner>
+      ) : (
+        <Div className="flex flex-col gap-4">
+          {!billId && (
+            <EntityPickerFieldWidget
+              fieldName="billId"
+              field={{ ...field.children.billId, hidden: false }}
             />
           )}
-        </Div>
-      )}
+          <Div className="rounded-lg border border-warning/30 bg-warning/10 px-4 py-3">
+            <P className="text-sm text-warning">
+              {t("post.widget.confirmDescription")}
+            </P>
+          </Div>
 
-      {bill?.canRecordReverseCharge && (
-        <Div className="space-y-2">
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            aria-expanded={expanded}
-            onClick={toggleCharge}
-          >
-            {t("reverseCharge.title")}
-          </Button>
-          {expanded && (
-            <Div className="space-y-3 rounded-md border p-3">
-              <P className="text-sm text-muted-foreground">
-                {t("reverseCharge.help")}
-              </P>
-              <NumberFieldWidget
-                fieldName="reverseChargeBase"
-                presentation="money"
-                currency={bill.currency}
-                field={withValue(
-                  field.children.reverseChargeBase,
-                  undefined,
-                  null,
-                )}
-              />
-              <NumberFieldWidget
-                fieldName="reverseChargeRatePercent"
-                presentation="quantity"
-                field={withValue(
-                  field.children.reverseChargeRatePercent,
-                  undefined,
-                  null,
-                )}
-              />
+          {bill?.status === BillStatus.RECEIVED && (
+            <Div className="space-y-3">
+              {bill.bankSupplierDocument === "missing" && (
+                <>
+                  <P className="text-sm text-muted-foreground">
+                    {t("supplierDocument.missingHelp")}
+                  </P>
+                  <BooleanFieldWidget
+                    fieldName="confirmNoSupplierDocument"
+                    field={field.children.confirmNoSupplierDocument}
+                  />
+                </>
+              )}
+              {bill.possibleBankDuplicate && (
+                <BooleanFieldWidget
+                  fieldName="confirmSeparateBankBill"
+                  field={field.children.confirmSeparateBankBill}
+                />
+              )}
+            </Div>
+          )}
+
+          {bill?.canRecordReverseCharge && (
+            <Div className="space-y-2">
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                aria-expanded={expanded}
+                onClick={toggleCharge}
+              >
+                {t("reverseCharge.title")}
+              </Button>
+              {expanded && (
+                <Div className="space-y-3 rounded-lg border p-3">
+                  <P className="text-sm text-muted-foreground">
+                    {t("reverseCharge.help")}
+                  </P>
+                  <NumberFieldWidget
+                    fieldName="reverseChargeBase"
+                    presentation="money"
+                    currency={bill.currency}
+                    field={withValue(
+                      field.children.reverseChargeBase,
+                      undefined,
+                      null,
+                    )}
+                  />
+                  <NumberFieldWidget
+                    fieldName="reverseChargeRatePercent"
+                    presentation="quantity"
+                    field={withValue(
+                      field.children.reverseChargeRatePercent,
+                      undefined,
+                      null,
+                    )}
+                  />
+                </Div>
+              )}
             </Div>
           )}
         </Div>
       )}
-      <FormAlertWidget field={{}} />
-      <SubmitButtonWidget<typeof definition.POST>
-        field={{
-          text:
-            bill?.status === BillStatus.DRAFT
-              ? "receiveBill"
-              : "post.widget.submit",
-        }}
-      />
-    </Div>
+    </AdminForm>
   );
 }

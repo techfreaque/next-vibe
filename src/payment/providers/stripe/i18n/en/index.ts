@@ -23,7 +23,7 @@ export const translations = {
 
   status: {
     authenticated: "Authenticated and ready",
-    not_authenticated: "Not authenticated — run 'stripe login'",
+    not_authenticated: "Not authenticated. Run 'stripe login'.",
     not_installed: "Stripe CLI is not installed. {{instructions}}",
   },
 

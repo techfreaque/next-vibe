@@ -113,9 +113,9 @@ export const translations: typeof enTranslations = {
     placeholder: "0.19",
   },
   expenseAccountId: {
-    label: "Conto passivo",
-    description: "Che spese conto questo post a",
-    placeholder: "Account UUID",
+    label: "Conto di costo",
+    description: "Conto di costo su cui registrare questa riga",
+    placeholder: "Seleziona conto di costo",
   },
   widget: {
     submit: "Aggiungere la linea",

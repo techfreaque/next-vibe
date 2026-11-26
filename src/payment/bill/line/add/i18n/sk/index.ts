@@ -110,7 +110,7 @@ export const translations: typeof enTranslations = {
   expenseAccountId: {
     label: "Nákladový účet",
     description: "Nákladový účet, na ktorý sa položka zaúčtuje",
-    placeholder: "UUID účtu",
+    placeholder: "Vybrať nákladový účet",
   },
   widget: {
     submit: "Pridať položku",

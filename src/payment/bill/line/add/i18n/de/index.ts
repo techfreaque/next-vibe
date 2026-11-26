@@ -105,7 +105,7 @@ export const translations: typeof enTranslations = {
   expenseAccountId: {
     label: "Aufwandskonto",
     description: "Auf welches Aufwandskonto diese Position gebucht wird",
-    placeholder: "Konto-UUID",
+    placeholder: "Aufwandskonto auswählen",
   },
   widget: {
     submit: "Position hinzufügen",

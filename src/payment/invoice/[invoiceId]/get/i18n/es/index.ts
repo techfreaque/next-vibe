@@ -138,7 +138,7 @@ export const translations: typeof enTranslations = {
     viewOriginalJournal: "Abrir el asiento original",
     viewVoidReversal: "Abrir el asiento de reversión",
     backToInvoiceList: "Volver a las facturas",
-    viewJournalEntry: "View Journal Entry",
+    viewJournalEntry: "Ver asiento contable",
     status: {
       draft: "Proyecto",
       open: "Abierto",

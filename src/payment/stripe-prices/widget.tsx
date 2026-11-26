@@ -11,7 +11,6 @@ import { Div } from "next-vibe/ui/components/div";
 import { MetricCard } from "next-vibe/ui/components/metric-card";
 import { MetricGrid } from "next-vibe/ui/components/metric-grid";
 import { Pre } from "next-vibe/ui/components/pre";
-import { P } from "next-vibe/ui/components/typography";
 import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
 import {
   useWidgetPlatform,
@@ -19,8 +18,8 @@ import {
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
+import { AdminForm } from "next-vibe/unified-ui/widgets/containers/admin-form/widget";
 import { BooleanFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/boolean-field/widget";
-import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 import type { JSX } from "react";
 
@@ -63,38 +62,43 @@ export function StripePricesWidget({
   }
 
   return (
-    <Div className="max-w-3xl mx-auto w-full px-4 pt-6 pb-6 flex flex-col gap-4">
-      <P className="text-sm text-muted-foreground">{t("post.widget.hint")}</P>
+    <AdminForm
+      title={t("post.title")}
+      description={t("post.widget.hint")}
+      primaryAction={
+        <SubmitButtonWidget<typeof definition.POST>
+          field={{ text: "post.widget.submit" }}
+        />
+      }
+      result={
+        result ? (
+          <Div className="flex flex-col gap-3">
+            <MetricGrid columns={3}>
+              <MetricCard
+                label={t("post.response.existing")}
+                value={result.existing}
+                variant="muted"
+              />
+              <MetricCard
+                label={t("post.response.created")}
+                value={result.created}
+                variant="success"
+              />
+              <MetricCard
+                label={t("post.response.missing")}
+                value={result.missing}
+                variant="info"
+              />
+            </MetricGrid>
+            <Pre>{reportLines(result, t)}</Pre>
+          </Div>
+        ) : undefined
+      }
+    >
       <BooleanFieldWidget
         fieldName="dryRun"
         field={withValue(children.dryRun, undefined, null)}
       />
-      <FormAlertWidget field={{}} />
-      {result && (
-        <Div className="flex flex-col gap-3">
-          <MetricGrid columns={3}>
-            <MetricCard
-              label={t("post.response.existing")}
-              value={result.existing}
-              variant="muted"
-            />
-            <MetricCard
-              label={t("post.response.created")}
-              value={result.created}
-              variant="success"
-            />
-            <MetricCard
-              label={t("post.response.missing")}
-              value={result.missing}
-              variant="info"
-            />
-          </MetricGrid>
-          <Pre>{reportLines(result, t)}</Pre>
-        </Div>
-      )}
-      <SubmitButtonWidget<typeof definition.POST>
-        field={{ text: "post.widget.submit" as const }}
-      />
-    </Div>
+    </AdminForm>
   );
 }

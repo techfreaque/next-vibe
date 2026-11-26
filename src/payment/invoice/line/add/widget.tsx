@@ -2,7 +2,9 @@
 
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
+import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
 import { Input } from "next-vibe/ui/components/input";
+import { ResultBanner } from "next-vibe/ui/components/result-banner";
 import { Span } from "next-vibe/ui/components/span";
 import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
 import {
@@ -21,9 +23,12 @@ import {
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { useApiQuery } from "next-vibe/unified-ui/hooks/use-api-query";
 import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
+import {
+  AdminForm,
+  AdminFormSection,
+} from "next-vibe/unified-ui/widgets/containers/admin-form/widget";
 import { NumberFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/number-field/widget";
 import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-field/widget";
-import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 import type { JSX } from "react";
 import { useMemo } from "react";
@@ -190,24 +195,52 @@ export function InvoiceLineAddWidget({
     })();
   };
 
+  const backButton = navigation.canGoBack ? (
+    <Button
+      type="button"
+      variant="ghost"
+      size="sm"
+      onClick={() => navigation.pop()}
+    >
+      <ChevronLeft className="h-4 w-4" />
+      {t("widget.viewInvoice")}
+    </Button>
+  ) : undefined;
+
   // Success state — line added
   if (line?.id) {
     return (
-      <Div className="flex flex-col gap-5">
-        {/* Success banner */}
-        <Div className="rounded-lg border border-success/30 bg-success/10 px-4 py-3 flex items-center gap-3">
-          <Span className="text-success text-lg">✓</Span>
-          <Div className="flex flex-col">
-            <Span className="text-sm font-semibold text-success">
-              {t("post.success.title")}
-            </Span>
-            <Span className="text-xs text-muted-foreground">
-              {line.description}
-            </Span>
-          </Div>
-        </Div>
+      <AdminForm
+        title={t("post.title")}
+        description={t("post.description")}
+        backButton={backButton}
+        secondaryActions={
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleViewInvoice}
+            type="button"
+          >
+            {t("widget.viewInvoice")}
+          </Button>
+        }
+        primaryAction={
+          <Button
+            variant="default"
+            size="sm"
+            onClick={handleAddAnother}
+            type="button"
+          >
+            + {t("widget.addAnotherLine")}
+          </Button>
+        }
+      >
+        <ResultBanner
+          variant="success"
+          title={t("post.success.title")}
+          message={line.description}
+        />
 
-        {/* Line details */}
         <Div className="rounded-lg border overflow-hidden divide-y">
           <Div className="flex items-center justify-between px-4 py-3 bg-muted/30">
             <Span className="text-sm font-medium">{line.description}</Span>
@@ -227,44 +260,25 @@ export function InvoiceLineAddWidget({
             <Span className="text-sm tabular-nums">{fmt(line.lineTotal)}</Span>
           </Div>
         </Div>
-
-        {/* Navigation actions */}
-        <Div className="flex flex-col gap-2">
-          <Button
-            variant="default"
-            size="lg"
-            className="w-full"
-            onClick={handleAddAnother}
-          >
-            + {t("widget.addAnotherLine")}
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            className="w-full"
-            onClick={handleViewInvoice}
-          >
-            {t("widget.viewInvoice")}
-          </Button>
-        </Div>
-      </Div>
+      </AdminForm>
     );
   }
 
   const hasPreview = qty > 0 && unitPrice > 0;
 
   return (
-    <Div className="flex flex-col gap-5">
-      <FormAlertWidget field={{}} />
-
-      {/* === Product search section === */}
-      <Div className="flex flex-col gap-2">
-        <Span className="text-sm font-medium text-foreground">
-          {t("widget.searchProduct")}
-        </Span>
-
+    <AdminForm
+      title={t("post.title")}
+      description={t("post.description")}
+      backButton={backButton}
+      primaryAction={
+        <SubmitButtonWidget<typeof definition.POST>
+          field={{ text: "widget.submit" }}
+        />
+      }
+    >
+      <AdminFormSection title={t("widget.searchProduct")}>
         {selectedProduct ? (
-          /* Selected product chip */
           <Div className="rounded-lg border bg-muted/20 px-4 py-3 flex items-center justify-between gap-3">
             <Div className="flex flex-col gap-0.5 min-w-0 flex-1">
               <Span className="text-sm font-semibold truncate">
@@ -296,7 +310,6 @@ export function InvoiceLineAddWidget({
             </Button>
           </Div>
         ) : (
-          /* Search input + button */
           <Div className="flex flex-col gap-2">
             <Div className="flex gap-2">
               <Input
@@ -325,7 +338,6 @@ export function InvoiceLineAddWidget({
               </Button>
             </Div>
 
-            {/* Search results dropdown */}
             {searchResults.length > 0 ? (
               <Div className="rounded-lg border overflow-hidden divide-y shadow-sm">
                 {searchResults.map((product) => (
@@ -359,26 +371,14 @@ export function InvoiceLineAddWidget({
             ) : null}
           </Div>
         )}
-      </Div>
+      </AdminFormSection>
 
-      {/* === Or enter manually === */}
-      <Div className="flex items-center gap-3">
-        <Div className="flex-1 border-t" />
-        <Span className="text-xs text-muted-foreground shrink-0">
-          {t("widget.orManual")}
-        </Span>
-        <Div className="flex-1 border-t" />
-      </Div>
-
-      {/* Line item form */}
-      <Div className="flex flex-col gap-3">
-        {/* Description full width */}
+      <AdminFormSection title={t("post.form.title")}>
         <TextFieldWidget
           fieldName="description"
           field={withValue(field.children.description, undefined, null)}
         />
-        {/* Quantity + price side by side */}
-        <Div className="grid grid-cols-2 gap-3">
+        <Div className="grid grid-cols-1 gap-3 @md:grid-cols-2">
           <NumberFieldWidget
             fieldName="quantity"
             presentation="quantity"
@@ -391,7 +391,6 @@ export function InvoiceLineAddWidget({
             field={withValue(field.children.unitPrice, undefined, null)}
           />
         </Div>
-        {/* Tax rate */}
         {exemptionNotice ? (
           <Span className="text-sm">{exemptionNotice}</Span>
         ) : (
@@ -401,32 +400,27 @@ export function InvoiceLineAddWidget({
             field={withValue(field.children.taxRate, undefined, null)}
           />
         )}
-      </Div>
 
-      {/* Live line total preview */}
-      {hasPreview ? (
-        <Div className="rounded-lg border bg-muted/20 px-4 py-3 flex items-center justify-between">
-          <Div className="flex flex-col gap-0.5">
-            <Span className="text-xs text-muted-foreground">
-              {description ? `${description} · ` : ""}
-              {qty} {t("widget.multiplier")} {fmt(unitPrice)}
-              {taxRate > 0
-                ? ` + ${formatPercent(taxRate, locale)} ${t("widget.taxLabel")}`
-                : ""}
-            </Span>
-            <Span className="text-xs text-muted-foreground">
-              {t("widget.linePreview")}
+        {hasPreview ? (
+          <Div className="rounded-lg border bg-muted/20 px-4 py-3 flex items-center justify-between">
+            <Div className="flex flex-col gap-0.5">
+              <Span className="text-xs text-muted-foreground">
+                {description ? `${description} · ` : ""}
+                {qty} {t("widget.multiplier")} {fmt(unitPrice)}
+                {taxRate > 0
+                  ? ` + ${formatPercent(taxRate, locale)} ${t("widget.taxLabel")}`
+                  : ""}
+              </Span>
+              <Span className="text-xs text-muted-foreground">
+                {t("widget.linePreview")}
+              </Span>
+            </Div>
+            <Span className="text-base font-semibold tabular-nums">
+              {fmt(lineTotal)}
             </Span>
           </Div>
-          <Span className="text-base font-semibold tabular-nums">
-            {fmt(lineTotal)}
-          </Span>
-        </Div>
-      ) : null}
-
-      <SubmitButtonWidget<typeof definition.POST>
-        field={{ text: "widget.submit" as const }}
-      />
-    </Div>
+        ) : null}
+      </AdminFormSection>
+    </AdminForm>
   );
 }

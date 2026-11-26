@@ -26,7 +26,7 @@ export const translations: typeof enTranslations = {
 
   status: {
     authenticated: "Uwierzytelniony i gotowy",
-    not_authenticated: "Nieuwierzytelniony — uruchom 'stripe login'",
+    not_authenticated: "Nieuwierzytelniony. Uruchom 'stripe login'.",
     not_installed: "Stripe CLI nie jest zainstalowany. {{instructions}}",
   },
 

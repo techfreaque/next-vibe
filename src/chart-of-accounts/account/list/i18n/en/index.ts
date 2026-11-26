@@ -1,6 +1,6 @@
 export const translations = {
   get: {
-    title: "Chart of Accounts",
+    title: "Chart of accounts",
     titleShort: "Accounts",
     description: "Full account tree for a company with hierarchical structure",
     companyId: {
@@ -13,7 +13,7 @@ export const translations = {
       description: "Page number (starts at 1)",
     },
     pageSize: {
-      label: "Per Page",
+      label: "Per page",
       description: "Accounts per page (max 200)",
     },
     response: {
@@ -39,7 +39,7 @@ export const translations = {
         description: "You must be logged in to view accounts",
       },
       validation: {
-        title: "Validation Error",
+        title: "Validation error",
         description: "Invalid company ID",
       },
       forbidden: {
@@ -47,11 +47,11 @@ export const translations = {
         description: "You do not have access to this company's accounts",
       },
       server: {
-        title: "Server Error",
+        title: "Server error",
         description: "Could not load accounts",
       },
       unknown: {
-        title: "Unknown Error",
+        title: "Unknown error",
         description: "An unexpected error occurred",
       },
       conflict: {
@@ -59,20 +59,20 @@ export const translations = {
         description: "Data conflict",
       },
       network: {
-        title: "Network Error",
+        title: "Network error",
         description: "Could not reach the server",
       },
       notFound: {
-        title: "Not Found",
+        title: "Not found",
         description: "No accounts found for this company",
       },
       unsavedChanges: {
-        title: "Unsaved Changes",
+        title: "Unsaved changes",
         description: "You have unsaved changes",
       },
     },
     success: {
-      title: "Accounts Loaded",
+      title: "Accounts loaded",
       description: "Chart of accounts retrieved successfully",
     },
     widget: {
@@ -128,7 +128,7 @@ export const translations = {
       OTHER: "Other",
     },
   },
-  title: "Account List",
+  title: "Account list",
   description: "List all accounts in the chart of accounts",
   category: "Chart of Accounts",
   tag: "Account",

@@ -2,11 +2,18 @@
 
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
+import { EmptyBlock } from "next-vibe/ui/components/empty-block";
 import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
-import { Loader2 } from "next-vibe/ui/components/icons/Loader2";
 import { UserPlus } from "next-vibe/ui/components/icons/UserPlus";
-import { Users } from "next-vibe/ui/components/icons/Users";
+import { LoadingBlock } from "next-vibe/ui/components/loading-block";
 import { Span } from "next-vibe/ui/components/span";
+import {
+  StatusPill,
+  type StatusPillVariant,
+} from "next-vibe/ui/components/status-pill";
+import { WidgetHeader } from "next-vibe/ui/components/widget-header";
+import { WidgetShell } from "next-vibe/ui/components/widget-shell";
+import { formatDocDate } from "next-vibe/unified-ui/_shared/format-money";
 import { usePickerCallback } from "next-vibe/unified-ui/_shared/picker-context";
 import {
   useWidgetForm,
@@ -25,15 +32,12 @@ import type { MembersListGetResponseOutput } from "./definition";
 
 type Member = NonNullable<MembersListGetResponseOutput["members"]>[number];
 
-const ROLE_COLOR: Record<typeof CompanyMemberRoleValue, string> = {
-  [CompanyMemberRole.OWNER]:
-    "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300",
-  [CompanyMemberRole.ADMIN]:
-    "bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300",
-  [CompanyMemberRole.ACCOUNTANT]:
-    "bg-indigo-100 text-indigo-800 dark:bg-indigo-900/40 dark:text-indigo-300",
-  [CompanyMemberRole.MEMBER]: "bg-muted text-muted-foreground",
-  [CompanyMemberRole.VIEWER]: "bg-muted text-muted-foreground",
+const ROLE_VARIANT: Record<typeof CompanyMemberRoleValue, StatusPillVariant> = {
+  [CompanyMemberRole.OWNER]: "warning",
+  [CompanyMemberRole.ADMIN]: "info",
+  [CompanyMemberRole.ACCOUNTANT]: "default",
+  [CompanyMemberRole.MEMBER]: "muted",
+  [CompanyMemberRole.VIEWER]: "muted",
 };
 
 function MemberRow({
@@ -59,37 +63,37 @@ function MemberRow({
   tRemove: string;
   tActive: string;
   tInactive: string;
-  locale: string;
+  locale: ReturnType<typeof useWidgetLocale>;
 }): JSX.Element {
   return (
     <Div
-      className={`flex items-center gap-3 px-4 py-3 border-b last:border-b-0 hover:bg-muted/20 transition-colors${isPickerMode ? " cursor-pointer" : ""}`}
+      className={`flex flex-col gap-2 px-4 py-3 border-b last:border-b-0 hover:bg-muted/20 transition-colors @md:flex-row @md:items-center @md:gap-3${isPickerMode ? " cursor-pointer" : ""}`}
       onClick={isPickerMode && onPick ? () => onPick(member) : undefined}
     >
       <Div className="flex-1 min-w-0">
         <Span className="text-sm font-medium block truncate">
-          {member.name ?? member.email ?? `Member ${member.id.slice(0, 8)}`}
+          {member.name ?? member.email ?? roleLabel}
         </Span>
         {member.name && member.email && (
-          <Span className="text-xs text-muted-foreground block">
+          <Span className="text-xs text-muted-foreground block truncate">
             {member.email}
           </Span>
         )}
         <Span className="text-xs text-muted-foreground block">
           {member.isActive ? tActive : tInactive}
-          {member.joinedAt &&
-            ` · ${new Date(member.joinedAt).toLocaleDateString(locale, { year: "numeric", month: "short", day: "numeric" })}`}
+          {member.joinedAt && ` · ${formatDocDate(member.joinedAt, locale)}`}
         </Span>
       </Div>
-      <Div className="flex items-center gap-2 shrink-0 flex-wrap justify-end">
-        <Span
-          className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${ROLE_COLOR[member.role] ?? "bg-muted text-muted-foreground"}`}
-        >
-          {roleLabel}
-        </Span>
+      <Div className="flex items-center gap-2 shrink-0 flex-wrap @md:justify-end">
+        <StatusPill
+          status={member.role}
+          label={roleLabel}
+          variant={ROLE_VARIANT[member.role] ?? "muted"}
+        />
         {!isPickerMode && (
           <>
             <Button
+              type="button"
               size="sm"
               variant="ghost"
               className="text-xs h-7 px-2"
@@ -98,6 +102,7 @@ function MemberRow({
               {tUpdateRole}
             </Button>
             <Button
+              type="button"
               size="sm"
               variant="ghost"
               className="text-xs h-7 px-2 text-destructive hover:text-destructive hover:bg-destructive/10"
@@ -158,84 +163,71 @@ export function MembersListWidget(_props: {
     })();
   };
 
+  const backButton = navigation.canGoBack ? (
+    <Button
+      type="button"
+      variant="ghost"
+      size="sm"
+      onClick={() => navigation.pop()}
+    >
+      <ChevronLeft className="h-4 w-4" />
+      {t("get.widget.back")}
+    </Button>
+  ) : undefined;
+
   const members = data?.members ?? [];
 
   if (!data) {
     return (
-      <Div className="max-w-2xl mx-auto w-full px-4 py-6">
-        {navigation.canGoBack && (
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={() => navigation.pop()}
-            className="self-start gap-1.5 mb-4"
-          >
-            <ChevronLeft className="h-4 w-4" />
-            {t("get.widget.back")}
-          </Button>
-        )}
-        <Div className="flex items-center justify-center py-16 text-muted-foreground gap-2">
-          <Loader2 className="h-5 w-5 animate-spin" />
-          <Span className="text-sm">{t("get.widget.loading")}</Span>
-        </Div>
-      </Div>
+      <WidgetShell layout="page" className="mx-auto max-w-3xl">
+        <WidgetHeader
+          size="page"
+          title={t("get.widget.title")}
+          backButton={backButton}
+        />
+        <LoadingBlock message={t("get.widget.loading")} />
+      </WidgetShell>
     );
   }
 
   return (
-    <Div className="max-w-2xl mx-auto w-full px-4 pt-8 pb-6 flex flex-col gap-6">
-      {navigation.canGoBack && (
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={() => navigation.pop()}
-          className="self-start gap-1.5 -ml-1"
-        >
-          <ChevronLeft className="h-4 w-4" />
-          {t("get.widget.back")}
-        </Button>
-      )}
-
-      <Div className="flex items-center justify-between gap-3">
-        <Div className="flex flex-col gap-0.5">
-          <Span className="text-lg font-semibold">{t("get.widget.title")}</Span>
-          <Span className="text-xs text-muted-foreground">
-            {members.length}{" "}
-            {members.length === 1
-              ? t("get.widget.memberSingular")
-              : t("get.widget.memberPlural")}
-          </Span>
-        </Div>
-        {!isPickerMode && (
-          <Button size="sm" onClick={handleInvite} className="gap-1.5">
-            <UserPlus className="h-3.5 w-3.5" />
-            {t("get.widget.invite")}
-          </Button>
-        )}
-      </Div>
+    <WidgetShell layout="page" className="mx-auto max-w-3xl">
+      <WidgetHeader
+        size="page"
+        title={t("get.widget.title")}
+        subtitle={`${members.length} ${
+          members.length === 1
+            ? t("get.widget.memberSingular")
+            : t("get.widget.memberPlural")
+        }`}
+        backButton={backButton}
+        actions={
+          !isPickerMode ? (
+            <Button
+              type="button"
+              size="sm"
+              onClick={handleInvite}
+              className="gap-1.5"
+            >
+              <UserPlus className="h-3.5 w-3.5" />
+              {t("get.widget.invite")}
+            </Button>
+          ) : undefined
+        }
+      />
 
       {members.length === 0 ? (
-        <Div className="py-14 text-center border border-dashed rounded-md flex flex-col items-center gap-4">
-          <Users className="h-8 w-8 text-muted-foreground" />
-          <Div className="flex flex-col gap-1">
-            <Span className="text-sm font-medium">
-              {t("get.widget.empty.title")}
-            </Span>
-            <Span className="text-xs text-muted-foreground">
-              {t("get.widget.empty.hint")}
-            </Span>
-          </Div>
-          {!isPickerMode && (
-            <Button size="sm" onClick={handleInvite} className="gap-1.5">
-              <UserPlus className="h-3.5 w-3.5" />
-              {t("get.widget.empty.cta")}
-            </Button>
-          )}
-        </Div>
+        <EmptyBlock
+          title={t("get.widget.empty.title")}
+          message={t("get.widget.empty.hint")}
+          action={
+            !isPickerMode
+              ? { label: t("get.widget.empty.cta"), onClick: handleInvite }
+              : undefined
+          }
+        />
       ) : (
-        <Div className="rounded-md border overflow-hidden">
+        <Div className="rounded-lg border bg-card overflow-hidden">
           {members.map((member) => (
             <MemberRow
               key={member.id}
@@ -254,6 +246,6 @@ export function MembersListWidget(_props: {
           ))}
         </Div>
       )}
-    </Div>
+    </WidgetShell>
   );
 }

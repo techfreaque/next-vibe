@@ -821,7 +821,7 @@ export const translations: typeof enTranslations = {
           },
           internal: {
             title: "Błąd wewnętrzny",
-            description: "Błąd serwera — spróbuj ponownie",
+            description: "Błąd serwera. Spróbuj ponownie.",
           },
           unknown: {
             title: "Nieznany błąd",
@@ -915,7 +915,7 @@ export const translations: typeof enTranslations = {
           },
           internal: {
             title: "Błąd wewnętrzny",
-            description: "Błąd serwera — spróbuj ponownie",
+            description: "Błąd serwera. Spróbuj ponownie.",
           },
           unknown: {
             title: "Nieznany błąd",
@@ -997,7 +997,7 @@ export const translations: typeof enTranslations = {
           },
           internal: {
             title: "Błąd wewnętrzny",
-            description: "Błąd serwera — spróbuj ponownie",
+            description: "Błąd serwera. Spróbuj ponownie.",
           },
           unknown: {
             title: "Nieznany błąd",
@@ -1038,7 +1038,7 @@ export const translations: typeof enTranslations = {
         title: "Usuń notatkę użytkownika",
         titleShort: "Usuń notatkę",
         description:
-          "Usuń notatkę CRM — tylko autor lub administrator może to zrobić",
+          "Usuń notatkę CRM. Tylko autor lub administrator może to zrobić.",
         fields: {
           noteId: {
             label: "ID notatki",
@@ -1077,7 +1077,7 @@ export const translations: typeof enTranslations = {
           },
           internal: {
             title: "Błąd wewnętrzny",
-            description: "Błąd serwera — spróbuj ponownie",
+            description: "Błąd serwera. Spróbuj ponownie.",
           },
           unknown: {
             title: "Nieznany błąd",

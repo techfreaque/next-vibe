@@ -1,7 +1,7 @@
 export const translations = {
   tags: { antiFarming: "anti-farming", admin: "admin" },
   get: {
-    title: "Free Credit Farming Report",
+    title: "Free credit farming report",
     titleShort: "Farming report",
     description:
       "Who is farming free credits. Top subnets by blocked attempts and by free pools claimed, top email domains among duplicate and disposable signups, and the active limits.",

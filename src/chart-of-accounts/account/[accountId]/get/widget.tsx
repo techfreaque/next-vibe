@@ -2,14 +2,21 @@
 
 import { Badge } from "next-vibe/ui/components/badge";
 import { Button } from "next-vibe/ui/components/button";
+import { DetailField, DetailGrid } from "next-vibe/ui/components/detail-grid";
 import { Div } from "next-vibe/ui/components/div";
 import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
-import { Span } from "next-vibe/ui/components/span";
+import {
+  StatusPill,
+  type StatusPillVariant,
+} from "next-vibe/ui/components/status-pill";
+import { WidgetHeader } from "next-vibe/ui/components/widget-header";
+import { WidgetShell } from "next-vibe/ui/components/widget-shell";
 import {
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
+import { AdminForm } from "next-vibe/unified-ui/widgets/containers/admin-form/widget";
 import { EntityPickerFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/entity-picker-field/widget";
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 import type { JSX } from "react";
@@ -17,42 +24,13 @@ import type { JSX } from "react";
 import { AccountType } from "../../../enum";
 import type definition from "./definition";
 
-const TYPE_COLOR: Record<string, string> = {
-  [AccountType.ASSET]:
-    "bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300",
-  [AccountType.LIABILITY]:
-    "bg-orange-100 text-orange-800 dark:bg-orange-900/40 dark:text-orange-300",
-  [AccountType.EQUITY]:
-    "bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-300",
-  [AccountType.REVENUE]:
-    "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300",
-  [AccountType.EXPENSE]:
-    "bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300",
+const TYPE_VARIANT: Record<string, StatusPillVariant> = {
+  [AccountType.ASSET]: "info",
+  [AccountType.LIABILITY]: "warning",
+  [AccountType.EQUITY]: "default",
+  [AccountType.REVENUE]: "success",
+  [AccountType.EXPENSE]: "danger",
 };
-
-function InfoRow({
-  label,
-  value,
-  mono,
-}: {
-  label: string;
-  value: string | null | undefined | boolean;
-  mono?: boolean;
-}): JSX.Element | null {
-  if (value === null || value === undefined || value === false) {
-    return null;
-  }
-  const displayValue =
-    typeof value === "boolean" ? (value ? "Yes" : "No") : String(value);
-  return (
-    <Div className="flex items-start gap-3 py-2 border-b last:border-b-0 text-sm">
-      <Span className="text-muted-foreground w-32 shrink-0 pt-px">{label}</Span>
-      <Span className={`flex-1 font-medium ${mono ? "font-mono" : ""}`}>
-        {displayValue}
-      </Span>
-    </Div>
-  );
-}
 
 export function CoaAccountGetWidget({
   field,
@@ -113,131 +91,115 @@ export function CoaAccountGetWidget({
     })();
   };
 
+  const backButton = navigation.canGoBack ? (
+    <Button
+      type="button"
+      variant="ghost"
+      size="sm"
+      onClick={() => navigation.pop()}
+    >
+      <ChevronLeft className="h-4 w-4" />
+      {t("accountGet.widget.back")}
+    </Button>
+  ) : undefined;
+
   if (!account) {
     return (
-      <Div className="flex flex-col gap-4">
-        {navigation.canGoBack && (
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={() => navigation.pop()}
-            className="self-start gap-1.5 -ml-1"
-          >
-            <ChevronLeft className="h-4 w-4" />
-            {t("accountGet.widget.back")}
-          </Button>
-        )}
+      <AdminForm
+        title={t("accountGet.title")}
+        backButton={backButton}
+        primaryAction={
+          <SubmitButtonWidget<typeof definition.GET>
+            field={{ text: "accountGet.widget.select" }}
+          />
+        }
+      >
         <EntityPickerFieldWidget
           fieldName="accountId"
           field={field.children.accountId}
         />
-        <SubmitButtonWidget<typeof definition.GET>
-          field={{ text: "accountGet.widget.select" as const }}
-        />
-      </Div>
+      </AdminForm>
     );
   }
 
-  const typeColor =
-    TYPE_COLOR[account.type] ?? "bg-muted text-muted-foreground";
   const typeLabel = t(account.type as Parameters<typeof t>[0]);
   const subtypeLabel = t(account.subtype as Parameters<typeof t>[0]);
 
   return (
-    <Div className="flex flex-col gap-4">
-      {navigation.canGoBack && (
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={() => navigation.pop()}
-          className="self-start gap-1.5 -ml-1"
-        >
-          <ChevronLeft className="h-4 w-4" />
-          {t("accountGet.widget.back")}
-        </Button>
-      )}
-      {/* Account header */}
-      <Div className="rounded-md border p-4 flex flex-col gap-3">
-        <Div className="flex items-center gap-3 flex-wrap">
-          <Span className="font-mono text-xl font-bold text-muted-foreground">
-            {account.code}
-          </Span>
-          <Span className="text-xl font-bold flex-1">{account.name}</Span>
-        </Div>
+    <WidgetShell layout="page" className="mx-auto max-w-3xl">
+      <WidgetHeader
+        size="page"
+        title={`${account.code} · ${account.name}`}
+        subtitle={account.description ?? undefined}
+        backButton={backButton}
+        actions={
+          <Div className="flex flex-wrap gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleLedger}
+            >
+              {t("accountGet.widget.viewLedgerButton")}
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleEdit}
+            >
+              {t("accountGet.widget.editButton")}
+            </Button>
+            {account.isActive && !account.isSystem && (
+              <Button
+                type="button"
+                variant="destructive"
+                size="sm"
+                onClick={handleDeactivate}
+              >
+                {t("accountGet.widget.deactivateButton")}
+              </Button>
+            )}
+          </Div>
+        }
+      />
 
-        <Div className="flex flex-wrap gap-2 items-center">
-          {/* Type badge with color */}
-          <Span
-            className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${typeColor}`}
-          >
-            {typeLabel}
-          </Span>
-          {/* Subtype */}
-          <Badge variant="secondary" className="text-xs">
-            {subtypeLabel}
-          </Badge>
-          {/* Active/Inactive */}
-          <Badge
-            variant={account.isActive ? "default" : "destructive"}
-            className={`text-xs ${account.isActive ? "bg-emerald-600 hover:bg-emerald-600 dark:bg-emerald-700" : ""}`}
-          >
-            {account.isActive
+      <Div className="flex flex-wrap gap-2 items-center">
+        <StatusPill
+          status={account.type}
+          label={typeLabel}
+          variant={TYPE_VARIANT[account.type] ?? "muted"}
+        />
+        <Badge variant="secondary" className="text-xs">
+          {subtypeLabel}
+        </Badge>
+        <StatusPill
+          status={account.isActive ? "active" : "inactive"}
+          label={
+            account.isActive
               ? t("accountGet.widget.active")
-              : t("accountGet.widget.inactive")}
+              : t("accountGet.widget.inactive")
+          }
+          variant={account.isActive ? "success" : "muted"}
+        />
+        {account.isPostable && (
+          <Badge variant="outline" className="text-xs">
+            {t("accountGet.widget.postable")}
           </Badge>
-          {account.isPostable && (
-            <Badge variant="outline" className="text-xs">
-              {t("accountGet.widget.postable")}
-            </Badge>
-          )}
-          {account.isSystem && (
-            <Badge variant="secondary" className="text-xs">
-              {t("accountGet.widget.system")}
-            </Badge>
-          )}
-        </Div>
-
-        {account.description ? (
-          <Span className="text-sm text-muted-foreground">
-            {account.description}
-          </Span>
-        ) : null}
+        )}
+        {account.isSystem && (
+          <Badge variant="secondary" className="text-xs">
+            {t("accountGet.widget.system")}
+          </Badge>
+        )}
       </Div>
 
-      {/* Additional details */}
-      <Div className="rounded-md border px-4 py-1">
-        <InfoRow
+      <DetailGrid columns={2}>
+        <DetailField
           label={t("accountGet.response.sortOrder")}
           value={String(account.sortOrder)}
         />
-      </Div>
-
-      {/* Action buttons */}
-      <Div className="flex flex-wrap gap-2">
-        <Button type="button" variant="outline" size="sm" onClick={handleEdit}>
-          {t("accountGet.widget.editButton")}
-        </Button>
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          onClick={handleLedger}
-        >
-          {t("accountGet.widget.viewLedgerButton")}
-        </Button>
-        {account.isActive && !account.isSystem && (
-          <Button
-            type="button"
-            variant="destructive"
-            size="sm"
-            onClick={handleDeactivate}
-          >
-            {t("accountGet.widget.deactivateButton")}
-          </Button>
-        )}
-      </Div>
-    </Div>
+      </DetailGrid>
+    </WidgetShell>
   );
 }

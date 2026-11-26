@@ -42,14 +42,14 @@ export const translations = {
     },
     errors: {
       validation: {
-        title: "Validation Error",
+        title: "Validation error",
         description: "Check all fields",
       },
       unauthorized: {
-        title: "Not Signed In",
+        title: "Not signed in",
         description: "Sign in to onboard a company",
       },
-      forbidden: { title: "Access Denied", description: "Admin role required" },
+      forbidden: { title: "Access denied", description: "Admin role required" },
       conflict: {
         title: "The existing chart uses a different country template",
         description:
@@ -58,20 +58,20 @@ export const translations = {
       profileMismatch:
         "Choose the accounting template for the country on the company profile.",
       server: {
-        title: "Server Error",
+        title: "Server error",
         description: "Could not complete onboarding",
       },
       unknown: {
-        title: "Unknown Error",
+        title: "Unknown error",
         description: "An unexpected error occurred",
       },
-      network: { title: "Network Error", description: "Check your connection" },
+      network: { title: "Network error", description: "Check your connection" },
       notFound: {
-        title: "Company Not Found",
+        title: "Company not found",
         description: "This company does not exist",
       },
       unsavedChanges: {
-        title: "Unsaved Changes",
+        title: "Unsaved changes",
         description: "You have unsaved changes",
       },
     },

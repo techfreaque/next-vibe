@@ -37,24 +37,24 @@ export const translations = {
   headerCredit: "Credit",
   errors: {
     unauthorized: { title: "Unauthorized", description: "Login required" },
-    validation: { title: "Validation Error", description: "Check all fields" },
+    validation: { title: "Validation error", description: "Check all fields" },
     forbidden: { title: "Forbidden", description: "Insufficient permissions" },
     server: {
-      title: "Server Error",
+      title: "Server error",
       description: "Operation failed. Try again.",
     },
     unknown: {
-      title: "Unknown Error",
+      title: "Unknown error",
       description: "An unexpected error occurred",
     },
     conflict: { title: "Conflict", description: "Data conflict" },
     network: {
-      title: "Network Error",
+      title: "Network error",
       description: "Could not reach the server",
     },
-    notFound: { title: "Not Found", description: "Resource not found" },
+    notFound: { title: "Not found", description: "Resource not found" },
     unsavedChanges: {
-      title: "Unsaved Changes",
+      title: "Unsaved changes",
       description: "You have unsaved changes",
     },
   },

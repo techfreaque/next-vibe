@@ -34,23 +34,23 @@ export const translations = {
   auth: {
     errors: {
       forbidden: {
-        title: "Access Denied",
+        title: "Access denied",
         description: "You do not have permission to perform this action",
       },
       notFound: {
-        title: "Company Not Found",
+        title: "Company not found",
         description: "This company does not exist",
       },
       server: {
-        title: "Server Error",
-        description: "Something went wrong — try again",
+        title: "Server error",
+        description: "Something went wrong. Try again.",
       },
       patchNotFound: {
-        title: "Company Not Found",
+        title: "Company not found",
         description: "Could not find company to update",
       },
       patchServer: {
-        title: "Server Error",
+        title: "Server error",
         description: "Failed to update company",
       },
     },
@@ -59,50 +59,50 @@ export const translations = {
   // update-role endpoint translations
   updateRole: {
     patch: {
-      title: "Update Member Role",
-      titleShort: "Update Role",
+      title: "Update member role",
+      titleShort: "Update role",
       description: "Change a member's role. Owner only.",
       companyId: { label: "Company ID", description: "Company" },
       memberId: { label: "Member ID", description: "The member to update" },
       role: {
-        label: "New Role",
+        label: "New role",
         description: "Role to assign to this member",
         placeholder: "Select role",
       },
       errors: {
-        validation: { title: "Validation Error", description: "Invalid input" },
+        validation: { title: "Validation error", description: "Invalid input" },
         unauthorized: {
-          title: "Not Signed In",
+          title: "Not signed in",
           description: "Sign in to update member roles",
         },
         forbidden: {
-          title: "Owner Only",
+          title: "Owner only",
           description: "Only the company Owner can change member roles",
         },
         conflict: { title: "Conflict", description: "Data conflict" },
         server: {
-          title: "Server Error",
-          description: "Something went wrong — try again",
+          title: "Server error",
+          description: "Something went wrong. Try again.",
         },
         unknown: {
-          title: "Unknown Error",
+          title: "Unknown error",
           description: "An unexpected error occurred",
         },
         network: {
-          title: "Network Error",
+          title: "Network error",
           description: "Check your connection and try again",
         },
         notFound: {
-          title: "Member Not Found",
+          title: "Member not found",
           description: "This member does not exist in the company",
         },
         unsavedChanges: {
-          title: "Unsaved Changes",
+          title: "Unsaved changes",
           description: "You have unsaved changes",
         },
       },
       success: {
-        title: "Role Updated",
+        title: "Role updated",
         description: "Member role changed successfully",
       },
       response: {
@@ -112,7 +112,7 @@ export const translations = {
       widget: {
         back: "Back to Members",
         successLabel: "Role updated",
-        title: "Change Member Role",
+        title: "Change member role",
       },
     },
   },
@@ -120,50 +120,50 @@ export const translations = {
   // remove endpoint translations
   removeMember: {
     post: {
-      title: "Remove Member",
-      titleShort: "Remove Member",
+      title: "Remove member",
+      titleShort: "Remove member",
       description:
         "Remove a member from the company. Cannot remove the last Owner.",
       companyId: { label: "Company ID", description: "Company" },
       memberId: { label: "Member ID", description: "The member to remove" },
       errors: {
-        validation: { title: "Validation Error", description: "Invalid input" },
+        validation: { title: "Validation error", description: "Invalid input" },
         unauthorized: {
-          title: "Not Signed In",
+          title: "Not signed in",
           description: "Sign in to remove members",
         },
         forbidden: {
-          title: "Access Denied",
+          title: "Access denied",
           description:
             "Owner or Admin role required. Cannot remove the last Owner.",
         },
         conflict: {
-          title: "Last Owner",
+          title: "Last owner",
           description: "Cannot remove the last Owner of the company",
         },
         server: {
-          title: "Server Error",
-          description: "Something went wrong — try again",
+          title: "Server error",
+          description: "Something went wrong. Try again.",
         },
         unknown: {
-          title: "Unknown Error",
+          title: "Unknown error",
           description: "An unexpected error occurred",
         },
         network: {
-          title: "Network Error",
+          title: "Network error",
           description: "Check your connection and try again",
         },
         notFound: {
-          title: "Member Not Found",
+          title: "Member not found",
           description: "This member does not exist in the company",
         },
         unsavedChanges: {
-          title: "Unsaved Changes",
+          title: "Unsaved changes",
           description: "You have unsaved changes",
         },
       },
       success: {
-        title: "Member Removed",
+        title: "Member removed",
         description: "Member has been removed from the company",
       },
       response: {

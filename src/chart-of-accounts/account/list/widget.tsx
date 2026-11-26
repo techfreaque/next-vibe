@@ -182,7 +182,7 @@ function AccountItem({
                 </Span>
               )}
               {amount !== 0 && (
-                <Span className="ml-1 text-xs text-muted-foreground">
+                <Span className="ml-1 whitespace-nowrap text-xs text-muted-foreground">
                   {side}
                 </Span>
               )}

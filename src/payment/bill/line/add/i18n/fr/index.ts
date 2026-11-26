@@ -116,7 +116,7 @@ export const translations: typeof enTranslations = {
   expenseAccountId: {
     label: "Compte de charges",
     description: "Compte de charges sur lequel imputer cette ligne",
-    placeholder: "UUID du compte",
+    placeholder: "Sélectionner un compte de charges",
   },
   widget: {
     submit: "Ajouter la ligne",

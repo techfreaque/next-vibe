@@ -215,7 +215,7 @@ export class SubscriptionAdminReferralsRepository {
       const payoutRows = await db
         .select({
           id: payoutRequests.id,
-          userId: payoutRequests.userId,
+          userEmail: users.email,
           amountCents: payoutRequests.amountCents,
           currency: payoutRequests.currency,
           status: payoutRequests.status,
@@ -226,22 +226,15 @@ export class SubscriptionAdminReferralsRepository {
           processedAt: payoutRequests.processedAt,
         })
         .from(payoutRequests)
+        .leftJoin(users, eq(payoutRequests.userId, users.id))
         .where(payoutWhereClause)
         .orderBy(desc(payoutRequests.createdAt))
         .limit(50);
 
-      // Resolve user emails for payout requests
-      const payoutRequestsList: ReferralsResponse["payoutRequests"] = [];
-      for (const row of payoutRows) {
-        const [userRow] = await db
-          .select({ email: users.email })
-          .from(users)
-          .where(eq(users.id, row.userId))
-          .limit(1);
-
-        payoutRequestsList.push({
+      const payoutRequestsList: ReferralsResponse["payoutRequests"] =
+        payoutRows.map((row) => ({
           id: row.id,
-          userEmail: userRow?.email ?? "",
+          userEmail: row.userEmail ?? "",
           amountCents: row.amountCents,
           currency: row.currency,
           status: row.status,
@@ -250,8 +243,7 @@ export class SubscriptionAdminReferralsRepository {
           rejectionReason: row.rejectionReason,
           createdAt: row.createdAt,
           processedAt: row.processedAt,
-        });
-      }
+        }));
 
       // === SUMMARY ===
       const [totalCodesResult] = await db

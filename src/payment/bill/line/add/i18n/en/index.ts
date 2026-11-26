@@ -102,7 +102,7 @@ export const translations = {
   expenseAccountId: {
     label: "Expense account",
     description: "Which expense account this posts to",
-    placeholder: "Account UUID",
+    placeholder: "Select expense account",
   },
   widget: {
     submit: "Add line",

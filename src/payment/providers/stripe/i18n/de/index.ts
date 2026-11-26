@@ -25,7 +25,7 @@ export const translations: typeof enTranslations = {
 
   status: {
     authenticated: "Authentifiziert und bereit",
-    not_authenticated: "Nicht authentifiziert — führe 'stripe login' aus",
+    not_authenticated: "Nicht authentifiziert. Führe 'stripe login' aus.",
     not_installed: "Stripe CLI ist nicht installiert. {{instructions}}",
   },
 

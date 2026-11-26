@@ -456,7 +456,7 @@ export function CreditsTabHeader({
                 onClick={() => handleTabClick(tab.id)}
                 role="tab"
                 className={cn(
-                  "h-11 gap-2 whitespace-nowrap rounded-lg px-3 text-sm font-medium transition-colors",
+                  "h-auto min-h-11 min-w-0 gap-1.5 whitespace-normal rounded-lg px-2.5 py-2 text-center text-sm font-medium leading-tight transition-colors",
                   isActive
                     ? "bg-card text-foreground shadow-sm ring-1 ring-border hover:bg-card"
                     : "text-muted-foreground hover:bg-card/60 hover:text-foreground",
@@ -464,11 +464,11 @@ export function CreditsTabHeader({
               >
                 <TabIcon
                   className={cn(
-                    "h-4 w-4",
+                    "h-4 w-4 shrink-0",
                     isActive ? "text-primary" : "text-muted-foreground",
                   )}
                 />
-                {tab.label}
+                <Span className="min-w-0 break-words">{tab.label}</Span>
               </Button>
             );
           })}

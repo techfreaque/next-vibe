@@ -19,8 +19,8 @@ export const translations = {
     list: "List",
   },
   get: {
-    title: "Team Members",
-    titleShort: "Team Members",
+    title: "Team members",
+    titleShort: "Team members",
     description: "List all members of this company",
     companyId: {
       label: "Company ID",
@@ -28,15 +28,15 @@ export const translations = {
     },
     errors: {
       validation: {
-        title: "Validation Error",
+        title: "Validation error",
         description: "Invalid company ID",
       },
       unauthorized: {
-        title: "Not Signed In",
+        title: "Not signed in",
         description: "Sign in to view company members",
       },
       forbidden: {
-        title: "Access Denied",
+        title: "Access denied",
         description: "You are not a member of this company",
       },
       conflict: {
@@ -44,28 +44,28 @@ export const translations = {
         description: "Data conflict",
       },
       server: {
-        title: "Server Error",
-        description: "Something went wrong — try again",
+        title: "Server error",
+        description: "Something went wrong. Try again.",
       },
       unknown: {
-        title: "Unknown Error",
+        title: "Unknown error",
         description: "An unexpected error occurred",
       },
       network: {
-        title: "Network Error",
+        title: "Network error",
         description: "Check your connection and try again",
       },
       notFound: {
-        title: "Company Not Found",
+        title: "Company not found",
         description: "This company does not exist",
       },
       unsavedChanges: {
-        title: "Unsaved Changes",
+        title: "Unsaved changes",
         description: "You have unsaved changes",
       },
     },
     success: {
-      title: "Members Loaded",
+      title: "Members loaded",
       description: "Member list retrieved",
     },
     response: {
@@ -80,7 +80,7 @@ export const translations = {
     widget: {
       back: "Back",
       loading: "Loading members...",
-      title: "Team Members",
+      title: "Team members",
       memberSingular: "member",
       memberPlural: "members",
       invite: "Invite Member",

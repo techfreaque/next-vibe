@@ -245,7 +245,7 @@ export function PurchasesContainer({ field }: CustomWidgetProps): JSX.Element {
     const key = Object.entries(sourceKeys).find(
       ([stored]) => stored === purchase.source,
     )?.[1];
-    return key ? t(key) : purchase.source;
+    return key ? t(key) : purchase.source || typeLabel(purchase);
   };
   const paidLabel = (purchase: Purchase): string =>
     purchase.paidAmount !== null && purchase.paidCurrency

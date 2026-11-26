@@ -19,25 +19,25 @@ export const translations = {
     management: "Management",
   },
   patch: {
-    title: "Update Company",
-    titleShort: "Update Company",
+    title: "Update company",
+    titleShort: "Update company",
     description: "Edit company details. Requires Admin or Owner role.",
     companyId: {
       label: "Company ID",
       description: "The company to update",
     },
     name: {
-      label: "Company Name",
+      label: "Company name",
       description: "Legal name of the company",
       placeholder: "Acme GmbH",
     },
     type: {
-      label: "Company Type",
+      label: "Company type",
       description: "Business model",
       placeholder: "Select type",
     },
     vatNumber: {
-      label: "VAT Number",
+      label: "VAT number",
       description: "VAT identification number",
       placeholder: "DE123456789",
     },
@@ -47,17 +47,17 @@ export const translations = {
       placeholder: "DE",
     },
     currency: {
-      label: "Default Currency",
+      label: "Default currency",
       description: "Primary invoicing currency",
       placeholder: "EUR",
     },
     email: {
-      label: "Company Email",
+      label: "Company email",
       description: "Primary business email",
       placeholder: "contact@company.com",
     },
     phone: {
-      label: "Company Phone",
+      label: "Company phone",
       description: "Primary business phone",
       placeholder: "+43 1 234 5678",
     },
@@ -68,15 +68,15 @@ export const translations = {
     },
     errors: {
       validation: {
-        title: "Validation Error",
+        title: "Validation error",
         description: "Check the form and try again",
       },
       unauthorized: {
-        title: "Not Signed In",
+        title: "Not signed in",
         description: "Sign in to update company details",
       },
       forbidden: {
-        title: "Access Denied",
+        title: "Access denied",
         description: "Admin or Owner role required to update company details",
       },
       conflict: {
@@ -84,28 +84,28 @@ export const translations = {
         description: "Data conflict",
       },
       server: {
-        title: "Server Error",
-        description: "Something went wrong — try again",
+        title: "Server error",
+        description: "Something went wrong. Try again.",
       },
       unknown: {
-        title: "Unknown Error",
+        title: "Unknown error",
         description: "An unexpected error occurred",
       },
       network: {
-        title: "Network Error",
+        title: "Network error",
         description: "Check your connection and try again",
       },
       notFound: {
-        title: "Company Not Found",
+        title: "Company not found",
         description: "This company does not exist",
       },
       unsavedChanges: {
-        title: "Unsaved Changes",
+        title: "Unsaved changes",
         description: "You have unsaved changes",
       },
     },
     success: {
-      title: "Company Updated",
+      title: "Company updated",
       description: "Company details saved successfully",
     },
     response: {

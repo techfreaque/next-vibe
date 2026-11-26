@@ -841,7 +841,7 @@ export const translations: typeof enTranslations = {
           },
           internal: {
             title: "Interner Fehler",
-            description: "Serverfehler — erneut versuchen",
+            description: "Serverfehler. Erneut versuchen.",
           },
           unknown: {
             title: "Unbekannter Fehler",
@@ -936,7 +936,7 @@ export const translations: typeof enTranslations = {
           },
           internal: {
             title: "Interner Fehler",
-            description: "Serverfehler — erneut versuchen",
+            description: "Serverfehler. Erneut versuchen.",
           },
           unknown: {
             title: "Unbekannter Fehler",
@@ -1019,7 +1019,7 @@ export const translations: typeof enTranslations = {
           },
           internal: {
             title: "Interner Fehler",
-            description: "Serverfehler — erneut versuchen",
+            description: "Serverfehler. Erneut versuchen.",
           },
           unknown: {
             title: "Unbekannter Fehler",
@@ -1060,7 +1060,7 @@ export const translations: typeof enTranslations = {
         title: "Benutzernotiz löschen",
         titleShort: "Notiz löschen",
         description:
-          "CRM-Notiz löschen — nur der Autor oder ein Administrator kann dies tun",
+          "CRM-Notiz löschen. Nur der Autor oder ein Administrator kann dies tun.",
         fields: {
           noteId: {
             label: "Notiz-ID",
@@ -1100,7 +1100,7 @@ export const translations: typeof enTranslations = {
           },
           internal: {
             title: "Interner Fehler",
-            description: "Serverfehler — erneut versuchen",
+            description: "Serverfehler. Erneut versuchen.",
           },
           unknown: {
             title: "Unbekannter Fehler",

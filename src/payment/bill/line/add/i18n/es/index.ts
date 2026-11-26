@@ -107,8 +107,8 @@ export const translations: typeof enTranslations = {
   },
   expenseAccountId: {
     label: "Cuenta de gastos",
-    description: "¿Qué gastos representan estos puestos a",
-    placeholder: "Cuenta UUID",
+    description: "Cuenta de gastos en la que se contabiliza esta línea",
+    placeholder: "Seleccionar cuenta de gastos",
   },
   widget: {
     submit: "Añadir línea",

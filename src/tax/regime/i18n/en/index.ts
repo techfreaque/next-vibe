@@ -1,7 +1,7 @@
 export const translations = {
   errors: {
     validation: {
-      title: "Validation Error",
+      title: "Validation error",
       description:
         "Check the company country, VAT treatment and effective date.",
     },
@@ -14,25 +14,25 @@ export const translations = {
       description:
         "Only company owners and administrators can change the VAT regime.",
     },
-    notFound: { title: "Not Found", description: "Company not found" },
+    notFound: { title: "Not found", description: "Company not found" },
     conflict: {
       title: "Effective date already used",
       description: "This company already has a VAT regime for that date.",
     },
     server: {
-      title: "Server Error",
+      title: "Server error",
       description: "An internal error occurred",
     },
     network: {
-      title: "Network Error",
+      title: "Network error",
       description: "A network error occurred",
     },
     unknown: {
-      title: "Unknown Error",
+      title: "Unknown error",
       description: "An unexpected error occurred",
     },
     unsavedChanges: {
-      title: "Unsaved Changes",
+      title: "Unsaved changes",
       description: "You have unsaved changes",
     },
   },

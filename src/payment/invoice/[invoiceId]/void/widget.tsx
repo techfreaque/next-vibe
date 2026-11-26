@@ -91,10 +91,9 @@ export function InvoiceVoidWidget({
   ) : undefined;
 
   return (
-    <WidgetShell padding="sm">
+    <WidgetShell layout="page" className="mx-auto max-w-3xl">
       <WidgetHeader
         size="page"
-        className="[&_h1]:text-lg"
         title={t(confirmed ? "widget.voided" : "post.title")}
         backButton={back}
       />

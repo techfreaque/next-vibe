@@ -20,7 +20,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "next-vibe/ui/components/alert-dialog";
-import { Badge } from "next-vibe/ui/components/badge";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
@@ -28,6 +27,10 @@ import { ChevronRight } from "next-vibe/ui/components/icons/ChevronRight";
 import { Loader2 } from "next-vibe/ui/components/icons/Loader2";
 import { RefreshCw } from "next-vibe/ui/components/icons/RefreshCw";
 import { Span } from "next-vibe/ui/components/span";
+import {
+  StatusPill,
+  type StatusPillVariant,
+} from "next-vibe/ui/components/status-pill";
 import {
   useWidgetContext,
   useWidgetForm,
@@ -42,7 +45,8 @@ import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-f
 import React, { useCallback, useState } from "react";
 
 import { scopedTranslation as growthTranslation } from "@/leads/growth/i18n";
-import { PayoutStatus } from "@/referral/enum";
+import { PayoutCurrency, PayoutStatus } from "@/referral/enum";
+import { scopedTranslation as referralTranslation } from "@/referral/i18n";
 
 import { PayoutAction } from "../enum";
 import type definition from "./definition";
@@ -59,15 +63,13 @@ interface CustomWidgetProps {
   field: (typeof definition.GET)["fields"];
 }
 
-const STATUS_COLORS: Record<string, string> = {
-  [PayoutStatus.PENDING]: "bg-warning/10 text-warning",
-  [PayoutStatus.APPROVED]: "bg-info/10 text-info",
-  [PayoutStatus.REJECTED]: "bg-destructive/10 text-destructive",
-  [PayoutStatus.PROCESSING]:
-    "bg-violet-100 text-violet-800 dark:bg-violet-900/30 dark:text-violet-300",
-  [PayoutStatus.COMPLETED]:
-    "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300",
-  [PayoutStatus.FAILED]: "bg-destructive/10 text-destructive",
+const STATUS_VARIANT: Record<string, StatusPillVariant> = {
+  [PayoutStatus.PENDING]: "warning",
+  [PayoutStatus.APPROVED]: "info",
+  [PayoutStatus.REJECTED]: "danger",
+  [PayoutStatus.PROCESSING]: "info",
+  [PayoutStatus.COMPLETED]: "success",
+  [PayoutStatus.FAILED]: "danger",
 };
 
 function StatCard({
@@ -105,15 +107,13 @@ function CodeRow({
       <Div className="flex-1 min-w-0 space-y-1">
         <Div className="flex items-center gap-2 flex-wrap">
           <Span className="font-mono font-medium text-sm">{code.code}</Span>
-          <Badge
-            className={
-              code.isActive
-                ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300"
-                : "bg-muted text-muted-foreground"
+          <StatusPill
+            status={code.isActive ? "active" : "inactive"}
+            label={
+              code.isActive ? t("widget.codeActive") : t("widget.codeInactive")
             }
-          >
-            {code.isActive ? t("widget.codeActive") : t("widget.codeInactive")}
-          </Badge>
+            variant={code.isActive ? "success" : "muted"}
+          />
         </Div>
         <Div className="text-sm text-muted-foreground">
           {code.ownerEmail || code.ownerName}
@@ -173,24 +173,34 @@ function PayoutRow({
     action: (typeof PayoutAction)[keyof typeof PayoutAction],
   ) => void;
 }): React.JSX.Element {
+  const { t: referralT } = referralTranslation.scopedT(locale);
+  const statusKey = Object.values(PayoutStatus).find(
+    (s) => s === payout.status,
+  );
+  const currencyKey = Object.values(PayoutCurrency).find(
+    (c) => c === payout.currency,
+  );
+  const statusLabel = statusKey ? referralT(statusKey) : payout.status;
+  const currencyLabel = currencyKey ? referralT(currencyKey) : payout.currency;
+
   return (
     <Div className="flex items-start justify-between gap-3 py-4">
       <Div className="flex-1 min-w-0 space-y-1">
         <Div className="flex items-center gap-2 flex-wrap">
-          <Span className="font-medium text-sm">{payout.userEmail}</Span>
-          <Badge
-            className={
-              STATUS_COLORS[payout.status] ?? "bg-muted text-muted-foreground"
-            }
-          >
-            {payout.status}
-          </Badge>
+          <Span className="font-medium text-sm break-all">
+            {payout.userEmail}
+          </Span>
+          <StatusPill
+            status={payout.status}
+            label={statusLabel}
+            variant={STATUS_VARIANT[payout.status] ?? "muted"}
+          />
         </Div>
         <Div className="text-sm text-muted-foreground">
           <Span className="tabular-nums">
             {payout.amountCents.toLocaleString(locale)}
           </Span>{" "}
-          {payout.currency}
+          {currencyLabel}
         </Div>
         {payout.walletAddress ? (
           <Div className="text-xs text-muted-foreground truncate max-w-xs">
@@ -355,7 +365,7 @@ export function ReferralsContainer({
 
       {/* Summary Stats */}
       {summary ? (
-        <Div className="grid grid-cols-5 gap-2 p-4 border-b">
+        <Div className="grid grid-cols-2 @md:grid-cols-5 gap-2 p-4 border-b">
           <StatCard
             label={t("get.response.summary.totalCodes.label")}
             value={summary.totalCodes}
@@ -391,7 +401,7 @@ export function ReferralsContainer({
           field={children.searchFilters.children.search}
         />
       </Div>
-      <Div className="px-4 pb-2 grid grid-cols-2 gap-2">
+      <Div className="px-4 pb-2 grid grid-cols-1 @md:grid-cols-3 gap-2">
         <SelectFieldWidget
           fieldName="acquisitionCurrency"
           field={children.acquisitionCurrency}
