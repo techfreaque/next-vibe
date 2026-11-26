@@ -146,6 +146,8 @@ export const translations: typeof enTranslations = {
       storageFailed:
         "Video sa vytvorilo, ale nepodarilo sa ho uložiť. Kredity sa ti neodpočítali. Skús to znova.",
       creditsFailed: "Kredity za vytvorenie videa sa nepodarilo odpočítať.",
+      imageRequiredForModel:
+        "{{model}} animuje obrázok. Pridaj úvodný obrázok a potom generuj znova.",
       inputMediaRequired:
         "Tento model potrebuje adresu vstupného obrázka. Vlož odkaz na obrázok, ktorý chceš rozhýbať.",
       imageInputUnsupported:

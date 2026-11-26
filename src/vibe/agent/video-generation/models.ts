@@ -161,6 +161,7 @@ export const videoGenModelDefinitions: Record<
         id: VideoGenModelId.WAN_2_6_I2V,
         apiProvider: ApiProvider.MODELSLAB,
         providerModel: "wan2.6-i2v",
+        requiresFrameImage: true, // ModelsLab image-to-video route
         creditCostPerSecond: 10, // updated: 2026-04-04 from modelslab.com
         supportedFrameImages: ["first_frame"], // updated: 2026-11-13 from modelslab.com
         supportedResolutions: ["720p", "1080p"], // updated: 2026-11-15 from modelslab.com
@@ -210,6 +211,7 @@ export const videoGenModelDefinitions: Record<
         id: VideoGenModelId.WAN_2_6_I2V_FLASH,
         apiProvider: ApiProvider.MODELSLAB,
         providerModel: "wan2.6-i2v-flash",
+        requiresFrameImage: true, // ModelsLab image-to-video route
         creditCostPerSecond: 10, // updated: 2026-07-02 from modelslab.com
         supportedFrameImages: ["first_frame"], // updated: 2026-11-13 from modelslab.com
         supportedResolutions: ["720p", "1080p"], // updated: 2026-11-15 from modelslab.com
@@ -259,6 +261,7 @@ export const videoGenModelDefinitions: Record<
         id: VideoGenModelId.SEEDANCE_1_5_PRO,
         apiProvider: ApiProvider.MODELSLAB,
         providerModel: "seedance-1-5-pro",
+        requiresFrameImage: true, // ModelsLab image-to-video route
         creditCostPerSecond: 6.24, // updated: 2026-11-13 from modelslab.com (720p base; 480p via pricingByResolution)
         pricingByResolution: { "480p": 3, "720p": 6.24, "1080p": 13.92 }, // updated: 2026-11-15 from modelslab.com
         supportedResolutions: ["480p", "720p", "1080p"], // updated: 2026-11-15 from modelslab.com
@@ -302,6 +305,7 @@ export const videoGenModelDefinitions: Record<
         id: VideoGenModelId.OMNIHUMAN_1_5,
         apiProvider: ApiProvider.MODELSLAB,
         providerModel: "omni-human-1.5",
+        requiresFrameImage: true, // ModelsLab image-to-video route
         creditCostPerSecond: 14, // updated: 2026-03-31 from modelslab.com
         supportedFrameImages: ["first_frame"], // updated: 2026-11-13 from modelslab.com
         defaultDurationSeconds: 5,
@@ -498,6 +502,7 @@ export const videoGenModelDefinitions: Record<
         id: VideoGenModelId.KLING_V2_5_TURBO_I2V,
         apiProvider: ApiProvider.MODELSLAB,
         providerModel: "kling-v2-5-turbo-i2v",
+        requiresFrameImage: true, // ModelsLab image-to-video route
         creditCostPerSecond: 4.2, // updated: 2026-11-09 from modelslab.com
         supportedFrameImages: ["first_frame"], // updated: 2026-11-13 from modelslab.com
         minDurationSeconds: 5, // updated: 2026-04-04 from modelslab.com
@@ -627,6 +632,7 @@ export const videoGenModelDefinitions: Record<
         id: VideoGenModelId.KLING_V2_1_MASTER_I2V,
         apiProvider: ApiProvider.MODELSLAB,
         providerModel: "kling-v2-1-master-i2v",
+        requiresFrameImage: true, // ModelsLab image-to-video route
         creditCostPerSecond: 33.6, // updated: 2026-03-31 from modelslab.com
         supportedFrameImages: ["first_frame"], // updated: 2026-11-13 from modelslab.com
         minDurationSeconds: 5, // updated: 2026-04-04 from modelslab.com
@@ -774,6 +780,7 @@ export const videoGenModelDefinitions: Record<
         id: VideoGenModelId.LTX_2_3_PRO_I2V,
         apiProvider: ApiProvider.MODELSLAB,
         providerModel: "ltx-2-3-pro-i2v",
+        requiresFrameImage: true, // ModelsLab image-to-video route
         creditCostPerSecond: 9.6, // updated: 2026-11-09 from modelslab.com (FHD base; sent as 1920x1080 when no resolution is picked)
         supportedFrameImages: ["first_frame"], // updated: 2026-11-13 from modelslab.com
         supportedResolutions: ["2K", "4K"], // updated: 2026-04-04 from modelslab.com
@@ -882,6 +889,7 @@ export const videoGenModelDefinitions: Record<
         id: VideoGenModelId.HAILUO_2_3_I2V,
         apiProvider: ApiProvider.MODELSLAB,
         providerModel: "Hailuo-2.3-i2v",
+        requiresFrameImage: true, // ModelsLab image-to-video route
         creditCostPerSecond: 6.7, // updated: 2026-07-02 from modelslab.com
         supportedFrameImages: ["first_frame"], // updated: 2026-11-13 from modelslab.com
         minDurationSeconds: 6, // updated: 2026-04-04 from modelslab.com
@@ -925,6 +933,7 @@ export const videoGenModelDefinitions: Record<
         id: VideoGenModelId.HAILUO_2_3_FAST_I2V,
         apiProvider: ApiProvider.MODELSLAB,
         providerModel: "Hailuo-2.3-Fast-i2v",
+        requiresFrameImage: true, // ModelsLab image-to-video route
         creditCostPerSecond: 3.8, // updated: 2026-03-31 from modelslab.com
         supportedFrameImages: ["first_frame"], // updated: 2026-11-13 from modelslab.com
         minDurationSeconds: 6, // updated: 2026-04-04 from modelslab.com
@@ -1302,6 +1311,7 @@ export const videoGenModelDefinitions: Record<
         id: VideoGenModelId.GROK_I2V,
         apiProvider: ApiProvider.MODELSLAB,
         providerModel: "grok-i2v",
+        requiresFrameImage: true, // ModelsLab image-to-video route
         creditCostPerSecond: 6, // updated: 2026-03-31 from modelslab.com
         supportedFrameImages: ["first_frame"], // updated: 2026-11-13 from modelslab.com
         minDurationSeconds: 1, // updated: 2026-04-04 from modelslab.com
@@ -2886,6 +2896,33 @@ export function videoRouteReportsImage(provider: ModelProviderConfig): boolean {
     provider.apiProvider !== ApiProvider.UNBOTTLED &&
     "supportedFrameImages" in provider &&
     (provider.supportedFrameImages?.length ?? 0) > 0
+  );
+}
+
+/**
+ * True when the model cannot generate without a first frame: every direct
+ * route is image-to-video only. Relay rows inherit it (the cloud's route needs
+ * the image too).
+ */
+export function videoModelRequiresImage(def: ModelDefinition): boolean {
+  const direct = def.providers.filter(
+    (provider) => provider.apiProvider !== ApiProvider.UNBOTTLED,
+  );
+  return (
+    direct.length > 0 &&
+    direct.every(
+      (provider) =>
+        "requiresFrameImage" in provider &&
+        provider.requiresFrameImage === true,
+    )
+  );
+}
+
+/** videoModelRequiresImage by model id (false for unknown ids). */
+export function videoGenModelRequiresImage(modelId: string): boolean {
+  const id = Object.values(VideoGenModelId).find((value) => value === modelId);
+  return (
+    id !== undefined && videoModelRequiresImage(videoGenModelDefinitions[id])
   );
 }
 

@@ -11,7 +11,11 @@ import { db } from "next-vibe/database";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-import { publicCapSpenders, publicFreeTierDailyCap } from "./db";
+import {
+  publicCapReservations,
+  publicCapSpenders,
+  publicFreeTierDailyCap,
+} from "./db";
 import { PublicCapRepository } from "./repository";
 
 const logger = createEndpointLogger(false, defaultLocale);
@@ -19,6 +23,13 @@ const logger = createEndpointLogger(false, defaultLocale);
 let saved: typeof publicFreeTierDailyCap.$inferSelect | undefined;
 const testLeads: string[] = [];
 const testIpHashes: string[] = [];
+const testPools: string[] = [];
+
+function pool(tag: string): string {
+  const key = `lead:cap-test-pool-${tag}-${Date.now()}-${Math.floor(Math.random() * 1e6)}`;
+  testPools.push(key);
+  return key;
+}
 
 function lead(tag: string): string {
   const id = `cap-test-${tag}-${Date.now()}-${Math.floor(Math.random() * 1e6)}`;
@@ -68,6 +79,11 @@ afterAll(async () => {
   await db
     .delete(publicCapSpenders)
     .where(inArray(publicCapSpenders.key, [...testLeads, ...testIpHashes]));
+  if (testPools.length > 0) {
+    await db
+      .delete(publicCapReservations)
+      .where(inArray(publicCapReservations.poolKey, testPools));
+  }
 });
 
 describe("PublicCapRepository", () => {
@@ -198,5 +214,107 @@ describe("PublicCapRepository", () => {
     } finally {
       db.select = original;
     }
+  });
+
+  it("parallel turns of one pool cannot reserve more than its free credits", async () => {
+    await setRow({ spendToday: 0, capAmount: 1000, perLeadCap: 1000, perIpCap: 1000 });
+    const poolKey = pool("wallet");
+    const id = lead("wallet");
+    const results = await Promise.all(
+      Array.from({ length: 12 }, () =>
+        PublicCapRepository.gate(
+          {
+            leadId: id,
+            ipAddress: undefined,
+            expectedCost: 1,
+            model: "m",
+            reservation: { poolKey, spendable: 5 },
+          },
+          logger,
+          defaultLocale,
+        ),
+      ),
+    );
+    expect(results.filter((r) => r.success)).toHaveLength(5);
+    const refused = results.find((r) => !r.success);
+    expect(refused?.message).toBe(
+      "Your free credits are still covering a reply in progress. Let it finish, then send again.",
+    );
+    // Each passing turn's budget excludes what the others already hold.
+    const budgets = results.flatMap((r) => (r.success ? [r.data.remaining] : []));
+    expect(budgets.toSorted()).toEqual([1, 2, 3, 4, 5]);
+  });
+
+  it("parallel requests from one IP stop at the IP sub-cap", async () => {
+    await setRow({ spendToday: 0, capAmount: 1000, perLeadCap: 1000, perIpCap: 4 });
+    const ip = `198.51.100.${Math.floor(Math.random() * 250)}`;
+    testIpHashes.push(PublicCapRepository.hashIp(ip));
+    const results = await Promise.all(
+      Array.from({ length: 10 }, (_, i) =>
+        PublicCapRepository.gate(
+          {
+            leadId: lead(`ip-par-${i}`),
+            ipAddress: ip,
+            expectedCost: 1,
+            model: "m",
+            reservation: { poolKey: pool(`ip-par-${i}`), spendable: 20 },
+          },
+          logger,
+          defaultLocale,
+        ),
+      ),
+    );
+    expect(results.filter((r) => r.success)).toHaveLength(4);
+  });
+
+  it("settling a billed turn releases its reservation; expired ones never count", async () => {
+    await setRow({ spendToday: 0, capAmount: 1000, perLeadCap: 1000, perIpCap: 1000 });
+    const poolKey = pool("settle");
+    const id = lead("settle");
+    const request = {
+      leadId: id,
+      ipAddress: undefined,
+      expectedCost: 2,
+      model: "m",
+      reservation: { poolKey, spendable: 4 },
+    };
+    expect((await PublicCapRepository.gate(request, logger, defaultLocale)).success).toBe(true);
+    expect((await PublicCapRepository.gate(request, logger, defaultLocale)).success).toBe(true);
+    expect((await PublicCapRepository.gate(request, logger, defaultLocale)).success).toBe(false);
+
+    // The first turn bills: its spend is recorded and one reservation released.
+    const before = await spend();
+    await PublicCapRepository.settleSpend(2, logger, { leadId: id, poolKey });
+    expect(await spend()).toBeCloseTo(before + 2, 5);
+    const held = await db
+      .select()
+      .from(publicCapReservations)
+      .where(eq(publicCapReservations.poolKey, poolKey));
+    expect(held).toHaveLength(1);
+    // The caller's next balance check sees 2 spendable: the live reservation blocks.
+    expect(
+      (
+        await PublicCapRepository.gate(
+          { ...request, reservation: { poolKey, spendable: 2 } },
+          logger,
+          defaultLocale,
+        )
+      ).success,
+    ).toBe(false);
+
+    // A turn that died before billing: its reservation expires.
+    await db
+      .update(publicCapReservations)
+      .set({ expiresAt: new Date(Date.now() - 1000) })
+      .where(eq(publicCapReservations.poolKey, poolKey));
+    expect(
+      (
+        await PublicCapRepository.gate(
+          { ...request, reservation: { poolKey, spendable: 2 } },
+          logger,
+          defaultLocale,
+        )
+      ).success,
+    ).toBe(true);
   });
 });

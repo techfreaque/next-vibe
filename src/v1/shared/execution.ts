@@ -374,6 +374,7 @@ async function preflight(params: {
     logger,
     creditsT,
     locale,
+    eligible.data,
   );
   if (!cap.success) {
     return {

@@ -432,6 +432,30 @@ function isResolutionValue(s: string): boolean {
 }
 
 /** Normalize resolution values: "720P" → "720p", keep named ones as-is */
+/**
+ * Which resolution tier a video route's base `creditCostPerSecond` tracks:
+ * the tier whose current price equals the current base, else 720p.
+ * Undefined when the fresh data has no tiers (base_price is then the price).
+ */
+export function pickBaseResolution(
+  freshTiers: Partial<Record<string, number>>,
+  currentTiers: Partial<Record<string, number>> | undefined,
+  currentBase: number | undefined,
+): string | undefined {
+  if (Object.keys(freshTiers).length === 0) {
+    return undefined;
+  }
+  if (currentTiers && currentBase !== undefined) {
+    const tracked = Object.entries(currentTiers).find(
+      ([res, credits]) => credits === currentBase && res in freshTiers,
+    );
+    if (tracked) {
+      return tracked[0];
+    }
+  }
+  return "720p" in freshTiers ? "720p" : undefined;
+}
+
 function normalizeResolution(s: string): string {
   const trimmed = s.trim().replaceAll(/[()]/g, "");
   // Lowercase the 'p' suffix: "720P" → "720p"
@@ -620,6 +644,8 @@ export class ModelslabPriceFetcher extends PriceFetcher {
       defaultDurationSeconds: number;
       /** Current credit cost in the definition (plausibility baseline) */
       currentCredits: number | undefined;
+      /** Current per-resolution prices (which tier the base cost tracks) */
+      currentResolutionPricing: Partial<Record<string, number>> | undefined;
     }> = [];
 
     for (const def of allDefs) {
@@ -652,6 +678,10 @@ export class ModelslabPriceFetcher extends PriceFetcher {
                 : "creditCostPerImage" in providerConfig
                   ? providerConfig.creditCostPerImage
                   : undefined,
+          currentResolutionPricing:
+            "pricingByResolution" in providerConfig
+              ? providerConfig.pricingByResolution
+              : undefined,
         });
       }
     }
@@ -749,12 +779,30 @@ export class ModelslabPriceFetcher extends PriceFetcher {
         : config.isVideo
           ? "creditCostPerSecond"
           : "creditCostPerClip";
-      const usdValue = toFieldUsd(parsed.usdPrice);
+      // With per-resolution pricing, page base_price is the CHEAPEST tier
+      // (e.g. 480p). The base cost field tracks the tier it tracked before
+      // (720p for Seedance), so pick that tier's fresh price.
+      const freshTiersUsd: Record<string, number> = {};
+      for (const [res, usd] of Object.entries(parsed.resolutionPricing ?? {})) {
+        freshTiersUsd[normalizeResolution(res)] = usd;
+      }
+      const baseResolution = config.isVideo
+        ? pickBaseResolution(
+            freshTiersUsd,
+            config.currentResolutionPricing,
+            config.currentCredits,
+          )
+        : undefined;
+      const baseUsd =
+        baseResolution === undefined
+          ? parsed.usdPrice
+          : (freshTiersUsd[baseResolution] ?? parsed.usdPrice);
+      const usdValue = toFieldUsd(baseUsd);
       const credits = this.usdToCredits(usdValue);
 
       const implausible = implausiblePriceReason({
         field,
-        usdRaw: parsed.usdPrice,
+        usdRaw: baseUsd,
         usdValue,
         credits,
         currentCredits: config.currentCredits,

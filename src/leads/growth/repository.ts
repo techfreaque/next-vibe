@@ -57,6 +57,7 @@ export class GrowthJourneyRepository {
           source: t.source,
           medium: t.medium,
           campaign: t.campaign,
+          content: t.content,
           referrerHost: t.referrerHost,
           refCode: t.refCode,
           geoCountry,

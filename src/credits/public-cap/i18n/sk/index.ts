@@ -156,6 +156,8 @@ export const translations: typeof enTranslations = {
       "Dnešný bezplatný limit na túto požiadavku nestačí. Skús to zajtra alebo použi platené kredity.",
     leadCapExceeded:
       "Táto požiadavka prekračuje tvoj dnešný bezplatný limit. Skús to zajtra alebo použi platené kredity.",
+    reservedByRunningReply:
+      "Tvoje bezplatné kredity ešte pokrývajú rozpracovanú odpoveď. Počkaj, kým skončí, a potom pošli znova.",
     capUnavailable: "Bezplatné kredity sú dočasne nedostupné. Skús to neskôr.",
     getCapFailed:
       "Nepodarilo sa načítať nastavenie limitu bezplatných kreditov",

@@ -54,6 +54,7 @@ import {
   resolveVideoGenRouteForImageInput,
   videoClipCredits,
   videoGenModelOptions,
+  videoGenModelRequiresImage,
   type VideoGenModelSelection,
 } from "./models";
 import { billableVideoSeconds, readMp4DurationSeconds } from "./mp4-duration";
@@ -266,6 +267,16 @@ export class VideoGenerationRepository {
       return fail({
         message: t("post.errors.inputMediaRequired"),
         errorType: ErrorResponseTypes.BAD_REQUEST,
+      });
+    }
+    // Image-to-video only models (every route animates a first frame): reject
+    // before any credit check or provider call, with the model named.
+    if (!seedImageUrl && videoGenModelRequiresImage(videoModel.id)) {
+      return fail({
+        message: t("post.errors.imageRequiredForModel", {
+          model: videoModel.name,
+        }),
+        errorType: ErrorResponseTypes.VALIDATION_ERROR,
       });
     }
 

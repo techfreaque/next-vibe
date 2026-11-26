@@ -182,6 +182,13 @@ export interface CreditPool {
   poolType: string;
 }
 
+/** Stable key of a pool for free-tier reservations (same in gate and deduction). */
+export function freeTierPoolKey(
+  pool: Pick<CreditPool, "poolId" | "poolType">,
+): string {
+  return `${pool.poolType}:${pool.poolId}`;
+}
+
 export interface CreditTransactionOutput {
   id: string;
   amount: number;
@@ -3498,7 +3505,15 @@ export class CreditRepository {
       // on it — keeps the hot path lean. incrementSpend swallows its own errors,
       // so no unhandled rejection. A not-yet-applied increment widens overshoot
       // slightly, which is acceptable (bounded, "slight overshoot is fine").
-      if (freeCreditsDeducted > 0) {
+      // Model usage (allowPartial) settles the reservation its pre-generation
+      // gate took, even when nothing free was left to deduct.
+      if (isFreeTierPool && allowPartial) {
+        void PublicCapRepository.settleSpend(freeCreditsDeducted, logger, {
+          leadId: currentLeadId,
+          ipAddress: capIpAddress,
+          poolKey: freeTierPoolKey(pool),
+        });
+      } else if (freeCreditsDeducted > 0) {
         void PublicCapRepository.incrementSpend(freeCreditsDeducted, logger, {
           leadId: currentLeadId,
           ipAddress: capIpAddress,
@@ -5259,6 +5274,12 @@ export class CreditRepository {
    * hold paid credits. Fails CLOSED (PAYMENT_REQUIRED, drives the out-of-credits
    * nudge) when the pool, the lead or the IP has hit its daily ceiling.
    */
+  /**
+   * Pre-generation free-tier gate for model usage. For a free pool it also
+   * reserves `expectedCost` atomically (see PublicCapRepository.gate), so
+   * parallel requests of one pool cannot all spend the same allowance.
+   * `spendable` = the pool's spendable free credits from the balance check.
+   */
   static async gateFreeTierCap(
     user: JwtPayloadType,
     ipAddress: string | undefined,
@@ -5267,6 +5288,7 @@ export class CreditRepository {
     logger: EndpointLogger,
     t: CreditsT,
     locale: CountryLanguage,
+    spendable?: number,
   ): Promise<ResponseType<PublicCapAllowance | null>> {
     if (expectedCost <= 0) {
       return success(null);
@@ -5295,7 +5317,13 @@ export class CreditRepository {
       return success(null);
     }
     return PublicCapRepository.gate(
-      { leadId: user.leadId, ipAddress, expectedCost, model },
+      {
+        leadId: user.leadId,
+        ipAddress,
+        expectedCost,
+        model,
+        reservation: { poolKey: freeTierPoolKey(pool), spendable },
+      },
       logger,
       locale,
     );

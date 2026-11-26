@@ -156,6 +156,8 @@ export const translations: typeof enTranslations = {
       "Na to zapytanie nie wystarczy już darmowych kredytów z dzisiejszej puli. Spróbuj jutro lub skorzystaj z płatnych kredytów.",
     leadCapExceeded:
       "To zapytanie przekracza Twój dzisiejszy bezpłatny limit. Spróbuj jutro lub skorzystaj z płatnych kredytów.",
+    reservedByRunningReply:
+      "Twoje darmowe kredyty pokrywają jeszcze trwającą odpowiedź. Poczekaj, aż się skończy, i wyślij ponownie.",
     capUnavailable:
       "Darmowe kredyty są chwilowo niedostępne. Spróbuj ponownie później.",
     getCapFailed: "Nie udało się pobrać konfiguracji limitu darmowych kredytów",

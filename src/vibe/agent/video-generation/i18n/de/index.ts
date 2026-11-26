@@ -147,6 +147,8 @@ export const translations: typeof enTranslations = {
         "Das Video wurde erzeugt, ließ sich aber nicht speichern. Es wurden keine Credits berechnet. Versuch es erneut.",
       creditsFailed:
         "Credits für Videogenerierung konnten nicht abgezogen werden",
+      imageRequiredForModel:
+        "{{model}} animiert ein Bild. Füge ein Startbild hinzu und generiere dann erneut.",
       inputMediaRequired:
         "Dieses Modell benötigt eine Bild-URL. Füge einen Bildlink ein, der animiert werden soll.",
       imageInputUnsupported:

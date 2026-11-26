@@ -6,7 +6,7 @@
  * Requires a server (Atlas dev by default): `vibe dev`.
  */
 
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { db } from "next-vibe/database";
 import { UserDetailLevel } from "next-vibe/identity/user/enum";
@@ -22,7 +22,7 @@ import { describe, expect } from "vitest";
 import signupEndpoints from "@/user/public/signup/definition";
 import userDeleteDefinitions from "@/users/user/[id]/definition";
 
-import { growthJourneys } from "./db";
+import { growthJourneys, growthVisits } from "./db";
 import { ChannelType } from "./enum";
 
 const PASSWORD = "E2eSecurePass123";
@@ -60,14 +60,16 @@ describe("E2E: growth attribution", () => {
     async ({ goto, open, page, uniqueEmail, cleanup }) => {
       const email = uniqueEmail("growth");
       cleanup(() => deleteUserAndJourney(email));
+      // A dot keeps the run id a campaign label: one 24+ char token with
+      // digits is dropped as an opaque id by sanitizeAttributionValue.
       const run = email.split("@")[0] ?? "run";
 
       // First touch: lands from a Reddit campaign
       await goto(
-        `/story?utm_source=E2E-Reddit&utm_medium=social&utm_campaign=growth-${run}&utm_content=top&secret=drop-me`,
+        `/story?utm_source=E2E-Reddit&utm_medium=social&utm_campaign=growth.${run}&utm_content=top&secret=drop-me`,
       );
       // Later visit through a second tagged link: moves only the last touch
-      await goto(`/story?utm_source=e2e-youtube&utm_campaign=second-${run}`);
+      await goto(`/story?utm_source=e2e-youtube&utm_campaign=second.${run}`);
 
       const form = await open(signupEndpoints.POST, { path: "/user/signup" });
       await form.fill({
@@ -96,7 +98,7 @@ describe("E2E: growth attribution", () => {
       // First touch: set on the first visit, never overwritten
       expect(journey.firstSource).toBe("e2e-reddit");
       expect(journey.firstMedium).toBe("social");
-      expect(journey.firstCampaign).toBe(`growth-${run}`);
+      expect(journey.firstCampaign).toBe(`growth.${run}`);
       expect(journey.firstContent).toBe("top");
       expect(journey.firstChannel).toBe("e2e-reddit");
       expect(journey.firstChannelType).toBe(ChannelType.CAMPAIGN);
@@ -105,8 +107,24 @@ describe("E2E: growth attribution", () => {
 
       // Last touch: the later tagged visit
       expect(journey.lastSource).toBe("e2e-youtube");
-      expect(journey.lastCampaign).toBe(`second-${run}`);
+      expect(journey.lastCampaign).toBe(`second.${run}`);
       expect(journey.lastMedium).toBe(null);
+
+      // Raw arrivals keep utm_content per visit (per-recipient outreach clicks)
+      const visitContent = async (campaign: string): Promise<(string | null)[]> =>
+        (
+          await db
+            .select({ content: growthVisits.content })
+            .from(growthVisits)
+            .where(
+              and(
+                eq(growthVisits.leadId, journey.leadId),
+                eq(growthVisits.campaign, campaign),
+              ),
+            )
+        ).map((visit) => visit.content);
+      expect(await visitContent(`growth.${run}`)).toEqual(["top"]);
+      expect(await visitContent(`second.${run}`)).toEqual([null]);
 
       // Funnel: signup stamped on the journey
       expect(journey.signedUpAt).not.toBe(null);

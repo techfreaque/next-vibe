@@ -144,6 +144,8 @@ export const translations = {
       storageFailed:
         "The video was generated but could not be saved. You were not charged. Try again.",
       creditsFailed: "Failed to deduct credits for video generation",
+      imageRequiredForModel:
+        "{{model}} animates an image. Add a start image, then generate again.",
       inputMediaRequired:
         "This model requires an input image URL. Paste an image link to animate it.",
       imageInputUnsupported:

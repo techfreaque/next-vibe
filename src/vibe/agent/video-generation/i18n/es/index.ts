@@ -151,6 +151,8 @@ export const translations: typeof enTranslations = {
         "El vídeo se generó pero no se pudo guardar. No te acusaron. Inténtalo de nuevo.",
       creditsFailed:
         "Fallado para deducir créditos para la generación de vídeo",
+      imageRequiredForModel:
+        "{{model}} anima una imagen. Añade una imagen inicial y vuelve a generar.",
       inputMediaRequired:
         "Este modelo requiere una imagen de entrada URL. Pruebe un enlace de imagen para animarlo.",
       imageInputUnsupported:

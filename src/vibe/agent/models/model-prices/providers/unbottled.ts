@@ -6,7 +6,12 @@
  * All non-cost fields (supportedResolutions, minDurationSeconds, etc.) are copied verbatim.
  *
  * "add"    → model has no UNBOTTLED entry yet, insert a new entry
- * "update" → model already has an UNBOTTLED entry, rewrite it from primary
+ * "update" → model already has an UNBOTTLED entry; the repository patches only
+ *            its price fields in place (capabilities of the relay row are kept)
+ *
+ * Prices are derived from THIS run's fresh primary prices (the results of the
+ * other fetchers), not from the definitions as loaded, so a relay row never
+ * lags one refresh behind its primary.
  *
  * NOTE: When unbottled.ai cloud is deployed, fetch live prices from:
  * GET /api/<locale>/agent/ai-stream/ws-provider/models on the cloud instance
@@ -44,7 +49,12 @@ import {
 import type { ModelDefinition, ModelProviderConfig } from "../../models";
 import { ApiProvider } from "../../models";
 import { tokenTariffs } from "../../token-tariffs";
-import type { ProviderEntryOperation, ProviderPriceResult } from "./base";
+import { parseNumberMap } from "../source-patch";
+import type {
+  PriceUpdate,
+  ProviderEntryOperation,
+  ProviderPriceResult,
+} from "./base";
 import { PriceFetcher, roundUpPrice } from "./base";
 
 const MODEL_ID_ENUMS: Record<string, Record<string, string>> = {
@@ -260,11 +270,91 @@ function buildOp(
   return op;
 }
 
+/** Price fields a fresh primary PriceUpdate can carry over to the relay op. */
+const OVERLAY_FIELDS = [
+  "creditCost",
+  "creditCostPerImage",
+  "creditCostPerClip",
+  "creditCostPerSecond",
+  "creditCostPerCharacter",
+  "inputTokenCost",
+  "outputTokenCost",
+  "cacheReadTokenCost",
+  "cacheWriteTokenCost",
+  "cacheWrite1hTokenCost",
+  "imageOutputTokenCost",
+] as const satisfies readonly PriceUpdate["field"][];
+
+type OverlayField = (typeof OVERLAY_FIELDS)[number];
+
+function isOverlayField(field: PriceUpdate["field"]): field is OverlayField {
+  return OVERLAY_FIELDS.some((candidate) => candidate === field);
+}
+
+const PRICING_MAP_FIELDS = [
+  "pricingByResolution",
+  "pricingBySize",
+  "pricingByQuality",
+] as const;
+
+type PricingMapField = (typeof PRICING_MAP_FIELDS)[number];
+
+function isPricingMapField(field: string): field is PricingMapField {
+  return PRICING_MAP_FIELDS.some((candidate) => candidate === field);
+}
+
+/**
+ * Apply this run's fresh primary prices to a relay op built from the loaded
+ * definition. Only updates for the same model, provider and providerModel as
+ * the primary route count.
+ */
+export function overlayFreshPrimaryPrices(
+  op: ProviderEntryOperation,
+  primary: ModelProviderConfig,
+  fresh: readonly ProviderPriceResult[],
+): ProviderEntryOperation {
+  const next: ProviderEntryOperation = { ...op };
+  for (const result of fresh) {
+    for (const update of result.updates) {
+      if (
+        update.modelId !== op.modelId ||
+        update.provider !== primary.apiProvider ||
+        update.providerModel !== primary.providerModel ||
+        !isOverlayField(update.field)
+      ) {
+        continue;
+      }
+      if (update.field === "creditCost" && next.creditCost === undefined) {
+        continue;
+      }
+      next[update.field] = markup(update.value);
+    }
+    for (const update of result.settingsUpdates ?? []) {
+      if (
+        update.providerModel !== primary.providerModel ||
+        (update.apiProvider !== undefined &&
+          update.apiProvider !== primary.apiProvider) ||
+        !isPricingMapField(update.field)
+      ) {
+        continue;
+      }
+      const map = parseNumberMap(update.tsLiteral);
+      if (map) {
+        next[update.field] = markupRecord(map);
+      }
+    }
+  }
+  return next;
+}
+
 export class UnbottledPriceFetcher extends PriceFetcher {
   // eslint-disable-next-line i18next/no-literal-string
   readonly providerName = "unbottled";
 
-  async fetch(logger: EndpointLogger): Promise<ProviderPriceResult> {
+  async fetch(
+    logger: EndpointLogger,
+    fresh: readonly ProviderPriceResult[] = [],
+  ): Promise<ProviderPriceResult> {
     const providerEntryOps: ProviderEntryOperation[] = [];
 
     const allDefsByRole = getAllDefsByRole();
@@ -295,13 +385,17 @@ export class UnbottledPriceFetcher extends PriceFetcher {
         const action = unbottledProvider ? "update" : "add";
 
         providerEntryOps.push(
-          buildOp(
-            action,
-            role,
-            enumKey,
-            modelId,
-            providerModel,
+          overlayFreshPrimaryPrices(
+            buildOp(
+              action,
+              role,
+              enumKey,
+              modelId,
+              providerModel,
+              primaryProvider,
+            ),
             primaryProvider,
+            fresh,
           ),
         );
       }

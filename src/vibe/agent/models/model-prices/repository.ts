@@ -66,6 +66,13 @@ import { ReplicatePriceFetcher } from "./providers/replicate";
 import { UnbottledPriceFetcher } from "./providers/unbottled";
 import { UncensoredAiPriceFetcher } from "./providers/uncensored-ai";
 import { VenicePriceFetcher } from "./providers/venice-ai";
+import {
+  findField,
+  formatTsLiteral,
+  isRelayRowAt,
+  literalsEqual,
+  patchRelayBlock,
+} from "./source-patch";
 
 export type { PriceFetcher, ProviderPriceResult };
 
@@ -117,7 +124,7 @@ function buildUpdateComment(source: string): string {
 }
 
 /**
- * Check if a price line already has the correct value and a valid update comment.
+ * Check if a price line already has the correct value (comment ignored).
  * Returns true if the line should be skipped (no update needed).
  * Only updates the timestamp when the actual value changes - preserves the
  * original date so you can see when a price last *actually* changed.
@@ -127,10 +134,8 @@ function isAlreadyUpToDate(
   field: string,
   newValue: number,
 ): boolean {
-  const regex = new RegExp(
-    `${field}:\\s*${String(newValue).replaceAll(".", "\\.")}[,]?\\s*// updated: \\d{4}-\\d{2}-\\d{2} from `,
-  );
-  return regex.test(line);
+  const value = new RegExp(`${field}:\\s*([\\d.]+)`).exec(line)?.[1];
+  return value !== undefined && Number(value) === newValue;
 }
 
 /**
@@ -160,6 +165,7 @@ function applyPriceUpdate(
   field: string,
   newValue: number,
   source: string,
+  skipRelayRows: boolean,
 ): { content: string; changed: boolean } {
   const comment = buildUpdateComment(source);
 
@@ -173,9 +179,12 @@ function applyPriceUpdate(
   let changed = false;
   const updated = content.replace(
     blockRegex,
-    (fullMatch: string, prefix: string, priceLine: string) => {
+    (fullMatch: string, prefix: string, priceLine: string, offset: number) => {
       // fullMatch === prefix + priceLine by regex definition; prefix used to reconstruct
-      void fullMatch;
+      // Upstream prices never land on a relay row sharing the providerModel.
+      if (skipRelayRows && isRelayRowAt(content, offset)) {
+        return fullMatch;
+      }
       // Skip if value matches and line already has a valid update comment
       if (isAlreadyUpToDate(priceLine, field, newValue)) {
         return prefix + priceLine;
@@ -206,42 +215,49 @@ function applyCacheCostUpdate(
   newValue: number,
   source: string,
   insertAfterField: string,
+  skipRelayRows: boolean,
 ): { content: string; changed: boolean } {
   const comment = buildUpdateComment(source);
 
   // Match only fields at the provider's indentation. Nested tariffs have
   // identical field names and may precede the base cache rates.
   const routes = new RegExp(
-    `^( *)providerModel: *"${escapedProviderModel}",[^\\n]*\\n((?:\\1[^\\n]*\\n)*)`,
+    `^( *)providerModel: *"${escapedProviderModel}",[^\\n]*\\n(?:\\1[^\\n]*\\n)*`,
     "gm",
   );
   let changed = false;
-  const updated = content.replace(routes, (route: string, indent: string) => {
-    const fieldLine = new RegExp(`^${indent}${field}: [^\\n]*`, "m");
-    const line = route.match(fieldLine)?.[0];
-    if (line !== undefined) {
-      if (isAlreadyUpToDate(line, field, newValue)) {
+  const updated = content.replace(
+    routes,
+    (route: string, indent: string, offset: number) => {
+      if (skipRelayRows && isRelayRowAt(content, offset)) {
+        return route;
+      }
+      const fieldLine = new RegExp(`^${indent}${field}: [^\\n]*`, "m");
+      const line = route.match(fieldLine)?.[0];
+      if (line !== undefined) {
+        if (isAlreadyUpToDate(line, field, newValue)) {
+          return route;
+        }
+        changed = true;
+        return route.replace(
+          fieldLine,
+          replaceValueAndComment(line, field, newValue, comment),
+        );
+      }
+      const anchor = new RegExp(
+        `^(${indent}${insertAfterField}: [^\\n]*)\\n`,
+        "m",
+      );
+      if (!anchor.test(route)) {
         return route;
       }
       changed = true;
       return route.replace(
-        fieldLine,
-        replaceValueAndComment(line, field, newValue, comment),
+        anchor,
+        `$1\n${indent}${field}: ${newValue}, ${comment}\n`,
       );
-    }
-    const anchor = new RegExp(
-      `^(${indent}${insertAfterField}: [^\\n]*)\\n`,
-      "m",
-    );
-    if (!anchor.test(route)) {
-      return route;
-    }
-    changed = true;
-    return route.replace(
-      anchor,
-      `$1\n${indent}${field}: ${newValue}, ${comment}\n`,
-    );
-  });
+    },
+  );
   return { content: updated, changed };
 }
 
@@ -250,7 +266,7 @@ function applyCacheCostUpdate(
  * Inserts the field if missing, updates if present.
  * Placed right after creditCostPerSecond (or similar cost field) in the provider block.
  */
-function applySettingsUpdate(
+export function applySettingsUpdate(
   content: string,
   update: SettingsUpdate,
 ): { content: string; changed: boolean } {
@@ -287,31 +303,17 @@ function applySettingsUpdate(
     return { content, changed: false };
   }
   const blockContent = content.slice(pmIdx, blockEndIdx);
+  const indent = content.slice(content.lastIndexOf("\n", pmIdx) + 1, pmIdx);
+  const literal = formatTsLiteral(update.tsLiteral, indent, update.field);
 
-  const fieldRegex = new RegExp(
-    `(${update.field}:\\s*(?:\\[[^\\]]*\\]|\\{[^}]*\\}|true|false|[\\d.]+)[,]?(?:\\s*//[^\n]*)?)`,
-  );
-  if (fieldRegex.test(blockContent)) {
-    // Field exists — update in place
-    let changed = false;
-    const newBlock = blockContent.replace(
-      fieldRegex,
-      (fullMatch: string, fieldLine: string) => {
-        void fullMatch;
-        const newLine = `${update.field}: ${update.tsLiteral}, ${comment}`;
-        if (
-          fieldLine.includes(update.tsLiteral) &&
-          fieldLine.includes("updated:")
-        ) {
-          return fieldLine;
-        }
-        changed = true;
-        return newLine;
-      },
-    );
-    if (!changed) {
+  const span = findField(blockContent, indent, update.field);
+  if (span) {
+    // Same value in different formatting is NOT a change: keep the line,
+    // its formatting and its original update date.
+    if (literalsEqual(span.value, literal)) {
       return { content, changed: false };
     }
+    const newBlock = `${blockContent.slice(0, span.lineStart)}${indent}${update.field}: ${literal}, ${comment}${blockContent.slice(span.lineEnd)}`;
     return {
       content:
         content.slice(0, pmIdx) +
@@ -325,11 +327,10 @@ function applySettingsUpdate(
   const costRegex = new RegExp(
     `((?:outputTokenCost|creditCostPerSecond|creditCostPerImage|creditCostPerClip):\\s*[\\d.]+[,]?(?:\\s*//[^\n]*)?)(\\n)`,
   );
-  if (costRegex.test(blockContent)) {
-    const newBlock = blockContent.replace(
-      costRegex,
-      `$1$2        ${update.field}: ${update.tsLiteral}, ${comment}\n`,
-    );
+  const costMatch = costRegex.exec(blockContent);
+  if (costMatch) {
+    const insertAt = costMatch.index + costMatch[0].length;
+    const newBlock = `${blockContent.slice(0, insertAt)}${indent}${update.field}: ${literal}, ${comment}\n${blockContent.slice(insertAt)}`;
     return {
       content:
         content.slice(0, pmIdx) +
@@ -348,18 +349,17 @@ function formatModalityArray(modalities: Modality[]): string {
 }
 
 /**
- * Check if a modality line already has the correct value and a valid update comment.
+ * Check if a modality line already holds the given value. The trailing
+ * comment does not matter: a line without one is still up to date, and
+ * rewriting it would only add a fresh date to an unchanged value.
  */
 function isModalityUpToDate(
   line: string,
   field: string,
   arrayStr: string,
 ): boolean {
-  const escaped = arrayStr.replaceAll(/[[\]]/g, "\\$&");
-  const regex = new RegExp(
-    `${field}:\\s*${escaped}[,]?\\s*// updated: \\d{4}-\\d{2}-\\d{2} from `,
-  );
-  return regex.test(line);
+  const value = new RegExp(`${field}:\\s*(\\[[^\\]]*\\])`).exec(line)?.[1];
+  return value !== undefined && literalsEqual(value, arrayStr);
 }
 
 /**
@@ -462,6 +462,8 @@ const ENUM_PREFIX_BY_ROLE: Record<string, string> = {
   stt: "SttModelId",
 };
 
+const ENTRY_INDENT = "        ";
+
 /**
  * Build the TypeScript source for an UNBOTTLED provider entry from a typed op.
  * All cost fields in op are already marked up. Non-cost fields are copied verbatim.
@@ -557,40 +559,42 @@ function buildUnbottledEntrySource(
   }
   if (op.supportedDurations !== undefined) {
     lines.push(
-      `        supportedDurations: ${JSON.stringify(op.supportedDurations)},`,
+      `        supportedDurations: ${formatTsLiteral(JSON.stringify(op.supportedDurations), ENTRY_INDENT, "supportedDurations")},`,
     );
   }
   if (op.supportedResolutions !== undefined) {
     lines.push(
-      `        supportedResolutions: ${JSON.stringify(op.supportedResolutions)},`,
+      `        supportedResolutions: ${formatTsLiteral(JSON.stringify(op.supportedResolutions), ENTRY_INDENT, "supportedResolutions")},`,
     );
   }
   if (op.supportedAspectRatios !== undefined) {
     lines.push(
-      `        supportedAspectRatios: ${JSON.stringify(op.supportedAspectRatios)},`,
+      `        supportedAspectRatios: ${formatTsLiteral(JSON.stringify(op.supportedAspectRatios), ENTRY_INDENT, "supportedAspectRatios")},`,
     );
   }
   if (op.supportedSizes !== undefined) {
-    lines.push(`        supportedSizes: ${JSON.stringify(op.supportedSizes)},`);
+    lines.push(
+      `        supportedSizes: ${formatTsLiteral(JSON.stringify(op.supportedSizes), ENTRY_INDENT, "supportedSizes")},`,
+    );
   }
   if (op.supportedQualities !== undefined) {
     lines.push(
-      `        supportedQualities: ${JSON.stringify(op.supportedQualities)},`,
+      `        supportedQualities: ${formatTsLiteral(JSON.stringify(op.supportedQualities), ENTRY_INDENT, "supportedQualities")},`,
     );
   }
   if (op.pricingByResolution !== undefined) {
     lines.push(
-      `        pricingByResolution: ${JSON.stringify(op.pricingByResolution)}, ${comment}`,
+      `        pricingByResolution: ${formatTsLiteral(JSON.stringify(op.pricingByResolution), ENTRY_INDENT, "pricingByResolution")}, ${comment}`,
     );
   }
   if (op.pricingBySize !== undefined) {
     lines.push(
-      `        pricingBySize: ${JSON.stringify(op.pricingBySize)}, ${comment}`,
+      `        pricingBySize: ${formatTsLiteral(JSON.stringify(op.pricingBySize), ENTRY_INDENT, "pricingBySize")}, ${comment}`,
     );
   }
   if (op.pricingByQuality !== undefined) {
     lines.push(
-      `        pricingByQuality: ${JSON.stringify(op.pricingByQuality)}, ${comment}`,
+      `        pricingByQuality: ${formatTsLiteral(JSON.stringify(op.pricingByQuality), ENTRY_INDENT, "pricingByQuality")}, ${comment}`,
     );
   }
 
@@ -658,8 +662,11 @@ export function addProviderEntry(
 }
 
 /**
- * Update an existing UNBOTTLED provider entry to match the primary provider's structure.
- * Replaces the entire UNBOTTLED block with a freshly generated entry from the typed op.
+ * Update an existing UNBOTTLED relay entry from the typed op, in place.
+ * Only price fields are patched, and only when their value changed. The relay
+ * row's own capability fields (sizes, aspect ratios, durations, passthrough
+ * params) describe what the cloud route supports and are never rewritten
+ * from the primary provider.
  */
 export function updateUnbottledEntry(
   content: string,
@@ -669,8 +676,6 @@ export function updateUnbottledEntry(
   if (!enumPrefix) {
     return { content, changed: false };
   }
-
-  const newEntry = buildUnbottledEntrySource(enumPrefix, op.enumKey, op);
 
   // Find and replace the existing UNBOTTLED block
   const blockStart = new RegExp(`\\[${enumPrefix}\\.${op.enumKey}\\]:\\s*\\{`);
@@ -736,28 +741,18 @@ export function updateUnbottledEntry(
     return { content, changed: false };
   }
 
-  // Expand to include leading whitespace and trailing comma+newline
-  let removeStart = unbottledStart;
-  while (
-    removeStart > 0 &&
-    (content[removeStart - 1] === " " || content[removeStart - 1] === "\n")
-  ) {
-    removeStart--;
-  }
-  let removeEnd = unbottledEnd;
-  if (content[removeEnd] === ",") {
-    removeEnd++;
-  }
-  if (content[removeEnd] === "\n") {
-    removeEnd++;
-  }
-
-  const updated = `${content.slice(0, removeStart)}\n${newEntry.trimEnd()}\n${content.slice(removeEnd)}`;
-
-  if (updated === content) {
+  const patched = patchRelayBlock(
+    content.slice(unbottledStart, unbottledEnd),
+    op,
+    buildUpdateComment(op.source),
+  );
+  if (!patched.changed) {
     return { content, changed: false };
   }
-  return { content: updated, changed: true };
+  return {
+    content: `${content.slice(0, unbottledStart)}${patched.block}${content.slice(unbottledEnd)}`,
+    changed: true,
+  };
 }
 
 /**
@@ -869,11 +864,11 @@ export class ModelPricesRepository {
   static async fetchProviderPrices(
     logger: EndpointLogger,
   ): Promise<ProviderPriceResult[]> {
-    return await Promise.all(
-      [...BASE_FETCHERS, UNBOTTLED_FETCHER].map((fetcher) =>
-        fetcher.fetch(logger),
-      ),
+    const base = await Promise.all(
+      BASE_FETCHERS.map((fetcher) => fetcher.fetch(logger)),
     );
+    // Relay rows are priced from this run's fresh primary prices.
+    return [...base, await UNBOTTLED_FETCHER.fetch(logger, base)];
   }
 
   static async fetchAndUpdate(
@@ -1028,6 +1023,7 @@ export class ModelPricesRepository {
           /[.*+?^${}()|[\]\\]/g,
           "\\$&",
         );
+        const skipRelayRows = update.provider !== ApiProvider.UNBOTTLED;
 
         // Token cost fields: insert if missing, update if present
         if (
@@ -1053,11 +1049,22 @@ export class ModelPricesRepository {
             const migrateRegex = new RegExp(
               `(providerModel:\\s*"${escaped}"[^}]*?)(creditCost:\\s*)[\\d.]+([,]?(?:\\s*//[^\n]*)?)`,
             );
-            if (migrateRegex.test(roleFileContents[role])) {
-              roleFileContents[role] = roleFileContents[role].replace(
-                migrateRegex,
-                "$1$2calculateCreditCost$3",
-              );
+            const before = roleFileContents[role];
+            const migrated = before.replace(
+              migrateRegex,
+              (
+                match: string,
+                prefix: string,
+                field: string,
+                tail: string,
+                offset: number,
+              ) =>
+                skipRelayRows && isRelayRowAt(before, offset)
+                  ? match
+                  : `${prefix}${field}calculateCreditCost${tail}`,
+            );
+            if (migrated !== before) {
+              roleFileContents[role] = migrated;
               updatedCount++;
             }
           }
@@ -1069,6 +1076,7 @@ export class ModelPricesRepository {
             update.value,
             update.source,
             insertAfter,
+            skipRelayRows,
           );
           if (result.changed) {
             roleFileContents[role] = result.content;
@@ -1084,6 +1092,7 @@ export class ModelPricesRepository {
           update.field,
           update.value,
           update.source,
+          skipRelayRows,
         );
         if (result.changed) {
           roleFileContents[role] = result.content;

@@ -26,6 +26,7 @@ import { Div } from "next-vibe/ui/components/div";
 import { Input } from "next-vibe/ui/components/input";
 import { Label } from "next-vibe/ui/components/label";
 import { Summary } from "next-vibe/ui/components/summary";
+import { P } from "next-vibe/ui/components/typography";
 import {
   useWidgetForm,
   useWidgetLocale,
@@ -50,12 +51,17 @@ function ReferenceInput({
   label,
   value,
   onChange,
+  requiredHint,
 }: {
   label: string;
   value?: string;
   onChange: (url: string) => void;
+  /** Shown while empty when the model cannot run without this image */
+  requiredHint?: string;
 }): JSX.Element {
   const id = useId();
+  const hintId = useId();
+  const showHint = !!requiredHint && !value?.trim();
   return (
     <Div className="flex flex-col gap-2">
       <Label htmlFor={id}>{label}</Label>
@@ -65,8 +71,15 @@ function ReferenceInput({
         placeholder="https://"
         value={value ?? ""}
         onChangeText={onChange}
+        required={!!requiredHint}
+        aria-describedby={showHint ? hintId : undefined}
         className="min-h-11"
       />
+      {showHint ? (
+        <P id={hintId} className="text-sm text-muted-foreground">
+          {requiredHint}
+        </P>
+      ) : null}
     </Div>
   );
 }
@@ -260,7 +273,10 @@ export function StudioVideo({
       models={models}
       model={model}
       cost={route ? videoClipCredits(route, seconds, resolution) : undefined}
-      ready={!!prompt.trim() && (!model?.requiresImage || frames.length > 0)}
+      ready={
+        !!prompt.trim() &&
+        (!model?.requiresImage || frames.some((f) => f.role === "first"))
+      }
       onModel={(value) => {
         const next = Object.values(VideoGenModelId).find((v) => v === value);
         if (!next) {
@@ -296,6 +312,7 @@ export function StudioVideo({
           label={t("reference")}
           value={frames.find((f) => f.role === "first")?.url}
           onChange={(url) => updateFrame("first", url)}
+          requiredHint={t("startImageRequired")}
         />
       ) : null}
       <Div className="grid grid-cols-3 gap-2 sm:gap-4">

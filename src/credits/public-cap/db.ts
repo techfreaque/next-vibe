@@ -105,6 +105,30 @@ export const publicCapEvents = pgTable(
   (t) => [index("public_cap_events_created_idx").on(t.createdAt)],
 );
 
+/**
+ * In-flight free-tier reservations. The pre-generation gate reserves the
+ * request's expected cost under one advisory lock, so parallel requests from
+ * one pool / lead / IP see each other before any spend is recorded. The first
+ * model-usage deduction of the pool releases its oldest reservation; a request
+ * that dies before billing frees its reservation at expiresAt.
+ */
+export const publicCapReservations = pgTable(
+  "public_cap_reservations",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    poolKey: text("pool_key").notNull(),
+    leadId: text("lead_id"),
+    ipHash: text("ip_hash"),
+    amount: numericNumber("amount").notNull(),
+    expiresAt: timestamp("expires_at").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (t) => [
+    index("public_cap_reservations_pool_idx").on(t.poolKey, t.createdAt),
+    index("public_cap_reservations_expires_idx").on(t.expiresAt),
+  ],
+);
+
 export const selectPublicCapSchema = createSelectSchema(publicFreeTierDailyCap);
 export const insertPublicCapSchema = createInsertSchema(publicFreeTierDailyCap);
 

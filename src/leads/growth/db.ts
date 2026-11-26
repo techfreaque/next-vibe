@@ -39,6 +39,8 @@ export const growthVisits = pgTable(
     source: text("source"),
     medium: text("medium"),
     campaign: text("campaign"),
+    /** utm_content of this arrival (outreach recipient / creative), sanitized */
+    content: text("content"),
     referrerHost: text("referrer_host"),
     refCode: text("ref_code"),
     /** Visitor country at this arrival (ISO 3166-1 alpha-2, "ZZ" unknown) */

@@ -53,6 +53,8 @@ export const translations: typeof enTranslations = {
   size: "Veľkosť",
   quality: "Kvalita",
   reference: "URL referenčného obrázka",
+  startImageRequired:
+    "Tento model animuje obrázok. Pridaj úvodný obrázok, aby si mohol generovať.",
   lastFrame: "URL poslednej snímky",
   creating: "Generuje sa · {{seconds}} s",
   submitImage: "Vytvoriť obrázok",

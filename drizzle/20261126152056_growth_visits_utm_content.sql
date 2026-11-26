@@ -1,0 +1,1 @@
+ALTER TABLE "growth_visits" ADD COLUMN "content" text;

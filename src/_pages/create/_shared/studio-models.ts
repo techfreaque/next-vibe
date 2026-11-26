@@ -11,7 +11,10 @@ import { getModelPrice } from "next-vibe/agent/models/models";
 import { musicGenModelOptions } from "next-vibe/agent/music-generation/models";
 import { sttModelOptions } from "next-vibe/agent/speech-to-text/models";
 import { ttsModelOptions } from "next-vibe/agent/text-to-speech/models";
-import { videoGenModelOptions } from "next-vibe/agent/video-generation/models";
+import {
+  videoGenModelOptions,
+  videoGenModelRequiresImage,
+} from "next-vibe/agent/video-generation/models";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 
 import {
@@ -82,7 +85,8 @@ export async function studioModelLists(
       rate,
       isTokenPriced,
       requiresImage:
-        entry.inputs.includes("image") && !entry.inputs.includes("text"),
+        (entry.inputs.includes("image") && !entry.inputs.includes("text")) ||
+        (kind === "video" && videoGenModelRequiresImage(entry.id)),
       providerRate:
         speech?.creditCostPerCharacter ?? stt?.creditCostPerSecond ?? 0,
       commercialUse: commercialUseFor(entry.id),

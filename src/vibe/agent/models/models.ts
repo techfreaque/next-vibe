@@ -236,6 +236,8 @@ export interface ModelProviderConfigVideoBased {
   pricingByResolution?: Partial<Record<string, number>>;
   /** Which frame image types are supported: "first_frame", "last_frame" */
   supportedFrameImages?: readonly string[];
+  /** Image-to-video only: the route animates a first frame and fails without one */
+  requiresFrameImage?: boolean;
   /** Whether this provider endpoint generates audio alongside video */
   generateAudio?: boolean;
   /** Exact pixel dimensions supported (e.g. ["1280x720", "1920x1080"]) */

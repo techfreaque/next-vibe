@@ -2,7 +2,7 @@ import "server-only";
 
 import { createHash } from "node:crypto";
 
-import { and, desc, eq, or, sql } from "drizzle-orm";
+import { and, desc, eq, gt, lt, or, sql } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translation";
 import {
@@ -17,6 +17,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 
 import {
   publicCapEvents,
+  publicCapReservations,
   publicCapSpenders,
   publicFreeTierDailyCap,
 } from "./db";
@@ -33,8 +34,14 @@ export type PublicCapEventKind =
   | "ip-cap"
   | "single-request"
   | "fail-closed"
+  | "pool-reserved"
   | "threshold-80"
   | "threshold-100";
+
+/** One advisory lock serializes every reserving gate (short critical section). */
+const RESERVATION_LOCK_KEY = 7_311_026;
+/** An unbilled request (provider error, abort) frees its reservation after this. */
+const RESERVATION_TTL_MS = 5 * 60 * 1000;
 
 export interface PublicCapAllowance {
   remaining: number;
@@ -47,6 +54,12 @@ export interface PublicCapGateParams {
   /** Expected cost of the request (model cost at default token estimate) */
   expectedCost: number;
   model: string;
+  /**
+   * Reserve `expectedCost` for this request (pre-generation model usage).
+   * `spendable` = the pool's free credits at validation time; live
+   * reservations of the same pool are subtracted from it.
+   */
+  reservation?: { poolKey: string; spendable?: number };
 }
 
 /**
@@ -361,6 +374,12 @@ export class PublicCapRepository {
    * Pre-generation gate for free-tier pools. Fails CLOSED on any error.
    * Rejects when: pool cap reached, expected cost alone exceeds what is left,
    * or this lead / IP has used its daily sub-cap (suspected abuse, logged).
+   *
+   * With `reservation`, the check and a reservation of `expectedCost` happen
+   * atomically under one advisory lock, counting every live reservation: N
+   * parallel requests from one pool / lead / IP can no longer all pass against
+   * the same remaining allowance. The pool's next model-usage deduction
+   * releases it (settleSpend); an unbilled request's reservation expires.
    */
   static async gate(
     params: PublicCapGateParams,
@@ -368,7 +387,7 @@ export class PublicCapRepository {
     locale: CountryLanguage,
   ): Promise<ResponseType<PublicCapAllowance>> {
     const { t } = scopedTranslation.scopedT(locale);
-    const { leadId, ipAddress, expectedCost, model } = params;
+    const { leadId, ipAddress, expectedCost, model, reservation } = params;
     const ipHash = ipAddress
       ? PublicCapRepository.hashIp(ipAddress)
       : undefined;
@@ -380,123 +399,196 @@ export class PublicCapRepository {
         .set({ spendToday: 0, lastResetAt: new Date(), updatedAt: new Date() })
         .where(sql`${publicFreeTierDailyCap.lastResetAt} < ${startOfToday}`);
 
-      const [stored] = await db.select().from(publicFreeTierDailyCap).limit(1);
-      const rowResult = stored
-        ? success(stored)
-        : await this.getOrCreateRow(logger, t);
-      if (!rowResult.success) {
-        return fail({
-          message: t("repository.capUnavailable"),
-          errorType: ErrorResponseTypes.PAYMENT_REQUIRED,
-        });
-      }
-      const row = rowResult.data;
-
-      const base = {
-        leadId,
-        ipHash,
-        model,
-        cost: expectedCost,
-        spendToday: row.spendToday,
-        capAmount: row.capAmount,
-      };
-
-      if (row.spendToday >= row.capAmount) {
-        await PublicCapRepository.recordEvent(
-          { kind: "global-cap", ...base },
-          logger,
-        );
-        return fail({
-          message: t("repository.capExceeded"),
-          errorType: ErrorResponseTypes.PAYMENT_REQUIRED,
-        });
-      }
-
-      // Single-request clamp: one generation must not blow the remaining pool.
-      if (expectedCost > row.capAmount - row.spendToday) {
-        await PublicCapRepository.recordEvent(
-          { kind: "single-request", ...base },
-          logger,
-        );
-        return fail({
-          message: t("repository.capExceeded"),
-          errorType: ErrorResponseTypes.PAYMENT_REQUIRED,
-        });
+      const [existing] = await db
+        .select({ id: publicFreeTierDailyCap.id })
+        .from(publicFreeTierDailyCap)
+        .limit(1);
+      if (!existing) {
+        const created = await this.getOrCreateRow(logger, t);
+        if (!created.success) {
+          return fail({
+            message: t("repository.capUnavailable"),
+            errorType: ErrorResponseTypes.PAYMENT_REQUIRED,
+          });
+        }
       }
 
       const day = PublicCapRepository.todayString();
-      const spenders = await db
-        .select()
-        .from(publicCapSpenders)
-        .where(
-          and(
-            eq(publicCapSpenders.day, day),
-            or(
-              leadId
-                ? and(
-                    eq(publicCapSpenders.kind, "lead"),
-                    eq(publicCapSpenders.key, leadId),
-                  )
-                : undefined,
-              ipHash
-                ? and(
-                    eq(publicCapSpenders.kind, "ip"),
-                    eq(publicCapSpenders.key, ipHash),
-                  )
-                : undefined,
+      const now = new Date();
+      // Events are written after the transaction: never a second connection
+      // while the advisory lock is held.
+      const outcome = await db.transaction(async (tx) => {
+        if (reservation) {
+          await tx.execute(
+            sql`SELECT pg_advisory_xact_lock(${RESERVATION_LOCK_KEY})`,
+          );
+        }
+        const [row] = await tx.select().from(publicFreeTierDailyCap).limit(1);
+        if (!row) {
+          return { ok: false as const, refusal: "capUnavailable" as const };
+        }
+
+        const spenders = await tx
+          .select()
+          .from(publicCapSpenders)
+          .where(
+            and(
+              eq(publicCapSpenders.day, day),
+              or(
+                leadId
+                  ? and(
+                      eq(publicCapSpenders.kind, "lead"),
+                      eq(publicCapSpenders.key, leadId),
+                    )
+                  : undefined,
+                ipHash
+                  ? and(
+                      eq(publicCapSpenders.kind, "ip"),
+                      eq(publicCapSpenders.key, ipHash),
+                    )
+                  : undefined,
+              ),
             ),
-          ),
-        );
-      const leadSpend =
-        spenders.find((s) => s.kind === "lead" && s.key === leadId)?.spend ?? 0;
-      const ipSpend =
-        spenders.find((s) => s.kind === "ip" && s.key === ipHash)?.spend ?? 0;
+          );
+        const leadSpend =
+          spenders.find((s) => s.kind === "lead" && s.key === leadId)?.spend ??
+          0;
+        const ipSpend =
+          spenders.find((s) => s.kind === "ip" && s.key === ipHash)?.spend ?? 0;
 
-      if (leadId && leadSpend + expectedCost > row.perLeadCap) {
-        // spendToday/capAmount are the shared pool; name the lead's own
-        // spend and sub-cap, or the refusal looks like a bug.
-        await PublicCapRepository.recordEvent(
-          {
-            kind: "lead-cap",
-            ...base,
-            subCapSpend: leadSpend,
-            subCap: row.perLeadCap,
-          },
-          logger,
+        // Live reservations of requests still in flight (zero without reservation).
+        const [held] = reservation
+          ? await tx
+              .select({
+                all: sql<string>`coalesce(sum(${publicCapReservations.amount}), 0)`,
+                pool: sql<string>`coalesce(sum(${publicCapReservations.amount}) FILTER (WHERE ${publicCapReservations.poolKey} = ${reservation.poolKey}), 0)`,
+                lead: leadId
+                  ? sql<string>`coalesce(sum(${publicCapReservations.amount}) FILTER (WHERE ${publicCapReservations.leadId} = ${leadId}), 0)`
+                  : sql<string>`0`,
+                ip: ipHash
+                  ? sql<string>`coalesce(sum(${publicCapReservations.amount}) FILTER (WHERE ${publicCapReservations.ipHash} = ${ipHash}), 0)`
+                  : sql<string>`0`,
+              })
+              .from(publicCapReservations)
+              .where(gt(publicCapReservations.expiresAt, now))
+          : [undefined];
+        const reserved = {
+          all: Number(held?.all ?? 0),
+          pool: Number(held?.pool ?? 0),
+          lead: Number(held?.lead ?? 0),
+          ip: Number(held?.ip ?? 0),
+        };
+
+        const spendToday = row.spendToday + reserved.all;
+        const base = {
+          leadId,
+          ipHash,
+          model,
+          cost: expectedCost,
+          spendToday,
+          capAmount: row.capAmount,
+        };
+
+        if (spendToday >= row.capAmount) {
+          return {
+            ok: false as const,
+            refusal: "capExceeded" as const,
+            event: { kind: "global-cap" as const, ...base },
+          };
+        }
+        // Single-request clamp: one generation must not blow the remaining pool.
+        if (expectedCost > row.capAmount - spendToday) {
+          return {
+            ok: false as const,
+            refusal: "capExceeded" as const,
+            event: { kind: "single-request" as const, ...base },
+          };
+        }
+        const leadUsed = leadSpend + reserved.lead;
+        if (leadId && leadUsed + expectedCost > row.perLeadCap) {
+          // spendToday/capAmount are the shared pool; name the lead's own
+          // spend and sub-cap, or the refusal looks like a bug.
+          return {
+            ok: false as const,
+            refusal: "leadCapExceeded" as const,
+            event: {
+              kind: "lead-cap" as const,
+              ...base,
+              subCapSpend: leadUsed,
+              subCap: row.perLeadCap,
+            },
+          };
+        }
+        const ipUsed = ipSpend + reserved.ip;
+        if (ipHash && ipUsed + expectedCost > row.perIpCap) {
+          return {
+            ok: false as const,
+            refusal: "leadCapExceeded" as const,
+            event: {
+              kind: "ip-cap" as const,
+              ...base,
+              subCapSpend: ipUsed,
+              subCap: row.perIpCap,
+            },
+          };
+        }
+        const walletLeft =
+          reservation?.spendable === undefined
+            ? undefined
+            : reservation.spendable - reserved.pool;
+        if (walletLeft !== undefined && expectedCost > walletLeft) {
+          return {
+            ok: false as const,
+            refusal: "reservedByRunningReply" as const,
+            event: {
+              kind: "pool-reserved" as const,
+              ...base,
+              subCapSpend: reserved.pool,
+              subCap: reservation?.spendable,
+            },
+          };
+        }
+
+        if (reservation) {
+          await tx.insert(publicCapReservations).values({
+            poolKey: reservation.poolKey,
+            leadId: leadId ?? null,
+            ipHash: ipHash ?? null,
+            amount: expectedCost,
+            expiresAt: new Date(now.getTime() + RESERVATION_TTL_MS),
+          });
+        }
+
+        const poolRemaining = row.capAmount - spendToday;
+        const capRemaining = Math.min(
+          poolRemaining,
+          leadId ? row.perLeadCap - leadUsed : poolRemaining,
+          ipHash ? row.perIpCap - ipUsed : poolRemaining,
         );
+        return {
+          ok: true as const,
+          remaining:
+            walletLeft === undefined
+              ? capRemaining
+              : Math.min(capRemaining, walletLeft),
+          limitedByPool: capRemaining === poolRemaining,
+        };
+      });
+
+      if (!outcome.ok) {
+        if (outcome.event) {
+          await PublicCapRepository.recordEvent(outcome.event, logger);
+        }
         return fail({
-          message: t("repository.leadCapExceeded"),
+          message: t(`repository.${outcome.refusal}`),
           errorType: ErrorResponseTypes.PAYMENT_REQUIRED,
         });
       }
-      if (ipHash && ipSpend + expectedCost > row.perIpCap) {
-        await PublicCapRepository.recordEvent(
-          {
-            kind: "ip-cap",
-            ...base,
-            subCapSpend: ipSpend,
-            subCap: row.perIpCap,
-          },
-          logger,
-        );
-        return fail({
-          message: t("repository.leadCapExceeded"),
-          errorType: ErrorResponseTypes.PAYMENT_REQUIRED,
-        });
-      }
-
-      const poolRemaining = row.capAmount - row.spendToday;
-      const remaining = Math.min(
-        poolRemaining,
-        leadId ? row.perLeadCap - leadSpend : poolRemaining,
-        ipHash ? row.perIpCap - ipSpend : poolRemaining,
-      );
       return success({
-        remaining,
-        limitMessage:
-          remaining === poolRemaining
-            ? t("repository.capExceeded")
-            : t("repository.leadCapExceeded"),
+        remaining: outcome.remaining,
+        limitMessage: outcome.limitedByPool
+          ? t("repository.capExceeded")
+          : t("repository.leadCapExceeded"),
       });
     } catch (error) {
       // FAIL CLOSED: never allow unbounded free spend because the cap is unreadable.
@@ -509,6 +601,43 @@ export class PublicCapRepository {
         message: t("repository.capUnavailable"),
         errorType: ErrorResponseTypes.PAYMENT_REQUIRED,
       });
+    }
+  }
+
+  /**
+   * Free model usage was billed for `poolKey`: record the spend, then release
+   * the pool's oldest live reservation (and drop expired ones). Never throws.
+   */
+  static async settleSpend(
+    amount: number,
+    logger: EndpointLogger,
+    who: { leadId?: string; ipAddress?: string; poolKey?: string },
+  ): Promise<void> {
+    if (amount > 0) {
+      await PublicCapRepository.incrementSpend(amount, logger, who);
+    }
+    if (!who.poolKey) {
+      return;
+    }
+    try {
+      const now = new Date();
+      await db
+        .delete(publicCapReservations)
+        .where(
+          or(
+            lt(publicCapReservations.expiresAt, now),
+            eq(
+              publicCapReservations.id,
+              sql`(SELECT ${publicCapReservations.id} FROM ${publicCapReservations} WHERE ${publicCapReservations.poolKey} = ${who.poolKey} AND ${publicCapReservations.expiresAt} >= ${now} ORDER BY ${publicCapReservations.createdAt} LIMIT 1)`,
+            ),
+          ),
+        );
+    } catch (error) {
+      logger.error(
+        "[PublicCap] failed to release free-tier reservation",
+        parseError(error),
+        { poolKey: who.poolKey },
+      );
     }
   }
 }

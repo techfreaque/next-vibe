@@ -54,6 +54,8 @@ export const translations: typeof enTranslations = {
   size: "Dimensione",
   quality: "Qualità",
   reference: "Immagine di riferimento URL",
+  startImageRequired:
+    "Questo modello anima un'immagine. Aggiungi un'immagine iniziale per generare.",
   lastFrame: "Ultimo frame URL",
   creating: "Generazione · {{seconds}} s",
   submitImage: "Generare l'immagine",

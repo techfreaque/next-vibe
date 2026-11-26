@@ -142,6 +142,8 @@ export class CreditValidatorHandler {
 
     // Public free-tier daily cap: hard gate BEFORE generation. PAYMENT_REQUIRED
     // routes into the same out-of-credits conversion card as an empty wallet.
+    // Free pools also reserve modelCost here, atomically: parallel turns of
+    // one guest / IP pool cannot all pass against the same allowance.
     const capGate = await CreditRepository.gateFreeTierCap(
       user,
       ipAddress,
@@ -150,6 +152,7 @@ export class CreditValidatorHandler {
       logger,
       creditsT,
       locale,
+      eligible.data,
     );
     if (!capGate.success) {
       logger.info("[AiStream] Daily free-tier gate refused generation", {

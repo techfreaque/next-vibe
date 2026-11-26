@@ -143,6 +143,8 @@ export const translations: typeof enTranslations = {
       storageFailed:
         "Wideo powstało, ale nie udało się go zapisać. Nie pobrano kredytów. Spróbuj ponownie.",
       creditsFailed: "Nie udało się odjąć kredytów za generowanie wideo",
+      imageRequiredForModel:
+        "{{model}} animuje obraz. Dodaj obraz startowy i wygeneruj ponownie.",
       inputMediaRequired:
         "Ten model wymaga URL obrazu wejściowego. Wklej link do obrazu, który chcesz animować.",
       imageInputUnsupported:

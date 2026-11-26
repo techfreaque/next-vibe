@@ -50,6 +50,8 @@ export const translations = {
   size: "Size",
   quality: "Quality",
   reference: "Reference image URL",
+  startImageRequired:
+    "This model animates an image. Add a start image to generate.",
   lastFrame: "Last frame URL",
   creating: "Generating · {{seconds}} s",
   submitImage: "Generate image",

@@ -156,6 +156,8 @@ export const translations: typeof enTranslations = {
       "La quota gratuita rimasta per oggi non basta per questa richiesta. Riprova domani o usa crediti a pagamento.",
     leadCapExceeded:
       "Questa richiesta supera il tuo limite gratuito di oggi. Riprova domani o usa crediti a pagamento.",
+    reservedByRunningReply:
+      "I tuoi crediti gratuiti coprono ancora una risposta in corso. Aspetta che finisca, poi invia di nuovo.",
     capUnavailable:
       "I crediti gratuiti sono temporaneamente indisponibili. Riprova più tardi.",
     getCapFailed:
