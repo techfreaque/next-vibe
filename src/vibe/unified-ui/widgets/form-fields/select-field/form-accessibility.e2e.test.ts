@@ -2,15 +2,21 @@ import { endpointToUrlSegment } from "next-vibe/core/core-utils/path";
 import { ExportFormat } from "next-vibe/identity/lead/enum";
 import { E2E_LOCALE } from "next-vibe/tooling/testing/e2e/config";
 import { useE2E } from "next-vibe/tooling/testing/e2e/harness";
+import { resolveTestAdminUser } from "next-vibe/tooling/testing/testing-suite/resolve-test-user";
 import type { Locator } from "playwright";
 import { describe, expect } from "vitest";
 
 import { scopedTranslation as reportsTranslation } from "@/chart-of-accounts/i18n";
-import { prepareAtlasCompany } from "@/chart-of-accounts/tests/atlas-workflow-fixture";
+import {
+  authAtlas,
+  prepareAtlasCompany,
+} from "@/chart-of-accounts/tests/atlas-workflow-fixture";
 import leadCreateDefinition from "@/leads/create/definition";
 import { scopedTranslation as leadCreateTranslation } from "@/leads/create/i18n";
 import exportDefinition from "@/leads/export/definition";
 import { scopedTranslation as exportTranslation } from "@/leads/export/i18n";
+import taxRateCreateDefinition from "@/tax/rate/create/definition";
+import { scopedTranslation as taxTranslation } from "@/tax/i18n";
 
 async function labelTarget(control: Locator): Promise<string> {
   const { id, label, count } = await control.evaluate((node) => {
@@ -58,6 +64,27 @@ describe("Accessible administration form fields", () => {
       await page.waitForFunction(
         (id) => document.activeElement?.id === id,
         await labelTarget(source),
+      );
+    },
+  );
+
+  e2e.it(
+    "focuses the company picker when tax-rate creation is blocked",
+    async (fixtures) => {
+      await authAtlas(fixtures, await resolveTestAdminUser());
+      const { page } = fixtures;
+      const { t } = taxTranslation.scopedT(E2E_LOCALE);
+      const company = page.locator('button[name="companyId"]');
+      await fixtures.open(taxRateCreateDefinition.POST, {
+        ready: () => company.waitFor(),
+      });
+      await page
+        .getByRole("button", { name: t("rate.create.widget.save"), exact: true })
+        .click();
+      await company.and(page.locator('[aria-invalid="true"]')).waitFor();
+      await page.waitForFunction(
+        (id) => document.activeElement?.id === id,
+        await labelTarget(company),
       );
     },
   );

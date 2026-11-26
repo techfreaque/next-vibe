@@ -83,7 +83,7 @@ const { POST } = createEndpoint({
         description: "roles.post.id.description" as const,
         placeholder: "roles.post.id.placeholder" as const,
         columns: 12,
-        schema: z.string().uuid("usersErrors.validation.id.invalid"),
+        schema: z.uuid(),
       }),
 
       // === REQUEST BODY ===
@@ -238,7 +238,7 @@ const { DELETE } = createEndpoint({
         description: "roles.delete.id.description" as const,
         placeholder: "roles.delete.id.placeholder" as const,
         columns: 12,
-        schema: z.uuid("usersErrors.validation.id.invalid"),
+        schema: z.uuid(),
       }),
 
       // === REQUEST BODY ===
