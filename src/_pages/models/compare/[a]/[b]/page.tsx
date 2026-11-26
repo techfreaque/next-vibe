@@ -9,7 +9,10 @@
 import type { Metadata } from "next";
 import { getEnvAvailability } from "next-vibe/agent/env-availability";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
+import {
+  metadataGenerator,
+  NOINDEX_FOLLOW_ROBOTS,
+} from "next-vibe/core/i18n/core/metadata";
 import { JsonLd, type JsonLdNode } from "next-vibe/ui/components/json-ld";
 import { notFound } from "next-vibe/ui/lib/not-found";
 import type { JSX } from "react";
@@ -23,6 +26,7 @@ import type {
 import {
   buildComparePickers,
   canonicalComparisonPath,
+  isIndexableComparison,
   type ModelFacts,
 } from "../../../_shared/model-facts";
 import {
@@ -59,14 +63,18 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
   const meta = compareMeta(pair.left, pair.right, locale);
   const path = canonicalComparisonPath(pair.left, pair.right);
+  const indexable = isIndexableComparison(pair.left, pair.right);
   return metadataGenerator(locale, {
     path: path.slice(1),
-    generateAlternates: path === `/models/compare/${a}/${b}`,
+    generateAlternates: indexable && path === `/models/compare/${a}/${b}`,
     title: meta.title,
     category: t("meta.category"),
     description: meta.description,
     imageAlt: t("meta.compare.imageAlt", vars),
     keywords: [t("meta.compare.keywords", vars)],
+    additionalMetadata: indexable
+      ? undefined
+      : { robots: NOINDEX_FOLLOW_ROBOTS },
   });
 }
 

@@ -9,6 +9,7 @@ import {
 
 import {
   canonicalComparisonPath,
+  isIndexableComparison,
   listModelFacts,
 } from "../../models/_shared/model-facts";
 import { listMediaFacts } from "../../models/_shared/model-media-facts";
@@ -109,9 +110,7 @@ describe("sitemap.xml", () => {
     const response = await rootRoute.GET();
     expect(response.status).toBe(200);
     const xml = await response.text();
-    const modelLocs = locs(xml).filter(
-      (url) => url.includes("/models/") && !url.endsWith("/models/changelog"),
-    );
+    const modelLocs = locs(xml).filter((url) => url.includes("/models/"));
     const skillLocs = locs(xml).filter((url) => url.includes("/skill/"));
     expect(skillLocs.length).toBeGreaterThan(0);
     if (listModelFacts(availability).length > 0) {
@@ -153,9 +152,25 @@ describe("sitemap.xml", () => {
         expect.unreachable("sitemap compares unavailable models");
       }
       expect(left.id).not.toBe(right.id);
+      expect(isIndexableComparison(left, right)).toBe(true);
       const path = canonicalComparisonPath(left, right);
       expect(path).toBe(canonicalComparisonPath(right, left));
       expect(url).toBe(`${BASE}/${locale}${path}`);
+    }
+    // Every legacy model with an available successor has its upgrade comparison
+    // in the sitemap (real "old vs new" search queries).
+    const legacyWithSuccessor = listModelFacts(ALL).filter(
+      (facts) => facts.isLegacy && facts.successor !== null,
+    );
+    expect(legacyWithSuccessor.length).toBeGreaterThan(0);
+    for (const legacy of legacyWithSuccessor) {
+      if (!legacy.successor) {
+        continue;
+      }
+      const upgradePath = canonicalComparisonPath(legacy, legacy.successor);
+      for (const locale of SEO_LOCALES) {
+        expect(urls.has(`${BASE}/${locale}${upgradePath}`)).toBe(true);
+      }
     }
     for (const block of xml.matchAll(/<url>([\s\S]*?)<\/url>/g)) {
       const page = block[1] ?? "";

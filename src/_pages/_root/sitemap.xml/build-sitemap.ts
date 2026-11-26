@@ -133,6 +133,13 @@ export function collectSitemapEntries(
   }
   for (const facts of models) {
     if (facts.isLegacy) {
+      if (facts.successor !== null) {
+        const path = canonicalComparisonPath(facts, facts.successor);
+        if (!seenPairs.has(path)) {
+          seenPairs.add(path);
+          entries.push({ path, lastmod: null });
+        }
+      }
       continue;
     }
     for (const other of suggestComparisons(

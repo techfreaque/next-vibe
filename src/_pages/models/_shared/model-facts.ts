@@ -515,6 +515,34 @@ export function canonicalComparisonPath(
     : `/models/compare/${right.slug}/${left.slug}`;
 }
 
+/** True when a pair compares a legacy model directly against its current successor. */
+export function isLegacyUpgradeComparison(
+  left: Pick<ModelFacts, "id" | "isLegacy" | "successor">,
+  right: Pick<ModelFacts, "id" | "isLegacy" | "successor">,
+): boolean {
+  return (
+    (left.isLegacy && !right.isLegacy && left.successor?.id === right.id) ||
+    (right.isLegacy && !left.isLegacy && right.successor?.id === left.id)
+  );
+}
+
+/**
+ * True when a comparison page should be indexed (and eligible for the sitemap):
+ * - two current models, OR
+ * - a legacy model compared directly against its current successor ("old vs new" upgrade query).
+ * Legacy-vs-unrelated and legacy-vs-legacy pairs stay reachable for users and
+ * link-followable, but carry noindex, follow to avoid programmatic index bloat.
+ */
+export function isIndexableComparison(
+  left: Pick<ModelFacts, "id" | "isLegacy" | "successor">,
+  right: Pick<ModelFacts, "id" | "isLegacy" | "successor">,
+): boolean {
+  return (
+    (!left.isLegacy && !right.isLegacy) ||
+    isLegacyUpgradeComparison(left, right)
+  );
+}
+
 /** Featured partners of a model, in pair order, public text models only. */
 function featuredComparisons(
   facts: ModelFacts,

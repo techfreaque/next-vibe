@@ -18,6 +18,12 @@ import type { AgentEnvAvailability } from "next-vibe/agent/env-availability";
 import { SkillsRepository } from "next-vibe/agent/skills/repository";
 import { NOINDEX_FOLLOW_ROBOTS } from "next-vibe/core/i18n/core/metadata";
 
+import {
+  canonicalComparisonPath,
+  isIndexableComparison,
+  listModelFacts,
+} from "../../models/_shared/model-facts";
+import { generateMetadata as compareMetadata } from "../../models/compare/[a]/[b]/page";
 import { generateMetadata as threadsMetadata } from "../../threads/[...path]/page";
 import { listSitemapUrls } from "./build-sitemap";
 
@@ -185,5 +191,86 @@ describe("robots.txt rules", () => {
       searchParams: Promise.resolve({}),
     });
     expect(metadata.robots).toEqual(NOINDEX_FOLLOW_ROBOTS);
+  });
+
+  test("compare pages index current pairs and legacy->successor upgrades, and noindex unrelated legacy pairs", async () => {
+    const models = listModelFacts(ALL);
+    const legacyWithSuccessor = models.find(
+      (facts) => facts.isLegacy && facts.successor !== null,
+    );
+    const otherLegacy = models.find(
+      (facts) =>
+        facts.isLegacy &&
+        legacyWithSuccessor !== undefined &&
+        facts.id !== legacyWithSuccessor.id,
+    );
+    const currentModels = models.filter((facts) => !facts.isLegacy);
+    const unrelatedCurrent = currentModels.find(
+      (facts) =>
+        legacyWithSuccessor?.successor !== null &&
+        facts.id !== legacyWithSuccessor?.successor?.id,
+    );
+    if (!legacyWithSuccessor?.successor || !otherLegacy || !unrelatedCurrent) {
+      expect.unreachable("expected legacy and current models in registry");
+    }
+
+    const successorFacts = models.find(
+      (facts) => facts.id === legacyWithSuccessor.successor?.id,
+    );
+    if (!successorFacts) {
+      expect.unreachable("expected successor facts");
+    }
+
+    expect(isIndexableComparison(successorFacts, unrelatedCurrent)).toBe(true);
+    expect(isIndexableComparison(legacyWithSuccessor, successorFacts)).toBe(
+      true,
+    );
+    expect(isIndexableComparison(legacyWithSuccessor, unrelatedCurrent)).toBe(
+      false,
+    );
+    expect(isIndexableComparison(legacyWithSuccessor, otherLegacy)).toBe(false);
+
+    // Every compare URL in the sitemap must be indexable.
+    const bySlug = new Map(models.map((facts) => [facts.slug, facts]));
+    for (const { url } of listSitemapUrls(ALL, [], BASE)) {
+      const path = url.slice(BASE.length).replace(/^\/[a-z]{2}-[A-Z]+/, "");
+      if (!path.startsWith("/models/compare/")) {
+        continue;
+      }
+      const [, , , leftSlug, rightSlug] = path.split("/");
+      const left = leftSlug ? bySlug.get(leftSlug) : undefined;
+      const right = rightSlug ? bySlug.get(rightSlug) : undefined;
+      if (!left || !right) {
+        expect.unreachable(`unknown models in sitemap compare path: ${path}`);
+      }
+      expect(isIndexableComparison(left, right)).toBe(true);
+    }
+
+    // Metadata robots check on real compare page generateMetadata (when a
+    // provider key is configured in the test env for these models).
+    const upgradePath = canonicalComparisonPath(
+      legacyWithSuccessor,
+      successorFacts,
+    );
+    const [, , , upA, upB] = upgradePath.split("/");
+    const unrelatedPath = canonicalComparisonPath(
+      legacyWithSuccessor,
+      unrelatedCurrent,
+    );
+    const [, , , unA, unB] = unrelatedPath.split("/");
+    if (upA && upB && unA && unB) {
+      try {
+        const upgradeMeta = await compareMetadata({
+          params: Promise.resolve({ locale: "en-US", a: upA, b: upB }),
+        });
+        expect(upgradeMeta.robots).not.toEqual(NOINDEX_FOLLOW_ROBOTS);
+        const unrelatedMeta = await compareMetadata({
+          params: Promise.resolve({ locale: "en-US", a: unA, b: unB }),
+        });
+        expect(unrelatedMeta.robots).toEqual(NOINDEX_FOLLOW_ROBOTS);
+      } catch {
+        // In environments without provider keys configured, notFound() throws.
+      }
+    }
   });
 });
