@@ -31807,7 +31807,7 @@
         "contentLevel": {
           "type": "form_field",
           "fieldType": "select",
-          "label": "Content Level",
+          "label": "Content level",
           "description": "Filter by content policy. Mainstream = standard safety filters. Open = fewer restrictions. Uncensored = no filters.",
           "placeholder": "All content levels",
           "options": [
@@ -33582,8 +33582,6 @@
     "titleShort": "Model Stats",
     "description": "One model's refusal, hedge and answer rates across all current questions, plus approved sample answers.",
     "fields": {
-      "type": "container",
-      "layoutType": "stacked",
       "usage": {
         "request": "urlPathParams",
         "response": true
@@ -34357,6 +34355,7 @@
           }
         }
       },
+      "type": "custom-widget",
       "schemaType": "object"
     },
     "executionMode": "via-execute-route",

@@ -33582,8 +33582,6 @@
     "titleShort": "Štatistika modelu",
     "description": "Podiel priamych odpovedí, vyhýbavých odpovedí a odmietnutí pri všetkých aktuálnych otázkach pre jeden model. Súčasťou sú aj schválené ukážky odpovedí.",
     "fields": {
-      "type": "container",
-      "layoutType": "stacked",
       "usage": {
         "request": "urlPathParams",
         "response": true
@@ -34357,6 +34355,7 @@
           }
         }
       },
+      "type": "custom-widget",
       "schemaType": "object"
     },
     "executionMode": "via-execute-route",

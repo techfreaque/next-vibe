@@ -51666,8 +51666,8 @@
         "companyId": {
           "type": "form_field",
           "fieldType": "entity_picker",
-          "label": "ID de l'entreprise",
-          "description": "L'entreprise à laquelle ajouter le compte",
+          "label": "Entreprise",
+          "description": "Le plan comptable de cette entreprise reçoit le compte",
           "columns": 12,
           "schema": {
             "def": {
@@ -52033,7 +52033,7 @@
         },
         "id": {
           "type": "text",
-          "label": "ID du compte",
+          "label": "Compte",
           "schema": {
             "def": {
               "type": "string"
@@ -133659,7 +133659,7 @@
     "toolName": "leads_id_DELETE",
     "title": "Supprimer le lead",
     "titleShort": "Supprimer le lead",
-    "description": "Supprimer un lead du système",
+    "description": "Supprime définitivement ce lead et son parcours. Action irréversible.",
     "fields": {
       "type": "container",
       "layoutType": "stacked",
@@ -133669,15 +133669,6 @@
         "request": "urlPathParams"
       },
       "children": {
-        "title": {
-          "schemaType": "widget",
-          "type": "title",
-          "level": 5,
-          "label": "Voulez-vous vraiment supprimer définitivement ce lead ?",
-          "usage": {
-            "request": "urlPathParams"
-          }
-        },
         "id": {
           "type": "form_field",
           "fieldType": "entity_picker",
@@ -133706,7 +133697,7 @@
             "request": "urlPathParams"
           },
           "type": "navigate_button",
-          "label": "Retour au lead",
+          "label": "Annuler",
           "icon": "arrow-left",
           "variant": "outline",
           "prefillFromGet": false,
@@ -186475,7 +186466,7 @@
   {
     "toolName": "leads-list",
     "title": "Leads",
-    "titleShort": "Liste des leads",
+    "titleShort": "Tous les leads",
     "description": "Récupérer une liste paginée de leads avec filtres",
     "fields": {
       "usage": {
@@ -196367,7 +196358,7 @@
   {
     "toolName": "leads-search",
     "title": "Rechercher des leads",
-    "titleShort": "Rechercher des leads",
+    "titleShort": "Trouver par e-mail ou nom",
     "description": "Rechercher des leads avec filtres et pagination",
     "fields": {
       "usage": {
@@ -361535,18 +361526,10 @@
           "schema": {
             "def": {
               "type": "string",
-              "checks": [
-                {
-                  "def": {
-                    "type": "string",
-                    "format": "uuid",
-                    "check": "string_format",
-                    "abort": false,
-                    "pattern": {}
-                  },
-                  "type": "string"
-                }
-              ]
+              "format": "uuid",
+              "check": "string_format",
+              "abort": false,
+              "pattern": {}
             },
             "type": "string"
           },
@@ -421575,8 +421558,6 @@
     "titleShort": "Stats du modèle",
     "description": "Les taux de refus, d'esquive et de réponse d'un modèle sur toutes les questions actuelles, plus des exemples de réponses approuvés.",
     "fields": {
-      "type": "container",
-      "layoutType": "stacked",
       "usage": {
         "request": "urlPathParams",
         "response": true
@@ -422350,6 +422331,7 @@
           }
         }
       },
+      "type": "custom-widget",
       "schemaType": "object"
     },
     "executionMode": "via-execute-route",
@@ -679491,7 +679473,7 @@
           "type": "form_field",
           "fieldType": "entity_picker",
           "labelField": "name",
-          "label": "ID d'instance",
+          "label": "Connexion",
           "description": "L'instance de connexion à afficher",
           "schema": {
             "def": {
@@ -679809,7 +679791,7 @@
           "type": "form_field",
           "fieldType": "entity_picker",
           "labelField": "name",
-          "label": "ID d'instance",
+          "label": "Connexion",
           "description": "L'instance de connexion à afficher",
           "schema": {
             "def": {
@@ -680564,7 +680546,7 @@
           "type": "form_field",
           "fieldType": "entity_picker",
           "labelField": "name",
-          "label": "ID d'instance",
+          "label": "Connexion",
           "description": "L'instance de connexion à afficher",
           "schema": {
             "def": {
@@ -680618,7 +680600,7 @@
         "instanceId": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "ID d'instance",
+          "label": "Nom de l'instance",
           "description": "L'identifiant unique de l'instance locale",
           "placeholder": "hermes",
           "columns": 6,
@@ -681847,7 +681829,7 @@
         "auditConnection": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "ID de connexion pour le journal",
+          "label": "Connexion",
           "description": "Filtrer le journal sur une connexion.",
           "hidden": true,
           "schema": {
@@ -684110,8 +684092,8 @@
         "newInstanceId": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Nouvel ID d'instance",
-          "description": "Le nouvel identifiant de cette instance",
+          "label": "Nouveau nom de l'instance",
+          "description": "Les instances connectées voient ce serveur sous ce nom. Unique, 32 caractères maximum.",
           "placeholder": "hermes",
           "columns": 12,
           "schema": {
@@ -684129,8 +684111,8 @@
         "propagate": {
           "type": "form_field",
           "fieldType": "boolean",
-          "label": "Nouvel ID d'instance",
-          "description": "Le nouvel identifiant de cette instance",
+          "label": "Nouveau nom de l'instance",
+          "description": "Les instances connectées voient ce serveur sous ce nom. Unique, 32 caractères maximum.",
           "hidden": true,
           "schema": {
             "def": {
@@ -684159,7 +684141,7 @@
           "schemaType": "widget",
           "type": "submit_button",
           "text": "patch.title",
-          "loadingText": "patch.title",
+          "loadingText": "patch.renaming",
           "icon": "pencil",
           "variant": "default",
           "size": "default",

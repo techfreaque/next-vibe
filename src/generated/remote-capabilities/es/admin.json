@@ -51586,7 +51586,7 @@
         "sortOrder": {
           "type": "form_field",
           "fieldType": "number",
-          "label": "Ordenar orden",
+          "label": "Orden",
           "description": "Orden de visualización dentro del grupo padre. los números inferiores aparecen primero",
           "placeholder": "por ejemplo 10",
           "columns": 6,
@@ -51660,8 +51660,8 @@
         "companyId": {
           "type": "form_field",
           "fieldType": "entity_picker",
-          "label": "Company ID",
-          "description": "La empresa para añadir la cuenta a",
+          "label": "Empresa",
+          "description": "El plan de cuentas de esta empresa recibe la cuenta",
           "columns": 12,
           "schema": {
             "def": {
@@ -51690,7 +51690,7 @@
         "code": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Código de Cuenta",
+          "label": "Código de cuenta",
           "description": "Código numérico único para la cuenta",
           "placeholder": "por ejemplo 1150",
           "schema": {
@@ -51710,7 +51710,7 @@
           "fieldType": "text",
           "label": "Nombre de la cuenta",
           "description": "Nombre descriptivo para la cuenta",
-          "placeholder": "Por ejemplo. Petty Cash",
+          "placeholder": "p. ej. Caja chica",
           "schema": {
             "def": {
               "type": "string",
@@ -51993,8 +51993,8 @@
         "parentId": {
           "type": "form_field",
           "fieldType": "entity_picker",
-          "label": "Cuenta para Padres",
-          "description": "Cuenta de padres opcionales para agrupar jerarquías",
+          "label": "Cuenta superior",
+          "description": "Agrupa la cuenta bajo otra en los informes",
           "schema": {
             "def": {
               "type": "optional",
@@ -52027,7 +52027,7 @@
         },
         "id": {
           "type": "text",
-          "label": "Cuenta ID",
+          "label": "Cuenta",
           "schema": {
             "def": {
               "type": "string"
@@ -133653,7 +133653,7 @@
     "toolName": "leads_id_DELETE",
     "title": "Eliminar contacto",
     "titleShort": "Eliminar contacto",
-    "description": "Elimina un contacto del sistema",
+    "description": "Elimina para siempre el contacto y su recorrido. No se puede deshacer.",
     "fields": {
       "type": "container",
       "layoutType": "stacked",
@@ -133663,15 +133663,6 @@
         "request": "urlPathParams"
       },
       "children": {
-        "title": {
-          "schemaType": "widget",
-          "type": "title",
-          "level": 5,
-          "label": "¿Estás seguro de que quieres eliminar permanentemente esta pista?",
-          "usage": {
-            "request": "urlPathParams"
-          }
-        },
         "id": {
           "type": "form_field",
           "fieldType": "entity_picker",
@@ -133700,7 +133691,7 @@
             "request": "urlPathParams"
           },
           "type": "navigate_button",
-          "label": "Volver al contacto",
+          "label": "Cancelar",
           "icon": "arrow-left",
           "variant": "outline",
           "prefillFromGet": false,
@@ -186469,7 +186460,7 @@
   {
     "toolName": "leads-list",
     "title": "Contactos",
-    "titleShort": "Lista principal",
+    "titleShort": "Todos los leads",
     "description": "Recuperar una lista de pistas con filtro",
     "fields": {
       "usage": {
@@ -196361,7 +196352,7 @@
   {
     "toolName": "leads-search",
     "title": "Búsqueda de contactos",
-    "titleShort": "Búsqueda de contactos",
+    "titleShort": "Buscar por email o nombre",
     "description": "Búsqueda conduce con filtrado y paginación",
     "fields": {
       "usage": {
@@ -361529,18 +361520,10 @@
           "schema": {
             "def": {
               "type": "string",
-              "checks": [
-                {
-                  "def": {
-                    "type": "string",
-                    "format": "uuid",
-                    "check": "string_format",
-                    "abort": false,
-                    "pattern": {}
-                  },
-                  "type": "string"
-                }
-              ]
+              "format": "uuid",
+              "check": "string_format",
+              "abort": false,
+              "pattern": {}
             },
             "type": "string"
           },
@@ -421569,8 +421552,6 @@
     "titleShort": "Modelo Stats",
     "description": "El índice de rechazo, cobertura y respuesta de un modelo en todas las preguntas actuales, además de respuestas de muestra aprobadas.",
     "fields": {
-      "type": "container",
-      "layoutType": "stacked",
       "usage": {
         "request": "urlPathParams",
         "response": true
@@ -422344,6 +422325,7 @@
           }
         }
       },
+      "type": "custom-widget",
       "schemaType": "object"
     },
     "executionMode": "via-execute-route",
@@ -679485,7 +679467,7 @@
           "type": "form_field",
           "fieldType": "entity_picker",
           "labelField": "name",
-          "label": "Instance ID",
+          "label": "Conexión",
           "description": "La instancia de conexión a la vista",
           "schema": {
             "def": {
@@ -679803,7 +679785,7 @@
           "type": "form_field",
           "fieldType": "entity_picker",
           "labelField": "name",
-          "label": "Instance ID",
+          "label": "Conexión",
           "description": "La instancia de conexión a la vista",
           "schema": {
             "def": {
@@ -680558,7 +680540,7 @@
           "type": "form_field",
           "fieldType": "entity_picker",
           "labelField": "name",
-          "label": "Instance ID",
+          "label": "Conexión",
           "description": "La instancia de conexión a la vista",
           "schema": {
             "def": {
@@ -680612,7 +680594,7 @@
         "instanceId": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Instance ID",
+          "label": "Nombre de la instancia",
           "description": "El identificador único de la instancia local",
           "placeholder": "hermes",
           "columns": 6,
@@ -681841,7 +681823,7 @@
         "auditConnection": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "ID de conexión para el registro",
+          "label": "Conexión",
           "description": "Limita el registro a una conexión.",
           "hidden": true,
           "schema": {
@@ -684104,8 +684086,8 @@
         "newInstanceId": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Nueva instancia ID",
-          "description": "El nuevo identificador para este caso",
+          "label": "Nuevo nombre de la instancia",
+          "description": "Las instancias conectadas ven este servidor con este nombre. Debe ser único, máximo 32 caracteres.",
           "placeholder": "hermes",
           "columns": 12,
           "schema": {
@@ -684123,8 +684105,8 @@
         "propagate": {
           "type": "form_field",
           "fieldType": "boolean",
-          "label": "Nueva instancia ID",
-          "description": "El nuevo identificador para este caso",
+          "label": "Nuevo nombre de la instancia",
+          "description": "Las instancias conectadas ven este servidor con este nombre. Debe ser único, máximo 32 caracteres.",
           "hidden": true,
           "schema": {
             "def": {
@@ -684153,7 +684135,7 @@
           "schemaType": "widget",
           "type": "submit_button",
           "text": "patch.title",
-          "loadingText": "patch.title",
+          "loadingText": "patch.renaming",
           "icon": "pencil",
           "variant": "default",
           "size": "default",

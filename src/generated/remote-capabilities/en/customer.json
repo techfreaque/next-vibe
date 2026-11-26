@@ -58633,7 +58633,7 @@
         "contentLevel": {
           "type": "form_field",
           "fieldType": "select",
-          "label": "Content Level",
+          "label": "Content level",
           "description": "Filter by content policy. Mainstream = standard safety filters. Open = fewer restrictions. Uncensored = no filters.",
           "placeholder": "All content levels",
           "options": [
@@ -60408,8 +60408,6 @@
     "titleShort": "Model Stats",
     "description": "One model's refusal, hedge and answer rates across all current questions, plus approved sample answers.",
     "fields": {
-      "type": "container",
-      "layoutType": "stacked",
       "usage": {
         "request": "urlPathParams",
         "response": true
@@ -61183,6 +61181,7 @@
           }
         }
       },
+      "type": "custom-widget",
       "schemaType": "object"
     },
     "executionMode": "via-execute-route",
@@ -291910,7 +291909,7 @@
           "type": "form_field",
           "fieldType": "entity_picker",
           "labelField": "name",
-          "label": "Instance ID",
+          "label": "Connection",
           "description": "The connection instance to view",
           "schema": {
             "def": {
@@ -292228,7 +292227,7 @@
           "type": "form_field",
           "fieldType": "entity_picker",
           "labelField": "name",
-          "label": "Instance ID",
+          "label": "Connection",
           "description": "The connection instance to view",
           "schema": {
             "def": {
@@ -292282,7 +292281,7 @@
         "instanceId": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Instance ID",
+          "label": "Instance name",
           "description": "The unique identifier of the local instance",
           "placeholder": "hermes",
           "columns": 6,
@@ -292876,7 +292875,7 @@
   },
   {
     "toolName": "remote-connections",
-    "title": "Remote Connections",
+    "title": "Remote connections",
     "titleShort": "Connections",
     "description": "Your linked instances. Admins also see the health of every connection on this server.",
     "fields": {
@@ -293183,7 +293182,7 @@
         "auditConnection": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Audit connection ID",
+          "label": "Connection",
           "description": "Limit audit events to one connection.",
           "hidden": true,
           "schema": {
@@ -295432,8 +295431,8 @@
   },
   {
     "toolName": "rename-self",
-    "title": "Rename This Instance",
-    "titleShort": "Rename Instance",
+    "title": "Rename this instance",
+    "titleShort": "Rename instance",
     "description": "Update the friendly name of your own instance",
     "fields": {
       "type": "container",
@@ -295446,8 +295445,8 @@
         "newInstanceId": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "New Instance ID",
-          "description": "The new identifier for this instance",
+          "label": "New instance name",
+          "description": "Connected instances see this server under this name. Must be unique, up to 32 characters.",
           "placeholder": "hermes",
           "columns": 12,
           "schema": {
@@ -295465,8 +295464,8 @@
         "propagate": {
           "type": "form_field",
           "fieldType": "boolean",
-          "label": "New Instance ID",
-          "description": "The new identifier for this instance",
+          "label": "New instance name",
+          "description": "Connected instances see this server under this name. Must be unique, up to 32 characters.",
           "hidden": true,
           "schema": {
             "def": {
@@ -295495,7 +295494,7 @@
           "schemaType": "widget",
           "type": "submit_button",
           "text": "patch.title",
-          "loadingText": "patch.title",
+          "loadingText": "patch.renaming",
           "icon": "pencil",
           "variant": "default",
           "size": "default",

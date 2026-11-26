@@ -60408,8 +60408,6 @@
     "titleShort": "Modello Stats",
     "description": "Il rifiuto, la copertura e la risposta di un modello su tutte le domande attuali, oltre alle risposte del campione approvate.",
     "fields": {
-      "type": "container",
-      "layoutType": "stacked",
       "usage": {
         "request": "urlPathParams",
         "response": true
@@ -61183,6 +61181,7 @@
           }
         }
       },
+      "type": "custom-widget",
       "schemaType": "object"
     },
     "executionMode": "via-execute-route",
@@ -291910,7 +291909,7 @@
           "type": "form_field",
           "fieldType": "entity_picker",
           "labelField": "name",
-          "label": "Articolo ID",
+          "label": "Collegamento",
           "description": "L'istanza di connessione per visualizzare",
           "schema": {
             "def": {
@@ -292228,7 +292227,7 @@
           "type": "form_field",
           "fieldType": "entity_picker",
           "labelField": "name",
-          "label": "Articolo ID",
+          "label": "Collegamento",
           "description": "L'istanza di connessione per visualizzare",
           "schema": {
             "def": {
@@ -292282,7 +292281,7 @@
         "instanceId": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Articolo ID",
+          "label": "Nome dell'istanza",
           "description": "L'identificatore unico dell'istanza locale",
           "placeholder": "hermes",
           "columns": 6,
@@ -293183,7 +293182,7 @@
         "auditConnection": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "ID connessione per il registro",
+          "label": "Collegamento",
           "description": "Filtra il registro per una sola connessione.",
           "hidden": true,
           "schema": {
@@ -295446,8 +295445,8 @@
         "newInstanceId": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Nuovo sistema ID",
-          "description": "Il nuovo identificatore per questa istanza",
+          "label": "Nuovo nome dell'istanza",
+          "description": "Le istanze collegate vedono questo server con questo nome. Deve essere unico, massimo 32 caratteri.",
           "placeholder": "hermes",
           "columns": 12,
           "schema": {
@@ -295465,8 +295464,8 @@
         "propagate": {
           "type": "form_field",
           "fieldType": "boolean",
-          "label": "Nuovo sistema ID",
-          "description": "Il nuovo identificatore per questa istanza",
+          "label": "Nuovo nome dell'istanza",
+          "description": "Le istanze collegate vedono questo server con questo nome. Deve essere unico, massimo 32 caratteri.",
           "hidden": true,
           "schema": {
             "def": {
@@ -295495,7 +295494,7 @@
           "schemaType": "widget",
           "type": "submit_button",
           "text": "patch.title",
-          "loadingText": "patch.title",
+          "loadingText": "patch.renaming",
           "icon": "pencil",
           "variant": "default",
           "size": "default",

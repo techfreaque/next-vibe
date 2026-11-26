@@ -51368,8 +51368,8 @@
   },
   {
     "toolName": "coa-account-update",
-    "title": "Modifica account",
-    "titleShort": "Modifica account",
+    "title": "Modifica conto",
+    "titleShort": "Modifica conto",
     "description": "Aggiorna il nome dell'account, la descrizione o l'ordine ordinario. Il tipo e il sottotipo non possono essere modificati sui conti di sistema.",
     "fields": {
       "usage": {
@@ -51586,7 +51586,7 @@
         "sortOrder": {
           "type": "form_field",
           "fieldType": "number",
-          "label": "Ordinare",
+          "label": "Ordine",
           "description": "Ordine di visualizzazione all'interno del gruppo genitore. i numeri più bassi appaiono prima",
           "placeholder": "ad esempio 10",
           "columns": 6,
@@ -51648,8 +51648,8 @@
   },
   {
     "toolName": "coa-account-create",
-    "title": "Crea account",
-    "titleShort": "Nuovo account",
+    "title": "Crea conto",
+    "titleShort": "Nuovo conto",
     "description": "Aggiungi un account personalizzato al grafico degli account dell'azienda",
     "fields": {
       "usage": {
@@ -51660,8 +51660,8 @@
         "companyId": {
           "type": "form_field",
           "fieldType": "entity_picker",
-          "label": "Società ID",
-          "description": "La società per aggiungere il conto a",
+          "label": "Società",
+          "description": "Il piano dei conti di questa società riceve il conto",
           "columns": 12,
           "schema": {
             "def": {
@@ -51710,7 +51710,7 @@
           "fieldType": "text",
           "label": "Nome del conto",
           "description": "Nome descrittivo dell'account",
-          "placeholder": "ad es. Petty Cash",
+          "placeholder": "ad es. Piccola cassa",
           "schema": {
             "def": {
               "type": "string",
@@ -51786,7 +51786,7 @@
         "subtype": {
           "type": "form_field",
           "fieldType": "select",
-          "label": "Sottotitoli",
+          "label": "Sottotipo di conto",
           "description": "Classificazione dettagliata all'interno del tipo",
           "placeholder": "Selezionare il sottotipo",
           "options": [
@@ -51993,8 +51993,8 @@
         "parentId": {
           "type": "form_field",
           "fieldType": "entity_picker",
-          "label": "Account principale",
-          "description": "Conto madre opzionale per il raggruppamento gerarchico",
+          "label": "Conto padre",
+          "description": "Raggruppa il conto sotto un altro nei report",
           "schema": {
             "def": {
               "type": "optional",
@@ -52027,7 +52027,7 @@
         },
         "id": {
           "type": "text",
-          "label": "Account ID",
+          "label": "Conto",
           "schema": {
             "def": {
               "type": "string"
@@ -133653,7 +133653,7 @@
     "toolName": "leads_id_DELETE",
     "title": "Elimina contatto",
     "titleShort": "Elimina contatto",
-    "description": "Elimina un contatto dal sistema",
+    "description": "Elimina per sempre il contatto e il suo percorso. Non si può annullare.",
     "fields": {
       "type": "container",
       "layoutType": "stacked",
@@ -133663,15 +133663,6 @@
         "request": "urlPathParams"
       },
       "children": {
-        "title": {
-          "schemaType": "widget",
-          "type": "title",
-          "level": 5,
-          "label": "Sei sicuro di voler eliminare definitivamente questa pista?",
-          "usage": {
-            "request": "urlPathParams"
-          }
-        },
         "id": {
           "type": "form_field",
           "fieldType": "entity_picker",
@@ -133700,7 +133691,7 @@
             "request": "urlPathParams"
           },
           "type": "navigate_button",
-          "label": "Torna al contatto",
+          "label": "Annulla",
           "icon": "arrow-left",
           "variant": "outline",
           "prefillFromGet": false,
@@ -186469,7 +186460,7 @@
   {
     "toolName": "leads-list",
     "title": "Contatti",
-    "titleShort": "Elenco dei lead",
+    "titleShort": "Tutti i lead",
     "description": "Recuperare un elenco impaginato di cavi con filtraggio",
     "fields": {
       "usage": {
@@ -196361,7 +196352,7 @@
   {
     "toolName": "leads-search",
     "title": "Contatto di ricerca",
-    "titleShort": "Contatto di ricerca",
+    "titleShort": "Trova per email o nome",
     "description": "Ricerca con filtro e impaginazione",
     "fields": {
       "usage": {
@@ -361529,18 +361520,10 @@
           "schema": {
             "def": {
               "type": "string",
-              "checks": [
-                {
-                  "def": {
-                    "type": "string",
-                    "format": "uuid",
-                    "check": "string_format",
-                    "abort": false,
-                    "pattern": {}
-                  },
-                  "type": "string"
-                }
-              ]
+              "format": "uuid",
+              "check": "string_format",
+              "abort": false,
+              "pattern": {}
             },
             "type": "string"
           },
@@ -421569,8 +421552,6 @@
     "titleShort": "Modello Stats",
     "description": "Il rifiuto, la copertura e la risposta di un modello su tutte le domande attuali, oltre alle risposte del campione approvate.",
     "fields": {
-      "type": "container",
-      "layoutType": "stacked",
       "usage": {
         "request": "urlPathParams",
         "response": true
@@ -422344,6 +422325,7 @@
           }
         }
       },
+      "type": "custom-widget",
       "schemaType": "object"
     },
     "executionMode": "via-execute-route",
@@ -679485,7 +679467,7 @@
           "type": "form_field",
           "fieldType": "entity_picker",
           "labelField": "name",
-          "label": "Articolo ID",
+          "label": "Collegamento",
           "description": "L'istanza di connessione per visualizzare",
           "schema": {
             "def": {
@@ -679803,7 +679785,7 @@
           "type": "form_field",
           "fieldType": "entity_picker",
           "labelField": "name",
-          "label": "Articolo ID",
+          "label": "Collegamento",
           "description": "L'istanza di connessione per visualizzare",
           "schema": {
             "def": {
@@ -680558,7 +680540,7 @@
           "type": "form_field",
           "fieldType": "entity_picker",
           "labelField": "name",
-          "label": "Articolo ID",
+          "label": "Collegamento",
           "description": "L'istanza di connessione per visualizzare",
           "schema": {
             "def": {
@@ -680612,7 +680594,7 @@
         "instanceId": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Articolo ID",
+          "label": "Nome dell'istanza",
           "description": "L'identificatore unico dell'istanza locale",
           "placeholder": "hermes",
           "columns": 6,
@@ -681841,7 +681823,7 @@
         "auditConnection": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "ID connessione per il registro",
+          "label": "Collegamento",
           "description": "Filtra il registro per una sola connessione.",
           "hidden": true,
           "schema": {
@@ -684104,8 +684086,8 @@
         "newInstanceId": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Nuovo sistema ID",
-          "description": "Il nuovo identificatore per questa istanza",
+          "label": "Nuovo nome dell'istanza",
+          "description": "Le istanze collegate vedono questo server con questo nome. Deve essere unico, massimo 32 caratteri.",
           "placeholder": "hermes",
           "columns": 12,
           "schema": {
@@ -684123,8 +684105,8 @@
         "propagate": {
           "type": "form_field",
           "fieldType": "boolean",
-          "label": "Nuovo sistema ID",
-          "description": "Il nuovo identificatore per questa istanza",
+          "label": "Nuovo nome dell'istanza",
+          "description": "Le istanze collegate vedono questo server con questo nome. Deve essere unico, massimo 32 caratteri.",
           "hidden": true,
           "schema": {
             "def": {
@@ -684153,7 +684135,7 @@
           "schemaType": "widget",
           "type": "submit_button",
           "text": "patch.title",
-          "loadingText": "patch.title",
+          "loadingText": "patch.renaming",
           "icon": "pencil",
           "variant": "default",
           "size": "default",

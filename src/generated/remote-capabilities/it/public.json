@@ -33582,8 +33582,6 @@
     "titleShort": "Modello Stats",
     "description": "Il rifiuto, la copertura e la risposta di un modello su tutte le domande attuali, oltre alle risposte del campione approvate.",
     "fields": {
-      "type": "container",
-      "layoutType": "stacked",
       "usage": {
         "request": "urlPathParams",
         "response": true
@@ -34357,6 +34355,7 @@
           }
         }
       },
+      "type": "custom-widget",
       "schemaType": "object"
     },
     "executionMode": "via-execute-route",

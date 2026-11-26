@@ -60408,8 +60408,6 @@
     "titleShort": "Štatistika modelu",
     "description": "Podiel priamych odpovedí, vyhýbavých odpovedí a odmietnutí pri všetkých aktuálnych otázkach pre jeden model. Súčasťou sú aj schválené ukážky odpovedí.",
     "fields": {
-      "type": "container",
-      "layoutType": "stacked",
       "usage": {
         "request": "urlPathParams",
         "response": true
@@ -61183,6 +61181,7 @@
           }
         }
       },
+      "type": "custom-widget",
       "schemaType": "object"
     },
     "executionMode": "via-execute-route",
@@ -291910,7 +291909,7 @@
           "type": "form_field",
           "fieldType": "entity_picker",
           "labelField": "name",
-          "label": "ID inštancie",
+          "label": "Pripojenie",
           "description": "Inštancia, ktorej pripojenie chceš zobraziť",
           "schema": {
             "def": {
@@ -292228,7 +292227,7 @@
           "type": "form_field",
           "fieldType": "entity_picker",
           "labelField": "name",
-          "label": "ID inštancie",
+          "label": "Pripojenie",
           "description": "Inštancia, ktorej pripojenie chceš zobraziť",
           "schema": {
             "def": {
@@ -292282,7 +292281,7 @@
         "instanceId": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "ID inštancie",
+          "label": "Názov inštancie",
           "description": "Jedinečný identifikátor miestnej inštancie",
           "placeholder": "hermes",
           "columns": 6,
@@ -293183,7 +293182,7 @@
         "auditConnection": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "ID pripojenia pre audit",
+          "label": "Pripojenie",
           "description": "Zobraziť udalosti auditu iba pre vybrané pripojenie.",
           "hidden": true,
           "schema": {
@@ -295446,8 +295445,8 @@
         "newInstanceId": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Nové ID inštancie",
-          "description": "Nový identifikátor tejto inštancie",
+          "label": "Nový názov inštancie",
+          "description": "Pod týmto názvom vidia pripojené inštancie tento server. Musí byť jedinečný, najviac 32 znakov.",
           "placeholder": "hermes",
           "columns": 12,
           "schema": {
@@ -295465,8 +295464,8 @@
         "propagate": {
           "type": "form_field",
           "fieldType": "boolean",
-          "label": "Nové ID inštancie",
-          "description": "Nový identifikátor tejto inštancie",
+          "label": "Nový názov inštancie",
+          "description": "Pod týmto názvom vidia pripojené inštancie tento server. Musí byť jedinečný, najviac 32 znakov.",
           "hidden": true,
           "schema": {
             "def": {
@@ -295495,7 +295494,7 @@
           "schemaType": "widget",
           "type": "submit_button",
           "text": "patch.title",
-          "loadingText": "patch.title",
+          "loadingText": "patch.renaming",
           "icon": "pencil",
           "variant": "default",
           "size": "default",

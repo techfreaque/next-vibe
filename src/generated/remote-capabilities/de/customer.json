@@ -60408,8 +60408,6 @@
     "titleShort": "Modell-Werte",
     "description": "Antwort-, Abschwächungs- und Verweigerungsrate eines Modells über alle aktuellen Fragen, plus freigegebene Beispielantworten.",
     "fields": {
-      "type": "container",
-      "layoutType": "stacked",
       "usage": {
         "request": "urlPathParams",
         "response": true
@@ -61183,6 +61181,7 @@
           }
         }
       },
+      "type": "custom-widget",
       "schemaType": "object"
     },
     "executionMode": "via-execute-route",
@@ -291910,7 +291909,7 @@
           "type": "form_field",
           "fieldType": "entity_picker",
           "labelField": "name",
-          "label": "Instanz-ID",
+          "label": "Verbindung",
           "description": "Die Verbindungsinstanz, die angezeigt werden soll",
           "schema": {
             "def": {
@@ -292228,7 +292227,7 @@
           "type": "form_field",
           "fieldType": "entity_picker",
           "labelField": "name",
-          "label": "Instanz-ID",
+          "label": "Verbindung",
           "description": "Die Verbindungsinstanz, die angezeigt werden soll",
           "schema": {
             "def": {
@@ -292282,7 +292281,7 @@
         "instanceId": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Instanz-ID",
+          "label": "Instanzname",
           "description": "Die eindeutige Kennung der lokalen Instanz",
           "placeholder": "hermes",
           "columns": 6,
@@ -293183,7 +293182,7 @@
         "auditConnection": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Verbindungs-ID für das Protokoll",
+          "label": "Verbindung",
           "description": "Protokoll auf eine Verbindung eingrenzen.",
           "hidden": true,
           "schema": {
@@ -295446,8 +295445,8 @@
         "newInstanceId": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Neue Instanz-ID",
-          "description": "Der neue Bezeichner für diese Instanz",
+          "label": "Neuer Instanzname",
+          "description": "Unter diesem Namen sehen verbundene Instanzen diesen Server. Eindeutig, höchstens 32 Zeichen.",
           "placeholder": "hermes",
           "columns": 12,
           "schema": {
@@ -295465,8 +295464,8 @@
         "propagate": {
           "type": "form_field",
           "fieldType": "boolean",
-          "label": "Neue Instanz-ID",
-          "description": "Der neue Bezeichner für diese Instanz",
+          "label": "Neuer Instanzname",
+          "description": "Unter diesem Namen sehen verbundene Instanzen diesen Server. Eindeutig, höchstens 32 Zeichen.",
           "hidden": true,
           "schema": {
             "def": {
@@ -295495,7 +295494,7 @@
           "schemaType": "widget",
           "type": "submit_button",
           "text": "patch.title",
-          "loadingText": "patch.title",
+          "loadingText": "patch.renaming",
           "icon": "pencil",
           "variant": "default",
           "size": "default",

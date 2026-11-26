@@ -33582,8 +33582,6 @@
     "titleShort": "Modelo Stats",
     "description": "El índice de rechazo, cobertura y respuesta de un modelo en todas las preguntas actuales, además de respuestas de muestra aprobadas.",
     "fields": {
-      "type": "container",
-      "layoutType": "stacked",
       "usage": {
         "request": "urlPathParams",
         "response": true
@@ -34357,6 +34355,7 @@
           }
         }
       },
+      "type": "custom-widget",
       "schemaType": "object"
     },
     "executionMode": "via-execute-route",

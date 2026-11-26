@@ -51368,8 +51368,8 @@
   },
   {
     "toolName": "coa-account-update",
-    "title": "Edit Account",
-    "titleShort": "Edit Account",
+    "title": "Edit account",
+    "titleShort": "Edit account",
     "description": "Update account name, description, or sort order. Type and subtype cannot be changed on system accounts.",
     "fields": {
       "usage": {
@@ -51536,7 +51536,7 @@
         "name": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Account Name",
+          "label": "Account name",
           "description": "Display name for this account",
           "placeholder": "e.g. Accounts Receivable",
           "columns": 12,
@@ -51586,8 +51586,8 @@
         "sortOrder": {
           "type": "form_field",
           "fieldType": "number",
-          "label": "Sort Order",
-          "description": "Display order within the parent group — lower numbers appear first",
+          "label": "Sort order",
+          "description": "Lower numbers appear first within the parent group",
           "placeholder": "e.g. 10",
           "columns": 6,
           "schema": {
@@ -51648,8 +51648,8 @@
   },
   {
     "toolName": "coa-account-create",
-    "title": "Create Account",
-    "titleShort": "New Account",
+    "title": "Create account",
+    "titleShort": "New account",
     "description": "Add a custom account to the company's chart of accounts",
     "fields": {
       "usage": {
@@ -51660,8 +51660,8 @@
         "companyId": {
           "type": "form_field",
           "fieldType": "entity_picker",
-          "label": "Company ID",
-          "description": "The company to add the account to",
+          "label": "Company",
+          "description": "The company whose chart of accounts gets this account",
           "columns": 12,
           "schema": {
             "def": {
@@ -51690,7 +51690,7 @@
         "code": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Account Code",
+          "label": "Account code",
           "description": "Unique numeric code for the account",
           "placeholder": "e.g. 1150",
           "schema": {
@@ -51708,7 +51708,7 @@
         "name": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Account Name",
+          "label": "Account name",
           "description": "Descriptive name for the account",
           "placeholder": "e.g. Petty Cash",
           "schema": {
@@ -51726,7 +51726,7 @@
         "type": {
           "type": "form_field",
           "fieldType": "select",
-          "label": "Account Type",
+          "label": "Account type",
           "description": "Top-level account classification",
           "placeholder": "Select type",
           "options": [
@@ -51786,7 +51786,7 @@
         "subtype": {
           "type": "form_field",
           "fieldType": "select",
-          "label": "Account Subtype",
+          "label": "Account subtype",
           "description": "Detailed classification within the type",
           "placeholder": "Select subtype",
           "options": [
@@ -51993,8 +51993,8 @@
         "parentId": {
           "type": "form_field",
           "fieldType": "entity_picker",
-          "label": "Parent Account",
-          "description": "Optional parent account for hierarchy grouping",
+          "label": "Parent account",
+          "description": "Groups this account under another one in reports",
           "schema": {
             "def": {
               "type": "optional",
@@ -52027,7 +52027,7 @@
         },
         "id": {
           "type": "text",
-          "label": "Account ID",
+          "label": "Account",
           "schema": {
             "def": {
               "type": "string"
@@ -129234,7 +129234,7 @@
         "email": {
           "type": "form_field",
           "fieldType": "email",
-          "label": "Email Address",
+          "label": "Email",
           "description": "Lead's email address",
           "placeholder": "email@example.com",
           "columns": 6,
@@ -129262,7 +129262,7 @@
         "businessName": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Business Name",
+          "label": "Business name",
           "description": "Name of the business",
           "placeholder": "Acme Corporation",
           "columns": 6,
@@ -129384,7 +129384,7 @@
         "contactName": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Contact Name",
+          "label": "Contact name",
           "description": "Primary contact person",
           "placeholder": "John Doe",
           "columns": 6,
@@ -129414,7 +129414,7 @@
         "status": {
           "type": "form_field",
           "fieldType": "select",
-          "label": "Lead Status",
+          "label": "Status",
           "description": "Current status of the lead",
           "placeholder": "Select status",
           "columns": 6,
@@ -129523,7 +129523,7 @@
         "phone": {
           "type": "form_field",
           "fieldType": "tel",
-          "label": "Phone Number",
+          "label": "Phone",
           "description": "Contact phone number",
           "placeholder": "+1234567890",
           "columns": 6,
@@ -130813,7 +130813,7 @@
         "source": {
           "type": "form_field",
           "fieldType": "select",
-          "label": "Lead Source",
+          "label": "Source",
           "description": "Origin of the lead",
           "placeholder": "Select source",
           "columns": 6,
@@ -130880,7 +130880,7 @@
         "currentCampaignStage": {
           "type": "form_field",
           "fieldType": "select",
-          "label": "Campaign Stage",
+          "label": "Campaign stage",
           "description": "Current email campaign stage",
           "placeholder": "Select stage",
           "columns": 6,
@@ -133651,9 +133651,9 @@
   },
   {
     "toolName": "leads_id_DELETE",
-    "title": "Delete Lead",
-    "titleShort": "Delete Lead",
-    "description": "Delete a lead from the system",
+    "title": "Delete lead",
+    "titleShort": "Delete lead",
+    "description": "Permanently delete this lead and its journey. This cannot be undone.",
     "fields": {
       "type": "container",
       "layoutType": "stacked",
@@ -133663,15 +133663,6 @@
         "request": "urlPathParams"
       },
       "children": {
-        "title": {
-          "schemaType": "widget",
-          "type": "title",
-          "level": 5,
-          "label": "Are you sure you want to permanently delete this lead?",
-          "usage": {
-            "request": "urlPathParams"
-          }
-        },
         "id": {
           "type": "form_field",
           "fieldType": "entity_picker",
@@ -133700,7 +133691,7 @@
             "request": "urlPathParams"
           },
           "type": "navigate_button",
-          "label": "Back to Lead",
+          "label": "Cancel",
           "icon": "arrow-left",
           "variant": "outline",
           "prefillFromGet": false,
@@ -151088,7 +151079,7 @@
         },
         "contactInfo": {
           "type": "container",
-          "title": "Contact Information",
+          "title": "Contact",
           "description": "Primary contact details for the lead",
           "layoutType": "grid_2_columns",
           "usage": {
@@ -151098,7 +151089,7 @@
             "email": {
               "type": "form_field",
               "fieldType": "email",
-              "label": "Email Address",
+              "label": "Email",
               "description": "Primary email address for communication",
               "placeholder": "john@example.com",
               "columns": 12,
@@ -151120,7 +151111,7 @@
             "businessName": {
               "type": "form_field",
               "fieldType": "text",
-              "label": "Business Name",
+              "label": "Business name",
               "description": "Name of the company or business",
               "placeholder": "Example Corp",
               "columns": 12,
@@ -151139,7 +151130,7 @@
             "phone": {
               "type": "form_field",
               "fieldType": "tel",
-              "label": "Phone Number",
+              "label": "Phone",
               "description": "Contact phone number with country code",
               "placeholder": "+1234567890",
               "columns": 6,
@@ -151425,7 +151416,7 @@
         },
         "locationPreferences": {
           "type": "container",
-          "title": "Location & Preferences",
+          "title": "Location and language",
           "description": "Geographic and language preferences",
           "layoutType": "grid_2_columns",
           "usage": {
@@ -152622,7 +152613,7 @@
         },
         "leadDetails": {
           "type": "container",
-          "title": "Lead Details",
+          "title": "Source and notes",
           "description": "Additional information about the lead",
           "layoutType": "stacked",
           "usage": {
@@ -152632,7 +152623,7 @@
             "source": {
               "type": "form_field",
               "fieldType": "select",
-              "label": "Lead Source",
+              "label": "Source",
               "description": "How the lead was acquired",
               "placeholder": "Select source",
               "columns": 12,
@@ -153322,7 +153313,7 @@
   },
   {
     "toolName": "leads-dashboard",
-    "title": "Leads Dashboard",
+    "title": "Leads dashboard",
     "titleShort": "Lead Dashboard",
     "description": "Live counts of active leads, new arrivals, running campaigns, and conversions",
     "fields": {
@@ -155360,7 +155351,7 @@
         },
         "recentLeads": {
           "type": "container",
-          "title": "Recent Leads",
+          "title": "Recent leads",
           "child": {
             "type": "text",
             "label": "get.response.recentLeads.id",
@@ -186469,7 +186460,7 @@
   {
     "toolName": "leads-list",
     "title": "Leads",
-    "titleShort": "Lead List",
+    "titleShort": "All leads",
     "description": "Retrieve a paginated list of leads with filtering",
     "fields": {
       "usage": {
@@ -196361,7 +196352,7 @@
   {
     "toolName": "leads-search",
     "title": "Search Leads",
-    "titleShort": "Search Leads",
+    "titleShort": "Find by email or name",
     "description": "Search leads with filtering and pagination",
     "fields": {
       "usage": {
@@ -361529,18 +361520,10 @@
           "schema": {
             "def": {
               "type": "string",
-              "checks": [
-                {
-                  "def": {
-                    "type": "string",
-                    "format": "uuid",
-                    "check": "string_format",
-                    "abort": false,
-                    "pattern": {}
-                  },
-                  "type": "string"
-                }
-              ]
+              "format": "uuid",
+              "check": "string_format",
+              "abort": false,
+              "pattern": {}
             },
             "type": "string"
           },
@@ -417699,7 +417682,7 @@
         "contentLevel": {
           "type": "form_field",
           "fieldType": "select",
-          "label": "Content Level",
+          "label": "Content level",
           "description": "Filter by content policy. Mainstream = standard safety filters. Open = fewer restrictions. Uncensored = no filters.",
           "placeholder": "All content levels",
           "options": [
@@ -421569,8 +421552,6 @@
     "titleShort": "Model Stats",
     "description": "One model's refusal, hedge and answer rates across all current questions, plus approved sample answers.",
     "fields": {
-      "type": "container",
-      "layoutType": "stacked",
       "usage": {
         "request": "urlPathParams",
         "response": true
@@ -422344,6 +422325,7 @@
           }
         }
       },
+      "type": "custom-widget",
       "schemaType": "object"
     },
     "executionMode": "via-execute-route",
@@ -679485,7 +679467,7 @@
           "type": "form_field",
           "fieldType": "entity_picker",
           "labelField": "name",
-          "label": "Instance ID",
+          "label": "Connection",
           "description": "The connection instance to view",
           "schema": {
             "def": {
@@ -679803,7 +679785,7 @@
           "type": "form_field",
           "fieldType": "entity_picker",
           "labelField": "name",
-          "label": "Instance ID",
+          "label": "Connection",
           "description": "The connection instance to view",
           "schema": {
             "def": {
@@ -680290,7 +680272,7 @@
           "type": "form_field",
           "fieldType": "boolean",
           "label": "Inference Provider",
-          "description": "Allow this connection to serve AI inference — remote instance runs the LLM loop over reverse-WS.",
+          "description": "Allow this connection to serve AI inference. The remote instance runs the LLM loop over reverse-WS.",
           "schema": {
             "def": {
               "type": "optional",
@@ -680558,7 +680540,7 @@
           "type": "form_field",
           "fieldType": "entity_picker",
           "labelField": "name",
-          "label": "Instance ID",
+          "label": "Connection",
           "description": "The connection instance to view",
           "schema": {
             "def": {
@@ -680612,7 +680594,7 @@
         "instanceId": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Instance ID",
+          "label": "Instance name",
           "description": "The unique identifier of the local instance",
           "placeholder": "hermes",
           "columns": 6,
@@ -681206,8 +681188,8 @@
   },
   {
     "toolName": "remote-connect",
-    "title": "Connect to Remote Account",
-    "titleShort": "Remote Connect",
+    "title": "Connect to a remote account",
+    "titleShort": "Remote connect",
     "description": "Connect your account to a remote instance to sync memories and use AI tools from anywhere",
     "fields": {
       "usage": {
@@ -681360,8 +681342,8 @@
         "isInferenceProvider": {
           "type": "form_field",
           "fieldType": "boolean",
-          "label": "Use as Inference Provider",
-          "description": "Let this connection run AI streams — the remote instance handles the AI loop over the reverse WS channel.",
+          "label": "Use as inference provider",
+          "description": "Let this connection run AI streams. The remote instance handles the AI loop over the reverse WS channel.",
           "schema": {
             "def": {
               "type": "optional",
@@ -681382,7 +681364,7 @@
         "syncScope": {
           "type": "form_field",
           "fieldType": "json",
-          "label": "Sync Scope",
+          "label": "Sync scope",
           "description": "Which data syncs over this connection.",
           "schema": {
             "def": {
@@ -681534,7 +681516,7 @@
   },
   {
     "toolName": "remote-connections",
-    "title": "Remote Connections",
+    "title": "Remote connections",
     "titleShort": "Connections",
     "description": "Your linked instances. Admins also see the health of every connection on this server.",
     "fields": {
@@ -681841,7 +681823,7 @@
         "auditConnection": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Audit connection ID",
+          "label": "Connection",
           "description": "Limit audit events to one connection.",
           "hidden": true,
           "schema": {
@@ -684090,8 +684072,8 @@
   },
   {
     "toolName": "rename-self",
-    "title": "Rename This Instance",
-    "titleShort": "Rename Instance",
+    "title": "Rename this instance",
+    "titleShort": "Rename instance",
     "description": "Update the friendly name of your own instance",
     "fields": {
       "type": "container",
@@ -684104,8 +684086,8 @@
         "newInstanceId": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "New Instance ID",
-          "description": "The new identifier for this instance",
+          "label": "New instance name",
+          "description": "Connected instances see this server under this name. Must be unique, up to 32 characters.",
           "placeholder": "hermes",
           "columns": 12,
           "schema": {
@@ -684123,8 +684105,8 @@
         "propagate": {
           "type": "form_field",
           "fieldType": "boolean",
-          "label": "New Instance ID",
-          "description": "The new identifier for this instance",
+          "label": "New instance name",
+          "description": "Connected instances see this server under this name. Must be unique, up to 32 characters.",
           "hidden": true,
           "schema": {
             "def": {
@@ -684153,7 +684135,7 @@
           "schemaType": "widget",
           "type": "submit_button",
           "text": "patch.title",
-          "loadingText": "patch.title",
+          "loadingText": "patch.renaming",
           "icon": "pencil",
           "variant": "default",
           "size": "default",
