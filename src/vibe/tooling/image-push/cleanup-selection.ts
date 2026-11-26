@@ -154,16 +154,21 @@ export function selectLocalImageRefsToRemove(params: {
     .map(({ repository, tag }) => `${repository}:${tag}`);
 }
 
-/** Groups old full-SHA export dirs and completion markers by commit. */
+const EXPORT_MARKER_SUFFIXES = [".done", ".checked", ".gate-dirty"] as const;
+
+/** Groups old full-SHA export dirs and sibling markers by commit. */
 export function selectExportEntriesToPark(params: {
   entries: ExportEntry[];
   currentSha: string;
 }): Map<string, string[]> {
   const exportsToPark = new Map<string, string[]>();
   for (const { name, isDirectory, isFile } of params.entries) {
-    const sha = isFile && name.endsWith(".done") ? name.slice(0, -5) : name;
+    const markerSuffix = isFile
+      ? EXPORT_MARKER_SUFFIXES.find((suffix) => name.endsWith(suffix))
+      : undefined;
+    const sha = markerSuffix ? name.slice(0, -markerSuffix.length) : name;
     if (
-      !(isDirectory || sha !== name) ||
+      !(isDirectory || markerSuffix !== undefined) ||
       !FULL_SHA.test(sha) ||
       sha === params.currentSha
     ) {

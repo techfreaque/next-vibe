@@ -77,6 +77,16 @@ export const translations: typeof enTranslations = {
         description:
           "Domyślnie włączone. Gdy node się wdroży i przejdzie health check, na tym serwerze zostaje tylko: obraz używany przez dowolny kontener, jego tagi rollback (Server 1 :latest, :rollback, :prod-current-good; Server 2 :unbottled, :unbottled-rollback, :unbottled-prev oraz :latest współhostowanej strony) i 3 najnowsze buildy ghcr.io/techfreaque/next-vibe-app. Starsze tagi usuwa zwykłe docker rmi (nigdy -f, Docker odmawia dla używanych obrazów), potem znikają osierocone obrazy. Przed każdym ładowaniem ta sama retencja rusza poniżej 30 GB wolnego miejsca. Tylko skonfigurowane serwery HA, nigdy jawny --sshTarget. Wyłączone = tylko ostrzeżenie.",
       },
+      skipCheck: {
+        title: "Pomiń bramkę bezpieczeństwa",
+        description:
+          "Jawna furtka pozwalająca ominąć bramkę przed buildem (weryfikacja vibe gen i pełny vibe check). Wymaga niepustego powodu, który trafia do logów. Nie zapisuje znacznika .checked.",
+      },
+      checkOnly: {
+        title: "Tylko sprawdzenie",
+        description:
+          "Eksportuje commit, uruchamia bramkę przed buildem (vibe gen i pełny vibe check), zapisuje znacznik .checked po zaliczeniu i kończy przed budowaniem oraz wysyłką obrazu Docker.",
+      },
       success: {
         title: "Sukces",
       },
@@ -235,6 +245,33 @@ export const translations: typeof enTranslations = {
         remoteTagFailed: "{{target}}: nie udało się usunąć {{ref}}: {{error}}",
         remoteRetained:
           "🧹 {{target}}: usunięto {{count}} starych refów, zostaje {{keep}} najnowszych buildów, tagi rollback i używane obrazy: {{tags}}. Osierocone: {{pruned}}",
+        gateSkipped:
+          "⚠️ Bramka bezpieczeństwa wdrożenia POMINIĘTA dla commita {{sha}} (--skipCheck): {{reason}}",
+        gateCached:
+          "✅ Bramka bezpieczeństwa już zaliczona dla commita {{sha}} (znacznik cache: {{marker}})",
+        gateGenStart:
+          "🔍 Sprawdzam aktualność wygenerowanych plików w commicie {{sha}} ...",
+        gateGenPassed: "✅ Wygenerowane pliki są aktualne dla commita {{sha}}",
+        gateGenFailed:
+          "Wdrożenie zablokowane: vibe gen nie powiódł się dla commita {{sha}}: {{error}}",
+        gateGenStale:
+          "Wdrożenie zablokowane: wygenerowane pliki w commicie {{sha}} są nieaktualne ({{count}} zmienionych plików): {{files}}",
+        gateCheckStart:
+          "🔍 Uruchamiam pełny vibe check w wyeksportowanym commicie {{sha}} ...",
+        gateCheckPassed: "✅ Pełny vibe check zaliczony dla commita {{sha}}",
+        gateCheckFailed:
+          "Wdrożenie zablokowane: vibe check nie przeszedł dla commita {{sha}}: {{error}}",
+        gateCheckIncomplete:
+          "Wdrożenie zablokowane: vibe check nie ukończył się dla commita {{sha}}: {{error}}",
+        gateSetupFailed:
+          "Wdrożenie zablokowane: nie udało się przygotować commita {{sha}} do bramki bezpieczeństwa: {{error}}",
+        gateCleanupWarn:
+          "⚠️ Ostrzeżenie podczas sprzątania po bramce w {{dir}}: {{error}}",
+        gateMarkerWarn:
+          "⚠️ Bramka bezpieczeństwa zaliczona dla {{sha}}, ale zapis znacznika {{path}} nie powiódł się: {{error}}",
+        gatePassed: "✅ Bramka bezpieczeństwa zaliczona dla commita {{sha}}",
+        checkOnlySuccess:
+          "✅ Bramka bezpieczeństwa ({{status}}) dla commita {{sha}} (build i wysyłka Docker pominięte przez --checkOnly)",
       },
     },
   },

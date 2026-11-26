@@ -78,6 +78,16 @@ export const translations: typeof enTranslations = {
         description:
           "Predefinito. Dopo un nodo distribuito e superato il suo controllo sanitario, tenere su quel server solo: l'immagine qualsiasi contenitore viene eseguito, i suoi tag rollback (Server 1 : più tardi, :rollback, :prod-current-good; Server 2 :unbottled-rollback, :unbottled-prev e il sito co-hosted's :latest) e le più recenti 3 build di ghcr.io/Tecnologia/Consiglio/Consiglionext-vibe- App. I tag più vecchi vanno con docker rmi semplice (mai -f, docker rifiuta immagini in uso), quindi le immagini di abbagliamento sono indiscreti. Prima di ogni carico, meno di 30 GB libera esegue la stessa ritenzione. Solo i server HA configurati, mai un esplicito -- sshTarget. Off = avvertire solo.",
       },
+      skipCheck: {
+        title: "Salta controllo di sicurezza",
+        description:
+          "Uscita esplicita per saltare il controllo di sicurezza pre-build (controllo vibe gen e vibe check completo). Richiede un motivo non vuoto che viene registrato nei log. Non scrive il marcatore .checked.",
+      },
+      checkOnly: {
+        title: "Solo controllo",
+        description:
+          "Esporta il commit, esegue il controllo di sicurezza pre-build (vibe gen e vibe check completo), scrive il marcatore .checked in caso di successo e si ferma prima di build e push Docker.",
+      },
       success: {
         title: "Operazione riuscita",
       },
@@ -236,6 +246,34 @@ export const translations: typeof enTranslations = {
         remoteTagFailed: "{{target}}: non può rimuovere {{ref}}: {{error}}",
         remoteRetained:
           " ⁇  {{target}}: rimosso {{count}} vecchio immagine ref(s), mantenuto il più recente {{keep}} costruisce più tag rollback e immagini in uso: {{tags}}. Prugna dangling: {{pruned}}",
+        gateSkipped:
+          "⚠️ Controllo di sicurezza SALTATO per il commit {{sha}} (--skipCheck): {{reason}}",
+        gateCached:
+          "✅ Controllo di sicurezza già superato per il commit {{sha}} (marcatore in cache: {{marker}})",
+        gateGenStart:
+          "🔍 Controllo dei file generati nel commit esportato {{sha}} ...",
+        gateGenPassed: "✅ File generati aggiornati per il commit {{sha}}",
+        gateGenFailed:
+          "Deploy bloccato: vibe gen non riuscito per il commit {{sha}}: {{error}}",
+        gateGenStale:
+          "Deploy bloccato: file generati non aggiornati nel commit {{sha}} ({{count}} file modificati da vibe gen): {{files}}",
+        gateCheckStart:
+          "🔍 Esecuzione di vibe check completo nel commit esportato {{sha}} ...",
+        gateCheckPassed:
+          "✅ vibe check completo superato per il commit {{sha}}",
+        gateCheckFailed:
+          "Deploy bloccato: vibe check non superato per il commit {{sha}}: {{error}}",
+        gateCheckIncomplete:
+          "Deploy bloccato: vibe check non completato per il commit {{sha}}: {{error}}",
+        gateSetupFailed:
+          "Deploy bloccato: impossibile preparare il commit {{sha}} per il controllo di sicurezza: {{error}}",
+        gateCleanupWarn:
+          "⚠️ Avviso durante la pulizia del controllo di sicurezza in {{dir}}: {{error}}",
+        gateMarkerWarn:
+          "⚠️ Controllo di sicurezza superato per {{sha}}, ma scrittura del marcatore {{path}} fallita: {{error}}",
+        gatePassed: "✅ Controllo di sicurezza superato per il commit {{sha}}",
+        checkOnlySuccess:
+          "✅ Controllo di sicurezza {{status}} per il commit {{sha}} (build e push Docker saltati con --checkOnly)",
       },
     },
   },

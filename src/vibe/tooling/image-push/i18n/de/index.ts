@@ -77,6 +77,16 @@ export const translations: typeof enTranslations = {
         description:
           "Standardmäßig an. Nachdem ein Node deployt und den Health-Check bestanden hat, bleibt auf diesem Server nur: das Image, das ein Container nutzt, seine Rollback-Tags (Server 1 :latest, :rollback, :prod-current-good; Server 2 :unbottled, :unbottled-rollback, :unbottled-prev und :latest der mitgehosteten Seite) und die neuesten 3 Builds von ghcr.io/techfreaque/next-vibe-app. Ältere Tags entfernt ein einfaches docker rmi (nie -f, Docker verweigert genutzte Images), danach werden verwaiste Images gelöscht. Vor jedem Laden greift dieselbe Bereinigung unter 30 GB frei. Nur die konfigurierten HA-Server, nie ein explizites --sshTarget. Aus = nur warnen.",
       },
+      skipCheck: {
+        title: "Sicherheitsprüfung überspringen",
+        description:
+          "Ausdrücklicher Notausgang, um die Vorab-Prüfung (vibe gen und vollständiges vibe check) zu überspringen. Erfordert einen nicht-leeren Grund, der geloggt wird. Schreibt keine .checked-Markierung.",
+      },
+      checkOnly: {
+        title: "Nur prüfen",
+        description:
+          "Exportiert den Commit, führt die Vorab-Prüfung aus (vibe gen und vollständiges vibe check), schreibt bei Erfolg die .checked-Markierung und bricht vor Docker-Build und Push ab.",
+      },
       success: {
         title: "Erfolg",
       },
@@ -236,6 +246,34 @@ export const translations: typeof enTranslations = {
           "{{target}}: {{ref}} konnte nicht entfernt werden: {{error}}",
         remoteRetained:
           "🧹 {{target}}: {{count}} alte Image-Refs entfernt, behalten: die neuesten {{keep}} Builds, Rollback-Tags und genutzte Images: {{tags}}. Verwaiste gelöscht: {{pruned}}",
+        gateSkipped:
+          "⚠️ Deploy-Sicherheitsprüfung für Commit {{sha}} ÜBERSPRUNGEN (--skipCheck): {{reason}}",
+        gateCached:
+          "✅ Deploy-Sicherheitsprüfung für Commit {{sha}} bereits bestanden (Cache-Markierung: {{marker}})",
+        gateGenStart:
+          "🔍 Prüfe generierte Dateien auf Abweichungen in Commit {{sha}} ...",
+        gateGenPassed: "✅ Generierte Dateien sind aktuell für Commit {{sha}}",
+        gateGenFailed:
+          "Deploy blockiert: vibe gen fehlgeschlagen für Commit {{sha}}: {{error}}",
+        gateGenStale:
+          "Deploy blockiert: generierte Dateien in Commit {{sha}} sind veraltet ({{count}} Datei(en) von vibe gen geändert): {{files}}",
+        gateCheckStart:
+          "🔍 Starte vollständiges vibe check im exportierten Commit {{sha}} ...",
+        gateCheckPassed:
+          "✅ Vollständiges vibe check bestanden für Commit {{sha}}",
+        gateCheckFailed:
+          "Deploy blockiert: vibe check fehlgeschlagen für Commit {{sha}}: {{error}}",
+        gateCheckIncomplete:
+          "Deploy blockiert: vibe check wurde für Commit {{sha}} nicht vollständig ausgeführt: {{error}}",
+        gateSetupFailed:
+          "Deploy blockiert: exportierter Commit {{sha}} konnte nicht für die Sicherheitsprüfung vorbereitet werden: {{error}}",
+        gateCleanupWarn:
+          "⚠️ Warnung beim Aufräumen der Sicherheitsprüfung in {{dir}}: {{error}}",
+        gateMarkerWarn:
+          "⚠️ Sicherheitsprüfung für {{sha}} bestanden, aber Schreiben der Cache-Markierung {{path}} fehlgeschlagen: {{error}}",
+        gatePassed: "✅ Deploy-Sicherheitsprüfung bestanden für Commit {{sha}}",
+        checkOnlySuccess:
+          "✅ Sicherheitsprüfung {{status}} für Commit {{sha}} (Docker-Build und Push per --checkOnly übersprungen)",
       },
     },
   },

@@ -380,7 +380,9 @@ export class ImagePushCleanup {
     for (const [sha, names] of exportsToPark) {
       const taken =
         existsSync(join(parkRoot, sha)) ||
-        existsSync(join(parkRoot, `${sha}.done`));
+        existsSync(join(parkRoot, `${sha}.done`)) ||
+        existsSync(join(parkRoot, `${sha}.checked`)) ||
+        existsSync(join(parkRoot, `${sha}.gate-dirty`));
       const destSha = taken ? `${sha}-${randomUUID()}` : sha;
       try {
         for (const name of names.toSorted()) {

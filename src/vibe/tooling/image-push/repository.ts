@@ -42,6 +42,7 @@ import type {
   ImagePushRequestOutput,
   ImagePushResponseOutput,
 } from "./definition";
+import { gateDirtyMarkerPath, runDeployGate } from "./deploy-gate";
 import { imagePushEnv } from "./env";
 import type { ImagePushT } from "./i18n";
 import {
@@ -99,7 +100,7 @@ export class ImagePushRepository {
     );
     // A registry-only push leaves no new image in the local Docker store.
     // Use the resolved commit for cleanup even if the input ref has moved.
-    if (result.success && data.push && data.cleanup) {
+    if (result.success && data.push && data.cleanup && !data.checkOnly) {
       const { buildRoot, repoRoot } = ImagePushRepository.buildPaths();
       ImagePushCleanup.afterPush(
         {
@@ -147,6 +148,44 @@ export class ImagePushRepository {
       return exportResult;
     }
     const contextDir = exportResult.data;
+
+    // Mandatory pre-build safety gate: verify generated files are fresh and
+    // repo-wide `vibe check` passes inside the exported commit tree before
+    // spending RAM/time on the Docker build or touching any server.
+    const { buildRoot, repoRoot } = ImagePushRepository.buildPaths();
+    const gateResult = await runDeployGate(
+      {
+        sha,
+        shortSha,
+        contextDir,
+        buildRoot,
+        repoRoot,
+        skipCheck: data.skipCheck,
+      },
+      logger,
+      t,
+    );
+    if (!gateResult.success) {
+      return gateResult;
+    }
+
+    const tag = data.tag ?? shortSha;
+    // First ref is the one `docker save`d for the ssh transfer; the short sha
+    // is always tagged too so every pushed image maps back to its commit.
+    const tags = [...new Set([tag, shortSha, "latest"])];
+
+    if (data.checkOnly) {
+      return success({
+        success: true,
+        output: t("post.repository.messages.checkOnlySuccess", {
+          status: gateResult.data.status,
+          sha: shortSha,
+        }),
+        resolvedImage: image,
+        tags,
+        duration: Date.now() - startTime,
+      });
+    }
 
     // Older release archives also contain the old deploy drivers. Installing
     // those on an HA node would silently remove its automatic edge rollback.
@@ -205,10 +244,6 @@ export class ImagePushRepository {
       t,
     );
 
-    const tag = data.tag ?? shortSha;
-    // First ref is the one `docker save`d for the ssh transfer; the short sha
-    // is always tagged too so every pushed image maps back to its commit.
-    const tags = [...new Set([tag, shortSha, "latest"])];
     const refs = tags.map((tagName) => `${image}:${tagName}`);
     logger.info(t("post.repository.messages.buildStart", { image, tag }));
 
@@ -1898,8 +1933,9 @@ export class ImagePushRepository {
     const { buildRoot, repoRoot } = ImagePushRepository.buildPaths();
     const dir = join(buildRoot, sha);
     const doneMarker = join(buildRoot, `${sha}.done`);
+    const dirtyMarker = gateDirtyMarkerPath(buildRoot, sha);
 
-    if (existsSync(dir) && existsSync(doneMarker)) {
+    if (existsSync(dir) && existsSync(doneMarker) && !existsSync(dirtyMarker)) {
       logger.info(
         t("post.repository.messages.exportReused", { sha: shortSha, dir }),
       );
@@ -1918,16 +1954,37 @@ export class ImagePushRepository {
     };
 
     try {
+      const parkStamp = String(Date.now());
       if (existsSync(dir)) {
-        // Leftover from an interrupted export - never rm, park it instead.
+        // Leftover from an interrupted export or gate run - never rm, park it instead.
         const parked = join(
           repoRoot,
           ".tmp",
           "todelete",
-          `image-build-${sha}-${Date.now()}`,
+          `image-build-${sha}-${parkStamp}`,
         );
         mkdirSync(join(parked, ".."), { recursive: true });
         renameSync(dir, parked);
+      }
+      if (existsSync(doneMarker)) {
+        const parkedDone = join(
+          repoRoot,
+          ".tmp",
+          "todelete",
+          `image-build-${sha}-${parkStamp}.done`,
+        );
+        mkdirSync(join(parkedDone, ".."), { recursive: true });
+        renameSync(doneMarker, parkedDone);
+      }
+      if (existsSync(dirtyMarker)) {
+        const parkedDirty = join(
+          repoRoot,
+          ".tmp",
+          "todelete",
+          `image-build-${sha}-${parkStamp}.gate-dirty`,
+        );
+        mkdirSync(join(parkedDirty, ".."), { recursive: true });
+        renameSync(dirtyMarker, parkedDirty);
       }
       mkdirSync(dir, { recursive: true });
     } catch (error) {

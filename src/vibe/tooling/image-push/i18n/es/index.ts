@@ -78,6 +78,16 @@ export const translations: typeof enTranslations = {
         description:
           "Default on. Después de un nodo desplegado y aprobado su cheque de salud, mantenga en ese servidor solamente: la imagen que cualquier contenedor corre, sus etiquetas de rebote (Server 1 :latest, :rollback, :prod-current-good; Server 2 :unbottled-rollback, :unbottled-prev y el sitio co-establecido :latest) y las 3 nuevas construcciones de ghcr.io/techfreaque/next-vibe-app. Las etiquetas más antiguas van con el simple docker rmi (nunca -f, docker rechaza las imágenes en uso), entonces se corren imágenes colgantes. Antes de cada carga, menos de 30 GB libre corre la misma retención. Sólo los servidores HA configurados, nunca un sshTarget explícito. - Sólo advierta.",
       },
+      skipCheck: {
+        title: "Omitir puerta de seguridad",
+        description:
+          "Salida explícita para omitir la puerta de seguridad previa al build (revisión de vibe gen y vibe check completo). Exige un motivo no vacío que queda registrado. No escribe el marcador .checked.",
+      },
+      checkOnly: {
+        title: "Solo verificar",
+        description:
+          "Exporta el commit, ejecuta la puerta de seguridad previa al build (vibe gen y vibe check completo), escribe el marcador .checked si pasa y se detiene antes del build y push de Docker.",
+      },
       success: {
         title: "Operación completada",
       },
@@ -237,6 +247,34 @@ export const translations: typeof enTranslations = {
         remoteTagFailed: "{{target}} : no podía quitar {{ref}} : {{error}}",
         remoteRetained:
           " ⁇  {{target}} : Removido {{count}} antiguo imagen ref(s), mantuvo el nuevo {{keep}} construye más etiquetas de redondeo e imágenes en uso: {{tags}}. Próxima de enganche: {{pruned}}",
+        gateSkipped:
+          "⚠️ Puerta de seguridad OMITIDA para el commit {{sha}} (--skipCheck): {{reason}}",
+        gateCached:
+          "✅ Puerta de seguridad ya aprobada para el commit {{sha}} (marcador en caché: {{marker}})",
+        gateGenStart:
+          "🔍 Verificando archivos generados en el commit exportado {{sha}} ...",
+        gateGenPassed: "✅ Archivos generados al día para el commit {{sha}}",
+        gateGenFailed:
+          "Despliegue bloqueado: falló vibe gen para el commit {{sha}}: {{error}}",
+        gateGenStale:
+          "Despliegue bloqueado: archivos generados desactualizados en el commit {{sha}} ({{count}} archivo(s) modificados por vibe gen): {{files}}",
+        gateCheckStart:
+          "🔍 Ejecutando vibe check completo en el commit exportado {{sha}} ...",
+        gateCheckPassed:
+          "✅ vibe check completo aprobado para el commit {{sha}}",
+        gateCheckFailed:
+          "Despliegue bloqueado: falló vibe check para el commit {{sha}}: {{error}}",
+        gateCheckIncomplete:
+          "Despliegue bloqueado: vibe check no se completó para el commit {{sha}}: {{error}}",
+        gateSetupFailed:
+          "Despliegue bloqueado: no se pudo preparar el commit {{sha}} para la puerta de seguridad: {{error}}",
+        gateCleanupWarn:
+          "⚠️ Aviso al limpiar la puerta de seguridad en {{dir}}: {{error}}",
+        gateMarkerWarn:
+          "⚠️ Puerta de seguridad aprobada para {{sha}}, pero falló al escribir el marcador {{path}}: {{error}}",
+        gatePassed: "✅ Puerta de seguridad aprobada para el commit {{sha}}",
+        checkOnlySuccess:
+          "✅ Puerta de seguridad {{status}} para el commit {{sha}} (build y push de Docker omitidos con --checkOnly)",
       },
     },
   },

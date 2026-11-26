@@ -75,6 +75,16 @@ export const translations = {
         description:
           "Default on. After a node deployed and passed its health check, keep on that server only: the image any container runs, its rollback tags (Server 1 :latest, :rollback, :prod-current-good; Server 2 :unbottled, :unbottled-rollback, :unbottled-prev and the co-hosted site's :latest) and the newest 3 builds of ghcr.io/techfreaque/next-vibe-app. Older tags go with plain docker rmi (never -f, docker refuses images in use), then dangling images are pruned. Before each load, under 30 GB free runs the same retention. Only the configured HA servers, never an explicit --sshTarget. Off = warn only.",
       },
+      skipCheck: {
+        title: "Skip safety gate",
+        description:
+          "Explicit escape hatch to bypass the pre-build safety gate (vibe gen drift check and repo-wide vibe check). Requires a non-empty reason, which is logged. Does not write the .checked cache marker.",
+      },
+      checkOnly: {
+        title: "Check only",
+        description:
+          "Export the commit, run the pre-build safety gate (vibe gen drift check and repo-wide vibe check), write the .checked marker on pass, and stop before building or pushing the Docker image.",
+      },
       success: {
         title: "Success",
       },
@@ -225,6 +235,33 @@ export const translations = {
         remoteTagFailed: "{{target}}: could not remove {{ref}}: {{error}}",
         remoteRetained:
           "🧹 {{target}}: removed {{count}} old image ref(s), kept the newest {{keep}} builds plus rollback tags and images in use: {{tags}}. Dangling prune: {{pruned}}",
+        gateSkipped:
+          "⚠️ Deploy safety gate SKIPPED for commit {{sha}} (--skipCheck): {{reason}}",
+        gateCached:
+          "✅ Deploy safety gate already passed for commit {{sha}} (cached marker: {{marker}})",
+        gateGenStart:
+          "🔍 Checking generated files for drift in exported commit {{sha}} ...",
+        gateGenPassed: "✅ Generated files are up to date for commit {{sha}}",
+        gateGenFailed:
+          "Deploy blocked: vibe gen check failed for commit {{sha}}: {{error}}",
+        gateGenStale:
+          "Deploy blocked: generated files are stale in commit {{sha}} ({{count}} file(s) changed by vibe gen): {{files}}",
+        gateCheckStart:
+          "🔍 Running repo-wide vibe check in exported commit {{sha}} ...",
+        gateCheckPassed: "✅ Repo-wide vibe check passed for commit {{sha}}",
+        gateCheckFailed:
+          "Deploy blocked: vibe check failed for commit {{sha}}: {{error}}",
+        gateCheckIncomplete:
+          "Deploy blocked: vibe check did not complete for commit {{sha}}: {{error}}",
+        gateSetupFailed:
+          "Deploy blocked: could not prepare exported commit {{sha}} for safety gate: {{error}}",
+        gateCleanupWarn:
+          "⚠️ Safety gate cleanup warning for {{dir}}: {{error}}",
+        gateMarkerWarn:
+          "⚠️ Safety gate passed for {{sha}}, but writing cache marker {{path}} failed: {{error}}",
+        gatePassed: "✅ Deploy safety gate passed for commit {{sha}}",
+        checkOnlySuccess:
+          "✅ Safety gate {{status}} for commit {{sha}} (Docker build and push skipped via --checkOnly)",
       },
     },
   },

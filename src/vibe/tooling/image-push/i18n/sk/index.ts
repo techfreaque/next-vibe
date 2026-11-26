@@ -77,6 +77,16 @@ export const translations: typeof enTranslations = {
         description:
           "Predvolene zapnuté. Po nasadení a úspešnej kontrole stavu ponechá na serveri obrazy používané kontajnermi, značky na návrat (server 1: :latest, :rollback a :prod-current-good; server 2: :unbottled, :unbottled-rollback, :unbottled-prev a :latest druhej hostovanej stránky) a 3 najnovšie zostavy ghcr.io/techfreaque/next-vibe-app. Staršie značky odstráni príkazom docker rmi bez -f. Docker odmietne odstrániť používané obrazy. Nakoniec sa odstránia nepoužívané obrazy bez značky. Ak pred načítaním zostáva menej ako 30 GB, použijú sa rovnaké pravidlá. Čistenie platí len pre nakonfigurované servery HA. Pri zadaní --sshTarget sa nepoužíva. Po vypnutí sa zobrazí iba upozornenie.",
       },
+      skipCheck: {
+        title: "Preskočiť bezpečnostnú kontrolu",
+        description:
+          "Výslovná výnimka na obídenie kontroly pred zostavením (overenie vibe gen a úplný vibe check). Vyžaduje neprázdny dôvod, ktorý sa zapíše do záznamu. Nezapisuje značku .checked.",
+      },
+      checkOnly: {
+        title: "Iba kontrola",
+        description:
+          "Exportuje commit, spustí bezpečnostnú kontrolu pred zostavením (overenie vibe gen a úplný vibe check), pri úspechu zapíše značku .checked a skončí pred zostavením a odoslaním obrazu Docker.",
+      },
       success: {
         title: "Úspech",
       },
@@ -237,6 +247,34 @@ export const translations: typeof enTranslations = {
         remoteTagFailed: "{{target}}: nemohol odstrániť {{ref}} : {{error}}",
         remoteRetained:
           "🧹 {{target}}: odstránené staré odkazy na obrazy ({{count}}). Zachované nové zostavy ({{keep}}), značky na návrat a používané obrazy: {{tags}}. Odstránené nepoužívané vrstvy: {{pruned}}",
+        gateSkipped:
+          "⚠️ Bezpečnostná kontrola nasadenia PRESKOČENÁ pre commit {{sha}} (--skipCheck): {{reason}}",
+        gateCached:
+          "✅ Bezpečnostná kontrola už prešla pre commit {{sha}} (uložená značka: {{marker}})",
+        gateGenStart:
+          "🔍 Overuje sa aktuálnosť vygenerovaných súborov v commite {{sha}}…",
+        gateGenPassed: "✅ Vygenerované súbory sú aktuálne pre commit {{sha}}",
+        gateGenFailed:
+          "Nasadenie zablokované: kontrola vibe gen zlyhala pre commit {{sha}}: {{error}}",
+        gateGenStale:
+          "Nasadenie zablokované: vygenerované súbory v commite {{sha}} sú zastarané ({{count}} zmenených súborov): {{files}}",
+        gateCheckStart:
+          "🔍 Spúšťa sa úplný vibe check v exportovanom commite {{sha}}…",
+        gateCheckPassed: "✅ Úplný vibe check prešiel pre commit {{sha}}",
+        gateCheckFailed:
+          "Nasadenie zablokované: vibe check zlyhal pre commit {{sha}}: {{error}}",
+        gateCheckIncomplete:
+          "Nasadenie zablokované: vibe check sa nedokončil pre commit {{sha}}: {{error}}",
+        gateSetupFailed:
+          "Nasadenie zablokované: exportovaný commit {{sha}} sa nepodarilo pripraviť na kontrolu: {{error}}",
+        gateCleanupWarn:
+          "⚠️ Upozornenie pri upratovaní po kontrole v {{dir}}: {{error}}",
+        gateMarkerWarn:
+          "⚠️ Bezpečnostná kontrola prešla pre {{sha}}, ale zápis značky {{path}} zlyhal: {{error}}",
+        gatePassed:
+          "✅ Bezpečnostná kontrola nasadenia prešla pre commit {{sha}}",
+        checkOnlySuccess:
+          "✅ Bezpečnostná kontrola ({{status}}) pre commit {{sha}} (zostavenie a odoslanie Dockeru preskočené cez --checkOnly)",
       },
     },
   },

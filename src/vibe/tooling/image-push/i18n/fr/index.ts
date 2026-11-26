@@ -77,6 +77,16 @@ export const translations: typeof enTranslations = {
         description:
           "Activé par défaut. Une fois un nœud déployé et son health check passé, ne garde sur ce serveur que : l'image utilisée par chaque conteneur, ses tags de rollback (serveur 1 :latest, :rollback, :prod-current-good ; serveur 2 :unbottled, :unbottled-rollback, :unbottled-prev et le :latest du site co-hébergé) et les 3 builds les plus récents de ghcr.io/techfreaque/next-vibe-app. Les tags plus anciens partent avec un simple docker rmi (jamais -f, docker refuse les images utilisées), puis les images orphelines sont purgées. Avant chaque chargement, sous 30 Go libres, la même rétention s'applique. Uniquement les serveurs HA configurés, jamais un --sshTarget explicite. Désactivé = avertissement uniquement.",
       },
+      skipCheck: {
+        title: "Ignorer la vérification",
+        description:
+          "Dérogation explicite pour contourner la barrière de sécurité avant build (dérive vibe gen et vibe check complet). Exige un motif non vide, consigné dans les logs. N'écrit pas le marqueur .checked.",
+      },
+      checkOnly: {
+        title: "Vérifier uniquement",
+        description:
+          "Exporte le commit, exécute la barrière de sécurité avant build (dérive vibe gen et vibe check complet), écrit le marqueur .checked en cas de succès et s'arrête avant le build et le push Docker.",
+      },
       success: {
         title: "Succès",
       },
@@ -244,6 +254,33 @@ export const translations: typeof enTranslations = {
           "{{target}} : impossible de supprimer {{ref}} : {{error}}",
         remoteRetained:
           "🧹 {{target}} : {{count}} ancienne(s) référence(s) d'image supprimée(s), {{keep}} builds les plus récents conservés ainsi que les tags de rollback et les images utilisées : {{tags}}. Purge des orphelines : {{pruned}}",
+        gateSkipped:
+          "⚠️ Barrière de sécurité IGNORÉE pour le commit {{sha}} (--skipCheck) : {{reason}}",
+        gateCached:
+          "✅ Barrière de sécurité déjà validée pour le commit {{sha}} (marqueur en cache : {{marker}})",
+        gateGenStart:
+          "🔍 Vérification de la fraîcheur des fichiers générés dans le commit {{sha}} ...",
+        gateGenPassed: "✅ Fichiers générés à jour pour le commit {{sha}}",
+        gateGenFailed:
+          "Déploiement bloqué : échec de vibe gen pour le commit {{sha}} : {{error}}",
+        gateGenStale:
+          "Déploiement bloqué : fichiers générés obsolètes dans le commit {{sha}} ({{count}} fichier(s) modifié(s) par vibe gen) : {{files}}",
+        gateCheckStart:
+          "🔍 Exécution de vibe check complet dans le commit exporté {{sha}} ...",
+        gateCheckPassed: "✅ vibe check complet validé pour le commit {{sha}}",
+        gateCheckFailed:
+          "Déploiement bloqué : échec de vibe check pour le commit {{sha}} : {{error}}",
+        gateCheckIncomplete:
+          "Déploiement bloqué : vibe check ne s'est pas terminé pour le commit {{sha}} : {{error}}",
+        gateSetupFailed:
+          "Déploiement bloqué : impossible de préparer le commit {{sha}} pour la barrière de sécurité : {{error}}",
+        gateCleanupWarn:
+          "⚠️ Avertissement lors du nettoyage de la barrière dans {{dir}} : {{error}}",
+        gateMarkerWarn:
+          "⚠️ Barrière validée pour {{sha}}, mais l'écriture du marqueur {{path}} a échoué : {{error}}",
+        gatePassed: "✅ Barrière de sécurité validée pour le commit {{sha}}",
+        checkOnlySuccess:
+          "✅ Barrière de sécurité {{status}} pour le commit {{sha}} (build et push Docker ignorés via --checkOnly)",
       },
     },
   },

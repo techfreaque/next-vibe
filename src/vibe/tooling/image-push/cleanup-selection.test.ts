@@ -268,19 +268,34 @@ describe("selectExportEntriesToPark", () => {
     );
   });
 
-  it("parks orphaned old markers and skips unrelated entries", () => {
+  it("parks orphaned old markers including .checked and .gate-dirty, and skips unrelated entries", () => {
     const entries: ExportEntry[] = [
       exportFile(`${exportSha("a")}.done`),
+      exportFile(`${exportSha("a")}.checked`),
       exportFile(`${exportSha("b")}.done`),
+      exportFile(`${exportSha("b")}.checked`),
+      exportFile(`${exportSha("b")}.gate-dirty`),
       { name: "notes", isDirectory: true, isFile: false },
       exportFile("notes.done"),
+      exportFile("notes.checked"),
       exportFile(exportSha("f")),
       { name: `${exportSha("e")}.done`, isDirectory: true, isFile: false },
       { name: exportSha("d"), isDirectory: false, isFile: false },
     ];
     expect(
       selectExportEntriesToPark({ entries, currentSha: exportSha("a") }),
-    ).toEqual(new Map([[exportSha("b"), [`${exportSha("b")}.done`]]]));
+    ).toEqual(
+      new Map([
+        [
+          exportSha("b"),
+          [
+            `${exportSha("b")}.done`,
+            `${exportSha("b")}.checked`,
+            `${exportSha("b")}.gate-dirty`,
+          ],
+        ],
+      ]),
+    );
   });
 });
 

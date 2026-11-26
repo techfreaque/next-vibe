@@ -149,6 +149,22 @@ const { POST } = createEndpoint({
         schema: z.boolean().default(true),
       }),
 
+      skipCheck: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "post.fields.skipCheck.title",
+        description: "post.fields.skipCheck.description",
+        schema: z.string().trim().min(1).optional(),
+      }),
+
+      checkOnly: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "post.fields.checkOnly.title",
+        description: "post.fields.checkOnly.description",
+        schema: z.boolean().default(false),
+      }),
+
       // === RESPONSE FIELDS ===
       success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
