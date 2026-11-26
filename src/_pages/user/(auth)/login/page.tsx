@@ -4,7 +4,10 @@ import type { Metadata } from "next";
 import { coreEnv } from "next-vibe/core/env";
 import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
+import {
+  metadataGenerator,
+  NOINDEX_FOLLOW_ROBOTS,
+} from "next-vibe/core/i18n/core/metadata";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { UserRepository } from "next-vibe/identity/user/repository";
@@ -59,6 +62,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     imageAlt: t("meta.imageAlt"),
     keywords: [t("meta.keywords", { appName })],
     additionalMetadata: {
+      // Auth form: crawlable (every nav bar links it), never indexed.
+      robots: NOINDEX_FOLLOW_ROBOTS,
       openGraph: {
         title: t("meta.ogTitle", { appName }),
         description: t("meta.ogDescription", { appName }),

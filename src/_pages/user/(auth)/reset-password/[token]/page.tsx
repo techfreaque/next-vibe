@@ -3,7 +3,10 @@ export const dynamic = "force-dynamic";
 import type { Metadata } from "next";
 import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
+import {
+  metadataGenerator,
+  NOINDEX_FOLLOW_ROBOTS,
+} from "next-vibe/core/i18n/core/metadata";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserRepository } from "next-vibe/identity/user/repository";
@@ -46,6 +49,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     keywords: [t("meta.passwordReset.keywords", { appName })],
     category: t("meta.passwordReset.category"),
     additionalMetadata: {
+      // Auth form: crawlable (every nav bar links it), never indexed.
+      robots: NOINDEX_FOLLOW_ROBOTS,
       openGraph: {
         title: t("meta.passwordReset.title", { appName }),
         description: t("meta.passwordReset.description", { appName }),

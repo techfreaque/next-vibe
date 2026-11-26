@@ -2,6 +2,7 @@ export const dynamic = "force-dynamic";
 
 import type { Metadata } from "next";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { NOINDEX_FOLLOW_ROBOTS } from "next-vibe/core/i18n/core/metadata";
 import { AuthRepository } from "next-vibe/identity/auth/repository";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserRole } from "next-vibe/identity/roles/enum";
@@ -27,7 +28,9 @@ export async function generateMetadata({
   const { locale } = await params;
   const { t } = scopedTranslation.scopedT(locale);
 
+  // Utility page (email address in the URL): never indexed.
   return {
+    robots: NOINDEX_FOLLOW_ROBOTS,
     title: t("unsubscribe.page.title"),
     description: t("unsubscribe.page.description"),
     openGraph: {

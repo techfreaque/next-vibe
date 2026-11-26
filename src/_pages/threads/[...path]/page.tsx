@@ -11,6 +11,7 @@
 
 export const dynamic = "force-dynamic";
 
+import type { Metadata } from "next";
 import { NEW_MESSAGE_ID } from "next-vibe/agent/chat/enum";
 import type { FolderContentsResponseOutput } from "next-vibe/agent/chat/folder-contents/[rootFolderId]/definition";
 import { scopedTranslation as folderContentsScopedTranslation } from "next-vibe/agent/chat/folder-contents/[rootFolderId]/i18n";
@@ -43,6 +44,7 @@ import { SkillsRepository } from "next-vibe/agent/skills/repository";
 import { coreEnv } from "next-vibe/core/env";
 import { DefaultFolderId } from "next-vibe/core/execution-context";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { NOINDEX_FOLLOW_ROBOTS } from "next-vibe/core/i18n/core/metadata";
 import { VibeMode } from "next-vibe/env/env-util";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserRole } from "next-vibe/identity/roles/enum";
@@ -79,6 +81,16 @@ interface ThreadsPathPageProps {
     ref?: string;
   }>;
 }
+
+/**
+ * Chat app pages (every root folder, thread and new-chat URL, including the
+ * public feed) are crawlable but never indexed. Public pages link here from
+ * every nav bar and model page, so blocking them in robots.txt only produced
+ * "Indexed, though blocked by robots.txt".
+ */
+export const generateMetadata: (
+  props: ThreadsPathPageProps,
+) => Metadata = () => ({ robots: NOINDEX_FOLLOW_ROBOTS });
 
 export interface ThreadsPathPageData {
   locale: CountryLanguage;

@@ -1,14 +1,13 @@
-# Public site is crawlable; private app areas and APIs are not.
+# Public site is crawlable. Raw APIs and the admin tools are not.
+# Chat (/threads) and account (/user) pages are crawlable on purpose: they
+# carry a noindex meta tag, and Google can only honour a noindex it is
+# allowed to fetch (a Disallow here left them "Indexed, though blocked").
 User-agent: *
 Allow: /
 Disallow: /api/
 Disallow: /*/api/
-Disallow: /*/threads/
-Disallow: /*/threads$
 Disallow: /*/tools/
 Disallow: /*/tools$
-Disallow: /*/user/
-Disallow: /*/user$
 
 Sitemap: https://unbottled.ai/sitemap.xml
 

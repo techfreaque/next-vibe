@@ -11,6 +11,19 @@ import {
 } from "./seo-locales";
 
 /**
+ * Robots value for app pages (chat, account, auth): crawlable but never
+ * indexed, links followed. These paths are NOT disallowed in robots.txt on
+ * purpose: Google can only drop a URL it is allowed to fetch and see this
+ * noindex on, otherwise every linked app URL ends up "Indexed, though blocked
+ * by robots.txt".
+ */
+export const NOINDEX_FOLLOW_ROBOTS = {
+  index: false,
+  follow: true,
+  googleBot: { index: false, follow: true },
+} as const satisfies Metadata["robots"];
+
+/**
  * Options for generating metadata with translations
  */
 interface GenerateMetadataOptions {

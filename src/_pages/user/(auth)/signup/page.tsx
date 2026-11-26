@@ -3,7 +3,10 @@ export const dynamic = "force-dynamic";
 import type { Metadata } from "next";
 import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
+import {
+  metadataGenerator,
+  NOINDEX_FOLLOW_ROBOTS,
+} from "next-vibe/core/i18n/core/metadata";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserRepository } from "next-vibe/identity/user/repository";
 import { createEndpointLogger } from "next-vibe/logger/server";
@@ -51,6 +54,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     imageAlt: t("meta.imageAlt", { appName }),
     keywords: [t("meta.keywords", { appName })],
     additionalMetadata: {
+      // Auth form: crawlable (every nav bar links it), never indexed.
+      robots: NOINDEX_FOLLOW_ROBOTS,
       openGraph: {
         title: t("meta.ogTitle", { appName }),
         description: t("meta.ogDescription", { appName }),

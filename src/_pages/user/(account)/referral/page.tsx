@@ -7,6 +7,7 @@ export const dynamic = "force-dynamic";
 
 import type { Metadata } from "next";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { NOINDEX_FOLLOW_ROBOTS } from "next-vibe/core/i18n/core/metadata";
 import { AuthRepository } from "next-vibe/identity/auth/repository";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserRole } from "next-vibe/identity/roles/enum";
@@ -49,6 +50,8 @@ export async function generateMetadata({
       appName: configTranslations.appName,
       ...referralParams,
     }),
+    // Account page; the public program page is /story/earn.
+    robots: NOINDEX_FOLLOW_ROBOTS,
   };
 }
 
