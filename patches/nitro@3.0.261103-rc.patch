@@ -1,9 +1,47 @@
 diff --git a/dist/runtime/internal/vite/dev-worker.mjs b/dist/runtime/internal/vite/dev-worker.mjs
 --- a/dist/runtime/internal/vite/dev-worker.mjs
 +++ b/dist/runtime/internal/vite/dev-worker.mjs
-@@ -145,20 +145,38 @@
-   // Modules the change cannot affect keep their state (and their singletons).
-   invalidateFile(file) {
+@@ -88,7 +88,11 @@
+       : new ESModulesEvaluator();
+     const debug =
+       typeof process !== "undefined" && process.env?.NITRO_DEBUG ? console.debug : undefined;
+-    this.runner = new ModuleRunner({ transport }, evaluator, debug);
++    this.runner = new ModuleRunner(
++      { transport, explicitEvaluationInvalidation: true },
++      evaluator,
++      debug,
++    );
+ 
+     this.reload();
+   }
+@@ -119,11 +123,9 @@
+         if (all) {
+           // Nothing to scope the reload to (added or removed handlers): drop
+           // every evaluation, the same way Vite's own full-reload handler does.
+-          this.runner.evaluatedModules.clear();
++          this.runner.invalidateEvaluations();
+         } else {
+-          for (const file of files) {
+-            this.invalidateFile(file);
+-          }
++          this.invalidateFiles(files);
+         }
+         this.entry = await this.runner.import(this.entryPath);
+         this.entryError = undefined;
+@@ -137,28 +139,42 @@
+     return queuedReload;
+   }
+ 
+-  // Drops the evaluations of `file` and of everything importing it, so the next
+-  // import re-evaluates them. Vite already invalidates them on the server, but
+-  // a plugin that crawls (and re-transforms) a module's dependencies can
+-  // repopulate their transform result before the runner re-fetches them, and
+-  // `fetchModule` then answers `{cache: true}` and the stale evaluation is kept.
+-  // Modules the change cannot affect keep their state (and their singletons).
+-  invalidateFile(file) {
++  // Retire changed files and their importers together. The host's transform
++  // cache and the worker's evaluation cache have separate lifetimes.
++  invalidateFiles(files) {
      const { evaluatedModules } = this.runner;
 -    const seen = new Set();
 -    const invalidate = (mod) => {
@@ -22,9 +60,13 @@ diff --git a/dist/runtime/internal/vite/dev-worker.mjs b/dist/runtime/internal/v
 +        collect(evaluatedModules.getModuleById(importer));
 +      }
      };
-     for (const mod of evaluatedModules.getModulesByFile(file) || []) {
+-    for (const mod of evaluatedModules.getModulesByFile(file) || []) {
 -      invalidate(mod);
-+      collect(mod);
+-    }
++    for (const file of files) {
++      for (const mod of evaluatedModules.getModulesByFile(file) || []) {
++        collect(mod);
++      }
 +    }
 +
 +    // TanStack builds its generated tree by mutating the imported Route instances.
@@ -42,9 +84,21 @@ diff --git a/dist/runtime/internal/vite/dev-worker.mjs b/dist/runtime/internal/v
 +        }
 +      }
 +    }
-+    for (const mod of affected) {
-+      evaluatedModules.invalidateModule(mod);
-     }
++    this.runner.invalidateEvaluations(affected);
    }
  
    // Whether `file` is part of this environment's evaluated module graph.
+@@ -312,10 +328,10 @@
+       // requests (requests and messages are not ordered in workerd).
+       if (message.event === "nitro:invalidate") {
+         const { id, env: name, moduleId } = message.data;
+-        const evaluatedModules = envs[name]?.runner.evaluatedModules;
+-        const mod = evaluatedModules?.getModuleById(moduleId);
++        const runner = envs[name]?.runner;
++        const mod = runner?.evaluatedModules.getModuleById(moduleId);
+         if (mod) {
+-          evaluatedModules.invalidateModule(mod);
++          runner.invalidateEvaluations(new Set([mod]));
+         }
+         sendMessage?.({ type: "custom", event: "nitro:invalidated", data: { id } });
+         return;
