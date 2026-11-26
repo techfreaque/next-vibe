@@ -13,8 +13,9 @@ import { InventoryWarehouseUpdateRepository } from "./repository";
 export const { PATCH, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.PATCH]: {
-    handler: ({ data, user, logger, locale }) =>
+    handler: ({ data, urlPathParams, user, logger, locale }) =>
       InventoryWarehouseUpdateRepository.updateWarehouse(
+        urlPathParams.warehouseId,
         data,
         user.id,
         logger,

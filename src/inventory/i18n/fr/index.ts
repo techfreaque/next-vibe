@@ -9,6 +9,7 @@ export const translations: typeof enTranslations = {
     },
   },
   tags: {
+    cancel: "Annuler",
     inventory: "Stocks",
     warehouse: "Entrepôt",
     stock: "Stock",
@@ -53,13 +54,15 @@ export const translations: typeof enTranslations = {
       titleShort: "Nouvel entrepôt",
       description: "Enregistrer un nouvel entrepôt pour une entreprise.",
       widget: {
+        openWarehouse: "Ouvrir l'entrepôt",
+        createAnother: "En créer un autre",
         backToList: "Retour aux entrepôts",
         active: "Actif",
         inactive: "Inactif",
         default: "Par défaut",
       },
       companyId: {
-        label: "ID de l'entreprise",
+        label: "Entreprise",
         description: "Entreprise à laquelle appartient cet entrepôt",
       },
       name: {
@@ -145,6 +148,9 @@ export const translations: typeof enTranslations = {
       titleShort: "Entrepôts",
       description: "Lister tous les entrepôts d'une entreprise.",
       widget: {
+        subtitle:
+          "Là où vit votre stock. Ouvrez-en un pour voir son stock et sa valeur.",
+        status: "Statut",
         active: "Actif",
         inactive: "Inactif",
         default: "Par défaut",
@@ -161,7 +167,7 @@ export const translations: typeof enTranslations = {
           "Saisissez un ID d'entreprise pour charger les entrepôts.",
       },
       companyId: {
-        label: "ID de l'entreprise",
+        label: "Entreprise",
         description: "Entreprise dont lister les entrepôts",
       },
       errors: {
@@ -235,7 +241,7 @@ export const translations: typeof enTranslations = {
         select: "Choisir un entrepôt",
       },
       warehouseId: {
-        label: "ID de l'entrepôt",
+        label: "Entrepôt",
         description: "Entrepôt à consulter",
       },
       errors: {
@@ -303,7 +309,7 @@ export const translations: typeof enTranslations = {
         inactive: "Inactif",
       },
       warehouseId: {
-        label: "ID de l'entrepôt",
+        label: "Entrepôt",
         description: "Entrepôt à modifier",
       },
       name: {
@@ -427,11 +433,11 @@ export const translations: typeof enTranslations = {
         statusOk: "En stock",
       },
       warehouseId: {
-        label: "ID de l'entrepôt",
+        label: "Entrepôt",
         description: "Entrepôt dont consulter le stock",
       },
       productId: {
-        label: "ID du produit",
+        label: "Produit",
         description: "Filtrer sur un produit précis (facultatif)",
       },
       errors: {
@@ -494,6 +500,11 @@ export const translations: typeof enTranslations = {
   },
 
   // Stock adjust
+  stockWrite: {
+    onHandNow: "En stock maintenant :",
+    viewStock: "Voir les niveaux de stock",
+    again: "En saisir un autre",
+  },
   stockAdjust: {
     post: {
       title: "Ajuster le stock",
@@ -509,10 +520,10 @@ export const translations: typeof enTranslations = {
         negativeHint: "Une quantité négative retire du stock",
       },
       warehouseId: {
-        label: "ID de l'entrepôt",
+        label: "Entrepôt",
         description: "Entrepôt dans lequel ajuster le stock",
       },
-      productId: { label: "ID du produit", description: "Produit à ajuster" },
+      productId: { label: "Produit", description: "Produit à ajuster" },
       quantity: {
         label: "Quantité",
         description:
@@ -592,11 +603,11 @@ export const translations: typeof enTranslations = {
         backToStock: "Retour au stock",
       },
       warehouseId: {
-        label: "ID de l'entrepôt",
+        label: "Entrepôt",
         description: "Entrepôt qui réceptionne le stock",
       },
       productId: {
-        label: "ID du produit",
+        label: "Produit",
         description: "Produit réceptionné",
       },
       quantity: {
@@ -674,10 +685,10 @@ export const translations: typeof enTranslations = {
         backToStock: "Retour au stock",
       },
       warehouseId: {
-        label: "ID de l'entrepôt",
+        label: "Entrepôt",
         description: "Entrepôt d'où sort le stock",
       },
-      productId: { label: "ID du produit", description: "Produit à sortir" },
+      productId: { label: "Produit", description: "Produit à sortir" },
       quantity: {
         label: "Quantité",
         description: "Nombre d'unités à sortir",
@@ -754,12 +765,17 @@ export const translations: typeof enTranslations = {
       description:
         "Créer une demande de transfert entre entrepôts. Démarre au statut Brouillon.",
       widget: {
+        itemsTitle: "Articles à déplacer",
+        pickSource: "Choisissez l'entrepôt source pour voir son stock.",
+        noStock: "Cet entrepôt n'a aucun stock à déplacer.",
+        available: "{{quantity}} disponible(s)",
+        itemsRequired: "Saisissez une quantité pour au moins un produit.",
         backToList: "Retour aux transferts",
         viewTransfer: "Voir le transfert",
         browseWarehouses: "Parcourir les entrepôts",
       },
       companyId: {
-        label: "ID de l'entreprise",
+        label: "Entreprise",
         description: "Entreprise à laquelle appartient ce transfert",
       },
       fromWarehouseId: {
@@ -798,6 +814,10 @@ export const translations: typeof enTranslations = {
           description: "Aucun accès à cette entreprise",
         },
         conflict: {
+          invalidWarehouses:
+            "Les deux entrepôts doivent être actifs et appartenir à cette entreprise.",
+          invalidItems:
+            "Chaque produit une seule fois, avec une quantité supérieure à zéro (4 décimales max).",
           title: "Même entrepôt",
           description:
             "Les entrepôts d'origine et de destination doivent être différents",
@@ -866,7 +886,7 @@ export const translations: typeof enTranslations = {
         arrowSeparator: "→",
       },
       companyId: {
-        label: "ID de l'entreprise",
+        label: "Entreprise",
         description: "Entreprise dont lister les transferts",
       },
       errors: {
@@ -929,6 +949,7 @@ export const translations: typeof enTranslations = {
       titleShort: "Transfert",
       description: "Récupérer un transfert avec toutes ses lignes.",
       widget: {
+        cancel: "Annuler le transfert",
         retry: "Réessayer",
         noItems: "Ce transfert ne contient aucun article.",
         noItemsHint:
@@ -942,7 +963,7 @@ export const translations: typeof enTranslations = {
         select: "Choisir un transfert",
       },
       transferId: {
-        label: "ID du transfert",
+        label: "Transfert",
         description: "Transfert à consulter",
       },
       errors: {
@@ -1007,6 +1028,68 @@ export const translations: typeof enTranslations = {
   },
 
   // Transfer dispatch
+  transferCancel: {
+    post: {
+      title: "Annuler le transfert",
+      titleShort: "Annuler le transfert",
+      description:
+        "Arrête ce transfert. Un transfert expédié remet son stock dans l'entrepôt source.",
+      widget: {
+        backToTransfer: "Retour au transfert",
+      },
+      transferId: {
+        label: "Transfert",
+        description: "Transfert à annuler",
+      },
+      errors: {
+        validation: {
+          title: "Erreur de validation",
+          description: "Transfert invalide",
+        },
+        unauthorized: {
+          title: "Non connecté",
+          description: "Connectez-vous pour annuler des transferts",
+        },
+        forbidden: {
+          title: "Accès refusé",
+          description: "Aucun accès à ce transfert",
+        },
+        conflict: {
+          title: "Annulation impossible",
+          description:
+            "Seuls les brouillons et transferts en transit peuvent être annulés",
+        },
+        server: {
+          title: "Erreur serveur",
+          description: "Impossible d'annuler le transfert",
+        },
+        unknown: {
+          title: "Erreur inconnue",
+          description: "Une erreur inattendue s'est produite",
+        },
+        network: {
+          title: "Erreur réseau",
+          description: "Vérifiez votre connexion et réessayez",
+        },
+        notFound: {
+          title: "Transfert introuvable",
+          description: "Ce transfert n'existe pas",
+        },
+        unsavedChanges: {
+          title: "Modifications non enregistrées",
+          description: "Vous avez des modifications non enregistrées",
+        },
+      },
+      success: {
+        title: "Transfert annulé",
+        description: "Plus rien de ce transfert n'est en transit.",
+      },
+      response: {
+        id: "Transfert",
+        status: "Statut",
+      },
+    },
+  },
   transferDispatch: {
     post: {
       title: "Expédier le transfert",
@@ -1017,7 +1100,7 @@ export const translations: typeof enTranslations = {
         backToTransfer: "Retour au transfert",
       },
       transferId: {
-        label: "ID du transfert",
+        label: "Transfert",
         description: "Transfert à expédier",
       },
       errors: {
@@ -1034,6 +1117,8 @@ export const translations: typeof enTranslations = {
           description: "Aucun accès à ce transfert",
         },
         conflict: {
+          insufficientStock:
+            "Stock insuffisant dans l'entrepôt source pour au moins un article.",
           title: "Pas un brouillon",
           description:
             "Seuls les transferts en brouillon peuvent être expédiés",
@@ -1081,7 +1166,7 @@ export const translations: typeof enTranslations = {
         backToTransfer: "Retour au transfert",
       },
       transferId: {
-        label: "ID du transfert",
+        label: "Transfert",
         description: "Transfert à réceptionner",
       },
       errors: {
@@ -1143,6 +1228,14 @@ export const translations: typeof enTranslations = {
       description:
         "État des stocks en temps réel : santé du stock, transferts en cours et nombre d'entrepôts.",
       widget: {
+        navStockLevelsHint:
+          "Quantités, valeur et seuils de réapprovisionnement",
+        noWarehousesHint:
+          "Créez un entrepôt pour recevoir et déplacer du stock.",
+        navTransfersHint: "En transit : {{count}}",
+        navWarehousesHint: "Sites : {{count}}",
+        noWarehouses: "Aucun entrepôt pour l'instant",
+        related: "Voir aussi",
         kpiInStock: "En stock",
         kpiOutOfStock: "En rupture",
         kpiLowStock: "Stock bas",

@@ -7,6 +7,7 @@ export const translations = {
     },
   },
   tags: {
+    cancel: "Cancel",
     inventory: "Inventory",
     warehouse: "Warehouse",
     stock: "Stock",
@@ -23,22 +24,22 @@ export const translations = {
   endpointCategories: {
     inventory: "Inventory",
     warehouses: "Warehouses",
-    stock: "Stock Levels",
+    stock: "Stock levels",
     transfers: "Transfers",
   },
   enums: {
     movementType: {
       receipt: "Receipt",
       issue: "Issue",
-      transferIn: "Transfer In",
-      transferOut: "Transfer Out",
+      transferIn: "Transfer in",
+      transferOut: "Transfer out",
       adjustment: "Adjustment",
       sale: "Sale",
       return: "Return",
     },
     transferStatus: {
       draft: "Draft",
-      inTransit: "In Transit",
+      inTransit: "In transit",
       received: "Received",
       cancelled: "Cancelled",
     },
@@ -47,23 +48,25 @@ export const translations = {
   // Warehouse create
   warehouseCreate: {
     post: {
-      title: "Create Warehouse",
-      titleShort: "New Warehouse",
+      title: "Create warehouse",
+      titleShort: "New warehouse",
       description: "Register a new warehouse for a company.",
       widget: {
+        openWarehouse: "Open warehouse",
+        createAnother: "Create another",
         backToList: "Back to warehouses",
         active: "Active",
         inactive: "Inactive",
         default: "Default",
       },
       companyId: {
-        label: "Company ID",
+        label: "Company",
         description: "Company this warehouse belongs to",
       },
       name: {
-        label: "Warehouse Name",
+        label: "Warehouse name",
         description: "Full name of the warehouse",
-        placeholder: "Main Warehouse",
+        placeholder: "Main warehouse",
       },
       code: {
         label: "Code",
@@ -80,51 +83,51 @@ export const translations = {
         description: "Whether this warehouse is operational",
       },
       isDefault: {
-        label: "Default Warehouse",
+        label: "Default warehouse",
         description: "Set as the default warehouse for this company",
       },
       errors: {
         validation: {
-          title: "Validation Error",
+          title: "Validation error",
           description: "Check required fields",
         },
         unauthorized: {
-          title: "Not Signed In",
+          title: "Not signed in",
           description: "Sign in to create warehouses",
         },
         forbidden: {
-          title: "Admin Required",
+          title: "Admin required",
           description: "Only admins can create warehouses",
         },
         conflict: {
-          title: "Code Already Exists",
+          title: "Code already exists",
           description: "A warehouse with this code already exists",
         },
         server: {
-          title: "Server Error",
+          title: "Server error",
           description: "Failed to create warehouse. Try again.",
         },
         unknown: {
-          title: "Unknown Error",
+          title: "Unknown error",
           description: "An unexpected error occurred",
         },
         network: {
-          title: "Network Error",
+          title: "Network error",
           description: "Check your connection and try again",
         },
-        notFound: { title: "Not Found", description: "Company not found" },
+        notFound: { title: "Not found", description: "Company not found" },
         unsavedChanges: {
-          title: "Unsaved Changes",
+          title: "Unsaved changes",
           description: "You have unsaved changes",
         },
       },
       success: {
-        title: "Warehouse Created",
+        title: "Warehouse created",
         description: "Warehouse registered successfully",
       },
       response: {
         id: "Warehouse ID",
-        name: "Warehouse Name",
+        name: "Warehouse name",
         code: "Code",
         companyId: "Company ID",
         isActive: "Active",
@@ -140,58 +143,61 @@ export const translations = {
       titleShort: "Warehouses",
       description: "List all warehouses for a company.",
       widget: {
+        subtitle:
+          "Where your stock lives. Open one to see its stock and value.",
+        status: "Status",
         active: "Active",
         inactive: "Inactive",
         default: "Default",
         total: "warehouses",
-        createWarehouse: "New Warehouse",
+        createWarehouse: "New warehouse",
         empty: "No warehouses yet.",
         emptyHint: "Create your first warehouse to start tracking inventory.",
         emptyIcon: "🏭",
         back: "Back",
         loading: "Loading warehouses…",
         load: "Load",
-        viewStock: "View Stock",
+        viewStock: "View stock",
         selectCompany: "Enter a company ID to load warehouses.",
       },
       companyId: {
-        label: "Company ID",
+        label: "Company",
         description: "Company to list warehouses for",
       },
       errors: {
         validation: {
-          title: "Validation Error",
+          title: "Validation error",
           description: "Check required fields",
         },
         unauthorized: {
-          title: "Not Signed In",
+          title: "Not signed in",
           description: "Sign in to list warehouses",
         },
         forbidden: {
-          title: "Access Denied",
+          title: "Access denied",
           description: "No access to this company",
         },
         conflict: { title: "Conflict", description: "Data conflict" },
         server: {
-          title: "Server Error",
+          title: "Server error",
           description: "Failed to list warehouses",
         },
         unknown: {
-          title: "Unknown Error",
+          title: "Unknown error",
           description: "An unexpected error occurred",
         },
         network: {
-          title: "Network Error",
+          title: "Network error",
           description: "Check your connection and try again",
         },
-        notFound: { title: "Not Found", description: "Company not found" },
+        notFound: { title: "Not found", description: "Company not found" },
         unsavedChanges: {
-          title: "Unsaved Changes",
+          title: "Unsaved changes",
           description: "You have unsaved changes",
         },
       },
       success: {
-        title: "Warehouses Loaded",
+        title: "Warehouses loaded",
         description: "Warehouse list retrieved",
       },
       response: {
@@ -201,7 +207,7 @@ export const translations = {
         address: "Address",
         isActive: "Active",
         isDefault: "Default",
-        createdAt: "Created At",
+        createdAt: "Created at",
       },
     },
   },
@@ -209,7 +215,7 @@ export const translations = {
   // Warehouse get
   warehouseGet: {
     get: {
-      title: "Get Warehouse",
+      title: "Get warehouse",
       titleShort: "Warehouse",
       description: "Retrieve details for a specific warehouse.",
       widget: {
@@ -226,46 +232,46 @@ export const translations = {
         select: "Select warehouse",
       },
       warehouseId: {
-        label: "Warehouse ID",
+        label: "Warehouse",
         description: "Warehouse to retrieve",
       },
       errors: {
         validation: {
-          title: "Validation Error",
+          title: "Validation error",
           description: "Invalid warehouse ID",
         },
         unauthorized: {
-          title: "Not Signed In",
+          title: "Not signed in",
           description: "Sign in to view warehouses",
         },
         forbidden: {
-          title: "Access Denied",
+          title: "Access denied",
           description: "No access to this warehouse",
         },
         conflict: { title: "Conflict", description: "Data conflict" },
         server: {
-          title: "Server Error",
+          title: "Server error",
           description: "Failed to load warehouse",
         },
         unknown: {
-          title: "Unknown Error",
+          title: "Unknown error",
           description: "An unexpected error occurred",
         },
         network: {
-          title: "Network Error",
+          title: "Network error",
           description: "Check your connection and try again",
         },
         notFound: {
-          title: "Warehouse Not Found",
+          title: "Warehouse not found",
           description: "Warehouse does not exist",
         },
         unsavedChanges: {
-          title: "Unsaved Changes",
+          title: "Unsaved changes",
           description: "You have unsaved changes",
         },
       },
       success: {
-        title: "Warehouse Loaded",
+        title: "Warehouse loaded",
         description: "Warehouse details retrieved",
       },
       response: {
@@ -276,8 +282,8 @@ export const translations = {
         address: "Address",
         isActive: "Active",
         isDefault: "Default",
-        createdAt: "Created At",
-        updatedAt: "Updated At",
+        createdAt: "Created at",
+        updatedAt: "Updated at",
       },
     },
   },
@@ -285,8 +291,8 @@ export const translations = {
   // Warehouse update
   warehouseUpdate: {
     patch: {
-      title: "Update Warehouse",
-      titleShort: "Edit Warehouse",
+      title: "Update warehouse",
+      titleShort: "Edit warehouse",
       description: "Update warehouse details.",
       widget: {
         backToWarehouse: "Back to warehouse",
@@ -294,13 +300,13 @@ export const translations = {
         inactive: "Inactive",
       },
       warehouseId: {
-        label: "Warehouse ID",
+        label: "Warehouse",
         description: "Warehouse to update",
       },
       name: {
-        label: "Warehouse Name",
+        label: "Warehouse name",
         description: "Full name of the warehouse",
-        placeholder: "Main Warehouse",
+        placeholder: "Main warehouse",
       },
       code: {
         label: "Code",
@@ -317,49 +323,49 @@ export const translations = {
         description: "Whether this warehouse is operational",
       },
       isDefault: {
-        label: "Default Warehouse",
+        label: "Default warehouse",
         description: "Set as the default warehouse",
       },
       errors: {
         validation: {
-          title: "Validation Error",
+          title: "Validation error",
           description: "Check required fields",
         },
         unauthorized: {
-          title: "Not Signed In",
+          title: "Not signed in",
           description: "Sign in to update warehouses",
         },
         forbidden: {
-          title: "Admin Required",
+          title: "Admin required",
           description: "Only admins can update warehouses",
         },
         conflict: {
-          title: "Code Conflict",
+          title: "Code conflict",
           description: "That warehouse code is already taken",
         },
         server: {
-          title: "Server Error",
+          title: "Server error",
           description: "Failed to update warehouse",
         },
         unknown: {
-          title: "Unknown Error",
+          title: "Unknown error",
           description: "An unexpected error occurred",
         },
         network: {
-          title: "Network Error",
+          title: "Network error",
           description: "Check your connection and try again",
         },
         notFound: {
-          title: "Warehouse Not Found",
+          title: "Warehouse not found",
           description: "Warehouse does not exist",
         },
         unsavedChanges: {
-          title: "Unsaved Changes",
+          title: "Unsaved changes",
           description: "You have unsaved changes",
         },
       },
       success: {
-        title: "Warehouse Updated",
+        title: "Warehouse updated",
         description: "Warehouse updated successfully",
       },
       response: {
@@ -375,8 +381,8 @@ export const translations = {
   // Stock list
   stockList: {
     get: {
-      title: "Stock Levels",
-      titleShort: "Stock Levels",
+      title: "Stock levels",
+      titleShort: "Stock levels",
       description:
         "View stock levels for a warehouse with availability and low-stock indicators.",
       widget: {
@@ -415,49 +421,49 @@ export const translations = {
         statusOk: "In stock",
       },
       warehouseId: {
-        label: "Warehouse ID",
+        label: "Warehouse",
         description: "Warehouse to query stock for",
       },
       productId: {
-        label: "Product ID",
+        label: "Product",
         description: "Filter to a specific product (optional)",
       },
       errors: {
         validation: {
-          title: "Validation Error",
+          title: "Validation error",
           description: "Check required fields",
         },
         unauthorized: {
-          title: "Not Signed In",
+          title: "Not signed in",
           description: "Sign in to view stock",
         },
         forbidden: {
-          title: "Access Denied",
+          title: "Access denied",
           description: "No access to this warehouse",
         },
         conflict: { title: "Conflict", description: "Data conflict" },
         server: {
-          title: "Server Error",
+          title: "Server error",
           description: "Failed to load stock levels",
         },
         unknown: {
-          title: "Unknown Error",
+          title: "Unknown error",
           description: "An unexpected error occurred",
         },
         network: {
-          title: "Network Error",
+          title: "Network error",
           description: "Check your connection and try again",
         },
         notFound: {
-          title: "Warehouse Not Found",
+          title: "Warehouse not found",
           description: "Warehouse does not exist",
         },
         unsavedChanges: {
-          title: "Unsaved Changes",
+          title: "Unsaved changes",
           description: "You have unsaved changes",
         },
       },
-      success: { title: "Stock Loaded", description: "Stock levels retrieved" },
+      success: { title: "Stock loaded", description: "Stock levels retrieved" },
       response: {
         currency: "Currency",
         id: "Stock ID",
@@ -465,24 +471,29 @@ export const translations = {
         warehouseName: "Warehouse",
         productId: "Product ID",
         productName: "Product",
-        quantityOnHand: "On Hand",
+        quantityOnHand: "On hand",
         quantityReserved: "Reserved",
-        quantityOnOrder: "On Order",
+        quantityOnOrder: "On order",
         quantityAvailable: "Available",
-        reorderPoint: "Reorder Point",
-        reorderQuantity: "Reorder Qty",
-        unitCost: "Unit Cost",
-        isLowStock: "Low Stock",
-        updatedAt: "Updated At",
+        reorderPoint: "Reorder point",
+        reorderQuantity: "Reorder qty",
+        unitCost: "Unit cost",
+        isLowStock: "Low stock",
+        updatedAt: "Updated at",
       },
     },
   },
 
   // Stock adjust
+  stockWrite: {
+    onHandNow: "On hand now:",
+    viewStock: "View stock levels",
+    again: "Record another",
+  },
   stockAdjust: {
     post: {
-      title: "Adjust Stock",
-      titleShort: "Adjust Stock",
+      title: "Adjust stock",
+      titleShort: "Adjust stock",
       description:
         "Manually adjust stock quantity. Use negative values for write-offs.",
       widget: {
@@ -494,10 +505,10 @@ export const translations = {
         negativeHint: "Negative quantity removes stock",
       },
       warehouseId: {
-        label: "Warehouse ID",
+        label: "Warehouse",
         description: "Warehouse to adjust stock in",
       },
-      productId: { label: "Product ID", description: "Product to adjust" },
+      productId: { label: "Product", description: "Product to adjust" },
       quantity: {
         label: "Quantity",
         description:
@@ -510,57 +521,57 @@ export const translations = {
         placeholder: "Physical count correction",
       },
       unitCost: {
-        label: "Unit Cost",
+        label: "Unit cost",
         description: "Cost per unit (optional)",
         placeholder: "0.00",
       },
       errors: {
         validation: {
-          title: "Validation Error",
+          title: "Validation error",
           description: "Check required fields",
         },
         unauthorized: {
-          title: "Not Signed In",
+          title: "Not signed in",
           description: "Sign in to adjust stock",
         },
         forbidden: {
-          title: "Access Denied",
+          title: "Access denied",
           description: "No access to this warehouse",
         },
         conflict: {
-          title: "Insufficient Stock",
+          title: "Insufficient stock",
           description: "Not enough stock available for this adjustment",
         },
         server: {
-          title: "Server Error",
+          title: "Server error",
           description: "Failed to adjust stock",
         },
         unknown: {
-          title: "Unknown Error",
+          title: "Unknown error",
           description: "An unexpected error occurred",
         },
         network: {
-          title: "Network Error",
+          title: "Network error",
           description: "Check your connection and try again",
         },
         notFound: {
-          title: "Not Found",
+          title: "Not found",
           description: "Warehouse or product not found",
         },
         unsavedChanges: {
-          title: "Unsaved Changes",
+          title: "Unsaved changes",
           description: "You have unsaved changes",
         },
       },
       success: {
-        title: "Stock Adjusted",
+        title: "Stock adjusted",
         description: "Stock adjustment recorded",
       },
       response: {
         movementId: "Movement ID",
         productId: "Product ID",
         warehouseId: "Warehouse ID",
-        quantityOnHand: "New On Hand",
+        quantityOnHand: "New on hand",
         quantityAvailable: "Available",
       },
     },
@@ -569,25 +580,25 @@ export const translations = {
   // Stock receive
   stockReceive: {
     post: {
-      title: "Receive Stock",
-      titleShort: "Receive Stock",
+      title: "Receive stock",
+      titleShort: "Receive stock",
       description:
         "Record a stock receipt to update the quantity on hand and weighted average cost.",
       widget: {
         backToStock: "Back to stock",
       },
       warehouseId: {
-        label: "Warehouse ID",
+        label: "Warehouse",
         description: "Warehouse receiving the stock",
       },
-      productId: { label: "Product ID", description: "Product being received" },
+      productId: { label: "Product", description: "Product being received" },
       quantity: {
         label: "Quantity",
         description: "Number of units received",
         placeholder: "100",
       },
       unitCost: {
-        label: "Unit Cost",
+        label: "Unit cost",
         description: "Cost per unit received",
         placeholder: "0.00",
       },
@@ -598,49 +609,49 @@ export const translations = {
       },
       errors: {
         validation: {
-          title: "Validation Error",
+          title: "Validation error",
           description: "Check required fields",
         },
         unauthorized: {
-          title: "Not Signed In",
+          title: "Not signed in",
           description: "Sign in to receive stock",
         },
         forbidden: {
-          title: "Access Denied",
+          title: "Access denied",
           description: "No access to this warehouse",
         },
         conflict: { title: "Conflict", description: "Data conflict" },
         server: {
-          title: "Server Error",
+          title: "Server error",
           description: "Failed to receive stock",
         },
         unknown: {
-          title: "Unknown Error",
+          title: "Unknown error",
           description: "An unexpected error occurred",
         },
         network: {
-          title: "Network Error",
+          title: "Network error",
           description: "Check your connection and try again",
         },
         notFound: {
-          title: "Not Found",
+          title: "Not found",
           description: "Warehouse or product not found",
         },
         unsavedChanges: {
-          title: "Unsaved Changes",
+          title: "Unsaved changes",
           description: "You have unsaved changes",
         },
       },
       success: {
-        title: "Stock Received",
+        title: "Stock received",
         description: "Stock receipt recorded",
       },
       response: {
         movementId: "Movement ID",
         productId: "Product ID",
         warehouseId: "Warehouse ID",
-        quantityOnHand: "New On Hand",
-        unitCost: "New Unit Cost",
+        quantityOnHand: "New on hand",
+        unitCost: "New unit cost",
       },
     },
   },
@@ -648,18 +659,18 @@ export const translations = {
   // Stock issue
   stockIssue: {
     post: {
-      title: "Issue Stock",
-      titleShort: "Issue Stock",
+      title: "Issue stock",
+      titleShort: "Issue stock",
       description:
         "Issue stock out of a warehouse. Validates sufficient available quantity.",
       widget: {
         backToStock: "Back to stock",
       },
       warehouseId: {
-        label: "Warehouse ID",
+        label: "Warehouse",
         description: "Warehouse issuing stock from",
       },
-      productId: { label: "Product ID", description: "Product to issue" },
+      productId: { label: "Product", description: "Product to issue" },
       quantity: {
         label: "Quantity",
         description: "Number of units to issue",
@@ -671,54 +682,54 @@ export const translations = {
         placeholder: "WO-2024-001",
       },
       unitCost: {
-        label: "Unit Cost",
+        label: "Unit cost",
         description: "Cost per unit (defaults to current weighted average)",
         placeholder: "0.00",
       },
       errors: {
         validation: {
-          title: "Validation Error",
+          title: "Validation error",
           description: "Check required fields",
         },
         unauthorized: {
-          title: "Not Signed In",
+          title: "Not signed in",
           description: "Sign in to issue stock",
         },
         forbidden: {
-          title: "Access Denied",
+          title: "Access denied",
           description: "No access to this warehouse",
         },
         conflict: {
-          title: "Insufficient Stock",
+          title: "Insufficient stock",
           description: "Not enough stock available to issue",
         },
-        server: { title: "Server Error", description: "Failed to issue stock" },
+        server: { title: "Server error", description: "Failed to issue stock" },
         unknown: {
-          title: "Unknown Error",
+          title: "Unknown error",
           description: "An unexpected error occurred",
         },
         network: {
-          title: "Network Error",
+          title: "Network error",
           description: "Check your connection and try again",
         },
         notFound: {
-          title: "Not Found",
+          title: "Not found",
           description: "Warehouse or product not found",
         },
         unsavedChanges: {
-          title: "Unsaved Changes",
+          title: "Unsaved changes",
           description: "You have unsaved changes",
         },
       },
       success: {
-        title: "Stock Issued",
+        title: "Stock issued",
         description: "Stock issued successfully",
       },
       response: {
         movementId: "Movement ID",
         productId: "Product ID",
         warehouseId: "Warehouse ID",
-        quantityOnHand: "New On Hand",
+        quantityOnHand: "New on hand",
         quantityAvailable: "Available",
       },
     },
@@ -727,25 +738,30 @@ export const translations = {
   // Transfer create
   transferCreate: {
     post: {
-      title: "Create Transfer",
-      titleShort: "New Transfer",
+      title: "Create transfer",
+      titleShort: "New transfer",
       description:
-        "Create a warehouse transfer request. Starts in Draft status.",
+        "Create a warehouse transfer request. Starts in draft status.",
       widget: {
+        itemsTitle: "Items to move",
+        pickSource: "Pick the source warehouse to see what it holds.",
+        noStock: "This warehouse holds no stock to move.",
+        available: "{{quantity}} available",
+        itemsRequired: "Enter a quantity for at least one product.",
         backToList: "Back to transfers",
-        viewTransfer: "View Transfer",
-        browseWarehouses: "Browse Warehouses",
+        viewTransfer: "View transfer",
+        browseWarehouses: "Browse warehouses",
       },
       companyId: {
-        label: "Company ID",
+        label: "Company",
         description: "Company this transfer belongs to",
       },
       fromWarehouseId: {
-        label: "From Warehouse",
+        label: "From warehouse",
         description: "Warehouse sending stock",
       },
       toWarehouseId: {
-        label: "To Warehouse",
+        label: "To warehouse",
         description: "Warehouse receiving stock",
       },
       reference: {
@@ -764,49 +780,53 @@ export const translations = {
       },
       errors: {
         validation: {
-          title: "Validation Error",
+          title: "Validation error",
           description: "Check required fields",
         },
         unauthorized: {
-          title: "Not Signed In",
+          title: "Not signed in",
           description: "Sign in to create transfers",
         },
         forbidden: {
-          title: "Access Denied",
+          title: "Access denied",
           description: "No access to this company",
         },
         conflict: {
-          title: "Same Warehouse",
+          invalidWarehouses:
+            "Both warehouses must be active and belong to this company.",
+          invalidItems:
+            "List each product once with a quantity above zero (up to 4 decimals).",
+          title: "Same warehouse",
           description: "From and to warehouse must be different",
         },
         server: {
-          title: "Server Error",
+          title: "Server error",
           description: "Failed to create transfer",
         },
         unknown: {
-          title: "Unknown Error",
+          title: "Unknown error",
           description: "An unexpected error occurred",
         },
         network: {
-          title: "Network Error",
+          title: "Network error",
           description: "Check your connection and try again",
         },
-        notFound: { title: "Not Found", description: "Warehouse not found" },
+        notFound: { title: "Not found", description: "Warehouse not found" },
         unsavedChanges: {
-          title: "Unsaved Changes",
+          title: "Unsaved changes",
           description: "You have unsaved changes",
         },
       },
       success: {
-        title: "Transfer Created",
+        title: "Transfer created",
         description: "Transfer draft created",
       },
       response: {
         id: "Transfer ID",
         status: "Status",
         reference: "Reference",
-        fromWarehouseId: "From Warehouse",
-        toWarehouseId: "To Warehouse",
+        fromWarehouseId: "From warehouse",
+        toWarehouseId: "To warehouse",
       },
     },
   },
@@ -819,7 +839,7 @@ export const translations = {
       description: "List warehouse transfers for a company.",
       widget: {
         back: "Back",
-        newTransfer: "New Transfer",
+        newTransfer: "New transfer",
         empty: "No transfers yet.",
         emptyHint: "Create a transfer to move stock between warehouses.",
         emptyIcon: "🔄",
@@ -829,65 +849,65 @@ export const translations = {
         total: "transfers",
         view: "View",
         draft: "Draft",
-        inTransit: "In Transit",
-        viewTransfer: "View Transfer",
+        inTransit: "In transit",
+        viewTransfer: "View transfer",
         tabAll: "All",
         tabDraft: "Pending",
-        tabInTransit: "In Transit",
+        tabInTransit: "In transit",
         tabReceived: "Completed",
         tabCancelled: "Cancelled",
         arrowSeparator: "→",
       },
       companyId: {
-        label: "Company ID",
+        label: "Company",
         description: "Company to list transfers for",
       },
       errors: {
         validation: {
-          title: "Validation Error",
+          title: "Validation error",
           description: "Check required fields",
         },
         unauthorized: {
-          title: "Not Signed In",
+          title: "Not signed in",
           description: "Sign in to list transfers",
         },
         forbidden: {
-          title: "Access Denied",
+          title: "Access denied",
           description: "No access to this company",
         },
         conflict: { title: "Conflict", description: "Data conflict" },
         server: {
-          title: "Server Error",
+          title: "Server error",
           description: "Failed to list transfers",
         },
         unknown: {
-          title: "Unknown Error",
+          title: "Unknown error",
           description: "An unexpected error occurred",
         },
         network: {
-          title: "Network Error",
+          title: "Network error",
           description: "Check your connection and try again",
         },
-        notFound: { title: "Not Found", description: "Company not found" },
+        notFound: { title: "Not found", description: "Company not found" },
         unsavedChanges: {
-          title: "Unsaved Changes",
+          title: "Unsaved changes",
           description: "You have unsaved changes",
         },
       },
       success: {
-        title: "Transfers Loaded",
+        title: "Transfers loaded",
         description: "Transfer list retrieved",
       },
       response: {
         id: "Transfer ID",
-        fromWarehouseId: "From Warehouse ID",
+        fromWarehouseId: "From warehouse ID",
         fromWarehouseName: "From",
-        toWarehouseId: "To Warehouse ID",
+        toWarehouseId: "To warehouse ID",
         toWarehouseName: "To",
         status: "Status",
         reference: "Reference",
-        createdAt: "Created At",
-        completedAt: "Completed At",
+        createdAt: "Created at",
+        completedAt: "Completed at",
       },
     },
   },
@@ -895,10 +915,11 @@ export const translations = {
   // Transfer get
   transferGet: {
     get: {
-      title: "Get Transfer",
+      title: "Get transfer",
       titleShort: "Transfer",
       description: "Retrieve a transfer with all its line items.",
       widget: {
+        cancel: "Cancel transfer",
         retry: "Try again",
         noItems: "This transfer has no items.",
         noItemsHint:
@@ -911,52 +932,52 @@ export const translations = {
         status: "Status",
         select: "Select transfer",
       },
-      transferId: { label: "Transfer ID", description: "Transfer to retrieve" },
+      transferId: { label: "Transfer", description: "Transfer to retrieve" },
       errors: {
         validation: {
-          title: "Validation Error",
+          title: "Validation error",
           description: "Invalid transfer ID",
         },
         unauthorized: {
-          title: "Not Signed In",
+          title: "Not signed in",
           description: "Sign in to view transfers",
         },
         forbidden: {
-          title: "Access Denied",
+          title: "Access denied",
           description: "No access to this transfer",
         },
         conflict: { title: "Conflict", description: "Data conflict" },
         server: {
-          title: "Server Error",
+          title: "Server error",
           description: "Failed to load transfer",
         },
         unknown: {
-          title: "Unknown Error",
+          title: "Unknown error",
           description: "An unexpected error occurred",
         },
         network: {
-          title: "Network Error",
+          title: "Network error",
           description: "Check your connection and try again",
         },
         notFound: {
-          title: "Transfer Not Found",
+          title: "Transfer not found",
           description: "Transfer does not exist",
         },
         unsavedChanges: {
-          title: "Unsaved Changes",
+          title: "Unsaved changes",
           description: "You have unsaved changes",
         },
       },
       success: {
-        title: "Transfer Loaded",
+        title: "Transfer loaded",
         description: "Transfer details retrieved",
       },
       response: {
         id: "Transfer ID",
         companyId: "Company ID",
-        fromWarehouseId: "From Warehouse",
+        fromWarehouseId: "From warehouse",
         fromWarehouseName: "From warehouse",
-        toWarehouseId: "To Warehouse",
+        toWarehouseId: "To warehouse",
         toWarehouseName: "To warehouse",
         status: "Status",
         reference: "Reference",
@@ -974,56 +995,119 @@ export const translations = {
   },
 
   // Transfer dispatch
+  transferCancel: {
+    post: {
+      title: "Cancel transfer",
+      titleShort: "Cancel transfer",
+      description:
+        "Stop this transfer. A dispatched transfer puts its stock back into the source warehouse.",
+      widget: {
+        backToTransfer: "Back to transfer",
+      },
+      transferId: {
+        label: "Transfer",
+        description: "Transfer to cancel",
+      },
+      errors: {
+        validation: {
+          title: "Validation error",
+          description: "Invalid transfer",
+        },
+        unauthorized: {
+          title: "Not signed in",
+          description: "Sign in to cancel transfers",
+        },
+        forbidden: {
+          title: "Access denied",
+          description: "No access to this transfer",
+        },
+        conflict: {
+          title: "Cannot cancel",
+          description: "Only draft or in-transit transfers can be cancelled",
+        },
+        server: {
+          title: "Server error",
+          description: "Failed to cancel transfer",
+        },
+        unknown: {
+          title: "Unknown error",
+          description: "An unexpected error occurred",
+        },
+        network: {
+          title: "Network error",
+          description: "Check your connection and try again",
+        },
+        notFound: {
+          title: "Transfer not found",
+          description: "Transfer does not exist",
+        },
+        unsavedChanges: {
+          title: "Unsaved changes",
+          description: "You have unsaved changes",
+        },
+      },
+      success: {
+        title: "Transfer cancelled",
+        description: "Nothing from this transfer is in transit anymore.",
+      },
+      response: {
+        id: "Transfer",
+        status: "Status",
+      },
+    },
+  },
   transferDispatch: {
     post: {
-      title: "Dispatch Transfer",
+      title: "Dispatch transfer",
       titleShort: "Dispatch",
       description:
         "Mark transfer as in transit. Stock leaves the source warehouse.",
       widget: {
         backToTransfer: "Back to transfer",
       },
-      transferId: { label: "Transfer ID", description: "Transfer to dispatch" },
+      transferId: { label: "Transfer", description: "Transfer to dispatch" },
       errors: {
         validation: {
-          title: "Validation Error",
+          title: "Validation error",
           description: "Invalid transfer ID",
         },
         unauthorized: {
-          title: "Not Signed In",
+          title: "Not signed in",
           description: "Sign in to dispatch transfers",
         },
         forbidden: {
-          title: "Access Denied",
+          title: "Access denied",
           description: "No access to this transfer",
         },
         conflict: {
-          title: "Not a Draft",
+          insufficientStock:
+            "Not enough stock in the source warehouse for every item.",
+          title: "Not a draft",
           description: "Only draft transfers can be dispatched",
         },
         server: {
-          title: "Server Error",
+          title: "Server error",
           description: "Failed to dispatch transfer",
         },
         unknown: {
-          title: "Unknown Error",
+          title: "Unknown error",
           description: "An unexpected error occurred",
         },
         network: {
-          title: "Network Error",
+          title: "Network error",
           description: "Check your connection and try again",
         },
         notFound: {
-          title: "Transfer Not Found",
+          title: "Transfer not found",
           description: "Transfer does not exist",
         },
         unsavedChanges: {
-          title: "Unsaved Changes",
+          title: "Unsaved changes",
           description: "You have unsaved changes",
         },
       },
       success: {
-        title: "Transfer Dispatched",
+        title: "Transfer dispatched",
         description: "Transfer is now in transit",
       },
       response: {
@@ -1036,60 +1120,60 @@ export const translations = {
   // Transfer receive
   transferReceive: {
     post: {
-      title: "Receive Transfer",
-      titleShort: "Receive Transfer",
+      title: "Receive transfer",
+      titleShort: "Receive transfer",
       description:
         "Mark transfer as received. Creates stock movements and updates inventory on both ends.",
       widget: {
         backToTransfer: "Back to transfer",
       },
-      transferId: { label: "Transfer ID", description: "Transfer to receive" },
+      transferId: { label: "Transfer", description: "Transfer to receive" },
       errors: {
         validation: {
-          title: "Validation Error",
+          title: "Validation error",
           description: "Invalid transfer ID",
         },
         unauthorized: {
-          title: "Not Signed In",
+          title: "Not signed in",
           description: "Sign in to receive transfers",
         },
         forbidden: {
-          title: "Access Denied",
+          title: "Access denied",
           description: "No access to this transfer",
         },
         conflict: {
-          title: "Not In Transit",
+          title: "Not in transit",
           description: "Only in-transit transfers can be received",
         },
         server: {
-          title: "Server Error",
+          title: "Server error",
           description: "Failed to receive transfer",
         },
         unknown: {
-          title: "Unknown Error",
+          title: "Unknown error",
           description: "An unexpected error occurred",
         },
         network: {
-          title: "Network Error",
+          title: "Network error",
           description: "Check your connection and try again",
         },
         notFound: {
-          title: "Transfer Not Found",
+          title: "Transfer not found",
           description: "Transfer does not exist",
         },
         unsavedChanges: {
-          title: "Unsaved Changes",
+          title: "Unsaved changes",
           description: "You have unsaved changes",
         },
       },
       success: {
-        title: "Transfer Received",
+        title: "Transfer received",
         description: "Stock movements created and inventory updated",
       },
       response: {
         id: "Transfer ID",
         status: "Status",
-        completedAt: "Completed At",
+        completedAt: "Completed at",
       },
     },
   },
@@ -1097,14 +1181,21 @@ export const translations = {
   // Inventory Dashboard
   dashboard: {
     get: {
-      title: "Inventory Overview",
+      title: "Inventory overview",
       titleShort: "Overview",
       description:
         "Live snapshot of stock health, pending transfers, and warehouse counts.",
       widget: {
-        kpiInStock: "In Stock",
-        kpiOutOfStock: "Out of Stock",
-        kpiLowStock: "Low Stock",
+        noWarehousesHint:
+          "Create a warehouse to start receiving and moving stock.",
+        navStockLevelsHint: "Quantities, value and reorder points",
+        navTransfersHint: "In transit: {{count}}",
+        navWarehousesHint: "Locations: {{count}}",
+        noWarehouses: "No warehouses yet",
+        related: "Related",
+        kpiInStock: "In stock",
+        kpiOutOfStock: "Out of stock",
+        kpiLowStock: "Low stock",
         kpiWarehouses: "Warehouses",
         attention: "Stock needing attention",
         noAttention: "No items are below their stock threshold.",
@@ -1112,7 +1203,7 @@ export const translations = {
         kpiTransfersInTransit: "Transfers in transit",
         alertOutOfStock: "{{count}} product out of stock",
         alertOutOfStockPlural: "{{count}} products out of stock",
-        navStockLevels: "Stock Levels",
+        navStockLevels: "Stock levels",
         navTransfers: "Transfers",
         navWarehouses: "Warehouses",
         loading: "Loading…",
@@ -1125,45 +1216,45 @@ export const translations = {
       },
       errors: {
         validation: {
-          title: "Validation Error",
+          title: "Validation error",
           description: "Check required fields",
         },
         unauthorized: {
-          title: "Not Signed In",
+          title: "Not signed in",
           description: "Sign in to view inventory overview",
         },
         forbidden: {
-          title: "Access Denied",
+          title: "Access denied",
           description: "No access to this company",
         },
         conflict: { title: "Conflict", description: "Data conflict" },
         server: {
-          title: "Server Error",
+          title: "Server error",
           description: "Failed to load inventory overview",
         },
         unknown: {
-          title: "Unknown Error",
+          title: "Unknown error",
           description: "An unexpected error occurred",
         },
         network: {
-          title: "Network Error",
+          title: "Network error",
           description: "Check your connection and try again",
         },
-        notFound: { title: "Not Found", description: "Company not found" },
+        notFound: { title: "Not found", description: "Company not found" },
         unsavedChanges: {
-          title: "Unsaved Changes",
+          title: "Unsaved changes",
           description: "You have unsaved changes",
         },
       },
       success: {
-        title: "Dashboard Loaded",
+        title: "Dashboard loaded",
         description: "Inventory overview retrieved",
       },
       response: {
-        inStockCount: "In Stock",
-        outOfStockCount: "Out of Stock",
-        lowStockCount: "Low Stock",
-        pendingTransferCount: "Pending Transfers",
+        inStockCount: "In stock",
+        outOfStockCount: "Out of stock",
+        lowStockCount: "Low stock",
+        pendingTransferCount: "Pending transfers",
         warehouseCount: "Warehouses",
       },
     },

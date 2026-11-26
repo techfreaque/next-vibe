@@ -1,14 +1,22 @@
 "use client";
 
-import { Badge } from "next-vibe/ui/components/badge";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
+import { EmptyBlock } from "next-vibe/ui/components/empty-block";
+import { Archive } from "next-vibe/ui/components/icons/Archive";
 import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
-import { Loader2 } from "next-vibe/ui/components/icons/Loader2";
+import { RecordTable } from "next-vibe/ui/components/record-table";
+import { Skeleton } from "next-vibe/ui/components/skeleton";
 import { Span } from "next-vibe/ui/components/span";
+import { StatusPill } from "next-vibe/ui/components/status-pill";
+import { WidgetHeader } from "next-vibe/ui/components/widget-header";
+import { WidgetShell } from "next-vibe/ui/components/widget-shell";
 import { usePickerCallback } from "next-vibe/unified-ui/_shared/picker-context";
 import {
+  useWidgetEndpointMutations,
+  useWidgetIsInteractive,
   useWidgetNavigation,
+  useWidgetResponse,
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
@@ -21,261 +29,198 @@ type WarehouseRow = NonNullable<
   InventoryWarehouseListGetResponseOutput["warehouses"]
 >[number];
 
-function WarehouseItem({
-  warehouse,
-  onView,
-  onViewStock,
-  activeLabel,
-  inactiveLabel,
-  defaultLabel,
-  viewStockLabel,
-  isPickerMode,
-}: {
-  warehouse: WarehouseRow;
-  onView: (id: string) => void;
-  onViewStock: (id: string) => void;
-  activeLabel: string;
-  inactiveLabel: string;
-  defaultLabel: string;
-  viewStockLabel: string;
-  isPickerMode: boolean;
-}): JSX.Element {
-  return (
-    <Div className="flex items-center gap-3 py-3 px-4 border-b last:border-b-0 hover:bg-muted/30 transition-colors">
-      {/* Code badge */}
-      <Span className="font-mono text-xs w-20 shrink-0 text-muted-foreground bg-muted px-2 py-1 rounded text-center">
-        {warehouse.code}
-      </Span>
-
-      {/* Name + address */}
-      <Div
-        className="flex-1 min-w-0 cursor-pointer"
-        onClick={() => {
-          onView(warehouse.id);
-        }}
-      >
-        <Span
-          className={`block text-sm font-semibold truncate${!warehouse.isActive ? " line-through text-muted-foreground" : ""}`}
-        >
-          {warehouse.name}
-        </Span>
-        {warehouse.address ? (
-          <Span className="text-xs text-muted-foreground truncate block mt-0.5">
-            {warehouse.address}
-          </Span>
-        ) : null}
-      </Div>
-
-      {/* Status badges */}
-      <Div className="flex items-center gap-1.5 shrink-0">
-        {warehouse.isDefault ? (
-          <Badge
-            variant="default"
-            className="text-xs h-5 px-2 bg-emerald-600 hover:bg-emerald-600"
-          >
-            {defaultLabel}
-          </Badge>
-        ) : null}
-        {warehouse.isActive ? (
-          <Badge variant="secondary" className="text-xs h-5 px-2">
-            {activeLabel}
-          </Badge>
-        ) : (
-          <Badge variant="outline" className="text-xs h-5 px-2 opacity-60">
-            {inactiveLabel}
-          </Badge>
-        )}
-      </Div>
-
-      {/* View Stock button — hidden in picker mode */}
-      {!isPickerMode && (
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          className="h-7 px-3 text-xs shrink-0"
-          onClick={() => {
-            onViewStock(warehouse.id);
-          }}
-        >
-          {viewStockLabel}
-        </Button>
-      )}
-    </Div>
-  );
-}
-
-export function InventoryWarehouseListWidget(
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  _props: {
-    field: (typeof definition.GET)["fields"];
-  },
-): JSX.Element {
+export function InventoryWarehouseListWidget(): JSX.Element {
   const data = useWidgetValue<typeof definition.GET>();
   const navigation = useWidgetNavigation();
+  const interactive = useWidgetIsInteractive();
+  const response = useWidgetResponse();
+  const read = useWidgetEndpointMutations()?.read;
   const t = useWidgetTranslation<typeof definition.GET>();
-  const onPick =
-    usePickerCallback<
-      NonNullable<
-        (typeof definition.GET.types.ResponseOutput)["warehouses"]
-      >[number]
-    >();
-  const isPickerMode = !!onPick;
+  const onPick = usePickerCallback<WarehouseRow>();
 
-  const handleView = (warehouseId: string): void => {
-    if (isPickerMode) {
-      const warehouse = (data?.warehouses ?? []).find(
-        (w) => w.id === warehouseId,
-      );
-      if (warehouse && onPick) {
-        onPick(warehouse);
-      }
+  const open = (warehouse: WarehouseRow): void => {
+    if (onPick) {
+      onPick(warehouse);
       return;
     }
-    void (async (): Promise<void> => {
-      const def = await import("../[warehouseId]/get/definition");
-      navigation.push(def.default.GET, {
-        urlPathParams: { warehouseId },
-      });
-    })();
+    void import("../[warehouseId]/get/definition").then(({ default: get }) =>
+      navigation.push(get.GET, {
+        urlPathParams: { warehouseId: warehouse.id },
+      }),
+    );
   };
-
-  const handleViewStock = (warehouseId: string): void => {
-    void (async (): Promise<void> => {
-      const def = await import("../../stock/list/definition");
-      navigation.push(def.default.GET, {
-        data: { warehouseId },
-      });
-    })();
+  const viewStock = (warehouse: WarehouseRow): void => {
+    void import("../../stock/list/definition").then(({ default: list }) =>
+      navigation.push(list.GET, {
+        data: { warehouseId: warehouse.id },
+      }),
+    );
   };
-
-  const handleCreate = (): void => {
-    void (async (): Promise<void> => {
-      const [createDef, getDef] = await Promise.all([
-        import("../create/definition"),
-        import("../[warehouseId]/get/definition"),
-      ]);
-      navigation.push(createDef.default.POST, {
+  const create = (): void => {
+    void Promise.all([
+      import("../create/definition"),
+      import("../[warehouseId]/get/definition"),
+    ]).then(([{ default: write }, { default: get }]) =>
+      navigation.push(write.POST, {
         replaceOnSuccess: {
-          endpoint: getDef.default.GET,
+          endpoint: get.GET,
           getUrlPathParams: (responseData: { result: { id: string } }) => ({
             warehouseId: responseData.result.id,
           }),
         },
-      });
-    })();
+      }),
+    );
   };
 
-  // Loading state
-  if (!data) {
-    return (
-      <Div className="max-w-2xl mx-auto w-full px-4 pt-8 pb-6 flex items-center justify-center py-12 text-muted-foreground">
-        <Loader2 className="h-5 w-5 animate-spin mr-2" />
-        <Span className="text-sm">{t("warehouseList.get.widget.loading")}</Span>
-      </Div>
-    );
-  }
-
-  const rows = data.warehouses ?? [];
-  const activeCount = rows.filter((w) => w.isActive).length;
+  const warehouses = data?.warehouses ?? [];
+  const title = t("warehouseList.get.title");
+  const status = (row: WarehouseRow): JSX.Element => (
+    <Div className="flex flex-wrap items-center gap-1.5">
+      <StatusPill
+        status={t(
+          row.isActive
+            ? "warehouseList.get.widget.active"
+            : "warehouseList.get.widget.inactive",
+        )}
+        variant={row.isActive ? "success" : "muted"}
+      />
+      {row.isDefault && (
+        <StatusPill
+          status={t("warehouseList.get.widget.default")}
+          variant="info"
+        />
+      )}
+    </Div>
+  );
+  const name = (row: WarehouseRow): JSX.Element => (
+    <Div className="flex min-w-0 flex-col items-start gap-0.5">
+      <Button
+        type="button"
+        variant="link"
+        className="h-auto min-h-10 justify-start whitespace-normal p-0 text-left font-semibold"
+        onClick={() => open(row)}
+      >
+        {row.name}
+      </Button>
+      {row.address && (
+        <Span className="text-sm text-muted-foreground">{row.address}</Span>
+      )}
+    </Div>
+  );
+  const code = (row: WarehouseRow): JSX.Element => (
+    <Span className="font-mono text-sm">{row.code}</Span>
+  );
+  const stockAction = (row: WarehouseRow): JSX.Element | null =>
+    interactive && !onPick ? (
+      <Button
+        type="button"
+        variant="outline"
+        size="sm"
+        className="min-h-10"
+        onClick={() => viewStock(row)}
+      >
+        {t("warehouseList.get.widget.viewStock")}
+      </Button>
+    ) : null;
 
   return (
-    <Div className="max-w-2xl mx-auto w-full px-4 pt-8 pb-6 flex flex-col gap-4">
-      {navigation.canGoBack && (
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={() => {
-            navigation.pop();
-          }}
-          className="self-start gap-1.5 -ml-1"
-        >
-          <ChevronLeft className="h-4 w-4" />
-          {t("warehouseList.get.widget.back")}
-        </Button>
+    <WidgetShell layout="page">
+      <WidgetHeader
+        size="page"
+        title={title}
+        subtitle={t("warehouseList.get.widget.subtitle")}
+        backButton={
+          interactive &&
+          navigation.canGoBack && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="-ml-2 min-h-10 gap-1.5 self-start"
+              onClick={() => navigation.pop()}
+            >
+              <ChevronLeft className="size-4" aria-hidden="true" />
+              {t("warehouseList.get.widget.back")}
+            </Button>
+          )
+        }
+        actions={
+          interactive &&
+          !onPick &&
+          warehouses.length > 0 && (
+            <Button type="button" className="min-h-10" onClick={create}>
+              {t("warehouseList.get.widget.createWarehouse")}
+            </Button>
+          )
+        }
+      />
+      {response?.success === false ? (
+        <EmptyBlock
+          title={response.message}
+          action={
+            read && interactive
+              ? {
+                  label: t("transferGet.get.widget.retry"),
+                  onClick: () => void read.refetch(),
+                }
+              : undefined
+          }
+        />
+      ) : !data ? (
+        <Skeleton className="h-32 w-full" />
+      ) : !warehouses.length ? (
+        <EmptyBlock
+          size="page"
+          icon={<Archive className="size-6" aria-hidden="true" />}
+          title={t("warehouseList.get.widget.empty")}
+          message={t("warehouseList.get.widget.emptyHint")}
+          action={
+            interactive && !onPick
+              ? {
+                  label: t("warehouseList.get.widget.createWarehouse"),
+                  onClick: create,
+                }
+              : undefined
+          }
+        />
+      ) : (
+        <RecordTable
+          label={title}
+          columns={[
+            { id: "name", label: t("warehouseList.get.response.name") },
+            { id: "code", label: t("warehouseList.get.response.code") },
+            { id: "status", label: t("warehouseList.get.widget.status") },
+            { id: "action", label: t("stockList.get.widget.actions") },
+          ]}
+          rows={warehouses.map((row) => ({
+            id: row.id,
+            cells: {
+              name: name(row),
+              code: code(row),
+              status: status(row),
+              action: stockAction(row),
+            },
+          }))}
+          compact={
+            <Div className="divide-y rounded-xl border bg-card">
+              {warehouses.map((row) => (
+                <Div key={row.id} className="flex min-w-0 flex-col gap-2 p-3">
+                  <Div className="flex min-w-0 items-start justify-between gap-2">
+                    {name(row)}
+                    <Span className="shrink-0 pt-2.5 font-mono text-sm text-muted-foreground">
+                      {row.code}
+                    </Span>
+                  </Div>
+                  <Div className="flex flex-wrap items-center justify-between gap-2">
+                    {status(row)}
+                    {stockAction(row)}
+                  </Div>
+                </Div>
+              ))}
+            </Div>
+          }
+        />
       )}
-
-      {/* Header with count + create */}
-      <Div className="flex items-center justify-between">
-        <Div className="flex items-center gap-2">
-          <Span className="text-sm font-medium">
-            {rows.length} {t("warehouseList.get.widget.total")}
-          </Span>
-          {rows.length > 0 && activeCount < rows.length ? (
-            <Badge variant="secondary" className="text-xs h-5 px-1.5">
-              {activeCount} {t("warehouseList.get.widget.active")}
-            </Badge>
-          ) : null}
-        </Div>
-        {!isPickerMode && (
-          <Button
-            type="button"
-            variant="default"
-            size="sm"
-            onClick={handleCreate}
-          >
-            {t("warehouseList.get.widget.createWarehouse")}
-          </Button>
-        )}
-      </Div>
-
-      {/* Warehouse table */}
-      {rows.length > 0 ? (
-        <Div className="rounded-lg border overflow-hidden">
-          <Div className="flex items-center gap-3 px-4 py-2 bg-muted/40 border-b text-xs font-medium text-muted-foreground uppercase tracking-wide">
-            <Span className="w-20 shrink-0">
-              {t("warehouseList.get.response.code")}
-            </Span>
-            <Span className="flex-1">
-              {t("warehouseList.get.response.name")}
-            </Span>
-            <Span className="shrink-0 pr-20">
-              {t("warehouseList.get.response.isActive")}
-            </Span>
-          </Div>
-          {rows.map((warehouse) => (
-            <WarehouseItem
-              key={warehouse.id}
-              warehouse={warehouse}
-              onView={handleView}
-              onViewStock={handleViewStock}
-              activeLabel={t("warehouseList.get.widget.active")}
-              inactiveLabel={t("warehouseList.get.widget.inactive")}
-              defaultLabel={t("warehouseList.get.widget.default")}
-              viewStockLabel={t("warehouseList.get.widget.viewStock")}
-              isPickerMode={isPickerMode}
-            />
-          ))}
-        </Div>
-      ) : null}
-
-      {/* Empty state */}
-      {rows.length === 0 ? (
-        <Div className="flex flex-col items-center gap-3 py-16 text-center border rounded-lg border-dashed">
-          <Div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center">
-            <Span className="text-xl">
-              {t("warehouseList.get.widget.emptyIcon")}
-            </Span>
-          </Div>
-          <Div className="flex flex-col gap-1">
-            <Span className="text-sm font-semibold">
-              {t("warehouseList.get.widget.empty")}
-            </Span>
-            <Span className="text-xs text-muted-foreground">
-              {t("warehouseList.get.widget.emptyHint")}
-            </Span>
-          </Div>
-          <Button
-            type="button"
-            variant="default"
-            size="sm"
-            onClick={handleCreate}
-          >
-            {t("warehouseList.get.widget.createWarehouse")}
-          </Button>
-        </Div>
-      ) : null}
-    </Div>
+    </WidgetShell>
   );
 }

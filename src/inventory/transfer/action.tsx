@@ -35,7 +35,7 @@ export function TransferAction({
   picker,
   submit,
 }: {
-  action: "dispatch" | "receive";
+  action: "dispatch" | "receive" | "cancel";
   transferId: string;
   completed: boolean;
   picker: ReactNode;
@@ -58,12 +58,31 @@ export function TransferAction({
   const transfer =
     query.data?.result.id === transferId ? query.data.result : undefined;
   const dispatch = action === "dispatch";
-  const expected = dispatch ? "DRAFT" : "IN_TRANSIT";
-  const title = t(
-    dispatch
-      ? "transferGet.get.widget.dispatch"
-      : "transferGet.get.widget.receive",
-  );
+  const expected =
+    action === "cancel"
+      ? ["DRAFT", "IN_TRANSIT"]
+      : [dispatch ? "DRAFT" : "IN_TRANSIT"];
+  const copy = {
+    dispatch: {
+      title: "transferGet.get.widget.dispatch",
+      description: "transferDispatch.post.description",
+      success: "transferDispatch.post.success.title",
+      conflict: "transferDispatch.post.errors.conflict.description",
+    },
+    receive: {
+      title: "transferGet.get.widget.receive",
+      description: "transferReceive.post.description",
+      success: "transferReceive.post.success.title",
+      conflict: "transferReceive.post.errors.conflict.description",
+    },
+    cancel: {
+      title: "transferGet.get.widget.cancel",
+      description: "transferCancel.post.description",
+      success: "transferCancel.post.success.title",
+      conflict: "transferCancel.post.errors.conflict.description",
+    },
+  } as const;
+  const title = t(copy[action].title);
   const back = (): void => {
     if (navigation.canGoBack) {
       navigation.pop();
@@ -80,11 +99,7 @@ export function TransferAction({
       <WidgetHeader
         size="page"
         title={title}
-        subtitle={t(
-          dispatch
-            ? "transferDispatch.post.description"
-            : "transferReceive.post.description",
-        )}
+        subtitle={t(copy[action].description)}
         backButton={
           interactive && (
             <Button
@@ -106,14 +121,7 @@ export function TransferAction({
       />
       <FormAlertWidget field={{}} />
       {completed ? (
-        <ResultBanner
-          variant="success"
-          title={t(
-            dispatch
-              ? "transferDispatch.post.success.title"
-              : "transferReceive.post.success.title",
-          )}
-        >
+        <ResultBanner variant="success" title={t(copy[action].success)}>
           {interactive && (
             <Button type="button" size="sm" variant="outline" onClick={back}>
               {t("transferDispatch.post.widget.backToTransfer")}
@@ -171,19 +179,13 @@ export function TransferAction({
               ))}
             </Div>
           )}
-          {transfer.status !== expected ? (
-            <EmptyBlock
-              title={t(
-                dispatch
-                  ? "transferDispatch.post.errors.conflict.description"
-                  : "transferReceive.post.errors.conflict.description",
-              )}
-            />
+          {!expected.includes(transfer.status) ? (
+            <EmptyBlock title={t(copy[action].conflict)} />
           ) : !transfer.canManage ? (
             <EmptyBlock
               title={t("transferDispatch.post.errors.forbidden.title")}
             />
-          ) : !transfer.items.length ? (
+          ) : action !== "cancel" && !transfer.items.length ? (
             <EmptyBlock title={t("transferGet.get.widget.noItems")} />
           ) : (
             <Div className="self-end">{submit}</Div>

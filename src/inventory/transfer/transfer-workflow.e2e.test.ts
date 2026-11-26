@@ -100,7 +100,7 @@ describe("Warehouse transfer", () => {
         .waitFor();
       for (const [openLabel, submitLabel, route, state] of [
         ["Dispatch transfer", "Dispatch", "dispatch", "IN_TRANSIT"],
-        ["Mark received", "Receive Transfer", "receive", "RECEIVED"],
+        ["Mark received", "Receive transfer", "receive", "RECEIVED"],
       ] as const) {
         await page
           .getByRole("button", { name: openLabel, exact: true })

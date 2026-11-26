@@ -9,6 +9,7 @@ export const translations: typeof enTranslations = {
     },
   },
   tags: {
+    cancel: "Anuluj",
     inventory: "Magazyn",
     warehouse: "Magazyn",
     stock: "Stan",
@@ -52,13 +53,15 @@ export const translations: typeof enTranslations = {
       titleShort: "Nowy magazyn",
       description: "Zarejestruj nowy magazyn dla firmy.",
       widget: {
+        openWarehouse: "Otwórz magazyn",
+        createAnother: "Utwórz kolejny",
         backToList: "Wróć do listy magazynów",
         active: "Aktywny",
         inactive: "Nieaktywny",
         default: "Domyślny",
       },
       companyId: {
-        label: "ID firmy",
+        label: "Firma",
         description: "Firma, do której należy magazyn",
       },
       name: {
@@ -143,6 +146,9 @@ export const translations: typeof enTranslations = {
       titleShort: "Magazyny",
       description: "Wyświetl wszystkie magazyny firmy.",
       widget: {
+        subtitle:
+          "Tu leży Twój towar. Otwórz magazyn, aby zobaczyć stan i wartość.",
+        status: "Status",
         active: "Aktywny",
         inactive: "Nieaktywny",
         default: "Domyślny",
@@ -159,7 +165,7 @@ export const translations: typeof enTranslations = {
         selectCompany: "Podaj ID firmy, aby załadować magazyny.",
       },
       companyId: {
-        label: "ID firmy",
+        label: "Firma",
         description: "Firma, której magazyny mają być wyświetlone",
       },
       errors: {
@@ -231,7 +237,7 @@ export const translations: typeof enTranslations = {
         viewStock: "Wyświetl stan",
         select: "Wybierz magazyn",
       },
-      warehouseId: { label: "ID magazynu", description: "Magazyn do pobrania" },
+      warehouseId: { label: "Magazyn", description: "Magazyn do pobrania" },
       errors: {
         validation: {
           title: "Błąd walidacji",
@@ -296,7 +302,7 @@ export const translations: typeof enTranslations = {
         inactive: "Nieaktywny",
       },
       warehouseId: {
-        label: "ID magazynu",
+        label: "Magazyn",
         description: "Magazyn do aktualizacji",
       },
       name: {
@@ -418,11 +424,11 @@ export const translations: typeof enTranslations = {
         statusOk: "Na stanie",
       },
       warehouseId: {
-        label: "ID magazynu",
+        label: "Magazyn",
         description: "Magazyn, dla którego sprawdzany jest stan",
       },
       productId: {
-        label: "ID produktu",
+        label: "Produkt",
         description: "Ogranicz do konkretnego produktu (opcjonalnie)",
       },
       errors: {
@@ -484,6 +490,11 @@ export const translations: typeof enTranslations = {
     },
   },
 
+  stockWrite: {
+    onHandNow: "Stan teraz:",
+    viewStock: "Zobacz stany",
+    again: "Zapisz kolejną",
+  },
   stockAdjust: {
     post: {
       title: "Korekta stanu",
@@ -499,10 +510,10 @@ export const translations: typeof enTranslations = {
         negativeHint: "Ujemna wartość zmniejsza stan",
       },
       warehouseId: {
-        label: "ID magazynu",
+        label: "Magazyn",
         description: "Magazyn, w którym korygowany jest stan",
       },
-      productId: { label: "ID produktu", description: "Produkt do korekty" },
+      productId: { label: "Produkt", description: "Produkt do korekty" },
       quantity: {
         label: "Ilość",
         description:
@@ -581,10 +592,10 @@ export const translations: typeof enTranslations = {
         backToStock: "Wróć do stanów",
       },
       warehouseId: {
-        label: "ID magazynu",
+        label: "Magazyn",
         description: "Magazyn przyjmujący towar",
       },
-      productId: { label: "ID produktu", description: "Przyjmowany produkt" },
+      productId: { label: "Produkt", description: "Przyjmowany produkt" },
       quantity: {
         label: "Ilość",
         description: "Liczba przyjętych jednostek",
@@ -659,10 +670,10 @@ export const translations: typeof enTranslations = {
         backToStock: "Wróć do stanów",
       },
       warehouseId: {
-        label: "ID magazynu",
+        label: "Magazyn",
         description: "Magazyn wydający towar",
       },
-      productId: { label: "ID produktu", description: "Produkt do wydania" },
+      productId: { label: "Produkt", description: "Produkt do wydania" },
       quantity: {
         label: "Ilość",
         description: "Liczba jednostek do wydania",
@@ -734,12 +745,17 @@ export const translations: typeof enTranslations = {
       description:
         "Utwórz zlecenie przesunięcia między magazynami. Status: Szkic.",
       widget: {
+        itemsTitle: "Pozycje do przesunięcia",
+        pickSource: "Wybierz magazyn źródłowy, aby zobaczyć jego stan.",
+        noStock: "Ten magazyn nie ma towaru do przesunięcia.",
+        available: "Dostępne: {{quantity}}",
+        itemsRequired: "Podaj ilość dla co najmniej jednego produktu.",
         backToList: "Wróć do przesunięć",
         viewTransfer: "Podgląd przesunięcia",
         browseWarehouses: "Przeglądaj magazyny",
       },
       companyId: {
-        label: "ID firmy",
+        label: "Firma",
         description: "Firma, do której należy przesunięcie",
       },
       fromWarehouseId: {
@@ -778,6 +794,10 @@ export const translations: typeof enTranslations = {
           description: "Brak dostępu do tej firmy",
         },
         conflict: {
+          invalidWarehouses:
+            "Oba magazyny muszą być aktywne i należeć do tej firmy.",
+          invalidItems:
+            "Każdy produkt tylko raz, z ilością większą od zera (do 4 miejsc po przecinku).",
           title: "Ten sam magazyn",
           description: "Magazyn źródłowy i docelowy muszą być różne",
         },
@@ -844,7 +864,7 @@ export const translations: typeof enTranslations = {
         arrowSeparator: "→",
       },
       companyId: {
-        label: "ID firmy",
+        label: "Firma",
         description: "Firma, której przesunięcia mają być wyświetlone",
       },
       errors: {
@@ -906,6 +926,7 @@ export const translations: typeof enTranslations = {
       titleShort: "Przesunięcie",
       description: "Pobierz przesunięcie ze wszystkimi pozycjami.",
       widget: {
+        cancel: "Anuluj przesunięcie",
         retry: "Spróbuj ponownie",
         noItems: "To przesunięcie nie zawiera pozycji.",
         noItemsHint:
@@ -919,7 +940,7 @@ export const translations: typeof enTranslations = {
         select: "Wybierz przesunięcie",
       },
       transferId: {
-        label: "ID przesunięcia",
+        label: "Przesunięcie",
         description: "Przesunięcie do pobrania",
       },
       errors: {
@@ -983,6 +1004,67 @@ export const translations: typeof enTranslations = {
     },
   },
 
+  transferCancel: {
+    post: {
+      title: "Anuluj przesunięcie",
+      titleShort: "Anuluj przesunięcie",
+      description:
+        "Zatrzymuje przesunięcie. Wysłany towar wraca do magazynu źródłowego.",
+      widget: {
+        backToTransfer: "Wróć do przesunięcia",
+      },
+      transferId: {
+        label: "Przesunięcie",
+        description: "Przesunięcie do anulowania",
+      },
+      errors: {
+        validation: {
+          title: "Błąd walidacji",
+          description: "Nieprawidłowe przesunięcie",
+        },
+        unauthorized: {
+          title: "Nie zalogowano",
+          description: "Zaloguj się, aby anulować przesunięcia",
+        },
+        forbidden: {
+          title: "Brak dostępu",
+          description: "Brak dostępu do tego przesunięcia",
+        },
+        conflict: {
+          title: "Nie można anulować",
+          description: "Anulować można tylko szkice i przesunięcia w drodze",
+        },
+        server: {
+          title: "Błąd serwera",
+          description: "Nie udało się anulować przesunięcia",
+        },
+        unknown: {
+          title: "Nieznany błąd",
+          description: "Wystąpił nieoczekiwany błąd",
+        },
+        network: {
+          title: "Błąd sieci",
+          description: "Sprawdź połączenie i spróbuj ponownie",
+        },
+        notFound: {
+          title: "Nie znaleziono przesunięcia",
+          description: "To przesunięcie nie istnieje",
+        },
+        unsavedChanges: {
+          title: "Niezapisane zmiany",
+          description: "Masz niezapisane zmiany",
+        },
+      },
+      success: {
+        title: "Przesunięcie anulowane",
+        description: "Nic z tego przesunięcia nie jest już w drodze.",
+      },
+      response: {
+        id: "Przesunięcie",
+        status: "Status",
+      },
+    },
+  },
   transferDispatch: {
     post: {
       title: "Wyślij przesunięcie",
@@ -993,7 +1075,7 @@ export const translations: typeof enTranslations = {
         backToTransfer: "Wróć do przesunięcia",
       },
       transferId: {
-        label: "ID przesunięcia",
+        label: "Przesunięcie",
         description: "Przesunięcie do wysłania",
       },
       errors: {
@@ -1010,6 +1092,8 @@ export const translations: typeof enTranslations = {
           description: "Brak dostępu do tego przesunięcia",
         },
         conflict: {
+          insufficientStock:
+            "W magazynie źródłowym brakuje towaru dla części pozycji.",
           title: "Nie szkic",
           description: "Tylko szkice mogą być wysłane",
         },
@@ -1055,7 +1139,7 @@ export const translations: typeof enTranslations = {
         backToTransfer: "Wróć do przesunięcia",
       },
       transferId: {
-        label: "ID przesunięcia",
+        label: "Przesunięcie",
         description: "Przesunięcie do przyjęcia",
       },
       errors: {
@@ -1115,6 +1199,12 @@ export const translations: typeof enTranslations = {
       description:
         "Aktualny stan zapasów, oczekujące transfery i liczba magazynów.",
       widget: {
+        navStockLevelsHint: "Ilości, wartość i punkty zamawiania",
+        navTransfersHint: "W drodze: {{count}}",
+        navWarehousesHint: "Lokalizacje: {{count}}",
+        noWarehouses: "Brak magazynów",
+        noWarehousesHint: "Utwórz magazyn, aby przyjmować i przesuwać towar.",
+        related: "Powiązane",
         kpiInStock: "Na stanie",
         kpiOutOfStock: "Brak w magazynie",
         kpiLowStock: "Niski stan",

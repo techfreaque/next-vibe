@@ -15,6 +15,7 @@ import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
 import {
   objectField,
   requestField,
+  requestUrlPathParamsField,
   responseField,
 } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
@@ -45,16 +46,15 @@ const { PATCH } = createEndpoint({
   icon: "archive" as const,
 
   fields: customWidgetObject({
-    usage: { request: "data", response: true } as const,
+    usage: { request: "data&urlPathParams", response: true } as const,
     render: InventoryWarehouseUpdateWidget,
     children: {
-      warehouseId: requestField(scopedTranslation, {
+      warehouseId: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
         label: "warehouseUpdate.patch.warehouseId.label" as const,
         description: "warehouseUpdate.patch.warehouseId.description" as const,
         schema: z.uuid(),
-        urlPathParam: true,
         listEndpoint: async () =>
           (await import("@/inventory/warehouse/list/definition")).default.GET,
         labelField: "name",
@@ -179,9 +179,11 @@ const { PATCH } = createEndpoint({
   },
 
   examples: {
+    urlPathParams: {
+      default: { warehouseId: "aabbccdd-e89b-12d3-a456-426614174001" },
+    },
     requests: {
       default: {
-        warehouseId: "aabbccdd-e89b-12d3-a456-426614174001",
         name: "Main Warehouse Updated",
         isActive: true,
       },
@@ -202,6 +204,8 @@ const { PATCH } = createEndpoint({
 
 export type InventoryWarehouseUpdateRequestOutput =
   typeof PATCH.types.RequestOutput;
+export type InventoryWarehouseUpdateUrlVariablesOutput =
+  typeof PATCH.types.UrlVariablesOutput;
 export type InventoryWarehouseUpdateResponseOutput =
   typeof PATCH.types.ResponseOutput;
 

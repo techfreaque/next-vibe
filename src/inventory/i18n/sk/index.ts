@@ -9,6 +9,7 @@ export const translations: typeof enTranslations = {
     },
   },
   tags: {
+    cancel: "Zrušiť",
     inventory: "Skladové hospodárstvo",
     warehouse: "Sklad",
     stock: "Zásoby",
@@ -51,13 +52,15 @@ export const translations: typeof enTranslations = {
       titleShort: "Nový sklad",
       description: "Zaregistrovať nový sklad pre firmu.",
       widget: {
+        openWarehouse: "Otvoriť sklad",
+        createAnother: "Vytvoriť ďalší",
         backToList: "Späť na zoznam skladov",
         active: "Aktívny",
         inactive: "Neaktívny",
         default: "Predvolený",
       },
       companyId: {
-        label: "ID firmy",
+        label: "Firma",
         description: "Firma, ktorej sklad patrí",
       },
       name: {
@@ -141,6 +144,8 @@ export const translations: typeof enTranslations = {
       titleShort: "Sklady",
       description: "Zobraziť všetky sklady firmy.",
       widget: {
+        subtitle: "Tu sú vaše zásoby. Otvorte sklad a uvidíte stav a hodnotu.",
+        status: "Stav",
         active: "v prevádzke",
         inactive: "mimo prevádzky",
         default: "Predvolený",
@@ -156,7 +161,7 @@ export const translations: typeof enTranslations = {
         selectCompany: "Zadajte ID firmy, ktorej sklady chcete načítať.",
       },
       companyId: {
-        label: "ID firmy",
+        label: "Firma",
         description: "Firma, ktorej sklady sa majú zobraziť",
       },
       errors: {
@@ -231,7 +236,7 @@ export const translations: typeof enTranslations = {
         select: "Vyberte sklad",
       },
       warehouseId: {
-        label: "ID skladu",
+        label: "Sklad",
         description: "Sklad, ktorého podrobnosti chcete načítať",
       },
       errors: {
@@ -300,7 +305,7 @@ export const translations: typeof enTranslations = {
         inactive: "Neaktívny",
       },
       warehouseId: {
-        label: "ID skladu",
+        label: "Sklad",
         description: "Sklad, ktorý chcete upraviť",
       },
       name: {
@@ -420,11 +425,11 @@ export const translations: typeof enTranslations = {
         statusOk: "Na sklade",
       },
       warehouseId: {
-        label: "ID skladu",
+        label: "Sklad",
         description: "Sklad, ktorého zásoby sa majú načítať",
       },
       productId: {
-        label: "ID produktu",
+        label: "Produkt",
         description: "Zobraziť zásoby len pre vybraný produkt (nepovinné)",
       },
       errors: {
@@ -488,6 +493,11 @@ export const translations: typeof enTranslations = {
       },
     },
   },
+  stockWrite: {
+    onHandNow: "Teraz na sklade:",
+    viewStock: "Zobraziť zásoby",
+    again: "Zapísať ďalší",
+  },
   stockAdjust: {
     post: {
       title: "Upraviť stav zásob",
@@ -503,11 +513,11 @@ export const translations: typeof enTranslations = {
         negativeHint: "Záporné množstvo zníži stav zásob",
       },
       warehouseId: {
-        label: "ID skladu",
+        label: "Sklad",
         description: "Sklad, v ktorom sa upraví množstvo zásob",
       },
       productId: {
-        label: "ID produktu",
+        label: "Produkt",
         description: "Produkt, ktorého množstvo chcete upraviť",
       },
       quantity: {
@@ -587,11 +597,11 @@ export const translations: typeof enTranslations = {
         backToStock: "Späť na sklade",
       },
       warehouseId: {
-        label: "ID skladu",
+        label: "Sklad",
         description: "Sklad, ktorý zásoby prijíma",
       },
       productId: {
-        label: "ID produktu",
+        label: "Produkt",
         description: "Produkt, ktorý prijímate na sklad",
       },
       quantity: {
@@ -670,11 +680,11 @@ export const translations: typeof enTranslations = {
         backToStock: "Späť na sklade",
       },
       warehouseId: {
-        label: "ID skladu",
+        label: "Sklad",
         description: "Sklad, z ktorého sa vydávajú zásoby",
       },
       productId: {
-        label: "ID produktu",
+        label: "Produkt",
         description: "Produkt, ktorý vydávate zo skladu",
       },
       quantity: {
@@ -751,12 +761,17 @@ export const translations: typeof enTranslations = {
       description:
         "Vytvoriť požiadavku na presun medzi skladmi. Presun začína v stave Koncept.",
       widget: {
+        itemsTitle: "Položky na presun",
+        pickSource: "Vyberte zdrojový sklad a uvidíte jeho zásoby.",
+        noStock: "Tento sklad nemá žiadne zásoby na presun.",
+        available: "Dostupné: {{quantity}}",
+        itemsRequired: "Zadajte množstvo aspoň pre jeden produkt.",
         backToList: "Späť na zoznam presunov",
         viewTransfer: "Zobraziť presun",
         browseWarehouses: "Zobraziť sklady",
       },
       companyId: {
-        label: "ID firmy",
+        label: "Firma",
         description: "Firma, ktorej presun patrí",
       },
       fromWarehouseId: {
@@ -795,6 +810,10 @@ export const translations: typeof enTranslations = {
           description: "Žiadny prístup k tejto spoločnosti",
         },
         conflict: {
+          invalidWarehouses:
+            "Oba sklady musia byť aktívne a patriť tejto firme.",
+          invalidItems:
+            "Každý produkt len raz, s množstvom nad nulou (najviac 4 desatinné miesta).",
           title: "Rovnaký sklad",
           description: "Zdrojový a cieľový sklad musia byť rôzne",
         },
@@ -859,7 +878,7 @@ export const translations: typeof enTranslations = {
         arrowSeparator: "→",
       },
       companyId: {
-        label: "ID firmy",
+        label: "Firma",
         description: "Firma, ktorej presuny chcete zobraziť",
       },
       errors: {
@@ -923,6 +942,7 @@ export const translations: typeof enTranslations = {
       titleShort: "Presun",
       description: "Načítať podrobnosti presunu vrátane všetkých položiek.",
       widget: {
+        cancel: "Zrušiť presun",
         retry: "Skúsiť znova",
         noItems: "Tento presun neobsahuje žiadne položky.",
         noItemsHint:
@@ -936,7 +956,7 @@ export const translations: typeof enTranslations = {
         select: "Vyberte presun",
       },
       transferId: {
-        label: "ID presunu",
+        label: "Presun",
         description: "Presun, ktorý chcete načítať",
       },
       errors: {
@@ -1002,6 +1022,67 @@ export const translations: typeof enTranslations = {
       },
     },
   },
+  transferCancel: {
+    post: {
+      title: "Zrušiť presun",
+      titleShort: "Zrušiť presun",
+      description:
+        "Zastaví tento presun. Odoslaný tovar sa vráti do zdrojového skladu.",
+      widget: {
+        backToTransfer: "Späť na presun",
+      },
+      transferId: {
+        label: "Presun",
+        description: "Presun na zrušenie",
+      },
+      errors: {
+        validation: {
+          title: "Chyba overenia",
+          description: "Neplatný presun",
+        },
+        unauthorized: {
+          title: "Nie ste prihlásený",
+          description: "Prihláste sa, ak chcete rušiť presuny",
+        },
+        forbidden: {
+          title: "Prístup zamietnutý",
+          description: "K tomuto presunu nemáte prístup",
+        },
+        conflict: {
+          title: "Nedá sa zrušiť",
+          description: "Zrušiť sa dajú len koncepty a presuny na ceste",
+        },
+        server: {
+          title: "Chyba servera",
+          description: "Presun sa nepodarilo zrušiť",
+        },
+        unknown: {
+          title: "Neznáma chyba",
+          description: "Vyskytla sa neočakávaná chyba",
+        },
+        network: {
+          title: "Chyba siete",
+          description: "Skontrolujte pripojenie a skúste to znova",
+        },
+        notFound: {
+          title: "Presun sa nenašiel",
+          description: "Tento presun neexistuje",
+        },
+        unsavedChanges: {
+          title: "Neuložené zmeny",
+          description: "Máte neuložené zmeny",
+        },
+      },
+      success: {
+        title: "Presun zrušený",
+        description: "Z tohto presunu už nič nie je na ceste.",
+      },
+      response: {
+        id: "Presun",
+        status: "Stav",
+      },
+    },
+  },
   transferDispatch: {
     post: {
       title: "Expedovať presun",
@@ -1012,7 +1093,7 @@ export const translations: typeof enTranslations = {
         backToTransfer: "Späť na podrobnosti presunu",
       },
       transferId: {
-        label: "ID presunu",
+        label: "Presun",
         description: "Presun, ktorý chcete expedovať",
       },
       errors: {
@@ -1029,6 +1110,8 @@ export const translations: typeof enTranslations = {
           description: "K tomuto presunu nemáte prístup",
         },
         conflict: {
+          insufficientStock:
+            "Zdrojový sklad nemá dosť zásob pre všetky položky.",
           title: "Presun nie je v stave Koncept",
           description: "Expedovať možno iba presuny v stave Koncept",
         },
@@ -1073,7 +1156,7 @@ export const translations: typeof enTranslations = {
         backToTransfer: "Späť na podrobnosti presunu",
       },
       transferId: {
-        label: "ID presunu",
+        label: "Presun",
         description: "Presun, ktorý chcete prijať",
       },
       errors: {
@@ -1133,6 +1216,13 @@ export const translations: typeof enTranslations = {
       description:
         "Aktuálny prehľad zásob, nedokončených presunov a počtu skladov.",
       widget: {
+        noWarehousesHint:
+          "Vytvorte sklad a začnite prijímať a presúvať zásoby.",
+        navStockLevelsHint: "Množstvá, hodnota a body objednania",
+        navTransfersHint: "Na ceste: {{count}}",
+        navWarehousesHint: "Lokality: {{count}}",
+        noWarehouses: "Zatiaľ žiadne sklady",
+        related: "Súvisiace",
         kpiInStock: "Na sklade",
         kpiOutOfStock: "Bez zásob",
         kpiLowStock: "Nízka zásoba",

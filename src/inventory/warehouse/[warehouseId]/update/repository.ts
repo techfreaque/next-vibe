@@ -24,6 +24,7 @@ import type { InventoryWarehouseUpdateRequestOutput } from "./definition";
 
 export class InventoryWarehouseUpdateRepository {
   static async updateWarehouse(
+    warehouseId: string,
     data: InventoryWarehouseUpdateRequestOutput,
     userId: string,
     logger: EndpointLogger,
@@ -45,7 +46,7 @@ export class InventoryWarehouseUpdateRepository {
       const [existing] = await db
         .select()
         .from(warehouses)
-        .where(eq(warehouses.id, data.warehouseId))
+        .where(eq(warehouses.id, warehouseId))
         .limit(1);
 
       if (!existing) {
@@ -75,7 +76,7 @@ export class InventoryWarehouseUpdateRepository {
             and(
               eq(warehouses.companyId, existing.companyId),
               eq(warehouses.code, data.code),
-              ne(warehouses.id, data.warehouseId),
+              ne(warehouses.id, warehouseId),
             ),
           )
           .limit(1);
@@ -95,7 +96,7 @@ export class InventoryWarehouseUpdateRepository {
           .where(
             and(
               eq(warehouses.companyId, existing.companyId),
-              ne(warehouses.id, data.warehouseId),
+              ne(warehouses.id, warehouseId),
             ),
           );
       }
@@ -110,7 +111,7 @@ export class InventoryWarehouseUpdateRepository {
           isDefault: data.isDefault ?? existing.isDefault,
           updatedAt: new Date(),
         })
-        .where(eq(warehouses.id, data.warehouseId))
+        .where(eq(warehouses.id, warehouseId))
         .returning();
 
       if (!updated) {

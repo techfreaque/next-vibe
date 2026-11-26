@@ -77,6 +77,18 @@ export function InventoryTransferGetWidget(): JSX.Element {
       }),
     );
   };
+  const cancel = (): void => {
+    if (!result || !editable) {
+      return;
+    }
+    void import("../cancel/definition").then(({ default: action }) =>
+      navigation.push(action.POST, {
+        urlPathParams: { transferId: result.id },
+        popNavigationOnSuccess: 1,
+        onSuccessCallback: () => read?.refetch(),
+      }),
+    );
+  };
   const columns = [
     { id: "product", label: t("transferGet.get.response.productName") },
     {
@@ -194,6 +206,17 @@ export function InventoryTransferGetWidget(): JSX.Element {
               ),
               onClick: move,
             }
+          : undefined
+      }
+      secondaryActions={
+        interactive && editable
+          ? [
+              {
+                key: "cancel",
+                label: t("transferGet.get.widget.cancel"),
+                onClick: cancel,
+              },
+            ]
           : undefined
       }
       technicalDetails={

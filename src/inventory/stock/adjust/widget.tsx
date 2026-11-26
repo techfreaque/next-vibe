@@ -1,23 +1,28 @@
 "use client";
 
-import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
-import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
-import { Span } from "next-vibe/ui/components/span";
 import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
+import { formatQuantity } from "next-vibe/unified-ui/_shared/format-money";
 import {
   useWidgetForm,
+  useWidgetLocale,
   useWidgetNavigation,
   useWidgetTranslation,
+  useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { EntityPickerFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/entity-picker-field/widget";
 import { NumberFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/number-field/widget";
 import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-field/widget";
-import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 import type { JSX } from "react";
 
+import {
+  InventoryFormPage,
+  InventoryWriteResult,
+} from "../../_shared/inventory-form-page";
+import { StockTarget } from "../../_shared/stock-target";
 import type definition from "./definition";
+import { AdjustPreview } from "./preview";
 
 export function InventoryStockAdjustWidget({
   field,
@@ -26,32 +31,59 @@ export function InventoryStockAdjustWidget({
 }): JSX.Element {
   const navigation = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.POST>();
+  const locale = useWidgetLocale();
   const form = useWidgetForm<typeof definition.POST>();
-
-  const quantityDelta = form?.watch("quantity");
-  const showPreview =
-    quantityDelta !== undefined &&
-    quantityDelta !== null &&
-    quantityDelta !== 0;
+  const result = useWidgetValue<typeof definition.POST>()?.result;
+  const warehouseId = result?.warehouseId ?? form.watch("warehouseId");
+  const viewStock = (): void => {
+    void import("../list/definition").then(({ default: list }) =>
+      navigation.push(list.GET, {
+        data: warehouseId ? { warehouseId } : undefined,
+      }),
+    );
+  };
+  const again = (): void => {
+    void import("./definition").then(({ default: write }) =>
+      navigation.push(write.POST, {
+        data: warehouseId ? { warehouseId } : undefined,
+      }),
+    );
+  };
 
   return (
-    <Div className="max-w-lg mx-auto w-full px-4 pt-8 pb-6 flex flex-col gap-4">
-      {navigation.canGoBack && (
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={() => {
-            navigation.pop();
+    <InventoryFormPage
+      title={t("stockAdjust.post.titleShort")}
+      subtitle={t("stockAdjust.post.description")}
+      backLabel={t("stockAdjust.post.widget.backToStock")}
+      onBackFallback={viewStock}
+      result={
+        result ? (
+          <InventoryWriteResult
+            title={t("stockAdjust.post.success.title")}
+            message={`${t("stockWrite.onHandNow")} ${formatQuantity(result.quantityOnHand, locale)}`}
+            primary={{ label: t("stockWrite.viewStock"), onClick: viewStock }}
+            secondary={{ label: t("stockWrite.again"), onClick: again }}
+          />
+        ) : undefined
+      }
+      footer={<AdjustPreview />}
+      submit={
+        <SubmitButtonWidget<typeof definition.POST>
+          field={{
+            text: "stockAdjust.post.title" as const,
+            className: "min-h-10 px-6",
           }}
-          className="self-start gap-1.5 -ml-1"
-        >
-          <ChevronLeft className="h-4 w-4" />
-          {t("stockAdjust.post.widget.backToStock")}
-        </Button>
-      )}
-
-      <Div className="flex flex-col gap-3">
+        />
+      }
+    >
+      <StockTarget
+        warehouseId={form.watch("warehouseId")}
+        productId={form.watch("productId")}
+        warehouseLabel={t("stockAdjust.post.warehouseId.label")}
+        productLabel={t("stockAdjust.post.productId.label")}
+        onHandLabel={t("stockList.get.response.quantityOnHand")}
+      />
+      <Div className="grid gap-4 @lg:grid-cols-2">
         <EntityPickerFieldWidget
           fieldName="warehouseId"
           field={withValue(field.children.warehouseId, undefined, null)}
@@ -60,52 +92,21 @@ export function InventoryStockAdjustWidget({
           fieldName="productId"
           field={withValue(field.children.productId, undefined, null)}
         />
+      </Div>
+      <Div className="grid gap-4 @lg:grid-cols-2 @lg:items-end">
         <NumberFieldWidget
           fieldName="quantity"
           field={withValue(field.children.quantity, undefined, null)}
-        />
-        <TextFieldWidget
-          fieldName="reason"
-          field={withValue(field.children.reason, undefined, null)}
         />
         <NumberFieldWidget
           fieldName="unitCost"
           field={withValue(field.children.unitCost, undefined, null)}
         />
       </Div>
-
-      {showPreview ? (
-        <Div className="rounded-lg border bg-muted/10 p-4 flex flex-col gap-3">
-          <Span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-            {t("stockAdjust.post.widget.preview")}
-          </Span>
-          <Div className="flex items-center gap-3">
-            <Span className="text-sm text-muted-foreground">
-              {t("stockAdjust.post.widget.quantityChange")}:
-            </Span>
-            <Span
-              className={`font-bold text-lg tabular-nums ${
-                quantityDelta > 0
-                  ? "text-emerald-700 dark:text-emerald-400"
-                  : "text-red-600 dark:text-red-400"
-              }`}
-            >
-              {quantityDelta > 0 ? "+" : ""}
-              {quantityDelta}
-            </Span>
-          </Div>
-          <Span className="text-xs text-muted-foreground">
-            {quantityDelta > 0
-              ? t("stockAdjust.post.widget.positiveHint")
-              : t("stockAdjust.post.widget.negativeHint")}
-          </Span>
-        </Div>
-      ) : null}
-
-      <FormAlertWidget field={{}} />
-      <SubmitButtonWidget<typeof definition.POST>
-        field={{ text: "stockAdjust.post.title" as const }}
+      <TextFieldWidget
+        fieldName="reason"
+        field={withValue(field.children.reason, undefined, null)}
       />
-    </Div>
+    </InventoryFormPage>
   );
 }

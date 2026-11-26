@@ -1,20 +1,22 @@
 "use client";
 
-import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
-import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
 import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
 import {
   useWidgetNavigation,
   useWidgetTranslation,
+  useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { BooleanFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/boolean-field/widget";
 import { EntityPickerFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/entity-picker-field/widget";
 import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-field/widget";
-import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 import type { JSX } from "react";
 
+import {
+  InventoryFormPage,
+  InventoryWriteResult,
+} from "../../_shared/inventory-form-page";
 import type definition from "./definition";
 
 export function InventoryWarehouseCreateWidget({
@@ -24,27 +26,64 @@ export function InventoryWarehouseCreateWidget({
 }): JSX.Element {
   const navigation = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.POST>();
+  const result = useWidgetValue<typeof definition.POST>()?.result;
+  const openWarehouse = (): void => {
+    if (!result) {
+      return;
+    }
+    void import("../[warehouseId]/get/definition").then(({ default: get }) =>
+      navigation.push(get.GET, { urlPathParams: { warehouseId: result.id } }),
+    );
+  };
+  const createAnother = (): void => {
+    void import("./definition").then(({ default: write }) =>
+      navigation.push(write.POST, {
+        data: result ? { companyId: result.companyId } : undefined,
+      }),
+    );
+  };
+  const openList = (): void => {
+    void import("../list/definition").then(({ default: list }) =>
+      navigation.push(list.GET),
+    );
+  };
 
   return (
-    <Div className="flex flex-col gap-4">
-      {navigation.canGoBack && (
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={() => navigation.pop()}
-          className="self-start gap-1.5 -ml-1"
-        >
-          <ChevronLeft className="h-4 w-4" />
-          {t("warehouseCreate.post.widget.backToList")}
-        </Button>
-      )}
-
-      <Div className="flex flex-col gap-3">
-        <EntityPickerFieldWidget
-          fieldName="companyId"
-          field={field.children.companyId}
+    <InventoryFormPage
+      title={t("warehouseCreate.post.titleShort")}
+      subtitle={t("warehouseCreate.post.description")}
+      backLabel={t("warehouseCreate.post.widget.backToList")}
+      onBackFallback={openList}
+      result={
+        result ? (
+          <InventoryWriteResult
+            title={t("warehouseCreate.post.success.title")}
+            message={`${result.name} (${result.code})`}
+            primary={{
+              label: t("warehouseCreate.post.widget.openWarehouse"),
+              onClick: openWarehouse,
+            }}
+            secondary={{
+              label: t("warehouseCreate.post.widget.createAnother"),
+              onClick: createAnother,
+            }}
+          />
+        ) : undefined
+      }
+      submit={
+        <SubmitButtonWidget<typeof definition.POST>
+          field={{
+            text: "warehouseCreate.post.title" as const,
+            className: "min-h-10 px-6",
+          }}
         />
+      }
+    >
+      <EntityPickerFieldWidget
+        fieldName="companyId"
+        field={field.children.companyId}
+      />
+      <Div className="grid gap-4 @lg:grid-cols-[2fr_1fr] @lg:items-end">
         <TextFieldWidget
           fieldName="name"
           field={withValue(field.children.name, undefined, null)}
@@ -53,26 +92,21 @@ export function InventoryWarehouseCreateWidget({
           fieldName="code"
           field={withValue(field.children.code, undefined, null)}
         />
-        <TextFieldWidget
-          fieldName="address"
-          field={withValue(field.children.address, undefined, null)}
-        />
-        <Div className="grid grid-cols-2 gap-3">
-          <BooleanFieldWidget
-            fieldName="isActive"
-            field={withValue(field.children.isActive, undefined, null)}
-          />
-          <BooleanFieldWidget
-            fieldName="isDefault"
-            field={withValue(field.children.isDefault, undefined, null)}
-          />
-        </Div>
       </Div>
-
-      <FormAlertWidget field={{}} />
-      <SubmitButtonWidget<typeof definition.POST>
-        field={{ text: "warehouseCreate.post.title" as const }}
+      <TextFieldWidget
+        fieldName="address"
+        field={withValue(field.children.address, undefined, null)}
       />
-    </Div>
+      <Div className="grid gap-3 border-t pt-4 @lg:grid-cols-2">
+        <BooleanFieldWidget
+          fieldName="isDefault"
+          field={withValue(field.children.isDefault, undefined, null)}
+        />
+        <BooleanFieldWidget
+          fieldName="isActive"
+          field={withValue(field.children.isActive, undefined, null)}
+        />
+      </Div>
+    </InventoryFormPage>
   );
 }

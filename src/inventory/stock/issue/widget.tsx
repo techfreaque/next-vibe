@@ -1,20 +1,26 @@
 "use client";
 
-import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
-import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
 import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
+import { formatQuantity } from "next-vibe/unified-ui/_shared/format-money";
 import {
+  useWidgetForm,
+  useWidgetLocale,
   useWidgetNavigation,
   useWidgetTranslation,
+  useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { EntityPickerFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/entity-picker-field/widget";
 import { NumberFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/number-field/widget";
 import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-field/widget";
-import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 import type { JSX } from "react";
 
+import {
+  InventoryFormPage,
+  InventoryWriteResult,
+} from "../../_shared/inventory-form-page";
+import { StockTarget } from "../../_shared/stock-target";
 import type definition from "./definition";
 
 export function InventoryStockIssueWidget({
@@ -24,25 +30,58 @@ export function InventoryStockIssueWidget({
 }): JSX.Element {
   const navigation = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.POST>();
+  const locale = useWidgetLocale();
+  const form = useWidgetForm<typeof definition.POST>();
+  const result = useWidgetValue<typeof definition.POST>()?.result;
+  const warehouseId = result?.warehouseId ?? form.watch("warehouseId");
+  const viewStock = (): void => {
+    void import("../list/definition").then(({ default: list }) =>
+      navigation.push(list.GET, {
+        data: warehouseId ? { warehouseId } : undefined,
+      }),
+    );
+  };
+  const again = (): void => {
+    void import("./definition").then(({ default: write }) =>
+      navigation.push(write.POST, {
+        data: warehouseId ? { warehouseId } : undefined,
+      }),
+    );
+  };
 
   return (
-    <Div className="max-w-lg mx-auto w-full px-4 pt-8 pb-6 flex flex-col gap-4">
-      {navigation.canGoBack && (
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={() => {
-            navigation.pop();
+    <InventoryFormPage
+      title={t("stockIssue.post.titleShort")}
+      subtitle={t("stockIssue.post.description")}
+      backLabel={t("stockIssue.post.widget.backToStock")}
+      onBackFallback={viewStock}
+      result={
+        result ? (
+          <InventoryWriteResult
+            title={t("stockIssue.post.success.title")}
+            message={`${t("stockWrite.onHandNow")} ${formatQuantity(result.quantityOnHand, locale)}`}
+            primary={{ label: t("stockWrite.viewStock"), onClick: viewStock }}
+            secondary={{ label: t("stockWrite.again"), onClick: again }}
+          />
+        ) : undefined
+      }
+      submit={
+        <SubmitButtonWidget<typeof definition.POST>
+          field={{
+            text: "stockIssue.post.title" as const,
+            className: "min-h-10 px-6",
           }}
-          className="self-start gap-1.5 -ml-1"
-        >
-          <ChevronLeft className="h-4 w-4" />
-          {t("stockIssue.post.widget.backToStock")}
-        </Button>
-      )}
-
-      <Div className="flex flex-col gap-3">
+        />
+      }
+    >
+      <StockTarget
+        warehouseId={form.watch("warehouseId")}
+        productId={form.watch("productId")}
+        warehouseLabel={t("stockIssue.post.warehouseId.label")}
+        productLabel={t("stockIssue.post.productId.label")}
+        onHandLabel={t("stockList.get.response.quantityOnHand")}
+      />
+      <Div className="grid gap-4 @lg:grid-cols-2">
         <EntityPickerFieldWidget
           fieldName="warehouseId"
           field={withValue(field.children.warehouseId, undefined, null)}
@@ -51,24 +90,21 @@ export function InventoryStockIssueWidget({
           fieldName="productId"
           field={withValue(field.children.productId, undefined, null)}
         />
+      </Div>
+      <Div className="grid gap-4 @lg:grid-cols-2 @lg:items-end">
         <NumberFieldWidget
           fieldName="quantity"
           field={withValue(field.children.quantity, undefined, null)}
-        />
-        <TextFieldWidget
-          fieldName="reference"
-          field={withValue(field.children.reference, undefined, null)}
         />
         <NumberFieldWidget
           fieldName="unitCost"
           field={withValue(field.children.unitCost, undefined, null)}
         />
       </Div>
-
-      <FormAlertWidget field={{}} />
-      <SubmitButtonWidget<typeof definition.POST>
-        field={{ text: "stockIssue.post.title" as const }}
+      <TextFieldWidget
+        fieldName="reference"
+        field={withValue(field.children.reference, undefined, null)}
       />
-    </Div>
+    </InventoryFormPage>
   );
 }

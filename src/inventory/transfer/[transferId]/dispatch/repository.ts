@@ -116,7 +116,7 @@ export class InventoryTransferDispatchRepository {
                 userId,
                 logger,
                 insufficientStockError: t(
-                  "transferDispatch.post.errors.conflict.title",
+                  "transferDispatch.post.errors.conflict.insufficientStock",
                 ),
               },
               tx,
@@ -150,7 +150,13 @@ export class InventoryTransferDispatchRepository {
             },
           });
         },
-        () => conflict,
+        () =>
+          fail({
+            message: t(
+              "transferDispatch.post.errors.conflict.insufficientStock",
+            ),
+            errorType: ErrorResponseTypes.CONFLICT,
+          }),
       );
     } catch (error) {
       logger.error("Error dispatching transfer", parseError(error));

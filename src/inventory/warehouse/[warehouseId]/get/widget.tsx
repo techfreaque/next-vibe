@@ -5,6 +5,7 @@ import { DetailField, DetailGrid } from "next-vibe/ui/components/detail-grid";
 import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
 import { formatMoney } from "next-vibe/unified-ui/_shared/format-money";
 import {
+  useWidgetEndpointMutations,
   useWidgetIsInteractive,
   useWidgetLocale,
   useWidgetNavigation,
@@ -24,6 +25,7 @@ export function InventoryWarehouseGetWidget({
   field: (typeof definition.GET)["fields"];
 }): JSX.Element {
   const result = useWidgetValue<typeof definition.GET>()?.result;
+  const read = useWidgetEndpointMutations()?.read;
   const navigation = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.GET>();
   const locale = useWidgetLocale();
@@ -74,8 +76,16 @@ export function InventoryWarehouseGetWidget({
   const edit = (): void => {
     void import("../update/definition").then((mod) =>
       navigation.push(mod.default.PATCH, {
-        data: { warehouseId: result.id },
+        urlPathParams: { warehouseId: result.id },
+        data: {
+          name: result.name,
+          code: result.code,
+          address: result.address ?? "",
+          isActive: result.isActive,
+          isDefault: result.isDefault,
+        },
         popNavigationOnSuccess: 1,
+        onSuccessCallback: () => read?.refetch(),
       }),
     );
   };

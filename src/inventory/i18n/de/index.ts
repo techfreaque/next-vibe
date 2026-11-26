@@ -9,6 +9,7 @@ export const translations: typeof enTranslations = {
     },
   },
   tags: {
+    cancel: "Stornieren",
     inventory: "Lager",
     warehouse: "Lagerhaus",
     stock: "Bestand",
@@ -52,13 +53,15 @@ export const translations: typeof enTranslations = {
       titleShort: "Neues Lager",
       description: "Neues Lagerhaus für ein Unternehmen anlegen.",
       widget: {
+        openWarehouse: "Lager öffnen",
+        createAnother: "Weiteres anlegen",
         backToList: "Zurück zur Lagerhausliste",
         active: "Aktiv",
         inactive: "Inaktiv",
         default: "Standard",
       },
       companyId: {
-        label: "Unternehmens-ID",
+        label: "Unternehmen",
         description: "Zugehöriges Unternehmen",
       },
       name: {
@@ -144,6 +147,9 @@ export const translations: typeof enTranslations = {
       titleShort: "Lager",
       description: "Alle Lagerhäuser eines Unternehmens auflisten.",
       widget: {
+        subtitle:
+          "Hier liegt dein Bestand. Öffne ein Lager für Bestand und Wert.",
+        status: "Status",
         active: "Aktiv",
         inactive: "Inaktiv",
         default: "Standard",
@@ -160,7 +166,7 @@ export const translations: typeof enTranslations = {
         selectCompany: "Unternehmens-ID eingeben, um Lagerhäuser zu laden.",
       },
       companyId: {
-        label: "Unternehmens-ID",
+        label: "Unternehmen",
         description: "Unternehmen, dessen Lagerhäuser aufgelistet werden",
       },
       errors: {
@@ -233,7 +239,7 @@ export const translations: typeof enTranslations = {
         select: "Lagerhaus auswählen",
       },
       warehouseId: {
-        label: "Lagerhaus-ID",
+        label: "Lager",
         description: "Abzurufendes Lagerhaus",
       },
       errors: {
@@ -300,7 +306,7 @@ export const translations: typeof enTranslations = {
         inactive: "Inaktiv",
       },
       warehouseId: {
-        label: "Lagerhaus-ID",
+        label: "Lager",
         description: "Zu aktualisierendes Lagerhaus",
       },
       name: {
@@ -423,11 +429,11 @@ export const translations: typeof enTranslations = {
         statusOk: "Auf Lager",
       },
       warehouseId: {
-        label: "Lagerhaus-ID",
+        label: "Lager",
         description: "Lagerhaus, dessen Bestand abgefragt wird",
       },
       productId: {
-        label: "Produkt-ID",
+        label: "Produkt",
         description: "Auf ein bestimmtes Produkt filtern (optional)",
       },
       errors: {
@@ -489,6 +495,11 @@ export const translations: typeof enTranslations = {
     },
   },
 
+  stockWrite: {
+    onHandNow: "Jetzt am Lager:",
+    viewStock: "Bestand ansehen",
+    again: "Weitere Buchung",
+  },
   stockAdjust: {
     post: {
       title: "Bestand korrigieren",
@@ -504,11 +515,11 @@ export const translations: typeof enTranslations = {
         negativeHint: "Negative Menge reduziert den Bestand",
       },
       warehouseId: {
-        label: "Lagerhaus-ID",
+        label: "Lager",
         description: "Lagerhaus, in dem der Bestand korrigiert wird",
       },
       productId: {
-        label: "Produkt-ID",
+        label: "Produkt",
         description: "Zu korrigierendes Produkt",
       },
       quantity: {
@@ -589,10 +600,10 @@ export const translations: typeof enTranslations = {
         backToStock: "Zurück zum Bestand",
       },
       warehouseId: {
-        label: "Lagerhaus-ID",
+        label: "Lager",
         description: "Empfangendes Lagerhaus",
       },
-      productId: { label: "Produkt-ID", description: "Empfangenes Produkt" },
+      productId: { label: "Produkt", description: "Empfangenes Produkt" },
       quantity: {
         label: "Menge",
         description: "Anzahl empfangener Einheiten",
@@ -667,10 +678,10 @@ export const translations: typeof enTranslations = {
         backToStock: "Zurück zum Bestand",
       },
       warehouseId: {
-        label: "Lagerhaus-ID",
+        label: "Lager",
         description: "Auslagerndes Lagerhaus",
       },
-      productId: { label: "Produkt-ID", description: "Auszulagendes Produkt" },
+      productId: { label: "Produkt", description: "Auszulagendes Produkt" },
       quantity: {
         label: "Menge",
         description: "Anzahl auszulagernder Einheiten",
@@ -745,12 +756,17 @@ export const translations: typeof enTranslations = {
       titleShort: "Neue Umlagerung",
       description: "Umlagerungsauftrag erstellen. Startet im Status Entwurf.",
       widget: {
+        itemsTitle: "Zu verschiebende Artikel",
+        pickSource: "Wähle das Quelllager, um seinen Bestand zu sehen.",
+        noStock: "Dieses Lager hat keinen Bestand zum Umlagern.",
+        available: "{{quantity}} verfügbar",
+        itemsRequired: "Gib für mindestens ein Produkt eine Menge ein.",
         backToList: "Zurück zu Umlagerungen",
         viewTransfer: "Umlagerung ansehen",
         browseWarehouses: "Lager durchsuchen",
       },
       companyId: {
-        label: "Unternehmens-ID",
+        label: "Unternehmen",
         description: "Zugehöriges Unternehmen",
       },
       fromWarehouseId: {
@@ -789,6 +805,10 @@ export const translations: typeof enTranslations = {
           description: "Kein Zugriff auf dieses Unternehmen",
         },
         conflict: {
+          invalidWarehouses:
+            "Beide Lager müssen aktiv sein und zu diesem Unternehmen gehören.",
+          invalidItems:
+            "Jedes Produkt nur einmal und mit einer Menge über null (bis 4 Nachkommastellen).",
           title: "Gleiches Lagerhaus",
           description: "Ausgangs- und Ziellager müssen verschieden sein",
         },
@@ -845,17 +865,17 @@ export const translations: typeof enTranslations = {
         total: "Umlagerungen",
         view: "Ansehen",
         draft: "Entwurf",
-        inTransit: "In Transit",
+        inTransit: "Unterwegs",
         viewTransfer: "Umlagerung ansehen",
         tabAll: "Alle",
         tabDraft: "Ausstehend",
-        tabInTransit: "In Transit",
+        tabInTransit: "Unterwegs",
         tabReceived: "Abgeschlossen",
         tabCancelled: "Storniert",
         arrowSeparator: "→",
       },
       companyId: {
-        label: "Unternehmens-ID",
+        label: "Unternehmen",
         description: "Unternehmen, dessen Umlagerungen aufgelistet werden",
       },
       errors: {
@@ -917,6 +937,7 @@ export const translations: typeof enTranslations = {
       titleShort: "Umlagerung",
       description: "Umlagerung mit allen Positionen abrufen.",
       widget: {
+        cancel: "Umlagerung stornieren",
         retry: "Erneut versuchen",
         noItems: "Diese Umlagerung enthält keine Positionen.",
         noItemsHint:
@@ -930,7 +951,7 @@ export const translations: typeof enTranslations = {
         select: "Umlagerung auswählen",
       },
       transferId: {
-        label: "Umlagerungs-ID",
+        label: "Umlagerung",
         description: "Abzurufende Umlagerung",
       },
       errors: {
@@ -994,6 +1015,68 @@ export const translations: typeof enTranslations = {
     },
   },
 
+  transferCancel: {
+    post: {
+      title: "Umlagerung stornieren",
+      titleShort: "Umlagerung stornieren",
+      description:
+        "Stoppt diese Umlagerung. Bereits versendete Ware geht zurück ins Quelllager.",
+      widget: {
+        backToTransfer: "Zurück zur Umlagerung",
+      },
+      transferId: {
+        label: "Umlagerung",
+        description: "Zu stornierende Umlagerung",
+      },
+      errors: {
+        validation: {
+          title: "Ungültige Eingabe",
+          description: "Ungültige Umlagerung",
+        },
+        unauthorized: {
+          title: "Nicht angemeldet",
+          description: "Melde dich an, um Umlagerungen zu stornieren",
+        },
+        forbidden: {
+          title: "Zugriff verweigert",
+          description: "Kein Zugriff auf diese Umlagerung",
+        },
+        conflict: {
+          title: "Stornierung nicht möglich",
+          description:
+            "Nur Entwürfe und Umlagerungen unterwegs lassen sich stornieren",
+        },
+        server: {
+          title: "Serverfehler",
+          description: "Umlagerung konnte nicht storniert werden",
+        },
+        unknown: {
+          title: "Unbekannter Fehler",
+          description: "Ein unerwarteter Fehler ist aufgetreten",
+        },
+        network: {
+          title: "Netzwerkfehler",
+          description: "Prüfe deine Verbindung und versuche es erneut",
+        },
+        notFound: {
+          title: "Umlagerung nicht gefunden",
+          description: "Diese Umlagerung existiert nicht",
+        },
+        unsavedChanges: {
+          title: "Ungespeicherte Änderungen",
+          description: "Du hast ungespeicherte Änderungen",
+        },
+      },
+      success: {
+        title: "Umlagerung storniert",
+        description: "Aus dieser Umlagerung ist nichts mehr unterwegs.",
+      },
+      response: {
+        id: "Umlagerung",
+        status: "Status",
+      },
+    },
+  },
   transferDispatch: {
     post: {
       title: "Umlagerung versenden",
@@ -1004,7 +1087,7 @@ export const translations: typeof enTranslations = {
         backToTransfer: "Zurück zur Umlagerung",
       },
       transferId: {
-        label: "Umlagerungs-ID",
+        label: "Umlagerung",
         description: "Zu versendende Umlagerung",
       },
       errors: {
@@ -1021,6 +1104,8 @@ export const translations: typeof enTranslations = {
           description: "Kein Zugriff auf diese Umlagerung",
         },
         conflict: {
+          insufficientStock:
+            "Im Quelllager ist nicht für jeden Artikel genug Bestand.",
           title: "Kein Entwurf",
           description: "Nur Entwürfe können versendet werden",
         },
@@ -1066,7 +1151,7 @@ export const translations: typeof enTranslations = {
         backToTransfer: "Zurück zur Umlagerung",
       },
       transferId: {
-        label: "Umlagerungs-ID",
+        label: "Umlagerung",
         description: "Zu empfangende Umlagerung",
       },
       errors: {
@@ -1126,6 +1211,13 @@ export const translations: typeof enTranslations = {
       description:
         "Aktueller Stand des Lagerbestands, ausstehende Transfers und Lageranzahl.",
       widget: {
+        noWarehousesHint:
+          "Lege ein Lager an, um Ware einzubuchen und umzulagern.",
+        navStockLevelsHint: "Mengen, Wert und Meldebestände",
+        navTransfersHint: "Unterwegs: {{count}}",
+        navWarehousesHint: "Standorte: {{count}}",
+        noWarehouses: "Noch keine Lager",
+        related: "Verwandt",
         kpiInStock: "Auf Lager",
         kpiOutOfStock: "Nicht vorrätig",
         kpiLowStock: "Niedriger Bestand",

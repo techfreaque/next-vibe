@@ -9,6 +9,7 @@ export const translations: typeof enTranslations = {
     },
   },
   tags: {
+    cancel: "Annulla",
     inventory: "Inventario",
     warehouse: "magazzino",
     stock: "Scorte",
@@ -40,7 +41,7 @@ export const translations: typeof enTranslations = {
     },
     transferStatus: {
       draft: "Progetto",
-      inTransit: "In Transit",
+      inTransit: "In transito",
       received: "Ricevuto.",
       cancelled: "Annullamento",
     },
@@ -53,13 +54,15 @@ export const translations: typeof enTranslations = {
       titleShort: "Nuovo magazzino",
       description: "Registrare un nuovo magazzino per una società.",
       widget: {
+        openWarehouse: "Apri magazzino",
+        createAnother: "Creane un altro",
         backToList: "Torna ai magazzini",
         active: "Attivo",
         inactive: "Inattivo",
         default: "Predefinito",
       },
       companyId: {
-        label: "Società ID",
+        label: "Società",
         description: "Azienda questo magazzino appartiene a",
       },
       name: {
@@ -142,6 +145,9 @@ export const translations: typeof enTranslations = {
       titleShort: "Magazzini",
       description: "Elenca tutti i magazzini per un'azienda.",
       widget: {
+        subtitle:
+          "Dove si trova la tua merce. Aprine uno per vedere giacenze e valore.",
+        status: "Stato",
         active: "Attivo",
         inactive: "Inattivo",
         default: "Predefinito",
@@ -158,7 +164,7 @@ export const translations: typeof enTranslations = {
         selectCompany: "Immettere una società ID per caricare i magazzini.",
       },
       companyId: {
-        label: "Società ID",
+        label: "Società",
         description: "Società per elencare magazzini per",
       },
       errors: {
@@ -229,7 +235,7 @@ export const translations: typeof enTranslations = {
         select: "Selezionare il magazzino",
       },
       warehouseId: {
-        label: "Magazzino ID",
+        label: "Magazzino",
         description: "Magazzino per recuperare",
       },
       errors: {
@@ -297,7 +303,7 @@ export const translations: typeof enTranslations = {
         inactive: "Inattivo",
       },
       warehouseId: {
-        label: "Magazzino ID",
+        label: "Magazzino",
         description: "Magazzino per aggiornare",
       },
       name: {
@@ -422,11 +428,11 @@ export const translations: typeof enTranslations = {
         statusOk: "Disponibile",
       },
       warehouseId: {
-        label: "Magazzino ID",
+        label: "Magazzino",
         description: "Magazzino per query stock",
       },
       productId: {
-        label: "Prodotto ID",
+        label: "Prodotto",
         description: "Filtra a un prodotto specifico (opzionale)",
       },
       errors: {
@@ -470,7 +476,7 @@ export const translations: typeof enTranslations = {
       },
       response: {
         currency: "Valuta",
-        id: "Stock ID",
+        id: "Giacenza",
         warehouseId: "Magazzino ID",
         warehouseName: "magazzino",
         productId: "Prodotto ID",
@@ -480,7 +486,7 @@ export const translations: typeof enTranslations = {
         quantityOnOrder: "Su ordine",
         quantityAvailable: "Disponibile",
         reorderPoint: "Punto di riferimento",
-        reorderQuantity: "Reorder Qty",
+        reorderQuantity: "Qtà di riordino",
         unitCost: "Costo unitario",
         isLowStock: "Basso stock",
         updatedAt: "Aggiornato At",
@@ -489,6 +495,11 @@ export const translations: typeof enTranslations = {
   },
 
   // Stock adjust
+  stockWrite: {
+    onHandNow: "Giacenza attuale:",
+    viewStock: "Vedi giacenze",
+    again: "Registra un'altra",
+  },
   stockAdjust: {
     post: {
       title: "Regolare le azioni",
@@ -504,10 +515,10 @@ export const translations: typeof enTranslations = {
         negativeHint: "Quantità negativa rimuove le scorte",
       },
       warehouseId: {
-        label: "Magazzino ID",
+        label: "Magazzino",
         description: "Magazzino per regolare le scorte in",
       },
-      productId: { label: "Prodotto ID", description: "Prodotto per regolare" },
+      productId: { label: "Prodotto", description: "Prodotto per regolare" },
       quantity: {
         label: "Quantità",
         description:
@@ -588,10 +599,10 @@ export const translations: typeof enTranslations = {
         backToStock: "Torna a magazzino",
       },
       warehouseId: {
-        label: "Magazzino ID",
+        label: "Magazzino",
         description: "Magazzino che riceve il magazzino",
       },
-      productId: { label: "Prodotto ID", description: "Prodotto ricevuto" },
+      productId: { label: "Prodotto", description: "Prodotto ricevuto" },
       quantity: {
         label: "Quantità",
         description: "Numero di unità ricevute",
@@ -667,10 +678,10 @@ export const translations: typeof enTranslations = {
         backToStock: "Torna a magazzino",
       },
       warehouseId: {
-        label: "Magazzino ID",
+        label: "Magazzino",
         description: "Magazzino emissione stock da",
       },
-      productId: { label: "Prodotto ID", description: "Prodotto da emettere" },
+      productId: { label: "Prodotto", description: "Prodotto da emettere" },
       quantity: {
         label: "Quantità",
         description: "Numero di unità da emettere",
@@ -747,12 +758,17 @@ export const translations: typeof enTranslations = {
       description:
         "Creare una richiesta di trasferimento magazzino. Comincia in Situazione di progetto.",
       widget: {
+        itemsTitle: "Articoli da spostare",
+        pickSource: "Scegli il magazzino di origine per vederne le giacenze.",
+        noStock: "Questo magazzino non ha giacenze da spostare.",
+        available: "{{quantity}} disponibili",
+        itemsRequired: "Inserisci una quantità per almeno un prodotto.",
         backToList: "Torna ai trasferimenti",
         viewTransfer: "Visualizza trasferimento",
         browseWarehouses: "Sfoglia i Magazzini",
       },
       companyId: {
-        label: "Società ID",
+        label: "Società",
         description: "Società questo trasferimento appartiene a",
       },
       fromWarehouseId: {
@@ -791,6 +807,10 @@ export const translations: typeof enTranslations = {
           description: "Nessun accesso a questa azienda",
         },
         conflict: {
+          invalidWarehouses:
+            "Entrambi i magazzini devono essere attivi e appartenere a questa società.",
+          invalidItems:
+            "Ogni prodotto una sola volta, con quantità maggiore di zero (fino a 4 decimali).",
           title: "Stesso magazzino",
           description: "Da e per il magazzino deve essere diverso",
         },
@@ -848,17 +868,17 @@ export const translations: typeof enTranslations = {
         total: "bonifici",
         view: "Vista",
         draft: "Progetto",
-        inTransit: "In Transit",
+        inTransit: "In transito",
         viewTransfer: "Visualizza trasferimento",
         tabAll: "Tutti",
         tabDraft: "Finanziamenti",
-        tabInTransit: "In Transit",
+        tabInTransit: "In transito",
         tabReceived: "Completo",
         tabCancelled: "Annullamento",
         arrowSeparator: "→",
       },
       companyId: {
-        label: "Società ID",
+        label: "Società",
         description: "Società di elencare i trasferimenti per",
       },
       errors: {
@@ -919,6 +939,7 @@ export const translations: typeof enTranslations = {
       description:
         "Recuperare un trasferimento con tutti i suoi articoli di linea.",
       widget: {
+        cancel: "Annulla trasferimento",
         retry: "Riprova",
         noItems: "Questo trasferimento non contiene articoli.",
         noItemsHint:
@@ -932,7 +953,7 @@ export const translations: typeof enTranslations = {
         select: "Selezionare il trasferimento",
       },
       transferId: {
-        label: "Trasferimento ID",
+        label: "Trasferimento",
         description: "Trasferimenti per recuperare",
       },
       errors: {
@@ -997,6 +1018,68 @@ export const translations: typeof enTranslations = {
   },
 
   // Transfer dispatch
+  transferCancel: {
+    post: {
+      title: "Annulla trasferimento",
+      titleShort: "Annulla trasferimento",
+      description:
+        "Ferma questo trasferimento. Se già spedito, la merce torna nel magazzino di origine.",
+      widget: {
+        backToTransfer: "Torna al trasferimento",
+      },
+      transferId: {
+        label: "Trasferimento",
+        description: "Trasferimento da annullare",
+      },
+      errors: {
+        validation: {
+          title: "Errore di convalida",
+          description: "Trasferimento non valido",
+        },
+        unauthorized: {
+          title: "Accesso non effettuato",
+          description: "Accedi per annullare i trasferimenti",
+        },
+        forbidden: {
+          title: "Accesso negato",
+          description: "Nessun accesso a questo trasferimento",
+        },
+        conflict: {
+          title: "Impossibile annullare",
+          description:
+            "Si possono annullare solo bozze e trasferimenti in transito",
+        },
+        server: {
+          title: "Errore del server",
+          description: "Impossibile annullare il trasferimento",
+        },
+        unknown: {
+          title: "Errore sconosciuto",
+          description: "Si è verificato un errore imprevisto",
+        },
+        network: {
+          title: "Errore di rete",
+          description: "Controlla la connessione e riprova",
+        },
+        notFound: {
+          title: "Trasferimento non trovato",
+          description: "Questo trasferimento non esiste",
+        },
+        unsavedChanges: {
+          title: "Modifiche non salvate",
+          description: "Hai modifiche non salvate",
+        },
+      },
+      success: {
+        title: "Trasferimento annullato",
+        description: "Nulla di questo trasferimento è più in transito.",
+      },
+      response: {
+        id: "Trasferimento",
+        status: "Stato",
+      },
+    },
+  },
   transferDispatch: {
     post: {
       title: "Trasferimento della posta",
@@ -1007,7 +1090,7 @@ export const translations: typeof enTranslations = {
         backToTransfer: "Ritorno al trasferimento",
       },
       transferId: {
-        label: "Trasferimento ID",
+        label: "Trasferimento",
         description: "Trasferimento alla spedizione",
       },
       errors: {
@@ -1024,6 +1107,8 @@ export const translations: typeof enTranslations = {
           description: "Nessun accesso a questo trasferimento",
         },
         conflict: {
+          insufficientStock:
+            "Giacenza insufficiente nel magazzino di origine per almeno un articolo.",
           title: "Non un progetto",
           description: "Possono essere spediti solo bozze di bozzetti",
         },
@@ -1070,7 +1155,7 @@ export const translations: typeof enTranslations = {
         backToTransfer: "Ritorno al trasferimento",
       },
       transferId: {
-        label: "Trasferimento ID",
+        label: "Trasferimento",
         description: "Trasferimenti per ricevere",
       },
       errors: {
@@ -1132,6 +1217,12 @@ export const translations: typeof enTranslations = {
       description:
         "snapshot dal vivo della salute delle scorte, dei trasferimenti in sospeso e dei conteggi di magazzino.",
       widget: {
+        navStockLevelsHint: "Quantità, valore e punti di riordino",
+        navTransfersHint: "In transito: {{count}}",
+        navWarehousesHint: "Sedi: {{count}}",
+        noWarehouses: "Nessun magazzino",
+        noWarehousesHint: "Crea un magazzino per ricevere e spostare merce.",
+        related: "Correlati",
         kpiInStock: "In stock",
         kpiOutOfStock: "Fuori dal magazzino",
         kpiLowStock: "Basso stock",

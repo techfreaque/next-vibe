@@ -4,13 +4,14 @@ export const translations: typeof enTranslations = {
   category: "Inventario",
   shared: {
     errors: {
-      failedToRecordMovement: "Failed to record stock movement",
-      failedToApplyMovement: "Failed to apply stock movement",
+      failedToRecordMovement: "No se pudo registrar el movimiento de stock",
+      failedToApplyMovement: "No se pudo aplicar el movimiento de stock",
     },
   },
   tags: {
+    cancel: "Cancelar",
     inventory: "Inventario",
-    warehouse: "Warehouse",
+    warehouse: "Almacén",
     stock: "Existencias",
     transfer: "Transferencia",
     create: "Crear",
@@ -30,13 +31,13 @@ export const translations: typeof enTranslations = {
   },
   enums: {
     movementType: {
-      receipt: "Receipt",
-      issue: "Cuestión",
-      transferIn: "Transferencia en",
-      transferOut: "Transferencia",
+      receipt: "Entrada",
+      issue: "Salida",
+      transferIn: "Transferencia entrante",
+      transferOut: "Transferencia saliente",
       adjustment: "Ajuste",
       sale: "Venta",
-      return: "Regreso",
+      return: "Devolución",
     },
     transferStatus: {
       draft: "Proyecto",
@@ -50,16 +51,18 @@ export const translations: typeof enTranslations = {
   warehouseCreate: {
     post: {
       title: "Crear almacén",
-      titleShort: "New Warehouse",
+      titleShort: "Nuevo almacén",
       description: "Registrar un nuevo almacén para una empresa.",
       widget: {
+        openWarehouse: "Abrir almacén",
+        createAnother: "Crear otro",
         backToList: "Volver a los almacenes",
         active: "Activa",
         inactive: "Inactivo",
         default: "Predeterminado",
       },
       companyId: {
-        label: "Company ID",
+        label: "Empresa",
         description: "Empresa este almacén pertenece a",
       },
       name: {
@@ -82,7 +85,7 @@ export const translations: typeof enTranslations = {
         description: "Si este almacén está en funcionamiento",
       },
       isDefault: {
-        label: "Default Warehouse",
+        label: "Almacén predeterminado",
         description:
           "Establecer como el almacén predeterminado de esta empresa",
       },
@@ -125,14 +128,14 @@ export const translations: typeof enTranslations = {
         },
       },
       success: {
-        title: "Warehouse Created",
+        title: "Almacén creado",
         description: "Almacén registrado con éxito",
       },
       response: {
-        id: "Warehouse ID",
+        id: "Almacén",
         name: "Nombre del almacén",
         code: "Código",
-        companyId: "Company ID",
+        companyId: "Empresa",
         isActive: "Activa",
         isDefault: "Predeterminado",
       },
@@ -146,11 +149,14 @@ export const translations: typeof enTranslations = {
       titleShort: "Almacenes",
       description: "Lista todos los almacenes para una empresa.",
       widget: {
+        subtitle:
+          "Donde viven tus existencias. Abre uno para ver su stock y valor.",
+        status: "Estado",
         active: "Activa",
         inactive: "Inactivo",
         default: "Predeterminado",
         total: "Almacenes",
-        createWarehouse: "New Warehouse",
+        createWarehouse: "Nuevo almacén",
         empty: "Todavía no hay almacenes.",
         emptyHint:
           "Cree su primer almacén para iniciar el seguimiento del inventario.",
@@ -162,7 +168,7 @@ export const translations: typeof enTranslations = {
         selectCompany: "Introduzca una empresa ID para cargar almacenes.",
       },
       companyId: {
-        label: "Company ID",
+        label: "Empresa",
         description: "Empresa para listar almacenes para",
       },
       errors: {
@@ -181,7 +187,7 @@ export const translations: typeof enTranslations = {
         conflict: { title: "Conflicto", description: "Conflicto de datos" },
         server: {
           title: "Error del servidor",
-          description: "Failed to list warehouses",
+          description: "No se pudieron listar los almacenes",
         },
         unknown: {
           title: "Error desconocido",
@@ -205,7 +211,7 @@ export const translations: typeof enTranslations = {
         description: "Lista de almacenes recuperados",
       },
       response: {
-        id: "Warehouse ID",
+        id: "Almacén",
         name: "Nombre",
         code: "Código",
         address: "Dirección",
@@ -220,7 +226,7 @@ export const translations: typeof enTranslations = {
   warehouseGet: {
     get: {
       title: "Ve a Warehouse",
-      titleShort: "Warehouse",
+      titleShort: "Almacén",
       description: "Recuperar detalles para un almacén específico.",
       widget: {
         companyName: "Empresa",
@@ -236,7 +242,7 @@ export const translations: typeof enTranslations = {
         select: "Seleccione el almacén",
       },
       warehouseId: {
-        label: "Warehouse ID",
+        label: "Almacén",
         description: "Almacén para recuperar",
       },
       errors: {
@@ -255,7 +261,7 @@ export const translations: typeof enTranslations = {
         conflict: { title: "Conflicto", description: "Conflicto de datos" },
         server: {
           title: "Error del servidor",
-          description: "Failed to load warehouse",
+          description: "No se pudo cargar el almacén",
         },
         unknown: {
           title: "Error desconocido",
@@ -279,8 +285,8 @@ export const translations: typeof enTranslations = {
         description: "Datos del almacén recuperados",
       },
       response: {
-        id: "Warehouse ID",
-        companyId: "Company ID",
+        id: "Almacén",
+        companyId: "Empresa",
         name: "Nombre",
         code: "Código",
         address: "Dirección",
@@ -304,7 +310,7 @@ export const translations: typeof enTranslations = {
         inactive: "Inactivo",
       },
       warehouseId: {
-        label: "Warehouse ID",
+        label: "Almacén",
         description: "Warehouse para actualizar",
       },
       name: {
@@ -327,7 +333,7 @@ export const translations: typeof enTranslations = {
         description: "Si este almacén está en funcionamiento",
       },
       isDefault: {
-        label: "Default Warehouse",
+        label: "Almacén predeterminado",
         description: "Establecer como almacén predeterminado",
       },
       errors: {
@@ -344,7 +350,7 @@ export const translations: typeof enTranslations = {
           description: "Sólo los administradores pueden actualizar almacenes",
         },
         conflict: {
-          title: "Code Conflict",
+          title: "Código en conflicto",
           description: "Ese código de almacén ya está tomado.",
         },
         server: {
@@ -373,7 +379,7 @@ export const translations: typeof enTranslations = {
         description: "Warehouse actualizado con éxito",
       },
       response: {
-        id: "Warehouse ID",
+        id: "Almacén",
         name: "Nombre",
         code: "Código",
         isActive: "Activa",
@@ -428,11 +434,11 @@ export const translations: typeof enTranslations = {
         statusOk: "En existencias",
       },
       warehouseId: {
-        label: "Warehouse ID",
+        label: "Almacén",
         description: "Almacén para el almacén de la consulta",
       },
       productId: {
-        label: "Producto ID",
+        label: "Producto",
         description: "Filtrar a un producto específico (opcional)",
       },
       errors: {
@@ -451,7 +457,7 @@ export const translations: typeof enTranslations = {
         conflict: { title: "Conflicto", description: "Conflicto de datos" },
         server: {
           title: "Error del servidor",
-          description: "Failed to load stock levels",
+          description: "No se pudieron cargar los niveles de stock",
         },
         unknown: {
           title: "Error desconocido",
@@ -476,9 +482,9 @@ export const translations: typeof enTranslations = {
       },
       response: {
         currency: "Moneda",
-        id: "Stock ID",
-        warehouseId: "Warehouse ID",
-        warehouseName: "Warehouse",
+        id: "Registro de stock",
+        warehouseId: "Almacén",
+        warehouseName: "Almacén",
         productId: "Producto ID",
         productName: "Producto",
         quantityOnHand: "Manos",
@@ -486,7 +492,7 @@ export const translations: typeof enTranslations = {
         quantityOnOrder: "En orden",
         quantityAvailable: "Disponible",
         reorderPoint: "Punto de reordenamiento",
-        reorderQuantity: "Reorder Qty",
+        reorderQuantity: "Cantidad de pedido",
         unitCost: "Costo de la Dependencia",
         isLowStock: "Stock bajo",
         updatedAt: "Actualizado en",
@@ -495,10 +501,15 @@ export const translations: typeof enTranslations = {
   },
 
   // Stock adjust
+  stockWrite: {
+    onHandNow: "Existencias ahora:",
+    viewStock: "Ver niveles de stock",
+    again: "Registrar otra",
+  },
   stockAdjust: {
     post: {
-      title: "Adjust Stock",
-      titleShort: "Adjust Stock",
+      title: "Ajustar stock",
+      titleShort: "Ajustar stock",
       description:
         "Ajuste manualmente la cantidad de stock. Use valores negativos para los paso a pérdidas y ganancias.",
       widget: {
@@ -510,10 +521,10 @@ export const translations: typeof enTranslations = {
         negativeHint: "Cantidad negativa elimina el stock",
       },
       warehouseId: {
-        label: "Warehouse ID",
+        label: "Almacén",
         description: "Almacén para ajustar el stock en",
       },
-      productId: { label: "Producto ID", description: "Producto para ajustar" },
+      productId: { label: "Producto", description: "Producto para ajustar" },
       quantity: {
         label: "Cantidad",
         description:
@@ -569,13 +580,13 @@ export const translations: typeof enTranslations = {
         },
       },
       success: {
-        title: "Stock Adjusted",
+        title: "Stock ajustado",
         description: "Ajuste de las existencias registrados",
       },
       response: {
         movementId: "Movimiento ID",
         productId: "Producto ID",
-        warehouseId: "Warehouse ID",
+        warehouseId: "Almacén",
         quantityOnHand: "Nueva mano",
         quantityAvailable: "Disponible",
       },
@@ -593,10 +604,10 @@ export const translations: typeof enTranslations = {
         backToStock: "Volver a la acción",
       },
       warehouseId: {
-        label: "Warehouse ID",
+        label: "Almacén",
         description: "Almacén que recibe el stock",
       },
-      productId: { label: "Producto ID", description: "Producto recibido" },
+      productId: { label: "Producto", description: "Producto recibido" },
       quantity: {
         label: "Cantidad",
         description: "Número de unidades recibidas",
@@ -628,7 +639,7 @@ export const translations: typeof enTranslations = {
         conflict: { title: "Conflicto", description: "Conflicto de datos" },
         server: {
           title: "Error del servidor",
-          description: "Failed to receive stock",
+          description: "No se pudo recibir el stock",
         },
         unknown: {
           title: "Error desconocido",
@@ -654,7 +665,7 @@ export const translations: typeof enTranslations = {
       response: {
         movementId: "Movimiento ID",
         productId: "Producto ID",
-        warehouseId: "Warehouse ID",
+        warehouseId: "Almacén",
         quantityOnHand: "Nueva mano",
         unitCost: "Nuevo costo de la unidad",
       },
@@ -672,10 +683,10 @@ export const translations: typeof enTranslations = {
         backToStock: "Volver a la acción",
       },
       warehouseId: {
-        label: "Warehouse ID",
+        label: "Almacén",
         description: "Warehouse emitiendo acciones",
       },
-      productId: { label: "Producto ID", description: "Producto a la emisión" },
+      productId: { label: "Producto", description: "Producto a la emisión" },
       quantity: {
         label: "Cantidad",
         description: "Número de unidades a las que se ha de emitir",
@@ -730,13 +741,13 @@ export const translations: typeof enTranslations = {
         },
       },
       success: {
-        title: "Stock Issued",
-        description: "Stock issued successfully",
+        title: "Stock retirado",
+        description: "Stock retirado correctamente",
       },
       response: {
         movementId: "Movimiento ID",
         productId: "Producto ID",
-        warehouseId: "Warehouse ID",
+        warehouseId: "Almacén",
         quantityOnHand: "Nueva mano",
         quantityAvailable: "Disponible",
       },
@@ -751,12 +762,17 @@ export const translations: typeof enTranslations = {
       description:
         "Cree una solicitud de transferencia de almacén. Empieza en Borrador de estado.",
       widget: {
+        itemsTitle: "Artículos a mover",
+        pickSource: "Elige el almacén de origen para ver sus existencias.",
+        noStock: "Este almacén no tiene existencias para mover.",
+        available: "{{quantity}} disponibles",
+        itemsRequired: "Introduce una cantidad para al menos un producto.",
         backToList: "Volver a las transferencias",
-        viewTransfer: "View Transfer",
+        viewTransfer: "Ver transferencia",
         browseWarehouses: "Navega los Almacenes",
       },
       companyId: {
-        label: "Company ID",
+        label: "Empresa",
         description: "Empresa este traslado pertenece a",
       },
       fromWarehouseId: {
@@ -795,12 +811,16 @@ export const translations: typeof enTranslations = {
           description: "No hay acceso a esta empresa",
         },
         conflict: {
+          invalidWarehouses:
+            "Ambos almacenes deben estar activos y pertenecer a esta empresa.",
+          invalidItems:
+            "Cada producto una sola vez, con cantidad mayor que cero (hasta 4 decimales).",
           title: "El mismo almacén.",
           description: "De y a almacén debe ser diferente",
         },
         server: {
           title: "Error del servidor",
-          description: "Failed to create transfer",
+          description: "No se pudo crear la transferencia",
         },
         unknown: {
           title: "Error desconocido",
@@ -853,7 +873,7 @@ export const translations: typeof enTranslations = {
         view: "Vista",
         draft: "Proyecto",
         inTransit: "En tránsito",
-        viewTransfer: "View Transfer",
+        viewTransfer: "Ver transferencia",
         tabAll: "Todos",
         tabDraft: "Pendiente",
         tabInTransit: "En tránsito",
@@ -862,7 +882,7 @@ export const translations: typeof enTranslations = {
         arrowSeparator: "→",
       },
       companyId: {
-        label: "Company ID",
+        label: "Empresa",
         description: "Compañía para enumerar las transferencias",
       },
       errors: {
@@ -881,7 +901,7 @@ export const translations: typeof enTranslations = {
         conflict: { title: "Conflicto", description: "Conflicto de datos" },
         server: {
           title: "Error del servidor",
-          description: "Failed to list transfers",
+          description: "No se pudieron listar las transferencias",
         },
         unknown: {
           title: "Error desconocido",
@@ -926,6 +946,7 @@ export const translations: typeof enTranslations = {
       description:
         "Recuperar una transferencia con todos sus artículos de línea.",
       widget: {
+        cancel: "Cancelar transferencia",
         retry: "Volver a intentar",
         noItems: "Este traslado no contiene artículos.",
         noItemsHint:
@@ -934,12 +955,12 @@ export const translations: typeof enTranslations = {
         newTransfer: "Nuevo traslado",
         back: "Atrás",
         dispatch: "Transferencia de separación",
-        receive: "Mark received",
+        receive: "Marcar como recibida",
         status: "Situación",
         select: "Seleccione la transferencia",
       },
       transferId: {
-        label: "Transferencia ID",
+        label: "Transferencia",
         description: "Transferencia para recuperar",
       },
       errors: {
@@ -958,7 +979,7 @@ export const translations: typeof enTranslations = {
         conflict: { title: "Conflicto", description: "Conflicto de datos" },
         server: {
           title: "Error del servidor",
-          description: "Failed to load transfer",
+          description: "No se pudo cargar la transferencia",
         },
         unknown: {
           title: "Error desconocido",
@@ -969,7 +990,7 @@ export const translations: typeof enTranslations = {
           description: "Revise su conexión e inténtelo de nuevo",
         },
         notFound: {
-          title: "Transfer Not Found",
+          title: "Transferencia no encontrada",
           description: "La transferencia no existe",
         },
         unsavedChanges: {
@@ -983,7 +1004,7 @@ export const translations: typeof enTranslations = {
       },
       response: {
         id: "Transferencia ID",
-        companyId: "Company ID",
+        companyId: "Empresa",
         fromWarehouseId: "De Warehouse",
         fromWarehouseName: "De Warehouse",
         toWarehouseId: "A Warehouse",
@@ -1004,6 +1025,68 @@ export const translations: typeof enTranslations = {
   },
 
   // Transfer dispatch
+  transferCancel: {
+    post: {
+      title: "Cancelar transferencia",
+      titleShort: "Cancelar transferencia",
+      description:
+        "Detiene esta transferencia. Si ya salió, el stock vuelve al almacén de origen.",
+      widget: {
+        backToTransfer: "Volver a la transferencia",
+      },
+      transferId: {
+        label: "Transferencia",
+        description: "Transferencia a cancelar",
+      },
+      errors: {
+        validation: {
+          title: "Error de validación",
+          description: "Transferencia no válida",
+        },
+        unauthorized: {
+          title: "Sesión no iniciada",
+          description: "Inicia sesión para cancelar transferencias",
+        },
+        forbidden: {
+          title: "Acceso denegado",
+          description: "Sin acceso a esta transferencia",
+        },
+        conflict: {
+          title: "No se puede cancelar",
+          description:
+            "Solo se pueden cancelar borradores y transferencias en tránsito",
+        },
+        server: {
+          title: "Error del servidor",
+          description: "No se pudo cancelar la transferencia",
+        },
+        unknown: {
+          title: "Error desconocido",
+          description: "Se produjo un error inesperado",
+        },
+        network: {
+          title: "Error de red",
+          description: "Revisa tu conexión e inténtalo de nuevo",
+        },
+        notFound: {
+          title: "Transferencia no encontrada",
+          description: "Esta transferencia no existe",
+        },
+        unsavedChanges: {
+          title: "Cambios sin guardar",
+          description: "Tienes cambios sin guardar",
+        },
+      },
+      success: {
+        title: "Transferencia cancelada",
+        description: "Ya no queda nada de esta transferencia en tránsito.",
+      },
+      response: {
+        id: "Transferencia",
+        status: "Estado",
+      },
+    },
+  },
   transferDispatch: {
     post: {
       title: "Transferencia de basura",
@@ -1014,7 +1097,7 @@ export const translations: typeof enTranslations = {
         backToTransfer: "Volver a la transferencia",
       },
       transferId: {
-        label: "Transferencia ID",
+        label: "Transferencia",
         description: "Transferencia al envío",
       },
       errors: {
@@ -1031,6 +1114,8 @@ export const translations: typeof enTranslations = {
           description: "No hay acceso a esta transferencia",
         },
         conflict: {
+          insufficientStock:
+            "No hay stock suficiente en el almacén de origen para todos los artículos.",
           title: "No es un borrador",
           description: "Sólo se pueden enviar proyectos de transferencia",
         },
@@ -1047,7 +1132,7 @@ export const translations: typeof enTranslations = {
           description: "Revise su conexión e inténtelo de nuevo",
         },
         notFound: {
-          title: "Transfer Not Found",
+          title: "Transferencia no encontrada",
           description: "La transferencia no existe",
         },
         unsavedChanges: {
@@ -1056,7 +1141,7 @@ export const translations: typeof enTranslations = {
         },
       },
       success: {
-        title: "Transfer Dispatched",
+        title: "Transferencia enviada",
         description: "La transferencia está ahora en tránsito",
       },
       response: {
@@ -1077,7 +1162,7 @@ export const translations: typeof enTranslations = {
         backToTransfer: "Volver a la transferencia",
       },
       transferId: {
-        label: "Transferencia ID",
+        label: "Transferencia",
         description: "Transferencia para recibir",
       },
       errors: {
@@ -1110,7 +1195,7 @@ export const translations: typeof enTranslations = {
           description: "Revise su conexión e inténtelo de nuevo",
         },
         notFound: {
-          title: "Transfer Not Found",
+          title: "Transferencia no encontrada",
           description: "La transferencia no existe",
         },
         unsavedChanges: {
@@ -1133,12 +1218,18 @@ export const translations: typeof enTranslations = {
   // Inventory Dashboard
   dashboard: {
     get: {
-      title: "Inventory Overview",
+      title: "Resumen de inventario",
       titleShort: "Sinopsis",
       description:
         "instantánea en vivo de la salud de stock, transferencias pendientes y conteos de almacén.",
       widget: {
-        kpiInStock: "In Stock",
+        navStockLevelsHint: "Cantidades, valor y puntos de pedido",
+        navTransfersHint: "En tránsito: {{count}}",
+        navWarehousesHint: "Ubicaciones: {{count}}",
+        noWarehouses: "Aún no hay almacenes",
+        noWarehousesHint: "Crea un almacén para recibir y mover existencias.",
+        related: "Relacionado",
+        kpiInStock: "En stock",
         kpiOutOfStock: "Existencias",
         kpiLowStock: "Stock bajo",
         kpiWarehouses: "Almacenes",
@@ -1156,7 +1247,7 @@ export const translations: typeof enTranslations = {
         pendingTransfersPlural: "Transferencias {{count}} en tránsito",
       },
       companyId: {
-        label: "Company",
+        label: "Empresa",
         description:
           "Empresa para mostrar estadísticas de inventario para (opcional)",
       },
@@ -1176,7 +1267,7 @@ export const translations: typeof enTranslations = {
         conflict: { title: "Conflicto", description: "Conflicto de datos" },
         server: {
           title: "Error del servidor",
-          description: "Failed to load inventory overview",
+          description: "No se pudo cargar el resumen de inventario",
         },
         unknown: {
           title: "Error desconocido",
@@ -1200,7 +1291,7 @@ export const translations: typeof enTranslations = {
         description: "Resumen de inventario recuperado",
       },
       response: {
-        inStockCount: "In Stock",
+        inStockCount: "En stock",
         outOfStockCount: "Existencias",
         lowStockCount: "Stock bajo",
         pendingTransferCount: "Transferencias pendientes",

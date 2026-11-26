@@ -66,7 +66,7 @@ export class InventoryTransferCreateRepository {
       // Validate same company owns both warehouses
       if (data.fromWarehouseId === data.toWarehouseId) {
         return fail({
-          message: t("transferCreate.post.errors.conflict.title"),
+          message: t("transferCreate.post.errors.conflict.description"),
           errorType: ErrorResponseTypes.CONFLICT,
         });
       }
@@ -86,8 +86,13 @@ export class InventoryTransferCreateRepository {
             ),
           );
         const ids = data.items.map((item) => item.productId);
+        if (locations.length !== 2) {
+          return fail({
+            message: t("transferCreate.post.errors.conflict.invalidWarehouses"),
+            errorType: ErrorResponseTypes.CONFLICT,
+          });
+        }
         if (
-          locations.length !== 2 ||
           !ids.length ||
           new Set(ids).size !== ids.length ||
           data.items.some((item) => {
@@ -100,7 +105,7 @@ export class InventoryTransferCreateRepository {
           })
         ) {
           return fail({
-            message: t("transferCreate.post.errors.conflict.title"),
+            message: t("transferCreate.post.errors.conflict.invalidItems"),
             errorType: ErrorResponseTypes.CONFLICT,
           });
         }
