@@ -43,6 +43,33 @@ export const translations: typeof enTranslations = {
     },
   },
 
+  workflow: {
+    backToSessionOrders: "Zurück zu den Kassenbestellungen",
+    receiptTitle: "Beleg",
+    amountDue: "Offener Betrag",
+    ledgerCurrencyMismatch:
+      "Diese Bestellung verwendet eine andere Währung als die Buchhaltung. Verwenden Sie vor der Zahlung ein Terminal oder eine Bestellung in der Buchhaltungswährung.",
+    postingUnavailable:
+      "Der Verkauf konnte nicht gebucht werden. Prüfen Sie Firmenwährung, offene Buchungsperiode und Konten.",
+    cashCurrencyMismatch:
+      "Barzahlungen müssen in der Kassenwährung erfolgen. Wählen Sie für diese Bestellung eine andere Zahlungsart.",
+    tenderMinorUnits: "Geben Sie Bargeld und Zahlungen in ganzen Cent an.",
+    legacyTenderReview:
+      "Für diese Bestellung wurde bereits eine Zahlung mit Bruchteilen eines Cents erfasst. Prüfen Sie die Zahlung vor dem nächsten Einzug.",
+    legacyTenderRecorded:
+      "Die ursprünglichen Beträge dieser Bestellung haben vier Nachkommastellen.",
+    legacyPostingReview:
+      "Die erfassten Beträge mit Bruchteilen eines Cents können nicht gebucht werden. Prüfen Sie die ursprüngliche Zahlung vor dem Verkaufsabschluss.",
+    viewReceipt: "Beleg anzeigen",
+    openDrawer: "Kasse öffnen",
+    warehouse: "Verkaufslager",
+    noWarehouse: "Kein Lager zugewiesen",
+    chooseCompanyFirst: "Wählen Sie zuerst eine Firma.",
+    warehouseInstruction:
+      "Wählen Sie ein aktives Lager der ausgewählten Firma.",
+    stockUnavailable:
+      "Im Kassenlager fehlt verfügbarer Bestand. Prüfen Sie die Mengen vor dem Verkaufsabschluss.",
+  },
   dashboard: {
     get: {
       title: "Kassenübersicht",
@@ -377,7 +404,7 @@ export const translations: typeof enTranslations = {
         sessionSummary: "Sitzungsübersicht",
         terminal: "Terminal",
         openedAt: "Geöffnet um",
-        orderCount: "Bestellungen",
+        orderCount: "Bestellungen: {{count}}",
         sessionRevenue: "Umsatz",
         floatHint: "Bargeld in der Kasse vor dem Schließen zählen.",
         reconciliation: "Tagesabschluss",

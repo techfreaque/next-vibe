@@ -63,3 +63,30 @@ export function applyWorkspaceCompanyToEntry(
   const params = applyWorkspaceCompany(entry.endpoint, entry.params, companyId);
   return params === entry.params ? entry : { ...entry, params };
 }
+
+/** A record inherits its company from its identity or authorized response. */
+export function hasFixedRecordCompany(
+  endpoint: CreateApiEndpointAny | null | undefined,
+): boolean {
+  if (
+    !endpoint ||
+    !erpCategories.has(endpoint.category) ||
+    !endpoint.path.some((segment) => segment.startsWith("["))
+  ) {
+    return false;
+  }
+  if (endpoint.method !== "GET") {
+    return companyInput(endpoint) === undefined;
+  }
+  if (!(endpoint.responseSchema instanceof z.ZodObject)) {
+    return false;
+  }
+  const shape = endpoint.responseSchema.shape;
+  return (
+    Object.hasOwn(shape, "companyId") ||
+    [shape.entry, shape.result].some(
+      (field) =>
+        field instanceof z.ZodObject && Object.hasOwn(field.shape, "companyId"),
+    )
+  );
+}

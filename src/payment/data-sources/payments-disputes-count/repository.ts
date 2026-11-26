@@ -21,7 +21,11 @@ import { resolutionBucketExpr } from "next-vibe/dataflow/shared/query-utils";
 import { fillGaps } from "next-vibe/dataflow/shared/range";
 import type { QueryResultRow } from "pg";
 
-import { notInternalUserSql, utcTs } from "../../analytics/money-sql";
+import {
+  REPORTABLE_PAYMENT_SQL,
+  reportingUserSql,
+  utcTs,
+} from "../../analytics/money-sql";
 
 export class QueryPaymentsDisputesCountRepository {
   static async queryPaymentsDisputesCount(data: {
@@ -41,7 +45,8 @@ export class QueryPaymentsDisputesCountRepository {
       SELECT ${resolutionBucketExpr(resolution, sql`d.created_at`)} AS bucket,
         count(*) AS value
       FROM payment_disputes d
-      WHERE ${notInternalUserSql("d.user_id")}
+      JOIN payment_transactions pt ON pt.id = d.transaction_id
+      WHERE ${REPORTABLE_PAYMENT_SQL} AND ${reportingUserSql("d.user_id")}
         AND d.created_at >= ${utcTs(range.from)}
         AND d.created_at <= ${utcTs(range.to)}
       GROUP BY 1 ORDER BY 1`);

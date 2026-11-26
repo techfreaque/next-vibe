@@ -1,17 +1,26 @@
 "use client";
 
-import { Badge } from "next-vibe/ui/components/badge";
+import { CurrenciesArr } from "next-vibe/core/i18n/core/config";
 import { Button } from "next-vibe/ui/components/button";
+import { DetailField, DetailGrid } from "next-vibe/ui/components/detail-grid";
 import { Div } from "next-vibe/ui/components/div";
+import { EmptyBlock } from "next-vibe/ui/components/empty-block";
 import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
-import { Span } from "next-vibe/ui/components/span";
+import { SectionGroup } from "next-vibe/ui/components/section-group";
+import { StatusPill } from "next-vibe/ui/components/status-pill";
+import { P } from "next-vibe/ui/components/typography";
+import { WidgetHeader } from "next-vibe/ui/components/widget-header";
+import { WidgetShell } from "next-vibe/ui/components/widget-shell";
 import {
+  formatDocDate,
   formatMoney,
   formatPercent,
 } from "next-vibe/unified-ui/_shared/format-money";
 import {
+  useWidgetIsInteractive,
   useWidgetLocale,
   useWidgetNavigation,
+  useWidgetResponse,
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
@@ -19,19 +28,11 @@ import { EntityPickerFieldWidget } from "next-vibe/unified-ui/widgets/form-field
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 import type { JSX } from "react";
 
+import { scopedTranslation as accountingTranslation } from "@/payment/accounting/i18n";
+import { PaymentProvider } from "@/payment/enum";
+
 import { ProductType } from "../../../enum";
 import type definition from "./definition";
-
-// ProductType enum values are i18n translation keys (e.g. "enums.productType.service")
-// product.type at runtime holds those same key strings
-const PRODUCT_TYPE_VARIANT: Record<
-  string,
-  "default" | "secondary" | "outline" | "destructive"
-> = {
-  [ProductType.SERVICE]: "default",
-  [ProductType.PHYSICAL]: "secondary",
-  [ProductType.DIGITAL]: "outline",
-};
 
 export function CatalogProductGetWidget({
   field,
@@ -39,265 +40,325 @@ export function CatalogProductGetWidget({
   field: (typeof definition.GET)["fields"];
 }): JSX.Element {
   const data = useWidgetValue<typeof definition.GET>();
-  const { push: navigate, pop, canGoBack } = useWidgetNavigation();
+  const response = useWidgetResponse();
+  const { push, pop, canGoBack } = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.GET>();
   const locale = useWidgetLocale();
-
-  const handleEdit = (): void => {
-    if (!data?.result?.id) {
-      return;
-    }
-    const productId = data.result.id;
-    void (async (): Promise<void> => {
-      const def = await import("../update/definition");
-      navigate(def.default.PATCH, {
-        urlPathParams: { productId },
-        popNavigationOnSuccess: 1,
-      });
-    })();
-  };
-
-  const handleDeactivate = (): void => {
-    if (!data?.result?.id) {
-      return;
-    }
-    const productId = data.result.id;
-    void (async (): Promise<void> => {
-      const def = await import("../deactivate/definition");
-      navigate(def.default.POST, {
-        urlPathParams: { productId },
-        popNavigationOnSuccess: 1,
-      });
-    })();
-  };
-
-  const labelService = t("get.widget.typeService");
-  const labelPhysical = t("get.widget.typePhysical");
-  const labelDigital = t("get.widget.typeDigital");
-
-  const handleAddToInvoice = (): void => {
-    if (!data?.result) {
-      return;
-    }
-    const { id, name, basePrice } = data.result;
-    void (async (): Promise<void> => {
-      const def = await import("@/payment/invoice/line/add/definition");
-      navigate(def.default.POST, {
-        data: {
-          productId: id,
-          description: name,
-          unitPrice: basePrice,
-          quantity: 1,
-          taxRate: data.result?.defaultTaxRate ?? 0,
-        },
-      });
-    })();
-  };
-
+  const interactive = useWidgetIsInteractive();
+  const { t: accountingT } = accountingTranslation.scopedT(locale);
   const product = data?.result;
+  const commerce = data?.commerce;
+
+  const browse = (): void => {
+    if (canGoBack) {
+      pop();
+      return;
+    }
+    void import("../../list/definition").then(({ default: catalog }) => {
+      push(catalog.GET, {});
+      return undefined;
+    });
+  };
+  const back = interactive ? (
+    <Button type="button" variant="ghost" size="sm" onClick={browse}>
+      <ChevronLeft className="size-4" />
+      {t("get.widget.back")}
+    </Button>
+  ) : undefined;
 
   if (!product) {
     return (
-      <Div className="max-w-2xl mx-auto w-full px-4 pt-8 pb-6 flex flex-col gap-4">
-        {canGoBack && (
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={() => pop()}
-            className="self-start gap-1.5 -ml-1"
-          >
-            <ChevronLeft className="h-4 w-4" />
-            {t("get.widget.back")}
-          </Button>
+      <WidgetShell layout="page">
+        <WidgetHeader size="page" title={t("get.title")} backButton={back} />
+        {response?.success === false ? (
+          <EmptyBlock
+            title={t("get.widget.unavailable")}
+            message={response.message}
+          />
+        ) : (
+          interactive && (
+            <>
+              <EntityPickerFieldWidget
+                fieldName="productId"
+                field={field.children.productId}
+              />
+              <SubmitButtonWidget<typeof definition.GET>
+                field={{ text: "get.widget.select" }}
+              />
+            </>
+          )
         )}
-        <EntityPickerFieldWidget
-          fieldName="productId"
-          field={field.children.productId}
-        />
-        <SubmitButtonWidget<typeof definition.GET>
-          field={{ text: "get.widget.select" as const }}
-        />
-      </Div>
+      </WidgetShell>
     );
   }
 
-  const typeVariant = PRODUCT_TYPE_VARIANT[product.type] ?? "outline";
-  const typeLabel =
-    product.type === ProductType.SERVICE
-      ? labelService
-      : product.type === ProductType.PHYSICAL
-        ? labelPhysical
-        : labelDigital;
-
-  const billingIntervalLabel =
+  const physical = product.type === ProductType.PHYSICAL;
+  const typeLabel = physical
+    ? t("get.widget.typePhysical")
+    : product.type === ProductType.SERVICE
+      ? t("get.widget.typeService")
+      : t("get.widget.typeDigital");
+  const interval =
     product.billingInterval === "MONTHLY"
       ? t("get.widget.billingMonthly")
       : product.billingInterval === "YEARLY"
         ? t("get.widget.billingYearly")
-        : null;
+        : undefined;
+  const canMap = commerce?.canConfigure && product.isActive && !!product.sku;
+  const companyId = product.companyId ?? undefined;
+  const configure = (): void => {
+    if (!companyId) {
+      return;
+    }
+    void import("@/payment/accounting/mapping/definition").then(
+      ({ default: mapping }) => {
+        push(mapping.POST, {
+          data: {
+            companyId,
+            productId: product.id,
+            currency: CurrenciesArr.find(
+              (code) => code === commerce?.companyCurrency,
+            ),
+          },
+        });
+        return undefined;
+      },
+    );
+  };
 
   return (
-    <Div className="max-w-2xl mx-auto w-full px-4 pt-8 pb-6 flex flex-col gap-4">
-      {/* Back nav */}
-      {canGoBack && (
-        <Button
-          type="button"
-          size="sm"
-          variant="ghost"
-          className="self-start gap-1.5 -ml-1"
-          onClick={() => pop()}
-        >
-          <ChevronLeft className="h-4 w-4" />
-          {t("get.widget.back")}
-        </Button>
+    <WidgetShell layout="page">
+      <WidgetHeader
+        size="page"
+        title={product.name}
+        subtitle={product.description ?? commerce?.companyName}
+        backButton={back}
+        titleAccessory={
+          <StatusPill
+            status={product.isActive ? "active" : "inactive"}
+            label={
+              product.isActive
+                ? t("get.widget.active")
+                : t("get.widget.inactive")
+            }
+            variant={product.isActive ? "success" : "muted"}
+          />
+        }
+        actions={
+          interactive && commerce?.canEdit ? (
+            <Button
+              type="button"
+              size="sm"
+              onClick={() => {
+                void import("../update/definition").then(
+                  ({ default: editor }) => {
+                    push(editor.PATCH, {
+                      urlPathParams: { productId: product.id },
+                      popNavigationOnSuccess: 1,
+                    });
+                    return undefined;
+                  },
+                );
+              }}
+            >
+              {t("get.widget.edit")}
+            </Button>
+          ) : undefined
+        }
+      />
+
+      <SectionGroup title={t("get.widget.details")}>
+        <DetailGrid columns={3}>
+          <DetailField
+            label={t("get.response.sku")}
+            value={product.sku ?? undefined}
+          />
+          <DetailField label={t("get.response.type")} value={typeLabel} />
+          {commerce?.companyName && (
+            <DetailField
+              label={t("get.response.companyId")}
+              value={commerce.companyName}
+            />
+          )}
+          {product.isSubscription && (
+            <DetailField label={t("get.widget.recurring")} value={interval} />
+          )}
+          <DetailField
+            label={t("get.response.basePrice")}
+            value={formatMoney(product.basePrice, product.currency, locale)}
+          />
+          <DetailField
+            label={t("get.response.currency")}
+            value={product.currency}
+          />
+          <DetailField
+            label={t("get.response.defaultTaxRate")}
+            value={
+              product.defaultTaxRate !== null
+                ? formatPercent(product.defaultTaxRate, locale)
+                : undefined
+            }
+          />
+          {product.unit && (
+            <DetailField label={t("get.response.unit")} value={product.unit} />
+          )}
+          <DetailField
+            label={t("get.response.updatedAt")}
+            value={formatDocDate(product.updatedAt, locale)}
+          />
+        </DetailGrid>
+      </SectionGroup>
+
+      {commerce && commerce.prices.length > 0 && (
+        <SectionGroup title={t("get.widget.prices")}>
+          <DetailGrid columns={3}>
+            {commerce.prices.map((price) => (
+              <DetailField
+                key={price.id}
+                label={
+                  price.tierName
+                    ? `${price.tierName} · ${price.currency}`
+                    : price.currency
+                }
+                value={formatMoney(price.price, price.currency, locale)}
+              />
+            ))}
+          </DetailGrid>
+        </SectionGroup>
       )}
 
-      {/* Header */}
-      <Div className="flex items-start justify-between gap-3">
-        <Div className="flex flex-col gap-1.5 min-w-0">
-          <Span className="text-lg font-semibold leading-tight">
-            {product.name}
-          </Span>
-          <Div className="flex items-center gap-2 flex-wrap">
-            {product.sku ? (
-              <Span className="text-xs font-mono text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
-                {product.sku}
-              </Span>
-            ) : null}
-            <Badge variant={typeVariant} className="text-xs">
-              {typeLabel}
-            </Badge>
-            {product.isSubscription ? (
-              <Badge
-                variant="outline"
-                className="text-xs border-blue-500/30 text-blue-600 dark:text-blue-400 bg-blue-500/5"
-              >
-                {t("get.widget.recurring")}
-              </Badge>
-            ) : null}
-            <Badge
-              variant={product.isActive ? "default" : "secondary"}
-              className={[
-                "text-xs",
-                product.isActive
-                  ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border-emerald-500/20"
-                  : "",
-              ].join(" ")}
-            >
-              {product.isActive
-                ? t("get.widget.active")
-                : t("get.widget.inactive")}
-            </Badge>
-          </Div>
-        </Div>
-        <Div className="flex gap-2 shrink-0 flex-wrap justify-end">
+      {interactive && physical && commerce?.canViewStock && companyId && (
+        <SectionGroup title={t("get.widget.stock")}>
           <Button
             type="button"
-            size="sm"
-            variant="secondary"
-            onClick={handleAddToInvoice}
-          >
-            {t("get.widget.addToInvoice")}
-          </Button>
-          <Button
-            type="button"
-            size="sm"
-            variant="default"
-            onClick={handleEdit}
-          >
-            {t("get.widget.edit")}
-          </Button>
-          <Button
-            type="button"
-            size="sm"
             variant="outline"
-            className="text-destructive hover:text-destructive hover:bg-destructive/10"
-            onClick={handleDeactivate}
+            className="self-start"
+            onClick={() => {
+              void import("@/inventory/stock/list/definition").then(
+                ({ default: stock }) => {
+                  push(stock.GET, {
+                    data: {
+                      companyId,
+                      productId: product.id,
+                    },
+                  });
+                  return undefined;
+                },
+              );
+            }}
           >
-            {product.isActive
-              ? t("get.widget.deactivate")
-              : t("get.widget.activate")}
+            {t("get.widget.viewStock")}
           </Button>
-        </Div>
-      </Div>
+        </SectionGroup>
+      )}
 
-      {/* Price */}
-      <Div className="rounded-lg border p-3 flex items-center justify-between">
-        <Div className="flex flex-col gap-0.5">
-          <Span className="text-xs text-muted-foreground uppercase tracking-wide">
-            {t("get.response.basePrice")}
-          </Span>
-          <Div className="flex items-baseline gap-1">
-            <Span className="text-xl font-bold font-mono">
-              {formatMoney(product.basePrice, product.currency, locale)}
-            </Span>
-            {product.unit ? (
-              <Span className="text-xs text-muted-foreground">
-                {/* eslint-disable-next-line i18n/no-literal-string */}/{" "}
-                {product.unit}
-              </Span>
-            ) : null}
-          </Div>
-          {billingIntervalLabel ? (
-            <Span className="text-xs text-muted-foreground">
-              {billingIntervalLabel}
-            </Span>
-          ) : null}
-        </Div>
-        {product.defaultTaxRate !== null &&
-        product.defaultTaxRate !== undefined ? (
-          <Div className="text-right">
-            <Span className="text-xs text-muted-foreground block">
-              {t("get.response.defaultTaxRate")}
-            </Span>
-            <Span className="text-sm font-mono font-semibold">
-              {formatPercent(product.defaultTaxRate, locale)}
-            </Span>
-          </Div>
-        ) : null}
-      </Div>
+      {commerce?.canConfigure && (
+        <SectionGroup title={t("get.widget.offers")}>
+          {commerce.offers.length > 0 ? (
+            commerce.offers.map((offer) => (
+              <Div key={offer.id} className="rounded-md border p-3">
+                <DetailGrid columns={3}>
+                  <DetailField
+                    label={accountingT(
+                      offer.provider === PaymentProvider.STRIPE
+                        ? "providerStripe"
+                        : "providerNow",
+                    )}
+                    value={offer.offerId}
+                  />
+                  <DetailField
+                    label={t("get.response.currency")}
+                    value={offer.currency}
+                  />
+                  <DetailField
+                    label={t(
+                      offer.recognition === "immediate"
+                        ? "get.widget.revenueAccount"
+                        : "get.widget.liabilityAccount",
+                    )}
+                    value={
+                      offer.accountName
+                        ? [offer.accountCode, offer.accountName]
+                            .filter(Boolean)
+                            .join(" ")
+                        : undefined
+                    }
+                  />
+                </DetailGrid>
+              </Div>
+            ))
+          ) : (
+            <P className="text-sm text-muted-foreground">
+              {t("get.widget.noOffers")}
+            </P>
+          )}
+          {interactive &&
+            (canMap ? (
+              <Button
+                type="button"
+                variant="outline"
+                className="self-start"
+                onClick={configure}
+              >
+                {t("get.widget.configureOffer")}
+              </Button>
+            ) : (
+              <P className="text-sm text-muted-foreground">
+                {t("get.widget.offerNeedsSku")}
+              </P>
+            ))}
+        </SectionGroup>
+      )}
 
-      {/* Description */}
-      {product.description ? (
-        <Div className="flex flex-col gap-1">
-          <Span className="text-xs text-muted-foreground uppercase tracking-wide">
-            {t("get.response.description")}
-          </Span>
-          <Span className="text-sm leading-relaxed">{product.description}</Span>
+      {interactive && (product.isActive || commerce?.canEdit) && (
+        <Div className="flex flex-wrap gap-2">
+          {product.isActive && (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                void import("@/payment/invoice/line/add/definition").then(
+                  ({ default: invoice }) => {
+                    push(invoice.POST, {
+                      data: {
+                        productId: product.id,
+                        description: product.name,
+                        quantity: 1,
+                      },
+                    });
+                    return undefined;
+                  },
+                );
+              }}
+            >
+              {t("get.widget.addToInvoice")}
+            </Button>
+          )}
+          {commerce?.canEdit && (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                void import("../deactivate/definition").then(
+                  ({ default: update }) => {
+                    push(update.POST, {
+                      urlPathParams: { productId: product.id },
+                      popNavigationOnSuccess: 1,
+                    });
+                    return undefined;
+                  },
+                );
+              }}
+            >
+              {t(
+                product.isActive
+                  ? "get.widget.deactivate"
+                  : "get.widget.activate",
+              )}
+            </Button>
+          )}
         </Div>
-      ) : null}
-
-      {/* Metadata */}
-      <Div className="rounded-lg border p-3 flex flex-col gap-2">
-        <Span className="text-xs text-muted-foreground uppercase tracking-wide">
-          {t("get.widget.details")}
-        </Span>
-        <Div className="grid grid-cols-2 gap-x-4 gap-y-1.5">
-          {product.categoryId ? (
-            <>
-              <Span className="text-xs text-muted-foreground">
-                {t("get.response.categoryId")}
-              </Span>
-              <Span className="text-xs font-mono truncate">
-                {product.categoryId}
-              </Span>
-            </>
-          ) : null}
-          <Span className="text-xs text-muted-foreground">
-            {t("get.response.createdAt")}
-          </Span>
-          <Span className="text-xs">
-            {new Date(product.createdAt).toLocaleDateString(locale)}
-          </Span>
-          <Span className="text-xs text-muted-foreground">
-            {t("get.response.updatedAt")}
-          </Span>
-          <Span className="text-xs">
-            {new Date(product.updatedAt).toLocaleDateString(locale)}
-          </Span>
-        </Div>
-      </Div>
-    </Div>
+      )}
+    </WidgetShell>
   );
 }

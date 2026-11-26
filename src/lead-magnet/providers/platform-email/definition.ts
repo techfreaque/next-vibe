@@ -2,7 +2,6 @@ import { createEndpoint } from "next-vibe/core/definition/create-i18n";
 import {
   EndpointErrorTypes,
   FieldDataType,
-  LayoutType,
   Methods,
   WidgetType,
 } from "next-vibe/core/definition/enums";
@@ -15,6 +14,7 @@ import {
 import { z } from "zod";
 
 import { scopedTranslation } from "../../i18n";
+import { providerFormLayout } from "../form-layout";
 
 const ALLOWED_ROLES = [
   UserRole.CUSTOMER,
@@ -38,9 +38,8 @@ export const { POST } = createEndpoint({
 
   fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
-    title: "providers.platformEmail.title" as const,
+    ...providerFormLayout("providers.platformEmail.title"),
     description: "providers.platformEmail.description" as const,
-    layoutType: LayoutType.STACKED,
     usage: { request: "data", response: true },
     children: {
       notifyEmail: requestField(scopedTranslation, {

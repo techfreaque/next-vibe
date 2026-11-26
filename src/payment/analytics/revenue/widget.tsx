@@ -4,7 +4,11 @@
 
 "use client";
 
-import { CurrenciesArr } from "next-vibe/core/i18n/core/config";
+import {
+  type CountryLanguage,
+  CurrenciesArr,
+} from "next-vibe/core/i18n/core/config";
+import { Platform } from "next-vibe/platforms/platforms";
 import {
   type AnalyticsFilterChip,
   AnalyticsSegmented,
@@ -17,6 +21,9 @@ import {
 } from "next-vibe/ui/components/analytics";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
+import { ChevronDown } from "next-vibe/ui/components/icons/ChevronDown";
+import { LoadingBlock } from "next-vibe/ui/components/loading-block";
+import { ResultBanner } from "next-vibe/ui/components/result-banner";
 import { Span } from "next-vibe/ui/components/span";
 import {
   StatusPill,
@@ -24,6 +31,11 @@ import {
 } from "next-vibe/ui/components/status-pill";
 import { WidgetHeader } from "next-vibe/ui/components/widget-header";
 import { WidgetShell } from "next-vibe/ui/components/widget-shell";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
+import {
+  formatDocDate,
+  formatMoney,
+} from "next-vibe/unified-ui/_shared/format-money";
 import { useRelatedEntityNavigation } from "next-vibe/unified-ui/_shared/related-entities";
 import {
   useWidgetContext,
@@ -31,15 +43,20 @@ import {
   useWidgetIsInteractive,
   useWidgetLocale,
   useWidgetOnSubmit,
+  useWidgetPlatform,
+  useWidgetResponse,
   useWidgetResponseOnly,
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { AnalyticsRange } from "next-vibe/unified-ui/analytics/enum";
-import { formatAnalyticsValue } from "next-vibe/unified-ui/analytics/format";
+import {
+  formatAnalyticsValue,
+  formatPeriod,
+} from "next-vibe/unified-ui/analytics/format";
 import type { BreakdownRow } from "next-vibe/unified-ui/analytics/schema";
 import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/navigate-button/widget";
-import type { JSX } from "react";
+import { type JSX, useId, useState } from "react";
 
 import { SubscriptionStatusAdminFilter } from "@/subscription/admin/enum";
 import {
@@ -56,7 +73,18 @@ import {
 import type definitions from "./definition";
 import { RevenueKind, type RevenueKindValue } from "./enum";
 
+const REPORT_CURRENCY = "USD";
 const DAY_MS = 86_400_000;
+
+function formatRevenueWindow(
+  from: string,
+  to: string,
+  locale: CountryLanguage,
+): string {
+  return from === to
+    ? formatDocDate(from, locale)
+    : formatPeriod(from, to, locale);
+}
 
 function bucketEnd(start: string, bucket: "day" | "week" | "month"): string {
   const date = new Date(`${start}T00:00:00.000Z`);
@@ -116,9 +144,15 @@ export function RevenueReportWidget({
   const value = useWidgetValue<typeof definitions.GET>();
   const responseOnly = useWidgetResponseOnly();
   const isInteractive = useWidgetIsInteractive() && !responseOnly;
+  const compactFilters =
+    useWidgetPlatform() === Platform.NEXT_PAGE && isInteractive;
+  const filtersId = useId();
+  const [filtersOpen, setFiltersOpen] = useState(false);
   const { endpointMutations } = useWidgetContext();
   const navigate = useRelatedEntityNavigation();
-  const isLoading = endpointMutations?.read?.isFetching ?? false;
+  const read = endpointMutations?.read;
+  const isLoading = read?.isFetching ?? false;
+  const failed = useWidgetResponse()?.success === false;
 
   // Interactive surfaces follow the form; CLI/MCP show what the server applied.
   const applied = isInteractive ? undefined : value?.appliedFilters;
@@ -281,6 +315,7 @@ export function RevenueReportWidget({
       key: "revenueUsd",
       label: t("widget.column.revenueUsd"),
       format: "currency",
+      currency: REPORT_CURRENCY,
     },
     { key: "payments", label: t("widget.extra.paid"), format: "number" },
     {
@@ -298,6 +333,7 @@ export function RevenueReportWidget({
       key: "refundsUsd",
       label: t("widget.column.refundsUsd"),
       format: "currency",
+      currency: REPORT_CURRENCY,
       secondary: true,
     },
   ] as const;
@@ -325,13 +361,10 @@ export function RevenueReportWidget({
     .join(", ");
   const currencySublabel = (row: BreakdownRow): string | undefined => {
     const code = CurrenciesArr.find((c) => c === row.key);
-    if (!code || code === "USD") {
+    if (!code || code === REPORT_CURRENCY) {
       return undefined;
     }
-    const native = new Intl.NumberFormat(locale, {
-      style: "currency",
-      currency: code,
-    }).format(row.metrics.amount ?? 0);
+    const native = formatMoney(row.metrics.amount ?? 0, code, locale);
     const rate = value?.fxRates.find((r) => r.currency === code);
     return rate
       ? `${native} · ${t("widget.label.rate", {
@@ -365,10 +398,7 @@ export function RevenueReportWidget({
       const collected =
         payment.status === PaymentStatus.SUCCEEDED ||
         payment.status === PaymentStatus.REFUNDED;
-      const native = new Intl.NumberFormat(locale, {
-        style: "currency",
-        currency: payment.currency,
-      }).format(payment.amount);
+      const native = formatMoney(payment.amount, payment.currency, locale);
       const parts: string[] = [kindLabel(payment.kind)];
       if (payment.plan) {
         parts.push(keyLabel(payment.plan));
@@ -378,7 +408,7 @@ export function RevenueReportWidget({
       if (!collected && !isInteractive) {
         parts.unshift(t(payment.status));
       }
-      if (payment.currency !== "USD" || !collected) {
+      if (payment.currency !== REPORT_CURRENCY || !collected) {
         parts.push(native);
       }
       parts.push(date);
@@ -422,93 +452,152 @@ export function RevenueReportWidget({
   return (
     <WidgetShell className="min-w-0">
       <WidgetHeader
-        title={t("get.title")}
+        size="page"
+        border={false}
+        title={t("widget.operatingTitle")}
+        subtitle={t("widget.currencyBasis")}
         backButton={
           isInteractive && <NavigateButtonWidget field={children.backButton} />
         }
       />
-      <AnalyticsToolbar
-        locale={locale}
-        period={win}
-        isLoading={isLoading}
-        onRefresh={isInteractive ? submit : undefined}
-        value={{
-          range: form.watch("range"),
-          granularity: form.watch("granularity"),
-          from: form.watch("from"),
-          to: form.watch("to"),
-        }}
-        onChange={(patch) => {
-          if (patch.range !== undefined) {
-            form.setValue("range", patch.range, { shouldDirty: true });
-          }
-          if (patch.granularity !== undefined) {
-            form.setValue("granularity", patch.granularity, {
-              shouldDirty: true,
-            });
-          }
-          if ("from" in patch) {
-            form.setValue("from", patch.from, { shouldDirty: true });
-          }
-          if ("to" in patch) {
-            form.setValue("to", patch.to, { shouldDirty: true });
-          }
-          submit();
-        }}
-        filters={filters}
-        onClearFilters={clearFilters}
-      >
-        {isInteractive && (
-          <>
-            <AnalyticsSegmented
-              label={t("widget.filter.kind")}
-              value={kind}
-              onSelect={setKind}
-              options={KINDS.map((option) => ({
-                value: option,
-                label: t(option),
-              }))}
+      <Div className="flex min-w-0 flex-wrap items-start justify-between gap-2">
+        {win && (
+          <Div className="min-w-0 space-y-1 text-xs text-muted-foreground">
+            <Div className="flex flex-wrap gap-x-2 gap-y-1 tabular-nums">
+              <Span className="font-medium text-foreground">
+                {formatRevenueWindow(win.from, win.to, locale)}
+              </Span>
+              {win.previousFrom && win.previousTo && (
+                <Span>
+                  {t("analytics.chart.comparedTo", {
+                    period: formatRevenueWindow(
+                      win.previousFrom,
+                      win.previousTo,
+                      locale,
+                    ),
+                  })}
+                </Span>
+              )}
+              <Span>{t(`analytics.chart.groupedBy.${win.bucket}`)}</Span>
+            </Div>
+            {compactFilters && !filtersOpen && filters.length > 0 && (
+              <Div className="flex flex-wrap gap-x-3 gap-y-1 @3xl:hidden">
+                {filters.map(({ key, label, value: filterValue }) => (
+                  <Span key={key} className="break-words">
+                    {label}: {filterValue}
+                  </Span>
+                ))}
+              </Div>
+            )}
+          </Div>
+        )}
+        {compactFilters && (
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="shrink-0 @3xl:hidden"
+            aria-controls={filtersId}
+            aria-expanded={filtersOpen}
+            onClick={() => setFiltersOpen(!filtersOpen)}
+          >
+            {t("widget.filterDisclosure")}
+            <ChevronDown
+              className={cn("size-4", filtersOpen && "rotate-180")}
+              aria-hidden="true"
             />
-            <AnalyticsSegmented
-              label={t("widget.filter.provider")}
-              value={provider ?? ALL}
-              onSelect={(next) => setProvider(asProvider(next))}
-              options={[
-                { value: ALL, label: t("widget.extra.processorAll") },
-                ...Object.values(PaymentProvider).map((option) => ({
+          </Button>
+        )}
+      </Div>
+      <Div
+        id={filtersId}
+        className={cn(compactFilters && !filtersOpen && "hidden @3xl:block")}
+      >
+        <AnalyticsToolbar
+          locale={locale}
+          isLoading={isLoading}
+          onRefresh={isInteractive ? submit : undefined}
+          value={{
+            range: form.watch("range"),
+            granularity: form.watch("granularity"),
+            from: form.watch("from"),
+            to: form.watch("to"),
+          }}
+          onChange={(patch) => {
+            if (patch.range !== undefined) {
+              form.setValue("range", patch.range, { shouldDirty: true });
+            }
+            if (patch.granularity !== undefined) {
+              form.setValue("granularity", patch.granularity, {
+                shouldDirty: true,
+              });
+            }
+            if ("from" in patch) {
+              form.setValue("from", patch.from, { shouldDirty: true });
+            }
+            if ("to" in patch) {
+              form.setValue("to", patch.to, { shouldDirty: true });
+            }
+            submit();
+          }}
+          filters={filters}
+          onClearFilters={clearFilters}
+        >
+          {isInteractive && (
+            <>
+              <AnalyticsSegmented
+                label={t("widget.filter.kind")}
+                value={kind}
+                onSelect={setKind}
+                options={KINDS.map((option) => ({
                   value: option,
                   label: t(option),
-                })),
-              ]}
-            />
-            <AnalyticsSegmented
-              label={t("widget.filter.currency")}
-              value={currency ?? ALL}
-              onSelect={(next) =>
-                setCurrency(CurrenciesArr.find((code) => code === next))
-              }
-              options={[
-                { value: ALL, label: t("widget.extra.currencyAll") },
-                ...CurrenciesArr.map((code) => ({ value: code, label: code })),
-              ]}
-            />
-            <Button
-              type="button"
-              variant="ghost"
-              aria-pressed={includeInternal}
-              disabled={isLoading}
-              onClick={() => setInternal(!includeInternal)}
-              className={
-                includeInternal
-                  ? "h-auto whitespace-nowrap rounded-md border bg-background px-2.5 py-1 text-xs font-medium text-foreground shadow-sm"
-                  : "h-auto whitespace-nowrap rounded-md border border-dashed px-2.5 py-1 text-xs font-medium text-muted-foreground hover:text-foreground"
-              }
-            >
-              {t("widget.includeInternal")}
-            </Button>
-          </>
-        )}
-      </AnalyticsToolbar>
+                }))}
+              />
+              <AnalyticsSegmented
+                label={t("widget.filter.provider")}
+                value={provider ?? ALL}
+                onSelect={(next) => setProvider(asProvider(next))}
+                options={[
+                  { value: ALL, label: t("widget.extra.processorAll") },
+                  ...Object.values(PaymentProvider).map((option) => ({
+                    value: option,
+                    label: t(option),
+                  })),
+                ]}
+              />
+              <AnalyticsSegmented
+                label={t("widget.filter.currency")}
+                value={currency ?? ALL}
+                onSelect={(next) =>
+                  setCurrency(CurrenciesArr.find((code) => code === next))
+                }
+                options={[
+                  { value: ALL, label: t("widget.extra.currencyAll") },
+                  ...CurrenciesArr.map((code) => ({
+                    value: code,
+                    label: code,
+                  })),
+                ]}
+              />
+              <Button
+                type="button"
+                variant="ghost"
+                aria-pressed={includeInternal}
+                disabled={isLoading}
+                onClick={() => setInternal(!includeInternal)}
+                className={
+                  includeInternal
+                    ? "h-auto whitespace-nowrap rounded-md border bg-background px-2.5 py-1 text-xs font-medium text-foreground shadow-sm"
+                    : "h-auto whitespace-nowrap rounded-md border border-dashed px-2.5 py-1 text-xs font-medium text-muted-foreground hover:text-foreground"
+                }
+              >
+                {t("widget.includeInternal")}
+              </Button>
+            </>
+          )}
+        </AnalyticsToolbar>
+      </Div>
 
       {kpis && win && value && (
         <>
@@ -518,13 +607,16 @@ export function RevenueReportWidget({
               value={kpis.grossRevenueUsd.value}
               previous={kpis.grossRevenueUsd.previous}
               format="currency"
+              currency={REPORT_CURRENCY}
               hint={t("widget.extra.grossHint", {
                 subs: formatAnalyticsValue(subscriptionRevenue, {
                   format: "currency",
+                  currency: REPORT_CURRENCY,
                   locale,
                 }),
                 packs: formatAnalyticsValue(packRevenue, {
                   format: "currency",
+                  currency: REPORT_CURRENCY,
                   locale,
                 }),
               })}
@@ -539,6 +631,7 @@ export function RevenueReportWidget({
               value={kpis.netRevenueUsd.value}
               previous={kpis.netRevenueUsd.previous}
               format="currency"
+              currency={REPORT_CURRENCY}
               hint={t("widget.extra.netHint")}
               locale={locale}
             />
@@ -547,6 +640,7 @@ export function RevenueReportWidget({
               value={kpis.mrrUsd.value}
               previous={kpis.mrrUsd.previous}
               format="currency"
+              currency={REPORT_CURRENCY}
               hint={subHint(t("widget.extra.mrrHint"))}
               tone={subTone}
               locale={locale}
@@ -557,6 +651,7 @@ export function RevenueReportWidget({
               value={kpis.refundsUsd.value}
               previous={kpis.refundsUsd.previous}
               format="currency"
+              currency={REPORT_CURRENCY}
               invertDelta
               tone={kpis.refundsUsd.value > 0 ? "warning" : undefined}
               hint={t("widget.hint.refundsUsd")}
@@ -694,6 +789,7 @@ export function RevenueReportWidget({
               }))}
               variant="stacked-bar"
               format="currency"
+              currency={REPORT_CURRENCY}
               locale={locale}
               emptyLabel={t("widget.empty")}
               onBucketClick={isInteractive ? drillBucket : undefined}
@@ -710,6 +806,7 @@ export function RevenueReportWidget({
               }))}
               variant="stacked-bar"
               format="currency"
+              currency={REPORT_CURRENCY}
               locale={locale}
               emptyLabel={t("widget.empty")}
               onBucketClick={isInteractive ? drillBucket : undefined}
@@ -733,6 +830,7 @@ export function RevenueReportWidget({
               ]}
               variant="area"
               format="currency"
+              currency={REPORT_CURRENCY}
               locale={locale}
               height={200}
               emptyLabel={t("widget.empty")}
@@ -832,6 +930,7 @@ export function RevenueReportWidget({
                   key: "revenueUsd",
                   label: t("widget.column.revenueUsd"),
                   format: "currency",
+                  currency: REPORT_CURRENCY,
                 },
                 {
                   key: "payments",
@@ -860,6 +959,7 @@ export function RevenueReportWidget({
                 key: "usd",
                 label: t("widget.column.usd"),
                 format: "currency",
+                currency: REPORT_CURRENCY,
               },
             ]}
             rows={recentRows}
@@ -882,7 +982,28 @@ export function RevenueReportWidget({
           />
         </>
       )}
-      {!value && !isLoading && (
+      {!value && isLoading && (
+        <LoadingBlock message={t("widget.loadingReport")} />
+      )}
+      {!value && !isLoading && failed && (
+        <ResultBanner
+          variant="warning"
+          title={t("get.errors.server.title")}
+          message={t("get.errors.server.description")}
+        >
+          {isInteractive && (
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              onClick={() => void read?.refetch()}
+            >
+              {t("analytics.chart.refresh")}
+            </Button>
+          )}
+        </ResultBanner>
+      )}
+      {!value && !isLoading && !failed && (
         <Div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
           <Span>{t("widget.extra.notLoaded")}</Span>
           {isInteractive && (

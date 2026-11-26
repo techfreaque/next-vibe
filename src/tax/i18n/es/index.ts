@@ -9,11 +9,13 @@ export const translations: typeof enTranslations = {
   },
 
   rate: {
+    details: "Datos del tipo impositivo",
     create: {
       title: "Crear tasa de impuestos",
       titleShort: "Crear tarifas",
       description: "Añada una tasa de impuestos para su empresa",
       widget: {
+        save: "Crear tipo impositivo",
         backToList: "Volver a Tasas Fiscales",
       },
       companyId: {
@@ -111,6 +113,10 @@ export const translations: typeof enTranslations = {
       description:
         "Todas las tarifas de impuestos configuradas para su empresa",
       widget: {
+        actions: "Acciones",
+        retry: "Volver a intentar",
+        previous: "Anterior",
+        next: "Siguiente",
         addRate: "Tasa",
         labelDefault: "Predeterminado",
         labelActive: "Activa",
@@ -215,6 +221,7 @@ export const translations: typeof enTranslations = {
       titleShort: "Tasa de actualización",
       description: "Modificar la tasa tributaria existente",
       widget: {
+        save: "Guardar tipo impositivo",
         backToList: "Volver a Tasas Fiscales",
         failed: "Failed",
       },
@@ -363,6 +370,7 @@ export const translations: typeof enTranslations = {
     description:
       "Consulta los impuestos registrados en facturas de venta, notas de crédito, facturas de compra y ventas en caja.",
     widget: {
+      retry: "Volver a cargar el informe",
       scope:
         "Las facturas de venta usan la fecha del asiento asociado o la fecha de creación. Las compras usan la fecha de la factura. Las ventas en caja usan su fecha de cierre (UTC) e incluyen las líneas con un tipo positivo o un importe de impuesto registrado. Si una factura emitida comparte el asiento, representa esa venta.",
       empty: "Ninguna línea de documento coincide con estos filtros.",
@@ -372,6 +380,8 @@ export const translations: typeof enTranslations = {
       unknownRate: "Tasa indeterminada",
       run: "Generar informe",
       running: "Generando informe…",
+      scopeHint:
+        "Compara el IVA de ventas y compras por tipo impositivo para una empresa y un periodo.",
       selectCompany: "Selecciona la empresa para este informe.",
     },
     currency: {
@@ -448,6 +458,8 @@ export const translations: typeof enTranslations = {
 
   enums: {
     reportDirection: {
+      nonDeductible: "IVA soportado no deducible",
+      reverseCharge: "IVA devengado por inversión del sujeto pasivo",
       posSales: "Ventas en caja",
       sales: "Facturas de venta",
       creditNotes: "Notas de crédito de ventas",

@@ -1,0 +1,121 @@
+import type { translations as enTranslations } from "../en";
+
+export const translations: typeof enTranslations = {
+  saleType: "Predaj",
+  feeType: "Poplatok brány",
+  refundType: "Vrátená platba",
+
+  title: "Účtovanie platieb z brány",
+  review: "Skontrolovať alebo zaúčtovať overené platby",
+  configure: "Nastaviť katalógovú ponuku",
+  company: "Firma",
+  product: "Katalógový produkt",
+  providerStripe: "Stripe",
+  providerNow: "NOWPayments",
+  currencyEur: "EUR",
+  currencyUsd: "USD",
+  currencyPln: "PLN",
+  provider: "Poskytovateľ",
+  merchant: "Overená identita obchodníka",
+  offer: "ID ponuky alebo ceny poskytovateľa",
+  currency: "Mena",
+  recognition: "Vykázanie výnosu",
+  immediate: "Vykázať pri predaji",
+  deferred: "Vykázať ako záväzok",
+  receivable: "Účet pohľadávok",
+  clearing: "Zúčtovací účet platobnej brány",
+  consideration: "Výnosový alebo záväzkový účet",
+  vat: "Účet DPH na výstupe",
+  expense: "Nákladový účet poplatkov",
+  zeroTax:
+    "Výslovne potvrďte, že chýbajúca DPH pri tomto produkte s nulovou sadzbou znamená nulovú DPH",
+  ids: "ID overených podkladov",
+  dryRun: "Iba náhľad",
+  submit: "Spustiť",
+  sources: "Overené podklady",
+  gross: "Hrubá suma",
+  tax: "Suma DPH",
+  fee: "Poplatok poskytovateľa",
+  receipt: "Referencie faktúry a zápisu",
+  posted: "Zaúčtované",
+  ready: "Pripravené na zaúčtovanie",
+  saved: "Ponuka bola priradená",
+  alreadyPosted: "Už zaúčtované",
+  forbidden: "Pre túto firmu nemáte potrebné oprávnenie.",
+  missingEvidence: "Overený podklad nie je dostupný.",
+  missingMapping:
+    "Priraďte zodpovedajúcu ponuku obchodníka a katalógový produkt.",
+  unsupportedCurrency: "Skontrolujte menu a prevod vysporiadajte samostatne.",
+  unmatchedTransaction: "Pred zaúčtovaním priraďte overenú lokálnu platbu.",
+  unverifiedTax:
+    "Získajte overený rozpis DPH alebo výslovne nastavte oprávnenú ponuku s nulovou sadzbou.",
+  invalidAccounts:
+    "Skontrolujte, či sú účty firmy aktívne a zodpovedajú svojim účelom.",
+  periodClosed: "Otvorte účtovné obdobie alebo zosúlaďte dátum podkladu.",
+  unverifiedRefundAllocation:
+    "Získajte overený rozpis vrátenej platby alebo ju zosúlaďte s pôvodným predajom.",
+  creditsGranted: "Pridelené kredity",
+  creditsConsumed: "Použité kredity",
+  deferredRefundNeedsReview:
+    "Overte, aká časť pôvodnej služby alebo balíka kreditov bola využitá. Zosúlaďte refundáciu so zvyšným záväzkom a vykázanými výnosmi.",
+  feeBillLinked: "Dodávateľská faktúra je prepojená",
+  openFeeEntry: "Zosúladiť faktúru za poplatok",
+  openJournal: "Otvoriť účtovný zápis",
+  openInvoice: "Otvoriť faktúru",
+  openFeeBill: "Otvoriť dodávateľskú faktúru",
+  feeNeedsBill:
+    "Faktúru za poplatky zaevidujte medzi prijaté faktúry. Pred zaúčtovaním overte DPH.",
+  taxRegimeConflict:
+    "Firma bola oslobodená, no v podklade je účtovaná DPH. Podklad zosúlaďte.",
+  inconsistentEvidence:
+    "Presné údaje podkladu sa nezhodujú s lokálnou platbou.",
+  postingFailed:
+    "Zápis sa nepodarilo zaúčtovať. Skontrolujte podklad a skúste to znova.",
+  missingProduct:
+    "Vyberte aktívny katalógový produkt firmy s kódom SKU a správnou sadzbou DPH.",
+  conflict: "Táto ponuka obchodníka už je priradená.",
+  empty: "Žiadne zodpovedajúce overené podklady.",
+  intro:
+    "Priraďte katalógový produkt k overenej ponuke obchodníka a zobrazte náhľad podkladov predaja.",
+  stripeTest: "Testovací obchodník Stripe",
+  stripeLive: "Produkčný obchodník Stripe",
+  nowMerchant: "Obchodník NOWPayments",
+  listError: "Podklady sa nepodarilo načítať",
+  detail: "Skontrolujte firmu a zadané údaje a skúste to znova.",
+  recognizedRevenue: "Vykázané výnosy",
+  remainingLiability: "Zvyšný záväzok",
+  recognitionTitle: "Vykázanie výnosov z predplatených služieb",
+  recognitionDescription:
+    "Pridajte pravidlo s dátumom účinnosti alebo nechajte jeho polia prázdne a zobrazte náhľad overenej spotreby kreditov.",
+  recognitionFrom: "Účinnosť od (RRRR-MM-DD)",
+  recognitionAccount: "Účet výnosov",
+  recognitionServicePeriods: "Vykázať výnosy za overené obdobia predplatného",
+  recognitionExpiry: "Vykázať oprávnené prepadnuté kredity",
+  recognitionEntries: "Pohyby kreditov",
+  recognitionPreview: "Náhľad je pripravený",
+  recognitionPosted: "Výnos bol zaúčtovaný",
+  recognitionCurrent: "Žiadne nové oprávnené pohyby",
+  recognitionPolicySaved: "Pravidlo bolo uložené",
+  recognitionPolicyConflict:
+    "Dátum sa prekrýva s existujúcim pravidlom alebo zaúčtovaným výnosom.",
+  recognitionPolicyMissing: "Pridajte pravidlo platné ku dňu pohybu.",
+  recognitionEvidenceMissing:
+    "Skontrolujte pôvodný predaj, úhradu a pohyb kreditov.",
+  recognitionExpiryReview: "Overte prepadnutie kreditov a príslušné pravidlo.",
+  recognitionServiceConflict:
+    "Platobný poskytovateľ uviedol rozdielne obdobia služby alebo sumy. Pred vykázaním výnosov overte pôvodnú faktúru.",
+  recognitionSubscriptionReview:
+    "Výnosy z predplatného vyžadujú overené priradenie k obdobiu služby.",
+  recognitionInvalidAccounts:
+    "Vyberte aktívne účty záväzkov a výnosov tejto spoločnosti.",
+  recognitionPeriodClosed: "Otvorte účtovné obdobie pohybu.",
+  recognitionForbidden: "Pre túto spoločnosť nemáte právo vykazovať výnosy.",
+  recognitionFailed:
+    "Výnos sa nepodarilo zaúčtovať. Skontrolujte podklady a skúste znova.",
+  chooseProvider: "Vyberte poskytovateľa",
+  chooseCurrency: "Vyberte menu",
+  chooseRecognition: "Vyberte spôsob vykázania výnosov",
+  noVatAccount:
+    "Pridajte do účtovej osnovy aktívny účet DPH na výstupe, aby ste ho tu mohli vybrať.",
+  saveOffer: "Uložiť ponuku",
+};

@@ -116,7 +116,7 @@ export type BankCsvMapping = Partial<Record<BankCsvField, number>>;
 
 export type BankCsvSeparator = "," | ";";
 
-function readMappedRecord(
+export function readMappedRecord(
   record: string,
   separator: BankCsvSeparator,
 ): string[] | undefined {
@@ -138,6 +138,7 @@ function readMappedRecord(
 export function readBankCsvColumns(
   input: string,
   separator: BankCsvSeparator = ",",
+  minimumColumns = 4,
 ):
   | {
       success: true;
@@ -153,7 +154,7 @@ export function readBankCsvColumns(
   const headers = readMappedRecord(header, separator);
   if (
     !headers ||
-    headers.length < 4 ||
+    headers.length < minimumColumns ||
     headers.length > 100 ||
     headers.some((column) => !column.trim())
   ) {

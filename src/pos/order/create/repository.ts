@@ -18,6 +18,10 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { CompanyMemberRole } from "@/companies/enum";
 import { CompanyAuthRepository } from "@/companies/repository";
+import {
+  LINE_SETTLEMENT_V1,
+  supportsLineCentSettlement,
+} from "@/tax/line-settlement";
 
 import { posOrders, posSessions, posTerminals } from "../../db";
 import { PosOrderStatus, PosSessionStatus } from "../../enum";
@@ -133,6 +137,9 @@ export class PosOrderCreateRepository {
             currency: terminal.currency,
             orderNumber,
             status: PosOrderStatus.OPEN,
+            lineSettlement: supportsLineCentSettlement(terminal.currency)
+              ? LINE_SETTLEMENT_V1
+              : null,
             subtotal: 0,
             taxAmount: 0,
             total: 0,

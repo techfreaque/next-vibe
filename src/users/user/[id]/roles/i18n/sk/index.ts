@@ -20,7 +20,7 @@ export const translations: typeof enTranslations = {
         description: "Vyberte rolu, ktorú chcete používateľovi prideliť",
       },
       id: {
-        label: "ID používateľa",
+        label: "Používateľ",
         description:
           "Jedinečný identifikátor používateľa, ktorému chcete prideliť rolu",
         placeholder: "Zadajte ID používateľa…",
@@ -99,7 +99,7 @@ export const translations: typeof enTranslations = {
         description: "Vyberte rolu, ktorú chcete používateľovi odobrať",
       },
       id: {
-        label: "ID používateľa",
+        label: "Používateľ",
         description:
           "Jedinečný identifikátor používateľa, ktorému chcete odobrať rolu",
         placeholder: "Zadajte ID používateľa…",

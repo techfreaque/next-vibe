@@ -74,6 +74,17 @@ export const translations = {
       updatedAt: "Updated",
     },
     widget: {
+      unavailable: "Product unavailable",
+      prices: "Active price tiers",
+      stock: "Inventory",
+      viewStock: "View warehouse stock",
+      offers: "Processor offers",
+      noOffers: "No active processor offers are linked to this product.",
+      configureOffer: "Configure processor offer",
+      offerNeedsSku:
+        "Activate the product and add a SKU to configure an offer.",
+      revenueAccount: "Revenue account",
+      liabilityAccount: "Deferred revenue account",
       edit: "Edit",
       deactivate: "Deactivate",
       activate: "Activate",

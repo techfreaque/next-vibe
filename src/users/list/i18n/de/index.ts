@@ -264,6 +264,11 @@ export const translations: typeof enTranslations = {
     },
   },
   widget: {
+    planStatus: "Tarif und Status",
+    accountActive: "Aktiv",
+    accountInactive: "Inaktiv",
+    none: "Keine",
+    creditAmount: "{{count}} Credits",
     spent30d: "{{count}} in 30 T.",
     notTracked: "nicht erfasst",
     oneOff: "Nur Credits",
@@ -295,7 +300,7 @@ export const translations: typeof enTranslations = {
       matchingHint:
         "Registrierungen pro Woche, letzte 12 volle Wochen. Letzte Woche: {{last}}, diese Woche bisher: {{count}}",
       verified: "E-Mail bestätigt",
-      verifiedHint: "{{count}} Konten",
+      verifiedHint: "Verifiziert: {{count}}",
       active: "Aktiv 30 T.",
       matching: "Treffer",
       paying: "Zahlend",

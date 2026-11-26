@@ -32,6 +32,7 @@ import {
 import { AbuseGroupBy } from "../analytics/enum";
 import type { LeadsDashboardResponseOutput } from "./definition";
 import type { LeadsDashboardT } from "./i18n";
+import { summarizeLeads } from "./summary";
 
 export class LeadsDashboardRepository {
   static async getDashboard(
@@ -160,7 +161,7 @@ export class LeadsDashboardRepository {
       const series = (key: string): number[] =>
         core.trend.series.find((entry) => entry.key === key)?.values ?? [];
 
-      return success({
+      const dashboard: LeadsDashboardResponseOutput = {
         last7Days: {
           window: serializeWindow(win),
           humanLeads: core.kpis.humanLeads,
@@ -184,6 +185,10 @@ export class LeadsDashboardRepository {
         conversionRate,
         statusBreakdown,
         recentLeads,
+      };
+      return success({
+        ...dashboard,
+        summary: summarizeLeads(dashboard, t("widget.unnamedLead")),
       });
     } catch (error) {
       const parsed = parseError(error);

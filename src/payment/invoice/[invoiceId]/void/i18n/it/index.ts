@@ -73,6 +73,17 @@ export const translations: typeof enTranslations = {
     placeholder: "Inserire la fattura ID",
   },
   widget: {
+    invoice: "Fattura",
+    total: "Totale della fattura",
+    customer: "Cliente",
+    openInvoice: "Apri la fattura",
+    retry: "Riprova",
+    loading: "Caricamento della fattura…",
+    unavailable: "Fattura non disponibile",
+    reversal: "Uno storno con data odierna chiude il credito residuo.",
+    cancelOnly: "La fattura verrà annullata.",
+    ineligible:
+      "Può annullare una bozza o una fattura non pagata senza pagamenti o note di credito associati.",
     back: "Indietro",
     submit: "Fatturato",
     warning:

@@ -90,6 +90,14 @@ const { GET } = createEndpoint({
         schema: z.enum([...InvoiceStatusDB, OVERDUE_INVOICE_FILTER]).optional(),
       }),
 
+      selection: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        hidden: true,
+        includeInCacheKey: true,
+        label: "widget.creditable",
+        schema: z.literal("credit").optional(),
+      }),
       customerId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,

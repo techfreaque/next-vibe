@@ -42,6 +42,32 @@ export const translations: typeof enTranslations = {
       other: "Iný spôsob",
     },
   },
+  workflow: {
+    backToSessionOrders: "Späť na objednávky relácie",
+    receiptTitle: "Účtenka",
+    amountDue: "Suma na úhradu",
+    ledgerCurrencyMismatch:
+      "Objednávka používa inú menu než účtovníctvo. Pred prijatím platby použite pokladňu alebo objednávku v účtovnej mene.",
+    postingUnavailable:
+      "Predaj sa nepodarilo zaúčtovať. Skontrolujte menu spoločnosti, otvorené účtovné obdobie a účty.",
+    cashCurrencyMismatch:
+      "Hotovosť musí byť v mene pokladne. Pre túto objednávku vyberte iný spôsob platby.",
+    tenderMinorUnits: "Zadajte sumu s presnosťou na celé centy.",
+    legacyTenderReview:
+      "Skoršia platba obsahuje zlomok centa. Pred prijatím ďalšej platby skontrolujte zaznamenanú sumu.",
+    legacyTenderRecorded:
+      "Objednávka zachováva pôvodné sumy so štyrmi desatinnými miestami.",
+    legacyPostingReview:
+      "Zaznamenané zlomky centa nemožno zaúčtovať. Pred uzavretím predaja skontrolujte pôvodnú platbu.",
+    viewReceipt: "Zobraziť účtenku",
+    openDrawer: "Otvoriť pokladňu",
+    warehouse: "Predajný sklad",
+    noWarehouse: "Bez priradeného skladu",
+    chooseCompanyFirst: "Najprv vyberte spoločnosť.",
+    warehouseInstruction: "Vyberte aktívny sklad zvolenej spoločnosti.",
+    stockUnavailable:
+      "V sklade tejto pokladne nie je dostatok dostupného tovaru. Pred dokončením predaja skontrolujte množstvá.",
+  },
   dashboard: {
     get: {
       title: "Prehľad pokladníc",
@@ -377,7 +403,7 @@ export const translations: typeof enTranslations = {
         sessionSummary: "Súhrn pokladničnej zmeny",
         terminal: "Pokladničný terminál",
         openedAt: "Otvorené pri",
-        orderCount: "Objednávky",
+        orderCount: "Objednávky: {{count}}",
         sessionRevenue: "Tržby",
         floatHint: "Pred uzavretím spočítajte hotovosť v pokladnici.",
         reconciliation: "Koniec dňa",

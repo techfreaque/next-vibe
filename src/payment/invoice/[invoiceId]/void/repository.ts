@@ -95,6 +95,12 @@ export class InvoiceVoidRepository {
           });
         }
         if (
+          invoice.status === InvoiceStatus.VOID &&
+          Number(invoice.amount) >= 0
+        ) {
+          return success({ success: true, message: null });
+        }
+        if (
           (invoice.status !== InvoiceStatus.DRAFT &&
             invoice.status !== InvoiceStatus.OPEN) ||
           Number(invoice.amount) < 0

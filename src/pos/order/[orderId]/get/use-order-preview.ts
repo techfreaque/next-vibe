@@ -23,12 +23,13 @@ export function useOrderPreview(
         urlPathParams: { orderId: orderId ?? "" },
         queryOptions: {
           enabled: interactive && z.uuid().safeParse(orderId).success,
+          staleTime: 0,
         },
       },
     }),
     [orderId, interactive],
   );
-  const order = useEndpoint(definition, options, logger, user).read?.data
-    ?.result;
-  return order?.id === orderId ? order : undefined;
+  const read = useEndpoint(definition, options, logger, user).read;
+  const order = read?.data?.result;
+  return !read?.isFetching && order?.id === orderId ? order : undefined;
 }

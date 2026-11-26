@@ -27,9 +27,10 @@ import { fillGaps } from "next-vibe/dataflow/shared/range";
 import type { QueryResultRow } from "pg";
 
 import {
-  notInternalUserSql,
   paidStatusSql,
   paymentKindSql,
+  REPORTABLE_PAYMENT_SQL,
+  reportingUserSql,
   utcTs,
 } from "../../analytics/money-sql";
 import { CheckoutMode, PaymentStatus } from "../../enum";
@@ -60,9 +61,9 @@ export class QueryPaymentsCheckoutsRepository {
       SELECT ${resolutionBucketExpr(resolution, sql`pt.created_at`)} AS bucket,
         count(*) AS checkouts
       FROM payment_transactions pt
-      WHERE pt.mode <> ${CheckoutMode.SETUP}
+      WHERE ${REPORTABLE_PAYMENT_SQL} AND pt.mode <> ${CheckoutMode.SETUP}
         AND ${paymentKindSql("pt")} <> 'renewal'
-        AND ${notInternalUserSql("pt.user_id")}
+        AND ${reportingUserSql("pt.user_id")}
         AND ${OUTCOME_SQL[data.outcome]}
         AND pt.created_at >= ${utcTs(range.from)}
         AND pt.created_at <= ${utcTs(range.to)}

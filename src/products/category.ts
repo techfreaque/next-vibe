@@ -21,9 +21,28 @@ export const category: CategoryDefinition = {
     "es-ES": "Productos",
     "sk-SK": "Produkty",
   },
+  description: {
+    "en-US": "Manage products, services, plans and prices.",
+    "de-DE": "Verwalten Sie Produkte, Leistungen, Tarife und Preise.",
+    "pl-PL": "Zarządzaj produktami, usługami, planami i cenami.",
+    "fr-FR": "Gérez les produits, les services, les offres et leurs prix.",
+    "it-IT": "Gestisca prodotti, servizi, piani e prezzi.",
+    "es-ES": "Gestione productos, servicios, planes y precios.",
+    "sk-SK": "Spravujte produkty, služby, predplatné a ceny.",
+    "en-GLOBAL": "Manage products, services, plans and prices.",
+  },
   group: "business",
   icon: "package",
   order: 40,
+  createActions: ["products_catalog_create_POST"],
+  landing: {
+    destinations: ["products-catalog-list", "products-category-list"],
+    actions: [
+      "products-catalog-list",
+      "products-category-list",
+      "processor-accounting-map",
+    ],
+  },
   defaultEntry: {
     [UserPermissionRole.ADMIN]: PRODUCTS_CATALOG_LIST_ALIAS,
     [UserPermissionRole.CUSTOMER]: USER_ME_ALIAS,

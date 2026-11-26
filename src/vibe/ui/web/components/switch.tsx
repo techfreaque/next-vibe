@@ -8,6 +8,7 @@ import type { StyleType } from "../utils/style-type";
 
 // Cross-platform types
 export type SwitchRootProps = {
+  "aria-label"?: string;
   checked?: boolean;
   defaultChecked?: boolean;
   onCheckedChange?: (checked: boolean) => void;
@@ -33,6 +34,7 @@ export function Switch({
   required,
   id,
   onBlur,
+  "aria-label": accessibleName,
 }: SwitchRootProps): React.JSX.Element {
   return (
     <SwitchPrimitives.Root
@@ -50,6 +52,7 @@ export function Switch({
       required={required}
       id={id}
       onBlur={onBlur}
+      aria-label={accessibleName}
     >
       <SwitchPrimitives.Thumb
         className={cn(

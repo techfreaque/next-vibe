@@ -1,0 +1,73 @@
+import type { translations as enTranslations } from "../en";
+
+export const translations: typeof enTranslations = {
+  title: "Súkromie bankového účtu",
+  description: "Skontrolujte pohyby na zmiešaných účtoch pred zaúčtovaním.",
+  connection: "Bankové prepojenie",
+  empty: "Toto prepojenie nemá pohyby na kontrolu.",
+  selectConnection:
+    "Vyberte bankové prepojenie a zobrazte jeho nastavenia ochrany súkromia.",
+  policy: "Nastavenia súkromia",
+  policyDescription: "Určte, ktoré pohyby sa môžu preniesť do účtovníctva.",
+  mode: "Režim",
+  retention: "Uchovávanie v dňoch",
+  rules: "Pravidlá",
+  suggestions: "Navrhovaní dodávatelia",
+  inbox: "Pohyby na kontrolu",
+  decision: "Rozhodnutie o pohybe",
+  decisionDescription:
+    "Preneste firemný pohyb do účtovníctva alebo vymažte údaje o súkromnom pohybe.",
+  operation: "Akcia pravidla",
+  ruleField: "Porovnávané pole",
+  ruleMatch: "Typ zhody",
+  literal: "Hľadaný text",
+  outcome: "Výsledok",
+  ruleSupplier: "Dodávateľ v súčtoch (voliteľné)",
+  chooseSupplier: "Vybrať dodávateľa",
+  clearSupplier: "Odstrániť dodávateľa",
+  identity: "Identifikátor pohybu",
+  always: "Používajte toto rozhodnutie vždy pri rovnakej protistrane",
+  apply: "Použiť",
+  saved: "Uložené",
+  ruleSaved: "Pravidlo je uložené",
+  ruleFailed: "Rozhodnutie je uložené. Pravidlo sa nepodarilo uložiť.",
+  addSuggestion: "Pridať ako firemné pravidlo",
+  editPolicy: "Upraviť nastavenia",
+  editRule: "Pridať alebo upraviť pravidlo",
+  approving: "Čaká na prenos do účtovníctva",
+  privateAction: "Ponechať pohyb ako súkromný",
+  businessAction: "Preniesť do účtovníctva",
+  expires: "Platnosť do {{date}}",
+  businessExplanation:
+    "V režime firemného účtu sa nové pohyby bez pravidla prenášajú do účtovníctva.",
+  modes: {
+    mixed: "Zmiešaný účet",
+    business: "Výlučne firemný účet",
+  },
+  outcomes: {
+    business: "Firemný",
+    private: "Súkromný",
+  },
+  ruleFields: {
+    counterparty: "Protistrana",
+    iban: "IBAN",
+    description: "Popis",
+  },
+  matches: {
+    equals: "Presná zhoda",
+    contains: "Obsahuje",
+    startsWith: "Začína sa na",
+  },
+  operations: {
+    policy: "Zmeniť nastavenia",
+    set: "Pridať alebo nahradiť pravidlo",
+    remove: "Odstrániť pravidlo",
+  },
+  errors: {
+    forbidden: "Toto bankové prepojenie Vám nepatrí.",
+    invalid: "Skontrolujte údaje a skúste znova.",
+    conflict: "Pohyb sa zmenil alebo platnosť dokladu vypršala.",
+    unavailable: "Úkon na ochranu súkromia sa nepodarilo dokončiť.",
+    import: "Schválený pohyb sa nepodarilo preniesť.",
+  },
+};

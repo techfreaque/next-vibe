@@ -25,6 +25,7 @@ import type { QueryResultRow } from "pg";
 import {
   paidStatusSql,
   paymentKindSql,
+  REPORTABLE_PAYMENT_SQL,
   usdSql,
 } from "@/payment/analytics/money-sql";
 
@@ -68,7 +69,7 @@ export class QuerySubscriptionsMrrRepository {
       LEFT JOIN LATERAL (
         SELECT ${usdSql("pt.amount", "pt.currency")} AS usd
         FROM payment_transactions pt
-        WHERE s.id IS NOT NULL
+        WHERE ${REPORTABLE_PAYMENT_SQL} AND s.id IS NOT NULL
           AND pt.user_id = s.user_id
           AND ${paymentKindSql("pt")} IN ('newSubscription', 'renewal')
           AND ${paidStatusSql("pt")}

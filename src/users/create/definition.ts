@@ -49,7 +49,7 @@ const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["users", "create"],
   aliases: [USERS_CREATE_ALIAS] as const,
-  allowedRoles: [UserRole.ADMIN, UserRole.PARTNER_ADMIN] as const,
+  allowedRoles: [UserRole.ADMIN] as const,
 
   title: "post.title" as const,
   titleShort: "post.titleShort",
@@ -311,7 +311,7 @@ const { POST } = createEndpoint({
             role: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               label: "post.response.userRoles.role.content" as const,
-              schema: z.enum(Object.values(UserRole)),
+              schema: z.enum(UserPermissionRole),
             }),
           },
         }),

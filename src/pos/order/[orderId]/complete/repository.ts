@@ -25,11 +25,18 @@ import {
   type AutoPostLine,
   postJournalEntry,
 } from "@/chart-of-accounts/shared/auto-post";
+import { scopedTranslation as regimeTranslation } from "@/tax/regime/i18n";
+import { getCompanyTaxRegime } from "@/tax/regime/policy";
 
 import { posOrders, posPayments } from "../../../db";
 import { PosOrderStatus, PosPaymentMethod } from "../../../enum";
 import { scopedTranslation } from "../../../i18n";
 import { withOpenOrder } from "../../open-order";
+import {
+  isPosMinorUnitAmount,
+  posSettlementAmounts,
+} from "../../settlement-amounts";
+import { issuePosOrderStock } from "../../stock";
 import type { PosOrderCompletePostRequestOutput } from "./definition";
 
 export class PosOrderCompleteRepository {
@@ -38,6 +45,7 @@ export class PosOrderCompleteRepository {
     userId: string,
     logger: EndpointLogger,
     locale: CountryLanguage = defaultLocale,
+    pathOrderId?: string,
   ): Promise<
     ResponseType<{
       result: {
@@ -50,10 +58,22 @@ export class PosOrderCompleteRepository {
     }>
   > {
     const { t } = scopedTranslation.scopedT(locale);
+    const orderId = pathOrderId ?? data.orderId;
+
+    if (!orderId || (data.orderId !== undefined && data.orderId !== orderId)) {
+      return fail({
+        message: t("orderComplete.post.errors.validation.title"),
+        errorType: ErrorResponseTypes.VALIDATION_ERROR,
+      });
+    }
+
+    const stockConflict = fail({
+      message: t("workflow.stockUnavailable"),
+      errorType: ErrorResponseTypes.CONFLICT,
+    });
+    let stockFailed = false;
 
     try {
-      const { orderId } = data;
-
       const conflict = fail({
         message: t("orderComplete.post.errors.conflict.title"),
         errorType: ErrorResponseTypes.CONFLICT,
@@ -68,11 +88,22 @@ export class PosOrderCompleteRepository {
           conflict: t("orderComplete.post.errors.conflict.title"),
         },
         async (tx, order) => {
-          const total = Math.round(order.total * 10_000);
+          const regime = await getCompanyTaxRegime(
+            tx,
+            order.companyId,
+            new Date(),
+          );
+          if (regime.exempt && order.taxAmount !== 0) {
+            return fail({
+              message: regimeTranslation.scopedT(locale).t("saleConflict"),
+              errorType: ErrorResponseTypes.VALIDATION_ERROR,
+            });
+          }
+          const storedTotal = Math.round(order.total * 10_000);
           if (
-            total < 0 ||
+            storedTotal < 0 ||
             order.journalEntryId ||
-            total !==
+            storedTotal !==
               Math.round(order.subtotal * 10_000) +
                 Math.round(order.taxAmount * 10_000)
           ) {
@@ -83,6 +114,15 @@ export class PosOrderCompleteRepository {
             .from(posPayments)
             .where(eq(posPayments.orderId, orderId))
             .orderBy(asc(posPayments.createdAt), asc(posPayments.id));
+          const settlement =
+            payments.length === 0
+              ? posSettlementAmounts(order.total, order.taxAmount)
+              : {
+                  subtotal: order.subtotal,
+                  taxAmount: order.taxAmount,
+                  total: order.total,
+                };
+          const total = Math.round(settlement.total * 10_000);
           let excess = payments.reduce(
             (sum, payment) =>
               sum +
@@ -146,6 +186,19 @@ export class PosOrderCompleteRepository {
               order.cashAccountId ||
               payments.some((payment) => payment.accountNodeId))
           ) {
+            if (
+              ![
+                settlement.subtotal,
+                settlement.taxAmount,
+                settlement.total,
+                ...lines.map(({ amount }) => amount),
+              ].every(isPosMinorUnitAmount)
+            ) {
+              return fail({
+                message: t("workflow.legacyPostingReview"),
+                errorType: ErrorResponseTypes.CONFLICT,
+              });
+            }
             const explicit = lines.flatMap((line) =>
               line.accountNodeId ? [line.accountNodeId] : [],
             );
@@ -172,20 +225,20 @@ export class PosOrderCompleteRepository {
                 return conflict;
               }
             }
-            if (order.subtotal > 0) {
+            if (settlement.subtotal > 0) {
               lines.push({
                 type: LineType.CREDIT,
                 subtype: AccountSubtype.REVENUE_SALES,
                 fallbackSubtype: AccountSubtype.REVENUE_SERVICE,
-                amount: order.subtotal,
+                amount: settlement.subtotal,
                 currency: order.currency,
               });
             }
-            if (order.taxAmount > 0) {
+            if (settlement.taxAmount > 0) {
               lines.push({
                 type: LineType.CREDIT,
                 subtype: AccountSubtype.VAT_PAYABLE,
-                amount: order.taxAmount,
+                amount: settlement.taxAmount,
                 currency: order.currency,
               });
             }
@@ -203,7 +256,23 @@ export class PosOrderCompleteRepository {
               tx,
             );
             if (!journalEntryId) {
-              return conflict;
+              return fail({
+                message: t("workflow.postingUnavailable"),
+                errorType: ErrorResponseTypes.CONFLICT,
+              });
+            }
+          }
+          if (order.warehouseId) {
+            const issued = await issuePosOrderStock(
+              tx,
+              { ...order, warehouseId: order.warehouseId },
+              userId,
+              logger,
+              t("workflow.stockUnavailable"),
+            );
+            if (!issued.success) {
+              stockFailed = true;
+              return tx.rollback();
             }
           }
           for (const payment of cashChange) {
@@ -216,6 +285,8 @@ export class PosOrderCompleteRepository {
             .update(posOrders)
             .set({
               status: PosOrderStatus.COMPLETED,
+              ...settlement,
+              taxExemptionNotice: regime.notice,
               journalEntryId,
               updatedAt: new Date(),
             })
@@ -225,13 +296,16 @@ export class PosOrderCompleteRepository {
               currency: order.currency,
               id: orderId,
               status: PosOrderStatus.COMPLETED,
-              total: order.total,
+              total: settlement.total,
               journalEntryId,
             },
           });
         },
       );
     } catch (error) {
+      if (stockFailed) {
+        return stockConflict;
+      }
       logger.error("Error completing POS order", parseError(error));
       return fail({
         message: t("orderComplete.post.errors.server.title"),

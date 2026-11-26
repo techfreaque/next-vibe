@@ -107,6 +107,7 @@ export const translations: typeof enTranslations = {
   },
   providers: {
     shared: {
+      connectionSettings: "Ajustes de conexión",
       listId: {
         label: "Lista / Grupo ID",
         description: "El ID de la lista o segmento para añadir leads a",

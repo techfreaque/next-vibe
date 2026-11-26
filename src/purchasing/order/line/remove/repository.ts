@@ -44,7 +44,7 @@ export class OrderLineRemoveRepository {
         },
         async (tx, po) => {
           const [line] = await tx
-            .select({ id: purchaseOrderLines.id })
+            .select({ description: purchaseOrderLines.description })
             .from(purchaseOrderLines)
             .where(
               and(
@@ -80,6 +80,7 @@ export class OrderLineRemoveRepository {
           return success({
             result: {
               currency: po.currency,
+              removedDescription: line.description,
               ...totals,
             },
           });

@@ -78,6 +78,10 @@ export const translations: typeof enTranslations = {
       description: "Účtový rozvrh sa načítal",
     },
     widget: {
+      searchPage: "Hľadajte na tejto strane podľa názvu alebo kódu",
+      noMatches: "Na tejto strane sa nenašli žiadne zodpovedajúce účty",
+      previousPage: "Predchádzajúca strana",
+      nextPage: "Nasledujúca strana",
       debitSide: "MD",
       creditSide: "D",
       loading: "Načítavajú sa účty…",

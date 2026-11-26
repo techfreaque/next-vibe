@@ -17,6 +17,11 @@ import invoiceCreate from "@/payment/invoice/create/definition";
 import invoiceList from "@/payment/invoice/list/definition";
 
 import type { EndpointMeta } from "../../core/definition/endpoints-meta";
+import {
+  buildAdminCatalogDestinations,
+  getAdminCategoryLandings,
+} from "../admin-catalog-model";
+import type { CategoryDefinitionSerialized } from "../category-types";
 import type { JwtPayloadType } from "../../identity/auth/types";
 import { PlatformMarker, UserPermissionRole } from "../../identity/roles/enum";
 import { Platform } from "../../platforms/platforms";
@@ -38,6 +43,7 @@ import {
   getRecordSearchTargets,
   resolveEffectiveUser,
   searchCatalog,
+  rankWorkspaceMatches,
 } from "./meta-filter";
 
 const adminUser: JwtPayloadType = {
@@ -63,6 +69,28 @@ const catalogItem: EndpointMeta = {
 };
 
 describe("admin catalog", () => {
+  test("leads with the customer invoice list for a business term and keeps specific actions reachable", () => {
+    const search = (query: string) => rankWorkspaceMatches(searchCatalog(endpointsMeta, query, tool => tool.toolName), query);
+    expect(search("invoice")[0]?.toolName).toBe("payment-invoice-list");
+    expect(search("invoice-share")[0]?.toolName).toBe("invoice-share");
+    expect(search("Duplicate Invoice")[0]?.path.at(-1)).toBe("duplicate");
+  });
+  test("requires every catalog query term and ranks the exact title first", () => {
+    const tools = [
+      { ...catalogItem, toolName: "trialing", title: "Trialing accounts" },
+      {
+        ...catalogItem,
+        toolName: "revenue-trial-history",
+        description: "Starting balance",
+      },
+      { ...catalogItem, toolName: "coa-trial-balance", title: "Trial balance" },
+    ];
+    expect(
+      searchCatalog(tools, "trial balance", (r) => r.toolName).map(
+        (r) => r.toolName,
+      ),
+    ).toEqual(["coa-trial-balance", "revenue-trial-history"]);
+  });
   test("finds an unpinned tool by its localized short title and honors web and role boundaries", () => {
     const tools: EndpointMeta[] = [
       catalogItem,
@@ -358,4 +386,234 @@ describe("workspace company", () => {
     ).toBeUndefined();
     expect(applyWorkspaceCompany(invoiceList.GET, explicit)).toBe(explicit);
   });
+});
+
+describe("platform admin landing metadata", () => {
+  const category: CategoryDefinitionSerialized = {
+    key: "billing",
+    label: "Fakturácia",
+    labels: { "sk-SK": "Fakturácia" },
+    group: "billing",
+    icon: "receipt",
+    order: 1,
+    landing: {
+      actions: ["fixture-removed", "fixture-admin", "fixture-bill"],
+      heading: { "sk-SK": "Fakturácia" },
+      destinationDescriptions: {
+        "fixture-bill": { "sk-SK": "Skontrolujte doručené faktúry." },
+      },
+      destinations: ["fixture-bill", "fixture-invoice", "fixture-admin"],
+      overview: { alias: "fixture-removed", scope: "company" },
+    },
+    descriptions: { "sk-SK": "Prehľad fakturácie a dodávateľských dokladov." },
+    createActions: ["fixture-create"],
+  };
+  const operations: EndpointMeta[] = [
+    {
+      ...catalogItem,
+      category: "billing",
+      toolName: "fixture-only-admin",
+      aliases: ["fixture-admin"],
+      title: "Spravovať fakturáciu",
+      titleShort: "",
+    },
+    {
+      ...catalogItem,
+      category: "billing",
+      toolName: "fixture-invoice",
+      aliases: ["fixture-bill"],
+      title: "Dodávateľské faktúry",
+      titleShort: "",
+      allowedRoles: [UserPermissionRole.CUSTOMER, UserPermissionRole.ADMIN],
+    },
+  ];
+
+  test("adds new permitted tools and drops removed declarations and orphan routes", () => {
+    const adminOps = filterMetaForUser(
+      operations,
+      Platform.NEXT_PAGE,
+      adminUser,
+    );
+    const initial = getAdminCategoryLandings([category], adminOps).billing;
+    expect(initial?.actions).toEqual([]);
+    expect(initial?.destinations).toEqual([
+      { alias: "fixture-bill", title: "Dodávateľské faktúry" },
+      { alias: "fixture-admin", title: "Spravovať fakturáciu" },
+    ]);
+    expect(
+      getAdminCategoryLandings([category], adminOps).billing?.overview,
+    ).toBeUndefined();
+    const added = {
+      ...catalogItem,
+      category: "billing",
+      toolName: "fixture-new",
+      aliases: ["fixture-removed"],
+      title: "Nový nástroj",
+      titleShort: "",
+    };
+    const current = [...adminOps, added];
+    expect(
+      getAdminCategoryLandings([category], current).billing?.destinations.map(({ alias }) => alias),
+    ).toContain("fixture-removed");
+    expect(
+      getAdminCategoryLandings([category], current).billing?.overview?.alias,
+    ).toBe("fixture-removed");
+    expect(
+      buildAdminCatalogDestinations(current)["fixture-removed"]?.category,
+    ).toBe("billing");
+    expect(
+      buildAdminCatalogDestinations(current)["fixture-new"]?.category,
+    ).toBe("billing");
+    expect(
+      buildAdminCatalogDestinations([
+        {
+          ...added,
+          path: ["fixture", "report"],
+          aliases: ["fixture-a", "fixture-b"],
+        },
+      ])["fixture/report/GET"]?.category,
+    ).toBe("billing");
+    expect(
+      buildAdminCatalogDestinations([
+        { ...added, aliases: ["fixture-a", "fixture-b"] },
+      ])["fixture-b"]?.category,
+    ).toBe("billing");
+    expect(
+      buildAdminCatalogDestinations(adminOps)["fixture-removed"],
+    ).toBeUndefined();
+  });
+
+  test("keeps the embedded summary out of destinations under each of its aliases", () => {
+    const landing = getAdminCategoryLandings([{
+      ...category,
+      landing: {
+        summary: { alias: "fixture-bill", scope: "platform" },
+        overview: { alias: "fixture-admin", scope: "platform" },
+        destinations: ["fixture-invoice", "fixture-bill"],
+      },
+    }], operations).billing;
+    expect(landing?.summary?.alias).toBe("fixture-bill");
+    expect(landing?.destinations.map(({ alias }) => alias)).toEqual(["fixture-admin"]);
+  });
+  test("fills undeclared landing destinations from the current permitted definitions", () => {
+    const newList: EndpointMeta = {
+      ...catalogItem,
+      category: "billing",
+      toolName: "fixture-account-list",
+      aliases: [],
+      titleShort: "Settlement accounts",
+      path: ["settlements", "list"],
+    };
+    const withList = getAdminCategoryLandings([category], [...operations, newList]);
+    expect(withList.billing?.destinations).toContainEqual({
+      alias: newList.toolName, title: "Settlement accounts",
+    });
+    const afterRemoval = getAdminCategoryLandings([category], operations);
+    expect(afterRemoval.billing?.destinations.map(({alias}) => alias)).not.toContain(newList.toolName);
+  });
+
+  test("drops denied actions per effective role and leaves a permitted peer visible", () => {
+    const customer = resolveEffectiveUser(
+      adminUser,
+      UserPermissionRole.CUSTOMER,
+    );
+    const web = filterMetaForUser(operations, Platform.NEXT_PAGE, customer);
+    const landing = getAdminCategoryLandings([category], web).billing;
+    expect(landing?.actions).toEqual([]);
+    expect(landing?.destinations).toEqual([
+      { alias: "fixture-bill", title: "Dodávateľské faktúry" },
+    ]);
+    expect(buildAdminCatalogDestinations(web)["fixture-admin"]).toBeUndefined();
+    expect(buildAdminCatalogDestinations(web)["fixture-bill"]?.category).toBe(
+      "billing",
+    );
+  });
+
+  test("localizes the landing and suppresses records, hidden links and undeclared create actions", () => {
+    const extraTools: EndpointMeta[] = [
+      {
+        ...catalogItem,
+        category: "billing",
+        toolName: "fixture-create",
+        aliases: [],
+        path: ["fixture", "create"],
+        method: "POST",
+      },
+      {
+        ...catalogItem,
+        category: "billing",
+        toolName: "fixture-record",
+        aliases: [],
+        path: ["fixture", "[id]"],
+      },
+      {
+        ...catalogItem,
+        category: "billing",
+        toolName: "fixture-sync",
+        aliases: [],
+        path: ["fixture", "sync"],
+        method: "POST",
+      },
+      {
+        ...catalogItem,
+        category: "billing",
+        toolName: "fixture-debug",
+        aliases: [],
+        path: ["fixture", "debug"],
+      },
+      {
+        ...catalogItem,
+        category: "billing",
+        toolName: "fixture-hidden",
+        aliases: [],
+        admin: { hidden: true },
+      },
+    ];
+    const landing = getAdminCategoryLandings(
+      [category],
+      [...operations, ...extraTools],
+      "sk-SK",
+    ).billing;
+    expect(landing?.description).toBe(
+      "Prehľad fakturácie a dodávateľských dokladov.",
+    );
+    expect(landing?.heading).toBe("Fakturácia");
+    expect(landing?.actions.map(({ alias }) => alias)).toEqual(["fixture-create"]);
+    expect(landing?.destinations[0]?.description).toBe("Skontrolujte doručené faktúry.");
+    expect(landing?.destinations.map(({ alias }) => alias)).toEqual([
+      "fixture-bill",
+      "fixture-admin",
+    ]);
+    expect(landing?.createActions.map(({ alias }) => alias)).toEqual([
+      "fixture-create",
+    ]);
+    expect(landing?.automations.map(({ alias }) => alias)).toEqual([
+      "fixture-sync",
+    ]);
+    expect(landing?.developerCount).toBe(1);
+  });
+
+  test("excludes destructive, actor-only and system tools from declared landing actions", () => {
+    const hidden = {
+      ...catalogItem,
+      category: "billing",
+      toolName: "fixture-automation",
+      titleShort: "Automate",
+      aliases: [],
+      path: ["fixtures", "sync"],
+      method: "POST",
+    };
+    const tools = [
+      hidden,
+      { ...hidden, toolName: "fixture-dev", path: ["fixtures", "debug"] },
+      { ...hidden, toolName: "fixture-remove", path: ["fixtures", "remove"], method: "DELETE" },
+      { ...hidden, toolName: "fixture-actor", path: ["fixtures", "create"], category: "accountSettings" },
+    ];
+    const landing = getAdminCategoryLandings([{
+      ...category,
+      landing: { actions: tools.map(({ toolName }) => toolName) },
+    }], [...operations, ...tools]).billing;
+    expect(landing?.actions).toEqual([]);
+  });
+
 });

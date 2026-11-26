@@ -90,6 +90,11 @@ export const translations: typeof enTranslations = {
         enterPhoneNumber: "Zadajte telefónne číslo",
         required: "Povinné",
         selectDate: "Vyberte dátum",
+        openCalendar: "Otvorte kalendár",
+        startDate: "Dátum začiatku",
+        endDate: "Dátum konca",
+        decreaseValue: "Znížte hodnotu",
+        increaseValue: "Zvýšte hodnotu",
         unknownFieldType: "Neznámy typ poľa",
       },
       entityPicker: {
@@ -136,6 +141,7 @@ export const translations: typeof enTranslations = {
       httpStatus: "Požiadavka na {{url}} zlyhala so stavom {{status}}",
       responseValidation: "Odpoveď servera neprešla overením: {{error}}",
       malformedResponse: "Odpoveď z {{url}} má nesprávny formát",
+      recordTimeout: "Načítanie záznamu trvá príliš dlho. Skúste to znova.",
       requestFailed: "Požiadavka na {{path}} zlyhala: {{error}}",
       /**
        * `reason` is the endpoint's own declared error-type description, already

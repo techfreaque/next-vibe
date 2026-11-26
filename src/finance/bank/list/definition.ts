@@ -101,6 +101,28 @@ const { GET } = createEndpoint({
         hidden: true,
         schema: z.string().optional(),
       }),
+      settings: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "adjustment.settings",
+        hidden: true,
+        schema: z
+          .object({
+            bookedCurrency: z.string(),
+            foreignCurrency: z.string().nullable(),
+            maxFxDifference: z.string().nullable(),
+            maxFxBps: z.number().nullable(),
+            maxDateDistanceDays: z.number(),
+            gainAccountId: z.uuid().nullable(),
+            lossAccountId: z.uuid().nullable(),
+            feeAccountId: z.uuid().nullable(),
+          })
+          .optional(),
+      }),
+      canManage: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "fields.confirm",
+        schema: z.boolean().optional(),
+      }),
       selectedCompanyName: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         label: "fields.company",

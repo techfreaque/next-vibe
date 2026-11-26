@@ -52,8 +52,9 @@ export const translations = {
       description: "Export leads created until this date",
     },
     includeMetadata: {
-      label: "Include Metadata",
-      description: "Include creation and update timestamps",
+      label: "Include technical metadata",
+      description:
+        "Add timestamps, IP address, device information, referral code and stored metadata.",
     },
     includeEngagementData: {
       label: "Include Engagement Data",
@@ -112,7 +113,8 @@ export const translations = {
     },
   },
   widget: {
-    exportLeads: "Export Leads",
+    prepareFile: "Prepare export",
+    exportLeads: "Export leads",
     import: "Import",
     viewList: "View List",
     importLeadsTitle: "Import Leads",
@@ -120,7 +122,7 @@ export const translations = {
     copyCsvTitle: "Copy CSV content to clipboard",
     generatingExport: "Generating export…",
     generatingExportHint: "This may take a moment for large datasets",
-    exportReady: "Export Ready",
+    exportReady: "Export ready",
     fileReadyToDownload: "Your file is ready to download",
     records: "Records",
     format: "Format",
@@ -132,7 +134,7 @@ export const translations = {
     nextSteps: "Next steps:",
     viewLeads: "View Leads",
     importLeads: "Import Leads",
-    configureExport: "Configure Export",
+    configureExport: "File options",
     configureExportHint:
       "Select format and filters below, then click Export to generate your file",
     formatLabel: "Format",
@@ -147,6 +149,18 @@ export const translations = {
     viewLeadsList: "View Leads List",
     excelSpreadsheet: "Excel Spreadsheet",
     csvFile: "CSV File",
+    description: "Choose a file format and filter the leads to export.",
+    changeFilters: "Change filters",
+    advancedFilters: "Advanced filters",
+    activeFilters: "{{count}} active",
+    exportFailed:
+      "The export could not be prepared. Your filters are still selected. Try again.",
+    retry: "Try again",
+    noMatchingRecords: "No leads match these filters",
+    noMatchingRecordsHint:
+      "Change or remove a filter and prepare the export again.",
+    fileDetails: "Records: {{count}} · {{size}}",
+    generatedAt: "Generated {{date}}",
   },
   enums: {
     exportFormat: {

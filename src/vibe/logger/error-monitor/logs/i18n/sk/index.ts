@@ -341,6 +341,8 @@ export const translations: typeof enTranslations = {
 
   widget: {
     kpi: {
+      unresolvedInScope: "Nevyriešené v tomto zobrazení",
+      unresolvedAllTimeLink: "Nevyriešené za celé obdobie: {{count}}",
       unresolvedMessages: "Správy: {{messages}} · výskyty: {{occurrences}}",
       unresolvedMatching: "Nevyriešené podľa filtrov: {{count}}",
       unresolved: "Nevyriešené triedy za celý čas",
@@ -428,6 +430,10 @@ export const translations: typeof enTranslations = {
       resolving: "Ukladá sa…",
     },
     filter: {
+      apply: "Použiť filtre",
+      more: "Filtre",
+      moreCount: "Filtre ({{count}})",
+      moreDescription: "Filtrujte podľa stavu, závažnosti alebo pôvodu.",
       fingerprint: "Trieda",
       endpoint: "Koncový bod",
       search: "Hľadať",

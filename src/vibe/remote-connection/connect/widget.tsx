@@ -24,13 +24,15 @@ import { AlertTriangle } from "next-vibe/ui/components/icons/AlertTriangle";
 import { CheckCircle2 } from "next-vibe/ui/components/icons/CheckCircle2";
 import { Link2 } from "next-vibe/ui/components/icons/Link2";
 import { Lock } from "next-vibe/ui/components/icons/Lock";
+import { Label } from "next-vibe/ui/components/label";
 import { SectionGroup } from "next-vibe/ui/components/section-group";
 import { Switch } from "next-vibe/ui/components/switch";
 import { P } from "next-vibe/ui/components/typography";
-import type { JSX } from "react";
+import { type JSX, useId } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
 
 import { UserPermissionRole } from "../../identity/roles/enum";
+import { SYNC_DOMAINS } from "../../realtime/core/sync-domain";
 import {
   useWidgetLocale,
   useWidgetLogger,
@@ -44,8 +46,6 @@ import { UrlFieldWidget } from "../../unified-ui/widgets/form-fields/url-field/w
 import { FormAlertWidget } from "../../unified-ui/widgets/interactive/form-alert/widget";
 import { NavigateButtonWidget } from "../../unified-ui/widgets/interactive/navigate-button/widget";
 import { SubmitButtonWidget } from "../../unified-ui/widgets/interactive/submit-button/widget";
-import type { SyncScope } from "../db";
-import type { SyncProviderInfo } from "../sync/providers/definition";
 import syncProvidersDefinitions from "../sync/providers/definition";
 import type definitions from "./definition";
 import { scopedTranslation } from "./i18n";
@@ -56,11 +56,18 @@ interface ConnectWidgetProps {
 
 function SyncScopeEditor({
   t,
+  schema,
 }: {
   t: ReturnType<typeof scopedTranslation.scopedT>["t"];
+  schema: ConnectWidgetProps["field"]["children"]["syncScope"]["schema"];
 }): JSX.Element {
-  const { setValue } = useFormContext();
-  const syncScope = useWatch({ name: "syncScope" }) as SyncScope | undefined;
+  const id = useId();
+  const { control, getValues, setValue } =
+    useFormContext<(typeof definitions.POST.types)["RequestOutput"]>();
+  const watchedScope = schema.safeParse(
+    useWatch({ control, name: "syncScope" }) ?? {},
+  );
+  const syncScope = watchedScope.success ? watchedScope.data : schema.parse({});
   const user = useWidgetUser();
   const logger = useWidgetLogger();
   const syncProvidersEndpoint = useEndpoint(
@@ -69,22 +76,11 @@ function SyncScopeEditor({
     logger,
     user,
   );
-  const providers: SyncProviderInfo[] =
-    syncProvidersEndpoint.read?.data?.providers ?? [];
-
-  const current: Record<string, boolean> = {};
-  const scopeRecord = syncScope as Record<string, boolean | undefined> | null;
-  for (const p of providers) {
-    current[p.key] = scopeRecord?.[p.key] ?? false;
-  }
-
-  const toggle = (key: string): void => {
-    setValue(
-      "syncScope",
-      { ...current, [key]: !current[key] },
-      { shouldDirty: true },
-    );
-  };
+  const providers =
+    syncProvidersEndpoint.read?.data?.providers.flatMap((provider) => {
+      const domain = SYNC_DOMAINS.find((key) => key === provider.key);
+      return domain ? [{ ...provider, domain }] : [];
+    }) ?? [];
 
   if (providers.length === 0) {
     return <></>;
@@ -96,24 +92,43 @@ function SyncScopeEditor({
         {t("post.syncScope.description")}
       </P>
       <Div className="grid grid-cols-1 gap-2">
-        {providers.map((p) => (
-          <Div
-            key={p.key}
-            className="flex items-center justify-between rounded-md border px-3 py-2 bg-background"
-          >
-            <Div className="flex flex-col gap-0.5">
-              <P className="text-sm font-medium">{p.label}</P>
-              {p.description && (
-                <P className="text-xs text-muted-foreground">{p.description}</P>
-              )}
+        {providers.map(({ domain, label, description }) => {
+          const switchId = `${id}-${domain}`;
+          return (
+            <Div
+              key={domain}
+              className="flex min-w-0 items-center justify-between gap-3 rounded-md border px-3 py-2 bg-background"
+            >
+              <Div className="flex min-w-0 flex-col gap-1">
+                <Label
+                  htmlFor={switchId}
+                  className="cursor-pointer leading-snug"
+                >
+                  {label}
+                </Label>
+                {description && (
+                  <P className="text-xs text-muted-foreground">{description}</P>
+                )}
+              </Div>
+              <Switch
+                id={switchId}
+                aria-label={label}
+                checked={syncScope[domain]}
+                onCheckedChange={(checked) => {
+                  const latest = schema.safeParse(getValues("syncScope"));
+                  setValue(
+                    "syncScope",
+                    {
+                      ...(latest.success ? latest.data : syncScope),
+                      [domain]: checked,
+                    },
+                    { shouldDirty: true },
+                  );
+                }}
+              />
             </Div>
-            <Switch
-              checked={current[p.key] ?? false}
-              onCheckedChange={() => toggle(p.key)}
-              aria-label={p.label}
-            />
-          </Div>
-        ))}
+          );
+        })}
       </Div>
     </SectionGroup>
   );
@@ -200,7 +215,13 @@ export function RemoteConnectWidget({
             <Div className="col-span-2">
               <UrlFieldWidget
                 fieldName="remoteUrl"
-                field={field.children.remoteUrl}
+                field={{
+                  ...field.children.remoteUrl,
+                  theme: {
+                    ...field.children.remoteUrl.theme,
+                    descriptionStyle: "inline",
+                  },
+                }}
               />
             </Div>
 
@@ -233,7 +254,7 @@ export function RemoteConnectWidget({
             field={field.children.isInferenceProvider}
           />
 
-          <SyncScopeEditor t={t} />
+          <SyncScopeEditor t={t} schema={field.children.syncScope.schema} />
 
           <FormAlertWidget field={field.children.formAlert} />
 

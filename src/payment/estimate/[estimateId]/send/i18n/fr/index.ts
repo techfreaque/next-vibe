@@ -4,11 +4,11 @@ export const translations: typeof enTranslations = {
   category: "Devis",
   tags: { payment: "paiement", estimate: "devis" },
   post: {
-    title: "Envoyer le devis",
-    titleShort: "Envoyer le devis",
+    title: "Marquer le devis comme envoyé",
+    titleShort: "Marquer le devis comme envoyé",
     description: "Marquer le devis comme envoyé au client",
     form: {
-      title: "Envoyer le devis",
+      title: "Marquer le devis comme envoyé",
       description: "Marquer le devis comme envoyé au client",
     },
     response: { success: "Succès", message: "Message de statut" },
@@ -52,9 +52,8 @@ export const translations: typeof enTranslations = {
   estimateId: { label: "ID du devis", description: "Le devis concerné" },
   widget: {
     back: "Retour",
-    submit: "Envoyer le devis",
+    submit: "Marquer comme envoyé",
     sent: "Devis marqué comme envoyé au client.",
-    sendNote:
-      "Le devis passera au statut Envoyé. Le client pourra ensuite l'accepter ou le refuser.",
+    sendNote: "Confirmez que vous avez envoyé ce devis au client.",
   },
 };

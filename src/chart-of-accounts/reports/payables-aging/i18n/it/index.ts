@@ -61,6 +61,7 @@ export const translations: typeof enTranslations = {
       "Le fatture contestate sono escluse dai totali delle fatture approvate e in attesa.",
   },
   widget: {
+    showBills: "Vedi fatture",
     asOf: "Situazione al {{date}}",
     back: "Indietro",
     loading: "Caricamento dei debiti verso fornitori",

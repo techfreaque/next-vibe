@@ -1,11 +1,5 @@
 "use client";
 
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "next-vibe/ui/components/accordion";
 import { Badge } from "next-vibe/ui/components/badge";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
@@ -21,7 +15,6 @@ import { H1, H2, P } from "next-vibe/ui/components/typography";
 import type { JSX, ReactNode } from "react";
 import { useState } from "react";
 
-import type { WorkspaceCompany } from "@/companies/_shared/workspace-company";
 import { ADMIN_GROUPS } from "@/generated/categories/registry";
 
 import type { CountryLanguage } from "../core/i18n/core/config";
@@ -35,7 +28,6 @@ import type {
   HelpGetResponseOutput,
   HelpToolMetadataSerialized,
 } from "./definition";
-import { ErpCatalogIntro, ErpCatalogWorkflows } from "./erp-catalog";
 import type { HelpT } from "./i18n";
 import { localizedLabel } from "./localized-label";
 
@@ -53,45 +45,50 @@ function categoryLabel(
     : key;
 }
 
-function RecordSearch({
+export function RecordSearch({
   targets,
   onSearch,
   t,
+  embedded = false,
 }: {
   targets: readonly { label: string; alias: string; field: string }[];
   onSearch: (alias: string, field: string, value: string) => void;
   t: HelpT;
+  embedded?: boolean;
 }): JSX.Element {
   const [draft, setDraft] = useState("");
   const value = draft.trim();
 
-  return (
-    <SectionGroup title={t("catalog.findRecord")}>
-      <Div className="flex flex-wrap items-end gap-2">
-        <Input
-          type="text"
-          value={draft}
-          autoComplete="off"
-          maxLength={200}
-          onChange={(event) => setDraft(event.target.value)}
-          aria-label={t("catalog.recordPlaceholder")}
-          placeholder={t("catalog.recordPlaceholder")}
-          className="min-w-0 basis-56 grow"
-        />
-        {targets.map((target) => (
-          <Button
-            key={target.alias}
-            type="button"
-            variant="outline"
-            disabled={!value}
-            onClick={() => onSearch(target.alias, target.field, value)}
-          >
-            {target.label}
-            <ArrowRight className="size-4" />
-          </Button>
-        ))}
-      </Div>
-    </SectionGroup>
+  const fields = (
+    <Div className="flex flex-wrap items-end gap-2">
+      <Input
+        type="text"
+        value={draft}
+        autoComplete="off"
+        maxLength={200}
+        onChange={(event) => setDraft(event.target.value)}
+        aria-label={t("catalog.recordPlaceholder")}
+        placeholder={t("catalog.recordPlaceholder")}
+        className="min-w-0 basis-56 grow"
+      />
+      {targets.map((target) => (
+        <Button
+          key={target.alias}
+          type="button"
+          variant="outline"
+          disabled={!value}
+          onClick={() => onSearch(target.alias, target.field, value)}
+        >
+          {target.label}
+          <ArrowRight className="size-4" />
+        </Button>
+      ))}
+    </Div>
+  );
+  return embedded ? (
+    fields
+  ) : (
+    <SectionGroup title={t("catalog.findRecord")}>{fields}</SectionGroup>
   );
 }
 
@@ -108,10 +105,6 @@ export function AdminCatalog({
   search,
   layoutControls,
   recordSearchTargets,
-  erpWorkflowAliases,
-  activeCompany,
-  hasNoCompany,
-  accountingOverview,
   overview,
   loading,
   error,
@@ -137,10 +130,6 @@ export function AdminCatalog({
   recordSearchTargets: NonNullable<
     HelpGetResponseOutput["recordSearchTargets"]
   >;
-  erpWorkflowAliases?: readonly string[];
-  activeCompany?: WorkspaceCompany;
-  hasNoCompany: boolean;
-  accountingOverview?: ReactNode;
   /** Business overview report on the catalog root. */
   overview?: ReactNode;
   loading: boolean;
@@ -180,24 +169,10 @@ export function AdminCatalog({
   }
 
   const isCatalogRoot = !activeCategory && !isSearching;
-  const erpAvailable =
-    isCatalogRoot && erpWorkflowAliases?.length
-      ? new Set(erpWorkflowAliases)
-      : undefined;
-  const showOverview = !!overview && isCatalogRoot;
-  const showOverviewFirst = showOverview && !erpAvailable;
+  const showOverviewFirst = !!overview && isCatalogRoot;
 
   return (
     <Div className="@container mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 pb-8 pt-6 sm:px-8">
-      {erpAvailable && (
-        <ErpCatalogIntro
-          available={erpAvailable}
-          t={t}
-          onOpenTool={onOpenTool}
-          hasActiveCompany={!!activeCompany}
-          hasNoCompany={hasNoCompany}
-        />
-      )}
       {showOverviewFirst && (
         <Div className="flex flex-col gap-3">
           <Div className="flex flex-wrap items-center justify-between gap-3">
@@ -209,60 +184,32 @@ export function AdminCatalog({
           {overview}
         </Div>
       )}
-      {!erpAvailable && (
-        <Div className="flex flex-col gap-3">
-          {activeLabel && (
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              className="self-start gap-1 -ml-2"
-              onClick={() => onSelectCategory()}
-            >
-              <ChevronRight className="size-4 rotate-180" />
-              {t("catalog.title")}
-            </Button>
-          )}
-          {showOverviewFirst ? (
-            <H2 className="min-w-0 break-words pt-2 text-lg font-semibold">
-              {t("catalog.allTools")}
-            </H2>
-          ) : (
-            <Div className="flex flex-wrap items-center justify-between gap-3">
-              <H1 className="min-w-0 break-words text-2xl font-semibold sm:text-3xl">
-                {activeLabel ?? t("catalog.title")}
-              </H1>
-              {layoutControls}
-            </Div>
-          )}
-        </Div>
-      )}
-      {erpAvailable && accountingOverview}
-      {erpAvailable && (
-        <ErpCatalogWorkflows
-          available={erpAvailable}
-          t={t}
-          onOpenTool={onOpenTool}
-        />
-      )}
-      {erpAvailable && showOverview && (
-        <Accordion collapsible className="rounded-lg border bg-card px-4">
-          <AccordionItem value="overview" className="border-0">
-            <AccordionTrigger className="min-h-11 py-3 text-start font-semibold">
-              {t("catalog.overview")}
-            </AccordionTrigger>
-            <AccordionContent className="pb-4">{overview}</AccordionContent>
-          </AccordionItem>
-        </Accordion>
-      )}
-      {erpAvailable && (
-        <Div className="flex flex-wrap items-start justify-between gap-2">
-          <H2 className="min-w-0 break-words border-0 pb-0 text-lg font-semibold">
+      <Div className="flex flex-col gap-3">
+        {activeLabel && (
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="self-start gap-1 -ml-2"
+            onClick={() => onSelectCategory()}
+          >
+            <ChevronRight className="size-4 rotate-180" />
+            {t("catalog.title")}
+          </Button>
+        )}
+        {showOverviewFirst ? (
+          <H2 className="min-w-0 break-words pt-2 text-lg font-semibold">
             {t("catalog.allTools")}
           </H2>
-          {layoutControls}
-        </Div>
-      )}
+        ) : (
+          <Div className="flex flex-wrap items-center justify-between gap-3">
+            <H1 className="min-w-0 break-words text-2xl font-semibold sm:text-3xl">
+              {activeLabel ?? t("catalog.title")}
+            </H1>
+            {layoutControls}
+          </Div>
+        )}
+      </Div>
       <Div key="catalog-search">{search}</Div>
       {isCatalogRoot && recordSearchTargets.length > 0 && (
         <RecordSearch
@@ -348,11 +295,7 @@ export function AdminCatalog({
           ) : (
             <Div className="grid min-w-0 gap-2 lg:grid-cols-2">
               {tools.map((tool) => {
-                const title =
-                  tool.titleShort ??
-                  tool.title ??
-                  tool.aliases?.[0] ??
-                  tool.name;
+                const title = tool.titleShort ?? tool.title ?? t("admin.tool");
                 const canOpen =
                   !tool.platforms ||
                   tool.platforms.includes(Platform.NEXT_PAGE);

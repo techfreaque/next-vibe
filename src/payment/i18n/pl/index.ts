@@ -963,9 +963,17 @@ export const translations: typeof enTranslations = {
 
   // Get payment endpoint
   get: {
-    title: "Pobierz informacje o płatności",
+    title: "Twoje płatności",
     titleShort: "Płatności",
-    description: "Pobierz transakcje płatnicze i metody płatności",
+    description: "Do dziesięciu ostatnich transakcji na Twoim koncie.",
+    summary: {
+      empty: "Brak płatności",
+      emptyDescription: "Tutaj pojawią się Twoje płatności.",
+      loading: "Wczytywanie płatności…",
+      error: "Nie udało się wczytać płatności",
+      retry: "Spróbuj ponownie",
+      amountUnavailable: "Kwota niedostępna",
+    },
     form: {
       title: "Zapytanie o płatność",
       description: "Zapytaj o informacje o płatności",

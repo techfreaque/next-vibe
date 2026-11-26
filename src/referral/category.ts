@@ -22,9 +22,28 @@ export const category: CategoryDefinition = {
     "es-ES": "Referidos",
     "sk-SK": "Odporúčania",
   },
-  group: "business",
+  description: {
+    "en-US": "Review referral earnings and outstanding payouts.",
+    "en-GLOBAL": "Review referral earnings and outstanding payouts.",
+    "de-DE": "Prüfen Sie Empfehlungsprovisionen und offene Auszahlungen.",
+    "pl-PL": "Sprawdź prowizje za polecenia i kwoty do wypłaty.",
+    "fr-FR":
+      "Consultez les commissions de parrainage et les versements en attente.",
+    "it-IT": "Verifichi le commissioni sugli inviti e i pagamenti in sospeso.",
+    "es-ES":
+      "Revise las comisiones por recomendaciones y los pagos pendientes.",
+    "sk-SK": "Skontrolujte provízie za odporúčania a sumy na vyplatenie.",
+  },
+  group: "billing",
   icon: "share-2",
   order: 60,
+  landing: {
+    actions: [
+      "referral-overview",
+      "referral_admin_payouts_GET",
+      "referral-code-report",
+    ],
+  },
   defaultEntry: {
     [UserPermissionRole.ADMIN]: REFERRAL_OVERVIEW_ALIAS,
     [UserPermissionRole.CUSTOMER]: REFERRAL_STATS_ALIAS,

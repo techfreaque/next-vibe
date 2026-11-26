@@ -23,6 +23,7 @@ export const translations: typeof enTranslations = {
     addTags: "Tags hinzufügen",
     addCustomValue: "'{{value}}' hinzufügen",
     required: "Erforderlich",
+    callingCode: "Ländervorwahl {{prefix}}",
     enterPhoneNumber: "Telefonnummer eingeben",
     unknownFieldType: "Unbekannter Feldtyp",
     selectDate: "Datum auswählen",
@@ -55,6 +56,8 @@ export const translations: typeof enTranslations = {
       copyCode: "Code kopieren",
     },
     multiSelect: {
+      search: "Optionen suchen",
+      remove: "{{label}} entfernen",
       placeholder: "Elemente auswählen...",
       noResultsFound: "Keine Ergebnisse gefunden",
     },

@@ -88,6 +88,11 @@ export const translations = {
         enterPhoneNumber: "Enter phone number",
         required: "Required",
         selectDate: "Select date",
+        openCalendar: "Open calendar",
+        startDate: "Start date",
+        endDate: "End date",
+        decreaseValue: "Decrease value",
+        increaseValue: "Increase value",
         unknownFieldType: "Unknown field type",
       },
       entityPicker: {
@@ -134,6 +139,7 @@ export const translations = {
       httpStatus: "Request to {{url}} failed with status {{status}}",
       responseValidation: "Server response failed validation: {{error}}",
       malformedResponse: "Malformed response from {{url}}",
+      recordTimeout: "This record took too long to load. Try again.",
       requestFailed: "Request to {{path}} failed: {{error}}",
       /**
        * `reason` is the endpoint's own declared error-type description, already

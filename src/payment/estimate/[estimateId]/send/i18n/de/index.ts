@@ -4,11 +4,11 @@ export const translations: typeof enTranslations = {
   category: "Angebote",
   tags: { payment: "zahlung", estimate: "angebot" },
   post: {
-    title: "Angebot versenden",
-    titleShort: "Angebot senden",
+    title: "Angebot als versendet markieren",
+    titleShort: "Angebot als versendet markieren",
     description: "Angebot als an Kunden versendet markieren",
     form: {
-      title: "Angebot versenden",
+      title: "Angebot als versendet markieren",
       description: "Angebot als an Kunden versendet markieren",
     },
     response: { success: "Erfolgreich", message: "Statusmeldung" },
@@ -55,9 +55,9 @@ export const translations: typeof enTranslations = {
   },
   widget: {
     back: "Zurück",
-    submit: "Angebot senden",
+    submit: "Als versendet markieren",
     sent: "Angebot als an den Kunden versendet markiert.",
     sendNote:
-      "Der Status des Angebots wird auf 'Versendet' gesetzt. Der Kunde kann es dann annehmen oder ablehnen.",
+      "Erfassen Sie, dass Sie das Angebot an den Kunden versendet haben.",
   },
 };

@@ -589,6 +589,7 @@ export const translations: typeof enTranslations = {
         "Saisissez l’adresse e-mail exacte du compte ou l’identifiant utilisateur.",
       renewsOn: "Renouvellement le {{date}}",
       endsOn: "Prend fin le {{date}}",
+      packBalance: "Crédits des packs",
       freeBalance: "Crédits gratuits",
       balanceSplit:
         "{{total}} au total · {{paid}} en packs · {{free}} gratuits",
@@ -627,7 +628,7 @@ export const translations: typeof enTranslations = {
     },
     post: {
       stepTwo: "Étape 2 sur 2 : montant",
-      testerPreset: "3 000 (testeur)",
+      testerPreset: "Utiliser {{amount}} crédits",
       preview: "Solde {{before}} → {{after}} (+{{amount}})",
       title: "Ajouter des crédits",
       titleShort: "Ajouter des crédits",
@@ -647,8 +648,8 @@ export const translations: typeof enTranslations = {
       },
       amount: {
         label: "Montant en crédits",
-        description: "Saisissez un nombre entier de crédits bonus.",
-        placeholder: "137",
+        description: "Saisissez au moins 1 crédit, en nombre entier.",
+        placeholder: "p. ex. 25",
       },
       packType: {
         label: "Type de pack",

@@ -17,7 +17,6 @@ import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
 import {
   objectField,
   requestField,
-  requestUrlPathParamsField,
   responseField,
 } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
@@ -47,9 +46,9 @@ const { POST } = createEndpoint({
 
   fields: customWidgetObject({
     render: OrderLineAddWidgetLazy,
-    usage: { request: "data&urlPathParams", response: true },
+    usage: { request: "data", response: true },
     children: {
-      poId: requestUrlPathParamsField(scopedTranslation, {
+      poId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
         listEndpoint: async () =>
@@ -194,11 +193,9 @@ const { POST } = createEndpoint({
   },
 
   examples: {
-    urlPathParams: {
-      default: { poId: "789e1234-e89b-12d3-a456-426614174000" },
-    },
     requests: {
       default: {
+        poId: "789e1234-e89b-12d3-a456-426614174000",
         productId: undefined,
         itemDescription: "Office chairs",
         quantity: 10,

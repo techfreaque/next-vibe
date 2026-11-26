@@ -12,13 +12,19 @@ import { z } from "zod";
 
 import { dateSchema } from "../../core/definition/common.schema";
 import { FieldDataType, WidgetType } from "../../core/definition/enums";
+import type { CountryLanguage } from "../../core/i18n/core/config";
 import { lazyWidget } from "../../unified-ui/_shared/lazy-widget";
 import { customWidgetObject } from "../../unified-ui/_shared/utils";
 import {
   requestField,
   responseField,
 } from "../../unified-ui/_shared/utils-i18n";
-import { GraphResolution, GraphResolutionDB } from "../enum";
+import {
+  GraphResolution,
+  GraphResolutionDB,
+  GraphResolutionOptions,
+} from "../enum";
+import { scopedTranslation } from "../i18n";
 
 // ─── Core Data Types ─────────────────────────────────────────────────────────
 
@@ -179,7 +185,11 @@ export function resolutionRequestField<TST extends AnyScoped>(
     label: TST["ScopedTranslationKey"];
     description: TST["ScopedTranslationKey"] | undefined;
     schema: z.ZodDefault<typeof ResolutionSchema>;
-    options: { value: string; label: string }[];
+    options: {
+      value: Resolution;
+      label: Resolution;
+      translateLabel: (locale: CountryLanguage) => string;
+    }[];
   }
 > {
   return requestField(st, {
@@ -188,9 +198,11 @@ export function resolutionRequestField<TST extends AnyScoped>(
     label: opts.label,
     description: opts.description,
     schema: ResolutionSchema.default(GraphResolution.ONE_DAY),
-    options: Object.values(GraphResolution).map((v) => ({
-      value: v,
-      label: v,
+    options: GraphResolutionOptions.map(({ value, label }) => ({
+      value,
+      label,
+      translateLabel: (locale: CountryLanguage) =>
+        scopedTranslation.scopedT(locale).t(label),
     })),
   });
 }

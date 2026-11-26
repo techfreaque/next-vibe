@@ -111,11 +111,14 @@ export function EstimateLineAddWidget({
   const taxRate = Number(form?.watch("taxRate") ?? 0);
   const description = String(form?.watch("description") ?? "");
 
-  const { lineTotal } = calculateInvoiceLine({
-    quantity: qty,
-    unitPrice,
-    taxRate,
-  });
+  const { lineTotal } = calculateInvoiceLine(
+    {
+      quantity: qty,
+      unitPrice,
+      taxRate,
+    },
+    detail?.lineSettlement,
+  );
 
   const handleProductSearch = (): void => {
     if (!searchQuery.trim()) {
@@ -300,6 +303,7 @@ export function EstimateLineAddWidget({
                     handleProductSearch();
                   }
                 }}
+                aria-label={t("widget.searchProduct")}
                 placeholder={t("widget.searchPlaceholder")}
                 className="flex-1"
               />

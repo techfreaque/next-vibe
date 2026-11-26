@@ -110,11 +110,14 @@ export const translations: typeof enTranslations = {
       "Réutilisez la même clé si vous réessayez ce paiement. Utilisez une nouvelle clé pour un autre encaissement.",
   },
   accountNodeId: {
-    label: "ID du compte comptable",
-    description: "Facultatif : compte comptable qui a reçu ce paiement",
-    placeholder: "Saisir l'ID du compte comptable",
+    label: "Compte de règlement",
+    description:
+      "Choisissez le compte bancaire ou la caisse qui a reçu le règlement.",
+    placeholder: "Choisir un compte",
+    automatic: "Utiliser le compte par défaut",
   },
   widget: {
+    details: "Détails du règlement",
     back: "Retour",
     submit: "Enregistrer le paiement",
     paymentRecorded: "Paiement enregistré.",

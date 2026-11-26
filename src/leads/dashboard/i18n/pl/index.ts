@@ -71,6 +71,12 @@ export const translations: typeof enTranslations = {
     },
   },
   widget: {
+    dashboardContext: "Pozyskiwanie leadów, konwersja i ostatnia aktywność.",
+    unnamedLead: "Lead bez nazwy",
+    attention: "Wymaga uwagi",
+    noAttention: "W tym okresie nie oznaczono grup sieciowych.",
+    flaggedAttention: "Oznaczone grupy sieciowe ({{count}})",
+    retry: "Spróbuj ponownie",
     reports: "Raporty",
     last7Days: "Ostatnie 7 dni",
     humanLeads: "Leady od ludzi",

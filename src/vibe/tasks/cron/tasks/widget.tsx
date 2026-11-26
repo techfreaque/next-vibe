@@ -42,7 +42,13 @@ import {
 } from "next-vibe/ui/components/select";
 import { Span } from "next-vibe/ui/components/span";
 import { WidgetShell } from "next-vibe/ui/components/widget-shell";
-import React, { useCallback, useMemo, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 import type { CountryLanguage } from "../../../core/i18n/core/config";
 import { getDefaultTimezone } from "../../../core/i18n/core/localization-utils";
@@ -50,7 +56,8 @@ import type { EndpointLogger } from "../../../logger/types";
 import { cn } from "../../../unified-ui/_shared/cn";
 import { useRelatedEntityNavigation } from "../../../unified-ui/_shared/related-entities";
 import {
-  useWidgetContext,
+  useWidgetEndpoint,
+  useWidgetEndpointMutations,
   useWidgetForm,
   useWidgetLocale,
   useWidgetLogger,
@@ -61,6 +68,7 @@ import {
   useWidgetValue,
 } from "../../../unified-ui/_shared/use-widget-context";
 import { useApiMutation } from "../../../unified-ui/hooks/use-api-mutation";
+import { useApiQuery } from "../../../unified-ui/hooks/use-api-query";
 import { FormAlertWidget } from "../../../unified-ui/widgets/interactive/form-alert/widget";
 import { NavigateButtonWidget } from "../../../unified-ui/widgets/interactive/navigate-button/widget";
 import { formatCronScheduleShort } from "../../cron-formatter";
@@ -576,19 +584,64 @@ function BulkToolbar({
 
 export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
   const children = field.children;
-  const data = useWidgetValue<typeof endpoints.GET>();
-  const { endpointMutations } = useWidgetContext();
+  const initialData = useWidgetValue<typeof endpoints.GET>();
+  const initialError = useWidgetResponse()?.success === false;
+  const endpoint = useWidgetEndpoint<typeof endpoints.GET>();
+  const endpointMutations = useWidgetEndpointMutations();
   const { push: navigate } = useWidgetNavigation();
   const navigateRelated = useRelatedEntityNavigation();
   const t = useWidgetTranslation<typeof endpoints.GET>();
   const locale = useWidgetLocale();
-  const { t: tTasks } = tasksScopedTranslation.scopedT(locale);
-  const form = useWidgetForm<typeof endpoints.GET>();
-
-  const hasError = useWidgetResponse()?.success === false;
-  const isLoading = !hasError && (!data || endpointMutations?.read?.isLoading);
   const logger = useWidgetLogger();
   const user = useWidgetUser();
+  const { t: tTasks } = tasksScopedTranslation.scopedT(locale);
+  const form = useWidgetForm<typeof endpoints.GET>();
+  const [filters, setFilters] = useState<RequestOutput>();
+  const filterTimer = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined,
+  );
+
+  useEffect(
+    () => (): void => {
+      clearTimeout(filterTimer.current);
+    },
+    [],
+  );
+
+  const scheduleFilterSubmit = useCallback((): void => {
+    clearTimeout(filterTimer.current);
+    filterTimer.current = setTimeout((): void => {
+      const parsed = endpoint.requestSchema.safeParse(form.getValues());
+      if (parsed.success) {
+        setFilters(parsed.data);
+      }
+    }, 300);
+  }, [endpoint.requestSchema, form]);
+
+  const filteredRead = useApiQuery({
+    endpoint,
+    requestData: filters ?? form.getValues(),
+    options: {
+      enabled: filters !== undefined,
+      queryKey: JSON.stringify([
+        "cron-task-directory",
+        user.isPublic ? null : user.id,
+        filters,
+      ]),
+    },
+    logger,
+    user,
+  });
+  const data = filters ? filteredRead.data : initialData;
+  const hasError = filters ? filteredRead.isError : initialError;
+  const isLoading =
+    !hasError &&
+    (!data ||
+      (filters ? filteredRead.isLoading : endpointMutations?.read?.isLoading));
+
+  const refreshDirectory = filters
+    ? filteredRead.refetch
+    : endpointMutations?.read?.refetch;
 
   const tasks: Task[] = useMemo(() => data?.tasks ?? [], [data?.tasks]);
   const totalTasks = data?.totalTasks ?? 0;
@@ -709,23 +762,17 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
               import("../queue/definition"),
             ]);
             await Promise.all([
-              endpointMutations?.read?.refetch(),
+              refreshDirectory?.(),
               apiClient.refetchEndpoint(queue.default.GET, logger),
             ]);
           }
           return undefined;
         });
     },
-    [
-      selectedIds,
-      bulkMutation,
-      handleClearSelection,
-      endpointMutations,
-      logger,
-    ],
+    [selectedIds, bulkMutation, handleClearSelection, refreshDirectory, logger],
   );
 
-  // ── Helper: update form fields - auto-submit handles the refetch ─────────
+  // ── Apply the filter changes together after the editing pause ─────────────
   const patchForm = useCallback(
     (
       patch: Partial<(typeof endpoints.GET)["types"]["RequestOutput"]>,
@@ -763,8 +810,9 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
           shouldTouch: true,
         });
       }
+      scheduleFilterSubmit();
     },
-    [form, handleClearSelection],
+    [form, handleClearSelection, scheduleFilterSubmit],
   );
 
   // ── Status tab handler - updates server-side filters and refetches ───────
@@ -842,14 +890,15 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
         shouldDirty: true,
         shouldTouch: true,
       });
+      scheduleFilterSubmit();
     },
-    [form, handleClearSelection],
+    [form, handleClearSelection, scheduleFilterSubmit],
   );
 
   // ── Navigation handlers ──────────────────────────────────────────────────
   const handleRefresh = useCallback((): void => {
-    endpointMutations?.read?.refetch?.();
-  }, [endpointMutations]);
+    void refreshDirectory?.();
+  }, [refreshDirectory]);
 
   const handleNavigateStats = useCallback((): void => {
     void (async (): Promise<void> => {
@@ -1045,6 +1094,7 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
   const changePage = (newOffset: number): void => {
     handleClearSelection();
     form.setValue("offset", String(newOffset), { shouldDirty: true });
+    scheduleFilterSubmit();
   };
 
   // ── Render ────────────────────────────────────────────────────────────────
@@ -1181,6 +1231,7 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
         {/* Select-all checkbox */}
         <Checkbox
           checked={allFilteredSelected}
+          disabled={filteredTasks.length === 0}
           aria-label={t(
             allFilteredSelected
               ? "widget.bulk.clearSelection"
@@ -1208,6 +1259,7 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
                 shouldDirty: true,
                 shouldTouch: true,
               });
+              scheduleFilterSubmit();
             }}
             placeholder={t("widget.search.placeholder")}
             className="pl-8 h-8 text-sm"
@@ -1223,7 +1275,10 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
             )
           }
         >
-          <SelectTrigger className="h-8 w-auto min-w-[110px] text-xs">
+          <SelectTrigger
+            aria-label={t("get.fields.priority.label")}
+            className="h-8 w-auto min-w-[110px] text-xs"
+          >
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -1247,7 +1302,10 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
             )
           }
         >
-          <SelectTrigger className="h-8 w-auto min-w-[110px] text-xs">
+          <SelectTrigger
+            aria-label={t("get.fields.category.label")}
+            className="h-8 w-auto min-w-[110px] text-xs"
+          >
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -1273,9 +1331,13 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
               shouldDirty: true,
               shouldTouch: true,
             });
+            scheduleFilterSubmit();
           }}
         >
-          <SelectTrigger className="h-8 w-auto min-w-[120px] text-xs">
+          <SelectTrigger
+            aria-label={t("get.fields.sort.label")}
+            className="h-8 w-auto min-w-[120px] text-xs"
+          >
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -1349,7 +1411,16 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
         </Div>
       )}
 
-      <FormAlertWidget field={{ className: "m-4" }} />
+      {filters && filteredRead.error ? (
+        <Div
+          role="alert"
+          className="m-4 rounded-md border border-destructive/30 p-3 text-sm"
+        >
+          {filteredRead.error.message}
+        </Div>
+      ) : (
+        <FormAlertWidget field={{ className: "m-4" }} />
+      )}
 
       {/* ── Loading state ───────────────────────────────────────────── */}
       {isLoading && (

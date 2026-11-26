@@ -90,7 +90,10 @@ const { POST } = createEndpoint({
       }),
       deliveryWarehouseId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.UUID,
+        fieldType: FieldDataType.ENTITY_PICKER,
+        listEndpoint: async () =>
+          (await import("@/inventory/warehouse/list/definition")).default.GET,
+        labelField: "name",
         label: "orderCreate.deliveryWarehouseId.label" as const,
         description: "orderCreate.deliveryWarehouseId.description" as const,
         placeholder: "orderCreate.deliveryWarehouseId.placeholder" as const,

@@ -61,6 +61,7 @@ export const translations: typeof enTranslations = {
       "Sporné faktúry sa nezapočítavajú do súčtu schválených faktúr ani faktúr čakajúcich na schválenie.",
   },
   widget: {
+    showBills: "Zobraziť faktúry",
     asOf: "Stav k {{date}}",
     back: "Späť",
     loading: "Načítavajú sa záväzky…",

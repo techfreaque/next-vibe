@@ -9,6 +9,8 @@ export const translations = {
       description: "Enter the details of the expense",
     },
     errors: {
+      evidenceReview:
+        "Review the original supplier document before changing its allocation.",
       validation: {
         title: "Validation Error",
         description: "Check all fields",

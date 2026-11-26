@@ -14,6 +14,7 @@ import {
 } from "@/chart-of-accounts/enum";
 import { CompanyMemberRole } from "@/companies/enum";
 import { getInvoiceOpenBalanceParts } from "@/finance/document-balance";
+import { CompanyTaxRegime } from "@/tax/regime/enum";
 
 import { paymentInvoices } from "../db";
 import { InvoiceStatus, ManualPaymentMethod } from "../enum";
@@ -39,6 +40,7 @@ const logger = createEndpointLogger(false, defaultLocale);
 
 beforeAll(async () => {
   await pg.exec(`
+    CREATE TABLE company_tax_regimes (company_id uuid NOT NULL, effective_from date NOT NULL, regime text NOT NULL, recorded_by uuid, recorded_at timestamp DEFAULT now(), PRIMARY KEY (company_id, effective_from));
     CREATE TABLE companies (id uuid PRIMARY KEY, currency text, name text, is_active boolean);
     CREATE TABLE company_members (
       id uuid PRIMARY KEY DEFAULT gen_random_uuid(), company_id uuid, user_id uuid,
@@ -365,7 +367,7 @@ it("creates draft lines, totals and unique company references together", async (
       [invoice.id],
     );
     expect(rows).toEqual([
-      { description: "Planning", line_total: "123.6150" },
+      { description: "Planning", line_total: "123.6200" },
       { description: "Review", line_total: "11.0000" },
     ]);
   }
@@ -480,7 +482,8 @@ it("uses active company roles for invoice reads and writes regardless of the cre
     data: {
       id: invoiceId,
       canManage: true,
-      canCreateCreditNote: true,
+      // A draft invoice cannot be credited until it is issued.
+      canCreateCreditNote: false,
       recentReminders: [{ currency: "EUR", amount: "123.01" }],
     },
   });
@@ -732,4 +735,135 @@ it("searches linked and snapshotted customer names and paginates positive overdu
     }
   }
   expect(foundIds.toSorted()).toEqual([linked, saved].toSorted());
+});
+
+it("credits two separately rounded invoice lines, and reverses full credit at the stored amounts", async () => {
+  const { InvoiceCreateRepository } = await import("./create/repository");
+  const { InvoiceSendRepository } =
+    await import("./[invoiceId]/send/repository");
+  const { CreditNoteCreateRepository } =
+    await import("../credit-note/create/repository");
+  const line = {
+    description: "Catalogue page",
+    quantity: 1,
+    unitPrice: 1.07,
+    taxRate: 0.23,
+  };
+  for (const mode of ["partial", "full"] as const) {
+    const draft = await InvoiceCreateRepository.createInvoice(
+      ownerId,
+      { companyId, lineItems: [line, line] },
+      logger,
+    );
+    expect(draft.success).toBe(true);
+    if (!draft.success) return;
+    const invoiceId = draft.data.invoice.id;
+    expect(draft.data.invoice.amount).toBe("2.64");
+    expect(
+      (await InvoiceSendRepository.sendInvoice(ownerId, { invoiceId }, logger))
+        .success,
+    ).toBe(true);
+    const sourceCredit = {
+      companyId,
+      invoiceId,
+      reason: "Returned service",
+      lineItems: mode === "partial" ? [{ ...line, taxRate: 23 }] : undefined,
+    };
+    const first = await CreditNoteCreateRepository.createCreditNote(
+      ownerId,
+      sourceCredit,
+      logger,
+    );
+    expect(first.success).toBe(true);
+    if (!first.success) return;
+    expect(first.data.creditNote.amount).toBe(
+      mode === "partial" ? "-1.32" : "-2.64",
+    );
+    if (mode === "partial") {
+      const second = await CreditNoteCreateRepository.createCreditNote(
+        ownerId,
+        sourceCredit,
+        logger,
+      );
+      expect(second.success).toBe(true);
+      if (!second.success) return;
+      expect(second.data.creditNote.amount).toBe("-1.32");
+    }
+    const surplus = await CreditNoteCreateRepository.createCreditNote(
+      ownerId,
+      sourceCredit,
+      logger,
+    );
+    expect(surplus.success).toBe(false);
+    expect((await invoiceBalance(invoiceId)).amountDue).toBe(0);
+    const { rows } = await pg.query<{ vat: string; gross: string }>(
+      `SELECT sum(lines.tax_amount)::text AS vat, sum(lines.line_total)::text AS gross
+       FROM payment_invoices notes
+       JOIN payment_invoice_lines lines ON lines.invoice_id = notes.id
+       WHERE notes.metadata ->> 'originalInvoiceId' = $1`,
+      [invoiceId],
+    );
+    expect(rows).toEqual([{ vat: "-0.5000", gross: "-2.6400" }]);
+  }
+});
+
+it("carries the issued §19 notice into an exact zero-VAT full credit", async () => {
+  const { InvoiceCreateRepository } = await import("./create/repository");
+  const { InvoiceSendRepository } =
+    await import("./[invoiceId]/send/repository");
+  const { CreditNoteCreateRepository } =
+    await import("../credit-note/create/repository");
+  await pg.query(
+    "INSERT INTO company_tax_regimes (company_id, effective_from, regime) VALUES ($1, $2, $3)",
+    [companyId, today, CompanyTaxRegime.DE_SMALL_BUSINESS],
+  );
+  try {
+    const draft = await InvoiceCreateRepository.createInvoice(
+      ownerId,
+      {
+        companyId,
+        lineItems: [
+          {
+            description: "Catalogue page",
+            quantity: 1,
+            unitPrice: 0.025,
+            taxRate: 0,
+          },
+        ],
+      },
+      logger,
+    );
+    expect(draft.success).toBe(true);
+    if (!draft.success) return;
+    expect(draft.data.invoice.amount).toBe("0.03");
+    const invoiceId = draft.data.invoice.id;
+    expect(
+      (await InvoiceSendRepository.sendInvoice(ownerId, { invoiceId }, logger))
+        .success,
+    ).toBe(true);
+    const note = await CreditNoteCreateRepository.createCreditNote(
+      ownerId,
+      {
+        companyId,
+        invoiceId,
+        reason: "Returned service",
+      },
+      logger,
+    );
+    expect(note.success).toBe(true);
+    if (!note.success) return;
+    expect(note.data.creditNote.amount).toBe("-0.03");
+    const { rows } = await pg.query<{ amount: string; notice: string }>(
+      "SELECT line.tax_amount AS amount, invoice.metadata->>'taxExemptionNotice' AS notice FROM payment_invoices invoice JOIN payment_invoice_lines line ON invoice.id = line.invoice_id WHERE invoice.id = $1",
+      [note.data.creditNote.id],
+    );
+    expect(rows).toEqual([
+      { amount: "0.0000", notice: expect.stringContaining("§ 19") },
+    ]);
+  } finally {
+    await pg.query(
+      "DELETE FROM company_tax_regimes WHERE company_id = $1 AND effective_from = $2",
+      [companyId, today],
+    );
+  }
 });

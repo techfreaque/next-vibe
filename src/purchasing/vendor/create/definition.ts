@@ -7,19 +7,23 @@ import { createEndpoint } from "next-vibe/core/definition/create-i18n";
 import {
   EndpointErrorTypes,
   FieldDataType,
-  LayoutType,
   Methods,
   WidgetType,
 } from "next-vibe/core/definition/enums";
 import { UserRole } from "next-vibe/identity/roles/enum";
+import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
+import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
 import {
-  objectField,
   requestField,
   responseField,
 } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
 import { scopedTranslation } from "../../i18n";
+
+const VendorCreateWidgetLazy = lazyWidget(() =>
+  import("./widget").then((m) => ({ default: m.VendorCreateWidget })),
+);
 
 const { POST } = createEndpoint({
   scopedTranslation,
@@ -38,12 +42,8 @@ const { POST } = createEndpoint({
   ],
   allowedRoles: [UserRole.ADMIN] as const,
 
-  fields: objectField(scopedTranslation, {
-    type: WidgetType.CONTAINER,
-    title: "vendorCreate.post.title" as const,
-    description: "vendorCreate.post.description" as const,
-    layoutType: LayoutType.GRID,
-    columns: 12,
+  fields: customWidgetObject({
+    render: VendorCreateWidgetLazy,
     usage: { request: "data", response: true },
     children: {
       companyId: requestField(scopedTranslation, {

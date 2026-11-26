@@ -2,6 +2,8 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   analytics: {
+    review: "Verifica",
+    reviewItem: "Verifica {{item}}",
     range: {
       label: "Periodo",
       description: "Finestra temporale del report",
@@ -66,6 +68,11 @@ export const translations: typeof enTranslations = {
       filters: "Filtri",
       refresh: "Aggiorna",
       byGranularity: "per {{granularity}}",
+      groupedBy: {
+        day: "per giorno",
+        week: "per settimana",
+        month: "per mese",
+      },
     },
   },
 };

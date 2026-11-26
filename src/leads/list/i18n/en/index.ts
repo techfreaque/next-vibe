@@ -320,6 +320,7 @@ export const translations = {
     paid: "Paid",
     chatted: "Chatted",
     bot: "Bot",
+    listFilters: "Filters and sorting",
     analyticsFilters: "More filters",
     apply: "Apply",
   },

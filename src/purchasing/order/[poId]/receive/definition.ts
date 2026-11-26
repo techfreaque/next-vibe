@@ -49,6 +49,7 @@ const { POST } = createEndpoint({
     "tags.receive" as const,
   ],
   allowedRoles: [UserRole.ADMIN] as const,
+  options: { formOptions: { persistForm: false } },
 
   fields: customWidgetObject({
     render: OrderReceiveWidgetLazy,
@@ -65,9 +66,19 @@ const { POST } = createEndpoint({
           (await import("@/purchasing/order/list/definition")).default.GET,
         labelField: "poNumber",
       }),
-      warehouseId: requestField(scopedTranslation, {
+      receiptId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
+        label: "orderReceive.post.response.receiptId",
+        hidden: true,
+        schema: z.uuid().optional(),
+      }),
+      warehouseId: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.ENTITY_PICKER,
+        listEndpoint: async () =>
+          (await import("@/inventory/warehouse/list/definition")).default.GET,
+        labelField: "name",
         label: "orderReceive.post.warehouseId.label" as const,
         description: "orderReceive.post.warehouseId.description" as const,
         placeholder: "orderReceive.post.warehouseId.placeholder" as const,

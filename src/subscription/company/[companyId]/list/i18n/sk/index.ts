@@ -7,9 +7,9 @@ export const translations: typeof enTranslations = {
     list: "Zoznam",
   },
   get: {
-    title: "Predplatné spoločnosti",
-    titleShort: "Predplatné spoločnosti",
-    description: "Načíta všetky predplatné spoločnosti",
+    title: "Predplatné vlastníka",
+    titleShort: "Predplatné vlastníka",
+    description: "Zobrazte si osobné predplatné vlastníka firmy.",
     companyId: {
       label: "ID spoločnosti",
       description: "Spoločnosť, ktorej predplatné chcete zobraziť",

@@ -1,41 +1,47 @@
-/**
- * Leads Export Widget
- * Rich UI for lead export with download functionality
- */
-
 "use client";
 
 import { MimeType } from "next-vibe/identity/lead/enum";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "next-vibe/ui/components/accordion";
 import { Button } from "next-vibe/ui/components/button";
 import { Checkbox } from "next-vibe/ui/components/checkbox";
 import { Div } from "next-vibe/ui/components/div";
-import { ArrowRight } from "next-vibe/ui/components/icons/ArrowRight";
-import { CheckCircle } from "next-vibe/ui/components/icons/CheckCircle";
-import { Clock } from "next-vibe/ui/components/icons/Clock";
-import { Copy } from "next-vibe/ui/components/icons/Copy";
+import { EmptyBlock } from "next-vibe/ui/components/empty-block";
+import { FormAlert } from "next-vibe/ui/components/form/form-alert";
 import { Download } from "next-vibe/ui/components/icons/Download";
 import { FileText } from "next-vibe/ui/components/icons/FileText";
-import { List } from "next-vibe/ui/components/icons/List";
-import { Loader2 } from "next-vibe/ui/components/icons/Loader2";
-import { Upload } from "next-vibe/ui/components/icons/Upload";
-import { Input } from "next-vibe/ui/components/input";
 import { Label } from "next-vibe/ui/components/label";
+import { LoadingBlock } from "next-vibe/ui/components/loading-block";
+import { SectionGroup } from "next-vibe/ui/components/section-group";
 import { Span } from "next-vibe/ui/components/span";
-import { copyToClipboard } from "next-vibe/ui/lib/clipboard";
+import { WidgetShell } from "next-vibe/ui/components/widget-shell";
 import { downloadBinaryFile } from "next-vibe/ui/lib/download";
 import {
   useWidgetContext,
   useWidgetForm,
-  useWidgetLogger,
-  useWidgetNavigation,
+  useWidgetLocale,
   useWidgetOnSubmit,
+  useWidgetResponse,
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
+import {
+  AdminForm,
+  AdminFormSection,
+} from "next-vibe/unified-ui/widgets/containers/admin-form/widget";
+import {
+  pickerDateFromUtcDay,
+  utcDayFromPickerDate,
+} from "next-vibe/unified-ui/widgets/form-fields/date-field/calendar-date";
+import { DateFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/date-field/widget";
 import { SelectFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/select-field/widget";
 import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-field/widget";
 import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/navigate-button/widget";
-import React, { useCallback, useState } from "react";
+import { type JSX, useState } from "react";
 
 import type definition from "./definition";
 
@@ -43,342 +49,238 @@ interface CustomWidgetProps {
   field: (typeof definition.GET)["fields"];
 }
 
-function formatFileSize(base64Length: number): string {
-  const bytes = Math.round(base64Length * 0.75);
-  if (bytes < 1024) {
-    return `${bytes} B`;
-  }
-  const kb = Math.round(bytes / 1024);
-  if (kb < 1024) {
-    return `${kb} KB`;
-  }
-  const mb = (bytes / (1024 * 1024)).toFixed(1);
-  return `${mb} MB`;
+function decodedByteLength(base64: string): number {
+  const padding = base64.endsWith("==") ? 2 : base64.endsWith("=") ? 1 : 0;
+  return Math.floor((base64.length * 3) / 4) - padding;
 }
 
 export function LeadsExportContainer({
   field,
-}: CustomWidgetProps): React.JSX.Element {
-  const children = field.children;
+}: CustomWidgetProps): JSX.Element {
+  const { children } = field;
   const data = useWidgetValue<typeof definition.GET>();
+  const response = useWidgetResponse();
   const { endpointMutations } = useWidgetContext();
-  const { push: navigate } = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.GET>();
-  const logger = useWidgetLogger();
+  const locale = useWidgetLocale();
   const onSubmit = useWidgetOnSubmit();
   const form = useWidgetForm<typeof definition.GET>();
-  const isLoading = endpointMutations?.read?.isLoading;
+  const read = endpointMutations?.read;
+  const isLoading = read?.isFetching || read?.isLoading || false;
+  const failed = response?.success === false;
 
-  const dateFromRaw = form.watch("dateFrom");
-  const dateToRaw = form.watch("dateTo");
-  const dateFrom = dateFromRaw ? dateFromRaw.toISOString().slice(0, 10) : "";
-  const dateTo = dateToRaw ? dateToRaw.toISOString().slice(0, 10) : "";
-  const includeMetadata = form.watch("includeMetadata") ?? true;
+  const [openSection, setOpenSection] = useState("");
+
+  const filters = form
+    .watch(["status", "source", "country", "language", "dateFrom", "dateTo"])
+    .filter(Boolean).length;
+
+  const includeMetadata = form.watch("includeMetadata") ?? false;
   const includeEngagementData = form.watch("includeEngagementData") ?? false;
 
-  const [copied, setCopied] = useState(false);
-
-  const handleDownload = useCallback((): void => {
+  const handleDownload = (): void => {
     if (!data?.fileContent || !data.fileName || !data.mimeType) {
       return;
     }
-    const byteChars = atob(data.fileContent);
-    const byteArray = new Uint8Array(byteChars.length);
-    for (let i = 0; i < byteChars.length; i++) {
-      byteArray[i] = byteChars.charCodeAt(i);
+    const bytes = Uint8Array.from(atob(data.fileContent), (character) =>
+      character.charCodeAt(0),
+    );
+    downloadBinaryFile(
+      data.fileName,
+      bytes,
+      data.mimeType === MimeType.CSV
+        ? "text/csv;charset=utf-8"
+        : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    );
+  };
+
+  const handleRunExport = (): void => {
+    const end = utcDayFromPickerDate(
+      pickerDateFromUtcDay(form.getValues("dateTo")),
+    );
+    if (end) {
+      end.setUTCHours(23, 59, 59, 999);
+      form.setValue("dateTo", end);
     }
-    downloadBinaryFile(data.fileName, byteArray, data.mimeType);
-  }, [data]);
-
-  const handleCopyToClipboard = useCallback((): void => {
-    if (!data?.fileContent) {
-      return;
-    }
-    const text = atob(data.fileContent);
-    void copyToClipboard(text, logger).then(() => {
-      setCopied(true);
-      setTimeout(() => {
-        setCopied(false);
-      }, 2000);
-      return undefined;
-    });
-  }, [data, logger]);
-
-  const handleViewList = useCallback((): void => {
-    void (async (): Promise<void> => {
-      const listDef = await import("@/leads/list/definition");
-      navigate(listDef.default.GET);
-    })();
-  }, [navigate]);
-
-  const handleImport = useCallback((): void => {
-    void (async (): Promise<void> => {
-      const importDef = await import("@/leads/import/definition");
-      navigate(importDef.default.POST);
-    })();
-  }, [navigate]);
-
-  const handleRunExport = useCallback((): void => {
     if (onSubmit) {
       onSubmit();
     } else {
-      endpointMutations?.read?.refetch?.();
+      void read?.refetch();
     }
-  }, [onSubmit, endpointMutations]);
+  };
 
-  const isCsv = data?.mimeType === MimeType.CSV;
-
-  const fileLabel =
-    data?.mimeType === MimeType.XLSX
-      ? t("widget.excelSpreadsheet")
-      : t("widget.csvFile");
-
-  const exportedAtFormatted = data?.exportedAt
-    ? new Date(data.exportedAt).toLocaleString()
-    : null;
+  const actionLabel = isLoading
+    ? t("widget.generatingExport")
+    : failed
+      ? t("widget.retry")
+      : t("widget.prepareFile");
 
   return (
-    <Div className="flex flex-col gap-4 p-4">
-      {/* Header */}
-      <Div className="flex items-center gap-2 pb-2 border-b">
-        <NavigateButtonWidget field={children.backButton} />
-        <Div className="flex items-center gap-2 mr-auto">
-          <Download className="h-5 w-5 text-muted-foreground" />
-          <Span className="font-semibold text-base">
-            {t("widget.exportLeads")}
-          </Span>
-        </Div>
-        {/* Navigation shortcuts always visible in header */}
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={handleImport}
-          className="gap-1 text-xs"
-          title={t("widget.importLeadsTitle")}
-        >
-          <Upload className="h-4 w-4" />
-          {t("widget.import")}
-        </Button>
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={handleViewList}
-          className="gap-1 text-xs"
-          title={t("widget.viewLeadsListTitle")}
-        >
-          <List className="h-4 w-4" />
-          {t("widget.viewList")}
-        </Button>
-      </Div>
-
-      {/* Export configuration form */}
-      <Div className="rounded-lg border p-4 flex flex-col gap-3">
-        <Span className="text-sm font-semibold">
-          {t("widget.configureExport")}
-        </Span>
-        <Div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+    <Div className="mx-auto w-full min-w-0 max-w-3xl">
+      <AdminForm
+        title={t("widget.exportLeads")}
+        description={t("widget.description")}
+        backButton={<NavigateButtonWidget field={children.backButton} />}
+        alert={
+          failed && response.errorType.errorCode >= 500 ? (
+            <FormAlert
+              alert={{
+                variant: "destructive",
+                message: { message: t("widget.exportFailed") },
+              }}
+            />
+          ) : undefined
+        }
+        primaryAction={
+          <Button
+            type="button"
+            disabled={isLoading}
+            variant={data && !isLoading && !failed ? "outline" : "default"}
+            onClick={handleRunExport}
+            className="min-h-11 gap-2"
+          >
+            <FileText className="size-4" aria-hidden="true" />
+            {actionLabel}
+          </Button>
+        }
+      >
+        <AdminFormSection title={t("widget.configureExport")} columns={2}>
           <SelectFieldWidget fieldName="format" field={children.format} />
-          <SelectFieldWidget fieldName="status" field={children.status} />
-          <SelectFieldWidget fieldName="source" field={children.source} />
-          <SelectFieldWidget fieldName="country" field={children.country} />
-          <SelectFieldWidget fieldName="language" field={children.language} />
           <TextFieldWidget fieldName="search" field={children.search} />
-          <Div className="flex flex-col gap-1">
-            <Span className="text-xs text-muted-foreground">
-              {t(children.dateFrom.label)}
-            </Span>
-            <Input
-              type="date"
-              value={dateFrom}
-              onChange={(e) => {
-                form.setValue("dateFrom", new Date(e.target.value));
-              }}
-              className="h-9"
-            />
-          </Div>
-          <Div className="flex flex-col gap-1">
-            <Span className="text-xs text-muted-foreground">
-              {t(children.dateTo.label)}
-            </Span>
-            <Input
-              type="date"
-              value={dateTo}
-              onChange={(e) => {
-                form.setValue("dateTo", new Date(e.target.value));
-              }}
-              className="h-9"
-            />
-          </Div>
-        </Div>
-        <Div className="flex items-center gap-4 flex-wrap">
-          <Label className="flex items-center gap-2 cursor-pointer">
-            <Checkbox
-              checked={includeMetadata}
-              onCheckedChange={(checked) => {
-                form.setValue("includeMetadata", checked === true);
-              }}
-            />
-            <Span className="text-sm">{t(children.includeMetadata.label)}</Span>
-          </Label>
-          <Label className="flex items-center gap-2 cursor-pointer">
-            <Checkbox
-              checked={includeEngagementData}
-              onCheckedChange={(checked) => {
-                form.setValue("includeEngagementData", checked === true);
-              }}
-            />
-            <Span className="text-sm">
-              {t(children.includeEngagementData.label)}
-            </Span>
-          </Label>
-        </Div>
-        <Button
-          type="button"
-          variant="default"
-          size="sm"
-          onClick={handleRunExport}
-          className="self-start gap-1"
+        </AdminFormSection>
+
+        <Accordion
+          type="single"
+          collapsible
+          value={openSection}
+          onValueChange={(value) => {
+            setOpenSection(typeof value === "string" ? value : "");
+          }}
+          className="rounded-lg border bg-card"
         >
-          <Download className="h-4 w-4" />
-          {t("widget.download")}
-        </Button>
-      </Div>
+          <AccordionItem value="filters" className="border-0">
+            <AccordionTrigger className="min-h-11 gap-3 px-4 py-3 text-start">
+              <Span>{t("widget.advancedFilters")}</Span>
+              {filters > 0 && (
+                <Span className="ms-auto text-xs text-muted-foreground">
+                  {t("widget.activeFilters", {
+                    count: filters.toLocaleString(locale),
+                  })}
+                </Span>
+              )}
+            </AccordionTrigger>
+            <AccordionContent>
+              <Div className="grid min-w-0 grid-cols-1 gap-4 border-t p-4 @lg:grid-cols-2">
+                <SelectFieldWidget fieldName="status" field={children.status} />
+                <SelectFieldWidget fieldName="source" field={children.source} />
+                <SelectFieldWidget
+                  fieldName="country"
+                  field={children.country}
+                />
+                <SelectFieldWidget
+                  fieldName="language"
+                  field={children.language}
+                />
+                <DateFieldWidget
+                  localizedDate
+                  utcCalendarDay
+                  fieldName="dateFrom"
+                  field={children.dateFrom}
+                />
+                <DateFieldWidget
+                  localizedDate
+                  utcCalendarDay
+                  fieldName="dateTo"
+                  field={children.dateTo}
+                />
+                <Div className="grid grid-cols-1 gap-3 @lg:col-span-2 @lg:grid-cols-2">
+                  <Label className="flex min-h-11 cursor-pointer items-center gap-2">
+                    <Checkbox
+                      checked={includeMetadata}
+                      onCheckedChange={(checked) => {
+                        form.setValue("includeMetadata", checked === true);
+                      }}
+                    />
+                    <Span>{t(children.includeMetadata.label)}</Span>
+                  </Label>
+                  <Label className="flex min-h-11 cursor-pointer items-center gap-2">
+                    <Checkbox
+                      checked={includeEngagementData}
+                      onCheckedChange={(checked) => {
+                        form.setValue(
+                          "includeEngagementData",
+                          checked === true,
+                        );
+                      }}
+                    />
+                    <Span>{t(children.includeEngagementData.label)}</Span>
+                  </Label>
+                </Div>
+              </Div>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
+        {isLoading && (
+          <LoadingBlock
+            announce
+            message={t("widget.generatingExportHint")}
+            className="justify-start rounded-lg border border-border bg-muted/40 p-4 text-start [&>span]:text-foreground"
+          />
+        )}
+      </AdminForm>
 
-      {/* Loading state */}
-      {isLoading && (
-        <Div className="h-40 flex flex-col items-center justify-center gap-3">
-          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-          <Span className="text-sm text-muted-foreground">
-            {t("widget.generatingExport")}
-          </Span>
-          <Span className="text-xs text-muted-foreground">
-            {t("widget.generatingExportHint")}
-          </Span>
-        </Div>
-      )}
-
-      {/* Result */}
-      {data?.fileContent && !isLoading && (
-        <Div className="rounded-lg border bg-card p-6 flex flex-col gap-5">
-          {/* Success header */}
-          <Div className="flex items-center gap-3">
-            <CheckCircle className="h-8 w-8 text-success flex-shrink-0" />
-            <Div>
-              <Span className="font-semibold block">
-                {t("widget.exportReady")}
-              </Span>
-              <Span className="text-sm text-muted-foreground">
-                {t("widget.fileReadyToDownload")}
-              </Span>
-            </Div>
-          </Div>
-
-          {/* Summary stats */}
-          <Div className="grid grid-cols-3 gap-3">
-            <Div className="rounded-md border bg-muted/30 p-3 flex flex-col gap-1">
-              <Span className="text-xs text-muted-foreground uppercase tracking-wide">
-                {t("widget.records")}
-              </Span>
-              <Span className="text-xl font-bold tabular-nums">
-                {data.totalRecords?.toLocaleString() ?? "—"}
-              </Span>
-            </Div>
-            <Div className="rounded-md border bg-muted/30 p-3 flex flex-col gap-1">
-              <Span className="text-xs text-muted-foreground uppercase tracking-wide">
-                {t("widget.format")}
-              </Span>
-              <Span className="text-xl font-bold">{fileLabel}</Span>
-            </Div>
-            <Div className="rounded-md border bg-muted/30 p-3 flex flex-col gap-1">
-              <Span className="text-xs text-muted-foreground uppercase tracking-wide">
-                {t("widget.fileSize")}
-              </Span>
-              <Span className="text-xl font-bold tabular-nums">
-                {formatFileSize(data.fileContent.length)}
-              </Span>
-            </Div>
-          </Div>
-
-          {/* File row with download */}
-          <Div className="flex items-center gap-3 rounded-lg border bg-muted/30 px-4 py-3 w-full">
-            <FileText className="h-8 w-8 text-muted-foreground flex-shrink-0" />
-            <Div className="flex-1 min-w-0">
-              <Span className="text-sm font-medium block truncate">
-                {data.fileName}
-              </Span>
-              <Span className="text-xs text-muted-foreground">
-                {fileLabel}
-                {exportedAtFormatted && <> {exportedAtFormatted}</>}
-              </Span>
-            </Div>
-            <Div className="flex items-center gap-2 flex-shrink-0">
-              {isCsv && (
+      {!isLoading && !failed && data && (
+        <WidgetShell layout="page" scroll={false}>
+          {data.totalRecords === 0 ? (
+            <EmptyBlock
+              size="page"
+              action={{
+                label: t("widget.changeFilters"),
+                onClick: () => {
+                  setOpenSection("filters");
+                  form.setFocus("search");
+                },
+              }}
+              icon={<FileText className="size-6" aria-hidden="true" />}
+              title={t("widget.noMatchingRecords")}
+              message={t("widget.noMatchingRecordsHint")}
+              className="rounded-lg border bg-card px-4 py-6"
+            />
+          ) : (
+            <SectionGroup title={t("widget.exportReady")} className="min-w-0">
+              <Div className="flex flex-wrap items-center gap-3">
+                <Div className="flex min-w-0 flex-1 basis-52 flex-col gap-1">
+                  <Span className="break-all text-sm font-medium">
+                    {data.fileName}
+                  </Span>
+                  <Span className="text-xs text-muted-foreground">
+                    {t("widget.fileDetails", {
+                      count: data.totalRecords.toLocaleString(locale),
+                      size: new Intl.NumberFormat(locale, {
+                        style: "unit",
+                        unit: "byte",
+                        unitDisplay: "long",
+                      }).format(decodedByteLength(data.fileContent)),
+                    })}
+                  </Span>
+                  <Span className="text-xs text-muted-foreground">
+                    {t("widget.generatedAt", {
+                      date: new Date(data.exportedAt).toLocaleString(locale),
+                    })}
+                  </Span>
+                </Div>
                 <Button
                   type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={handleCopyToClipboard}
-                  className="gap-1"
-                  title={t("widget.copyCsvTitle")}
+                  onClick={handleDownload}
+                  className="min-h-11 w-full gap-2 @sm:w-auto"
                 >
-                  <Copy className="h-4 w-4" />
-                  {copied ? t("widget.copied") : t("widget.copy")}
+                  <Download className="size-4" aria-hidden="true" />
+                  {t("widget.download")}
                 </Button>
-              )}
-              <Button
-                type="button"
-                variant="default"
-                size="sm"
-                onClick={handleDownload}
-                className="gap-1"
-              >
-                <Download className="h-4 w-4" />
-                {t("widget.download")}
-              </Button>
-            </Div>
-          </Div>
-
-          {/* Exported timestamp */}
-          {exportedAtFormatted && (
-            <Div className="flex items-center gap-2 text-xs text-muted-foreground">
-              <Clock className="h-3.5 w-3.5 flex-shrink-0" />
-              <Span>
-                {t("widget.exportedAt")} {exportedAtFormatted}
-              </Span>
-            </Div>
+              </Div>
+            </SectionGroup>
           )}
-
-          {/* Post-export actions */}
-          <Div className="flex items-center gap-2 pt-1 border-t">
-            <Span className="text-xs text-muted-foreground mr-auto">
-              {t("widget.nextSteps")}
-            </Span>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={handleViewList}
-              className="gap-1"
-            >
-              <List className="h-4 w-4" />
-              {t("widget.viewLeads")}
-              <ArrowRight className="h-3.5 w-3.5" />
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={handleImport}
-              className="gap-1"
-            >
-              <Upload className="h-4 w-4" />
-              {t("widget.importLeads")}
-              <ArrowRight className="h-3.5 w-3.5" />
-            </Button>
-          </Div>
-        </Div>
+        </WidgetShell>
       )}
     </Div>
   );

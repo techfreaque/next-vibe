@@ -257,6 +257,12 @@ export const translations = {
       titleShort: "Vendor Details",
       description: "Retrieve full details for a vendor.",
       widget: {
+        companyName: "Company",
+        orderCount: "Purchase orders",
+        receivingCount: "Awaiting receipt",
+        details: "Vendor details",
+        related: "Vendor actions",
+        backToList: "Back to vendors",
         back: "Back",
         edit: "Edit vendor",
         createOrder: "New Purchase Order",
@@ -670,6 +676,9 @@ export const translations = {
         colStatus: "Status",
         deliveryArrow: "→",
         overdue: "overdue",
+        readyToBill: "Received, ready for billing",
+        openAttentionOrder: "Open order {{reference}}",
+        attentionCount: "Orders needing attention: {{count}}",
         actionNeeded: "purchase orders need attention",
         back: "Back",
         loading: "Loading…",
@@ -740,8 +749,10 @@ export const translations = {
       description:
         "Retrieve a purchase order with all lines and receipt history.",
       widget: {
+        precision:
+          "Line totals use the original supplier unit price before display rounding.",
         back: "Back",
-        send: "Send to vendor",
+        send: "Mark as Sent",
         confirm: "Mark confirmed",
         receive: "Receive goods",
         convertToBill: "Convert to bill",
@@ -970,9 +981,9 @@ export const translations = {
   // PO send
   orderSend: {
     post: {
-      title: "Send Purchase Order",
-      titleShort: "Send Order",
-      description: "Mark purchase order as Sent to vendor.",
+      title: "Mark Purchase Order as Sent",
+      titleShort: "Mark as Sent",
+      description: "Record that the purchase order was sent.",
       poId: {
         label: "Purchase Order ID",
         description: "Purchase order to send",
@@ -980,8 +991,7 @@ export const translations = {
       widget: {
         back: "Back",
         backToPO: "Back to Purchase Order",
-        warning:
-          "Sending marks this purchase order as dispatched to the vendor. Status changes from Draft to Sent.",
+        warning: "This changes the order status to Sent in this workspace.",
       },
       errors: {
         validation: {
@@ -1022,8 +1032,8 @@ export const translations = {
         },
       },
       success: {
-        title: "Purchase Order Sent",
-        description: "Purchase order marked as Sent",
+        title: "Purchase Order Marked as Sent",
+        description: "The purchase order now has Sent status.",
       },
       response: {
         id: "Purchase Order ID",
@@ -1104,6 +1114,10 @@ export const translations = {
       description:
         "Record receipt of goods against a purchase order. Creates stock movements.",
       widget: {
+        retry: "Try again",
+        loading: "Loading order…",
+        remaining: "{{quantity}} remaining",
+        noOpenLines: "All ordered quantities have been received.",
         backToPO: "Back to Purchase Order",
       },
       poId: {
@@ -1248,6 +1262,10 @@ export const translations = {
   orderLineAdd: {
     post: {
       widget: {
+        productSearch: "Search products by name or SKU",
+        search: "Search",
+        noProducts: "No matching products.",
+        clearProduct: "Clear product",
         backToOrder: "Back to order",
         lineAdded: "Line item added",
       },
@@ -1346,6 +1364,10 @@ export const translations = {
       },
       lineId: { label: "Line ID", description: "Line item to remove" },
       widget: {
+        updatedOrderTotals: "Updated order totals",
+        cancel: "Cancel",
+        verifying: "Checking the selected item…",
+        unavailable: "Open the draft order again and select a line to remove.",
         backToOrder: "Back to purchase order",
         warning:
           "This will permanently remove the line item from the purchase order.",

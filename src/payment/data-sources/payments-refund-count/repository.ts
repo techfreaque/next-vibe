@@ -21,7 +21,11 @@ import { resolutionBucketExpr } from "next-vibe/dataflow/shared/query-utils";
 import { fillGaps } from "next-vibe/dataflow/shared/range";
 import type { QueryResultRow } from "pg";
 
-import { notInternalUserSql, utcTs } from "../../analytics/money-sql";
+import {
+  REPORTABLE_PAYMENT_SQL,
+  reportingUserSql,
+  utcTs,
+} from "../../analytics/money-sql";
 import { RefundStatus } from "../../enum";
 
 export class QueryPaymentsRefundCountRepository {
@@ -42,8 +46,9 @@ export class QueryPaymentsRefundCountRepository {
       SELECT ${resolutionBucketExpr(resolution, sql`r.created_at`)} AS bucket,
         count(*) AS value
       FROM payment_refunds r
-      WHERE r.status = ${RefundStatus.SUCCEEDED}
-        AND ${notInternalUserSql("r.user_id")}
+      JOIN payment_transactions pt ON pt.id = r.transaction_id
+      WHERE ${REPORTABLE_PAYMENT_SQL} AND r.status = ${RefundStatus.SUCCEEDED}
+        AND ${reportingUserSql("r.user_id")}
         AND r.created_at >= ${utcTs(range.from)}
         AND r.created_at <= ${utcTs(range.to)}
       GROUP BY 1 ORDER BY 1`);

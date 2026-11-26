@@ -4,11 +4,11 @@ export const translations: typeof enTranslations = {
   category: "Cenové ponuky",
   tags: { payment: "platba", estimate: "cenová ponuka" },
   post: {
-    title: "Odoslať cenovú ponuku",
-    titleShort: "Odoslať cenovú ponuku",
+    title: "Označiť cenovú ponuku ako odoslanú",
+    titleShort: "Označiť cenovú ponuku ako odoslanú",
     description: "Označiť cenovú ponuku ako odoslanú zákazníkovi",
     form: {
-      title: "Odoslať cenovú ponuku",
+      title: "Označiť cenovú ponuku ako odoslanú",
       description: "Označiť cenovú ponuku ako odoslanú zákazníkovi",
     },
     response: { success: "Úspech", message: "Stavová správa" },
@@ -58,9 +58,8 @@ export const translations: typeof enTranslations = {
   },
   widget: {
     back: "Späť",
-    submit: "Odoslať cenovú ponuku",
+    submit: "Označiť ako odoslanú",
     sent: "Cenová ponuka bola označená ako odoslaná zákazníkovi.",
-    sendNote:
-      "Stav cenovej ponuky sa zmení na Odoslaná. Zákazník ju potom môže prijať alebo odmietnuť.",
+    sendNote: "Potvrďte, že ste túto ponuku odoslali zákazníkovi.",
   },
 };

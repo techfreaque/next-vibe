@@ -78,6 +78,10 @@ export const translations: typeof enTranslations = {
       description: "Plan kont pobrany pomyślnie",
     },
     widget: {
+      searchPage: "Szukaj na tej stronie według nazwy lub kodu",
+      noMatches: "Brak pasujących kont na tej stronie",
+      previousPage: "Poprzednia strona",
+      nextPage: "Następna strona",
       debitSide: "Wn",
       creditSide: "Ma",
       loading: "Ładowanie kont...",

@@ -719,6 +719,8 @@ export const translations = {
   widget: {
     loading: "Loading lead...",
     notFound: "Lead not found.",
+    loadFailed: "Lead could not load",
+    retryLoad: "Try again",
     back: "Back",
     leadFallbackTitle: "Lead",
     edit: "Edit",

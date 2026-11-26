@@ -1,6 +1,94 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  adjustment: {
+    confirmHint:
+      "Potvrďte prepojenie položky výpisu a zaúčtovanie zobrazených úprav.",
+    autoMatch: "Automaticky spárovať overené platby dodávateľom",
+    autoMatched: "Automaticky spárované",
+    followup: "Spracovanie bankového pohybu",
+    followupHint:
+      "Skontrolujte dočasný návrh faktúry alebo zrušte potvrdené párovanie.",
+    vendor: "Dodávateľ",
+    expenseAccount: "Nákladový účet",
+    reversalDate: "Dátum storna (RRRR-MM-DD)",
+    reason: "Dôvod zrušenia",
+    openDraft: "Otvoriť dodávateľskú faktúru",
+    settings: "Nastavenia párovania banky",
+    settingsHint:
+      "Nastavte menu účtu, povolenú dvojicu mien, časové okno a limity.",
+    settingsSaved: "Nastavenia párovania sú uložené",
+    save: "Uložiť nastavenia",
+    foreignCurrency: "Mena faktúry pre kurzové rozdiely",
+    absTolerance: "Najvyšší kurzový rozdiel v mene účtu",
+    bpsTolerance: "Najvyšší kurzový rozdiel v bázických bodoch",
+    days: "Časové okno párovania v dňoch",
+    gainAccount: "Účet kurzových ziskov",
+    lossAccount: "Účet kurzových strát",
+    feeAccount: "Nákladový účet pre doložené poplatky",
+    invalidSettings:
+      "Skontrolujte dvojicu mien, limity a aktívne účty spoločnosti.",
+    description: "Vyrovnávací zápis {{reference}}",
+    unavailable:
+      "Rozdiel sa nepodarilo zaúčtovať. Skontrolujte dátum, otvorené obdobie a zvolené účty.",
+    journal: "Vyrovnávací zápis",
+    kind: "Typ párovania",
+    fxDifference: "Kurzový zisk alebo strata",
+    release: "Zrušiť bankové párovanie",
+    releaseHint:
+      "Zrušte prepojenie a stornujte vyrovnávací zápis v otvorenom období.",
+    releaseSuccess: "Bankové párovanie je zrušené",
+    draft: "Návrh dodávateľskej faktúry z banky",
+    draftHint:
+      "Ako dočasný doklad použite zaúčtovanú sumu. Pred odpočtom dane pridajte originál faktúry.",
+    draftReady: "Návrh dodávateľskej faktúry je pripravený",
+    confirmDraft: "Vytvoriť dočasný návrh faktúry",
+    sourceMemo: "Doklad z výpisu {{reference}}. Originál faktúry zatiaľ chýba.",
+  },
+  statement: {
+    projected: "Pripravené na import",
+    localPreview:
+      "Náhľad súboru zobrazuje dátumy a sumy pred kontrolou súkromia.",
+    screenedOut: "Vylúčené kontrolou súkromia",
+    screenedOutCount:
+      "Kontrola súkromia nepreniesla {{count}} riadkov do bankovej evidencie.",
+    format: "Formát výpisu",
+    mapping: "Priradenie stĺpcov výpisu",
+    preview: "Náhľad importu",
+    previewSuccess: "Náhľad importu",
+    invalid:
+      "Výpis sa vo vybranom formáte nepodarilo prečítať (riadok {{row}}).",
+    decimal: "Desatinný oddeľovač",
+    dotDecimal: "Desatinná bodka",
+    commaDecimal: "Desatinná čiarka",
+    unmapped: "Bez stĺpca",
+    overlap:
+      "Možný súbeh s iným bankovým výpisom. Skontrolujte pôvodné bankové referencie.",
+    columns: {
+      counterpartyIban: "IBAN protistrany",
+      id: "Banková referencia",
+      date: "Dátum zaúčtovania",
+      valueDate: "Dátum valuty",
+      amount: "Zaúčtovaná suma",
+      currency: "Mena zaúčtovania",
+      nativeAmount: "Pôvodná suma",
+      nativeCurrency: "Pôvodná mena",
+      feeAmount: "Doložený poplatok",
+      feeCurrency: "Mena poplatku",
+      description: "Opis",
+      counterparty: "Protistrana",
+      status: "Stav",
+    },
+    formats: {
+      normalized: "Štandardný CSV",
+      c24: "CSV z C24",
+      revolut: "CSV z osobného Revolutu",
+      revolutBusiness: "CSV z Revolut Business",
+      mapped: "Vlastný CSV",
+      camt053: "CAMT.053",
+      mt940: "MT940",
+    },
+  },
   tags: {
     bank: "banka",
     reconciliation: "párovanie transakcií",
@@ -10,7 +98,7 @@ export const translations: typeof enTranslations = {
     status: "Stav",
     company: "Firma",
     account: "Bankový účet",
-    csv: "Bankový výpis vo formáte CSV",
+    csv: "Bankový výpis",
     line: "Riadok bankového výpisu",
     transactionId: "ID transakcie",
     bookedDate: "Dátum zaúčtovania",
@@ -29,23 +117,24 @@ export const translations: typeof enTranslations = {
     total: "Spolu",
   },
   ui: {
-    csvFormat: "Formát CSV",
-    commaFormat: "Čiarky medzi poľami, bodky v desatinných číslach",
-    semicolonFormat: "Bodkočiarky medzi poľami, čiarky v desatinných číslach",
+    exactMatch: "Presná zhoda",
+    csvFormat: "Oddeľovač stĺpcov",
+    commaFormat: "Čiarka",
+    semicolonFormat: "Bodkočiarka",
     sameDay: "Rovnaká suma aj dátum",
-    upload: "Vyberte súbor CSV",
-    dropCsv: "Alebo sem presuňte súbor CSV",
-    pasteCsv: "Vložiť text CSV",
-    supportedFormat: "Podporovaný formát",
+    upload: "Vybrať súbor výpisu",
+    dropCsv: "Alebo sem presuňte výpis",
+    pasteCsv: "Vložiť text výpisu",
+    supportedFormat: "Podporované formáty",
     mapping: "Priradiť stĺpce",
     chooseColumn: "Vyberte stĺpec CSV",
     preview: "Náhľad prvých piatich transakcií",
     matchRow: "Spárovať",
     unmatched: "Nespárované",
     csvHelp:
-      "Priraďte stĺpce pre nemenné ID transakcie, dátum (YYYY-MM-DD alebo DD.MM.YYYY), sumu so znamienkom vo zvolenom desatinnom formáte a kód meny veľkými písmenami. Kladná suma znamená príjem. Každý záznam uveďte na jednom riadku. Nepoužívajte oddeľovače tisícov.",
+      "Vyberte export z banky alebo priraďte stĺpce CSV. Potrebujete dátum zaúčtovania a sumu so znamienkom.",
     unsupported:
-      "Súbory CAMT XML, OFX/QFX, MT940, tabuľky, PDF aj údaje s inými oddeľovačmi alebo viacriadkovými záznamami najprv preveďte do tohto formátu CSV.",
+      "Použite CSV, CAMT.053 XML alebo text MT940. Súbory PDF, tabuľky a iné formáty najprv skonvertujte.",
     chooseScope: "Vyberte firmu a aktívny bankový účet.",
     empty: "Žiadne nespárované položky",
     emptyHint: "Importujte bankový výpis a začnite párovať.",
@@ -54,7 +143,7 @@ export const translations: typeof enTranslations = {
     noCandidatesHint:
       "Skontrolujte bankový účet, menu a sumu zaúčtovaného zápisu.",
     alreadyMatched: "Tento riadok už je spárovaný.",
-    importAction: "Importovať CSV",
+    importAction: "Importovať výpis",
     listAction: "Zobraziť riadky bankového výpisu",
     back: "Späť",
     previous: "Späť",
@@ -125,8 +214,7 @@ export const translations: typeof enTranslations = {
   },
   import: {
     title: "Import bankového výpisu",
-    description:
-      "Nahrajte súbor CSV alebo vložte jeho obsah pre jeden bankový účet.",
+    description: "Nahrajte alebo vložte výpis pre jeden bankový účet.",
     success: "Bankový výpis spracovaný",
   },
   list: {

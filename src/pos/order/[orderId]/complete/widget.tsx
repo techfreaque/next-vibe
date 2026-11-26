@@ -5,35 +5,35 @@ import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
 import { Span } from "next-vibe/ui/components/span";
-import { formatMoney } from "next-vibe/unified-ui/_shared/format-money";
 import {
   useWidgetLocale,
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
+import { EntityPickerFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/entity-picker-field/widget";
 import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 import { type JSX } from "react";
 
+import { formatPosSettlement } from "../../format-settlement";
 import type definition from "./definition";
 
-export function PosOrderCompleteWidget(
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  _props: {
-    field: (typeof definition.POST)["fields"];
-  },
-): JSX.Element {
+export function PosOrderCompleteWidget({
+  field,
+}: {
+  field: (typeof definition.POST)["fields"];
+}): JSX.Element {
   const data = useWidgetValue<typeof definition.POST>();
   const navigation = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.POST>();
   const locale = useWidgetLocale();
   const result = data?.result;
 
-  const handleBackToList = (): void => {
+  const handleViewReceipt = (orderId: string): void => {
     void (async (): Promise<void> => {
-      const def = await import("@/pos/order/list/definition");
-      navigation.push(def.default.GET, {});
+      const def = await import("../get/definition");
+      navigation.push(def.default.GET, { urlPathParams: { orderId } });
     })();
   };
 
@@ -69,7 +69,7 @@ export function PosOrderCompleteWidget(
               {t("orderComplete.post.response.total")}
             </Span>
             <Span className="text-xl font-mono font-bold tabular-nums">
-              {formatMoney(result.total, result?.currency, locale)}
+              {formatPosSettlement(result.total, result?.currency, locale)}
             </Span>
           </Div>
         </Div>
@@ -79,9 +79,9 @@ export function PosOrderCompleteWidget(
           variant="default"
           size="lg"
           className="w-full"
-          onClick={handleBackToList}
+          onClick={() => handleViewReceipt(result.id)}
         >
-          {t("orderComplete.post.widget.backToList")}
+          {t("workflow.viewReceipt")}
         </Button>
       </Div>
     );
@@ -104,6 +104,10 @@ export function PosOrderCompleteWidget(
       )}
 
       <FormAlertWidget field={{}} />
+      <EntityPickerFieldWidget
+        fieldName="orderId"
+        field={field.children.orderId}
+      />
 
       {/* Confirmation header */}
       <Div className="flex flex-col gap-1 text-center py-2">
@@ -116,7 +120,9 @@ export function PosOrderCompleteWidget(
       </Div>
 
       {/* Big confirm button */}
-      <SubmitButtonWidget<typeof definition.POST> field={{}} />
+      <SubmitButtonWidget<typeof definition.POST>
+        field={{ text: "orderGet.get.widget.complete" }}
+      />
 
       <Button
         type="button"

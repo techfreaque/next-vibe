@@ -34,7 +34,7 @@ export const translations: typeof enTranslations = {
     },
     notFound: {
       title: "Nie znaleziono użytkownika",
-      description: "Brak użytkownika o tym ID",
+      description: "Tego konta nie ma już w katalogu. Wybierz inne konto.",
     },
     serverError: {
       title: "Nie udało się wczytać użytkownika",
@@ -86,14 +86,15 @@ export const translations: typeof enTranslations = {
   },
   kpi: {
     paid: "Zapłacono łącznie",
-    paidHint: "{{count}} udanych płatności, USD",
+    paidHint: "Płatności: {{count}}",
     refunded: "Zwrócono",
     credits: "Saldo kredytów",
-    creditsHint: "+{{free}} darmowych kredytów",
+    creditsHint: "Dostępne darmowe kredyty: {{free}}",
     spent: "Wydane kredyty",
     spentHint: "około {{usd}} użycia",
     lastSeen: "Ostatnio widziany",
     joined: "Od {{date}}",
+    justNow: "Przed chwilą",
   },
   payment: {
     subscription: "Subskrypcja",
@@ -184,12 +185,15 @@ export const translations: typeof enTranslations = {
     openMonitor: "Otwórz monitor błędów",
   },
   widget: {
+    creditAmount: "{{count}} kred.",
     unavailable: "Konto niedostępne",
     chooseUser: "Wybierz konto do podglądu",
     loading: "Wczytywanie użytkownika...",
     never: "Nigdy",
     actions: {
-      browse: "Przeglądaj konta",
+      retry: "Spróbuj ponownie",
+      more: "Więcej",
+      browse: "Wróć do kont",
       edit: "Edytuj",
       addCredits: "Przyznaj kredyty",
       delete: "Usuń użytkownika",
@@ -206,6 +210,8 @@ export const translations: typeof enTranslations = {
     remove: "Odbierz rolę",
   },
   tabs: {
+    section: "Sekcja profilu",
+    scrollHint: "Przewiń, aby zobaczyć wszystkie sekcje",
     overview: "Przegląd",
     billing: "Płatności",
     credits: "Historia kredytów",

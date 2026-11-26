@@ -42,6 +42,7 @@ import type { EndpointLogger, LoggerMetadata } from "../../logger/types";
 import { mintRequestId, withLogContext } from "../../logger/with-log-context";
 import { Platform } from "../../platforms/platforms";
 import {
+  readEdgeRequestId,
   readEdgeRequestTimingHeader,
   readEdgeTimingHeader,
   readProxyTimingHeader,
@@ -70,6 +71,50 @@ function isJsonObject(value: WidgetData): value is Record<string, WidgetData> {
     !(value instanceof Blob) &&
     !(value instanceof Date)
   );
+}
+
+function queryScalar(value: WidgetData): string {
+  return value instanceof Date && Number.isFinite(value.getTime())
+    ? value.toISOString()
+    : String(value);
+}
+
+export function serializeGetQuery(requestData: WidgetData): string {
+  const searchParams = new URLSearchParams();
+
+  function flattenObject(obj: Record<string, WidgetData>, prefix = ""): void {
+    for (const [key, value] of Object.entries(obj)) {
+      const fullKey = prefix ? `${prefix}.${key}` : key;
+      if (value === undefined || value === null) {
+        continue;
+      } else if (Array.isArray(value)) {
+        if (value.length === 0) {
+          continue;
+        }
+        value.forEach((item, index) => {
+          if (isJsonObject(item)) {
+            flattenObject(item, `${fullKey}[${index}]`);
+          } else {
+            searchParams.append(`${fullKey}[${index}]`, queryScalar(item));
+          }
+        });
+      } else if (isJsonObject(value)) {
+        const hasNonNullValues = Object.values(value).some(
+          (v) => v !== undefined && v !== null,
+        );
+        if (hasNonNullValues) {
+          flattenObject(value, fullKey);
+        }
+      } else {
+        searchParams.append(fullKey, queryScalar(value));
+      }
+    }
+  }
+
+  if (isJsonObject(requestData)) {
+    flattenObject(requestData);
+  }
+  return searchParams.toString();
 }
 
 function buildUrl<TEndpoint extends CreateApiEndpointAny>(
@@ -117,46 +162,8 @@ function buildUrl<TEndpoint extends CreateApiEndpointAny>(
     }
   }
 
-  if (
-    endpoint.method === Methods.GET &&
-    requestData &&
-    typeof requestData === "object"
-  ) {
-    const searchParams = new URLSearchParams();
-
-    function flattenObject(obj: Record<string, WidgetData>, prefix = ""): void {
-      for (const [key, value] of Object.entries(obj)) {
-        const fullKey = prefix ? `${prefix}.${key}` : key;
-        if (value === undefined || value === null) {
-          continue;
-        } else if (Array.isArray(value)) {
-          if (value.length === 0) {
-            continue;
-          }
-          value.forEach((item, index) => {
-            if (isJsonObject(item)) {
-              flattenObject(item, `${fullKey}[${index}]`);
-            } else {
-              searchParams.append(`${fullKey}[${index}]`, String(item));
-            }
-          });
-        } else if (isJsonObject(value)) {
-          const hasNonNullValues = Object.values(value).some(
-            (v) => v !== undefined && v !== null,
-          );
-          if (hasNonNullValues) {
-            flattenObject(value, fullKey);
-          }
-        } else {
-          searchParams.append(fullKey, String(value));
-        }
-      }
-    }
-
-    if (isJsonObject(requestData)) {
-      flattenObject(requestData);
-    }
-    const queryString = searchParams.toString();
+  if (endpoint.method === Methods.GET) {
+    const queryString = serializeGetQuery(requestData);
     if (queryString) {
       url += `?${queryString}`;
     }
@@ -231,6 +238,8 @@ interface CallDiagnostics {
   requestBody?: { kind: "json" | "form-data"; size: number } | null;
   /** Edge `via` header of the response (Caddy) - which proxy chain answered. */
   via?: string | null;
+  responseRequestId?: string | null;
+  responseServerTiming?: string | null;
   /** Page visibility when the call started (network-failure diagnosis). */
   visibilityAtStart?: string | null;
   /**
@@ -427,6 +436,12 @@ function reportApiFailure(
     (diag.thrown !== undefined ||
       (status !== null && status >= 500) ||
       errorCode >= 500);
+  const reportNetworkFailure =
+    diag.thrown !== undefined &&
+    !isAbort &&
+    (noHttpResponse ||
+      (diag.phase === "response-body" &&
+        isBrowserNetworkLossMessage(diag.thrown.message)));
   const context = {
     endpoint: `${endpointPath}/${endpoint.method}`,
     alias: endpoint.aliases?.[0] ?? null,
@@ -450,11 +465,15 @@ function reportApiFailure(
     isPublicUser: user.isPublic,
     // Match against the server's error_logs rows for the same request
     requestId: diag.requestId,
+    responseRequestId: diag.responseRequestId ?? null,
+    proxyTimingStage: readProxyTimingHeader(diag.responseServerTiming ?? null),
+    edgeTimingNode: readEdgeTimingHeader(diag.responseServerTiming ?? null),
+    edgeRequestId: readEdgeRequestTimingHeader(
+      diag.responseServerTiming ?? null,
+    ),
     retryOfRequestId: diag.retryOf ?? null,
     csrfHeaderSent: diag.csrfHeaderSent ?? null,
-    ...(noHttpResponse && diag.thrown && !isAbort
-      ? networkFailureContext(diag, durationMs)
-      : {}),
+    ...(reportNetworkFailure ? networkFailureContext(diag, durationMs) : {}),
   };
   if (isServerSide) {
     logger.error(
@@ -518,15 +537,15 @@ export async function callApi<TEndpoint extends CreateApiEndpointAny>(
     // Query hooks return typed errors as data, so React Query does not retry
     // them. Give interrupted reads and malformed framework errors one retry.
     // The first attempt is reported whether the retry succeeds or fails.
-    const lostResponse =
-      diag.status === undefined &&
-      diag.phase === "fetch" &&
+    const interruptedResponse =
+      (diag.phase === "fetch" || diag.phase === "response-body") &&
       diag.thrown !== undefined &&
+      diag.thrown.name !== "AbortError" &&
       isBrowserNetworkLossMessage(diag.thrown.message);
     if (
       retryOf === undefined &&
       endpoint.method === Methods.GET &&
-      (lostResponse || diag.unexpectedHttpError) &&
+      (interruptedResponse || diag.unexpectedHttpError) &&
       currentVisibility() === "visible" &&
       browserOnline()
     ) {
@@ -629,6 +648,7 @@ async function callApiInner<TEndpoint extends CreateApiEndpointAny>(
     });
   }
 
+  let recordDeadline: AbortSignal | undefined;
   const postBody = buildBody(endpoint, requestData);
   diag.requestBody =
     endpoint.method === Methods.GET ? null : describeRequestBody(postBody);
@@ -679,6 +699,17 @@ async function callApiInner<TEndpoint extends CreateApiEndpointAny>(
       credentials: "include",
     };
 
+    if (
+      platform.isBrowser &&
+      endpoint.method === Methods.GET &&
+      "usage" in endpoint.fields &&
+      endpoint.fields.usage.request === "urlPathParams" &&
+      /^\/[^/]+\/tools(?:\/|$)/.test(getCurrentPathname())
+    ) {
+      recordDeadline = AbortSignal.timeout(15_000);
+      options.signal = recordDeadline;
+    }
+
     if (endpoint.method !== Methods.GET && postBody) {
       options.body = postBody;
     }
@@ -710,6 +741,10 @@ async function callApiInner<TEndpoint extends CreateApiEndpointAny>(
     diag.status = response.status;
     diag.redirected = response.redirected;
     diag.via = response.headers.get("via");
+    diag.responseRequestId = readEdgeRequestId(
+      response.headers.get(REQUEST_ID_HEADER_NAME) ?? undefined,
+    );
+    diag.responseServerTiming = response.headers.get("server-timing");
     diag.phase = "response-body";
     diag.unexpectedHttpError = !response.redirected && response.status >= 500;
     // A proxy/gateway error (502/503 "Service Unavailable") has a plain-text
@@ -837,6 +872,14 @@ async function callApiInner<TEndpoint extends CreateApiEndpointAny>(
     // Network failure, timeout, CORS, aborted request or JSON parse error -
     // reported by callApi() with the Error itself (name + stack).
     diag.thrown = error instanceof Error ? error : new Error(String(error));
+    if (recordDeadline?.aborted) {
+      return fail({
+        message: hooksTranslation
+          .scopedT(locale)
+          .t("apiUtils.errors.recordTimeout"),
+        errorType: ErrorResponseTypes.HTTP_ERROR,
+      });
+    }
     return fail({
       message: hooksTranslation
         .scopedT(locale)

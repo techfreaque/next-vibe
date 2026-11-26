@@ -50,7 +50,7 @@ type LeadDimensionValue = (typeof LeadDimension)[keyof typeof LeadDimension];
 
 // The Nov 20 crawl paired this exact browser string with a Google origin
 // referrer. Preserve older traffic and leads with observed account or chat activity.
-const chrome131Crawler = sql`(
+const chrome131Crawler = (noLeadChat: SQL): SQL => sql`(
   ident.ua = ${CHROME_131_CRAWLER_UA}
   AND l.created_at >= timestamp '2026-11-20'
   AND l.metadata->>'anonymous' = 'true'
@@ -59,7 +59,7 @@ const chrome131Crawler = sql`(
   AND l.email IS NULL
   AND l.converted_user_id IS NULL AND j.user_id IS NULL
   AND l.signed_up_at IS NULL AND j.signed_up_at IS NULL
-  AND j.first_chat_at IS NULL AND lead_chat.first_at IS NULL
+  AND j.first_chat_at IS NULL AND ${noLeadChat}
 )`;
 
 /**
@@ -109,9 +109,24 @@ export function leadFactsSql(leadCondition: SQL = sql`TRUE`): SQL {
       WHERE status = ${PaymentStatus.SUCCEEDED} AND amount > 0 GROUP BY user_id
     ) pay ON pay.user_id = u.id
     CROSS JOIN LATERAL (
-      SELECT ${botFamilySql(sql`ident.ua`, chrome131Crawler)} AS bot_family
+      SELECT ${botFamilySql(sql`ident.ua`, chrome131Crawler(sql`lead_chat.first_at IS NULL`))} AS bot_family
     ) fam
     WHERE ${leadCondition}
+  `;
+}
+
+/** Lead creation events for the unsegmented human headline. */
+export function humanLeadCreationsSql(leadCondition: SQL): SQL {
+  const noLeadChat = sql`NOT EXISTS (
+    SELECT 1 FROM chat_threads ct WHERE ct.lead_id = l.id AND ct.created_at IS NOT NULL
+  )`;
+  const family = botFamilySql(sql`ident.ua`, chrome131Crawler(noLeadChat));
+  return sql`
+    SELECT l.created_at
+    FROM leads l
+    CROSS JOIN LATERAL (SELECT ${leadUserAgentSql("l")} AS ua) ident
+    LEFT JOIN growth_journeys j ON j.lead_id = l.id
+    WHERE (${leadCondition}) AND ${family} = ${BotFamily.HUMAN}
   `;
 }
 

@@ -199,7 +199,10 @@ export function ReceivablesAgingWidget(): JSX.Element {
         }
       }}
     >
-      <SelectTrigger className="w-auto min-w-32">
+      <SelectTrigger
+        aria-label={t("reports.switchReport")}
+        className="w-auto min-w-32"
+      >
         <SelectValue placeholder={t("reports.switchReport")} />
       </SelectTrigger>
       <SelectContent>

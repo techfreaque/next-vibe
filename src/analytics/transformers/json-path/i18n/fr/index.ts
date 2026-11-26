@@ -6,13 +6,13 @@ export const translations: typeof enTranslations = {
     title: "JSON Path",
     titleShort: "JSON Path",
     description:
-      "JSON Path : extrait une valeur via un chemin en notation pointée (obsolète, renvoie un résultat vide)",
+      "Extrait la valeur observée ou un champ numérique des métadonnées.",
     fields: {
       source: { label: "Source", description: "Série temporelle d'entrée" },
       path: {
         label: "Chemin",
         description:
-          "Chemin en notation pointée à extraire (plus pris en charge)",
+          "Saisissez value ou un chemin de métadonnées comme meta.close.",
       },
       resolution: {
         label: "Résolution",

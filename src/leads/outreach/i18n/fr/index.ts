@@ -125,6 +125,7 @@ export const translations: typeof enTranslations = {
           replied: "a répondu le {{date}}",
         },
         deals: {
+          prepareBill: "Préparer la facture fournisseur",
           title: "Accords payants",
           hint: "Dépense face aux visites, inscriptions et revenus apportés par le lien suivi ou le code parrain de chaque accord.",
           columns: {

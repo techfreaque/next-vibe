@@ -7,9 +7,9 @@ export const translations: typeof enTranslations = {
     list: "Lista",
   },
   get: {
-    title: "Subskrypcje firmy",
-    titleShort: "Subskrypcje firmy",
-    description: "Wyświetl wszystkie subskrypcje firmy",
+    title: "Subskrypcje właściciela",
+    titleShort: "Subskrypcje właściciela",
+    description: "Wyświetl osobistą subskrypcję właściciela firmy.",
     companyId: {
       label: "ID firmy",
       description: "Firma, której subskrypcje należy wyświetlić",
@@ -33,7 +33,7 @@ export const translations: typeof enTranslations = {
       },
       server: {
         title: "Błąd serwera",
-        description: "Coś poszło nie tak — spróbuj ponownie",
+        description: "Coś poszło nie tak. spróbuj ponownie",
       },
       unknown: {
         title: "Nieznany błąd",

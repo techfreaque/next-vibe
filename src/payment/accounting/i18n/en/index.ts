@@ -1,0 +1,118 @@
+export const translations = {
+  saleType: "Sale",
+  feeType: "Processor fee",
+  refundType: "Refund",
+
+  title: "Processor accounting",
+  review: "Review or post verified payments",
+  configure: "Configure a catalog offer",
+  company: "Company",
+  product: "Catalog product",
+  providerStripe: "Stripe",
+  providerNow: "NOWPayments",
+  currencyEur: "EUR",
+  currencyUsd: "USD",
+  currencyPln: "PLN",
+  provider: "Provider",
+  merchant: "Verified merchant identity",
+  offer: "Provider offer or price ID",
+  currency: "Currency",
+  recognition: "Recognition",
+  immediate: "Recognize on sale",
+  deferred: "Defer as a liability",
+  receivable: "Receivable account",
+  clearing: "Processor clearing account",
+  consideration: "Revenue or liability account",
+  vat: "Output VAT account",
+  expense: "Fee expense account",
+  zeroTax:
+    "Confirm explicitly that missing provider VAT means zero for this zero-rated product",
+  ids: "Verified evidence IDs",
+  dryRun: "Preview only",
+  submit: "Run",
+  sources: "Verified evidence",
+  gross: "Gross amount",
+  tax: "Tax amount",
+  fee: "Provider fee",
+  receipt: "Invoice and journal references",
+  posted: "Posted",
+  ready: "Ready to post",
+  saved: "Offer linked",
+  alreadyPosted: "Already posted",
+  forbidden: "You do not have permission for this company.",
+  missingEvidence: "The verified evidence is unavailable.",
+  missingMapping: "Configure a matching merchant offer and catalog product.",
+  unsupportedCurrency:
+    "Review the currency and reconcile conversion separately.",
+  unmatchedTransaction: "Link to the verified local payment before posting.",
+  unverifiedTax:
+    "Obtain a verified tax breakdown or explicitly configure an eligible zero-rated offer.",
+  invalidAccounts:
+    "Check that the company's accounts are active and match their roles.",
+  periodClosed: "Open the accounting period or reconcile the source date.",
+  unverifiedRefundAllocation:
+    "Obtain a verified refund allocation or reconcile this refund against the original sale.",
+  creditsGranted: "Credits granted",
+  creditsConsumed: "Credits used",
+  deferredRefundNeedsReview:
+    "Check how much of the original service or credit pack was used. Reconcile the refund against the remaining liability and recognized revenue.",
+  feeBillLinked: "Supplier bill linked",
+  openFeeEntry: "Reconcile fee invoice",
+  openJournal: "Open journal entry",
+  openInvoice: "Open invoice",
+  openFeeBill: "Open supplier bill",
+  feeNeedsBill:
+    "Record the provider's fee invoice through supplier bills. Verify its tax before posting.",
+  taxRegimeConflict:
+    "The source charged VAT while the company was exempt. Reconcile the source.",
+  inconsistentEvidence:
+    "The exact evidence does not agree with the local payment.",
+  postingFailed:
+    "The entry could not be posted. Review its source and try again.",
+  missingProduct:
+    "Choose an active company catalog product with an SKU and the correct tax rate.",
+  conflict: "This merchant offer is already linked.",
+  empty: "No matching verified evidence.",
+  intro:
+    "Link a catalog product to a verified merchant offer, then preview its sales evidence.",
+  stripeTest: "Stripe test merchant",
+  stripeLive: "Stripe live merchant",
+  nowMerchant: "NOWPayments merchant",
+  listError: "Could not load accounting evidence",
+  detail: "Check the company and input, then try again.",
+  recognizedRevenue: "Recognized revenue",
+  remainingLiability: "Remaining liability",
+  recognitionTitle: "Recognize prepaid revenue",
+  recognitionDescription:
+    "Add a dated revenue policy for the offer, or leave policy fields blank to preview verified credit usage.",
+  recognitionFrom: "Policy effective date (YYYY-MM-DD)",
+  recognitionAccount: "Recognized revenue account",
+  recognitionServicePeriods: "Recognize verified subscription service periods",
+  recognitionExpiry: "Recognize eligible expired credits",
+  recognitionEntries: "Credit ledger movements",
+  recognitionPreview: "Recognition preview ready",
+  recognitionPosted: "Revenue posted",
+  recognitionCurrent: "No eligible new movements",
+  recognitionPolicySaved: "Recognition policy saved",
+  recognitionPolicyConflict:
+    "This date overlaps an existing policy or a posted allocation.",
+  recognitionPolicyMissing: "Add a policy effective on the movement date.",
+  recognitionEvidenceMissing:
+    "Check the original sale, receipt and credit movement.",
+  recognitionExpiryReview: "Verify expiry and the applicable breakage policy.",
+  recognitionServiceConflict:
+    "The processor sent conflicting service dates or amounts. Verify the original invoice before recognizing revenue.",
+  recognitionSubscriptionReview:
+    "Subscription revenue needs a verified service-period allocation.",
+  recognitionInvalidAccounts:
+    "Select active liability and revenue accounts for this company.",
+  recognitionPeriodClosed: "Open the accounting period for this movement.",
+  recognitionForbidden: "You cannot recognize revenue for this company.",
+  recognitionFailed: "Revenue recognition failed. Review the source and retry.",
+  chooseProvider: "Choose a provider",
+  chooseCurrency: "Choose a currency",
+  chooseRecognition: "Choose when to recognize revenue",
+  noVatAccount:
+    "Add an active output VAT account to the company chart to select it here.",
+  saveOffer: "Save offer",
+};

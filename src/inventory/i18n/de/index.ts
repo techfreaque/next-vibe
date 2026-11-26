@@ -220,6 +220,13 @@ export const translations: typeof enTranslations = {
       titleShort: "Lagerhaus",
       description: "Details eines bestimmten Lagerhauses abrufen.",
       widget: {
+        companyName: "Unternehmen",
+        stockedProducts: "Produkte auf Lager",
+        companyInventory: "Lagerübersicht des Unternehmens",
+        missingValuation: "Einstandspreis fehlt",
+        details: "Lagerdetails",
+        related: "Bestand",
+        backToList: "Zurück zur Lagerliste",
         back: "Zurück",
         edit: "Lagerhaus bearbeiten",
         viewStock: "Bestand anzeigen",
@@ -386,6 +393,12 @@ export const translations: typeof enTranslations = {
         loadMore: "Mehr anzeigen",
 
         back: "Zurück",
+        defaultLowStockRule:
+          "Niedrig bei weniger als {{threshold}} verfügbaren Einheiten",
+        reorderPointRule:
+          "Niedrig bei höchstens {{threshold}} verfügbaren Einheiten",
+        stockValuePrecision:
+          "Der Lagerwert entspricht der Lagermenge × den ungerundeten Stückkosten. Angezeigte Kosten sind auf zwei Nachkommastellen gerundet.",
         lowStock: "Mindestbestand unterschritten",
         available: "Verfügbar",
         onHand: "Auf Lager",
@@ -904,6 +917,8 @@ export const translations: typeof enTranslations = {
       titleShort: "Umlagerung",
       description: "Umlagerung mit allen Positionen abrufen.",
       widget: {
+        retry: "Erneut versuchen",
+        noItems: "Diese Umlagerung enthält keine Positionen.",
         back: "Zurück",
         dispatch: "Umlagerung versenden",
         receive: "Als empfangen markieren",

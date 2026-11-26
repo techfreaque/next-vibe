@@ -3,7 +3,7 @@
  * Retrieves a single catalog product by ID
  */
 
-import { eq } from "drizzle-orm";
+import { and, asc, eq } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
@@ -16,10 +16,13 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
+import { accountNodes } from "@/chart-of-accounts/db";
+import { companies } from "@/companies/db";
 import { CompanyMemberRole } from "@/companies/enum";
 import { CompanyAuthRepository } from "@/companies/repository";
+import { paymentAccountingOffers } from "@/payment/accounting/db";
 
-import { catalogProducts } from "../../../db";
+import { catalogProducts, productPrices } from "../../../db";
 import type { CatalogGetResponseOutput } from "./definition";
 import { scopedTranslation } from "./i18n";
 
@@ -65,33 +68,102 @@ export class CatalogGetRepository {
         });
       }
 
-      // Verify ownership: either the user owns it directly or is a member of the owning company
       const isOwner = product.ownerUserId === userId;
-
-      if (!isOwner) {
-        if (product.companyId) {
-          const authResult = await CompanyAuthRepository.requireMember(
+      const companyId = product.companyId;
+      const membership = companyId
+        ? await CompanyAuthRepository.requireMember(
             userId,
-            product.companyId,
+            companyId,
             CompanyMemberRole.VIEWER,
             logger,
             locale,
-          );
-          if (!authResult.success) {
-            return fail({
-              message: t("get.errors.forbidden.title"),
-              errorType: ErrorResponseTypes.FORBIDDEN,
-            });
-          }
-        } else {
-          return fail({
-            message: t("get.errors.forbidden.title"),
-            errorType: ErrorResponseTypes.FORBIDDEN,
-          });
-        }
+          )
+        : undefined;
+      const role = membership?.success ? membership.data.role : undefined;
+      if (!isOwner && !role) {
+        return fail({
+          message: t("get.errors.forbidden.title"),
+          errorType: ErrorResponseTypes.FORBIDDEN,
+        });
       }
 
+      const canEdit =
+        isOwner ||
+        role === CompanyMemberRole.OWNER ||
+        role === CompanyMemberRole.ADMIN;
+      const canConfigure =
+        role === CompanyMemberRole.OWNER ||
+        role === CompanyMemberRole.ADMIN ||
+        role === CompanyMemberRole.ACCOUNTANT;
+      const [prices, companyRows, offers] = await Promise.all([
+        db
+          .select({
+            id: productPrices.id,
+            price: productPrices.price,
+            currency: productPrices.currency,
+            tierName: productPrices.tierName,
+          })
+          .from(productPrices)
+          .where(
+            and(
+              eq(productPrices.productId, productId),
+              eq(productPrices.isActive, true),
+            ),
+          )
+          .orderBy(asc(productPrices.currency), asc(productPrices.tierName))
+          .limit(25),
+        companyId && role
+          ? db
+              .select({ name: companies.name, currency: companies.currency })
+              .from(companies)
+              .where(eq(companies.id, companyId))
+              .limit(1)
+          : [],
+        companyId && canConfigure
+          ? db
+              .select({
+                id: paymentAccountingOffers.id,
+                offerId: paymentAccountingOffers.offerId,
+                provider: paymentAccountingOffers.provider,
+                currency: paymentAccountingOffers.currency,
+                recognition: paymentAccountingOffers.recognition,
+                accountCode: accountNodes.code,
+                accountName: accountNodes.name,
+              })
+              .from(paymentAccountingOffers)
+              .leftJoin(
+                accountNodes,
+                and(
+                  eq(
+                    accountNodes.id,
+                    paymentAccountingOffers.considerationAccountId,
+                  ),
+                  eq(accountNodes.companyId, companyId),
+                ),
+              )
+              .where(
+                and(
+                  eq(paymentAccountingOffers.productId, productId),
+                  eq(paymentAccountingOffers.companyId, companyId),
+                  eq(paymentAccountingOffers.active, true),
+                ),
+              )
+              .orderBy(asc(paymentAccountingOffers.offerId))
+              .limit(25)
+          : [],
+      ]);
+      const [company] = companyRows;
+
       return success({
+        commerce: {
+          companyName: company?.name,
+          companyCurrency: company?.currency ?? undefined,
+          canEdit,
+          canConfigure,
+          canViewStock: !!role,
+          prices,
+          offers,
+        },
         result: {
           id: product.id,
           companyId: product.companyId ?? null,

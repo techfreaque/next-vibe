@@ -70,10 +70,31 @@ export function BankCandidatesWidget({
       push(match.POST, {
         renderInModal: false,
         popNavigationOnSuccess: 1,
-        urlPathParams: { lineId: statementLine.id },
-        data: { companyId: data.selectedCompanyId, journalLineId },
+        data: {
+          companyId: data.selectedCompanyId,
+          lineId: statementLine.id,
+          journalLineId,
+        },
       });
     })();
+  };
+  const followup = (action: "release" | "draft"): void => {
+    void import("../followup/definition").then(({ default: routes }) =>
+      push(routes.POST, {
+        data: {
+          companyId: data.selectedCompanyId,
+          lineId: statementLine.id,
+          action,
+          expectedJournalLineId: data.matchedJournalLineId ?? undefined,
+          expectedMatchedAt: data.matchedAt ?? undefined,
+        },
+      }),
+    );
+  };
+  const openBill = (billId: string): void => {
+    void import("@/payment/bill/[billId]/get/definition").then(
+      ({ default: routes }) => push(routes.GET, { urlPathParams: { billId } }),
+    );
   };
   const amount = formatMoney(
     statementLine.amount,
@@ -83,7 +104,19 @@ export function BankCandidatesWidget({
   const statementDate = formatDocDate(statementLine.bookedDate, locale);
   const rows = data.matches.map((row) => {
     const date = formatDocDate(row.journalDate, locale);
-    const sameDay = date === statementDate;
+    const exact = row.kind === undefined || row.kind === "exact";
+    const sameDay = exact && date === statementDate;
+    const adjustment = [
+      row.fee
+        ? `${t("statement.columns.feeAmount")} ${formatMoney(row.fee, statementLine.currency, locale)}`
+        : "",
+      row.fx
+        ? `${t("adjustment.fxDifference")} ${formatMoney(row.fx, statementLine.currency, locale)}`
+        : "",
+    ]
+      .filter(Boolean)
+      .join(" · ");
+    const match = exact ? t("ui.exactMatch") : adjustment;
     const dateCell = sameDay ? (
       <Div className="flex flex-col gap-1">
         <Span>{date}</Span>
@@ -107,7 +140,7 @@ export function BankCandidatesWidget({
         entryNumber: row.entryNumber,
         description: row.description,
         date: dateCell,
-        amount,
+        match,
         action: matchButton,
       },
       onOpen,
@@ -132,8 +165,71 @@ export function BankCandidatesWidget({
             value={formatDocDate(statementLine.bookedDate, locale)}
           />
           <DetailField label={t("fields.amount")} value={amount} />
+          {statementLine.nativeAmount && statementLine.nativeCurrency && (
+            <DetailField
+              label={t("statement.columns.nativeAmount")}
+              value={formatMoney(
+                statementLine.nativeAmount,
+                statementLine.nativeCurrency,
+                locale,
+              )}
+            />
+          )}
+          {statementLine.feeAmount && statementLine.feeCurrency && (
+            <DetailField
+              label={t("statement.columns.feeAmount")}
+              value={formatMoney(
+                statementLine.feeAmount,
+                statementLine.feeCurrency,
+                locale,
+              )}
+            />
+          )}
+          {statementLine.counterparty && (
+            <DetailField
+              label={t("statement.columns.counterparty")}
+              value={statementLine.counterparty}
+            />
+          )}
         </DetailGrid>
       </SectionGroup>
+      {interactive && data.canMatch && (
+        <Div className="flex flex-wrap gap-2">
+          {data.matchedJournalLineId && (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => followup("release")}
+            >
+              {t("adjustment.release")}
+            </Button>
+          )}
+          {statementLine.supplierBillId ? (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                if (statementLine.supplierBillId) {
+                  openBill(statementLine.supplierBillId);
+                }
+              }}
+            >
+              {t("adjustment.openDraft")}
+            </Button>
+          ) : (
+            !data.matchedJournalLineId &&
+            Number(statementLine.amount) < 0 && (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => followup("draft")}
+              >
+                {t("adjustment.draft")}
+              </Button>
+            )
+          )}
+        </Div>
+      )}
       <FormAlertWidget field={{}} />
       {data.matchedJournalLineId ? (
         <ResultBanner variant="success" title={t("ui.alreadyMatched")} />
@@ -149,7 +245,7 @@ export function BankCandidatesWidget({
             { id: "entryNumber", label: t("fields.entryNumber") },
             { id: "description", label: t("fields.description") },
             { id: "date", label: t("fields.journalDate") },
-            { id: "amount", label: t("fields.amount"), numeric: true },
+            { id: "match", label: t("adjustment.kind") },
             { id: "action", label: "" },
           ]}
           rows={rows.map(({ id, cells }) => ({ id, cells }))}
@@ -160,7 +256,7 @@ export function BankCandidatesWidget({
                   key={row.id}
                   title={row.cells.entryNumber}
                   subtitle={row.cells.description}
-                  meta={`${row.date} · ${row.cells.amount}${row.sameDay ? ` · ${t("ui.sameDay")}` : ""}`}
+                  meta={`${row.date} · ${row.cells.match}${row.sameDay ? ` · ${t("ui.sameDay")}` : ""}`}
                   onClick={row.onOpen}
                 />
               ))}

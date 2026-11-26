@@ -73,6 +73,17 @@ export const translations: typeof enTranslations = {
     placeholder: "Zadajte ID faktúry",
   },
   widget: {
+    invoice: "Faktúra",
+    total: "Suma faktúry",
+    customer: "Zákazník",
+    openInvoice: "Otvoriť faktúru",
+    retry: "Skúsiť znova",
+    loading: "Načítava sa faktúra…",
+    unavailable: "Faktúra nie je dostupná",
+    reversal: "Storno s dnešným dátumom vyrovná otvorenú pohľadávku.",
+    cancelOnly: "Faktúra bude zrušená.",
+    ineligible:
+      "Stornovať môžete koncept alebo neuhradenú faktúru bez priradených platieb či dobropisov.",
     back: "Späť",
     submit: "Stornovať faktúru",
     warning: "Faktúra sa natrvalo stornuje. Operáciu nemožno vrátiť späť.",

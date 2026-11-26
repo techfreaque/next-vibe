@@ -167,24 +167,38 @@ export const translations = {
       description: "Successfully retrieved your referral statistics",
     },
     widget: {
+      emptyAdminMessage:
+        "Open the overview to see activity across the entire program.",
+      loading: "Loading referral statistics",
+      loadError: "Referral statistics could not load",
+      retry: "Try again",
+      emptyTitle: "No referral activity yet",
+      openCodes: "Open referral codes",
+      revenueCoverage:
+        "Original purchase amounts recorded for {{measured}} of {{total}} purchases.",
+      revenueUnavailable: "Unavailable",
+      walletUnits: "{{amount}} credits",
       adminNotice:
-        "These are your personal referral numbers. The whole program lives in the Referral Overview.",
+        "These figures cover your referrals. Open the overview for program totals.",
       openOverview: "Open Referral Overview",
       emptyMessage:
-        "No activity yet - share your referral link to start earning",
+        "Share a referral code to start tracking signups and commissions.",
     },
     fields: {
       totalSignups: "Total Signups",
       totalSignupsDescription:
         "Number of users who signed up using your referral code",
-      totalRevenue: "Total Revenue",
-      totalRevenueDescription: "Total revenue generated from your referrals",
+      totalRevenue: "Recorded purchase value",
+      totalRevenueDescription:
+        "Original USD purchase amounts linked to your commissions.",
       totalEarned: "Total Earned",
-      totalEarnedDescription: "Total commission earned from referrals",
+      totalEarnedDescription:
+        "Credits earned, including those in the refund window.",
       availableBalance: "Available Balance",
-      availableBalanceDescription: "Available balance ready for payout",
+      availableBalanceDescription:
+        "Wallet credits available after payout reservations.",
       availableBalanceDescriptionLow:
-        "Spend on AI chats - other credits used first. Earn {{minPayout}} to unlock withdrawal.",
+        "Wallet credits available after payout reservations. Minimum payout: {{minPayout}} credits.",
       totalRevenueCredits: "Total Revenue (Credits)",
       totalEarnedCredits: "Total Earned (Credits)",
       totalPaidOutCredits: "Total Paid Out (Credits)",
@@ -416,6 +430,7 @@ export const translations = {
           credits:
             "Credits payouts convert when requested, so a pending one is stuck. Reject it to release the earnings; the partner can request again.",
         },
+        prepareBill: "Prepare supplier bill",
         codeReport: "Code report",
       },
     },

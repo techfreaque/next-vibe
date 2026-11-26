@@ -12,7 +12,13 @@ import { PosOrderRemoveItemRepository } from "./repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
-    handler: ({ data, user, logger, locale }) =>
-      PosOrderRemoveItemRepository.removeItem(data, user.id, logger, locale),
+    handler: ({ data, urlPathParams, user, logger, locale }) =>
+      PosOrderRemoveItemRepository.removeItem(
+        data,
+        user.id,
+        logger,
+        locale,
+        urlPathParams.orderId,
+      ),
   },
 });

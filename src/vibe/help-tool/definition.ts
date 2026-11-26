@@ -71,6 +71,12 @@ const aiToolMetadataSchema = z.object({
   instanceId: z.string().optional(),
 });
 
+const adminLandingLinkSchema = z.object({
+  alias: z.string(),
+  title: z.string(),
+  description: z.string().optional(),
+});
+
 const categoriesSchema = z.array(
   z.object({
     name: z.string(),
@@ -317,6 +323,77 @@ const { GET } = createEndpoint({
           Platform.MCP,
           Platform.CRON,
           Platform.REMOTE_SKILL,
+        ],
+      }),
+
+      adminCatalogDestinations: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "admin.workspaces",
+        schema: z
+          .record(
+            z.string(),
+            z.object({
+              category: z.string(),
+              subCategory: z.string().optional(),
+            }),
+          )
+          .optional(),
+        visibleFor: [UserPermissionRole.ADMIN],
+        hiddenForPlatforms: [
+          Platform.AI,
+          Platform.MCP,
+          Platform.CRON,
+          Platform.REMOTE_SKILL,
+          Platform.CLI,
+          Platform.CLI_PACKAGE,
+        ],
+      }),
+
+      adminCategoryLandings: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "admin.workspaces",
+        schema: z
+          .record(
+            z.string(),
+            z.object({
+              description: z.string().optional(),
+              heading: z.string().optional(),
+              overview: z
+                .object({
+                  alias: z.string(),
+                  scope: z.enum(["platform", "company"]),
+                })
+                .optional(),
+              summary: z
+                .object({
+                  alias: z.string(),
+                  scope: z.enum(["platform", "company"]),
+                  args: z.record(z.string(), z.string()).optional(),
+                  home: z.boolean().optional(),
+                  homeArgs: z.record(z.string(), z.string()).optional(),
+                  progressive: z.boolean().optional(),
+                })
+                .optional(),
+              contextualActions: z.boolean().optional(),
+              actions: z.array(
+                z.object({ alias: z.string(), title: z.string() }),
+              ),
+              destinations: z.array(adminLandingLinkSchema),
+              createActions: z.array(adminLandingLinkSchema),
+              automations: z.array(adminLandingLinkSchema),
+              automationCount: z.number(),
+              developerCount: z.number(),
+            }),
+          )
+          .optional(),
+        visibleFor: [UserPermissionRole.ADMIN],
+        hiddenForPlatforms: [
+          Platform.AI,
+          Platform.MCP,
+          Platform.CRON,
+          Platform.REMOTE_SKILL,
+          Platform.CLI,
+          Platform.CLI_PACKAGE,
         ],
       }),
 

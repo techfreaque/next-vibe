@@ -94,6 +94,10 @@ export const translations: typeof enTranslations = {
     },
   },
   widget: {
+    loadingReport: "Wczytywanie raportu przychodów…",
+    operatingTitle: "Przychody operacyjne",
+    currencyBasis: "Kwoty w przybliżeniu w USD.",
+    filterDisclosure: "Filtry",
     extra: {
       grossHint: "Subskrypcje {{subs}} · pakiety {{packs}} · ok. USD",
       newSubsHint:

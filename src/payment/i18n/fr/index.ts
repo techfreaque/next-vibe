@@ -951,9 +951,18 @@ export const translations: typeof enTranslations = {
   },
 
   get: {
-    title: "Informations de paiement",
+    title: "Vos paiements",
     titleShort: "Paiements",
-    description: "Récupère les transactions et moyens de paiement",
+    description:
+      "Les dix dernières opérations de paiement de votre compte au maximum.",
+    summary: {
+      empty: "Aucun paiement",
+      emptyDescription: "Vos paiements apparaîtront ici.",
+      loading: "Chargement de vos paiements…",
+      error: "Impossible de charger vos paiements",
+      retry: "Réessayer",
+      amountUnavailable: "Montant indisponible",
+    },
     form: {
       title: "Recherche de paiements",
       description: "Consultez les informations de paiement",

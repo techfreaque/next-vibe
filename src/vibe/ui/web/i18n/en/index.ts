@@ -21,6 +21,7 @@ export const translations = {
     addTags: "Add tags",
     addCustomValue: "Add '{{value}}'",
     required: "Required",
+    callingCode: "Country calling code {{prefix}}",
     enterPhoneNumber: "Enter phone number",
     unknownFieldType: "Unknown field type",
     selectDate: "Select date",
@@ -53,6 +54,8 @@ export const translations = {
       copyCode: "Copy code",
     },
     multiSelect: {
+      search: "Search options",
+      remove: "Remove {{label}}",
       placeholder: "Select items...",
       noResultsFound: "No results found",
     },

@@ -840,6 +840,14 @@ export const translations = {
 
   // Shared data-source chart widget UI
   dataSourceWidget: {
+    latestValue: "Latest",
+    browseGraphs: "Browse graphs",
+    filters: "Filters",
+    applyFilters: "Apply filters",
+    expandPeriod: "Show {{period}}",
+    period: "Period",
+    interval: "Group by",
+    loadError: "The chart could not load.",
     addToGraph: "Add to graph",
     newGraph: "New graph",
     loading: "Loading data…",

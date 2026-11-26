@@ -57,12 +57,15 @@ export function HmrWrapper({
 }: HmrWrapperProps): React.ReactElement {
   // On first render, getModulePromise() creates and caches the promise on state.
   // Subsequent renders (and client hydration) get the same cached instance.
-  // HMR updates swap both the promise and the lazy fallback; held in state so
-  // the swap re-renders and render never reads refs.
-  const [current, setCurrent] = useState<{
-    promise: Promise<AnyComponent> | null;
-    lazy: AnyComponent;
-  }>(() => ({ promise: getModulePromise(), lazy: state.lazy }));
+  // A prewarmed widget starts on the direct path. HMR intentionally replaces
+  // the mounted implementation through state.
+  const [current, setCurrent] = useState(() => {
+    const component = state.resolved;
+    return {
+      promise: component ? null : getModulePromise(),
+      component: component ?? state.lazy,
+    };
+  });
   const registeredRef = useRef(false);
 
   useEffect(() => {
@@ -72,6 +75,9 @@ export function HmrWrapper({
     registeredRef.current = true;
     ensureGlobals();
 
+    const onUpdate: UpdateCallback = (Component): void => {
+      setCurrent({ promise: null, component: Component });
+    };
     const registration = (async (): Promise<(() => void) | null> => {
       const mod = (await factory()) as WidgetModule;
 
@@ -93,13 +99,6 @@ export function HmrWrapper({
         byFile.set(moduleId, new Set());
       }
 
-      const onUpdate: UpdateCallback = (Component): void => {
-        const freshLazy = React.lazy((): Promise<{ default: AnyComponent }> =>
-          Promise.resolve({ default: Component }),
-        );
-        setCurrent({ promise: Promise.resolve(Component), lazy: freshLazy });
-      };
-
       byFile.get(moduleId)!.add(onUpdate);
       return (): void => {
         byFile.get(moduleId)?.delete(onUpdate);
@@ -111,31 +110,13 @@ export function HmrWrapper({
     };
   }, [factory]);
 
-  // The rendered tree shape must be IDENTICAL on server and client no matter
-  // which side resolved the module first. Suspense boundaries are part of the
-  // hydration structure (the server emits <!--$--> markers), so the old
-  // "skip Suspense when already resolved" fast path produced
-  // server=<Suspense> vs client=<component> whenever one side was warm and
-  // the other cold — the recurring hydration-mismatch error on every widget
-  // page. A Suspense that never suspends adds no DOM and costs nothing, so
-  // every path now renders through the same boundary; only the child differs
-  // (component types are not part of DOM matching).
-  const currentPromise = current.promise;
-  let child: React.ReactElement;
-  if (state.resolved !== null) {
-    // Warm path: resolved via prior render, preload(), or HMR update.
-    child = React.createElement(state.resolved, widgetProps);
-  } else if (currentPromise !== null) {
-    // Pending path: use() suspends until the module resolves. On the server,
-    // streaming waits inline before flushing this boundary's HTML; on the
-    // client during hydration, React defers hydrating just this boundary.
-    child = React.createElement(ResolvedWidget, {
-      promise: currentPromise,
-      widgetProps,
-    });
-  } else {
-    // No promise available (drizzle-kit or non-Vite context).
-    child = React.createElement(current.lazy, widgetProps);
-  }
+  // Choose the mounted path once. The promise resolving must not insert or
+  // remove a component layer around a widget that is already mounted.
+  const child = current.promise
+    ? React.createElement(ResolvedWidget, {
+        promise: current.promise,
+        widgetProps,
+      })
+    : React.createElement(current.component, widgetProps);
   return React.createElement(React.Suspense, { fallback: null }, child);
 }

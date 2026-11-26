@@ -54,8 +54,9 @@ export const translations: typeof enTranslations = {
       description: "Exportovať kontakty vytvorené do tohto dátumu",
     },
     includeMetadata: {
-      label: "Zahrnúť metadáta",
-      description: "Zahrnúť dátumy a časy vytvorenia a aktualizácie",
+      label: "Zahrnúť technické metadáta",
+      description:
+        "Pridajte časové údaje, IP adresu, údaje o zariadení, odporúčací kód a uložené metadáta.",
     },
     includeEngagementData: {
       label: "Zahrnúť údaje o interakciách",
@@ -114,6 +115,7 @@ export const translations: typeof enTranslations = {
     },
   },
   widget: {
+    prepareFile: "Pripraviť export",
     exportLeads: "Exportovať kontakty",
     import: "Import",
     viewList: "Zobraziť zoznam",
@@ -123,7 +125,7 @@ export const translations: typeof enTranslations = {
     generatingExport: "Pripravuje sa export…",
     generatingExportHint:
       "Spracovanie väčšieho množstva údajov môže chvíľu trvať",
-    exportReady: "Export pripravený",
+    exportReady: "Export je pripravený",
     fileReadyToDownload: "Váš súbor je pripravený na stiahnutie",
     records: "Záznamy",
     format: "Formát",
@@ -135,7 +137,7 @@ export const translations: typeof enTranslations = {
     nextSteps: "Ďalšie kroky:",
     viewLeads: "Zobraziť kontakty",
     importLeads: "Importovať kontakty",
-    configureExport: "Nastaviť export",
+    configureExport: "Možnosti súboru",
     configureExportHint:
       "Vyberte formát a filtre. Súbor vytvoríte kliknutím na Export.",
     formatLabel: "Formát",
@@ -149,6 +151,18 @@ export const translations: typeof enTranslations = {
     viewLeadsList: "Zoznam kontaktov",
     excelSpreadsheet: "Tabuľka Excel",
     csvFile: "Súbor CSV",
+    description: "Vyberte formát súboru a vyfiltrujte kontakty na export.",
+    changeFilters: "Upraviť filtre",
+    advancedFilters: "Rozšírené filtre",
+    activeFilters: "Aktívne filtre: {{count}}",
+    exportFailed:
+      "Export sa nepodarilo pripraviť. Vaše filtre zostali vybraté. Skúste to znova.",
+    retry: "Skúsiť znova",
+    noMatchingRecords: "Filtrom nezodpovedá žiadny kontakt",
+    noMatchingRecordsHint:
+      "Upravte alebo odstráňte filter a pripravte export znova.",
+    fileDetails: "Záznamy: {{count}} · {{size}}",
+    generatedAt: "Vytvorené {{date}}",
   },
   enums: {
     exportFormat: {

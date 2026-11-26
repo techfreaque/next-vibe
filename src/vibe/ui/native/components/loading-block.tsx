@@ -23,11 +23,13 @@ const sizeMap: Record<LoadingBlockSize, "small" | "large"> = {
 
 export function LoadingBlock({
   message,
+  announce = false,
   size = "md",
   className,
 }: LoadingBlockProps): React.JSX.Element {
   return (
     <StyledView
+      accessibilityLiveRegion={announce ? "polite" : undefined}
       className={cn("items-center justify-center gap-2 py-8", className)}
     >
       <ActivityIndicator size={sizeMap[size]} />

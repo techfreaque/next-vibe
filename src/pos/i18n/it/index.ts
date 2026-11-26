@@ -44,6 +44,33 @@ export const translations: typeof enTranslations = {
   },
 
   // POS Dashboard
+  workflow: {
+    backToSessionOrders: "Torna agli ordini della sessione",
+    receiptTitle: "Ricevuta",
+    amountDue: "Importo da incassare",
+    ledgerCurrencyMismatch:
+      "La valuta dell’ordine è diversa da quella contabile. Prima di incassare usa una cassa o un ordine nella valuta contabile.",
+    postingUnavailable:
+      "Impossibile contabilizzare la vendita. Controlla la valuta aziendale, il periodo aperto e i conti.",
+    cashCurrencyMismatch:
+      "Il contante deve essere nella valuta della cassa. Scegli un altro metodo di pagamento per questo ordine.",
+    tenderMinorUnits: "Inserisci importi in centesimi interi.",
+    legacyTenderReview:
+      "Un pagamento precedente include una frazione di centesimo. Verifica l’importo prima di incassare altro.",
+    legacyTenderRecorded:
+      "Questo ordine conserva gli importi originali con quattro decimali.",
+    legacyPostingReview:
+      "Gli importi registrati con frazioni di centesimo non possono essere contabilizzati. Verifica il pagamento iniziale prima di chiudere la vendita.",
+    viewReceipt: "Mostra ricevuta",
+    openDrawer: "Apri la cassa",
+    warehouse: "Magazzino di vendita",
+    noWarehouse: "Nessun magazzino assegnato",
+    chooseCompanyFirst: "Seleziona prima un’azienda.",
+    warehouseInstruction:
+      "Scegli un magazzino attivo dell’azienda selezionata.",
+    stockUnavailable:
+      "Le scorte disponibili nel magazzino di questa cassa sono insufficienti. Controlla le quantità prima di completare la vendita.",
+  },
   dashboard: {
     get: {
       title: "POS Dashboard",
@@ -377,7 +404,7 @@ export const translations: typeof enTranslations = {
         sessionSummary: "Sintesi della sessione",
         terminal: "Terminal",
         openedAt: "Aperto a",
-        orderCount: "Ordini",
+        orderCount: "Ordini: {{count}}",
         sessionRevenue: "Ricavi",
         floatHint: "Conta i soldi nel cassetto prima di chiudere.",
         reconciliation: "Fine del giorno",

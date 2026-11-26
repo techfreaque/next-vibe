@@ -5,13 +5,13 @@ export const translations: typeof enTranslations = {
   post: {
     title: "JSON-Pfad",
     titleShort: "JSON-Pfad",
-    description:
-      "JSON-Pfad - extrahiert Wert per Punktnotation (abgelöst, gibt leer zurück)",
+    description: "Liest den Messwert oder ein numerisches Metadatenfeld.",
     fields: {
       source: { label: "Quelle", description: "Eingabe-Zeitreihe" },
       path: {
         label: "Pfad",
-        description: "Punktnotationspfad (nicht mehr unterstützt)",
+        description:
+          "Geben Sie value oder einen Metadatenpfad wie meta.close ein.",
       },
       resolution: { label: "Auflösung", description: "Berechnungszeitrahmen" },
       range: { label: "Bereich", description: "Zu berechnender Zeitraum" },

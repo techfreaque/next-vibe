@@ -7,9 +7,9 @@ export const translations: typeof enTranslations = {
     list: "Lista",
   },
   get: {
-    title: "Suscripciones de la empresa",
-    titleShort: "Company Subs",
-    description: "Listar todas las suscripciones para una empresa",
+    title: "Suscripciones del titular",
+    titleShort: "Suscripciones del titular",
+    description: "Consulta la suscripción personal del titular de la empresa.",
     companyId: {
       label: "Company ID",
       description: "La empresa cuya suscripción a la lista",

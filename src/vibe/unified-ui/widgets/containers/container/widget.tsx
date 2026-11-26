@@ -20,6 +20,7 @@ import { useWatch } from "react-hook-form";
 import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
 import { LayoutType } from "../../../../core/definition/enums";
 import type { WidgetData } from "../../../../core/utils/json";
+import { UserPermissionRole } from "../../../../identity/roles/enum";
 import { cn } from "../../../_shared/cn";
 import type { ReactWidgetProps } from "../../../_shared/react-types";
 import { hasChild, hasChildren } from "../../../_shared/type-guards";
@@ -41,6 +42,7 @@ import {
   useWidgetOnSubmit,
   useWidgetResponse,
   useWidgetSubmitButton,
+  useWidgetUser,
 } from "../../../_shared/use-widget-context";
 import {
   getIconSizeClassName,
@@ -53,6 +55,8 @@ import { scopedTranslation as reactScopedTranslation } from "../../../hooks/i18n
 import { MultiWidgetRenderer } from "../../../renderers/web/MultiWidgetRenderer";
 import { Icon } from "../../form-fields/icon-field/icon-component";
 import type { IconKey } from "../../form-fields/icon-field/icons";
+import { SubmitButtonWidget } from "../../interactive/submit-button/widget";
+import { AdminForm, AdminFormSection } from "../admin-form/widget";
 import type {
   ContainerArrayWidgetConfig,
   ContainerObjectWidgetConfig,
@@ -144,6 +148,7 @@ export function ContainerWidget<
   const cancelButton = useWidgetCancelButton<TEndpoint>();
   const response = useWidgetResponse();
   const navigation = useWidgetNavigation();
+  const user = useWidgetUser();
 
   const { t: globalT } = reactScopedTranslation.scopedT(locale);
 
@@ -156,6 +161,7 @@ export function ContainerWidget<
     paddingBottom,
     borderBottom,
     title: titleKey,
+    adminForm,
     description: descriptionKey,
     noCard = false,
     innerClassName,
@@ -369,6 +375,48 @@ export function ContainerWidget<
   const loadingText = submitButtonConfig?.loadingText
     ? tField(submitButtonConfig.loadingText)
     : globalT("widgets.endpointRenderer.submitting");
+
+  if (
+    adminForm &&
+    isRootContainer &&
+    hasFormInputs &&
+    displayTitle &&
+    !user.isPublic &&
+    user.roles.includes(UserPermissionRole.ADMIN)
+  ) {
+    return (
+      <AdminForm
+        title={displayTitle}
+        description={description}
+        backButton={
+          shouldShowAutoBackButton ? (
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => navigation?.pop()}
+            >
+              {globalT("widgets.endpointRenderer.cancel")}
+            </Button>
+          ) : undefined
+        }
+        primaryAction={
+          <SubmitButtonWidget<TEndpoint>
+            field={{ text: adminForm.submitText }}
+          />
+        }
+      >
+        <AdminFormSection title={tField(adminForm.sectionTitle)} columns={2}>
+          <MultiWidgetRenderer
+            childrenSchema={childrenForRenderer}
+            value={fieldValue}
+            fieldName={fieldName}
+            discriminator={discriminator}
+            watchedDiscriminatorValue={watchedDiscriminator}
+          />
+        </AdminFormSection>
+      </AdminForm>
+    );
+  }
 
   // Check if children are present for validation
   const hasChildren_ = childrenForRenderer !== undefined;

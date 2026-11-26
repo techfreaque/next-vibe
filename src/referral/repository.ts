@@ -30,6 +30,7 @@ import { NotificationType } from "@/notifications/enum";
 import { NotificationsRepository } from "@/notifications/repository";
 
 import { withTransaction } from "../vibe/database/utils/repository-helpers";
+import { queryPartnerBalances } from "./analytics/queries";
 import type {
   CodesListGetResponseOutput,
   ReferralCode,
@@ -641,7 +642,7 @@ export class ReferralRepository {
 
   /**
    * Get referral stats for a user
-   * Returns: signups, revenue generated, earned credits, paid out, available
+   * Returns signups, recorded purchases, earned credits and available payout credits.
    */
   static async getReferralStats(
     userId: string,
@@ -651,73 +652,38 @@ export class ReferralRepository {
     try {
       logger.debug("Getting referral stats", { userId });
 
-      // Count total signups from user referrals
-      const [signupsResult] = await db
-        .select({
-          count: sql<number>`count(*)::int`,
-        })
-        .from(userReferrals)
-        .where(eq(userReferrals.referrerUserId, userId));
-
-      const totalSignups = signupsResult?.count || 0;
-
-      // Calculate total revenue generated (earnings / total pool percentage)
-      const revenueMultiplier = Math.round(
-        1 /
-          (REFERRAL_CONFIG.DIRECT_PERCENTAGE +
-            REFERRAL_CONFIG.UPLINE_PERCENTAGE),
-      );
-      const [revenueResult] = await db
-        .select({
-          total: sql<number>`COALESCE(SUM(${referralEarnings.amountCents}) * ${revenueMultiplier}, 0)::int`,
-        })
-        .from(referralEarnings)
-        .where(
-          and(
-            eq(referralEarnings.earnerUserId, userId),
-            ne(referralEarnings.status, ReferralEarningStatus.CANCELED),
-          ),
-        );
-
-      const totalRevenueCredits = revenueResult?.total || 0;
-
-      // Total earned = pending + confirmed (refunded/charged-back = canceled, excluded)
-      const [earningsResult] = await db
-        .select({
-          total: sql<number>`COALESCE(SUM(${referralEarnings.amountCents}), 0)::int`,
-          confirmed: sql<number>`COALESCE(SUM(${referralEarnings.amountCents}) FILTER (WHERE ${referralEarnings.status} = ${ReferralEarningStatus.CONFIRMED}), 0)::int`,
-        })
-        .from(referralEarnings)
-        .where(
-          and(
-            eq(referralEarnings.earnerUserId, userId),
-            ne(referralEarnings.status, ReferralEarningStatus.CANCELED),
-          ),
-        );
-
-      const totalEarnedCredits = earningsResult?.total || 0;
-      const confirmedEarnedCredits = earningsResult?.confirmed || 0;
-
-      // Calculate total paid out (from completed payout requests)
-      const [payoutResult] = await db
-        .select({
-          total: sql<number>`COALESCE(SUM(${payoutRequests.amountCents}), 0)::int`,
-        })
-        .from(payoutRequests)
-        .where(
-          and(
-            eq(payoutRequests.userId, userId),
-            eq(payoutRequests.status, PayoutStatus.COMPLETED),
-          ),
-        );
-
-      const totalPaidOutCredits = payoutResult?.total || 0;
-
-      // Available = confirmed (past the refund window) - paid out
-      const availableCredits = Math.max(
-        0,
-        confirmedEarnedCredits - totalPaidOutCredits,
-      );
+      // A purchase can produce more than one earning for an upstream partner.
+      // Its original USD base is recorded on the earning, independently of its
+      // commission rate. Legacy credit bases cannot establish purchase revenue.
+      const [{ rows }, balances] = await Promise.all([
+        db.execute<{
+          revenue_cents: number;
+          measured_purchases: number;
+          total_purchases: number;
+          earned_credits: number;
+        }>(sql`
+          WITH purchases AS (
+            SELECT
+              MAX(${referralEarnings.baseAmountUsdCents}) AS usd_cents,
+              SUM(${referralEarnings.amountCents})
+                FILTER (WHERE ${referralEarnings.currency} = ${PayoutCurrency.CREDITS}) AS earned
+            FROM ${referralEarnings}
+            WHERE ${referralEarnings.earnerUserId} = ${userId}
+              AND ${referralEarnings.status} <> ${ReferralEarningStatus.CANCELED}
+            GROUP BY ${referralEarnings.transactionId}
+          )
+          SELECT COALESCE(SUM(usd_cents), 0)::float8 AS revenue_cents,
+            COUNT(usd_cents)::int AS measured_purchases,
+            COUNT(*)::int AS total_purchases,
+            COALESCE(SUM(earned), 0)::float8 AS earned_credits
+          FROM purchases
+        `),
+        queryPartnerBalances([userId]),
+      ]);
+      const [totals] = rows;
+      const balance = balances.get(userId);
+      const totalSignups = balance?.referredUsers ?? 0;
+      const availableCredits = Math.max(0, balance?.freeCents ?? 0);
 
       return success({
         totalSignupsTitle: "stats.fields.totalSignups",
@@ -725,11 +691,13 @@ export class ReferralRepository {
         totalSignupsDescription: "stats.fields.totalSignupsDescription",
 
         totalRevenueTitle: "stats.fields.totalRevenue",
-        totalRevenueValue: totalRevenueCredits,
+        totalRevenueValue: totals?.revenue_cents ?? 0,
+        totalRevenueMeasuredPurchases: totals?.measured_purchases ?? 0,
+        totalRevenuePurchaseCount: totals?.total_purchases ?? 0,
         totalRevenueDescription: "stats.fields.totalRevenueDescription",
 
         totalEarnedTitle: "stats.fields.totalEarned",
-        totalEarnedValue: totalEarnedCredits,
+        totalEarnedValue: totals?.earned_credits ?? 0,
         totalEarnedDescription: "stats.fields.totalEarnedDescription",
 
         availableCreditsTitle: "stats.fields.availableBalance",

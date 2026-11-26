@@ -101,6 +101,11 @@ const { GET } = createEndpoint({
             hidden: true,
             schema: z.uuid(),
           }),
+          vendorName: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            label: "orderGet.get.widget.vendorLabel",
+            schema: z.string().nullable().optional(),
+          }),
           vendorId: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             label: "orderGet.get.response.vendorId" as const,

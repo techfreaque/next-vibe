@@ -23,6 +23,7 @@ import { CompanyAuthRepository } from "@/companies/repository";
 
 import { taxRates } from "../../db";
 import { scopedTranslation } from "../../i18n";
+import { getCompanyTaxRegime } from "../../regime/policy";
 import type {
   TaxRateListRequestOutput,
   TaxRateListResponseOutput,
@@ -73,7 +74,12 @@ export class TaxRateListRepository {
         companyIdCondition = eq(taxRates.companyId, data.companyId);
       }
 
-      const conditions = [companyIdCondition, eq(taxRates.isActive, true)];
+      const conditions = [
+        companyIdCondition,
+        data.rateId
+          ? eq(taxRates.id, data.rateId)
+          : eq(taxRates.isActive, true),
+      ];
 
       if (data.country) {
         conditions.push(eq(taxRates.country, data.country));
@@ -102,6 +108,13 @@ export class TaxRateListRepository {
         .offset(offset);
 
       return success({
+        ...(data.companyId
+          ? {
+              salesExemptionNotice: (
+                await getCompanyTaxRegime(db, data.companyId, new Date())
+              ).notice,
+            }
+          : {}),
         total: total ?? 0,
         rates: rows.map((row) => ({
           id: row.id,

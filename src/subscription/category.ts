@@ -6,9 +6,10 @@
 import type { CategoryDefinition } from "next-vibe/help-tool/category-types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 
-import { REVENUE_REPORT_ALIAS } from "@/payment/analytics/revenue/constants";
 import { SUBSCRIPTION_DASHBOARD_ALIAS } from "@/subscription/dashboard/constants";
 import { USER_ME_ALIAS } from "@/user/private/me/constants";
+
+import { SUBSCRIPTION_ADMIN_LIST_ALIAS } from "./admin/list/constants";
 
 export const category: CategoryDefinition = {
   key: "subscriptions",
@@ -22,11 +23,30 @@ export const category: CategoryDefinition = {
     "es-ES": "Suscripciones",
     "sk-SK": "Predplatné",
   },
-  group: "business",
+  description: {
+    "en-US": "Find active plans, renewals and cancellations.",
+    "en-GLOBAL": "Find active plans, renewals and cancellations.",
+    "de-DE": "Sehen Sie aktive Abos, Verlängerungen und Kündigungen ein.",
+    "pl-PL": "Sprawdź aktywne plany, odnowienia i rezygnacje.",
+    "fr-FR":
+      "Consultez les abonnements actifs, les renouvellements et les résiliations.",
+    "it-IT": "Consulti i piani attivi, i rinnovi e le disdette.",
+    "es-ES":
+      "Consulte los planes activos, las renovaciones y las cancelaciones.",
+    "sk-SK": "Skontrolujte aktívne predplatné, obnovenia a zrušenia.",
+  },
+  group: "billing",
   icon: "refresh-cw",
   order: 12,
+  landing: {
+    actions: [
+      "subscription-admin-list",
+      "subscription-admin-stats",
+      "products-catalog-list",
+    ],
+  },
   defaultEntry: {
-    [UserPermissionRole.ADMIN]: REVENUE_REPORT_ALIAS,
+    [UserPermissionRole.ADMIN]: SUBSCRIPTION_ADMIN_LIST_ALIAS,
     [UserPermissionRole.CUSTOMER]: SUBSCRIPTION_DASHBOARD_ALIAS,
     [UserPermissionRole.PUBLIC]: USER_ME_ALIAS,
   },

@@ -101,6 +101,18 @@ export const translations: typeof enTranslations = {
       total: "Gesamt",
     },
     widget: {
+      checkout: "Checkout-Angebote der Plattform",
+      checkoutHint:
+        "Hier sehen Sie die Tarife und Guthabenpakete für diesen Markt. Wählen Sie unten ein Unternehmensprodukt, um ein Prozessorangebot für die Buchhaltung zu verknüpfen.",
+      checkoutReference: "Checkout-Referenz",
+      checkoutCredits: "Enthaltene Credits",
+      oneTime: "Einmalpreis",
+      searchPage: "Diese Seite nach Name oder Artikelnummer durchsuchen",
+      noMatches: "Keine passenden Produkte auf dieser Seite",
+      retry: "Erneut versuchen",
+      previous: "Zurück",
+      next: "Weiter",
+      status: "Status",
       addProduct: "Produkt hinzufügen",
       active: "Aktiv",
       inactive: "Inaktiv",

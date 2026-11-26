@@ -35,6 +35,10 @@ import { useWorkspaceCompany } from "@/companies/_shared/workspace-company-conte
 import { DocumentDraftLines } from "@/finance/document-draft-lines";
 import { DocumentVatPicker } from "@/finance/document-vat-picker";
 import { useDocumentVatRates } from "@/finance/document-vat-rates";
+import {
+  LINE_SETTLEMENT_V1,
+  supportsLineCentSettlement,
+} from "@/tax/line-settlement";
 
 import { calculateInvoiceLine } from "../../invoice/line/amounts";
 import type definition from "./definition";
@@ -53,7 +57,8 @@ export function EstimateCreateWidget({
     control: form.control,
     name: "lines",
   });
-  const watched = useWatch({ control: form.control, name: "lines" }) ?? [];
+  const lineValues = useWatch({ control: form.control, name: "lines" });
+  const watched = Array.isArray(lineValues) ? lineValues : [];
   const disabled = useWidgetDisabled();
   const locale = useWidgetLocale();
   const [currency, companyId] = useWatch({
@@ -73,12 +78,19 @@ export function EstimateCreateWidget({
     denomination
       ? formatMoney(n, denomination, locale)
       : formatMoneyAmount(n, locale);
+  const settlement =
+    denomination && supportsLineCentSettlement(denomination)
+      ? LINE_SETTLEMENT_V1
+      : undefined;
   const calculated = watched.map((line) =>
-    calculateInvoiceLine({
-      quantity: line.quantity ?? 1,
-      unitPrice: line.unitPrice,
-      taxRate: line.taxRate ?? 0,
-    }),
+    calculateInvoiceLine(
+      {
+        quantity: line.quantity ?? 1,
+        unitPrice: line.unitPrice,
+        taxRate: line.taxRate ?? 0,
+      },
+      settlement,
+    ),
   );
   const gross = calculated.reduce(
     (total, line) => total + Math.round(line.lineTotal * 10000),

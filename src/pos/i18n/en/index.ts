@@ -42,6 +42,32 @@ export const translations = {
   },
 
   // POS Dashboard
+  workflow: {
+    backToSessionOrders: "Back to session orders",
+    receiptTitle: "Receipt",
+    amountDue: "Amount due",
+    ledgerCurrencyMismatch:
+      "This order uses a different currency from the company ledger. Use a terminal or order in the ledger currency before taking payment.",
+    postingUnavailable:
+      "Could not post this sale. Check the company currency, open accounting period and posting accounts.",
+    cashCurrencyMismatch:
+      "Cash must use the drawer currency. Choose a different payment method for this order.",
+    tenderMinorUnits: "Use whole cents for cash and payments.",
+    legacyTenderReview:
+      "This order has an earlier fractional-cent payment. Review the recorded tender before collecting more.",
+    legacyTenderRecorded:
+      "This order retains its original four-decimal amounts.",
+    legacyPostingReview:
+      "The recorded fractional-cent amounts cannot be posted to the ledger. Review the original tender before closing the sale.",
+    viewReceipt: "View receipt",
+    openDrawer: "Open drawer",
+    warehouse: "Sale warehouse",
+    noWarehouse: "No warehouse assigned",
+    chooseCompanyFirst: "Select a company first.",
+    warehouseInstruction: "Use an active warehouse from the selected company.",
+    stockUnavailable:
+      "Stock is unavailable at this terminal’s warehouse. Check available quantities before completing the sale.",
+  },
   dashboard: {
     get: {
       title: "POS Dashboard",
@@ -369,7 +395,7 @@ export const translations = {
         sessionSummary: "Session Summary",
         terminal: "Terminal",
         openedAt: "Opened at",
-        orderCount: "Orders",
+        orderCount: "Orders: {{count}}",
         sessionRevenue: "Revenue",
         floatHint: "Count the cash in the drawer before closing.",
         reconciliation: "End of Day",

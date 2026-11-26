@@ -52,7 +52,10 @@ import {
   type PayoutStatusValue,
 } from "../../enum";
 import type { ReferralT } from "../../i18n";
-import { getAdminPayoutActions } from "../../payout-actions";
+import {
+  canDocumentReferralPayout,
+  getAdminPayoutActions,
+} from "../../payout-actions";
 import definitions, { type AdminPayoutsGetResponseOutput } from "./definition";
 
 type Payout = AdminPayoutsGetResponseOutput["items"][number];
@@ -372,6 +375,29 @@ export function AdminPayoutsContainer({
             >
               {t("admin.payouts.widget.openPartner")}
             </Button>
+            {canDocumentReferralPayout(item) && (
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                onClick={() =>
+                  navigate(
+                    async () =>
+                      (await import("@/finance/supplier-evidence/definition"))
+                        .default.POST,
+                    {
+                      data: {
+                        operation: "referral",
+                        externalReference: item.id,
+                        dryRun: true,
+                      },
+                    },
+                  )
+                }
+              >
+                {t("admin.payouts.widget.prepareBill")}
+              </Button>
+            )}
             {item.partnerCodes[0] && (
               <Button
                 type="button"

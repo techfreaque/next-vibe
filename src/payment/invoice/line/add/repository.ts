@@ -19,6 +19,9 @@ import { db } from "next-vibe/database";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { getDocumentAccess } from "@/finance/document-company-scope";
+import { getLineSettlementPolicy } from "@/tax/line-settlement";
+import { scopedTranslation as regimeTranslation } from "@/tax/regime/i18n";
+import { getCompanyTaxRegime } from "@/tax/regime/policy";
 
 import { paymentInvoiceLines, paymentInvoices } from "../../../db";
 import { InvoiceStatus } from "../../../enum";
@@ -68,13 +71,32 @@ export class InvoiceLineAddRepository {
           });
         }
 
-        const { quantity, unitPrice, taxRate, taxAmount, lineTotal } =
-          calculateInvoiceLine({
-            quantity: data.quantity ?? 1,
-            unitPrice: data.unitPrice,
-            taxRate: data.taxRate ?? 0,
+        if (
+          invoice.companyId &&
+          data.taxRate > 0 &&
+          (await getCompanyTaxRegime(tx, invoice.companyId, new Date())).exempt
+        ) {
+          return fail({
+            message: regimeTranslation.scopedT(locale).t("saleConflict"),
+            errorType: ErrorResponseTypes.VALIDATION_ERROR,
           });
-        if (quantity <= 0) {
+        }
+        const { quantity, unitPrice, taxRate, taxAmount, lineTotal } =
+          calculateInvoiceLine(
+            {
+              quantity: data.quantity ?? 1,
+              unitPrice: data.unitPrice,
+              taxRate: data.taxRate ?? 0,
+            },
+            getLineSettlementPolicy(invoice.currency, invoice.metadata),
+          );
+        if (
+          quantity <= 0 ||
+          quantity >= 100_000_000 ||
+          unitPrice >= 100_000_000 ||
+          !Number.isFinite(lineTotal) ||
+          lineTotal >= 100_000_000
+        ) {
           return fail({
             message: t("post.errors.validation.title"),
             errorType: ErrorResponseTypes.VALIDATION_ERROR,
@@ -83,10 +105,23 @@ export class InvoiceLineAddRepository {
 
         // Get current max sort order for this invoice
         const existingLines = await tx
-          .select({ sortOrder: paymentInvoiceLines.sortOrder })
+          .select({
+            sortOrder: paymentInvoiceLines.sortOrder,
+            lineTotal: paymentInvoiceLines.lineTotal,
+          })
           .from(paymentInvoiceLines)
           .where(eq(paymentInvoiceLines.invoiceId, data.invoiceId));
 
+        const grossUnits = existingLines.reduce(
+          (sum, item) => sum + Math.round(item.lineTotal * 10_000),
+          Math.round(lineTotal * 10_000),
+        );
+        if (Math.round(grossUnits / 100) > 9_999_999_999) {
+          return fail({
+            message: t("post.errors.validation.title"),
+            errorType: ErrorResponseTypes.VALIDATION_ERROR,
+          });
+        }
         const maxSortOrder = existingLines.reduce(
           (max, l) => Math.max(max, l.sortOrder ?? 0),
           -1,

@@ -43,6 +43,7 @@ export class InventoryTransferGetRepository {
         toWarehouseId: string;
         toWarehouseName: string;
         status: string;
+        canManage: boolean;
         reference: string | null;
         notes: string | null;
         createdAt: Date;
@@ -122,6 +123,9 @@ export class InventoryTransferGetRepository {
           toWarehouseId: transfer.toWarehouseId,
           toWarehouseName: toWarehouse?.name ?? "",
           status: transfer.status,
+          canManage:
+            authResult.data.role === CompanyMemberRole.OWNER ||
+            authResult.data.role === CompanyMemberRole.ADMIN,
           reference: transfer.reference,
           notes: transfer.notes,
           createdAt: transfer.createdAt,

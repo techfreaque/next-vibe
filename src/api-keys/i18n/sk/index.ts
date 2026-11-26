@@ -4,6 +4,13 @@ export const translations: typeof enTranslations = {
   category: "Účet",
 
   widget: {
+    adminOverview:
+      "Spravujte kľúče svojho účtu. V dokumentácii API nájdete postup pripojenia aplikácie.",
+    loadFailed: "Vaše kľúče API sa nepodarilo načítať",
+    retry: "Skúste znova",
+    revokeNamed: "Zrušiť kľúč {{name}}",
+    revokeConfirm: "Aplikácie používajúce tento kľúč okamžite stratia prístup.",
+    cancel: "Zrušiť",
     upgradeTitle: "Prístup k API máš pri každom pláne od {{subPrice}} mesačne",
     upgradeBody:
       "Kľúče API odomkne každý plán. Bezplatné a bonusové kredity prístup neodomykajú.",

@@ -18,7 +18,7 @@ export const translations = {
         description: "Select a role to grant to this user",
       },
       id: {
-        label: "User ID",
+        label: "User",
         description: "Unique identifier of the user to grant the role to",
         placeholder: "Enter user ID...",
       },
@@ -95,7 +95,7 @@ export const translations = {
         description: "Select a role to revoke from this user",
       },
       id: {
-        label: "User ID",
+        label: "User",
         description: "Unique identifier of the user to revoke the role from",
         placeholder: "Enter user ID...",
       },

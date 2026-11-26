@@ -1,0 +1,121 @@
+import type { translations as enTranslations } from "../en";
+
+export const translations: typeof enTranslations = {
+  saleType: "Vendita",
+  feeType: "Commissione",
+  refundType: "Rimborso",
+
+  title: "Contabilità dei pagamenti",
+  review: "Verifica o registra pagamenti",
+  configure: "Associa un’offerta al catalogo",
+  company: "Azienda",
+  product: "Prodotto a catalogo",
+  providerStripe: "Stripe",
+  providerNow: "NOWPayments",
+  currencyEur: "EUR",
+  currencyUsd: "USD",
+  currencyPln: "PLN",
+  provider: "Gestore",
+  merchant: "Identità verificata dell’esercente",
+  offer: "ID dell’offerta o del prezzo",
+  currency: "Valuta",
+  recognition: "Rilevazione",
+  immediate: "Rileva alla vendita",
+  deferred: "Rinvia come passività",
+  receivable: "Conto crediti",
+  clearing: "Conto transitorio del gestore",
+  consideration: "Conto ricavi o passività",
+  vat: "Conto IVA a debito",
+  expense: "Conto costi per commissioni",
+  zeroTax:
+    "Conferma che l’IVA non esposta per questo prodotto ad aliquota zero è pari a zero",
+  ids: "ID delle prove verificate",
+  dryRun: "Solo anteprima",
+  submit: "Esegui",
+  sources: "Prove verificate",
+  gross: "Importo lordo",
+  tax: "Imposta",
+  fee: "Commissione del gestore",
+  receipt: "Riferimenti fattura e registrazione",
+  posted: "Registrato",
+  ready: "Pronto per la registrazione",
+  saved: "Offerta collegata",
+  alreadyPosted: "Già registrato",
+  forbidden: "Non hai i permessi per questa azienda.",
+  missingEvidence: "La prova verificata non è disponibile.",
+  missingMapping: "Associa un’offerta e un prodotto corrispondenti.",
+  unsupportedCurrency:
+    "Controlla la valuta e riconcilia il cambio separatamente.",
+  unmatchedTransaction:
+    "Collega il pagamento locale verificato prima di registrare.",
+  unverifiedTax:
+    "Ottieni il dettaglio dell’imposta o configura esplicitamente un’aliquota zero ammessa.",
+  invalidAccounts: "Controlla i conti attivi e il loro utilizzo.",
+  periodClosed: "Apri il periodo o riconcilia la data del documento.",
+  unverifiedRefundAllocation:
+    "Ottieni la ripartizione del rimborso o riconcilialo con la vendita originale.",
+  creditsGranted: "Crediti assegnati",
+  creditsConsumed: "Crediti utilizzati",
+  deferredRefundNeedsReview:
+    "Verifica quanta parte del servizio o del pacchetto di crediti è stata utilizzata. Riconcilia il rimborso con il debito residuo e i ricavi rilevati.",
+  feeBillLinked: "Fattura fornitore collegata",
+  openFeeEntry: "Riconcilia la fattura delle commissioni",
+  openJournal: "Apri la scrittura contabile",
+  openInvoice: "Apri la fattura",
+  openFeeBill: "Apri la fattura fornitore",
+  feeNeedsBill:
+    "Registra la fattura delle commissioni tra quelle dei fornitori e verifica l’imposta.",
+  taxRegimeConflict:
+    "Il gestore ha addebitato l’IVA a un’azienda esente. Riconcilia il documento.",
+  inconsistentEvidence: "La prova e il pagamento locale non coincidono.",
+  postingFailed: "Registrazione non riuscita. Controlla la prova e riprova.",
+  missingProduct: "Scegli un prodotto attivo con codice e aliquota corretti.",
+  conflict: "L’offerta è già collegata.",
+  empty: "Nessuna prova verificata corrispondente.",
+  intro:
+    "Associa un prodotto a un’offerta verificata e visualizza i dati della vendita.",
+  stripeTest: "Esercente Stripe di prova",
+  stripeLive: "Esercente Stripe effettivo",
+  nowMerchant: "Esercente NOWPayments",
+  listError: "Impossibile caricare le prove contabili",
+  detail: "Controlla l’azienda e i dati.",
+  recognizedRevenue: "Ricavi rilevati",
+  remainingLiability: "Passività residua",
+  recognitionTitle: "Rileva i ricavi anticipati",
+  recognitionDescription:
+    "Aggiungi una regola con data di decorrenza o lascia i campi vuoti per vedere in anteprima l’utilizzo dei crediti verificato.",
+  recognitionFrom: "Data di decorrenza (AAAA-MM-GG)",
+  recognitionAccount: "Conto ricavi",
+  recognitionServicePeriods:
+    "Rileva i ricavi dei periodi di abbonamento verificati",
+  recognitionExpiry: "Rileva i crediti scaduti idonei",
+  recognitionEntries: "Movimenti di credito",
+  recognitionPreview: "Anteprima pronta",
+  recognitionPosted: "Ricavo contabilizzato",
+  recognitionCurrent: "Nessun nuovo movimento idoneo",
+  recognitionPolicySaved: "Regola salvata",
+  recognitionPolicyConflict:
+    "La data coincide con una regola esistente o una quota già contabilizzata.",
+  recognitionPolicyMissing:
+    "Aggiungi una regola valida alla data del movimento.",
+  recognitionEvidenceMissing:
+    "Controlla vendita, incasso e movimento di credito.",
+  recognitionExpiryReview:
+    "Verifica la scadenza dei crediti e la regola applicabile.",
+  recognitionServiceConflict:
+    "Il gestore dei pagamenti ha inviato date di servizio o importi incoerenti. Verifica la fattura originale prima di rilevare i ricavi.",
+  recognitionSubscriptionReview:
+    "I ricavi da abbonamento richiedono una ripartizione verificata per periodo di servizio.",
+  recognitionInvalidAccounts:
+    "Seleziona i conti attivi delle passività e dei ricavi per questa azienda.",
+  recognitionPeriodClosed: "Apri il periodo contabile del movimento.",
+  recognitionForbidden: "Non puoi rilevare i ricavi per questa azienda.",
+  recognitionFailed:
+    "Registrazione non riuscita. Controlla il documento e riprova.",
+  chooseProvider: "Scegli il fornitore",
+  chooseCurrency: "Scegli la valuta",
+  chooseRecognition: "Scegli quando rilevare i ricavi",
+  noVatAccount:
+    "Aggiungi un conto IVA a debito attivo al piano dei conti per selezionarlo qui.",
+  saveOffer: "Salva offerta",
+};

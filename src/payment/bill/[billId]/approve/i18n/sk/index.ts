@@ -1,6 +1,26 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  receiveBill: "Označiť faktúru ako prijatú",
+  supplierDocument: {
+    confirmMissing: "Potvrdzujem, že dodávateľský doklad nie je k dispozícii",
+    confirmSeparate: "Potvrdzujem, že ide o samostatný výdavok",
+    missingHelp:
+      "Skontrolujte bankový doklad. Po schválení sa zaúčtuje celá suma bez odpočtu DPH.",
+    required:
+      "Priraďte dodávateľský doklad alebo potvrďte, že nie je k dispozícii. Na schválenie podľa bankového dokladu potrebujete overenú celú sumu bez zaúčtovania DPH.",
+    possibleDuplicate:
+      "Návrh z banky alebo dodávateľský doklad má podobné údaje. Priraďte doklad alebo potvrďte, že ide o samostatný výdavok.",
+  },
+  reverseCharge: {
+    title: "Prenesenie daňovej povinnosti (voliteľné)",
+    base: "Základ dane v mene faktúry",
+    rate: "Sadzba DPH (%)",
+    help: "Pri prijatej faktúre nemeckého malého podniku vyplňte obidve hodnoty až po potvrdení prenosu daňovej povinnosti. DPH sa zaúčtuje do nákladov a ako záväzok voči daňovému úradu.",
+    invalid:
+      "Zadajte potvrdený základ a sadzbu dane pre prijatú faktúru v nemeckom režime malého podniku.",
+    cost: "Neodpočítateľná DPH pri prenesení daňovej povinnosti",
+  },
   tags: { payment: "platba", bill: "prijatá faktúra", ap: "záväzky" },
   enums: {
     billStatus: {
@@ -22,6 +42,8 @@ export const translations: typeof enTranslations = {
     errors: {
       existingPosting:
         "Pred schválením faktúry skontrolujte a zosúlaďte jej existujúci účtovný zápis.",
+      lineTotalsReview:
+        "Položky sa nezhodujú s evidovanou sumou bez DPH, DPH alebo sumou s DPH. Pred schválením skontrolujte originál dodávateľskej faktúry.",
       billLines:
         "Pridajte položky s kladnou celkovou sumou a použite aktívne nákladové účty tejto firmy.",
       posting:

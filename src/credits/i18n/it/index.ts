@@ -579,6 +579,7 @@ export const translations: typeof enTranslations = {
         "Inserisci l’indirizzo email esatto o l’ID dell’utente.",
       renewsOn: "Si rinnova il {{date}}",
       endsOn: "Termina il {{date}}",
+      packBalance: "Crediti dei pacchetti",
       freeBalance: "Crediti gratuiti",
       balanceSplit:
         "{{total}} totali · {{paid}} nei pacchetti · {{free}} gratuiti",
@@ -616,7 +617,7 @@ export const translations: typeof enTranslations = {
     },
     post: {
       stepTwo: "Passo 2 di 2: importo",
-      testerPreset: "3.000 (tester)",
+      testerPreset: "Usa {{amount}} crediti",
       preview: "Saldo {{before}} → {{after}} (+{{amount}})",
       title: "Aggiungere crediti",
       titleShort: "Aggiungere crediti",
@@ -636,8 +637,8 @@ export const translations: typeof enTranslations = {
       },
       amount: {
         label: "Importo dei crediti",
-        description: "Inserisci un intero numero di crediti bonus.",
-        placeholder: "137",
+        description: "Inserisca almeno 1 credito. Usi un numero intero.",
+        placeholder: "es. 25",
       },
       packType: {
         label: "Tipo di pacchetto",

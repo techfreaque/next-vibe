@@ -63,7 +63,10 @@ export const translations: typeof enTranslations = {
     back: "Zurück",
     submit: "In Rechnung umwandeln",
     converted: "Aus diesem Angebot wurde eine Rechnung erstellt.",
-    viewInvoice: "Rechnung ansehen",
+    savedDraftNumber: "Rechnungsentwurf Nr. {{number}} erstellt",
+    savedDraft: "Rechnungsentwurf erstellt",
+    convertedNumber: "Erstellt aus Angebot {{number}}.",
+    viewInvoice: "Rechnungsentwurf öffnen",
     convertNote:
       "Ein Rechnungsentwurf mit denselben Positionen wird erstellt. Das Angebot wird als umgewandelt markiert.",
   },

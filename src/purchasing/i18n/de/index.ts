@@ -266,6 +266,12 @@ export const translations: typeof enTranslations = {
       titleShort: "Lieferantdetails",
       description: "Vollständige Details eines Lieferanten abrufen.",
       widget: {
+        companyName: "Unternehmen",
+        orderCount: "Bestellungen",
+        receivingCount: "Lieferung offen",
+        details: "Lieferantendetails",
+        related: "Lieferant verwalten",
+        backToList: "Zurück zur Lieferantenliste",
         back: "Zurück",
         edit: "Lieferant bearbeiten",
         createOrder: "Neue Bestellung",
@@ -685,6 +691,9 @@ export const translations: typeof enTranslations = {
         colStatus: "Status",
         deliveryArrow: "→",
         overdue: "überfällig",
+        readyToBill: "Eingegangen, bereit zur Rechnungsstellung",
+        openAttentionOrder: "Bestellung {{reference}} öffnen",
+        attentionCount: "Bestellungen mit Handlungsbedarf: {{count}}",
         actionNeeded: "Bestellungen benötigen Aufmerksamkeit",
         back: "Zurück",
         loading: "Wird geladen…",
@@ -757,8 +766,10 @@ export const translations: typeof enTranslations = {
       description:
         "Bestellung mit allen Positionen und Wareneingangshistorie abrufen.",
       widget: {
+        precision:
+          "Positionssummen basieren auf dem ungerundeten Einzelpreis des Lieferanten.",
         back: "Zurück",
-        send: "An Lieferant senden",
+        send: "Als gesendet markieren",
         confirm: "Als bestätigt markieren",
         receive: "Waren annehmen",
         convertToBill: "In Rechnung umwandeln",
@@ -978,15 +989,15 @@ export const translations: typeof enTranslations = {
 
   orderSend: {
     post: {
-      title: "Bestellung senden",
-      titleShort: "Bestellung senden",
-      description: "Bestellung als an Lieferant gesendet markieren.",
+      title: "Bestellung als gesendet markieren",
+      titleShort: "Als gesendet markieren",
+      description: "Halten Sie den Versand der Bestellung fest.",
       poId: { label: "Bestell-ID", description: "Zu sendende Bestellung" },
       widget: {
         back: "Zurück",
         backToPO: "Zur Bestellung",
         warning:
-          "Senden markiert diese Bestellung als an den Lieferanten übermittelt. Status wechselt von Entwurf zu Gesendet.",
+          "Der Status der Bestellung wechselt in diesem Arbeitsbereich zu Gesendet.",
       },
       errors: {
         validation: {
@@ -1027,8 +1038,8 @@ export const translations: typeof enTranslations = {
         },
       },
       success: {
-        title: "Bestellung gesendet",
-        description: "Bestellung als gesendet markiert",
+        title: "Versand der Bestellung erfasst",
+        description: "Die Bestellung hat jetzt den Status Gesendet.",
       },
       response: {
         id: "Bestell-ID",
@@ -1103,7 +1114,13 @@ export const translations: typeof enTranslations = {
       titleShort: "Waren empfangen",
       description:
         "Wareneingang für eine Bestellung erfassen. Erstellt Lagerbuchungen.",
-      widget: { backToPO: "Zurück zur Bestellung" },
+      widget: {
+        retry: "Erneut versuchen",
+        loading: "Bestellung wird geladen…",
+        remaining: "Noch offen: {{quantity}}",
+        noOpenLines: "Alle bestellten Mengen wurden erfasst.",
+        backToPO: "Zurück zur Bestellung",
+      },
       poId: {
         label: "Bestell-ID",
         description: "Bestellung, gegen die gebucht wird",
@@ -1243,6 +1260,10 @@ export const translations: typeof enTranslations = {
   orderLineAdd: {
     post: {
       widget: {
+        productSearch: "Produkte nach Name oder Artikelnummer suchen",
+        search: "Suchen",
+        noProducts: "Keine passenden Produkte.",
+        clearProduct: "Produktauswahl aufheben",
         backToOrder: "Zurück zur Bestellung",
         lineAdded: "Position hinzugefügt",
       },
@@ -1340,6 +1361,11 @@ export const translations: typeof enTranslations = {
       },
       lineId: { label: "Positions-ID", description: "Zu entfernende Position" },
       widget: {
+        updatedOrderTotals: "Neue Bestellsummen",
+        cancel: "Abbrechen",
+        verifying: "Die ausgewählte Position wird geprüft…",
+        unavailable:
+          "Öffnen Sie den Bestellentwurf erneut und wählen Sie die zu entfernende Position aus.",
         backToOrder: "Zurück zur Bestellung",
         warning:
           "Die Position wird unwiderruflich aus der Bestellung entfernt.",

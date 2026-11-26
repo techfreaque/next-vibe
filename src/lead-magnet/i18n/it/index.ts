@@ -106,6 +106,7 @@ export const translations: typeof enTranslations = {
   },
   providers: {
     shared: {
+      connectionSettings: "Impostazioni di connessione",
       listId: {
         label: "Elenco / Gruppo ID",
         description: "La ID dell'elenco o del segmento da aggiungere porta a",

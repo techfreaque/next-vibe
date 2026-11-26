@@ -34,7 +34,7 @@ export const translations: typeof enTranslations = {
     },
     notFound: {
       title: "Používateľ sa nenašiel",
-      description: "Používateľ s týmto ID neexistuje",
+      description: "Tento účet už v zozname nie je. Vyberte iný účet.",
     },
     serverError: {
       title: "Používateľa sa nepodarilo načítať",
@@ -87,14 +87,15 @@ export const translations: typeof enTranslations = {
   },
   kpi: {
     paid: "Zaplatené celkovo",
-    paidHint: "Úspešné platby v USD: {{count}}",
+    paidHint: "Platby: {{count}}",
     refunded: "Vrátená suma",
-    credits: "Zostatok kreditov",
-    creditsHint: "Bezplatné kredity navyše: {{free}}",
+    credits: "Zostatok",
+    creditsHint: "Dostupné bezplatné kredity: {{free}}",
     spent: "Minuté kredity",
     spentHint: "spotreba v hodnote približne {{usd}}",
     lastSeen: "Posledná aktivita",
     joined: "Registrácia {{date}}",
+    justNow: "Práve teraz",
   },
   payment: {
     subscription: "Predplatné",
@@ -186,12 +187,15 @@ export const translations: typeof enTranslations = {
     openMonitor: "Otvoriť prehľad chýb",
   },
   widget: {
+    creditAmount: "{{count}} kred.",
     unavailable: "Účet nie je dostupný",
     chooseUser: "Vyberte účet, ktorý chcete zobraziť",
     loading: "Načítavajú sa údaje používateľa…",
     never: "Nikdy",
     actions: {
-      browse: "Prehľadávať účty",
+      retry: "Skúste znova",
+      more: "Viac",
+      browse: "Späť na účty",
       edit: "Upraviť",
       addCredits: "Prideliť kredity",
       delete: "Odstrániť používateľa",
@@ -208,6 +212,8 @@ export const translations: typeof enTranslations = {
     remove: "Odobrať rolu",
   },
   tabs: {
+    section: "Časť profilu",
+    scrollHint: "Posúvaním zobrazíte všetky sekcie",
     overview: "Prehľad",
     billing: "Fakturácia",
     credits: "História kreditov",

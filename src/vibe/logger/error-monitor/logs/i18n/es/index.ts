@@ -338,6 +338,8 @@ export const translations: typeof enTranslations = {
 
   widget: {
     kpi: {
+      unresolvedInScope: "Sin resolver en esta vista",
+      unresolvedAllTimeLink: "Sin resolver desde el inicio: {{count}}",
       unresolvedMessages: "{{messages}} mensajes · {{occurrences}} apariciones",
       unresolvedMatching: "{{count}} sin resolver coinciden con los filtros",
       unresolved: "Clases sin resolver (total)",
@@ -425,6 +427,10 @@ export const translations: typeof enTranslations = {
       resolving: "Guardando...",
     },
     filter: {
+      apply: "Aplicar filtros",
+      more: "Filtros",
+      moreCount: "Filtros ({{count}})",
+      moreDescription: "Filtre por estado, gravedad u origen.",
       fingerprint: "Clase",
       endpoint: "Endpoint",
       search: "Buscar",

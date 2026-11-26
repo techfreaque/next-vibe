@@ -73,6 +73,18 @@ export const translations: typeof enTranslations = {
     placeholder: "Introduzca la factura ID",
   },
   widget: {
+    invoice: "Factura",
+    total: "Total de la factura",
+    customer: "Cliente",
+    openInvoice: "Abrir factura",
+    retry: "Reintentar",
+    loading: "Cargando la factura…",
+    unavailable: "Factura no disponible",
+    reversal:
+      "Un asiento de reversión con fecha de hoy salda el importe pendiente.",
+    cancelOnly: "La factura se cancelará.",
+    ineligible:
+      "Puede anular un borrador o una factura impagada sin pagos ni abonos aplicados.",
     back: "Atrás",
     submit: "Void Invoice",
     warning:

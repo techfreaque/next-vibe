@@ -17,6 +17,7 @@ import { BillStatus, InvoiceStatus } from "@/payment/enum";
 import { PosOrderStatus } from "@/pos/enum";
 
 import { scopedTranslation } from "../i18n";
+import { CompanyTaxRegime } from "../regime/enum";
 import { TaxReportDirection } from "./enum";
 
 const id = (n: number): string =>
@@ -54,7 +55,8 @@ beforeAll(async () => {
       journal_entry_id uuid, currency text, status text
     );
     CREATE TABLE payment_invoice_lines (invoice_id uuid, tax_rate numeric(12,4), tax_amount numeric(12,4), line_total numeric(12,4));
-    CREATE TABLE payment_bills (id uuid PRIMARY KEY, company_id uuid, bill_date timestamp, currency text, status text);
+    CREATE TABLE company_tax_regimes (company_id uuid, effective_from date, regime text);
+    CREATE TABLE payment_bills (id uuid PRIMARY KEY, company_id uuid, bill_date timestamp, currency text, status text, metadata jsonb, journal_entry_id uuid);
     CREATE TABLE payment_bill_lines (bill_id uuid, tax_rate numeric(12,4), tax_amount numeric(12,4), line_total numeric(12,4));
     CREATE TABLE pos_terminals (id uuid PRIMARY KEY, company_id uuid);
     CREATE TABLE pos_sessions (id uuid PRIMARY KEY, terminal_id uuid);
@@ -378,4 +380,48 @@ test("the endpoint normalizes date-picker values to the same UTC day as date-onl
     expect(valid.data.dateFrom).toEqual(new Date("2026-02-28T00:00:00Z"));
     expect(valid.data.dateTo).toEqual(new Date("2026-02-28T00:00:00Z"));
   }
+});
+
+test("uses the election on a pending bill date and preserves posted input VAT snapshots", async () => {
+  await pg.exec(`
+    INSERT INTO company_tax_regimes VALUES
+      ('${companyId}', '2026-08-10', '${CompanyTaxRegime.DE_SMALL_BUSINESS}'),
+      ('${companyId}', '2026-08-20', '${CompanyTaxRegime.STANDARD}');
+    INSERT INTO payment_bills (id, company_id, bill_date, currency, status, metadata) VALUES
+      ('${id(81)}', '${companyId}', '2026-08-09', 'EUR', '${BillStatus.RECEIVED}', null),
+      ('${id(82)}', '${companyId}', '2026-08-10', 'EUR', '${BillStatus.RECEIVED}', null),
+      ('${id(83)}', '${companyId}', '2026-08-15', 'EUR', '${BillStatus.APPROVED}', '{"inputVatDeductible":true}'),
+      ('${id(84)}', '${companyId}', '2026-08-20', 'EUR', '${BillStatus.DISPUTED}', null);
+    INSERT INTO payment_bill_lines VALUES
+      ('${id(81)}', 0.19, 19, 119), ('${id(82)}', 0.19, 19, 119),
+      ('${id(83)}', 0.19, 19, 119), ('${id(84)}', 0.19, 19, 119);
+  `);
+  const { TaxReportRepository } = await import("./repository");
+  const result = await TaxReportRepository.getReport(
+    {
+      companyId,
+      dateFrom: new Date("2026-08-01"),
+      dateTo: new Date("2026-08-31"),
+    },
+    userId,
+    createEndpointLogger(false, defaultLocale),
+    defaultLocale,
+  );
+  expect(result).toMatchObject({
+    success: true,
+    data: {
+      totals: expect.arrayContaining([
+        {
+          direction: TaxReportDirection.NON_DEDUCTIBLE,
+          taxableAmount: 100,
+          taxAmount: 19,
+        },
+        {
+          direction: TaxReportDirection.PURCHASES,
+          taxableAmount: 300,
+          taxAmount: 57,
+        },
+      ]),
+    },
+  });
 });

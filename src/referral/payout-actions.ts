@@ -21,3 +21,15 @@ export function getAdminPayoutActions(request: {
   }
   return request.status === PayoutStatus.APPROVED ? ["complete"] : [];
 }
+
+export function canDocumentReferralPayout(request: {
+  status: typeof PayoutStatusValue;
+  currency: typeof PayoutCurrencyValue;
+}): boolean {
+  return (
+    request.currency !== PayoutCurrency.CREDITS &&
+    (request.status === PayoutStatus.APPROVED ||
+      request.status === PayoutStatus.PROCESSING ||
+      request.status === PayoutStatus.COMPLETED)
+  );
+}

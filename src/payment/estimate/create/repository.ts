@@ -20,6 +20,10 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { lockLedgerCompany } from "@/chart-of-accounts/shared/ledger-write";
 import { getDocumentAccess } from "@/finance/document-company-scope";
+import {
+  LINE_SETTLEMENT_V1,
+  supportsLineCentSettlement,
+} from "@/tax/line-settlement";
 
 import { paymentEstimateLines, paymentEstimates } from "../../db";
 import { EstimateStatus } from "../../enum";
@@ -72,11 +76,14 @@ export class EstimateCreateRepository {
             errorType: ErrorResponseTypes.VALIDATION_ERROR,
           });
         }
+        const settlement = supportsLineCentSettlement(currency)
+          ? LINE_SETTLEMENT_V1
+          : undefined;
         const lines = [];
         let grossUnits = 0,
           taxUnits = 0;
         for (const [index, input] of (data.lines ?? []).entries()) {
-          const line = estimateLine(input, index);
+          const line = estimateLine(input, index, settlement);
           if (!line) {
             return fail({
               message: t("post.errors.validation.title"),
@@ -109,6 +116,7 @@ export class EstimateCreateRepository {
             estimateNumber,
             status: EstimateStatus.DRAFT,
             currency,
+            metadata: settlement ? { lineSettlement: settlement } : null,
             customerId: data.customerId,
             customerEmail: data.customerEmail,
             customerName: data.customerName,

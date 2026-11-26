@@ -22,6 +22,7 @@ import { CompanyAuthRepository } from "@/companies/repository";
 import { posSessions, posTerminals } from "../../db";
 import { PosSessionStatus } from "../../enum";
 import { scopedTranslation } from "../../i18n";
+import { isPosMinorUnitAmount } from "../../order/settlement-amounts";
 import type { PosSessionOpenPostRequestOutput } from "./definition";
 
 export class PosSessionOpenRepository {
@@ -46,6 +47,15 @@ export class PosSessionOpenRepository {
 
     try {
       const { details } = data;
+      if (
+        details.openingFloat !== undefined &&
+        !isPosMinorUnitAmount(details.openingFloat)
+      ) {
+        return fail({
+          message: t("workflow.tenderMinorUnits"),
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+        });
+      }
 
       // Verify terminal exists and load companyId for auth
       const [terminal] = await db

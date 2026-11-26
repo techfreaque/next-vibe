@@ -9,11 +9,13 @@ export const translations: typeof enTranslations = {
   },
 
   rate: {
+    details: "Détails du taux",
     create: {
       title: "Créer un taux de taxe",
       titleShort: "Créer un taux",
       description: "Ajouter un taux de taxe à votre entreprise",
       widget: {
+        save: "Créer le taux",
         backToList: "Retour aux taux de taxe",
       },
       companyId: {
@@ -108,6 +110,10 @@ export const translations: typeof enTranslations = {
       titleShort: "Taux de taxe",
       description: "Tous les taux de taxe configurés pour votre entreprise",
       widget: {
+        actions: "Actions",
+        retry: "Réessayer",
+        previous: "Précédente",
+        next: "Suivante",
         addRate: "Ajouter un taux",
         labelDefault: "Par défaut",
         labelActive: "Actif",
@@ -209,6 +215,7 @@ export const translations: typeof enTranslations = {
       titleShort: "Modifier le taux",
       description: "Modifier un taux de taxe existant",
       widget: {
+        save: "Enregistrer le taux",
         backToList: "Retour aux taux de taxe",
         failed: "Échec",
       },
@@ -348,6 +355,7 @@ export const translations: typeof enTranslations = {
     description:
       "Consultez les taxes enregistrées sur les factures de vente, les avoirs, les factures fournisseurs et les ventes en caisse.",
     widget: {
+      retry: "Relancer le rapport",
       scope:
         "Les factures de vente suivent la date de l’écriture liée ou leur date de création. Les achats suivent la date de la facture fournisseur. Les ventes en caisse suivent leur date de clôture (UTC), pour les lignes avec un taux positif ou un montant de taxe enregistré. Si une facture émise partage la même écriture, elle représente la vente.",
       empty: "Aucune ligne de document ne correspond à ces filtres.",
@@ -357,6 +365,8 @@ export const translations: typeof enTranslations = {
       unknownRate: "Taux indéterminé",
       run: "Générer le rapport",
       running: "Génération du rapport…",
+      scopeHint:
+        "Comparez la TVA sur les ventes et les achats par taux pour une entreprise et une période.",
       selectCompany: "Sélectionnez l’entreprise concernée.",
     },
     currency: {
@@ -431,6 +441,8 @@ export const translations: typeof enTranslations = {
 
   enums: {
     reportDirection: {
+      nonDeductible: "TVA fournisseur non déductible",
+      reverseCharge: "TVA due par autoliquidation",
       posSales: "Ventes en caisse",
       sales: "Factures de vente",
       creditNotes: "Avoirs clients",

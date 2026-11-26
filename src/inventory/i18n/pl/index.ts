@@ -219,6 +219,13 @@ export const translations: typeof enTranslations = {
       titleShort: "Magazyn",
       description: "Pobierz szczegóły konkretnego magazynu.",
       widget: {
+        companyName: "Firma",
+        stockedProducts: "Produkty w magazynie",
+        companyInventory: "Przegląd zapasów firmy",
+        missingValuation: "Brak kosztu",
+        details: "Szczegóły magazynu",
+        related: "Zapasy",
+        backToList: "Wróć do magazynów",
         back: "Wróć",
         edit: "Edytuj magazyn",
         viewStock: "Wyświetl stan",
@@ -382,6 +389,12 @@ export const translations: typeof enTranslations = {
         loadMore: "Pokaż więcej",
 
         back: "Wróć",
+        defaultLowStockRule:
+          "Niski stan poniżej {{threshold}} dostępnych jednostek",
+        reorderPointRule:
+          "Niski stan przy najwyżej {{threshold}} dostępnych jednostkach",
+        stockValuePrecision:
+          "Wartość zapasu to ilość w magazynie × niezaokrąglony koszt jednostkowy. Wyświetlane koszty są zaokrąglone do dwóch miejsc po przecinku.",
         lowStock: "Niski stan",
         available: "Dostępne",
         onHand: "Na stanie",
@@ -893,6 +906,8 @@ export const translations: typeof enTranslations = {
       titleShort: "Przesunięcie",
       description: "Pobierz przesunięcie ze wszystkimi pozycjami.",
       widget: {
+        retry: "Spróbuj ponownie",
+        noItems: "To przesunięcie nie zawiera pozycji.",
         back: "Wróć",
         dispatch: "Wyślij przesunięcie",
         receive: "Oznacz jako przyjęte",

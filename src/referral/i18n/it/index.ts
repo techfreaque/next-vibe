@@ -171,24 +171,38 @@ export const translations: typeof enTranslations = {
       description: "Recuperare con successo le statistiche di riferimento",
     },
     widget: {
+      emptyAdminMessage:
+        "Apri la panoramica per vedere le attività di tutto il programma.",
+      loading: "Caricamento delle statistiche referral",
+      loadError: "Impossibile caricare le statistiche referral",
+      retry: "Riprova",
+      emptyTitle: "Nessuna attività referral",
+      openCodes: "Apri i codici referral",
+      revenueCoverage:
+        "Importo iniziale registrato per {{measured}} acquisti su {{total}}.",
+      revenueUnavailable: "Non disponibile",
+      walletUnits: "{{amount}} crediti",
       adminNotice:
-        "Questi sono i tuoi numeri personali sugli inviti. L'intero programma è nella panoramica inviti.",
+        "Questi dati riguardano i tuoi referral. La panoramica mostra l’intero programma.",
       openOverview: "Apri la panoramica inviti",
       emptyMessage:
-        "Nessuna attività per ora. Condividi il link invito per iniziare a guadagnare.",
+        "Condividi un codice per iniziare a monitorare iscrizioni e commissioni.",
     },
     fields: {
       totalSignups: "Registrazioni totali",
       totalSignupsDescription:
         "Numero di persone che si sono registrate con il tuo codice invito",
-      totalRevenue: "Ricavi totali",
-      totalRevenueDescription: "Ricavi totali generati dai tuoi inviti",
+      totalRevenue: "Valore degli acquisti registrati",
+      totalRevenueDescription:
+        "Importi iniziali in USD su cui si basano le tue commissioni.",
       totalEarned: "Guadagni totali",
-      totalEarnedDescription: "Commissioni totali guadagnate con gli inviti",
+      totalEarnedDescription:
+        "Crediti guadagnati, compresi quelli ancora nel periodo di rimborso.",
       availableBalance: "Saldo disponibile",
-      availableBalanceDescription: "Saldo disponibile per il prelievo",
+      availableBalanceDescription:
+        "Crediti disponibili al netto dei prelievi riservati.",
       availableBalanceDescriptionLow:
-        "Usa i guadagni per chattare con l’IA. Gli altri crediti vengono usati per primi. Raggiungi {{minPayout}} per sbloccare il prelievo.",
+        "Crediti disponibili al netto dei prelievi riservati. Prelievo minimo: {{minPayout}} crediti.",
       totalRevenueCredits: "Ricavi totali (crediti)",
       totalEarnedCredits: "Guadagni totali (crediti)",
       totalPaidOutCredits: "Totale prelevato (crediti)",
@@ -422,6 +436,7 @@ export const translations: typeof enTranslations = {
           credits:
             "Le liquidazioni in crediti vengono convertite automaticamente. Nessuna azione richiesta.",
         },
+        prepareBill: "Prepara fattura fornitore",
         codeReport: "Report del codice",
       },
     },

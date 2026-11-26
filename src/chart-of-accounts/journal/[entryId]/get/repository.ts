@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import { and, eq } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
@@ -19,10 +19,29 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { CompanyMemberRole } from "@/companies/enum";
 import { CompanyAuthRepository } from "@/companies/repository";
+import { getDocumentAccess } from "@/finance/document-company-scope";
+import { paymentBills } from "@/payment/db";
+import { BillStatus } from "@/payment/enum";
 
 import { accountNodes, journalEntries, journalEntryLines } from "../../../db";
+import { JournalEntryStatus, JournalSourceType } from "../../../enum";
 import { scopedTranslation } from "../../../i18n";
 import type { CoaJournalEntryGetResponseOutput } from "./definition";
+
+function supplierPostingKind(
+  sourceType: string,
+): "approval" | "settlement" | undefined {
+  if (sourceType === JournalSourceType.AP_BILL || sourceType === "AP_BILL") {
+    return "approval";
+  }
+  if (
+    sourceType === JournalSourceType.AP_PAYMENT ||
+    sourceType === "AP_PAYMENT"
+  ) {
+    return "settlement";
+  }
+  return undefined;
+}
 
 export class CoaJournalEntryGetRepository {
   static async getEntry(
@@ -60,6 +79,79 @@ export class CoaJournalEntryGetRepository {
         return authResult;
       }
 
+      const supplierPosting = supplierPostingKind(entry.sourceType);
+      const sourceBillId = entry.sourceId;
+      const [sourceBill] =
+        supplierPosting &&
+        sourceBillId &&
+        !entry.reversalOfId &&
+        (entry.status === JournalEntryStatus.POSTED ||
+          entry.status === JournalEntryStatus.REVERSED) &&
+        (await getDocumentAccess(userId, { companyId: entry.companyId }))
+          ? await db
+              .select({
+                id: paymentBills.id,
+                number: paymentBills.billNumber,
+                supplierName: paymentBills.supplierName,
+              })
+              .from(paymentBills)
+              .where(
+                and(
+                  eq(paymentBills.id, sourceBillId),
+                  eq(paymentBills.companyId, entry.companyId),
+                  supplierPosting === "approval"
+                    ? eq(paymentBills.journalEntryId, entry.id)
+                    : eq(paymentBills.status, BillStatus.PAID),
+                ),
+              )
+              .limit(1)
+          : [];
+
+      const linkedIds = [entry.reversalOfId, entry.reversedById].filter(
+        (id): id is string => Boolean(id) && id !== entry.id,
+      );
+      const linkedRows = linkedIds.length
+        ? await db
+            .select({
+              id: journalEntries.id,
+              entryNumber: journalEntries.entryNumber,
+              reversalOfId: journalEntries.reversalOfId,
+              reversedById: journalEntries.reversedById,
+            })
+            .from(journalEntries)
+            .where(
+              and(
+                eq(journalEntries.companyId, entry.companyId),
+                inArray(journalEntries.id, linkedIds),
+              ),
+            )
+        : [];
+      const linkedEntries: NonNullable<
+        CoaJournalEntryGetResponseOutput["result"]["linkedEntries"]
+      > = [];
+      for (const linked of linkedRows) {
+        if (
+          linked.id === entry.reversalOfId &&
+          linked.reversedById === entry.id
+        ) {
+          linkedEntries.push({
+            id: linked.id,
+            entryNumber: linked.entryNumber,
+            relation: "original",
+          });
+        }
+        if (
+          linked.id === entry.reversedById &&
+          linked.reversalOfId === entry.id
+        ) {
+          linkedEntries.push({
+            id: linked.id,
+            entryNumber: linked.entryNumber,
+            relation: "reversal",
+          });
+        }
+      }
+
       const lines = await db
         .select({
           lineId: journalEntryLines.id,
@@ -93,9 +185,24 @@ export class CoaJournalEntryGetRepository {
           memo: entry.memo ?? null,
           status: entry.status,
           sourceType: entry.sourceType,
-          sourceId: entry.sourceId ?? null,
+          sourceId: supplierPosting
+            ? (sourceBill?.id ?? null)
+            : (entry.sourceId ?? null),
+          supplierBill:
+            sourceBill && supplierPosting
+              ? {
+                  ...sourceBill,
+                  posting: supplierPosting,
+                  systemDescription:
+                    entry.description ===
+                    `${supplierPosting === "approval" ? "AP bill" : "AP payment"}: ${sourceBill.supplierName}`,
+                }
+              : undefined,
           postedAt: entry.postedAt ?? null,
-          reversalOfId: entry.reversalOfId ?? null,
+          reversalOfId:
+            linkedEntries.find((link) => link.relation === "original")?.id ??
+            null,
+          linkedEntries,
           lines,
         },
       });

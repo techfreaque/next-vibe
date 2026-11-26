@@ -18,6 +18,7 @@ import { db } from "next-vibe/database";
 import { withTransaction } from "next-vibe/database/utils/repository-helpers";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { leads, userLeadLinks } from "next-vibe/identity/lead/db";
+import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { UserRolesRepository } from "next-vibe/identity/roles/repository";
 import { sessions } from "next-vibe/identity/session/db";
 import { userRoles as userRoleRows, users } from "next-vibe/identity/user/db";
@@ -53,6 +54,14 @@ export class UserByIdRepository {
     logger: EndpointLogger,
     locale: CountryLanguage,
   ): Promise<ResponseType<UserGetResponseOutput>> {
+    if (!user.roles.includes(UserPermissionRole.ADMIN)) {
+      return fail({
+        message: scopedTranslation
+          .scopedT(locale)
+          .t("id.get.errors.forbidden.description"),
+        errorType: ErrorResponseTypes.FORBIDDEN,
+      });
+    }
     try {
       logger.debug("Getting user by ID", {
         id: urlPathParams.id,
@@ -68,9 +77,7 @@ export class UserByIdRepository {
       if (!foundUser) {
         const { t } = scopedTranslation.scopedT(locale);
         return fail({
-          message: t("id.get.errors.notFound.detail", {
-            userId: urlPathParams.id,
-          }),
+          message: t("id.get.errors.notFound.description"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -111,11 +118,15 @@ export class UserByIdRepository {
         db
           .select({
             status: referralEarnings.status,
+            unit: sql<string>`upper(${referralEarnings.currency})`,
             total: sum(referralEarnings.amountCents),
           })
           .from(referralEarnings)
           .where(eq(referralEarnings.earnerUserId, foundUser.id))
-          .groupBy(referralEarnings.status),
+          .groupBy(
+            referralEarnings.status,
+            sql`upper(${referralEarnings.currency})`,
+          ),
         // Paid credit balance (sum across this user's wallet(s))
         db
           .select({ total: sum(creditWallets.balance) })
@@ -166,18 +177,38 @@ export class UserByIdRepository {
       const [firstReferralCount] = referralCountResult;
       const totalReferrals = Number(firstReferralCount?.cnt ?? 0);
 
-      // Earnings split by status
-      let confirmedEarnedCents = 0;
-      let pendingEarnedCents = 0;
+      const nativeEarnings = new Map<
+        string,
+        { unit: string; confirmed: number; pending: number }
+      >();
       for (const row of earningsResult) {
-        const amount = Number(row.total ?? 0);
-        if (row.status === ReferralEarningStatus.CONFIRMED) {
-          confirmedEarnedCents += amount;
-        } else if (row.status === ReferralEarningStatus.PENDING) {
-          pendingEarnedCents += amount;
+        if (row.status === ReferralEarningStatus.CANCELED) {
+          continue;
         }
+        const balance = nativeEarnings.get(row.unit) ?? {
+          unit: row.unit,
+          confirmed: 0,
+          pending: 0,
+        };
+        if (row.status === ReferralEarningStatus.CONFIRMED) {
+          balance.confirmed += Number(row.total ?? 0);
+        }
+        if (row.status === ReferralEarningStatus.PENDING) {
+          balance.pending += Number(row.total ?? 0);
+        }
+        nativeEarnings.set(row.unit, balance);
       }
-      // Total earned stays confirmed + pending (excludes canceled)
+      const earningsByUnit = [...nativeEarnings.values()].toSorted((a, b) =>
+        a.unit.localeCompare(b.unit),
+      );
+      // The old single-dollar equivalent covers USD cents and wallet awards
+      // (one referral credit per USD cent). Never add foreign-currency cents.
+      const confirmedEarnedCents =
+        (nativeEarnings.get("CREDITS")?.confirmed ?? 0) +
+        (nativeEarnings.get("USD")?.confirmed ?? 0);
+      const pendingEarnedCents =
+        (nativeEarnings.get("CREDITS")?.pending ?? 0) +
+        (nativeEarnings.get("USD")?.pending ?? 0);
       const totalEarnedCents = confirmedEarnedCents + pendingEarnedCents;
 
       // Paid credit balance
@@ -228,6 +259,7 @@ export class UserByIdRepository {
           referredByUserId: referralBy?.referrerUserId ?? null,
           referredByCode: referralBy?.code ?? null,
           totalReferrals,
+          earningsByUnit,
           totalEarnedCents,
           confirmedEarnedCents,
           pendingEarnedCents,
@@ -272,6 +304,14 @@ export class UserByIdRepository {
     logger: EndpointLogger,
     locale: CountryLanguage,
   ): Promise<ResponseType<UserPutResponseOutput>> {
+    if (!user.roles.includes(UserPermissionRole.ADMIN)) {
+      return fail({
+        message: scopedTranslation
+          .scopedT(locale)
+          .t("id.put.errors.forbidden.description"),
+        errorType: ErrorResponseTypes.FORBIDDEN,
+      });
+    }
     try {
       logger.debug("Updating user", {
         id: urlPathParams.id,
@@ -417,6 +457,14 @@ export class UserByIdRepository {
     logger: EndpointLogger,
     locale: CountryLanguage,
   ): Promise<ResponseType<UserDeleteResponseOutput>> {
+    if (!user.roles.includes(UserPermissionRole.ADMIN)) {
+      return fail({
+        message: scopedTranslation
+          .scopedT(locale)
+          .t("id.delete.errors.forbidden.description"),
+        errorType: ErrorResponseTypes.FORBIDDEN,
+      });
+    }
     try {
       logger.debug("Deleting user", {
         id: urlPathParams.id,

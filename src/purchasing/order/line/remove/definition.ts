@@ -16,7 +16,7 @@ import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
 import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
 import {
   objectField,
-  requestUrlPathParamsField,
+  requestField,
   responseField,
 } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
@@ -44,11 +44,53 @@ const { POST } = createEndpoint({
   ],
   allowedRoles: [UserRole.ADMIN] as const,
 
+  options: {
+    mutationOptions: {
+      onSuccess: async ({
+        logger,
+        requestData: { poId, lineId },
+        responseData: { result: totals },
+      }) => {
+        const [{ apiClient }, order] = await Promise.all([
+          import("next-vibe/unified-ui/hooks/store"),
+          import("../../[poId]/get/definition"),
+        ]);
+        if (!totals) {
+          return;
+        }
+        apiClient.updateEndpointData(
+          order.default.GET,
+          logger,
+          (cached) => {
+            if (!cached?.success || cached.data.result?.id !== poId) {
+              return cached;
+            }
+            const current = cached.data.result;
+            return {
+              ...cached,
+              data: {
+                ...cached.data,
+                result: {
+                  ...current,
+                  subtotal: totals.subtotal,
+                  taxAmount: totals.taxAmount,
+                  total: totals.total,
+                  lines: current.lines.filter((line) => line.id !== lineId),
+                },
+              },
+            };
+          },
+          { urlPathParams: { poId } },
+        );
+      },
+    },
+  },
+
   fields: customWidgetObject({
     render: OrderLineRemoveWidgetLazy,
-    usage: { request: "urlPathParams", response: true },
+    usage: { request: "data", response: true },
     children: {
-      poId: requestUrlPathParamsField(scopedTranslation, {
+      poId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
         listEndpoint: async () =>
@@ -60,7 +102,7 @@ const { POST } = createEndpoint({
         schema: z.uuid(),
       }),
 
-      lineId: requestUrlPathParamsField(scopedTranslation, {
+      lineId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
         label: "orderLineRemove.post.lineId.label" as const,
@@ -77,6 +119,11 @@ const { POST } = createEndpoint({
           currency: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             label: "orderCreate.currency.label",
+            schema: z.string().optional(),
+          }),
+          removedDescription: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            label: "orderLineAdd.post.itemDescription.label",
             schema: z.string().optional(),
           }),
           subtotal: responseField(scopedTranslation, {
@@ -150,7 +197,7 @@ const { POST } = createEndpoint({
   },
 
   examples: {
-    urlPathParams: {
+    requests: {
       default: {
         poId: "789e1234-e89b-12d3-a456-426614174000",
         lineId: "aaa11111-e89b-12d3-a456-426614174000",
@@ -159,6 +206,7 @@ const { POST } = createEndpoint({
     responses: {
       default: {
         result: {
+          removedDescription: "Packing tape",
           subtotal: 0,
           taxAmount: 0,
           total: 0,

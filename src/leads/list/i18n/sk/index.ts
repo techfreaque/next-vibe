@@ -323,6 +323,7 @@ export const translations: typeof enTranslations = {
     paid: "Platba",
     chatted: "Prvý čet",
     bot: "Robot",
+    listFilters: "Filtre a zoradenie",
     analyticsFilters: "Viac filtrov",
     apply: "Použiť",
   },

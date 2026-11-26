@@ -16,6 +16,8 @@ export const translations: typeof enTranslations = {
       description: "Inserisci i dettagli della spesa",
     },
     errors: {
+      evidenceReview:
+        "Verifica la fattura originale del fornitore prima di modificare l’imputazione.",
       validation: {
         title: "Errore di convalida",
         description: "Controlla tutti i campi",

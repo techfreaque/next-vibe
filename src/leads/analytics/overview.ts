@@ -17,18 +17,29 @@ import {
 } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
-import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import type {
   BreakdownRow,
   Kpi,
   TimeSeries,
 } from "next-vibe/unified-ui/analytics/schema";
-import type { AnalyticsWindow } from "next-vibe/unified-ui/analytics/window";
-import { inWindowSql } from "next-vibe/unified-ui/analytics/window-sql";
+import {
+  type AnalyticsWindow,
+  fillBuckets,
+} from "next-vibe/unified-ui/analytics/window";
+import {
+  bucketSql,
+  inPreviousWindowSql,
+  inWindowSql,
+  utcSql,
+} from "next-vibe/unified-ui/analytics/window-sql";
 import type { QueryResultRow } from "pg";
 
-import { usdSql } from "@/payment/analytics/money-sql";
+import {
+  REPORTABLE_PAYMENT_SQL,
+  reportingUserSql,
+  usdSql,
+} from "@/payment/analytics/money-sql";
 import { CheckoutMode, PaymentStatus } from "@/payment/enum";
 
 import { computeFlaggedSummary, DEFAULT_MIN_LEADS } from "./abuse/repository";
@@ -45,7 +56,92 @@ import {
   TrafficFilter,
 } from "./enum";
 import { scopedTranslation } from "./i18n";
-import { dimensionColumn, leadFactsSql } from "./segment-sql";
+import {
+  dimensionColumn,
+  humanLeadCreationsSql,
+  leadFactsSql,
+} from "./segment-sql";
+
+/** Unsegmented platform headline, with the same event windows as Acquisition. */
+export async function getAcquisitionHeadline(win: AnalyticsWindow): Promise<{
+  humanLeads: Kpi;
+  signups: Kpi;
+  leadsTrend: number[];
+  signupsTrend: number[];
+}> {
+  const leadCreated = sql`l.created_at`;
+  const userCreated = sql`u.created_at`;
+  const eventDate = sql`at`;
+  // Every linked account is counted once, using the lead facts' journey-first
+  // resolution and upper lead date bound. The unlinked branch is the same
+  // fallback used by the unsegmented acquisition report.
+  const { rows } = await db.execute<
+    QueryResultRow & {
+      key: "humanLeads" | "signups";
+      bucket: string;
+      current: number;
+      previous: number;
+    }
+  >(sql`
+    WITH events AS (
+      SELECT 'humanLeads'::text AS key, created_at AS at
+      FROM (${humanLeadCreationsSql(sql`
+        (${inWindowSql(leadCreated, win)}) OR (${inPreviousWindowSql(leadCreated, win)})
+      `)}) human_leads
+      UNION ALL
+      SELECT 'signups', u.created_at
+      FROM users u
+      WHERE ((${inWindowSql(userCreated, win)}) OR (${inPreviousWindowSql(userCreated, win)}))
+        AND (
+          EXISTS (
+            SELECT 1 FROM growth_journeys j JOIN leads l ON l.id = j.lead_id
+            WHERE j.user_id = u.id AND l.created_at < ${utcSql(win.to)}
+          )
+          OR EXISTS (
+            SELECT 1 FROM leads l LEFT JOIN growth_journeys j ON j.lead_id = l.id
+            WHERE l.converted_user_id = u.id AND l.created_at < ${utcSql(win.to)}
+              AND (j.user_id IS NULL OR j.user_id = u.id)
+          )
+          OR (
+            NOT EXISTS (SELECT 1 FROM growth_journeys j WHERE j.user_id = u.id)
+            AND NOT EXISTS (SELECT 1 FROM leads l WHERE l.converted_user_id = u.id)
+          )
+        )
+    )
+    SELECT key, ${bucketSql(eventDate, win.bucket)} AS bucket,
+      count(*) FILTER (WHERE ${inWindowSql(eventDate, win)})::int AS current,
+      count(*) FILTER (WHERE ${inPreviousWindowSql(eventDate, win)})::int AS previous
+    FROM events GROUP BY 1, 2
+  `);
+  const summarize = (
+    key: "humanLeads" | "signups",
+  ): { kpi: Kpi; trend: number[] } => {
+    const matching = rows.filter((row) => row.key === key);
+    return {
+      kpi: {
+        value: matching.reduce((sum, row) => sum + row.current, 0),
+        previous: win.previousFrom
+          ? matching.reduce((sum, row) => sum + row.previous, 0)
+          : null,
+      },
+      trend: fillBuckets(
+        win.buckets,
+        matching.map(({ bucket, current }) => ({
+          bucket,
+          value: current,
+        })),
+      ),
+    };
+  };
+  const leads = summarize("humanLeads");
+  const signups = summarize("signups");
+  return {
+    humanLeads: leads.kpi,
+    signups: signups.kpi,
+    leadsTrend: leads.trend,
+    signupsTrend: signups.trend,
+  };
+}
 
 export interface AcquisitionOverview {
   kpis: {
@@ -81,7 +177,7 @@ export interface AcquisitionOverview {
 /**
  * Payments collected in the window per first-touch channel of the paying
  * user. Same rule as the revenue report (paid = succeeded or refunded,
- * non-setup, admins excluded), so the values sum to its gross revenue and
+ * non-setup, real processor activity and the operating user audience), so the values sum to its gross revenue and
  * paying customers. Users without a journey land in UNATTRIBUTED.
  */
 async function paymentsByChannel(
@@ -93,10 +189,11 @@ async function paymentsByChannel(
     WITH paid AS (
       SELECT pt.user_id, ${usdSql("pt.amount", "pt.currency")} AS usd
       FROM payment_transactions pt
-      WHERE pt.mode <> ${CheckoutMode.SETUP}
+      WHERE ${REPORTABLE_PAYMENT_SQL}
+        AND pt.mode <> ${CheckoutMode.SETUP}
         AND pt.status IN (${PaymentStatus.SUCCEEDED}, ${PaymentStatus.REFUNDED})
         AND ${inWindowSql(sql`pt.created_at`, win)}
-        AND pt.user_id NOT IN (SELECT user_id FROM user_roles WHERE role = ${UserPermissionRole.ADMIN})
+        AND ${reportingUserSql("pt.user_id")}
     ),
     user_channel AS (
       SELECT DISTINCT ON (uid) uid, channel_type FROM (

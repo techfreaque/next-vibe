@@ -5,7 +5,11 @@ import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
 import { Span } from "next-vibe/ui/components/span";
+import { WidgetHeader } from "next-vibe/ui/components/widget-header";
+import { WidgetShell } from "next-vibe/ui/components/widget-shell";
+import { formatDocDate } from "next-vibe/unified-ui/_shared/format-money";
 import {
+  useWidgetLocale,
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetValue,
@@ -17,10 +21,6 @@ import type { JSX } from "react";
 import { PeriodStatus } from "../../../enum";
 import type definition from "./definition";
 
-function fmtDate(d: Date | string): string {
-  return d instanceof Date ? d.toLocaleDateString() : String(d);
-}
-
 export function CoaPeriodGetWidget({
   field,
 }: {
@@ -30,6 +30,7 @@ export function CoaPeriodGetWidget({
   const navigation = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.GET>();
 
+  const locale = useWidgetLocale();
   const period = data?.result;
 
   const handleClose = (): void => {
@@ -78,22 +79,27 @@ export function CoaPeriodGetWidget({
         : "secondary";
 
   return (
-    <Div className="flex flex-col gap-4">
-      {navigation.canGoBack && (
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={() => navigation.pop()}
-          className="self-start gap-1.5 -ml-1"
-        >
-          <ChevronLeft className="h-4 w-4" />
-          {t("periodGet.widget.back")}
-        </Button>
-      )}
-      <Div className="flex flex-col gap-3 rounded-md border p-4">
+    <WidgetShell layout="page">
+      <WidgetHeader
+        title={period.name}
+        subtitle={period.companyName}
+        size="page"
+        backButton={
+          navigation.canGoBack ? (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => navigation.pop()}
+            >
+              <ChevronLeft className="h-4 w-4" />
+              {t("periodGet.widget.back")}
+            </Button>
+          ) : undefined
+        }
+      />
+      <Div className="flex flex-col items-start gap-3 rounded-md border p-4">
         <Div className="flex items-center gap-2">
-          <Span className="text-base font-semibold flex-1">{period.name}</Span>
           <Badge variant={statusVariant} className="text-xs">
             {t(
               period.status === PeriodStatus.OPEN
@@ -109,20 +115,20 @@ export function CoaPeriodGetWidget({
             <Span className="text-xs uppercase tracking-wide font-medium">
               {t("periodGet.response.startDate")}
             </Span>
-            <Span>{fmtDate(period.startDate)}</Span>
+            <Span>{formatDocDate(period.startDate, locale)}</Span>
           </Div>
           <Div className="flex flex-col gap-0.5">
             <Span className="text-xs uppercase tracking-wide font-medium">
               {t("periodGet.response.endDate")}
             </Span>
-            <Span>{fmtDate(period.endDate)}</Span>
+            <Span>{formatDocDate(period.endDate, locale)}</Span>
           </Div>
           {period.closedAt && (
             <Div className="flex flex-col gap-0.5">
               <Span className="text-xs uppercase tracking-wide font-medium">
                 {t("periodGet.response.closedAt")}
               </Span>
-              <Span>{fmtDate(period.closedAt)}</Span>
+              <Span>{formatDocDate(period.closedAt, locale)}</Span>
             </Div>
           )}
         </Div>
@@ -140,6 +146,6 @@ export function CoaPeriodGetWidget({
           </Button>
         </Div>
       )}
-    </Div>
+    </WidgetShell>
   );
 }

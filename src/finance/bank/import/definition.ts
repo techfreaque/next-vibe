@@ -16,6 +16,11 @@ import { z } from "zod";
 import { BANK_STATEMENT_CSV_LIMIT } from "../csv";
 import { bankErrorTypes } from "../endpoint-errors";
 import { scopedTranslation } from "../i18n";
+import { statementFileOptionsSchema } from "../statement-file";
+import {
+  bankStatementFormats,
+  bankStatementFormatSchema,
+} from "../statement-format";
 
 const BankImportWidgetLazy = lazyWidget(() =>
   import("./widget").then((module) => ({ default: module.BankImportWidget })),
@@ -33,8 +38,14 @@ const { POST } = createEndpoint({
   subCategory: "Bank reconciliation",
   icon: "upload",
   tags: ["tags.bank", "tags.reconciliation"],
-  allowedRoles: [UserRole.ADMIN],
+  allowedRoles: [
+    UserRole.ADMIN,
+    UserRole.AI_TOOL_OFF,
+    UserRole.MCP_OFF,
+    UserRole.SKILL_OFF,
+  ],
   options: {
+    formOptions: { persistForm: false },
     mutationOptions: {
       onSuccess: async (context) => {
         const [{ apiClient }, list] = await Promise.all([
@@ -79,6 +90,39 @@ const { POST } = createEndpoint({
         label: "fields.csv",
         schema: z.string().max(BANK_STATEMENT_CSV_LIMIT),
       }),
+      format: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "statement.format",
+        options: bankStatementFormats.map((value) => ({
+          value,
+          label: `statement.formats.${value}` as const,
+        })),
+        schema: bankStatementFormatSchema.optional(),
+      }),
+      fileOptions: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "statement.mapping",
+        schema: statementFileOptionsSchema.optional(),
+      }),
+      dryRun: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "statement.preview",
+        schema: z.boolean().optional(),
+      }),
+      autoMatch: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "adjustment.autoMatch",
+        schema: z.boolean().optional(),
+      }),
+      autoMatched: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "adjustment.autoMatched",
+        schema: z.number().int().optional(),
+      }),
       imported: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         label: "fields.imported",
@@ -88,6 +132,16 @@ const { POST } = createEndpoint({
         type: WidgetType.TEXT,
         label: "fields.skipped",
         schema: z.number().int(),
+      }),
+      screenedOut: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "statement.screenedOut",
+        schema: z.number().int().optional(),
+      }),
+      preview: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "statement.preview",
+        schema: z.boolean().optional(),
       }),
       selectedCompanyId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,

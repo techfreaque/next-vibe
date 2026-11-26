@@ -59,10 +59,13 @@ export const translations = {
       AR_PAYMENT: "AR Payment",
       AP_BILL: "AP Bill",
       AP_PAYMENT: "AP Payment",
+      SUPPLIER_EVIDENCE: "Supplier evidence",
+      BANK_RECONCILIATION: "Bank reconciliation",
       POS_ORDER: "POS Order",
       TAX_PAYMENT: "Tax Payment",
       PERIOD_CLOSE: "Period Close",
       CREDIT_TRANSACTION: "Credit Transaction",
+      REVENUE_RECOGNITION: "Revenue recognition",
     },
     lineType: {
       DEBIT: "Debit",
@@ -199,6 +202,14 @@ export const translations = {
       back: "Back",
       loading: "Loading entry…",
       postButton: "Post Entry",
+      relatedEntries: "Related journal entries",
+      reversalBadge: "Reversal",
+      originalEntry: "Original entry",
+      reversingEntry: "Reversing entry",
+      reversedBy: "Reversed by",
+      originalLineNotes:
+        "Line descriptions come from the original entry. Debit and credit columns show this reversal.",
+      reverseReversal: "Reverse this reversal",
       reverseButton: "Reverse",
       balancedLabel: "Balanced",
       notBalancedLabel: "Not Balanced",
@@ -443,17 +454,16 @@ export const translations = {
       unbalanced: "Unbalanced",
       noActivity: "No accounts with activity found for this period.",
       total: "Total",
-      selectCompany:
-        "Enter a Company ID above and click Run to generate the trial balance.",
+      selectCompany: "Choose a company to view this report.",
     },
     title: "Trial Balance",
     titleShort: "Trial Balance",
     description:
       "Sum of all posted debits and credits per account as of a given date. Confirms the books balance.",
     companyId: {
-      label: "Company ID",
-      description: "Company to report on",
-      placeholder: "Company UUID",
+      label: "Company",
+      description: "Company covered by the report",
+      placeholder: "Choose a company",
     },
     asOfDate: {
       label: "As Of Date",
@@ -532,7 +542,9 @@ export const translations = {
       previousMonth: "Previous month",
       autoCurrency: "Automatic",
       run: "Run",
-      running: "Running…",
+      running: "Loading report…",
+      loadError: "The report could not load",
+      retry: "Try again",
     },
   },
   profitLoss: {
@@ -540,17 +552,16 @@ export const translations = {
       dateRange: "Period",
       noData: "No data for this period.",
       liabilitiesAndEquity: "Liabilities + Equity",
-      selectCompany:
-        "Enter a Company ID above and click Run to generate the P&L statement.",
+      selectCompany: "Choose a company to view this report.",
     },
     title: "Profit & Loss",
     titleShort: "P&L",
     description:
       "Revenue vs. expenses for a date range. Shows gross profit, operating profit, and net profit.",
     companyId: {
-      label: "Company ID",
-      description: "Company to report on",
-      placeholder: "Company UUID",
+      label: "Company",
+      description: "Company covered by the report",
+      placeholder: "Choose a company",
     },
     from: {
       label: "From",
@@ -619,16 +630,16 @@ export const translations = {
       unbalanced: "Not Balanced",
       noEntries: "No entries for this period",
       liabilitiesAndEquity: "Liabilities & Equity",
-      selectCompany: "Select a company to view the balance sheet",
+      selectCompany: "Choose a company to view this report.",
     },
     title: "Balance Sheet",
     titleShort: "Balance Sheet",
     description:
       "Assets, liabilities, and equity as of a date. Verifies the accounting equation holds.",
     companyId: {
-      label: "Company ID",
-      description: "Company to report on",
-      placeholder: "Company UUID",
+      label: "Company",
+      description: "Company covered by the report",
+      placeholder: "Choose a company",
     },
     asOfDate: {
       label: "As Of Date",
@@ -782,21 +793,23 @@ export const translations = {
   },
   taxReport: {
     widget: {
+      filters: "Period and currency",
+      window: "{{from}} to {{to}}",
       dateRange: "Period",
       noData: "No tax data for this period.",
       summarySection: "Summary",
-      detailSection: "Breakdown",
-      selectCompany:
-        "Enter a Company ID above and click Run to generate the tax report.",
+      detailSection: "Posted VAT account movements",
+      scopeHint:
+        "See the VAT collected and reclaimable for the selected period.",
+      selectCompany: "Choose a company to view this report.",
     },
     title: "Tax Report",
     titleShort: "Tax Report",
-    description:
-      "VAT collected vs. reclaimable for a period. Net VAT payable at a glance.",
+    description: "Booked movements on VAT accounts for the selected dates.",
     companyId: {
-      label: "Company ID",
-      description: "Company to report on",
-      placeholder: "Company UUID",
+      label: "Company",
+      description: "Company covered by the report",
+      placeholder: "Choose a company",
     },
     from: {
       label: "From",
@@ -811,12 +824,12 @@ export const translations = {
     response: {
       from: "From",
       to: "To",
-      vatCollected: "VAT Collected",
-      vatReclaimable: "VAT Reclaimable",
+      vatCollected: "Booked output VAT",
+      vatReclaimable: "Booked input VAT",
       netVatPayable: "Net VAT Payable",
       lines: "Tax Lines",
-      taxRateCode: "Rate Code",
-      taxRateName: "Rate Name",
+      taxRateCode: "Account code",
+      taxRateName: "Account name",
       netAmount: "Net Amount",
       taxAmount: "Tax Amount",
       rate: "Rate",

@@ -5,9 +5,9 @@ export const translations = {
     list: "List",
   },
   get: {
-    title: "Company Subscriptions",
-    titleShort: "Company Subs",
-    description: "List all subscriptions for a company",
+    title: "Owner subscriptions",
+    titleShort: "Owner subscriptions",
+    description: "View the company owner’s own subscription.",
     companyId: {
       label: "Company ID",
       description: "The company whose subscriptions to list",
@@ -31,7 +31,7 @@ export const translations = {
       },
       server: {
         title: "Server Error",
-        description: "Something went wrong — try again",
+        description: "Something went wrong. try again",
       },
       unknown: {
         title: "Unknown Error",

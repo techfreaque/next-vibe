@@ -2,7 +2,7 @@
  * Inventory Warehouse Get Repository
  */
 
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
@@ -15,11 +15,13 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
+import { companies } from "@/companies/db";
 import { CompanyMemberRole } from "@/companies/enum";
 import { CompanyAuthRepository } from "@/companies/repository";
 
-import { warehouses } from "../../../db";
+import { stockLevels, warehouses } from "../../../db";
 import { scopedTranslation } from "../../../i18n";
+import type { InventoryWarehouseGetResponseOutput } from "./definition";
 
 export class InventoryWarehouseGetRepository {
   static async getWarehouse(
@@ -27,21 +29,7 @@ export class InventoryWarehouseGetRepository {
     userId: string,
     logger: EndpointLogger,
     locale: CountryLanguage = defaultLocale,
-  ): Promise<
-    ResponseType<{
-      result: {
-        id: string;
-        companyId: string;
-        name: string;
-        code: string;
-        address: string | null;
-        isActive: boolean;
-        isDefault: boolean;
-        createdAt: Date;
-        updatedAt: Date;
-      };
-    }>
-  > {
+  ): Promise<ResponseType<InventoryWarehouseGetResponseOutput>> {
     const { t } = scopedTranslation.scopedT(locale);
 
     try {
@@ -69,10 +57,32 @@ export class InventoryWarehouseGetRepository {
         return authResult;
       }
 
+      const [[company], [stock]] = await Promise.all([
+        db
+          .select({ name: companies.name, currency: companies.currency })
+          .from(companies)
+          .where(eq(companies.id, warehouse.companyId)),
+        db
+          .select({
+            stockedProducts: sql<number>`count(*) filter (where ${stockLevels.quantityOnHand} > 0)::int`,
+            missingCosts: sql<number>`count(*) filter (where ${stockLevels.quantityOnHand} <> 0 and ${stockLevels.unitCost} is null)::int`,
+            value:
+              sql<number>`coalesce(sum(${stockLevels.quantityOnHand} * ${stockLevels.unitCost}), 0)`.mapWith(
+                Number,
+              ),
+          })
+          .from(stockLevels)
+          .where(eq(stockLevels.warehouseId, warehouse.id)),
+      ]);
+
       return success({
         result: {
           id: warehouse.id,
           companyId: warehouse.companyId,
+          companyName: company?.name,
+          stockedProducts: stock?.stockedProducts ?? 0,
+          stockValue: stock?.missingCosts ? null : (stock?.value ?? 0),
+          valuationCurrency: company?.currency ?? undefined,
           name: warehouse.name,
           code: warehouse.code,
           address: warehouse.address ?? null,

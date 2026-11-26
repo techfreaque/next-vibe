@@ -7,6 +7,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { z } from "zod";
 
 import { endpointToUrlSegment } from "../../core/core-utils/path";
 import type { NavigationStackEntry } from "../../core/definition/endpoint";
@@ -50,32 +51,119 @@ export function serializeNavigationData(
   return params;
 }
 
-export type NavigationArgument = string | string[] | boolean;
+export type NavigationArgument = string | string[] | boolean | number;
+
+interface NavigationData {
+  [key: string]: NavigationArgument | NavigationData;
+}
+
+function unwrapNavigationField(
+  schema: z.core.$ZodType | undefined,
+): z.core.$ZodType | undefined {
+  while (
+    schema instanceof z.ZodOptional ||
+    schema instanceof z.ZodNullable ||
+    schema instanceof z.ZodDefault ||
+    schema instanceof z.ZodPrefault
+  ) {
+    schema = schema.unwrap();
+  }
+  return schema;
+}
+
+function navigationField(
+  schema: z.core.$ZodType | undefined,
+  key: string,
+): z.core.$ZodType | undefined {
+  let field = unwrapNavigationField(schema);
+  for (const segment of key.split(".")) {
+    if (
+      !(field instanceof z.ZodObject) ||
+      !Object.hasOwn(field.shape, segment)
+    ) {
+      return undefined;
+    }
+    field = unwrapNavigationField(field.shape[segment]);
+  }
+  return field;
+}
 
 export function deserializeNavigationData(
   args: Record<string, string>,
-): Record<string, NavigationArgument> {
-  const data: Record<string, NavigationArgument> = {};
-  for (const [key, value] of Object.entries(args)) {
-    if (key.endsWith("[]")) {
+  schema?: z.ZodType,
+): NavigationData {
+  const data: NavigationData = {};
+  for (const [rawKey, value] of Object.entries(args)) {
+    const isArray = rawKey.endsWith("[]");
+    const isBoolean = rawKey.endsWith(":bool");
+    const key = isArray
+      ? rawKey.slice(0, -2)
+      : isBoolean
+        ? rawKey.slice(0, -5)
+        : rawKey;
+    const field = navigationField(schema, key);
+    const path = field ? key.split(".") : [key];
+    if (
+      path.some(
+        (part) =>
+          part === "__proto__" ||
+          part === "constructor" ||
+          part === "prototype",
+      )
+    ) {
+      continue;
+    }
+
+    let argument: NavigationArgument = value;
+    if (isArray) {
       try {
         const parsed: string | string[] = JSON.parse(value);
         if (
-          Array.isArray(parsed) &&
-          parsed.every((item) => typeof item === "string")
+          !Array.isArray(parsed) ||
+          !parsed.every((item) => typeof item === "string")
         ) {
-          data[key.slice(0, -2)] = parsed;
+          continue;
         }
+        argument = parsed;
       } catch {
         // Skip malformed multi-select values in manually edited URLs.
+        continue;
       }
-    } else if (key.endsWith(":bool")) {
+    } else if (isBoolean || field instanceof z.ZodBoolean) {
       if (value === "true" || value === "false") {
-        data[key.slice(0, -5)] = value === "true";
+        argument = value === "true";
+      } else if (isBoolean) {
+        continue;
       }
-    } else {
-      data[key] = value;
+    } else if (
+      field instanceof z.ZodNumber &&
+      value.trim() !== "" &&
+      Number.isFinite(Number(value))
+    ) {
+      argument = Number(value);
     }
+
+    // React Hook Form submits nested fields as objects. Store declared
+    // dotted inputs in that same shape so edits preserve their siblings.
+    const leaf = path.pop() ?? key;
+    let target = data;
+    for (const segment of path) {
+      const previous = Object.hasOwn(target, segment)
+        ? target[segment]
+        : undefined;
+      if (
+        previous &&
+        typeof previous === "object" &&
+        !Array.isArray(previous)
+      ) {
+        target = previous;
+      } else {
+        const nested: NavigationData = {};
+        target[segment] = nested;
+        target = nested;
+      }
+    }
+    target[leaf] = argument;
   }
   return data;
 }
@@ -127,7 +215,7 @@ async function reconstructEntry(
         Object.keys(urlPathParams).length > 0 ? urlPathParams : undefined,
       data:
         Object.keys(data).length > 0
-          ? deserializeNavigationData(data)
+          ? deserializeNavigationData(data, endpoint.requestSchema)
           : undefined,
     },
     timestamp: Date.now(),
@@ -298,10 +386,10 @@ export function useUrlNavStack(
         setStack(next);
         return;
       }
-      stackRef.current = [entry];
-      setStack([entry]);
       const serialized = serializeEntry(entry);
       historyRef.current.pushState(buildUrlRef.current(serialized));
+      stackRef.current = [entry];
+      setStack([entry]);
     },
     [navigationRestore],
   );
@@ -364,10 +452,10 @@ export function useUrlNavStack(
           opts?.replaceOnSuccess as NavigationStackEntry["replaceOnSuccess"],
         modalPosition: opts?.modalPosition,
       };
-      stackRef.current = [entry];
-      setStack([entry]);
       const serialized = serializeEntry(entry);
       historyRef.current.replaceState(buildUrlRef.current(serialized));
+      stackRef.current = [entry];
+      setStack([entry]);
     },
     [navigationRestore],
   );

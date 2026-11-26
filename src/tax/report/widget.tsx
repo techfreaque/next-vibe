@@ -3,6 +3,7 @@
 import { Div } from "next-vibe/ui/components/div";
 import { EmptyBlock } from "next-vibe/ui/components/empty-block";
 import { SectionGroup } from "next-vibe/ui/components/section-group";
+import { Skeleton } from "next-vibe/ui/components/skeleton";
 import { Span } from "next-vibe/ui/components/span";
 import {
   Table,
@@ -17,6 +18,7 @@ import { WidgetHeader } from "next-vibe/ui/components/widget-header";
 import { WidgetShell } from "next-vibe/ui/components/widget-shell";
 import { formatMoney } from "next-vibe/unified-ui/_shared/format-money";
 import {
+  useWidgetEndpointMutations,
   useWidgetForm,
   useWidgetIsInteractive,
   useWidgetLocale,
@@ -26,14 +28,16 @@ import {
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import { DateFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/date-field/widget";
 import { SelectFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/select-field/widget";
-import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
-import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
-import { type JSX, useState } from "react";
+import type { JSX } from "react";
 
+import {
+  ReportCompanyPicker,
+  ReportDateFilter,
+  ReportMenu,
+  ReportPeriodMenu,
+} from "@/chart-of-accounts/reports/balance-sheet/report-controls";
 import { formatAccountingDateInput } from "@/chart-of-accounts/shared/calendar-date";
-import { DocumentScopePicker } from "@/finance/document-list-ui";
 
 import type definition from "./definition";
 import { TaxReportDirectionDB } from "./enum";
@@ -51,14 +55,17 @@ export function TaxReportWidget({
   const locale = useWidgetLocale();
   const interactive = useWidgetIsInteractive();
   const responseOnly = useWidgetResponseOnly();
-  const [datePickerRevision, setDatePickerRevision] = useState(0);
+  const read = useWidgetEndpointMutations()?.read;
   const showInputs = interactive && !responseOnly;
   const companyId = form.watch("companyId");
   const currency = form.watch("currency");
   const from = formatAccountingDateInput(form.watch("dateFrom"));
   const to = formatAccountingDateInput(form.watch("dateTo"));
+  const needsCompany = showInputs && !companyId;
+  const failed = response?.success === false;
   const ready =
-    response?.success !== false &&
+    !needsCompany &&
+    !failed &&
     data?.reportCurrency &&
     (!showInputs ||
       ((!companyId || data.reportCompanyId === companyId) &&
@@ -90,8 +97,6 @@ export function TaxReportWidget({
     form.setValue("dateTo", new Date(Date.UTC(year, month, 0)), {
       shouldDirty: true,
     });
-    setDatePickerRevision((revision) => revision + 1);
-    onSubmit?.();
   };
 
   return (
@@ -99,54 +104,94 @@ export function TaxReportWidget({
       <WidgetHeader
         size="page"
         title={t("report.title")}
+        subtitle={t("report.description")}
         actions={
           showInputs && (
-            <SubmitButtonWidget<typeof definition.GET>
-              field={{
-                text: "report.widget.run",
-                loadingText: "report.widget.running",
-                size: "sm",
-              }}
+            <ReportMenu
+              current="taxRates"
+              companyId={companyId || data?.reportCompanyId}
             />
           )
         }
       />
       {showInputs && (
-        <Div className="grid items-end gap-3 @sm:grid-cols-2 @lg:grid-cols-4">
-          <Div className="flex flex-col gap-1.5">
-            <Span className="text-sm font-medium">
-              {t("report.companyId.label")}
-            </Span>
-            <DocumentScopePicker
-              kind="company"
-              required
-              value={companyId ?? data?.reportCompanyId}
-              appliedLabel={
-                !companyId || companyId === data?.reportCompanyId
-                  ? data?.reportCompanyName
-                  : undefined
-              }
-              onSelect={(id) =>
-                form.setValue("companyId", id, { shouldDirty: true })
-              }
+        <Div className="flex flex-wrap items-end gap-3 rounded-lg border bg-card p-3">
+          <ReportCompanyPicker
+            label={t("report.companyId.label")}
+            selectedId={companyId}
+            reportId={data?.reportCompanyId}
+            reportName={data?.reportCompanyName}
+            onChange={(id) =>
+              form.setValue("companyId", id, { shouldDirty: true })
+            }
+          />
+          <Div className="w-36 max-w-full">
+            <SelectFieldWidget
+              fieldName="currency"
+              field={{ ...children.currency, description: undefined }}
             />
           </Div>
-          <SelectFieldWidget fieldName="currency" field={children.currency} />
-          <DateFieldWidget
-            utcCalendarDay
-            key={`from-${datePickerRevision}`}
-            fieldName="dateFrom"
-            field={children.dateFrom}
+          <ReportDateFilter
+            id="tax-report-start"
+            label={t("report.dateFrom.label")}
+            day={from ?? data?.reportDateFrom}
+            onChange={(value) =>
+              form.setValue("dateFrom", value, { shouldDirty: true })
+            }
           />
-          <DateFieldWidget
-            utcCalendarDay
-            key={`to-${datePickerRevision}`}
-            fieldName="dateTo"
-            field={children.dateTo}
+          <ReportDateFilter
+            id="tax-report-end"
+            label={t("report.dateTo.label")}
+            day={to ?? data?.reportDateTo}
+            onChange={(value) =>
+              form.setValue("dateTo", value, { shouldDirty: true })
+            }
+          />
+          <ReportPeriodMenu
+            onChange={({ from: start, to: end }) => {
+              form.setValue("dateFrom", start, { shouldDirty: true });
+              form.setValue("dateTo", end, { shouldDirty: true });
+            }}
           />
         </Div>
       )}
-      <FormAlertWidget field={{}} />
+      {needsCompany && (
+        <EmptyBlock
+          size="page"
+          title={t("report.widget.selectCompany")}
+          message={t("report.widget.scopeHint")}
+        />
+      )}
+      {!needsCompany && failed && (
+        <EmptyBlock
+          title={response.message}
+          action={
+            showInputs && (read || onSubmit)
+              ? {
+                  label: t("report.widget.retry"),
+                  onClick: () => {
+                    if (read) {
+                      void read.refetch();
+                    } else {
+                      onSubmit?.();
+                    }
+                  },
+                }
+              : undefined
+          }
+        />
+      )}
+      {!needsCompany && !failed && read?.isLoadingFresh && !ready && (
+        <Div
+          className="space-y-3"
+          aria-live="polite"
+          aria-label={t("report.widget.running")}
+        >
+          <Skeleton className="h-20 w-full" />
+          <Skeleton className="h-20 w-full" />
+          <Skeleton className="h-20 w-full" />
+        </Div>
+      )}
       {ready && data ? (
         <>
           {data.reportDateFrom && data.reportDateTo && (
@@ -239,15 +284,13 @@ export function TaxReportWidget({
               }
             />
           )}
-          <Span className="text-sm text-muted-foreground">
-            {t("report.widget.scope")}
-          </Span>
+          {!!data.rows?.length && (
+            <Span className="text-xs text-muted-foreground">
+              {t("report.widget.scope")}
+            </Span>
+          )}
         </>
-      ) : (
-        showInputs &&
-        response?.success !== false &&
-        !companyId && <EmptyBlock title={t("report.widget.selectCompany")} />
-      )}
+      ) : null}
     </WidgetShell>
   );
 }

@@ -17,7 +17,6 @@ import { Pencil } from "next-vibe/ui/components/icons/Pencil";
 import { Play } from "next-vibe/ui/components/icons/Play";
 import { RefreshCw } from "next-vibe/ui/components/icons/RefreshCw";
 import { Trash2 } from "next-vibe/ui/components/icons/Trash2";
-import { TrendingUp } from "next-vibe/ui/components/icons/TrendingUp";
 import { XCircle } from "next-vibe/ui/components/icons/XCircle";
 import { Span } from "next-vibe/ui/components/span";
 import React, { useCallback, useEffect, useState } from "react";
@@ -26,6 +25,7 @@ import { getEndpoint } from "@/generated/endpoints/endpoint";
 
 import { getFullPath } from "../../../../core/core-utils/path";
 import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
+import type { CountryLanguage } from "../../../../core/i18n/core/config";
 import { getDefaultTimezone } from "../../../../core/i18n/core/localization-utils";
 import type { WidgetData } from "../../../../core/utils/json";
 import { cn } from "../../../../unified-ui/_shared/cn";
@@ -95,6 +95,44 @@ const PRIORITY_COLORS: Record<string, string> = {
 // Format helpers
 // ---------------------------------------------------------------------------
 
+// Render the fixed wall-clock time without shifting it into the viewer's zone.
+function annualScheduleParts(
+  schedule: string,
+  locale: CountryLanguage,
+): { date: string; time: string } | undefined {
+  const fixed = /^(\d{1,2})\s+(\d{1,2})\s+(\d{1,2})\s+(\d{1,2})\s+\*$/u.exec(
+    schedule.trim(),
+  );
+  if (!fixed) {
+    return undefined;
+  }
+  const minute = Number(fixed[1]);
+  const hour = Number(fixed[2]);
+  const day = Number(fixed[3]);
+  const month = Number(fixed[4]);
+  const date = new Date(Date.UTC(2000, month - 1, day, hour, minute));
+  if (
+    date.getUTCMonth() !== month - 1 ||
+    date.getUTCDate() !== day ||
+    date.getUTCHours() !== hour ||
+    date.getUTCMinutes() !== minute
+  ) {
+    return undefined;
+  }
+  return {
+    date: new Intl.DateTimeFormat(locale, {
+      month: "long",
+      day: "numeric",
+      timeZone: "UTC",
+    }).format(date),
+    time: new Intl.DateTimeFormat(locale, {
+      hour: "numeric",
+      minute: "2-digit",
+      timeZone: "UTC",
+    }).format(date),
+  };
+}
+
 function formatDate(s: string | null | undefined, never: string): string {
   if (!s) {
     return never;
@@ -150,7 +188,7 @@ function StatCard({
   iconColor: string;
 }): React.JSX.Element {
   return (
-    <Div className="flex flex-col items-center gap-1 p-4 rounded-lg border bg-card text-center">
+    <Div className="flex flex-col items-center min-w-0 gap-1 rounded-lg border bg-card px-2 py-3 text-center sm:p-4">
       <Div style={{ color: iconColor, marginBottom: "2px" }}>{icon}</Div>
       <Div
         style={{
@@ -162,7 +200,9 @@ function StatCard({
       >
         {String(value)}
       </Div>
-      <Div className="text-xs text-muted-foreground text-center">{label}</Div>
+      <Div className="max-w-full text-center text-xs leading-tight text-muted-foreground [overflow-wrap:anywhere]">
+        {label}
+      </Div>
     </Div>
   );
 }
@@ -573,11 +613,39 @@ export function CronTaskDetailContainer({
   const isLoading = endpointMutations?.read?.isLoading;
   const fieldValue = useWidgetValue<typeof endpoints.GET>();
   const task: Task | null | undefined = fieldValue?.task;
+  const form = useWidgetForm<typeof endpoints.GET>();
+  const routeTaskId = form.watch("id");
+  const taskId = task?.id ?? routeTaskId;
 
   // ── Refresh ──
   const handleRefresh = useCallback((): void => {
     endpointMutations?.read?.refetch?.();
   }, [endpointMutations]);
+
+  const [refresh, setRefresh] = useState<{
+    taskId: string;
+    status: "pending" | "success" | "error";
+  }>();
+  const refreshStatus =
+    refresh?.taskId === taskId ? refresh?.status : undefined;
+
+  const handleExplicitRefresh = async (): Promise<void> => {
+    const read = endpointMutations?.read;
+    if (!taskId || !read || refreshStatus === "pending") {
+      return;
+    }
+    if (!read.refetchResult) {
+      await read.refetch();
+      return;
+    }
+    setRefresh({ taskId, status: "pending" });
+    try {
+      const result = await read.refetchResult();
+      setRefresh({ taskId, status: result.success ? "success" : "error" });
+    } catch {
+      setRefresh({ taskId, status: "error" });
+    }
+  };
 
   // ── Navigation: edit task ──
   const handleEdit = useCallback((): void => {
@@ -643,7 +711,30 @@ export function CronTaskDetailContainer({
   }, [navigate, task, handleRefresh]);
 
   // ── Loading state ──
-  if (isLoading) {
+  if (!task && (refreshStatus === "pending" || refreshStatus === "error")) {
+    return (
+      <Div className="flex flex-col items-start gap-3 p-4">
+        <NavigateButtonWidget field={children.backButton} />
+        <Div aria-live="polite" className="text-sm text-muted-foreground">
+          {t(
+            refreshStatus === "error"
+              ? "widget.refreshFailed"
+              : "widget.refreshing",
+          )}
+        </Div>
+        <Button
+          type="button"
+          variant="outline"
+          disabled={refreshStatus === "pending"}
+          onClick={() => void handleExplicitRefresh()}
+        >
+          {t("widget.refresh")}
+        </Button>
+      </Div>
+    );
+  }
+
+  if (isLoading && !task) {
     return (
       <Div className="flex items-center justify-center h-full min-h-64 py-16">
         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
@@ -679,6 +770,7 @@ export function CronTaskDetailContainer({
       : 0;
 
   const neverLabel = t("widget.never");
+  const annualSchedule = annualScheduleParts(task.schedule, locale);
 
   const statusColorClass = task.lastExecutionStatus
     ? (STATUS_COLORS[task.lastExecutionStatus] ??
@@ -692,31 +784,27 @@ export function CronTaskDetailContainer({
   return (
     <Div className="flex flex-col gap-0 pb-8">
       {/* ── Top action bar ── */}
-      <Div className="flex items-center gap-2 p-4 border-b sticky top-0 bg-background z-10">
-        <NavigateButtonWidget field={children.backButton} />
-
-        <Div className="flex-1 min-w-0">
-          <Div className="font-bold text-lg truncate leading-tight">
-            {task.displayName}
-          </Div>
-          <Div
-            style={{
-              fontFamily: "monospace",
-              fontSize: "0.72rem",
-              color: "var(--muted-foreground)",
-              marginTop: "1px",
-            }}
-          >
-            {task.routeId}
+      <Div className="sticky top-0 z-10 flex min-w-0 flex-col gap-3 border-b bg-background p-4 md:flex-row md:flex-wrap md:items-center">
+        <Div className="flex min-w-0 items-center gap-2 md:flex-1">
+          <NavigateButtonWidget field={children.backButton} />
+          <Div className="min-w-0 flex-1">
+            <Div className="truncate text-lg font-bold leading-tight">
+              {task.displayName}
+            </Div>
+            <Div className="mt-px truncate font-mono text-xs text-muted-foreground">
+              {task.routeId}
+            </Div>
           </Div>
         </Div>
 
-        <Div className="flex items-center gap-1 flex-shrink-0">
+        <Div className="flex max-w-full flex-wrap items-center gap-1">
           <Button
             type="button"
             variant="ghost"
             size="sm"
-            onClick={handleRefresh}
+            onClick={() => void handleExplicitRefresh()}
+            disabled={refreshStatus === "pending"}
+            aria-label={t("widget.refresh")}
             className="gap-1.5"
           >
             <RefreshCw className="h-4 w-4" />
@@ -729,7 +817,7 @@ export function CronTaskDetailContainer({
             className="gap-1.5 text-success border-success/30 hover:bg-success/10"
           >
             <Play className="h-4 w-4" />
-            {t("widget.run")}
+            {t(task.enabled ? "widget.run" : "widget.runManually")}
           </Button>
           <Button
             type="button"
@@ -764,26 +852,31 @@ export function CronTaskDetailContainer({
         </Div>
       </Div>
 
-      <Div className="px-4 pt-4 flex flex-col gap-4">
-        {/* ── Header: displayName + routeId + enabled badge ── */}
-        <Div className="flex flex-wrap items-center gap-3 pb-1">
-          <Div className="text-2xl font-bold leading-snug">
-            {task.displayName}
-          </Div>
-          <Div
-            style={{
-              fontFamily: "monospace",
-              fontSize: "0.78rem",
-              color: "var(--muted-foreground)",
-              background: "var(--muted)",
-              borderRadius: "4px",
-              padding: "2px 8px",
-            }}
+      <Div aria-live="polite" className="px-4 text-sm text-muted-foreground">
+        {refreshStatus && (
+          <Span
+            className={cn(
+              "mt-3 inline-block",
+              refreshStatus === "error" && "text-destructive",
+            )}
           >
-            {task.routeId}
-          </Div>
+            {t(
+              refreshStatus === "pending"
+                ? "widget.refreshing"
+                : refreshStatus === "success"
+                  ? "widget.refreshSucceeded"
+                  : "widget.refreshFailed",
+            )}
+          </Span>
+        )}
+      </Div>
+
+      <Div className="px-4 pt-4 flex flex-col gap-4">
+        <Div className="flex flex-wrap items-center gap-3">
           <Badge
-            label={task.enabled ? t("widget.enabled") : t("widget.disabled")}
+            label={
+              task.enabled ? t("widget.enabled") : t("widget.schedulePaused")
+            }
             className={
               task.enabled
                 ? "bg-success/10 text-success"
@@ -793,7 +886,7 @@ export function CronTaskDetailContainer({
         </Div>
 
         {task.description && (
-          <Div className="text-sm text-muted-foreground -mt-2">
+          <Div className="text-sm text-muted-foreground">
             {task.description}
           </Div>
         )}
@@ -830,12 +923,14 @@ export function CronTaskDetailContainer({
             </InfoRow>
             <InfoRow label={t("widget.schedule")}>
               <Div className="text-sm">
-                {formatCronScheduleShort(
-                  task.schedule,
-                  task.timezone ?? getDefaultTimezone(locale),
-                  locale,
-                  logger,
-                )}
+                {annualSchedule
+                  ? t("widget.annualSchedule", annualSchedule)
+                  : formatCronScheduleShort(
+                      task.schedule,
+                      task.timezone ?? getDefaultTimezone(locale),
+                      locale,
+                      logger,
+                    )}
               </Div>
             </InfoRow>
             {task.timezone && (
@@ -875,8 +970,7 @@ export function CronTaskDetailContainer({
           </Div>
         </Div>
 
-        {/* ── Execution stats row: 4 stat cards ── */}
-        <Div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <Div className="grid grid-cols-3 gap-3">
           <StatCard
             icon={<Activity className="h-5 w-5" />}
             value={task.executionCount}
@@ -895,43 +989,38 @@ export function CronTaskDetailContainer({
             label={t("widget.stats.errors")}
             iconColor="#dc2626"
           />
-          <StatCard
-            icon={<TrendingUp className="h-5 w-5" />}
-            value={`${successRate}%`}
-            label={t("widget.stats.successRate")}
-            iconColor="#9333ea"
-          />
         </Div>
 
-        {/* ── Success rate progress bar ── */}
-        <Div className="rounded-lg border p-4 flex flex-col gap-2">
-          <Div className="flex items-center justify-between">
-            <Div className="text-xs font-medium text-muted-foreground">
-              {t("widget.stats.successRate")}
+        {task.executionCount > 0 && (
+          <Div className="rounded-lg border p-4 flex flex-col gap-2">
+            <Div className="flex items-center justify-between">
+              <Div className="text-xs font-medium text-muted-foreground">
+                {t("widget.stats.successRate")}
+              </Div>
+              <Div
+                style={{
+                  fontSize: "0.8rem",
+                  fontWeight: 600,
+                  color: "#16a34a",
+                  fontVariantNumeric: "tabular-nums",
+                }}
+              >
+                {successRate}%
+              </Div>
             </Div>
-            <Div
-              style={{
-                fontSize: "0.8rem",
-                fontWeight: 600,
-                color: "#16a34a",
-                fontVariantNumeric: "tabular-nums",
-              }}
-            >
-              {successRate}%
+            <Div className="bg-muted rounded-full h-2 overflow-hidden">
+              <Div
+                style={{
+                  width: `${Math.min(successRate, 100)}%`,
+                  backgroundColor: "#22c55e",
+                  height: "8px",
+                  borderRadius: "9999px",
+                  transition: "width 0.3s",
+                }}
+              />
             </Div>
           </Div>
-          <Div className="bg-muted rounded-full h-2 overflow-hidden">
-            <Div
-              style={{
-                width: `${Math.min(successRate, 100)}%`,
-                backgroundColor: "#22c55e",
-                height: "8px",
-                borderRadius: "9999px",
-                transition: "width 0.3s",
-              }}
-            />
-          </Div>
-        </Div>
+        )}
 
         {/* ── Timing section ── */}
         <Div className="rounded-lg border p-4 flex flex-col gap-3">
@@ -1021,7 +1110,7 @@ export function CronTaskDetailContainer({
             className="gap-1.5 text-success border-success/30 hover:bg-success/10"
           >
             <Play className="h-4 w-4" />
-            {t("widget.run")}
+            {t(task.enabled ? "widget.run" : "widget.runManually")}
           </Button>
           <Button
             type="button"
@@ -1047,7 +1136,8 @@ export function CronTaskDetailContainer({
             type="button"
             variant="outline"
             size="sm"
-            onClick={handleRefresh}
+            onClick={() => void handleExplicitRefresh()}
+            disabled={refreshStatus === "pending"}
             className="gap-1.5"
           >
             <RefreshCw className="h-4 w-4" />

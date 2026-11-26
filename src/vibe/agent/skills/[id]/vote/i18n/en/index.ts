@@ -4,6 +4,8 @@ export const translations = {
     skills: "skills",
   },
   post: {
+    selectSkill: "Open a community skill to cast your vote.",
+    browseSkills: "Browse community skills",
     title: "Vote for Skill",
     titleShort: "Vote Skill",
     description:

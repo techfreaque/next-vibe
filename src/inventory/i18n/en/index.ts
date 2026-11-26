@@ -213,6 +213,13 @@ export const translations = {
       titleShort: "Warehouse",
       description: "Retrieve details for a specific warehouse.",
       widget: {
+        companyName: "Company",
+        stockedProducts: "Products in stock",
+        companyInventory: "Company inventory overview",
+        missingValuation: "Missing cost",
+        details: "Warehouse details",
+        related: "Inventory",
+        backToList: "Back to warehouses",
         back: "Back",
         edit: "Edit warehouse",
         viewStock: "View stock",
@@ -381,6 +388,10 @@ export const translations = {
         loadMore: "Show more",
 
         back: "Back",
+        defaultLowStockRule: "Low below {{threshold}} available",
+        reorderPointRule: "Low at {{threshold}} available or less",
+        stockValuePrecision:
+          "Stock value uses on-hand quantity × unrounded unit cost. Displayed costs are rounded to two decimals.",
         lowStock: "Low stock",
         available: "Available",
         onHand: "On hand",
@@ -888,6 +899,8 @@ export const translations = {
       titleShort: "Transfer",
       description: "Retrieve a transfer with all its line items.",
       widget: {
+        retry: "Try again",
+        noItems: "This transfer has no items.",
         back: "Back",
         dispatch: "Dispatch transfer",
         receive: "Mark received",

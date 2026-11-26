@@ -34,7 +34,7 @@ export class OrderLineAddRepository {
   static async addLine(
     poId: string,
     userId: string,
-    data: OrderLineAddRequestOutput,
+    data: Omit<OrderLineAddRequestOutput, "poId">,
     logger: EndpointLogger,
     locale: CountryLanguage = defaultLocale,
   ): Promise<ResponseType<OrderLineAddResponseOutput>> {

@@ -25,12 +25,13 @@ import type { JSX } from "react";
 
 import { formatAccountingDateInput } from "../../shared/calendar-date";
 import {
-  reportAmountClass,
   ReportCompanyPicker,
   ReportDateFilter,
   ReportMenu,
   ReportPeriodMenu,
+  ReportReadState,
 } from "../balance-sheet/report-controls";
+import { reportAmountClass } from "../report-amount-class";
 import type definition from "./definition";
 import type { ProfitLossResponseOutput } from "./definition";
 
@@ -113,6 +114,7 @@ export function ProfitLossWidget({
   const responseOnly = useWidgetResponseOnly();
   const showInputs = interactive && !responseOnly;
   const companyId = form.watch("companyId");
+  const hasCompany = Boolean(companyId || data?.reportCompanyId);
   const requestedCurrency = form.watch("currency")?.trim().toUpperCase();
   const from = formatAccountingDateInput(form.watch("from"));
   const to = formatAccountingDateInput(form.watch("to"));
@@ -197,7 +199,9 @@ export function ProfitLossWidget({
           />
         </Div>
       )}
-      <FormAlertWidget field={{}} />
+      {hasCompany && response?.success !== false && (
+        <FormAlertWidget field={{}} />
+      )}
       {ready && data?.reportCurrency && (
         <Span className="text-sm font-medium">
           {t("reports.currency")} {data.reportCurrency}
@@ -285,12 +289,11 @@ export function ProfitLossWidget({
             </Div>
           </Div>
         </Div>
-      ) : response?.success === false ? null : (
-        <Div className="text-center py-10 text-sm text-muted-foreground border border-dashed rounded-md">
-          {companyId || data?.reportCompanyId
-            ? t("reports.widget.running")
-            : t("profitLoss.widget.selectCompany")}
-        </Div>
+      ) : (
+        <ReportReadState
+          hasCompany={hasCompany}
+          companyPrompt={t("profitLoss.widget.selectCompany")}
+        />
       )}
     </WidgetShell>
   );

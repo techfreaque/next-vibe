@@ -20,7 +20,7 @@ export const translations: typeof enTranslations = {
           "Wählen Sie eine Rolle aus, die diesem Benutzer gewährt werden soll",
       },
       id: {
-        label: "Benutzer-ID",
+        label: "Benutzer",
         description:
           "Eindeutige Kennung des Benutzers, dem die Rolle zugewiesen werden soll",
         placeholder: "Benutzer-ID eingeben...",
@@ -104,7 +104,7 @@ export const translations: typeof enTranslations = {
           "Wählen Sie eine Rolle aus, die diesem Benutzer entzogen werden soll",
       },
       id: {
-        label: "Benutzer-ID",
+        label: "Benutzer",
         description:
           "Eindeutige Kennung des Benutzers, dem die Rolle entzogen werden soll",
         placeholder: "Benutzer-ID eingeben...",

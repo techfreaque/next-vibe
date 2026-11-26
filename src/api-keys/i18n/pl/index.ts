@@ -4,6 +4,14 @@ export const translations: typeof enTranslations = {
   category: "Konto",
 
   widget: {
+    adminOverview:
+      "Zarządzaj kluczami swojego konta. Dokumentacja API pokazuje, jak połączyć aplikację.",
+    loadFailed: "Nie udało się wczytać kluczy API",
+    retry: "Spróbuj ponownie",
+    revokeNamed: "Unieważnij {{name}}",
+    revokeConfirm:
+      "Aplikacje korzystające z tego klucza natychmiast utracą dostęp.",
+    cancel: "Anuluj",
     upgradeTitle: "Dostęp do API daje każdy plan, od {{subPrice}} miesięcznie",
     upgradeBody:
       "Klucze API odblokowuje każdy plan. Darmowe i bonusowe kredyty tego nie robią.",

@@ -4,6 +4,14 @@ export const translations: typeof enTranslations = {
   category: "Compte",
 
   widget: {
+    adminOverview:
+      "Gérez les clés de votre compte. Consultez la documentation de l’API pour connecter une application.",
+    loadFailed: "Impossible de charger vos clés API",
+    retry: "Réessayer",
+    revokeNamed: "Révoquer {{name}}",
+    revokeConfirm:
+      "Les applications qui utilisent cette clé perdent immédiatement l’accès.",
+    cancel: "Annuler",
     upgradeTitle:
       "L'accès à l'API est inclus dans toutes les formules, dès {{subPrice}} par mois",
     upgradeBody:

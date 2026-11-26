@@ -114,7 +114,6 @@ export function VendorListWidget(_props: {
       const vendor = vendors.find((v) => v.id === vendorId);
       if (vendor && onPick) {
         onPick({ id: vendor.id, name: vendor.name });
-        navigation.pop();
       }
       return;
     }

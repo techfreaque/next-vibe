@@ -147,6 +147,7 @@ export class ConsumptionRepository {
   /** Paid USD per credit for each pack id (packs without a linked payment are left out). */
   static async packPrices(
     packIds: readonly string[],
+    options?: { exactUsdCheckoutOnly: boolean },
   ): Promise<Map<string, number>> {
     const prices = new Map<string, number>();
     if (packIds.length === 0) {
@@ -196,6 +197,13 @@ export class ConsumptionRepository {
       )})
     `);
     for (const row of result.rows) {
+      if (
+        options?.exactUsdCheckoutOnly &&
+        (row.type !== CreditPackType.PERMANENT ||
+          row.session_currency?.toUpperCase() !== "USD")
+      ) {
+        continue;
+      }
       const facts: PackFacts = {
         packId: row.id,
         kind:

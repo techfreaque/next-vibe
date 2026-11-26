@@ -1,6 +1,151 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  profit: {
+    run: "Zobraziť výkaz",
+    unallocatedRevenue:
+      "Zaúčtované výnosy bez priradenia k modelom: {{amount}}",
+    estimatedCosts: "Odhadované náklady na modely: {{amount}}",
+    usageValue: "Platená spotreba ocenená známymi nákupnými cenami: {{amount}}",
+    estimatedMargin: "Odhadovaná marža zo spotreby: {{amount}}",
+    marginUnknown:
+      "Marža nie je dostupná. Chýbajú údaje o financovaní alebo hodnote platenej spotreby.",
+    missingPrice:
+      "Pri {{credits}} spotrebovaných kreditoch chýba potvrdená nákupná cena.",
+    title: "Mesačný výkaz ziskov a strát",
+    description:
+      "Skontrolujte zaúčtované výnosy, náklady a výsledok za zvolený mesiac.",
+    revenue: "Čisté výnosy",
+    expenses: "Náklady",
+    net: "Čistý zisk alebo strata",
+    empty: "Za tento mesiac nie sú zaúčtované žiadne výnosy ani náklady.",
+    areas: "Zdroje nákladov",
+    signedExpenseAreas:
+      "Storná a ostatné dobropisy znižujú náklady. Záporná suma znamená, že v tomto mesiaci prevýšili zaúčtované náklady.",
+    openLedger: "Zobraziť účtovné zápisy",
+    noAccounts: "Žiadne pohyby.",
+    estimatesHint:
+      "Odhady v USD podľa spotreby najviac 20 modelov u priradených poskytovateľov. Prehľad vynecháva paušály a náklady bez údajov o spotrebe.",
+    estimatesEmpty:
+      "Pre tento výber nie sú k dispozícii odhady nákladov na modely.",
+    unknownModel: "Neidentifikovaný model",
+    paid: "Zakúpené kredity: {{amount}}",
+    free: "Bezplatný limit: {{amount}}",
+    gifted: "Darované kredity: {{amount}}",
+    unknownFunding: "Neznámy zdroj financovania: {{amount}}",
+    missing:
+      "Chýbajú presné údaje o nákladoch na {{credits}} spotrebovaných kreditov.",
+  },
+  suppliers: {
+    bankTransaction: "Banková transakcia",
+    bankLoading: "Načítava sa banková transakcia…",
+    bankUnavailable: "Overená banková transakcia nie je dostupná.",
+    previewBankLink: "Skontrolovať priradenie dokladu",
+    linkToBankBill: "Priradiť doklad",
+    bankDraftBill: "Faktúra z bankovej transakcie (nepovinné)",
+    sponsorshipSource: "Sponzorstvo tvorcu",
+    confirmSeparateBankBill:
+      "Potvrdzujem, že ide o samostatný výdavok mimo návrhov z banky",
+    possibleBankDuplicate:
+      "Faktúra vytvorená z bankového dokladu má podobné údaje. Vyberte ju na priradenie dokladu alebo potvrďte, že ide o samostatný výdavok.",
+    monthlyReview: "Mesačný náhľad zdrojov",
+    monthlyReviewHint:
+      "Skontrolujte uložené merania a potvrdené doklady o predplatbách za tento mesiac. Pri neúplných intervaloch môžu údaje chýbať.",
+    counterTotal: "Spotreba podľa počítadla (USD): {{amount}}",
+    estimatedTotal: "Odhadovaná spotreba (USD): {{amount}}",
+    unclassifiedTotal: "Spotreba bez určeného podkladu (USD): {{amount}}",
+    readingCoverage:
+      "Počet meraní: {{readings}}. Chýbajú náklady za interval: {{missing}}.",
+    receiptTotal:
+      "Potvrdené predplatby: {{amount}} v {{count}} dokladoch, zaúčtovaných: {{posted}}.",
+    noReceipts: "Za tento mesiac nie sú potvrdené doklady o predplatbách.",
+    ledgerPrepaid: "Zaúčtovaný zostatok predplatieb",
+    estimates: "Odhadované náklady na modely",
+    estimatesHint:
+      "20 najvyšších odhadov podľa spotreby u priradených poskytovateľov. Prehľad vynecháva paušály a náklady bez údajov o spotrebe.",
+    month: "Mesiac (RRRR-MM)",
+    monthly: "Zaúčtované mesačné náklady",
+    noMonthly: "Za tento mesiac nie sú zaúčtované žiadne náklady.",
+    area: {
+      referral: "Provízie za odporúčanie",
+      provider: "Poskytovatelia",
+      processor: "Spracovanie platieb",
+      sponsorship: "Sponzorstvo",
+      supplier: "Ostatné doklady od dodávateľov",
+      unallocated: "Nepriradené",
+    },
+    spendBasis: {
+      counter: "Počítadlo spotreby poskytovateľa",
+      "balance-delta": "Odhad podľa zmeny zostatku",
+      "usage-estimate": "Odhad podľa internej spotreby",
+    },
+    title: "Doklady od dodávateľov",
+    description:
+      "Skontrolujte zostatky u poskytovateľov a dodávateľské doklady.",
+    record: "Evidovať dodávateľský doklad",
+    recordDescription:
+      "Pred vytvorením faktúry alebo účtovného zápisu skontrolujte pôvodný doklad.",
+    company: "Spoločnosť",
+    vendor: "Dodávateľ",
+    chooseSupplier: "Vybrať dodávateľa",
+    operation: "Operácia",
+    provider: "Poskytovateľ",
+    reference: "Referencia dokladu",
+    invoiceReference: "Číslo dodávateľskej faktúry",
+    servicePeriodStart: "Začiatok obdobia služby (RRRR-MM-DD)",
+    servicePeriodEnd: "Koniec obdobia služby (RRRR-MM-DD)",
+    date: "Dátum účtovania (RRRR-MM-DD)",
+    gross: "Suma vrátane dane",
+    tax: "Potvrdená suma dane",
+    currency: "Mena (EUR, USD alebo PLN)",
+    memo: "Opis",
+    preview: "Len náhľad",
+    debit: "Účet Má dať alebo nákladový účet",
+    credit: "Účet Dal",
+    result: "Výsledok",
+    balances: "Zostatky u poskytovateľov",
+    observed: "Zistený zostatok",
+    interval: "Náklady za posledný interval bez overeného podkladu",
+    unavailable: "Nedostupné",
+    recent: "Posledné doklady",
+    noBindings: "Tejto spoločnosti nie je priradený žiadny poskytovateľ.",
+    noEvidence: "Zatiaľ ste nezaevidovali žiadny dodávateľský doklad.",
+    run: "Zobraziť doklady od dodávateľov",
+    previewEvidence: "Zobraziť náhľad dokladu",
+    invalid:
+      "Skontrolujte referenciu, potvrdené sumy, menu spoločnosti, účty a otvorené účtovné obdobie.",
+    conflict: "Táto referencia je už priradená k inému dokladu.",
+    taxHint: "Zadajte 0, ak pôvodný doklad potvrdzuje, že sa daň neuplatňuje.",
+    referralHint:
+      "Vyberte dodávateľa s overenou e-mailovou adresou príjemcu. Z dokladu o provízii opíšte sumu s daňou, menu a daň. Žiadosť o výplatu uvádza iba kredity.",
+    evidenceHint:
+      "Použite pôvodné potvrdenie alebo výpis. Samotný zostatok u poskytovateľa nestačí.",
+    openBill: "Otvoriť faktúru",
+    openJournal: "Otvoriť účtovný zápis",
+    banked:
+      "Zistené zostatky a náklady slúžia na kontrolu. Historické náklady môžu byť odhadnuté.",
+    kind: {
+      processorFee: "Použitie overeného poplatku za spracovanie platby",
+      fundBill: "Dodávateľská faktúra za predplatbu",
+      bind: "Priradenie poskytovateľa",
+      bill: "Dodávateľská faktúra",
+      fund: "Dobitie predplateného zostatku",
+      consume: "Čerpanie predplateného zostatku",
+      paid: "Evidencia uhradeného nákladu",
+      sponsorship: "Použitie záznamu o sponzorstve",
+      referral: "Pripraviť doklad k provízii",
+    },
+    outcome: {
+      linked: "Dodávateľský doklad je priradený",
+      preview: "Náhľad je overený",
+      bound: "Poskytovateľ je priradený",
+      bill: "Návrh faktúry je vytvorený",
+      posted: "Zápis je zaúčtovaný",
+      replayed: "Doklad je už zaevidovaný",
+      review:
+        "Vyžaduje sa kontrola. Samotný zdrojový záznam nedokladá vyrovnanie v mene spoločnosti ani daň.",
+    },
+  },
   spendAlert: {
     explained:
       "Účtovná evidencia vysvetľuje nárast spotreby u poskytovateľa {{provider}}.",
@@ -14,6 +159,15 @@ export const translations: typeof enTranslations = {
   },
   category: "Financie",
   documents: {
+    status: "Stav",
+    activeFilters: "{{label}} sú aktívne",
+    loadFailed: "Doklady sa nepodarilo načítať",
+    loadFailedHint: "Skúste zoznam načítať znova.",
+    scopeDenied: "K vybraným dokladom nemáte prístup.",
+    retry: "Načítať znova",
+    openAction: "Otvoriť",
+    pickAction: "Vybrať",
+    pageSingle: "Strana {{page}} z {{pages}} · {{total}} výsledok",
     clearCompany: "Zrušiť filter firmy",
     clearCustomer: "Zrušiť filter zákazníka",
     pageTotals: "Spolu · {{currency}}",

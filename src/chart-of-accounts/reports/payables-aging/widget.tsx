@@ -185,7 +185,25 @@ function PayablesSection({
                     }
                     title={supplierName(supplier)}
                     subtitle={supplier.supplierVat ?? undefined}
-                    meta={amount(supplier.totals.total, true)}
+                    meta={
+                      <Div className="flex min-w-0 flex-col gap-1">
+                        {amount(supplier.totals.total, true)}
+                        {agingBuckets
+                          .filter((key) => supplier.totals[key] !== 0)
+                          .map((key) => (
+                            <Div
+                              key={key}
+                              className="flex flex-wrap items-baseline gap-x-2"
+                            >
+                              <Span>{t(`columns.${key}`)}</Span>
+                              {amount(supplier.totals[key])}
+                            </Div>
+                          ))}
+                        <Span className="text-primary">
+                          {t("widget.showBills")}
+                        </Span>
+                      </Div>
+                    }
                     selected={selectedKey === supplier.key}
                     actions={
                       <ChevronDownIcon

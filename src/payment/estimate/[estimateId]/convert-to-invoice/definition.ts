@@ -85,6 +85,16 @@ const { POST } = createEndpoint({
         schema: z.string().nullable(),
       }),
 
+      invoiceSequenceNumber: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z.number().int().positive().optional(),
+      }),
+      estimateNumber: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z.string().optional(),
+      }),
       invoiceId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         label: "post.response.invoiceId" as const,
@@ -140,6 +150,8 @@ const { POST } = createEndpoint({
       default: {
         success: true,
         message: null,
+        invoiceSequenceNumber: 42,
+        estimateNumber: "Q-2026-0018",
         invoiceId: "789e0123-e89b-12d3-a456-426614174001",
       },
     },

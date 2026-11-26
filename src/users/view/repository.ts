@@ -40,6 +40,7 @@ import { paymentRefunds, paymentTransactions } from "@/payment/db";
 import { PaymentStatus, RefundStatus } from "@/payment/enum";
 import { canStartStripeRefund } from "@/payment/refund/eligibility";
 import { referralCodes, referralEarnings, userReferrals } from "@/referral/db";
+import { ReferralEarningStatus } from "@/referral/enum";
 import { subscriptions } from "@/subscription/db";
 import { SubscriptionStatus } from "@/subscription/enum";
 
@@ -524,7 +525,15 @@ export class UserViewRepository {
           count: sql<number>`count(*)::int`,
         })
         .from(referralEarnings)
-        .where(eq(referralEarnings.earnerUserId, userId))
+        .where(
+          and(
+            eq(referralEarnings.earnerUserId, userId),
+            inArray(referralEarnings.status, [
+              ReferralEarningStatus.CONFIRMED,
+              ReferralEarningStatus.PENDING,
+            ]),
+          ),
+        )
         .groupBy(referralEarnings.currency),
     ]);
 

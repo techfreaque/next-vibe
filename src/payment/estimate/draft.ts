@@ -5,6 +5,7 @@ import { and, eq, inArray, isNull, or, sql } from "drizzle-orm";
 import type { LedgerTransaction } from "@/chart-of-accounts/shared/ledger-write";
 import { catalogProducts } from "@/products/db";
 import { TaxCalculator } from "@/tax/calculator";
+import type { LINE_SETTLEMENT_V1 } from "@/tax/line-settlement";
 
 import { paymentEstimateLines, paymentEstimates } from "../db";
 import { calculateInvoiceLine } from "../invoice/line/amounts";
@@ -19,6 +20,7 @@ export function estimateLine(
     sortOrder?: number;
   },
   index: number,
+  settlement?: typeof LINE_SETTLEMENT_V1,
 ):
   | (ReturnType<typeof calculateInvoiceLine> & {
       description: string;
@@ -43,11 +45,14 @@ export function estimateLine(
   ) {
     return null;
   }
-  const amounts = calculateInvoiceLine({
-    quantity,
-    unitPrice: line.unitPrice,
-    taxRate,
-  });
+  const amounts = calculateInvoiceLine(
+    {
+      quantity,
+      unitPrice: line.unitPrice,
+      taxRate,
+    },
+    settlement,
+  );
   if (amounts.lineTotal >= 100_000_000) {
     return null;
   }

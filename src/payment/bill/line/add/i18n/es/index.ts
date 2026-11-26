@@ -12,6 +12,8 @@ export const translations: typeof enTranslations = {
       description: "Introduzca los detalles del gasto",
     },
     errors: {
+      evidenceReview:
+        "Revise la factura original del proveedor antes de cambiar su imputación.",
       validation: {
         title: "Error de validación",
         description: "Ver todos los campos",

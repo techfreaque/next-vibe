@@ -966,9 +966,17 @@ export const translations: typeof enTranslations = {
 
   // Get payment endpoint
   get: {
-    title: "Získať informácie o platbe",
+    title: "Vaše platby",
     titleShort: "Platby",
-    description: "Získať platobné transakcie a metódy",
+    description: "Najviac desať posledných platobných záznamov na vašom účte.",
+    summary: {
+      empty: "Zatiaľ žiadne platby",
+      emptyDescription: "Tu sa zobrazia vaše platby.",
+      loading: "Načítavajú sa vaše platby…",
+      error: "Vaše platby sa nepodarilo načítať",
+      retry: "Skúste znova",
+      amountUnavailable: "Suma nie je k dispozícii",
+    },
     form: {
       title: "Vyhľadávanie platieb",
       description: "Vyhľadať údaje o platbách",

@@ -23,6 +23,7 @@ import { z } from "zod";
 
 import { PosOrderStatus } from "../../../enum";
 import { scopedTranslation } from "../../../i18n";
+import { refreshPosOrder } from "../../refresh";
 
 const PosOrderVoidWidgetLazy = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.PosOrderVoidWidget })),
@@ -41,20 +42,30 @@ const { POST } = createEndpoint({
   allowedRoles: [UserRole.ADMIN],
   icon: "x-circle",
 
+  options: {
+    mutationOptions: {
+      onSuccess: ({ pathParams, logger }) =>
+        refreshPosOrder(pathParams.orderId, logger),
+    },
+  },
+
   fields: customWidgetObject({
     render: PosOrderVoidWidgetLazy,
-    usage: { request: "data", response: true },
+    usage: { request: "data&urlPathParams", response: true },
     children: {
-      orderId: requestField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.ENTITY_PICKER,
-        label: "orderVoid.post.orderId.label",
-        description: "orderVoid.post.orderId.description",
-        schema: z.uuid(),
-        listEndpoint: async () =>
-          (await import("@/pos/order/list/definition")).default.GET,
-        labelField: "orderNumber",
-      }),
+      orderId: {
+        ...requestField(scopedTranslation, {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.ENTITY_PICKER,
+          label: "orderVoid.post.orderId.label",
+          description: "orderVoid.post.orderId.description",
+          schema: z.uuid().optional(),
+          listEndpoint: async () =>
+            (await import("@/pos/order/list/definition")).default.GET,
+          labelField: "orderNumber",
+        }),
+        usage: { request: "data&urlPathParams" } as const,
+      },
 
       result: objectField(scopedTranslation, {
         type: WidgetType.CONTAINER,
@@ -121,6 +132,9 @@ const { POST } = createEndpoint({
   },
 
   examples: {
+    urlPathParams: {
+      default: { orderId: "eeff1122-e89b-12d3-a456-426614174003" },
+    },
     requests: {
       default: {
         orderId: "eeff1122-e89b-12d3-a456-426614174003",

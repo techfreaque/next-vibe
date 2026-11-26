@@ -1,6 +1,26 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  receiveBill: "Segna la fattura come ricevuta",
+  supplierDocument: {
+    confirmMissing: "Conferma che il documento del fornitore non è disponibile",
+    confirmSeparate: "Conferma che si tratta di una spesa distinta",
+    missingHelp:
+      "Verifica il documento bancario. L’approvazione registra il costo lordo senza detrarre l’IVA.",
+    required:
+      "Collega il documento del fornitore o conferma che non è disponibile. L’approvazione basata sulla banca richiede il lordo verificato e nessuna registrazione IVA.",
+    possibleDuplicate:
+      "Una bozza bancaria o un documento del fornitore ha dati simili. Collega il documento o conferma che si tratta di una spesa distinta.",
+  },
+  reverseCharge: {
+    title: "Inversione contabile (facoltativa)",
+    base: "Imponibile nella valuta della fattura",
+    rate: "Aliquota IVA (%)",
+    help: "Per una fattura ricevuta da una piccola impresa tedesca, inserisci i due valori solo dopo aver verificato l’obbligo di inversione contabile. L’IVA viene registrata come costo e debito fiscale.",
+    invalid:
+      "Indica base e aliquota confermate per una fattura ricevuta nel regime tedesco delle piccole imprese.",
+    cost: "IVA indetraibile da inversione contabile",
+  },
   tags: {
     payment: "pagamento",
     bill: "fatturazione",
@@ -27,6 +47,8 @@ export const translations: typeof enTranslations = {
     errors: {
       existingPosting:
         "Riconcilia la scrittura esistente prima di approvare la fattura.",
+      lineTotalsReview:
+        "Le righe non coincidono con il netto, l’IVA o il lordo registrati. Verifica la fattura originale del fornitore prima di approvarla.",
       billLines:
         "Aggiungi righe con un totale positivo e usa conti di costo attivi di questa azienda.",
       posting:

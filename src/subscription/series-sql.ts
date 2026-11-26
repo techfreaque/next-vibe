@@ -12,10 +12,9 @@ import type {
   Resolution,
   TimeRange,
 } from "next-vibe/dataflow/shared/fields";
-import { RESOLUTION_MS } from "next-vibe/dataflow/shared/fields";
 import { fillGaps } from "next-vibe/dataflow/shared/range";
 
-import { notInternalUserSql } from "@/payment/analytics/money-sql";
+import { reportingUserSql } from "@/payment/analytics/money-sql";
 
 import { SubscriptionStatus } from "./enum";
 
@@ -32,7 +31,7 @@ export const SUB_END_SQL = sql.raw(
  * and not owned by an admin (internal/test) account. Alias `s`.
  */
 export const COUNTED_SUBSCRIPTION_SQL: SQL = sql`s.status NOT IN (${SubscriptionStatus.INCOMPLETE}, ${SubscriptionStatus.INCOMPLETE_EXPIRED})
-  AND ${notInternalUserSql("s.user_id")}`;
+  AND ${reportingUserSql("s.user_id")}`;
 
 /** Timestamptz literal for a JS date. */
 export function tzSql(date: Date): SQL {
@@ -41,20 +40,20 @@ export function tzSql(date: Date): SQL {
 
 /**
  * Snapshot points for a range: one row per bucket of fillGaps (same aligned
- * timestamps the graph uses), measured at the bucket's end, capped at now.
+ * timestamps the graph uses), measured up to the next bucket, the requested end or now.
  */
 export function bucketEnds(
   range: TimeRange,
   resolution: Resolution,
 ): { start: Date; end: Date }[] {
   const starts = fillGaps([], range, resolution).map((p) => p.timestamp);
-  const now = Date.now();
+  const cutoff = Math.min(range.to.getTime(), Date.now());
   return starts.map((start, index) => {
     const next = starts[index + 1];
-    const end = next
-      ? next.getTime()
-      : start.getTime() + RESOLUTION_MS[resolution];
-    return { start, end: new Date(Math.min(end, now)) };
+    return {
+      start,
+      end: new Date(Math.min(next?.getTime() ?? cutoff, cutoff)),
+    };
   });
 }
 

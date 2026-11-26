@@ -58,6 +58,7 @@ export const translations: typeof enTranslations = {
       "Faktury sporne nie wchodzą do sum faktur zatwierdzonych ani oczekujących.",
   },
   widget: {
+    showBills: "Pokaż faktury",
     asOf: "Stan na {{date}}",
     back: "Wróć",
     loading: "Wczytywanie zobowiązań",

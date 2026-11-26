@@ -21,9 +21,26 @@ export const category: CategoryDefinition = {
     "es-ES": "Empresas",
     "sk-SK": "Firmy",
   },
-  group: "business",
+  description: {
+    "en-US": "Manage legal entities, company settings and team access.",
+    "de-DE":
+      "Verwalten Sie Rechtsträger, Firmeneinstellungen und Zugriffsrechte.",
+    "pl-PL": "Zarządzaj firmami, ich ustawieniami i dostępem zespołu.",
+    "fr-FR": "Gérez les sociétés, leurs paramètres et les accès des équipes.",
+    "it-IT":
+      "Gestisca le aziende, le impostazioni e gli accessi dei collaboratori.",
+    "es-ES":
+      "Gestione las empresas, su configuración y los accesos del equipo.",
+    "sk-SK": "Spravujte firmy, ich nastavenia a prístupy členov tímu.",
+    "en-GLOBAL": "Manage legal entities, company settings and team access.",
+  },
+  group: "people",
   icon: "building",
   order: 35,
+  createActions: ["companies_create_POST"],
+  landing: {
+    actions: ["companies-list", "companies_create_POST"],
+  },
   defaultEntry: {
     [UserPermissionRole.ADMIN]: COMPANIES_LIST_ALIAS,
     [UserPermissionRole.CUSTOMER]: COMPANIES_LIST_ALIAS,

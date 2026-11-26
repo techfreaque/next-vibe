@@ -116,6 +116,8 @@ export const translations: typeof enTranslations = {
     description: "Resultados por página",
   },
   widget: {
+    creditable: "Seleccione la factura que desea rectificar",
+    noCreditable: "No hay facturas con importes pendientes de abonar.",
     filters: "Filtros",
     partlyPaid: "Pagada en parte",
     pageCount: "Páginas totales",

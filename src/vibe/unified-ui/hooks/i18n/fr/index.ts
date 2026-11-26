@@ -90,6 +90,11 @@ export const translations: typeof enTranslations = {
         enterPhoneNumber: "Saisissez un numéro de téléphone",
         required: "Obligatoire",
         selectDate: "Choisir une date",
+        openCalendar: "Ouvrir le calendrier",
+        startDate: "Date de début",
+        endDate: "Date de fin",
+        decreaseValue: "Diminuer la valeur",
+        increaseValue: "Augmenter la valeur",
         unknownFieldType: "Type de champ inconnu",
       },
       entityPicker: {
@@ -136,6 +141,8 @@ export const translations: typeof enTranslations = {
       responseValidation:
         "La réponse du serveur n'a pas passé la validation : {{error}}",
       malformedResponse: "Réponse mal formée de {{url}}",
+      recordTimeout:
+        "Le chargement de cette fiche prend trop de temps. Réessayez.",
       requestFailed: "La requête vers {{path}} a échoué : {{error}}",
       endpointFailed: "{{reason}} ({{path}}) : {{error}}",
     },

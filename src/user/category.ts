@@ -26,9 +26,24 @@ export const category: CategoryDefinition = {
     "es-ES": "Cuenta",
     "sk-SK": "Účet",
   },
-  group: "system",
+  description: {
+    "en-US": "Find users and review their account access.",
+    "de-DE": "Finden Sie Nutzer und prüfen Sie deren Kontozugriff.",
+    "pl-PL": "Odszukaj użytkowników i sprawdź ich dostęp do konta.",
+    "fr-FR": "Recherchez des utilisateurs et vérifiez leurs accès.",
+    "it-IT":
+      "Cerchi gli utenti e verifichi le autorizzazioni sui loro account.",
+    "es-ES": "Busque usuarios y revise sus permisos de acceso.",
+    "sk-SK":
+      "Vyhľadajte používateľov a skontrolujte ich prístupové oprávnenia.",
+    "en-GLOBAL": "Find users and review their account access.",
+  },
+  group: "people",
   icon: "user",
   order: 10,
+  landing: {
+    actions: ["users-list", "users-stats"],
+  },
   defaultEntry: {
     // Admins land on the signups report; record search goes to users-list.
     [UserPermissionRole.ADMIN]: USERS_STATS_ALIAS,

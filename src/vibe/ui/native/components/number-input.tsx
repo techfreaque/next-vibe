@@ -1,7 +1,9 @@
+import { useTranslation } from "next-vibe/core/i18n/core/client";
 import * as React from "react";
 import { View } from "react-native";
 
 import { cn } from "../../../unified-ui/_shared/cn";
+import { scopedTranslation } from "../../../unified-ui/hooks/i18n";
 import type { NumberInputProps } from "../../web/components/number-input";
 import { applyStyleType } from "../../web/utils/style-type";
 import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
@@ -23,7 +25,11 @@ export function NumberInput({
   disabled = false,
   className,
   style,
+  locale,
+  ...inputProps
 }: NumberInputProps): React.JSX.Element {
+  const { locale: currentLocale } = useTranslation();
+  const { t } = scopedTranslation.scopedT(locale ?? currentLocale);
   const currentValue = value ?? min;
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
 
@@ -63,12 +69,14 @@ export function NumberInput({
       <Button
         variant="outline"
         size="sm"
+        aria-label={t("widgets.formFields.common.decreaseValue")}
         onClick={handleDecrement}
         disabled={isDecrementDisabled}
       >
         <Minus size={16} />
       </Button>
       <Input<"number">
+        {...inputProps}
         keyboardType="numeric"
         value={currentValue}
         onChangeText={handleInputChange}
@@ -79,6 +87,7 @@ export function NumberInput({
       <Button
         variant="outline"
         size="sm"
+        aria-label={t("widgets.formFields.common.increaseValue")}
         onClick={handleIncrement}
         disabled={isIncrementDisabled}
       >

@@ -2,8 +2,6 @@
  * Vibe Sense - JSON Path Transformer Definition
  *
  * Client+server safe. No server imports.
- * Kept for backwards compatibility. DataPoint no longer has a meta field
- * so this transformer returns an empty series.
  */
 
 import { createEndpoint } from "next-vibe/core/definition/create-i18n";
@@ -132,8 +130,14 @@ const { POST } = createEndpoint({
   examples: {
     requests: {
       default: {
-        source: [{ timestamp: new Date("2024-01-01"), value: 100 }],
-        path: "close",
+        source: [
+          {
+            timestamp: new Date("2024-01-01"),
+            value: 100,
+            meta: { close: 27 },
+          },
+        ],
+        path: "meta.close",
         range: {
           from: new Date("2024-01-01"),
           to: new Date("2024-01-01"),
@@ -142,7 +146,7 @@ const { POST } = createEndpoint({
     },
     responses: {
       default: {
-        result: [],
+        result: [{ timestamp: new Date("2024-01-01"), value: 27 }],
         meta: { actualResolution: "enums.resolution.1d", lookbackUsed: 0 },
       },
     },

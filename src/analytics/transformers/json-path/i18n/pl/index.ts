@@ -5,13 +5,12 @@ export const translations: typeof enTranslations = {
   post: {
     title: "Ścieżka JSON",
     titleShort: "JSON Path",
-    description:
-      "Ścieżka JSON - wyodrębnia wartość przez notację kropkową (przestarzałe, zwraca pustą tablicę)",
+    description: "Odczytuje wartość pomiaru lub pole liczbowe z metadanych.",
     fields: {
       source: { label: "Źródło", description: "Wejściowa seria czasowa" },
       path: {
         label: "Ścieżka",
-        description: "Ścieżka w notacji kropkowej (nie jest już obsługiwane)",
+        description: "Wpisz value lub ścieżkę do pola, na przykład meta.close.",
       },
       resolution: {
         label: "Rozdzielczość",

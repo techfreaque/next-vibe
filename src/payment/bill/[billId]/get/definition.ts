@@ -22,6 +22,8 @@ import {
 } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
+import { LINE_SETTLEMENT_V1 } from "@/tax/line-settlement";
+
 import { BillStatus, BillStatusDB, BillStatusOptions } from "../../../enum";
 import { scopedTranslation } from "./i18n";
 
@@ -76,6 +78,52 @@ const { GET } = createEndpoint({
         hidden: true,
         schema: z.boolean(),
       }),
+      canRecordReverseCharge: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z.boolean().optional(),
+      }),
+      possibleBankDuplicate: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z.boolean().optional(),
+      }),
+      bankBookedDate: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z.iso.date().optional(),
+      }),
+      bankSupplierDocument: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z.enum(["missing", "linkedAfterPosting"]).optional(),
+      }),
+      bankVendorId: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z.uuid().optional(),
+      }),
+      bankExpenseAccountId: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z.uuid().optional(),
+      }),
+      inputVatDeductible: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "widget.inputVat",
+        schema: z.boolean().nullish(),
+      }),
+      reverseCharge: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "widget.reverseCharge",
+        schema: z
+          .object({
+            base: z.number(),
+            ratePercent: z.number(),
+            amount: z.number(),
+          })
+          .nullish(),
+      }),
       companyId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         label: "get.response.companyId" as const,
@@ -114,15 +162,40 @@ const { GET } = createEndpoint({
         label: "get.response.currency" as const,
         schema: z.string(),
       }),
+      lineSettlement: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z.literal(LINE_SETTLEMENT_V1).optional(),
+      }),
+      canEditLines: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z.boolean().optional(),
+      }),
+      lineReviewRequired: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z.boolean().optional(),
+      }),
+      taxPending: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z.boolean().optional(),
+      }),
+      taxReviewId: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z.uuid().optional(),
+      }),
       subtotal: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         label: "get.response.subtotal" as const,
-        schema: z.number(),
+        schema: z.number().nullable(),
       }),
       taxAmount: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         label: "get.response.taxAmount" as const,
-        schema: z.number(),
+        schema: z.number().nullable(),
       }),
       total: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
@@ -143,6 +216,16 @@ const { GET } = createEndpoint({
         type: WidgetType.TEXT,
         label: "get.response.journalEntryId" as const,
         schema: z.uuid().nullable(),
+      }),
+      approvalJournal: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "widget.approvalJournal",
+        schema: z.object({ id: z.uuid(), number: z.string() }).optional(),
+      }),
+      settlementJournal: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "widget.settlementJournal",
+        schema: z.object({ id: z.uuid(), number: z.string() }).optional(),
       }),
       paidAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,

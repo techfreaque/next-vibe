@@ -23,6 +23,7 @@ export const translations: typeof enTranslations = {
     addTags: "Pridať značky",
     addCustomValue: "Pridať „{{value}}“",
     required: "Povinné",
+    callingCode: "Medzinárodná predvoľba {{prefix}}",
     enterPhoneNumber: "Zadajte telefónne číslo",
     unknownFieldType: "Neznámy typ poľa",
     selectDate: "Vybrať dátum",
@@ -55,6 +56,8 @@ export const translations: typeof enTranslations = {
       copyCode: "Kopírovať kód",
     },
     multiSelect: {
+      search: "Vyhľadajte možnosť",
+      remove: "Odstrániť {{label}}",
       placeholder: "Vybrať položky…",
       noResultsFound: "Nenašli sa žiadne výsledky",
     },

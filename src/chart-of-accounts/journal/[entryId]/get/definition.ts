@@ -115,6 +115,18 @@ const { GET } = createEndpoint({
             label: "journalEntryGet.response.sourceId",
             schema: z.string().uuid().nullable(),
           }),
+          supplierBill: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            schema: z
+              .object({
+                id: z.uuid(),
+                supplierName: z.string(),
+                number: z.string().nullable(),
+                posting: z.enum(["approval", "settlement"]),
+                systemDescription: z.boolean(),
+              })
+              .optional(),
+          }),
           postedAt: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             label: "journalEntryGet.response.postedAt",
@@ -125,6 +137,19 @@ const { GET } = createEndpoint({
             type: WidgetType.TEXT,
             label: "journalEntryGet.response.reversalOfId",
             schema: z.string().uuid().nullable(),
+          }),
+          linkedEntries: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            label: "journalEntryGet.widget.relatedEntries",
+            schema: z
+              .array(
+                z.object({
+                  id: z.uuid(),
+                  entryNumber: z.string(),
+                  relation: z.enum(["original", "reversal"]),
+                }),
+              )
+              .optional(),
           }),
           lines: responseArrayField(scopedTranslation, {
             type: WidgetType.CONTAINER,

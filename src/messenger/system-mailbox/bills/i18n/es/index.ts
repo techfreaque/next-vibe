@@ -1,0 +1,71 @@
+import type { translations as enTranslations } from "../en";
+
+export const translations: typeof enTranslations = {
+  taxPending:
+    "El impuesto del proveedor está pendiente. Confirma el importe documentado antes de recibir o contabilizar la factura.",
+  confirmTax: "Confirmar impuesto del proveedor",
+  confirmTaxHint:
+    "Introduce cero solo si el justificante del proveedor confirma que no hay impuesto.",
+  title: "Facturas de proveedores por correo",
+  description:
+    "Revisa facturas y recibos y abre las facturas de proveedor vinculadas.",
+  tag: "Facturas por correo",
+  company: "Empresa",
+  selectCompany: "Elige una empresa",
+  empty: "No hay justificantes por revisar.",
+  vendor: "Proveedor",
+  reference: "Número de documento",
+  date: "Fecha del documento",
+  currency: "Moneda",
+  gross: "Importe bruto",
+  tax: "Importe del impuesto",
+  ready: "Lista para registrar",
+  review: "Pendiente de revisión",
+  posted: "Factura vinculada",
+  missingFields: "Faltan datos obligatorios",
+  conflictingDocuments:
+    "Los datos no coinciden con los de otro documento o factura.",
+  unsupportedContent: "El adjunto está incompleto o no es compatible",
+  aiReviewRequested: "Revisión asistida solicitada",
+  evidence: "Ver justificante",
+  file: "Archivo",
+  approve: "Guardar borrador de factura",
+  approveTitle: "Revisar justificante",
+  manual:
+    "Introduce el número, la fecha, la moneda y los importes del archivo adjunto.",
+  openBill: "Abrir factura",
+  back: "Volver",
+  syncTitle: "Leer el buzón de facturas de proveedores",
+  syncDescription:
+    "Revisa la carpeta configurada y crea borradores a partir de documentos completos y de confianza.",
+  previewScan: "Previsualizar el buzón",
+  applyScan: "Revisar el buzón y guardar borradores",
+  newDraftCount: "Nuevos borradores posibles",
+  existingCount: "Ya vinculados o registrados",
+  dryRun: "Solo vista previa",
+  limit: "Máximo de mensajes",
+  scanned: "Examinados",
+  readyCount: "Posibles borradores",
+  linkedCount: "Facturas vinculadas",
+  reviewCount: "Pendientes",
+  persisted: "Guardadas",
+  skipped: "Omitidas",
+  flagged: "Marcadas",
+  attachmentTitle: "Descargar justificante",
+  download: "Descargar",
+  errors: {
+    disabled: "El buzón de facturas está desactivado para esta sesión.",
+    configuration: "Revisa el buzón y las asociaciones de proveedores.",
+    read: "No se pudo completar la solicitud al buzón.",
+    forbidden: "No tienes acceso a los justificantes de esta empresa.",
+    fields: "Introduce los datos que faltan.",
+    conflict:
+      "El justificante cambió o no coincide con una factura de proveedor.",
+  },
+  success: {
+    title: "Solicitud al buzón completada",
+    description: "El resultado está listo para revisar.",
+  },
+  billDescription: "Factura de proveedor recibida por correo",
+  fileIndex: "Número de archivo",
+};

@@ -26,9 +26,38 @@ export const category: CategoryDefinition = {
     "es-ES": "Prospectos",
     "sk-SK": "Potenciálni zákazníci",
   },
-  group: "business",
+  description: {
+    "en-US":
+      "Review where leads came from, how they converted and who arrived recently.",
+    "de-DE":
+      "Prüfen Sie die Herkunft, Konversion und letzten Zugänge Ihrer Leads.",
+    "pl-PL": "Sprawdź źródła leadów, konwersje i ostatnie kontakty.",
+    "fr-FR":
+      "Identifiez les sources de vos leads, les conversions et les nouveaux contacts.",
+    "it-IT": "Verifica la provenienza, le conversioni e i nuovi contatti.",
+    "es-ES":
+      "Revisa el origen, las conversiones y los prospectos más recientes.",
+    "sk-SK":
+      "Skontrolujte zdroje kontaktov, konverzie a najnovších potenciálnych zákazníkov.",
+    "en-GLOBAL":
+      "Review where leads came from, how they converted and who arrived recently.",
+  },
+  group: "people",
   icon: "target",
   order: 20,
+  createActions: ["leads_create_POST"],
+  landing: {
+    summary: { alias: "leads-dashboard", scope: "platform" },
+    actions: ["leads_create_POST"],
+    destinations: [
+      "leads-list",
+      "leads-search",
+      "acquisition-report",
+      "funnel-report",
+      "abuse-report",
+      "campaign-stats",
+    ],
+  },
   defaultEntry: {
     [UserPermissionRole.ADMIN]: ACQUISITION_REPORT_ALIAS,
     [UserPermissionRole.CUSTOMER]: USER_ME_ALIAS,

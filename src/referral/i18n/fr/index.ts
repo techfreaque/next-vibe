@@ -170,26 +170,38 @@ export const translations: typeof enTranslations = {
       description: "Vos statistiques de parrainage ont été récupérées",
     },
     widget: {
+      emptyAdminMessage:
+        "Le tableau de bord présente les activités de tout le programme.",
+      loading: "Chargement des statistiques de parrainage",
+      loadError: "Impossible de charger les statistiques de parrainage",
+      retry: "Réessayer",
+      emptyTitle: "Aucune activité de parrainage",
+      openCodes: "Ouvrir les codes de parrainage",
+      revenueCoverage:
+        "Montant initial renseigné pour {{measured}} achats sur {{total}}.",
+      revenueUnavailable: "Indisponible",
+      walletUnits: "{{amount}} crédits",
       adminNotice:
-        "Ce sont vos chiffres de parrainage personnels. Le programme complet se trouve dans la vue d'ensemble du parrainage.",
+        "Ces chiffres concernent vos parrainages. Le tableau de bord couvre tout le programme.",
       openOverview: "Ouvrir la vue d'ensemble",
       emptyMessage:
-        "Aucune activité pour l'instant. Partagez votre lien de parrainage pour commencer à gagner.",
+        "Partagez un code pour suivre les inscriptions et les commissions.",
     },
     fields: {
       totalSignups: "Inscriptions totales",
       totalSignupsDescription:
         "Nombre d'utilisateurs inscrits avec votre code de parrainage",
-      totalRevenue: "Chiffre d'affaires total",
+      totalRevenue: "Montant des achats renseignés",
       totalRevenueDescription:
-        "Chiffre d'affaires total généré par vos filleuls",
+        "Montants d’achat initiaux en USD à l’origine de vos commissions.",
       totalEarned: "Total gagné",
       totalEarnedDescription:
-        "Total des commissions gagnées grâce aux parrainages",
+        "Crédits gagnés, y compris ceux encore soumis au délai de remboursement.",
       availableBalance: "Solde disponible",
-      availableBalanceDescription: "Solde disponible pour un versement",
+      availableBalanceDescription:
+        "Crédits disponibles après déduction des retraits réservés.",
       availableBalanceDescriptionLow:
-        "À dépenser en chats IA (vos autres crédits sont utilisés en premier). Gagnez {{minPayout}} pour débloquer le retrait.",
+        "Crédits disponibles après déduction des retraits réservés. Retrait minimum : {{minPayout}} crédits.",
       totalRevenueCredits: "Chiffre d'affaires total (crédits)",
       totalEarnedCredits: "Total gagné (crédits)",
       totalPaidOutCredits: "Total versé (crédits)",
@@ -425,6 +437,7 @@ export const translations: typeof enTranslations = {
           credits:
             "Les versements en crédits sont convertis automatiquement. Rien à faire.",
         },
+        prepareBill: "Préparer une facture fournisseur",
         codeReport: "Rapport du code",
       },
     },

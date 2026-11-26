@@ -78,6 +78,10 @@ export const translations: typeof enTranslations = {
       description: "Plan comptable récupéré",
     },
     widget: {
+      searchPage: "Rechercher un nom ou un code sur cette page",
+      noMatches: "Aucun compte correspondant sur cette page",
+      previousPage: "Page précédente",
+      nextPage: "Page suivante",
       debitSide: "Débit",
       creditSide: "Crédit",
       loading: "Chargement des comptes...",

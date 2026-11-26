@@ -43,6 +43,22 @@ const OUTPUT_FILE = `${GENERATED_DIR}/categories/registry.ts`;
  */
 const CATEGORY_TYPES_MODULE = `${VIBE_DIR}/help-tool/category-types.ts`;
 
+function serializeAdminPlacement(
+  placement: Pick<CategoryDefinition, "adminPaths" | "adminPathPrefixes">,
+  depth: number,
+): string {
+  const indent = "  ".repeat(depth);
+  return (["adminPaths", "adminPathPrefixes"] as const)
+    .map((key) => {
+      const paths = placement[key];
+      const prefix = `${indent}${key}: `;
+      return paths?.length
+        ? `\n${prefix}${jsonToTs([...paths], depth, prefix.length)},`
+        : "";
+    })
+    .join("");
+}
+
 interface CategoryEntry {
   exportName: string;
   absPath: string;
@@ -183,7 +199,8 @@ function generateContent(
                 4,
                 "        labels: ".length,
               );
-              return `      ${subcatKey}: {\n        icon: "${sv.icon}",\n        order: ${sv.order ?? 0},\n        label: "${subcatLabelFallback}",\n        labels: ${subcatLabelsJson},\n      },`;
+              const placement = serializeAdminPlacement(sv, 4);
+              return `      ${subcatKey}: {\n        icon: "${sv.icon}",\n        order: ${sv.order ?? 0},\n        label: "${subcatLabelFallback}",\n        labels: ${subcatLabelsJson},${placement}\n      },`;
             })
             .join("\n")
         : null;
@@ -203,7 +220,18 @@ function generateContent(
         ? `\n    catalogOverview: "${String(c.def.catalogOverview)}",`
         : "";
 
-      return `  {\n    key: "${key}",\n    label: "${labelFallback}",\n    labels: ${labelsJson},\n    group: "${group}",\n    icon: "${icon}",\n    order: ${order ?? 99},${defaultEntryPart}${searchPart}${overviewPart}${subcatBlock}\n  },`;
+      const landing = c.def.landing
+        ? `\n    landing: ${jsonToTs({ ...c.def.landing, destinations: c.def.landing.destinations ? [...c.def.landing.destinations] : undefined, actions: c.def.landing.actions ? [...c.def.landing.actions] : undefined }, 2, "    landing: ".length)},`
+        : "";
+      const descriptions = c.def.description
+        ? `\n    descriptions: ${jsonToTs(c.def.description, 2, "    descriptions: ".length)},`
+        : "";
+      const createActions = c.def.createActions?.length
+        ? `\n    createActions: ${jsonToTs([...c.def.createActions], 2, "    createActions: ".length)},`
+        : "";
+      const placement = serializeAdminPlacement(c.def, 2);
+
+      return `  {\n    key: "${key}",\n    label: "${labelFallback}",\n    labels: ${labelsJson},\n    group: "${group}",\n    icon: "${icon}",\n    order: ${order ?? 99},${defaultEntryPart}${searchPart}${overviewPart}${landing}${descriptions}${createActions}${placement}${subcatBlock}\n  },`;
     })
     .join("\n");
 
@@ -226,7 +254,10 @@ ${registryEntries}
 
 export const ADMIN_GROUPS: AdminGroup[] = [
   "ai",
+  "people",
+  "billing",
   "analytics",
+  "content",
   "business",
   "system",
   "comms",
@@ -235,7 +266,10 @@ export const ADMIN_GROUPS: AdminGroup[] = [
 
 export const GROUP_LABELS: Record<AdminGroup, string> = {
   ai: "AI",
-  analytics: "Analytics",
+  analytics: "Growth and analytics",
+  people: "People",
+  billing: "Billing",
+  content: "Content",
   business: "Business",
   system: "System",
   comms: "Comms",

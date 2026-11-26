@@ -4,17 +4,33 @@ import { Badge } from "next-vibe/ui/components/badge";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
+import { Label } from "next-vibe/ui/components/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "next-vibe/ui/components/select";
 import { Span } from "next-vibe/ui/components/span";
 import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
 import {
+  useWidgetForm,
+  useWidgetLogger,
   useWidgetNavigation,
   useWidgetTranslation,
+  useWidgetUser,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
+import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
+import { EntityPickerFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/entity-picker-field/widget";
 import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-field/widget";
 import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
-import type { JSX } from "react";
+import { type JSX, useEffect, useId, useMemo } from "react";
+import { z } from "zod";
+
+import warehouseDefinition from "@/inventory/warehouse/list/definition";
 
 import type definition from "./definition";
 
@@ -29,6 +45,39 @@ export function PosTerminalCreateWidget({
   const navigation = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.POST>();
   const result = data?.result;
+  const form = useWidgetForm<typeof definition.POST>();
+  const logger = useWidgetLogger();
+  const user = useWidgetUser();
+  const warehousePickerId = useId();
+  const companyId = form.watch("details.companyId");
+  const warehouseId = form.watch("details.warehouseId");
+  const scopeReady = z.uuid().safeParse(companyId).success;
+  const warehouseOptions = useMemo(
+    () => ({
+      read: {
+        initialState: { companyId },
+        queryOptions: { enabled: scopeReady && !result },
+      },
+    }),
+    [companyId, scopeReady, result],
+  );
+  const warehouseRead = useEndpoint(
+    warehouseDefinition,
+    warehouseOptions,
+    logger,
+    user,
+  ).read;
+  const warehouseRows = warehouseRead?.data?.warehouses;
+  useEffect(() => {
+    if (
+      !result &&
+      warehouseId &&
+      warehouseRows &&
+      !warehouseRows.some((row) => row.isActive && row.id === warehouseId)
+    ) {
+      form.setValue("details.warehouseId", undefined, { shouldDirty: true });
+    }
+  }, [form, result, warehouseId, warehouseRows]);
 
   const handleBackToList = (): void => {
     void (async (): Promise<void> => {
@@ -82,10 +131,10 @@ export function PosTerminalCreateWidget({
           </Div>
           <Div className="flex items-center justify-between px-4 py-3">
             <Span className="text-sm text-muted-foreground">
-              {t("terminalCreate.post.response.id")}
+              {t("workflow.warehouse")}
             </Span>
-            <Span className="text-xs font-mono text-muted-foreground truncate max-w-48">
-              {result.id}
+            <Span className="text-sm">
+              {result.warehouseName ?? t("workflow.noWarehouse")}
             </Span>
           </Div>
         </Div>
@@ -133,13 +182,9 @@ export function PosTerminalCreateWidget({
       {/* 2-column form grid */}
       <Div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Div className="sm:col-span-2">
-          <TextFieldWidget
+          <EntityPickerFieldWidget
             fieldName="details.companyId"
-            field={withValue(
-              field.children.details.children.companyId,
-              undefined,
-              null,
-            )}
+            field={field.children.details.children.companyId}
           />
         </Div>
         <TextFieldWidget
@@ -166,6 +211,43 @@ export function PosTerminalCreateWidget({
             null,
           )}
         />
+        <Div className="flex min-w-0 flex-col gap-2">
+          <Label htmlFor={warehousePickerId}>{t("workflow.warehouse")}</Label>
+          <Select
+            value={warehouseId ?? "none"}
+            onValueChange={(value) =>
+              form.setValue(
+                "details.warehouseId",
+                value === "none" ? undefined : value,
+                {
+                  shouldDirty: true,
+                  shouldValidate: true,
+                },
+              )
+            }
+          >
+            <SelectTrigger id={warehousePickerId} disabled={!scopeReady}>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="none">{t("workflow.noWarehouse")}</SelectItem>
+              {warehouseRows
+                ?.filter((row) => row.isActive)
+                .map((row) => (
+                  <SelectItem key={row.id} value={row.id}>
+                    {row.name}
+                  </SelectItem>
+                ))}
+            </SelectContent>
+          </Select>
+          <Span className="text-xs text-muted-foreground">
+            {t(
+              scopeReady
+                ? "workflow.warehouseInstruction"
+                : "workflow.chooseCompanyFirst",
+            )}
+          </Span>
+        </Div>
         <TextFieldWidget
           fieldName="details.cashAccountNodeId"
           field={withValue(
@@ -176,7 +258,9 @@ export function PosTerminalCreateWidget({
         />
       </Div>
 
-      <SubmitButtonWidget<typeof definition.POST> field={{}} />
+      <SubmitButtonWidget<typeof definition.POST>
+        field={{ text: "terminalCreate.post.titleShort" }}
+      />
     </Div>
   );
 }

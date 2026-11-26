@@ -1,376 +1,135 @@
 "use client";
 
-import { LeadSource, LeadStatus } from "next-vibe/identity/lead/enum";
-import { scopedTranslation as leadsScopedTranslation } from "next-vibe/identity/lead/i18n";
-import { ActionCard } from "next-vibe/ui/components/action-card";
-import { KpiGrid, KpiTile } from "next-vibe/ui/components/analytics";
-import { Button, type ButtonMouseEvent } from "next-vibe/ui/components/button";
+import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { EmptyBlock } from "next-vibe/ui/components/empty-block";
-import { ArrowRight } from "next-vibe/ui/components/icons/ArrowRight";
-import { BarChart } from "next-vibe/ui/components/icons/BarChart";
-import { Download } from "next-vibe/ui/components/icons/Download";
-import { Plus } from "next-vibe/ui/components/icons/Plus";
-import { UserSearch } from "next-vibe/ui/components/icons/UserSearch";
-import { ListItem } from "next-vibe/ui/components/list-item";
-import { LoadingBlock } from "next-vibe/ui/components/loading-block";
-import { MetricCard } from "next-vibe/ui/components/metric-card";
-import { MetricGrid } from "next-vibe/ui/components/metric-grid";
-import { ProgressBlock } from "next-vibe/ui/components/progress-block";
-import { SectionGroup } from "next-vibe/ui/components/section-group";
-import { StatusPill } from "next-vibe/ui/components/status-pill";
+import { Skeleton } from "next-vibe/ui/components/skeleton";
+import { WidgetHeader } from "next-vibe/ui/components/widget-header";
 import { WidgetShell } from "next-vibe/ui/components/widget-shell";
-import { isValidEnumValue } from "next-vibe/unified-ui/_shared/enum";
+import { CategorySummaryPanel } from "next-vibe/unified-ui/_shared/category-summary-panel";
 import {
+  useWidgetEndpointMutations,
+  useWidgetIsInteractive,
   useWidgetLocale,
   useWidgetNavigation,
+  useWidgetResponse,
+  useWidgetResponseOnly,
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
-import { type JSX } from "react";
+import { resolveEndpoint } from "next-vibe/unified-ui/hooks/resolve-endpoint";
+import type { JSX } from "react";
 
 import type definition from "./definition";
+import { summarizeLeads } from "./summary";
 
-type StatusVariant = "default" | "success" | "warning" | "danger" | "info";
-
-const STATUS_VARIANT: Record<string, StatusVariant> = {
-  [LeadStatus.NEW]: "info",
-  [LeadStatus.PENDING]: "default",
-  [LeadStatus.CAMPAIGN_RUNNING]: "info",
-  [LeadStatus.WEBSITE_USER]: "default",
-  [LeadStatus.NEWSLETTER_SUBSCRIBER]: "default",
-  [LeadStatus.IN_CONTACT]: "info",
-  [LeadStatus.SIGNED_UP]: "success",
-  [LeadStatus.SUBSCRIPTION_CONFIRMED]: "success",
-  [LeadStatus.UNSUBSCRIBED]: "warning",
-  [LeadStatus.BOUNCED]: "danger",
-  [LeadStatus.INVALID]: "danger",
-};
-
-function getStatusVariant(status: string): StatusVariant {
-  return STATUS_VARIANT[status] ?? "default";
-}
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export function LeadsDashboardWidget(_props: {
-  field: (typeof definition.GET)["fields"];
-}): JSX.Element {
+export function LeadsDashboardWidget(): JSX.Element {
   const data = useWidgetValue<typeof definition.GET>();
-  const { push: navigate } = useWidgetNavigation();
+  const response = useWidgetResponse();
   const t = useWidgetTranslation<typeof definition.GET>();
   const locale = useWidgetLocale();
-  const { t: tLeads } = leadsScopedTranslation.scopedT(locale);
-
-  // --- Navigation handlers ---
-
-  const handleNavNewLead = (): void => {
-    void (async (): Promise<void> => {
-      const def = await import("@/leads/create/definition");
-      navigate(def.default.POST, { renderInModal: true });
-    })();
-  };
-
-  const handleNavAllLeads = (): void => {
-    void (async (): Promise<void> => {
-      const def = await import("@/leads/list/definition");
-      navigate(def.default.GET, {});
-    })();
-  };
-
-  const handleNavCampaignStats = (): void => {
-    void (async (): Promise<void> => {
-      const def = await import("@/leads/campaigns/stats/definition");
-      navigate(def.default.GET, {});
-    })();
-  };
-
-  const handleNavSearch = (): void => {
-    void (async (): Promise<void> => {
-      const def = await import("@/leads/search/definition");
-      navigate(def.default.GET, {});
-    })();
-  };
-
-  const handleNavImport = (): void => {
-    void (async (): Promise<void> => {
-      const def = await import("@/leads/import/definition");
-      navigate(def.default.POST, { renderInModal: true });
-    })();
-  };
-
-  const handleNavAcquisition = (): void => {
-    void (async (): Promise<void> => {
-      const def = await import("@/leads/analytics/acquisition/definition");
-      navigate(def.default.GET, {});
-    })();
-  };
-
-  const handleNavFunnel = (): void => {
-    void (async (): Promise<void> => {
-      const def = await import("@/leads/analytics/funnel/definition");
-      navigate(def.default.GET, {});
-    })();
-  };
-
-  const handleNavAbuse = (): void => {
-    void (async (): Promise<void> => {
-      const def = await import("@/leads/analytics/abuse/definition");
-      navigate(def.default.GET, {});
-    })();
-  };
-
-  const handleNavLeadDetail = (leadId: string) => (): void => {
-    void (async (): Promise<void> => {
-      const def = await import("@/leads/[id]/definition");
-      navigate(def.default.GET, { urlPathParams: { id: leadId } });
-    })();
+  const interactive = useWidgetIsInteractive();
+  const responseOnly = useWidgetResponseOnly();
+  const embedded = interactive && responseOnly;
+  const { push } = useWidgetNavigation();
+  const mutations = useWidgetEndpointMutations();
+  const summary =
+    data && (data.summary ?? summarizeLeads(data, t("widget.unnamedLead")));
+  const open = ({
+    alias,
+    urlPathParams,
+  }: {
+    alias: string;
+    urlPathParams?: Record<string, string>;
+  }): void => {
+    void resolveEndpoint(alias)
+      .catch(() => null)
+      .then((endpoint) => {
+        if (endpoint) {
+          push(endpoint, { urlPathParams });
+        }
+        return undefined;
+      });
   };
 
   return (
-    <WidgetShell>
-      <FormAlertWidget field={{}} />
-
-      {!data ? (
-        <LoadingBlock message={t("widget.loading")} />
-      ) : (data.totalLeadsCount ?? 0) === 0 ? (
-        <EmptyBlock
-          title={t("widget.noLeadsYet")}
-          message={t("widget.noLeadsHint")}
-          action={{
-            label: t("widget.createFirst"),
-            onClick: handleNavNewLead,
-          }}
+    <WidgetShell
+      layout={embedded ? "compact" : "page"}
+      padding={embedded ? "none" : undefined}
+    >
+      {!embedded && (
+        <WidgetHeader
+          size="page"
+          title={t("get.title")}
+          subtitle={t("widget.dashboardContext")}
+          actions={
+            interactive && (
+              <Div className="flex flex-wrap gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => open({ alias: "leads-list" })}
+                >
+                  {t("widget.allLeads")}
+                </Button>
+                <Button
+                  type="button"
+                  onClick={() => open({ alias: "leads_create_POST" })}
+                >
+                  {t("widget.newLead")}
+                </Button>
+              </Div>
+            )
+          }
         />
+      )}
+      {response?.success === false ? (
+        <EmptyBlock
+          title={t("get.errors.server.description")}
+          message={response.message}
+          action={
+            interactive
+              ? {
+                  label: t("widget.retry"),
+                  onClick: () => void mutations?.read?.refetch(),
+                }
+              : undefined
+          }
+        />
+      ) : !summary ? (
+        <Div className="grid grid-cols-2 gap-2 @xl:grid-cols-4">
+          <Skeleton className="h-20" />
+          <Skeleton className="h-20" />
+          <Skeleton className="h-20" />
+          <Skeleton className="h-20" />
+        </Div>
       ) : (
         <>
-          {/* Acquisition snapshot: last 7 days, opens the analytics reports */}
-          <SectionGroup title={t("widget.last7Days")}>
-            <KpiGrid columns={5}>
-              <KpiTile
-                label={t("widget.humanLeads")}
-                value={data.last7Days.humanLeads.value}
-                previous={data.last7Days.humanLeads.previous}
-                sparkline={data.last7Days.humanTrend}
-                locale={locale}
-                onClick={handleNavAcquisition}
-              />
-              <KpiTile
-                label={t("widget.botLeads")}
-                value={data.last7Days.botLeads.value}
-                previous={data.last7Days.botLeads.previous}
-                sparkline={data.last7Days.botTrend}
-                invertDelta
-                locale={locale}
-                onClick={handleNavAcquisition}
-              />
-              <KpiTile
-                label={t("widget.signups")}
-                value={data.last7Days.signups.value}
-                previous={data.last7Days.signups.previous}
-                sparkline={data.last7Days.signupTrend}
-                locale={locale}
-                onClick={handleNavFunnel}
-              />
-              <KpiTile
-                label={t("widget.payers")}
-                value={data.last7Days.payers.value}
-                previous={data.last7Days.payers.previous}
-                sparkline={data.last7Days.payerTrend}
-                tone="positive"
-                locale={locale}
-                onClick={handleNavFunnel}
-              />
-              <KpiTile
-                label={t("widget.flaggedNetworks")}
-                value={data.last7Days.flaggedNetworks.value}
-                previous={data.last7Days.flaggedNetworks.previous}
-                sparkline={data.last7Days.flaggedTrend}
-                invertDelta
-                tone={
-                  data.last7Days.flaggedNetworks.value > 0
-                    ? "warning"
-                    : undefined
-                }
-                locale={locale}
-                onClick={handleNavAbuse}
-              />
-            </KpiGrid>
-          </SectionGroup>
-
-          {/* Lead base (all time, includes bots) */}
-          <MetricGrid columns={2}>
-            <MetricCard
-              label={t("widget.totalLeads")}
-              value={data.totalLeadsCount}
+          <CategorySummaryPanel
+            summary={summary}
+            locale={locale}
+            translate={(key, args) => t(key, args)}
+            onOpen={interactive ? open : undefined}
+            sectionName={t("get.title")}
+            attentionTitle={t("widget.attention")}
+            clearLabel={t("widget.noAttention")}
+            unavailable={t("widget.loading")}
+            recentTitle={t("widget.recentLeads")}
+          />
+          {!embedded && data?.totalLeadsCount === 0 && (
+            <EmptyBlock
+              title={t("widget.noLeadsYet")}
+              message={t("widget.noLeadsHint")}
+              action={
+                interactive
+                  ? {
+                      label: t("widget.createFirst"),
+                      onClick: () => open({ alias: "leads_create_POST" }),
+                    }
+                  : undefined
+              }
             />
-            <MetricCard
-              label={t("widget.runningCampaigns")}
-              value={data.runningCampaignsCount}
-              variant="info"
-            />
-          </MetricGrid>
-
-          <SectionGroup title={t("widget.reports")}>
-            <Div className="grid grid-cols-1 gap-2 @sm:grid-cols-2 @lg:grid-cols-4">
-              <ActionCard
-                icon={<BarChart className="h-4 w-4" />}
-                title={t("widget.acquisition")}
-                description={t("widget.acquisitionDesc")}
-                onClick={handleNavAcquisition}
-                variant="primary"
-              />
-              <ActionCard
-                icon={<ArrowRight className="h-4 w-4" />}
-                title={t("widget.funnel")}
-                description={t("widget.funnelDesc")}
-                onClick={handleNavFunnel}
-              />
-              <ActionCard
-                icon={<UserSearch className="h-4 w-4" />}
-                title={t("widget.abuse")}
-                description={t("widget.abuseDesc")}
-                onClick={handleNavAbuse}
-              />
-              <ActionCard
-                icon={<BarChart className="h-4 w-4" />}
-                title={t("widget.campaignStats")}
-                description={t("widget.campaignStatsDesc")}
-                onClick={handleNavCampaignStats}
-              />
-            </Div>
-          </SectionGroup>
-
-          <SectionGroup title={t("widget.quickActions")}>
-            <Div className="grid grid-cols-1 gap-2 @sm:grid-cols-2 @lg:grid-cols-4">
-              <ActionCard
-                icon={<Plus className="h-4 w-4" />}
-                title={t("widget.newLead")}
-                description={t("widget.newLeadDesc")}
-                onClick={handleNavNewLead}
-              />
-              <ActionCard
-                icon={<UserSearch className="h-4 w-4" />}
-                title={t("widget.searchLeads")}
-                description={t("widget.searchLeadsDesc")}
-                onClick={handleNavSearch}
-              />
-              <ActionCard
-                icon={<ArrowRight className="h-4 w-4" />}
-                title={t("widget.allLeads")}
-                description={t("widget.allLeadsDesc")}
-                onClick={handleNavAllLeads}
-              />
-              <ActionCard
-                icon={<Download className="h-4 w-4" />}
-                title={t("widget.importLeads")}
-                description={t("widget.importLeadsDesc")}
-                onClick={handleNavImport}
-              />
-            </Div>
-          </SectionGroup>
-
-          {/* Status Breakdown */}
-          {data.statusBreakdown &&
-            Object.keys(data.statusBreakdown).length > 0 && (
-              <SectionGroup title={t("widget.statusBreakdown")}>
-                <Div className="flex flex-col gap-2">
-                  {(Object.entries(data.statusBreakdown) as [string, number][])
-                    .toSorted(([, a], [, b]) => b - a)
-                    .map(([status, statusCount]) => (
-                      <Div
-                        key={status}
-                        className="flex items-center justify-between gap-2"
-                      >
-                        <Div className="flex items-center gap-2 min-w-0">
-                          <StatusPill
-                            status={tLeads(
-                              status as Parameters<typeof tLeads>[0],
-                            )}
-                            variant={getStatusVariant(status)}
-                          />
-                        </Div>
-                        <ProgressBlock
-                          value={statusCount}
-                          max={data.totalLeadsCount}
-                          label={statusCount.toLocaleString(locale)}
-                          showPercentage={false}
-                          className="flex-1 max-w-48"
-                        />
-                      </Div>
-                    ))}
-                </Div>
-              </SectionGroup>
-            )}
-
-          {/* Recent Leads */}
-          <SectionGroup
-            title={t("widget.recentLeads")}
-            subtitle={
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={(e: ButtonMouseEvent) => {
-                  e.stopPropagation();
-                  handleNavAllLeads();
-                }}
-                className="gap-1 text-xs"
-              >
-                {t("widget.viewAll")}
-                <ArrowRight className="h-3 w-3" />
-              </Button>
-            }
-          >
-            {!data.recentLeads || data.recentLeads.length === 0 ? (
-              <EmptyBlock
-                title={t("widget.noLeadsYet")}
-                message={t("widget.noLeadsHint")}
-              />
-            ) : (
-              <Div className="flex flex-col divide-y divide-border rounded-lg border overflow-hidden">
-                {data.recentLeads.map(
-                  (lead: {
-                    id: string;
-                    businessName: string;
-                    email: string;
-                    status: string;
-                    source: string;
-                    createdAt: string;
-                  }) => (
-                    <ListItem
-                      key={lead.id}
-                      title={
-                        lead.businessName || lead.email || lead.id.slice(0, 8)
-                      }
-                      subtitle={[
-                        lead.businessName ? lead.email : null,
-                        isValidEnumValue(LeadSource, lead.source)
-                          ? tLeads(lead.source)
-                          : lead.source,
-                      ]
-                        .filter((part): part is string => Boolean(part))
-                        .join(" · ")}
-                      badges={
-                        <StatusPill
-                          status={tLeads(
-                            lead.status as Parameters<typeof tLeads>[0],
-                          )}
-                          variant={getStatusVariant(lead.status)}
-                        />
-                      }
-                      meta={
-                        <Div className="text-xs text-muted-foreground">
-                          {new Date(lead.createdAt).toLocaleDateString(locale)}
-                        </Div>
-                      }
-                      onClick={handleNavLeadDetail(lead.id)}
-                    />
-                  ),
-                )}
-              </Div>
-            )}
-          </SectionGroup>
+          )}
         </>
       )}
     </WidgetShell>

@@ -168,24 +168,38 @@ export const translations: typeof enTranslations = {
       description: "Štatistiky odporúčaní sa úspešne načítali",
     },
     widget: {
+      emptyAdminMessage:
+        "Otvorte prehľad a pozrite si aktivitu v celom programe.",
+      loading: "Načítavajú sa štatistiky odporúčaní",
+      loadError: "Štatistiky odporúčaní sa nepodarilo načítať",
+      retry: "Skúsiť znova",
+      emptyTitle: "Zatiaľ žiadna aktivita odporúčaní",
+      openCodes: "Otvoriť odporúčacie kódy",
+      revenueCoverage:
+        "Pôvodná suma zaznamenaná pri {{measured}} z {{total}} nákupov.",
+      revenueUnavailable: "Nedostupné",
+      walletUnits: "Kredity: {{amount}}",
       adminNotice:
-        "Tu sú vaše osobné výsledky. Údaje za celý program nájdete v prehľade odporúčaní.",
+        "Tieto údaje sa týkajú Vašich odporúčaní. Prehľad obsahuje výsledky celého programu.",
       openOverview: "Otvoriť prehľad odporúčaní",
       emptyMessage:
-        "Zatiaľ bez aktivity. Zdieľajte odkaz s odporúčaním a začnite získavať provízie.",
+        "Zdieľajte odporúčací kód, aby ste mohli sledovať registrácie a provízie.",
     },
     fields: {
       totalSignups: "Registrácie spolu",
       totalSignupsDescription:
         "Počet používateľov, ktorí sa zaregistrovali s vaším kódom",
-      totalRevenue: "Celkové tržby",
-      totalRevenueDescription: "Celkové tržby z vašich odporúčaní",
+      totalRevenue: "Zaznamenaná hodnota nákupov",
+      totalRevenueDescription:
+        "Pôvodné sumy nákupov v USD, z ktorých boli vypočítané Vaše provízie.",
       totalEarned: "Celkové provízie",
-      totalEarnedDescription: "Celkové provízie za odporúčania",
+      totalEarnedDescription:
+        "Získané kredity vrátane kreditov, pri ktorých ešte plynie lehota na vrátenie platby.",
       availableBalance: "Dostupný zostatok",
-      availableBalanceDescription: "Zostatok dostupný na výplatu",
+      availableBalanceDescription:
+        "Kredity dostupné po odpočítaní rezervovaných výplat.",
       availableBalanceDescriptionLow:
-        "Kredity môžete použiť na chaty s AI. Najprv sa čerpajú ostatné kredity. Výplatu môžete žiadať po dosiahnutí {{minPayout}}.",
+        "Kredity dostupné po odpočítaní rezervovaných výplat. Minimálna výplata: {{minPayout}} kreditov.",
       totalRevenueCredits: "Celkové tržby (v kreditoch)",
       totalEarnedCredits: "Celkové provízie (v kreditoch)",
       totalPaidOutCredits: "Celkom vyplatené (v kreditoch)",
@@ -422,6 +436,7 @@ export const translations: typeof enTranslations = {
           credits:
             "Pri žiadosti o výplatu v kreditoch prebehne prevod ihneď. Ak je žiadosť stále v stave Čaká, spracovanie uviazlo. Zamietnite ju, aby sa provízia uvoľnila a partner mohol podať novú žiadosť.",
         },
+        prepareBill: "Pripraviť došlú faktúru",
         codeReport: "Prehľad kódu",
       },
     },

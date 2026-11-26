@@ -5,13 +5,12 @@ export const translations: typeof enTranslations = {
   post: {
     title: "Výber poľa",
     titleShort: "Výber poľa",
-    description:
-      "Výber poľa podľa názvu z časového radu. Nástroj je zastaraný a vracia prázdny výsledok.",
+    description: "Získa číselnú hodnotu z metadát každého pozorovania.",
     fields: {
       source: { label: "Zdroj", description: "Vstupný časový rad" },
       field: {
         label: "Pole",
-        description: "Názov poľa na výber (už sa nepodporuje)",
+        description: "Názov poľa v metadátach, napríklad close.",
       },
       resolution: {
         label: "Časové rozlíšenie",

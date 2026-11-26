@@ -10,11 +10,11 @@ export const { GET, tools } = endpointsHandler({
   endpoint: definition,
   [Methods.GET]: {
     email: undefined,
-    handler: ({ data, urlPathParams, user, logger, locale }) =>
+    handler: ({ data, user, logger, locale }) =>
       BankReconciliationRepository.findCandidates(
         user.id,
         data,
-        urlPathParams,
+        { lineId: data.lineId },
         logger,
         locale,
       ),

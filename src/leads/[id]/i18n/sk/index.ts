@@ -725,6 +725,8 @@ export const translations: typeof enTranslations = {
   widget: {
     loading: "Načítava sa kontakt…",
     notFound: "Kontakt sa nenašiel.",
+    loadFailed: "Kontakt sa nepodarilo načítať",
+    retryLoad: "Skúste znova",
     back: "Späť",
     leadFallbackTitle: "Kontakt",
     edit: "Upraviť",

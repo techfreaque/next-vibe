@@ -12,10 +12,12 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { Form } from "next-vibe/ui/components/form/form";
+import { P } from "next-vibe/ui/components/typography";
 import type { JSX, ReactElement } from "react";
-import { useCallback, useMemo, useRef } from "react";
+import { useCallback, useContext, useMemo, useRef } from "react";
 import type {
   DefaultValues,
   FieldError,
@@ -26,7 +28,7 @@ import type {
 import { get, useForm } from "react-hook-form";
 
 import type { CreateApiEndpointAny } from "../../../core/definition/endpoint-base";
-import { WidgetType } from "../../../core/definition/enums";
+import { EndpointErrorTypes, WidgetType } from "../../../core/definition/enums";
 import type { CountryLanguage } from "../../../core/i18n/core/config";
 import type { TranslatedKeyType } from "../../../core/i18n/core/scoped-translation";
 import type {
@@ -37,6 +39,11 @@ import type { WidgetData } from "../../../core/utils/json";
 import type { JwtPayloadType } from "../../../identity/auth/types";
 import type { EndpointLogger } from "../../../logger/types";
 import { Platform } from "../../../platforms/platforms";
+import {
+  AdminRecordContext,
+  canRetryRecordRead,
+} from "../../_shared/admin-record-context";
+import { AdminRecordDetail } from "../../_shared/admin-record-detail";
 import {
   extractAllFields,
   scanForInlineButtons,
@@ -53,6 +60,7 @@ import {
   useNavigationStack,
   type UseNavigationStackReturn,
 } from "../../hooks/use-navigation-stack";
+import { AdminSilentRead } from "./AdminSilentRead";
 import { ContentBlocksRenderer } from "./ContentBlocksRenderer";
 import { LazyWidgetRenderer } from "./LazyWidgetRenderer";
 
@@ -176,6 +184,7 @@ export function EndpointRenderer<TEndpoint extends CreateApiEndpointAny>({
   navigationOverride,
 }: EndpointRendererProps<TEndpoint>): JSX.Element {
   // Initialize navigation stack for cross-definition navigation
+  const admin = useContext(AdminRecordContext);
   const baseNavigation = useNavigationStack();
   // Extract stable refs to avoid creating new object on every render
   const basePush = baseNavigation.push;
@@ -233,6 +242,57 @@ export function EndpointRenderer<TEndpoint extends CreateApiEndpointAny>({
       endpoint.fields.schemaType === "array" ||
       endpoint.fields.schemaType === "array-optional" ||
       endpoint.fields.schemaType === "widget-object");
+
+  // CUSTOM_WIDGET with render: render directly without WidgetRenderer.
+  // CONTAINER with render: also use custom rendering (e.g. browser tools).
+  // This avoids loading all widget dependencies when a custom component
+  // handles its own rendering (e.g. chat messages widget).
+  const isCustomWidget =
+    isRootContainer &&
+    "type" in endpoint.fields &&
+    (endpoint.fields.type === WidgetType.CUSTOM_WIDGET ||
+      endpoint.fields.type === WidgetType.CONTAINER);
+  const lazyRender = isCustomWidget
+    ? (
+        endpoint.fields as typeof endpoint.fields & {
+          // oxlint-disable-next-line typescript/no-explicit-any
+          render?: React.ComponentType<any>;
+        }
+      ).render
+    : undefined;
+  const CustomRender = useMemo((): typeof lazyRender => {
+    // Select the implementation once per configured renderer. A cold lazy
+    // resolving after its first render must not remount its live form.
+    const resolved: React.ComponentType | undefined =
+      lazyRender &&
+      typeof lazyRender === "function" &&
+      "cliWidget" in lazyRender &&
+      "resolved" in lazyRender &&
+      lazyRender.resolved !== null &&
+      lazyRender.resolved !== undefined
+        ? (lazyRender.resolved as React.ComponentType)
+        : lazyRender &&
+            typeof lazyRender === "object" &&
+            "_payload" in lazyRender &&
+            (
+              lazyRender as {
+                _payload: {
+                  _status: number;
+                  _result: { default: React.ComponentType };
+                };
+              }
+            )._payload._status === 1
+          ? (
+              lazyRender as {
+                _payload: {
+                  _status: number;
+                  _result: { default: React.ComponentType };
+                };
+              }
+            )._payload._result.default
+          : undefined;
+    return resolved ?? lazyRender;
+  }, [lazyRender]);
 
   // Create internal form if none provided (for display-only mode like tool calls)
   const internalFormConfig: UseFormProps<EndpointFormValues<TEndpoint>> =
@@ -393,6 +453,124 @@ export function EndpointRenderer<TEndpoint extends CreateApiEndpointAny>({
     ],
   );
 
+  if (
+    admin &&
+    endpoint.method === "GET" &&
+    !disabled &&
+    !responseOnly &&
+    "usage" in endpoint.fields &&
+    endpoint.fields.usage.request === "urlPathParams"
+  ) {
+    const title = endpoint.scopedTranslation
+      .scopedT(locale)
+      .t(endpoint.titleShort ?? endpoint.title);
+    const browse = (
+      <Button
+        type="button"
+        variant="ghost"
+        size="sm"
+        className="self-start"
+        onClick={admin.browse}
+      >
+        {admin.browseLabel}
+      </Button>
+    );
+    if (response?.success === false) {
+      const status = response.errorType.errorCode;
+      const retry = canRetryRecordRead(status)
+        ? endpointMutations?.read
+        : undefined;
+      const back = admin.recordBack(endpoint) ?? {
+        label: admin.browseLabel,
+        onClick: admin.browse,
+      };
+      const accessDenied = status === 403;
+      const detail = accessDenied
+        ? endpoint.scopedTranslation
+            .scopedT(locale)
+            .t(endpoint.errorTypes[EndpointErrorTypes.FORBIDDEN].description)
+        : undefined;
+      return (
+        <AdminRecordDetail
+          title={title}
+          breadcrumb={
+            retry ? (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="self-start"
+                onClick={back.onClick}
+              >
+                {back.label}
+              </Button>
+            ) : undefined
+          }
+          state={{
+            kind: "error",
+            title: accessDenied ? admin.accessDeniedLabel : response.message,
+            message: detail,
+            action: retry
+              ? {
+                  label: admin.retryLabel,
+                  onClick: () => void retry.refetch(),
+                }
+              : back,
+          }}
+        />
+      );
+    }
+    if (!data) {
+      const params = extractAllFields(endpoint.fields).filter(([name]) =>
+        endpoint.path.includes(`[${name}]`),
+      );
+      const values = form.watch();
+      const missing = params.some(([name]) => !get(values, name));
+      if (missing) {
+        const editable = params.filter(
+          ([, field]) => !("hidden" in field && field.hidden),
+        );
+        return (
+          <WidgetContextProvider context={context}>
+            <Form
+              form={form}
+              onSubmit={handleWidgetSubmitOrUndefined}
+              noFormElement={_noFormElement}
+              className={className}
+            >
+              <AdminRecordDetail
+                title={title}
+                breadcrumb={browse}
+                subtitle={admin.selectLabel}
+              >
+                {editable.map(([name, field]) => (
+                  <LazyWidgetRenderer
+                    key={name}
+                    fieldName={name}
+                    field={withValueNonStrict(field, undefined, null)}
+                  />
+                ))}
+                {editable.length > 0 && onSubmit && (
+                  <Button type="submit" className="self-start">
+                    {admin.openLabel}
+                  </Button>
+                )}
+              </AdminRecordDetail>
+            </Form>
+          </WidgetContextProvider>
+        );
+      }
+      if (endpointMutations?.read?.isLoadingFresh) {
+        return (
+          <AdminRecordDetail
+            title={title}
+            state={{ kind: "loading", label: admin.loadingLabel }}
+          />
+        );
+      }
+    }
+  }
+
   // ContentResponse: render mixed content blocks (text + images) directly
   // This applies to any endpoint that returns a ContentResponse (e.g. browser take-screenshot)
   if (
@@ -411,6 +589,87 @@ export function EndpointRenderer<TEndpoint extends CreateApiEndpointAny>({
     );
   }
 
+  const adminRead =
+    admin &&
+    platformProp === Platform.NEXT_PAGE &&
+    !user.isPublic &&
+    endpoint.method === "GET" &&
+    !disabled &&
+    !responseOnly &&
+    endpointMutations?.read;
+  let adminReadFeedback: JSX.Element | undefined;
+  if (admin && adminRead) {
+    const title = endpoint.scopedTranslation
+      .scopedT(locale)
+      .t(endpoint.titleShort ?? endpoint.title);
+    const pending = !data && (adminRead.isLoadingFresh || adminRead.isFetching);
+    if (pending) {
+      adminReadFeedback = (
+        <AdminRecordDetail title={title}>
+          <Div aria-live="polite">
+            <P className="text-sm text-muted-foreground">
+              {admin.loadingLabel}
+            </P>
+          </Div>
+        </AdminRecordDetail>
+      );
+    } else if (response?.success === false) {
+      const status = response.errorType.errorCode;
+      const retry = canRetryRecordRead(status);
+      const back = admin.recordBack(endpoint) ?? {
+        label: admin.browseLabel,
+        onClick: admin.browse,
+      };
+      const accessDenied = status === 403;
+      adminReadFeedback = (
+        <Div role="alert">
+          <AdminRecordDetail
+            title={title}
+            breadcrumb={
+              retry ? (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="self-start"
+                  onClick={back.onClick}
+                >
+                  {back.label}
+                </Button>
+              ) : undefined
+            }
+            state={{
+              kind: "error",
+              title: accessDenied ? admin.accessDeniedLabel : response.message,
+              message: accessDenied
+                ? endpoint.scopedTranslation
+                    .scopedT(locale)
+                    .t(
+                      endpoint.errorTypes[EndpointErrorTypes.FORBIDDEN]
+                        .description,
+                    )
+                : undefined,
+              action: retry
+                ? {
+                    label: admin.retryLabel,
+                    onClick: (): void => {
+                      void adminRead.refetch();
+                    },
+                  }
+                : back,
+            }}
+          />
+        </Div>
+      );
+    }
+  }
+  const withReadFeedback = (content: ReactElement): ReactElement =>
+    adminRead ? (
+      <AdminSilentRead fallback={adminReadFeedback}>{content}</AdminSilentRead>
+    ) : (
+      content
+    );
+
   // Check if there are any request fields
   const hasRequest =
     "usage" in endpoint.fields && endpoint.fields.usage.request;
@@ -423,57 +682,6 @@ export function EndpointRenderer<TEndpoint extends CreateApiEndpointAny>({
    * This ensures the root container's configuration (like submitButton) is not lost.
    */
   if (isRootContainer) {
-    // CUSTOM_WIDGET with render: render directly without WidgetRenderer.
-    // CONTAINER with render: also use custom rendering (e.g. browser tools).
-    // This avoids loading all widget dependencies when a custom component
-    // handles its own rendering (e.g. chat messages widget).
-    const isCustomWidget =
-      "type" in endpoint.fields &&
-      (endpoint.fields.type === WidgetType.CUSTOM_WIDGET ||
-        endpoint.fields.type === WidgetType.CONTAINER);
-    const lazyRender = isCustomWidget
-      ? (
-          endpoint.fields as typeof endpoint.fields & {
-            // oxlint-disable-next-line typescript/no-explicit-any
-            render?: React.ComponentType<any>;
-          }
-        ).render
-      : undefined;
-    // If the lazy has been pre-warmed, use the resolved component directly
-    // so the fast sync reconciler doesn't have to handle React.lazy/Suspense internals.
-    // lazyWidget() sets .resolved after preload(); bare React.lazy uses _payload._status === 1.
-    const resolved: React.ComponentType | undefined =
-      lazyRender &&
-      typeof lazyRender === "function" &&
-      "cliWidget" in lazyRender &&
-      "resolved" in lazyRender &&
-      lazyRender.resolved !== null &&
-      lazyRender.resolved !== undefined
-        ? (lazyRender.resolved as React.ComponentType)
-        : lazyRender &&
-            typeof lazyRender === "object" &&
-            "_payload" in lazyRender &&
-            (
-              lazyRender as {
-                _payload: {
-                  _status: number;
-                  _result: { default: React.ComponentType };
-                };
-              }
-            )._payload._status === 1
-          ? (
-              lazyRender as {
-                _payload: {
-                  _status: number;
-                  _result: { default: React.ComponentType };
-                };
-              }
-            )._payload._result.default
-          : undefined;
-    // oxlint-disable-next-line typescript/no-explicit-any
-    const CustomRender: React.ComponentType<any> | undefined =
-      resolved ?? lazyRender;
-
     const rootWidget =
       widget ??
       (CustomRender ? (
@@ -500,7 +708,7 @@ export function EndpointRenderer<TEndpoint extends CreateApiEndpointAny>({
             className={className}
             noFormElement={_noFormElement}
           >
-            {rootWidget}
+            {withReadFeedback(rootWidget)}
             {children}
           </Form>
         </WidgetContextProvider>
@@ -512,7 +720,7 @@ export function EndpointRenderer<TEndpoint extends CreateApiEndpointAny>({
     if (CustomRender) {
       return (
         <WidgetContextProvider context={context}>
-          {rootWidget}
+          {withReadFeedback(rootWidget)}
           {children}
         </WidgetContextProvider>
       );
@@ -521,7 +729,7 @@ export function EndpointRenderer<TEndpoint extends CreateApiEndpointAny>({
     return (
       <WidgetContextProvider context={context}>
         <Div className={className}>
-          {rootWidget}
+          {withReadFeedback(rootWidget)}
           {children}
         </Div>
       </WidgetContextProvider>
@@ -600,10 +808,12 @@ export function EndpointRenderer<TEndpoint extends CreateApiEndpointAny>({
           className={className}
           noFormElement={_noFormElement}
         >
-          <Div className="flex flex-col gap-6">
-            {allWidgets}
-            {children}
-          </Div>
+          {withReadFeedback(
+            <Div className="flex flex-col gap-6">
+              {allWidgets}
+              {children}
+            </Div>,
+          )}
         </Form>
       </WidgetContextProvider>
     );
@@ -613,10 +823,12 @@ export function EndpointRenderer<TEndpoint extends CreateApiEndpointAny>({
   return (
     <WidgetContextProvider context={context}>
       <Div className={className}>
-        <Div className="flex flex-col gap-4">
-          {allWidgets}
-          {children}
-        </Div>
+        {withReadFeedback(
+          <Div className="flex flex-col gap-4">
+            {allWidgets}
+            {children}
+          </Div>,
+        )}
       </Div>
     </WidgetContextProvider>
   );

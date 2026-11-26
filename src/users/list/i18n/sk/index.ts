@@ -269,6 +269,11 @@ export const translations: typeof enTranslations = {
     },
   },
   widget: {
+    planStatus: "Program a stav",
+    accountActive: "Aktívny",
+    accountInactive: "Neaktívny",
+    none: "Žiadne",
+    creditAmount: "{{count}} kred.",
     spent30d: "{{count}} za 30 dní",
     notTracked: "nesleduje sa",
     oneOff: "Iba kredity",
@@ -300,7 +305,7 @@ export const translations: typeof enTranslations = {
       matchingHint:
         "Registrácie za posledných 12 úplných týždňov. Minulý týždeň: {{last}}, tento týždeň zatiaľ: {{count}}.",
       verified: "Overený e-mail",
-      verifiedHint: "Počet účtov: {{count}}",
+      verifiedHint: "Overené účty: {{count}}",
       active: "Aktívni za 30 dní",
       matching: "Používatelia podľa filtrov",
       paying: "Platiaci",

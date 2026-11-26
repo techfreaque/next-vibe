@@ -11,6 +11,8 @@ export const translations: typeof enTranslations = {
       description: "Zadajte údaje nákladovej položky.",
     },
     errors: {
+      evidenceReview:
+        "Pred zmenou zaúčtovania skontrolujte pôvodnú dodávateľskú faktúru.",
       validation: {
         title: "Neplatné údaje",
         description: "Skontrolujte všetky polia",

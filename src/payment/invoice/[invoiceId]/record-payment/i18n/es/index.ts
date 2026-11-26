@@ -110,11 +110,14 @@ export const translations: typeof enTranslations = {
       "Usa la misma clave para reintentar este pago. Para otro cobro, usa una clave nueva.",
   },
   accountNodeId: {
-    label: "Nodo de cuenta ID",
-    description: "Opcional: nodo contable que recibió este pago",
-    placeholder: "Ingrese el nodo de cuenta ID",
+    label: "Cuenta de cobro",
+    description:
+      "Selecciona la cuenta bancaria o de caja donde se recibió el pago.",
+    placeholder: "Seleccionar cuenta",
+    automatic: "Usar la cuenta predeterminada",
   },
   widget: {
+    details: "Detalles del cobro",
     back: "Atrás",
     submit: "Pago de registro",
     paymentRecorded: "Pago registrado con éxito.",

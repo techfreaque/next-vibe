@@ -10,7 +10,6 @@ import { Div } from "next-vibe/ui/components/div";
 import { CheckCircle } from "next-vibe/ui/components/icons/CheckCircle";
 import { Globe } from "next-vibe/ui/components/icons/Globe";
 import { Mail } from "next-vibe/ui/components/icons/Mail";
-import { Plus } from "next-vibe/ui/components/icons/Plus";
 import { Tag } from "next-vibe/ui/components/icons/Tag";
 import { Span } from "next-vibe/ui/components/span";
 import { copyToClipboard } from "next-vibe/ui/lib/clipboard";
@@ -23,10 +22,13 @@ import {
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
+import {
+  AdminForm,
+  AdminFormSection,
+} from "next-vibe/unified-ui/widgets/containers/admin-form/widget";
 import { SelectFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/select-field/widget";
 import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-field/widget";
 import { TextareaFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/textarea-field/widget";
-import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/navigate-button/widget";
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 import React, { useCallback, useEffect } from "react";
@@ -130,7 +132,7 @@ export function LeadCreateContainer({
           <Div className="rounded-lg border bg-card p-4 flex flex-col gap-3">
             <Div className="flex items-center gap-2 flex-wrap">
               <Span className="font-semibold text-base">
-                {businessName ?? email ?? "—"}
+                {businessName ?? email}
               </Span>
               {status && (
                 <Span
@@ -194,18 +196,15 @@ export function LeadCreateContainer({
     );
   }
 
-  // Form state - render each field directly, exactly like favs pattern
+  const contact = children.contactInfo.children;
+  const preferences = children.locationPreferences.children;
+  const details = children.leadDetails.children;
+
   return (
-    <Div className="flex flex-col gap-0">
-      {/* Top actions */}
-      <Div className="flex items-center gap-2 px-4 pt-4 pb-4">
-        <NavigateButtonWidget field={children.backButton} />
-        <Div className="flex items-center gap-1 mr-auto">
-          <Plus className="h-4 w-4 text-muted-foreground" />
-          <Span className="font-semibold text-base">
-            {t("widget.headerCreateLead")}
-          </Span>
-        </Div>
+    <AdminForm
+      title={t("widget.headerCreateLead")}
+      backButton={<NavigateButtonWidget field={children.backButton} />}
+      primaryAction={
         <SubmitButtonWidget<typeof definition.POST>
           field={{
             text: "post.submitButton.label",
@@ -214,70 +213,48 @@ export function LeadCreateContainer({
             variant: "primary",
           }}
         />
-      </Div>
-
-      {/* Form fields */}
-      <Div className="overflow-y-auto max-h-[min(800px,calc(100dvh-180px))] px-4 pb-4 flex flex-col gap-4">
-        <FormAlertWidget field={{}} />
-
-        {/* Contact info */}
-        <TextFieldWidget
-          fieldName="contactInfo.email"
-          field={withValue(
-            children.contactInfo.children.email,
-            undefined,
-            null,
-          )}
-        />
+      }
+    >
+      <AdminFormSection title={t("post.contactInfo.title")} columns={2}>
         <TextFieldWidget
           fieldName="contactInfo.businessName"
-          field={withValue(
-            children.contactInfo.children.businessName,
-            undefined,
-            null,
-          )}
+          field={withValue(contact.businessName, undefined, null)}
+        />
+        <TextFieldWidget
+          fieldName="contactInfo.email"
+          field={withValue(contact.email, undefined, null)}
         />
         <TextFieldWidget
           fieldName="contactInfo.phone"
-          field={withValue(
-            children.contactInfo.children.phone,
-            undefined,
-            null,
-          )}
+          field={withValue(contact.phone, undefined, null)}
         />
         <TextFieldWidget
           fieldName="contactInfo.website"
-          field={withValue(
-            children.contactInfo.children.website,
-            undefined,
-            null,
-          )}
+          field={withValue(contact.website, undefined, null)}
         />
+      </AdminFormSection>
 
-        {/* Location */}
+      <AdminFormSection title={t("post.locationPreferences.title")} columns={2}>
         <SelectFieldWidget
           fieldName="locationPreferences.country"
-          field={children.locationPreferences.children.country}
+          field={preferences.country}
         />
         <SelectFieldWidget
           fieldName="locationPreferences.language"
-          field={children.locationPreferences.children.language}
+          field={preferences.language}
         />
+      </AdminFormSection>
 
-        {/* Lead details */}
+      <AdminFormSection title={t("post.leadDetails.title")}>
         <SelectFieldWidget
           fieldName="leadDetails.source"
-          field={children.leadDetails.children.source}
+          field={details.source}
         />
         <TextareaFieldWidget
           fieldName="leadDetails.notes"
-          field={withValue(
-            children.leadDetails.children.notes,
-            undefined,
-            null,
-          )}
+          field={withValue(details.notes, undefined, null)}
         />
-      </Div>
-    </Div>
+      </AdminFormSection>
+    </AdminForm>
   );
 }

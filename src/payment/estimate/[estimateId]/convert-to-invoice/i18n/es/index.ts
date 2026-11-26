@@ -67,7 +67,10 @@ export const translations: typeof enTranslations = {
     back: "Atrás",
     submit: "Convertir en Invoice",
     converted: "Factura creada a partir de esta estimación.",
-    viewInvoice: "Ver factura",
+    savedDraftNumber: "Borrador de factura n.º {{number}} creado",
+    savedDraft: "Borrador de factura creado",
+    convertedNumber: "Creado a partir del presupuesto {{number}}.",
+    viewInvoice: "Abrir borrador de factura",
     convertNote:
       "Se creará un proyecto de factura con los mismos artículos. La estimación se marcará como convertido.",
   },

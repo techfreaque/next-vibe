@@ -23,11 +23,11 @@ import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { EmptyBlock } from "next-vibe/ui/components/empty-block";
 import { BarChart3 } from "next-vibe/ui/components/icons/BarChart3";
+import { ChevronDown } from "next-vibe/ui/components/icons/ChevronDown";
 import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
 import { ChevronRight } from "next-vibe/ui/components/icons/ChevronRight";
 import { Download } from "next-vibe/ui/components/icons/Download";
 import { GitBranch } from "next-vibe/ui/components/icons/GitBranch";
-import { Loader2 } from "next-vibe/ui/components/icons/Loader2";
 import { Pencil } from "next-vibe/ui/components/icons/Pencil";
 import { Plus } from "next-vibe/ui/components/icons/Plus";
 import { RefreshCw } from "next-vibe/ui/components/icons/RefreshCw";
@@ -55,11 +55,12 @@ import {
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { AnalyticsFilterPanel } from "next-vibe/unified-ui/analytics/filter-panel";
+import { CompactFieldHelpContext } from "next-vibe/unified-ui/widgets/form-fields/_shared/description-style";
 import { MultiSelectFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/multiselect-field/widget";
 import { SelectFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/select-field/widget";
 import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-field/widget";
 import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/navigate-button/widget";
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback, useId, useMemo, useState } from "react";
 
 import { FunnelReach, isBotFamily } from "../analytics/enum";
 import { type LeadDrillFilters, SEGMENT_KEYS } from "../analytics/filters";
@@ -210,9 +211,9 @@ function LeadRow({
             type="button"
             variant="ghost"
             onClick={() => onView(lead)}
-            className="h-auto min-w-0 p-0 font-semibold text-sm hover:bg-transparent hover:underline before:absolute before:inset-0 before:rounded-lg focus-visible:before:ring-2 focus-visible:before:ring-ring"
+            className="h-auto min-w-0 max-w-full p-0 text-left font-semibold text-sm hover:bg-transparent hover:underline before:absolute before:inset-0 before:rounded-lg focus-visible:before:ring-2 focus-visible:before:ring-ring"
           >
-            <Span className="truncate">
+            <Span className="min-w-0 whitespace-normal [overflow-wrap:anywhere]">
               {lead.businessName || lead.email || lead.id}
             </Span>
           </Button>
@@ -258,7 +259,9 @@ function LeadRow({
         </Div>
         <Div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground mt-0.5">
           {lead.email && (
-            <Span className="truncate max-w-[180px]">{lead.email}</Span>
+            <Span className="min-w-0 [overflow-wrap:anywhere]">
+              {lead.email}
+            </Span>
           )}
           {lead.country && (
             <Span className="flex-shrink-0">{lead.country}</Span>
@@ -457,6 +460,8 @@ export function LeadsListContainer({
   const isPickerMode = !!onPick;
 
   const onSubmit = useWidgetOnSubmit();
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const filtersId = useId();
 
   const activeStatuses: (typeof LeadStatusFilterValue)[] =
     form.watch("statusFilters.status") ?? [];
@@ -468,7 +473,6 @@ export function LeadsListContainer({
   const paginationInfo = widgetData?.paginationInfo;
   const serverCountsByStatus = widgetData?.countsByStatus;
   const isLoadingFresh = endpointMutations?.read?.isLoadingFresh ?? false;
-  const isFetching = endpointMutations?.read?.isFetching ?? false;
   const isLoading = isLoadingFresh;
 
   // Status counts - from server (accurate across full DB, not just current page)
@@ -665,7 +669,10 @@ export function LeadsListContainer({
   const currentPage = form.watch("paginationInfo.page") ?? 1;
   const totalCount = paginationInfo?.totalCount ?? 0;
   const limit = form.watch("paginationInfo.limit") ?? 20;
-  const totalPages = Math.ceil(totalCount / limit) || 1;
+  const totalPages = Math.max(
+    1,
+    paginationInfo?.pageCount ?? Math.ceil(totalCount / limit),
+  );
 
   const handlePageChange = useCallback(
     (newPage: number): void => {
@@ -757,9 +764,6 @@ export function LeadsListContainer({
 
   const headerActions = (
     <Div className="flex items-center gap-1 flex-wrap">
-      {isFetching && !isLoadingFresh && (
-        <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
-      )}
       {!isPickerMode && (
         <>
           <Button
@@ -864,235 +868,258 @@ export function LeadsListContainer({
       {/* Header */}
       <Div className="px-4 pt-4">
         <WidgetHeader
+          size="page"
           title={`${t("get.title")}${totalCount > 0 ? ` (${totalCount})` : ""}`}
           backButton={<NavigateButtonWidget field={children.backButton} />}
           actions={headerActions}
         />
       </Div>
 
-      {/* Status quick-filter tabs — full mode only */}
+      <Div className="px-4 pt-2">
+        <TextFieldWidget
+          fieldName="statusFilters.search"
+          field={{
+            ...children.statusFilters.children.search,
+            description: undefined,
+          }}
+        />
+      </Div>
       {!isPickerMode && (
-        <Div className="flex items-center gap-1 px-4 pt-3 pb-1 flex-wrap">
-          {STATUS_TAB_VALUES.map((tab) => {
-            const isActive =
-              tab.value === null
-                ? activeStatuses.length === 0
-                : activeStatuses.includes(tab.value);
-            const count =
-              tab.value !== null
-                ? (statusCounts[tab.value] ?? 0)
-                : allStatusesCount;
-            return (
+        <Div className="px-4 py-2 @md:hidden">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            aria-expanded={filtersOpen}
+            aria-controls={filtersId}
+            onClick={() => setFiltersOpen(!filtersOpen)}
+          >
+            {t("widget.listFilters")}
+            <ChevronDown
+              className={cn("size-4", filtersOpen && "rotate-180")}
+              aria-hidden="true"
+            />
+          </Button>
+        </Div>
+      )}
+      <Div id={filtersId} className={cn(!filtersOpen && "hidden", "@md:block")}>
+        {/* Status quick-filter tabs — full mode only */}
+        {!isPickerMode && (
+          <Div className="flex items-center gap-1 px-4 pt-3 pb-1 flex-wrap">
+            {STATUS_TAB_VALUES.map((tab) => {
+              const isActive =
+                tab.value === null
+                  ? activeStatuses.length === 0
+                  : activeStatuses.includes(tab.value);
+              const count =
+                tab.value !== null
+                  ? (statusCounts[tab.value] ?? 0)
+                  : allStatusesCount;
+              return (
+                <Button
+                  key={tab.value ?? "all"}
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    if (tab.value === null) {
+                      form.setValue("statusFilters.status", []);
+                      form.setValue("paginationInfo.page", 1);
+                      if (onSubmit) {
+                        onSubmit();
+                      }
+                    } else {
+                      handleToggleStatus(tab.value);
+                    }
+                  }}
+                  className={cn(
+                    "inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium transition-colors border",
+                    isActive
+                      ? "bg-primary text-primary-foreground border-primary"
+                      : "bg-transparent text-muted-foreground border-border hover:bg-accent hover:text-accent-foreground",
+                  )}
+                >
+                  {t(tab.labelKey)}
+                  {count > 0 && (
+                    <Span
+                      className={cn(
+                        "inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1 rounded-full text-[10px] font-semibold",
+                        isActive
+                          ? "bg-primary-foreground/20 text-primary-foreground"
+                          : "bg-muted text-muted-foreground",
+                      )}
+                    >
+                      {count}
+                    </Span>
+                  )}
+                </Button>
+              );
+            })}
+          </Div>
+        )}
+
+        <Div className="grid gap-2 px-4 pt-2 @sm:grid-cols-2 @md:grid-cols-3">
+          {!isPickerMode && drillChips.length === 0 && (
+            <>
+              <MultiSelectFieldWidget
+                fieldName="statusFilters.source"
+                field={children.statusFilters.children.source}
+              />
+              <MultiSelectFieldWidget
+                fieldName="statusFilters.currentCampaignStage"
+                field={children.statusFilters.children.currentCampaignStage}
+              />
+              <MultiSelectFieldWidget
+                fieldName="locationFilters.country"
+                field={children.locationFilters.children.country}
+              />
+              <MultiSelectFieldWidget
+                fieldName="locationFilters.language"
+                field={children.locationFilters.children.language}
+              />
+              <CompactFieldHelpContext.Provider value>
+                <SelectFieldWidget
+                  fieldName="sortingOptions.sortBy"
+                  field={children.sortingOptions.children.sortBy}
+                />
+                <SelectFieldWidget
+                  fieldName="sortingOptions.sortOrder"
+                  field={children.sortingOptions.children.sortOrder}
+                />
+              </CompactFieldHelpContext.Provider>
+            </>
+          )}
+        </Div>
+
+        {!isPickerMode && drillChips.length > 0 && (
+          <Div className="px-4 pt-2">
+            <Div className="flex flex-wrap items-center gap-1.5 rounded-md border border-dashed bg-muted/30 px-2 py-1.5">
+              <Span className="text-xs font-medium text-muted-foreground">
+                {t("widget.drillTitle")}
+              </Span>
+              {drillChips.map((chip) => (
+                <Button
+                  key={chip.key}
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={chip.onRemove}
+                  className="h-6 gap-1 rounded-full px-2 text-xs"
+                  title={t("widget.clearDrill")}
+                >
+                  <Span className="text-muted-foreground">{chip.label}:</Span>
+                  <Span className="max-w-[220px] truncate font-medium">
+                    {chip.value}
+                  </Span>
+                  <X className="h-3 w-3" />
+                </Button>
+              ))}
               <Button
-                key={tab.value ?? "all"}
                 type="button"
                 variant="ghost"
                 size="sm"
-                onClick={() => {
-                  if (tab.value === null) {
-                    form.setValue("statusFilters.status", []);
-                    form.setValue("paginationInfo.page", 1);
-                    if (onSubmit) {
-                      onSubmit();
-                    }
-                  } else {
-                    handleToggleStatus(tab.value);
-                  }
-                }}
-                className={cn(
-                  "inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium transition-colors border",
-                  isActive
-                    ? "bg-primary text-primary-foreground border-primary"
-                    : "bg-transparent text-muted-foreground border-border hover:bg-accent hover:text-accent-foreground",
-                )}
+                onClick={clearDrill}
+                className="h-6 px-2 text-xs"
               >
-                {t(tab.labelKey)}
-                {count > 0 && (
-                  <Span
-                    className={cn(
-                      "inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1 rounded-full text-[10px] font-semibold",
-                      isActive
-                        ? "bg-primary-foreground/20 text-primary-foreground"
-                        : "bg-muted text-muted-foreground",
-                    )}
-                  >
-                    {count}
-                  </Span>
-                )}
+                {t("widget.clearDrill")}
               </Button>
-            );
-          })}
-        </Div>
-      )}
-
-      {/* Search — always visible; full filters only in normal mode */}
-      <Div className="px-4 pt-2 pb-0 grid grid-cols-1 @sm:grid-cols-2 @md:grid-cols-3 gap-2">
-        <TextFieldWidget
-          fieldName="statusFilters.search"
-          field={children.statusFilters.children.search}
-        />
-        {!isPickerMode && drillChips.length === 0 && (
-          <>
-            <MultiSelectFieldWidget
-              fieldName="statusFilters.source"
-              field={children.statusFilters.children.source}
-            />
-            <MultiSelectFieldWidget
-              fieldName="statusFilters.currentCampaignStage"
-              field={children.statusFilters.children.currentCampaignStage}
-            />
-            <MultiSelectFieldWidget
-              fieldName="locationFilters.country"
-              field={children.locationFilters.children.country}
-            />
-            <MultiSelectFieldWidget
-              fieldName="locationFilters.language"
-              field={children.locationFilters.children.language}
-            />
-            <SelectFieldWidget
-              fieldName="sortingOptions.sortBy"
-              field={children.sortingOptions.children.sortBy}
-            />
-            <SelectFieldWidget
-              fieldName="sortingOptions.sortOrder"
-              field={children.sortingOptions.children.sortOrder}
-            />
-          </>
-        )}
-      </Div>
-
-      {!isPickerMode && drillChips.length > 0 && (
-        <Div className="px-4 pt-2">
-          <Div className="flex flex-wrap items-center gap-1.5 rounded-md border border-dashed bg-muted/30 px-2 py-1.5">
-            <Span className="text-xs font-medium text-muted-foreground">
-              {t("widget.drillTitle")}
-            </Span>
-            {drillChips.map((chip) => (
-              <Button
-                key={chip.key}
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={chip.onRemove}
-                className="h-6 gap-1 rounded-full px-2 text-xs"
-                title={t("widget.clearDrill")}
-              >
-                <Span className="text-muted-foreground">{chip.label}:</Span>
-                <Span className="max-w-[220px] truncate font-medium">
-                  {chip.value}
-                </Span>
-                <X className="h-3 w-3" />
-              </Button>
-            ))}
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={clearDrill}
-              className="h-6 px-2 text-xs"
-            >
-              {t("widget.clearDrill")}
-            </Button>
+            </Div>
+            {widgetData?.drillSummary && (
+              <Div className="px-1 pt-1.5 text-xs tabular-nums text-muted-foreground">
+                {t("widget.drillSummary", {
+                  total: widgetData.drillSummary.total.toLocaleString(locale),
+                  humans: widgetData.drillSummary.humans.toLocaleString(locale),
+                  signups:
+                    widgetData.drillSummary.signups.toLocaleString(locale),
+                  paid: widgetData.drillSummary.paid.toLocaleString(locale),
+                  agents: widgetData.drillSummary.agents.toLocaleString(locale),
+                })}
+              </Div>
+            )}
           </Div>
-          {widgetData?.drillSummary && (
-            <Div className="px-1 pt-1.5 text-xs tabular-nums text-muted-foreground">
-              {t("widget.drillSummary", {
-                total: widgetData.drillSummary.total.toLocaleString(locale),
-                humans: widgetData.drillSummary.humans.toLocaleString(locale),
-                signups: widgetData.drillSummary.signups.toLocaleString(locale),
-                paid: widgetData.drillSummary.paid.toLocaleString(locale),
-                agents: widgetData.drillSummary.agents.toLocaleString(locale),
-              })}
+        )}
+
+        {!isPickerMode && (
+          <Div className="flex flex-col gap-2 px-4 py-2">
+            <SectionGroup
+              title={t("widget.analyticsFilters")}
+              collapsible
+              defaultOpen={false}
+            >
+              <AnalyticsFilterPanel
+                fields={ADVANCED_FILTER_FIELDS}
+                onApply={() => handlePageChange(1)}
+                applyLabel={t("widget.apply")}
+              >
+                <SegmentFilterInputs />
+                <Div className="grid grid-cols-1 gap-3 @sm:grid-cols-2 @lg:grid-cols-4">
+                  <TextFieldWidget
+                    fieldName="createdFrom"
+                    field={children.createdFrom}
+                  />
+                  <TextFieldWidget
+                    fieldName="createdTo"
+                    field={children.createdTo}
+                  />
+                  <SelectFieldWidget
+                    fieldName="reached"
+                    field={children.reached}
+                  />
+                </Div>
+                <Div className="border-t pt-3">
+                  <Span className="mb-2 block text-xs font-medium text-muted-foreground">
+                    {t("acquisition.title")}
+                  </Span>
+                  <AcquisitionFilterInputs />
+                </Div>
+              </AnalyticsFilterPanel>
+            </SectionGroup>
+          </Div>
+        )}
+
+        {/* Status breakdown subtitle — full mode only */}
+        {!isPickerMode &&
+          !isLoading &&
+          leads.length > 0 &&
+          drillChips.length === 0 && (
+            <Div className="px-4 pb-1 flex items-center gap-3 flex-wrap">
+              {objectEntries(statusCounts)
+                .toSorted(([, a], [, b]) => b - a)
+                .slice(0, 5)
+                .map(([status, count]) => {
+                  const filterKey = status.replace(
+                    "enums.leadStatus.",
+                    "enums.leadStatusFilter.",
+                  ) as (typeof LeadStatusFilter)[keyof typeof LeadStatusFilter];
+                  return (
+                    <Button
+                      key={status}
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleToggleStatus(status)}
+                      className={cn(
+                        "text-xs text-muted-foreground hover:text-foreground transition-colors",
+                        activeStatuses.includes(filterKey) &&
+                          "text-foreground font-medium",
+                      )}
+                    >
+                      <Span
+                        className={cn(
+                          "inline-block w-2 h-2 rounded-full mr-1",
+                          STATUS_DOT_COLORS[status] ?? "bg-gray-400",
+                        )}
+                      />
+                      {leadsT(status)}: {count}
+                    </Button>
+                  );
+                })}
             </Div>
           )}
-        </Div>
-      )}
-
-      {!isPickerMode && (
-        <Div className="flex flex-col gap-2 px-4 py-2">
-          <SectionGroup
-            title={t("widget.analyticsFilters")}
-            collapsible
-            defaultOpen={false}
-          >
-            <AnalyticsFilterPanel
-              fields={ADVANCED_FILTER_FIELDS}
-              onApply={() => handlePageChange(1)}
-              applyLabel={t("widget.apply")}
-            >
-              <SegmentFilterInputs />
-              <Div className="grid grid-cols-1 gap-3 @sm:grid-cols-2 @lg:grid-cols-4">
-                <TextFieldWidget
-                  fieldName="createdFrom"
-                  field={children.createdFrom}
-                />
-                <TextFieldWidget
-                  fieldName="createdTo"
-                  field={children.createdTo}
-                />
-                <SelectFieldWidget
-                  fieldName="reached"
-                  field={children.reached}
-                />
-              </Div>
-              <Div className="border-t pt-3">
-                <Span className="mb-2 block text-xs font-medium text-muted-foreground">
-                  {t("acquisition.title")}
-                </Span>
-                <AcquisitionFilterInputs />
-              </Div>
-            </AnalyticsFilterPanel>
-          </SectionGroup>
-        </Div>
-      )}
-
-      {/* Status breakdown subtitle — full mode only */}
-      {!isPickerMode &&
-        !isLoading &&
-        leads.length > 0 &&
-        drillChips.length === 0 && (
-          <Div className="px-4 pb-1 flex items-center gap-3 flex-wrap">
-            {objectEntries(statusCounts)
-              .toSorted(([, a], [, b]) => b - a)
-              .slice(0, 5)
-              .map(([status, count]) => {
-                const filterKey = status.replace(
-                  "enums.leadStatus.",
-                  "enums.leadStatusFilter.",
-                ) as (typeof LeadStatusFilter)[keyof typeof LeadStatusFilter];
-                return (
-                  <Button
-                    key={status}
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleToggleStatus(status)}
-                    className={cn(
-                      "text-xs text-muted-foreground hover:text-foreground transition-colors",
-                      activeStatuses.includes(filterKey) &&
-                        "text-foreground font-medium",
-                    )}
-                  >
-                    <Span
-                      className={cn(
-                        "inline-block w-2 h-2 rounded-full mr-1",
-                        STATUS_DOT_COLORS[status] ?? "bg-gray-400",
-                      )}
-                    />
-                    {leadsT(status)}: {count}
-                  </Button>
-                );
-              })}
-          </Div>
-        )}
+      </Div>
 
       {/* Lead list */}
-      <Div
-        className={cn(
-          "px-4 pb-2 overflow-y-auto @md:max-h-[min(700px,calc(100dvh-320px))]",
-          isFetching && !isLoadingFresh && "opacity-50 pointer-events-none",
-        )}
-      >
+      <Div className="px-4 pb-2 overflow-y-auto @md:max-h-[min(700px,calc(100dvh-320px))]">
         {response?.success === false ? (
           <EmptyBlock
             title={t("get.errors.server.title")}
@@ -1160,7 +1187,7 @@ export function LeadsListContainer({
 
       {/* Pagination footer — full mode only */}
       {!isPickerMode && totalPages > 1 && (
-        <Div className="flex items-center justify-between px-4 py-3 border-t text-sm text-muted-foreground">
+        <Div className="flex items-center justify-between px-4 py-1 border-t text-sm text-muted-foreground">
           <Span>
             {t("widget.pagination", {
               page: currentPage,
@@ -1173,6 +1200,8 @@ export function LeadsListContainer({
               type="button"
               variant="ghost"
               size="sm"
+              className="min-h-11 min-w-11"
+              aria-label={t("acquisition.previous")}
               disabled={currentPage <= 1}
               onClick={() => handlePageChange(currentPage - 1)}
             >
@@ -1182,6 +1211,8 @@ export function LeadsListContainer({
               type="button"
               variant="ghost"
               size="sm"
+              className="min-h-11 min-w-11"
+              aria-label={t("acquisition.next")}
               disabled={currentPage >= totalPages}
               onClick={() => handlePageChange(currentPage + 1)}
             >

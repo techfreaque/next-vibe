@@ -73,6 +73,17 @@ export const translations: typeof enTranslations = {
     placeholder: "Wprowadź ID faktury",
   },
   widget: {
+    invoice: "Faktura",
+    total: "Kwota faktury",
+    customer: "Klient",
+    openInvoice: "Otwórz fakturę",
+    retry: "Spróbuj ponownie",
+    loading: "Wczytywanie faktury…",
+    unavailable: "Faktura niedostępna",
+    reversal: "Storno z dzisiejszą datą rozliczy otwartą należność.",
+    cancelOnly: "Faktura zostanie anulowana.",
+    ineligible:
+      "Możesz anulować szkic lub nieopłaconą fakturę bez przypisanych wpłat i korekt.",
     back: "Wróć",
     submit: "Anuluj fakturę",
     warning:

@@ -342,6 +342,8 @@ export const translations: typeof enTranslations = {
 
   widget: {
     kpi: {
+      unresolvedInScope: "Offen in dieser Ansicht",
+      unresolvedAllTimeLink: "Offen über den gesamten Zeitraum: {{count}}",
       unresolvedMessages: "{{messages}} Meldungen · {{occurrences}} Vorkommen",
       unresolvedMatching: "{{count}} offene passen zu den Filtern",
       unresolved: "Offene Klassen (gesamt)",
@@ -429,6 +431,10 @@ export const translations: typeof enTranslations = {
       resolving: "Speichert...",
     },
     filter: {
+      apply: "Filter anwenden",
+      more: "Filter",
+      moreCount: "Filter ({{count}})",
+      moreDescription: "Filtern Sie nach Status, Schweregrad oder Herkunft.",
       fingerprint: "Klasse",
       endpoint: "Endpunkt",
       search: "Suche",

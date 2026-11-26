@@ -71,6 +71,8 @@ export function shouldSkipPath(path: string): boolean {
     // Skip webhook routes - they handle their own authentication
     path.includes("/payment/providers/stripe/webhook") ||
     path.includes("/payment/providers/nowpayments/webhook") ||
+    path ===
+      "/api/en-GLOBAL/finance/bank-connections/enable-banking/callback" ||
     // Skip AI skill manifests - public read-only docs, no identity required
     (path.includes("/ai/skills/") && path.endsWith(".md"))
   );

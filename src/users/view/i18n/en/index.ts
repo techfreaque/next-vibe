@@ -32,7 +32,8 @@ export const translations = {
     },
     notFound: {
       title: "User not found",
-      description: "No user with this ID",
+      description:
+        "This account no longer appears in the directory. Choose another account.",
     },
     serverError: {
       title: "Could not load user",
@@ -84,14 +85,15 @@ export const translations = {
   },
   kpi: {
     paid: "Lifetime paid",
-    paidHint: "{{count}} successful payments, USD",
+    paidHint: "Payments: {{count}}",
     refunded: "Refunded",
-    credits: "Credit balance",
-    creditsHint: "+{{free}} free credits",
+    credits: "Wallet balance",
+    creditsHint: "Free credits available: {{free}}",
     spent: "Credits spent",
     spentHint: "about {{usd}} of usage",
     lastSeen: "Last seen",
     joined: "Joined {{date}}",
+    justNow: "Just now",
   },
   payment: {
     subscription: "Subscription",
@@ -182,12 +184,15 @@ export const translations = {
     openMonitor: "Open error monitor",
   },
   widget: {
+    creditAmount: "{{count}} credits",
     unavailable: "Account unavailable",
     chooseUser: "Choose an account to view",
     loading: "Loading user...",
     never: "Never",
     actions: {
-      browse: "Browse accounts",
+      retry: "Retry",
+      more: "More",
+      browse: "Back to accounts",
       edit: "Edit",
       addCredits: "Grant credits",
       delete: "Delete user",
@@ -204,6 +209,8 @@ export const translations = {
     remove: "Remove role",
   },
   tabs: {
+    section: "Profile section",
+    scrollHint: "Scroll to see all sections",
     overview: "Overview",
     billing: "Billing",
     credits: "Credit history",

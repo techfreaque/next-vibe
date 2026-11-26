@@ -62,6 +62,7 @@ export const translations: typeof enTranslations = {
       "Les factures contestées restent en dehors des totaux validés et en attente.",
   },
   widget: {
+    showBills: "Voir les factures",
     asOf: "Situation au {{date}}",
     back: "Retour",
     loading: "Chargement des dettes fournisseurs",

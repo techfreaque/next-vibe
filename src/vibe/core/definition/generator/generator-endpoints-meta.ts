@@ -390,6 +390,7 @@ class EndpointsMetaGenerator {
           ? [...definition.allowedRoles]
           : [],
         aliases,
+        ...(definition.admin ? { admin: definition.admin } : {}),
         title,
         titleShort,
         description,

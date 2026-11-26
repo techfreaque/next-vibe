@@ -42,6 +42,24 @@ const { PATCH } = createEndpoint({
   allowedRoles: [UserRole.ADMIN],
   icon: "package",
 
+  options: {
+    mutationOptions: {
+      onSuccess: async ({ logger, pathParams: { productId } }) => {
+        const [{ apiClient }, detail, list] = await Promise.all([
+          import("next-vibe/unified-ui/hooks/store"),
+          import("../get/definition"),
+          import("../../list/definition"),
+        ]);
+        await Promise.all([
+          apiClient.refetchEndpoint(detail.default.GET, logger, {
+            urlPathParams: { productId },
+          }),
+          apiClient.refetchEndpoint(list.default.GET, logger),
+        ]);
+      },
+    },
+  },
+
   fields: customWidgetObject({
     usage: { request: "data&urlPathParams", response: true },
     render: CatalogUpdateWidget,
@@ -96,7 +114,11 @@ const { PATCH } = createEndpoint({
             label: "patch.sku.label",
             description: "patch.sku.description",
             placeholder: "patch.sku.placeholder",
-            schema: z.string().max(100).optional(),
+            schema: z
+              .string()
+              .max(100)
+              .refine((value) => !/[\r\n\u2028\u2029]/u.test(value))
+              .optional(),
           }),
           unit: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,

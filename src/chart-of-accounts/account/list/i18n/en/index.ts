@@ -76,6 +76,10 @@ export const translations = {
       description: "Chart of accounts retrieved successfully",
     },
     widget: {
+      searchPage: "Search this page by name or code",
+      noMatches: "No matching accounts on this page",
+      previousPage: "Previous page",
+      nextPage: "Next page",
       debitSide: "Dr",
       creditSide: "Cr",
       loading: "Loading accounts...",

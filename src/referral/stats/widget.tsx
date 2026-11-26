@@ -7,16 +7,26 @@
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
-import { DollarSign } from "next-vibe/ui/components/icons/DollarSign";
+import { AlertCircle } from "next-vibe/ui/components/icons/AlertCircle";
+import { Coins } from "next-vibe/ui/components/icons/Coins";
 import { Link2 } from "next-vibe/ui/components/icons/Link2";
 import { TrendingUp } from "next-vibe/ui/components/icons/TrendingUp";
 import { Users } from "next-vibe/ui/components/icons/Users";
 import { Wallet } from "next-vibe/ui/components/icons/Wallet";
 import { Span } from "next-vibe/ui/components/span";
+import { canRetryRecordRead } from "next-vibe/unified-ui/_shared/admin-record-context";
+import { AdminRecordDetail } from "next-vibe/unified-ui/_shared/admin-record-detail";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
+import {
+  formatMoney,
+  formatQuantity,
+} from "next-vibe/unified-ui/_shared/format-money";
 import { useRelatedEntityNavigation } from "next-vibe/unified-ui/_shared/related-entities";
 import {
+  useWidgetEndpointMutations,
   useWidgetIsInteractive,
+  useWidgetLocale,
+  useWidgetResponse,
   useWidgetTranslation,
   useWidgetUser,
   useWidgetValue,
@@ -24,14 +34,6 @@ import {
 
 import { REFERRAL_CONFIG } from "../config";
 import type definition from "./definition";
-
-/** Format credit cents as dollars: 100 credits = $1. Drops .00 for whole dollar amounts. */
-function formatDollars(credits: number): string {
-  const dollars = credits / 100;
-  return dollars % 1 === 0
-    ? `$${dollars.toFixed(0)}`
-    : `$${dollars.toFixed(2)}`;
-}
 
 /**
  * One stat tile: label, big number, one-line hint.
@@ -42,19 +44,17 @@ function StatCard({
   highlight = false,
   value,
   description,
-  formatAsDollars = false,
 }: {
   title: string;
   IconComponent: React.ComponentType<{ className?: string }>;
   highlight?: boolean;
-  value: number;
+  value: string;
   description: string;
-  formatAsDollars?: boolean;
 }): React.JSX.Element {
   return (
     <Div
       className={cn(
-        "flex flex-col gap-2 rounded-xl border bg-card p-4 shadow-sm sm:p-5",
+        "flex flex-col min-w-0 gap-2 rounded-xl border bg-card p-3 shadow-sm sm:p-5",
         highlight && "border-primary/40 ring-1 ring-primary/20",
       )}
     >
@@ -75,11 +75,11 @@ function StatCard({
       </Div>
       <Span
         className={cn(
-          "text-2xl font-semibold tabular-nums tracking-tight",
+          "text-2xl font-semibold tabular-nums tracking-tight break-words",
           highlight ? "text-primary" : "text-foreground",
         )}
       >
-        {formatAsDollars ? formatDollars(value) : value.toLocaleString()}
+        {value}
       </Span>
       <Span className="text-xs leading-snug text-muted-foreground">
         {description}
@@ -95,83 +95,148 @@ export function ReferralStatsContainer(): React.JSX.Element {
   const stats = useWidgetValue<typeof definition.GET>();
   const t = useWidgetTranslation<typeof definition.GET>();
   const user = useWidgetUser();
+  const response = useWidgetResponse();
+  const read = useWidgetEndpointMutations()?.read;
+  const title = t("stats.get.title");
+  const locale = useWidgetLocale();
   const interactive = useWidgetIsInteractive();
   const navigate = useRelatedEntityNavigation();
   const isAdmin =
     !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN);
 
+  const openOverview = (): void =>
+    navigate(() =>
+      import("../admin/overview/definition").then(
+        (module) => module.default.GET,
+      ),
+    );
+  const openCodes = (): void =>
+    navigate(() =>
+      import("../codes/list/definition").then((module) => module.default.GET),
+    );
+
   if (!stats) {
-    return <Div />;
+    if (response?.success === false && !read?.isFetching && !read?.isLoading) {
+      const icon = <AlertCircle className="size-5 text-destructive" />;
+      const retry =
+        interactive && read && canRetryRecordRead(response.errorType.errorCode);
+      return (
+        <AdminRecordDetail
+          title={title}
+          border={false}
+          state={{
+            kind: "error",
+            title: t("stats.widget.loadError"),
+            icon,
+            action: retry
+              ? {
+                  label: t("stats.widget.retry"),
+                  onClick: () => void read.refetch(),
+                }
+              : undefined,
+          }}
+        />
+      );
+    }
+    return (
+      <AdminRecordDetail
+        title={title}
+        border={false}
+        state={{ kind: "loading", label: t("stats.widget.loading") }}
+      />
+    );
   }
 
+  const measured = stats.totalRevenueMeasuredPurchases;
+  const purchases = stats.totalRevenuePurchaseCount;
+  const revenue =
+    measured || purchases === 0
+      ? formatMoney(stats.totalRevenueValue / 100, "USD", locale)
+      : t("stats.widget.revenueUnavailable");
+  const revenueDescription =
+    measured !== undefined && purchases
+      ? t("stats.widget.revenueCoverage", {
+          measured: measured.toLocaleString(locale),
+          total: purchases.toLocaleString(locale),
+        })
+      : t(stats.totalRevenueDescription);
+  const walletUnits = (value: number): string =>
+    t("stats.widget.walletUnits", { amount: formatQuantity(value, locale) });
   const allZero =
     stats.totalSignupsValue === 0 &&
-    stats.totalRevenueValue === 0 &&
+    purchases === 0 &&
     stats.totalEarnedValue === 0 &&
     stats.availableCreditsValue === 0;
 
+  if (allZero) {
+    const icon = <Link2 className="size-5 text-primary" />;
+    return (
+      <AdminRecordDetail
+        title={title}
+        border={false}
+        state={{
+          kind: "empty",
+          title: t("stats.widget.emptyTitle"),
+          message: t(
+            isAdmin
+              ? "stats.widget.emptyAdminMessage"
+              : "stats.widget.emptyMessage",
+          ),
+          icon,
+          action: interactive
+            ? {
+                label: isAdmin
+                  ? t("stats.widget.openOverview")
+                  : t("stats.widget.openCodes"),
+                onClick: isAdmin ? openOverview : openCodes,
+              }
+            : undefined,
+        }}
+      />
+    );
+  }
+
   return (
-    <Div className="flex flex-col gap-3">
+    <AdminRecordDetail title={title} border={false}>
       {isAdmin && (
         <Div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-primary/30 bg-primary/5 px-4 py-3 text-sm">
           <Span>{t("stats.widget.adminNotice")}</Span>
           {interactive && (
-            <Button
-              type="button"
-              size="sm"
-              onClick={() =>
-                navigate(
-                  () =>
-                    import("../admin/overview/definition").then(
-                      (module) => module.default.GET,
-                    ),
-                  {},
-                )
-              }
-            >
+            <Button type="button" size="sm" onClick={openOverview}>
               {t("stats.widget.openOverview")}
             </Button>
           )}
         </Div>
       )}
-      {allZero && !isAdmin && (
-        <Div className="flex items-center gap-3 rounded-lg border border-dashed bg-muted/40 px-4 py-3 text-sm text-muted-foreground">
-          <Link2 className="h-4 w-4 shrink-0 text-primary" />
-          <Div>{t("stats.widget.emptyMessage")}</Div>
-        </Div>
-      )}
-      <Div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+      <Div className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard
           title={t(stats.totalSignupsTitle)}
           IconComponent={Users}
-          value={stats.totalSignupsValue}
+          value={stats.totalSignupsValue.toLocaleString(locale)}
           description={t(stats.totalSignupsDescription)}
         />
         <StatCard
           title={t(stats.totalRevenueTitle)}
           IconComponent={TrendingUp}
-          value={stats.totalRevenueValue}
-          description={t(stats.totalRevenueDescription)}
-          formatAsDollars
+          value={revenue}
+          description={revenueDescription}
         />
         <StatCard
           title={t(stats.totalEarnedTitle)}
-          IconComponent={DollarSign}
-          value={stats.totalEarnedValue}
+          IconComponent={Coins}
+          value={walletUnits(stats.totalEarnedValue)}
           description={t(stats.totalEarnedDescription)}
-          formatAsDollars
         />
         <StatCard
           title={t(stats.availableCreditsTitle)}
           IconComponent={Wallet}
           highlight
-          value={stats.availableCreditsValue}
+          value={walletUnits(stats.availableCreditsValue)}
           description={t(stats.availableCreditsDescription, {
-            minPayout: `$${(REFERRAL_CONFIG.MIN_PAYOUT_CENTS / 100).toFixed(2)}`,
+            minPayout: formatQuantity(REFERRAL_CONFIG.MIN_PAYOUT_CENTS, locale),
           })}
-          formatAsDollars
         />
       </Div>
-    </Div>
+    </AdminRecordDetail>
   );
 }

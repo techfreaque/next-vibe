@@ -169,24 +169,38 @@ export const translations: typeof enTranslations = {
       description: "Ihre Empfehlungsstatistiken erfolgreich abgerufen",
     },
     widget: {
+      emptyAdminMessage:
+        "In der Übersicht sehen Sie die Aktivitäten des gesamten Programms.",
+      loading: "Empfehlungsstatistik wird geladen",
+      loadError: "Empfehlungsstatistik konnte nicht geladen werden",
+      retry: "Erneut versuchen",
+      emptyTitle: "Noch keine Empfehlungsaktivität",
+      openCodes: "Empfehlungscodes öffnen",
+      revenueCoverage:
+        "Ursprüngliche Kaufbeträge für {{measured}} von {{total}} Käufen erfasst.",
+      revenueUnavailable: "Nicht verfügbar",
+      walletUnits: "{{amount}} Credits",
       adminNotice:
-        "Das sind deine persönlichen Empfehlungszahlen. Das gesamte Programm siehst du in der Empfehlungsübersicht.",
+        "Diese Zahlen betreffen Ihre Empfehlungen. Die Übersicht zeigt das gesamte Programm.",
       openOverview: "Empfehlungsübersicht öffnen",
       emptyMessage:
-        "Noch keine Aktivität - teilen Sie Ihren Empfehlungslink, um zu verdienen",
+        "Teilen Sie einen Empfehlungscode, um Anmeldungen und Provisionen zu erfassen.",
     },
     fields: {
       totalSignups: "Anmeldungen gesamt",
       totalSignupsDescription:
         "Anzahl der Nutzer, die sich mit Ihrem Empfehlungscode angemeldet haben",
-      totalRevenue: "Gesamtumsatz",
-      totalRevenueDescription: "Gesamtumsatz aus Ihren Empfehlungen",
+      totalRevenue: "Erfasster Kaufwert",
+      totalRevenueDescription:
+        "Ursprüngliche Kaufbeträge in USD, auf denen Ihre Provisionen beruhen.",
       totalEarned: "Gesamt verdient",
-      totalEarnedDescription: "Gesamte Provision aus Empfehlungen",
+      totalEarnedDescription:
+        "Verdiente Credits einschließlich der Credits in der Rückerstattungsfrist.",
       availableBalance: "Verfügbares Guthaben",
-      availableBalanceDescription: "Verfügbares Guthaben für Auszahlung",
+      availableBalanceDescription:
+        "Verfügbare Wallet-Credits nach Abzug reservierter Auszahlungen.",
       availableBalanceDescriptionLow:
-        "Für KI-Chats ausgeben - andere Credits werden zuerst verwendet. {{minPayout}} verdienen, um Abhebung freizuschalten.",
+        "Verfügbare Wallet-Credits nach Abzug reservierter Auszahlungen. Mindestauszahlung: {{minPayout}} Credits.",
       totalRevenueCredits: "Gesamtumsatz (Credits)",
       totalEarnedCredits: "Gesamt verdient (Credits)",
       totalPaidOutCredits: "Gesamt ausgezahlt (Credits)",
@@ -420,6 +434,7 @@ export const translations: typeof enTranslations = {
           credits:
             "Credit-Auszahlungen werden automatisch umgewandelt. Nichts zu tun.",
         },
+        prepareBill: "Lieferantenrechnung vorbereiten",
         codeReport: "Code-Bericht",
       },
     },

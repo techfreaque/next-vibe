@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import { and, eq, sql } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
@@ -18,12 +18,22 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
+import { lockLedgerCompany } from "@/chart-of-accounts/shared/ledger-write";
 import { CompanyMemberRole } from "@/companies/enum";
 import { CompanyAuthRepository } from "@/companies/repository";
-import { TaxCalculator } from "@/tax/calculator";
+import { getDocumentAccess } from "@/finance/document-company-scope";
+import { mailboxTaxPending } from "@/finance/supplier-evidence/tax-pending";
+import { scopedTranslation as billDetailTranslation } from "@/payment/bill/[billId]/get/i18n";
+import { getLineSettlementPolicy } from "@/tax/line-settlement";
 
 import { paymentBillLines, paymentBills } from "../../../db";
 import { BillStatus } from "../../../enum";
+import {
+  billLinesMatchHeader,
+  calculateBillLine,
+  hasBillSourceEvidence,
+  summarizeBillLines,
+} from "../../create/amounts";
 import type {
   BillLineAddRequestOutput,
   BillLineAddResponseOutput,
@@ -66,6 +76,7 @@ export class BillLineAddRepository {
       }
 
       return await db.transaction(async (tx) => {
+        await lockLedgerCompany(tx, observedBill.companyId);
         const [bill] = await tx
           .select()
           .from(paymentBills)
@@ -85,30 +96,57 @@ export class BillLineAddRepository {
           });
         }
 
-        // Verify ACCOUNTANT+ membership
+        if (!(await getDocumentAccess(userId, bill, tx))?.canManage) {
+          return fail({
+            message: t("post.errors.forbidden.title"),
+            errorType: ErrorResponseTypes.FORBIDDEN,
+          });
+        }
 
-        if (bill.status !== BillStatus.DRAFT) {
+        if (mailboxTaxPending(bill.metadata)) {
+          return fail({
+            message: billDetailTranslation
+              .scopedT(locale)
+              .t("widget.taxPending"),
+            errorType: ErrorResponseTypes.CONFLICT,
+          });
+        }
+        if (bill.status !== BillStatus.DRAFT || bill.journalEntryId) {
           return fail({
             message: t("post.errors.conflict.title"),
             errorType: ErrorResponseTypes.CONFLICT,
           });
         }
 
-        const quantity = TaxCalculator.roundToFour(data.quantity ?? 1);
-        const unitPrice = TaxCalculator.roundToFour(data.unitPrice);
-        const taxRate = TaxCalculator.roundToFour(data.taxRate ?? 0);
-        const { taxAmount, total: lineTotal } =
-          TaxCalculator.calculateLineItemTax({
-            unitPrice,
-            quantity,
-            taxRate,
-          });
-
-        // Get current max sort order
         const existingLines = await tx
-          .select({ sortOrder: paymentBillLines.sortOrder })
+          .select()
           .from(paymentBillLines)
           .where(eq(paymentBillLines.billId, data.billId));
+        if (
+          hasBillSourceEvidence(bill.metadata) ||
+          !billLinesMatchHeader(bill, existingLines)
+        ) {
+          return fail({
+            message: t("post.errors.evidenceReview"),
+            errorType: ErrorResponseTypes.CONFLICT,
+          });
+        }
+
+        const amounts = calculateBillLine(
+          {
+            quantity: data.quantity ?? 1,
+            unitPrice: data.unitPrice,
+            taxRate: data.taxRate ?? 0,
+          },
+          getLineSettlementPolicy(bill.currency, bill.metadata),
+        );
+        const totals = summarizeBillLines([...existingLines, amounts]);
+        if (!totals.valid) {
+          return fail({
+            message: t("post.errors.validation.title"),
+            errorType: ErrorResponseTypes.VALIDATION_ERROR,
+          });
+        }
 
         const maxSortOrder = existingLines.reduce(
           (max, l) => Math.max(max, l.sortOrder ?? 0),
@@ -121,11 +159,7 @@ export class BillLineAddRepository {
             billId: data.billId,
             description: data.description,
             productId: data.productId ?? null,
-            quantity,
-            unitPrice,
-            taxRate,
-            taxAmount,
-            lineTotal,
+            ...amounts,
             expenseAccountId: data.expenseAccountId ?? null,
             sortOrder: maxSortOrder + 1,
           })
@@ -142,18 +176,9 @@ export class BillLineAddRepository {
         await tx
           .update(paymentBills)
           .set({
-            subtotal: sql`(
-              SELECT SUM(line_total - tax_amount) FROM payment_bill_lines
-              WHERE bill_id = ${data.billId}
-            )`,
-            taxAmount: sql`(
-              SELECT SUM(tax_amount) FROM payment_bill_lines
-              WHERE bill_id = ${data.billId}
-            )`,
-            total: sql`(
-              SELECT SUM(line_total) FROM payment_bill_lines
-              WHERE bill_id = ${data.billId}
-            )`,
+            subtotal: totals.subtotal,
+            taxAmount: totals.taxAmount,
+            total: totals.total,
             updatedAt: new Date(),
           })
           .where(eq(paymentBills.id, data.billId));
@@ -161,7 +186,7 @@ export class BillLineAddRepository {
         logger.debug("Bill line added", {
           lineId: line.id,
           billId: data.billId,
-          lineTotal,
+          lineTotal: line.lineTotal,
         });
 
         return success({

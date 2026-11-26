@@ -222,6 +222,13 @@ export const translations: typeof enTranslations = {
       titleShort: "Entrepôt",
       description: "Récupérer les détails d'un entrepôt.",
       widget: {
+        companyName: "Entreprise",
+        stockedProducts: "Produits en stock",
+        companyInventory: "Inventaire de l’entreprise",
+        missingValuation: "Coût manquant",
+        details: "Détails de l’entrepôt",
+        related: "Inventaire",
+        backToList: "Retour aux entrepôts",
         back: "Retour",
         edit: "Modifier l'entrepôt",
         viewStock: "Voir le stock",
@@ -390,6 +397,11 @@ export const translations: typeof enTranslations = {
         loadMore: "Afficher la suite",
 
         back: "Retour",
+        defaultLowStockRule: "Stock bas sous {{threshold}} unités disponibles",
+        reorderPointRule:
+          "Stock bas à {{threshold}} unités disponibles ou moins",
+        stockValuePrecision:
+          "La valeur du stock correspond à la quantité en stock × le coût unitaire non arrondi. Les coûts affichés sont arrondis à deux décimales.",
         lowStock: "Stock bas",
         available: "Disponible",
         onHand: "En stock",
@@ -917,6 +929,8 @@ export const translations: typeof enTranslations = {
       titleShort: "Transfert",
       description: "Récupérer un transfert avec toutes ses lignes.",
       widget: {
+        retry: "Réessayer",
+        noItems: "Ce transfert ne contient aucun article.",
         back: "Retour",
         dispatch: "Expédier le transfert",
         receive: "Marquer comme réceptionné",

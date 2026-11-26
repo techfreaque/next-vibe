@@ -23,6 +23,8 @@ import {
 } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
+import { LINE_SETTLEMENT_V1 } from "@/tax/line-settlement";
+
 import { InvoiceStatus } from "../../../enum";
 import { scopedTranslation } from "./i18n";
 
@@ -101,6 +103,12 @@ const { GET } = createEndpoint({
         label: "widget.customer",
         schema: z.string().nullable(),
       }),
+      sourceEstimate: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "widget.sourceQuote",
+        hidden: true,
+        schema: z.object({ id: z.uuid(), number: z.string() }).optional(),
+      }),
       invoiceSequenceNumber: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         label: "get.response.invoiceSequenceNumber" as const,
@@ -111,6 +119,11 @@ const { GET } = createEndpoint({
         label: "get.response.currency" as const,
         schema: z.string(),
       }),
+      lineSettlement: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z.literal(LINE_SETTLEMENT_V1).optional(),
+      }),
       status: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         label: "get.response.status" as const,
@@ -120,6 +133,11 @@ const { GET } = createEndpoint({
         type: WidgetType.TEXT,
         label: "get.response.amount" as const,
         schema: z.string(),
+      }),
+      remainingCredit: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "get.response.remainingCredit",
+        schema: z.number().nonnegative().optional(),
       }),
       amountPaid: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
@@ -150,6 +168,18 @@ const { GET } = createEndpoint({
         type: WidgetType.TEXT,
         label: "get.response.journalEntryId" as const,
         schema: z.string().nullable(),
+      }),
+      voidReversal: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "widget.viewVoidReversal" as const,
+        schema: z
+          .object({
+            originalEntryNumber: z.string().optional(),
+            entryId: z.uuid(),
+            entryNumber: z.string(),
+            effectiveDate: dateSchema,
+          })
+          .optional(),
       }),
       createdAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
@@ -369,6 +399,7 @@ const { GET } = createEndpoint({
         paidAt: null,
         notes: null,
         journalEntryId: null,
+        voidReversal: undefined,
         createdAt: "2024-01-01T00:00:00.000Z",
         updatedAt: "2024-01-01T00:00:00.000Z",
         receipts: [],

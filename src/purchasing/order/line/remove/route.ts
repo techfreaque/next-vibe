@@ -13,10 +13,10 @@ import { OrderLineRemoveRepository } from "./repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
-    handler: ({ urlPathParams, user, logger, locale }) =>
+    handler: ({ data, user, logger, locale }) =>
       OrderLineRemoveRepository.removeLine(
-        urlPathParams.poId,
-        urlPathParams.lineId,
+        data.poId,
+        data.lineId,
         user.id,
         logger,
         locale,

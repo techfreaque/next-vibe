@@ -930,6 +930,14 @@ export const translations: typeof enTranslations = {
 
   // Shared data-source chart widget UI
   dataSourceWidget: {
+    latestValue: "Posledná hodnota",
+    browseGraphs: "Zobraziť grafy",
+    filters: "Filtre",
+    applyFilters: "Použiť filtre",
+    expandPeriod: "Zobraziť {{period}}",
+    period: "Obdobie",
+    interval: "Zoskupiť podľa",
+    loadError: "Graf sa nepodarilo načítať.",
     addToGraph: "Pridať do grafu",
     newGraph: "Nový graf",
     loading: "Načítavajú sa údaje…",

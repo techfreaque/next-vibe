@@ -46,14 +46,8 @@ export function PosSessionOpenWidget({
 
   const handleStartOrders = (sessionId: string): void => {
     void (async (): Promise<void> => {
-      const def = await import("../../order/list/definition");
-      navigation.push(def.default.GET, {
-        data: {
-          input: { sessionId, status: undefined },
-          page: 1,
-          pageSize: 50,
-        },
-      });
+      const def = await import("../[sessionId]/get/definition");
+      navigation.push(def.default.GET, { urlPathParams: { sessionId } });
     })();
   };
 
@@ -124,7 +118,7 @@ export function PosSessionOpenWidget({
             className="w-full"
             onClick={() => handleStartOrders(result.id)}
           >
-            {t("sessionOpen.post.widget.startOrders")}
+            {t("workflow.openDrawer")}
           </Button>
           <Button
             type="button"
@@ -161,6 +155,7 @@ export function PosSessionOpenWidget({
       <Div className="flex flex-col gap-1">
         <NumberFieldWidget
           fieldName="details.openingFloat"
+          presentation="money"
           field={withValue(
             field.children.details.children.openingFloat,
             undefined,
@@ -172,7 +167,9 @@ export function PosSessionOpenWidget({
         </Span>
       </Div>
 
-      <SubmitButtonWidget<typeof definition.POST> field={{}} />
+      <SubmitButtonWidget<typeof definition.POST>
+        field={{ text: "dashboard.get.widget.openSession" }}
+      />
 
       <Button
         variant="ghost"

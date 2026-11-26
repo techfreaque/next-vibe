@@ -137,6 +137,16 @@ const { GET } = createEndpoint({
           layoutType: LayoutType.GRID,
           usage: { response: true },
           children: {
+            accountId: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              hidden: true,
+              schema: z.uuid(),
+            }),
+            direction: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              hidden: true,
+              schema: z.enum(["input", "output"]),
+            }),
             taxRateCode: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               label: "taxReport.response.taxRateCode" as const,
@@ -150,7 +160,7 @@ const { GET } = createEndpoint({
             netAmount: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               label: "taxReport.response.netAmount" as const,
-              schema: z.number(),
+              schema: z.number().nullable(),
             }),
             taxAmount: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
@@ -160,7 +170,7 @@ const { GET } = createEndpoint({
             rate: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               label: "taxReport.response.rate" as const,
-              schema: z.number(),
+              schema: z.number().nullable(),
             }),
           },
         }),

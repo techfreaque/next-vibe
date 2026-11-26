@@ -105,6 +105,7 @@ export const translations: typeof enTranslations = {
   },
   providers: {
     shared: {
+      connectionSettings: "Nastavenia pripojenia",
       listId: {
         label: "ID zoznamu alebo skupiny",
         description:

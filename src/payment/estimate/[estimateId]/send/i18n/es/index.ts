@@ -4,11 +4,11 @@ export const translations: typeof enTranslations = {
   category: "Estimación",
   tags: { payment: "pago", estimate: "Estimaciones" },
   post: {
-    title: "Enviar estimación",
-    titleShort: "Enviar estimación",
+    title: "Marcar el presupuesto como enviado",
+    titleShort: "Marcar el presupuesto como enviado",
     description: "Estimación de la marca como se envía al cliente",
     form: {
-      title: "Enviar estimación",
+      title: "Marcar el presupuesto como enviado",
       description: "Estimación de la marca como se envía al cliente",
     },
     response: { success: "Operación completada", message: "Mensaje de Estado" },
@@ -58,9 +58,8 @@ export const translations: typeof enTranslations = {
   },
   widget: {
     back: "Atrás",
-    submit: "Enviar estimación",
+    submit: "Marcar como enviado",
     sent: "Estimación marcada como enviada al cliente.",
-    sendNote:
-      "El estado estimado se actualizará a Sent. El cliente puede entonces aceptar o rechazarlo.",
+    sendNote: "Confirme que ha enviado este presupuesto al cliente.",
   },
 };

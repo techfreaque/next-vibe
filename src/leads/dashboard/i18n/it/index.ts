@@ -71,6 +71,13 @@ export const translations: typeof enTranslations = {
     },
   },
   widget: {
+    dashboardContext:
+      "Acquisizione, conversione e attività recente dei contatti.",
+    unnamedLead: "Contatto senza nome",
+    attention: "Da verificare",
+    noAttention: "Nessun gruppo di rete segnalato nel periodo.",
+    flaggedAttention: "Gruppi di rete segnalati ({{count}})",
+    retry: "Riprova",
     reports: "Report",
     last7Days: "Ultimi 7 giorni",
     humanLeads: "Lead umani",

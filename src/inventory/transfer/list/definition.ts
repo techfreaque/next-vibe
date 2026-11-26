@@ -47,6 +47,7 @@ const { GET } = createEndpoint({
   defaultWebPinned: [UserRole.ADMIN] as const,
   icon: "refresh-cw" as const,
 
+  options: { formOptions: { autoSubmit: true, debounceMs: 250 } },
   fields: customWidgetObject({
     usage: { request: "data", response: true } as const,
     render: InventoryTransferListWidget,

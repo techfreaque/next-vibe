@@ -269,9 +269,15 @@ export const translations: typeof enTranslations = {
       titleShort: "Podrobnosti o dodávateľovi",
       description: "Zobrazte všetky údaje o dodávateľovi.",
       widget: {
+        companyName: "Spoločnosť",
+        orderCount: "Nákupné objednávky",
+        receivingCount: "Čakajú na príjem",
+        details: "Údaje o dodávateľovi",
+        related: "Správa dodávateľa",
+        backToList: "Späť na zoznam dodávateľov",
         back: "Späť",
-        edit: "Upraviť dodávateľa",
-        createOrder: "Nová nákupná objednávka",
+        edit: "Upraviť",
+        createOrder: "Nová objednávka",
         viewOrders: "Zobraziť objednávky",
         deactivate: "Deaktivovať",
         select: "Vyberte dodávateľa",
@@ -700,6 +706,9 @@ export const translations: typeof enTranslations = {
         colStatus: "Stav",
         deliveryArrow: "→",
         overdue: "po termíne",
+        readyToBill: "Prijaté a pripravené na fakturáciu",
+        openAttentionOrder: "Otvoriť objednávku {{reference}}",
+        attentionCount: "Objednávky vyžadujúce pozornosť: {{count}}",
         actionNeeded: "na vybavenie",
         back: "Späť",
         loading: "Načítava sa…",
@@ -774,8 +783,10 @@ export const translations: typeof enTranslations = {
       description:
         "Zobrazte nákupnú objednávku vrátane položiek a doterajších príjemiek.",
       widget: {
+        precision:
+          "Sumy položiek sa počítajú z pôvodnej nezaokrúhlenej jednotkovej ceny dodávateľa.",
         back: "Späť",
-        send: "Odoslať dodávateľovi",
+        send: "Označiť ako odoslanú",
         confirm: "Označiť ako potvrdenú",
         receive: "Prijať tovar",
         convertToBill: "Vytvoriť dodávateľskú faktúru",
@@ -1003,9 +1014,9 @@ export const translations: typeof enTranslations = {
   },
   orderSend: {
     post: {
-      title: "Odoslať nákupnú objednávku",
-      titleShort: "Odoslať objednávku",
-      description: "Označte nákupnú objednávku ako odoslanú dodávateľovi.",
+      title: "Označiť objednávku ako odoslanú",
+      titleShort: "Označiť ako odoslanú",
+      description: "Zaznamenajte odoslanie nákupnej objednávky.",
       poId: {
         label: "ID objednávky",
         description: "Nákupná objednávka, ktorú chcete odoslať",
@@ -1014,7 +1025,7 @@ export const translations: typeof enTranslations = {
         back: "Späť",
         backToPO: "Späť na nákupnú objednávku",
         warning:
-          "Objednávka sa označí ako odoslaná dodávateľovi. Už nebude v stave konceptu.",
+          "Stav objednávky sa v tomto pracovnom priestore zmení na Odoslaná.",
       },
       errors: {
         validation: {
@@ -1055,8 +1066,8 @@ export const translations: typeof enTranslations = {
         },
       },
       success: {
-        title: "Nákupná objednávka bola odoslaná",
-        description: "Objednávka je označená ako odoslaná.",
+        title: "Odoslanie objednávky je zaznamenané",
+        description: "Nákupná objednávka je teraz v stave Odoslaná.",
       },
       response: {
         id: "ID objednávky",
@@ -1133,6 +1144,10 @@ export const translations: typeof enTranslations = {
       description:
         "Zaevidujte príjem tovaru k nákupnej objednávke. Príjem sa zapíše do skladových pohybov.",
       widget: {
+        retry: "Skúsiť znova",
+        loading: "Načítava sa objednávka…",
+        remaining: "Zostáva: {{quantity}}",
+        noOpenLines: "Všetky objednané množstvá boli prijaté.",
         backToPO: "Späť na nákupnú objednávku",
       },
       poId: {
@@ -1280,6 +1295,10 @@ export const translations: typeof enTranslations = {
   orderLineAdd: {
     post: {
       widget: {
+        productSearch: "Hľadať produkty podľa názvu alebo kódu",
+        search: "Hľadať",
+        noProducts: "Žiadne zodpovedajúce produkty.",
+        clearProduct: "Zrušiť výber produktu",
         backToOrder: "Späť na objednávku",
         lineAdded: "Položka bola pridaná",
       },
@@ -1379,6 +1398,11 @@ export const translations: typeof enTranslations = {
         description: "Položka, ktorú chcete odstrániť",
       },
       widget: {
+        updatedOrderTotals: "Aktualizované súčty objednávky",
+        cancel: "Zrušiť",
+        verifying: "Overuje sa vybraná položka…",
+        unavailable:
+          "Znova otvorte koncept objednávky a vyberte položku, ktorú chcete odstrániť.",
         backToOrder: "Späť na nákupnú objednávku",
         warning: "Položka sa natrvalo odstráni z nákupnej objednávky.",
       },

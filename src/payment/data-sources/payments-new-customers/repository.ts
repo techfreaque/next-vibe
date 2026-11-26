@@ -24,8 +24,9 @@ import { fillGaps } from "next-vibe/dataflow/shared/range";
 import type { QueryResultRow } from "pg";
 
 import {
-  notInternalUserSql,
   paidStatusSql,
+  REPORTABLE_PAYMENT_SQL,
+  reportingUserSql,
   utcTs,
 } from "../../analytics/money-sql";
 import { CheckoutMode } from "../../enum";
@@ -50,11 +51,11 @@ export class QueryPaymentsNewCustomersRepository {
       FROM (
         SELECT pt.user_id, min(pt.created_at) AS first_at
         FROM payment_transactions pt
-        WHERE ${paidStatusSql("pt")}
+        WHERE ${REPORTABLE_PAYMENT_SQL} AND ${paidStatusSql("pt")}
           AND pt.mode <> ${CheckoutMode.SETUP}
           AND pt.amount > 0
           AND pt.user_id IS NOT NULL
-          AND ${notInternalUserSql("pt.user_id")}
+          AND ${reportingUserSql("pt.user_id")}
         GROUP BY pt.user_id
       ) f
       WHERE f.first_at >= ${utcTs(range.from)}

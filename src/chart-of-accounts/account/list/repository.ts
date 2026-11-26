@@ -89,6 +89,9 @@ export class CoaAccountListRepository {
         inArray(accountNodes.companyId, companyIds),
         data.postableOnly ? eq(accountNodes.isPostable, true) : undefined,
         data.postableOnly ? eq(accountNodes.isActive, true) : undefined,
+        data.subtypes?.length
+          ? inArray(accountNodes.subtype, data.subtypes)
+          : undefined,
       );
 
       const [{ value: total }] = await db

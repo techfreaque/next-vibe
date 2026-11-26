@@ -20,7 +20,7 @@ export const translations: typeof enTranslations = {
         description: "Selezionare un ruolo da concedere a questo utente",
       },
       id: {
-        label: "Utente ID",
+        label: "Utente",
         description:
           "Unico identificatore dell'utente per concedere il ruolo a",
         placeholder: "Inserisci utente ID...",
@@ -102,7 +102,7 @@ export const translations: typeof enTranslations = {
         description: "Selezionare un ruolo da revocare da questo utente",
       },
       id: {
-        label: "Utente ID",
+        label: "Utente",
         description:
           "Unico identificatore dell'utente per revocare il ruolo da",
         placeholder: "Inserisci utente ID...",

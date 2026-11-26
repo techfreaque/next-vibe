@@ -6,12 +6,12 @@ export const translations: typeof enTranslations = {
     title: "Campo Pick",
     titleShort: "Campo Pick",
     description:
-      "Campo Pick - extrae un campo llamado de una serie de tiempo (superado, devuelve vacío)",
+      "Extrae un campo numérico de los metadatos de cada observación.",
     fields: {
       source: { label: "Fuente", description: "Serie de tiempo de entrada" },
       field: {
         label: "Campo",
-        description: "Nombre de campo para extraer (ya no soportado)",
+        description: "Nombre del campo en los metadatos, por ejemplo close.",
       },
       resolution: { label: "Resolución", description: "Plazo de cálculo" },
       range: { label: "Rango", description: "Rango de tiempo para calcular" },

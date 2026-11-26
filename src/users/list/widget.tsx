@@ -9,6 +9,7 @@
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { isCliPlatform, Platform } from "next-vibe/platforms/platforms";
 import { KpiGrid, KpiTile } from "next-vibe/ui/components/analytics";
+import { Avatar, AvatarFallback } from "next-vibe/ui/components/avatar";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { EmptyBlock } from "next-vibe/ui/components/empty-block";
@@ -53,6 +54,7 @@ import {
   useWidgetNavigation,
   useWidgetOnSubmit,
   useWidgetPlatform,
+  useWidgetResponse,
   useWidgetResponseOnly,
   useWidgetTranslation,
   useWidgetValue,
@@ -68,6 +70,9 @@ import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-a
 import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/navigate-button/widget";
 import type React from "react";
 import { useCallback, useId, useState } from "react";
+
+import { ChannelType } from "@/leads/growth/enum";
+import { scopedTranslation as growthTranslation } from "@/leads/growth/i18n";
 
 import {
   cell,
@@ -105,13 +110,25 @@ type LastActiveValue = (typeof LastActiveFilter)[keyof typeof LastActiveFilter];
 const ADMIN_ROLE = "enums.userRole.admin";
 
 /** One line of attribution: channel / campaign, plus the ref code once. */
-function sourceText(user: UserListRow, t: ListT): string {
+function sourceText(
+  user: UserListRow,
+  t: ListT,
+  locale: CountryLanguage,
+): string {
   const code = user.referralCode ?? user.firstRefCode;
   if (!user.source && code) {
     return t("widget.refCode", { code });
   }
+  const [channel, ...campaignParts] = user.source?.split(" / ") ?? [];
+  const localizedSource =
+    channel === "direct"
+      ? [
+          growthTranslation.scopedT(locale).t(ChannelType.DIRECT),
+          ...campaignParts,
+        ].join(" / ")
+      : user.source;
   const source =
-    user.source ??
+    localizedSource ??
     (user.referredByEmail
       ? t("widget.referredBy", { email: user.referredByEmail })
       : "");
@@ -224,7 +241,7 @@ function renderText(
               : "-",
           10,
         ),
-        cell(sourceText(user, t) || t("widget.notTracked"), 22),
+        cell(sourceText(user, t, locale) || t("widget.notTracked"), 22),
         user.id,
       ].join(" "),
     );
@@ -298,57 +315,147 @@ function UserCell({
   user,
   t,
   locale,
+  picker,
 }: {
   user: UserListRow;
   t: ListT;
   locale: CountryLanguage;
+  picker: boolean;
 }): React.JSX.Element {
+  const name = displayName(user);
+  const initials = name
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((word) => word[0])
+    .join("")
+    .toUpperCase();
   return (
-    <Div className="flex items-start gap-3 min-w-0">
-      <Div className="min-w-0">
-        <Div className="flex items-center gap-1.5 flex-wrap">
-          <Span className="font-medium text-sm break-all @3xl:truncate @3xl:max-w-[220px]">
-            {displayName(user)}
+    <Div className="flex min-w-0 flex-1 items-center gap-2">
+      <Avatar className="size-8">
+        <AvatarFallback className="bg-muted text-xs font-semibold">
+          {initials}
+        </AvatarFallback>
+      </Avatar>
+      <Div className="min-w-0 flex-1">
+        <Div className="flex min-w-0 flex-wrap items-center gap-1.5">
+          <Span
+            className={cn(
+              "max-w-full text-sm font-medium @3xl:max-w-[220px]",
+              !picker && name === user.email
+                ? "break-all @3xl:truncate"
+                : "truncate",
+            )}
+          >
+            {name}
           </Span>
-          {user.roles
-            .filter((role) => role !== "enums.userRole.customer")
-            .map((role) => (
+          <Div
+            className={cn(
+              "flex flex-wrap gap-1",
+              !picker && "hidden @3xl:flex",
+            )}
+          >
+            {user.roles
+              .filter((role) => role !== "enums.userRole.customer")
+              .map((role) => (
+                <StatusPill
+                  key={role}
+                  status={role}
+                  label={roleLabel(role, locale)}
+                  variant="info"
+                />
+              ))}
+            {picker && user.isBanned && (
               <StatusPill
-                key={role}
-                status={role}
-                label={roleLabel(role, locale)}
-                variant="info"
+                status="banned"
+                label={t("widget.flags.banned")}
+                variant="danger"
               />
-            ))}
-          {user.isBanned && (
-            <StatusPill
-              status="banned"
-              label={t("widget.flags.banned")}
-              variant="danger"
-            />
-          )}
-          {isFreeBurner(user) && (
-            <StatusPill
-              status="free-burn"
-              label={t("widget.flags.freeBurn")}
-              variant="warning"
-            />
-          )}
-          {!user.emailVerified && (
-            <StatusPill
-              status="unverified"
-              label={t("widget.flags.unverified")}
-              variant="warning"
-            />
-          )}
+            )}
+            {isFreeBurner(user) && (
+              <StatusPill
+                status="free-burn"
+                label={t("widget.flags.freeBurn")}
+                variant="warning"
+              />
+            )}
+            {!user.emailVerified && (
+              <StatusPill
+                status="unverified"
+                label={t("widget.flags.unverified")}
+                variant="warning"
+              />
+            )}
+          </Div>
         </Div>
-        {displayName(user) !== user.email && (
-          <Span className="block break-all text-xs text-muted-foreground @3xl:max-w-[320px] @3xl:truncate">
+        {name !== user.email && (
+          <Span
+            className={cn(
+              "max-w-full text-xs text-muted-foreground @3xl:block @3xl:max-w-[320px] @3xl:truncate",
+              picker ? "hidden" : "block break-all",
+            )}
+          >
             {user.email}
           </Span>
         )}
       </Div>
     </Div>
+  );
+}
+
+function planLabel(
+  user: UserListRow,
+  t: ListT,
+  locale: CountryLanguage,
+): string {
+  if (user.plan) {
+    return subscriptionPlanLabel(user.plan, locale);
+  }
+  return user.paymentsCount > 0 ? t("widget.oneOff") : t("widget.compact.free");
+}
+
+function AccountStatus({
+  user,
+  t,
+  locale,
+}: {
+  user: UserListRow;
+  t: ListT;
+  locale: CountryLanguage;
+}): React.JSX.Element {
+  if (user.isBanned) {
+    return (
+      <StatusPill
+        status="banned"
+        label={t("widget.flags.banned")}
+        variant="danger"
+      />
+    );
+  }
+  if (!user.isActive) {
+    return (
+      <StatusPill
+        status="inactive"
+        label={t("widget.accountInactive")}
+        variant="muted"
+      />
+    );
+  }
+  if (user.subscriptionStatus) {
+    return (
+      <StatusPill
+        status={user.subscriptionStatus}
+        label={subscriptionStatusLabel(user.subscriptionStatus, locale)}
+        variant={subscriptionStatusVariant(user.subscriptionStatus)}
+      />
+    );
+  }
+  return (
+    <StatusPill
+      status="active"
+      label={t("widget.accountActive")}
+      variant="muted"
+    />
   );
 }
 
@@ -477,6 +584,11 @@ export function UsersListContainer({
   const onPick = usePickerCallback<UserListRow>();
   const isPickerMode = !!onPick;
   const data = useWidgetValue<typeof definition.GET>();
+  const response = useWidgetResponse();
+  const listError = response?.success === false ? response : undefined;
+  const showRecovery =
+    Boolean(listError) ||
+    (!data && endpointMutations?.read?.isLoading === false);
   const [showFilters, setShowFilters] = useState(false);
 
   const sortBy: SortFieldValue =
@@ -939,8 +1051,9 @@ export function UsersListContainer({
   );
 
   return (
-    <WidgetShell className="min-w-0">
+    <WidgetShell layout={isPickerMode ? "compact" : "page"} className="min-w-0">
       <WidgetHeader
+        size={isPickerMode ? "section" : "page"}
         title={
           summary
             ? t("widget.titleWithCount", {
@@ -958,31 +1071,33 @@ export function UsersListContainer({
                 size="sm"
                 onClick={handleViewStats}
                 aria-label={t("widget.actions.stats")}
-                className="gap-1"
+                className="min-h-11 gap-1.5 whitespace-normal @lg:min-h-8"
               >
-                <BarChart3 className="h-4 w-4" />
-                <Span className="hidden sm:inline text-xs">
-                  {t("widget.actions.stats")}
-                </Span>
+                <BarChart3 className="h-4 w-4 shrink-0" />
+                <Span className="text-xs">{t("widget.actions.stats")}</Span>
               </Button>
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={handleRefresh}
-                title={t("widget.actions.refresh")}
-                aria-label={t("widget.actions.refresh")}
-              >
-                <RefreshCw className="h-4 w-4" />
-              </Button>
+              {!showRecovery && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleRefresh}
+                  title={t("widget.actions.refresh")}
+                  aria-label={t("widget.actions.refresh")}
+                  className="min-h-11 gap-1.5 whitespace-normal @lg:min-h-8"
+                >
+                  <RefreshCw className="h-4 w-4 shrink-0" />
+                  <Span className="text-xs">{t("widget.actions.refresh")}</Span>
+                </Button>
+              )}
               <Button
                 type="button"
                 variant="default"
                 size="sm"
                 onClick={handleCreate}
-                className="gap-1"
+                className="min-h-11 gap-1.5 whitespace-normal @lg:min-h-8"
               >
-                <UserPlus className="h-4 w-4" />
+                <UserPlus className="h-4 w-4 shrink-0" />
                 {t("widget.actions.newUser")}
               </Button>
             </>
@@ -990,28 +1105,31 @@ export function UsersListContainer({
         }
       />
 
-      <Div className="flex flex-col gap-2">
-        <Label htmlFor={searchId}>{t("get.fields.search.label")}</Label>
-        <Input
-          id={searchId}
-          type="text"
-          value={search}
-          autoCapitalize="none"
-          autoComplete="off"
-          spellCheck={false}
-          maxLength={200}
-          aria-label={t("get.fields.search.label")}
-          placeholder={t("get.fields.search.placeholder")}
-          onChangeText={(value) => {
-            form.setValue("page", 1, { shouldDirty: true });
-            form.setValue("search", value, { shouldDirty: true });
-          }}
-        />
-      </Div>
-
-      {!isPickerMode && (
-        <Div className="flex flex-col gap-2">
-          <Div className="flex flex-wrap items-center gap-1.5">
+      <Div className="flex min-w-0 flex-wrap items-center gap-2">
+        <Div
+          className={cn(
+            "min-w-0 basis-full @lg:basis-80 @xl:basis-96",
+            isPickerMode && "max-w-md",
+          )}
+        >
+          <Input
+            id={searchId}
+            type="text"
+            value={search}
+            autoCapitalize="none"
+            autoComplete="off"
+            spellCheck={false}
+            maxLength={200}
+            aria-label={t("get.fields.search.label")}
+            placeholder={t("get.fields.search.placeholder")}
+            onChangeText={(value) => {
+              form.setValue("page", 1, { shouldDirty: true });
+              form.setValue("search", value, { shouldDirty: true });
+            }}
+          />
+        </Div>
+        {!isPickerMode && (
+          <Div className="flex min-w-0 flex-1 flex-wrap items-center gap-2">
             <QuickChip
               label={t("widget.quick.humans")}
               active={audience === UsersAudience.HUMANS}
@@ -1035,22 +1153,6 @@ export function UsersListContainer({
               }
               onClick={toggleFreeBurn}
             />
-            <QuickChip
-              label={t("widget.quick.banned", {
-                count: formatNumber(summary?.bannedCount ?? 0, locale),
-              })}
-              active={
-                accountState.length === 1 &&
-                accountState[0] === AccountStateFilter.BANNED
-              }
-              onClick={toggleBanned}
-            />
-          </Div>
-          <Div className="flex flex-wrap items-center gap-2">
-            <Span className="mr-auto text-xs text-muted-foreground">
-              {t("get.fields.sortBy.label")} {t(sortBy)}{" "}
-              {sortOrder === ListSortOrder.ASC ? "↑" : "↓"}
-            </Span>
             {hasActiveFilters && (
               <Button
                 type="button"
@@ -1062,35 +1164,64 @@ export function UsersListContainer({
                 {t("widget.actions.clearFilters")}
               </Button>
             )}
-            <Button
-              type="button"
-              variant={showFilters ? "secondary" : "outline"}
-              size="sm"
-              className="h-7 gap-1 text-xs"
-              onClick={() => setShowFilters((v) => !v)}
-              aria-expanded={showFilters}
-            >
-              <Filter className="h-3.5 w-3.5" />
-              {t("widget.actions.moreFilters")}
-            </Button>
+            <Div className="flex basis-full flex-wrap gap-2 @lg:ml-auto @lg:basis-auto">
+              <QuickChip
+                label={t("widget.quick.banned", {
+                  count: formatNumber(summary?.bannedCount ?? 0, locale),
+                })}
+                active={
+                  accountState.length === 1 &&
+                  accountState[0] === AccountStateFilter.BANNED
+                }
+                onClick={toggleBanned}
+              />
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowFilters((v) => !v)}
+                className="gap-1 text-xs"
+                aria-expanded={showFilters}
+                aria-label={`${t("get.fields.sortBy.label")} ${t(sortBy)}`}
+              >
+                {sortOrder === ListSortOrder.ASC ? (
+                  <ArrowUp className="size-3.5" />
+                ) : (
+                  <ArrowDown className="size-3.5" />
+                )}
+                {t(sortBy)}
+              </Button>
+              <Button
+                type="button"
+                variant={showFilters ? "secondary" : "outline"}
+                size="sm"
+                className="h-7 gap-1 text-xs"
+                onClick={() => setShowFilters((v) => !v)}
+                aria-expanded={showFilters}
+              >
+                <Filter className="h-3.5 w-3.5" />
+                {t("widget.actions.moreFilters")}
+              </Button>
+            </Div>
           </Div>
-        </Div>
-      )}
+        )}
+      </Div>
 
       {/* KPI strip for the current filter */}
       {!isPickerMode && summary && (
         <KpiGrid columns={5}>
           <KpiTile
+            wrapLabel
             label={t("widget.kpi.matching")}
             value={summary.totalCount}
             locale={locale}
             onClick={handleViewStats}
           />
           <KpiTile
+            wrapLabel
             label={t("widget.kpi.paying")}
             value={summary.payingCount}
             locale={locale}
-            tone="positive"
             hint={
               summary.totalCount > 0
                 ? t("widget.kpi.payingShare", {
@@ -1103,6 +1234,7 @@ export function UsersListContainer({
             onClick={() => togglePayer(PayerFilter.PAID)}
           />
           <KpiTile
+            wrapLabel
             label={t("widget.kpi.verified")}
             value={
               summary.totalCount > 0
@@ -1117,6 +1249,7 @@ export function UsersListContainer({
             onClick={toggleVerified}
           />
           <KpiTile
+            wrapLabel
             label={t("widget.kpi.active")}
             value={summary.activeMonthCount}
             locale={locale}
@@ -1126,7 +1259,8 @@ export function UsersListContainer({
             onClick={() => toggleLastActive(LastActiveFilter.MONTH)}
           />
           <KpiTile
-            className="hidden @md:flex"
+            wrapLabel
+            className="col-span-full @md:col-span-2 @4xl:col-span-1"
             label={t("widget.kpi.revenue")}
             value={summary.totalPaidUsd}
             format="currency"
@@ -1238,23 +1372,26 @@ export function UsersListContainer({
         </Div>
       )}
 
-      <Div className="min-w-0 break-all">
-        <FormAlertWidget field={children.formAlert} />
-      </Div>
-
-      {/* Table */}
-      {!data ? (
-        endpointMutations?.read?.isLoading !== false ? (
-          <LoadingBlock message={t("widget.loading")} />
-        ) : (
+      {showRecovery ? (
+        <Div role="alert">
           <EmptyBlock
             icon={<Users className="h-8 w-8" />}
             title={t("get.errors.server.title")}
+            message={listError?.message}
             action={{
               label: t("widget.actions.refresh"),
               onClick: handleRefresh,
             }}
           />
+        </Div>
+      ) : (
+        <FormAlertWidget field={children.formAlert} />
+      )}
+
+      {/* Table */}
+      {!data ? (
+        showRecovery ? null : (
+          <LoadingBlock message={t("widget.loading")} />
         )
       ) : users.length === 0 ? (
         <EmptyBlock
@@ -1335,7 +1472,7 @@ export function UsersListContainer({
                       className="hidden text-right @3xl:table-cell"
                     />
                     <TableHead className="hidden text-xs @3xl:table-cell">
-                      {t("widget.columns.subscription")}
+                      {t("widget.planStatus")}
                     </TableHead>
                     <TableHead className="hidden text-xs @3xl:table-cell">
                       {t("widget.columns.source")}
@@ -1359,7 +1496,12 @@ export function UsersListContainer({
                   <TableCell className="whitespace-normal">
                     <Div className="flex flex-col items-start gap-2">
                       <Div className="flex w-full items-start justify-between gap-2">
-                        <UserCell user={user} t={t} locale={locale} />
+                        <UserCell
+                          user={user}
+                          t={t}
+                          locale={locale}
+                          picker={isPickerMode}
+                        />
                         {!isPickerMode && (
                           <Button
                             type="button"
@@ -1379,34 +1521,20 @@ export function UsersListContainer({
                         )}
                       </Div>
                       {!isPickerMode && (
-                        <Div className="flex w-full flex-col gap-1.5 text-xs @3xl:hidden">
-                          <Div className="grid grid-cols-2 gap-x-2 gap-y-1 text-muted-foreground">
-                            <Span>{t("widget.columns.joined")}</Span>
-                            <Span className="text-right">
-                              {formatDay(user.createdAt, locale)}
-                            </Span>
-                            <Span>{t("widget.columns.lastActive")}</Span>
-                            <Span className="text-right">
-                              {user.lastActiveAt
-                                ? formatRelative(user.lastActiveAt, locale)
-                                : t("widget.never")}
-                            </Span>
-                            <Span>{t("widget.columns.paid")}</Span>
-                            <Span className="text-right">
-                              {user.paymentsCount > 0
-                                ? formatUsd(user.totalPaidUsd, locale)
-                                : t("widget.compact.free")}
-                            </Span>
-                            <Span>{t("widget.columns.spent")}</Span>
-                            <Span className="text-right tabular-nums">
-                              {formatNumber(user.creditsSpent, locale)}
-                            </Span>
-                          </Div>
-                          {sourceText(user, t) && (
-                            <Span className="break-words text-muted-foreground">
-                              {sourceText(user, t)}
-                            </Span>
-                          )}
+                        <Div className="flex w-full min-w-0 flex-wrap items-center gap-x-3 gap-y-1 text-xs @3xl:hidden">
+                          <Span className="min-w-0 truncate text-muted-foreground">
+                            {planLabel(user, t, locale)}
+                          </Span>
+                          <AccountStatus user={user} t={t} locale={locale} />
+                          <Span className="ml-auto shrink-0 font-medium tabular-nums">
+                            {t("widget.creditAmount", {
+                              count: formatNumber(
+                                user.creditBalance,
+                                locale,
+                                2,
+                              ),
+                            })}
+                          </Span>
                         </Div>
                       )}
                       {isPickerMode && (
@@ -1443,7 +1571,9 @@ export function UsersListContainer({
                         )}
                       </TableCell>
                       <TableCell className="hidden text-right tabular-nums text-sm @3xl:table-cell">
-                        {formatNumber(user.creditBalance, locale)}
+                        {t("widget.creditAmount", {
+                          count: formatNumber(user.creditBalance, locale, 2),
+                        })}
                       </TableCell>
                       <TableCell
                         className={cn(
@@ -1453,50 +1583,44 @@ export function UsersListContainer({
                             : "text-muted-foreground",
                         )}
                       >
-                        {formatNumber(user.creditsSpent, locale)}
-                        <Span className="block text-[11px] font-normal text-muted-foreground">
-                          {t("widget.spent30d", {
-                            count: formatNumber(user.creditsSpent30d, locale),
+                        <Span>
+                          {t("widget.creditAmount", {
+                            count: formatNumber(user.creditsSpent, locale, 2),
                           })}
                         </Span>
+                        {user.creditsSpent30d > 0 && (
+                          <Span className="block text-[11px] font-normal text-muted-foreground">
+                            {t("widget.spent30d", {
+                              count: formatNumber(
+                                user.creditsSpent30d,
+                                locale,
+                                2,
+                              ),
+                            })}
+                          </Span>
+                        )}
                       </TableCell>
                       <TableCell className="hidden text-right tabular-nums text-sm @3xl:table-cell">
-                        {user.totalPaidUsd > 0 ? (
-                          <Span className="font-medium text-success">
-                            {formatUsd(user.totalPaidUsd, locale)}
-                          </Span>
+                        {user.paymentsCount > 0 ? (
+                          formatUsd(user.totalPaidUsd, locale)
                         ) : (
-                          <Span className="text-muted-foreground">-</Span>
+                          <Span className="text-muted-foreground">
+                            {t("widget.none")}
+                          </Span>
                         )}
                       </TableCell>
                       <TableCell className="hidden @3xl:table-cell">
-                        {user.subscriptionStatus ? (
-                          <Div className="flex flex-col items-start gap-0.5">
-                            {user.plan && (
-                              <Span className="text-xs font-medium">
-                                {subscriptionPlanLabel(user.plan, locale)}
-                              </Span>
-                            )}
-                            <StatusPill
-                              status={user.subscriptionStatus}
-                              label={subscriptionStatusLabel(
-                                user.subscriptionStatus,
-                                locale,
-                              )}
-                              variant={subscriptionStatusVariant(
-                                user.subscriptionStatus,
-                              )}
-                            />
-                          </Div>
-                        ) : (
-                          <Span className="whitespace-nowrap text-xs text-muted-foreground">
-                            {user.totalPaidUsd > 0 ? t("widget.oneOff") : "-"}
+                        <Div className="flex flex-col items-start gap-1">
+                          <Span className="text-xs">
+                            {planLabel(user, t, locale)}
                           </Span>
-                        )}
+                          <AccountStatus user={user} t={t} locale={locale} />
+                        </Div>
                       </TableCell>
                       <TableCell className="hidden text-xs text-muted-foreground max-w-[200px] @3xl:table-cell">
                         <Span className="block truncate">
-                          {sourceText(user, t) || t("widget.notTracked")}
+                          {sourceText(user, t, locale) ||
+                            t("widget.notTracked")}
                         </Span>
                       </TableCell>
                       <TableCell className="hidden w-10 @3xl:table-cell">
@@ -1526,7 +1650,7 @@ export function UsersListContainer({
       )}
 
       {/* Pagination */}
-      {summary && totalCount > 0 && (
+      {summary && totalPages > 1 && (
         <Div className="flex flex-wrap items-center justify-between gap-2 text-sm text-muted-foreground">
           <Span>
             {t("widget.pagination.showing", {
@@ -1535,33 +1659,31 @@ export function UsersListContainer({
               total: totalCount,
             })}
           </Span>
-          {totalPages > 1 && (
-            <Div className="flex items-center gap-1">
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                disabled={currentPage <= 1}
-                aria-label={t("widget.pagination.previous")}
-                onClick={() => handlePageChange(currentPage - 1)}
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-              <Span className="tabular-nums text-xs">
-                {currentPage} / {totalPages}
-              </Span>
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                disabled={currentPage >= totalPages}
-                aria-label={t("widget.pagination.next")}
-                onClick={() => handlePageChange(currentPage + 1)}
-              >
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-            </Div>
-          )}
+          <Div className="flex items-center gap-1">
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              disabled={currentPage <= 1}
+              aria-label={t("widget.pagination.previous")}
+              onClick={() => handlePageChange(currentPage - 1)}
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <Span className="tabular-nums text-xs">
+              {currentPage} / {totalPages}
+            </Span>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              disabled={currentPage >= totalPages}
+              aria-label={t("widget.pagination.next")}
+              onClick={() => handlePageChange(currentPage + 1)}
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </Div>
         </Div>
       )}
     </WidgetShell>

@@ -9,6 +9,7 @@ import type {
 } from "next-vibe/help-tool/category-types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 
+import type { PlatformSummaryInput } from "@/analytics/business/summary/definition";
 import { REVENUE_REPORT_ALIAS } from "@/payment/analytics/revenue/constants";
 import type invoiceList from "@/payment/invoice/list/definition";
 import { USER_ME_ALIAS } from "@/user/private/me/constants";
@@ -25,9 +26,41 @@ export const category: CategoryDefinition = {
     "es-ES": "Pagos",
     "sk-SK": "Platby",
   },
-  group: "business",
+  description: {
+    "en-US": "Track payments, refunds and processor settlement.",
+    "de-DE":
+      "Prüfen Sie Zahlungen, Erstattungen und Abrechnungen der Zahlungsanbieter.",
+    "pl-PL": "Śledź płatności, zwroty i rozliczenia operatorów płatności.",
+    "fr-FR":
+      "Suivez les paiements, les remboursements et les règlements des prestataires.",
+    "it-IT":
+      "Controlli i pagamenti, i rimborsi e gli accrediti dei gestori di pagamento.",
+    "es-ES":
+      "Revise los pagos, los reembolsos y las liquidaciones de los procesadores.",
+    "sk-SK": "Sledujte platby, refundácie a zúčtovanie platieb.",
+    "en-GLOBAL": "Track payments, refunds and processor settlement.",
+  },
+  group: "billing",
   icon: "credit-card",
   order: 10,
+  landing: {
+    summary: {
+      alias: "platform-summary",
+      scope: "platform",
+      progressive: true,
+      args: { section: "payments" } satisfies Pick<
+        PlatformSummaryInput,
+        "section"
+      >,
+    },
+    destinations: [
+      "revenue-report",
+      "products-catalog-list",
+      "processor-accounting",
+    ],
+    actions: ["payment_invoice_create_POST"],
+    overview: { alias: "revenue-report", scope: "platform" },
+  },
   defaultEntry: {
     [UserPermissionRole.ADMIN]: REVENUE_REPORT_ALIAS,
     [UserPermissionRole.CUSTOMER]: USER_ME_ALIAS,

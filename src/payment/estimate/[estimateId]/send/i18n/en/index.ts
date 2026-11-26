@@ -2,11 +2,11 @@ export const translations = {
   category: "Estimates",
   tags: { payment: "payment", estimate: "estimate" },
   post: {
-    title: "Send Estimate",
-    titleShort: "Send Estimate",
+    title: "Mark estimate as sent",
+    titleShort: "Mark estimate as sent",
     description: "Mark estimate as sent to customer",
     form: {
-      title: "Send Estimate",
+      title: "Mark estimate as sent",
       description: "Mark estimate as sent to customer",
     },
     response: { success: "Success", message: "Status message" },
@@ -47,9 +47,8 @@ export const translations = {
   estimateId: { label: "Estimate ID", description: "The estimate to act on" },
   widget: {
     back: "Back",
-    submit: "Send Estimate",
+    submit: "Mark as sent",
     sent: "Estimate marked as sent to customer.",
-    sendNote:
-      "The estimate status will be updated to Sent. The customer can then accept or decline it.",
+    sendNote: "Confirm that you have sent this estimate to the customer.",
   },
 };

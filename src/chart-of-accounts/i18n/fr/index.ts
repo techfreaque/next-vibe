@@ -61,10 +61,13 @@ export const translations: typeof enTranslations = {
       AR_PAYMENT: "Encaissement client",
       AP_BILL: "Facture fournisseur",
       AP_PAYMENT: "Paiement fournisseur",
+      SUPPLIER_EVIDENCE: "Justificatif fournisseur",
+      BANK_RECONCILIATION: "Rapprochement bancaire",
       POS_ORDER: "Vente en caisse",
       TAX_PAYMENT: "Paiement d'impôt",
       PERIOD_CLOSE: "Clôture de période",
       CREDIT_TRANSACTION: "Transaction de crédits",
+      REVENUE_RECOGNITION: "Comptabilisation des produits",
     },
     lineType: {
       DEBIT: "Débit",
@@ -207,6 +210,14 @@ export const translations: typeof enTranslations = {
       back: "Retour",
       loading: "Chargement de l'écriture…",
       postButton: "Comptabiliser",
+      relatedEntries: "Écritures liées",
+      reversalBadge: "Contre-passation",
+      originalEntry: "Écriture d’origine",
+      reversingEntry: "Écriture de contre-passation",
+      reversedBy: "Écriture de contre-passation",
+      originalLineNotes:
+        "Les libellés proviennent de l’écriture d’origine. Les colonnes débit et crédit correspondent à la contre-passation.",
+      reverseReversal: "Contre-passer cette contre-passation",
       reverseButton: "Contre-passer",
       balancedLabel: "Équilibrée",
       notBalancedLabel: "Déséquilibrée",
@@ -471,17 +482,16 @@ export const translations: typeof enTranslations = {
       unbalanced: "Déséquilibrée",
       noActivity: "Aucun compte mouvementé sur cette période.",
       total: "Total",
-      selectCompany:
-        "Saisissez un ID d'entreprise ci-dessus et cliquez sur Exécuter pour générer la balance.",
+      selectCompany: "Sélectionnez une entreprise pour consulter ce rapport.",
     },
     title: "Balance générale",
     titleShort: "Balance",
     description:
       "Total des débits et crédits comptabilisés par compte à une date donnée. Vérifie que les comptes sont équilibrés.",
     companyId: {
-      label: "ID de l'entreprise",
+      label: "Entreprise",
       description: "Entreprise concernée",
-      placeholder: "UUID de l'entreprise",
+      placeholder: "Choisir une entreprise",
     },
     asOfDate: {
       label: "Date d'arrêté",
@@ -566,7 +576,9 @@ export const translations: typeof enTranslations = {
       previousMonth: "Mois précédent",
       autoCurrency: "Automatique",
       run: "Exécuter",
-      running: "Exécution…",
+      running: "Chargement du rapport…",
+      loadError: "Impossible de charger le rapport",
+      retry: "Réessayer",
     },
   },
   profitLoss: {
@@ -574,17 +586,16 @@ export const translations: typeof enTranslations = {
       dateRange: "Période",
       noData: "Aucune donnée pour cette période.",
       liabilitiesAndEquity: "Passif + capitaux propres",
-      selectCompany:
-        "Saisissez un ID d'entreprise ci-dessus et cliquez sur Exécuter pour générer le compte de résultat.",
+      selectCompany: "Sélectionnez une entreprise pour consulter ce rapport.",
     },
     title: "Compte de résultat",
     titleShort: "Résultat",
     description:
       "Produits et charges sur une plage de dates. Affiche la marge brute, le résultat d'exploitation et le résultat net.",
     companyId: {
-      label: "ID de l'entreprise",
+      label: "Entreprise",
       description: "Entreprise concernée",
-      placeholder: "UUID de l'entreprise",
+      placeholder: "Choisir une entreprise",
     },
     from: {
       label: "Du",
@@ -662,16 +673,16 @@ export const translations: typeof enTranslations = {
       unbalanced: "Déséquilibré",
       noEntries: "Aucune écriture pour cette période",
       liabilitiesAndEquity: "Passif et capitaux propres",
-      selectCompany: "Choisissez une entreprise pour voir le bilan",
+      selectCompany: "Sélectionnez une entreprise pour consulter ce rapport.",
     },
     title: "Bilan",
     titleShort: "Bilan",
     description:
       "Actif, passif et capitaux propres à une date donnée. Vérifie que l'équation comptable est respectée.",
     companyId: {
-      label: "ID de l'entreprise",
+      label: "Entreprise",
       description: "Entreprise concernée",
-      placeholder: "UUID de l'entreprise",
+      placeholder: "Choisir une entreprise",
     },
     asOfDate: {
       label: "Date d'arrêté",
@@ -838,21 +849,24 @@ export const translations: typeof enTranslations = {
   },
   taxReport: {
     widget: {
+      filters: "Période et devise",
+      window: "Du {{from}} au {{to}}",
       dateRange: "Période",
       noData: "Aucune donnée fiscale pour cette période.",
       summarySection: "Synthèse",
-      detailSection: "Détail",
-      selectCompany:
-        "Saisissez un ID d'entreprise ci-dessus et cliquez sur Exécuter pour générer la déclaration fiscale.",
+      detailSection: "Écritures sur les comptes de TVA",
+      scopeHint:
+        "Consultez la TVA collectée et déductible pour la période choisie.",
+      selectCompany: "Sélectionnez une entreprise pour consulter ce rapport.",
     },
     title: "Déclaration fiscale",
     titleShort: "Déclaration fiscale",
     description:
-      "TVA collectée et TVA déductible sur une période. La TVA nette à payer en un coup d'œil.",
+      "Consultez les mouvements comptabilisés sur les comptes de TVA pour la période choisie.",
     companyId: {
-      label: "ID de l'entreprise",
+      label: "Entreprise",
       description: "Entreprise concernée",
-      placeholder: "UUID de l'entreprise",
+      placeholder: "Choisir une entreprise",
     },
     from: {
       label: "Du",
@@ -867,12 +881,12 @@ export const translations: typeof enTranslations = {
     response: {
       from: "Du",
       to: "Au",
-      vatCollected: "TVA collectée",
-      vatReclaimable: "TVA déductible",
+      vatCollected: "TVA collectée comptabilisée",
+      vatReclaimable: "TVA déductible comptabilisée",
       netVatPayable: "TVA nette à payer",
       lines: "Lignes de taxe",
-      taxRateCode: "Code du taux",
-      taxRateName: "Nom du taux",
+      taxRateCode: "Numéro de compte",
+      taxRateName: "Intitulé du compte",
       netAmount: "Montant HT",
       taxAmount: "Montant de TVA",
       rate: "Taux",

@@ -37,8 +37,8 @@ export function WidgetHeader({
         style={style}
       >
         {breadcrumb}
+        {backButton && <div className="flex min-w-0">{backButton}</div>}
         <div className="flex flex-wrap items-start gap-3 @lg:items-center">
-          {backButton}
           <div className="mr-auto min-w-0 basis-full @lg:min-w-48 @lg:flex-1">
             <div className="flex min-w-0 flex-wrap items-center gap-2">
               <h1 className="min-w-0 break-words text-2xl font-semibold leading-tight tracking-tight">

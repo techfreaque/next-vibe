@@ -30,6 +30,7 @@ import {
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import type { EndpointLogger } from "next-vibe/logger/types";
+import { AnalyticsRange } from "next-vibe/unified-ui/analytics/enum";
 import type { BreakdownRow, Kpi } from "next-vibe/unified-ui/analytics/schema";
 import {
   type AnalyticsWindow,
@@ -50,8 +51,9 @@ import {
   RefundStatus,
 } from "../../enum";
 import {
-  notInternalUserSql,
   paymentKindSql,
+  REPORTABLE_PAYMENT_SQL,
+  reportingUserSql,
   REVENUE_FX_RATES,
   usdSql,
   utcTs,
@@ -110,7 +112,7 @@ export interface RevenueFilters {
 }
 
 function internalUserFilter(column: string, includeInternal: boolean): SQL {
-  return includeInternal ? sql`` : sql`AND ${notInternalUserSql(column)}`;
+  return sql`AND ${reportingUserSql(column, includeInternal)}`;
 }
 
 /**
@@ -134,7 +136,7 @@ function paymentsCte(filters: RevenueFilters): SQL {
         FROM payment_transactions pt
         LEFT JOIN subscriptions s
           ON s.provider_subscription_id = pt.metadata->>'subscriptionId'
-        WHERE pt.mode <> ${CheckoutMode.SETUP}
+        WHERE ${REPORTABLE_PAYMENT_SQL} AND pt.mode <> ${CheckoutMode.SETUP}
           ${internalUserFilter("pt.user_id", filters.includeInternal)}
           ${filters.provider ? sql`AND pt.provider = ${filters.provider}` : sql``}
           ${filters.currency ? sql`AND pt.currency = ${filters.currency}` : sql``}
@@ -192,7 +194,9 @@ export class RevenueReportRepository {
       const win = resolveAnalyticsWindow(
         data,
         new Date(),
-        await RevenueReportRepository.dataFloor(),
+        data.range === AnalyticsRange.ALL_TIME
+          ? await RevenueReportRepository.dataFloor(data.includeInternal)
+          : null,
       );
       return success(
         await RevenueReportRepository.build(win, {
@@ -213,15 +217,109 @@ export class RevenueReportRepository {
   }
 
   /** Earliest payment or subscription (bounds all-time windows). */
-  static async dataFloor(): Promise<Date | null> {
+  static async dataFloor(includeInternal: boolean): Promise<Date | null> {
     const result = await db.execute<QueryResultRow & { first: string | null }>(
       sql`SELECT to_char(LEAST(
-            (SELECT min(created_at) FROM payment_transactions),
-            (SELECT min(created_at AT TIME ZONE 'UTC') FROM subscriptions)
+            (SELECT min(created_at) FROM payment_transactions pt WHERE ${REPORTABLE_PAYMENT_SQL} AND ${reportingUserSql("pt.user_id", includeInternal)}),
+            (SELECT min(created_at AT TIME ZONE 'UTC') FROM subscriptions s WHERE ${reportingUserSql("s.user_id", includeInternal)})
           ), 'YYYY-MM-DD') AS first`,
     );
     const first = result.rows[0]?.first;
     return first ? new Date(`${first}T00:00:00.000Z`) : null;
+  }
+
+  /** Lightweight landing projection using the same payment and refund filters as the detailed report. */
+  static async headline(
+    win: AnalyticsWindow,
+    includeRefunds = false,
+  ): Promise<{
+    revenueUsd: Kpi;
+    payingCustomers: Kpi;
+    refundsUsd?: Kpi;
+    netRevenueUsd?: Kpi;
+    payingCustomersTrend: number[];
+    revenueTrend: number[];
+  }> {
+    const cte = paymentsCte({ kind: RevenueKind.ALL, includeInternal: false });
+    const from = utcTs(win.from);
+    const first = utcTs(win.previousFrom ?? win.from);
+    const to = utcTs(win.to);
+    const rows = await db.execute<
+      QueryResultRow & {
+        current: boolean;
+        total: boolean;
+        refunds: NumLike;
+        byCustomerBucket: boolean;
+        bucket: string | null;
+        revenue: NumLike;
+        payers: NumLike;
+      }
+    >(sql`${cte}, paid_window AS (
+      SELECT at >= ${from} AS current, ${bucketSql(sql.raw("at"), win.bucket)} AS bucket,
+        kind, provider, usd, user_id FROM pa
+      WHERE paid AND at >= ${first} AND at < ${to}
+    ), grouped AS (
+    SELECT current, grouping(bucket) = 1 AS total, grouping(kind) = 1 AS "byCustomerBucket", bucket,
+      sum(usd) AS revenue, count(DISTINCT user_id) AS payers
+    FROM paid_window
+    GROUP BY GROUPING SETS ((current), (current, bucket), (current, bucket, kind, provider)))
+    ${
+      includeRefunds
+        ? sql`, refunded AS (
+      SELECT r.created_at >= ${from} AS current, sum(${usdSql("r.amount", "r.currency")}) AS refunds
+      FROM payment_refunds r JOIN pa ON pa.id=r.transaction_id
+      WHERE r.status=${RefundStatus.SUCCEEDED} AND r.created_at>=${first} AND r.created_at<${to}
+      GROUP BY 1)
+      SELECT grouped.*, null::numeric AS refunds FROM grouped WHERE NOT total
+      UNION ALL
+      SELECT current, true AS total, true AS "byCustomerBucket", null AS bucket,
+        grouped.revenue, grouped.payers, refunded.refunds
+      FROM (SELECT * FROM grouped WHERE total) grouped FULL JOIN refunded USING (current)`
+        : sql`SELECT grouped.*, null::numeric AS refunds FROM grouped`
+    }`);
+    const current = rows.rows.find((row) => row.total && row.current);
+    const previous = rows.rows.find((row) => row.total && !row.current);
+    // The full report rounds the processor/kind buckets before combining them.
+    const trend = rows.rows.flatMap((row) =>
+      row.current && row.bucket && !row.byCustomerBucket
+        ? [{ bucket: row.bucket, value: round(num(row.revenue)) }]
+        : [],
+    );
+    return {
+      revenueUsd: kpi(
+        num(current?.revenue),
+        win.previousFrom ? num(previous?.revenue) : null,
+      ),
+      payingCustomers: kpi(
+        num(current?.payers),
+        win.previousFrom ? num(previous?.payers) : null,
+      ),
+      ...(includeRefunds
+        ? {
+            refundsUsd: kpi(
+              num(current?.refunds),
+              win.previousFrom ? num(previous?.refunds) : null,
+            ),
+            netRevenueUsd: kpi(
+              num(current?.revenue) - num(current?.refunds),
+              win.previousFrom
+                ? num(previous?.revenue) - num(previous?.refunds)
+                : null,
+            ),
+          }
+        : {}),
+      payingCustomersTrend: fillBuckets(
+        win.buckets,
+        rows.rows.flatMap((row) =>
+          row.current && row.bucket && row.byCustomerBucket
+            ? [{ bucket: row.bucket, value: num(row.payers) }]
+            : [],
+        ),
+      ),
+      revenueTrend: fillBuckets(win.buckets, trend).map((value) =>
+        round(value),
+      ),
+    };
   }
 
   static async paymentTotals(
@@ -291,6 +389,7 @@ export class RevenueReportRepository {
         SELECT ${usdSql("pt.amount", "pt.currency")} AS usd
         FROM payment_transactions pt
         WHERE pt.user_id = s.user_id
+          AND ${REPORTABLE_PAYMENT_SQL}
           AND pt.mode = ${CheckoutMode.SUBSCRIPTION}
           AND pt.status IN (${PaymentStatus.SUCCEEDED}, ${PaymentStatus.REFUNDED})
           AND pt.created_at < ${utcTs(at)}
@@ -347,6 +446,7 @@ export class RevenueReportRepository {
         FROM payment_transactions pt
         WHERE s.id IS NOT NULL
           AND pt.user_id = s.user_id
+          AND ${REPORTABLE_PAYMENT_SQL}
           AND pt.mode = ${CheckoutMode.SUBSCRIPTION}
           AND pt.status IN (${PaymentStatus.SUCCEEDED}, ${PaymentStatus.REFUNDED})
           AND pt.created_at < (v.e AT TIME ZONE 'UTC')

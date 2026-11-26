@@ -123,6 +123,7 @@ export const translations: typeof enTranslations = {
           replied: "odpowiedź {{date}}",
         },
         deals: {
+          prepareBill: "Przygotuj fakturę zakupu",
           title: "Opłacone deale",
           hint: "Wydatki kontra wizyty, rejestracje i przychód z linku śledzącego lub kodu polecającego danego deala.",
           columns: {

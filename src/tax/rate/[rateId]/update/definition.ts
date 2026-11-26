@@ -76,7 +76,7 @@ const { PATCH } = createEndpoint({
         label: "rate.update.rate.label" as const,
         description: "rate.update.rate.description" as const,
         placeholder: "rate.update.rate.placeholder" as const,
-        schema: z.number().min(0).max(1).optional(),
+        schema: z.number().min(0).max(1).multipleOf(0.0001).optional(),
       }),
       isDefault: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -154,8 +154,8 @@ const { PATCH } = createEndpoint({
     },
     requests: {
       default: {
-        name: "VAT 20% (updated)",
-        rate: undefined,
+        name: "VAT 20%",
+        rate: 0.2,
         isDefault: undefined,
         isActive: undefined,
       },

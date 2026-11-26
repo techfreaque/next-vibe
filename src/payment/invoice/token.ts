@@ -9,6 +9,7 @@ import "server-only";
 
 import { createHmac, timingSafeEqual } from "node:crypto";
 
+import { coreEnv } from "next-vibe/core/env";
 import { identityEnv } from "next-vibe/identity/env";
 
 /**
@@ -37,4 +38,10 @@ export function verifyInvoiceViewToken(
     Buffer.from(expected, "utf8"),
     Buffer.from(token, "utf8"),
   );
+}
+
+/** Rebuild the same bearer link for an authorized issuer. */
+export function buildInvoiceViewUrl(invoiceId: string): string {
+  const base = coreEnv.NEXT_PUBLIC_APP_URL.replace(/\/+$/, "");
+  return `${base}/invoice/${invoiceId}?token=${generateInvoiceViewToken(invoiceId)}`;
 }

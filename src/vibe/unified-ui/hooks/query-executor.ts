@@ -105,6 +105,24 @@ export function isQueryRequestValid<TEndpoint extends CreateApiEndpointAny>(
   endpoint: TEndpoint,
   requestData: TEndpoint["types"]["RequestOutput"],
 ): boolean {
+  const options = endpoint.options;
+  if (
+    options &&
+    "autoFetchRequires" in options &&
+    options.autoFetchRequires?.some((key) => {
+      if (
+        !requestData ||
+        typeof requestData !== "object" ||
+        !(key in requestData)
+      ) {
+        return true;
+      }
+      const value = Reflect.get(requestData, key);
+      return value === undefined || value === null || value === "";
+    })
+  ) {
+    return false;
+  }
   const requestSchema = endpoint.requestSchema as z.ZodTypeAny;
   if (requestSchema instanceof z.ZodNever) {
     return true;

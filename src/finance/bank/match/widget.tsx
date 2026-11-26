@@ -15,6 +15,7 @@ import {
   useWidgetIsSubmitting,
   useWidgetLocale,
   useWidgetLogger,
+  useWidgetNavigation,
   useWidgetOnSubmit,
   useWidgetResponseOnly,
   useWidgetTranslation,
@@ -41,6 +42,7 @@ export function BankMatchWidget({
   const t = useWidgetTranslation<typeof definition.POST>();
   const data = useWidgetValue<typeof definition.POST>();
   const locale = useWidgetLocale();
+  const { push } = useWidgetNavigation();
   const onSubmit = useWidgetOnSubmit();
   const isSubmitting = useWidgetIsSubmitting();
   const form = useWidgetForm<typeof definition.POST>();
@@ -60,8 +62,7 @@ export function BankMatchWidget({
   const options = useMemo(
     () => ({
       read: {
-        urlPathParams: { lineId },
-        initialState: { companyId },
+        initialState: { companyId, lineId },
         queryOptions: { enabled: readEnabled },
       },
     }),
@@ -81,6 +82,10 @@ export function BankMatchWidget({
       ? loaded
       : undefined;
   const journal = review?.matches.find(({ id }) => id === journalLineId);
+  const exactAmount = review?.statementLine.amount;
+  const exactCurrency = review?.statementLine.currency;
+  const showExact =
+    exactAmount !== undefined && /\.\d{2}\d*[1-9]\d*$/u.test(exactAmount);
 
   return (
     <WidgetShell layout="page">
@@ -89,11 +94,30 @@ export function BankMatchWidget({
         subtitle={t("match.description")}
       />
       {data ? (
-        <ResultBanner
-          title={t("match.success")}
-          variant="success"
-          message={formatDocDate(data.matchedAt, locale)}
-        />
+        <>
+          <ResultBanner
+            title={t("match.success")}
+            variant="success"
+            message={formatDocDate(data.matchedAt, locale)}
+          />
+          {interactive && data.adjustmentJournalEntryId && (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                const entryId = data.adjustmentJournalEntryId;
+                if (entryId) {
+                  void import("@/chart-of-accounts/journal/[entryId]/get/definition").then(
+                    ({ default: routes }) =>
+                      push(routes.GET, { urlPathParams: { entryId } }),
+                  );
+                }
+              }}
+            >
+              {t("adjustment.journal")}
+            </Button>
+          )}
+        </>
       ) : (
         <>
           {!z.uuid().safeParse(companyId).success && (
@@ -129,13 +153,48 @@ export function BankMatchWidget({
                   locale,
                 )}
               />
-              <DetailField
-                label={t("fields.exactAmount")}
-                value={`${review.statementLine.amount} ${review.statementLine.currency}`}
-              />
+              {showExact &&
+                exactCurrency &&
+                /^[A-Z]{3}$/u.test(exactCurrency) && (
+                  <DetailField
+                    label={t("fields.exactAmount")}
+                    value={new Intl.NumberFormat(locale, {
+                      style: "currency",
+                      currency: exactCurrency,
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 4,
+                    }).format(Number(exactAmount))}
+                  />
+                )}
+              {journal.fee !== undefined && journal.fee !== 0 && (
+                <DetailField
+                  label={t("statement.columns.feeAmount")}
+                  value={formatMoney(
+                    journal.fee,
+                    review.statementLine.currency,
+                    locale,
+                  )}
+                />
+              )}
+              {journal.fx !== undefined && journal.fx !== 0 && (
+                <DetailField
+                  label={t("adjustment.fxDifference")}
+                  value={formatMoney(
+                    journal.fx,
+                    review.statementLine.currency,
+                    locale,
+                  )}
+                />
+              )}
             </DetailGrid>
           )}
-          <P className="text-sm text-muted-foreground">{t("ui.confirmHint")}</P>
+          <P className="text-sm text-muted-foreground">
+            {t(
+              journal?.kind === "fee" || journal?.kind === "fx"
+                ? "adjustment.confirmHint"
+                : "ui.confirmHint",
+            )}
+          </P>
           <FormAlertWidget field={{}} />
           {interactive && onSubmit && (
             <Button

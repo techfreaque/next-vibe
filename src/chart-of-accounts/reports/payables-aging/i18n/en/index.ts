@@ -56,6 +56,7 @@ export const translations = {
       "Disputed bills are excluded from the approved and pending totals.",
   },
   widget: {
+    showBills: "View bills",
     asOf: "As of {{date}}",
     back: "Back",
     loading: "Loading payables",

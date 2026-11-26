@@ -1402,6 +1402,41 @@
       "when": 1795639088528,
       "tag": "20261125203808_moaning_quentin_quire",
       "breakpoints": true
+    },
+    {
+      "idx": 200,
+      "version": "7",
+      "when": 1795648036215,
+      "tag": "20261125230716_admin_accounting_bank",
+      "breakpoints": true
+    },
+    {
+      "idx": 201,
+      "version": "7",
+      "when": 1795648747877,
+      "tag": "20261125231907_bank_consent_privacy",
+      "breakpoints": true
+    },
+    {
+      "idx": 202,
+      "version": "7",
+      "when": 1795652043891,
+      "tag": "20261126001403_subscription_service_periods",
+      "breakpoints": true
+    },
+    {
+      "idx": 203,
+      "version": "7",
+      "when": 1795657597223,
+      "tag": "20261126014637_pos_terminal_warehouse",
+      "breakpoints": true
+    },
+    {
+      "idx": 204,
+      "version": "7",
+      "when": 1795669648132,
+      "tag": "20261126050728_pos_line_settlement",
+      "breakpoints": true
     }
   ]
 }

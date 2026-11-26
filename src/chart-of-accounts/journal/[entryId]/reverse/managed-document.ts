@@ -2,6 +2,8 @@ import "server-only";
 
 import { and, eq } from "drizzle-orm";
 
+import { bankStatementLines } from "@/finance/bank/db";
+import { hasMatchedBankJournalEntry } from "@/finance/bank/reversal-guard";
 import { paymentBills, paymentInvoices } from "@/payment/db";
 import { posOrders, posSessions, posTerminals } from "@/pos/db";
 
@@ -13,6 +15,12 @@ export async function hasManagedJournalDocument(
   tx: LedgerTransaction,
   entry: JournalEntry,
 ): Promise<boolean> {
+  if (await hasMatchedBankJournalEntry(tx, entry.companyId, entry.id)) {
+    return true;
+  }
+  if (entry.sourceType === JournalSourceType.REVENUE_RECOGNITION) {
+    return true;
+  }
   if (entry.sourceType === JournalSourceType.MANUAL) {
     return false;
   }
@@ -75,6 +83,18 @@ export async function hasManagedJournalDocument(
           ),
         );
       return !!order;
+    }
+    case JournalSourceType.BANK_RECONCILIATION: {
+      const [statement] = await tx
+        .select({ id: bankStatementLines.id })
+        .from(bankStatementLines)
+        .where(
+          and(
+            eq(bankStatementLines.id, sourceId),
+            eq(bankStatementLines.companyId, entry.companyId),
+          ),
+        );
+      return !!statement;
     }
     default:
       return false;

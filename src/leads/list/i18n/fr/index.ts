@@ -325,6 +325,7 @@ export const translations: typeof enTranslations = {
     paid: "Payé",
     chatted: "A chatté",
     bot: "Bot",
+    listFilters: "Filtres et tri",
     analyticsFilters: "Plus de filtres",
     apply: "Appliquer",
   },

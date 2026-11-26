@@ -90,6 +90,11 @@ export const translations: typeof enTranslations = {
         enterPhoneNumber: "Telefonnummer eingeben",
         required: "Pflichtfeld",
         selectDate: "Datum auswählen",
+        openCalendar: "Kalender öffnen",
+        startDate: "Startdatum",
+        endDate: "Enddatum",
+        decreaseValue: "Wert verringern",
+        increaseValue: "Wert erhöhen",
         unknownFieldType: "Unbekannter Feldtyp",
       },
       entityPicker: {
@@ -135,6 +140,8 @@ export const translations: typeof enTranslations = {
       httpStatus: "Anfrage an {{url}} mit Status {{status}} fehlgeschlagen",
       responseValidation: "Serverantwort ist ungültig: {{error}}",
       malformedResponse: "Fehlerhafte Antwort von {{url}}",
+      recordTimeout:
+        "Das Laden dieses Eintrags dauert zu lange. Versuchen Sie es erneut.",
       requestFailed: "Anfrage an {{path}} fehlgeschlagen: {{error}}",
       endpointFailed: "{{reason}} — {{path}}: {{error}}",
     },

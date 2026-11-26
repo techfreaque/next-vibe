@@ -108,6 +108,10 @@ export const financeProviderSnapshots = pgTable(
     cumulativeUsageUsd: doublePrecision("cumulative_usage_usd"),
     /** Spend in USD since the previous reading */
     spendUsd: doublePrecision("spend_usd"),
+    /** Legacy rows have no interval provenance and remain unclassified. */
+    spendEvidence: text("spend_evidence", {
+      enum: ["counter", "balance-delta", "usage-estimate"],
+    }),
     /** Provider-reported spend in its own unit, for a non-USD balance */
     spendNative: doublePrecision("spend_native"),
     /** Hours between the previous reading and this one */

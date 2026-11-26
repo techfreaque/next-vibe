@@ -76,8 +76,15 @@ import type endpoints from "./definition";
 import type { RemoteConnection } from "./definition";
 import { FleetHealthReport } from "./fleet-health";
 
+function useIsToolsPage(): boolean {
+  const [, firstSegment, secondSegment] = usePathname().split("/");
+  return firstSegment === "tools" || secondSegment === "tools";
+}
+
 function connectionStatus(
   conn: RemoteConnection,
+  date: (value: string) => string,
+  compact: boolean,
   t: ReturnType<typeof useWidgetTranslation<typeof endpoints.GET>>,
 ): { label: string; variant: StatusPillVariant } {
   if (!conn.hasToken && !conn.remoteUrl) {
@@ -99,7 +106,12 @@ function connectionStatus(
     return { label: t("widget.health.noSyncRecorded"), variant: "warning" };
   }
   if (getSyncHealthIssue(Date.parse(conn.lastSyncedAt))) {
-    return { label: t("fleet.issue.staleSync"), variant: "warning" };
+    return {
+      label: compact
+        ? t("widget.health.overdue")
+        : t("fleet.issue.staleSync", { at: date(conn.lastSyncedAt) }),
+      variant: "warning",
+    };
   }
   if (conn.wsConnectedAt) {
     return { label: t("widget.health.socketOpen"), variant: "success" };
@@ -386,10 +398,10 @@ function ConnectionRow({
   const isInteractive = widgetIsInteractive && !responseOnly;
   const navigateRelated = useRelatedEntityNavigation();
   const isSelf = !conn.hasToken && conn.remoteUrl === "";
-  const status = connectionStatus(conn, t);
   const remoteUrl = conn.remoteUrl || conn.localUrl;
   const date = (value: string): string =>
     new Date(value).toLocaleString(locale, { timeZoneName: "short" });
+  const status = connectionStatus(conn, date, useIsToolsPage(), t);
 
   const handleView = (): void => {
     if (isPickerMode && onPick) {
@@ -549,6 +561,9 @@ function CloudView({
   isAdmin: boolean;
 }): JSX.Element {
   const appUrl = envClient.NEXT_PUBLIC_APP_URL ?? "";
+  const [guideOpen, setGuideOpen] = useState(false);
+  const isToolsPage = useIsToolsPage();
+  const foldGuide = isToolsPage && connections.length > 0;
   const openBuy = (): void => {
     void (async (): Promise<void> => {
       const def = await import("@/subscription/create/definition");
@@ -592,7 +607,21 @@ function CloudView({
           </Div>
         )}
       </Div>
-      {!isPickerMode && (
+      {!isPickerMode && foldGuide && (
+        <Div>
+          <Button
+            type="button"
+            variant="outline"
+            className="min-h-11"
+            aria-expanded={guideOpen}
+            onClick={() => setGuideOpen((open) => !open)}
+          >
+            <Plus className="size-4" aria-hidden="true" />
+            {t("widget.cloud.connectAnother")}
+          </Button>
+        </Div>
+      )}
+      {!isPickerMode && (!foldGuide || guideOpen) && (
         <>
           <Div className="flex flex-col gap-2">
             <H3 className="text-xl font-bold tracking-tight">
@@ -845,16 +874,14 @@ export function RemoteConnectionsListContainer(): JSX.Element {
   const widgetIsInteractive = useWidgetIsInteractive();
   const responseOnly = useWidgetResponseOnly();
   const isInteractive = widgetIsInteractive && !responseOnly;
-  const [, firstSegment, secondSegment] = usePathname().split("/");
+  const isToolsPage = useIsToolsPage();
   const onPick = usePickerCallback<RemoteConnection>();
   const user = useWidgetUser();
   const isPickerMode = !!onPick;
   const isCloud = envClient.NEXT_PUBLIC_VIBE_MODE === VibeMode.CLOUD;
   const isAdmin =
     !user.isPublic && user.roles?.includes(UserPermissionRole.ADMIN) === true;
-  const isToolsPage = firstSegment === "tools" || secondSegment === "tools";
-  const showBillingHeader =
-    isInteractive && !isPickerMode && !(isAdmin && isToolsPage);
+  const showBillingHeader = isInteractive && !isPickerMode && !isToolsPage;
   const hasError = response?.success === false;
   const platform = useWidgetPlatform();
   const isTextSurface = isCliPlatform(platform) || platform === Platform.MCP;

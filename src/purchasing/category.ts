@@ -21,9 +21,27 @@ export const category: CategoryDefinition = {
     "es-ES": "Compras",
     "sk-SK": "Nákup",
   },
+  description: {
+    "en-US": "Manage suppliers, purchase orders and deliveries.",
+    "de-DE": "Verwalten Sie Lieferanten, Bestellungen und Lieferungen.",
+    "pl-PL": "Zarządzaj dostawcami, zamówieniami i dostawami.",
+    "fr-FR": "Gérez les fournisseurs, les commandes et les livraisons.",
+    "it-IT": "Gestisca i fornitori, gli ordini di acquisto e le consegne.",
+    "es-ES": "Gestione proveedores, pedidos de compra y entregas.",
+    "sk-SK": "Spravujte dodávateľov, nákupné objednávky a dodávky.",
+    "en-GLOBAL": "Manage suppliers, purchase orders and deliveries.",
+  },
   group: "business",
   icon: "shopping-bag",
   order: 55,
+  createActions: [
+    "purchasing_order_create_POST",
+    "purchasing_vendor_create_POST",
+  ],
+  landing: {
+    actions: ["purchasing-orders", "purchasing-vendors"],
+    overview: { alias: "purchasing-dashboard", scope: "company" },
+  },
   defaultEntry: {
     [UserPermissionRole.ADMIN]: PURCHASING_DASHBOARD_ALIAS,
     [UserPermissionRole.CUSTOMER]: USER_ME_ALIAS,

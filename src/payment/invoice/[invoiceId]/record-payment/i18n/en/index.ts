@@ -5,12 +5,12 @@ export const translations = {
     invoice: "invoice",
   },
   post: {
-    title: "Record Manual Payment",
-    titleShort: "Record Payment",
+    title: "Record payment",
+    titleShort: "Record payment",
     description:
       "Record a manual payment against an invoice. Marks it as Paid if fully settled.",
     form: {
-      title: "Record Payment",
+      title: "Record payment",
       description: "Enter payment details to record against this invoice",
     },
     response: {
@@ -88,17 +88,17 @@ export const translations = {
     placeholder: "Enter invoice ID",
   },
   amount: {
-    label: "Amount Paid",
+    label: "Amount paid",
     description: "Amount received",
     placeholder: "0.00",
   },
   method: {
-    label: "Payment Method",
+    label: "Payment method",
     description: "How the payment was received",
     placeholder: "Select method",
   },
   paidAt: {
-    label: "Payment Date",
+    label: "Payment date",
     description: "When the payment was received",
     placeholder: "Select date",
   },
@@ -108,13 +108,15 @@ export const translations = {
       "Use the same key to retry this payment. Use a new key for another receipt.",
   },
   accountNodeId: {
-    label: "Account Node ID",
-    description: "Optional: accounting node that received this payment",
-    placeholder: "Enter account node ID",
+    label: "Payment account",
+    description: "Choose the bank or cash account that received the payment.",
+    placeholder: "Choose an account",
+    automatic: "Use the default account",
   },
   widget: {
+    details: "Payment details",
     back: "Back",
-    submit: "Record Payment",
+    submit: "Record payment",
     paymentRecorded: "Payment recorded successfully.",
     viewInvoice: "View Invoice",
   },

@@ -5,6 +5,28 @@ import { translations as leadAnalyticsTranslations } from "@/leads/analytics/i18
 export const translations = {
   ...analyticsTranslations,
   ...leadAnalyticsTranslations,
+  platformSummary: {
+    grossReceipts: "Gross receipts",
+    refunds: "Refunds",
+    netReceipts: "Receipts after refunds",
+
+    valuationBasis:
+      "Margin uses credits at list price minus provider cost. Only usage with a recorded cost is included.",
+    valuationCost: "Estimated AI cost",
+    valuationMargin: "Estimated AI usage margin",
+    newAccount: "Account registered",
+    receivedPayment: "Payment received",
+    completedTask: "Scheduled task completed",
+    operations: "Operations",
+    emptyActivity: "No activity in this period.",
+    period: "Last 30 days compared with the previous 30 days",
+    retry: "Try again",
+    title: "Platform overview",
+    description:
+      "Review acquisition, revenue and service health over the last 30 days.",
+    unavailable: "Unavailable",
+    recent: "Recent activity",
+  },
   category: "Analytics",
   tags: {
     analytics: "Analytics",

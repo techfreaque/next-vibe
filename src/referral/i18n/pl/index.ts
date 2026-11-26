@@ -168,25 +168,36 @@ export const translations: typeof enTranslations = {
       description: "Pomyślnie pobrano Twoje statystyki poleceń",
     },
     widget: {
+      emptyAdminMessage:
+        "Otwórz przegląd, aby zobaczyć aktywność w całym programie.",
+      loading: "Wczytywanie statystyk poleceń",
+      loadError: "Nie udało się wczytać statystyk poleceń",
+      retry: "Spróbuj ponownie",
+      emptyTitle: "Brak aktywności w poleceniach",
+      openCodes: "Otwórz kody polecające",
+      revenueCoverage:
+        "Pierwotna kwota zapisana dla {{measured}} z {{total}} zakupów.",
+      revenueUnavailable: "Brak danych",
+      walletUnits: "Kredyty: {{amount}}",
       adminNotice:
-        "To Twoje osobiste wyniki poleceń. Cały program znajdziesz w przeglądzie poleceń.",
+        "Te dane dotyczą Twoich poleceń. Przegląd zawiera wyniki całego programu.",
       openOverview: "Otwórz przegląd poleceń",
-      emptyMessage:
-        "Brak aktywności - udostępnij link polecający, aby zacząć zarabiać",
+      emptyMessage: "Udostępnij kod, aby śledzić rejestracje i prowizje.",
     },
     fields: {
       totalSignups: "Łączne rejestracje",
       totalSignupsDescription:
         "Liczba użytkowników, którzy zarejestrowali się za pomocą Twojego kodu polecającego",
-      totalRevenue: "Łączny przychód",
+      totalRevenue: "Zarejestrowana wartość zakupów",
       totalRevenueDescription:
-        "Całkowity przychód wygenerowany z Twoich poleceń",
+        "Pierwotne kwoty w USD, od których naliczono prowizje.",
       totalEarned: "Łącznie zarobione",
-      totalEarnedDescription: "Całkowita prowizja zarobiona z poleceń",
+      totalEarnedDescription: "Zdobyte kredyty, w tym objęte okresem zwrotu.",
       availableBalance: "Dostępne saldo",
-      availableBalanceDescription: "Dostępne saldo gotowe do wypłaty",
+      availableBalanceDescription:
+        "Kredyty dostępne po odjęciu zarezerwowanych wypłat.",
       availableBalanceDescriptionLow:
-        "Wydawaj na czaty AI - inne kredyty używane są najpierw. Zarobić {{minPayout}}, aby odblokować wypłatę.",
+        "Kredyty dostępne po odjęciu zarezerwowanych wypłat. Minimalna wypłata: {{minPayout}} kredytów.",
       totalRevenueCredits: "Łączny przychód (Kredyty)",
       totalEarnedCredits: "Łącznie zarobione (Kredyty)",
       totalPaidOutCredits: "Łącznie wypłacone (Kredyty)",
@@ -419,6 +430,7 @@ export const translations: typeof enTranslations = {
           credits:
             "Wypłaty w kredytach są przeliczane automatycznie. Nic nie trzeba robić.",
         },
+        prepareBill: "Przygotuj fakturę zakupu",
         codeReport: "Raport kodu",
       },
     },

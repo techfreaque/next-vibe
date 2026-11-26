@@ -1,0 +1,21 @@
+export const translations = {
+  snapshot: "As of {{date}}",
+  reviewErrors: "Review errors",
+  reviewTasks: "Review failing tasks",
+  reviewConnections: "Review connections",
+  title: "Operations overview",
+  description:
+    "Review unresolved errors, failing scheduled tasks and connected instance health.",
+  errors: "Unresolved errors",
+  tasks: "Failing tasks",
+  connections: "Unhealthy connections",
+  errorAlert: "Unresolved error groups ({{count}})",
+  taskAlert: "Failing scheduled tasks ({{count}})",
+  connectionAlert: "Connections needing attention ({{count}})",
+  attention: "Needs attention",
+  clear: "No open issues in these checks.",
+  unavailable: "Some health checks are unavailable.",
+  recent: "Recent activity",
+  loading: "Loading system health",
+  retry: "Retry",
+};

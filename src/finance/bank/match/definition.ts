@@ -9,7 +9,6 @@ import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
 import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
 import {
   requestField,
-  requestUrlPathParamsField,
   responseField,
 } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
@@ -50,7 +49,10 @@ const { POST } = createEndpoint({
             },
           }),
           apiClient.refetchEndpoint(candidates.default.GET, context.logger, {
-            urlPathParams: { lineId: context.pathParams.lineId },
+            requestData: {
+              lineId: context.requestData.lineId,
+              companyId: context.requestData.companyId,
+            },
           }),
         ]);
       },
@@ -58,9 +60,9 @@ const { POST } = createEndpoint({
   },
   fields: customWidgetObject({
     render: BankMatchWidgetLazy,
-    usage: { request: "data&urlPathParams", response: true },
+    usage: { request: "data", response: true },
     children: {
-      lineId: requestUrlPathParamsField(scopedTranslation, {
+      lineId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "fields.line",
@@ -97,6 +99,16 @@ const { POST } = createEndpoint({
         label: "fields.account",
         schema: z.uuid(),
       }),
+      adjustmentJournalEntryId: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "adjustment.journal",
+        schema: z.uuid().nullable().optional(),
+      }),
+      matchKind: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "adjustment.kind",
+        schema: z.enum(["exact", "fee", "fx"]).optional(),
+      }),
       matchedAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         label: "fields.matchedAt",
@@ -106,12 +118,10 @@ const { POST } = createEndpoint({
   }),
   errorTypes: bankErrorTypes,
   examples: {
-    urlPathParams: {
-      default: { lineId: "00000000-0000-4000-8000-000000000003" },
-    },
     requests: {
       default: {
         companyId: "00000000-0000-4000-8000-000000000001",
+        lineId: "00000000-0000-4000-8000-000000000003",
         journalLineId: "00000000-0000-4000-8000-000000000004",
         confirm: true,
       },
@@ -127,8 +137,8 @@ const { POST } = createEndpoint({
   successTypes: { title: "match.success", description: "match.description" },
 });
 
-export type BankMatchRequest = typeof POST.types.RequestOutput;
+export type BankMatchRequest = Omit<typeof POST.types.RequestOutput, "lineId">;
 export type BankMatchResponse = typeof POST.types.ResponseOutput;
-export type BankMatchPath = typeof POST.types.UrlVariablesOutput;
+export type BankMatchPath = Pick<typeof POST.types.RequestOutput, "lineId">;
 
 export default { POST };

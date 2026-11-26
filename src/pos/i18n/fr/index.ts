@@ -44,6 +44,33 @@ export const translations: typeof enTranslations = {
   },
 
   // POS Dashboard
+  workflow: {
+    backToSessionOrders: "Retour aux commandes de la session",
+    receiptTitle: "Reçu",
+    amountDue: "Montant dû",
+    ledgerCurrencyMismatch:
+      "La devise de cette commande diffère de celle de la comptabilité. Utilisez une caisse ou une commande dans la devise comptable avant d’encaisser.",
+    postingUnavailable:
+      "La vente n’a pas pu être comptabilisée. Vérifiez la devise de la société, la période ouverte et les comptes.",
+    cashCurrencyMismatch:
+      "Les espèces doivent être dans la devise de la caisse. Choisissez un autre moyen de paiement pour cette commande.",
+    tenderMinorUnits: "Saisissez des montants au centime près.",
+    legacyTenderReview:
+      "Un paiement antérieur comporte une fraction de centime. Vérifiez le paiement avant d’en encaisser un autre.",
+    legacyTenderRecorded:
+      "Cette commande conserve les montants d’origine à quatre décimales.",
+    legacyPostingReview:
+      "Les montants comportant une fraction de centime ne peuvent pas être comptabilisés. Vérifiez le paiement d’origine avant de conclure la vente.",
+    viewReceipt: "Voir le reçu",
+    openDrawer: "Ouvrir la caisse",
+    warehouse: "Entrepôt de vente",
+    noWarehouse: "Aucun entrepôt attribué",
+    chooseCompanyFirst: "Sélectionnez d’abord une société.",
+    warehouseInstruction:
+      "Choisissez un entrepôt actif de la société sélectionnée.",
+    stockUnavailable:
+      "Le stock disponible dans l’entrepôt de cette caisse est insuffisant. Vérifiez les quantités avant de terminer la vente.",
+  },
   dashboard: {
     get: {
       title: "Tableau de bord caisse",
@@ -384,7 +411,7 @@ export const translations: typeof enTranslations = {
         sessionSummary: "Récapitulatif de la session",
         terminal: "Terminal",
         openedAt: "Ouverte le",
-        orderCount: "Commandes",
+        orderCount: "Commandes : {{count}}",
         sessionRevenue: "Chiffre d'affaires",
         floatHint: "Comptez les espèces du tiroir avant la clôture.",
         reconciliation: "Clôture de caisse",

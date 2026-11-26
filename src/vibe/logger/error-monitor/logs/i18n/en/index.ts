@@ -334,6 +334,8 @@ export const translations = {
 
   widget: {
     kpi: {
+      unresolvedInScope: "Unresolved in this view",
+      unresolvedAllTimeLink: "Unresolved across all time: {{count}}",
       unresolvedMessages: "{{messages}} messages · {{occurrences}} occurrences",
       unresolvedMatching: "{{count}} unresolved match filters",
       unresolved: "Unresolved classes (all time)",
@@ -420,6 +422,10 @@ export const translations = {
       resolving: "Saving...",
     },
     filter: {
+      apply: "Apply filters",
+      more: "Filters",
+      moreCount: "Filters ({{count}})",
+      moreDescription: "Filter by status, severity or origin.",
       fingerprint: "Class",
       endpoint: "Endpoint",
       search: "Search",

@@ -1,11 +1,10 @@
 /**
  * Company Subscription Get Repository
- * Returns the active subscription for a company's owner.
+ * Shows the authorized company owner's account subscription.
  */
 
 import "server-only";
 
-import { eq } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import {
@@ -15,65 +14,50 @@ import {
   success,
 } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
-import { db } from "next-vibe/database";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { companyMembers } from "@/companies/db";
-import { subscriptions } from "@/subscription/db";
-
+import { readCompanyOwnerBilling } from "../owner-billing";
 import type { CompanySubscriptionGetResponseOutput } from "./definition";
 import { scopedTranslation } from "./i18n";
 
 export class CompanySubscriptionGetRepository {
   static async getCompanySubscription(
     companyId: string,
+    userId: string,
     logger: EndpointLogger,
     locale: CountryLanguage = defaultLocale,
   ): Promise<ResponseType<CompanySubscriptionGetResponseOutput>> {
     const { t } = scopedTranslation.scopedT(locale);
     try {
-      // Find the company owner and return their subscription
-      const [owner] = await db
-        .select({ userId: companyMembers.userId })
-        .from(companyMembers)
-        .where(eq(companyMembers.companyId, companyId))
-        .limit(1);
-
-      if (!owner) {
+      const billing = await readCompanyOwnerBilling(companyId, userId);
+      if (!billing) {
         return fail({
-          message: t("get.errors.notFound.title"),
-          errorType: ErrorResponseTypes.NOT_FOUND,
+          message: t("get.errors.forbidden.title"),
+          errorType: ErrorResponseTypes.FORBIDDEN,
         });
       }
-
-      const [sub] = await db
-        .select()
-        .from(subscriptions)
-        .where(eq(subscriptions.userId, owner.userId))
-        .limit(1);
-
-      if (!sub) {
-        return fail({
-          message: t("get.errors.notFound.title"),
-          errorType: ErrorResponseTypes.NOT_FOUND,
-        });
-      }
-
+      const sub = billing.subscription;
       return success({
-        id: sub.id,
-        plan: sub.planId,
-        billingInterval: sub.billingInterval,
-        status: sub.status,
-        currentPeriodStart: sub.currentPeriodStart ?? new Date(),
-        currentPeriodEnd: sub.currentPeriodEnd ?? new Date(),
-        cancelAtPeriodEnd: sub.cancelAtPeriodEnd,
-        cancelAt: sub.cancelAt?.toISOString() ?? undefined,
-        canceledAt: sub.canceledAt?.toISOString() ?? undefined,
-        endedAt: sub.endedAt?.toISOString() ?? undefined,
-        provider: sub.provider,
-        providerSubscriptionId: sub.providerSubscriptionId ?? undefined,
-        createdAt: sub.createdAt,
-        updatedAt: sub.updatedAt,
+        selectedCompanyId: companyId,
+        companyName: billing.companyName,
+        currentPeriodStart: sub?.currentPeriodStart ?? null,
+        currentPeriodEnd: sub?.currentPeriodEnd ?? null,
+        ...(sub
+          ? {
+              id: sub.id,
+              plan: sub.planId,
+              billingInterval: sub.billingInterval,
+              status: sub.status,
+              cancelAtPeriodEnd: sub.cancelAtPeriodEnd,
+              cancelAt: sub.cancelAt?.toISOString(),
+              canceledAt: sub.canceledAt?.toISOString(),
+              endedAt: sub.endedAt?.toISOString(),
+              provider: sub.provider,
+              providerSubscriptionId: sub.providerSubscriptionId ?? undefined,
+              createdAt: sub.createdAt,
+              updatedAt: sub.updatedAt,
+            }
+          : {}),
       });
     } catch (error) {
       logger.error("Failed to get company subscription", parseError(error));

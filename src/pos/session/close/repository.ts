@@ -16,12 +16,14 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
+import { companies } from "@/companies/db";
 import { CompanyMemberRole } from "@/companies/enum";
 import { CompanyAuthRepository } from "@/companies/repository";
 
 import { posOrders, posPayments, posSessions, posTerminals } from "../../db";
 import { PosOrderStatus, PosPaymentMethod, PosSessionStatus } from "../../enum";
 import { scopedTranslation } from "../../i18n";
+import { isPosMinorUnitAmount } from "../../order/settlement-amounts";
 import type { PosSessionClosePostRequestOutput } from "./definition";
 
 export class PosSessionCloseRepository {
@@ -34,6 +36,8 @@ export class PosSessionCloseRepository {
     ResponseType<{
       result: {
         currency: string;
+        terminalName?: string;
+        companyName?: string;
         id: string;
         status: string;
         closedAt: Date | null;
@@ -49,6 +53,15 @@ export class PosSessionCloseRepository {
 
     try {
       const { details } = data;
+      if (
+        details.closingFloat !== undefined &&
+        !isPosMinorUnitAmount(details.closingFloat)
+      ) {
+        return fail({
+          message: t("workflow.tenderMinorUnits"),
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+        });
+      }
 
       const [session] = await db
         .select({
@@ -72,9 +85,12 @@ export class PosSessionCloseRepository {
       const [terminal] = await db
         .select({
           companyId: posTerminals.companyId,
+          terminalName: posTerminals.name,
+          companyName: companies.name,
           currency: posTerminals.currency,
         })
         .from(posTerminals)
+        .innerJoin(companies, eq(companies.id, posTerminals.companyId))
         .where(eq(posTerminals.id, session.terminalId))
         .limit(1);
 
@@ -226,6 +242,8 @@ export class PosSessionCloseRepository {
         return success({
           result: {
             currency: terminal.currency,
+            terminalName: terminal.terminalName,
+            companyName: terminal.companyName,
             ...updated,
             expectedFloat,
             cashSalesTotal,

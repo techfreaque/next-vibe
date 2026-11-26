@@ -81,6 +81,23 @@ export const translations: typeof enTranslations = {
     },
   },
   widget: {
+    lineReviewRequired:
+      "Suma pozycji różni się od zapisanej kwoty. Sprawdź oryginalną fakturę dostawcy przed edycją lub zatwierdzeniem.",
+    removeAction: "Usuń",
+    removeLine: "Usuń {{description}}",
+    grossTotal: "Suma brutto",
+    taxPending:
+      "Kwota podatku dostawcy jest nieznana. Potwierdź ją na podstawie dokumentu przed przyjęciem lub zaksięgowaniem faktury.",
+    confirmSupplierTax: "Potwierdź podatek dostawcy",
+    bankDocumentMissing:
+      "Brak dokumentu od dostawcy. Powiąż go tutaj lub przy zatwierdzaniu potwierdź koszt brutto na podstawie dowodu bankowego.",
+    bankDocumentTaxReview:
+      "Dokument dostawcy powiązano po zaksięgowaniu. Ewentualną korektę podatku lub konta rozpatrz oddzielnie. Pierwotny zapis pozostaje bez zmian.",
+    linkBankDocument: "Powiąż dokument dostawcy",
+    inputVat: "Odliczenie VAT naliczonego",
+    taxIncludedCost: "VAT wliczony w koszt",
+    reverseCharge: "VAT należny z tytułu odwrotnego obciążenia",
+
     markReceived: "Oznacz jako otrzymaną",
     back: "Wróć",
     submit: "Wyszukaj rachunek",
@@ -101,7 +118,9 @@ export const translations: typeof enTranslations = {
     approveBill: "Zatwierdź fakturę",
     payBill: "Opłać fakturę",
     addLine: "Dodaj pozycję",
-    viewJournalEntry: "Pokaż zapis księgowy",
+    accountingEvidence: "Zapisy księgowe",
+    approvalJournal: "Zaksięgowanie faktury",
+    settlementJournal: "Zaksięgowanie płatności",
     approveConfirmTitle: "Zatwierdzić fakturę?",
     approveConfirmDescription:
       "Status faktury zostanie zmieniony. Po zatwierdzeniu zostanie utworzony zapis księgowy. Tej operacji nie można cofnąć.",

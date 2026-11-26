@@ -34,7 +34,8 @@ export const translations: typeof enTranslations = {
     },
     notFound: {
       title: "Nutzer nicht gefunden",
-      description: "Kein Nutzer mit dieser ID",
+      description:
+        "Dieses Konto ist im Verzeichnis nicht mehr verfügbar. Wählen Sie ein anderes Konto.",
     },
     serverError: {
       title: "Nutzer konnte nicht geladen werden",
@@ -85,15 +86,16 @@ export const translations: typeof enTranslations = {
       "Aktionen: vibe user-update --id={{id}} | vibe user-role-add --id={{id}} --role=<role> | vibe user-role-remove --id={{id}} --role=<role>",
   },
   kpi: {
-    paid: "Gesamtumsatz",
-    paidHint: "{{count}} erfolgreiche Zahlungen, USD",
+    paid: "Insgesamt bezahlt",
+    paidHint: "Zahlungen: {{count}}",
     refunded: "Erstattet",
-    credits: "Credit-Guthaben",
-    creditsHint: "+{{free}} Gratis-Credits",
+    credits: "Guthaben",
+    creditsHint: "Verfügbare Gratis-Credits: {{free}}",
     spent: "Verbrauchte Credits",
     spentHint: "etwa {{usd}} Nutzung",
     lastSeen: "Zuletzt gesehen",
     joined: "Dabei seit {{date}}",
+    justNow: "Gerade eben",
   },
   payment: {
     subscription: "Abo",
@@ -184,12 +186,15 @@ export const translations: typeof enTranslations = {
     openMonitor: "Fehlermonitor öffnen",
   },
   widget: {
+    creditAmount: "{{count}} Credits",
     unavailable: "Konto nicht verfügbar",
     chooseUser: "Wähle ein Konto aus",
     loading: "Nutzer wird geladen...",
     never: "Nie",
     actions: {
-      browse: "Konten durchsuchen",
+      retry: "Erneut versuchen",
+      more: "Mehr",
+      browse: "Zurück zu den Konten",
       edit: "Bearbeiten",
       addCredits: "Credits vergeben",
       delete: "Nutzer löschen",
@@ -206,6 +211,8 @@ export const translations: typeof enTranslations = {
     remove: "Rolle entziehen",
   },
   tabs: {
+    section: "Profilbereich",
+    scrollHint: "Scrollen für alle Bereiche",
     overview: "Übersicht",
     billing: "Abrechnung",
     credits: "Credit-Verlauf",

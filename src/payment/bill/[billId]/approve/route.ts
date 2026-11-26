@@ -14,7 +14,13 @@ export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ urlPathParams, user, logger, locale }) =>
-      BillApproveRepository.approveBill(user.id, urlPathParams, logger, locale),
+    handler: ({ data, urlPathParams, user, logger, locale }) =>
+      BillApproveRepository.approveBill(
+        user.id,
+        urlPathParams,
+        logger,
+        locale,
+        data,
+      ),
   },
 });

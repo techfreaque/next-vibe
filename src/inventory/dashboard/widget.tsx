@@ -1,5 +1,6 @@
 "use client";
 
+import { UserRole } from "next-vibe/identity/roles/enum";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { EmptyBlock } from "next-vibe/ui/components/empty-block";
@@ -11,13 +12,17 @@ import { Span } from "next-vibe/ui/components/span";
 import { WidgetHeader } from "next-vibe/ui/components/widget-header";
 import { WidgetShell } from "next-vibe/ui/components/widget-shell";
 import {
+  useWidgetForm,
   useWidgetIsInteractive,
   useWidgetLocale,
   useWidgetNavigation,
   useWidgetTranslation,
+  useWidgetUser,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
+
+import { scopedTranslation as liabilityTranslation } from "@/finance/credit-liabilities/i18n";
 
 import type definition from "./definition";
 
@@ -25,29 +30,59 @@ export function InventoryDashboardWidget(): JSX.Element {
   const data = useWidgetValue<typeof definition.GET>();
   const navigation = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.GET>();
+  const locale = useWidgetLocale();
+  const { t: finances } = liabilityTranslation.scopedT(locale);
+  const viewer = useWidgetUser();
 
-  const number = new Intl.NumberFormat(useWidgetLocale(), {
+  const number = new Intl.NumberFormat(locale, {
     maximumFractionDigits: 4,
   });
   const interactive = useWidgetIsInteractive();
+  const selectedCompanyId =
+    useWidgetForm<typeof definition.GET>().watch("companyId");
+  const hasFinancialTools = viewer.roles.some(
+    (role) => role === UserRole.ADMIN,
+  );
+  const openSupplierBalances = (): void => {
+    void import("@/finance/supplier-evidence/definition").then(
+      ({ default: endpoint }) =>
+        navigation.push(endpoint.GET, {
+          data: { companyId: selectedCompanyId },
+        }),
+    );
+  };
+  const openCreditLiabilities = (): void => {
+    void import("@/finance/credit-liabilities/definition").then(
+      ({ default: endpoint }) =>
+        navigation.push(endpoint.GET, {
+          data: { companyId: selectedCompanyId },
+        }),
+    );
+  };
   const handleStockLevels = (): void => {
     void (async (): Promise<void> => {
       const def = await import("../stock/list/definition");
-      navigation.push(def.default.GET, {});
+      navigation.push(def.default.GET, {
+        data: { companyId: selectedCompanyId },
+      });
     })();
   };
 
   const handleTransfers = (): void => {
     void (async (): Promise<void> => {
       const def = await import("../transfer/list/definition");
-      navigation.push(def.default.GET, {});
+      navigation.push(def.default.GET, {
+        data: { companyId: selectedCompanyId },
+      });
     })();
   };
 
   const handleWarehouses = (): void => {
     void (async (): Promise<void> => {
       const def = await import("../warehouse/list/definition");
-      navigation.push(def.default.GET, {});
+      navigation.push(def.default.GET, {
+        data: { companyId: selectedCompanyId },
+      });
     })();
   };
 
@@ -185,6 +220,26 @@ export function InventoryDashboardWidget(): JSX.Element {
           </Button>
           <Button variant="ghost" size="sm" onClick={handleWarehouses}>
             {t("dashboard.get.widget.navWarehouses")}
+          </Button>
+        </Div>
+      )}
+      {interactive && hasFinancialTools && selectedCompanyId && (
+        <Div className="flex flex-wrap gap-2 border-t pt-3">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={openSupplierBalances}
+          >
+            {finances("supplierLink")}
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={openCreditLiabilities}
+          >
+            {finances("title")}
           </Button>
         </Div>
       )}

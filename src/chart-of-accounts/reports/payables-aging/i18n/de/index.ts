@@ -62,6 +62,7 @@ export const translations: typeof enTranslations = {
       "Strittige Rechnungen zählen weder zu den freigegebenen noch zu den ausstehenden Beträgen.",
   },
   widget: {
+    showBills: "Belege anzeigen",
     asOf: "Stand {{date}}",
     back: "Zurück",
     loading: "Lieferantenposten werden geladen",

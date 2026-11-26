@@ -5,8 +5,8 @@
 
 import "server-only";
 
-import { eq } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { getLocaleFromLanguageAndCountry } from "next-vibe/core/i18n/core/language-utils";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
@@ -14,9 +14,10 @@ import {
   success,
 } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
-import { db } from "next-vibe/database";
+import { withTransaction } from "next-vibe/database/utils/repository-helpers";
 import { hashPassword } from "next-vibe/identity/auth/password";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
+import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { type NewUser, userRoles, users } from "next-vibe/identity/user/db";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
@@ -34,10 +35,16 @@ export class UserCreateRepository {
     logger: EndpointLogger,
     t: UsersCreateT,
   ): Promise<ResponseType<UserCreateResponseOutput>> {
+    if (!user.roles.includes(UserPermissionRole.ADMIN)) {
+      return fail({
+        message: t("post.errors.forbidden.description"),
+        errorType: ErrorResponseTypes.FORBIDDEN,
+      });
+    }
     try {
       logger.debug("Creating user", {
-        email: data.basicInfo.email,
         requestingUser: user.id,
+        locale,
       });
 
       // Hash password
@@ -49,7 +56,10 @@ export class UserCreateRepository {
         password: hashedPassword,
         privateName: data.basicInfo.privateName,
         publicName: data.basicInfo.publicName,
-        locale,
+        locale: getLocaleFromLanguageAndCountry(
+          data.basicInfo.language,
+          data.basicInfo.country,
+        ),
         isActive: data.adminSettings?.isActive ?? true,
         emailVerified: data.adminSettings?.emailVerified ?? false,
         marketingConsent: false,
@@ -60,73 +70,68 @@ export class UserCreateRepository {
         updatedBy: user.id,
       };
 
-      // Insert user
-      const [createdUser] = await db.insert(users).values(newUser).returning();
+      return await withTransaction(logger, async (tx) => {
+        const [createdUser] = await tx
+          .insert(users)
+          .values(newUser)
+          .onConflictDoNothing({ target: users.email })
+          .returning();
+        if (!createdUser) {
+          return fail({
+            message: t("post.errors.conflict.description"),
+            errorType: ErrorResponseTypes.CONFLICT,
+          });
+        }
+        const roles = [...new Set(data.adminSettings?.roles)];
+        const userRolesResult =
+          roles.length > 0
+            ? await tx
+                .insert(userRoles)
+                .values(
+                  roles.map((role) => ({
+                    userId: createdUser.id,
+                    role,
+                    assignedBy: user.id,
+                  })),
+                )
+                .returning({ id: userRoles.id, role: userRoles.role })
+            : [];
+        logger.debug("User created successfully", { userId: createdUser.id });
 
-      if (!createdUser) {
-        return fail({
-          message: t("post.errors.internal.title", {
-            details: t("post.errors.internal.description"),
-          }),
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        });
-      }
+        // Prepare response data
+        const responseData: UserCreateResponseOutput = {
+          success: {
+            created: true,
+            message: t("post.success.message.content"),
+          },
+          userInfo: {
+            id: createdUser.id,
+            email: createdUser.email,
+            privateName: createdUser.privateName,
+            publicName: createdUser.publicName,
+            createdAt: createdUser.createdAt,
+          },
+          responseId: createdUser.id,
+          responseLeadId: null,
+          responseEmail: createdUser.email,
+          responsePrivateName: createdUser.privateName,
+          responsePublicName: createdUser.publicName,
+          responseEmailVerified: createdUser.emailVerified,
+          responseIsActive: createdUser.isActive,
+          responseStripeCustomerId: createdUser.stripeCustomerId,
+          responseUserRoles: userRolesResult,
+          responseCreatedAt: createdUser.createdAt,
+          responseUpdatedAt: createdUser.updatedAt,
+        };
 
-      // Add roles if provided
-      if (data.adminSettings?.roles && data.adminSettings.roles.length > 0) {
-        await db.insert(userRoles).values(
-          data.adminSettings.roles.map((role) => ({
-            userId: createdUser.id,
-            role: role as (typeof userRoles.$inferInsert)["role"],
-            assignedBy: user.id,
-          })),
-        );
-      }
-
-      // Fetch user roles for response
-      const userRolesResult = await db
-        .select()
-        .from(userRoles)
-        .where(eq(userRoles.userId, createdUser.id));
-
-      logger.debug("User created successfully", { userId: createdUser.id });
-
-      // Prepare response data
-      const responseData: UserCreateResponseOutput = {
-        success: {
-          created: true,
-          message: t("post.success.message.content"),
-        },
-        userInfo: {
-          id: createdUser.id,
-          email: createdUser.email,
-          privateName: createdUser.privateName,
-          publicName: createdUser.publicName,
-          createdAt: createdUser.createdAt,
-        },
-        responseId: createdUser.id,
-        responseLeadId: null,
-        responseEmail: createdUser.email,
-        responsePrivateName: createdUser.privateName,
-        responsePublicName: createdUser.publicName,
-        responseEmailVerified: createdUser.emailVerified,
-        responseIsActive: createdUser.isActive,
-        responseStripeCustomerId: createdUser.stripeCustomerId,
-        responseUserRoles: userRolesResult.map((r) => ({
-          id: r.id,
-          role: r.role,
-        })),
-        responseCreatedAt: createdUser.createdAt,
-        responseUpdatedAt: createdUser.updatedAt,
-      };
-
-      return success(responseData);
+        return success(responseData);
+      });
     } catch (error) {
-      logger.error("Error creating user", parseError(error));
+      logger.error("Could not create account", {
+        errorName: parseError(error).name,
+      });
       return fail({
-        message: t("post.errors.internal.title", {
-          details: parseError(error).message,
-        }),
+        message: t("post.errors.internal.description"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }

@@ -5,16 +5,23 @@
 
 "use client";
 
+import { useTranslation } from "next-vibe/core/i18n/core/client";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { Minus } from "next-vibe/ui/components/icons/Minus";
 import { Plus } from "next-vibe/ui/components/icons/Plus";
-import type { JSX } from "react";
+import type { JSX, Ref } from "react";
 import { useEffect, useRef } from "react";
 
 import { cn } from "../../../unified-ui/_shared/cn";
+import { scopedTranslation } from "../../../unified-ui/hooks/i18n";
 import type { StyleType } from "../utils/style-type";
 import { Button } from "./button";
-import { Div } from "./div";
-import { Input, type InputChangeEvent } from "./input";
+import {
+  Input,
+  type InputChangeEvent,
+  type InputProps,
+  type InputRefObject,
+} from "./input";
 
 export type NumberInputProps = {
   value?: number;
@@ -23,9 +30,16 @@ export type NumberInputProps = {
   min?: number;
   max?: number;
   step?: number;
+  allowDecimals?: boolean;
   disabled?: boolean;
   name?: string;
-} & StyleType;
+  locale?: CountryLanguage;
+  ref?: Ref<InputRefObject>;
+} & Pick<
+  InputProps<"number">,
+  "id" | "aria-label" | "aria-describedby" | "aria-invalid"
+> &
+  StyleType;
 
 export function NumberInput(props: NumberInputProps): JSX.Element {
   const {
@@ -35,10 +49,15 @@ export function NumberInput(props: NumberInputProps): JSX.Element {
     min,
     max,
     step = 1,
+    allowDecimals = false,
     disabled = false,
     className,
-    name,
+    style,
+    locale,
+    ...inputProps
   } = props;
+  const { locale: currentLocale } = useTranslation();
+  const { t } = scopedTranslation.scopedT(locale ?? currentLocale);
 
   // Call onChange with initial value on mount to register the field
   const hasRegistered = useRef(false);
@@ -83,46 +102,49 @@ export function NumberInput(props: NumberInputProps): JSX.Element {
   };
 
   return (
-    <Div
+    <div
       className={cn(
-        "flex justify-between gap-3 border-input rounded",
+        "flex min-w-0 items-center justify-between border-input rounded",
         className,
       )}
+      style={style}
     >
       <Button
         type="button"
         variant="ghost"
         size="sm"
+        aria-label={t("widgets.formFields.common.decreaseValue")}
         onClick={handleDecrement}
         disabled={disabled || (min !== undefined ? value <= min : false)}
         tabIndex={-1}
-        className="border-r rounded-r-none"
+        className="shrink-0 border-r rounded-r-none"
       >
         <Minus className="h-4 w-4" />
       </Button>
       <Input
         type="number"
-        name={name}
+        {...inputProps}
         value={value}
         onChange={handleInputChange}
         onBlur={onBlur}
         min={min}
         max={max}
-        step={step}
+        step={allowDecimals && props.step === undefined ? "any" : step}
         disabled={disabled}
-        className="text-center w-full border-none"
+        className="min-w-0 flex-1 text-center border-none"
       />
       <Button
         type="button"
         variant="ghost"
         size="sm"
+        aria-label={t("widgets.formFields.common.increaseValue")}
         onClick={handleIncrement}
         disabled={disabled || (max !== undefined ? value >= max : false)}
         tabIndex={-1}
-        className="border-l rounded-l-none"
+        className="shrink-0 border-l rounded-l-none"
       >
         <Plus className="h-4 w-4" />
       </Button>
-    </Div>
+    </div>
   );
 }

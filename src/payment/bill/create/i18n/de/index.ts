@@ -45,7 +45,11 @@ export const translations: typeof enTranslations = {
         title: "Zugriff verweigert",
         description: "Buchhaltungs- oder Adminrolle erforderlich",
       },
-      conflict: { title: "Konflikt", description: "Datenkonflikt" },
+      conflict: {
+        title: "Konflikt",
+        description:
+          "Für diesen Lieferanten und diese Rechnungsnummer gibt es bereits eine Rechnung. Prüfe den vorhandenen Beleg.",
+      },
       server: {
         title: "Serverfehler",
         description:
@@ -88,6 +92,8 @@ export const translations: typeof enTranslations = {
       addItem: "Position hinzufügen",
       removeItem: "Position entfernen",
       itemError: "Prüfen Sie Beschreibung, Menge, Preis und USt.-Satz.",
+      supplierTotalReview:
+        "Vergleichen Sie diese Summe mit der Lieferantenrechnung. Prüfen Sie bei Abweichungen den Originalbeleg, bevor Sie speichern.",
       summary: "Rechnungsübersicht",
       net: "Netto",
       tax: "Umsatzsteuer",

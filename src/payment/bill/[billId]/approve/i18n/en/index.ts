@@ -1,4 +1,24 @@
 export const translations = {
+  receiveBill: "Mark bill received",
+  supplierDocument: {
+    confirmMissing: "Confirm no supplier document is available",
+    confirmSeparate: "Confirm this is a separate charge",
+    missingHelp:
+      "Check the bank evidence. Approval records the gross cost without deductible VAT.",
+    required:
+      "Link the supplier document or confirm that it is unavailable. A bank-only approval requires the verified gross amount and no VAT entry.",
+    possibleDuplicate:
+      "A bank draft or supplier document has matching details. Link the document or confirm this is a separate charge.",
+  },
+  reverseCharge: {
+    title: "Reverse charge (optional)",
+    base: "Taxable base in bill currency",
+    rate: "VAT rate (%)",
+    help: "For a received German small-business bill, enter both values only after confirming that reverse charge applies. The charge is booked as a cost and VAT payable.",
+    invalid:
+      "Enter a confirmed base and rate on a received bill under the German small-business regime.",
+    cost: "Non-deductible reverse-charge VAT",
+  },
   tags: { payment: "payment", bill: "bill", ap: "accounts-payable" },
   enums: {
     billStatus: {
@@ -17,6 +37,8 @@ export const translations = {
     errors: {
       existingPosting:
         "Reconcile the existing posting for this bill before approving it.",
+      lineTotalsReview:
+        "The lines differ from the recorded net, VAT or gross total. Review the original supplier document before approving.",
       billLines:
         "Add bill lines with a positive total and use active expense accounts from this company.",
       posting:

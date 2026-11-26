@@ -29,10 +29,10 @@ import type { JSX } from "react";
 import { useMemo } from "react";
 import { useState } from "react";
 
-import { calculateInvoiceLine } from "@/payment/invoice/line/amounts";
 import productLookupEndpoint from "@/pos/product-lookup/definition";
 
 import detailDefinition from "../../[billId]/get/definition";
+import { calculateBillLine } from "../../create/amounts";
 import type definition from "./definition";
 
 interface BillLineAddWidgetProps {
@@ -114,11 +114,10 @@ export function BillLineAddWidget({
   const taxRate = Number(form?.watch("taxRate") ?? 0);
   const description = String(form?.watch("description") ?? "");
 
-  const { lineTotal } = calculateInvoiceLine({
-    quantity: qty,
-    unitPrice,
-    taxRate,
-  });
+  const { lineTotal } = calculateBillLine(
+    { quantity: qty, unitPrice, taxRate },
+    detail?.lineSettlement,
+  );
 
   const handleProductSearch = (): void => {
     if (!searchQuery.trim()) {
@@ -301,6 +300,7 @@ export function BillLineAddWidget({
                     handleProductSearch();
                   }
                 }}
+                aria-label={t("widget.searchProduct")}
                 placeholder={t("widget.searchPlaceholder")}
                 className="flex-1"
               />

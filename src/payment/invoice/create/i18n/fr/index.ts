@@ -78,6 +78,8 @@ export const translations: typeof enTranslations = {
       description: "Facture créée à l'état de brouillon",
     },
     widget: {
+      draftSaved: "Brouillon de facture enregistré",
+      draftSavedNumber: "Brouillon de facture nº {{number}} enregistré",
       details: "Détails de la facture",
       draftHint:
         "Enregistrez un brouillon pour le vérifier avant de l’émettre.",
@@ -100,12 +102,18 @@ export const translations: typeof enTranslations = {
       net: "Hors taxe",
       tax: "TVA",
       total: "Total",
+      customerSelected: "Client sélectionné",
       clearCustomer: "Retirer le client",
       lineTotal: "Total de la ligne",
       companyCurrencyValue: "Devise de l’entreprise : {{currency}}",
       companyCurrency: "La devise de l’entreprise s’applique par défaut.",
       back: "Retour",
       submit: "Enregistrer le brouillon",
+      saving: "Enregistrement du brouillon…",
+      retrySave: "Réessayer d’enregistrer le brouillon",
+      saveFailed: "Impossible d’enregistrer le brouillon de facture",
+      saveFailedHint:
+        "Vos saisies sont toujours dans le formulaire. Vérifiez-les, puis enregistrez de nouveau le brouillon.",
       viewButton: "Voir la facture",
     },
   },

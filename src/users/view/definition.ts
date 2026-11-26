@@ -41,12 +41,14 @@ export const { GET } = createEndpoint({
   description: "get.description",
   category: "account",
   subCategory: "manageUsers",
+  admin: { role: "record" },
   icon: "user" as const,
   tags: ["tags.user" as const, "tags.view" as const],
   allowedRoles: [UserRole.ADMIN] as const,
 
   fields: customWidgetObject({
     render: UserViewContainer,
+    noFormElement: true,
     usage: { request: "data", response: true } as const,
     children: {
       // Request fields
@@ -57,6 +59,25 @@ export const { GET } = createEndpoint({
         label: "get.userId.label" as const,
         hidden: true,
         includeInCacheKey: true,
+      }),
+
+      tab: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        schema: z
+          .enum([
+            "overview",
+            "billing",
+            "credits",
+            "referrals",
+            "activity",
+            "connections",
+            "favorites",
+            "skills",
+          ])
+          .optional(),
+        label: "tabs.overview",
+        hidden: true,
       }),
 
       // Top action buttons
@@ -607,3 +628,5 @@ export type UserViewRequestOutput = typeof GET.types.RequestOutput;
 export type UserViewResponseOutput = typeof GET.types.ResponseOutput;
 
 export default { GET };
+
+export type UserViewTab = NonNullable<(typeof GET.types.RequestOutput)["tab"]>;

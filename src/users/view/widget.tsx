@@ -16,14 +16,21 @@ import { isCliPlatform, Platform } from "next-vibe/platforms/platforms";
 import { Button } from "next-vibe/ui/components/button";
 import { DetailField, DetailGrid } from "next-vibe/ui/components/detail-grid";
 import { Div } from "next-vibe/ui/components/div";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "next-vibe/ui/components/dropdown-menu";
 import { EmptyBlock } from "next-vibe/ui/components/empty-block";
 import { AlertCircle } from "next-vibe/ui/components/icons/AlertCircle";
 import { AlertTriangle } from "next-vibe/ui/components/icons/AlertTriangle";
 import { CheckCircle } from "next-vibe/ui/components/icons/CheckCircle";
+import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
 import { Coins } from "next-vibe/ui/components/icons/Coins";
 import { Copy } from "next-vibe/ui/components/icons/Copy";
 import { DollarSign } from "next-vibe/ui/components/icons/DollarSign";
-import { Mail } from "next-vibe/ui/components/icons/Mail";
 import { Pencil } from "next-vibe/ui/components/icons/Pencil";
 import { Plus } from "next-vibe/ui/components/icons/Plus";
 import { Trash2 } from "next-vibe/ui/components/icons/Trash2";
@@ -37,7 +44,15 @@ import { LoadingBlock } from "next-vibe/ui/components/loading-block";
 import { MetricCard } from "next-vibe/ui/components/metric-card";
 import { MetricGrid } from "next-vibe/ui/components/metric-grid";
 import { Pre } from "next-vibe/ui/components/pre";
+import { Section } from "next-vibe/ui/components/section";
 import { SectionGroup } from "next-vibe/ui/components/section-group";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "next-vibe/ui/components/select";
 import { Span } from "next-vibe/ui/components/span";
 import { StatusPill } from "next-vibe/ui/components/status-pill";
 import {
@@ -48,10 +63,19 @@ import {
   TableHeader,
   TableRow,
 } from "next-vibe/ui/components/table";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "next-vibe/ui/components/tabs";
 import { P } from "next-vibe/ui/components/typography";
-import { WidgetHeader } from "next-vibe/ui/components/widget-header";
-import { WidgetShell } from "next-vibe/ui/components/widget-shell";
 import { copyToClipboard } from "next-vibe/ui/lib/clipboard";
+import { canRetryRecordRead } from "next-vibe/unified-ui/_shared/admin-record-context";
+import {
+  AdminRecordDetail,
+  type AdminRecordDetailState,
+} from "next-vibe/unified-ui/_shared/admin-record-detail";
 import { isValidEnumValue } from "next-vibe/unified-ui/_shared/enum";
 import {
   RelatedEntitiesPanel,
@@ -74,7 +98,7 @@ import {
 import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
 import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/navigate-button/widget";
-import { useCallback, useMemo, useState } from "react";
+import { Fragment, useCallback, useId, useMemo, useState } from "react";
 
 import { CheckoutMode, PaymentProvider, PaymentStatus } from "@/payment/enum";
 import { scopedTranslation as paymentTranslation } from "@/payment/i18n";
@@ -86,6 +110,7 @@ import {
   formatDay,
   formatMoney,
   formatNumber,
+  formatReferralEarning,
   formatRelative,
   formatUsd,
   roleLabel,
@@ -93,23 +118,13 @@ import {
   subscriptionStatusVariant,
 } from "../format";
 import type definition from "./definition";
-import type { UserViewResponseOutput } from "./definition";
+import type { UserViewResponseOutput, UserViewTab } from "./definition";
 
 interface CustomWidgetProps {
   field: (typeof definition.GET)["fields"];
 }
 
 type ViewT = ReturnType<typeof useWidgetTranslation<typeof definition.GET>>;
-
-type TabId =
-  | "overview"
-  | "billing"
-  | "credits"
-  | "referrals"
-  | "activity"
-  | "connections"
-  | "favorites"
-  | "skills";
 
 /** Last time we saw the user do anything: spend credits or log in. */
 function lastSeen(data: UserViewResponseOutput): Date | null {
@@ -124,9 +139,37 @@ function lastSeen(data: UserViewResponseOutput): Date | null {
   return new Date(Math.max(...candidates.map((d) => new Date(d).getTime())));
 }
 
+function activityKpi(
+  date: Date | null,
+  locale: CountryLanguage,
+  t: ViewT,
+): string {
+  if (!date) {
+    return t("widget.never");
+  }
+  return Math.abs(Date.now() - date.getTime()) < 60_000
+    ? t("kpi.justNow")
+    : formatRelative(date, locale);
+}
+
 /** Short label from an enum i18n value ("enums.paymentStatus.succeeded" -> "succeeded"). */
 function enumTail(value: string): string {
   return value.split(".").pop() ?? value;
+}
+
+function billingIntervalLabel(
+  value: string | null,
+  locale: CountryLanguage,
+): string {
+  const interval =
+    value === "monthly"
+      ? BillingInterval.MONTHLY
+      : value === "yearly"
+        ? BillingInterval.YEARLY
+        : value;
+  return interval && isValidEnumValue(BillingInterval, interval)
+    ? subscriptionTranslation.scopedT(locale).t(interval)
+    : "-";
 }
 
 function paymentStatusVariant(
@@ -243,6 +286,7 @@ export function UserViewContainer({
   const t = useWidgetTranslation<typeof definition.GET>();
   const locale = useWidgetLocale();
   const platform = useWidgetPlatform();
+  const interactive = useWidgetIsInteractive();
   const responseOnly = useWidgetResponseOnly();
   const { user, endpointMutations } = useWidgetContext();
   const { push: navigate, canGoBack } = useWidgetNavigation();
@@ -254,8 +298,12 @@ export function UserViewContainer({
   const data = useWidgetValue<typeof definition.GET>();
   const children = field.children;
 
-  const [activeTab, setActiveTab] = useState<TabId>("overview");
+  const [activeTab, setActiveTab] = useState<UserViewTab>(
+    () => form?.getValues("tab") ?? "overview",
+  );
   const [copyIdSuccess, setCopyIdSuccess] = useState(false);
+  const [mobileActionsOpen, setMobileActionsOpen] = useState(false);
+  const mobileActionsId = useId();
 
   const userId = data?.basicInfo?.id;
 
@@ -277,8 +325,6 @@ export function UserViewContainer({
     const userDefs = await import("../user/[id]/definition");
     navigate(userDefs.default.PUT, {
       urlPathParams: { id: userId },
-      prefillFromGet: true,
-      getEndpoint: userDefs.default.GET,
       popNavigationOnSuccess: 1,
     });
   }, [navigate, userId]);
@@ -306,8 +352,6 @@ export function UserViewContainer({
         data: isBanned
           ? { isBanned: true }
           : { isBanned: false, bannedReason: null },
-        prefillFromGet: true,
-        getEndpoint: userDefs.default.GET,
         popNavigationOnSuccess: 1,
       });
     },
@@ -414,28 +458,60 @@ export function UserViewContainer({
     const validTarget = endpoint.requestSchema.safeParse({
       userId: requestedId,
     }).success;
+    const status =
+      response?.success === false ? response.errorType.errorCode : undefined;
+    const unavailableMessage =
+      status === 404
+        ? t("errors.notFound.description")
+        : status === 403
+          ? t("errors.forbidden.description")
+          : response?.success === false
+            ? response.message
+            : undefined;
+    const retryable =
+      validTarget && status !== undefined && canRetryRecordRead(status);
+    const state: AdminRecordDetailState =
+      validTarget &&
+      response?.success !== false &&
+      endpointMutations?.read?.isLoading !== false
+        ? { kind: "loading", label: t("widget.loading") }
+        : {
+            kind: response?.success === false ? "error" : "empty",
+            icon: <Users className="size-8" />,
+            title: t(requestedId ? "widget.unavailable" : "widget.chooseUser"),
+            message: unavailableMessage,
+            action: retryable
+              ? {
+                  label: t("widget.actions.retry"),
+                  onClick: () => void endpointMutations?.read?.refetch(),
+                }
+              : { label: t("widget.actions.browse"), onClick: openDirectory },
+          };
     return (
-      <WidgetShell className="min-w-0">
-        <WidgetHeader
-          title={t("get.title")}
-          backButton={<NavigateButtonWidget field={children.backButton} />}
-        />
-        <FormAlertWidget field={{}} />
-        {validTarget &&
-        response?.success !== false &&
-        endpointMutations?.read?.isLoading !== false ? (
-          <LoadingBlock message={t("widget.loading")} />
-        ) : (
-          <EmptyBlock
-            icon={<Users className="h-8 w-8" />}
-            title={t(requestedId ? "widget.unavailable" : "widget.chooseUser")}
-            action={{
-              label: t("widget.actions.browse"),
-              onClick: openDirectory,
-            }}
-          />
-        )}
-      </WidgetShell>
+      <AdminRecordDetail
+        title={t("get.title")}
+        backButton={
+          retryable && interactive ? (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={openDirectory}
+            >
+              <ChevronLeft className="size-4" aria-hidden="true" />
+              {t("widget.actions.browse")}
+            </Button>
+          ) : (
+            <NavigateButtonWidget field={children.backButton} />
+          )
+        }
+        state={state}
+        feedback={
+          response?.success === false ? undefined : (
+            <FormAlertWidget field={{}} />
+          )
+        }
+      />
     );
   }
 
@@ -453,7 +529,7 @@ export function UserViewContainer({
     (option) => !heldRoles.has(option.value),
   );
 
-  const tabs: { id: TabId; label: string; count?: number }[] = [
+  const tabs: { id: UserViewTab; label: string; count?: number }[] = [
     { id: "overview", label: t("tabs.overview") },
     {
       id: "billing",
@@ -487,102 +563,197 @@ export function UserViewContainer({
       count: data.engagement.customSkillsCount,
     },
   ];
+  const selectSection = (value: string): void => {
+    const section = tabs.find((tab) => tab.id === value);
+    if (section) {
+      setActiveTab(section.id);
+    }
+  };
 
+  const moreActions = [
+    {
+      key: "edit",
+      label: t("widget.actions.edit"),
+      icon: Pencil,
+      run: handleEdit,
+    },
+    {
+      key: "copy",
+      label: t("widget.actions.copyUserId"),
+      icon: copyIdSuccess ? CheckCircle : Copy,
+      run: handleCopyUserId,
+    },
+    {
+      key: "ban",
+      label: t(basicInfo.isBanned ? "ban.unbanUser" : "ban.banUser"),
+      icon: basicInfo.isBanned ? CheckCircle : XCircle,
+      run: (): Promise<void> => handleSetBanned(!basicInfo.isBanned),
+    },
+    {
+      key: "delete",
+      label: t("widget.actions.delete"),
+      icon: Trash2,
+      run: handleDelete,
+    },
+  ];
+
+  const name = basicInfo.privateName || basicInfo.publicName || basicInfo.email;
   return (
-    <WidgetShell className="min-w-0">
-      <WidgetHeader
-        title={basicInfo.privateName || basicInfo.email}
-        backButton={<NavigateButtonWidget field={children.backButton} />}
-        actions={
-          !canGoBack && (
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={openDirectory}
-            >
-              {t("widget.actions.browse")}
-            </Button>
-          )
-        }
-      />
-
-      {/* Identity */}
-      <Div className="flex items-start gap-4">
-        <Div className="h-14 w-14 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 text-lg font-semibold text-primary">
-          {(basicInfo.privateName || basicInfo.email).slice(0, 2).toUpperCase()}
-        </Div>
-        <Div className="flex-1 min-w-0 flex flex-col gap-1">
-          <Div className="flex items-center gap-2 flex-wrap">
-            <Span className="break-all text-xl font-bold">
-              {basicInfo.privateName}
-            </Span>
-            <Span className="break-all text-sm text-muted-foreground">
-              @{basicInfo.publicName}
-            </Span>
-            {basicInfo.isBanned ? (
-              <StatusPill
-                status="banned"
-                label={t("status.banned")}
-                variant="danger"
-              />
-            ) : basicInfo.isActive ? (
-              <StatusPill
-                status="active"
-                label={t("status.active")}
-                variant="success"
-              />
-            ) : (
-              <StatusPill
-                status="inactive"
-                label={t("status.inactive")}
-                variant="muted"
-              />
-            )}
-            <StatusPill
-              status={basicInfo.emailVerified ? "verified" : "unverified"}
-              label={
-                basicInfo.emailVerified
-                  ? t("status.verified")
-                  : t("status.unverified")
+    <AdminRecordDetail
+      title={name}
+      subtitle={basicInfo.email !== name ? basicInfo.email : undefined}
+      status={
+        basicInfo.isBanned
+          ? { status: "banned", label: t("status.banned"), variant: "danger" }
+          : basicInfo.isActive
+            ? {
+                status: "active",
+                label: t("status.active"),
+                variant: "success",
               }
-              variant={basicInfo.emailVerified ? "info" : "warning"}
+            : {
+                status: "inactive",
+                label: t("status.inactive"),
+                variant: "muted",
+              }
+      }
+      titleAccessory={
+        <>
+          <StatusPill
+            status={basicInfo.emailVerified ? "verified" : "unverified"}
+            label={
+              basicInfo.emailVerified
+                ? t("status.verified")
+                : t("status.unverified")
+            }
+            variant={basicInfo.emailVerified ? "info" : "warning"}
+          />
+          {paymentStats.subscriptionStatus && (
+            <StatusPill
+              status={paymentStats.subscriptionStatus}
+              label={subscriptionStatusLabel(
+                paymentStats.subscriptionStatus,
+                locale,
+              )}
+              variant={subscriptionStatusVariant(
+                paymentStats.subscriptionStatus,
+              )}
             />
-            {paymentStats.subscriptionStatus && (
-              <StatusPill
-                status={paymentStats.subscriptionStatus}
-                label={subscriptionStatusLabel(
-                  paymentStats.subscriptionStatus,
-                  locale,
-                )}
-                variant={subscriptionStatusVariant(
-                  paymentStats.subscriptionStatus,
-                )}
-              />
-            )}
+          )}
+        </>
+      }
+      backButton={
+        canGoBack ? (
+          <NavigateButtonWidget field={children.backButton} />
+        ) : (
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="gap-1.5"
+            onClick={openDirectory}
+          >
+            <ChevronLeft className="size-4" aria-hidden="true" />
+            {t("widget.actions.browse")}
+          </Button>
+        )
+      }
+      actions={
+        <>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="min-h-11 @lg:hidden"
+            aria-expanded={mobileActionsOpen}
+            aria-controls={mobileActionsId}
+            onClick={() => setMobileActionsOpen((open) => !open)}
+          >
+            {t("widget.actions.more")}
+          </Button>
+          <Div className="hidden @lg:block">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button type="button" variant="outline" size="sm">
+                  {t("widget.actions.more")}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                align="end"
+                className="min-w-48 data-[state=open]:animate-none"
+              >
+                {moreActions.map(({ key, label, icon: ActionIcon, run }) => (
+                  <Fragment key={key}>
+                    {key === "delete" && <DropdownMenuSeparator />}
+                    <DropdownMenuItem
+                      className={
+                        key === "delete" ? "text-destructive" : undefined
+                      }
+                      onSelect={() => void run()}
+                    >
+                      <ActionIcon className="size-4" />
+                      {label}
+                    </DropdownMenuItem>
+                  </Fragment>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </Div>
-          <P className="text-sm text-muted-foreground flex items-center gap-1">
-            <Mail className="h-3 w-3 shrink-0" />
-            <Span className="break-all">{basicInfo.email}</Span>
-          </P>
-          <Div className="flex items-center gap-1 text-xs text-muted-foreground font-mono">
-            <Span className="break-all">{basicInfo.id}</Span>
+          <Button
+            type="button"
+            size="sm"
+            onClick={() => void handleAddCredits()}
+            className="gap-1"
+          >
+            <Coins className="size-4" />
+            {t("widget.actions.addCredits")}
+          </Button>
+        </>
+      }
+    >
+      <Section
+        id={mobileActionsId}
+        aria-label={t("widget.actions.more")}
+        className={
+          mobileActionsOpen
+            ? "flex flex-col rounded-lg border bg-card p-1 @lg:hidden"
+            : "hidden"
+        }
+      >
+        {mobileActionsOpen &&
+          moreActions.map(({ key, label, icon: ActionIcon, run }) => (
             <Button
+              key={key}
               type="button"
               variant="ghost"
-              size="sm"
-              className="h-9 w-9 shrink-0 p-0"
-              onClick={() => void handleCopyUserId()}
-              title={t("widget.actions.copyUserId")}
-              aria-label={t("widget.actions.copyUserId")}
+              className={`h-auto min-h-11 justify-start gap-3 whitespace-normal px-3 text-left ${key === "delete" ? "text-destructive" : ""}`}
+              onClick={() => {
+                setMobileActionsOpen(false);
+                void run();
+              }}
             >
-              {copyIdSuccess ? (
-                <CheckCircle className="h-3 w-3 text-success" />
-              ) : (
-                <Copy className="h-3 w-3" />
-              )}
+              <ActionIcon className="size-4 shrink-0" />
+              {label}
             </Button>
-          </Div>
+          ))}
+      </Section>
+
+      <Div className="flex min-w-0 items-center gap-3">
+        <Div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-muted text-sm font-semibold">
+          {name
+            .trim()
+            .split(/\s+/)
+            .slice(0, 2)
+            .map((word) => word[0])
+            .join("")
+            .toUpperCase()}
+        </Div>
+        <Div className="flex min-w-0 flex-1 flex-col gap-1">
+          {basicInfo.publicName && basicInfo.publicName !== name && (
+            <Span className="truncate text-sm text-muted-foreground">
+              {basicInfo.publicName}
+            </Span>
+          )}
           {/* Roles with inline management */}
           <Div className="flex items-center gap-1.5 flex-wrap pt-1">
             {roles.map((roleItem) => (
@@ -627,63 +798,6 @@ export function UserViewContainer({
         </Div>
       </Div>
 
-      <Div className="flex flex-wrap gap-2">
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={() => void handleEdit()}
-          className="gap-1"
-        >
-          <Pencil className="h-4 w-4" />
-          {t("widget.actions.edit")}
-        </Button>
-        <Button
-          type="button"
-          variant="default"
-          size="sm"
-          onClick={() => void handleAddCredits()}
-          className="gap-1"
-        >
-          <Coins className="h-4 w-4" />
-          {t("widget.actions.addCredits")}
-        </Button>
-        {basicInfo.isBanned ? (
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={() => void handleSetBanned(false)}
-            className="gap-1 text-success hover:text-success/80"
-          >
-            <CheckCircle className="h-4 w-4" />
-            {t("ban.unbanUser")}
-          </Button>
-        ) : (
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={() => void handleSetBanned(true)}
-            className="gap-1 text-destructive hover:text-destructive"
-          >
-            <XCircle className="h-4 w-4" />
-            {t("ban.banUser")}
-          </Button>
-        )}
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={() => void handleDelete()}
-          className="gap-1 text-destructive hover:text-destructive"
-          title={t("widget.actions.delete")}
-          aria-label={t("widget.actions.delete")}
-        >
-          <Trash2 className="h-4 w-4" />
-        </Button>
-      </Div>
-
       {basicInfo.isBanned && basicInfo.bannedReason && (
         <Div className="rounded-lg bg-destructive/10 p-3 border border-destructive/30 flex items-start gap-2">
           <AlertCircle className="h-4 w-4 text-destructive mt-0.5" />
@@ -706,12 +820,14 @@ export function UserViewContainer({
           description={t("kpi.paidHint", {
             count: paymentStats.successfulPayments,
           })}
-          variant={paymentStats.totalPaidUsd > 0 ? "success" : "muted"}
+          variant="muted"
           icon={<DollarSign className="h-4 w-4" />}
         />
         <MetricCard
           label={t("kpi.credits")}
-          value={formatNumber(creditInfo.currentBalance, locale)}
+          value={t("widget.creditAmount", {
+            count: formatNumber(creditInfo.currentBalance, locale, 2),
+          })}
           description={t("kpi.creditsHint", {
             free: formatNumber(creditInfo.freeCreditsRemaining, locale),
           })}
@@ -720,15 +836,15 @@ export function UserViewContainer({
         />
         <MetricCard
           label={t("kpi.spent")}
-          value={formatNumber(creditInfo.totalCreditsSpent, locale)}
-          description={t("kpi.spentHint", {
-            usd: formatUsd(creditInfo.totalCreditsSpent * 0.01, locale),
+          value={t("widget.creditAmount", {
+            count: formatNumber(creditInfo.totalCreditsSpent, locale, 2),
           })}
           icon={<Zap className="h-4 w-4" />}
         />
         <MetricCard
           label={t("kpi.lastSeen")}
-          value={seen ? formatRelative(seen, locale) : t("widget.never")}
+          value={activityKpi(seen, locale, t)}
+          className="[&>div:nth-child(2)>span]:text-lg @md:[&>div:nth-child(2)>span]:text-2xl"
           description={t("kpi.joined", {
             date: formatDay(basicInfo.createdAt, locale),
           })}
@@ -736,103 +852,120 @@ export function UserViewContainer({
         />
       </MetricGrid>
 
-      {/* Tabs */}
-      <Div className="flex flex-wrap gap-1 border-b">
-        {tabs.map((tab) => (
-          <Button
-            key={tab.id}
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={() => setActiveTab(tab.id)}
-            aria-pressed={activeTab === tab.id}
-            className={`h-auto min-h-9 whitespace-normal rounded-b-none border-b-2 gap-1.5 ${
-              activeTab === tab.id
-                ? "border-primary text-primary font-semibold"
-                : "border-transparent text-muted-foreground hover:text-foreground"
-            }`}
+      <Tabs value={activeTab} onValueChange={selectSection}>
+        <Div className="flex min-w-0 flex-col gap-1 @lg:hidden">
+          <Span className="text-xs font-medium text-muted-foreground">
+            {t("tabs.section")}
+          </Span>
+          <Select value={activeTab} onValueChange={selectSection}>
+            <SelectTrigger aria-label={t("tabs.section")} className="min-h-11">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {tabs.map((tab) => (
+                <SelectItem value={tab.id} key={tab.id}>
+                  {tab.label}
+                  {tab.count ? ` (${formatNumber(tab.count, locale)})` : ""}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </Div>
+        <Div className="hidden max-w-full min-w-0 overflow-x-auto border-b [scrollbar-width:thin] @lg:block">
+          <TabsList
+            aria-label={t("get.title")}
+            className="h-auto w-max min-w-full justify-start gap-1 rounded-none border-0 bg-transparent p-0"
           >
-            {tab.label}
-            {tab.count !== undefined && tab.count > 0 && (
-              <Span className="rounded-full bg-muted px-1.5 text-[10px] tabular-nums text-muted-foreground">
-                {tab.count}
-              </Span>
+            {tabs.map((tab) => (
+              <TabsTrigger
+                key={tab.id}
+                value={tab.id}
+                className="min-h-11 shrink-0 snap-start gap-1.5 rounded-b-none border-b-2 border-transparent px-3 text-muted-foreground data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:font-semibold data-[state=active]:text-primary data-[state=active]:shadow-none @lg:min-h-9"
+              >
+                {tab.label}
+                {tab.count !== undefined && tab.count > 0 && (
+                  <Span className="rounded-full bg-muted px-1.5 text-[10px] tabular-nums text-muted-foreground">
+                    {tab.count}
+                  </Span>
+                )}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </Div>
+        <TabsContent value={activeTab} className="mt-4 min-w-0">
+          {activeTab === "overview" && (
+            <OverviewTab data={data} t={t} locale={locale} />
+          )}
+
+          {activeTab === "billing" && (
+            <BillingTab data={data} t={t} locale={locale} />
+          )}
+
+          {activeTab === "credits" && creditsEndpointOptions && (
+            <CreditHistoryTab
+              locale={locale}
+              user={user}
+              endpointOptions={creditsEndpointOptions}
+            />
+          )}
+
+          {activeTab === "referrals" &&
+            referralEndpointOptions &&
+            earningsEndpointOptions && (
+              <Div className="flex flex-col gap-4">
+                <ReferralSummary data={data} t={t} locale={locale} />
+                <ReferralCodesTab
+                  locale={locale}
+                  user={user}
+                  endpointOptions={referralEndpointOptions}
+                />
+                <ReferralEarningsTab
+                  locale={locale}
+                  user={user}
+                  endpointOptions={earningsEndpointOptions}
+                />
+              </Div>
             )}
-          </Button>
-        ))}
-      </Div>
 
-      {activeTab === "overview" && (
-        <OverviewTab data={data} t={t} locale={locale} />
-      )}
+          {activeTab === "activity" && (
+            <ActivityTab
+              data={data}
+              chatStats={chatStats}
+              recentActivity={recentActivity}
+              t={t}
+              locale={locale}
+              onViewErrors={handleViewErrors}
+            />
+          )}
 
-      {activeTab === "billing" && (
-        <BillingTab data={data} t={t} locale={locale} />
-      )}
+          {activeTab === "connections" && (
+            <ConnectionsTab
+              connectedLeads={data.connectedLeads}
+              connectedLeadsTotal={data.connectedLeadsTotal}
+              connectedUsers={data.connectedUsers}
+              t={t}
+              locale={locale}
+            />
+          )}
 
-      {activeTab === "credits" && creditsEndpointOptions && (
-        <CreditHistoryTab
-          locale={locale}
-          user={user}
-          endpointOptions={creditsEndpointOptions}
-        />
-      )}
-
-      {activeTab === "referrals" &&
-        referralEndpointOptions &&
-        earningsEndpointOptions && (
-          <Div className="flex flex-col gap-4">
-            <ReferralSummary data={data} t={t} locale={locale} />
-            <ReferralCodesTab
+          {activeTab === "favorites" && favoritesEndpointOptions && (
+            <FavoritesTab
               locale={locale}
               user={user}
-              endpointOptions={referralEndpointOptions}
+              endpointOptions={favoritesEndpointOptions}
             />
-            <ReferralEarningsTab
+          )}
+
+          {activeTab === "skills" && skillsEndpointOptions && (
+            <SkillsTab
               locale={locale}
               user={user}
-              endpointOptions={earningsEndpointOptions}
+              endpointOptions={skillsEndpointOptions}
             />
-          </Div>
-        )}
-
-      {activeTab === "activity" && (
-        <ActivityTab
-          data={data}
-          chatStats={chatStats}
-          recentActivity={recentActivity}
-          t={t}
-          locale={locale}
-          onViewErrors={handleViewErrors}
-        />
-      )}
-
-      {activeTab === "connections" && (
-        <ConnectionsTab
-          connectedLeads={data.connectedLeads}
-          connectedLeadsTotal={data.connectedLeadsTotal}
-          connectedUsers={data.connectedUsers}
-          t={t}
-          locale={locale}
-        />
-      )}
-
-      {activeTab === "favorites" && favoritesEndpointOptions && (
-        <FavoritesTab
-          locale={locale}
-          user={user}
-          endpointOptions={favoritesEndpointOptions}
-        />
-      )}
-
-      {activeTab === "skills" && skillsEndpointOptions && (
-        <SkillsTab
-          locale={locale}
-          user={user}
-          endpointOptions={skillsEndpointOptions}
-        />
-      )}
-    </WidgetShell>
+          )}
+        </TabsContent>
+      </Tabs>
+    </AdminRecordDetail>
   );
 }
 
@@ -871,11 +1004,10 @@ function OverviewTab({
             />
             <DetailField
               label={t("payment.interval")}
-              value={
-                paymentStats.subscriptionInterval
-                  ? enumTail(paymentStats.subscriptionInterval)
-                  : "-"
-              }
+              value={billingIntervalLabel(
+                paymentStats.subscriptionInterval,
+                locale,
+              )}
             />
             <DetailField
               label={
@@ -911,7 +1043,7 @@ function OverviewTab({
       </SectionGroup>
 
       <SectionGroup title={t("sections.credits")}>
-        <MetricGrid columns={4}>
+        <MetricGrid columns={2} className="@xl:grid-cols-4">
           <MetricCard
             label={t("credits.subscription")}
             value={formatNumber(creditInfo.subscriptionCredits, locale)}
@@ -934,7 +1066,6 @@ function OverviewTab({
           <MetricCard
             label={t("credits.free")}
             value={formatNumber(creditInfo.freeCreditsRemaining, locale)}
-            description={creditInfo.freePeriodId ?? undefined}
           />
         </MetricGrid>
         <DetailGrid columns={3}>
@@ -1065,7 +1196,6 @@ function BillingTab({
   const openRelated = useRelatedEntityNavigation();
   const isInteractive = useWidgetIsInteractive();
   const { t: tPayment } = paymentTranslation.scopedT(locale);
-  const { t: tSubscription } = subscriptionTranslation.scopedT(locale);
   return (
     <Div className="flex flex-col gap-4">
       <MetricGrid columns={4}>
@@ -1093,12 +1223,20 @@ function BillingTab({
         />
       </MetricGrid>
 
-      <SectionGroup title={t("billing.paymentsTitle")}>
+      <SectionGroup
+        title={t("billing.paymentsTitle")}
+        subtitle={
+          basicInfo.privateName || basicInfo.publicName || basicInfo.email
+        }
+      >
         {payments.length === 0 ? (
-          <EmptyBlock
-            icon={<DollarSign className="h-8 w-8" />}
-            title={t("billing.noPayments")}
-          />
+          <Div className="flex min-w-0 items-center gap-3 rounded-md bg-muted/35 px-3 py-4 text-sm text-foreground">
+            <DollarSign
+              aria-hidden="true"
+              className="size-4 shrink-0 text-muted-foreground"
+            />
+            <Span>{t("billing.noPayments")}</Span>
+          </Div>
         ) : (
           <Div className="flex flex-col gap-2">
             {payments.map((payment) => {
@@ -1137,7 +1275,7 @@ function BillingTab({
                           : payment.mode}
                       </Span>
                       {payment.currency.toUpperCase() !== "USD" && (
-                        <Span>{formatUsd(payment.amountUsd, locale)} USD</Span>
+                        <Span>{formatUsd(payment.amountUsd, locale)}</Span>
                       )}
                       {isInteractive && (
                         <Div className="flex flex-wrap gap-2">
@@ -1238,12 +1376,10 @@ function BillingTab({
               )
                 ? tPayment(subscription.provider)
                 : subscription.provider;
-              const interval = isValidEnumValue(
-                BillingInterval,
+              const interval = billingIntervalLabel(
                 subscription.billingInterval,
-              )
-                ? tSubscription(subscription.billingInterval)
-                : subscription.billingInterval;
+                locale,
+              );
               return (
                 <ListItem
                   key={subscription.id}
@@ -1361,9 +1497,9 @@ function ReferralSummary({
               ? "-"
               : referralStats.earnings
                   .map((e) =>
-                    formatMoney(e.amountCents / 100, e.currency, locale),
+                    formatReferralEarning(e.amountCents, e.currency, locale),
                   )
-                  .join(" + ")
+                  .join(" · ")
           }
           variant="info"
         />

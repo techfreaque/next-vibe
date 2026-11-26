@@ -10,11 +10,11 @@ export const { POST, tools } = endpointsHandler({
   endpoint: definition,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ data, urlPathParams, user, logger, locale }) =>
+    handler: ({ data, user, logger, locale }) =>
       BankReconciliationRepository.match(
         user.id,
         data,
-        urlPathParams,
+        { lineId: data.lineId },
         logger,
         locale,
       ),

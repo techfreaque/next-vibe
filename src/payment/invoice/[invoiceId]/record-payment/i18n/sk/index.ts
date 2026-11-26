@@ -108,11 +108,14 @@ export const translations: typeof enTranslations = {
       "Pri opakovaní tejto úhrady použite rovnaký kľúč. Pre inú úhradu použite nový kľúč.",
   },
   accountNodeId: {
-    label: "ID účtu",
-    description: "Nepovinný účet, na ktorý bola pripísaná úhrada",
-    placeholder: "Zadajte ID účtu",
+    label: "Účet úhrady",
+    description:
+      "Vyberte bankový účet alebo pokladnicu, na ktorú ste prijali úhradu.",
+    placeholder: "Vyberte účet",
+    automatic: "Použiť predvolený účet",
   },
   widget: {
+    details: "Podrobnosti úhrady",
     back: "Späť",
     submit: "Zaevidovať úhradu",
     paymentRecorded: "Úhrada bola zaevidovaná.",

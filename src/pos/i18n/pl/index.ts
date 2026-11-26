@@ -43,6 +43,32 @@ export const translations: typeof enTranslations = {
     },
   },
 
+  workflow: {
+    backToSessionOrders: "Wróć do zamówień sesji",
+    receiptTitle: "Paragon",
+    amountDue: "Do zapłaty",
+    ledgerCurrencyMismatch:
+      "Waluta zamówienia różni się od waluty ksiąg. Przed przyjęciem płatności użyj kasy lub zamówienia w walucie ksiąg.",
+    postingUnavailable:
+      "Nie udało się zaksięgować sprzedaży. Sprawdź walutę firmy, otwarty okres i konta księgowe.",
+    cashCurrencyMismatch:
+      "Gotówkę przyjmuj w walucie kasy. Wybierz inną metodę płatności dla tego zamówienia.",
+    tenderMinorUnits: "Wpisz kwotę z dokładnością do pełnych groszy.",
+    legacyTenderReview:
+      "Wcześniejsza płatność zawiera ułamek grosza. Sprawdź zapisaną płatność przed przyjęciem kolejnej.",
+    legacyTenderRecorded:
+      "To zamówienie zachowuje pierwotne kwoty z czterema miejscami po przecinku.",
+    legacyPostingReview:
+      "Nie można zaksięgować kwot zawierających ułamki grosza. Sprawdź pierwotną płatność przed zamknięciem sprzedaży.",
+    viewReceipt: "Zobacz paragon",
+    openDrawer: "Otwórz kasę",
+    warehouse: "Magazyn sprzedaży",
+    noWarehouse: "Nie przypisano magazynu",
+    chooseCompanyFirst: "Najpierw wybierz firmę.",
+    warehouseInstruction: "Wybierz aktywny magazyn wybranej firmy.",
+    stockUnavailable:
+      "W magazynie tej kasy brakuje dostępnych towarów. Przed zakończeniem sprzedaży sprawdź stan.",
+  },
   dashboard: {
     get: {
       title: "Panel POS",
@@ -376,7 +402,7 @@ export const translations: typeof enTranslations = {
         sessionSummary: "Podsumowanie sesji",
         terminal: "Terminal",
         openedAt: "Otwarto o",
-        orderCount: "Zamówienia",
+        orderCount: "Zamówienia: {{count}}",
         sessionRevenue: "Przychód",
         floatHint: "Policz gotówkę w kasie przed zamknięciem.",
         reconciliation: "Zamknięcie dnia",

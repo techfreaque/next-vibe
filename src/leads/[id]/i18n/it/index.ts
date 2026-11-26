@@ -728,6 +728,8 @@ export const translations: typeof enTranslations = {
   widget: {
     loading: "Caricamento del contatto...",
     notFound: "Contatto non trovato.",
+    loadFailed: "Impossibile caricare il contatto",
+    retryLoad: "Riprova",
     back: "Indietro",
     leadFallbackTitle: "Contatto",
     edit: "Modifica",

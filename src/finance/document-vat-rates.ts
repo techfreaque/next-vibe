@@ -16,10 +16,10 @@ export interface VatRateChoice {
   name: string;
 }
 
-export function useDocumentVatRates(
+export function useDocumentVatPolicy(
   companyId: string | undefined,
   enabled: boolean,
-): readonly VatRateChoice[] {
+): { choices: readonly VatRateChoice[]; exemptionNotice: string | null } {
   const logger = useWidgetLogger();
   const user = useWidgetUser();
   const readEnabled = enabled && z.uuid().safeParse(companyId).success;
@@ -37,7 +37,7 @@ export function useDocumentVatRates(
   );
   const { read } = useEndpoint(taxRatesDefinition, options, logger, user);
   if (!readEnabled || !read?.data || read.isLoadingFresh) {
-    return [];
+    return { choices: [], exemptionNotice: null };
   }
   const choices = new Map<number, VatRateChoice>();
   for (const rate of read.data.rates) {
@@ -53,5 +53,15 @@ export function useDocumentVatRates(
       choices.set(rate.rate, { rate: rate.rate, name: rate.name });
     }
   }
-  return [...choices.values()].toSorted((a, b) => a.rate - b.rate);
+  return {
+    choices: [...choices.values()].toSorted((a, b) => a.rate - b.rate),
+    exemptionNotice: read.data.salesExemptionNotice ?? null,
+  };
+}
+
+export function useDocumentVatRates(
+  companyId: string | undefined,
+  enabled: boolean,
+): readonly VatRateChoice[] {
+  return useDocumentVatPolicy(companyId, enabled).choices;
 }

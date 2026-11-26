@@ -268,6 +268,12 @@ export const translations: typeof enTranslations = {
       titleShort: "Detalles del vendedor",
       description: "Recuperar detalles completos para un vendedor.",
       widget: {
+        companyName: "Empresa",
+        orderCount: "Pedidos de compra",
+        receivingCount: "Pendientes de recepción",
+        details: "Datos del proveedor",
+        related: "Gestionar proveedor",
+        backToList: "Volver a los proveedores",
         back: "Atrás",
         edit: "Editar vendedor",
         createOrder: "Nueva Orden de Compra",
@@ -685,6 +691,9 @@ export const translations: typeof enTranslations = {
         colStatus: "Situación",
         deliveryArrow: "→",
         overdue: "atrasado",
+        readyToBill: "Recibidos, pendientes de facturar",
+        openAttentionOrder: "Abrir el pedido {{reference}}",
+        attentionCount: "Pedidos que requieren atención: {{count}}",
         actionNeeded: "órdenes de compra necesitan atención",
         back: "Atrás",
         loading: "Cargando…",
@@ -758,8 +767,10 @@ export const translations: typeof enTranslations = {
       description:
         "Recuperar una orden de compra con todas las líneas y la historia de la recepción.",
       widget: {
+        precision:
+          "Los totales de las líneas usan el precio unitario del proveedor antes del redondeo.",
         back: "Atrás",
-        send: "Enviar a un vendedor",
+        send: "Marcar como enviado",
         confirm: "Mark confirmó",
         receive: "Recibir bienes",
         convertToBill: "Convertirse en factura",
@@ -988,9 +999,9 @@ export const translations: typeof enTranslations = {
   // PO send
   orderSend: {
     post: {
-      title: "Enviar Pedido de Compra",
-      titleShort: "Enviar pedido",
-      description: "Marcar el pedido de compra como se envió al vendedor.",
+      title: "Marcar pedido como enviado",
+      titleShort: "Marcar como enviado",
+      description: "Registre el envío del pedido de compra.",
       poId: {
         label: "Orden de compra ID",
         description: "Orden de compra para enviar",
@@ -999,7 +1010,7 @@ export const translations: typeof enTranslations = {
         back: "Atrás",
         backToPO: "Volver a la orden de compra",
         warning:
-          "Enviar marcas esta orden de compra como enviado al vendedor. Cambios de estado de Borrador a Sent.",
+          "El estado del pedido cambia a Enviado en este espacio de trabajo.",
       },
       errors: {
         validation: {
@@ -1040,8 +1051,8 @@ export const translations: typeof enTranslations = {
         },
       },
       success: {
-        title: "Pedido de compra enviado",
-        description: "Orden de compra marcado como enviado",
+        title: "Pedido marcado como enviado",
+        description: "El pedido está ahora en estado Enviado.",
       },
       response: {
         id: "Orden de compra ID",
@@ -1123,6 +1134,10 @@ export const translations: typeof enTranslations = {
       description:
         "Registro de recibo de mercancías contra una orden de compra. Crea movimientos de acciones.",
       widget: {
+        retry: "Volver a intentar",
+        loading: "Cargando pedido…",
+        remaining: "Cantidad pendiente: {{quantity}}",
+        noOpenLines: "Ya se recibieron todas las cantidades del pedido.",
         backToPO: "Volver a la orden de compra",
       },
       poId: {
@@ -1273,6 +1288,10 @@ export const translations: typeof enTranslations = {
   orderLineAdd: {
     post: {
       widget: {
+        productSearch: "Buscar productos por nombre o SKU",
+        search: "Buscar",
+        noProducts: "No hay productos que coincidan.",
+        clearProduct: "Quitar producto",
         backToOrder: "Regresar al orden",
         lineAdded: "Tema de línea añadido",
       },
@@ -1375,6 +1394,11 @@ export const translations: typeof enTranslations = {
         description: "Artículo de línea para eliminar",
       },
       widget: {
+        updatedOrderTotals: "Totales actualizados del pedido",
+        cancel: "Cancelar",
+        verifying: "Comprobando la línea seleccionada…",
+        unavailable:
+          "Vuelva a abrir el pedido en borrador y seleccione la línea que quiere quitar.",
         backToOrder: "Volver al pedido de compra",
         warning:
           "Esto eliminará permanentemente el artículo de la línea del pedido de compra.",

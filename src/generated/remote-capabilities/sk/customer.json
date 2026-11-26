@@ -2644,8 +2644,12 @@
     "fields": {
       "type": "container",
       "title": "Pripojiť Acumbamail",
-      "description": "Pripoj účet Acumbamail a zbieraj kontakty zo stránky svojej zručnosti",
       "layoutType": "stacked",
+      "adminForm": {
+        "sectionTitle": "providers.shared.connectionSettings",
+        "submitText": "providers.acumbamail.title"
+      },
+      "description": "Pripoj účet Acumbamail a zbieraj kontakty zo stránky svojej zručnosti",
       "usage": {
         "request": "data",
         "response": true
@@ -2837,8 +2841,12 @@
     "fields": {
       "type": "container",
       "title": "Pripojiť Adobe Campaign",
-      "description": "Pripoj účet Adobe Campaign a zbieraj kontakty zo stránky svojej zručnosti",
       "layoutType": "stacked",
+      "adminForm": {
+        "sectionTitle": "providers.shared.connectionSettings",
+        "submitText": "providers.adobecampaign.title"
+      },
+      "description": "Pripoj účet Adobe Campaign a zbieraj kontakty zo stránky svojej zručnosti",
       "usage": {
         "request": "data",
         "response": true
@@ -3107,8 +3115,12 @@
     "fields": {
       "type": "container",
       "title": "Pripojiť CleverReach",
-      "description": "Pripoj účet CleverReach a zbieraj kontakty zo stránky svojej zručnosti",
       "layoutType": "stacked",
+      "adminForm": {
+        "sectionTitle": "providers.shared.connectionSettings",
+        "submitText": "providers.cleverreach.title"
+      },
+      "description": "Pripoj účet CleverReach a zbieraj kontakty zo stránky svojej zručnosti",
       "usage": {
         "request": "data",
         "response": true
@@ -3365,8 +3377,12 @@
     "fields": {
       "type": "container",
       "title": "Pripojiť Connectif",
-      "description": "Pripoj účet Connectif a zbieraj kontakty zo stránky svojej zručnosti",
       "layoutType": "stacked",
+      "adminForm": {
+        "sectionTitle": "providers.shared.connectionSettings",
+        "submitText": "providers.connectif.title"
+      },
+      "description": "Pripoj účet Connectif a zbieraj kontakty zo stránky svojej zručnosti",
       "usage": {
         "request": "data",
         "response": true
@@ -3558,8 +3574,12 @@
     "fields": {
       "type": "container",
       "title": "Pripojiť DataNext",
-      "description": "Pripoj účet DataNext a zbieraj kontakty zo stránky svojej zručnosti",
       "layoutType": "stacked",
+      "adminForm": {
+        "sectionTitle": "providers.shared.connectionSettings",
+        "submitText": "providers.datanext.title"
+      },
+      "description": "Pripoj účet DataNext a zbieraj kontakty zo stránky svojej zručnosti",
       "usage": {
         "request": "data",
         "response": true
@@ -3810,8 +3830,12 @@
     "fields": {
       "type": "container",
       "title": "Pripojiť Edrone",
-      "description": "Pripoj účet Edrone a zbieraj kontakty zo stránky svojej zručnosti",
       "layoutType": "stacked",
+      "adminForm": {
+        "sectionTitle": "providers.shared.connectionSettings",
+        "submitText": "providers.edrone.title"
+      },
+      "description": "Pripoj účet Edrone a zbieraj kontakty zo stránky svojej zručnosti",
       "usage": {
         "request": "data",
         "response": true
@@ -3998,8 +4022,12 @@
     "fields": {
       "type": "container",
       "title": "Pripojiť Emarsys",
-      "description": "Pripoj účet Emarsys a zbieraj kontakty zo stránky svojej zručnosti",
       "layoutType": "stacked",
+      "adminForm": {
+        "sectionTitle": "providers.shared.connectionSettings",
+        "submitText": "providers.emarsys.title"
+      },
+      "description": "Pripoj účet Emarsys a zbieraj kontakty zo stránky svojej zručnosti",
       "usage": {
         "request": "data",
         "response": true
@@ -4227,8 +4255,12 @@
     "fields": {
       "type": "container",
       "title": "Pripojiť ExpertSender",
-      "description": "Pripoj účet ExpertSender a zbieraj kontakty zo stránky svojej zručnosti",
       "layoutType": "stacked",
+      "adminForm": {
+        "sectionTitle": "providers.shared.connectionSettings",
+        "submitText": "providers.expertsender.title"
+      },
+      "description": "Pripoj účet ExpertSender a zbieraj kontakty zo stránky svojej zručnosti",
       "usage": {
         "request": "data",
         "response": true
@@ -4438,8 +4470,12 @@
     "fields": {
       "type": "container",
       "title": "Pripojiť FreshMail",
-      "description": "Pripoj účet FreshMail a zbieraj kontakty zo stránky svojej zručnosti",
       "layoutType": "stacked",
+      "adminForm": {
+        "sectionTitle": "providers.shared.connectionSettings",
+        "submitText": "providers.freshmail.title"
+      },
+      "description": "Pripoj účet FreshMail a zbieraj kontakty zo stránky svojej zručnosti",
       "usage": {
         "request": "data",
         "response": true
@@ -4672,8 +4708,12 @@
     "fields": {
       "type": "container",
       "title": "Pripojiť GetResponse",
-      "description": "Pripoj účet GetResponse a zbieraj kontakty zo stránky svojej zručnosti",
       "layoutType": "stacked",
+      "adminForm": {
+        "sectionTitle": "providers.shared.connectionSettings",
+        "submitText": "providers.getresponse.title"
+      },
+      "description": "Pripoj účet GetResponse a zbieraj kontakty zo stránky svojej zručnosti",
       "usage": {
         "request": "data",
         "response": true
@@ -5128,8 +5168,12 @@
     "fields": {
       "type": "container",
       "title": "Pripojiť Klaviyo",
-      "description": "Pripoj účet Klaviyo a zbieraj kontakty zo stránky svojej zručnosti",
       "layoutType": "stacked",
+      "adminForm": {
+        "sectionTitle": "providers.shared.connectionSettings",
+        "submitText": "providers.klaviyo.title"
+      },
+      "description": "Pripoj účet Klaviyo a zbieraj kontakty zo stránky svojej zručnosti",
       "usage": {
         "request": "data",
         "response": true
@@ -5321,8 +5365,12 @@
     "fields": {
       "type": "container",
       "title": "Pripojiť MailUp",
-      "description": "Pripoj účet MailUp a zbieraj kontakty zo stránky svojej zručnosti",
       "layoutType": "stacked",
+      "adminForm": {
+        "sectionTitle": "providers.shared.connectionSettings",
+        "submitText": "providers.mailup.title"
+      },
+      "description": "Pripoj účet MailUp a zbieraj kontakty zo stránky svojej zručnosti",
       "usage": {
         "request": "data",
         "response": true
@@ -5591,8 +5639,12 @@
     "fields": {
       "type": "container",
       "title": "Pripojiť Mapp",
-      "description": "Pripoj účet Mapp a zbieraj kontakty zo stránky svojej zručnosti",
       "layoutType": "stacked",
+      "adminForm": {
+        "sectionTitle": "providers.shared.connectionSettings",
+        "submitText": "providers.mapp.title"
+      },
+      "description": "Pripoj účet Mapp a zbieraj kontakty zo stránky svojej zručnosti",
       "usage": {
         "request": "data",
         "response": true
@@ -5820,8 +5872,12 @@
     "fields": {
       "type": "container",
       "title": "Oznamovať e-mailom cez platformu",
-      "description": "Dostaneš e-mail vždy, keď sa niekto prihlási na odber cez tvoj formulár",
       "layoutType": "stacked",
+      "adminForm": {
+        "sectionTitle": "providers.shared.connectionSettings",
+        "submitText": "providers.platformEmail.title"
+      },
+      "description": "Dostaneš e-mail vždy, keď sa niekto prihlási na odber cez tvoj formulár",
       "usage": {
         "request": "data",
         "response": true
@@ -6000,8 +6056,12 @@
     "fields": {
       "type": "container",
       "title": "Pripojiť Sailthru",
-      "description": "Pripoj účet Sailthru a zbieraj kontakty zo stránky svojej zručnosti",
       "layoutType": "stacked",
+      "adminForm": {
+        "sectionTitle": "providers.shared.connectionSettings",
+        "submitText": "providers.sailthru.title"
+      },
+      "description": "Pripoj účet Sailthru a zbieraj kontakty zo stránky svojej zručnosti",
       "usage": {
         "request": "data",
         "response": true
@@ -6234,8 +6294,12 @@
     "fields": {
       "type": "container",
       "title": "Pripojiť SALESmanago",
-      "description": "Pripoj účet SALESmanago a zbieraj kontakty zo stránky svojej zručnosti",
       "layoutType": "stacked",
+      "adminForm": {
+        "sectionTitle": "providers.shared.connectionSettings",
+        "submitText": "providers.salesmanago.title"
+      },
+      "description": "Pripoj účet SALESmanago a zbieraj kontakty zo stránky svojej zručnosti",
       "usage": {
         "request": "data",
         "response": true
@@ -6504,8 +6568,12 @@
     "fields": {
       "type": "container",
       "title": "Pripojiť Shopify",
-      "description": "Pripoj obchod Shopify a zbieraj kontakty zo stránky svojej zručnosti",
       "layoutType": "stacked",
+      "adminForm": {
+        "sectionTitle": "providers.shared.connectionSettings",
+        "submitText": "providers.shopify.title"
+      },
+      "description": "Pripoj obchod Shopify a zbieraj kontakty zo stránky svojej zručnosti",
       "usage": {
         "request": "data",
         "response": true
@@ -6715,8 +6783,12 @@
     "fields": {
       "type": "container",
       "title": "Pripojiť Spotler",
-      "description": "Pripoj účet Spotler a zbieraj kontakty zo stránky svojej zručnosti",
       "layoutType": "stacked",
+      "adminForm": {
+        "sectionTitle": "providers.shared.connectionSettings",
+        "submitText": "providers.spotler.title"
+      },
+      "description": "Pripoj účet Spotler a zbieraj kontakty zo stránky svojej zručnosti",
       "usage": {
         "request": "data",
         "response": true
@@ -6926,8 +6998,12 @@
     "fields": {
       "type": "container",
       "title": "Pripojiť YouLead",
-      "description": "Pripoj účet YouLead a zbieraj kontakty zo stránky svojej zručnosti",
       "layoutType": "stacked",
+      "adminForm": {
+        "sectionTitle": "providers.shared.connectionSettings",
+        "submitText": "providers.youlead.title"
+      },
+      "description": "Pripoj účet YouLead a zbieraj kontakty zo stránky svojej zručnosti",
       "usage": {
         "request": "data",
         "response": true
@@ -11407,6 +11483,72 @@
             },
             "type": "number",
             "isFinite": true
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "totalRevenueMeasuredPurchases": {
+          "type": "text",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "number",
+                  "checks": [
+                    {
+                      "def": {
+                        "type": "number",
+                        "check": "number_format",
+                        "abort": false,
+                        "format": "safeint"
+                      },
+                      "type": "number",
+                      "isFinite": true
+                    },
+                    {}
+                  ]
+                },
+                "type": "number",
+                "isFinite": true
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "totalRevenuePurchaseCount": {
+          "type": "text",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "number",
+                  "checks": [
+                    {
+                      "def": {
+                        "type": "number",
+                        "check": "number_format",
+                        "abort": false,
+                        "format": "safeint"
+                      },
+                      "type": "number",
+                      "isFinite": true
+                    },
+                    {}
+                  ]
+                },
+                "type": "number",
+                "isFinite": true
+              }
+            },
+            "type": "optional"
           },
           "usage": {
             "response": true
@@ -289371,6 +289513,1104 @@
             "type": "optional"
           },
           "hiddenForPlatforms": ["ai", "mcp", "cron", "remote-skill"],
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "adminCatalogDestinations": {
+          "type": "text",
+          "label": "Pracovné oblasti",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "record",
+                  "keyType": {
+                    "def": {
+                      "type": "string"
+                    },
+                    "type": "string"
+                  },
+                  "valueType": {
+                    "def": {
+                      "type": "object",
+                      "shape": {
+                        "category": {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string"
+                        },
+                        "subCategory": {
+                          "def": {
+                            "type": "optional",
+                            "innerType": {
+                              "def": {
+                                "type": "string"
+                              },
+                              "type": "string"
+                            }
+                          },
+                          "type": "optional"
+                        }
+                      }
+                    },
+                    "type": "object"
+                  }
+                },
+                "type": "record",
+                "keyType": {
+                  "def": {
+                    "type": "string"
+                  },
+                  "type": "string"
+                },
+                "valueType": {
+                  "def": {
+                    "type": "object",
+                    "shape": {
+                      "category": {
+                        "def": {
+                          "type": "string"
+                        },
+                        "type": "string"
+                      },
+                      "subCategory": {
+                        "def": {
+                          "type": "optional",
+                          "innerType": {
+                            "def": {
+                              "type": "string"
+                            },
+                            "type": "string"
+                          }
+                        },
+                        "type": "optional"
+                      }
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "type": "optional"
+          },
+          "visibleFor": ["enums.userRole.admin"],
+          "hiddenForPlatforms": [
+            "ai",
+            "mcp",
+            "cron",
+            "remote-skill",
+            "cli",
+            "cli-package"
+          ],
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "adminCategoryLandings": {
+          "type": "text",
+          "label": "Pracovné oblasti",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "record",
+                  "keyType": {
+                    "def": {
+                      "type": "string"
+                    },
+                    "type": "string"
+                  },
+                  "valueType": {
+                    "def": {
+                      "type": "object",
+                      "shape": {
+                        "description": {
+                          "def": {
+                            "type": "optional",
+                            "innerType": {
+                              "def": {
+                                "type": "string"
+                              },
+                              "type": "string"
+                            }
+                          },
+                          "type": "optional"
+                        },
+                        "heading": {
+                          "def": {
+                            "type": "optional",
+                            "innerType": {
+                              "def": {
+                                "type": "string"
+                              },
+                              "type": "string"
+                            }
+                          },
+                          "type": "optional"
+                        },
+                        "overview": {
+                          "def": {
+                            "type": "optional",
+                            "innerType": {
+                              "def": {
+                                "type": "object",
+                                "shape": {
+                                  "alias": {
+                                    "def": {
+                                      "type": "string"
+                                    },
+                                    "type": "string"
+                                  },
+                                  "scope": {
+                                    "def": {
+                                      "type": "enum",
+                                      "entries": {
+                                        "platform": "platform",
+                                        "company": "company"
+                                      }
+                                    },
+                                    "type": "enum",
+                                    "enum": {
+                                      "platform": "platform",
+                                      "company": "company"
+                                    },
+                                    "options": ["platform", "company"]
+                                  }
+                                }
+                              },
+                              "type": "object"
+                            }
+                          },
+                          "type": "optional"
+                        },
+                        "summary": {
+                          "def": {
+                            "type": "optional",
+                            "innerType": {
+                              "def": {
+                                "type": "object",
+                                "shape": {
+                                  "alias": {
+                                    "def": {
+                                      "type": "string"
+                                    },
+                                    "type": "string"
+                                  },
+                                  "scope": {
+                                    "def": {
+                                      "type": "enum",
+                                      "entries": {
+                                        "platform": "platform",
+                                        "company": "company"
+                                      }
+                                    },
+                                    "type": "enum",
+                                    "enum": {
+                                      "platform": "platform",
+                                      "company": "company"
+                                    },
+                                    "options": ["platform", "company"]
+                                  },
+                                  "args": {
+                                    "def": {
+                                      "type": "optional",
+                                      "innerType": {
+                                        "def": {
+                                          "type": "record",
+                                          "keyType": {
+                                            "def": {
+                                              "type": "string"
+                                            },
+                                            "type": "string"
+                                          },
+                                          "valueType": {
+                                            "def": {
+                                              "type": "string"
+                                            },
+                                            "type": "string"
+                                          }
+                                        },
+                                        "type": "record",
+                                        "keyType": {
+                                          "def": {
+                                            "type": "string"
+                                          },
+                                          "type": "string"
+                                        },
+                                        "valueType": {
+                                          "def": {
+                                            "type": "string"
+                                          },
+                                          "type": "string"
+                                        }
+                                      }
+                                    },
+                                    "type": "optional"
+                                  },
+                                  "home": {
+                                    "def": {
+                                      "type": "optional",
+                                      "innerType": {
+                                        "def": {
+                                          "type": "boolean"
+                                        },
+                                        "type": "boolean"
+                                      }
+                                    },
+                                    "type": "optional"
+                                  },
+                                  "homeArgs": {
+                                    "def": {
+                                      "type": "optional",
+                                      "innerType": {
+                                        "def": {
+                                          "type": "record",
+                                          "keyType": {
+                                            "def": {
+                                              "type": "string"
+                                            },
+                                            "type": "string"
+                                          },
+                                          "valueType": {
+                                            "def": {
+                                              "type": "string"
+                                            },
+                                            "type": "string"
+                                          }
+                                        },
+                                        "type": "record",
+                                        "keyType": {
+                                          "def": {
+                                            "type": "string"
+                                          },
+                                          "type": "string"
+                                        },
+                                        "valueType": {
+                                          "def": {
+                                            "type": "string"
+                                          },
+                                          "type": "string"
+                                        }
+                                      }
+                                    },
+                                    "type": "optional"
+                                  },
+                                  "progressive": {
+                                    "def": {
+                                      "type": "optional",
+                                      "innerType": {
+                                        "def": {
+                                          "type": "boolean"
+                                        },
+                                        "type": "boolean"
+                                      }
+                                    },
+                                    "type": "optional"
+                                  }
+                                }
+                              },
+                              "type": "object"
+                            }
+                          },
+                          "type": "optional"
+                        },
+                        "contextualActions": {
+                          "def": {
+                            "type": "optional",
+                            "innerType": {
+                              "def": {
+                                "type": "boolean"
+                              },
+                              "type": "boolean"
+                            }
+                          },
+                          "type": "optional"
+                        },
+                        "actions": {
+                          "def": {
+                            "type": "array",
+                            "element": {
+                              "def": {
+                                "type": "object",
+                                "shape": {
+                                  "alias": {
+                                    "def": {
+                                      "type": "string"
+                                    },
+                                    "type": "string"
+                                  },
+                                  "title": {
+                                    "def": {
+                                      "type": "string"
+                                    },
+                                    "type": "string"
+                                  }
+                                }
+                              },
+                              "type": "object"
+                            }
+                          },
+                          "type": "array",
+                          "element": {
+                            "def": {
+                              "type": "object",
+                              "shape": {
+                                "alias": {
+                                  "def": {
+                                    "type": "string"
+                                  },
+                                  "type": "string"
+                                },
+                                "title": {
+                                  "def": {
+                                    "type": "string"
+                                  },
+                                  "type": "string"
+                                }
+                              }
+                            },
+                            "type": "object"
+                          }
+                        },
+                        "destinations": {
+                          "def": {
+                            "type": "array",
+                            "element": {
+                              "def": {
+                                "type": "object",
+                                "shape": {
+                                  "alias": {
+                                    "def": {
+                                      "type": "string"
+                                    },
+                                    "type": "string"
+                                  },
+                                  "title": {
+                                    "def": {
+                                      "type": "string"
+                                    },
+                                    "type": "string"
+                                  },
+                                  "description": {
+                                    "def": {
+                                      "type": "optional",
+                                      "innerType": {
+                                        "def": {
+                                          "type": "string"
+                                        },
+                                        "type": "string"
+                                      }
+                                    },
+                                    "type": "optional"
+                                  }
+                                }
+                              },
+                              "type": "object"
+                            }
+                          },
+                          "type": "array",
+                          "element": {
+                            "def": {
+                              "type": "object",
+                              "shape": {
+                                "alias": {
+                                  "def": {
+                                    "type": "string"
+                                  },
+                                  "type": "string"
+                                },
+                                "title": {
+                                  "def": {
+                                    "type": "string"
+                                  },
+                                  "type": "string"
+                                },
+                                "description": {
+                                  "def": {
+                                    "type": "optional",
+                                    "innerType": {
+                                      "def": {
+                                        "type": "string"
+                                      },
+                                      "type": "string"
+                                    }
+                                  },
+                                  "type": "optional"
+                                }
+                              }
+                            },
+                            "type": "object"
+                          }
+                        },
+                        "createActions": {
+                          "def": {
+                            "type": "array",
+                            "element": {
+                              "def": {
+                                "type": "object",
+                                "shape": {
+                                  "alias": {
+                                    "def": {
+                                      "type": "string"
+                                    },
+                                    "type": "string"
+                                  },
+                                  "title": {
+                                    "def": {
+                                      "type": "string"
+                                    },
+                                    "type": "string"
+                                  },
+                                  "description": {
+                                    "def": {
+                                      "type": "optional",
+                                      "innerType": {
+                                        "def": {
+                                          "type": "string"
+                                        },
+                                        "type": "string"
+                                      }
+                                    },
+                                    "type": "optional"
+                                  }
+                                }
+                              },
+                              "type": "object"
+                            }
+                          },
+                          "type": "array",
+                          "element": {
+                            "def": {
+                              "type": "object",
+                              "shape": {
+                                "alias": {
+                                  "def": {
+                                    "type": "string"
+                                  },
+                                  "type": "string"
+                                },
+                                "title": {
+                                  "def": {
+                                    "type": "string"
+                                  },
+                                  "type": "string"
+                                },
+                                "description": {
+                                  "def": {
+                                    "type": "optional",
+                                    "innerType": {
+                                      "def": {
+                                        "type": "string"
+                                      },
+                                      "type": "string"
+                                    }
+                                  },
+                                  "type": "optional"
+                                }
+                              }
+                            },
+                            "type": "object"
+                          }
+                        },
+                        "automations": {
+                          "def": {
+                            "type": "array",
+                            "element": {
+                              "def": {
+                                "type": "object",
+                                "shape": {
+                                  "alias": {
+                                    "def": {
+                                      "type": "string"
+                                    },
+                                    "type": "string"
+                                  },
+                                  "title": {
+                                    "def": {
+                                      "type": "string"
+                                    },
+                                    "type": "string"
+                                  },
+                                  "description": {
+                                    "def": {
+                                      "type": "optional",
+                                      "innerType": {
+                                        "def": {
+                                          "type": "string"
+                                        },
+                                        "type": "string"
+                                      }
+                                    },
+                                    "type": "optional"
+                                  }
+                                }
+                              },
+                              "type": "object"
+                            }
+                          },
+                          "type": "array",
+                          "element": {
+                            "def": {
+                              "type": "object",
+                              "shape": {
+                                "alias": {
+                                  "def": {
+                                    "type": "string"
+                                  },
+                                  "type": "string"
+                                },
+                                "title": {
+                                  "def": {
+                                    "type": "string"
+                                  },
+                                  "type": "string"
+                                },
+                                "description": {
+                                  "def": {
+                                    "type": "optional",
+                                    "innerType": {
+                                      "def": {
+                                        "type": "string"
+                                      },
+                                      "type": "string"
+                                    }
+                                  },
+                                  "type": "optional"
+                                }
+                              }
+                            },
+                            "type": "object"
+                          }
+                        },
+                        "automationCount": {
+                          "def": {
+                            "type": "number",
+                            "checks": []
+                          },
+                          "type": "number",
+                          "isFinite": true
+                        },
+                        "developerCount": {
+                          "def": {
+                            "type": "number",
+                            "checks": []
+                          },
+                          "type": "number",
+                          "isFinite": true
+                        }
+                      }
+                    },
+                    "type": "object"
+                  }
+                },
+                "type": "record",
+                "keyType": {
+                  "def": {
+                    "type": "string"
+                  },
+                  "type": "string"
+                },
+                "valueType": {
+                  "def": {
+                    "type": "object",
+                    "shape": {
+                      "description": {
+                        "def": {
+                          "type": "optional",
+                          "innerType": {
+                            "def": {
+                              "type": "string"
+                            },
+                            "type": "string"
+                          }
+                        },
+                        "type": "optional"
+                      },
+                      "heading": {
+                        "def": {
+                          "type": "optional",
+                          "innerType": {
+                            "def": {
+                              "type": "string"
+                            },
+                            "type": "string"
+                          }
+                        },
+                        "type": "optional"
+                      },
+                      "overview": {
+                        "def": {
+                          "type": "optional",
+                          "innerType": {
+                            "def": {
+                              "type": "object",
+                              "shape": {
+                                "alias": {
+                                  "def": {
+                                    "type": "string"
+                                  },
+                                  "type": "string"
+                                },
+                                "scope": {
+                                  "def": {
+                                    "type": "enum",
+                                    "entries": {
+                                      "platform": "platform",
+                                      "company": "company"
+                                    }
+                                  },
+                                  "type": "enum",
+                                  "enum": {
+                                    "platform": "platform",
+                                    "company": "company"
+                                  },
+                                  "options": ["platform", "company"]
+                                }
+                              }
+                            },
+                            "type": "object"
+                          }
+                        },
+                        "type": "optional"
+                      },
+                      "summary": {
+                        "def": {
+                          "type": "optional",
+                          "innerType": {
+                            "def": {
+                              "type": "object",
+                              "shape": {
+                                "alias": {
+                                  "def": {
+                                    "type": "string"
+                                  },
+                                  "type": "string"
+                                },
+                                "scope": {
+                                  "def": {
+                                    "type": "enum",
+                                    "entries": {
+                                      "platform": "platform",
+                                      "company": "company"
+                                    }
+                                  },
+                                  "type": "enum",
+                                  "enum": {
+                                    "platform": "platform",
+                                    "company": "company"
+                                  },
+                                  "options": ["platform", "company"]
+                                },
+                                "args": {
+                                  "def": {
+                                    "type": "optional",
+                                    "innerType": {
+                                      "def": {
+                                        "type": "record",
+                                        "keyType": {
+                                          "def": {
+                                            "type": "string"
+                                          },
+                                          "type": "string"
+                                        },
+                                        "valueType": {
+                                          "def": {
+                                            "type": "string"
+                                          },
+                                          "type": "string"
+                                        }
+                                      },
+                                      "type": "record",
+                                      "keyType": {
+                                        "def": {
+                                          "type": "string"
+                                        },
+                                        "type": "string"
+                                      },
+                                      "valueType": {
+                                        "def": {
+                                          "type": "string"
+                                        },
+                                        "type": "string"
+                                      }
+                                    }
+                                  },
+                                  "type": "optional"
+                                },
+                                "home": {
+                                  "def": {
+                                    "type": "optional",
+                                    "innerType": {
+                                      "def": {
+                                        "type": "boolean"
+                                      },
+                                      "type": "boolean"
+                                    }
+                                  },
+                                  "type": "optional"
+                                },
+                                "homeArgs": {
+                                  "def": {
+                                    "type": "optional",
+                                    "innerType": {
+                                      "def": {
+                                        "type": "record",
+                                        "keyType": {
+                                          "def": {
+                                            "type": "string"
+                                          },
+                                          "type": "string"
+                                        },
+                                        "valueType": {
+                                          "def": {
+                                            "type": "string"
+                                          },
+                                          "type": "string"
+                                        }
+                                      },
+                                      "type": "record",
+                                      "keyType": {
+                                        "def": {
+                                          "type": "string"
+                                        },
+                                        "type": "string"
+                                      },
+                                      "valueType": {
+                                        "def": {
+                                          "type": "string"
+                                        },
+                                        "type": "string"
+                                      }
+                                    }
+                                  },
+                                  "type": "optional"
+                                },
+                                "progressive": {
+                                  "def": {
+                                    "type": "optional",
+                                    "innerType": {
+                                      "def": {
+                                        "type": "boolean"
+                                      },
+                                      "type": "boolean"
+                                    }
+                                  },
+                                  "type": "optional"
+                                }
+                              }
+                            },
+                            "type": "object"
+                          }
+                        },
+                        "type": "optional"
+                      },
+                      "contextualActions": {
+                        "def": {
+                          "type": "optional",
+                          "innerType": {
+                            "def": {
+                              "type": "boolean"
+                            },
+                            "type": "boolean"
+                          }
+                        },
+                        "type": "optional"
+                      },
+                      "actions": {
+                        "def": {
+                          "type": "array",
+                          "element": {
+                            "def": {
+                              "type": "object",
+                              "shape": {
+                                "alias": {
+                                  "def": {
+                                    "type": "string"
+                                  },
+                                  "type": "string"
+                                },
+                                "title": {
+                                  "def": {
+                                    "type": "string"
+                                  },
+                                  "type": "string"
+                                }
+                              }
+                            },
+                            "type": "object"
+                          }
+                        },
+                        "type": "array",
+                        "element": {
+                          "def": {
+                            "type": "object",
+                            "shape": {
+                              "alias": {
+                                "def": {
+                                  "type": "string"
+                                },
+                                "type": "string"
+                              },
+                              "title": {
+                                "def": {
+                                  "type": "string"
+                                },
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "type": "object"
+                        }
+                      },
+                      "destinations": {
+                        "def": {
+                          "type": "array",
+                          "element": {
+                            "def": {
+                              "type": "object",
+                              "shape": {
+                                "alias": {
+                                  "def": {
+                                    "type": "string"
+                                  },
+                                  "type": "string"
+                                },
+                                "title": {
+                                  "def": {
+                                    "type": "string"
+                                  },
+                                  "type": "string"
+                                },
+                                "description": {
+                                  "def": {
+                                    "type": "optional",
+                                    "innerType": {
+                                      "def": {
+                                        "type": "string"
+                                      },
+                                      "type": "string"
+                                    }
+                                  },
+                                  "type": "optional"
+                                }
+                              }
+                            },
+                            "type": "object"
+                          }
+                        },
+                        "type": "array",
+                        "element": {
+                          "def": {
+                            "type": "object",
+                            "shape": {
+                              "alias": {
+                                "def": {
+                                  "type": "string"
+                                },
+                                "type": "string"
+                              },
+                              "title": {
+                                "def": {
+                                  "type": "string"
+                                },
+                                "type": "string"
+                              },
+                              "description": {
+                                "def": {
+                                  "type": "optional",
+                                  "innerType": {
+                                    "def": {
+                                      "type": "string"
+                                    },
+                                    "type": "string"
+                                  }
+                                },
+                                "type": "optional"
+                              }
+                            }
+                          },
+                          "type": "object"
+                        }
+                      },
+                      "createActions": {
+                        "def": {
+                          "type": "array",
+                          "element": {
+                            "def": {
+                              "type": "object",
+                              "shape": {
+                                "alias": {
+                                  "def": {
+                                    "type": "string"
+                                  },
+                                  "type": "string"
+                                },
+                                "title": {
+                                  "def": {
+                                    "type": "string"
+                                  },
+                                  "type": "string"
+                                },
+                                "description": {
+                                  "def": {
+                                    "type": "optional",
+                                    "innerType": {
+                                      "def": {
+                                        "type": "string"
+                                      },
+                                      "type": "string"
+                                    }
+                                  },
+                                  "type": "optional"
+                                }
+                              }
+                            },
+                            "type": "object"
+                          }
+                        },
+                        "type": "array",
+                        "element": {
+                          "def": {
+                            "type": "object",
+                            "shape": {
+                              "alias": {
+                                "def": {
+                                  "type": "string"
+                                },
+                                "type": "string"
+                              },
+                              "title": {
+                                "def": {
+                                  "type": "string"
+                                },
+                                "type": "string"
+                              },
+                              "description": {
+                                "def": {
+                                  "type": "optional",
+                                  "innerType": {
+                                    "def": {
+                                      "type": "string"
+                                    },
+                                    "type": "string"
+                                  }
+                                },
+                                "type": "optional"
+                              }
+                            }
+                          },
+                          "type": "object"
+                        }
+                      },
+                      "automations": {
+                        "def": {
+                          "type": "array",
+                          "element": {
+                            "def": {
+                              "type": "object",
+                              "shape": {
+                                "alias": {
+                                  "def": {
+                                    "type": "string"
+                                  },
+                                  "type": "string"
+                                },
+                                "title": {
+                                  "def": {
+                                    "type": "string"
+                                  },
+                                  "type": "string"
+                                },
+                                "description": {
+                                  "def": {
+                                    "type": "optional",
+                                    "innerType": {
+                                      "def": {
+                                        "type": "string"
+                                      },
+                                      "type": "string"
+                                    }
+                                  },
+                                  "type": "optional"
+                                }
+                              }
+                            },
+                            "type": "object"
+                          }
+                        },
+                        "type": "array",
+                        "element": {
+                          "def": {
+                            "type": "object",
+                            "shape": {
+                              "alias": {
+                                "def": {
+                                  "type": "string"
+                                },
+                                "type": "string"
+                              },
+                              "title": {
+                                "def": {
+                                  "type": "string"
+                                },
+                                "type": "string"
+                              },
+                              "description": {
+                                "def": {
+                                  "type": "optional",
+                                  "innerType": {
+                                    "def": {
+                                      "type": "string"
+                                    },
+                                    "type": "string"
+                                  }
+                                },
+                                "type": "optional"
+                              }
+                            }
+                          },
+                          "type": "object"
+                        }
+                      },
+                      "automationCount": {
+                        "def": {
+                          "type": "number",
+                          "checks": []
+                        },
+                        "type": "number",
+                        "isFinite": true
+                      },
+                      "developerCount": {
+                        "def": {
+                          "type": "number",
+                          "checks": []
+                        },
+                        "type": "number",
+                        "isFinite": true
+                      }
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "type": "optional"
+          },
+          "visibleFor": ["enums.userRole.admin"],
+          "hiddenForPlatforms": [
+            "ai",
+            "mcp",
+            "cron",
+            "remote-skill",
+            "cli",
+            "cli-package"
+          ],
           "usage": {
             "response": true
           },

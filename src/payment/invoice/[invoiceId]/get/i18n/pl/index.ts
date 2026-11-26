@@ -16,6 +16,7 @@ export const translations: typeof enTranslations = {
     },
     response: {
       companyName: "Firma",
+      remainingCredit: "Kwota do skorygowania",
       amountPaid: "Zapłacono",
       amountDue: "Do zapłaty",
       id: "ID faktury",
@@ -93,6 +94,9 @@ export const translations: typeof enTranslations = {
     placeholder: "Wprowadź ID faktury",
   },
   widget: {
+    sourceQuote: "Oferta źródłowa",
+    openSourceQuote: "Otwórz ofertę źródłową",
+    draftReference: "Szkic faktury nr {{number}}",
     recentReminderDrafts: "Ostatnie szkice przypomnień",
     receipts: "Historia wpłat",
     receiptDate: "Data wpłaty",
@@ -128,6 +132,12 @@ export const translations: typeof enTranslations = {
     recordPayment: "Zarejestruj płatność",
     sendReminder: "Przygotuj przypomnienie",
     void: "Anuluj",
+    remainingBalance: "Pozostało do zapłaty",
+    originalTotal: "Pierwotna kwota faktury",
+    voidReversalDate: "Data storna",
+    viewOriginalJournal: "Otwórz pierwotny zapis",
+    viewVoidReversal: "Otwórz zapis storna",
+    backToInvoiceList: "Wróć do faktur",
     viewJournalEntry: "Zobacz zapis",
     status: {
       draft: "Szkic",

@@ -571,6 +571,7 @@ export const translations: typeof enTranslations = {
         "Zadaj presnú e-mailovú adresu účtu alebo ID používateľa.",
       renewsOn: "Obnoví sa {{date}}",
       endsOn: "Skončí sa {{date}}",
+      packBalance: "Kredity z balíkov",
       freeBalance: "Bezplatné kredity",
       balanceSplit:
         "Celkom: {{total}} · V balíkoch: {{paid}} · Bezplatné: {{free}}",
@@ -608,7 +609,7 @@ export const translations: typeof enTranslations = {
     },
     post: {
       stepTwo: "Krok 2 z 2: počet kreditov",
-      testerPreset: "3 000 (tester)",
+      testerPreset: "Použiť {{amount}} kreditov",
       preview: "Zostatok {{before}} → {{after}} (+{{amount}})",
       title: "Pridať kredity",
       titleShort: "Pridať kredity",
@@ -628,8 +629,8 @@ export const translations: typeof enTranslations = {
       },
       amount: {
         label: "Počet kreditov",
-        description: "Zadaj počet bonusových kreditov ako celé číslo.",
-        placeholder: "137",
+        description: "Zadajte aspoň 1 kredit. Použite celé číslo.",
+        placeholder: "napr. 25",
       },
       packType: {
         label: "Typ balíka",

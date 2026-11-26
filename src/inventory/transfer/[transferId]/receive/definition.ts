@@ -14,7 +14,7 @@ import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
 import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
 import {
   objectField,
-  requestField,
+  requestUrlPathParamsField,
   responseField,
 } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
@@ -45,19 +45,18 @@ const { POST } = createEndpoint({
   icon: "check-circle" as const,
 
   fields: customWidgetObject({
-    usage: { request: "data", response: true } as const,
+    usage: { request: "urlPathParams", response: true } as const,
     render: InventoryTransferReceiveWidget,
     children: {
-      transferId: requestField(scopedTranslation, {
+      transferId: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
         label: "transferReceive.post.transferId.label" as const,
         description: "transferReceive.post.transferId.description" as const,
         schema: z.uuid(),
-        urlPathParam: true,
         listEndpoint: async () =>
           (await import("@/inventory/transfer/list/definition")).default.GET,
-        labelField: "id",
+        labelField: "reference",
       }),
 
       result: objectField(scopedTranslation, {
@@ -134,7 +133,7 @@ const { POST } = createEndpoint({
   },
 
   examples: {
-    requests: {
+    urlPathParams: {
       default: {
         transferId: "ddee1122-e89b-12d3-a456-426614174001",
       },
@@ -152,7 +151,7 @@ const { POST } = createEndpoint({
 });
 
 export type InventoryTransferReceiveRequestOutput =
-  typeof POST.types.RequestOutput;
+  typeof POST.types.UrlVariablesOutput;
 export type InventoryTransferReceiveResponseOutput =
   typeof POST.types.ResponseOutput;
 

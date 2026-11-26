@@ -34,7 +34,11 @@ export const translations: typeof enTranslations = {
         title: "Acceso denegado",
         description: "Necesitas el papel de contador o de administrador",
       },
-      conflict: { title: "Conflicto", description: "Conflicto de datos" },
+      conflict: {
+        title: "Conflicto",
+        description:
+          "Ya existe una factura con este proveedor y número. Revisa la factura existente antes de crear otra.",
+      },
       server: {
         title: "Error del servidor",
         description: "No podía crear la cuenta. probar de nuevo",
@@ -76,6 +80,8 @@ export const translations: typeof enTranslations = {
       addItem: "Añadir línea",
       removeItem: "Eliminar línea",
       itemError: "Revisa la descripción, la cantidad, el precio y el IVA.",
+      supplierTotalReview:
+        "Compare este total con la factura del proveedor. Si difiere, revise el documento original antes de guardar.",
       summary: "Resumen de la factura",
       net: "Base imponible",
       tax: "IVA",

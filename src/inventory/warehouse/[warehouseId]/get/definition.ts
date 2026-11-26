@@ -75,6 +75,26 @@ const { GET } = createEndpoint({
             hidden: true,
             schema: z.uuid(),
           }),
+          companyName: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            label: "warehouseGet.get.widget.companyName",
+            schema: z.string().optional(),
+          }),
+          stockedProducts: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            label: "warehouseGet.get.widget.stockedProducts",
+            schema: z.number().int().nonnegative().optional(),
+          }),
+          stockValue: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            label: "stockList.get.widget.stockValue",
+            schema: z.number().nullable().optional(),
+          }),
+          valuationCurrency: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            label: "stockList.get.response.currency",
+            schema: z.string().optional(),
+          }),
           name: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             label: "warehouseGet.get.response.name" as const,
@@ -174,6 +194,10 @@ const { GET } = createEndpoint({
         result: {
           id: "aabbccdd-e89b-12d3-a456-426614174001",
           companyId: "123e4567-e89b-12d3-a456-426614174000",
+          companyName: "Tatra Ledger Studio",
+          stockedProducts: 3,
+          stockValue: 245,
+          valuationCurrency: "EUR",
           name: "Main Warehouse",
           code: "WH-01",
           address: "123 Storage Lane",

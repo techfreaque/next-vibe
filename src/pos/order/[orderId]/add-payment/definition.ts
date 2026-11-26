@@ -17,12 +17,14 @@ import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
 import {
   objectField,
   requestField,
+  requestUrlPathParamsField,
   responseField,
 } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
 import { PosPaymentMethod, PosPaymentMethodOptions } from "../../../enum";
 import { scopedTranslation } from "../../../i18n";
+import { refreshPosOrder } from "../../refresh";
 
 const PosOrderAddPaymentWidgetLazy = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.PosOrderAddPaymentWidget })),
@@ -41,10 +43,27 @@ const { POST } = createEndpoint({
   allowedRoles: [UserRole.ADMIN],
   icon: "credit-card",
 
+  options: {
+    mutationOptions: {
+      onSuccess: ({ pathParams, logger }) =>
+        refreshPosOrder(pathParams.orderId, logger),
+    },
+  },
+
   fields: customWidgetObject({
     render: PosOrderAddPaymentWidgetLazy,
-    usage: { request: "data", response: true },
+    usage: { request: "data&urlPathParams", response: true },
     children: {
+      orderId: requestUrlPathParamsField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.ENTITY_PICKER,
+        label: "orderAddPayment.post.orderId.label",
+        description: "orderAddPayment.post.orderId.description",
+        schema: z.uuid(),
+        listEndpoint: async () =>
+          (await import("@/pos/order/list/definition")).default.GET,
+        labelField: "orderNumber",
+      }),
       details: objectField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         layoutType: LayoutType.GRID_2_COLUMNS,
@@ -192,6 +211,9 @@ const { POST } = createEndpoint({
   },
 
   examples: {
+    urlPathParams: {
+      default: { orderId: "eeff1122-e89b-12d3-a456-426614174003" },
+    },
     requests: {
       default: {
         details: {

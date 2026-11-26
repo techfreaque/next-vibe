@@ -1590,8 +1590,7 @@ export class LeadsRepository {
         .where(whereClause)
         .orderBy(desc(leads.createdAt));
 
-      // Generate CSV content
-      const csvContent = LeadsRepository.generateCsvContent(
+      const rows = LeadsRepository.exportRows(
         leadsData,
         query.includeMetadata,
         query.includeEngagementData,
@@ -1599,15 +1598,31 @@ export class LeadsRepository {
       );
 
       const dateString = new Date().toISOString().split("T")[0];
-      const DEFAULT_FILE_PREFIX = "leads_export_";
-      const CSV_EXTENSION = ".csv";
-      const EXCEL_EXTENSION = ".xlsx";
-
-      const filePrefix = DEFAULT_FILE_PREFIX;
-      const fileSuffix =
-        query.format === ExportFormat.CSV ? CSV_EXTENSION : EXCEL_EXTENSION;
-      const fileName = `${filePrefix}${dateString}${fileSuffix}`;
-      const fileContent = Buffer.from(csvContent).toString("base64");
+      const isCsv = query.format === ExportFormat.CSV;
+      const fileName = `leads_export_${dateString}.${isCsv ? "csv" : "xlsx"}`;
+      let fileContent: string;
+      if (isCsv) {
+        const csv = rows
+          .map((row) =>
+            row
+              .map((value) => {
+                const safe = /^[\s]*[=+@-]/u.test(value) ? `'${value}` : value;
+                return /[",\n\r]/u.test(safe)
+                  ? `"${safe.replaceAll('"', '""')}"`
+                  : safe;
+              })
+              .join(","),
+          )
+          .join("\r\n");
+        fileContent = Buffer.from(csv, "utf8").toString("base64");
+      } else {
+        const { utils, write } = await import("xlsx");
+        const workbook = utils.book_new();
+        utils.book_append_sheet(workbook, utils.aoa_to_sheet(rows));
+        fileContent = Buffer.from(
+          write(workbook, { bookType: "xlsx", type: "buffer" }),
+        ).toString("base64");
+      }
 
       logger.debug("Leads exported successfully", {
         totalRecords: leadsData.length,
@@ -1633,14 +1648,14 @@ export class LeadsRepository {
   }
 
   /**
-   * Generate CSV content from leads data
+   * Use the same header and column order in both spreadsheet formats.
    */
-  private static generateCsvContent(
+  private static exportRows(
     leadsData: Lead[],
     includeMetadata: boolean,
     includeEngagementData: boolean,
     t: LeadsT,
-  ): string {
+  ): string[][] {
     const headers = [
       t("export.headers.email"),
       t("export.headers.businessName"),
@@ -1652,15 +1667,20 @@ export class LeadsRepository {
       t("export.headers.status"),
       t("export.headers.source"),
       t("export.headers.notes"),
-      t("export.headers.createdAt"),
-      t("export.headers.updatedAt"),
-      t("export.headers.ipAddress"),
-      t("export.headers.userAgent"),
-      t("export.headers.deviceType"),
-      t("export.headers.browser"),
-      t("export.headers.os"),
-      t("export.headers.referralCode"),
     ];
+
+    if (includeMetadata) {
+      headers.push(
+        t("export.headers.createdAt"),
+        t("export.headers.updatedAt"),
+        t("export.headers.ipAddress"),
+        t("export.headers.userAgent"),
+        t("export.headers.deviceType"),
+        t("export.headers.browser"),
+        t("export.headers.os"),
+        t("export.headers.referralCode"),
+      );
+    }
 
     if (includeEngagementData) {
       headers.push(
@@ -1681,6 +1701,7 @@ export class LeadsRepository {
       const row = [
         lead.email,
         lead.businessName,
+        lead.contactName,
         lead.phone || "",
         lead.website || "",
         lead.country,
@@ -1688,15 +1709,20 @@ export class LeadsRepository {
         lead.status,
         lead.source || "",
         lead.notes || "",
-        lead.createdAt.toISOString(),
-        lead.updatedAt.toISOString(),
-        lead.ipAddress || "",
-        lead.userAgent || "",
-        lead.deviceType || "",
-        lead.browser || "",
-        lead.os || "",
-        lead.referralCode || "",
       ];
+
+      if (includeMetadata) {
+        row.push(
+          lead.createdAt.toISOString(),
+          lead.updatedAt.toISOString(),
+          lead.ipAddress || "",
+          lead.userAgent || "",
+          lead.deviceType || "",
+          lead.browser || "",
+          lead.os || "",
+          lead.referralCode || "",
+        );
+      }
 
       if (includeEngagementData) {
         row.push(
@@ -1716,34 +1742,7 @@ export class LeadsRepository {
       return row;
     });
 
-    // Escape CSV values and join
-    const CSV_COMMA = ",";
-    const CSV_QUOTE = '"';
-    const CSV_NEWLINE = "\n";
-    const CSV_DOUBLE_QUOTE = '""';
-
-    const escapeCsvValue = (value: string | undefined): string => {
-      const stringValue = value || "";
-      if (
-        stringValue.includes(CSV_COMMA) ||
-        stringValue.includes(CSV_QUOTE) ||
-        stringValue.includes(CSV_NEWLINE)
-      ) {
-        const quotedValue = stringValue.replaceAll(
-          new RegExp(CSV_QUOTE, "g"),
-          CSV_DOUBLE_QUOTE,
-        );
-        return `${CSV_QUOTE}${quotedValue}${CSV_QUOTE}`;
-      }
-      return stringValue;
-    };
-
-    const csvRows = [headers.map(escapeCsvValue).join(",")];
-    rows.forEach((row) => {
-      csvRows.push(row.map((value) => escapeCsvValue(value ?? "")).join(","));
-    });
-
-    return csvRows.join("\n");
+    return [headers, ...rows.map((row) => row.map((value) => value ?? ""))];
   }
 
   /**
@@ -2523,19 +2522,20 @@ export class LeadsRepository {
         Date.now() - windowDays * 24 * 60 * 60 * 1000,
       );
 
-      // Find anonymous leads grouped by IP that have more than one lead
+      // Generate each pair in UUID order so the batch can stop at the limit
+      // without sorting or deduplicating the full same-IP join.
       const pairs = await db.execute<{
         lead_id1: string;
         lead_id2: string;
         ip_address: string;
       }>(
         sql`
-          SELECT DISTINCT
-            LEAST(l1.id::text, l2.id::text) AS lead_id1,
-            GREATEST(l1.id::text, l2.id::text) AS lead_id2,
+          SELECT
+            l1.id AS lead_id1,
+            l2.id AS lead_id2,
             l1.ip_address
           FROM leads l1
-          JOIN leads l2 ON l1.ip_address = l2.ip_address AND l1.id != l2.id
+          JOIN leads l2 ON l1.ip_address = l2.ip_address AND l1.id < l2.id
           WHERE l1.ip_address IS NOT NULL
             AND l1.status = ${LeadStatus.WEBSITE_USER}
             AND l2.status = ${LeadStatus.WEBSITE_USER}
@@ -2546,8 +2546,8 @@ export class LeadsRepository {
             -- Exclude already linked pairs
             AND NOT EXISTS (
               SELECT 1 FROM lead_lead_links lll
-              WHERE (lll.lead_id_1 = LEAST(l1.id::text, l2.id::text)::uuid
-                 AND lll.lead_id_2 = GREATEST(l1.id::text, l2.id::text)::uuid)
+              WHERE lll.lead_id_1 = l1.id
+                AND lll.lead_id_2 = l2.id
             )
           LIMIT 1000
         `,

@@ -121,6 +121,13 @@ export const translations: typeof enTranslations = {
       name: "Nombre del producto",
     },
     widget: {
+      catalogCompany: "Empresa del catálogo",
+      billingCadence: "Frecuencia de facturación",
+      oneTime: "Compra única",
+      personalCatalog: "Catálogo personal",
+      companyUnavailable: "Nombre de la empresa no disponible",
+      couldNotLoad: "No se pudo cargar el producto.",
+      retry: "Reintentar",
       backToList: "Volver a Productos",
       back: "Atrás",
     },

@@ -68,6 +68,16 @@ const { GET } = createEndpoint({
             hidden: true,
             schema: z.uuid(),
           }),
+          terminalName: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            label: "sessionGet.get.response.terminalId",
+            schema: z.string().optional(),
+          }),
+          companyName: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            label: "sessionGet.get.response.terminalId",
+            schema: z.string().optional(),
+          }),
           terminalId: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             label: "sessionGet.get.response.terminalId",

@@ -36,6 +36,7 @@ import {
   lockLedgerCompany,
 } from "../../../shared/ledger-write";
 import type { CoaJournalReverseRequestOutput } from "./definition";
+import { describeJournalReversal } from "./i18n/entry-description";
 import { hasManagedJournalDocument } from "./managed-document";
 
 export class CoaJournalReverseRepository {
@@ -168,7 +169,11 @@ export class CoaJournalReverseRepository {
             date: reversalDate,
             userId: user.id,
             memo: entry.memo,
-            description: `Reversal of ${entry.entryNumber}: ${entry.description}`,
+            description: describeJournalReversal(
+              locale,
+              entry.entryNumber,
+              entry.description,
+            ),
           },
         );
         if (!reversalEntry) {

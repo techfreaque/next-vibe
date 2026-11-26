@@ -73,6 +73,18 @@ export const translations: typeof enTranslations = {
     placeholder: "Rechnungs-ID eingeben",
   },
   widget: {
+    invoice: "Rechnung",
+    total: "Rechnungsbetrag",
+    customer: "Kunde",
+    openInvoice: "Rechnung öffnen",
+    retry: "Erneut versuchen",
+    loading: "Rechnung wird geladen …",
+    unavailable: "Rechnung nicht verfügbar",
+    reversal:
+      "Eine Stornobuchung mit heutigem Datum gleicht die offene Forderung aus.",
+    cancelOnly: "Die Rechnung wird storniert.",
+    ineligible:
+      "Nur Entwürfe und unbezahlte Rechnungen ohne Zuordnungen können storniert werden.",
     back: "Zurück",
     submit: "Rechnung stornieren",
     warning:

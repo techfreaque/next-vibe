@@ -3,7 +3,7 @@
  * Fetches catalog products with optional filters and pagination
  */
 
-import { and, count, eq } from "drizzle-orm";
+import { and, asc, count, eq } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
@@ -16,6 +16,7 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
+import { companies } from "@/companies/db";
 import { CompanyMemberRole } from "@/companies/enum";
 import { CompanyAuthRepository } from "@/companies/repository";
 
@@ -52,11 +53,11 @@ export class CatalogListRepository {
         }
       }
 
-      const conditions = [eq(catalogProducts.ownerUserId, userId)];
-
-      if (filters?.companyId) {
-        conditions.push(eq(catalogProducts.companyId, filters.companyId));
-      }
+      const conditions = [
+        filters?.companyId
+          ? eq(catalogProducts.companyId, filters.companyId)
+          : eq(catalogProducts.ownerUserId, userId),
+      ];
       if (filters?.categoryId) {
         conditions.push(eq(catalogProducts.categoryId, filters.categoryId));
       }
@@ -95,6 +96,7 @@ export class CatalogListRepository {
         })
         .from(catalogProducts)
         .where(where)
+        .orderBy(asc(catalogProducts.name), asc(catalogProducts.id))
         .limit(pageSize)
         .offset(offset);
 
@@ -103,7 +105,18 @@ export class CatalogListRepository {
         isSubscription: row.isSubscription ?? false,
       }));
 
-      return success({ total: total ?? 0, products });
+      const [company] = filters?.companyId
+        ? await db
+            .select({ name: companies.name })
+            .from(companies)
+            .where(eq(companies.id, filters.companyId))
+            .limit(1)
+        : [];
+      return success({
+        total: total ?? 0,
+        products,
+        companyName: company?.name,
+      });
     } catch (error) {
       logger.error("Error listing catalog products", parseError(error));
       return fail({

@@ -1,6 +1,7 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  lineRounding: "Arrotondamento per riga",
   category: "Stime",
   tags: { payment: "pagamento", estimate: "Grafico" },
   post: {
@@ -51,7 +52,9 @@ export const translations: typeof enTranslations = {
   },
   estimateId: { label: "Stima ID", description: "La stima di agire su" },
   widget: {
-    send: "Invia preventivo",
+    send: "Segna come inviato",
+    terms: "Condizioni",
+    noItems: "Questo preventivo non contiene voci.",
     addLine: "Aggiungere la linea",
     accept: "Accettazione dei record",
     decline: "Rifiuto record",

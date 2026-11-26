@@ -81,6 +81,23 @@ export const translations: typeof enTranslations = {
     },
   },
   widget: {
+    lineReviewRequired:
+      "Die Positionssummen weichen vom erfassten Rechnungsbetrag ab. Prüfen Sie vor der Bearbeitung oder Freigabe den Originalbeleg.",
+    removeAction: "Entfernen",
+    removeLine: "{{description}} entfernen",
+    grossTotal: "Bruttobetrag",
+    taxPending:
+      "Die Steuer des Lieferanten ist noch offen. Bestätigen Sie den Betrag anhand des Belegs, bevor Sie die Rechnung als eingegangen markieren oder buchen.",
+    confirmSupplierTax: "Lieferantensteuer bestätigen",
+    bankDocumentMissing:
+      "Der Lieferantenbeleg fehlt. Verknüpfen Sie ihn hier oder bestätigen Sie bei der Freigabe den Bruttobetrag anhand des Bankbelegs.",
+    bankDocumentTaxReview:
+      "Der Lieferantenbeleg wurde nach der Buchung verknüpft. Prüfen Sie eine steuerliche oder buchhalterische Umbuchung separat. Die ursprüngliche Buchung bleibt bestehen.",
+    linkBankDocument: "Lieferantenbeleg verknüpfen",
+    inputVat: "Vorsteuerabzug",
+    taxIncludedCost: "Umsatzsteuer im Aufwand enthalten",
+    reverseCharge: "Steuerschuld aus Reverse Charge",
+
     markReceived: "Als erhalten markieren",
     back: "Zurück",
     submit: "Rechnung abrufen",
@@ -101,7 +118,9 @@ export const translations: typeof enTranslations = {
     approveBill: "Rechnung genehmigen",
     payBill: "Rechnung bezahlen",
     addLine: "Position hinzufügen",
-    viewJournalEntry: "Buchungssatz ansehen",
+    accountingEvidence: "Buchungen",
+    approvalJournal: "Rechnungsbuchung",
+    settlementJournal: "Zahlungsbuchung",
     approveConfirmTitle: "Rechnung genehmigen?",
     approveConfirmDescription:
       "Der Rechnungsstatus wird vorgerückt. Nach der Genehmigung wird ein Buchungssatz erstellt. Dies kann nicht rückgängig gemacht werden.",

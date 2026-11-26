@@ -73,6 +73,18 @@ export const translations: typeof enTranslations = {
     placeholder: "Saisir l'ID de facture",
   },
   widget: {
+    invoice: "Facture",
+    total: "Total de la facture",
+    customer: "Client",
+    openInvoice: "Ouvrir la facture",
+    retry: "Réessayer",
+    loading: "Chargement de la facture…",
+    unavailable: "Facture indisponible",
+    reversal:
+      "Une contrepassation datée d’aujourd’hui solde la créance ouverte.",
+    cancelOnly: "La facture sera annulée.",
+    ineligible:
+      "Vous pouvez annuler un brouillon ou une facture impayée sans paiement ni avoir affecté.",
     back: "Retour",
     submit: "Annuler la facture",
     warning:

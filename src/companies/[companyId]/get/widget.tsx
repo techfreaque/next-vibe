@@ -81,11 +81,13 @@ function ModuleCard({
       type="button"
       variant="outline"
       onClick={onClick}
-      className="flex flex-col gap-1.5 rounded-lg p-4 h-auto items-start text-left hover:bg-muted/60"
+      className="flex min-w-0 flex-col gap-1.5 rounded-lg p-4 h-auto items-start whitespace-normal text-left hover:bg-muted/60"
     >
-      <Div className="flex items-center gap-2">
-        <Div className="text-muted-foreground">{icon}</Div>
-        <Span className="text-sm font-semibold">{label}</Span>
+      <Div className="flex min-w-0 items-start gap-2">
+        <Div className="shrink-0 text-muted-foreground">{icon}</Div>
+        <Span className="min-w-0 break-words hyphens-auto text-sm font-semibold">
+          {label}
+        </Span>
       </Div>
       <Span className="text-xs text-muted-foreground leading-snug font-normal">
         {description}
@@ -207,7 +209,7 @@ export function CompanyGetWidget(_props: {
   return (
     <Div className="max-w-2xl mx-auto w-full px-4 pt-8 pb-6 flex flex-col gap-6">
       {/* Back + Edit */}
-      <Div className="flex items-center justify-between gap-3">
+      <Div className="flex flex-wrap items-center justify-between gap-3">
         {canGoBack ? (
           <Button
             type="button"
@@ -263,7 +265,7 @@ export function CompanyGetWidget(_props: {
         <Span className="text-sm font-semibold text-muted-foreground">
           {t("get.widget.modules.title")}
         </Span>
-        <Div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+        <Div className="grid grid-cols-1 min-[360px]:grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
           <ModuleCard
             icon={<BookOpen className="h-4 w-4" />}
             label={t("get.widget.modules.accounting.label")}

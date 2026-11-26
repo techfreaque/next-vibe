@@ -71,6 +71,13 @@ export const translations: typeof enTranslations = {
     },
   },
   widget: {
+    dashboardContext:
+      "Získavanie potenciálnych zákazníkov, konverzie a nedávna aktivita.",
+    unnamedLead: "Potenciálny zákazník bez mena",
+    attention: "Vyžaduje pozornosť",
+    noAttention: "V tomto období neboli označené žiadne skupiny sietí.",
+    flaggedAttention: "Označené skupiny sietí ({{count}})",
+    retry: "Skúste znova",
     reports: "Prehľady",
     last7Days: "Posledných 7 dní",
     humanLeads: "Kontakty od ľudí",

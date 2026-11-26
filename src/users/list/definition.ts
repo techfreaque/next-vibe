@@ -68,6 +68,27 @@ const userRowSchema = z.object({
   referralsMade: z.coerce.number(),
 });
 
+const emptyDirectoryExample = {
+  users: [],
+  summary: {
+    totalCount: 0,
+    pageCount: 0,
+    page: 1,
+    limit: 20,
+    payingCount: 0,
+    verifiedCount: 0,
+    activeMonthCount: 0,
+    bannedCount: 0,
+    freeBurnCount: 0,
+    totalPaidUsd: 0,
+    creditBalance: 0,
+    creditsSpent: 0,
+    creditsSpent30d: 0,
+    signupsByWeek: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    signupsThisWeek: 0,
+  },
+};
+
 /**
  * Get Users List Endpoint (GET)
  */
@@ -242,6 +263,7 @@ const { GET } = createEndpoint({
   examples: {
     requests: {
       default: {},
+      empty: { search: "no-matching-account-example", limit: 20 },
       payingActive: {
         audience: UsersAudience.HUMANS,
         payer: PayerFilter.PAID,
@@ -298,26 +320,8 @@ const { GET } = createEndpoint({
           signupsThisWeek: 0,
         },
       },
-      payingActive: {
-        users: [],
-        summary: {
-          totalCount: 0,
-          pageCount: 0,
-          page: 1,
-          limit: 20,
-          payingCount: 0,
-          verifiedCount: 0,
-          activeMonthCount: 0,
-          bannedCount: 0,
-          freeBurnCount: 0,
-          totalPaidUsd: 0,
-          creditBalance: 0,
-          creditsSpent: 0,
-          creditsSpent30d: 0,
-          signupsByWeek: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-          signupsThisWeek: 0,
-        },
-      },
+      empty: emptyDirectoryExample,
+      payingActive: emptyDirectoryExample,
     },
   },
 });

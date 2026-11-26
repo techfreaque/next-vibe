@@ -12,11 +12,11 @@ import {
   FormControl,
   FormField,
   FormItem,
+  FormLabel,
   FormMessage,
 } from "next-vibe/ui/components/form/form";
 import { AlertCircle } from "next-vibe/ui/components/icons/AlertCircle";
 import { Info } from "next-vibe/ui/components/icons/Info";
-import { Label } from "next-vibe/ui/components/label";
 import { Span } from "next-vibe/ui/components/span";
 import { Switch } from "next-vibe/ui/components/switch";
 import {
@@ -40,6 +40,7 @@ import {
 } from "../../../_shared/use-widget-context";
 import { scopedTranslation as unifiedInterfaceScopedTranslation } from "../../../hooks/i18n";
 import { getTheme } from "../_shared/constants";
+import { useFormFieldDescriptionStyle } from "../_shared/description-style";
 import type { BooleanFieldWidgetConfig } from "./types";
 
 export function BooleanFieldWidget<
@@ -64,13 +65,16 @@ export function BooleanFieldWidget<
 
   const { t: widgetT } = unifiedInterfaceScopedTranslation.scopedT(locale);
 
+  const theme = getTheme(field.theme);
+  const descriptionStyle = useFormFieldDescriptionStyle(theme.descriptionStyle);
+
   if (!form || !fieldName) {
     return <Div>{widgetT("widgets.formField.requiresContext")}</Div>;
   }
 
   const variant = field.variant || "checkbox";
-  const theme = getTheme(field.theme);
-  const descriptionStyle = theme.descriptionStyle;
+
+  const switchLabel = field.switchLabel ?? field.label;
 
   return (
     <FormField
@@ -85,7 +89,6 @@ export function BooleanFieldWidget<
                   <FormControl>
                     <Checkbox
                       ref={formField.ref}
-                      id={formField.name}
                       name={formField.name}
                       checked={formField.value === true}
                       onCheckedChange={(checked) => formField.onChange(checked)}
@@ -93,10 +96,7 @@ export function BooleanFieldWidget<
                       className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                     />
                   </FormControl>
-                  <Label
-                    htmlFor={formField.name}
-                    className="text-sm font-normal cursor-pointer leading-relaxed flex items-center gap-1.5"
-                  >
+                  <FormLabel className="text-sm font-normal cursor-pointer leading-relaxed flex items-center gap-1.5">
                     <Span>
                       {field.checkboxLabel
                         ? t(field.checkboxLabel)
@@ -110,6 +110,7 @@ export function BooleanFieldWidget<
                           <TooltipTrigger asChild>
                             <Button
                               type="button"
+                              aria-label={t(field.description)}
                               className="cursor-help inline-flex p-0 h-auto"
                               variant={"ghost"}
                             >
@@ -132,13 +133,12 @@ export function BooleanFieldWidget<
                         </Span>
                       </Div>
                     )}
-                  </Label>
+                  </FormLabel>
                 </Div>
               ) : (
                 <Div className="flex items-center space-x-3 py-2">
                   <FormControl>
                     <Switch
-                      id={formField.name}
                       name={formField.name}
                       checked={formField.value === true}
                       onCheckedChange={(checked) => formField.onChange(checked)}
@@ -146,18 +146,16 @@ export function BooleanFieldWidget<
                       className="data-[state=checked]:bg-primary"
                     />
                   </FormControl>
-                  {field.switchLabel && (
-                    <Label
-                      htmlFor={formField.name}
-                      className="text-sm font-normal cursor-pointer leading-relaxed flex items-center gap-1.5"
-                    >
-                      <Span>{t(field.switchLabel)}</Span>
+                  {switchLabel && (
+                    <FormLabel className="text-sm font-normal cursor-pointer leading-relaxed flex items-center gap-1.5">
+                      <Span>{t(switchLabel)}</Span>
                       {field.description && descriptionStyle === "tooltip" && (
                         <TooltipProvider delayDuration={300}>
                           <Tooltip>
                             <TooltipTrigger asChild>
                               <Button
                                 type="button"
+                                aria-label={t(field.description)}
                                 className="cursor-help inline-flex p-0 h-auto"
                                 variant={"ghost"}
                               >
@@ -180,7 +178,7 @@ export function BooleanFieldWidget<
                           </Span>
                         </Div>
                       )}
-                    </Label>
+                    </FormLabel>
                   )}
                 </Div>
               )}

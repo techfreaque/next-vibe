@@ -4,6 +4,14 @@ export const translations: typeof enTranslations = {
   category: "Konto",
 
   widget: {
+    adminOverview:
+      "Verwalten Sie die Schlüssel Ihres Kontos. Die API-Dokumentation erklärt, wie Sie eine App verbinden.",
+    loadFailed: "Ihre API-Schlüssel konnten nicht geladen werden",
+    retry: "Erneut versuchen",
+    revokeNamed: "{{name}} widerrufen",
+    revokeConfirm:
+      "Apps, die diesen Schlüssel verwenden, verlieren sofort den Zugriff.",
+    cancel: "Abbrechen",
     upgradeTitle: "API-Zugang steckt in jedem Tarif, ab {{subPrice}} im Monat",
     upgradeBody:
       "Jeder Tarif schaltet API-Schlüssel frei. Gratis- und Bonus-Credits tun das nicht.",

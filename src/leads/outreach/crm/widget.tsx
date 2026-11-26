@@ -10,6 +10,7 @@
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { isCliPlatform, Platform } from "next-vibe/platforms/platforms";
 import { Button } from "next-vibe/ui/components/button";
+import { DetailField, DetailGrid } from "next-vibe/ui/components/detail-grid";
 import { Div } from "next-vibe/ui/components/div";
 import { EmptyBlock } from "next-vibe/ui/components/empty-block";
 import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
@@ -40,6 +41,7 @@ import { P } from "next-vibe/ui/components/typography";
 import { WidgetHeader } from "next-vibe/ui/components/widget-header";
 import { WidgetShell } from "next-vibe/ui/components/widget-shell";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
+import { useRelatedEntityNavigation } from "next-vibe/unified-ui/_shared/related-entities";
 import {
   useWidgetContext,
   useWidgetForm,
@@ -57,6 +59,7 @@ import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-a
 import type React from "react";
 import { useCallback } from "react";
 
+import { creatorDealBillDate } from "../deal/bill-date";
 import type { OutreachContactStatusValue } from "../enum";
 import { OutreachAttributionBasis, OutreachDealStatus } from "../enum";
 import {
@@ -246,10 +249,12 @@ function DealResultNote({
   deal,
   t,
   locale,
+  wrap = false,
 }: {
   deal: OutreachDealRow;
   t: CrmT;
   locale: CountryLanguage;
+  wrap?: boolean;
 }): React.JSX.Element {
   const parts = [
     deal.liveAt
@@ -264,9 +269,64 @@ function DealResultNote({
       : "",
   ].filter(Boolean);
   return (
-    <Span className="block text-xs text-muted-foreground truncate max-w-[280px]">
+    <Span
+      className={cn(
+        "block text-xs text-muted-foreground",
+        wrap ? "break-words" : "truncate max-w-[280px]",
+      )}
+    >
       {parts.join(" · ")}
     </Span>
+  );
+}
+
+function DealIdentity({
+  deal,
+  t,
+  locale,
+  open,
+  prepare,
+  wrap = false,
+}: {
+  deal: OutreachDealRow;
+  t: CrmT;
+  locale: CountryLanguage;
+  open: () => void;
+  prepare: () => void;
+  wrap?: boolean;
+}): React.JSX.Element {
+  return (
+    <>
+      <Button
+        type="button"
+        variant="ghost"
+        size="sm"
+        className="h-auto max-w-full whitespace-normal px-0 text-start font-medium"
+        onClick={open}
+      >
+        {deal.contactName}
+      </Button>
+      <Span
+        className={cn(
+          "block text-xs",
+          wrap ? "break-words" : "truncate max-w-[280px]",
+        )}
+      >
+        {deal.deliverable}
+      </Span>
+      <DealResultNote deal={deal} t={t} locale={locale} wrap={wrap} />
+      {creatorDealBillDate(deal) && (
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          className="mt-1 h-auto min-h-9 max-w-full whitespace-normal px-2 text-start text-primary"
+          onClick={prepare}
+        >
+          {t("crm.get.widget.deals.prepareBill")}
+        </Button>
+      )}
+    </>
   );
 }
 
@@ -283,10 +343,27 @@ export function OutreachCrmWidget({
   const platform = useWidgetPlatform();
   const responseOnly = useWidgetResponseOnly();
   const { push: navigate, pop, canGoBack } = useWidgetNavigation();
+  const openRelated = useRelatedEntityNavigation();
   const t = useWidgetTranslation<typeof definition.GET>();
   const form = useWidgetForm<typeof definition.GET>();
   const onSubmit = useWidgetOnSubmit();
   const data = useWidgetValue<typeof definition.GET>();
+
+  const prepareBill = (deal: OutreachDealRow): void =>
+    openRelated(
+      async () =>
+        (await import("@/finance/supplier-evidence/definition")).default.POST,
+      {
+        data: {
+          operation: "sponsorship",
+          externalReference: deal.id,
+          description: deal.deliverable,
+          grossAmount: (deal.amountCents / 100).toFixed(2),
+          currency: deal.currency,
+          dryRun: true,
+        },
+      },
+    );
 
   const activeStatus = form.watch("status");
 
@@ -553,93 +630,150 @@ export function OutreachCrmWidget({
                 }}
               />
             ) : (
-              <Div className="rounded-lg border overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="text-xs">
-                        {t("crm.get.widget.deals.columns.deal")}
-                      </TableHead>
-                      <TableHead className="text-xs">
-                        {t("crm.get.widget.deals.columns.status")}
-                      </TableHead>
-                      <TableHead className="text-xs text-right">
-                        {t("crm.get.widget.deals.columns.spend")}
-                      </TableHead>
-                      <TableHead className="text-xs text-right">
-                        {t("crm.get.widget.deals.columns.visits")}
-                      </TableHead>
-                      <TableHead className="text-xs text-right">
-                        {t("crm.get.widget.deals.columns.signups")}
-                      </TableHead>
-                      <TableHead className="text-xs text-right">
-                        {t("crm.get.widget.deals.columns.paying")}
-                      </TableHead>
-                      <TableHead className="text-xs text-right">
-                        {t("crm.get.widget.deals.columns.revenue")}
-                      </TableHead>
-                      <TableHead className="text-xs text-right whitespace-nowrap">
-                        {t("crm.get.widget.deals.columns.costPerSignup")}
-                      </TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {deals.map((deal) => (
-                      <TableRow
-                        key={deal.id}
-                        className="cursor-pointer hover:bg-accent/50"
-                        onClick={() => openDeal(deal)}
-                      >
-                        <TableCell>
-                          <Span className="block text-sm font-medium truncate max-w-[280px]">
-                            {deal.contactName}
-                          </Span>
-                          <Span className="block text-xs truncate max-w-[280px]">
-                            {deal.deliverable}
-                          </Span>
-                          <DealResultNote deal={deal} t={t} locale={locale} />
-                        </TableCell>
-                        <TableCell>
-                          <StatusPill
-                            status={deal.status}
-                            label={t(deal.status)}
-                            variant={dealStatusVariant(deal.status)}
-                          />
-                        </TableCell>
-                        <TableCell className="text-right tabular-nums text-sm font-medium whitespace-nowrap">
-                          {dealSpend(deal, locale)}
-                        </TableCell>
-                        <TableCell className="text-right tabular-nums text-sm">
-                          {formatNumber(
+              <>
+                <Div className="grid min-w-0 gap-3 @4xl:hidden">
+                  {deals.map((deal) => (
+                    <Div
+                      key={deal.id}
+                      data-deal-summary
+                      className="min-w-0 rounded-lg border p-3"
+                    >
+                      <DealIdentity
+                        deal={deal}
+                        t={t}
+                        locale={locale}
+                        wrap
+                        open={() => openDeal(deal)}
+                        prepare={() => prepareBill(deal)}
+                      />
+                      <DetailGrid className="mt-3 grid-cols-2 gap-x-3 border-t pt-3">
+                        <DetailField
+                          label={t("crm.get.widget.deals.columns.status")}
+                          value={
+                            <StatusPill
+                              status={deal.status}
+                              label={t(deal.status)}
+                              variant={dealStatusVariant(deal.status)}
+                            />
+                          }
+                        />
+                        <DetailField
+                          label={t("crm.get.widget.deals.columns.spend")}
+                          value={dealSpend(deal, locale)}
+                        />
+                        <DetailField
+                          label={t("crm.get.widget.deals.columns.visits")}
+                          value={formatNumber(
                             deal.linkVisits ?? deal.visitors,
                             locale,
                           )}
-                        </TableCell>
-                        <TableCell className="text-right tabular-nums text-sm">
-                          {formatNumber(deal.signups, locale)}
-                        </TableCell>
-                        <TableCell className="text-right tabular-nums text-sm">
-                          {formatNumber(deal.paying, locale)}
-                        </TableCell>
-                        <TableCell className="text-right tabular-nums text-sm whitespace-nowrap">
-                          {deal.revenue.length > 0 ? (
-                            <Span className="font-medium text-success">
-                              {moneyList(deal.revenue, locale)}
-                            </Span>
-                          ) : (
-                            <Span className="text-muted-foreground">
-                              {NONE}
-                            </Span>
+                        />
+                        <DetailField
+                          label={t("crm.get.widget.deals.columns.signups")}
+                          value={formatNumber(deal.signups, locale)}
+                        />
+                        <DetailField
+                          label={t("crm.get.widget.deals.columns.paying")}
+                          value={formatNumber(deal.paying, locale)}
+                        />
+                        <DetailField
+                          label={t("crm.get.widget.deals.columns.revenue")}
+                          value={moneyList(deal.revenue, locale)}
+                        />
+                        <DetailField
+                          label={t(
+                            "crm.get.widget.deals.columns.costPerSignup",
                           )}
-                        </TableCell>
-                        <TableCell className="text-right tabular-nums text-sm whitespace-nowrap">
-                          {costPerSignup(deal, locale)}
-                        </TableCell>
+                          value={costPerSignup(deal, locale)}
+                        />
+                      </DetailGrid>
+                    </Div>
+                  ))}
+                </Div>
+                <Div className="hidden overflow-x-auto rounded-lg border @4xl:block">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="text-xs">
+                          {t("crm.get.widget.deals.columns.deal")}
+                        </TableHead>
+                        <TableHead className="text-xs">
+                          {t("crm.get.widget.deals.columns.status")}
+                        </TableHead>
+                        <TableHead className="text-xs text-right">
+                          {t("crm.get.widget.deals.columns.spend")}
+                        </TableHead>
+                        <TableHead className="text-xs text-right">
+                          {t("crm.get.widget.deals.columns.visits")}
+                        </TableHead>
+                        <TableHead className="text-xs text-right">
+                          {t("crm.get.widget.deals.columns.signups")}
+                        </TableHead>
+                        <TableHead className="text-xs text-right">
+                          {t("crm.get.widget.deals.columns.paying")}
+                        </TableHead>
+                        <TableHead className="text-xs text-right">
+                          {t("crm.get.widget.deals.columns.revenue")}
+                        </TableHead>
+                        <TableHead className="text-xs text-right whitespace-nowrap">
+                          {t("crm.get.widget.deals.columns.costPerSignup")}
+                        </TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </Div>
+                    </TableHeader>
+                    <TableBody>
+                      {deals.map((deal) => (
+                        <TableRow key={deal.id}>
+                          <TableCell>
+                            <DealIdentity
+                              deal={deal}
+                              t={t}
+                              locale={locale}
+                              open={() => openDeal(deal)}
+                              prepare={() => prepareBill(deal)}
+                            />
+                          </TableCell>
+                          <TableCell>
+                            <StatusPill
+                              status={deal.status}
+                              label={t(deal.status)}
+                              variant={dealStatusVariant(deal.status)}
+                            />
+                          </TableCell>
+                          <TableCell className="text-right tabular-nums text-sm font-medium whitespace-nowrap">
+                            {dealSpend(deal, locale)}
+                          </TableCell>
+                          <TableCell className="text-right tabular-nums text-sm">
+                            {formatNumber(
+                              deal.linkVisits ?? deal.visitors,
+                              locale,
+                            )}
+                          </TableCell>
+                          <TableCell className="text-right tabular-nums text-sm">
+                            {formatNumber(deal.signups, locale)}
+                          </TableCell>
+                          <TableCell className="text-right tabular-nums text-sm">
+                            {formatNumber(deal.paying, locale)}
+                          </TableCell>
+                          <TableCell className="text-right tabular-nums text-sm whitespace-nowrap">
+                            {deal.revenue.length > 0 ? (
+                              <Span className="font-medium text-success">
+                                {moneyList(deal.revenue, locale)}
+                              </Span>
+                            ) : (
+                              <Span className="text-muted-foreground">
+                                {NONE}
+                              </Span>
+                            )}
+                          </TableCell>
+                          <TableCell className="text-right tabular-nums text-sm whitespace-nowrap">
+                            {costPerSignup(deal, locale)}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </Div>
+              </>
             )}
           </SectionGroup>
 

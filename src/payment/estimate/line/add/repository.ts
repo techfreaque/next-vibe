@@ -19,6 +19,7 @@ import { db } from "next-vibe/database";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { getDocumentAccess } from "@/finance/document-company-scope";
+import { getLineSettlementPolicy } from "@/tax/line-settlement";
 
 import { paymentEstimateLines, paymentEstimates } from "../../../db";
 import { EstimateStatus } from "../../../enum";
@@ -87,7 +88,11 @@ export class EstimateLineAddRepository {
           .select({ last: max(paymentEstimateLines.sortOrder) })
           .from(paymentEstimateLines)
           .where(eq(paymentEstimateLines.estimateId, estimate.id));
-        const values = estimateLine(data, (last ?? -1) + 1);
+        const values = estimateLine(
+          data,
+          (last ?? -1) + 1,
+          getLineSettlementPolicy(locked.currency, locked.metadata),
+        );
         if (
           !values ||
           Math.round(locked.total * 10_000) +

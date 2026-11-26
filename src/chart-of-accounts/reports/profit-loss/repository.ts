@@ -19,6 +19,7 @@ import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { CompanyAuthRepository } from "@/companies/repository";
+import { excludePeriodClosing } from "@/finance/supplier-evidence/monthly";
 
 import { accountNodes, journalEntries, journalEntryLines } from "../../db";
 import {
@@ -44,8 +45,6 @@ interface AccountLine {
   name: string;
   amount: number;
 }
-
-const COGS_SUBTYPES: Set<string> = new Set([AccountSubtype.COGS]);
 
 const OPERATING_EXPENSE_SUBTYPES: Set<string> = new Set([
   AccountSubtype.PAYROLL,
@@ -110,6 +109,7 @@ export class ProfitLossRepository {
         eq(journalEntries.companyId, company.id),
         eq(accountNodes.companyId, company.id),
         inArray(journalEntries.status, ledgerEntryStatuses),
+        excludePeriodClosing(),
         gte(journalEntries.date, accountingDay(fromDate)),
         lt(journalEntries.date, nextAccountingDay(toDate)),
         inArray(accountNodes.type, [AccountType.REVENUE, AccountType.EXPENSE]),
@@ -140,8 +140,12 @@ export class ProfitLossRepository {
           name: accountNodes.name,
           type: accountNodes.type,
           subtype: accountNodes.subtype,
-          debitTotal: sql<number>`coalesce(sum(case when ${journalEntryLines.type} = ${LineType.DEBIT} then ${journalEntryLines.amount} else 0 end), 0)`,
-          creditTotal: sql<number>`coalesce(sum(case when ${journalEntryLines.type} = ${LineType.CREDIT} then ${journalEntryLines.amount} else 0 end), 0)`,
+          debitUnits: sql<string>`(
+            sum(case
+              when ${journalEntryLines.type} = ${LineType.DEBIT} then ${journalEntryLines.amount}
+              when ${journalEntryLines.type} = ${LineType.CREDIT} then -${journalEntryLines.amount}
+              else 0 end) * 10000
+          )::numeric(30, 0)`,
         })
         .from(journalEntryLines)
         .innerJoin(
@@ -165,59 +169,35 @@ export class ProfitLossRepository {
       const revenue: AccountLine[] = [];
       const expenses: AccountLine[] = [];
 
-      for (const r of rows) {
-        const debit = Number(r.debitTotal);
-        const credit = Number(r.creditTotal);
-
-        if (r.type === AccountType.REVENUE) {
-          // Revenue increases on credit side
-          revenue.push({
-            accountId: r.accountId,
-            code: r.code,
-            name: r.name,
-            amount: credit - debit,
-          });
-        } else {
-          // Expense increases on debit side
-          expenses.push({
-            accountId: r.accountId,
-            code: r.code,
-            name: r.name,
-            amount: debit - credit,
-          });
+      let revenueUnits = BigInt(0);
+      let expenseUnits = BigInt(0);
+      let cogsUnits = BigInt(0);
+      let operatingUnits = BigInt(0);
+      for (const row of rows) {
+        const debit = BigInt(row.debitUnits);
+        const isRevenue = row.type === AccountType.REVENUE;
+        const units = isRevenue ? -debit : debit;
+        const account = {
+          accountId: row.accountId,
+          code: row.code,
+          name: row.name,
+          amount: Number(units) / 10_000,
+        };
+        if (isRevenue) {
+          revenueUnits += units;
+          revenue.push(account);
+          continue;
+        }
+        expenseUnits += units;
+        expenses.push(account);
+        if (row.subtype === AccountSubtype.COGS) {
+          cogsUnits += units;
+        } else if (OPERATING_EXPENSE_SUBTYPES.has(row.subtype)) {
+          operatingUnits += units;
         }
       }
 
-      const totalRevenue = revenue.reduce((s, a) => s + a.amount, 0);
-      const totalExpenses = expenses.reduce((s, a) => s + a.amount, 0);
-
-      // COGS for gross profit
-      const cogsExpenses = rows
-        .filter(
-          (r) => r.type === AccountType.EXPENSE && COGS_SUBTYPES.has(r.subtype),
-        )
-        .reduce(
-          (s, r) => s + (Number(r.debitTotal) - Number(r.creditTotal)),
-          0,
-        );
-
-      const grossProfit = totalRevenue - cogsExpenses;
-
-      // Operating expenses (exclude COGS, financial, tax)
-      const operatingExpenses = rows
-        .filter(
-          (r) =>
-            r.type === AccountType.EXPENSE &&
-            !COGS_SUBTYPES.has(r.subtype) &&
-            OPERATING_EXPENSE_SUBTYPES.has(r.subtype),
-        )
-        .reduce(
-          (s, r) => s + (Number(r.debitTotal) - Number(r.creditTotal)),
-          0,
-        );
-
-      const operatingProfit = grossProfit - operatingExpenses;
-      const netProfit = totalRevenue - totalExpenses;
+      const grossUnits = revenueUnits - cogsUnits;
 
       return success({
         reportCompanyId: company.id,
@@ -226,12 +206,12 @@ export class ProfitLossRepository {
         fromResponse: fromDate,
         toResponse: toDate,
         revenue,
-        totalRevenue,
+        totalRevenue: Number(revenueUnits) / 10_000,
         expenses,
-        totalExpenses,
-        grossProfit,
-        operatingProfit,
-        netProfit,
+        totalExpenses: Number(expenseUnits) / 10_000,
+        grossProfit: Number(grossUnits) / 10_000,
+        operatingProfit: Number(grossUnits - operatingUnits) / 10_000,
+        netProfit: Number(revenueUnits - expenseUnits) / 10_000,
       });
     } catch (error) {
       logger.error("Error computing profit & loss", parseError(error));

@@ -7,18 +7,23 @@
 
 "use client";
 
+import { UserRole } from "next-vibe/identity/roles/enum";
+import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { CheckCircle2 } from "next-vibe/ui/components/icons/CheckCircle2";
 import { Span } from "next-vibe/ui/components/span";
+import { WidgetHeader } from "next-vibe/ui/components/widget-header";
+import { AdminRecordContext } from "next-vibe/unified-ui/_shared/admin-record-context";
 import {
   useWidgetNavigation,
   useWidgetTranslation,
+  useWidgetUser,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/navigate-button/widget";
-import { type JSX } from "react";
+import { type JSX, useContext } from "react";
 
-import { SkillTrustLevel } from "../../enum";
+import { SkillSourceFilter, SkillTrustLevel } from "../../enum";
 import type definition from "./definition";
 import { SkillVoteButtons } from "./vote-buttons";
 
@@ -32,6 +37,33 @@ export function SkillVoteContainer({ field }: CustomWidgetProps): JSX.Element {
   const t = useWidgetTranslation<typeof definition.POST>();
   const navigation = useWidgetNavigation();
   const skillId = navigation.current?.params?.urlPathParams?.id ?? null;
+  const admin = useContext(AdminRecordContext);
+  const user = useWidgetUser();
+
+  const isAdminTool =
+    admin && !user.isPublic && user.roles.includes(UserRole.ADMIN);
+
+  if (isAdminTool && !skillId) {
+    const browse = async (): Promise<void> => {
+      const { default: skills } = await import("../../definition");
+      navigation.push(skills.GET, {
+        data: { sourceFilter: SkillSourceFilter.COMMUNITY },
+      });
+    };
+    return (
+      <Div className="flex min-w-0 flex-col items-start gap-4 p-4">
+        <WidgetHeader
+          size="page"
+          border={false}
+          title={t("post.title")}
+          subtitle={t("post.selectSkill")}
+        />
+        <Button type="button" onClick={() => void browse()}>
+          {t("post.browseSkills")}
+        </Button>
+      </Div>
+    );
+  }
 
   return (
     <Div className="flex flex-col gap-4 p-4">
@@ -42,6 +74,8 @@ export function SkillVoteContainer({ field }: CustomWidgetProps): JSX.Element {
             skillId={skillId}
             initialUserVote={data?.userVote ?? null}
             initialVoteCount={data?.voteCount ?? null}
+            upLabel={isAdminTool ? t("post.direction.up") : undefined}
+            downLabel={isAdminTool ? t("post.direction.down") : undefined}
           />
         ) : null}
       </Div>

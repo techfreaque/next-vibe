@@ -52,6 +52,25 @@ export function BankListWidget(): JSX.Element {
       push(create.POST, { data: { companyId, accountId } });
     })();
   };
+  const openSettings = (): void => {
+    void import("../settings/definition").then(({ default: routes }) =>
+      push(routes.POST, {
+        data: {
+          companyId,
+          accountId,
+          bookedCurrency:
+            data?.settings?.bookedCurrency ?? data?.selectedCurrency,
+          foreignCurrency: data?.settings?.foreignCurrency ?? undefined,
+          maxFxDifference: data?.settings?.maxFxDifference ?? undefined,
+          maxFxBps: data?.settings?.maxFxBps ?? undefined,
+          maxDateDistanceDays: data?.settings?.maxDateDistanceDays ?? 7,
+          gainAccountId: data?.settings?.gainAccountId ?? undefined,
+          lossAccountId: data?.settings?.lossAccountId ?? undefined,
+          feeAccountId: data?.settings?.feeAccountId ?? undefined,
+        },
+      }),
+    );
+  };
   const openCandidates = (lineId: string): void => {
     if (!data?.selectedCompanyId) {
       return;
@@ -60,8 +79,7 @@ export function BankListWidget(): JSX.Element {
     void (async (): Promise<void> => {
       const { default: candidates } = await import("../candidates/definition");
       push(candidates.GET, {
-        data: { companyId: appliedCompany },
-        urlPathParams: { lineId },
+        data: { companyId: appliedCompany, lineId },
       });
     })();
   };
@@ -106,9 +124,21 @@ export function BankListWidget(): JSX.Element {
         subtitle={data?.selectedAccountName ?? t("list.description")}
         actions={
           interactive ? (
-            <Button type="button" size="sm" onClick={openImport}>
-              {t("ui.importAction")}
-            </Button>
+            <Div className="flex flex-wrap gap-2">
+              <Button type="button" size="sm" onClick={openImport}>
+                {t("ui.importAction")}
+              </Button>
+              {data?.canManage && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={openSettings}
+                >
+                  {t("adjustment.settings")}
+                </Button>
+              )}
+            </Div>
           ) : undefined
         }
       />

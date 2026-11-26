@@ -150,6 +150,41 @@ function ts(date: Date): SQL {
   return sql`(${date.toISOString()}::timestamptz AT TIME ZONE 'UTC')`;
 }
 
+const hasRecordedCost = sql`(t.metadata->>'upstreamCostUsd' IS NOT NULL
+  OR t.metadata->>'fallbackCostUsd' IS NOT NULL)`;
+const recordedCostUsd = sql`(COALESCE((t.metadata->>'upstreamCostUsd')::numeric, 0)
+  + COALESCE((t.metadata->>'fallbackCostUsd')::numeric, 0))`;
+const spendingUserId = sql`COALESCE(w.user_id, link.user_id)`;
+
+const usageWalletAndActor = sql`
+  JOIN credit_wallets w ON w.id = t.wallet_id
+  LEFT JOIN LATERAL (
+    SELECT CASE WHEN t.metadata->>'actorLeadId' ~ '^[0-9a-fA-F-]{36}$'
+      THEN (t.metadata->>'actorLeadId')::uuid END AS lead_id
+  ) actor ON true
+  LEFT JOIN LATERAL (
+    SELECT l.user_id FROM user_lead_links l
+    WHERE w.user_id IS NULL
+      AND l.lead_id = COALESCE(actor.lead_id, w.lead_id)
+      AND l.linked_at <= t.created_at
+    ORDER BY l.linked_at
+    LIMIT 1
+  ) link ON true`;
+
+function eligibleUsage(start: Date, end: Date): SQL {
+  return sql`t.type = ${CreditTransactionType.USAGE}
+    AND t.amount < 0
+    AND ${sql.raw(notSignupCarryoverRaw("t"))}
+    AND t.created_at >= ${ts(start)}
+    AND t.created_at < ${ts(end)}`;
+}
+
+function externalSpender(userId: SQL): SQL {
+  return sql`(${userId} IS NULL OR ${userId} NOT IN (
+    SELECT user_id FROM user_roles WHERE role = ${UserPermissionRole.ADMIN}
+  ))`;
+}
+
 /** Credits of a base row when its funding bucket is one of `keys`. */
 function fundedPart(keys: readonly FundingKey[]): SQL {
   return sql`(CASE WHEN b.bucket IN (${fundingList(keys)}) THEN b.credits ELSE 0 END)`;
@@ -187,8 +222,6 @@ export function creditUsageCte(
   end: Date,
   filters: CreditUsageFilters,
 ): SQL {
-  const usage = CreditTransactionType.USAGE;
-  const realUsage = sql.raw(notSignupCarryoverRaw("t"));
   const credits: SQL =
     filters.creditKind === UsageCreditKind.ALL
       ? sql.raw("b.credits")
@@ -206,7 +239,7 @@ export function creditUsageCte(
         : sql``;
   const internalFilter = filters.includeInternal
     ? sql``
-    : sql`AND (b.user_id IS NULL OR b.user_id NOT IN (SELECT user_id FROM user_roles WHERE role = ${UserPermissionRole.ADMIN}))`;
+    : sql`AND ${externalSpender(sql`b.user_id`)}`;
   const modelFilter = filters.model
     ? sql`AND b.model = ${filters.model}`
     : sql``;
@@ -228,14 +261,13 @@ export function creditUsageCte(
         t.model_id AS model,
         COALESCE(NULLIF(${featureIdSql(sql`t.feature`)}, ''), CASE WHEN t.model_id IS NOT NULL THEN 'chat' END) AS feature,
         NULLIF(t.metadata->>'upstreamProvider', '') AS provider,
-        (t.metadata ? 'upstreamCostUsd' OR t.metadata ? 'fallbackCostUsd') AS has_cost,
-        (COALESCE((t.metadata->>'upstreamCostUsd')::numeric, 0)
-          + COALESCE((t.metadata->>'fallbackCostUsd')::numeric, 0)) AS cost_usd,
-        COALESCE(w.user_id, link.user_id) AS user_id,
-        CASE WHEN COALESCE(w.user_id, link.user_id) IS NULL
+        ${hasRecordedCost} AS has_cost,
+        ${recordedCostUsd} AS cost_usd,
+        ${spendingUserId} AS user_id,
+        CASE WHEN ${spendingUserId} IS NULL
           THEN COALESCE(actor.lead_id, w.lead_id) END AS lead_id
       FROM credit_transactions t
-      JOIN credit_wallets w ON w.id = t.wallet_id
+      ${usageWalletAndActor}
       LEFT JOIN credit_packs pk ON pk.id = t.pack_id
       LEFT JOIN LATERAL (
         -- Unstamped rows (written by a build before funding_type existed).
@@ -249,23 +281,7 @@ export function creditUsageCte(
             THEN ${CreditFundingType.FREE_UNKNOWN}
           ELSE ${CreditFundingType.PACK_UNKNOWN} END) AS bucket
       ) fund ON true
-      LEFT JOIN LATERAL (
-        SELECT CASE WHEN t.metadata->>'actorLeadId' ~ '^[0-9a-fA-F-]{36}$'
-          THEN (t.metadata->>'actorLeadId')::uuid END AS lead_id
-      ) actor ON true
-      LEFT JOIN LATERAL (
-        SELECT l.user_id FROM user_lead_links l
-        WHERE w.user_id IS NULL
-          AND l.lead_id = COALESCE(actor.lead_id, w.lead_id)
-          AND l.linked_at <= t.created_at
-        ORDER BY l.linked_at
-        LIMIT 1
-      ) link ON true
-      WHERE t.type = ${usage}
-        AND t.amount < 0
-        AND ${realUsage}
-        AND t.created_at >= ${ts(start)}
-        AND t.created_at < ${ts(end)}
+      WHERE ${eligibleUsage(start, end)}
     ),
     f AS (
       SELECT
@@ -296,7 +312,9 @@ interface UsageTotals {
   spenders: number;
 }
 
-function marginUsd(totals: UsageTotals): number {
+function marginUsd(
+  totals: Pick<UsageTotals, "costedCredits" | "costUsd">,
+): number {
   return totals.costedCredits * CREDIT_VALUE_USD - totals.costUsd;
 }
 
@@ -308,6 +326,51 @@ function kpi(value: number, previous: number | null, digits = 2): Kpi {
 }
 
 export class CreditUsageReportRepository {
+  /**
+   * Dashboard estimates from costed usage only. This skips funding and report
+   * breakdowns. Credit list value includes free and gifted spend.
+   */
+  static async headline(win: AnalyticsWindow): Promise<{
+    estimatedCostUsd: Kpi | null;
+    costedUsageMarginUsd: Kpi | null;
+  }> {
+    const result = await db.execute<
+      QueryResultRow & {
+        period: "current" | "previous";
+        cost: NumLike;
+        costed: NumLike;
+      }
+    >(sql`
+      SELECT CASE WHEN t.created_at >= ${ts(win.from)}
+        THEN 'current' ELSE 'previous' END AS period,
+        SUM(${recordedCostUsd}) AS cost,
+        SUM(-t.amount) AS costed
+      FROM credit_transactions t
+      ${usageWalletAndActor}
+      WHERE ${eligibleUsage(win.previousFrom ?? win.from, win.to)}
+        AND ${hasRecordedCost}
+        AND ${externalSpender(spendingUserId)}
+      GROUP BY 1`);
+    const current = result.rows.find((row) => row.period === "current");
+    if (!current) {
+      return { estimatedCostUsd: null, costedUsageMarginUsd: null };
+    }
+    const previous = result.rows.find((row) => row.period === "previous");
+    const margin = (row: typeof current): number =>
+      marginUsd({ costUsd: num(row.cost), costedCredits: num(row.costed) });
+
+    return {
+      estimatedCostUsd: kpi(
+        num(current.cost),
+        previous ? num(previous.cost) : null,
+      ),
+      costedUsageMarginUsd: kpi(
+        margin(current),
+        previous ? margin(previous) : null,
+      ),
+    };
+  }
+
   static async getReport(
     data: CreditUsageReportRequestOutput,
     logger: EndpointLogger,

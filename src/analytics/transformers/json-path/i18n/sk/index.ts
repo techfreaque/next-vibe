@@ -5,14 +5,13 @@ export const translations: typeof enTranslations = {
   post: {
     title: "Cesta JSON",
     titleShort: "Cesta JSON",
-    description:
-      "Cesta JSON vyberá hodnotu podľa cesty v bodkovom zápise. Nástroj je zastaraný a vracia prázdny výsledok.",
+    description: "Získa nameranú hodnotu alebo číselné pole z metadát.",
     fields: {
       source: { label: "Zdroj", description: "Vstupný časový rad" },
       path: {
         label: "Cesta",
         description:
-          "Cesta v bodkovom zápise pre výber hodnoty (už sa nepodporuje)",
+          "Zadajte value alebo cestu k poľu v metadátach, napríklad meta.close.",
       },
       resolution: {
         label: "Časové rozlíšenie",

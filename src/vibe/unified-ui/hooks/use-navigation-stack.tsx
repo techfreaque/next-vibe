@@ -6,23 +6,22 @@ import { createStore, type StoreApi, useStore } from "zustand";
 import type { NavigationStackEntry } from "../../core/definition/endpoint";
 import type { CreateApiEndpointAny } from "../../core/definition/endpoint-base";
 import type { WidgetData } from "../../core/utils/json";
-import type { CliComponent } from "../_shared/lazy-widget";
 
 /** Preload the lazyWidget for an endpoint before pushing it onto the stack. */
-async function preloadEndpointWidget(
+export async function preloadEndpointWidget(
   endpoint: CreateApiEndpointAny,
 ): Promise<void> {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- runtime duck-typing on lazyWidget
-  const render = (endpoint.fields as Record<string, any>)?.render;
+  const render =
+    "render" in endpoint.fields ? endpoint.fields.render : undefined;
   if (
-    render &&
     typeof render === "function" &&
     "cliWidget" in render &&
     "preload" in render &&
-    typeof (render as CliComponent).preload === "function" &&
-    (render as CliComponent).resolved === null
+    typeof render.preload === "function" &&
+    "resolved" in render &&
+    render.resolved === null
   ) {
-    await (render as CliComponent).preload();
+    await render.preload();
   }
 }
 

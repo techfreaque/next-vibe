@@ -3,13 +3,12 @@ export const translations = {
   post: {
     title: "JSON Path",
     titleShort: "JSON Path",
-    description:
-      "JSON Path - extracts a value via dot-notation path (superseded, returns empty)",
+    description: "Extract the observed value or a numeric metadata field.",
     fields: {
       source: { label: "Source", description: "Input time series" },
       path: {
         label: "Path",
-        description: "Dot-notation path to extract (no longer supported)",
+        description: "Enter value or a metadata path such as meta.close.",
       },
       resolution: { label: "Resolution", description: "Computation timeframe" },
       range: { label: "Range", description: "Time range to compute" },

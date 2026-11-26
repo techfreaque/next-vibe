@@ -296,6 +296,7 @@ export class ErrorLogsRepository {
             outside: sql<string>`COUNT(*) FILTER (WHERE NOT ${ErrorLogsRepository.seenInWindowSql(win)})`,
             messages: sql<string>`COUNT(DISTINCT ${errorLogs.message})`,
             matching: sql<string>`COUNT(*) FILTER (WHERE ${filterSql})`,
+            inView: sql<string>`COUNT(*) FILTER (WHERE ${listWhere})`,
           })
           .from(errorLogs)
           .where(eq(errorLogs.resolved, false)),
@@ -437,6 +438,7 @@ export class ErrorLogsRepository {
           unresolvedOutsideWindow: Number(unresolvedRow?.outside ?? 0),
           unresolvedMessages: Number(unresolvedRow?.messages ?? 0),
           unresolvedMatching: Number(unresolvedRow?.matching ?? 0),
+          unresolvedInView: Number(unresolvedRow?.inView ?? 0),
           occurrences: dailyKpi(
             Number(occurrenceRow?.current ?? 0),
             Number(occurrenceRow?.previous ?? 0),

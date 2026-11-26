@@ -20,7 +20,7 @@ export const translations: typeof enTranslations = {
         description: "Seleccione un papel para otorgar a este usuario",
       },
       id: {
-        label: "Usuario ID",
+        label: "Usuario",
         description:
           "Un identificador único del usuario para otorgar el papel a",
         placeholder: "Introduzca el usuario ID...",
@@ -101,7 +101,7 @@ export const translations: typeof enTranslations = {
         description: "Seleccione un papel para revocar de este usuario",
       },
       id: {
-        label: "Usuario ID",
+        label: "Usuario",
         description:
           "Un identificador único del usuario para revocar el papel de",
         placeholder: "Introduzca el usuario ID...",

@@ -52,7 +52,10 @@ export const translations = {
     back: "Back",
     submit: "Convert to Invoice",
     converted: "Invoice created from this estimate.",
-    viewInvoice: "View Invoice",
+    savedDraftNumber: "Draft invoice #{{number}} created",
+    savedDraft: "Draft invoice created",
+    convertedNumber: "Converted from estimate {{number}}.",
+    viewInvoice: "Open draft invoice",
     convertNote:
       "A draft invoice will be created with the same line items. The estimate will be marked as converted.",
   },

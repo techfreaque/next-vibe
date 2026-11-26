@@ -131,10 +131,17 @@ async function enqueueServerWidgetImport(
  * Safe to call in drizzle-kit context: each factory guards itself with
  * the import.meta.env check.
  */
-export function preloadAllLazyWidgets(): Promise<void> {
-  return Promise.all(_lazyWidgetRegistry.map((fn) => fn())).then(
-    () => undefined,
-  );
+export async function preloadAllLazyWidgets(
+  allowStaleFactories = import.meta.env?.DEV === true,
+): Promise<void> {
+  const preloads = _lazyWidgetRegistry.map((preload) => preload());
+  // HMR can leave a previous definition's factory in the registry after the
+  // source file moves. Only the widget actually being rendered is required.
+  if (allowStaleFactories) {
+    await Promise.allSettled(preloads);
+    return;
+  }
+  await Promise.all(preloads);
 }
 
 export function lazyWidget(
@@ -161,10 +168,18 @@ export function lazyWidget(
         state.resolved = mod.default;
         return mod.default;
       };
-      state.modulePromise =
+      const pending =
         typeof window === "undefined"
           ? enqueueServerWidgetImport(load)
           : load();
+      state.modulePromise = pending;
+      // Keep the failure on this attempt. A later navigation or warmup can
+      // retry after the development resolver has received the updated module.
+      void pending.catch(() => {
+        if (state.modulePromise === pending) {
+          state.modulePromise = null;
+        }
+      });
     }
     return state.modulePromise;
   }

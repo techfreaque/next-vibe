@@ -14,6 +14,7 @@ export function PaymentsRefundVolumeWidget(): React.JSX.Element {
   const t = useWidgetTranslation<typeof definitions.POST>();
   return (
     <DataSourceChartWidget
+      currency="USD"
       definition={definitions}
       label={t("post.fields.result.label")}
     />

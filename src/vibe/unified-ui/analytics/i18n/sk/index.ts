@@ -9,6 +9,8 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   analytics: {
+    review: "Skontrolovať",
+    reviewItem: "Skontrolovať {{item}}",
     range: {
       label: "Obdobie",
       description: "Časové obdobie prehľadu",
@@ -73,6 +75,11 @@ export const translations: typeof enTranslations = {
       filters: "Filtre",
       refresh: "Obnoviť",
       byGranularity: "zoskupenie podľa položky {{granularity}}",
+      groupedBy: {
+        day: "po dňoch",
+        week: "po týždňoch",
+        month: "po mesiacoch",
+      },
     },
   },
 };

@@ -282,6 +282,7 @@ export const translations: typeof enTranslations = {
     health: {
       socketOpen: "WebSocket je otvorený",
       noSyncRecorded: "Zatiaľ bez synchronizácie",
+      overdue: "Synchronizácia mešká",
       syncRecorded: "Synchronizácia zaznamenaná",
       tunnelOpen: "Otvorený tunel",
       bridgeActive: "Pripojené",
@@ -302,6 +303,7 @@ export const translations: typeof enTranslations = {
     },
     // Cloud marketing panel
     cloud: {
+      connectAnother: "Pripojiť ďalšiu inštanciu",
       heroTitle: "Pripoj vlastnú inštanciu",
       heroSubtitle:
         "Spusti next-vibe na vlastnom hardvéri a prepoj ho s týmto účtom. Tvoje čety, spomienky a zručnosti budeš mať poruke. Nástroje bežia na tvojom počítači.",

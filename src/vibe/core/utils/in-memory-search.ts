@@ -20,6 +20,7 @@ interface SearchField<T> {
 interface SearchOptions<T> {
   fields: SearchField<T>[];
   query: string;
+  requireAllTerms?: boolean;
 }
 
 /**
@@ -56,6 +57,7 @@ export function searchItems<T>(items: T[], options: SearchOptions<T>): T[] {
 
   const scored = items.map((item) => {
     let score = 0;
+    const found = options.requireAllTerms ? new Set<string>() : undefined;
 
     for (const field of fields) {
       const raw = field.get(item);
@@ -63,6 +65,14 @@ export function searchItems<T>(items: T[], options: SearchOptions<T>): T[] {
 
       for (const value of values) {
         const v = value.toLowerCase();
+
+        if (found) {
+          for (const term of terms) {
+            if (v.includes(term)) {
+              found.add(term);
+            }
+          }
+        }
 
         // Exact full match - highest signal
         if (v === normalized) {
@@ -86,7 +96,10 @@ export function searchItems<T>(items: T[], options: SearchOptions<T>): T[] {
       }
     }
 
-    return { item, score };
+    return {
+      item,
+      score: !found || terms.every((term) => found.has(term)) ? score : 0,
+    };
   });
 
   return scored

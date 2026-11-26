@@ -1,13 +1,18 @@
 "use client";
 
 import { formatDate } from "next-vibe/core/i18n/core/localization-utils";
-import { Badge } from "next-vibe/ui/components/badge";
 import { Button, type ButtonMouseEvent } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
 import { ExternalLink } from "next-vibe/ui/components/icons/ExternalLink";
 import { Span } from "next-vibe/ui/components/span";
-import { H3, P } from "next-vibe/ui/components/typography";
+import { P } from "next-vibe/ui/components/typography";
+import { WidgetShell } from "next-vibe/ui/components/widget-shell";
+import { AdminRecordDetail } from "next-vibe/unified-ui/_shared/admin-record-detail";
+import {
+  formatMoney,
+  formatPercent,
+} from "next-vibe/unified-ui/_shared/format-money";
 import {
   useWidgetIsInteractive,
   useWidgetLocale,
@@ -22,6 +27,7 @@ import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/sub
 import type { JSX } from "react";
 
 import { DocumentLineItems } from "@/finance/document-line-items";
+import { evidenceCurrencies } from "@/finance/supplier-evidence/rules";
 import { BillStatus } from "@/payment/enum";
 
 import type definition from "./definition";
@@ -31,20 +37,20 @@ function isInPast(date: Date | string | number): boolean {
   return new Date(date) < new Date();
 }
 
-function getStatusBadgeVariant(
+function getStatusVariant(
   status: string,
-): "default" | "secondary" | "destructive" | "outline" {
+): "success" | "info" | "danger" | "muted" {
   switch (status) {
     case BillStatus.PAID:
-      return "default";
+      return "success";
     case BillStatus.APPROVED:
-      return "secondary";
+      return "info";
     case BillStatus.DISPUTED:
-      return "destructive";
+      return "danger";
     case BillStatus.DRAFT:
     case BillStatus.RECEIVED:
     default:
-      return "outline";
+      return "muted";
   }
 }
 
@@ -62,7 +68,7 @@ export function BillGetWidget({
 
   if (!data?.id) {
     return (
-      <Div className="flex flex-col gap-4">
+      <WidgetShell layout="page">
         {canGoBack && (
           <Button
             type="button"
@@ -83,16 +89,12 @@ export function BillGetWidget({
         <SubmitButtonWidget<typeof definition.GET>
           field={{ text: "widget.submit" as const }}
         />
-      </Div>
+      </WidgetShell>
     );
   }
 
   const money = (amount: number): string =>
-    new Intl.NumberFormat(locale, {
-      style: "currency",
-      currency: data.currency,
-      currencyDisplay: "code",
-    }).format(amount);
+    formatMoney(amount, data.currency, locale);
 
   const isOverdue =
     (data.status === BillStatus.RECEIVED ||
@@ -100,6 +102,25 @@ export function BillGetWidget({
     data.dueDate !== null &&
     data.dueDate !== undefined &&
     isInPast(data.dueDate);
+
+  const handleLinkSupplierDocument = (): void => {
+    void (async (): Promise<void> => {
+      const route = await import("@/finance/supplier-evidence/definition");
+      const currency = evidenceCurrencies.safeParse(data.currency);
+      navigate(route.default.POST, {
+        data: {
+          operation: "bill",
+          companyId: data.companyId,
+          vendorId: data.bankVendorId,
+          debitAccountId: data.bankExpenseAccountId,
+          bankDraftBillId: data.id,
+          currency: currency.success ? currency.data : undefined,
+          grossAmount: String(data.total),
+          dryRun: true,
+        },
+      });
+    })();
+  };
 
   const handleApproveBill = (e: ButtonMouseEvent): void => {
     e.stopPropagation();
@@ -136,12 +157,19 @@ export function BillGetWidget({
     })();
   };
 
-  const handleViewJournalEntry = (e: ButtonMouseEvent): void => {
-    e.stopPropagation();
-    const entryId = data.journalEntryId;
-    if (!entryId) {
-      return;
-    }
+  const handleRemoveLine = (lineId: string): void => {
+    void (async (): Promise<void> => {
+      const def =
+        await import("@/payment/bill/line/[billId]/[lineId]/remove/definition");
+      navigate(def.default.POST, {
+        urlPathParams: { billId: data.id, lineId },
+        renderInModal: true,
+        popNavigationOnSuccess: 1,
+      });
+    })();
+  };
+
+  const handleViewJournalEntry = (entryId: string): void => {
     void (async (): Promise<void> => {
       const def =
         await import("@/chart-of-accounts/journal/[entryId]/get/definition");
@@ -166,149 +194,239 @@ export function BillGetWidget({
     }
   }
 
-  return (
-    <Div className="@container flex min-w-0 flex-col gap-6">
-      {canGoBack && (
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={() => pop()}
-          className="self-start gap-1.5 -ml-1"
-        >
-          <ChevronLeft className="h-4 w-4" />
-          {t("widget.back")}
-        </Button>
-      )}
+  const title = data.billNumber
+    ? `${t("widget.billNumber")} ${data.billNumber}`
+    : t("widget.billNumber");
+  const subtitle = new Intl.ListFormat(locale, {
+    style: "short",
+    type: "unit",
+  }).format(
+    data.companyName
+      ? [data.supplierName, data.companyName]
+      : [data.supplierName],
+  );
 
-      {/* Bill header */}
-      <Div className="flex min-w-0 flex-wrap items-start justify-between gap-3 p-4 rounded-lg border bg-card">
-        <Div className="flex min-w-0 flex-col gap-2">
-          <Div className="flex flex-wrap items-center gap-3">
-            <H3 className="text-lg font-semibold [overflow-wrap:anywhere]">
-              {t("widget.billNumber")} {data.billNumber ?? "—"}
-            </H3>
-            <Badge variant={getStatusBadgeVariant(data.status)}>
-              {getStatusLabel(data.status)}
-            </Badge>
-            {isOverdue && (
-              <Span className="text-xs font-medium text-destructive">
-                {t("widget.overdue")}
-              </Span>
+  const gross = (
+    <Span className="text-xl font-semibold tabular-nums">
+      {money(data.total)}
+    </Span>
+  );
+
+  return (
+    <AdminRecordDetail
+      title={title}
+      subtitle={subtitle}
+      status={{
+        status: getStatusLabel(data.status),
+        variant: getStatusVariant(data.status),
+      }}
+      titleAccessory={
+        isOverdue && (
+          <Span className="text-sm font-medium text-destructive">
+            {t("widget.overdue")}
+          </Span>
+        )
+      }
+      backButton={
+        canGoBack && (
+          <Button type="button" variant="ghost" size="sm" onClick={() => pop()}>
+            <ChevronLeft className="h-4 w-4" />
+            {t("widget.back")}
+          </Button>
+        )
+      }
+      facts={[
+        {
+          key: "gross",
+          label: t("widget.grossTotal"),
+          value: gross,
+        },
+        {
+          key: "date",
+          label: t("widget.billDate"),
+          value: formatDate(data.billDate, locale, "PP"),
+        },
+        ...(data.dueDate
+          ? [
+              {
+                key: "due",
+                label: t("widget.dueDate"),
+                value: formatDate(data.dueDate, locale, "PP"),
+              },
+            ]
+          : []),
+        ...(data.paidAt
+          ? [
+              {
+                key: "paid",
+                label: t("widget.paidAt"),
+                value: formatDate(data.paidAt, locale, "PP"),
+              },
+            ]
+          : []),
+        ...(data.supplierVatNumber
+          ? [
+              {
+                key: "supplierVat",
+                label: t("get.response.supplierVatNumber"),
+                value: data.supplierVatNumber,
+              },
+            ]
+          : []),
+      ]}
+    >
+      {(data.approvalJournal || data.settlementJournal) && (
+        <Div className="flex min-w-0 flex-col gap-2 rounded-lg border px-3 py-2.5">
+          <P className="text-sm font-semibold">
+            {t("widget.accountingEvidence")}
+          </P>
+          <Div className="grid min-w-0 gap-2 sm:grid-cols-2">
+            {[
+              {
+                label: t("widget.approvalJournal"),
+                entry: data.approvalJournal,
+              },
+              {
+                label: t("widget.settlementJournal"),
+                entry: data.settlementJournal,
+              },
+            ].map(
+              ({ label, entry }) =>
+                entry && (
+                  <Div
+                    key={entry.id}
+                    className="flex min-w-0 flex-col items-start gap-0.5"
+                  >
+                    <Span className="text-sm text-muted-foreground">
+                      {label}
+                    </Span>
+                    {isInteractive ? (
+                      <Button
+                        type="button"
+                        variant="link"
+                        className="h-auto min-h-11 max-w-full gap-1.5 whitespace-normal p-0 text-left tabular-nums"
+                        aria-label={`${label} ${entry.number}`}
+                        onClick={() => handleViewJournalEntry(entry.id)}
+                      >
+                        {entry.number}
+                        <ExternalLink
+                          className="size-3.5 shrink-0"
+                          aria-hidden="true"
+                        />
+                      </Button>
+                    ) : (
+                      <Span className="text-sm tabular-nums">
+                        {entry.number}
+                      </Span>
+                    )}
+                  </Div>
+                ),
             )}
           </Div>
-
-          {/* Supplier */}
-          {data.supplierName && (
-            <P className="text-sm">
-              <Span className="text-muted-foreground">
-                {t("widget.supplier")}:
-              </Span>{" "}
-              <Span className="font-medium">{data.supplierName}</Span>
-              {data.supplierVatNumber && (
-                <Span className="ml-2 text-xs text-muted-foreground font-mono">
-                  {data.supplierVatNumber}
-                </Span>
-              )}
-            </P>
-          )}
-
-          {/* Dates */}
-          <Div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-muted-foreground">
-            <Div className="flex flex-col gap-0.5">
-              <Span className="text-xs uppercase tracking-wide">
-                {t("widget.billDate")}
-              </Span>
-              <Span>{formatDate(data.billDate, locale, "PP")}</Span>
-            </Div>
-            {data.dueDate ? (
-              <Div className="flex flex-col gap-0.5">
-                <Span className="text-xs uppercase tracking-wide">
-                  {t("widget.dueDate")}
-                </Span>
-                <Span
-                  className={isOverdue ? "text-destructive font-medium" : ""}
-                >
-                  {formatDate(data.dueDate, locale, "PP")}
-                </Span>
-              </Div>
-            ) : null}
-            {data.paidAt ? (
-              <Div className="flex flex-col gap-0.5">
-                <Span className="text-xs uppercase tracking-wide">
-                  {t("widget.paidAt")}
-                </Span>
-                <Span>{formatDate(data.paidAt, locale, "PP")}</Span>
-              </Div>
-            ) : null}
-          </Div>
-
-          {/* Notes */}
-          {data.notes ? (
-            <P className="text-sm text-muted-foreground [overflow-wrap:anywhere]">
-              {data.notes}
-            </P>
-          ) : null}
         </Div>
-
-        {/* Journal entry indicator */}
-        {data.journalEntryId ? (
-          <Div className="flex items-center gap-1 text-xs text-muted-foreground">
-            <ExternalLink className="h-3.5 w-3.5" />
-            <Span>{t("widget.journalEntry")}</Span>
-          </Div>
-        ) : null}
-      </Div>
-
-      {data.companyName && (
+      )}
+      {data.notes && (
         <P className="text-sm text-muted-foreground [overflow-wrap:anywhere]">
-          {data.companyName}
+          {data.notes}
         </P>
       )}
-
-      {/* Action buttons by status */}
-      <Div className="flex flex-wrap gap-2 pt-2 border-t">
-        {isInteractive &&
-          data.canManage &&
-          (data.status === BillStatus.DRAFT ||
-            data.status === BillStatus.RECEIVED) && (
-            <>
-              <Button type="button" onClick={handleApproveBill}>
-                {t(
-                  data.status === BillStatus.DRAFT
-                    ? "widget.markReceived"
-                    : "widget.approveBill",
-                )}
-              </Button>
-              {data.status === BillStatus.DRAFT && (
-                <Button type="button" variant="outline" onClick={handleAddLine}>
-                  {t("widget.addLine")}
-                </Button>
-              )}
-            </>
+      {data.bankSupplierDocument && (
+        <P className="text-sm text-muted-foreground">
+          {t(
+            data.bankSupplierDocument === "missing"
+              ? "widget.bankDocumentMissing"
+              : "widget.bankDocumentTaxReview",
           )}
+        </P>
+      )}
+      {data.taxPending && (
+        <Div className="flex flex-wrap items-center gap-3 rounded-lg border p-3">
+          <P className="text-sm">{t("widget.taxPending")}</P>
+          {isInteractive && data.taxReviewId && (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                void import("@/messenger/system-mailbox/bills/definition").then(
+                  ({ default: mailbox }) =>
+                    navigate(mailbox.POST, {
+                      data: {
+                        reviewId: data.taxReviewId,
+                        confirmTax: true,
+                        reference: data.billNumber ?? undefined,
+                        date: new Date(data.billDate)
+                          .toISOString()
+                          .slice(0, 10),
+                        currency: evidenceCurrencies.safeParse(data.currency)
+                          .data,
+                        grossAmount: String(data.total),
+                      },
+                    }),
+                );
+              }}
+            >
+              {t("widget.confirmSupplierTax")}
+            </Button>
+          )}
+        </Div>
+      )}
+      {isInteractive &&
+        data.canManage &&
+        ((!data.taxPending &&
+          (data.status === BillStatus.DRAFT ||
+            data.status === BillStatus.RECEIVED)) ||
+          data.status === BillStatus.APPROVED ||
+          data.bankSupplierDocument === "missing") && (
+          <Div className="flex flex-wrap gap-2">
+            {!data.taxPending &&
+              (data.status === BillStatus.DRAFT ||
+                data.status === BillStatus.RECEIVED) && (
+                <>
+                  <Button type="button" onClick={handleApproveBill}>
+                    {t(
+                      data.status === BillStatus.DRAFT
+                        ? "widget.markReceived"
+                        : "widget.approveBill",
+                    )}
+                  </Button>
+                  {data.canEditLines && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={handleAddLine}
+                    >
+                      {t("widget.addLine")}
+                    </Button>
+                  )}
+                </>
+              )}
 
-        {isInteractive &&
-          data.canManage &&
-          data.status === BillStatus.APPROVED && (
-            <>
+            {data.status === BillStatus.APPROVED && (
               <Button type="button" onClick={handlePayBill}>
                 {t("widget.payBill")}
               </Button>
-            </>
-          )}
+            )}
 
-        {isInteractive && data.journalEntryId ? (
-          <Button
-            type="button"
-            variant="outline"
-            onClick={handleViewJournalEntry}
-          >
-            <ExternalLink className="h-4 w-4 mr-1.5" />
-            {t("widget.viewJournalEntry")}
-          </Button>
-        ) : null}
-      </Div>
+            {data.bankSupplierDocument === "missing" && (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleLinkSupplierDocument}
+              >
+                {t("widget.linkBankDocument")}
+              </Button>
+            )}
+          </Div>
+        )}
+
+      {data.lineReviewRequired && (
+        <Div
+          aria-live="polite"
+          className="rounded-md border border-warning/30 bg-warning/10 p-3 text-sm"
+        >
+          {t("widget.lineReviewRequired")}
+        </Div>
+      )}
 
       {/* Line items */}
       {data.lines.length > 0 && (
@@ -322,36 +440,71 @@ export function BillGetWidget({
             total: t("widget.total"),
           }}
           money={money}
+          action={
+            isInteractive && data.canEditLines
+              ? {
+                  label: t("widget.removeAction"),
+                  render: (line): JSX.Element => (
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="ghost"
+                      aria-label={t("widget.removeLine", {
+                        description: line.description,
+                      })}
+                      className="self-start"
+                      onClick={() => handleRemoveLine(line.id)}
+                    >
+                      {t("widget.removeAction")}
+                    </Button>
+                  ),
+                }
+              : undefined
+          }
         />
       )}
 
-      {/* Summary */}
-      <Div className="flex justify-end">
-        <Div className="flex flex-col gap-1.5 w-full max-w-xs text-sm">
-          {data.lines.length > 0 && (
-            <>
-              <Div className="flex flex-wrap justify-between gap-2">
-                <Span className="text-muted-foreground">
-                  {t("widget.subtotal")}
-                </Span>
-                <Span className="font-mono">{money(data.subtotal)}</Span>
-              </Div>
-              {data.taxAmount > 0 && (
+      {(data.lines.length > 0 || data.reverseCharge) && (
+        <Div className="flex justify-end">
+          <Div className="flex flex-col gap-1.5 w-full max-w-xs text-sm">
+            {data.lines.length > 0 && data.subtotal !== null && (
+              <>
                 <Div className="flex flex-wrap justify-between gap-2">
                   <Span className="text-muted-foreground">
-                    {t("widget.tax")}
+                    {t("widget.subtotal")}
                   </Span>
-                  <Span className="font-mono">{money(data.taxAmount)}</Span>
+                  <Span className="font-mono">{money(data.subtotal)}</Span>
                 </Div>
-              )}
-            </>
-          )}
-          <Div className="flex flex-wrap justify-between gap-2 border-t pt-1.5 font-semibold">
-            <Span>{t("widget.total")}</Span>
-            <Span className="font-mono">{money(data.total)}</Span>
+                {data.taxAmount !== null && data.taxAmount > 0 && (
+                  <Div className="flex flex-wrap justify-between gap-2">
+                    <Span className="text-muted-foreground">
+                      {t(
+                        data.inputVatDeductible === false
+                          ? "widget.taxIncludedCost"
+                          : "widget.tax",
+                      )}
+                    </Span>
+                    <Span className="font-mono">{money(data.taxAmount)}</Span>
+                  </Div>
+                )}
+              </>
+            )}
+            {data.reverseCharge && (
+              <Div className="mt-2 flex flex-wrap justify-between gap-2 border-t pt-2">
+                <Div>
+                  <P className="font-medium">{t("widget.reverseCharge")}</P>
+                  <P className="text-xs text-muted-foreground">
+                    {`${money(data.reverseCharge.base)} × ${formatPercent(data.reverseCharge.ratePercent / 100, locale)}`}
+                  </P>
+                </Div>
+                <Span className="tabular-nums">
+                  {money(data.reverseCharge.amount)}
+                </Span>
+              </Div>
+            )}
           </Div>
         </Div>
-      </Div>
-    </Div>
+      )}
+    </AdminRecordDetail>
   );
 }

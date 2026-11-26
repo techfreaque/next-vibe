@@ -9,16 +9,20 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "next-vibe/ui/components/dropdown-menu";
+import { EmptyBlock } from "next-vibe/ui/components/empty-block";
 import { Label } from "next-vibe/ui/components/label";
+import { canRetryRecordRead } from "next-vibe/unified-ui/_shared/admin-record-context";
 import {
+  useWidgetEndpointMutations,
   useWidgetLocale,
   useWidgetNavigation,
+  useWidgetResponse,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import {
   pickerDateFromUtcDay,
   utcDayFromPickerDate,
 } from "next-vibe/unified-ui/widgets/form-fields/date-field/calendar-date";
-import type { JSX } from "react";
+import { type JSX, useId } from "react";
 
 import { useWorkspaceCompany } from "@/companies/_shared/workspace-company-context";
 import { DocumentScopePicker } from "@/finance/document-list-ui";
@@ -121,30 +125,93 @@ export function ReportMenu({
   );
 }
 
+export function ReportReadState({
+  hasCompany,
+  companyPrompt,
+  companyHint,
+}: {
+  hasCompany: boolean;
+  companyPrompt: string;
+  companyHint?: string;
+}): JSX.Element {
+  const { t } = scopedTranslation.scopedT(useWidgetLocale());
+  const response = useWidgetResponse();
+  const read = useWidgetEndpointMutations()?.read;
+  if (!hasCompany) {
+    return (
+      <EmptyBlock
+        className="rounded-md border border-dashed"
+        size={companyHint ? "page" : "compact"}
+        title={companyPrompt}
+        message={companyHint}
+      />
+    );
+  }
+  if (response?.success === false && !read?.isFetching && !read?.isLoading) {
+    const transient = canRetryRecordRead(response.errorType.errorCode);
+    return (
+      <EmptyBlock
+        size="page"
+        className="rounded-md border bg-card"
+        title={t("reports.widget.loadError")}
+        message={transient ? undefined : response.message}
+        action={
+          transient && read
+            ? {
+                label: t("reports.widget.retry"),
+                onClick: () => void read.refetch(),
+              }
+            : undefined
+        }
+      />
+    );
+  }
+  return (
+    <Div
+      aria-live="polite"
+      className="rounded-md border border-dashed py-10 text-center text-sm text-muted-foreground"
+    >
+      {t("reports.widget.running")}
+    </Div>
+  );
+}
+
 export function ReportCompanyPicker({
+  label,
   selectedId,
   reportId,
   reportName,
   onChange,
 }: {
+  label?: string;
   selectedId?: string;
   reportId?: string;
   reportName?: string;
   onChange: (id: string) => void;
 }): JSX.Element | null {
   const workspace = useWorkspaceCompany();
+  const id = useId();
   const value = selectedId || reportId;
   if (value && workspace?.active?.id === value) {
     return null;
   }
-  return (
+  const picker = (
     <DocumentScopePicker
+      id={id}
       kind="company"
       required
       value={value}
       appliedLabel={value === reportId ? reportName : undefined}
       onSelect={onChange}
     />
+  );
+  return label ? (
+    <Div className="flex min-w-0 flex-col gap-1.5">
+      <Label htmlFor={id}>{label}</Label>
+      {picker}
+    </Div>
+  ) : (
+    picker
   );
 }
 
@@ -206,10 +273,4 @@ export function ReportPeriodMenu({
       </DropdownMenuContent>
     </DropdownMenu>
   );
-}
-
-export function reportAmountClass(value: number): string {
-  return Math.abs(value) < 0.005
-    ? "tabular-nums text-muted-foreground"
-    : "tabular-nums text-foreground";
 }

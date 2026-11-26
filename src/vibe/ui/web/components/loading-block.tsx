@@ -7,6 +7,7 @@ export type LoadingBlockSize = "sm" | "md" | "lg";
 
 export type LoadingBlockProps = {
   message?: string;
+  announce?: boolean;
   size?: LoadingBlockSize;
 } & StyleType;
 
@@ -21,14 +22,16 @@ const sizeConfig: Record<
 
 export function LoadingBlock({
   message,
+  announce = false,
   size = "md",
   className,
   style,
 }: LoadingBlockProps): React.JSX.Element {
   const config = sizeConfig[size];
+  const Container = announce ? "output" : "div";
 
   return (
-    <div
+    <Container
       className={cn(
         "flex items-center justify-center gap-2 text-muted-foreground",
         config.container,
@@ -37,7 +40,12 @@ export function LoadingBlock({
       style={style}
     >
       <svg
-        className={cn("animate-spin", config.spinner)}
+        className={cn(
+          "animate-spin",
+          announce && "motion-reduce:animate-none",
+          config.spinner,
+        )}
+        aria-hidden="true"
         xmlns="http://www.w3.org/2000/svg"
         fill="none"
         viewBox="0 0 24 24"
@@ -61,7 +69,7 @@ export function LoadingBlock({
           {message}
         </span>
       ) : null}
-    </div>
+    </Container>
   );
 }
 LoadingBlock.displayName = "LoadingBlock";

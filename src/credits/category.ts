@@ -21,9 +21,22 @@ export const category: CategoryDefinition = {
     "es-ES": "Créditos",
     "sk-SK": "Kredity",
   },
-  group: "business",
+  description: {
+    "en-US": "Review credit purchases, balances and usage.",
+    "en-GLOBAL": "Review credit purchases, balances and usage.",
+    "de-DE": "Prüfen Sie Guthabenkäufe, Salden und Verbrauch.",
+    "pl-PL": "Sprawdź zakupione środki, salda i zużycie.",
+    "fr-FR": "Consultez les achats de crédits, les soldes et la consommation.",
+    "it-IT": "Consulti gli acquisti di crediti, i saldi e i consumi.",
+    "es-ES": "Consulte las compras de créditos, los saldos y el consumo.",
+    "sk-SK": "Skontrolujte nákupy kreditov, zostatky a čerpanie.",
+  },
+  group: "billing",
   icon: "coins",
   order: 15,
+  landing: {
+    actions: ["credit-usage-report", "credits-history", "credits-balance"],
+  },
   defaultEntry: {
     [UserPermissionRole.ADMIN]: CREDIT_USAGE_REPORT_ALIAS,
     [UserPermissionRole.CUSTOMER]: CREDITS_ALIAS,

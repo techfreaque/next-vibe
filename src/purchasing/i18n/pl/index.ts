@@ -265,6 +265,12 @@ export const translations: typeof enTranslations = {
       titleShort: "Szczegóły dostawcy",
       description: "Pobierz pełne dane dostawcy.",
       widget: {
+        companyName: "Firma",
+        orderCount: "Zamówienia zakupu",
+        receivingCount: "Oczekujące na przyjęcie",
+        details: "Dane dostawcy",
+        related: "Zarządzaj dostawcą",
+        backToList: "Wróć do dostawców",
         back: "Wróć",
         edit: "Edytuj dostawcę",
         createOrder: "Nowe zamówienie",
@@ -672,6 +678,9 @@ export const translations: typeof enTranslations = {
         colStatus: "Status",
         deliveryArrow: "→",
         overdue: "po terminie",
+        readyToBill: "Odebrane i gotowe do rozliczenia",
+        openAttentionOrder: "Otwórz zamówienie {{reference}}",
+        attentionCount: "Zamówienia wymagające uwagi: {{count}}",
         actionNeeded: "zamówień wymaga uwagi",
         back: "Wróć",
         loading: "Wczytywanie…",
@@ -743,8 +752,10 @@ export const translations: typeof enTranslations = {
       titleShort: "Szczegóły zamówienia",
       description: "Pobierz zamówienie zakupu z pozycjami i historią odbioru.",
       widget: {
+        precision:
+          "Wartości pozycji obliczono z niezaokrąglonych cen jednostkowych dostawcy.",
         back: "Wróć",
-        send: "Wyślij do dostawcy",
+        send: "Oznacz jako wysłane",
         confirm: "Oznacz jako potwierdzone",
         receive: "Odbierz towar",
         convertToBill: "Konwertuj do faktury",
@@ -963,15 +974,15 @@ export const translations: typeof enTranslations = {
 
   orderSend: {
     post: {
-      title: "Wyślij zamówienie",
-      titleShort: "Wyślij zamówienie",
-      description: "Oznacz zamówienie jako wysłane do dostawcy.",
+      title: "Oznacz zamówienie jako wysłane",
+      titleShort: "Oznacz jako wysłane",
+      description: "Odnotuj wysłanie zamówienia.",
       poId: { label: "ID zamówienia", description: "Zamówienie do wysłania" },
       widget: {
         back: "Wróć",
         backToPO: "Wróć do zamówienia",
         warning:
-          "Wysłanie oznacza to zamówienie jako przekazane dostawcy. Status zmienia się ze Szkicu na Wysłane.",
+          "Status zamówienia w tym obszarze roboczym zmieni się na Wysłane.",
       },
       errors: {
         validation: {
@@ -1012,8 +1023,8 @@ export const translations: typeof enTranslations = {
         },
       },
       success: {
-        title: "Zamówienie wysłane",
-        description: "Zamówienie oznaczone jako Wysłane",
+        title: "Wysyłka zamówienia odnotowana",
+        description: "Zamówienie ma teraz status Wysłane.",
       },
       response: {
         id: "ID zamówienia",
@@ -1091,7 +1102,13 @@ export const translations: typeof enTranslations = {
       titleShort: "Przyjmij towary",
       description:
         "Zarejestruj odbiór towaru do zamówienia. Tworzy ruchy magazynowe.",
-      widget: { backToPO: "Powrót do zamówienia" },
+      widget: {
+        retry: "Spróbuj ponownie",
+        loading: "Wczytywanie zamówienia…",
+        remaining: "Pozostało: {{quantity}}",
+        noOpenLines: "Przyjęto wszystkie zamówione ilości.",
+        backToPO: "Powrót do zamówienia",
+      },
       poId: {
         label: "ID zamówienia",
         description: "Zamówienie, do którego przypisano odbiór",
@@ -1234,6 +1251,10 @@ export const translations: typeof enTranslations = {
   orderLineAdd: {
     post: {
       widget: {
+        productSearch: "Szukaj produktów po nazwie lub SKU",
+        search: "Szukaj",
+        noProducts: "Brak pasujących produktów.",
+        clearProduct: "Wyczyść wybór produktu",
         backToOrder: "Powrót do zamówienia",
         lineAdded: "Pozycja dodana",
       },
@@ -1331,6 +1352,11 @@ export const translations: typeof enTranslations = {
       },
       lineId: { label: "ID pozycji", description: "Pozycja do usunięcia" },
       widget: {
+        updatedOrderTotals: "Zaktualizowane sumy zamówienia",
+        cancel: "Anuluj",
+        verifying: "Sprawdzamy wybraną pozycję…",
+        unavailable:
+          "Otwórz ponownie wersję roboczą zamówienia i wybierz pozycję do usunięcia.",
         backToOrder: "Powrót do zamówienia",
         warning: "Pozycja zostanie trwale usunięta z zamówienia zakupu.",
       },

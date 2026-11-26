@@ -16,6 +16,7 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
+import { companies } from "@/companies/db";
 import { CompanyMemberRole } from "@/companies/enum";
 import { CompanyAuthRepository } from "@/companies/repository";
 
@@ -33,6 +34,8 @@ export class PosSessionGetRepository {
         currency: string;
         id: string;
         terminalId: string;
+        terminalName?: string;
+        companyName?: string;
         cashierUserId: string;
         status: string;
         openedAt: Date;
@@ -71,9 +74,12 @@ export class PosSessionGetRepository {
       const [terminal] = await db
         .select({
           companyId: posTerminals.companyId,
+          terminalName: posTerminals.name,
+          companyName: companies.name,
           currency: posTerminals.currency,
         })
         .from(posTerminals)
+        .innerJoin(companies, eq(companies.id, posTerminals.companyId))
         .where(eq(posTerminals.id, session.terminalId))
         .limit(1);
 
@@ -96,7 +102,14 @@ export class PosSessionGetRepository {
         }
       }
 
-      return success({ result: { ...session, currency: terminal.currency } });
+      return success({
+        result: {
+          ...session,
+          currency: terminal.currency,
+          terminalName: terminal.terminalName,
+          companyName: terminal.companyName,
+        },
+      });
     } catch (error) {
       logger.error("Error getting POS session", parseError(error));
       return fail({

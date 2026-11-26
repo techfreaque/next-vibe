@@ -1,6 +1,7 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  lineRounding: "Redondeo por línea",
   category: "Estimación",
   tags: { payment: "pago", estimate: "Estimaciones" },
   post: {
@@ -57,7 +58,9 @@ export const translations: typeof enTranslations = {
     description: "La estimación para actuar en",
   },
   widget: {
-    send: "Estimaciones",
+    send: "Marcar como enviado",
+    terms: "Condiciones",
+    noItems: "Este presupuesto no contiene partidas.",
     addLine: "Línea de adición",
     accept: "Aceptación récord",
     decline: "Declinación récord",

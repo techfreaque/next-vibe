@@ -24,7 +24,7 @@ import {
 import { EntityPickerFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/entity-picker-field/widget";
 import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
-import type { JSX } from "react";
+import { type JSX, useEffect } from "react";
 import { useWatch } from "react-hook-form";
 
 import { PosOrderStatus } from "../../../enum";
@@ -39,10 +39,15 @@ export function PosOrderRemoveItemWidget({
   const t = useWidgetTranslation<typeof definition.POST>();
   const result = useWidgetValue<typeof definition.POST>()?.result;
   const form = useWidgetForm<typeof definition.POST>();
-  const [orderId, itemId] = useWatch({
+  const [orderId, bodyOrderId, itemId] = useWatch({
     control: form.control,
-    name: ["details.orderId", "details.itemId"],
+    name: ["orderId", "details.orderId", "details.itemId"],
   });
+  useEffect(() => {
+    if (orderId && orderId !== bodyOrderId) {
+      form.setValue("details.orderId", orderId, { shouldValidate: true });
+    }
+  }, [bodyOrderId, form, orderId]);
   const order = useOrderPreview(result?.orderId ?? orderId);
   const selected = order?.items.find((row) => row.itemId === itemId);
   const locale = useWidgetLocale();
@@ -95,8 +100,8 @@ export function PosOrderRemoveItemWidget({
       ) : (
         <>
           <EntityPickerFieldWidget
-            fieldName="details.orderId"
-            field={field.children.details.children.orderId}
+            fieldName="orderId"
+            field={field.children.orderId}
           />
           {order && (
             <>

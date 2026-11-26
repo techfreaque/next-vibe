@@ -16,11 +16,12 @@ import {
 import { Search } from "next-vibe/ui/components/icons/Search";
 import { Input } from "next-vibe/ui/components/input";
 import { Span } from "next-vibe/ui/components/span";
-import type { JSX } from "react";
+import { type JSX, useContext } from "react";
 import type { z } from "zod";
 
 import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
 import { FieldDataType } from "../../../../core/definition/enums";
+import { AdminRecordContext } from "../../../_shared/admin-record-context";
 import { cn } from "../../../_shared/cn";
 import type { ReactStaticWidgetProps } from "../../../_shared/react-types";
 import type { FieldUsageConfig } from "../../../_shared/types";
@@ -81,6 +82,7 @@ export function SearchBarWidget<
   >
 >): JSX.Element | null {
   const locale = useWidgetLocale();
+  const admin = useContext(AdminRecordContext);
   const { t: tField } = useWidgetContext();
   const isDisabled = useWidgetDisabled();
   const form = useWidgetForm();
@@ -143,6 +145,13 @@ export function SearchBarWidget<
                   }
                 }}
                 type={FieldDataType.TEXT}
+                aria-label={
+                  admin
+                    ? field.label
+                      ? tField(field.label)
+                      : (placeholderText ?? submitText)
+                    : undefined
+                }
                 placeholder={placeholderText}
                 disabled={isDisabled}
                 className={cn(

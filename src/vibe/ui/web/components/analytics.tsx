@@ -18,7 +18,6 @@ import { useState } from "react";
 import type { CountryLanguage } from "../../../core/i18n/core/config";
 import { cn } from "../../../unified-ui/_shared/cn";
 import {
-  ANALYTICS_BUCKET_KEY,
   ANALYTICS_RANGE_SHORT_KEY,
   type AnalyticsBucket,
   AnalyticsGranularity,
@@ -92,6 +91,7 @@ function analyticsColor(
 // ---------------------------------------------------------------------------
 
 export type KpiTileProps = {
+  wrapLabel?: boolean;
   label: string;
   value: number | null;
   /** Same metric in the previous window. Omit to hide the delta. */
@@ -162,6 +162,7 @@ function Sparkline({
 
 export function KpiTile({
   label,
+  wrapLabel = false,
   value,
   previous,
   format = "number",
@@ -206,12 +207,20 @@ export function KpiTile({
   const content = (
     <>
       <span className="flex items-center justify-between gap-2">
-        <span className="truncate text-xs font-medium text-muted-foreground">
+        <span
+          className={cn(
+            "min-w-0 text-xs font-medium text-muted-foreground",
+            wrapLabel ? "break-words whitespace-normal" : "truncate",
+          )}
+        >
           {label}
         </span>
         {onClick ? (
           <span
-            className="text-xs text-muted-foreground/60 transition-colors group-hover:text-foreground"
+            className={cn(
+              "text-muted-foreground transition-colors group-hover:text-foreground",
+              wrapLabel ? "text-base leading-none" : "text-xs",
+            )}
             aria-hidden="true"
           >
             {CHEVRON_GLYPH}
@@ -1272,11 +1281,7 @@ export function AnalyticsToolbar({
                 : ""}
               {hideGranularity
                 ? ""
-                : ` · ${t("analytics.chart.byGranularity", {
-                    granularity: t(
-                      ANALYTICS_BUCKET_KEY[period.bucket],
-                    ).toLowerCase(),
-                  })}`}
+                : ` · ${t(`analytics.chart.groupedBy.${period.bucket}`)}`}
             </span>
           ) : null}
           {onRefresh ? (

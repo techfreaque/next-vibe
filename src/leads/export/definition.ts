@@ -57,6 +57,10 @@ const { GET } = createEndpoint({
   tags: ["tags.leads", "tags.export"],
   allowedRoles: [UserRole.ADMIN],
   icon: "download",
+  options: {
+    queryOptions: { enabled: false },
+    formOptions: { autoSubmit: false },
+  },
 
   fields: customWidgetObject({
     render: LeadsExportContainer,
@@ -150,7 +154,7 @@ const { GET } = createEndpoint({
         label: "get.includeMetadata.label",
         description: "get.includeMetadata.description",
         columns: 6,
-        schema: z.coerce.boolean().default(false),
+        schema: z.union([z.boolean(), z.stringbool()]).default(false),
       }),
 
       includeEngagementData: requestField(scopedTranslation, {
@@ -159,7 +163,7 @@ const { GET } = createEndpoint({
         label: "get.includeEngagementData.label",
         description: "get.includeEngagementData.description",
         columns: 6,
-        schema: z.coerce.boolean().default(false),
+        schema: z.union([z.boolean(), z.stringbool()]).default(false),
       }),
 
       // === RESPONSE FIELDS ===
@@ -243,9 +247,10 @@ const { GET } = createEndpoint({
     responses: {
       default: {
         fileName: "leads_export_2023-01-01.csv",
-        fileContent: "ZW1haWwsYnVzaW5lc3NfbmFtZSxjb250YWN0X25hbWU...",
+        fileContent:
+          "RW1haWwsQnVzaW5lc3MgTmFtZQ0KbGVhZEBleGFtcGxlLmludmFsaWQsU2FtcGxlIEJvb2tzaG9wDQo=",
         mimeType: MimeType.CSV,
-        totalRecords: 150,
+        totalRecords: 1,
         exportedAt: new Date("2023-01-01T12:00:00.000Z"),
       },
     },

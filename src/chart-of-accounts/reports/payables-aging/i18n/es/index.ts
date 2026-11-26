@@ -62,6 +62,7 @@ export const translations: typeof enTranslations = {
       "Las facturas en disputa se excluyen de los totales de facturas aprobadas y pendientes.",
   },
   widget: {
+    showBills: "Ver facturas",
     asOf: "Situación al {{date}}",
     back: "Volver",
     loading: "Cargando cuentas por pagar",

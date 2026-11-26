@@ -7,7 +7,9 @@ import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { scopedTranslation as rolesTranslation } from "next-vibe/identity/roles/i18n";
 import { isValidEnumValue } from "next-vibe/unified-ui/_shared/enum";
+import { formatMoney as formatDocumentMoney } from "next-vibe/unified-ui/_shared/format-money";
 
+import { scopedTranslation as creditsTranslation } from "@/credits/i18n";
 import { SubscriptionPlan, SubscriptionStatus } from "@/subscription/enum";
 import { scopedTranslation as subscriptionTranslation } from "@/subscription/i18n";
 
@@ -19,11 +21,7 @@ function intlLocale(locale: CountryLanguage): string {
 }
 
 export function formatUsd(value: number, locale: CountryLanguage): string {
-  return new Intl.NumberFormat(intlLocale(locale), {
-    style: "currency",
-    currency: "USD",
-    maximumFractionDigits: value >= 1000 ? 0 : 2,
-  }).format(value);
+  return formatMoney(value, "USD", locale);
 }
 
 export function formatMoney(
@@ -31,14 +29,18 @@ export function formatMoney(
   currency: string,
   locale: CountryLanguage,
 ): string {
-  try {
-    return new Intl.NumberFormat(intlLocale(locale), {
-      style: "currency",
-      currency: currency.toUpperCase(),
-    }).format(value);
-  } catch {
-    return `${value.toFixed(2)} ${currency.toUpperCase()}`;
-  }
+  return formatDocumentMoney(value, currency, intlLocale(locale));
+}
+
+/** Current referral awards are whole wallet credits; historical cash rows store cents. */
+export function formatReferralEarning(
+  amount: number,
+  unit: string,
+  locale: CountryLanguage,
+): string {
+  return unit.toUpperCase() === "CREDITS"
+    ? `${formatNumber(amount, locale)} ${creditsTranslation.scopedT(locale).t("tags.credits")}`
+    : formatMoney(amount / 100, unit, locale);
 }
 
 export function formatNumber(

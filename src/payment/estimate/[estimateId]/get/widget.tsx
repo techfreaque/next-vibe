@@ -1,13 +1,15 @@
 "use client";
 
-import { formatDate } from "next-vibe/core/i18n/core/localization-utils";
-import { Badge } from "next-vibe/ui/components/badge";
 import { Button, type ButtonMouseEvent } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
 import { Span } from "next-vibe/ui/components/span";
-import { H3, P } from "next-vibe/ui/components/typography";
-import { formatMoney } from "next-vibe/unified-ui/_shared/format-money";
+import { P } from "next-vibe/ui/components/typography";
+import { AdminRecordDetail } from "next-vibe/unified-ui/_shared/admin-record-detail";
+import {
+  formatDocDate,
+  formatMoney,
+} from "next-vibe/unified-ui/_shared/format-money";
 import {
   useWidgetIsInteractive,
   useWidgetLocale,
@@ -22,27 +24,10 @@ import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/sub
 import { type JSX } from "react";
 
 import { DocumentLineItems } from "@/finance/document-line-items";
+import { documentStatusVariant } from "@/finance/document-status";
 import { EstimateStatus } from "@/payment/enum";
 
 import type definition from "./definition";
-
-function getStatusBadgeVariant(
-  status: string,
-): "default" | "secondary" | "destructive" | "outline" {
-  switch (status) {
-    case EstimateStatus.ACCEPTED:
-      return "default";
-    case EstimateStatus.SENT:
-      return "secondary";
-    case EstimateStatus.DECLINED:
-    case EstimateStatus.EXPIRED:
-      return "destructive";
-    case EstimateStatus.DRAFT:
-    case EstimateStatus.CONVERTED:
-    default:
-      return "outline";
-  }
-}
 
 export function EstimateGetWidget({
   field,
@@ -164,122 +149,110 @@ export function EstimateGetWidget({
     }
   };
 
+  const title = `${t("widget.estimateNumber")} ${data.estimateNumber}`;
+  const facts = [
+    { key: "total", label: t("widget.total"), value: money(data.total) },
+    ...(data.customerName || data.customerEmail
+      ? [
+          {
+            key: "customer",
+            label: t("widget.customer"),
+            value: data.customerName ?? data.customerEmail,
+          },
+        ]
+      : []),
+    ...(data.validUntil
+      ? [
+          {
+            key: "valid",
+            label: t("widget.valid"),
+            value: formatDocDate(data.validUntil, locale),
+          },
+        ]
+      : []),
+  ];
   return (
-    <Div className="@container flex min-w-0 flex-col gap-6">
-      {/* Back button */}
-      {canGoBack && (
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={() => pop()}
-          className="self-start gap-1.5 -ml-1"
-        >
-          <ChevronLeft className="h-4 w-4" />
-          {t("widget.back")}
-        </Button>
-      )}
-
-      {/* Estimate header */}
-      <Div className="flex min-w-0 flex-wrap items-start justify-between gap-3 p-4 rounded-lg border bg-card">
-        <Div className="flex min-w-0 flex-col gap-2">
-          <Div className="flex flex-wrap items-center gap-3">
-            <H3 className="text-lg font-semibold [overflow-wrap:anywhere]">
-              {t("widget.estimateNumber")} {data.estimateNumber}
-            </H3>
-            <Badge variant={getStatusBadgeVariant(data.status)}>
-              {getStatusLabel(data.status)}
-            </Badge>
-          </Div>
-
-          {/* Meta */}
-          <Div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-muted-foreground">
-            {data.validUntil && (
-              <Div className="flex flex-col gap-0.5">
-                <Span className="text-xs uppercase tracking-wide">
-                  {t("widget.valid")}
-                </Span>
-                <Span>{formatDate(data.validUntil, locale, "PP")}</Span>
-              </Div>
+    <AdminRecordDetail
+      title={title}
+      subtitle={[data.companyName, data.title].filter(Boolean).join(" · ")}
+      status={{
+        status: getStatusLabel(data.status),
+        variant: documentStatusVariant(data.status),
+      }}
+      facts={facts}
+      backButton={
+        canGoBack && (
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => pop()}
+            className="self-start gap-1.5"
+          >
+            <ChevronLeft className="h-4 w-4" />
+            {t("widget.back")}
+          </Button>
+        )
+      }
+      actions={
+        <>
+          {isInteractive &&
+            data.canManage &&
+            data.status === EstimateStatus.DRAFT && (
+              <>
+                <Button type="button" onClick={() => openStatusAction("send")}>
+                  {t("widget.send")}
+                </Button>
+                <Button type="button" variant="outline" onClick={addLine}>
+                  {t("widget.addLine")}
+                </Button>
+              </>
             )}
-          </Div>
-
-          {/* Customer */}
-          {data.customerName && (
-            <P className="text-sm">
-              <Span className="text-muted-foreground">
-                {t("widget.customer")}:
-              </Span>{" "}
-              <Span>{data.customerName}</Span>
-            </P>
-          )}
-
-          {/* Notes */}
-          {data.notes && (
-            <P className="text-sm text-muted-foreground [overflow-wrap:anywhere]">
-              {data.notes}
-            </P>
-          )}
-        </Div>
-      </Div>
-
-      {data.companyName && (
-        <P className="text-sm text-muted-foreground [overflow-wrap:anywhere]">
-          {data.companyName}
-        </P>
-      )}
-
-      {/* Actions */}
-      <Div className="flex flex-wrap gap-2 pt-2 border-t">
-        {isInteractive &&
-          data.canManage &&
-          data.status === EstimateStatus.DRAFT && (
-            <>
-              <Button type="button" onClick={() => openStatusAction("send")}>
-                {t("widget.send")}
-              </Button>
-              <Button type="button" variant="outline" onClick={addLine}>
-                {t("widget.addLine")}
-              </Button>
-            </>
-          )}
-        {isInteractive &&
-          data.canManage &&
-          data.status === EstimateStatus.SENT && (
-            <>
-              <Button type="button" onClick={() => openStatusAction("accept")}>
-                {t("widget.accept")}
-              </Button>
+          {isInteractive &&
+            data.canManage &&
+            data.status === EstimateStatus.SENT && (
+              <>
+                <Button
+                  type="button"
+                  onClick={() => openStatusAction("accept")}
+                >
+                  {t("widget.accept")}
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => openStatusAction("decline")}
+                >
+                  {t("widget.decline")}
+                </Button>
+              </>
+            )}
+          {isInteractive &&
+            data.canManage &&
+            (data.status === EstimateStatus.SENT ||
+              data.status === EstimateStatus.ACCEPTED) && (
               <Button
                 type="button"
-                variant="outline"
-                onClick={() => openStatusAction("decline")}
+                variant={
+                  data.status === EstimateStatus.ACCEPTED
+                    ? "default"
+                    : "outline"
+                }
+                onClick={handleConvertToInvoice}
               >
-                {t("widget.decline")}
+                {t("widget.convertToInvoice")}
               </Button>
-            </>
-          )}
-        {isInteractive &&
-          data.canManage &&
-          (data.status === EstimateStatus.SENT ||
-            data.status === EstimateStatus.ACCEPTED) && (
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleConvertToInvoice}
-            >
-              {t("widget.convertToInvoice")}
+            )}
+          {isInteractive && invoiceId && (
+            <Button type="button" variant="outline" onClick={openInvoice}>
+              {t("widget.openInvoice")}
             </Button>
           )}
-        {isInteractive && invoiceId && (
-          <Button type="button" variant="outline" onClick={openInvoice}>
-            {t("widget.openInvoice")}
-          </Button>
-        )}
-      </Div>
-
+        </>
+      }
+    >
       {/* Line items */}
-      {data.lines.length > 0 && (
+      {data.lines.length > 0 ? (
         <DocumentLineItems
           title={t("widget.lineItems")}
           lines={data.lines}
@@ -291,8 +264,25 @@ export function EstimateGetWidget({
           }}
           money={money}
         />
+      ) : (
+        <P className="rounded-lg border border-dashed p-4 text-sm text-muted-foreground">
+          {t("widget.noItems")}
+        </P>
       )}
 
+      {data.notes && (
+        <P className="whitespace-pre-line text-sm [overflow-wrap:anywhere]">
+          {data.notes}
+        </P>
+      )}
+      {data.terms && (
+        <Div className="flex flex-col gap-1">
+          <Span className="text-sm font-medium">{t("widget.terms")}</Span>
+          <P className="whitespace-pre-line text-sm text-muted-foreground [overflow-wrap:anywhere]">
+            {data.terms}
+          </P>
+        </Div>
+      )}
       {/* Summary */}
       <Div className="flex justify-end">
         <Div className="flex flex-col gap-1.5 w-full max-w-xs text-sm">
@@ -320,6 +310,6 @@ export function EstimateGetWidget({
           </Div>
         </Div>
       </Div>
-    </Div>
+    </AdminRecordDetail>
   );
 }

@@ -53,9 +53,9 @@ test("estimate allocates beyond existing suffixes, defaults company currency and
   expect(result.success && result.data.estimate).toMatchObject({
     currency: "PLN",
     estimateNumber: `EST-${year}-0010`,
-    subtotal: 20.0002,
+    subtotal: 20,
     taxAmount: 4.6,
-    total: 24.6002,
+    total: 24.6,
   });
   if (!result.success) return;
   const copies = await Promise.all(
@@ -75,7 +75,7 @@ test("estimate allocates beyond existing suffixes, defaults company currency and
     "select title,total::text from payment_estimates where estimate_number=$1",
     [numbers[0]],
   );
-  expect(clone.rows).toEqual([{ title: "Quote A", total: "24.6002" }]);
+  expect(clone.rows).toEqual([{ title: "Quote A", total: "24.6000" }]);
 });
 
 test("rejects foreign products, rolls back a failed line insert and serializes status and line mutations", async () => {
@@ -179,9 +179,16 @@ test("converts a quoted recipient without a user account and rejects a mismatche
   if (!result.success) return;
   const estimateId = result.data.estimate.id;
   await EstimateSendRepository.sendEstimate(user, { estimateId }, logger);
-  await pg.query("update payment_estimates set total=17 where id=$1", [
-    estimateId,
-  ]);
+  // An accepted legacy quote predates per-line settlement. Its four-place
+  // lines and original cent conversion must survive a retry.
+  await pg.query(
+    "update payment_estimate_lines set line_total=6.125 where estimate_id=$1",
+    [estimateId],
+  );
+  await pg.query(
+    "update payment_estimates set metadata=null, subtotal=6.125, total=17 where id=$1",
+    [estimateId],
+  );
   expect(
     (
       await EstimateConvertToInvoiceRepository.convertToInvoice(
@@ -256,4 +263,66 @@ test("an archived company or a viewer cannot create an estimate", async () => {
       )
     ).rows,
   ).toHaveLength(0);
+});
+
+test("a quote using line rounding cannot convert a fractional or mismatched tax total", async () => {
+  const { EstimateCreateRepository } = await import("./create/repository");
+  const { EstimateConvertToInvoiceRepository } =
+    await import("./[estimateId]/convert-to-invoice/repository");
+  const created = await EstimateCreateRepository.createEstimate(
+    user,
+    createDefinition.POST.requestSchema.parse({
+      companyId: company,
+      title: "Line-rounded quote",
+      lines: [
+        {
+          description: "First print",
+          quantity: 1,
+          unitPrice: 1.07,
+          taxRate: 0.23,
+        },
+        {
+          description: "Second print",
+          quantity: 1,
+          unitPrice: 1.07,
+          taxRate: 0.23,
+        },
+      ],
+    }),
+    logger,
+  );
+  expect(created.success && created.data.estimate).toMatchObject({
+    subtotal: 2.14,
+    taxAmount: 0.5,
+    total: 2.64,
+  });
+  if (!created.success) return;
+  const estimateId = created.data.estimate.id;
+  await pg.query(
+    "update payment_estimates set status=$1, tax_amount=.49 where id=$2",
+    [EstimateStatus.SENT, estimateId],
+  );
+  const convert = () =>
+    EstimateConvertToInvoiceRepository.convertToInvoice(
+      user,
+      { estimateId },
+      logger,
+    );
+  expect((await convert()).success).toBe(false);
+  await pg.query("update payment_estimates set tax_amount=.5 where id=$1", [
+    estimateId,
+  ]);
+  await pg.query(
+    "update payment_estimate_lines set tax_amount=.2461 where estimate_id=$1",
+    [estimateId],
+  );
+  expect((await convert()).success).toBe(false);
+  expect(
+    (
+      await pg.query(
+        "select count(*)::int as n from payment_invoices where metadata->>'estimateId'=$1",
+        [estimateId],
+      )
+    ).rows,
+  ).toEqual([{ n: 0 }]);
 });

@@ -121,6 +121,13 @@ export const translations: typeof enTranslations = {
       name: "Názov produktu",
     },
     widget: {
+      catalogCompany: "Firma priradená ku katalógu",
+      billingCadence: "Interval fakturácie",
+      oneTime: "Jednorazový nákup",
+      personalCatalog: "Osobný katalóg",
+      companyUnavailable: "Názov firmy nie je dostupný",
+      couldNotLoad: "Produkt sa nepodarilo načítať.",
+      retry: "Skúsiť znova",
       backToList: "Späť na produkty",
       back: "Späť",
     },

@@ -45,6 +45,7 @@ import { maybeColorize, semantic } from "../../../logger/colors";
 import { serverFileLog } from "../../../logger/file";
 import { createNextjsFormatter } from "../../../logger/formatters";
 import type { EndpointLogger } from "../../../logger/types";
+import { applyResponseIdentityCookies } from "../../../platforms/web/middleware/utils";
 import type { BuildProfile, FileToCompile } from "../definition";
 import type { scopedTranslation } from "../i18n";
 import { PROFILE_DEFAULTS, ROOT_DIR } from "./constants";
@@ -1589,6 +1590,7 @@ class ViteCompiler {
       )) as {
         tanstackStart: (opts: {
           srcDirectory: string;
+          router?: { enableRouteTreeFormatting?: boolean };
           importProtection?: {
             client?: { specifiers?: string[] };
           };
@@ -1622,6 +1624,15 @@ class ViteCompiler {
       );
       const tanstackRoutes = `${tanstackSource}/routes/`;
       const tanstackRouteTree = `${tanstackSource}/routeTree.gen.ts`;
+      const categoryRegistryDirectory = `${sourceWatchPrefix}generated/categories/`;
+      const categoryRegistry = `${categoryRegistryDirectory}registry.ts`;
+      const endpointRegistryDirectory = `${sourceWatchPrefix}generated/endpoints/`;
+      const endpointMetaDirectory = `${endpointRegistryDirectory}meta/`;
+      const endpointRegistryFiles = new Set(
+        ["endpoint", "endpoint-dev", "alias-map", "alias-map-dev"].map(
+          (name) => `${endpointRegistryDirectory}${name}.ts`,
+        ),
+      );
       const nextBuildRootPrefix = `${watchRoot}/.next-`;
       const ignoredWatchRoots = [
         ".tmp",
@@ -1724,6 +1735,9 @@ class ViteCompiler {
           tailwindVite(),
           tanstackStart({
             srcDirectory,
+            // Generated routes work directly from the generator's output.
+            // Formatting the entire tree blocks dev requests during route edits.
+            router: { enableRouteTreeFormatting: false },
             // server-only is handled by our server-only-trace plugin (not TanStack's importProtection)
             // so we get importer info in the error message instead of a generic proxy mock.
           }),
@@ -2574,8 +2588,8 @@ if (typeof import.meta.hot !== 'undefined' && import.meta.hot) {
           host: "127.0.0.1",
           watch: {
             // Ignore .tmp dir - build artifacts, not user source.
-            // Watch the TanStack route inputs and output so its live generator
-            // sees added or removed routes and Vite invalidates cached routers.
+            // Watch generated route, category and endpoint data used by both SSR
+            // and the browser so either graph can invalidate it after edits.
             // Keep other generated files out of the Tailwind scan.
             // Use a function for ignored so it works with disableGlobbing:true.
             // Glob strings in ignored are treated as literals when disableGlobbing
@@ -2596,6 +2610,14 @@ if (typeof import.meta.hot !== 'undefined' && import.meta.hot) {
                 directoryPath.includes("/node_modules/") ||
                 (directoryPath.includes("/generated/") &&
                   filePath !== tanstackRouteTree &&
+                  filePath !== categoryRegistry &&
+                  !endpointRegistryFiles.has(filePath) &&
+                  !endpointMetaDirectory.startsWith(directoryPath) &&
+                  !(
+                    filePath.startsWith(endpointMetaDirectory) &&
+                    filePath.endsWith(".ts")
+                  ) &&
+                  !categoryRegistryDirectory.startsWith(directoryPath) &&
                   !directoryPath.startsWith(tanstackRoutes) &&
                   !tanstackRoutes.startsWith(directoryPath)) ||
                 directoryPath.includes("/app-native/") ||
@@ -2892,78 +2914,122 @@ if (typeof import.meta.hot !== 'undefined' && import.meta.hot) {
       // self-request right after listen absorbs that cost during boot; the
       // user's first page load then only evaluates its own page chain.
       void (async (): Promise<void> => {
-        // Wait for Vite's own dependency crawl/optimization to settle before
-        // firing the self-request at all. On a slow machine or a genuinely
-        // cold esbuild cache, "[optimizer] scanning/bundling dependencies"
-        // alone can run 30s+ AFTER "Ready" is printed — firing immediately
-        // guaranteed every attempt below raced that window and lost.
-        // Best-effort (never blocks priming forever).
+        // Let the client crawl get a head start. Incoming browser requests
+        // can keep it busy while their documents wait for a cold SSR graph.
+        // With holdUntilCrawlEnd disabled, SSR only needs a bounded head start.
+        const primeQueuedAt = performance.now();
+        let crawlTimer: ReturnType<typeof setTimeout> | undefined;
         try {
-          await server.waitForRequestsIdle();
-        } catch {
-          /* proceed anyway — the retry loop below is still a safety net */
+          await Promise.race([
+            server.waitForRequestsIdle(),
+            new Promise<void>((_resolve) => {
+              crawlTimer = setTimeout(_resolve, 1000);
+            }),
+          ]);
+        } catch (error) {
+          viteLogger.warn(
+            `SSR prime client crawl failed: ${parseError(error).message}`,
+          );
+        } finally {
+          clearTimeout(crawlTimer);
         }
+        viteLogger.info(
+          `Starting SSR graph priming after ${String(Math.round(performance.now() - primeQueuedAt))} ms`,
+        );
         // Sequential: concurrent cold SSR renders race the module runner.
         // /en-US warms the shared graph (providers, layout, i18n); the
         // threads page additionally warms the chat/ai-stream widget chain —
         // the page users open first, whose first render otherwise holds its
         // SSR stream open for many seconds.
+        const primeHeaders = new Headers({ "user-agent": "vibe-ssr-prime" });
         for (const path of ["/en-US", "/en-US/threads/incognito/new"]) {
-          // Up to 8 attempts: on a genuinely cold cache / slow machine EITHER
-          // the first SSR transform of the whole route graph can itself exceed
-          // Bun's fixed 10s idle-socket timeout (nothing request-level runs
-          // until that transform finishes), OR nitro's dev-worker environment
-          // is simply not registered yet (a "Vite environment \"nitro\" is
-          // unavailable" 503). Each attempt leaves the graph MORE
-          // compiled/cached than the last, so persisting (with a short
-          // backoff so we don't hammer a worker that's still booting)
-          // converges.
+          // Nitro can accept requests before its worker environment is ready.
+          // A cold request can also be interrupted while transforming the
+          // graph. Retry with a delay to let the worker make progress.
           let primed = false;
+          const primeStartedAt = performance.now();
+          let lastFailure: string | undefined;
           for (let attempt = 1; attempt <= 8 && !primed; attempt++) {
             try {
-              // oxlint-disable-next-line restricted/no-raw-fetch -- dev-server self-request to prime SSR page rendering, not an endpoint call
-              const res = await fetch(`${url}${path}`, {
-                headers: { "user-agent": "vibe-ssr-prime" },
-              });
-              // Drain the stream so the full page (not just the shell) evaluates.
-              await res.text();
+              let target = new URL(path, url);
+              const origin = target.origin;
+              const readPage = async (): Promise<Response> => {
+                // oxlint-disable-next-line restricted/no-raw-fetch -- dev server self-request to prime SSR rendering
+                const response = await fetch(target, {
+                  headers: primeHeaders,
+                  redirect: "manual",
+                });
+                applyResponseIdentityCookies(
+                  primeHeaders,
+                  response.headers.getSetCookie(),
+                );
+                // Drain the stream so the full page evaluates.
+                await response.text();
+                return response;
+              };
+              let res = await readPage();
+              for (let redirects = 0; redirects < 4; redirects++) {
+                const location = res.headers.get("location");
+                if (res.status < 300 || res.status >= 400 || !location) {
+                  break;
+                }
+                const next = new URL(location, target);
+                if (next.origin !== origin) {
+                  break;
+                }
+                target = next;
+                res = await readPage();
+              }
               if (res.ok) {
                 primed = true;
+                const elapsedMs = Math.round(
+                  performance.now() - primeStartedAt,
+                );
+                const retryDetail = lastFailure
+                  ? `, last failure: ${lastFailure}`
+                  : "";
                 const primeMsg = fmtVite(
-                  attempt === 1
-                    ? `SSR graph primed (${path})`
-                    : `SSR graph primed (${path}) — succeeded on retry ${String(attempt)} after a cold-cache timeout`,
+                  `SSR graph primed (${path}) in ${String(elapsedMs)} ms, attempt ${String(attempt)}${retryDetail}`,
                 );
                 process.stdout.write(`${primeMsg}
 `);
                 serverFileLog(primeMsg);
               } else if (attempt === 8) {
-                const primeMsg = fmtVite(
-                  `SSR prime got HTTP ${res.status} (${path}) after ${String(attempt)} attempts — first cold render failed, check the request log above`,
+                viteLogger.error(
+                  `SSR prime got HTTP ${String(res.status)} (${path}) after ${String(attempt)} attempts`,
                 );
-                process.stdout.write(`${primeMsg}
-`);
-                serverFileLog(primeMsg);
               } else {
+                lastFailure = `HTTP ${String(res.status)}`;
+                const retryAfter = Number(res.headers.get("retry-after"));
+                const retryDelay =
+                  retryAfter > 0 && Number.isFinite(retryAfter)
+                    ? retryAfter * 1000
+                    : 1000;
+                await new Promise<void>((_resolve) => {
+                  setTimeout(_resolve, retryDelay);
+                });
+              }
+            } catch (error) {
+              const cause = parseError(error);
+              if (attempt === 8) {
+                viteLogger.error(
+                  `SSR prime failed (${path}) after ${String(attempt)} attempts: ${cause.message}`,
+                );
+              } else {
+                lastFailure = cause.message;
                 await new Promise<void>((_resolve) => {
                   setTimeout(_resolve, 1000);
                 });
               }
-            } catch {
-              /* priming is best-effort — a connection reset mid-transform is
-               * expected on early attempts of a cold cache; retry the loop. */
             }
           }
         }
       })();
 
       const closeFn = (): Promise<void> => {
-        // Force-terminate all keep-alive connections before closing so the TCP
-        // socket is released immediately. Without this, server.close() waits
-        // for keep-alive connections (e.g. from the Bun proxy) to drain, the
-        // 2-second timeout in the shutdown handler fires, and process.exit()
-        // leaves the socket open — which Docker/WSL2 HNS then inherits as a
-        // zombie (PID 7256 on Windows).
+        // Close the listener before clearing its connections, so an incoming
+        // connection cannot slip in between draining and closing.
+        const closing = server.close();
         if (server.httpServer) {
           const h = server.httpServer as NodeHttpServer & {
             closeAllConnections?: () => void;
@@ -2972,7 +3038,7 @@ if (typeof import.meta.hot !== 'undefined' && import.meta.hot) {
           h.closeAllConnections?.();
           h.closeIdleConnections?.();
         }
-        return server.close();
+        return closing;
       };
       if (closeRef) {
         closeRef.fn = closeFn;

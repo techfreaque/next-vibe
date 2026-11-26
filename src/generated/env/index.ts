@@ -24,6 +24,11 @@ import {
   protectionEnvSchema,
 } from "../../credits/anti-farming/env";
 import {
+  bankConnectionEnv,
+  bankConnectionEnvExamples,
+  bankConnectionEnvSchema,
+} from "../../finance/bank-connections/env";
+import {
   financeEnv,
   financeEnvExamples,
   financeEnvSchema,
@@ -49,10 +54,20 @@ import {
   imapClientEnvSchema,
 } from "../../messenger/providers/email/imap-client/env";
 import {
+  billMailboxEnv,
+  billMailboxEnvExamples,
+  billMailboxEnvSchema,
+} from "../../messenger/system-mailbox/bills/env";
+import {
   systemMailboxEnv,
   systemMailboxEnvExamples,
   systemMailboxEnvSchema,
 } from "../../messenger/system-mailbox/env";
+import {
+  paymentAccountingEnv,
+  paymentAccountingEnvExamples,
+  paymentAccountingEnvSchema,
+} from "../../payment/accounting/env";
 import {
   paymentEnv,
   paymentEnvExamples,
@@ -168,6 +183,11 @@ export const envModules: Record<
     schema: protectionEnvSchema,
     examples: protectionEnvExamples,
   },
+  bankConnection: {
+    env: bankConnectionEnv,
+    schema: bankConnectionEnvSchema,
+    examples: bankConnectionEnvExamples,
+  },
   finance: {
     env: financeEnv,
     schema: financeEnvSchema,
@@ -193,10 +213,20 @@ export const envModules: Record<
     schema: imapClientEnvSchema,
     examples: imapClientEnvExamples,
   },
+  billMailbox: {
+    env: billMailboxEnv,
+    schema: billMailboxEnvSchema,
+    examples: billMailboxEnvExamples,
+  },
   systemMailbox: {
     env: systemMailboxEnv,
     schema: systemMailboxEnvSchema,
     examples: systemMailboxEnvExamples,
+  },
+  paymentAccounting: {
+    env: paymentAccountingEnv,
+    schema: paymentAccountingEnvSchema,
+    examples: paymentAccountingEnvExamples,
   },
   payment: {
     env: paymentEnv,
@@ -267,12 +297,15 @@ export const envModules: Record<
 // Combined schema using merge
 export const envSchema = browserEnvSchema
   .merge(protectionEnvSchema)
+  .merge(bankConnectionEnvSchema)
   .merge(financeEnvSchema)
   .merge(googleSheetsEnvSchema)
   .merge(leadsCampaignsEnvSchema)
   .merge(messengerEnvSchema)
   .merge(imapClientEnvSchema)
+  .merge(billMailboxEnvSchema)
   .merge(systemMailboxEnvSchema)
+  .merge(paymentAccountingEnvSchema)
   .merge(paymentEnvSchema)
   .merge(smsEnvSchema)
   .merge(sshEnvSchema)

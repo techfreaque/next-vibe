@@ -26,6 +26,7 @@ import type {
   InventoryStockListGetRequestOutput,
   InventoryStockListGetResponseOutput,
 } from "./definition";
+import { DEFAULT_LOW_STOCK_THRESHOLD } from "./threshold";
 
 export class InventoryStockListRepository {
   static async listStock(
@@ -85,7 +86,7 @@ export class InventoryStockListRepository {
             Number,
           ),
           isLowStock: sql<boolean>`case when ${stockLevels.reorderPoint} is not null
-           then ${available} <= ${stockLevels.reorderPoint} else ${available} < 5 end`,
+           then ${available} <= ${stockLevels.reorderPoint} else ${available} < ${DEFAULT_LOW_STOCK_THRESHOLD} end`,
           updatedAt: stockLevels.updatedAt,
         })
         .from(stockLevels)

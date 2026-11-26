@@ -125,6 +125,7 @@ export const translations: typeof enTranslations = {
           replied: "ha risposto {{date}}",
         },
         deals: {
+          prepareBill: "Prepara fattura fornitore",
           title: "Offerte a pagamento",
           hint: "Trascorrere contro le visite, le iscrizioni e i ricavi ogni link tracciato dell'affare o il codice ref introdotto.",
           columns: {

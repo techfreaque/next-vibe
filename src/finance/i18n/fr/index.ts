@@ -1,6 +1,150 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  profit: {
+    run: "Afficher le rapport",
+    unallocatedRevenue:
+      "Produits comptabilisés sans affectation par modèle : {{amount}}",
+    estimatedCosts: "Coûts estimés des modèles : {{amount}}",
+    usageValue: "Usage payant valorisé aux prix d’achat connus : {{amount}}",
+    estimatedMargin: "Marge d’usage estimée : {{amount}}",
+    marginUnknown:
+      "Marge indisponible. Le financement ou la valeur de l’usage payant est incomplet.",
+    missingPrice:
+      "Prix d’achat non confirmé pour {{credits}} crédits consommés.",
+    title: "Résultat mensuel",
+    description:
+      "Consultez les produits et charges comptabilisés et le résultat par mois.",
+    revenue: "Produits nets",
+    expenses: "Charges",
+    net: "Bénéfice ou perte nette",
+    empty: "Aucun produit ni aucune charge n’a été comptabilisé ce mois-ci.",
+    areas: "Sources des charges",
+    signedExpenseAreas:
+      "Les contre-passations et autres écritures au crédit réduisent les charges. Un total négatif indique que les crédits ont dépassé les charges ce mois-ci.",
+    openLedger: "Voir les écritures",
+    noAccounts: "Aucun mouvement.",
+    estimatesHint:
+      "Estimations d’usage en USD pour au plus 20 modèles des prestataires associés. Les forfaits et les coûts sans relevé d’usage sont exclus.",
+    estimatesEmpty:
+      "Aucune estimation de coût des modèles pour cette sélection.",
+    unknownModel: "Modèle non identifié",
+    paid: "Crédits achetés : {{amount}}",
+    free: "Quota gratuit : {{amount}}",
+    gifted: "Crédits offerts : {{amount}}",
+    unknownFunding: "Financement inconnu : {{amount}}",
+    missing: "Coût exact indisponible pour {{credits}} crédits consommés.",
+  },
+  suppliers: {
+    bankTransaction: "Opération bancaire",
+    bankLoading: "Chargement de l’opération bancaire…",
+    bankUnavailable: "L’opération bancaire vérifiée est indisponible.",
+    previewBankLink: "Prévisualiser le lien",
+    linkToBankBill: "Associer le justificatif",
+    bankDraftBill: "Facture issue de la transaction (facultatif)",
+    sponsorshipSource: "Parrainage de créateur",
+    confirmSeparateBankBill:
+      "Confirmer que la dépense est distincte des brouillons bancaires",
+    possibleBankDuplicate:
+      "Une facture issue du relevé bancaire présente des données similaires. Sélectionnez-la pour associer le justificatif ou confirmez que la dépense est distincte.",
+    monthlyReview: "Aperçu mensuel des sources",
+    monthlyReviewHint:
+      "Vérifiez les relevés enregistrés et les prépaiements confirmés du mois. Des périodes incomplètes peuvent produire des écarts.",
+    counterTotal: "Usage relevé au compteur (USD) : {{amount}}",
+    estimatedTotal: "Usage estimé (USD) : {{amount}}",
+    unclassifiedTotal: "Usage sans base identifiée (USD) : {{amount}}",
+    readingCoverage:
+      "{{readings}} relevés, dont {{missing}} sans coût d’intervalle.",
+    receiptTotal:
+      "Prépaiements confirmés : {{amount}} dans {{count}} pièces, dont {{posted}} comptabilisées.",
+    noReceipts: "Aucun justificatif de prépaiement confirmé ce mois-ci.",
+    ledgerPrepaid: "Solde prépayé comptabilisé",
+    estimates: "Coûts estimés des modèles",
+    estimatesHint:
+      "Les 20 estimations d’usage les plus élevées des prestataires associés. Les forfaits et les coûts sans relevé d’usage sont exclus.",
+    month: "Mois (AAAA-MM)",
+    monthly: "Charges mensuelles comptabilisées",
+    noMonthly: "Aucune charge comptabilisée pour ce mois.",
+    area: {
+      referral: "Commissions de parrainage",
+      provider: "Prestataires",
+      processor: "Traitement des paiements",
+      sponsorship: "Parrainage",
+      supplier: "Autres justificatifs fournisseurs",
+      unallocated: "Sans affectation",
+    },
+    spendBasis: {
+      counter: "Compteur du prestataire",
+      "balance-delta": "Estimation d’après la variation de solde",
+      "usage-estimate": "Estimation d’après l’usage interne",
+    },
+    title: "Justificatifs fournisseurs",
+    description:
+      "Consultez les soldes des prestataires et les justificatifs fournisseurs.",
+    record: "Enregistrer un justificatif",
+    recordDescription:
+      "Vérifiez le justificatif avant de créer une facture ou une écriture.",
+    company: "Société",
+    vendor: "Fournisseur",
+    chooseSupplier: "Choisir un fournisseur",
+    operation: "Action",
+    provider: "Prestataire",
+    reference: "Référence du justificatif",
+    invoiceReference: "Numéro de facture fournisseur",
+    servicePeriodStart: "Début de la prestation (AAAA-MM-JJ)",
+    servicePeriodEnd: "Fin de la prestation (AAAA-MM-JJ)",
+    date: "Date comptable (AAAA-MM-JJ)",
+    gross: "Montant brut",
+    tax: "Montant de taxe confirmé",
+    currency: "Devise (EUR, USD ou PLN)",
+    memo: "Description",
+    preview: "Aperçu uniquement",
+    debit: "Compte de débit ou de charges",
+    credit: "Compte de crédit",
+    result: "Résultat",
+    balances: "Soldes des prestataires",
+    observed: "Solde relevé",
+    interval: "Coût du dernier intervalle, base non vérifiée",
+    unavailable: "Indisponible",
+    recent: "Justificatifs récents",
+    noBindings: "Aucun prestataire n’est associé à cette société.",
+    noEvidence: "Aucun justificatif fournisseur enregistré.",
+    run: "Afficher les justificatifs fournisseurs",
+    previewEvidence: "Prévisualiser le justificatif",
+    invalid:
+      "Vérifiez la référence, les montants confirmés, la devise de la société, les comptes et la période ouverte.",
+    conflict: "Cette référence est déjà associée à un autre justificatif.",
+    taxHint: "Saisissez 0 si le justificatif confirme l’absence de taxe.",
+    referralHint:
+      "Sélectionnez le fournisseur dont l’adresse e-mail correspond à celle vérifiée du bénéficiaire. Reprenez le montant TTC, la devise et la taxe du justificatif de commission. La demande de versement indique uniquement des crédits.",
+    evidenceHint:
+      "Utilisez le reçu ou le relevé d’origine. Le solde du prestataire seul ne suffit pas.",
+    openBill: "Ouvrir la facture",
+    openJournal: "Ouvrir l’écriture",
+    banked:
+      "Les soldes et coûts relevés servent au contrôle. Les coûts historiques peuvent être estimés.",
+    kind: {
+      processorFee: "Utiliser les frais de paiement vérifiés",
+      fundBill: "Facture d’acompte fournisseur",
+      bind: "Associer un prestataire",
+      bill: "Facture fournisseur",
+      fund: "Alimenter le solde prépayé",
+      consume: "Utiliser le solde prépayé",
+      paid: "Enregistrer une charge payée",
+      sponsorship: "Utiliser un contrat de parrainage",
+      referral: "Saisir une facture de commission",
+    },
+    outcome: {
+      linked: "Justificatif fournisseur associé",
+      preview: "Aperçu validé",
+      bound: "Prestataire associé",
+      bill: "Brouillon de facture créé",
+      posted: "Écriture comptabilisée",
+      replayed: "Déjà enregistré",
+      review:
+        "Contrôle requis. La source seule ne justifie ni le règlement dans la devise de la société ni la taxe.",
+    },
+  },
   spendAlert: {
     explained: "Le registre d’usage explique le pic chez {{provider}}.",
     unexplained: "Clé API potentiellement compromise chez {{provider}}.",
@@ -13,6 +157,15 @@ export const translations: typeof enTranslations = {
   },
   category: "Finance",
   documents: {
+    status: "Statut",
+    activeFilters: "{{label}} actifs",
+    loadFailed: "Impossible de charger les documents",
+    loadFailedHint: "Rechargez la liste.",
+    scopeDenied: "Vous ne pouvez pas accéder aux documents sélectionnés.",
+    retry: "Réessayer",
+    openAction: "Ouvrir",
+    pickAction: "Sélectionner",
+    pageSingle: "Page {{page}} sur {{pages}} · {{total}} résultat",
     clearCompany: "Retirer le filtre entreprise",
     clearCustomer: "Retirer le filtre client",
     pageTotals: "Totaux · {{currency}}",

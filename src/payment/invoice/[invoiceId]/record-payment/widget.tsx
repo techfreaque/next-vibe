@@ -2,24 +2,53 @@
 
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
+import {
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "next-vibe/ui/components/form/form";
 import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "next-vibe/ui/components/select";
 import { Span } from "next-vibe/ui/components/span";
 import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
 import {
+  useWidgetDisabled,
   useWidgetForm,
+  useWidgetIsInteractive,
+  useWidgetLogger,
   useWidgetNavigation,
   useWidgetTranslation,
+  useWidgetUser,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
+import { useApiQuery } from "next-vibe/unified-ui/hooks/use-api-query";
+import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
+import {
+  AdminForm,
+  AdminFormSection,
+} from "next-vibe/unified-ui/widgets/containers/admin-form/widget";
+import { utcDayFromPickerDate } from "next-vibe/unified-ui/widgets/form-fields/date-field/calendar-date";
 import { DateFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/date-field/widget";
-import { EntityPickerFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/entity-picker-field/widget";
 import { NumberFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/number-field/widget";
 import { SelectFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/select-field/widget";
-import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
-import { type JSX, useEffect, useRef } from "react";
+import { type JSX, useEffect, useMemo, useRef } from "react";
 import { v4 as uuidv4 } from "uuid";
+import { z } from "zod";
 
+import accountsDefinition from "@/chart-of-accounts/account/list/definition";
+import { AccountSubtype } from "@/chart-of-accounts/enum";
+
+import invoiceListDefinition from "../../list/definition";
+import invoiceDefinition from "../get/definition";
 import type definition from "./definition";
 
 export function InvoiceRecordPaymentWidget({
@@ -32,8 +61,76 @@ export function InvoiceRecordPaymentWidget({
   const t = useWidgetTranslation<typeof definition.POST>();
   const form = useWidgetForm<typeof definition.POST>();
 
+  const disabled = useWidgetDisabled();
+  const interactive = useWidgetIsInteractive();
+  const logger = useWidgetLogger();
+  const user = useWidgetUser();
+  const invoiceId = form.watch("invoiceId");
+  const formVisible = interactive && !data?.success;
+  const invoiceOptions = useMemo(
+    () => ({
+      read: {
+        urlPathParams: { invoiceId },
+        queryOptions: {
+          enabled: formVisible && z.uuid().safeParse(invoiceId).success,
+        },
+      },
+    }),
+    [formVisible, invoiceId],
+  );
+  const loadedInvoice = useEndpoint(
+    invoiceDefinition,
+    invoiceOptions,
+    logger,
+    user,
+  ).read?.data;
+  const invoice = loadedInvoice?.id === invoiceId ? loadedInvoice : undefined;
+  const companyId = invoice?.companyId ?? undefined;
+  const currency = invoice?.currency;
+  const reference = [
+    invoice?.invoiceNumber ?? invoice?.invoiceSequenceNumber,
+    invoice?.customerName ?? invoice?.companyName,
+  ]
+    .filter(Boolean)
+    .join(" · ");
+  const accounts = useApiQuery({
+    endpoint: accountsDefinition.GET,
+    requestData: {
+      companyId,
+      postableOnly: true,
+      subtypes: [AccountSubtype.BANK, AccountSubtype.CASH],
+      page: 1,
+      pageSize: 200,
+    },
+    options: {
+      enabled: formVisible && z.uuid().safeParse(companyId).success,
+      queryKey: `invoice-payment-accounts:${companyId ?? ""}`,
+    },
+    logger,
+    user,
+  }).data?.accounts;
+  const paymentAccounts =
+    accounts?.filter(
+      (account) =>
+        account.companyId === companyId &&
+        account.isActive &&
+        account.isPostable &&
+        (account.subtype === AccountSubtype.BANK ||
+          account.subtype === AccountSubtype.CASH),
+    ) ?? [];
+
   const receiptKey = form.watch("receiptKey");
   const generatedReceiptKey = useRef<string | undefined>(undefined);
+  const didInitializeDate = useRef(false);
+
+  useEffect(() => {
+    if (formVisible && !didInitializeDate.current) {
+      didInitializeDate.current = true;
+      if (form.getValues("paidAt") === undefined) {
+        form.setValue("paidAt", utcDayFromPickerDate(new Date()));
+      }
+    }
+  }, [form, formVisible]);
 
   useEffect(() => {
     if (!receiptKey && !data?.success) {
@@ -43,15 +140,19 @@ export function InvoiceRecordPaymentWidget({
   }, [data?.success, form, receiptKey]);
 
   const handleViewInvoice = (): void => {
-    const invoiceId = form?.getValues("invoiceId") ?? "";
-    if (!invoiceId) {
-      navigation.pop();
-      return;
+    if (invoiceId) {
+      navigation.push(invoiceDefinition.GET, { urlPathParams: { invoiceId } });
+    } else {
+      navigation.push(invoiceListDefinition.GET);
     }
-    void (async (): Promise<void> => {
-      const def = await import("@/payment/invoice/[invoiceId]/get/definition");
-      navigation.push(def.default.GET, { urlPathParams: { invoiceId } });
-    })();
+  };
+
+  const handleBack = (): void => {
+    if (navigation.canGoBack) {
+      navigation.pop();
+    } else {
+      handleViewInvoice();
+    }
   };
 
   if (data?.success === true) {
@@ -88,50 +189,89 @@ export function InvoiceRecordPaymentWidget({
   }
 
   return (
-    <Div className="flex flex-col gap-4">
-      {navigation.canGoBack && (
+    <AdminForm
+      title={t("post.title")}
+      description={reference || undefined}
+      className="mx-auto max-w-3xl"
+      backButton={
         <Button
           type="button"
           variant="ghost"
           size="sm"
-          onClick={() => navigation.pop()}
+          onClick={handleBack}
           className="self-start gap-1.5 -ml-1"
         >
           <ChevronLeft className="h-4 w-4" />
           {t("widget.back")}
         </Button>
-      )}
-
-      <Span className="text-base font-semibold">{t("post.title")}</Span>
-
-      <Div className="flex flex-col gap-3">
-        <Div className="grid grid-cols-2 gap-3">
-          <NumberFieldWidget
-            fieldName="amount"
-            field={withValue(field.children.amount, undefined, null)}
+      }
+      primaryAction={
+        <SubmitButtonWidget<typeof definition.POST>
+          field={{ text: "widget.submit" }}
+        />
+      }
+    >
+      <AdminFormSection title={t("widget.details")} columns={2}>
+        <NumberFieldWidget
+          fieldName="amount"
+          presentation="money"
+          currency={currency}
+          field={{
+            ...withValue(field.children.amount, undefined, null),
+            className: "[&_input]:h-10",
+          }}
+        />
+        <SelectFieldWidget
+          fieldName="method"
+          field={withValue(field.children.method, undefined, null)}
+        />
+        <DateFieldWidget
+          fieldName="paidAt"
+          utcCalendarDay
+          localizedDate
+          field={withValue(field.children.paidAt, undefined, null)}
+        />
+        {companyId && (
+          <FormField
+            control={form.control}
+            name="accountNodeId"
+            render={({ field: accountField, fieldState }) => (
+              <FormItem className="flex min-w-0 flex-col gap-2">
+                <FormLabel>{t("accountNodeId.label")}</FormLabel>
+                <Select
+                  name={accountField.name}
+                  value={accountField.value ?? "automatic"}
+                  onValueChange={(value) =>
+                    accountField.onChange(
+                      value === "automatic" ? undefined : value,
+                    )
+                  }
+                  disabled={disabled || !paymentAccounts.length}
+                >
+                  <FormControl>
+                    <SelectTrigger className="h-10">
+                      <SelectValue
+                        placeholder={t("accountNodeId.placeholder")}
+                      />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="automatic">
+                      {t("accountNodeId.automatic")}
+                    </SelectItem>
+                    {paymentAccounts.map(({ id, code, name }) => (
+                      <SelectItem key={id} value={id}>
+                        {code} {name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {fieldState.error && <FormMessage t={t} />}
+              </FormItem>
+            )}
           />
-          <SelectFieldWidget
-            fieldName="method"
-            field={withValue(field.children.method, undefined, null)}
-          />
-        </Div>
-        <Div className="grid grid-cols-2 gap-3">
-          <DateFieldWidget
-            fieldName="paidAt"
-            utcCalendarDay
-            field={withValue(field.children.paidAt, undefined, null)}
-          />
-          <EntityPickerFieldWidget
-            fieldName="accountNodeId"
-            field={withValue(field.children.accountNodeId, undefined, null)}
-          />
-        </Div>
-      </Div>
-
-      <FormAlertWidget field={{}} />
-      <SubmitButtonWidget<typeof definition.POST>
-        field={{ text: "widget.submit" as const }}
-      />
-    </Div>
+        )}
+      </AdminFormSection>
+    </AdminForm>
   );
 }

@@ -100,6 +100,7 @@ export const translations: typeof enTranslations = {
   },
   providers: {
     shared: {
+      connectionSettings: "Ustawienia połączenia",
       listId: {
         label: "ID listy",
         description: "ID docelowej listy lub segmentu",

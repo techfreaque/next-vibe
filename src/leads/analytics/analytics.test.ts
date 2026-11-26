@@ -25,10 +25,7 @@ const pg = new PGlite();
 mock.module("next-vibe/database", () => ({ db: drizzle(pg) }));
 
 const now = new Date("2026-11-21T12:00:00Z");
-const win = resolveAnalyticsWindow(
-  { range: AnalyticsRange.LAST_7_DAYS },
-  now,
-);
+const win = resolveAnalyticsWindow({ range: AnalyticsRange.LAST_7_DAYS }, now);
 
 const id = (n: number): string =>
   `00000000-0000-4000-8000-${n.toString().padStart(12, "0")}`;
@@ -41,7 +38,7 @@ beforeAll(async () => {
       referral_code text, converted_user_id uuid, signed_up_at timestamp,
       geo_country text, metadata jsonb NOT NULL DEFAULT '{}'::jsonb
     );
-    CREATE TABLE users (id uuid PRIMARY KEY, created_at timestamp, email_verified boolean);
+    CREATE TABLE users (id uuid PRIMARY KEY, created_at timestamp, email_verified boolean, email text);
     CREATE TABLE growth_journeys (
       lead_id uuid PRIMARY KEY, user_id uuid, first_channel text, first_channel_type text,
       first_source text, first_medium text, first_campaign text, first_referrer_host text,
@@ -50,7 +47,7 @@ beforeAll(async () => {
     );
     CREATE TABLE growth_visits (id serial, lead_id uuid, visited_at timestamp);
     CREATE TABLE chat_threads (id serial, lead_id uuid, user_id uuid, created_at timestamp);
-    CREATE TABLE payment_transactions (user_id uuid, amount numeric, currency text, status text, mode text DEFAULT 'enums.checkoutMode.subscription', created_at timestamp);
+    CREATE TABLE payment_transactions (user_id uuid, amount numeric, currency text, status text, mode text DEFAULT 'enums.checkoutMode.subscription', created_at timestamp, metadata jsonb, provider_session_id text, provider_payment_intent_id text);
     CREATE TABLE credit_wallets (id uuid PRIMARY KEY, lead_id uuid, user_id uuid);
     CREATE TABLE credit_transactions (wallet_id uuid, type text, metadata jsonb, created_at timestamp);
     CREATE TABLE user_lead_links (lead_id uuid, user_id uuid);
@@ -138,9 +135,8 @@ test("acquisition core counts humans, bots and funnel events in the window", asy
 });
 
 test("breakdowns use filter-ready keys and classify bot families", async () => {
-  const { computeAcquisitionBreakdown } = await import(
-    "./acquisition/repository"
-  );
+  const { computeAcquisitionBreakdown } =
+    await import("./acquisition/repository");
   const channels = await computeAcquisitionBreakdown(
     win,
     {},
@@ -173,13 +169,11 @@ test("breakdowns use filter-ready keys and classify bot families", async () => {
 
 test("acquisition renders the response dimension in CLI and MCP breakdown headers", async () => {
   await import("next-vibe/platforms/cli/runtime/cli-widget-plugin");
-  const { CliResultFormatter } = await import(
-    "next-vibe/unified-ui/renderers/cli/response/result-formatter"
-  );
+  const { CliResultFormatter } =
+    await import("next-vibe/unified-ui/renderers/cli/response/result-formatter");
   const { default: definition } = await import("./acquisition/definition");
-  const { AcquisitionReportRepository } = await import(
-    "./acquisition/repository"
-  );
+  const { AcquisitionReportRepository } =
+    await import("./acquisition/repository");
   const logger = createEndpointLogger(false, defaultLocale);
   const { t } = definition.GET.scopedTranslation.scopedT(defaultLocale);
   const window = {
@@ -242,7 +236,9 @@ test("abuse report flags the /24 burst and non-user free-credit burn", async () 
 test("list drill-down ids match the report filters", async () => {
   const { matchingLeadIdsSql } = await import("./segment-sql");
   const { db } = await import("next-vibe/database");
-  const run = async (sqlQuery: ReturnType<typeof matchingLeadIdsSql>): Promise<number> => {
+  const run = async (
+    sqlQuery: ReturnType<typeof matchingLeadIdsSql>,
+  ): Promise<number> => {
     if (!sqlQuery) {
       return -1;
     }
@@ -251,29 +247,53 @@ test("list drill-down ids match the report filters", async () => {
   };
   expect(
     await run(
-      matchingLeadIdsSql({ createdFrom: "2026-11-15", createdTo: "2026-11-21", traffic: TrafficFilter.BOTS }),
+      matchingLeadIdsSql({
+        createdFrom: "2026-11-15",
+        createdTo: "2026-11-21",
+        traffic: TrafficFilter.BOTS,
+      }),
     ),
   ).toBe(13);
   expect(
     await run(
-      matchingLeadIdsSql({ createdFrom: "2026-11-15", createdTo: "2026-11-21", traffic: TrafficFilter.UNKNOWN }),
+      matchingLeadIdsSql({
+        createdFrom: "2026-11-15",
+        createdTo: "2026-11-21",
+        traffic: TrafficFilter.UNKNOWN,
+      }),
     ),
   ).toBe(1);
   expect(
     await run(
-      matchingLeadIdsSql({ createdFrom: "2026-11-15", createdTo: "2026-11-21", traffic: TrafficFilter.NOT_BOTS }),
+      matchingLeadIdsSql({
+        createdFrom: "2026-11-15",
+        createdTo: "2026-11-21",
+        traffic: TrafficFilter.NOT_BOTS,
+      }),
     ),
   ).toBe(3);
-  expect(await run(matchingLeadIdsSql({ ipPrefix: "203.0.113.0/24" }))).toBe(12);
-  expect(await run(matchingLeadIdsSql({ ipPrefix: "2001:db8:42::/48" }))).toBe(1);
+  expect(await run(matchingLeadIdsSql({ ipPrefix: "203.0.113.0/24" }))).toBe(
+    12,
+  );
+  expect(await run(matchingLeadIdsSql({ ipPrefix: "2001:db8:42::/48" }))).toBe(
+    1,
+  );
   expect(
     await run(
-      matchingLeadIdsSql({ reached: FunnelReach.PAID, reachedFrom: "2026-11-19", reachedTo: "2026-11-19" }),
+      matchingLeadIdsSql({
+        reached: FunnelReach.PAID,
+        reachedFrom: "2026-11-19",
+        reachedTo: "2026-11-19",
+      }),
     ),
   ).toBe(1);
   expect(
     await run(
-      matchingLeadIdsSql({ reached: FunnelReach.VISITED, reachedFrom: "2026-11-20", reachedTo: "2026-11-20" }),
+      matchingLeadIdsSql({
+        reached: FunnelReach.VISITED,
+        reachedFrom: "2026-11-20",
+        reachedTo: "2026-11-20",
+      }),
     ),
   ).toBe(1);
   expect(matchingLeadIdsSql({})).toBeNull();
@@ -284,15 +304,16 @@ test("list drill-down ids match the report filters", async () => {
 });
 
 test("country breakdown uses the visitor country, locale region stays its own dimension", async () => {
-  const { computeAcquisitionBreakdown } = await import(
-    "./acquisition/repository"
-  );
+  const { computeAcquisitionBreakdown } =
+    await import("./acquisition/repository");
   const countries = await computeAcquisitionBreakdown(
     win,
     {},
     LeadDimension.COUNTRY,
   );
-  const byCountry = new Map(countries.map((row) => [row.key, row.metrics.leads]));
+  const byCountry = new Map(
+    countries.map((row) => [row.key, row.metrics.leads]),
+  );
   expect(byCountry.get("BR")).toBe(1);
   expect(byCountry.get("ZZ")).toBe(1);
   expect(byCountry.get("DE")).toBeUndefined();
@@ -301,7 +322,9 @@ test("country breakdown uses the visitor country, locale region stays its own di
     {},
     LeadDimension.LOCALE_COUNTRY,
   );
-  expect(new Map(locales.map((row) => [row.key, row.metrics.leads])).get("DE")).toBe(1);
+  expect(
+    new Map(locales.map((row) => [row.key, row.metrics.leads])).get("DE"),
+  ).toBe(1);
 });
 
 test("overview topSources reconcile with the overview totals", async () => {
@@ -309,11 +332,18 @@ test("overview topSources reconcile with the overview totals", async () => {
   const logger = createEndpointLogger(false, defaultLocale);
   const { computeAcquisitionCore } = await import("./acquisition/repository");
   const core = await computeAcquisitionCore(win, {});
-  const result = await getAcquisitionOverview(
-    win,
-    logger,
-    defaultLocale,
-  );
+  await pg.exec(`
+    UPDATE users SET email = 'member@synthetic-market.acme' WHERE id = '${id(901)}';
+    INSERT INTO users VALUES ('${id(8901)}', '2024-11-19 12:00:00', true, 'reserved@example.test');
+    INSERT INTO payment_transactions
+      (user_id, amount, currency, status, created_at, metadata, provider_session_id, provider_payment_intent_id)
+    VALUES
+      ('${id(901)}', 100, 'USD', '${PaymentStatus.SUCCEEDED}', '2026-11-19 12:00:00', '{"type":"accounting_fixture"}', NULL, NULL),
+      ('${id(901)}', 200, 'USD', '${PaymentStatus.SUCCEEDED}', '2026-11-19 12:00:00', NULL, 'cs_test_headline', NULL),
+      ('${id(901)}', 300, 'USD', '${PaymentStatus.SUCCEEDED}', '2026-11-19 12:00:00', NULL, NULL, 'pi_fixture_headline'),
+      ('${id(8901)}', 400, 'USD', '${PaymentStatus.SUCCEEDED}', '2026-11-19 12:00:00', NULL, NULL, NULL);
+  `);
+  const result = await getAcquisitionOverview(win, logger, defaultLocale);
   expect(result.success).toBe(true);
   if (!result.success) {
     return;
@@ -342,7 +372,8 @@ const octWin = resolveAnalyticsWindow(
 async function seedProductionShape(): Promise<void> {
   const chrome =
     "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/158.0.0.0 Safari/537.36";
-  const meta = "meta-externalagent/1.1 (+https://developers.facebook.com/docs/sharing/webmasters/crawler)";
+  const meta =
+    "meta-externalagent/1.1 (+https://developers.facebook.com/docs/sharing/webmasters/crawler)";
   const lead = (n: number, at: string, ua: string | null, ip: string): string =>
     `('${id(n)}', '${at}', 'US', '', '${JSON.stringify({ anonymous: true, userAgent: ua, ipAddress: ip })}'::jsonb)`;
   await pg.exec(`
@@ -394,9 +425,8 @@ async function seedProductionShape(): Promise<void> {
 
 test("metadata-only user agents: humans, bots and unknown with previous period", async () => {
   await seedProductionShape();
-  const { computeAcquisitionCore, computeAcquisitionBreakdown } = await import(
-    "./acquisition/repository"
-  );
+  const { computeAcquisitionCore, computeAcquisitionBreakdown } =
+    await import("./acquisition/repository");
   const core = await computeAcquisitionCore(octWin, {});
   expect(core.kpis.humanLeads.value).toBe(5);
   expect(core.kpis.botLeads.value).toBe(2);
@@ -424,7 +454,9 @@ test("metadata-only user agents: humans, bots and unknown with previous period",
     {},
     LeadDimension.DEVICE,
   );
-  const deviceKeys = new Map(devices.map((row) => [row.key, row.metrics.leads]));
+  const deviceKeys = new Map(
+    devices.map((row) => [row.key, row.metrics.leads]),
+  );
   expect(deviceKeys.get("leadAnalytics.device.desktop")).toBe(5);
   expect(deviceKeys.get("leadAnalytics.device.bot")).toBe(2);
 
@@ -532,9 +564,14 @@ test("acquisition, funnel and drill-down agree on the Chrome 131 crawler", async
     to: "2026-11-23",
   };
   const { computeAcquisitionCore } = await import("./acquisition/repository");
-  const core = await computeAcquisitionCore(
-    resolveAnalyticsWindow(params, new Date("2026-11-23T12:00:00Z")),
-    {},
+  const { getAcquisitionHeadline } = await import("./overview");
+  const crawlerWindow = resolveAnalyticsWindow(
+    params,
+    new Date("2026-11-23T12:00:00Z"),
+  );
+  const core = await computeAcquisitionCore(crawlerWindow, {});
+  expect((await getAcquisitionHeadline(crawlerWindow)).humanLeads).toEqual(
+    core.kpis.humanLeads,
   );
   expect(core.kpis.humanVisits.value).toBe(5);
   expect(core.kpis.botVisits.value).toBe(2);
@@ -567,4 +604,63 @@ test("acquisition, funnel and drill-down agree on the Chrome 131 crawler", async
     { key: "emailConfirmed", value: 1 },
     { key: "payers", value: 0 },
   ]);
+});
+
+test("acquisition headline matches current, previous and all-time activity", async () => {
+  const { getAcquisitionHeadline } = await import("./overview");
+  const { computeAcquisitionCore } = await import("./acquisition/repository");
+  const human = JSON.stringify({
+    userAgent:
+      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/142.0 Safari/537.36",
+  });
+  await pg.exec(`
+    INSERT INTO users (id, created_at) VALUES
+      ('${id(861)}', '2025-03-28'),
+      ('${id(862)}', '2025-04-02'),
+      ('${id(863)}', '2025-04-02'),
+      ('${id(864)}', '2025-04-02'),
+      ('${id(865)}', '2025-04-02'),
+      ('${id(866)}', '2025-04-02'),
+      ('${id(867)}', '2025-04-02');
+    INSERT INTO leads (id, created_at, converted_user_id, metadata) VALUES
+      ('${id(651)}', '2025-03-05', '${id(863)}', '{}'),
+      ('${id(652)}', '2025-03-05', '${id(864)}', '{}'),
+      ('${id(653)}', '2025-04-10', '${id(866)}', '{}'),
+      ('${id(654)}', '2025-03-05', '${id(867)}', '{}'),
+      ('${id(655)}', '2025-04-04', '${id(867)}', '${human}'),
+      ('${id(656)}', '2025-03-28', NULL, '${human}'),
+      ('${id(657)}', '2025-04-05', NULL, '{"userAgent":"python-requests/2.32.3"}');
+    INSERT INTO growth_journeys (lead_id, user_id) VALUES
+      ('${id(652)}', '${id(865)}');
+  `);
+  const custom = resolveAnalyticsWindow(
+    {
+      range: AnalyticsRange.CUSTOM,
+      from: "2025-04-01",
+      to: "2025-04-07",
+    },
+    now,
+  );
+  const allTime = resolveAnalyticsWindow(
+    { range: AnalyticsRange.ALL_TIME },
+    new Date("2025-04-07T12:00:00Z"),
+    new Date("2025-03-01T00:00:00Z"),
+  );
+  for (const window of [custom, allTime]) {
+    const [headline, core] = await Promise.all([
+      getAcquisitionHeadline(window),
+      computeAcquisitionCore(window, {}),
+    ]);
+    expect(headline).toEqual({
+      humanLeads: core.kpis.humanLeads,
+      signups: core.kpis.signups,
+      leadsTrend:
+        core.trend.series.find(({ key }) => key === "humanLeads")?.values ?? [],
+      signupsTrend:
+        core.trend.series.find(({ key }) => key === "signups")?.values ?? [],
+    });
+  }
+  const headline = await getAcquisitionHeadline(custom);
+  expect(headline.humanLeads).toEqual({ value: 1, previous: 1 });
+  expect(headline.signups).toEqual({ value: 4, previous: 1 });
 });

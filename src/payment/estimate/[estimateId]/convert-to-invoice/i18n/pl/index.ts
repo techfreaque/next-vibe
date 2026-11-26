@@ -57,7 +57,10 @@ export const translations: typeof enTranslations = {
     back: "Wróć",
     submit: "Przekształć w fakturę",
     converted: "Na podstawie tej oferty utworzono fakturę.",
-    viewInvoice: "Zobacz fakturę",
+    savedDraftNumber: "Utworzono szkic faktury nr {{number}}",
+    savedDraft: "Utworzono szkic faktury",
+    convertedNumber: "Na podstawie oferty {{number}}.",
+    viewInvoice: "Otwórz szkic faktury",
     convertNote:
       "Zostanie utworzony szkic faktury z tymi samymi pozycjami. Oferta zostanie oznaczona jako przekonwertowana.",
   },

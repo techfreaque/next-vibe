@@ -39,6 +39,7 @@ import {
 } from "../../../_shared/use-widget-context";
 import { scopedTranslation as unifiedInterfaceScopedTranslation } from "../../../hooks/i18n";
 import { getTheme } from "../_shared/constants";
+import { useFormFieldDescriptionStyle } from "../_shared/description-style";
 import { renderPrefillDisplay } from "../_shared/prefill";
 import { getFieldStyleClassName } from "../_shared/styling";
 import { getFieldValidationState } from "../_shared/validation";
@@ -66,11 +67,12 @@ export function TextareaFieldWidget<
 
   const { t: widgetT } = unifiedInterfaceScopedTranslation.scopedT(locale);
 
+  const theme = getTheme(field.theme);
+  const descriptionStyle = useFormFieldDescriptionStyle(theme.descriptionStyle);
+
   if (!form || !fieldName) {
     return <Div>{widgetT("widgets.formField.requiresContext")}</Div>;
   }
-  const theme = getTheme(field.theme);
-  const descriptionStyle = theme.descriptionStyle;
   const isRequired = !field.schema.isOptional();
 
   return (
@@ -102,27 +104,29 @@ export function TextareaFieldWidget<
                   {field.label && style === "asterisk" && isRequired && (
                     <Span className="text-info font-bold">*</Span>
                   )}
-                  {field.description && descriptionStyle === "tooltip" && (
-                    <TooltipProvider delayDuration={300}>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button
-                            type="button"
-                            className="cursor-help inline-flex"
-                            variant={"ghost"}
-                          >
-                            <Info className="h-4 w-4 text-muted-foreground hover:text-foreground transition-colors" />
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent className="max-w-[250px]">
-                          <Span className="text-sm">
-                            {tField(field.description)}
-                          </Span>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                  )}
                 </FormLabel>
+                {field.description && descriptionStyle === "tooltip" && (
+                  <TooltipProvider delayDuration={300}>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          type="button"
+                          size="unset"
+                          aria-label={tField(field.description)}
+                          className="inline-grid size-5 shrink-0 cursor-help place-items-center rounded-sm"
+                          variant={"ghost"}
+                        >
+                          <Info className="h-4 w-4 text-muted-foreground hover:text-foreground transition-colors" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent className="max-w-[250px]">
+                        <Span className="text-sm">
+                          {tField(field.description)}
+                        </Span>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                )}
                 {style === "badge" && isRequired && (
                   <Badge
                     variant="secondary"

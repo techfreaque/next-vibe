@@ -34,7 +34,8 @@ export const translations: typeof enTranslations = {
     },
     notFound: {
       title: "Utilisateur introuvable",
-      description: "Aucun utilisateur avec cet ID",
+      description:
+        "Ce compte ne figure plus dans l’annuaire. Sélectionnez un autre compte.",
     },
     serverError: {
       title: "Chargement impossible",
@@ -88,14 +89,15 @@ export const translations: typeof enTranslations = {
   },
   kpi: {
     paid: "Total payé",
-    paidHint: "{{count}} paiements réussis, USD",
+    paidHint: "Paiements : {{count}}",
     refunded: "Remboursé",
     credits: "Solde de crédits",
-    creditsHint: "+{{free}} crédits gratuits",
+    creditsHint: "Crédits gratuits disponibles : {{free}}",
     spent: "Crédits dépensés",
     spentHint: "environ {{usd}} d'utilisation",
     lastSeen: "Dernière visite",
     joined: "Inscrit le {{date}}",
+    justNow: "À l’instant",
   },
   payment: {
     subscription: "Abonnement",
@@ -188,12 +190,15 @@ export const translations: typeof enTranslations = {
     openMonitor: "Ouvrir le moniteur d'erreurs",
   },
   widget: {
+    creditAmount: "{{count}} crédits",
     unavailable: "Compte indisponible",
     chooseUser: "Choisissez un compte à consulter",
     loading: "Chargement de l'utilisateur...",
     never: "Jamais",
     actions: {
-      browse: "Parcourir les comptes",
+      retry: "Réessayer",
+      more: "Plus",
+      browse: "Retour aux comptes",
       edit: "Modifier",
       addCredits: "Accorder des crédits",
       delete: "Supprimer l'utilisateur",
@@ -210,6 +215,8 @@ export const translations: typeof enTranslations = {
     remove: "Retirer un rôle",
   },
   tabs: {
+    section: "Rubrique du profil",
+    scrollHint: "Faites défiler pour voir toutes les sections",
     overview: "Vue d'ensemble",
     billing: "Facturation",
     credits: "Historique des crédits",

@@ -3,8 +3,10 @@
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
+import { EmptyBlock } from "next-vibe/ui/components/empty-block";
 import { Building } from "next-vibe/ui/components/icons/Building";
 import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
+import { Input } from "next-vibe/ui/components/input";
 import { Span } from "next-vibe/ui/components/span";
 import {
   Table,
@@ -26,7 +28,7 @@ import {
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import { type JSX, useEffect, useRef } from "react";
+import { type JSX, useEffect, useRef, useState } from "react";
 
 import { AccountSubtype, AccountType } from "../../enum";
 import { setCachedAccount } from "../_shared/account-picker-cache";
@@ -52,34 +54,63 @@ function FlagBadge({ label }: { label: string }): JSX.Element {
   );
 }
 
-// Build a map of accountId → indent depth based on parentId chain
-function buildAccountIndentMap(rows: AccountRow[]): Map<string, number> {
-  const parents = new Map(rows.map(({ id, parentId }) => [id, parentId]));
-  const depthMap = new Map<string, number>();
-  for (const { id } of rows) {
-    const visited = new Set([id]);
-    let parent = parents.get(id);
-    while (
-      parent &&
-      parents.has(parent) &&
-      !visited.has(parent) &&
-      visited.size < 5
+function accountTree(
+  rows: AccountRow[],
+  search: string,
+  collator: Intl.Collator,
+  locale: CountryLanguage,
+): { account: AccountRow; indent: number }[] {
+  const byId = new Map(rows.map((row) => [row.id, row]));
+  const included = new Set<string>();
+  for (const row of rows) {
+    if (
+      search &&
+      !`${row.code} ${row.name}`.toLocaleLowerCase(locale).includes(search)
     ) {
-      visited.add(parent);
-      parent = parents.get(parent);
+      continue;
     }
-    depthMap.set(id, visited.size - 1);
+    for (
+      let current: AccountRow | undefined = row;
+      current && !included.has(current.id);
+      current = current.parentId ? byId.get(current.parentId) : undefined
+    ) {
+      included.add(current.id);
+    }
   }
-  return depthMap;
+
+  const filtered = rows.filter((row) => included.has(row.id));
+  const sorted = filtered.toSorted(
+    (a, b) => a.sortOrder - b.sortOrder || collator.compare(a.code, b.code),
+  );
+  const children = new Map<string | null, AccountRow[]>();
+  for (const row of sorted) {
+    const parent =
+      row.parentId && included.has(row.parentId) ? row.parentId : null;
+    const siblings = children.get(parent) ?? [];
+    siblings.push(row);
+    children.set(parent, siblings);
+  }
+  const visited = new Set<string>();
+  const ordered: { account: AccountRow; indent: number }[] = [];
+  const append = (account: AccountRow, indent: number): void => {
+    if (visited.has(account.id)) {
+      return;
+    }
+    visited.add(account.id);
+    ordered.push({ account, indent });
+    children.get(account.id)?.forEach((child) => append(child, indent + 1));
+  };
+  children.get(null)?.forEach((row) => append(row, 0));
+  // Show legacy cycles and orphaned entries once.
+  sorted.forEach((row) => append(row, 0));
+  return ordered;
 }
 
-// Tailwind safe-listed indent classes for hierarchy depth 0–4
 const INDENT_CLASS: Record<number, string> = {
-  0: "pl-3",
-  1: "pl-7",
-  2: "pl-11",
-  3: "pl-14",
-  4: "pl-16",
+  0: "pl-2",
+  1: "pl-4 @md:pl-6",
+  2: "pl-6 @md:pl-10",
+  3: "pl-8 @md:pl-12",
 };
 
 function AccountItem({
@@ -107,17 +138,24 @@ function AccountItem({
 }): JSX.Element {
   const debitNormal =
     account.type === AccountType.ASSET || account.type === AccountType.EXPENSE;
+  const balances = account.balances ?? [];
   return (
-    <TableRow onClick={() => onView(account.id)}>
-      <TableCell className="w-16 align-top font-mono text-xs text-muted-foreground">
+    <TableRow>
+      <TableCell className="w-16 whitespace-normal break-words text-left align-top font-mono text-xs text-muted-foreground">
         {account.code}
       </TableCell>
       <TableCell
-        className={`min-w-0 text-left ${INDENT_CLASS[indent] ?? "pl-3"}`}
+        className={`min-w-0 text-left ${INDENT_CLASS[Math.min(indent, 3)] ?? "pl-2"}`}
       >
-        <Span className="block whitespace-normal break-words text-left font-medium">
+        <Button
+          type="button"
+          variant="link"
+          size="sm"
+          className="h-auto min-w-0 max-w-full justify-start whitespace-normal p-0 text-left font-medium [overflow-wrap:anywhere]"
+          onClick={() => onView(account.id)}
+        >
           {account.name}
-        </Span>
+        </Button>
         <Div className="mt-0.5 flex flex-wrap items-center gap-1 text-xs text-muted-foreground">
           <Span>{subtypeLabel}</Span>
           {!account.isActive && <FlagBadge label={inactiveLabel} />}
@@ -126,16 +164,24 @@ function AccountItem({
         </Div>
       </TableCell>
       <TableCell className="align-top text-right tabular-nums">
-        {(account.balances ?? []).map(({ currency, amount }) => (
-          <Span key={currency} className="block [overflow-wrap:anywhere]">
-            {formatMoney(Math.abs(amount), currency, locale)}
-            {amount !== 0 && (
-              <Span className="ml-1 text-xs text-muted-foreground">
-                {amount > 0 === debitNormal ? debitLabel : creditLabel}
-              </Span>
-            )}
-          </Span>
-        ))}
+        {balances.map(({ currency, amount }) => {
+          const side = amount > 0 === debitNormal ? debitLabel : creditLabel;
+          return (
+            <Span key={currency} className="block [overflow-wrap:anywhere]">
+              {formatMoney(Math.abs(amount), currency, locale)}
+              {balances.length > 1 && (
+                <Span className="ml-1 text-xs text-muted-foreground">
+                  {currency}
+                </Span>
+              )}
+              {amount !== 0 && (
+                <Span className="ml-1 text-xs text-muted-foreground">
+                  {side}
+                </Span>
+              )}
+            </Span>
+          );
+        })}
       </TableCell>
     </TableRow>
   );
@@ -148,11 +194,16 @@ export function CoaAccountListWidget(_props: {
   const data = useWidgetValue<typeof definition.GET>();
   const navigation = useWidgetNavigation();
   const locale = useWidgetLocale();
-  const companyId = useWidgetForm<typeof definition.GET>().watch("companyId");
+  const form = useWidgetForm<typeof definition.GET>();
+  const companyId = form.watch("companyId");
+  const page = form.watch("page") ?? 1;
+  const pageSize = form.watch("pageSize") ?? 100;
+  const [search, setSearch] = useState("");
   const t = useWidgetTranslation<typeof definition.GET>();
   const onSubmit = useWidgetOnSubmit();
   const onPick = usePickerCallback<{
     id: string;
+    companyId: string;
     name: string;
     code: string;
     type: string;
@@ -180,6 +231,7 @@ export function CoaAccountListWidget(_props: {
       if (account && onPick) {
         const picked = {
           id: account.id,
+          companyId: account.companyId,
           name: account.name,
           code: account.code,
           type: account.type,
@@ -191,7 +243,6 @@ export function CoaAccountListWidget(_props: {
         };
         setCachedAccount(picked);
         onPick(picked);
-        navigation.pop();
       }
       return;
     }
@@ -299,7 +350,8 @@ export function CoaAccountListWidget(_props: {
     [AccountSubtype.OTHER]: t("enums.accountSubtype.OTHER"),
   };
 
-  const indentMap = buildAccountIndentMap(accounts);
+  const term = search.trim().toLocaleLowerCase(locale);
+  const collator = new Intl.Collator(locale, { numeric: true });
 
   // Group by type — the type value is the AccountType enum value (i18n key path)
   const grouped = accounts.reduce<Record<string, AccountRow[]>>((acc, acct) => {
@@ -310,6 +362,15 @@ export function CoaAccountListWidget(_props: {
     acc[key].push(acct);
     return acc;
   }, {});
+
+  const groups = TYPE_ORDER.map((type) => ({
+    type,
+    rows: accountTree(grouped[type] ?? [], term, collator, locale),
+  })).filter(({ rows }) => rows.length > 0);
+  const goToPage = (next: number): void => {
+    form.setValue("page", next);
+    onSubmit?.();
+  };
 
   return (
     <WidgetShell layout={isPickerMode ? "compact" : "page"}>
@@ -325,33 +386,46 @@ export function CoaAccountListWidget(_props: {
           )
         }
       />
-      <Span className="text-sm text-muted-foreground">
-        {`${t("get.response.total")} ${new Intl.NumberFormat(locale).format(data.total)}`}
-      </Span>
-      {TYPE_ORDER.filter((type) => grouped[type]?.length).map((type) => (
+      <Div className="flex flex-wrap items-center justify-between gap-2">
+        <Input
+          className="w-full @sm:max-w-xs"
+          aria-label={t("get.widget.searchPage")}
+          placeholder={t("get.widget.searchPage")}
+          value={search}
+          onChangeText={setSearch}
+        />
+        <Span className="text-sm text-muted-foreground">
+          {`${t("get.response.total")} ${new Intl.NumberFormat(locale).format(data.total)}`}
+        </Span>
+      </Div>
+      {groups.map(({ type, rows }) => (
         <Div key={type} className="min-w-0 rounded-md border bg-card">
           <Div className="flex items-center justify-between gap-2 border-b px-3 py-2">
             <Span className="font-semibold">{accountTypeLabels[type]}</Span>
             <Span className="text-sm tabular-nums text-muted-foreground">
-              {grouped[type]?.length}
+              {new Intl.NumberFormat(locale).format(rows.length)}
             </Span>
           </Div>
           <Table className="table-fixed">
             <TableHeader>
               <TableRow>
-                <TableHead className="w-16">{t("get.response.code")}</TableHead>
-                <TableHead>{t("get.response.name")}</TableHead>
+                <TableHead className="w-16 text-left">
+                  {t("get.response.code")}
+                </TableHead>
+                <TableHead className="text-left">
+                  {t("get.response.name")}
+                </TableHead>
                 <TableHead className="w-28 text-right @md:w-36">
                   {t("get.response.balance")}
                 </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {grouped[type]?.map((account) => (
+              {rows.map(({ account, indent }) => (
                 <AccountItem
                   key={account.id}
                   account={account}
-                  indent={indentMap.get(account.id) ?? 0}
+                  indent={indent}
                   onView={handleView}
                   subtypeLabel={
                     accountSubtypeLabels[account.subtype] ?? account.subtype
@@ -369,6 +443,31 @@ export function CoaAccountListWidget(_props: {
         </Div>
       ))}
 
+      {term && accounts.length > 0 && groups.length === 0 && (
+        <EmptyBlock title={t("get.widget.noMatches")} />
+      )}
+      {data.total > pageSize && (
+        <Div className="flex flex-wrap items-center justify-between gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            disabled={page <= 1}
+            onClick={() => goToPage(page - 1)}
+          >
+            {t("get.widget.previousPage")}
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            disabled={page * pageSize >= data.total}
+            onClick={() => goToPage(page + 1)}
+          >
+            {t("get.widget.nextPage")}
+          </Button>
+        </Div>
+      )}
       {/* Empty state — data loaded but no accounts */}
       {accounts.length === 0 && (
         <Div className="flex flex-col items-center gap-4 py-14 text-center border border-dashed rounded-md">

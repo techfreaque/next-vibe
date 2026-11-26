@@ -13,9 +13,10 @@ import { CompanySubscriptionListRepository } from "./repository";
 export const { GET, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
-    handler: ({ urlPathParams, logger, locale }) =>
+    handler: ({ urlPathParams, user, logger, locale }) =>
       CompanySubscriptionListRepository.listCompanySubscriptions(
         urlPathParams.companyId,
+        user.id,
         logger,
         locale,
       ),

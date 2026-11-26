@@ -19,6 +19,8 @@ import { TASK_WATCHDOG_CONFIG } from "next-vibe/tasks/watchdog/config";
 import { Badge } from "next-vibe/ui/components/badge";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
+import { EmptyBlock } from "next-vibe/ui/components/empty-block";
+import { AlertCircle } from "next-vibe/ui/components/icons/AlertCircle";
 import { Bot } from "next-vibe/ui/components/icons/Bot";
 import { Brain } from "next-vibe/ui/components/icons/Brain";
 import { ChevronDown } from "next-vibe/ui/components/icons/ChevronDown";
@@ -56,7 +58,10 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "next-vibe/ui/components/tooltip";
+import { WidgetHeader } from "next-vibe/ui/components/widget-header";
+import { WidgetShell } from "next-vibe/ui/components/widget-shell";
 import { useRouter } from "next-vibe/ui/hooks/use-navigation";
+import { AdminRecordContext } from "next-vibe/unified-ui/_shared/admin-record-context";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
 import {
   useWidgetLocale,
@@ -69,7 +74,7 @@ import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage"
 import { Icon } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icon-component";
 import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/navigate-button/widget";
 import type { JSX, ReactNode } from "react";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useContext, useMemo, useState } from "react";
 
 import { buildFolderUrl } from "@/_pages/chat/lib/utils/navigation";
 
@@ -95,8 +100,8 @@ import { SearchProvider, SearchProviderOptions } from "../../web-search/enum";
 import { scopedTranslation as searchScopedTranslation } from "../../web-search/i18n";
 import { parseSkillId } from "../slugify";
 import { turnStepLimitSchema } from "./constants";
-import type definition from "./definition";
 import type { ChatSettingsUpdateRequestOutput } from "./definition";
+import definition from "./definition";
 import { useChatSettings } from "./hooks";
 import { scopedTranslation } from "./i18n";
 import {
@@ -1204,6 +1209,7 @@ export function ChatSettingsWidget({
   const { t } = scopedTranslation.scopedT(locale);
   const { t: tSearch } = searchScopedTranslation.scopedT(locale);
 
+  const admin = useContext(AdminRecordContext);
   const { settings, isLoading, updateSettings } = useChatSettings(user, logger);
   const { favorites } = useChatFavorites(logger, {
     activeFavoriteId: settings?.activeFavoriteId ?? null,
@@ -1211,6 +1217,7 @@ export function ChatSettingsWidget({
   const { addFavorite } = useFavoriteCreate(user, logger);
 
   const [isSaving, setIsSaving] = useState(false);
+  const [isRetrying, setIsRetrying] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [stepLimitDraft, setStepLimitDraft] = useState<string | null>(null);
 
@@ -1323,6 +1330,51 @@ export function ChatSettingsWidget({
   );
 
   const isAdmin = !user.isPublic && user.roles.includes(UserRole.ADMIN);
+
+  if (admin && isAdmin && !settings) {
+    if (isLoading || isRetrying) {
+      return (
+        <Div
+          aria-live="polite"
+          className="flex items-center justify-center gap-2 py-12"
+        >
+          <Loader2
+            aria-hidden="true"
+            className="size-5 animate-spin text-muted-foreground"
+          />
+          {admin.loadingLabel}
+        </Div>
+      );
+    }
+    return (
+      <WidgetShell layout="page">
+        <WidgetHeader size="page" title={t("get.titleShort")} border={false} />
+        <EmptyBlock
+          size="page"
+          className="w-full max-w-xl rounded-xl border border-border bg-card"
+          icon={
+            <AlertCircle
+              className="size-5 text-destructive"
+              aria-hidden="true"
+            />
+          }
+          title={t("get.errors.server.title")}
+          message={t("get.errors.server.description")}
+          action={{
+            label: admin.retryLabel,
+            onClick: (): void => {
+              setIsRetrying(true);
+              void apiClient
+                .refetchEndpoint(definition.GET, logger)
+                .finally(() => {
+                  setIsRetrying(false);
+                });
+            },
+          }}
+        />
+      </WidgetShell>
+    );
+  }
 
   if (isLoading || !settings) {
     return (

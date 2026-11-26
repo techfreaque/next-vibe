@@ -7,6 +7,8 @@
  */
 export const translations = {
   analytics: {
+    review: "Review",
+    reviewItem: "Review {{item}}",
     range: {
       label: "Period",
       description: "Time window for the report",
@@ -71,6 +73,11 @@ export const translations = {
       filters: "Filters",
       refresh: "Refresh",
       byGranularity: "by {{granularity}}",
+      groupedBy: {
+        day: "by day",
+        week: "by week",
+        month: "by month",
+      },
     },
   },
 };

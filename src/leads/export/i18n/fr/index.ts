@@ -54,8 +54,9 @@ export const translations: typeof enTranslations = {
       description: "Exporter les leads créés jusqu'à cette date",
     },
     includeMetadata: {
-      label: "Inclure les métadonnées",
-      description: "Inclure les dates de création et de mise à jour",
+      label: "Inclure les métadonnées techniques",
+      description:
+        "Ajoutez les dates, l’adresse IP, les données de l’appareil, le code de parrainage et les métadonnées enregistrées.",
     },
     includeEngagementData: {
       label: "Inclure les données d'engagement",
@@ -115,7 +116,8 @@ export const translations: typeof enTranslations = {
     },
   },
   widget: {
-    exportLeads: "Exporter les leads",
+    prepareFile: "Préparer l’export",
+    exportLeads: "Exporter les prospects",
     import: "Importer",
     viewList: "Voir la liste",
     importLeadsTitle: "Importer des leads",
@@ -135,7 +137,7 @@ export const translations: typeof enTranslations = {
     nextSteps: "Étapes suivantes :",
     viewLeads: "Voir les leads",
     importLeads: "Importer des leads",
-    configureExport: "Configurer l'export",
+    configureExport: "Options du fichier",
     configureExportHint:
       "Choisissez le format et les filtres ci-dessous, puis cliquez sur Exporter pour générer votre fichier",
     formatLabel: "Format",
@@ -150,6 +152,19 @@ export const translations: typeof enTranslations = {
     viewLeadsList: "Voir la liste des leads",
     excelSpreadsheet: "Classeur Excel",
     csvFile: "Fichier CSV",
+    description:
+      "Choisissez le format du fichier et filtrez les prospects à exporter.",
+    changeFilters: "Modifier les filtres",
+    advancedFilters: "Filtres avancés",
+    activeFilters: "Filtres actifs : {{count}}",
+    exportFailed:
+      "Le fichier d’export n’a pas pu être préparé. Vos filtres sont conservés. Réessayez.",
+    retry: "Réessayer",
+    noMatchingRecords: "Aucun prospect ne correspond aux filtres",
+    noMatchingRecordsHint:
+      "Modifiez ou retirez un filtre, puis préparez à nouveau l’export.",
+    fileDetails: "Enregistrements : {{count}} · {{size}}",
+    generatedAt: "Généré le {{date}}",
   },
   enums: {
     exportFormat: {

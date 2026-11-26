@@ -52,11 +52,19 @@ const { GET } = createEndpoint({
   defaultWebPinned: ALLOWED_ROLES,
   icon: "list",
 
+  options: { formOptions: { autoSubmit: true, debounceMs: 250 } },
   fields: customWidgetObject({
     usage: { request: "data", response: true },
     render: TaxRateListWidget,
     children: {
       // === REQUEST FIELDS ===
+      rateId: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.UUID,
+        hidden: true,
+        label: "rate.update.rateId.label",
+        schema: z.uuid().optional(),
+      }),
       companyId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
@@ -105,6 +113,10 @@ const { GET } = createEndpoint({
         type: WidgetType.TEXT,
         label: "rate.list.response.total" as const,
         schema: z.number(),
+      }),
+      salesExemptionNotice: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        schema: z.string().nullable().optional(),
       }),
       rates: responseArrayField(scopedTranslation, {
         type: WidgetType.CONTAINER,

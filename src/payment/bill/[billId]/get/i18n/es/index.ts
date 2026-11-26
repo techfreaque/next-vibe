@@ -82,6 +82,23 @@ export const translations: typeof enTranslations = {
     },
   },
   widget: {
+    lineReviewRequired:
+      "La suma de las líneas no coincide con el total registrado. Revise la factura original del proveedor antes de editarla o aprobarla.",
+    removeAction: "Eliminar",
+    removeLine: "Eliminar {{description}}",
+    grossTotal: "Importe total bruto",
+    taxPending:
+      "El impuesto del proveedor está pendiente. Confirma el importe documentado antes de recibir o contabilizar la factura.",
+    confirmSupplierTax: "Confirmar impuesto del proveedor",
+    bankDocumentMissing:
+      "Falta el justificante del proveedor. Vincúlalo aquí o confirma el importe bruto con el justificante bancario al aprobar.",
+    bankDocumentTaxReview:
+      "Justificante del proveedor vinculado después de contabilizar. Revisa por separado cualquier reclasificación fiscal o contable. El asiento original sigue vigente.",
+    linkBankDocument: "Vincular justificante del proveedor",
+    inputVat: "Deducción del IVA soportado",
+    taxIncludedCost: "IVA incluido en el coste",
+    reverseCharge: "IVA a pagar por inversión del sujeto pasivo",
+
     markReceived: "Mark received",
     back: "Atrás",
     submit: "Mira a Bill.",
@@ -102,7 +119,9 @@ export const translations: typeof enTranslations = {
     approveBill: "Proyecto de ley",
     payBill: "Pago",
     addLine: "Añadir línea",
-    viewJournalEntry: "View Journal Entry",
+    accountingEvidence: "Asientos contables",
+    approvalJournal: "Contabilización de la factura",
+    settlementJournal: "Contabilización del pago",
     approveConfirmTitle: "¿Aprobar este proyecto de ley?",
     approveConfirmDescription:
       "Esto promoverá el estado de la factura. Una vez aprobado, se publicará una entrada de la revista. Esto no puede ser deshecho.",

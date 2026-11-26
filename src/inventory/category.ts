@@ -21,9 +21,31 @@ export const category: CategoryDefinition = {
     "es-ES": "Inventario",
     "sk-SK": "Zásoby",
   },
+  description: {
+    "en-US": "Track physical stock, warehouse movements and transfers.",
+    "de-DE": "Verfolgen Sie Warenbestände, Lagerbewegungen und Umlagerungen.",
+    "pl-PL": "Śledź stany magazynowe, ruch towarów i przesunięcia.",
+    "fr-FR":
+      "Suivez les stocks physiques, les mouvements et les transferts entre entrepôts.",
+    "it-IT":
+      "Controlli le giacenze, i movimenti e i trasferimenti tra magazzini.",
+    "es-ES":
+      "Controle las existencias, los movimientos y los traslados entre almacenes.",
+    "sk-SK": "Sledujte stav zásob, skladové pohyby a presuny medzi skladmi.",
+    "en-GLOBAL": "Track physical stock, warehouse movements and transfers.",
+  },
   group: "business",
   icon: "box",
   order: 50,
+  createActions: [
+    "inventory_transfer_create_POST",
+    "inventory_warehouse_create_POST",
+  ],
+  landing: {
+    destinations: ["supplier-evidence", "finance-credit-liabilities"],
+    actions: ["inventory-stock", "inventory-warehouses", "inventory-transfers"],
+    overview: { alias: "inventory-dashboard", scope: "company" },
+  },
   defaultEntry: {
     [UserPermissionRole.ADMIN]: INVENTORY_DASHBOARD_ALIAS,
     [UserPermissionRole.CUSTOMER]: USER_ME_ALIAS,

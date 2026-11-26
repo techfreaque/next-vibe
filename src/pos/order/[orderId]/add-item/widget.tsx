@@ -9,6 +9,7 @@ import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
 import {
   formatMoney,
   formatPercent,
+  formatQuantity,
 } from "next-vibe/unified-ui/_shared/format-money";
 import {
   useWidgetForm,
@@ -20,16 +21,23 @@ import {
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { useApiQuery } from "next-vibe/unified-ui/hooks/use-api-query";
+import { EntityPickerFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/entity-picker-field/widget";
 import { NumberFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/number-field/widget";
 import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-field/widget";
 import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 import type { JSX } from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
+import { useDocumentVatPolicy } from "@/finance/document-vat-rates";
 import productLookupEndpoint from "@/pos/product-lookup/definition";
 import { TaxCalculator } from "@/tax/calculator";
+import {
+  calculateSettledTaxLine,
+  LINE_SETTLEMENT_V1,
+} from "@/tax/line-settlement";
 
+import { formatPosSettlement } from "../../format-settlement";
 import { useOrderPreview } from "../get/use-order-preview";
 import type definition from "./definition";
 
@@ -60,6 +68,10 @@ export function PosOrderAddItemWidget({
   const result = data?.result;
 
   const order = useOrderPreview(result ? undefined : form.watch("orderId"));
+  const { exemptionNotice } = useDocumentVatPolicy(
+    order?.companyId ?? undefined,
+    !result,
+  );
   const currency = result?.currency ?? order?.currency;
   const fmt = (n: number): string => formatMoney(n, currency, locale);
 
@@ -89,13 +101,22 @@ export function PosOrderAddItemWidget({
   const qty = Number(form?.watch("item.quantity") ?? 1);
   const unitPrice = Number(form?.watch("item.unitPrice") ?? 0);
   const taxRate = Number(form?.watch("item.taxRate") ?? 0);
+  useEffect(() => {
+    if (exemptionNotice && taxRate !== 0) {
+      form.setValue("item.taxRate", 0);
+    }
+  }, [exemptionNotice, form, taxRate]);
   const description = form?.watch("item.description") ?? "";
 
-  const { total: lineTotal } = TaxCalculator.calculateLineItemTax({
+  const previewLine = {
     quantity: qty,
     unitPrice,
-    taxRate,
-  });
+    taxRate: exemptionNotice ? 0 : taxRate,
+  };
+  const lineTotal =
+    order?.lineSettlement === LINE_SETTLEMENT_V1
+      ? calculateSettledTaxLine(previewLine).lineTotal
+      : TaxCalculator.calculateLineItemTax(previewLine).total;
 
   const handleProductSearch = (): void => {
     if (!searchQuery.trim()) {
@@ -113,7 +134,10 @@ export function PosOrderAddItemWidget({
       product.defaultTaxRate !== null &&
       product.defaultTaxRate !== undefined
     ) {
-      form?.setValue("item.taxRate", product.defaultTaxRate);
+      form?.setValue(
+        "item.taxRate",
+        exemptionNotice ? 0 : product.defaultTaxRate,
+      );
     }
     setSearchQuery("");
     setSubmittedQuery("");
@@ -129,9 +153,13 @@ export function PosOrderAddItemWidget({
 
   const handleAddAnother = (): void => {
     void (async (): Promise<void> => {
-      const orderId = form?.getValues("orderId") ?? result?.id ?? "";
+      const orderId = form.getValues("orderId");
+      if (!orderId) {
+        return;
+      }
       const def = await import("./definition");
       navigation.push(def.default.POST, {
+        urlPathParams: { orderId },
         data: {
           orderId,
           item: {
@@ -147,7 +175,14 @@ export function PosOrderAddItemWidget({
   };
 
   const handleBackToOrder = (): void => {
-    navigation.pop();
+    const orderId = form.getValues("orderId");
+    if (!orderId) {
+      return;
+    }
+    void (async (): Promise<void> => {
+      const def = await import("../get/definition");
+      navigation.push(def.default.GET, { urlPathParams: { orderId } });
+    })();
   };
 
   // Success state — item added
@@ -176,8 +211,9 @@ export function PosOrderAddItemWidget({
           </Div>
           <Div className="flex items-center justify-between px-4 py-3">
             <Span className="text-sm text-muted-foreground">
-              {result.quantity} {t("orderAddItem.post.widget.multiplier")}{" "}
-              {fmt(result.unitPrice)}
+              {formatQuantity(result.quantity, locale)}{" "}
+              {t("orderAddItem.post.widget.multiplier")}{" "}
+              {formatPosSettlement(result.unitPrice, currency, locale)}
             </Span>
             <Span className="text-sm tabular-nums">
               {fmt(result.lineTotal)}
@@ -234,6 +270,10 @@ export function PosOrderAddItemWidget({
         </Button>
       )}
       <FormAlertWidget field={{}} />
+      <EntityPickerFieldWidget
+        fieldName="orderId"
+        field={field.children.orderId}
+      />
 
       {/* === Product search section === */}
       <Div className="flex flex-col gap-2">
@@ -385,15 +425,19 @@ export function PosOrderAddItemWidget({
           />
         </Div>
         {/* Tax rate — optional, collapsed feel */}
-        <NumberFieldWidget
-          fieldName="item.taxRate"
-          presentation="percent"
-          field={withValue(
-            field.children.item.children.taxRate,
-            undefined,
-            null,
-          )}
-        />
+        {exemptionNotice ? (
+          <Span className="text-sm">{exemptionNotice}</Span>
+        ) : (
+          <NumberFieldWidget
+            fieldName="item.taxRate"
+            presentation="percent"
+            field={withValue(
+              field.children.item.children.taxRate,
+              undefined,
+              null,
+            )}
+          />
+        )}
       </Div>
 
       {/* Live line total preview */}
@@ -402,7 +446,9 @@ export function PosOrderAddItemWidget({
           <Div className="flex flex-col gap-0.5">
             <Span className="text-xs text-muted-foreground">
               {description ? `${String(description)} · ` : ""}
-              {qty} {t("orderAddItem.post.widget.multiplier")} {fmt(unitPrice)}
+              {formatQuantity(qty, locale)}{" "}
+              {t("orderAddItem.post.widget.multiplier")}{" "}
+              {formatPosSettlement(unitPrice, currency, locale)}
               {taxRate > 0
                 ? ` + ${formatPercent(taxRate, locale)} ${t("orderAddItem.post.widget.taxNote")}`
                 : ""}
@@ -417,7 +463,9 @@ export function PosOrderAddItemWidget({
         </Div>
       ) : null}
 
-      <SubmitButtonWidget<typeof definition.POST> field={{}} />
+      <SubmitButtonWidget<typeof definition.POST>
+        field={{ text: "orderGet.get.widget.addItem" }}
+      />
     </Div>
   );
 }

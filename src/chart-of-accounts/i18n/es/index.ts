@@ -61,10 +61,13 @@ export const translations: typeof enTranslations = {
       AR_PAYMENT: "Pago AR",
       AP_BILL: "AP Bill",
       AP_PAYMENT: "Pago AP",
+      SUPPLIER_EVIDENCE: "Justificante de proveedor",
+      BANK_RECONCILIATION: "Conciliación bancaria",
       POS_ORDER: "Orden POS",
       TAX_PAYMENT: "Pago fiscal",
       PERIOD_CLOSE: "Período de cierre",
       CREDIT_TRANSACTION: "Transacción de créditos",
+      REVENUE_RECOGNITION: "Reconocimiento de ingresos",
     },
     lineType: {
       DEBIT: "Debito",
@@ -213,6 +216,14 @@ export const translations: typeof enTranslations = {
       back: "Atrás",
       loading: "Carga de entrada...",
       postButton: "Entrada posterior",
+      relatedEntries: "Asientos relacionados",
+      reversalBadge: "Anulación",
+      originalEntry: "Asiento original",
+      reversingEntry: "Asiento de anulación",
+      reversedBy: "Asiento de anulación",
+      originalLineNotes:
+        "Los conceptos proceden del asiento original. El debe y el haber corresponden a la anulación.",
+      reverseReversal: "Anular este asiento de anulación",
       reverseButton: "Inversión",
       balancedLabel: "Saldo",
       notBalancedLabel: "No balanceado",
@@ -476,17 +487,16 @@ export const translations: typeof enTranslations = {
       unbalanced: "Desequilibrado",
       noActivity: "No hay cuentas con actividad encontradas para este período.",
       total: "Total",
-      selectCompany:
-        "Introduzca una empresa ID arriba y haga clic en Ejecutar para generar el balance de prueba.",
+      selectCompany: "Elige una empresa para consultar el informe.",
     },
     title: "Saldo de juicio",
     titleShort: "Saldo de juicio",
     description:
       "Suma de todos los débitos y créditos publicados por cuenta a partir de una fecha determinada. Confirma el balance de libros.",
     companyId: {
-      label: "Company ID",
-      description: "Company to report on",
-      placeholder: "Company UUID",
+      label: "Empresa",
+      description: "Empresa del informe",
+      placeholder: "Elegir empresa",
     },
     asOfDate: {
       label: "As of Date",
@@ -571,7 +581,9 @@ export const translations: typeof enTranslations = {
       previousMonth: "Mes anterior",
       autoCurrency: "Automática",
       run: "Corre",
-      running: "Corriendo...",
+      running: "Cargando informe…",
+      loadError: "No se pudo cargar el informe",
+      retry: "Reintentar",
     },
   },
   profitLoss: {
@@ -579,17 +591,16 @@ export const translations: typeof enTranslations = {
       dateRange: "Período",
       noData: "No hay datos para este período.",
       liabilitiesAndEquity: "Pasivo + Equidad",
-      selectCompany:
-        "Ingrese una compañía ID arriba y haga clic en Ejecutar para generar la declaración P comprimido.",
+      selectCompany: "Elige una empresa para consultar el informe.",
     },
     title: "Profit &quot; Loss &quot;",
     titleShort: "PL",
     description:
       "Ingresos vs. gastos para un rango de fechas. Muestra ganancias brutas, ganancias operativas y beneficios netos.",
     companyId: {
-      label: "Company ID",
-      description: "Company to report on",
-      placeholder: "Company UUID",
+      label: "Empresa",
+      description: "Empresa del informe",
+      placeholder: "Elegir empresa",
     },
     from: {
       label: "Desde",
@@ -667,16 +678,16 @@ export const translations: typeof enTranslations = {
       unbalanced: "No balanceado",
       noEntries: "No hay entradas para este período",
       liabilitiesAndEquity: "Pasivo &quot; Equidad &quot;",
-      selectCompany: "Seleccione una empresa para ver el balance",
+      selectCompany: "Elige una empresa para consultar el informe.",
     },
     title: "Hoja de equilibrio",
     titleShort: "Hoja de equilibrio",
     description:
       "Activos, pasivos y equidad a partir de una fecha. Verifica la ecuación contable.",
     companyId: {
-      label: "Company ID",
-      description: "Company to report on",
-      placeholder: "Company UUID",
+      label: "Empresa",
+      description: "Empresa del informe",
+      placeholder: "Elegir empresa",
     },
     asOfDate: {
       label: "As of Date",
@@ -842,21 +853,24 @@ export const translations: typeof enTranslations = {
   },
   taxReport: {
     widget: {
+      filters: "Período y moneda",
+      window: "Del {{from}} al {{to}}",
       dateRange: "Período",
       noData: "No hay datos fiscales para este período.",
       summarySection: "Resumen",
-      detailSection: "Desglose",
-      selectCompany:
-        "Introduzca una empresa ID arriba y haga clic en Ejecutar para generar el informe de impuestos.",
+      detailSection: "Movimientos contabilizados en cuentas de IVA",
+      scopeHint:
+        "Consulta el IVA repercutido y el IVA deducible del periodo seleccionado.",
+      selectCompany: "Elige una empresa para consultar el informe.",
     },
     title: "Informe fiscal",
     titleShort: "Informe fiscal",
     description:
-      "VAT recogió vs. reclamable por un período. Net VAT paga a un vistazo.",
+      "Consulta los movimientos contabilizados en las cuentas de IVA durante el período seleccionado.",
     companyId: {
-      label: "Company ID",
-      description: "Company to report on",
-      placeholder: "Company UUID",
+      label: "Empresa",
+      description: "Empresa del informe",
+      placeholder: "Elegir empresa",
     },
     from: {
       label: "Desde",
@@ -871,12 +885,12 @@ export const translations: typeof enTranslations = {
     response: {
       from: "Desde",
       to: "A",
-      vatCollected: "VAT Collected",
-      vatReclaimable: "VAT Reclamable",
+      vatCollected: "IVA repercutido contabilizado",
+      vatReclaimable: "IVA soportado contabilizado",
       netVatPayable: "Net VAT Payable",
       lines: "Tax Lines",
-      taxRateCode: "Código de Tasa",
-      taxRateName: "Tasa de nombre",
+      taxRateCode: "Código de cuenta",
+      taxRateName: "Nombre de cuenta",
       netAmount: "Monto neto",
       taxAmount: "Cuantía fiscal",
       rate: "Tasa",

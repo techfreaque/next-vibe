@@ -34,7 +34,11 @@ export const translations: typeof enTranslations = {
         title: "Prístup zamietnutý",
         description: "Potrebujete rolu účtovníka alebo správcu.",
       },
-      conflict: { title: "Konflikt", description: "Konflikt údajov" },
+      conflict: {
+        title: "Konflikt",
+        description:
+          "Faktúra s týmto dodávateľom a číslom už existuje. Pred vytvorením ďalšej skontrolujte existujúcu faktúru.",
+      },
       server: {
         title: "Chyba servera",
         description: "Faktúru sa nepodarilo vytvoriť. Skúste to znova.",
@@ -76,6 +80,8 @@ export const translations: typeof enTranslations = {
       addItem: "Pridať položku",
       removeItem: "Odstrániť položku",
       itemError: "Skontrolujte opis, množstvo, cenu a sadzbu DPH.",
+      supplierTotalReview:
+        "Porovnajte túto sumu s dodávateľskou faktúrou. Ak sa sumy líšia, pred uložením skontrolujte pôvodný doklad.",
       summary: "Súhrn prijatej faktúry",
       net: "Základ dane",
       tax: "DPH",

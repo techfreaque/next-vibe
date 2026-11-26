@@ -268,6 +268,12 @@ export const translations: typeof enTranslations = {
       titleShort: "Détails du fournisseur",
       description: "Afficher la fiche complète d'un fournisseur.",
       widget: {
+        companyName: "Entreprise",
+        orderCount: "Commandes d’achat",
+        receivingCount: "En attente de réception",
+        details: "Détails du fournisseur",
+        related: "Gérer le fournisseur",
+        backToList: "Retour aux fournisseurs",
         back: "Retour",
         edit: "Modifier le fournisseur",
         createOrder: "Nouveau bon de commande",
@@ -693,6 +699,9 @@ export const translations: typeof enTranslations = {
         colStatus: "Statut",
         deliveryArrow: "→",
         overdue: "en retard",
+        readyToBill: "Réception terminée, facturation possible",
+        openAttentionOrder: "Ouvrir la commande {{reference}}",
+        attentionCount: "Commandes à traiter : {{count}}",
         actionNeeded: "bons de commande à traiter",
         back: "Retour",
         loading: "Chargement…",
@@ -766,8 +775,10 @@ export const translations: typeof enTranslations = {
       description:
         "Afficher un bon de commande avec toutes ses lignes et l'historique des réceptions.",
       widget: {
+        precision:
+          "Les totaux des lignes utilisent le prix unitaire du fournisseur avant arrondi.",
         back: "Retour",
-        send: "Envoyer au fournisseur",
+        send: "Marquer comme envoyée",
         confirm: "Marquer comme confirmé",
         receive: "Réceptionner",
         convertToBill: "Convertir en facture",
@@ -999,9 +1010,9 @@ export const translations: typeof enTranslations = {
   // PO send
   orderSend: {
     post: {
-      title: "Envoyer le bon de commande",
-      titleShort: "Envoyer la commande",
-      description: "Marquer le bon de commande comme envoyé au fournisseur.",
+      title: "Marquer la commande comme envoyée",
+      titleShort: "Marquer comme envoyée",
+      description: "Enregistrez l’envoi du bon de commande.",
       poId: {
         label: "ID du bon de commande",
         description: "Bon de commande à envoyer",
@@ -1010,7 +1021,7 @@ export const translations: typeof enTranslations = {
         back: "Retour",
         backToPO: "Retour au bon de commande",
         warning:
-          "L'envoi marque ce bon de commande comme transmis au fournisseur. Le statut passe de Brouillon à Envoyé.",
+          "Le statut du bon de commande passe à Envoyé dans cet espace de travail.",
       },
       errors: {
         validation: {
@@ -1052,8 +1063,8 @@ export const translations: typeof enTranslations = {
         },
       },
       success: {
-        title: "Bon de commande envoyé",
-        description: "Bon de commande marqué comme Envoyé",
+        title: "Commande marquée comme envoyée",
+        description: "Le bon de commande est désormais au statut Envoyé.",
       },
       response: {
         id: "ID du bon de commande",
@@ -1136,6 +1147,10 @@ export const translations: typeof enTranslations = {
       description:
         "Enregistrer la réception de marchandise sur un bon de commande. Génère les mouvements de stock.",
       widget: {
+        retry: "Réessayer",
+        loading: "Chargement de la commande…",
+        remaining: "Quantité restante : {{quantity}}",
+        noOpenLines: "Toutes les quantités commandées ont été réceptionnées.",
         backToPO: "Retour au bon de commande",
       },
       poId: {
@@ -1286,6 +1301,10 @@ export const translations: typeof enTranslations = {
   orderLineAdd: {
     post: {
       widget: {
+        productSearch: "Rechercher un produit par nom ou référence",
+        search: "Rechercher",
+        noProducts: "Aucun produit correspondant.",
+        clearProduct: "Retirer le produit",
         backToOrder: "Retour à la commande",
         lineAdded: "Ligne ajoutée",
       },
@@ -1385,6 +1404,11 @@ export const translations: typeof enTranslations = {
       },
       lineId: { label: "ID de la ligne", description: "Ligne à retirer" },
       widget: {
+        updatedOrderTotals: "Totaux actualisés de la commande",
+        cancel: "Annuler",
+        verifying: "Vérification de la ligne sélectionnée…",
+        unavailable:
+          "Rouvrez le bon de commande en brouillon et sélectionnez la ligne à supprimer.",
         backToOrder: "Retour au bon de commande",
         warning: "La ligne sera définitivement retirée du bon de commande.",
       },

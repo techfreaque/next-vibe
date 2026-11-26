@@ -7,11 +7,13 @@ export const translations = {
   },
 
   rate: {
+    details: "Rate details",
     create: {
       title: "Create Tax Rate",
       titleShort: "Create Rate",
       description: "Add a tax rate for your company",
       widget: {
+        save: "Create tax rate",
         backToList: "Back to Tax Rates",
       },
       companyId: {
@@ -103,6 +105,10 @@ export const translations = {
       titleShort: "Tax Rates",
       description: "All tax rates configured for your company",
       widget: {
+        actions: "Actions",
+        retry: "Try again",
+        previous: "Previous",
+        next: "Next",
         addRate: "Add Rate",
         labelDefault: "Default",
         labelActive: "Active",
@@ -199,6 +205,7 @@ export const translations = {
       titleShort: "Update Rate",
       description: "Modify an existing tax rate",
       widget: {
+        save: "Save tax rate",
         backToList: "Back to Tax Rates",
         failed: "Failed",
       },
@@ -332,6 +339,7 @@ export const translations = {
     description:
       "Review recorded tax on sales invoices, credit notes, supplier bills, and till sales.",
     widget: {
+      retry: "Run report again",
       scope:
         "Invoices use their linked ledger date or their creation date. Purchases use the bill date. Till sales use their UTC completion date and include lines with a positive rate or recorded tax. When an issued invoice shares a ledger entry with a till sale, the invoice represents the sale.",
       empty: "No document lines match these filters.",
@@ -341,6 +349,8 @@ export const translations = {
       unknownRate: "Rate unavailable",
       run: "Run report",
       running: "Running report…",
+      scopeHint:
+        "Compare sales and purchase tax by rate for one company and period.",
       selectCompany: "Select the company for this report.",
     },
     currency: {
@@ -413,6 +423,8 @@ export const translations = {
 
   enums: {
     reportDirection: {
+      nonDeductible: "Non-deductible supplier VAT",
+      reverseCharge: "Reverse-charge VAT payable",
       posSales: "Till sales",
       sales: "Sales invoices",
       creditNotes: "Sales credit notes",

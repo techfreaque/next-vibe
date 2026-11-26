@@ -70,7 +70,10 @@ export const translations: typeof enTranslations = {
     back: "Späť",
     submit: "Vytvoriť faktúru",
     converted: "Z tejto cenovej ponuky sa vytvorila faktúra.",
-    viewInvoice: "Zobraziť faktúru",
+    savedDraftNumber: "Koncept faktúry č. {{number}} bol vytvorený",
+    savedDraft: "Koncept faktúry bol vytvorený",
+    convertedNumber: "Vytvorené z cenovej ponuky {{number}}.",
+    viewInvoice: "Otvoriť koncept faktúry",
     convertNote:
       "Vytvorí sa koncept faktúry s rovnakými položkami. Cenová ponuka sa označí ako prevedená na faktúru.",
   },

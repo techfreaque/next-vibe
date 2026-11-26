@@ -20,9 +20,84 @@ export const category: CategoryDefinition = {
     "es-ES": "Agente de IA",
     "sk-SK": "Agent AI",
   },
+  description: {
+    "en-US": "Explore models, skills and conversations.",
+    "de-DE": "Öffnen Sie Modelle, Fähigkeiten und Unterhaltungen.",
+    "pl-PL": "Przeglądaj modele, umiejętności i rozmowy.",
+    "fr-FR": "Retrouvez les modèles, les compétences et les conversations.",
+    "it-IT": "Esplori modelli, competenze e conversazioni.",
+    "es-ES": "Explore modelos, habilidades y conversaciones.",
+    "sk-SK": "Prezrite si modely, zručnosti a konverzácie.",
+    "en-GLOBAL": "Explore models, skills and conversations.",
+  },
   group: "ai",
   icon: "bot",
   order: 10,
+  createActions: ["skill-create"],
+  landing: {
+    heading: {
+      "en-US": "AI",
+      "en-GLOBAL": "AI",
+      "de-DE": "KI",
+      "pl-PL": "AI",
+      "fr-FR": "IA",
+      "it-IT": "IA",
+      "es-ES": "IA",
+      "sk-SK": "AI",
+    },
+    destinationDescriptions: {
+      models: {
+        "en-US": "Browse available models and compare prices.",
+        "en-GLOBAL": "Browse available models and compare prices.",
+        "de-DE": "Verfügbare Modelle ansehen und Preise vergleichen.",
+        "pl-PL": "Przeglądaj dostępne modele i porównuj ceny.",
+        "fr-FR": "Consultez les modèles disponibles et comparez les prix.",
+        "it-IT": "Esplori i modelli disponibili e confronti i prezzi.",
+        "es-ES": "Consulte los modelos disponibles y compare los precios.",
+        "sk-SK": "Prezrite si dostupné modely a porovnajte ceny.",
+      },
+      skills: {
+        "en-US": "Browse reusable instructions and tools for agents.",
+        "en-GLOBAL": "Browse reusable instructions and tools for agents.",
+        "de-DE":
+          "Wiederverwendbare Anweisungen und Werkzeuge für Agenten ansehen.",
+        "pl-PL":
+          "Przeglądaj instrukcje i narzędzia wielokrotnego użytku dla agentów.",
+        "fr-FR":
+          "Parcourez les instructions et outils réutilisables par les agents.",
+        "it-IT":
+          "Esplori istruzioni e strumenti riutilizzabili per gli agenti.",
+        "es-ES":
+          "Explore instrucciones y herramientas reutilizables para agentes.",
+        "sk-SK":
+          "Prezrite si opakovane použiteľné pokyny a nástroje pre agentov.",
+      },
+      "agent-chat-threads": {
+        "en-US": "Open your saved agent conversations.",
+        "en-GLOBAL": "Open your saved agent conversations.",
+        "de-DE": "Eigene gespeicherte Unterhaltungen mit Agenten öffnen.",
+        "pl-PL": "Otwórz zapisane rozmowy z agentami.",
+        "fr-FR": "Ouvrez vos conversations enregistrées avec les agents.",
+        "it-IT": "Apra le conversazioni salvate con gli agenti.",
+        "es-ES": "Abra sus conversaciones guardadas con agentes.",
+        "sk-SK": "Otvorte svoje uložené konverzácie s agentmi.",
+      },
+      "task-list": {
+        "en-US": "Check task status and upcoming runs.",
+        "en-GLOBAL": "Check task status and upcoming runs.",
+        "de-DE": "Aufgabenstatus und nächste Ausführungen prüfen.",
+        "pl-PL": "Sprawdź stan zadań i terminy kolejnych uruchomień.",
+        "fr-FR": "Vérifiez l’état des tâches et les prochaines exécutions.",
+        "it-IT": "Controlli lo stato delle attività e le prossime esecuzioni.",
+        "es-ES":
+          "Compruebe el estado de las tareas y sus próximas ejecuciones.",
+        "sk-SK": "Skontrolujte stav úloh a ich najbližšie spustenia.",
+      },
+    },
+    summary: { alias: "ai-admin-summary", scope: "platform" },
+    destinations: ["models", "skills", "agent-chat-threads", "task-list"],
+    actions: ["skill-create"],
+  },
   defaultEntry: {
     [UserPermissionRole.ADMIN]: AI_STREAM_ALIAS,
     [UserPermissionRole.CUSTOMER]: AI_STREAM_ALIAS,

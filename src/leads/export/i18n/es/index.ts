@@ -54,8 +54,9 @@ export const translations: typeof enTranslations = {
       description: "Exportar leads creados hasta esta fecha",
     },
     includeMetadata: {
-      label: "Incluir los metadatos",
-      description: "Incluya la creación y actualizaciones timetamps",
+      label: "Incluir metadatos técnicos",
+      description:
+        "Añade fechas, dirección IP, datos del dispositivo, código de referido y metadatos guardados.",
     },
     includeEngagementData: {
       label: "Incluir los datos de compromiso",
@@ -117,7 +118,8 @@ export const translations: typeof enTranslations = {
     },
   },
   widget: {
-    exportLeads: "Export Leads",
+    prepareFile: "Preparar exportación",
+    exportLeads: "Exportar leads",
     import: "Importación",
     viewList: "Ver lista",
     importLeadsTitle: "Importar contactos",
@@ -126,7 +128,7 @@ export const translations: typeof enTranslations = {
     generatingExport: "Generando exportación...",
     generatingExportHint:
       "Esto puede tomar un momento para grandes conjuntos de datos",
-    exportReady: "Exportar",
+    exportReady: "Exportación lista",
     fileReadyToDownload: "Su archivo está listo para descargar",
     records: "Documentos",
     format: "Format",
@@ -138,7 +140,7 @@ export const translations: typeof enTranslations = {
     nextSteps: "Siguientes pasos:",
     viewLeads: "View Leads",
     importLeads: "Importar contactos",
-    configureExport: "Configure Export",
+    configureExport: "Opciones del archivo",
     configureExportHint:
       "Seleccione el formato y los filtros a continuación, haga clic en Exportar para generar su archivo",
     formatLabel: "Format",
@@ -153,6 +155,19 @@ export const translations: typeof enTranslations = {
     viewLeadsList: "Ver Lista de Líderes",
     excelSpreadsheet: "Excel Spreadsheet",
     csvFile: "CSV File",
+    description:
+      "Elige el formato del archivo y filtra los leads que quieres exportar.",
+    changeFilters: "Cambiar filtros",
+    advancedFilters: "Filtros avanzados",
+    activeFilters: "Filtros activos: {{count}}",
+    exportFailed:
+      "No se pudo preparar la exportación. Se conservan los filtros seleccionados. Vuelva a intentarlo.",
+    retry: "Volver a intentar",
+    noMatchingRecords: "Ningún lead coincide con los filtros",
+    noMatchingRecordsHint:
+      "Cambia o quita un filtro y vuelve a preparar la exportación.",
+    fileDetails: "Registros: {{count}} · {{size}}",
+    generatedAt: "Generado el {{date}}",
   },
   enums: {
     exportFormat: {

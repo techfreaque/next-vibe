@@ -16,6 +16,7 @@ export const translations: typeof enTranslations = {
     },
     response: {
       companyName: "Entreprise",
+      remainingCredit: "Montant disponible pour un avoir",
       amountPaid: "Montant payé",
       amountDue: "Reste à payer",
       id: "ID de facture",
@@ -93,6 +94,9 @@ export const translations: typeof enTranslations = {
     placeholder: "Saisir l'ID de facture",
   },
   widget: {
+    sourceQuote: "Devis d’origine",
+    openSourceQuote: "Ouvrir le devis d’origine",
+    draftReference: "Brouillon de facture n° {{number}}",
     recentReminderDrafts: "Brouillons de relance récents",
     receipts: "Historique des encaissements",
     receiptDate: "Date d’encaissement",
@@ -128,6 +132,12 @@ export const translations: typeof enTranslations = {
     recordPayment: "Enregistrer un paiement",
     sendReminder: "Préparer une relance",
     void: "Annuler",
+    remainingBalance: "Solde restant",
+    originalTotal: "Montant initial de la facture",
+    voidReversalDate: "Date de contrepassation",
+    viewOriginalJournal: "Ouvrir l’écriture d’origine",
+    viewVoidReversal: "Ouvrir l’écriture de contrepassation",
+    backToInvoiceList: "Retour aux factures",
     viewJournalEntry: "Voir l'écriture comptable",
     status: {
       draft: "Brouillon",

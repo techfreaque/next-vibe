@@ -93,6 +93,10 @@ export const translations: typeof enTranslations = {
     },
   },
   widget: {
+    loadingReport: "Načítava sa prehľad tržieb…",
+    operatingTitle: "Prevádzkové tržby",
+    currencyBasis: "Sumy sú uvádzané v približnej hodnote v USD.",
+    filterDisclosure: "Filtre",
     extra: {
       grossHint: "Predplatné {{subs}} · balíky {{packs}} · cca. USD",
       newSubsHint:

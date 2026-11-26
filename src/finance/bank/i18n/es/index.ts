@@ -1,6 +1,95 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  adjustment: {
+    confirmHint:
+      "Confirme para vincular el movimiento bancario y contabilizar los ajustes indicados.",
+    autoMatch: "Conciliar automáticamente los pagos verificados a proveedores",
+    autoMatched: "Conciliados automáticamente",
+    followup: "Seguimiento del movimiento",
+    followupHint:
+      "Revisa un borrador de proveedor o anula una conciliación confirmada.",
+    vendor: "Proveedor",
+    expenseAccount: "Cuenta de gastos",
+    reversalDate: "Fecha de reversión (AAAA-MM-DD)",
+    reason: "Motivo de la anulación",
+    openDraft: "Abrir factura de proveedor",
+    settings: "Ajustes de conciliación bancaria",
+    settingsHint:
+      "Configura la divisa de la cuenta, el par permitido, el intervalo y los límites.",
+    settingsSaved: "Ajustes de conciliación guardados",
+    save: "Guardar ajustes",
+    foreignCurrency: "Divisa de la factura para diferencias de cambio",
+    absTolerance: "Diferencia de cambio máxima en la divisa de la cuenta",
+    bpsTolerance: "Diferencia de cambio máxima en puntos básicos",
+    days: "Intervalo de conciliación en días",
+    gainAccount: "Cuenta de ganancias de cambio",
+    lossAccount: "Cuenta de pérdidas de cambio",
+    feeAccount: "Cuenta de gastos por comisiones documentadas",
+    invalidSettings:
+      "Revisa el par de divisas, los límites y las cuentas activas de la empresa.",
+    description: "Ajuste de conciliación {{reference}}",
+    unavailable:
+      "No se pudo contabilizar el ajuste. Revisa la fecha, el período abierto y las cuentas.",
+    journal: "Asiento de ajuste",
+    kind: "Tipo de conciliación",
+    fxDifference: "Ganancia o pérdida de cambio",
+    release: "Anular conciliación bancaria",
+    releaseHint:
+      "Desvincula la línea y revierte el ajuste en un período abierto.",
+    releaseSuccess: "Conciliación anulada",
+    draft: "Borrador de factura desde movimiento bancario",
+    draftHint:
+      "Usa el importe contabilizado como justificante provisional. Añade la factura original antes de deducir impuestos.",
+    draftReady: "Borrador de proveedor listo",
+    confirmDraft: "Crear borrador provisional",
+    sourceMemo:
+      "Justificante bancario {{reference}}. Factura original pendiente.",
+  },
+  statement: {
+    projected: "Listas para importar",
+    localPreview:
+      "La vista previa muestra fechas e importes antes del filtro de privacidad.",
+    screenedOut: "Excluidas por el filtro de privacidad",
+    screenedOutCount:
+      "El filtro de privacidad dejó {{count}} líneas fuera del registro bancario.",
+    format: "Formato del extracto",
+    mapping: "Asignación de columnas",
+    preview: "Vista previa de la importación",
+    previewSuccess: "Vista previa de la importación",
+    invalid:
+      "El formato seleccionado no permite leer el extracto (fila {{row}}).",
+    decimal: "Separador decimal",
+    dotDecimal: "Punto decimal",
+    commaDecimal: "Coma decimal",
+    unmapped: "Sin columna",
+    overlap:
+      "Posible solapamiento con otro extracto. Revisa las referencias bancarias originales.",
+    columns: {
+      counterpartyIban: "IBAN de la contraparte",
+      id: "Referencia bancaria",
+      date: "Fecha contable",
+      valueDate: "Fecha valor",
+      amount: "Importe contabilizado",
+      currency: "Divisa de contabilización",
+      nativeAmount: "Importe original",
+      nativeCurrency: "Divisa original",
+      feeAmount: "Comisión documentada",
+      feeCurrency: "Divisa de la comisión",
+      description: "Descripción",
+      counterparty: "Contraparte",
+      status: "Estado",
+    },
+    formats: {
+      normalized: "CSV estándar",
+      c24: "CSV de C24",
+      revolut: "CSV de Revolut personal",
+      revolutBusiness: "CSV de Revolut Business",
+      mapped: "CSV personalizado",
+      camt053: "CAMT.053",
+      mt940: "MT940",
+    },
+  },
   tags: {
     bank: "banca",
     reconciliation: "conciliación",
@@ -10,7 +99,7 @@ export const translations: typeof enTranslations = {
     status: "Estado",
     company: "Empresa",
     account: "Cuenta bancaria",
-    csv: "Extracto CSV",
+    csv: "Extracto bancario",
     line: "Movimiento bancario",
     transactionId: "ID de transacción",
     bookedDate: "Fecha contable",
@@ -29,23 +118,24 @@ export const translations: typeof enTranslations = {
     total: "Total",
   },
   ui: {
-    csvFormat: "Formato CSV",
-    commaFormat: "Separador coma y punto decimal",
-    semicolonFormat: "Separador punto y coma y coma decimal",
+    exactMatch: "Coincidencia exacta",
+    csvFormat: "Separador de columnas",
+    commaFormat: "Coma",
+    semicolonFormat: "Punto y coma",
     sameDay: "Mismo importe y fecha",
-    upload: "Elegir archivo CSV",
-    dropCsv: "O arrastra un CSV aquí",
-    pasteCsv: "Pegar texto CSV",
-    supportedFormat: "Formato admitido",
+    upload: "Elegir archivo del extracto",
+    dropCsv: "O suelta un extracto aquí",
+    pasteCsv: "Pegar texto del extracto",
+    supportedFormat: "Formatos compatibles",
     mapping: "Asignar columnas",
     chooseColumn: "Elegir columna del CSV",
     preview: "Vista previa (primeros 5 movimientos)",
     matchRow: "Conciliar",
     unmatched: "Pendiente",
     csvHelp:
-      "Asigna un identificador estable, una fecha (AAAA-MM-DD o DD.MM.AAAA), un importe con signo en el formato decimal elegido y una moneda en mayúsculas. Los importes positivos son ingresos. Un movimiento por línea, sin separadores de miles.",
+      "Elige un extracto bancario o asigna las columnas CSV. La fecha contable y el importe con signo son obligatorios.",
     unsupported:
-      "Convierte antes CAMT XML, OFX/QFX, MT940, hojas de cálculo, PDF y CSV con otros separadores o registros de varias líneas.",
+      "Usa CSV, CAMT.053 XML o texto MT940. Convierte primero los PDF, hojas de cálculo y otros formatos.",
     chooseScope: "Selecciona una empresa y una cuenta bancaria activa.",
     empty: "No hay movimientos por conciliar",
     emptyHint: "Importa un extracto para empezar.",
@@ -54,7 +144,7 @@ export const translations: typeof enTranslations = {
     noCandidatesHint:
       "Comprueba la cuenta bancaria, la moneda y el importe del asiento.",
     alreadyMatched: "Este movimiento ya está conciliado.",
-    importAction: "Importar CSV",
+    importAction: "Importar extracto",
     listAction: "Mostrar movimientos bancarios",
     back: "Volver",
     previous: "Anterior",
@@ -126,7 +216,7 @@ export const translations: typeof enTranslations = {
   },
   import: {
     title: "Importar extracto bancario",
-    description: "Sube o pega el CSV de una cuenta bancaria.",
+    description: "Cargue o pegue el extracto de una cuenta bancaria.",
     success: "Extracto procesado",
   },
   list: {

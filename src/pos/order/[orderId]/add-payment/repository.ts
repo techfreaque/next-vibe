@@ -3,7 +3,7 @@
  * Records a payment against an open order
  */
 
-import { eq, sql } from "drizzle-orm";
+import { count, eq, sql } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
@@ -15,10 +15,17 @@ import {
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { posPayments } from "../../../db";
+import { accountNodes } from "@/chart-of-accounts/db";
+import { lockLedgerCompany } from "@/chart-of-accounts/shared/ledger-write";
+
+import { posOrders, posPayments } from "../../../db";
 import { PosPaymentMethod } from "../../../enum";
 import { scopedTranslation } from "../../../i18n";
 import { withOpenOrder } from "../../open-order";
+import {
+  isPosMinorUnitAmount,
+  posSettlementAmounts,
+} from "../../settlement-amounts";
 import type { PosOrderAddPaymentPostRequestOutput } from "./definition";
 
 export class PosOrderAddPaymentRepository {
@@ -27,6 +34,7 @@ export class PosOrderAddPaymentRepository {
     userId: string,
     logger: EndpointLogger,
     locale: CountryLanguage = defaultLocale,
+    pathOrderId?: string,
   ): Promise<
     ResponseType<{
       result: {
@@ -42,6 +50,13 @@ export class PosOrderAddPaymentRepository {
   > {
     const { t } = scopedTranslation.scopedT(locale);
 
+    if (pathOrderId !== undefined && pathOrderId !== data.details.orderId) {
+      return fail({
+        message: t("orderAddPayment.post.errors.validation.title"),
+        errorType: ErrorResponseTypes.VALIDATION_ERROR,
+      });
+    }
+
     try {
       const { details } = data;
 
@@ -56,14 +71,69 @@ export class PosOrderAddPaymentRepository {
           conflict: t("orderAddPayment.post.errors.conflict.title"),
         },
         async (tx, order) => {
+          if (
+            details.method === PosPaymentMethod.CASH &&
+            order.currency !== order.terminalCurrency
+          ) {
+            return fail({
+              message: t("workflow.cashCurrencyMismatch"),
+              errorType: ErrorResponseTypes.CONFLICT,
+            });
+          }
+          if (
+            !isPosMinorUnitAmount(details.amount) ||
+            (details.change !== undefined &&
+              !isPosMinorUnitAmount(details.change))
+          ) {
+            return fail({
+              message: t("workflow.tenderMinorUnits"),
+              errorType: ErrorResponseTypes.VALIDATION_ERROR,
+            });
+          }
+
+          // Coordinate with chart setup and company-currency changes while
+          // accepting tender. Completion revalidates under the same lock.
+          const company = await lockLedgerCompany(tx, order.companyId);
+          if (!company) {
+            return fail({
+              message: t("orderAddPayment.post.errors.notFound.title"),
+              errorType: ErrorResponseTypes.NOT_FOUND,
+            });
+          }
+
           const [paid] = await tx
             .select({
+              count: count(),
+              explicitAccount: sql<boolean>`coalesce(bool_or(${posPayments.accountNodeId} is not null), false)`,
               total: sql<string>`coalesce(sum(${posPayments.amount} - ${posPayments.change}),0)`,
             })
             .from(posPayments)
             .where(eq(posPayments.orderId, details.orderId));
+          if (order.currency !== (company.currency ?? "EUR")) {
+            const [ledgerAccount] = await tx
+              .select({ id: accountNodes.id })
+              .from(accountNodes)
+              .where(eq(accountNodes.companyId, order.companyId))
+              .limit(1);
+            if (
+              ledgerAccount ||
+              order.cashAccountId ||
+              details.accountNodeId ||
+              paid.explicitAccount
+            ) {
+              return fail({
+                message: t("workflow.ledgerCurrencyMismatch"),
+                errorType: ErrorResponseTypes.CONFLICT,
+              });
+            }
+          }
+          const settlement =
+            paid.count === 0
+              ? posSettlementAmounts(order.total, order.taxAmount)
+              : undefined;
+          const orderTotal = settlement?.total ?? order.total;
           const remaining =
-            Math.round(order.total * 10_000) -
+            Math.round(orderTotal * 10_000) -
             Math.round(Number(paid.total) * 10_000);
           const amount = Math.round(details.amount * 10_000);
           const change =
@@ -71,6 +141,12 @@ export class PosOrderAddPaymentRepository {
             details.method === PosPaymentMethod.CASH
               ? Math.max(0, amount - remaining)
               : Math.round((details.change ?? 0) * 10_000);
+          if (change % 100 !== 0) {
+            return fail({
+              message: t("workflow.legacyTenderReview"),
+              errorType: ErrorResponseTypes.CONFLICT,
+            });
+          }
           if (
             remaining <= 0 ||
             !Number.isSafeInteger(amount) ||
@@ -114,9 +190,16 @@ export class PosOrderAddPaymentRepository {
             });
           }
 
+          if (settlement) {
+            await tx
+              .update(posOrders)
+              .set({ ...settlement, updatedAt: new Date() })
+              .where(eq(posOrders.id, details.orderId));
+          }
+
           const outstanding = (remaining - amount + change) / 10_000;
           const totalPaid =
-            (Math.round(order.total * 10_000) -
+            (Math.round(orderTotal * 10_000) -
               Math.round(outstanding * 10_000)) /
             10_000;
           return success({

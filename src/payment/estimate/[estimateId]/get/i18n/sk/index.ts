@@ -1,6 +1,7 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  lineRounding: "Zaokrúhľovanie položiek",
   category: "Cenové ponuky",
   tags: { payment: "platba", estimate: "cenová ponuka" },
   post: {
@@ -60,7 +61,9 @@ export const translations: typeof enTranslations = {
     description: "Cenová ponuka, ktorej sa úkon týka",
   },
   widget: {
-    send: "Odoslať cenovú ponuku",
+    send: "Označiť ako odoslanú",
+    terms: "Podmienky",
+    noItems: "Táto cenová ponuka neobsahuje žiadne položky.",
     addLine: "Pridať položku",
     accept: "Zaevidovať prijatie",
     decline: "Zaevidovať odmietnutie",

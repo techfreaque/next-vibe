@@ -7,9 +7,9 @@ export const translations: typeof enTranslations = {
     list: "Elenco",
   },
   get: {
-    title: "Abbonamenti aziendali",
-    titleShort: "Società Subs",
-    description: "Elenca tutti gli abbonamenti per una società",
+    title: "Abbonamenti del titolare",
+    titleShort: "Abbonamenti del titolare",
+    description: "Consulta l’abbonamento personale del titolare dell’azienda.",
     companyId: {
       label: "Società ID",
       description: "L'azienda i cui abbonamenti elencano",

@@ -12,7 +12,12 @@ export async function refreshInvoiceDocuments(
   ]);
   await Promise.all([
     apiClient.refetchEndpoint(dashboard.default.GET, logger),
-    apiClient.refetchEndpoint(list.default.GET, logger),
+    apiClient.refetchEndpoint(list.default.GET, logger, {
+      requestData: { selection: undefined },
+    }),
+    apiClient.refetchEndpoint(list.default.GET, logger, {
+      requestData: { selection: "credit" },
+    }),
     invoiceId
       ? apiClient.refetchEndpoint(detail.default.GET, logger, {
           urlPathParams: { invoiceId },

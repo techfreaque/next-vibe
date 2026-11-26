@@ -48,7 +48,6 @@ import { ExternalLink as ExternalLinkIcon } from "next-vibe/ui/components/icons/
 import { Globe } from "next-vibe/ui/components/icons/Globe";
 import { Info } from "next-vibe/ui/components/icons/Info";
 import { Loader2 } from "next-vibe/ui/components/icons/Loader2";
-import { Mail } from "next-vibe/ui/components/icons/Mail";
 import { Pencil } from "next-vibe/ui/components/icons/Pencil";
 import { Phone } from "next-vibe/ui/components/icons/Phone";
 import { Save } from "next-vibe/ui/components/icons/Save";
@@ -56,12 +55,10 @@ import { Search } from "next-vibe/ui/components/icons/Search";
 import { Send } from "next-vibe/ui/components/icons/Send";
 import { Target } from "next-vibe/ui/components/icons/Target";
 import { Trash2 } from "next-vibe/ui/components/icons/Trash2";
-import { User } from "next-vibe/ui/components/icons/User";
 import { Input } from "next-vibe/ui/components/input";
 import { Label } from "next-vibe/ui/components/label";
 import { ExternalLink } from "next-vibe/ui/components/link";
 import { ListItem } from "next-vibe/ui/components/list-item";
-import { LoadingBlock } from "next-vibe/ui/components/loading-block";
 import { MetricCard } from "next-vibe/ui/components/metric-card";
 import { MetricGrid } from "next-vibe/ui/components/metric-grid";
 import { ProgressBlock } from "next-vibe/ui/components/progress-block";
@@ -89,6 +86,7 @@ import { P } from "next-vibe/ui/components/typography";
 import { WidgetHeader } from "next-vibe/ui/components/widget-header";
 import { WidgetShell } from "next-vibe/ui/components/widget-shell";
 import { copyToClipboard } from "next-vibe/ui/lib/clipboard";
+import { AdminRecordDetail } from "next-vibe/unified-ui/_shared/admin-record-detail";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
 import {
   RelatedEntitiesPanel,
@@ -324,81 +322,6 @@ function daysSince(date: Date | string | null | undefined): number | null {
   return Math.floor((Date.now() - d.getTime()) / (1000 * 60 * 60 * 24));
 }
 
-// ─── Lead header (shared between view tabs) ───────────────────────────────────
-
-function LeadHeader({
-  businessName,
-  email,
-  contactName,
-  leadId,
-  status,
-  isConverted,
-  t,
-  leadsT,
-}: {
-  businessName: string | null | undefined;
-  email: string | null | undefined;
-  contactName: string | null | undefined;
-  leadId: string | null | undefined;
-  status:
-    | NonNullable<LeadGetResponseOutput["lead"]>["basicInfo"]["status"]
-    | null
-    | undefined;
-  isConverted: boolean;
-  t: ReturnType<typeof useWidgetTranslation<typeof definition.GET>>;
-  leadsT: LeadsT;
-}): React.JSX.Element {
-  return (
-    <SectionGroup
-      title=""
-      subtitle={
-        <Div className="flex items-start gap-4 w-full">
-          <Div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center text-lg font-bold text-primary flex-shrink-0">
-            {(businessName ?? email ?? "?").slice(0, 2).toUpperCase()}
-          </Div>
-          <Div className="flex-1 min-w-0">
-            <Div className="flex flex-wrap items-center gap-2 mb-1">
-              <Strong className="text-lg font-bold">
-                {businessName ?? "—"}
-              </Strong>
-              {status && (
-                <StatusPill
-                  status={leadsT(status)}
-                  variant={STATUS_VARIANT[status] ?? "default"}
-                />
-              )}
-              {isConverted && (
-                <StatusPill status={t("widget.converted")} variant="success" />
-              )}
-            </Div>
-            {contactName && (
-              <P className="text-sm text-muted-foreground flex items-center gap-1">
-                <User className="h-3 w-3" />
-                {contactName}
-              </P>
-            )}
-            {email && (
-              <Div className="flex items-center gap-1">
-                <Mail className="h-3 w-3 text-muted-foreground flex-shrink-0" />
-                <P className="text-sm text-muted-foreground">{email}</P>
-                <CopyButton text={email} label={t("widget.copyEmail")} />
-              </Div>
-            )}
-            {leadId && (
-              <Div className="flex items-center gap-1 mt-0.5">
-                <P className="text-xs text-muted-foreground/60 font-mono">
-                  {leadId}
-                </P>
-                <CopyButton text={leadId} label={t("widget.copyId")} />
-              </Div>
-            )}
-          </Div>
-        </Div>
-      }
-    />
-  );
-}
-
 // ─── Overview tab content ─────────────────────────────────────────────────────
 
 function OverviewTab({
@@ -406,30 +329,18 @@ function OverviewTab({
   locale,
   t,
   leadsT,
-  onEdit,
-  onDelete,
   onSendTestEmail,
   onViewInSearch,
-  onViewUserProfile,
 }: {
   data: NonNullable<LeadGetResponseOutput["lead"]>;
   locale: CountryLanguage;
   t: ReturnType<typeof useWidgetTranslation<typeof definition.GET>>;
   leadsT: LeadsT;
-  onEdit: () => void;
-  onDelete: () => void;
   onSendTestEmail: () => void;
   onViewInSearch: () => void;
-  onViewUserProfile: (id: string) => void;
 }): React.JSX.Element {
-  const {
-    basicInfo,
-    contactDetails,
-    campaignTracking,
-    engagement,
-    conversion,
-    metadata,
-  } = data;
+  const { basicInfo, contactDetails, campaignTracking, engagement, metadata } =
+    data;
 
   const openRate =
     campaignTracking.emailsSent > 0
@@ -501,67 +412,30 @@ function OverviewTab({
         )}
       </Div>
 
-      {/* Quick actions */}
-      <SectionGroup title={t("widget.quickActions")}>
-        <Div className="flex flex-wrap gap-2">
+      {basicInfo.email && (
+        <Div className="flex flex-wrap gap-2 border-y py-2">
           <Button
             type="button"
             variant="outline"
             size="sm"
-            onClick={onEdit}
+            onClick={onViewInSearch}
             className="gap-1.5"
           >
-            <Pencil className="h-3.5 w-3.5" />
-            {t("widget.editLead")}
+            <Search className="size-3.5" />
+            {t("widget.viewInSearch")}
           </Button>
-          {basicInfo.email && (
-            <>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={onSendTestEmail}
-                className="gap-1.5"
-              >
-                <Send className="h-3.5 w-3.5" />
-                {t("widget.sendTestEmail")}
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={onViewInSearch}
-                className="gap-1.5"
-              >
-                <Search className="h-3.5 w-3.5" />
-                {t("widget.viewInSearch")}
-              </Button>
-            </>
-          )}
-          {conversion.convertedUserId && (
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => onViewUserProfile(conversion.convertedUserId!)}
-              className="gap-1.5"
-            >
-              <User className="h-3.5 w-3.5" />
-              {t("widget.userProfile")}
-            </Button>
-          )}
           <Button
             type="button"
             variant="ghost"
             size="sm"
-            onClick={onDelete}
-            className="gap-1.5 text-destructive hover:text-destructive"
+            onClick={onSendTestEmail}
+            className="gap-1.5"
           >
-            <Trash2 className="h-3.5 w-3.5" />
-            {t("widget.delete")}
+            <Send className="size-3.5" />
+            {t("widget.sendTestEmail")}
           </Button>
         </Div>
-      </SectionGroup>
+      )}
 
       {/* Campaign funnel */}
       <SectionGroup title={t("widget.campaignFunnel")}>
@@ -671,10 +545,12 @@ function DetailsTab({
   data,
   locale,
   t,
+  onViewUserProfile,
 }: {
   data: NonNullable<LeadGetResponseOutput["lead"]>;
   locale: CountryLanguage;
   t: ReturnType<typeof useWidgetTranslation<typeof definition.GET>>;
+  onViewUserProfile: (id: string) => void;
 }): React.JSX.Element {
   const { engagement, conversion, metadata } = data;
   const hasSubscription = Boolean(conversion.subscriptionConfirmedAt);
@@ -739,12 +615,17 @@ function DetailsTab({
               />
             )}
             {conversion.convertedUserId && (
-              <DetailField
-                label={t("widget.convertedUserId")}
-                value={conversion.convertedUserId}
-                mono
-                copyable
-              />
+              <Button
+                type="button"
+                variant="link"
+                className="justify-start px-0"
+                onClick={() =>
+                  conversion.convertedUserId &&
+                  onViewUserProfile(conversion.convertedUserId)
+                }
+              >
+                {t("widget.userProfile")}
+              </Button>
             )}
           </DetailGrid>
           {hasSubscription && (
@@ -1560,12 +1441,20 @@ export function LeadDetailContainer(): React.JSX.Element {
     navigation.push(leadsSearchDefinitions.GET);
   }, [navigation]);
 
-  if (!fieldValue) {
-    if (isLoading) {
+  const fallbackTitle = t("widget.leadFallbackTitle");
+  const backButton = (
+    <Button type="button" variant="outline" size="sm" onClick={handleBack}>
+      {t("widget.back")}
+    </Button>
+  );
+  if (!data) {
+    if (isLoading && !fieldValue) {
       return (
-        <WidgetShell>
-          <LoadingBlock message={t("widget.loading")} />
-        </WidgetShell>
+        <AdminRecordDetail
+          title={fallbackTitle}
+          backButton={backButton}
+          state={{ kind: "loading", label: t("widget.loading") }}
+        />
       );
     }
     if (
@@ -1573,54 +1462,67 @@ export function LeadDetailContainer(): React.JSX.Element {
       navigation.current?.params?.urlPathParams?.id
     ) {
       return (
-        <WidgetShell>
-          <EmptyBlock
-            title={response.message}
-            action={{ label: t("widget.back"), onClick: handleBack }}
-          />
-        </WidgetShell>
+        <AdminRecordDetail
+          title={fallbackTitle}
+          backButton={backButton}
+          state={{
+            kind: "error",
+            title: t("widget.loadFailed"),
+            message: response.message,
+            action: endpointMutations?.read?.refetch
+              ? {
+                  label: t("widget.retryLoad"),
+                  onClick: (): void => {
+                    void endpointMutations.read?.refetch?.();
+                  },
+                }
+              : undefined,
+          }}
+        />
+      );
+    }
+    if (fieldValue) {
+      return (
+        <AdminRecordDetail
+          title={fallbackTitle}
+          backButton={backButton}
+          state={{
+            kind: "empty",
+            title: t("widget.notFound"),
+            icon: <AlertCircle className="size-8" />,
+          }}
+        />
       );
     }
     return (
-      <WidgetShell>
-        <Div className="flex items-center justify-center h-full py-16">
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            className="gap-2"
-            onClick={() => {
+      <AdminRecordDetail
+        title={fallbackTitle}
+        backButton={backButton}
+        state={{
+          kind: "empty",
+          title: t("widget.selectLead"),
+          icon: <Search className="size-8" />,
+          action: {
+            label: t("widget.selectLead"),
+            onClick: () =>
               navigation.push(leadsSearchDefinitions.GET, {
                 renderInModal: true,
                 pickerCallback: (picked) => {
-                  const lead = picked as { id: string };
-                  navigation.replace(definition.GET, {
-                    urlPathParams: { id: lead.id },
-                  });
+                  if (
+                    typeof picked === "object" &&
+                    picked !== null &&
+                    "id" in picked &&
+                    typeof picked.id === "string"
+                  ) {
+                    navigation.replace(definition.GET, {
+                      urlPathParams: { id: picked.id },
+                    });
+                  }
                 },
-              });
-            }}
-          >
-            <Search className="h-4 w-4" />
-            {t("widget.selectLead")}
-          </Button>
-        </Div>
-      </WidgetShell>
-    );
-  }
-
-  if (!data) {
-    return (
-      <WidgetShell>
-        <EmptyBlock
-          icon={<AlertCircle className="h-8 w-8" />}
-          title={t("widget.notFound")}
-          action={{
-            label: t("widget.back"),
-            onClick: handleBack,
-          }}
-        />
-      </WidgetShell>
+              }),
+          },
+        }}
+      />
     );
   }
 
@@ -1655,99 +1557,110 @@ export function LeadDetailContainer(): React.JSX.Element {
   );
 
   return (
-    <WidgetShell padding="none">
-      {/* Top action bar */}
-      <Div className="px-4 pt-4">
-        <WidgetHeader
-          title={
-            basicInfo.businessName ??
-            basicInfo.email ??
-            t("widget.leadFallbackTitle")
-          }
-          backButton={
-            <Button variant="outline" size="sm" onClick={handleBack}>
-              {t("widget.back")}
-            </Button>
-          }
-          actions={headerActions}
-        />
-      </Div>
-
-      <Div className="px-4 pt-4 pb-6 flex flex-col gap-4">
-        <LeadHeader
-          businessName={basicInfo.businessName}
-          email={basicInfo.email}
-          contactName={basicInfo.contactName}
-          leadId={leadId}
-          status={basicInfo.status}
-          isConverted={Boolean(conversion.convertedUserId)}
-          t={t}
-          leadsT={leadsT}
-        />
-
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="w-full">
-            <TabsTrigger value="overview" className="flex-1">
-              {t("widget.tabOverview")}
-            </TabsTrigger>
-            <TabsTrigger value="details" className="flex-1">
-              {t("widget.tabDetails")}
-            </TabsTrigger>
-            <TabsTrigger value="identity" className="flex-1 relative">
-              {t("widget.tabIdentity")}
-              {identityCount > 0 && (
-                <Span className="absolute -top-1 -right-1 inline-flex items-center justify-center rounded-full bg-primary px-1 text-primary-foreground text-[10px] font-bold min-w-4 h-4">
-                  {identityCount}
-                </Span>
-              )}
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="overview" className="mt-4 flex flex-col gap-4">
-            <JourneyOverview
-              lead={data}
-              review={fieldValue.review}
-              locale={locale}
-              t={t}
-              leadsT={leadsT}
-            />
-            {fieldValue.traffic && (
-              <TrafficSection
-                traffic={fieldValue.traffic}
-                locale={locale}
-                t={t}
-              />
+    <AdminRecordDetail
+      border={false}
+      title={
+        basicInfo.businessName?.trim() ||
+        basicInfo.contactName?.trim() ||
+        basicInfo.email?.trim() ||
+        fallbackTitle
+      }
+      subtitle={
+        basicInfo.email && basicInfo.email !== basicInfo.businessName
+          ? basicInfo.email
+          : undefined
+      }
+      status={
+        basicInfo.status
+          ? {
+              status: basicInfo.status,
+              label: leadsT(basicInfo.status),
+              variant: STATUS_VARIANT[basicInfo.status] ?? "default",
+            }
+          : undefined
+      }
+      titleAccessory={
+        conversion.convertedUserId ? (
+          <StatusPill status={t("widget.converted")} variant="success" />
+        ) : undefined
+      }
+      backButton={backButton}
+      actions={headerActions}
+    >
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <TabsList className="h-auto w-full justify-start gap-2 rounded-none border-0 border-b bg-transparent p-0">
+          <TabsTrigger
+            value="overview"
+            className="h-auto min-h-11 whitespace-normal rounded-none border-b-2 border-transparent px-2 text-start data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=active]:shadow-none"
+          >
+            {t("widget.tabOverview")}
+          </TabsTrigger>
+          <TabsTrigger
+            value="details"
+            className="h-auto min-h-11 whitespace-normal rounded-none border-b-2 border-transparent px-2 text-start data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=active]:shadow-none"
+          >
+            {t("widget.tabDetails")}
+          </TabsTrigger>
+          <TabsTrigger
+            value="identity"
+            className="h-auto min-h-11 gap-1 whitespace-normal rounded-none border-b-2 border-transparent px-2 text-start data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=active]:shadow-none"
+          >
+            {t("widget.tabIdentity")}
+            {identityCount > 0 && (
+              <Span className="text-xs tabular-nums text-muted-foreground">
+                {identityCount}
+              </Span>
             )}
-            <OverviewTab
-              data={data}
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="overview" className="mt-4 flex flex-col gap-4">
+          <JourneyOverview
+            lead={data}
+            review={fieldValue.review}
+            locale={locale}
+            t={t}
+            leadsT={leadsT}
+          />
+          {fieldValue.traffic && (
+            <TrafficSection
+              traffic={fieldValue.traffic}
               locale={locale}
               t={t}
-              leadsT={leadsT}
-              onEdit={handleEdit}
-              onDelete={handleDelete}
-              onSendTestEmail={handleSendTestEmail}
-              onViewInSearch={handleViewInSearch}
-              onViewUserProfile={handleViewUserProfile}
             />
-          </TabsContent>
+          )}
+          <OverviewTab
+            data={data}
+            locale={locale}
+            t={t}
+            leadsT={leadsT}
+            onSendTestEmail={handleSendTestEmail}
+            onViewInSearch={handleViewInSearch}
+          />
+        </TabsContent>
 
-          <TabsContent value="details" className="mt-4">
-            <DetailsTab data={data} locale={locale} t={t} />
-          </TabsContent>
+        <TabsContent value="details" className="mt-4">
+          <DetailsTab
+            data={data}
+            locale={locale}
+            t={t}
+            onViewUserProfile={handleViewUserProfile}
+          />
+          {leadId && <CopyButton text={leadId} label={t("widget.copyId")} />}
+        </TabsContent>
 
-          <TabsContent value="identity" className="mt-4">
-            <LinkedIdentitiesTab
-              data={data}
-              review={fieldValue.review}
-              locale={locale}
-              t={t}
-              leadsT={leadsT}
-              onViewUserProfile={handleViewUserProfile}
-            />
-          </TabsContent>
-        </Tabs>
-      </Div>
-    </WidgetShell>
+        <TabsContent value="identity" className="mt-4">
+          <LinkedIdentitiesTab
+            data={data}
+            review={fieldValue.review}
+            locale={locale}
+            t={t}
+            leadsT={leadsT}
+            onViewUserProfile={handleViewUserProfile}
+          />
+        </TabsContent>
+      </Tabs>
+    </AdminRecordDetail>
   );
 }
 

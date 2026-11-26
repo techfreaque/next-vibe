@@ -7,6 +7,28 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   ...analyticsTranslations,
   ...leadAnalyticsTranslations,
+  platformSummary: {
+    grossReceipts: "Incassi lordi",
+    refunds: "Rimborsi",
+    netReceipts: "Incassi al netto dei rimborsi",
+
+    valuationBasis:
+      "Il margine è il valore dei crediti a listino meno il costo del fornitore. Include solo gli utilizzi con un costo registrato.",
+    valuationCost: "Costo IA stimato",
+    valuationMargin: "Margine stimato sull’uso dell’IA",
+    newAccount: "Account registrato",
+    receivedPayment: "Pagamento ricevuto",
+    completedTask: "Attività pianificata completata",
+    operations: "Operazioni",
+    emptyActivity: "Nessuna attività nel periodo.",
+    period: "Ultimi 30 giorni rispetto ai 30 precedenti",
+    retry: "Riprova",
+    title: "Panoramica della piattaforma",
+    description:
+      "Consulti acquisizione, ricavi e stato dei servizi negli ultimi 30 giorni.",
+    unavailable: "Non disponibile",
+    recent: "Attività recente",
+  },
   category: "Analisi",
   tags: {
     analytics: "Analisi",

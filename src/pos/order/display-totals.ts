@@ -1,7 +1,6 @@
 import { PosOrderStatus } from "../enum";
 
-export function cashChangeDue(
-  tendered: number,
+export function outstandingSaleAmount(
   total: number,
   payments: readonly { amount: number; change: number | null }[],
 ): number {
@@ -12,7 +11,17 @@ export function cashChangeDue(
       Math.round((payment.change ?? 0) * 10_000),
     0,
   );
-  const outstanding = Math.max(0, Math.round(total * 10_000) - received);
+  return Math.max(0, Math.round(total * 10_000) - received) / 10_000;
+}
+
+export function cashChangeDue(
+  tendered: number,
+  total: number,
+  payments: readonly { amount: number; change: number | null }[],
+): number {
+  const outstanding = Math.round(
+    outstandingSaleAmount(total, payments) * 10_000,
+  );
   return Math.max(0, Math.round(tendered * 10_000) - outstanding) / 10_000;
 }
 

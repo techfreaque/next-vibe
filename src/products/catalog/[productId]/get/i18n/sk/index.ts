@@ -76,6 +76,17 @@ export const translations: typeof enTranslations = {
       updatedAt: "Aktualizované",
     },
     widget: {
+      unavailable: "Produkt nie je dostupný",
+      prices: "Aktívne cenové úrovne",
+      stock: "Sklad",
+      viewStock: "Zobrazte stav zásob",
+      offers: "Ponuky poskytovateľov platieb",
+      noOffers: "S týmto produktom nie je prepojená žiadna aktívna ponuka.",
+      configureOffer: "Nastavte platobnú ponuku",
+      offerNeedsSku:
+        "Aktivujte produkt a doplňte SKU, aby ste mohli nastaviť ponuku.",
+      revenueAccount: "Výnosový účet",
+      liabilityAccount: "Účet výnosov budúcich období",
       edit: "Upraviť",
       deactivate: "Deaktivovať",
       activate: "Aktivovať",

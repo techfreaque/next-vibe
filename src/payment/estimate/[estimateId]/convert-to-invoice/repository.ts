@@ -22,6 +22,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import { lockLedgerCompany } from "@/chart-of-accounts/shared/ledger-write";
 import { getDocumentAccess } from "@/finance/document-company-scope";
 import { nextCompanyInvoiceSequence } from "@/finance/document-number";
+import { getLineSettlementPolicy } from "@/tax/line-settlement";
 
 import {
   paymentEstimateLines,
@@ -106,8 +107,28 @@ export class EstimateConvertToInvoiceRepository {
           (sum, line) => sum + Math.round(line.lineTotal * 10_000),
           0,
         );
+        const settlement = getLineSettlementPolicy(
+          lockedEstimate.currency,
+          lockedEstimate.metadata,
+        );
+        const taxUnits = estimateLineRows.reduce(
+          (sum, line) => sum + Math.round(line.taxAmount * 10_000),
+          0,
+        );
+        const invalidSettlement =
+          settlement &&
+          (estimateLineRows.some(
+            (line) =>
+              Math.round(line.lineTotal * 10_000) % 100 !== 0 ||
+              Math.round(line.taxAmount * 10_000) % 100 !== 0,
+          ) ||
+            grossUnits !== Math.round(lockedEstimate.total * 10_000) ||
+            taxUnits !== Math.round(lockedEstimate.taxAmount * 10_000) ||
+            grossUnits - taxUnits !==
+              Math.round(lockedEstimate.subtotal * 10_000));
         const cents = Math.round(grossUnits / 100);
         if (
+          invalidSettlement ||
           !Number.isSafeInteger(grossUnits) ||
           cents < 0 ||
           cents > 9_999_999_999 ||
@@ -138,6 +159,7 @@ export class EstimateConvertToInvoiceRepository {
             amount: (cents / 100).toFixed(2),
             notes: lockedEstimate.notes ?? null,
             metadata: {
+              ...(settlement ? { lineSettlement: settlement } : {}),
               estimateId: lockedEstimate.id,
               estimateNumber: lockedEstimate.estimateNumber,
               ...(lockedEstimate.customerId
@@ -195,6 +217,8 @@ export class EstimateConvertToInvoiceRepository {
         return success({
           success: true,
           message: null,
+          invoiceSequenceNumber: nextSeq,
+          estimateNumber: lockedEstimate.estimateNumber,
           invoiceId: invoice.id,
         });
       });

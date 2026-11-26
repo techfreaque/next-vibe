@@ -114,6 +114,8 @@ export const translations = {
     description: "Results per page",
   },
   widget: {
+    creditable: "Select an invoice to credit",
+    noCreditable: "No invoices have credit available.",
     filters: "Filters",
     partlyPaid: "Partly paid",
     pageCount: "Total pages",

@@ -76,6 +76,17 @@ export const translations: typeof enTranslations = {
       updatedAt: "Aggiornato",
     },
     widget: {
+      unavailable: "Prodotto non disponibile",
+      prices: "Fasce di prezzo attive",
+      stock: "Magazzino",
+      viewStock: "Veda le giacenze",
+      offers: "Offerte di pagamento",
+      noOffers: "Nessuna offerta attiva è collegata a questo prodotto.",
+      configureOffer: "Configuri un’offerta di pagamento",
+      offerNeedsSku:
+        "Attivi il prodotto e inserisca uno SKU per configurare un’offerta.",
+      revenueAccount: "Conto dei ricavi",
+      liabilityAccount: "Conto dei ricavi differiti",
       edit: "Modifica",
       deactivate: "Disattivare",
       activate: "Attivare",

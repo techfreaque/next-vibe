@@ -14,3 +14,5 @@ export const scopedTranslation = createScopedTranslation({
 
 export type BankTranslationKey =
   (typeof scopedTranslation)["ScopedTranslationKey"];
+
+export type BankT = ReturnType<typeof scopedTranslation.scopedT>["t"];

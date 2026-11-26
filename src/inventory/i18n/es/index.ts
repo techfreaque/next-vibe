@@ -223,6 +223,13 @@ export const translations: typeof enTranslations = {
       titleShort: "Warehouse",
       description: "Recuperar detalles para un almacén específico.",
       widget: {
+        companyName: "Empresa",
+        stockedProducts: "Productos en stock",
+        companyInventory: "Inventario de la empresa",
+        missingValuation: "Falta el coste",
+        details: "Datos del almacén",
+        related: "Inventario",
+        backToList: "Volver a los almacenes",
         back: "Atrás",
         edit: "Editar el almacén",
         viewStock: "Ver stock",
@@ -391,6 +398,12 @@ export const translations: typeof enTranslations = {
         loadMore: "Mostrar más",
 
         back: "Atrás",
+        defaultLowStockRule:
+          "Stock bajo por debajo de {{threshold}} unidades disponibles",
+        reorderPointRule:
+          "Stock bajo con {{threshold}} unidades disponibles o menos",
+        stockValuePrecision:
+          "El valor de las existencias se calcula con la cantidad en almacén × el coste unitario sin redondear. Los costes mostrados se redondean a dos decimales.",
         lowStock: "Bajo stock",
         available: "Disponible",
         onHand: "En la mano",
@@ -913,6 +926,8 @@ export const translations: typeof enTranslations = {
       description:
         "Recuperar una transferencia con todos sus artículos de línea.",
       widget: {
+        retry: "Volver a intentar",
+        noItems: "Este traslado no contiene artículos.",
         back: "Atrás",
         dispatch: "Transferencia de separación",
         receive: "Mark received",

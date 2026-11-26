@@ -239,6 +239,8 @@ export const { GET } = createEndpoint({
           unresolvedMessages: z.number(),
           /** Unresolved classes matching the filters (any time) */
           unresolvedMatching: z.number(),
+          /** Unresolved classes matching both filters and period */
+          unresolvedInView: z.number().optional(),
           /** Filtered: occurrences in the window */
           occurrences: kpiSchema,
           /** Filtered: classes first seen in the window */

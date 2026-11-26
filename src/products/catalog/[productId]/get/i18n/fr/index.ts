@@ -76,6 +76,17 @@ export const translations: typeof enTranslations = {
       updatedAt: "Mis à jour le",
     },
     widget: {
+      unavailable: "Produit indisponible",
+      prices: "Tarifs actifs",
+      stock: "Stock",
+      viewStock: "Voir le stock des entrepôts",
+      offers: "Offres de paiement",
+      noOffers: "Aucune offre active n’est liée à ce produit.",
+      configureOffer: "Configurer une offre de paiement",
+      offerNeedsSku:
+        "Activez le produit et donnez-lui une référence pour configurer une offre.",
+      revenueAccount: "Compte de produits",
+      liabilityAccount: "Compte de produits constatés d’avance",
       edit: "Modifier",
       deactivate: "Désactiver",
       activate: "Activer",

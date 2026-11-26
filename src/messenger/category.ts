@@ -21,6 +21,20 @@ export const category: CategoryDefinition = {
     "es-ES": "Mensajería",
     "sk-SK": "Správy",
   },
+  description: {
+    "en-US": "Manage connected mailboxes and read incoming messages.",
+    "en-GLOBAL": "Manage connected mailboxes and read incoming messages.",
+    "de-DE":
+      "Verwalten Sie verbundene Postfächer und lesen Sie eingehende Nachrichten.",
+    "pl-PL": "Zarządzaj połączonymi skrzynkami i czytaj odebrane wiadomości.",
+    "fr-FR":
+      "Gérez les boîtes mail connectées et consultez les messages reçus.",
+    "it-IT":
+      "Gestisca le caselle di posta collegate e legga i messaggi ricevuti.",
+    "es-ES":
+      "Gestione los buzones conectados y consulte los mensajes recibidos.",
+    "sk-SK": "Spravujte pripojené schránky a čítajte prijaté správy.",
+  },
   group: "comms",
   icon: "mail",
   order: 10,

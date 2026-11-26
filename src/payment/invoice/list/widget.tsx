@@ -57,6 +57,7 @@ export function InvoiceListWidget(): JSX.Element {
   const responseOnly = useWidgetResponseOnly();
   const isInteractive = useWidgetIsInteractive() && !responseOnly;
   const companyId = form.watch("companyId");
+  const selection = form.watch("selection");
   const { field: searchField } = useController({
     control: form.control,
     name: "search",
@@ -71,6 +72,9 @@ export function InvoiceListWidget(): JSX.Element {
 
   const rememberFilters = (page: number): void => {
     const values = form.getValues();
+    if (onPick) {
+      return;
+    }
     rememberList({
       search: values.search,
       status: values.status,
@@ -87,7 +91,11 @@ export function InvoiceListWidget(): JSX.Element {
   };
 
   const clearFilters = (): void => {
-    form.reset({ page: 1, pageSize: data?.pageSizeApplied ?? 20 });
+    form.reset({
+      page: 1,
+      pageSize: data?.pageSizeApplied ?? 20,
+      ...(selection ? { selection, companyId } : {}),
+    });
     setPage(1);
   };
 
@@ -130,15 +138,24 @@ export function InvoiceListWidget(): JSX.Element {
 
   return (
     <DocumentList
-      title={t("widget.title")}
+      title={t(selection === "credit" ? "widget.creditable" : "widget.title")}
       backLabel={t("widget.back")}
       loadingLabel={t("widget.loading")}
-      emptyTitle={t("widget.empty.title")}
+      emptyTitle={t(
+        selection === "credit" ? "widget.noCreditable" : "widget.empty.title",
+      )}
       emptyHint={onPick ? undefined : t("widget.empty.hint")}
       filterLabel={t("widget.filters")}
-      filtered={data?.hasFilters ?? false}
+      filtered={Boolean(
+        statusField.value || searchField.value?.trim() || customerId,
+      )}
+      activeFilters={Boolean(
+        companyId || searchField.value?.trim() || customerId,
+      )}
+      scopeSummary={data?.selectedCompanyName}
+      selecting={Boolean(onPick)}
       statusTabs={
-        isInteractive && onSubmit ? (
+        isInteractive && onSubmit && !selection ? (
           <DocumentStatusTabs
             allLabel={t("status.placeholder")}
             selected={statusField.value}
@@ -169,25 +186,27 @@ export function InvoiceListWidget(): JSX.Element {
               }}
             />
             <Div className="flex min-w-0 flex-wrap items-center gap-2">
-              <DocumentScopePicker
-                kind="company"
-                value={companyId ?? data?.selectedCompanyId ?? undefined}
-                appliedLabel={data?.selectedCompanyName}
-                onSelect={(id) => {
-                  form.setValue("companyId", id, { shouldDirty: true });
-                  setPage(1);
-                }}
-                onClear={
-                  companyId
-                    ? () => {
-                        form.setValue("companyId", undefined, {
-                          shouldDirty: true,
-                        });
-                        setPage(1);
-                      }
-                    : undefined
-                }
-              />
+              {(!selection || !companyId) && (
+                <DocumentScopePicker
+                  kind="company"
+                  value={companyId ?? data?.selectedCompanyId ?? undefined}
+                  appliedLabel={data?.selectedCompanyName}
+                  onSelect={(id) => {
+                    form.setValue("companyId", id, { shouldDirty: true });
+                    setPage(1);
+                  }}
+                  onClear={
+                    companyId
+                      ? () => {
+                          form.setValue("companyId", undefined, {
+                            shouldDirty: true,
+                          });
+                          setPage(1);
+                        }
+                      : undefined
+                  }
+                />
+              )}
               <DocumentScopePicker
                 kind="customer"
                 value={customerId}

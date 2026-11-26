@@ -54,8 +54,9 @@ export const translations: typeof enTranslations = {
       description: "Eksportuj leady utworzone do tej daty",
     },
     includeMetadata: {
-      label: "Uwzględnij metadane",
-      description: "Uwzględnij znaczniki czasu utworzenia i aktualizacji",
+      label: "Dołącz metadane techniczne",
+      description:
+        "Dodaj znaczniki czasu, adres IP, dane urządzenia, kod polecenia i zapisane metadane.",
     },
     includeEngagementData: {
       label: "Uwzględnij dane zaangażowania",
@@ -114,6 +115,7 @@ export const translations: typeof enTranslations = {
     },
   },
   widget: {
+    prepareFile: "Przygotuj eksport",
     exportLeads: "Eksportuj leady",
     import: "Importuj",
     viewList: "Zobacz listę",
@@ -134,7 +136,7 @@ export const translations: typeof enTranslations = {
     nextSteps: "Następne kroki:",
     viewLeads: "Zobacz leady",
     importLeads: "Importuj leady",
-    configureExport: "Konfiguruj eksport",
+    configureExport: "Opcje pliku",
     configureExportHint:
       "Wybierz format i filtry poniżej, a następnie kliknij Eksportuj aby wygenerować plik",
     formatLabel: "Format",
@@ -149,6 +151,18 @@ export const translations: typeof enTranslations = {
     viewLeadsList: "Zobacz listę leadów",
     excelSpreadsheet: "Arkusz Excel",
     csvFile: "Plik CSV",
+    description:
+      "Wybierz format pliku i użyj filtrów, aby wybrać leady do eksportu.",
+    changeFilters: "Zmień filtry",
+    advancedFilters: "Filtry zaawansowane",
+    activeFilters: "Aktywne filtry: {{count}}",
+    exportFailed:
+      "Nie udało się przygotować eksportu. Wybrane filtry są zachowane. Spróbuj ponownie.",
+    retry: "Spróbuj ponownie",
+    noMatchingRecords: "Brak leadów pasujących do filtrów",
+    noMatchingRecordsHint: "Zmień lub usuń filtr i ponownie przygotuj eksport.",
+    fileDetails: "Rekordy: {{count}} · {{size}}",
+    generatedAt: "Utworzono {{date}}",
   },
   enums: {
     exportFormat: {

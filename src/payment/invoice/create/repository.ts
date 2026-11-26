@@ -21,6 +21,12 @@ import { z } from "zod";
 import { lockLedgerCompany } from "@/chart-of-accounts/shared/ledger-write";
 import { getDocumentAccess } from "@/finance/document-company-scope";
 import { nextCompanyInvoiceSequence } from "@/finance/document-number";
+import {
+  LINE_SETTLEMENT_V1,
+  supportsLineCentSettlement,
+} from "@/tax/line-settlement";
+import { scopedTranslation as regimeTranslation } from "@/tax/regime/i18n";
+import { getCompanyTaxRegime } from "@/tax/regime/policy";
 
 import { paymentInvoiceLines, paymentInvoices } from "../../db";
 import { InvoiceStatus } from "../../enum";
@@ -49,24 +55,6 @@ export class InvoiceCreateRepository {
         });
       }
 
-      const lines = (data.lineItems ?? []).map((line, sortOrder) => ({
-        description: line.description,
-        sortOrder,
-        ...calculateInvoiceLine(line),
-      }));
-      const totalUnits = lines.reduce(
-        (total, line) => total + Math.round(line.lineTotal * 10_000),
-        0,
-      );
-      const totalCents = Math.round(totalUnits / 100);
-      if (!Number.isSafeInteger(totalCents) || totalCents > 9_999_999_999) {
-        return fail({
-          message: t("post.widget.itemsTotalError"),
-          errorType: ErrorResponseTypes.VALIDATION_ERROR,
-        });
-      }
-      const amount = (totalCents / 100).toFixed(2);
-
       return await db.transaction(async (tx) => {
         const company = await lockLedgerCompany(tx, data.companyId);
         if (!(await getDocumentAccess(userId, scope, tx))?.canManage) {
@@ -78,11 +66,47 @@ export class InvoiceCreateRepository {
         const companyCurrency = z
           .enum(CurrenciesArr)
           .safeParse(company?.currency);
-        const nextSeq = await nextCompanyInvoiceSequence(tx, data.companyId);
-        const arInvoiceId = `AR-${data.companyId.slice(0, 8)}-${String(nextSeq).padStart(6, "0")}`;
         const currency =
           data.currency ??
           (companyCurrency.success ? companyCurrency.data : "EUR");
+        const lineSettlement = supportsLineCentSettlement(currency)
+          ? LINE_SETTLEMENT_V1
+          : undefined;
+        const lines = (data.lineItems ?? []).map((line, sortOrder) => ({
+          description: line.description,
+          sortOrder,
+          ...calculateInvoiceLine(line, lineSettlement),
+        }));
+        const totalUnits = lines.reduce(
+          (total, line) => total + Math.round(line.lineTotal * 10_000),
+          0,
+        );
+        const totalCents = Math.round(totalUnits / 100);
+        if (
+          !Number.isSafeInteger(totalCents) ||
+          totalCents > 9_999_999_999 ||
+          lines.some((line) => line.lineTotal >= 100_000_000)
+        ) {
+          return fail({
+            message: t("post.widget.itemsTotalError"),
+            errorType: ErrorResponseTypes.VALIDATION_ERROR,
+          });
+        }
+        const amount = (totalCents / 100).toFixed(2);
+
+        const regime = await getCompanyTaxRegime(
+          tx,
+          data.companyId,
+          new Date(),
+        );
+        if (regime.exempt && lines.some((line) => line.taxRate > 0)) {
+          return fail({
+            message: regimeTranslation.scopedT(locale).t("saleConflict"),
+            errorType: ErrorResponseTypes.VALIDATION_ERROR,
+          });
+        }
+        const nextSeq = await nextCompanyInvoiceSequence(tx, data.companyId);
+        const arInvoiceId = `AR-${data.companyId.slice(0, 8)}-${String(nextSeq).padStart(6, "0")}`;
 
         const [invoice] = await tx
           .insert(paymentInvoices)
@@ -96,7 +120,10 @@ export class InvoiceCreateRepository {
             amount,
             dueDate: data.dueDate ? new Date(data.dueDate) : null,
             notes: data.notes ?? null,
-            metadata: data.customerId ? { customerId: data.customerId } : null,
+            metadata:
+              data.customerId || lineSettlement
+                ? { customerId: data.customerId, lineSettlement }
+                : null,
           })
           .returning();
 

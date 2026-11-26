@@ -6,16 +6,18 @@ import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
 import { Span } from "next-vibe/ui/components/span";
 import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
 import {
+  useWidgetForm,
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
+import { AdminForm } from "next-vibe/unified-ui/widgets/containers/admin-form/widget";
 import { BooleanFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/boolean-field/widget";
+import { EntityPickerFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/entity-picker-field/widget";
 import { NumberFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/number-field/widget";
 import { SelectFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/select-field/widget";
 import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-field/widget";
 import { TextareaFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/textarea-field/widget";
-import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 import type { JSX } from "react";
 
@@ -29,6 +31,9 @@ export function CatalogCreateWidget({
   const data = useWidgetValue<typeof definition.POST>();
   const { push: navigate, pop, canGoBack } = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.POST>();
+  const form = useWidgetForm<typeof definition.POST>();
+  const currency = form.watch("details.currency") || "EUR";
+  const isSubscription = form.watch("details.isSubscription");
 
   const handleViewProduct = (productId: string): void => {
     void (async (): Promise<void> => {
@@ -37,10 +42,10 @@ export function CatalogCreateWidget({
     })();
   };
 
-  const handleAddAnother = (): void => {
+  const handleBrowse = (): void => {
     void (async (): Promise<void> => {
-      const def = await import("./definition");
-      navigate(def.default.POST, {});
+      const def = await import("../list/definition");
+      navigate(def.default.GET, {});
     })();
   };
 
@@ -55,9 +60,6 @@ export function CatalogCreateWidget({
           </Span>
           <Span className="text-base font-semibold text-foreground mt-1">
             {result.name}
-          </Span>
-          <Span className="font-mono text-xs text-muted-foreground">
-            {result.id}
           </Span>
         </Div>
         <Div className="flex gap-2">
@@ -75,7 +77,7 @@ export function CatalogCreateWidget({
             type="button"
             variant="outline"
             size="sm"
-            onClick={handleAddAnother}
+            onClick={handleBrowse}
           >
             {t("post.widget.backToList")}
           </Button>
@@ -85,22 +87,25 @@ export function CatalogCreateWidget({
   }
 
   return (
-    <Div className="flex flex-col gap-4">
-      {canGoBack && (
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={() => pop()}
-          className="self-start gap-1.5 -ml-1"
-        >
-          <ChevronLeft className="h-4 w-4" />
-          {t("post.widget.back")}
-        </Button>
-      )}
-
+    <AdminForm
+      title={t("post.title")}
+      className="mx-auto max-w-3xl"
+      backButton={
+        canGoBack && (
+          <Button type="button" variant="ghost" size="sm" onClick={() => pop()}>
+            <ChevronLeft className="size-4" aria-hidden="true" />
+            {t("post.widget.back")}
+          </Button>
+        )
+      }
+      primaryAction={
+        <SubmitButtonWidget<typeof definition.POST>
+          field={{ text: "post.title" }}
+        />
+      }
+    >
       <Div className="flex flex-col gap-3">
-        <Div className="grid grid-cols-2 gap-3">
+        <Div className="grid min-w-0 gap-3 @sm:grid-cols-2">
           <TextFieldWidget
             fieldName="details.name"
             field={withValue(
@@ -118,6 +123,10 @@ export function CatalogCreateWidget({
             )}
           />
         </Div>
+        <EntityPickerFieldWidget
+          fieldName="details.companyId"
+          field={field.children.details.children.companyId}
+        />
         <TextareaFieldWidget
           fieldName="details.productDescription"
           field={withValue(
@@ -126,7 +135,7 @@ export function CatalogCreateWidget({
             null,
           )}
         />
-        <Div className="grid grid-cols-2 gap-3">
+        <Div className="grid min-w-0 gap-3 @sm:grid-cols-2">
           <TextFieldWidget
             fieldName="details.sku"
             field={withValue(
@@ -144,9 +153,11 @@ export function CatalogCreateWidget({
             )}
           />
         </Div>
-        <Div className="grid grid-cols-2 gap-3">
+        <Div className="grid min-w-0 gap-3 @sm:grid-cols-2">
           <NumberFieldWidget
             fieldName="details.basePrice"
+            presentation="money"
+            currency={currency}
             field={withValue(
               field.children.details.children.basePrice,
               undefined,
@@ -164,11 +175,15 @@ export function CatalogCreateWidget({
         </Div>
         <NumberFieldWidget
           fieldName="details.defaultTaxRate"
-          field={withValue(
-            field.children.details.children.defaultTaxRate,
-            undefined,
-            null,
-          )}
+          presentation="percent"
+          field={{
+            ...withValue(
+              field.children.details.children.defaultTaxRate,
+              undefined,
+              null,
+            ),
+            description: undefined,
+          }}
         />
         <BooleanFieldWidget
           fieldName="details.isSubscription"
@@ -178,18 +193,17 @@ export function CatalogCreateWidget({
             null,
           )}
         />
-        <SelectFieldWidget
-          fieldName="details.billingInterval"
-          field={withValue(
-            field.children.details.children.billingInterval,
-            undefined,
-            null,
-          )}
-        />
+        {isSubscription && (
+          <SelectFieldWidget
+            fieldName="details.billingInterval"
+            field={withValue(
+              field.children.details.children.billingInterval,
+              undefined,
+              null,
+            )}
+          />
+        )}
       </Div>
-
-      <FormAlertWidget field={{}} />
-      <SubmitButtonWidget<typeof definition.POST> field={{}} />
-    </Div>
+    </AdminForm>
   );
 }

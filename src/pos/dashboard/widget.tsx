@@ -5,6 +5,7 @@ import { Div } from "next-vibe/ui/components/div";
 import { Monitor } from "next-vibe/ui/components/icons/Monitor";
 import { ShoppingCart } from "next-vibe/ui/components/icons/ShoppingCart";
 import { Span } from "next-vibe/ui/components/span";
+import { WidgetShell } from "next-vibe/ui/components/widget-shell";
 import { formatMoney } from "next-vibe/unified-ui/_shared/format-money";
 import {
   useWidgetLocale,
@@ -37,9 +38,7 @@ function KpiCard({
     <Div
       className={`flex flex-col gap-1 rounded-lg border px-4 py-3 ${highlight ? "border-blue-500/30 bg-blue-500/5" : ""}`}
     >
-      <Span className="text-xs text-muted-foreground font-medium uppercase tracking-wide">
-        {label}
-      </Span>
+      <Span className="text-xs text-muted-foreground font-medium">{label}</Span>
       <Span className="text-2xl font-bold tabular-nums">{value}</Span>
     </Div>
   );
@@ -72,7 +71,7 @@ function TerminalCard({
 }: TerminalCardProps): JSX.Element {
   return (
     <Div
-      className={`flex items-center gap-3 px-4 py-4 border-b last:border-b-0 transition-colors ${terminal.isActive ? "hover:bg-muted/30" : "opacity-55"}`}
+      className={`flex flex-wrap items-center gap-3 px-4 py-4 border-b last:border-b-0 transition-colors ${terminal.isActive ? "hover:bg-muted/30" : "opacity-55"}`}
     >
       {/* Icon */}
       <Div
@@ -95,11 +94,8 @@ function TerminalCard({
         />
       </Div>
 
-      {/* Info — clickable to view session detail */}
-      <Div
-        className="flex-1 min-w-0 cursor-pointer"
-        onClick={() => onViewSession(terminal)}
-      >
+      {/* Terminal identity and status */}
+      <Div className="flex-1 min-w-0">
         <Div className="flex items-center gap-2 flex-wrap">
           <Span className="text-sm font-semibold truncate">
             {terminal.name}
@@ -134,7 +130,7 @@ function TerminalCard({
 
       {/* CTA */}
       {terminal.hasOpenSession && terminal.openSessionId ? (
-        <Div className="flex gap-2 shrink-0">
+        <Div className="flex w-full flex-wrap gap-2 @lg:w-auto">
           <Button
             type="button"
             size="sm"
@@ -257,7 +253,7 @@ export function PosDashboardWidget(
     : [{ currency: data.currency, amount: data.todaySalesTotal ?? 0 }];
 
   return (
-    <Div className="max-w-2xl mx-auto w-full px-4 pt-8 pb-6 flex flex-col gap-5">
+    <WidgetShell layout="page">
       {/* KPI Row */}
       <Div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <KpiCard
@@ -341,6 +337,6 @@ export function PosDashboardWidget(
           ))}
         </Div>
       )}
-    </Div>
+    </WidgetShell>
   );
 }

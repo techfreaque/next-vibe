@@ -76834,6 +76834,1104 @@
           },
           "schemaType": "primitive"
         },
+        "adminCatalogDestinations": {
+          "type": "text",
+          "label": "Workspaces",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "record",
+                  "keyType": {
+                    "def": {
+                      "type": "string"
+                    },
+                    "type": "string"
+                  },
+                  "valueType": {
+                    "def": {
+                      "type": "object",
+                      "shape": {
+                        "category": {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string"
+                        },
+                        "subCategory": {
+                          "def": {
+                            "type": "optional",
+                            "innerType": {
+                              "def": {
+                                "type": "string"
+                              },
+                              "type": "string"
+                            }
+                          },
+                          "type": "optional"
+                        }
+                      }
+                    },
+                    "type": "object"
+                  }
+                },
+                "type": "record",
+                "keyType": {
+                  "def": {
+                    "type": "string"
+                  },
+                  "type": "string"
+                },
+                "valueType": {
+                  "def": {
+                    "type": "object",
+                    "shape": {
+                      "category": {
+                        "def": {
+                          "type": "string"
+                        },
+                        "type": "string"
+                      },
+                      "subCategory": {
+                        "def": {
+                          "type": "optional",
+                          "innerType": {
+                            "def": {
+                              "type": "string"
+                            },
+                            "type": "string"
+                          }
+                        },
+                        "type": "optional"
+                      }
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "type": "optional"
+          },
+          "visibleFor": ["enums.userRole.admin"],
+          "hiddenForPlatforms": [
+            "ai",
+            "mcp",
+            "cron",
+            "remote-skill",
+            "cli",
+            "cli-package"
+          ],
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "adminCategoryLandings": {
+          "type": "text",
+          "label": "Workspaces",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "record",
+                  "keyType": {
+                    "def": {
+                      "type": "string"
+                    },
+                    "type": "string"
+                  },
+                  "valueType": {
+                    "def": {
+                      "type": "object",
+                      "shape": {
+                        "description": {
+                          "def": {
+                            "type": "optional",
+                            "innerType": {
+                              "def": {
+                                "type": "string"
+                              },
+                              "type": "string"
+                            }
+                          },
+                          "type": "optional"
+                        },
+                        "heading": {
+                          "def": {
+                            "type": "optional",
+                            "innerType": {
+                              "def": {
+                                "type": "string"
+                              },
+                              "type": "string"
+                            }
+                          },
+                          "type": "optional"
+                        },
+                        "overview": {
+                          "def": {
+                            "type": "optional",
+                            "innerType": {
+                              "def": {
+                                "type": "object",
+                                "shape": {
+                                  "alias": {
+                                    "def": {
+                                      "type": "string"
+                                    },
+                                    "type": "string"
+                                  },
+                                  "scope": {
+                                    "def": {
+                                      "type": "enum",
+                                      "entries": {
+                                        "platform": "platform",
+                                        "company": "company"
+                                      }
+                                    },
+                                    "type": "enum",
+                                    "enum": {
+                                      "platform": "platform",
+                                      "company": "company"
+                                    },
+                                    "options": ["platform", "company"]
+                                  }
+                                }
+                              },
+                              "type": "object"
+                            }
+                          },
+                          "type": "optional"
+                        },
+                        "summary": {
+                          "def": {
+                            "type": "optional",
+                            "innerType": {
+                              "def": {
+                                "type": "object",
+                                "shape": {
+                                  "alias": {
+                                    "def": {
+                                      "type": "string"
+                                    },
+                                    "type": "string"
+                                  },
+                                  "scope": {
+                                    "def": {
+                                      "type": "enum",
+                                      "entries": {
+                                        "platform": "platform",
+                                        "company": "company"
+                                      }
+                                    },
+                                    "type": "enum",
+                                    "enum": {
+                                      "platform": "platform",
+                                      "company": "company"
+                                    },
+                                    "options": ["platform", "company"]
+                                  },
+                                  "args": {
+                                    "def": {
+                                      "type": "optional",
+                                      "innerType": {
+                                        "def": {
+                                          "type": "record",
+                                          "keyType": {
+                                            "def": {
+                                              "type": "string"
+                                            },
+                                            "type": "string"
+                                          },
+                                          "valueType": {
+                                            "def": {
+                                              "type": "string"
+                                            },
+                                            "type": "string"
+                                          }
+                                        },
+                                        "type": "record",
+                                        "keyType": {
+                                          "def": {
+                                            "type": "string"
+                                          },
+                                          "type": "string"
+                                        },
+                                        "valueType": {
+                                          "def": {
+                                            "type": "string"
+                                          },
+                                          "type": "string"
+                                        }
+                                      }
+                                    },
+                                    "type": "optional"
+                                  },
+                                  "home": {
+                                    "def": {
+                                      "type": "optional",
+                                      "innerType": {
+                                        "def": {
+                                          "type": "boolean"
+                                        },
+                                        "type": "boolean"
+                                      }
+                                    },
+                                    "type": "optional"
+                                  },
+                                  "homeArgs": {
+                                    "def": {
+                                      "type": "optional",
+                                      "innerType": {
+                                        "def": {
+                                          "type": "record",
+                                          "keyType": {
+                                            "def": {
+                                              "type": "string"
+                                            },
+                                            "type": "string"
+                                          },
+                                          "valueType": {
+                                            "def": {
+                                              "type": "string"
+                                            },
+                                            "type": "string"
+                                          }
+                                        },
+                                        "type": "record",
+                                        "keyType": {
+                                          "def": {
+                                            "type": "string"
+                                          },
+                                          "type": "string"
+                                        },
+                                        "valueType": {
+                                          "def": {
+                                            "type": "string"
+                                          },
+                                          "type": "string"
+                                        }
+                                      }
+                                    },
+                                    "type": "optional"
+                                  },
+                                  "progressive": {
+                                    "def": {
+                                      "type": "optional",
+                                      "innerType": {
+                                        "def": {
+                                          "type": "boolean"
+                                        },
+                                        "type": "boolean"
+                                      }
+                                    },
+                                    "type": "optional"
+                                  }
+                                }
+                              },
+                              "type": "object"
+                            }
+                          },
+                          "type": "optional"
+                        },
+                        "contextualActions": {
+                          "def": {
+                            "type": "optional",
+                            "innerType": {
+                              "def": {
+                                "type": "boolean"
+                              },
+                              "type": "boolean"
+                            }
+                          },
+                          "type": "optional"
+                        },
+                        "actions": {
+                          "def": {
+                            "type": "array",
+                            "element": {
+                              "def": {
+                                "type": "object",
+                                "shape": {
+                                  "alias": {
+                                    "def": {
+                                      "type": "string"
+                                    },
+                                    "type": "string"
+                                  },
+                                  "title": {
+                                    "def": {
+                                      "type": "string"
+                                    },
+                                    "type": "string"
+                                  }
+                                }
+                              },
+                              "type": "object"
+                            }
+                          },
+                          "type": "array",
+                          "element": {
+                            "def": {
+                              "type": "object",
+                              "shape": {
+                                "alias": {
+                                  "def": {
+                                    "type": "string"
+                                  },
+                                  "type": "string"
+                                },
+                                "title": {
+                                  "def": {
+                                    "type": "string"
+                                  },
+                                  "type": "string"
+                                }
+                              }
+                            },
+                            "type": "object"
+                          }
+                        },
+                        "destinations": {
+                          "def": {
+                            "type": "array",
+                            "element": {
+                              "def": {
+                                "type": "object",
+                                "shape": {
+                                  "alias": {
+                                    "def": {
+                                      "type": "string"
+                                    },
+                                    "type": "string"
+                                  },
+                                  "title": {
+                                    "def": {
+                                      "type": "string"
+                                    },
+                                    "type": "string"
+                                  },
+                                  "description": {
+                                    "def": {
+                                      "type": "optional",
+                                      "innerType": {
+                                        "def": {
+                                          "type": "string"
+                                        },
+                                        "type": "string"
+                                      }
+                                    },
+                                    "type": "optional"
+                                  }
+                                }
+                              },
+                              "type": "object"
+                            }
+                          },
+                          "type": "array",
+                          "element": {
+                            "def": {
+                              "type": "object",
+                              "shape": {
+                                "alias": {
+                                  "def": {
+                                    "type": "string"
+                                  },
+                                  "type": "string"
+                                },
+                                "title": {
+                                  "def": {
+                                    "type": "string"
+                                  },
+                                  "type": "string"
+                                },
+                                "description": {
+                                  "def": {
+                                    "type": "optional",
+                                    "innerType": {
+                                      "def": {
+                                        "type": "string"
+                                      },
+                                      "type": "string"
+                                    }
+                                  },
+                                  "type": "optional"
+                                }
+                              }
+                            },
+                            "type": "object"
+                          }
+                        },
+                        "createActions": {
+                          "def": {
+                            "type": "array",
+                            "element": {
+                              "def": {
+                                "type": "object",
+                                "shape": {
+                                  "alias": {
+                                    "def": {
+                                      "type": "string"
+                                    },
+                                    "type": "string"
+                                  },
+                                  "title": {
+                                    "def": {
+                                      "type": "string"
+                                    },
+                                    "type": "string"
+                                  },
+                                  "description": {
+                                    "def": {
+                                      "type": "optional",
+                                      "innerType": {
+                                        "def": {
+                                          "type": "string"
+                                        },
+                                        "type": "string"
+                                      }
+                                    },
+                                    "type": "optional"
+                                  }
+                                }
+                              },
+                              "type": "object"
+                            }
+                          },
+                          "type": "array",
+                          "element": {
+                            "def": {
+                              "type": "object",
+                              "shape": {
+                                "alias": {
+                                  "def": {
+                                    "type": "string"
+                                  },
+                                  "type": "string"
+                                },
+                                "title": {
+                                  "def": {
+                                    "type": "string"
+                                  },
+                                  "type": "string"
+                                },
+                                "description": {
+                                  "def": {
+                                    "type": "optional",
+                                    "innerType": {
+                                      "def": {
+                                        "type": "string"
+                                      },
+                                      "type": "string"
+                                    }
+                                  },
+                                  "type": "optional"
+                                }
+                              }
+                            },
+                            "type": "object"
+                          }
+                        },
+                        "automations": {
+                          "def": {
+                            "type": "array",
+                            "element": {
+                              "def": {
+                                "type": "object",
+                                "shape": {
+                                  "alias": {
+                                    "def": {
+                                      "type": "string"
+                                    },
+                                    "type": "string"
+                                  },
+                                  "title": {
+                                    "def": {
+                                      "type": "string"
+                                    },
+                                    "type": "string"
+                                  },
+                                  "description": {
+                                    "def": {
+                                      "type": "optional",
+                                      "innerType": {
+                                        "def": {
+                                          "type": "string"
+                                        },
+                                        "type": "string"
+                                      }
+                                    },
+                                    "type": "optional"
+                                  }
+                                }
+                              },
+                              "type": "object"
+                            }
+                          },
+                          "type": "array",
+                          "element": {
+                            "def": {
+                              "type": "object",
+                              "shape": {
+                                "alias": {
+                                  "def": {
+                                    "type": "string"
+                                  },
+                                  "type": "string"
+                                },
+                                "title": {
+                                  "def": {
+                                    "type": "string"
+                                  },
+                                  "type": "string"
+                                },
+                                "description": {
+                                  "def": {
+                                    "type": "optional",
+                                    "innerType": {
+                                      "def": {
+                                        "type": "string"
+                                      },
+                                      "type": "string"
+                                    }
+                                  },
+                                  "type": "optional"
+                                }
+                              }
+                            },
+                            "type": "object"
+                          }
+                        },
+                        "automationCount": {
+                          "def": {
+                            "type": "number",
+                            "checks": []
+                          },
+                          "type": "number",
+                          "isFinite": true
+                        },
+                        "developerCount": {
+                          "def": {
+                            "type": "number",
+                            "checks": []
+                          },
+                          "type": "number",
+                          "isFinite": true
+                        }
+                      }
+                    },
+                    "type": "object"
+                  }
+                },
+                "type": "record",
+                "keyType": {
+                  "def": {
+                    "type": "string"
+                  },
+                  "type": "string"
+                },
+                "valueType": {
+                  "def": {
+                    "type": "object",
+                    "shape": {
+                      "description": {
+                        "def": {
+                          "type": "optional",
+                          "innerType": {
+                            "def": {
+                              "type": "string"
+                            },
+                            "type": "string"
+                          }
+                        },
+                        "type": "optional"
+                      },
+                      "heading": {
+                        "def": {
+                          "type": "optional",
+                          "innerType": {
+                            "def": {
+                              "type": "string"
+                            },
+                            "type": "string"
+                          }
+                        },
+                        "type": "optional"
+                      },
+                      "overview": {
+                        "def": {
+                          "type": "optional",
+                          "innerType": {
+                            "def": {
+                              "type": "object",
+                              "shape": {
+                                "alias": {
+                                  "def": {
+                                    "type": "string"
+                                  },
+                                  "type": "string"
+                                },
+                                "scope": {
+                                  "def": {
+                                    "type": "enum",
+                                    "entries": {
+                                      "platform": "platform",
+                                      "company": "company"
+                                    }
+                                  },
+                                  "type": "enum",
+                                  "enum": {
+                                    "platform": "platform",
+                                    "company": "company"
+                                  },
+                                  "options": ["platform", "company"]
+                                }
+                              }
+                            },
+                            "type": "object"
+                          }
+                        },
+                        "type": "optional"
+                      },
+                      "summary": {
+                        "def": {
+                          "type": "optional",
+                          "innerType": {
+                            "def": {
+                              "type": "object",
+                              "shape": {
+                                "alias": {
+                                  "def": {
+                                    "type": "string"
+                                  },
+                                  "type": "string"
+                                },
+                                "scope": {
+                                  "def": {
+                                    "type": "enum",
+                                    "entries": {
+                                      "platform": "platform",
+                                      "company": "company"
+                                    }
+                                  },
+                                  "type": "enum",
+                                  "enum": {
+                                    "platform": "platform",
+                                    "company": "company"
+                                  },
+                                  "options": ["platform", "company"]
+                                },
+                                "args": {
+                                  "def": {
+                                    "type": "optional",
+                                    "innerType": {
+                                      "def": {
+                                        "type": "record",
+                                        "keyType": {
+                                          "def": {
+                                            "type": "string"
+                                          },
+                                          "type": "string"
+                                        },
+                                        "valueType": {
+                                          "def": {
+                                            "type": "string"
+                                          },
+                                          "type": "string"
+                                        }
+                                      },
+                                      "type": "record",
+                                      "keyType": {
+                                        "def": {
+                                          "type": "string"
+                                        },
+                                        "type": "string"
+                                      },
+                                      "valueType": {
+                                        "def": {
+                                          "type": "string"
+                                        },
+                                        "type": "string"
+                                      }
+                                    }
+                                  },
+                                  "type": "optional"
+                                },
+                                "home": {
+                                  "def": {
+                                    "type": "optional",
+                                    "innerType": {
+                                      "def": {
+                                        "type": "boolean"
+                                      },
+                                      "type": "boolean"
+                                    }
+                                  },
+                                  "type": "optional"
+                                },
+                                "homeArgs": {
+                                  "def": {
+                                    "type": "optional",
+                                    "innerType": {
+                                      "def": {
+                                        "type": "record",
+                                        "keyType": {
+                                          "def": {
+                                            "type": "string"
+                                          },
+                                          "type": "string"
+                                        },
+                                        "valueType": {
+                                          "def": {
+                                            "type": "string"
+                                          },
+                                          "type": "string"
+                                        }
+                                      },
+                                      "type": "record",
+                                      "keyType": {
+                                        "def": {
+                                          "type": "string"
+                                        },
+                                        "type": "string"
+                                      },
+                                      "valueType": {
+                                        "def": {
+                                          "type": "string"
+                                        },
+                                        "type": "string"
+                                      }
+                                    }
+                                  },
+                                  "type": "optional"
+                                },
+                                "progressive": {
+                                  "def": {
+                                    "type": "optional",
+                                    "innerType": {
+                                      "def": {
+                                        "type": "boolean"
+                                      },
+                                      "type": "boolean"
+                                    }
+                                  },
+                                  "type": "optional"
+                                }
+                              }
+                            },
+                            "type": "object"
+                          }
+                        },
+                        "type": "optional"
+                      },
+                      "contextualActions": {
+                        "def": {
+                          "type": "optional",
+                          "innerType": {
+                            "def": {
+                              "type": "boolean"
+                            },
+                            "type": "boolean"
+                          }
+                        },
+                        "type": "optional"
+                      },
+                      "actions": {
+                        "def": {
+                          "type": "array",
+                          "element": {
+                            "def": {
+                              "type": "object",
+                              "shape": {
+                                "alias": {
+                                  "def": {
+                                    "type": "string"
+                                  },
+                                  "type": "string"
+                                },
+                                "title": {
+                                  "def": {
+                                    "type": "string"
+                                  },
+                                  "type": "string"
+                                }
+                              }
+                            },
+                            "type": "object"
+                          }
+                        },
+                        "type": "array",
+                        "element": {
+                          "def": {
+                            "type": "object",
+                            "shape": {
+                              "alias": {
+                                "def": {
+                                  "type": "string"
+                                },
+                                "type": "string"
+                              },
+                              "title": {
+                                "def": {
+                                  "type": "string"
+                                },
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "type": "object"
+                        }
+                      },
+                      "destinations": {
+                        "def": {
+                          "type": "array",
+                          "element": {
+                            "def": {
+                              "type": "object",
+                              "shape": {
+                                "alias": {
+                                  "def": {
+                                    "type": "string"
+                                  },
+                                  "type": "string"
+                                },
+                                "title": {
+                                  "def": {
+                                    "type": "string"
+                                  },
+                                  "type": "string"
+                                },
+                                "description": {
+                                  "def": {
+                                    "type": "optional",
+                                    "innerType": {
+                                      "def": {
+                                        "type": "string"
+                                      },
+                                      "type": "string"
+                                    }
+                                  },
+                                  "type": "optional"
+                                }
+                              }
+                            },
+                            "type": "object"
+                          }
+                        },
+                        "type": "array",
+                        "element": {
+                          "def": {
+                            "type": "object",
+                            "shape": {
+                              "alias": {
+                                "def": {
+                                  "type": "string"
+                                },
+                                "type": "string"
+                              },
+                              "title": {
+                                "def": {
+                                  "type": "string"
+                                },
+                                "type": "string"
+                              },
+                              "description": {
+                                "def": {
+                                  "type": "optional",
+                                  "innerType": {
+                                    "def": {
+                                      "type": "string"
+                                    },
+                                    "type": "string"
+                                  }
+                                },
+                                "type": "optional"
+                              }
+                            }
+                          },
+                          "type": "object"
+                        }
+                      },
+                      "createActions": {
+                        "def": {
+                          "type": "array",
+                          "element": {
+                            "def": {
+                              "type": "object",
+                              "shape": {
+                                "alias": {
+                                  "def": {
+                                    "type": "string"
+                                  },
+                                  "type": "string"
+                                },
+                                "title": {
+                                  "def": {
+                                    "type": "string"
+                                  },
+                                  "type": "string"
+                                },
+                                "description": {
+                                  "def": {
+                                    "type": "optional",
+                                    "innerType": {
+                                      "def": {
+                                        "type": "string"
+                                      },
+                                      "type": "string"
+                                    }
+                                  },
+                                  "type": "optional"
+                                }
+                              }
+                            },
+                            "type": "object"
+                          }
+                        },
+                        "type": "array",
+                        "element": {
+                          "def": {
+                            "type": "object",
+                            "shape": {
+                              "alias": {
+                                "def": {
+                                  "type": "string"
+                                },
+                                "type": "string"
+                              },
+                              "title": {
+                                "def": {
+                                  "type": "string"
+                                },
+                                "type": "string"
+                              },
+                              "description": {
+                                "def": {
+                                  "type": "optional",
+                                  "innerType": {
+                                    "def": {
+                                      "type": "string"
+                                    },
+                                    "type": "string"
+                                  }
+                                },
+                                "type": "optional"
+                              }
+                            }
+                          },
+                          "type": "object"
+                        }
+                      },
+                      "automations": {
+                        "def": {
+                          "type": "array",
+                          "element": {
+                            "def": {
+                              "type": "object",
+                              "shape": {
+                                "alias": {
+                                  "def": {
+                                    "type": "string"
+                                  },
+                                  "type": "string"
+                                },
+                                "title": {
+                                  "def": {
+                                    "type": "string"
+                                  },
+                                  "type": "string"
+                                },
+                                "description": {
+                                  "def": {
+                                    "type": "optional",
+                                    "innerType": {
+                                      "def": {
+                                        "type": "string"
+                                      },
+                                      "type": "string"
+                                    }
+                                  },
+                                  "type": "optional"
+                                }
+                              }
+                            },
+                            "type": "object"
+                          }
+                        },
+                        "type": "array",
+                        "element": {
+                          "def": {
+                            "type": "object",
+                            "shape": {
+                              "alias": {
+                                "def": {
+                                  "type": "string"
+                                },
+                                "type": "string"
+                              },
+                              "title": {
+                                "def": {
+                                  "type": "string"
+                                },
+                                "type": "string"
+                              },
+                              "description": {
+                                "def": {
+                                  "type": "optional",
+                                  "innerType": {
+                                    "def": {
+                                      "type": "string"
+                                    },
+                                    "type": "string"
+                                  }
+                                },
+                                "type": "optional"
+                              }
+                            }
+                          },
+                          "type": "object"
+                        }
+                      },
+                      "automationCount": {
+                        "def": {
+                          "type": "number",
+                          "checks": []
+                        },
+                        "type": "number",
+                        "isFinite": true
+                      },
+                      "developerCount": {
+                        "def": {
+                          "type": "number",
+                          "checks": []
+                        },
+                        "type": "number",
+                        "isFinite": true
+                      }
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "type": "optional"
+          },
+          "visibleFor": ["enums.userRole.admin"],
+          "hiddenForPlatforms": [
+            "ai",
+            "mcp",
+            "cron",
+            "remote-skill",
+            "cli",
+            "cli-package"
+          ],
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
         "catalogOverview": {
           "type": "text",
           "label": "Business overview",

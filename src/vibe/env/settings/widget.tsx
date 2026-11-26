@@ -109,6 +109,7 @@ function SettingFieldInput({
     return (
       <Div className="flex items-center gap-1.5 w-full">
         <Input
+          aria-label={setting.key}
           className={cn(
             "h-7 text-xs font-mono flex-1",
             isEdited && "border-primary",
@@ -152,6 +153,7 @@ function SettingFieldInput({
         onValueChange={(v: string): void => onEdit(setting.key, v)}
       >
         <SelectTrigger
+          aria-label={setting.key}
           className={cn("h-7 text-xs font-mono", isEdited && "border-primary")}
         >
           <SelectValue placeholder={t("widget.selectPlaceholder")} />
@@ -176,6 +178,7 @@ function SettingFieldInput({
     return (
       <Div className="flex items-center gap-2">
         <Switch
+          aria-label={setting.key}
           checked={checked}
           onCheckedChange={(v: boolean): void =>
             onEdit(setting.key, v ? "true" : "false")
@@ -195,6 +198,7 @@ function SettingFieldInput({
     return (
       <Div className="flex items-center gap-2 w-full">
         <Switch
+          aria-label={setting.key}
           checked={enabled}
           onCheckedChange={(v: boolean): void =>
             onEdit(setting.key, v ? pathValue : "false")
@@ -202,6 +206,7 @@ function SettingFieldInput({
         />
         {enabled ? (
           <Input
+            aria-label={setting.key}
             className={cn(
               "h-7 text-xs font-mono flex-1",
               isEdited && "border-primary",
@@ -224,6 +229,7 @@ function SettingFieldInput({
   // Text input (all env values are strings - fieldType is just metadata)
   return (
     <Input
+      aria-label={setting.key}
       className={cn("h-7 text-xs font-mono", isEdited && "border-primary")}
       value={displayValue}
       placeholder={setting.example || setting.comment || ""}
@@ -249,8 +255,8 @@ function SettingRow({
 }): JSX.Element {
   return (
     <Div className="flex flex-col gap-1 px-4 py-2 border-b last:border-b-0 text-sm">
-      <Div className="flex items-center gap-2">
-        <Div className="flex items-center gap-1.5 w-64 shrink-0">
+      <Div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center">
+        <Div className="flex min-w-0 items-center gap-1.5 sm:w-64 sm:shrink-0">
           {setting.isSensitive && !setting.isEncrypted && (
             <Lock className="h-3 w-3 text-muted-foreground shrink-0" />
           )}
@@ -490,26 +496,32 @@ export function SystemSettingsWidget(): JSX.Element {
   return (
     <Div className="flex flex-col gap-0">
       {/* Header */}
-      <Div className="flex items-center gap-2 p-4 border-b">
-        <Settings className="h-4 w-4 text-muted-foreground" />
-        <Span className="font-semibold text-base">{t("widget.title")}</Span>
-        <Span className="text-xs text-muted-foreground ml-2">
-          {t("widget.subtitle")}
-        </Span>
-        <Div className="ml-auto flex gap-2">
+      <Div className="flex min-w-0 flex-col gap-3 border-b p-4 md:flex-row md:items-center">
+        <Div className="flex min-w-0 flex-1 items-start gap-2">
+          <Settings className="mt-1 h-4 w-4 shrink-0 text-muted-foreground" />
+          <Div className="flex min-w-0 flex-wrap items-baseline gap-x-2 gap-y-1">
+            <Span className="text-base font-semibold">{t("widget.title")}</Span>
+            <Span className="text-xs text-muted-foreground">
+              {t("widget.subtitle")}
+            </Span>
+          </Div>
+        </Div>
+        <Div className="flex min-w-0 flex-wrap gap-2">
           {!showWizard && (
             <Button
               variant="outline"
               size="sm"
+              className="h-auto min-h-8 max-w-full whitespace-normal text-start"
               onClick={(): void => setShowExport((v) => !v)}
             >
-              <Server className="h-3.5 w-3.5 mr-1.5" />
+              <Server className="mr-1.5 h-3.5 w-3.5 shrink-0" />
               {tStr("widget.exportProd")}
             </Button>
           )}
           <Button
             variant={showWizard ? "default" : "outline"}
             size="sm"
+            className="h-auto min-h-8 max-w-full whitespace-normal text-start"
             onClick={(): void => {
               if (showWizard) {
                 void storage.setItem(WIZARD_DISMISSED_STORAGE_KEY, "1", logger);
@@ -524,7 +536,7 @@ export function SystemSettingsWidget(): JSX.Element {
               }
             }}
           >
-            <Wand2 className="h-3.5 w-3.5 mr-1.5" />
+            <Wand2 className="mr-1.5 h-3.5 w-3.5 shrink-0" />
             {showWizard
               ? tStr("wizard.viewAllSettings")
               : tStr("widget.restartWizard")}

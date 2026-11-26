@@ -117,6 +117,8 @@ export const translations: typeof enTranslations = {
     description: "Résultats par page",
   },
   widget: {
+    creditable: "Choisir la facture à créditer",
+    noCreditable: "Aucune facture ne peut faire l’objet d’un avoir.",
     filters: "Filtres",
     partlyPaid: "Partiellement réglée",
     pageCount: "Nombre de pages",

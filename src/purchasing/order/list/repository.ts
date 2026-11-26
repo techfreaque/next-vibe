@@ -76,6 +76,9 @@ export class OrderListRepository {
       }
 
       const conditions = [inArray(purchaseOrders.companyId, companyIds)];
+      if (data.vendorId) {
+        conditions.push(eq(purchaseOrders.vendorId, data.vendorId));
+      }
       if (data.status) {
         conditions.push(eq(purchaseOrders.status, data.status));
       }

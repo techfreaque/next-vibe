@@ -4,7 +4,6 @@ import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { HelpGetResponseOutput } from "next-vibe/help-tool/definition";
 import type { HelpGetRequestInput } from "next-vibe/help-tool/definition";
-import { AuthRepository } from "next-vibe/identity/auth/repository";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserPermissionRole, UserRole } from "next-vibe/identity/roles/enum";
 import { createEndpointLogger } from "next-vibe/logger/server";
@@ -40,8 +39,7 @@ export async function tanstackLoader({
   params,
   searchParams,
 }: ToolsPageProps): Promise<ToolsPageData> {
-  const { locale } = await params;
-  const query = await searchParams;
+  const [{ locale }, query] = await Promise.all([params, searchParams]);
   const initialState = parseToolsInitialState({
     get: (name) => {
       const value = query?.[name];
@@ -50,48 +48,60 @@ export async function tanstackLoader({
   });
   const logger = createEndpointLogger(false, locale);
 
+  const { AuthRepository } = await import("next-vibe/identity/auth/repository");
   const user = await AuthRepository.getAuthMinimalUser(
     [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN],
     { platform: Platform.NEXT_PAGE, locale },
     logger,
   );
 
-  let initialHelpData: HelpGetResponseOutput | null = null;
-  try {
-    const { HelpRepository } = await import("next-vibe/help-tool/repository");
-    const result = await HelpRepository.getTools(
-      {
-        ...initialState,
-        page: initialState.page,
-        pageSize: initialState.pageSize,
-      },
-      user,
-      locale,
-      Platform.NEXT_PAGE,
-      logger,
+  const [catalog, workspace] = await Promise.allSettled([
+    import("next-vibe/help-tool/repository").then(({ HelpRepository }) =>
+      HelpRepository.getTools(
+        {
+          ...initialState,
+          page: initialState.page,
+          pageSize: initialState.pageSize,
+        },
+        user,
+        locale,
+        Platform.NEXT_PAGE,
+        logger,
+      ),
+    ),
+    !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN)
+      ? Promise.all([
+          import("@/companies/_shared/workspace-company.repository").then(
+            ({ listWorkspaceCompanies }) => listWorkspaceCompanies(user.id),
+          ),
+          cookies().then((store) =>
+            readWorkspaceCompanyCookie(
+              store.get(WORKSPACE_COMPANY_COOKIE)?.value,
+              user.id,
+            ),
+          ),
+        ])
+      : null,
+  ]);
+  if (catalog.status === "rejected") {
+    logger.error(
+      "Unable to load the tools catalog",
+      parseError(catalog.reason),
     );
-    if (result.success) {
-      initialHelpData = result.data;
-    }
-  } catch (e) {
-    logger.error("[SSR help] catch:", parseError(e));
   }
-
-  let workspaceCompanies: WorkspaceCompany[] | null = null;
-  let workspaceCompanyId: string | undefined;
-  if (!user.isPublic && user.roles.includes(UserPermissionRole.ADMIN)) {
-    try {
-      const { listWorkspaceCompanies } =
-        await import("@/companies/_shared/workspace-company.repository");
-      const cookie = (await cookies()).get(WORKSPACE_COMPANY_COOKIE);
-      workspaceCompanyId = readWorkspaceCompanyCookie(cookie?.value, user.id);
-      workspaceCompanies = await listWorkspaceCompanies(user.id);
-    } catch (error) {
-      logger.warn("Unable to load workspace companies", {
-        error: parseError(error).message,
-      });
-    }
+  if (workspace.status === "rejected") {
+    logger.warn("Unable to load workspace companies", {
+      error: parseError(workspace.reason).message,
+    });
   }
+  const initialHelpData =
+    catalog.status === "fulfilled" && catalog.value.success
+      ? catalog.value.data
+      : null;
+  const [workspaceCompanies, workspaceCompanyId] =
+    workspace.status === "fulfilled" && workspace.value
+      ? workspace.value
+      : [null, undefined];
 
   return {
     locale,

@@ -9,7 +9,6 @@ import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
 import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
 import {
   requestField,
-  requestUrlPathParamsField,
   responseField,
 } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
@@ -39,18 +38,20 @@ const { GET } = createEndpoint({
   allowedRoles: [UserRole.ADMIN],
   fields: customWidgetObject({
     render: BankCandidatesWidgetLazy,
-    usage: { request: "data&urlPathParams", response: true },
+    usage: { request: "data", response: true },
     children: {
-      lineId: requestUrlPathParamsField(scopedTranslation, {
+      lineId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "fields.line",
+        includeInCacheKey: true,
         schema: z.uuid(),
       }),
       companyId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
         label: "fields.company",
+        includeInCacheKey: true,
         schema: z.uuid(),
         listEndpoint: async () =>
           (await import("@/companies/list/definition")).default.GET,
@@ -76,6 +77,11 @@ const { GET } = createEndpoint({
         label: "fields.journalLine",
         schema: z.uuid().nullable(),
       }),
+      matchedAt: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "fields.matchedAt",
+        schema: z.string().nullable().optional(),
+      }),
       canMatch: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         label: "fields.confirm",
@@ -85,11 +91,11 @@ const { GET } = createEndpoint({
   }),
   errorTypes: bankErrorTypes,
   examples: {
-    urlPathParams: {
-      default: { lineId: "00000000-0000-4000-8000-000000000003" },
-    },
     requests: {
-      default: { companyId: "00000000-0000-4000-8000-000000000001" },
+      default: {
+        companyId: "00000000-0000-4000-8000-000000000001",
+        lineId: "00000000-0000-4000-8000-000000000003",
+      },
     },
     responses: {
       default: {
@@ -120,8 +126,11 @@ const { GET } = createEndpoint({
   },
 });
 
-export type BankCandidatesRequest = typeof GET.types.RequestOutput;
+export type BankCandidatesRequest = Omit<
+  typeof GET.types.RequestOutput,
+  "lineId"
+>;
 export type BankCandidatesResponse = typeof GET.types.ResponseOutput;
-export type BankCandidatesPath = typeof GET.types.UrlVariablesOutput;
+export type BankCandidatesPath = Pick<typeof GET.types.RequestOutput, "lineId">;
 
 export default { GET };

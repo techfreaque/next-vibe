@@ -1,6 +1,7 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  lineRounding: "Zaokrąglanie pozycji",
   category: "Oferty",
   tags: { payment: "płatność", estimate: "oferta" },
   post: {
@@ -51,7 +52,9 @@ export const translations: typeof enTranslations = {
     description: "Oferta, na której wykonywana jest akcja",
   },
   widget: {
-    send: "Wyślij ofertę",
+    send: "Oznacz jako wysłaną",
+    terms: "Warunki",
+    noItems: "Ta oferta nie zawiera pozycji.",
     addLine: "Dodaj pozycję",
     accept: "Zapisz akceptację",
     decline: "Zapisz odrzucenie",

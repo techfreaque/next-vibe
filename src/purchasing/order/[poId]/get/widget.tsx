@@ -1,14 +1,19 @@
 "use client";
 
-import { Badge } from "next-vibe/ui/components/badge";
 import { Button, type ButtonMouseEvent } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
 import { Span } from "next-vibe/ui/components/span";
-import { formatMoney } from "next-vibe/unified-ui/_shared/format-money";
+import { StatusPill } from "next-vibe/ui/components/status-pill";
 import {
+  formatDocDate,
+  formatMoney,
+} from "next-vibe/unified-ui/_shared/format-money";
+import {
+  useWidgetIsInteractive,
   useWidgetLocale,
   useWidgetNavigation,
+  useWidgetResponseOnly,
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
@@ -16,31 +21,10 @@ import { EntityPickerFieldWidget } from "next-vibe/unified-ui/widgets/form-field
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 import type { JSX } from "react";
 
+import { isPurchaseDeliveryOverdue, purchaseOrderStatus } from "../../status";
 import type definition from "./definition";
 
 const MULTIPLY_SIGN = "\u00D7";
-
-type StatusVariant = "default" | "secondary" | "destructive" | "outline";
-
-const STATUS_VARIANT: Record<string, StatusVariant> = {
-  DRAFT: "secondary",
-  SENT: "outline",
-  CONFIRMED: "default",
-  PARTIALLY_RECEIVED: "default",
-  RECEIVED: "default",
-  BILLED: "default",
-  CANCELLED: "destructive",
-};
-
-const STATUS_COLOR: Record<string, string> = {
-  DRAFT: "text-slate-500",
-  SENT: "text-amber-600",
-  CONFIRMED: "text-blue-600",
-  PARTIALLY_RECEIVED: "text-amber-600",
-  RECEIVED: "text-green-700",
-  BILLED: "text-purple-600",
-  CANCELLED: "text-red-500",
-};
 
 // Only DRAFT and SENT can be cancelled
 const CANCELLABLE_STATUSES = new Set(["DRAFT", "SENT"]);
@@ -55,27 +39,6 @@ const RECEIVABLE_STATUSES = new Set(["CONFIRMED", "PARTIALLY_RECEIVED"]);
 // Only DRAFT can have lines added
 const LINE_EDITABLE_STATUSES = new Set(["DRAFT"]);
 
-function formatDate(date: Date | null, locale: string): string {
-  if (!date) {
-    return "";
-  }
-  return new Date(date).toLocaleDateString(locale, {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  });
-}
-
-function isOverdue(date: Date | null, status: string): boolean {
-  if (!date) {
-    return false;
-  }
-  if (status === "RECEIVED" || status === "CANCELLED") {
-    return false;
-  }
-  return new Date(date) < new Date();
-}
-
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function OrderGetWidget({
   field,
@@ -86,6 +49,8 @@ export function OrderGetWidget({
   const navigation = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.GET>();
   const locale = useWidgetLocale();
+  const interactive = useWidgetIsInteractive();
+  const responseOnly = useWidgetResponseOnly();
 
   if (!data?.result) {
     return (
@@ -170,8 +135,18 @@ export function OrderGetWidget({
     void (async (): Promise<void> => {
       const def = await import("../../line/add/definition");
       navigation.push(def.default.POST, {
-        urlPathParams: { poId: result.id },
+        data: { poId: result.id },
         popNavigationOnSuccess: 1,
+      });
+    })();
+  };
+
+  const handleRemoveLine = (lineId: string): void => {
+    void (async (): Promise<void> => {
+      const def = await import("../../line/remove/definition");
+      navigation.push(def.default.POST, {
+        data: { poId: result.id, lineId },
+        renderInModal: true,
       });
     })();
   };
@@ -190,20 +165,14 @@ export function OrderGetWidget({
     })();
   };
 
-  const statusVariant = STATUS_VARIANT[result.status] ?? "secondary";
-  const statusColor = STATUS_COLOR[result.status] ?? "text-muted-foreground";
-  const overdue = isOverdue(result.expectedDeliveryDate, result.status);
-
-  const statusLabels: Record<string, string> = {
-    DRAFT: t("enums.poStatus.draft"),
-    SENT: t("enums.poStatus.sent"),
-    CONFIRMED: t("enums.poStatus.confirmed"),
-    PARTIALLY_RECEIVED: t("enums.poStatus.partiallyReceived"),
-    RECEIVED: t("enums.poStatus.received"),
-    BILLED: t("enums.poStatus.billed"),
-    CANCELLED: t("enums.poStatus.cancelled"),
-  };
-  const statusLabel = statusLabels[result.status] ?? result.status;
+  const status = purchaseOrderStatus(result.status, t);
+  const overdue = isPurchaseDeliveryOverdue(
+    result.expectedDeliveryDate,
+    result.status,
+  );
+  const preciseCost = result.lines.some(
+    (line) => Math.round(line.unitPrice * 10_000) % 100 !== 0,
+  );
 
   return (
     <Div className="max-w-2xl mx-auto w-full px-4 pt-8 pb-6 flex flex-col gap-4">
@@ -222,26 +191,23 @@ export function OrderGetWidget({
       )}
 
       {/* Header: PO number, vendor, status, actions */}
-      <Div className="flex items-start justify-between gap-3 flex-wrap">
+      <Div className="flex flex-col items-start gap-3 sm:flex-row sm:justify-between">
         <Div>
           <Span className="text-xl font-semibold font-mono block">
             {result.poNumber}
           </Span>
           <Div className="flex items-center gap-2 mt-0.5 flex-wrap">
-            <Badge
-              variant={statusVariant}
-              className={["text-xs", statusColor].join(" ")}
-            >
-              {statusLabel}
-            </Badge>
+            <StatusPill status={status.label} variant={status.variant} />
             <Span className="text-sm text-muted-foreground">
               {result.currency}
             </Span>
           </Div>
-          <Div className="flex items-center gap-1 mt-1 text-xs text-muted-foreground">
-            <Span>{t("orderGet.get.widget.vendorLabel")}</Span>
-            <Span className="font-mono">{result.vendorId}</Span>
-          </Div>
+          {result.vendorName && (
+            <Div className="flex items-center gap-1 mt-1 text-xs text-muted-foreground">
+              <Span>{t("orderGet.get.widget.vendorLabel")}</Span>
+              <Span>{result.vendorName}</Span>
+            </Div>
+          )}
         </Div>
         <Div className="flex items-center gap-2 flex-wrap justify-end">
           {EDITABLE_STATUSES.has(result.status) && (
@@ -323,8 +289,8 @@ export function OrderGetWidget({
           <Span className="text-muted-foreground">
             {t("orderGet.get.widget.delivery")}
           </Span>
-          <Span className={overdue ? "text-red-600 font-medium" : ""}>
-            {formatDate(result.expectedDeliveryDate, locale)}
+          <Span className={overdue ? "text-destructive font-medium" : ""}>
+            {formatDocDate(result.expectedDeliveryDate, locale)}
             {overdue ? ` ${t("orderGet.get.widget.overdue")}` : ""}
           </Span>
         </Div>
@@ -388,8 +354,22 @@ export function OrderGetWidget({
               >
                 <Div className="flex-1 min-w-0">
                   <Span className="block">{line.description}</Span>
+                  {interactive &&
+                    !responseOnly &&
+                    LINE_EDITABLE_STATUSES.has(result.status) && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="h-auto min-h-11 justify-start whitespace-normal p-0 text-left text-destructive"
+                        aria-label={`${t("orderLineRemove.post.titleShort")} ${line.description}`}
+                        onClick={() => handleRemoveLine(line.id)}
+                      >
+                        {t("orderLineRemove.post.titleShort")}
+                      </Button>
+                    )}
                   {line.quantityReceived > 0 && (
-                    <Span className="text-xs text-green-600 block">
+                    <Span className="text-xs text-success block">
                       {line.quantityReceived}/{line.quantity}{" "}
                       {t("orderGet.get.widget.received")}
                     </Span>
@@ -408,6 +388,11 @@ export function OrderGetWidget({
         )}
       </Div>
 
+      {preciseCost && (
+        <Span className="text-xs text-muted-foreground">
+          {t("orderGet.get.widget.precision")}
+        </Span>
+      )}
       {/* Receipt history */}
       {result.receipts.length > 0 && (
         <Div>
@@ -418,12 +403,32 @@ export function OrderGetWidget({
             {result.receipts.map((receipt) => (
               <Div
                 key={receipt.id}
-                className="flex items-center justify-between p-2 rounded border text-sm"
+                className="flex flex-col gap-1 rounded border p-2 text-sm"
               >
-                <Span>{formatDate(receipt.receivedAt, locale)}</Span>
-                <Span className="text-muted-foreground">
-                  {receipt.lines.length} {t("orderGet.get.response.lines")}
+                <Span>
+                  {new Intl.DateTimeFormat(locale, {
+                    dateStyle: "medium",
+                    timeStyle: "short",
+                  }).format(new Date(receipt.receivedAt))}
                 </Span>
+                {receipt.lines.map((line) => (
+                  <Div
+                    key={line.poLineId}
+                    className="flex justify-between gap-2 text-muted-foreground"
+                  >
+                    <Span>
+                      {
+                        result.lines.find(({ id }) => id === line.poLineId)
+                          ?.description
+                      }
+                    </Span>
+                    <Span className="tabular-nums">
+                      {new Intl.NumberFormat(locale, {
+                        maximumFractionDigits: 4,
+                      }).format(line.quantityReceived)}
+                    </Span>
+                  </Div>
+                ))}
                 {receipt.notes ? (
                   <Span className="text-muted-foreground">{receipt.notes}</Span>
                 ) : null}

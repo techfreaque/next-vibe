@@ -22,10 +22,10 @@ import {
 import { EmptyBlock } from "next-vibe/ui/components/empty-block";
 import { ArrowRight } from "next-vibe/ui/components/icons/ArrowRight";
 import { Bot } from "next-vibe/ui/components/icons/Bot";
+import { Building } from "next-vibe/ui/components/icons/Building";
 import { Check } from "next-vibe/ui/components/icons/Check";
 import { ChevronDown } from "next-vibe/ui/components/icons/ChevronDown";
 import { ChevronRight } from "next-vibe/ui/components/icons/ChevronRight";
-import { Download } from "next-vibe/ui/components/icons/Download";
 import { Eye } from "next-vibe/ui/components/icons/Eye";
 import { EyeOff } from "next-vibe/ui/components/icons/EyeOff";
 import { Globe } from "next-vibe/ui/components/icons/Globe";
@@ -39,9 +39,12 @@ import { Search } from "next-vibe/ui/components/icons/Search";
 import { Settings } from "next-vibe/ui/components/icons/Settings";
 import { Shield } from "next-vibe/ui/components/icons/Shield";
 import { Terminal } from "next-vibe/ui/components/icons/Terminal";
+import { User } from "next-vibe/ui/components/icons/User";
 import { X } from "next-vibe/ui/components/icons/X";
 import { Zap } from "next-vibe/ui/components/icons/Zap";
+import type { InputRefObject } from "next-vibe/ui/components/input";
 import { Input } from "next-vibe/ui/components/input";
+import { Link } from "next-vibe/ui/components/link";
 import { LoadingBlock } from "next-vibe/ui/components/loading-block";
 import { AnimatePresence, MotionDiv } from "next-vibe/ui/components/motion";
 import { Pre } from "next-vibe/ui/components/pre";
@@ -75,12 +78,17 @@ import {
   getCurrentPathname,
   getCurrentSearch,
   historyBack,
+  reloadPage,
 } from "next-vibe/ui/lib/location";
 import { getScreenWidth } from "next-vibe/ui/lib/screen";
 import { storage } from "next-vibe/ui/lib/storage";
+import {
+  AdminRecordCompanyContext,
+  adminRecordCompanyKey,
+} from "next-vibe/unified-ui/_shared/admin-record-company";
+import { AdminRecordContext } from "next-vibe/unified-ui/_shared/admin-record-context";
 import type { JSX } from "react";
 import {
-  createContext,
   useCallback,
   useContext,
   useEffect,
@@ -112,10 +120,13 @@ import {
 } from "../agent/chat/constants";
 import type { EnabledTool } from "../agent/chat/hooks/store";
 import settingsDefinition from "../agent/chat/settings/definition";
-import { isSkillVariantId } from "../agent/chat/slugify";
 import favoriteByIdDefinition from "../agent/skills/favorites/[id]/definition";
 import favoritesListDefinition from "../agent/skills/favorites/definition";
-import { endpointToUrlSegment } from "../core/core-utils/path";
+import {
+  endpointToUrlSegment,
+  getPreferredName,
+  pathSegmentsToToolName,
+} from "../core/core-utils/path";
 import type { NavigationStackEntry } from "../core/definition/endpoint";
 import type { CreateApiEndpointAny } from "../core/definition/endpoint-base";
 import { coreClientEnv } from "../core/env-client";
@@ -146,31 +157,32 @@ import { useEndpoint } from "../unified-ui/hooks/use-endpoint";
 import type { NavigationOptions } from "../unified-ui/hooks/use-navigation-stack";
 import {
   deserializeNavigationData,
-  type NavigationArgument,
   serializeNavigationData,
   useUrlNavStack,
 } from "../unified-ui/hooks/use-url-nav-stack";
 import { EndpointsPage } from "../unified-ui/renderers/web/EndpointsPage";
 import { Icon } from "../unified-ui/widgets/form-fields/icon-field/icon-component";
 import type { IconKey } from "../unified-ui/widgets/form-fields/icon-field/icons";
-import { AdminCatalog } from "./admin-catalog";
+import { AdminCatalog, RecordSearch } from "./admin-catalog";
 import { CatalogOverview } from "./catalog-overview";
 import type { CategoryDefinitionSerialized } from "./category-types";
 import type definition from "./definition";
 import type {
   HelpGetRequestInput,
+  HelpGetResponseOutput,
   HelpToolMetadataSerialized,
 } from "./definition";
 import {
   applyWorkspaceCompany,
   applyWorkspaceCompanyToEntry,
+  hasFixedRecordCompany,
   readWorkspaceCompanyOverride,
 } from "./erp-company-scope";
 import { ErpCompanySwitch } from "./erp-company-switch";
-import { erpEntryPoints, erpInvoiceCreate } from "./erp-workflows";
-import { ErpWorkspaceNav } from "./erp-workspace-nav";
 import { scopedTranslation } from "./i18n";
 import { localizedLabel } from "./localized-label";
+import { PlatformAdminCatalog } from "./platform-admin-catalog";
+import { PlatformAdminNav } from "./platform-admin-nav";
 import { resolveEffectiveUser } from "./repository/meta-filter";
 
 // ─── Constants ──────────────────────────────────────────────────────────────
@@ -191,7 +203,7 @@ function splitToolInputs(
   args: Record<string, string>,
 ): {
   urlPathParams?: Record<string, string>;
-  data?: Record<string, NavigationArgument>;
+  data?: ReturnType<typeof deserializeNavigationData>;
 } {
   const pathParamKeys = new Set(
     endpoint.path
@@ -208,7 +220,7 @@ function splitToolInputs(
       Object.keys(urlPathParams).length > 0 ? urlPathParams : undefined,
     data:
       Object.keys(data).length > 0
-        ? deserializeNavigationData(data)
+        ? deserializeNavigationData(data, endpoint.requestSchema)
         : undefined,
   };
 }
@@ -226,7 +238,33 @@ async function resolveCatalogEndpoint(
 
 // Prevents the admin two-pane layout from rendering recursively when HelpToolsWidget
 // is mounted inside another HelpToolsWidget's EndpointsPage.
-const HelpAdminLayoutActiveContext = createContext(false);
+
+function RestoringTool({
+  loading,
+  unavailable,
+  retry,
+  failed,
+}: {
+  loading: string;
+  unavailable: string;
+  retry: string;
+  failed: boolean;
+}): JSX.Element {
+  const [timedOut, setTimedOut] = useState(false);
+  useEffect(() => {
+    const timeout = setTimeout(() => setTimedOut(true), 15_000);
+    return (): void => clearTimeout(timeout);
+  }, []);
+  return failed || timedOut ? (
+    <EmptyBlock
+      className="mx-4 mt-6 rounded-xl border bg-card px-4 py-8 sm:mx-8"
+      title={unavailable}
+      action={{ label: retry, onClick: reloadPage }}
+    />
+  ) : (
+    <LoadingBlock className="mt-16" message={loading} />
+  );
+}
 
 function FolderCell({
   icon,
@@ -469,12 +507,67 @@ export function HelpToolsWidget(): JSX.Element {
   const hasLocalWorkspace =
     isAdminUser && !activeViewAsRole && !activeInstanceId;
   const activeCompany = hasLocalWorkspace ? workspace?.active : undefined;
+  const [recordCompany, setRecordCompany] = useState<{
+    key: string;
+    companyId: string;
+  }>();
+  const publishRecordCompany = useCallback(
+    (key: string, companyId: string | undefined): void => {
+      setRecordCompany((previous) => {
+        if (!companyId) {
+          return previous?.key === key ? undefined : previous;
+        }
+        return previous?.key === key && previous.companyId === companyId
+          ? previous
+          : { key, companyId };
+      });
+    },
+    [],
+  );
+  const [reportAction, setReportAction] = useState<{
+    reportAlias: string;
+    companyId: string;
+    actionAlias: string | undefined;
+  }>();
+  const updateReportAction = useCallback(
+    (
+      reportAlias: string,
+      companyId: string,
+      actionAlias: string | undefined,
+    ): void => {
+      setReportAction({ reportAlias, companyId, actionAlias });
+    },
+    [],
+  );
   const triggerRefetchRef = useRef<() => void>(() => undefined);
+  // Two-pane sidebar mode when on /tools path.
+  // Disabled if this widget is nested inside another HelpToolsWidget's admin layout
+  // (prevents infinite recursive nesting).
+  const isInsideAdminLayout = useContext(AdminRecordContext) !== null;
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const isAdminLayout =
+    !isInsideAdminLayout && pathname.split("/").includes(ADMIN_ENDPOINTS_PATH);
+  const response = useWidgetValue<typeof definition.GET>();
+  const endpointResponse = useWidgetResponse();
+  const catalogDestinations = response?.adminCatalogDestinations;
+  const catalogPending =
+    isAdminUser &&
+    !activeInstanceId &&
+    !catalogDestinations &&
+    endpointResponse?.success !== false;
   const canOpenLocalEndpoint = useCallback(
     (endpoint: CreateApiEndpointAny): boolean => {
       const values = form.getValues();
       return (
         !values.instanceId &&
+        (!isAdminLayout ||
+          !isAdminUser ||
+          (catalogDestinations !== undefined &&
+            Object.hasOwn(
+              catalogDestinations,
+              endpointToUrlSegment(endpoint),
+            ))) &&
         (!values.includeProdOnly ||
           !endpoint.allowedRoles.includes(PlatformMarker.PRODUCTION_OFF)) &&
         permissionsRegistry.validateEndpointAccess(
@@ -487,17 +580,9 @@ export function HelpToolsWidget(): JSX.Element {
         ).allowed
       );
     },
-    [form, isAdminUser, platform, user],
+    [catalogDestinations, form, isAdminLayout, isAdminUser, platform, user],
   );
 
-  // Two-pane sidebar mode when on /tools path.
-  // Disabled if this widget is nested inside another HelpToolsWidget's admin layout
-  // (prevents infinite recursive nesting).
-  const isInsideAdminLayout = useContext(HelpAdminLayoutActiveContext);
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const isAdminLayout =
-    !isInsideAdminLayout && pathname.split("/").includes(ADMIN_ENDPOINTS_PATH);
   const [selectedAdminEndpoint, setSelectedAdminEndpointState] =
     useState<CreateApiEndpointAny | null>(null);
   const [unavailableSelection, setUnavailableSelection] = useState(false);
@@ -752,7 +837,7 @@ export function HelpToolsWidget(): JSX.Element {
 
   const lastRouterLocation = useRef<string | undefined>(undefined);
   useEffect(() => {
-    if (!isAdminLayout) {
+    if (!isAdminLayout || catalogPending) {
       return;
     }
     const observed = `${pathname}?${routerSearch}`;
@@ -760,7 +845,6 @@ export function HelpToolsWidget(): JSX.Element {
     if (observed === previous) {
       return;
     }
-    lastRouterLocation.current = observed;
     const browserSearch = new URLSearchParams(getCurrentSearch());
     if (
       pathname !== getCurrentPathname() ||
@@ -768,6 +852,7 @@ export function HelpToolsWidget(): JSX.Element {
     ) {
       return;
     }
+    lastRouterLocation.current = observed;
     if (
       previous !== undefined &&
       effectivePathnameRef.current === pathname &&
@@ -782,6 +867,7 @@ export function HelpToolsWidget(): JSX.Element {
     restoreCatalogFilters();
     void restoreBaseTool();
   }, [
+    catalogPending,
     isAdminLayout,
     pathname,
     restoreBaseTool,
@@ -832,51 +918,37 @@ export function HelpToolsWidget(): JSX.Element {
     [settingsState.read?.data],
   );
 
-  // A merged `skill__variant` activeFavoriteId is a mode picked without a
-  // favorite row (the new-thread spotlight writes it when the user has no
-  // favorite for that variant). It may or may not match one of the user's
-  // favorites, so resolve it against the list instead of fetching it blind
-  // (that 404'd for every user without a matching row).
-  const activeIsMergedSkillId =
-    activeFavoriteId !== null && isSkillVariantId(activeFavoriteId);
-
-  // When no activeFavoriteId is set in settings, fall back to the first favorite in the list.
-  // This lets the tool toggles work even if the user hasn't explicitly selected a favorite.
+  // Settings can outlive a deleted favorite or name a mode without a row.
+  // Resolve the selection against the user's favorites before reading its config.
+  const favoritesEnabled = !user.isPublic && settingsLoaded;
   const favoritesListState = useEndpoint(
     favoritesListDefinition,
     useMemo(
       () => ({
         read: {
           queryOptions: {
-            enabled:
-              !user?.isPublic &&
-              settingsLoaded &&
-              (activeFavoriteId === null || activeIsMergedSkillId),
+            enabled: favoritesEnabled,
             refetchOnWindowFocus: false,
           },
         },
       }),
-      [user?.isPublic, settingsLoaded, activeFavoriteId, activeIsMergedSkillId],
+      [favoritesEnabled],
     ),
     logger,
     user,
   );
+  const favorites = favoritesListState.read?.data?.favorites;
   const effectiveFavoriteId = useMemo((): string | null => {
-    const favorites = favoritesListState.read?.data?.favorites;
     if (activeFavoriteId === null) {
       return favorites?.[0]?.id ?? null;
     }
-    if (!activeIsMergedSkillId) {
-      return activeFavoriteId;
-    }
-    // No matching row: the active mode has no favorite, so there is no
-    // favorite-level tool config to load or save.
     return (
-      favorites?.find(
-        (f) => f.id === activeFavoriteId || f.skillId === activeFavoriteId,
-      )?.id ?? null
+      favorites?.find((favorite) => favorite.id === activeFavoriteId)?.id ??
+      favorites?.find((favorite) => favorite.skillId === activeFavoriteId)
+        ?.id ??
+      null
     );
-  }, [activeFavoriteId, activeIsMergedSkillId, favoritesListState.read?.data]);
+  }, [activeFavoriteId, favorites]);
 
   // Web sidebar pinned tools — separate from AI pinnedTools on favorites
   const webPinnedTools = useMemo(
@@ -900,7 +972,7 @@ export function HelpToolsWidget(): JSX.Element {
         settingsDefinition.POST,
         logger,
         user,
-        { webPinnedTools: tools },
+        { webPinnedTools: tools, turnStepLimit: undefined },
         undefined,
         locale,
       );
@@ -1115,8 +1187,6 @@ export function HelpToolsWidget(): JSX.Element {
 
   // SSR renders from a per-request query cache (QueryProvider
   // isolateServerRender), so the server and hydrating client agree.
-  const response = useWidgetValue<typeof definition.GET>();
-  const endpointResponse = useWidgetResponse();
   const isFetching = endpointMutations?.read?.isFetching ?? false;
   const availableTools: HelpToolMetadataSerialized[] = useMemo(
     () => response?.tools ?? [],
@@ -1846,6 +1916,7 @@ export function HelpToolsWidget(): JSX.Element {
   );
 
   const searchDebounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const catalogInput = useRef<InputRefObject>(null);
   const setSearchQuery = useCallback(
     (value: string) => {
       form.setValue("query", value || undefined, { shouldDirty: true });
@@ -2184,8 +2255,20 @@ export function HelpToolsWidget(): JSX.Element {
       <Div className="flex w-full min-w-0 items-center gap-2 rounded-lg border bg-card px-2 focus-within:border-ring">
         <Search className="size-4 shrink-0 text-muted-foreground" />
         <Input
+          ref={catalogInput}
           value={searchQuery}
-          onChange={(event) => setSearchQuery(event.target.value)}
+          onChange={(event) => {
+            const value = event.target.value;
+            if (
+              value &&
+              (activeCatKey || selectedAdminEndpoint) &&
+              hasLocalWorkspace &&
+              !showAllTools
+            ) {
+              setSidebarPath([], "webPinned");
+            }
+            setSearchQuery(value);
+          }}
           onKeyDown={(event) => {
             if (event.key === "Enter") {
               event.preventDefault();
@@ -2888,7 +2971,29 @@ export function HelpToolsWidget(): JSX.Element {
     const activeNavigationEntry = urlNavStack?.current;
     const displayedEndpoint =
       activeNavigationEntry?.endpoint ?? selectedAdminEndpoint;
+    const selectedCategory = displayedEndpoint
+      ? (catalogDestinations?.[endpointToUrlSegment(displayedEndpoint)]
+          ?.category ?? displayedEndpoint.category)
+      : undefined;
     const displayedMethod = displayedEndpoint?.method;
+    const recordNavigationEntry = urlNavStack?.stack.findLast(
+      (entry) => !entry.renderInModal,
+    );
+    const recordEndpoint =
+      recordNavigationEntry?.endpoint ?? selectedAdminEndpoint;
+    const fixedRecordCompany =
+      !!recordEndpoint && hasFixedRecordCompany(recordEndpoint);
+    const recordCompanyKey =
+      fixedRecordCompany && hasLocalWorkspace && !isRestoringTool
+        ? adminRecordCompanyKey(
+            recordEndpoint,
+            (recordNavigationEntry?.params ?? selectedToolInputs).urlPathParams,
+          )
+        : undefined;
+    const companyOnRecord =
+      recordCompany && recordCompany.key === recordCompanyKey
+        ? workspace?.companies.find(({ id }) => id === recordCompany.companyId)
+        : undefined;
     const explicitCompanyId = displayedEndpoint
       ? readWorkspaceCompanyOverride(
           displayedEndpoint,
@@ -2902,11 +3007,19 @@ export function HelpToolsWidget(): JSX.Element {
     // Restored browser state can affect whether the toolbar shows the switch.
     const companySwitcherVisible =
       hydrated &&
+      !isRestoringTool &&
+      !fixedRecordCompany &&
       hasLocalWorkspace &&
       workspace &&
       workspace.companies.length > 0 &&
+      (categoryByKey.get(selectedCategory ?? activeCatKey ?? "")?.group ===
+        "business" ||
+        explicitCompanyId !== undefined) &&
       (explicitCompanyId === undefined || companyInToolbar !== undefined);
     const selectWorkspaceCompany = (id: string): void => {
+      if (id !== activeCompany?.id) {
+        setReportAction(undefined);
+      }
       workspace?.select(id);
       if (displayedMethod !== "GET" || explicitCompanyId === undefined) {
         return;
@@ -2920,24 +3033,59 @@ export function HelpToolsWidget(): JSX.Element {
       urlNavStack?._clearStack();
       void restoreBaseTool();
     };
-    const hasBusinessNavigation =
-      hasLocalWorkspace && !!workspace?.companies.length;
-    const showBusinessNavigation = hasBusinessNavigation && !showAllTools;
+    const showPlatformAdmin = hasLocalWorkspace && !showAllTools;
+    const createActions = [
+      ...new Map(
+        Object.values(response?.adminCategoryLandings ?? {})
+          .flatMap((landing) => landing.createActions)
+          .map((action) => [action.alias, action]),
+      ).values(),
+    ];
     const goHome = (): void => setSidebarPath([], "webPinned", "business");
-    const showDeveloperCatalog = (): void => {
-      setSidebarPath([], "webPinned", "all");
+    const showDeveloperCatalog = (category?: string): void => {
+      setSidebarPath(
+        category ? [category] : [],
+        category ? "web" : "webPinned",
+        "all",
+      );
       if (isMobile) {
         setAdminSidebarCollapsed(false);
       }
     };
+    const accountSettings = categoryByKey.get("accountSettings");
+    const showAccountSettings =
+      accountSettings &&
+      webCategories.some(({ name }) => name === "accountSettings");
     const browseTools = (): void => {
-      if (showBusinessNavigation) {
-        showDeveloperCatalog();
+      const category = showPlatformAdmin
+        ? (selectedCategory ?? activeCatKey)
+        : undefined;
+      if (showPlatformAdmin) {
+        setSidebarPath(
+          category ? [category] : [],
+          category ? "web" : "webPinned",
+        );
       } else {
         setSidebarPath(sidebarPath);
       }
     };
-    const companySwitch = companySwitcherVisible ? (
+    const companySwitch = companyOnRecord ? (
+      <Span
+        title={companyOnRecord.name}
+        className="inline-flex min-h-8 min-w-0 max-w-full items-center gap-2 rounded-md border bg-background px-2 py-1 text-sm sm:max-w-80"
+      >
+        <Building className="size-4 shrink-0" aria-hidden="true" />
+        <Span className="sr-only">
+          {t("erp.companySwitch.current", { name: companyOnRecord.name })}
+        </Span>
+        <Span
+          aria-hidden="true"
+          className="line-clamp-2 min-w-0 [overflow-wrap:anywhere]"
+        >
+          {companyOnRecord.name}
+        </Span>
+      </Span>
+    ) : companySwitcherVisible ? (
       <ErpCompanySwitch
         t={t}
         activeCompany={companyInToolbar}
@@ -2951,54 +3099,36 @@ export function HelpToolsWidget(): JSX.Element {
         onBrowse={isMobile && selectedAdminEndpoint ? browseTools : undefined}
       />
     ) : undefined;
-    const navCategory = displayedEndpoint?.category ?? activeCatKey;
-    const activeNavigationCategory = navCategory
-      ? categoryByKey.get(navCategory)
-      : undefined;
-    const endpointSubcategory = displayedEndpoint?.subCategory;
-    const navSubcategory =
-      displayedEndpoint &&
-      endpointSubcategory &&
-      activeNavigationCategory?.subcategories?.[endpointSubcategory] &&
-      endpointToUrlSegment(displayedEndpoint) !==
-        activeNavigationCategory.defaultEntryAlias
-        ? endpointSubcategory
-        : displayedEndpoint
-          ? undefined
-          : activeSubKey;
-    const sidePanel = showBusinessNavigation ? (
-      <ErpWorkspaceNav
+    const sidePanel = showPlatformAdmin ? (
+      <PlatformAdminNav
         t={t}
         locale={locale}
-        categories={CATEGORY_REGISTRY}
-        permitted={response?.webCategories}
-        defaults={response?.erpNavigationAliases}
-        currentCategory={navCategory}
-        currentSubcategory={navSubcategory}
-        currentAlias={
-          displayedEndpoint
-            ? endpointToUrlSegment(displayedEndpoint)
-            : undefined
+        registry={categoryByKey}
+        summaries={webCategories}
+        landings={response?.adminCategoryLandings}
+        activeCategory={selectedCategory ?? activeCatKey}
+        homeActive={
+          !unavailableSelection &&
+          !isRestoringTool &&
+          !displayedEndpoint &&
+          !activeCatKey &&
+          !isSearching
         }
-        onOpenTool={(alias) => void handleOpenTool(alias)}
         onHome={goHome}
         onAllTools={showDeveloperCatalog}
-        onSelect={(category, subcategory, alias) => {
-          if (alias) {
-            void handleOpenTool(alias);
-          } else {
-            setSidebarPath(
-              subcategory ? [category, subcategory] : [category],
-              "web",
-            );
+        onOpenTool={(alias) => void handleOpenTool(alias)}
+        onSelectCategory={(category) => {
+          setSidebarPath([category], "web");
+          if (searchQuery) {
+            setSearchQuery("");
           }
         }}
-        company={isMobile ? undefined : companySwitch}
+        company={isMobile || fixedRecordCompany ? undefined : companySwitch}
         instances={instanceControls}
       />
     ) : (
       <Div className="flex h-full min-h-0 flex-col">
-        {hasBusinessNavigation && (
+        {hasLocalWorkspace && (
           <Div className="shrink-0 border-b p-2">
             <Button
               type="button"
@@ -3041,15 +3171,23 @@ export function HelpToolsWidget(): JSX.Element {
             current: scopedStack.at(-1) ?? null,
           }
         : urlNavStack;
-    const scopedEntry = navigationOverride?.current;
+    // A picker can be scoped to a company without changing the page beneath it.
+    const scopedEntry = navigationOverride?.stack.findLast(
+      (entry) => !entry.renderInModal,
+    );
     const selectedCompanyId = scopedEntry
       ? readWorkspaceCompanyOverride(scopedEntry.endpoint, scopedEntry.params)
       : selectedAdminEndpoint
         ? readWorkspaceCompanyOverride(selectedAdminEndpoint, toolInputs)
         : undefined;
-    const toolPageKey = selectedCompanyId
-      ? `${selectedToolId}:${selectedCompanyId}`
-      : selectedToolId;
+    const baseRecordKey = fixedRecordCompany
+      ? adminRecordCompanyKey(selectedAdminEndpoint, toolInputs.urlPathParams)
+      : undefined;
+    const toolPageKey =
+      baseRecordKey ??
+      (selectedCompanyId
+        ? `${selectedToolId}:${selectedCompanyId}`
+        : selectedToolId);
     const mutationOptions = {
       urlPathParams: toolInputs.urlPathParams,
       autoPrefillData: toolInputs.data,
@@ -3129,6 +3267,139 @@ export function HelpToolsWidget(): JSX.Element {
         )
       : undefined;
 
+    const adminLanding = activeCatKey
+      ? response?.adminCategoryLandings?.[activeCatKey]
+      : undefined;
+    const landingOverview = adminLanding?.summary ?? adminLanding?.overview;
+    const homeSummary = Object.values(
+      response?.adminCategoryLandings ?? {},
+    ).find(
+      ({ summary }) => summary?.scope === "platform" && summary.home,
+    )?.summary;
+    const renderLandingReport = (
+      report: NonNullable<
+        HelpGetResponseOutput["adminCategoryLandings"]
+      >[string]["summary"],
+      contextualActions = false,
+    ): JSX.Element | undefined => {
+      if (!report) {
+        return undefined;
+      }
+      if (report.scope === "company" && !activeCompany) {
+        const createCompany =
+          response?.adminCategoryLandings?.companies?.createActions[0];
+        if (workspace?.companies.length) {
+          return (
+            <Div className="flex min-w-0 flex-col items-start gap-3 rounded-xl border bg-card p-5">
+              <P className="font-medium">{t("erp.overview.chooseCompany")}</P>
+              <ErpCompanySwitch
+                t={t}
+                companies={workspace.companies}
+                onSelect={selectWorkspaceCompany}
+              />
+            </Div>
+          );
+        }
+        return (
+          <Div className="flex flex-col items-start gap-3 rounded-xl border bg-card p-5">
+            <P className="font-medium">{t("erp.overview.chooseCompany")}</P>
+            {createCompany && (
+              <Link
+                href={`/${locale}/${ADMIN_ENDPOINTS_PATH}/${createCompany.alias}`}
+                className="inline-flex min-h-10 items-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+              >
+                {t("erp.createCompany")}
+              </Link>
+            )}
+          </Div>
+        );
+      }
+      return (
+        <CatalogOverview
+          alias={report.alias}
+          args={report.args}
+          progressive={report.progressive}
+          onReportAction={contextualActions ? updateReportAction : undefined}
+          companyId={report.scope === "company" ? activeCompany?.id : undefined}
+          pageProps={{
+            ...toolPageProps,
+            navigationOverride: catalogOverviewNavigation,
+          }}
+        />
+      );
+    };
+    // A category report has its own query and timeout. Keep it mounted when
+    // the permitted category metadata is already present during a catalog refresh.
+    const hasWorkspaceMetadata = activeCatKey
+      ? Boolean(adminLanding && !activeSubKey)
+      : Boolean(catalogDestinations && response?.webCategories);
+    const catalogLoading =
+      (isFetching && (isSearching || !hasWorkspaceMetadata)) ||
+      (!response && endpointResponse === undefined);
+    const catalogError =
+      endpointResponse?.success === false
+        ? endpointResponse.message
+        : undefined;
+    const jumpToPage = (page: number): void => {
+      form.setValue("page", page, { shouldDirty: true });
+      syncFilterParamsToUrl({ page });
+      triggerRefetch();
+    };
+    const openTool = (toolName: string): void => {
+      void handleOpenTool(toolName);
+    };
+    const openRecordSearch = (
+      alias: string,
+      field: string,
+      value: string,
+    ): void => {
+      void handleOpenTool(alias, { field, value });
+    };
+
+    const recordBack = (
+      endpoint: CreateApiEndpointAny,
+    ): { label: string; onClick: () => void } | undefined => {
+      const scope = catalogDestinations?.[endpointToUrlSegment(endpoint)];
+      const parameter = endpoint.path.findIndex((segment) =>
+        segment.startsWith("["),
+      );
+      if (!scope || parameter <= 0) {
+        return undefined;
+      }
+      const listPath = [...endpoint.path.slice(0, parameter), "list"];
+      const adjacentList = getPreferredName(
+        pathSegmentsToToolName(listPath, "GET"),
+      );
+      const category = categoryByKey.get(scope.category);
+      const alias =
+        catalogDestinations[adjacentList]?.category === scope.category
+          ? adjacentList
+          : category?.recordSearch?.alias;
+      const target = alias && catalogDestinations[getPreferredName(alias)];
+      if (!alias || !target || target.category !== scope.category) {
+        return undefined;
+      }
+      const landing = response?.adminCategoryLandings?.[scope.category];
+      const link = [
+        ...(landing?.destinations ?? []),
+        ...(landing?.actions ?? []),
+      ].find((item) => getPreferredName(item.alias) === alias);
+      const section = target.subCategory
+        ? category?.subcategories?.[target.subCategory]
+        : undefined;
+      const name =
+        link?.title ??
+        (section
+          ? (localizedLabel(section.labels, locale) ?? section.label)
+          : undefined);
+      return {
+        label: name
+          ? t("admin.recordBackTo", { section: name })
+          : t("catalog.browse"),
+        onClick: () => openTool(alias),
+      };
+    };
+
     const mainContent = (
       <Div
         id={
@@ -3145,25 +3416,110 @@ export function HelpToolsWidget(): JSX.Element {
               isRestoringTool && "hidden",
             )}
           >
-            <HelpAdminLayoutActiveContext.Provider value={true}>
-              {renderSelectedTool(selectedAdminEndpoint)}
-            </HelpAdminLayoutActiveContext.Provider>
+            <AdminRecordContext.Provider
+              value={{
+                browse: browseTools,
+                browseLabel: t("catalog.browse"),
+                retryLabel: t("catalog.retry"),
+                accessDeniedLabel: t("admin.recordAccessDenied"),
+                recordBack,
+                selectLabel: t("catalog.selectRecord"),
+                openLabel: t("catalog.openRecord"),
+                loadingLabel: t("aiTools.modal.loading"),
+              }}
+            >
+              <AdminRecordCompanyContext.Provider
+                value={
+                  recordCompanyKey
+                    ? { key: recordCompanyKey, publish: publishRecordCompany }
+                    : null
+                }
+              >
+                {renderSelectedTool(selectedAdminEndpoint)}
+              </AdminRecordCompanyContext.Provider>
+            </AdminRecordContext.Provider>
           </Div>
         )}
-        {isRestoringTool ? (
-          <LoadingBlock
-            className="mt-16"
-            message={t("aiTools.modal.loading")}
+        {isRestoringTool ||
+        (unavailableSelection &&
+          !catalogDestinations &&
+          endpointResponse?.success === false) ? (
+          <RestoringTool
+            loading={t("aiTools.modal.loading")}
+            unavailable={t("catalog.openError")}
+            retry={t("catalog.retry")}
+            failed={!catalogDestinations && endpointResponse?.success === false}
           />
         ) : selectedToolAllowed ? null : unavailableSelection ||
           selectedAdminEndpoint ? (
           <EmptyBlock
-            className="mt-16"
+            className="mx-4 mt-6 rounded-xl border bg-card px-4 py-8 sm:mx-8"
             title={t("catalog.toolNotFound")}
+            message={t("catalog.toolUnavailableHint")}
             action={{
               label: t("catalog.browse"),
               onClick: () => setSidebarPath(sidebarPath),
             }}
+          />
+        ) : showPlatformAdmin ? (
+          <PlatformAdminCatalog
+            t={t}
+            locale={locale}
+            registry={categoryByKey}
+            summaries={webCategories}
+            activeCategory={activeCatKey}
+            activeSubCategory={activeSubKey}
+            tools={
+              isSearching || activeCatKey || statsFilter === "webPinned"
+                ? visibleTools
+                : []
+            }
+            landing={adminLanding}
+            landings={response?.adminCategoryLandings}
+            query={searchQuery}
+            contextualActionAlias={
+              reportAction &&
+              reportAction.reportAlias === landingOverview?.alias &&
+              reportAction.companyId === activeCompany?.id
+                ? reportAction.actionAlias
+                : undefined
+            }
+            overview={renderLandingReport(
+              landingOverview,
+              adminLanding?.contextualActions,
+            )}
+            homeSummary={renderLandingReport(
+              homeSummary && {
+                ...homeSummary,
+                args: { ...homeSummary.args, ...homeSummary.homeArgs },
+              },
+            )}
+            recordSearch={
+              response?.recordSearchTargets?.length ? (
+                <RecordSearch
+                  targets={response.recordSearchTargets}
+                  t={t}
+                  onSearch={openRecordSearch}
+                  embedded
+                />
+              ) : undefined
+            }
+            loading={catalogLoading}
+            error={catalogError}
+            currentPage={response?.currentPage ?? 1}
+            totalPages={response?.totalPages ?? 0}
+            matchedCount={response?.matchedCount ?? 0}
+            onHome={goHome}
+            onAllTools={showDeveloperCatalog}
+            onSelectCategory={(category, subCategory) =>
+              setSidebarPath(
+                subCategory ? [category, subCategory] : [category],
+                "web",
+              )
+            }
+            onOpenTool={openTool}
+            onPage={jumpToPage}
+            onRetry={triggerRefetch}
           />
         ) : (
           <AdminCatalog
@@ -3182,29 +3538,6 @@ export function HelpToolsWidget(): JSX.Element {
               isAdminUser && !activeViewAsRole && !activeInstanceId
                 ? (response?.recordSearchTargets ?? [])
                 : []
-            }
-            erpWorkflowAliases={
-              hasLocalWorkspace && !showAllTools
-                ? response?.erpWorkflowAliases
-                : undefined
-            }
-            activeCompany={activeCompany}
-            hasNoCompany={workspace?.companies.length === 0}
-            accountingOverview={
-              !showAllTools &&
-              activeCompany &&
-              response?.erpWorkflowAliases?.includes(
-                erpEntryPoints.accounting,
-              ) ? (
-                <CatalogOverview
-                  alias={erpEntryPoints.accounting}
-                  companyId={activeCompany.id}
-                  pageProps={{
-                    ...toolPageProps,
-                    navigationOverride: catalogOverviewNavigation,
-                  }}
-                />
-              ) : undefined
             }
             overview={
               isAdminUser &&
@@ -3253,7 +3586,19 @@ export function HelpToolsWidget(): JSX.Element {
 
     return (
       <>
-        <Div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-background">
+        <Div
+          className="flex min-h-0 flex-1 flex-col overflow-hidden bg-background"
+          onKeyDown={(event) => {
+            if (
+              showPlatformAdmin &&
+              (event.ctrlKey || event.metaKey) &&
+              event.key.toLowerCase() === "k"
+            ) {
+              event.preventDefault();
+              catalogInput.current?.focus();
+            }
+          }}
+        >
           <LocalePickerDialog
             locale={locale}
             user={user}
@@ -3263,6 +3608,7 @@ export function HelpToolsWidget(): JSX.Element {
 
           <Div
             id="admin-tools-toolbar"
+            data-admin-ready={hydrated ? "true" : undefined}
             className="relative z-[310] flex shrink-0 flex-wrap items-center gap-1 border-b bg-background px-4 py-2"
           >
             {/* Sidebar toggle */}
@@ -3373,131 +3719,134 @@ export function HelpToolsWidget(): JSX.Element {
 
             {/* Logo */}
             <Div
-              className={
-                companySwitcherVisible ? "hidden min-[930px]:block" : undefined
-              }
+              className={companySwitch ? "hidden min-[930px]:block" : undefined}
             >
               <Logo locale={locale} size="h-8" />
             </Div>
-            {(companySwitcherVisible || selectedAdminEndpoint) && (
-              <Div className="ml-auto flex min-w-0 items-center justify-end gap-2">
-                {(isMobile ||
-                  adminSidebarCollapsed ||
-                  !showBusinessNavigation) &&
-                  companySwitch}
-                {hasLocalWorkspace &&
-                  companyInToolbar &&
-                  displayedMethod === "GET" &&
-                  selectedAdminEndpoint && (
-                    <Div className="hidden shrink-0 items-center gap-1 min-[930px]:flex">
-                      {response?.erpWorkflowAliases?.includes(
-                        erpInvoiceCreate,
-                      ) && (
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          className="size-9"
-                          title={t("erp.newInvoice")}
-                          aria-label={t("erp.newInvoice")}
-                          onClick={() => {
-                            void import("@/payment/invoice/create/definition").then(
-                              ({ default: invoice }) =>
-                                catalogOverviewNavigation.push(invoice.POST, {
-                                  data: { companyId: companyInToolbar.id },
-                                }),
-                            );
-                          }}
-                        >
-                          <Plus className="size-4" aria-hidden="true" />
-                        </Button>
-                      )}
-                      {response?.erpWorkflowAliases?.includes(
-                        "coa-journal-export",
-                      ) && (
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          className="size-9"
-                          title={t("erp.exports.secondary")}
-                          aria-label={t("erp.exports.secondary")}
-                          onClick={() => {
-                            void import("@/chart-of-accounts/reports/journal-export/definition").then(
-                              ({ default: journal }) =>
-                                catalogOverviewNavigation.push(journal.GET, {
-                                  data: { companyId: companyInToolbar.id },
-                                }),
-                            );
-                          }}
-                        >
-                          <Download className="size-4" aria-hidden="true" />
-                        </Button>
-                      )}
-                    </Div>
-                  )}
-                {selectedAdminEndpoint && (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    className={cn(
-                      "h-auto min-h-9 max-w-full whitespace-normal",
-                      companySwitcherVisible &&
-                        "hidden min-[930px]:inline-flex",
-                    )}
-                    onClick={browseTools}
-                  >
-                    {t("catalog.browse")}
-                  </Button>
-                )}
+            {showPlatformAdmin && (
+              <Div className="order-last min-w-0 basis-full pt-1 sm:order-none sm:mx-2 sm:max-w-md sm:flex-1 sm:basis-auto sm:pt-0">
+                {searchBox}
               </Div>
             )}
+            <Div className="ml-auto flex min-w-0 flex-1 basis-0 items-center justify-end gap-2 sm:flex-initial sm:basis-auto">
+              {(companySwitch ||
+                (!showPlatformAdmin && selectedAdminEndpoint)) && (
+                <Div className="flex min-w-0 flex-1 items-center justify-end gap-2">
+                  {(companyOnRecord ||
+                    isMobile ||
+                    adminSidebarCollapsed ||
+                    !showPlatformAdmin) &&
+                    companySwitch}
+                  {selectedAdminEndpoint && !showPlatformAdmin && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className={cn(
+                        "h-auto min-h-9 max-w-full whitespace-normal",
+                        companySwitcherVisible &&
+                          "hidden min-[930px]:inline-flex",
+                      )}
+                      onClick={browseTools}
+                    >
+                      {t("catalog.browse")}
+                    </Button>
+                  )}
+                </Div>
+              )}
+              {showPlatformAdmin && createActions.length > 0 && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      type="button"
+                      size="sm"
+                      className="min-h-9 shrink-0 gap-1"
+                    >
+                      <Plus className="size-4 shrink-0" aria-hidden="true" />
+                      {t("admin.new")}
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                    align="start"
+                    className="max-h-[60vh] w-64 max-w-[90vw] overflow-y-auto"
+                  >
+                    {createActions.map(({ alias, title }) => (
+                      <DropdownMenuItem
+                        key={alias}
+                        onSelect={() => void handleOpenTool(alias)}
+                      >
+                        {title}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
+              {showPlatformAdmin && showAccountSettings && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      type="button"
+                      size="icon"
+                      variant="ghost"
+                      aria-label={t("admin.accountMenu")}
+                    >
+                      <User className="size-4" aria-hidden="true" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem
+                      onSelect={() =>
+                        setSidebarPath(["accountSettings"], "web")
+                      }
+                    >
+                      {localizedLabel(accountSettings.labels, locale) ??
+                        accountSettings.label}
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
+            </Div>
           </Div>
 
           {/* ── Sidebar + Main Content ──────────────────────────────── */}
-          {isMobile ? (
-            <Div className="relative flex min-h-0 w-full flex-1">
-              <AnimatePresence initial={false}>
-                {!adminSidebarCollapsed && (
-                  <MotionDiv
-                    key="mobile-sidebar"
-                    initial={{ x: -260 }}
-                    animate={{ x: 0 }}
-                    exit={{ x: -260 }}
-                    transition={{ duration: 0.3, ease: "easeInOut" }}
-                    className="absolute inset-y-0 left-0 z-[210] w-65 max-w-full border-r border-border bg-background"
-                  >
-                    <Div className="h-full w-full bg-background">
-                      {sidePanel}
-                    </Div>
-                  </MotionDiv>
-                )}
-              </AnimatePresence>
+          <Div className="relative flex min-h-0 w-full flex-1 flex-row">
+            {isMobile ? (
+              <>
+                <AnimatePresence initial={false}>
+                  {!adminSidebarCollapsed && (
+                    <MotionDiv
+                      key="mobile-sidebar"
+                      initial={{ x: -260 }}
+                      animate={{ x: 0 }}
+                      exit={{ x: -260 }}
+                      transition={{ duration: 0.3, ease: "easeInOut" }}
+                      className="absolute inset-y-0 left-0 z-[210] w-65 max-w-full border-r border-border bg-background"
+                    >
+                      <Div className="h-full w-full bg-background">
+                        {sidePanel}
+                      </Div>
+                    </MotionDiv>
+                  )}
+                </AnimatePresence>
 
-              <AnimatePresence initial={false}>
-                {!adminSidebarCollapsed && (
-                  <MotionDiv
-                    key="mobile-backdrop"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.3, ease: "easeInOut" }}
-                    className="absolute inset-0 z-[200] bg-black/50"
-                    onClick={() => setAdminSidebarCollapsed(true)}
-                    aria-label={t("aiTools.modal.closeSidebar")}
-                  />
-                )}
-              </AnimatePresence>
-
-              <Div className="flex flex-col flex-1 min-h-0 min-w-0 w-full overflow-y-auto">
-                {mainContent}
-              </Div>
-            </Div>
-          ) : (
-            <Div className="flex flex-row flex-1 min-h-0 w-full">
+                <AnimatePresence initial={false}>
+                  {!adminSidebarCollapsed && (
+                    <MotionDiv
+                      key="mobile-backdrop"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.3, ease: "easeInOut" }}
+                      className="absolute inset-0 z-[200] bg-black/50"
+                      onClick={() => setAdminSidebarCollapsed(true)}
+                      aria-label={t("aiTools.modal.closeSidebar")}
+                    />
+                  )}
+                </AnimatePresence>
+              </>
+            ) : (
               <ResizableContainer
-                defaultWidth={showBusinessNavigation ? 232 : 280}
+                defaultWidth={showPlatformAdmin ? 232 : 280}
                 minWidth={200}
                 maxWidth="90vw"
                 storageId="admin-endpoints-sidebar"
@@ -3520,12 +3869,17 @@ export function HelpToolsWidget(): JSX.Element {
                   )}
                 </AnimatePresence>
               </ResizableContainer>
-
-              <Div className="flex flex-col flex-1 min-h-0 min-w-0 relative z-9 overflow-y-auto">
-                {mainContent}
-              </Div>
+            )}
+            {/* Keep the endpoint tree mounted when the sidebar changes modes. */}
+            <Div
+              className={cn(
+                "flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto",
+                isMobile ? "w-full" : "relative z-9",
+              )}
+            >
+              {mainContent}
             </Div>
-          )}
+          </Div>
         </Div>
         {remoteToolOverlay}
       </>

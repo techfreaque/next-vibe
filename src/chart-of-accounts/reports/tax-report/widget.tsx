@@ -1,7 +1,14 @@
 "use client";
 
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "next-vibe/ui/components/accordion";
 import { Div } from "next-vibe/ui/components/div";
 import { Span } from "next-vibe/ui/components/span";
+import { H2 } from "next-vibe/ui/components/typography";
 import { WidgetHeader } from "next-vibe/ui/components/widget-header";
 import { WidgetShell } from "next-vibe/ui/components/widget-shell";
 import {
@@ -21,14 +28,17 @@ import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-f
 import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import type { JSX } from "react";
 
+import { useWorkspaceCompany } from "@/companies/_shared/workspace-company-context";
+
 import { formatAccountingDateInput } from "../../shared/calendar-date";
 import {
-  reportAmountClass,
   ReportCompanyPicker,
   ReportDateFilter,
   ReportMenu,
   ReportPeriodMenu,
+  ReportReadState,
 } from "../balance-sheet/report-controls";
+import { reportAmountClass } from "../report-amount-class";
 import type definition from "./definition";
 import type { TaxReportResponseOutput } from "./definition";
 
@@ -40,35 +50,30 @@ type TaxLine = NonNullable<TaxReportResponseOutput["lines"]>[number];
 
 function TaxLineRow({
   line,
+  direction,
   formatAmount,
 }: {
   line: TaxLine;
+  direction: string;
   formatAmount: (value: number) => string;
 }): JSX.Element {
   return (
-    <Div className="grid grid-cols-[2.5rem_minmax(0,1.5fr)_repeat(3,minmax(0,1fr))] @lg:grid-cols-[6rem_minmax(0,1fr)_8rem_8rem_6rem] gap-2 px-3 py-1.5 border-b last:border-b-0 text-sm hover:bg-muted/20">
-      <Span className="font-mono text-xs text-muted-foreground">
-        {line.taxRateCode}
-      </Span>
-      <Span className="truncate">{line.taxRateName}</Span>
+    <Div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 border-b px-3 py-2 last:border-b-0">
+      <Div className="flex min-w-0 flex-col gap-0.5">
+        <Span className="break-words text-sm">
+          {line.taxRateCode} {line.taxRateName}
+        </Span>
+        <Span className="text-xs text-muted-foreground">{direction}</Span>
+      </Div>
       <Span
-        className={`break-words text-right text-xs @lg:text-sm ${reportAmountClass(line.netAmount)}`}
-      >
-        {formatAmount(line.netAmount)}
-      </Span>
-      <Span
-        className={`break-words text-right text-xs @lg:text-sm ${reportAmountClass(line.taxAmount)}`}
+        className={`text-right text-sm ${reportAmountClass(line.taxAmount)}`}
       >
         {formatAmount(line.taxAmount)}
-      </Span>
-      <Span className="text-right font-mono text-muted-foreground">
-        {(line.rate * 100).toFixed(1)}%
       </Span>
     </Div>
   );
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function TaxReportWidget({
   field: { children },
 }: TaxReportWidgetProps): JSX.Element {
@@ -80,7 +85,9 @@ export function TaxReportWidget({
   const interactive = useWidgetIsInteractive();
   const responseOnly = useWidgetResponseOnly();
   const showInputs = interactive && !responseOnly;
+  const workspace = useWorkspaceCompany();
   const companyId = form.watch("companyId");
+  const hasCompany = Boolean(companyId || data?.reportCompanyId);
   const requestedCurrency = form.watch("currency")?.trim().toUpperCase();
   const from = formatAccountingDateInput(form.watch("from"));
   const to = formatAccountingDateInput(form.watch("to"));
@@ -110,130 +117,149 @@ export function TaxReportWidget({
         }
       />
       {showInputs && (
-        <Div className="flex flex-wrap items-end gap-2 rounded-md border bg-card p-3">
-          <ReportCompanyPicker
-            selectedId={companyId}
-            reportId={data?.reportCompanyId}
-            reportName={data?.reportCompanyName}
-            onChange={(id) =>
-              form.setValue("companyId", id, { shouldDirty: true })
-            }
-          />
-          <Div className="w-40">
-            <TextFieldWidget
-              fieldName="currency"
-              field={{
-                ...children.currency,
-                description: undefined,
-                placeholder: "reports.widget.autoCurrency",
-              }}
-            />
-          </Div>
-          <ReportDateFilter
-            id="report-from"
-            label={t("taxReport.from.label")}
-            day={from ?? formatAccountingDateInput(data?.fromResponse)}
-            onChange={(date) =>
-              form.setValue("from", date, { shouldDirty: true })
-            }
-          />
-          <ReportDateFilter
-            id="report-to"
-            label={t("taxReport.to.label")}
-            day={to ?? formatAccountingDateInput(data?.toResponse)}
-            onChange={(date) =>
-              form.setValue("to", date, { shouldDirty: true })
-            }
-          />
-          <ReportPeriodMenu
-            onChange={({ from: start, to: end }) => {
-              form.setValue("from", start, { shouldDirty: true });
-              form.setValue("to", end, { shouldDirty: true });
-            }}
-          />
-        </Div>
+        <ReportCompanyPicker
+          selectedId={companyId}
+          reportId={data?.reportCompanyId}
+          reportName={data?.reportCompanyName}
+          onChange={(id) => {
+            workspace?.select(id);
+            form.setValue("companyId", id, { shouldDirty: true });
+          }}
+        />
       )}
-      <FormAlertWidget field={{}} />
-      {ready && data?.reportCurrency && (
-        <Span className="text-sm font-medium">
-          {t("reports.currency")} {data.reportCurrency}
-        </Span>
+      {showInputs && hasCompany && (
+        <Accordion collapsible className="rounded-md border bg-card px-3">
+          <AccordionItem value="filters" className="border-0">
+            <AccordionTrigger className="min-h-10 py-2 text-sm">
+              {t("taxReport.widget.filters")}
+            </AccordionTrigger>
+            <AccordionContent>
+              <Div className="flex flex-wrap items-end gap-2">
+                <ReportDateFilter
+                  id="report-from"
+                  label={t("taxReport.from.label")}
+                  day={from ?? formatAccountingDateInput(data?.fromResponse)}
+                  onChange={(date) =>
+                    form.setValue("from", date, { shouldDirty: true })
+                  }
+                />
+                <ReportDateFilter
+                  id="report-to"
+                  label={t("taxReport.to.label")}
+                  day={to ?? formatAccountingDateInput(data?.toResponse)}
+                  onChange={(date) =>
+                    form.setValue("to", date, { shouldDirty: true })
+                  }
+                />
+                <Div className="w-32">
+                  <TextFieldWidget
+                    fieldName="currency"
+                    field={{
+                      ...children.currency,
+                      description: undefined,
+                      placeholder: "reports.widget.autoCurrency",
+                    }}
+                  />
+                </Div>
+                <ReportPeriodMenu
+                  onChange={({ from: start, to: end }) => {
+                    form.setValue("from", start, { shouldDirty: true });
+                    form.setValue("to", end, { shouldDirty: true });
+                  }}
+                />
+              </Div>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
+      )}
+      {hasCompany && response?.success !== false && (
+        <FormAlertWidget field={{}} />
       )}
       {ready && data?.vatCollected !== undefined ? (
         <Div className="flex flex-col gap-4">
-          {data.fromResponse && data.toResponse && (
-            <Span className="text-sm text-muted-foreground">
-              {`${t("taxReport.widget.dateRange")} · ${formatDocDate(data.fromResponse, locale)} – ${formatDocDate(data.toResponse, locale)}`}
+          <Div className="flex flex-col gap-3 rounded-lg border bg-card p-4">
+            <Span className="break-words text-sm font-medium">
+              {data.reportCompanyName}
             </Span>
-          )}
-
-          <Div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <Div className="rounded-md border p-3 flex flex-col gap-1">
-              <Span className="text-xs text-muted-foreground">
-                {t("taxReport.response.vatCollected")}
-              </Span>
-              <Span
-                className={`text-lg font-semibold ${reportAmountClass(data.vatCollected)}`}
-              >
-                {formatAmount(data.vatCollected)}
-              </Span>
+            <Div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-foreground">
+              {data.fromResponse && data.toResponse && (
+                <Span>
+                  {t("taxReport.widget.window", {
+                    from: formatDocDate(data.fromResponse, locale),
+                    to: formatDocDate(data.toResponse, locale),
+                  })}
+                </Span>
+              )}
+              {data.reportCurrency && (
+                <Span>
+                  {t("reports.currency")} {data.reportCurrency}
+                </Span>
+              )}
             </Div>
-            <Div className="rounded-md border p-3 flex flex-col gap-1">
-              <Span className="text-xs text-muted-foreground">
-                {t("taxReport.response.vatReclaimable")}
-              </Span>
-              <Span
-                className={`text-lg font-semibold ${reportAmountClass(data.vatReclaimable)}`}
-              >
-                {formatAmount(data.vatReclaimable)}
-              </Span>
-            </Div>
-            <Div className="rounded-md border p-3 flex flex-col gap-1">
-              <Span className="text-xs text-muted-foreground">
+            <Div className="flex flex-col gap-1">
+              <H2 className="text-sm font-medium text-muted-foreground">
                 {t("taxReport.response.netVatPayable")}
-              </Span>
+              </H2>
               <Span
-                className={`text-lg font-semibold ${reportAmountClass(data.netVatPayable ?? 0)}`}
+                className={`text-2xl font-semibold ${reportAmountClass(data.netVatPayable ?? 0)}`}
               >
                 {formatAmount(data.netVatPayable ?? 0)}
               </Span>
             </Div>
+            <Div className="grid max-w-xl grid-cols-2 gap-4 border-t pt-3">
+              <Div className="flex min-w-0 flex-col justify-between gap-1">
+                <Span className="text-xs text-muted-foreground">
+                  {t("taxReport.response.vatCollected")}
+                </Span>
+                <Span
+                  className={`font-medium ${reportAmountClass(data.vatCollected)}`}
+                >
+                  {formatAmount(data.vatCollected)}
+                </Span>
+              </Div>
+              <Div className="flex min-w-0 flex-col justify-between gap-1">
+                <Span className="text-xs text-muted-foreground">
+                  {t("taxReport.response.vatReclaimable")}
+                </Span>
+                <Span
+                  className={`font-medium ${reportAmountClass(data.vatReclaimable)}`}
+                >
+                  {formatAmount(data.vatReclaimable)}
+                </Span>
+              </Div>
+            </Div>
           </Div>
 
-          {data.lines && data.lines.length > 0 && (
-            <Div className="rounded-md border overflow-hidden">
-              <Div className="px-3 py-2 bg-muted/50 border-b text-xs font-semibold text-muted-foreground">
+          {data.lines?.length ? (
+            <Div className="max-w-4xl overflow-hidden rounded-md border">
+              <H2 className="border-b bg-muted/50 px-3 py-2 text-sm font-semibold">
                 {t("taxReport.widget.detailSection")}
-              </Div>
-              <Div className="grid grid-cols-[2.5rem_minmax(0,1.5fr)_repeat(3,minmax(0,1fr))] @lg:grid-cols-[6rem_minmax(0,1fr)_8rem_8rem_6rem] gap-2 px-3 py-1.5 border-b text-xs font-medium text-muted-foreground bg-muted/30">
-                <Span>{t("taxReport.response.taxRateCode")}</Span>
-                <Span>{t("taxReport.response.taxRateName")}</Span>
-                <Span className="text-right">
-                  {t("taxReport.response.netAmount")}
-                </Span>
-                <Span className="text-right">
-                  {t("taxReport.response.taxAmount")}
-                </Span>
-                <Span className="text-right">
-                  {t("taxReport.response.rate")}
-                </Span>
-              </Div>
+              </H2>
               {data.lines.map((line) => (
                 <TaxLineRow
-                  key={line.taxRateCode}
+                  key={line.accountId}
                   line={line}
+                  direction={t(
+                    line.direction === "output"
+                      ? "taxReport.response.vatCollected"
+                      : "taxReport.response.vatReclaimable",
+                  )}
                   formatAmount={formatAmount}
                 />
               ))}
             </Div>
+          ) : (
+            <Span className="text-sm text-muted-foreground">
+              {t("taxReport.widget.noData")}
+            </Span>
           )}
         </Div>
-      ) : response?.success === false ? null : (
-        <Div className="text-center py-10 text-sm text-muted-foreground border border-dashed rounded-md">
-          {companyId || data?.reportCompanyId
-            ? t("reports.widget.running")
-            : t("taxReport.widget.selectCompany")}
-        </Div>
+      ) : (
+        <ReportReadState
+          hasCompany={hasCompany}
+          companyPrompt={t("taxReport.widget.selectCompany")}
+          companyHint={t("taxReport.widget.scopeHint")}
+        />
       )}
     </WidgetShell>
   );

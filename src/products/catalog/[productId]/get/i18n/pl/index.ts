@@ -75,6 +75,17 @@ export const translations: typeof enTranslations = {
       updatedAt: "Zaktualizowano",
     },
     widget: {
+      unavailable: "Produkt niedostępny",
+      prices: "Aktywne progi cenowe",
+      stock: "Magazyn",
+      viewStock: "Sprawdź stany magazynowe",
+      offers: "Oferty operatorów płatności",
+      noOffers: "Z tym produktem nie powiązano aktywnych ofert.",
+      configureOffer: "Skonfiguruj ofertę płatności",
+      offerNeedsSku:
+        "Aktywuj produkt i uzupełnij SKU, aby skonfigurować ofertę.",
+      revenueAccount: "Konto przychodów",
+      liabilityAccount: "Konto przychodów przyszłych okresów",
       edit: "Edytuj",
       deactivate: "Dezaktywuj",
       activate: "Aktywuj",

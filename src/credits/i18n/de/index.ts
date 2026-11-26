@@ -569,6 +569,7 @@ export const translations: typeof enTranslations = {
         "Gib die vollständige Konto-E-Mail-Adresse oder Nutzer-ID ein.",
       renewsOn: "Verlängert sich am {{date}}",
       endsOn: "Endet am {{date}}",
+      packBalance: "Guthaben aus Paketen",
       freeBalance: "Gratis-Credits",
       balanceSplit: "{{total}} gesamt · {{paid}} aus Paketen · {{free}} gratis",
       stepHint: "Schritt 1: Empfänger prüfen. Schritt 2: Betrag wählen.",
@@ -605,7 +606,7 @@ export const translations: typeof enTranslations = {
     },
     post: {
       stepTwo: "Schritt 2 von 2: Betrag",
-      testerPreset: "3.000 (Tester)",
+      testerPreset: "{{amount}} Credits verwenden",
       preview: "Stand {{before}} → {{after}} (+{{amount}})",
       title: "Guthaben hinzufügen",
       titleShort: "Guthaben hinzufügen",
@@ -625,8 +626,8 @@ export const translations: typeof enTranslations = {
       },
       amount: {
         label: "Betrag in Credits",
-        description: "Bonus-Credits als ganze Zahl eingeben.",
-        placeholder: "137",
+        description: "Geben Sie mindestens 1 Credit als ganze Zahl ein.",
+        placeholder: "z. B. 25",
       },
       packType: {
         label: "Pakettyp",

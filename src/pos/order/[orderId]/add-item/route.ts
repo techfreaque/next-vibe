@@ -12,7 +12,13 @@ import { PosOrderAddItemRepository } from "./repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
-    handler: ({ data, user, logger, locale }) =>
-      PosOrderAddItemRepository.addItem(data, user.id, logger, locale),
+    handler: ({ data, urlPathParams, user, logger, locale }) =>
+      PosOrderAddItemRepository.addItem(
+        data,
+        user.id,
+        logger,
+        locale,
+        urlPathParams.orderId ?? "",
+      ),
   },
 });

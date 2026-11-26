@@ -1,6 +1,151 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  profit: {
+    run: "Bericht anzeigen",
+    unallocatedRevenue: "Gebuchte Erlöse ohne Modellzuordnung: {{amount}}",
+    estimatedCosts: "Geschätzte Modellkosten: {{amount}}",
+    usageValue: "Bezahlte Nutzung zu bestätigten Kaufpreisen: {{amount}}",
+    estimatedMargin: "Geschätzte Nutzungsmarge: {{amount}}",
+    marginUnknown:
+      "Marge nicht verfügbar. Angaben zur Finanzierung oder zum Nutzungswert fehlen.",
+    missingPrice:
+      "Kein bestätigter Kaufpreis für {{credits}} verbrauchte Credits.",
+    title: "Monatliche Gewinn- und Verlustrechnung",
+    description:
+      "Prüfen Sie gebuchte Erlöse, Aufwendungen und das Monatsergebnis.",
+    revenue: "Nettoerlöse",
+    expenses: "Aufwendungen",
+    net: "Gewinn oder Verlust",
+    empty: "In diesem Monat wurden keine Erlöse oder Aufwendungen gebucht.",
+    areas: "Aufwandsquellen",
+    signedExpenseAreas:
+      "Stornierungen und andere Gutschriften mindern den Aufwand. Ein negativer Betrag bedeutet, dass sie in diesem Monat die Belastungen überstiegen.",
+    openLedger: "Buchungen anzeigen",
+    noAccounts: "Keine Bewegungen.",
+    estimatesHint:
+      "Nutzungsbasierte USD-Schätzwerte für bis zu 20 Modelle zugeordneter Anbieter. Feste Abos und Kosten ohne Nutzungsdaten sind ausgenommen.",
+    estimatesEmpty:
+      "Für diese Auswahl liegen keine Modellkostenschätzungen vor.",
+    unknownModel: "Unbekanntes Modell",
+    paid: "Bezahlte Credits: {{amount}}",
+    free: "Freikontingent: {{amount}}",
+    gifted: "Geschenkte Credits: {{amount}}",
+    unknownFunding: "Unbekannte Finanzierung: {{amount}}",
+    missing:
+      "Für {{credits}} verbrauchte Credits liegen keine genauen Kostendaten vor.",
+  },
+  suppliers: {
+    bankTransaction: "Bankumsatz",
+    bankLoading: "Bankumsatz wird geladen …",
+    bankUnavailable: "Der geprüfte Bankumsatz ist nicht verfügbar.",
+    previewBankLink: "Verknüpfung prüfen",
+    linkToBankBill: "Beleg verknüpfen",
+    bankDraftBill: "Rechnung aus Bankumsatz (optional)",
+    sponsorshipSource: "Creator-Sponsoring",
+    confirmSeparateBankBill:
+      "Separate Belastung gegenüber den Bankentwürfen bestätigen",
+    possibleBankDuplicate:
+      "Eine Rechnung aus einem Bankumsatz weist ähnliche Daten auf. Wählen Sie sie zum Verknüpfen aus oder bestätigen Sie eine separate Belastung.",
+    monthlyReview: "Monatliche Quellenvorschau",
+    monthlyReviewHint:
+      "Prüfen Sie gespeicherte Messwerte und bestätigte Belege für Vorauszahlungen in diesem Monat. Unvollständige Intervalle können Lücken hinterlassen.",
+    counterTotal: "Nutzung laut Zähler (USD): {{amount}}",
+    estimatedTotal: "Geschätzte Nutzung (USD): {{amount}}",
+    unclassifiedTotal: "Nutzung mit ungeklärter Grundlage (USD): {{amount}}",
+    readingCoverage:
+      "{{readings}} Messwerte, davon {{missing}} ohne Intervallkosten.",
+    receiptTotal:
+      "Bestätigte Vorauszahlungen: {{amount}} in {{count}} Belegen, davon {{posted}} gebucht.",
+    noReceipts:
+      "Für diesen Monat liegen keine bestätigten Belege für Vorauszahlungen vor.",
+    ledgerPrepaid: "Gebuchte Vorauszahlungen",
+    estimates: "Geschätzte Modellkosten",
+    estimatesHint:
+      "Die 20 höchsten nutzungsbasierten Schätzwerte für zugeordnete Anbieter. Feste Abos und Kosten ohne Nutzungsdaten sind ausgenommen.",
+    month: "Monat (JJJJ-MM)",
+    monthly: "Gebuchte Monatsaufwendungen",
+    noMonthly: "Für diesen Monat sind keine Aufwendungen gebucht.",
+    area: {
+      referral: "Vermittlungsprovisionen",
+      provider: "Anbieter",
+      processor: "Zahlungsabwicklung",
+      sponsorship: "Sponsoring",
+      supplier: "Sonstige Lieferantenbelege",
+      unallocated: "Nicht zugeordnet",
+    },
+    spendBasis: {
+      counter: "Nutzungszähler des Anbieters",
+      "balance-delta": "Aus Guthabenänderung geschätzt",
+      "usage-estimate": "Aus interner Nutzung geschätzt",
+    },
+    title: "Lieferantenbelege",
+    description: "Anbieterguthaben und Lieferantenbelege prüfen.",
+    record: "Lieferantenbeleg erfassen",
+    recordDescription:
+      "Historische Belege prüfen, bevor Sie eine Rechnung oder Buchung erfassen.",
+    company: "Unternehmen",
+    vendor: "Lieferant",
+    chooseSupplier: "Lieferanten auswählen",
+    operation: "Aktion",
+    provider: "Anbieter",
+    reference: "Belegreferenz",
+    invoiceReference: "Rechnungsnummer des Lieferanten",
+    servicePeriodStart: "Leistungsbeginn (JJJJ-MM-TT)",
+    servicePeriodEnd: "Leistungsende (JJJJ-MM-TT)",
+    date: "Buchungsdatum (JJJJ-MM-TT)",
+    gross: "Bruttobetrag",
+    tax: "Bestätigter Steuerbetrag",
+    currency: "Währung (EUR, USD oder PLN)",
+    memo: "Beschreibung",
+    preview: "Nur Vorschau",
+    debit: "Soll- oder Aufwandskonto",
+    credit: "Habenkonto",
+    result: "Ergebnis",
+    balances: "Anbieterguthaben",
+    observed: "Gemeldetes Guthaben",
+    interval: "Letzte Intervallkosten, Grundlage ungeprüft",
+    unavailable: "Nicht verfügbar",
+    recent: "Letzte Belege",
+    noBindings: "Diesem Unternehmen ist kein Anbieter zugeordnet.",
+    noEvidence: "Es wurden noch keine Lieferantenbelege erfasst.",
+    run: "Lieferantenbelege anzeigen",
+    previewEvidence: "Beleg prüfen",
+    invalid:
+      "Prüfen Sie Belegreferenz, bestätigte Beträge, Unternehmenswährung, Konten und offene Periode.",
+    conflict: "Diese Belegreferenz ist bereits einem anderen Beleg zugeordnet.",
+    taxHint:
+      "Geben Sie 0 ein, wenn der Beleg bestätigt, dass keine Steuer anfällt.",
+    referralHint:
+      "Wählen Sie den Lieferanten mit der bestätigten E-Mail-Adresse des Empfängers. Übernehmen Sie Bruttobetrag, Währung und Steuer aus dem Provisionsbeleg. Der Auszahlungsantrag weist nur Credits aus.",
+    evidenceHint:
+      "Verwenden Sie den Originalbeleg oder einen Kontoauszug. Ein Anbieterguthaben allein reicht nicht aus.",
+    openBill: "Rechnung öffnen",
+    openJournal: "Buchung öffnen",
+    banked:
+      "Gemeldete Guthaben und Kosten dienen der Prüfung. Historische Intervallkosten können geschätzt sein.",
+    kind: {
+      processorFee: "Bestätigte Zahlungsgebühr verwenden",
+      fundBill: "Lieferantenrechnung für Vorauszahlung",
+      bind: "Anbieter zuordnen",
+      bill: "Lieferantenrechnung",
+      fund: "Vorauszahlung leisten",
+      consume: "Vorauszahlung verbrauchen",
+      paid: "Bezahlten Aufwand erfassen",
+      sponsorship: "Sponsoringbeleg verwenden",
+      referral: "Provisionsbeleg erfassen",
+    },
+    outcome: {
+      linked: "Lieferantenbeleg verknüpft",
+      preview: "Vorschau erfolgreich",
+      bound: "Anbieter zugeordnet",
+      bill: "Rechnungsentwurf erstellt",
+      posted: "Buchung erfasst",
+      replayed: "Bereits erfasst",
+      review:
+        "Prüfung erforderlich. Ein Quelldatensatz allein belegt weder den Ausgleich in Unternehmenswährung noch die Steuer.",
+    },
+  },
   spendAlert: {
     explained: "Das Ledger erklärt die Nutzungsspitze bei {{provider}}.",
     unexplained: "API-Schlüssel möglicherweise kompromittiert: {{provider}}.",
@@ -14,6 +159,15 @@ export const translations: typeof enTranslations = {
   },
   category: "Finanzen",
   documents: {
+    status: "Status",
+    activeFilters: "{{label}} aktiv",
+    loadFailed: "Belege konnten nicht geladen werden",
+    loadFailedHint: "Laden Sie die Liste erneut.",
+    scopeDenied: "Sie haben keinen Zugriff auf die ausgewählten Belege.",
+    retry: "Erneut laden",
+    openAction: "Öffnen",
+    pickAction: "Auswählen",
+    pageSingle: "Seite {{page}} von {{pages}} · {{total}} Ergebnis",
     clearCompany: "Unternehmensfilter entfernen",
     clearCustomer: "Kundenfilter entfernen",
     pageTotals: "Summe · {{currency}}",

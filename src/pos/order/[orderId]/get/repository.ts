@@ -26,7 +26,9 @@ import {
   posSessions,
   posTerminals,
 } from "../../../db";
+import { PosOrderStatus } from "../../../enum";
 import { scopedTranslation } from "../../../i18n";
+import { posSettlementAmounts } from "../../settlement-amounts";
 import type { PosOrderGetResponseOutput } from "./definition";
 
 export class PosOrderGetRepository {
@@ -102,6 +104,15 @@ export class PosOrderGetRepository {
         .from(posPayments)
         .where(eq(posPayments.orderId, orderId));
 
+      const totals =
+        order.status === PosOrderStatus.OPEN && payments.length === 0
+          ? posSettlementAmounts(order.total, order.taxAmount)
+          : {
+              subtotal: order.subtotal,
+              taxAmount: order.taxAmount,
+              total: order.total,
+            };
+
       return success({
         result: {
           id: order.id,
@@ -111,9 +122,9 @@ export class PosOrderGetRepository {
           customerId: order.customerId ?? null,
           status: order.status,
           currency: order.currency,
-          subtotal: order.subtotal,
-          taxAmount: order.taxAmount,
-          total: order.total,
+          ...totals,
+          taxExemptionNotice: order.taxExemptionNotice,
+          lineSettlement: order.lineSettlement,
           journalEntryId: order.journalEntryId ?? null,
           createdAt: order.createdAt,
           items: items.map((item) => ({

@@ -5,13 +5,13 @@ export const translations: typeof enTranslations = {
   post: {
     title: "Sentiero JSON",
     titleShort: "Sentiero JSON",
-    description:
-      "JSON Path - estrae un valore attraverso il percorso di notazione (superato, restituisce vuoto)",
+    description: "Estrae il valore osservato o un campo numerico dei metadati.",
     fields: {
       source: { label: "Fonte", description: "Serie di tempo di input" },
       path: {
         label: "Sentiero",
-        description: "Percorso dot-notazione per estrarre (non più supportato)",
+        description:
+          "Inserisca value o un percorso nei metadati, per esempio meta.close.",
       },
       resolution: { label: "Risoluzione", description: "Tempo di calcolo" },
       range: {

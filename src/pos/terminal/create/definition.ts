@@ -51,8 +51,11 @@ const { POST } = createEndpoint({
         children: {
           companyId: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.TEXT,
+            fieldType: FieldDataType.ENTITY_PICKER,
             label: "terminalCreate.post.companyId.label",
+            listEndpoint: async () =>
+              (await import("@/companies/list/definition")).default.GET,
+            labelField: "name",
             description: "terminalCreate.post.companyId.description",
             schema: z.uuid(),
           }),
@@ -79,6 +82,13 @@ const { POST } = createEndpoint({
             description: "terminalCreate.post.currency.description",
             placeholder: "terminalCreate.post.currency.placeholder",
             schema: z.string().length(3).optional(),
+          }),
+          warehouseId: requestField(scopedTranslation, {
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.TEXT,
+            label: "workflow.warehouse",
+            description: "workflow.warehouseInstruction",
+            schema: z.uuid().optional(),
           }),
           cashAccountNodeId: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
@@ -114,6 +124,11 @@ const { POST } = createEndpoint({
             type: WidgetType.TEXT,
             label: "terminalCreate.post.response.currency",
             schema: z.string(),
+          }),
+          warehouseName: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            label: "workflow.warehouse",
+            schema: z.string().optional(),
           }),
           isActive: responseField(scopedTranslation, {
             type: WidgetType.TEXT,

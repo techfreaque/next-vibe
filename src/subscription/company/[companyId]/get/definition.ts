@@ -1,6 +1,6 @@
 /**
  * Company Subscription Get API Endpoint Definition
- * Returns the active subscription for a company
+ * Shows the authorized company owner's account subscription.
  */
 
 import { dateSchema } from "next-vibe/core/definition/common.schema";
@@ -8,13 +8,13 @@ import { createEndpoint } from "next-vibe/core/definition/create-i18n";
 import {
   EndpointErrorTypes,
   FieldDataType,
-  LayoutType,
   Methods,
   WidgetType,
 } from "next-vibe/core/definition/enums";
 import { UserRole } from "next-vibe/identity/roles/enum";
+import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
+import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
 import {
-  objectField,
   requestUrlPathParamsField,
   responseField,
 } from "next-vibe/unified-ui/_shared/utils-i18n";
@@ -30,6 +30,12 @@ import {
 } from "../../../enum";
 import { scopedTranslation } from "./i18n";
 
+const SubscriptionWidget = lazyWidget(() =>
+  import("./widget").then(({ CompanySubscriptionWidget }) => ({
+    default: CompanySubscriptionWidget,
+  })),
+);
+
 const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
@@ -43,12 +49,19 @@ const { GET } = createEndpoint({
   tags: ["tags.subscription", "tags.company", "tags.get"],
   allowedRoles: [UserRole.ADMIN, UserRole.PARTNER_ADMIN] as const,
 
-  fields: objectField(scopedTranslation, {
-    type: WidgetType.CONTAINER,
-    layoutType: LayoutType.STACKED,
-    noCard: true,
+  fields: customWidgetObject({
+    render: SubscriptionWidget,
     usage: { request: "urlPathParams", response: true },
     children: {
+      selectedCompanyId: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z.uuid(),
+      }),
+      companyName: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        schema: z.string(),
+      }),
       companyId: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
@@ -65,33 +78,33 @@ const { GET } = createEndpoint({
       id: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         hidden: true,
-        schema: z.uuid(),
+        schema: z.uuid().optional(),
       }),
       plan: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        schema: z.enum(SubscriptionPlan),
+        schema: z.enum(SubscriptionPlan).optional(),
       }),
       billingInterval: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        schema: z.enum(BillingInterval),
+        schema: z.enum(BillingInterval).optional(),
       }),
       status: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        schema: z.enum(SubscriptionStatus),
+        schema: z.enum(SubscriptionStatus).optional(),
       }),
       currentPeriodStart: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         fieldType: FieldDataType.DATETIME,
-        schema: dateSchema,
+        schema: dateSchema.nullable(),
       }),
       currentPeriodEnd: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         fieldType: FieldDataType.DATETIME,
-        schema: dateSchema,
+        schema: dateSchema.nullable(),
       }),
       cancelAtPeriodEnd: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        schema: z.boolean(),
+        schema: z.boolean().optional(),
       }),
       cancelAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
@@ -107,7 +120,7 @@ const { GET } = createEndpoint({
       }),
       provider: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        schema: z.enum(PaymentProviderDB),
+        schema: z.enum(PaymentProviderDB).optional(),
       }),
       providerSubscriptionId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
@@ -116,12 +129,12 @@ const { GET } = createEndpoint({
       createdAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         fieldType: FieldDataType.DATETIME,
-        schema: dateSchema,
+        schema: dateSchema.optional(),
       }),
       updatedAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         fieldType: FieldDataType.DATETIME,
-        schema: dateSchema,
+        schema: dateSchema.optional(),
       }),
     },
   }),
@@ -178,6 +191,8 @@ const { GET } = createEndpoint({
     },
     responses: {
       default: {
+        selectedCompanyId: "123e4567-e89b-12d3-a456-426614174000",
+        companyName: "Example Company",
         id: "123e4567-e89b-12d3-a456-426614174001",
         plan: SubscriptionPlan.SUBSCRIPTION,
         billingInterval: BillingInterval.MONTHLY,

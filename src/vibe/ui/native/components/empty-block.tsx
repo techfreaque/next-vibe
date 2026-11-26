@@ -14,6 +14,7 @@ const StyledView = styledNative(View);
 const StyledPressable = styledNative(Pressable);
 
 export function EmptyBlock({
+  size = "compact",
   icon,
   title,
   message,
@@ -24,13 +25,33 @@ export function EmptyBlock({
     <StyledView
       className={cn("items-center justify-center gap-3 py-12", className)}
     >
-      {icon ? <StyledView className="opacity-30">{icon}</StyledView> : null}
+      {icon ? (
+        <StyledView
+          className={
+            size === "page" ? "rounded-full bg-muted p-2" : "opacity-30"
+          }
+        >
+          {icon}
+        </StyledView>
+      ) : null}
       <StyledView className="items-center gap-1">
-        <Text className="text-sm font-medium text-muted-foreground">
+        <Text
+          className={
+            size === "page"
+              ? "text-base font-semibold text-foreground"
+              : "text-sm font-medium text-muted-foreground"
+          }
+        >
           {title}
         </Text>
         {message ? (
-          <Text className="text-xs text-muted-foreground text-center">
+          <Text
+            className={
+              size === "page"
+                ? "text-center text-sm text-muted-foreground"
+                : "text-xs text-muted-foreground text-center"
+            }
+          >
             {message}
           </Text>
         ) : null}
@@ -38,7 +59,10 @@ export function EmptyBlock({
       {action ? (
         <StyledPressable
           onPress={action.onClick}
-          className="mt-1 rounded-md bg-primary px-3 py-1.5"
+          className={cn(
+            "mt-1 justify-center rounded-md bg-primary px-3 py-1.5",
+            size === "page" && "min-h-11 px-4",
+          )}
         >
           <Text className="text-xs font-medium text-primary-foreground">
             {action.label}

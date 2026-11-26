@@ -21,9 +21,26 @@ export const category: CategoryDefinition = {
     "es-ES": "Punto de venta",
     "sk-SK": "Predajné miesto",
   },
+  description: {
+    "en-US": "Open a till, record sales and close the shift.",
+    "en-GLOBAL": "Open a till, record sales and close the shift.",
+    "de-DE":
+      "Öffnen Sie die Kasse, erfassen Sie Verkäufe und schließen Sie die Schicht ab.",
+    "pl-PL": "Otwórz kasę, zarejestruj sprzedaż i zamknij zmianę.",
+    "fr-FR":
+      "Ouvrez une caisse, enregistrez les ventes et clôturez le service.",
+    "it-IT": "Apra la cassa, registri le vendite e chiuda il turno.",
+    "es-ES": "Abra la caja, registre ventas y cierre el turno.",
+    "sk-SK": "Otvorte pokladnicu, zaevidujte predaj a uzavrite zmenu.",
+  },
   group: "business",
   icon: "shopping-cart",
   order: 45,
+  createActions: ["pos_terminal_create_POST"],
+  landing: {
+    actions: ["pos-terminals", "pos-order-list"],
+    overview: { alias: "pos-dashboard", scope: "company" },
+  },
   defaultEntry: {
     [UserPermissionRole.ADMIN]: POS_DASHBOARD_ALIAS,
     [UserPermissionRole.CUSTOMER]: USER_ME_ALIAS,

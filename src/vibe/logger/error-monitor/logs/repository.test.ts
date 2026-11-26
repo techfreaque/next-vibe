@@ -113,6 +113,26 @@ it("matches literal percent and underscore without counting unrelated groups", a
   expect(result.success && result.data.unresolvedCount).toBe(2);
 });
 
+it("counts unresolved classes within the selected period as well as filters", async () => {
+  const result = await ErrorLogsRepository.getLogs(
+    GET.requestSchema.parse({
+      range: AnalyticsRange.CUSTOM,
+      from: "2026-11-20",
+      to: "2026-11-22",
+      search: "job",
+      group: false,
+    }),
+    t,
+    logger,
+  );
+  expect(result.success && result.data.kpis).toMatchObject({
+    unresolved: 2,
+    unresolvedMatching: 2,
+    unresolvedInView: 1,
+  });
+  expect(result.success && result.data.totalCount).toBe(1);
+});
+
 it("uses the requested page size and keeps equal timestamps in deterministic order", async () => {
   const firstPage = await ErrorLogsRepository.getLogs(
     GET.requestSchema.parse({

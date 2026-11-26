@@ -62,6 +62,7 @@ import type {
   InferSchemaFromField,
   MergeFormValues,
 } from "./endpoint";
+import type { AdminToolPlacement } from "./endpoints-meta";
 import type { EndpointErrorTypes, Methods } from "./enums";
 import type { FieldUsage } from "./enums";
 
@@ -159,6 +160,8 @@ export type InferUrlVariablesOutput<TFields> = z.output<
  * These options will be merged with hook-provided options (hook options take priority)
  */
 export interface EndpointReadOptions<TRequest, TResponse, TUrlVariables> {
+  /** Fields an interactive query must have before fetching automatically. Explicit API reads still use the request schema. */
+  autoFetchRequires?: readonly Extract<keyof TRequest, string>[];
   /** Form options for query forms (filtering, search, etc.) */
   formOptions?: ApiQueryFormOptions<TRequest> | ApiFormOptions<TRequest>;
   /** Query options for data fetching */
@@ -381,6 +384,7 @@ export interface ApiEndpoint<
    * Example: [UserRole.ADMIN]
    */
   readonly defaultWebPinned?: readonly UserRoleValue[];
+  readonly admin?: AdminToolPlacement;
   /**
    * Stream timeout in milliseconds when this tool is called by AI and escalates
    * to a background task (via escalateToTask or remote queue).
@@ -852,6 +856,7 @@ export function buildEndpoint<
     timeoutMs: config.timeoutMs,
     defaultAiPinned: config.defaultAiPinned,
     defaultWebPinned: config.defaultWebPinned,
+    admin: config.admin,
     events: config.events as TEvents | undefined,
     channel: config.channel as TChannel,
     icon: config.icon,

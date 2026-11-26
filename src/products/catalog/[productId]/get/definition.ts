@@ -56,6 +56,39 @@ const { GET } = createEndpoint({
         labelField: "name",
       }),
 
+      commerce: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "get.widget.details",
+        hidden: true,
+        schema: z
+          .object({
+            companyName: z.string().optional(),
+            companyCurrency: z.string().optional(),
+            canEdit: z.boolean(),
+            canConfigure: z.boolean(),
+            canViewStock: z.boolean(),
+            prices: z.array(
+              z.object({
+                id: z.uuid(),
+                price: z.number(),
+                currency: z.string(),
+                tierName: z.string().nullable(),
+              }),
+            ),
+            offers: z.array(
+              z.object({
+                id: z.uuid(),
+                offerId: z.string(),
+                provider: z.string(),
+                currency: z.string(),
+                recognition: z.enum(["immediate", "deferred"]),
+                accountCode: z.string().nullable(),
+                accountName: z.string().nullable(),
+              }),
+            ),
+          })
+          .optional(),
+      }),
       result: objectField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         layoutType: LayoutType.GRID_2_COLUMNS,

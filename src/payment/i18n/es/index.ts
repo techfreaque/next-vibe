@@ -964,9 +964,17 @@ export const translations: typeof enTranslations = {
 
   // Get payment endpoint
   get: {
-    title: "Obtener información de pago",
+    title: "Tus pagos",
     titleShort: "Pagos",
-    description: "Recuperar las transacciones y los métodos de pago",
+    description: "Hasta diez operaciones de pago recientes de tu cuenta.",
+    summary: {
+      empty: "Aún no hay pagos",
+      emptyDescription: "Tus pagos aparecerán aquí.",
+      loading: "Cargando tus pagos…",
+      error: "No se han podido cargar tus pagos",
+      retry: "Volver a intentar",
+      amountUnavailable: "Importe no disponible",
+    },
     form: {
       title: "Consultas de pago",
       description: "Información sobre el pago de consultas",

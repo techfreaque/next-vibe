@@ -77,6 +77,21 @@ const { GET } = createEndpoint({
             hidden: true,
             schema: z.uuid(),
           }),
+          companyName: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            label: "vendorGet.get.widget.companyName",
+            schema: z.string().optional(),
+          }),
+          orderCount: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            label: "vendorGet.get.widget.orderCount",
+            schema: z.number().int().nonnegative().optional(),
+          }),
+          receivingCount: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            label: "vendorGet.get.widget.receivingCount",
+            schema: z.number().int().nonnegative().optional(),
+          }),
           name: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             label: "vendorGet.get.response.name" as const,
@@ -235,6 +250,9 @@ const { GET } = createEndpoint({
         result: {
           id: "456e7890-e89b-12d3-a456-426614174000",
           companyId: "00000000-0000-0000-0000-000000000001",
+          companyName: "Tatra Ledger Studio",
+          orderCount: 4,
+          receivingCount: 2,
           name: "Acme GmbH",
           code: "ACM-001",
           email: "orders@acme.com",

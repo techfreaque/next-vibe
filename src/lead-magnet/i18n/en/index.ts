@@ -101,6 +101,7 @@ export const translations = {
   },
   providers: {
     shared: {
+      connectionSettings: "Connection settings",
       listId: {
         label: "List / Group ID",
         description: "The ID of the list or segment to add leads to",

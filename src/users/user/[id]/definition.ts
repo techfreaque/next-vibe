@@ -13,7 +13,7 @@ import {
   Methods,
   WidgetType,
 } from "next-vibe/core/definition/enums";
-import { UserRole } from "next-vibe/identity/roles/enum";
+import { UserPermissionRole, UserRole } from "next-vibe/identity/roles/enum";
 import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
 import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
 import {
@@ -60,7 +60,7 @@ const { GET } = createEndpoint({
   category: "account",
   subCategory: "manageUsers",
   tags: ["tag" as const],
-  allowedRoles: [UserRole.ADMIN, UserRole.PARTNER_ADMIN] as const,
+  allowedRoles: [UserRole.ADMIN] as const,
 
   fields: customWidgetObject({
     render: UserDetailContainer,
@@ -170,7 +170,7 @@ const { GET } = createEndpoint({
                 role: responseField(scopedTranslation, {
                   type: WidgetType.BADGE,
                   text: "id.get.response.accountStatus.userRoles.content" as const,
-                  schema: z.string().describe("Role name"),
+                  schema: z.enum(UserPermissionRole),
                 }),
               },
             }),
@@ -226,6 +226,19 @@ const { GET } = createEndpoint({
             content:
               "id.get.response.referralInfo.totalReferrals.content" as const,
             schema: z.coerce.number(),
+          }),
+          earningsByUnit: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            content: "id.widget.earned" as const,
+            schema: z
+              .array(
+                z.object({
+                  unit: z.string(),
+                  confirmed: z.number().int(),
+                  pending: z.number().int(),
+                }),
+              )
+              .optional(),
           }),
           totalEarnedCents: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
@@ -350,7 +363,7 @@ const { GET } = createEndpoint({
             role: responseField(scopedTranslation, {
               type: WidgetType.BADGE,
               text: "id.get.response.userRoles.content" as const,
-              schema: z.string(),
+              schema: z.enum(UserPermissionRole),
             }),
           },
         }),
@@ -495,7 +508,7 @@ const { PUT } = createEndpoint({
   category: "account",
   subCategory: "manageUsers",
   tags: ["tag" as const],
-  allowedRoles: [UserRole.ADMIN, UserRole.PARTNER_ADMIN] as const,
+  allowedRoles: [UserRole.ADMIN] as const,
 
   options: {
     mutationOptions: {
@@ -535,6 +548,9 @@ const { PUT } = createEndpoint({
             };
           },
         );
+        await apiClient.refetchEndpoint(GET, data.logger, {
+          urlPathParams: { id: data.pathParams.id },
+        });
         // Admin detail view shows ban state, roles and profile: refresh it
         const viewDefinition = await import("../../view/definition");
         await apiClient.refetchEndpoint(viewDefinition.GET, data.logger, {
@@ -675,7 +691,7 @@ const { PUT } = createEndpoint({
             role: responseField(scopedTranslation, {
               type: WidgetType.BADGE,
               text: "id.put.response.userRoles.content" as const,
-              schema: z.string(),
+              schema: z.enum(UserPermissionRole),
             }),
           },
         }),

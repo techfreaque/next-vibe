@@ -35,7 +35,11 @@ export const translations: typeof enTranslations = {
         title: "Accès refusé",
         description: "Rôle Comptable ou Admin requis",
       },
-      conflict: { title: "Conflit", description: "Conflit de données" },
+      conflict: {
+        title: "Conflit",
+        description:
+          "Une facture utilise déjà ce fournisseur et ce numéro. Vérifiez la facture existante avant d’en créer une autre.",
+      },
       server: {
         title: "Erreur serveur",
         description: "Impossible de créer la facture. Réessayez.",
@@ -74,6 +78,8 @@ export const translations: typeof enTranslations = {
       addItem: "Ajouter une ligne",
       removeItem: "Supprimer la ligne",
       itemError: "Vérifiez la description, la quantité, le prix et la TVA.",
+      supplierTotalReview:
+        "Comparez ce total avec la facture fournisseur. En cas d’écart, vérifiez le document d’origine avant d’enregistrer.",
       summary: "Récapitulatif de la facture",
       net: "Hors taxe",
       tax: "TVA",

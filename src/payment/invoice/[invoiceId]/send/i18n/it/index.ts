@@ -15,7 +15,7 @@ export const translations: typeof enTranslations = {
       description: "Dopo l’emissione sarà disponibile un link per il cliente.",
     },
     response: {
-      success: "Fattura inviata",
+      success: "Fattura emessa",
       message: "Messaggio di stato",
       viewUrl: "Vista clienti URL",
     },
@@ -62,8 +62,8 @@ export const translations: typeof enTranslations = {
       },
     },
     success: {
-      title: "Operazione riuscita",
-      description: "Fatturato contrassegnato come inviato",
+      title: "Fattura emessa",
+      description: "Il link è pronto per essere condiviso con il cliente.",
     },
   },
   invoiceId: {
@@ -71,10 +71,41 @@ export const translations: typeof enTranslations = {
     description: "ID della fattura da inviare",
     placeholder: "Inserire la fattura ID",
   },
+  delivery: {
+    share: "Condividi la fattura",
+    description:
+      "Copia il link per il cliente oppure invialo all’indirizzo salvato sulla fattura.",
+    send: "Invia per e-mail",
+    confirmDescription:
+      "Invia il link della fattura al destinatario confermato.",
+    recipient: "Destinatario della fattura",
+    noRecipient:
+      "La fattura non ha un destinatario valido. Puoi comunque copiare il link.",
+    status: "Stato dell’e-mail",
+    notIssued: "Puoi condividere solo le fatture emesse.",
+    recipientChanged:
+      "Il destinatario è cambiato o non è disponibile. Riapri la condivisione della fattura.",
+    emailSubject: "Fattura {{number}}",
+    emailText:
+      "{{company}} ha emesso la fattura {{number}}. Aprila qui:\n{{url}}",
+    states: {
+      ready: "Pronta per l’invio",
+      pending:
+        "L’invio è in corso o da confermare. I nuovi tentativi sono sospesi.",
+      accepted: "Il server di posta ha accettato il messaggio.",
+      retryable: "Il server di posta non è stato contattato. Puoi riprovare.",
+      uncertain:
+        "L’esito dell’invio è incerto. Verifica con il destinatario prima di condividere il link separatamente.",
+    },
+  },
   widget: {
     back: "Indietro",
     submit: "Emetti fattura",
-    sent: "Fattura emessa",
+    sent: "Condividi il link con il cliente per consegnare la fattura.",
+    copy: "Copia il link per il cliente",
+    copied: "Link copiato",
+    copyError:
+      "Impossibile copiare il link. Seleziona e copia l’indirizzo qui sopra.",
     viewUrl: "Link di visualizzazione del cliente",
   },
 };

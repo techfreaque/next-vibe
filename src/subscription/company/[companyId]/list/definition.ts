@@ -1,6 +1,6 @@
 /**
  * Company Subscription List API Endpoint Definition
- * Lists all subscriptions for a company
+ * Shows the authorized company owner's account subscription.
  */
 
 import { dateSchema } from "next-vibe/core/definition/common.schema";
@@ -13,6 +13,8 @@ import {
   WidgetType,
 } from "next-vibe/core/definition/enums";
 import { UserRole } from "next-vibe/identity/roles/enum";
+import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
+import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
 import {
   objectField,
   requestUrlPathParamsField,
@@ -31,6 +33,12 @@ import {
 } from "../../../enum";
 import { scopedTranslation } from "./i18n";
 
+const SubscriptionWidget = lazyWidget(() =>
+  import("./widget").then(({ CompanySubscriptionWidget }) => ({
+    default: CompanySubscriptionWidget,
+  })),
+);
+
 const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
@@ -44,12 +52,19 @@ const { GET } = createEndpoint({
   tags: ["tags.subscription", "tags.company", "tags.list"],
   allowedRoles: [UserRole.ADMIN, UserRole.PARTNER_ADMIN] as const,
 
-  fields: objectField(scopedTranslation, {
-    type: WidgetType.CONTAINER,
-    layoutType: LayoutType.STACKED,
-    noCard: true,
+  fields: customWidgetObject({
+    render: SubscriptionWidget,
     usage: { request: "urlPathParams", response: true },
     children: {
+      selectedCompanyId: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z.uuid(),
+      }),
+      companyName: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        schema: z.string(),
+      }),
       companyId: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
@@ -89,12 +104,12 @@ const { GET } = createEndpoint({
             currentPeriodStart: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               fieldType: FieldDataType.DATETIME,
-              schema: dateSchema,
+              schema: dateSchema.nullable(),
             }),
             currentPeriodEnd: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               fieldType: FieldDataType.DATETIME,
-              schema: dateSchema,
+              schema: dateSchema.nullable(),
             }),
             cancelAtPeriodEnd: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
@@ -188,6 +203,8 @@ const { GET } = createEndpoint({
     },
     responses: {
       default: {
+        selectedCompanyId: "123e4567-e89b-12d3-a456-426614174000",
+        companyName: "Example Company",
         subscriptions: [
           {
             id: "123e4567-e89b-12d3-a456-426614174001",

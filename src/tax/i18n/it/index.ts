@@ -9,11 +9,13 @@ export const translations: typeof enTranslations = {
   },
 
   rate: {
+    details: "Dati dell’aliquota",
     create: {
       title: "Creare Tasso Fiscale",
       titleShort: "Creare",
       description: "Aggiungi una tassa per la tua azienda",
       widget: {
+        save: "Crea aliquota",
         backToList: "Torna a Tassi di Tassa",
       },
       companyId: {
@@ -108,6 +110,10 @@ export const translations: typeof enTranslations = {
       titleShort: "Aliquote fiscali",
       description: "Tutte le tariffe fiscali configurate per la vostra azienda",
       widget: {
+        actions: "Azioni",
+        retry: "Riprova",
+        previous: "Precedente",
+        next: "Successiva",
         addRate: "Tasso",
         labelDefault: "Predefinito",
         labelActive: "Attivo",
@@ -209,6 +215,7 @@ export const translations: typeof enTranslations = {
       titleShort: "Tasso di aggiornamento",
       description: "Modificare il tasso di imposta esistente",
       widget: {
+        save: "Salva aliquota",
         backToList: "Torna a Tassi di Tassa",
         failed: "Sfigato",
       },
@@ -355,6 +362,7 @@ export const translations: typeof enTranslations = {
     description:
       "Consulta le imposte registrate su fatture di vendita, note di credito, fatture di acquisto e vendite alla cassa.",
     widget: {
+      retry: "Ricarica il report",
       scope:
         "Per le fatture di vendita vale la data della registrazione collegata o la data di creazione. Per gli acquisti vale la data della fattura. Le vendite alla cassa seguono la data di completamento (UTC) e includono le righe con aliquota positiva o imposta registrata. Se una fattura emessa condivide la registrazione contabile, la vendita compare in fattura.",
       empty: "Nessuna riga di documento corrisponde ai filtri.",
@@ -364,6 +372,8 @@ export const translations: typeof enTranslations = {
       unknownRate: "Aliquota non determinabile",
       run: "Genera report",
       running: "Generazione del report…",
+      scopeHint:
+        "Confronta l’IVA su vendite e acquisti per aliquota, azienda e periodo.",
       selectCompany: "Seleziona l’azienda per questo report.",
     },
     currency: {
@@ -439,6 +449,8 @@ export const translations: typeof enTranslations = {
 
   enums: {
     reportDirection: {
+      nonDeductible: "IVA sugli acquisti indetraibile",
+      reverseCharge: "IVA a debito da inversione contabile",
       posSales: "Vendite alla cassa",
       sales: "Fatture di vendita",
       creditNotes: "Note di credito a clienti",

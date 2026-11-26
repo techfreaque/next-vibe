@@ -87,10 +87,27 @@ export const translations: typeof enTranslations = {
     },
   },
   widget: {
+    lineReviewRequired:
+      "Súčet položiek sa líši od evidovanej sumy. Pred úpravou alebo schválením skontrolujte pôvodnú dodávateľskú faktúru.",
+    removeAction: "Odstrániť",
+    removeLine: "Odstrániť {{description}}",
+    grossTotal: "Celkom s daňou",
+    taxPending:
+      "Daň účtovaná dodávateľom zatiaľ nie je známa. Pred prijatím alebo zaúčtovaním faktúry potvrďte sumu podľa dokladu.",
+    confirmSupplierTax: "Potvrdiť daň dodávateľa",
+    bankDocumentMissing:
+      "Dodávateľský doklad chýba. Priraďte ho tu alebo pri schvaľovaní potvrďte celú sumu podľa bankového dokladu.",
+    bankDocumentTaxReview:
+      "Dodávateľský doklad je priradený po zaúčtovaní. Prípadnú daňovú alebo účtovnú opravu posúďte samostatne. Pôvodný zápis zostáva v platnosti.",
+    linkBankDocument: "Priradiť dodávateľský doklad",
+    inputVat: "Odpočet DPH",
+    taxIncludedCost: "DPH zahrnutá v nákladoch",
+    reverseCharge: "Splatná DPH pri prenesení daňovej povinnosti",
+
     markReceived: "Označiť ako prijatú",
     back: "Späť",
     submit: "Vyhľadať prijatú faktúru",
-    billNumber: "Dodávateľská faktúra",
+    billNumber: "Faktúra",
     supplier: "Dodávateľ",
     overdue: "Po splatnosti",
     billDate: "Dátum vystavenia",
@@ -107,7 +124,9 @@ export const translations: typeof enTranslations = {
     approveBill: "Schváliť dodávateľskú faktúru",
     payBill: "Uhradiť prijatú faktúru",
     addLine: "Pridať položku",
-    viewJournalEntry: "Zobraziť účtovný zápis",
+    accountingEvidence: "Účtovné zápisy",
+    approvalJournal: "Zaúčtovanie faktúry",
+    settlementJournal: "Zaúčtovanie úhrady",
     approveConfirmTitle: "Schváliť túto dodávateľskú faktúru?",
     approveConfirmDescription:
       "Stav faktúry prejde do ďalšej fázy. Po schválení sa vytvorí účtovný zápis. Túto akciu nemožno vrátiť späť.",

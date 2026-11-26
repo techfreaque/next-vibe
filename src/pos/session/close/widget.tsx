@@ -4,8 +4,8 @@ import { Badge } from "next-vibe/ui/components/badge";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { Span } from "next-vibe/ui/components/span";
+import { WidgetShell } from "next-vibe/ui/components/widget-shell";
 import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
-import { formatMoney } from "next-vibe/unified-ui/_shared/format-money";
 import {
   useWidgetForm,
   useWidgetLocale,
@@ -18,6 +18,7 @@ import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-a
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 import type { JSX } from "react";
 
+import { formatPosSettlement } from "../../order/format-settlement";
 import type definition from "./definition";
 
 interface PosSessionCloseWidgetProps {
@@ -34,7 +35,8 @@ export function PosSessionCloseWidget({
   const locale = useWidgetLocale();
   const result = data?.result;
 
-  const fmt = (n: number): string => formatMoney(n, result?.currency, locale);
+  const fmt = (n: number): string =>
+    formatPosSettlement(n, result?.currency, locale);
 
   // Read sessionId from form for display purposes (no state needed)
   const sessionId = form?.getValues("details.sessionId") ?? "";
@@ -47,23 +49,24 @@ export function PosSessionCloseWidget({
     // Determine variance badge color
     const absVariance = Math.abs(result.variance);
     const varianceBadgeClass =
-      absVariance <= 1.0
+      absVariance === 0
         ? "bg-green-600 hover:bg-green-600 text-white"
         : absVariance <= 5.0
           ? "bg-amber-500 hover:bg-amber-500 text-white"
           : "bg-destructive hover:bg-destructive text-destructive-foreground";
 
     return (
-      <Div className="flex flex-col gap-5">
+      <WidgetShell layout="page">
         {/* Success banner */}
         <Div className="rounded-lg border border-muted bg-muted/20 px-4 py-4 flex items-start gap-3">
           <Div className="flex flex-col gap-0.5">
             <Span className="text-sm font-semibold">
               {t("sessionClose.post.success.title")}
             </Span>
-            <Span className="text-xs text-muted-foreground">
-              {t("sessionClose.post.success.description")}
-            </Span>
+            <Div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-sm text-muted-foreground">
+              {result.terminalName && <Span>{result.terminalName}</Span>}
+              {result.companyName && <Span>{result.companyName}</Span>}
+            </Div>
           </Div>
         </Div>
 
@@ -76,12 +79,12 @@ export function PosSessionCloseWidget({
             </Span>
             <Div className="flex items-center gap-2">
               <Span className="text-xs text-muted-foreground">
-                {String(result.orderCount)}{" "}
-                {t("sessionClose.post.widget.orderCount")}
+                {t("sessionClose.post.widget.orderCount", {
+                  count: new Intl.NumberFormat(locale).format(
+                    result.orderCount,
+                  ),
+                })}
               </Span>
-              <Badge variant="secondary" className="text-xs">
-                {t("enums.sessionStatus.closed")}
-              </Badge>
             </Div>
           </Div>
 
@@ -136,7 +139,7 @@ export function PosSessionCloseWidget({
             <Badge
               className={`text-sm font-mono tabular-nums ${varianceBadgeClass}`}
             >
-              {result.variance >= 0 ? "+" : ""}
+              {result.variance > 0 ? "+" : ""}
               {fmt(result.variance)}
             </Badge>
           </Div>
@@ -163,12 +166,12 @@ export function PosSessionCloseWidget({
         >
           {t("sessionClose.post.widget.backToTerminals")}
         </Button>
-      </Div>
+      </WidgetShell>
     );
   }
 
   return (
-    <Div className="flex flex-col gap-5">
+    <WidgetShell layout="page">
       <FormAlertWidget field={{}} />
 
       {/* Session summary header — shows status without UUID */}
@@ -200,6 +203,7 @@ export function PosSessionCloseWidget({
       <Div className="flex flex-col gap-1">
         <NumberFieldWidget
           fieldName="details.closingFloat"
+          presentation="money"
           field={withValue(
             field.children.details.children.closingFloat,
             undefined,
@@ -211,7 +215,9 @@ export function PosSessionCloseWidget({
         </Span>
       </Div>
 
-      <SubmitButtonWidget<typeof definition.POST> field={{}} />
+      <SubmitButtonWidget<typeof definition.POST>
+        field={{ text: "sessionGet.get.widget.closeSession" }}
+      />
 
       <Button
         type="button"
@@ -222,6 +228,6 @@ export function PosSessionCloseWidget({
       >
         {t("sessionClose.post.widget.backToTerminals")}
       </Button>
-    </Div>
+    </WidgetShell>
   );
 }

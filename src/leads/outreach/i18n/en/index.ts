@@ -121,6 +121,7 @@ export const translations = {
           replied: "replied {{date}}",
         },
         deals: {
+          prepareBill: "Prepare supplier bill",
           title: "Paid deals",
           hint: "Spend against the visits, signups and revenue each deal's tracked link or ref code brought in.",
           columns: {

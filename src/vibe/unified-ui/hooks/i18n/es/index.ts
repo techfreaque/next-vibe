@@ -90,6 +90,11 @@ export const translations: typeof enTranslations = {
         enterPhoneNumber: "Ingresa el número de teléfono",
         required: "Obligatorio",
         selectDate: "Selecciona una fecha",
+        openCalendar: "Abrir el calendario",
+        startDate: "Fecha de inicio",
+        endDate: "Fecha de fin",
+        decreaseValue: "Reducir el valor",
+        increaseValue: "Aumentar el valor",
         unknownFieldType: "Tipo de campo desconocido",
       },
       entityPicker: {
@@ -138,6 +143,8 @@ export const translations: typeof enTranslations = {
       responseValidation:
         "La respuesta del servidor no superó la validación: {{error}}",
       malformedResponse: "Respuesta de {{url}} con formato no válido",
+      recordTimeout:
+        "Este registro tarda demasiado en cargarse. Vuelva a intentarlo.",
       requestFailed: "Falló la solicitud a {{path}}: {{error}}",
       /**
        * `reason` is the endpoint's own declared error-type description, already

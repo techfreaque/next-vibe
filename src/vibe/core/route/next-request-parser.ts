@@ -11,7 +11,6 @@ import type { z } from "zod";
 
 import type { EndpointLogger } from "../../logger/types";
 import { isStringQueryField } from "../definition/common.schema";
-import { parseError } from "../utils/parse-error";
 import { sanitizeTelemetryUrl } from "../utils/telemetry-url";
 
 /**
@@ -408,11 +407,28 @@ export async function parseRequestBody(
 > {
   let bodyStage = "read-body";
   let receivedCharacters: number | null = null;
+  const contentType = request.headers.get("content-type") ?? "";
+  const contentTypeFamily = contentType.includes("multipart/form-data")
+    ? "multipart"
+    : contentType.includes("application/x-www-form-urlencoded")
+      ? "urlencoded"
+      : contentType.includes("application/json")
+        ? "json"
+        : contentType
+          ? "other"
+          : "none";
+  const announcedLength = request.headers.get("content-length");
+  const announcedBytes =
+    announcedLength === null ? null : Number(announcedLength);
+  const contentLength =
+    announcedBytes !== null &&
+    Number.isSafeInteger(announcedBytes) &&
+    announcedBytes >= 0
+      ? announcedBytes
+      : null;
   try {
-    const contentType = request.headers.get("content-type") || "";
-
     // Handle multipart/form-data (file uploads)
-    if (contentType.includes("multipart/form-data")) {
+    if (contentTypeFamily === "multipart") {
       bodyStage = "decode-multipart";
       const formData = await request.formData();
 
@@ -420,42 +436,19 @@ export async function parseRequestBody(
       // eslint-disable-next-line restricted/restricted-syntax, @typescript-eslint/no-explicit-any -- Infrastructure: FormData type compatibility
       const dataField = (formData as any).get("data") as string | File | null;
       if (dataField && typeof dataField === "string") {
-        // Parse the JSON data field
+        bodyStage = "decode-multipart-json";
+        receivedCharacters = dataField.length;
         const jsonData = JSON.parse(dataField) as MergedObject;
 
-        // Log raw FormData keys for diagnostics (helps debug file upload issues)
-        const rawFormDataKeys: string[] = [];
-        // eslint-disable-next-line restricted/restricted-syntax, @typescript-eslint/no-explicit-any -- Infrastructure: FormData type compatibility
-        for (const [key] of (formData as any).entries()) {
-          rawFormDataKeys.push(key as string);
-        }
-        logger.debug("Raw FormData keys from client", { rawFormDataKeys });
-
-        // Parse remaining FormData fields (files with dot notation)
+        bodyStage = "merge-multipart";
         const fileFields = parseFormData(formData);
-        // Remove the "data" field from fileFields since we already parsed it
         delete fileFields["data"];
-
-        // Merge JSON data with file fields (files override null placeholders)
         const merged = deepMerge(jsonData, fileFields);
 
-        const mergedFileUpload = merged["fileUpload"] as
-          | MergedObject
-          | null
-          | undefined;
-        const mergedFiles = mergedFileUpload?.["files"];
         logger.debug("Parsed mixed FormData + JSON request", {
-          jsonDataKeys: Object.keys(jsonData),
-          fileFieldKeys: Object.keys(fileFields),
-          mergedKeys: Object.keys(merged),
-          mergedFileUploadFilesLength: Array.isArray(mergedFiles)
-            ? mergedFiles.length
-            : "not array",
-          mergedFileUploadFilesTypes: Array.isArray(mergedFiles)
-            ? mergedFiles.map((f) =>
-                f instanceof File ? `File(${f.name},${f.size})` : typeof f,
-              )
-            : "not array",
+          jsonFieldCount: Object.keys(jsonData).length,
+          multipartFieldCount: Object.keys(fileFields).length,
+          mergedFieldCount: Object.keys(merged).length,
         });
 
         return merged as Record<
@@ -477,7 +470,8 @@ export async function parseRequestBody(
 
     // Handle application/x-www-form-urlencoded (e.g. RFC 8058 one-click
     // unsubscribe POST: `List-Unsubscribe=One-Click`)
-    if (contentType.includes("application/x-www-form-urlencoded")) {
+    if (contentTypeFamily === "urlencoded") {
+      bodyStage = "decode-urlencoded";
       const params = new URLSearchParams(await request.text());
       const fields: Record<string, string> = {};
       for (const [key, value] of params.entries()) {
@@ -496,16 +490,13 @@ export async function parseRequestBody(
       // (proxy retry, aborted upload). Validation then reports every field as
       // missing, which reads like a client bug - say what actually happened.
       // 2026-11-13: a burst of stream POSTs failed this way with no trace.
-      const announcedBytes = Number(request.headers.get("content-length"));
-      if (Number.isFinite(announcedBytes) && announcedBytes > 0) {
+      if (contentLength !== null && contentLength > 0) {
         logger.error("Request body empty despite Content-Length", {
-          contentLength: announcedBytes,
-          receivedBytes: bodyText.length,
-          contentType: contentType || "(none)",
-          transferEncoding: request.headers.get("transfer-encoding") ?? null,
-          via: request.headers.get("via") ?? null,
-          method: request.method,
-          path: sanitizeTelemetryUrl(request.url),
+          contentLength,
+          receivedCharacters,
+          contentTypeFamily,
+          bodyStage,
+          pathname: sanitizeTelemetryUrl(request.nextUrl.pathname),
         });
       }
       return {};
@@ -522,21 +513,13 @@ export async function parseRequestBody(
       | Record<string, string | number | boolean | null>
     >;
     return body;
-  } catch (error) {
-    const contentType = request.headers.get("content-type") || "(none)";
-    // Error.message/.stack are non-enumerable, so `...parseError(error)`
-    // spread nothing useful - every occurrence of this log was missing the
-    // one field that actually explains the failure. Pull them explicitly.
-    const parsed = parseError(error);
+  } catch {
+    // Decoder exceptions may include raw input, field names or filenames.
     logger.error("Failed to parse request body", {
-      error: parsed.message,
-      errorStack: parsed.stack,
-      contentType,
-      contentLength: request.headers.get("content-length") ?? "(none)",
+      contentTypeFamily,
+      contentLength,
       bodyStage,
       receivedCharacters,
-      clientDisconnected: request.signal.aborted,
-      method: request.method,
       pathname: sanitizeTelemetryUrl(request.nextUrl.pathname),
     });
     // If parsing fails, return empty object

@@ -126,8 +126,12 @@ import { Route as ApiLocaleDesktopPressKeyRouteImport } from './routes/api.$loca
 import { Route as ApiLocaleDesktopScrollRouteImport } from './routes/api.$locale.desktop.scroll'
 import { Route as ApiLocaleDesktopTakeScreenshotRouteImport } from './routes/api.$locale.desktop.take-screenshot'
 import { Route as ApiLocaleDesktopTypeTextRouteImport } from './routes/api.$locale.desktop.type-text'
+import { Route as ApiLocaleFinanceBankConnectionsRouteImport } from './routes/api.$locale.finance.bank-connections'
+import { Route as ApiLocaleFinanceCreditLiabilitiesRouteImport } from './routes/api.$locale.finance.credit-liabilities'
 import { Route as ApiLocaleFinanceIngestRouteImport } from './routes/api.$locale.finance.ingest'
+import { Route as ApiLocaleFinanceMonthlyProfitRouteImport } from './routes/api.$locale.finance.monthly-profit'
 import { Route as ApiLocaleFinanceStatusRouteImport } from './routes/api.$locale.finance.status'
+import { Route as ApiLocaleFinanceSupplierEvidenceRouteImport } from './routes/api.$locale.finance.supplier-evidence'
 import { Route as ApiLocaleFinanceThresholdsRouteImport } from './routes/api.$locale.finance.thresholds'
 import { Route as ApiLocaleInventoryDashboardRouteImport } from './routes/api.$locale.inventory.dashboard'
 import { Route as ApiLocaleLeadMagnetCaptureRouteImport } from './routes/api.$locale.lead-magnet.capture'
@@ -154,7 +158,9 @@ import { Route as ApiLocaleNewsletterUnsubscribeRouteImport } from './routes/api
 import { Route as ApiLocaleNotificationsListRouteImport } from './routes/api.$locale.notifications.list'
 import { Route as ApiLocaleNotificationsReadRouteImport } from './routes/api.$locale.notifications.read'
 import { Route as ApiLocaleNotificationsUnreadCountRouteImport } from './routes/api.$locale.notifications.unread-count'
+import { Route as ApiLocalePaymentAccountingRouteImport } from './routes/api.$locale.payment.accounting'
 import { Route as ApiLocalePaymentCheckoutRouteImport } from './routes/api.$locale.payment.checkout'
+import { Route as ApiLocalePaymentCostBackfillRouteImport } from './routes/api.$locale.payment.cost-backfill'
 import { Route as ApiLocalePaymentDashboardRouteImport } from './routes/api.$locale.payment.dashboard'
 import { Route as ApiLocalePaymentInvoiceRouteImport } from './routes/api.$locale.payment.invoice'
 import { Route as ApiLocalePaymentPortalRouteImport } from './routes/api.$locale.payment.portal'
@@ -168,11 +174,13 @@ import { Route as ApiLocaleReferralLinksRouteImport } from './routes/api.$locale
 import { Route as ApiLocaleReferralPayoutRouteImport } from './routes/api.$locale.referral.payout'
 import { Route as ApiLocaleReferralStatsRouteImport } from './routes/api.$locale.referral.stats'
 import { Route as ApiLocaleSeoIndexnowRouteImport } from './routes/api.$locale.seo.indexnow'
+import { Route as ApiLocaleSeoSummaryRouteImport } from './routes/api.$locale.seo.summary'
 import { Route as ApiLocaleSubscriptionCancelRouteImport } from './routes/api.$locale.subscription.cancel'
 import { Route as ApiLocaleSubscriptionCreateRouteImport } from './routes/api.$locale.subscription.create'
 import { Route as ApiLocaleSubscriptionDashboardRouteImport } from './routes/api.$locale.subscription.dashboard'
 import { Route as ApiLocaleSubscriptionUpdateRouteImport } from './routes/api.$locale.subscription.update'
 import { Route as ApiLocaleSubscriptionYearlyCreditsRouteImport } from './routes/api.$locale.subscription.yearly-credits'
+import { Route as ApiLocaleTaxRegimeRouteImport } from './routes/api.$locale.tax.regime'
 import { Route as ApiLocaleTaxReportRouteImport } from './routes/api.$locale.tax.report'
 import { Route as ApiLocaleUserSessionCleanupRouteImport } from './routes/api.$locale.user.session-cleanup'
 import { Route as ApiLocaleUserSignupReminderRouteImport } from './routes/api.$locale.user.signup-reminder'
@@ -180,6 +188,7 @@ import { Route as ApiLocaleUserVerifyEmailReminderRouteImport } from './routes/a
 import { Route as ApiLocaleUsersCreateRouteImport } from './routes/api.$locale.users.create'
 import { Route as ApiLocaleUsersListRouteImport } from './routes/api.$locale.users.list'
 import { Route as ApiLocaleUsersStatsRouteImport } from './routes/api.$locale.users.stats'
+import { Route as ApiLocaleUsersSummaryRouteImport } from './routes/api.$locale.users.summary'
 import { Route as ApiLocaleUsersViewRouteImport } from './routes/api.$locale.users.view'
 import { Route as ApiLocaleV1MessagesRouteImport } from './routes/api.$locale.v1.messages'
 import { Route as ApiLocaleV1ModelsRouteImport } from './routes/api.$locale.v1.models'
@@ -258,6 +267,7 @@ import { Route as LocaleUserAuthLoginIndexRouteImport } from './routes/$locale.u
 import { Route as LocaleUserAuthResetPasswordIndexRouteImport } from './routes/$locale.user._auth.reset-password.index'
 import { Route as LocaleUserAuthSignupIndexRouteImport } from './routes/$locale.user._auth.signup.index'
 import { Route as ApiLocaleAnalyticsBusinessOverviewRouteImport } from './routes/api.$locale.analytics.business.overview'
+import { Route as ApiLocaleAnalyticsBusinessSummaryRouteImport } from './routes/api.$locale.analytics.business.summary'
 import { Route as ApiLocaleAnalyticsEvaluatorsAndRouteImport } from './routes/api.$locale.analytics.evaluators.and'
 import { Route as ApiLocaleAnalyticsEvaluatorsCrossoverRouteImport } from './routes/api.$locale.analytics.evaluators.crossover'
 import { Route as ApiLocaleAnalyticsEvaluatorsDropRouteImport } from './routes/api.$locale.analytics.evaluators.drop'
@@ -322,10 +332,13 @@ import { Route as ApiLocaleCreditsDataSourcesCreditsTransactionsCountRouteImport
 import { Route as ApiLocaleCreditsDataSourcesCreditsTransferVolumeRouteImport } from './routes/api.$locale.credits.data-sources.credits-transfer-volume'
 import { Route as ApiLocaleCreditsDataSourcesCreditsUsageWithFeatureRouteImport } from './routes/api.$locale.credits.data-sources.credits-usage-with-feature'
 import { Route as ApiLocaleCreditsDataSourcesCreditsWalletsTotalRouteImport } from './routes/api.$locale.credits.data-sources.credits-wallets-total'
+import { Route as ApiLocaleFinanceBankConnectionsPrivacyRouteImport } from './routes/api.$locale.finance.bank-connections.privacy'
 import { Route as ApiLocaleFinanceBankCandidatesRouteImport } from './routes/api.$locale.finance.bank.candidates'
+import { Route as ApiLocaleFinanceBankFollowupRouteImport } from './routes/api.$locale.finance.bank.followup'
 import { Route as ApiLocaleFinanceBankImportRouteImport } from './routes/api.$locale.finance.bank.import'
 import { Route as ApiLocaleFinanceBankListRouteImport } from './routes/api.$locale.finance.bank.list'
 import { Route as ApiLocaleFinanceBankMatchRouteImport } from './routes/api.$locale.finance.bank.match'
+import { Route as ApiLocaleFinanceBankSettingsRouteImport } from './routes/api.$locale.finance.bank.settings'
 import { Route as ApiLocaleFinanceDataSourcesFinanceSeriesRouteImport } from './routes/api.$locale.finance.data-sources.finance-series'
 import { Route as ApiLocaleInventoryStockAdjustRouteImport } from './routes/api.$locale.inventory.stock.adjust'
 import { Route as ApiLocaleInventoryStockIssueRouteImport } from './routes/api.$locale.inventory.stock.issue'
@@ -413,6 +426,7 @@ import { Route as ApiLocaleMessengerMessagesListRouteImport } from './routes/api
 import { Route as ApiLocaleMessengerMessagesStatsRouteImport } from './routes/api.$locale.messenger.messages.stats'
 import { Route as ApiLocaleMessengerPreviewRenderRouteImport } from './routes/api.$locale.messenger.preview.render'
 import { Route as ApiLocaleMessengerPreviewSendTestRouteImport } from './routes/api.$locale.messenger.preview.send-test'
+import { Route as ApiLocaleMessengerSystemMailboxBillsRouteImport } from './routes/api.$locale.messenger.system-mailbox.bills'
 import { Route as ApiLocaleMessengerSystemMailboxInboxRouteImport } from './routes/api.$locale.messenger.system-mailbox.inbox'
 import { Route as ApiLocaleMessengerSystemMailboxMessageRouteImport } from './routes/api.$locale.messenger.system-mailbox.message'
 import { Route as ApiLocaleMessengerSystemMailboxReportRouteImport } from './routes/api.$locale.messenger.system-mailbox.report'
@@ -422,6 +436,8 @@ import { Route as ApiLocaleNewsletterDataSourcesNewsletterEventsTotalRouteImport
 import { Route as ApiLocaleNewsletterDataSourcesNewsletterSubscriptionsNewRouteImport } from './routes/api.$locale.newsletter.data-sources.newsletter-subscriptions-new'
 import { Route as ApiLocaleNewsletterDataSourcesNewsletterUnsubscribesRouteImport } from './routes/api.$locale.newsletter.data-sources.newsletter-unsubscribes'
 import { Route as ApiLocaleNewsletterUnsubscribeSyncRouteImport } from './routes/api.$locale.newsletter.unsubscribe.sync'
+import { Route as ApiLocalePaymentAccountingMappingRouteImport } from './routes/api.$locale.payment.accounting.mapping'
+import { Route as ApiLocalePaymentAccountingRecognitionRouteImport } from './routes/api.$locale.payment.accounting.recognition'
 import { Route as ApiLocalePaymentAnalyticsRevenueRouteImport } from './routes/api.$locale.payment.analytics.revenue'
 import { Route as ApiLocalePaymentBillCreateRouteImport } from './routes/api.$locale.payment.bill.create'
 import { Route as ApiLocalePaymentBillListRouteImport } from './routes/api.$locale.payment.bill.list'
@@ -520,6 +536,7 @@ import { Route as ApiLocaleVibeAgentImageGenerationRouteImport } from './routes/
 import { Route as ApiLocaleVibeAgentMusicGenerationRouteImport } from './routes/api.$locale.vibe.agent.music-generation'
 import { Route as ApiLocaleVibeAgentSkillsRouteImport } from './routes/api.$locale.vibe.agent.skills'
 import { Route as ApiLocaleVibeAgentSpeechToTextRouteImport } from './routes/api.$locale.vibe.agent.speech-to-text'
+import { Route as ApiLocaleVibeAgentSummaryRouteImport } from './routes/api.$locale.vibe.agent.summary'
 import { Route as ApiLocaleVibeAgentTextToSpeechRouteImport } from './routes/api.$locale.vibe.agent.text-to-speech'
 import { Route as ApiLocaleVibeAgentVideoGenerationRouteImport } from './routes/api.$locale.vibe.agent.video-generation'
 import { Route as ApiLocaleVibeAgentViewImageRouteImport } from './routes/api.$locale.vibe.agent.view-image'
@@ -532,6 +549,7 @@ import { Route as ApiLocaleVibeEnvSettingsRouteImport } from './routes/api.$loca
 import { Route as ApiLocaleVibeExecuteToolAwaitTaskRouteImport } from './routes/api.$locale.vibe.execute-tool.await-task'
 import { Route as ApiLocaleVibeExecuteToolCompleteRouteImport } from './routes/api.$locale.vibe.execute-tool.complete'
 import { Route as ApiLocaleVibeExecuteToolRevivalRouteImport } from './routes/api.$locale.vibe.execute-tool.revival'
+import { Route as ApiLocaleVibeLoggerOperationsSummaryRouteImport } from './routes/api.$locale.vibe.logger.operations-summary'
 import { Route as ApiLocaleVibeRealtimeRemoteEventBridgeRouteImport } from './routes/api.$locale.vibe.realtime.remote-event-bridge'
 import { Route as ApiLocaleVibeRemoteConnectionInstanceIdRouteImport } from './routes/api.$locale.vibe.remote-connection.$instanceId'
 import { Route as ApiLocaleVibeRemoteConnectionConnectRouteImport } from './routes/api.$locale.vibe.remote-connection.connect'
@@ -554,6 +572,8 @@ import { Route as ApiLocaleChartOfAccountsPeriodPeriodIdCloseRouteImport } from 
 import { Route as ApiLocaleChartOfAccountsPeriodPeriodIdGetRouteImport } from './routes/api.$locale.chart-of-accounts.period.$periodId.get'
 import { Route as ApiLocaleCompaniesCompanyIdMembersInviteRouteImport } from './routes/api.$locale.companies.$companyId.members.invite'
 import { Route as ApiLocaleCompaniesCompanyIdMembersListRouteImport } from './routes/api.$locale.companies.$companyId.members.list'
+import { Route as ApiLocaleFinanceBankConnectionsEnableBankingCallbackRouteImport } from './routes/api.$locale.finance.bank-connections.enable-banking.callback'
+import { Route as ApiLocaleFinanceBankConnectionsEnableBankingConnectRouteImport } from './routes/api.$locale.finance.bank-connections.enable-banking.connect'
 import { Route as ApiLocaleInventoryTransferTransferIdDispatchRouteImport } from './routes/api.$locale.inventory.transfer.$transferId.dispatch'
 import { Route as ApiLocaleInventoryTransferTransferIdGetRouteImport } from './routes/api.$locale.inventory.transfer.$transferId.get'
 import { Route as ApiLocaleInventoryTransferTransferIdReceiveRouteImport } from './routes/api.$locale.inventory.transfer.$transferId.receive'
@@ -566,6 +586,8 @@ import { Route as ApiLocaleLeadsGrowthDataSourcesChannelSpendRouteImport } from 
 import { Route as ApiLocaleLeadsGrowthDataSourcesFunnelStepRouteImport } from './routes/api.$locale.leads.growth.data-sources.funnel-step'
 import { Route as ApiLocaleLeadsImportJobsJobIdRouteImport } from './routes/api.$locale.leads.import.jobs.$jobId'
 import { Route as ApiLocaleMessengerAccountsEditIdRouteImport } from './routes/api.$locale.messenger.accounts.edit.$id'
+import { Route as ApiLocaleMessengerSystemMailboxBillsAttachmentRouteImport } from './routes/api.$locale.messenger.system-mailbox.bills.attachment'
+import { Route as ApiLocaleMessengerSystemMailboxBillsSyncRouteImport } from './routes/api.$locale.messenger.system-mailbox.bills.sync'
 import { Route as ApiLocaleNewsletterUnsubscribeOneclickTokenRouteImport } from './routes/api.$locale.newsletter.unsubscribe.oneclick.$token'
 import { Route as ApiLocalePaymentBillBillIdApproveRouteImport } from './routes/api.$locale.payment.bill.$billId.approve'
 import { Route as ApiLocalePaymentBillBillIdGetRouteImport } from './routes/api.$locale.payment.bill.$billId.get'
@@ -765,6 +787,7 @@ import { Route as ApiLocaleVibeToolingInfraClusterStatusRouteImport } from './ro
 import { Route as ApiLocaleVibeToolingInfraDeployPreviewRouteImport } from './routes/api.$locale.vibe.tooling.infra.deploy.preview'
 import { Route as ApiLocaleVibeToolingInfraDeployPushRouteImport } from './routes/api.$locale.vibe.tooling.infra.deploy.push'
 import { Route as ApiLocaleVibeToolingInfraScaleReplicasRouteImport } from './routes/api.$locale.vibe.tooling.infra.scale.replicas'
+import { Route as ApiLocalePaymentBillLineBillIdLineIdRemoveRouteImport } from './routes/api.$locale.payment.bill.line.$billId.$lineId.remove'
 import { Route as ApiLocaleVibeAgentChatFoldersRootFolderIdCreateRouteImport } from './routes/api.$locale.vibe.agent.chat.folders.$rootFolderId.create'
 import { Route as ApiLocaleVibeAgentChatFoldersRootFolderIdRootPermissionsRouteImport } from './routes/api.$locale.vibe.agent.chat.folders.$rootFolderId.root-permissions'
 import { Route as ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdRouteImport } from './routes/api.$locale.vibe.agent.chat.folders.subfolders.$subFolderId'
@@ -1428,16 +1451,40 @@ const ApiLocaleDesktopTypeTextRoute =
     path: '/api/$locale/desktop/type-text',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiLocaleFinanceBankConnectionsRoute =
+  ApiLocaleFinanceBankConnectionsRouteImport.update({
+    id: '/api/$locale/finance/bank-connections',
+    path: '/api/$locale/finance/bank-connections',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleFinanceCreditLiabilitiesRoute =
+  ApiLocaleFinanceCreditLiabilitiesRouteImport.update({
+    id: '/api/$locale/finance/credit-liabilities',
+    path: '/api/$locale/finance/credit-liabilities',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiLocaleFinanceIngestRoute = ApiLocaleFinanceIngestRouteImport.update({
   id: '/api/$locale/finance/ingest',
   path: '/api/$locale/finance/ingest',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiLocaleFinanceMonthlyProfitRoute =
+  ApiLocaleFinanceMonthlyProfitRouteImport.update({
+    id: '/api/$locale/finance/monthly-profit',
+    path: '/api/$locale/finance/monthly-profit',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiLocaleFinanceStatusRoute = ApiLocaleFinanceStatusRouteImport.update({
   id: '/api/$locale/finance/status',
   path: '/api/$locale/finance/status',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiLocaleFinanceSupplierEvidenceRoute =
+  ApiLocaleFinanceSupplierEvidenceRouteImport.update({
+    id: '/api/$locale/finance/supplier-evidence',
+    path: '/api/$locale/finance/supplier-evidence',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiLocaleFinanceThresholdsRoute =
   ApiLocaleFinanceThresholdsRouteImport.update({
     id: '/api/$locale/finance/thresholds',
@@ -1582,10 +1629,22 @@ const ApiLocaleNotificationsUnreadCountRoute =
     path: '/api/$locale/notifications/unread-count',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiLocalePaymentAccountingRoute =
+  ApiLocalePaymentAccountingRouteImport.update({
+    id: '/accounting',
+    path: '/accounting',
+    getParentRoute: () => ApiLocalePaymentRoute,
+  } as any)
 const ApiLocalePaymentCheckoutRoute =
   ApiLocalePaymentCheckoutRouteImport.update({
     id: '/checkout',
     path: '/checkout',
+    getParentRoute: () => ApiLocalePaymentRoute,
+  } as any)
+const ApiLocalePaymentCostBackfillRoute =
+  ApiLocalePaymentCostBackfillRouteImport.update({
+    id: '/cost-backfill',
+    path: '/cost-backfill',
     getParentRoute: () => ApiLocalePaymentRoute,
   } as any)
 const ApiLocalePaymentDashboardRoute =
@@ -1658,6 +1717,11 @@ const ApiLocaleSeoIndexnowRoute = ApiLocaleSeoIndexnowRouteImport.update({
   path: '/api/$locale/seo/indexnow',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiLocaleSeoSummaryRoute = ApiLocaleSeoSummaryRouteImport.update({
+  id: '/api/$locale/seo/summary',
+  path: '/api/$locale/seo/summary',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiLocaleSubscriptionCancelRoute =
   ApiLocaleSubscriptionCancelRouteImport.update({
     id: '/cancel',
@@ -1688,6 +1752,11 @@ const ApiLocaleSubscriptionYearlyCreditsRoute =
     path: '/yearly-credits',
     getParentRoute: () => ApiLocaleSubscriptionRoute,
   } as any)
+const ApiLocaleTaxRegimeRoute = ApiLocaleTaxRegimeRouteImport.update({
+  id: '/api/$locale/tax/regime',
+  path: '/api/$locale/tax/regime',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiLocaleTaxReportRoute = ApiLocaleTaxReportRouteImport.update({
   id: '/api/$locale/tax/report',
   path: '/api/$locale/tax/report',
@@ -1724,6 +1793,11 @@ const ApiLocaleUsersListRoute = ApiLocaleUsersListRouteImport.update({
 const ApiLocaleUsersStatsRoute = ApiLocaleUsersStatsRouteImport.update({
   id: '/api/$locale/users/stats',
   path: '/api/$locale/users/stats',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiLocaleUsersSummaryRoute = ApiLocaleUsersSummaryRouteImport.update({
+  id: '/api/$locale/users/summary',
+  path: '/api/$locale/users/summary',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiLocaleUsersViewRoute = ApiLocaleUsersViewRouteImport.update({
@@ -2187,6 +2261,12 @@ const ApiLocaleAnalyticsBusinessOverviewRoute =
     path: '/api/$locale/analytics/business/overview',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiLocaleAnalyticsBusinessSummaryRoute =
+  ApiLocaleAnalyticsBusinessSummaryRouteImport.update({
+    id: '/api/$locale/analytics/business/summary',
+    path: '/api/$locale/analytics/business/summary',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiLocaleAnalyticsEvaluatorsAndRoute =
   ApiLocaleAnalyticsEvaluatorsAndRouteImport.update({
     id: '/api/$locale/analytics/evaluators/and',
@@ -2571,10 +2651,22 @@ const ApiLocaleCreditsDataSourcesCreditsWalletsTotalRoute =
     path: '/data-sources/credits-wallets-total',
     getParentRoute: () => ApiLocaleCreditsRoute,
   } as any)
+const ApiLocaleFinanceBankConnectionsPrivacyRoute =
+  ApiLocaleFinanceBankConnectionsPrivacyRouteImport.update({
+    id: '/privacy',
+    path: '/privacy',
+    getParentRoute: () => ApiLocaleFinanceBankConnectionsRoute,
+  } as any)
 const ApiLocaleFinanceBankCandidatesRoute =
   ApiLocaleFinanceBankCandidatesRouteImport.update({
     id: '/api/$locale/finance/bank/candidates',
     path: '/api/$locale/finance/bank/candidates',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleFinanceBankFollowupRoute =
+  ApiLocaleFinanceBankFollowupRouteImport.update({
+    id: '/api/$locale/finance/bank/followup',
+    path: '/api/$locale/finance/bank/followup',
     getParentRoute: () => rootRouteImport,
   } as any)
 const ApiLocaleFinanceBankImportRoute =
@@ -2593,6 +2685,12 @@ const ApiLocaleFinanceBankMatchRoute =
   ApiLocaleFinanceBankMatchRouteImport.update({
     id: '/api/$locale/finance/bank/match',
     path: '/api/$locale/finance/bank/match',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleFinanceBankSettingsRoute =
+  ApiLocaleFinanceBankSettingsRouteImport.update({
+    id: '/api/$locale/finance/bank/settings',
+    path: '/api/$locale/finance/bank/settings',
     getParentRoute: () => rootRouteImport,
   } as any)
 const ApiLocaleFinanceDataSourcesFinanceSeriesRoute =
@@ -3116,6 +3214,12 @@ const ApiLocaleMessengerPreviewSendTestRoute =
     path: '/api/$locale/messenger/preview/send-test',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiLocaleMessengerSystemMailboxBillsRoute =
+  ApiLocaleMessengerSystemMailboxBillsRouteImport.update({
+    id: '/api/$locale/messenger/system-mailbox/bills',
+    path: '/api/$locale/messenger/system-mailbox/bills',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiLocaleMessengerSystemMailboxInboxRoute =
   ApiLocaleMessengerSystemMailboxInboxRouteImport.update({
     id: '/api/$locale/messenger/system-mailbox/inbox',
@@ -3169,6 +3273,18 @@ const ApiLocaleNewsletterUnsubscribeSyncRoute =
     id: '/sync',
     path: '/sync',
     getParentRoute: () => ApiLocaleNewsletterUnsubscribeRoute,
+  } as any)
+const ApiLocalePaymentAccountingMappingRoute =
+  ApiLocalePaymentAccountingMappingRouteImport.update({
+    id: '/mapping',
+    path: '/mapping',
+    getParentRoute: () => ApiLocalePaymentAccountingRoute,
+  } as any)
+const ApiLocalePaymentAccountingRecognitionRoute =
+  ApiLocalePaymentAccountingRecognitionRouteImport.update({
+    id: '/recognition',
+    path: '/recognition',
+    getParentRoute: () => ApiLocalePaymentAccountingRoute,
   } as any)
 const ApiLocalePaymentAnalyticsRevenueRoute =
   ApiLocalePaymentAnalyticsRevenueRouteImport.update({
@@ -3747,6 +3863,12 @@ const ApiLocaleVibeAgentSpeechToTextRoute =
     path: '/api/$locale/vibe/agent/speech-to-text',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiLocaleVibeAgentSummaryRoute =
+  ApiLocaleVibeAgentSummaryRouteImport.update({
+    id: '/api/$locale/vibe/agent/summary',
+    path: '/api/$locale/vibe/agent/summary',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiLocaleVibeAgentTextToSpeechRoute =
   ApiLocaleVibeAgentTextToSpeechRouteImport.update({
     id: '/api/$locale/vibe/agent/text-to-speech',
@@ -3818,6 +3940,12 @@ const ApiLocaleVibeExecuteToolRevivalRoute =
     id: '/revival',
     path: '/revival',
     getParentRoute: () => ApiLocaleVibeExecuteToolRoute,
+  } as any)
+const ApiLocaleVibeLoggerOperationsSummaryRoute =
+  ApiLocaleVibeLoggerOperationsSummaryRouteImport.update({
+    id: '/api/$locale/vibe/logger/operations-summary',
+    path: '/api/$locale/vibe/logger/operations-summary',
+    getParentRoute: () => rootRouteImport,
   } as any)
 const ApiLocaleVibeRealtimeRemoteEventBridgeRoute =
   ApiLocaleVibeRealtimeRemoteEventBridgeRouteImport.update({
@@ -3951,6 +4079,18 @@ const ApiLocaleCompaniesCompanyIdMembersListRoute =
     path: '/api/$locale/companies/$companyId/members/list',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiLocaleFinanceBankConnectionsEnableBankingCallbackRoute =
+  ApiLocaleFinanceBankConnectionsEnableBankingCallbackRouteImport.update({
+    id: '/enable-banking/callback',
+    path: '/enable-banking/callback',
+    getParentRoute: () => ApiLocaleFinanceBankConnectionsRoute,
+  } as any)
+const ApiLocaleFinanceBankConnectionsEnableBankingConnectRoute =
+  ApiLocaleFinanceBankConnectionsEnableBankingConnectRouteImport.update({
+    id: '/enable-banking/connect',
+    path: '/enable-banking/connect',
+    getParentRoute: () => ApiLocaleFinanceBankConnectionsRoute,
+  } as any)
 const ApiLocaleInventoryTransferTransferIdDispatchRoute =
   ApiLocaleInventoryTransferTransferIdDispatchRouteImport.update({
     id: '/api/$locale/inventory/transfer/$transferId/dispatch',
@@ -4022,6 +4162,18 @@ const ApiLocaleMessengerAccountsEditIdRoute =
     id: '/api/$locale/messenger/accounts/edit/$id',
     path: '/api/$locale/messenger/accounts/edit/$id',
     getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleMessengerSystemMailboxBillsAttachmentRoute =
+  ApiLocaleMessengerSystemMailboxBillsAttachmentRouteImport.update({
+    id: '/attachment',
+    path: '/attachment',
+    getParentRoute: () => ApiLocaleMessengerSystemMailboxBillsRoute,
+  } as any)
+const ApiLocaleMessengerSystemMailboxBillsSyncRoute =
+  ApiLocaleMessengerSystemMailboxBillsSyncRouteImport.update({
+    id: '/sync',
+    path: '/sync',
+    getParentRoute: () => ApiLocaleMessengerSystemMailboxBillsRoute,
   } as any)
 const ApiLocaleNewsletterUnsubscribeOneclickTokenRoute =
   ApiLocaleNewsletterUnsubscribeOneclickTokenRouteImport.update({
@@ -5219,6 +5371,12 @@ const ApiLocaleVibeToolingInfraScaleReplicasRoute =
     path: '/api/$locale/vibe/tooling/infra/scale/replicas',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiLocalePaymentBillLineBillIdLineIdRemoveRoute =
+  ApiLocalePaymentBillLineBillIdLineIdRemoveRouteImport.update({
+    id: '/bill/line/$billId/$lineId/remove',
+    path: '/bill/line/$billId/$lineId/remove',
+    getParentRoute: () => ApiLocalePaymentRoute,
+  } as any)
 const ApiLocaleVibeAgentChatFoldersRootFolderIdCreateRoute =
   ApiLocaleVibeAgentChatFoldersRootFolderIdCreateRouteImport.update({
     id: '/create',
@@ -5467,8 +5625,12 @@ export interface FileRoutesByFullPath {
   '/api/$locale/desktop/scroll': typeof ApiLocaleDesktopScrollRoute
   '/api/$locale/desktop/take-screenshot': typeof ApiLocaleDesktopTakeScreenshotRoute
   '/api/$locale/desktop/type-text': typeof ApiLocaleDesktopTypeTextRoute
+  '/api/$locale/finance/bank-connections': typeof ApiLocaleFinanceBankConnectionsRouteWithChildren
+  '/api/$locale/finance/credit-liabilities': typeof ApiLocaleFinanceCreditLiabilitiesRoute
   '/api/$locale/finance/ingest': typeof ApiLocaleFinanceIngestRoute
+  '/api/$locale/finance/monthly-profit': typeof ApiLocaleFinanceMonthlyProfitRoute
   '/api/$locale/finance/status': typeof ApiLocaleFinanceStatusRoute
+  '/api/$locale/finance/supplier-evidence': typeof ApiLocaleFinanceSupplierEvidenceRoute
   '/api/$locale/finance/thresholds': typeof ApiLocaleFinanceThresholdsRoute
   '/api/$locale/inventory/dashboard': typeof ApiLocaleInventoryDashboardRoute
   '/api/$locale/lead-magnet/capture': typeof ApiLocaleLeadMagnetCaptureRoute
@@ -5495,7 +5657,9 @@ export interface FileRoutesByFullPath {
   '/api/$locale/notifications/list': typeof ApiLocaleNotificationsListRoute
   '/api/$locale/notifications/read': typeof ApiLocaleNotificationsReadRoute
   '/api/$locale/notifications/unread-count': typeof ApiLocaleNotificationsUnreadCountRoute
+  '/api/$locale/payment/accounting': typeof ApiLocalePaymentAccountingRouteWithChildren
   '/api/$locale/payment/checkout': typeof ApiLocalePaymentCheckoutRoute
+  '/api/$locale/payment/cost-backfill': typeof ApiLocalePaymentCostBackfillRoute
   '/api/$locale/payment/dashboard': typeof ApiLocalePaymentDashboardRoute
   '/api/$locale/payment/invoice': typeof ApiLocalePaymentInvoiceRouteWithChildren
   '/api/$locale/payment/portal': typeof ApiLocalePaymentPortalRoute
@@ -5509,11 +5673,13 @@ export interface FileRoutesByFullPath {
   '/api/$locale/referral/payout': typeof ApiLocaleReferralPayoutRoute
   '/api/$locale/referral/stats': typeof ApiLocaleReferralStatsRoute
   '/api/$locale/seo/indexnow': typeof ApiLocaleSeoIndexnowRoute
+  '/api/$locale/seo/summary': typeof ApiLocaleSeoSummaryRoute
   '/api/$locale/subscription/cancel': typeof ApiLocaleSubscriptionCancelRoute
   '/api/$locale/subscription/create': typeof ApiLocaleSubscriptionCreateRoute
   '/api/$locale/subscription/dashboard': typeof ApiLocaleSubscriptionDashboardRoute
   '/api/$locale/subscription/update': typeof ApiLocaleSubscriptionUpdateRoute
   '/api/$locale/subscription/yearly-credits': typeof ApiLocaleSubscriptionYearlyCreditsRouteWithChildren
+  '/api/$locale/tax/regime': typeof ApiLocaleTaxRegimeRoute
   '/api/$locale/tax/report': typeof ApiLocaleTaxReportRoute
   '/api/$locale/user/session-cleanup': typeof ApiLocaleUserSessionCleanupRoute
   '/api/$locale/user/signup-reminder': typeof ApiLocaleUserSignupReminderRoute
@@ -5521,6 +5687,7 @@ export interface FileRoutesByFullPath {
   '/api/$locale/users/create': typeof ApiLocaleUsersCreateRoute
   '/api/$locale/users/list': typeof ApiLocaleUsersListRoute
   '/api/$locale/users/stats': typeof ApiLocaleUsersStatsRoute
+  '/api/$locale/users/summary': typeof ApiLocaleUsersSummaryRoute
   '/api/$locale/users/view': typeof ApiLocaleUsersViewRoute
   '/api/$locale/v1/messages': typeof ApiLocaleV1MessagesRouteWithChildren
   '/api/$locale/v1/models': typeof ApiLocaleV1ModelsRoute
@@ -5558,6 +5725,7 @@ export interface FileRoutesByFullPath {
   '/$locale/subscription/overview/': typeof LocaleSubscriptionOverviewIndexRoute
   '/$locale/subscription/remote/': typeof LocaleSubscriptionRemoteIndexRoute
   '/api/$locale/analytics/business/overview': typeof ApiLocaleAnalyticsBusinessOverviewRoute
+  '/api/$locale/analytics/business/summary': typeof ApiLocaleAnalyticsBusinessSummaryRoute
   '/api/$locale/analytics/evaluators/and': typeof ApiLocaleAnalyticsEvaluatorsAndRoute
   '/api/$locale/analytics/evaluators/crossover': typeof ApiLocaleAnalyticsEvaluatorsCrossoverRoute
   '/api/$locale/analytics/evaluators/drop': typeof ApiLocaleAnalyticsEvaluatorsDropRoute
@@ -5622,10 +5790,13 @@ export interface FileRoutesByFullPath {
   '/api/$locale/credits/data-sources/credits-transfer-volume': typeof ApiLocaleCreditsDataSourcesCreditsTransferVolumeRoute
   '/api/$locale/credits/data-sources/credits-usage-with-feature': typeof ApiLocaleCreditsDataSourcesCreditsUsageWithFeatureRoute
   '/api/$locale/credits/data-sources/credits-wallets-total': typeof ApiLocaleCreditsDataSourcesCreditsWalletsTotalRoute
+  '/api/$locale/finance/bank-connections/privacy': typeof ApiLocaleFinanceBankConnectionsPrivacyRoute
   '/api/$locale/finance/bank/candidates': typeof ApiLocaleFinanceBankCandidatesRoute
+  '/api/$locale/finance/bank/followup': typeof ApiLocaleFinanceBankFollowupRoute
   '/api/$locale/finance/bank/import': typeof ApiLocaleFinanceBankImportRoute
   '/api/$locale/finance/bank/list': typeof ApiLocaleFinanceBankListRoute
   '/api/$locale/finance/bank/match': typeof ApiLocaleFinanceBankMatchRoute
+  '/api/$locale/finance/bank/settings': typeof ApiLocaleFinanceBankSettingsRoute
   '/api/$locale/finance/data-sources/finance-series': typeof ApiLocaleFinanceDataSourcesFinanceSeriesRoute
   '/api/$locale/inventory/stock/adjust': typeof ApiLocaleInventoryStockAdjustRoute
   '/api/$locale/inventory/stock/issue': typeof ApiLocaleInventoryStockIssueRoute
@@ -5713,6 +5884,7 @@ export interface FileRoutesByFullPath {
   '/api/$locale/messenger/messages/stats': typeof ApiLocaleMessengerMessagesStatsRoute
   '/api/$locale/messenger/preview/render': typeof ApiLocaleMessengerPreviewRenderRoute
   '/api/$locale/messenger/preview/send-test': typeof ApiLocaleMessengerPreviewSendTestRoute
+  '/api/$locale/messenger/system-mailbox/bills': typeof ApiLocaleMessengerSystemMailboxBillsRouteWithChildren
   '/api/$locale/messenger/system-mailbox/inbox': typeof ApiLocaleMessengerSystemMailboxInboxRoute
   '/api/$locale/messenger/system-mailbox/message': typeof ApiLocaleMessengerSystemMailboxMessageRoute
   '/api/$locale/messenger/system-mailbox/report': typeof ApiLocaleMessengerSystemMailboxReportRoute
@@ -5722,6 +5894,8 @@ export interface FileRoutesByFullPath {
   '/api/$locale/newsletter/data-sources/newsletter-subscriptions-new': typeof ApiLocaleNewsletterDataSourcesNewsletterSubscriptionsNewRoute
   '/api/$locale/newsletter/data-sources/newsletter-unsubscribes': typeof ApiLocaleNewsletterDataSourcesNewsletterUnsubscribesRoute
   '/api/$locale/newsletter/unsubscribe/sync': typeof ApiLocaleNewsletterUnsubscribeSyncRoute
+  '/api/$locale/payment/accounting/mapping': typeof ApiLocalePaymentAccountingMappingRoute
+  '/api/$locale/payment/accounting/recognition': typeof ApiLocalePaymentAccountingRecognitionRoute
   '/api/$locale/payment/analytics/revenue': typeof ApiLocalePaymentAnalyticsRevenueRoute
   '/api/$locale/payment/bill/create': typeof ApiLocalePaymentBillCreateRoute
   '/api/$locale/payment/bill/list': typeof ApiLocalePaymentBillListRoute
@@ -5820,6 +5994,7 @@ export interface FileRoutesByFullPath {
   '/api/$locale/vibe/agent/music-generation': typeof ApiLocaleVibeAgentMusicGenerationRoute
   '/api/$locale/vibe/agent/skills': typeof ApiLocaleVibeAgentSkillsRouteWithChildren
   '/api/$locale/vibe/agent/speech-to-text': typeof ApiLocaleVibeAgentSpeechToTextRoute
+  '/api/$locale/vibe/agent/summary': typeof ApiLocaleVibeAgentSummaryRoute
   '/api/$locale/vibe/agent/text-to-speech': typeof ApiLocaleVibeAgentTextToSpeechRoute
   '/api/$locale/vibe/agent/video-generation': typeof ApiLocaleVibeAgentVideoGenerationRoute
   '/api/$locale/vibe/agent/view-image': typeof ApiLocaleVibeAgentViewImageRoute
@@ -5832,6 +6007,7 @@ export interface FileRoutesByFullPath {
   '/api/$locale/vibe/execute-tool/await-task': typeof ApiLocaleVibeExecuteToolAwaitTaskRoute
   '/api/$locale/vibe/execute-tool/complete': typeof ApiLocaleVibeExecuteToolCompleteRoute
   '/api/$locale/vibe/execute-tool/revival': typeof ApiLocaleVibeExecuteToolRevivalRoute
+  '/api/$locale/vibe/logger/operations-summary': typeof ApiLocaleVibeLoggerOperationsSummaryRoute
   '/api/$locale/vibe/realtime/remote-event-bridge': typeof ApiLocaleVibeRealtimeRemoteEventBridgeRoute
   '/api/$locale/vibe/remote-connection/$instanceId': typeof ApiLocaleVibeRemoteConnectionInstanceIdRoute
   '/api/$locale/vibe/remote-connection/connect': typeof ApiLocaleVibeRemoteConnectionConnectRoute
@@ -5918,6 +6094,8 @@ export interface FileRoutesByFullPath {
   '/api/$locale/chart-of-accounts/period/$periodId/get': typeof ApiLocaleChartOfAccountsPeriodPeriodIdGetRoute
   '/api/$locale/companies/$companyId/members/invite': typeof ApiLocaleCompaniesCompanyIdMembersInviteRoute
   '/api/$locale/companies/$companyId/members/list': typeof ApiLocaleCompaniesCompanyIdMembersListRoute
+  '/api/$locale/finance/bank-connections/enable-banking/callback': typeof ApiLocaleFinanceBankConnectionsEnableBankingCallbackRoute
+  '/api/$locale/finance/bank-connections/enable-banking/connect': typeof ApiLocaleFinanceBankConnectionsEnableBankingConnectRoute
   '/api/$locale/inventory/transfer/$transferId/dispatch': typeof ApiLocaleInventoryTransferTransferIdDispatchRoute
   '/api/$locale/inventory/transfer/$transferId/get': typeof ApiLocaleInventoryTransferTransferIdGetRoute
   '/api/$locale/inventory/transfer/$transferId/receive': typeof ApiLocaleInventoryTransferTransferIdReceiveRoute
@@ -5930,6 +6108,8 @@ export interface FileRoutesByFullPath {
   '/api/$locale/leads/growth/data-sources/funnel-step': typeof ApiLocaleLeadsGrowthDataSourcesFunnelStepRoute
   '/api/$locale/leads/import/jobs/$jobId': typeof ApiLocaleLeadsImportJobsJobIdRouteWithChildren
   '/api/$locale/messenger/accounts/edit/$id': typeof ApiLocaleMessengerAccountsEditIdRoute
+  '/api/$locale/messenger/system-mailbox/bills/attachment': typeof ApiLocaleMessengerSystemMailboxBillsAttachmentRoute
+  '/api/$locale/messenger/system-mailbox/bills/sync': typeof ApiLocaleMessengerSystemMailboxBillsSyncRoute
   '/api/$locale/newsletter/unsubscribe/oneclick/$token': typeof ApiLocaleNewsletterUnsubscribeOneclickTokenRoute
   '/api/$locale/payment/bill/$billId/approve': typeof ApiLocalePaymentBillBillIdApproveRoute
   '/api/$locale/payment/bill/$billId/get': typeof ApiLocalePaymentBillBillIdGetRoute
@@ -6134,6 +6314,7 @@ export interface FileRoutesByFullPath {
   '/api/$locale/vibe/tooling/infra/deploy/preview': typeof ApiLocaleVibeToolingInfraDeployPreviewRoute
   '/api/$locale/vibe/tooling/infra/deploy/push': typeof ApiLocaleVibeToolingInfraDeployPushRoute
   '/api/$locale/vibe/tooling/infra/scale/replicas': typeof ApiLocaleVibeToolingInfraScaleReplicasRoute
+  '/api/$locale/payment/bill/line/$billId/$lineId/remove': typeof ApiLocalePaymentBillLineBillIdLineIdRemoveRoute
   '/api/$locale/vibe/agent/chat/folders/$rootFolderId/create': typeof ApiLocaleVibeAgentChatFoldersRootFolderIdCreateRoute
   '/api/$locale/vibe/agent/chat/folders/$rootFolderId/root-permissions': typeof ApiLocaleVibeAgentChatFoldersRootFolderIdRootPermissionsRoute
   '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId': typeof ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdRouteWithChildren
@@ -6241,8 +6422,12 @@ export interface FileRoutesByTo {
   '/api/$locale/desktop/scroll': typeof ApiLocaleDesktopScrollRoute
   '/api/$locale/desktop/take-screenshot': typeof ApiLocaleDesktopTakeScreenshotRoute
   '/api/$locale/desktop/type-text': typeof ApiLocaleDesktopTypeTextRoute
+  '/api/$locale/finance/bank-connections': typeof ApiLocaleFinanceBankConnectionsRouteWithChildren
+  '/api/$locale/finance/credit-liabilities': typeof ApiLocaleFinanceCreditLiabilitiesRoute
   '/api/$locale/finance/ingest': typeof ApiLocaleFinanceIngestRoute
+  '/api/$locale/finance/monthly-profit': typeof ApiLocaleFinanceMonthlyProfitRoute
   '/api/$locale/finance/status': typeof ApiLocaleFinanceStatusRoute
+  '/api/$locale/finance/supplier-evidence': typeof ApiLocaleFinanceSupplierEvidenceRoute
   '/api/$locale/finance/thresholds': typeof ApiLocaleFinanceThresholdsRoute
   '/api/$locale/inventory/dashboard': typeof ApiLocaleInventoryDashboardRoute
   '/api/$locale/lead-magnet/capture': typeof ApiLocaleLeadMagnetCaptureRoute
@@ -6269,7 +6454,9 @@ export interface FileRoutesByTo {
   '/api/$locale/notifications/list': typeof ApiLocaleNotificationsListRoute
   '/api/$locale/notifications/read': typeof ApiLocaleNotificationsReadRoute
   '/api/$locale/notifications/unread-count': typeof ApiLocaleNotificationsUnreadCountRoute
+  '/api/$locale/payment/accounting': typeof ApiLocalePaymentAccountingRouteWithChildren
   '/api/$locale/payment/checkout': typeof ApiLocalePaymentCheckoutRoute
+  '/api/$locale/payment/cost-backfill': typeof ApiLocalePaymentCostBackfillRoute
   '/api/$locale/payment/dashboard': typeof ApiLocalePaymentDashboardRoute
   '/api/$locale/payment/invoice': typeof ApiLocalePaymentInvoiceRouteWithChildren
   '/api/$locale/payment/portal': typeof ApiLocalePaymentPortalRoute
@@ -6283,11 +6470,13 @@ export interface FileRoutesByTo {
   '/api/$locale/referral/payout': typeof ApiLocaleReferralPayoutRoute
   '/api/$locale/referral/stats': typeof ApiLocaleReferralStatsRoute
   '/api/$locale/seo/indexnow': typeof ApiLocaleSeoIndexnowRoute
+  '/api/$locale/seo/summary': typeof ApiLocaleSeoSummaryRoute
   '/api/$locale/subscription/cancel': typeof ApiLocaleSubscriptionCancelRoute
   '/api/$locale/subscription/create': typeof ApiLocaleSubscriptionCreateRoute
   '/api/$locale/subscription/dashboard': typeof ApiLocaleSubscriptionDashboardRoute
   '/api/$locale/subscription/update': typeof ApiLocaleSubscriptionUpdateRoute
   '/api/$locale/subscription/yearly-credits': typeof ApiLocaleSubscriptionYearlyCreditsRouteWithChildren
+  '/api/$locale/tax/regime': typeof ApiLocaleTaxRegimeRoute
   '/api/$locale/tax/report': typeof ApiLocaleTaxReportRoute
   '/api/$locale/user/session-cleanup': typeof ApiLocaleUserSessionCleanupRoute
   '/api/$locale/user/signup-reminder': typeof ApiLocaleUserSignupReminderRoute
@@ -6295,6 +6484,7 @@ export interface FileRoutesByTo {
   '/api/$locale/users/create': typeof ApiLocaleUsersCreateRoute
   '/api/$locale/users/list': typeof ApiLocaleUsersListRoute
   '/api/$locale/users/stats': typeof ApiLocaleUsersStatsRoute
+  '/api/$locale/users/summary': typeof ApiLocaleUsersSummaryRoute
   '/api/$locale/users/view': typeof ApiLocaleUsersViewRoute
   '/api/$locale/v1/messages': typeof ApiLocaleV1MessagesRouteWithChildren
   '/api/$locale/v1/models': typeof ApiLocaleV1ModelsRoute
@@ -6332,6 +6522,7 @@ export interface FileRoutesByTo {
   '/$locale/subscription/overview': typeof LocaleSubscriptionOverviewIndexRoute
   '/$locale/subscription/remote': typeof LocaleSubscriptionRemoteIndexRoute
   '/api/$locale/analytics/business/overview': typeof ApiLocaleAnalyticsBusinessOverviewRoute
+  '/api/$locale/analytics/business/summary': typeof ApiLocaleAnalyticsBusinessSummaryRoute
   '/api/$locale/analytics/evaluators/and': typeof ApiLocaleAnalyticsEvaluatorsAndRoute
   '/api/$locale/analytics/evaluators/crossover': typeof ApiLocaleAnalyticsEvaluatorsCrossoverRoute
   '/api/$locale/analytics/evaluators/drop': typeof ApiLocaleAnalyticsEvaluatorsDropRoute
@@ -6396,10 +6587,13 @@ export interface FileRoutesByTo {
   '/api/$locale/credits/data-sources/credits-transfer-volume': typeof ApiLocaleCreditsDataSourcesCreditsTransferVolumeRoute
   '/api/$locale/credits/data-sources/credits-usage-with-feature': typeof ApiLocaleCreditsDataSourcesCreditsUsageWithFeatureRoute
   '/api/$locale/credits/data-sources/credits-wallets-total': typeof ApiLocaleCreditsDataSourcesCreditsWalletsTotalRoute
+  '/api/$locale/finance/bank-connections/privacy': typeof ApiLocaleFinanceBankConnectionsPrivacyRoute
   '/api/$locale/finance/bank/candidates': typeof ApiLocaleFinanceBankCandidatesRoute
+  '/api/$locale/finance/bank/followup': typeof ApiLocaleFinanceBankFollowupRoute
   '/api/$locale/finance/bank/import': typeof ApiLocaleFinanceBankImportRoute
   '/api/$locale/finance/bank/list': typeof ApiLocaleFinanceBankListRoute
   '/api/$locale/finance/bank/match': typeof ApiLocaleFinanceBankMatchRoute
+  '/api/$locale/finance/bank/settings': typeof ApiLocaleFinanceBankSettingsRoute
   '/api/$locale/finance/data-sources/finance-series': typeof ApiLocaleFinanceDataSourcesFinanceSeriesRoute
   '/api/$locale/inventory/stock/adjust': typeof ApiLocaleInventoryStockAdjustRoute
   '/api/$locale/inventory/stock/issue': typeof ApiLocaleInventoryStockIssueRoute
@@ -6487,6 +6681,7 @@ export interface FileRoutesByTo {
   '/api/$locale/messenger/messages/stats': typeof ApiLocaleMessengerMessagesStatsRoute
   '/api/$locale/messenger/preview/render': typeof ApiLocaleMessengerPreviewRenderRoute
   '/api/$locale/messenger/preview/send-test': typeof ApiLocaleMessengerPreviewSendTestRoute
+  '/api/$locale/messenger/system-mailbox/bills': typeof ApiLocaleMessengerSystemMailboxBillsRouteWithChildren
   '/api/$locale/messenger/system-mailbox/inbox': typeof ApiLocaleMessengerSystemMailboxInboxRoute
   '/api/$locale/messenger/system-mailbox/message': typeof ApiLocaleMessengerSystemMailboxMessageRoute
   '/api/$locale/messenger/system-mailbox/report': typeof ApiLocaleMessengerSystemMailboxReportRoute
@@ -6496,6 +6691,8 @@ export interface FileRoutesByTo {
   '/api/$locale/newsletter/data-sources/newsletter-subscriptions-new': typeof ApiLocaleNewsletterDataSourcesNewsletterSubscriptionsNewRoute
   '/api/$locale/newsletter/data-sources/newsletter-unsubscribes': typeof ApiLocaleNewsletterDataSourcesNewsletterUnsubscribesRoute
   '/api/$locale/newsletter/unsubscribe/sync': typeof ApiLocaleNewsletterUnsubscribeSyncRoute
+  '/api/$locale/payment/accounting/mapping': typeof ApiLocalePaymentAccountingMappingRoute
+  '/api/$locale/payment/accounting/recognition': typeof ApiLocalePaymentAccountingRecognitionRoute
   '/api/$locale/payment/analytics/revenue': typeof ApiLocalePaymentAnalyticsRevenueRoute
   '/api/$locale/payment/bill/create': typeof ApiLocalePaymentBillCreateRoute
   '/api/$locale/payment/bill/list': typeof ApiLocalePaymentBillListRoute
@@ -6594,6 +6791,7 @@ export interface FileRoutesByTo {
   '/api/$locale/vibe/agent/music-generation': typeof ApiLocaleVibeAgentMusicGenerationRoute
   '/api/$locale/vibe/agent/skills': typeof ApiLocaleVibeAgentSkillsRouteWithChildren
   '/api/$locale/vibe/agent/speech-to-text': typeof ApiLocaleVibeAgentSpeechToTextRoute
+  '/api/$locale/vibe/agent/summary': typeof ApiLocaleVibeAgentSummaryRoute
   '/api/$locale/vibe/agent/text-to-speech': typeof ApiLocaleVibeAgentTextToSpeechRoute
   '/api/$locale/vibe/agent/video-generation': typeof ApiLocaleVibeAgentVideoGenerationRoute
   '/api/$locale/vibe/agent/view-image': typeof ApiLocaleVibeAgentViewImageRoute
@@ -6606,6 +6804,7 @@ export interface FileRoutesByTo {
   '/api/$locale/vibe/execute-tool/await-task': typeof ApiLocaleVibeExecuteToolAwaitTaskRoute
   '/api/$locale/vibe/execute-tool/complete': typeof ApiLocaleVibeExecuteToolCompleteRoute
   '/api/$locale/vibe/execute-tool/revival': typeof ApiLocaleVibeExecuteToolRevivalRoute
+  '/api/$locale/vibe/logger/operations-summary': typeof ApiLocaleVibeLoggerOperationsSummaryRoute
   '/api/$locale/vibe/realtime/remote-event-bridge': typeof ApiLocaleVibeRealtimeRemoteEventBridgeRoute
   '/api/$locale/vibe/remote-connection/$instanceId': typeof ApiLocaleVibeRemoteConnectionInstanceIdRoute
   '/api/$locale/vibe/remote-connection/connect': typeof ApiLocaleVibeRemoteConnectionConnectRoute
@@ -6692,6 +6891,8 @@ export interface FileRoutesByTo {
   '/api/$locale/chart-of-accounts/period/$periodId/get': typeof ApiLocaleChartOfAccountsPeriodPeriodIdGetRoute
   '/api/$locale/companies/$companyId/members/invite': typeof ApiLocaleCompaniesCompanyIdMembersInviteRoute
   '/api/$locale/companies/$companyId/members/list': typeof ApiLocaleCompaniesCompanyIdMembersListRoute
+  '/api/$locale/finance/bank-connections/enable-banking/callback': typeof ApiLocaleFinanceBankConnectionsEnableBankingCallbackRoute
+  '/api/$locale/finance/bank-connections/enable-banking/connect': typeof ApiLocaleFinanceBankConnectionsEnableBankingConnectRoute
   '/api/$locale/inventory/transfer/$transferId/dispatch': typeof ApiLocaleInventoryTransferTransferIdDispatchRoute
   '/api/$locale/inventory/transfer/$transferId/get': typeof ApiLocaleInventoryTransferTransferIdGetRoute
   '/api/$locale/inventory/transfer/$transferId/receive': typeof ApiLocaleInventoryTransferTransferIdReceiveRoute
@@ -6704,6 +6905,8 @@ export interface FileRoutesByTo {
   '/api/$locale/leads/growth/data-sources/funnel-step': typeof ApiLocaleLeadsGrowthDataSourcesFunnelStepRoute
   '/api/$locale/leads/import/jobs/$jobId': typeof ApiLocaleLeadsImportJobsJobIdRouteWithChildren
   '/api/$locale/messenger/accounts/edit/$id': typeof ApiLocaleMessengerAccountsEditIdRoute
+  '/api/$locale/messenger/system-mailbox/bills/attachment': typeof ApiLocaleMessengerSystemMailboxBillsAttachmentRoute
+  '/api/$locale/messenger/system-mailbox/bills/sync': typeof ApiLocaleMessengerSystemMailboxBillsSyncRoute
   '/api/$locale/newsletter/unsubscribe/oneclick/$token': typeof ApiLocaleNewsletterUnsubscribeOneclickTokenRoute
   '/api/$locale/payment/bill/$billId/approve': typeof ApiLocalePaymentBillBillIdApproveRoute
   '/api/$locale/payment/bill/$billId/get': typeof ApiLocalePaymentBillBillIdGetRoute
@@ -6908,6 +7111,7 @@ export interface FileRoutesByTo {
   '/api/$locale/vibe/tooling/infra/deploy/preview': typeof ApiLocaleVibeToolingInfraDeployPreviewRoute
   '/api/$locale/vibe/tooling/infra/deploy/push': typeof ApiLocaleVibeToolingInfraDeployPushRoute
   '/api/$locale/vibe/tooling/infra/scale/replicas': typeof ApiLocaleVibeToolingInfraScaleReplicasRoute
+  '/api/$locale/payment/bill/line/$billId/$lineId/remove': typeof ApiLocalePaymentBillLineBillIdLineIdRemoveRoute
   '/api/$locale/vibe/agent/chat/folders/$rootFolderId/create': typeof ApiLocaleVibeAgentChatFoldersRootFolderIdCreateRoute
   '/api/$locale/vibe/agent/chat/folders/$rootFolderId/root-permissions': typeof ApiLocaleVibeAgentChatFoldersRootFolderIdRootPermissionsRoute
   '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId': typeof ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdRouteWithChildren
@@ -7024,8 +7228,12 @@ export interface FileRoutesById {
   '/api/$locale/desktop/scroll': typeof ApiLocaleDesktopScrollRoute
   '/api/$locale/desktop/take-screenshot': typeof ApiLocaleDesktopTakeScreenshotRoute
   '/api/$locale/desktop/type-text': typeof ApiLocaleDesktopTypeTextRoute
+  '/api/$locale/finance/bank-connections': typeof ApiLocaleFinanceBankConnectionsRouteWithChildren
+  '/api/$locale/finance/credit-liabilities': typeof ApiLocaleFinanceCreditLiabilitiesRoute
   '/api/$locale/finance/ingest': typeof ApiLocaleFinanceIngestRoute
+  '/api/$locale/finance/monthly-profit': typeof ApiLocaleFinanceMonthlyProfitRoute
   '/api/$locale/finance/status': typeof ApiLocaleFinanceStatusRoute
+  '/api/$locale/finance/supplier-evidence': typeof ApiLocaleFinanceSupplierEvidenceRoute
   '/api/$locale/finance/thresholds': typeof ApiLocaleFinanceThresholdsRoute
   '/api/$locale/inventory/dashboard': typeof ApiLocaleInventoryDashboardRoute
   '/api/$locale/lead-magnet/capture': typeof ApiLocaleLeadMagnetCaptureRoute
@@ -7052,7 +7260,9 @@ export interface FileRoutesById {
   '/api/$locale/notifications/list': typeof ApiLocaleNotificationsListRoute
   '/api/$locale/notifications/read': typeof ApiLocaleNotificationsReadRoute
   '/api/$locale/notifications/unread-count': typeof ApiLocaleNotificationsUnreadCountRoute
+  '/api/$locale/payment/accounting': typeof ApiLocalePaymentAccountingRouteWithChildren
   '/api/$locale/payment/checkout': typeof ApiLocalePaymentCheckoutRoute
+  '/api/$locale/payment/cost-backfill': typeof ApiLocalePaymentCostBackfillRoute
   '/api/$locale/payment/dashboard': typeof ApiLocalePaymentDashboardRoute
   '/api/$locale/payment/invoice': typeof ApiLocalePaymentInvoiceRouteWithChildren
   '/api/$locale/payment/portal': typeof ApiLocalePaymentPortalRoute
@@ -7066,11 +7276,13 @@ export interface FileRoutesById {
   '/api/$locale/referral/payout': typeof ApiLocaleReferralPayoutRoute
   '/api/$locale/referral/stats': typeof ApiLocaleReferralStatsRoute
   '/api/$locale/seo/indexnow': typeof ApiLocaleSeoIndexnowRoute
+  '/api/$locale/seo/summary': typeof ApiLocaleSeoSummaryRoute
   '/api/$locale/subscription/cancel': typeof ApiLocaleSubscriptionCancelRoute
   '/api/$locale/subscription/create': typeof ApiLocaleSubscriptionCreateRoute
   '/api/$locale/subscription/dashboard': typeof ApiLocaleSubscriptionDashboardRoute
   '/api/$locale/subscription/update': typeof ApiLocaleSubscriptionUpdateRoute
   '/api/$locale/subscription/yearly-credits': typeof ApiLocaleSubscriptionYearlyCreditsRouteWithChildren
+  '/api/$locale/tax/regime': typeof ApiLocaleTaxRegimeRoute
   '/api/$locale/tax/report': typeof ApiLocaleTaxReportRoute
   '/api/$locale/user/session-cleanup': typeof ApiLocaleUserSessionCleanupRoute
   '/api/$locale/user/signup-reminder': typeof ApiLocaleUserSignupReminderRoute
@@ -7078,6 +7290,7 @@ export interface FileRoutesById {
   '/api/$locale/users/create': typeof ApiLocaleUsersCreateRoute
   '/api/$locale/users/list': typeof ApiLocaleUsersListRoute
   '/api/$locale/users/stats': typeof ApiLocaleUsersStatsRoute
+  '/api/$locale/users/summary': typeof ApiLocaleUsersSummaryRoute
   '/api/$locale/users/view': typeof ApiLocaleUsersViewRoute
   '/api/$locale/v1/messages': typeof ApiLocaleV1MessagesRouteWithChildren
   '/api/$locale/v1/models': typeof ApiLocaleV1ModelsRoute
@@ -7115,6 +7328,7 @@ export interface FileRoutesById {
   '/$locale/subscription/overview/': typeof LocaleSubscriptionOverviewIndexRoute
   '/$locale/subscription/remote/': typeof LocaleSubscriptionRemoteIndexRoute
   '/api/$locale/analytics/business/overview': typeof ApiLocaleAnalyticsBusinessOverviewRoute
+  '/api/$locale/analytics/business/summary': typeof ApiLocaleAnalyticsBusinessSummaryRoute
   '/api/$locale/analytics/evaluators/and': typeof ApiLocaleAnalyticsEvaluatorsAndRoute
   '/api/$locale/analytics/evaluators/crossover': typeof ApiLocaleAnalyticsEvaluatorsCrossoverRoute
   '/api/$locale/analytics/evaluators/drop': typeof ApiLocaleAnalyticsEvaluatorsDropRoute
@@ -7179,10 +7393,13 @@ export interface FileRoutesById {
   '/api/$locale/credits/data-sources/credits-transfer-volume': typeof ApiLocaleCreditsDataSourcesCreditsTransferVolumeRoute
   '/api/$locale/credits/data-sources/credits-usage-with-feature': typeof ApiLocaleCreditsDataSourcesCreditsUsageWithFeatureRoute
   '/api/$locale/credits/data-sources/credits-wallets-total': typeof ApiLocaleCreditsDataSourcesCreditsWalletsTotalRoute
+  '/api/$locale/finance/bank-connections/privacy': typeof ApiLocaleFinanceBankConnectionsPrivacyRoute
   '/api/$locale/finance/bank/candidates': typeof ApiLocaleFinanceBankCandidatesRoute
+  '/api/$locale/finance/bank/followup': typeof ApiLocaleFinanceBankFollowupRoute
   '/api/$locale/finance/bank/import': typeof ApiLocaleFinanceBankImportRoute
   '/api/$locale/finance/bank/list': typeof ApiLocaleFinanceBankListRoute
   '/api/$locale/finance/bank/match': typeof ApiLocaleFinanceBankMatchRoute
+  '/api/$locale/finance/bank/settings': typeof ApiLocaleFinanceBankSettingsRoute
   '/api/$locale/finance/data-sources/finance-series': typeof ApiLocaleFinanceDataSourcesFinanceSeriesRoute
   '/api/$locale/inventory/stock/adjust': typeof ApiLocaleInventoryStockAdjustRoute
   '/api/$locale/inventory/stock/issue': typeof ApiLocaleInventoryStockIssueRoute
@@ -7270,6 +7487,7 @@ export interface FileRoutesById {
   '/api/$locale/messenger/messages/stats': typeof ApiLocaleMessengerMessagesStatsRoute
   '/api/$locale/messenger/preview/render': typeof ApiLocaleMessengerPreviewRenderRoute
   '/api/$locale/messenger/preview/send-test': typeof ApiLocaleMessengerPreviewSendTestRoute
+  '/api/$locale/messenger/system-mailbox/bills': typeof ApiLocaleMessengerSystemMailboxBillsRouteWithChildren
   '/api/$locale/messenger/system-mailbox/inbox': typeof ApiLocaleMessengerSystemMailboxInboxRoute
   '/api/$locale/messenger/system-mailbox/message': typeof ApiLocaleMessengerSystemMailboxMessageRoute
   '/api/$locale/messenger/system-mailbox/report': typeof ApiLocaleMessengerSystemMailboxReportRoute
@@ -7279,6 +7497,8 @@ export interface FileRoutesById {
   '/api/$locale/newsletter/data-sources/newsletter-subscriptions-new': typeof ApiLocaleNewsletterDataSourcesNewsletterSubscriptionsNewRoute
   '/api/$locale/newsletter/data-sources/newsletter-unsubscribes': typeof ApiLocaleNewsletterDataSourcesNewsletterUnsubscribesRoute
   '/api/$locale/newsletter/unsubscribe/sync': typeof ApiLocaleNewsletterUnsubscribeSyncRoute
+  '/api/$locale/payment/accounting/mapping': typeof ApiLocalePaymentAccountingMappingRoute
+  '/api/$locale/payment/accounting/recognition': typeof ApiLocalePaymentAccountingRecognitionRoute
   '/api/$locale/payment/analytics/revenue': typeof ApiLocalePaymentAnalyticsRevenueRoute
   '/api/$locale/payment/bill/create': typeof ApiLocalePaymentBillCreateRoute
   '/api/$locale/payment/bill/list': typeof ApiLocalePaymentBillListRoute
@@ -7377,6 +7597,7 @@ export interface FileRoutesById {
   '/api/$locale/vibe/agent/music-generation': typeof ApiLocaleVibeAgentMusicGenerationRoute
   '/api/$locale/vibe/agent/skills': typeof ApiLocaleVibeAgentSkillsRouteWithChildren
   '/api/$locale/vibe/agent/speech-to-text': typeof ApiLocaleVibeAgentSpeechToTextRoute
+  '/api/$locale/vibe/agent/summary': typeof ApiLocaleVibeAgentSummaryRoute
   '/api/$locale/vibe/agent/text-to-speech': typeof ApiLocaleVibeAgentTextToSpeechRoute
   '/api/$locale/vibe/agent/video-generation': typeof ApiLocaleVibeAgentVideoGenerationRoute
   '/api/$locale/vibe/agent/view-image': typeof ApiLocaleVibeAgentViewImageRoute
@@ -7389,6 +7610,7 @@ export interface FileRoutesById {
   '/api/$locale/vibe/execute-tool/await-task': typeof ApiLocaleVibeExecuteToolAwaitTaskRoute
   '/api/$locale/vibe/execute-tool/complete': typeof ApiLocaleVibeExecuteToolCompleteRoute
   '/api/$locale/vibe/execute-tool/revival': typeof ApiLocaleVibeExecuteToolRevivalRoute
+  '/api/$locale/vibe/logger/operations-summary': typeof ApiLocaleVibeLoggerOperationsSummaryRoute
   '/api/$locale/vibe/realtime/remote-event-bridge': typeof ApiLocaleVibeRealtimeRemoteEventBridgeRoute
   '/api/$locale/vibe/remote-connection/$instanceId': typeof ApiLocaleVibeRemoteConnectionInstanceIdRoute
   '/api/$locale/vibe/remote-connection/connect': typeof ApiLocaleVibeRemoteConnectionConnectRoute
@@ -7475,6 +7697,8 @@ export interface FileRoutesById {
   '/api/$locale/chart-of-accounts/period/$periodId/get': typeof ApiLocaleChartOfAccountsPeriodPeriodIdGetRoute
   '/api/$locale/companies/$companyId/members/invite': typeof ApiLocaleCompaniesCompanyIdMembersInviteRoute
   '/api/$locale/companies/$companyId/members/list': typeof ApiLocaleCompaniesCompanyIdMembersListRoute
+  '/api/$locale/finance/bank-connections/enable-banking/callback': typeof ApiLocaleFinanceBankConnectionsEnableBankingCallbackRoute
+  '/api/$locale/finance/bank-connections/enable-banking/connect': typeof ApiLocaleFinanceBankConnectionsEnableBankingConnectRoute
   '/api/$locale/inventory/transfer/$transferId/dispatch': typeof ApiLocaleInventoryTransferTransferIdDispatchRoute
   '/api/$locale/inventory/transfer/$transferId/get': typeof ApiLocaleInventoryTransferTransferIdGetRoute
   '/api/$locale/inventory/transfer/$transferId/receive': typeof ApiLocaleInventoryTransferTransferIdReceiveRoute
@@ -7487,6 +7711,8 @@ export interface FileRoutesById {
   '/api/$locale/leads/growth/data-sources/funnel-step': typeof ApiLocaleLeadsGrowthDataSourcesFunnelStepRoute
   '/api/$locale/leads/import/jobs/$jobId': typeof ApiLocaleLeadsImportJobsJobIdRouteWithChildren
   '/api/$locale/messenger/accounts/edit/$id': typeof ApiLocaleMessengerAccountsEditIdRoute
+  '/api/$locale/messenger/system-mailbox/bills/attachment': typeof ApiLocaleMessengerSystemMailboxBillsAttachmentRoute
+  '/api/$locale/messenger/system-mailbox/bills/sync': typeof ApiLocaleMessengerSystemMailboxBillsSyncRoute
   '/api/$locale/newsletter/unsubscribe/oneclick/$token': typeof ApiLocaleNewsletterUnsubscribeOneclickTokenRoute
   '/api/$locale/payment/bill/$billId/approve': typeof ApiLocalePaymentBillBillIdApproveRoute
   '/api/$locale/payment/bill/$billId/get': typeof ApiLocalePaymentBillBillIdGetRoute
@@ -7691,6 +7917,7 @@ export interface FileRoutesById {
   '/api/$locale/vibe/tooling/infra/deploy/preview': typeof ApiLocaleVibeToolingInfraDeployPreviewRoute
   '/api/$locale/vibe/tooling/infra/deploy/push': typeof ApiLocaleVibeToolingInfraDeployPushRoute
   '/api/$locale/vibe/tooling/infra/scale/replicas': typeof ApiLocaleVibeToolingInfraScaleReplicasRoute
+  '/api/$locale/payment/bill/line/$billId/$lineId/remove': typeof ApiLocalePaymentBillLineBillIdLineIdRemoveRoute
   '/api/$locale/vibe/agent/chat/folders/$rootFolderId/create': typeof ApiLocaleVibeAgentChatFoldersRootFolderIdCreateRoute
   '/api/$locale/vibe/agent/chat/folders/$rootFolderId/root-permissions': typeof ApiLocaleVibeAgentChatFoldersRootFolderIdRootPermissionsRoute
   '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId': typeof ApiLocaleVibeAgentChatFoldersSubfoldersSubFolderIdRouteWithChildren
@@ -7807,8 +8034,12 @@ export interface FileRouteTypes {
     | '/api/$locale/desktop/scroll'
     | '/api/$locale/desktop/take-screenshot'
     | '/api/$locale/desktop/type-text'
+    | '/api/$locale/finance/bank-connections'
+    | '/api/$locale/finance/credit-liabilities'
     | '/api/$locale/finance/ingest'
+    | '/api/$locale/finance/monthly-profit'
     | '/api/$locale/finance/status'
+    | '/api/$locale/finance/supplier-evidence'
     | '/api/$locale/finance/thresholds'
     | '/api/$locale/inventory/dashboard'
     | '/api/$locale/lead-magnet/capture'
@@ -7835,7 +8066,9 @@ export interface FileRouteTypes {
     | '/api/$locale/notifications/list'
     | '/api/$locale/notifications/read'
     | '/api/$locale/notifications/unread-count'
+    | '/api/$locale/payment/accounting'
     | '/api/$locale/payment/checkout'
+    | '/api/$locale/payment/cost-backfill'
     | '/api/$locale/payment/dashboard'
     | '/api/$locale/payment/invoice'
     | '/api/$locale/payment/portal'
@@ -7849,11 +8082,13 @@ export interface FileRouteTypes {
     | '/api/$locale/referral/payout'
     | '/api/$locale/referral/stats'
     | '/api/$locale/seo/indexnow'
+    | '/api/$locale/seo/summary'
     | '/api/$locale/subscription/cancel'
     | '/api/$locale/subscription/create'
     | '/api/$locale/subscription/dashboard'
     | '/api/$locale/subscription/update'
     | '/api/$locale/subscription/yearly-credits'
+    | '/api/$locale/tax/regime'
     | '/api/$locale/tax/report'
     | '/api/$locale/user/session-cleanup'
     | '/api/$locale/user/signup-reminder'
@@ -7861,6 +8096,7 @@ export interface FileRouteTypes {
     | '/api/$locale/users/create'
     | '/api/$locale/users/list'
     | '/api/$locale/users/stats'
+    | '/api/$locale/users/summary'
     | '/api/$locale/users/view'
     | '/api/$locale/v1/messages'
     | '/api/$locale/v1/models'
@@ -7898,6 +8134,7 @@ export interface FileRouteTypes {
     | '/$locale/subscription/overview/'
     | '/$locale/subscription/remote/'
     | '/api/$locale/analytics/business/overview'
+    | '/api/$locale/analytics/business/summary'
     | '/api/$locale/analytics/evaluators/and'
     | '/api/$locale/analytics/evaluators/crossover'
     | '/api/$locale/analytics/evaluators/drop'
@@ -7962,10 +8199,13 @@ export interface FileRouteTypes {
     | '/api/$locale/credits/data-sources/credits-transfer-volume'
     | '/api/$locale/credits/data-sources/credits-usage-with-feature'
     | '/api/$locale/credits/data-sources/credits-wallets-total'
+    | '/api/$locale/finance/bank-connections/privacy'
     | '/api/$locale/finance/bank/candidates'
+    | '/api/$locale/finance/bank/followup'
     | '/api/$locale/finance/bank/import'
     | '/api/$locale/finance/bank/list'
     | '/api/$locale/finance/bank/match'
+    | '/api/$locale/finance/bank/settings'
     | '/api/$locale/finance/data-sources/finance-series'
     | '/api/$locale/inventory/stock/adjust'
     | '/api/$locale/inventory/stock/issue'
@@ -8053,6 +8293,7 @@ export interface FileRouteTypes {
     | '/api/$locale/messenger/messages/stats'
     | '/api/$locale/messenger/preview/render'
     | '/api/$locale/messenger/preview/send-test'
+    | '/api/$locale/messenger/system-mailbox/bills'
     | '/api/$locale/messenger/system-mailbox/inbox'
     | '/api/$locale/messenger/system-mailbox/message'
     | '/api/$locale/messenger/system-mailbox/report'
@@ -8062,6 +8303,8 @@ export interface FileRouteTypes {
     | '/api/$locale/newsletter/data-sources/newsletter-subscriptions-new'
     | '/api/$locale/newsletter/data-sources/newsletter-unsubscribes'
     | '/api/$locale/newsletter/unsubscribe/sync'
+    | '/api/$locale/payment/accounting/mapping'
+    | '/api/$locale/payment/accounting/recognition'
     | '/api/$locale/payment/analytics/revenue'
     | '/api/$locale/payment/bill/create'
     | '/api/$locale/payment/bill/list'
@@ -8160,6 +8403,7 @@ export interface FileRouteTypes {
     | '/api/$locale/vibe/agent/music-generation'
     | '/api/$locale/vibe/agent/skills'
     | '/api/$locale/vibe/agent/speech-to-text'
+    | '/api/$locale/vibe/agent/summary'
     | '/api/$locale/vibe/agent/text-to-speech'
     | '/api/$locale/vibe/agent/video-generation'
     | '/api/$locale/vibe/agent/view-image'
@@ -8172,6 +8416,7 @@ export interface FileRouteTypes {
     | '/api/$locale/vibe/execute-tool/await-task'
     | '/api/$locale/vibe/execute-tool/complete'
     | '/api/$locale/vibe/execute-tool/revival'
+    | '/api/$locale/vibe/logger/operations-summary'
     | '/api/$locale/vibe/realtime/remote-event-bridge'
     | '/api/$locale/vibe/remote-connection/$instanceId'
     | '/api/$locale/vibe/remote-connection/connect'
@@ -8258,6 +8503,8 @@ export interface FileRouteTypes {
     | '/api/$locale/chart-of-accounts/period/$periodId/get'
     | '/api/$locale/companies/$companyId/members/invite'
     | '/api/$locale/companies/$companyId/members/list'
+    | '/api/$locale/finance/bank-connections/enable-banking/callback'
+    | '/api/$locale/finance/bank-connections/enable-banking/connect'
     | '/api/$locale/inventory/transfer/$transferId/dispatch'
     | '/api/$locale/inventory/transfer/$transferId/get'
     | '/api/$locale/inventory/transfer/$transferId/receive'
@@ -8270,6 +8517,8 @@ export interface FileRouteTypes {
     | '/api/$locale/leads/growth/data-sources/funnel-step'
     | '/api/$locale/leads/import/jobs/$jobId'
     | '/api/$locale/messenger/accounts/edit/$id'
+    | '/api/$locale/messenger/system-mailbox/bills/attachment'
+    | '/api/$locale/messenger/system-mailbox/bills/sync'
     | '/api/$locale/newsletter/unsubscribe/oneclick/$token'
     | '/api/$locale/payment/bill/$billId/approve'
     | '/api/$locale/payment/bill/$billId/get'
@@ -8474,6 +8723,7 @@ export interface FileRouteTypes {
     | '/api/$locale/vibe/tooling/infra/deploy/preview'
     | '/api/$locale/vibe/tooling/infra/deploy/push'
     | '/api/$locale/vibe/tooling/infra/scale/replicas'
+    | '/api/$locale/payment/bill/line/$billId/$lineId/remove'
     | '/api/$locale/vibe/agent/chat/folders/$rootFolderId/create'
     | '/api/$locale/vibe/agent/chat/folders/$rootFolderId/root-permissions'
     | '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId'
@@ -8581,8 +8831,12 @@ export interface FileRouteTypes {
     | '/api/$locale/desktop/scroll'
     | '/api/$locale/desktop/take-screenshot'
     | '/api/$locale/desktop/type-text'
+    | '/api/$locale/finance/bank-connections'
+    | '/api/$locale/finance/credit-liabilities'
     | '/api/$locale/finance/ingest'
+    | '/api/$locale/finance/monthly-profit'
     | '/api/$locale/finance/status'
+    | '/api/$locale/finance/supplier-evidence'
     | '/api/$locale/finance/thresholds'
     | '/api/$locale/inventory/dashboard'
     | '/api/$locale/lead-magnet/capture'
@@ -8609,7 +8863,9 @@ export interface FileRouteTypes {
     | '/api/$locale/notifications/list'
     | '/api/$locale/notifications/read'
     | '/api/$locale/notifications/unread-count'
+    | '/api/$locale/payment/accounting'
     | '/api/$locale/payment/checkout'
+    | '/api/$locale/payment/cost-backfill'
     | '/api/$locale/payment/dashboard'
     | '/api/$locale/payment/invoice'
     | '/api/$locale/payment/portal'
@@ -8623,11 +8879,13 @@ export interface FileRouteTypes {
     | '/api/$locale/referral/payout'
     | '/api/$locale/referral/stats'
     | '/api/$locale/seo/indexnow'
+    | '/api/$locale/seo/summary'
     | '/api/$locale/subscription/cancel'
     | '/api/$locale/subscription/create'
     | '/api/$locale/subscription/dashboard'
     | '/api/$locale/subscription/update'
     | '/api/$locale/subscription/yearly-credits'
+    | '/api/$locale/tax/regime'
     | '/api/$locale/tax/report'
     | '/api/$locale/user/session-cleanup'
     | '/api/$locale/user/signup-reminder'
@@ -8635,6 +8893,7 @@ export interface FileRouteTypes {
     | '/api/$locale/users/create'
     | '/api/$locale/users/list'
     | '/api/$locale/users/stats'
+    | '/api/$locale/users/summary'
     | '/api/$locale/users/view'
     | '/api/$locale/v1/messages'
     | '/api/$locale/v1/models'
@@ -8672,6 +8931,7 @@ export interface FileRouteTypes {
     | '/$locale/subscription/overview'
     | '/$locale/subscription/remote'
     | '/api/$locale/analytics/business/overview'
+    | '/api/$locale/analytics/business/summary'
     | '/api/$locale/analytics/evaluators/and'
     | '/api/$locale/analytics/evaluators/crossover'
     | '/api/$locale/analytics/evaluators/drop'
@@ -8736,10 +8996,13 @@ export interface FileRouteTypes {
     | '/api/$locale/credits/data-sources/credits-transfer-volume'
     | '/api/$locale/credits/data-sources/credits-usage-with-feature'
     | '/api/$locale/credits/data-sources/credits-wallets-total'
+    | '/api/$locale/finance/bank-connections/privacy'
     | '/api/$locale/finance/bank/candidates'
+    | '/api/$locale/finance/bank/followup'
     | '/api/$locale/finance/bank/import'
     | '/api/$locale/finance/bank/list'
     | '/api/$locale/finance/bank/match'
+    | '/api/$locale/finance/bank/settings'
     | '/api/$locale/finance/data-sources/finance-series'
     | '/api/$locale/inventory/stock/adjust'
     | '/api/$locale/inventory/stock/issue'
@@ -8827,6 +9090,7 @@ export interface FileRouteTypes {
     | '/api/$locale/messenger/messages/stats'
     | '/api/$locale/messenger/preview/render'
     | '/api/$locale/messenger/preview/send-test'
+    | '/api/$locale/messenger/system-mailbox/bills'
     | '/api/$locale/messenger/system-mailbox/inbox'
     | '/api/$locale/messenger/system-mailbox/message'
     | '/api/$locale/messenger/system-mailbox/report'
@@ -8836,6 +9100,8 @@ export interface FileRouteTypes {
     | '/api/$locale/newsletter/data-sources/newsletter-subscriptions-new'
     | '/api/$locale/newsletter/data-sources/newsletter-unsubscribes'
     | '/api/$locale/newsletter/unsubscribe/sync'
+    | '/api/$locale/payment/accounting/mapping'
+    | '/api/$locale/payment/accounting/recognition'
     | '/api/$locale/payment/analytics/revenue'
     | '/api/$locale/payment/bill/create'
     | '/api/$locale/payment/bill/list'
@@ -8934,6 +9200,7 @@ export interface FileRouteTypes {
     | '/api/$locale/vibe/agent/music-generation'
     | '/api/$locale/vibe/agent/skills'
     | '/api/$locale/vibe/agent/speech-to-text'
+    | '/api/$locale/vibe/agent/summary'
     | '/api/$locale/vibe/agent/text-to-speech'
     | '/api/$locale/vibe/agent/video-generation'
     | '/api/$locale/vibe/agent/view-image'
@@ -8946,6 +9213,7 @@ export interface FileRouteTypes {
     | '/api/$locale/vibe/execute-tool/await-task'
     | '/api/$locale/vibe/execute-tool/complete'
     | '/api/$locale/vibe/execute-tool/revival'
+    | '/api/$locale/vibe/logger/operations-summary'
     | '/api/$locale/vibe/realtime/remote-event-bridge'
     | '/api/$locale/vibe/remote-connection/$instanceId'
     | '/api/$locale/vibe/remote-connection/connect'
@@ -9032,6 +9300,8 @@ export interface FileRouteTypes {
     | '/api/$locale/chart-of-accounts/period/$periodId/get'
     | '/api/$locale/companies/$companyId/members/invite'
     | '/api/$locale/companies/$companyId/members/list'
+    | '/api/$locale/finance/bank-connections/enable-banking/callback'
+    | '/api/$locale/finance/bank-connections/enable-banking/connect'
     | '/api/$locale/inventory/transfer/$transferId/dispatch'
     | '/api/$locale/inventory/transfer/$transferId/get'
     | '/api/$locale/inventory/transfer/$transferId/receive'
@@ -9044,6 +9314,8 @@ export interface FileRouteTypes {
     | '/api/$locale/leads/growth/data-sources/funnel-step'
     | '/api/$locale/leads/import/jobs/$jobId'
     | '/api/$locale/messenger/accounts/edit/$id'
+    | '/api/$locale/messenger/system-mailbox/bills/attachment'
+    | '/api/$locale/messenger/system-mailbox/bills/sync'
     | '/api/$locale/newsletter/unsubscribe/oneclick/$token'
     | '/api/$locale/payment/bill/$billId/approve'
     | '/api/$locale/payment/bill/$billId/get'
@@ -9248,6 +9520,7 @@ export interface FileRouteTypes {
     | '/api/$locale/vibe/tooling/infra/deploy/preview'
     | '/api/$locale/vibe/tooling/infra/deploy/push'
     | '/api/$locale/vibe/tooling/infra/scale/replicas'
+    | '/api/$locale/payment/bill/line/$billId/$lineId/remove'
     | '/api/$locale/vibe/agent/chat/folders/$rootFolderId/create'
     | '/api/$locale/vibe/agent/chat/folders/$rootFolderId/root-permissions'
     | '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId'
@@ -9363,8 +9636,12 @@ export interface FileRouteTypes {
     | '/api/$locale/desktop/scroll'
     | '/api/$locale/desktop/take-screenshot'
     | '/api/$locale/desktop/type-text'
+    | '/api/$locale/finance/bank-connections'
+    | '/api/$locale/finance/credit-liabilities'
     | '/api/$locale/finance/ingest'
+    | '/api/$locale/finance/monthly-profit'
     | '/api/$locale/finance/status'
+    | '/api/$locale/finance/supplier-evidence'
     | '/api/$locale/finance/thresholds'
     | '/api/$locale/inventory/dashboard'
     | '/api/$locale/lead-magnet/capture'
@@ -9391,7 +9668,9 @@ export interface FileRouteTypes {
     | '/api/$locale/notifications/list'
     | '/api/$locale/notifications/read'
     | '/api/$locale/notifications/unread-count'
+    | '/api/$locale/payment/accounting'
     | '/api/$locale/payment/checkout'
+    | '/api/$locale/payment/cost-backfill'
     | '/api/$locale/payment/dashboard'
     | '/api/$locale/payment/invoice'
     | '/api/$locale/payment/portal'
@@ -9405,11 +9684,13 @@ export interface FileRouteTypes {
     | '/api/$locale/referral/payout'
     | '/api/$locale/referral/stats'
     | '/api/$locale/seo/indexnow'
+    | '/api/$locale/seo/summary'
     | '/api/$locale/subscription/cancel'
     | '/api/$locale/subscription/create'
     | '/api/$locale/subscription/dashboard'
     | '/api/$locale/subscription/update'
     | '/api/$locale/subscription/yearly-credits'
+    | '/api/$locale/tax/regime'
     | '/api/$locale/tax/report'
     | '/api/$locale/user/session-cleanup'
     | '/api/$locale/user/signup-reminder'
@@ -9417,6 +9698,7 @@ export interface FileRouteTypes {
     | '/api/$locale/users/create'
     | '/api/$locale/users/list'
     | '/api/$locale/users/stats'
+    | '/api/$locale/users/summary'
     | '/api/$locale/users/view'
     | '/api/$locale/v1/messages'
     | '/api/$locale/v1/models'
@@ -9454,6 +9736,7 @@ export interface FileRouteTypes {
     | '/$locale/subscription/overview/'
     | '/$locale/subscription/remote/'
     | '/api/$locale/analytics/business/overview'
+    | '/api/$locale/analytics/business/summary'
     | '/api/$locale/analytics/evaluators/and'
     | '/api/$locale/analytics/evaluators/crossover'
     | '/api/$locale/analytics/evaluators/drop'
@@ -9518,10 +9801,13 @@ export interface FileRouteTypes {
     | '/api/$locale/credits/data-sources/credits-transfer-volume'
     | '/api/$locale/credits/data-sources/credits-usage-with-feature'
     | '/api/$locale/credits/data-sources/credits-wallets-total'
+    | '/api/$locale/finance/bank-connections/privacy'
     | '/api/$locale/finance/bank/candidates'
+    | '/api/$locale/finance/bank/followup'
     | '/api/$locale/finance/bank/import'
     | '/api/$locale/finance/bank/list'
     | '/api/$locale/finance/bank/match'
+    | '/api/$locale/finance/bank/settings'
     | '/api/$locale/finance/data-sources/finance-series'
     | '/api/$locale/inventory/stock/adjust'
     | '/api/$locale/inventory/stock/issue'
@@ -9609,6 +9895,7 @@ export interface FileRouteTypes {
     | '/api/$locale/messenger/messages/stats'
     | '/api/$locale/messenger/preview/render'
     | '/api/$locale/messenger/preview/send-test'
+    | '/api/$locale/messenger/system-mailbox/bills'
     | '/api/$locale/messenger/system-mailbox/inbox'
     | '/api/$locale/messenger/system-mailbox/message'
     | '/api/$locale/messenger/system-mailbox/report'
@@ -9618,6 +9905,8 @@ export interface FileRouteTypes {
     | '/api/$locale/newsletter/data-sources/newsletter-subscriptions-new'
     | '/api/$locale/newsletter/data-sources/newsletter-unsubscribes'
     | '/api/$locale/newsletter/unsubscribe/sync'
+    | '/api/$locale/payment/accounting/mapping'
+    | '/api/$locale/payment/accounting/recognition'
     | '/api/$locale/payment/analytics/revenue'
     | '/api/$locale/payment/bill/create'
     | '/api/$locale/payment/bill/list'
@@ -9716,6 +10005,7 @@ export interface FileRouteTypes {
     | '/api/$locale/vibe/agent/music-generation'
     | '/api/$locale/vibe/agent/skills'
     | '/api/$locale/vibe/agent/speech-to-text'
+    | '/api/$locale/vibe/agent/summary'
     | '/api/$locale/vibe/agent/text-to-speech'
     | '/api/$locale/vibe/agent/video-generation'
     | '/api/$locale/vibe/agent/view-image'
@@ -9728,6 +10018,7 @@ export interface FileRouteTypes {
     | '/api/$locale/vibe/execute-tool/await-task'
     | '/api/$locale/vibe/execute-tool/complete'
     | '/api/$locale/vibe/execute-tool/revival'
+    | '/api/$locale/vibe/logger/operations-summary'
     | '/api/$locale/vibe/realtime/remote-event-bridge'
     | '/api/$locale/vibe/remote-connection/$instanceId'
     | '/api/$locale/vibe/remote-connection/connect'
@@ -9814,6 +10105,8 @@ export interface FileRouteTypes {
     | '/api/$locale/chart-of-accounts/period/$periodId/get'
     | '/api/$locale/companies/$companyId/members/invite'
     | '/api/$locale/companies/$companyId/members/list'
+    | '/api/$locale/finance/bank-connections/enable-banking/callback'
+    | '/api/$locale/finance/bank-connections/enable-banking/connect'
     | '/api/$locale/inventory/transfer/$transferId/dispatch'
     | '/api/$locale/inventory/transfer/$transferId/get'
     | '/api/$locale/inventory/transfer/$transferId/receive'
@@ -9826,6 +10119,8 @@ export interface FileRouteTypes {
     | '/api/$locale/leads/growth/data-sources/funnel-step'
     | '/api/$locale/leads/import/jobs/$jobId'
     | '/api/$locale/messenger/accounts/edit/$id'
+    | '/api/$locale/messenger/system-mailbox/bills/attachment'
+    | '/api/$locale/messenger/system-mailbox/bills/sync'
     | '/api/$locale/newsletter/unsubscribe/oneclick/$token'
     | '/api/$locale/payment/bill/$billId/approve'
     | '/api/$locale/payment/bill/$billId/get'
@@ -10030,6 +10325,7 @@ export interface FileRouteTypes {
     | '/api/$locale/vibe/tooling/infra/deploy/preview'
     | '/api/$locale/vibe/tooling/infra/deploy/push'
     | '/api/$locale/vibe/tooling/infra/scale/replicas'
+    | '/api/$locale/payment/bill/line/$billId/$lineId/remove'
     | '/api/$locale/vibe/agent/chat/folders/$rootFolderId/create'
     | '/api/$locale/vibe/agent/chat/folders/$rootFolderId/root-permissions'
     | '/api/$locale/vibe/agent/chat/folders/subfolders/$subFolderId'
@@ -10132,8 +10428,12 @@ export interface RootRouteChildren {
   ApiLocaleDesktopScrollRoute: typeof ApiLocaleDesktopScrollRoute
   ApiLocaleDesktopTakeScreenshotRoute: typeof ApiLocaleDesktopTakeScreenshotRoute
   ApiLocaleDesktopTypeTextRoute: typeof ApiLocaleDesktopTypeTextRoute
+  ApiLocaleFinanceBankConnectionsRoute: typeof ApiLocaleFinanceBankConnectionsRouteWithChildren
+  ApiLocaleFinanceCreditLiabilitiesRoute: typeof ApiLocaleFinanceCreditLiabilitiesRoute
   ApiLocaleFinanceIngestRoute: typeof ApiLocaleFinanceIngestRoute
+  ApiLocaleFinanceMonthlyProfitRoute: typeof ApiLocaleFinanceMonthlyProfitRoute
   ApiLocaleFinanceStatusRoute: typeof ApiLocaleFinanceStatusRoute
+  ApiLocaleFinanceSupplierEvidenceRoute: typeof ApiLocaleFinanceSupplierEvidenceRoute
   ApiLocaleFinanceThresholdsRoute: typeof ApiLocaleFinanceThresholdsRoute
   ApiLocaleInventoryDashboardRoute: typeof ApiLocaleInventoryDashboardRoute
   ApiLocaleLeadMagnetCaptureRoute: typeof ApiLocaleLeadMagnetCaptureRoute
@@ -10164,6 +10464,8 @@ export interface RootRouteChildren {
   ApiLocalePosProductLookupRoute: typeof ApiLocalePosProductLookupRoute
   ApiLocalePurchasingDashboardRoute: typeof ApiLocalePurchasingDashboardRoute
   ApiLocaleSeoIndexnowRoute: typeof ApiLocaleSeoIndexnowRoute
+  ApiLocaleSeoSummaryRoute: typeof ApiLocaleSeoSummaryRoute
+  ApiLocaleTaxRegimeRoute: typeof ApiLocaleTaxRegimeRoute
   ApiLocaleTaxReportRoute: typeof ApiLocaleTaxReportRoute
   ApiLocaleUserSessionCleanupRoute: typeof ApiLocaleUserSessionCleanupRoute
   ApiLocaleUserSignupReminderRoute: typeof ApiLocaleUserSignupReminderRoute
@@ -10171,6 +10473,7 @@ export interface RootRouteChildren {
   ApiLocaleUsersCreateRoute: typeof ApiLocaleUsersCreateRoute
   ApiLocaleUsersListRoute: typeof ApiLocaleUsersListRoute
   ApiLocaleUsersStatsRoute: typeof ApiLocaleUsersStatsRoute
+  ApiLocaleUsersSummaryRoute: typeof ApiLocaleUsersSummaryRoute
   ApiLocaleUsersViewRoute: typeof ApiLocaleUsersViewRoute
   ApiLocaleV1MessagesRoute: typeof ApiLocaleV1MessagesRouteWithChildren
   ApiLocaleV1ModelsRoute: typeof ApiLocaleV1ModelsRoute
@@ -10184,6 +10487,7 @@ export interface RootRouteChildren {
   LocaleSharedTokenIndexRoute: typeof LocaleSharedTokenIndexRoute
   LocaleSkillSkillIdIndexRoute: typeof LocaleSkillSkillIdIndexRoute
   ApiLocaleAnalyticsBusinessOverviewRoute: typeof ApiLocaleAnalyticsBusinessOverviewRoute
+  ApiLocaleAnalyticsBusinessSummaryRoute: typeof ApiLocaleAnalyticsBusinessSummaryRoute
   ApiLocaleAnalyticsEvaluatorsAndRoute: typeof ApiLocaleAnalyticsEvaluatorsAndRoute
   ApiLocaleAnalyticsEvaluatorsCrossoverRoute: typeof ApiLocaleAnalyticsEvaluatorsCrossoverRoute
   ApiLocaleAnalyticsEvaluatorsDropRoute: typeof ApiLocaleAnalyticsEvaluatorsDropRoute
@@ -10225,9 +10529,11 @@ export interface RootRouteChildren {
   ApiLocaleCompaniesCompanyIdOnboardRoute: typeof ApiLocaleCompaniesCompanyIdOnboardRoute
   ApiLocaleCompaniesCompanyIdUpdateRoute: typeof ApiLocaleCompaniesCompanyIdUpdateRoute
   ApiLocaleFinanceBankCandidatesRoute: typeof ApiLocaleFinanceBankCandidatesRoute
+  ApiLocaleFinanceBankFollowupRoute: typeof ApiLocaleFinanceBankFollowupRoute
   ApiLocaleFinanceBankImportRoute: typeof ApiLocaleFinanceBankImportRoute
   ApiLocaleFinanceBankListRoute: typeof ApiLocaleFinanceBankListRoute
   ApiLocaleFinanceBankMatchRoute: typeof ApiLocaleFinanceBankMatchRoute
+  ApiLocaleFinanceBankSettingsRoute: typeof ApiLocaleFinanceBankSettingsRoute
   ApiLocaleFinanceDataSourcesFinanceSeriesRoute: typeof ApiLocaleFinanceDataSourcesFinanceSeriesRoute
   ApiLocaleInventoryStockAdjustRoute: typeof ApiLocaleInventoryStockAdjustRoute
   ApiLocaleInventoryStockIssueRoute: typeof ApiLocaleInventoryStockIssueRoute
@@ -10312,6 +10618,7 @@ export interface RootRouteChildren {
   ApiLocaleMessengerMessagesStatsRoute: typeof ApiLocaleMessengerMessagesStatsRoute
   ApiLocaleMessengerPreviewRenderRoute: typeof ApiLocaleMessengerPreviewRenderRoute
   ApiLocaleMessengerPreviewSendTestRoute: typeof ApiLocaleMessengerPreviewSendTestRoute
+  ApiLocaleMessengerSystemMailboxBillsRoute: typeof ApiLocaleMessengerSystemMailboxBillsRouteWithChildren
   ApiLocaleMessengerSystemMailboxInboxRoute: typeof ApiLocaleMessengerSystemMailboxInboxRoute
   ApiLocaleMessengerSystemMailboxMessageRoute: typeof ApiLocaleMessengerSystemMailboxMessageRoute
   ApiLocaleMessengerSystemMailboxReportRoute: typeof ApiLocaleMessengerSystemMailboxReportRoute
@@ -10369,6 +10676,7 @@ export interface RootRouteChildren {
   ApiLocaleVibeAgentMusicGenerationRoute: typeof ApiLocaleVibeAgentMusicGenerationRoute
   ApiLocaleVibeAgentSkillsRoute: typeof ApiLocaleVibeAgentSkillsRouteWithChildren
   ApiLocaleVibeAgentSpeechToTextRoute: typeof ApiLocaleVibeAgentSpeechToTextRoute
+  ApiLocaleVibeAgentSummaryRoute: typeof ApiLocaleVibeAgentSummaryRoute
   ApiLocaleVibeAgentTextToSpeechRoute: typeof ApiLocaleVibeAgentTextToSpeechRoute
   ApiLocaleVibeAgentVideoGenerationRoute: typeof ApiLocaleVibeAgentVideoGenerationRoute
   ApiLocaleVibeAgentViewImageRoute: typeof ApiLocaleVibeAgentViewImageRoute
@@ -10378,6 +10686,7 @@ export interface RootRouteChildren {
   ApiLocaleVibeDataflowGraphsRoute: typeof ApiLocaleVibeDataflowGraphsRouteWithChildren
   ApiLocaleVibeDataflowRunConfigRoute: typeof ApiLocaleVibeDataflowRunConfigRoute
   ApiLocaleVibeEnvSettingsRoute: typeof ApiLocaleVibeEnvSettingsRouteWithChildren
+  ApiLocaleVibeLoggerOperationsSummaryRoute: typeof ApiLocaleVibeLoggerOperationsSummaryRoute
   ApiLocaleVibeRealtimeRemoteEventBridgeRoute: typeof ApiLocaleVibeRealtimeRemoteEventBridgeRoute
   ApiLocaleVibeRemoteConnectionInstanceIdRoute: typeof ApiLocaleVibeRemoteConnectionInstanceIdRoute
   ApiLocaleVibeRemoteConnectionConnectRoute: typeof ApiLocaleVibeRemoteConnectionConnectRoute
@@ -11347,6 +11656,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiLocaleDesktopTypeTextRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/$locale/finance/bank-connections': {
+      id: '/api/$locale/finance/bank-connections'
+      path: '/api/$locale/finance/bank-connections'
+      fullPath: '/api/$locale/finance/bank-connections'
+      preLoaderRoute: typeof ApiLocaleFinanceBankConnectionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/finance/credit-liabilities': {
+      id: '/api/$locale/finance/credit-liabilities'
+      path: '/api/$locale/finance/credit-liabilities'
+      fullPath: '/api/$locale/finance/credit-liabilities'
+      preLoaderRoute: typeof ApiLocaleFinanceCreditLiabilitiesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/$locale/finance/ingest': {
       id: '/api/$locale/finance/ingest'
       path: '/api/$locale/finance/ingest'
@@ -11354,11 +11677,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiLocaleFinanceIngestRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/$locale/finance/monthly-profit': {
+      id: '/api/$locale/finance/monthly-profit'
+      path: '/api/$locale/finance/monthly-profit'
+      fullPath: '/api/$locale/finance/monthly-profit'
+      preLoaderRoute: typeof ApiLocaleFinanceMonthlyProfitRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/$locale/finance/status': {
       id: '/api/$locale/finance/status'
       path: '/api/$locale/finance/status'
       fullPath: '/api/$locale/finance/status'
       preLoaderRoute: typeof ApiLocaleFinanceStatusRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/finance/supplier-evidence': {
+      id: '/api/$locale/finance/supplier-evidence'
+      path: '/api/$locale/finance/supplier-evidence'
+      fullPath: '/api/$locale/finance/supplier-evidence'
+      preLoaderRoute: typeof ApiLocaleFinanceSupplierEvidenceRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/$locale/finance/thresholds': {
@@ -11543,11 +11880,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiLocaleNotificationsUnreadCountRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/$locale/payment/accounting': {
+      id: '/api/$locale/payment/accounting'
+      path: '/accounting'
+      fullPath: '/api/$locale/payment/accounting'
+      preLoaderRoute: typeof ApiLocalePaymentAccountingRouteImport
+      parentRoute: typeof ApiLocalePaymentRoute
+    }
     '/api/$locale/payment/checkout': {
       id: '/api/$locale/payment/checkout'
       path: '/checkout'
       fullPath: '/api/$locale/payment/checkout'
       preLoaderRoute: typeof ApiLocalePaymentCheckoutRouteImport
+      parentRoute: typeof ApiLocalePaymentRoute
+    }
+    '/api/$locale/payment/cost-backfill': {
+      id: '/api/$locale/payment/cost-backfill'
+      path: '/cost-backfill'
+      fullPath: '/api/$locale/payment/cost-backfill'
+      preLoaderRoute: typeof ApiLocalePaymentCostBackfillRouteImport
       parentRoute: typeof ApiLocalePaymentRoute
     }
     '/api/$locale/payment/dashboard': {
@@ -11641,6 +11992,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiLocaleSeoIndexnowRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/$locale/seo/summary': {
+      id: '/api/$locale/seo/summary'
+      path: '/api/$locale/seo/summary'
+      fullPath: '/api/$locale/seo/summary'
+      preLoaderRoute: typeof ApiLocaleSeoSummaryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/$locale/subscription/cancel': {
       id: '/api/$locale/subscription/cancel'
       path: '/cancel'
@@ -11675,6 +12033,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/api/$locale/subscription/yearly-credits'
       preLoaderRoute: typeof ApiLocaleSubscriptionYearlyCreditsRouteImport
       parentRoute: typeof ApiLocaleSubscriptionRoute
+    }
+    '/api/$locale/tax/regime': {
+      id: '/api/$locale/tax/regime'
+      path: '/api/$locale/tax/regime'
+      fullPath: '/api/$locale/tax/regime'
+      preLoaderRoute: typeof ApiLocaleTaxRegimeRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/api/$locale/tax/report': {
       id: '/api/$locale/tax/report'
@@ -11723,6 +12088,13 @@ declare module '@tanstack/react-router' {
       path: '/api/$locale/users/stats'
       fullPath: '/api/$locale/users/stats'
       preLoaderRoute: typeof ApiLocaleUsersStatsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/users/summary': {
+      id: '/api/$locale/users/summary'
+      path: '/api/$locale/users/summary'
+      fullPath: '/api/$locale/users/summary'
+      preLoaderRoute: typeof ApiLocaleUsersSummaryRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/$locale/users/view': {
@@ -12271,6 +12643,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiLocaleAnalyticsBusinessOverviewRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/$locale/analytics/business/summary': {
+      id: '/api/$locale/analytics/business/summary'
+      path: '/api/$locale/analytics/business/summary'
+      fullPath: '/api/$locale/analytics/business/summary'
+      preLoaderRoute: typeof ApiLocaleAnalyticsBusinessSummaryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/$locale/analytics/evaluators/and': {
       id: '/api/$locale/analytics/evaluators/and'
       path: '/api/$locale/analytics/evaluators/and'
@@ -12719,11 +13098,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiLocaleCreditsDataSourcesCreditsWalletsTotalRouteImport
       parentRoute: typeof ApiLocaleCreditsRoute
     }
+    '/api/$locale/finance/bank-connections/privacy': {
+      id: '/api/$locale/finance/bank-connections/privacy'
+      path: '/privacy'
+      fullPath: '/api/$locale/finance/bank-connections/privacy'
+      preLoaderRoute: typeof ApiLocaleFinanceBankConnectionsPrivacyRouteImport
+      parentRoute: typeof ApiLocaleFinanceBankConnectionsRoute
+    }
     '/api/$locale/finance/bank/candidates': {
       id: '/api/$locale/finance/bank/candidates'
       path: '/api/$locale/finance/bank/candidates'
       fullPath: '/api/$locale/finance/bank/candidates'
       preLoaderRoute: typeof ApiLocaleFinanceBankCandidatesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/finance/bank/followup': {
+      id: '/api/$locale/finance/bank/followup'
+      path: '/api/$locale/finance/bank/followup'
+      fullPath: '/api/$locale/finance/bank/followup'
+      preLoaderRoute: typeof ApiLocaleFinanceBankFollowupRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/$locale/finance/bank/import': {
@@ -12745,6 +13138,13 @@ declare module '@tanstack/react-router' {
       path: '/api/$locale/finance/bank/match'
       fullPath: '/api/$locale/finance/bank/match'
       preLoaderRoute: typeof ApiLocaleFinanceBankMatchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/finance/bank/settings': {
+      id: '/api/$locale/finance/bank/settings'
+      path: '/api/$locale/finance/bank/settings'
+      fullPath: '/api/$locale/finance/bank/settings'
+      preLoaderRoute: typeof ApiLocaleFinanceBankSettingsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/$locale/finance/data-sources/finance-series': {
@@ -13356,6 +13756,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiLocaleMessengerPreviewSendTestRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/$locale/messenger/system-mailbox/bills': {
+      id: '/api/$locale/messenger/system-mailbox/bills'
+      path: '/api/$locale/messenger/system-mailbox/bills'
+      fullPath: '/api/$locale/messenger/system-mailbox/bills'
+      preLoaderRoute: typeof ApiLocaleMessengerSystemMailboxBillsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/$locale/messenger/system-mailbox/inbox': {
       id: '/api/$locale/messenger/system-mailbox/inbox'
       path: '/api/$locale/messenger/system-mailbox/inbox'
@@ -13418,6 +13825,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/api/$locale/newsletter/unsubscribe/sync'
       preLoaderRoute: typeof ApiLocaleNewsletterUnsubscribeSyncRouteImport
       parentRoute: typeof ApiLocaleNewsletterUnsubscribeRoute
+    }
+    '/api/$locale/payment/accounting/mapping': {
+      id: '/api/$locale/payment/accounting/mapping'
+      path: '/mapping'
+      fullPath: '/api/$locale/payment/accounting/mapping'
+      preLoaderRoute: typeof ApiLocalePaymentAccountingMappingRouteImport
+      parentRoute: typeof ApiLocalePaymentAccountingRoute
+    }
+    '/api/$locale/payment/accounting/recognition': {
+      id: '/api/$locale/payment/accounting/recognition'
+      path: '/recognition'
+      fullPath: '/api/$locale/payment/accounting/recognition'
+      preLoaderRoute: typeof ApiLocalePaymentAccountingRecognitionRouteImport
+      parentRoute: typeof ApiLocalePaymentAccountingRoute
     }
     '/api/$locale/payment/analytics/revenue': {
       id: '/api/$locale/payment/analytics/revenue'
@@ -14105,6 +14526,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiLocaleVibeAgentSpeechToTextRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/$locale/vibe/agent/summary': {
+      id: '/api/$locale/vibe/agent/summary'
+      path: '/api/$locale/vibe/agent/summary'
+      fullPath: '/api/$locale/vibe/agent/summary'
+      preLoaderRoute: typeof ApiLocaleVibeAgentSummaryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/$locale/vibe/agent/text-to-speech': {
       id: '/api/$locale/vibe/agent/text-to-speech'
       path: '/api/$locale/vibe/agent/text-to-speech'
@@ -14188,6 +14616,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/api/$locale/vibe/execute-tool/revival'
       preLoaderRoute: typeof ApiLocaleVibeExecuteToolRevivalRouteImport
       parentRoute: typeof ApiLocaleVibeExecuteToolRoute
+    }
+    '/api/$locale/vibe/logger/operations-summary': {
+      id: '/api/$locale/vibe/logger/operations-summary'
+      path: '/api/$locale/vibe/logger/operations-summary'
+      fullPath: '/api/$locale/vibe/logger/operations-summary'
+      preLoaderRoute: typeof ApiLocaleVibeLoggerOperationsSummaryRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/api/$locale/vibe/realtime/remote-event-bridge': {
       id: '/api/$locale/vibe/realtime/remote-event-bridge'
@@ -14343,6 +14778,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiLocaleCompaniesCompanyIdMembersListRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/$locale/finance/bank-connections/enable-banking/callback': {
+      id: '/api/$locale/finance/bank-connections/enable-banking/callback'
+      path: '/enable-banking/callback'
+      fullPath: '/api/$locale/finance/bank-connections/enable-banking/callback'
+      preLoaderRoute: typeof ApiLocaleFinanceBankConnectionsEnableBankingCallbackRouteImport
+      parentRoute: typeof ApiLocaleFinanceBankConnectionsRoute
+    }
+    '/api/$locale/finance/bank-connections/enable-banking/connect': {
+      id: '/api/$locale/finance/bank-connections/enable-banking/connect'
+      path: '/enable-banking/connect'
+      fullPath: '/api/$locale/finance/bank-connections/enable-banking/connect'
+      preLoaderRoute: typeof ApiLocaleFinanceBankConnectionsEnableBankingConnectRouteImport
+      parentRoute: typeof ApiLocaleFinanceBankConnectionsRoute
+    }
     '/api/$locale/inventory/transfer/$transferId/dispatch': {
       id: '/api/$locale/inventory/transfer/$transferId/dispatch'
       path: '/api/$locale/inventory/transfer/$transferId/dispatch'
@@ -14426,6 +14875,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/api/$locale/messenger/accounts/edit/$id'
       preLoaderRoute: typeof ApiLocaleMessengerAccountsEditIdRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/messenger/system-mailbox/bills/attachment': {
+      id: '/api/$locale/messenger/system-mailbox/bills/attachment'
+      path: '/attachment'
+      fullPath: '/api/$locale/messenger/system-mailbox/bills/attachment'
+      preLoaderRoute: typeof ApiLocaleMessengerSystemMailboxBillsAttachmentRouteImport
+      parentRoute: typeof ApiLocaleMessengerSystemMailboxBillsRoute
+    }
+    '/api/$locale/messenger/system-mailbox/bills/sync': {
+      id: '/api/$locale/messenger/system-mailbox/bills/sync'
+      path: '/sync'
+      fullPath: '/api/$locale/messenger/system-mailbox/bills/sync'
+      preLoaderRoute: typeof ApiLocaleMessengerSystemMailboxBillsSyncRouteImport
+      parentRoute: typeof ApiLocaleMessengerSystemMailboxBillsRoute
     }
     '/api/$locale/newsletter/unsubscribe/oneclick/$token': {
       id: '/api/$locale/newsletter/unsubscribe/oneclick/$token'
@@ -15820,6 +16283,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiLocaleVibeToolingInfraScaleReplicasRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/$locale/payment/bill/line/$billId/$lineId/remove': {
+      id: '/api/$locale/payment/bill/line/$billId/$lineId/remove'
+      path: '/bill/line/$billId/$lineId/remove'
+      fullPath: '/api/$locale/payment/bill/line/$billId/$lineId/remove'
+      preLoaderRoute: typeof ApiLocalePaymentBillLineBillIdLineIdRemoveRouteImport
+      parentRoute: typeof ApiLocalePaymentRoute
+    }
     '/api/$locale/vibe/agent/chat/folders/$rootFolderId/create': {
       id: '/api/$locale/vibe/agent/chat/folders/$rootFolderId/create'
       path: '/create'
@@ -16468,6 +16938,24 @@ const ApiLocaleCreditsRouteChildren: ApiLocaleCreditsRouteChildren = {
 const ApiLocaleCreditsRouteWithChildren =
   ApiLocaleCreditsRoute._addFileChildren(ApiLocaleCreditsRouteChildren)
 
+interface ApiLocalePaymentAccountingRouteChildren {
+  ApiLocalePaymentAccountingMappingRoute: typeof ApiLocalePaymentAccountingMappingRoute
+  ApiLocalePaymentAccountingRecognitionRoute: typeof ApiLocalePaymentAccountingRecognitionRoute
+}
+
+const ApiLocalePaymentAccountingRouteChildren: ApiLocalePaymentAccountingRouteChildren =
+  {
+    ApiLocalePaymentAccountingMappingRoute:
+      ApiLocalePaymentAccountingMappingRoute,
+    ApiLocalePaymentAccountingRecognitionRoute:
+      ApiLocalePaymentAccountingRecognitionRoute,
+  }
+
+const ApiLocalePaymentAccountingRouteWithChildren =
+  ApiLocalePaymentAccountingRoute._addFileChildren(
+    ApiLocalePaymentAccountingRouteChildren,
+  )
+
 interface ApiLocalePaymentInvoiceRouteChildren {
   ApiLocalePaymentInvoiceCreateRoute: typeof ApiLocalePaymentInvoiceCreateRoute
   ApiLocalePaymentInvoiceListRoute: typeof ApiLocalePaymentInvoiceListRoute
@@ -16514,7 +17002,9 @@ const ApiLocalePaymentInvoiceRouteWithChildren =
   )
 
 interface ApiLocalePaymentRouteChildren {
+  ApiLocalePaymentAccountingRoute: typeof ApiLocalePaymentAccountingRouteWithChildren
   ApiLocalePaymentCheckoutRoute: typeof ApiLocalePaymentCheckoutRoute
+  ApiLocalePaymentCostBackfillRoute: typeof ApiLocalePaymentCostBackfillRoute
   ApiLocalePaymentDashboardRoute: typeof ApiLocalePaymentDashboardRoute
   ApiLocalePaymentInvoiceRoute: typeof ApiLocalePaymentInvoiceRouteWithChildren
   ApiLocalePaymentPortalRoute: typeof ApiLocalePaymentPortalRoute
@@ -16551,10 +17041,13 @@ interface ApiLocalePaymentRouteChildren {
   ApiLocalePaymentProvidersNowpaymentsWebhookRoute: typeof ApiLocalePaymentProvidersNowpaymentsWebhookRoute
   ApiLocalePaymentProvidersStripeWebhookRoute: typeof ApiLocalePaymentProvidersStripeWebhookRoute
   ApiLocalePaymentEstimateLineLineIdRemoveRoute: typeof ApiLocalePaymentEstimateLineLineIdRemoveRoute
+  ApiLocalePaymentBillLineBillIdLineIdRemoveRoute: typeof ApiLocalePaymentBillLineBillIdLineIdRemoveRoute
 }
 
 const ApiLocalePaymentRouteChildren: ApiLocalePaymentRouteChildren = {
+  ApiLocalePaymentAccountingRoute: ApiLocalePaymentAccountingRouteWithChildren,
   ApiLocalePaymentCheckoutRoute: ApiLocalePaymentCheckoutRoute,
+  ApiLocalePaymentCostBackfillRoute: ApiLocalePaymentCostBackfillRoute,
   ApiLocalePaymentDashboardRoute: ApiLocalePaymentDashboardRoute,
   ApiLocalePaymentInvoiceRoute: ApiLocalePaymentInvoiceRouteWithChildren,
   ApiLocalePaymentPortalRoute: ApiLocalePaymentPortalRoute,
@@ -16611,6 +17104,8 @@ const ApiLocalePaymentRouteChildren: ApiLocalePaymentRouteChildren = {
     ApiLocalePaymentProvidersStripeWebhookRoute,
   ApiLocalePaymentEstimateLineLineIdRemoveRoute:
     ApiLocalePaymentEstimateLineLineIdRemoveRoute,
+  ApiLocalePaymentBillLineBillIdLineIdRemoveRoute:
+    ApiLocalePaymentBillLineBillIdLineIdRemoveRoute,
 }
 
 const ApiLocalePaymentRouteWithChildren =
@@ -16743,6 +17238,27 @@ const ApiLocaleSubscriptionRouteChildren: ApiLocaleSubscriptionRouteChildren = {
 const ApiLocaleSubscriptionRouteWithChildren =
   ApiLocaleSubscriptionRoute._addFileChildren(
     ApiLocaleSubscriptionRouteChildren,
+  )
+
+interface ApiLocaleFinanceBankConnectionsRouteChildren {
+  ApiLocaleFinanceBankConnectionsPrivacyRoute: typeof ApiLocaleFinanceBankConnectionsPrivacyRoute
+  ApiLocaleFinanceBankConnectionsEnableBankingCallbackRoute: typeof ApiLocaleFinanceBankConnectionsEnableBankingCallbackRoute
+  ApiLocaleFinanceBankConnectionsEnableBankingConnectRoute: typeof ApiLocaleFinanceBankConnectionsEnableBankingConnectRoute
+}
+
+const ApiLocaleFinanceBankConnectionsRouteChildren: ApiLocaleFinanceBankConnectionsRouteChildren =
+  {
+    ApiLocaleFinanceBankConnectionsPrivacyRoute:
+      ApiLocaleFinanceBankConnectionsPrivacyRoute,
+    ApiLocaleFinanceBankConnectionsEnableBankingCallbackRoute:
+      ApiLocaleFinanceBankConnectionsEnableBankingCallbackRoute,
+    ApiLocaleFinanceBankConnectionsEnableBankingConnectRoute:
+      ApiLocaleFinanceBankConnectionsEnableBankingConnectRoute,
+  }
+
+const ApiLocaleFinanceBankConnectionsRouteWithChildren =
+  ApiLocaleFinanceBankConnectionsRoute._addFileChildren(
+    ApiLocaleFinanceBankConnectionsRouteChildren,
   )
 
 interface ApiLocaleLeadsImportJobsJobIdRouteChildren {
@@ -16914,6 +17430,24 @@ const ApiLocaleLeadMagnetProvidersGoogleSheetsRouteChildren: ApiLocaleLeadMagnet
 const ApiLocaleLeadMagnetProvidersGoogleSheetsRouteWithChildren =
   ApiLocaleLeadMagnetProvidersGoogleSheetsRoute._addFileChildren(
     ApiLocaleLeadMagnetProvidersGoogleSheetsRouteChildren,
+  )
+
+interface ApiLocaleMessengerSystemMailboxBillsRouteChildren {
+  ApiLocaleMessengerSystemMailboxBillsAttachmentRoute: typeof ApiLocaleMessengerSystemMailboxBillsAttachmentRoute
+  ApiLocaleMessengerSystemMailboxBillsSyncRoute: typeof ApiLocaleMessengerSystemMailboxBillsSyncRoute
+}
+
+const ApiLocaleMessengerSystemMailboxBillsRouteChildren: ApiLocaleMessengerSystemMailboxBillsRouteChildren =
+  {
+    ApiLocaleMessengerSystemMailboxBillsAttachmentRoute:
+      ApiLocaleMessengerSystemMailboxBillsAttachmentRoute,
+    ApiLocaleMessengerSystemMailboxBillsSyncRoute:
+      ApiLocaleMessengerSystemMailboxBillsSyncRoute,
+  }
+
+const ApiLocaleMessengerSystemMailboxBillsRouteWithChildren =
+  ApiLocaleMessengerSystemMailboxBillsRoute._addFileChildren(
+    ApiLocaleMessengerSystemMailboxBillsRouteChildren,
   )
 
 interface ApiLocaleSshConnectionsIdRouteChildren {
@@ -17529,8 +18063,14 @@ const rootRouteChildren: RootRouteChildren = {
   ApiLocaleDesktopScrollRoute: ApiLocaleDesktopScrollRoute,
   ApiLocaleDesktopTakeScreenshotRoute: ApiLocaleDesktopTakeScreenshotRoute,
   ApiLocaleDesktopTypeTextRoute: ApiLocaleDesktopTypeTextRoute,
+  ApiLocaleFinanceBankConnectionsRoute:
+    ApiLocaleFinanceBankConnectionsRouteWithChildren,
+  ApiLocaleFinanceCreditLiabilitiesRoute:
+    ApiLocaleFinanceCreditLiabilitiesRoute,
   ApiLocaleFinanceIngestRoute: ApiLocaleFinanceIngestRoute,
+  ApiLocaleFinanceMonthlyProfitRoute: ApiLocaleFinanceMonthlyProfitRoute,
   ApiLocaleFinanceStatusRoute: ApiLocaleFinanceStatusRoute,
+  ApiLocaleFinanceSupplierEvidenceRoute: ApiLocaleFinanceSupplierEvidenceRoute,
   ApiLocaleFinanceThresholdsRoute: ApiLocaleFinanceThresholdsRoute,
   ApiLocaleInventoryDashboardRoute: ApiLocaleInventoryDashboardRoute,
   ApiLocaleLeadMagnetCaptureRoute: ApiLocaleLeadMagnetCaptureRoute,
@@ -17563,6 +18103,8 @@ const rootRouteChildren: RootRouteChildren = {
   ApiLocalePosProductLookupRoute: ApiLocalePosProductLookupRoute,
   ApiLocalePurchasingDashboardRoute: ApiLocalePurchasingDashboardRoute,
   ApiLocaleSeoIndexnowRoute: ApiLocaleSeoIndexnowRoute,
+  ApiLocaleSeoSummaryRoute: ApiLocaleSeoSummaryRoute,
+  ApiLocaleTaxRegimeRoute: ApiLocaleTaxRegimeRoute,
   ApiLocaleTaxReportRoute: ApiLocaleTaxReportRoute,
   ApiLocaleUserSessionCleanupRoute: ApiLocaleUserSessionCleanupRoute,
   ApiLocaleUserSignupReminderRoute: ApiLocaleUserSignupReminderRoute,
@@ -17570,6 +18112,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiLocaleUsersCreateRoute: ApiLocaleUsersCreateRoute,
   ApiLocaleUsersListRoute: ApiLocaleUsersListRoute,
   ApiLocaleUsersStatsRoute: ApiLocaleUsersStatsRoute,
+  ApiLocaleUsersSummaryRoute: ApiLocaleUsersSummaryRoute,
   ApiLocaleUsersViewRoute: ApiLocaleUsersViewRoute,
   ApiLocaleV1MessagesRoute: ApiLocaleV1MessagesRouteWithChildren,
   ApiLocaleV1ModelsRoute: ApiLocaleV1ModelsRoute,
@@ -17584,6 +18127,8 @@ const rootRouteChildren: RootRouteChildren = {
   LocaleSkillSkillIdIndexRoute: LocaleSkillSkillIdIndexRoute,
   ApiLocaleAnalyticsBusinessOverviewRoute:
     ApiLocaleAnalyticsBusinessOverviewRoute,
+  ApiLocaleAnalyticsBusinessSummaryRoute:
+    ApiLocaleAnalyticsBusinessSummaryRoute,
   ApiLocaleAnalyticsEvaluatorsAndRoute: ApiLocaleAnalyticsEvaluatorsAndRoute,
   ApiLocaleAnalyticsEvaluatorsCrossoverRoute:
     ApiLocaleAnalyticsEvaluatorsCrossoverRoute,
@@ -17657,9 +18202,11 @@ const rootRouteChildren: RootRouteChildren = {
   ApiLocaleCompaniesCompanyIdUpdateRoute:
     ApiLocaleCompaniesCompanyIdUpdateRoute,
   ApiLocaleFinanceBankCandidatesRoute: ApiLocaleFinanceBankCandidatesRoute,
+  ApiLocaleFinanceBankFollowupRoute: ApiLocaleFinanceBankFollowupRoute,
   ApiLocaleFinanceBankImportRoute: ApiLocaleFinanceBankImportRoute,
   ApiLocaleFinanceBankListRoute: ApiLocaleFinanceBankListRoute,
   ApiLocaleFinanceBankMatchRoute: ApiLocaleFinanceBankMatchRoute,
+  ApiLocaleFinanceBankSettingsRoute: ApiLocaleFinanceBankSettingsRoute,
   ApiLocaleFinanceDataSourcesFinanceSeriesRoute:
     ApiLocaleFinanceDataSourcesFinanceSeriesRoute,
   ApiLocaleInventoryStockAdjustRoute: ApiLocaleInventoryStockAdjustRoute,
@@ -17794,6 +18341,8 @@ const rootRouteChildren: RootRouteChildren = {
   ApiLocaleMessengerPreviewRenderRoute: ApiLocaleMessengerPreviewRenderRoute,
   ApiLocaleMessengerPreviewSendTestRoute:
     ApiLocaleMessengerPreviewSendTestRoute,
+  ApiLocaleMessengerSystemMailboxBillsRoute:
+    ApiLocaleMessengerSystemMailboxBillsRouteWithChildren,
   ApiLocaleMessengerSystemMailboxInboxRoute:
     ApiLocaleMessengerSystemMailboxInboxRoute,
   ApiLocaleMessengerSystemMailboxMessageRoute:
@@ -17872,6 +18421,7 @@ const rootRouteChildren: RootRouteChildren = {
     ApiLocaleVibeAgentMusicGenerationRoute,
   ApiLocaleVibeAgentSkillsRoute: ApiLocaleVibeAgentSkillsRouteWithChildren,
   ApiLocaleVibeAgentSpeechToTextRoute: ApiLocaleVibeAgentSpeechToTextRoute,
+  ApiLocaleVibeAgentSummaryRoute: ApiLocaleVibeAgentSummaryRoute,
   ApiLocaleVibeAgentTextToSpeechRoute: ApiLocaleVibeAgentTextToSpeechRoute,
   ApiLocaleVibeAgentVideoGenerationRoute:
     ApiLocaleVibeAgentVideoGenerationRoute,
@@ -17884,6 +18434,8 @@ const rootRouteChildren: RootRouteChildren = {
     ApiLocaleVibeDataflowGraphsRouteWithChildren,
   ApiLocaleVibeDataflowRunConfigRoute: ApiLocaleVibeDataflowRunConfigRoute,
   ApiLocaleVibeEnvSettingsRoute: ApiLocaleVibeEnvSettingsRouteWithChildren,
+  ApiLocaleVibeLoggerOperationsSummaryRoute:
+    ApiLocaleVibeLoggerOperationsSummaryRoute,
   ApiLocaleVibeRealtimeRemoteEventBridgeRoute:
     ApiLocaleVibeRealtimeRemoteEventBridgeRoute,
   ApiLocaleVibeRemoteConnectionInstanceIdRoute:

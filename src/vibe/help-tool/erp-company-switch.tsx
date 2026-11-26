@@ -41,7 +41,8 @@ export function ErpCompanySwitch({
           disabled={!onSelect && !onBrowse}
           variant="outline"
           size="sm"
-          className="max-w-[calc(100vw-8rem)] justify-start min-[930px]:max-w-80"
+          className="h-auto min-h-8 w-full min-w-0 max-w-full justify-start whitespace-normal py-1 text-left sm:max-w-80"
+          title={activeCompany?.name}
           aria-label={
             activeCompany
               ? t("erp.companySwitch.current", { name: activeCompany.name })
@@ -49,7 +50,7 @@ export function ErpCompanySwitch({
           }
         >
           <Building className="size-4 shrink-0" aria-hidden="true" />
-          <Span className="min-w-0 truncate">
+          <Span className="line-clamp-2 min-w-0 flex-1 [overflow-wrap:anywhere] sm:line-clamp-none">
             {activeCompany?.name ?? t("erp.companySwitch.select")}
           </Span>
           <ChevronDownIcon className="size-4 shrink-0 text-muted-foreground" />
@@ -70,7 +71,9 @@ export function ErpCompanySwitch({
             >
               {companies.map(({ id, name, currency }) => (
                 <DropdownMenuRadioItem key={id} value={id} className="gap-2">
-                  <Span className="min-w-0 flex-1 break-words">{name}</Span>
+                  <Span className="min-w-0 flex-1 [overflow-wrap:anywhere]">
+                    {name}
+                  </Span>
                   {currency && (
                     <Span className="shrink-0 text-xs text-muted-foreground">
                       {currency}
@@ -80,6 +83,11 @@ export function ErpCompanySwitch({
               ))}
             </DropdownMenuRadioGroup>
           </>
+        )}
+        {!onSelect && activeCompany && (
+          <DropdownMenuLabel className="whitespace-normal [overflow-wrap:anywhere]">
+            {activeCompany.name}
+          </DropdownMenuLabel>
         )}
         {onBrowse && (
           <>

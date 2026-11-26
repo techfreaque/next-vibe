@@ -5,6 +5,17 @@ import { getAvailableChatModelCount } from "next-vibe/agent/models/all-models";
 import { useUncensoredConsent } from "next-vibe/agent/models/uncensored-consent/hooks";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { Alert, AlertDescription } from "next-vibe/ui/components/alert";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "next-vibe/ui/components/alert-dialog";
 import { Button } from "next-vibe/ui/components/button";
 import { Checkbox } from "next-vibe/ui/components/checkbox";
 import { Div } from "next-vibe/ui/components/div";
@@ -29,18 +40,20 @@ import { P } from "next-vibe/ui/components/typography";
 import { WidgetHeader } from "next-vibe/ui/components/widget-header";
 import { WidgetShell } from "next-vibe/ui/components/widget-shell";
 import { copyToClipboard } from "next-vibe/ui/lib/clipboard";
+import { AdminRecordContext } from "next-vibe/unified-ui/_shared/admin-record-context";
 import {
   useWidgetContext,
   useWidgetLocale,
   useWidgetLogger,
   useWidgetNavigation,
+  useWidgetResponse,
   useWidgetTranslation,
   useWidgetUser,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { apiClient } from "next-vibe/unified-ui/hooks/store";
 import type { JSX } from "react";
-import { useState } from "react";
+import { useContext, useState } from "react";
 
 import revokeEndpoints from "./[id]/definition";
 import { API_UNLOCK_PATH, getApiAccessPrices } from "./access";
@@ -148,34 +161,81 @@ function SnippetCard({
   );
 }
 
+function ApiKeysIntroduction(): JSX.Element {
+  const t = useWidgetTranslation<typeof apiKeysEndpoints.GET>();
+  const user = useWidgetUser();
+  const availability = useProviderAvailability();
+  const isAdmin = !user.isPublic && user.roles.includes(UserRole.ADMIN);
+  const modelCount = getAvailableChatModelCount(isAdmin, availability);
+
+  return (
+    <P className="m-0 px-1 text-sm text-muted-foreground">
+      {t("widget.intro", { modelCount })}
+    </P>
+  );
+}
+
+function ApiKeysConsent({
+  onError,
+}: {
+  onError: (message: string | null) => void;
+}): JSX.Element {
+  const user = useWidgetUser();
+  const logger = useWidgetLogger();
+  const t = useWidgetTranslation<typeof apiKeysEndpoints.GET>();
+  const consent = useUncensoredConsent(user, logger);
+
+  const handleChange = (allow: boolean): void => {
+    onError(null);
+    void (async (): Promise<void> => {
+      const result = allow ? await consent.agree() : await consent.withdraw();
+      if (!result.success) {
+        onError(result.message ?? t("widget.uncensoredFailed"));
+      }
+    })();
+  };
+
+  return (
+    <Div className="mt-1 flex items-start gap-3 rounded-lg border border-warning/30 bg-warning/5 p-3">
+      <Checkbox
+        id="api-keys-uncensored-consent"
+        className="mt-0.5"
+        checked={consent.consented === true}
+        disabled={consent.consented === null || consent.isSaving}
+        onCheckedChange={handleChange}
+      />
+      <Div className="flex min-w-0 flex-col gap-1">
+        <Label
+          htmlFor="api-keys-uncensored-consent"
+          className="cursor-pointer text-sm font-semibold leading-snug"
+        >
+          {t("widget.uncensoredLabel")}
+        </Label>
+        <Span className="text-xs leading-relaxed text-muted-foreground">
+          {t("widget.uncensoredHint")}
+        </Span>
+      </Div>
+    </Div>
+  );
+}
+
 export function ApiKeysContainer(): JSX.Element {
   const data = useWidgetValue<typeof apiKeysEndpoints.GET>();
+  const response = useWidgetResponse();
+  const admin = useContext(AdminRecordContext);
   const { pop, canGoBack } = useWidgetNavigation();
   const { endpointMutations } = useWidgetContext();
   const t = useWidgetTranslation<typeof apiKeysEndpoints.GET>();
   const locale = useWidgetLocale();
   const user = useWidgetUser();
   const logger = useWidgetLogger();
-  const availability = useProviderAvailability();
-  const isAdmin = !user.isPublic && user.roles.includes(UserRole.ADMIN);
-  const modelCount = getAvailableChatModelCount(isAdmin, availability);
   const [name, setName] = useState("");
   const [creating, setCreating] = useState(false);
   const [revoking, setRevoking] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [newKey, setNewKey] = useState<string | null>(null);
-  // Uncensored models on /v1 need the account's one-time 18+ consent.
-  const consent = useUncensoredConsent(user, logger);
-
-  const handleUncensoredToggle = (allow: boolean): void => {
-    setError(null);
-    void (async (): Promise<void> => {
-      const result = allow ? await consent.agree() : await consent.withdraw();
-      if (!result.success) {
-        setError(result.message ?? t("widget.uncensoredFailed"));
-      }
-    })();
-  };
+  const [newKey, setNewKey] = useState<{ id: string; text: string } | null>(
+    null,
+  );
 
   const handleCreate = (): void => {
     const trimmed = name.trim();
@@ -198,7 +258,7 @@ export function ApiKeysContainer(): JSX.Element {
         setError(result.message ?? t("widget.createFailed"));
         return;
       }
-      setNewKey(result.data.key);
+      setNewKey({ id: result.data.id, text: result.data.key });
       setName("");
       endpointMutations?.read?.refetch?.();
     })();
@@ -221,22 +281,52 @@ export function ApiKeysContainer(): JSX.Element {
         setError(result.message ?? t("widget.revokeFailed"));
         return;
       }
+      if (admin && newKey?.id === id) {
+        setNewKey(null);
+      }
       endpointMutations?.read?.refetch?.();
     })();
   };
 
+  if (response?.success === false) {
+    return (
+      <WidgetShell layout="page">
+        <WidgetHeader title={t("list.title")} />
+        <EmptyBlock
+          title={t("widget.loadFailed")}
+          icon={<Key />}
+          action={
+            endpointMutations?.read
+              ? {
+                  label: t("widget.retry"),
+                  onClick: () => void endpointMutations.read?.refetch(),
+                }
+              : undefined
+          }
+        />
+      </WidgetShell>
+    );
+  }
+
   if (!data) {
-    return <LoadingBlock message={t("widget.loading")} />;
+    return (
+      <WidgetShell layout="page">
+        <WidgetHeader title={t("list.title")} />
+        <LoadingBlock message={t("widget.loading")} />
+      </WidgetShell>
+    );
   }
 
   const prices = getApiAccessPrices(locale);
-  const snippets = buildCodingToolSnippets({
-    baseUrl: data.baseUrl,
-    apiKey: newKey,
-  });
+  const snippets = admin
+    ? undefined
+    : buildCodingToolSnippets({
+        baseUrl: data.baseUrl,
+        apiKey: newKey?.text ?? null,
+      });
 
   return (
-    <WidgetShell className="gap-4">
+    <WidgetShell layout={admin ? "page" : undefined} className="gap-4">
       <WidgetHeader
         title={t("list.title")}
         backButton={
@@ -257,9 +347,13 @@ export function ApiKeysContainer(): JSX.Element {
         }
       />
 
-      <P className="m-0 px-1 text-sm text-muted-foreground">
-        {t("widget.intro", { modelCount })}
-      </P>
+      {admin ? (
+        <P className="m-0 text-sm text-muted-foreground">
+          {t("widget.adminOverview")}
+        </P>
+      ) : (
+        <ApiKeysIntroduction />
+      )}
 
       {error ? (
         <Alert variant="destructive" className="mx-1">
@@ -319,26 +413,7 @@ export function ApiKeysContainer(): JSX.Element {
             {t("widget.createInactiveHint")}
           </P>
         )}
-        <Div className="mt-1 flex items-start gap-3 rounded-lg border border-warning/30 bg-warning/5 p-3">
-          <Checkbox
-            id="api-keys-uncensored-consent"
-            className="mt-0.5"
-            checked={consent.consented === true}
-            disabled={consent.consented === null || consent.isSaving}
-            onCheckedChange={handleUncensoredToggle}
-          />
-          <Div className="flex min-w-0 flex-col gap-1">
-            <Label
-              htmlFor="api-keys-uncensored-consent"
-              className="cursor-pointer text-sm font-semibold leading-snug"
-            >
-              {t("widget.uncensoredLabel")}
-            </Label>
-            <Span className="text-xs leading-relaxed text-muted-foreground">
-              {t("widget.uncensoredHint")}
-            </Span>
-          </Div>
-        </Div>
+        {!admin && <ApiKeysConsent onError={setError} />}
       </Div>
 
       {newKey ? (
@@ -350,7 +425,7 @@ export function ApiKeysContainer(): JSX.Element {
             {t("widget.newKeyHint")}
           </P>
           <CopyBlock
-            text={newKey}
+            text={newKey.text}
             copyLabel={t("widget.copy")}
             copiedLabel={t("widget.copied")}
           />
@@ -403,119 +478,178 @@ export function ApiKeysContainer(): JSX.Element {
                   })}
                 </Span>
               </Div>
-              <Button
-                variant="outline"
-                disabled={revoking === k.id}
-                className="h-10 shrink-0 border-destructive/40 text-destructive hover:bg-destructive/10 hover:text-destructive"
-                onClick={(): void => handleRevoke(k.id)}
-              >
-                {revoking === k.id ? t("widget.revoking") : t("widget.revoke")}
-              </Button>
+              {admin ? (
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      disabled={revoking !== null}
+                      className="h-10 shrink-0 border-destructive/40 text-destructive"
+                      aria-label={t("widget.revokeNamed", { name: k.name })}
+                    >
+                      {revoking === k.id
+                        ? t("widget.revoking")
+                        : t("widget.revoke")}
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>
+                        {t("widget.revokeNamed", { name: k.name })}
+                      </AlertDialogTitle>
+                      <AlertDialogDescription>
+                        {t("widget.revokeConfirm")}
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>
+                        {t("widget.cancel")}
+                      </AlertDialogCancel>
+                      <AlertDialogAction asChild>
+                        <Button
+                          type="button"
+                          variant="destructive"
+                          onClick={() => handleRevoke(k.id)}
+                        >
+                          {t("widget.revoke")}
+                        </Button>
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              ) : (
+                <Button
+                  variant="outline"
+                  disabled={revoking === k.id}
+                  className="h-10 shrink-0 border-destructive/40 text-destructive hover:bg-destructive/10 hover:text-destructive"
+                  onClick={(): void => handleRevoke(k.id)}
+                >
+                  {revoking === k.id
+                    ? t("widget.revoking")
+                    : t("widget.revoke")}
+                </Button>
+              )}
             </Div>
           ))}
         </Div>
       )}
 
-      <Div className="flex min-w-0 flex-col gap-3 rounded-xl border bg-card p-4 shadow-sm">
-        <Div className="grid min-w-0 gap-3 @lg:grid-cols-2">
-          <Div className="flex min-w-0 flex-col gap-1.5">
-            <Span className="text-sm font-semibold">
-              {t("widget.baseUrlTitle")}
-            </Span>
-            <CopyBlock
-              text={snippets.baseUrl}
-              copyLabel={t("widget.copy")}
-              copiedLabel={t("widget.copied")}
-            />
-            <P className="m-0 text-xs text-muted-foreground">
-              {t("widget.baseUrlHint")}
-            </P>
+      {snippets ? (
+        <Div className="flex min-w-0 flex-col gap-3 rounded-xl border bg-card p-4 shadow-sm">
+          <Div className="grid min-w-0 gap-3 @lg:grid-cols-2">
+            <Div className="flex min-w-0 flex-col gap-1.5">
+              <Span className="text-sm font-semibold">
+                {t("widget.baseUrlTitle")}
+              </Span>
+              <CopyBlock
+                text={snippets.baseUrl}
+                copyLabel={t("widget.copy")}
+                copiedLabel={t("widget.copied")}
+              />
+              <P className="m-0 text-xs text-muted-foreground">
+                {t("widget.baseUrlHint")}
+              </P>
+            </Div>
+            <Div className="flex min-w-0 flex-col gap-1.5">
+              <Span className="text-sm font-semibold">
+                {t("widget.anthropicBaseUrlTitle")}
+              </Span>
+              <CopyBlock
+                text={snippets.anthropicBaseUrl}
+                copyLabel={t("widget.copy")}
+                copiedLabel={t("widget.copied")}
+              />
+              <P className="m-0 text-xs text-muted-foreground">
+                {t("widget.anthropicBaseUrlHint")}
+              </P>
+            </Div>
           </Div>
-          <Div className="flex min-w-0 flex-col gap-1.5">
-            <Span className="text-sm font-semibold">
-              {t("widget.anthropicBaseUrlTitle")}
-            </Span>
-            <CopyBlock
-              text={snippets.anthropicBaseUrl}
-              copyLabel={t("widget.copy")}
-              copiedLabel={t("widget.copied")}
-            />
-            <P className="m-0 text-xs text-muted-foreground">
-              {t("widget.anthropicBaseUrlHint")}
-            </P>
-          </Div>
-        </Div>
 
-        <Span className="mt-2 text-sm font-semibold">
-          {t("widget.setupTitle")}
-        </Span>
-        <P
-          className={
-            snippets.hasRealKey
-              ? "m-0 rounded-lg bg-primary/10 px-3 py-2 text-xs font-medium text-foreground"
-              : "m-0 text-xs text-muted-foreground"
-          }
-        >
-          {snippets.hasRealKey
-            ? t("widget.setupKeyFilled")
-            : t("widget.setupKeyMissing", { placeholder: API_KEY_PLACEHOLDER })}
-        </P>
-        <Tabs defaultValue={snippets.tools.codex.name} className="min-w-0">
-          <TabsList className="flex h-auto w-full flex-wrap justify-start gap-1">
-            {CODING_TOOL_IDS.map((id) => (
-              <TabsTrigger
-                key={id}
-                value={snippets.tools[id].name}
-                className="h-9 px-3"
-              >
-                {snippets.tools[id].name}
-              </TabsTrigger>
-            ))}
-          </TabsList>
-          {CODING_TOOL_IDS.map((id) => {
-            const tool = snippets.tools[id];
-            return (
-              <TabsContent key={id} value={tool.name} className="mt-3 min-w-0">
-                <Div className="flex min-w-0 flex-col gap-3">
-                  <P className="m-0 text-sm text-muted-foreground">
-                    {t(`codingTools.tools.${id}.hint`)}
-                  </P>
-                  {tool.blocks.map((block) => (
-                    <SnippetCard
-                      key={`${id}-${block.kind}`}
-                      block={block}
-                      caption={t(`codingTools.blocks.${block.kind}`)}
-                      copyLabel={t("widget.copy")}
-                      copiedLabel={t("widget.copied")}
-                    />
-                  ))}
-                  <P className="m-0 text-xs text-muted-foreground">
-                    {tool.tested
-                      ? `${t("codingTools.tested", {
-                          name: tool.name,
-                          version: tool.tested.version,
-                        })}. `
-                      : ""}
-                    {t("codingTools.anyModel", {
-                      model: CODING_TOOL_MODEL,
-                      examples: CODING_TOOL_EXAMPLE_MODELS.join(", "),
-                    })}
-                  </P>
-                </Div>
-              </TabsContent>
-            );
-          })}
-        </Tabs>
-        <P className="m-0 text-xs text-muted-foreground">
-          {t("widget.billingNote")}
-        </P>
+          <Span className="mt-2 text-sm font-semibold">
+            {t("widget.setupTitle")}
+          </Span>
+          <P
+            className={
+              snippets.hasRealKey
+                ? "m-0 rounded-lg bg-primary/10 px-3 py-2 text-xs font-medium text-foreground"
+                : "m-0 text-xs text-muted-foreground"
+            }
+          >
+            {snippets.hasRealKey
+              ? t("widget.setupKeyFilled")
+              : t("widget.setupKeyMissing", {
+                  placeholder: API_KEY_PLACEHOLDER,
+                })}
+          </P>
+          <Tabs defaultValue={snippets.tools.codex.name} className="min-w-0">
+            <TabsList className="flex h-auto w-full flex-wrap justify-start gap-1">
+              {CODING_TOOL_IDS.map((id) => (
+                <TabsTrigger
+                  key={id}
+                  value={snippets.tools[id].name}
+                  className="h-9 px-3"
+                >
+                  {snippets.tools[id].name}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+            {CODING_TOOL_IDS.map((id) => {
+              const tool = snippets.tools[id];
+              return (
+                <TabsContent
+                  key={id}
+                  value={tool.name}
+                  className="mt-3 min-w-0"
+                >
+                  <Div className="flex min-w-0 flex-col gap-3">
+                    <P className="m-0 text-sm text-muted-foreground">
+                      {t(`codingTools.tools.${id}.hint`)}
+                    </P>
+                    {tool.blocks.map((block) => (
+                      <SnippetCard
+                        key={`${id}-${block.kind}`}
+                        block={block}
+                        caption={t(`codingTools.blocks.${block.kind}`)}
+                        copyLabel={t("widget.copy")}
+                        copiedLabel={t("widget.copied")}
+                      />
+                    ))}
+                    <P className="m-0 text-xs text-muted-foreground">
+                      {tool.tested
+                        ? `${t("codingTools.tested", {
+                            name: tool.name,
+                            version: tool.tested.version,
+                          })}. `
+                        : ""}
+                      {t("codingTools.anyModel", {
+                        model: CODING_TOOL_MODEL,
+                        examples: CODING_TOOL_EXAMPLE_MODELS.join(", "),
+                      })}
+                    </P>
+                  </Div>
+                </TabsContent>
+              );
+            })}
+          </Tabs>
+          <P className="m-0 text-xs text-muted-foreground">
+            {t("widget.billingNote")}
+          </P>
+          <Link
+            href={`/${locale}/${API_DOCS_PATH}`}
+            className="text-sm font-medium text-primary hover:underline"
+          >
+            {t("widget.docsLink")}
+          </Link>
+        </Div>
+      ) : (
         <Link
           href={`/${locale}/${API_DOCS_PATH}`}
-          className="text-sm font-medium text-primary hover:underline"
+          className="self-start text-sm font-medium text-primary hover:underline"
         >
           {t("widget.docsLink")}
         </Link>
-      </Div>
+      )}
     </WidgetShell>
   );
 }

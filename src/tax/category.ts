@@ -22,9 +22,30 @@ export const category: CategoryDefinition = {
     "es-ES": "Impuestos",
     "sk-SK": "Dane",
   },
+  description: {
+    "en-US": "Review your tax regime, rates and VAT summary.",
+    "de-DE":
+      "Prüfen Sie Steuerregelung, Steuersätze und Umsatzsteuerübersicht.",
+    "pl-PL": "Sprawdź sposób rozliczania podatku, stawki i podsumowanie VAT.",
+    "fr-FR":
+      "Consultez votre régime fiscal, vos taux et votre synthèse de TVA.",
+    "it-IT": "Consulti il regime fiscale, le aliquote e il riepilogo IVA.",
+    "es-ES": "Revise su régimen fiscal, tipos impositivos y resumen de IVA.",
+    "sk-SK": "Skontrolujte daňový režim firmy, sadzby a prehľad DPH.",
+    "en-GLOBAL": "Review your tax regime, rates and VAT summary.",
+  },
   group: "business",
   icon: "file-text",
   order: 65,
+  createActions: ["tax_rate_create_POST"],
+  landing: {
+    destinations: [
+      "company-tax-regime-view",
+      "tax-rate-list",
+      "coa-tax-report",
+    ],
+    actions: ["company-tax-regime-view", "tax-rate-list", "coa-tax-report"],
+  },
   defaultEntry: {
     [UserPermissionRole.ADMIN]: TAX_RATE_LIST_ALIAS,
     [UserPermissionRole.CUSTOMER]: USER_ME_ALIAS,

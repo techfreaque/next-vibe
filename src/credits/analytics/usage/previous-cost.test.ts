@@ -47,7 +47,7 @@ beforeAll(async () => {
     INSERT INTO credit_wallets VALUES ('${id(1)}', NULL, '${id(11)}');
     INSERT INTO credit_transactions (wallet_id, type, amount, metadata, funding_type, model_id, feature, created_at) VALUES
       -- previous period (Nov 8-14): real usage, no provider cost recorded yet
-      ('${id(1)}', '${usage}', -500, '{}', '${free}', 'kimi-k3', NULL, '2026-11-10 10:00:00'),
+      ('${id(1)}', '${usage}', -500, '{"upstreamCostUsd": null}', '${free}', 'kimi-k3', NULL, '2026-11-10 10:00:00'),
       ('${id(1)}', '${usage}', -2, '{}', '${free}', NULL, 'Search the Web', '2026-11-10 11:00:00'),
       -- current period: half the usage has provider cost
       ('${id(1)}', '${usage}', -400, '{"upstreamCostUsd": 3}', '${free}', 'kimi-k3', NULL, '2026-11-18 10:00:00'),
@@ -81,6 +81,19 @@ test("previous period without cost data has no cost comparison", async () => {
   expect(report.kpis.marginUsd.value).toBe(1);
   // Coverage of the previous period really was 0%.
   expect(report.kpis.costCoverage.previous).toBe(0);
+  expect(await CreditUsageReportRepository.headline(win)).toEqual({
+    estimatedCostUsd: report.kpis.upstreamCostUsd,
+    costedUsageMarginUsd: report.kpis.marginUsd,
+  });
+  const unvalued = resolveAnalyticsWindow({
+    range: AnalyticsRange.CUSTOM,
+    from: "2026-11-10",
+    to: "2026-11-10",
+  });
+  expect(await CreditUsageReportRepository.headline(unvalued)).toEqual({
+    estimatedCostUsd: null,
+    costedUsageMarginUsd: null,
+  });
 });
 
 test("guest spend rounds the ledger total once, independently of the guest share", async () => {

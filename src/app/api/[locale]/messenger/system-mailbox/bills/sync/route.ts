@@ -1,0 +1,2 @@
+// AUTO-GENERATED from src/messenger/system-mailbox/bills/sync/route.ts. Add "use custom" to this file to preserve customizations.
+export * from "../../../../../../../messenger/system-mailbox/bills/sync/route";

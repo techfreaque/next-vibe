@@ -42,7 +42,11 @@ export const translations: typeof enTranslations = {
         title: "Brak dostępu",
         description: "Wymagana rola Księgowy lub Administrator",
       },
-      conflict: { title: "Konflikt", description: "Konflikt danych" },
+      conflict: {
+        title: "Konflikt",
+        description:
+          "Istnieje już faktura z tym dostawcą i numerem. Sprawdź ją przed zapisaniem kolejnej.",
+      },
       server: {
         title: "Błąd serwera",
         description: "Nie można utworzyć faktury. Spróbuj ponownie.",
@@ -81,6 +85,8 @@ export const translations: typeof enTranslations = {
       addItem: "Dodaj pozycję",
       removeItem: "Usuń pozycję",
       itemError: "Sprawdź opis, ilość, cenę i stawkę VAT.",
+      supplierTotalReview:
+        "Porównaj tę kwotę z fakturą dostawcy. Jeśli kwoty się różnią, sprawdź oryginał przed zapisaniem.",
       summary: "Podsumowanie faktury",
       net: "Netto",
       tax: "VAT",

@@ -41,6 +41,7 @@ import {
 } from "../../../_shared/use-widget-context";
 import { scopedTranslation as unifiedInterfaceScopedTranslation } from "../../../hooks/i18n";
 import { getTheme } from "../_shared/constants";
+import { useFormFieldDescriptionStyle } from "../_shared/description-style";
 import { renderPrefillDisplay } from "../_shared/prefill";
 import { getFieldStyleClassName } from "../_shared/styling";
 import { getFieldValidationState } from "../_shared/validation";
@@ -83,7 +84,7 @@ export function TextFieldWidget<
     TEndpoint,
     TUsage,
     TextFieldWidgetConfig<TKey, TSchema, TUsage>
-  >["field"];
+  >["field"] & { fieldType?: FieldDataType };
 }): JSX.Element {
   const { t: tField } = useWidgetContext();
   const locale = useWidgetLocale();
@@ -92,12 +93,22 @@ export function TextFieldWidget<
 
   const { t: widgetT } = unifiedInterfaceScopedTranslation.scopedT(locale);
 
+  const theme = getTheme(field.theme);
+  const descriptionStyle = useFormFieldDescriptionStyle(theme.descriptionStyle);
+  const fieldType = field.fieldType;
+  const inputType =
+    fieldType === FieldDataType.EMAIL ||
+    fieldType === FieldDataType.URL ||
+    fieldType === FieldDataType.TEL ||
+    fieldType === FieldDataType.DATE
+      ? fieldType
+      : "text";
+
   if (!form || !fieldName) {
     return <Div>{widgetT("widgets.formField.requiresContext")}</Div>;
   }
 
   // Get theme from config or use default
-  const theme = getTheme(field.theme);
   const isRequired = !field.schema.isOptional();
 
   return (
@@ -113,8 +124,6 @@ export function TextFieldWidget<
 
         const styleClassName = getFieldStyleClassName(validationState, theme);
         const { style } = theme;
-
-        const descriptionStyle = theme.descriptionStyle;
 
         return (
           <FormItem
@@ -132,27 +141,28 @@ export function TextFieldWidget<
                   {field.label && style === "asterisk" && isRequired && (
                     <Span className="text-info font-bold">*</Span>
                   )}
-                  {field.description && descriptionStyle === "tooltip" && (
-                    <TooltipProvider delayDuration={300}>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button
-                            type="button"
-                            className="cursor-help inline-flex"
-                            variant={"ghost"}
-                          >
-                            <Info className="h-4 w-4 text-muted-foreground hover:text-foreground transition-colors" />
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent className="max-w-[250px]">
-                          <Span className="text-sm">
-                            {tField(field.description)}
-                          </Span>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                  )}
                 </FormLabel>
+                {field.description && descriptionStyle === "tooltip" && (
+                  <TooltipProvider delayDuration={300}>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          type="button"
+                          aria-label={tField(field.description)}
+                          className="cursor-help inline-flex"
+                          variant={"ghost"}
+                        >
+                          <Info className="h-4 w-4 text-muted-foreground hover:text-foreground transition-colors" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent className="max-w-[250px]">
+                        <Span className="text-sm">
+                          {tField(field.description)}
+                        </Span>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                )}
                 {style === "badge" && isRequired && (
                   <Badge
                     variant="secondary"
@@ -189,7 +199,7 @@ export function TextFieldWidget<
                   value={formField.value ? tField(formField.value) : ""}
                   onChange={(e) => formField.onChange(e.target.value)}
                   onBlur={formField.onBlur}
-                  type={FieldDataType.TEXT}
+                  type={inputType}
                   placeholder={
                     field.placeholder ? tField(field.placeholder) : undefined
                   }

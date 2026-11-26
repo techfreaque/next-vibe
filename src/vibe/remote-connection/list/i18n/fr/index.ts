@@ -278,6 +278,7 @@ export const translations: typeof enTranslations = {
     health: {
       socketOpen: "WebSocket ouvert",
       noSyncRecorded: "Aucune synchronisation enregistrée",
+      overdue: "Synchronisation en retard",
       syncRecorded: "Synchronisation enregistrée",
       tunnelOpen: "Tunnel ouvert",
       bridgeActive: "Connectée",
@@ -298,6 +299,7 @@ export const translations: typeof enTranslations = {
     },
     // Cloud marketing panel
     cloud: {
+      connectAnother: "Connecter une autre instance",
       heroTitle: "Votre propre instance",
       heroSubtitle:
         "Faites tourner next-vibe sur votre matériel et reliez-le à ce compte. Vos discussions, souvenirs et skills vous suivent. Vos outils tournent chez vous.",

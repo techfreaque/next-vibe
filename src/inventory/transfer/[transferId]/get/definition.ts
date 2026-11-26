@@ -15,7 +15,7 @@ import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
 import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
 import {
   objectField,
-  requestField,
+  requestUrlPathParamsField,
   responseArrayField,
   responseField,
 } from "next-vibe/unified-ui/_shared/utils-i18n";
@@ -45,19 +45,18 @@ const { GET } = createEndpoint({
   icon: "refresh-cw" as const,
 
   fields: customWidgetObject({
-    usage: { request: "data", response: true } as const,
+    usage: { request: "urlPathParams", response: true } as const,
     render: InventoryTransferGetWidget,
     children: {
-      transferId: requestField(scopedTranslation, {
+      transferId: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ENTITY_PICKER,
         label: "transferGet.get.transferId.label" as const,
         description: "transferGet.get.transferId.description" as const,
         schema: z.uuid(),
-        urlPathParam: true,
         listEndpoint: async () =>
           (await import("@/inventory/transfer/list/definition")).default.GET,
-        labelField: "transferNumber",
+        labelField: "reference",
       }),
 
       result: objectField(scopedTranslation, {
@@ -97,6 +96,11 @@ const { GET } = createEndpoint({
             type: WidgetType.TEXT,
             label: "transferGet.get.response.toWarehouseName" as const,
             schema: z.string(),
+          }),
+          canManage: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            hidden: true,
+            schema: z.boolean(),
           }),
           status: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
@@ -213,7 +217,7 @@ const { GET } = createEndpoint({
   },
 
   examples: {
-    requests: {
+    urlPathParams: {
       default: {
         transferId: "ddee1122-e89b-12d3-a456-426614174001",
       },
@@ -228,6 +232,7 @@ const { GET } = createEndpoint({
           toWarehouseId: "aabbccdd-e89b-12d3-a456-426614174002",
           toWarehouseName: "Branch Office",
           status: "DRAFT",
+          canManage: true,
           reference: "TR-2024-001",
           notes: null,
           createdAt: new Date("2024-01-01T00:00:00.000Z"),
@@ -247,7 +252,8 @@ const { GET } = createEndpoint({
   },
 });
 
-export type InventoryTransferGetRequestOutput = typeof GET.types.RequestOutput;
+export type InventoryTransferGetRequestOutput =
+  typeof GET.types.UrlVariablesOutput;
 export type InventoryTransferGetResponseOutput =
   typeof GET.types.ResponseOutput;
 

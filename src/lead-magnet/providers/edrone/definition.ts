@@ -2,7 +2,6 @@ import { createEndpoint } from "next-vibe/core/definition/create-i18n";
 import {
   EndpointErrorTypes,
   FieldDataType,
-  LayoutType,
   Methods,
   WidgetType,
 } from "next-vibe/core/definition/enums";
@@ -15,6 +14,7 @@ import {
 import { z } from "zod";
 
 import { scopedTranslation } from "../../i18n";
+import { providerFormLayout } from "../form-layout";
 
 const ALLOWED_ROLES = [
   UserRole.CUSTOMER,
@@ -37,9 +37,8 @@ export const { POST } = createEndpoint({
   allowedRoles: ALLOWED_ROLES,
   fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
-    title: "providers.edrone.title" as const,
+    ...providerFormLayout("providers.edrone.title"),
     description: "providers.edrone.description" as const,
-    layoutType: LayoutType.STACKED,
     usage: { request: "data", response: true },
     children: {
       edroneAppId: requestField(scopedTranslation, {

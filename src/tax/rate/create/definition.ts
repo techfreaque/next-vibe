@@ -92,7 +92,7 @@ const { POST } = createEndpoint({
         label: "rate.create.rate.label" as const,
         description: "rate.create.rate.description" as const,
         placeholder: "rate.create.rate.placeholder" as const,
-        schema: z.number().min(0).max(1),
+        schema: z.number().min(0).max(1).multipleOf(0.0001),
       }),
       country: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,

@@ -722,6 +722,8 @@ export const translations: typeof enTranslations = {
   widget: {
     loading: "Ładowanie leada...",
     notFound: "Lead nie znaleziony.",
+    loadFailed: "Nie udało się wczytać kontaktu",
+    retryLoad: "Spróbuj ponownie",
     back: "Wstecz",
     leadFallbackTitle: "Lead",
     edit: "Edytuj",

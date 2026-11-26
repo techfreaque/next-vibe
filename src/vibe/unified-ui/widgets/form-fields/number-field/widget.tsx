@@ -41,6 +41,7 @@ import {
 } from "../../../_shared/use-widget-context";
 import { scopedTranslation as unifiedInterfaceScopedTranslation } from "../../../hooks/i18n";
 import { getTheme } from "../_shared/constants";
+import { useFormFieldDescriptionStyle } from "../_shared/description-style";
 import { renderPrefillDisplay } from "../_shared/prefill";
 import { getFieldStyleClassName } from "../_shared/styling";
 import { getFieldValidationState } from "../_shared/validation";
@@ -48,30 +49,14 @@ import { DecimalInput } from "./decimal-input";
 import type { DecimalPresentation } from "./decimal-value";
 import type { NumberFieldWidgetConfig } from "./types";
 
-/**
- * Read a numeric bound the schema already declares.
- *
- * `z.coerce.number().min(1)` states the constraint once; requiring the field
- * config to repeat it as `min: 1` is duplication that silently drifts — which is
- * exactly what let arrow keys step `limit`/`page` into the negatives while the
- * schema said min 1. Wrappers (`.optional()`, `.default()`, `.nullable()`) hide
- * the bound, so unwrap until the number itself is reached.
- */
-function schemaBound(
-  schema: z.ZodTypeAny | undefined,
-  bound: "minValue" | "maxValue",
-): number | undefined {
-  let current: z.ZodTypeAny | undefined = schema;
+/** Read constraints on the number inside optional, nullable and default field schemas. */
+function numberSchema(schema: z.ZodType | undefined): z.ZodNumber | undefined {
+  let current = schema;
   for (let depth = 0; depth < 6 && current; depth++) {
-    const direct = Reflect.get(current, bound);
-    if (typeof direct === "number" && Number.isFinite(direct)) {
-      return direct;
+    if (current instanceof z.ZodNumber) {
+      return current;
     }
-    const def = Reflect.get(current, "def");
-    const inner =
-      def && typeof def === "object"
-        ? Reflect.get(def, "innerType")
-        : undefined;
+    const inner = Reflect.get(current.def, "innerType");
     current = inner instanceof z.ZodType ? inner : undefined;
   }
   return undefined;
@@ -104,16 +89,29 @@ export function NumberFieldWidget<
 
   const { t: widgetT } = unifiedInterfaceScopedTranslation.scopedT(locale);
 
+  const theme = getTheme(field.theme);
+  const descriptionStyle = useFormFieldDescriptionStyle(theme.descriptionStyle);
+
   if (!form || !fieldName) {
     return <Div>{widgetT("widgets.formField.requiresContext")}</Div>;
   }
-  const theme = getTheme(field.theme);
-  const descriptionStyle = theme.descriptionStyle;
   const isRequired = !field.schema.isOptional();
   // An explicit field config wins; otherwise fall back to what the schema
   // already declares, so `.min(1)` clamps the stepper without being restated.
-  const effectiveMin = field.min ?? schemaBound(field.schema, "minValue");
-  const effectiveMax = field.max ?? schemaBound(field.schema, "maxValue");
+  const numeric = numberSchema(field.schema);
+  const lowerBound = numeric?.minValue;
+  const upperBound = numeric?.maxValue;
+  const effectiveMin =
+    field.min ??
+    (typeof lowerBound === "number" && Number.isFinite(lowerBound)
+      ? lowerBound
+      : undefined);
+  const effectiveMax =
+    field.max ??
+    (typeof upperBound === "number" && Number.isFinite(upperBound)
+      ? upperBound
+      : undefined);
+  const allowDecimals = numeric?.isInt === false;
 
   return (
     <FormField
@@ -144,29 +142,30 @@ export function NumberFieldWidget<
                   {field.label && style === "asterisk" && isRequired && (
                     <Span className="text-info font-bold">*</Span>
                   )}
-                  {!presentation &&
-                    field.description &&
-                    descriptionStyle === "tooltip" && (
-                      <TooltipProvider delayDuration={300}>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button
-                              type="button"
-                              className="cursor-help inline-flex"
-                              variant={"ghost"}
-                            >
-                              <Info className="h-4 w-4 text-muted-foreground hover:text-foreground transition-colors" />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent className="max-w-[250px]">
-                            <Span className="text-sm">
-                              {tField(field.description)}
-                            </Span>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                    )}
                 </FormLabel>
+                {!presentation &&
+                  field.description &&
+                  descriptionStyle === "tooltip" && (
+                    <TooltipProvider delayDuration={300}>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            type="button"
+                            aria-label={tField(field.description)}
+                            className="cursor-help inline-flex"
+                            variant={"ghost"}
+                          >
+                            <Info className="h-4 w-4 text-muted-foreground hover:text-foreground transition-colors" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent className="max-w-[250px]">
+                          <Span className="text-sm">
+                            {tField(field.description)}
+                          </Span>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  )}
                 {style === "badge" && isRequired && (
                   <Badge
                     variant="secondary"
@@ -198,6 +197,7 @@ export function NumberFieldWidget<
                 )
               ) : presentation ? (
                 <DecimalInput
+                  ref={formField.ref}
                   name={formField.name}
                   aria-label={field.label && tField(field.label)}
                   aria-invalid={fieldState.invalid}
@@ -214,6 +214,9 @@ export function NumberFieldWidget<
                 />
               ) : (
                 <NumberInput
+                  ref={formField.ref}
+                  aria-label={field.label && tField(field.label)}
+                  locale={locale}
                   name={formField.name}
                   value={formField.value ?? effectiveMin ?? 0}
                   onChange={(value) => formField.onChange(value)}
@@ -221,6 +224,7 @@ export function NumberFieldWidget<
                   min={effectiveMin}
                   max={effectiveMax}
                   step={field.step}
+                  allowDecimals={allowDecimals}
                   disabled={isDisabled || field.disabled || field.readonly}
                   className={styleClassName.inputClassName}
                 />

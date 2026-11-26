@@ -2644,8 +2644,12 @@
     "fields": {
       "type": "container",
       "title": "Connect Acumbamail",
-      "description": "Connect your Acumbamail account to capture leads from your skill page",
       "layoutType": "stacked",
+      "adminForm": {
+        "sectionTitle": "providers.shared.connectionSettings",
+        "submitText": "providers.acumbamail.title"
+      },
+      "description": "Connect your Acumbamail account to capture leads from your skill page",
       "usage": {
         "request": "data",
         "response": true
@@ -2837,8 +2841,12 @@
     "fields": {
       "type": "container",
       "title": "Connect Adobe Campaign",
-      "description": "Connect your Adobe Campaign account to capture leads from your skill page",
       "layoutType": "stacked",
+      "adminForm": {
+        "sectionTitle": "providers.shared.connectionSettings",
+        "submitText": "providers.adobecampaign.title"
+      },
+      "description": "Connect your Adobe Campaign account to capture leads from your skill page",
       "usage": {
         "request": "data",
         "response": true
@@ -3107,8 +3115,12 @@
     "fields": {
       "type": "container",
       "title": "Connect CleverReach",
-      "description": "Connect your CleverReach account to capture leads from your skill page",
       "layoutType": "stacked",
+      "adminForm": {
+        "sectionTitle": "providers.shared.connectionSettings",
+        "submitText": "providers.cleverreach.title"
+      },
+      "description": "Connect your CleverReach account to capture leads from your skill page",
       "usage": {
         "request": "data",
         "response": true
@@ -3365,8 +3377,12 @@
     "fields": {
       "type": "container",
       "title": "Connect Connectif",
-      "description": "Connect your Connectif account to capture leads from your skill page",
       "layoutType": "stacked",
+      "adminForm": {
+        "sectionTitle": "providers.shared.connectionSettings",
+        "submitText": "providers.connectif.title"
+      },
+      "description": "Connect your Connectif account to capture leads from your skill page",
       "usage": {
         "request": "data",
         "response": true
@@ -3558,8 +3574,12 @@
     "fields": {
       "type": "container",
       "title": "Connect DataNext",
-      "description": "Connect your DataNext account to capture leads from your skill page",
       "layoutType": "stacked",
+      "adminForm": {
+        "sectionTitle": "providers.shared.connectionSettings",
+        "submitText": "providers.datanext.title"
+      },
+      "description": "Connect your DataNext account to capture leads from your skill page",
       "usage": {
         "request": "data",
         "response": true
@@ -3810,8 +3830,12 @@
     "fields": {
       "type": "container",
       "title": "Connect Edrone",
-      "description": "Connect your Edrone account to capture leads from your skill page",
       "layoutType": "stacked",
+      "adminForm": {
+        "sectionTitle": "providers.shared.connectionSettings",
+        "submitText": "providers.edrone.title"
+      },
+      "description": "Connect your Edrone account to capture leads from your skill page",
       "usage": {
         "request": "data",
         "response": true
@@ -3998,8 +4022,12 @@
     "fields": {
       "type": "container",
       "title": "Connect Emarsys",
-      "description": "Connect your Emarsys account to capture leads from your skill page",
       "layoutType": "stacked",
+      "adminForm": {
+        "sectionTitle": "providers.shared.connectionSettings",
+        "submitText": "providers.emarsys.title"
+      },
+      "description": "Connect your Emarsys account to capture leads from your skill page",
       "usage": {
         "request": "data",
         "response": true
@@ -4227,8 +4255,12 @@
     "fields": {
       "type": "container",
       "title": "Connect ExpertSender",
-      "description": "Connect your ExpertSender account to capture leads from your skill page",
       "layoutType": "stacked",
+      "adminForm": {
+        "sectionTitle": "providers.shared.connectionSettings",
+        "submitText": "providers.expertsender.title"
+      },
+      "description": "Connect your ExpertSender account to capture leads from your skill page",
       "usage": {
         "request": "data",
         "response": true
@@ -4438,8 +4470,12 @@
     "fields": {
       "type": "container",
       "title": "Connect FreshMail",
-      "description": "Connect your FreshMail account to capture leads from your skill page",
       "layoutType": "stacked",
+      "adminForm": {
+        "sectionTitle": "providers.shared.connectionSettings",
+        "submitText": "providers.freshmail.title"
+      },
+      "description": "Connect your FreshMail account to capture leads from your skill page",
       "usage": {
         "request": "data",
         "response": true
@@ -4672,8 +4708,12 @@
     "fields": {
       "type": "container",
       "title": "Connect GetResponse",
-      "description": "Connect your GetResponse account to capture leads from your skill page",
       "layoutType": "stacked",
+      "adminForm": {
+        "sectionTitle": "providers.shared.connectionSettings",
+        "submitText": "providers.getresponse.title"
+      },
+      "description": "Connect your GetResponse account to capture leads from your skill page",
       "usage": {
         "request": "data",
         "response": true
@@ -5128,8 +5168,12 @@
     "fields": {
       "type": "container",
       "title": "Connect Klaviyo",
-      "description": "Connect your Klaviyo account to capture leads from your skill page",
       "layoutType": "stacked",
+      "adminForm": {
+        "sectionTitle": "providers.shared.connectionSettings",
+        "submitText": "providers.klaviyo.title"
+      },
+      "description": "Connect your Klaviyo account to capture leads from your skill page",
       "usage": {
         "request": "data",
         "response": true
@@ -5321,8 +5365,12 @@
     "fields": {
       "type": "container",
       "title": "Connect MailUp",
-      "description": "Connect your MailUp account to capture leads from your skill page",
       "layoutType": "stacked",
+      "adminForm": {
+        "sectionTitle": "providers.shared.connectionSettings",
+        "submitText": "providers.mailup.title"
+      },
+      "description": "Connect your MailUp account to capture leads from your skill page",
       "usage": {
         "request": "data",
         "response": true
@@ -5591,8 +5639,12 @@
     "fields": {
       "type": "container",
       "title": "Connect Mapp",
-      "description": "Connect your Mapp account to capture leads from your skill page",
       "layoutType": "stacked",
+      "adminForm": {
+        "sectionTitle": "providers.shared.connectionSettings",
+        "submitText": "providers.mapp.title"
+      },
+      "description": "Connect your Mapp account to capture leads from your skill page",
       "usage": {
         "request": "data",
         "response": true
@@ -5820,8 +5872,12 @@
     "fields": {
       "type": "container",
       "title": "Notify via platform email",
-      "description": "Get an email notification every time someone signs up via your lead magnet",
       "layoutType": "stacked",
+      "adminForm": {
+        "sectionTitle": "providers.shared.connectionSettings",
+        "submitText": "providers.platformEmail.title"
+      },
+      "description": "Get an email notification every time someone signs up via your lead magnet",
       "usage": {
         "request": "data",
         "response": true
@@ -6000,8 +6056,12 @@
     "fields": {
       "type": "container",
       "title": "Connect Sailthru",
-      "description": "Connect your Sailthru account to capture leads from your skill page",
       "layoutType": "stacked",
+      "adminForm": {
+        "sectionTitle": "providers.shared.connectionSettings",
+        "submitText": "providers.sailthru.title"
+      },
+      "description": "Connect your Sailthru account to capture leads from your skill page",
       "usage": {
         "request": "data",
         "response": true
@@ -6234,8 +6294,12 @@
     "fields": {
       "type": "container",
       "title": "Connect SALESmanago",
-      "description": "Connect your SALESmanago account to capture leads from your skill page",
       "layoutType": "stacked",
+      "adminForm": {
+        "sectionTitle": "providers.shared.connectionSettings",
+        "submitText": "providers.salesmanago.title"
+      },
+      "description": "Connect your SALESmanago account to capture leads from your skill page",
       "usage": {
         "request": "data",
         "response": true
@@ -6504,8 +6568,12 @@
     "fields": {
       "type": "container",
       "title": "Connect Shopify",
-      "description": "Connect your Shopify store to capture leads from your skill page",
       "layoutType": "stacked",
+      "adminForm": {
+        "sectionTitle": "providers.shared.connectionSettings",
+        "submitText": "providers.shopify.title"
+      },
+      "description": "Connect your Shopify store to capture leads from your skill page",
       "usage": {
         "request": "data",
         "response": true
@@ -6715,8 +6783,12 @@
     "fields": {
       "type": "container",
       "title": "Connect Spotler",
-      "description": "Connect your Spotler account to capture leads from your skill page",
       "layoutType": "stacked",
+      "adminForm": {
+        "sectionTitle": "providers.shared.connectionSettings",
+        "submitText": "providers.spotler.title"
+      },
+      "description": "Connect your Spotler account to capture leads from your skill page",
       "usage": {
         "request": "data",
         "response": true
@@ -6926,8 +6998,12 @@
     "fields": {
       "type": "container",
       "title": "Connect YouLead",
-      "description": "Connect your YouLead account to capture leads from your skill page",
       "layoutType": "stacked",
+      "adminForm": {
+        "sectionTitle": "providers.shared.connectionSettings",
+        "submitText": "providers.youlead.title"
+      },
+      "description": "Connect your YouLead account to capture leads from your skill page",
       "usage": {
         "request": "data",
         "response": true
@@ -11407,6 +11483,72 @@
             },
             "type": "number",
             "isFinite": true
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "totalRevenueMeasuredPurchases": {
+          "type": "text",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "number",
+                  "checks": [
+                    {
+                      "def": {
+                        "type": "number",
+                        "check": "number_format",
+                        "abort": false,
+                        "format": "safeint"
+                      },
+                      "type": "number",
+                      "isFinite": true
+                    },
+                    {}
+                  ]
+                },
+                "type": "number",
+                "isFinite": true
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "totalRevenuePurchaseCount": {
+          "type": "text",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "number",
+                  "checks": [
+                    {
+                      "def": {
+                        "type": "number",
+                        "check": "number_format",
+                        "abort": false,
+                        "format": "safeint"
+                      },
+                      "type": "number",
+                      "isFinite": true
+                    },
+                    {}
+                  ]
+                },
+                "type": "number",
+                "isFinite": true
+              }
+            },
+            "type": "optional"
           },
           "usage": {
             "response": true
@@ -289371,6 +289513,1104 @@
             "type": "optional"
           },
           "hiddenForPlatforms": ["ai", "mcp", "cron", "remote-skill"],
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "adminCatalogDestinations": {
+          "type": "text",
+          "label": "Workspaces",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "record",
+                  "keyType": {
+                    "def": {
+                      "type": "string"
+                    },
+                    "type": "string"
+                  },
+                  "valueType": {
+                    "def": {
+                      "type": "object",
+                      "shape": {
+                        "category": {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string"
+                        },
+                        "subCategory": {
+                          "def": {
+                            "type": "optional",
+                            "innerType": {
+                              "def": {
+                                "type": "string"
+                              },
+                              "type": "string"
+                            }
+                          },
+                          "type": "optional"
+                        }
+                      }
+                    },
+                    "type": "object"
+                  }
+                },
+                "type": "record",
+                "keyType": {
+                  "def": {
+                    "type": "string"
+                  },
+                  "type": "string"
+                },
+                "valueType": {
+                  "def": {
+                    "type": "object",
+                    "shape": {
+                      "category": {
+                        "def": {
+                          "type": "string"
+                        },
+                        "type": "string"
+                      },
+                      "subCategory": {
+                        "def": {
+                          "type": "optional",
+                          "innerType": {
+                            "def": {
+                              "type": "string"
+                            },
+                            "type": "string"
+                          }
+                        },
+                        "type": "optional"
+                      }
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "type": "optional"
+          },
+          "visibleFor": ["enums.userRole.admin"],
+          "hiddenForPlatforms": [
+            "ai",
+            "mcp",
+            "cron",
+            "remote-skill",
+            "cli",
+            "cli-package"
+          ],
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "adminCategoryLandings": {
+          "type": "text",
+          "label": "Workspaces",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "record",
+                  "keyType": {
+                    "def": {
+                      "type": "string"
+                    },
+                    "type": "string"
+                  },
+                  "valueType": {
+                    "def": {
+                      "type": "object",
+                      "shape": {
+                        "description": {
+                          "def": {
+                            "type": "optional",
+                            "innerType": {
+                              "def": {
+                                "type": "string"
+                              },
+                              "type": "string"
+                            }
+                          },
+                          "type": "optional"
+                        },
+                        "heading": {
+                          "def": {
+                            "type": "optional",
+                            "innerType": {
+                              "def": {
+                                "type": "string"
+                              },
+                              "type": "string"
+                            }
+                          },
+                          "type": "optional"
+                        },
+                        "overview": {
+                          "def": {
+                            "type": "optional",
+                            "innerType": {
+                              "def": {
+                                "type": "object",
+                                "shape": {
+                                  "alias": {
+                                    "def": {
+                                      "type": "string"
+                                    },
+                                    "type": "string"
+                                  },
+                                  "scope": {
+                                    "def": {
+                                      "type": "enum",
+                                      "entries": {
+                                        "platform": "platform",
+                                        "company": "company"
+                                      }
+                                    },
+                                    "type": "enum",
+                                    "enum": {
+                                      "platform": "platform",
+                                      "company": "company"
+                                    },
+                                    "options": ["platform", "company"]
+                                  }
+                                }
+                              },
+                              "type": "object"
+                            }
+                          },
+                          "type": "optional"
+                        },
+                        "summary": {
+                          "def": {
+                            "type": "optional",
+                            "innerType": {
+                              "def": {
+                                "type": "object",
+                                "shape": {
+                                  "alias": {
+                                    "def": {
+                                      "type": "string"
+                                    },
+                                    "type": "string"
+                                  },
+                                  "scope": {
+                                    "def": {
+                                      "type": "enum",
+                                      "entries": {
+                                        "platform": "platform",
+                                        "company": "company"
+                                      }
+                                    },
+                                    "type": "enum",
+                                    "enum": {
+                                      "platform": "platform",
+                                      "company": "company"
+                                    },
+                                    "options": ["platform", "company"]
+                                  },
+                                  "args": {
+                                    "def": {
+                                      "type": "optional",
+                                      "innerType": {
+                                        "def": {
+                                          "type": "record",
+                                          "keyType": {
+                                            "def": {
+                                              "type": "string"
+                                            },
+                                            "type": "string"
+                                          },
+                                          "valueType": {
+                                            "def": {
+                                              "type": "string"
+                                            },
+                                            "type": "string"
+                                          }
+                                        },
+                                        "type": "record",
+                                        "keyType": {
+                                          "def": {
+                                            "type": "string"
+                                          },
+                                          "type": "string"
+                                        },
+                                        "valueType": {
+                                          "def": {
+                                            "type": "string"
+                                          },
+                                          "type": "string"
+                                        }
+                                      }
+                                    },
+                                    "type": "optional"
+                                  },
+                                  "home": {
+                                    "def": {
+                                      "type": "optional",
+                                      "innerType": {
+                                        "def": {
+                                          "type": "boolean"
+                                        },
+                                        "type": "boolean"
+                                      }
+                                    },
+                                    "type": "optional"
+                                  },
+                                  "homeArgs": {
+                                    "def": {
+                                      "type": "optional",
+                                      "innerType": {
+                                        "def": {
+                                          "type": "record",
+                                          "keyType": {
+                                            "def": {
+                                              "type": "string"
+                                            },
+                                            "type": "string"
+                                          },
+                                          "valueType": {
+                                            "def": {
+                                              "type": "string"
+                                            },
+                                            "type": "string"
+                                          }
+                                        },
+                                        "type": "record",
+                                        "keyType": {
+                                          "def": {
+                                            "type": "string"
+                                          },
+                                          "type": "string"
+                                        },
+                                        "valueType": {
+                                          "def": {
+                                            "type": "string"
+                                          },
+                                          "type": "string"
+                                        }
+                                      }
+                                    },
+                                    "type": "optional"
+                                  },
+                                  "progressive": {
+                                    "def": {
+                                      "type": "optional",
+                                      "innerType": {
+                                        "def": {
+                                          "type": "boolean"
+                                        },
+                                        "type": "boolean"
+                                      }
+                                    },
+                                    "type": "optional"
+                                  }
+                                }
+                              },
+                              "type": "object"
+                            }
+                          },
+                          "type": "optional"
+                        },
+                        "contextualActions": {
+                          "def": {
+                            "type": "optional",
+                            "innerType": {
+                              "def": {
+                                "type": "boolean"
+                              },
+                              "type": "boolean"
+                            }
+                          },
+                          "type": "optional"
+                        },
+                        "actions": {
+                          "def": {
+                            "type": "array",
+                            "element": {
+                              "def": {
+                                "type": "object",
+                                "shape": {
+                                  "alias": {
+                                    "def": {
+                                      "type": "string"
+                                    },
+                                    "type": "string"
+                                  },
+                                  "title": {
+                                    "def": {
+                                      "type": "string"
+                                    },
+                                    "type": "string"
+                                  }
+                                }
+                              },
+                              "type": "object"
+                            }
+                          },
+                          "type": "array",
+                          "element": {
+                            "def": {
+                              "type": "object",
+                              "shape": {
+                                "alias": {
+                                  "def": {
+                                    "type": "string"
+                                  },
+                                  "type": "string"
+                                },
+                                "title": {
+                                  "def": {
+                                    "type": "string"
+                                  },
+                                  "type": "string"
+                                }
+                              }
+                            },
+                            "type": "object"
+                          }
+                        },
+                        "destinations": {
+                          "def": {
+                            "type": "array",
+                            "element": {
+                              "def": {
+                                "type": "object",
+                                "shape": {
+                                  "alias": {
+                                    "def": {
+                                      "type": "string"
+                                    },
+                                    "type": "string"
+                                  },
+                                  "title": {
+                                    "def": {
+                                      "type": "string"
+                                    },
+                                    "type": "string"
+                                  },
+                                  "description": {
+                                    "def": {
+                                      "type": "optional",
+                                      "innerType": {
+                                        "def": {
+                                          "type": "string"
+                                        },
+                                        "type": "string"
+                                      }
+                                    },
+                                    "type": "optional"
+                                  }
+                                }
+                              },
+                              "type": "object"
+                            }
+                          },
+                          "type": "array",
+                          "element": {
+                            "def": {
+                              "type": "object",
+                              "shape": {
+                                "alias": {
+                                  "def": {
+                                    "type": "string"
+                                  },
+                                  "type": "string"
+                                },
+                                "title": {
+                                  "def": {
+                                    "type": "string"
+                                  },
+                                  "type": "string"
+                                },
+                                "description": {
+                                  "def": {
+                                    "type": "optional",
+                                    "innerType": {
+                                      "def": {
+                                        "type": "string"
+                                      },
+                                      "type": "string"
+                                    }
+                                  },
+                                  "type": "optional"
+                                }
+                              }
+                            },
+                            "type": "object"
+                          }
+                        },
+                        "createActions": {
+                          "def": {
+                            "type": "array",
+                            "element": {
+                              "def": {
+                                "type": "object",
+                                "shape": {
+                                  "alias": {
+                                    "def": {
+                                      "type": "string"
+                                    },
+                                    "type": "string"
+                                  },
+                                  "title": {
+                                    "def": {
+                                      "type": "string"
+                                    },
+                                    "type": "string"
+                                  },
+                                  "description": {
+                                    "def": {
+                                      "type": "optional",
+                                      "innerType": {
+                                        "def": {
+                                          "type": "string"
+                                        },
+                                        "type": "string"
+                                      }
+                                    },
+                                    "type": "optional"
+                                  }
+                                }
+                              },
+                              "type": "object"
+                            }
+                          },
+                          "type": "array",
+                          "element": {
+                            "def": {
+                              "type": "object",
+                              "shape": {
+                                "alias": {
+                                  "def": {
+                                    "type": "string"
+                                  },
+                                  "type": "string"
+                                },
+                                "title": {
+                                  "def": {
+                                    "type": "string"
+                                  },
+                                  "type": "string"
+                                },
+                                "description": {
+                                  "def": {
+                                    "type": "optional",
+                                    "innerType": {
+                                      "def": {
+                                        "type": "string"
+                                      },
+                                      "type": "string"
+                                    }
+                                  },
+                                  "type": "optional"
+                                }
+                              }
+                            },
+                            "type": "object"
+                          }
+                        },
+                        "automations": {
+                          "def": {
+                            "type": "array",
+                            "element": {
+                              "def": {
+                                "type": "object",
+                                "shape": {
+                                  "alias": {
+                                    "def": {
+                                      "type": "string"
+                                    },
+                                    "type": "string"
+                                  },
+                                  "title": {
+                                    "def": {
+                                      "type": "string"
+                                    },
+                                    "type": "string"
+                                  },
+                                  "description": {
+                                    "def": {
+                                      "type": "optional",
+                                      "innerType": {
+                                        "def": {
+                                          "type": "string"
+                                        },
+                                        "type": "string"
+                                      }
+                                    },
+                                    "type": "optional"
+                                  }
+                                }
+                              },
+                              "type": "object"
+                            }
+                          },
+                          "type": "array",
+                          "element": {
+                            "def": {
+                              "type": "object",
+                              "shape": {
+                                "alias": {
+                                  "def": {
+                                    "type": "string"
+                                  },
+                                  "type": "string"
+                                },
+                                "title": {
+                                  "def": {
+                                    "type": "string"
+                                  },
+                                  "type": "string"
+                                },
+                                "description": {
+                                  "def": {
+                                    "type": "optional",
+                                    "innerType": {
+                                      "def": {
+                                        "type": "string"
+                                      },
+                                      "type": "string"
+                                    }
+                                  },
+                                  "type": "optional"
+                                }
+                              }
+                            },
+                            "type": "object"
+                          }
+                        },
+                        "automationCount": {
+                          "def": {
+                            "type": "number",
+                            "checks": []
+                          },
+                          "type": "number",
+                          "isFinite": true
+                        },
+                        "developerCount": {
+                          "def": {
+                            "type": "number",
+                            "checks": []
+                          },
+                          "type": "number",
+                          "isFinite": true
+                        }
+                      }
+                    },
+                    "type": "object"
+                  }
+                },
+                "type": "record",
+                "keyType": {
+                  "def": {
+                    "type": "string"
+                  },
+                  "type": "string"
+                },
+                "valueType": {
+                  "def": {
+                    "type": "object",
+                    "shape": {
+                      "description": {
+                        "def": {
+                          "type": "optional",
+                          "innerType": {
+                            "def": {
+                              "type": "string"
+                            },
+                            "type": "string"
+                          }
+                        },
+                        "type": "optional"
+                      },
+                      "heading": {
+                        "def": {
+                          "type": "optional",
+                          "innerType": {
+                            "def": {
+                              "type": "string"
+                            },
+                            "type": "string"
+                          }
+                        },
+                        "type": "optional"
+                      },
+                      "overview": {
+                        "def": {
+                          "type": "optional",
+                          "innerType": {
+                            "def": {
+                              "type": "object",
+                              "shape": {
+                                "alias": {
+                                  "def": {
+                                    "type": "string"
+                                  },
+                                  "type": "string"
+                                },
+                                "scope": {
+                                  "def": {
+                                    "type": "enum",
+                                    "entries": {
+                                      "platform": "platform",
+                                      "company": "company"
+                                    }
+                                  },
+                                  "type": "enum",
+                                  "enum": {
+                                    "platform": "platform",
+                                    "company": "company"
+                                  },
+                                  "options": ["platform", "company"]
+                                }
+                              }
+                            },
+                            "type": "object"
+                          }
+                        },
+                        "type": "optional"
+                      },
+                      "summary": {
+                        "def": {
+                          "type": "optional",
+                          "innerType": {
+                            "def": {
+                              "type": "object",
+                              "shape": {
+                                "alias": {
+                                  "def": {
+                                    "type": "string"
+                                  },
+                                  "type": "string"
+                                },
+                                "scope": {
+                                  "def": {
+                                    "type": "enum",
+                                    "entries": {
+                                      "platform": "platform",
+                                      "company": "company"
+                                    }
+                                  },
+                                  "type": "enum",
+                                  "enum": {
+                                    "platform": "platform",
+                                    "company": "company"
+                                  },
+                                  "options": ["platform", "company"]
+                                },
+                                "args": {
+                                  "def": {
+                                    "type": "optional",
+                                    "innerType": {
+                                      "def": {
+                                        "type": "record",
+                                        "keyType": {
+                                          "def": {
+                                            "type": "string"
+                                          },
+                                          "type": "string"
+                                        },
+                                        "valueType": {
+                                          "def": {
+                                            "type": "string"
+                                          },
+                                          "type": "string"
+                                        }
+                                      },
+                                      "type": "record",
+                                      "keyType": {
+                                        "def": {
+                                          "type": "string"
+                                        },
+                                        "type": "string"
+                                      },
+                                      "valueType": {
+                                        "def": {
+                                          "type": "string"
+                                        },
+                                        "type": "string"
+                                      }
+                                    }
+                                  },
+                                  "type": "optional"
+                                },
+                                "home": {
+                                  "def": {
+                                    "type": "optional",
+                                    "innerType": {
+                                      "def": {
+                                        "type": "boolean"
+                                      },
+                                      "type": "boolean"
+                                    }
+                                  },
+                                  "type": "optional"
+                                },
+                                "homeArgs": {
+                                  "def": {
+                                    "type": "optional",
+                                    "innerType": {
+                                      "def": {
+                                        "type": "record",
+                                        "keyType": {
+                                          "def": {
+                                            "type": "string"
+                                          },
+                                          "type": "string"
+                                        },
+                                        "valueType": {
+                                          "def": {
+                                            "type": "string"
+                                          },
+                                          "type": "string"
+                                        }
+                                      },
+                                      "type": "record",
+                                      "keyType": {
+                                        "def": {
+                                          "type": "string"
+                                        },
+                                        "type": "string"
+                                      },
+                                      "valueType": {
+                                        "def": {
+                                          "type": "string"
+                                        },
+                                        "type": "string"
+                                      }
+                                    }
+                                  },
+                                  "type": "optional"
+                                },
+                                "progressive": {
+                                  "def": {
+                                    "type": "optional",
+                                    "innerType": {
+                                      "def": {
+                                        "type": "boolean"
+                                      },
+                                      "type": "boolean"
+                                    }
+                                  },
+                                  "type": "optional"
+                                }
+                              }
+                            },
+                            "type": "object"
+                          }
+                        },
+                        "type": "optional"
+                      },
+                      "contextualActions": {
+                        "def": {
+                          "type": "optional",
+                          "innerType": {
+                            "def": {
+                              "type": "boolean"
+                            },
+                            "type": "boolean"
+                          }
+                        },
+                        "type": "optional"
+                      },
+                      "actions": {
+                        "def": {
+                          "type": "array",
+                          "element": {
+                            "def": {
+                              "type": "object",
+                              "shape": {
+                                "alias": {
+                                  "def": {
+                                    "type": "string"
+                                  },
+                                  "type": "string"
+                                },
+                                "title": {
+                                  "def": {
+                                    "type": "string"
+                                  },
+                                  "type": "string"
+                                }
+                              }
+                            },
+                            "type": "object"
+                          }
+                        },
+                        "type": "array",
+                        "element": {
+                          "def": {
+                            "type": "object",
+                            "shape": {
+                              "alias": {
+                                "def": {
+                                  "type": "string"
+                                },
+                                "type": "string"
+                              },
+                              "title": {
+                                "def": {
+                                  "type": "string"
+                                },
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "type": "object"
+                        }
+                      },
+                      "destinations": {
+                        "def": {
+                          "type": "array",
+                          "element": {
+                            "def": {
+                              "type": "object",
+                              "shape": {
+                                "alias": {
+                                  "def": {
+                                    "type": "string"
+                                  },
+                                  "type": "string"
+                                },
+                                "title": {
+                                  "def": {
+                                    "type": "string"
+                                  },
+                                  "type": "string"
+                                },
+                                "description": {
+                                  "def": {
+                                    "type": "optional",
+                                    "innerType": {
+                                      "def": {
+                                        "type": "string"
+                                      },
+                                      "type": "string"
+                                    }
+                                  },
+                                  "type": "optional"
+                                }
+                              }
+                            },
+                            "type": "object"
+                          }
+                        },
+                        "type": "array",
+                        "element": {
+                          "def": {
+                            "type": "object",
+                            "shape": {
+                              "alias": {
+                                "def": {
+                                  "type": "string"
+                                },
+                                "type": "string"
+                              },
+                              "title": {
+                                "def": {
+                                  "type": "string"
+                                },
+                                "type": "string"
+                              },
+                              "description": {
+                                "def": {
+                                  "type": "optional",
+                                  "innerType": {
+                                    "def": {
+                                      "type": "string"
+                                    },
+                                    "type": "string"
+                                  }
+                                },
+                                "type": "optional"
+                              }
+                            }
+                          },
+                          "type": "object"
+                        }
+                      },
+                      "createActions": {
+                        "def": {
+                          "type": "array",
+                          "element": {
+                            "def": {
+                              "type": "object",
+                              "shape": {
+                                "alias": {
+                                  "def": {
+                                    "type": "string"
+                                  },
+                                  "type": "string"
+                                },
+                                "title": {
+                                  "def": {
+                                    "type": "string"
+                                  },
+                                  "type": "string"
+                                },
+                                "description": {
+                                  "def": {
+                                    "type": "optional",
+                                    "innerType": {
+                                      "def": {
+                                        "type": "string"
+                                      },
+                                      "type": "string"
+                                    }
+                                  },
+                                  "type": "optional"
+                                }
+                              }
+                            },
+                            "type": "object"
+                          }
+                        },
+                        "type": "array",
+                        "element": {
+                          "def": {
+                            "type": "object",
+                            "shape": {
+                              "alias": {
+                                "def": {
+                                  "type": "string"
+                                },
+                                "type": "string"
+                              },
+                              "title": {
+                                "def": {
+                                  "type": "string"
+                                },
+                                "type": "string"
+                              },
+                              "description": {
+                                "def": {
+                                  "type": "optional",
+                                  "innerType": {
+                                    "def": {
+                                      "type": "string"
+                                    },
+                                    "type": "string"
+                                  }
+                                },
+                                "type": "optional"
+                              }
+                            }
+                          },
+                          "type": "object"
+                        }
+                      },
+                      "automations": {
+                        "def": {
+                          "type": "array",
+                          "element": {
+                            "def": {
+                              "type": "object",
+                              "shape": {
+                                "alias": {
+                                  "def": {
+                                    "type": "string"
+                                  },
+                                  "type": "string"
+                                },
+                                "title": {
+                                  "def": {
+                                    "type": "string"
+                                  },
+                                  "type": "string"
+                                },
+                                "description": {
+                                  "def": {
+                                    "type": "optional",
+                                    "innerType": {
+                                      "def": {
+                                        "type": "string"
+                                      },
+                                      "type": "string"
+                                    }
+                                  },
+                                  "type": "optional"
+                                }
+                              }
+                            },
+                            "type": "object"
+                          }
+                        },
+                        "type": "array",
+                        "element": {
+                          "def": {
+                            "type": "object",
+                            "shape": {
+                              "alias": {
+                                "def": {
+                                  "type": "string"
+                                },
+                                "type": "string"
+                              },
+                              "title": {
+                                "def": {
+                                  "type": "string"
+                                },
+                                "type": "string"
+                              },
+                              "description": {
+                                "def": {
+                                  "type": "optional",
+                                  "innerType": {
+                                    "def": {
+                                      "type": "string"
+                                    },
+                                    "type": "string"
+                                  }
+                                },
+                                "type": "optional"
+                              }
+                            }
+                          },
+                          "type": "object"
+                        }
+                      },
+                      "automationCount": {
+                        "def": {
+                          "type": "number",
+                          "checks": []
+                        },
+                        "type": "number",
+                        "isFinite": true
+                      },
+                      "developerCount": {
+                        "def": {
+                          "type": "number",
+                          "checks": []
+                        },
+                        "type": "number",
+                        "isFinite": true
+                      }
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "type": "optional"
+          },
+          "visibleFor": ["enums.userRole.admin"],
+          "hiddenForPlatforms": [
+            "ai",
+            "mcp",
+            "cron",
+            "remote-skill",
+            "cli",
+            "cli-package"
+          ],
           "usage": {
             "response": true
           },

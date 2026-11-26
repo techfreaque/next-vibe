@@ -21,9 +21,27 @@ export const category: CategoryDefinition = {
     "es-ES": "Boletín",
     "sk-SK": "Newsletter",
   },
-  group: "comms",
+  description: {
+    "en-US": "Review subscribers, scheduled campaigns and delivery results.",
+    "en-GLOBAL":
+      "Review subscribers, scheduled campaigns and delivery results.",
+    "de-DE": "Prüfen Sie Abonnenten, geplante Kampagnen und Zustellergebnisse.",
+    "pl-PL": "Sprawdź subskrybentów, zaplanowane kampanie i wyniki wysyłek.",
+    "fr-FR":
+      "Consultez les abonnés, les campagnes prévues et les résultats des envois.",
+    "it-IT":
+      "Consulti gli iscritti, le campagne programmate e gli esiti degli invii.",
+    "es-ES":
+      "Consulte los suscriptores, las campañas programadas y los resultados de los envíos.",
+    "sk-SK":
+      "Skontrolujte odberateľov, plánované kampane a výsledky doručovania.",
+  },
+  group: "analytics",
   icon: "send",
   order: 20,
+  landing: {
+    actions: ["campaign-stats", "campaign-queue", "campaign-journey-variants"],
+  },
   defaultEntry: {
     [UserPermissionRole.ADMIN]: CAMPAIGN_STATS_ALIAS,
     [UserPermissionRole.CUSTOMER]: USER_ME_ALIAS,

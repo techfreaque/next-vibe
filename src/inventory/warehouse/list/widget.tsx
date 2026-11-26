@@ -129,7 +129,6 @@ export function InventoryWarehouseListWidget(
       );
       if (warehouse && onPick) {
         onPick(warehouse);
-        navigation.pop();
       }
       return;
     }

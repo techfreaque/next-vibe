@@ -1,4 +1,5 @@
 export const translations = {
+  lineRounding: "Line rounding",
   category: "Estimates",
   tags: { payment: "payment", estimate: "estimate" },
   post: {
@@ -46,7 +47,9 @@ export const translations = {
   },
   estimateId: { label: "Estimate ID", description: "The estimate to act on" },
   widget: {
-    send: "Send estimate",
+    send: "Mark as sent",
+    terms: "Terms",
+    noItems: "No line items on this estimate.",
     addLine: "Add line",
     accept: "Record acceptance",
     decline: "Record decline",

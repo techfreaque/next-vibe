@@ -15,7 +15,7 @@ export const translations: typeof enTranslations = {
       description: "Un lien client sera disponible après émission.",
     },
     response: {
-      success: "Facture envoyée",
+      success: "Facture émise",
       message: "Message d'état",
       viewUrl: "URL de consultation client",
     },
@@ -62,8 +62,8 @@ export const translations: typeof enTranslations = {
       },
     },
     success: {
-      title: "Succès",
-      description: "Facture marquée comme envoyée",
+      title: "Facture émise",
+      description: "Le lien de consultation peut être partagé.",
     },
   },
   invoiceId: {
@@ -71,10 +71,42 @@ export const translations: typeof enTranslations = {
     description: "ID de la facture à envoyer",
     placeholder: "Saisir l'ID de facture",
   },
+  delivery: {
+    share: "Partager la facture",
+    description:
+      "Copiez le lien de consultation ou envoyez-le à l’adresse enregistrée sur la facture.",
+    send: "Envoyer par e-mail",
+    confirmDescription:
+      "Envoyez le lien de la facture au destinataire confirmé.",
+    recipient: "Destinataire de la facture",
+    noRecipient:
+      "Aucune adresse admissible ne figure sur cette facture. Vous pouvez copier le lien.",
+    status: "État de l’e-mail",
+    notIssued: "Seules les factures émises peuvent être partagées.",
+    recipientChanged:
+      "Le destinataire a changé ou reste indisponible. Rouvrez le partage de la facture.",
+    emailSubject: "Facture {{number}}",
+    emailText:
+      "{{company}} a émis la facture {{number}}. Consultez-la ici :\n{{url}}",
+    states: {
+      ready: "Prêt à envoyer",
+      pending:
+        "L’envoi est en cours ou reste à confirmer. Les nouvelles tentatives sont suspendues.",
+      accepted: "Le serveur de messagerie a accepté le message.",
+      retryable:
+        "Le serveur de messagerie n’a pas été contacté. Vous pouvez réessayer.",
+      uncertain:
+        "L’issue de l’envoi reste indéterminée. Vérifiez auprès du destinataire avant de partager le lien séparément.",
+    },
+  },
   widget: {
     back: "Retour",
     submit: "Émettre la facture",
-    sent: "Facture émise",
+    sent: "Partagez le lien avec votre client pour lui transmettre la facture.",
+    copy: "Copier le lien client",
+    copied: "Lien copié",
+    copyError:
+      "Impossible de copier le lien. Sélectionnez et copiez l’adresse ci-dessus.",
     viewUrl: "Lien de consultation client",
   },
 };

@@ -32,7 +32,11 @@ export const translations = {
         title: "Access Denied",
         description: "You need Accountant or Admin role",
       },
-      conflict: { title: "Conflict", description: "Data conflict" },
+      conflict: {
+        title: "Conflict",
+        description:
+          "A bill already uses this supplier and invoice number. Check the existing bill before creating another.",
+      },
       server: {
         title: "Server Error",
         description: "Could not create the bill. Try again.",
@@ -71,6 +75,8 @@ export const translations = {
       addItem: "Add line",
       removeItem: "Remove line",
       itemError: "Check the description, quantity, price and VAT rate.",
+      supplierTotalReview:
+        "Compare this total with the supplier’s invoice. If it differs, review the original document before saving.",
       summary: "Bill summary",
       net: "Net",
       tax: "VAT",

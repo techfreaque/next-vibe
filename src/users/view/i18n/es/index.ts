@@ -35,7 +35,8 @@ export const translations: typeof enTranslations = {
     },
     notFound: {
       title: "Usuario no encontrado",
-      description: "Ningún usuario con este ID",
+      description:
+        "Esta cuenta ya no figura en el directorio. Seleccione otra cuenta.",
     },
     serverError: {
       title: "No se puede cargar el usuario",
@@ -86,15 +87,16 @@ export const translations: typeof enTranslations = {
       "Acciones: vibe user-update --id= {{id}} ANTERIVISO VENDIDOS-ROLE-add --id= {{id}} --role= <role> TEN VENDO DE REMOVISIÓN DE USUARIO --id= {{id}} --role= <role>",
   },
   kpi: {
-    paid: "Hora de la vida pagada",
-    paidHint: "{{count}} pagos exitosos, USD",
+    paid: "Total pagado",
+    paidHint: "Pagos: {{count}}",
     refunded: "Reembolsos",
-    credits: "Saldo acreedor",
-    creditsHint: "+ {{free}} créditos gratis",
+    credits: "Saldo de créditos",
+    creditsHint: "Créditos gratis disponibles: {{free}}",
     spent: "Créditos gastados",
     spentHint: "sobre {{usd}} de uso",
     lastSeen: "Última vista",
-    joined: "Joined {{date}}",
+    joined: "Alta: {{date}}",
+    justNow: "Ahora mismo",
   },
   payment: {
     subscription: "Suscripción",
@@ -186,12 +188,15 @@ export const translations: typeof enTranslations = {
     openMonitor: "Monitor de error abierto",
   },
   widget: {
+    creditAmount: "{{count}} créditos",
     unavailable: "Cuenta no disponible",
     chooseUser: "Elija una cuenta para ver",
     loading: "Cargando usuario...",
     never: "Nunca.",
     actions: {
-      browse: "Examinar cuentas",
+      retry: "Reintentar",
+      more: "Más",
+      browse: "Volver a las cuentas",
       edit: "Editar",
       addCredits: "Créditos de las subvenciones",
       delete: "Eliminar el usuario",
@@ -208,6 +213,8 @@ export const translations: typeof enTranslations = {
     remove: "Eliminar el papel",
   },
   tabs: {
+    section: "Sección del perfil",
+    scrollHint: "Desplázate para ver todas las secciones",
     overview: "Sinopsis",
     billing: "Facturación",
     credits: "Historia del crédito",

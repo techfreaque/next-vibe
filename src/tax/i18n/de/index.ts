@@ -9,11 +9,13 @@ export const translations: typeof enTranslations = {
   },
 
   rate: {
+    details: "Angaben zum Steuersatz",
     create: {
       title: "Steuersatz anlegen",
       titleShort: "Steuersatz erstellen",
       description: "Einen Steuersatz für Ihr Unternehmen hinzufügen",
       widget: {
+        save: "Steuersatz anlegen",
         backToList: "Zurück zu Steuersätzen",
       },
       companyId: {
@@ -108,6 +110,10 @@ export const translations: typeof enTranslations = {
       titleShort: "Steuersätze",
       description: "Alle konfigurierten Steuersätze Ihres Unternehmens",
       widget: {
+        actions: "Aktionen",
+        retry: "Erneut versuchen",
+        previous: "Zurück",
+        next: "Weiter",
         addRate: "Satz hinzufügen",
         labelDefault: "Standard",
         labelActive: "Aktiv",
@@ -212,6 +218,7 @@ export const translations: typeof enTranslations = {
       titleShort: "Steuersatz ändern",
       description: "Einen bestehenden Steuersatz anpassen",
       widget: {
+        save: "Steuersatz speichern",
         backToList: "Zurück zu Steuersätzen",
         failed: "Fehlgeschlagen",
       },
@@ -357,6 +364,7 @@ export const translations: typeof enTranslations = {
     description:
       "Prüfen Sie die erfasste Steuer auf Ausgangsrechnungen, Gutschriften, Eingangsrechnungen und Kassenverkäufen.",
     widget: {
+      retry: "Bericht erneut laden",
       scope:
         "Für Ausgangsrechnungen gilt das verknüpfte Buchungsdatum oder das Erstellungsdatum. Für Eingangsrechnungen gilt das Belegdatum. Kassenverkäufe zählen am Abschlusstag (UTC), wenn die Position einen positiven Steuersatz oder einen Steuerbetrag hat. Bei einem gemeinsamen Buchungssatz zählt die ausgestellte Rechnung.",
       empty: "Keine Belegpositionen entsprechen diesen Filtern.",
@@ -366,6 +374,8 @@ export const translations: typeof enTranslations = {
       unknownRate: "Steuersatz nicht ermittelbar",
       run: "Bericht erstellen",
       running: "Bericht wird erstellt…",
+      scopeHint:
+        "Vergleichen Sie die Steuer auf Verkäufe und Einkäufe nach Steuersatz für ein Unternehmen und einen Zeitraum.",
       selectCompany: "Wählen Sie das Unternehmen für diesen Bericht.",
     },
     currency: {
@@ -444,6 +454,8 @@ export const translations: typeof enTranslations = {
 
   enums: {
     reportDirection: {
+      nonDeductible: "Nicht abzugsfähige Vorsteuer",
+      reverseCharge: "Geschuldete Umsatzsteuer nach § 13b",
       posSales: "Kassenverkäufe",
       sales: "Ausgangsrechnungen",
       creditNotes: "Ausgangsgutschriften",

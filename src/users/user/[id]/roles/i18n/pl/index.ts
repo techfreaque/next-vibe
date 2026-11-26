@@ -19,7 +19,7 @@ export const translations: typeof enTranslations = {
         description: "Wybierz rolę do przyznania temu użytkownikowi",
       },
       id: {
-        label: "ID użytkownika",
+        label: "Użytkownik",
         description:
           "Unikalny identyfikator użytkownika, któremu ma być przyznana rola",
         placeholder: "Wprowadź ID użytkownika...",
@@ -99,7 +99,7 @@ export const translations: typeof enTranslations = {
         description: "Wybierz rolę do odwołania od tego użytkownika",
       },
       id: {
-        label: "ID użytkownika",
+        label: "Użytkownik",
         description:
           "Unikalny identyfikator użytkownika, któremu ma być odwołana rola",
         placeholder: "Wprowadź ID użytkownika...",

@@ -12,6 +12,7 @@ import {
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { EmailFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/email-field/widget";
+import { EntityPickerFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/entity-picker-field/widget";
 import { NumberFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/number-field/widget";
 import { PhoneFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/phone-field/widget";
 import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-field/widget";
@@ -151,9 +152,9 @@ export function VendorCreateWidget({
               fieldName="code"
               field={withValue(field.children.code, undefined, null)}
             />
-            <TextFieldWidget
+            <EntityPickerFieldWidget
               fieldName="companyId"
-              field={withValue(field.children.companyId, undefined, null)}
+              field={field.children.companyId}
             />
           </Div>
         </Div>

@@ -110,11 +110,14 @@ export const translations: typeof enTranslations = {
       "Verwenden Sie bei einem erneuten Versuch denselben Schlüssel. Nutzen Sie für eine weitere Zahlung einen neuen Schlüssel.",
   },
   accountNodeId: {
-    label: "Kontoknotens-ID",
-    description: "Optional: Buchungsknoten, der diese Zahlung erhalten hat",
-    placeholder: "Knotens-ID eingeben",
+    label: "Zahlungskonto",
+    description:
+      "Wählen Sie das Bank- oder Kassenkonto, auf dem die Zahlung eingegangen ist.",
+    placeholder: "Konto auswählen",
+    automatic: "Standardkonto verwenden",
   },
   widget: {
+    details: "Zahlungsdetails",
     back: "Zurück",
     submit: "Zahlung erfassen",
     paymentRecorded: "Zahlung wurde erfolgreich erfasst.",

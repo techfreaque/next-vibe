@@ -7,9 +7,10 @@ export const translations: typeof enTranslations = {
     list: "Liste",
   },
   get: {
-    title: "Abonnements de l'entreprise",
-    titleShort: "Abos entreprise",
-    description: "Lister tous les abonnements d'une entreprise",
+    title: "Abonnements du propriétaire",
+    titleShort: "Abonnements du propriétaire",
+    description:
+      "Consultez l’abonnement personnel du propriétaire de l’entreprise.",
     companyId: {
       label: "ID de l'entreprise",
       description: "L'entreprise dont les abonnements doivent être listés",

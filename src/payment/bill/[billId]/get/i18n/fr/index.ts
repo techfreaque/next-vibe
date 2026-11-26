@@ -91,6 +91,23 @@ export const translations: typeof enTranslations = {
     },
   },
   widget: {
+    lineReviewRequired:
+      "Le total des lignes diffère du montant enregistré. Vérifiez la facture fournisseur d’origine avant de la modifier ou de l’approuver.",
+    removeAction: "Supprimer",
+    removeLine: "Supprimer {{description}}",
+    grossTotal: "Total TTC",
+    taxPending:
+      "La taxe du fournisseur reste à confirmer. Vérifiez le montant sur le justificatif avant de réceptionner ou comptabiliser la facture.",
+    confirmSupplierTax: "Confirmer la taxe du fournisseur",
+    bankDocumentMissing:
+      "Justificatif fournisseur en attente. Associez-le ici ou confirmez le montant TTC sur la base du justificatif bancaire lors de l’approbation.",
+    bankDocumentTaxReview:
+      "Justificatif fournisseur associé après comptabilisation. Examinez séparément tout reclassement fiscal ou comptable. L’écriture initiale reste en place.",
+    linkBankDocument: "Associer le justificatif fournisseur",
+    inputVat: "Déduction de la TVA",
+    taxIncludedCost: "TVA incluse dans la charge",
+    reverseCharge: "TVA à payer par autoliquidation",
+
     markReceived: "Marquer comme reçue",
     back: "Retour",
     submit: "Rechercher la facture",
@@ -111,7 +128,9 @@ export const translations: typeof enTranslations = {
     approveBill: "Approuver la facture",
     payBill: "Payer la facture",
     addLine: "Ajouter une ligne",
-    viewJournalEntry: "Voir l'écriture comptable",
+    accountingEvidence: "Écritures comptables",
+    approvalJournal: "Comptabilisation de la facture",
+    settlementJournal: "Comptabilisation du paiement",
     approveConfirmTitle: "Approuver cette facture ?",
     approveConfirmDescription:
       "Le statut de la facture va avancer. Une fois approuvée, une écriture comptable sera passée. Cette action est irréversible.",

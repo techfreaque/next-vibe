@@ -79,6 +79,10 @@ export const translations: typeof enTranslations = {
       description: "Grafico dei conti recuperati con successo",
     },
     widget: {
+      searchPage: "Cerca per nome o codice in questa pagina",
+      noMatches: "Nessun conto corrispondente in questa pagina",
+      previousPage: "Pagina precedente",
+      nextPage: "Pagina successiva",
       debitSide: "Dare",
       creditSide: "Avere",
       loading: "Conti di carico...",

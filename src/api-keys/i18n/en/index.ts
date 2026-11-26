@@ -2,6 +2,13 @@ export const translations = {
   category: "Account",
 
   widget: {
+    adminOverview:
+      "Manage your account’s keys. Use the API docs to connect an app.",
+    loadFailed: "Could not load your API keys",
+    retry: "Try again",
+    revokeNamed: "Revoke {{name}}",
+    revokeConfirm: "Apps using this key will lose access immediately.",
+    cancel: "Cancel",
     upgradeTitle: "API access comes with every plan, from {{subPrice}} a month",
     upgradeBody: "Any plan unlocks API keys. Free and bonus credits don't.",
     upgradeCta: "Unlock the API",

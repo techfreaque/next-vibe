@@ -143,6 +143,9 @@ export interface BaseWidgetContext<TEndpoint extends CreateApiEndpointAny> {
     };
     read?: {
       refetch: () => Promise<void>;
+      refetchResult?: () => Promise<
+        ResponseType<TEndpoint["types"]["ResponseOutput"]>
+      >;
       remove?: () => void;
       isLoading?: boolean;
       isLoadingFresh?: boolean;

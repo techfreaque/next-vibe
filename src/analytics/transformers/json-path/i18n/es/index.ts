@@ -6,13 +6,13 @@ export const translations: typeof enTranslations = {
     title: "Sendero JSON",
     titleShort: "Sendero JSON",
     description:
-      "JSON Path - extrae un valor a través de la ruta de notación de puntos (superada, devuelve vacía)",
+      "Extrae el valor observado o un campo numérico de los metadatos.",
     fields: {
       source: { label: "Fuente", description: "Serie de tiempo de entrada" },
       path: {
         label: "Camino",
         description:
-          "Camino de la notación de puntos para extraer (no soportado más)",
+          "Introduzca value o una ruta de metadatos como meta.close.",
       },
       resolution: { label: "Resolución", description: "Plazo de cálculo" },
       range: { label: "Rango", description: "Rango de tiempo para calcular" },

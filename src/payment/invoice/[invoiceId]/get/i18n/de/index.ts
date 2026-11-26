@@ -16,6 +16,7 @@ export const translations: typeof enTranslations = {
     },
     response: {
       companyName: "Unternehmen",
+      remainingCredit: "Verfügbarer Gutschriftsbetrag",
       amountPaid: "Gezahlter Betrag",
       amountDue: "Offener Betrag",
       id: "Rechnungs-ID",
@@ -93,6 +94,9 @@ export const translations: typeof enTranslations = {
     placeholder: "Rechnungs-ID eingeben",
   },
   widget: {
+    sourceQuote: "Ursprüngliches Angebot",
+    openSourceQuote: "Ursprüngliches Angebot öffnen",
+    draftReference: "Rechnungsentwurf Nr. {{number}}",
     recentReminderDrafts: "Aktuelle Erinnerungsentwürfe",
     receipts: "Zahlungshistorie",
     receiptDate: "Zahlungsdatum",
@@ -128,6 +132,12 @@ export const translations: typeof enTranslations = {
     recordPayment: "Zahlung erfassen",
     sendReminder: "Erinnerung vorbereiten",
     void: "Stornieren",
+    remainingBalance: "Offener Betrag",
+    originalTotal: "Ursprünglicher Rechnungsbetrag",
+    voidReversalDate: "Stornodatum",
+    viewOriginalJournal: "Originalbuchung öffnen",
+    viewVoidReversal: "Stornobuchung öffnen",
+    backToInvoiceList: "Zurück zu den Rechnungen",
     viewJournalEntry: "Buchungssatz ansehen",
     status: {
       draft: "Entwurf",

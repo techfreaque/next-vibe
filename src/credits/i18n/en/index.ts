@@ -562,6 +562,7 @@ export const translations = {
       lookupDescription: "Enter the exact account email address or user ID.",
       renewsOn: "Renews {{date}}",
       endsOn: "Ends {{date}}",
+      packBalance: "Credits in packs",
       freeBalance: "Free credits",
       balanceSplit: "{{total}} total · {{paid}} in packs · {{free}} free",
       stepHint:
@@ -599,7 +600,7 @@ export const translations = {
     },
     post: {
       stepTwo: "Step 2 of 2: amount",
-      testerPreset: "3,000 (tester)",
+      testerPreset: "Use {{amount}} credits",
       preview: "Balance {{before}} → {{after}} (+{{amount}})",
       title: "Add Credits",
       titleShort: "Add Credits",
@@ -618,8 +619,8 @@ export const translations = {
       },
       amount: {
         label: "Amount in credits",
-        description: "Enter a whole number of bonus credits.",
-        placeholder: "137",
+        description: "Enter at least 1 credit. Use whole numbers only.",
+        placeholder: "e.g. 25",
       },
       packType: {
         label: "Pack Type",

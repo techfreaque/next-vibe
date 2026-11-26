@@ -40,7 +40,8 @@ beforeAll(async () => {
     );
     CREATE TABLE journal_entries (
       id uuid PRIMARY KEY, company_id uuid, entry_number text, description text,
-      date timestamp, status text, reversed_by_id uuid
+      date timestamp, status text, reversed_by_id uuid, source_id uuid,
+      source_type text NOT NULL DEFAULT 'manual' 
     );
     CREATE TABLE journal_entry_lines (
       id uuid PRIMARY KEY, journal_entry_id uuid, account_id uuid,
@@ -64,6 +65,33 @@ beforeAll(async () => {
       ),
     ).text(),
   );
+  await pg.exec(`
+    ALTER TABLE bank_statement_lines
+      ADD COLUMN value_date date,
+      ADD COLUMN native_amount numeric(14,4),
+      ADD COLUMN native_currency text,
+      ADD COLUMN fee_amount numeric(14,4),
+      ADD COLUMN fee_currency text,
+      ADD COLUMN source_format text,
+      ADD COLUMN source_feed text,
+      ADD COLUMN source_reference text,
+      ADD COLUMN stable_fingerprint text,
+      ADD COLUMN description text,
+      ADD COLUMN counterparty text,
+      ADD COLUMN adjustment_journal_entry_id uuid,
+      ADD COLUMN adjustment_reversal_entry_id uuid,
+      ADD COLUMN supplier_bill_id uuid,
+      ADD COLUMN match_kind text;
+    CREATE TABLE finance_bank_feed_mappings (
+      consent_account_id uuid, actor_id uuid, company_id uuid, account_id uuid
+    );
+    CREATE TABLE bank_account_reconciliation_settings (
+      account_id uuid PRIMARY KEY, company_id uuid, booked_currency text,
+      foreign_currency text, max_fx_difference numeric(14,4), max_fx_bps int,
+      max_date_distance_days int, gain_account_id uuid, loss_account_id uuid,
+      fee_account_id uuid, configured_by_user_id uuid, updated_at timestamp
+    );
+  `);
 });
 afterAll(() => pg.close());
 

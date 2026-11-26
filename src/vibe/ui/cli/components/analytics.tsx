@@ -9,7 +9,6 @@ import { Box, Text } from "ink";
 import type { JSX } from "react";
 
 import { useIsMcp } from "../../../unified-ui/_shared/use-widget-context";
-import { ANALYTICS_BUCKET_KEY } from "../../../unified-ui/analytics/enum";
 import {
   formatAnalyticsValue,
   formatBucketLabel,
@@ -220,9 +219,7 @@ export function TimeSeriesChart({
           {title}
           <Text dimColor>
             {"  "}
-            {t("analytics.chart.byGranularity", {
-              granularity: t(ANALYTICS_BUCKET_KEY[bucket]).toLowerCase(),
-            })}
+            {t(`analytics.chart.groupedBy.${bucket}`)}
           </Text>
           {drillHint ? <Text color="cyan">{`  -> ${drillHint}`}</Text> : null}
         </Text>
@@ -515,9 +512,7 @@ export function AnalyticsToolbar({
   const label = formatPeriod(period.from, period.to, locale);
   const by = hideGranularity
     ? ""
-    : ` (${t("analytics.chart.byGranularity", {
-        granularity: t(ANALYTICS_BUCKET_KEY[period.bucket]).toLowerCase(),
-      })})`;
+    : ` (${t(`analytics.chart.groupedBy.${period.bucket}`)})`;
   const filterText =
     filters && filters.length > 0
       ? ` ${t("analytics.chart.filters")}: ${filters

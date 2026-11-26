@@ -119,6 +119,13 @@ export const translations = {
       name: "Product Name",
     },
     widget: {
+      catalogCompany: "Catalog company",
+      billingCadence: "Billing cadence",
+      oneTime: "One-time purchase",
+      personalCatalog: "Personal catalog",
+      companyUnavailable: "Company name unavailable",
+      couldNotLoad: "Could not load the product.",
+      retry: "Retry",
       backToList: "Back to Products",
       back: "Back",
     },

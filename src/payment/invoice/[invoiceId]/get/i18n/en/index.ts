@@ -14,6 +14,7 @@ export const translations = {
     },
     response: {
       companyName: "Company",
+      remainingCredit: "Credit available",
       amountPaid: "Amount paid",
       amountDue: "Amount due",
       id: "Invoice ID",
@@ -91,6 +92,9 @@ export const translations = {
     placeholder: "Enter invoice ID",
   },
   widget: {
+    sourceQuote: "Source quote",
+    openSourceQuote: "Open source quote",
+    draftReference: "Draft invoice #{{number}}",
     recentReminderDrafts: "Recent reminder drafts",
     receipts: "Payment history",
     receiptDate: "Receipt date",
@@ -126,6 +130,12 @@ export const translations = {
     recordPayment: "Record Payment",
     sendReminder: "Prepare reminder",
     void: "Void",
+    remainingBalance: "Remaining balance",
+    originalTotal: "Original invoice total",
+    voidReversalDate: "Reversal date",
+    viewOriginalJournal: "Open original journal entry",
+    viewVoidReversal: "Open reversal entry",
+    backToInvoiceList: "Back to invoices",
     viewJournalEntry: "View Journal Entry",
     status: {
       draft: "Draft",

@@ -75,6 +75,14 @@ export const { GET } = createEndpoint({
         type: WidgetType.TEXT,
         schema: z.coerce.number(),
       }),
+      totalRevenueMeasuredPurchases: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        schema: z.number().int().nonnegative().optional(),
+      }),
+      totalRevenuePurchaseCount: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        schema: z.number().int().nonnegative().optional(),
+      }),
       totalRevenueDescription: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: scopedTranslation.translationKeySchema(),
@@ -115,21 +123,42 @@ export const { GET } = createEndpoint({
   examples: {
     responses: {
       default: {
-        totalSignupsTitle: "fields.totalSignups",
+        totalSignupsTitle: "stats.fields.totalSignups",
         totalSignupsValue: 10,
-        totalSignupsDescription: "fields.totalSignupsDescription",
+        totalSignupsDescription: "stats.fields.totalSignupsDescription",
 
-        totalRevenueTitle: "fields.totalRevenue",
+        totalRevenueTitle: "stats.fields.totalRevenue",
         totalRevenueValue: 8000,
-        totalRevenueDescription: "fields.totalRevenueDescription",
+        totalRevenueMeasuredPurchases: 3,
+        totalRevenuePurchaseCount: 4,
+        totalRevenueDescription: "stats.fields.totalRevenueDescription",
 
-        totalEarnedTitle: "fields.totalEarned",
+        totalEarnedTitle: "stats.fields.totalEarned",
         totalEarnedValue: 1600,
-        totalEarnedDescription: "fields.totalEarnedDescription",
+        totalEarnedDescription: "stats.fields.totalEarnedDescription",
 
-        availableCreditsTitle: "fields.availableBalance",
+        availableCreditsTitle: "stats.fields.availableBalance",
         availableCreditsValue: 1600,
-        availableCreditsDescription: "fields.availableBalanceDescription",
+        availableCreditsDescription:
+          "stats.fields.availableBalanceDescriptionLow",
+        availableCreditsReadyForPayout: false,
+      },
+      empty: {
+        totalSignupsTitle: "stats.fields.totalSignups",
+        totalSignupsValue: 0,
+        totalSignupsDescription: "stats.fields.totalSignupsDescription",
+        totalRevenueTitle: "stats.fields.totalRevenue",
+        totalRevenueValue: 0,
+        totalRevenueMeasuredPurchases: 0,
+        totalRevenuePurchaseCount: 0,
+        totalRevenueDescription: "stats.fields.totalRevenueDescription",
+        totalEarnedTitle: "stats.fields.totalEarned",
+        totalEarnedValue: 0,
+        totalEarnedDescription: "stats.fields.totalEarnedDescription",
+        availableCreditsTitle: "stats.fields.availableBalance",
+        availableCreditsValue: 0,
+        availableCreditsDescription:
+          "stats.fields.availableBalanceDescriptionLow",
         availableCreditsReadyForPayout: false,
       },
     },

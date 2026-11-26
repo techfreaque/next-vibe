@@ -8,7 +8,7 @@
 import { ChevronDown } from "next-vibe/ui/components/icons/ChevronDown";
 import { Phone } from "next-vibe/ui/components/icons/Phone";
 import type { JSX } from "react";
-import { useMemo, useState } from "react";
+import { useId, useMemo, useState } from "react";
 
 import { useTranslation } from "../../../core/i18n/core/client";
 import { cn } from "../../../unified-ui/_shared/cn";
@@ -52,6 +52,7 @@ export const COUNTRIES: CountryData[] = [
   { code: "DK", name: "Denmark", prefix: "+45", flag: "🇩🇰" },
   { code: "FI", name: "Finland", prefix: "+358", flag: "🇫🇮" },
   { code: "PL", name: "Poland", prefix: "+48", flag: "🇵🇱" },
+  { code: "SK", name: "Slovakia", prefix: "+421", flag: "🇸🇰" },
   { code: "CZ", name: "Czech Republic", prefix: "+420", flag: "🇨🇿" },
   { code: "HU", name: "Hungary", prefix: "+36", flag: "🇭🇺" },
   { code: "PT", name: "Portugal", prefix: "+351", flag: "🇵🇹" },
@@ -70,6 +71,16 @@ export const COUNTRIES: CountryData[] = [
   { code: "ZA", name: "South Africa", prefix: "+27", flag: "🇿🇦" },
 ];
 
+export function localizedCallingCountries(locale: string): CountryData[] {
+  const names = new Intl.DisplayNames([locale.split("-")[0]], {
+    type: "region",
+  });
+  return COUNTRIES.map((country) => ({
+    ...country,
+    name: names.of(country.code) ?? country.name,
+  }));
+}
+
 export type PhoneFieldProps = {
   value?: string;
   onChange: (value: string) => void;
@@ -79,6 +90,8 @@ export type PhoneFieldProps = {
   preferredCountries?: string[];
   disabled?: boolean;
   name?: string;
+  label?: string;
+  id?: string;
 } & StyleType;
 
 export function PhoneField({
@@ -92,10 +105,16 @@ export function PhoneField({
   className,
   style,
   name,
+  label,
+  id,
 }: PhoneFieldProps): JSX.Element {
+  const listboxId = useId();
   const { locale } = useTranslation();
   const { t: _t } = scopedTranslation.scopedT(locale);
   const [open, setOpen] = useState(false);
+  const countries = useMemo(() => localizedCallingCountries(locale), [locale]);
+  const initialCountry =
+    defaultCountry === "GLOBAL" ? locale.split("-")[1] : defaultCountry;
 
   // Parse the current value to extract country and number
   const parsePhoneValue = (
@@ -103,13 +122,13 @@ export function PhoneField({
   ): { country: string; number: string } => {
     if (!phoneValue) {
       return {
-        country: defaultCountry || "US",
+        country: initialCountry || "US",
         number: "",
       };
     }
 
     // Find matching country by prefix
-    const matchingCountry = COUNTRIES.find((country) =>
+    const matchingCountry = countries.find((country) =>
       phoneValue.startsWith(country.prefix),
     );
 
@@ -120,27 +139,27 @@ export function PhoneField({
       };
     }
 
-    return { country: defaultCountry || "US", number: phoneValue };
+    return { country: initialCountry || "US", number: phoneValue };
   };
 
   const { country: selectedCountry, number: phoneNumber } =
     parsePhoneValue(value);
   const currentCountry =
-    COUNTRIES.find((c) => c.code === selectedCountry) || COUNTRIES[0];
+    countries.find((c) => c.code === selectedCountry) || countries[0];
 
   // Organize countries with preferred ones first
   const organizedCountries = useMemo(() => {
-    const preferred = COUNTRIES.filter((country) =>
+    const preferred = countries.filter((country) =>
       preferredCountries.includes(country.code),
     );
-    const others = COUNTRIES.filter(
+    const others = countries.filter(
       (country) => !preferredCountries.includes(country.code),
     );
     return { preferred, others };
-  }, [preferredCountries]);
+  }, [countries, preferredCountries]);
 
   const handleCountrySelect = (countryCode: string): void => {
-    const newCountry = COUNTRIES.find((c) => c.code === countryCode);
+    const newCountry = countries.find((c) => c.code === countryCode);
     if (newCountry) {
       const newValue = phoneNumber
         ? `${newCountry.prefix} ${phoneNumber}`
@@ -168,7 +187,10 @@ export function PhoneField({
             variant="outline"
             role="combobox"
             aria-expanded={open}
-            aria-controls="country-listbox"
+            aria-label={_t("common.callingCode", {
+              prefix: currentCountry.prefix,
+            })}
+            aria-controls={listboxId}
             className={cn(
               "w-[120px] justify-between rounded-r-none border-r-0 h-10",
               disabled && "cursor-not-allowed opacity-50",
@@ -183,7 +205,7 @@ export function PhoneField({
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-[300px] p-0" align="start">
-          <Command id="country-listbox">
+          <Command id={listboxId}>
             <CommandInput placeholder={_t("common.searchCountries")} />
             <CommandList className="max-h-[200px]">
               <CommandEmpty>{_t("common.noCountryFound")}</CommandEmpty>
@@ -237,6 +259,8 @@ export function PhoneField({
         <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
           type="tel"
+          id={id}
+          aria-label={label ?? _t("common.enterPhoneNumber")}
           value={phoneNumber}
           onChange={(e) => handleNumberChange(e.target.value)}
           onBlur={onBlur}

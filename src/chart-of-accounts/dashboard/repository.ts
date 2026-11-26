@@ -183,12 +183,26 @@ export class AccountingDashboardRepository {
           )
         : {};
 
+      const canConfigure =
+        authResult.data.role === CompanyMemberRole.ADMIN ||
+        authResult.data.role === CompanyMemberRole.OWNER;
+      const hasSetup = Number(accountCount) > 0;
+      const canPost =
+        canConfigure || authResult.data.role === CompanyMemberRole.ACCOUNTANT;
+      let primaryActionAlias: AccountingDashboardResponseOutput["primaryActionAlias"];
+      if (!hasSetup) {
+        primaryActionAlias = canConfigure ? "coa-setup" : undefined;
+      } else if (!openPeriod) {
+        primaryActionAlias = canConfigure ? "coa-period-create" : undefined;
+      } else if (canPost) {
+        primaryActionAlias = "coa-journal-create";
+      }
+
       return success({
         selectedCompanyId: company.id,
         selectedCompanyName: company.name,
-        canConfigure:
-          authResult.data.role === CompanyMemberRole.ADMIN ||
-          authResult.data.role === CompanyMemberRole.OWNER,
+        canConfigure,
+        primaryActionAlias,
         currentPeriodId: openPeriod?.id ?? null,
         currentPeriodName: openPeriod?.name ?? null,
         currentPeriodStatus: openPeriod?.status ?? null,
@@ -199,7 +213,7 @@ export class AccountingDashboardRepository {
         accountCount: Number(accountCount),
         draftEntryCount: Number(draftEntryCount),
         postedThisMonthCount: Number(postedThisMonthCount),
-        hasSetup: Number(accountCount) > 0,
+        hasSetup,
         currency,
         ...money,
       });

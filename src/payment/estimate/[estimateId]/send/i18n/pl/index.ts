@@ -4,11 +4,11 @@ export const translations: typeof enTranslations = {
   category: "Oferty",
   tags: { payment: "płatność", estimate: "oferta" },
   post: {
-    title: "Wyślij ofertę",
-    titleShort: "Wyślij wycenę",
+    title: "Oznacz ofertę jako wysłaną",
+    titleShort: "Oznacz ofertę jako wysłaną",
     description: "Oznacz ofertę jako wysłaną do klienta",
     form: {
-      title: "Wyślij ofertę",
+      title: "Oznacz ofertę jako wysłaną",
       description: "Oznacz ofertę jako wysłaną do klienta",
     },
     response: { success: "Sukces", message: "Komunikat statusu" },
@@ -52,9 +52,8 @@ export const translations: typeof enTranslations = {
   },
   widget: {
     back: "Wróć",
-    submit: "Wyślij ofertę",
+    submit: "Oznacz jako wysłaną",
     sent: "Oferta oznaczona jako wysłana do klienta.",
-    sendNote:
-      "Status oferty zostanie zmieniony na 'Wysłana'. Klient będzie mógł ją zaakceptować lub odrzucić.",
+    sendNote: "Potwierdź wysłanie oferty do klienta.",
   },
 };

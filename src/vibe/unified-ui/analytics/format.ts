@@ -4,6 +4,7 @@
  */
 
 import type { CountryLanguage } from "../../core/i18n/core/config";
+import { formatMoney } from "../_shared/format-money";
 import type { AnalyticsBucket } from "./enum";
 
 export type AnalyticsValueFormat =
@@ -46,11 +47,7 @@ export function formatAnalyticsValue(
         minimumFractionDigits: 0,
       }).format(value);
     case "currency":
-      return new Intl.NumberFormat(loc, {
-        style: "currency",
-        currency,
-        maximumFractionDigits: Math.abs(value) >= 1000 ? 0 : 2,
-      }).format(value);
+      return formatMoney(value, currency, loc);
     case "compact":
       return new Intl.NumberFormat(loc, {
         notation: "compact",

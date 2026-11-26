@@ -20,8 +20,7 @@ import { z } from "zod";
 
 import { CATEGORY_REGISTRY } from "@/generated/categories/registry";
 
-import { getEnvAvailability } from "../agent/env-availability";
-import { getUnavailableModelIds } from "../agent/models/all-models";
+import { isAdminToolConfigured } from "../core/definition/admin-availability.server";
 import type { CreateApiEndpointAny } from "../core/definition/endpoint-base";
 import {
   enrichJsonSchemaFromFields,
@@ -47,6 +46,11 @@ import { dropEnumValues } from "../platforms/ai/tool-json-schema";
 import { Platform } from "../platforms/platforms";
 import { RunningTaskRegistry } from "../tasks/watchdog/registry";
 import { generateSchemaForUsage } from "../unified-ui/_shared/utils";
+import {
+  buildAdminCatalogDestinations,
+  getAdminCategoryLandings,
+} from "./admin-catalog-model";
+import { classifyAdminCatalog } from "./admin-classification";
 import type {
   HelpGetRequestOutput,
   HelpGetResponseOutput,
@@ -66,6 +70,7 @@ import {
   getCatalogOverview,
   getMetaPlatforms,
   getRecordSearchTargets,
+  rankWorkspaceMatches,
   resolveEffectiveUser,
   searchCatalog,
 } from "./repository/meta-filter";
@@ -247,10 +252,20 @@ export class HelpRepository {
 
     const isAdmin =
       !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN);
+    const isCli =
+      platform === Platform.CLI || platform === Platform.CLI_PACKAGE;
+    const isWebPlatform = !isCompact && !isCli;
     const userRoles = filterUserPermissionRoles(user.roles);
-    const unavailableModelIds = getUnavailableModelIds(
-      await getEnvAvailability(),
-    );
+    // A normal workspace or category only needs metadata. Resolve live model
+    // availability once if this request actually expands a parameter schema.
+    let modelIds: Promise<ReadonlySet<string>> | undefined;
+    const unavailableModelIds = (): Promise<ReadonlySet<string>> =>
+      (modelIds ??= Promise.all([
+        import("../agent/env-availability"),
+        import("../agent/models/all-models"),
+      ]).then(async ([environment, models]) =>
+        models.getUnavailableModelIds(await environment.getEnvAvailability()),
+      ));
 
     const effectivePageSize =
       data.pageSize ??
@@ -281,7 +296,10 @@ export class HelpRepository {
       `help:metadata-import:${language}`,
     );
     const metaModule = await metadata[language]().finally(endMetadataLoad);
-    const allMeta = metaModule.endpointsMeta;
+    const allMeta =
+      isAdmin && isWebPlatform
+        ? metaModule.endpointsMeta.filter(isAdminToolConfigured)
+        : metaModule.endpointsMeta;
 
     // Discovery platform - what platform context are we listing tools for?
     // Compact (AI/MCP/CRON): always the actual platform so counts/filtering match
@@ -305,17 +323,25 @@ export class HelpRepository {
       discoveryPlatform,
       effectiveUser,
     );
-    const isCli =
-      platform === Platform.CLI || platform === Platform.CLI_PACKAGE;
-    const isWebPlatform = !isCompact && !isCli;
-    const webMeta = !isCompact
+    const permittedWebMeta = !isCompact
       ? filterMetaForUser(allMeta, Platform.NEXT_PAGE, effectiveUser)
       : [];
+    const webMeta =
+      isAdmin && isWebPlatform && !viewAsRole
+        ? classifyAdminCatalog(permittedWebMeta, CATEGORY_REGISTRY)
+        : permittedWebMeta;
     const allowedForProduction = (tool: EndpointMeta): boolean =>
       !isAdmin ||
       !data.includeProdOnly ||
       !tool.allowedRoles.includes(PlatformMarker.PRODUCTION_OFF);
     const webCatalog = webMeta.filter(allowedForProduction);
+    const webCategories = isWebPlatform
+      ? buildCategories(
+          webCatalog.filter(
+            (tool) => !isAdmin || !!viewAsRole || !tool.admin?.hidden,
+          ),
+        )
+      : undefined;
     const recordSearchTargets =
       isAdmin && isWebPlatform && !viewAsRole
         ? getRecordSearchTargets(CATEGORY_REGISTRY, webCatalog)
@@ -408,6 +434,18 @@ export class HelpRepository {
         ? {
             currentPlatform: platform,
             currentEnv,
+            ...(isWebPlatform
+              ? {
+                  webCategories,
+                  adminCatalogDestinations:
+                    buildAdminCatalogDestinations(webCatalog),
+                  adminCategoryLandings: getAdminCategoryLandings(
+                    CATEGORY_REGISTRY,
+                    webCatalog,
+                    locale,
+                  ),
+                }
+              : {}),
           }
         : {};
 
@@ -463,7 +501,7 @@ export class HelpRepository {
             platform,
             userRoles,
             logger,
-            unavailableModelIds,
+            await unavailableModelIds(),
           ) ?? undefined)
         : undefined;
       const callAs = matchedTool.toolName;
@@ -517,7 +555,7 @@ export class HelpRepository {
               platform,
               userRoles,
               logger,
-              unavailableModelIds,
+              await unavailableModelIds(),
             ) ?? undefined)
           : undefined;
         const callAs = exactMatch.toolName;
@@ -557,6 +595,9 @@ export class HelpRepository {
 
     if (query) {
       filtered = searchCatalog(filtered, query, (tool) => tool.toolName);
+      if (searchWebCatalog && isAdmin && !viewAsRole) {
+        filtered = rankWorkspaceMatches(filtered, query);
+      }
     }
 
     // Web: if no filters at all (no query, no category, no toolName), return categories only.
@@ -630,7 +671,7 @@ export class HelpRepository {
                   platform,
                   userRoles,
                   logger,
-                  unavailableModelIds,
+                  await unavailableModelIds(),
                 ) ?? undefined)
               : undefined;
             return serializeMeta(
@@ -716,7 +757,7 @@ export class HelpRepository {
                 platform,
                 userRoles,
                 logger,
-                unavailableModelIds,
+                await unavailableModelIds(),
               ) ?? undefined)
             : undefined;
           return serializeMeta(m, parameters, true, getToolPlatforms(m));
@@ -742,7 +783,7 @@ export class HelpRepository {
       totalCount,
       matchedCount,
       categories,
-      webCategories: isWebPlatform ? buildCategories(webCatalog) : undefined,
+      webCategories,
       recordSearchTargets,
       erpWorkflowAliases,
       erpNavigationAliases,

@@ -70,6 +70,23 @@ export const translations = {
     },
   },
   widget: {
+    lineReviewRequired:
+      "Line totals differ from the recorded bill total. Review the original supplier document before editing or approving.",
+    removeAction: "Remove",
+    removeLine: "Remove {{description}}",
+    grossTotal: "Gross total",
+    taxPending:
+      "Supplier tax is unknown. Confirm the documented amount before receiving or posting this bill.",
+    confirmSupplierTax: "Confirm supplier tax",
+    bankDocumentMissing:
+      "Supplier document pending. Link it here, or confirm the gross cost from the bank evidence during approval.",
+    bankDocumentTaxReview:
+      "Supplier document linked after posting. Review any tax or account reclassification separately. The original posting is unchanged.",
+    linkBankDocument: "Link supplier document",
+    inputVat: "Input VAT deduction",
+    taxIncludedCost: "VAT included in cost",
+    reverseCharge: "Reverse-charge VAT payable",
+
     markReceived: "Mark received",
     back: "Back",
     submit: "Look Up Bill",
@@ -90,7 +107,9 @@ export const translations = {
     approveBill: "Approve Bill",
     payBill: "Pay Bill",
     addLine: "Add Line",
-    viewJournalEntry: "View Journal Entry",
+    accountingEvidence: "Accounting entries",
+    approvalJournal: "Bill approval",
+    settlementJournal: "Payment posting",
     approveConfirmTitle: "Approve this bill?",
     approveConfirmDescription:
       "This will advance the bill status. Once approved, a journal entry will be posted. This cannot be undone.",

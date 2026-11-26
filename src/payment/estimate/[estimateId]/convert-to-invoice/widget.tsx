@@ -3,6 +3,7 @@
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
+import { ResultBanner } from "next-vibe/ui/components/result-banner";
 import { Span } from "next-vibe/ui/components/span";
 import { P } from "next-vibe/ui/components/typography";
 import {
@@ -35,36 +36,30 @@ export function EstimateConvertToInvoiceWidget(_props: {
 
   if (data?.invoiceId) {
     return (
-      <Div className="flex flex-col gap-4 p-4 rounded-lg border bg-emerald-50/50 dark:bg-emerald-900/10 border-emerald-200 dark:border-emerald-800">
-        <Div className="flex flex-col gap-1">
-          <Span className="text-xs font-semibold text-emerald-700 dark:text-emerald-400 uppercase tracking-wide">
-            {t("post.success.title")}
-          </Span>
-          <Span className="text-sm text-muted-foreground mt-1">
-            {t("widget.converted")}
-          </Span>
-        </Div>
-        <Div className="flex gap-2">
-          <Button
-            type="button"
-            variant="default"
-            size="sm"
-            onClick={handleViewInvoice}
-          >
-            {t("widget.viewInvoice")}
-          </Button>
-          {navigation.canGoBack && (
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => navigation.pop()}
-            >
-              {t("widget.back")}
-            </Button>
-          )}
-        </Div>
-      </Div>
+      <ResultBanner
+        variant="success"
+        title={
+          data.invoiceSequenceNumber
+            ? t("widget.savedDraftNumber", {
+                number: data.invoiceSequenceNumber,
+              })
+            : t("widget.savedDraft")
+        }
+        message={
+          data.estimateNumber
+            ? t("widget.convertedNumber", { number: data.estimateNumber })
+            : t("widget.converted")
+        }
+      >
+        <Button
+          type="button"
+          variant="default"
+          size="sm"
+          onClick={handleViewInvoice}
+        >
+          {t("widget.viewInvoice")}
+        </Button>
+      </ResultBanner>
     );
   }
 

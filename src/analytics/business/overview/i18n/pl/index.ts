@@ -7,6 +7,28 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   ...analyticsTranslations,
   ...leadAnalyticsTranslations,
+  platformSummary: {
+    grossReceipts: "Wpływy brutto",
+    refunds: "Zwroty",
+    netReceipts: "Wpływy po zwrotach",
+
+    valuationBasis:
+      "Marża to wartość kredytów według cennika pomniejszona o koszt dostawcy. Obejmuje tylko użycie z zapisanym kosztem.",
+    valuationCost: "Szacowany koszt AI",
+    valuationMargin: "Szacowana marża na użyciu AI",
+    newAccount: "Zarejestrowano konto",
+    receivedPayment: "Otrzymano płatność",
+    completedTask: "Ukończono zaplanowane zadanie",
+    operations: "Operacje",
+    emptyActivity: "Brak aktywności w tym okresie.",
+    period: "Ostatnie 30 dni w porównaniu z poprzednimi 30 dniami",
+    retry: "Spróbuj ponownie",
+    title: "Przegląd platformy",
+    description:
+      "Sprawdź pozyskiwanie klientów, przychody i stan usług z ostatnich 30 dni.",
+    unavailable: "Brak danych",
+    recent: "Ostatnia aktywność",
+  },
   category: "Analityka",
   tags: {
     analytics: "Analityka",

@@ -1,9 +1,11 @@
 "use client";
 
+import { ErrorResponseTypes } from "next-vibe/core/route/response.schema";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { EmptyBlock } from "next-vibe/ui/components/empty-block";
 import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
+import { ChevronRight } from "next-vibe/ui/components/icons/ChevronRight";
 import { X } from "next-vibe/ui/components/icons/X";
 import { Input } from "next-vibe/ui/components/input";
 import { Label } from "next-vibe/ui/components/label";
@@ -13,6 +15,7 @@ import {
   RecordTable,
   type RecordTableProps,
 } from "next-vibe/ui/components/record-table";
+import { ResultBanner } from "next-vibe/ui/components/result-banner";
 import {
   Select,
   SelectContent,
@@ -32,7 +35,6 @@ import {
   useWidgetNavigation,
   useWidgetResponse,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import { type JSX, type ReactNode, useId, useState } from "react";
 import { z } from "zod";
 
@@ -45,6 +47,7 @@ const pickSchema = z.object({
 });
 
 export function DocumentScopePicker({
+  id,
   kind,
   value,
   appliedLabel,
@@ -52,6 +55,7 @@ export function DocumentScopePicker({
   onSelect,
   onClear,
 }: {
+  id?: string;
   kind: "company" | "customer";
   value?: string;
   appliedLabel?: string | null;
@@ -91,6 +95,7 @@ export function DocumentScopePicker({
   return (
     <Div className="flex min-w-0 items-center">
       <Button
+        id={id}
         type="button"
         variant="outline"
         size="sm"
@@ -200,32 +205,61 @@ export function DocumentStatusTabs<Status extends string>({
   options: readonly { status: Status; label: string }[];
   onSelect: (status: Status | undefined) => void;
 }): JSX.Element {
+  const t = useDocumentListCopy();
+  const statusId = useId();
+  const all = "__all_document_statuses";
   return (
-    <Div className="flex min-w-0 gap-1 overflow-x-auto pb-1 @md:flex-wrap">
-      <Button
-        type="button"
-        size="sm"
-        className="shrink-0"
-        variant={selected === undefined ? "secondary" : "ghost"}
-        aria-pressed={selected === undefined}
-        onClick={() => onSelect(undefined)}
-      >
-        {allLabel}
-      </Button>
-      {options.map(({ status, label }) => (
+    <>
+      <Div className="flex min-w-0 flex-col gap-1.5 @md:hidden">
+        <Label htmlFor={statusId}>{t("documents.status")}</Label>
+        <Select
+          value={selected ?? all}
+          onValueChange={(value) => {
+            onSelect(options.find(({ status }) => status === value)?.status);
+          }}
+        >
+          <SelectTrigger
+            id={statusId}
+            className={selected ? "border-primary" : undefined}
+          >
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value={all}>{allLabel}</SelectItem>
+            {options.map(({ status, label }) => (
+              <SelectItem key={status} value={status}>
+                {label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </Div>
+      <Div className="hidden min-w-0 flex-wrap gap-1 @md:flex">
         <Button
-          key={status}
           type="button"
           size="sm"
           className="shrink-0"
-          variant={selected === status ? "secondary" : "ghost"}
-          aria-pressed={selected === status}
-          onClick={() => onSelect(status)}
+          variant={selected === undefined ? "secondary" : "ghost"}
+          aria-pressed={selected === undefined}
+          onClick={() => onSelect(undefined)}
         >
-          {label}
+          {allLabel}
         </Button>
-      ))}
-    </Div>
+        {options.map(({ status, label }) => (
+          <Button
+            key={status}
+            type="button"
+            size="sm"
+            className="shrink-0"
+            variant={selected === status ? "secondary" : "ghost"}
+            aria-pressed={selected === status}
+            onClick={() => onSelect(status)}
+          >
+            {label}
+          </Button>
+        ))}
+      </Div>
+    </>
   );
 }
 
@@ -279,6 +313,9 @@ export function DocumentList({
   filters,
   filterLabel,
   filtered,
+  activeFilters,
+  scopeSummary,
+  selecting,
   columns,
   items,
   pageSize,
@@ -297,6 +334,9 @@ export function DocumentList({
   filters?: ReactNode;
   filterLabel: string;
   filtered: boolean;
+  activeFilters?: boolean;
+  scopeSummary?: string | null;
+  selecting?: boolean;
   columns: RecordTableProps["columns"];
   items: (RelatedEntityItem & { cells: Readonly<Record<string, ReactNode>> })[];
   pageSize?: ReactNode;
@@ -348,8 +388,19 @@ export function DocumentList({
   const response = useWidgetResponse();
   const { canGoBack, pop } = useWidgetNavigation();
   const isInteractive = useWidgetIsInteractive();
-  const isFetching = useWidgetEndpointMutations()?.read?.isFetching ?? false;
+  const read = useWidgetEndpointMutations()?.read;
+  const isFetching = read?.isFetching ?? false;
   const hasError = response?.success === false;
+  const scopeDenied =
+    hasError &&
+    response.errorType.errorKey === ErrorResponseTypes.FORBIDDEN.errorKey;
+  const showActions = isInteractive && items.some((item) => item.action);
+  const actionLabel = t(
+    selecting ? "documents.pickAction" : "documents.openAction",
+  );
+  const tableColumns = showActions
+    ? [...columns, { id: "open", label: actionLabel }]
+    : columns;
 
   return (
     <WidgetShell layout="page" className="min-w-0">
@@ -378,13 +429,20 @@ export function DocumentList({
         <Button
           type="button"
           size="sm"
-          variant={filtered ? "secondary" : "outline"}
+          variant={activeFilters ? "secondary" : "outline"}
           className="self-start @md:hidden"
           aria-expanded={filtersOpen}
           onClick={() => setFiltersOpen(!filtersOpen)}
         >
-          {filterLabel}
+          {activeFilters
+            ? t("documents.activeFilters", { label: filterLabel })
+            : filterLabel}
         </Button>
+      )}
+      {scopeSummary && !filtersOpen && (
+        <Span className="text-sm text-muted-foreground @md:hidden">
+          {scopeSummary}
+        </Span>
       )}
       {filters && (
         <Div
@@ -393,20 +451,74 @@ export function DocumentList({
           {filters}
         </Div>
       )}
-      <FormAlertWidget field={{}} />
+      {hasError && (
+        <Div role="alert">
+          <ResultBanner
+            variant="danger"
+            title={t("documents.loadFailed")}
+            message={t(
+              scopeDenied
+                ? "documents.scopeDenied"
+                : "documents.loadFailedHint",
+            )}
+          >
+            {isInteractive && scopeDenied && (activeFilters || filtered) && (
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                onClick={onClear}
+              >
+                {t("documents.clear")}
+              </Button>
+            )}
+            {isInteractive && !scopeDenied && read && (
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                disabled={isFetching}
+                onClick={() => {
+                  void read.refetch();
+                }}
+              >
+                {t("documents.retry")}
+              </Button>
+            )}
+          </ResultBanner>
+        </Div>
+      )}
       {!hasError && !pagination && <LoadingBlock message={loadingLabel} />}
       {!hasError && pagination && (
         <>
           {items.length > 0 ? (
             <RecordTable
               label={title}
-              columns={columns}
+              columns={tableColumns}
               footerRows={footerRows}
-              rows={items.map((item) => ({
-                id: item.id,
-                cells: item.cells,
-                onOpen: isInteractive ? item.action?.onClick : undefined,
-              }))}
+              rows={items.map((item) => {
+                const action = isInteractive ? item.action : undefined;
+                const open = action ? (
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="ghost"
+                    aria-label={action.label}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      action.onClick();
+                    }}
+                  >
+                    {actionLabel}
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                ) : null;
+                return {
+                  id: item.id,
+                  cells: showActions ? { ...item.cells, open } : item.cells,
+                  onOpen: action?.onClick,
+                };
+              })}
               compact={
                 <Div className="flex min-w-0 flex-col gap-2">
                   {items.map((item) => (
@@ -415,7 +527,17 @@ export function DocumentList({
                       title={item.title}
                       subtitle={item.subtitle}
                       badges={item.badges}
-                      meta={item.meta}
+                      meta={
+                        <>
+                          {item.meta}
+                          {isInteractive && item.action && (
+                            <Span className="inline-flex items-center gap-1 font-medium text-primary">
+                              {actionLabel}
+                              <ChevronRight className="h-3.5 w-3.5" />
+                            </Span>
+                          )}
+                        </>
+                      }
                       onClick={isInteractive ? item.action?.onClick : undefined}
                     />
                   ))}
@@ -457,22 +579,27 @@ export function DocumentList({
                     ? {
                         label: t("documents.clear"),
                         onClick: onClear,
-                        variant: "outline",
+                        variant: "default",
                       }
                     : undefined
                 }
               />
-              {create}
+              {!filtered && create}
             </Div>
           )}
           {pagination.total > 0 && (
             <Div className="flex flex-wrap items-center justify-between gap-2 text-sm">
               <Span className="text-muted-foreground">
-                {t("documents.page", {
-                  page: pagination.currentPage,
-                  pages: pagination.pageCount,
-                  total: pagination.total,
-                })}
+                {t(
+                  pagination.total === 1
+                    ? "documents.pageSingle"
+                    : "documents.page",
+                  {
+                    page: pagination.currentPage,
+                    pages: pagination.pageCount,
+                    total: pagination.total,
+                  },
+                )}
               </Span>
               {pageSize}
               {isInteractive && pagination.pageCount > 1 && (

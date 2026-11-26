@@ -44,6 +44,32 @@ export const translations: typeof enTranslations = {
   },
 
   // POS Dashboard
+  workflow: {
+    backToSessionOrders: "Volver a los pedidos de la sesión",
+    receiptTitle: "Recibo",
+    amountDue: "Importe pendiente",
+    ledgerCurrencyMismatch:
+      "La moneda del pedido difiere de la moneda contable. Usa una caja o un pedido en la moneda contable antes de cobrar.",
+    postingUnavailable:
+      "No se pudo contabilizar la venta. Comprueba la moneda de la empresa, el periodo abierto y las cuentas.",
+    cashCurrencyMismatch:
+      "El efectivo debe usar la moneda de la caja. Elige otro método de pago para este pedido.",
+    tenderMinorUnits: "Introduce importes en céntimos enteros.",
+    legacyTenderReview:
+      "Un pago anterior incluye una fracción de céntimo. Revisa el pago antes de cobrar otro importe.",
+    legacyTenderRecorded:
+      "Este pedido conserva los importes originales con cuatro decimales.",
+    legacyPostingReview:
+      "No se pueden contabilizar los importes con fracciones de céntimo. Revisa el pago original antes de cerrar la venta.",
+    viewReceipt: "Ver recibo",
+    openDrawer: "Abrir caja",
+    warehouse: "Almacén de venta",
+    noWarehouse: "Sin almacén asignado",
+    chooseCompanyFirst: "Selecciona primero una empresa.",
+    warehouseInstruction: "Elige un almacén activo de la empresa seleccionada.",
+    stockUnavailable:
+      "No hay stock disponible suficiente en el almacén de esta caja. Revisa las cantidades antes de cerrar la venta.",
+  },
   dashboard: {
     get: {
       title: "POS Dashboard",
@@ -383,7 +409,7 @@ export const translations: typeof enTranslations = {
         sessionSummary: "Resumen de la sesión",
         terminal: "Terminal",
         openedAt: "Abierto en",
-        orderCount: "Pedidos",
+        orderCount: "Pedidos: {{count}}",
         sessionRevenue: "Ingresos generados",
         floatHint: "Cuenta el dinero en el cajón antes de cerrar.",
         reconciliation: "Fin del día",

@@ -9,8 +9,8 @@ import { CreditCard } from "next-vibe/ui/components/icons/CreditCard";
 import { MoreHorizontal } from "next-vibe/ui/components/icons/MoreHorizontal";
 import { Wallet } from "next-vibe/ui/components/icons/Wallet";
 import { Span } from "next-vibe/ui/components/span";
+import { WidgetShell } from "next-vibe/ui/components/widget-shell";
 import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
-import { formatMoney } from "next-vibe/unified-ui/_shared/format-money";
 import {
   useWidgetForm,
   useWidgetLocale,
@@ -18,14 +18,16 @@ import {
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
+import { EntityPickerFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/entity-picker-field/widget";
 import { NumberFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/number-field/widget";
 import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
-import type { JSX } from "react";
+import { type JSX, useEffect } from "react";
 
 import { PosPaymentMethod, PosPaymentMethodOptions } from "@/pos/enum";
 
-import { cashChangeDue } from "../../display-totals";
+import { cashChangeDue, outstandingSaleAmount } from "../../display-totals";
+import { formatPosSettlement } from "../../format-settlement";
 import { useOrderPreview } from "../get/use-order-preview";
 import type definition from "./definition";
 
@@ -50,21 +52,32 @@ export function PosOrderAddPaymentWidget({
   const locale = useWidgetLocale();
   const result = data?.result;
 
-  const preview = useOrderPreview(
-    result ? undefined : form.watch("details.orderId"),
-  );
+  const orderId = form.watch("orderId");
+  const bodyOrderId = form.watch("details.orderId");
+  useEffect(() => {
+    if (orderId && orderId !== bodyOrderId) {
+      form.setValue("details.orderId", orderId, { shouldValidate: true });
+    }
+  }, [bodyOrderId, form, orderId]);
+  const preview = useOrderPreview(result ? undefined : orderId);
   const selectedMethod = form?.watch("details.method") ?? PosPaymentMethod.CASH;
   const amount = Number(form?.watch("details.amount") ?? 0);
 
   const handleBackToOrder = (): void => {
-    navigation.pop();
+    const submittedOrderId = form.getValues("details.orderId");
+    void (async (): Promise<void> => {
+      const def = await import("../get/definition");
+      navigation.push(def.default.GET, {
+        urlPathParams: { orderId: submittedOrderId },
+      });
+    })();
   };
 
   // Success state
   if (result?.id) {
     const isPaid = Math.round(result.outstanding * 10_000) === 0;
     return (
-      <Div className="flex flex-col gap-5">
+      <WidgetShell layout="page">
         {/* Payment recorded banner */}
         <Div
           className={`rounded-lg border px-4 py-4 flex items-start gap-3 ${isPaid ? "border-green-500/30 bg-green-500/10" : "border-muted"}`}
@@ -95,7 +108,7 @@ export function PosOrderAddPaymentWidget({
               {t(result.method as Parameters<typeof t>[0])}
             </Badge>
             <Span className="text-sm font-mono font-bold tabular-nums">
-              {formatMoney(result.amount, result?.currency, locale)}
+              {formatPosSettlement(result.amount, result?.currency, locale)}
             </Span>
           </Div>
           {result.change > 0 ? (
@@ -104,7 +117,7 @@ export function PosOrderAddPaymentWidget({
                 {t("orderAddPayment.post.widget.changeLabel")}
               </Span>
               <Span className="text-sm font-mono font-semibold tabular-nums">
-                {formatMoney(result.change, result?.currency, locale)}
+                {formatPosSettlement(result.change, result?.currency, locale)}
               </Span>
             </Div>
           ) : null}
@@ -113,7 +126,7 @@ export function PosOrderAddPaymentWidget({
               {t("orderAddPayment.post.response.totalPaid")}
             </Span>
             <Span className="text-sm font-mono font-semibold tabular-nums">
-              {formatMoney(result.totalPaid, result?.currency, locale)}
+              {formatPosSettlement(result.totalPaid, result?.currency, locale)}
             </Span>
           </Div>
           <Div className="flex items-center justify-between px-4 py-3">
@@ -129,7 +142,11 @@ export function PosOrderAddPaymentWidget({
               </Badge>
             ) : (
               <Span className="text-sm font-mono font-semibold text-destructive tabular-nums">
-                {formatMoney(result.outstanding, result?.currency, locale)}
+                {formatPosSettlement(
+                  result.outstanding,
+                  result?.currency,
+                  locale,
+                )}
               </Span>
             )}
           </Div>
@@ -142,23 +159,24 @@ export function PosOrderAddPaymentWidget({
           className="w-full"
           onClick={handleBackToOrder}
         >
-          {isPaid
-            ? t("orderAddPayment.post.widget.backToOrder")
-            : t("orderAddPayment.post.widget.addAnotherPayment")}
+          {t("orderAddPayment.post.widget.backToOrder")}
         </Button>
-      </Div>
+      </WidgetShell>
     );
   }
 
   // Payment form
   const isCash = selectedMethod === PosPaymentMethod.CASH;
+  const remaining = preview
+    ? outstandingSaleAmount(preview.total, preview.payments ?? [])
+    : undefined;
   const changePreview =
     isCash && preview && amount > 0
       ? cashChangeDue(amount, preview.total, preview.payments ?? [])
       : 0;
 
   return (
-    <Div className="flex flex-col gap-5">
+    <WidgetShell layout="page">
       {navigation.canGoBack && (
         <Button
           type="button"
@@ -172,6 +190,21 @@ export function PosOrderAddPaymentWidget({
         </Button>
       )}
       <FormAlertWidget field={{}} />
+      <EntityPickerFieldWidget
+        fieldName="orderId"
+        field={field.children.orderId}
+      />
+
+      {remaining !== undefined && preview && (
+        <Div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border bg-card px-4 py-3">
+          <Span className="text-sm font-semibold">
+            {t("workflow.amountDue")}
+          </Span>
+          <Span className="text-xl font-semibold tabular-nums">
+            {formatPosSettlement(remaining, preview.currency, locale)}
+          </Span>
+        </Div>
+      )}
 
       {/* Payment method selector — large tap targets */}
       <Div className="flex flex-col gap-2">
@@ -206,6 +239,8 @@ export function PosOrderAddPaymentWidget({
       {/* Amount */}
       <NumberFieldWidget
         fieldName="details.amount"
+        presentation="money"
+        currency={preview?.currency}
         field={withValue(
           field.children.details.children.amount,
           undefined,
@@ -225,12 +260,14 @@ export function PosOrderAddPaymentWidget({
             </Span>
           </Div>
           <Span className="text-base font-mono font-bold tabular-nums">
-            {formatMoney(changePreview, preview?.currency, locale)}
+            {formatPosSettlement(changePreview, preview?.currency, locale)}
           </Span>
         </Div>
       ) : null}
 
-      <SubmitButtonWidget<typeof definition.POST> field={{}} />
-    </Div>
+      <SubmitButtonWidget<typeof definition.POST>
+        field={{ text: "orderGet.get.widget.addPayment" }}
+      />
+    </WidgetShell>
   );
 }

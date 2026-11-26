@@ -53,7 +53,12 @@ const user: JwtPrivatePayloadType = {
 
 beforeAll(async () => {
   await pg.exec(`
-    CREATE TABLE companies (id uuid PRIMARY KEY, currency text, name text, is_active boolean);
+    CREATE TABLE bank_statement_lines (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    company_id uuid,
+    matched_journal_line_id uuid
+  );
+  CREATE TABLE companies (id uuid PRIMARY KEY, currency text, name text, is_active boolean);
     CREATE TABLE company_members (
       id uuid PRIMARY KEY DEFAULT gen_random_uuid(), company_id uuid, user_id uuid,
       role text, is_active boolean, invited_by_user_id uuid, joined_at timestamp,

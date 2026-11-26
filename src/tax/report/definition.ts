@@ -52,7 +52,8 @@ const { GET } = createEndpoint({
   defaultWebPinned: ALLOWED_ROLES,
   icon: "bar-chart",
   options: {
-    queryOptions: { enabled: false },
+    autoFetchRequires: ["companyId"],
+    formOptions: { autoSubmit: true, debounceMs: 300 },
   },
 
   fields: customWidgetObject({

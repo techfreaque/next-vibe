@@ -1,6 +1,7 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  lineRounding: "Rundung je Position",
   category: "Angebote",
   tags: { payment: "zahlung", estimate: "angebot" },
   post: {
@@ -54,7 +55,9 @@ export const translations: typeof enTranslations = {
     description: "Das Angebot, auf das die Aktion angewendet wird",
   },
   widget: {
-    send: "Angebot senden",
+    send: "Als versendet markieren",
+    terms: "Konditionen",
+    noItems: "Dieses Angebot enthält noch keine Positionen.",
     addLine: "Position hinzufügen",
     accept: "Annahme erfassen",
     decline: "Ablehnung erfassen",

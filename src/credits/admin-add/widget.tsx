@@ -307,11 +307,13 @@ export function AdminAddCreditsContainer({
   };
 
   return (
-    <WidgetShell className="gap-3">
+    <WidgetShell padding="sm" className="gap-3">
       {!responseOnly && !grantComplete && (
         <>
           <WidgetHeader
             title={t("adminAdd.post.container.title")}
+            size="page"
+            className="pb-3 [&_h1]:text-lg"
             backButton={<NavigateButtonWidget field={children.backButton} />}
           />
           {!targetUserId && (
@@ -365,26 +367,45 @@ export function AdminAddCreditsContainer({
                     status={t("adminAdd.recipient.verified")}
                     variant="success"
                   />
-                  <Span className="min-w-0 font-semibold [overflow-wrap:anywhere]">
-                    {recipient.email}
+                  <Span className="block w-full min-w-0 font-semibold [overflow-wrap:anywhere]">
+                    <Span>
+                      {recipient.email.slice(
+                        0,
+                        recipient.email.lastIndexOf("@") + 1,
+                      )}
+                    </Span>
+                    <Span className="inline-block max-w-full">
+                      {recipient.email.slice(
+                        recipient.email.lastIndexOf("@") + 1,
+                      )}
+                    </Span>
                   </Span>
                 </Div>
-                <DetailField
-                  label={t("adminAdd.recipient.balance")}
-                  value={t("adminAdd.recipient.balanceSplit", {
-                    total: numbers.format(
+                <DetailGrid
+                  columns={3}
+                  className="grid-cols-3 items-end gap-x-2 gap-y-1 @sm:grid-cols-3 [&_span]:[overflow-wrap:anywhere] dark:[&_.text-muted-foreground]:text-foreground/85"
+                >
+                  <DetailField
+                    label={t("adminAdd.recipient.balance")}
+                    value={numbers.format(
                       recipient.balance + recipient.freeBalance,
-                    ),
-                    paid: numbers.format(recipient.balance),
-                    free: numbers.format(recipient.freeBalance),
-                  })}
-                />
+                    )}
+                  />
+                  <DetailField
+                    label={t("adminAdd.recipient.packBalance")}
+                    value={numbers.format(recipient.balance)}
+                  />
+                  <DetailField
+                    label={t("adminAdd.recipient.freeBalance")}
+                    value={numbers.format(recipient.freeBalance)}
+                  />
+                </DetailGrid>
                 <Div className="flex flex-wrap items-center gap-2">
                   <Button
                     type="button"
                     variant="link"
                     size="sm"
-                    className="h-auto whitespace-normal px-0"
+                    className="h-auto whitespace-normal px-0 underline underline-offset-4 dark:text-foreground"
                     aria-expanded={showRecipientDetails}
                     onClick={() => setShowRecipientDetails((shown) => !shown)}
                   >
@@ -394,7 +415,7 @@ export function AdminAddCreditsContainer({
                     type="button"
                     variant="link"
                     size="sm"
-                    className="h-auto whitespace-normal px-0"
+                    className="h-auto whitespace-normal px-0 underline underline-offset-4 dark:text-foreground"
                     disabled={disabled || isSubmitting}
                     onClick={changeRecipient}
                   >
@@ -467,7 +488,9 @@ export function AdminAddCreditsContainer({
                         type="text"
                         keyboardType="numeric"
                         name={amount.name}
-                        value={String(amount.value ?? "")}
+                        value={
+                          amount.value === 0 ? "" : String(amount.value ?? "")
+                        }
                         onChange={(event) =>
                           amount.onChange(event.target.value)
                         }
@@ -493,7 +516,9 @@ export function AdminAddCreditsContainer({
                     form.setValue("amount", 3000, { shouldDirty: true })
                   }
                 >
-                  {t("adminAdd.post.testerPreset")}
+                  {t("adminAdd.post.testerPreset", {
+                    amount: numbers.format(3000),
+                  })}
                 </Button>
                 {validAmount && (
                   <Span className="text-sm tabular-nums text-muted-foreground">
@@ -511,7 +536,7 @@ export function AdminAddCreditsContainer({
               </Div>
               <Button
                 type="submit"
-                className="w-full @md:w-auto @md:self-start"
+                className="w-full disabled:border disabled:border-border disabled:bg-muted disabled:text-muted-foreground disabled:opacity-100 @md:w-auto @md:self-start"
                 disabled={disabled || isSubmitting || !validAmount}
               >
                 {isSubmitting

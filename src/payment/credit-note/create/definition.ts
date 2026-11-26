@@ -71,7 +71,10 @@ const { POST } = createEndpoint({
       // REQUEST FIELDS
       invoiceId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
+        fieldType: FieldDataType.ENTITY_PICKER,
+        listEndpoint: async () =>
+          (await import("@/payment/invoice/list/definition")).default.GET,
+        labelField: "invoiceNumber",
         label: "invoiceId.label" as const,
         description: "invoiceId.description" as const,
         placeholder: "invoiceId.placeholder" as const,
@@ -106,7 +109,7 @@ const { POST } = createEndpoint({
         description: "lineItems.description" as const,
         placeholder: "lineItems.placeholder" as const,
         columns: 12,
-        schema: z.array(lineItemSchema).optional(),
+        schema: z.array(lineItemSchema).min(1).optional(),
       }),
 
       // RESPONSE FIELDS
@@ -134,6 +137,11 @@ const { POST } = createEndpoint({
             type: WidgetType.TEXT,
             label: "post.response.creditNote.id" as const,
             schema: z.uuid(),
+          }),
+          invoiceNumber: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            label: "post.widget.number",
+            schema: z.string().optional(),
           }),
           invoiceId: responseField(scopedTranslation, {
             type: WidgetType.TEXT,

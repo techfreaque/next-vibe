@@ -115,6 +115,12 @@ const { GET } = createEndpoint({
         label: "get.response.total",
         schema: z.number(),
       }),
+      companyName: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "get.companyId.label",
+        hidden: true,
+        schema: z.string().optional(),
+      }),
       products: responseArrayField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         child: objectField(scopedTranslation, {

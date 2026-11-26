@@ -1,6 +1,95 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  adjustment: {
+    confirmHint:
+      "Bestätigen Sie den Abgleich, um die Bankbuchung zu verknüpfen und die angegebenen Korrekturen zu buchen.",
+    autoMatch: "Bestätigte Lieferantenzahlungen automatisch abgleichen",
+    autoMatched: "Automatisch zugeordnet",
+    followup: "Bankumsatz weiterbearbeiten",
+    followupHint:
+      "Prüfen Sie den vorläufigen Rechnungsentwurf oder lösen Sie eine bestätigte Zuordnung.",
+    vendor: "Lieferant",
+    expenseAccount: "Aufwandskonto",
+    reversalDate: "Stornodatum (JJJJ-MM-TT)",
+    reason: "Grund für die Aufhebung",
+    openDraft: "Lieferantenrechnung öffnen",
+    settings: "Einstellungen für den Bankabgleich",
+    settingsHint:
+      "Legen Sie Kontowährung, zulässiges Währungspaar, Datumsfenster und Grenzen fest.",
+    settingsSaved: "Einstellungen gespeichert",
+    save: "Einstellungen speichern",
+    foreignCurrency: "Rechnungswährung für Kursdifferenzen",
+    absTolerance: "Maximale Kursdifferenz in Kontowährung",
+    bpsTolerance: "Maximale Kursdifferenz in Basispunkten",
+    days: "Datumsfenster für den Abgleich in Tagen",
+    gainAccount: "Konto für Kursgewinne",
+    lossAccount: "Konto für Kursverluste",
+    feeAccount: "Aufwandskonto für belegte Gebühren",
+    invalidSettings:
+      "Prüfen Sie Währungspaar, Grenzen und aktive Konten dieses Unternehmens.",
+    description: "Ausgleichsbuchung {{reference}}",
+    unavailable:
+      "Die Ausgleichsbuchung war nicht möglich. Prüfen Sie Datum, offene Periode und Konten.",
+    journal: "Ausgleichsbuchung",
+    kind: "Art des Abgleichs",
+    fxDifference: "Kursgewinn oder Kursverlust",
+    release: "Bankabgleich aufheben",
+    releaseHint:
+      "Lösen Sie die Zuordnung und stornieren Sie die Ausgleichsbuchung in einer offenen Periode.",
+    releaseSuccess: "Bankabgleich aufgehoben",
+    draft: "Rechnungsentwurf aus Bankumsatz",
+    draftHint:
+      "Verwenden Sie den Buchungsbetrag als vorläufigen Nachweis. Ergänzen Sie für den Steuerabzug die Originalrechnung.",
+    draftReady: "Lieferantenentwurf erstellt",
+    confirmDraft: "Vorläufige Lieferantenrechnung erstellen",
+    sourceMemo:
+      "Kontoauszug {{reference}} als Nachweis. Originalrechnung steht aus.",
+  },
+  statement: {
+    projected: "Bereit zum Import",
+    localPreview:
+      "Die Dateivorschau zeigt Datum und Betrag vor der Datenschutzprüfung.",
+    screenedOut: "Datenschutzfilter",
+    screenedOutCount:
+      "Die Datenschutzprüfung hat {{count}} Zeilen vom Bankbuch ausgeschlossen.",
+    format: "Kontoauszugsformat",
+    mapping: "Auszugsspalten zuordnen",
+    preview: "Import prüfen",
+    previewSuccess: "Importvorschau",
+    invalid:
+      "Der Auszug konnte im gewählten Format nicht gelesen werden (Zeile {{row}}).",
+    decimal: "Dezimaltrennzeichen",
+    dotDecimal: "Dezimalpunkt",
+    commaDecimal: "Dezimalkomma",
+    unmapped: "Keine Spalte",
+    overlap:
+      "Mögliche Überschneidung mit einem anderen Kontoauszug. Prüfen Sie die ursprünglichen Bankreferenzen.",
+    columns: {
+      counterpartyIban: "IBAN des Zahlungspartners",
+      id: "Bankreferenz",
+      date: "Buchungsdatum",
+      valueDate: "Wertstellungsdatum",
+      amount: "Gebuchter Betrag",
+      currency: "Buchungswährung",
+      nativeAmount: "Originalbetrag",
+      nativeCurrency: "Originalwährung",
+      feeAmount: "Belegte Gebühr",
+      feeCurrency: "Gebührenwährung",
+      description: "Beschreibung",
+      counterparty: "Zahlungspartner",
+      status: "Status",
+    },
+    formats: {
+      normalized: "Standard-CSV",
+      c24: "C24-CSV",
+      revolut: "Revolut Privatkunden-CSV",
+      revolutBusiness: "Revolut Business-CSV",
+      mapped: "Eigene CSV",
+      camt053: "CAMT.053",
+      mt940: "MT940",
+    },
+  },
   tags: {
     bank: "Bank",
     reconciliation: "Bankabgleich",
@@ -10,7 +99,7 @@ export const translations: typeof enTranslations = {
     status: "Status",
     company: "Unternehmen",
     account: "Bankkonto",
-    csv: "Kontoauszug als CSV",
+    csv: "Kontoauszug",
     line: "Bankzeile",
     transactionId: "Transaktions-ID",
     bookedDate: "Buchungsdatum",
@@ -29,23 +118,24 @@ export const translations: typeof enTranslations = {
     total: "Gesamt",
   },
   ui: {
-    csvFormat: "CSV-Format",
-    commaFormat: "Komma als Trennzeichen, Dezimalpunkt",
-    semicolonFormat: "Semikolon als Trennzeichen, Dezimalkomma",
+    exactMatch: "Exakter Abgleich",
+    csvFormat: "Spaltentrennzeichen",
+    commaFormat: "Komma",
+    semicolonFormat: "Semikolon",
     sameDay: "Gleicher Betrag, gleicher Tag",
-    upload: "CSV-Datei auswählen",
-    dropCsv: "Oder CSV hier ablegen",
-    pasteCsv: "CSV-Text einfügen",
-    supportedFormat: "Unterstütztes Format",
+    upload: "Kontoauszug auswählen",
+    dropCsv: "Oder Kontoauszug hier ablegen",
+    pasteCsv: "Auszugstext einfügen",
+    supportedFormat: "Unterstützte Formate",
     mapping: "Spalten zuordnen",
     chooseColumn: "CSV-Spalte auswählen",
     preview: "Vorschau (erste 5 Buchungen)",
     matchRow: "Zuordnen",
     unmatched: "Offen",
     csvHelp:
-      "Ordnen Sie eine stabile Transaktions-ID, ein Datum (JJJJ-MM-TT oder TT.MM.JJJJ), einen vorzeichenbehafteten Betrag im gewählten Dezimalformat und einen Währungscode in Großbuchstaben zu. Positive Beträge sind Eingänge. Eine Buchung pro Zeile. Keine Tausendertrennzeichen.",
+      "Wählen Sie einen Bankexport oder ordnen Sie die CSV-Spalten zu. Buchungsdatum und Betrag mit Vorzeichen sind Pflicht.",
     unsupported:
-      "Konvertieren Sie CAMT XML, OFX/QFX, MT940, Tabellen, PDF und CSV mit anderen Trennzeichen oder mehrzeiligen Datensätzen zuerst in dieses Format.",
+      "Verwenden Sie CSV, CAMT.053-XML oder MT940-Text. Wandeln Sie PDF, Tabellen und andere Formate vorher um.",
     chooseScope: "Wählen Sie ein Unternehmen und ein aktives Bankkonto.",
     empty: "Keine offenen Bankzeilen",
     emptyHint: "Importieren Sie zum Abgleich einen Kontoauszug.",
@@ -53,7 +143,7 @@ export const translations: typeof enTranslations = {
     noCandidates: "Keine passenden Buchungszeilen",
     noCandidatesHint: "Prüfen Sie Bankkonto, Währung und Betrag der Buchung.",
     alreadyMatched: "Diese Zeile ist bereits abgeglichen.",
-    importAction: "CSV importieren",
+    importAction: "Kontoauszug importieren",
     listAction: "Bankzeilen anzeigen",
     back: "Zurück",
     previous: "Vorherige",
@@ -127,7 +217,8 @@ export const translations: typeof enTranslations = {
   },
   import: {
     title: "Kontoauszug importieren",
-    description: "CSV für ein Bankkonto hochladen oder einfügen.",
+    description:
+      "Laden Sie einen Auszug für ein Bankkonto hoch oder fügen Sie ihn ein.",
     success: "Kontoauszug verarbeitet",
   },
   list: {

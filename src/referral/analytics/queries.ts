@@ -19,6 +19,7 @@ import type { AnalyticsBucket } from "next-vibe/unified-ui/analytics/enum";
 import { bucketSql } from "next-vibe/unified-ui/analytics/window-sql";
 import type { QueryResultRow } from "pg";
 
+import { CreditPackType } from "@/credits/enum";
 import { FINANCE_CONFIG } from "@/finance/config";
 import { PaymentStatus } from "@/payment/enum";
 
@@ -547,9 +548,9 @@ export interface PartnerBalance {
   pendingCents: number;
   paidOutCents: number;
   openPayoutCents: number;
-  /** Confirmed minus paid out (before open requests). */
+  /** Remaining EARNED wallet credits before open payout reservations. */
   availableCents: number;
-  /** Confirmed minus paid out minus open requests; negative = over-committed. */
+  /** Remaining EARNED wallet credits minus open payout reservations. Negative means over-committed. */
   freeCents: number;
   referredUsers: number;
   codes: number;
@@ -573,6 +574,7 @@ export async function queryPartnerBalances(
       confirmed: number;
       pending: number;
       paid: number;
+      earned_wallet: number;
       open: number;
       referred: number;
       codes: number;
@@ -585,6 +587,9 @@ export async function queryPartnerBalances(
         WHERE e.earner_user_id = u.id AND e.status = ${ReferralEarningStatus.PENDING}) AS pending,
       (SELECT coalesce(sum(amount_cents), 0)::float8 FROM payout_requests r
         WHERE r.user_id = u.id AND r.status = ${PayoutStatus.COMPLETED}) AS paid,
+      (SELECT coalesce(sum(p.remaining), 0)::float8
+        FROM credit_wallets w JOIN credit_packs p ON p.wallet_id = w.id
+        WHERE w.user_id = u.id AND p.type = ${CreditPackType.EARNED}) AS earned_wallet,
       (SELECT coalesce(sum(amount_cents), 0)::float8 FROM payout_requests r
         WHERE r.user_id = u.id AND r.status IN (${PayoutStatus.PENDING}, ${PayoutStatus.APPROVED}, ${PayoutStatus.PROCESSING})) AS open,
       (SELECT count(*)::int FROM user_referrals ur WHERE ur.referrer_user_id = u.id) AS referred,
@@ -595,13 +600,14 @@ export async function queryPartnerBalances(
     const confirmed = Number(row.confirmed);
     const paid = Number(row.paid);
     const open = Number(row.open);
+    const earnedWallet = Number(row.earned_wallet);
     result.set(row.user_id, {
       confirmedCents: confirmed,
       pendingCents: Number(row.pending),
       paidOutCents: paid,
       openPayoutCents: open,
-      availableCents: Math.max(0, confirmed - paid),
-      freeCents: confirmed - paid - open,
+      availableCents: Math.max(0, earnedWallet),
+      freeCents: earnedWallet - open,
       referredUsers: Number(row.referred),
       codes: Number(row.codes),
     });

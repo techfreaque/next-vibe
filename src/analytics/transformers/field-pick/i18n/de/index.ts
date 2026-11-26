@@ -5,13 +5,12 @@ export const translations: typeof enTranslations = {
   post: {
     title: "Feld auswählen",
     titleShort: "Feldauswahl",
-    description:
-      "Feld auswählen - extrahiert ein benanntes Feld (abgelöst, gibt leer zurück)",
+    description: "Liest ein numerisches Metadatenfeld aus jeder Beobachtung.",
     fields: {
       source: { label: "Quelle", description: "Eingabe-Zeitreihe" },
       field: {
         label: "Feld",
-        description: "Zu extrahierender Feldname (nicht mehr unterstützt)",
+        description: "Name des Metadatenfelds, zum Beispiel close.",
       },
       resolution: { label: "Auflösung", description: "Berechnungszeitrahmen" },
       range: { label: "Bereich", description: "Zu berechnender Zeitraum" },

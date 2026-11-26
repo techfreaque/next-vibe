@@ -4,7 +4,7 @@
 
 import "server-only";
 
-import { and, eq, inArray, isNull } from "drizzle-orm";
+import { and, eq, inArray, isNull, sql } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import {
@@ -16,6 +16,7 @@ import {
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import type { EndpointLogger } from "next-vibe/logger/types";
+import { z } from "zod";
 
 import { accountNodes, journalEntries } from "@/chart-of-accounts/db";
 import {
@@ -32,11 +33,23 @@ import {
 import { lockLedgerCompany } from "@/chart-of-accounts/shared/ledger-write";
 import { CompanyMemberRole } from "@/companies/enum";
 import { CompanyAuthRepository } from "@/companies/repository";
+import {
+  findBankBillStatement,
+  hasSupplierBillCandidate,
+  readBankBillOrigin,
+} from "@/finance/bank/followup/bill-provenance";
+import { isConfirmedPrepaidSupplierBill } from "@/finance/supplier-evidence/prepaid-bill";
+import { mailboxTaxPending } from "@/finance/supplier-evidence/tax-pending";
+import { scopedTranslation as billDetailTranslation } from "@/payment/bill/[billId]/get/i18n";
 import { TaxCalculator } from "@/tax/calculator";
+import { CompanyTaxRegime } from "@/tax/regime/enum";
+import { getCompanyTaxRegime } from "@/tax/regime/policy";
+import { reverseChargeDecision } from "@/tax/regime/reverse-charge";
 
 import { paymentBillLines, paymentBills } from "../../../db";
 import { BillStatus } from "../../../enum";
 import type {
+  BillApprovalTaxInputs,
   BillApproveResponseOutput,
   BillApproveUrlPathParams,
 } from "./definition";
@@ -48,6 +61,7 @@ export class BillApproveRepository {
     urlPathParams: BillApproveUrlPathParams,
     logger: EndpointLogger,
     locale: CountryLanguage = defaultLocale,
+    taxInputs: BillApprovalTaxInputs = {},
   ): Promise<ResponseType<BillApproveResponseOutput>> {
     const { t } = scopedTranslation.scopedT(locale);
 
@@ -100,6 +114,14 @@ export class BillApproveRepository {
           });
         }
 
+        if (mailboxTaxPending(bill.metadata)) {
+          return fail({
+            message: billDetailTranslation
+              .scopedT(locale)
+              .t("widget.taxPending"),
+            errorType: ErrorResponseTypes.CONFLICT,
+          });
+        }
         if (
           bill.status !== observedBill.status ||
           bill.journalEntryId ||
@@ -123,6 +145,66 @@ export class BillApproveRepository {
           bill.status === BillStatus.DRAFT
             ? BillStatus.RECEIVED
             : BillStatus.APPROVED;
+        const reverseCharge = reverseChargeDecision(
+          taxInputs.reverseChargeBase,
+          taxInputs.reverseChargeRatePercent,
+          bill.total,
+        );
+        if (
+          reverseCharge === false ||
+          (reverseCharge && status !== BillStatus.APPROVED)
+        ) {
+          return fail({
+            message: t("reverseCharge.invalid"),
+            errorType: ErrorResponseTypes.VALIDATION_ERROR,
+          });
+        }
+        const bankOrigin = readBankBillOrigin(bill);
+        const missingDocument =
+          bankOrigin?.originalSupplierInvoicePending === true;
+        if (
+          status === BillStatus.APPROVED &&
+          missingDocument &&
+          (!taxInputs.confirmNoSupplierDocument ||
+            bill.billNumber ||
+            bill.taxAmount !== 0 ||
+            reverseCharge ||
+            !(await findBankBillStatement(tx, bill, bankOrigin)))
+        ) {
+          return fail({
+            message: t("supplierDocument.required"),
+            errorType: ErrorResponseTypes.VALIDATION_ERROR,
+          });
+        }
+        if (
+          status === BillStatus.APPROVED &&
+          !taxInputs.confirmSeparateBankBill &&
+          (missingDocument || (!bankOrigin && Boolean(bill.billNumber?.trim())))
+        ) {
+          const vendor = z
+            .object({ vendorId: z.uuid() })
+            .safeParse(bill.metadata);
+          const possibleDuplicate = await hasSupplierBillCandidate(
+            tx,
+            {
+              companyId: bill.companyId,
+              vendorId: vendor.success ? vendor.data.vendorId : null,
+              supplierName: bill.supplierName,
+              currency: bill.currency,
+              total: bill.total,
+              date: bill.billDate,
+              excludedBillId: bill.id,
+            },
+            missingDocument ? "numbered-document" : "bank-pending",
+          );
+          if (possibleDuplicate) {
+            return fail({
+              message: t("supplierDocument.possibleDuplicate"),
+              errorType: ErrorResponseTypes.CONFLICT,
+            });
+          }
+        }
+        let deductible = !missingDocument;
         let journalEntryId: string | null = null;
         if (status === BillStatus.APPROVED) {
           const [existingPosting] = await tx
@@ -148,23 +230,61 @@ export class BillApproveRepository {
             });
           }
 
+          const regime = await getCompanyTaxRegime(
+            tx,
+            bill.companyId,
+            bill.billDate,
+          );
+          deductible = !regime.exempt && !missingDocument;
+          if (
+            reverseCharge &&
+            regime.code !== CompanyTaxRegime.DE_SMALL_BUSINESS
+          ) {
+            return fail({
+              message: t("reverseCharge.invalid"),
+              errorType: ErrorResponseTypes.VALIDATION_ERROR,
+            });
+          }
           const billLines = await tx
             .select()
             .from(paymentBillLines)
             .where(eq(paymentBillLines.billId, bill.id))
             .orderBy(paymentBillLines.sortOrder, paymentBillLines.id);
+          const lineTaxUnits = billLines.reduce(
+            (total, line) => total + Math.round(line.taxAmount * 10_000),
+            0,
+          );
+          const lineGrossUnits = billLines.reduce(
+            (total, line) => total + Math.round(line.lineTotal * 10_000),
+            0,
+          );
+          if (
+            billLines.length > 0 &&
+            (lineTaxUnits !== Math.round(bill.taxAmount * 10_000) ||
+              lineGrossUnits !== Math.round(bill.total * 10_000) ||
+              lineGrossUnits - lineTaxUnits !==
+                Math.round(bill.subtotal * 10_000))
+          ) {
+            return fail({
+              message: t("post.errors.lineTotalsReview"),
+              errorType: ErrorResponseTypes.CONFLICT,
+            });
+          }
           const explicitAccountIds = billLines.flatMap(({ expenseAccountId }) =>
             expenseAccountId ? [expenseAccountId] : [],
           );
           const expenseAccounts = explicitAccountIds.length
             ? await tx
-                .select({ id: accountNodes.id })
+                .select({
+                  id: accountNodes.id,
+                  type: accountNodes.type,
+                  subtype: accountNodes.subtype,
+                })
                 .from(accountNodes)
                 .where(
                   and(
                     inArray(accountNodes.id, explicitAccountIds),
                     eq(accountNodes.companyId, bill.companyId),
-                    eq(accountNodes.type, AccountType.EXPENSE),
                     eq(accountNodes.isActive, true),
                     eq(accountNodes.isPostable, true),
                   ),
@@ -172,16 +292,24 @@ export class BillApproveRepository {
                 .orderBy(accountNodes.id)
                 .for("share")
             : [];
-          const expenseAccountIds = new Set(
-            expenseAccounts.map(({ id }) => id),
-          );
-          const lineTaxUnits = billLines.reduce(
-            (total, line) => total + Math.round(line.taxAmount * 10_000),
-            0,
-          );
+          const expenseAccountIds = new Set<string>();
+          for (const account of expenseAccounts) {
+            if (
+              account.type === AccountType.EXPENSE ||
+              (account.type === AccountType.ASSET &&
+                account.subtype === AccountSubtype.PREPAID &&
+                (await isConfirmedPrepaidSupplierBill(tx, bill, account.id)))
+            ) {
+              expenseAccountIds.add(account.id);
+            }
+          }
           if (
-            lineTaxUnits !== Math.round(bill.taxAmount * 10_000) ||
             billLines.length === 0 ||
+            (missingDocument &&
+              (billLines.length !== 1 ||
+                billLines[0]?.expenseAccountId !==
+                  bankOrigin.expenseAccountId ||
+                billLines[0]?.lineTotal !== bill.total)) ||
             billLines.some(
               ({ expenseAccountId, lineTotal, taxAmount }) =>
                 (expenseAccountId !== null &&
@@ -199,7 +327,7 @@ export class BillApproveRepository {
           const lines: AutoPostLine[] = [];
           for (const line of billLines) {
             const net = TaxCalculator.roundToFour(
-              line.lineTotal - line.taxAmount,
+              deductible ? line.lineTotal - line.taxAmount : line.lineTotal,
             );
             if (net > 0) {
               lines.push({
@@ -212,7 +340,7 @@ export class BillApproveRepository {
               });
             }
           }
-          if (bill.taxAmount > 0) {
+          if (deductible && bill.taxAmount > 0) {
             lines.push({
               subtype: AccountSubtype.VAT_RECEIVABLE,
               type: LineType.DEBIT,
@@ -220,6 +348,24 @@ export class BillApproveRepository {
               currency: bill.currency,
               description: "VAT receivable",
             });
+          }
+          if (reverseCharge) {
+            lines.push(
+              {
+                subtype: AccountSubtype.OPEX,
+                type: LineType.DEBIT,
+                amount: reverseCharge.amount,
+                currency: bill.currency,
+                description: t("reverseCharge.cost"),
+              },
+              {
+                subtype: AccountSubtype.VAT_PAYABLE,
+                type: LineType.CREDIT,
+                amount: reverseCharge.amount,
+                currency: bill.currency,
+                description: t("reverseCharge.title"),
+              },
+            );
           }
           lines.push({
             subtype: AccountSubtype.ACCOUNTS_PAYABLE,
@@ -252,7 +398,35 @@ export class BillApproveRepository {
 
         await tx
           .update(paymentBills)
-          .set({ status, journalEntryId, updatedAt: new Date() })
+          .set({
+            status,
+            journalEntryId,
+            updatedAt: new Date(),
+            ...(status === BillStatus.APPROVED
+              ? {
+                  metadata: sql`coalesce(${paymentBills.metadata}, '{}'::jsonb) || ${JSON.stringify(
+                    {
+                      inputVatDeductible: deductible,
+                      reverseCharge: reverseCharge ?? null,
+                      ...(taxInputs.confirmSeparateBankBill
+                        ? {
+                            separateBankChargeConfirmedAt:
+                              new Date().toISOString(),
+                            separateBankChargeConfirmedBy: userId,
+                          }
+                        : {}),
+                      ...(missingDocument
+                        ? {
+                            noSupplierDocumentConfirmedAt:
+                              new Date().toISOString(),
+                            noSupplierDocumentConfirmedBy: userId,
+                          }
+                        : {}),
+                    },
+                  )}::jsonb`,
+                }
+              : {}),
+          })
           .where(eq(paymentBills.id, bill.id));
 
         logger.info("AP bill status advanced", {

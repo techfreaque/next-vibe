@@ -21,6 +21,8 @@ type PosTransaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
 type OpenOrder = typeof posOrders.$inferSelect & {
   companyId: string;
   cashAccountId: string | null;
+  warehouseId: string | null;
+  terminalCurrency: string;
 };
 
 export async function withOpenOrder<T>(
@@ -59,6 +61,8 @@ export async function withOpenOrder<T>(
       .select({
         order: posOrders,
         cashAccountId: posTerminals.cashAccountNodeId,
+        warehouseId: posTerminals.warehouseId,
+        terminalCurrency: posTerminals.currency,
         sessionStatus: posSessions.status,
       })
       .from(posOrders)
@@ -98,6 +102,8 @@ export async function withOpenOrder<T>(
       ...row.order,
       companyId: owner.companyId,
       cashAccountId: row.cashAccountId,
+      warehouseId: row.warehouseId,
+      terminalCurrency: row.terminalCurrency,
     });
   });
 }

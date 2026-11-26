@@ -5,7 +5,6 @@
 import "server-only";
 
 import { and, eq, ne, sql } from "drizzle-orm";
-import { coreEnv } from "next-vibe/core/env";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import {
@@ -29,17 +28,23 @@ import {
 } from "@/chart-of-accounts/shared/auto-post";
 import { lockLedgerCompany } from "@/chart-of-accounts/shared/ledger-write";
 import { getDocumentAccess } from "@/finance/document-company-scope";
+import { scopedTranslation as regimeTranslation } from "@/tax/regime/i18n";
+import { getCompanyTaxRegime, notesWithTaxNotice } from "@/tax/regime/policy";
 
 import { paymentInvoiceLines, paymentInvoices } from "../../../db";
 import { InvoiceStatus } from "../../../enum";
-import { generateInvoiceViewToken } from "../../token";
+import { buildInvoiceViewUrl } from "../../token";
 import type {
   InvoiceSendResponseOutput,
   InvoiceSendUrlPathParams,
 } from "./definition";
+import { InvoiceDeliveryRepository } from "./delivery-repository";
 import { scopedTranslation } from "./i18n";
 
 export class InvoiceSendRepository {
+  static shareInvoice = InvoiceDeliveryRepository.share;
+  static emailInvoice = InvoiceDeliveryRepository.send;
+
   static async sendInvoice(
     userId: string,
     urlPathParams: InvoiceSendUrlPathParams,
@@ -103,11 +108,22 @@ export class InvoiceSendRepository {
         }
 
         const today = new Date();
+        let taxNotice: string | null = null;
         let invoiceNumber = invoice.invoiceNumber;
         let journalEntryId: string | null = null;
         if (invoice.companyId) {
+          const regime = await getCompanyTaxRegime(
+            tx,
+            invoice.companyId,
+            today,
+          );
+          taxNotice = regime.notice;
           const [totals] = await tx
             .select({
+              taxedLines:
+                sql<number>`count(*) filter (where ${paymentInvoiceLines.taxRate} > 0 or ${paymentInvoiceLines.taxAmount} <> 0)`.mapWith(
+                  Number,
+                ),
               grossCents:
                 sql<number>`round(sum(${paymentInvoiceLines.lineTotal}) * 100)`.mapWith(
                   Number,
@@ -119,6 +135,12 @@ export class InvoiceSendRepository {
             })
             .from(paymentInvoiceLines)
             .where(eq(paymentInvoiceLines.invoiceId, invoice.id));
+          if (regime.exempt && (totals?.taxedLines ?? 0) > 0) {
+            return fail({
+              message: regimeTranslation.scopedT(locale).t("saleConflict"),
+              errorType: ErrorResponseTypes.VALIDATION_ERROR,
+            });
+          }
           const grossCents = totals?.grossCents ?? 0;
           const vatCents = totals?.vatCents ?? 0;
           if (
@@ -213,14 +235,19 @@ export class InvoiceSendRepository {
           .update(paymentInvoices)
           .set({
             status: InvoiceStatus.OPEN,
+            ...(taxNotice
+              ? {
+                  notes: notesWithTaxNotice(invoice.notes, taxNotice),
+                  metadata: sql`coalesce(${paymentInvoices.metadata}, '{}'::jsonb) || jsonb_build_object('taxExemptionNotice', ${taxNotice}::text)`,
+                }
+              : {}),
             invoiceNumber,
             journalEntryId,
             updatedAt: today,
           })
           .where(eq(paymentInvoices.id, invoice.id));
 
-        const viewToken = generateInvoiceViewToken(invoice.id);
-        const viewUrl = `${coreEnv.NEXT_PUBLIC_APP_URL}/invoice/${invoice.id}?token=${viewToken}`;
+        const viewUrl = buildInvoiceViewUrl(invoice.id);
         logger.debug("Invoice issued", {
           invoiceId: invoice.id,
           userId,

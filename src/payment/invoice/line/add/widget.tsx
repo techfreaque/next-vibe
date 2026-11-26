@@ -27,8 +27,9 @@ import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-a
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 import type { JSX } from "react";
 import { useMemo } from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
+import { useDocumentVatPolicy } from "@/finance/document-vat-rates";
 import { calculateInvoiceLine } from "@/payment/invoice/line/amounts";
 import productLookupEndpoint from "@/pos/product-lookup/definition";
 
@@ -78,6 +79,10 @@ export function InvoiceLineAddWidget({
     user,
   ).read?.data;
   const detail = loadedDetail?.id === documentId ? loadedDetail : undefined;
+  const { exemptionNotice } = useDocumentVatPolicy(
+    detail?.companyId ?? undefined,
+    interactive && !line,
+  );
   const denomination = line?.currency ?? detail?.currency;
   const fmt = (amount: number): string =>
     formatMoney(amount, denomination, locale);
@@ -112,13 +117,17 @@ export function InvoiceLineAddWidget({
   const qty = Number(form?.watch("quantity") ?? 1);
   const unitPrice = Number(form?.watch("unitPrice") ?? 0);
   const taxRate = Number(form?.watch("taxRate") ?? 0);
+  useEffect(() => {
+    if (exemptionNotice && taxRate !== 0) {
+      form.setValue("taxRate", 0);
+    }
+  }, [exemptionNotice, form, taxRate]);
   const description = String(form?.watch("description") ?? "");
 
-  const { lineTotal } = calculateInvoiceLine({
-    quantity: qty,
-    unitPrice,
-    taxRate,
-  });
+  const { lineTotal } = calculateInvoiceLine(
+    { quantity: qty, unitPrice, taxRate },
+    detail?.lineSettlement,
+  );
 
   const handleProductSearch = (): void => {
     if (!searchQuery.trim()) {
@@ -136,7 +145,7 @@ export function InvoiceLineAddWidget({
       product.defaultTaxRate !== null &&
       product.defaultTaxRate !== undefined
     ) {
-      form?.setValue("taxRate", product.defaultTaxRate);
+      form?.setValue("taxRate", exemptionNotice ? 0 : product.defaultTaxRate);
     }
     setSearchQuery("");
     setSubmittedQuery("");
@@ -300,6 +309,7 @@ export function InvoiceLineAddWidget({
                     handleProductSearch();
                   }
                 }}
+                aria-label={t("widget.searchProduct")}
                 placeholder={t("widget.searchPlaceholder")}
                 className="flex-1"
               />
@@ -382,11 +392,15 @@ export function InvoiceLineAddWidget({
           />
         </Div>
         {/* Tax rate */}
-        <NumberFieldWidget
-          fieldName="taxRate"
-          presentation="percent"
-          field={withValue(field.children.taxRate, undefined, null)}
-        />
+        {exemptionNotice ? (
+          <Span className="text-sm">{exemptionNotice}</Span>
+        ) : (
+          <NumberFieldWidget
+            fieldName="taxRate"
+            presentation="percent"
+            field={withValue(field.children.taxRate, undefined, null)}
+          />
+        )}
       </Div>
 
       {/* Live line total preview */}

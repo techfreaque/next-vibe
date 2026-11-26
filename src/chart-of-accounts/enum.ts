@@ -102,10 +102,13 @@ export const {
   AR_PAYMENT: "enums.journalSourceType.AR_PAYMENT",
   AP_BILL: "enums.journalSourceType.AP_BILL",
   AP_PAYMENT: "enums.journalSourceType.AP_PAYMENT",
+  SUPPLIER_EVIDENCE: "enums.journalSourceType.SUPPLIER_EVIDENCE",
+  BANK_RECONCILIATION: "enums.journalSourceType.BANK_RECONCILIATION",
   POS_ORDER: "enums.journalSourceType.POS_ORDER",
   TAX_PAYMENT: "enums.journalSourceType.TAX_PAYMENT",
   PERIOD_CLOSE: "enums.journalSourceType.PERIOD_CLOSE",
   CREDIT_TRANSACTION: "enums.journalSourceType.CREDIT_TRANSACTION",
+  REVENUE_RECOGNITION: "enums.journalSourceType.REVENUE_RECOGNITION",
 });
 
 /**
@@ -183,10 +186,13 @@ export const JournalSourceTypeDB = [
   JournalSourceType.AR_PAYMENT,
   JournalSourceType.AP_BILL,
   JournalSourceType.AP_PAYMENT,
+  JournalSourceType.SUPPLIER_EVIDENCE,
+  JournalSourceType.BANK_RECONCILIATION,
   JournalSourceType.POS_ORDER,
   JournalSourceType.TAX_PAYMENT,
   JournalSourceType.PERIOD_CLOSE,
   JournalSourceType.CREDIT_TRANSACTION,
+  JournalSourceType.REVENUE_RECOGNITION,
 ] as const;
 
 export const LineTypeDB = [LineType.DEBIT, LineType.CREDIT] as const;

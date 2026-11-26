@@ -216,6 +216,13 @@ export const translations: typeof enTranslations = {
       titleShort: "magazzino",
       description: "Recuperare i dettagli per un magazzino specifico.",
       widget: {
+        companyName: "Azienda",
+        stockedProducts: "Prodotti in magazzino",
+        companyInventory: "Inventario aziendale",
+        missingValuation: "Costo mancante",
+        details: "Dati del magazzino",
+        related: "Inventario",
+        backToList: "Torna ai magazzini",
         back: "Indietro",
         edit: "Modifica del magazzino",
         viewStock: "Visualizza stock",
@@ -384,6 +391,12 @@ export const translations: typeof enTranslations = {
         loadMore: "Mostra altri",
 
         back: "Indietro",
+        defaultLowStockRule:
+          "Scorta bassa sotto {{threshold}} unità disponibili",
+        reorderPointRule:
+          "Scorta bassa con {{threshold}} unità disponibili o meno",
+        stockValuePrecision:
+          "Il valore delle scorte è dato dalla quantità a magazzino × il costo unitario non arrotondato. I costi visualizzati sono arrotondati a due decimali.",
         lowStock: "Basso stock",
         available: "Disponibile",
         onHand: "Sulla mano",
@@ -906,6 +919,8 @@ export const translations: typeof enTranslations = {
       description:
         "Recuperare un trasferimento con tutti i suoi articoli di linea.",
       widget: {
+        retry: "Riprova",
+        noItems: "Questo trasferimento non contiene articoli.",
         back: "Indietro",
         dispatch: "Trasferimenti di spedizione",
         receive: "Mark ricevuto",

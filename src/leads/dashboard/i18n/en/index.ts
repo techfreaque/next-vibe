@@ -69,6 +69,12 @@ export const translations = {
     },
   },
   widget: {
+    dashboardContext: "Lead acquisition, conversion and recent activity.",
+    unnamedLead: "Unnamed lead",
+    attention: "Needs attention",
+    noAttention: "No network clusters flagged for this period.",
+    flaggedAttention: "Flagged network clusters ({{count}})",
+    retry: "Retry",
     reports: "Reports",
     last7Days: "Last 7 days",
     humanLeads: "Human leads",

@@ -1,6 +1,26 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  receiveBill: "Marcar factura como recibida",
+  supplierDocument: {
+    confirmMissing: "Confirmar que no hay justificante del proveedor",
+    confirmSeparate: "Confirmar que es un cargo distinto",
+    missingHelp:
+      "Comprueba el justificante bancario. La aprobación contabiliza el importe bruto sin deducir el IVA.",
+    required:
+      "Vincula el justificante del proveedor o confirma que no está disponible. La aprobación a partir del banco requiere el importe bruto verificado y ningún asiento de IVA.",
+    possibleDuplicate:
+      "Un borrador bancario o un justificante del proveedor tiene datos similares. Vincula el justificante o confirma que es un cargo distinto.",
+  },
+  reverseCharge: {
+    title: "Inversión del sujeto pasivo (opcional)",
+    base: "Base imponible en la moneda de la factura",
+    rate: "Tipo de IVA (%)",
+    help: "En una factura recibida bajo el régimen alemán de pequeñas empresas, indique ambos valores solo tras confirmar que procede la inversión del sujeto pasivo. El IVA se registra como gasto y como deuda tributaria.",
+    invalid:
+      "Indique la base y el tipo confirmados de una factura recibida bajo el régimen alemán de pequeñas empresas.",
+    cost: "IVA no deducible por inversión del sujeto pasivo",
+  },
   tags: { payment: "pago", bill: "factura", ap: "cuentas pagaderas" },
   enums: {
     billStatus: {
@@ -23,6 +43,8 @@ export const translations: typeof enTranslations = {
     errors: {
       existingPosting:
         "Concilia el asiento existente de esta factura antes de aprobarla.",
+      lineTotalsReview:
+        "Las líneas no coinciden con el importe neto, el IVA o el total registrado. Revise la factura original del proveedor antes de aprobarla.",
       billLines:
         "Añade líneas con un total positivo y usa cuentas de gastos activas de esta empresa.",
       posting:

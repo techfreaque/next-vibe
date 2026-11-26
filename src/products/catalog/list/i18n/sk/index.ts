@@ -102,6 +102,18 @@ export const translations: typeof enTranslations = {
       total: "Spolu",
     },
     widget: {
+      checkout: "Ponuky predávané platformou",
+      checkoutHint:
+        "Skontrolujte programy a balíky s cenami pre tento trh. Ak chcete prepojiť predaj s účtovníctvom, vyberte nižšie firemný produkt a nastavte jeho platobnú ponuku.",
+      checkoutReference: "Identifikátor ponuky",
+      checkoutCredits: "Kredity v cene",
+      oneTime: "Jednorazová cena",
+      searchPage: "Hľadajte na tejto strane podľa názvu alebo SKU",
+      noMatches: "Na tejto strane sa nenašli žiadne zodpovedajúce produkty",
+      retry: "Skúste znova",
+      previous: "Predchádzajúca",
+      next: "Nasledujúca",
+      status: "Stav",
       addProduct: "Pridať produkt",
       active: "Aktívny",
       inactive: "Neaktívny",

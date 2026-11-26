@@ -13,14 +13,17 @@ import { useFieldArray, useWatch } from "react-hook-form";
 import { DocumentDraftLines } from "@/finance/document-draft-lines";
 import { DocumentVatPicker } from "@/finance/document-vat-picker";
 import { useDocumentVatRates } from "@/finance/document-vat-rates";
+import type { LINE_SETTLEMENT_V1 } from "@/tax/line-settlement";
 
 import { calculateBillLine } from "./amounts";
 import type definition from "./definition";
 
 export function BillLineEditor({
   money,
+  lineSettlement,
 }: {
   money: (amount: number) => string;
+  lineSettlement?: typeof LINE_SETTLEMENT_V1;
 }): JSX.Element {
   const form = useWidgetForm<typeof definition.POST>();
   const t = useWidgetTranslation<typeof definition.POST>();
@@ -55,7 +58,7 @@ export function BillLineEditor({
       rows={fields.map((field, index) => {
         const line = lines[index] ?? field;
         const errors = form.formState.errors.lineItems?.[index];
-        const total = calculateBillLine(line).lineTotal;
+        const total = calculateBillLine(line, lineSettlement).lineTotal;
         const taxControl = (
           <DocumentVatPicker
             rates={vatRates}

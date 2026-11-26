@@ -87,6 +87,16 @@ const { POST } = createEndpoint({
             label: "sessionClose.post.response.status",
             schema: z.string(),
           }),
+          terminalName: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            label: "sessionClose.post.sessionId.label",
+            schema: z.string().optional(),
+          }),
+          companyName: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            label: "sessionClose.post.sessionId.label",
+            schema: z.string().optional(),
+          }),
           closedAt: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             label: "sessionClose.post.response.closedAt",

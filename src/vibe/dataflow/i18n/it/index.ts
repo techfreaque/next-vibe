@@ -943,6 +943,14 @@ export const translations: typeof enTranslations = {
 
   // Shared data-source chart widget UI
   dataSourceWidget: {
+    latestValue: "Ultimo valore",
+    browseGraphs: "Visualizza grafici",
+    filters: "Filtri",
+    applyFilters: "Applica filtri",
+    expandPeriod: "Mostra {{period}}",
+    period: "Periodo",
+    interval: "Raggruppa per",
+    loadError: "Impossibile caricare il grafico.",
     addToGraph: "Aggiungi al grafico",
     newGraph: "Nuovo grafico",
     loading: "Caricamento dati...",

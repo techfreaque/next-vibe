@@ -125,6 +125,7 @@ export const translations: typeof enTranslations = {
           replied: "odpoveď {{date}}",
         },
         deals: {
+          prepareBill: "Pripraviť dodávateľskú faktúru",
           title: "Zaplatené dohody",
           hint: "Výdavky v porovnaní s návštevami, registráciami a tržbami zo sledovaného odkazu alebo kódu odporúčania každej dohody.",
           columns: {

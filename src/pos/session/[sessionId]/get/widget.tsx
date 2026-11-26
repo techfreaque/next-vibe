@@ -5,7 +5,6 @@ import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
 import { Span } from "next-vibe/ui/components/span";
-import { formatMoney } from "next-vibe/unified-ui/_shared/format-money";
 import {
   useWidgetLocale,
   useWidgetNavigation,
@@ -15,6 +14,7 @@ import {
 import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import type { JSX } from "react";
 
+import { formatPosSettlement } from "../../../order/format-settlement";
 import type definition from "./definition";
 
 export function PosSessionGetWidget(
@@ -43,12 +43,12 @@ export function PosSessionGetWidget(
     })();
   };
 
-  const handleNewOrder = (sessionId: string): void => {
+  const handleNewOrder = (sessionId: string, currency?: string): void => {
     void (async (): Promise<void> => {
       const def = await import("../../../order/create/definition");
       navigation.push(def.default.POST, {
         data: {
-          details: { sessionId, customerId: undefined, currency: undefined },
+          details: { sessionId, customerId: undefined, currency },
         },
       });
     })();
@@ -113,7 +113,7 @@ export function PosSessionGetWidget(
       <Div className="rounded-lg border overflow-hidden divide-y">
         <Div className="flex items-center justify-between px-4 py-3 bg-muted/30">
           <Span className="text-sm font-semibold">
-            {t("sessionGet.get.widget.sessionDetails")}
+            {session.terminalName ?? t("sessionGet.get.widget.sessionDetails")}
           </Span>
           <Badge
             variant={isOpen ? "default" : "secondary"}
@@ -125,6 +125,10 @@ export function PosSessionGetWidget(
               ? t("enums.sessionStatus.open")
               : t("enums.sessionStatus.closed")}
           </Badge>
+        </Div>
+        <Div className="flex flex-wrap justify-between gap-2 px-4 py-3 text-sm text-muted-foreground">
+          <Span>{session.companyName}</Span>
+          <Span className="font-mono uppercase">{session.id.slice(0, 8)}</Span>
         </Div>
         <Div className="flex items-center justify-between px-4 py-3">
           <Span className="text-sm text-muted-foreground">
@@ -139,7 +143,11 @@ export function PosSessionGetWidget(
             {t("sessionGet.get.response.openingFloat")}
           </Span>
           <Span className="text-sm font-mono tabular-nums">
-            {formatMoney(session.openingFloat, session.currency, locale)}
+            {formatPosSettlement(
+              session.openingFloat,
+              session.currency,
+              locale,
+            )}
           </Span>
         </Div>
         {session.closedAt ? (
@@ -158,7 +166,11 @@ export function PosSessionGetWidget(
               {t("sessionGet.get.response.closingFloat")}
             </Span>
             <Span className="text-sm font-mono tabular-nums">
-              {formatMoney(session.closingFloat, session.currency, locale)}
+              {formatPosSettlement(
+                session.closingFloat,
+                session.currency,
+                locale,
+              )}
             </Span>
           </Div>
         ) : null}
@@ -173,7 +185,7 @@ export function PosSessionGetWidget(
               variant="default"
               size="lg"
               className="w-full"
-              onClick={() => handleNewOrder(session.id)}
+              onClick={() => handleNewOrder(session.id, session.currency)}
             >
               {t("sessionGet.get.widget.newOrder")}
             </Button>

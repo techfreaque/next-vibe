@@ -9,11 +9,13 @@ export const translations: typeof enTranslations = {
   },
 
   rate: {
+    details: "Údaje o sadzbe",
     create: {
       title: "Vytvoriť sadzbu dane",
       titleShort: "Pridať sadzbu",
       description: "Pridať sadzbu dane pre firmu",
       widget: {
+        save: "Vytvoriť sadzbu dane",
         backToList: "Späť na sadzby dane",
       },
       companyId: {
@@ -105,6 +107,10 @@ export const translations: typeof enTranslations = {
       titleShort: "Sadzby dane",
       description: "Prehľad sadzieb dane nastavených pre vašu spoločnosť.",
       widget: {
+        actions: "Akcie",
+        retry: "Skúsiť znova",
+        previous: "Predchádzajúca",
+        next: "Nasledujúca",
         addRate: "Pridať sadzbu",
         labelDefault: "Predvolená",
         labelActive: "Aktívna",
@@ -201,6 +207,7 @@ export const translations: typeof enTranslations = {
       titleShort: "Upraviť sadzbu",
       description: "Upravte existujúcu sadzbu dane.",
       widget: {
+        save: "Uložiť sadzbu dane",
         backToList: "Späť na sadzby dane",
         failed: "Zlyhalo",
       },
@@ -339,6 +346,7 @@ export const translations: typeof enTranslations = {
     description:
       "Skontrolujte zaevidované dane z odberateľských faktúr, dobropisov, dodávateľských faktúr a pokladničných predajov.",
     widget: {
+      retry: "Znova načítať výkaz",
       scope:
         "Odberateľské faktúry sa vykazujú ku dňu účtovného zápisu alebo vytvorenia faktúry. Pri nákupoch sa používa dátum dodávateľskej faktúry. Pokladničné predaje sa vykazujú ku dňu dokončenia v UTC a zahŕňajú položky s kladnou sadzbou alebo zaevidovanou daňou. Ak vystavená faktúra a pokladničný predaj odkazujú na ten istý účtovný zápis, predaj sa vykáže podľa faktúry.",
       empty: "Zvoleným filtrom nezodpovedajú žiadne položky.",
@@ -348,6 +356,8 @@ export const translations: typeof enTranslations = {
       unknownRate: "Sadzba nie je k dispozícii",
       run: "Zobraziť prehľad",
       running: "Načítava sa prehľad…",
+      scopeHint:
+        "Porovnajte DPH z predaja a nákupu podľa sadzby za vybranú firmu a obdobie.",
       selectCompany: "Vyberte spoločnosť pre tento prehľad.",
     },
     currency: {
@@ -422,6 +432,8 @@ export const translations: typeof enTranslations = {
 
   enums: {
     reportDirection: {
+      nonDeductible: "Neodpočítateľná DPH z nákupov",
+      reverseCharge: "Splatná DPH pri prenesení daňovej povinnosti",
       posSales: "Pokladničné predaje",
       sales: "Vystavené faktúry",
       creditNotes: "Vystavené dobropisy",

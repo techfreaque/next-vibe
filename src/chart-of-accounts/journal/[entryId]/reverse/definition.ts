@@ -42,6 +42,25 @@ const { POST } = createEndpoint({
   subCategory: "Journal",
   tags: ["tags.journal" as const],
 
+  options: {
+    mutationOptions: {
+      onSuccess: async ({ logger, pathParams }) => {
+        const [{ apiClient }, { default: detail }, { default: list }] =
+          await Promise.all([
+            import("next-vibe/unified-ui/hooks/store"),
+            import("../get/definition"),
+            import("../../list/definition"),
+          ]);
+        await Promise.all([
+          apiClient.refetchEndpoint(detail.GET, logger, {
+            urlPathParams: { entryId: pathParams.entryId },
+          }),
+          apiClient.refetchEndpoint(list.GET, logger),
+        ]);
+      },
+    },
+  },
+
   fields: customWidgetObject({
     render: CoaJournalReverseWidgetLazy,
     usage: { request: "data&urlPathParams", response: true },

@@ -20,12 +20,52 @@ export type AdminGroup =
   | "ai"
   | "analytics"
   | "business"
+  | "billing"
+  | "people"
+  | "content"
   | "system"
   | "comms"
   | "platform";
 
+type CatalogAlias = keyof typeof pathToAliasMap;
+
+export interface CategoryLanding<TAlias extends string = string> {
+  /** Heading for the admin landing only. */
+  heading?: Partial<Record<CountryLanguage, string>>;
+  /** Plain-language descriptions for specifically declared admin shortcuts. */
+  destinationDescriptions?: Partial<
+    Record<TAlias, Partial<Record<CountryLanguage, string>>>
+  >;
+  /** Summary endpoint rendered using the shared category metrics presentation. */
+  summary?: {
+    alias: TAlias;
+    scope: "company" | "platform";
+    /** Static request values for the embedded read, such as a reporting section. */
+    args?: Record<string, string>;
+    home?: boolean;
+    /** Request values used when this summary appears on the workspace home. */
+    homeArgs?: Record<string, string>;
+    progressive?: boolean;
+  };
+  /** Ordered list and report entry points. */
+  destinations?: readonly TAlias[];
+  /** A GET endpoint that can be shown without an entity identifier. */
+  overview?: { alias: TAlias; scope: "company" | "platform" };
+  /** Ordered create or contextual workflow actions. Read links become destinations. */
+  actions?: readonly TAlias[];
+  /** Select one declared action using the company overview response. */
+  contextualActions?: boolean;
+}
+
+interface AdminPlacement {
+  /** Slash-delimited endpoint paths, without child paths. */
+  adminPaths?: readonly string[];
+  /** Slash-delimited endpoint path prefixes, matched on complete segments. */
+  adminPathPrefixes?: readonly string[];
+}
+
 /** A named sub-section within a category */
-export interface SubcategoryDefinition {
+export interface SubcategoryDefinition extends AdminPlacement {
   icon: IconKey;
   /** Sort order within category (lower = first) */
   order: number;
@@ -51,7 +91,10 @@ export interface RecordSearchDestination<
  * Category definition exported from a module's category.ts.
  * Must be a plain const (no dynamic imports) - the generator reads this at build time.
  */
-export interface CategoryDefinition {
+export interface CategoryDefinition extends AdminPlacement {
+  description?: Partial<Record<CountryLanguage, string>>;
+  createActions?: readonly CatalogAlias[];
+  landing?: CategoryLanding<CatalogAlias>;
   /** Must match the `category` key used in the module's definition.ts files. */
   key: string;
   /** Display labels per locale */
@@ -89,7 +132,10 @@ export interface CategoryDefinition {
  * Serialized form of CategoryDefinition (no live endpoint references)
  * — safe to include in generated files.
  */
-export interface CategoryDefinitionSerialized {
+export interface CategoryDefinitionSerialized extends AdminPlacement {
+  descriptions?: Record<string, string>;
+  createActions?: readonly string[];
+  landing?: CategoryLanding;
   key: string;
   /** Default label (en-GLOBAL fallback) */
   label: string;
@@ -107,7 +153,7 @@ export interface CategoryDefinitionSerialized {
   catalogOverview?: string;
   subcategories?: Record<
     string,
-    {
+    AdminPlacement & {
       icon: IconKey;
       order: number;
       /** Default label (en-GLOBAL fallback) */

@@ -18,6 +18,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import { posOrderItems, posOrders } from "../../../db";
 import { scopedTranslation } from "../../../i18n";
 import { withOpenOrder } from "../../open-order";
+import { posSettlementAmounts } from "../../settlement-amounts";
 import type { PosOrderRemoveItemPostRequestOutput } from "./definition";
 
 export class PosOrderRemoveItemRepository {
@@ -26,6 +27,7 @@ export class PosOrderRemoveItemRepository {
     userId: string,
     logger: EndpointLogger,
     locale: CountryLanguage = defaultLocale,
+    pathOrderId?: string,
   ): Promise<
     ResponseType<{
       result: {
@@ -35,6 +37,13 @@ export class PosOrderRemoveItemRepository {
     }>
   > {
     const { t } = scopedTranslation.scopedT(locale);
+
+    if (pathOrderId !== undefined && pathOrderId !== data.details.orderId) {
+      return fail({
+        message: t("orderRemoveItem.post.errors.validation.title"),
+        errorType: ErrorResponseTypes.VALIDATION_ERROR,
+      });
+    }
 
     try {
       const { details } = data;
@@ -83,19 +92,15 @@ export class PosOrderRemoveItemRepository {
             .from(posOrderItems)
             .where(eq(posOrderItems.orderId, details.orderId));
 
-          const newSubtotal = Number(totals?.subtotal ?? 0);
-          const newTaxAmount = Number(totals?.taxAmount ?? 0);
-          const newTotal = newSubtotal;
+          const settlement = posSettlementAmounts(
+            Number(totals?.subtotal ?? 0),
+            Number(totals?.taxAmount ?? 0),
+          );
 
           await tx
             .update(posOrders)
             .set({
-              subtotal:
-                (Math.round(newSubtotal * 10_000) -
-                  Math.round(newTaxAmount * 10_000)) /
-                10_000,
-              taxAmount: newTaxAmount,
-              total: newTotal,
+              ...settlement,
               updatedAt: new Date(),
             })
             .where(eq(posOrders.id, details.orderId));
@@ -103,7 +108,7 @@ export class PosOrderRemoveItemRepository {
           return success({
             result: {
               orderId: details.orderId,
-              orderTotal: newTotal,
+              orderTotal: settlement.total,
             },
           });
         },

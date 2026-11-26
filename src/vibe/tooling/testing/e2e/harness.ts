@@ -32,6 +32,7 @@ import { seedFixtureThread } from "../../../agent/ai-stream/testing/fixture-seed
 import { endpointToUrlSegment } from "../../../core/core-utils/path";
 import type { CreateApiEndpointAny } from "../../../core/definition/endpoint-base";
 import { FIXTURE_SCOPE_HEADER } from "../../../core/execution-context";
+import type { CountryLanguage } from "../../../core/i18n/core/config";
 import type { JwtPrivatePayloadType } from "../../../identity/auth/types";
 import { createTestSessionToken, E2E_AUTH_COOKIE_NAME } from "./auth";
 import {
@@ -100,8 +101,8 @@ export interface E2EFixtures {
     action: () => Promise<void>,
     timeoutMs?: number,
   ) => Promise<E2ESubmitSent<TEndpoint>>;
-  /** Navigate to a locale-less path (waits for load; retries dev-server 503s). */
-  goto: (path: string) => Promise<void>;
+  /** Navigate to a locale-less path and retry temporary dev-proxy document failures. */
+  goto: (path: string, locale?: CountryLanguage) => Promise<void>;
   /**
    * Navigate until `ready` resolves, reloading through dev-server HMR windows —
    * what `open()` does, for hand-built pages driven via `page`.
@@ -172,7 +173,10 @@ export function useE2E(
     ).toBeTruthy();
     baseUrl = resolved ?? "";
     // oxlint-disable-next-line restricted/no-raw-fetch -- reachability probe of the server under test
-    const probe = await fetch(baseUrl, { signal: AbortSignal.timeout(60_000) })
+    const probe = await fetch(new URL("/robots.txt", baseUrl), {
+      method: "HEAD",
+      signal: AbortSignal.timeout(15_000),
+    })
       .then((r) => r.status)
       .catch((error: Error) => error.message);
     expect(
@@ -283,14 +287,22 @@ export function useE2E(
 
           // Endpoint forms signal their own hydration (`[data-hydrated]`, see
           // EndpointForm.root); "load" covers hand-built pages driven via `page`.
-          const goto = async (path: string): Promise<void> => {
+          const goto = async (
+            path: string,
+            locale: CountryLanguage = E2E_LOCALE,
+          ): Promise<void> => {
             for (let attempt = 0; ; attempt++) {
-              const response = await page.goto(
-                `${baseUrl}/${E2E_LOCALE}${path}`,
-                { waitUntil: "load", timeout: E2E_HYDRATION_TIMEOUT_MS },
-              );
-              // 503 = dev proxy while the inner server restarts
-              if (response?.status() !== 503 || attempt >= DEV_RELOAD_RETRIES) {
+              const response = await page.goto(`${baseUrl}/${locale}${path}`, {
+                waitUntil: "load",
+                timeout: E2E_HYDRATION_TIMEOUT_MS,
+              });
+              // The dev proxy can return a temporary busy, upstream or timeout
+              // page while a browser navigation is compiling. Only repeat the document GET.
+              if (
+                !response ||
+                ![502, 503, 504].includes(response.status()) ||
+                attempt >= DEV_RELOAD_RETRIES
+              ) {
                 return;
               }
               await new Promise<void>((resolve) => {
@@ -436,37 +448,67 @@ export function useE2E(
             failure = error instanceof Error ? error : new Error(String(error));
           }
 
-          if (failure) {
-            const dir = join(E2E_ARTIFACTS_DIR, slug(suite), slug(name));
-            mkdirSync(dir, { recursive: true });
-            await page
-              .screenshot({
-                path: join(dir, "screenshot.png"),
-                fullPage: true,
-                caret: "initial",
-              })
-              .catch(() => undefined);
-            await context.tracing
-              .stop({ path: join(dir, "trace.zip") })
-              .catch(() => undefined);
-            writeFileSync(
-              join(dir, "console.log"),
-              [
-                `url: ${page.url()}`,
-                ...pageErrors.map((e) => `[pageerror] ${e}`),
-                ...consoleLog,
-              ].join("\n"),
+          // A closed browser or a failed artifact write must not strand fixture data.
+          const teardownErrors: Error[] = [];
+          const rememberTeardownError = (cause: Error): void => {
+            teardownErrors.push(cause);
+          };
+          try {
+            if (failure) {
+              const dir = join(E2E_ARTIFACTS_DIR, slug(suite), slug(name));
+              mkdirSync(dir, { recursive: true });
+              await page
+                .screenshot({
+                  path: join(dir, "screenshot.png"),
+                  fullPage: true,
+                  caret: "initial",
+                })
+                .catch(() => undefined);
+              await context.tracing
+                .stop({ path: join(dir, "trace.zip") })
+                .catch(() => undefined);
+              writeFileSync(
+                join(dir, "console.log"),
+                [
+                  `url: ${page.url()}`,
+                  ...pageErrors.map((e) => `[pageerror] ${e}`),
+                  ...consoleLog,
+                ].join("\n"),
+              );
+              failure = new Error(
+                `${failure.message}\n[e2e] artifacts: ${dir}\n[e2e] trace: bunx playwright show-trace "${join(dir, "trace.zip")}"`,
+                { cause: failure },
+              );
+            } else {
+              await context.tracing.stop();
+            }
+            if (!page.isClosed()) {
+              await page.unrouteAll({ behavior: "ignoreErrors" });
+            }
+          } catch (cause) {
+            rememberTeardownError(
+              cause instanceof Error ? cause : new Error(String(cause)),
             );
-            failure.message += `\n[e2e] artifacts: ${dir}\n[e2e] trace: bunx playwright show-trace "${join(dir, "trace.zip")}"`;
-          } else {
-            await context.tracing.stop();
+          } finally {
+            await context.close().catch(rememberTeardownError);
+            for (const cleanupFn of cleanups.toReversed()) {
+              try {
+                await cleanupFn();
+              } catch (cause) {
+                rememberTeardownError(
+                  cause instanceof Error ? cause : new Error(String(cause)),
+                );
+              }
+            }
           }
-          // Drop in-flight route handlers first, else they surface as
-          // "Request context disposed" unhandled errors in the next test.
-          await page.unrouteAll({ behavior: "ignoreErrors" });
-          await context.close();
-          for (const cleanupFn of cleanups.toReversed()) {
-            await cleanupFn();
+          if (teardownErrors.length) {
+            failure = new AggregateError(
+              failure ? [failure, ...teardownErrors] : teardownErrors,
+              [failure, ...teardownErrors]
+                .filter((error) => error !== null)
+                .map((error) => error.message)
+                .join("\n"),
+            );
           }
           if (failure) {
             // eslint-disable-next-line restricted/restricted-syntax -- rethrow so the test runner records the failure

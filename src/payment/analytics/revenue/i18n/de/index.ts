@@ -8,7 +8,7 @@ export const translations: typeof enTranslations = {
     title: "Umsatz",
     titleShort: "Umsatz",
     description:
-      "Umsatz aus Credit-Paketen, Neuabos und Verlängerungen nach Zahlungsanbieter, Plan und Währung, mit Erstattungen, Disputes, MRR, aktiven Abos und Kündigungen.",
+      "Umsatz aus Credit-Paketen, Neuabos und Verlängerungen nach Zahlungsanbieter, Plan und Währung, mit Erstattungen, Rückbuchungen, MRR, aktiven Abos und Kündigungen.",
     tags: {
       revenue: "Umsatz",
       mrr: "MRR",
@@ -94,6 +94,10 @@ export const translations: typeof enTranslations = {
     },
   },
   widget: {
+    loadingReport: "Umsatzbericht wird geladen…",
+    operatingTitle: "Operativer Umsatz",
+    currencyBasis: "Beträge als Näherungswerte in USD.",
+    filterDisclosure: "Filter",
     extra: {
       grossHint: "Abos {{subs}} · Pakete {{packs}} · ca. USD",
       newSubsHint: "Im Zeitraum gestartete Abos · {{count}} Erstzahlungen",
@@ -111,7 +115,7 @@ export const translations: typeof enTranslations = {
       subscriptionNote:
         "Abo-Kennzahlen ignorieren den Art- und Währungsfilter.",
       netHint:
-        "Brutto minus Erstattungen im Zeitraum; Disputes und Zahlungsgebühren nicht abgezogen",
+        "Brutto minus Erstattungen im Zeitraum; Rückbuchungen und Zahlungsgebühren nicht abgezogen",
       mrrHint: "Laufende Abos zum Periodenende, Jahrespläne ÷ 12",
       mrrChart: "MRR im Zeitverlauf",
       mrrNote: "Wiederkehrender Umsatz der jeweils laufenden Abos.",
@@ -139,7 +143,7 @@ export const translations: typeof enTranslations = {
       churnedSubscriptions: "Gekündigt",
       renewals: "Verlängerungen",
       packPurchases: "Paketkäufe",
-      disputes: "Disputes",
+      disputes: "Rückbuchungen",
       failedPayments: "Fehlgeschlagene Zahlungen",
     },
     hint: {

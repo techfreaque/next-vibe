@@ -4,6 +4,27 @@ export const translations: typeof enTranslations = {
   category: "Pomoc a dokumentácia",
   tag: "Pomoc",
   uncategorized: "Ostatné",
+  admin: {
+    recordBackTo: "Späť na {{section}}",
+    recordAccessDenied: "K tomuto záznamu nemáte prístup",
+    overviewLoadError: "Prehľad sa nepodarilo načítať",
+    accountMenu: "Nastavenia účtu",
+    homeDescription:
+      "Spravujte platformu a skontrolujte, čo si vyžaduje Vašu pozornosť.",
+    new: "Nové",
+    destinations: "Zoznamy a výkazy",
+    noDestinations:
+      "V tejto oblasti nie sú dostupné žiadne zoznamy ani výkazy.",
+    automations: "Automatizácie",
+    developer: "Nástroje pre vývojárov",
+    openDeveloper: "Otvorte katalóg pre vývojárov",
+    title: "Správa platformy",
+    workspaces: "Pracovné oblasti",
+    pinned: "Pripnuté nástroje",
+    categoryTools: "Nástroje v tejto oblasti",
+    results: "Výsledky vyhľadávania",
+    tool: "Nástroj",
+  },
   erp: {
     navigation: {
       sales: "Predaj",
@@ -13,6 +34,7 @@ export const translations: typeof enTranslations = {
       bills: "Prijaté faktúry",
     },
     overview: {
+      chooseCompany: "Vyberte spoločnosť, ktorej prehľad chcete zobraziť.",
       loading: "Načítava sa prehľad firmy",
       loadError: "Prehľad firmy sa nepodarilo načítať",
     },
@@ -89,12 +111,15 @@ export const translations: typeof enTranslations = {
     },
   },
   catalog: {
+    moreMatches: "Ďalšie výsledky ({{count}})",
     title: "Katalóg nástrojov",
     searchLabel: "Vyhľadať v katalógu nástrojov",
     searchAction: "Vyhľadať nástroje",
     clearSearch: "Vymazať vyhľadávanie",
     overview: "Prehľad firmy",
     allTools: "Všetky nástroje",
+    selectRecord: "Vyberte záznam, ktorého podrobnosti chcete zobraziť.",
+    openRecord: "Otvoriť záznam",
     findRecord: "Vyhľadať záznam",
     recordPlaceholder: "Názov, e-mail alebo referencia",
     loadError: "Katalóg sa nepodarilo načítať",
@@ -111,6 +136,9 @@ export const translations: typeof enTranslations = {
     page: "Strana {{page}} z {{total}}",
     openSidebar: "Otvoriť bočný panel nástrojov",
     browse: "Prehliadať nástroje",
+    toolUnavailableHint:
+      "Odkaz už nemusí byť platný alebo vaša rola nemá prístup. Otvorte prehľad nástrojov, ktoré máte k dispozícii.",
+    openError: "Nástroj sa nepodarilo otvoriť",
     toolNotFound: "Tento nástroj nie je dostupný",
     localInstance: "Miestna inštancia",
     allowTool: "Povoliť nástroj pre AI",
@@ -122,11 +150,14 @@ export const translations: typeof enTranslations = {
   },
   groups: {
     ai: "AI",
-    analytics: "Analytika",
+    analytics: "Rast",
     business: "Podnikanie",
-    system: "Systém",
+    system: "Prevádzka",
     comms: "Komunikácia",
     platform: "Platforma",
+    people: "Ľudia a CRM",
+    billing: "Fakturácia a platby",
+    content: "Obsah",
   },
   get: {
     title: "Pomocník pre nástroje",

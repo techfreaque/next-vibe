@@ -16,6 +16,7 @@ export const translations: typeof enTranslations = {
     },
     response: {
       companyName: "Firma",
+      remainingCredit: "Suma, ktorú možno dobropisovať",
       amountPaid: "Uhradená suma",
       amountDue: "Suma na úhradu",
       id: "ID faktúry",
@@ -93,6 +94,9 @@ export const translations: typeof enTranslations = {
     placeholder: "Zadajte ID faktúry",
   },
   widget: {
+    sourceQuote: "Pôvodná ponuka",
+    openSourceQuote: "Otvoriť pôvodnú ponuku",
+    draftReference: "Koncept faktúry č. {{number}}",
     recentReminderDrafts: "Nedávne koncepty upomienok",
     receipts: "História úhrad",
     receiptDate: "Dátum prijatia úhrady",
@@ -128,6 +132,12 @@ export const translations: typeof enTranslations = {
     recordPayment: "Zaevidovať úhradu",
     sendReminder: "Pripraviť upomienku",
     void: "Storno",
+    remainingBalance: "Zostatok na úhradu",
+    originalTotal: "Pôvodná suma faktúry",
+    voidReversalDate: "Dátum storna",
+    viewOriginalJournal: "Otvoriť pôvodný účtovný zápis",
+    viewVoidReversal: "Otvoriť stornovací zápis",
+    backToInvoiceList: "Späť na faktúry",
     viewJournalEntry: "Zobraziť účtovný zápis",
     status: {
       draft: "Koncept",

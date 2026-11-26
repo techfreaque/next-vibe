@@ -103,27 +103,28 @@ export function UuidFieldWidget<
                   {field.label && style === "asterisk" && isRequired && (
                     <Span className="text-info font-bold">*</Span>
                   )}
-                  {field.description && descriptionStyle === "tooltip" && (
-                    <TooltipProvider delayDuration={300}>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button
-                            type="button"
-                            className="cursor-help inline-flex"
-                            variant={"ghost"}
-                          >
-                            <Info className="h-4 w-4 text-muted-foreground hover:text-foreground transition-colors" />
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent className="max-w-[250px]">
-                          <Span className="text-sm">
-                            {tField(field.description)}
-                          </Span>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                  )}
                 </FormLabel>
+                {field.description && descriptionStyle === "tooltip" && (
+                  <TooltipProvider delayDuration={300}>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          type="button"
+                          aria-label={tField(field.description)}
+                          className="cursor-help inline-flex"
+                          variant={"ghost"}
+                        >
+                          <Info className="h-4 w-4 text-muted-foreground hover:text-foreground transition-colors" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent className="max-w-[250px]">
+                        <Span className="text-sm">
+                          {tField(field.description)}
+                        </Span>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                )}
                 {style === "badge" && isRequired && (
                   <Badge
                     variant="secondary"

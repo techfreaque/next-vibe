@@ -110,11 +110,14 @@ export const translations: typeof enTranslations = {
       "Usa la stessa chiave per riprovare questo pagamento. Usa una nuova chiave per un altro incasso.",
   },
   accountNodeId: {
-    label: "Account Node ID",
-    description: "Facoltativo: nodo contabile che ha ricevuto questo pagamento",
-    placeholder: "Inserire il nodo dell'account ID",
+    label: "Conto di incasso",
+    description:
+      "Scegli il conto bancario o di cassa che ha ricevuto il pagamento.",
+    placeholder: "Scegli un conto",
+    automatic: "Usa il conto predefinito",
   },
   widget: {
+    details: "Dettagli del pagamento",
     back: "Indietro",
     submit: "Pagamento record",
     paymentRecorded: "Pagamento registrato con successo.",

@@ -33,6 +33,8 @@ import {
   haveCompanyAccounts,
   lockLedgerCompany,
 } from "@/chart-of-accounts/shared/ledger-write";
+import { scopedTranslation as bankTranslation } from "@/finance/bank/i18n";
+import { hasMatchedBankJournalEntry } from "@/finance/bank/reversal-guard";
 import { getInvoiceOpenBalanceParts } from "@/finance/document-balance";
 import { getDocumentAccess } from "@/finance/document-company-scope";
 
@@ -158,6 +160,13 @@ export class InvoiceReversePaymentRepository {
         ) {
           return fail({
             message: t("invalidReceipt"),
+            errorType: ErrorResponseTypes.CONFLICT,
+          });
+        }
+
+        if (await hasMatchedBankJournalEntry(tx, companyId, original.id)) {
+          return fail({
+            message: bankTranslation.scopedT(locale).t("adjustment.release"),
             errorType: ErrorResponseTypes.CONFLICT,
           });
         }

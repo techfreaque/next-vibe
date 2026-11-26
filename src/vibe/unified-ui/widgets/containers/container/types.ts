@@ -106,6 +106,11 @@ export interface BaseContainerLayoutProps<TKey extends string> {
     /** Button size */
     size?: "default" | "sm" | "lg" | "icon";
   };
+  /** Opt into the admin form layout while keeping other callers on the regular container. */
+  adminForm?: {
+    sectionTitle: NoInfer<TKey>;
+    submitText: NoInfer<TKey>;
+  };
   /**
    * Show auto FormAlert at top of container when there are request fields
    * Displays error/success messages from context.response

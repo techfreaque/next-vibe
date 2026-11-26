@@ -69,7 +69,7 @@ export const referralCodeRowSchema = z.object({
   signupsPrevious: z.number().nullable(),
   /** Owner (all time): open payout requests. */
   ownerQueueUsd: z.number(),
-  /** Owner (all time): confirmed - paid out - open requests (negative = over-committed). */
+  /** Earned credits remaining in the owner’s wallet, less open payout reservations. */
   ownerFreeUsd: z.number(),
 });
 export type ReferralCodeRow = z.output<typeof referralCodeRowSchema>;

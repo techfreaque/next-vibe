@@ -9,9 +9,10 @@
 import "server-only";
 
 import { type SQL, sql } from "drizzle-orm";
-import { UserPermissionRole } from "next-vibe/identity/roles/enum";
+import { users } from "next-vibe/identity/user/db";
 
 import { FINANCE_CONFIG } from "@/finance/config";
+import { humanUserSql, testEmailSql } from "@/users/audience-sql";
 
 import { CheckoutMode, PaymentStatus } from "../enum";
 
@@ -64,7 +65,17 @@ export function paidStatusSql(alias: string): SQL {
   );
 }
 
-/** `column` is not an admin (internal/test) account. */
-export function notInternalUserSql(column: string): SQL {
-  return sql`${sql.raw(column)} NOT IN (SELECT user_id FROM user_roles WHERE role = ${UserPermissionRole.ADMIN})`;
+/** Match the Users report's audience; including admins still excludes fixture accounts. */
+export function reportingUserSql(column: string, includeAdmins = false): SQL {
+  const audience = includeAdmins
+    ? sql`NOT ${testEmailSql(users.email)}`
+    : humanUserSql(users.id, users.email);
+  return sql`${sql.raw(column)} IN (SELECT ${users.id} FROM ${users} WHERE ${audience})`;
 }
+
+/** Real processor activity. SQL callers use the payment_transactions alias pt. */
+export const REPORTABLE_PAYMENT_SQL = sql`
+  (pt.metadata->>'type') IS DISTINCT FROM 'accounting_fixture'
+  AND NOT starts_with(COALESCE(pt.provider_session_id, ''), 'cs_test_')
+  AND NOT starts_with(COALESCE(pt.provider_session_id, ''), 'cs_fixture_')
+  AND NOT starts_with(COALESCE(pt.provider_payment_intent_id, ''), 'pi_fixture_')`;

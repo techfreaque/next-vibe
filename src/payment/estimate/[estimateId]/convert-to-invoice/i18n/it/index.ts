@@ -61,7 +61,10 @@ export const translations: typeof enTranslations = {
     back: "Indietro",
     submit: "Converti in Fattura",
     converted: "Fattura creata da questa stima.",
-    viewInvoice: "Visualizza Fattura",
+    savedDraftNumber: "Bozza di fattura n. {{number}} creata",
+    savedDraft: "Bozza di fattura creata",
+    convertedNumber: "Creata dal preventivo {{number}}.",
+    viewInvoice: "Apri la bozza",
     convertNote:
       "Verrà creata una bozza di fattura con gli stessi articoli di linea. La stima sarà contrassegnata come convertita.",
   },

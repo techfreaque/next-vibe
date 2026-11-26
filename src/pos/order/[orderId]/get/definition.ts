@@ -22,6 +22,8 @@ import {
 } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
+import { LINE_SETTLEMENT_V1 } from "@/tax/line-settlement";
+
 import { PosOrderStatus } from "../../../enum";
 import { scopedTranslation } from "../../../i18n";
 
@@ -100,10 +102,18 @@ const { GET } = createEndpoint({
             label: "orderGet.get.response.currency",
             schema: z.string(),
           }),
+          lineSettlement: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            schema: z.literal(LINE_SETTLEMENT_V1).nullable().optional(),
+          }),
           subtotal: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             label: "orderGet.get.response.subtotal",
             schema: z.number(),
+          }),
+          taxExemptionNotice: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            schema: z.string().nullable().optional(),
           }),
           taxAmount: responseField(scopedTranslation, {
             type: WidgetType.TEXT,

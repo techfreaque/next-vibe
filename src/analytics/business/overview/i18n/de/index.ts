@@ -7,6 +7,28 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   ...analyticsTranslations,
   ...leadAnalyticsTranslations,
+  platformSummary: {
+    grossReceipts: "Zahlungseingänge",
+    refunds: "Erstattungen",
+    netReceipts: "Eingänge nach Erstattungen",
+
+    valuationBasis:
+      "Die Marge entspricht dem Listenwert der Credits abzüglich Anbieterkosten. Berücksichtigt wird nur Nutzung mit erfassten Kosten.",
+    valuationCost: "Geschätzte KI-Kosten",
+    valuationMargin: "Geschätzte KI-Nutzungsmarge",
+    newAccount: "Konto registriert",
+    receivedPayment: "Zahlung eingegangen",
+    completedTask: "Geplante Aufgabe abgeschlossen",
+    operations: "Betrieb",
+    emptyActivity: "Keine Aktivitäten in diesem Zeitraum.",
+    period: "Letzte 30 Tage im Vergleich zu den 30 Tagen davor",
+    retry: "Erneut versuchen",
+    title: "Plattformübersicht",
+    description:
+      "Prüfen Sie Kundengewinnung, Umsatz und Systemzustand der letzten 30 Tage.",
+    unavailable: "Nicht verfügbar",
+    recent: "Letzte Aktivitäten",
+  },
   category: "Analytik",
   tags: {
     analytics: "Analytik",

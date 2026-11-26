@@ -7,6 +7,7 @@ import type { JSX } from "react";
 import { useState } from "react";
 
 import { useIsMcp } from "../../../unified-ui/_shared/use-widget-context";
+import { parseFormDate } from "../../../unified-ui/widgets/form-fields/_shared/date-value";
 import type { DatePickerProps } from "../../web/components/date-picker";
 
 export type { DatePickerProps } from "../../web/components/date-picker";
@@ -23,14 +24,6 @@ function formatDate(date: Date | undefined): string {
   return `${year}-${month}-${day}`;
 }
 
-function parseDate(str: string): Date | undefined {
-  if (!str || str.length < 8) {
-    return undefined;
-  }
-  const d = new Date(str);
-  return isNaN(d.getTime()) ? undefined : d;
-}
-
 export function DatePicker({
   value,
   onChange,
@@ -38,7 +31,7 @@ export function DatePicker({
   disabled,
 }: DatePickerProps): JSX.Element | null {
   const isMcp = useIsMcp();
-  const [text, setText] = useState(formatDate(value));
+  const [draft, setDraft] = useState<string>();
 
   if (isMcp) {
     return <Text>{formatDate(value) || placeholder || DATE_FORMAT}</Text>;
@@ -53,11 +46,14 @@ export function DatePicker({
   return (
     <Box>
       <TextInput
-        value={text}
+        value={draft ?? formatDate(value)}
         placeholder={placeholder ?? DATE_FORMAT}
         onChange={(t): void => {
-          setText(t);
-          onChange(parseDate(t));
+          setDraft(t);
+          const parsed = parseFormDate(t);
+          if (parsed || !t) {
+            onChange(parsed);
+          }
         }}
       />
     </Box>

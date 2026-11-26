@@ -80,6 +80,10 @@ export const translations: typeof enTranslations = {
       description: "Kontenplan erfolgreich abgerufen",
     },
     widget: {
+      searchPage: "Diese Seite nach Name oder Code durchsuchen",
+      noMatches: "Keine passenden Konten auf dieser Seite",
+      previousPage: "Vorherige Seite",
+      nextPage: "Nächste Seite",
       debitSide: "Soll",
       creditSide: "Haben",
       loading: "Konten werden geladen...",

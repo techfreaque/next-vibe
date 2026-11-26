@@ -45,7 +45,8 @@ import {
   useWidgetLocale,
 } from "../../../_shared/use-widget-context";
 import { scopedTranslation as unifiedInterfaceScopedTranslation } from "../../../hooks/i18n";
-import { getTheme, OPTION_KEY_PREFIX } from "../_shared/constants";
+import { getTheme } from "../_shared/constants";
+import { useFormFieldDescriptionStyle } from "../_shared/description-style";
 import { renderPrefillDisplay } from "../_shared/prefill";
 import { getFieldStyleClassName } from "../_shared/styling";
 import { getFieldValidationState } from "../_shared/validation";
@@ -74,11 +75,12 @@ export function SelectFieldWidget<
 
   const { t: widgetT } = unifiedInterfaceScopedTranslation.scopedT(locale);
 
+  const theme = getTheme(field.theme);
+  const descriptionStyle = useFormFieldDescriptionStyle(theme.descriptionStyle);
+
   if (!form || !fieldName) {
     return <Div>{widgetT("widgets.formField.requiresContext")}</Div>;
   }
-  const theme = getTheme(field.theme);
-  const descriptionStyle = theme.descriptionStyle;
   const isRequired = !field.schema.isOptional();
 
   return (
@@ -102,7 +104,8 @@ export function SelectFieldWidget<
             String(option.value) === String(formField.value),
         );
         const selectedLabel = selectedOption
-          ? tField(selectedOption.label, selectedOption.labelParams)
+          ? (selectedOption.translateLabel?.(locale) ??
+            tField(selectedOption.label, selectedOption.labelParams))
           : undefined;
 
         return (
@@ -121,27 +124,28 @@ export function SelectFieldWidget<
                   {field.label && style === "asterisk" && isRequired && (
                     <Span className="text-info font-bold">*</Span>
                   )}
-                  {field.description && descriptionStyle === "tooltip" && (
-                    <TooltipProvider delayDuration={300}>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button
-                            type="button"
-                            className="cursor-help inline-flex"
-                            variant={"ghost"}
-                          >
-                            <Info className="h-4 w-4 text-muted-foreground hover:text-foreground transition-colors" />
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent className="max-w-[250px]">
-                          <Span className="text-sm">
-                            {tField(field.description)}
-                          </Span>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                  )}
                 </FormLabel>
+                {field.description && descriptionStyle === "tooltip" && (
+                  <TooltipProvider delayDuration={300}>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          type="button"
+                          aria-label={tField(field.description)}
+                          className="cursor-help inline-flex"
+                          variant={"ghost"}
+                        >
+                          <Info className="h-4 w-4 text-muted-foreground hover:text-foreground transition-colors" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent className="max-w-[250px]">
+                        <Span className="text-sm">
+                          {tField(field.description)}
+                        </Span>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                )}
                 {style === "badge" && isRequired && (
                   <Badge
                     variant="secondary"
@@ -159,28 +163,27 @@ export function SelectFieldWidget<
               )}
             </Div>
 
-            <FormControl>
-              {field.prefillDisplay &&
-              formField.value &&
-              !fieldState.isDirty ? (
-                renderPrefillDisplay(
+            {field.prefillDisplay && formField.value && !fieldState.isDirty ? (
+              <FormControl>
+                {renderPrefillDisplay(
                   formField.value,
                   field.label,
                   field.prefillDisplay,
                   tField,
-                )
-              ) : (
-                <Select
-                  key={`${formField.name}-${formField.value || "empty"}`}
-                  onValueChange={(value) => formField.onChange(value)}
-                  value={
-                    formField.value !== undefined && formField.value !== null
-                      ? formField.value
-                      : undefined
-                  }
-                  disabled={isDisabled || field.disabled || field.readonly}
-                  name={formField.name}
-                >
+                )}
+              </FormControl>
+            ) : (
+              <Select
+                onValueChange={(value) => formField.onChange(value)}
+                value={
+                  formField.value !== undefined && formField.value !== null
+                    ? String(formField.value)
+                    : ""
+                }
+                disabled={isDisabled || field.disabled || field.readonly}
+                name={formField.name}
+              >
+                <FormControl>
                   <SelectTrigger
                     className={cn(styleClassName.inputClassName, "h-10")}
                   >
@@ -194,42 +197,28 @@ export function SelectFieldWidget<
                       {selectedLabel}
                     </SelectValue>
                   </SelectTrigger>
-                  <SelectContent>
-                    {field.options
-                      .filter(
-                        (option: {
-                          value: string | number;
-                          label: string;
-                          labelParams?: Record<string, string | number>;
-                          disabled?: boolean;
-                        }) =>
-                          option.value !== undefined &&
-                          option.value !== null &&
-                          option.value !== "",
-                      )
-                      .map(
-                        (
-                          option: {
-                            value: string | number;
-                            label: string;
-                            labelParams?: Record<string, string | number>;
-                            disabled?: boolean;
-                          },
-                          index: number,
-                        ) => (
-                          <SelectItem
-                            key={option.value ?? `${OPTION_KEY_PREFIX}${index}`}
-                            value={String(option.value)}
-                            disabled={option.disabled}
-                          >
-                            {tField(option.label, option.labelParams)}
-                          </SelectItem>
-                        ),
-                      )}
-                  </SelectContent>
-                </Select>
-              )}
-            </FormControl>
+                </FormControl>
+                <SelectContent>
+                  {field.options
+                    .filter(
+                      (option) =>
+                        option.value !== null &&
+                        option.value !== undefined &&
+                        option.value !== "",
+                    )
+                    .map((option) => (
+                      <SelectItem
+                        key={option.value}
+                        value={String(option.value)}
+                        disabled={option.disabled}
+                      >
+                        {option.translateLabel?.(locale) ??
+                          tField(option.label, option.labelParams)}
+                      </SelectItem>
+                    ))}
+                </SelectContent>
+              </Select>
+            )}
 
             {fieldState.error && (
               <Div className={styleClassName.errorClassName}>

@@ -18,12 +18,19 @@ export function formatMoney(
     const formatted = formatMoneyAmount(value, locale);
     return code ? `${formatted} ${code}` : formatted;
   }
+  return moneyNumberFormat(code, locale).format(value);
+}
+
+export function moneyNumberFormat(
+  currency: string,
+  locale: string,
+): Intl.NumberFormat {
   return new Intl.NumberFormat(locale, {
     style: "currency",
-    currency: code,
+    currency,
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
-  }).format(value);
+  });
 }
 
 export function formatMoneyAmount(amount: number, locale: string): string {

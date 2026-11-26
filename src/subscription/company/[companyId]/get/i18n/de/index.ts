@@ -6,10 +6,28 @@ export const translations: typeof enTranslations = {
     company: "Unternehmen",
     get: "Abrufen",
   },
+  view: {
+    empty: "Kein Abonnement vorhanden",
+    emptyHelp: "Für Ihr Konto ist kein Abonnement hinterlegt.",
+    status: "Status",
+    interval: "Abrechnungsintervall",
+    periodStart: "Zeitraumbeginn",
+    periodEnd: "Zeitraumende",
+    unavailable: "Nicht erfasst",
+    provider: "Zahlungsanbieter",
+    cancellation: "Kündigung",
+    endOfPeriod: "Zum Ende des Zeitraums",
+    scheduled: "Geplante Kündigung",
+    canceled: "Gekündigt am",
+    ended: "Beendet am",
+    open: "Abonnementdetails öffnen",
+    list: "Zurück zu den Abonnements",
+  },
   get: {
-    title: "Unternehmensabonnement",
-    titleShort: "Unternehmens-Abo",
-    description: "Aktives Abonnement eines Unternehmens abrufen",
+    title: "Abonnement des Inhabers",
+    titleShort: "Abonnement des Inhabers",
+    description:
+      "Zeigen Sie das persönliche Abonnement des Unternehmensinhabers an.",
     companyId: {
       label: "Unternehmens-ID",
       description: "Das Unternehmen, dessen Abonnement abgerufen werden soll",
@@ -33,7 +51,7 @@ export const translations: typeof enTranslations = {
       },
       server: {
         title: "Serverfehler",
-        description: "Etwas ist schiefgelaufen — bitte erneut versuchen",
+        description: "Etwas ist schiefgelaufen. bitte erneut versuchen",
       },
       unknown: {
         title: "Unbekannter Fehler",

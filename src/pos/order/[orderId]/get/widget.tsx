@@ -6,7 +6,12 @@ import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
 import { Span } from "next-vibe/ui/components/span";
-import { formatMoney } from "next-vibe/unified-ui/_shared/format-money";
+import { WidgetHeader } from "next-vibe/ui/components/widget-header";
+import { WidgetShell } from "next-vibe/ui/components/widget-shell";
+import {
+  formatMoney,
+  formatQuantity,
+} from "next-vibe/unified-ui/_shared/format-money";
 import {
   useWidgetLocale,
   useWidgetNavigation,
@@ -23,6 +28,8 @@ import {
   PosOrderStatusDB,
   PosPaymentMethodDB,
 } from "../../../enum";
+import { formatPosSettlement } from "../../format-settlement";
+import { isPosMinorUnitAmount } from "../../settlement-amounts";
 import type definition from "./definition";
 import type { PosOrderGetResponseOutput } from "./definition";
 
@@ -70,6 +77,7 @@ export function PosOrderGetWidget({
     void (async (): Promise<void> => {
       const def = await import("../add-item/definition");
       navigation.push(def.default.POST, {
+        urlPathParams: { orderId },
         data: {
           orderId,
           item: {
@@ -89,6 +97,7 @@ export function PosOrderGetWidget({
       const def = await import("../add-payment/definition");
       const { PosPaymentMethod } = await import("@/pos/enum");
       navigation.push(def.default.POST, {
+        urlPathParams: { orderId },
         data: {
           details: {
             orderId,
@@ -107,6 +116,7 @@ export function PosOrderGetWidget({
     void (async (): Promise<void> => {
       const def = await import("../complete/definition");
       navigation.push(def.default.POST, {
+        urlPathParams: { orderId },
         data: { orderId },
       });
     })();
@@ -116,8 +126,16 @@ export function PosOrderGetWidget({
     void (async (): Promise<void> => {
       const def = await import("../void/definition");
       navigation.push(def.default.POST, {
+        urlPathParams: { orderId },
         data: { orderId },
       });
+    })();
+  };
+
+  const handleViewSession = (sessionId: string): void => {
+    void (async (): Promise<void> => {
+      const def = await import("../../../session/[sessionId]/get/definition");
+      navigation.push(def.default.GET, { urlPathParams: { sessionId } });
     })();
   };
 
@@ -131,26 +149,39 @@ export function PosOrderGetWidget({
     })();
   };
 
+  const handleViewSessionOrders = (sessionId: string): void => {
+    void (async (): Promise<void> => {
+      const def = await import("../../list/definition");
+      navigation.push(def.default.GET, {
+        data: {
+          input: { sessionId, status: undefined },
+          page: 1,
+          pageSize: 50,
+        },
+      });
+    })();
+  };
+
   const fmt = (n: number, currency: string): string =>
     formatMoney(n, currency, locale);
 
+  const back = navigation.canGoBack ? (
+    <Button
+      type="button"
+      variant="ghost"
+      size="sm"
+      className="self-start gap-1.5 -ml-1"
+      onClick={() => navigation.pop()}
+    >
+      <ChevronLeft className="h-4 w-4" />
+      {t("orderGet.get.widget.back")}
+    </Button>
+  ) : undefined;
+
   if (!order) {
     return (
-      <Div className="max-w-2xl mx-auto w-full px-4 pt-8 pb-6 flex flex-col gap-4">
-        {navigation.canGoBack && (
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={() => {
-              navigation.pop();
-            }}
-            className="self-start gap-1.5 -ml-1"
-          >
-            <ChevronLeft className="h-4 w-4" />
-            {t("orderGet.get.widget.back")}
-          </Button>
-        )}
+      <WidgetShell layout="page" className="mx-auto max-w-3xl">
+        <WidgetHeader title={t("orderGet.get.title")} backButton={back} />
         <EntityPickerFieldWidget
           fieldName="orderId"
           field={field.children.orderId}
@@ -158,7 +189,7 @@ export function PosOrderGetWidget({
         <SubmitButtonWidget<typeof definition.GET>
           field={{ text: "orderGet.get.widget.select" as const }}
         />
-      </Div>
+      </WidgetShell>
     );
   }
 
@@ -172,42 +203,48 @@ export function PosOrderGetWidget({
   );
   const outstanding = (Math.round(order.total * 10_000) - totalPaid) / 10_000;
   const canEdit = isOpen && order.payments.length === 0;
+  const legacyTender =
+    !isPosMinorUnitAmount(order.total) ||
+    order.payments.some(
+      ({ amount, change }) =>
+        !isPosMinorUnitAmount(amount) || !isPosMinorUnitAmount(change),
+    );
   const translatedStatus = PosOrderStatusDB.find((key) => key === order.status);
 
   return (
-    <Div className="max-w-2xl mx-auto w-full px-4 pt-8 pb-6 flex flex-col gap-4">
-      {/* Back button */}
-      {navigation.canGoBack && (
+    <WidgetShell layout="page" className="mx-auto max-w-3xl">
+      {!navigation.canGoBack && (
         <Button
           type="button"
           variant="ghost"
           size="sm"
-          onClick={() => navigation.pop()}
           className="self-start gap-1.5 -ml-1"
+          onClick={() => handleViewSessionOrders(order.sessionId)}
         >
           <ChevronLeft className="h-4 w-4" />
-          {t("orderGet.get.widget.back")}
+          {t("workflow.backToSessionOrders")}
         </Button>
       )}
-
-      <FormAlertWidget field={{}} />
-
-      {/* Header: order number + status */}
-      <Div className="flex items-center justify-between gap-2">
-        <Div className="flex items-center gap-2">
-          <Span className="text-lg font-mono font-bold">
-            #{order.orderNumber}
-          </Span>
+      <WidgetHeader
+        title={t(isCompleted ? "workflow.receiptTitle" : "orderGet.get.title")}
+        backButton={back}
+        titleAccessory={
           <Span
             className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${orderStatusBadgeClass(order.status)}`}
           >
             {translatedStatus ? t(translatedStatus) : order.status}
           </Span>
-        </Div>
+        }
+      />
+      <Div className="flex min-w-0 flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+        <Span className="min-w-0 font-mono text-sm font-medium [overflow-wrap:anywhere]">
+          #{order.orderNumber}
+        </Span>
         <Span className="text-xs text-muted-foreground tabular-nums">
           {new Date(order.createdAt).toLocaleString(locale)}
         </Span>
       </Div>
+      <FormAlertWidget field={{}} />
 
       {/* Total summary */}
       <Div className="rounded-lg border overflow-hidden divide-y">
@@ -216,16 +253,29 @@ export function PosOrderGetWidget({
             {t("orderGet.get.response.subtotal")}
           </Span>
           <Span className="text-sm font-mono tabular-nums">
-            {fmt(Number(order.subtotal), order.currency)}
+            {formatPosSettlement(
+              Number(order.subtotal),
+              order.currency,
+              locale,
+            )}
           </Span>
         </Div>
+        {order.taxExemptionNotice && (
+          <Span className="text-sm text-muted-foreground">
+            {order.taxExemptionNotice}
+          </Span>
+        )}
         {Number(order.taxAmount) > 0 ? (
           <Div className="flex items-center justify-between px-4 py-3">
             <Span className="text-sm text-muted-foreground">
               {t("orderGet.get.response.taxAmount")}
             </Span>
             <Span className="text-sm font-mono tabular-nums">
-              {fmt(Number(order.taxAmount), order.currency)}
+              {formatPosSettlement(
+                Number(order.taxAmount),
+                order.currency,
+                locale,
+              )}
             </Span>
           </Div>
         ) : null}
@@ -234,7 +284,7 @@ export function PosOrderGetWidget({
             {t("orderGet.get.response.total")}
           </Span>
           <Span className="text-lg font-mono font-bold tabular-nums">
-            {fmt(Number(order.total), order.currency)}
+            {formatPosSettlement(Number(order.total), order.currency, locale)}
           </Span>
         </Div>
       </Div>
@@ -266,8 +316,13 @@ export function PosOrderGetWidget({
                     {item.description}
                   </Span>
                   <Span className="text-xs text-muted-foreground">
-                    {item.quantity} {t("orderGet.get.widget.qtyTimesPrice")}{" "}
-                    {fmt(Number(item.unitPrice), order.currency)}
+                    {formatQuantity(item.quantity, locale)}{" "}
+                    {t("orderGet.get.widget.qtyTimesPrice")}{" "}
+                    {formatPosSettlement(
+                      item.unitPrice,
+                      order.currency,
+                      locale,
+                    )}
                   </Span>
                 </Div>
                 <Span className="text-sm font-mono font-semibold tabular-nums shrink-0">
@@ -281,6 +336,7 @@ export function PosOrderGetWidget({
                     onClick={() => {
                       void import("../remove-item/definition").then((mod) =>
                         navigation.push(mod.default.POST, {
+                          urlPathParams: { orderId: order.id },
                           data: {
                             details: { orderId: order.id, itemId: item.itemId },
                           },
@@ -303,6 +359,12 @@ export function PosOrderGetWidget({
         </Div>
       ) : null}
 
+      {legacyTender && (
+        <Span className="text-sm text-muted-foreground">
+          {t("workflow.legacyTenderRecorded")}
+        </Span>
+      )}
+
       {/* Payments list */}
       {order.payments.length > 0 ? (
         <Div className="flex flex-col gap-1">
@@ -324,12 +386,20 @@ export function PosOrderGetWidget({
                     .at(0) ?? payment.method}
                 </Badge>
                 <Span className="flex-1 text-sm font-mono tabular-nums">
-                  {fmt(Number(payment.amount), order.currency)}
+                  {formatPosSettlement(
+                    Number(payment.amount),
+                    order.currency,
+                    locale,
+                  )}
                 </Span>
                 {Number(payment.change) > 0 ? (
                   <Span className="text-xs text-muted-foreground tabular-nums shrink-0">
                     {t("orderGet.get.response.change")}:{" "}
-                    {fmt(Number(payment.change), order.currency)}
+                    {formatPosSettlement(
+                      Number(payment.change),
+                      order.currency,
+                      locale,
+                    )}
                   </Span>
                 ) : null}
               </Div>
@@ -355,6 +425,14 @@ export function PosOrderGetWidget({
               {t("orderGet.get.widget.completedReadOnly")}
             </Span>
           </Div>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => handleViewSession(order.sessionId)}
+          >
+            {t("dashboard.get.widget.viewSession")}
+          </Button>
           {order.journalEntryId ? (
             <Button
               type="button"
@@ -415,7 +493,7 @@ export function PosOrderGetWidget({
           </Button>
         </Div>
       ) : null}
-    </Div>
+    </WidgetShell>
   );
 }
 
@@ -430,7 +508,7 @@ function OutstandingBalance({
   locale: CountryLanguage;
   t: ReturnType<typeof useWidgetTranslation<typeof definition.GET>>;
 }): JSX.Element {
-  const fmt = (n: number): string => formatMoney(n, currency, locale);
+  const fmt = (n: number): string => formatPosSettlement(n, currency, locale);
 
   if (outstanding <= 0) {
     return (

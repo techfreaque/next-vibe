@@ -18,7 +18,7 @@ export const { GET, POST, tools } = endpointsHandler({
       PaymentRepository.createPaymentSession(data, user, t, logger, locale),
   },
   [Methods.GET]: {
-    handler: ({ data, user, t, logger }) =>
-      PaymentRepository.getPaymentInfo(data, user, t, logger),
+    handler: ({ user, t, logger }) =>
+      PaymentRepository.getPaymentInfo(user, t, logger),
   },
 });

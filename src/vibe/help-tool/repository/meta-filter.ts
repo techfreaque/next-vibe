@@ -16,6 +16,7 @@ import {
   type UserRoleValue,
 } from "../../identity/roles/enum";
 import { Platform } from "../../platforms/platforms";
+import { getAdminToolRole } from "../admin-classification";
 import type { HelpGetRequestOutput } from "../definition";
 
 /**
@@ -116,6 +117,44 @@ export function getCatalogOverview(
   return undefined;
 }
 
+/** Prefer directly usable lists and create forms for a business term.
+ * Exact aliases and named actions keep their direct lookup behavior.
+ */
+export function rankWorkspaceMatches(
+  ranked: EndpointMeta[],
+  query: string,
+): EndpointMeta[] {
+  const normalized = query.trim().toLowerCase();
+  const terms = normalized.split(/\s+/u);
+  const priority = (tool: EndpointMeta): number => {
+    if (
+      [tool.toolName, ...tool.aliases].some(
+        (name) => name.toLowerCase() === normalized,
+      )
+    ) {
+      return 0;
+    }
+    const titles = [tool.titleShort, tool.title].map(
+      (title) => title?.toLowerCase() ?? "",
+    );
+    if (terms.length > 1 && titles.includes(normalized)) {
+      return 0;
+    }
+    if (!titles.some((title) => terms.every((term) => title.includes(term)))) {
+      return 4;
+    }
+    const role = getAdminToolRole(tool);
+    if (role === "destination") {
+      return 1;
+    }
+    return role === "create" ? 2 : 3;
+  };
+  return ranked
+    .map((tool) => ({ tool, rank: priority(tool) }))
+    .toSorted((a, b) => a.rank - b.rank)
+    .map(({ tool }) => tool);
+}
+
 interface CatalogMetadata {
   category?: string;
   subCategory?: string;
@@ -130,8 +169,9 @@ export function searchCatalog<
     tags?: string[];
   },
 >(tools: TTool[], query: string, getName: (tool: TTool) => string): TTool[] {
-  return searchItems(tools, {
+  const ranked = searchItems(tools, {
     query,
+    requireAllTerms: true,
     fields: [
       searchField(getName, 1),
       searchField((tool) => tool.aliases ?? [], 0.9),
@@ -142,6 +182,14 @@ export function searchCatalog<
       searchField((tool) => tool.category ?? "", 0.1),
     ],
   });
+  const normalized = query.trim().toLowerCase();
+  const exact = (tool: TTool): boolean =>
+    [tool.titleShort, tool.title, getName(tool), ...(tool.aliases ?? [])].some(
+      (text) => text?.toLowerCase() === normalized,
+    );
+  return ranked.toSorted(
+    (left, right) => Number(exact(right)) - Number(exact(left)),
+  );
 }
 
 export function filterCatalogCategory<TTool extends CatalogMetadata>(

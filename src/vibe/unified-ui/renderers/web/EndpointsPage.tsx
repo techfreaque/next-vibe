@@ -30,6 +30,7 @@ import type { WidgetData } from "../../../core/utils/json";
 import type { JwtPayloadType } from "../../../identity/auth/types";
 import type { EndpointLogger } from "../../../logger/types";
 import { isCliPlatform, type Platform } from "../../../platforms/platforms";
+import { useObserveAdminRecordCompany } from "../../_shared/admin-record-company";
 import { cn } from "../../_shared/cn";
 import { PickerProvider } from "../../_shared/picker-context";
 import type {
@@ -650,6 +651,18 @@ function EndpointsPageInternal<
     isLoading = deleteOp.isSubmitting;
   }
 
+  useObserveAdminRecordCompany(
+    activeEndpoint,
+    endpointOptions?.read?.urlPathParams,
+    !disabled &&
+      !responseOnly &&
+      isGetEndpoint &&
+      !endpointState.read?.isLoadingFresh &&
+      !endpointState.read?.error
+      ? responseData
+      : undefined,
+  );
+
   // Build endpoint mutations for context - widgets can call these directly
   const endpointMutations = {
     create: endpointState.create
@@ -687,6 +700,7 @@ function EndpointsPageInternal<
           refetch: async (): Promise<void> => {
             await endpointState.read?.refetch();
           },
+          refetchResult: endpointState.read.refetch,
           remove: (): void => {
             endpointState.read?.remove();
           },

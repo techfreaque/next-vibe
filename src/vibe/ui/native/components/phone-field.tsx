@@ -12,7 +12,10 @@ import type {
   CountryData,
   PhoneFieldProps,
 } from "../../web/components/phone-field";
-import { COUNTRIES } from "../../web/components/phone-field";
+import {
+  COUNTRIES,
+  localizedCallingCountries,
+} from "../../web/components/phone-field";
 import { scopedTranslation } from "../../web/i18n";
 import { applyStyleType } from "../../web/utils/style-type";
 import { convertCSSToViewStyle } from "../utils/style-converter";
@@ -22,7 +25,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "./popover";
 import { Text as UIText } from "./text";
 
 // Re-export COUNTRIES and types for use in other modules
-export { COUNTRIES };
+export { COUNTRIES, localizedCallingCountries };
 export type { CountryData, PhoneFieldProps };
 
 export function PhoneField({
@@ -30,6 +33,7 @@ export function PhoneField({
   onChange,
   onBlur,
   placeholder = "Enter phone number",
+  label,
   defaultCountry = "US",
   preferredCountries = [],
   disabled = false,
@@ -39,6 +43,9 @@ export function PhoneField({
   const [open, setOpen] = useState(false);
   const { locale } = useTranslation();
   const { t } = scopedTranslation.scopedT(locale);
+  const countries = useMemo(() => localizedCallingCountries(locale), [locale]);
+  const initialCountry =
+    defaultCountry === "GLOBAL" ? locale.split("-")[1] : defaultCountry;
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
 
   // Parse the current value to extract country and number
@@ -47,13 +54,13 @@ export function PhoneField({
   ): { country: string; number: string } => {
     if (!phoneValue) {
       return {
-        country: defaultCountry || "US",
+        country: initialCountry || "US",
         number: "",
       };
     }
 
     // Find matching country by prefix
-    const matchingCountry = COUNTRIES.find((country: CountryData) =>
+    const matchingCountry = countries.find((country: CountryData) =>
       phoneValue.startsWith(country.prefix),
     );
 
@@ -64,28 +71,28 @@ export function PhoneField({
       };
     }
 
-    return { country: defaultCountry || "US", number: phoneValue };
+    return { country: initialCountry || "US", number: phoneValue };
   };
 
   const { country: selectedCountry, number: phoneNumber } =
     parsePhoneValue(value);
   const currentCountry =
-    COUNTRIES.find((c: CountryData) => c.code === selectedCountry) ||
-    COUNTRIES[0];
+    countries.find((c: CountryData) => c.code === selectedCountry) ||
+    countries[0];
 
   // Organize countries with preferred ones first
   const organizedCountries = useMemo(() => {
-    const preferred = COUNTRIES.filter((country: CountryData) =>
+    const preferred = countries.filter((country: CountryData) =>
       preferredCountries.includes(country.code),
     );
-    const others = COUNTRIES.filter(
+    const others = countries.filter(
       (country: CountryData) => !preferredCountries.includes(country.code),
     );
     return { preferred, others };
-  }, [preferredCountries]);
+  }, [countries, preferredCountries]);
 
   const handleCountrySelect = (countryCode: string): void => {
-    const newCountry = COUNTRIES.find(
+    const newCountry = countries.find(
       (c: CountryData) => c.code === countryCode,
     );
     if (newCountry) {
@@ -137,6 +144,9 @@ export function PhoneField({
       <Popover open={open} onOpenChange={handleOpenChange}>
         <PopoverTrigger>
           <Pressable
+            accessibilityLabel={t("common.callingCode", {
+              prefix: currentCountry.prefix,
+            })}
             disabled={disabled}
             className={cn(
               "w-[120px] h-12 flex-row items-center justify-between rounded-l-md border border-input border-r-0 bg-background px-3 py-2",
@@ -179,6 +189,7 @@ export function PhoneField({
           <Phone size={16} color="#888" />
         </View>
         <Input
+          aria-label={label ?? t("common.enterPhoneNumber")}
           keyboardType="phone-pad"
           value={phoneNumber}
           onChangeText={handleNumberChange}

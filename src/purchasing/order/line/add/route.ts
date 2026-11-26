@@ -13,13 +13,7 @@ import { OrderLineAddRepository } from "./repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
-    handler: ({ data, urlPathParams, user, logger, locale }) =>
-      OrderLineAddRepository.addLine(
-        urlPathParams.poId,
-        user.id,
-        data,
-        logger,
-        locale,
-      ),
+    handler: ({ data, user, logger, locale }) =>
+      OrderLineAddRepository.addLine(data.poId, user.id, data, logger, locale),
   },
 });

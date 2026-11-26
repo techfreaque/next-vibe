@@ -187,7 +187,6 @@ const { POST } = createEndpoint({
       default: {
         amount: 1476,
         method: ManualPaymentMethod.BANK_TRANSFER,
-        paidAt: "2024-01-15T10:00:00Z",
         receiptKey: "bank-receipt-2024-01-15-1",
       },
     },

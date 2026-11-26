@@ -106,11 +106,13 @@ export const translations: typeof enTranslations = {
       "Ponów tę płatność z tym samym kluczem. Dla kolejnego wpływu użyj nowego klucza.",
   },
   accountNodeId: {
-    label: "ID węzła konta",
-    description: "Opcjonalnie: węzeł księgowy, który otrzymał tę płatność",
-    placeholder: "Wprowadź ID węzła",
+    label: "Konto płatności",
+    description: "Wybierz konto bankowe lub kasę, do której wpłynęła płatność.",
+    placeholder: "Wybierz konto",
+    automatic: "Użyj konta domyślnego",
   },
   widget: {
+    details: "Szczegóły płatności",
     back: "Wróć",
     submit: "Zarejestruj płatność",
     paymentRecorded: "Płatność została zarejestrowana.",

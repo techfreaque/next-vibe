@@ -63,6 +63,13 @@ const { GET } = createEndpoint({
         description: "orderList.get.companyId.description" as const,
         schema: z.uuid().optional(),
       }),
+      vendorId: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.UUID,
+        label: "orderList.get.response.vendorId",
+        hidden: true,
+        schema: z.uuid().optional(),
+      }),
       status: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,

@@ -18,6 +18,9 @@ import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { users } from "next-vibe/identity/user/db";
 import type { z } from "zod";
 
+import { warehouses } from "@/inventory/db";
+import { LINE_SETTLEMENT_V1 } from "@/tax/line-settlement";
+
 import {
   PosOrderStatus,
   PosOrderStatusDB,
@@ -60,10 +63,16 @@ export const posTerminals = pgTable(
     isActive: boolean("is_active").notNull().default(true),
     // Soft ref — no FK — points to the cash drawer accountNode
     cashAccountNodeId: uuid("cash_account_node_id"),
+    warehouseId: uuid("warehouse_id").references(() => warehouses.id, {
+      onDelete: "restrict",
+    }),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },
-  (table) => [index("idx_pos_terminals_company").on(table.companyId)],
+  (table) => [
+    index("idx_pos_terminals_company").on(table.companyId),
+    index("idx_pos_terminals_warehouse").on(table.warehouseId),
+  ],
 );
 
 /**
@@ -113,6 +122,8 @@ export const posOrders = pgTable(
       .notNull()
       .default(PosOrderStatus.OPEN),
     orderNumber: text("order_number").notNull(),
+    taxExemptionNotice: text("tax_exemption_notice"),
+    lineSettlement: text("line_settlement", { enum: [LINE_SETTLEMENT_V1] }),
     currency: text("currency").notNull().default("EUR"),
     subtotal: numericNumber("subtotal").notNull().default(0),
     taxAmount: numericNumber("tax_amount").notNull().default(0),

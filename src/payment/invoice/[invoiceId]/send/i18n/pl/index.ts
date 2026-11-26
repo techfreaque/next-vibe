@@ -15,7 +15,7 @@ export const translations: typeof enTranslations = {
       description: "Po wystawieniu otrzymasz link dla klienta.",
     },
     response: {
-      success: "Faktura wysłana",
+      success: "Faktura wystawiona",
       message: "Komunikat statusu",
       viewUrl: "URL widoku klienta",
     },
@@ -61,8 +61,8 @@ export const translations: typeof enTranslations = {
       },
     },
     success: {
-      title: "Sukces",
-      description: "Faktura oznaczona jako wysłana",
+      title: "Faktura wystawiona",
+      description: "Link do faktury jest gotowy do udostępnienia.",
     },
   },
   invoiceId: {
@@ -70,10 +70,41 @@ export const translations: typeof enTranslations = {
     description: "ID faktury do wysłania",
     placeholder: "Wprowadź ID faktury",
   },
+  delivery: {
+    share: "Udostępnij fakturę",
+    description:
+      "Skopiuj link dla klienta lub wyślij go na adres zapisany na fakturze.",
+    send: "Wyślij e-mailem",
+    confirmDescription: "Wyślij link do faktury na potwierdzony adres.",
+    recipient: "Odbiorca faktury",
+    noRecipient:
+      "Na fakturze nie ma prawidłowego adresu odbiorcy. Nadal możesz skopiować link.",
+    status: "Status e-maila",
+    notIssued: "Możesz udostępniać tylko wystawione faktury.",
+    recipientChanged:
+      "Odbiorca faktury się zmienił lub jest niedostępny. Otwórz ponownie opcję udostępniania.",
+    emailSubject: "Faktura {{number}}",
+    emailText:
+      "Firma {{company}} wystawiła fakturę {{number}}. Otwórz ją tutaj:\n{{url}}",
+    states: {
+      ready: "Gotowe do wysłania",
+      pending:
+        "Wysyłka jest w toku lub nie została potwierdzona. Kolejne próby są wstrzymane.",
+      accepted: "Serwer pocztowy przyjął wiadomość.",
+      retryable:
+        "Nie połączono się z serwerem pocztowym. Możesz ponowić próbę.",
+      uncertain:
+        "Nie udało się potwierdzić wyniku wysyłki. Skontaktuj się z odbiorcą przed osobnym wysłaniem linku.",
+    },
+  },
   widget: {
     back: "Wróć",
     submit: "Wystaw fakturę",
-    sent: "Faktura wystawiona",
+    sent: "Udostępnij klientowi link do faktury.",
+    copy: "Skopiuj link dla klienta",
+    copied: "Link skopiowany",
+    copyError:
+      "Nie udało się skopiować linku. Zaznacz i skopiuj adres powyżej.",
     viewUrl: "Link widoku klienta",
   },
 };

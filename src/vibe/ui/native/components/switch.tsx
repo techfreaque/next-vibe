@@ -46,6 +46,7 @@ export function Switch({
   onBlur,
   children,
   id,
+  "aria-label": accessibleName,
 }: SwitchRootProps): React.JSX.Element {
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
   const { colorScheme } = useColorScheme();
@@ -98,6 +99,7 @@ export function Switch({
         checked={isChecked}
         onCheckedChange={handleCheckedChange}
         disabled={disabled}
+        accessibilityLabel={accessibleName}
       >
         <StyledAnimatedView style={animatedThumbStyle}>
           <StyledSwitchThumb className={THUMB_CLASSNAME} />

@@ -101,6 +101,18 @@ export const translations: typeof enTranslations = {
       total: "Total",
     },
     widget: {
+      checkout: "Offres vendues par la plateforme",
+      checkoutHint:
+        "Consultez les abonnements et les packs aux tarifs de ce marché. Pour rattacher une vente à la comptabilité, choisissez un produit d’entreprise ci-dessous et configurez son offre de paiement.",
+      checkoutReference: "Référence de paiement",
+      checkoutCredits: "Crédits inclus",
+      oneTime: "Prix unique",
+      searchPage: "Chercher par nom ou référence sur cette page",
+      noMatches: "Aucun produit correspondant sur cette page",
+      retry: "Réessayer",
+      previous: "Précédent",
+      next: "Suivant",
+      status: "Statut",
       addProduct: "Ajouter un produit",
       active: "Actif",
       inactive: "Inactif",

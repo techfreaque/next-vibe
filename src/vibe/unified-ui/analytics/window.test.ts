@@ -80,7 +80,15 @@ describe("helpers", () => {
 
   it("formats values and ticks", () => {
     expect(formatAnalyticsValue(0.256, { format: "percent", locale: "en-US" })).toBe("26%");
-    expect(formatAnalyticsValue(1234.5, { format: "currency", currency: "USD", locale: "en-US" })).toBe("$1,235");
+    expect(
+      formatAnalyticsValue(1234.5, { format: "currency", currency: "USD", locale: "en-US" }),
+    ).toBe("$1,234.50");
+    expect(
+      formatAnalyticsValue(-2626, { format: "currency", currency: "EUR", locale: "de-DE" }),
+    ).toBe("-2.626,00\u00a0€");
+    expect(
+      formatAnalyticsValue(5, { format: "currency", currency: "JPY", locale: "en-US" }),
+    ).toBe("¥5.00");
     expect(niceTicks(87)).toEqual([0, 50, 100]);
     expect(sparkline([0, 1, 2, 3])).toHaveLength(4);
   });

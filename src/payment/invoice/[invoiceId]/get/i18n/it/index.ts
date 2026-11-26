@@ -17,6 +17,7 @@ export const translations: typeof enTranslations = {
     },
     response: {
       companyName: "Azienda",
+      remainingCredit: "Importo ancora accreditabile",
       amountPaid: "Importo pagato",
       amountDue: "Importo residuo",
       id: "Fatturazione ID",
@@ -94,6 +95,9 @@ export const translations: typeof enTranslations = {
     placeholder: "Inserire la fattura ID",
   },
   widget: {
+    sourceQuote: "Preventivo di origine",
+    openSourceQuote: "Apri il preventivo di origine",
+    draftReference: "Bozza di fattura n. {{number}}",
     recentReminderDrafts: "Bozze recenti dei solleciti",
     receipts: "Cronologia incassi",
     receiptDate: "Data incasso",
@@ -129,6 +133,12 @@ export const translations: typeof enTranslations = {
     recordPayment: "Pagamento record",
     sendReminder: "Prepara sollecito",
     void: "Void",
+    remainingBalance: "Saldo residuo",
+    originalTotal: "Totale originale della fattura",
+    voidReversalDate: "Data dello storno",
+    viewOriginalJournal: "Apri la scrittura originale",
+    viewVoidReversal: "Apri la scrittura di storno",
+    backToInvoiceList: "Torna alle fatture",
     viewJournalEntry: "Visualizza l'ingresso del giornale",
     status: {
       draft: "Progetto",

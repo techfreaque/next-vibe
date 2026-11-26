@@ -71,6 +71,16 @@ export const translations = {
     placeholder: "Enter invoice ID",
   },
   widget: {
+    invoice: "Invoice",
+    total: "Invoice total",
+    customer: "Customer",
+    openInvoice: "Open invoice",
+    retry: "Retry",
+    loading: "Loading invoice…",
+    unavailable: "Invoice unavailable",
+    reversal: "A reversal dated today clears the outstanding receivable.",
+    cancelOnly: "The invoice will be cancelled.",
+    ineligible: "Only a draft or an unpaid, unapplied invoice can be voided.",
     back: "Back",
     submit: "Void Invoice",
     warning:

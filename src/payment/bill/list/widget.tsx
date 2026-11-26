@@ -133,7 +133,10 @@ export function BillListWidget(): JSX.Element {
       emptyTitle={t("widget.empty.title")}
       emptyHint={onPick ? undefined : t("widget.empty.hint")}
       filterLabel={t("widget.filters")}
-      filtered={data?.hasFilters ?? false}
+      filtered={Boolean(statusField.value || searchField.value?.trim())}
+      activeFilters={Boolean(companyId || searchField.value?.trim())}
+      scopeSummary={data?.selectedCompanyName}
+      selecting={Boolean(onPick)}
       statusTabs={
         isInteractive && onSubmit ? (
           <DocumentStatusTabs

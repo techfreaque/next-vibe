@@ -116,6 +116,8 @@ export const translations: typeof enTranslations = {
     description: "Risultati per pagina",
   },
   widget: {
+    creditable: "Seleziona la fattura da stornare",
+    noCreditable: "Nessuna fattura ha un importo da stornare.",
     filters: "Filtri",
     partlyPaid: "Pagata in parte",
     pageCount: "Totale pagine",

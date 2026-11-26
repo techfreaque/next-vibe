@@ -21,9 +21,34 @@ export const category: CategoryDefinition = {
     "es-ES": "Contabilidad",
     "sk-SK": "Účtovníctvo",
   },
+  description: {
+    "en-US": "Review journals, outstanding balances and open periods.",
+    "de-DE": "Prüfen Sie Buchungen, offene Posten und Perioden.",
+    "pl-PL": "Sprawdź zapisy księgowe, rozrachunki i otwarte okresy.",
+    "fr-FR": "Consultez les écritures, les soldes et les périodes ouvertes.",
+    "it-IT":
+      "Consulti le registrazioni, le partite aperte e i periodi contabili.",
+    "es-ES":
+      "Revise los asientos, los saldos pendientes y los períodos abiertos.",
+    "sk-SK":
+      "Skontrolujte účtovné zápisy, neuhradené položky a otvorené obdobia.",
+    "en-GLOBAL": "Review journals, outstanding balances and open periods.",
+  },
   group: "business",
   icon: "receipt",
   order: 30,
+  createActions: ["coa-journal-create", "coa-period-create"],
+  landing: {
+    destinations: [
+      "coa-journal-list",
+      "coa-receivables-aging",
+      "coa-payables-aging",
+      "coa-period-list",
+    ],
+    actions: ["coa-setup", "coa-period-create", "coa-journal-create"],
+    contextualActions: true,
+    overview: { alias: "accounting-dashboard", scope: "company" },
+  },
   defaultEntry: {
     [UserPermissionRole.ADMIN]: ACCOUNTING_DASHBOARD_ALIAS,
     [UserPermissionRole.CUSTOMER]: USER_ME_ALIAS,

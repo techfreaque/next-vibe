@@ -9,11 +9,13 @@ export const translations: typeof enTranslations = {
   },
 
   rate: {
+    details: "Dane stawki podatku",
     create: {
       title: "Utwórz stawkę podatkową",
       titleShort: "Utwórz stawkę",
       description: "Dodaj stawkę podatkową dla swojej firmy",
       widget: {
+        save: "Utwórz stawkę podatku",
         backToList: "Powrót do stawek podatkowych",
       },
       companyId: {
@@ -105,6 +107,10 @@ export const translations: typeof enTranslations = {
       titleShort: "Stawki podatkowe",
       description: "Wszystkie stawki podatkowe skonfigurowane dla Twojej firmy",
       widget: {
+        actions: "Działania",
+        retry: "Spróbuj ponownie",
+        previous: "Poprzednia",
+        next: "Następna",
         addRate: "Dodaj stawkę",
         labelDefault: "Domyślna",
         labelActive: "Aktywna",
@@ -203,6 +209,7 @@ export const translations: typeof enTranslations = {
       titleShort: "Zmień stawkę",
       description: "Zmodyfikuj istniejącą stawkę podatkową",
       widget: {
+        save: "Zapisz stawkę podatku",
         backToList: "Powrót do stawek podatkowych",
         failed: "Nie udało się",
       },
@@ -336,6 +343,7 @@ export const translations: typeof enTranslations = {
     description:
       "Sprawdź podatek zapisany na fakturach sprzedaży, korektach, fakturach zakupu i paragonach.",
     widget: {
+      retry: "Wczytaj raport ponownie",
       scope:
         "Dla faktur sprzedaży obowiązuje data powiązanego księgowania lub data utworzenia. Zakupy liczymy według daty faktury. Sprzedaż kasową liczymy według daty zakończenia (UTC) i uwzględniamy pozycje z dodatnią stawką lub zapisaną kwotą podatku. Jeśli wystawiona faktura ma to samo księgowanie, ujmujemy sprzedaż na fakturze.",
       empty: "Brak pozycji dokumentów spełniających kryteria.",
@@ -345,6 +353,8 @@ export const translations: typeof enTranslations = {
       unknownRate: "Nie można ustalić stawki",
       run: "Utwórz raport",
       running: "Tworzenie raportu…",
+      scopeHint:
+        "Porównaj VAT od sprzedaży i zakupów według stawek dla wybranej firmy i okresu.",
       selectCompany: "Wybierz firmę dla tego raportu.",
     },
     currency: {
@@ -417,6 +427,8 @@ export const translations: typeof enTranslations = {
 
   enums: {
     reportDirection: {
+      nonDeductible: "VAT od zakupów bez prawa do odliczenia",
+      reverseCharge: "VAT należny z odwrotnego obciążenia",
       posSales: "Sprzedaż kasowa",
       sales: "Faktury sprzedaży",
       creditNotes: "Korekty sprzedaży",

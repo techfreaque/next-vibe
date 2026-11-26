@@ -40,6 +40,10 @@ import { useWatch } from "react-hook-form";
 import { z } from "zod";
 
 import vendorDefinition from "@/purchasing/vendor/[vendorId]/get/definition";
+import {
+  LINE_SETTLEMENT_V1,
+  supportsLineCentSettlement,
+} from "@/tax/line-settlement";
 
 import { calculateBillLine, summarizeBillLines } from "./amounts";
 import { billDateToday, billDueDateFromTerms } from "./dates";
@@ -94,7 +98,12 @@ export function BillCreateWidget({
     vendor?.isActive && vendor.companyId === companyId && vendor.id === vendorId
       ? vendor
       : undefined;
-  const summary = summarizeBillLines(lines.map(calculateBillLine));
+  const lineSettlement = supportsLineCentSettlement(currency)
+    ? LINE_SETTLEMENT_V1
+    : undefined;
+  const summary = summarizeBillLines(
+    lines.map((line) => calculateBillLine(line, lineSettlement)),
+  );
   const money = (amount: number): string =>
     formatMoney(amount, currency, locale);
 
@@ -381,7 +390,7 @@ export function BillCreateWidget({
             </Div>
           </SectionGroup>
 
-          <BillLineEditor money={money} />
+          <BillLineEditor money={money} lineSettlement={lineSettlement} />
 
           <SectionGroup title={t("notes.label")}>
             <TextareaFieldWidget
@@ -418,6 +427,11 @@ export function BillCreateWidget({
                 <Span>{t("post.widget.total")}</Span>
                 <Span className="tabular-nums">{money(summary.total)}</Span>
               </Div>
+              {lines.length > 0 && (
+                <P className="text-xs text-muted-foreground">
+                  {t("post.widget.supplierTotalReview")}
+                </P>
+              )}
             </Div>
           ) : (
             <P className="text-sm text-destructive">

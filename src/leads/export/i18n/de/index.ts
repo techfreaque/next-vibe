@@ -54,8 +54,9 @@ export const translations: typeof enTranslations = {
       description: "Leads bis zu diesem Datum exportieren",
     },
     includeMetadata: {
-      label: "Metadaten einschließen",
-      description: "Erstellungs- und Aktualisierungszeitstempel einschließen",
+      label: "Technische Metadaten einschließen",
+      description:
+        "Zeitstempel, IP-Adresse, Gerätedaten, Empfehlungscode und gespeicherte Metadaten hinzufügen.",
     },
     includeEngagementData: {
       label: "Engagement-Daten einschließen",
@@ -114,6 +115,7 @@ export const translations: typeof enTranslations = {
     },
   },
   widget: {
+    prepareFile: "Export erstellen",
     exportLeads: "Leads exportieren",
     import: "Importieren",
     viewList: "Liste anzeigen",
@@ -135,7 +137,7 @@ export const translations: typeof enTranslations = {
     nextSteps: "Nächste Schritte:",
     viewLeads: "Leads anzeigen",
     importLeads: "Leads importieren",
-    configureExport: "Export konfigurieren",
+    configureExport: "Dateioptionen",
     configureExportHint:
       "Format und Filter unten auswählen, dann auf Exportieren klicken um die Datei zu generieren",
     formatLabel: "Format",
@@ -150,6 +152,19 @@ export const translations: typeof enTranslations = {
     viewLeadsList: "Lead-Liste anzeigen",
     excelSpreadsheet: "Excel-Tabelle",
     csvFile: "CSV-Datei",
+    description:
+      "Wählen Sie das Dateiformat und filtern Sie die Leads für den Export.",
+    changeFilters: "Filter ändern",
+    advancedFilters: "Weitere Filter",
+    activeFilters: "{{count}} aktiv",
+    exportFailed:
+      "Die Exportdatei konnte nicht erstellt werden. Ihre Filter bleiben ausgewählt. Versuchen Sie es erneut.",
+    retry: "Erneut versuchen",
+    noMatchingRecords: "Keine Leads entsprechen den Filtern",
+    noMatchingRecordsHint:
+      "Ändern oder entfernen Sie einen Filter und starten Sie den Export erneut.",
+    fileDetails: "Datensätze: {{count}} · {{size}}",
+    generatedAt: "Erstellt am {{date}}",
   },
   enums: {
     exportFormat: {

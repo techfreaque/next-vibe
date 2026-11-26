@@ -25,14 +25,15 @@ import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-a
 import type { JSX } from "react";
 
 import { formatAccountingDateInput } from "../../shared/calendar-date";
+import { reportAmountClass } from "../report-amount-class";
 import type definition from "./definition";
 import type { BalanceSheetResponseOutput } from "./definition";
 import {
-  reportAmountClass,
   ReportCompanyPicker,
   ReportDateFilter,
   ReportMenu,
   ReportPeriodMenu,
+  ReportReadState,
 } from "./report-controls";
 
 interface BalanceSheetWidgetProps {
@@ -149,6 +150,7 @@ export function BalanceSheetWidget(
   const responseOnly = useWidgetResponseOnly();
   const showInputs = interactive && !responseOnly;
   const companyId = form.watch("companyId");
+  const hasCompany = Boolean(companyId || data?.reportCompanyId);
   const requestedCurrency = form.watch("currency")?.trim().toUpperCase();
   const asOf = formatAccountingDateInput(form.watch("asOfDate"));
   const ready =
@@ -222,7 +224,9 @@ export function BalanceSheetWidget(
           />
         </Div>
       )}
-      <FormAlertWidget field={{}} />
+      {hasCompany && response?.success !== false && (
+        <FormAlertWidget field={{}} />
+      )}
       {ready && data?.reportCurrency && (
         <Span className="text-sm font-medium">
           {t("reports.currency")} {data.reportCurrency}
@@ -311,12 +315,11 @@ export function BalanceSheetWidget(
             </Div>
           </Div>
         </Div>
-      ) : response?.success === false ? null : (
-        <Div className="text-center py-10 text-sm text-muted-foreground border border-dashed rounded-md">
-          {companyId || data?.reportCompanyId
-            ? t("reports.widget.running")
-            : t("balanceSheet.widget.selectCompany")}
-        </Div>
+      ) : (
+        <ReportReadState
+          hasCompany={hasCompany}
+          companyPrompt={t("balanceSheet.widget.selectCompany")}
+        />
       )}
     </WidgetShell>
   );

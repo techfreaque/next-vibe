@@ -37,6 +37,8 @@ interface SkillVoteButtonsProps {
   /** Compact icon-only sizing for tight rows. */
   size?: "sm" | "default";
   className?: string;
+  upLabel?: string;
+  downLabel?: string;
 }
 
 export function SkillVoteButtons({
@@ -45,6 +47,8 @@ export function SkillVoteButtons({
   initialVoteCount = null,
   size = "default",
   className,
+  upLabel,
+  downLabel,
 }: SkillVoteButtonsProps): JSX.Element {
   const { user, locale } = useWidgetContext();
   const logger = useWidgetLogger();
@@ -114,6 +118,7 @@ export function SkillVoteButtons({
         variant="ghost"
         size="sm"
         disabled={pending}
+        aria-label={upLabel}
         aria-pressed={userVote === SkillVoteDirection.UP}
         className={cn(
           btnSize,
@@ -148,6 +153,7 @@ export function SkillVoteButtons({
         variant="ghost"
         size="sm"
         disabled={pending}
+        aria-label={downLabel}
         aria-pressed={userVote === SkillVoteDirection.DOWN}
         className={cn(
           btnSize,

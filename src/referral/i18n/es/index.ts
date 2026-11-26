@@ -171,24 +171,38 @@ export const translations: typeof enTranslations = {
       description: "Recuperado exitosamente sus estadísticas de referencia",
     },
     widget: {
+      emptyAdminMessage:
+        "Consulta el resumen para ver la actividad de todo el programa.",
+      loading: "Cargando estadísticas de referidos",
+      loadError: "No se pudieron cargar las estadísticas de referidos",
+      retry: "Reintentar",
+      emptyTitle: "Aún no hay actividad de referidos",
+      openCodes: "Abrir códigos de referidos",
+      revenueCoverage:
+        "Importe original registrado en {{measured}} de {{total}} compras.",
+      revenueUnavailable: "No disponible",
+      walletUnits: "{{amount}} créditos",
       adminNotice:
-        "Estas son tus cifras personales de referidos. El programa completo está en el resumen de referidos.",
+        "Estas cifras corresponden a tus referidos. Consulta el resumen para ver todo el programa.",
       openOverview: "Abrir resumen de referidos",
       emptyMessage:
-        "Aún no hay actividad. Comparte tu enlace de referido para empezar a ganar.",
+        "Comparte un código para empezar a registrar altas y comisiones.",
     },
     fields: {
       totalSignups: "Total de registros",
       totalSignupsDescription:
         "Número de personas que se registraron con tu código de referido",
-      totalRevenue: "Ingresos generados",
-      totalRevenueDescription: "Ingresos totales generados por tus referidos",
+      totalRevenue: "Valor de compras registrado",
+      totalRevenueDescription:
+        "Importes originales en USD vinculados a tus comisiones.",
       totalEarned: "Ganancias totales",
-      totalEarnedDescription: "Comisiones totales que ganaste por referidos",
+      totalEarnedDescription:
+        "Créditos ganados, incluidos los que siguen en periodo de reembolso.",
       availableBalance: "Saldo disponible",
-      availableBalanceDescription: "Saldo disponible para retirar",
+      availableBalanceDescription:
+        "Créditos disponibles tras descontar los retiros reservados.",
       availableBalanceDescriptionLow:
-        "Usa tus ganancias para chatear con IA. Primero se gastan tus otros créditos. Llega a {{minPayout}} para poder retirar tus ganancias.",
+        "Créditos disponibles tras descontar los retiros reservados. Retiro mínimo: {{minPayout}} créditos.",
       totalRevenueCredits: "Ingresos generados (créditos)",
       totalEarnedCredits: "Ganancias totales (créditos)",
       totalPaidOutCredits: "Total retirado (créditos)",
@@ -422,6 +436,7 @@ export const translations: typeof enTranslations = {
           credits:
             "Los pagos en créditos se convierten automáticamente. No hace falta hacer nada.",
         },
+        prepareBill: "Preparar factura de proveedor",
         codeReport: "Informe del código",
       },
     },

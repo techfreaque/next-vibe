@@ -61,10 +61,13 @@ export const translations: typeof enTranslations = {
       AR_PAYMENT: "Zahlungseingang",
       AP_BILL: "Eingangsrechnung",
       AP_PAYMENT: "Zahlungsausgang",
+      SUPPLIER_EVIDENCE: "Lieferantenbeleg",
+      BANK_RECONCILIATION: "Bankabstimmung",
       POS_ORDER: "Kassenbon",
       TAX_PAYMENT: "Steuerzahlung",
       PERIOD_CLOSE: "Periodenabschluss",
       CREDIT_TRANSACTION: "Guthaben-Transaktion",
+      REVENUE_RECOGNITION: "Erlöserfassung",
     },
     lineType: {
       DEBIT: "Soll",
@@ -181,6 +184,14 @@ export const translations: typeof enTranslations = {
       back: "Zurück",
       loading: "Buchungssatz wird geladen…",
       postButton: "Buchung buchen",
+      relatedEntries: "Verknüpfte Buchungen",
+      reversalBadge: "Storno",
+      originalEntry: "Ursprüngliche Buchung",
+      reversingEntry: "Stornierende Buchung",
+      reversedBy: "Stornobuchung",
+      originalLineNotes:
+        "Die Zeilentexte stammen aus der ursprünglichen Buchung. Soll und Haben zeigen die Stornobuchung.",
+      reverseReversal: "Stornobuchung stornieren",
       reverseButton: "Stornieren",
       balancedLabel: "Ausgeglichen",
       notBalancedLabel: "Nicht ausgeglichen",
@@ -466,17 +477,16 @@ export const translations: typeof enTranslations = {
       unbalanced: "Nicht ausgeglichen",
       noActivity: "Keine Konten mit Aktivität in diesem Zeitraum.",
       total: "Gesamt",
-      selectCompany:
-        "Unternehmens-ID eingeben und auf Ausführen klicken, um die Probebilanz zu erstellen.",
+      selectCompany: "Wählen Sie ein Unternehmen für diesen Bericht.",
     },
     title: "Probebilanz",
     titleShort: "Probebilanz",
     description:
       "Summe aller gebuchten Soll- und Haben-Beträge je Konto. Bestätigt den Buchungsausgleich.",
     companyId: {
-      label: "Unternehmens-ID",
+      label: "Unternehmen",
       description: "Unternehmen für den Bericht",
-      placeholder: "Unternehmens-UUID",
+      placeholder: "Unternehmen auswählen",
     },
     asOfDate: {
       label: "Stichtag",
@@ -561,7 +571,9 @@ export const translations: typeof enTranslations = {
       previousMonth: "Letzter Monat",
       autoCurrency: "Automatisch",
       run: "Ausführen",
-      running: "Wird ausgeführt…",
+      running: "Bericht wird geladen…",
+      loadError: "Der Bericht konnte nicht geladen werden",
+      retry: "Erneut versuchen",
     },
   },
   profitLoss: {
@@ -569,17 +581,16 @@ export const translations: typeof enTranslations = {
       dateRange: "Zeitraum",
       noData: "Keine Daten für diesen Zeitraum.",
       liabilitiesAndEquity: "Verbindlichkeiten + Eigenkapital",
-      selectCompany:
-        "Unternehmens-ID eingeben und auf Ausführen klicken, um die GuV zu erstellen.",
+      selectCompany: "Wählen Sie ein Unternehmen für diesen Bericht.",
     },
     title: "Gewinn- und Verlustrechnung",
     titleShort: "GuV",
     description:
       "Erträge vs. Aufwendungen im Berichtszeitraum. Zeigt Rohgewinn, Betriebsergebnis und Jahresüberschuss.",
     companyId: {
-      label: "Unternehmens-ID",
+      label: "Unternehmen",
       description: "Unternehmen für den Bericht",
-      placeholder: "Unternehmens-UUID",
+      placeholder: "Unternehmen auswählen",
     },
     from: {
       label: "Von",
@@ -657,16 +668,16 @@ export const translations: typeof enTranslations = {
       unbalanced: "Nicht ausgeglichen",
       noEntries: "Keine Buchungen für diesen Zeitraum",
       liabilitiesAndEquity: "Passiva",
-      selectCompany: "Firma auswählen, um die Bilanz anzuzeigen",
+      selectCompany: "Wählen Sie ein Unternehmen für diesen Bericht.",
     },
     title: "Bilanz",
     titleShort: "Bilanz",
     description:
       "Aktiva, Passiva und Eigenkapital zum Stichtag. Prüft, ob die Buchhaltungsgleichung stimmt.",
     companyId: {
-      label: "Unternehmens-ID",
+      label: "Unternehmen",
       description: "Unternehmen für den Bericht",
-      placeholder: "Unternehmens-UUID",
+      placeholder: "Unternehmen auswählen",
     },
     asOfDate: {
       label: "Stichtag",
@@ -824,26 +835,29 @@ export const translations: typeof enTranslations = {
       balanceSheet: "Bilanz",
       profitLoss: "GuV",
       trialBalance: "Probebilanz",
-      taxReport: "Steuerauswertung",
+      taxReport: "Umsatzsteuerübersicht",
     },
   },
   taxReport: {
     widget: {
+      filters: "Zeitraum und Währung",
+      window: "{{from}} bis {{to}}",
       dateRange: "Zeitraum",
-      noData: "Keine Steuerdaten für diesen Zeitraum.",
+      noData:
+        "Keine Buchungen auf Umsatz- oder Vorsteuerkonten in diesem Zeitraum.",
       summarySection: "Zusammenfassung",
-      detailSection: "Aufschlüsselung",
-      selectCompany:
-        "Unternehmens-ID eingeben und auf Ausführen klicken, um den Steuerbericht zu erstellen.",
+      detailSection: "Buchungen auf Umsatz- und Vorsteuerkonten",
+      scopeHint:
+        "Sehen Sie die Umsatzsteuer und die abziehbare Vorsteuer für den gewählten Zeitraum ein.",
+      selectCompany: "Wählen Sie ein Unternehmen für diesen Bericht.",
     },
-    title: "Steuerauswertung",
-    titleShort: "Steuerbericht",
-    description:
-      "Vereinnahmte vs. abzugsfähige Mehrwertsteuer im Berichtszeitraum. Nettosteuerschuld auf einen Blick.",
+    title: "Umsatzsteuerübersicht",
+    titleShort: "Umsatzsteuer",
+    description: "Gebuchte Umsatz- und Vorsteuer für den gewählten Zeitraum.",
     companyId: {
-      label: "Unternehmens-ID",
+      label: "Unternehmen",
       description: "Unternehmen für den Bericht",
-      placeholder: "Unternehmens-UUID",
+      placeholder: "Unternehmen auswählen",
     },
     from: {
       label: "Von",
@@ -858,19 +872,19 @@ export const translations: typeof enTranslations = {
     response: {
       from: "Von",
       to: "Bis",
-      vatCollected: "Vereinnahmte MwSt.",
-      vatReclaimable: "Abzugsfähige Vorsteuer",
-      netVatPayable: "Nettosteuerschuld",
-      lines: "Steuerzeilen",
-      taxRateCode: "Steuersatz-Code",
-      taxRateName: "Steuersatzname",
+      vatCollected: "Gebuchte Umsatzsteuer",
+      vatReclaimable: "Gebuchte Vorsteuer",
+      netVatPayable: "Umsatzsteuer-Zahllast",
+      lines: "Umsatz- und Vorsteuerkonten",
+      taxRateCode: "Kontonummer",
+      taxRateName: "Kontoname",
       netAmount: "Nettobetrag",
-      taxAmount: "Steuerbetrag",
+      taxAmount: "Gebuchte Steuer",
       rate: "Satz",
     },
     success: {
-      title: "Steuerauswertung bereit",
-      description: "Steuerauswertung berechnet",
+      title: "Umsatzsteuerübersicht bereit",
+      description: "Umsatzsteuerübersicht berechnet",
     },
     errors: {
       unauthorized: {
@@ -887,7 +901,7 @@ export const translations: typeof enTranslations = {
       },
       server: {
         title: "Serverfehler",
-        description: "Steuerauswertung konnte nicht berechnet werden",
+        description: "Umsatzsteuerübersicht konnte nicht berechnet werden",
       },
       unknown: {
         title: "Unbekannter Fehler",

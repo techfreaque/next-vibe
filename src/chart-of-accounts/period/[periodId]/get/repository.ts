@@ -17,6 +17,7 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
+import { companies } from "@/companies/db";
 import { CompanyMemberRole } from "@/companies/enum";
 import { CompanyAuthRepository } from "@/companies/repository";
 
@@ -60,10 +61,15 @@ export class CoaPeriodGetRepository {
         return authResult;
       }
 
+      const [company] = await db
+        .select({ name: companies.name })
+        .from(companies)
+        .where(eq(companies.id, period.companyId));
       return success({
         result: {
           id: period.id,
           companyId: period.companyId,
+          companyName: company?.name,
           name: period.name,
           startDate: period.startDate,
           endDate: period.endDate,

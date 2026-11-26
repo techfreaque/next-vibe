@@ -1,6 +1,151 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  profit: {
+    run: "Mostrar el informe",
+    unallocatedRevenue:
+      "Ingresos contabilizados sin asignación a modelos: {{amount}}",
+    estimatedCosts: "Costes estimados de modelos: {{amount}}",
+    usageValue:
+      "Uso de pago valorado a precios de compra conocidos: {{amount}}",
+    estimatedMargin: "Margen de uso estimado: {{amount}}",
+    marginUnknown:
+      "Margen no disponible. Faltan datos de financiación o del valor del uso.",
+    missingPrice:
+      "Sin precio de compra confirmado para {{credits}} créditos consumidos.",
+    title: "Resultados mensuales",
+    description:
+      "Consulta los ingresos y gastos contabilizados y el resultado neto por mes.",
+    revenue: "Ingresos netos",
+    expenses: "Gastos",
+    net: "Beneficio o pérdida neta",
+    empty: "No se contabilizaron ingresos ni gastos este mes.",
+    areas: "Fuentes de gastos",
+    signedExpenseAreas:
+      "Las anulaciones y otros abonos reducen los gastos. Un total negativo indica que los abonos superaron los cargos este mes.",
+    openLedger: "Ver asientos",
+    noAccounts: "Sin movimientos.",
+    estimatesHint:
+      "Estimaciones de uso en USD de hasta 20 modelos de los prestadores asociados. Se excluyen las cuotas fijas y los costes sin datos de uso.",
+    estimatesEmpty:
+      "No hay estimaciones de costes de modelos para esta selección.",
+    unknownModel: "Modelo sin identificar",
+    paid: "Créditos comprados: {{amount}}",
+    free: "Cuota gratuita: {{amount}}",
+    gifted: "Créditos regalados: {{amount}}",
+    unknownFunding: "Financiación desconocida: {{amount}}",
+    missing:
+      "Faltan datos de coste exacto para {{credits}} créditos consumidos.",
+  },
+  suppliers: {
+    bankTransaction: "Operación bancaria",
+    bankLoading: "Cargando la operación bancaria…",
+    bankUnavailable: "La operación bancaria verificada no está disponible.",
+    previewBankLink: "Previsualizar la vinculación",
+    linkToBankBill: "Vincular justificante",
+    bankDraftBill: "Factura de la operación bancaria (opcional)",
+    sponsorshipSource: "Patrocinio de creador",
+    confirmSeparateBankBill:
+      "Confirmar que el cargo es distinto de los borradores bancarios",
+    possibleBankDuplicate:
+      "Una factura procedente del banco tiene datos similares. Selecciónala para vincular el justificante o confirma que es un cargo distinto.",
+    monthlyReview: "Vista previa mensual de las fuentes",
+    monthlyReviewHint:
+      "Revisa los datos guardados y los prepagos confirmados del mes. Los intervalos incompletos pueden dejar huecos.",
+    counterTotal: "Uso según contador (USD): {{amount}}",
+    estimatedTotal: "Uso estimado (USD): {{amount}}",
+    unclassifiedTotal: "Uso con base desconocida (USD): {{amount}}",
+    readingCoverage:
+      "{{readings}} lecturas, {{missing}} sin coste de intervalo.",
+    receiptTotal:
+      "Prepagos confirmados: {{amount}} en {{count}} documentos, {{posted}} contabilizados.",
+    noReceipts: "No hay comprobantes de prepago confirmados este mes.",
+    ledgerPrepaid: "Saldo prepagado contabilizado",
+    estimates: "Costes estimados de los modelos",
+    estimatesHint:
+      "Las 20 estimaciones de uso más altas de los prestadores asociados. Se excluyen las cuotas fijas y los costes sin datos de uso.",
+    month: "Mes (AAAA-MM)",
+    monthly: "Gastos mensuales contabilizados",
+    noMonthly: "No hay gastos contabilizados este mes.",
+    area: {
+      referral: "Comisiones por referidos",
+      provider: "Prestadores",
+      processor: "Procesamiento de pagos",
+      sponsorship: "Patrocinio",
+      supplier: "Otros justificantes de proveedores",
+      unallocated: "Sin asignar",
+    },
+    spendBasis: {
+      counter: "Contador de consumo del prestador",
+      "balance-delta": "Estimación por variación del saldo",
+      "usage-estimate": "Estimación por uso interno",
+    },
+    title: "Justificantes de proveedores",
+    description: "Consulta saldos y documentos de proveedores.",
+    record: "Registrar un justificante",
+    recordDescription:
+      "Revisa el documento antes de crear una factura o un asiento.",
+    company: "Empresa",
+    vendor: "Proveedor",
+    chooseSupplier: "Elegir proveedor",
+    operation: "Acción",
+    provider: "Prestador",
+    reference: "Referencia del documento",
+    invoiceReference: "Número de factura del proveedor",
+    servicePeriodStart: "Inicio del período del servicio (AAAA-MM-DD)",
+    servicePeriodEnd: "Fin del período del servicio (AAAA-MM-DD)",
+    date: "Fecha contable (AAAA-MM-DD)",
+    gross: "Importe bruto",
+    tax: "Importe confirmado del impuesto",
+    currency: "Divisa (EUR, USD o PLN)",
+    memo: "Descripción",
+    preview: "Solo vista previa",
+    debit: "Cuenta de débito o de gasto",
+    credit: "Cuenta de crédito",
+    result: "Resultado",
+    balances: "Saldos de prestadores",
+    observed: "Saldo observado",
+    interval: "Coste del último intervalo sin base verificada",
+    unavailable: "No disponible",
+    recent: "Justificantes recientes",
+    noBindings: "Esta empresa no tiene prestadores asignados.",
+    noEvidence: "No hay justificantes de proveedores registrados.",
+    run: "Mostrar justificantes de proveedores",
+    previewEvidence: "Previsualizar el justificante",
+    invalid:
+      "Revisa la referencia, los importes confirmados, la divisa de la empresa, las cuentas y el período abierto.",
+    conflict: "Esta referencia ya está asignada a otro justificante.",
+    taxHint: "Introduce 0 si el justificante confirma que no hay impuestos.",
+    referralHint:
+      "Selecciona el proveedor con el correo verificado del beneficiario. Copia el importe bruto, la moneda y el impuesto del justificante de comisión. La solicitud de pago solo indica los créditos.",
+    evidenceHint:
+      "Usa el recibo o extracto original. El saldo del prestador por sí solo no basta.",
+    openBill: "Abrir factura",
+    openJournal: "Abrir asiento",
+    banked:
+      "Los saldos y costes observados se muestran para revisión. Los costes históricos pueden ser estimaciones.",
+    kind: {
+      processorFee: "Usar una comisión de pago verificada",
+      fundBill: "Factura de proveedor por prepago",
+      bind: "Asignar un prestador",
+      bill: "Factura de proveedor",
+      fund: "Recargar el saldo prepagado",
+      consume: "Usar el saldo prepagado",
+      paid: "Registrar un gasto pagado",
+      sponsorship: "Usar un registro de patrocinio",
+      referral: "Preparar factura de comisión",
+    },
+    outcome: {
+      linked: "Justificante del proveedor vinculado",
+      preview: "Vista previa validada",
+      bound: "Prestador asignado",
+      bill: "Borrador de factura creado",
+      posted: "Asiento contabilizado",
+      replayed: "Ya registrado",
+      review:
+        "Requiere revisión. El registro de origen por sí solo no acredita la liquidación en la divisa de la empresa ni el impuesto.",
+    },
+  },
   spendAlert: {
     explained: "El registro de uso explica el pico en {{provider}}.",
     unexplained: "Posible compromiso de la clave de API de {{provider}}.",
@@ -13,6 +158,15 @@ export const translations: typeof enTranslations = {
   },
   category: "Finanzas",
   documents: {
+    status: "Estado",
+    activeFilters: "{{label}} activos",
+    loadFailed: "No se han podido cargar los documentos",
+    loadFailedHint: "Vuelva a cargar la lista.",
+    scopeDenied: "No tiene acceso a los documentos seleccionados.",
+    retry: "Reintentar",
+    openAction: "Abrir",
+    pickAction: "Seleccionar",
+    pageSingle: "Página {{page}} de {{pages}} · {{total}} resultado",
     clearCompany: "Quitar filtro de empresa",
     clearCustomer: "Quitar filtro de cliente",
     pageTotals: "Totales · {{currency}}",

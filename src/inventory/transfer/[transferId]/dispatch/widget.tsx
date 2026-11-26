@@ -1,48 +1,40 @@
 "use client";
 
-import { Button } from "next-vibe/ui/components/button";
-import { Div } from "next-vibe/ui/components/div";
-import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
+import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
 import {
-  useWidgetNavigation,
-  useWidgetTranslation,
+  useWidgetForm,
+  useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
+import { EntityPickerFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/entity-picker-field/widget";
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 import type { JSX } from "react";
 
+import { TransferAction } from "../../action";
 import type definition from "./definition";
 
-export function InventoryTransferDispatchWidget(
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  _props: {
-    field: (typeof definition.POST)["fields"];
-  },
-): JSX.Element {
-  const navigation = useWidgetNavigation();
-  const t = useWidgetTranslation<typeof definition.POST>();
-
+export function InventoryTransferDispatchWidget({
+  field,
+}: {
+  field: (typeof definition.POST)["fields"];
+}): JSX.Element {
+  const form = useWidgetForm<typeof definition.POST>();
+  const result = useWidgetValue<typeof definition.POST>()?.result;
   return (
-    <Div className="max-w-lg mx-auto w-full px-4 pt-8 pb-6 flex flex-col gap-4">
-      {navigation.canGoBack && (
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={() => {
-            navigation.pop();
-          }}
-          className="self-start gap-1.5 -ml-1"
-        >
-          <ChevronLeft className="h-4 w-4" />
-          {t("transferDispatch.post.widget.backToTransfer")}
-        </Button>
-      )}
-
-      <FormAlertWidget field={{}} />
-      <SubmitButtonWidget<typeof definition.POST>
-        field={{ text: "transferDispatch.post.title" as const }}
-      />
-    </Div>
+    <TransferAction
+      action="dispatch"
+      transferId={form.watch("transferId")}
+      completed={Boolean(result)}
+      picker={
+        <EntityPickerFieldWidget
+          fieldName="transferId"
+          field={withValue(field.children.transferId, undefined, null)}
+        />
+      }
+      submit={
+        <SubmitButtonWidget<typeof definition.POST>
+          field={{ text: "transferDispatch.post.titleShort" }}
+        />
+      }
+    />
   );
 }

@@ -15,6 +15,7 @@ import { EmptyBlock } from "next-vibe/ui/components/empty-block";
 import { AlertTriangle } from "next-vibe/ui/components/icons/AlertTriangle";
 import { CheckCircle2 } from "next-vibe/ui/components/icons/CheckCircle2";
 import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
+import { Filter } from "next-vibe/ui/components/icons/Filter";
 import { Input } from "next-vibe/ui/components/input";
 import { LoadingBlock } from "next-vibe/ui/components/loading-block";
 import { Pre } from "next-vibe/ui/components/pre";
@@ -25,6 +26,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "next-vibe/ui/components/select";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "next-vibe/ui/components/sheet";
 import { Span } from "next-vibe/ui/components/span";
 import { StatusPill } from "next-vibe/ui/components/status-pill";
 import { WidgetHeader } from "next-vibe/ui/components/widget-header";
@@ -57,7 +66,10 @@ import { FormAlertWidget } from "../../../unified-ui/widgets/interactive/form-al
 import { SubmitButtonWidget } from "../../../unified-ui/widgets/interactive/submit-button/widget";
 import { ERROR_LOGS_PAGE_SIZE } from "./constants";
 import type endpoints from "./definition";
-import type { ErrorLogsResponseOutput } from "./definition";
+import type {
+  ErrorLogsRequestOutput,
+  ErrorLogsResponseOutput,
+} from "./definition";
 import endpointDefinitions from "./definition";
 import {
   ERROR_LOG_TREND_SERIES,
@@ -73,6 +85,10 @@ import {
 } from "./enum";
 
 type ErrorLog = ErrorLogsResponseOutput["logs"][number];
+type SecondaryFilters = Pick<
+  ErrorLogsRequestOutput,
+  "status" | "level" | "source"
+>;
 type GetT = ReturnType<typeof useWidgetTranslation<typeof endpoints.GET>>;
 
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -540,23 +556,33 @@ function SegmentedFilter<TValue extends string>({
   onSelect: (value: TValue) => void;
 }): JSX.Element {
   return (
-    <Div
-      title={label}
-      className="inline-flex shrink-0 items-center rounded-md border p-0.5"
-    >
-      {options.map((option) => (
-        <Button
-          key={option.value}
-          type="button"
-          size="sm"
-          variant={value === option.value ? "default" : "ghost"}
-          aria-pressed={value === option.value}
-          className="h-7 px-2.5 text-xs"
-          onClick={() => onSelect(option.value)}
-        >
-          {option.label}
-        </Button>
-      ))}
+    <Div className="min-w-0">
+      <Span className="mb-1 block text-xs font-medium @4xl:sr-only">
+        {label}
+      </Span>
+      <Div
+        role="group" // oxlint-disable-line jsx-a11y/prefer-tag-over-role -- Shared UI has no cross-platform fieldset component.
+        ariaLabel={label}
+        className="inline-flex min-w-0 flex-wrap items-center rounded-md border p-0.5"
+      >
+        {options.map((option) => (
+          <Button
+            key={option.value}
+            type="button"
+            size="sm"
+            variant={value === option.value ? "default" : "ghost"}
+            aria-pressed={value === option.value}
+            className={
+              value === option.value
+                ? "h-7 px-2.5 text-xs transition-none"
+                : "h-7 px-2.5 text-xs transition-none hover:bg-transparent hover:text-inherit"
+            }
+            onClick={() => onSelect(option.value)}
+          >
+            {option.label}
+          </Button>
+        ))}
+      </Div>
     </Div>
   );
 }
@@ -586,6 +612,7 @@ export function ErrorLogsContainer(): JSX.Element {
     null,
   );
   const [confirmBulk, setConfirmBulk] = useState(false);
+  const [filterDraft, setFilterDraft] = useState<SecondaryFilters | null>(null);
   /** Last resolve/reopen, for the confirmation line with Undo. */
   const [lastAction, setLastAction] = useState<{
     fingerprints: string[];
@@ -747,6 +774,59 @@ export function ErrorLogsContainer(): JSX.Element {
     level !== ErrorLogLevelFilter.ALL ||
     source !== ErrorLogSourceFilter.ALL;
 
+  const secondaryCount =
+    Number(status !== ErrorLogStatusFilter.ACTIVE) +
+    Number(level !== ErrorLogLevelFilter.ALL) +
+    Number(source !== ErrorLogSourceFilter.ALL);
+  const liveFilters = { status, level, source };
+  const applySecondary = (patch: Partial<SecondaryFilters>): void => {
+    setOffset(0);
+    if (patch.status !== undefined) {
+      form.setValue("status", patch.status, { shouldDirty: true });
+    }
+    if (patch.level !== undefined) {
+      form.setValue("level", patch.level, { shouldDirty: true });
+    }
+    if (patch.source !== undefined) {
+      form.setValue("source", patch.source, { shouldDirty: true });
+    }
+  };
+  const secondaryFilters = (
+    values: SecondaryFilters,
+    update: (patch: Partial<SecondaryFilters>) => void,
+  ): JSX.Element => (
+    <>
+      <SegmentedFilter
+        label={t("get.fields.status.label")}
+        value={values.status}
+        onSelect={(value) => update({ status: value })}
+        options={[
+          ErrorLogStatusFilter.ACTIVE,
+          ErrorLogStatusFilter.RESOLVED,
+          ErrorLogStatusFilter.ALL,
+        ].map((value) => ({ value, label: t(value) }))}
+      />
+      <SegmentedFilter
+        label={t("get.fields.level.label")}
+        value={values.level}
+        onSelect={(value) => update({ level: value })}
+        options={ErrorLogLevelFilterOptions.map((o) => ({
+          value: o.value,
+          label: t(o.label),
+        }))}
+      />
+      <SegmentedFilter
+        label={t("get.fields.source.label")}
+        value={values.source}
+        onSelect={(value) => update({ source: value })}
+        options={ErrorLogSourceFilterOptions.map((o) => ({
+          value: o.value,
+          label: t(o.label),
+        }))}
+      />
+    </>
+  );
+
   const kpis = data?.kpis;
   const windowEcho = data?.window;
   const occurrencesSeries = data?.trend.series ?? [];
@@ -754,13 +834,18 @@ export function ErrorLogsContainer(): JSX.Element {
     (acc, s) => s.values.map((v, i) => v + (acc[i] ?? 0)),
     [],
   );
+  const hasTrend = totalSpark.some((count) => count > 0);
   const historyNote =
     data && windowEcho
       ? data.historySince === null
         ? t("widget.chart.historyNone")
         : data.historySince > windowEcho.from
           ? t("widget.chart.historyNote", {
-              date: shortDate(data.historySince, locale),
+              date: new Date(data.historySince).toLocaleDateString(locale, {
+                month: "long",
+                day: "numeric",
+                timeZone: "UTC",
+              }),
             })
           : null
       : null;
@@ -815,47 +900,89 @@ export function ErrorLogsContainer(): JSX.Element {
           filters={chips}
           onClearFilters={hasFilters ? clearFilters : undefined}
         >
-          <SegmentedFilter
-            label={t("get.fields.status.label")}
-            value={status}
-            onSelect={(value) => {
-              setOffset(0);
-              form.setValue("status", value, { shouldDirty: true });
-            }}
-            options={[
-              ErrorLogStatusFilter.ACTIVE,
-              ErrorLogStatusFilter.RESOLVED,
-              ErrorLogStatusFilter.ALL,
-            ].map((value) => ({ value, label: t(value) }))}
-          />
-          <SegmentedFilter
-            label={t("get.fields.level.label")}
-            value={level}
-            onSelect={(value) => {
-              setOffset(0);
-              form.setValue("level", value, { shouldDirty: true });
-            }}
-            options={ErrorLogLevelFilterOptions.map((o) => ({
-              value: o.value,
-              label: t(o.label),
-            }))}
-          />
-          <SegmentedFilter
-            label={t("get.fields.source.label")}
-            value={source}
-            onSelect={(value) => {
-              setOffset(0);
-              form.setValue("source", value, { shouldDirty: true });
-            }}
-            options={ErrorLogSourceFilterOptions.map((o) => ({
-              value: o.value,
-              label: t(o.label),
-            }))}
-          />
+          {isText ? (
+            secondaryFilters(liveFilters, applySecondary)
+          ) : (
+            <>
+              <Div className="hidden flex-wrap items-center gap-2 @4xl:flex">
+                {secondaryFilters(liveFilters, applySecondary)}
+              </Div>
+              <Div className="@4xl:hidden">
+                <Sheet
+                  open={filterDraft !== null}
+                  onOpenChange={(open) =>
+                    setFilterDraft(open ? liveFilters : null)
+                  }
+                >
+                  <SheetTrigger asChild>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="gap-1.5"
+                    >
+                      <Filter className="size-4" />
+                      {secondaryCount
+                        ? t("widget.filter.moreCount", {
+                            count: secondaryCount,
+                          })
+                        : t("widget.filter.more")}
+                    </Button>
+                  </SheetTrigger>
+                  <SheetContent
+                    side="bottom"
+                    className="max-h-[85dvh] overflow-y-auto bg-popover text-popover-foreground transition-[transform,translate] motion-reduce:transition-none motion-reduce:animate-none"
+                  >
+                    <SheetHeader>
+                      <SheetTitle className="text-popover-foreground">
+                        {t("widget.filter.more")}
+                      </SheetTitle>
+                      <SheetDescription>
+                        {t("widget.filter.moreDescription")}
+                      </SheetDescription>
+                    </SheetHeader>
+                    <Div className="flex flex-col items-start gap-4 px-4 pb-5">
+                      {filterDraft && (
+                        <>
+                          {secondaryFilters(filterDraft, (patch) =>
+                            setFilterDraft({ ...filterDraft, ...patch }),
+                          )}
+                          <Button
+                            type="button"
+                            onClick={() => {
+                              applySecondary(filterDraft);
+                              setFilterDraft(null);
+                            }}
+                          >
+                            {t("widget.filter.apply")}
+                          </Button>
+                        </>
+                      )}
+                    </Div>
+                  </SheetContent>
+                </Sheet>
+              </Div>
+            </>
+          )}
         </AnalyticsToolbar>
       )}
 
-      <FormAlertWidget field={{}} />
+      {!hasError && <FormAlertWidget field={{}} />}
+      {hasError && (
+        <EmptyBlock
+          icon={<AlertTriangle className="size-7" />}
+          title={t("get.errors.server.title")}
+          message={t("get.errors.server.description")}
+          action={
+            isInteractive
+              ? {
+                  label: t("widget.header.refresh"),
+                  onClick: () => void read?.refetch(),
+                }
+              : undefined
+          }
+        />
+      )}
       {isLoading && (
         <Div aria-live="polite">
           <LoadingBlock message={t("widget.loading")} />
@@ -864,50 +991,20 @@ export function ErrorLogsContainer(): JSX.Element {
       {data && kpis && windowEcho && !hasError && !isLoading && (
         <>
           <KpiGrid columns={5}>
-            <KpiTile
-              label={t("widget.kpi.unresolved")}
-              value={kpis.unresolved}
-              locale={locale}
-              tone={kpis.unresolved > 0 ? "negative" : "positive"}
-              hint={[
-                t("widget.kpi.unresolvedMessages", {
-                  messages: kpis.unresolvedMessages.toLocaleString(locale),
-                  occurrences:
-                    kpis.unresolvedOccurrences.toLocaleString(locale),
-                }),
-                kpis.unresolvedMatching !== kpis.unresolved
-                  ? t("widget.kpi.unresolvedMatching", {
-                      count: kpis.unresolvedMatching.toLocaleString(locale),
-                    })
-                  : kpis.unresolvedOutsideWindow > 0
-                    ? t("widget.kpi.unresolvedOutside", {
-                        count:
-                          kpis.unresolvedOutsideWindow.toLocaleString(locale),
-                      })
-                    : null,
-              ]
-                .filter((line) => line !== null)
-                .join(" · ")}
-              onClick={
-                isInteractive && kpis.unresolvedOutsideWindow > 0
-                  ? () => {
-                      setOffset(0);
-                      form.setValue("range", AnalyticsRange.ALL_TIME, {
-                        shouldDirty: true,
-                      });
-                      form.setValue("status", ErrorLogStatusFilter.ACTIVE, {
-                        shouldDirty: true,
-                      });
-                    }
-                  : undefined
-              }
-            />
+            {kpis.unresolvedInView !== undefined && (
+              <KpiTile
+                label={t("widget.kpi.unresolvedInScope")}
+                wrapLabel
+                value={kpis.unresolvedInView}
+                locale={locale}
+              />
+            )}
             <KpiTile
               label={t("widget.kpi.occurrences")}
               value={kpis.occurrences.value}
               previous={kpis.occurrences.previous}
               invertDelta
-              sparkline={totalSpark}
+              sparkline={hasTrend ? totalSpark : undefined}
               locale={locale}
             />
             <KpiTile
@@ -943,60 +1040,57 @@ export function ErrorLogsContainer(): JSX.Element {
             />
           </KpiGrid>
 
-          <TimeSeriesChart
-            title={t("widget.chart.trendTitle")}
-            subtitle={
-              historyNote ??
-              (isInteractive ? t("widget.chart.trendSubtitle") : undefined)
-            }
-            buckets={data.trend.buckets}
-            bucket={windowEcho.bucket}
-            series={data.trend.series.map((s) => ({
-              key: s.key,
-              label: isSeriesKey(s.key) ? t(SERIES_LABEL[s.key]) : s.key,
-              values: s.values,
-              color: isSeriesKey(s.key) ? SERIES_COLOR[s.key] : undefined,
-            }))}
-            variant="stacked-bar"
-            locale={locale}
-            height={180}
-            onBucketClick={
-              isInteractive
-                ? (key) => {
-                    setOffset(0);
-                    form.setValue("range", AnalyticsRange.CUSTOM, {
-                      shouldDirty: true,
-                    });
-                    form.setValue("from", key, { shouldDirty: true });
-                    form.setValue("to", bucketEnd(key, windowEcho.bucket), {
-                      shouldDirty: true,
-                    });
-                  }
-                : undefined
-            }
-            actions={
-              isInteractive && (
-                <SegmentedFilter
-                  label={t("get.fields.split.label")}
-                  value={split}
-                  onSelect={(value) =>
-                    form.setValue("split", value, { shouldDirty: true })
-                  }
-                  options={ErrorLogTrendSplitOptions.map((o) => ({
-                    value: o.value,
-                    label: t(o.label),
-                  }))}
-                />
-              )
-            }
-            emptyLabel={
-              data.historySince === null
-                ? t("widget.chart.historyNone")
-                : t("widget.chart.emptyFiltered")
-            }
-          />
+          {hasTrend && (
+            <TimeSeriesChart
+              title={t("widget.chart.trendTitle")}
+              subtitle={
+                historyNote ??
+                (isInteractive ? t("widget.chart.trendSubtitle") : undefined)
+              }
+              buckets={data.trend.buckets}
+              bucket={windowEcho.bucket}
+              series={data.trend.series.map((s) => ({
+                key: s.key,
+                label: isSeriesKey(s.key) ? t(SERIES_LABEL[s.key]) : s.key,
+                values: s.values,
+                color: isSeriesKey(s.key) ? SERIES_COLOR[s.key] : undefined,
+              }))}
+              variant="stacked-bar"
+              locale={locale}
+              height={180}
+              onBucketClick={
+                isInteractive
+                  ? (key) => {
+                      setOffset(0);
+                      form.setValue("range", AnalyticsRange.CUSTOM, {
+                        shouldDirty: true,
+                      });
+                      form.setValue("from", key, { shouldDirty: true });
+                      form.setValue("to", bucketEnd(key, windowEcho.bucket), {
+                        shouldDirty: true,
+                      });
+                    }
+                  : undefined
+              }
+              actions={
+                isInteractive && (
+                  <SegmentedFilter
+                    label={t("get.fields.split.label")}
+                    value={split}
+                    onSelect={(value) =>
+                      form.setValue("split", value, { shouldDirty: true })
+                    }
+                    options={ErrorLogTrendSplitOptions.map((o) => ({
+                      value: o.value,
+                      label: t(o.label),
+                    }))}
+                  />
+                )
+              }
+            />
+          )}
 
-          {!fingerprint && (
+          {!fingerprint && data.byEndpoint.length > 0 && (
             <BreakdownTable
               title={t("widget.chart.endpointTitle")}
               subtitle={t("widget.chart.endpointSubtitle")}
@@ -1023,6 +1117,25 @@ export function ErrorLogsContainer(): JSX.Element {
               limit={isText ? 8 : 6}
               locale={locale}
             />
+          )}
+
+          {isInteractive && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="h-auto self-start whitespace-normal px-0 text-start text-xs text-muted-foreground"
+              onClick={() => {
+                clearFilters();
+                form.setValue("range", AnalyticsRange.ALL_TIME, {
+                  shouldDirty: true,
+                });
+              }}
+            >
+              {t("widget.kpi.unresolvedAllTimeLink", {
+                count: kpis.unresolved.toLocaleString(locale),
+              })}
+            </Button>
           )}
 
           <Div className="flex min-w-0 flex-col gap-2">

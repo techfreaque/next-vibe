@@ -13,9 +13,9 @@ import { InventoryTransferReceiveRepository } from "./repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
-    handler: ({ data, user, logger, locale }) =>
+    handler: ({ urlPathParams, user, logger, locale }) =>
       InventoryTransferReceiveRepository.receiveTransfer(
-        data,
+        urlPathParams,
         user.id,
         logger,
         locale,

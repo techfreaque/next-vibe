@@ -18,9 +18,11 @@ import {
   useWidgetDisabled,
   useWidgetForm,
   useWidgetIsInteractive,
+  useWidgetIsSubmitting,
   useWidgetLocale,
   useWidgetLogger,
   useWidgetNavigation,
+  useWidgetResponse,
   useWidgetResponseOnly,
   useWidgetTranslation,
   useWidgetUser,
@@ -31,7 +33,6 @@ import { DateFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/date-f
 import { EntityPickerFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/entity-picker-field/widget";
 import { SelectFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/select-field/widget";
 import { TextareaFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/textarea-field/widget";
-import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 import { type JSX, useEffect, useMemo, useRef } from "react";
 import { useController, useFieldArray, useWatch } from "react-hook-form";
@@ -42,7 +43,12 @@ import companyDefinition from "@/companies/[companyId]/get/definition";
 import { DocumentDraftLines } from "@/finance/document-draft-lines";
 import { DocumentScopePicker } from "@/finance/document-list-ui";
 import { DocumentVatPicker } from "@/finance/document-vat-picker";
-import { useDocumentVatRates } from "@/finance/document-vat-rates";
+import { useDocumentVatPolicy } from "@/finance/document-vat-rates";
+import {
+  LINE_SETTLEMENT_V1,
+  supportsLineCentSettlement,
+} from "@/tax/line-settlement";
+import customerDefinition from "@/users/user/[id]/definition";
 
 import { calculateInvoiceLine } from "../line/amounts";
 import type definition from "./definition";
@@ -56,20 +62,24 @@ export function InvoiceCreateWidget({
   const form = useWidgetForm<typeof definition.POST>();
   const { canGoBack, pop, push } = useWidgetNavigation();
   const disabled = useWidgetDisabled();
+  const isSubmitting = useWidgetIsSubmitting();
+  const response = useWidgetResponse();
+  const saveError = response?.success === false ? response : undefined;
   const locale = useWidgetLocale();
   const t = useWidgetTranslation<typeof definition.POST>();
   const lineItems = useFieldArray({ control: form.control, name: "lineItems" });
-  const watchedLines =
-    useWatch({ control: form.control, name: "lineItems" }) ?? [];
+  const lineValues = useWatch({ control: form.control, name: "lineItems" });
+  const watchedLines = useMemo(() => lineValues ?? [], [lineValues]);
   const currency = useWatch({ control: form.control, name: "currency" });
   const { field: companyField, fieldState: companyFieldState } = useController({
     control: form.control,
     name: "companyId",
   });
-  const { field: customerField } = useController({
-    control: form.control,
-    name: "customerId",
-  });
+  const { field: customerField, fieldState: customerFieldState } =
+    useController({
+      control: form.control,
+      name: "customerId",
+    });
   const companyId = companyField.value;
   const customerId = customerField.value;
   const responseOnly = useWidgetResponseOnly();
@@ -104,7 +114,37 @@ export function InvoiceCreateWidget({
   ).read;
   const company =
     workspaceCompany ?? (readCompany ? companyRead?.data : undefined);
-  const vatRates = useDocumentVatRates(
+  // The picker already knows the chosen name. Resolve prefilled IDs through the
+  // authorized customer read, and keep a selected-state label on failure.
+  const displayCustomerId = data?.invoice?.customerId ?? customerId;
+  const readCustomer =
+    interactive &&
+    Boolean(displayCustomerId) &&
+    (Boolean(data?.invoice?.id) || !customerFieldState.isDirty);
+  const customerOptions = useMemo(
+    () => ({
+      read: {
+        urlPathParams: { id: displayCustomerId ?? "" },
+        queryOptions: { enabled: readCustomer },
+      },
+    }),
+    [displayCustomerId, readCustomer],
+  );
+  const customerRead = useEndpoint(
+    customerDefinition,
+    customerOptions,
+    logger,
+    user,
+  ).read;
+  const selectedCustomer =
+    readCustomer &&
+    customerRead?.data?.userProfile.basicInfo.id === displayCustomerId
+      ? customerRead.data
+      : undefined;
+  const selectedCustomerLabel = customerId
+    ? selectedCustomer?.privateName || t("post.widget.customerSelected")
+    : undefined;
+  const { choices: vatRates, exemptionNotice } = useDocumentVatPolicy(
     companyId,
     interactive && !data?.invoice?.id,
   );
@@ -129,7 +169,21 @@ export function InvoiceCreateWidget({
       form.setValue("dueDate", due);
     }
   }, [data?.invoice?.id, form, interactive]);
-  const amounts = watchedLines.map(calculateInvoiceLine);
+  useEffect(() => {
+    if (exemptionNotice && interactive) {
+      watchedLines.forEach((line, index) => {
+        if (line.taxRate) {
+          form.setValue(`lineItems.${index}.taxRate`, 0, { shouldDirty: true });
+        }
+      });
+    }
+  }, [exemptionNotice, form, interactive, watchedLines]);
+  const lineSettlement = supportsLineCentSettlement(effectiveCurrency ?? "EUR")
+    ? LINE_SETTLEMENT_V1
+    : undefined;
+  const amounts = watchedLines.map((line) =>
+    calculateInvoiceLine(line, lineSettlement),
+  );
   const hasIncompleteAmounts = amounts.some(
     (line) => !Number.isFinite(line.lineTotal),
   );
@@ -159,20 +213,31 @@ export function InvoiceCreateWidget({
       <WidgetShell layout="page">
         <ResultBanner
           variant="success"
-          title={t("post.success.title")}
+          title={
+            data.invoice.invoiceSequenceNumber !== null
+              ? t("post.widget.draftSavedNumber", {
+                  number: data.invoice.invoiceSequenceNumber,
+                })
+              : t("post.widget.draftSaved")
+          }
           message={formatMoney(
             data.invoice.amount,
             data.invoice.currency,
             locale,
           )}
         >
-          <Button
-            type="button"
-            size="sm"
-            onClick={() => handleView(data.invoice.id)}
-          >
-            {t("post.widget.viewButton")}
-          </Button>
+          <Div className="flex min-w-0 flex-col items-start gap-3">
+            {selectedCustomer?.privateName && (
+              <P className="text-sm">{selectedCustomer.privateName}</P>
+            )}
+            <Button
+              type="button"
+              size="sm"
+              onClick={() => handleView(data.invoice.id)}
+            >
+              {t("post.widget.viewButton")}
+            </Button>
+          </Div>
         </ResultBanner>
       </WidgetShell>
     );
@@ -199,11 +264,31 @@ export function InvoiceCreateWidget({
         }
         actions={
           <SubmitButtonWidget<typeof definition.POST>
-            field={{ text: "post.widget.submit" }}
+            field={{
+              text: saveError ? "post.widget.retrySave" : "post.widget.submit",
+              loadingText: "post.widget.saving",
+            }}
           />
         }
       />
-      <FormAlertWidget field={{}} />
+      {isSubmitting && (
+        <Div aria-live="polite" className="text-sm font-medium">
+          {t("post.widget.saving")}
+        </Div>
+      )}
+      {!isSubmitting && saveError && (
+        <Div role="alert">
+          <ResultBanner
+            variant="danger"
+            title={t("post.widget.saveFailed")}
+            message={t("post.widget.saveFailedHint")}
+          >
+            {saveError.errorType.errorCode < 500 && (
+              <P className="text-sm">{saveError.message}</P>
+            )}
+          </ResultBanner>
+        </Div>
+      )}
 
       <Div className="grid min-w-0 grid-cols-1 items-start gap-4 @3xl:grid-cols-[minmax(0,1fr)_16rem]">
         <Div className="flex min-w-0 flex-col gap-4">
@@ -238,6 +323,7 @@ export function InvoiceCreateWidget({
                   <DocumentScopePicker
                     kind="customer"
                     value={customerId}
+                    appliedLabel={selectedCustomerLabel}
                     required
                     onSelect={(id) => customerField.onChange(id)}
                   />
@@ -275,6 +361,11 @@ export function InvoiceCreateWidget({
             </Div>
           </SectionGroup>
 
+          {exemptionNotice && (
+            <P className="rounded-md border bg-muted/30 p-3 text-sm">
+              {exemptionNotice}
+            </P>
+          )}
           <DocumentDraftLines
             locale={locale}
             disabled={disabled}
@@ -300,7 +391,7 @@ export function InvoiceCreateWidget({
                   value={line.taxRate}
                   label={t("post.widget.taxRate")}
                   manualLabel={t("post.widget.manualTaxRate")}
-                  disabled={disabled}
+                  disabled={disabled || Boolean(exemptionNotice)}
                   invalid={Boolean(errors?.taxRate)}
                   onChange={(rate) =>
                     form.setValue(`lineItems.${index}.taxRate`, rate, {

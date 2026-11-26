@@ -2,7 +2,7 @@
 
 import "server-only";
 
-import { and, eq, inArray } from "drizzle-orm";
+import { and, eq, inArray, sql } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
@@ -17,9 +17,19 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { accountNodes } from "@/chart-of-accounts/db";
 import { AccountType } from "@/chart-of-accounts/enum";
+import {
+  accountingDay,
+  nextAccountingDay,
+} from "@/chart-of-accounts/shared/journal-validation";
+import { lockLedgerCompany } from "@/chart-of-accounts/shared/ledger-write";
 import { CompanyMemberRole } from "@/companies/enum";
 import { CompanyAuthRepository } from "@/companies/repository";
+import { getDocumentAccess } from "@/finance/document-company-scope";
 import { purchasingVendors } from "@/purchasing/db";
+import {
+  LINE_SETTLEMENT_V1,
+  supportsLineCentSettlement,
+} from "@/tax/line-settlement";
 
 import { paymentBillLines, paymentBills } from "../../db";
 import { calculateBillLine, summarizeBillLines } from "./amounts";
@@ -66,8 +76,11 @@ export class BillCreateRepository {
         });
       }
 
+      const lineSettlement = supportsLineCentSettlement(data.currency)
+        ? LINE_SETTLEMENT_V1
+        : undefined;
       const lines = (data.lineItems ?? []).map((line, sortOrder) => ({
-        ...calculateBillLine(line),
+        ...calculateBillLine(line, lineSettlement),
         description: line.description,
         productId: line.productId ?? null,
         expenseAccountId: line.expenseAccountId ?? null,
@@ -82,6 +95,18 @@ export class BillCreateRepository {
       }
 
       return await db.transaction(async (tx) => {
+        const company = await lockLedgerCompany(tx, data.companyId);
+        const access = await getDocumentAccess(
+          userId,
+          { companyId: data.companyId },
+          tx,
+        );
+        if (!company || !access?.canManage) {
+          return fail({
+            message: t("post.errors.forbidden.title"),
+            errorType: ErrorResponseTypes.FORBIDDEN,
+          });
+        }
         const [vendor] = data.vendorId
           ? await tx
               .select({
@@ -106,6 +131,33 @@ export class BillCreateRepository {
             message: t("post.errors.vendor"),
             errorType: ErrorResponseTypes.NOT_FOUND,
           });
+        }
+        const billNumber = data.billNumber?.trim() || null;
+        if (vendor && billNumber) {
+          const [duplicate] = await tx
+            .select({ id: paymentBills.id })
+            .from(paymentBills)
+            .where(
+              and(
+                eq(paymentBills.companyId, data.companyId),
+                sql`upper(btrim(${paymentBills.billNumber})) = upper(${billNumber})`,
+                sql`(
+                  ${paymentBills.metadata}->>'vendorId' = ${vendor.id}
+                  OR (${paymentBills.metadata}->>'vendorId' IS NULL
+                    AND ${paymentBills.supplierName} = ${vendor.name}
+                    AND ${paymentBills.currency} = ${data.currency}
+                    AND ${paymentBills.billDate} >= ${accountingDay(billDate).toISOString()}::timestamp
+                    AND ${paymentBills.billDate} < ${nextAccountingDay(billDate).toISOString()}::timestamp)
+                )`,
+              ),
+            )
+            .limit(1);
+          if (duplicate) {
+            return fail({
+              message: t("post.errors.conflict.description"),
+              errorType: ErrorResponseTypes.CONFLICT,
+            });
+          }
         }
         const dueDate =
           suppliedDueDate === undefined
@@ -156,12 +208,15 @@ export class BillCreateRepository {
             supplierName,
             supplierVatNumber:
               data.supplierVatNumber?.trim() || vendor?.vatNumber || null,
-            billNumber: data.billNumber?.trim() || null,
+            billNumber,
             billDate,
             dueDate,
             currency: data.currency,
             notes: data.notes ?? null,
-            metadata: vendor ? { vendorId: vendor.id } : null,
+            metadata:
+              vendor || lineSettlement
+                ? { vendorId: vendor?.id, lineSettlement }
+                : null,
             subtotal: totals.subtotal,
             taxAmount: totals.taxAmount,
             total: totals.total,

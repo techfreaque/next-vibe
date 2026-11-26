@@ -12,6 +12,8 @@ export const translations: typeof enTranslations = {
       description: "Ausgabendetails eingeben",
     },
     errors: {
+      evidenceReview:
+        "Prüfen Sie den Originalbeleg, bevor Sie seine Kontierung ändern.",
       validation: { title: "Validierungsfehler", description: "Felder prüfen" },
       unauthorized: {
         title: "Nicht angemeldet",

@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
@@ -26,6 +26,7 @@ import {
   purchaseOrders,
   purchaseReceiptLines,
   purchaseReceipts,
+  purchasingVendors,
 } from "../../../db";
 import { scopedTranslation } from "../../../i18n";
 import type { OrderGetResponseOutput } from "./definition";
@@ -74,6 +75,16 @@ export class OrderGetRepository {
         .where(eq(purchaseOrderLines.poId, poId))
         .orderBy(purchaseOrderLines.sortOrder);
 
+      const [vendor] = await db
+        .select({ name: purchasingVendors.name })
+        .from(purchasingVendors)
+        .where(
+          and(
+            eq(purchasingVendors.id, po.vendorId),
+            eq(purchasingVendors.companyId, po.companyId),
+          ),
+        );
+
       // Fetch receipts with their lines
       const receipts = await db
         .select({
@@ -89,7 +100,7 @@ export class OrderGetRepository {
           eq(purchaseReceiptLines.receiptId, purchaseReceipts.id),
         )
         .where(eq(purchaseReceipts.poId, poId))
-        .orderBy(purchaseReceipts.receivedAt);
+        .orderBy(purchaseReceipts.receivedAt, purchaseReceipts.id);
 
       // Group receipt lines by receipt
       const receiptMap = new Map<
@@ -132,6 +143,7 @@ export class OrderGetRepository {
           id: po.id,
           companyId: po.companyId,
           vendorId: po.vendorId,
+          vendorName: vendor?.name ?? null,
           poNumber: po.poNumber,
           status: po.status,
           currency: po.currency,

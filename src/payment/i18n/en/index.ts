@@ -954,9 +954,17 @@ export const translations = {
 
   // Get payment endpoint
   get: {
-    title: "Get Payment Information",
+    title: "Your payments",
     titleShort: "Payments",
-    description: "Retrieve payment transactions and methods",
+    description: "Up to ten recent payment records for your account.",
+    summary: {
+      empty: "No payments yet",
+      emptyDescription: "Your payment records will appear here.",
+      loading: "Loading your payments…",
+      error: "Could not load your payments",
+      retry: "Try again",
+      amountUnavailable: "Amount unavailable",
+    },
     form: {
       title: "Payment Query",
       description: "Query payment information",

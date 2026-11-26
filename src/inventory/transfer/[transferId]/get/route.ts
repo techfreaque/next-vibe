@@ -13,7 +13,12 @@ import { InventoryTransferGetRepository } from "./repository";
 export const { GET, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
-    handler: ({ data, user, logger, locale }) =>
-      InventoryTransferGetRepository.getTransfer(data, user.id, logger, locale),
+    handler: ({ urlPathParams, user, logger, locale }) =>
+      InventoryTransferGetRepository.getTransfer(
+        urlPathParams,
+        user.id,
+        logger,
+        locale,
+      ),
   },
 });

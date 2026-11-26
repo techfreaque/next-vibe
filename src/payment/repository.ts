@@ -70,9 +70,8 @@ import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
 
 import { subscriptions } from "../subscription/db";
 import { ensureCheckoutTransaction } from "./checkout/transaction";
-import { paymentMethods, paymentTransactions, paymentWebhooks } from "./db";
+import { paymentTransactions, paymentWebhooks } from "./db";
 import type {
-  PaymentGetRequestOutput,
   PaymentGetResponseOutput,
   PaymentPostRequestOutput,
   PaymentPostResponseOutput,
@@ -270,64 +269,59 @@ export class PaymentRepository {
   }
 
   static async getPaymentInfo(
-    data: PaymentGetRequestOutput,
     user: JwtPayloadType,
     t: PaymentT,
     logger: EndpointLogger,
   ): Promise<ResponseType<PaymentGetResponseOutput>> {
-    try {
-      // Payment endpoints require authenticated users with ID
-      if (user.isPublic) {
-        logger.error("payment.get.error.publicUserNotAllowed");
-        return fail({
-          message: t("errors.unauthorized.signInRequired"),
-          errorType: ErrorResponseTypes.UNAUTHORIZED,
-        });
-      }
-
-      logger.debug("Getting payment information", {
-        userId: user.id,
-        requestData: data,
+    if (user.isPublic) {
+      return fail({
+        message: t("errors.unauthorized.signInRequired"),
+        errorType: ErrorResponseTypes.UNAUTHORIZED,
       });
+    }
 
-      // Get user's recent transactions
-      const userTransactions = await db
-        .select()
+    try {
+      const transactions = await db
+        .select({
+          id: paymentTransactions.id,
+          amount: paymentTransactions.amount,
+          currency: paymentTransactions.currency,
+          status: paymentTransactions.status,
+          provider: paymentTransactions.provider,
+          mode: paymentTransactions.mode,
+          createdAt: paymentTransactions.createdAt,
+        })
         .from(paymentTransactions)
         .where(eq(paymentTransactions.userId, user.id))
-        .orderBy(desc(paymentTransactions.createdAt))
+        .orderBy(
+          desc(paymentTransactions.createdAt),
+          desc(paymentTransactions.id),
+        )
         .limit(10);
-
-      // Get user's payment methods
-      const userPaymentMethods = await db
-        .select()
-        .from(paymentMethods)
-        .where(eq(paymentMethods.userId, user.id))
-        .orderBy(desc(paymentMethods.createdAt))
-        .limit(10);
-
-      logger.debug("Payment information retrieved", {
-        userId: user.id,
-        transactionCount: userTransactions.length,
-        paymentMethodCount: userPaymentMethods.length,
-      });
 
       return success({
-        priceId: userTransactions[0]?.providerSessionId || "",
-        mode: userTransactions[0]?.mode || CheckoutMode.PAYMENT,
-        sessionUrl: "",
-        sessionId: userTransactions[0]?.providerSessionId || "",
+        mode: transactions[0]?.mode,
+        transactions: transactions.map((transaction) => {
+          // The admin checkout can start at 0 USD until the provider confirms.
+          const unconfirmedAmount =
+            Number(transaction.amount) === 0 &&
+            transaction.status !== PaymentStatus.SUCCEEDED &&
+            transaction.status !== PaymentStatus.REFUNDED;
+          return {
+            ...transaction,
+            amount: unconfirmedAmount ? null : transaction.amount,
+            currency: unconfirmedAmount ? null : transaction.currency,
+            createdAt: transaction.createdAt.toISOString(),
+          };
+        }),
         message: t("success.infoRetrieved"),
       });
     } catch (error) {
-      const parsedError = parseError(error);
       logger.error("payment.get.error.failed", {
-        error: parsedError.message,
-        userId: user.id,
+        error: parseError(error).message,
       });
-
       return fail({
-        message: t("get.errors.server.detail", { error: parsedError.message }),
+        message: t("get.summary.error"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -431,6 +425,29 @@ export class PaymentRepository {
       }
 
       const event = verificationResult.data;
+
+      let accountingEvidenceId: string | undefined;
+      try {
+        const { paymentAccountingEnv } = await import("./accounting/env");
+        if (
+          paymentAccountingEnv.PAYMENT_ACCOUNTING_WEBHOOK_CAPTURE === "true"
+        ) {
+          const { captureVerifiedAccountingEvidence } =
+            await import("./accounting/capture");
+          accountingEvidenceId = await captureVerifiedAccountingEvidence(
+            provider,
+            body,
+            event,
+          );
+        }
+      } catch {
+        logger.error(
+          "Verified payment accounting evidence could not be saved",
+          {
+            eventId: event.id,
+          },
+        );
+      }
 
       logger.debug("Webhook verified", {
         eventType: event.type,
@@ -576,6 +593,25 @@ export class PaymentRepository {
           logger.debug("Unhandled webhook event type", {
             eventType: event.type,
           });
+      }
+
+      if (accountingEvidenceId) {
+        try {
+          const { SalesAccountingRepository } =
+            await import("./accounting/repository");
+          await SalesAccountingRepository.postConfigured(
+            accountingEvidenceId,
+            logger,
+            locale,
+          );
+        } catch {
+          logger.warn(
+            "Verified accounting evidence is waiting for reconciliation",
+            {
+              evidenceId: accountingEvidenceId,
+            },
+          );
+        }
       }
 
       // Mark webhook as processed

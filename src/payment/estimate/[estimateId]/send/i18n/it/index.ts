@@ -4,11 +4,11 @@ export const translations: typeof enTranslations = {
   category: "Stime",
   tags: { payment: "pagamento", estimate: "Grafico" },
   post: {
-    title: "Invia la tua stima",
-    titleShort: "Invia la tua stima",
+    title: "Segna il preventivo come inviato",
+    titleShort: "Segna il preventivo come inviato",
     description: "Valuta di marca come inviato al cliente",
     form: {
-      title: "Invia la tua stima",
+      title: "Segna il preventivo come inviato",
       description: "Valuta di marca come inviato al cliente",
     },
     response: { success: "Operazione riuscita", message: "Messaggio di stato" },
@@ -52,9 +52,8 @@ export const translations: typeof enTranslations = {
   estimateId: { label: "Stima ID", description: "La stima di agire su" },
   widget: {
     back: "Indietro",
-    submit: "Invia la tua stima",
+    submit: "Segna come inviato",
     sent: "Stime contrassegnate come inviate al cliente.",
-    sendNote:
-      "Lo stato di stima sarà aggiornato a Sent. Il cliente può quindi accettare o rifiutare.",
+    sendNote: "Conferma di aver inviato il preventivo al cliente.",
   },
 };

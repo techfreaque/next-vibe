@@ -2,10 +2,16 @@
  * DatePicker Component for React Native
  * Date input with calendar - placeholder implementation
  */
+import { useTranslation } from "next-vibe/core/i18n/core/client";
 import React, { useState } from "react";
 import { Pressable, View } from "react-native";
 
 import { cn } from "../../../unified-ui/_shared/cn";
+import { scopedTranslation } from "../../../unified-ui/hooks/i18n";
+import {
+  createCalendarDateFormatter,
+  parseCalendarDate,
+} from "../../../unified-ui/widgets/form-fields/date-field/local-date";
 // Import all types from web (web is source of truth)
 import type { DatePickerProps } from "../../web/components/date-picker";
 import { applyStyleType } from "../../web/utils/style-type";
@@ -31,42 +37,42 @@ function formatDate(date: Date | undefined): string {
   return `${year}-${month}-${day}`;
 }
 
-/**
- * Parse YYYY-MM-DD string to Date
- */
-function parseDate(dateString: string): Date | undefined {
-  if (!dateString) {
-    return undefined;
-  }
-  const date = new Date(dateString);
-  return Number.isNaN(date.getTime()) ? undefined : date;
-}
-
 export function DatePicker({
   value,
   onChange,
   onBlur,
-  placeholder = "Select date",
+  placeholder,
   disabled = false,
   className,
   style,
+  locale,
+  localizedDate = false,
+  inputClassName,
+  name,
+  id,
+  ...inputProps
 }: DatePickerProps): React.JSX.Element {
+  const { locale: currentLocale } = useTranslation();
+  const { t } = scopedTranslation.scopedT(locale ?? currentLocale);
   const [open, setOpen] = useState(false);
-  const [inputValue, setInputValue] = useState(formatDate(value));
+  const [draft, setDraft] = useState<string>();
+  const formatter = localizedDate
+    ? createCalendarDateFormatter(locale ?? currentLocale)
+    : undefined;
+  const inputValue =
+    draft ?? (value && formatter ? formatter.format(value) : formatDate(value));
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
 
   const handleInputChange = (newValue: string): void => {
-    setInputValue(newValue);
-    const parsed = parseDate(newValue);
-    if (parsed) {
+    setDraft(newValue);
+    const parsed = parseCalendarDate(newValue, formatter);
+    if (parsed || !newValue) {
       onChange(parsed);
     }
   };
 
   const handleInputBlur = (): void => {
-    // Reformat to standard format on blur
-    const parsed = parseDate(inputValue);
-    setInputValue(formatDate(parsed));
+    setDraft(undefined);
     if (onBlur) {
       onBlur();
     }
@@ -86,18 +92,22 @@ export function DatePicker({
       {/* Date input */}
       <View className="relative flex-1">
         <Input
+          {...inputProps}
+          id={id ?? name}
+          name={name}
           value={inputValue}
           onChangeText={handleInputChange}
           onBlur={handleInputBlur}
-          placeholder={placeholder}
+          placeholder={placeholder ?? t("widgets.formFields.common.selectDate")}
           editable={!disabled}
-          className="pr-12 h-12"
+          className={cn("pr-12 h-12", inputClassName)}
         />
 
         {/* Calendar icon button */}
         <Popover open={open} onOpenChange={handleOpenChange}>
           <PopoverTrigger>
             <Pressable
+              accessibilityLabel={t("widgets.formFields.common.openCalendar")}
               disabled={disabled}
               className={cn(
                 "absolute right-0 top-0 h-12 w-12 items-center justify-center",

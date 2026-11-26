@@ -96,13 +96,59 @@ export class OrderReceiveRepository {
               ),
             )
             .for("update");
+          if (!po) {
+            return conflict;
+          }
+          const warehouseId = data.warehouseId ?? po.warehouseId;
+          const requested = new Map(
+            data.lines.map((line) => [line.poLineId, line.quantityReceived]),
+          );
+          if (requested.size !== data.lines.length || !requested.size) {
+            return conflict;
+          }
+          if (data.receiptId) {
+            const [existing] = await tx
+              .select()
+              .from(purchaseReceipts)
+              .where(
+                and(
+                  eq(purchaseReceipts.id, data.receiptId),
+                  eq(purchaseReceipts.poId, poId),
+                ),
+              );
+            if (existing) {
+              const priorLines = await tx
+                .select()
+                .from(purchaseReceiptLines)
+                .where(eq(purchaseReceiptLines.receiptId, existing.id));
+              if (
+                existing.warehouseId !== warehouseId ||
+                existing.notes !== (data.notes ?? null) ||
+                priorLines.length !== requested.size ||
+                priorLines.some(
+                  (line) =>
+                    requested.get(line.poLineId) !== line.quantityReceived,
+                )
+              ) {
+                return conflict;
+              }
+              return success({
+                result: {
+                  receiptId: existing.id,
+                  status:
+                    po.receivedAt?.getTime() === existing.receivedAt.getTime()
+                      ? "RECEIVED"
+                      : "PARTIALLY_RECEIVED",
+                  receivedAt: existing.receivedAt,
+                },
+              });
+            }
+          }
           if (
-            !po ||
             !["CONFIRMED", "SENT", "PARTIALLY_RECEIVED"].includes(po.status)
           ) {
             return conflict;
           }
-          const warehouseId = data.warehouseId ?? po.warehouseId;
           if (warehouseId) {
             const [warehouse] = await tx
               .select({ id: warehouses.id })
@@ -130,12 +176,6 @@ export class OrderReceiveRepository {
             .from(purchaseOrderLines)
             .where(eq(purchaseOrderLines.poId, poId))
             .for("update");
-          const requested = new Map(
-            data.lines.map((line) => [line.poLineId, line.quantityReceived]),
-          );
-          if (requested.size !== data.lines.length || !requested.size) {
-            return conflict;
-          }
           const byId = new Map(lines.map((line) => [line.id, line]));
           for (const [id, qty] of requested) {
             const line = byId.get(id);
@@ -164,16 +204,23 @@ export class OrderReceiveRepository {
               return conflict;
             }
           }
-          const receiptId = crypto.randomUUID();
+          const receiptId = data.receiptId ?? crypto.randomUUID();
           const receivedAt = new Date();
-          await tx.insert(purchaseReceipts).values({
-            id: receiptId,
-            poId,
-            warehouseId,
-            receivedByUserId: userId,
-            notes: data.notes,
-            receivedAt,
-          });
+          const [recorded] = await tx
+            .insert(purchaseReceipts)
+            .values({
+              id: receiptId,
+              poId,
+              warehouseId,
+              receivedByUserId: userId,
+              notes: data.notes,
+              receivedAt,
+            })
+            .onConflictDoNothing({ target: purchaseReceipts.id })
+            .returning({ id: purchaseReceipts.id });
+          if (!recorded) {
+            return conflict;
+          }
           await tx
             .insert(purchaseReceiptLines)
             .values(data.lines.map((line) => ({ receiptId, ...line })));

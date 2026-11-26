@@ -34,7 +34,11 @@ export const translations: typeof enTranslations = {
         title: "Accesso negato",
         description: "Hai bisogno di ruolo Contabile o Amministratore",
       },
-      conflict: { title: "Conflitto", description: "Conflittuale dei dati" },
+      conflict: {
+        title: "Conflitto",
+        description:
+          "Esiste già una fattura con questo fornitore e numero. Controllala prima di crearne un’altra.",
+      },
       server: {
         title: "Errore del server",
         description: "Non poteva creare il disegno di legge. riprovare",
@@ -73,6 +77,8 @@ export const translations: typeof enTranslations = {
       addItem: "Aggiungi riga",
       removeItem: "Rimuovi riga",
       itemError: "Controlla descrizione, quantità, prezzo e IVA.",
+      supplierTotalReview:
+        "Confronta questo totale con la fattura del fornitore. Se non coincide, verifica il documento originale prima di salvare.",
       summary: "Riepilogo fattura",
       net: "Imponibile",
       tax: "IVA",

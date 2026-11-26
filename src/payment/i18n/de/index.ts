@@ -974,9 +974,17 @@ export const translations: typeof enTranslations = {
 
   // Get payment endpoint
   get: {
-    title: "Zahlungsinformationen abrufen",
+    title: "Ihre Zahlungen",
     titleShort: "Zahlungen",
-    description: "Zahlungstransaktionen und -methoden abrufen",
+    description: "Bis zu zehn aktuelle Zahlungsvorgänge Ihres Kontos.",
+    summary: {
+      empty: "Noch keine Zahlungen",
+      emptyDescription: "Ihre Zahlungsvorgänge erscheinen hier.",
+      loading: "Ihre Zahlungen werden geladen…",
+      error: "Ihre Zahlungen konnten nicht geladen werden",
+      retry: "Erneut versuchen",
+      amountUnavailable: "Betrag nicht verfügbar",
+    },
     form: {
       title: "Zahlungsabfrage",
       description: "Zahlungsinformationen abfragen",

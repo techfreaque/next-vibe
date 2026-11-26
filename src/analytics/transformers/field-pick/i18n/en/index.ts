@@ -3,13 +3,12 @@ export const translations = {
   post: {
     title: "Field Pick",
     titleShort: "Field Pick",
-    description:
-      "Field Pick - extracts a named field from a time series (superseded, returns empty)",
+    description: "Extract a numeric metadata field from each observation.",
     fields: {
       source: { label: "Source", description: "Input time series" },
       field: {
         label: "Field",
-        description: "Field name to extract (no longer supported)",
+        description: "Name of the metadata field, for example close.",
       },
       resolution: { label: "Resolution", description: "Computation timeframe" },
       range: { label: "Range", description: "Time range to compute" },

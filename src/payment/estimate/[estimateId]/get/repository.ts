@@ -23,6 +23,7 @@ import {
   canManageCompanyDocuments,
   getDocumentCompanies,
 } from "@/finance/document-company-scope";
+import { getLineSettlementPolicy } from "@/tax/line-settlement";
 
 import { paymentEstimateLines, paymentEstimates } from "../../../db";
 import type {
@@ -90,6 +91,10 @@ export class EstimateGetRepository {
         customerEmail: estimate.customerEmail ?? null,
         customerName: estimate.customerName ?? null,
         currency: estimate.currency,
+        lineSettlement: getLineSettlementPolicy(
+          estimate.currency,
+          estimate.metadata,
+        ),
         validUntil: estimate.validUntil ?? null,
         title: estimate.title ?? null,
         notes: estimate.notes ?? null,

@@ -25,6 +25,7 @@ import {
   TooltipTrigger,
 } from "next-vibe/ui/components/tooltip";
 import type { JSX } from "react";
+import { z } from "zod";
 
 import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
 import { cn } from "../../../_shared/cn";
@@ -39,10 +40,17 @@ import {
 } from "../../../_shared/use-widget-context";
 import { scopedTranslation as unifiedInterfaceScopedTranslation } from "../../../hooks/i18n";
 import { getTheme } from "../_shared/constants";
+import { parseFormDate } from "../_shared/date-value";
+import { useFormFieldDescriptionStyle } from "../_shared/description-style";
 import { renderPrefillDisplay } from "../_shared/prefill";
 import { getFieldStyleClassName } from "../_shared/styling";
 import { getFieldValidationState } from "../_shared/validation";
 import type { DateRangeFieldWidgetConfig } from "./types";
+
+const dateRangeInputSchema = z.object({
+  from: z.union([z.date(), z.string()]).optional(),
+  to: z.union([z.date(), z.string()]).optional(),
+});
 
 const formatDate = (date: Date | undefined): string => {
   if (!date) {
@@ -76,11 +84,12 @@ export function DateRangeFieldWidget<
 
   const { t: widgetT } = unifiedInterfaceScopedTranslation.scopedT(locale);
 
+  const theme = getTheme(field.theme);
+  const descriptionStyle = useFormFieldDescriptionStyle(theme.descriptionStyle);
+
   if (!form || !fieldName) {
     return <Div>{widgetT("widgets.formField.requiresContext")}</Div>;
   }
-  const theme = getTheme(field.theme);
-  const descriptionStyle = theme.descriptionStyle;
   const isRequired = !field.schema.isOptional();
 
   return (
@@ -95,6 +104,12 @@ export function DateRangeFieldWidget<
         );
         const styleClassName = getFieldStyleClassName(validationState, theme);
         const { style } = theme;
+        const parsedRange = dateRangeInputSchema.safeParse(formField.value);
+        const range = parsedRange.success ? parsedRange.data : {};
+        const min = formatDate(field.minDate) || undefined;
+        const max = formatDate(field.maxDate) || undefined;
+        const startLabel = widgetT("widgets.formFields.common.startDate");
+        const endLabel = widgetT("widgets.formFields.common.endDate");
 
         return (
           <FormItem
@@ -112,27 +127,28 @@ export function DateRangeFieldWidget<
                   {field.label && style === "asterisk" && isRequired && (
                     <Span className="text-info font-bold">*</Span>
                   )}
-                  {field.description && descriptionStyle === "tooltip" && (
-                    <TooltipProvider delayDuration={300}>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button
-                            type="button"
-                            className="cursor-help inline-flex"
-                            variant={"ghost"}
-                          >
-                            <Info className="h-4 w-4 text-muted-foreground hover:text-foreground transition-colors" />
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent className="max-w-[250px]">
-                          <Span className="text-sm">
-                            {tField(field.description)}
-                          </Span>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                  )}
                 </FormLabel>
+                {field.description && descriptionStyle === "tooltip" && (
+                  <TooltipProvider delayDuration={300}>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          type="button"
+                          aria-label={tField(field.description)}
+                          className="cursor-help inline-flex"
+                          variant={"ghost"}
+                        >
+                          <Info className="h-4 w-4 text-muted-foreground hover:text-foreground transition-colors" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent className="max-w-[250px]">
+                        <Span className="text-sm">
+                          {tField(field.description)}
+                        </Span>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                )}
                 {style === "badge" && isRequired && (
                   <Badge
                     variant="secondary"
@@ -150,38 +166,57 @@ export function DateRangeFieldWidget<
               )}
             </Div>
 
-            <FormControl>
-              {field.prefillDisplay &&
-              formField.value &&
-              !fieldState.isDirty ? (
-                renderPrefillDisplay(
+            {field.prefillDisplay && formField.value && !fieldState.isDirty ? (
+              <FormControl>
+                {renderPrefillDisplay(
                   formField.value,
                   field.label,
                   field.prefillDisplay,
                   tField,
-                )
-              ) : (
-                <Div className="flex gap-2 items-center">
+                )}
+              </FormControl>
+            ) : (
+              <Div className="grid min-w-0 grid-cols-1 gap-2 sm:grid-cols-2">
+                <FormControl>
                   <Input
+                    ref={formField.ref}
                     type="date"
-                    placeholder="Start date"
+                    aria-label={startLabel}
+                    placeholder={startLabel}
+                    value={formatDate(parseFormDate(range.from))}
+                    onChange={(event) =>
+                      formField.onChange({
+                        ...range,
+                        from: event.target.value || undefined,
+                      })
+                    }
+                    onBlur={formField.onBlur}
                     disabled={isDisabled || field.disabled || field.readonly}
-                    min={field.minDate ? formatDate(field.minDate) : undefined}
-                    max={field.maxDate ? formatDate(field.maxDate) : undefined}
-                    className={styleClassName.inputClassName}
+                    min={min}
+                    max={max}
+                    className={cn("min-w-0", styleClassName.inputClassName)}
                   />
-                  <Span className="text-muted-foreground">to</Span>
-                  <Input
-                    type="date"
-                    placeholder="End date"
-                    disabled={isDisabled || field.disabled || field.readonly}
-                    min={field.minDate ? formatDate(field.minDate) : undefined}
-                    max={field.maxDate ? formatDate(field.maxDate) : undefined}
-                    className={styleClassName.inputClassName}
-                  />
-                </Div>
-              )}
-            </FormControl>
+                </FormControl>
+                <Input
+                  type="date"
+                  aria-label={endLabel}
+                  aria-invalid={fieldState.invalid}
+                  placeholder={endLabel}
+                  value={formatDate(parseFormDate(range.to))}
+                  onChange={(event) =>
+                    formField.onChange({
+                      ...range,
+                      to: event.target.value || undefined,
+                    })
+                  }
+                  onBlur={formField.onBlur}
+                  disabled={isDisabled || field.disabled || field.readonly}
+                  min={min}
+                  max={max}
+                  className={cn("min-w-0", styleClassName.inputClassName)}
+                />
+              </Div>
+            )}
 
             {fieldState.error && (
               <Div className={styleClassName.errorClassName}>

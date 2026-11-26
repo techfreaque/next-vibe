@@ -58,7 +58,10 @@ export const translations: typeof enTranslations = {
     back: "Retour",
     submit: "Convertir en facture",
     converted: "Facture créée à partir de ce devis.",
-    viewInvoice: "Voir la facture",
+    savedDraftNumber: "Brouillon de facture n° {{number}} créé",
+    savedDraft: "Brouillon de facture créé",
+    convertedNumber: "Créé à partir du devis {{number}}.",
+    viewInvoice: "Ouvrir le brouillon",
     convertNote:
       "Une facture brouillon sera créée avec les mêmes lignes. Le devis sera marqué comme converti.",
   },

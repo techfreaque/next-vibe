@@ -5,13 +5,12 @@ export const translations: typeof enTranslations = {
   post: {
     title: "Scegli il campo",
     titleShort: "Scegli il campo",
-    description:
-      "Field Pick - estrae un campo chiamato da una serie di tempo (superato, restituisce vuoto)",
+    description: "Estrae un campo numerico dai metadati di ogni osservazione.",
     fields: {
       source: { label: "Fonte", description: "Serie di tempo di input" },
       field: {
         label: "Campo di applicazione",
-        description: "Nome di campo da estrarre (non più supportato)",
+        description: "Nome del campo nei metadati, per esempio close.",
       },
       resolution: { label: "Risoluzione", description: "Tempo di calcolo" },
       range: {

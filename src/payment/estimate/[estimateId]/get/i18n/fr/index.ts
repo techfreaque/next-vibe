@@ -1,6 +1,7 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  lineRounding: "Arrondi par ligne",
   category: "Devis",
   tags: { payment: "paiement", estimate: "devis" },
   post: {
@@ -51,7 +52,9 @@ export const translations: typeof enTranslations = {
   },
   estimateId: { label: "ID du devis", description: "Le devis concerné" },
   widget: {
-    send: "Envoyer le devis",
+    send: "Marquer comme envoyé",
+    terms: "Conditions",
+    noItems: "Ce devis ne contient aucune ligne.",
     addLine: "Ajouter une ligne",
     accept: "Enregistrer l’acceptation",
     decline: "Enregistrer le refus",

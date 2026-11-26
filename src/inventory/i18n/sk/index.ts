@@ -218,6 +218,13 @@ export const translations: typeof enTranslations = {
       titleShort: "Sklad",
       description: "Načítať podrobnosti konkrétneho skladu.",
       widget: {
+        companyName: "Spoločnosť",
+        stockedProducts: "Produkty na sklade",
+        companyInventory: "Prehľad zásob spoločnosti",
+        missingValuation: "Chýba obstarávacia cena",
+        details: "Údaje o sklade",
+        related: "Zásoby",
+        backToList: "Späť na zoznam skladov",
         back: "Späť",
         edit: "Upraviť sklad",
         viewStock: "Zobraziť zásoby",
@@ -384,6 +391,12 @@ export const translations: typeof enTranslations = {
         noMatches: "Vyhľadávaniu nezodpovedá žiadna skladová položka.",
         loadMore: "Zobraziť viac",
         back: "Späť",
+        defaultLowStockRule:
+          "Nízky stav pri menej ako {{threshold}} dostupných jednotkách",
+        reorderPointRule:
+          "Nízky stav pri najviac {{threshold}} dostupných jednotkách",
+        stockValuePrecision:
+          "Hodnota zásob je množstvo na sklade × nezaokrúhlený jednotkový náklad. Zobrazené náklady sú zaokrúhlené na dve desatinné miesta.",
         lowStock: "Nízky stav zásob",
         available: "Dostupné množstvo",
         onHand: "Na sklade",
@@ -910,6 +923,8 @@ export const translations: typeof enTranslations = {
       titleShort: "Presun",
       description: "Načítať podrobnosti presunu vrátane všetkých položiek.",
       widget: {
+        retry: "Skúsiť znova",
+        noItems: "Tento presun neobsahuje žiadne položky.",
         back: "Späť",
         dispatch: "Expedovať presun",
         receive: "Označiť ako prijatý",

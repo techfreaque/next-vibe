@@ -49,6 +49,8 @@ import { posOrderItems, posOrders, posSessions, posTerminals } from "@/pos/db";
 import { PosOrderStatus } from "@/pos/enum";
 
 import { scopedTranslation } from "../i18n";
+import { companyTaxRegimes } from "../regime/db";
+import { CompanyTaxRegime } from "../regime/enum";
 import type {
   TaxReportRequestOutput,
   TaxReportResponseOutput,
@@ -188,11 +190,26 @@ export class TaxReportRepository {
           ),
         );
 
+      // Approval records the tax treatment. Pending bills follow the election
+      // effective on their bill date until they have a posting snapshot.
+      const pendingExemption = sql`(
+        ${paymentBills.status} in (${BillStatus.RECEIVED}, ${BillStatus.DISPUTED})
+        and ${paymentBills.journalEntryId} is null
+        and coalesce((
+          select ${companyTaxRegimes.regime} from ${companyTaxRegimes}
+          where ${companyTaxRegimes.companyId} = ${paymentBills.companyId}
+            and ${companyTaxRegimes.effectiveFrom} <= ${paymentBills.billDate}::date
+          order by ${companyTaxRegimes.effectiveFrom} desc limit 1
+        ), ${CompanyTaxRegime.STANDARD}) <> ${CompanyTaxRegime.STANDARD}
+      )`;
       const billLines = db
         .select({
           direction: sql<
             typeof TaxReportDirectionValue
-          >`${TaxReportDirection.PURCHASES}::text`.as("direction"),
+          >`case when coalesce((${paymentBills.metadata}->>'inputVatDeductible') = 'false', ${pendingExemption})
+              then ${TaxReportDirection.NON_DEDUCTIBLE}::text else ${TaxReportDirection.PURCHASES}::text end`.as(
+            "direction",
+          ),
           rate: sql<number | null>`${paymentBillLines.taxRate}`
             .mapWith(Number)
             .as("rate"),
@@ -214,6 +231,40 @@ export class TaxReportRepository {
               BillStatus.PAID,
               BillStatus.DISPUTED,
             ]),
+            gte(paymentBills.billDate, start),
+            lt(paymentBills.billDate, end),
+          ),
+        );
+
+      const reverseChargeLines = db
+        .select({
+          direction: sql<
+            typeof TaxReportDirectionValue
+          >`${TaxReportDirection.REVERSE_CHARGE}::text`.as("direction"),
+          rate: sql<
+            number | null
+          >`(${paymentBills.metadata}->'reverseCharge'->>'ratePercent')::numeric / 100`
+            .mapWith(Number)
+            .as("rate"),
+          taxableAmount:
+            sql`(${paymentBills.metadata}->'reverseCharge'->>'base')::numeric`.as(
+              "taxable_amount",
+            ),
+          taxAmount:
+            sql`(${paymentBills.metadata}->'reverseCharge'->>'amount')::numeric`.as(
+              "tax_amount",
+            ),
+        })
+        .from(paymentBills)
+        .where(
+          and(
+            eq(paymentBills.companyId, company.id),
+            eq(paymentBills.currency, currency),
+            inArray(paymentBills.status, [
+              BillStatus.APPROVED,
+              BillStatus.PAID,
+            ]),
+            sql`jsonb_typeof(${paymentBills.metadata}->'reverseCharge'->'amount') = 'number'`,
             gte(paymentBills.billDate, start),
             lt(paymentBills.billDate, end),
           ),
@@ -271,6 +322,7 @@ export class TaxReportRepository {
 
       const lines = invoiceLines
         .unionAll(billLines)
+        .unionAll(reverseChargeLines)
         .unionAll(posLines)
         .as("document_lines");
       const grouped = await db

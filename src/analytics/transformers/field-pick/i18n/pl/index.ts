@@ -6,12 +6,12 @@ export const translations: typeof enTranslations = {
     title: "Wybór pola",
     titleShort: "Wybór pola",
     description:
-      "Wybór pola - wyodrębnia nazwane pole (przestarzałe, zwraca pustą tablicę)",
+      "Odczytuje wskazane pole liczbowe z metadanych każdej obserwacji.",
     fields: {
       source: { label: "Źródło", description: "Wejściowa seria czasowa" },
       field: {
         label: "Pole",
-        description: "Nazwa pola do wyodrębnienia (nie jest już obsługiwane)",
+        description: "Nazwa pola w metadanych, na przykład close.",
       },
       resolution: {
         label: "Rozdzielczość",

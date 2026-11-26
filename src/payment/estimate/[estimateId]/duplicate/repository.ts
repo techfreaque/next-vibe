@@ -20,6 +20,10 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { lockLedgerCompany } from "@/chart-of-accounts/shared/ledger-write";
 import { getDocumentAccess } from "@/finance/document-company-scope";
+import {
+  getLineSettlementPolicy,
+  LINE_SETTLEMENT_V1,
+} from "@/tax/line-settlement";
 
 import { paymentEstimateLines, paymentEstimates } from "../../../db";
 import { EstimateStatus } from "../../../enum";
@@ -89,6 +93,9 @@ export class EstimateDuplicateRepository {
             customerEmail: source.customerEmail ?? null,
             customerName: source.customerName ?? null,
             currency: source.currency,
+            metadata: getLineSettlementPolicy(source.currency, source.metadata)
+              ? { lineSettlement: LINE_SETTLEMENT_V1 }
+              : null,
             validUntil: source.validUntil ?? null,
             title: source.title,
             notes: source.notes ?? null,

@@ -61,10 +61,13 @@ export const translations: typeof enTranslations = {
       AR_PAYMENT: "Pagamento AR",
       AP_BILL: "AP Bill",
       AP_PAYMENT: "Pagamento AP",
+      SUPPLIER_EVIDENCE: "Giustificativo fornitore",
+      BANK_RECONCILIATION: "Riconciliazione bancaria",
       POS_ORDER: "Ordine POS",
       TAX_PAYMENT: "Pagamento fiscale",
       PERIOD_CLOSE: "Periodo di chiusura",
       CREDIT_TRANSACTION: "Transazione di credito",
+      REVENUE_RECOGNITION: "Rilevazione dei ricavi",
     },
     lineType: {
       DEBIT: "Debito",
@@ -211,6 +214,14 @@ export const translations: typeof enTranslations = {
       back: "Indietro",
       loading: "Caricamento...",
       postButton: "Posta di ingresso",
+      relatedEntries: "Registrazioni collegate",
+      reversalBadge: "Storno",
+      originalEntry: "Registrazione originaria",
+      reversingEntry: "Registrazione di storno",
+      reversedBy: "Registrazione di storno",
+      originalLineNotes:
+        "Le descrizioni delle righe provengono dalla registrazione originale. Dare e avere si riferiscono allo storno.",
+      reverseReversal: "Storna questa registrazione di storno",
       reverseButton: "Inversione",
       balancedLabel: "Equilibrio",
       notBalancedLabel: "Non bilanciato",
@@ -475,17 +486,16 @@ export const translations: typeof enTranslations = {
       unbalanced: "Squilibrato",
       noActivity: "Nessun account con attività trovata per questo periodo.",
       total: "Totale",
-      selectCompany:
-        "Inserire una Società ID sopra e fare clic su Esegui per generare il saldo di prova.",
+      selectCompany: "Seleziona un’azienda per consultare il report.",
     },
     title: "Equilibrio di prova",
     titleShort: "Equilibrio di prova",
     description:
       "Somma di tutti i debiti e crediti postati per conto a partire da una data specifica. Conferma l'equilibrio dei libri.",
     companyId: {
-      label: "Società ID",
-      description: "Società di relazione",
-      placeholder: "Società UUID",
+      label: "Azienda",
+      description: "Azienda del report",
+      placeholder: "Seleziona un’azienda",
     },
     asOfDate: {
       label: "Come da data",
@@ -567,7 +577,9 @@ export const translations: typeof enTranslations = {
       previousMonth: "Mese precedente",
       autoCurrency: "Automatica",
       run: "Corri!",
-      running: "Correre...",
+      running: "Caricamento del report…",
+      loadError: "Impossibile caricare il report",
+      retry: "Riprova",
     },
   },
   profitLoss: {
@@ -575,17 +587,16 @@ export const translations: typeof enTranslations = {
       dateRange: "Periodo",
       noData: "Nessun dato per questo periodo.",
       liabilitiesAndEquity: "Capacità + Equità",
-      selectCompany:
-        "Immettere una Società ID sopra e fare clic su Esegui per generare l'affermazione P&L.",
+      selectCompany: "Seleziona un’azienda per consultare il report.",
     },
     title: "Profit & Loss",
     titleShort: "P&L",
     description:
       "Entrate vs. spese per una data gamma. Mostra profitto lordo, profitto operativo e profitto netto.",
     companyId: {
-      label: "Società ID",
-      description: "Società di relazione",
-      placeholder: "Società UUID",
+      label: "Azienda",
+      description: "Azienda del report",
+      placeholder: "Seleziona un’azienda",
     },
     from: {
       label: "Da",
@@ -660,16 +671,16 @@ export const translations: typeof enTranslations = {
       unbalanced: "Non bilanciato",
       noEntries: "Nessuna voce per questo periodo",
       liabilitiesAndEquity: "Capacità &amp; Equity",
-      selectCompany: "Selezionare un'azienda per visualizzare il bilancio",
+      selectCompany: "Seleziona un’azienda per consultare il report.",
     },
     title: "Foglio di equilibrio",
     titleShort: "Foglio di equilibrio",
     description:
       "Attività, passività e patrimonio netto a partire da una data. Verifica l'equazione contabile.",
     companyId: {
-      label: "Società ID",
-      description: "Società di relazione",
-      placeholder: "Società UUID",
+      label: "Azienda",
+      description: "Azienda del report",
+      placeholder: "Seleziona un’azienda",
     },
     asOfDate: {
       label: "Come da data",
@@ -829,21 +840,24 @@ export const translations: typeof enTranslations = {
   },
   taxReport: {
     widget: {
+      filters: "Periodo e valuta",
+      window: "Dal {{from}} al {{to}}",
       dateRange: "Periodo",
       noData: "Nessun dato fiscale per questo periodo.",
       summarySection: "Riepilogo",
-      detailSection: "Ripartizione",
-      selectCompany:
-        "Inserisci una Società ID sopra e fare clic su Esegui per generare il rapporto fiscale.",
+      detailSection: "Movimenti registrati nei conti IVA",
+      scopeHint:
+        "Consulta l’IVA a debito e l’IVA detraibile per il periodo selezionato.",
+      selectCompany: "Seleziona un’azienda per consultare il report.",
     },
     title: "Relazione fiscale",
     titleShort: "Relazione fiscale",
     description:
-      "VAT raccolto vs. recuperabile per un periodo. Net VAT pagabile a colpo d'occhio.",
+      "Consulta i movimenti registrati nei conti IVA per il periodo selezionato.",
     companyId: {
-      label: "Società ID",
-      description: "Società di relazione",
-      placeholder: "Società UUID",
+      label: "Azienda",
+      description: "Azienda del report",
+      placeholder: "Seleziona un’azienda",
     },
     from: {
       label: "Da",
@@ -858,12 +872,12 @@ export const translations: typeof enTranslations = {
     response: {
       from: "Da",
       to: "A",
-      vatCollected: "VAT Collezionato",
-      vatReclaimable: "VAT Reclaimable",
+      vatCollected: "IVA a debito registrata",
+      vatReclaimable: "IVA a credito registrata",
       netVatPayable: "Net VAT Payable",
       lines: "Linee fiscali",
-      taxRateCode: "Codice di tasso",
-      taxRateName: "Nome della tariffa",
+      taxRateCode: "Codice conto",
+      taxRateName: "Nome conto",
       netAmount: "Importo netto",
       taxAmount: "Importo fiscale",
       rate: "Tasso",

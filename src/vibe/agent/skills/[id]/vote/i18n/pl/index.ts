@@ -6,6 +6,8 @@ export const translations: typeof enTranslations = {
     skills: "umiejętności",
   },
   post: {
+    selectSkill: "Otwórz umiejętność społeczności, aby zagłosować.",
+    browseSkills: "Przeglądaj umiejętności społeczności",
     title: "Głosuj na umiejętność",
     titleShort: "Zagłosuj",
     description:

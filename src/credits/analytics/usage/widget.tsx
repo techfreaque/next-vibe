@@ -374,8 +374,9 @@ export function CreditUsageReportWidget({
   });
 
   return (
-    <WidgetShell className="min-w-0">
+    <WidgetShell layout="page" className="min-w-0">
       <WidgetHeader
+        size="page"
         title={t("get.title")}
         backButton={
           isInteractive && <NavigateButtonWidget field={children.backButton} />

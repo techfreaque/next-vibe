@@ -6,12 +6,12 @@ export const translations: typeof enTranslations = {
     title: "Sélection de champ",
     titleShort: "Sélection de champ",
     description:
-      "Sélection de champ : extrait un champ nommé d'une série temporelle (obsolète, renvoie un résultat vide)",
+      "Extrait un champ numérique des métadonnées de chaque observation.",
     fields: {
       source: { label: "Source", description: "Série temporelle d'entrée" },
       field: {
         label: "Champ",
-        description: "Nom du champ à extraire (plus pris en charge)",
+        description: "Nom du champ de métadonnées, par exemple close.",
       },
       resolution: {
         label: "Résolution",

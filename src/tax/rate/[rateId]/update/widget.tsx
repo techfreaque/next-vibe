@@ -3,21 +3,34 @@
 import { Badge } from "next-vibe/ui/components/badge";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
+import { EmptyBlock } from "next-vibe/ui/components/empty-block";
 import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
+import { Skeleton } from "next-vibe/ui/components/skeleton";
 import { Span } from "next-vibe/ui/components/span";
 import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
 import {
+  useWidgetForm,
+  useWidgetIsInteractive,
+  useWidgetLogger,
   useWidgetNavigation,
   useWidgetTranslation,
+  useWidgetUser,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
+import { useApiQuery } from "next-vibe/unified-ui/hooks/use-api-query";
+import {
+  AdminForm,
+  AdminFormSection,
+} from "next-vibe/unified-ui/widgets/containers/admin-form/widget";
 import { BooleanFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/boolean-field/widget";
+import { EntityPickerFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/entity-picker-field/widget";
 import { NumberFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/number-field/widget";
 import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-field/widget";
-import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
-import type { JSX } from "react";
+import { type JSX, useEffect, useRef } from "react";
+import { z } from "zod";
 
+import listDefinition from "../../list/definition";
 import type definition from "./definition";
 
 export function TaxRateUpdateWidget({
@@ -29,7 +42,54 @@ export function TaxRateUpdateWidget({
   const navigation = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.PATCH>();
 
+  const form = useWidgetForm<typeof definition.PATCH>();
+  const logger = useWidgetLogger();
+  const user = useWidgetUser();
+  const interactive = useWidgetIsInteractive();
+  const rateId = form.watch("rateId");
+  const selected = z.uuid().safeParse(rateId).success;
+  const lookup = useApiQuery({
+    endpoint: listDefinition.GET,
+    requestData: { rateId, page: 1, pageSize: 1 },
+    options: {
+      enabled: interactive && selected && !data?.updated,
+      queryKey: `tax-rate-editor:${rateId}`,
+      staleTime: 0,
+      gcTime: 0,
+    },
+    logger,
+    user,
+  });
+  const stored = lookup.data?.rates?.find((row) => row.id === rateId);
+  const initialized = useRef<string | undefined>(undefined);
+  const defaults = form.formState.defaultValues;
+  useEffect(() => {
+    if (!selected) {
+      initialized.current = undefined;
+      return;
+    }
+    if (lookup.isFetching || !stored || initialized.current === stored.id) {
+      return;
+    }
+    initialized.current = stored.id;
+    form.reset({
+      rateId: stored.id,
+      name: stored.name,
+      rate: stored.rate,
+      isDefault: stored.isDefault,
+      isActive: stored.isActive,
+    });
+  }, [form, lookup.isFetching, selected, stored]);
+  const canEdit =
+    selected &&
+    (!interactive ||
+      (!!stored && defaults?.rateId === rateId && defaults.name !== undefined));
+
   const handleBack = (): void => {
+    if (navigation.canGoBack) {
+      navigation.pop();
+      return;
+    }
     void (async (): Promise<void> => {
       const def = await import("../../list/definition");
       navigation.push(def.default.GET, {});
@@ -66,50 +126,83 @@ export function TaxRateUpdateWidget({
   }
 
   return (
-    <Div className="flex flex-col gap-4">
-      {navigation.canGoBack && (
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={() => navigation.pop()}
-          className="self-start gap-1.5 -ml-1"
-        >
-          <ChevronLeft className="h-4 w-4" />
-          {t("rate.update.widget.backToList")}
-        </Button>
+    <AdminForm
+      className="mx-auto max-w-3xl"
+      title={t("rate.update.title")}
+      description={t("rate.update.description")}
+      backButton={
+        navigation.canGoBack && (
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => navigation.pop()}
+            className="self-start gap-1.5 -ml-1"
+          >
+            <ChevronLeft className="h-4 w-4" />
+            {t("rate.update.widget.backToList")}
+          </Button>
+        )
+      }
+      primaryAction={
+        canEdit && (
+          <SubmitButtonWidget<typeof definition.PATCH>
+            field={{ text: "rate.update.widget.save" }}
+          />
+        )
+      }
+    >
+      {!selected ? (
+        <EntityPickerFieldWidget
+          fieldName="rateId"
+          field={withValue(field.children.rateId, undefined, null)}
+        />
+      ) : !canEdit ? (
+        lookup.error || (!stored && lookup.isSuccess && !lookup.isFetching) ? (
+          <EmptyBlock
+            action={
+              lookup.error
+                ? {
+                    label: t("report.widget.retry"),
+                    onClick: () => void lookup.refetch(),
+                  }
+                : {
+                    label: t("rate.update.widget.backToList"),
+                    onClick: handleBack,
+                  }
+            }
+            title={
+              lookup.error?.message || t("rate.update.errors.notFound.title")
+            }
+          />
+        ) : (
+          <Skeleton className="h-28 w-full" />
+        )
+      ) : (
+        <AdminFormSection title={t("rate.details")} columns={2}>
+          <TextFieldWidget
+            fieldName="name"
+            field={withValue(field.children.name, undefined, null)}
+          />
+          <NumberFieldWidget
+            presentation="percent"
+            fieldName="rate"
+            field={{
+              ...withValue(field.children.rate, undefined, null),
+              description: undefined,
+              placeholder: undefined,
+            }}
+          />
+          <BooleanFieldWidget
+            fieldName="isDefault"
+            field={withValue(field.children.isDefault, undefined, null)}
+          />
+          <BooleanFieldWidget
+            fieldName="isActive"
+            field={withValue(field.children.isActive, undefined, null)}
+          />
+        </AdminFormSection>
       )}
-
-      <Div className="flex flex-col gap-1">
-        <Span className="text-base font-semibold">
-          {t("rate.update.title")}
-        </Span>
-        <Span className="text-sm text-muted-foreground">
-          {t("rate.update.description")}
-        </Span>
-      </Div>
-
-      <Div className="flex flex-col gap-3">
-        <TextFieldWidget
-          fieldName="name"
-          field={withValue(field.children.name, undefined, null)}
-        />
-        <NumberFieldWidget
-          fieldName="rate"
-          field={withValue(field.children.rate, undefined, null)}
-        />
-        <BooleanFieldWidget
-          fieldName="isDefault"
-          field={withValue(field.children.isDefault, undefined, null)}
-        />
-        <BooleanFieldWidget
-          fieldName="isActive"
-          field={withValue(field.children.isActive, undefined, null)}
-        />
-      </Div>
-
-      <FormAlertWidget field={{}} />
-      <SubmitButtonWidget<typeof definition.PATCH> field={{}} />
-    </Div>
+    </AdminForm>
   );
 }

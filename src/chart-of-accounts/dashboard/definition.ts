@@ -67,6 +67,13 @@ const { GET } = createEndpoint({
         label: "dashboard.companyId.label",
         schema: z.string().nullable(),
       }),
+      primaryActionAlias: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z
+          .enum(["coa-setup", "coa-period-create", "coa-journal-create"])
+          .optional(),
+      }),
       canConfigure: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         hidden: true,

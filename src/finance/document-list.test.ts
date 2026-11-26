@@ -119,7 +119,7 @@ describe("company document lists", () => {
       total: 2,
       currentPage: 1,
       pageCount: 2,
-      invoices: [{ id: firstInvoice, companyId: firstCompany }],
+      invoices: [{ id: secondInvoice, companyId: secondCompany }],
     });
 
     const second = await InvoiceListRepository.listInvoices(
@@ -131,7 +131,7 @@ describe("company document lists", () => {
       total: 2,
       currentPage: 2,
       pageCount: 2,
-      invoices: [{ id: secondInvoice, companyId: secondCompany }],
+      invoices: [{ id: firstInvoice, companyId: firstCompany }],
     });
 
     const empty = await InvoiceListRepository.listInvoices(

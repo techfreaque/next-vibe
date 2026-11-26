@@ -273,6 +273,7 @@ export const translations = {
     health: {
       socketOpen: "WebSocket open",
       noSyncRecorded: "No sync recorded",
+      overdue: "Sync overdue",
       syncRecorded: "Sync recorded",
       tunnelOpen: "Tunnel open",
       bridgeActive: "Connected",
@@ -293,6 +294,7 @@ export const translations = {
     },
     // Cloud marketing panel
     cloud: {
+      connectAnother: "Connect another instance",
       heroTitle: "Bring your own instance",
       heroSubtitle:
         "Run next-vibe on your own hardware and link it to this account. Your chats, memories and skills follow you. Your tools run on your machine.",

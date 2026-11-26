@@ -17,9 +17,9 @@ import {
   SelectValue,
 } from "next-vibe/ui/components/select";
 import { Span } from "next-vibe/ui/components/span";
+import { StatusPill } from "next-vibe/ui/components/status-pill";
 import { WidgetHeader } from "next-vibe/ui/components/widget-header";
 import { WidgetShell } from "next-vibe/ui/components/widget-shell";
-import { formatMoney } from "next-vibe/unified-ui/_shared/format-money";
 import {
   useWidgetDisabled,
   useWidgetForm,
@@ -48,6 +48,7 @@ import accountDefinition from "../../account/list/definition";
 import { LineType, type LineTypeValue, PeriodStatus } from "../../enum";
 import periodDefinition from "../../period/list/definition";
 import { accountingCalendarDay } from "../../shared/calendar-date";
+import { formatJournalCurrency } from "../../shared/journal-presentation";
 import {
   accountingDay,
   journalAmountUnits,
@@ -213,11 +214,13 @@ export function CoaJournalCreateWidget({
     debitUnits >= creditUnits
       ? debitUnits - creditUnits
       : creditUnits - debitUnits;
-  const cent = BigInt(100);
   const money = (units: bigint): string =>
-    formatMoney(Number(units) / 10_000, currency, locale);
+    formatJournalCurrency(units, currency, locale);
+  const cent = BigInt(100);
   const subcentDifference = difference > BigInt(0) && difference < cent;
   const residual = subcentDifference ? `< ${money(cent)}` : money(difference);
+  const missingSide =
+    debitUnits > creditUnits ? LineType.CREDIT : LineType.DEBIT;
   const amountNumber = new Intl.NumberFormat(locale, {
     useGrouping: false,
     minimumFractionDigits: 2,
@@ -225,7 +228,22 @@ export function CoaJournalCreateWidget({
   });
   const exactAmountNumber = new Intl.NumberFormat(locale, {
     useGrouping: false,
+    minimumFractionDigits: 2,
     maximumFractionDigits: 4,
+  });
+  const emptyAmount = amountNumber.format(0);
+  const previewLines = lineEditor.fields.flatMap(({ id }, index) => {
+    const line = lines[index];
+    if (!line || journalAmountUnits(line.amount) === null) {
+      return [];
+    }
+    const account = accounts?.find(
+      ({ id: accountId }) => accountId === line.accountId,
+    );
+    const side = journalLineType(line.type);
+    return account && side
+      ? [{ id, account, side, amount: exactAmountNumber.format(line.amount) }]
+      : [];
   });
   const clearAmountEdit = (lineId: string): void => {
     setAmountEdits((edits) => {
@@ -331,14 +349,23 @@ export function CoaJournalCreateWidget({
           )
         }
         actions={
-          <SubmitButtonWidget<typeof definition.POST>
-            field={{ text: "journalCreate.widget.saveDraft" }}
-          />
+          <>
+            {balanced && (
+              <StatusPill
+                status="balanced"
+                label={t("journalCreate.widget.balanced")}
+                variant="success"
+              />
+            )}
+            <SubmitButtonWidget<typeof definition.POST>
+              field={{ text: "journalCreate.widget.saveDraft" }}
+            />
+          </>
         }
       />
       <FormAlertWidget field={{}} />
       <SectionGroup title={currency ?? t("journalCreate.widget.currency")}>
-        <DetailGrid columns={3}>
+        <DetailGrid columns={3} className="grid-cols-3 gap-x-2">
           <DetailField
             label={t("journalCreate.widget.totalDebits")}
             value={money(debitUnits)}
@@ -352,26 +379,53 @@ export function CoaJournalCreateWidget({
             value={residual}
           />
         </DetailGrid>
-        {/* oxlint-disable-next-line jsx-a11y/prefer-tag-over-role -- No cross-platform output component. Keep the balance announcement. */}
-        <Div role="status">
-          {balanced ? (
-            <Span className="text-sm font-medium text-success">
-              {t("journalCreate.widget.balanced")}
-            </Span>
-          ) : difference !== BigInt(0) ? (
-            <Span className="text-sm font-medium text-destructive">
-              {subcentDifference
-                ? t("journalCreate.widget.offByLessThan", {
-                    amount: money(cent),
-                  })
-                : t("journalCreate.widget.offBy", { amount: residual })}
-            </Span>
-          ) : (
-            <Span className="text-sm text-muted-foreground">
-              {t("journalCreate.widget.incomplete")}
-            </Span>
-          )}
-        </Div>
+        {previewLines.length > 0 && (
+          <Div
+            data-testid="journal-balance-preview"
+            className="flex min-w-0 flex-col gap-1 border-t pt-2 @md:hidden"
+          >
+            <Div className="grid grid-cols-[minmax(0,1fr)_5.25rem_5.25rem] gap-2 text-xs font-medium text-muted-foreground">
+              <Span>{t("journalCreate.widget.account")}</Span>
+              <Span className="text-right">{t(LineType.DEBIT)}</Span>
+              <Span className="text-right">{t(LineType.CREDIT)}</Span>
+            </Div>
+            {previewLines.map(({ id, account, side, amount }) => (
+              <Div
+                key={id}
+                data-testid="journal-balance-preview-line"
+                className="grid grid-cols-[minmax(0,1fr)_5.25rem_5.25rem] items-start gap-2 text-xs"
+              >
+                <Span className="[overflow-wrap:anywhere]">
+                  {account.code} {account.name}
+                </Span>
+                <Span className="text-right tabular-nums [overflow-wrap:anywhere]">
+                  {side === LineType.DEBIT ? amount : emptyAmount}
+                </Span>
+                <Span className="text-right tabular-nums [overflow-wrap:anywhere]">
+                  {side === LineType.CREDIT ? amount : emptyAmount}
+                </Span>
+              </Div>
+            ))}
+          </Div>
+        )}
+        {!balanced && (
+          <Div aria-live="polite">
+            {!invalidAmounts && difference !== BigInt(0) ? (
+              <Span className="text-sm font-medium text-destructive">
+                {t(missingSide)}:{" "}
+                {subcentDifference
+                  ? t("journalCreate.widget.offByLessThan", {
+                      amount: money(cent),
+                    })
+                  : t("journalCreate.widget.offBy", { amount: residual })}
+              </Span>
+            ) : (
+              <Span className="text-sm text-muted-foreground">
+                {t("journalCreate.widget.incomplete")}
+              </Span>
+            )}
+          </Div>
+        )}
       </SectionGroup>
       <SectionGroup title={t("journalCreate.widget.details")}>
         <Div className="grid min-w-0 gap-3 @md:grid-cols-2 @xl:grid-cols-3">
@@ -422,19 +476,25 @@ export function CoaJournalCreateWidget({
           </Div>
           <DateFieldWidget
             utcCalendarDay
+            localizedDate
             key={`${periodId}:${dateInPeriod}`}
             fieldName="date"
             field={{
               ...children.date,
+              description: undefined,
+              placeholder: undefined,
               minDate: dateStart,
               maxDate: dateEnd,
             }}
           />
           <TextFieldWidget
             fieldName="description"
-            field={children.description}
+            field={{ ...children.description, description: undefined }}
           />
-          <TextareaFieldWidget fieldName="memo" field={children.memo} />
+          <TextareaFieldWidget
+            fieldName="memo"
+            field={{ ...children.memo, description: undefined }}
+          />
         </Div>
       </SectionGroup>
       <SectionGroup title={t("journalCreate.lines.label")}>
@@ -537,10 +597,12 @@ export function CoaJournalCreateWidget({
                           ((hasAmount || Boolean(raw?.trim())) && !valid)),
                       )}
                       value={raw ?? display}
+                      placeholder={emptyAmount}
+                      keyboardType="decimal-pad"
                       className="text-right tabular-nums"
                       disabled={disabled}
                       onFocus={() => {
-                        if (ownsAmount && valid && raw === undefined) {
+                        if (hasAmount && valid && raw === undefined) {
                           setAmountEdits((edits) => ({
                             ...edits,
                             [line.id]: exactAmountNumber.format(amount),

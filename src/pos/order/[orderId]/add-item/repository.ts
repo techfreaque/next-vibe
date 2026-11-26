@@ -16,10 +16,17 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { catalogProducts } from "@/products/db";
+import {
+  calculateSettledTaxLine,
+  LINE_SETTLEMENT_V1,
+} from "@/tax/line-settlement";
+import { scopedTranslation as regimeTranslation } from "@/tax/regime/i18n";
+import { getCompanyTaxRegime } from "@/tax/regime/policy";
 
 import { posOrderItems, posOrders } from "../../../db";
 import { scopedTranslation } from "../../../i18n";
 import { withOpenOrder } from "../../open-order";
+import { posSettlementAmounts } from "../../settlement-amounts";
 import type { PosOrderAddItemPostRequestOutput } from "./definition";
 
 export class PosOrderAddItemRepository {
@@ -28,6 +35,7 @@ export class PosOrderAddItemRepository {
     userId: string,
     logger: EndpointLogger,
     locale: CountryLanguage = defaultLocale,
+    pathOrderId?: string,
   ): Promise<
     ResponseType<{
       result: {
@@ -43,9 +51,17 @@ export class PosOrderAddItemRepository {
     }>
   > {
     const { t } = scopedTranslation.scopedT(locale);
+    const orderId = pathOrderId ?? data.orderId;
+
+    if (!orderId || (data.orderId !== undefined && data.orderId !== orderId)) {
+      return fail({
+        message: t("orderAddItem.post.errors.validation.title"),
+        errorType: ErrorResponseTypes.VALIDATION_ERROR,
+      });
+    }
 
     try {
-      const { orderId, item } = data;
+      const { item } = data;
 
       // Verify order exists and is open
       return await withOpenOrder(
@@ -118,7 +134,18 @@ export class PosOrderAddItemRepository {
           }
 
           // Calculate line amounts
-          const taxRate = resolvedTaxRate ?? 0;
+          const regime = await getCompanyTaxRegime(
+            tx,
+            order.companyId,
+            new Date(),
+          );
+          if (regime.exempt && (item.taxRate ?? 0) > 0) {
+            return fail({
+              message: regimeTranslation.scopedT(locale).t("saleConflict"),
+              errorType: ErrorResponseTypes.VALIDATION_ERROR,
+            });
+          }
+          const taxRate = regime.exempt ? 0 : (resolvedTaxRate ?? 0);
           const values = [resolvedQuantity, resolvedUnitPrice, taxRate];
           if (
             resolvedQuantity <= 0 ||
@@ -136,8 +163,17 @@ export class PosOrderAddItemRepository {
             });
           }
           const net = sql`round(${resolvedQuantity}::numeric * ${resolvedUnitPrice}::numeric,4)`;
-          const taxAmount = sql`round(${net} * ${taxRate}::numeric,4)`;
-          const lineTotal = sql`${net} + ${taxAmount}`;
+          const settled =
+            order.lineSettlement === LINE_SETTLEMENT_V1
+              ? calculateSettledTaxLine({
+                  quantity: resolvedQuantity,
+                  unitPrice: resolvedUnitPrice,
+                  taxRate,
+                })
+              : undefined;
+          const legacyTax = sql`round(${net} * ${taxRate}::numeric,4)`;
+          const taxAmount = settled?.taxAmount ?? legacyTax;
+          const lineTotal = settled?.lineTotal ?? sql`${net} + ${legacyTax}`;
           // Get current sort order
           const existingItems = await tx
             .select({ sortOrder: posOrderItems.sortOrder })
@@ -188,19 +224,15 @@ export class PosOrderAddItemRepository {
             .from(posOrderItems)
             .where(eq(posOrderItems.orderId, orderId));
 
-          const newSubtotal = Number(totals?.subtotal ?? 0);
-          const newTaxAmount = Number(totals?.taxAmount ?? 0);
-          const newTotal = newSubtotal;
+          const settlement = posSettlementAmounts(
+            Number(totals?.subtotal ?? 0),
+            Number(totals?.taxAmount ?? 0),
+          );
 
           await tx
             .update(posOrders)
             .set({
-              subtotal:
-                (Math.round(newSubtotal * 10_000) -
-                  Math.round(newTaxAmount * 10_000)) /
-                10_000,
-              taxAmount: newTaxAmount,
-              total: newTotal,
+              ...settlement,
               updatedAt: new Date(),
             })
             .where(eq(posOrders.id, orderId));
@@ -209,7 +241,7 @@ export class PosOrderAddItemRepository {
             result: {
               currency: order.currency,
               ...newItem,
-              orderTotal: newTotal,
+              orderTotal: settlement.total,
             },
           });
         },

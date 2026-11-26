@@ -27,6 +27,7 @@ import { type JSX, useId, useState } from "react";
 
 import type definition from "./definition";
 import type { InventoryStockListGetResponseOutput } from "./definition";
+import { DEFAULT_LOW_STOCK_THRESHOLD } from "./threshold";
 
 type StockRow = InventoryStockListGetResponseOutput["stockLevels"][number];
 
@@ -42,7 +43,7 @@ export function InventoryStockListWidget(): JSX.Element {
   const [search, setSearch] = useState(""),
     [visibleCount, setVisibleCount] = useState(25);
   const inputId = useId();
-  const number = new Intl.NumberFormat(locale);
+  const number = new Intl.NumberFormat(locale, { maximumFractionDigits: 4 });
   const receive = (): void => {
     void import("../receive/definition").then((mod) =>
       navigation.push(mod.default.POST, {
@@ -93,22 +94,36 @@ export function InventoryStockListWidget(): JSX.Element {
         </Button>
       </Div>
     ) : null;
-  const status = (row: StockRow): JSX.Element => (
-    <Badge
-      variant={
-        row.quantityAvailable <= 0
-          ? "destructive"
+  const stockStatus = (row: StockRow): JSX.Element => (
+    <Div className="flex min-w-0 flex-col items-start gap-1">
+      <Badge
+        variant={
+          row.quantityAvailable <= 0
+            ? "destructive"
+            : row.isLowStock
+              ? "warning"
+              : "success"
+        }
+      >
+        {row.quantityAvailable <= 0
+          ? t("stockList.get.widget.outOfStock")
           : row.isLowStock
-            ? "warning"
-            : "success"
-      }
-    >
-      {row.quantityAvailable <= 0
-        ? t("stockList.get.widget.outOfStock")
-        : row.isLowStock
-          ? t("stockList.get.widget.lowStock")
-          : t("stockList.get.widget.statusOk")}
-    </Badge>
+            ? t("stockList.get.widget.lowStock")
+            : t("stockList.get.widget.statusOk")}
+      </Badge>
+      <Span className="text-xs text-muted-foreground">
+        {t(
+          row.reorderPoint === null || row.reorderPoint === undefined
+            ? "stockList.get.widget.defaultLowStockRule"
+            : "stockList.get.widget.reorderPointRule",
+          {
+            threshold: number.format(
+              row.reorderPoint ?? DEFAULT_LOW_STOCK_THRESHOLD,
+            ),
+          },
+        )}
+      </Span>
+    </Div>
   );
   const rows = data?.stockLevels ?? [],
     query = search.trim().toLocaleLowerCase(locale);
@@ -120,6 +135,13 @@ export function InventoryStockListWidget(): JSX.Element {
       )
     : rows;
   const visible = interactive ? matching.slice(0, visibleCount) : matching;
+  const showsRoundedCost = visible.some(
+    ({ unitCost, currency, stockValue }) =>
+      unitCost !== null &&
+      Boolean(currency) &&
+      typeof stockValue === "number" &&
+      Math.abs(unitCost * 100 - Math.round(unitCost * 100)) > 0.000_001,
+  );
   const receiveButton =
     interactive && !onPick ? (
       <Button type="button" size="sm" onClick={receive}>
@@ -160,6 +182,11 @@ export function InventoryStockListWidget(): JSX.Element {
                 }}
               />
             </Div>
+          )}
+          {showsRoundedCost && (
+            <Span className="text-sm text-muted-foreground">
+              {t("stockList.get.widget.stockValuePrecision")}
+            </Span>
           )}
           {visible.length > 0 ? (
             <RecordTable
@@ -227,7 +254,7 @@ export function InventoryStockListWidget(): JSX.Element {
                       row.currency && typeof row.stockValue === "number"
                         ? formatMoney(row.stockValue, row.currency, locale)
                         : "",
-                    status: status(row),
+                    status: stockStatus(row),
                     actions: actions(row),
                   },
                 };
@@ -252,12 +279,16 @@ export function InventoryStockListWidget(): JSX.Element {
                         ) : (
                           <Span className="font-semibold">{title(row)}</Span>
                         )}
-                        {status(row)}
+                        {stockStatus(row)}
                       </Div>
                       <Span className="text-sm text-muted-foreground">
                         {row.warehouseName}
                       </Span>
                       <Div className="grid grid-cols-2 gap-1 text-sm">
+                        <Span>{t("stockList.get.widget.onHand")}</Span>
+                        <Span className="text-right tabular-nums">
+                          {number.format(row.quantityOnHand)}
+                        </Span>
                         <Span>{t("stockList.get.widget.available")}</Span>
                         <Span className="text-right font-semibold tabular-nums">
                           {number.format(row.quantityAvailable)}

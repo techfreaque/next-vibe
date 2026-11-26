@@ -94,6 +94,10 @@ export const translations: typeof enTranslations = {
     },
   },
   widget: {
+    loadingReport: "Caricamento del rapporto sui ricavi…",
+    operatingTitle: "Ricavi operativi",
+    currencyBasis: "Importi approssimativi in USD.",
+    filterDisclosure: "Filtri",
     extra: {
       grossHint: "Abbonamenti {{subs}} · pacchetti {{packs}} · ca. USD",
       newSubsHint:

@@ -12,8 +12,10 @@ import {
   formatMoney,
 } from "next-vibe/unified-ui/_shared/format-money";
 import {
+  useWidgetIsInteractive,
   useWidgetLocale,
   useWidgetNavigation,
+  useWidgetResponseOnly,
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
@@ -22,12 +24,14 @@ import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/sub
 import type { JSX } from "react";
 
 import { JournalEntryStatus, JournalSourceType, LineType } from "../../../enum";
+import { formatJournalCurrency } from "../../../shared/journal-presentation";
 import {
   journalAmountUnits,
   journalLineType,
 } from "../../../shared/journal-validation";
 import type definition from "./definition";
 import type { CoaJournalEntryGetResponseOutput } from "./definition";
+import { supplierJournalCopy } from "./i18n/supplier-journal";
 
 type JournalLine = NonNullable<
   CoaJournalEntryGetResponseOutput["result"]
@@ -47,7 +51,11 @@ function JournalLineRow({
   const account = [line.accountCode, line.accountName]
     .filter(Boolean)
     .join(" ");
-  const display = formatMoney(line.amount, line.currency, locale);
+  const units = journalAmountUnits(line.amount);
+  const display =
+    units === null
+      ? formatMoney(line.amount, line.currency, locale)
+      : formatJournalCurrency(units, line.currency, locale);
   return (
     <Div className="grid grid-cols-[minmax(0,1fr)_minmax(5.5rem,0.6fr)_minmax(5.5rem,0.6fr)] @md:grid-cols-[minmax(0,1fr)_10rem_10rem] gap-0 border-b last:border-b-0 hover:bg-muted/20">
       {/* Account identifier — code if available, else short UUID */}
@@ -71,7 +79,7 @@ function JournalLineRow({
       {/* Debit column */}
       <Div className="flex items-center justify-end px-2 py-2 @md:px-4 border-r">
         {side === LineType.DEBIT && (
-          <Span className="font-mono text-sm font-medium tabular-nums">
+          <Span className="min-w-0 text-right text-sm font-medium tabular-nums [overflow-wrap:anywhere]">
             {display}
           </Span>
         )}
@@ -80,7 +88,7 @@ function JournalLineRow({
       {/* Credit column */}
       <Div className="flex items-center justify-end px-2 py-2 @md:px-4">
         {side === LineType.CREDIT && (
-          <Span className="font-mono text-sm font-medium tabular-nums">
+          <Span className="min-w-0 text-right text-sm font-medium tabular-nums [overflow-wrap:anywhere]">
             {display}
           </Span>
         )}
@@ -107,6 +115,8 @@ const SOURCE_BADGE_CLASS: Record<string, string> = {
     "bg-orange-100 text-orange-800 dark:bg-orange-900/40 dark:text-orange-300",
 };
 
+const REVERSAL_BADGE_CLASS = "bg-accent text-accent-foreground";
+
 function InlineBadge({
   label,
   colorClass,
@@ -132,8 +142,24 @@ export function CoaJournalEntryGetWidget({
   const navigation = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.GET>();
   const locale = useWidgetLocale();
+  const { t: supplierT } = supplierJournalCopy.scopedT(locale);
+  const isInteractive = useWidgetIsInteractive();
+  const responseOnly = useWidgetResponseOnly();
 
   const entry = data?.result;
+
+  const openSupplierBill = (billId: string): void => {
+    void (async (): Promise<void> => {
+      const def = await import("@/payment/bill/[billId]/get/definition");
+      navigation.push(def.default.GET, { urlPathParams: { billId } });
+    })();
+  };
+
+  const openJournal = (entryId: string): void => {
+    void import("./definition").then(({ default: endpoint }) =>
+      navigation.push(endpoint.GET, { urlPathParams: { entryId } }),
+    );
+  };
 
   const handleAccountClick = (accountId: string): void => {
     void (async (): Promise<void> => {
@@ -228,6 +254,14 @@ export function CoaJournalEntryGetWidget({
   const source = Object.values(JournalSourceType).find(
     (key) => key === entry.sourceType || key.endsWith(`.${entry.sourceType}`),
   );
+  const bill = entry.supplierBill;
+  const billPostingTitle = bill && supplierT(bill.posting);
+  const billLabel = bill?.number
+    ? new Intl.ListFormat(locale, { style: "short", type: "unit" }).format([
+        bill.number,
+        bill.supplierName,
+      ])
+    : bill?.supplierName;
   const statusBadgeClass =
     STATUS_BADGE_CLASS[status?.split(".").at(-1) ?? ""] ??
     "bg-muted text-muted-foreground";
@@ -240,11 +274,21 @@ export function CoaJournalEntryGetWidget({
       <WidgetHeader
         size="page"
         title={entry.entryNumber}
-        subtitle={entry.description}
+        subtitle={
+          bill?.systemDescription ? billPostingTitle : entry.description
+        }
         titleAccessory={
-          status && (
-            <InlineBadge label={t(status)} colorClass={statusBadgeClass} />
-          )
+          <Div className="flex flex-wrap items-center gap-2">
+            {status && (
+              <InlineBadge label={t(status)} colorClass={statusBadgeClass} />
+            )}
+            {entry.reversalOfId && (
+              <InlineBadge
+                label={t("journalEntryGet.widget.reversalBadge")}
+                colorClass={REVERSAL_BADGE_CLASS}
+              />
+            )}
+          </Div>
         }
         backButton={
           navigation.canGoBack && (
@@ -265,10 +309,51 @@ export function CoaJournalEntryGetWidget({
           <Span className="text-sm text-muted-foreground">
             {formatDocDate(entry.date, locale)}
           </Span>
-          {source && (
-            <InlineBadge label={t(source)} colorClass={sourceBadgeClass} />
+          {source && !bill?.systemDescription && (
+            <InlineBadge
+              label={billPostingTitle ?? t(source)}
+              colorClass={sourceBadgeClass}
+            />
           )}
         </Div>
+
+        {entry.linkedEntries?.map((link) => {
+          const relationship = t(
+            link.relation === "original"
+              ? "journalEntryGet.widget.originalEntry"
+              : "journalEntryGet.widget.reversingEntry",
+          );
+          return (
+            <Div
+              key={link.id}
+              className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm"
+            >
+              <Span className="font-medium">{relationship}</Span>
+              {isInteractive && !responseOnly ? (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="h-auto min-h-9 max-w-full whitespace-normal px-2 text-start text-foreground [overflow-wrap:anywhere]"
+                  aria-label={`${relationship} ${link.entryNumber}`}
+                  onClick={() => openJournal(link.id)}
+                >
+                  {link.entryNumber}
+                </Button>
+              ) : (
+                <Span className="[overflow-wrap:anywhere]">
+                  {link.entryNumber}
+                </Span>
+              )}
+            </Div>
+          );
+        })}
+        {entry.reversalOfId &&
+          entry.lines.some((line) => line.lineDescription) && (
+            <Span className="text-sm text-muted-foreground">
+              {t("journalEntryGet.widget.originalLineNotes")}
+            </Span>
+          )}
 
         {/* Memo */}
         {entry.memo && (
@@ -277,11 +362,32 @@ export function CoaJournalEntryGetWidget({
           </Span>
         )}
 
-        {/* Source reference */}
-        {entry.sourceId && (
-          <Span className="text-xs text-muted-foreground font-mono">
-            {t("journalEntryGet.response.sourceId")}: {entry.sourceId}
-          </Span>
+        {bill && billLabel ? (
+          <Div className="flex min-w-0 flex-col items-start gap-1">
+            <Span className="text-sm text-muted-foreground">
+              {supplierT("sourceBill")}
+            </Span>
+            {isInteractive && !responseOnly ? (
+              <Button
+                type="button"
+                variant="link"
+                className="h-auto min-h-11 max-w-full justify-start whitespace-normal p-0 text-left"
+                onClick={() => openSupplierBill(bill.id)}
+              >
+                {billLabel}
+              </Button>
+            ) : (
+              <Span className="text-sm [overflow-wrap:anywhere]">
+                {billLabel}
+              </Span>
+            )}
+          </Div>
+        ) : (
+          entry.sourceId && (
+            <Span className="text-xs text-muted-foreground font-mono">
+              {t("journalEntryGet.response.sourceId")}: {entry.sourceId}
+            </Span>
+          )
         )}
       </Div>
 
@@ -330,21 +436,13 @@ export function CoaJournalEntryGetWidget({
                   </Badge>
                 </Div>
                 <Div className="flex items-center justify-end border-r px-2 py-2 @md:px-4">
-                  <Span className="text-sm font-semibold tabular-nums">
-                    {formatMoney(
-                      Number(total.debits) / 10_000,
-                      currency,
-                      locale,
-                    )}
+                  <Span className="min-w-0 text-right text-sm font-semibold tabular-nums [overflow-wrap:anywhere]">
+                    {formatJournalCurrency(total.debits, currency, locale)}
                   </Span>
                 </Div>
                 <Div className="flex items-center justify-end px-2 py-2 @md:px-4">
-                  <Span className="text-sm font-semibold tabular-nums">
-                    {formatMoney(
-                      Number(total.credits) / 10_000,
-                      currency,
-                      locale,
-                    )}
+                  <Span className="min-w-0 text-right text-sm font-semibold tabular-nums [overflow-wrap:anywhere]">
+                    {formatJournalCurrency(total.credits, currency, locale)}
                   </Span>
                 </Div>
               </Div>
@@ -366,7 +464,11 @@ export function CoaJournalEntryGetWidget({
           (entry.sourceType === JournalSourceType.MANUAL ||
             entry.sourceType === "MANUAL") && (
             <Button variant="outline" size="sm" onClick={handleReverse}>
-              {t("journalEntryGet.widget.reverseButton")}
+              {t(
+                entry.reversalOfId
+                  ? "journalEntryGet.widget.reverseReversal"
+                  : "journalEntryGet.widget.reverseButton",
+              )}
             </Button>
           )}
       </Div>

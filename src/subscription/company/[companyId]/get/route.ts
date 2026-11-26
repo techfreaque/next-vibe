@@ -13,9 +13,10 @@ import { CompanySubscriptionGetRepository } from "./repository";
 export const { GET, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
-    handler: ({ urlPathParams, logger, locale }) =>
+    handler: ({ urlPathParams, user, logger, locale }) =>
       CompanySubscriptionGetRepository.getCompanySubscription(
         urlPathParams.companyId,
+        user.id,
         logger,
         locale,
       ),

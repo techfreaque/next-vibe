@@ -6,6 +6,7 @@ import { ErrorResponseTypes } from "next-vibe/core/route/response.schema";
 import { createEndpointLogger } from "next-vibe/logger/server";
 
 import { CompanyMemberRole } from "@/companies/enum";
+import { LINE_SETTLEMENT_V1 } from "@/tax/line-settlement";
 
 import { BillStatus } from "../../enum";
 import type { BillCreateRequestOutput } from "./definition";
@@ -21,6 +22,7 @@ const logger = createEndpointLogger(false, defaultLocale);
 
 beforeAll(async () => {
   await pg.exec(`
+    CREATE TABLE companies (id uuid PRIMARY KEY, currency text, name text, is_active boolean);
     CREATE TABLE company_members (
       id uuid PRIMARY KEY DEFAULT gen_random_uuid(), company_id uuid, user_id uuid,
       role text, is_active boolean, invited_by_user_id uuid, joined_at timestamp,
@@ -41,6 +43,7 @@ beforeAll(async () => {
       tax_rate numeric(12,4), tax_amount numeric(12,4), line_total numeric(12,4),
       sort_order int, created_at timestamp DEFAULT now(), updated_at timestamp DEFAULT now()
     );
+    INSERT INTO companies VALUES ('${companyId}', 'EUR', 'Manual company', true);
     INSERT INTO company_members (company_id, user_id, role, is_active)
       VALUES ('${companyId}', '${userId}', '${CompanyMemberRole.ACCOUNTANT}', true);
     INSERT INTO purchasing_vendors VALUES
@@ -61,7 +64,7 @@ function base(): BillCreateRequestOutput {
   };
 }
 
-it("saves supplier snapshot, item rows and exact four-place totals together", async () => {
+it("saves supplier snapshot, item rows and settled cent totals together", async () => {
   const { BillCreateRepository } = await import("./repository");
   const result = await BillCreateRepository.createBill(
     userId,
@@ -91,22 +94,25 @@ it("saves supplier snapshot, item rows and exact four-place totals together", as
     data: {
       supplierNameResponse: "Synthetic Parts Supplier",
       status: BillStatus.DRAFT,
-      subtotal: 30.7065,
-      taxAmount: 5.5397,
-      total: 36.2462,
+      subtotal: 30.71,
+      taxAmount: 5.54,
+      total: 36.25,
       currencyResponse: "EUR",
     },
   });
   if (result.success) {
     const bill = await pg.query<{
       supplier_vat_number: string;
-      metadata: { vendorId: string };
+      metadata: { vendorId: string; lineSettlement: typeof LINE_SETTLEMENT_V1 };
     }>(
       "SELECT supplier_vat_number, metadata FROM payment_bills WHERE id = $1",
       [result.data.id],
     );
     expect(bill.rows).toEqual([
-      { supplier_vat_number: "ATU12345678", metadata: { vendorId } },
+      {
+        supplier_vat_number: "ATU12345678",
+        metadata: { vendorId, lineSettlement: LINE_SETTLEMENT_V1 },
+      },
     ]);
     const lines = await pg.query<{
       description: string;
@@ -119,10 +125,10 @@ it("saves supplier snapshot, item rows and exact four-place totals together", as
     expect(lines.rows).toEqual([
       {
         description: "Components",
-        tax_amount: "4.9382",
-        line_total: "29.6294",
+        tax_amount: "4.9400",
+        line_total: "29.6300",
       },
-      { description: "Handling", tax_amount: "0.6015", line_total: "6.6168" },
+      { description: "Handling", tax_amount: "0.6000", line_total: "6.6200" },
     ]);
   }
 });
@@ -178,7 +184,13 @@ it("defaults missing bill and due dates from the UTC day and selected supplier t
   const dayBefore = new Date().toISOString().slice(0, 10);
   const result = await BillCreateRepository.createBill(
     userId,
-    { ...base(), billDate: undefined, dueDate: undefined, vendorId },
+    {
+      ...base(),
+      billNumber: undefined,
+      billDate: undefined,
+      dueDate: undefined,
+      vendorId,
+    },
     logger,
   );
   expect(result.success).toBe(true);
@@ -205,7 +217,7 @@ it("preserves explicit due dates including a deliberately unset supplier due dat
   for (const dueDate of [new Date("2026-11-28"), null]) {
     const result = await BillCreateRepository.createBill(
       userId,
-      { ...base(), dueDate, vendorId },
+      { ...base(), billNumber: undefined, dueDate, vendorId },
       logger,
     );
     expect(result.success).toBe(true);

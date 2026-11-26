@@ -6,11 +6,7 @@
 import "server-only";
 
 import type { CreateApiEndpointAny } from "../definition/endpoint-base";
-import {
-  type ApiHandlerOptions,
-  createGenericHandler,
-  type GenericHandlerReturnType,
-} from "./handler";
+import type { ApiHandlerOptions, GenericHandlerReturnType } from "./handler";
 // TYPE-ONLY on purpose. ./next-handler pulls the Next.js request/response layer
 // (NextRequest/NextResponse via ui/lib/request). Every route.ts calls
 // endpointHandler, so importing it for VALUE here dragged that layer into every
@@ -63,7 +59,23 @@ export function endpointHandler<T extends CreateApiEndpointAny>(
     return builtNextHandler(request, ctx);
   };
 
-  const genericHandler = createGenericHandler(options);
+  // Registering a route must not initialize the authentication and execution
+  // graph. Vite can evaluate other route modules while that graph is loading.
+  let builtGenericHandler: GenericHandlerReturnType<T> | undefined;
+  const dispatch: GenericHandlerReturnType<T> = async (props) => {
+    if (!builtGenericHandler) {
+      const { createGenericHandler } = await import("./handler");
+      builtGenericHandler ??= createGenericHandler(options);
+    }
+    return builtGenericHandler(props);
+  };
+  // Remote callers inspect these resolvers before the first local invocation.
+  const genericHandler = Object.assign(dispatch, {
+    ...(options.requestDefaults && {
+      requestDefaults: options.requestDefaults,
+    }),
+    ...(options.fieldDefaults && { fieldDefaults: options.fieldDefaults }),
+  });
   const method = options.endpoint.method;
 
   return {

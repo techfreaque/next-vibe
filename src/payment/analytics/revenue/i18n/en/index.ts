@@ -90,6 +90,10 @@ export const translations = {
     },
   },
   widget: {
+    loadingReport: "Loading operating revenue…",
+    operatingTitle: "Operating revenue",
+    currencyBasis: "Amounts shown in approximate USD.",
+    filterDisclosure: "Filters",
     extra: {
       grossHint: "Subscriptions {{subs}} · packs {{packs}} · approx. USD",
       newSubsHint:

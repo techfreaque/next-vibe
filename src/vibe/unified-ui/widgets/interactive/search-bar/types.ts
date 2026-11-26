@@ -27,6 +27,8 @@ export interface SearchBarWidgetConfig<
   type: WidgetType.SEARCH_BAR;
   /** Form field name for the query input */
   fieldName: string;
+  /** Accessible name for the query input. */
+  label?: NoInfer<TKey>;
   /** Placeholder translation key */
   placeholder?: NoInfer<TKey>;
   /** Submit button label translation key */

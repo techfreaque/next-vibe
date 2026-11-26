@@ -1,0 +1,69 @@
+import type { translations as enTranslations } from "../en";
+
+export const translations: typeof enTranslations = {
+  errors: {
+    validation: {
+      title: "Erreur de validation",
+      description:
+        "Vérifiez le pays de l’entreprise, le régime de TVA et la date d’effet.",
+    },
+    unauthorized: {
+      title: "Non autorisé",
+      description: "Vous devez être connecté",
+    },
+    forbidden: {
+      title: "Accès refusé",
+      description:
+        "Seuls les propriétaires et les administrateurs de l’entreprise peuvent modifier le régime de TVA.",
+    },
+    notFound: {
+      title: "Introuvable",
+      description: "Entreprise introuvable",
+    },
+    conflict: {
+      title: "Date d’effet déjà utilisée",
+      description: "Un régime de TVA est déjà enregistré pour cette date.",
+    },
+    server: {
+      title: "Erreur serveur",
+      description: "Une erreur interne est survenue",
+    },
+    network: {
+      title: "Erreur réseau",
+      description: "Une erreur réseau est survenue",
+    },
+    unknown: {
+      title: "Erreur inconnue",
+      description: "Une erreur inattendue est survenue",
+    },
+    unsavedChanges: {
+      title: "Modifications non enregistrées",
+      description: "Vous avez des modifications non enregistrées",
+    },
+  },
+  reviewDescription:
+    "Consultez le régime de TVA applicable à cette entreprise à la date choisie.",
+  view: "Consulter le régime de TVA",
+  asOf: "Au",
+  change: "Modifier le régime fiscal",
+  regimes: {
+    standard: "Régime normal de TVA",
+    german: "Allemagne : franchise des petites entreprises (§ 19 UStG)",
+    austrian:
+      "Autriche : franchise des petites entreprises (§ 6, al. 1, point 27 UStG)",
+    slovak: "Slovaquie : entreprise non immatriculée à la TVA",
+  },
+  title: "Régime de TVA de l’entreprise",
+  description:
+    "Choisissez le régime de TVA des pièces à partir d’une date donnée.",
+  company: "Entreprise",
+  from: "Date d’effet",
+  save: "Enregistrer le régime",
+  regime: "Régime de TVA",
+  saved: "Le régime s’applique à compter de la date choisie.",
+  conflict: "Choisissez une autre date ou vérifiez le régime déjà enregistré.",
+  foreign:
+    "Consultez votre conseil fiscal pour les prestations étrangères. L’autoliquidation peut s’appliquer même en cas de franchise.",
+  saleConflict:
+    "La TVA facturée est incompatible avec la franchise. Vérifiez les lignes avant d’émettre la facture.",
+};

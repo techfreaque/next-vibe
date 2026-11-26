@@ -108,6 +108,15 @@ export class InvoiceListRepository {
           : data.status;
       const where = and(
         inArray(paymentInvoices.companyId, [...companyNames.keys()]),
+        data.selection === "credit"
+          ? and(
+              inArray(paymentInvoices.status, [
+                InvoiceStatus.OPEN,
+                InvoiceStatus.PAID,
+              ]),
+              sql`round(${paymentInvoices.amount}, 2) > round(coalesce(${credits.credited}, 0), 2)`,
+            )
+          : undefined,
         selectedStatus ? eq(paymentInvoices.status, selectedStatus) : undefined,
         overdueOnly
           ? and(lt(paymentInvoices.dueDate, today), sql`${openAmount} > 0`)
@@ -140,7 +149,10 @@ export class InvoiceListRepository {
         countRows.leftJoin(users, customerJoin);
       }
       if (overdueOnly) {
-        countRows.leftJoin(payments, paymentJoin).leftJoin(credits, creditJoin);
+        countRows.leftJoin(payments, paymentJoin);
+      }
+      if (overdueOnly || data.selection === "credit") {
+        countRows.leftJoin(credits, creditJoin);
       }
       const [{ value: total }] = await countRows.where(where);
       const pagination = documentPage(total, data.page, pageSize);

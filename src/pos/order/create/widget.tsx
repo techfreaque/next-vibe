@@ -37,6 +37,7 @@ export function PosOrderCreateWidget({
     void (async (): Promise<void> => {
       const def = await import("@/pos/order/[orderId]/add-item/definition");
       navigation.push(def.default.POST, {
+        urlPathParams: { orderId },
         data: {
           orderId,
           item: {
@@ -174,7 +175,9 @@ export function PosOrderCreateWidget({
         />
       </Div>
 
-      <SubmitButtonWidget<typeof definition.POST> field={{}} />
+      <SubmitButtonWidget<typeof definition.POST>
+        field={{ text: "sessionGet.get.widget.newOrder" }}
+      />
     </Div>
   );
 }

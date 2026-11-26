@@ -22,7 +22,11 @@ import {
 } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
-import { AccountSubtypeOptions, AccountTypeOptions } from "../../enum";
+import {
+  AccountSubtype,
+  AccountSubtypeOptions,
+  AccountTypeOptions,
+} from "../../enum";
 import { scopedTranslation } from "./i18n";
 
 const CoaAccountListWidget = lazyWidget(() =>
@@ -63,6 +67,14 @@ const { GET } = createEndpoint({
         fieldType: FieldDataType.BOOLEAN,
         label: "get.response.isPostable",
         schema: z.boolean().optional(),
+        hidden: true,
+      }),
+      subtypes: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.MULTISELECT,
+        label: "get.response.subtype",
+        options: AccountSubtypeOptions,
+        schema: z.array(z.enum(AccountSubtype)).optional(),
         hidden: true,
       }),
       page: requestField(scopedTranslation, {

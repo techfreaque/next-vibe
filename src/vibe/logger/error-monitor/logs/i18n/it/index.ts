@@ -342,6 +342,8 @@ export const translations: typeof enTranslations = {
 
   widget: {
     kpi: {
+      unresolvedInScope: "Irrisolte in questa vista",
+      unresolvedAllTimeLink: "Irrisolte dall’inizio: {{count}}",
       unresolvedMessages: "{{messages}} messaggi · {{occurrences}} occorrenze",
       unresolvedMatching: "{{count}} irrisolte corrispondono ai filtri",
       unresolved: "Classi irrisolte (totale)",
@@ -429,6 +431,10 @@ export const translations: typeof enTranslations = {
       resolving: "Salvataggio...",
     },
     filter: {
+      apply: "Applica filtri",
+      more: "Filtri",
+      moreCount: "Filtri ({{count}})",
+      moreDescription: "Filtri per stato, gravità o origine.",
       fingerprint: "Classe",
       endpoint: "Endpoint",
       search: "Cerca",

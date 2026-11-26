@@ -262,6 +262,11 @@ export const translations = {
     },
   },
   widget: {
+    planStatus: "Plan and status",
+    accountActive: "Active",
+    accountInactive: "Inactive",
+    none: "None",
+    creditAmount: "{{count}} credits",
     spent30d: "{{count}} in 30d",
     notTracked: "not tracked",
     oneOff: "Credits only",
@@ -293,7 +298,7 @@ export const translations = {
       matchingHint:
         "Signups per week, last 12 full weeks. Last week: {{last}}, this week so far: {{count}}",
       verified: "Email verified",
-      verifiedHint: "{{count}} accounts",
+      verifiedHint: "Verified: {{count}}",
       active: "Active 30d",
       matching: "Matching users",
       paying: "Paying",

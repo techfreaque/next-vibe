@@ -92,6 +92,23 @@ export const translations: typeof enTranslations = {
     },
   },
   widget: {
+    lineReviewRequired:
+      "Il totale delle righe non coincide con l’importo registrato. Verifica la fattura originale prima di modificarla o approvarla.",
+    removeAction: "Rimuovi",
+    removeLine: "Rimuovi {{description}}",
+    grossTotal: "Totale lordo",
+    taxPending:
+      "L’imposta del fornitore è da confermare. Verifica l’importo sul documento prima di registrare la ricezione o contabilizzare la fattura.",
+    confirmSupplierTax: "Conferma l’imposta del fornitore",
+    bankDocumentMissing:
+      "Documento del fornitore in attesa. Collegalo qui o conferma il costo lordo dal documento bancario al momento dell’approvazione.",
+    bankDocumentTaxReview:
+      "Documento del fornitore collegato dopo la contabilizzazione. Esamina separatamente eventuali riclassificazioni fiscali o contabili. La registrazione iniziale rimane invariata.",
+    linkBankDocument: "Collega il documento del fornitore",
+    inputVat: "Detrazione IVA",
+    taxIncludedCost: "IVA inclusa nel costo",
+    reverseCharge: "IVA a debito per inversione contabile",
+
     markReceived: "Mark ricevuto",
     back: "Indietro",
     submit: "Guarda Bill",
@@ -112,7 +129,9 @@ export const translations: typeof enTranslations = {
     approveBill: "Approvo Bill",
     payBill: "Paga Bill",
     addLine: "Aggiungere la linea",
-    viewJournalEntry: "Visualizza l'ingresso del giornale",
+    accountingEvidence: "Registrazioni contabili",
+    approvalJournal: "Registrazione della fattura",
+    settlementJournal: "Registrazione del pagamento",
     approveConfirmTitle: "Approva questo disegno di legge?",
     approveConfirmDescription:
       "Questo avanzerà lo stato di fattura. Una volta approvato, verrà postata una voce di giornale. Questo non può essere annullato.",

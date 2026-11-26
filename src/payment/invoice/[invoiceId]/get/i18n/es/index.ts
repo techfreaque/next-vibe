@@ -16,6 +16,7 @@ export const translations: typeof enTranslations = {
     },
     response: {
       companyName: "Empresa",
+      remainingCredit: "Importe disponible para abono",
       amountPaid: "Importe pagado",
       amountDue: "Importe pendiente",
       id: "Factura ID",
@@ -93,6 +94,9 @@ export const translations: typeof enTranslations = {
     placeholder: "Introduzca la factura ID",
   },
   widget: {
+    sourceQuote: "Presupuesto de origen",
+    openSourceQuote: "Abrir presupuesto de origen",
+    draftReference: "Borrador de factura n.º {{number}}",
     recentReminderDrafts: "Borradores de recordatorios recientes",
     receipts: "Historial de cobros",
     receiptDate: "Fecha del cobro",
@@ -128,6 +132,12 @@ export const translations: typeof enTranslations = {
     recordPayment: "Pago de registro",
     sendReminder: "Preparar recordatorio",
     void: "Vacío",
+    remainingBalance: "Saldo pendiente",
+    originalTotal: "Total original de la factura",
+    voidReversalDate: "Fecha de reversión",
+    viewOriginalJournal: "Abrir el asiento original",
+    viewVoidReversal: "Abrir el asiento de reversión",
+    backToInvoiceList: "Volver a las facturas",
     viewJournalEntry: "View Journal Entry",
     status: {
       draft: "Proyecto",

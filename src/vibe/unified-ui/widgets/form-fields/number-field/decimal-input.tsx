@@ -2,9 +2,9 @@
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { Div } from "next-vibe/ui/components/div";
-import { Input } from "next-vibe/ui/components/input";
+import { Input, type InputRefObject } from "next-vibe/ui/components/input";
 import { Span } from "next-vibe/ui/components/span";
-import { type JSX, useState } from "react";
+import { type JSX, type Ref, useState } from "react";
 
 import { cn } from "../../../_shared/cn";
 import {
@@ -23,6 +23,7 @@ interface DecimalInputProps {
   disabled?: boolean;
   name?: string;
   id?: string;
+  ref?: Ref<InputRefObject>;
   className?: string;
   "aria-label"?: string;
   "aria-invalid"?: boolean;

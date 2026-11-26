@@ -502,12 +502,6 @@ const { GET } = createEndpoint({
     title: "get.success.retrieved.title",
     description: "get.success.retrieved.description",
   },
-  options: {
-    formOptions: {
-      autoSubmit: true,
-      debounceMs: 300,
-    },
-  },
   examples: {
     requests: {
       default: {},

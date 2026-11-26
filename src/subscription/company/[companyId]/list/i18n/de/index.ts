@@ -7,9 +7,10 @@ export const translations: typeof enTranslations = {
     list: "Liste",
   },
   get: {
-    title: "Unternehmensabonnements",
-    titleShort: "Unternehmens-Abos",
-    description: "Alle Abonnements eines Unternehmens auflisten",
+    title: "Abonnements des Inhabers",
+    titleShort: "Abonnements des Inhabers",
+    description:
+      "Zeigen Sie das persönliche Abonnement des Unternehmensinhabers an.",
     companyId: {
       label: "Unternehmens-ID",
       description:
@@ -34,7 +35,7 @@ export const translations: typeof enTranslations = {
       },
       server: {
         title: "Serverfehler",
-        description: "Etwas ist schiefgelaufen — bitte erneut versuchen",
+        description: "Etwas ist schiefgelaufen. bitte erneut versuchen",
       },
       unknown: {
         title: "Unbekannter Fehler",

@@ -27,6 +27,7 @@ export class PosOrderVoidRepository {
     userId: string,
     logger: EndpointLogger,
     locale: CountryLanguage = defaultLocale,
+    pathOrderId?: string,
   ): Promise<
     ResponseType<{
       result: {
@@ -36,10 +37,16 @@ export class PosOrderVoidRepository {
     }>
   > {
     const { t } = scopedTranslation.scopedT(locale);
+    const orderId = pathOrderId ?? data.orderId;
+
+    if (!orderId || (data.orderId !== undefined && data.orderId !== orderId)) {
+      return fail({
+        message: t("orderVoid.post.errors.validation.title"),
+        errorType: ErrorResponseTypes.VALIDATION_ERROR,
+      });
+    }
 
     try {
-      const { orderId } = data;
-
       return await withOpenOrder(
         orderId,
         userId,

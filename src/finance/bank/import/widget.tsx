@@ -18,13 +18,18 @@ import {
 import { Textarea } from "next-vibe/ui/components/textarea";
 import { P } from "next-vibe/ui/components/typography";
 import { WidgetShell } from "next-vibe/ui/components/widget-shell";
-import { formatMoney } from "next-vibe/unified-ui/_shared/format-money";
+import {
+  formatDocDate,
+  formatMoney,
+} from "next-vibe/unified-ui/_shared/format-money";
 import {
   useWidgetForm,
   useWidgetIsInteractive,
+  useWidgetIsSubmitting,
   useWidgetLocale,
   useWidgetLogger,
   useWidgetNavigation,
+  useWidgetOnSubmit,
   useWidgetPlatform,
   useWidgetResponseOnly,
   useWidgetTranslation,
@@ -32,6 +37,7 @@ import {
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
+import { BooleanFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/boolean-field/widget";
 import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 import { type JSX, useEffect, useMemo, useRef, useState } from "react";
@@ -52,18 +58,31 @@ import {
 } from "../csv";
 import listDefinition from "../list/definition";
 import { BankPageHeader } from "../page-header";
+import { statementColumns, type StatementMapping } from "../statement-csv";
+import { parseStatementFile } from "../statement-file";
+import {
+  bankStatementFormats,
+  bankStatementFormatSchema,
+} from "../statement-format";
 import type definition from "./definition";
 
-export function BankImportWidget(): JSX.Element {
+export function BankImportWidget({
+  field: fields,
+}: {
+  field: (typeof definition.POST)["fields"];
+}): JSX.Element {
   const data = useWidgetValue<typeof definition.POST>();
   const form = useWidgetForm<typeof definition.POST>();
   const { push } = useWidgetNavigation();
+  const onSubmit = useWidgetOnSubmit();
+  const isSubmitting = useWidgetIsSubmitting();
   const locale = useWidgetLocale();
   const t = useWidgetTranslation<typeof definition.POST>();
-  const [companyId, accountId] = useWatch({
+  const [companyId, accountId, selectedFormat] = useWatch({
     control: form.control,
-    name: ["companyId", "accountId"],
+    name: ["companyId", "accountId", "format"],
   });
+  const format = selectedFormat ?? "normalized";
   const [input, setInput] = useState(() => form.getValues("csv") ?? "");
   const [fileName, setFileName] = useState<string>();
   const fileInput = useRef<InputRefObject>(null);
@@ -71,22 +90,38 @@ export function BankImportWidget(): JSX.Element {
   const uploadAttempt = useRef(0);
   const [showPaste, setShowPaste] = useState(false);
   const [showFormat, setShowFormat] = useState(false);
-  const [separator, setSeparator] = useState<BankCsvSeparator>(",");
+  const [separator, setSeparator] = useState<BankCsvSeparator>(
+    () =>
+      form.getValues("fileOptions")?.separator ??
+      (form.getValues("format") === "c24" ? ";" : ","),
+  );
   const [mapping, setMapping] = useState<BankCsvMapping>({});
+  const [customMapping, setCustomMapping] = useState<StatementMapping>(
+    () => form.getValues("fileOptions")?.mapping ?? {},
+  );
+  const [decimal, setDecimal] = useState<"," | ".">(
+    () =>
+      form.getValues("fileOptions")?.decimal ??
+      (form.getValues("format") === "c24" ? "," : "."),
+  );
   const platform = useWidgetPlatform();
   const web =
     platform === Platform.NEXT_PAGE ||
     platform === Platform.ELECTRON ||
     platform === Platform.FRAME;
   const source = useMemo(
-    () => (input ? readBankCsvColumns(input, separator) : undefined),
-    [input, separator],
+    () =>
+      input && (format === "normalized" || format === "mapped")
+        ? readBankCsvColumns(input, separator, format === "mapped" ? 2 : 4)
+        : undefined,
+    [format, input, separator],
   );
   const updateInput = (value: string, name?: string): void => {
     uploadAttempt.current++;
     setFileError(undefined);
     setFileName(name);
     setMapping({});
+    setCustomMapping({});
     setInput(value);
   };
   const readFile = async (file: File | undefined): Promise<void> => {
@@ -105,6 +140,11 @@ export function BankImportWidget(): JSX.Element {
       );
       if (attempt === uploadAttempt.current) {
         updateInput(contents, file.name);
+        if (/\.xml$/iu.test(file.name)) {
+          form.setValue("format", "camt053", { shouldDirty: true });
+        } else if (/\.(mt940|sta)$/iu.test(file.name)) {
+          form.setValue("format", "mt940", { shouldDirty: true });
+        }
       }
     } catch {
       if (attempt === uploadAttempt.current) {
@@ -140,7 +180,7 @@ export function BankImportWidget(): JSX.Element {
 
   const selectedCurrency = appliedScope?.selectedCurrency;
   const mapped = useMemo(() => {
-    if (!source?.success) {
+    if (format !== "normalized" || !source?.success) {
       return undefined;
     }
     const defaults: BankCsvMapping = {};
@@ -155,8 +195,39 @@ export function BankImportWidget(): JSX.Element {
       { ...defaults, ...mapping },
       selectedCurrency,
     );
-  }, [mapping, selectedCurrency, source]);
-  const csv = mapped?.success && !fileError ? mapped.csv : "";
+  }, [format, mapping, selectedCurrency, source]);
+  const fileOptions = useMemo(
+    () => ({
+      mapping: customMapping,
+      separator,
+      decimal,
+    }),
+    [customMapping, decimal, separator],
+  );
+  const advanced = useMemo(
+    () =>
+      input && format !== "normalized"
+        ? parseStatementFile(input, format, fileOptions, selectedCurrency)
+        : undefined,
+    [fileOptions, format, input, selectedCurrency],
+  );
+  const mismatch =
+    advanced?.success &&
+    selectedCurrency &&
+    advanced.rows.some(({ currency }) => currency !== selectedCurrency);
+  const csv =
+    !fileError && !mismatch
+      ? mapped?.success
+        ? mapped.csv
+        : advanced?.success
+          ? input
+          : ""
+      : "";
+  useEffect(() => {
+    if (!data && format !== "normalized") {
+      form.setValue("fileOptions", fileOptions);
+    }
+  }, [data, fileOptions, form, format]);
   useEffect(() => {
     if (!data && csv !== form.getValues("csv")) {
       form.setValue("csv", csv, { shouldDirty: Boolean(input) });
@@ -179,33 +250,46 @@ export function BankImportWidget(): JSX.Element {
       ? t("check.encoding")
       : fileError === "size"
         ? t("check.size")
-        : source && !source.success
-          ? source.error === "header"
-            ? t("check.mappingHeader")
-            : source.error === "size"
-              ? t("check.size")
-              : t("check.empty")
-          : mapped && !mapped.success
-            ? mapped.error === "mapping"
-              ? t("check.mapping")
-              : mapped.error === "columns"
-                ? t("check.columns", { row: mapped.row ?? 0 })
-                : mapped.error === "value" && mapped.field
-                  ? t("check.value", {
-                      row: mapped.row ?? 0,
-                      field: fieldLabel(mapped.field),
-                    })
-                  : mapped.error === "duplicate"
-                    ? t("check.duplicate", { row: mapped.row ?? 0 })
-                    : mapped.error === "size"
-                      ? t("check.size")
-                      : mapped.error === "currency"
-                        ? t("check.currency")
-                        : t("check.row", { row: mapped.row ?? 0 })
-            : undefined;
+        : mismatch
+          ? t("check.currency")
+          : advanced && !advanced.success
+            ? t("statement.invalid", { row: advanced.row ?? 0 })
+            : source && !source.success
+              ? source.error === "header"
+                ? t("check.mappingHeader")
+                : source.error === "size"
+                  ? t("check.size")
+                  : t("check.empty")
+              : mapped && !mapped.success
+                ? mapped.error === "mapping"
+                  ? t("check.mapping")
+                  : mapped.error === "columns"
+                    ? t("check.columns", { row: mapped.row ?? 0 })
+                    : mapped.error === "value" && mapped.field
+                      ? t("check.value", {
+                          row: mapped.row ?? 0,
+                          field: fieldLabel(mapped.field),
+                        })
+                      : mapped.error === "duplicate"
+                        ? t("check.duplicate", { row: mapped.row ?? 0 })
+                        : mapped.error === "size"
+                          ? t("check.size")
+                          : mapped.error === "currency"
+                            ? t("check.currency")
+                            : t("check.row", { row: mapped.row ?? 0 })
+                : undefined;
 
   const previewRows = mapped?.success ? mapped.rows.slice(0, 5) : [];
+  const statementRows = advanced?.success ? advanced.rows.slice(0, 5) : [];
   if (data) {
+    const canApplyPreview =
+      data.preview &&
+      data.imported > 0 &&
+      interactive &&
+      !!onSubmit &&
+      !!csv &&
+      companyId === data.selectedCompanyId &&
+      accountId === data.selectedAccountId;
     const view = (): void => {
       void (async (): Promise<void> => {
         const { default: list } = await import("../list/definition");
@@ -224,14 +308,52 @@ export function BankImportWidget(): JSX.Element {
           title={t("import.title")}
           subtitle={t("import.description")}
         />
-        <ResultBanner title={t("import.success")} variant="success" />
+        <ResultBanner
+          title={t(
+            data.preview ? "statement.previewSuccess" : "import.success",
+          )}
+          variant="success"
+        />
         <DetailGrid columns={2}>
-          <DetailField label={t("fields.imported")} value={data.imported} />
+          <DetailField
+            label={t(data.preview ? "statement.projected" : "fields.imported")}
+            value={data.imported}
+          />
           <DetailField label={t("fields.skipped")} value={data.skipped} />
+          {!data.preview && typeof data.autoMatched === "number" && (
+            <DetailField
+              label={t("adjustment.autoMatched")}
+              value={data.autoMatched}
+            />
+          )}
         </DetailGrid>
-        <Button type="button" onClick={view} className="self-start">
-          {t("ui.listAction")}
-        </Button>
+        {typeof data.screenedOut === "number" && data.screenedOut > 0 && (
+          <P className="text-sm text-muted-foreground">
+            {t("statement.screenedOutCount", { count: data.screenedOut })}
+          </P>
+        )}
+        <FormAlertWidget field={{}} />
+        <Div className="flex flex-wrap gap-2">
+          {canApplyPreview && (
+            <Button
+              type="button"
+              disabled={isSubmitting}
+              onClick={() => {
+                form.setValue("dryRun", false, { shouldDirty: true });
+                onSubmit();
+              }}
+            >
+              {t("ui.importAction")}
+            </Button>
+          )}
+          <Button
+            type="button"
+            onClick={view}
+            variant={canApplyPreview ? "outline" : "default"}
+          >
+            {t("ui.listAction")}
+          </Button>
+        </Div>
       </WidgetShell>
     );
   }
@@ -287,7 +409,7 @@ export function BankImportWidget(): JSX.Element {
             <Input
               ref={fileInput}
               type="file"
-              accept=".csv,text/csv"
+              accept=".csv,.xml,.sta,.mt940,.txt,text/csv,text/plain,application/xml"
               aria-label={t("ui.upload")}
               className="hidden"
               onChange={(event) => {
@@ -302,25 +424,74 @@ export function BankImportWidget(): JSX.Element {
           </Div>
         )}
         <Div className="flex min-w-0 flex-col items-start gap-1">
-          <P className="text-sm font-medium">{t("ui.csvFormat")}</P>
+          <P className="text-sm font-medium">{t("statement.format")}</P>
           <Select
-            value={separator}
+            value={format}
             onValueChange={(value) => {
-              if (value === "," || value === ";") {
-                setMapping({});
-                setSeparator(value);
+              const parsed = bankStatementFormatSchema.safeParse(value);
+              if (parsed.success) {
+                form.setValue("format", parsed.data, { shouldDirty: true });
+                setSeparator(parsed.data === "c24" ? ";" : ",");
+                setDecimal(parsed.data === "c24" ? "," : ".");
+                setCustomMapping({});
               }
             }}
           >
-            <SelectTrigger aria-label={t("ui.csvFormat")}>
+            <SelectTrigger aria-label={t("statement.format")}>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value=",">{t("ui.commaFormat")}</SelectItem>
-              <SelectItem value=";">{t("ui.semicolonFormat")}</SelectItem>
+              {bankStatementFormats.map((value) => (
+                <SelectItem key={value} value={value}>
+                  {t(`statement.formats.${value}`)}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </Div>
+        {format !== "mt940" && format !== "camt053" && (
+          <Div className="flex min-w-0 flex-col items-start gap-1">
+            <P className="text-sm font-medium">{t("ui.csvFormat")}</P>
+            <Select
+              value={separator}
+              onValueChange={(value) => {
+                if (value === "," || value === ";") {
+                  setMapping({});
+                  setSeparator(value);
+                }
+              }}
+            >
+              <SelectTrigger aria-label={t("ui.csvFormat")}>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value=",">{t("ui.commaFormat")}</SelectItem>
+                <SelectItem value=";">{t("ui.semicolonFormat")}</SelectItem>
+              </SelectContent>
+            </Select>
+          </Div>
+        )}
+        {(format === "mapped" ||
+          format === "revolut" ||
+          format === "revolutBusiness" ||
+          format === "c24") && (
+          <Select
+            value={decimal}
+            onValueChange={(value) => {
+              if (value === "," || value === ".") {
+                setDecimal(value);
+              }
+            }}
+          >
+            <SelectTrigger aria-label={t("statement.decimal")}>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value=".">{t("statement.dotDecimal")}</SelectItem>
+              <SelectItem value=",">{t("statement.commaDecimal")}</SelectItem>
+            </SelectContent>
+          </Select>
+        )}
         {(!web || showPaste) && (
           <Textarea
             aria-label={t("ui.pasteCsv")}
@@ -359,7 +530,7 @@ export function BankImportWidget(): JSX.Element {
           </Div>
         )}
       </SectionGroup>
-      {source?.success && (
+      {format === "normalized" && source?.success && (
         <SectionGroup title={t("ui.mapping")}>
           <Div className="grid grid-cols-1 gap-3 @sm:grid-cols-2 @xl:grid-cols-4">
             {BANK_CSV_FIELDS.map((key) => {
@@ -396,12 +567,103 @@ export function BankImportWidget(): JSX.Element {
           </Div>
         </SectionGroup>
       )}
+      {format === "mapped" && source?.success && (
+        <SectionGroup title={t("statement.mapping")}>
+          <Div className="grid grid-cols-1 gap-3 @sm:grid-cols-2 @xl:grid-cols-4">
+            {statementColumns.map((field) => (
+              <Div key={field} className="flex min-w-0 flex-col gap-1">
+                <P className="text-sm">{t(`statement.columns.${field}`)}</P>
+                <Select
+                  value={
+                    customMapping[field] === undefined
+                      ? "unset"
+                      : String(customMapping[field])
+                  }
+                  onValueChange={(value) =>
+                    setCustomMapping((previous) => {
+                      const next = { ...previous };
+                      if (value === "unset") {
+                        delete next[field];
+                      } else {
+                        next[field] = Number(value);
+                      }
+                      return next;
+                    })
+                  }
+                >
+                  <SelectTrigger aria-label={t(`statement.columns.${field}`)}>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="unset">
+                      {t("statement.unmapped")}
+                    </SelectItem>
+                    {source.headers.map((header, index) => (
+                      <SelectItem key={index} value={String(index)}>
+                        {header}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </Div>
+            ))}
+          </Div>
+        </SectionGroup>
+      )}
+      {statementRows.length > 0 && !fileError && !mismatch && (
+        <SectionGroup title={t("ui.preview")}>
+          <P className="text-sm text-muted-foreground">
+            {t("statement.localPreview")}
+          </P>
+          {statementRows.map((row, index) => (
+            <Div key={index} className="border-t py-2">
+              <DetailGrid columns={3}>
+                <DetailField
+                  label={t("fields.bookedDate")}
+                  value={formatDocDate(row.bookedDate, locale)}
+                />
+                <DetailField
+                  label={t("statement.columns.amount")}
+                  value={formatMoney(row.amount, row.currency, locale)}
+                />
+                {row.valueDate && row.valueDate !== row.bookedDate && (
+                  <DetailField
+                    label={t("statement.columns.valueDate")}
+                    value={formatDocDate(row.valueDate, locale)}
+                  />
+                )}
+                {row.nativeAmount && row.nativeCurrency && (
+                  <DetailField
+                    label={t("statement.columns.nativeAmount")}
+                    value={formatMoney(
+                      row.nativeAmount,
+                      row.nativeCurrency,
+                      locale,
+                    )}
+                  />
+                )}
+                {row.feeAmount && row.feeCurrency && (
+                  <DetailField
+                    label={t("statement.columns.feeAmount")}
+                    value={formatMoney(row.feeAmount, row.feeCurrency, locale)}
+                  />
+                )}
+              </DetailGrid>
+            </Div>
+          ))}
+        </SectionGroup>
+      )}
       {errorMessage && <ResultBanner title={errorMessage} variant="danger" />}
       {mapped?.success && !fileError && (
         <SectionGroup title={t("ui.preview")}>
+          <P className="text-sm text-muted-foreground">
+            {t("statement.localPreview")}
+          </P>
           <RecordTable
             label={t("ui.preview")}
-            columns={BANK_CSV_FIELDS.map((key) => ({
+            columns={BANK_CSV_FIELDS.filter(
+              (key) => key !== "transactionId",
+            ).map((key) => ({
               id: key,
               label: fieldLabel(key),
               numeric: key === "amount",
@@ -409,8 +671,7 @@ export function BankImportWidget(): JSX.Element {
             rows={previewRows.map((row) => ({
               id: row.transactionId,
               cells: {
-                transactionId: row.transactionId,
-                date: row.bookedDate,
+                date: formatDocDate(row.bookedDate, locale),
                 amount: formatMoney(row.amount, row.currency, locale),
                 currency: row.currency,
               },
@@ -424,12 +685,8 @@ export function BankImportWidget(): JSX.Element {
                   >
                     <DetailGrid columns={2}>
                       <DetailField
-                        label={t("fields.transactionId")}
-                        value={row.transactionId}
-                      />
-                      <DetailField
                         label={t("fields.bookedDate")}
-                        value={row.bookedDate}
+                        value={formatDocDate(row.bookedDate, locale)}
                       />
                       <DetailField
                         label={t("fields.amount")}
@@ -448,7 +705,19 @@ export function BankImportWidget(): JSX.Element {
         </SectionGroup>
       )}
       <FormAlertWidget field={{}} />
-      {csv && scopeReadEnabled && (
+      {csv && appliedScope && (
+        <Div className="flex flex-wrap gap-3">
+          <BooleanFieldWidget
+            fieldName="dryRun"
+            field={fields.children.dryRun}
+          />
+          <BooleanFieldWidget
+            fieldName="autoMatch"
+            field={fields.children.autoMatch}
+          />
+        </Div>
+      )}
+      {csv && appliedScope && (
         <SubmitButtonWidget<typeof definition.POST>
           field={{ text: "ui.importAction", className: "self-end" }}
         />

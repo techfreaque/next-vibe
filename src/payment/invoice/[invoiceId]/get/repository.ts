@@ -35,13 +35,15 @@ import {
 } from "@/chart-of-accounts/enum";
 import { getInvoiceOpenBalanceParts } from "@/finance/document-balance";
 import { getDocumentAccess } from "@/finance/document-company-scope";
+import { getLineSettlementPolicy } from "@/tax/line-settlement";
 
 import {
+  paymentEstimates,
   paymentInvoiceLines,
   paymentInvoiceReceipts,
   paymentInvoices,
 } from "../../../db";
-import { InvoiceStatus } from "../../../enum";
+import { EstimateStatus, InvoiceStatus } from "../../../enum";
 import { listInvoiceReminders } from "../send-reminder/history";
 import type {
   InvoiceGetResponseOutput,
@@ -95,6 +97,28 @@ export class InvoiceGetRepository {
         ? (parsedMeta.data.customerId ?? null)
         : null;
 
+      const quoteOrigin = z
+        .object({ estimateId: z.uuid() })
+        .safeParse(invoice.metadata);
+      const [sourceEstimate] =
+        invoice.companyId && quoteOrigin.success
+          ? await db
+              .select({
+                id: paymentEstimates.id,
+                number: paymentEstimates.estimateNumber,
+              })
+              .from(paymentEstimates)
+              .where(
+                and(
+                  eq(paymentEstimates.id, quoteOrigin.data.estimateId),
+                  eq(paymentEstimates.companyId, invoice.companyId),
+                  eq(paymentEstimates.invoiceId, invoice.id),
+                  eq(paymentEstimates.status, EstimateStatus.CONVERTED),
+                ),
+              )
+              .limit(1)
+          : [];
+
       const [customer] =
         customerId && z.uuid().safeParse(customerId).success
           ? await db
@@ -117,7 +141,7 @@ export class InvoiceGetRepository {
         invoice.currency,
       );
       const [balance] = await db
-        .select({ amountPaid, openAmount })
+        .select({ amountPaid, openAmount, issuedCredit: credits.credited })
         .from(paymentInvoices)
         .leftJoin(payments, paymentJoin)
         .leftJoin(credits, creditJoin)
@@ -129,25 +153,52 @@ export class InvoiceGetRepository {
             invoice.currency,
           )
         : [];
+      const voidReversal =
+        invoice.status === InvoiceStatus.VOID &&
+        invoice.companyId &&
+        invoice.journalEntryId
+          ? await InvoiceGetRepository.findVoidReversal(
+              invoice.id,
+              invoice.companyId,
+              invoice.journalEntryId,
+            )
+          : undefined;
       const recordedPayments = Number(balance?.amountPaid ?? 0);
       const recentReminders = access.canManage
         ? await listInvoiceReminders(invoice.id, invoice.companyId)
         : undefined;
 
+      const remainingCredit =
+        Math.max(
+          0,
+          Math.round(Number(invoice.amount) * 100) -
+            Math.round(Number(balance?.issuedCredit ?? 0) * 100),
+        ) / 100;
       return success({
         id: invoice.id,
         invoiceNumber: invoice.invoiceNumber,
         companyName: access.companyName,
         canManage: access.canManage,
-        canCreateCreditNote: invoice.companyId !== null && access.canManage,
+        canCreateCreditNote:
+          invoice.companyId !== null &&
+          access.canManage &&
+          remainingCredit > 0 &&
+          (invoice.status === InvoiceStatus.OPEN ||
+            invoice.status === InvoiceStatus.PAID),
+        remainingCredit,
         companyId: invoice.companyId ?? null,
         customerId,
         customerName:
           customer?.name ??
           customer?.legalName ??
           (savedCustomer.success ? savedCustomer.data.customerName : null),
+        sourceEstimate,
         invoiceSequenceNumber: invoice.invoiceSequenceNumber ?? null,
         currency: invoice.currency,
+        lineSettlement: getLineSettlementPolicy(
+          invoice.currency,
+          invoice.metadata,
+        ),
         status: invoice.status,
         amount: invoice.amount,
         amountPaid:
@@ -162,6 +213,7 @@ export class InvoiceGetRepository {
         paidAt: invoice.paidAt ?? null,
         notes: invoice.notes ?? null,
         journalEntryId: invoice.journalEntryId ?? null,
+        voidReversal,
         createdAt: invoice.createdAt,
         updatedAt: invoice.updatedAt,
         receipts,
@@ -188,6 +240,45 @@ export class InvoiceGetRepository {
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
+  }
+
+  private static async findVoidReversal(
+    invoiceId: string,
+    companyId: string,
+    originalId: string,
+  ): Promise<InvoiceGetResponseOutput["voidReversal"]> {
+    const reversal = alias(journalEntries, "invoice_void_reversal");
+    const [linked] = await db
+      .select({
+        originalEntryNumber: journalEntries.entryNumber,
+        entryId: reversal.id,
+        entryNumber: reversal.entryNumber,
+        effectiveDate: reversal.date,
+      })
+      .from(journalEntries)
+      .innerJoin(
+        reversal,
+        and(
+          eq(reversal.id, journalEntries.reversedById),
+          eq(reversal.reversalOfId, journalEntries.id),
+          eq(reversal.companyId, companyId),
+          eq(reversal.sourceType, JournalSourceType.AR_INVOICE),
+          eq(reversal.sourceId, invoiceId),
+          eq(reversal.status, JournalEntryStatus.POSTED),
+        ),
+      )
+      .where(
+        and(
+          eq(journalEntries.id, originalId),
+          eq(journalEntries.companyId, companyId),
+          eq(journalEntries.sourceType, JournalSourceType.AR_INVOICE),
+          eq(journalEntries.sourceId, invoiceId),
+          eq(journalEntries.status, JournalEntryStatus.REVERSED),
+          isNull(journalEntries.reversalOfId),
+        ),
+      )
+      .limit(1);
+    return linked;
   }
 
   private static async listJournalReceipts(

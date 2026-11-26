@@ -24,9 +24,10 @@ import { fillGaps } from "next-vibe/dataflow/shared/range";
 import type { QueryResultRow } from "pg";
 
 import {
-  notInternalUserSql,
   paidStatusSql,
   paymentKindSql,
+  REPORTABLE_PAYMENT_SQL,
+  reportingUserSql,
   usdSql,
   utcTs,
 } from "../../analytics/money-sql";
@@ -74,9 +75,9 @@ export class QueryPaymentsRevenueRepository {
       SELECT ${resolutionBucketExpr(resolution, sql`pt.created_at`)} AS bucket,
         sum(${usdSql("pt.amount", "pt.currency")}) AS usd
       FROM payment_transactions pt
-      WHERE ${paidStatusSql("pt")}
+      WHERE ${REPORTABLE_PAYMENT_SQL} AND ${paidStatusSql("pt")}
         AND pt.mode <> ${CheckoutMode.SETUP}
-        AND ${notInternalUserSql("pt.user_id")}
+        AND ${reportingUserSql("pt.user_id")}
         AND pt.created_at >= ${utcTs(range.from)}
         AND pt.created_at <= ${utcTs(range.to)}
         ${

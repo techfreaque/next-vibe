@@ -10,12 +10,8 @@ import { Div } from "next-vibe/ui/components/div";
 import { CheckCircle } from "next-vibe/ui/components/icons/CheckCircle";
 import { Copy } from "next-vibe/ui/components/icons/Copy";
 import { CreditCard } from "next-vibe/ui/components/icons/CreditCard";
-import { ExternalLink } from "next-vibe/ui/components/icons/ExternalLink";
-import { History } from "next-vibe/ui/components/icons/History";
 import { Mail } from "next-vibe/ui/components/icons/Mail";
-import { RotateCcw } from "next-vibe/ui/components/icons/RotateCcw";
 import { Shield } from "next-vibe/ui/components/icons/Shield";
-import { UserCheck } from "next-vibe/ui/components/icons/UserCheck";
 import { UserPlus } from "next-vibe/ui/components/icons/UserPlus";
 import { Span } from "next-vibe/ui/components/span";
 import { copyToClipboard } from "next-vibe/ui/lib/clipboard";
@@ -38,22 +34,12 @@ import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/n
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 import React, { useState } from "react";
 
+import { AccountRoleBadge } from "../account-role-badge";
 import type definition from "./definition";
 
 interface CustomWidgetProps {
   field: (typeof definition.POST)["fields"];
 }
-
-const handleCreateAnother = (): void => {
-  // No-op: mutation reset is not available via endpointMutations context
-};
-
-const ROLE_COLORS: Record<string, string> = {
-  ADMIN: "bg-destructive/10 text-destructive",
-  PARTNER_ADMIN:
-    "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300",
-  CUSTOMER: "bg-info/10 text-info",
-};
 
 export function UserCreateContainer({
   field,
@@ -69,22 +55,8 @@ export function UserCreateContainer({
 
   const handleViewUser = (userId: string): void => {
     void (async (): Promise<void> => {
-      const userDef = await import("../user/[id]/definition");
-      navigate(userDef.default.GET, { urlPathParams: { id: userId } });
-    })();
-  };
-
-  const handleFullProfile = (userId: string): void => {
-    void (async (): Promise<void> => {
-      const userDef = await import("../user/[id]/definition");
-      navigate(userDef.default.GET, { urlPathParams: { id: userId } });
-    })();
-  };
-
-  const handleCreditHistory = (userId: string): void => {
-    void (async (): Promise<void> => {
-      const userDef = await import("../user/[id]/definition");
-      navigate(userDef.default.GET, { urlPathParams: { id: userId } });
+      const userDef = await import("../view/definition");
+      navigate(userDef.default.GET, { data: { userId } });
     })();
   };
 
@@ -152,7 +124,7 @@ export function UserCreateContainer({
               {/* Name + status badges */}
               <Div className="flex items-center gap-2 flex-wrap">
                 <Span className="font-semibold text-base">
-                  {privateName ?? "—"}
+                  {privateName ?? "–"}
                 </Span>
                 {publicName && publicName !== privateName && (
                   <Span className="text-sm text-muted-foreground">
@@ -184,24 +156,13 @@ export function UserCreateContainer({
               {roles.length > 0 && (
                 <Div className="flex items-center gap-1.5 flex-wrap mt-2">
                   <Shield className="h-3.5 w-3.5 text-muted-foreground flex-shrink-0" />
-                  {roles.map((r, i) => {
-                    const roleEntry = r as { id: string; role: string };
-                    const roleName =
-                      roleEntry.role.split(".").pop()?.toUpperCase() ??
-                      roleEntry.role.toUpperCase();
-                    return (
-                      <Span
-                        key={i}
-                        className={cn(
-                          "inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium",
-                          ROLE_COLORS[roleName] ??
-                            "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200",
-                        )}
-                      >
-                        {roleName.replaceAll("_", " ")}
-                      </Span>
-                    );
-                  })}
+                  {roles.map((entry) => (
+                    <AccountRoleBadge
+                      key={entry.id}
+                      role={entry.role}
+                      locale={locale}
+                    />
+                  ))}
                 </Div>
               )}
 
@@ -254,60 +215,12 @@ export function UserCreateContainer({
             </Div>
           </Div>
 
-          {/* Primary actions */}
           {userId && (
-            <Div className="flex flex-col gap-2">
-              {/* Row 1: View User + Full Profile */}
-              <Div className="flex gap-2">
-                <Button
-                  type="button"
-                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors"
-                  onClick={() => {
-                    handleViewUser(userId);
-                  }}
-                >
-                  <UserPlus className="h-4 w-4" />
-                  {t("widget.viewUserButton")}
-                </Button>
-                <Button
-                  type="button"
-                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-secondary text-secondary-foreground text-sm font-medium hover:bg-secondary/80 transition-colors"
-                  onClick={() => {
-                    handleFullProfile(userId);
-                  }}
-                >
-                  <UserCheck className="h-4 w-4" />
-                  {t("widget.fullProfileButton")}
-                </Button>
-              </Div>
-
-              {/* Row 2: Credit History */}
-              <Button
-                type="button"
-                className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg border border-border bg-background text-sm font-medium hover:bg-muted transition-colors"
-                onClick={() => {
-                  handleCreditHistory(userId);
-                }}
-              >
-                <History className="h-4 w-4 text-muted-foreground" />
-                {t("widget.creditHistoryButton")}
-                <ExternalLink className="h-3.5 w-3.5 text-muted-foreground ml-auto" />
-              </Button>
-            </Div>
+            <Button type="button" onClick={() => handleViewUser(userId)}>
+              <UserPlus className="size-4" />
+              {t("widget.viewUserButton")}
+            </Button>
           )}
-
-          {/* Divider */}
-          <Div className="border-t" />
-
-          {/* Create Another User */}
-          <Button
-            type="button"
-            className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg border border-dashed border-border text-sm text-muted-foreground hover:text-foreground hover:border-foreground/30 hover:bg-muted/50 transition-colors"
-            onClick={handleCreateAnother}
-          >
-            <RotateCcw className="h-4 w-4" />
-            {t("widget.createAnotherButton")}
-          </Button>
         </Div>
       </Div>
     );

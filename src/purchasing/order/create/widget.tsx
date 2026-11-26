@@ -16,6 +16,7 @@ import {
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
+import { EntityPickerFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/entity-picker-field/widget";
 import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-field/widget";
 import { TextareaFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/textarea-field/widget";
 import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
@@ -139,13 +140,13 @@ export function OrderCreateWidget({
       )}
 
       <Div className="flex flex-col gap-3">
-        <TextFieldWidget
+        <EntityPickerFieldWidget
           fieldName="companyId"
-          field={withValue(field.children.companyId, undefined, null)}
+          field={field.children.companyId}
         />
-        <TextFieldWidget
+        <EntityPickerFieldWidget
           fieldName="vendorId"
-          field={withValue(field.children.vendorId, undefined, null)}
+          field={field.children.vendorId}
         />
         <Div className="grid grid-cols-2 gap-3">
           <TextFieldWidget
@@ -164,9 +165,9 @@ export function OrderCreateWidget({
             }
           />
         </Div>
-        <TextFieldWidget
+        <EntityPickerFieldWidget
           fieldName="deliveryWarehouseId"
-          field={withValue(field.children.deliveryWarehouseId, undefined, null)}
+          field={field.children.deliveryWarehouseId}
         />
         <TextareaFieldWidget
           fieldName="notes"

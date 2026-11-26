@@ -95,6 +95,10 @@ export const translations: typeof enTranslations = {
     },
   },
   widget: {
+    loadingReport: "Cargando el informe de ingresos…",
+    operatingTitle: "Ingresos operativos",
+    currencyBasis: "Importes aproximados en USD.",
+    filterDisclosure: "Filtros",
     extra: {
       grossHint: "Suscripciones {{subs}} · paquetes {{packs}} · aprox. USD",
       newSubsHint:

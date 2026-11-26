@@ -26,12 +26,13 @@ import type { JSX } from "react";
 
 import { formatAccountingDateInput } from "../../shared/calendar-date";
 import {
-  reportAmountClass,
   ReportCompanyPicker,
   ReportDateFilter,
   ReportMenu,
   ReportPeriodMenu,
+  ReportReadState,
 } from "../balance-sheet/report-controls";
+import { reportAmountClass } from "../report-amount-class";
 import type definition from "./definition";
 import type { TrialBalanceResponseOutput } from "./definition";
 
@@ -95,6 +96,7 @@ export function TrialBalanceWidget(
   const responseOnly = useWidgetResponseOnly();
   const showInputs = interactive && !responseOnly;
   const companyId = form.watch("companyId");
+  const hasCompany = Boolean(companyId || data?.reportCompanyId);
   const requestedCurrency = form.watch("currency")?.trim().toUpperCase();
   const asOf = formatAccountingDateInput(form.watch("asOfDate"));
   const ready =
@@ -168,7 +170,9 @@ export function TrialBalanceWidget(
           />
         </Div>
       )}
-      <FormAlertWidget field={{}} />
+      {hasCompany && response?.success !== false && (
+        <FormAlertWidget field={{}} />
+      )}
       {ready && data?.reportCurrency && (
         <Span className="text-sm font-medium">
           {t("reports.currency")} {data.reportCurrency}
@@ -247,12 +251,11 @@ export function TrialBalanceWidget(
             </Div>
           )}
         </Div>
-      ) : response?.success === false ? null : (
-        <Div className="text-center py-10 text-sm text-muted-foreground border border-dashed rounded-md">
-          {companyId || data?.reportCompanyId
-            ? t("reports.widget.running")
-            : t("trialBalance.widget.selectCompany")}
-        </Div>
+      ) : (
+        <ReportReadState
+          hasCompany={hasCompany}
+          companyPrompt={t("trialBalance.widget.selectCompany")}
+        />
       )}
     </WidgetShell>
   );

@@ -14,6 +14,7 @@ import {
 } from "next-vibe/core/definition/enums";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import {
+  customWidgetObject,
   objectField,
   requestResponseField,
   responseField,
@@ -25,8 +26,11 @@ import {
   CheckoutModeOptions,
   PaymentMethodType,
   PaymentMethodTypeOptions,
+  PaymentProvider,
+  PaymentStatus,
 } from "./enum";
 import { scopedTranslation } from "./i18n";
+import { PaymentInfoWidget } from "./payment-info-widget";
 
 /**
  * GET endpoint for retrieving payment information
@@ -44,77 +48,64 @@ const { GET } = createEndpoint({
   tags: ["tags.payment" as const, "tags.stripe" as const, "tags.info" as const],
   allowedRoles: [UserRole.ADMIN, UserRole.AI_TOOL_OFF] as const,
 
-  fields: objectField(scopedTranslation, {
-    type: WidgetType.CONTAINER,
-    title: "form.title" as const,
-    description: "form.description" as const,
-    layoutType: LayoutType.GRID,
-    columns: 12,
+  fields: customWidgetObject({
     usage: { response: true },
+    render: PaymentInfoWidget,
     children: {
-      priceId: responseField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
-        label: "priceId.label" as const,
-        description: "priceId.description" as const,
-        placeholder: "priceId.placeholder" as const,
-        columns: 12,
-        schema: z.string().min(1),
+      transactions: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "get.response.transactions",
+        schema: z.array(
+          z.object({
+            id: z.uuid(),
+            amount: z.string().nullable(),
+            currency: z.string().nullable(),
+            status: z.enum(PaymentStatus),
+            provider: z.enum(PaymentProvider),
+            mode: z.enum(CheckoutMode),
+            createdAt: z.iso.datetime(),
+          }),
+        ),
       }),
       mode: responseField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.SELECT,
-        label: "mode.label" as const,
-        description: "mode.description" as const,
-        options: CheckoutModeOptions,
-        columns: 12,
-        schema: z.enum(CheckoutMode),
+        type: WidgetType.TEXT,
+        label: "mode.label",
+        schema: z.enum(CheckoutMode).optional(),
+      }),
+      priceId: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "priceId.label",
+        schema: z.string().min(1).optional(),
       }),
       paymentMethodTypes: responseField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.MULTISELECT,
-        label: "create.paymentMethodTypes.label" as const,
-        description: "create.paymentMethodTypes.description" as const,
-        options: PaymentMethodTypeOptions,
-        columns: 12,
+        type: WidgetType.TEXT,
+        label: "create.paymentMethodTypes.label",
         schema: z.array(z.enum(PaymentMethodType)).optional(),
       }),
       successUrl: responseField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.URL,
-        label: "create.successUrl.label" as const,
-        description: "create.successUrl.description" as const,
-        placeholder: "create.successUrl.placeholder" as const,
-        columns: 6,
-        schema: z.string().url().optional(),
+        type: WidgetType.TEXT,
+        label: "create.successUrl.label",
+        schema: z.url().optional(),
       }),
       cancelUrl: responseField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.URL,
-        label: "create.cancelUrl.label" as const,
-        description: "create.cancelUrl.description" as const,
-        placeholder: "create.cancelUrl.placeholder" as const,
-        columns: 6,
-        schema: z.string().url().optional(),
+        type: WidgetType.TEXT,
+        label: "create.cancelUrl.label",
+        schema: z.url().optional(),
       }),
       customerEmail: responseField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.EMAIL,
-        label: "create.customerEmail.label" as const,
-        description: "create.customerEmail.description" as const,
-        placeholder: "create.customerEmail.placeholder" as const,
-        columns: 12,
+        type: WidgetType.TEXT,
+        label: "create.customerEmail.label",
         schema: z.email().optional(),
       }),
       sessionUrl: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        label: "get.response.sessionUrl" as const,
-        schema: z.string().url(),
+        label: "get.response.sessionUrl",
+        schema: z.url().optional(),
       }),
       sessionId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        label: "get.response.sessionId" as const,
-        schema: z.string(),
+        label: "get.response.sessionId",
+        schema: z.string().optional(),
       }),
     },
   }),
@@ -166,21 +157,20 @@ const { GET } = createEndpoint({
   examples: {
     responses: {
       default: {
-        priceId: "price_1234567890",
         mode: CheckoutMode.PAYMENT,
-        paymentMethodTypes: [PaymentMethodType.CARD, PaymentMethodType.PAYPAL],
-        successUrl: "https://example.com/success",
-        cancelUrl: "https://example.com/cancel",
-        customerEmail: "user@example.com",
-        sessionUrl: "https://checkout.stripe.com/pay/cs_test_1234567890",
-        sessionId: "cs_test_1234567890",
+        transactions: [
+          {
+            id: "00000000-0000-4000-8000-000000000001",
+            amount: "24.95",
+            currency: "EUR",
+            status: PaymentStatus.SUCCEEDED,
+            provider: PaymentProvider.STRIPE,
+            mode: CheckoutMode.PAYMENT,
+            createdAt: "2026-01-15T10:30:00.000Z",
+          },
+        ],
       } as const,
-      minimal: {
-        priceId: "price_1234567890",
-        mode: CheckoutMode.PAYMENT,
-        sessionUrl: "https://checkout.stripe.com/pay/cs_test_1234567890",
-        sessionId: "cs_test_1234567890",
-      } as const,
+      empty: { transactions: [] } as const,
     } as const,
   },
 });

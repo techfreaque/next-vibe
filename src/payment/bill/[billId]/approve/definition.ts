@@ -14,6 +14,7 @@ import { UserRole } from "next-vibe/identity/roles/enum";
 import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
 import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
 import {
+  requestField,
   requestUrlPathParamsField,
   responseField,
 } from "next-vibe/unified-ui/_shared/utils-i18n";
@@ -51,7 +52,7 @@ const { POST } = createEndpoint({
 
   fields: customWidgetObject({
     render: BillApproveWidgetLazy,
-    usage: { request: "urlPathParams", response: true },
+    usage: { request: "data&urlPathParams", response: true },
     children: {
       // URL PATH PARAMS
       billId: requestUrlPathParamsField(scopedTranslation, {
@@ -66,6 +67,30 @@ const { POST } = createEndpoint({
         labelField: "billNumber",
       }),
 
+      reverseChargeBase: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label: "reverseCharge.base",
+        schema: z.number().positive().optional(),
+      }),
+      reverseChargeRatePercent: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label: "reverseCharge.rate",
+        schema: z.number().positive().max(100).optional(),
+      }),
+      confirmNoSupplierDocument: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "supplierDocument.confirmMissing",
+        schema: z.boolean().optional(),
+      }),
+      confirmSeparateBankBill: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "supplierDocument.confirmSeparate",
+        schema: z.boolean().optional(),
+      }),
       // RESPONSE FIELDS
       status: responseField(scopedTranslation, {
         type: WidgetType.BADGE,
@@ -126,6 +151,7 @@ const { POST } = createEndpoint({
   },
 
   examples: {
+    requests: { default: {} },
     urlPathParams: {
       default: { billId: "456e7890-e89b-12d3-a456-426614174000" },
     },
@@ -138,6 +164,7 @@ const { POST } = createEndpoint({
   },
 });
 
+export type BillApprovalTaxInputs = typeof POST.types.RequestOutput;
 export type BillApproveUrlPathParams = typeof POST.types.UrlVariablesOutput;
 export type BillApproveResponseOutput = typeof POST.types.ResponseOutput;
 

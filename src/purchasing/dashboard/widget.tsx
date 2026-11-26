@@ -19,6 +19,7 @@ import {
   useWidgetIsInteractive,
   useWidgetLocale,
   useWidgetNavigation,
+  useWidgetResponseOnly,
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
@@ -30,6 +31,7 @@ export function PurchasingDashboardWidget(): JSX.Element {
   const data = useWidgetValue<typeof definition.GET>();
   const locale = useWidgetLocale();
   const interactive = useWidgetIsInteractive();
+  const embedded = useWidgetResponseOnly() && interactive;
   const companyId = useWidgetForm<typeof definition.GET>().watch("companyId");
   const navigation = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.GET>();
@@ -107,18 +109,32 @@ export function PurchasingDashboardWidget(): JSX.Element {
     );
   };
   return (
-    <WidgetShell layout="page">
-      <WidgetHeader
-        size="page"
-        title={t("dashboard.get.title")}
-        subtitle={t("dashboard.get.description")}
-        actions={
-          <Button type="button" size="sm" onClick={handleNewPo}>
-            {t("dashboard.get.widget.navNewPo")}
-          </Button>
+    <WidgetShell
+      layout={embedded ? "compact" : "page"}
+      padding={embedded ? "none" : "md"}
+    >
+      {!embedded && (
+        <WidgetHeader
+          size="page"
+          title={t("dashboard.get.title")}
+          subtitle={t("dashboard.get.description")}
+          actions={
+            interactive && (
+              <Button type="button" size="sm" onClick={handleNewPo}>
+                {t("dashboard.get.widget.navNewPo")}
+              </Button>
+            )
+          }
+        />
+      )}
+      <MetricGrid
+        columns={4}
+        className={
+          embedded
+            ? "grid-cols-2 gap-2 [&>*]:px-3 [&>*]:py-2.5 [&>*>div:first-child>span]:whitespace-normal"
+            : undefined
         }
-      />
-      <MetricGrid columns={4}>
+      >
         <MetricCard
           label={t("dashboard.get.widget.kpiDraft")}
           value={data.draftCount}
@@ -140,7 +156,11 @@ export function PurchasingDashboardWidget(): JSX.Element {
       {data.moneyByCurrency?.map((row) => (
         <Div
           key={row.currency}
-          className="grid gap-3 rounded-lg border bg-card p-4 @md:grid-cols-2"
+          className={
+            embedded
+              ? "grid min-w-0 grid-cols-2 gap-2 [&>*]:px-3 [&>*]:py-2.5 [&>*>div:first-child>span]:whitespace-normal [&>*>div:nth-child(2)>span]:break-words [&>*>div:nth-child(2)>span]:text-base @sm:[&>*>div:nth-child(2)>span]:text-lg @2xl:[&>*>div:nth-child(2)>span]:text-2xl"
+              : "grid gap-3 rounded-lg border bg-card p-4 @md:grid-cols-2"
+          }
         >
           <MetricCard
             label={`${t("dashboard.get.widget.openValue")} · ${row.currency}`}
@@ -232,33 +252,34 @@ export function PurchasingDashboardWidget(): JSX.Element {
           )}
         </Div>
       )}
-      {/* Quick nav */}
-      <Div className="flex flex-wrap gap-2">
-        <Button
-          type="button"
-          size="sm"
-          variant="outline"
-          onClick={handleAllPos}
-        >
-          {t("dashboard.get.widget.navAllPos")}
-        </Button>
-        <Button
-          type="button"
-          size="sm"
-          variant="outline"
-          onClick={handleVendors}
-        >
-          {t("dashboard.get.widget.navVendors")}
-        </Button>
-        <Button
-          type="button"
-          size="sm"
-          variant="outline"
-          onClick={handleNewVendor}
-        >
-          {t("dashboard.get.widget.navNewVendor")}
-        </Button>
-      </Div>
+      {interactive && !embedded && (
+        <Div className="flex flex-wrap gap-2">
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            onClick={handleAllPos}
+          >
+            {t("dashboard.get.widget.navAllPos")}
+          </Button>
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            onClick={handleVendors}
+          >
+            {t("dashboard.get.widget.navVendors")}
+          </Button>
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            onClick={handleNewVendor}
+          >
+            {t("dashboard.get.widget.navNewVendor")}
+          </Button>
+        </Div>
+      )}
     </WidgetShell>
   );
 }

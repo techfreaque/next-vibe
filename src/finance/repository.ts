@@ -56,6 +56,7 @@ import {
 import {
   financeAlerts,
   financeDailyRollups,
+  type FinanceProviderSnapshotRow,
   financeProviderSnapshots,
   financeRevenueEvents,
   financeRevenueSnapshots,
@@ -836,6 +837,17 @@ export class FinanceRepository {
       }
 
       if (!dryRun) {
+        const spendEvidence: FinanceProviderSnapshotRow["spendEvidence"] =
+          !delta
+            ? null
+            : spendBasis === "usage-ledger"
+              ? "usage-estimate"
+              : previous &&
+                  previous.cumulativeUsageUsd !== null &&
+                  cumulativeUsageUsd !== null &&
+                  cumulativeUsageUsd >= previous.cumulativeUsageUsd
+                ? "counter"
+                : "balance-delta";
         const values = {
           provider,
           bucketAt,
@@ -845,6 +857,7 @@ export class FinanceRepository {
           unit,
           cumulativeUsageUsd,
           spendUsd: delta?.spendUsd ?? null,
+          spendEvidence,
           spendNative,
           elapsedHours: delta?.elapsedHours ?? null,
         };

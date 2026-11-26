@@ -7,6 +7,28 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   ...analyticsTranslations,
   ...leadAnalyticsTranslations,
+  platformSummary: {
+    grossReceipts: "Prijaté platby",
+    refunds: "Vrátené platby",
+    netReceipts: "Príjmy po vrátení platieb",
+
+    valuationBasis:
+      "Marža je cenníková hodnota kreditov po odpočítaní nákladov dodávateľa. Zahŕňa len využitie so zaznamenanými nákladmi.",
+    valuationCost: "Odhadované náklady na AI",
+    valuationMargin: "Odhadovaná marža z používania AI",
+    newAccount: "Zaregistrovaný účet",
+    receivedPayment: "Prijatá platba",
+    completedTask: "Naplánovaná úloha dokončená",
+    operations: "Prevádzka",
+    emptyActivity: "V tomto období nebola zaznamenaná žiadna aktivita.",
+    period: "Posledných 30 dní v porovnaní s predchádzajúcimi 30 dňami",
+    retry: "Skúsiť znova",
+    title: "Prehľad platformy",
+    description:
+      "Skontrolujte získavanie zákazníkov, výnosy a stav služieb za posledných 30 dní.",
+    unavailable: "Údaj nie je dostupný",
+    recent: "Posledná aktivita",
+  },
   category: "Analytika",
   tags: {
     analytics: "Analytika",

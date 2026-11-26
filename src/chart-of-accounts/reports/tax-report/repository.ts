@@ -31,15 +31,10 @@ import {
   findLedgerReportCompany,
   resolveLedgerReportCurrency,
 } from "../../shared/report-currency";
-import type { TaxReportRequestOutput } from "./definition";
-
-interface TaxLine {
-  taxRateCode: string;
-  taxRateName: string;
-  netAmount: number;
-  taxAmount: number;
-  rate: number;
-}
+import type {
+  TaxReportRequestOutput,
+  TaxReportResponseOutput,
+} from "./definition";
 
 export class TaxReportRepository {
   static async getTaxReport(
@@ -47,19 +42,7 @@ export class TaxReportRepository {
     logger: EndpointLogger,
     user: JwtPrivatePayloadType,
     locale: CountryLanguage,
-  ): Promise<
-    ResponseType<{
-      reportCompanyId: string;
-      reportCompanyName: string;
-      reportCurrency: string;
-      fromResponse: Date;
-      toResponse: Date;
-      vatCollected: number;
-      vatReclaimable: number;
-      netVatPayable: number;
-      lines: TaxLine[];
-    }>
-  > {
+  ): Promise<ResponseType<TaxReportResponseOutput>> {
     const { t } = scopedTranslation.scopedT(locale);
 
     if (data.companyId) {
@@ -118,11 +101,16 @@ export class TaxReportRepository {
 
       const rows = await db
         .select({
+          id: accountNodes.id,
           code: accountNodes.code,
           name: accountNodes.name,
           subtype: accountNodes.subtype,
-          debitTotal: sql<number>`coalesce(sum(case when ${journalEntryLines.type} = ${LineType.DEBIT} then ${journalEntryLines.amount} else 0 end), 0)`,
-          creditTotal: sql<number>`coalesce(sum(case when ${journalEntryLines.type} = ${LineType.CREDIT} then ${journalEntryLines.amount} else 0 end), 0)`,
+          debitUnits: sql<string>`(
+            SUM(CASE
+              WHEN ${journalEntryLines.type} = ${LineType.DEBIT} THEN ${journalEntryLines.amount}
+              WHEN ${journalEntryLines.type} = ${LineType.CREDIT} THEN -${journalEntryLines.amount}
+              ELSE 0 END) * 10000
+          )::bigint::text`,
         })
         .from(journalEntryLines)
         .innerJoin(
@@ -134,49 +122,32 @@ export class TaxReportRepository {
           eq(journalEntryLines.accountId, accountNodes.id),
         )
         .where(and(...entryConditions))
-        .groupBy(accountNodes.code, accountNodes.name, accountNodes.subtype)
-        .orderBy(accountNodes.code);
+        .groupBy(accountNodes.id)
+        .orderBy(accountNodes.code, accountNodes.id);
 
-      let vatCollected = 0;
-      let vatReclaimable = 0;
-
-      for (const r of rows) {
-        const credit = Number(r.creditTotal);
-        const debit = Number(r.debitTotal);
-
-        if (r.subtype === AccountSubtype.VAT_PAYABLE) {
-          // VAT collected = credit side (normal balance for liability)
-          vatCollected += credit - debit;
-        } else if (r.subtype === AccountSubtype.VAT_RECEIVABLE) {
-          // VAT reclaimable = debit side (normal balance for asset)
-          vatReclaimable += debit - credit;
-        }
-      }
-
-      const netVatPayable = vatCollected - vatReclaimable;
-
-      // Build tax lines — one per account, derive rate from account name/code heuristic
-      // (in a real system this would join to a tax rates table)
-      const lines: TaxLine[] = rows.map((r) => {
-        const credit = Number(r.creditTotal);
-        const debit = Number(r.debitTotal);
-        const isPayable = r.subtype === AccountSubtype.VAT_PAYABLE;
-        const taxAmount = isPayable ? credit - debit : debit - credit;
-
-        // Derive a naive rate from the account code suffix (e.g. "MwSt 20" → 0.20)
-        // Real implementations would join to a rates table
-        const rateMatch = /(\d+)/.exec(r.name);
-        const rate = rateMatch ? Number(rateMatch[1]) / 100 : 0;
-        const netAmount = rate > 0 ? taxAmount / rate : 0;
-
-        return {
-          taxRateCode: r.code,
-          taxRateName: r.name,
-          netAmount,
-          taxAmount,
-          rate,
-        };
-      });
+      let collected = BigInt(0);
+      let reclaimable = BigInt(0);
+      const lines: NonNullable<TaxReportResponseOutput["lines"]> = rows.map(
+        (row) => {
+          const debitUnits = BigInt(row.debitUnits);
+          const output = row.subtype === AccountSubtype.VAT_PAYABLE;
+          const units = output ? -debitUnits : debitUnits;
+          if (output) {
+            collected += units;
+          } else {
+            reclaimable += units;
+          }
+          return {
+            accountId: row.id,
+            direction: output ? "output" : "input",
+            taxRateCode: row.code,
+            taxRateName: row.name,
+            taxAmount: Number(units) / 10_000,
+            netAmount: null,
+            rate: null,
+          };
+        },
+      );
 
       return success({
         reportCompanyId: company.id,
@@ -184,9 +155,9 @@ export class TaxReportRepository {
         reportCurrency,
         fromResponse: fromDate,
         toResponse: toDate,
-        vatCollected,
-        vatReclaimable,
-        netVatPayable,
+        vatCollected: Number(collected) / 10_000,
+        vatReclaimable: Number(reclaimable) / 10_000,
+        netVatPayable: Number(collected - reclaimable) / 10_000,
         lines,
       });
     } catch (error) {

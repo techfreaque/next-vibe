@@ -37,15 +37,32 @@ import { accountingDay } from "@/chart-of-accounts/shared/journal-validation";
 import { lockLedgerCompany } from "@/chart-of-accounts/shared/ledger-write";
 import { getDocumentAccess } from "@/finance/document-company-scope";
 import { nextCompanyInvoiceSequence } from "@/finance/document-number";
-import { TaxCalculator } from "@/tax/calculator";
+import { getLineSettlementPolicy } from "@/tax/line-settlement";
 
 import { paymentInvoiceLines, paymentInvoices } from "../../db";
 import { InvoiceStatus } from "../../enum";
+import { calculateInvoiceLine } from "../../invoice/line/amounts";
 import type {
   CreditNoteCreateRequestOutput,
   CreditNoteCreateResponseOutput,
 } from "./definition";
 import { scopedTranslation } from "./i18n";
+
+function sumByRate(
+  lines: readonly { taxRate: number; taxAmount: number; lineTotal: number }[],
+  sign: 1 | -1,
+): Map<number, { net: number; vat: number }> {
+  const totals = new Map<number, { net: number; vat: number }>();
+  for (const line of lines) {
+    const vat = sign * Math.round(line.taxAmount * 100);
+    const gross = sign * Math.round(line.lineTotal * 100);
+    const current = totals.get(line.taxRate) ?? { net: 0, vat: 0 };
+    current.vat += vat;
+    current.net += gross - vat;
+    totals.set(line.taxRate, current);
+  }
+  return totals;
+}
 
 export class CreditNoteCreateRepository {
   static async createCreditNote(
@@ -57,6 +74,12 @@ export class CreditNoteCreateRepository {
     const { t } = scopedTranslation.scopedT(locale);
 
     try {
+      if (data.lineItems?.length === 0) {
+        return fail({
+          message: t("post.errors.creditLines"),
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+        });
+      }
       const scope = { companyId: data.companyId };
       if (!(await getDocumentAccess(userId, scope))?.canManage) {
         return fail({
@@ -117,27 +140,28 @@ export class CreditNoteCreateRepository {
           ) / 100,
         );
         const originalNetCents = originalGrossCents - originalVatCents;
+        const lineSettlement = getLineSettlementPolicy(
+          original.currency,
+          original.metadata,
+        );
         const rates = new Set(originalLines.map((line) => line.taxRate));
 
         const creditLines = data.lineItems?.length
           ? data.lineItems.map((line) => {
-              const quantity = TaxCalculator.roundToFour(line.quantity);
-              const unitPrice = TaxCalculator.roundToFour(
-                Math.abs(line.unitPrice),
+              const amount = calculateInvoiceLine(
+                {
+                  quantity: line.quantity,
+                  unitPrice: Math.abs(line.unitPrice),
+                  taxRate: line.taxRate / 100,
+                },
+                lineSettlement,
               );
-              const taxRate = TaxCalculator.roundToFour(line.taxRate / 100);
-              const { taxAmount, total } = TaxCalculator.calculateLineItemTax({
-                quantity,
-                unitPrice,
-                taxRate,
-              });
               return {
+                ...amount,
                 description: line.description,
-                quantity,
-                unitPrice: -unitPrice,
-                taxRate,
-                taxAmount: -taxAmount,
-                lineTotal: -total,
+                unitPrice: -amount.unitPrice,
+                taxAmount: -amount.taxAmount,
+                lineTotal: -amount.lineTotal,
                 productId: null,
               };
             })
@@ -183,6 +207,13 @@ export class CreditNoteCreateRepository {
           });
         }
 
+        const issuedCreditScope = and(
+          eq(paymentInvoices.companyId, data.companyId),
+          eq(paymentInvoices.currency, original.currency),
+          eq(paymentInvoices.status, InvoiceStatus.OPEN),
+          sql`${paymentInvoices.amount} < 0`,
+          sql`${paymentInvoices.metadata}->>'originalInvoiceId' = ${original.id}`,
+        );
         const issuedCredits = tx
           .select({
             grossCents: sql<string>`-${paymentInvoices.amount} * 100`.as(
@@ -198,15 +229,7 @@ export class CreditNoteCreateRepository {
             paymentInvoiceLines,
             eq(paymentInvoiceLines.invoiceId, paymentInvoices.id),
           )
-          .where(
-            and(
-              eq(paymentInvoices.companyId, data.companyId),
-              eq(paymentInvoices.currency, original.currency),
-              eq(paymentInvoices.status, InvoiceStatus.OPEN),
-              sql`${paymentInvoices.amount} < 0`,
-              sql`${paymentInvoices.metadata}->>'originalInvoiceId' = ${original.id}`,
-            ),
-          )
+          .where(issuedCreditScope)
           .groupBy(paymentInvoices.id, paymentInvoices.amount)
           .as("issued_credits");
         const [prior] = await tx
@@ -232,6 +255,47 @@ export class CreditNoteCreateRepository {
             message: t("post.errors.creditLimit"),
             errorType: ErrorResponseTypes.VALIDATION_ERROR,
           });
+        }
+
+        if (lineSettlement) {
+          // New invoices have settled cents per line. Apply caps per stored
+          // VAT rate as well as on the whole document, including prior credits.
+          const previousByRate = await tx
+            .select({
+              taxRate: paymentInvoiceLines.taxRate,
+              lineTotal:
+                sql<number>`coalesce(sum(-${paymentInvoiceLines.lineTotal}), 0)`.mapWith(
+                  Number,
+                ),
+              taxAmount:
+                sql<number>`coalesce(sum(-${paymentInvoiceLines.taxAmount}), 0)`.mapWith(
+                  Number,
+                ),
+            })
+            .from(paymentInvoiceLines)
+            .innerJoin(
+              paymentInvoices,
+              eq(paymentInvoiceLines.invoiceId, paymentInvoices.id),
+            )
+            .where(issuedCreditScope)
+            .groupBy(paymentInvoiceLines.taxRate);
+          const available = sumByRate(originalLines, 1);
+          const requested = sumByRate(creditLines, -1);
+          const previous = sumByRate(previousByRate, 1);
+          for (const [rate, current] of requested) {
+            const alreadyCredited = previous.get(rate);
+            const capacity = available.get(rate);
+            if (
+              !capacity ||
+              current.net + (alreadyCredited?.net ?? 0) > capacity.net ||
+              current.vat + (alreadyCredited?.vat ?? 0) > capacity.vat
+            ) {
+              return fail({
+                message: t("post.errors.creditLimit"),
+                errorType: ErrorResponseTypes.VALIDATION_ERROR,
+              });
+            }
+          }
         }
 
         const today = new Date();
@@ -355,7 +419,10 @@ export class CreditNoteCreateRepository {
 
         const amount = (-grossCents / 100).toFixed(2);
         const metadata = z
-          .object({ customerId: z.string().optional() })
+          .object({
+            customerId: z.string().optional(),
+            taxExemptionNotice: z.string().optional(),
+          })
           .safeParse(original.metadata);
         await tx.insert(paymentInvoices).values({
           id: creditNoteId,
@@ -372,6 +439,10 @@ export class CreditNoteCreateRepository {
             originalInvoiceId: original.id,
             reason: data.reason,
             customerId: metadata.success ? metadata.data.customerId : undefined,
+            taxExemptionNotice: metadata.success
+              ? metadata.data.taxExemptionNotice
+              : undefined,
+            lineSettlement,
           },
           journalEntryId,
           createdAt: today,
@@ -396,6 +467,7 @@ export class CreditNoteCreateRepository {
           message: null,
           creditNote: {
             id: creditNoteId,
+            invoiceNumber,
             invoiceId: original.id,
             companyId: data.companyId,
             currency,

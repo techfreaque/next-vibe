@@ -23,6 +23,8 @@ import {
 } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
+import { LINE_SETTLEMENT_V1 } from "@/tax/line-settlement";
+
 import { EstimateStatus } from "../../../enum";
 import { scopedTranslation } from "./i18n";
 
@@ -109,6 +111,12 @@ const { GET } = createEndpoint({
         type: WidgetType.TEXT,
         label: "post.response.success" as const,
         schema: z.string(),
+      }),
+      lineSettlement: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "lineRounding",
+        hidden: true,
+        schema: z.literal(LINE_SETTLEMENT_V1).optional(),
       }),
       validUntil: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
@@ -274,19 +282,31 @@ const { GET } = createEndpoint({
         status: EstimateStatus.ACCEPTED,
         customerId: null,
         customerEmail: null,
-        customerName: null,
+        customerName: "Atlas Print Studio",
         currency: "EUR",
-        validUntil: null,
+        validUntil: "2026-12-12T00:00:00.000Z",
         title: null,
         notes: null,
         terms: null,
-        subtotal: 0,
-        taxAmount: 0,
-        total: 0,
+        subtotal: 150,
+        taxAmount: 30,
+        total: 180,
         invoiceId: null,
         createdAt: "2024-01-01T00:00:00.000Z",
         updatedAt: "2024-01-01T00:00:00.000Z",
-        lines: [],
+        lines: [
+          {
+            id: "456e7890-e89b-42d3-a456-426614174001",
+            description: "Catalogue design",
+            productId: null,
+            quantity: 2,
+            unitPrice: 75,
+            taxRate: 0.2,
+            taxAmount: 30,
+            lineTotal: 180,
+            sortOrder: 0,
+          },
+        ],
       },
     },
   },

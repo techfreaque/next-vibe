@@ -16,6 +16,7 @@ import {
 import {
   Countries,
   CountriesOptions,
+  type CountryLanguage,
   Languages,
   LanguagesOptions,
 } from "next-vibe/core/i18n/core/config";
@@ -124,7 +125,11 @@ export const leadsSortingFields = {
     label: "filters.sortBy.label",
     description: "filters.sortBy.description",
     placeholder: "filters.sortBy.placeholder",
-    options: LeadSortFieldOptions,
+    options: LeadSortFieldOptions.map((option) => ({
+      ...option,
+      translateLabel: (locale: CountryLanguage): string =>
+        scopedTranslation.scopedT(locale).t(option.label),
+    })),
     schema: z.enum(LeadSortField).default(LeadSortField.CREATED_AT),
   }),
 
@@ -134,7 +139,11 @@ export const leadsSortingFields = {
     label: "filters.sortOrder.label",
     description: "filters.sortOrder.description",
     placeholder: "filters.sortOrder.placeholder",
-    options: SortOrderOptions,
+    options: SortOrderOptions.map((option) => ({
+      ...option,
+      translateLabel: (locale: CountryLanguage): string =>
+        scopedTranslation.scopedT(locale).t(option.label),
+    })),
     schema: z.enum(SortOrder).default(SortOrder.DESC),
   }),
 } as const;

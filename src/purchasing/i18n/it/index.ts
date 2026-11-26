@@ -262,6 +262,12 @@ export const translations: typeof enTranslations = {
       titleShort: "Dettagli del fornitore",
       description: "Recuperare i dettagli completi per un venditore.",
       widget: {
+        companyName: "Azienda",
+        orderCount: "Ordini di acquisto",
+        receivingCount: "In attesa di ricezione",
+        details: "Dati del fornitore",
+        related: "Gestisci fornitore",
+        backToList: "Torna ai fornitori",
         back: "Indietro",
         edit: "Modifica del fornitore",
         createOrder: "Nuovo acquisto",
@@ -685,6 +691,9 @@ export const translations: typeof enTranslations = {
         colStatus: "Stato",
         deliveryArrow: "→",
         overdue: "in ritardo",
+        readyToBill: "Ricevuti, pronti per la fatturazione",
+        openAttentionOrder: "Apri l’ordine {{reference}}",
+        attentionCount: "Ordini da verificare: {{count}}",
         actionNeeded: "ordini di acquisto bisogno attenzione",
         back: "Indietro",
         loading: "Caricamento…",
@@ -755,8 +764,10 @@ export const translations: typeof enTranslations = {
       description:
         "Recuperare un ordine di acquisto con tutte le linee e la cronologia delle ricevute.",
       widget: {
+        precision:
+          "I totali delle righe usano il prezzo unitario del fornitore prima dell’arrotondamento.",
         back: "Indietro",
-        send: "Invia al venditore",
+        send: "Segna come inviato",
         confirm: "Mark confermato",
         receive: "Ricevere beni",
         convertToBill: "Converti in fattura",
@@ -987,9 +998,9 @@ export const translations: typeof enTranslations = {
   // PO send
   orderSend: {
     post: {
-      title: "Invia l'ordine di acquisto",
-      titleShort: "Invia ordine",
-      description: "Mark ordine di acquisto come Invia al fornitore.",
+      title: "Contrassegna l’ordine come inviato",
+      titleShort: "Segna come inviato",
+      description: "Registra l’invio dell’ordine di acquisto.",
       poId: {
         label: "Ordine ID",
         description: "Ordine di acquisto per l'invio",
@@ -998,7 +1009,7 @@ export const translations: typeof enTranslations = {
         back: "Indietro",
         backToPO: "Torna all'acquisto",
         warning:
-          "L'invio di marchi questo ordine di acquisto come spedito al venditore. Modifica dello stato da Draft a Sent.",
+          "Lo stato dell’ordine passa a Inviato in questo spazio di lavoro.",
       },
       errors: {
         validation: {
@@ -1040,8 +1051,8 @@ export const translations: typeof enTranslations = {
         },
       },
       success: {
-        title: "Ordinare il pagamento",
-        description: "Ordine di acquisto contrassegnato come Inviato",
+        title: "Ordine contrassegnato come inviato",
+        description: "L’ordine di acquisto ora è nello stato Inviato.",
       },
       response: {
         id: "Ordine ID",
@@ -1124,6 +1135,10 @@ export const translations: typeof enTranslations = {
       description:
         "Registrazione della merce contro un ordine di acquisto. Crea movimenti azionari.",
       widget: {
+        retry: "Riprova",
+        loading: "Caricamento dell’ordine…",
+        remaining: "Quantità rimanente: {{quantity}}",
+        noOpenLines: "Sono state ricevute tutte le quantità ordinate.",
         backToPO: "Torna all'acquisto",
       },
       poId: {
@@ -1271,6 +1286,10 @@ export const translations: typeof enTranslations = {
   orderLineAdd: {
     post: {
       widget: {
+        productSearch: "Cerca prodotti per nome o codice",
+        search: "Cerca",
+        noProducts: "Nessun prodotto corrispondente.",
+        clearProduct: "Rimuovi prodotto",
         backToOrder: "Torna all'ordine",
         lineAdded: "Articolo di linea aggiunto",
       },
@@ -1373,6 +1392,11 @@ export const translations: typeof enTranslations = {
         description: "Elemento di linea per rimuovere",
       },
       widget: {
+        updatedOrderTotals: "Totali aggiornati dell’ordine",
+        cancel: "Annulla",
+        verifying: "Verifica della riga selezionata…",
+        unavailable:
+          "Riapri l’ordine in bozza e seleziona la riga da rimuovere.",
         backToOrder: "Torna all'ordine di acquisto",
         warning:
           "Questo rimuoverà definitivamente l'elemento di linea dall'ordine di acquisto.",

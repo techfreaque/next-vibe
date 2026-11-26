@@ -68,6 +68,11 @@ const { GET } = createEndpoint({
             hidden: true,
             schema: z.string().uuid(),
           }),
+          companyName: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            label: "periodGet.response.companyId",
+            schema: z.string().optional(),
+          }),
           companyId: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             label: "periodGet.response.companyId",

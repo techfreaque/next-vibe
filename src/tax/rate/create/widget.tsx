@@ -11,11 +11,15 @@ import {
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
+import {
+  AdminForm,
+  AdminFormSection,
+} from "next-vibe/unified-ui/widgets/containers/admin-form/widget";
 import { BooleanFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/boolean-field/widget";
+import { EntityPickerFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/entity-picker-field/widget";
 import { NumberFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/number-field/widget";
 import { SelectFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/select-field/widget";
 import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-field/widget";
-import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 import type { JSX } from "react";
 
@@ -65,35 +69,36 @@ export function TaxRateCreateWidget({
   }
 
   return (
-    <Div className="flex flex-col gap-4">
-      {navigation.canGoBack && (
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={() => navigation.pop()}
-          className="self-start gap-1.5 -ml-1"
-        >
-          <ChevronLeft className="h-4 w-4" />
-          {t("rate.create.widget.backToList")}
-        </Button>
-      )}
-
-      <Div className="flex flex-col gap-1">
-        <Span className="text-base font-semibold">
-          {t("rate.create.title")}
-        </Span>
-        <Span className="text-sm text-muted-foreground">
-          {t("rate.create.description")}
-        </Span>
-      </Div>
-
-      <Div className="flex flex-col gap-3">
-        <TextFieldWidget
+    <AdminForm
+      className="mx-auto max-w-3xl"
+      title={t("rate.create.title")}
+      description={t("rate.create.description")}
+      backButton={
+        navigation.canGoBack && (
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => navigation.pop()}
+            className="self-start gap-1.5 -ml-1"
+          >
+            <ChevronLeft className="h-4 w-4" />
+            {t("rate.create.widget.backToList")}
+          </Button>
+        )
+      }
+      primaryAction={
+        <SubmitButtonWidget<typeof definition.POST>
+          field={{ text: "rate.create.widget.save" }}
+        />
+      }
+    >
+      <AdminFormSection title={t("rate.details")}>
+        <EntityPickerFieldWidget
           fieldName="companyId"
           field={withValue(field.children.companyId, undefined, null)}
         />
-        <Div className="grid grid-cols-2 gap-3">
+        <Div className="grid gap-3 @md:grid-cols-2">
           <TextFieldWidget
             fieldName="taxName"
             field={withValue(field.children.taxName, undefined, null)}
@@ -103,17 +108,22 @@ export function TaxRateCreateWidget({
             field={withValue(field.children.taxCode, undefined, null)}
           />
         </Div>
-        <Div className="grid grid-cols-2 gap-3">
+        <Div className="grid gap-3 @md:grid-cols-2">
           <SelectFieldWidget
             fieldName="type"
             field={withValue(field.children.type, undefined, null)}
           />
           <NumberFieldWidget
+            presentation="percent"
             fieldName="rate"
-            field={withValue(field.children.rate, undefined, null)}
+            field={{
+              ...withValue(field.children.rate, undefined, null),
+              description: undefined,
+              placeholder: undefined,
+            }}
           />
         </Div>
-        <Div className="grid grid-cols-2 gap-3">
+        <Div className="grid gap-3 @md:grid-cols-2">
           <TextFieldWidget
             fieldName="country"
             field={withValue(field.children.country, undefined, null)}
@@ -127,10 +137,7 @@ export function TaxRateCreateWidget({
           fieldName="isDefault"
           field={withValue(field.children.isDefault, undefined, null)}
         />
-      </Div>
-
-      <FormAlertWidget field={{}} />
-      <SubmitButtonWidget<typeof definition.POST> field={{}} />
-    </Div>
+      </AdminFormSection>
+    </AdminForm>
   );
 }

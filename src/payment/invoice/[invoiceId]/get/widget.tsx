@@ -15,6 +15,7 @@ import {
   formatDocDate,
   formatMoney,
 } from "next-vibe/unified-ui/_shared/format-money";
+import { useRelatedEntityNavigation } from "next-vibe/unified-ui/_shared/related-entities";
 import {
   useWidgetIsInteractive,
   useWidgetLocale,
@@ -54,6 +55,7 @@ export function InvoiceGetWidget({
 }): JSX.Element {
   const data = useWidgetValue<typeof definition.GET>();
   const { push: navigate, pop, canGoBack } = useWidgetNavigation();
+  const openRelated = useRelatedEntityNavigation();
   const t = useWidgetTranslation<typeof definition.GET>();
   const locale = useWidgetLocale();
   const responseOnly = useWidgetResponseOnly();
@@ -98,12 +100,15 @@ export function InvoiceGetWidget({
     ) / 100;
   const subtotal = totalAmount - taxTotal;
   const isDraft = data.status === InvoiceStatus.DRAFT;
+  const isVoid = data.status === InvoiceStatus.VOID;
   const isOpen = data.status === InvoiceStatus.OPEN;
   const hasBalance = isOpen && data.amountDue > 0;
   const documentNumber =
     data.invoiceNumber ??
     (isDraft
-      ? getStatusLabel(data.status)
+      ? data.invoiceSequenceNumber
+        ? t("widget.draftReference", { number: data.invoiceSequenceNumber })
+        : getStatusLabel(data.status)
       : data.invoiceSequenceNumber === null
         ? t("widget.invoiceNumber")
         : `INV-${data.invoiceSequenceNumber}`);
@@ -126,7 +131,6 @@ export function InvoiceGetWidget({
     navigate(invoiceSendDefinitions.POST, {
       urlPathParams: { invoiceId: data.id },
       renderInModal: true,
-      popNavigationOnSuccess: 1,
     });
   };
 
@@ -167,19 +171,48 @@ export function InvoiceGetWidget({
     });
   };
 
-  const handleViewJournalEntry = (e: ButtonMouseEvent): void => {
-    e.stopPropagation();
-    const entryId = data.journalEntryId;
-    if (!entryId) {
-      return;
-    }
+  const openJournal = (entryId: string): void => {
+    openRelated(
+      () =>
+        import("@/chart-of-accounts/journal/[entryId]/get/definition").then(
+          (module) => module.default.GET,
+        ),
+      { urlPathParams: { entryId } },
+    );
+  };
+
+  const openSourceQuote = (estimateId: string): void => {
     void (async (): Promise<void> => {
-      const def =
-        await import("@/chart-of-accounts/journal/[entryId]/get/definition");
-      navigate(def.default.GET, {
-        urlPathParams: { entryId },
-      });
+      const { default: estimate } =
+        await import("@/payment/estimate/[estimateId]/get/definition");
+      navigate(estimate.GET, { urlPathParams: { estimateId } });
     })();
+  };
+
+  const sourceEstimate = data.sourceEstimate;
+  const sourceQuoteLink =
+    sourceEstimate &&
+    (isInteractive ? (
+      <Button
+        type="button"
+        variant="link"
+        className="h-auto min-h-11 max-w-full justify-start p-0 text-left whitespace-normal"
+        aria-label={`${t("widget.openSourceQuote")} ${sourceEstimate.number}`}
+        onClick={() => openSourceQuote(sourceEstimate.id)}
+      >
+        {sourceEstimate.number}
+        <ExternalLink className="size-3.5 shrink-0" aria-hidden="true" />
+      </Button>
+    ) : (
+      <Span>{sourceEstimate.number}</Span>
+    ));
+
+  const openInvoiceList = (): void => {
+    openRelated(
+      () =>
+        import("../../list/definition").then((module) => module.default.GET),
+      { data: { companyId: data.companyId ?? undefined } },
+    );
   };
 
   function getStatusLabel(status: string): string {
@@ -199,6 +232,11 @@ export function InvoiceGetWidget({
     }
   }
 
+  const { t: shareT } =
+    invoiceSendDefinitions.GET.scopedTranslation.scopedT(locale);
+  const canShare =
+    data.canManage &&
+    (data.status === InvoiceStatus.OPEN || data.status === InvoiceStatus.PAID);
   const secondaryActions = isInteractive && (
     <Div className="flex min-w-0 flex-wrap gap-2">
       {isDraft && data.canManage && (
@@ -260,32 +298,37 @@ export function InvoiceGetWidget({
         title={documentNumber}
         subtitle={data.customerName ?? data.companyName ?? undefined}
         backButton={
-          canGoBack ? (
+          canGoBack || (isVoid && isInteractive) ? (
             <Button
               type="button"
               variant="ghost"
               size="sm"
-              onClick={() => pop()}
+              onClick={canGoBack ? () => pop() : openInvoiceList}
             >
-              <ChevronLeft className="h-4 w-4" />
-              {t("widget.back")}
+              <ChevronLeft className="h-4 w-4" aria-hidden="true" />
+              {t(canGoBack ? "widget.back" : "widget.backToInvoiceList")}
             </Button>
           ) : undefined
         }
         titleAccessory={
-          <StatusPill
-            status={
-              isOverdue
-                ? t("widget.overdue")
-                : hasBalance && data.amountPaid > 0
-                  ? t("widget.partlyPaid")
-                  : getStatusLabel(data.status)
-            }
-            variant={documentStatusVariant(data.status, {
-              overdue: isOverdue,
-              partialPayment: hasBalance && data.amountPaid > 0,
-            })}
-          />
+          !isDraft || data.invoiceNumber ? (
+            <StatusPill
+              status={
+                isOverdue
+                  ? t("widget.overdue")
+                  : hasBalance && data.amountPaid > 0
+                    ? t("widget.partlyPaid")
+                    : getStatusLabel(data.status)
+              }
+              className={
+                isVoid ? "border border-border text-foreground" : undefined
+              }
+              variant={documentStatusVariant(data.status, {
+                overdue: isOverdue,
+                partialPayment: hasBalance && data.amountPaid > 0,
+              })}
+            />
+          ) : undefined
         }
         actions={
           <>
@@ -307,15 +350,41 @@ export function InvoiceGetWidget({
                 {t("widget.recordPayment")}
               </Button>
             )}
+            {isInteractive && canShare && (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() =>
+                  navigate(invoiceSendDefinitions.GET, {
+                    urlPathParams: { invoiceId: data.id },
+                    renderInModal: true,
+                  })
+                }
+              >
+                {shareT("delivery.share")}
+              </Button>
+            )}
             {secondaryActions}
           </>
         }
       />
 
-      <Div className="grid min-w-0 grid-cols-1 items-start gap-4 @3xl:grid-cols-[minmax(0,1fr)_18rem]">
+      <Div
+        className={
+          isVoid
+            ? "grid min-w-0 grid-cols-1 items-start gap-4 @3xl:grid-cols-[minmax(0,1fr)_minmax(20rem,0.58fr)]"
+            : "grid min-w-0 grid-cols-1 items-start gap-4 @3xl:grid-cols-[minmax(0,1fr)_18rem]"
+        }
+      >
         <Div className="flex min-w-0 flex-col gap-4">
           <SectionGroup title={t("widget.details")}>
             <DetailGrid columns={2}>
+              {sourceEstimate && (
+                <DetailField
+                  label={t("widget.sourceQuote")}
+                  value={sourceQuoteLink}
+                />
+              )}
               {data.companyName && (
                 <DetailField
                   label={t("get.response.companyName")}
@@ -487,14 +556,16 @@ export function InvoiceGetWidget({
             </SectionGroup>
           )}
 
-          {data.journalEntryId && isInteractive && (
+          {!isVoid && data.journalEntryId && isInteractive && (
             <SectionGroup title={t("widget.journalEntry")}>
               <Button
                 type="button"
                 variant="outline"
                 size="sm"
                 className="self-start"
-                onClick={handleViewJournalEntry}
+                onClick={() =>
+                  data.journalEntryId && openJournal(data.journalEntryId)
+                }
               >
                 <ExternalLink className="h-4 w-4" />
                 {t("widget.viewJournalEntry")}
@@ -506,9 +577,11 @@ export function InvoiceGetWidget({
         <SectionGroup
           className="order-first @3xl:order-last"
           title={t(
-            isOpen && totalAmount > 0
-              ? "get.response.amountDue"
-              : "widget.total",
+            isVoid
+              ? "widget.remainingBalance"
+              : isOpen && totalAmount > 0
+                ? "get.response.amountDue"
+                : "widget.total",
           )}
         >
           <Div className="flex min-w-0 flex-col gap-2">
@@ -519,8 +592,72 @@ export function InvoiceGetWidget({
                   : "text-2xl font-semibold tracking-tight tabular-nums"
               }
             >
-              {money(isOpen && totalAmount > 0 ? data.amountDue : totalAmount)}
+              {money(
+                isVoid || (isOpen && totalAmount > 0)
+                  ? data.amountDue
+                  : totalAmount,
+              )}
             </Span>
+            {isVoid && (
+              <Div className="flex flex-col gap-3 border-t pt-3">
+                <DetailGrid columns={2}>
+                  <DetailField
+                    label={t("widget.originalTotal")}
+                    value={money(totalAmount)}
+                  />
+                  {data.voidReversal && (
+                    <DetailField
+                      label={t("widget.voidReversalDate")}
+                      value={formatDocDate(
+                        data.voidReversal.effectiveDate,
+                        locale,
+                      )}
+                    />
+                  )}
+                </DetailGrid>
+                {isInteractive &&
+                  (data.journalEntryId || data.voidReversal) && (
+                    <Div className="grid min-w-0 gap-2">
+                      {data.journalEntryId && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          type="button"
+                          className="h-auto min-h-10 w-full flex-wrap justify-between gap-x-2 gap-y-0.5 whitespace-normal text-start"
+                          onClick={() =>
+                            data.journalEntryId &&
+                            openJournal(data.journalEntryId)
+                          }
+                        >
+                          <Span>{t("widget.viewOriginalJournal")}</Span>
+                          {data.voidReversal?.originalEntryNumber && (
+                            <Span className="shrink-0 whitespace-nowrap text-xs tabular-nums text-muted-foreground">
+                              {data.voidReversal.originalEntryNumber}
+                            </Span>
+                          )}
+                        </Button>
+                      )}
+                      {data.voidReversal && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          type="button"
+                          className="h-auto min-h-10 w-full flex-wrap justify-between gap-x-2 gap-y-0.5 whitespace-normal text-start"
+                          onClick={() =>
+                            data.voidReversal &&
+                            openJournal(data.voidReversal.entryId)
+                          }
+                        >
+                          <Span>{t("widget.viewVoidReversal")}</Span>
+                          <Span className="shrink-0 whitespace-nowrap text-xs tabular-nums text-muted-foreground">
+                            {data.voidReversal.entryNumber}
+                          </Span>
+                        </Button>
+                      )}
+                    </Div>
+                  )}
+              </Div>
+            )}
             {data.lines.length > 0 && (
               <Div className="flex flex-col gap-2 border-t pt-3 text-sm">
                 <Div className="flex justify-between gap-2">
