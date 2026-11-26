@@ -871,6 +871,7 @@ async function regenerateRouteTree(result: GenerationResult): Promise<void> {
       getConfig: (inlineConfig: {
         routesDirectory: string;
         generatedRouteTree: string;
+        enableRouteTreeFormatting: boolean;
         routeTreeFileFooter?: string[];
       }) => GeneratorConfig;
       Generator: new (opts: { config: GeneratorConfig; root: string }) => {
@@ -880,6 +881,9 @@ async function regenerateRouteTree(result: GenerationResult): Promise<void> {
     const config = getConfig({
       routesDirectory: resolve(srcDirectory, "routes"),
       generatedRouteTree: resolve(srcDirectory, "routeTree.gen.ts"),
+      // Match Vite's generator so a standalone run does not rewrite an
+      // unchanged live route tree into a different format and trigger reloads.
+      enableRouteTreeFormatting: false,
       routeTreeFileFooter: [ROUTE_TREE_FILE_FOOTER],
     });
     const gen = new Generator({ config, root: projectRoot() });

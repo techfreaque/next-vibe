@@ -78,9 +78,13 @@ export interface AcquisitionCore {
 }
 
 /** `WITH seg AS (...)`: lead facts restricted to the win and the segment. */
-function segmentCte(win: AnalyticsWindow, filters: LeadSegmentFilters): SQL {
+function segmentCte(
+  win: AnalyticsWindow,
+  filters: LeadSegmentFilters,
+  columns: SQL = sql`*`,
+): SQL {
   return sql`seg AS (
-    SELECT * FROM (${leadFactsSql(relevantLeadsCondition(win))}) f
+    SELECT ${columns} FROM (${leadFactsSql(relevantLeadsCondition(win))}) f
     WHERE ${andAll(segmentConditions(filters))}
   ),
   seg_users AS (
@@ -144,6 +148,13 @@ export async function computeAcquisitionCore(
   const chat = sql`first_chat_at`;
   const paid = sql`first_paid_at`;
   const visited = sql`v.visited_at`;
+  // Both reports reuse this CTE several times. Carry only the fields the
+  // aggregates need, while still applying all requested filters to lead facts.
+  const segment = segmentCte(
+    win,
+    filters,
+    sql`f.id, f.user_id, f.created_at, f.signed_up_at, f.first_chat_at, f.first_paid_at, f.bot_family`,
+  );
 
   const {
     rows: [totals],
@@ -173,7 +184,7 @@ export async function computeAcquisitionCore(
       prevUnknownVisits: number;
     }
   >(sql`
-    WITH ${segmentCte(win, filters)},
+    WITH ${segment},
     visit_totals AS (
       SELECT
         count(*) FILTER (WHERE ${w(visited)})::int AS visits,
@@ -187,6 +198,7 @@ export async function computeAcquisitionCore(
         count(*) FILTER (WHERE ${w(visited)} AND seg.bot_family = ${NO_UA})::int AS "unknownVisits",
         count(*) FILTER (WHERE ${p(visited)} AND seg.bot_family = ${NO_UA})::int AS "prevUnknownVisits"
       FROM growth_visits v JOIN seg ON seg.id = v.lead_id
+      WHERE ${w(visited)} OR ${p(visited)}
     )
     SELECT
       count(*) FILTER (WHERE ${w(created)} AND bot_family = ${HUMAN})::int AS "humanLeads",
@@ -218,7 +230,17 @@ export async function computeAcquisitionCore(
   const { rows: series } = await db.execute<
     QueryResultRow & { key: string; bucket: string; value: number }
   >(sql`
-    WITH ${segmentCte(win, filters)}
+    WITH ${segment},
+    visits_by_bucket AS (
+      SELECT ${bucketSql(visited, bucket)} AS bucket,
+        count(*)::int AS visits,
+        count(*) FILTER (WHERE seg.bot_family = ${HUMAN})::int AS human_visits,
+        count(*) FILTER (WHERE ${isBot(sql`seg.bot_family`)})::int AS bot_visits,
+        count(DISTINCT v.lead_id)::int AS visitors
+      FROM growth_visits v JOIN seg ON seg.id = v.lead_id
+      WHERE ${w(visited)}
+      GROUP BY 1
+    )
     SELECT 'humanLeads' AS key, ${bucketSql(created, bucket)} AS bucket, count(*)::int AS value
       FROM seg WHERE ${w(created)} AND bot_family = ${HUMAN} GROUP BY 2
     UNION ALL
@@ -234,17 +256,14 @@ export async function computeAcquisitionCore(
     SELECT 'payers', ${bucketSql(paid, bucket)}, count(*)::int
       FROM seg_users WHERE ${w(paid)} GROUP BY 2
     UNION ALL
-    SELECT 'visits', ${bucketSql(visited, bucket)}, count(*)::int
-      FROM growth_visits v JOIN seg ON seg.id = v.lead_id WHERE ${w(visited)} GROUP BY 2
-    UNION ALL
-    SELECT 'humanVisits', ${bucketSql(visited, bucket)}, count(*)::int
-      FROM growth_visits v JOIN seg ON seg.id = v.lead_id WHERE ${w(visited)} AND seg.bot_family = ${HUMAN} GROUP BY 2
-    UNION ALL
-    SELECT 'botVisits', ${bucketSql(visited, bucket)}, count(*)::int
-      FROM growth_visits v JOIN seg ON seg.id = v.lead_id WHERE ${w(visited)} AND ${isBot(sql`seg.bot_family`)} GROUP BY 2
-    UNION ALL
-    SELECT 'visitors', ${bucketSql(visited, bucket)}, count(DISTINCT v.lead_id)::int
-      FROM growth_visits v JOIN seg ON seg.id = v.lead_id WHERE ${w(visited)} GROUP BY 2
+    SELECT metric.key, v.bucket, metric.value
+      FROM visits_by_bucket v
+      CROSS JOIN LATERAL (VALUES
+        ('visits', v.visits),
+        ('humanVisits', v.human_visits),
+        ('botVisits', v.bot_visits),
+        ('visitors', v.visitors)
+      ) AS metric(key, value)
   `);
 
   // Unfiltered signups include accounts without any lead (UNATTRIBUTED).

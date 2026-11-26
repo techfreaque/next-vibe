@@ -120,7 +120,6 @@ export function createNextHandler<T extends CreateApiEndpointAny>(
 > {
   const { endpoint } = options;
   const endpointPath = endpoint.path.join("/");
-  const traceTransport = TRANSPORT_TRACE_ENDPOINTS.has(endpointPath);
 
   // Create the shared generic handler (handles auth, permissions, validation, business logic, email)
   const genericHandler = createGenericHandler(options);
@@ -140,7 +139,9 @@ export function createNextHandler<T extends CreateApiEndpointAny>(
     const urlPathParams = resolvedParams as T["types"]["UrlVariablesOutput"];
     const requestId = resolveRequestId(request);
     const logger = createEndpointLogger(false, locale, { requestId });
-    const traceStartedAt = traceTransport ? Date.now() : null;
+    const traceStartedAt = TRANSPORT_TRACE_ENDPOINTS.has(endpointPath)
+      ? Date.now()
+      : null;
     const traceContext = {
       requestId,
       endpoint: endpointPath,

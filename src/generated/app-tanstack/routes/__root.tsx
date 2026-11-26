@@ -2,6 +2,7 @@
 // import "next-vibe/ui/tanstack/global-css";
 
 import { TanstackPage as RootLayout } from "@root-layout/layout";
+import { rootViewport } from "@root-layout/layout-viewport";
 import { createRootRoute, ErrorComponent, Outlet } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
@@ -12,17 +13,18 @@ import { Html } from "next-vibe/ui/components/html";
 import { Scripts } from "next-vibe/ui/components/scripts";
 import globalsUrl from "next-vibe/ui/globals.css?url";
 
+import { runPageLoader } from "../nextjs-compat-wrapper";
+
 const loadLayout = createServerFn({ method: "GET" })
   .validator((data: { locale: string }) => data)
-  .handler(async ({ data }) => {
-    // `viewport` is a server-only export (stripped from the client bundle),
-    // so it is resolved here and shipped as head data.
-    const { tanstackLoader, viewport } = await import("@root-layout/layout");
-    const layout = await tanstackLoader({
-      params: Promise.resolve({ locale: data.locale as CountryLanguage }),
-    });
-    return { layout, viewportMeta: viewportToHead(viewport) };
-  });
+  .handler(async ({ data }) =>
+    runPageLoader(async () => {
+      const { tanstackLoader } = await import("@root-layout/layout");
+      return tanstackLoader({
+        params: Promise.resolve({ locale: data.locale as CountryLanguage }),
+      });
+    }),
+  );
 
 export const Route = createRootRoute({
   staleTime: 0,
@@ -32,8 +34,8 @@ export const Route = createRootRoute({
   },
   // Page-specific title/description/canonical/hreflang/OG/robots come from
   // each generated page route's head() (resolved from generateMetadata).
-  head: ({ loaderData }) => ({
-    meta: [{ charSet: "utf-8" }, ...(loaderData?.viewportMeta ?? [])],
+  head: () => ({
+    meta: [{ charSet: "utf-8" }, ...viewportToHead(rootViewport)],
     links: [
       { rel: "stylesheet", href: globalsUrl },
       { rel: "icon", href: "/favicon.ico", sizes: "any" },
@@ -42,7 +44,7 @@ export const Route = createRootRoute({
   }),
   errorComponent: ErrorComponent,
   shellComponent: function ShellComponent({ children }) {
-    const layout = Route.useLoaderData()?.layout;
+    const layout = Route.useLoaderData();
     if (layout) {
       return <RootLayout {...layout}>{children}</RootLayout>;
     }

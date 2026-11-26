@@ -70,6 +70,7 @@ describe("Fixed company on authorized ERP records", () => {
       const invoicePath = `/api/${locale}/payment/invoice/${invoiceId}/get`;
       const journalPath = `/api/${locale}/chart-of-accounts/journal/${entryId}/get`;
       const missingPath = `/api/${locale}/chart-of-accounts/journal/${missingId}/get`;
+      const favoritesPath = `/api/${locale}/vibe/agent/skills/favorites`;
       const reportPath = `/api/${locale}/chart-of-accounts/reports/receivables-aging`;
       const paths = new Set([invoicePath, journalPath, missingPath, reportPath]);
       await page.route(
@@ -92,9 +93,29 @@ describe("Fixed company on authorized ERP records", () => {
         expect(await toolbar.getByRole("button", { name: recordCompanyLabel, exact: true }).count()).toBe(0);
         expect(await savedSwitcher.count()).toBe(0);
       };
+      // Every Tools document starts a favorites read during hydration.
+      const openTool = async (path: string): Promise<void> => {
+        const documentUrl = new URL(`/${locale}${path}`, origin);
+        const [favorites] = await Promise.all([
+          page.waitForResponse((response) => {
+            const url = new URL(response.url());
+            if (url.origin !== origin || url.pathname !== favoritesPath ||
+                response.request().method() !== "GET") {
+              return false;
+            }
+            const frameUrl = new URL(response.frame().url());
+            return frameUrl.pathname === documentUrl.pathname &&
+              [...documentUrl.searchParams].every(
+                ([key, value]) => frameUrl.searchParams.get(key) === value,
+              );
+          }),
+          fixture.goto(path, locale),
+        ]);
+        expect(await favorites.finished()).toBeNull();
+      };
 
       await page.setViewportSize({ width: 390, height: 844 });
-      await fixture.goto("/tools?cat=accounting", locale);
+      await openTool("/tools?cat=accounting");
       await toolbar.waitFor();
       await toolbar.getByRole("button", { name: t("erp.companySwitch.select"), exact: true }).click();
       await page.getByRole("menuitemradio").filter({ hasText: workspaceName }).click();
@@ -105,7 +126,7 @@ describe("Fixed company on authorized ERP records", () => {
         { url: `/tools/payment-invoice-get?arg.invoiceId=${invoiceId}`, heading: invoiceNumber, name: "invoice" },
         { url: `/tools/coa-journal-entry-get?arg.entryId=${entryId}`, heading: entryNumber, name: "journal" },
       ]) {
-        await fixture.goto(record.url, locale);
+        await openTool(record.url);
         const ready = async (): Promise<void> => {
           await page.getByRole("heading", { name: record.heading, exact: true }).waitFor();
           await fixedCompanyReady();
@@ -119,7 +140,7 @@ describe("Fixed company on authorized ERP records", () => {
 
       const [missing] = await Promise.all([
         page.waitForResponse((result) => new URL(result.url()).pathname === missingPath),
-        fixture.goto(`/tools/coa-journal-entry-get?arg.entryId=${missingId}`, locale),
+        openTool(`/tools/coa-journal-entry-get?arg.entryId=${missingId}`),
       ]);
       expect(missing.status()).toBe(404);
       await toolbar.waitFor();
@@ -131,7 +152,7 @@ describe("Fixed company on authorized ERP records", () => {
           const url = new URL(result.url());
           return url.pathname === reportPath && url.searchParams.get("companyId") === savedCompany.companyId;
         }),
-        fixture.goto("/tools/coa-receivables-aging", locale),
+        openTool("/tools/coa-receivables-aging"),
       ]);
       expect(report.status()).toBe(200);
       await savedSwitcher.waitFor();

@@ -8,7 +8,8 @@ import { CHROME_131_CRAWLER_UA } from "@/leads/growth/chrome-131-crawler";
 import { proxy } from "@/proxy";
 
 import { defaultLocale } from "../../../core/i18n/core/config";
-import { GuestLeadDatabaseDeadlineError } from "../../../identity/lead/database-deadline";
+import { errorResponseSchema } from "../../../core/route/error-response.schema";
+import * as leadDatabase from "../../../identity/lead/database-deadline";
 import * as leadOps from "../../../identity/lead/middleware-ops";
 import { createLeadId } from "../../../identity/middleware/lead-id";
 import * as serverLogger from "../../../logger/server";
@@ -58,6 +59,14 @@ it("limits public fallback to anonymous read-only documents and keeps real DB er
     ["/en-US", "GET", "", "insert", "Query read timeout", 200],
     ["/en-US/", "HEAD", "", "insert", "Query read timeout", 200],
     ["/en-US?ref=fixture", "GET", "", "insert", "Query read timeout", 503],
+    [
+      "/en-US/tools?cat=ai",
+      "GET",
+      `${AUTH_TOKEN_COOKIE_NAME}=session`,
+      "insert",
+      "Query read timeout",
+      503,
+    ],
     [
       "/en-US",
       "GET",
@@ -114,6 +123,10 @@ it("limits public fallback to anonymous read-only documents and keeps real DB er
       ),
     );
     const incoming = request(path, method, cookie);
+    const isToolsPage = path.startsWith("/en-US/tools");
+    if (isToolsPage) {
+      incoming.headers.set("Accept", "text/html");
+    }
     const response = await middleware(incoming, {
       ...options,
       supportedLocales: ["en-US"],
@@ -130,6 +143,26 @@ it("limits public fallback to anonymous read-only documents and keeps real DB er
     expect(response.headers.get("Cache-Control")).toBe(
       status === 200 ? "private, no-store" : "no-store",
     );
+    if (path.startsWith("/api/")) {
+      expect(response.headers.get("Content-Type")).toContain(
+        "application/json",
+      );
+      expect(
+        errorResponseSchema.parse(await response.json()).errorType,
+      ).toEqual({
+        errorKey: "errorTypes.database_error",
+        errorCode: status,
+      });
+    } else if (isToolsPage) {
+      expect(response.headers.get("Content-Type")).toBe(
+        "text/html; charset=utf-8",
+      );
+      expect(response.headers.get("Content-Disposition")).toBeNull();
+      expect(response.headers.get("Location")).toBeNull();
+      const body = await response.text();
+      expect(body).toContain('<a href="">Reload page</a>');
+      expect(body).not.toContain("?cat=ai");
+    }
     expect(report).toHaveBeenLastCalledWith(
       "Anonymous lead creation failed in middleware",
       expect.objectContaining({
@@ -147,7 +180,7 @@ it("limits public fallback to anonymous read-only documents and keeps real DB er
 it("forwards only the proxy's decision and preserves an unverified guest cookie", async () => {
   const report = captureErrors();
   const validate = spyOn(leadOps, "validateLeadIdExists").mockRejectedValue(
-    new GuestLeadDatabaseDeadlineError("lookup", null),
+    new leadDatabase.GuestLeadDatabaseDeadlineError("lookup", null),
   );
   const create = spyOn(leadOps, "createAnonymousLead");
   const cookie = `${LEAD_ID_COOKIE_NAME}=${crypto.randomUUID()}`;
@@ -196,6 +229,29 @@ it("forwards only the proxy's decision and preserves an unverified guest cookie"
   const headers = new Headers(incoming.headers);
   expect(forwardDegradedPublicDocument(headers, normal)).toBe(false);
   expect(headers.has(DEGRADED_PUBLIC_DOCUMENT_HEADER)).toBe(false);
+});
+
+it("shares an ongoing lead lookup only with the same visitor", async () => {
+  const guest = crypto.randomUUID();
+  const anotherGuest = crypto.randomUUID();
+  const firstLookup = Promise.withResolvers<boolean>();
+  const lookup = spyOn(leadDatabase, "withLeadLookupDeadline")
+    .mockReturnValueOnce(firstLookup.promise)
+    .mockResolvedValue(false);
+  const start = performance.now();
+  const first = leadOps.validateLeadIdExists(guest, start + 1000);
+  const second = leadOps.validateLeadIdExists(guest, start + 1200);
+  const other = leadOps.validateLeadIdExists(anotherGuest, start + 1200);
+  expect(lookup).toHaveBeenCalledTimes(2);
+
+  firstLookup.resolve(true);
+  expect(await Promise.all([first, second, other])).toEqual([
+    true,
+    true,
+    false,
+  ]);
+  expect(await leadOps.validateLeadIdExists(guest, start + 1500)).toBe(false);
+  expect(lookup).toHaveBeenCalledTimes(3);
 });
 
 it("bounds a cold geo lookup before the insert starts", async () => {

@@ -1,6 +1,10 @@
 import http from "node:http";
 import { setTimeout } from "node:timers/promises";
 
+import { REQUEST_ID_HEADER_NAME } from "@/env/constants";
+
+import { proxyTimingHeader } from "../core/proxy-timing";
+
 let ready = new AbortController();
 let started: Promise<void> | undefined;
 let probeHealthy = false;
@@ -51,9 +55,14 @@ export async function databaseAdmission(
   return requireReady && !probeHealthy ? AbortSignal.abort() : ready.signal;
 }
 
-export function databaseUnavailable(): Response {
+export function databaseUnavailable(requestId: string): Response {
   return new Response("Database unavailable", {
     status: 503,
-    headers: { "cache-control": "no-store", "retry-after": "1" },
+    headers: {
+      "cache-control": "no-store",
+      "retry-after": "1",
+      [REQUEST_ID_HEADER_NAME]: requestId,
+      "server-timing": proxyTimingHeader("database-unavailable"),
+    },
   });
 }

@@ -87,7 +87,7 @@ function transformDevSsrLocaleSource(source) {
 function transformViteDevSsrLocaleSource(source, id) {
   const path = id.replaceAll("\\", "/").replace(/\?.*$/, "");
   const isLiveScope =
-    /\/src\/(?:_pages\/create|user\/public\/signup|vibe\/agent\/(?:ai-stream\/stream|media-studio\/history|models))\/i18n\/index\.ts$/.test(
+    /\/src\/(?:_pages\/(?:create|story\/(?:business|framework|self-host))|user\/public\/signup|vibe\/(?:help-tool|agent\/(?:ai-stream\/stream|media-studio\/history|models)))\/i18n\/index\.ts$/.test(
       path,
     );
   return isLiveScope ? transformDevSsrLocaleSource(source) : source;

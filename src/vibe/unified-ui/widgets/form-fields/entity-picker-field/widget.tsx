@@ -20,9 +20,10 @@
 "use client";
 
 import { Badge } from "next-vibe/ui/components/badge";
-import { Button } from "next-vibe/ui/components/button";
+import { Button, type ButtonProps } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import {
+  FormControl,
   FormField,
   FormItem,
   FormLabel,
@@ -205,51 +206,61 @@ export function EntityPickerFieldWidget<
     );
   }
 
-  // Web / interactive CLI — always visible (field was empty on first render)
-  const control = isFilled ? (
-    <Div className="flex items-center gap-2 min-w-0">
-      <Div className="flex items-center gap-1.5 min-w-0 flex-1">
-        <Badge
-          variant="secondary"
-          className="bg-primary/8 text-primary border-primary/20 font-medium max-w-[260px] truncate"
-        >
-          {pickedLabel ?? String(currentValue)}
-        </Badge>
-        {pickedLabel && (
-          <Span className="text-xs text-muted-foreground font-mono truncate hidden sm:inline">
-            {/* eslint-disable-next-line i18n/no-literal-string */}
-            {String(currentValue).slice(0, 8)}…
-          </Span>
-        )}
-      </Div>
+  // The visible button is the focus target for form errors in both states.
+  const renderControl = (ref?: ButtonProps["ref"]): JSX.Element => {
+    const button = (
       <Button
+        ref={ref}
+        name={name}
         type="button"
-        variant="ghost"
+        variant={isFilled ? "ghost" : "outline"}
         size="sm"
-        className="text-xs h-7 px-2 shrink-0 text-muted-foreground hover:text-foreground"
+        className={
+          isFilled
+            ? "text-xs h-7 px-2 shrink-0 text-muted-foreground hover:text-foreground"
+            : "w-full justify-start text-muted-foreground hover:text-foreground gap-2"
+        }
         onClick={handleOpen}
       >
-        {widgetT("widgets.formFields.entityPicker.change")}
+        {isFilled ? (
+          widgetT("widgets.formFields.entityPicker.change")
+        ) : (
+          <>
+            {/* eslint-disable-next-line i18n/no-literal-string */}
+            <Span className="text-base leading-none opacity-50">+</Span>
+            {widgetT("widgets.formFields.entityPicker.selectLabel", {
+              label: pickerButtonLabel(resolvedLabel, locale),
+            })}
+          </>
+        )}
       </Button>
-    </Div>
-  ) : (
-    <Button
-      type="button"
-      variant="outline"
-      size="sm"
-      className="w-full justify-start text-muted-foreground hover:text-foreground gap-2"
-      onClick={handleOpen}
-    >
-      {/* eslint-disable-next-line i18n/no-literal-string */}
-      <Span className="text-base leading-none opacity-50">+</Span>
-      {widgetT("widgets.formFields.entityPicker.selectLabel", {
-        label: pickerButtonLabel(resolvedLabel, locale),
-      })}
-    </Button>
-  );
+    );
+    const control = ref ? <FormControl>{button}</FormControl> : button;
+    return isFilled ? (
+      <Div className="flex items-center gap-2 min-w-0">
+        <Div className="flex items-center gap-1.5 min-w-0 flex-1">
+          <Badge
+            variant="secondary"
+            className="bg-primary/8 text-primary border-primary/20 font-medium max-w-[260px] truncate"
+          >
+            {pickedLabel ?? String(currentValue)}
+          </Badge>
+          {pickedLabel && (
+            <Span className="text-xs text-muted-foreground font-mono truncate hidden sm:inline">
+              {/* eslint-disable-next-line i18n/no-literal-string */}
+              {String(currentValue).slice(0, 8)}…
+            </Span>
+          )}
+        </Div>
+        {control}
+      </Div>
+    ) : (
+      control
+    );
+  };
 
   if (!form) {
-    return control;
+    return renderControl();
   }
   const isRequired = !field.schema.isOptional();
 
@@ -259,7 +270,7 @@ export function EntityPickerFieldWidget<
     <FormField
       control={form.control}
       name={name}
-      render={() => (
+      render={({ field: formField }) => (
         <FormItem
           className={cn("flex min-w-0 flex-col gap-2", field.className)}
         >
@@ -279,7 +290,7 @@ export function EntityPickerFieldWidget<
               )}
             </Div>
           )}
-          {control}
+          {renderControl(formField.ref)}
           <FormMessage t={tField} />
         </FormItem>
       )}

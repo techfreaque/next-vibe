@@ -7,11 +7,12 @@ import { parseError } from "../../core/utils/parse-error";
 import { isPrivateAddress } from "../../core/utils/ssrf-guard";
 import { sanitizeTelemetryUrl } from "../../core/utils/telemetry-url";
 import { db } from "../../database";
-import { pool } from "../../database/client";
+import { getGuestLeadPool } from "../../database/client";
 import { databaseFailureDiagnostics } from "../../database/error-diagnostics";
 import { Environment } from "../../env/env-util";
 import type { EndpointLogger } from "../../logger/types";
 import {
+  GuestLeadDatabaseDeadlineError,
   type LeadProvisionStep,
   withLeadDatabaseDeadline,
   withLeadLookupDeadline,
@@ -24,6 +25,11 @@ import {
   ipPoolKey,
 } from "./ip-key";
 import { parseLeadUserAgent } from "./user-agent";
+
+const pendingLeadLookups = new Map<
+  string,
+  { deadlineMs: number; result: Promise<boolean> }
+>();
 
 interface ClientInfo {
   userAgent?: string;
@@ -61,7 +67,41 @@ export async function validateLeadIdExists(
     return !!lead;
   };
   if (deadlineMs !== undefined) {
-    return withLeadLookupDeadline(pool, deadlineMs, lookup);
+    const pending = pendingLeadLookups.get(leadId);
+    const now = performance.now();
+    // Parallel requests from the same visitor can share the in-flight SELECT.
+    // Each caller keeps its own deadline and a settled result is discarded.
+    if (
+      pending &&
+      pending.deadlineMs > now &&
+      pending.deadlineMs <= deadlineMs
+    ) {
+      try {
+        return await pending.result;
+      } catch (error) {
+        if (
+          !(error instanceof GuestLeadDatabaseDeadlineError) ||
+          performance.now() >= deadlineMs
+        ) {
+          return Promise.reject(error);
+        }
+        return validateLeadIdExists(leadId, deadlineMs);
+      }
+    }
+    const result = withLeadLookupDeadline(
+      getGuestLeadPool(),
+      deadlineMs,
+      lookup,
+    );
+    const active = { deadlineMs, result };
+    pendingLeadLookups.set(leadId, active);
+    try {
+      return await result;
+    } finally {
+      if (pendingLeadLookups.get(leadId) === active) {
+        pendingLeadLookups.delete(leadId);
+      }
+    }
   }
   try {
     return await lookup(db);
@@ -79,15 +119,18 @@ export function createAnonymousLead(
   if (deadlineMs === undefined) {
     return provisionAnonymousLead(db, clientInfo, locale, logger, false);
   }
-  return withLeadDatabaseDeadline(pool, deadlineMs, (connection, setStep) =>
-    provisionAnonymousLead(
-      connection,
-      clientInfo,
-      locale,
-      logger,
-      true,
-      setStep,
-    ),
+  return withLeadDatabaseDeadline(
+    getGuestLeadPool(),
+    deadlineMs,
+    (connection, setStep) =>
+      provisionAnonymousLead(
+        connection,
+        clientInfo,
+        locale,
+        logger,
+        true,
+        setStep,
+      ),
   );
 }
 
@@ -226,18 +269,25 @@ async function linkLeadsByIp(
   transactional: boolean,
 ): Promise<void> {
   const startedAt = performance.now();
-  let matches = 0;
-  try {
-    const ipKey = ipPoolKey(ipAddress);
-    if (!ipKey || isServerSideIp(ipAddress)) {
-      return;
-    }
-    const since = new Date(
-      Date.now() - GUEST_IP_POOL_WINDOW_HOURS * 60 * 60 * 1000,
-    );
+  const ipKey = ipPoolKey(ipAddress);
+  if (!ipKey || isServerSideIp(ipAddress)) {
+    return;
+  }
+  const since = new Date(
+    Date.now() - GUEST_IP_POOL_WINDOW_HOURS * 60 * 60 * 1000,
+  );
 
-    const sameIpLeads = await connection
-      .select({ id: leads.id })
+  try {
+    // Select and insert in one statement on the bounded provisioning client.
+    const eligible = connection
+      .select({
+        id: sql<string>`gen_random_uuid()`,
+        leadId1: sql<string>`${newLeadId}::uuid`,
+        leadId2: leads.id,
+        linkReason: sql<"ip_match">`'ip_match'`,
+        linkedAt: sql<Date>`now()`,
+        createdAt: sql<Date>`now()`,
+      })
       .from(leads)
       .where(
         and(
@@ -255,33 +305,23 @@ async function linkLeadsByIp(
       )
       .limit(20);
 
-    matches = sameIpLeads.length;
-    if (matches === 0) {
-      return;
-    }
-
-    await connection
+    const result = await connection
       .insert(leadLeadLinks)
-      .values(
-        sameIpLeads.map((existing) => ({
-          leadId1: newLeadId,
-          leadId2: existing.id,
-          linkReason: "ip_match" as const,
-        })),
-      )
+      .select(eligible.getSQL())
       .onConflictDoNothing();
 
-    logger.debug("Linked new lead to same-IP guest leads", {
-      newLeadId,
-      linkedCount: sameIpLeads.length,
-    });
+    if (result.rowCount !== null && result.rowCount > 0) {
+      logger.debug("Linked new lead to same-IP guest leads", {
+        newLeadId,
+        linkedCount: result.rowCount,
+      });
+    }
   } catch (error) {
     logger.error("Failed to link leads by IP", {
       ...databaseFailureDiagnostics(
         error instanceof Error ? error : parseError(error),
       ),
-      stage: matches ? "insertLinks" : "findGuests",
-      matches,
+      stage: "insert-select-links",
       elapsedMs: Math.round(performance.now() - startedAt),
     });
     if (transactional) {

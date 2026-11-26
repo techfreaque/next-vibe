@@ -15,13 +15,21 @@ import { type NodePgDatabase } from "drizzle-orm/node-postgres";
 import { type PgliteDatabase } from "drizzle-orm/pglite";
 import type { Pool } from "pg";
 
+import { defaultLocale } from "../core/i18n/core/config";
 import { parseError } from "../core/utils/parse-error";
+import { processManagesShutdown } from "../core/utils/process-shutdown";
+import { createLogger } from "../logger/create-logger";
+import { serverFileLog } from "../logger/file";
+import type { LoggerMetadata } from "../logger/types";
 import { resolveEffectiveDatabaseUrl } from "./effective-url";
 import { databaseEnv } from "./env";
+import { PglitePoolClient } from "./pglite-pool-client";
 import {
   APP_POOL_KEY,
   createStandardPool,
+  isTransientConnectError,
   LONG_RUNNING_POOL_MAX,
+  observePgPoolCheckouts,
   processSharedPool,
   ResilientPool,
   resolveConnectRetryOptions,
@@ -62,6 +70,13 @@ const DATABASE_URL = resolveEffectiveDatabaseUrl(
 );
 
 export const isPglite = DATABASE_URL.startsWith("file:");
+
+const pgliteLogger = createLogger(
+  false,
+  defaultLocale,
+  undefined,
+  serverFileLog,
+);
 
 // ─── Path helpers ─────────────────────────────────────────────────────────────
 
@@ -179,35 +194,104 @@ export function createLongRunningPool(): Pool {
   });
 }
 
-function createSocketPool(port: number, resolvedUrl: string): Pool {
+function pgliteConnectionErrorDetails(error: Error): LoggerMetadata {
+  // pg-pool attaches the client to idle errors. Keep that client and its
+  // connection settings out of the archive.
+  return {
+    name: error.name,
+    message: error.message,
+    stack: error.stack,
+    code:
+      "code" in error && typeof error.code === "string"
+        ? error.code
+        : undefined,
+  };
+}
+
+async function recoverPgliteAfterIdleError(
+  port: number,
+  resolvedUrl: string,
+  poolName: "app" | "guest-lead",
+): Promise<void> {
+  try {
+    await ensurePgliteOwner(port, resolvedUrl, "idle-recovery");
+  } catch (error) {
+    pgliteLogger.error(
+      "[pglite] Loopback recovery after idle connection failure failed",
+      pgliteConnectionErrorDetails(parseError(error)),
+      { port, poolName, processId: process.pid },
+    );
+  }
+}
+
+function createSocketPool(
+  port: number,
+  resolvedUrl: string,
+  poolName: "app" | "guest-lead" = "app",
+): Pool {
+  // Database connection errors must reach the dev archive without trying to
+  // persist them through the connection that just failed.
   const socketPool = new ResilientPool(
     {
+      Client: PglitePoolClient,
       host: "127.0.0.1",
       port,
       database: "postgres",
       user: "postgres",
       password: "postgres",
-      max: 10,
+      max: poolName === "guest-lead" ? 2 : 10,
       idleTimeoutMillis: 30_000,
       connectionTimeoutMillis: 30_000,
     },
     resolveConnectRetryOptions({
       retries: 2,
       onRetry: (error, attempt, delayMs) => {
-        process.stderr.write(
-          `[pglite] Connection startup on port ${String(port)} failed. Retrying (attempt ${String(attempt + 1)}, delay ${String(delayMs)}ms): ${error.message}\n`,
+        pgliteLogger.error(
+          "[pglite] Connection checkout failed. Retrying.",
+          pgliteConnectionErrorDetails(error),
+          {
+            port,
+            poolName,
+            processId: process.pid,
+            attempt: attempt + 1,
+            delayMs,
+          },
         );
       },
       // A previous owner can accept TCP and exit before completing the pg
       // handshake. Re-elect on that path too, before spending another attempt.
-      recover: () => ensurePgliteOwner(port, resolvedUrl, false),
+      recover: () =>
+        ensurePgliteOwner(port, resolvedUrl, "connection-recovery"),
     }),
   );
-  socketPool.on("error", (error: Error) => {
-    process.stderr.write(
-      `[pglite] Idle connection on port ${String(port)} failed and was discarded: ${error.message}\n`,
+  socketPool.on("error", (error, client) => {
+    pgliteLogger.error(
+      "[pglite] Idle connection failed and was discarded",
+      pgliteConnectionErrorDetails(error),
+      {
+        port,
+        poolName,
+        processId: process.pid,
+        ownsListener: !!g[PGLITE_GLOBAL_KEY],
+        listenerProcessId:
+          client instanceof PglitePoolClient
+            ? client.loopbackOwnerPid
+            : undefined,
+      },
     );
+    // Let the long-lived dev host start opening the engine during a handoff,
+    // before a guest request has to spend its lookup deadline on recovery.
+    if (
+      processManagesShutdown() &&
+      !socketPool.ending &&
+      !g[PGLITE_GLOBAL_KEY] &&
+      !globalThis.__vibePgliteOwnership &&
+      isTransientConnectError(error)
+    ) {
+      void recoverPgliteAfterIdleError(port, resolvedUrl, poolName);
+    }
   });
+  observePgPoolCheckouts(socketPool);
   return socketPool;
 }
 
@@ -223,7 +307,7 @@ declare global {
 async function ensurePgliteOwner(
   port: number,
   resolvedUrl: string,
-  allowSelfHeal: boolean,
+  reason: "startup" | "connection-recovery" | "idle-recovery",
 ): Promise<void> {
   if (!g[PGLITE_GLOBAL_KEY]) {
     globalThis.__vibePgliteOwnership ??= (async (): Promise<void> => {
@@ -237,7 +321,7 @@ async function ensurePgliteOwner(
       try {
         removeStalePgliteLock(resolvedUrl);
         const dbPath = fileURLToPath(resolvedUrl);
-        if (allowSelfHeal) {
+        if (reason === "startup") {
           fresh = await openPgliteWithSelfHeal(dbPath);
         } else {
           // A dropped connection alone is never a reason to discard data.
@@ -246,6 +330,11 @@ async function ensurePgliteOwner(
         }
         servePgliteOn(claimed, fresh);
         g[PGLITE_GLOBAL_KEY] = fresh;
+        pgliteLogger.info("[pglite] Loopback ownership acquired", {
+          port,
+          processId: process.pid,
+          reason,
+        });
       } catch (error) {
         try {
           await fresh?.close();
@@ -284,6 +373,19 @@ export let pool: Pool | null = isPglite
   ? null
   : processSharedPool(APP_POOL_KEY, createPool);
 
+/** PGlite runs statements serially, but unrelated requests can also exhaust
+ * the app pool before a guest lookup reaches the wire server. Reserve a
+ * small pool of loopback clients for the bounded middleware operations. */
+export function getGuestLeadPool(): Pool | null {
+  if (!isPglite) {
+    return pool;
+  }
+  const resolvedUrl = resolvePgliteUrl(DATABASE_URL);
+  return processSharedPool(`pglite:guest-lead:${resolvedUrl}`, () =>
+    createSocketPool(getPglitePort(resolvedUrl), resolvedUrl, "guest-lead"),
+  );
+}
+
 /**
  * Resolves once PGlite ownership for this process has been decided (owner or
  * client) and, if owner, once the WASM instance has finished loading.
@@ -315,7 +417,7 @@ if (isPglite) {
   // Ensure the state directory exists (heal/reset bookkeeping lives here).
   mkdirSync(socketDir, { recursive: true });
 
-  void ensurePgliteOwner(port, resolvedUrl, true)
+  void ensurePgliteOwner(port, resolvedUrl, "startup")
     .catch((error) => {
       process.stderr.write(
         `[pglite] Database initialization failed on port ${String(port)}: ${parseError(error).message}\n`,
@@ -323,8 +425,10 @@ if (isPglite) {
     })
     .finally(resolvePgliteReady);
 
-  // All processes (owner and clients) use a loopback pool so db/relational stay uniform.
-  pool = createSocketPool(port, resolvedUrl);
+  // Keep warm loopback clients when Nitro evaluates this module again.
+  pool = processSharedPool(`pglite:${resolvedUrl}`, () =>
+    createSocketPool(port, resolvedUrl),
+  );
 }
 
 // ─── No-op shims ──────────────────────────────────────────────────────────────

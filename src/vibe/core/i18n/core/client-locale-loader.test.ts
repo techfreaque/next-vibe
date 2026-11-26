@@ -79,9 +79,13 @@ describe("client-locale-loader", () => {
   });
 
   it.each([
+    ["src/_pages/story/framework/i18n/index.ts", "de"],
+    ["src/_pages/story/self-host/i18n/index.ts", "de"],
     ["src/user/public/signup/i18n/index.ts", "de"],
     ["src/vibe/agent/ai-stream/stream/i18n/index.ts", "de"],
     ["src/vibe/agent/models/i18n/index.ts", "sk"],
+    ["src/vibe/help-tool/i18n/index.ts", "de"],
+    ["src/vibe/help-tool/i18n/index.ts", "sk"],
   ])("keeps SSR up to date with locale edits in %s", (file, language) => {
     const id = resolve(file);
     const source = readFileSync(id, "utf8");

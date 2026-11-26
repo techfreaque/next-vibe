@@ -39,6 +39,7 @@ import { SubmitButtonWidget } from "../../unified-ui/widgets/interactive/submit-
 import { endpoints as cronTaskEndpoints } from "../cron/[id]/definition";
 import { CronTaskStatus } from "../enum";
 import type endpoints from "./definition";
+import { formatExecutionDate } from "./format-execution-date";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -71,13 +72,6 @@ function formatDuration(ms: number | null | undefined): string {
     return `${(ms / 1000).toFixed(1)}s`;
   }
   return `${Math.floor(ms / 60000)}m ${Math.round((ms % 60000) / 1000)}s`;
-}
-
-function formatDate(s: string | null | undefined): string {
-  if (!s) {
-    return "—";
-  }
-  return s.slice(0, 19).replace("T", " ");
 }
 
 // ---------------------------------------------------------------------------
@@ -308,7 +302,7 @@ export function TaskExecuteContainer({ field }: WidgetProps): JSX.Element {
                   {t("post.response.executedAt")}
                 </Div>
                 <Div className="text-sm">
-                  {formatDate(result.executedAt.toISOString())}
+                  {formatExecutionDate(result.executedAt)}
                 </Div>
               </Div>
             )}

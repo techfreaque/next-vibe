@@ -26,6 +26,12 @@ import type { EndpointLogger } from "../../logger/types";
 import { mintRequestId } from "../../logger/with-log-context";
 import { serverSystemEnv } from "../../platforms/web/env";
 import {
+  isToolsDocument,
+  toolsDocumentHeaders,
+  toolsDocumentHtml,
+  toolsDocumentLocale,
+} from "../../platforms/web/middleware/tools-document";
+import {
   proxyTimingHeader,
   readLeadFailureTimingHeader,
   readProxyTimingHeader,
@@ -105,6 +111,24 @@ const NON_PAGE_PATH =
 const ASSET_EXTENSION =
   /\.(?:avif|webp|png|jpe?g|gif|svg|ico|bmp|tiff?|mp[34]|m4[av]|webm|mov|avi|mkv|wav|aac|flac|og[agv]|opus|m3u8|mpd|m4s|ts|vtt|pdf|woff2?|ttf|otf|eot|css|js|map|xml|txt|json|gz|zip|md)$/i;
 
+function hopByHopHeaders(connection: string | null | undefined): Set<string> {
+  return new Set([
+    "connection",
+    "keep-alive",
+    "proxy-authenticate",
+    "proxy-authorization",
+    "proxy-connection",
+    "te",
+    "trailer",
+    "transfer-encoding",
+    "upgrade",
+    ...(connection
+      ?.toLowerCase()
+      .split(",")
+      .map((name) => name.trim()) ?? []),
+  ]);
+}
+
 function isPageRender(req: Request, pathname: string): boolean {
   return (
     (req.method === "GET" || req.method === "HEAD") &&
@@ -138,8 +162,49 @@ export async function handleHttpProxy(
   req: Request,
   ctx: HttpProxyContext,
 ): Promise<Response> {
-  const { nextPort, logger, isShuttingDown } = ctx;
   const url = new URL(req.url);
+  const response = await forwardHttpRequest(req, url, ctx);
+  if (
+    response.status < 500 ||
+    !isToolsDocument(req, url.pathname) ||
+    response.headers.get("content-type")?.toLowerCase().includes("text/html")
+  ) {
+    return response;
+  }
+  const headers = new Headers(toolsDocumentHeaders);
+  for (const name of [REQUEST_ID_HEADER_NAME, "retry-after", "server-timing"]) {
+    const value = response.headers.get(name);
+    if (value) {
+      headers.set(name, value);
+    }
+  }
+  for (const cookie of response.headers.getSetCookie()) {
+    headers.append("set-cookie", cookie);
+  }
+  await response.body?.cancel();
+  return new Response(
+    req.method === "HEAD"
+      ? null
+      : toolsDocumentHtml(toolsDocumentLocale(url.pathname)),
+    {
+      status: response.status,
+      headers,
+    },
+  );
+}
+
+async function forwardHttpRequest(
+  req: Request,
+  url: URL,
+  ctx: HttpProxyContext,
+): Promise<Response> {
+  const { nextPort, logger, isShuttingDown } = ctx;
+  const isApi = url.pathname.startsWith("/api/");
+  const clientRequestId = req.headers.get(REQUEST_ID_HEADER_NAME);
+  const requestId =
+    clientRequestId && /^[A-Za-z0-9_-]{8,64}$/.test(clientRequestId)
+      ? clientRequestId
+      : mintRequestId();
   // The readiness companion uses robots.txt to check the renderer independently.
   const readiness =
     ctx.databaseReadiness ??
@@ -164,26 +229,23 @@ export async function handleHttpProxy(
     );
   }
   if (db?.aborted) {
-    return databaseUnavailable();
+    return databaseUnavailable(requestId);
   }
   if (db && strictProbe) {
     return new Response("ready\n", {
       headers: { "cache-control": "no-store", "x-ha-readiness": "v1-ready" },
     });
   }
-  const clientRequestId = req.headers.get(REQUEST_ID_HEADER_NAME);
-  const requestId =
-    clientRequestId && /^[A-Za-z0-9_-]{8,64}$/.test(clientRequestId)
-      ? clientRequestId
-      : mintRequestId();
-
   const clientIp =
     req.headers.get("x-forwarded-for") ??
     req.headers.get("x-real-ip") ??
     "127.0.0.1";
   const outHeaders: Record<string, string> = {};
+  const requestHopHeaders = hopByHopHeaders(req.headers.get("connection"));
   req.headers.forEach((value, key) => {
-    outHeaders[key] = value;
+    if (!requestHopHeaders.has(key)) {
+      outHeaders[key] = value;
+    }
   });
   outHeaders[REQUEST_ID_HEADER_NAME] = requestId;
   outHeaders["host"] = `127.0.0.1:${String(nextPort)}`;
@@ -200,8 +262,8 @@ export async function handleHttpProxy(
 
   // Only idempotent methods get retry logic. Non-idempotent methods are proxied
   // fire-and-forget (no body buffering, no retry on ECONNREFUSED).
-  const isIdempotent =
-    req.method === "GET" || req.method === "HEAD" || req.method === "OPTIONS";
+  const isRead = req.method === "GET" || req.method === "HEAD";
+  const isIdempotent = isRead || req.method === "OPTIONS";
   const PROXY_RETRY_DELAYS = isIdempotent ? [500, 1000, 2000, 4000, 8000] : [];
 
   let lastProxyError = "Unknown error";
@@ -215,18 +277,41 @@ export async function handleHttpProxy(
     pageDeadline === undefined
       ? Infinity
       : Math.max(0, pageDeadline - performance.now());
-  const upstreamTimeout = (): Response => {
+  const upstreamTimeout = (
+    phase: "retry-budget" | "connect" | "response-headers" = "retry-budget",
+  ): Response => {
     if (!isShuttingDown()) {
+      const now = Date.now();
       logger.error("[Proxy] Upstream request timed out", {
         requestId,
         path: sanitizeRoutePath(url.pathname),
         method: req.method,
-        elapsedMs: Date.now() - proxyStartMs,
+        phase,
+        targetPort: nextPort,
+        elapsedMs: now - proxyStartMs,
+        previousUpstreamResponseAgeMs:
+          lastUpstreamOkAt > 0 ? now - lastUpstreamOkAt : null,
+        inFlightCount: inFlightRequests.size,
       });
     }
     return new Response(req.method === "HEAD" ? null : "Gateway Timeout", {
       status: 504,
-      headers: { "server-timing": proxyTimingHeader("upstream-timeout") },
+      headers: {
+        [REQUEST_ID_HEADER_NAME]: requestId,
+        "server-timing": proxyTimingHeader("upstream-timeout"),
+      },
+    });
+  };
+  const clientClosed = (): Response => {
+    logger.info("[Proxy] Client closed before response headers", {
+      requestId,
+      path: sanitizeRoutePath(url.pathname),
+      method: req.method,
+      elapsedMs: Date.now() - proxyStartMs,
+    });
+    return new Response(null, {
+      status: 499,
+      headers: { [REQUEST_ID_HEADER_NAME]: requestId },
     });
   };
 
@@ -270,13 +355,15 @@ export async function handleHttpProxy(
       });
       return new Response("Request body read failed", { status: 400 });
     }
-    delete outHeaders["transfer-encoding"];
     outHeaders["content-length"] = String(bufferedBody.length);
   }
 
   for (let attempt = 0; attempt <= PROXY_RETRY_DELAYS.length; attempt++) {
+    if (isRead && req.signal.aborted) {
+      return clientClosed();
+    }
     if (db?.aborted) {
-      return databaseUnavailable();
+      return databaseUnavailable(requestId);
     }
     const remainingMs = remainingPageTime();
     if (remainingMs === 0) {
@@ -285,6 +372,7 @@ export async function handleHttpProxy(
     const proxyResult = await new Promise<Response | null>((resolve) => {
       let settled = false;
       let headersReceived = false;
+      let connected = false;
       const inFlight = Symbol();
       inFlightRequests.set(inFlight, {
         method: req.method,
@@ -305,13 +393,14 @@ export async function handleHttpProxy(
           stopTracking();
         }
         db?.removeEventListener("abort", onDatabaseLoss);
+        req.signal.removeEventListener("abort", onClientClose);
         clearTimeout(timeoutHandle);
         // oxlint-disable-next-line promise/no-multiple-resolved -- `settled` guard prevents double-resolve; static analysis can't track it
         resolve(result);
       };
       const timeoutHandle = setTimeout(
         () => {
-          settle(upstreamTimeout());
+          settle(upstreamTimeout(connected ? "response-headers" : "connect"));
           proxyReq.destroy();
         },
         Math.min(Math.ceil(remainingMs), PROXY_REQUEST_TIMEOUT_MS),
@@ -345,7 +434,7 @@ export async function handleHttpProxy(
           const responseContentType = proxyRes.headers["content-type"];
           const unexpectedApiNotFound =
             status === 404 &&
-            url.pathname.startsWith("/api/") &&
+            isApi &&
             req.headers.get("accept")?.includes("application/json") &&
             responseContentType?.includes("text/html");
           if (status >= 500 || unexpectedApiNotFound) {
@@ -386,8 +475,13 @@ export async function handleHttpProxy(
           // Use Headers so Set-Cookie entries are appended individually (joining
           // multiple Set-Cookie with ", " breaks them).
           const resHeaders = new Headers();
+          // Node has already parsed the upstream framing. Bun frames the
+          // outgoing stream using its own connection and protocol.
+          const responseHopHeaders = hopByHopHeaders(
+            proxyRes.headers.connection,
+          );
           for (const [key, value] of Object.entries(proxyRes.headers)) {
-            if (value === undefined) {
+            if (value === undefined || responseHopHeaders.has(key)) {
               continue;
             }
             if (Array.isArray(value)) {
@@ -399,7 +493,13 @@ export async function handleHttpProxy(
             }
           }
           if (
-            url.pathname.startsWith("/_next/static/") &&
+            (isApi || (status >= 500 && isToolsDocument(req, url.pathname))) &&
+            !resHeaders.has(REQUEST_ID_HEADER_NAME)
+          ) {
+            resHeaders.set(REQUEST_ID_HEADER_NAME, requestId);
+          }
+          if (
+            (isApi || url.pathname.startsWith("/_next/static/")) &&
             readProxyTimingHeader(resHeaders.get("server-timing")) === null
           ) {
             resHeaders.append(
@@ -429,24 +529,25 @@ export async function handleHttpProxy(
           let downstreamClosed = false;
           const stream = new ReadableStream({
             start(controller): void {
+              let finished = false;
               proxyRes.on("data", (chunk: Buffer) => {
-                if (downstreamClosed) {
+                if (downstreamClosed || finished) {
                   return;
                 }
                 controller.enqueue(chunk);
               });
               proxyRes.on("end", () => {
-                if (downstreamClosed) {
+                if (downstreamClosed || finished) {
                   return;
                 }
+                finished = true;
                 controller.close();
               });
-              proxyRes.on("error", (err) => {
-                if (downstreamClosed) {
-                  // Our own destroy() after the browser cancelled, not an
-                  // upstream failure.
+              const fail = (err: Error): void => {
+                if (downstreamClosed || finished) {
                   return;
                 }
+                finished = true;
                 // Upstream died mid-body: the browser gets a truncated
                 // response with a 200 status (shows up client-side as a
                 // ChunkLoadError / failed resource with responseStatus 200).
@@ -460,6 +561,12 @@ export async function handleHttpProxy(
                   elapsedMs: Date.now() - proxyStartMs,
                 });
                 controller.error(err);
+              };
+              proxyRes.on("error", fail);
+              proxyRes.on("close", () => {
+                if (!finished && !downstreamClosed) {
+                  fail(new Error("Upstream closed before the response ended"));
+                }
               });
             },
             cancel(reason): void {
@@ -467,7 +574,8 @@ export async function handleHttpProxy(
               stopTracking();
               // The browser went away: stop reading from Next.js.
               logger.debug("[Proxy] Client closed response mid-body", {
-                path: url.pathname,
+                requestId,
+                path: sanitizeRoutePath(url.pathname),
                 method: req.method,
                 status: proxyRes.statusCode,
                 reason: String(reason),
@@ -485,14 +593,27 @@ export async function handleHttpProxy(
           );
         },
       );
+      proxyReq.once("socket", (socket) => {
+        if (socket.connecting) {
+          socket.once("connect", () => {
+            connected = true;
+          });
+        } else {
+          connected = true;
+        }
+      });
 
       function onDatabaseLoss(): void {
-        settle(databaseUnavailable());
+        settle(databaseUnavailable(requestId));
+        proxyReq.destroy();
+      }
+      function onClientClose(): void {
+        settle(clientClosed());
         proxyReq.destroy();
       }
       // Once headers have been delivered, settle() removes this listener.
       // Never interrupt a write whose commit outcome may already be unknown.
-      if (req.method === "GET" || req.method === "HEAD") {
+      if (isRead) {
         db?.addEventListener("abort", onDatabaseLoss, { once: true });
       }
       proxyReq.on("error", (err) => {
@@ -552,6 +673,7 @@ export async function handleHttpProxy(
               status: 503,
               headers: {
                 "retry-after": "5",
+                [REQUEST_ID_HEADER_NAME]: requestId,
                 "server-timing": proxyTimingHeader("upstream-unavailable"),
               },
             }),
@@ -572,11 +694,20 @@ export async function handleHttpProxy(
           new Response("Bad Gateway", {
             status: 502,
             headers: {
+              [REQUEST_ID_HEADER_NAME]: requestId,
               "server-timing": proxyTimingHeader("upstream-unavailable"),
             },
           }),
         );
       });
+
+      if (isRead) {
+        req.signal.addEventListener("abort", onClientClose, { once: true });
+        if (req.signal.aborted) {
+          onClientClose();
+          return;
+        }
+      }
 
       // Send the request body upstream. Multipart and JSON bodies are
       // pre-buffered above to avoid Bun's idle timeout truncating large bodies
@@ -644,6 +775,9 @@ export async function handleHttpProxy(
     });
   }
 
+  if (isRead && req.signal.aborted) {
+    return clientClosed();
+  }
   if (remainingPageTime() === 0) {
     return upstreamTimeout();
   }
@@ -666,6 +800,7 @@ export async function handleHttpProxy(
       "content-type": "text/html; charset=utf-8",
       "retry-after": "15",
       "cache-control": "no-store",
+      [REQUEST_ID_HEADER_NAME]: requestId,
       "server-timing": proxyTimingHeader("upstream-unavailable"),
     },
   });

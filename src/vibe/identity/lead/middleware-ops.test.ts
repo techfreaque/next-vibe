@@ -5,16 +5,16 @@
  * Requires the dev DB, like the other lead/credits repository tests.
  */
 
+import { afterAll, describe, expect, it } from "bun:test";
 import { eq, inArray, or } from "drizzle-orm";
-import { afterAll, describe, expect, it } from "vitest";
 
 import { defaultLocale } from "../../core/i18n/core/config";
 import { db } from "../../database";
 import { createEndpointLogger } from "../../logger/server";
+import { GUEST_LEAD_DB_BUDGET_MS } from "./database-deadline";
 import { leadLeadLinks, leads } from "./db";
 import { LeadSource, LeadStatus } from "./enum";
 import { IP_LINK_EXEMPT_METADATA_KEY, ipPoolKey } from "./ip-key";
-import { GUEST_LEAD_DB_BUDGET_MS } from "./database-deadline";
 import {
   createAnonymousLead,
   isServerSideIp,
@@ -31,7 +31,7 @@ function freshPublicIp(): string {
 
 async function insertGuestLead(
   ip: string,
-  extra: Record<string, boolean>,
+  extra: Record<string, boolean | null>,
 ): Promise<string> {
   const [row] = await db
     .insert(leads)
@@ -111,6 +111,7 @@ describe("linkLeadsByIp", () => {
       [IP_LINK_EXEMPT_METADATA_KEY]: true,
     });
     const guest = await insertGuestLead(ip, {});
+    const legacyGuest = await insertGuestLead(ip, { ipKey: null });
 
     const newcomer = await visit(ip);
     expect(
@@ -125,6 +126,7 @@ describe("linkLeadsByIp", () => {
     const links = await linkedIds(newcomer);
 
     expect(links).toContain(guest);
+    expect(links).toContain(legacyGuest);
     expect(links).not.toContain(probe);
     expect(await linkedIds(probe)).toEqual([]);
   });

@@ -42,6 +42,7 @@ import { ServerFramework } from "../enum";
 import {
   ATLAS_PID_FILE,
   cleanupPidFile,
+  DEV_VITE_SHUTDOWN_GRACE_MS,
   getPidOnPort,
   HERMES_DEV_PID_FILE,
   killPreviousInstance,
@@ -139,6 +140,8 @@ export class DevRepository {
         },
         undefined,
         false,
+        // Leave time for the predecessor to exit after its own shutdown timer.
+        DEV_VITE_SHUTDOWN_GRACE_MS + 1000,
       );
       truncateServerLog();
       truncateClientLogs();
@@ -576,21 +579,40 @@ export class DevRepository {
       const viteClosed = viteClose?.().catch((error) => {
         logger.error("Failed to close the Vite dev server", parseError(error));
       });
+      const pending = new Set<string>();
+      const trackClose = <T>(
+        component: string,
+        closing: Promise<T> | undefined,
+      ): Promise<T> | undefined => {
+        if (closing) {
+          pending.add(component);
+          return closing.finally(() => {
+            pending.delete(component);
+          });
+        }
+        return undefined;
+      };
+      const closed = Promise.allSettled([
+        trackClose("vite", viteClosed),
+        trackClose("next", nextClosed),
+        trackClose("task-runners", runnersStopped),
+      ]);
       const exitTimer = setTimeout(
         () => {
           logger.warn("Development server shutdown exceeded its grace period", {
             activeTasks: UnifiedTaskRunnerRepository.getRunningTasks(),
+            pending: [...pending],
           });
           process.exit(code);
         },
-        nextClosed ? 5000 : 2000,
+        // Nitro may spend up to five seconds waiting for its worker's
+        // shutdown acknowledgement before it starts closing the runner.
+        viteClosed ? DEV_VITE_SHUTDOWN_GRACE_MS : nextClosed ? 5000 : 2000,
       );
-      void Promise.allSettled([viteClosed, nextClosed, runnersStopped]).then(
-        () => {
-          clearTimeout(exitTimer);
-          process.exit(code);
-        },
-      );
+      void closed.then(() => {
+        clearTimeout(exitTimer);
+        process.exit(code);
+      });
     };
 
     // Replace early exit handler with full graceful shutdown handler

@@ -5,11 +5,13 @@
  * http:// even though the TLS edge (Caddy) had sent X-Forwarded-Proto: https.
  */
 
+import { createServer, type Socket } from "node:net";
+
 import { afterAll, beforeAll, describe, expect, it, mock } from "bun:test";
 
 import { defaultLocale } from "../../core/i18n/core/config";
 import { createEndpointLogger } from "../../logger/server";
-import type { LoggerMetadata } from "../../logger/types";
+import type { EndpointLogger } from "../../logger/types";
 import { readProxyTimingHeader } from "../core/proxy-timing";
 import { handleHttpProxy, summarizeInFlightRequests } from "./http-proxy";
 
@@ -28,6 +30,11 @@ beforeAll(() => {
           length: req.headers.get("content-length"),
           bytes: (await req.arrayBuffer()).byteLength,
           requestId: req.headers.get("x-request-id"),
+        });
+      }
+      if (path === "/sk-SK/tools/tax-report") {
+        return Response.json({ message: "internal diagnostic" }, {
+          status: 500, headers: {"Retry-After": "5", "Set-Cookie": "fixture=1", "Content-Disposition": "attachment"},
         });
       }
       if (path === "/api/en-US/failing") {
@@ -53,6 +60,26 @@ beforeAll(() => {
       }
       if (path === "/api/en-US/preflight") {
         return new Response(null, { status: 204 });
+      }
+      if (path === "/api/en-US/streamed-response") {
+        const hop = req.headers.has("x-request-hop");
+        return new Response(
+          new ReadableStream({
+            start(controller): void {
+              const encoder = new TextEncoder();
+              controller.enqueue(encoder.encode('{"requestHopForwarded":'));
+              controller.enqueue(encoder.encode(`${String(hop)}}`));
+              controller.close();
+            },
+          }),
+          {
+            headers: {
+              connection: "close, X-Response-Hop",
+              "content-type": "application/json",
+              "x-response-hop": "upstream-only",
+            },
+          },
+        );
       }
       if (path === "/api/en-US/cached") {
         return new Response(null, {
@@ -96,7 +123,7 @@ it("correlates a startup refusal and its retry outcome", async () => {
   const port = reserved.port ?? 0;
   await reserved.stop(true);
   let recovering: ReturnType<typeof Bun.serve> | undefined;
-  const warn = mock((message: string, ..._metadata: LoggerMetadata[]) => {
+  const warn = mock<EndpointLogger["warn"]>((message): void => {
     if (message === "[Proxy] Server not ready, retrying") {
       recovering ??= Bun.serve({
         hostname: "127.0.0.1",
@@ -105,7 +132,7 @@ it("correlates a startup refusal and its retry outcome", async () => {
       });
     }
   });
-  const info = mock((_message: string, ..._metadata: LoggerMetadata[]) => {});
+  const info = mock<EndpointLogger["info"]>();
   try {
     const response = await handleHttpProxy(
       new Request("http://127.0.0.1:3000/robots.txt"),
@@ -151,7 +178,7 @@ it("identifies Next asset responses while preserving upstream timing", async () 
 });
 
 it("correlates framework API failures and preserves the upstream responses", async () => {
-  const error = mock((_message: string, ..._metadata: LoggerMetadata[]) => {});
+  const error = mock<EndpointLogger["error"]>();
   const headers = {
     accept: "application/json",
     "x-request-id": "fixture-request-error",
@@ -194,7 +221,7 @@ it("correlates framework API failures and preserves the upstream responses", asy
 });
 
 it("forwards bodyless upstream responses", async () => {
-  const context = { nextPort, logger, isShuttingDown: () => false };
+  const context = { nextPort, logger, isShuttingDown: (): boolean => false };
   const preflight = await handleHttpProxy(
     new Request("http://127.0.0.1:3000/api/en-US/preflight", {
       method: "OPTIONS",
@@ -212,12 +239,34 @@ it("forwards bodyless upstream responses", async () => {
   expect(cached.headers.get("etag")).toBe('"fixture"');
 });
 
+it("separates request and response framing and correlates streamed API responses", async () => {
+  const requestId = "4b0c1d7e-8f1a-4c2b-9d3e-5f6a7b8c9d0e";
+  const response = await handleHttpProxy(
+    new Request("http://127.0.0.1:3000/api/en-US/streamed-response", {
+      headers: {
+        connection: "keep-alive, X-Request-Hop",
+        "x-request-hop": "downstream-only",
+        "x-request-id": requestId,
+      },
+    }),
+    { nextPort, logger, isShuttingDown: () => false },
+  );
+  expect(await response.json()).toEqual({ requestHopForwarded: false });
+  expect(response.headers.has("connection")).toBe(false);
+  expect(response.headers.has("transfer-encoding")).toBe(false);
+  expect(response.headers.has("x-response-hop")).toBe(false);
+  expect(response.headers.get("x-request-id")).toBe(requestId);
+  expect(readProxyTimingHeader(response.headers.get("server-timing"))).toBe(
+    "upstream-response",
+  );
+});
+
 it("records a serving upstream's retry interval on a 503", async () => {
-  const error = mock((_message: string, ..._metadata: LoggerMetadata[]) => {});
+  const error = mock<EndpointLogger["error"]>();
   const context = {
     nextPort,
     logger: { ...logger, error },
-    isShuttingDown: () => false,
+    isShuttingDown: (): boolean => false,
   };
   const warm = await handleHttpProxy(
     new Request("http://127.0.0.1:3000/robots.txt"),
@@ -246,7 +295,7 @@ it("identifies and logs a synthetic 503 with the client request id", async () =>
   const socket = Bun.serve({ port: 0, fetch: () => new Response("fixture") });
   const port = socket.port ?? 0;
   await socket.stop(true);
-  const warn = mock((_message: string, ..._metadata: LoggerMetadata[]) => {});
+  const warn = mock<EndpointLogger["warn"]>();
   const response = await handleHttpProxy(
     new Request("http://127.0.0.1:3000/api/en-US/sample", {
       method: "POST",
@@ -309,7 +358,7 @@ it("frames a buffered request using its byte count and forwards a request id", a
 });
 
 it("reports truncated buffered requests before opening the upstream connection", async () => {
-  const error = mock((_message: string, ..._metadata: LoggerMetadata[]) => {});
+  const error = mock<EndpointLogger["error"]>();
   const response = await handleHttpProxy(
     new Request("http://127.0.0.1:3000/api/en-US/upload", {
       method: "POST",
@@ -338,6 +387,7 @@ it("rejects a write before dispatch when the HA database path is down", async ()
     new Request("http://localhost/checkout", {
       method: "POST",
       body: "fixture",
+      headers: { "x-request-id": "fixture-db-admission" },
     }),
     {
       nextPort: 0,
@@ -348,6 +398,10 @@ it("rejects a write before dispatch when the HA database path is down", async ()
   );
   expect(response.status).toBe(503);
   expect(response.headers.get("retry-after")).toBe("1");
+  expect(response.headers.get("x-request-id")).toBe("fixture-db-admission");
+  expect(readProxyTimingHeader(response.headers.get("server-timing"))).toBe(
+    "database-unavailable",
+  );
 });
 
 it("releases a read waiting for headers when HA database readiness fails", async () => {
@@ -363,7 +417,9 @@ it("releases a read waiting for headers when HA database readiness fails", async
   });
   try {
     const response = await handleHttpProxy(
-      new Request("http://localhost/en-US/story"),
+      new Request("http://localhost/en-US/story", {
+        headers: { "x-request-id": "fixture-inflight-db-loss" },
+      }),
       {
         nextPort: slow.port ?? 0,
         logger,
@@ -372,9 +428,55 @@ it("releases a read waiting for headers when HA database readiness fails", async
       },
     );
     expect(response.status).toBe(503);
+    expect(response.headers.get("x-request-id")).toBe("fixture-inflight-db-loss");
+    expect(readProxyTimingHeader(response.headers.get("server-timing"))).toBe(
+      "database-unavailable",
+    );
     expect(await response.text()).toBe("Database unavailable");
   } finally {
     await slow.stop(true);
+  }
+});
+
+it("closes the upstream socket when a client abandons a read before headers", async () => {
+  const received = Promise.withResolvers<void>();
+  const closed = Promise.withResolvers<void>();
+  const server = createServer((socket) => {
+    socket.once("data", () => received.resolve());
+    socket.once("close", () => closed.resolve());
+  });
+  await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
+  const address = server.address();
+  const client = new AbortController();
+  const error = mock<EndpointLogger["error"]>();
+  const info = mock<EndpointLogger["info"]>();
+  try {
+    const pending = handleHttpProxy(
+      new Request("http://localhost/en-US/tools", {
+        signal: client.signal,
+        headers: { "x-request-id": "fixture-abandoned-read" },
+      }),
+      {
+        nextPort: address && typeof address !== "string" ? address.port : 0,
+        databaseReadiness: () =>
+          Promise.resolve(new AbortController().signal),
+        logger: { ...logger, error, info },
+        isShuttingDown: () => false,
+      },
+    );
+    await received.promise;
+    client.abort();
+    const response = await pending;
+    expect(response.status).toBe(499);
+    await closed.promise;
+    expect(summarizeInFlightRequests()).not.toContain("GET /en-US/tools");
+    expect(error).not.toHaveBeenCalled();
+    expect(info).toHaveBeenCalledWith(
+      "[Proxy] Client closed before response headers",
+      expect.objectContaining({ requestId: "fixture-abandoned-read" }),
+    );
+  } finally {
+    server.close();
   }
 });
 
@@ -391,18 +493,20 @@ it("returns 504 for page headers and gives assets, traffic streams, and writes m
       return new Response("upstream");
     },
   });
-  const error = mock((_message: string, ..._metadata: LoggerMetadata[]) => {});
+  const error = mock<EndpointLogger["error"]>();
   const ctx = {
     nextPort: slow.port ?? 0,
     pageRenderTimeoutMs: 100,
     databaseReadiness: (): Promise<AbortSignal> =>
       Promise.resolve(new AbortController().signal),
     logger: { ...logger, error },
-    isShuttingDown: () => false,
+    isShuttingDown: (): boolean => false,
   };
   try {
     const page = handleHttpProxy(
-      new Request("http://localhost/en-US/user/reset-password/fixture-token?secret=fixture"),
+      new Request(
+        "http://localhost/en-US/user/reset-password/fixture-token?secret=fixture",
+      ),
       ctx,
     );
     const head = handleHttpProxy(
@@ -427,7 +531,9 @@ it("returns 504 for page headers and gives assets, traffic streams, and writes m
     ].map((request) => handleHttpProxy(request, ctx));
 
     await Promise.race([pageReceived.promise, page]);
-    expect(summarizeInFlightRequests()).toContain("GET /en-US/user/reset-password/:token");
+    expect(summarizeInFlightRequests()).toContain(
+      "GET /en-US/user/reset-password/:token",
+    );
     expect(summarizeInFlightRequests()).not.toContain("fixture-token");
     const response = await page;
     expect(response.status).toBe(504);
@@ -444,7 +550,17 @@ it("returns 504 for page headers and gives assets, traffic streams, and writes m
       bypasses.map(() => "upstream"),
     );
     expect(error).toHaveBeenCalledTimes(2);
-    expect(summarizeInFlightRequests()).not.toContain("/en-US/user/reset-password/");
+    expect(error).toHaveBeenCalledWith(
+      "[Proxy] Upstream request timed out",
+      expect.objectContaining({
+        path: "/en-US/user/reset-password/:token",
+        phase: "response-headers",
+        targetPort: ctx.nextPort,
+      }),
+    );
+    expect(summarizeInFlightRequests()).not.toContain(
+      "/en-US/user/reset-password/",
+    );
   } finally {
     await slow.stop(true);
   }
@@ -454,12 +570,15 @@ it("counts reconnect backoff against the page deadline", async () => {
   const reserved = Bun.serve({ port: 0, fetch: () => new Response("fixture") });
   const port = reserved.port ?? 0;
   await reserved.stop(true);
-  const response = await handleHttpProxy(new Request("http://localhost/en-US"), {
-    nextPort: port,
-    pageRenderTimeoutMs: 100,
-    logger,
-    isShuttingDown: () => false,
-  });
+  const response = await handleHttpProxy(
+    new Request("http://localhost/en-US"),
+    {
+      nextPort: port,
+      pageRenderTimeoutMs: 100,
+      logger,
+      isShuttingDown: () => false,
+    },
+  );
   expect(response.status).toBe(504);
 });
 
@@ -469,27 +588,72 @@ it("lets an open page response continue streaming past the header deadline", asy
     hostname: "127.0.0.1",
     port: 0,
     fetch: () =>
-      new Response(new ReadableStream({
-        async start(controller) {
-          controller.enqueue(encoder.encode("first "));
-          await Bun.sleep(225);
-          controller.enqueue(encoder.encode("last"));
-          controller.close();
-        },
-      })),
+      new Response(
+        new ReadableStream({
+          async start(controller): Promise<void> {
+            controller.enqueue(encoder.encode("first "));
+            await Bun.sleep(225);
+            controller.enqueue(encoder.encode("last"));
+            controller.close();
+          },
+        }),
+      ),
   });
   try {
-    const response = await handleHttpProxy(new Request("http://localhost/en-US/story"), {
-      nextPort: streaming.port ?? 0,
-      pageRenderTimeoutMs: 100,
-      logger,
-      isShuttingDown: () => false,
-    });
+    const response = await handleHttpProxy(
+      new Request("http://localhost/en-US/story"),
+      {
+        nextPort: streaming.port ?? 0,
+        pageRenderTimeoutMs: 100,
+        logger,
+        isShuttingDown: () => false,
+      },
+    );
     expect(response.status).toBe(200);
     expect(summarizeInFlightRequests()).toContain("GET /en-US/story");
     expect(await response.text()).toBe("first last");
   } finally {
     await streaming.stop(true);
+  }
+});
+
+it("reports an incomplete upstream response body once with its request ID", async () => {
+  const upstreamSocket = Promise.withResolvers<Socket>();
+  const server = createServer((socket) => {
+    upstreamSocket.resolve(socket);
+    socket.once("data", () => {
+      socket.write(
+        "HTTP/1.1 200 OK\r\nContent-Length: 9\r\nConnection: close\r\n\r\nstart",
+      );
+    });
+  });
+  await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
+  const address = server.address();
+  const error = mock<EndpointLogger["error"]>();
+  try {
+    const response = await handleHttpProxy(
+      new Request("http://localhost/api/en-US/partial-response", {
+        headers: { "x-request-id": "fixture-partial-response" },
+      }),
+      {
+        nextPort: address && typeof address !== "string" ? address.port : 0,
+        logger: { ...logger, error },
+        isShuttingDown: () => false,
+      },
+    );
+    expect(response.status).toBe(200);
+    (await upstreamSocket.promise).end();
+    await expect(response.text()).rejects.toThrow();
+    expect(error).toHaveBeenCalledTimes(1);
+    expect(error).toHaveBeenCalledWith(
+      "[Proxy] Upstream response failed mid-body",
+      expect.objectContaining({
+        requestId: "fixture-partial-response",
+        status: 200,
+      }),
+    );
+  } finally {
+    server.close();
   }
 });
 
@@ -499,19 +663,60 @@ it("reports renderer health on both readiness paths", async () => {
   const ctx = {
     nextPort,
     logger,
-    databaseReadiness: () => Promise.resolve(db.signal),
-    isRendererReady: () => ready,
-    isShuttingDown: () => false,
+    databaseReadiness: (): Promise<AbortSignal> => Promise.resolve(db.signal),
+    isRendererReady: (): boolean => ready,
+    isShuttingDown: (): boolean => false,
   };
   for (const path of ["/robots.txt", "/_ha/ready"]) {
     const req = new Request(`http://localhost${path}`);
     ready = false;
     const unavailable = await handleHttpProxy(req, ctx);
     expect(unavailable.status).toBe(503);
-    expect(unavailable.headers.get("x-ha-readiness")).toBe("v1-renderer-unavailable");
+    expect(unavailable.headers.get("x-ha-readiness")).toBe(
+      "v1-renderer-unavailable",
+    );
     ready = true;
     const restored = await handleHttpProxy(req, ctx);
     expect(restored.status).toBe(200);
     await restored.text();
   }
+});
+
+it("returns localized HTML for failed admin document navigation and preserves API and data reads", async () => {
+  const origin = "http://127.0.0.1:3000";
+  const ctx = {nextPort, logger, isShuttingDown: () => false};
+  for (const method of ["GET", "HEAD"]) {
+    const response = await handleHttpProxy(new Request(origin + "/sk-SK/tools/tax-report", {
+      method, headers: { accept: "text/html" },
+    }), ctx);
+    expect(response.status).toBe(500);
+    expect(response.headers.get("Content-Type")).toContain("text/html");
+    expect(response.headers.get("Content-Disposition")).toBeNull();
+    expect(response.headers.get("Cache-Control")).toBe("no-store");
+    expect(response.headers.get("Retry-After")).toBe("5");
+    expect(response.headers.getSetCookie()).toEqual(["fixture=1"]);
+    const body = await response.text();
+    if (method === "HEAD") {
+      expect(body).toBe("");
+    } else {
+      expect(body).toContain('lang="sk"');
+      expect(body).toContain("Znova načítať stránku");
+      expect(body).not.toContain("internal diagnostic");
+    }
+  }
+  for (const [path, accept] of [["/sk-SK/tools/tax-report","application/json"],["/api/en-US/failing","text/html"]]) {
+    const response = await handleHttpProxy(new Request(origin + path, { headers: { accept } }), ctx);
+    expect(response.status).toBe(500);
+    expect(response.headers.get("Content-Type")).toContain("application/json");
+  }
+});
+
+it("provides the same admin recovery page when proxy admission fails before reaching the renderer", async () => {
+  const response = await handleHttpProxy(new Request("http://localhost/de-DE/tools", {headers: {accept: "text/html"}}), {
+    nextPort, logger, isShuttingDown: () => false, databaseReadiness: () => Promise.resolve(AbortSignal.abort()),
+  });
+  expect(response.status).toBe(503);
+  expect(response.headers.get("retry-after")).toBe("1");
+  expect(response.headers.get("content-type")).toContain("text/html");
+  expect(await response.text()).toContain('lang="de"');
 });

@@ -1,6 +1,7 @@
 "use client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import { Button } from "next-vibe/ui/components/button";
 import {
   Dialog,
   DialogContent,
@@ -14,15 +15,16 @@ import {
   DrawerDescription,
   DrawerTitle,
 } from "next-vibe/ui/components/drawer";
+import { Span } from "next-vibe/ui/components/span";
 import type { JSX } from "react";
 import { useState } from "react";
 
 import { scopedTranslation } from "./i18n";
 import { getLocaleModel } from "./model";
 import { LocalePickerPanel } from "./panel";
-import { flagTrigger, PickerSurface, useIsPhone } from "./shell";
+import { PickerSurface } from "./shell";
+import { useIsPhone } from "./use-is-phone";
 
-export { getLocaleLabel } from "./model";
 export { LocalePickerPanel } from "./panel";
 
 interface LocalePickerProps {
@@ -38,6 +40,10 @@ export function LocalePicker({ locale, user }: LocalePickerProps): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
   const { currentLanguage, currentRegion } = getLocaleModel(locale);
   const [open, setOpen] = useState(false);
+  const triggerLabel = t("trigger", {
+    language: currentLanguage.nativeName,
+    region: currentRegion.name,
+  });
   return (
     <PickerSurface
       open={open}
@@ -46,13 +52,19 @@ export function LocalePicker({ locale, user }: LocalePickerProps): JSX.Element {
       description={t("description")}
       desktopClassName="w-[600px] h-[min(70vh,520px)]"
       phoneClassName="h-[88dvh]"
-      trigger={flagTrigger({
-        flag: currentRegion.flag,
-        label: t("trigger", {
-          language: currentLanguage.nativeName,
-          region: currentRegion.name,
-        }),
-      })}
+      trigger={
+        <Button
+          variant="ghost"
+          size="unset"
+          className="flex h-10 w-10 items-center justify-center"
+          aria-label={triggerLabel}
+          title={triggerLabel}
+        >
+          <Span className="my-auto flex items-center justify-center text-lg">
+            {currentRegion.flag}
+          </Span>
+        </Button>
+      }
     >
       <LocalePickerPanel
         locale={locale}

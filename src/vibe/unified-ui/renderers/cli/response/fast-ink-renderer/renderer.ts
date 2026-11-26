@@ -1322,18 +1322,25 @@ function renderWithReconciler(
   const MAX_RENDER_ERRORS = 8;
   let errorCount = 0;
   let tripped = false;
+  let reportingRenderError = false;
 
   class RenderCircuitBreakerError extends Error {}
 
   const recordError = (label: string, err: Error): void => {
     errorCount += 1;
     // Only log the first handful; the rest are the same cascade repeating.
-    if (errorCount <= 3) {
-      logger.error(`[Fast Renderer] ${label}:`, parseError(err));
-    } else if (errorCount === 4) {
-      logger.error(
-        `[Fast Renderer] Suppressing further render errors (widget render is looping; likely a web-only widget on the CLI platform).`,
-      );
+    reportingRenderError = true;
+    try {
+      if (errorCount <= 3) {
+        logger.error(`[Fast Renderer] ${label}:`, parseError(err));
+      } else if (errorCount === 4) {
+        logger.error(
+          "[Fast Renderer] Repeated render errors. The renderer will abort if the errors continue.",
+          parseError(err),
+        );
+      }
+    } finally {
+      reportingRenderError = false;
     }
     if (errorCount >= MAX_RENDER_ERRORS && !tripped) {
       tripped = true;
@@ -1390,7 +1397,19 @@ function renderWithReconciler(
   type ConsoleArgs = Parameters<typeof console.error>;
   const guardConsole = (original: (...a: ConsoleArgs) => void) => {
     return (...a: ConsoleArgs): void => {
-      recordError("Render error (console)", new Error(String(a[0] ?? "")));
+      // The endpoint logger writes to console too. Only count messages
+      // originating outside the renderer's own error reporting.
+      if (reportingRenderError) {
+        original(...a);
+        return;
+      }
+      const cause = a.find(
+        (argument): argument is Error => argument instanceof Error,
+      );
+      recordError(
+        "Render error (console)",
+        cause ?? new Error(String(a[0] ?? "")),
+      );
       if (errorCount <= 3) {
         original(...a);
       }

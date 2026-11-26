@@ -25,6 +25,7 @@ export function databaseFailureDiagnostics(error: Error): {
     "canceling statement due to lock timeout",
     "Query read timeout",
     "timeout exceeded when trying to connect",
+    "Connection terminated",
     "Connection terminated unexpectedly",
     "Connection terminated due to connection timeout",
   ].find((message) => message === driver.message);

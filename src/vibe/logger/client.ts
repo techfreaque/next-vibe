@@ -4,14 +4,15 @@
  * Import this in all client code: "use client" components, client hooks, etc.
  */
 
+import type { ModuleNamespace, ViteHotContext } from "vite/types/hot.d.ts";
+import { z } from "zod";
+
 import { type CountryLanguage, defaultLocale } from "../core/i18n/core/config";
 import { UserPermissionRole } from "../identity/roles/enum";
 import { getClientReportContext } from "./client-context";
 import { createLogger } from "./create-logger";
-import {
-  CLIENT_LOG_FINGERPRINT_IGNORE_KEYS,
-  CLIENT_LOG_OCCURRENCES_KEY,
-} from "./error-monitor/client-log/constants";
+import { CLIENT_LOG_OCCURRENCES_KEY } from "./error-monitor/client-log/constants";
+import { CLIENT_LOG_FINGERPRINT_IGNORE_KEYS } from "./error-monitor/client-log/fingerprint-keys";
 import { serializeLogValue } from "./serialize";
 import { sanitizeLogString, sanitizeLogText } from "./telemetry-privacy";
 import type { EndpointLogger, LoggerMetadata } from "./types";
@@ -84,11 +85,69 @@ interface DedupEntry {
   repeats: number;
 }
 
-const dedupEntries = new Map<string, DedupEntry>();
-let sendsThisMinute = 0;
-let minuteTimerArmed = false;
-let suppressedCount = 0;
-const suppressedSamples: string[] = [];
+interface ClientReportState {
+  dedupEntries: Map<string, DedupEntry>;
+  sendsThisMinute: number;
+  minuteTimerArmed: boolean;
+  suppressedCount: number;
+  suppressedSamples: string[];
+  lastLocale: CountryLanguage;
+  create: typeof createClientLoggerImpl;
+  report: typeof reportToServer;
+}
+
+const browserHot:
+  | (Partial<Pick<ViteHotContext, "invalidate">> & {
+      readonly data: { clientReportState?: ClientReportState };
+    })
+  | undefined = typeof window === "undefined" ? undefined : import.meta.hot;
+const hotData = browserHot?.data;
+const reportState: ClientReportState = hotData?.clientReportState ?? {
+  dedupEntries: new Map(),
+  sendsThisMinute: 0,
+  minuteTimerArmed: false,
+  suppressedCount: 0,
+  suppressedSamples: [],
+  lastLocale: defaultLocale,
+  create: createClientLoggerImpl,
+  report: reportToServer,
+};
+if (hotData) {
+  // Existing loggers and pending timers share this state with the new module.
+  hotData.clientReportState = reportState;
+  reportState.create = createClientLoggerImpl;
+  reportState.report = reportToServer;
+}
+let fingerprintIgnoreKeys = CLIENT_LOG_FINGERPRINT_IGNORE_KEYS;
+
+if (browserHot && import.meta.hot) {
+  import.meta.hot.accept((updated: ModuleNamespace | undefined) => {
+    if (updated && typeof updated.createClientLogger !== "function") {
+      browserHot.invalidate?.(
+        "Client logger no longer exports createClientLogger",
+      );
+    }
+  });
+  const fingerprintKeysModuleSchema = z.object({
+    CLIENT_LOG_FINGERPRINT_IGNORE_KEYS: z.set(z.string()),
+  });
+  import.meta.hot.accept(
+    "./error-monitor/client-log/fingerprint-keys",
+    (updated: ModuleNamespace | undefined) => {
+      if (!updated) {
+        return;
+      }
+      const policy = fingerprintKeysModuleSchema.safeParse(updated);
+      if (!policy.success) {
+        browserHot.invalidate?.(
+          "Client logger fingerprint keys have an incompatible export",
+        );
+        return;
+      }
+      fingerprintIgnoreKeys = policy.data.CLIENT_LOG_FINGERPRINT_IGNORE_KEYS;
+    },
+  );
+}
 
 /**
  * setTimeout that never keeps a process alive: the CLI/MCP renderers reuse
@@ -117,7 +176,7 @@ function buildFingerprint(
   const stable = metadata.map((m) => {
     const out: ReportMeta = {};
     for (const [k, v] of Object.entries(m)) {
-      if (!CLIENT_LOG_FINGERPRINT_IGNORE_KEYS.has(k)) {
+      if (!fingerprintIgnoreKeys.has(k)) {
         out[k] = v;
       }
     }
@@ -131,35 +190,33 @@ function buildFingerprint(
 }
 
 function armMinuteTimer(): void {
-  if (minuteTimerArmed) {
+  if (reportState.minuteTimerArmed) {
     return;
   }
-  minuteTimerArmed = true;
+  reportState.minuteTimerArmed = true;
   schedule(() => {
-    minuteTimerArmed = false;
-    sendsThisMinute = 0;
-    if (suppressedCount > 0) {
+    reportState.minuteTimerArmed = false;
+    reportState.sendsThisMinute = 0;
+    if (reportState.suppressedCount > 0) {
       const summary: ReportPayload = {
         level: "warn",
         message: "Client error reports rate-limited",
         metadata: [
           {
-            suppressedCount,
+            suppressedCount: reportState.suppressedCount,
             maxPerMinute: MAX_SENDS_PER_MINUTE,
-            samples: suppressedSamples.join(" | ").slice(0, 2000),
+            samples: reportState.suppressedSamples.join(" | ").slice(0, 2000),
           },
           getClientReportContext(),
         ],
-        locale: lastLocale,
+        locale: reportState.lastLocale,
       };
-      suppressedCount = 0;
-      suppressedSamples.length = 0;
+      reportState.suppressedCount = 0;
+      reportState.suppressedSamples.length = 0;
       transmit(summary);
     }
   }, 60_000);
 }
-
-let lastLocale: CountryLanguage = defaultLocale;
 
 function transmit(payload: ReportPayload): void {
   // Use the typed executeMutation transport - handles CSRF, auth, and response parsing.
@@ -198,26 +255,26 @@ function transmit(payload: ReportPayload): void {
 }
 
 function send(payload: ReportPayload): void {
-  if (sendsThisMinute >= MAX_SENDS_PER_MINUTE) {
-    suppressedCount++;
-    if (suppressedSamples.length < SUPPRESSED_SAMPLE_LIMIT) {
-      suppressedSamples.push(payload.message.slice(0, 150));
+  if (reportState.sendsThisMinute >= MAX_SENDS_PER_MINUTE) {
+    reportState.suppressedCount++;
+    if (reportState.suppressedSamples.length < SUPPRESSED_SAMPLE_LIMIT) {
+      reportState.suppressedSamples.push(payload.message.slice(0, 150));
     }
     armMinuteTimer();
     return;
   }
-  sendsThisMinute++;
+  reportState.sendsThisMinute++;
   armMinuteTimer();
   transmit(payload);
 }
 
 function flushDedupEntry(fingerprint: string): void {
-  const entry = dedupEntries.get(fingerprint);
+  const entry = reportState.dedupEntries.get(fingerprint);
   if (!entry) {
     return;
   }
   if (entry.repeats === 0) {
-    dedupEntries.delete(fingerprint);
+    reportState.dedupEntries.delete(fingerprint);
     return;
   }
   const repeats = entry.repeats;
@@ -244,7 +301,7 @@ function reportToServer(
   locale: CountryLanguage,
   tabId: string | undefined,
 ): void {
-  lastLocale = locale;
+  reportState.lastLocale = locale;
   const safeMessage = sanitizeLogText(message);
   const allMeta = error !== undefined ? [error, ...metadata] : metadata;
   const normalizedMeta = allMeta.map((m) =>
@@ -272,7 +329,7 @@ function reportToServer(
     .map(sanitizeMetadata);
 
   const fingerprint = buildFingerprint(level, safeMessage, metaPayload);
-  const existing = dedupEntries.get(fingerprint);
+  const existing = reportState.dedupEntries.get(fingerprint);
   if (existing) {
     existing.repeats++;
     return;
@@ -291,13 +348,13 @@ function reportToServer(
     metadata: metaPayload,
     locale,
   };
-  dedupEntries.set(fingerprint, { payload, repeats: 0 });
+  reportState.dedupEntries.set(fingerprint, { payload, repeats: 0 });
   schedule(() => flushDedupEntry(fingerprint), DEDUP_WINDOW_MS);
   send(payload);
 }
 
-export function createClientLogger(
-  debugEnabled = false,
+function createClientLoggerImpl(
+  debugEnabled: boolean,
   locale: CountryLanguage,
   tabId?: string,
 ): EndpointLogger {
@@ -305,7 +362,15 @@ export function createClientLogger(
     debugEnabled,
     locale,
     (level, message, error, metadata) => {
-      reportToServer(level, message, error, metadata, locale, tabId);
+      reportState.report(level, message, error, metadata, locale, tabId);
     },
   );
+}
+
+export function createClientLogger(
+  debugEnabled = false,
+  locale: CountryLanguage,
+  tabId?: string,
+): EndpointLogger {
+  return reportState.create(debugEnabled, locale, tabId);
 }

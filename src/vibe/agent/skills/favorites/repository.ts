@@ -319,7 +319,7 @@ export class ChatFavoritesRepository {
     );
 
     // Use slug as the external ID (fall back to UUID for backcompat)
-    return ChatFavoritesRepositoryClient.computeFavoriteDisplayFields(
+    const card = ChatFavoritesRepositoryClient.computeFavoriteDisplayFields(
       {
         id: favorite.slug || favorite.id,
         skillId: formatSkillId(canonicalSkillId, favorite.variantId ?? null),
@@ -351,6 +351,7 @@ export class ChatFavoritesRepository {
       availability,
       variantName,
     );
+    return { ...card, rowId: favorite.id };
   }
 
   /**

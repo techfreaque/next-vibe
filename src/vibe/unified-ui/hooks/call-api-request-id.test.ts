@@ -5,8 +5,17 @@
  * on every persisted row without splitting the error_logs fingerprint.
  */
 
-import { afterAll, beforeAll, describe, expect, it, mock, spyOn } from "bun:test";
 import { hostname } from "node:os";
+
+import {
+  afterAll,
+  beforeAll,
+  describe,
+  expect,
+  it,
+  mock,
+  spyOn,
+} from "bun:test";
 
 import ledgerDefinition from "@/chart-of-accounts/ledger/[accountId]/definition";
 import creditsDefinition from "@/credits/definition";
@@ -113,14 +122,18 @@ describe("request id propagation", () => {
         }
         return Promise.resolve(
           new Response(
-            JSON.stringify(malformedError ? { message: "HTTPError" } : {
-              success: false,
-              message: "boom",
-              errorType: {
-                errorKey: "errorTypes.internal_error",
-                errorCode: 500,
-              },
-            }),
+            JSON.stringify(
+              malformedError
+                ? { message: "HTTPError" }
+                : {
+                    success: false,
+                    message: "boom",
+                    errorType: {
+                      errorKey: "errorTypes.internal_error",
+                      errorCode: 500,
+                    },
+                  },
+            ),
             { status: 500, headers: { "content-type": "application/json" } },
           ),
         );
@@ -152,7 +165,13 @@ describe("request id propagation", () => {
       );
       expect(result.success).toBe(false);
       expect(result.errorType?.errorKey).toBe("errorTypes.http_error");
-      expect(rows.some((row) => row.level === "error" && row.message.startsWith("Endpoint call failed"))).toBe(true);
+      expect(
+        rows.some(
+          (row) =>
+            row.level === "error" &&
+            row.message.startsWith("Endpoint call failed"),
+        ),
+      ).toBe(true);
     } finally {
       malformedError = false;
     }
@@ -275,6 +294,60 @@ describe("request id propagation", () => {
         }),
       );
 
+      const beforeInterruptedBody = sentHeaders.length;
+      queuedResponses.push(
+        new Response(
+          new ReadableStream({
+            start(controller): void {
+              controller.error(new TypeError("Failed to fetch"));
+            },
+          }),
+          {
+            headers: {
+              "content-type": "application/json",
+              [REQUEST_ID_HEADER_NAME]: "4b0c1d7e-8f1a-4c2b-9d3e-5f6a7b8c9d0e",
+            },
+          },
+        ),
+        Response.json(
+          {
+            success: false,
+            message: "Missing credits",
+            errorType: { errorKey: "errorTypes.not_found", errorCode: 404 },
+          },
+          { status: 404 },
+        ),
+      );
+      const bodyResult = await callApi<CreateApiEndpointAny>(
+        creditsDefinition.GET,
+        recordingLogger(rows),
+        {
+          isPublic: true,
+          leadId: "00000000-0000-4000-8000-000000000002",
+          roles: [],
+        },
+        "en-GLOBAL",
+        undefined,
+        undefined,
+      );
+      expect(bodyResult.success).toBe(false);
+      expect(bodyResult.errorType?.errorKey).toBe("errorTypes.not_found");
+      expect(sentHeaders.length - beforeInterruptedBody).toBe(2);
+      expect(rows).toContainEqual(
+        expect.objectContaining({
+          level: "error",
+          message: "Endpoint call failed: credits/GET",
+          metadata: expect.arrayContaining([
+            expect.objectContaining({
+              failurePhase: "response-body",
+              status: 200,
+              responseReceived: true,
+              responseRequestId: "4b0c1d7e-8f1a-4c2b-9d3e-5f6a7b8c9d0e",
+            }),
+          ]),
+        }),
+      );
+
       // A different GET receives a framework page instead of an endpoint
       // response. Retry that read once and return the real endpoint's result.
       const beforeLedger = sentHeaders.length;
@@ -308,7 +381,9 @@ describe("request id propagation", () => {
       expect(ledgerResult.success).toBe(false);
       expect(ledgerResult.errorType?.errorKey).toBe("errorTypes.not_found");
       expect(sentHeaders.length - beforeLedger).toBe(2);
-      expect(rows.some((row) => row.message === "callApi: non-JSON response")).toBe(true);
+      expect(
+        rows.some((row) => row.message === "callApi: non-JSON response"),
+      ).toBe(true);
     } finally {
       clock.mockRestore();
       fetchFailures = 0;

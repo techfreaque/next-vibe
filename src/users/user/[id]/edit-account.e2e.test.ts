@@ -17,6 +17,11 @@ import {
 import { scopedTranslation as profileTranslation } from "../../view/i18n";
 import { scopedTranslation } from "./i18n";
 
+type AccountSnapshot = Pick<
+  typeof users.$inferSelect,
+  "id" | "privateName" | "publicName" | "email" | "isActive" | "emailVerified"
+>;
+
 describe("Edit a customer account", () => {
   const e2e = useE2E("users/edit-account");
   for (const locale of ["en-US", "de-DE", "sk-SK"] as const) {
@@ -25,7 +30,7 @@ describe("Edit a customer account", () => {
       const name = "Avery Martin";
       const amended = "Avery Santos";
       const email = fixture.uniqueEmail("edit-account");
-      const findAccount = () => db.select({
+      const findAccount = async (): Promise<AccountSnapshot[]> => db.select({
         id: users.id,
         privateName: users.privateName,
         publicName: users.publicName,
@@ -40,10 +45,14 @@ describe("Edit a customer account", () => {
       });
       const created = await createTestUser(email, name);
       expect(created.success).toBe(true);
-      if (!created.success) return;
+      if (!created.success) {
+        return;
+      }
       const [original] = await findAccount();
       expect(original).toBeDefined();
-      if (!original) return;
+      if (!original) {
+        return;
+      }
       const admin = await resolveTestAdminUser();
       expect(original.id).not.toBe(admin.id);
       const auth = await authAtlas(fixture, admin);
@@ -59,7 +68,9 @@ describe("Edit a customer account", () => {
         });
       let writes = 0;
       await page.route(url => url.origin === new URL(baseUrl).origin && url.pathname === path, async route => {
-        if (route.request().method() === "PUT") writes++;
+        if (route.request().method() === "PUT") {
+          writes++;
+        }
         await route.continue({headers:{...route.request().headers(),authorization:auth.authorization}});
       });
       const { t } = scopedTranslation.scopedT(locale);
@@ -86,7 +97,8 @@ describe("Edit a customer account", () => {
           expect(await originalEmail.textContent()).toBe(email);
           expect(await originalEmail.evaluate(element =>
             element.scrollWidth <= element.clientWidth + 1 &&
-            element.getBoundingClientRect().right <= window.innerWidth)).toBe(true);
+            element.getBoundingClientRect().right <=
+              element.ownerDocument.documentElement.clientWidth)).toBe(true);
           await page.getByText(t("id.put.sections.basicInfo.title"),{exact:true}).filter({visible:true}).waitFor();
         });
       }
@@ -99,7 +111,12 @@ describe("Edit a customer account", () => {
       expect(await reply.json()).toMatchObject({success:true,data:{privateName:amended,email}});
       expect(writes).toBe(1);
       expect(await findAccount()).toEqual([{...original,privateName:amended}]);
-      await fixture.goto(`/tools/user-view?arg.id=${original.id}`,locale);
+      // The save refreshes the record before its success action is rendered.
+      await page.getByRole("button", { name: t("id.get.titleShort"), exact: true }).click();
+      await page.waitForURL((url) =>
+        url.pathname === `/${locale}/tools/user-view` &&
+        url.searchParams.get("arg.id") === original.id,
+      );
       await page.getByRole("heading",{name:amended,exact:true}).first().waitFor();
       await page.getByRole("button",{name:t("id.put.titleShort"),exact:true}).click();
       await field.waitFor();
@@ -107,8 +124,9 @@ describe("Edit a customer account", () => {
       expect(writes).toBe(1);
 
       await page.setViewportSize({width:390,height:844});
-      const statusOfTarget = () => db.select({banned:users.isBanned,reason:users.bannedReason})
-        .from(users).where(eq(users.id,original.id));
+      const statusOfTarget = async (): Promise<{ banned: boolean; reason: string | null }[]> =>
+        db.select({banned:users.isBanned,reason:users.bannedReason})
+          .from(users).where(eq(users.id,original.id));
       for (const suspend of [true,false]) {
         await fixture.goto(`/tools/users-view?arg.userId=${original.id}`, locale);
         await page.getByRole("heading",{name:amended,exact:true}).first().waitFor();

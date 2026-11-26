@@ -228,8 +228,9 @@ export class PublicFeedRepository {
         )
         .where(listCondition)
         .orderBy(
+          // A synced thread can have a later timestamp than this instance's clock.
           sortMode === FeedSortMode.HOT
-            ? sql`(coalesce(${statsSubquery.totalUpvotes}, 0) - coalesce(${statsSubquery.totalDownvotes}, 0)) / power(extract(epoch from (now() - ${chatThreads.createdAt})) / 3600 + 2, 1.5) desc`
+            ? sql`(coalesce(${statsSubquery.totalUpvotes}, 0) - coalesce(${statsSubquery.totalDownvotes}, 0)) / power(greatest(extract(epoch from (now() - ${chatThreads.createdAt})) / 3600, 0) + 2, 1.5) desc`
             : desc(chatThreads.createdAt),
         )
         .limit(limit)

@@ -61,6 +61,7 @@ const { GET } = createEndpoint({
 
   fields: customWidgetObject({
     render: RemoteConnectionByIdWidget,
+    noFormElement: true,
     usage: { response: true, request: "urlPathParams" } as const,
     children: {
       backButton: backButton(scopedTranslation, {

@@ -34,10 +34,8 @@ import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage"
 import type { JSX } from "react";
 import { useCallback, useState, useSyncExternalStore } from "react";
 
-import {
-  getLocaleLabel,
-  LocalePickerDialog,
-} from "@/_pages/_components/locale-picker";
+import { LocalePickerDialog } from "@/_pages/_components/locale-picker";
+import { getLocaleLabel } from "@/_pages/_components/locale-picker/model";
 import { Logo } from "@/_pages/_components/logo";
 import { ThemeToggleDropdown } from "@/_pages/_components/theme-toggle";
 

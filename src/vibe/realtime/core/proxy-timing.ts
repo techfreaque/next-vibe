@@ -22,6 +22,7 @@ export function readLeadFailureTimingHeader(
 }
 
 export type ProxyTimingStage =
+  | "database-unavailable"
   | "upstream-response"
   | "upstream-timeout"
   | "upstream-unavailable";
@@ -33,7 +34,8 @@ export function proxyTimingHeader(stage: ProxyTimingStage): string {
 export function readProxyTimingStage(
   value: string | undefined,
 ): ProxyTimingStage | null {
-  return value === "upstream-response" ||
+  return value === "database-unavailable" ||
+    value === "upstream-response" ||
     value === "upstream-timeout" ||
     value === "upstream-unavailable"
     ? value

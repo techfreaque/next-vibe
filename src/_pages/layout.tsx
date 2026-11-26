@@ -35,12 +35,9 @@ import { sessionNoticeRecipient } from "@/user/public/verify-email/session-notic
 import { buildSiteStructuredData } from "./_components/structured-data";
 import { scopedTranslation } from "./layout-i18n";
 import { RootProviders } from "./layout-shared";
+import { rootViewport } from "./layout-viewport";
 
-export const viewport: Viewport = {
-  themeColor: "#0EA5E9",
-  width: "device-width",
-  initialScale: 1,
-};
+export const viewport: Viewport = rootViewport;
 
 interface RootLayoutMetaProps {
   params: Promise<{ locale: CountryLanguage }>;

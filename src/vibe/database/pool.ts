@@ -25,7 +25,7 @@ import {
  *  - idle_in_transaction_session_timeout frees locks held by vanished clients.
  *  - maxLifetimeSeconds recycles old sockets (proxied over WireGuard on HA S2)
  *    before they can go stale.
- *  - a NEW connection that fails with a transient network error
+ *  - a checkout that fails with a transient network error
  *    (ECONNREFUSED while a link or proxy comes back, reset, unreachable, the
  *    server still starting) is retried a few times with backoff. Only the
  *    connect phase: no query has been sent yet, so a retry can never run a
@@ -103,7 +103,7 @@ const TRANSIENT_CONNECT_CODES: ReadonlySet<string> = new Set([
 ]);
 
 /**
- * True when a failed NEW connection is worth another try. Never true for the
+ * True when a failed checkout is worth another try. Never true for the
  * pool's own "timeout exceeded when trying to connect": that already spent
  * the whole connectionTimeoutMillis budget (or waited for a busy pool slot).
  */
@@ -184,19 +184,44 @@ type PoolConnectCallback = Parameters<Pool["connect"]>[0];
  */
 export class ResilientPool extends Pool {
   private readonly connectRetry: ConnectRetryOptions;
+  private readonly connectionErrors = new WeakMap<PoolClient, Error>();
 
   constructor(config: PoolConfig, connectRetry: ConnectRetryOptions) {
     super(config);
     this.connectRetry = connectRetry;
+    this.on("connect", (client) => {
+      // pg-pool removes its idle error listener at checkout, before the
+      // query or transaction takes ownership of the client.
+      client.on("error", (error: Error) => {
+        this.connectionErrors.set(client, error);
+      });
+    });
   }
 
   override connect(): Promise<PoolClient>;
   override connect(callback: PoolConnectCallback): void;
   override connect(callback?: PoolConnectCallback): Promise<PoolClient> | void {
-    const connected = retryTransientConnect(
-      () => super.connect(),
-      this.connectRetry,
-    );
+    const connected = retryTransientConnect(async () => {
+      const client = await super.connect();
+      const { stream } = client.connection;
+      const connectionError =
+        this.connectionErrors.get(client) ?? stream.errored;
+      if (
+        !connectionError &&
+        !stream.destroyed &&
+        !stream.readableEnded &&
+        !stream.writableEnded
+      ) {
+        return client;
+      }
+      const error =
+        connectionError ??
+        Object.assign(new Error("Database socket closed during checkout"), {
+          code: "08003",
+        });
+      client.release(error);
+      return Promise.reject(error);
+    }, this.connectRetry);
     if (!callback) {
       return connected;
     }
@@ -273,10 +298,6 @@ export function guardPool(p: Pool): Pool {
 
 /**
  * Real-Postgres pools additionally:
- * - give every client a permanent no-op 'error' listener: a checked-out client
- *   has no pool listener, so a socket death mid-checkout would otherwise crash
- *   the process (the dead client is not queryable, so the pool drops it on
- *   release);
  * - end clients released with a hung query (client read timeout inside a
  *   transaction, where drizzle releases without an error) before the pool
  *   decides: `end()` marks them ending synchronously, so the pool removes them
@@ -284,19 +305,25 @@ export function guardPool(p: Pool): Pool {
  */
 function guardStandardPool(p: Pool): Pool {
   guardPool(p);
+  observePgPoolCheckouts(p, true);
+  return p;
+}
+
+/** Track owners of pooled sockets for checkout-timeout diagnostics. */
+export function observePgPoolCheckouts(
+  p: Pool,
+  discardActiveOnRelease = false,
+): void {
   globalThis.__vibePgCheckouts ??= new WeakMap();
   const checkouts = new Map<PoolClient, number>();
   globalThis.__vibePgCheckouts.set(p, checkouts);
-  p.on("connect", (client) => {
-    client.on("error", () => undefined);
-  });
   p.on("acquire", (client) => {
     checkouts.set(client, performance.now());
     observePgResultDecoding(client);
   });
   p.on("release", (err, client) => {
     checkouts.delete(client);
-    if (!err && getActivePgQuery(client)) {
+    if (discardActiveOnRelease && !err && getActivePgQuery(client)) {
       // Callback form: end() never rejects into an unhandled promise here.
       client.end(() => undefined);
     }
@@ -304,7 +331,6 @@ function guardStandardPool(p: Pool): Pool {
   p.on("remove", (client) => {
     checkouts.delete(client);
   });
-  return p;
 }
 
 /** Oldest checked-out clients at a timeout, with no SQL text or parameters. */

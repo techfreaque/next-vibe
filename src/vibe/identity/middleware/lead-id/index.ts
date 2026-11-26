@@ -25,9 +25,13 @@ import { matchesChrome131CrawlerHeaders } from "@/leads/growth/chrome-131-crawle
 import { coreEnv } from "../../../core/env";
 import type { CountryLanguage } from "../../../core/i18n/core/config";
 import { getLanguageAndCountryFromLocale } from "../../../core/i18n/core/language-utils";
+import { scopedTranslation as sharedTranslation } from "../../../core/i18n/shared";
+import { ErrorResponseTypes, fail } from "../../../core/route/response.schema";
 import { parseError } from "../../../core/utils/parse-error";
 import { db } from "../../../database";
+import { isPglite, pool } from "../../../database/client";
 import { databaseFailureDiagnostics } from "../../../database/error-diagnostics";
+import { describePgPoolCheckouts } from "../../../database/pool";
 import { Environment } from "../../../env/env-util";
 import { sanitizeRoutePath } from "../../../logger/client-context";
 import { createEndpointLogger } from "../../../logger/server";
@@ -37,6 +41,11 @@ import {
   canRenderWithoutLead,
   markDegradedPublicDocument,
 } from "../../../platforms/web/middleware/public-document";
+import {
+  isToolsDocument,
+  toolsDocumentHeaders,
+  toolsDocumentHtml,
+} from "../../../platforms/web/middleware/tools-document";
 import { shouldSkipPath } from "../../../platforms/web/middleware/utils";
 import { leadFailureTimingHeader } from "../../../realtime/core/proxy-timing";
 import {
@@ -208,6 +217,7 @@ export function leadFailureResponse(
   logger: EndpointLogger,
   error: Error,
   deadlineMs: number,
+  locale: CountryLanguage,
   operation: "create" | "lookup",
   creationStage?: LeadCreationStage,
 ): NextResponse {
@@ -240,6 +250,12 @@ export function leadFailureResponse(
       poolTotal: databaseDeadline?.poolTotal,
       poolIdle: databaseDeadline?.poolIdle,
       poolWaiting: databaseDeadline?.poolWaiting,
+      leadCheckoutWaiting: databaseDeadline?.leadCheckoutWaiting,
+      oldestPoolCheckouts: databaseDeadline?.oldestPoolCheckouts,
+      oldestAppPoolCheckouts:
+        databaseDeadline && isPglite && pool
+          ? describePgPoolCheckouts(pool)
+          : undefined,
       method: request.method,
       path: sanitizeRoutePath(request.nextUrl.pathname),
       status,
@@ -249,16 +265,36 @@ export function leadFailureResponse(
   if (renderPublic) {
     return leadlessPublicDocument();
   }
+  const responseInit = {
+    status,
+    headers: {
+      "Cache-Control": "no-store",
+      "Server-Timing": leadFailureTimingHeader(creationStage ?? "lookup"),
+      ...(status === 503 ? { "Retry-After": "5" } : {}),
+    },
+  };
+  if (request.nextUrl.pathname.startsWith("/api/")) {
+    const { t } = sharedTranslation.scopedT(locale);
+    return NextResponseClass.json(
+      fail({
+        message: t("errorTypes.database_error"),
+        errorType: { ...ErrorResponseTypes.DATABASE_ERROR, errorCode: status },
+      }),
+      responseInit,
+    );
+  }
+  if (isToolsDocument(request, request.nextUrl.pathname)) {
+    return new NextResponseClass(
+      request.method === "HEAD" ? null : toolsDocumentHtml(locale),
+      {
+        ...responseInit,
+        headers: { ...responseInit.headers, ...toolsDocumentHeaders },
+      },
+    );
+  }
   return new NextResponseClass(
     status === 503 ? "Service Unavailable" : "Internal Server Error",
-    {
-      status,
-      headers: {
-        "Cache-Control": "no-store",
-        "Server-Timing": leadFailureTimingHeader(creationStage ?? "lookup"),
-        ...(status === 503 ? { "Retry-After": "5" } : {}),
-      },
-    },
+    responseInit,
   );
 }
 
@@ -346,6 +382,7 @@ export async function createLeadId(
       logger,
       error instanceof Error ? error : parseError(error),
       deadlineMs,
+      locale,
       "create",
       stage,
     );
@@ -357,6 +394,7 @@ export async function createLeadId(
       logger,
       new Error("Guest provisioning returned no identity"),
       deadlineMs,
+      locale,
       "create",
       stage,
     );

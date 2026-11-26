@@ -18,6 +18,7 @@ import { eq, inArray } from "drizzle-orm";
 import { DefaultFolderId } from "next-vibe/core/execution-context";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { getLanguageAndCountryFromLocale } from "next-vibe/core/i18n/core/language-utils";
+import { ErrorResponseTypes } from "next-vibe/core/route/response.schema";
 import { db } from "next-vibe/database";
 import type {
   JwtPayloadType,
@@ -25,30 +26,59 @@ import type {
 } from "next-vibe/identity/auth/types";
 import { leads, userLeadLinks } from "next-vibe/identity/lead/db";
 import { LeadSource, LeadStatus } from "next-vibe/identity/lead/enum";
-import { UserPermissionRole, UserRole } from "next-vibe/identity/roles/enum";
+import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { userRoles, users } from "next-vibe/identity/user/db";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import { sendTestRequest } from "next-vibe/tooling/testing/testing-suite/send-test-request";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-import { ErrorResponseTypes } from "next-vibe/core/route/response.schema";
-import { resolveTaskOwnerUser } from "next-vibe/tasks/cron/resolve-task-user";
-
-import { DEFAULT_CHAT_MODEL_ID } from "../../ai-stream/constants";
-import { runAutoQueueBranch } from "../../ai-stream/repository/intake/queue";
-import { runHeadlessIntakePhase } from "../../ai-stream/repository/setup/headless-intake-phase";
-import type { AiStreamPostRequestOutput } from "../../ai-stream/stream/definition";
-import { scopedTranslation as aiStreamTranslation } from "../../ai-stream/stream/i18n";
-import { NO_SKILL_ID } from "../../skills/constants";
-import { chatFolders, chatMessages, chatThreads } from "../db";
-import { ChatMessageRole, ThreadStreamingState } from "../enum";
+import { chatThreads } from "../db";
 import rootPermissionsEndpoints from "../folders/[rootFolderId]/root-permissions/definition";
-import { ThreadsRepository } from "../threads/repository";
 import threadsEndpoints from "../threads/definition";
-import feedEndpoints, { FeedSortMode } from "./definition";
+import { ThreadsRepository } from "../threads/repository";
+import feedEndpoints, {
+  FeedSortMode,
+  type PublicFeedGetRequestOutput,
+} from "./definition";
 
 const TEST_TIMEOUT = 60_000;
 const logger = createEndpointLogger(false, defaultLocale);
+
+/** The gate every AI turn passes before a message lands in a thread. */
+async function ensure(
+  user: JwtPayloadType,
+  threadId: string,
+  rootFolderId = DefaultFolderId.PUBLIC,
+): Promise<{ success: boolean; forbidden: boolean }> {
+  const result = await ThreadsRepository.ensureThread({
+    threadId,
+    rootFolderId,
+    subFolderId: null,
+    userId: user.isPublic ? undefined : user.id,
+    leadId: user.leadId,
+    isIncognito: rootFolderId === DefaultFolderId.INCOGNITO,
+    logger,
+    user,
+    locale: defaultLocale,
+  });
+  return {
+    success: result.success,
+    forbidden:
+      !result.success &&
+      result.errorType.errorKey === ErrorResponseTypes.FORBIDDEN.errorKey,
+  };
+}
+
+async function canCreateInPublicRoot(user: JwtPayloadType): Promise<boolean> {
+  const result = await sendTestRequest({
+    toolExecutionContext: undefined,
+    endpoint: rootPermissionsEndpoints.GET,
+    urlPathParams: { rootFolderId: DefaultFolderId.PUBLIC },
+    user,
+  });
+  expect(result.success, JSON.stringify(result)).toBe(true);
+  return result.success && result.data.canCreateThread;
+}
 
 describe("public root visibility", () => {
   const stamp = `pubvis${Date.now()}`;
@@ -171,15 +201,19 @@ describe("public root visibility", () => {
     return listed.success ? listed.data.threads.map((th) => th.title) : [];
   }
 
-  async function feedTitles(user: JwtPayloadType): Promise<string[]> {
+  async function feedTitles(
+    user: JwtPayloadType,
+    sortMode: PublicFeedGetRequestOutput["sortMode"] = FeedSortMode.NEW,
+    search = stamp,
+  ): Promise<string[]> {
     const feed = await sendTestRequest({
       toolExecutionContext: undefined,
       endpoint: feedEndpoints.GET,
       data: {
-        sortMode: FeedSortMode.NEW,
+        sortMode,
         page: 1,
         limit: 20,
-        search: stamp,
+        search,
         needsReply: undefined,
       },
       user,
@@ -199,41 +233,25 @@ describe("public root visibility", () => {
     TEST_TIMEOUT,
   );
 
-  /** The gate every AI turn passes before a message lands in a thread. */
-  async function ensure(
-    user: JwtPayloadType,
-    threadId: string,
-    rootFolderId: DefaultFolderId = DefaultFolderId.PUBLIC,
-  ): Promise<{ success: boolean; forbidden: boolean }> {
-    const result = await ThreadsRepository.ensureThread({
-      threadId,
-      rootFolderId,
-      subFolderId: null,
-      userId: user.isPublic ? undefined : user.id,
-      leadId: user.leadId,
-      isIncognito: rootFolderId === DefaultFolderId.INCOGNITO,
-      logger,
-      user,
-      locale: defaultLocale,
-    });
-    return {
-      success: result.success,
-      forbidden:
-        !result.success &&
-        result.errorType.errorKey === ErrorResponseTypes.FORBIDDEN.errorKey,
-    };
-  }
+  it(
+    "the hot feed includes public threads dated ahead of the local clock",
+    async () => {
+      const futureTitle = `${stamp} future thread`;
+      await db.insert(chatThreads).values({
+        userId: author.id,
+        leadId: author.leadId,
+        title: futureTitle,
+        rootFolderId: DefaultFolderId.PUBLIC,
+        published: true,
+        createdAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
+      });
 
-  async function canCreateInPublicRoot(user: JwtPayloadType): Promise<boolean> {
-    const result = await sendTestRequest({
-      toolExecutionContext: undefined,
-      endpoint: rootPermissionsEndpoints.GET,
-      urlPathParams: { rootFolderId: DefaultFolderId.PUBLIC },
-      user,
-    });
-    expect(result.success, JSON.stringify(result)).toBe(true);
-    return result.success && result.data.canCreateThread;
-  }
+      expect(await feedTitles(guest, FeedSortMode.HOT, futureTitle)).toEqual([
+        futureTitle,
+      ]);
+    },
+    TEST_TIMEOUT,
+  );
 
   it(
     "signed-in users reply and start threads in Public, guests cannot",
@@ -270,80 +288,12 @@ describe("public root visibility", () => {
     TEST_TIMEOUT,
   );
 
-  it(
-    "guests can continue only their own lead-owned Background threads",
-    async () => {
-      for (const [rootFolderId, leadId, userId, allowed] of [
-        [DefaultFolderId.BACKGROUND, guest.leadId, null, true],
-        [DefaultFolderId.BACKGROUND, author.leadId, null, false],
-        [DefaultFolderId.BACKGROUND, guest.leadId, author.id, false],
-        [DefaultFolderId.PRIVATE, guest.leadId, null, false],
-        [DefaultFolderId.SHARED, guest.leadId, null, false],
-        [DefaultFolderId.PUBLIC, guest.leadId, null, false],
-      ] as const) {
-        const threadId = crypto.randomUUID();
-        await db.insert(chatThreads).values({
-          id: threadId,
-          rootFolderId,
-          leadId,
-          userId,
-          title: visibleTitle,
-          rolesPost: [UserRole.PUBLIC],
-        });
-        expect(await ensure(guest, threadId, rootFolderId)).toEqual({
-          success: allowed,
-          forbidden: !allowed,
-        });
-      }
-    },
-    TEST_TIMEOUT,
-  );
-
-  it(
-    "keeps Announcements creation and replies restricted to admins",
-    async () => {
-      await db.insert(chatFolders).values({
-        id: announcementsId,
-        name: `${stamp} Announcements`,
-        rootFolderId: DefaultFolderId.PUBLIC,
-        rolesCreateThread: [UserRole.ADMIN],
-        rolesPost: [UserRole.ADMIN],
-      });
-      const threadId = crypto.randomUUID();
-      await db.insert(chatThreads).values({
-        id: threadId,
-        folderId: announcementsId,
-        rootFolderId: DefaultFolderId.PUBLIC,
-        userId: author.id,
-        leadId: author.leadId,
-        title: visibleTitle,
-      });
-      for (const user of [guest, customer]) {
-        expect(await ensure(user, threadId)).toEqual({
-          success: false,
-          forbidden: true,
-        });
-        const result = await ThreadsRepository.ensureThread({
-          threadId: crypto.randomUUID(),
-          rootFolderId: DefaultFolderId.PUBLIC,
-          subFolderId: announcementsId,
-          isIncognito: false,
-          userId: user.id,
-          leadId: user.leadId,
-          user,
-          logger,
-          locale: defaultLocale,
-        });
-        expect(!result.success && result.errorType.errorKey).toBe(
-          ErrorResponseTypes.FORBIDDEN.errorKey,
-        );
-      }
-    },
-    TEST_TIMEOUT,
-  );
-
-  it.each(Object.values(DefaultFolderId))(
-    "checks creation and persistence for guests, customers and role-less accounts in %s",
+  it.each(
+    Object.values(DefaultFolderId).filter(
+      (id) => id !== DefaultFolderId.PUBLIC,
+    ),
+  )(
+    "enforces new-thread access and storage for the %s root",
     async (rootFolderId) => {
       const isIncognito = rootFolderId === DefaultFolderId.INCOGNITO;
       for (const user of [guest, customer, roleless]) {

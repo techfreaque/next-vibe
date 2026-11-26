@@ -1,6 +1,6 @@
 "use client";
 
-import { useTranslation } from "next-vibe/core/i18n/core/client";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { Div } from "next-vibe/ui/components/div";
 import { ArrowLeft } from "next-vibe/ui/components/icons/ArrowLeft";
 import { Link } from "next-vibe/ui/components/link";
@@ -14,8 +14,13 @@ import { scopedTranslation } from "@/_pages/user/(auth)/i18n";
  * Focused auth shell: back link, centred logo, one card, quiet legal footer.
  * The pages render only their card.
  */
-export function AuthShell({ children }: { children?: ReactNode }): JSX.Element {
-  const { locale } = useTranslation();
+export function AuthShell({
+  children,
+  locale,
+}: {
+  children?: ReactNode;
+  locale: CountryLanguage;
+}): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
   const legalLinks = [
     { href: `/${locale}/story/terms-of-service`, label: t("terms") },

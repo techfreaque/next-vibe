@@ -62,7 +62,7 @@ export function toNextParams<
 }
 
 /**
- * Run a generated page/layout loader with partial-namespace retry.
+ * Retry transient Vite SSR partial-module evaluation.
  *
  * Loader server-fns dynamic-import their page module, which can race the
  * routeTree's own static evaluation of the same module during cold boot.
@@ -70,18 +70,23 @@ export function toNextParams<
  * initialized namespace; calling tanstackLoader from it then throws
  * "Cannot access '__vite_ssr_import_N__' before initialization" — which
  * rendered as a completely silent 500 on the first request of a cold page.
- * Retrying re-imports the module; once the graph finishes evaluating, the
- * namespace is complete and the loader succeeds. Dev-only failure mode —
- * production bundles have no module runner — so the retry never fires there.
+ * The tools loader can also observe a missing AuthRepository binding while
+ * that module is evaluating. In both cases, retrying re-imports the module.
  */
-export async function runPageLoader<T>(run: () => Promise<T>): Promise<T> {
+async function retryViteModuleRace<T>(run: () => Promise<T>): Promise<T> {
   for (let attempt = 0; ; attempt++) {
     try {
       return await run();
     } catch (error) {
       const isPartialModule =
-        error instanceof ReferenceError &&
-        error.message.includes("__vite_ssr_import_");
+        (error instanceof ReferenceError &&
+          /Cannot access '__vite_ssr_import_\d+__' before initialization/.test(
+            error.message,
+          )) ||
+        (error instanceof TypeError &&
+          /^undefined is not an object \(evaluating '(?:__vite_ssr_import_\d+__\.)?AuthRepository\.getAuthMinimalUser'\)$/.test(
+            error.message,
+          ));
       if (!isPartialModule || attempt >= 20) {
         // oxlint-disable-next-line restricted/restricted-syntax -- loader errors must propagate to the router's error handling
         throw error;
@@ -92,6 +97,8 @@ export async function runPageLoader<T>(run: () => Promise<T>): Promise<T> {
     }
   }
 }
+
+export const runPageLoader = retryViteModuleRace;
 
 // ---------------------------------------------------------------------------
 // API route wrapper
@@ -120,7 +127,9 @@ export function wrapNextApiRoute(
   const handlers: TanstackHandlers = {};
   for (const method of methods) {
     handlers[method] = async (ctx: TanstackHandlerCtx): Promise<Response> => {
-      const mod = await importFn();
+      // Module initialization can race HMR. Only retry the import, since
+      // dispatching the handler a second time could repeat a committed write.
+      const mod = await retryViteModuleRace(importFn);
       const handler = mod[method];
       if (!handler) {
         return new Response("Method Not Allowed", { status: 405 });

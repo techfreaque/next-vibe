@@ -245,6 +245,7 @@ export async function middleware(
       createEndpointLogger(false, locale),
       error,
       deadlineMs,
+      locale,
       "lookup",
     );
     addCorsHeaders(request, response, path);

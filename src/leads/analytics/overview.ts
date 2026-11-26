@@ -72,9 +72,9 @@ export async function getAcquisitionHeadline(win: AnalyticsWindow): Promise<{
   const leadCreated = sql`l.created_at`;
   const userCreated = sql`u.created_at`;
   const eventDate = sql`at`;
-  // Every linked account is counted once, using the lead facts' journey-first
-  // resolution and upper lead date bound. The unlinked branch is the same
-  // fallback used by the unsegmented acquisition report.
+  // Resolve raw and eligible account links together. Rechecking converted
+  // leads for each user can repeatedly scan the leads table while PGlite's
+  // single execution queue is also serving guest identity lookups.
   const { rows } = await db.execute<
     QueryResultRow & {
       key: "humanLeads" | "signups";
@@ -83,30 +83,34 @@ export async function getAcquisitionHeadline(win: AnalyticsWindow): Promise<{
       previous: number;
     }
   >(sql`
-    WITH events AS (
+    WITH signup_users AS MATERIALIZED (
+      SELECT u.id, u.created_at
+      FROM users u
+      WHERE (${inWindowSql(userCreated, win)}) OR (${inPreviousWindowSql(userCreated, win)})
+    ), signup_links AS (
+      SELECT user_id, bool_or(eligible) AS eligible
+      FROM (
+        SELECT j.user_id, l.created_at < ${utcSql(win.to)} AS eligible
+        FROM signup_users u
+        JOIN growth_journeys j ON j.user_id = u.id
+        LEFT JOIN leads l ON l.id = j.lead_id
+        UNION ALL
+        SELECT l.converted_user_id,
+          j.user_id IS NULL AND l.created_at < ${utcSql(win.to)}
+        FROM signup_users u
+        JOIN leads l ON l.converted_user_id = u.id
+        LEFT JOIN growth_journeys j ON j.lead_id = l.id
+      ) AS links
+      GROUP BY user_id
+    ), events AS (
       SELECT 'humanLeads'::text AS key, created_at AS at
       FROM (${humanLeadCreationsSql(sql`
         (${inWindowSql(leadCreated, win)}) OR (${inPreviousWindowSql(leadCreated, win)})
       `)}) human_leads
       UNION ALL
       SELECT 'signups', u.created_at
-      FROM users u
-      WHERE ((${inWindowSql(userCreated, win)}) OR (${inPreviousWindowSql(userCreated, win)}))
-        AND (
-          EXISTS (
-            SELECT 1 FROM growth_journeys j JOIN leads l ON l.id = j.lead_id
-            WHERE j.user_id = u.id AND l.created_at < ${utcSql(win.to)}
-          )
-          OR EXISTS (
-            SELECT 1 FROM leads l LEFT JOIN growth_journeys j ON j.lead_id = l.id
-            WHERE l.converted_user_id = u.id AND l.created_at < ${utcSql(win.to)}
-              AND (j.user_id IS NULL OR j.user_id = u.id)
-          )
-          OR (
-            NOT EXISTS (SELECT 1 FROM growth_journeys j WHERE j.user_id = u.id)
-            AND NOT EXISTS (SELECT 1 FROM leads l WHERE l.converted_user_id = u.id)
-          )
-        )
+      FROM signup_users u LEFT JOIN signup_links s ON s.user_id = u.id
+      WHERE s.user_id IS NULL OR s.eligible
     )
     SELECT key, ${bucketSql(eventDate, win.bucket)} AS bucket,
       count(*) FILTER (WHERE ${inWindowSql(eventDate, win)})::int AS current,

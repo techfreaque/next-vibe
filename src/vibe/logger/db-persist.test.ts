@@ -9,7 +9,7 @@ import { beforeAll, describe, expect, it, mock } from "bun:test";
 import {
   CLIENT_LOG_FINGERPRINT_IGNORE_KEYS,
   FOREIGN_SOURCE_FINGERPRINT_IGNORE_KEYS,
-} from "./error-monitor/client-log/constants";
+} from "./error-monitor/client-log/fingerprint-keys";
 import type { LoggerMetadata } from "./types";
 
 interface UpsertedRow {

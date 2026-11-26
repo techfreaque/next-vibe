@@ -708,8 +708,22 @@ export async function listMonitors(
       }
     }
   } catch (error) {
+    const cause = parseError(error);
     logger.warn("[Desktop] kscreen-doctor failed, trying xrandr", {
-      error: parseError(error).message,
+      error: cause.message,
+      code:
+        "code" in cause &&
+        (typeof cause.code === "number" || typeof cause.code === "string")
+          ? cause.code
+          : null,
+      signal:
+        "signal" in cause && typeof cause.signal === "string"
+          ? cause.signal
+          : null,
+      stderr:
+        "stderr" in cause && typeof cause.stderr === "string"
+          ? cause.stderr.trim().slice(0, 500)
+          : null,
     });
   }
 

@@ -46,6 +46,7 @@ const knownChatModel = z.enum(ChatModelId);
  */
 const favoriteCardSchema = z.object({
   id: z.string(),
+  rowId: z.uuid().optional(),
   skillId: z.string(),
   customVariantName: z.string().nullable(),
   variantName: z.string().optional(),
@@ -217,6 +218,11 @@ const { GET } = createEndpoint({
               type: WidgetType.TEXT,
               hidden: true,
               schema: favoriteCardSchema.shape.id,
+            }),
+            rowId: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              hidden: true,
+              schema: favoriteCardSchema.shape.rowId,
             }),
             skillId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,

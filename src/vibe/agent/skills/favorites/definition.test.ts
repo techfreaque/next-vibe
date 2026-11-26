@@ -20,7 +20,8 @@ it("keeps the favorites list when a newer deployment sends an unknown model", ()
     modelInfo: "GPT 6.2 Sol",
     modelProvider: "OpenAI",
   };
-  const favorites = [{ ...card, modelId: "future-chat-model" }, card];
+  const rowId = "34971a82-d50e-462f-9847-f347dc7cdde7";
+  const favorites = [{ ...card, rowId, modelId: "future-chat-model" }, card];
   const response = {
     totalCount: null,
     matchedCount: null,
@@ -34,6 +35,10 @@ it("keeps the favorites list when a newer deployment sends an unknown model", ()
   const parsed = schema.safeParse(response);
   expect(parsed.success).toBe(true);
   if (parsed.success) {
+    expect(parsed.data.favorites.map((favorite) => favorite.rowId)).toEqual([
+      rowId,
+      undefined,
+    ]);
     expect(parsed.data.favorites.map(({ modelId, modelInfo }) => ({
       modelId,
       modelInfo,

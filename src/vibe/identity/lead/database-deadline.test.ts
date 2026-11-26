@@ -66,6 +66,46 @@ describe("guest lead database deadline (local Postgres)", () => {
     }
   });
 
+  it("removes expired guest waiters before they enter pg-pool", async () => {
+    const pool = new Pool({ connectionString, max: 1 });
+    const held = await pool.connect();
+    const checkout = spyOn(pool, "connect");
+    let fixtureReleased = false;
+    try {
+      const expiredDeadline = performance.now() + 100;
+      let expiredWorkStarted = false;
+      const expiring = Array.from({ length: 8 }, () =>
+        withLeadLookupDeadline(pool, expiredDeadline, () => {
+          expiredWorkStarted = true;
+          return Promise.resolve(false);
+        }),
+      );
+      const expiration = Promise.allSettled(expiring);
+      const live = withLeadLookupDeadline(
+        pool,
+        performance.now() + 1500,
+        () => Promise.resolve(true),
+      );
+      expect(pool.waitingCount).toBe(1);
+      expect((await expiration).map(({ status }) => status)).toEqual(
+        Array.from({ length: 8 }, () => "rejected"),
+      );
+      expect(pool.waitingCount).toBe(1);
+      held.release();
+      fixtureReleased = true;
+      expect(await live).toBe(true);
+      expect(pool.waitingCount).toBe(0);
+      expect(checkout).toHaveBeenCalledTimes(1);
+      expect(expiredWorkStarted).toBe(false);
+    } finally {
+      checkout.mockRestore();
+      if (!fixtureReleased) {
+        held.release();
+      }
+      await pool.end();
+    }
+  });
+
   it("executes an existing lead lookup in a single round trip", async () => {
     const pool = new Pool({ connectionString, max: 1 });
     const held = await pool.connect();

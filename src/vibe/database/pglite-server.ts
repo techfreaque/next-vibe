@@ -21,8 +21,15 @@ import { connect, createServer, type Server, type Socket } from "node:net";
 
 import type { PGlite } from "@electric-sql/pglite";
 
+import { defaultLocale } from "../core/i18n/core/config";
 import { processManagesShutdown } from "../core/utils/process-shutdown";
+import { createLogger } from "../logger/create-logger";
+import { serverFileLog } from "../logger/file";
 import { databaseEnv } from "./env";
+import { describePgStatement } from "./pg-result-diagnostics";
+import { PGLITE_OWNER_PID_PARAMETER } from "./pglite-pool-client";
+
+const wireLogger = createLogger(false, defaultLocale, undefined, serverFileLog);
 
 // ─── Wire-protocol constants ──────────────────────────────────────────────────
 
@@ -344,6 +351,7 @@ async function execInsertReturning(
 
 const gq = globalThis as typeof globalThis & {
   __pglite_queue__?: Promise<void>;
+  __pglite_queue_turn__?: { startedAt: number; nextTurn: Promise<void> };
   __pglite_transaction__?: {
     socket: Socket;
     done: Promise<void>;
@@ -354,43 +362,73 @@ if (!gq.__pglite_queue__) {
   gq.__pglite_queue__ = Promise.resolve();
 }
 
+const QUEUE_TURN_BUDGET_MS = 8;
+
 // Watchdog: the queue is strictly serial, so ONE statement that never settles
 // stalls every connection with no error anywhere. Log the stuck statement so a
 // wedge is diagnosable instead of silent.
 const STUCK_AFTER_MS = 15_000;
+const SLOW_BATCH_MS = 500;
 
 function withWatchdog<T>(
-  label: string,
+  describe: () => string,
   fn: () => Promise<T>,
 ): () => Promise<T> {
   return async () => {
+    const startedAt = performance.now();
     const timer = setInterval(() => {
-      process.stderr.write(
-        `[pglite] statement running > ${String(STUCK_AFTER_MS / 1000)}s, queue is blocked: ${label}
-`,
-      );
+      wireLogger.error("[pglite] Statement is blocking the queue", {
+        elapsedMs: Math.round(performance.now() - startedAt),
+        statement: describe(),
+        processId: process.pid,
+      });
     }, STUCK_AFTER_MS);
     try {
       return await fn();
     } finally {
       clearInterval(timer);
+      // Synchronous WASM can block the watchdog timer until the batch returns.
+      const elapsedMs = Math.round(performance.now() - startedAt);
+      if (elapsedMs >= SLOW_BATCH_MS) {
+        wireLogger.warn("[pglite] Database batch held the queue", {
+          elapsedMs,
+          statement: describe(),
+          processId: process.pid,
+        });
+      }
     }
   };
 }
 
 function serialise<T>(
   fn: () => Promise<T>,
-  label = "direct",
+  describe = (): string => "direct",
   socket?: Socket,
 ): Promise<T> {
   const result = (gq.__pglite_queue__ ?? Promise.resolve()).then<
     { wait: Promise<void> } | { value: T }
   >(async () => {
+    const turn = gq.__pglite_queue_turn__;
+    if (turn && performance.now() - turn.startedAt >= QUEUE_TURN_BUDGET_MS) {
+      await turn.nextTurn;
+    }
     const transaction = gq.__pglite_transaction__;
     if (transaction && transaction.socket !== socket) {
       return { wait: transaction.done };
     }
-    return { value: await withWatchdog(label, fn)() };
+    // Already queued batches can execute in consecutive microtasks. Give I/O
+    // a turn between batches once the budget is spent, without releasing the
+    // FIFO slot or interrupting a wire batch.
+    gq.__pglite_queue_turn__ ??= {
+      startedAt: performance.now(),
+      nextTurn: new Promise<void>((resolve) => {
+        setImmediate(() => {
+          gq.__pglite_queue_turn__ = undefined;
+          resolve();
+        });
+      }),
+    };
+    return { value: await withWatchdog(describe, fn)() };
   });
   // Swallow errors on the queue tail so one failure doesn't poison later work
   gq.__pglite_queue__ = result.then(
@@ -401,7 +439,7 @@ function serialise<T>(
   // COMMIT or ROLLBACK while other sockets are waiting.
   return result.then((entry) =>
     "wait" in entry
-      ? entry.wait.then(() => serialise(fn, label, socket))
+      ? entry.wait.then(() => serialise(fn, describe, socket))
       : entry.value,
   );
 }
@@ -422,22 +460,18 @@ let nextPid = 10000;
 /** Human-readable label of a batch for the watchdog (first SQL in it). */
 function describeBatch(messages: Buffer, fenceType: number): string {
   if (fenceType === MSG_SIMPLE_QUERY) {
-    return messages
-      .slice(5, messages.length - 1)
-      .toString("utf8")
-      .trim()
-      .slice(0, 200);
+    return describePgStatement(
+      messages.toString("utf8", 5, messages.length - 1),
+    );
   }
   let off = 0;
   while (off + 5 <= messages.length) {
     const bLen = messages.readInt32BE(off + 1);
     if (messages.readUInt8(off) === MSG_PARSE) {
-      return (
-        parseSqlFromParseMessage(messages.slice(off, off + 1 + bLen))?.slice(
-          0,
-          200,
-        ) ?? "parse"
+      const sql = parseSqlFromParseMessage(
+        messages.subarray(off, off + 1 + bLen),
       );
+      return sql === null ? "parse" : describePgStatement(sql);
     }
     off += 1 + bLen;
   }
@@ -509,7 +543,7 @@ function handleConnection(pg: PGlite, socket: Socket): void {
             setTxStatus("I");
           }
         },
-        "ROLLBACK (orphaned tx)",
+        () => "ROLLBACK (orphaned tx)",
         socket,
       ).catch((error) => {
         process.stderr.write(
@@ -578,6 +612,7 @@ function handleConnection(pg: PGlite, socket: Socket): void {
         buildParameterStatus("server_encoding", "UTF8"),
         buildParameterStatus("DateStyle", "ISO, MDY"),
         buildParameterStatus("integer_datetimes", "on"),
+        buildParameterStatus(PGLITE_OWNER_PID_PARAMETER, String(process.pid)),
         buildBackendKeyData(pid, secret),
         buildReadyForQuery(),
       ]),
@@ -633,7 +668,7 @@ function handleConnection(pg: PGlite, socket: Socket): void {
               socket.destroyed
                 ? null
                 : execInsertReturning(pg, sql, [], txStatus),
-            sql.slice(0, 200),
+            () => describePgStatement(sql),
             socket,
           );
           if (response) {
@@ -687,7 +722,7 @@ function handleConnection(pg: PGlite, socket: Socket): void {
                 socket.destroyed
                   ? null
                   : execInsertReturning(pg, sql, params, txStatus),
-              sql.slice(0, 200),
+              () => describePgStatement(sql),
               socket,
             );
             if (dataResp) {
@@ -732,7 +767,7 @@ function handleConnection(pg: PGlite, socket: Socket): void {
           trackTxStatus(resp);
           socket.write(Buffer.from(resp));
         },
-        describeBatch(messages, fenceType),
+        () => describeBatch(messages, fenceType),
         socket,
       );
     } catch (e) {

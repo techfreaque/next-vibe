@@ -2,6 +2,7 @@ import { drizzle, type NodePgDatabase } from "drizzle-orm/node-postgres";
 import type { Pool, PoolClient } from "pg";
 
 import { pgDiagnosticQueryLogger } from "../../database/pg-result-diagnostics";
+import { describePgPoolCheckouts } from "../../database/pool";
 
 export const GUEST_LEAD_DB_BUDGET_MS = 1500;
 
@@ -20,10 +21,97 @@ export type LeadProvisionStep =
   | "insert-guest"
   | "link-guest-pool";
 
+interface LeadCheckout {
+  deadline: number;
+  resolve: (client: PoolClient | undefined) => void;
+  reject: (error: Error) => void;
+}
+
+interface LeadCheckoutQueue {
+  pending: boolean;
+  waiters: Set<LeadCheckout>;
+}
+
+declare global {
+  var __vibeLeadCheckoutQueues: WeakMap<Pool, LeadCheckoutQueue> | undefined;
+}
+
+function takeLiveCheckout(queue: LeadCheckoutQueue): LeadCheckout | undefined {
+  const now = performance.now();
+  for (const waiter of queue.waiters) {
+    queue.waiters.delete(waiter);
+    if (waiter.deadline > now) {
+      return waiter;
+    }
+    waiter.resolve(undefined);
+  }
+  return undefined;
+}
+
+function dispatchLeadCheckout(pool: Pool, queue: LeadCheckoutQueue): void {
+  if (queue.pending || queue.waiters.size === 0) {
+    return;
+  }
+  queue.pending = true;
+  void pool
+    .connect()
+    .then(
+      (client) => {
+        const waiter = takeLiveCheckout(queue);
+        if (waiter) {
+          waiter.resolve(client);
+        } else {
+          client.release();
+        }
+        return undefined;
+      },
+      (error: Error) => takeLiveCheckout(queue)?.reject(error),
+    )
+    .finally(() => {
+      queue.pending = false;
+      dispatchLeadCheckout(pool, queue);
+    });
+}
+
+// pg-pool keeps a queued checkout until it acquires a socket or its own,
+// longer connect timeout expires. Keep the other guest waiters here so their
+// deadlines can remove them. Hand the acquired socket to the oldest live
+// waiter so a late checkout can still serve a request with time left.
+function checkoutLeadClient(
+  pool: Pool,
+  deadline: number,
+  signal: AbortSignal,
+): Promise<PoolClient | undefined> {
+  const queues = (globalThis.__vibeLeadCheckoutQueues ??= new WeakMap());
+  const queue = queues.get(pool) ?? {
+    pending: false,
+    waiters: new Set<LeadCheckout>(),
+  };
+  queues.set(pool, queue);
+  const result = Promise.withResolvers<PoolClient | undefined>();
+  const waiter: LeadCheckout = {
+    deadline,
+    resolve: result.resolve,
+    reject: result.reject,
+  };
+  const cancel = (): void => {
+    queue.waiters.delete(waiter);
+    result.resolve(undefined);
+  };
+  queue.waiters.add(waiter);
+  signal.addEventListener("abort", cancel, { once: true });
+  dispatchLeadCheckout(pool, queue);
+  return result.promise.finally(() =>
+    signal.removeEventListener("abort", cancel),
+  );
+}
+
 export class GuestLeadDatabaseDeadlineError extends Error {
   readonly poolTotal: number | undefined;
   readonly poolIdle: number | undefined;
   readonly poolWaiting: number | undefined;
+  readonly leadCheckoutWaiting: number | undefined;
+  readonly oldestPoolCheckouts: ReturnType<typeof describePgPoolCheckouts>;
 
   constructor(
     readonly phase: LeadDatabasePhase,
@@ -33,6 +121,10 @@ export class GuestLeadDatabaseDeadlineError extends Error {
     this.poolTotal = pool?.totalCount;
     this.poolIdle = pool?.idleCount;
     this.poolWaiting = pool?.waitingCount;
+    this.leadCheckoutWaiting = pool
+      ? globalThis.__vibeLeadCheckoutQueues?.get(pool)?.waiters.size
+      : undefined;
+    this.oldestPoolCheckouts = pool ? describePgPoolCheckouts(pool) : undefined;
   }
 }
 
@@ -65,9 +157,11 @@ async function withBoundedCheckout<T>(
     phase = next;
   };
   const timeout = Promise.withResolvers<never>();
+  const checkout = new AbortController();
   const timer = setTimeout(() => {
     expired = true;
     const failure = new GuestLeadDatabaseDeadlineError(phase, pool);
+    checkout.abort();
     const client = acquired;
     acquired = undefined;
     client?.release(true);
@@ -75,10 +169,10 @@ async function withBoundedCheckout<T>(
   }, deadline - now);
 
   const run = async (): Promise<T> => {
-    const client = await pool.connect();
-    if (expired || performance.now() >= deadline) {
+    const client = await checkoutLeadClient(pool, deadline, checkout.signal);
+    if (!client || expired || performance.now() >= deadline) {
       const failure = new GuestLeadDatabaseDeadlineError(phase, pool);
-      client.release();
+      client?.release();
       return Promise.reject(failure);
     }
     acquired = client;

@@ -5,14 +5,16 @@ import type { JSX } from "react";
 
 import { TanstackPage as Layout } from "@/_pages/user/(auth)/layout";
 
-import { runPageLoader } from "../nextjs-compat-wrapper";
+import { runPageLoader, toNextParams } from "../nextjs-compat-wrapper";
 
-const loadData = createServerFn({ method: "GET" }).handler(async () =>
-  runPageLoader(async () => {
-    const { tanstackLoader } = await import("@/_pages/user/(auth)/layout");
-    return tanstackLoader();
-  }),
-);
+const loadData = createServerFn({ method: "GET" })
+  .validator((data: Record<string, string>) => data)
+  .handler(async ({ data }) =>
+    runPageLoader(async () => {
+      const { tanstackLoader } = await import("@/_pages/user/(auth)/layout");
+      return tanstackLoader({ params: Promise.resolve(toNextParams(data)) });
+    }),
+  );
 
 function LayoutComponent(): JSX.Element {
   return (
@@ -24,6 +26,6 @@ function LayoutComponent(): JSX.Element {
 
 export const Route = createFileRoute("/$locale/user/_auth")({
   staleTime: Infinity,
-  loader: () => loadData(),
+  loader: ({ params }) => loadData({ data: params as Record<string, string> }),
   component: LayoutComponent,
 });

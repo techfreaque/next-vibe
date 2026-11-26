@@ -1,5 +1,4 @@
 "use client";
-import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import {
   Drawer,
@@ -13,44 +12,10 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "next-vibe/ui/components/popover";
-import { Span } from "next-vibe/ui/components/span";
-import { useWindowSize } from "next-vibe/ui/hooks/use-window-size";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
 import type { JSX, ReactNode } from "react";
 
-/** Below this width the picker opens as a bottom sheet. */
-export const PHONE_BREAKPOINT = 768;
-
-export function useIsPhone(): boolean {
-  const { width } = useWindowSize();
-  return width < PHONE_BREAKPOINT;
-}
-
-interface FlagTriggerProps {
-  flag: string;
-  label: string;
-}
-
-/**
- * Navbar trigger: flag only (Max, 2026-11-18), full name for SR + tooltip.
- * A plain element factory, not a component: Radix `asChild` triggers inject
- * their handlers into the Button directly.
- */
-export function flagTrigger({ flag, label }: FlagTriggerProps): JSX.Element {
-  return (
-    <Button
-      variant="ghost"
-      size="unset"
-      className="flex h-10 w-10 items-center justify-center"
-      aria-label={label}
-      title={label}
-    >
-      <Span className="my-auto flex items-center justify-center text-lg">
-        {flag}
-      </Span>
-    </Button>
-  );
-}
+import { useIsPhone } from "./use-is-phone";
 
 interface PickerSurfaceProps {
   open: boolean;

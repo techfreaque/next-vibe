@@ -36,6 +36,9 @@ export const HERMES_DEV_PID_FILE = ".tmp/.hermes-dev.pid";
 /** Default port for vibe --hermes dev (shares preview DB at 5433 with vibe start) */
 export const LOCAL_BASE_PORT = 3002;
 
+/** The Vite close grace includes Nitro's worker shutdown. */
+export const DEV_VITE_SHUTDOWN_GRACE_MS = 7000;
+
 /**
  * Check if a process with the given PID is still running
  */
@@ -59,6 +62,7 @@ export function killPreviousInstance(
   logger: EndpointLogger,
   basePort?: number,
   reclaimUntrackedPort = true,
+  graceMs = 5000,
 ): void {
   if (!existsSync(pidFile)) {
     // No pid file, but if a same-cwd process is on our internal port it's an orphaned
@@ -136,8 +140,7 @@ export function killPreviousInstance(
       }
     }
 
-    // Wait up to 5 seconds for all to exit
-    const deadline = Date.now() + 5000;
+    const deadline = Date.now() + graceMs;
     while (Date.now() < deadline && running.some(isProcessRunning)) {
       Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 100);
     }
@@ -147,6 +150,7 @@ export function killPreviousInstance(
       if (isProcessRunning(pid)) {
         logger.warn(
           "Previous instance did not exit gracefully, force killing...",
+          { pid, pidFile, graceMs },
         );
         try {
           process.kill(pid, "SIGKILL");

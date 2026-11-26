@@ -17,6 +17,7 @@ import {
 } from "../../unified-ui/_shared/use-widget-context";
 import { CronTaskStatus } from "../enum";
 import type { TaskExecuteResponseOutput } from "./definition";
+import { formatExecutionDate } from "./format-execution-date";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -44,13 +45,6 @@ function formatDuration(ms: number | null | undefined): string {
     return `${(ms / 1000).toFixed(1)}s`;
   }
   return `${Math.floor(ms / 60000)}m ${Math.round((ms % 60000) / 1000)}s`;
-}
-
-function formatDate(s: string | null | undefined): string {
-  if (!s) {
-    return "—";
-  }
-  return s.slice(0, 19).replace("T", " ");
 }
 
 function statusIcon(status: string | null | undefined): string {
@@ -100,7 +94,7 @@ function renderCli(value: TaskExecuteResponseOutput): string {
   }
   if (value.executedAt) {
     lines.push(
-      `${chalk.dim("Executed")}  ${formatDate(value.executedAt.toISOString())}`,
+      `${chalk.dim("Executed")}  ${formatExecutionDate(value.executedAt)}`,
     );
   }
   if (value.message) {
@@ -133,7 +127,7 @@ function renderMcp(value: TaskExecuteResponseOutput): string {
     lines.push(`Duration: ${formatDuration(value.duration)}`);
   }
   if (value.executedAt) {
-    lines.push(`Executed: ${formatDate(value.executedAt.toISOString())}`);
+    lines.push(`Executed: ${formatExecutionDate(value.executedAt)}`);
   }
   if (value.message) {
     lines.push(`Message: ${value.message}`);

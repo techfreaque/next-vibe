@@ -21,6 +21,8 @@ export interface ButtonMouseEvent {
 
 export type ButtonProps = {
   id?: string;
+  name?: string;
+  ref?: React.RefCallback<{ focus: () => void }>;
   suppressHydrationWarning?: boolean;
   variant?: ButtonVariant;
   size?: ButtonSize;

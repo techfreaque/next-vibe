@@ -13,15 +13,15 @@ import { persistErrorLog } from "../../db-persist";
 import { isFileLoggingEnabled } from "../../debug";
 import { isForeignErrorSource } from "../../error-source";
 import { clientFileLog } from "../../file";
-import {
-  CLIENT_LOG_FINGERPRINT_IGNORE_KEYS,
-  CLIENT_LOG_OCCURRENCES_KEY,
-  FOREIGN_SOURCE_FINGERPRINT_IGNORE_KEYS,
-} from "./constants";
+import { CLIENT_LOG_OCCURRENCES_KEY } from "./constants";
 import type {
   ClientLogRequestOutput,
   ClientLogResponseOutput,
 } from "./definition";
+import {
+  CLIENT_LOG_FINGERPRINT_IGNORE_KEYS,
+  FOREIGN_SOURCE_FINGERPRINT_IGNORE_KEYS,
+} from "./fingerprint-keys";
 
 function extractTabId(
   metadata: ClientLogRequestOutput["metadata"],

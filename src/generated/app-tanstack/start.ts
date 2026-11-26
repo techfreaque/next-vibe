@@ -25,6 +25,7 @@ import {
   forwardDegradedPublicDocument,
 } from "next-vibe/platforms/web/middleware/public-document";
 import { applyResponseIdentityCookies } from "next-vibe/platforms/web/middleware/utils";
+import { readEdgeRequestId } from "next-vibe/realtime/core/proxy-timing";
 import { preloadAllLazyWidgets } from "next-vibe/unified-ui/_shared/lazy-widget";
 
 import { REQUEST_ID_HEADER_NAME } from "@/env/constants";
@@ -64,22 +65,27 @@ function statusColor(status: number): string {
 }
 
 function logRequest(
-  method: string,
+  request: Request,
   path: string,
   status: number,
   totalMs: number,
   appMs: number,
 ): void {
+  const { method } = request;
+  const requestId = readEdgeRequestId(
+    request.headers.get(REQUEST_ID_HEADER_NAME) ?? undefined,
+  );
+  const correlation = requestId ? ` [requestId=${requestId}]` : "";
   const useColors = shouldUseColors();
   const ts = `[${formatSinceStart()}]`;
   const total = formatMs(totalMs);
   const app = `(app: ${formatMs(appMs)})`;
   const statusStr = String(status);
-  const plain = `${ts} ${method} ${path} ${statusStr} in ${total} ${app}`;
+  const plain = `${ts} ${method} ${path} ${statusStr} in ${total} ${app}${correlation}`;
   if (useColors) {
     // [time] white · method+path web cyan · status by class · "in" + (app) dim · total bold white
     process.stdout.write(
-      `${C.timeWhite}${ts}${C.reset} ${C.blue}${method} ${path}${C.reset} ${statusColor(status)}${statusStr}${C.reset} ${C.dim}in${C.reset} ${C.white}${C.bold}${total}${C.reset} ${C.dim}${app}${C.reset}\n`,
+      `${C.timeWhite}${ts}${C.reset} ${C.blue}${method} ${path}${C.reset} ${statusColor(status)}${statusStr}${C.reset} ${C.dim}in${C.reset} ${C.white}${C.bold}${total}${C.reset} ${C.dim}${app}${correlation}${C.reset}\n`,
     );
   } else {
     process.stdout.write(`${plain}\n`);
@@ -222,7 +228,7 @@ const proxyMiddleware = createMiddleware().server(async ({ next, request }) => {
     const result = await next();
     const total = Date.now() - requestStart;
     const app = Date.now() - appStart;
-    logRequest(request.method, path, result.response.status, total, app);
+    logRequest(request, path, result.response.status, total, app);
     return result;
   }
 
@@ -240,7 +246,7 @@ const proxyMiddleware = createMiddleware().server(async ({ next, request }) => {
   // If the proxy returned a redirect or error (non-2xx), short-circuit
   if (proxyResponse.status !== 200) {
     const total = Date.now() - requestStart;
-    logRequest(request.method, path, proxyResponse.status, total, 0);
+    logRequest(request, path, proxyResponse.status, total, 0);
     return proxyResponse;
   }
 
@@ -275,7 +281,7 @@ const proxyMiddleware = createMiddleware().server(async ({ next, request }) => {
   const result = await next();
   const total = Date.now() - requestStart;
   const app = Date.now() - appStart;
-  logRequest(request.method, path, result.response.status, total, app);
+  logRequest(request, path, result.response.status, total, app);
   return result;
 });
 

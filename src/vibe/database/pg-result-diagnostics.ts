@@ -94,7 +94,8 @@ function queryId(sql: string): string {
   return createHash("sha256").update(sql).digest("hex").slice(0, 16);
 }
 
-function queryName(sql: string): string {
+/** Label a statement using only its operation and known relations. */
+export function describePgStatement(sql: string): string {
   const isUploadListing = sql.includes("/* cortex-upload-listing */");
   const statement = sql
     .slice(0, QUERY_LABEL_SCAN_LIMIT)
@@ -103,7 +104,7 @@ function queryName(sql: string): string {
       " ",
     );
   const operation =
-    /^(select|with|insert|update|delete|values|show|explain)\b/i
+    /^(select|with|insert|update|delete|values|show|explain|begin|commit|rollback|set)\b/i
       .exec(statement.trimStart())?.[1]
       ?.toUpperCase() ?? "OTHER";
   const tables = new Set<string>();
@@ -144,7 +145,7 @@ export const pgDiagnosticQueryLogger = {
             !frame.startsWith("src/vibe/database/pg-result-diagnostics.ts:"),
         );
       identity = {
-        queryName: queryName(sql),
+        queryName: describePgStatement(sql),
         caller: caller ?? null,
       };
       state.queries.set(id, identity);
@@ -203,7 +204,7 @@ export function describeActivePgQuery(client: PoolClient): string | null {
     return null;
   }
   return "text" in query && typeof query.text === "string"
-    ? queryName(query.text)
+    ? describePgStatement(query.text)
     : "OTHER";
 }
 
@@ -237,7 +238,7 @@ export function observePgResultDecoding(client: PoolClient): void {
     const entry = state.queries.get(id);
     result = {
       queryId: id,
-      queryName: entry?.queryName ?? queryName(query.text),
+      queryName: entry?.queryName ?? describePgStatement(query.text),
       caller: entry?.caller ?? null,
       relationOids: [...new Set(message.fields.map((field) => field.tableID))]
         .filter((oid) => oid > 0)

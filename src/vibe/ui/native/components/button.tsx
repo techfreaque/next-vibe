@@ -29,6 +29,8 @@ function Button({
   title,
   // Extract web-only props to prevent passing to native primitives
   type,
+  name,
+  ref,
   suppressHydrationWarning,
   role,
   tabIndex,
@@ -48,6 +50,8 @@ function Button({
   // draggable/onDragStart are web-only drag props - void to satisfy linter
   void draggable;
   void onDragStart;
+  void name;
+  void ref;
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
 
   const handlePress =
