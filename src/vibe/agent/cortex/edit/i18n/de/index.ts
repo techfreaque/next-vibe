@@ -20,7 +20,8 @@ export const translations: typeof enTranslations = {
       },
       find: {
         label: "Suchen",
-        description: "Diesen Text finden",
+        description:
+          "Diesen Text finden. Jeder Treffer wird ersetzt (kein replace_all nötig)",
       },
       replace: {
         label: "Ersetzen",

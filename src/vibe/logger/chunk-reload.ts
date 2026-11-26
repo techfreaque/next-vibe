@@ -46,6 +46,9 @@ import {
 } from "./resource-diagnostics";
 import type { EndpointLogger, ErrorLogLevel, LoggerMetadata } from "./types";
 
+/** webpack's default chunkLoadTimeout (next.config sets none). */
+const CHUNK_LOADER_TIMEOUT_MS = 120_000;
+
 /** One reload per page, including when several chunks fail before it starts. */
 let pendingReloadAt: number | null = null;
 let reloadRequestedAt: number | null = null;
@@ -291,6 +294,8 @@ export function handleChunkLoadFailure(
 ): boolean {
   const diagnostics = chunkLoadDiagnostics(error.message);
   const buildId = currentBuildId();
+  const pageAgeMs =
+    typeof performance === "undefined" ? null : Math.round(performance.now());
   const details = {
     source,
     errorName: error.name,
@@ -298,6 +303,15 @@ export function handleChunkLoadFailure(
     stack: error.stack?.slice(0, 1500),
     ...diagnostics,
     chunkId: diagnostics.chunkId ?? null,
+    pageAgeMs,
+    // The loader only reports "timeout" after its 120 s script timer. Sooner
+    // means the timers were fast-forwarded: a headless renderer with a
+    // virtual-time budget (prod 2026-11-26 13:48: "timeout" 4 s after the
+    // reload, desktop Chrome 154 from a data-center region, new lead).
+    timeoutBeforeLoaderLimit:
+      diagnostics.chunkFailKind === "timeout" && pageAgeMs !== null
+        ? pageAgeMs < CHUNK_LOADER_TIMEOUT_MS
+        : null,
     ...context,
   };
   if (pendingReloadAt !== null) {

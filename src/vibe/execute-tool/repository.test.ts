@@ -15,16 +15,22 @@ import "server-only";
 
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { rootlessToolExecutionContext } from "../core/execution-context";
 import { defaultLocale } from "../core/i18n/core/config";
+import { ErrorResponseTypes, fail } from "../core/route/response.schema";
 import type { JwtPrivatePayloadType } from "../identity/auth/types";
 import { createEndpointLogger } from "../logger/server";
+import { scopedTranslation as aiTranslation } from "../platforms/ai/i18n";
+import { Platform } from "../platforms/platforms";
 import {
   clearLocalBroadcast,
   registerLocalBroadcast,
 } from "../realtime/core/local-broadcast";
 import * as resolveTaskUser from "../tasks/cron/resolve-task-user";
 import { RouteExecuteRepository } from "./repository";
+import { ExecuteToolGuards } from "./repository/guards";
 import { handleIncomingToolRequest } from "./repository/incoming";
+import { LocalExecution } from "./repository/local";
 import { PendingCalls } from "./repository/pending-calls";
 import { handleToolResult } from "./repository/result-handler";
 
@@ -241,3 +247,49 @@ describe("RouteExecuteRepository remote handlers", () => {
     expect(result).toEqual({ status: "failed", output: { message: "boom" } });
   });
 });
+
+describe("RouteExecuteRepository AI validation hints", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  const { t } = aiTranslation.scopedT(defaultLocale);
+  // Any VALIDATION_ERROR from the target stands in for the handler's
+  // "Invalid request data: query: expected string ..." message.
+  const targetError = fail({
+    message: t("executeTool.post.errors.validation.description"),
+    errorType: ErrorResponseTypes.VALIDATION_ERROR,
+  });
+
+  async function run(
+    input: Record<string, string>,
+    platform: Platform,
+  ): Promise<string | undefined> {
+    vi.spyOn(ExecuteToolGuards, "checkFolderRestrictions").mockResolvedValue(
+      null,
+    );
+    vi.spyOn(LocalExecution, "execute").mockResolvedValue(targetError);
+    const result = await RouteExecuteRepository.execute(
+      { toolName: "web-search", input, callbackMode: "wait" },
+      ownerUser,
+      defaultLocale,
+      makeLogger(),
+      t,
+      rootlessToolExecutionContext(),
+      platform,
+    );
+    return result.success ? undefined : result.message;
+  }
+
+  it("ET-EMPTY-INPUT: an AI call with no input is told where the arguments go (kimi-k3, prod 11-26)", async () => {
+    const message = await run({}, Platform.AI);
+    expect(message).toContain(targetError.message);
+    expect(message).toContain('"toolName": "web-search", "input": {');
+  });
+
+  it("ET-EMPTY-INPUT-SCOPE: a call with input, or from another surface, keeps the target's error", async () => {
+    expect(await run({ query: "x" }, Platform.AI)).toBe(targetError.message);
+    expect(await run({}, Platform.CLI)).toBe(targetError.message);
+  });
+});
+

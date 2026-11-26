@@ -115,7 +115,12 @@ export function unknownToolFields(
   if (!isRecord(value)) {
     return [];
   }
-  return Object.entries(value).flatMap(([key, entry]) => {
+  // One message per object, not per key: the expected-shape summary can list
+  // dozens of enum values (generate_image models), and a model inventing three
+  // keys got it three times (prod 2026-11-26, uncensored-lm style/resolution/nsfw).
+  const unknown: string[] = [];
+  const hints: string[] = [];
+  const nestedIssues = Object.entries(value).flatMap(([key, entry]) => {
     const properties = schema.properties;
     const field =
       properties && Object.hasOwn(properties, key)
@@ -126,17 +131,28 @@ export function unknownToolFields(
       field === undefined &&
       (nested === false || (properties && nested === undefined))
     ) {
-      const hint = /^end[_-]?loop$/i.test(key)
-        ? `. Use top-level callbackMode: "${CallbackMode.END_LOOP}" to end the turn`
-        : /^callback[_-]?mode$/i.test(key)
-          ? `. Set callbackMode at the top level: ${CallbackModeDB.join("|")}`
-          : "";
-      return [
-        `Unknown key '${key}' in ${path}. Expected ${toolSchemaSummary(schema)}${hint}`,
-      ];
+      unknown.push(`'${key}'`);
+      if (/^end[_-]?loop$/i.test(key)) {
+        hints.push(
+          `Use top-level callbackMode: "${CallbackMode.END_LOOP}" to end the turn`,
+        );
+      } else if (/^callback[_-]?mode$/i.test(key)) {
+        hints.push(
+          `Set callbackMode at the top level: ${CallbackModeDB.join("|")}`,
+        );
+      }
+      return [];
     }
     return nested ? unknownToolFields(nested, entry, `${path}.${key}`) : [];
   });
+  if (unknown.length === 0) {
+    return nestedIssues;
+  }
+  const label = unknown.length === 1 ? "Unknown key" : "Unknown keys";
+  return [
+    `${label} ${unknown.join(", ")} in ${path}. Expected ${toolSchemaSummary(schema)}${hints.map((hint) => `. ${hint}`).join("")}`,
+    ...nestedIssues,
+  ];
 }
 
 /** The SDK uses the returned value for both the stored call and subsequent prompts. */

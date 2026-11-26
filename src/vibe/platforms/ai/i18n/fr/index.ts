@@ -57,6 +57,10 @@ export const translations: typeof enTranslations = {
           title:
             "{{toolName}} n'est pas disponible dans ce fil. Appelez directement les outils de votre liste d'outils.",
         },
+        emptyInput: {
+          title:
+            '{{error}} Votre appel n\'avait pas de champ input. Placez les arguments de {{toolName}} dans input : {"toolName": "{{toolName}}", "input": { ... }}.',
+        },
         notFound: {
           title: "Outil introuvable",
           description:

@@ -57,6 +57,10 @@ export const translations: typeof enTranslations = {
           title:
             "{{toolName}} no está disponible en este hilo. Llame las herramientas en su lista de herramientas directamente.",
         },
+        emptyInput: {
+          title:
+            '{{error}} Su llamada no tenía el campo input. Ponga los argumentos de {{toolName}} dentro de input: {"toolName": "{{toolName}}", "input": { ... }}.',
+        },
         notFound: {
           title: "Herramienta no encontrada",
           description:

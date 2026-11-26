@@ -19,7 +19,8 @@ export const translations = {
       },
       find: {
         label: "Find",
-        description: "Text to find",
+        description:
+          "Text to find. Every match is replaced (no replace_all flag needed)",
       },
       replace: {
         label: "Replace",

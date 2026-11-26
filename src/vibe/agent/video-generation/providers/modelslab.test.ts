@@ -1,9 +1,12 @@
 import { describe, expect, test } from "bun:test";
 
+import { defaultLocale } from "../../../core/i18n/core/config";
+import { createEndpointLogger } from "../../../logger/server";
 import { ApiProvider } from "../../models/models";
 import { videoGenModelDefinitions } from "../models";
 import {
   buildModelsLabVideoRequest,
+  generateVideoWithModelsLab,
   MODELSLAB_VIDEO_MODELS,
 } from "./modelslab";
 
@@ -157,5 +160,42 @@ describe("buildModelsLabVideoRequest", () => {
       "https://modelslab.com/api/v6/video/text2video_ultra",
     );
     expect(request.ok && request.body.num_frames).toBe(24);
+  });
+});
+
+describe("generateVideoWithModelsLab init_image rejections", () => {
+  const rejection = "The init_image is invalid. Make sure the image is a JPG or PNG.";
+  // No network: the HEAD probe and the submit both answer from here.
+  const fetchImpl: typeof globalThis.fetch = Object.assign(
+    async (_input: RequestInfo | URL, init?: RequestInit): Promise<Response> =>
+      init?.method === "HEAD"
+        ? new Response(null, { status: 200 })
+        : Response.json({ status: "error", message: rejection }),
+    { preconnect: (): void => undefined },
+  );
+
+  async function run(providerModel: string): Promise<string | undefined> {
+    const result = await generateVideoWithModelsLab({
+      providerModel,
+      prompt: "waves",
+      durationSeconds: 5,
+      logger: createEndpointLogger(false, defaultLocale),
+      locale: defaultLocale,
+      inputImageUrl: IMAGE,
+      fetchImpl,
+    });
+    return result.success ? undefined : result.message;
+  }
+
+  test("an image-to-video model shows the provider's reason (prod 11-26 grok-i2v / kling i2v)", async () => {
+    const message = await run("kling-v2-5-turbo-i2v");
+    expect(message).toContain(rejection);
+    expect(message).not.toContain("does not support image-to-video");
+  });
+
+  test("a text-to-video model still gets the drop-the-model hint", async () => {
+    expect(await run("kling-v2-5-turbo-t2v")).toContain(
+      "does not support image-to-video",
+    );
   });
 });

@@ -542,10 +542,27 @@ export async function generateVideoWithModelsLab(params: {
     // so translate them into an actionable hint the AI can act on.
     const rawError = result.message;
     if (inputImageUrl && rawError && /init_image/i.test(rawError)) {
+      const takesImages =
+        MODELSLAB_VIDEO_MODELS[providerModel]?.route === "image-to-video";
+      // The provider's own words, without the image URL (user content).
+      logger.warn("[ModelsLab Video] Provider rejected the input image", {
+        providerModel,
+        takesImages,
+        providerError: rawError.slice(0, 300),
+        imageSource: inputImageUrl.startsWith("data:")
+          ? "data-uri"
+          : (/^https?:\/\/([^/]+)/.exec(inputImageUrl)?.[1] ?? "other"),
+      });
+      // An image-to-video model does take images: "does not support
+      // image-to-video, retry without the model" sent the user (prod
+      // 2026-11-26 11:00, grok-i2v and kling-v2-5-turbo-i2v on /create/video)
+      // in circles. Its rejection is about THIS image, so show the reason.
       return fail({
-        message: t("post.errors.imageInputUnsupported", {
-          model: providerModel,
-        }),
+        message: takesImages
+          ? t("post.errors.providerError", { error: rawError })
+          : t("post.errors.imageInputUnsupported", {
+              model: providerModel,
+            }),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
       });
     }

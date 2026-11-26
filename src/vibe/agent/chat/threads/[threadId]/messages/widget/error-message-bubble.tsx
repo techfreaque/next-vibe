@@ -42,6 +42,7 @@ import { OutOfCreditsCard } from "../../../../../ai-stream/stream/widget/out-of-
 import type { ChatMessage } from "../../../../db";
 import { useModelSelectorState } from "../../../../model-selector-state";
 import { scopedTranslation } from "../i18n";
+import { isBalanceCutStreamError } from "./balance-cut";
 import { CopyButton } from "./copy-button";
 import { useMessageGroupName } from "./embedded-context";
 import { useErrorContinue, useErrorRetry } from "./error-retry-context";
@@ -125,7 +126,8 @@ export function ErrorMessageBubble({
     }
     // Credit refusal (402) is an expected outcome rendered as a top-up card
     const isCreditRefusal =
-      structuredErrorCode === ErrorResponseTypes.PAYMENT_REQUIRED.errorCode;
+      structuredErrorCode === ErrorResponseTypes.PAYMENT_REQUIRED.errorCode ||
+      isBalanceCutStreamError(message);
     (isCreditRefusal ? logger.warn : logger.error).bind(logger)(
       "Chat: Error message bubble shown to user",
       {
@@ -324,17 +326,24 @@ export function ErrorMessageBubble({
     displayContent = message.content ?? "";
   }
 
-  // Credit refusals (402) are not faults: offer the way forward instead of an error
+  // Credit refusals (402) are not faults: offer the way forward instead of an
+  // error. That includes a reply the balance cut off mid-stream (plain-text
+  // content, the 402 lives in streamError): it used to render as a red
+  // "auto-reported" error bubble (prod 2026-11-26).
   if (
     errorData?.errorType?.errorCode ===
-    ErrorResponseTypes.PAYMENT_REQUIRED.errorCode
+      ErrorResponseTypes.PAYMENT_REQUIRED.errorCode ||
+    isBalanceCutStreamError(message)
   ) {
     return (
       <Div className={cn("flex items-start gap-3", group)}>
         <OutOfCreditsCard
           locale={locale}
           isGuest={user.isPublic}
-          reason={creditPolicyReason(errorData.errorType.errorKey)}
+          reason={creditPolicyReason(
+            errorData?.errorType?.errorKey ??
+              message.metadata?.streamError?.key,
+          )}
         />
       </Div>
     );

@@ -57,6 +57,10 @@ export const translations: typeof enTranslations = {
           title:
             "{{toolName}} non è disponibile in questo thread. Chiama direttamente gli strumenti nella tua lista degli strumenti.",
         },
+        emptyInput: {
+          title:
+            '{{error}} La chiamata non aveva il campo input. Metti gli argomenti di {{toolName}} dentro input: {"toolName": "{{toolName}}", "input": { ... }}.',
+        },
         notFound: {
           title: "Strumento non trovato",
           description:

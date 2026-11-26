@@ -21,7 +21,8 @@ export const translations: typeof enTranslations = {
       },
       find: {
         label: "Trova",
-        description: "Testo da trovare",
+        description:
+          "Testo da trovare. Ogni occorrenza viene sostituita (non serve replace_all)",
       },
       replace: {
         label: "Sostituire",

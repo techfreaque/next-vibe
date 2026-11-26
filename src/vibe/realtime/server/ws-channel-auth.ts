@@ -261,6 +261,71 @@ export async function isRequestedUidLinkedLead(
   }
 }
 
+/**
+ * Denial-path only, for "socket-guest-other-uid": compare the socket's guest
+ * lead with the lead the page rendered. Prod 11-26: 22 denials came from one
+ * IP that minted 38 bot-classified leads with rotating user agents, while
+ * the page kept rendering a lead from another IP. These fields name that
+ * pattern in the row (no IP or user agent is logged, only whether they
+ * match). Two primary-key reads, denial path only.
+ */
+export async function describeGuestLeadMismatch(
+  socketLeadId: string,
+  channel: string,
+): Promise<{
+  socketLeadDeviceType?: string | null;
+  requestedLeadDeviceType?: string | null;
+  requestedLeadFound?: boolean;
+  requestedLeadAgeMin?: number;
+  leadsShareIp?: boolean;
+  leadsShareUserAgent?: boolean;
+}> {
+  const requestedUid = /^user\/([^/]+)\//.exec(channel)?.[1];
+  if (!requestedUid || requestedUid === socketLeadId) {
+    return {};
+  }
+  try {
+    const [{ db }, { leads }, { inArray }] = await Promise.all([
+      import("../../database"),
+      import("../../identity/lead/db"),
+      import("drizzle-orm"),
+    ]);
+    const rows = await db
+      .select({
+        id: leads.id,
+        deviceType: leads.deviceType,
+        ipAddress: leads.ipAddress,
+        userAgent: leads.userAgent,
+        createdAt: leads.createdAt,
+      })
+      .from(leads)
+      .where(inArray(leads.id, [socketLeadId, requestedUid]));
+    const socketLead = rows.find((row) => row.id === socketLeadId);
+    const requestedLead = rows.find((row) => row.id === requestedUid);
+    return {
+      socketLeadDeviceType: socketLead?.deviceType ?? null,
+      requestedLeadDeviceType: requestedLead?.deviceType ?? null,
+      requestedLeadFound: requestedLead !== undefined,
+      requestedLeadAgeMin: requestedLead
+        ? Math.round((Date.now() - requestedLead.createdAt.getTime()) / 60_000)
+        : undefined,
+      leadsShareIp:
+        socketLead && requestedLead
+          ? socketLead.ipAddress !== null &&
+            socketLead.ipAddress === requestedLead.ipAddress
+          : undefined,
+      leadsShareUserAgent:
+        socketLead && requestedLead
+          ? socketLead.userAgent !== null &&
+            socketLead.userAgent === requestedLead.userAgent
+          : undefined,
+    };
+  } catch {
+    // Not a uuid / DB hiccup: the denial still logs without the lead facts.
+    return {};
+  }
+}
+
 // ─── Channel authorization ────────────────────────────────────────────────────
 
 type WsChannelAccess =

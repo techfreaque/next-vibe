@@ -20,7 +20,7 @@ import type {
   JwtPrivatePayloadType,
   JWTPublicPayloadType,
 } from "../../identity/auth/types";
-import { userLeadLinks } from "../../identity/lead/db";
+import { leads, userLeadLinks } from "../../identity/lead/db";
 import { UserPermissionRole } from "../../identity/roles/enum";
 import { sessions } from "../../identity/session/db";
 import { userRoles, users } from "../../identity/user/db";
@@ -29,6 +29,7 @@ import { buildUserWsChannel, buildWsChannel } from "../core/channel";
 import {
   authenticateWsRequest,
   authorizeWsChannel,
+  describeGuestLeadMismatch,
   describeSubscribeIdentity,
 } from "./ws-channel-auth";
 
@@ -99,6 +100,9 @@ describe("WebSocket browser session authorization", () => {
     const threadColumns = Object.values(getTableColumns(chatThreads))
       .map((column) => `${column.name} ${column.getSQLType()}`)
       .join(", ");
+    const leadColumns = Object.values(getTableColumns(leads))
+      .map((column) => `${column.name} ${column.getSQLType()}`)
+      .join(", ");
     await pg.exec(`
       CREATE TABLE users (id uuid PRIMARY KEY, is_active boolean DEFAULT true, is_banned boolean DEFAULT false);
       CREATE TABLE sessions (
@@ -114,6 +118,7 @@ describe("WebSocket browser session authorization", () => {
         assigned_by uuid, created_at timestamp DEFAULT now(), updated_at timestamp DEFAULT now()
       );
       CREATE TABLE chat_threads (${threadColumns});
+      CREATE TABLE leads (${leadColumns});
     `);
     await pg.query("INSERT INTO users (id) VALUES ($1)", [USER]);
     await db.insert(userLeadLinks).values({
@@ -294,6 +299,35 @@ describe("WebSocket browser session authorization", () => {
         ),
       ),
     ).toBe("[true,false,true,false,true,false,true,false]");
+  });
+
+  it("describes a guest socket whose lead differs from the rendered one without logging the IP", async () => {
+    const BOT_LEAD = "2b0f7c1e-5d0e-4c55-9d43-0f5a8e7b6a10";
+    const RENDERED_LEAD = "9a3c1f2e-7b44-4c1a-8f6e-2d5b9c0e1a77";
+    const createdAt = new Date(Date.now() - 30 * 60_000);
+    await pg.query(
+      "INSERT INTO leads (id, status, device_type, ip_address, user_agent, created_at, updated_at) VALUES ($1, 'new', 'enums.deviceType.bot', '198.51.100.7', 'ua-a', now(), now()), ($2, 'new', 'enums.deviceType.bot', '203.0.113.9', 'ua-b', $3, $3)",
+      [BOT_LEAD, RENDERED_LEAD, createdAt],
+    );
+    const facts = await describeGuestLeadMismatch(
+      BOT_LEAD,
+      `user/${RENDERED_LEAD}/ws-credits-GET`,
+    );
+    expect(facts).toEqual({
+      socketLeadDeviceType: "enums.deviceType.bot",
+      requestedLeadDeviceType: "enums.deviceType.bot",
+      requestedLeadFound: true,
+      requestedLeadAgeMin: 30,
+      leadsShareIp: false,
+      leadsShareUserAgent: false,
+    });
+    expect(JSON.stringify(facts)).not.toContain("198.51.100.7");
+    expect(
+      await describeGuestLeadMismatch(BOT_LEAD, `user/${OTHER}/ws-credits-GET`),
+    ).toMatchObject({ requestedLeadFound: false, leadsShareIp: undefined });
+    expect(await describeGuestLeadMismatch(BOT_LEAD, "ws-credits-GET")).toEqual(
+      {},
+    );
   });
 
   it("reports which authorization gate denied the subscription", async () => {

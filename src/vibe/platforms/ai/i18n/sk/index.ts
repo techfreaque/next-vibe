@@ -57,6 +57,10 @@ export const translations: typeof enTranslations = {
           title:
             "Nástroj {{toolName}} nie je v tomto vlákne dostupný. Dostupné nástroje zo svojho zoznamu volaj priamo.",
         },
+        emptyInput: {
+          title:
+            '{{error}} Volanie neobsahovalo pole input. Argumenty pre {{toolName}} patria do input: {"toolName": "{{toolName}}", "input": { ... }}.',
+        },
         notFound: {
           title: "Nástroj sa nenašiel",
           description:

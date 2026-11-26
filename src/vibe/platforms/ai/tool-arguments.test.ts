@@ -74,8 +74,7 @@ describe("model tool arguments", () => {
       "input",
     );
     expect(issues).toEqual([
-      "Unknown key 'name' in input. Expected { title: string, description?: string }",
-      "Unknown key 'extra' in input. Expected { title: string, description?: string }",
+      "Unknown keys 'name', 'extra' in input. Expected { title: string, description?: string }",
     ]);
   });
 

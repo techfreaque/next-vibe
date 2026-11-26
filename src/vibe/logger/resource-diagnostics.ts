@@ -20,8 +20,12 @@ import {
 import { sanitizeRoutePath } from "./client-context";
 
 // Match the public JS/CSS paths recorded in both Caddy edge logs.
+// Content-hashed build files carry no user data. App Router segment chunks
+// keep their route folders ("app/%5Blocale%5D/threads/page-<hash>.js"): the
+// id sanitizer used to turn the hashed file name into ":id", so a stale-build
+// miss could not be matched to a build (prod 2026-11-26 10:06 Firefox row).
 const NEXT_BUNDLE_PATH =
-  /^\/_next\/static\/chunks\/[A-Za-z0-9_./~-]+\.(?:js|css)$/;
+  /^\/_next\/static\/(?:chunks|css|media)\/[A-Za-z0-9_./~%()[\]@-]+\.(?:js|css|woff2?|ttf|otf)$/;
 // Keep the same shipped badge names that the edge can record on a 5xx.
 const PUBLIC_BADGE_PATH =
   /^\/images\/badges\/(?:(?:dang|postmake|toolpilot)-(?:dark|light)\.png|(?:aitoolscapital|bestekitools)-(?:dark|light)\.svg|opensourcealternatives\.svg|whatsthebigdata\.jpg)$/;

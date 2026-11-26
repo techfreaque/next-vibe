@@ -21,7 +21,8 @@ export const translations: typeof enTranslations = {
       },
       find: {
         label: "Rechercher",
-        description: "Texte à rechercher",
+        description:
+          "Texte à rechercher. Chaque occurrence est remplacée (pas besoin de replace_all)",
       },
       replace: {
         label: "Remplacer",

@@ -207,6 +207,30 @@ export function encodeGeoTable(table: GeoTable): Uint8Array {
   return bytes;
 }
 
+const HOST_IS_LITTLE_ENDIAN =
+  new Uint8Array(new Uint32Array([1]).buffer)[0] === 1;
+
+/** `count` little-endian uint32 values starting at `offset`. */
+function readUint32s(
+  view: DataView,
+  bytes: Uint8Array,
+  offset: number,
+  count: number,
+): Uint32Array {
+  if (HOST_IS_LITTLE_ENDIAN) {
+    // Copy into a fresh, exactly sized, 4-byte aligned buffer. Not slice():
+    // on a Node Buffer (the inflated table) slice() is a view of the pool.
+    return new Uint32Array(
+      new Uint8Array(bytes.subarray(offset, offset + count * 4)).buffer,
+    );
+  }
+  const values = new Uint32Array(count);
+  for (let i = 0; i < count; i++) {
+    values[i] = view.getUint32(offset + i * 4, true);
+  }
+  return values;
+}
+
 /** Null when the bytes are not a GEO1 table. */
 export function decodeGeoTable(bytes: Uint8Array): GeoTable | null {
   if (
@@ -230,19 +254,20 @@ export function decodeGeoTable(bytes: Uint8Array): GeoTable | null {
   if (bytes.length !== offset + v4 * 5 + v6 * 9) {
     return null;
   }
-  const v4Starts = new Uint32Array(v4);
-  for (let i = 0; i < v4; i++) {
-    v4Starts[i] = view.getUint32(offset, true);
-    offset += 4;
-  }
+  // Bulk copies instead of one DataView read per value: the per-range loops
+  // held the event loop ~110 ms on a cold load (prod 2026-11-26 13:00,
+  // decodeGeoTable compact.ts:235/244 hot during the hourly geo cron).
+  const v4Starts = readUint32s(view, bytes, offset, v4);
+  offset += v4 * 4;
   const v4Codes = bytes.slice(offset, offset + v4);
   offset += v4;
+  const v6Pairs = readUint32s(view, bytes, offset, v6 * 2);
+  offset += v6 * 8;
   const v6Hi = new Uint32Array(v6);
   const v6Lo = new Uint32Array(v6);
   for (let i = 0; i < v6; i++) {
-    v6Hi[i] = view.getUint32(offset, true);
-    v6Lo[i] = view.getUint32(offset + 4, true);
-    offset += 8;
+    v6Hi[i] = v6Pairs[i * 2] ?? 0;
+    v6Lo[i] = v6Pairs[i * 2 + 1] ?? 0;
   }
   const v6Codes = bytes.slice(offset, offset + v6);
   return { codes, v4Starts, v4Codes, v6Hi, v6Lo, v6Codes };

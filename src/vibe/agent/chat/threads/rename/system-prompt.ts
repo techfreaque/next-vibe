@@ -114,7 +114,7 @@ export const threadRenameFragment: SystemPromptFragment = {
       : `execute-tool with arguments ${JSON.stringify({ toolName: renameToolName, input: renameInput, ...(params.user.isPublic ? {} : { callbackMode: "endLoop" }) })}`;
     const timing =
       "Finish the user's request first. Once all work is complete, write the visible answer and silently call the rename tool in the same response. If you already answered this turn, send only the rename. Never end the turn with work pending.";
-    const fields = `Example: ${callShape}. Replace the example title and description with a title of up to eight words and a short summary of this conversation.`;
+    const fields = `Example: ${callShape}. Replace the example title and description with a title of up to eight words and a one-sentence summary of this conversation (under 300 characters).`;
 
     if (isNew) {
       return `[MANDATORY THIS TURN, ALONGSIDE YOUR ANSWER] This thread still has a placeholder title. Give it a title even if the conversation is just starting. ${timing} ${fields}`;

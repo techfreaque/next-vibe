@@ -12,6 +12,7 @@ import {
   affordableOutputTokens,
   canFundCompaction,
   computeOutputCap,
+  MIN_AFFORDABLE_IMAGE_OUTPUT_TOKENS,
   MIN_AFFORDABLE_OUTPUT_TOKENS,
   MIN_AFFORDABLE_REASONING_OUTPUT_TOKENS,
   minAffordableOutputTokens,
@@ -168,6 +169,26 @@ describe("computeOutputCap", () => {
     expect(cap.kind).toBe("unaffordable");
     if (cap.kind === "unaffordable") {
       expect(cap.requiredCredits).toBeGreaterThan(remainingCredits);
+    }
+  });
+  it("an image-output model is refused when the balance cannot pay one image (prod 11-26)", () => {
+    const nanoBananaPro = getChatModelById(
+      ChatModelId.GEMINI_3_PRO_IMAGE_PREVIEW,
+    );
+    expect(minAffordableOutputTokens(nanoBananaPro)).toBe(
+      MIN_AFFORDABLE_IMAGE_OUTPUT_TOKENS,
+    );
+    // The prod turn: 14.73 credits, small prompt. It was capped at ~900
+    // tokens, ended "length" with no image and was billed.
+    const cap = computeOutputCap({
+      model: nanoBananaPro,
+      modelCost: 1,
+      remainingCredits: 14.73,
+      inputTokens: 1_500,
+    });
+    expect(cap.kind).toBe("unaffordable");
+    if (cap.kind === "unaffordable") {
+      expect(cap.requiredCredits).toBeGreaterThan(14.73);
     }
   });
 });

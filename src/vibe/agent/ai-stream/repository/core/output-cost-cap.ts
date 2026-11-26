@@ -38,11 +38,23 @@ export const MIN_AFFORDABLE_OUTPUT_TOKENS = 256;
  */
 export const MIN_AFFORDABLE_REASONING_OUTPUT_TOKENS = 2048;
 
+/**
+ * Image-output chat models write the picture as output tokens: a 1K/2K
+ * Gemini image is 1120 tokens at the image rate, plus a short caption. A
+ * smaller cap bought only the model's thinking, no image, billed anyway (prod
+ * 2026-11-26: gemini-3-pro-image-preview with 14.7 credits, capped at ~900
+ * tokens, finish "length", empty answer, charged 0.54).
+ */
+export const MIN_AFFORDABLE_IMAGE_OUTPUT_TOKENS = 1536;
+
 /** Smallest output worth starting a step with on this model. */
 export function minAffordableOutputTokens(model: ChatModelOption): number {
-  return model.utilities.includes(ModelUtility.REASONING)
+  const base = model.utilities.includes(ModelUtility.REASONING)
     ? MIN_AFFORDABLE_REASONING_OUTPUT_TOKENS
     : MIN_AFFORDABLE_OUTPUT_TOKENS;
+  return model.outputs.includes("image")
+    ? Math.max(base, MIN_AFFORDABLE_IMAGE_OUTPUT_TOKENS)
+    : base;
 }
 
 /**

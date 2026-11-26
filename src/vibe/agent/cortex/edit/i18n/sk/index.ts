@@ -21,7 +21,8 @@ export const translations: typeof enTranslations = {
       },
       find: {
         label: "Nájsť",
-        description: "Text, ktorý sa má nájsť",
+        description:
+          "Text, ktorý sa má nájsť. Nahradí sa každý výskyt (replace_all netreba)",
       },
       replace: {
         label: "Nahradiť",

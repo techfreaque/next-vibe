@@ -55,6 +55,10 @@ export const translations = {
           title:
             "{{toolName}} is not available in this thread. Call the tools in your tool list directly.",
         },
+        emptyInput: {
+          title:
+            '{{error}} Your call sent no input. Put the arguments of {{toolName}} inside input: {"toolName": "{{toolName}}", "input": { ... }}.',
+        },
         notFound: {
           title: "Tool Not Found",
           description: "No registered tool matches the given toolName",

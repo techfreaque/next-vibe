@@ -33,7 +33,7 @@ import { parseError } from "../../core/utils/parse-error";
 import type { JwtPayloadType } from "../../identity/auth/types";
 import type { EndpointLogger } from "../../logger/types";
 import type { AiT } from "../../platforms/ai/i18n";
-import type { Platform } from "../../platforms/platforms";
+import { Platform } from "../../platforms/platforms";
 import type {
   RouteExecuteRequestOutput,
   RouteExecuteResponseOutput,
@@ -193,6 +193,23 @@ export class RouteExecuteRepository {
         platform,
       );
       if (!waitResult.success) {
+        // kimi-k3 (prod 2026-11-26, 34 calls) sent {toolName} with no input
+        // and retried the same call: the target's "query: expected string"
+        // never said where the arguments go.
+        if (
+          platform === Platform.AI &&
+          waitResult.errorType.errorKey ===
+            ErrorResponseTypes.VALIDATION_ERROR.errorKey &&
+          Object.keys(input ?? {}).length === 0
+        ) {
+          return fail({
+            message: t("executeTool.post.errors.emptyInput.title", {
+              error: waitResult.message,
+              toolName,
+            }),
+            errorType: waitResult.errorType,
+          });
+        }
         return waitResult;
       }
       // Wrap local WAIT data in `result` to satisfy the route schema.

@@ -57,6 +57,10 @@ export const translations: typeof enTranslations = {
           title:
             "{{toolName}} steht in diesem Thread nicht zur Verfügung. Ruf die Tools aus deiner Tool-Liste direkt auf.",
         },
+        emptyInput: {
+          title:
+            '{{error}} Dein Aufruf hatte kein input. Die Argumente für {{toolName}} gehören in input: {"toolName": "{{toolName}}", "input": { ... }}.',
+        },
         notFound: {
           title: "Tool nicht gefunden",
           description: "Kein registriertes Tool mit diesem Namen gefunden",

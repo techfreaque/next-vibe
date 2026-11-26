@@ -57,6 +57,10 @@ export const translations: typeof enTranslations = {
           title:
             "{{toolName}} nie jest dostępne w tym wątku. Wywołuj bezpośrednio narzędzia z Twojej listy.",
         },
+        emptyInput: {
+          title:
+            '{{error}} Twoje wywołanie nie miało pola input. Argumenty dla {{toolName}} umieść w input: {"toolName": "{{toolName}}", "input": { ... }}.',
+        },
         notFound: {
           title: "Narzędzie nie znalezione",
           description: "Brak zarejestrowanego narzędzia o podanej nazwie",

@@ -147,6 +147,20 @@ describe("handleChunkLoadFailure", () => {
   it("keeps only the public same-origin bundle path for edge correlation", () => {
     const path = "/_next/static/chunks/123456-a1b2c3d4e5f6abcd.js";
     expect(describeUrl(path)).toBe(path);
+    // App Router segment chunks and fonts keep their hashed names (the 11-26
+    // Firefox stale-build row read "chunks/app/%5Blocale%5D/threads/:id").
+    const segmentChunk =
+      "/_next/static/chunks/app/%5Blocale%5D/threads/page-94fac8c647f3d689.js";
+    expect(describeUrl(segmentChunk)).toBe(segmentChunk);
+    expect(
+      describeUrl("/_next/static/chunks/app/(auth)/%5B...path%5D/page-0a1b2c3d4e5f6789.js"),
+    ).toBe("/_next/static/chunks/app/(auth)/%5B...path%5D/page-0a1b2c3d4e5f6789.js");
+    expect(describeUrl("/_next/static/media/e4af272ccee01ff0-s.p.woff2")).toBe(
+      "/_next/static/media/e4af272ccee01ff0-s.p.woff2",
+    );
+    expect(describeUrl("/_next/static/abcde12345abcde12345/_buildManifest.js")).toBe(
+      "/_next/static/:id/_buildManifest.js",
+    );
     expect(describeUrl("/images/unbottled-icon-white.png?src=private")).toBe(
       "/images/unbottled-icon-white.png",
     );
@@ -408,6 +422,23 @@ describe("handleChunkLoadFailure", () => {
       navigation.mockRestore();
       now.mockRestore();
     }
+  });
+
+  it("flags a loader timeout that fired before the 120 s limit (virtual-time renderer)", () => {
+    const calls: LoggedCall[] = [];
+    const logger = createCapturingLogger(calls);
+    const timeout = new Error(
+      "Loading chunk 936326 failed.\n(timeout: https://unbottled.ai/_next/static/chunks/936326-1c5b1769a7fdd7bd.js)",
+    );
+    timeout.name = "ChunkLoadError";
+    handleChunkLoadFailure(logger, { source: "test", error: timeout });
+    handleChunkLoadFailure(logger, { source: "test", error: chunkError() });
+    // The test process is seconds old, like the prod tab that "timed out" 4 s in.
+    expect(calls[0]?.context).toMatchObject({
+      chunkFailKind: "timeout",
+      timeoutBeforeLoaderLimit: true,
+    });
+    expect(calls[1]?.context).toMatchObject({ timeoutBeforeLoaderLimit: null });
   });
 
   it("reports the failure when the reload guard cannot be stored", () => {

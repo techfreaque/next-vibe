@@ -64,6 +64,7 @@ import {
 import {
   authenticateWsRequest,
   authorizeWsChannel,
+  describeGuestLeadMismatch,
   describeSubscribeIdentity,
   isRequestedUidLinkedLead,
 } from "./ws-channel-auth";
@@ -842,6 +843,14 @@ export function startWebSocketServer(
                 guestIdentityRefreshNotice =
                   sent === 0 ? "dropped" : sent < 0 ? "queued" : "sent";
               }
+              const leadFacts =
+                identity.identityMismatch === "socket-guest-other-uid" &&
+                ws.data.user.leadId
+                  ? await describeGuestLeadMismatch(
+                      ws.data.user.leadId,
+                      msg.channel,
+                    )
+                  : {};
               logger.warn(
                 "[WS] Subscribe denied - socket identity may not join channel",
                 {
@@ -862,6 +871,7 @@ export function startWebSocketServer(
                     msg.refreshGuestIdentity === true,
                   staleRenderedGuestLead: shouldRefreshGuestIdentity,
                   guestIdentityRefreshNotice,
+                  ...leadFacts,
                 },
               );
               return;

@@ -472,6 +472,10 @@ function startSession(logger: EndpointLogger): ProfileSession {
             totalSamples: stall.totalSamples,
             windowSampleCount: stall.windowSampleCount,
             sampledSpanMs: stall.sampledSpanMs,
+            // Seconds since process start: a boot-time stall (runtime-env
+            // patch before Next.js serves, prod 2026-11-26 14:17 at ~10 s)
+            // reads apart from one under traffic.
+            uptimeS: Math.floor(process.uptime()),
           },
         );
       }

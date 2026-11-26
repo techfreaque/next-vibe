@@ -21,7 +21,8 @@ export const translations: typeof enTranslations = {
       },
       find: {
         label: "Encontrar",
-        description: "Texto para encontrar",
+        description:
+          "Texto para encontrar. Se reemplazan todas las coincidencias (no hace falta replace_all)",
       },
       replace: {
         label: "Reemplazamiento",
