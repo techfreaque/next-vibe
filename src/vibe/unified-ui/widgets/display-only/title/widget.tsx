@@ -185,7 +185,7 @@ export function TitleWidget<
 
     return (
       <Div className={cn("flex flex-col", gapClass, alignmentClass, className)}>
-        <Title level={level} className="leading-tight font-mono">
+        <Title level={level} className="leading-tight tabular-nums">
           {dateFormatted}
         </Title>
       </Div>

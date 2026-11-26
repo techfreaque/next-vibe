@@ -9,6 +9,7 @@ import { Pressable, View } from "react-native";
 import { cn } from "../../../unified-ui/_shared/cn";
 import { scopedTranslation } from "../../../unified-ui/hooks/i18n";
 import {
+  createCalendarDateDisplayFormatter,
   createCalendarDateFormatter,
   parseCalendarDate,
 } from "../../../unified-ui/widgets/form-fields/date-field/local-date";
@@ -46,7 +47,7 @@ export function DatePicker({
   className,
   style,
   locale,
-  localizedDate = false,
+  localizedDate = true,
   inputClassName,
   name,
   id,
@@ -59,8 +60,14 @@ export function DatePicker({
   const formatter = localizedDate
     ? createCalendarDateFormatter(locale ?? currentLocale)
     : undefined;
+  const displayFormatter = localizedDate
+    ? createCalendarDateDisplayFormatter(locale ?? currentLocale)
+    : undefined;
   const inputValue =
-    draft ?? (value && formatter ? formatter.format(value) : formatDate(value));
+    draft ??
+    (value && displayFormatter
+      ? displayFormatter.format(value)
+      : formatDate(value));
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
 
   const handleInputChange = (newValue: string): void => {

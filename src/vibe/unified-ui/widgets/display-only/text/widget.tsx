@@ -210,7 +210,9 @@ export function TextWidget<
     return (
       <Div className={alignmentClass}>
         {label && <Label className=" font-medium">{label}</Label>}
-        <Span className={cn("font-mono ", styleClasses)}>{displayText}</Span>
+        <Span className={cn("whitespace-nowrap tabular-nums", styleClasses)}>
+          {displayText}
+        </Span>
       </Div>
     );
   }

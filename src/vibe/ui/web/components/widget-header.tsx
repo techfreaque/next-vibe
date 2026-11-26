@@ -51,7 +51,7 @@ export function WidgetHeader({
             )}
           </div>
           {actions && (
-            <div className="flex min-w-0 max-w-full flex-wrap items-center gap-2">
+            <div className="flex w-full min-w-0 max-w-full flex-wrap items-center gap-2 @lg:w-auto">
               {actions}
             </div>
           )}

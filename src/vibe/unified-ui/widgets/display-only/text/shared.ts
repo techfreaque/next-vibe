@@ -148,19 +148,25 @@ function formatDateValue(
       return String(value);
     }
 
-    const options: Intl.DateTimeFormatOptions = includeTime
-      ? {
-          year: "numeric",
-          month: "short",
-          day: "numeric",
-          hour: "2-digit",
-          minute: "2-digit",
-        }
-      : {
-          year: "numeric",
-          month: "short",
-          day: "numeric",
-        };
+    // A bare calendar day ("2026-11-26") is that day everywhere: format it
+    // in UTC so a viewer west of Greenwich never sees the day before.
+    const isCalendarDay =
+      typeof dateValue === "string" && /^\d{4}-\d{2}-\d{2}$/.test(dateValue);
+    const options: Intl.DateTimeFormatOptions =
+      includeTime && !isCalendarDay
+        ? {
+            year: "numeric",
+            month: "short",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+          }
+        : {
+            year: "numeric",
+            month: "short",
+            day: "2-digit",
+            ...(isCalendarDay ? { timeZone: "UTC" } : {}),
+          };
 
     return new Intl.DateTimeFormat(locale, options).format(date);
   } catch {
@@ -182,14 +188,29 @@ export function formatIfDate(
   fieldType: FieldDataType | undefined,
   locale: string,
 ): string | null {
-  if (!fieldType || !value) {
+  if (!value) {
     return null;
   }
 
   // Check for DATE field type
-  if (fieldType.includes("DATE")) {
+  if (fieldType?.includes("DATE")) {
     const includeTime = fieldType.includes("DATETIME");
     return formatDateValue(value, locale, includeTime);
+  }
+
+  // Untyped response values that are ISO dates still read as dates, never
+  // as "2026-11-26T10:00:00.000Z".
+  if (!fieldType && typeof value === "string") {
+    if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+      return formatDateValue(value, locale, false);
+    }
+    if (
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|[+-]\d{2}:?\d{2})$/.test(
+        value,
+      )
+    ) {
+      return formatDateValue(value, locale, true);
+    }
   }
 
   return null;

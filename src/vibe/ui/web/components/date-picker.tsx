@@ -14,6 +14,7 @@ import { useState } from "react";
 import { cn } from "../../../unified-ui/_shared/cn";
 import { scopedTranslation } from "../../../unified-ui/hooks/i18n";
 import {
+  createCalendarDateDisplayFormatter,
   createCalendarDateFormatter,
   parseCalendarDate,
 } from "../../../unified-ui/widgets/form-fields/date-field/local-date";
@@ -33,6 +34,10 @@ export type DatePickerProps = {
   disabled?: boolean;
   name?: string;
   locale?: CountryLanguage;
+  /**
+   * Show the date in the viewer's locale ("26 Nov 2026", "26. Nov. 2026")
+   * while the value stays a calendar day. Default true; false shows ISO.
+   */
   localizedDate?: boolean;
   inputClassName?: string;
   ref?: Ref<InputRefObject>;
@@ -67,7 +72,7 @@ export function DatePicker({
   style,
   name,
   locale,
-  localizedDate = false,
+  localizedDate = true,
   inputClassName,
   id,
   ...inputProps
@@ -79,8 +84,14 @@ export function DatePicker({
   const formatter = localizedDate
     ? createCalendarDateFormatter(locale ?? currentLocale)
     : undefined;
+  const displayFormatter = localizedDate
+    ? createCalendarDateDisplayFormatter(locale ?? currentLocale)
+    : undefined;
   const inputValue =
-    draft ?? (value && formatter ? formatter.format(value) : formatDate(value));
+    draft ??
+    (value && displayFormatter
+      ? displayFormatter.format(value)
+      : formatDate(value));
 
   const handleSelect = (date: Date | undefined): void => {
     onChange(date);
