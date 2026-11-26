@@ -338,9 +338,12 @@ export const translations: typeof enTranslations = {
   },
 
   widget: {
+    subtitle:
+      "Wszystkie błędy i ostrzeżenia pogrupowane w klasy. Oznacz naprawione jako rozwiązane; ponowne wystąpienie otwiera je znowu.",
     kpi: {
       unresolvedInScope: "Otwarte w tym widoku",
-      unresolvedAllTimeLink: "Otwarte od początku: {{count}}",
+      unresolvedAllTimeLink:
+        "Wszystkie otwarte klasy, błędy i ostrzeżenia, od początku: {{count}}",
       unresolvedMessages:
         "Komunikaty: {{messages}} · trafienia: {{occurrences}}",
       unresolvedMatching: "Nierozwiązane pasujące do filtrów: {{count}}",

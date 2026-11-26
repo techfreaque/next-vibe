@@ -928,6 +928,10 @@ export const translations: typeof enTranslations = {
       widget: {
         retry: "Volver a intentar",
         noItems: "Este traslado no contiene artículos.",
+        noItemsHint:
+          "Añade los productos que se mueven al crear el traslado. Sin artículos no se puede despachar.",
+        receivedOf: "{{received}} de {{requested}} recibidos",
+        newTransfer: "Nuevo traslado",
         back: "Atrás",
         dispatch: "Transferencia de separación",
         receive: "Mark received",
@@ -987,8 +991,8 @@ export const translations: typeof enTranslations = {
         status: "Situación",
         reference: "Referencia",
         notes: "Notas",
-        createdAt: "Creado en",
-        completedAt: "Completado en",
+        createdAt: "Creado",
+        completedAt: "Completado",
         items: "Temas",
         itemId: "Tema ID",
         productId: "Producto ID",

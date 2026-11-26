@@ -10090,11 +10090,6 @@
     "titleShort": "Ganancias",
     "description": "Consulta tu historial de ganancias por referidos",
     "fields": {
-      "type": "container",
-      "title": "Detalles del Código de Remisión",
-      "description": "Ver información sobre el código de referencia",
-      "layoutType": "grid",
-      "columns": 12,
       "usage": {
         "request": "data",
         "response": true
@@ -10103,8 +10098,9 @@
         "targetUserId": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Consultar código de referido",
+          "label": "Cuenta del partner",
           "hidden": true,
+          "includeInCacheKey": true,
           "schema": {
             "def": {
               "type": "optional",
@@ -10125,8 +10121,9 @@
         "limit": {
           "type": "form_field",
           "fieldType": "number",
-          "label": "Limitación",
-          "description": "Número máximo de resultados a la vuelta",
+          "label": "Filas por página",
+          "description": "Cuántas ganancias mostrar por página",
+          "hidden": true,
           "schema": {
             "def": {
               "type": "optional",
@@ -10134,7 +10131,20 @@
                 "def": {
                   "type": "number",
                   "coerce": true,
-                  "checks": [{}]
+                  "checks": [
+                    {
+                      "def": {
+                        "type": "number",
+                        "check": "number_format",
+                        "abort": false,
+                        "format": "safeint"
+                      },
+                      "type": "number",
+                      "isFinite": true
+                    },
+                    {},
+                    {}
+                  ]
                 },
                 "type": "number",
                 "isFinite": true
@@ -10150,8 +10160,9 @@
         "offset": {
           "type": "form_field",
           "fieldType": "number",
-          "label": "Offset",
-          "description": "Número de resultados para saltar",
+          "label": "Empezar en",
+          "description": "Número de ganancias a omitir",
+          "hidden": true,
           "schema": {
             "def": {
               "type": "optional",
@@ -10159,7 +10170,19 @@
                 "def": {
                   "type": "number",
                   "coerce": true,
-                  "checks": [{}]
+                  "checks": [
+                    {
+                      "def": {
+                        "type": "number",
+                        "check": "number_format",
+                        "abort": false,
+                        "format": "safeint"
+                      },
+                      "type": "number",
+                      "isFinite": true
+                    },
+                    {}
+                  ]
                 },
                 "type": "number",
                 "isFinite": true
@@ -10173,138 +10196,346 @@
           "schemaType": "primitive"
         },
         "earnings": {
-          "type": "container",
-          "child": {
-            "type": "container",
-            "layoutType": "grid",
-            "columns": 12,
-            "usage": {
-              "response": true
+          "type": "text",
+          "schema": {
+            "def": {
+              "type": "array",
+              "element": {
+                "def": {
+                  "type": "object",
+                  "shape": {
+                    "id": {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    },
+                    "earnerUserId": {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    },
+                    "sourceUserId": {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    },
+                    "transactionId": {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    },
+                    "level": {
+                      "def": {
+                        "type": "number",
+                        "coerce": true,
+                        "checks": []
+                      },
+                      "type": "number",
+                      "isFinite": true
+                    },
+                    "amountCents": {
+                      "def": {
+                        "type": "number",
+                        "coerce": true,
+                        "checks": []
+                      },
+                      "type": "number",
+                      "isFinite": true
+                    },
+                    "currency": {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    },
+                    "status": {
+                      "def": {
+                        "type": "enum",
+                        "entries": {
+                          "enums.earningStatus.pending": "enums.earningStatus.pending",
+                          "enums.earningStatus.confirmed": "enums.earningStatus.confirmed",
+                          "enums.earningStatus.canceled": "enums.earningStatus.canceled"
+                        }
+                      },
+                      "type": "enum",
+                      "enum": {
+                        "enums.earningStatus.pending": "enums.earningStatus.pending",
+                        "enums.earningStatus.confirmed": "enums.earningStatus.confirmed",
+                        "enums.earningStatus.canceled": "enums.earningStatus.canceled"
+                      },
+                      "options": [
+                        "enums.earningStatus.pending",
+                        "enums.earningStatus.confirmed",
+                        "enums.earningStatus.canceled"
+                      ]
+                    },
+                    "createdAt": {
+                      "def": {
+                        "type": "pipe",
+                        "in": {
+                          "def": {
+                            "type": "union",
+                            "options": [
+                              {
+                                "def": {
+                                  "type": "string"
+                                },
+                                "type": "string"
+                              },
+                              {
+                                "def": {
+                                  "type": "date"
+                                },
+                                "type": "date"
+                              },
+                              {
+                                "def": {
+                                  "type": "number",
+                                  "coerce": true,
+                                  "checks": []
+                                },
+                                "type": "number",
+                                "isFinite": true
+                              }
+                            ]
+                          },
+                          "type": "union",
+                          "options": [
+                            {
+                              "def": {
+                                "type": "string"
+                              },
+                              "type": "string"
+                            },
+                            {
+                              "def": {
+                                "type": "date"
+                              },
+                              "type": "date"
+                            },
+                            {
+                              "def": {
+                                "type": "number",
+                                "coerce": true,
+                                "checks": []
+                              },
+                              "type": "number",
+                              "isFinite": true
+                            }
+                          ]
+                        },
+                        "out": {
+                          "def": {
+                            "type": "transform"
+                          },
+                          "type": "transform"
+                        }
+                      },
+                      "type": "pipe",
+                      "in": {
+                        "def": {
+                          "type": "union",
+                          "options": [
+                            {
+                              "def": {
+                                "type": "string"
+                              },
+                              "type": "string"
+                            },
+                            {
+                              "def": {
+                                "type": "date"
+                              },
+                              "type": "date"
+                            },
+                            {
+                              "def": {
+                                "type": "number",
+                                "coerce": true,
+                                "checks": []
+                              },
+                              "type": "number",
+                              "isFinite": true
+                            }
+                          ]
+                        },
+                        "type": "union",
+                        "options": [
+                          {
+                            "def": {
+                              "type": "string"
+                            },
+                            "type": "string"
+                          },
+                          {
+                            "def": {
+                              "type": "date"
+                            },
+                            "type": "date"
+                          },
+                          {
+                            "def": {
+                              "type": "number",
+                              "coerce": true,
+                              "checks": []
+                            },
+                            "type": "number",
+                            "isFinite": true
+                          }
+                        ]
+                      },
+                      "out": {
+                        "def": {
+                          "type": "transform"
+                        },
+                        "type": "transform"
+                      }
+                    }
+                  }
+                },
+                "type": "object"
+              }
             },
-            "children": {
-              "id": {
-                "type": "text",
-                "label": "ID",
-                "schema": {
-                  "def": {
+            "type": "array",
+            "element": {
+              "def": {
+                "type": "object",
+                "shape": {
+                  "id": {
+                    "def": {
+                      "type": "string"
+                    },
                     "type": "string"
                   },
-                  "type": "string"
-                },
-                "usage": {
-                  "response": true
-                },
-                "schemaType": "primitive"
-              },
-              "earnerUserId": {
-                "type": "text",
-                "label": "Earner Usuario ID",
-                "schema": {
-                  "def": {
+                  "earnerUserId": {
+                    "def": {
+                      "type": "string"
+                    },
                     "type": "string"
                   },
-                  "type": "string"
-                },
-                "usage": {
-                  "response": true
-                },
-                "schemaType": "primitive"
-              },
-              "sourceUserId": {
-                "type": "text",
-                "label": "Fuente Usuario ID",
-                "schema": {
-                  "def": {
+                  "sourceUserId": {
+                    "def": {
+                      "type": "string"
+                    },
                     "type": "string"
                   },
-                  "type": "string"
-                },
-                "usage": {
-                  "response": true
-                },
-                "schemaType": "primitive"
-              },
-              "transactionId": {
-                "type": "text",
-                "label": "ID del movimiento",
-                "schema": {
-                  "def": {
+                  "transactionId": {
+                    "def": {
+                      "type": "string"
+                    },
                     "type": "string"
                   },
-                  "type": "string"
-                },
-                "usage": {
-                  "response": true
-                },
-                "schemaType": "primitive"
-              },
-              "level": {
-                "type": "text",
-                "label": "Nivel",
-                "schema": {
-                  "def": {
+                  "level": {
+                    "def": {
+                      "type": "number",
+                      "coerce": true,
+                      "checks": []
+                    },
                     "type": "number",
-                    "coerce": true,
-                    "checks": []
+                    "isFinite": true
                   },
-                  "type": "number",
-                  "isFinite": true
-                },
-                "usage": {
-                  "response": true
-                },
-                "schemaType": "primitive"
-              },
-              "amountCents": {
-                "type": "text",
-                "label": "Cantidad (Cents)",
-                "schema": {
-                  "def": {
+                  "amountCents": {
+                    "def": {
+                      "type": "number",
+                      "coerce": true,
+                      "checks": []
+                    },
                     "type": "number",
-                    "coerce": true,
-                    "checks": []
+                    "isFinite": true
                   },
-                  "type": "number",
-                  "isFinite": true
-                },
-                "usage": {
-                  "response": true
-                },
-                "schemaType": "primitive"
-              },
-              "currency": {
-                "type": "text",
-                "label": "Moneda",
-                "schema": {
-                  "def": {
+                  "currency": {
+                    "def": {
+                      "type": "string"
+                    },
                     "type": "string"
                   },
-                  "type": "string"
-                },
-                "usage": {
-                  "response": true
-                },
-                "schemaType": "primitive"
-              },
-              "status": {
-                "type": "text",
-                "label": "Situación",
-                "schema": {
-                  "def": {
-                    "type": "string"
+                  "status": {
+                    "def": {
+                      "type": "enum",
+                      "entries": {
+                        "enums.earningStatus.pending": "enums.earningStatus.pending",
+                        "enums.earningStatus.confirmed": "enums.earningStatus.confirmed",
+                        "enums.earningStatus.canceled": "enums.earningStatus.canceled"
+                      }
+                    },
+                    "type": "enum",
+                    "enum": {
+                      "enums.earningStatus.pending": "enums.earningStatus.pending",
+                      "enums.earningStatus.confirmed": "enums.earningStatus.confirmed",
+                      "enums.earningStatus.canceled": "enums.earningStatus.canceled"
+                    },
+                    "options": [
+                      "enums.earningStatus.pending",
+                      "enums.earningStatus.confirmed",
+                      "enums.earningStatus.canceled"
+                    ]
                   },
-                  "type": "string"
-                },
-                "usage": {
-                  "response": true
-                },
-                "schemaType": "primitive"
-              },
-              "createdAt": {
-                "type": "text",
-                "label": "Creado en",
-                "schema": {
-                  "def": {
+                  "createdAt": {
+                    "def": {
+                      "type": "pipe",
+                      "in": {
+                        "def": {
+                          "type": "union",
+                          "options": [
+                            {
+                              "def": {
+                                "type": "string"
+                              },
+                              "type": "string"
+                            },
+                            {
+                              "def": {
+                                "type": "date"
+                              },
+                              "type": "date"
+                            },
+                            {
+                              "def": {
+                                "type": "number",
+                                "coerce": true,
+                                "checks": []
+                              },
+                              "type": "number",
+                              "isFinite": true
+                            }
+                          ]
+                        },
+                        "type": "union",
+                        "options": [
+                          {
+                            "def": {
+                              "type": "string"
+                            },
+                            "type": "string"
+                          },
+                          {
+                            "def": {
+                              "type": "date"
+                            },
+                            "type": "date"
+                          },
+                          {
+                            "def": {
+                              "type": "number",
+                              "coerce": true,
+                              "checks": []
+                            },
+                            "type": "number",
+                            "isFinite": true
+                          }
+                        ]
+                      },
+                      "out": {
+                        "def": {
+                          "type": "transform"
+                        },
+                        "type": "transform"
+                      }
+                    },
                     "type": "pipe",
                     "in": {
                       "def": {
@@ -10364,83 +10595,19 @@
                       },
                       "type": "transform"
                     }
-                  },
-                  "type": "pipe",
-                  "in": {
-                    "def": {
-                      "type": "union",
-                      "options": [
-                        {
-                          "def": {
-                            "type": "string"
-                          },
-                          "type": "string"
-                        },
-                        {
-                          "def": {
-                            "type": "date"
-                          },
-                          "type": "date"
-                        },
-                        {
-                          "def": {
-                            "type": "number",
-                            "coerce": true,
-                            "checks": []
-                          },
-                          "type": "number",
-                          "isFinite": true
-                        }
-                      ]
-                    },
-                    "type": "union",
-                    "options": [
-                      {
-                        "def": {
-                          "type": "string"
-                        },
-                        "type": "string"
-                      },
-                      {
-                        "def": {
-                          "type": "date"
-                        },
-                        "type": "date"
-                      },
-                      {
-                        "def": {
-                          "type": "number",
-                          "coerce": true,
-                          "checks": []
-                        },
-                        "type": "number",
-                        "isFinite": true
-                      }
-                    ]
-                  },
-                  "out": {
-                    "def": {
-                      "type": "transform"
-                    },
-                    "type": "transform"
                   }
-                },
-                "usage": {
-                  "response": true
-                },
-                "schemaType": "primitive"
-              }
-            },
-            "schemaType": "object"
+                }
+              },
+              "type": "object"
+            }
           },
-          "schemaType": "array",
           "usage": {
             "response": true
-          }
+          },
+          "schemaType": "primitive"
         },
         "totalCount": {
           "type": "text",
-          "label": "Total Conde",
           "schema": {
             "def": {
               "type": "number",
@@ -10456,6 +10623,7 @@
           "schemaType": "primitive"
         }
       },
+      "type": "custom-widget",
       "schemaType": "object"
     },
     "executionMode": "via-execute-route",

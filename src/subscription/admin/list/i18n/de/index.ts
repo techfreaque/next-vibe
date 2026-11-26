@@ -9,7 +9,7 @@ export const translations: typeof enTranslations = {
       description: "Nur Abos in diesem Tarif",
     },
     title: "Abonnements",
-    titleShort: "Abo-Liste",
+    titleShort: "Abonnements",
     description: "Alle Abonnements durchsuchen",
     form: {
       title: "Abo-Verwaltung",

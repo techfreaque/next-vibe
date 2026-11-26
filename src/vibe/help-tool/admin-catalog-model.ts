@@ -164,13 +164,17 @@ export function getAdminCategoryLandings(
         ...(landing?.destinations ?? []),
         ...(landing?.actions ?? []),
       ].filter(isDestination);
-      const scopedDestinations = links(
-        [
-          ...declaredDestinations,
-          ...roleLinks("destination").filter(isDestination),
-        ],
-        landing,
-      ).slice(0, Math.max(6, links(declaredDestinations).length));
+      // A curated landing shows exactly its declared shortcuts. Undeclared
+      // categories fall back to their first six destination tools.
+      const scopedDestinations = landing?.destinations?.length
+        ? links(declaredDestinations, landing)
+        : links(
+            [
+              ...declaredDestinations,
+              ...roleLinks("destination").filter(isDestination),
+            ],
+            landing,
+          ).slice(0, 6);
       const automations = roleLinks("automation");
       return [
         key,

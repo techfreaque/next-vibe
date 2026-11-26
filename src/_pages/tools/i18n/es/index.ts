@@ -26,4 +26,11 @@ export const translations: typeof enTranslations = {
     requiresConfirmation: "requiere confirmación",
     loadingTools: "Carga de herramientas...",
   },
+  loadError: {
+    title: "No se pudo cargar la administración",
+    message:
+      "No pudimos comprobar tu sesión. Recarga la página; si sigue fallando, vuelve a iniciar sesión.",
+    reload: "Recargar",
+    signIn: "Iniciar sesión",
+  },
 };

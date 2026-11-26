@@ -9,7 +9,7 @@ export const translations: typeof enTranslations = {
       description: "Tylko subskrypcje w tym planie",
     },
     title: "Subskrypcje",
-    titleShort: "Lista subskrypcji",
+    titleShort: "Subskrypcje",
     description: "Przeglądaj wszystkie subskrypcje",
     form: {
       title: "Zarządzanie subskrypcjami",

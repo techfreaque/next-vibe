@@ -128,7 +128,11 @@ export const translations = {
         empty: "This partner never requested a payout.",
       },
       notFound: "Code {{code}} does not exist.",
-      pickCode: "Enter a referral code to see its report.",
+      pickCode: "Pick a code from the overview table, or type one above.",
+      pickTitle: "No code selected",
+      browseCodes: "Browse codes",
+      subtitle:
+        "Clicks, signups, revenue, commission and partner balance for one code.",
       loading: "Loading code report",
     },
   },

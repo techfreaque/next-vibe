@@ -6,7 +6,6 @@
 "use client";
 
 import { Badge } from "next-vibe/ui/components/badge";
-import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import {
   FormControl,
@@ -19,12 +18,6 @@ import { AlertCircle } from "next-vibe/ui/components/icons/AlertCircle";
 import { Info } from "next-vibe/ui/components/icons/Info";
 import { MultiSelect } from "next-vibe/ui/components/multi-select";
 import { Span } from "next-vibe/ui/components/span";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "next-vibe/ui/components/tooltip";
 import type { JSX } from "react";
 
 import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
@@ -41,6 +34,7 @@ import {
 import { scopedTranslation as unifiedInterfaceScopedTranslation } from "../../../hooks/i18n";
 import { getTheme } from "../_shared/constants";
 import { useFormFieldDescriptionStyle } from "../_shared/description-style";
+import { FieldInfoTooltip } from "../_shared/field-info-tooltip";
 import { getFieldStyleClassName } from "../_shared/styling";
 import { getFieldValidationState } from "../_shared/validation";
 import type { MultiSelectFieldWidgetConfig } from "./types";
@@ -97,7 +91,7 @@ export function MultiSelectFieldWidget<
             className={cn(styleClassName.containerClassName, field.className)}
           >
             <Div className="flex flex-col gap-1">
-              <Div className="flex flex-row items-start gap-2">
+              <Div className="flex flex-row items-center gap-1.5">
                 <FormLabel
                   className={cn(
                     styleClassName.labelClassName,
@@ -110,26 +104,10 @@ export function MultiSelectFieldWidget<
                   )}
                 </FormLabel>
                 {field.description && descriptionStyle === "tooltip" && (
-                  <TooltipProvider delayDuration={300}>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button
-                          type="button"
-                          size="unset"
-                          aria-label={tField(field.description)}
-                          className="inline-grid size-5 shrink-0 cursor-help place-items-center rounded-sm"
-                          variant={"ghost"}
-                        >
-                          <Info className="h-4 w-4 text-muted-foreground hover:text-foreground transition-colors" />
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent className="max-w-[250px]">
-                        <Span className="text-sm">
-                          {tField(field.description)}
-                        </Span>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
+                  <FieldInfoTooltip
+                    text={tField(field.description)}
+                    label={field.label ? tField(field.label) : undefined}
+                  />
                 )}
                 {style === "badge" && isRequired && (
                   <Badge

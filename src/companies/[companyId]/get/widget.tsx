@@ -1,99 +1,55 @@
 "use client";
 
-import { Badge } from "next-vibe/ui/components/badge";
-import { Button, type ButtonMouseEvent } from "next-vibe/ui/components/button";
+import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { BookOpen } from "next-vibe/ui/components/icons/BookOpen";
 import { Box } from "next-vibe/ui/components/icons/Box";
 import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
 import { FileText } from "next-vibe/ui/components/icons/FileText";
 import { Inbox } from "next-vibe/ui/components/icons/Inbox";
-import { Loader2 } from "next-vibe/ui/components/icons/Loader2";
 import { Pencil } from "next-vibe/ui/components/icons/Pencil";
 import { ShoppingBag } from "next-vibe/ui/components/icons/ShoppingBag";
 import { ShoppingCart } from "next-vibe/ui/components/icons/ShoppingCart";
 import { Users } from "next-vibe/ui/components/icons/Users";
-import { Span } from "next-vibe/ui/components/span";
+import { SectionGroup } from "next-vibe/ui/components/section-group";
+import { AdminRecordDetail } from "next-vibe/unified-ui/_shared/admin-record-detail";
+import { formatDocDate } from "next-vibe/unified-ui/_shared/format-money";
 import {
+  useWidgetEndpointMutations,
+  useWidgetIsInteractive,
   useWidgetLocale,
+  useWidgetLogger,
   useWidgetNavigation,
+  useWidgetResponse,
   useWidgetTranslation,
+  useWidgetUser,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
-import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
+import { useApiQuery } from "next-vibe/unified-ui/hooks/use-api-query";
 import type { JSX, ReactNode } from "react";
 
+import accountsDefinition from "@/chart-of-accounts/account/list/definition";
+
 import { useWorkspaceCompany } from "../../_shared/workspace-company-context";
-import type { CompanyTypeValue } from "../../enum";
-import { CompanyType } from "../../enum";
 import { scopedTranslation as companiesScopedTranslation } from "../../i18n";
 import { proposeOpeningMonth } from "../onboard/first-period";
 import { getCompanySetupCountry } from "../onboard/setup-country";
 import type definition from "./definition";
 
-const TYPE_COLOR: Record<typeof CompanyTypeValue, string> = {
-  [CompanyType.B2B]:
-    "bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300",
-  [CompanyType.B2C]:
-    "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300",
-  [CompanyType.INDIVIDUAL]:
-    "bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-300",
-};
+type ListImport = () => Promise<{
+  default: {
+    GET: Parameters<ReturnType<typeof useWidgetNavigation>["push"]>[0];
+  };
+}>;
 
-function InfoRow({
-  label,
-  value,
-  mono,
-}: {
-  label: string;
-  value: string | null | undefined;
-  mono?: boolean;
-}): JSX.Element | null {
-  if (!value) {
+function countryName(code: string | null, locale: string): string | null {
+  if (!code) {
     return null;
   }
-  return (
-    <Div className="flex items-start gap-3 py-2.5 border-b last:border-b-0 text-sm">
-      <Span className="text-muted-foreground w-36 shrink-0">{label}</Span>
-      <Span
-        className={`flex-1 font-medium break-all ${mono ? "font-mono text-xs" : ""}`}
-      >
-        {value}
-      </Span>
-    </Div>
-  );
-}
-
-function ModuleCard({
-  icon,
-  label,
-  description,
-  onClick,
-}: {
-  icon: ReactNode;
-  label: string;
-  description: string;
-  onClick: (e: ButtonMouseEvent) => void;
-}): JSX.Element {
-  return (
-    <Button
-      type="button"
-      variant="outline"
-      onClick={onClick}
-      className="flex min-w-0 flex-col gap-1.5 rounded-lg p-4 h-auto items-start whitespace-normal text-left hover:bg-muted/60"
-    >
-      <Div className="flex min-w-0 items-start gap-2">
-        <Div className="shrink-0 text-muted-foreground">{icon}</Div>
-        <Span className="min-w-0 break-words hyphens-auto text-sm font-semibold">
-          {label}
-        </Span>
-      </Div>
-      <Span className="text-xs text-muted-foreground leading-snug font-normal">
-        {description}
-      </Span>
-    </Button>
-  );
+  if (!/^[A-Z]{2}$/.test(code)) {
+    return code;
+  }
+  return new Intl.DisplayNames([locale], { type: "region" }).of(code) ?? code;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -101,21 +57,49 @@ export function CompanyGetWidget(_props: {
   field: (typeof definition.GET)["fields"];
 }): JSX.Element {
   const data = useWidgetValue<typeof definition.GET>();
-  const { push: navigate, pop, canGoBack } = useWidgetNavigation();
+  const navigation = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.GET>();
   const workspace = useWorkspaceCompany();
   const locale = useWidgetLocale();
+  const logger = useWidgetLogger();
+  const user = useWidgetUser();
+  const interactive = useWidgetIsInteractive();
+  const response = useWidgetResponse();
+  const read = useWidgetEndpointMutations()?.read;
   const { t: tCompanies } = companiesScopedTranslation.scopedT(locale);
+  const companyId = data?.id;
 
-  const handleEdit = (e: ButtonMouseEvent): void => {
-    e.stopPropagation();
-    if (!data?.id) {
+  // One cheap probe: does this company already have a chart of accounts?
+  const accounts = useApiQuery({
+    endpoint: accountsDefinition.GET,
+    requestData: { companyId, page: 1, pageSize: 1 },
+    options: {
+      enabled: interactive && !!companyId,
+      queryKey: `company-detail-coa:${companyId ?? ""}`,
+    },
+    logger,
+    user,
+  }).data;
+  const needsAccounting = accounts !== undefined && accounts.total === 0;
+
+  const backToList = (): void => {
+    if (navigation.canGoBack) {
+      navigation.pop();
+      return;
+    }
+    void import("../../list/definition").then(({ default: list }) =>
+      navigation.push(list.GET, {}),
+    );
+  };
+
+  const edit = (): void => {
+    if (!companyId) {
       return;
     }
     void (async (): Promise<void> => {
       const def = await import("../update/definition");
-      navigate(def.default.PATCH, {
-        urlPathParams: { companyId: data.id },
+      navigation.push(def.default.PATCH, {
+        urlPathParams: { companyId },
         prefillFromGet: true,
         getEndpoint: (await import("./definition")).default.GET,
         popNavigationOnSuccess: 1,
@@ -123,23 +107,23 @@ export function CompanyGetWidget(_props: {
     })();
   };
 
-  const handleSetupAccounting = (): void => {
+  const setupAccounting = (): void => {
     if (!data?.id) {
       return;
     }
-    const companyId = data.id;
+    const id = data.id;
     const country = getCompanySetupCountry(data.country);
     if (data.isActive) {
       workspace?.register({
-        id: companyId,
+        id,
         name: data.name,
         currency: data.currency,
       });
     }
     void (async (): Promise<void> => {
       const { default: onboard } = await import("../onboard/definition");
-      navigate(onboard.POST, {
-        urlPathParams: { companyId },
+      navigation.push(onboard.POST, {
+        urlPathParams: { companyId: id },
         data: {
           country,
           openFirstPeriod: true,
@@ -149,214 +133,202 @@ export function CompanyGetWidget(_props: {
     })();
   };
 
-  const handleMembers = (e: ButtonMouseEvent): void => {
-    e.stopPropagation();
-    if (!data?.id) {
+  const members = (): void => {
+    if (!companyId) {
       return;
     }
-    void (async (): Promise<void> => {
-      const def = await import("../members/list/definition");
-      navigate(def.default.GET, {
-        urlPathParams: { companyId: data.id },
-      });
-    })();
+    void import("../members/list/definition").then(({ default: def }) =>
+      navigation.push(def.GET, { urlPathParams: { companyId } }),
+    );
   };
 
-  const handleModule =
-    (
-      importFn: () => Promise<{
-        default: { GET: Parameters<typeof navigate>[0] };
-      }>,
-    ) =>
-    (e: ButtonMouseEvent): void => {
-      e.stopPropagation();
-      if (!data?.id) {
-        return;
-      }
-      void (async (): Promise<void> => {
-        const def = await importFn();
-        navigate(def.default.GET, { data: { companyId: data.id } });
-      })();
-    };
-
-  // ── No data yet — show lookup form ──────────────────────────────
-  if (!data?.id) {
-    return (
-      <Div className="max-w-2xl mx-auto w-full px-4 py-6 flex flex-col gap-4">
-        {canGoBack && (
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={() => pop()}
-            className="self-start gap-1.5"
-          >
-            <ChevronLeft className="h-4 w-4" />
-            {t("get.widget.back")}
-          </Button>
-        )}
-        <Div className="flex items-center justify-center py-16 text-muted-foreground gap-2">
-          <Loader2 className="h-5 w-5 animate-spin" />
-          <Span className="text-sm">{t("get.widget.loading")}</Span>
-        </Div>
-        <FormAlertWidget field={{}} />
-        <SubmitButtonWidget<typeof definition.GET> field={{}} />
-      </Div>
+  const openList = (importFn: ListImport) => (): void => {
+    if (!companyId) {
+      return;
+    }
+    void importFn().then(({ default: def }) =>
+      navigation.push(def.GET, { data: { companyId } }),
     );
-  }
+  };
 
-  // ── Company detail ──────────────────────────────────────────────
+  const related: {
+    key: string;
+    icon: ReactNode;
+    label: string;
+    run: () => void;
+  }[] = [
+    {
+      key: "accounting",
+      icon: <BookOpen className="size-4" aria-hidden="true" />,
+      label: t("get.widget.modules.accounting.label"),
+      run: openList(
+        () => import("@/chart-of-accounts/account/list/definition"),
+      ),
+    },
+    {
+      key: "invoices",
+      icon: <FileText className="size-4" aria-hidden="true" />,
+      label: t("get.widget.modules.invoices.label"),
+      run: openList(() => import("@/payment/invoice/list/definition")),
+    },
+    {
+      key: "estimates",
+      icon: <FileText className="size-4" aria-hidden="true" />,
+      label: t("get.widget.modules.estimates.label"),
+      run: openList(() => import("@/payment/estimate/list/definition")),
+    },
+    {
+      key: "bills",
+      icon: <Inbox className="size-4" aria-hidden="true" />,
+      label: t("get.widget.modules.bills.label"),
+      run: openList(() => import("@/payment/bill/list/definition")),
+    },
+    {
+      key: "purchasing",
+      icon: <ShoppingBag className="size-4" aria-hidden="true" />,
+      label: t("get.widget.modules.purchasing.label"),
+      run: openList(() => import("@/purchasing/order/list/definition")),
+    },
+    {
+      key: "inventory",
+      icon: <Box className="size-4" aria-hidden="true" />,
+      label: t("get.widget.modules.inventory.label"),
+      run: openList(() => import("@/inventory/warehouse/list/definition")),
+    },
+    {
+      key: "pos",
+      icon: <ShoppingCart className="size-4" aria-hidden="true" />,
+      label: t("get.widget.modules.pos.label"),
+      run: openList(() => import("@/pos/terminal/list/definition")),
+    },
+  ];
+
+  const backButton = interactive && (
+    <Button
+      type="button"
+      variant="ghost"
+      size="sm"
+      className="self-start gap-1.5 -ml-2"
+      onClick={backToList}
+    >
+      <ChevronLeft className="size-4" aria-hidden="true" />
+      {t("get.widget.backToList")}
+    </Button>
+  );
+
+  const country = countryName(data?.country ?? null, locale);
+  const facts = data?.id
+    ? [
+        { key: "vat", label: t("get.widget.vatNumber"), value: data.vatNumber },
+        { key: "tax", label: t("get.widget.taxId"), value: data.taxId },
+        { key: "email", label: t("get.widget.email"), value: data.email },
+        { key: "phone", label: t("get.widget.phone"), value: data.phone },
+        { key: "website", label: t("get.widget.website"), value: data.website },
+        {
+          key: "created",
+          label: t("get.widget.createdAt"),
+          value: formatDocDate(data.createdAt, locale),
+        },
+      ].filter((fact) => !!fact.value)
+    : [];
+
   return (
-    <Div className="max-w-2xl mx-auto w-full px-4 pt-8 pb-6 flex flex-col gap-6">
-      {/* Back + Edit */}
-      <Div className="flex flex-wrap items-center justify-between gap-3">
-        {canGoBack ? (
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={() => pop()}
-            className="gap-1.5"
-          >
-            <ChevronLeft className="h-4 w-4" />
-            {t("get.widget.back")}
-          </Button>
-        ) : (
-          <Div />
-        )}
-        <Div className="flex flex-wrap items-center justify-end gap-2">
-          <Button type="button" size="sm" onClick={handleSetupAccounting}>
-            <BookOpen className="size-4 shrink-0" />
-            {t("get.widget.setupAccounting")}
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={handleEdit}
-            className="gap-1.5"
-          >
-            <Pencil className="h-3.5 w-3.5" />
-            {t("get.widget.edit")}
-          </Button>
-        </Div>
-      </Div>
-
-      {/* Header */}
-      <Div className="flex flex-col gap-2">
-        <Span className="text-2xl font-bold">{data.name}</Span>
-        <Div className="flex items-center gap-2 flex-wrap">
-          <Span
-            className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${TYPE_COLOR[data.type] ?? "bg-muted text-muted-foreground"}`}
-          >
-            {tCompanies(data.type)}
-          </Span>
-          <Badge
-            variant={data.isActive ? "default" : "secondary"}
-            className={`text-xs ${data.isActive ? "bg-emerald-600 hover:bg-emerald-600 dark:bg-emerald-700" : ""}`}
-          >
-            {data.isActive ? t("get.widget.active") : t("get.widget.inactive")}
-          </Badge>
-        </Div>
-      </Div>
-
-      {/* Modules grid */}
-      <Div className="flex flex-col gap-2">
-        <Span className="text-sm font-semibold text-muted-foreground">
-          {t("get.widget.modules.title")}
-        </Span>
-        <Div className="grid grid-cols-1 min-[360px]:grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-          <ModuleCard
-            icon={<BookOpen className="h-4 w-4" />}
-            label={t("get.widget.modules.accounting.label")}
-            description={t("get.widget.modules.accounting.description")}
-            onClick={handleModule(
-              () => import("@/chart-of-accounts/account/list/definition"),
-            )}
-          />
-          <ModuleCard
-            icon={<FileText className="h-4 w-4" />}
-            label={t("get.widget.modules.invoices.label")}
-            description={t("get.widget.modules.invoices.description")}
-            onClick={handleModule(
-              () => import("@/payment/invoice/list/definition"),
-            )}
-          />
-          <ModuleCard
-            icon={<FileText className="h-4 w-4" />}
-            label={t("get.widget.modules.estimates.label")}
-            description={t("get.widget.modules.estimates.description")}
-            onClick={handleModule(
-              () => import("@/payment/estimate/list/definition"),
-            )}
-          />
-          <ModuleCard
-            icon={<Inbox className="h-4 w-4" />}
-            label={t("get.widget.modules.bills.label")}
-            description={t("get.widget.modules.bills.description")}
-            onClick={handleModule(
-              () => import("@/payment/bill/list/definition"),
-            )}
-          />
-          <ModuleCard
-            icon={<ShoppingCart className="h-4 w-4" />}
-            label={t("get.widget.modules.pos.label")}
-            description={t("get.widget.modules.pos.description")}
-            onClick={handleModule(
-              () => import("@/pos/terminal/list/definition"),
-            )}
-          />
-          <ModuleCard
-            icon={<ShoppingBag className="h-4 w-4" />}
-            label={t("get.widget.modules.purchasing.label")}
-            description={t("get.widget.modules.purchasing.description")}
-            onClick={handleModule(
-              () => import("@/purchasing/order/list/definition"),
-            )}
-          />
-          <ModuleCard
-            icon={<Box className="h-4 w-4" />}
-            label={t("get.widget.modules.inventory.label")}
-            description={t("get.widget.modules.inventory.description")}
-            onClick={handleModule(
-              () => import("@/inventory/warehouse/list/definition"),
-            )}
-          />
-          <ModuleCard
-            icon={<Users className="h-4 w-4" />}
-            label={t("get.widget.modules.team.label")}
-            description={t("get.widget.modules.team.description")}
-            onClick={handleMembers}
-          />
-        </Div>
-      </Div>
-
-      {/* Company details */}
-      <Div className="rounded-md border px-4 py-1">
-        <InfoRow
-          label={t("get.widget.vatNumber")}
-          value={data.vatNumber}
-          mono
-        />
-        <InfoRow label={t("get.widget.taxId")} value={data.taxId} mono />
-        <InfoRow label={t("get.widget.country")} value={data.country} />
-        <InfoRow label={t("get.widget.currency")} value={data.currency} mono />
-        <InfoRow label={t("get.widget.email")} value={data.email} />
-        <InfoRow label={t("get.widget.phone")} value={data.phone} />
-        <InfoRow label={t("get.widget.website")} value={data.website} />
-        <InfoRow
-          label={t("get.widget.createdAt")}
-          value={
-            data.createdAt
-              ? new Date(data.createdAt).toLocaleDateString(locale, {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })
-              : null
-          }
-        />
-      </Div>
-    </Div>
+    <AdminRecordDetail
+      title={data?.name ?? t("get.titleShort")}
+      subtitle={
+        data?.id
+          ? [tCompanies(data.type), country, data.currency]
+              .filter(Boolean)
+              .join(" · ")
+          : undefined
+      }
+      status={
+        data?.id
+          ? {
+              status: data.isActive ? "active" : "inactive",
+              label: data.isActive
+                ? t("get.widget.active")
+                : t("get.widget.inactive"),
+              variant: data.isActive ? "success" : "muted",
+            }
+          : undefined
+      }
+      backButton={backButton}
+      primaryAction={
+        interactive && needsAccounting
+          ? {
+              key: "setup",
+              label: t("get.widget.setupAccounting"),
+              icon: <BookOpen className="size-4" aria-hidden="true" />,
+              onClick: setupAccounting,
+            }
+          : undefined
+      }
+      secondaryActions={
+        interactive && data?.id
+          ? [
+              {
+                key: "members",
+                label: t("get.widget.members"),
+                icon: <Users className="size-4" aria-hidden="true" />,
+                onClick: members,
+              },
+              {
+                key: "edit",
+                label: t("get.widget.edit"),
+                icon: <Pencil className="size-4" aria-hidden="true" />,
+                onClick: edit,
+              },
+            ]
+          : undefined
+      }
+      facts={facts}
+      technicalDetails={
+        data?.id
+          ? [{ key: "id", label: t("get.companyId.label"), value: data.id }]
+          : undefined
+      }
+      state={
+        data?.id
+          ? { kind: "ready" }
+          : response?.success === false
+            ? {
+                kind: "error",
+                title: t("get.widget.loadFailed"),
+                message: response.message,
+                action:
+                  read && interactive
+                    ? {
+                        label: t("get.widget.retry"),
+                        onClick: () => void read.refetch(),
+                      }
+                    : undefined,
+                secondaryAction: interactive
+                  ? { label: t("get.widget.backToList"), onClick: backToList }
+                  : undefined,
+              }
+            : { kind: "loading", label: t("get.widget.loading") }
+      }
+    >
+      {interactive && data?.id && (
+        <SectionGroup title={t("get.widget.related")}>
+          <Div className="flex flex-wrap gap-2">
+            {related.map(({ key, icon, label, run }) => (
+              <Button
+                key={key}
+                type="button"
+                variant="outline"
+                size="sm"
+                className="gap-1.5"
+                onClick={run}
+              >
+                {icon}
+                {label}
+              </Button>
+            ))}
+          </Div>
+        </SectionGroup>
+      )}
+    </AdminRecordDetail>
   );
 }

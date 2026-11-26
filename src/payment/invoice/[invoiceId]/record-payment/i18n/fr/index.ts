@@ -122,5 +122,9 @@ export const translations: typeof enTranslations = {
     submit: "Enregistrer le paiement",
     paymentRecorded: "Paiement enregistré.",
     viewInvoice: "Voir la facture",
+    amountDue: "{{amount}} restant dû",
+    notOpenTitle: "Cette facture n'est pas ouverte",
+    notOpenMessage:
+      "Seules les factures émises et impayées acceptent un paiement. Émettez d'abord la facture ou ouvrez la bonne.",
   },
 };

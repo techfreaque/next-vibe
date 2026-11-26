@@ -57,14 +57,20 @@ describe("Admin home usage and recent activity", () => {
         );
         for (const row of activity.recent) {
           expect(row.title).toBeUndefined();
-          if (row.drill.alias === "revenue-report") {
+          if (row.label === "platformSummary.receivedPayment") {
             expect(row.detail?.kind).toBe("money");
+            expect(row.drill.alias).toBe("payment-processor");
+            expect(row.drill.args?.transactionId).toBeTruthy();
+          } else if (row.label === "platformSummary.newAccount") {
+            // The account holder is the subject; no language or locale detail.
+            expect(row.subject).toBeTruthy();
+            expect(row.detail).toBeUndefined();
+            expect(row.drill.alias).toBe("user-view");
+            expect(row.drill.urlPathParams?.id).toBeTruthy();
           } else {
             expect(row.detail?.kind).toBe("name");
+            expect(row.drill.alias).toBe("cron-history");
           }
-          expect(row.drill.alias).toMatch(
-            /^(users-list|revenue-report|cron-history)$/,
-          );
           expect(new Date(row.at).getTime()).toBeGreaterThanOrEqual(
             new Date(activity.from).getTime(),
           );
@@ -88,6 +94,12 @@ describe("Admin home usage and recent activity", () => {
           .first();
         await cost.waitFor({ timeout: 45000 });
         for (const event of activity.recent) {
+          if (event.subject)
+            await recent
+              .locator("..")
+              .getByText(event.subject, { exact: false })
+              .first()
+              .waitFor();
           const detail = event.detail;
           if (detail)
             await recent
@@ -105,7 +117,7 @@ describe("Admin home usage and recent activity", () => {
           const label = activity.recent[0].label;
           if (label)
             await page
-              .getByRole("button", { name: t(label), exact: true })
+              .getByRole("button", { name: new RegExp(t(label)) })
               .first()
               .waitFor();
         } else {

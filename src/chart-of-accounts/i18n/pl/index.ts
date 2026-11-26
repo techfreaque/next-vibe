@@ -233,11 +233,22 @@ export const translations: typeof enTranslations = {
     widget: {
       loading: "Ładowanie wpisów dziennika...",
       empty: "Nie znaleziono wpisów dziennika.",
-      createButton: "Nowy wpis",
+      createButton: "Nowy zapis",
       periodsButton: "Okresy",
       applyFilters: "Zastosuj filtry",
       selectCompany:
         "Podaj ID firmy powyżej i zastosuj filtry, aby załadować wpisy dziennika.",
+      loadFailed: "Nie udało się wczytać zapisów księgowych",
+      retry: "Spróbuj ponownie",
+      emptyTitle: "Brak zapisów księgowych",
+      emptyMessage:
+        "Każda zaksięgowana faktura, faktura zakupu, płatność i zapis ręczny trafia tutaj jako zbilansowany zapis. Resztę zaksięgujesz ręcznie.",
+      emptyAction: "Dodaj zapis księgowy",
+      count: "Zapisy: {{count}}",
+      subtitle: "Wszystkie zapisy w księdze, od najnowszych.",
+      pageOf: "Strona {{page}} z {{pages}}",
+      previous: "Poprzednia",
+      next: "Następna",
     },
     title: "Dziennik księgowy",
     titleShort: "Dziennik",

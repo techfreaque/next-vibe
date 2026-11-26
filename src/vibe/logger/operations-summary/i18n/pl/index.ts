@@ -8,10 +8,10 @@ export const translations: typeof enTranslations = {
   title: "Przegląd operacji",
   description:
     "Sprawdź otwarte błędy, nieudane zadania i stan połączonych instancji.",
-  errors: "Otwarte błędy",
+  errors: "Otwarte klasy błędów",
   tasks: "Nieudane zadania",
   connections: "Problemy z połączeniem",
-  errorAlert: "Otwarte grupy błędów ({{count}})",
+  errorAlert: "Otwarte klasy błędów bez ostrzeżeń ({{count}})",
   taskAlert: "Nieudane zadania cykliczne ({{count}})",
   connectionAlert: "Połączenia wymagające uwagi ({{count}})",
   attention: "Wymaga uwagi",

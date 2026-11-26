@@ -368,7 +368,7 @@ export const translations: typeof enTranslations = {
   },
   status: {
     title: "Finanza",
-    titleShort: "Finanza",
+    titleShort: "Costi e margine",
     description:
       "Revenue vs costo a monte: bilancia dei fornitori, margine, avvisi e soglie.",
     response: {

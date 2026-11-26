@@ -67,7 +67,7 @@ export const translations: typeof enTranslations = {
 
   inbox: {
     title: "Skrzynka odbiorcza platformy",
-    titleShort: "Odbiorcza",
+    titleShort: "Skrzynka platformy",
     description: "Pokaż najnowsze wiadomości INBOX ze skrzynki platformy",
     container: {
       title: "Skrzynka odbiorcza platformy",

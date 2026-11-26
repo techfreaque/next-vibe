@@ -79,8 +79,12 @@ export function TaxRateListWidget(): JSX.Element {
     );
   };
   const title = t("rate.list.titleShort");
+  const showCompany = !companyId;
   const columns = [
     { id: "name", label: t("rate.list.response.rate.name") },
+    ...(showCompany
+      ? [{ id: "company", label: t("rate.list.response.rate.company") }]
+      : []),
     { id: "location", label: t("rate.list.response.rate.country") },
     { id: "type", label: t("rate.list.response.rate.type") },
     { id: "rate", label: t("rate.list.response.rate.rate"), numeric: true },
@@ -140,6 +144,7 @@ export function TaxRateListWidget(): JSX.Element {
       cells: {
         name,
         actions,
+        company: row.companyName,
         location: [row.country, row.region].filter(Boolean).join(", "),
         type: type ? t(type) : row.type,
         rate: formatPercent(row.rate, locale),
@@ -204,7 +209,13 @@ export function TaxRateListWidget(): JSX.Element {
                     </Span>
                   </Div>
                   <Span className="text-sm text-muted-foreground">
-                    {[cells.type, cells.location].filter(Boolean).join(" · ")}
+                    {[
+                      showCompany ? cells.company : undefined,
+                      cells.type,
+                      cells.location,
+                    ]
+                      .filter(Boolean)
+                      .join(" · ")}
                   </Span>
                   {cells.actions}
                 </Div>

@@ -28,6 +28,8 @@ export const translations: typeof enTranslations = {
       "Sprawdź pozyskiwanie klientów, przychody i stan usług z ostatnich 30 dni.",
     unavailable: "Brak danych",
     recent: "Ostatnia aktywność",
+    recentPayments: "Ostatnie płatności",
+    emptyPayments: "Brak płatności w ostatnich 30 dniach.",
   },
   category: "Analityka",
   tags: {
@@ -132,6 +134,8 @@ export const translations: typeof enTranslations = {
         payouts: "{{count}} wniosków o wypłatę czeka ({{amount}})",
         tasks: "{{count}} zaplanowanych zadań kończy się błędem",
         connections: "{{count}} połączeń zdalnych z problemem",
+        failedPayments: "Nieudane płatności z ostatnich 30 dni: {{count}}",
+        disputes: "Otwarte spory dotyczące płatności: {{count}}",
         costCoverage:
           "Koszt dostawców znany tylko dla {{coverage}} użycia AI, marża jest niepełna",
         unattributed: "{{share}} przychodu bez znanego źródła ({{amount}})",

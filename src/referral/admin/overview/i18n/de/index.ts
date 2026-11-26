@@ -62,6 +62,8 @@ export const translations: typeof enTranslations = {
       payouts: "Auszahlungswarteschlange",
     },
     widget: {
+      subtitle:
+        "Klicks, Anmeldungen, Umsatz und Provision je Partnercode, verglichen mit dem Vorzeitraum.",
       kpi: {
         clicks: "Klicks",
         clicksHint: "Browser-Aufrufe mit Code",

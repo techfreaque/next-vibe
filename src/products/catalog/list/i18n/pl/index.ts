@@ -127,8 +127,15 @@ export const translations: typeof enTranslations = {
       billingMonthly: "Miesięcznie",
       billingYearly: "Rocznie",
       navCategories: "Kategorie",
-      navTaxRates: "Stawki podatkowe",
+      navTaxRates: "Stawki VAT",
       back: "Wróć",
+      count: "Produkty: {{count}}",
+      columnSku: "SKU",
+      columnPrice: "Cena",
+      emptyTitle: "Brak produktów",
+      emptyMessage:
+        "Tu trzymasz produkty i usługi, które sprzedajesz. Faktury, kasa i zakupy pobierają z nich cenę, jednostkę i VAT.",
+      clearFilters: "Wyczyść filtry",
     },
   },
 };

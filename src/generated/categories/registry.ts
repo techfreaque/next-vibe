@@ -186,7 +186,51 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
     order: 2,
     defaultEntryAlias: "models",
     landing: {
-      actions: ["models", "model-catalog-scan"],
+      destinations: [
+        "models",
+        "model-catalog-scan",
+        "refusal-index-leaderboard",
+      ],
+      destinationDescriptions: {
+        models: {
+          "en-US": "Browse available models and compare prices.",
+          "en-GLOBAL": "Browse available models and compare prices.",
+          "de-DE": "Verfügbare Modelle ansehen und Preise vergleichen.",
+          "pl-PL": "Przeglądaj dostępne modele i porównuj ceny.",
+          "fr-FR": "Consultez les modèles disponibles et comparez les prix.",
+          "it-IT": "Esplori i modelli disponibili e confronti i prezzi.",
+          "es-ES": "Consulte los modelos disponibles y compare los precios.",
+          "sk-SK": "Prezrite si dostupné modely a porovnajte ceny.",
+        },
+        "model-catalog-scan": {
+          "en-US": "New upstream models, price drift and announced shutdowns.",
+          "en-GLOBAL":
+            "New upstream models, price drift and announced shutdowns.",
+          "de-DE":
+            "Neue Modelle der Anbieter, Preisänderungen und angekündigte Abschaltungen.",
+          "pl-PL":
+            "Nowe modele dostawców, zmiany cen i zapowiedziane wyłączenia.",
+          "fr-FR":
+            "Nouveaux modèles des fournisseurs, écarts de prix et arrêts annoncés.",
+          "it-IT":
+            "Nuovi modelli dei fornitori, variazioni di prezzo e dismissioni annunciate.",
+          "es-ES":
+            "Nuevos modelos de los proveedores, cambios de precio y cierres anunciados.",
+          "sk-SK":
+            "Nové modely poskytovateľov, zmeny cien a ohlásené vypnutia.",
+        },
+        "refusal-index-leaderboard": {
+          "en-US": "How often each model answers, hedges or refuses.",
+          "en-GLOBAL": "How often each model answers, hedges or refuses.",
+          "de-DE": "Wie oft jedes Modell antwortet, ausweicht oder ablehnt.",
+          "pl-PL": "Jak często każdy model odpowiada, wykręca się lub odmawia.",
+          "fr-FR":
+            "À quelle fréquence chaque modèle répond, esquive ou refuse.",
+          "it-IT": "Quanto spesso ogni modello risponde, divaga o rifiuta.",
+          "es-ES": "Con qué frecuencia cada modelo responde, evade o se niega.",
+          "sk-SK": "Ako často každý model odpovie, vyhne sa alebo odmietne.",
+        },
+      },
     },
     descriptions: {
       "en-US": "Browse model availability and provider catalog changes.",
@@ -233,6 +277,16 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
         "es-ES": "IA",
         "sk-SK": "AI",
       },
+      summary: { alias: "ai-admin-summary", scope: "platform" },
+      actions: ["skill-create"],
+      destinations: [
+        "models",
+        "skills",
+        "agent-chat-threads",
+        "task-list",
+        "chat-moderation",
+        "skill-moderation",
+      ],
       destinationDescriptions: {
         models: {
           "en-US": "Browse available models and compare prices.",
@@ -282,10 +336,36 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
             "Compruebe el estado de las tareas y sus próximas ejecuciones.",
           "sk-SK": "Skontrolujte stav úloh a ich najbližšie spustenia.",
         },
+        "chat-moderation": {
+          "en-US": "Reported and hidden public posts, most urgent first.",
+          "en-GLOBAL": "Reported and hidden public posts, most urgent first.",
+          "de-DE":
+            "Gemeldete und ausgeblendete öffentliche Beiträge, Dringendes zuerst.",
+          "pl-PL":
+            "Zgłoszone i ukryte publiczne wpisy, najpilniejsze najpierw.",
+          "fr-FR":
+            "Publications publiques signalées ou masquées, les plus urgentes d’abord.",
+          "it-IT": "Post pubblici segnalati o nascosti, prima i più urgenti.",
+          "es-ES":
+            "Publicaciones públicas denunciadas u ocultas, primero las más urgentes.",
+          "sk-SK":
+            "Nahlásené a skryté verejné príspevky, najnaliehavejšie navrchu.",
+        },
+        "skill-moderation": {
+          "en-US": "Community skills with reports, most reported first.",
+          "en-GLOBAL": "Community skills with reports, most reported first.",
+          "de-DE": "Community-Skills mit Meldungen, meistgemeldete zuerst.",
+          "pl-PL":
+            "Zgłoszone umiejętności społeczności, najczęściej zgłaszane najpierw.",
+          "fr-FR":
+            "Compétences de la communauté signalées, les plus signalées d’abord.",
+          "it-IT": "Skill della community segnalate, prima le più segnalate.",
+          "es-ES":
+            "Skills de la comunidad denunciadas, primero las más denunciadas.",
+          "sk-SK":
+            "Zručnosti komunity s hláseniami, najčastejšie nahlásené navrchu.",
+        },
       },
-      summary: { alias: "ai-admin-summary", scope: "platform" },
-      destinations: ["models", "skills", "agent-chat-threads", "task-list"],
-      actions: ["skill-create"],
     },
     descriptions: {
       "en-US": "Explore models, skills and conversations.",
@@ -588,6 +668,45 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
     icon: "brain",
     order: 20,
     defaultEntryAlias: "cortex-list",
+    landing: {
+      destinations: ["cortex-tree", "cortex-search", "cortex-terminals"],
+      destinationDescriptions: {
+        "cortex-tree": {
+          "en-US": "The full folder structure of AI memory at a glance.",
+          "en-GLOBAL": "The full folder structure of AI memory at a glance.",
+          "de-DE":
+            "Die komplette Ordnerstruktur des KI-Speichers auf einen Blick.",
+          "pl-PL": "Pełna struktura folderów pamięci AI w jednym widoku.",
+          "fr-FR":
+            "Toute l’arborescence de la mémoire de l’IA en un coup d’œil.",
+          "it-IT":
+            "L’intera struttura delle cartelle della memoria IA a colpo d’occhio.",
+          "es-ES":
+            "Toda la estructura de carpetas de la memoria de la IA de un vistazo.",
+          "sk-SK": "Celá štruktúra priečinkov pamäte AI na jeden pohľad.",
+        },
+        "cortex-search": {
+          "en-US": "Find any file by name or content.",
+          "en-GLOBAL": "Find any file by name or content.",
+          "de-DE": "Jede Datei nach Name oder Inhalt finden.",
+          "pl-PL": "Znajdź dowolny plik po nazwie lub treści.",
+          "fr-FR": "Trouvez un fichier par son nom ou son contenu.",
+          "it-IT": "Trovi qualsiasi file per nome o contenuto.",
+          "es-ES": "Encuentre cualquier archivo por nombre o contenido.",
+          "sk-SK": "Nájdite ľubovoľný súbor podľa názvu alebo obsahu.",
+        },
+        "cortex-terminals": {
+          "en-US": "Open terminal sessions and where each one is.",
+          "en-GLOBAL": "Open terminal sessions and where each one is.",
+          "de-DE": "Offene Terminal-Sitzungen und ihr aktuelles Verzeichnis.",
+          "pl-PL": "Otwarte sesje terminala i ich bieżące katalogi.",
+          "fr-FR": "Sessions de terminal ouvertes et leur dossier courant.",
+          "it-IT": "Sessioni di terminale aperte e la loro cartella corrente.",
+          "es-ES": "Sesiones de terminal abiertas y su carpeta actual.",
+          "sk-SK": "Otvorené relácie terminálu a ich aktuálne priečinky.",
+        },
+      },
+    },
     descriptions: {
       "en-US": "Browse files and folders in AI memory.",
       "en-GLOBAL": "Browse files and folders in AI memory.",
@@ -617,11 +736,58 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
     order: 2,
     defaultEntryAlias: "outreach-crm",
     landing: {
-      actions: [
+      destinations: [
         "outreach-crm",
         "growth-campaign-links",
         "growth-channel-spend-list",
       ],
+      destinationDescriptions: {
+        "outreach-crm": {
+          "en-US":
+            "Every contact pitched, where each stands and what deals paid back.",
+          "en-GLOBAL":
+            "Every contact pitched, where each stands and what deals paid back.",
+          "de-DE":
+            "Jeder angefragte Kontakt, sein Stand und was die Deals eingebracht haben.",
+          "pl-PL":
+            "Każdy kontakt, do którego pisaliśmy, jego etap i zwrot z umów.",
+          "fr-FR":
+            "Chaque contact sollicité, son statut et ce que les accords ont rapporté.",
+          "it-IT":
+            "Ogni contatto proposto, a che punto è e cosa hanno reso gli accordi.",
+          "es-ES":
+            "Cada contacto propuesto, en qué punto está y qué devolvieron los acuerdos.",
+          "sk-SK": "Každý oslovený kontakt, jeho stav a čo dohody priniesli.",
+        },
+        "growth-campaign-links": {
+          "en-US": "Tagged links per channel with visits, signups and payers.",
+          "en-GLOBAL":
+            "Tagged links per channel with visits, signups and payers.",
+          "de-DE":
+            "Getaggte Links je Kanal mit Besuchen, Anmeldungen und Zahlern.",
+          "pl-PL":
+            "Oznaczone linki według kanału z wizytami, rejestracjami i płacącymi.",
+          "fr-FR":
+            "Liens tagués par canal, avec visites, inscriptions et payeurs.",
+          "it-IT":
+            "Link tracciati per canale, con visite, iscrizioni e paganti.",
+          "es-ES":
+            "Enlaces etiquetados por canal, con visitas, registros y pagadores.",
+          "sk-SK":
+            "Označené odkazy podľa kanála s návštevami, registráciami a platiacimi.",
+        },
+        "growth-channel-spend-list": {
+          "en-US": "Spend per channel and the cost of each paying user.",
+          "en-GLOBAL": "Spend per channel and the cost of each paying user.",
+          "de-DE": "Ausgaben je Kanal und Kosten pro zahlendem Nutzer.",
+          "pl-PL": "Wydatki na kanał i koszt pozyskania płacącego użytkownika.",
+          "fr-FR": "Dépenses par canal et coût de chaque utilisateur payant.",
+          "it-IT": "Spesa per canale e costo di ogni utente pagante.",
+          "es-ES": "Gasto por canal y coste de cada usuario de pago.",
+          "sk-SK":
+            "Výdavky podľa kanála a cena každého platiaceho používateľa.",
+        },
+      },
     },
     descriptions: {
       "en-US": "Track creator deals, campaign links and marketing costs.",
@@ -667,12 +833,67 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
         homeArgs: { profile: "home" },
         progressive: true,
       },
+      overview: { alias: "business-overview", scope: "platform" },
       destinations: [
         "business-overview",
-        "vibe-sense-graphs",
         "acquisition-report",
+        "funnel-report",
+        "vibe-sense-graphs",
       ],
-      overview: { alias: "business-overview", scope: "platform" },
+      destinationDescriptions: {
+        "business-overview": {
+          "en-US":
+            "Traffic, signups, payers, revenue and AI cost for any period.",
+          "en-GLOBAL":
+            "Traffic, signups, payers, revenue and AI cost for any period.",
+          "de-DE":
+            "Traffic, Anmeldungen, Zahler, Umsatz und KI-Kosten für jeden Zeitraum.",
+          "pl-PL":
+            "Ruch, rejestracje, płacący, przychód i koszt AI w dowolnym okresie.",
+          "fr-FR":
+            "Trafic, inscriptions, payeurs, revenus et coût IA sur la période choisie.",
+          "it-IT":
+            "Traffico, iscrizioni, paganti, ricavi e costi IA per qualsiasi periodo.",
+          "es-ES":
+            "Tráfico, registros, pagadores, ingresos y coste de IA en cualquier periodo.",
+          "sk-SK":
+            "Návštevnosť, registrácie, platiaci, tržby a náklady na AI za ľubovoľné obdobie.",
+        },
+        "acquisition-report": {
+          "en-US": "See which sources bring visitors, leads and signups.",
+          "en-GLOBAL": "See which sources bring visitors, leads and signups.",
+          "de-DE":
+            "Sehen, welche Quellen Besucher, Leads und Anmeldungen bringen.",
+          "pl-PL": "Zobacz, które źródła dają odwiedziny, leady i rejestracje.",
+          "fr-FR":
+            "Voyez quelles sources apportent visiteurs, leads et inscriptions.",
+          "it-IT": "Veda quali fonti portano visitatori, lead e iscrizioni.",
+          "es-ES": "Vea qué fuentes traen visitas, leads y registros.",
+          "sk-SK":
+            "Pozrite si, ktoré zdroje prinášajú návštevy, leady a registrácie.",
+        },
+        "funnel-report": {
+          "en-US": "Find where visitors drop off before they pay.",
+          "en-GLOBAL": "Find where visitors drop off before they pay.",
+          "de-DE": "Erkennen, wo Besucher vor dem Bezahlen abspringen.",
+          "pl-PL": "Sprawdź, gdzie odwiedzający odpadają przed zapłatą.",
+          "fr-FR": "Repérez où les visiteurs décrochent avant de payer.",
+          "it-IT": "Scopra dove i visitatori abbandonano prima di pagare.",
+          "es-ES": "Detecte dónde abandonan los visitantes antes de pagar.",
+          "sk-SK": "Zistite, kde návštevníci odpadávajú pred platbou.",
+        },
+        "vibe-sense-graphs": {
+          "en-US": "Build and run metric graphs on live platform data.",
+          "en-GLOBAL": "Build and run metric graphs on live platform data.",
+          "de-DE": "Kennzahlen-Graphen auf Live-Daten bauen und ausführen.",
+          "pl-PL": "Buduj i uruchamiaj wykresy wskaźników na żywych danych.",
+          "fr-FR":
+            "Créez et exécutez des graphes d’indicateurs sur les données en direct.",
+          "it-IT": "Crei ed esegua grafi di metriche sui dati in tempo reale.",
+          "es-ES": "Cree y ejecute grafos de métricas con datos en vivo.",
+          "sk-SK": "Zostavte a spúšťajte grafy metrík nad živými dátami.",
+        },
+      },
     },
     descriptions: {
       "en-US": "Track acquisition, revenue and operating trends.",
@@ -945,11 +1166,68 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
     order: 20,
     defaultEntryAlias: "campaign-stats",
     landing: {
-      actions: [
+      destinations: [
         "campaign-stats",
         "campaign-queue",
+        "lifecycle",
         "campaign-journey-variants",
       ],
+      destinationDescriptions: {
+        "campaign-stats": {
+          "en-US": "Sent, opened, clicked and bounced per journey and locale.",
+          "en-GLOBAL":
+            "Sent, opened, clicked and bounced per journey and locale.",
+          "de-DE":
+            "Gesendet, geöffnet, geklickt und gebounct je Journey und Sprache.",
+          "pl-PL":
+            "Wysłane, otwarte, kliknięte i odbite według ścieżki i języka.",
+          "fr-FR":
+            "Envoyés, ouverts, cliqués et rebonds par parcours et langue.",
+          "it-IT":
+            "Inviate, aperte, cliccate e rimbalzate per percorso e lingua.",
+          "es-ES":
+            "Enviados, abiertos, clics y rebotes por recorrido e idioma.",
+          "sk-SK":
+            "Odoslané, otvorené, kliknuté a nedoručené podľa cesty a jazyka.",
+        },
+        "campaign-queue": {
+          "en-US": "Leads waiting for their next campaign email.",
+          "en-GLOBAL": "Leads waiting for their next campaign email.",
+          "de-DE": "Leads, die auf ihre nächste Kampagnen-Mail warten.",
+          "pl-PL": "Leady czekające na kolejny e-mail kampanii.",
+          "fr-FR": "Leads en attente de leur prochain e-mail de campagne.",
+          "it-IT": "Lead in attesa della prossima email della campagna.",
+          "es-ES": "Leads a la espera de su próximo correo de campaña.",
+          "sk-SK": "Leady čakajúce na ďalší e-mail kampane.",
+        },
+        lifecycle: {
+          "en-US":
+            "Journeys, enrollments and conversions, with the kill switch.",
+          "en-GLOBAL":
+            "Journeys, enrollments and conversions, with the kill switch.",
+          "de-DE": "Journeys, Anmeldungen und Conversions, mit Notschalter.",
+          "pl-PL": "Ścieżki, zapisy i konwersje, z wyłącznikiem awaryjnym.",
+          "fr-FR":
+            "Parcours, inscriptions et conversions, avec l’arrêt d’urgence.",
+          "it-IT":
+            "Percorsi, iscrizioni e conversioni, con l’interruttore di emergenza.",
+          "es-ES":
+            "Recorridos, inscripciones y conversiones, con el interruptor de emergencia.",
+          "sk-SK": "Cesty, zápisy a konverzie s núdzovým vypínačom.",
+        },
+        "campaign-journey-variants": {
+          "en-US": "The email journeys leads can be enrolled in.",
+          "en-GLOBAL": "The email journeys leads can be enrolled in.",
+          "de-DE":
+            "Die E-Mail-Journeys, in die Leads aufgenommen werden können.",
+          "pl-PL": "Ścieżki e-mailowe, do których można zapisać leady.",
+          "fr-FR": "Les parcours e-mail auxquels un lead peut être inscrit.",
+          "it-IT": "I percorsi email a cui iscrivere i lead.",
+          "es-ES":
+            "Los recorridos de correo en los que se puede inscribir a los leads.",
+          "sk-SK": "E-mailové cesty, do ktorých možno zaradiť leady.",
+        },
+      },
     },
     descriptions: {
       "en-US": "Review subscribers, scheduled campaigns and delivery results.",
@@ -1070,13 +1348,68 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
         progressive: true,
         args: { section: "payments" },
       },
-      destinations: [
-        "revenue-report",
-        "products-catalog-list",
-        "processor-accounting",
-      ],
       actions: ["payment_invoice_create_POST"],
       overview: { alias: "revenue-report", scope: "platform" },
+      destinations: [
+        "revenue-report",
+        "payment-processor",
+        "processor-accounting",
+        "products-catalog-list",
+      ],
+      destinationDescriptions: {
+        "revenue-report": {
+          "en-US":
+            "Revenue by processor, plan and currency, with MRR and churn.",
+          "en-GLOBAL":
+            "Revenue by processor, plan and currency, with MRR and churn.",
+          "de-DE":
+            "Umsatz nach Zahlungsanbieter, Tarif und Währung, mit MRR und Churn.",
+          "pl-PL":
+            "Przychód według operatora, planu i waluty, z MRR i odpływem.",
+          "fr-FR":
+            "Revenus par prestataire, offre et devise, avec MRR et attrition.",
+          "it-IT":
+            "Ricavi per processore, piano e valuta, con MRR e abbandoni.",
+          "es-ES": "Ingresos por procesador, plan y divisa, con MRR y bajas.",
+          "sk-SK":
+            "Tržby podľa spracovateľa, plánu a meny vrátane MRR a odchodov.",
+        },
+        "payment-processor": {
+          "en-US": "Checkouts, renewals, failed payments and webhook runs.",
+          "en-GLOBAL": "Checkouts, renewals, failed payments and webhook runs.",
+          "de-DE":
+            "Checkouts, Verlängerungen, fehlgeschlagene Zahlungen und Webhooks.",
+          "pl-PL": "Zakupy, odnowienia, nieudane płatności i webhooki.",
+          "fr-FR": "Paiements, renouvellements, échecs et webhooks reçus.",
+          "it-IT": "Checkout, rinnovi, pagamenti falliti e webhook ricevuti.",
+          "es-ES": "Pagos, renovaciones, cobros fallidos y webhooks recibidos.",
+          "sk-SK": "Platby, obnovenia, neúspešné platby a prijaté webhooky.",
+        },
+        "processor-accounting": {
+          "en-US": "Match processor payouts and fees to your books.",
+          "en-GLOBAL": "Match processor payouts and fees to your books.",
+          "de-DE":
+            "Auszahlungen und Gebühren der Zahlungsanbieter mit der Buchhaltung abgleichen.",
+          "pl-PL": "Uzgadniaj wypłaty i opłaty operatorów z księgami.",
+          "fr-FR":
+            "Rapprochez versements et frais des prestataires avec votre comptabilité.",
+          "it-IT":
+            "Riconcili versamenti e commissioni dei processori con la contabilità.",
+          "es-ES":
+            "Concilie liquidaciones y comisiones de los procesadores con la contabilidad.",
+          "sk-SK": "Spárujte výplaty a poplatky spracovateľov s účtovníctvom.",
+        },
+        "products-catalog-list": {
+          "en-US": "Plans, credit packs and goods you sell.",
+          "en-GLOBAL": "Plans, credit packs and goods you sell.",
+          "de-DE": "Tarife, Credit-Pakete und Waren, die Sie verkaufen.",
+          "pl-PL": "Plany, pakiety kredytów i towary, które sprzedajesz.",
+          "fr-FR": "Offres, packs de crédits et produits que vous vendez.",
+          "it-IT": "Piani, pacchetti di crediti e prodotti che vende.",
+          "es-ES": "Planes, paquetes de créditos y productos que vende.",
+          "sk-SK": "Plány, balíky kreditov a tovar, ktorý predávate.",
+        },
+      },
     },
     descriptions: {
       "en-US": "Track payments, refunds and processor settlement.",
@@ -1143,11 +1476,61 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
     order: 12,
     defaultEntryAlias: "subscription-admin-list",
     landing: {
-      actions: [
+      destinations: [
         "subscription-admin-list",
         "subscription-admin-stats",
+        "subscription-admin-purchases",
         "products-catalog-list",
       ],
+      destinationDescriptions: {
+        "subscription-admin-list": {
+          "en-US": "Every subscription with plan, status and renewal date.",
+          "en-GLOBAL": "Every subscription with plan, status and renewal date.",
+          "de-DE": "Alle Abonnements mit Tarif, Status und Verlängerung.",
+          "pl-PL":
+            "Wszystkie subskrypcje z planem, statusem i datą odnowienia.",
+          "fr-FR": "Tous les abonnements avec offre, statut et renouvellement.",
+          "it-IT": "Tutti gli abbonamenti con piano, stato e rinnovo.",
+          "es-ES": "Todas las suscripciones con plan, estado y renovación.",
+          "sk-SK": "Všetky predplatné s plánom, stavom a dátumom obnovenia.",
+        },
+        "subscription-admin-stats": {
+          "en-US": "Subscription, credit and referral revenue in one view.",
+          "en-GLOBAL": "Subscription, credit and referral revenue in one view.",
+          "de-DE": "Umsatz aus Abos, Credits und Empfehlungen auf einen Blick.",
+          "pl-PL":
+            "Przychody z subskrypcji, kredytów i poleceń w jednym widoku.",
+          "fr-FR":
+            "Revenus des abonnements, crédits et parrainages en un coup d’œil.",
+          "it-IT":
+            "Ricavi da abbonamenti, crediti e referral in un’unica vista.",
+          "es-ES":
+            "Ingresos de suscripciones, créditos y referidos de un vistazo.",
+          "sk-SK":
+            "Tržby z predplatného, kreditov a odporúčaní na jednom mieste.",
+        },
+        "subscription-admin-purchases": {
+          "en-US": "Every credit pack bought, by whom and when.",
+          "en-GLOBAL": "Every credit pack bought, by whom and when.",
+          "de-DE": "Jedes gekaufte Credit-Paket, mit Käufer und Datum.",
+          "pl-PL": "Każdy kupiony pakiet kredytów: kto i kiedy.",
+          "fr-FR": "Chaque pack de crédits acheté, par qui et quand.",
+          "it-IT": "Ogni pacchetto di crediti acquistato, da chi e quando.",
+          "es-ES": "Cada paquete de créditos comprado, por quién y cuándo.",
+          "sk-SK": "Každý kúpený balík kreditov, kto a kedy.",
+        },
+        "products-catalog-list": {
+          "en-US": "The plans and credit packs customers can buy.",
+          "en-GLOBAL": "The plans and credit packs customers can buy.",
+          "de-DE": "Die Tarife und Credit-Pakete, die Kunden kaufen können.",
+          "pl-PL": "Plany i pakiety kredytów dostępne dla klientów.",
+          "fr-FR": "Les offres et packs de crédits proposés aux clients.",
+          "it-IT": "I piani e i pacchetti di crediti acquistabili dai clienti.",
+          "es-ES":
+            "Los planes y paquetes de créditos que pueden comprar los clientes.",
+          "sk-SK": "Plány a balíky kreditov, ktoré si zákazníci môžu kúpiť.",
+        },
+      },
     },
     descriptions: {
       "en-US": "Find active plans, renewals and cancellations.",
@@ -1227,7 +1610,78 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
     order: 15,
     defaultEntryAlias: "credit-usage-report",
     landing: {
-      actions: ["credit-usage-report", "credits-history", "credits-balance"],
+      destinations: [
+        "credit-usage-report",
+        "verify-credit-grant",
+        "finance-credit-liabilities",
+        "anti-farming-report",
+        "credits-public-cap",
+      ],
+      destinationDescriptions: {
+        "credit-usage-report": {
+          "en-US": "Credit spend by model, feature and provider, with margin.",
+          "en-GLOBAL":
+            "Credit spend by model, feature and provider, with margin.",
+          "de-DE":
+            "Credit-Verbrauch nach Modell, Funktion und Anbieter, mit Marge.",
+          "pl-PL":
+            "Wydatki kredytów według modelu, funkcji i dostawcy, z marżą.",
+          "fr-FR":
+            "Dépense de crédits par modèle, fonction et fournisseur, avec la marge.",
+          "it-IT":
+            "Spesa di crediti per modello, funzione e fornitore, con margine.",
+          "es-ES":
+            "Gasto de créditos por modelo, función y proveedor, con margen.",
+          "sk-SK":
+            "Spotreba kreditov podľa modelu, funkcie a poskytovateľa vrátane marže.",
+        },
+        "verify-credit-grant": {
+          "en-US": "Find an account and give it bonus credits.",
+          "en-GLOBAL": "Find an account and give it bonus credits.",
+          "de-DE": "Konto suchen und Bonus-Credits gutschreiben.",
+          "pl-PL": "Znajdź konto i przyznaj mu kredyty bonusowe.",
+          "fr-FR": "Trouvez un compte et attribuez-lui des crédits bonus.",
+          "it-IT": "Trovi un account e gli assegni crediti bonus.",
+          "es-ES": "Busque una cuenta y concédale créditos de bonificación.",
+          "sk-SK": "Nájdite účet a prideľte mu bonusové kredity.",
+        },
+        "finance-credit-liabilities": {
+          "en-US": "Paid credits customers have not used yet.",
+          "en-GLOBAL": "Paid credits customers have not used yet.",
+          "de-DE": "Bezahlte Credits, die Kunden noch nicht genutzt haben.",
+          "pl-PL":
+            "Opłacone kredyty, których klienci jeszcze nie wykorzystali.",
+          "fr-FR": "Crédits payés que les clients n’ont pas encore utilisés.",
+          "it-IT": "Crediti pagati che i clienti non hanno ancora usato.",
+          "es-ES": "Créditos pagados que los clientes aún no han usado.",
+          "sk-SK": "Zaplatené kredity, ktoré zákazníci ešte nevyužili.",
+        },
+        "anti-farming-report": {
+          "en-US": "Networks and email domains farming free credits.",
+          "en-GLOBAL": "Networks and email domains farming free credits.",
+          "de-DE": "Netze und E-Mail-Domains, die Gratis-Credits abgreifen.",
+          "pl-PL": "Sieci i domeny e-mail, które wyłudzają darmowe kredyty.",
+          "fr-FR":
+            "Réseaux et domaines e-mail qui exploitent les crédits gratuits.",
+          "it-IT": "Reti e domini email che sfruttano i crediti gratuiti.",
+          "es-ES":
+            "Redes y dominios de correo que explotan los créditos gratuitos.",
+          "sk-SK":
+            "Siete a e-mailové domény, ktoré zneužívajú bezplatné kredity.",
+        },
+        "credits-public-cap": {
+          "en-US": "Today’s free-tier spend against the global cap.",
+          "en-GLOBAL": "Today’s free-tier spend against the global cap.",
+          "de-DE": "Heutiger Gratis-Verbrauch im Vergleich zum globalen Limit.",
+          "pl-PL":
+            "Dzisiejsze zużycie darmowego planu na tle globalnego limitu.",
+          "fr-FR": "Dépense gratuite du jour face au plafond global.",
+          "it-IT": "Spesa gratuita di oggi rispetto al limite globale.",
+          "es-ES": "Gasto gratuito de hoy frente al límite global.",
+          "sk-SK":
+            "Dnešná spotreba bezplatnej úrovne oproti globálnemu limitu.",
+        },
+      },
     },
     descriptions: {
       "en-US": "Review credit purchases, balances and usage.",
@@ -1291,11 +1745,55 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
     order: 60,
     defaultEntryAlias: "referral-overview",
     landing: {
-      actions: [
+      destinations: [
         "referral-overview",
         "referral_admin_payouts_GET",
         "referral-code-report",
       ],
+      destinationDescriptions: {
+        "referral-overview": {
+          "en-US": "Clicks, signups, revenue and commission for every code.",
+          "en-GLOBAL":
+            "Clicks, signups, revenue and commission for every code.",
+          "de-DE": "Klicks, Anmeldungen, Umsatz und Provision für jeden Code.",
+          "pl-PL":
+            "Kliknięcia, rejestracje, przychód i prowizja dla każdego kodu.",
+          "fr-FR":
+            "Clics, inscriptions, revenus et commissions pour chaque code.",
+          "it-IT": "Clic, iscrizioni, ricavi e commissioni per ogni codice.",
+          "es-ES": "Clics, registros, ingresos y comisiones de cada código.",
+          "sk-SK": "Kliknutia, registrácie, tržby a provízie pre každý kód.",
+        },
+        referral_admin_payouts_GET: {
+          "en-US": "Approve or reject partner payout requests.",
+          "en-GLOBAL": "Approve or reject partner payout requests.",
+          "de-DE": "Auszahlungsanfragen von Partnern freigeben oder ablehnen.",
+          "pl-PL": "Akceptuj lub odrzucaj wnioski partnerów o wypłatę.",
+          "fr-FR":
+            "Validez ou refusez les demandes de versement des partenaires.",
+          "it-IT": "Approvi o rifiuti le richieste di pagamento dei partner.",
+          "es-ES": "Apruebe o rechace las solicitudes de pago de los socios.",
+          "sk-SK": "Schváľte alebo zamietnite žiadosti partnerov o výplatu.",
+        },
+        "referral-code-report": {
+          "en-US":
+            "One code end to end: owner, conversions, money and payouts.",
+          "en-GLOBAL":
+            "One code end to end: owner, conversions, money and payouts.",
+          "de-DE":
+            "Ein Code komplett: Inhaber, Conversions, Umsatz und Auszahlungen.",
+          "pl-PL":
+            "Jeden kod od początku do końca: właściciel, konwersje, pieniądze i wypłaty.",
+          "fr-FR":
+            "Un code de bout en bout : titulaire, conversions, revenus et versements.",
+          "it-IT":
+            "Un codice dall’inizio alla fine: titolare, conversioni, ricavi e pagamenti.",
+          "es-ES":
+            "Un código de principio a fin: titular, conversiones, ingresos y pagos.",
+          "sk-SK":
+            "Jeden kód od začiatku do konca: vlastník, konverzie, peniaze a výplaty.",
+        },
+      },
     },
     descriptions: {
       "en-US": "Review referral earnings and outstanding payouts.",
@@ -1361,18 +1859,67 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
     order: 2,
     defaultEntryAlias: "payment-invoice-list",
     landing: {
+      overview: { alias: "payment-dashboard", scope: "company" },
       destinations: [
         "payment-invoice-list",
         "payment-bill-list",
         "payment-estimate-list",
+        "mail-bill-reviews",
       ],
       actions: [
-        "payment-invoice-list",
         "payment_invoice_create_POST",
-        "payment-bill-list",
-        "payment-estimate-list",
+        "payment_bill_create_POST",
+        "payment_estimate_create_POST",
       ],
-      overview: { alias: "payment-dashboard", scope: "company" },
+      destinationDescriptions: {
+        "payment-invoice-list": {
+          "en-US": "Customer invoices by number, customer and status.",
+          "en-GLOBAL": "Customer invoices by number, customer and status.",
+          "de-DE": "Kundenrechnungen nach Nummer, Kunde und Status.",
+          "pl-PL": "Faktury klientów według numeru, klienta i statusu.",
+          "fr-FR": "Factures clients par numéro, client et statut.",
+          "it-IT": "Fatture clienti per numero, cliente e stato.",
+          "es-ES": "Facturas de clientes por número, cliente y estado.",
+          "sk-SK": "Faktúry zákazníkov podľa čísla, zákazníka a stavu.",
+        },
+        "payment-bill-list": {
+          "en-US": "Supplier bills to approve, pay and book.",
+          "en-GLOBAL": "Supplier bills to approve, pay and book.",
+          "de-DE": "Lieferantenrechnungen zum Freigeben, Bezahlen und Buchen.",
+          "pl-PL": "Rachunki dostawców do akceptacji, zapłaty i zaksięgowania.",
+          "fr-FR": "Factures fournisseurs à valider, payer et comptabiliser.",
+          "it-IT": "Fatture fornitori da approvare, pagare e registrare.",
+          "es-ES":
+            "Facturas de proveedores para aprobar, pagar y contabilizar.",
+          "sk-SK": "Faktúry dodávateľov na schválenie, úhradu a zaúčtovanie.",
+        },
+        "payment-estimate-list": {
+          "en-US": "Quotes sent to customers and whether they accepted.",
+          "en-GLOBAL": "Quotes sent to customers and whether they accepted.",
+          "de-DE": "Angebote an Kunden und ob sie angenommen wurden.",
+          "pl-PL": "Oferty wysłane klientom i informacja, czy je przyjęli.",
+          "fr-FR": "Devis envoyés aux clients et leur réponse.",
+          "it-IT": "Preventivi inviati ai clienti ed eventuale accettazione.",
+          "es-ES": "Presupuestos enviados a clientes y si los aceptaron.",
+          "sk-SK": "Cenové ponuky odoslané zákazníkom a či ich prijali.",
+        },
+        "mail-bill-reviews": {
+          "en-US":
+            "Invoices and receipts that arrived by email, ready to book.",
+          "en-GLOBAL":
+            "Invoices and receipts that arrived by email, ready to book.",
+          "de-DE":
+            "Per E-Mail eingegangene Rechnungen und Belege, bereit zum Buchen.",
+          "pl-PL": "Faktury i paragony z e-maila gotowe do zaksięgowania.",
+          "fr-FR":
+            "Factures et reçus arrivés par e-mail, prêts à comptabiliser.",
+          "it-IT":
+            "Fatture e ricevute arrivate via email, pronte da registrare.",
+          "es-ES":
+            "Facturas y recibos llegados por correo, listos para contabilizar.",
+          "sk-SK": "Faktúry a doklady z e-mailu pripravené na zaúčtovanie.",
+        },
+      },
     },
     descriptions: {
       "en-US":
@@ -1482,15 +2029,83 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
     order: 30,
     defaultEntryAlias: "accounting-dashboard",
     landing: {
+      actions: ["coa-setup", "coa-period-create", "coa-journal-create"],
+      contextualActions: true,
+      overview: { alias: "accounting-dashboard", scope: "company" },
       destinations: [
         "coa-journal-list",
+        "coa-profit-loss",
+        "coa-balance-sheet",
         "coa-receivables-aging",
         "coa-payables-aging",
         "coa-period-list",
       ],
-      actions: ["coa-setup", "coa-period-create", "coa-journal-create"],
-      contextualActions: true,
-      overview: { alias: "accounting-dashboard", scope: "company" },
+      destinationDescriptions: {
+        "coa-journal-list": {
+          "en-US": "Every posted entry, filtered by account and date.",
+          "en-GLOBAL": "Every posted entry, filtered by account and date.",
+          "de-DE": "Alle gebuchten Einträge, filterbar nach Konto und Datum.",
+          "pl-PL": "Wszystkie zaksięgowane wpisy z filtrem po koncie i dacie.",
+          "fr-FR":
+            "Toutes les écritures passées, filtrables par compte et par date.",
+          "it-IT": "Tutte le registrazioni, filtrabili per conto e data.",
+          "es-ES":
+            "Todos los asientos contabilizados, filtrables por cuenta y fecha.",
+          "sk-SK": "Všetky zaúčtované zápisy s filtrom podľa účtu a dátumu.",
+        },
+        "coa-profit-loss": {
+          "en-US": "Income, expenses and profit for the period.",
+          "en-GLOBAL": "Income, expenses and profit for the period.",
+          "de-DE": "Erträge, Aufwände und Gewinn im Zeitraum.",
+          "pl-PL": "Przychody, koszty i zysk w okresie.",
+          "fr-FR": "Produits, charges et résultat de la période.",
+          "it-IT": "Ricavi, costi e utile del periodo.",
+          "es-ES": "Ingresos, gastos y beneficio del periodo.",
+          "sk-SK": "Výnosy, náklady a zisk za obdobie.",
+        },
+        "coa-balance-sheet": {
+          "en-US": "Assets, liabilities and equity on any date.",
+          "en-GLOBAL": "Assets, liabilities and equity on any date.",
+          "de-DE": "Vermögen, Schulden und Eigenkapital zu jedem Stichtag.",
+          "pl-PL": "Aktywa, zobowiązania i kapitał na wybrany dzień.",
+          "fr-FR": "Actif, passif et capitaux propres à la date choisie.",
+          "it-IT": "Attività, passività e patrimonio netto a qualsiasi data.",
+          "es-ES": "Activos, pasivos y patrimonio en cualquier fecha.",
+          "sk-SK": "Aktíva, záväzky a vlastné imanie k ľubovoľnému dňu.",
+        },
+        "coa-receivables-aging": {
+          "en-US": "Customer invoices still unpaid, grouped by age.",
+          "en-GLOBAL": "Customer invoices still unpaid, grouped by age.",
+          "de-DE": "Offene Kundenrechnungen, nach Alter gruppiert.",
+          "pl-PL": "Niezapłacone faktury klientów pogrupowane według wieku.",
+          "fr-FR": "Factures clients impayées, classées par ancienneté.",
+          "it-IT": "Fatture clienti non pagate, raggruppate per anzianità.",
+          "es-ES": "Facturas de clientes pendientes, agrupadas por antigüedad.",
+          "sk-SK": "Neuhradené faktúry zákazníkov zoskupené podľa veku.",
+        },
+        "coa-payables-aging": {
+          "en-US": "Supplier bills you still owe, grouped by due date.",
+          "en-GLOBAL": "Supplier bills you still owe, grouped by due date.",
+          "de-DE": "Offene Lieferantenrechnungen, nach Fälligkeit gruppiert.",
+          "pl-PL":
+            "Niezapłacone rachunki dostawców pogrupowane według terminu.",
+          "fr-FR": "Factures fournisseurs à payer, classées par échéance.",
+          "it-IT": "Fatture fornitori da pagare, raggruppate per scadenza.",
+          "es-ES":
+            "Facturas de proveedores pendientes, agrupadas por vencimiento.",
+          "sk-SK": "Neuhradené faktúry dodávateľov zoskupené podľa splatnosti.",
+        },
+        "coa-period-list": {
+          "en-US": "Open and close accounting periods.",
+          "en-GLOBAL": "Open and close accounting periods.",
+          "de-DE": "Buchungsperioden öffnen und abschließen.",
+          "pl-PL": "Otwieraj i zamykaj okresy księgowe.",
+          "fr-FR": "Ouvrez et clôturez les périodes comptables.",
+          "it-IT": "Apra e chiuda i periodi contabili.",
+          "es-ES": "Abra y cierre periodos contables.",
+          "sk-SK": "Otvárajte a uzatvárajte účtovné obdobia.",
+        },
+      },
     },
     descriptions: {
       "en-US": "Review journals, outstanding balances and open periods.",
@@ -1604,10 +2219,31 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
     landing: {
       destinations: ["products-catalog-list", "products-category-list"],
       actions: [
-        "products-catalog-list",
-        "products-category-list",
-        "processor-accounting-map",
+        "products_catalog_create_POST",
+        "products_category_create_POST",
       ],
+      destinationDescriptions: {
+        "products-catalog-list": {
+          "en-US": "Plans, credit packs and goods you sell.",
+          "en-GLOBAL": "Plans, credit packs and goods you sell.",
+          "de-DE": "Tarife, Credit-Pakete und Waren, die Sie verkaufen.",
+          "pl-PL": "Plany, pakiety kredytów i towary, które sprzedajesz.",
+          "fr-FR": "Offres, packs de crédits et produits que vous vendez.",
+          "it-IT": "Piani, pacchetti di crediti e prodotti che vende.",
+          "es-ES": "Planes, paquetes de créditos y productos que vende.",
+          "sk-SK": "Plány, balíky kreditov a tovar, ktorý predávate.",
+        },
+        "products-category-list": {
+          "en-US": "Groups that keep the catalog in order.",
+          "en-GLOBAL": "Groups that keep the catalog in order.",
+          "de-DE": "Gruppen, die den Katalog ordnen.",
+          "pl-PL": "Grupy, które porządkują katalog.",
+          "fr-FR": "Les groupes qui structurent le catalogue.",
+          "it-IT": "I gruppi che ordinano il catalogo.",
+          "es-ES": "Los grupos que ordenan el catálogo.",
+          "sk-SK": "Skupiny, ktoré udržiavajú katalóg v poriadku.",
+        },
+      },
     },
     descriptions: {
       "en-US": "Manage products, services, plans and prices.",
@@ -1671,8 +2307,45 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
     order: 45,
     defaultEntryAlias: "pos-dashboard",
     landing: {
-      actions: ["pos-terminals", "pos-order-list"],
       overview: { alias: "pos-dashboard", scope: "company" },
+      destinations: [
+        "pos-order-list",
+        "pos-terminals",
+        "products-catalog-list",
+      ],
+      actions: ["pos_order_create_POST", "pos_terminal_create_POST"],
+      destinationDescriptions: {
+        "pos-order-list": {
+          "en-US": "Till sales by terminal, session and status.",
+          "en-GLOBAL": "Till sales by terminal, session and status.",
+          "de-DE": "Kassenverkäufe nach Kasse, Schicht und Status.",
+          "pl-PL": "Sprzedaż kasowa według kasy, zmiany i statusu.",
+          "fr-FR": "Ventes en caisse par terminal, session et statut.",
+          "it-IT": "Vendite in cassa per terminale, sessione e stato.",
+          "es-ES": "Ventas en caja por terminal, sesión y estado.",
+          "sk-SK": "Predaje v pokladni podľa terminálu, zmeny a stavu.",
+        },
+        "pos-terminals": {
+          "en-US": "Tills and devices that take payments.",
+          "en-GLOBAL": "Tills and devices that take payments.",
+          "de-DE": "Kassen und Geräte, die Zahlungen annehmen.",
+          "pl-PL": "Kasy i urządzenia przyjmujące płatności.",
+          "fr-FR": "Caisses et appareils qui encaissent les paiements.",
+          "it-IT": "Casse e dispositivi che incassano i pagamenti.",
+          "es-ES": "Cajas y dispositivos que cobran los pagos.",
+          "sk-SK": "Pokladne a zariadenia, ktoré prijímajú platby.",
+        },
+        "products-catalog-list": {
+          "en-US": "The products your tills can sell.",
+          "en-GLOBAL": "The products your tills can sell.",
+          "de-DE": "Die Produkte, die Ihre Kassen verkaufen können.",
+          "pl-PL": "Produkty, które mogą sprzedawać twoje kasy.",
+          "fr-FR": "Les produits que vos caisses peuvent vendre.",
+          "it-IT": "I prodotti che le sue casse possono vendere.",
+          "es-ES": "Los productos que pueden vender sus cajas.",
+          "sk-SK": "Produkty, ktoré môžu vaše pokladne predávať.",
+        },
+      },
     },
     descriptions: {
       "en-US": "Open a till, record sales and close the shift.",
@@ -1768,13 +2441,48 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
     order: 50,
     defaultEntryAlias: "inventory-dashboard",
     landing: {
-      destinations: ["supplier-evidence", "finance-credit-liabilities"],
-      actions: [
+      overview: { alias: "inventory-dashboard", scope: "company" },
+      destinations: [
         "inventory-stock",
         "inventory-warehouses",
         "inventory-transfers",
       ],
-      overview: { alias: "inventory-dashboard", scope: "company" },
+      actions: [
+        "inventory_transfer_create_POST",
+        "inventory_warehouse_create_POST",
+      ],
+      destinationDescriptions: {
+        "inventory-stock": {
+          "en-US": "Stock per warehouse, with low-stock warnings.",
+          "en-GLOBAL": "Stock per warehouse, with low-stock warnings.",
+          "de-DE": "Bestand je Lager, mit Warnung bei Mindestbestand.",
+          "pl-PL": "Stany w każdym magazynie z ostrzeżeniem o niskim stanie.",
+          "fr-FR": "Stock par entrepôt, avec alerte de stock bas.",
+          "it-IT": "Giacenze per magazzino, con avviso di scorte basse.",
+          "es-ES": "Existencias por almacén, con aviso de stock bajo.",
+          "sk-SK": "Zásoby v každom sklade s upozornením na nízky stav.",
+        },
+        "inventory-warehouses": {
+          "en-US": "Every warehouse and stock location you run.",
+          "en-GLOBAL": "Every warehouse and stock location you run.",
+          "de-DE": "Alle Lager und Lagerorte Ihres Unternehmens.",
+          "pl-PL": "Wszystkie magazyny i miejsca składowania.",
+          "fr-FR": "Tous vos entrepôts et emplacements de stock.",
+          "it-IT": "Tutti i magazzini e i punti di stoccaggio.",
+          "es-ES": "Todos sus almacenes y ubicaciones de stock.",
+          "sk-SK": "Všetky sklady a skladové miesta.",
+        },
+        "inventory-transfers": {
+          "en-US": "Stock moved between warehouses, open and done.",
+          "en-GLOBAL": "Stock moved between warehouses, open and done.",
+          "de-DE": "Umlagerungen zwischen Lagern, offen und erledigt.",
+          "pl-PL": "Przesunięcia między magazynami, otwarte i zakończone.",
+          "fr-FR": "Transferts entre entrepôts, en cours et terminés.",
+          "it-IT": "Trasferimenti tra magazzini, aperti e completati.",
+          "es-ES": "Traslados entre almacenes, abiertos y completados.",
+          "sk-SK": "Presuny medzi skladmi, otvorené aj dokončené.",
+        },
+      },
     },
     descriptions: {
       "en-US": "Track physical stock, warehouse movements and transfers.",
@@ -1859,8 +2567,46 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
     order: 55,
     defaultEntryAlias: "purchasing-dashboard",
     landing: {
-      actions: ["purchasing-orders", "purchasing-vendors"],
       overview: { alias: "purchasing-dashboard", scope: "company" },
+      destinations: [
+        "purchasing-orders",
+        "purchasing-vendors",
+        "payment-bill-list",
+      ],
+      actions: ["purchasing_order_create_POST"],
+      destinationDescriptions: {
+        "purchasing-orders": {
+          "en-US": "Purchase orders by vendor and status.",
+          "en-GLOBAL": "Purchase orders by vendor and status.",
+          "de-DE": "Bestellungen nach Lieferant und Status.",
+          "pl-PL": "Zamówienia zakupu według dostawcy i statusu.",
+          "fr-FR": "Bons de commande par fournisseur et statut.",
+          "it-IT": "Ordini di acquisto per fornitore e stato.",
+          "es-ES": "Pedidos de compra por proveedor y estado.",
+          "sk-SK": "Nákupné objednávky podľa dodávateľa a stavu.",
+        },
+        "purchasing-vendors": {
+          "en-US": "The suppliers you buy from.",
+          "en-GLOBAL": "The suppliers you buy from.",
+          "de-DE": "Die Lieferanten, bei denen Sie einkaufen.",
+          "pl-PL": "Dostawcy, od których kupujesz.",
+          "fr-FR": "Les fournisseurs auprès desquels vous achetez.",
+          "it-IT": "I fornitori da cui acquista.",
+          "es-ES": "Los proveedores a los que compra.",
+          "sk-SK": "Dodávatelia, od ktorých nakupujete.",
+        },
+        "payment-bill-list": {
+          "en-US": "Bills from your vendors, ready to approve and pay.",
+          "en-GLOBAL": "Bills from your vendors, ready to approve and pay.",
+          "de-DE":
+            "Rechnungen Ihrer Lieferanten, bereit zum Freigeben und Bezahlen.",
+          "pl-PL": "Rachunki od dostawców gotowe do akceptacji i zapłaty.",
+          "fr-FR": "Factures de vos fournisseurs, prêtes à valider et payer.",
+          "it-IT": "Fatture dei fornitori, pronte da approvare e pagare.",
+          "es-ES": "Facturas de sus proveedores, listas para aprobar y pagar.",
+          "sk-SK": "Faktúry od dodávateľov pripravené na schválenie a úhradu.",
+        },
+      },
     },
     descriptions: {
       "en-US": "Manage suppliers, purchase orders and deliveries.",
@@ -1931,8 +2677,56 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
         "company-tax-regime-view",
         "tax-rate-list",
         "coa-tax-report",
+        "tax_report_GET",
       ],
-      actions: ["company-tax-regime-view", "tax-rate-list", "coa-tax-report"],
+      actions: ["tax_rate_create_POST"],
+      destinationDescriptions: {
+        "company-tax-regime-view": {
+          "en-US": "Choose how VAT applies to your documents.",
+          "en-GLOBAL": "Choose how VAT applies to your documents.",
+          "de-DE":
+            "Festlegen, wie die Umsatzsteuer auf Ihre Belege angewendet wird.",
+          "pl-PL": "Wybierz, jak VAT ma działać na dokumentach.",
+          "fr-FR": "Choisissez le régime de TVA appliqué à vos documents.",
+          "it-IT": "Scelga come applicare l’IVA ai documenti.",
+          "es-ES": "Elija cómo se aplica el IVA a sus documentos.",
+          "sk-SK": "Vyberte, ako sa DPH uplatňuje na vaše doklady.",
+        },
+        "tax-rate-list": {
+          "en-US": "The tax rates your documents can use.",
+          "en-GLOBAL": "The tax rates your documents can use.",
+          "de-DE": "Die Steuersätze, die Ihre Belege verwenden können.",
+          "pl-PL": "Stawki podatku dostępne w dokumentach.",
+          "fr-FR": "Les taux de taxe utilisables dans vos documents.",
+          "it-IT": "Le aliquote disponibili per i documenti.",
+          "es-ES": "Los tipos impositivos disponibles para sus documentos.",
+          "sk-SK": "Sadzby dane, ktoré môžu používať vaše doklady.",
+        },
+        "coa-tax-report": {
+          "en-US": "Booked VAT movements for the dates you pick.",
+          "en-GLOBAL": "Booked VAT movements for the dates you pick.",
+          "de-DE":
+            "Gebuchte Umsatzsteuerbewegungen für den gewählten Zeitraum.",
+          "pl-PL": "Zaksięgowane ruchy VAT w wybranym okresie.",
+          "fr-FR": "Mouvements de TVA comptabilisés sur les dates choisies.",
+          "it-IT": "Movimenti IVA registrati nelle date scelte.",
+          "es-ES": "Movimientos de IVA contabilizados en las fechas elegidas.",
+          "sk-SK": "Zaúčtované pohyby DPH za zvolené obdobie.",
+        },
+        tax_report_GET: {
+          "en-US": "Tax on invoices, bills and till sales, by rate.",
+          "en-GLOBAL": "Tax on invoices, bills and till sales, by rate.",
+          "de-DE":
+            "Steuer auf Rechnungen, Eingangsrechnungen und Kassenverkäufe, nach Satz.",
+          "pl-PL":
+            "Podatek z faktur, rachunków i sprzedaży kasowej według stawki.",
+          "fr-FR": "Taxe sur factures, achats et ventes en caisse, par taux.",
+          "it-IT":
+            "Imposta su fatture, acquisti e vendite in cassa, per aliquota.",
+          "es-ES": "Impuesto en facturas, compras y ventas en caja, por tipo.",
+          "sk-SK": "Daň z faktúr, nákupov a predaja v pokladni podľa sadzby.",
+        },
+      },
     },
     descriptions: {
       "en-US": "Review your tax regime, rates and VAT summary.",
@@ -1997,6 +2791,40 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
     icon: "bell",
     order: 70,
     defaultEntryAlias: "notifications",
+    landing: {
+      destinations: ["notifications"],
+      destinationDescriptions: {
+        notifications: {
+          "en-US":
+            "Everything that finished while you were away, unread first.",
+          "en-GLOBAL":
+            "Everything that finished while you were away, unread first.",
+          "de-DE":
+            "Alles, was in Ihrer Abwesenheit fertig wurde, Ungelesenes zuerst.",
+          "pl-PL":
+            "Wszystko, co zakończyło się pod twoją nieobecność, nieprzeczytane najpierw.",
+          "fr-FR":
+            "Tout ce qui s’est terminé en votre absence, non lus en premier.",
+          "it-IT":
+            "Tutto ciò che si è concluso in sua assenza, prima i non letti.",
+          "es-ES": "Todo lo que terminó en su ausencia, primero lo no leído.",
+          "sk-SK":
+            "Všetko, čo sa dokončilo počas vašej neprítomnosti, neprečítané navrchu.",
+        },
+      },
+    },
+    descriptions: {
+      "en-US": "Finished work, alerts and replies, unread first.",
+      "en-GLOBAL": "Finished work, alerts and replies, unread first.",
+      "de-DE":
+        "Erledigte Aufgaben, Warnungen und Antworten, Ungelesenes zuerst.",
+      "pl-PL":
+        "Zakończone zadania, alerty i odpowiedzi, nieprzeczytane najpierw.",
+      "fr-FR": "Tâches terminées, alertes et réponses, non lues en premier.",
+      "it-IT": "Attività concluse, avvisi e risposte, prima i non letti.",
+      "es-ES": "Tareas terminadas, alertas y respuestas, primero lo no leído.",
+      "sk-SK": "Dokončené úlohy, upozornenia a odpovede, neprečítané navrchu.",
+    },
   },
   {
     key: "messenger",
@@ -2015,6 +2843,75 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
     icon: "mail",
     order: 10,
     defaultEntryAlias: "messenger-accounts",
+    landing: {
+      destinations: [
+        "system-mail-inbox",
+        "messenger-inbox",
+        "messenger-messages",
+        "email-stats",
+        "messenger-accounts",
+      ],
+      actions: ["messenger_accounts_create_POST"],
+      destinationDescriptions: {
+        "system-mail-inbox": {
+          "en-US": "Mail sent to the platform address, newest first.",
+          "en-GLOBAL": "Mail sent to the platform address, newest first.",
+          "de-DE": "Post an die Plattform-Adresse, neueste zuerst.",
+          "pl-PL": "Poczta na adres platformy, od najnowszej.",
+          "fr-FR":
+            "Courrier reçu à l’adresse de la plateforme, le plus récent d’abord.",
+          "it-IT":
+            "Posta ricevuta all’indirizzo della piattaforma, la più recente per prima.",
+          "es-ES":
+            "Correo recibido en la dirección de la plataforma, lo más reciente primero.",
+          "sk-SK": "Pošta na adresu platformy, najnovšia navrchu.",
+        },
+        "messenger-inbox": {
+          "en-US": "Read mail in your connected mailboxes.",
+          "en-GLOBAL": "Read mail in your connected mailboxes.",
+          "de-DE": "Post in verbundenen Postfächern lesen.",
+          "pl-PL": "Czytaj pocztę w podłączonych skrzynkach.",
+          "fr-FR": "Lisez le courrier de vos boîtes connectées.",
+          "it-IT": "Legga la posta delle caselle collegate.",
+          "es-ES": "Lea el correo de sus buzones conectados.",
+          "sk-SK": "Čítajte poštu v pripojených schránkach.",
+        },
+        "messenger-messages": {
+          "en-US": "Every email the platform sent, searchable and filtered.",
+          "en-GLOBAL":
+            "Every email the platform sent, searchable and filtered.",
+          "de-DE": "Jede versendete E-Mail, durchsuchbar und filterbar.",
+          "pl-PL": "Każdy wysłany e-mail z wyszukiwaniem i filtrami.",
+          "fr-FR": "Chaque e-mail envoyé, avec recherche et filtres.",
+          "it-IT": "Ogni email inviata, con ricerca e filtri.",
+          "es-ES": "Cada correo enviado, con búsqueda y filtros.",
+          "sk-SK": "Každý odoslaný e-mail s vyhľadávaním a filtrami.",
+        },
+        "email-stats": {
+          "en-US": "Sends, opens, clicks and bounces over time.",
+          "en-GLOBAL": "Sends, opens, clicks and bounces over time.",
+          "de-DE": "Versand, Öffnungen, Klicks und Bounces im Verlauf.",
+          "pl-PL": "Wysyłki, otwarcia, kliknięcia i odbicia w czasie.",
+          "fr-FR": "Envois, ouvertures, clics et rebonds dans le temps.",
+          "it-IT": "Invii, aperture, clic e rimbalzi nel tempo.",
+          "es-ES": "Envíos, aperturas, clics y rebotes a lo largo del tiempo.",
+          "sk-SK": "Odoslané, otvorené, kliknutia a nedoručené v čase.",
+        },
+        "messenger-accounts": {
+          "en-US": "The accounts the platform sends from, on every channel.",
+          "en-GLOBAL":
+            "The accounts the platform sends from, on every channel.",
+          "de-DE":
+            "Die Konten, über die die Plattform sendet, auf allen Kanälen.",
+          "pl-PL": "Konta, z których wysyła platforma, na wszystkich kanałach.",
+          "fr-FR": "Les comptes d’envoi de la plateforme, sur tous les canaux.",
+          "it-IT": "Gli account da cui invia la piattaforma, su ogni canale.",
+          "es-ES":
+            "Las cuentas desde las que envía la plataforma, en todos los canales.",
+          "sk-SK": "Účty, z ktorých platforma posiela, na všetkých kanáloch.",
+        },
+      },
+    },
     descriptions: {
       "en-US": "Manage connected mailboxes and read incoming messages.",
       "en-GLOBAL": "Manage connected mailboxes and read incoming messages.",
@@ -2111,7 +3008,35 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
     defaultEntryAlias: "forum-threads",
     landing: {
       summary: { alias: "publishing-summary", scope: "platform" },
-      destinations: ["forum-threads"],
+      destinations: ["forum-threads", "chat-moderation"],
+      destinationDescriptions: {
+        "forum-threads": {
+          "en-US": "Public threads members shared with the community.",
+          "en-GLOBAL": "Public threads members shared with the community.",
+          "de-DE":
+            "Öffentliche Threads, die Mitglieder mit der Community teilen.",
+          "pl-PL": "Publiczne wątki udostępnione społeczności.",
+          "fr-FR": "Fils publics partagés avec la communauté.",
+          "it-IT": "Conversazioni pubbliche condivise con la community.",
+          "es-ES": "Conversaciones públicas compartidas con la comunidad.",
+          "sk-SK": "Verejné konverzácie zdieľané s komunitou.",
+        },
+        "chat-moderation": {
+          "en-US": "Reported and hidden public posts, most urgent first.",
+          "en-GLOBAL": "Reported and hidden public posts, most urgent first.",
+          "de-DE":
+            "Gemeldete und ausgeblendete öffentliche Beiträge, Dringendes zuerst.",
+          "pl-PL":
+            "Zgłoszone i ukryte publiczne wpisy, najpilniejsze najpierw.",
+          "fr-FR":
+            "Publications publiques signalées ou masquées, les plus urgentes d’abord.",
+          "it-IT": "Post pubblici segnalati o nascosti, prima i più urgenti.",
+          "es-ES":
+            "Publicaciones públicas denunciadas u ocultas, primero las más urgentes.",
+          "sk-SK":
+            "Nahlásené a skryté verejné príspevky, najnaliehavejšie navrchu.",
+        },
+      },
     },
     descriptions: {
       "en-US": "Manage forum discussions and search indexing.",
@@ -2183,6 +3108,34 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       summary: { alias: "users-admin-summary", scope: "platform" },
       destinations: ["users-list", "users-stats"],
       actions: ["users-create"],
+      destinationDescriptions: {
+        "users-list": {
+          "en-US":
+            "Every account with what it paid, spends and when it was last active.",
+          "en-GLOBAL":
+            "Every account with what it paid, spends and when it was last active.",
+          "de-DE":
+            "Alle Konten mit Zahlungen, Verbrauch und letzter Aktivität.",
+          "pl-PL": "Każde konto z wpłatami, wydatkami i ostatnią aktywnością.",
+          "fr-FR":
+            "Chaque compte avec ses paiements, sa consommation et sa dernière activité.",
+          "it-IT": "Ogni account con pagamenti, consumi e ultima attività.",
+          "es-ES":
+            "Cada cuenta con lo que pagó, lo que gasta y su última actividad.",
+          "sk-SK": "Každý účet s platbami, spotrebou a poslednou aktivitou.",
+        },
+        "users-stats": {
+          "en-US": "Who signed up, from where, and who stayed and paid.",
+          "en-GLOBAL": "Who signed up, from where, and who stayed and paid.",
+          "de-DE":
+            "Wer sich angemeldet hat, woher, und wer geblieben ist und zahlt.",
+          "pl-PL": "Kto się zarejestrował, skąd, kto został i kto zapłacił.",
+          "fr-FR": "Qui s’est inscrit, d’où, et qui est resté et a payé.",
+          "it-IT": "Chi si è iscritto, da dove, e chi è rimasto e ha pagato.",
+          "es-ES": "Quién se registró, desde dónde, y quién se quedó y pagó.",
+          "sk-SK": "Kto sa zaregistroval, odkiaľ a kto zostal a zaplatil.",
+        },
+      },
     },
     descriptions: {
       "en-US": "Find people, review access and manage user accounts.",
@@ -2379,12 +3332,75 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       actions: ["leads_create_POST"],
       destinations: [
         "leads-list",
-        "leads-search",
         "acquisition-report",
         "funnel-report",
         "abuse-report",
-        "campaign-stats",
+        "leads-import-status",
       ],
+      destinationDescriptions: {
+        "leads-list": {
+          "en-US": "Every lead with source, status and campaign stage.",
+          "en-GLOBAL": "Every lead with source, status and campaign stage.",
+          "de-DE": "Alle Leads mit Quelle, Status und Kampagnenstufe.",
+          "pl-PL": "Wszystkie leady ze źródłem, statusem i etapem kampanii.",
+          "fr-FR":
+            "Tous les leads avec leur source, statut et étape de campagne.",
+          "it-IT": "Tutti i lead con fonte, stato e fase della campagna.",
+          "es-ES": "Todos los leads con origen, estado y etapa de campaña.",
+          "sk-SK": "Všetky leady so zdrojom, stavom a fázou kampane.",
+        },
+        "acquisition-report": {
+          "en-US": "See which sources bring visitors, leads and signups.",
+          "en-GLOBAL": "See which sources bring visitors, leads and signups.",
+          "de-DE":
+            "Sehen, welche Quellen Besucher, Leads und Anmeldungen bringen.",
+          "pl-PL": "Zobacz, które źródła dają odwiedziny, leady i rejestracje.",
+          "fr-FR":
+            "Voyez quelles sources apportent visiteurs, leads et inscriptions.",
+          "it-IT": "Veda quali fonti portano visitatori, lead e iscrizioni.",
+          "es-ES": "Vea qué fuentes traen visitas, leads y registros.",
+          "sk-SK":
+            "Pozrite si, ktoré zdroje prinášajú návštevy, leady a registrácie.",
+        },
+        "funnel-report": {
+          "en-US": "Find where visitors drop off before they pay.",
+          "en-GLOBAL": "Find where visitors drop off before they pay.",
+          "de-DE": "Erkennen, wo Besucher vor dem Bezahlen abspringen.",
+          "pl-PL": "Sprawdź, gdzie odwiedzający odpadają przed zapłatą.",
+          "fr-FR": "Repérez où les visiteurs décrochent avant de payer.",
+          "it-IT": "Scopra dove i visitatori abbandonano prima di pagare.",
+          "es-ES": "Detecte dónde abandonan los visitantes antes de pagar.",
+          "sk-SK": "Zistite, kde návštevníci odpadávajú pred platbou.",
+        },
+        "abuse-report": {
+          "en-US":
+            "Bot bursts and free-credit burners, by network and user agent.",
+          "en-GLOBAL":
+            "Bot bursts and free-credit burners, by network and user agent.",
+          "de-DE":
+            "Bot-Wellen und Gratis-Credit-Verbraucher, nach Netz und User-Agent.",
+          "pl-PL":
+            "Fale botów i zużycie darmowych kredytów według sieci i przeglądarki.",
+          "fr-FR":
+            "Vagues de bots et consommateurs de crédits gratuits, par réseau et agent.",
+          "it-IT":
+            "Ondate di bot e consumo di crediti gratuiti, per rete e user agent.",
+          "es-ES":
+            "Oleadas de bots y consumo de créditos gratuitos, por red y agente.",
+          "sk-SK":
+            "Vlny botov a míňanie bezplatných kreditov podľa siete a prehliadača.",
+        },
+        "leads-import-status": {
+          "en-US": "Progress and errors of every CSV import.",
+          "en-GLOBAL": "Progress and errors of every CSV import.",
+          "de-DE": "Fortschritt und Fehler jedes CSV-Imports.",
+          "pl-PL": "Postęp i błędy każdego importu CSV.",
+          "fr-FR": "Avancement et erreurs de chaque import CSV.",
+          "it-IT": "Avanzamento ed errori di ogni importazione CSV.",
+          "es-ES": "Progreso y errores de cada importación CSV.",
+          "sk-SK": "Priebeh a chyby každého importu CSV.",
+        },
+      },
     },
     descriptions: {
       "en-US":
@@ -2589,7 +3605,21 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
     order: 35,
     defaultEntryAlias: "companies-list",
     landing: {
-      actions: ["companies-list", "companies_create_POST"],
+      destinations: ["companies-list"],
+      actions: ["companies_create_POST"],
+      destinationDescriptions: {
+        "companies-list": {
+          "en-US": "Switch between companies and edit their details.",
+          "en-GLOBAL": "Switch between companies and edit their details.",
+          "de-DE": "Zwischen Unternehmen wechseln und Stammdaten bearbeiten.",
+          "pl-PL": "Przełączaj firmy i edytuj ich dane.",
+          "fr-FR":
+            "Passez d’une entreprise à l’autre et modifiez leurs données.",
+          "it-IT": "Passi da un’azienda all’altra e ne modifichi i dati.",
+          "es-ES": "Cambie de empresa y edite sus datos.",
+          "sk-SK": "Prepínajte medzi spoločnosťami a upravujte ich údaje.",
+        },
+      },
     },
     descriptions: {
       "en-US": "Manage legal entities, company settings and team access.",
@@ -2735,6 +3765,48 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
     icon: "terminal",
     order: 20,
     defaultEntryAlias: "ssh-connections-list",
+    landing: {
+      destinations: ["ssh-connections-list", "ssh_linux_users_list_GET"],
+      actions: ["ssh_connections_create_POST", "ssh_linux_users_create_POST"],
+      destinationDescriptions: {
+        "ssh-connections-list": {
+          "en-US": "Servers and instances you can open a shell on.",
+          "en-GLOBAL": "Servers and instances you can open a shell on.",
+          "de-DE":
+            "Server und Instanzen, auf denen Sie eine Shell öffnen können.",
+          "pl-PL": "Serwery i instancje, na których otworzysz powłokę.",
+          "fr-FR": "Serveurs et instances où ouvrir un terminal.",
+          "it-IT": "Server e istanze su cui aprire una shell.",
+          "es-ES": "Servidores e instancias en los que abrir una terminal.",
+          "sk-SK": "Servery a inštancie, na ktorých otvoríte shell.",
+        },
+        ssh_linux_users_list_GET: {
+          "en-US": "Login accounts on the host operating system.",
+          "en-GLOBAL": "Login accounts on the host operating system.",
+          "de-DE": "Anmeldekonten im Betriebssystem des Hosts.",
+          "pl-PL": "Konta logowania w systemie hosta.",
+          "fr-FR": "Comptes de connexion du système hôte.",
+          "it-IT": "Account di accesso del sistema operativo host.",
+          "es-ES": "Cuentas de acceso del sistema operativo del host.",
+          "sk-SK": "Prihlasovacie účty v operačnom systéme hostiteľa.",
+        },
+      },
+    },
+    descriptions: {
+      "en-US": "Open a shell on your servers and manage their login accounts.",
+      "en-GLOBAL":
+        "Open a shell on your servers and manage their login accounts.",
+      "de-DE":
+        "Shells auf Ihren Servern öffnen und deren Anmeldekonten verwalten.",
+      "pl-PL": "Otwieraj powłokę na serwerach i zarządzaj kontami logowania.",
+      "fr-FR": "Ouvrez un terminal sur vos serveurs et gérez leurs comptes.",
+      "it-IT":
+        "Apra una shell sui server e ne gestisca gli account di accesso.",
+      "es-ES":
+        "Abra una terminal en sus servidores y gestione sus cuentas de acceso.",
+      "sk-SK":
+        "Otvorte shell na svojich serveroch a spravujte prihlasovacie účty.",
+    },
     subcategories: {
       Connections: {
         icon: "link-2",
@@ -2865,6 +3937,86 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
     icon: "user",
     order: 99,
     defaultEntryAlias: "user-me",
+    landing: {
+      destinations: [
+        "user-me",
+        "user-sessions",
+        "subscription_GET",
+        "payment_GET",
+        "user_private_me_addresses_GET",
+        "api-keys",
+      ],
+      destinationDescriptions: {
+        "user-me": {
+          "en-US": "Edit your name, email and profile details.",
+          "en-GLOBAL": "Edit your name, email and profile details.",
+          "de-DE": "Name, E-Mail und Profildaten bearbeiten.",
+          "pl-PL": "Edytuj imię, e-mail i dane profilu.",
+          "fr-FR": "Modifiez votre nom, votre e-mail et votre profil.",
+          "it-IT": "Modifichi nome, email e dati del profilo.",
+          "es-ES": "Edite su nombre, correo y datos de perfil.",
+          "sk-SK": "Upravte meno, e-mail a údaje profilu.",
+        },
+        "user-sessions": {
+          "en-US":
+            "See signed-in devices and sign out the ones you do not trust.",
+          "en-GLOBAL":
+            "See signed-in devices and sign out the ones you do not trust.",
+          "de-DE": "Angemeldete Geräte sehen und unbekannte abmelden.",
+          "pl-PL":
+            "Zobacz zalogowane urządzenia i wyloguj te, którym nie ufasz.",
+          "fr-FR":
+            "Voyez les appareils connectés et déconnectez ceux que vous ne reconnaissez pas.",
+          "it-IT":
+            "Veda i dispositivi connessi e disconnetta quelli che non riconosce.",
+          "es-ES":
+            "Vea los dispositivos conectados y cierre la sesión en los que no reconozca.",
+          "sk-SK":
+            "Pozrite si prihlásené zariadenia a odhláste tie, ktorým nedôverujete.",
+        },
+        subscription_GET: {
+          "en-US": "Check your plan, renewal date and credits.",
+          "en-GLOBAL": "Check your plan, renewal date and credits.",
+          "de-DE": "Tarif, Verlängerungsdatum und Credits prüfen.",
+          "pl-PL": "Sprawdź plan, datę odnowienia i kredyty.",
+          "fr-FR":
+            "Vérifiez votre offre, la date de renouvellement et vos crédits.",
+          "it-IT": "Controlli piano, data di rinnovo e crediti.",
+          "es-ES": "Consulte su plan, la fecha de renovación y sus créditos.",
+          "sk-SK": "Skontrolujte plán, dátum obnovenia a kredity.",
+        },
+        payment_GET: {
+          "en-US": "Your most recent payments and their status.",
+          "en-GLOBAL": "Your most recent payments and their status.",
+          "de-DE": "Ihre letzten Zahlungen und deren Status.",
+          "pl-PL": "Twoje ostatnie płatności i ich status.",
+          "fr-FR": "Vos derniers paiements et leur statut.",
+          "it-IT": "I suoi ultimi pagamenti e il loro stato.",
+          "es-ES": "Sus pagos más recientes y su estado.",
+          "sk-SK": "Vaše posledné platby a ich stav.",
+        },
+        user_private_me_addresses_GET: {
+          "en-US": "Set the billing address printed on your invoices.",
+          "en-GLOBAL": "Set the billing address printed on your invoices.",
+          "de-DE": "Rechnungsadresse für Ihre Rechnungen festlegen.",
+          "pl-PL": "Ustaw adres rozliczeniowy widoczny na fakturach.",
+          "fr-FR": "Définissez l’adresse imprimée sur vos factures.",
+          "it-IT": "Imposti l’indirizzo di fatturazione delle sue fatture.",
+          "es-ES": "Defina la dirección de facturación de sus facturas.",
+          "sk-SK": "Nastavte fakturačnú adresu na vašich faktúrach.",
+        },
+        "api-keys": {
+          "en-US": "Create and revoke keys for the API.",
+          "en-GLOBAL": "Create and revoke keys for the API.",
+          "de-DE": "Schlüssel für die API erstellen und widerrufen.",
+          "pl-PL": "Twórz i unieważniaj klucze do API.",
+          "fr-FR": "Créez et révoquez vos clés d’API.",
+          "it-IT": "Crei e revochi le chiavi per l’API.",
+          "es-ES": "Cree y revoque claves para la API.",
+          "sk-SK": "Vytvárajte a rušte kľúče k API.",
+        },
+      },
+    },
     descriptions: {
       "en-US": "Manage your profile, sign-in, billing and API keys.",
       "de-DE":
@@ -2927,11 +4079,74 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
     landing: {
       summary: { alias: "operations-summary", scope: "platform" },
       destinations: [
-        "task-health",
         "error-logs",
+        "task-health",
+        "health",
         "remote-connections",
-        "cluster-status",
+        "task-budget-caps",
       ],
+      destinationDescriptions: {
+        "error-logs": {
+          "en-US": "Unresolved errors with counts, trend and affected users.",
+          "en-GLOBAL":
+            "Unresolved errors with counts, trend and affected users.",
+          "de-DE": "Offene Fehler mit Anzahl, Verlauf und betroffenen Nutzern.",
+          "pl-PL":
+            "Nierozwiązane błędy z liczbą, trendem i dotkniętymi użytkownikami.",
+          "fr-FR":
+            "Erreurs non résolues avec volume, tendance et utilisateurs touchés.",
+          "it-IT": "Errori aperti con conteggi, andamento e utenti coinvolti.",
+          "es-ES":
+            "Errores sin resolver con recuento, tendencia y usuarios afectados.",
+          "sk-SK":
+            "Nevyriešené chyby s počtom, trendom a dotknutými používateľmi.",
+        },
+        "task-health": {
+          "en-US": "Running tasks, recent failures and open incidents.",
+          "en-GLOBAL": "Running tasks, recent failures and open incidents.",
+          "de-DE": "Laufende Aufgaben, letzte Fehlschläge und offene Vorfälle.",
+          "pl-PL": "Trwające zadania, ostatnie awarie i otwarte incydenty.",
+          "fr-FR": "Tâches en cours, échecs récents et incidents ouverts.",
+          "it-IT": "Attività in corso, errori recenti e incidenti aperti.",
+          "es-ES": "Tareas en curso, fallos recientes e incidentes abiertos.",
+          "sk-SK": "Bežiace úlohy, posledné zlyhania a otvorené incidenty.",
+        },
+        health: {
+          "en-US": "Server status and diagnostics right now.",
+          "en-GLOBAL": "Server status and diagnostics right now.",
+          "de-DE": "Aktueller Serverstatus und Diagnose.",
+          "pl-PL": "Bieżący stan serwera i diagnostyka.",
+          "fr-FR": "État du serveur et diagnostic en temps réel.",
+          "it-IT": "Stato del server e diagnostica in tempo reale.",
+          "es-ES": "Estado del servidor y diagnóstico en tiempo real.",
+          "sk-SK": "Aktuálny stav servera a diagnostika.",
+        },
+        "remote-connections": {
+          "en-US": "Linked instances and the health of each connection.",
+          "en-GLOBAL": "Linked instances and the health of each connection.",
+          "de-DE": "Verbundene Instanzen und der Zustand jeder Verbindung.",
+          "pl-PL": "Połączone instancje i stan każdego połączenia.",
+          "fr-FR": "Instances liées et état de chaque connexion.",
+          "it-IT": "Istanze collegate e stato di ogni connessione.",
+          "es-ES": "Instancias vinculadas y el estado de cada conexión.",
+          "sk-SK": "Prepojené inštancie a stav každého pripojenia.",
+        },
+        "task-budget-caps": {
+          "en-US": "Credit limits that stop runaway background tasks.",
+          "en-GLOBAL": "Credit limits that stop runaway background tasks.",
+          "de-DE": "Credit-Limits, die ausufernde Hintergrundaufgaben stoppen.",
+          "pl-PL":
+            "Limity kredytów zatrzymujące niekontrolowane zadania w tle.",
+          "fr-FR":
+            "Plafonds de crédits qui arrêtent les tâches de fond incontrôlées.",
+          "it-IT":
+            "Limiti di crediti che fermano le attività in background fuori controllo.",
+          "es-ES":
+            "Límites de créditos que detienen tareas en segundo plano descontroladas.",
+          "sk-SK":
+            "Limity kreditov, ktoré zastavia nekontrolované úlohy na pozadí.",
+        },
+      },
     },
     descriptions: {
       "en-US":
@@ -2976,7 +4191,56 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
     order: 2,
     defaultEntryAlias: "task-list",
     landing: {
-      actions: ["task-list", "cron-queue", "cron-history", "cron-stats"],
+      destinations: ["task-list", "cron-stats", "cron-queue", "cron-history"],
+      destinationDescriptions: {
+        "task-list": {
+          "en-US": "Check task status and upcoming runs.",
+          "en-GLOBAL": "Check task status and upcoming runs.",
+          "de-DE": "Aufgabenstatus und nächste Ausführungen prüfen.",
+          "pl-PL": "Sprawdź stan zadań i terminy kolejnych uruchomień.",
+          "fr-FR": "Vérifiez l’état des tâches et les prochaines exécutions.",
+          "it-IT":
+            "Controlli lo stato delle attività e le prossime esecuzioni.",
+          "es-ES":
+            "Compruebe el estado de las tareas y sus próximas ejecuciones.",
+          "sk-SK": "Skontrolujte stav úloh a ich najbližšie spustenia.",
+        },
+        "cron-stats": {
+          "en-US": "Failing, stuck and overdue tasks with success rates.",
+          "en-GLOBAL": "Failing, stuck and overdue tasks with success rates.",
+          "de-DE":
+            "Fehlschlagende, hängende und überfällige Aufgaben mit Erfolgsquote.",
+          "pl-PL":
+            "Zadania z błędami, zawieszone i zaległe wraz ze skutecznością.",
+          "fr-FR":
+            "Tâches en échec, bloquées ou en retard, avec taux de réussite.",
+          "it-IT":
+            "Attività fallite, bloccate o in ritardo, con tasso di successo.",
+          "es-ES":
+            "Tareas fallidas, bloqueadas o atrasadas, con tasa de éxito.",
+          "sk-SK": "Zlyhané, zaseknuté a oneskorené úlohy s mierou úspešnosti.",
+        },
+        "cron-queue": {
+          "en-US": "What runs next, in order of start time.",
+          "en-GLOBAL": "What runs next, in order of start time.",
+          "de-DE": "Was als Nächstes läuft, nach Startzeit sortiert.",
+          "pl-PL": "Co uruchomi się następne, według godziny startu.",
+          "fr-FR": "Ce qui s’exécute ensuite, par heure de départ.",
+          "it-IT": "Cosa parte dopo, in ordine di avvio.",
+          "es-ES": "Lo que se ejecuta a continuación, por hora de inicio.",
+          "sk-SK": "Čo sa spustí ďalej, podľa času spustenia.",
+        },
+        "cron-history": {
+          "en-US": "Past runs with result, duration and errors.",
+          "en-GLOBAL": "Past runs with result, duration and errors.",
+          "de-DE": "Frühere Läufe mit Ergebnis, Dauer und Fehlern.",
+          "pl-PL": "Wcześniejsze uruchomienia z wynikiem, czasem i błędami.",
+          "fr-FR": "Exécutions passées avec résultat, durée et erreurs.",
+          "it-IT": "Esecuzioni passate con esito, durata ed errori.",
+          "es-ES": "Ejecuciones anteriores con resultado, duración y errores.",
+          "sk-SK": "Minulé spustenia s výsledkom, trvaním a chybami.",
+        },
+      },
     },
     descriptions: {
       "en-US": "Inspect scheduled jobs, task runs and failures.",
@@ -3008,7 +4272,19 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
     order: 5,
     defaultEntryAlias: "remote-connections",
     landing: {
-      actions: ["remote-connections", "self-instance-id"],
+      destinations: ["remote-connections"],
+      destinationDescriptions: {
+        "remote-connections": {
+          "en-US": "Linked instances and the health of each connection.",
+          "en-GLOBAL": "Linked instances and the health of each connection.",
+          "de-DE": "Verbundene Instanzen und der Zustand jeder Verbindung.",
+          "pl-PL": "Połączone instancje i stan każdego połączenia.",
+          "fr-FR": "Instances liées et état de chaque connexion.",
+          "it-IT": "Istanze collegate e stato di ogni connessione.",
+          "es-ES": "Instancias vinculadas y el estado de cada conexión.",
+          "sk-SK": "Prepojené inštancie a stav každého pripojenia.",
+        },
+      },
     },
     descriptions: {
       "en-US": "Review connected instances and their connection status.",
@@ -3040,6 +4316,45 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
     icon: "settings",
     order: 20,
     defaultEntryAlias: "system-settings",
+    landing: {
+      destinations: ["system-settings", "vibe_env_settings_export-env_GET"],
+      destinationDescriptions: {
+        "system-settings": {
+          "en-US": "Environment configuration, grouped by module.",
+          "en-GLOBAL": "Environment configuration, grouped by module.",
+          "de-DE": "Umgebungskonfiguration, nach Modul gruppiert.",
+          "pl-PL": "Konfiguracja środowiska pogrupowana według modułów.",
+          "fr-FR": "Configuration de l’environnement, regroupée par module.",
+          "it-IT": "Configurazione dell’ambiente, raggruppata per modulo.",
+          "es-ES": "Configuración del entorno, agrupada por módulo.",
+          "sk-SK": "Konfigurácia prostredia zoskupená podľa modulov.",
+        },
+        "vibe_env_settings_export-env_GET": {
+          "en-US": "Download a production .env with a deploy checklist.",
+          "en-GLOBAL": "Download a production .env with a deploy checklist.",
+          "de-DE":
+            "Eine Produktions-.env samt Deploy-Checkliste herunterladen.",
+          "pl-PL": "Pobierz produkcyjny plik .env z listą kontrolną wdrożenia.",
+          "fr-FR":
+            "Téléchargez un .env de production avec sa liste de déploiement.",
+          "it-IT":
+            "Scarichi un .env di produzione con la checklist di rilascio.",
+          "es-ES":
+            "Descargue un .env de producción con su lista de despliegue.",
+          "sk-SK": "Stiahnite produkčný .env s kontrolným zoznamom nasadenia.",
+        },
+      },
+    },
+    descriptions: {
+      "en-US": "Environment settings and the production configuration.",
+      "en-GLOBAL": "Environment settings and the production configuration.",
+      "de-DE": "Umgebungseinstellungen und die Produktionskonfiguration.",
+      "pl-PL": "Ustawienia środowiska i konfiguracja produkcyjna.",
+      "fr-FR": "Réglages de l’environnement et configuration de production.",
+      "it-IT": "Impostazioni dell’ambiente e configurazione di produzione.",
+      "es-ES": "Ajustes del entorno y configuración de producción.",
+      "sk-SK": "Nastavenia prostredia a produkčná konfigurácia.",
+    },
     subcategories: {
       Generators: {
         icon: "code-2",
@@ -3336,19 +4651,85 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
     order: 66,
     defaultEntryAlias: "finance-status",
     landing: {
+      overview: { alias: "finance-monthly-profit", scope: "company" },
       destinations: [
         "finance-monthly-profit",
+        "finance-status",
         "bank-statement-lines",
         "bank-connections",
-        "supplier-evidence",
-        "finance-credit-liabilities",
-      ],
-      overview: { alias: "finance-monthly-profit", scope: "company" },
-      actions: [
-        "bank-statement-lines",
-        "finance-monthly-profit",
+        "mail-bill-reviews",
         "supplier-evidence",
       ],
+      destinationDescriptions: {
+        "finance-monthly-profit": {
+          "en-US": "Posted revenue, expenses and net result by month.",
+          "en-GLOBAL": "Posted revenue, expenses and net result by month.",
+          "de-DE": "Gebuchter Umsatz, Aufwand und Ergebnis pro Monat.",
+          "pl-PL": "Zaksięgowane przychody, koszty i wynik w każdym miesiącu.",
+          "fr-FR":
+            "Revenus, charges et résultat net comptabilisés, mois par mois.",
+          "it-IT": "Ricavi, costi e risultato netto registrati, mese per mese.",
+          "es-ES":
+            "Ingresos, gastos y resultado neto contabilizados, mes a mes.",
+          "sk-SK": "Zaúčtované tržby, náklady a čistý výsledok po mesiacoch.",
+        },
+        "finance-status": {
+          "en-US": "Provider balances, margin and cost alerts.",
+          "en-GLOBAL": "Provider balances, margin and cost alerts.",
+          "de-DE": "Anbieter-Guthaben, Marge und Kostenwarnungen.",
+          "pl-PL": "Salda u dostawców, marża i alerty kosztów.",
+          "fr-FR": "Soldes fournisseurs, marge et alertes de coûts.",
+          "it-IT": "Saldi dei fornitori, margine e avvisi sui costi.",
+          "es-ES": "Saldos de proveedores, margen y alertas de costes.",
+          "sk-SK": "Zostatky u poskytovateľov, marža a upozornenia na náklady.",
+        },
+        "bank-statement-lines": {
+          "en-US": "Imported bank lines waiting for a journal entry.",
+          "en-GLOBAL": "Imported bank lines waiting for a journal entry.",
+          "de-DE": "Importierte Bankzeilen, die noch auf eine Buchung warten.",
+          "pl-PL": "Zaimportowane wiersze bankowe czekające na księgowanie.",
+          "fr-FR": "Lignes bancaires importées en attente d’une écriture.",
+          "it-IT": "Righe bancarie importate in attesa di una registrazione.",
+          "es-ES": "Líneas bancarias importadas a la espera de un asiento.",
+          "sk-SK": "Importované bankové riadky čakajúce na zaúčtovanie.",
+        },
+        "bank-connections": {
+          "en-US": "Import transactions from a connected bank account.",
+          "en-GLOBAL": "Import transactions from a connected bank account.",
+          "de-DE": "Umsätze aus einem verbundenen Bankkonto importieren.",
+          "pl-PL": "Importuj transakcje z połączonego konta bankowego.",
+          "fr-FR": "Importez les opérations d’un compte bancaire connecté.",
+          "it-IT": "Importi i movimenti da un conto bancario collegato.",
+          "es-ES": "Importe movimientos de una cuenta bancaria conectada.",
+          "sk-SK": "Importujte transakcie z pripojeného bankového účtu.",
+        },
+        "mail-bill-reviews": {
+          "en-US":
+            "Invoices and receipts that arrived by email, ready to book.",
+          "en-GLOBAL":
+            "Invoices and receipts that arrived by email, ready to book.",
+          "de-DE":
+            "Per E-Mail eingegangene Rechnungen und Belege, bereit zum Buchen.",
+          "pl-PL": "Faktury i paragony z e-maila gotowe do zaksięgowania.",
+          "fr-FR":
+            "Factures et reçus arrivés par e-mail, prêts à comptabiliser.",
+          "it-IT":
+            "Fatture e ricevute arrivate via email, pronte da registrare.",
+          "es-ES":
+            "Facturas y recibos llegados por correo, listos para contabilizar.",
+          "sk-SK": "Faktúry a doklady z e-mailu pripravené na zaúčtovanie.",
+        },
+        "supplier-evidence": {
+          "en-US": "Provider balances and supplier documents in one place.",
+          "en-GLOBAL": "Provider balances and supplier documents in one place.",
+          "de-DE": "Anbieter-Guthaben und Lieferantenbelege an einem Ort.",
+          "pl-PL": "Salda u dostawców i ich dokumenty w jednym miejscu.",
+          "fr-FR": "Soldes et justificatifs fournisseurs au même endroit.",
+          "it-IT": "Saldi e documenti dei fornitori in un unico posto.",
+          "es-ES": "Saldos y documentos de proveedores en un solo lugar.",
+          "sk-SK": "Zostatky a doklady dodávateľov na jednom mieste.",
+        },
+      },
     },
     descriptions: {
       "en-US": "Review monthly profit, provider costs and bank transactions.",

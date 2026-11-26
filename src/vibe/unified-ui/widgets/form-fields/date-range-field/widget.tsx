@@ -5,7 +5,7 @@
 "use client";
 
 import { Badge } from "next-vibe/ui/components/badge";
-import { Button } from "next-vibe/ui/components/button";
+import { DatePicker } from "next-vibe/ui/components/date-picker";
 import { Div } from "next-vibe/ui/components/div";
 import {
   FormControl,
@@ -16,14 +16,7 @@ import {
 } from "next-vibe/ui/components/form/form";
 import { AlertCircle } from "next-vibe/ui/components/icons/AlertCircle";
 import { Info } from "next-vibe/ui/components/icons/Info";
-import { Input } from "next-vibe/ui/components/input";
 import { Span } from "next-vibe/ui/components/span";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "next-vibe/ui/components/tooltip";
 import type { JSX } from "react";
 import { z } from "zod";
 
@@ -42,6 +35,7 @@ import { scopedTranslation as unifiedInterfaceScopedTranslation } from "../../..
 import { getTheme } from "../_shared/constants";
 import { parseFormDate } from "../_shared/date-value";
 import { useFormFieldDescriptionStyle } from "../_shared/description-style";
+import { FieldInfoTooltip } from "../_shared/field-info-tooltip";
 import { renderPrefillDisplay } from "../_shared/prefill";
 import { getFieldStyleClassName } from "../_shared/styling";
 import { getFieldValidationState } from "../_shared/validation";
@@ -116,7 +110,7 @@ export function DateRangeFieldWidget<
             className={cn(styleClassName.containerClassName, field.className)}
           >
             <Div className="flex flex-col gap-1">
-              <Div className="flex flex-row items-start gap-2">
+              <Div className="flex flex-row items-center gap-1.5">
                 <FormLabel
                   className={cn(
                     styleClassName.labelClassName,
@@ -129,25 +123,10 @@ export function DateRangeFieldWidget<
                   )}
                 </FormLabel>
                 {field.description && descriptionStyle === "tooltip" && (
-                  <TooltipProvider delayDuration={300}>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button
-                          type="button"
-                          aria-label={tField(field.description)}
-                          className="cursor-help inline-flex"
-                          variant={"ghost"}
-                        >
-                          <Info className="h-4 w-4 text-muted-foreground hover:text-foreground transition-colors" />
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent className="max-w-[250px]">
-                        <Span className="text-sm">
-                          {tField(field.description)}
-                        </Span>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
+                  <FieldInfoTooltip
+                    text={tField(field.description)}
+                    label={field.label ? tField(field.label) : undefined}
+                  />
                 )}
                 {style === "badge" && isRequired && (
                   <Badge
@@ -176,44 +155,44 @@ export function DateRangeFieldWidget<
                 )}
               </FormControl>
             ) : (
-              <Div className="grid min-w-0 grid-cols-1 gap-2 sm:grid-cols-2">
+              <Div className="grid min-w-0 grid-cols-1 gap-2 @sm:grid-cols-2">
                 <FormControl>
-                  <Input
+                  <DatePicker
                     ref={formField.ref}
-                    type="date"
                     aria-label={startLabel}
                     placeholder={startLabel}
-                    value={formatDate(parseFormDate(range.from))}
-                    onChange={(event) =>
+                    locale={locale}
+                    value={parseFormDate(range.from)}
+                    onChange={(date) =>
                       formField.onChange({
                         ...range,
-                        from: event.target.value || undefined,
+                        from: formatDate(date) || undefined,
                       })
                     }
                     onBlur={formField.onBlur}
                     disabled={isDisabled || field.disabled || field.readonly}
-                    min={min}
-                    max={max}
-                    className={cn("min-w-0", styleClassName.inputClassName)}
+                    minDate={parseFormDate(min)}
+                    maxDate={parseFormDate(max)}
+                    inputClassName={styleClassName.inputClassName}
                   />
                 </FormControl>
-                <Input
-                  type="date"
+                <DatePicker
                   aria-label={endLabel}
                   aria-invalid={fieldState.invalid}
                   placeholder={endLabel}
-                  value={formatDate(parseFormDate(range.to))}
-                  onChange={(event) =>
+                  locale={locale}
+                  value={parseFormDate(range.to)}
+                  onChange={(date) =>
                     formField.onChange({
                       ...range,
-                      to: event.target.value || undefined,
+                      to: formatDate(date) || undefined,
                     })
                   }
                   onBlur={formField.onBlur}
                   disabled={isDisabled || field.disabled || field.readonly}
-                  min={min}
-                  max={max}
-                  className={cn("min-w-0", styleClassName.inputClassName)}
+                  minDate={parseFormDate(range.from) ?? parseFormDate(min)}
+                  maxDate={parseFormDate(max)}
+                  inputClassName={styleClassName.inputClassName}
                 />
               </Div>
             )}

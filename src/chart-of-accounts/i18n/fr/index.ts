@@ -235,6 +235,18 @@ export const translations: typeof enTranslations = {
       applyFilters: "Appliquer les filtres",
       selectCompany:
         "Saisissez un ID d'entreprise ci-dessus et appliquez les filtres pour charger les écritures.",
+      loadFailed: "Impossible de charger les écritures",
+      retry: "Réessayer",
+      emptyTitle: "Aucune écriture pour l'instant",
+      emptyMessage:
+        "Chaque facture, facture fournisseur, paiement et écriture manuelle comptabilisé apparaît ici sous forme d'écriture équilibrée. Le reste se saisit à la main.",
+      emptyAction: "Saisir une écriture",
+      count: "{{count}} écritures",
+      subtitle:
+        "Toutes les écritures du grand livre, les plus récentes d'abord.",
+      pageOf: "Page {{page}} sur {{pages}}",
+      previous: "Précédent",
+      next: "Suivant",
     },
     title: "Écritures comptables",
     titleShort: "Journal",

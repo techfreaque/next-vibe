@@ -368,7 +368,7 @@ export const translations: typeof enTranslations = {
   },
   status: {
     title: "Finanzas",
-    titleShort: "Finanzas",
+    titleShort: "Costes y margen",
     description:
       "Costo de ingresos vs: balances de proveedores, margen, alertas y umbrales.",
     response: {

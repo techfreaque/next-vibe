@@ -45,6 +45,16 @@ export const category: CategoryDefinition = {
       "es-ES": "IA",
       "sk-SK": "AI",
     },
+    summary: { alias: "ai-admin-summary", scope: "platform" },
+    actions: ["skill-create"],
+    destinations: [
+      "models",
+      "skills",
+      "agent-chat-threads",
+      "task-list",
+      "chat-moderation",
+      "skill-moderation",
+    ],
     destinationDescriptions: {
       models: {
         "en-US": "Browse available models and compare prices.",
@@ -93,10 +103,35 @@ export const category: CategoryDefinition = {
           "Compruebe el estado de las tareas y sus próximas ejecuciones.",
         "sk-SK": "Skontrolujte stav úloh a ich najbližšie spustenia.",
       },
+      "chat-moderation": {
+        "en-US": "Reported and hidden public posts, most urgent first.",
+        "en-GLOBAL": "Reported and hidden public posts, most urgent first.",
+        "de-DE":
+          "Gemeldete und ausgeblendete öffentliche Beiträge, Dringendes zuerst.",
+        "pl-PL": "Zgłoszone i ukryte publiczne wpisy, najpilniejsze najpierw.",
+        "fr-FR":
+          "Publications publiques signalées ou masquées, les plus urgentes d’abord.",
+        "it-IT": "Post pubblici segnalati o nascosti, prima i più urgenti.",
+        "es-ES":
+          "Publicaciones públicas denunciadas u ocultas, primero las más urgentes.",
+        "sk-SK":
+          "Nahlásené a skryté verejné príspevky, najnaliehavejšie navrchu.",
+      },
+      "skill-moderation": {
+        "en-US": "Community skills with reports, most reported first.",
+        "en-GLOBAL": "Community skills with reports, most reported first.",
+        "de-DE": "Community-Skills mit Meldungen, meistgemeldete zuerst.",
+        "pl-PL":
+          "Zgłoszone umiejętności społeczności, najczęściej zgłaszane najpierw.",
+        "fr-FR":
+          "Compétences de la communauté signalées, les plus signalées d’abord.",
+        "it-IT": "Skill della community segnalate, prima le più segnalate.",
+        "es-ES":
+          "Skills de la comunidad denunciadas, primero las más denunciadas.",
+        "sk-SK":
+          "Zručnosti komunity s hláseniami, najčastejšie nahlásené navrchu.",
+      },
     },
-    summary: { alias: "ai-admin-summary", scope: "platform" },
-    destinations: ["models", "skills", "agent-chat-threads", "task-list"],
-    actions: ["skill-create"],
   },
   defaultEntry: {
     [UserPermissionRole.ADMIN]: AI_STREAM_ALIAS,

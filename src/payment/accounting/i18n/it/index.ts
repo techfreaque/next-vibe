@@ -27,8 +27,7 @@ export const translations: typeof enTranslations = {
   consideration: "Conto ricavi o passività",
   vat: "Conto IVA a debito",
   expense: "Conto costi per commissioni",
-  zeroTax:
-    "Conferma che l’IVA non esposta per questo prodotto ad aliquota zero è pari a zero",
+  zeroTax: "Registra le vendite senza dettaglio IVA allo 0 %",
   ids: "ID delle prove verificate",
   dryRun: "Solo anteprima",
   submit: "Esegui",
@@ -118,4 +117,26 @@ export const translations: typeof enTranslations = {
   noVatAccount:
     "Aggiungi un conto IVA a debito attivo al piano dei conti per selezionarlo qui.",
   saveOffer: "Salva offerta",
+  sectionOffer: "Offerta",
+  sectionBooks: "Registrazioni",
+  sectionTax: "Imposte",
+  chooseAccount: "Scegli un conto",
+  chooseProduct: "Scegli un prodotto",
+  chooseCompanyFirst: "Scegli prima un'azienda",
+  noMatchingAccount: "Nessun conto adatto nel piano di questa azienda.",
+  noMatchingProduct: "Qui compaiono solo prodotti attivi con codice.",
+  productHint:
+    "Il prodotto venduto da questa offerta. Il suo codice deve corrispondere all'offerta del provider.",
+  receivableHint: "Credito verso il cliente fino al versamento del provider.",
+  clearingHint: "Denaro incassato dal provider ma non ancora versato.",
+  considerationHint:
+    "Ricavo se riconosciuto alla vendita, passività se differito.",
+  vatHint: "Facoltativo. Serve se il provider comunica l'IVA.",
+  expenseHint: "Facoltativo. Registra le commissioni del provider.",
+  merchantHelp: "ID esercente o account dalla dashboard del provider.",
+  merchantPlaceholder: "acct_1Nxxxxxxxx",
+  offerHelp: "ID prezzo o prodotto di questa offerta presso il provider.",
+  offerPlaceholder: "price_1Pxxxxxxxx",
+  zeroTaxHelp:
+    "Solo per prodotti ad aliquota zero. Senza questa opzione quelle vendite restano in revisione finché il provider non invia un importo IVA verificato.",
 };

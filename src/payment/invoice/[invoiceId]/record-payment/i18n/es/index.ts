@@ -122,5 +122,9 @@ export const translations: typeof enTranslations = {
     submit: "Pago de registro",
     paymentRecorded: "Pago registrado con éxito.",
     viewInvoice: "Ver factura",
+    amountDue: "{{amount}} pendiente",
+    notOpenTitle: "Esta factura no está abierta",
+    notOpenMessage:
+      "Solo las facturas emitidas y sin pagar admiten pagos. Emite primero la factura o abre la correcta.",
   },
 };

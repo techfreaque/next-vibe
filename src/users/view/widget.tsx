@@ -117,6 +117,7 @@ import {
   subscriptionStatusLabel,
   subscriptionStatusVariant,
 } from "../format";
+import { UserDeleteDialog } from "../user/[id]/delete-dialog";
 import type definition from "./definition";
 import type { UserViewResponseOutput, UserViewTab } from "./definition";
 
@@ -329,17 +330,10 @@ export function UserViewContainer({
     });
   }, [navigate, userId]);
 
-  const handleDelete = useCallback(async (): Promise<void> => {
-    if (!userId) {
-      return;
-    }
-    const userDefs = await import("../user/[id]/definition");
-    navigate(userDefs.default.DELETE, {
-      urlPathParams: { id: userId },
-      renderInModal: true,
-      popNavigationOnSuccess: 2,
-    });
-  }, [navigate, userId]);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const handleDelete = useCallback((): void => {
+    setDeleteOpen(true);
+  }, []);
 
   const handleSetBanned = useCallback(
     async (isBanned: boolean): Promise<void> => {
@@ -606,11 +600,7 @@ export function UserViewContainer({
         basicInfo.isBanned
           ? { status: "banned", label: t("status.banned"), variant: "danger" }
           : basicInfo.isActive
-            ? {
-                status: "active",
-                label: t("status.active"),
-                variant: "success",
-              }
+            ? undefined
             : {
                 status: "inactive",
                 label: t("status.inactive"),
@@ -798,6 +788,14 @@ export function UserViewContainer({
         </Div>
       </Div>
 
+      <UserDeleteDialog
+        userId={basicInfo.id}
+        name={name}
+        open={deleteOpen}
+        onOpenChange={setDeleteOpen}
+        onDeleted={openDirectory}
+      />
+
       {basicInfo.isBanned && basicInfo.bannedReason && (
         <Div className="rounded-lg bg-destructive/10 p-3 border border-destructive/30 flex items-start gap-2">
           <AlertCircle className="h-4 w-4 text-destructive mt-0.5" />
@@ -820,24 +818,22 @@ export function UserViewContainer({
           description={t("kpi.paidHint", {
             count: paymentStats.successfulPayments,
           })}
-          variant="muted"
           icon={<DollarSign className="h-4 w-4" />}
         />
         <MetricCard
           label={t("kpi.credits")}
           value={t("widget.creditAmount", {
-            count: formatNumber(creditInfo.currentBalance, locale, 2),
+            count: formatNumber(creditInfo.currentBalance, locale),
           })}
           description={t("kpi.creditsHint", {
             free: formatNumber(creditInfo.freeCreditsRemaining, locale),
           })}
-          variant="info"
           icon={<Coins className="h-4 w-4" />}
         />
         <MetricCard
           label={t("kpi.spent")}
           value={t("widget.creditAmount", {
-            count: formatNumber(creditInfo.totalCreditsSpent, locale, 2),
+            count: formatNumber(creditInfo.totalCreditsSpent, locale),
           })}
           icon={<Zap className="h-4 w-4" />}
         />

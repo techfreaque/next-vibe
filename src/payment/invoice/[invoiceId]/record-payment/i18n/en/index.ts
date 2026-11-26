@@ -118,6 +118,10 @@ export const translations = {
     back: "Back",
     submit: "Record payment",
     paymentRecorded: "Payment recorded successfully.",
-    viewInvoice: "View Invoice",
+    viewInvoice: "View invoice",
+    amountDue: "{{amount}} open",
+    notOpenTitle: "This invoice is not open",
+    notOpenMessage:
+      "Only issued, unpaid invoices take payments. Issue the invoice first, or open the right one.",
   },
 };

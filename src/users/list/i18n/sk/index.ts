@@ -269,7 +269,7 @@ export const translations: typeof enTranslations = {
     },
   },
   widget: {
-    planStatus: "Program a stav",
+    planStatus: "Program",
     accountActive: "Aktívny",
     accountInactive: "Neaktívny",
     none: "Žiadne",
@@ -369,5 +369,6 @@ export const translations: typeof enTranslations = {
       pageHint: "Strana {{page}} z {{pages}}. Ďalšia: --page={{next}}",
       detailHint: "Podrobnosti: vibe users-view --userId=<ID>",
     },
+    planFree: "Zadarmo",
   },
 };

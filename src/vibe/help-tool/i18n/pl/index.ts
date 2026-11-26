@@ -21,6 +21,9 @@ export const translations: typeof enTranslations = {
     pinned: "Przypięte narzędzia",
     categoryTools: "Narzędzia w tym obszarze",
     results: "Wyniki wyszukiwania",
+    resultsForOne: "1 wynik dla „{{query}}”",
+    resultsFor: "Wyniki dla „{{query}}”: {{count}}",
+    jumpTo: "Albo otwórz obszar roboczy",
     tool: "Narzędzie",
   },
   erp: {
@@ -133,6 +136,7 @@ export const translations: typeof enTranslations = {
     page: "Strona {{page}} z {{total}}",
     openSidebar: "Otwórz panel narzędzi",
     browse: "Przeglądaj narzędzia",
+    backHome: "Przejdź do strony głównej panelu",
     toolUnavailableHint:
       "Link może być nieaktualny albo Twoja rola nie ma dostępu. Przejdź do listy dostępnych narzędzi.",
     openError: "Nie udało się otworzyć narzędzia",

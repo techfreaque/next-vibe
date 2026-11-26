@@ -71,6 +71,7 @@ export async function aiSummary(
         to: now.toISOString().slice(0, 10),
         attentionAvailable: true,
         recent: [],
+        destinationCounts: [{ alias: "models", count: models.length }],
         attention: flagged
           ? [
               {

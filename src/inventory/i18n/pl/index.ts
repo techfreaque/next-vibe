@@ -908,6 +908,10 @@ export const translations: typeof enTranslations = {
       widget: {
         retry: "Spróbuj ponownie",
         noItems: "To przesunięcie nie zawiera pozycji.",
+        noItemsHint:
+          "Dodaj produkty do przeniesienia przy tworzeniu przesunięcia. Bez pozycji nie da się go wysłać.",
+        receivedOf: "Przyjęto {{received}} z {{requested}}",
+        newTransfer: "Nowe przesunięcie",
         back: "Wróć",
         dispatch: "Wyślij przesunięcie",
         receive: "Oznacz jako przyjęte",

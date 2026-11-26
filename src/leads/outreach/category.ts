@@ -35,11 +35,56 @@ export const category: CategoryDefinition = {
   order: 2,
   adminPathPrefixes: ["leads/outreach", "leads/growth"],
   landing: {
-    actions: [
+    destinations: [
       "outreach-crm",
       "growth-campaign-links",
       "growth-channel-spend-list",
     ],
+    destinationDescriptions: {
+      "outreach-crm": {
+        "en-US":
+          "Every contact pitched, where each stands and what deals paid back.",
+        "en-GLOBAL":
+          "Every contact pitched, where each stands and what deals paid back.",
+        "de-DE":
+          "Jeder angefragte Kontakt, sein Stand und was die Deals eingebracht haben.",
+        "pl-PL":
+          "Każdy kontakt, do którego pisaliśmy, jego etap i zwrot z umów.",
+        "fr-FR":
+          "Chaque contact sollicité, son statut et ce que les accords ont rapporté.",
+        "it-IT":
+          "Ogni contatto proposto, a che punto è e cosa hanno reso gli accordi.",
+        "es-ES":
+          "Cada contacto propuesto, en qué punto está y qué devolvieron los acuerdos.",
+        "sk-SK": "Každý oslovený kontakt, jeho stav a čo dohody priniesli.",
+      },
+      "growth-campaign-links": {
+        "en-US": "Tagged links per channel with visits, signups and payers.",
+        "en-GLOBAL":
+          "Tagged links per channel with visits, signups and payers.",
+        "de-DE":
+          "Getaggte Links je Kanal mit Besuchen, Anmeldungen und Zahlern.",
+        "pl-PL":
+          "Oznaczone linki według kanału z wizytami, rejestracjami i płacącymi.",
+        "fr-FR":
+          "Liens tagués par canal, avec visites, inscriptions et payeurs.",
+        "it-IT": "Link tracciati per canale, con visite, iscrizioni e paganti.",
+        "es-ES":
+          "Enlaces etiquetados por canal, con visitas, registros y pagadores.",
+        "sk-SK":
+          "Označené odkazy podľa kanála s návštevami, registráciami a platiacimi.",
+      },
+      "growth-channel-spend-list": {
+        "en-US": "Spend per channel and the cost of each paying user.",
+        "en-GLOBAL": "Spend per channel and the cost of each paying user.",
+        "de-DE": "Ausgaben je Kanal und Kosten pro zahlendem Nutzer.",
+        "pl-PL": "Wydatki na kanał i koszt pozyskania płacącego użytkownika.",
+        "fr-FR": "Dépenses par canal et coût de chaque utilisateur payant.",
+        "it-IT": "Spesa per canale e costo di ogni utente pagante.",
+        "es-ES": "Gasto por canal y coste de cada usuario de pago.",
+        "sk-SK": "Výdavky podľa kanála a cena každého platiaceho používateľa.",
+      },
+    },
   },
   defaultEntry: {
     [UserPermissionRole.ADMIN]: "outreach-crm",

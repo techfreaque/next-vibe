@@ -46,13 +46,13 @@ export function CompanyUpdateWidget({
 
   if (data?.result?.id) {
     return (
-      <Div className="flex flex-col gap-6 p-4 rounded-lg border border-emerald-500/30 bg-emerald-500/5">
+      <Div className="flex flex-col gap-6 p-4 rounded-lg border border-success/30 bg-success/5">
         <Div className="flex items-start gap-3">
-          <Div className="h-10 w-10 rounded-full bg-emerald-500/15 flex items-center justify-center shrink-0">
-            <Building className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+          <Div className="h-10 w-10 rounded-full bg-success/15 flex items-center justify-center shrink-0">
+            <Building className="h-5 w-5 text-success" />
           </Div>
           <Div>
-            <Span className="text-base font-semibold block text-emerald-700 dark:text-emerald-400">
+            <Span className="text-base font-semibold block text-success">
               {t("patch.success.title")}
             </Span>
             <Span className="text-sm text-muted-foreground block mt-0.5">

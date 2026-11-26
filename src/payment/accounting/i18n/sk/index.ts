@@ -27,8 +27,7 @@ export const translations: typeof enTranslations = {
   consideration: "Výnosový alebo záväzkový účet",
   vat: "Účet DPH na výstupe",
   expense: "Nákladový účet poplatkov",
-  zeroTax:
-    "Výslovne potvrďte, že chýbajúca DPH pri tomto produkte s nulovou sadzbou znamená nulovú DPH",
+  zeroTax: "Predaje bez rozpisu DPH účtovať s 0 % DPH",
   ids: "ID overených podkladov",
   dryRun: "Iba náhľad",
   submit: "Spustiť",
@@ -118,4 +117,26 @@ export const translations: typeof enTranslations = {
   noVatAccount:
     "Pridajte do účtovej osnovy aktívny účet DPH na výstupe, aby ste ho tu mohli vybrať.",
   saveOffer: "Uložiť ponuku",
+  sectionOffer: "Ponuka",
+  sectionBooks: "Zaúčtovanie",
+  sectionTax: "Daň",
+  chooseAccount: "Vyberte účet",
+  chooseProduct: "Vyberte produkt",
+  chooseCompanyFirst: "Najprv vyberte firmu",
+  noMatchingAccount: "V účtovom rozvrhu tejto firmy nie je vhodný účet.",
+  noMatchingProduct: "Zobrazujú sa len aktívne produkty s kódom.",
+  productHint:
+    "Produkt, ktorý táto ponuka predáva. Jeho kód sa musí zhodovať s ponukou poskytovateľa.",
+  receivableHint: "Pohľadávka voči zákazníkovi, kým poskytovateľ nevyplatí.",
+  clearingHint: "Peniaze, ktoré poskytovateľ vybral, ale ešte nevyplatil.",
+  considerationHint:
+    "Výnos pri zaúčtovaní pri predaji, záväzok pri časovom rozlíšení.",
+  vatHint: "Voliteľné. Potrebné, ak poskytovateľ vykazuje DPH.",
+  expenseHint: "Voliteľné. Zaúčtuje poplatky poskytovateľa.",
+  merchantHelp: "ID obchodníka alebo účtu z dashboardu poskytovateľa.",
+  merchantPlaceholder: "acct_1Nxxxxxxxx",
+  offerHelp: "ID ceny alebo produktu tejto ponuky u poskytovateľa.",
+  offerPlaceholder: "price_1Pxxxxxxxx",
+  zeroTaxHelp:
+    "Len pre produkty s nulovou sadzbou. Bez tejto voľby takéto predaje čakajú na kontrolu, kým poskytovateľ nepošle overenú sumu DPH.",
 };

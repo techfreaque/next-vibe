@@ -62,4 +62,23 @@ export const translations: typeof enTranslations = {
     "Skonsultuj zagraniczne usługi z doradcą podatkowym. Odwrotne obciążenie może dotyczyć również firm zwolnionych z VAT.",
   saleConflict:
     "Naliczony VAT jest sprzeczny ze zwolnieniem firmy. Sprawdź pozycje przed wystawieniem faktury.",
+  choose: "Wybierz sposób rozliczania VAT",
+  back: "Wstecz",
+  appliesOn: "Rozliczanie VAT na dzień {{date}}",
+  invoiceText: "Adnotacja na fakturach",
+  savedTitle: "{{regime}} obowiązuje od {{date}}",
+  pickCompany: {
+    title: "Wybierz firmę",
+    message:
+      "Sprawdź, jakie zasady VAT obowiązują na jej fakturach w wybranym dniu.",
+  },
+  hints: {
+    standard:
+      "Faktury naliczają VAT według stawek firmy. VAT z zakupów podlega odliczeniu.",
+    german: "Faktury bez VAT, z adnotacją o zwolnieniu z § 19 UStG.",
+    austrian:
+      "Faktury bez VAT, z adnotacją o austriackim zwolnieniu dla małych firm.",
+    slovak:
+      "Faktury bez VAT, bo firma nie jest zarejestrowana jako podatnik VAT.",
+  },
 };

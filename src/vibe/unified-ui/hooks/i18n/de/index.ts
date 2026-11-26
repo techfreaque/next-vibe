@@ -35,6 +35,40 @@ export const translations: typeof enTranslations = {
       cancel: "Abbrechen",
       submit: "Absenden",
       submitting: "Wird gesendet...",
+      showResults: "Ergebnisse anzeigen",
+      saveChanges: "Änderungen speichern",
+      saving: "Wird gespeichert...",
+      result: "Ergebnis",
+      fixFields: "Prüfe die markierten Felder und versuche es erneut.",
+      hiddenInvalid:
+        "„{{field}}“ fehlt oder ist ungültig. Lade die Seite neu und versuche es erneut.",
+    },
+    toolUnavailable: {
+      permissionTitle: "Du hast keinen Zugriff auf dieses Tool",
+      permissionMessage:
+        "Deine Rolle kann es nicht öffnen. Bitte einen Inhaber dieses Workspaces um Zugriff.",
+      instanceTitle: "Dieses Tool läuft nicht auf dieser Instanz",
+      instanceMessage:
+        "Es läuft auf einer anderen verbundenen Instanz. Wechsle die Instanz in der Seitenleiste, um es zu öffnen.",
+      setupTitle: "Dieses Tool muss erst eingerichtet werden",
+      setupMessage:
+        "Eine Pflichteinstellung fehlt. Schließe die Einrichtung ab und öffne das Tool dann erneut.",
+      unknownTitle: "Dieser Link führt zu keinem Tool",
+      unknownMessage: "Der Link ist veraltet oder falsch geschrieben.",
+    },
+    recordState: {
+      loading: "Wird geladen",
+      notFoundMessage: "Der Eintrag wurde gelöscht oder der Link ist veraltet.",
+      loadFailed: "{{title}} konnte nicht geladen werden",
+      serverError:
+        "Bei uns ist etwas schiefgelaufen. Versuche es gleich noch einmal.",
+      technicalDetails: "Technische Details",
+      moreActions: "Weitere Aktionen",
+      more: "Mehr",
+      confirmCancel: "Abbrechen",
+      details: "Details",
+      emptyTitle: "Noch keine Einträge",
+      copy: "Kopieren",
     },
     formField: {
       requiresContext: "Dieses Feld erfordert Kontext",
@@ -91,6 +125,7 @@ export const translations: typeof enTranslations = {
         required: "Pflichtfeld",
         selectDate: "Datum auswählen",
         openCalendar: "Kalender öffnen",
+        time: "Uhrzeit",
         startDate: "Startdatum",
         endDate: "Enddatum",
         decreaseValue: "Wert verringern",
@@ -126,6 +161,18 @@ export const translations: typeof enTranslations = {
         },
       },
     },
+  },
+  formErrors: {
+    required: "Bitte einen Wert eingeben",
+    invalid: "Dieser Wert ist ungültig",
+    minLength: "Mindestens {{min}} Zeichen",
+    maxLength: "Höchstens {{max}} Zeichen",
+    minNumber: "Mindestens {{min}} eingeben",
+    maxNumber: "Höchstens {{max}} eingeben",
+    minItems: "Mindestens {{min}} hinzufügen",
+    email: "Gültige E-Mail-Adresse eingeben",
+    url: "Vollständigen Link eingeben, z. B. https://example.com",
+    choose: "Eine der Optionen wählen",
   },
   localstorage: {
     noCallback: "Kein Callback für localStorage-Operation bereitgestellt",

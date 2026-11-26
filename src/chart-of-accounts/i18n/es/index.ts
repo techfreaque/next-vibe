@@ -236,11 +236,23 @@ export const translations: typeof enTranslations = {
     widget: {
       loading: "Carga de entradas de diario...",
       empty: "No se han encontrado entradas de diario.",
-      createButton: "Nueva entrada",
+      createButton: "Nuevo asiento",
       periodsButton: "Períodos",
       applyFilters: "Aplicar filtros",
       selectCompany:
         "Introduzca una empresa ID arriba y aplique filtros para cargar entradas de diario.",
+      loadFailed: "No se pudieron cargar los asientos",
+      retry: "Reintentar",
+      emptyTitle: "Aún no hay asientos",
+      emptyMessage:
+        "Cada factura, factura de proveedor, pago y asiento manual contabilizado aparece aquí como asiento cuadrado. Lo demás se registra a mano.",
+      emptyAction: "Registrar un asiento",
+      count: "{{count}} asientos",
+      subtitle:
+        "Todos los asientos del libro mayor, los más recientes primero.",
+      pageOf: "Página {{page}} de {{pages}}",
+      previous: "Anterior",
+      next: "Siguiente",
     },
     title: "Journal Entries",
     titleShort: "Libro diario",

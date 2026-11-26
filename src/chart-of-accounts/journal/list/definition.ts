@@ -169,6 +169,17 @@ const { GET } = createEndpoint({
               label: "journalList.response.postedAt" as const,
               schema: dateSchema.nullable(),
             }),
+            companyId: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              label: "journalCreate.companyId.label" as const,
+              hidden: true,
+              schema: z.string(),
+            }),
+            companyName: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              label: "journalCreate.companyId.label" as const,
+              schema: z.string().nullable(),
+            }),
           },
         }),
       }),

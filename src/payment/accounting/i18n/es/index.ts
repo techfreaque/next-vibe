@@ -27,8 +27,7 @@ export const translations: typeof enTranslations = {
   consideration: "Cuenta de ingresos o pasivo",
   vat: "IVA repercutido",
   expense: "Cuenta de gasto por comisiones",
-  zeroTax:
-    "Confirma que el IVA no indicado de este producto a tipo cero equivale a cero",
+  zeroTax: "Registrar ventas sin desglose de IVA al 0 %",
   ids: "ID de justificantes verificados",
   dryRun: "Solo vista previa",
   submit: "Ejecutar",
@@ -118,4 +117,27 @@ export const translations: typeof enTranslations = {
   noVatAccount:
     "Añade una cuenta activa de IVA repercutido al plan contable para poder elegirla aquí.",
   saveOffer: "Guardar oferta",
+  sectionOffer: "Oferta",
+  sectionBooks: "Asientos",
+  sectionTax: "Impuestos",
+  chooseAccount: "Elige una cuenta",
+  chooseProduct: "Elige un producto",
+  chooseCompanyFirst: "Elige primero una empresa",
+  noMatchingAccount:
+    "No hay ninguna cuenta adecuada en el plan de esta empresa.",
+  noMatchingProduct: "Aquí solo aparecen productos activos con SKU.",
+  productHint:
+    "El producto que vende esta oferta. Su SKU debe coincidir con la oferta del proveedor.",
+  receivableHint: "Saldo del cliente hasta que el proveedor liquide.",
+  clearingHint: "Dinero cobrado por el proveedor y aún no transferido.",
+  considerationHint:
+    "Ingreso si se reconoce en la venta, pasivo si se difiere.",
+  vatHint: "Opcional. Necesaria si el proveedor informa del IVA.",
+  expenseHint: "Opcional. Registra las comisiones del proveedor.",
+  merchantHelp: "ID de comerciante o de cuenta del panel del proveedor.",
+  merchantPlaceholder: "acct_1Nxxxxxxxx",
+  offerHelp: "ID de precio o de producto de esta oferta en el proveedor.",
+  offerPlaceholder: "price_1Pxxxxxxxx",
+  zeroTaxHelp:
+    "Solo para productos exentos. Sin esta opción, esas ventas quedan en revisión hasta que el proveedor envíe un IVA verificado.",
 };

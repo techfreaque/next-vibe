@@ -35,9 +35,9 @@ export function VendorUpdateWidget({
 
   if (result !== undefined) {
     return (
-      <Div className="flex flex-col gap-4 p-4 rounded-lg border bg-emerald-50/50 dark:bg-emerald-900/10 border-emerald-200 dark:border-emerald-800">
+      <Div className="flex flex-col gap-4 p-4 rounded-lg border border-success/30 bg-success/5">
         <Div className="flex flex-col gap-1">
-          <Span className="text-base font-semibold text-emerald-700 dark:text-emerald-400 block">
+          <Span className="text-base font-semibold text-success block">
             {result.nameResponse}
           </Span>
           <Span className="text-sm text-muted-foreground mt-0.5">

@@ -31,7 +31,19 @@ export const category: CategoryDefinition = {
   order: 5,
   adminPathPrefixes: ["vibe/remote-connection"],
   landing: {
-    actions: ["remote-connections", "self-instance-id"],
+    destinations: ["remote-connections"],
+    destinationDescriptions: {
+      "remote-connections": {
+        "en-US": "Linked instances and the health of each connection.",
+        "en-GLOBAL": "Linked instances and the health of each connection.",
+        "de-DE": "Verbundene Instanzen und der Zustand jeder Verbindung.",
+        "pl-PL": "Połączone instancje i stan każdego połączenia.",
+        "fr-FR": "Instances liées et état de chaque connexion.",
+        "it-IT": "Istanze collegate e stato di ogni connessione.",
+        "es-ES": "Instancias vinculadas y el estado de cada conexión.",
+        "sk-SK": "Prepojené inštancie a stav každého pripojenia.",
+      },
+    },
   },
   defaultEntry: {
     [UserPermissionRole.ADMIN]: "remote-connections",

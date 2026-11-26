@@ -1,12 +1,13 @@
 "use client";
 
-import { Badge } from "next-vibe/ui/components/badge";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { EmptyBlock } from "next-vibe/ui/components/empty-block";
+import { AlertCircle } from "next-vibe/ui/components/icons/AlertCircle";
 import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
+import { Search } from "next-vibe/ui/components/icons/Search";
+import { ResultBanner } from "next-vibe/ui/components/result-banner";
 import { Skeleton } from "next-vibe/ui/components/skeleton";
-import { Span } from "next-vibe/ui/components/span";
 import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
 import {
   useWidgetForm,
@@ -98,20 +99,18 @@ export function TaxRateUpdateWidget({
 
   if (data?.updated !== undefined) {
     return (
-      <Div className="flex flex-col gap-4 p-4 rounded-lg border bg-emerald-50/50 dark:bg-emerald-900/10 border-emerald-200 dark:border-emerald-800">
-        <Div className="flex items-center gap-3">
-          <Span className="text-sm font-semibold text-emerald-700 dark:text-emerald-400">
-            {t("rate.update.success.title")}
-          </Span>
-          <Badge
-            variant={data.updated ? "default" : "destructive"}
-            className="text-xs"
-          >
-            {data.updated
-              ? t("rate.update.response.updated")
-              : t("rate.update.widget.failed")}
-          </Badge>
-        </Div>
+      <Div className="mx-auto flex w-full max-w-3xl flex-col gap-4 p-4">
+        <ResultBanner
+          variant={data.updated ? "success" : "danger"}
+          title={
+            data.updated
+              ? t("rate.update.success.title")
+              : t("rate.update.widget.failed")
+          }
+          message={
+            data.updated ? t("rate.update.success.description") : undefined
+          }
+        />
         <Button
           type="button"
           variant="outline"
@@ -128,8 +127,15 @@ export function TaxRateUpdateWidget({
   return (
     <AdminForm
       className="mx-auto max-w-3xl"
-      title={t("rate.update.title")}
-      description={t("rate.update.description")}
+      title={stored?.name ?? t("rate.update.title")}
+      description={
+        stored
+          ? t("rate.update.widget.subtitle", {
+              company: stored.companyName,
+              code: stored.code,
+            })
+          : t("rate.update.description")
+      }
       backButton={
         navigation.canGoBack && (
           <Button
@@ -159,30 +165,58 @@ export function TaxRateUpdateWidget({
         />
       ) : !canEdit ? (
         lookup.error || (!stored && lookup.isSuccess && !lookup.isFetching) ? (
-          <EmptyBlock
-            action={
-              lookup.error
-                ? {
-                    label: t("report.widget.retry"),
-                    onClick: () => void lookup.refetch(),
-                  }
-                : {
-                    label: t("rate.update.widget.backToList"),
-                    onClick: handleBack,
-                  }
-            }
-            title={
-              lookup.error?.message || t("rate.update.errors.notFound.title")
-            }
-          />
+          <Div className="rounded-lg border bg-card">
+            <EmptyBlock
+              size="page"
+              icon={
+                lookup.error ? (
+                  <AlertCircle className="h-6 w-6" />
+                ) : (
+                  <Search className="h-6 w-6" />
+                )
+              }
+              title={
+                lookup.error
+                  ? t("rate.update.widget.loadErrorTitle")
+                  : t("rate.update.widget.notFoundTitle")
+              }
+              message={
+                lookup.error
+                  ? lookup.error.message
+                  : t("rate.update.widget.notFoundMessage")
+              }
+              action={
+                lookup.error
+                  ? {
+                      label: t("rate.list.widget.retry"),
+                      onClick: () => void lookup.refetch(),
+                    }
+                  : {
+                      label: t("rate.update.widget.backToList"),
+                      onClick: handleBack,
+                    }
+              }
+            />
+          </Div>
         ) : (
-          <Skeleton className="h-28 w-full" />
+          <Div className="flex flex-col gap-4 rounded-lg border bg-card p-4">
+            <Skeleton className="h-4 w-28" />
+            <Div className="grid gap-4 @md:grid-cols-2">
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-5 w-32" />
+              <Skeleton className="h-5 w-24" />
+            </Div>
+          </Div>
         )
       ) : (
         <AdminFormSection title={t("rate.details")} columns={2}>
           <TextFieldWidget
             fieldName="name"
-            field={withValue(field.children.name, undefined, null)}
+            field={{
+              ...withValue(field.children.name, undefined, null),
+              description: undefined,
+            }}
           />
           <NumberFieldWidget
             presentation="percent"
@@ -195,11 +229,17 @@ export function TaxRateUpdateWidget({
           />
           <BooleanFieldWidget
             fieldName="isDefault"
-            field={withValue(field.children.isDefault, undefined, null)}
+            field={{
+              ...withValue(field.children.isDefault, undefined, null),
+              description: undefined,
+            }}
           />
           <BooleanFieldWidget
             fieldName="isActive"
-            field={withValue(field.children.isActive, undefined, null)}
+            field={{
+              ...withValue(field.children.isActive, undefined, null),
+              description: undefined,
+            }}
           />
         </AdminFormSection>
       )}

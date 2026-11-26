@@ -21,12 +21,6 @@ import { Markdown } from "next-vibe/ui/components/markdown";
 import type { ToolbarAction } from "next-vibe/ui/components/markdown-editor";
 import { MarkdownEditor } from "next-vibe/ui/components/markdown-editor";
 import { Span } from "next-vibe/ui/components/span";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "next-vibe/ui/components/tooltip";
 import type { JSX } from "react";
 import { useMemo, useState } from "react";
 
@@ -43,6 +37,7 @@ import {
 } from "../../../_shared/use-widget-context";
 import { scopedTranslation as unifiedInterfaceScopedTranslation } from "../../../hooks/i18n";
 import { getTheme } from "../_shared/constants";
+import { FieldInfoTooltip } from "../_shared/field-info-tooltip";
 import { getFieldStyleClassName } from "../_shared/styling";
 import { getFieldValidationState } from "../_shared/validation";
 import type { MarkdownTextareaFieldWidgetConfig } from "./types";
@@ -126,7 +121,7 @@ export function MarkdownTextareaFieldWidget<
           >
             {/* ── Label row ── */}
             <Div className="flex items-center justify-between gap-2">
-              <Div className="flex flex-row items-start gap-2">
+              <Div className="flex flex-row items-center gap-1.5">
                 <FormLabel
                   className={cn(
                     styleClassName.labelClassName,
@@ -138,24 +133,10 @@ export function MarkdownTextareaFieldWidget<
                     <Span className="text-info font-bold">*</Span>
                   )}
                   {field.description && descriptionStyle === "tooltip" && (
-                    <TooltipProvider delayDuration={300}>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button
-                            type="button"
-                            className="cursor-help inline-flex"
-                            variant="ghost"
-                          >
-                            <Info className="h-4 w-4 text-muted-foreground hover:text-foreground transition-colors" />
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent className="max-w-[250px]">
-                          <Span className="text-sm">
-                            {tField(field.description)}
-                          </Span>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
+                    <FieldInfoTooltip
+                      text={tField(field.description)}
+                      label={field.label ? tField(field.label) : undefined}
+                    />
                   )}
                 </FormLabel>
                 {style === "badge" && isRequired && (

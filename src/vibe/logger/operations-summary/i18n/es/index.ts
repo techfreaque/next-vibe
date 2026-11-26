@@ -8,10 +8,10 @@ export const translations: typeof enTranslations = {
   title: "Resumen operativo",
   description:
     "Consulta los errores abiertos, las tareas fallidas y el estado de las instancias conectadas.",
-  errors: "Errores abiertos",
+  errors: "Clases de errores abiertas",
   tasks: "Tareas fallidas",
   connections: "Conexiones con problemas",
-  errorAlert: "Grupos de errores abiertos ({{count}})",
+  errorAlert: "Clases de errores abiertas, sin avisos ({{count}})",
   taskAlert: "Tareas programadas fallidas ({{count}})",
   connectionAlert: "Conexiones que requieren atención ({{count}})",
   attention: "Requiere atención",

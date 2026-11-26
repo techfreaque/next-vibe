@@ -17,22 +17,26 @@ import { Span } from "next-vibe/ui/components/span";
 import { copyToClipboard } from "next-vibe/ui/lib/clipboard";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
 import {
+  useWidgetForm,
   useWidgetLocale,
   useWidgetLogger,
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
+import {
+  AdminForm,
+  AdminFormSection,
+} from "next-vibe/unified-ui/widgets/containers/admin-form/widget";
 import { BooleanFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/boolean-field/widget";
 import { EmailFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/email-field/widget";
 import { MultiSelectFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/multiselect-field/widget";
 import { PasswordFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/password-field/widget";
 import { SelectFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/select-field/widget";
 import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-field/widget";
-import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/navigate-button/widget";
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import { AccountRoleBadge } from "../account-role-badge";
 import type definition from "./definition";
@@ -52,6 +56,13 @@ export function UserCreateContainer({
   const logger = useWidgetLogger();
 
   const [idCopied, setIdCopied] = useState(false);
+  const form = useWidgetForm<typeof definition.POST>();
+  // The server creates active accounts unless told otherwise; show that.
+  useEffect(() => {
+    if (form && form.getValues("adminSettings.isActive") === undefined) {
+      form.setValue("adminSettings.isActive", true);
+    }
+  }, [form]);
 
   const handleViewUser = (userId: string): void => {
     void (async (): Promise<void> => {
@@ -124,7 +135,7 @@ export function UserCreateContainer({
               {/* Name + status badges */}
               <Div className="flex items-center gap-2 flex-wrap">
                 <Span className="font-semibold text-base">
-                  {privateName ?? "–"}
+                  {privateName ?? "-"}
                 </Span>
                 {publicName && publicName !== privateName && (
                   <Span className="text-sm text-muted-foreground">
@@ -228,68 +239,60 @@ export function UserCreateContainer({
 
   // Default: form state
   return (
-    <Div className="flex flex-col gap-0">
-      {/* Header */}
-      <Div className="flex items-center gap-2 p-4 border-b">
-        <NavigateButtonWidget field={children.backButton} />
-        <Div className="flex items-center gap-2 mr-auto">
-          <UserPlus className="h-5 w-5 text-muted-foreground" />
-          <Span className="font-semibold text-base">
-            {t("widget.headerCreate")}
-          </Span>
-        </Div>
-        <Span className="text-xs text-muted-foreground hidden sm:block">
-          {t("widget.headerSubtitle")}
-        </Span>
-      </Div>
-
-      {/* Form body */}
-      <Div className="flex flex-col gap-4 p-4 overflow-y-auto">
-        <Div className="grid grid-cols-2 gap-3">
-          <EmailFieldWidget
-            fieldName="basicInfo.email"
-            field={children.basicInfo.children.email}
-          />
-          <PasswordFieldWidget
-            fieldName="basicInfo.password"
-            field={children.basicInfo.children.password}
-          />
-          <TextFieldWidget
-            fieldName="basicInfo.privateName"
-            field={children.basicInfo.children.privateName}
-          />
-          <TextFieldWidget
-            fieldName="basicInfo.publicName"
-            field={children.basicInfo.children.publicName}
-          />
-          <SelectFieldWidget
-            fieldName="basicInfo.country"
-            field={children.basicInfo.children.country}
-          />
-          <SelectFieldWidget
-            fieldName="basicInfo.language"
-            field={children.basicInfo.children.language}
-          />
-        </Div>
-        <Div className="grid grid-cols-2 gap-3">
-          <MultiSelectFieldWidget
-            fieldName="adminSettings.roles"
-            field={children.adminSettings.children.roles}
+    <AdminForm
+      title={t("widget.headerCreate")}
+      description={t("widget.headerSubtitle")}
+      backButton={<NavigateButtonWidget field={children.backButton} />}
+      primaryAction={
+        <SubmitButtonWidget<typeof definition.POST>
+          field={{ text: "widget.createButton" }}
+        />
+      }
+    >
+      <AdminFormSection title={t("widget.sections.signIn")} columns={2}>
+        <EmailFieldWidget
+          fieldName="basicInfo.email"
+          field={children.basicInfo.children.email}
+        />
+        <PasswordFieldWidget
+          fieldName="basicInfo.password"
+          field={children.basicInfo.children.password}
+        />
+      </AdminFormSection>
+      <AdminFormSection title={t("widget.sections.profile")} columns={2}>
+        <TextFieldWidget
+          fieldName="basicInfo.privateName"
+          field={children.basicInfo.children.privateName}
+        />
+        <TextFieldWidget
+          fieldName="basicInfo.publicName"
+          field={children.basicInfo.children.publicName}
+        />
+        <SelectFieldWidget
+          fieldName="basicInfo.country"
+          field={children.basicInfo.children.country}
+        />
+        <SelectFieldWidget
+          fieldName="basicInfo.language"
+          field={children.basicInfo.children.language}
+        />
+      </AdminFormSection>
+      <AdminFormSection title={t("widget.sections.access")}>
+        <MultiSelectFieldWidget
+          fieldName="adminSettings.roles"
+          field={children.adminSettings.children.roles}
+        />
+        <Div className="grid gap-3 @sm:grid-cols-2">
+          <BooleanFieldWidget
+            fieldName="adminSettings.isActive"
+            field={children.adminSettings.children.isActive}
           />
           <BooleanFieldWidget
             fieldName="adminSettings.emailVerified"
             field={children.adminSettings.children.emailVerified}
           />
-          <BooleanFieldWidget
-            fieldName="adminSettings.isActive"
-            field={children.adminSettings.children.isActive}
-          />
         </Div>
-        <Div className="flex gap-2">
-          <FormAlertWidget field={{}} />
-          <SubmitButtonWidget<typeof definition.POST> field={{}} />
-        </Div>
-      </Div>
-    </Div>
+      </AdminFormSection>
+    </AdminForm>
   );
 }

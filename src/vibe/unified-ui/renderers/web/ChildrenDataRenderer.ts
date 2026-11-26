@@ -21,9 +21,12 @@ import type { UnifiedField } from "../../_shared/configs";
 import { isRequestField, isResponseField } from "../../_shared/type-guards";
 import type {
   AnyChildrenConstrain,
+  ArrayChildConstraint,
   BaseWidgetConfig,
   FieldUsageConfig,
+  ObjectChildrenConstraint,
   SchemaTypes,
+  UnionObjectWidgetConfigConstrain,
 } from "../../_shared/types";
 
 /**
@@ -324,4 +327,171 @@ export class ChildrenDataRenderer {
 
     return { groups, members };
   }
+}
+
+/**
+ * Which part of a form template a child belongs to:
+ * - fields: inputs and static content inside the section card
+ * - actions: submit buttons, rendered in the template footer
+ * - response: response-only data, rendered after a successful submit
+ */
+export type ChildSlot =
+  | "fields"
+  | "actions"
+  | "response"
+  /** response-only primitives worth a fact tile (no raw ids) */
+  | "facts"
+  /** response-only lists and nested objects */
+  | "sections";
+
+const UUID_PATTERN =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/** Raw identifiers belong in "Technical details", never in facts. */
+export function isRawIdentifier(value: WidgetData): boolean {
+  return typeof value === "string" && UUID_PATTERN.test(value);
+}
+
+export function matchesSlot(
+  slot: ChildSlot,
+  field: SlotField,
+  data: WidgetData,
+): boolean {
+  const own = getChildSlot(field);
+  if (slot === "facts" || slot === "sections") {
+    if (own !== "response") {
+      return false;
+    }
+    const primitive = "schemaType" in field && field.schemaType === "primitive";
+    if (slot === "facts") {
+      return primitive && !isRawIdentifier(data);
+    }
+    // An empty list is not worth an empty card.
+    return !primitive && !(Array.isArray(data) && data.length === 0);
+  }
+  return own === slot;
+}
+
+export type SlotField = ProcessedChildren["children"][number]["field"];
+
+function getChildSlot(field: SlotField): ChildSlot | "alert" {
+  const type = "type" in field ? field.type : undefined;
+  if (type === WidgetType.SUBMIT_BUTTON) {
+    return "actions";
+  }
+  if (type === WidgetType.FORM_ALERT) {
+    return "alert";
+  }
+  if (isResponseField(field) && !isRequestField(field)) {
+    return "response";
+  }
+  return "fields";
+}
+
+/**
+ * True when an object's children contain something visible for `slot`
+ * (e.g. response data worth a "Result" section after a submit).
+ */
+export function hasSlotContent<
+  TKey extends string,
+  TUsage extends FieldUsageConfig,
+>(
+  childrenSchema:
+    | ObjectChildrenConstraint<TKey, TUsage>
+    | ArrayChildConstraint<TKey, TUsage>
+    | UnionObjectWidgetConfigConstrain<TKey, TUsage>
+    | undefined,
+  value: WidgetData | undefined,
+  slot: ChildSlot,
+  userRoles: NonNullable<
+    Parameters<typeof ChildrenDataRenderer.extractChildren>[2]
+  >["userRoles"],
+): boolean {
+  if (
+    !childrenSchema ||
+    isUnionVariants<TKey, TUsage>(childrenSchema) ||
+    isArrayChild<TKey, TUsage>(childrenSchema) ||
+    !value ||
+    typeof value !== "object" ||
+    Array.isArray(value)
+  ) {
+    return false;
+  }
+  const objectChildren: ObjectChildrenConstraint<TKey, TUsage> = childrenSchema;
+  return ChildrenDataRenderer.extractChildren(objectChildren, value, {
+    userRoles,
+  }).some(
+    (child) =>
+      matchesSlot(slot, child.field, child.data) &&
+      child.data !== null &&
+      child.data !== undefined,
+  );
+}
+
+/** True when at least one child renders in `slot` (data not required). */
+export function hasSlotChildren<
+  TKey extends string,
+  TUsage extends FieldUsageConfig,
+>(
+  childrenSchema:
+    | ObjectChildrenConstraint<TKey, TUsage>
+    | ArrayChildConstraint<TKey, TUsage>
+    | UnionObjectWidgetConfigConstrain<TKey, TUsage>
+    | undefined,
+  value: WidgetData | undefined,
+  slot: ChildSlot,
+  userRoles: NonNullable<
+    Parameters<typeof ChildrenDataRenderer.extractChildren>[2]
+  >["userRoles"],
+): boolean {
+  if (!childrenSchema || isArrayChild<TKey, TUsage>(childrenSchema)) {
+    return false;
+  }
+  if (isUnionVariants<TKey, TUsage>(childrenSchema)) {
+    return true;
+  }
+  const objectChildren: ObjectChildrenConstraint<TKey, TUsage> = childrenSchema;
+  const objectValue =
+    value && typeof value === "object" && !Array.isArray(value)
+      ? value
+      : undefined;
+  return ChildrenDataRenderer.extractChildren(objectChildren, objectValue, {
+    userRoles,
+  }).some((child) => matchesSlot(slot, child.field, child.data));
+}
+
+/**
+ * Type guard to check if children is a union of variants
+ */
+export function isUnionVariants<TKey extends string, TUsage extends FieldUsageConfig>(
+  children:
+    | ObjectChildrenConstraint<TKey, TUsage>
+    | ArrayChildConstraint<TKey, TUsage>
+    | UnionObjectWidgetConfigConstrain<TKey, TUsage>
+    | undefined,
+): children is UnionObjectWidgetConfigConstrain<TKey, TUsage> {
+  return (
+    Array.isArray(children) &&
+    children.length > 0 &&
+    children[0] &&
+    "children" in children[0]
+  );
+}
+
+/**
+ * Type guard to check if children is a single child constraint (array element)
+ */
+export function isArrayChild<TKey extends string, TUsage extends FieldUsageConfig>(
+  children:
+    | ObjectChildrenConstraint<TKey, TUsage>
+    | ArrayChildConstraint<TKey, TUsage>
+    | UnionObjectWidgetConfigConstrain<TKey, TUsage>
+    | undefined,
+): children is ArrayChildConstraint<TKey, TUsage> {
+  return (
+    children !== undefined &&
+    !Array.isArray(children) &&
+    children !== null &&
+    "type" in children
+  );
 }

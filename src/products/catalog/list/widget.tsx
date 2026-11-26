@@ -1,14 +1,15 @@
 "use client";
 
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { Badge } from "next-vibe/ui/components/badge";
 import { Button } from "next-vibe/ui/components/button";
 import { DetailField, DetailGrid } from "next-vibe/ui/components/detail-grid";
 import { Div } from "next-vibe/ui/components/div";
 import { EmptyBlock } from "next-vibe/ui/components/empty-block";
 import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
+import { Plus } from "next-vibe/ui/components/icons/Plus";
 import { Input } from "next-vibe/ui/components/input";
+import { ListItem } from "next-vibe/ui/components/list-item";
 import { LoadingBlock } from "next-vibe/ui/components/loading-block";
+import { RecordTable } from "next-vibe/ui/components/record-table";
 import { SectionGroup } from "next-vibe/ui/components/section-group";
 import {
   Select,
@@ -18,6 +19,7 @@ import {
   SelectValue,
 } from "next-vibe/ui/components/select";
 import { Span } from "next-vibe/ui/components/span";
+import { StatusPill } from "next-vibe/ui/components/status-pill";
 import { WidgetHeader } from "next-vibe/ui/components/widget-header";
 import { WidgetShell } from "next-vibe/ui/components/widget-shell";
 import { formatMoney } from "next-vibe/unified-ui/_shared/format-money";
@@ -48,117 +50,20 @@ import type { CatalogListGetResponseOutput } from "./definition";
 
 type Product = NonNullable<CatalogListGetResponseOutput["products"]>[number];
 
-// ProductType enum values are i18n translation keys (e.g. "enums.productType.service")
-// The badge label displayed comes from product.type which is also that key string
-// We map to a visual variant based on which key it is
-const PRODUCT_TYPE_VARIANT: Record<
-  string,
-  "default" | "secondary" | "outline" | "destructive"
-> = {
-  [ProductType.SERVICE]: "default",
-  [ProductType.PHYSICAL]: "secondary",
-  [ProductType.DIGITAL]: "outline",
-};
+function mutedCell(text: string): JSX.Element {
+  return <Span className="text-muted-foreground">{text}</Span>;
+}
 
-function ProductRow({
-  product,
-  onClick,
-  locale,
-  labelActive,
-  labelInactive,
-  labelService,
-  labelPhysical,
-  labelDigital,
-  labelRecurring,
-  labelMonthly,
-  labelYearly,
-}: {
-  product: Product;
-  onClick: () => void;
-  locale: CountryLanguage;
-  labelActive: string;
-  labelInactive: string;
-  labelService: string;
-  labelPhysical: string;
-  labelDigital: string;
-  labelRecurring: string;
-  labelMonthly: string;
-  labelYearly: string;
-}): JSX.Element {
-  const typeVariant = PRODUCT_TYPE_VARIANT[product.type] ?? "outline";
-  const typeLabel =
-    product.type === ProductType.SERVICE
-      ? labelService
-      : product.type === ProductType.PHYSICAL
-        ? labelPhysical
-        : labelDigital;
-
-  const billingIntervalLabel =
-    product.billingInterval === "MONTHLY"
-      ? labelMonthly
-      : product.billingInterval === "YEARLY"
-        ? labelYearly
-        : null;
-
-  return (
-    <Div
-      className={[
-        "grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-start gap-x-3 gap-y-2 border-b px-3 py-3 last:border-b-0",
-        product.isActive ? "hover:bg-muted/30" : "opacity-55 hover:bg-muted/10",
-      ].join(" ")}
+function skuCell(product: Product): JSX.Element {
+  return product.sku ? (
+    <Span
+      className="block max-w-56 truncate text-muted-foreground"
+      title={product.sku}
     >
-      {/* Left: Name + SKU + billing interval */}
-      <Div className="flex-1 min-w-0 flex flex-col gap-0.5">
-        <Div className="flex flex-wrap items-center gap-1">
-          <Button
-            type="button"
-            variant="link"
-            className="h-auto min-w-0 max-w-full justify-start whitespace-normal p-0 text-left text-sm font-semibold [overflow-wrap:anywhere]"
-            onClick={onClick}
-          >
-            {product.name}
-          </Button>
-          {product.isSubscription ? (
-            <Badge
-              variant="outline"
-              className="text-xs font-medium border-blue-500/30 text-blue-600 dark:text-blue-400 bg-blue-500/5"
-            >
-              {labelRecurring}
-            </Badge>
-          ) : null}
-        </Div>
-        {product.sku ? (
-          <Span className="text-xs text-muted-foreground font-mono tracking-tight">
-            {product.sku}
-          </Span>
-        ) : null}
-        {billingIntervalLabel ? (
-          <Span className="text-xs text-muted-foreground">
-            {billingIntervalLabel}
-          </Span>
-        ) : null}
-      </Div>
-
-      <Div className="flex flex-col items-end gap-1 text-right">
-        <Span className="text-sm font-semibold tabular-nums">
-          {formatMoney(product.basePrice, product.currency, locale)}
-        </Span>
-        {product.unit && (
-          <Span className="text-xs text-muted-foreground">{product.unit}</Span>
-        )}
-      </Div>
-      <Div className="col-span-2 flex flex-wrap gap-1.5">
-        <Badge variant={typeVariant} className="text-xs">
-          {typeLabel}
-        </Badge>
-        <Badge
-          variant={product.isActive ? "outline" : "secondary"}
-          className="text-xs"
-        >
-          {product.isActive ? labelActive : labelInactive}
-        </Badge>
-      </Div>
-    </Div>
+      {product.sku}
+    </Span>
+  ) : (
+    mutedCell("-")
   );
 }
 
@@ -234,9 +139,6 @@ export function CatalogListWidget(_props: {
   const labelActive = t("get.widget.active");
   const labelInactive = t("get.widget.inactive");
   const labelAddProduct = t("get.widget.addProduct");
-  const labelEmpty = t("get.widget.empty");
-  const labelProduct = t("get.widget.columnProduct");
-  const labelTypePrice = t("get.widget.columnTypePrice");
   const labelFilterAllTypes = t("get.widget.filterAllTypes");
   const labelFilterAllStatus = t("get.widget.filterAllStatus");
   const labelFilterActiveOnly = t("get.widget.filterActiveOnly");
@@ -270,6 +172,58 @@ export function CatalogListWidget(_props: {
     setSearch("");
   };
 
+  const typeLabel = (type: Product["type"]): string =>
+    type === ProductType.SERVICE
+      ? labelService
+      : type === ProductType.PHYSICAL
+        ? labelPhysical
+        : labelDigital;
+  const billingLabel = (product: Product): string =>
+    product.billingInterval === "MONTHLY"
+      ? labelMonthly
+      : product.billingInterval === "YEARLY"
+        ? labelYearly
+        : labelRecurring;
+  const statusPill = (isActive: boolean): JSX.Element => (
+    <StatusPill
+      status={isActive ? "active" : "inactive"}
+      label={isActive ? labelActive : labelInactive}
+      variant={isActive ? "success" : "muted"}
+    />
+  );
+  const priceCell = (product: Product): JSX.Element => (
+    <Span className="whitespace-nowrap tabular-nums">
+      <Span
+        className={
+          Number(product.basePrice) === 0
+            ? "text-muted-foreground"
+            : "font-medium"
+        }
+      >
+        {formatMoney(product.basePrice, product.currency, locale)}
+      </Span>
+      {product.unit && (
+        <Span className="text-xs text-muted-foreground">{` / ${product.unit}`}</Span>
+      )}
+    </Span>
+  );
+  const nameCell = (product: Product): JSX.Element => (
+    <Div className="flex min-w-0 flex-col">
+      <Span className="font-medium">{product.name}</Span>
+      {product.isSubscription && (
+        <Span className="text-xs text-muted-foreground">
+          {billingLabel(product)}
+        </Span>
+      )}
+    </Div>
+  );
+  const clearFilters = (): void => {
+    setSearch("");
+    form.setValue("filters.type", undefined, { shouldDirty: true });
+    form.setValue("filters.isActive", undefined, { shouldDirty: true });
+    form.setValue("page", 1, { shouldDirty: true });
+  };
+
   // Map typeValue (which is an i18n key or undefined) to a Select-compatible string
   const typeSelectValue = typeValue ?? SENTINEL_ALL;
 
@@ -286,6 +240,13 @@ export function CatalogListWidget(_props: {
       <WidgetHeader
         size={isPickerMode ? "section" : "page"}
         title={t("get.title")}
+        subtitle={
+          data && !isPickerMode
+            ? t("get.widget.count", {
+                count: new Intl.NumberFormat(locale).format(data.total),
+              })
+            : undefined
+        }
         backButton={
           canGoBack && (
             <Button
@@ -301,41 +262,40 @@ export function CatalogListWidget(_props: {
         }
         actions={
           interactive && !isPickerMode ? (
-            <Button type="button" size="sm" onClick={handleCreate}>
-              {labelAddProduct}
-            </Button>
+            <>
+              <Button
+                type="button"
+                variant="ghost"
+                className="hidden @md:inline-flex"
+                aria-expanded={showCheckout}
+                onClick={() => setShowCheckout(!showCheckout)}
+              >
+                {t("get.widget.checkout")}
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                className="hidden @md:inline-flex"
+                onClick={handleCategories}
+              >
+                {labelNavCategories}
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                className="hidden @md:inline-flex"
+                onClick={handleTaxRates}
+              >
+                {labelNavTaxRates}
+              </Button>
+              <Button type="button" onClick={handleCreate}>
+                <Plus className="size-4" aria-hidden="true" />
+                {labelAddProduct}
+              </Button>
+            </>
           ) : undefined
         }
       />
-      {interactive && !isPickerMode && (
-        <Div className="flex flex-wrap gap-2">
-          <Button
-            type="button"
-            size="sm"
-            variant="outline"
-            onClick={handleCategories}
-          >
-            {labelNavCategories}
-          </Button>
-          <Button
-            type="button"
-            size="sm"
-            variant="outline"
-            onClick={handleTaxRates}
-          >
-            {labelNavTaxRates}
-          </Button>
-          <Button
-            type="button"
-            size="sm"
-            variant="outline"
-            aria-expanded={showCheckout}
-            onClick={() => setShowCheckout(!showCheckout)}
-          >
-            {t("get.widget.checkout")}
-          </Button>
-        </Div>
-      )}
       {showCheckout && (
         <SectionGroup title={t("get.widget.checkout")}>
           <Span className="text-sm text-muted-foreground">
@@ -398,10 +358,7 @@ export function CatalogListWidget(_props: {
             value={search}
             onChangeText={setSearch}
           />
-          <Div className="flex flex-col gap-1 min-w-[130px]">
-            <Span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-              {labelType}
-            </Span>
+          <Div className="flex min-w-[140px] flex-col">
             <Select
               value={typeSelectValue}
               onValueChange={(val): void => {
@@ -419,7 +376,7 @@ export function CatalogListWidget(_props: {
                 }
               }}
             >
-              <SelectTrigger className="h-8 text-xs" aria-label={labelType}>
+              <SelectTrigger aria-label={labelType}>
                 <SelectValue placeholder={labelFilterAllTypes} />
               </SelectTrigger>
               <SelectContent>
@@ -440,10 +397,7 @@ export function CatalogListWidget(_props: {
           </Div>
 
           {/* Active filter */}
-          <Div className="flex flex-col gap-1 min-w-[130px]">
-            <Span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-              {labelStatus}
-            </Span>
+          <Div className="flex min-w-[140px] flex-col">
             <Select
               value={activeSelectValue}
               onValueChange={(val): void => {
@@ -463,7 +417,7 @@ export function CatalogListWidget(_props: {
                 }
               }}
             >
-              <SelectTrigger className="h-8 text-xs" aria-label={labelStatus}>
+              <SelectTrigger aria-label={labelStatus}>
                 <SelectValue placeholder={labelFilterAllStatus} />
               </SelectTrigger>
               <SelectContent>
@@ -482,44 +436,76 @@ export function CatalogListWidget(_props: {
         </Div>
       ) : null}
 
-      {data && (
-        <Span className="text-sm text-muted-foreground">
-          {t("get.response.total")}{" "}
-          {new Intl.NumberFormat(locale).format(data.total)}
-        </Span>
-      )}
-
-      {/* Product list */}
       {products.length > 0 ? (
-        <Div className="rounded-lg border overflow-hidden">
-          {/* Column header */}
-          <Div className="flex items-center justify-between gap-3 border-b bg-muted/40 px-3 py-2 text-xs font-medium text-muted-foreground">
-            <Span>{labelProduct}</Span>
-            <Span>{labelTypePrice}</Span>
-          </Div>
-          {products.map((product) => (
-            <ProductRow
-              key={product.id}
-              product={product}
-              onClick={(): void => handleDetail(product.id)}
-              locale={locale}
-              labelActive={labelActive}
-              labelInactive={labelInactive}
-              labelService={labelService}
-              labelPhysical={labelPhysical}
-              labelDigital={labelDigital}
-              labelRecurring={labelRecurring}
-              labelMonthly={labelMonthly}
-              labelYearly={labelYearly}
-            />
-          ))}
-        </Div>
-      ) : data ? (
-        <EmptyBlock
-          title={searchTerm ? t("get.widget.noMatches") : labelEmpty}
+        <RecordTable
+          label={t("get.title")}
+          columns={[
+            { id: "product", label: t("get.widget.columnProduct") },
+            { id: "sku", label: t("get.widget.columnSku") },
+            { id: "type", label: labelType },
+            { id: "status", label: labelStatus },
+            { id: "price", label: t("get.widget.columnPrice"), numeric: true },
+          ]}
+          rows={products.map((product) => ({
+            id: product.id,
+            onOpen: (): void => handleDetail(product.id),
+            cells: {
+              product: nameCell(product),
+              sku: skuCell(product),
+              type: mutedCell(typeLabel(product.type)),
+              status: statusPill(product.isActive),
+              price: priceCell(product),
+            },
+          }))}
+          compact={
+            <Div className="flex flex-col gap-2">
+              {products.map((product) => (
+                <ListItem
+                  key={product.id}
+                  title={product.name}
+                  subtitle={[
+                    typeLabel(product.type),
+                    product.isSubscription ? billingLabel(product) : null,
+                  ]
+                    .filter(Boolean)
+                    .join(" · ")}
+                  badges={product.isActive ? undefined : statusPill(false)}
+                  meta={priceCell(product)}
+                  onClick={(): void => handleDetail(product.id)}
+                />
+              ))}
+            </Div>
+          }
         />
+      ) : data ? (
+        searchTerm || typeValue !== undefined || isActiveValue !== undefined ? (
+          <EmptyBlock
+            size="page"
+            className="rounded-xl border bg-card"
+            title={t("get.widget.noMatches")}
+            action={
+              interactive
+                ? { label: t("get.widget.clearFilters"), onClick: clearFilters }
+                : undefined
+            }
+          />
+        ) : (
+          <EmptyBlock
+            size="page"
+            className="rounded-xl border bg-card"
+            title={t("get.widget.emptyTitle")}
+            message={t("get.widget.emptyMessage")}
+            action={
+              interactive && !isPickerMode
+                ? { label: labelAddProduct, onClick: handleCreate }
+                : undefined
+            }
+          />
+        )
       ) : response?.success === false ? (
         <EmptyBlock
+          size="page"
+          className="rounded-xl border bg-card"
           title={t("get.errors.server.title")}
           message={response.message}
           action={

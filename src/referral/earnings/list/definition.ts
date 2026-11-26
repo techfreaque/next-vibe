@@ -8,20 +8,24 @@ import { createEndpoint } from "next-vibe/core/definition/create-i18n";
 import {
   EndpointErrorTypes,
   FieldDataType,
-  LayoutType,
   Methods,
   WidgetType,
 } from "next-vibe/core/definition/enums";
 import { UserRole } from "next-vibe/identity/roles/enum";
+import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
+import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
 import {
-  objectField,
   requestField,
-  responseArrayField,
   responseField,
 } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
+import { ReferralEarningStatus, ReferralEarningStatusDB } from "../../enum";
 import { scopedTranslation } from "../../i18n";
+
+const EarningsListContainer = lazyWidget(() =>
+  import("./widget").then((m) => ({ default: m.EarningsListContainer })),
+);
 
 /**
  * GET endpoint for earnings list
@@ -44,109 +48,85 @@ export const { GET } = createEndpoint({
     UserRole.PARTNER_EMPLOYEE,
   ] as const,
 
-  fields: objectField(scopedTranslation, {
-    type: WidgetType.CONTAINER,
-    title: "get.form.title" as const,
-    description: "get.form.description" as const,
-    layoutType: LayoutType.GRID,
-    columns: 12,
-    usage: { request: "data", response: true },
+  fields: customWidgetObject({
+    render: EarningsListContainer,
+    usage: { request: "data", response: true } as const,
     children: {
       // Admin override: view another user's referral earnings
       targetUserId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "get.title" as const,
+        label: "earnings.list.get.form.targetUserId" as const,
         hidden: true,
+        includeInCacheKey: true,
         schema: z.string().optional(),
       }),
-      // Request fields
       limit: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label: "get.form.limit.label" as const,
-        description: "get.form.limit.description" as const,
-        schema: z.coerce.number().positive().optional(),
+        label: "earnings.list.get.form.limit.label" as const,
+        description: "earnings.list.get.form.limit.description" as const,
+        hidden: true,
+        schema: z.coerce.number().int().positive().max(200).optional(),
       }),
       offset: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label: "get.form.offset.label" as const,
-        description: "get.form.offset.description" as const,
-        schema: z.coerce.number().min(0).optional(),
+        label: "earnings.list.get.form.offset.label" as const,
+        description: "earnings.list.get.form.offset.description" as const,
+        hidden: true,
+        schema: z.coerce.number().int().min(0).optional(),
       }),
-
-      // Response fields
-      earnings: responseArrayField(scopedTranslation, {
-        type: WidgetType.CONTAINER,
-        child: objectField(scopedTranslation, {
-          type: WidgetType.CONTAINER,
-          layoutType: LayoutType.GRID,
-          columns: 12,
-          usage: { response: true },
-          children: {
-            id: responseField(scopedTranslation, {
-              type: WidgetType.TEXT,
-              label: "get.response.earnings.id" as const,
-              schema: z.string(),
-            }),
-            earnerUserId: responseField(scopedTranslation, {
-              type: WidgetType.TEXT,
-              label: "get.response.earnings.earnerUserId" as const,
-              schema: z.string(),
-            }),
-            sourceUserId: responseField(scopedTranslation, {
-              type: WidgetType.TEXT,
-              label: "get.response.earnings.sourceUserId" as const,
-              schema: z.string(),
-            }),
-            transactionId: responseField(scopedTranslation, {
-              type: WidgetType.TEXT,
-              label: "get.response.earnings.transactionId" as const,
-              schema: z.string(),
-            }),
-            level: responseField(scopedTranslation, {
-              type: WidgetType.TEXT,
-              label: "get.response.earnings.level" as const,
-              schema: z.coerce.number(),
-            }),
-            amountCents: responseField(scopedTranslation, {
-              type: WidgetType.TEXT,
-              label: "get.response.earnings.amountCents" as const,
-              schema: z.coerce.number(),
-            }),
-            currency: responseField(scopedTranslation, {
-              type: WidgetType.TEXT,
-              label: "get.response.earnings.currency" as const,
-              schema: z.string(),
-            }),
-            status: responseField(scopedTranslation, {
-              type: WidgetType.TEXT,
-              label: "get.response.earnings.status" as const,
-              schema: z.string(),
-            }),
-            createdAt: responseField(scopedTranslation, {
-              type: WidgetType.TEXT,
-              label: "get.response.earnings.createdAt" as const,
-              schema: dateSchema,
-            }),
-          },
-        }),
+      earnings: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        schema: z.array(
+          z.object({
+            id: z.string(),
+            earnerUserId: z.string(),
+            sourceUserId: z.string(),
+            transactionId: z.string(),
+            level: z.coerce.number(),
+            amountCents: z.coerce.number(),
+            currency: z.string(),
+            status: z.enum(ReferralEarningStatusDB),
+            createdAt: dateSchema,
+          }),
+        ),
       }),
       totalCount: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        label: "get.response.totalCount" as const,
         schema: z.coerce.number(),
       }),
     },
   }),
 
+  options: {
+    formOptions: { autoSubmit: true, debounceMs: 0 },
+  },
+
   examples: {
     requests: {
       default: {},
+      firstPage: { limit: 25, offset: 0 },
     },
     responses: {
       default: {
+        earnings: [
+          {
+            id: "123e4567-e89b-12d3-a456-426614174201",
+            earnerUserId: "123e4567-e89b-12d3-a456-426614174000",
+            sourceUserId: "123e4567-e89b-12d3-a456-426614174001",
+            transactionId: "123e4567-e89b-12d3-a456-426614174301",
+            level: 1,
+            amountCents: 200,
+            currency: "USD",
+            status: ReferralEarningStatus.CONFIRMED,
+            createdAt: "2026-11-18T15:20:00.000Z",
+          },
+        ],
+        totalCount: 1,
+      },
+      firstPage: {
         earnings: [],
         totalCount: 0,
       },

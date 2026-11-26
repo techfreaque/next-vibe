@@ -130,6 +130,16 @@ const { GET } = createEndpoint({
               label: "rate.list.response.rate.id" as const,
               schema: z.string().uuid(),
             }),
+            companyId: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              label: "rate.list.response.rate.company" as const,
+              schema: z.uuid(),
+            }),
+            companyName: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              label: "rate.list.response.rate.company" as const,
+              schema: z.string(),
+            }),
             name: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               label: "rate.list.response.rate.name" as const,
@@ -251,6 +261,8 @@ const { GET } = createEndpoint({
         rates: [
           {
             id: "550e8400-e29b-41d4-a716-446655440001",
+            companyId: "550e8400-e29b-41d4-a716-446655440000",
+            companyName: "Example company",
             name: "VAT 20%",
             code: "AT-VAT20",
             type: TaxType.VAT,

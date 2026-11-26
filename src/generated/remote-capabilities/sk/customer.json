@@ -10090,11 +10090,6 @@
     "titleShort": "Provízie",
     "description": "Načíta históriu vašich provízií za odporúčania",
     "fields": {
-      "type": "container",
-      "title": "Podrobnosti kódu odporúčania",
-      "description": "Zobraziť údaje o kóde odporúčania",
-      "layoutType": "grid",
-      "columns": 12,
       "usage": {
         "request": "data",
         "response": true
@@ -10103,8 +10098,9 @@
         "targetUserId": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Získať kód odporúčania",
+          "label": "Účet partnera",
           "hidden": true,
+          "includeInCacheKey": true,
           "schema": {
             "def": {
               "type": "optional",
@@ -10125,8 +10121,9 @@
         "limit": {
           "type": "form_field",
           "fieldType": "number",
-          "label": "Limit",
-          "description": "Najvyšší počet výsledkov",
+          "label": "Riadky na stranu",
+          "description": "Koľko provízií zobraziť na stranu",
+          "hidden": true,
           "schema": {
             "def": {
               "type": "optional",
@@ -10134,7 +10131,20 @@
                 "def": {
                   "type": "number",
                   "coerce": true,
-                  "checks": [{}]
+                  "checks": [
+                    {
+                      "def": {
+                        "type": "number",
+                        "check": "number_format",
+                        "abort": false,
+                        "format": "safeint"
+                      },
+                      "type": "number",
+                      "isFinite": true
+                    },
+                    {},
+                    {}
+                  ]
                 },
                 "type": "number",
                 "isFinite": true
@@ -10150,8 +10160,9 @@
         "offset": {
           "type": "form_field",
           "fieldType": "number",
-          "label": "Posun",
-          "description": "Počet výsledkov na preskočenie",
+          "label": "Začať od",
+          "description": "Počet preskočených provízií",
+          "hidden": true,
           "schema": {
             "def": {
               "type": "optional",
@@ -10159,7 +10170,19 @@
                 "def": {
                   "type": "number",
                   "coerce": true,
-                  "checks": [{}]
+                  "checks": [
+                    {
+                      "def": {
+                        "type": "number",
+                        "check": "number_format",
+                        "abort": false,
+                        "format": "safeint"
+                      },
+                      "type": "number",
+                      "isFinite": true
+                    },
+                    {}
+                  ]
                 },
                 "type": "number",
                 "isFinite": true
@@ -10173,138 +10196,346 @@
           "schemaType": "primitive"
         },
         "earnings": {
-          "type": "container",
-          "child": {
-            "type": "container",
-            "layoutType": "grid",
-            "columns": 12,
-            "usage": {
-              "response": true
+          "type": "text",
+          "schema": {
+            "def": {
+              "type": "array",
+              "element": {
+                "def": {
+                  "type": "object",
+                  "shape": {
+                    "id": {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    },
+                    "earnerUserId": {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    },
+                    "sourceUserId": {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    },
+                    "transactionId": {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    },
+                    "level": {
+                      "def": {
+                        "type": "number",
+                        "coerce": true,
+                        "checks": []
+                      },
+                      "type": "number",
+                      "isFinite": true
+                    },
+                    "amountCents": {
+                      "def": {
+                        "type": "number",
+                        "coerce": true,
+                        "checks": []
+                      },
+                      "type": "number",
+                      "isFinite": true
+                    },
+                    "currency": {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    },
+                    "status": {
+                      "def": {
+                        "type": "enum",
+                        "entries": {
+                          "enums.earningStatus.pending": "enums.earningStatus.pending",
+                          "enums.earningStatus.confirmed": "enums.earningStatus.confirmed",
+                          "enums.earningStatus.canceled": "enums.earningStatus.canceled"
+                        }
+                      },
+                      "type": "enum",
+                      "enum": {
+                        "enums.earningStatus.pending": "enums.earningStatus.pending",
+                        "enums.earningStatus.confirmed": "enums.earningStatus.confirmed",
+                        "enums.earningStatus.canceled": "enums.earningStatus.canceled"
+                      },
+                      "options": [
+                        "enums.earningStatus.pending",
+                        "enums.earningStatus.confirmed",
+                        "enums.earningStatus.canceled"
+                      ]
+                    },
+                    "createdAt": {
+                      "def": {
+                        "type": "pipe",
+                        "in": {
+                          "def": {
+                            "type": "union",
+                            "options": [
+                              {
+                                "def": {
+                                  "type": "string"
+                                },
+                                "type": "string"
+                              },
+                              {
+                                "def": {
+                                  "type": "date"
+                                },
+                                "type": "date"
+                              },
+                              {
+                                "def": {
+                                  "type": "number",
+                                  "coerce": true,
+                                  "checks": []
+                                },
+                                "type": "number",
+                                "isFinite": true
+                              }
+                            ]
+                          },
+                          "type": "union",
+                          "options": [
+                            {
+                              "def": {
+                                "type": "string"
+                              },
+                              "type": "string"
+                            },
+                            {
+                              "def": {
+                                "type": "date"
+                              },
+                              "type": "date"
+                            },
+                            {
+                              "def": {
+                                "type": "number",
+                                "coerce": true,
+                                "checks": []
+                              },
+                              "type": "number",
+                              "isFinite": true
+                            }
+                          ]
+                        },
+                        "out": {
+                          "def": {
+                            "type": "transform"
+                          },
+                          "type": "transform"
+                        }
+                      },
+                      "type": "pipe",
+                      "in": {
+                        "def": {
+                          "type": "union",
+                          "options": [
+                            {
+                              "def": {
+                                "type": "string"
+                              },
+                              "type": "string"
+                            },
+                            {
+                              "def": {
+                                "type": "date"
+                              },
+                              "type": "date"
+                            },
+                            {
+                              "def": {
+                                "type": "number",
+                                "coerce": true,
+                                "checks": []
+                              },
+                              "type": "number",
+                              "isFinite": true
+                            }
+                          ]
+                        },
+                        "type": "union",
+                        "options": [
+                          {
+                            "def": {
+                              "type": "string"
+                            },
+                            "type": "string"
+                          },
+                          {
+                            "def": {
+                              "type": "date"
+                            },
+                            "type": "date"
+                          },
+                          {
+                            "def": {
+                              "type": "number",
+                              "coerce": true,
+                              "checks": []
+                            },
+                            "type": "number",
+                            "isFinite": true
+                          }
+                        ]
+                      },
+                      "out": {
+                        "def": {
+                          "type": "transform"
+                        },
+                        "type": "transform"
+                      }
+                    }
+                  }
+                },
+                "type": "object"
+              }
             },
-            "children": {
-              "id": {
-                "type": "text",
-                "label": "ID",
-                "schema": {
-                  "def": {
+            "type": "array",
+            "element": {
+              "def": {
+                "type": "object",
+                "shape": {
+                  "id": {
+                    "def": {
+                      "type": "string"
+                    },
                     "type": "string"
                   },
-                  "type": "string"
-                },
-                "usage": {
-                  "response": true
-                },
-                "schemaType": "primitive"
-              },
-              "earnerUserId": {
-                "type": "text",
-                "label": "ID príjemcu provízie",
-                "schema": {
-                  "def": {
+                  "earnerUserId": {
+                    "def": {
+                      "type": "string"
+                    },
                     "type": "string"
                   },
-                  "type": "string"
-                },
-                "usage": {
-                  "response": true
-                },
-                "schemaType": "primitive"
-              },
-              "sourceUserId": {
-                "type": "text",
-                "label": "ID používateľa, z ktorého platby vznikla provízia",
-                "schema": {
-                  "def": {
+                  "sourceUserId": {
+                    "def": {
+                      "type": "string"
+                    },
                     "type": "string"
                   },
-                  "type": "string"
-                },
-                "usage": {
-                  "response": true
-                },
-                "schemaType": "primitive"
-              },
-              "transactionId": {
-                "type": "text",
-                "label": "ID transakcie",
-                "schema": {
-                  "def": {
+                  "transactionId": {
+                    "def": {
+                      "type": "string"
+                    },
                     "type": "string"
                   },
-                  "type": "string"
-                },
-                "usage": {
-                  "response": true
-                },
-                "schemaType": "primitive"
-              },
-              "level": {
-                "type": "text",
-                "label": "Úroveň",
-                "schema": {
-                  "def": {
+                  "level": {
+                    "def": {
+                      "type": "number",
+                      "coerce": true,
+                      "checks": []
+                    },
                     "type": "number",
-                    "coerce": true,
-                    "checks": []
+                    "isFinite": true
                   },
-                  "type": "number",
-                  "isFinite": true
-                },
-                "usage": {
-                  "response": true
-                },
-                "schemaType": "primitive"
-              },
-              "amountCents": {
-                "type": "text",
-                "label": "Suma (v centoch)",
-                "schema": {
-                  "def": {
+                  "amountCents": {
+                    "def": {
+                      "type": "number",
+                      "coerce": true,
+                      "checks": []
+                    },
                     "type": "number",
-                    "coerce": true,
-                    "checks": []
+                    "isFinite": true
                   },
-                  "type": "number",
-                  "isFinite": true
-                },
-                "usage": {
-                  "response": true
-                },
-                "schemaType": "primitive"
-              },
-              "currency": {
-                "type": "text",
-                "label": "Mena",
-                "schema": {
-                  "def": {
+                  "currency": {
+                    "def": {
+                      "type": "string"
+                    },
                     "type": "string"
                   },
-                  "type": "string"
-                },
-                "usage": {
-                  "response": true
-                },
-                "schemaType": "primitive"
-              },
-              "status": {
-                "type": "text",
-                "label": "Stav",
-                "schema": {
-                  "def": {
-                    "type": "string"
+                  "status": {
+                    "def": {
+                      "type": "enum",
+                      "entries": {
+                        "enums.earningStatus.pending": "enums.earningStatus.pending",
+                        "enums.earningStatus.confirmed": "enums.earningStatus.confirmed",
+                        "enums.earningStatus.canceled": "enums.earningStatus.canceled"
+                      }
+                    },
+                    "type": "enum",
+                    "enum": {
+                      "enums.earningStatus.pending": "enums.earningStatus.pending",
+                      "enums.earningStatus.confirmed": "enums.earningStatus.confirmed",
+                      "enums.earningStatus.canceled": "enums.earningStatus.canceled"
+                    },
+                    "options": [
+                      "enums.earningStatus.pending",
+                      "enums.earningStatus.confirmed",
+                      "enums.earningStatus.canceled"
+                    ]
                   },
-                  "type": "string"
-                },
-                "usage": {
-                  "response": true
-                },
-                "schemaType": "primitive"
-              },
-              "createdAt": {
-                "type": "text",
-                "label": "Vytvorené",
-                "schema": {
-                  "def": {
+                  "createdAt": {
+                    "def": {
+                      "type": "pipe",
+                      "in": {
+                        "def": {
+                          "type": "union",
+                          "options": [
+                            {
+                              "def": {
+                                "type": "string"
+                              },
+                              "type": "string"
+                            },
+                            {
+                              "def": {
+                                "type": "date"
+                              },
+                              "type": "date"
+                            },
+                            {
+                              "def": {
+                                "type": "number",
+                                "coerce": true,
+                                "checks": []
+                              },
+                              "type": "number",
+                              "isFinite": true
+                            }
+                          ]
+                        },
+                        "type": "union",
+                        "options": [
+                          {
+                            "def": {
+                              "type": "string"
+                            },
+                            "type": "string"
+                          },
+                          {
+                            "def": {
+                              "type": "date"
+                            },
+                            "type": "date"
+                          },
+                          {
+                            "def": {
+                              "type": "number",
+                              "coerce": true,
+                              "checks": []
+                            },
+                            "type": "number",
+                            "isFinite": true
+                          }
+                        ]
+                      },
+                      "out": {
+                        "def": {
+                          "type": "transform"
+                        },
+                        "type": "transform"
+                      }
+                    },
                     "type": "pipe",
                     "in": {
                       "def": {
@@ -10364,83 +10595,19 @@
                       },
                       "type": "transform"
                     }
-                  },
-                  "type": "pipe",
-                  "in": {
-                    "def": {
-                      "type": "union",
-                      "options": [
-                        {
-                          "def": {
-                            "type": "string"
-                          },
-                          "type": "string"
-                        },
-                        {
-                          "def": {
-                            "type": "date"
-                          },
-                          "type": "date"
-                        },
-                        {
-                          "def": {
-                            "type": "number",
-                            "coerce": true,
-                            "checks": []
-                          },
-                          "type": "number",
-                          "isFinite": true
-                        }
-                      ]
-                    },
-                    "type": "union",
-                    "options": [
-                      {
-                        "def": {
-                          "type": "string"
-                        },
-                        "type": "string"
-                      },
-                      {
-                        "def": {
-                          "type": "date"
-                        },
-                        "type": "date"
-                      },
-                      {
-                        "def": {
-                          "type": "number",
-                          "coerce": true,
-                          "checks": []
-                        },
-                        "type": "number",
-                        "isFinite": true
-                      }
-                    ]
-                  },
-                  "out": {
-                    "def": {
-                      "type": "transform"
-                    },
-                    "type": "transform"
                   }
-                },
-                "usage": {
-                  "response": true
-                },
-                "schemaType": "primitive"
-              }
-            },
-            "schemaType": "object"
+                }
+              },
+              "type": "object"
+            }
           },
-          "schemaType": "array",
           "usage": {
             "response": true
-          }
+          },
+          "schemaType": "primitive"
         },
         "totalCount": {
           "type": "text",
-          "label": "Celkový počet",
           "schema": {
             "def": {
               "type": "number",
@@ -10456,6 +10623,7 @@
           "schemaType": "primitive"
         }
       },
+      "type": "custom-widget",
       "schemaType": "object"
     },
     "executionMode": "via-execute-route",

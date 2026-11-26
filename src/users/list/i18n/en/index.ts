@@ -262,7 +262,7 @@ export const translations = {
     },
   },
   widget: {
-    planStatus: "Plan and status",
+    planStatus: "Plan",
     accountActive: "Active",
     accountInactive: "Inactive",
     none: "None",
@@ -361,5 +361,6 @@ export const translations = {
       pageHint: "Page {{page}}/{{pages}}. Next: --page={{next}}",
       detailHint: "Details: vibe users-view --userId=<ID>",
     },
+    planFree: "Free",
   },
 };

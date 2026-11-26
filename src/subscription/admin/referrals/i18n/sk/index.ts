@@ -7,7 +7,7 @@ export const translations: typeof enTranslations = {
   },
   get: {
     title: "Prehľad odporúčaní",
-    titleShort: "Správa odporúčaní",
+    titleShort: "Aktivita odporúčaní",
     description: "Kódy odporúčaní, provízie a výplaty",
     form: {
       title: "Správa odporúčaní",

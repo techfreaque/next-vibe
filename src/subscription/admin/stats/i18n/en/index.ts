@@ -1,7 +1,7 @@
 export const translations = {
   get: {
     title: "Subscription statistics",
-    titleShort: "Admin Stats",
+    titleShort: "Subscription metrics",
     description: "Revenue, subscription, credit and referral metrics",
     form: {
       title: "Statistics Dashboard",

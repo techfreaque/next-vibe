@@ -5,7 +5,7 @@ export const translations = {
   },
   get: {
     title: "Reported Skills",
-    titleShort: "Moderation",
+    titleShort: "Reported skills",
     description: "List skills with reports, sorted by report count",
     fields: {
       minReports: {

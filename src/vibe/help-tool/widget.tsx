@@ -45,7 +45,6 @@ import { Zap } from "next-vibe/ui/components/icons/Zap";
 import type { InputRefObject } from "next-vibe/ui/components/input";
 import { Input } from "next-vibe/ui/components/input";
 import { Link } from "next-vibe/ui/components/link";
-import { LoadingBlock } from "next-vibe/ui/components/loading-block";
 import { AnimatePresence, MotionDiv } from "next-vibe/ui/components/motion";
 import { Pre } from "next-vibe/ui/components/pre";
 import { ResizableContainer } from "next-vibe/ui/components/resizable";
@@ -56,6 +55,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "next-vibe/ui/components/select";
+import { Skeleton } from "next-vibe/ui/components/skeleton";
 import { Span } from "next-vibe/ui/components/span";
 import { Switch } from "next-vibe/ui/components/switch";
 import {
@@ -87,6 +87,8 @@ import {
   adminRecordCompanyKey,
 } from "next-vibe/unified-ui/_shared/admin-record-company";
 import { AdminRecordContext } from "next-vibe/unified-ui/_shared/admin-record-context";
+import { LandingCountsContext } from "next-vibe/unified-ui/_shared/category-summary-panel";
+import { ToolUnavailableState } from "next-vibe/unified-ui/_shared/tool-unavailable-state";
 import type { JSX } from "react";
 import {
   useCallback,
@@ -262,7 +264,27 @@ function RestoringTool({
       action={{ label: retry, onClick: reloadPage }}
     />
   ) : (
-    <LoadingBlock className="mt-16" message={loading} />
+    <Div
+      aria-busy={true}
+      aria-label={loading}
+      className="mx-auto flex w-full max-w-7xl flex-col gap-4 px-4 pb-10 pt-5 sm:px-8 sm:pt-8"
+    >
+      <Skeleton className="h-4 w-40" />
+      <Skeleton className="h-8 w-72 max-w-full" />
+      <Div className="grid grid-cols-2 gap-3 @2xl:grid-cols-4">
+        <Skeleton className="h-20" />
+        <Skeleton className="h-20" />
+        <Skeleton className="h-20" />
+        <Skeleton className="h-20" />
+      </Div>
+      <Div className="flex flex-col gap-2 rounded-xl border bg-card p-4">
+        <Skeleton className="h-9 w-full" />
+        <Skeleton className="h-9 w-full" />
+        <Skeleton className="h-9 w-full" />
+        <Skeleton className="h-9 w-full" />
+        <Skeleton className="h-9 w-full" />
+      </Div>
+    </Div>
   );
 }
 
@@ -521,6 +543,25 @@ export function HelpToolsWidget(): JSX.Element {
           ? previous
           : { key, companyId };
       });
+    },
+    [],
+  );
+  // Record counts that landing summaries report for "Work with" shortcuts.
+  const [landingCounts, setLandingCounts] = useState<
+    Readonly<Record<string, number>>
+  >({});
+  const publishLandingCounts = useCallback(
+    (counts: readonly { alias: string; count: number }[]): void => {
+      setLandingCounts((previous) =>
+        counts.every(({ alias, count }) => previous[alias] === count)
+          ? previous
+          : {
+              ...previous,
+              ...Object.fromEntries(
+                counts.map(({ alias, count }) => [alias, count]),
+              ),
+            },
+      );
     },
     [],
   );
@@ -3452,75 +3493,85 @@ export function HelpToolsWidget(): JSX.Element {
           />
         ) : selectedToolAllowed ? null : unavailableSelection ||
           selectedAdminEndpoint ? (
-          <EmptyBlock
-            className="mx-4 mt-6 rounded-xl border bg-card px-4 py-8 sm:mx-8"
-            title={t("catalog.toolNotFound")}
-            message={t("catalog.toolUnavailableHint")}
-            action={{
-              label: t("catalog.browse"),
-              onClick: () => setSidebarPath(sidebarPath),
-            }}
+          <ToolUnavailableState
+            reason={
+              selectedAdminEndpoint && !unavailableSelection
+                ? "permission"
+                : "unknown"
+            }
+            locale={locale}
+            back={
+              showPlatformAdmin
+                ? { label: t("catalog.backHome"), onClick: goHome }
+                : {
+                    label: t("catalog.browse"),
+                    onClick: (): void => setSidebarPath(sidebarPath),
+                  }
+            }
           />
         ) : showPlatformAdmin ? (
-          <PlatformAdminCatalog
-            t={t}
-            locale={locale}
-            registry={categoryByKey}
-            summaries={webCategories}
-            activeCategory={activeCatKey}
-            activeSubCategory={activeSubKey}
-            tools={
-              isSearching || activeCatKey || statsFilter === "webPinned"
-                ? visibleTools
-                : []
-            }
-            landing={adminLanding}
-            landings={response?.adminCategoryLandings}
-            query={searchQuery}
-            contextualActionAlias={
-              reportAction &&
-              reportAction.reportAlias === landingOverview?.alias &&
-              reportAction.companyId === activeCompany?.id
-                ? reportAction.actionAlias
-                : undefined
-            }
-            overview={renderLandingReport(
-              landingOverview,
-              adminLanding?.contextualActions,
-            )}
-            homeSummary={renderLandingReport(
-              homeSummary && {
-                ...homeSummary,
-                args: { ...homeSummary.args, ...homeSummary.homeArgs },
-              },
-            )}
-            recordSearch={
-              response?.recordSearchTargets?.length ? (
-                <RecordSearch
-                  targets={response.recordSearchTargets}
-                  t={t}
-                  onSearch={openRecordSearch}
-                  embedded
-                />
-              ) : undefined
-            }
-            loading={catalogLoading}
-            error={catalogError}
-            currentPage={response?.currentPage ?? 1}
-            totalPages={response?.totalPages ?? 0}
-            matchedCount={response?.matchedCount ?? 0}
-            onHome={goHome}
-            onAllTools={showDeveloperCatalog}
-            onSelectCategory={(category, subCategory) =>
-              setSidebarPath(
-                subCategory ? [category, subCategory] : [category],
-                "web",
-              )
-            }
-            onOpenTool={openTool}
-            onPage={jumpToPage}
-            onRetry={triggerRefetch}
-          />
+          <LandingCountsContext.Provider value={publishLandingCounts}>
+            <PlatformAdminCatalog
+              counts={landingCounts}
+              t={t}
+              locale={locale}
+              registry={categoryByKey}
+              summaries={webCategories}
+              activeCategory={activeCatKey}
+              activeSubCategory={activeSubKey}
+              tools={
+                isSearching || activeCatKey || statsFilter === "webPinned"
+                  ? visibleTools
+                  : []
+              }
+              landing={adminLanding}
+              landings={response?.adminCategoryLandings}
+              query={searchQuery}
+              contextualActionAlias={
+                reportAction &&
+                reportAction.reportAlias === landingOverview?.alias &&
+                reportAction.companyId === activeCompany?.id
+                  ? reportAction.actionAlias
+                  : undefined
+              }
+              overview={renderLandingReport(
+                landingOverview,
+                adminLanding?.contextualActions,
+              )}
+              homeSummary={renderLandingReport(
+                homeSummary && {
+                  ...homeSummary,
+                  args: { ...homeSummary.args, ...homeSummary.homeArgs },
+                },
+              )}
+              recordSearch={
+                response?.recordSearchTargets?.length ? (
+                  <RecordSearch
+                    targets={response.recordSearchTargets}
+                    t={t}
+                    onSearch={openRecordSearch}
+                    embedded
+                  />
+                ) : undefined
+              }
+              loading={catalogLoading}
+              error={catalogError}
+              currentPage={response?.currentPage ?? 1}
+              totalPages={response?.totalPages ?? 0}
+              matchedCount={response?.matchedCount ?? 0}
+              onHome={goHome}
+              onAllTools={showDeveloperCatalog}
+              onSelectCategory={(category, subCategory) =>
+                setSidebarPath(
+                  subCategory ? [category, subCategory] : [category],
+                  "web",
+                )
+              }
+              onOpenTool={openTool}
+              onPage={jumpToPage}
+              onRetry={triggerRefetch}
+            />
+          </LandingCountsContext.Provider>
         ) : (
           <AdminCatalog
             locale={locale}

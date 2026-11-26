@@ -1,10 +1,9 @@
 "use client";
 
-import { Badge } from "next-vibe/ui/components/badge";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
-import { Span } from "next-vibe/ui/components/span";
+import { ResultBanner } from "next-vibe/ui/components/result-banner";
 import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
 import {
   useWidgetNavigation,
@@ -43,18 +42,12 @@ export function TaxRateCreateWidget({
 
   if (data?.id) {
     return (
-      <Div className="flex flex-col gap-4 p-4 rounded-lg border bg-emerald-50/50 dark:bg-emerald-900/10 border-emerald-200 dark:border-emerald-800">
-        <Div className="flex flex-col gap-1">
-          <Span className="text-xs font-semibold text-emerald-700 dark:text-emerald-400 uppercase tracking-wide">
-            {t("rate.create.success.title")}
-          </Span>
-          <Div className="flex items-center gap-2 mt-1">
-            <Badge variant="outline" className="font-mono text-xs">
-              {data.resultCode}
-            </Badge>
-            <Span className="text-sm font-medium">{data.resultName}</Span>
-          </Div>
-        </Div>
+      <Div className="mx-auto flex w-full max-w-3xl flex-col gap-4 p-4">
+        <ResultBanner
+          variant="success"
+          title={t("rate.create.success.title")}
+          message={`${data.resultName} · ${data.resultCode}`}
+        />
         <Button
           type="button"
           variant="outline"
@@ -96,22 +89,34 @@ export function TaxRateCreateWidget({
       <AdminFormSection title={t("rate.details")}>
         <EntityPickerFieldWidget
           fieldName="companyId"
-          field={withValue(field.children.companyId, undefined, null)}
+          field={{
+            ...withValue(field.children.companyId, undefined, null),
+            description: undefined,
+          }}
         />
         <Div className="grid gap-3 @md:grid-cols-2">
           <TextFieldWidget
             fieldName="taxName"
-            field={withValue(field.children.taxName, undefined, null)}
+            field={{
+              ...withValue(field.children.taxName, undefined, null),
+              description: undefined,
+            }}
           />
           <TextFieldWidget
             fieldName="taxCode"
-            field={withValue(field.children.taxCode, undefined, null)}
+            field={{
+              ...withValue(field.children.taxCode, undefined, null),
+              description: undefined,
+            }}
           />
         </Div>
         <Div className="grid gap-3 @md:grid-cols-2">
           <SelectFieldWidget
             fieldName="type"
-            field={withValue(field.children.type, undefined, null)}
+            field={{
+              ...withValue(field.children.type, undefined, null),
+              description: undefined,
+            }}
           />
           <NumberFieldWidget
             presentation="percent"
@@ -126,16 +131,25 @@ export function TaxRateCreateWidget({
         <Div className="grid gap-3 @md:grid-cols-2">
           <TextFieldWidget
             fieldName="country"
-            field={withValue(field.children.country, undefined, null)}
+            field={{
+              ...withValue(field.children.country, undefined, null),
+              description: undefined,
+            }}
           />
           <TextFieldWidget
             fieldName="region"
-            field={withValue(field.children.region, undefined, null)}
+            field={{
+              ...withValue(field.children.region, undefined, null),
+              description: undefined,
+            }}
           />
         </Div>
         <BooleanFieldWidget
           fieldName="isDefault"
-          field={withValue(field.children.isDefault, undefined, null)}
+          field={{
+            ...withValue(field.children.isDefault, undefined, null),
+            description: undefined,
+          }}
         />
       </AdminFormSection>
     </AdminForm>

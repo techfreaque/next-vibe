@@ -30,7 +30,54 @@ export const category: CategoryDefinition = {
   order: 2,
   adminPathPrefixes: ["vibe/tasks"],
   landing: {
-    actions: ["task-list", "cron-queue", "cron-history", "cron-stats"],
+    destinations: ["task-list", "cron-stats", "cron-queue", "cron-history"],
+    destinationDescriptions: {
+      "task-list": {
+        "en-US": "Check task status and upcoming runs.",
+        "en-GLOBAL": "Check task status and upcoming runs.",
+        "de-DE": "Aufgabenstatus und nächste Ausführungen prüfen.",
+        "pl-PL": "Sprawdź stan zadań i terminy kolejnych uruchomień.",
+        "fr-FR": "Vérifiez l’état des tâches et les prochaines exécutions.",
+        "it-IT": "Controlli lo stato delle attività e le prossime esecuzioni.",
+        "es-ES":
+          "Compruebe el estado de las tareas y sus próximas ejecuciones.",
+        "sk-SK": "Skontrolujte stav úloh a ich najbližšie spustenia.",
+      },
+      "cron-stats": {
+        "en-US": "Failing, stuck and overdue tasks with success rates.",
+        "en-GLOBAL": "Failing, stuck and overdue tasks with success rates.",
+        "de-DE":
+          "Fehlschlagende, hängende und überfällige Aufgaben mit Erfolgsquote.",
+        "pl-PL":
+          "Zadania z błędami, zawieszone i zaległe wraz ze skutecznością.",
+        "fr-FR":
+          "Tâches en échec, bloquées ou en retard, avec taux de réussite.",
+        "it-IT":
+          "Attività fallite, bloccate o in ritardo, con tasso di successo.",
+        "es-ES": "Tareas fallidas, bloqueadas o atrasadas, con tasa de éxito.",
+        "sk-SK": "Zlyhané, zaseknuté a oneskorené úlohy s mierou úspešnosti.",
+      },
+      "cron-queue": {
+        "en-US": "What runs next, in order of start time.",
+        "en-GLOBAL": "What runs next, in order of start time.",
+        "de-DE": "Was als Nächstes läuft, nach Startzeit sortiert.",
+        "pl-PL": "Co uruchomi się następne, według godziny startu.",
+        "fr-FR": "Ce qui s’exécute ensuite, par heure de départ.",
+        "it-IT": "Cosa parte dopo, in ordine di avvio.",
+        "es-ES": "Lo que se ejecuta a continuación, por hora de inicio.",
+        "sk-SK": "Čo sa spustí ďalej, podľa času spustenia.",
+      },
+      "cron-history": {
+        "en-US": "Past runs with result, duration and errors.",
+        "en-GLOBAL": "Past runs with result, duration and errors.",
+        "de-DE": "Frühere Läufe mit Ergebnis, Dauer und Fehlern.",
+        "pl-PL": "Wcześniejsze uruchomienia z wynikiem, czasem i błędami.",
+        "fr-FR": "Exécutions passées avec résultat, durée et erreurs.",
+        "it-IT": "Esecuzioni passate con esito, durata ed errori.",
+        "es-ES": "Ejecuciones anteriores con resultado, duración y errores.",
+        "sk-SK": "Minulé spustenia s výsledkom, trvaním a chybami.",
+      },
+    },
   },
   defaultEntry: {
     [UserPermissionRole.ADMIN]: "task-list",

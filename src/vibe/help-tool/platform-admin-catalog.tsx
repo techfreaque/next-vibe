@@ -10,8 +10,8 @@ import {
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { EmptyBlock } from "next-vibe/ui/components/empty-block";
-import { ArrowRight } from "next-vibe/ui/components/icons/ArrowRight";
 import { ChevronRight } from "next-vibe/ui/components/icons/ChevronRight";
+import { Plus } from "next-vibe/ui/components/icons/Plus";
 import { Search } from "next-vibe/ui/components/icons/Search";
 import { Wrench } from "next-vibe/ui/components/icons/Wrench";
 import { Skeleton } from "next-vibe/ui/components/skeleton";
@@ -51,6 +51,8 @@ interface PlatformAdminCatalogProps {
   landing?: Landing;
   contextualActionAlias?: string;
   landings?: HelpGetResponseOutput["adminCategoryLandings"];
+  /** Record counts reported by the landing summary, keyed by tool alias. */
+  counts?: Readonly<Record<string, number>>;
   query: string;
   overview?: ReactNode;
   homeSummary?: ReactNode;
@@ -146,6 +148,18 @@ function ToolGrid({
   );
 }
 
+/**
+ * Within a workspace, places to go and create actions come before actions on a
+ * single record, which need a record picked first.
+ */
+function searchRank(tool: HelpToolMetadataSerialized): number {
+  const id = tool.id ?? tool.name;
+  if (id.includes("[")) {
+    return 2;
+  }
+  return tool.method === "GET" || id.endsWith("_create_POST") ? 0 : 1;
+}
+
 function SearchResults({
   tools,
   registry,
@@ -158,7 +172,7 @@ function SearchResults({
 >): JSX.Element {
   // First occurrence preserves the server's relevance ranking between workspaces.
   const sections = new Map<string, HelpToolMetadataSerialized[]>();
-  for (const tool of tools) {
+  for (const tool of tools.toSorted((a, b) => searchRank(a) - searchRank(b))) {
     const key = tool.category ?? "";
     const section = sections.get(key);
     if (section) {
@@ -215,11 +229,16 @@ function SearchResults({
 
 function LandingLinks({
   links,
+  counts,
+  locale,
   onOpenTool,
 }: {
   links: Landing["destinations"];
+  counts?: Readonly<Record<string, number>>;
+  locale: CountryLanguage;
   onOpenTool: PlatformAdminCatalogProps["onOpenTool"];
 }): JSX.Element {
+  const number = new Intl.NumberFormat(locale);
   return (
     <Div className="flex min-w-0 flex-col divide-y">
       {links.map(({ alias, title, description }) => (
@@ -239,10 +258,17 @@ function LandingLinks({
               </Span>
             )}
           </Div>
-          <ChevronRight
-            className="size-4 shrink-0 text-muted-foreground"
-            aria-hidden="true"
-          />
+          <Span className="flex shrink-0 items-center gap-2">
+            {counts?.[alias] !== undefined && (
+              <Span className="rounded-full bg-muted px-2 py-0.5 text-xs font-medium tabular-nums text-muted-foreground">
+                {number.format(counts[alias])}
+              </Span>
+            )}
+            <ChevronRight
+              className="size-4 shrink-0 text-muted-foreground"
+              aria-hidden="true"
+            />
+          </Span>
         </Button>
       ))}
     </Div>
@@ -260,6 +286,7 @@ export function PlatformAdminCatalog({
   landing,
   contextualActionAlias,
   landings,
+  counts,
   query,
   overview,
   homeSummary,
@@ -357,13 +384,13 @@ export function PlatformAdminCatalog({
                     : title}
               </H1>
               {searching && !loading && !error && matchedCount > 0 && (
-                <P className="flex flex-wrap items-baseline gap-x-2 break-words text-sm text-muted-foreground">
+                <P className="break-words text-sm text-muted-foreground">
                   {matchedCount === 1
-                    ? t("aiTools.modal.searchResultOne")
-                    : t("aiTools.modal.searchResultMany", {
+                    ? t("admin.resultsForOne", { query: query.trim() })
+                    : t("admin.resultsFor", {
                         count: matchedCount,
+                        query: query.trim(),
                       })}
-                  <Span className="font-medium text-foreground">{query}</Span>
                 </P>
               )}
               {isHome && (
@@ -388,13 +415,10 @@ export function PlatformAdminCatalog({
                   className="h-auto min-h-10 max-w-full whitespace-normal text-start"
                   onClick={() => onOpenTool(action.alias)}
                 >
-                  {action.title}
-                  {action === actions[0] && (
-                    <ArrowRight
-                      className="size-4 shrink-0"
-                      aria-hidden="true"
-                    />
+                  {!landing?.contextualActions && (
+                    <Plus className="size-4 shrink-0" aria-hidden="true" />
                   )}
+                  {action.title}
                 </Button>
               ))}
             </Div>
@@ -506,6 +530,8 @@ export function PlatformAdminCatalog({
                 </H2>
                 <LandingLinks
                   links={otherDestinations}
+                  counts={counts}
+                  locale={locale}
                   onOpenTool={onOpenTool}
                 />
               </Div>
@@ -531,6 +557,7 @@ export function PlatformAdminCatalog({
                     <AccordionContent>
                       <LandingLinks
                         links={landing.automations}
+                        locale={locale}
                         onOpenTool={onOpenTool}
                       />
                       {landing.automationCount > landing.automations.length && (
@@ -618,19 +645,53 @@ export function PlatformAdminCatalog({
               <ToolGrid tools={tools} t={t} onOpenTool={onOpenTool} />
             )
           ) : (
-            <EmptyBlock
-              icon={<Search className="size-6" />}
-              title={t(
-                searching ? "aiTools.modal.searchNoResults" : "catalog.noTools",
+            <Div className="flex min-w-0 flex-col gap-6">
+              <EmptyBlock
+                className="rounded-xl border bg-card py-8"
+                icon={<Search className="size-6" />}
+                title={t(
+                  searching
+                    ? "aiTools.modal.searchNoResults"
+                    : "catalog.noTools",
+                )}
+                message={
+                  searching ? t("catalog.noMatches", { query }) : undefined
+                }
+                action={{
+                  label: t("catalog.allTools"),
+                  onClick: () => onAllTools(activeCategory),
+                }}
+              />
+              {searching && !activeCategory && summariesByGroup.length > 0 && (
+                <Div className="flex min-w-0 flex-col gap-3">
+                  <H2 className="border-0 text-sm font-semibold text-muted-foreground">
+                    {t("admin.jumpTo")}
+                  </H2>
+                  <Div className="flex flex-wrap gap-2">
+                    {summariesByGroup
+                      .flatMap(({ categories }) => categories.slice(0, 2))
+                      .map(({ name, label, metadata }) => (
+                        <Button
+                          key={name}
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          className="h-auto min-h-9 gap-2 whitespace-normal bg-card text-start"
+                          onClick={() => onSelectCategory(name)}
+                        >
+                          {metadata?.icon && (
+                            <Icon
+                              icon={metadata.icon}
+                              className="size-4 shrink-0 text-muted-foreground"
+                            />
+                          )}
+                          {label}
+                        </Button>
+                      ))}
+                  </Div>
+                </Div>
               )}
-              message={
-                searching ? t("catalog.noMatches", { query }) : undefined
-              }
-              action={{
-                label: t("catalog.allTools"),
-                onClick: () => onAllTools(activeCategory),
-              }}
-            />
+            </Div>
           )}
           {totalPages > 1 && (
             <Div className="flex flex-wrap items-center justify-end gap-2">

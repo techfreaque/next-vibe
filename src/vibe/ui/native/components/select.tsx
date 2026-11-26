@@ -122,6 +122,8 @@ export function SelectTrigger({
   style,
   children,
   disabled,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Web-only focus ref (form error focus), extracted so it is not spread onto the native trigger
+  ref: _ref,
   ...props
 }: SelectTriggerProps): React.JSX.Element {
   const nativeStyle: ViewStyle | undefined = style

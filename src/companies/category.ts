@@ -39,7 +39,20 @@ export const category: CategoryDefinition = {
   order: 35,
   createActions: ["companies_create_POST"],
   landing: {
-    actions: ["companies-list", "companies_create_POST"],
+    destinations: ["companies-list"],
+    actions: ["companies_create_POST"],
+    destinationDescriptions: {
+      "companies-list": {
+        "en-US": "Switch between companies and edit their details.",
+        "en-GLOBAL": "Switch between companies and edit their details.",
+        "de-DE": "Zwischen Unternehmen wechseln und Stammdaten bearbeiten.",
+        "pl-PL": "Przełączaj firmy i edytuj ich dane.",
+        "fr-FR": "Passez d’une entreprise à l’autre et modifiez leurs données.",
+        "it-IT": "Passi da un’azienda all’altra e ne modifichi i dati.",
+        "es-ES": "Cambie de empresa y edite sus datos.",
+        "sk-SK": "Prepínajte medzi spoločnosťami a upravujte ich údaje.",
+      },
+    },
   },
   defaultEntry: {
     [UserPermissionRole.ADMIN]: COMPANIES_LIST_ALIAS,

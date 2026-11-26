@@ -28,6 +28,8 @@ export const translations: typeof enTranslations = {
       "Revise la captación, los ingresos y el estado de los servicios de los últimos 30 días.",
     unavailable: "Sin datos",
     recent: "Actividad reciente",
+    recentPayments: "Pagos recientes",
+    emptyPayments: "No hay pagos en los últimos 30 días.",
   },
   category: "Analítica",
   tags: {
@@ -132,6 +134,8 @@ export const translations: typeof enTranslations = {
         payouts: "{{count}} solicitudes de pago pendientes ({{amount}})",
         tasks: "{{count}} tareas programadas fallan",
         connections: "{{count}} conexiones remotas con problemas",
+        failedPayments: "Pagos fallidos en los últimos 30 días: {{count}}",
+        disputes: "Disputas de pago abiertas: {{count}}",
         costCoverage:
           "Coste de proveedores conocido solo para {{coverage}} del uso de IA, margen parcial",
         unattributed:

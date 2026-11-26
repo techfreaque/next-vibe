@@ -6,10 +6,10 @@ export const translations = {
   title: "Operations overview",
   description:
     "Review unresolved errors, failing scheduled tasks and connected instance health.",
-  errors: "Unresolved errors",
+  errors: "Unresolved error classes",
   tasks: "Failing tasks",
   connections: "Unhealthy connections",
-  errorAlert: "Unresolved error groups ({{count}})",
+  errorAlert: "Unresolved error classes, warnings excluded ({{count}})",
   taskAlert: "Failing scheduled tasks ({{count}})",
   connectionAlert: "Connections needing attention ({{count}})",
   attention: "Needs attention",

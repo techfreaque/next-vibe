@@ -6,7 +6,7 @@ export const translations: typeof enTranslations = {
     emails: "Emails",
   },
   title: "Lista de correo electrónico",
-  titleShort: "Lista de correo electrónico",
+  titleShort: "Registro de correos",
   description:
     "Recuperar una lista de correos electrónicos con filtro y paginación",
   container: {

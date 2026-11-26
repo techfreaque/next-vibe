@@ -10,11 +10,11 @@ export const translations = {
       addHint: "Takes effect on the user's next request.",
     },
     post: {
-      title: "Add User Role",
-      titleShort: "Add Role",
+      title: "Add user role",
+      titleShort: "Add role",
       description: "Grant a role to a specific user account",
       container: {
-        title: "Add Role",
+        title: "Add role",
         description: "Select a role to grant to this user",
       },
       id: {
@@ -28,17 +28,17 @@ export const translations = {
         placeholder: "Select a role...",
       },
       submit: {
-        label: "Add Role",
+        label: "Add role",
       },
       response: {
         roleId: {
-          content: "Role Assignment ID",
+          content: "Role assignment ID",
         },
         userId: {
           content: "User ID",
         },
         assignedRole: {
-          content: "Assigned Role",
+          content: "Assigned role",
         },
       },
       errors: {
@@ -47,51 +47,51 @@ export const translations = {
           description: "You must be logged in to manage user roles",
         },
         validation: {
-          title: "Validation Failed",
+          title: "Validation failed",
           description: "Please provide a valid user ID and role",
         },
         forbidden: {
-          title: "Access Forbidden",
+          title: "Access forbidden",
           description: "Only administrators can manage user roles",
         },
         notFound: {
-          title: "User Not Found",
+          title: "User not found",
           description: "The specified user could not be found",
           detail: "No user found with ID {{userId}}.",
         },
         conflict: {
-          title: "Role Already Assigned",
+          title: "Role already assigned",
           description: "This user already has the specified role",
         },
         network: {
-          title: "Network Error",
+          title: "Network error",
           description: "Unable to connect to the server",
         },
         unsavedChanges: {
-          title: "Unsaved Changes",
+          title: "Unsaved changes",
           description: "You have unsaved changes that will be lost",
         },
         server: {
-          title: "Server Error",
+          title: "Server error",
           description: "Unable to add role due to server error",
           detail: "Could not grant the {{role}} role to user {{userId}}.",
         },
         unknown: {
-          title: "Unknown Error",
+          title: "Unknown error",
           description: "An unexpected error occurred while adding the role",
         },
       },
       success: {
-        title: "Role Added",
+        title: "Role added",
         description: "The role has been successfully granted to the user",
       },
     },
     delete: {
-      title: "Remove User Role",
-      titleShort: "Remove Role",
+      title: "Remove user role",
+      titleShort: "Remove role",
       description: "Revoke a role from a specific user account",
       container: {
-        title: "Remove Role",
+        title: "Remove role",
         description: "Select a role to revoke from this user",
       },
       id: {
@@ -105,11 +105,11 @@ export const translations = {
         placeholder: "Select a role...",
       },
       submit: {
-        label: "Remove Role",
+        label: "Remove role",
       },
       response: {
         success: {
-          content: "Role Removed",
+          content: "Role removed",
         },
       },
       errors: {
@@ -118,42 +118,42 @@ export const translations = {
           description: "You must be logged in to manage user roles",
         },
         validation: {
-          title: "Validation Failed",
+          title: "Validation failed",
           description: "Please provide a valid user ID and role",
         },
         forbidden: {
-          title: "Access Forbidden",
+          title: "Access forbidden",
           description: "Only administrators can manage user roles",
         },
         notFound: {
-          title: "User Not Found",
+          title: "User not found",
           description: "The specified user could not be found",
           detail: "No user found with ID {{userId}}.",
         },
         conflict: {
-          title: "Conflict Error",
+          title: "Conflict error",
           description: "Unable to remove role due to existing dependencies",
         },
         network: {
-          title: "Network Error",
+          title: "Network error",
           description: "Unable to connect to the server",
         },
         unsavedChanges: {
-          title: "Unsaved Changes",
+          title: "Unsaved changes",
           description: "You have unsaved changes that will be lost",
         },
         server: {
-          title: "Server Error",
+          title: "Server error",
           description: "Unable to remove role due to server error",
           detail: "Could not remove the {{role}} role from user {{userId}}.",
         },
         unknown: {
-          title: "Unknown Error",
+          title: "Unknown error",
           description: "An unexpected error occurred while removing the role",
         },
       },
       success: {
-        title: "Role Removed",
+        title: "Role removed",
         description: "The role has been successfully revoked from the user",
       },
     },
@@ -162,17 +162,17 @@ export const translations = {
     userRole: {
       public: "Public",
       customer: "Customer",
-      partnerAdmin: "Partner Admin",
-      partnerEmployee: "Partner Employee",
+      partnerAdmin: "Partner admin",
+      partnerEmployee: "Partner employee",
       admin: "Admin",
-      cliOff: "CLI Disabled",
-      cliAuthBypass: "CLI Auth Bypass",
-      aiToolOff: "AI Tool Disabled",
-      webOff: "Web Disabled",
-      mcpOff: "MCP Disabled",
-      mcpVisible: "MCP Visible",
-      productionOff: "Production Disabled",
-      skillOff: "Skill Disabled",
+      cliOff: "CLI disabled",
+      cliAuthBypass: "CLI auth bypass",
+      aiToolOff: "AI tool disabled",
+      webOff: "Web disabled",
+      mcpOff: "MCP disabled",
+      mcpVisible: "MCP visible",
+      productionOff: "Production disabled",
+      skillOff: "Skill disabled",
     },
   },
 };

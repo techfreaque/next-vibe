@@ -10,7 +10,7 @@ export const translations: typeof enTranslations = {
       description: "Solo abbonamenti con questo piano",
     },
     title: "Abbonamenti",
-    titleShort: "Elenco dei membri",
+    titleShort: "Abbonamenti",
     description: "Sfoglia tutti gli abbonamenti",
     form: {
       title: "Gestione dell'abbonamento",

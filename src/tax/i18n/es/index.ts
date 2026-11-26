@@ -122,7 +122,7 @@ export const translations: typeof enTranslations = {
         labelActive: "Activa",
         labelInactive: "Inactivo",
         labelEdit: "Editar",
-        labelDelete: "Eliminar",
+        labelDelete: "Desactivar",
         labelCompound: "Compuesto",
         empty:
           "No hay tasas de impuestos configuradas. Agregue su primera tasa para empezar.",
@@ -160,6 +160,7 @@ export const translations: typeof enTranslations = {
         rates: "Tasas impositivas",
         rate: {
           id: "ID",
+          company: "Empresa",
           name: "Nombre",
           code: "Código",
           type: "Tipo",
@@ -223,7 +224,12 @@ export const translations: typeof enTranslations = {
       widget: {
         save: "Guardar tipo impositivo",
         backToList: "Volver a Tasas Fiscales",
-        failed: "Failed",
+        failed: "No se guardó el tipo",
+        subtitle: "{{company}} · {{code}}",
+        notFoundTitle: "Este tipo impositivo ya no existe",
+        notFoundMessage:
+          "Se eliminó o pertenece a una empresa a la que no tienes acceso. Elige un tipo de la lista.",
+        loadErrorTitle: "No se pudo cargar el tipo impositivo",
       },
       rateId: {
         label: "Tasa de impuestos ID",
@@ -373,7 +379,8 @@ export const translations: typeof enTranslations = {
       retry: "Volver a cargar el informe",
       scope:
         "Las facturas de venta usan la fecha del asiento asociado o la fecha de creación. Las compras usan la fecha de la factura. Las ventas en caja usan su fecha de cierre (UTC) e incluyen las líneas con un tipo positivo o un importe de impuesto registrado. Si una factura emitida comparte el asiento, representa esa venta.",
-      empty: "Ninguna línea de documento coincide con estos filtros.",
+      empty:
+        "Aquí aparecen las facturas emitidas, notas de crédito, facturas de compra y ventas en caja con impuestos, agrupadas por tipo.",
       range: "Del {{from}} al {{to}}",
       total: "Total",
       previousMonth: "Ver el mes anterior",
@@ -383,6 +390,23 @@ export const translations: typeof enTranslations = {
       scopeHint:
         "Compara el IVA de ventas y compras por tipo impositivo para una empresa y un periodo.",
       selectCompany: "Selecciona la empresa para este informe.",
+      subtitle: "{{company}} · del {{from}} al {{to}}",
+      errorTitle: "No se pudo cargar el informe de impuestos",
+      emptyTitle: "No hay documentos con impuestos en este periodo",
+      period: {
+        label: "Periodo",
+        thisMonth: "Este mes",
+        lastMonth: "Mes pasado",
+        thisQuarter: "Este trimestre",
+        thisYear: "Este año",
+        custom: "Personalizado",
+      },
+      kpi: {
+        salesTax: "IVA repercutido",
+        salesBase: "Ventas sujetas",
+        purchaseTax: "IVA soportado",
+        purchaseBase: "Compras sujetas",
+      },
     },
     currency: {
       label: "Moneda",

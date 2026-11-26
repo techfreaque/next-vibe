@@ -4,7 +4,7 @@ export const translations = {
       label: "Credits left",
     },
     title: "Credit packs",
-    titleShort: "Admin Purchases",
+    titleShort: "Credit pack sales",
     description: "Credit pack purchase history",
     form: {
       title: "Purchase History",

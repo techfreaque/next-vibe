@@ -25,6 +25,7 @@ import { Div } from "next-vibe/ui/components/div";
 import {
   FormField,
   FormItem,
+  FormLabel,
   FormMessage,
 } from "next-vibe/ui/components/form/form";
 import { Span } from "next-vibe/ui/components/span";
@@ -33,6 +34,7 @@ import { type JSX, useEffect, useState } from "react";
 import { getPreferredToolName } from "../../../../core/core-utils/path";
 import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
 import type { WidgetData } from "../../../../core/utils/json";
+import { cn } from "../../../_shared/cn";
 import type { ReactFormFieldProps } from "../../../_shared/react-types";
 import type { StringWidgetSchema } from "../../../_shared/schema-constraints";
 import type { FieldUsageConfig } from "../../../_shared/types";
@@ -44,6 +46,10 @@ import {
   useWidgetNavigation,
 } from "../../../_shared/use-widget-context";
 import { scopedTranslation as unifiedInterfaceScopedTranslation } from "../../../hooks/i18n";
+import { getTheme } from "../_shared/constants";
+import { useFormFieldDescriptionStyle } from "../_shared/description-style";
+import { FieldInfoTooltip } from "../_shared/field-info-tooltip";
+import { pickerButtonLabel, pickerFieldLabel } from "./label";
 import type { EntityPickerFieldWidgetConfig } from "./types";
 
 /**
@@ -72,17 +78,23 @@ export function EntityPickerFieldWidget<
 >({
   field,
   fieldName,
+  showLabel = true,
 }: ReactFormFieldProps<
   TEndpoint,
   TUsage,
   EntityPickerFieldWidgetConfig<TKey, TSchema, TUsage>
->): JSX.Element | null {
+> & {
+  /** False when the surrounding layout already renders the field label. */
+  showLabel?: boolean;
+}): JSX.Element | null {
   const form = useWidgetForm<CreateApiEndpointAny>();
   const navigation = useWidgetNavigation();
   const isMcp = useIsMcp();
   const locale = useWidgetLocale();
   const { t: widgetT } = unifiedInterfaceScopedTranslation.scopedT(locale);
   const { t: tField } = useWidgetContext();
+  const theme = getTheme(field.theme);
+  const descriptionStyle = useFormFieldDescriptionStyle(theme.descriptionStyle);
 
   const currentValue = form?.watch(fieldName);
   const isFilled =
@@ -168,7 +180,10 @@ export function EntityPickerFieldWidget<
     });
   };
 
-  const resolvedLabel = field.label ? tField(field.label) : fieldName;
+  // A picker selects by name, so "Company ID" reads as "Company".
+  const resolvedLabel = pickerFieldLabel(
+    field.label ? tField(field.label) : fieldName,
+  );
   const listToolName = resolvedEndpoint
     ? getPreferredToolName(resolvedEndpoint)
     : "";
@@ -228,7 +243,7 @@ export function EntityPickerFieldWidget<
       {/* eslint-disable-next-line i18n/no-literal-string */}
       <Span className="text-base leading-none opacity-50">+</Span>
       {widgetT("widgets.formFields.entityPicker.selectLabel", {
-        label: resolvedLabel,
+        label: pickerButtonLabel(resolvedLabel, locale),
       })}
     </Button>
   );
@@ -236,6 +251,7 @@ export function EntityPickerFieldWidget<
   if (!form) {
     return control;
   }
+  const isRequired = !field.schema.isOptional();
 
   // FormItem registers the field like every other input: a validation error
   // (required id never picked) renders under the picker instead of vanishing.
@@ -244,7 +260,25 @@ export function EntityPickerFieldWidget<
       control={form.control}
       name={name}
       render={() => (
-        <FormItem>
+        <FormItem
+          className={cn("flex min-w-0 flex-col gap-2", field.className)}
+        >
+          {showLabel && field.label && (
+            <Div className="flex flex-row items-center gap-1.5">
+              <FormLabel className="flex items-center gap-1.5 text-sm font-medium">
+                <Span>{resolvedLabel}</Span>
+                {theme.style === "asterisk" && isRequired && (
+                  <Span className="text-info font-bold">*</Span>
+                )}
+              </FormLabel>
+              {field.description && descriptionStyle === "tooltip" && (
+                <FieldInfoTooltip
+                  text={tField(field.description)}
+                  label={resolvedLabel}
+                />
+              )}
+            </Div>
+          )}
           {control}
           <FormMessage t={tField} />
         </FormItem>
@@ -381,7 +415,9 @@ export function EntityPickerField<TValue extends WidgetData>({
     >
       {/* eslint-disable-next-line i18n/no-literal-string */}
       <Span className="text-base leading-none opacity-50">+</Span>
-      {widgetT("widgets.formFields.entityPicker.selectLabel", { label })}
+      {widgetT("widgets.formFields.entityPicker.selectLabel", {
+        label: pickerButtonLabel(pickerFieldLabel(label), locale),
+      })}
     </Button>
   );
 }

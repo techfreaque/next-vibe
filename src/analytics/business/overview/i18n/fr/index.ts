@@ -28,6 +28,8 @@ export const translations: typeof enTranslations = {
       "Consultez l’acquisition, les revenus et l’état des services sur les 30 derniers jours.",
     unavailable: "Indisponible",
     recent: "Activité récente",
+    recentPayments: "Derniers paiements",
+    emptyPayments: "Aucun paiement sur les 30 derniers jours.",
   },
   category: "Analytique",
   tags: {
@@ -131,6 +133,9 @@ export const translations: typeof enTranslations = {
         payouts: "{{count}} demandes de paiement en attente ({{amount}})",
         tasks: "{{count}} tâches planifiées en échec",
         connections: "{{count}} connexions distantes en défaut",
+        failedPayments:
+          "Paiements échoués sur les 30 derniers jours : {{count}}",
+        disputes: "Litiges de paiement ouverts : {{count}}",
         costCoverage:
           "Coût fournisseurs connu pour seulement {{coverage}} de l'usage IA, marge partielle",
         unattributed: "{{share}} des revenus sans source connue ({{amount}})",

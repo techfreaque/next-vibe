@@ -43,7 +43,8 @@ describe("Shared field description tooltips", () => {
           },
           {
             alias: "outreach-contact-upsert",
-            inputType: "datetime-local",
+            // Localized date text input ("26 Nov 2026"); the time sits beside it.
+            inputType: "text",
             label: outreachT("contact.post.fields.at.label"),
             description: outreachT("contact.post.fields.at.description"),
           },

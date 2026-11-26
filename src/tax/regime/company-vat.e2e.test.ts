@@ -353,19 +353,18 @@ describe("Company VAT election and first accounting documents", () => {
         },
       );
       const { t } = scopedTranslation.scopedT(E2E_LOCALE);
-      const review = page
-        .getByRole("button", { name: t("view"), exact: true })
-        .last();
-      await gotoReady(
-        "/tools/company-tax-regime-view?arg.companyId=" + companyId,
-        () => review.waitFor({ timeout: 18000 }),
-      );
       const loaded = page.waitForResponse(
         (r) =>
           r.request().method() === "GET" &&
           new URL(r.url()).pathname.endsWith("/tax/regime"),
       );
-      await review.click();
+      const regimeName = page
+        .getByText(t(CompanyTaxRegime.DE_SMALL_BUSINESS), { exact: true })
+        .last();
+      await gotoReady(
+        "/tools/company-tax-regime-view?arg.companyId=" + companyId,
+        () => regimeName.waitFor({ timeout: 18000 }),
+      );
       expect((await loaded).ok()).toBe(true);
       await page
         .getByText(notice, { exact: true })

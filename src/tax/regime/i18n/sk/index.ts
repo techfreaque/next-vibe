@@ -59,4 +59,22 @@ export const translations: typeof enTranslations = {
     "Služby zo zahraničia posúďte s daňovým poradcom. Prenesenie daňovej povinnosti sa môže vzťahovať aj na malý podnik oslobodený od DPH.",
   saleConflict:
     "Vyčíslená DPH je v rozpore s oslobodením firmy. Pred vystavením faktúry skontrolujte jej položky.",
+  choose: "Vyberte režim DPH",
+  back: "Späť",
+  appliesOn: "Režim DPH k {{date}}",
+  invoiceText: "Text na faktúrach",
+  savedTitle: "{{regime}} platí od {{date}}",
+  pickCompany: {
+    title: "Vyberte spoločnosť",
+    message:
+      "Pozrite si, aké pravidlá DPH platia pre jej faktúry k ľubovoľnému dňu.",
+  },
+  hints: {
+    standard:
+      "Faktúry uplatňujú DPH podľa sadzieb spoločnosti. DPH z nákupov je odpočítateľná.",
+    german: "Faktúry bez DPH, s odkazom na oslobodenie podľa § 19 UStG.",
+    austrian:
+      "Faktúry bez DPH, s odkazom na rakúsky režim malých podnikateľov.",
+    slovak: "Faktúry bez DPH, pretože podnik nie je registrovaný pre DPH.",
+  },
 };

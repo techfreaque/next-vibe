@@ -66,4 +66,23 @@ export const translations: typeof enTranslations = {
     "Consultez votre conseil fiscal pour les prestations étrangères. L’autoliquidation peut s’appliquer même en cas de franchise.",
   saleConflict:
     "La TVA facturée est incompatible avec la franchise. Vérifiez les lignes avant d’émettre la facture.",
+  choose: "Choisir le régime de TVA",
+  back: "Retour",
+  appliesOn: "Régime de TVA au {{date}}",
+  invoiceText: "Mention sur les factures",
+  savedTitle: "{{regime}} s’applique à partir du {{date}}",
+  pickCompany: {
+    title: "Choisissez une entreprise",
+    message:
+      "Voyez quelles règles de TVA s’appliquent à ses factures à une date donnée.",
+  },
+  hints: {
+    standard:
+      "Les factures appliquent la TVA aux taux de l’entreprise. La TVA sur achats est déductible.",
+    german: "Factures sans TVA, avec la mention d’exonération du § 19 UStG.",
+    austrian:
+      "Factures sans TVA, avec la mention de la franchise autrichienne des petites entreprises.",
+    slovak:
+      "Factures sans TVA, car l’entreprise n’est pas immatriculée à la TVA.",
+  },
 };

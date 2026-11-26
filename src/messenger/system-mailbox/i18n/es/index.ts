@@ -67,7 +67,7 @@ export const translations: typeof enTranslations = {
 
   inbox: {
     title: "Plataforma Inbox",
-    titleShort: "Bandeja de entrada",
+    titleShort: "Buzón de la plataforma",
     description: "Lista de mensajes recientes INBOX del buzón de la plataforma",
     container: {
       title: "Plataforma Inbox",

@@ -5,7 +5,7 @@ export const translations: typeof enTranslations = {
       label: "Credits übrig",
     },
     title: "Credit-Pakete",
-    titleShort: "Admin-Käufe",
+    titleShort: "Verkaufte Credit-Pakete",
     description: "Kaufhistorie der Credit-Pakete",
     form: {
       title: "Kaufhistorie",

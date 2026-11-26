@@ -23,6 +23,9 @@ export const translations: typeof enTranslations = {
     pinned: "Angeheftete Werkzeuge",
     categoryTools: "Werkzeuge in diesem Bereich",
     results: "Suchergebnisse",
+    resultsForOne: "1 Treffer für „{{query}}“",
+    resultsFor: "{{count}} Treffer für „{{query}}“",
+    jumpTo: "Oder einen Arbeitsbereich öffnen",
     tool: "Werkzeug",
   },
   erp: {
@@ -138,6 +141,7 @@ export const translations: typeof enTranslations = {
     page: "Seite {{page}} von {{total}}",
     openSidebar: "Tool-Seitenleiste öffnen",
     browse: "Tools durchsuchen",
+    backHome: "Zur Admin-Startseite",
     toolUnavailableHint:
       "Der Link ist möglicherweise veraltet oder Ihre Rolle hat keinen Zugriff. Öffnen Sie die Übersicht Ihrer verfügbaren Werkzeuge.",
     openError: "Das Werkzeug konnte nicht geöffnet werden",

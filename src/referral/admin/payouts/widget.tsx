@@ -5,13 +5,36 @@ import {
   formatCurrency,
   formatDate,
 } from "next-vibe/core/i18n/core/localization-utils";
+import { isAgentPlatform, isCliPlatform } from "next-vibe/platforms/platforms";
 import { Alert } from "next-vibe/ui/components/alert";
-import { KpiGrid, KpiTile } from "next-vibe/ui/components/analytics";
 import { Button } from "next-vibe/ui/components/button";
 import { DetailField, DetailGrid } from "next-vibe/ui/components/detail-grid";
 import { Div } from "next-vibe/ui/components/div";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "next-vibe/ui/components/dropdown-menu";
 import { EmptyBlock } from "next-vibe/ui/components/empty-block";
+import { AlertTriangle } from "next-vibe/ui/components/icons/AlertTriangle";
+import { Check } from "next-vibe/ui/components/icons/Check";
+import { Copy } from "next-vibe/ui/components/icons/Copy";
+import { MoreHorizontal } from "next-vibe/ui/components/icons/MoreHorizontal";
+import { RefreshCw } from "next-vibe/ui/components/icons/RefreshCw";
+import { Search } from "next-vibe/ui/components/icons/Search";
+import { Wallet } from "next-vibe/ui/components/icons/Wallet";
+import { Input } from "next-vibe/ui/components/input";
 import { LoadingBlock } from "next-vibe/ui/components/loading-block";
+import { RecordTable } from "next-vibe/ui/components/record-table";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "next-vibe/ui/components/select";
 import { Span } from "next-vibe/ui/components/span";
 import {
   StatusPill,
@@ -19,18 +42,20 @@ import {
 } from "next-vibe/ui/components/status-pill";
 import { WidgetHeader } from "next-vibe/ui/components/widget-header";
 import { WidgetShell } from "next-vibe/ui/components/widget-shell";
+import { copyToClipboard } from "next-vibe/ui/lib/clipboard";
 import {
-  RelatedEntitiesPanel,
-  type RelatedEntityItem,
-  useRelatedEntityNavigation,
-} from "next-vibe/unified-ui/_shared/related-entities";
+  formatDocDate,
+  formatMoney,
+} from "next-vibe/unified-ui/_shared/format-money";
+import { useRelatedEntityNavigation } from "next-vibe/unified-ui/_shared/related-entities";
 import {
   useWidgetEndpointMutations,
   useWidgetForm,
   useWidgetIsInteractive,
   useWidgetLocale,
   useWidgetLogger,
-  useWidgetOnSubmit,
+  useWidgetNavigation,
+  useWidgetPlatform,
   useWidgetResponse,
   useWidgetResponseOnly,
   useWidgetTranslation,
@@ -43,22 +68,36 @@ import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-f
 import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/navigate-button/widget";
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
-import { type JSX, useMemo } from "react";
+import { type JSX, useMemo, useState } from "react";
 
 import {
   PayoutCurrency,
+  PayoutCurrencyDB,
   PayoutStatus,
   PayoutStatusDB,
   type PayoutStatusValue,
 } from "../../enum";
 import type { ReferralT } from "../../i18n";
 import {
+  type adminPayoutActions,
   canDocumentReferralPayout,
   getAdminPayoutActions,
 } from "../../payout-actions";
 import definitions, { type AdminPayoutsGetResponseOutput } from "./definition";
 
 type Payout = AdminPayoutsGetResponseOutput["items"][number];
+
+/** Work queue order: what needs a decision first, finished states last. */
+const TAB_ORDER = [
+  PayoutStatus.PENDING,
+  PayoutStatus.APPROVED,
+  PayoutStatus.PROCESSING,
+  PayoutStatus.FAILED,
+  PayoutStatus.COMPLETED,
+  PayoutStatus.REJECTED,
+] as const;
+
+const ALL_METHODS = "__all_payout_methods";
 
 const statusVariants: Record<typeof PayoutStatusValue, StatusPillVariant> = {
   [PayoutStatus.PENDING]: "warning",
@@ -73,6 +112,12 @@ const actionLabels = {
   approve: "admin.payouts.widget.approve",
   reject: "admin.payouts.widget.reject",
   complete: "admin.payouts.widget.complete",
+} as const;
+
+const actionTitles = {
+  approve: "admin.payouts.widget.confirmApprove",
+  reject: "admin.payouts.widget.confirmReject",
+  complete: "admin.payouts.widget.confirmComplete",
 } as const;
 
 const actionDescriptions = {
@@ -130,6 +175,80 @@ function formatPayoutValue(
   });
 }
 
+/** First 6 and last 4 characters: enough to match a wallet or reference by eye. */
+function maskValue(value: string): string {
+  return value.length > 14 ? `${value.slice(0, 6)}…${value.slice(-4)}` : value;
+}
+
+function CopyValue({
+  value,
+  label,
+  copyLabel,
+  copiedLabel,
+}: {
+  value: string;
+  label: string;
+  copyLabel: string;
+  copiedLabel: string;
+}): JSX.Element {
+  const [copied, setCopied] = useState(false);
+  const platform = useWidgetPlatform();
+  const logger = useWidgetLogger();
+  if (isCliPlatform(platform) || isAgentPlatform(platform)) {
+    return (
+      <Span className="font-mono text-xs">
+        {label}: {value}
+      </Span>
+    );
+  }
+  return (
+    <Div className="flex min-w-0 flex-col gap-0.5">
+      <Span className="text-xs text-muted-foreground">{label}</Span>
+      <Div className="flex min-w-0 items-center gap-1">
+        <Span className="font-mono text-xs" title={value}>
+          {maskValue(value)}
+        </Span>
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          className="size-7 text-muted-foreground"
+          aria-label={`${copyLabel}: ${label}`}
+          title={copied ? copiedLabel : copyLabel}
+          onClick={(event) => {
+            event.stopPropagation();
+            void copyToClipboard(value, logger).then((ok) => {
+              setCopied(ok);
+              if (ok) {
+                setTimeout(() => setCopied(false), 1500);
+              }
+              return ok;
+            });
+          }}
+        >
+          {copied ? (
+            <Check className="size-3.5 text-success" />
+          ) : (
+            <Copy className="size-3.5" />
+          )}
+        </Button>
+      </Div>
+    </Div>
+  );
+}
+
+type PayoutFlag = "over" | "duplicate" | null;
+
+function flagOf(item: Payout): PayoutFlag {
+  if (isOpenStatus(item.status) && item.partner.freeCents < 0) {
+    return "over";
+  }
+  if (item.duplicateCount > 0 && isOpenStatus(item.status)) {
+    return "duplicate";
+  }
+  return null;
+}
+
 export function AdminPayoutsContainer({
   field: { children },
 }: {
@@ -141,28 +260,48 @@ export function AdminPayoutsContainer({
   const locale = useWidgetLocale();
   const response = useWidgetResponse();
   const navigate = useRelatedEntityNavigation();
-  const onSubmit = useWidgetOnSubmit();
   const interactive = useWidgetIsInteractive();
   const responseOnly = useWidgetResponseOnly();
+  const platform = useWidgetPlatform();
+  const isText = isCliPlatform(platform) || isAgentPlatform(platform);
   const { read } = useWidgetEndpointMutations() ?? {};
   const isFetching = read?.isFetching ?? false;
-  const canFilter = interactive && !responseOnly && Boolean(onSubmit);
+  const canAct = interactive && !responseOnly;
+  const [openId, setOpenId] = useState<string | null>(null);
   const userId = form?.watch("userId");
   const activeStatus = form?.watch("status");
-  const requestId = form?.watch("requestId");
+  const activeCurrency = form?.watch("currency");
+  const search = form?.watch("search") ?? "";
   const page = data?.resultPage ?? 1;
-  const pageCount = data
-    ? Math.max(1, Math.ceil(data.totalCount / data.pageSize))
-    : 1;
+  const pageSize = data?.pageSize ?? form?.watch("limit") ?? 20;
+  const totalCount = data?.totalCount ?? 0;
+  const pageCount = Math.max(1, Math.ceil(totalCount / pageSize));
+  const hasError = response?.success === false;
+  const filtered = Boolean(search || activeCurrency || activeStatus);
 
-  function goToPage(nextPage: number): void {
-    form.setValue("page", nextPage);
-    onSubmit?.();
+  function setFilter(
+    key: "status" | "currency",
+    value: string | undefined,
+  ): void {
+    form.setValue("page", 1);
+    if (key === "status") {
+      form.setValue(
+        "status",
+        PayoutStatusDB.find((status) => status === value),
+      );
+    } else {
+      form.setValue(
+        "currency",
+        PayoutCurrencyDB.find((currency) => currency === value),
+      );
+    }
   }
 
   function clearFilters(): void {
-    form.reset({ userId, requestId, page: 1, limit: data?.pageSize ?? 20 });
-    onSubmit?.();
+    form.setValue("page", 1);
+    form.setValue("search", undefined);
+    form.setValue("status", undefined);
+    form.setValue("currency", undefined);
   }
 
   const firstOpenIds = new Set<string>();
@@ -174,395 +313,682 @@ export function AdminPayoutsContainer({
     }
   }
 
-  function buildRow(item: Payout): RelatedEntityItem {
-    const overCommitted =
-      isOpenStatus(item.status) && item.partner.freeCents < 0;
-    const firstOpenOfPartner = firstOpenIds.has(item.id);
-    const nextStep = nextStepKey(item);
-    const badges = (
+  function money(cents: number): string {
+    return formatMoney(cents / 100, "USD", locale);
+  }
+
+  function openAction(
+    item: Payout,
+    action: (typeof adminPayoutActions)[number],
+  ): void {
+    navigate(() => Promise.resolve(definitions.POST), {
+      data: { requestId: item.id, action },
+      renderInModal: true,
+      popNavigationOnSuccess: 1,
+    });
+  }
+
+  function openPartner(item: Payout): void {
+    navigate(
+      () =>
+        import("@/users/view/definition").then((module) => module.default.GET),
+      { data: { userId: item.userId } },
+    );
+  }
+
+  function openCodeReport(code: string): void {
+    navigate(
+      () => import("../code/definition").then((module) => module.default.GET),
+      { data: { code } },
+    );
+  }
+
+  function prepareBill(item: Payout): void {
+    navigate(
+      async () =>
+        (await import("@/finance/supplier-evidence/definition")).default.POST,
+      {
+        data: {
+          operation: "referral",
+          externalReference: item.id,
+          dryRun: true,
+        },
+      },
+    );
+  }
+
+  function statusPill(item: Payout): JSX.Element {
+    return (
       <StatusPill
         status={t(item.status)}
         variant={statusVariants[item.status]}
       />
     );
-    const meta = (
-      <Div className="flex w-full min-w-0 flex-col gap-2 text-sm">
-        <Span className="text-lg font-bold tabular-nums text-foreground">
-          {t("admin.payouts.widget.headline", {
-            value: formatCurrency(item.amountCents / 100, "USD", locale),
-            currency: t(item.currency),
-          })}
-        </Span>
-        <Span className="text-xs text-muted-foreground">
-          {t("admin.payouts.widget.creditsLine", {
-            credits: item.amountCents.toLocaleString(locale.split("-")[0]),
-          })}
-        </Span>
-        <Div className="grid min-w-0 gap-1 @sm:grid-cols-2">
-          <Span>
-            {t("admin.payouts.widget.requestedAt", {
-              date: formatDate(new Date(item.createdAt), locale, "PP p"),
+  }
+
+  function flagLine(item: Payout): JSX.Element | null {
+    const flag = flagOf(item);
+    if (!flag) {
+      return null;
+    }
+    return (
+      <Span className="inline-flex items-center gap-1 text-xs font-medium text-destructive">
+        <AlertTriangle className="size-3.5 shrink-0" />
+        {flag === "over"
+          ? t("admin.payouts.widget.flagOver")
+          : t("admin.payouts.widget.flagDuplicate", {
+              count: item.duplicateCount,
+            })}
+      </Span>
+    );
+  }
+
+  function rowActions(item: Payout): JSX.Element | null {
+    if (!canAct) {
+      return null;
+    }
+    const actions = getAdminPayoutActions(item);
+    const primary = actions.find((action) => action !== "reject");
+    const canReject = actions.includes("reject");
+    const overCommitted =
+      isOpenStatus(item.status) && item.partner.freeCents < 0;
+    return (
+      <Div className="flex items-center justify-end gap-1">
+        {primary && (
+          <Button
+            type="button"
+            size="sm"
+            variant={overCommitted ? "outline" : "default"}
+            className="h-8"
+            aria-label={t("admin.payouts.widget.actionFor", {
+              action: t(actionLabels[primary]),
+              email: item.userEmail,
+            })}
+            onClick={(event) => {
+              event.stopPropagation();
+              openAction(item, primary);
+            }}
+          >
+            {primary === "approve" && overCommitted
+              ? t("admin.payouts.widget.approveOverBalance")
+              : t(actionLabels[primary])}
+          </Button>
+        )}
+        {!primary && canReject && (
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            className="h-8"
+            aria-label={t("admin.payouts.widget.actionFor", {
+              action: t(actionLabels.reject),
+              email: item.userEmail,
+            })}
+            onClick={(event) => {
+              event.stopPropagation();
+              openAction(item, "reject");
+            }}
+          >
+            {t(actionLabels.reject)}
+          </Button>
+        )}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="size-8 text-muted-foreground"
+              aria-label={t("admin.payouts.widget.moreFor", {
+                email: item.userEmail,
+              })}
+              onClick={(event) => event.stopPropagation()}
+            >
+              <MoreHorizontal className="size-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="min-w-48" stopPropagation>
+            <DropdownMenuItem onSelect={() => openPartner(item)}>
+              {t("admin.payouts.widget.openPartner")}
+            </DropdownMenuItem>
+            {item.partnerCodes[0] && (
+              <DropdownMenuItem
+                onSelect={() => openCodeReport(item.partnerCodes[0] ?? "")}
+              >
+                {t("admin.payouts.widget.codeReport")}
+              </DropdownMenuItem>
+            )}
+            {canDocumentReferralPayout(item) && (
+              <DropdownMenuItem onSelect={() => prepareBill(item)}>
+                {t("admin.payouts.widget.prepareBill")}
+              </DropdownMenuItem>
+            )}
+            {primary && canReject && (
+              <>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  className="text-destructive focus:text-destructive"
+                  onSelect={() => openAction(item, "reject")}
+                >
+                  {t("admin.payouts.widget.rejectEllipsis")}
+                </DropdownMenuItem>
+              </>
+            )}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </Div>
+    );
+  }
+
+  function details(item: Payout): JSX.Element {
+    const nextStep = nextStepKey(item);
+    const overCommitted =
+      isOpenStatus(item.status) && item.partner.freeCents < 0;
+    const firstOpenOfPartner = firstOpenIds.has(item.id);
+    return (
+      <Div className="flex min-w-0 flex-col gap-3 text-sm">
+        {overCommitted && (
+          <Span className="font-medium text-destructive">
+            {!firstOpenOfPartner
+              ? t("admin.payouts.widget.overBalanceShort")
+              : item.partner.openCount > 1
+                ? t("admin.payouts.widget.overBalance", {
+                    count: item.partner.openCount,
+                    open: money(item.partner.openCents),
+                    available: money(item.partner.availableCents),
+                  })
+                : t("admin.payouts.widget.overBalanceSingle", {
+                    amount: money(item.amountCents),
+                    available: money(item.partner.availableCents),
+                  })}
+          </Span>
+        )}
+        {item.duplicateCount > 0 && isOpenStatus(item.status) && (
+          <Span className="font-medium text-destructive">
+            {t("admin.payouts.widget.possibleDuplicate", {
+              count: item.duplicateCount,
             })}
           </Span>
-          {item.processedAt && (
-            <Span>
-              {t("admin.payouts.widget.processedAt", {
-                date: formatDate(new Date(item.processedAt), locale, "PP p"),
-              })}
-            </Span>
-          )}
-        </Div>
-        <Div className="grid min-w-0 gap-3 @md:grid-cols-2">
-          <Div className="flex min-w-0 flex-col gap-1">
-            <Span
-              className={
-                item.partner.freeCents < 0
-                  ? "font-semibold text-destructive"
-                  : "font-semibold text-foreground"
-              }
-            >
-              {t("admin.payouts.widget.freeLine", {
-                free: formatCurrency(
-                  item.partner.freeCents / 100,
-                  "USD",
-                  locale,
-                ),
-              })}
-            </Span>
-            {overCommitted && firstOpenOfPartner && (
-              <Span className="font-medium text-destructive">
-                {item.partner.openCount > 1
-                  ? t("admin.payouts.widget.overBalance", {
-                      count: item.partner.openCount,
-                      open: formatCurrency(
-                        item.partner.openCents / 100,
-                        "USD",
-                        locale,
-                      ),
-                      available: formatCurrency(
-                        item.partner.availableCents / 100,
-                        "USD",
-                        locale,
-                      ),
-                    })
-                  : t("admin.payouts.widget.overBalanceSingle", {
-                      amount: formatCurrency(
-                        item.amountCents / 100,
-                        "USD",
-                        locale,
-                      ),
-                      available: formatCurrency(
-                        item.partner.availableCents / 100,
-                        "USD",
-                        locale,
-                      ),
-                    })}
+        )}
+        {nextStep && (
+          <Span className="text-muted-foreground">{t(nextStep)}</Span>
+        )}
+        <DetailGrid columns={3}>
+          <DetailField
+            label={t("admin.payouts.widget.freeLabel")}
+            value={
+              <Span
+                className={
+                  item.partner.freeCents < 0
+                    ? "tabular-nums text-destructive"
+                    : "tabular-nums"
+                }
+              >
+                {money(item.partner.freeCents)}
               </Span>
-            )}
-            {overCommitted && !firstOpenOfPartner && (
-              <Span className="font-medium text-destructive">
-                {t("admin.payouts.widget.overBalanceShort")}
-              </Span>
-            )}
-            {item.duplicateCount > 0 && firstOpenOfPartner && (
-              <Span className="font-medium text-destructive">
-                {t("admin.payouts.widget.possibleDuplicate", {
-                  count: item.duplicateCount,
-                })}
-              </Span>
-            )}
-            {item.rejectionReason && (
-              <Span className="break-words">
-                {t("admin.payouts.widget.rejectionReason", {
-                  reason: item.rejectionReason,
-                })}
-              </Span>
-            )}
-            {item.adminNotes && (
-              <Span className="break-words">
-                {t("admin.payouts.widget.adminNotes", {
-                  notes: item.adminNotes,
-                })}
-              </Span>
-            )}
-            <Span className="text-muted-foreground">
-              {t("admin.payouts.widget.partnerContext", {
-                confirmed: formatCurrency(
-                  item.partner.confirmedCents / 100,
-                  "USD",
-                  locale,
-                ),
-                pending: formatCurrency(
-                  item.partner.pendingCents / 100,
-                  "USD",
-                  locale,
-                ),
-                paid: formatCurrency(
-                  item.partner.paidOutCents / 100,
-                  "USD",
-                  locale,
-                ),
-              })}
-            </Span>
-            <Span className="text-muted-foreground">
-              {item.partnerCodes.length > 0
-                ? t("admin.payouts.widget.partnerCodes", {
+            }
+          />
+          <DetailField
+            label={t("admin.payouts.widget.earnedLabel")}
+            value={t("admin.payouts.widget.earnedValue", {
+              confirmed: money(item.partner.confirmedCents),
+              pending: money(item.partner.pendingCents),
+            })}
+          />
+          <DetailField
+            label={t("admin.payouts.widget.paidLabel")}
+            value={money(item.partner.paidOutCents)}
+          />
+          <DetailField
+            label={t("admin.payouts.widget.codesLabel")}
+            value={
+              item.partnerCodes.length > 0
+                ? t("admin.payouts.widget.codesValue", {
                     codes: item.partnerCodes.join(", "),
                     referred: item.partner.referredUsers,
                   })
                 : t("admin.payouts.widget.partnerNoCodes", {
                     referred: item.partner.referredUsers,
-                  })}
-            </Span>
-          </Div>
-          <Div className="flex min-w-0 flex-col gap-1 text-xs text-muted-foreground">
-            {item.walletAddress && (
-              <Span className="block break-all font-mono">
-                {item.walletAddress}
-              </Span>
-            )}
-            <Span className="block break-all font-mono">{item.id}</Span>
-          </Div>
-        </Div>
-        {nextStep && (
-          <Span className="text-muted-foreground">{t(nextStep)}</Span>
-        )}
-        {canFilter && (
-          <Div className="flex flex-wrap gap-2">
-            {getAdminPayoutActions(item).map((action) => (
-              <Button
-                key={action}
-                type="button"
-                size="sm"
-                variant={
-                  action === "reject" || (action === "approve" && overCommitted)
-                    ? "outline"
-                    : "default"
-                }
-                aria-label={t("admin.payouts.widget.actionFor", {
-                  action: t(actionLabels[action]),
-                  email: item.userEmail,
-                })}
-                onClick={() =>
-                  navigate(() => Promise.resolve(definitions.POST), {
-                    data: { requestId: item.id, action },
-                    renderInModal: true,
-                    popNavigationOnSuccess: 1,
                   })
-                }
-              >
-                {action === "approve" && overCommitted
-                  ? t("admin.payouts.widget.approveOverBalance")
-                  : t(actionLabels[action])}
-              </Button>
-            ))}
-            <Button
-              type="button"
-              size="sm"
-              variant="ghost"
-              aria-label={t("admin.payouts.widget.openPartnerFor", {
-                email: item.userEmail,
-              })}
-              onClick={() =>
-                navigate(
-                  () =>
-                    import("@/users/view/definition").then(
-                      (module) => module.default.GET,
-                    ),
-                  { data: { userId: item.userId } },
-                )
-              }
-            >
-              {t("admin.payouts.widget.openPartner")}
-            </Button>
-            {canDocumentReferralPayout(item) && (
-              <Button
-                type="button"
-                size="sm"
-                variant="outline"
-                onClick={() =>
-                  navigate(
-                    async () =>
-                      (await import("@/finance/supplier-evidence/definition"))
-                        .default.POST,
-                    {
-                      data: {
-                        operation: "referral",
-                        externalReference: item.id,
-                        dryRun: true,
-                      },
-                    },
-                  )
-                }
-              >
-                {t("admin.payouts.widget.prepareBill")}
-              </Button>
-            )}
-            {item.partnerCodes[0] && (
-              <Button
-                type="button"
-                size="sm"
-                variant="ghost"
-                onClick={() =>
-                  navigate(
-                    () =>
-                      import("../code/definition").then(
-                        (module) => module.default.GET,
-                      ),
-                    { data: { code: item.partnerCodes[0] } },
-                  )
-                }
-              >
-                {t("admin.payouts.widget.codeReport")}
-              </Button>
-            )}
-          </Div>
-        )}
+            }
+          />
+          <DetailField
+            label={t("admin.payouts.widget.valueLabel")}
+            value={formatPayoutValue(item, locale, t)}
+          />
+          {item.processedAt && (
+            <DetailField
+              label={t("admin.payouts.widget.updatedLabel")}
+              value={formatDate(new Date(item.processedAt), locale, "PP p")}
+            />
+          )}
+          {item.rejectionReason && (
+            <DetailField
+              label={t("admin.payouts.fields.rejectionReason.label")}
+              value={item.rejectionReason}
+            />
+          )}
+          {item.adminNotes && (
+            <DetailField
+              label={t("admin.payouts.fields.adminNotes.label")}
+              value={item.adminNotes}
+            />
+          )}
+          {item.walletAddress && (
+            <CopyValue
+              value={item.walletAddress}
+              label={t("payout.fields.walletAddress.label")}
+              copyLabel={t("admin.payouts.widget.copy")}
+              copiedLabel={t("admin.payouts.widget.copied")}
+            />
+          )}
+          <CopyValue
+            value={item.id}
+            label={t("admin.payouts.widget.reference")}
+            copyLabel={t("admin.payouts.widget.copy")}
+            copiedLabel={t("admin.payouts.widget.copied")}
+          />
+        </DetailGrid>
       </Div>
     );
-    return {
-      id: item.id,
-      title: item.partnerName
-        ? `${item.partnerName} · ${item.userEmail}`
-        : item.userEmail,
-      badges,
-      meta,
-    };
   }
 
-  return (
-    <WidgetShell className="gap-4">
-      {canFilter && (
-        <>
-          <WidgetHeader
-            title={t("admin.payouts.get.title")}
-            backButton={<NavigateButtonWidget field={children.backButton} />}
-          />
-          {userId && (
-            <Div className="flex flex-col gap-1">
-              <Span className="text-sm font-medium">
-                {t("admin.payouts.fields.userId.label")}
+  const items = data?.items ?? [];
+  const columns = [
+    { id: "partner", label: t("admin.payouts.widget.col.partner") },
+    { id: "requested", label: t("admin.payouts.widget.col.requested") },
+    { id: "method", label: t("admin.payouts.widget.col.method") },
+    { id: "status", label: t("admin.payouts.widget.col.status") },
+    {
+      id: "amount",
+      label: t("admin.payouts.widget.col.amount"),
+      numeric: true,
+    },
+    ...(canAct
+      ? [{ id: "actions", label: t("admin.payouts.widget.col.actions") }]
+      : []),
+  ];
+  function partnerCell(item: Payout): JSX.Element {
+    return (
+      <Div className="flex min-w-0 flex-col">
+        <Span className="truncate font-medium">
+          {item.partnerName ?? item.userEmail}
+        </Span>
+        {item.partnerName && (
+          <Span className="truncate text-xs text-muted-foreground">
+            {item.userEmail}
+          </Span>
+        )}
+        {flagLine(item)}
+      </Div>
+    );
+  }
+
+  function dateCell(item: Payout): JSX.Element {
+    return (
+      <Span className="whitespace-nowrap text-muted-foreground">
+        {formatDocDate(item.createdAt, locale)}
+      </Span>
+    );
+  }
+
+  function methodCell(item: Payout): JSX.Element {
+    return <Span className="whitespace-nowrap">{t(item.currency)}</Span>;
+  }
+
+  function amountCell(item: Payout): JSX.Element {
+    return <Span className="font-semibold">{money(item.amountCents)}</Span>;
+  }
+
+  const rows = items.map((item) => ({
+    id: item.id,
+    onOpen: (): void => setOpenId(openId === item.id ? null : item.id),
+    expanded: openId === item.id ? details(item) : undefined,
+    cells: {
+      partner: partnerCell(item),
+      requested: dateCell(item),
+      method: methodCell(item),
+      status: statusPill(item),
+      amount: amountCell(item),
+      actions: rowActions(item),
+    },
+  }));
+
+  const compact = (
+    <Div className="flex min-w-0 flex-col gap-2">
+      {items.map((item) => (
+        <Div
+          key={item.id}
+          className="flex min-w-0 flex-col gap-2 rounded-lg border bg-card p-3"
+        >
+          <Div className="flex min-w-0 items-start justify-between gap-3">
+            <Div className="flex min-w-0 flex-col">
+              <Span className="truncate text-sm font-semibold">
+                {item.partnerName ?? item.userEmail}
               </Span>
-              <Span className="break-all text-xs text-muted-foreground">
-                {data?.items[0]?.userEmail ?? userId}
+              <Span className="truncate text-xs text-muted-foreground">
+                {t("admin.payouts.widget.compactMeta", {
+                  method: t(item.currency),
+                  date: formatDocDate(item.createdAt, locale),
+                })}
+                {isText ? ` · ${money(item.amountCents)}` : ""}
               </Span>
             </Div>
-          )}
-          <Div className="grid min-w-0 gap-3 @sm:grid-cols-3">
-            <TextFieldWidget fieldName="search" field={children.search} />
-            <SelectFieldWidget fieldName="status" field={children.status} />
-            <SelectFieldWidget fieldName="currency" field={children.currency} />
+            <Div className="flex shrink-0 flex-col items-end gap-1">
+              {!isText && (
+                <Span className="text-sm font-semibold tabular-nums">
+                  {money(item.amountCents)}
+                </Span>
+              )}
+              {statusPill(item)}
+            </Div>
           </Div>
-          <Div className="flex flex-wrap items-center gap-2">
-            <Button
-              type="submit"
-              size="sm"
-              disabled={isFetching}
-              onClick={() => form.setValue("page", 1)}
-            >
-              {t("admin.payouts.widget.apply")}
-            </Button>
+          {flagLine(item)}
+          {(isText || openId === item.id) && details(item)}
+          {canAct && (
+            <Div className="flex items-center justify-between gap-2">
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="h-9 px-2 text-muted-foreground"
+                aria-expanded={openId === item.id}
+                onClick={() => setOpenId(openId === item.id ? null : item.id)}
+              >
+                {openId === item.id
+                  ? t("admin.payouts.widget.hideDetails")
+                  : t("admin.payouts.widget.showDetails")}
+              </Button>
+              {rowActions(item)}
+            </Div>
+          )}
+        </Div>
+      ))}
+    </Div>
+  );
+
+  const allCount = (data?.summary ?? []).reduce(
+    (sum, row) => sum + row.count,
+    0,
+  );
+  const tabs: { value: typeof PayoutStatusValue | undefined; count: number }[] =
+    [
+      { value: undefined, count: allCount },
+      ...TAB_ORDER.map((status) => ({
+        value: status,
+        count: summaryByStatus(data?.summary ?? [], status).count,
+      })),
+    ];
+  const from = totalCount === 0 ? 0 : (page - 1) * pageSize + 1;
+  const to = Math.min(totalCount, page * pageSize);
+  const scopedEmail = userId ? (items[0]?.userEmail ?? null) : null;
+
+  return (
+    <WidgetShell layout="page" className="min-w-0">
+      <WidgetHeader
+        size="page"
+        title={t("admin.payouts.get.title")}
+        subtitle={t("admin.payouts.widget.subtitle")}
+        backButton={
+          canAct ? (
+            <NavigateButtonWidget field={children.backButton} />
+          ) : undefined
+        }
+        actions={
+          canAct ? (
             <Button
               type="button"
-              size="sm"
               variant="outline"
-              disabled={isFetching}
-              onClick={clearFilters}
-            >
-              {t("admin.payouts.widget.clear")}
-            </Button>
-            <Button
-              type="button"
               size="sm"
-              variant="ghost"
+              className="gap-1.5"
+              aria-label={t("admin.payouts.widget.refresh")}
               disabled={isFetching}
               onClick={() => {
                 void read?.refetch();
               }}
             >
-              {t("admin.payouts.widget.refresh")}
+              <RefreshCw
+                className={isFetching ? "size-4 animate-spin" : "size-4"}
+              />
+              <Span className="hidden @sm:inline">
+                {t("admin.payouts.widget.refresh")}
+              </Span>
             </Button>
-          </Div>
-        </>
+          ) : undefined
+        }
+      />
+      {userId && (
+        <Div className="flex flex-wrap items-center gap-2 rounded-md border bg-muted/30 px-3 py-2 text-sm">
+          <Span className="min-w-0 [overflow-wrap:anywhere]">
+            {t("admin.payouts.widget.partnerScope", {
+              email: scopedEmail ?? t("admin.payouts.fields.userId.label"),
+            })}
+          </Span>
+          {canAct && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="ms-auto h-8"
+              onClick={() => {
+                form.setValue("page", 1);
+                form.setValue("userId", undefined);
+              }}
+            >
+              {t("admin.payouts.widget.showAllPartners")}
+            </Button>
+          )}
+        </Div>
       )}
       <FormAlertWidget field={{}} />
-      {data && (
-        <KpiGrid columns={6}>
-          {PayoutStatusDB.map((status) => {
-            const row = summaryByStatus(data.summary, status);
-            return (
-              <KpiTile
-                key={status}
-                label={t(status)}
-                value={row.count}
-                hint={formatCurrency(row.amountCents / 100, "USD", locale)}
-                tone={
-                  status === PayoutStatus.PENDING && row.count > 0
-                    ? "warning"
-                    : status === PayoutStatus.FAILED && row.count > 0
-                      ? "negative"
-                      : "default"
-                }
-                locale={locale}
-                onClick={
-                  canFilter
-                    ? () => {
-                        form.setValue(
-                          "status",
-                          activeStatus === status ? undefined : status,
-                        );
-                        form.setValue("page", 1);
-                        onSubmit?.();
-                      }
-                    : undefined
-                }
-              />
-            );
-          })}
-        </KpiGrid>
-      )}
-      {((!data && !response) || isFetching) && (
-        <LoadingBlock message={t("admin.payouts.widget.loading")} size="sm" />
-      )}
-      {data && response?.success !== false && !isFetching && (
-        <>
-          <RelatedEntitiesPanel
-            title={t("admin.payouts.widget.results", {
-              count: data.totalCount,
+      <Div className="flex min-w-0 flex-col gap-3">
+        {data && (
+          <Div
+            role="tablist" // oxlint-disable-line jsx-a11y/prefer-tag-over-role -- Shared UI has no cross-platform tablist component.
+            ariaLabel={t("admin.payouts.fields.status.label")}
+            className="-mx-1 flex min-w-0 gap-1 overflow-x-auto px-1 pb-1"
+          >
+            {tabs.map(({ value, count }) => {
+              const selected = activeStatus === value;
+              const alert =
+                count > 0 &&
+                (value === PayoutStatus.PENDING ||
+                  value === PayoutStatus.FAILED);
+              return (
+                <Button
+                  key={value ?? "all"}
+                  type="button"
+                  size="sm"
+                  role="tab"
+                  aria-selected={selected}
+                  variant={selected ? "secondary" : "ghost"}
+                  className="h-9 shrink-0 gap-1.5"
+                  disabled={!canAct}
+                  onClick={() => setFilter("status", value)}
+                >
+                  {value ? t(value) : t("admin.payouts.widget.tabAll")}
+                  <Span
+                    className={
+                      alert
+                        ? value === PayoutStatus.FAILED
+                          ? "rounded-full bg-destructive/10 px-1.5 text-xs tabular-nums text-destructive"
+                          : "rounded-full bg-warning/15 px-1.5 text-xs tabular-nums text-warning"
+                        : "rounded-full bg-muted px-1.5 text-xs tabular-nums text-muted-foreground"
+                    }
+                  >
+                    {count.toLocaleString(locale)}
+                  </Span>
+                </Button>
+              );
             })}
-            emptyTitle={t("admin.payouts.widget.empty")}
-            emptyMessage={t("admin.payouts.widget.emptyHint")}
-            items={data.items.map(buildRow)}
-          />
-          <Div className="flex flex-wrap items-center gap-2">
-            {canFilter && page > 1 && (
+          </Div>
+        )}
+        {canAct && (
+          <Div className="flex min-w-0 flex-wrap items-center gap-2">
+            <Div className="relative min-w-0 flex-1 basis-56 @md:max-w-sm">
+              <Search className="pointer-events-none absolute start-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                type="text"
+                name="search"
+                className="h-9 ps-8"
+                aria-label={t("admin.payouts.fields.search.label")}
+                placeholder={t("admin.payouts.widget.searchPlaceholder")}
+                value={search}
+                onChangeText={(value) => {
+                  form.setValue("page", 1);
+                  form.setValue("search", value || undefined);
+                }}
+              />
+            </Div>
+            <Select
+              value={activeCurrency ?? ALL_METHODS}
+              onValueChange={(value) =>
+                setFilter("currency", value === ALL_METHODS ? undefined : value)
+              }
+            >
+              <SelectTrigger
+                className={
+                  activeCurrency
+                    ? "h-9 w-auto min-w-36 border-primary"
+                    : "h-9 w-auto min-w-36"
+                }
+                aria-label={t("admin.payouts.fields.currency.label")}
+              >
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={ALL_METHODS}>
+                  {t("admin.payouts.fields.currency.all")}
+                </SelectItem>
+                {PayoutCurrencyDB.map((currency) => (
+                  <SelectItem key={currency} value={currency}>
+                    {t(currency)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {filtered && (
               <Button
                 type="button"
+                variant="ghost"
                 size="sm"
-                variant="outline"
-                onClick={() => goToPage(page - 1)}
+                className="h-9"
+                onClick={clearFilters}
               >
-                {t("admin.payouts.widget.previous")}
+                {t("admin.payouts.widget.clear")}
               </Button>
             )}
-            {(page > 1 || pageCount > 1) && (
-              <Span className="text-sm tabular-nums text-muted-foreground">
-                {t("admin.payouts.widget.page", { page, total: pageCount })}
+            {data && (
+              <Span
+                aria-live="polite"
+                className="ms-auto text-sm tabular-nums text-muted-foreground"
+              >
+                {t("admin.payouts.widget.results", {
+                  count: totalCount.toLocaleString(locale),
+                })}
               </Span>
             )}
-            {canFilter && page < pageCount && (
-              <Button
-                type="button"
-                size="sm"
-                variant="outline"
-                onClick={() => goToPage(page + 1)}
-              >
-                {t("admin.payouts.widget.next")}
-              </Button>
+          </Div>
+        )}
+        {hasError && (
+          <EmptyBlock
+            icon={<AlertTriangle className="size-6" />}
+            title={t("admin.payouts.widget.loadFailed")}
+            message={response?.message}
+            action={
+              canAct
+                ? {
+                    label: t("admin.payouts.widget.retry"),
+                    onClick: () => {
+                      void read?.refetch();
+                    },
+                  }
+                : undefined
+            }
+          />
+        )}
+        {!data && !hasError && (
+          <LoadingBlock message={t("admin.payouts.widget.loading")} size="sm" />
+        )}
+        {data && !hasError && items.length === 0 && (
+          <EmptyBlock
+            icon={<Wallet className="size-6" />}
+            title={
+              filtered
+                ? t("admin.payouts.widget.empty")
+                : t("admin.payouts.widget.emptyAll")
+            }
+            message={
+              filtered
+                ? t("admin.payouts.widget.emptyHint")
+                : t("admin.payouts.widget.emptyAllHint")
+            }
+            action={
+              canAct && filtered
+                ? {
+                    label: t("admin.payouts.widget.clear"),
+                    onClick: clearFilters,
+                  }
+                : undefined
+            }
+          />
+        )}
+        {data && !hasError && items.length > 0 && (
+          <Div
+            className={
+              isFetching
+                ? "min-w-0 opacity-60 transition-opacity"
+                : "min-w-0 transition-opacity"
+            }
+          >
+            <RecordTable
+              label={t("admin.payouts.get.title")}
+              columns={columns}
+              rows={rows}
+              compact={compact}
+            />
+          </Div>
+        )}
+        {data && !hasError && totalCount > 0 && (
+          <Div className="flex flex-wrap items-center justify-between gap-2 pt-1">
+            <Span className="text-sm tabular-nums text-muted-foreground">
+              {t("admin.payouts.widget.showing", {
+                from: from.toLocaleString(locale),
+                to: to.toLocaleString(locale),
+                total: totalCount.toLocaleString(locale),
+              })}
+            </Span>
+            {canAct && pageCount > 1 && (
+              <Div className="flex items-center gap-2">
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  disabled={page <= 1 || isFetching}
+                  onClick={() => form.setValue("page", page - 1)}
+                >
+                  {t("admin.payouts.widget.previous")}
+                </Button>
+                <Span className="text-sm tabular-nums text-muted-foreground">
+                  {t("admin.payouts.widget.page", {
+                    page,
+                    total: pageCount,
+                  })}
+                </Span>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  disabled={page >= pageCount || isFetching}
+                  onClick={() => form.setValue("page", page + 1)}
+                >
+                  {t("admin.payouts.widget.next")}
+                </Button>
+              </Div>
             )}
           </Div>
-        </>
-      )}
+        )}
+      </Div>
     </WidgetShell>
   );
 }
@@ -609,23 +1035,34 @@ export function PayoutActionContainer({
   const allowed =
     !read.isFetching && Boolean(action && allowedActions.includes(action));
 
+  const { pop, canGoBack } = useWidgetNavigation();
+  const headerTitle =
+    payout && action && allowedActions.includes(action)
+      ? t(actionTitles[action])
+      : t("admin.payouts.post.title");
+
   return (
     <WidgetShell className="gap-4">
       {!responseOnly && (
         <>
           <WidgetHeader
-            title={t("admin.payouts.post.title")}
+            title={headerTitle}
             backButton={<NavigateButtonWidget field={children.backButton} />}
           />
-          <Div
-            onKeyDown={(event) => {
-              if (event.key === "Enter") {
-                event.preventDefault();
-              }
-            }}
-          >
-            <TextFieldWidget fieldName="requestId" field={children.requestId} />
-          </Div>
+          {!payout && (
+            <Div
+              onKeyDown={(event) => {
+                if (event.key === "Enter") {
+                  event.preventDefault();
+                }
+              }}
+            >
+              <TextFieldWidget
+                fieldName="requestId"
+                field={children.requestId}
+              />
+            </Div>
+          )}
           {lookupId && read.isFetching && (
             <LoadingBlock message={t("admin.payouts.widget.loading")} />
           )}
@@ -644,8 +1081,8 @@ export function PayoutActionContainer({
           {payout && (
             <DetailGrid columns={2}>
               <DetailField
-                label={t("admin.payouts.fields.userId.label")}
-                value={payout.userEmail}
+                label={t("admin.payouts.widget.col.partner")}
+                value={payout.partnerName ?? payout.userEmail}
               />
               <DetailField
                 label={t("admin.payouts.widget.state")}
@@ -666,15 +1103,17 @@ export function PayoutActionContainer({
               />
               {payout.walletAddress && (
                 <DetailField
+                  className="@sm:col-span-2"
                   label={t("payout.fields.walletAddress.label")}
                   value={payout.walletAddress}
                   mono
                   copyable
+                  copyLabel={t("admin.payouts.widget.copy")}
                 />
               )}
             </DetailGrid>
           )}
-          {payout && allowedActions.length > 0 && (
+          {payout && allowedActions.length > 1 && (
             <SelectFieldWidget
               fieldName="action"
               field={{
@@ -708,9 +1147,18 @@ export function PayoutActionContainer({
                   field={children.adminNotes}
                 />
               )}
-              <SubmitButtonWidget<typeof definitions.POST>
-                field={children.submitButton}
-              />
+              <Div className="flex flex-wrap items-center justify-end gap-2">
+                {canGoBack && (
+                  <Button type="button" variant="ghost" onClick={() => pop()}>
+                    {t("admin.payouts.widget.cancel")}
+                  </Button>
+                )}
+                <SubmitButtonWidget<typeof definitions.POST>
+                  field={children.submitButton}
+                  label={action ? t(actionTitles[action]) : undefined}
+                  variant={action === "reject" ? "destructive" : "default"}
+                />
+              </Div>
             </>
           )}
         </>

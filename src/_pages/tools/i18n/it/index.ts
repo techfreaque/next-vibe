@@ -25,4 +25,11 @@ export const translations: typeof enTranslations = {
     requiresConfirmation: "richiede conferma",
     loadingTools: "Strumenti di caricamento...",
   },
+  loadError: {
+    title: "Impossibile caricare l’area admin",
+    message:
+      "Non è stato possibile verificare la sessione. Ricarica la pagina; se il problema continua, accedi di nuovo.",
+    reload: "Ricarica",
+    signIn: "Accedi",
+  },
 };

@@ -57,16 +57,16 @@ export function VendorCreateWidget({
 
   if (data !== undefined) {
     return (
-      <Div className="flex flex-col gap-4 p-4 rounded-lg border border-emerald-500/30 bg-emerald-500/5">
+      <Div className="flex flex-col gap-4 p-4 rounded-lg border border-success/30 bg-success/5">
         {/* Success header */}
         <Div className="flex items-start gap-3">
-          <Div className="h-10 w-10 rounded-full bg-emerald-500/15 flex items-center justify-center shrink-0 mt-0.5">
-            <Span className="text-emerald-600 dark:text-emerald-400 text-lg font-semibold">
+          <Div className="h-10 w-10 rounded-full bg-success/15 flex items-center justify-center shrink-0 mt-0.5">
+            <Span className="text-success text-lg font-semibold">
               {/* eslint-disable-next-line i18n/no-literal-string */}✓
             </Span>
           </Div>
           <Div>
-            <Span className="text-base font-semibold block text-emerald-700 dark:text-emerald-400">
+            <Span className="text-base font-semibold block text-success">
               {t("vendorCreate.post.success.title")}
             </Span>
             <Span className="text-sm text-muted-foreground block mt-0.5">
@@ -99,7 +99,7 @@ export function VendorCreateWidget({
           </Div>
           <Badge
             variant="default"
-            className="text-xs shrink-0 bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border-emerald-500/20"
+            className="text-xs shrink-0 bg-success/15 text-success border-success/20"
           >
             {t("vendorList.get.widget.active")}
           </Badge>

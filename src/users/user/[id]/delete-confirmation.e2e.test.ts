@@ -61,26 +61,28 @@ describe("User record deletion confirmation", () => {
       const dangerZone = page
         .getByText(t("id.widget.dangerZone"), { exact: true })
         .locator("xpath=../../..");
-      const open = dangerZone.getByRole("button", { name: t("id.delete.titleShort"), exact: true });
+      const open = dangerZone.getByRole("button", { name: t("id.widget.deleteAccount"), exact: true });
       const assertion = async (): Promise<void> => {
         await dangerZone.getByText(t("id.widget.deleteAccountHint", { name }), { exact: true }).waitFor();
         await open.scrollIntoViewIfNeeded();
       };
       await assertion();
       expect(await heading.locator("xpath=../../..").getByRole("button", {
-        name: t("id.delete.titleShort"), exact: true,
+        name: t("id.widget.deleteAccount"), exact: true,
       }).count()).toBe(0);
       if (process.env["USER_DELETE_SHOTS"] === "1") {
         await saveAdminViewMatrix(page, "usersDirectory", `user-delete-danger-${locale.slice(0, 2)}`, assertion);
       }
 
-      const confirm = page.getByRole("button", {
+      const dialog = page.getByRole("alertdialog");
+      const confirm = dialog.getByRole("button", {
         name: t("id.delete.submitButton.label"),
         exact: true,
-      }).and(page.locator('button[type="submit"]'));
-      const cancel = page.getByRole("button", { name: t("id.widget.cancelDeletion"), exact: true });
+      });
+      const cancel = dialog.getByRole("button", { name: t("id.widget.cancelDeletion"), exact: true });
       const confirmReady = async (): Promise<void> => {
-        await page.getByText(t("id.widget.confirmDeletionMessage"), { exact: true }).waitFor();
+        await dialog.getByRole("heading", { name: t("id.widget.deleteDialogTitle", { name }), exact: true }).waitFor();
+        await dialog.getByText(t("id.widget.confirmDeletionMessage"), { exact: true }).waitFor();
         await cancel.waitFor();
         await confirm.waitFor();
       };
@@ -90,8 +92,18 @@ describe("User record deletion confirmation", () => {
         await saveAdminViewMatrix(page, "usersDirectory", `user-delete-confirm-${locale.slice(0, 2)}`, confirmReady);
       }
       await cancel.click();
+      await dialog.waitFor({ state: "detached" });
       await heading.waitFor();
       await open.waitFor();
+      expect(deleteRequests).toBe(0);
+      expect(await findTarget()).toEqual([{ id }]);
+
+      // The header More menu opens the same confirmation; Escape keeps the account.
+      await page.getByRole("button", { name: t("id.widget.moreActions"), exact: true }).click();
+      await page.getByRole("menuitem", { name: t("id.widget.deleteAccount"), exact: true }).click();
+      await confirmReady();
+      await page.keyboard.press("Escape");
+      await dialog.waitFor({ state: "detached" });
       expect(deleteRequests).toBe(0);
       expect(await findTarget()).toEqual([{ id }]);
 

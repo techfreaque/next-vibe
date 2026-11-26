@@ -63,4 +63,22 @@ export const translations: typeof enTranslations = {
     "Consulta il commercialista per i servizi acquistati all’estero. L’inversione contabile può applicarsi anche alle piccole imprese esenti.",
   saleConflict:
     "L’IVA addebitata è incompatibile con l’esenzione. Verifica le voci prima di emettere la fattura.",
+  choose: "Scegli il regime IVA",
+  back: "Indietro",
+  appliesOn: "Regime IVA al {{date}}",
+  invoiceText: "Dicitura in fattura",
+  savedTitle: "{{regime}} si applica dal {{date}}",
+  pickCompany: {
+    title: "Scegli un’azienda",
+    message:
+      "Scopri quali regole IVA valgono per le sue fatture in una data qualsiasi.",
+  },
+  hints: {
+    standard:
+      "Le fatture applicano l’IVA alle aliquote dell’azienda. L’IVA sugli acquisti è detraibile.",
+    german: "Fatture senza IVA, con la dicitura di esenzione del § 19 UStG.",
+    austrian:
+      "Fatture senza IVA, con la dicitura del regime austriaco per piccole imprese.",
+    slovak: "Fatture senza IVA, perché l’impresa non è registrata ai fini IVA.",
+  },
 };

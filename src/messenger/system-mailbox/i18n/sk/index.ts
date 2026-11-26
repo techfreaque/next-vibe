@@ -68,7 +68,7 @@ export const translations: typeof enTranslations = {
 
   inbox: {
     title: "Doručená pošta platformy",
-    titleShort: "Doručená pošta",
+    titleShort: "Schránka platformy",
     description:
       "Zobraziť najnovšie správy v priečinku INBOX schránky platformy",
     container: {

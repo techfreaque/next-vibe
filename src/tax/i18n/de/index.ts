@@ -119,7 +119,7 @@ export const translations: typeof enTranslations = {
         labelActive: "Aktiv",
         labelInactive: "Inaktiv",
         labelEdit: "Bearbeiten",
-        labelDelete: "Löschen",
+        labelDelete: "Deaktivieren",
         labelCompound: "Zusammengesetzt",
         empty:
           "Keine Steuersätze konfiguriert. Legen Sie Ihren ersten Satz an.",
@@ -157,6 +157,7 @@ export const translations: typeof enTranslations = {
         rates: "Steuersätze",
         rate: {
           id: "ID",
+          company: "Unternehmen",
           name: "Name",
           code: "Kürzel",
           type: "Typ",
@@ -220,7 +221,12 @@ export const translations: typeof enTranslations = {
       widget: {
         save: "Steuersatz speichern",
         backToList: "Zurück zu Steuersätzen",
-        failed: "Fehlgeschlagen",
+        failed: "Steuersatz nicht gespeichert",
+        subtitle: "{{company}} · {{code}}",
+        notFoundTitle: "Diesen Steuersatz gibt es nicht mehr",
+        notFoundMessage:
+          "Er wurde gelöscht oder gehört zu einem Unternehmen, auf das Sie keinen Zugriff haben. Wählen Sie einen Satz aus der Liste.",
+        loadErrorTitle: "Steuersatz konnte nicht geladen werden",
       },
       rateId: {
         label: "Steuersatz-ID",
@@ -367,7 +373,8 @@ export const translations: typeof enTranslations = {
       retry: "Bericht erneut laden",
       scope:
         "Für Ausgangsrechnungen gilt das verknüpfte Buchungsdatum oder das Erstellungsdatum. Für Eingangsrechnungen gilt das Belegdatum. Kassenverkäufe zählen am Abschlusstag (UTC), wenn die Position einen positiven Steuersatz oder einen Steuerbetrag hat. Bei einem gemeinsamen Buchungssatz zählt die ausgestellte Rechnung.",
-      empty: "Keine Belegpositionen entsprechen diesen Filtern.",
+      empty:
+        "Hier erscheinen ausgestellte Rechnungen, Gutschriften, Eingangsrechnungen und Kassenverkäufe mit Steuer, gruppiert nach Steuersatz.",
       range: "{{from}} bis {{to}}",
       total: "Summe",
       previousMonth: "Vormonat anzeigen",
@@ -377,6 +384,23 @@ export const translations: typeof enTranslations = {
       scopeHint:
         "Vergleichen Sie die Steuer auf Verkäufe und Einkäufe nach Steuersatz für ein Unternehmen und einen Zeitraum.",
       selectCompany: "Wählen Sie das Unternehmen für diesen Bericht.",
+      subtitle: "{{company}} · {{from}} bis {{to}}",
+      errorTitle: "Steuerbericht konnte nicht geladen werden",
+      emptyTitle: "Keine besteuerten Belege in diesem Zeitraum",
+      period: {
+        label: "Zeitraum",
+        thisMonth: "Dieser Monat",
+        lastMonth: "Letzter Monat",
+        thisQuarter: "Dieses Quartal",
+        thisYear: "Dieses Jahr",
+        custom: "Eigener",
+      },
+      kpi: {
+        salesTax: "Steuer auf Verkäufe",
+        salesBase: "Steuerpflichtige Umsätze",
+        purchaseTax: "Vorsteuer",
+        purchaseBase: "Steuerpflichtige Einkäufe",
+      },
     },
     currency: {
       label: "Währung",

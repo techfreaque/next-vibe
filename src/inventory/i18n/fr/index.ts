@@ -931,6 +931,10 @@ export const translations: typeof enTranslations = {
       widget: {
         retry: "Réessayer",
         noItems: "Ce transfert ne contient aucun article.",
+        noItemsHint:
+          "Ajoutez les produits à déplacer lors de la création du transfert. Sans articles, il ne peut pas être expédié.",
+        receivedOf: "{{received}} sur {{requested}} reçus",
+        newTransfer: "Nouveau transfert",
         back: "Retour",
         dispatch: "Expédier le transfert",
         receive: "Marquer comme réceptionné",

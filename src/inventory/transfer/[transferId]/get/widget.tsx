@@ -3,6 +3,7 @@
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { EmptyBlock } from "next-vibe/ui/components/empty-block";
+import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
 import { RecordTable } from "next-vibe/ui/components/record-table";
 import { Span } from "next-vibe/ui/components/span";
 import { WidgetHeader } from "next-vibe/ui/components/widget-header";
@@ -49,9 +50,10 @@ export function InventoryTransferGetWidget(): JSX.Element {
       type="button"
       size="sm"
       variant="ghost"
-      className="self-start"
+      className="self-start gap-1.5 -ml-2"
       onClick={browse}
     >
+      <ChevronLeft className="size-4" aria-hidden="true" />
       {t("transferList.get.titleShort")}
     </Button>
   );
@@ -88,14 +90,44 @@ export function InventoryTransferGetWidget(): JSX.Element {
       numeric: true,
     },
   ];
-  const rows = items.map((item) => ({
-    id: item.id,
-    cells: {
-      product: item.productName,
-      requested: formatQuantity(item.quantityRequested, locale),
-      received: formatQuantity(item.quantityReceived, locale),
-    },
-  }));
+  const rows = items.map((item) => {
+    const product = <Span className="font-medium">{item.productName}</Span>;
+    const received = (
+      <Span
+        className={
+          item.quantityReceived > 0 ? undefined : "text-muted-foreground"
+        }
+      >
+        {formatQuantity(item.quantityReceived, locale)}
+      </Span>
+    );
+    return {
+      id: item.id,
+      cells: {
+        product,
+        requested: formatQuantity(item.quantityRequested, locale),
+        received,
+      },
+      receivedOf: t("transferGet.get.widget.receivedOf", {
+        received: formatQuantity(item.quantityReceived, locale),
+        requested: formatQuantity(item.quantityRequested, locale),
+      }),
+      name: item.productName,
+    };
+  });
+  const newTransfer = (): void => {
+    void import("../../create/definition").then(({ default: create }) =>
+      navigation.push(create.POST, {
+        data: result
+          ? {
+              companyId: result.companyId,
+              fromWarehouseId: result.fromWarehouseId,
+              toWarehouseId: result.toWarehouseId,
+            }
+          : undefined,
+      }),
+    );
+  };
   const facts = result
     ? [
         {
@@ -136,7 +168,12 @@ export function InventoryTransferGetWidget(): JSX.Element {
   return (
     <AdminRecordDetail
       title={result?.reference || t("transferGet.get.titleShort")}
-      breadcrumb={back}
+      subtitle={
+        result
+          ? `${result.fromWarehouseName} ${t("transferList.get.widget.arrowSeparator")} ${result.toWarehouseName}`
+          : undefined
+      }
+      backButton={back}
       facts={facts}
       status={
         result
@@ -146,18 +183,29 @@ export function InventoryTransferGetWidget(): JSX.Element {
             }
           : undefined
       }
-      actions={
-        interactive &&
-        editable &&
-        items.length > 0 && (
-          <Button type="button" onClick={move}>
-            {t(
-              result.status === "DRAFT"
-                ? "transferGet.get.widget.dispatch"
-                : "transferGet.get.widget.receive",
-            )}
-          </Button>
-        )
+      primaryAction={
+        interactive && editable && items.length > 0
+          ? {
+              key: "move",
+              label: t(
+                result.status === "DRAFT"
+                  ? "transferGet.get.widget.dispatch"
+                  : "transferGet.get.widget.receive",
+              ),
+              onClick: move,
+            }
+          : undefined
+      }
+      technicalDetails={
+        result
+          ? [
+              {
+                key: "id",
+                label: t("transferGet.get.response.id"),
+                value: result.id,
+              },
+            ]
+          : undefined
       }
       state={
         result
@@ -189,31 +237,49 @@ export function InventoryTransferGetWidget(): JSX.Element {
                 }
       }
     >
-      <WidgetHeader
-        title={t("transferGet.get.response.items")}
-        border={false}
-      />
-      {rows.length ? (
-        <RecordTable
-          columns={columns}
-          rows={rows}
-          label={t("transferGet.get.response.items")}
-          compact={
-            <Div className="divide-y rounded-lg border bg-card">
-              {rows.map(({ id, cells }) => (
-                <Div key={id} className="flex min-w-0 flex-col gap-1 px-3 py-2">
-                  <Span className="break-words font-medium">
-                    {cells.product}
-                  </Span>
-                  <Span className="text-sm tabular-nums text-muted-foreground">{`${t("transferGet.get.response.quantityRequested")} ${cells.requested} · ${t("transferGet.get.response.quantityReceived")} ${cells.received}`}</Span>
-                </Div>
-              ))}
-            </Div>
-          }
+      <Div className="flex min-w-0 flex-col gap-3">
+        <WidgetHeader
+          title={t("transferGet.get.response.items")}
+          border={false}
         />
-      ) : (
-        <EmptyBlock title={t("transferGet.get.widget.noItems")} />
-      )}
+        {rows.length ? (
+          <RecordTable
+            columns={columns}
+            rows={rows}
+            label={t("transferGet.get.response.items")}
+            compact={
+              <Div className="divide-y rounded-lg border bg-card">
+                {rows.map(({ id, name, receivedOf }) => (
+                  <Div
+                    key={id}
+                    className="flex min-w-0 items-baseline justify-between gap-3 px-3 py-2.5"
+                  >
+                    <Span className="min-w-0 break-words font-medium">
+                      {name}
+                    </Span>
+                    <Span className="shrink-0 text-sm tabular-nums text-muted-foreground">
+                      {receivedOf}
+                    </Span>
+                  </Div>
+                ))}
+              </Div>
+            }
+          />
+        ) : (
+          <EmptyBlock
+            title={t("transferGet.get.widget.noItems")}
+            message={t("transferGet.get.widget.noItemsHint")}
+            action={
+              interactive && result?.canManage
+                ? {
+                    label: t("transferGet.get.widget.newTransfer"),
+                    onClick: newTransfer,
+                  }
+                : undefined
+            }
+          />
+        )}
+      </Div>
     </AdminRecordDetail>
   );
 }

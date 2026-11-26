@@ -6,7 +6,7 @@ export const translations: typeof enTranslations = {
       label: "Zostávajúce kredity",
     },
     title: "Balíky kreditov",
-    titleShort: "Prehľad nákupov pre správcov",
+    titleShort: "Predaj balíkov kreditov",
     description: "História nákupov balíkov kreditov",
     form: {
       title: "História nákupov",

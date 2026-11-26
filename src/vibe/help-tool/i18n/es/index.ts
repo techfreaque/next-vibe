@@ -22,6 +22,9 @@ export const translations: typeof enTranslations = {
     pinned: "Herramientas fijadas",
     categoryTools: "Herramientas de esta área",
     results: "Resultados de búsqueda",
+    resultsForOne: "1 resultado para “{{query}}”",
+    resultsFor: "{{count}} resultados para “{{query}}”",
+    jumpTo: "O abra un área de trabajo",
     tool: "Herramienta",
   },
   erp: {
@@ -137,6 +140,7 @@ export const translations: typeof enTranslations = {
     page: "Página {{page}} de {{total}}",
     openSidebar: "Barra lateral de herramientas abierta",
     browse: "Herramientas de búsqueda",
+    backHome: "Ir al inicio de la administración",
     toolUnavailableHint:
       "El enlace puede estar desactualizado o su rol puede carecer de acceso. Consulte las herramientas disponibles.",
     openError: "No se pudo abrir la herramienta",

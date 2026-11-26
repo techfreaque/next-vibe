@@ -24,4 +24,11 @@ export const translations: typeof enTranslations = {
     requiresConfirmation: "confirmation requise",
     loadingTools: "Chargement des outils...",
   },
+  loadError: {
+    title: "L’administration n’a pas pu se charger",
+    message:
+      "Votre session n’a pas pu être vérifiée. Rechargez la page ; si le problème persiste, reconnectez-vous.",
+    reload: "Recharger",
+    signIn: "Se connecter",
+  },
 };

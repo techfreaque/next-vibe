@@ -59,4 +59,22 @@ export const translations = {
     "Check foreign services with your tax adviser. Reverse charge can apply even under the small-business exemption.",
   saleConflict:
     "Sales VAT conflicts with the company exemption. Review the lines before issuing this invoice.",
+  choose: "Choose a VAT treatment",
+  back: "Back",
+  appliesOn: "VAT treatment on {{date}}",
+  invoiceText: "Text on invoices",
+  savedTitle: "{{regime}} applies from {{date}}",
+  pickCompany: {
+    title: "Choose a company",
+    message: "See which VAT rules apply to its invoices on any date.",
+  },
+  hints: {
+    standard:
+      "Invoices charge VAT at the company tax rates. Supplier VAT is deductible.",
+    german: "Invoices carry no VAT and state the § 19 UStG exemption.",
+    austrian:
+      "Invoices carry no VAT and state the Austrian small-business exemption.",
+    slovak:
+      "Invoices carry no VAT because the business is not registered for VAT.",
+  },
 };

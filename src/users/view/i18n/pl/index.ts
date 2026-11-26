@@ -193,7 +193,7 @@ export const translations: typeof enTranslations = {
     actions: {
       retry: "Spróbuj ponownie",
       more: "Więcej",
-      browse: "Wróć do kont",
+      browse: "Wszyscy użytkownicy",
       edit: "Edytuj",
       addCredits: "Przyznaj kredyty",
       delete: "Usuń użytkownika",

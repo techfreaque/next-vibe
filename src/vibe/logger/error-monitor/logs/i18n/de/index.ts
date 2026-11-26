@@ -341,9 +341,12 @@ export const translations: typeof enTranslations = {
   },
 
   widget: {
+    subtitle:
+      "Alle Fehler und Warnungen nach Klasse gruppiert. Behobenes als gelöst markieren, ein erneutes Auftreten öffnet es wieder.",
     kpi: {
       unresolvedInScope: "Offen in dieser Ansicht",
-      unresolvedAllTimeLink: "Offen über den gesamten Zeitraum: {{count}}",
+      unresolvedAllTimeLink:
+        "Alle offenen Klassen, Fehler und Warnungen, gesamter Zeitraum: {{count}}",
       unresolvedMessages: "{{messages}} Meldungen · {{occurrences}} Vorkommen",
       unresolvedMatching: "{{count}} offene passen zu den Filtern",
       unresolved: "Offene Klassen (gesamt)",

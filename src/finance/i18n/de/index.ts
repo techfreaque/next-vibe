@@ -369,7 +369,7 @@ export const translations: typeof enTranslations = {
   },
   status: {
     title: "Finanzen",
-    titleShort: "Finanzen",
+    titleShort: "Kosten und Marge",
     description:
       "Umsatz gegen Einkaufskosten: Anbieter-Guthaben, Marge, Alarme und Schwellenwerte.",
     response: {

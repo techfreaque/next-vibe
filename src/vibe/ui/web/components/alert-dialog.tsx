@@ -60,6 +60,7 @@ export type AlertDialogActionProps = {
   asChild?: boolean;
   onClick?: () => void;
   stopPropagation?: boolean;
+  disabled?: boolean;
 } & StyleType;
 
 export type AlertDialogCancelProps = {
@@ -67,6 +68,7 @@ export type AlertDialogCancelProps = {
   asChild?: boolean;
   stopPropagation?: boolean;
   onClick?: () => void;
+  disabled?: boolean;
 } & StyleType;
 
 export function AlertDialog({

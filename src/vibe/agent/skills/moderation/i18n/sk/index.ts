@@ -7,7 +7,7 @@ export const translations: typeof enTranslations = {
   },
   get: {
     title: "Nahlásené zručnosti",
-    titleShort: "Moderovanie",
+    titleShort: "Nahlásené zručnosti",
     description: "Zobrazí nahlásené zručnosti zoradené podľa počtu hlásení.",
     fields: {
       minReports: {

@@ -69,7 +69,7 @@ import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-f
 import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/navigate-button/widget";
 import type React from "react";
-import { useCallback, useId, useState } from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 
 import { ChannelType } from "@/leads/growth/enum";
 import { scopedTranslation as growthTranslation } from "@/leads/growth/i18n";
@@ -362,7 +362,7 @@ function UserCell({
                   key={role}
                   status={role}
                   label={roleLabel(role, locale)}
-                  variant="info"
+                  variant="muted"
                 />
               ))}
             {picker && user.isBanned && (
@@ -411,7 +411,95 @@ function planLabel(
   if (user.plan) {
     return subscriptionPlanLabel(user.plan, locale);
   }
-  return user.paymentsCount > 0 ? t("widget.oneOff") : t("widget.compact.free");
+  return user.paymentsCount > 0 ? t("widget.oneOff") : t("widget.planFree");
+}
+
+/** Phone card: identity, balance, email, then plan and status. */
+function UserCard({
+  user,
+  t,
+  locale,
+  onOpen,
+}: {
+  user: UserListRow;
+  t: ListT;
+  locale: CountryLanguage;
+  onOpen: () => void;
+}): React.JSX.Element {
+  const name = displayName(user);
+  const initials = name
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((word) => word[0])
+    .join("")
+    .toUpperCase();
+  return (
+    <Button
+      type="button"
+      variant="ghost"
+      className="h-auto min-h-16 w-full min-w-0 items-start justify-start gap-3 rounded-none px-3 py-3 text-start font-normal whitespace-normal"
+      aria-label={t("widget.actions.openUser", { email: user.email })}
+      onClick={onOpen}
+    >
+      <Avatar className="size-9 shrink-0">
+        <AvatarFallback className="bg-muted text-xs font-semibold">
+          {initials}
+        </AvatarFallback>
+      </Avatar>
+      <Div className="flex min-w-0 flex-1 flex-col gap-1">
+        <Div className="flex min-w-0 items-baseline gap-2">
+          <Span className="min-w-0 flex-1 truncate text-sm font-medium">
+            {name}
+          </Span>
+          <Span
+            className={cn(
+              "shrink-0 text-sm tabular-nums",
+              user.creditBalance === 0
+                ? "text-muted-foreground"
+                : "font-medium",
+            )}
+          >
+            {t("widget.creditAmount", {
+              count: formatNumber(user.creditBalance, locale, 2),
+            })}
+          </Span>
+        </Div>
+        {name !== user.email && (
+          <Span className="block min-w-0 truncate text-xs text-muted-foreground">
+            {user.email}
+          </Span>
+        )}
+        <Div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1 text-xs">
+          <Span className="text-muted-foreground">
+            {planLabel(user, t, locale)}
+          </Span>
+          <AccountStatus user={user} t={t} locale={locale} />
+          {user.roles
+            .filter((role) => role !== "enums.userRole.customer")
+            .map((role) => (
+              <StatusPill
+                key={role}
+                status={role}
+                label={roleLabel(role, locale)}
+                variant="muted"
+              />
+            ))}
+          {!user.emailVerified && (
+            <StatusPill
+              status="unverified"
+              label={t("widget.flags.unverified")}
+              variant="warning"
+            />
+          )}
+        </Div>
+      </Div>
+      <ChevronRight
+        aria-hidden="true"
+        className="mt-0.5 size-4 shrink-0 text-muted-foreground"
+      />
+    </Button>
+  );
 }
 
 function AccountStatus({
@@ -590,6 +678,20 @@ export function UsersListContainer({
     Boolean(listError) ||
     (!data && endpointMutations?.read?.isLoading === false);
   const [showFilters, setShowFilters] = useState(false);
+  // Browsing defaults to real people; a search looks across every account.
+  // "applied" = default on, "searching" = paused while a search runs,
+  // "manual" = the admin chose the audience, so never touch it again.
+  const [humansMode, setHumansMode] = useState<
+    "applied" | "searching" | "manual"
+  >(() =>
+    isPickerMode || form.getValues("audience") !== undefined
+      ? "manual"
+      : (form.getValues("search") ?? "").trim()
+        ? "searching"
+        : "applied",
+  );
+  const humansRefetch = useRef(false);
+  const humansSeeded = useRef(false);
 
   const sortBy: SortFieldValue =
     form.watch("sortBy") ?? UserListSortField.CREATED_AT;
@@ -685,7 +787,10 @@ export function UsersListContainer({
     form.setValue("creditsMax", undefined, { shouldDirty: true });
     form.setValue("source", "", { shouldDirty: true });
     form.setValue("referralActivity", undefined, { shouldDirty: true });
-    form.setValue("audience", undefined, { shouldDirty: true });
+    form.setValue("audience", isPickerMode ? undefined : UsersAudience.ALL, {
+      shouldDirty: true,
+    });
+    setHumansMode("manual");
     form.setValue("channel", "", { shouldDirty: true });
     form.setValue("channelType", undefined, { shouldDirty: true });
     form.setValue("refCode", "", { shouldDirty: true });
@@ -697,7 +802,7 @@ export function UsersListContainer({
     form.setValue("paidFrom", undefined, { shouldDirty: true });
     form.setValue("paidTo", undefined, { shouldDirty: true });
     resetPageAndSubmit();
-  }, [form, resetPageAndSubmit]);
+  }, [form, resetPageAndSubmit, isPickerMode]);
 
   const handlePageChange = useCallback(
     (page: number): void => {
@@ -766,10 +871,43 @@ export function UsersListContainer({
   const audience = form.watch("audience");
   const watchedAccountState = form.watch("accountState");
   const accountState = watchedAccountState ?? [];
+  useEffect(() => {
+    if (humansSeeded.current || humansMode !== "applied") {
+      return;
+    }
+    humansSeeded.current = true;
+    if (form.getValues("audience") === undefined) {
+      humansRefetch.current = true;
+      form.setValue("audience", UsersAudience.HUMANS, { shouldDirty: true });
+    }
+  }, [humansMode, form]);
+  // The first read starts before the default lands; refetch once it settles.
+  useEffect(() => {
+    if (humansRefetch.current && data && onSubmit) {
+      humansRefetch.current = false;
+      onSubmit();
+    }
+  }, [data, onSubmit]);
+  const syncHumansWithSearch = useCallback(
+    (value: string): void => {
+      const searching = value.trim().length > 0;
+      if (humansMode === "applied" && searching) {
+        setHumansMode("searching");
+        form.setValue("audience", undefined, { shouldDirty: true });
+      } else if (humansMode === "searching" && !searching) {
+        setHumansMode("applied");
+        form.setValue("audience", UsersAudience.HUMANS, { shouldDirty: true });
+      }
+    },
+    [form, humansMode],
+  );
   const toggleHumans = useCallback((): void => {
+    setHumansMode("manual");
     form.setValue(
       "audience",
-      audience === UsersAudience.HUMANS ? undefined : UsersAudience.HUMANS,
+      audience === UsersAudience.HUMANS
+        ? UsersAudience.ALL
+        : UsersAudience.HUMANS,
       { shouldDirty: true },
     );
     resetPageAndSubmit();
@@ -837,16 +975,6 @@ export function UsersListContainer({
     apply();
     resetPageAndSubmit();
   };
-  if (audience) {
-    chips.push({
-      key: "audience",
-      label: t("get.fields.audience.label"),
-      value: t(audience),
-      clear: clearAnd(() =>
-        form.setValue("audience", undefined, { shouldDirty: true }),
-      ),
-    });
-  }
   if (payer && payer !== PayerFilter.ANY) {
     chips.push({
       key: "payer",
@@ -1047,7 +1175,7 @@ export function UsersListContainer({
     form.watch("creditsMin") !== undefined ||
     form.watch("creditsMax") !== undefined ||
     chips.length > 0 ||
-    audience,
+    (audience === UsersAudience.HUMANS && humansMode === "manual"),
   );
 
   return (
@@ -1124,6 +1252,7 @@ export function UsersListContainer({
             placeholder={t("get.fields.search.placeholder")}
             onChangeText={(value) => {
               form.setValue("page", 1, { shouldDirty: true });
+              syncHumansWithSearch(value);
               form.setValue("search", value, { shouldDirty: true });
             }}
           />
@@ -1414,100 +1543,244 @@ export function UsersListContainer({
           }
         />
       ) : (
-        <Div className="rounded-lg border overflow-x-auto">
-          <Table>
-            <TableHeader
-              className={
-                isPickerMode ? undefined : "hidden @3xl:table-header-group"
-              }
-            >
-              <TableRow>
-                <SortHeader
-                  label={t("widget.columns.user")}
-                  field={UserListSortField.NAME}
-                  activeField={sortBy}
-                  order={sortOrder}
-                  onSort={handleSort}
-                />
-                {!isPickerMode && (
-                  <>
-                    <SortHeader
-                      label={t("widget.columns.joined")}
-                      field={UserListSortField.CREATED_AT}
-                      activeField={sortBy}
-                      order={sortOrder}
-                      onSort={handleSort}
-                      className="hidden whitespace-nowrap @3xl:table-cell"
-                    />
-                    <SortHeader
-                      label={t("widget.columns.lastActive")}
-                      field={UserListSortField.LAST_ACTIVE}
-                      activeField={sortBy}
-                      order={sortOrder}
-                      onSort={handleSort}
-                      className="hidden whitespace-nowrap @3xl:table-cell"
-                    />
-                    <SortHeader
-                      label={t("widget.columns.credits")}
-                      field={UserListSortField.CREDITS}
-                      activeField={sortBy}
-                      order={sortOrder}
-                      onSort={handleSort}
-                      className="hidden text-right @3xl:table-cell"
-                    />
-                    <SortHeader
-                      label={t("widget.columns.spent")}
-                      field={UserListSortField.CREDITS_SPENT}
-                      activeField={sortBy}
-                      order={sortOrder}
-                      onSort={handleSort}
-                      className="hidden text-right @3xl:table-cell"
-                    />
-                    <SortHeader
-                      label={t("widget.columns.paid")}
-                      field={UserListSortField.TOTAL_PAID}
-                      activeField={sortBy}
-                      order={sortOrder}
-                      onSort={handleSort}
-                      className="hidden text-right @3xl:table-cell"
-                    />
-                    <TableHead className="hidden text-xs @3xl:table-cell">
-                      {t("widget.planStatus")}
-                    </TableHead>
-                    <TableHead className="hidden text-xs @3xl:table-cell">
-                      {t("widget.columns.source")}
-                    </TableHead>
-                    <TableHead className="hidden w-10 @3xl:table-cell">
-                      <Span className="sr-only">
-                        {t("widget.actions.open")}
-                      </Span>
-                    </TableHead>
-                  </>
-                )}
-              </TableRow>
-            </TableHeader>
-            <TableBody>
+        <>
+          {!isPickerMode && (
+            <Div className="flex min-w-0 flex-col divide-y overflow-hidden rounded-lg border bg-card @3xl:hidden">
               {users.map((user) => (
-                <TableRow
+                <UserCard
                   key={user.id}
-                  className="cursor-pointer hover:bg-accent/50"
-                  onClick={() => handleRowClick(user)}
-                >
-                  <TableCell className="whitespace-normal">
-                    <Div className="flex flex-col items-start gap-2">
-                      <Div className="flex w-full items-start justify-between gap-2">
-                        <UserCell
-                          user={user}
-                          t={t}
-                          locale={locale}
-                          picker={isPickerMode}
-                        />
+                  user={user}
+                  t={t}
+                  locale={locale}
+                  onOpen={() => handleRowClick(user)}
+                />
+              ))}
+            </Div>
+          )}
+          <Div
+            className={cn(
+              "rounded-lg border overflow-x-auto",
+              !isPickerMode && "hidden @3xl:block",
+            )}
+          >
+            <Table>
+              <TableHeader
+                className={
+                  isPickerMode ? undefined : "hidden @3xl:table-header-group"
+                }
+              >
+                <TableRow>
+                  <SortHeader
+                    label={t("widget.columns.user")}
+                    field={UserListSortField.NAME}
+                    activeField={sortBy}
+                    order={sortOrder}
+                    onSort={handleSort}
+                  />
+                  {!isPickerMode && (
+                    <>
+                      <SortHeader
+                        label={t("widget.columns.joined")}
+                        field={UserListSortField.CREATED_AT}
+                        activeField={sortBy}
+                        order={sortOrder}
+                        onSort={handleSort}
+                        className="hidden whitespace-nowrap @3xl:table-cell"
+                      />
+                      <SortHeader
+                        label={t("widget.columns.lastActive")}
+                        field={UserListSortField.LAST_ACTIVE}
+                        activeField={sortBy}
+                        order={sortOrder}
+                        onSort={handleSort}
+                        className="hidden whitespace-nowrap @3xl:table-cell"
+                      />
+                      <SortHeader
+                        label={t("widget.columns.credits")}
+                        field={UserListSortField.CREDITS}
+                        activeField={sortBy}
+                        order={sortOrder}
+                        onSort={handleSort}
+                        className="hidden text-right @3xl:table-cell"
+                      />
+                      <SortHeader
+                        label={t("widget.columns.spent")}
+                        field={UserListSortField.CREDITS_SPENT}
+                        activeField={sortBy}
+                        order={sortOrder}
+                        onSort={handleSort}
+                        className="hidden text-right @3xl:table-cell"
+                      />
+                      <SortHeader
+                        label={t("widget.columns.paid")}
+                        field={UserListSortField.TOTAL_PAID}
+                        activeField={sortBy}
+                        order={sortOrder}
+                        onSort={handleSort}
+                        className="hidden text-right @3xl:table-cell"
+                      />
+                      <TableHead className="hidden whitespace-nowrap text-xs @3xl:table-cell">
+                        {t("widget.planStatus")}
+                      </TableHead>
+                      <TableHead className="hidden text-xs @3xl:table-cell">
+                        {t("widget.columns.source")}
+                      </TableHead>
+                      <TableHead className="hidden w-10 @3xl:table-cell">
+                        <Span className="sr-only">
+                          {t("widget.actions.open")}
+                        </Span>
+                      </TableHead>
+                    </>
+                  )}
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {users.map((user) => (
+                  <TableRow
+                    key={user.id}
+                    className="cursor-pointer hover:bg-accent/50"
+                    onClick={() => handleRowClick(user)}
+                  >
+                    <TableCell className="whitespace-normal">
+                      <Div className="flex flex-col items-start gap-2">
+                        <Div className="flex w-full items-start justify-between gap-2">
+                          <UserCell
+                            user={user}
+                            t={t}
+                            locale={locale}
+                            picker={isPickerMode}
+                          />
+                          {!isPickerMode && (
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              className="h-10 w-10 shrink-0 p-0 @3xl:hidden"
+                              aria-label={t("widget.actions.openUser", {
+                                email: user.email,
+                              })}
+                              onClick={(event) => {
+                                event.stopPropagation();
+                                handleRowClick(user);
+                              }}
+                            >
+                              <ChevronRight className="h-5 w-5" />
+                            </Button>
+                          )}
+                        </Div>
                         {!isPickerMode && (
+                          <Div className="flex w-full min-w-0 flex-wrap items-center gap-x-3 gap-y-1 text-xs @3xl:hidden">
+                            <Span className="min-w-0 truncate text-muted-foreground">
+                              {planLabel(user, t, locale)}
+                            </Span>
+                            <AccountStatus user={user} t={t} locale={locale} />
+                            <Span className="ml-auto shrink-0 font-medium tabular-nums">
+                              {t("widget.creditAmount", {
+                                count: formatNumber(
+                                  user.creditBalance,
+                                  locale,
+                                  2,
+                                ),
+                              })}
+                            </Span>
+                          </Div>
+                        )}
+                        {isPickerMode && (
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            className="h-auto min-h-9 whitespace-normal"
+                            aria-label={t("widget.actions.selectUser", {
+                              email: user.email,
+                            })}
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              handleRowClick(user);
+                            }}
+                          >
+                            {t("widget.actions.select")}
+                          </Button>
+                        )}
+                      </Div>
+                    </TableCell>
+                    {!isPickerMode && (
+                      <>
+                        <TableCell className="hidden text-xs text-muted-foreground whitespace-nowrap @3xl:table-cell">
+                          {formatDay(user.createdAt, locale)}
+                        </TableCell>
+                        <TableCell className="hidden text-xs whitespace-nowrap @3xl:table-cell">
+                          {user.lastActiveAt ? (
+                            formatRelative(user.lastActiveAt, locale)
+                          ) : (
+                            <Span className="text-muted-foreground">
+                              {t("widget.never")}
+                            </Span>
+                          )}
+                        </TableCell>
+                        <TableCell
+                          className={cn(
+                            "hidden whitespace-nowrap text-right tabular-nums text-sm @3xl:table-cell",
+                            user.creditBalance === 0 && "text-muted-foreground",
+                          )}
+                        >
+                          {t("widget.creditAmount", {
+                            count: formatNumber(user.creditBalance, locale, 2),
+                          })}
+                        </TableCell>
+                        <TableCell
+                          className={cn(
+                            "hidden whitespace-nowrap text-right tabular-nums text-sm @3xl:table-cell",
+                            isFreeBurner(user)
+                              ? "font-medium text-warning"
+                              : "text-muted-foreground",
+                          )}
+                        >
+                          <Span>
+                            {t("widget.creditAmount", {
+                              count: formatNumber(user.creditsSpent, locale, 2),
+                            })}
+                          </Span>
+                          {user.creditsSpent30d > 0 && (
+                            <Span className="block text-[11px] font-normal text-muted-foreground">
+                              {t("widget.spent30d", {
+                                count: formatNumber(
+                                  user.creditsSpent30d,
+                                  locale,
+                                  2,
+                                ),
+                              })}
+                            </Span>
+                          )}
+                        </TableCell>
+                        <TableCell
+                          className={cn(
+                            "hidden whitespace-nowrap text-right tabular-nums text-sm @3xl:table-cell",
+                            user.paymentsCount === 0 && "text-muted-foreground",
+                          )}
+                        >
+                          {formatUsd(user.totalPaidUsd, locale)}
+                        </TableCell>
+                        <TableCell className="hidden @3xl:table-cell">
+                          <Div className="flex flex-col items-start gap-1">
+                            <Span className="whitespace-nowrap text-xs">
+                              {planLabel(user, t, locale)}
+                            </Span>
+                            <AccountStatus user={user} t={t} locale={locale} />
+                          </Div>
+                        </TableCell>
+                        <TableCell className="hidden text-xs text-muted-foreground max-w-[200px] @3xl:table-cell">
+                          <Span className="block truncate">
+                            {sourceText(user, t, locale) ||
+                              t("widget.notTracked")}
+                          </Span>
+                        </TableCell>
+                        <TableCell className="hidden w-10 @3xl:table-cell">
                           <Button
                             type="button"
                             variant="ghost"
                             size="sm"
-                            className="h-10 w-10 shrink-0 p-0 @3xl:hidden"
+                            className="h-8 w-8 p-0 text-muted-foreground"
                             aria-label={t("widget.actions.openUser", {
                               email: user.email,
                             })}
@@ -1516,137 +1789,17 @@ export function UsersListContainer({
                               handleRowClick(user);
                             }}
                           >
-                            <ChevronRight className="h-5 w-5" />
+                            <ChevronRight className="h-4 w-4" />
                           </Button>
-                        )}
-                      </Div>
-                      {!isPickerMode && (
-                        <Div className="flex w-full min-w-0 flex-wrap items-center gap-x-3 gap-y-1 text-xs @3xl:hidden">
-                          <Span className="min-w-0 truncate text-muted-foreground">
-                            {planLabel(user, t, locale)}
-                          </Span>
-                          <AccountStatus user={user} t={t} locale={locale} />
-                          <Span className="ml-auto shrink-0 font-medium tabular-nums">
-                            {t("widget.creditAmount", {
-                              count: formatNumber(
-                                user.creditBalance,
-                                locale,
-                                2,
-                              ),
-                            })}
-                          </Span>
-                        </Div>
-                      )}
-                      {isPickerMode && (
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          className="h-auto min-h-9 whitespace-normal"
-                          aria-label={t("widget.actions.selectUser", {
-                            email: user.email,
-                          })}
-                          onClick={(event) => {
-                            event.stopPropagation();
-                            handleRowClick(user);
-                          }}
-                        >
-                          {t("widget.actions.select")}
-                        </Button>
-                      )}
-                    </Div>
-                  </TableCell>
-                  {!isPickerMode && (
-                    <>
-                      <TableCell className="hidden text-xs text-muted-foreground whitespace-nowrap @3xl:table-cell">
-                        {formatDay(user.createdAt, locale)}
-                      </TableCell>
-                      <TableCell className="hidden text-xs whitespace-nowrap @3xl:table-cell">
-                        {user.lastActiveAt ? (
-                          formatRelative(user.lastActiveAt, locale)
-                        ) : (
-                          <Span className="text-muted-foreground">
-                            {t("widget.never")}
-                          </Span>
-                        )}
-                      </TableCell>
-                      <TableCell className="hidden text-right tabular-nums text-sm @3xl:table-cell">
-                        {t("widget.creditAmount", {
-                          count: formatNumber(user.creditBalance, locale, 2),
-                        })}
-                      </TableCell>
-                      <TableCell
-                        className={cn(
-                          "hidden text-right tabular-nums text-sm @3xl:table-cell",
-                          isFreeBurner(user)
-                            ? "font-medium text-warning"
-                            : "text-muted-foreground",
-                        )}
-                      >
-                        <Span>
-                          {t("widget.creditAmount", {
-                            count: formatNumber(user.creditsSpent, locale, 2),
-                          })}
-                        </Span>
-                        {user.creditsSpent30d > 0 && (
-                          <Span className="block text-[11px] font-normal text-muted-foreground">
-                            {t("widget.spent30d", {
-                              count: formatNumber(
-                                user.creditsSpent30d,
-                                locale,
-                                2,
-                              ),
-                            })}
-                          </Span>
-                        )}
-                      </TableCell>
-                      <TableCell className="hidden text-right tabular-nums text-sm @3xl:table-cell">
-                        {user.paymentsCount > 0 ? (
-                          formatUsd(user.totalPaidUsd, locale)
-                        ) : (
-                          <Span className="text-muted-foreground">
-                            {t("widget.none")}
-                          </Span>
-                        )}
-                      </TableCell>
-                      <TableCell className="hidden @3xl:table-cell">
-                        <Div className="flex flex-col items-start gap-1">
-                          <Span className="text-xs">
-                            {planLabel(user, t, locale)}
-                          </Span>
-                          <AccountStatus user={user} t={t} locale={locale} />
-                        </Div>
-                      </TableCell>
-                      <TableCell className="hidden text-xs text-muted-foreground max-w-[200px] @3xl:table-cell">
-                        <Span className="block truncate">
-                          {sourceText(user, t, locale) ||
-                            t("widget.notTracked")}
-                        </Span>
-                      </TableCell>
-                      <TableCell className="hidden w-10 @3xl:table-cell">
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          className="h-8 w-8 p-0 text-muted-foreground"
-                          aria-label={t("widget.actions.openUser", {
-                            email: user.email,
-                          })}
-                          onClick={(event) => {
-                            event.stopPropagation();
-                            handleRowClick(user);
-                          }}
-                        >
-                          <ChevronRight className="h-4 w-4" />
-                        </Button>
-                      </TableCell>
-                    </>
-                  )}
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </Div>
+                        </TableCell>
+                      </>
+                    )}
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </Div>
+        </>
       )}
 
       {/* Pagination */}

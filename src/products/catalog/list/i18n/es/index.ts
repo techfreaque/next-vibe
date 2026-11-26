@@ -113,7 +113,7 @@ export const translations: typeof enTranslations = {
       previous: "Anterior",
       next: "Siguiente",
       status: "Estado",
-      addProduct: "Agregar producto",
+      addProduct: "Añadir producto",
       active: "Activa",
       inactive: "Inactivo",
       empty:
@@ -128,8 +128,15 @@ export const translations: typeof enTranslations = {
       billingMonthly: "Mensual",
       billingYearly: "Anual",
       navCategories: "Categorías",
-      navTaxRates: "Tasas impositivas",
+      navTaxRates: "Tipos de IVA",
       back: "Atrás",
+      count: "{{count}} productos",
+      columnSku: "SKU",
+      columnPrice: "Precio",
+      emptyTitle: "Aún no hay productos",
+      emptyMessage:
+        "Aquí están los productos y servicios que vendes. Facturas, TPV y compras toman de ellos precio, unidad e IVA.",
+      clearFilters: "Quitar filtros",
     },
   },
 };

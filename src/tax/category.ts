@@ -43,8 +43,55 @@ export const category: CategoryDefinition = {
       "company-tax-regime-view",
       "tax-rate-list",
       "coa-tax-report",
+      "tax_report_GET",
     ],
-    actions: ["company-tax-regime-view", "tax-rate-list", "coa-tax-report"],
+    actions: ["tax_rate_create_POST"],
+    destinationDescriptions: {
+      "company-tax-regime-view": {
+        "en-US": "Choose how VAT applies to your documents.",
+        "en-GLOBAL": "Choose how VAT applies to your documents.",
+        "de-DE":
+          "Festlegen, wie die Umsatzsteuer auf Ihre Belege angewendet wird.",
+        "pl-PL": "Wybierz, jak VAT ma działać na dokumentach.",
+        "fr-FR": "Choisissez le régime de TVA appliqué à vos documents.",
+        "it-IT": "Scelga come applicare l’IVA ai documenti.",
+        "es-ES": "Elija cómo se aplica el IVA a sus documentos.",
+        "sk-SK": "Vyberte, ako sa DPH uplatňuje na vaše doklady.",
+      },
+      "tax-rate-list": {
+        "en-US": "The tax rates your documents can use.",
+        "en-GLOBAL": "The tax rates your documents can use.",
+        "de-DE": "Die Steuersätze, die Ihre Belege verwenden können.",
+        "pl-PL": "Stawki podatku dostępne w dokumentach.",
+        "fr-FR": "Les taux de taxe utilisables dans vos documents.",
+        "it-IT": "Le aliquote disponibili per i documenti.",
+        "es-ES": "Los tipos impositivos disponibles para sus documentos.",
+        "sk-SK": "Sadzby dane, ktoré môžu používať vaše doklady.",
+      },
+      "coa-tax-report": {
+        "en-US": "Booked VAT movements for the dates you pick.",
+        "en-GLOBAL": "Booked VAT movements for the dates you pick.",
+        "de-DE": "Gebuchte Umsatzsteuerbewegungen für den gewählten Zeitraum.",
+        "pl-PL": "Zaksięgowane ruchy VAT w wybranym okresie.",
+        "fr-FR": "Mouvements de TVA comptabilisés sur les dates choisies.",
+        "it-IT": "Movimenti IVA registrati nelle date scelte.",
+        "es-ES": "Movimientos de IVA contabilizados en las fechas elegidas.",
+        "sk-SK": "Zaúčtované pohyby DPH za zvolené obdobie.",
+      },
+      tax_report_GET: {
+        "en-US": "Tax on invoices, bills and till sales, by rate.",
+        "en-GLOBAL": "Tax on invoices, bills and till sales, by rate.",
+        "de-DE":
+          "Steuer auf Rechnungen, Eingangsrechnungen und Kassenverkäufe, nach Satz.",
+        "pl-PL":
+          "Podatek z faktur, rachunków i sprzedaży kasowej według stawki.",
+        "fr-FR": "Taxe sur factures, achats et ventes en caisse, par taux.",
+        "it-IT":
+          "Imposta su fatture, acquisti e vendite in cassa, per aliquota.",
+        "es-ES": "Impuesto en facturas, compras y ventas en caja, por tipo.",
+        "sk-SK": "Daň z faktúr, nákupov a predaja v pokladni podľa sadzby.",
+      },
+    },
   },
   defaultEntry: {
     [UserPermissionRole.ADMIN]: TAX_RATE_LIST_ALIAS,

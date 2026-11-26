@@ -5,7 +5,6 @@
 
 "use client";
 
-import { Button } from "next-vibe/ui/components/button";
 import { Checkbox } from "next-vibe/ui/components/checkbox";
 import { Div } from "next-vibe/ui/components/div";
 import {
@@ -19,12 +18,6 @@ import { AlertCircle } from "next-vibe/ui/components/icons/AlertCircle";
 import { Info } from "next-vibe/ui/components/icons/Info";
 import { Span } from "next-vibe/ui/components/span";
 import { Switch } from "next-vibe/ui/components/switch";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "next-vibe/ui/components/tooltip";
 import type { JSX } from "react";
 
 import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
@@ -41,6 +34,7 @@ import {
 import { scopedTranslation as unifiedInterfaceScopedTranslation } from "../../../hooks/i18n";
 import { getTheme } from "../_shared/constants";
 import { useFormFieldDescriptionStyle } from "../_shared/description-style";
+import { FieldInfoTooltip } from "../_shared/field-info-tooltip";
 import type { BooleanFieldWidgetConfig } from "./types";
 
 export function BooleanFieldWidget<
@@ -105,25 +99,10 @@ export function BooleanFieldWidget<
                           : null}
                     </Span>
                     {field.description && descriptionStyle === "tooltip" && (
-                      <TooltipProvider delayDuration={300}>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button
-                              type="button"
-                              aria-label={t(field.description)}
-                              className="cursor-help inline-flex p-0 h-auto"
-                              variant={"ghost"}
-                            >
-                              <Info className="h-3.5 w-3.5 text-muted-foreground hover:text-foreground transition-colors" />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent className="max-w-[250px]">
-                            <Span className="text-sm">
-                              {t(field.description)}
-                            </Span>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
+                      <FieldInfoTooltip
+                        text={t(field.description)}
+                        label={field.label ? t(field.label) : undefined}
+                      />
                     )}
                     {field.description && descriptionStyle === "inline" && (
                       <Div className="flex items-center gap-1">
@@ -150,25 +129,10 @@ export function BooleanFieldWidget<
                     <FormLabel className="text-sm font-normal cursor-pointer leading-relaxed flex items-center gap-1.5">
                       <Span>{t(switchLabel)}</Span>
                       {field.description && descriptionStyle === "tooltip" && (
-                        <TooltipProvider delayDuration={300}>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Button
-                                type="button"
-                                aria-label={t(field.description)}
-                                className="cursor-help inline-flex p-0 h-auto"
-                                variant={"ghost"}
-                              >
-                                <Info className="h-3.5 w-3.5 text-muted-foreground hover:text-foreground transition-colors" />
-                              </Button>
-                            </TooltipTrigger>
-                            <TooltipContent className="max-w-[250px]">
-                              <Span className="text-sm">
-                                {t(field.description)}
-                              </Span>
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
+                        <FieldInfoTooltip
+                          text={t(field.description)}
+                          label={field.label ? t(field.label) : undefined}
+                        />
                       )}
                       {field.description && descriptionStyle === "inline" && (
                         <Div className="flex items-center gap-1">

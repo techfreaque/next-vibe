@@ -362,7 +362,7 @@ export const translations: typeof enTranslations = {
   },
   status: {
     title: "Finanse",
-    titleShort: "Finanse",
+    titleShort: "Koszty i marża",
     description:
       "Przychód kontra koszt u dostawców: salda, marża, alerty i progi.",
     response: {

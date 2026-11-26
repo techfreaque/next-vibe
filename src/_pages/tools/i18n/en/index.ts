@@ -22,4 +22,11 @@ export const translations = {
     requiresConfirmation: "requires confirmation",
     loadingTools: "Loading tools...",
   },
+  loadError: {
+    title: "The admin could not load",
+    message:
+      "Your session could not be checked. Reload the page; if it keeps failing, sign in again.",
+    reload: "Reload",
+    signIn: "Sign in",
+  },
 };

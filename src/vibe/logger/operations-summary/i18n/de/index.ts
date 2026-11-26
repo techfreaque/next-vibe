@@ -8,10 +8,10 @@ export const translations: typeof enTranslations = {
   title: "Betriebsübersicht",
   description:
     "Prüfen Sie offene Fehler, fehlgeschlagene Aufgaben und verbundene Instanzen.",
-  errors: "Offene Fehler",
+  errors: "Offene Fehlerklassen",
   tasks: "Fehlgeschlagene Aufgaben",
   connections: "Gestörte Verbindungen",
-  errorAlert: "Offene Fehlergruppen ({{count}})",
+  errorAlert: "Offene Fehlerklassen ohne Warnungen ({{count}})",
   taskAlert: "Fehlgeschlagene geplante Aufgaben ({{count}})",
   connectionAlert: "Verbindungen mit Handlungsbedarf ({{count}})",
   attention: "Handlungsbedarf",

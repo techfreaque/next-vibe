@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import { and, count, eq, inArray } from "drizzle-orm";
+import { and, asc, count, desc, eq, inArray } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import {
@@ -18,7 +18,7 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { companyMembers } from "@/companies/db";
+import { companies, companyMembers } from "@/companies/db";
 import { CompanyAuthRepository } from "@/companies/repository";
 
 import { taxRates } from "../../db";
@@ -101,9 +101,17 @@ export class TaxRateListRepository {
       const offset = (page - 1) * pageSize;
 
       const rows = await db
-        .select()
+        .select({ rate: taxRates, companyName: companies.name })
         .from(taxRates)
+        .innerJoin(companies, eq(companies.id, taxRates.companyId))
         .where(where)
+        .orderBy(
+          asc(companies.name),
+          desc(taxRates.isDefault),
+          desc(taxRates.rate),
+          asc(taxRates.name),
+          asc(taxRates.id),
+        )
         .limit(pageSize)
         .offset(offset);
 
@@ -116,8 +124,10 @@ export class TaxRateListRepository {
             }
           : {}),
         total: total ?? 0,
-        rates: rows.map((row) => ({
+        rates: rows.map(({ rate: row, companyName }) => ({
           id: row.id,
+          companyId: row.companyId,
+          companyName,
           name: row.name,
           code: row.code,
           type: row.type,

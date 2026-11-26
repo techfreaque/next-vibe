@@ -132,7 +132,12 @@ export const translations: typeof enTranslations = {
         empty: "Dieser Partner hat noch nie eine Auszahlung angefragt.",
       },
       notFound: "Code {{code}} existiert nicht.",
-      pickCode: "Gib einen Empfehlungscode ein, um seinen Bericht zu sehen.",
+      pickCode:
+        "Wähle einen Code aus der Übersichtstabelle oder gib ihn oben ein.",
+      pickTitle: "Kein Code gewählt",
+      browseCodes: "Codes durchsuchen",
+      subtitle:
+        "Klicks, Anmeldungen, Umsatz, Provision und Partnerguthaben für einen Code.",
       loading: "Code-Bericht wird geladen",
     },
   },

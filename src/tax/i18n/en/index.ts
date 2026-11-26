@@ -2,19 +2,19 @@ export const translations = {
   category: "Tax",
   endpointCategories: {
     tax: "Tax",
-    taxRates: "Tax Rates",
-    taxReports: "Tax Reports",
+    taxRates: "Tax rates",
+    taxReports: "Tax reports",
   },
 
   rate: {
     details: "Rate details",
     create: {
-      title: "Create Tax Rate",
-      titleShort: "Create Rate",
+      title: "Add tax rate",
+      titleShort: "Add tax rate",
       description: "Add a tax rate for your company",
       widget: {
         save: "Create tax rate",
-        backToList: "Back to Tax Rates",
+        backToList: "Back to tax rates",
       },
       companyId: {
         label: "Company",
@@ -32,7 +32,7 @@ export const translations = {
         placeholder: "e.g. AT-VAT20",
       },
       type: {
-        label: "Tax Type",
+        label: "Tax type",
         description: "The category of tax",
         placeholder: "Select tax type",
       },
@@ -52,7 +52,7 @@ export const translations = {
         placeholder: "e.g. Vienna",
       },
       isDefault: {
-        label: "Default Rate",
+        label: "Default rate",
         description: "Use this rate as the default for new items",
       },
       response: {
@@ -61,7 +61,7 @@ export const translations = {
         name: "Tax Rate Name",
       },
       success: {
-        title: "Tax Rate Created",
+        title: "Tax rate added",
         description: "The tax rate has been added to your company",
       },
       errors: {
@@ -79,7 +79,7 @@ export const translations = {
         },
         notFound: { title: "Not Found", description: "Company not found" },
         conflict: {
-          title: "Duplicate Code",
+          title: "Code already in use",
           description: "A tax rate with this code already exists",
         },
         server: {
@@ -101,24 +101,24 @@ export const translations = {
       },
     },
     list: {
-      title: "Tax Rates",
-      titleShort: "Tax Rates",
+      title: "Tax rates",
+      titleShort: "Tax rates",
       description: "All tax rates configured for your company",
       widget: {
         actions: "Actions",
         retry: "Try again",
         previous: "Previous",
         next: "Next",
-        addRate: "Add Rate",
+        addRate: "Add rate",
         labelDefault: "Default",
         labelActive: "Active",
         labelInactive: "Inactive",
         labelEdit: "Edit",
-        labelDelete: "Delete",
+        labelDelete: "Deactivate",
         labelCompound: "Compound",
         empty: "No tax rates configured. Add your first rate to get started.",
         emptySetup: "Set up the tax rates your company uses on invoices.",
-        columnRate: "Tax Rate",
+        columnRate: "Tax rate",
         columnTypeRateActions: "Type / Rate / Status",
         backToCatalog: "← Products",
       },
@@ -150,6 +150,7 @@ export const translations = {
         rates: "Tax Rates",
         rate: {
           id: "ID",
+          company: "Company",
           name: "Name",
           code: "Code",
           type: "Type",
@@ -201,13 +202,18 @@ export const translations = {
       },
     },
     update: {
-      title: "Update Tax Rate",
-      titleShort: "Update Rate",
+      title: "Edit tax rate",
+      titleShort: "Edit tax rate",
       description: "Modify an existing tax rate",
       widget: {
         save: "Save tax rate",
-        backToList: "Back to Tax Rates",
-        failed: "Failed",
+        backToList: "Back to tax rates",
+        failed: "Tax rate not saved",
+        subtitle: "{{company}} · {{code}}",
+        notFoundTitle: "This tax rate no longer exists",
+        notFoundMessage:
+          "It was deleted, or it belongs to a company you cannot open. Pick a rate from the list.",
+        loadErrorTitle: "The tax rate could not load",
       },
       rateId: {
         label: "Tax Rate ID",
@@ -225,7 +231,7 @@ export const translations = {
         placeholder: "0.2000",
       },
       isDefault: {
-        label: "Default Rate",
+        label: "Default rate",
         description: "Use this rate as the default for new items",
       },
       isActive: {
@@ -236,7 +242,7 @@ export const translations = {
         updated: "Updated",
       },
       success: {
-        title: "Tax Rate Updated",
+        title: "Tax rate saved",
         description: "The tax rate has been updated",
       },
       errors: {
@@ -273,11 +279,11 @@ export const translations = {
       },
     },
     delete: {
-      title: "Delete Tax Rate",
-      titleShort: "Delete Rate",
+      title: "Deactivate tax rate",
+      titleShort: "Deactivate rate",
       description: "Deactivate a tax rate",
       widget: {
-        backToList: "Back to Tax Rates",
+        backToList: "Back to tax rates",
         warning:
           "This will deactivate the tax rate. This action cannot be undone.",
         confirmTitle: "Deactivate this tax rate?",
@@ -295,7 +301,7 @@ export const translations = {
         deleted: "Deactivated",
       },
       success: {
-        title: "Tax Rate Deactivated",
+        title: "Tax rate deactivated",
         description: "The tax rate has been deactivated",
       },
       errors: {
@@ -342,7 +348,8 @@ export const translations = {
       retry: "Run report again",
       scope:
         "Invoices use their linked ledger date or their creation date. Purchases use the bill date. Till sales use their UTC completion date and include lines with a positive rate or recorded tax. When an issued invoice shares a ledger entry with a till sale, the invoice represents the sale.",
-      empty: "No document lines match these filters.",
+      empty:
+        "Issued invoices, credit notes, supplier bills and till sales with tax show up here, grouped by rate.",
       range: "{{from}} to {{to}}",
       total: "Total",
       previousMonth: "Show previous month",
@@ -352,6 +359,23 @@ export const translations = {
       scopeHint:
         "Compare sales and purchase tax by rate for one company and period.",
       selectCompany: "Select the company for this report.",
+      subtitle: "{{company}} · {{from}} to {{to}}",
+      errorTitle: "The tax report could not load",
+      emptyTitle: "No taxed documents in this period",
+      period: {
+        label: "Period",
+        thisMonth: "This month",
+        lastMonth: "Last month",
+        thisQuarter: "This quarter",
+        thisYear: "This year",
+        custom: "Custom",
+      },
+      kpi: {
+        salesTax: "Tax on sales",
+        salesBase: "Taxable sales",
+        purchaseTax: "Tax on purchases",
+        purchaseBase: "Taxable purchases",
+      },
     },
     currency: {
       label: "Currency",
@@ -379,8 +403,8 @@ export const translations = {
       row: {
         direction: "Document type",
         rate: "Tax rate",
-        taxableAmount: "Taxable Amount",
-        taxAmount: "Tax Amount",
+        taxableAmount: "Taxable amount",
+        taxAmount: "Tax",
       },
     },
     success: {
@@ -433,8 +457,8 @@ export const translations = {
     taxType: {
       vat: "VAT",
       gst: "GST",
-      sales: "Sales Tax",
-      withholding: "Withholding Tax",
+      sales: "Sales tax",
+      withholding: "Withholding tax",
       none: "No Tax / Exempt",
     },
   },

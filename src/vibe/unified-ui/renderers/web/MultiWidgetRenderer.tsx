@@ -9,6 +9,7 @@ import type z from "zod";
 
 import type { InferResponseOutput } from "../../../core/definition/create";
 import type { CreateApiEndpointAny } from "../../../core/definition/endpoint-base";
+import { FieldDataType } from "../../../core/definition/enums";
 import type { WidgetData } from "../../../core/utils/json";
 import { withValueNonStrict } from "../../_shared/field-helpers";
 import type {
@@ -25,8 +26,13 @@ import {
   useWidgetUser,
 } from "../../_shared/use-widget-context";
 import {
+  type ChildSlot,
   ChildrenDataRenderer,
+  isArrayChild,
+  isUnionVariants,
+  matchesSlot,
   type ProcessedChildren,
+  type SlotField,
 } from "./ChildrenDataRenderer";
 import { WidgetRenderer } from "./WidgetRenderer";
 
@@ -61,6 +67,31 @@ function getColumnSpanClass(
   };
 
   return colSpanMap[effective] ?? "";
+}
+
+const WIDE_FIELD_TYPES: ReadonlySet<string> = new Set([
+  FieldDataType.TEXTAREA,
+  FieldDataType.MARKDOWN_TEXTAREA,
+  FieldDataType.JSON,
+  FieldDataType.TAGS,
+  FieldDataType.TEXT_ARRAY,
+  FieldDataType.MULTISELECT,
+  FieldDataType.FILTER_PILLS,
+  FieldDataType.FILE,
+  FieldDataType.ENTITY_PICKER,
+]);
+
+/** Span class for a child inside the two-column form template grid. */
+function getFormGridSpanClass(field: SlotField, columns?: number): string {
+  const fieldType = "fieldType" in field ? field.fieldType : undefined;
+  const schemaType = "schemaType" in field ? field.schemaType : undefined;
+  const wide =
+    (columns !== undefined && columns > 6) ||
+    (typeof fieldType === "string" && WIDE_FIELD_TYPES.has(fieldType)) ||
+    (schemaType !== undefined &&
+      schemaType !== "primitive" &&
+      schemaType !== "widget");
+  return wide ? "@lg:col-span-2" : "";
 }
 
 /**
@@ -119,6 +150,10 @@ interface ObjectChildrenRendererProps<
   fieldName: string | undefined;
   /** Default column span for children without an explicit columns prop (e.g. 12 in grid layout) */
   defaultColumns?: number;
+  /** Render only the children of one form template slot */
+  slot?: ChildSlot;
+  /** Children sit in the two-column form template grid */
+  formGrid?: boolean;
 }
 
 /**
@@ -154,6 +189,8 @@ interface UnionObjectRendererProps<
   fieldName: string | undefined;
   discriminator: string | undefined;
   watchedDiscriminatorValue: string | undefined;
+  slot?: ChildSlot;
+  formGrid?: boolean;
 }
 
 /**
@@ -170,6 +207,8 @@ function ObjectChildrenRenderer<
   value,
   fieldName,
   defaultColumns,
+  slot,
+  formGrid = false,
 }: ObjectChildrenRendererProps<TKey, TUsage, TChildren>): JSX.Element {
   const form = useWidgetForm();
   const user = useWidgetUser();
@@ -223,14 +262,20 @@ function ObjectChildrenRenderer<
       mergedValue,
       { userRoles: user.roles },
     );
-    const sorted = ChildrenDataRenderer.sortChildren(extracted);
+    const sorted = ChildrenDataRenderer.sortChildren(
+      slot
+        ? extracted.filter((child) =>
+            matchesSlot(slot, child.field, child.data),
+          )
+        : extracted,
+    );
     const groupResult = ChildrenDataRenderer.groupInlineFields(sorted);
     return {
       children: sorted,
       inlineGroups: groupResult.groups,
       inlineGroupMembers: groupResult.members,
     };
-  }, [childrenSchema, mergedValue, user.roles]);
+  }, [childrenSchema, mergedValue, user.roles, slot]);
 
   if (!processed || processed.children.length === 0) {
     return <></>;
@@ -246,10 +291,9 @@ function ObjectChildrenRenderer<
         g.fields.some((f) => f.name === child.name),
       );
       if (group && group.fields[0].name === child.name) {
-        const groupColumnSpanClass = getColumnSpanClass(
-          group.totalColumns,
-          defaultColumns,
-        );
+        const groupColumnSpanClass = formGrid
+          ? "@lg:col-span-2"
+          : getColumnSpanClass(group.totalColumns, defaultColumns);
         const groupElement = renderInlineGroup<TEndpoint>(
           group,
           fieldName,
@@ -276,7 +320,9 @@ function ObjectChildrenRenderer<
     const childFieldName = fieldName
       ? `${fieldName}.${child.name}`
       : child.name;
-    const columnSpanClass = getColumnSpanClass(child.columns, defaultColumns);
+    const columnSpanClass = formGrid
+      ? getFormGridSpanClass(child.field, child.columns)
+      : getColumnSpanClass(child.columns, defaultColumns);
 
     const element = (
       <WidgetRenderer<TEndpoint>
@@ -384,6 +430,8 @@ function UnionObjectRenderer<
   fieldName,
   discriminator,
   watchedDiscriminatorValue,
+  slot,
+  formGrid,
 }: UnionObjectRendererProps<TKey, TUsage, TVariants>): JSX.Element {
   if (!variants || variants.length === 0 || !discriminator) {
     return <></>;
@@ -499,6 +547,8 @@ function UnionObjectRenderer<
           | undefined
       }
       fieldName={fieldName}
+      slot={slot}
+      formGrid={formGrid}
     />
   );
 }
@@ -528,6 +578,10 @@ interface MultiWidgetRendererProps<
   watchedDiscriminatorValue?: string;
   /** Default column span for children without an explicit columns prop (e.g. 12 in grid layout) */
   defaultColumns?: number;
+  /** Render only the children of one form template slot (object children only) */
+  slot?: ChildSlot;
+  /** Children sit in the two-column form template grid (object children only) */
+  formGrid?: boolean;
   /** Optional render callback for array items to customize rendering */
   renderItem?: (props: {
     itemData: InferResponseOutput<AnyChildrenConstrain<TKey, TUsage>>;
@@ -535,42 +589,6 @@ interface MultiWidgetRendererProps<
     itemFieldName: string;
     childSchema: AnyChildrenConstrain<TKey, TUsage>;
   }) => JSX.Element;
-}
-
-/**
- * Type guard to check if children is a union of variants
- */
-function isUnionVariants<TKey extends string, TUsage extends FieldUsageConfig>(
-  children:
-    | ObjectChildrenConstraint<TKey, TUsage>
-    | ArrayChildConstraint<TKey, TUsage>
-    | UnionObjectWidgetConfigConstrain<TKey, TUsage>
-    | undefined,
-): children is UnionObjectWidgetConfigConstrain<TKey, TUsage> {
-  return (
-    Array.isArray(children) &&
-    children.length > 0 &&
-    children[0] &&
-    "children" in children[0]
-  );
-}
-
-/**
- * Type guard to check if children is a single child constraint (array element)
- */
-function isArrayChild<TKey extends string, TUsage extends FieldUsageConfig>(
-  children:
-    | ObjectChildrenConstraint<TKey, TUsage>
-    | ArrayChildConstraint<TKey, TUsage>
-    | UnionObjectWidgetConfigConstrain<TKey, TUsage>
-    | undefined,
-): children is ArrayChildConstraint<TKey, TUsage> {
-  return (
-    children !== undefined &&
-    !Array.isArray(children) &&
-    children !== null &&
-    "type" in children
-  );
 }
 
 /**
@@ -593,6 +611,8 @@ export function MultiWidgetRenderer<
   watchedDiscriminatorValue,
   defaultColumns,
   renderItem,
+  slot,
+  formGrid,
 }: MultiWidgetRendererProps<TKey, TUsage, TChildren>): JSX.Element {
   if (!childrenSchema) {
     return <></>;
@@ -616,6 +636,8 @@ export function MultiWidgetRenderer<
         fieldName={fieldName}
         discriminator={discriminator}
         watchedDiscriminatorValue={watchedDiscriminatorValue}
+        slot={slot}
+        formGrid={formGrid}
       />
     );
   }
@@ -653,6 +675,8 @@ export function MultiWidgetRenderer<
       value={objectValue}
       fieldName={fieldName}
       defaultColumns={defaultColumns}
+      slot={slot}
+      formGrid={formGrid}
     />
   );
 }

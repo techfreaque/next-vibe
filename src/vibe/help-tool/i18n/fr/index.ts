@@ -22,6 +22,9 @@ export const translations: typeof enTranslations = {
     pinned: "Outils épinglés",
     categoryTools: "Outils de cet espace",
     results: "Résultats de recherche",
+    resultsForOne: "1 résultat pour « {{query}} »",
+    resultsFor: "{{count}} résultats pour « {{query}} »",
+    jumpTo: "Ou ouvrez un espace de travail",
     tool: "Outil",
   },
   erp: {
@@ -137,6 +140,7 @@ export const translations: typeof enTranslations = {
     page: "Page {{page}} sur {{total}}",
     openSidebar: "Ouvrir le volet des outils",
     browse: "Parcourir les outils",
+    backHome: "Aller à l’accueil de l’administration",
     toolUnavailableHint:
       "Ce lien peut être obsolète ou votre rôle peut ne pas y donner accès. Consultez les outils à votre disposition.",
     openError: "Impossible d’ouvrir cet outil",

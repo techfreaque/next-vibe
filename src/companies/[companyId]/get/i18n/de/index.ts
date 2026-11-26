@@ -71,6 +71,11 @@ export const translations: typeof enTranslations = {
       description: "Unternehmensdetails abgerufen",
     },
     widget: {
+      backToList: "Firmen",
+      type: "Kundentyp",
+      loadFailed: "Firma konnte nicht geladen werden",
+      retry: "Erneut versuchen",
+      related: "In dieser Firma arbeiten",
       setupAccounting: "Buchhaltung einrichten",
       back: "Zurück",
       loading: "Unternehmen wird geladen...",
@@ -89,41 +94,32 @@ export const translations: typeof enTranslations = {
       email: "E-Mail",
       phone: "Telefon",
       website: "Website",
-      createdAt: "Mitglied seit",
+      createdAt: "Angelegt am",
       actions: "Aktionen",
       modules: {
-        title: "Module",
         accounting: {
           label: "Buchhaltung",
-          description: "Kontenplan, Buchungseinträge, Berichte",
         },
         invoices: {
           label: "Rechnungen",
-          description: "Ausgangsrechnungen, Zahlungen",
         },
         estimates: {
           label: "Angebote",
-          description: "Angebotsentwürfe für Kunden",
         },
         bills: {
           label: "Eingangsrechnungen",
-          description: "Lieferantenrechnungen und Zahlungen",
         },
         pos: {
           label: "Kasse",
-          description: "Terminals, Sitzungen, Bestellungen",
         },
         purchasing: {
           label: "Einkauf",
-          description: "Bestellungen und Lieferanten",
         },
         inventory: {
           label: "Lager",
-          description: "Bestände, Lagerorte, Transfers",
         },
         team: {
           label: "Team",
-          description: "Mitglieder und Rollen",
         },
       },
     },

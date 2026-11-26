@@ -117,5 +117,9 @@ export const translations: typeof enTranslations = {
     submit: "Zarejestruj płatność",
     paymentRecorded: "Płatność została zarejestrowana.",
     viewInvoice: "Zobacz fakturę",
+    amountDue: "{{amount}} do zapłaty",
+    notOpenTitle: "Ta faktura nie jest otwarta",
+    notOpenMessage:
+      "Płatność zapiszesz tylko na wystawionej, nieopłaconej fakturze. Najpierw wystaw fakturę albo otwórz właściwą.",
   },
 };

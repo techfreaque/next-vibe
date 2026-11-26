@@ -368,7 +368,7 @@ export const translations: typeof enTranslations = {
   },
   status: {
     title: "Finance",
-    titleShort: "Finance",
+    titleShort: "Coûts et marge",
     description:
       "Chiffre d'affaires face au coût fournisseurs : soldes fournisseurs, marge, alertes et seuils.",
     response: {

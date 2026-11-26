@@ -152,6 +152,7 @@ export const translations: typeof enTranslations = {
         rates: "Sadzby dane",
         rate: {
           id: "Identifikátor",
+          company: "Spoločnosť",
           name: "Názov",
           code: "Kód",
           type: "Druh",
@@ -209,7 +210,12 @@ export const translations: typeof enTranslations = {
       widget: {
         save: "Uložiť sadzbu dane",
         backToList: "Späť na sadzby dane",
-        failed: "Zlyhalo",
+        failed: "Sadzba sa neuložila",
+        subtitle: "{{company}} · {{code}}",
+        notFoundTitle: "Táto sadzba už neexistuje",
+        notFoundMessage:
+          "Bola odstránená alebo patrí spoločnosti, ku ktorej nemáte prístup. Vyberte sadzbu zo zoznamu.",
+        loadErrorTitle: "Sadzbu sa nepodarilo načítať",
       },
       rateId: {
         label: "ID sadzby dane",
@@ -349,7 +355,8 @@ export const translations: typeof enTranslations = {
       retry: "Znova načítať výkaz",
       scope:
         "Odberateľské faktúry sa vykazujú ku dňu účtovného zápisu alebo vytvorenia faktúry. Pri nákupoch sa používa dátum dodávateľskej faktúry. Pokladničné predaje sa vykazujú ku dňu dokončenia v UTC a zahŕňajú položky s kladnou sadzbou alebo zaevidovanou daňou. Ak vystavená faktúra a pokladničný predaj odkazujú na ten istý účtovný zápis, predaj sa vykáže podľa faktúry.",
-      empty: "Zvoleným filtrom nezodpovedajú žiadne položky.",
+      empty:
+        "Tu sa zobrazia vystavené faktúry, dobropisy, dodávateľské faktúry a pokladničné predaje s daňou, zoskupené podľa sadzby.",
       range: "od {{from}} do {{to}}",
       total: "Spolu",
       previousMonth: "Zobraziť predchádzajúci mesiac",
@@ -359,6 +366,23 @@ export const translations: typeof enTranslations = {
       scopeHint:
         "Porovnajte DPH z predaja a nákupu podľa sadzby za vybranú firmu a obdobie.",
       selectCompany: "Vyberte spoločnosť pre tento prehľad.",
+      subtitle: "{{company}} · od {{from}} do {{to}}",
+      errorTitle: "Prehľad daní sa nepodarilo načítať",
+      emptyTitle: "V tomto období nie sú žiadne zdanené doklady",
+      period: {
+        label: "Obdobie",
+        thisMonth: "Tento mesiac",
+        lastMonth: "Minulý mesiac",
+        thisQuarter: "Tento štvrťrok",
+        thisYear: "Tento rok",
+        custom: "Vlastné",
+      },
+      kpi: {
+        salesTax: "DPH z predaja",
+        salesBase: "Zdaniteľné predaje",
+        purchaseTax: "DPH z nákupov",
+        purchaseBase: "Zdaniteľné nákupy",
+      },
     },
     currency: {
       label: "Mena",

@@ -152,7 +152,7 @@ describe("User record from the catalog", () => {
         [t("id.widget.relatedThreadActivity"), "activity", fullT("tabs.activity")],
         [fullT("tabs.referrals"), "referrals", fullT("tabs.referrals")],
       ] as const) {
-        await button(label).click();
+        await page.locator("#admin-tool-user-view").getByRole("button", { name: label, exact: true }).click();
         await page.waitForURL((url) => url.pathname.endsWith("/tools/users-view") &&
           url.searchParams.get("arg.userId") === id && url.searchParams.get("arg.tab") === tab);
         const sections = page.getByRole("combobox", {name:fullT("tabs.section")});

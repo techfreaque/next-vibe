@@ -2,6 +2,7 @@
 
 import {
   type AnalyticsFilterChip,
+  AnalyticsSegmented,
   AnalyticsToolbar,
   BreakdownTable,
   KpiGrid,
@@ -544,45 +545,33 @@ function ErrorLogRow({
   );
 }
 
+/**
+ * Domain filter with a visible label in the filter sheet. Same segmented
+ * control as the period presets, so the toolbar has one active style.
+ */
 function SegmentedFilter<TValue extends string>({
   label,
   value,
   options,
   onSelect,
+  showLabel = true,
 }: {
   label: string;
   value: TValue;
   options: ReadonlyArray<{ value: TValue; label: string }>;
   onSelect: (value: TValue) => void;
+  /** Visible caption above the control (sheet); the toolbar relies on aria. */
+  showLabel?: boolean;
 }): JSX.Element {
   return (
-    <Div className="min-w-0">
-      <Span className="mb-1 block text-xs font-medium @4xl:sr-only">
-        {label}
-      </Span>
-      <Div
-        role="group" // oxlint-disable-line jsx-a11y/prefer-tag-over-role -- Shared UI has no cross-platform fieldset component.
-        ariaLabel={label}
-        className="inline-flex min-w-0 flex-wrap items-center rounded-md border p-0.5"
-      >
-        {options.map((option) => (
-          <Button
-            key={option.value}
-            type="button"
-            size="sm"
-            variant={value === option.value ? "default" : "ghost"}
-            aria-pressed={value === option.value}
-            className={
-              value === option.value
-                ? "h-7 px-2.5 text-xs transition-none"
-                : "h-7 px-2.5 text-xs transition-none hover:bg-transparent hover:text-inherit"
-            }
-            onClick={() => onSelect(option.value)}
-          >
-            {option.label}
-          </Button>
-        ))}
-      </Div>
+    <Div className="flex min-w-0 max-w-full flex-col gap-1.5">
+      {showLabel && <Span className="text-xs font-medium">{label}</Span>}
+      <AnalyticsSegmented
+        label={label}
+        value={value}
+        onSelect={onSelect}
+        options={options}
+      />
     </Div>
   );
 }
@@ -794,9 +783,11 @@ export function ErrorLogsContainer(): JSX.Element {
   const secondaryFilters = (
     values: SecondaryFilters,
     update: (patch: Partial<SecondaryFilters>) => void,
+    showLabel: boolean,
   ): JSX.Element => (
     <>
       <SegmentedFilter
+        showLabel={showLabel}
         label={t("get.fields.status.label")}
         value={values.status}
         onSelect={(value) => update({ status: value })}
@@ -807,6 +798,7 @@ export function ErrorLogsContainer(): JSX.Element {
         ].map((value) => ({ value, label: t(value) }))}
       />
       <SegmentedFilter
+        showLabel={showLabel}
         label={t("get.fields.level.label")}
         value={values.level}
         onSelect={(value) => update({ level: value })}
@@ -816,6 +808,7 @@ export function ErrorLogsContainer(): JSX.Element {
         }))}
       />
       <SegmentedFilter
+        showLabel={showLabel}
         label={t("get.fields.source.label")}
         value={values.source}
         onSelect={(value) => update({ source: value })}
@@ -851,9 +844,11 @@ export function ErrorLogsContainer(): JSX.Element {
       : null;
 
   return (
-    <WidgetShell className="min-w-0">
+    <WidgetShell layout="page" className="min-w-0">
       <WidgetHeader
+        size="page"
         title={t("widget.title")}
+        subtitle={isInteractive ? t("widget.subtitle") : undefined}
         backButton={
           canGoBack && (
             <Button
@@ -901,11 +896,11 @@ export function ErrorLogsContainer(): JSX.Element {
           onClearFilters={hasFilters ? clearFilters : undefined}
         >
           {isText ? (
-            secondaryFilters(liveFilters, applySecondary)
+            secondaryFilters(liveFilters, applySecondary, true)
           ) : (
             <>
               <Div className="hidden flex-wrap items-center gap-2 @4xl:flex">
-                {secondaryFilters(liveFilters, applySecondary)}
+                {secondaryFilters(liveFilters, applySecondary, false)}
               </Div>
               <Div className="@4xl:hidden">
                 <Sheet
@@ -944,8 +939,11 @@ export function ErrorLogsContainer(): JSX.Element {
                     <Div className="flex flex-col items-start gap-4 px-4 pb-5">
                       {filterDraft && (
                         <>
-                          {secondaryFilters(filterDraft, (patch) =>
-                            setFilterDraft({ ...filterDraft, ...patch }),
+                          {secondaryFilters(
+                            filterDraft,
+                            (patch) =>
+                              setFilterDraft({ ...filterDraft, ...patch }),
+                            true,
                           )}
                           <Button
                             type="button"
@@ -1075,6 +1073,7 @@ export function ErrorLogsContainer(): JSX.Element {
               actions={
                 isInteractive && (
                   <SegmentedFilter
+                    showLabel={false}
                     label={t("get.fields.split.label")}
                     value={split}
                     onSelect={(value) =>

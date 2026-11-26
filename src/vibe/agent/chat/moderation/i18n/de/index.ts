@@ -7,7 +7,7 @@ export const translations: typeof enTranslations = {
   },
   get: {
     title: "Gemeldete Inhalte",
-    titleShort: "Moderations-Queue",
+    titleShort: "Gemeldete Beiträge",
     description:
       "Gemeldete und ausgeblendete Feed-Beiträge und geteilte Threads, das Dringendste zuerst",
     fields: {

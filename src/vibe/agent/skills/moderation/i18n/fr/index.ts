@@ -7,7 +7,7 @@ export const translations: typeof enTranslations = {
   },
   get: {
     title: "Compétences signalées",
-    titleShort: "Modération",
+    titleShort: "Compétences signalées",
     description:
       "Liste des compétences signalées, triées par nombre de signalements",
     fields: {

@@ -1,4 +1,14 @@
 "use client";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "next-vibe/ui/components/alert-dialog";
 import { Button } from "next-vibe/ui/components/button";
 import {
   Card,
@@ -12,8 +22,9 @@ import {
   FormAlert,
   type FormAlertState,
 } from "next-vibe/ui/components/form/form-alert";
+import { SectionGroup } from "next-vibe/ui/components/section-group";
 import { H1, P } from "next-vibe/ui/components/typography";
-import { type JSX } from "react";
+import { type JSX, useContext, useState } from "react";
 import type { Path } from "react-hook-form";
 import { useWatch } from "react-hook-form";
 
@@ -21,6 +32,8 @@ import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-
 import { LayoutType } from "../../../../core/definition/enums";
 import type { WidgetData } from "../../../../core/utils/json";
 import { UserPermissionRole } from "../../../../identity/roles/enum";
+import { AdminRecordContext } from "../../../_shared/admin-record-context";
+import { AdminRecordDetail } from "../../../_shared/admin-record-detail";
 import { cn } from "../../../_shared/cn";
 import type { ReactWidgetProps } from "../../../_shared/react-types";
 import { hasChild, hasChildren } from "../../../_shared/type-guards";
@@ -52,9 +65,15 @@ import {
   type LayoutConfig,
 } from "../../../_shared/widget-helpers";
 import { scopedTranslation as reactScopedTranslation } from "../../../hooks/i18n";
+import {
+  hasSlotChildren,
+  hasSlotContent,
+  isRawIdentifier,
+} from "../../../renderers/web/ChildrenDataRenderer";
 import { MultiWidgetRenderer } from "../../../renderers/web/MultiWidgetRenderer";
 import { Icon } from "../../form-fields/icon-field/icon-component";
 import type { IconKey } from "../../form-fields/icon-field/icons";
+import { getRootFormErrorMessage } from "../../interactive/form-alert/root-error";
 import { SubmitButtonWidget } from "../../interactive/submit-button/widget";
 import { AdminForm, AdminFormSection } from "../admin-form/widget";
 import type {
@@ -62,6 +81,15 @@ import type {
   ContainerObjectWidgetConfig,
   ContainerUnionWidgetConfig,
 } from "./types";
+
+/** Response keys that name a record well enough to be its page title. */
+const RECORD_NAME_KEYS = [
+  "name",
+  "title",
+  "displayName",
+  "label",
+  "email",
+] as const;
 
 /**
  * Container Widget - Displays container layouts with nested fields
@@ -139,7 +167,9 @@ export function ContainerWidget<
 >): JSX.Element {
   // Get context from hooks
   const locale = useWidgetLocale();
-  const { t: tField } = useWidgetContext();
+  const { t: tField, endpoint } = useWidgetContext();
+  const adminShell = useContext(AdminRecordContext);
+  const [confirmDelete, setConfirmDelete] = useState(false);
   const form = useWidgetForm();
   const onSubmit = useWidgetOnSubmit();
   const onCancel = useWidgetOnCancel();
@@ -376,44 +406,251 @@ export function ContainerWidget<
     ? tField(submitButtonConfig.loadingText)
     : globalT("widgets.endpointRenderer.submitting");
 
-  if (
-    adminForm &&
+  // One admin form template for every mutating root form inside the tools
+  // shell (explicit `adminForm` config, or any non-GET form without its own
+  // layout). Chat tool calls, public pages and CLI keep the plain layout.
+  const isAdminUser =
+    !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN);
+  const inToolsShell = adminShell !== null;
+  const useFormTemplate =
     isRootContainer &&
     hasFormInputs &&
-    displayTitle &&
-    !user.isPublic &&
-    user.roles.includes(UserPermissionRole.ADMIN)
-  ) {
+    !showHeaderButton &&
+    !showBottomButton &&
+    ((adminForm !== undefined && (isAdminUser || inToolsShell)) ||
+      (inToolsShell && endpoint.method !== "GET"));
+  // Generic record GET inside the tools shell: the shared record-detail
+  // template (H1 from the record's name, facts card, nested sections, raw
+  // ids only under "Technical details").
+  const recordValue =
+    fieldValue !== null &&
+    typeof fieldValue === "object" &&
+    !Array.isArray(fieldValue) &&
+    !(fieldValue instanceof Date)
+      ? fieldValue
+      : undefined;
+  const isRecordRead =
+    isRootContainer &&
+    inToolsShell &&
+    endpoint.method === "GET" &&
+    "usage" in endpoint.fields &&
+    endpoint.fields.usage.request === "urlPathParams" &&
+    response?.success === true &&
+    recordValue !== undefined;
+  if (isRecordRead && hasChildren(field)) {
+    const endpointTitle = tField(endpoint.titleShort ?? endpoint.title);
+    const nameValue = RECORD_NAME_KEYS.map((key) => recordValue[key]).find(
+      (value): value is string =>
+        typeof value === "string" && value.trim().length > 0,
+    );
+    const technicalDetails = Object.entries(field.children).flatMap(
+      ([key, child]) => {
+        const value = recordValue[key];
+        if (!child || typeof value !== "string" || !isRawIdentifier(value)) {
+          return [];
+        }
+        const label =
+          "label" in child && typeof child.label === "string"
+            ? tField(child.label)
+            : key;
+        return [{ key, label, value }];
+      },
+    );
+    return (
+      <AdminRecordDetail
+        title={nameValue ?? endpointTitle}
+        subtitle={nameValue ? endpointTitle : description}
+        technicalDetails={technicalDetails}
+      >
+        {hasSlotContent(
+          childrenForRenderer,
+          fieldValue,
+          "facts",
+          user.roles,
+        ) && (
+          <Div className="grid min-w-0 grid-cols-1 gap-x-6 gap-y-4 rounded-lg border bg-card p-4 @sm:grid-cols-2 @lg:grid-cols-3">
+            <MultiWidgetRenderer
+              childrenSchema={childrenForRenderer}
+              value={fieldValue}
+              fieldName={fieldName}
+              slot="facts"
+            />
+          </Div>
+        )}
+        <MultiWidgetRenderer
+          childrenSchema={childrenForRenderer}
+          value={fieldValue}
+          fieldName={fieldName}
+          slot="sections"
+        />
+      </AdminRecordDetail>
+    );
+  }
+
+  if (useFormTemplate) {
+    const endpointTitle = tField(endpoint.titleShort ?? endpoint.title);
+    const pageTitle = displayTitle ?? tField(endpoint.title);
+    const endpointDescription = endpoint.description
+      ? tField(endpoint.description)
+      : undefined;
+    const pageDescription =
+      description ??
+      (endpointDescription && endpointDescription.length <= 160
+        ? endpointDescription
+        : undefined);
+    const isDelete = endpoint.method === "DELETE";
+    const isSaveMethod =
+      endpoint.method === "PUT" || endpoint.method === "PATCH";
+    const derivedSubmitText = isSaveMethod
+      ? globalT("widgets.endpointRenderer.saveChanges")
+      : endpointTitle;
+    const hasInlineSubmit = inlineButtonInfo?.hasSubmitButton ?? false;
+    const showResult =
+      response?.success === true &&
+      endpoint.method !== "GET" &&
+      hasSlotContent(childrenForRenderer, fieldValue, "response", user.roles);
+    const fields = (
+      <MultiWidgetRenderer
+        childrenSchema={childrenForRenderer}
+        value={fieldValue}
+        fieldName={fieldName}
+        discriminator={discriminator}
+        watchedDiscriminatorValue={watchedDiscriminator}
+        slot="fields"
+        formGrid
+      />
+    );
     return (
       <AdminForm
-        title={displayTitle}
-        description={description}
+        title={pageTitle}
+        description={pageDescription}
         backButton={
           shouldShowAutoBackButton ? (
             <Button
               type="button"
               variant="ghost"
+              size="sm"
+              className="-ml-2 self-start"
               onClick={() => navigation?.pop()}
             >
+              <Icon icon="arrow-left" className="h-4 w-4" />
               {globalT("widgets.endpointRenderer.cancel")}
             </Button>
           ) : undefined
         }
+        secondaryActions={
+          onCancel && !shouldShowAutoBackButton ? (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onCancel}
+              disabled={isSubmitting}
+            >
+              {cancelButton?.text
+                ? tField(cancelButton.text)
+                : globalT("widgets.endpointRenderer.cancel")}
+            </Button>
+          ) : undefined
+        }
         primaryAction={
-          <SubmitButtonWidget<TEndpoint>
-            field={{ text: adminForm.submitText }}
-          />
+          adminForm ? (
+            <SubmitButtonWidget<TEndpoint>
+              field={{ text: adminForm.submitText }}
+            />
+          ) : hasInlineSubmit ? (
+            <Div className="flex [&_button]:w-full @md:[&_button]:w-auto">
+              <MultiWidgetRenderer
+                childrenSchema={childrenForRenderer}
+                value={fieldValue}
+                fieldName={fieldName}
+                discriminator={discriminator}
+                watchedDiscriminatorValue={watchedDiscriminator}
+                slot="actions"
+              />
+            </Div>
+          ) : (
+            <Button
+              type="button"
+              data-testid="endpoint-submit"
+              variant={isDelete ? "destructive" : "default"}
+              disabled={isSubmitting}
+              onClick={(): void => {
+                if (isDelete) {
+                  setConfirmDelete(true);
+                  return;
+                }
+                onSubmit?.();
+              }}
+            >
+              {isSubmitting
+                ? globalT(
+                    isSaveMethod
+                      ? "widgets.endpointRenderer.saving"
+                      : "widgets.endpointRenderer.submitting",
+                  )
+                : derivedSubmitText}
+            </Button>
+          )
+        }
+        result={
+          showResult ? (
+            <SectionGroup title={globalT("widgets.endpointRenderer.result")}>
+              <Div className="grid min-w-0 grid-cols-1 gap-4">
+                <MultiWidgetRenderer
+                  childrenSchema={childrenForRenderer}
+                  value={fieldValue}
+                  fieldName={fieldName}
+                  discriminator={discriminator}
+                  watchedDiscriminatorValue={watchedDiscriminator}
+                  slot="response"
+                />
+              </Div>
+            </SectionGroup>
+          ) : undefined
         }
       >
-        <AdminFormSection title={tField(adminForm.sectionTitle)} columns={2}>
-          <MultiWidgetRenderer
-            childrenSchema={childrenForRenderer}
-            value={fieldValue}
-            fieldName={fieldName}
-            discriminator={discriminator}
-            watchedDiscriminatorValue={watchedDiscriminator}
-          />
-        </AdminFormSection>
+        {adminForm ? (
+          <AdminFormSection title={tField(adminForm.sectionTitle)} columns={2}>
+            {fields}
+          </AdminFormSection>
+        ) : hasSlotChildren(
+            childrenForRenderer,
+            fieldValue,
+            "fields",
+            user.roles,
+          ) ? (
+          <Div className="grid min-w-0 grid-cols-1 gap-4 rounded-lg border bg-card p-4 @lg:grid-cols-2">
+            {fields}
+          </Div>
+        ) : null}
+        {isDelete && (
+          <AlertDialog open={confirmDelete} onOpenChange={setConfirmDelete}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>{pageTitle}</AlertDialogTitle>
+                {pageDescription && (
+                  <AlertDialogDescription>
+                    {pageDescription}
+                  </AlertDialogDescription>
+                )}
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>
+                  {globalT("widgets.endpointRenderer.cancel")}
+                </AlertDialogCancel>
+                <AlertDialogAction
+                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  onClick={(): void => {
+                    setConfirmDelete(false);
+                    onSubmit?.();
+                  }}
+                >
+                  {derivedSubmitText}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        )}
       </AdminForm>
     );
   }
@@ -443,7 +680,13 @@ export function ContainerWidget<
 
   // Build FormAlert state from response
   let formAlertState: FormAlertState | null = null;
-  if (response && response.success === false) {
+  const rootFormError = getRootFormErrorMessage(form?.formState.errors, locale);
+  if (rootFormError) {
+    formAlertState = {
+      variant: "destructive",
+      message: { message: rootFormError },
+    };
+  } else if (response && response.success === false) {
     formAlertState = {
       variant: "destructive",
       // `response.message` is already fully interpolated - nothing left to fill in.
@@ -453,7 +696,14 @@ export function ContainerWidget<
     };
   }
 
-  const autoSubmitText = globalT("widgets.endpointRenderer.submit");
+  // Say the action: a GET form shows results, a save saves, anything else
+  // is named after the endpoint ("Rename instance", "Send newsletter").
+  const autoSubmitText =
+    endpoint.method === "GET"
+      ? globalT("widgets.endpointRenderer.showResults")
+      : endpoint.method === "PUT" || endpoint.method === "PATCH"
+        ? globalT("widgets.endpointRenderer.saveChanges")
+        : tField(endpoint.titleShort ?? endpoint.title);
   const autoSubmitLoadingText = globalT("widgets.endpointRenderer.submitting");
 
   // If noCard is true, render without Card wrapper
@@ -584,7 +834,9 @@ export function ContainerWidget<
               variant={submitButton?.variant}
               size={submitButton?.size}
               className={
-                onCancel || shouldShowAutoBackButton ? "flex-1" : "w-full"
+                onCancel || shouldShowAutoBackButton
+                  ? "flex-1"
+                  : "w-full sm:ml-auto sm:w-auto"
               }
             >
               {isSubmitting ? autoSubmitLoadingText : autoSubmitText}
@@ -778,7 +1030,9 @@ export function ContainerWidget<
               }}
               disabled={isSubmitting}
               className={
-                onCancel || shouldShowAutoBackButton ? "flex-1" : "w-full"
+                onCancel || shouldShowAutoBackButton
+                  ? "flex-1"
+                  : "w-full sm:ml-auto sm:w-auto"
               }
             >
               {isSubmitting ? autoSubmitLoadingText : autoSubmitText}

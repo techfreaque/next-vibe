@@ -38,11 +38,53 @@ export const category: CategoryDefinition = {
   icon: "share-2",
   order: 60,
   landing: {
-    actions: [
+    destinations: [
       "referral-overview",
       "referral_admin_payouts_GET",
       "referral-code-report",
     ],
+    destinationDescriptions: {
+      "referral-overview": {
+        "en-US": "Clicks, signups, revenue and commission for every code.",
+        "en-GLOBAL": "Clicks, signups, revenue and commission for every code.",
+        "de-DE": "Klicks, Anmeldungen, Umsatz und Provision für jeden Code.",
+        "pl-PL":
+          "Kliknięcia, rejestracje, przychód i prowizja dla każdego kodu.",
+        "fr-FR":
+          "Clics, inscriptions, revenus et commissions pour chaque code.",
+        "it-IT": "Clic, iscrizioni, ricavi e commissioni per ogni codice.",
+        "es-ES": "Clics, registros, ingresos y comisiones de cada código.",
+        "sk-SK": "Kliknutia, registrácie, tržby a provízie pre každý kód.",
+      },
+      referral_admin_payouts_GET: {
+        "en-US": "Approve or reject partner payout requests.",
+        "en-GLOBAL": "Approve or reject partner payout requests.",
+        "de-DE": "Auszahlungsanfragen von Partnern freigeben oder ablehnen.",
+        "pl-PL": "Akceptuj lub odrzucaj wnioski partnerów o wypłatę.",
+        "fr-FR":
+          "Validez ou refusez les demandes de versement des partenaires.",
+        "it-IT": "Approvi o rifiuti le richieste di pagamento dei partner.",
+        "es-ES": "Apruebe o rechace las solicitudes de pago de los socios.",
+        "sk-SK": "Schváľte alebo zamietnite žiadosti partnerov o výplatu.",
+      },
+      "referral-code-report": {
+        "en-US": "One code end to end: owner, conversions, money and payouts.",
+        "en-GLOBAL":
+          "One code end to end: owner, conversions, money and payouts.",
+        "de-DE":
+          "Ein Code komplett: Inhaber, Conversions, Umsatz und Auszahlungen.",
+        "pl-PL":
+          "Jeden kod od początku do końca: właściciel, konwersje, pieniądze i wypłaty.",
+        "fr-FR":
+          "Un code de bout en bout : titulaire, conversions, revenus et versements.",
+        "it-IT":
+          "Un codice dall’inizio alla fine: titolare, conversioni, ricavi e pagamenti.",
+        "es-ES":
+          "Un código de principio a fin: titular, conversiones, ingresos y pagos.",
+        "sk-SK":
+          "Jeden kód od začiatku do konca: vlastník, konverzie, peniaze a výplaty.",
+      },
+    },
   },
   defaultEntry: {
     [UserPermissionRole.ADMIN]: REFERRAL_OVERVIEW_ALIAS,

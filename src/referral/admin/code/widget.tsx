@@ -13,6 +13,7 @@ import { Button } from "next-vibe/ui/components/button";
 import { DetailField, DetailGrid } from "next-vibe/ui/components/detail-grid";
 import { Div } from "next-vibe/ui/components/div";
 import { EmptyBlock } from "next-vibe/ui/components/empty-block";
+import { Search } from "next-vibe/ui/components/icons/Search";
 import { Input } from "next-vibe/ui/components/input";
 import { LoadingBlock } from "next-vibe/ui/components/loading-block";
 import { Span } from "next-vibe/ui/components/span";
@@ -219,10 +220,12 @@ export function ReferralCodeReportWidget({
 
   if (!value) {
     return (
-      <WidgetShell className="gap-4">
+      <WidgetShell layout="page" className="min-w-0">
         {canControl && (
           <WidgetHeader
+            size="page"
             title={t("get.title")}
+            subtitle={t("get.widget.subtitle")}
             backButton={<NavigateButtonWidget field={children.backButton} />}
           />
         )}
@@ -230,8 +233,24 @@ export function ReferralCodeReportWidget({
         <FormAlertWidget field={{}} />
         {!code ? (
           <EmptyBlock
-            title={t("get.title")}
+            icon={<Search className="size-6" />}
+            title={t("get.widget.pickTitle")}
             message={t("get.widget.pickCode")}
+            action={
+              canControl
+                ? {
+                    label: t("get.widget.browseCodes"),
+                    onClick: () =>
+                      navigate(
+                        () =>
+                          import("../overview/definition").then(
+                            (m) => m.default.GET,
+                          ),
+                        { data: {} },
+                      ),
+                  }
+                : undefined
+            }
           />
         ) : response?.success === false ? null : (
           <LoadingBlock message={t("get.widget.loading")} size="sm" />
@@ -243,9 +262,10 @@ export function ReferralCodeReportWidget({
   const { header, kpis, trend, balance } = value;
 
   return (
-    <WidgetShell className="gap-4">
+    <WidgetShell layout="page" className="min-w-0">
       {canControl && (
         <WidgetHeader
+          size="page"
           title={header.code}
           backButton={<NavigateButtonWidget field={children.backButton} />}
           actions={

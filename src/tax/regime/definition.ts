@@ -101,6 +101,7 @@ const { POST } = createEndpoint({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "regime",
+        placeholder: "choose",
         options: CompanyTaxRegimeOptions,
         schema: z.enum(CompanyTaxRegimeDB),
       }),
@@ -159,6 +160,10 @@ const { GET } = createEndpoint({
   method: Methods.GET,
   path: ["tax", "regime"],
   aliases: ["company-tax-regime-view"],
+  options: {
+    autoFetchRequires: ["companyId"],
+    formOptions: { autoSubmit: true, debounceMs: 300 },
+  },
   category: "tax",
   title: "view",
   titleShort: "title",

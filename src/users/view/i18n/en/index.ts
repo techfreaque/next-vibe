@@ -5,7 +5,7 @@ export const translations = {
     view: "View",
   },
   get: {
-    title: "User Details",
+    title: "User details",
     titleShort: "User",
     description:
       "One account end to end: lifetime revenue, credit wallet, subscription, payments, attribution, referrals, activity and errors. Edit, grant credits, change roles or ban from here.",
@@ -192,7 +192,7 @@ export const translations = {
     actions: {
       retry: "Retry",
       more: "More",
-      browse: "Back to accounts",
+      browse: "All users",
       edit: "Edit",
       addCredits: "Grant credits",
       delete: "Delete user",

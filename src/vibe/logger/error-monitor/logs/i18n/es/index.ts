@@ -337,9 +337,12 @@ export const translations: typeof enTranslations = {
   },
 
   widget: {
+    subtitle:
+      "Todos los errores y avisos agrupados por clase. Marca como resuelto lo que esté arreglado; si se repite, se reabre.",
     kpi: {
       unresolvedInScope: "Sin resolver en esta vista",
-      unresolvedAllTimeLink: "Sin resolver desde el inicio: {{count}}",
+      unresolvedAllTimeLink:
+        "Todas las clases sin resolver, errores y avisos, desde el inicio: {{count}}",
       unresolvedMessages: "{{messages}} mensajes · {{occurrences}} apariciones",
       unresolvedMatching: "{{count}} sin resolver coinciden con los filtros",
       unresolved: "Clases sin resolver (total)",

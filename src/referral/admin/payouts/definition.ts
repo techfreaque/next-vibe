@@ -209,6 +209,10 @@ export const { GET } = createEndpoint({
     },
   }),
 
+  options: {
+    formOptions: { autoSubmit: true, debounceMs: 300 },
+  },
+
   examples: {
     requests: {
       default: {},

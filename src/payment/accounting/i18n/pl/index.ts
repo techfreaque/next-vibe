@@ -27,8 +27,7 @@ export const translations: typeof enTranslations = {
   consideration: "Konto przychodów lub zobowiązań",
   vat: "Konto VAT należnego",
   expense: "Konto kosztów prowizji",
-  zeroTax:
-    "Potwierdź, że niewykazany VAT dla tego produktu ze stawką zero wynosi zero",
+  zeroTax: "Księguj sprzedaż bez rozbicia VAT ze stawką 0 %",
   ids: "Identyfikatory zweryfikowanych dowodów",
   dryRun: "Tylko podgląd",
   submit: "Uruchom",
@@ -114,4 +113,26 @@ export const translations: typeof enTranslations = {
   noVatAccount:
     "Dodaj aktywne konto VAT należnego w planie kont, aby móc je tutaj wybrać.",
   saveOffer: "Zapisz ofertę",
+  sectionOffer: "Oferta",
+  sectionBooks: "Księgowanie",
+  sectionTax: "Podatek",
+  chooseAccount: "Wybierz konto",
+  chooseProduct: "Wybierz produkt",
+  chooseCompanyFirst: "Najpierw wybierz firmę",
+  noMatchingAccount: "Brak pasującego konta w planie kont tej firmy.",
+  noMatchingProduct: "Widoczne są tylko aktywne produkty z SKU.",
+  productHint:
+    "Produkt sprzedawany w tej ofercie. Jego SKU musi zgadzać się z ofertą operatora.",
+  receivableHint: "Należność od klienta do czasu wypłaty przez operatora.",
+  clearingHint: "Środki pobrane przez operatora, ale jeszcze niewypłacone.",
+  considerationHint:
+    "Przychód przy ujęciu od razu, zobowiązanie przy rozliczeniu w czasie.",
+  vatHint: "Opcjonalne. Potrzebne, gdy operator raportuje VAT.",
+  expenseHint: "Opcjonalne. Księguje prowizje operatora.",
+  merchantHelp: "ID sprzedawcy lub konta z panelu operatora.",
+  merchantPlaceholder: "acct_1Nxxxxxxxx",
+  offerHelp: "ID ceny lub produktu tej oferty u operatora.",
+  offerPlaceholder: "price_1Pxxxxxxxx",
+  zeroTaxHelp:
+    "Tylko dla produktów ze stawką zerową. Bez tej opcji taka sprzedaż czeka na weryfikację, aż operator przekaże potwierdzoną kwotę VAT.",
 };

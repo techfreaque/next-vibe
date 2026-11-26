@@ -7,11 +7,35 @@ import { Div } from "next-vibe/ui/components/div";
 import { CheckCircle2 } from "next-vibe/ui/components/icons/CheckCircle2";
 import { Span } from "next-vibe/ui/components/span";
 import { H3, P } from "next-vibe/ui/components/typography";
-import type { JSX } from "react";
+import {
+  type Context,
+  createContext,
+  type JSX,
+  useContext,
+  useEffect,
+} from "react";
 
 import { scopedTranslation as analyticsCopy } from "../analytics/i18n";
 import type { CategorySummary } from "./category-summary";
 import { formatDocDate, formatMoney } from "./format-money";
+
+export type LandingCountsPublisher = (
+  counts: readonly { alias: string; count: number }[],
+) => void;
+
+declare global {
+  var __vibeLandingCountsContext:
+    | Context<LandingCountsPublisher | null>
+    | undefined;
+}
+
+/**
+ * A category landing provides this so the summary it embeds can report record
+ * counts for the landing's "Work with" shortcuts. HMR-stable identity.
+ */
+export const LandingCountsContext: Context<LandingCountsPublisher | null> =
+  (globalThis.__vibeLandingCountsContext ??=
+    createContext<LandingCountsPublisher | null>(null));
 
 export function CategorySummaryPanel<TLabel extends string>({
   summary,
@@ -41,16 +65,28 @@ export function CategorySummaryPanel<TLabel extends string>({
   section?: "metrics" | "attention" | "recent";
 }): JSX.Element {
   const ui = analyticsCopy.scopedT(locale).t;
+  const publishCounts = useContext(LandingCountsContext);
+  const counts = summary.destinationCounts;
+  useEffect(() => {
+    if (publishCounts && counts?.length) {
+      publishCounts(counts);
+    }
+  }, [publishCounts, counts]);
   const from = formatDocDate(summary.from, locale);
   const to = formatDocDate(summary.to, locale);
   const metrics = (
     <>
       {summary.kpis.map((metric) => {
         const target = metric.drill;
+        // Tint a tile only when an alert points at that tile alone.
         const severity =
           target &&
-          summary.attention.find((alert) => alert.drill.alias === target.alias)
-            ?.severity;
+          summary.kpis.filter((other) => other.drill?.alias === target.alias)
+            .length === 1
+            ? summary.attention.find(
+                (alert) => alert.drill.alias === target.alias,
+              )?.severity
+            : undefined;
         const label = translate(metric.label);
         return (
           <KpiTile
@@ -141,50 +177,66 @@ export function CategorySummaryPanel<TLabel extends string>({
     );
   const recent = (
     <Div className="rounded-lg border bg-card p-3">
-      <H3 className="border-0 text-sm font-semibold">{recentTitle}</H3>
+      <H3 className="border-0 pb-1 text-sm font-semibold">{recentTitle}</H3>
       {summary.recent.length === 0 && emptyRecent && (
         <P className="pt-1 text-sm text-muted-foreground">{emptyRecent}</P>
       )}
-      {summary.recent.map((row) => {
-        const text = row.label ? translate(row.label) : row.title;
-        const detail =
-          row.detail?.kind === "money"
-            ? formatMoney(row.detail.amount, row.detail.currency, locale)
-            : row.detail?.value;
-        const time = new Intl.DateTimeFormat(locale, {
-          dateStyle: "medium",
-          timeStyle: "short",
-        }).format(new Date(row.at));
-        return (
-          <Div
-            key={row.at + row.drill.alias}
-            className="flex flex-wrap items-center justify-between gap-x-3 gap-y-0.5 border-b py-2 last:border-b-0"
-          >
-            <Div className="flex min-w-0 flex-1 flex-col items-start gap-0.5">
-              {onOpen ? (
-                <Button
-                  type="button"
-                  variant="link"
-                  className="h-auto min-w-0 whitespace-normal p-0 text-start"
-                  onClick={() => onOpen(row.drill)}
-                >
-                  {text}
-                </Button>
-              ) : (
-                <P>{text}</P>
-              )}
-              {detail && (
-                <P className="break-words text-sm text-muted-foreground">
-                  {detail}
-                </P>
-              )}
+      <Div className="flex flex-col divide-y">
+        {summary.recent.map((row) => {
+          const text = row.label ? translate(row.label) : row.title;
+          const amount =
+            row.detail?.kind === "money"
+              ? formatMoney(row.detail.amount, row.detail.currency, locale)
+              : undefined;
+          const context = [
+            row.subject,
+            row.detail?.kind === "name" ? row.detail.value : undefined,
+          ]
+            .filter(Boolean)
+            .join(" · ");
+          const time = new Intl.DateTimeFormat(locale, {
+            dateStyle: "medium",
+            timeStyle: "short",
+          }).format(new Date(row.at));
+          const body = (
+            <>
+              <Span className="min-w-0 break-words text-sm font-medium">
+                {text}
+              </Span>
+              <Span className="shrink-0 whitespace-nowrap text-end text-sm font-semibold tabular-nums">
+                {amount}
+              </Span>
+              <Span className="min-w-0 break-words text-xs text-muted-foreground">
+                {context}
+              </Span>
+              <Span className="shrink-0 whitespace-nowrap text-end text-xs tabular-nums text-muted-foreground">
+                {time}
+              </Span>
+            </>
+          );
+          const rowClass =
+            "grid w-full min-w-0 grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-3 gap-y-0.5 py-2 text-start";
+          return onOpen ? (
+            <Button
+              key={row.at + row.drill.alias + (row.subject ?? "")}
+              type="button"
+              variant="ghost"
+              size="unset"
+              className={`${rowClass} h-auto rounded-none px-1 font-normal whitespace-normal hover:bg-muted/50`}
+              onClick={() => onOpen(row.drill)}
+            >
+              {body}
+            </Button>
+          ) : (
+            <Div
+              key={row.at + row.drill.alias + (row.subject ?? "")}
+              className={`${rowClass} px-1`}
+            >
+              {body}
             </Div>
-            <Span className="text-xs tabular-nums text-muted-foreground">
-              {time}
-            </Span>
-          </Div>
-        );
-      })}
+          );
+        })}
+      </Div>
     </Div>
   );
   if (section === "recent") {

@@ -37,11 +37,29 @@ export const category: CategoryDefinition = {
   createActions: ["products_catalog_create_POST"],
   landing: {
     destinations: ["products-catalog-list", "products-category-list"],
-    actions: [
-      "products-catalog-list",
-      "products-category-list",
-      "processor-accounting-map",
-    ],
+    actions: ["products_catalog_create_POST", "products_category_create_POST"],
+    destinationDescriptions: {
+      "products-catalog-list": {
+        "en-US": "Plans, credit packs and goods you sell.",
+        "en-GLOBAL": "Plans, credit packs and goods you sell.",
+        "de-DE": "Tarife, Credit-Pakete und Waren, die Sie verkaufen.",
+        "pl-PL": "Plany, pakiety kredytów i towary, które sprzedajesz.",
+        "fr-FR": "Offres, packs de crédits et produits que vous vendez.",
+        "it-IT": "Piani, pacchetti di crediti e prodotti che vende.",
+        "es-ES": "Planes, paquetes de créditos y productos que vende.",
+        "sk-SK": "Plány, balíky kreditov a tovar, ktorý predávate.",
+      },
+      "products-category-list": {
+        "en-US": "Groups that keep the catalog in order.",
+        "en-GLOBAL": "Groups that keep the catalog in order.",
+        "de-DE": "Gruppen, die den Katalog ordnen.",
+        "pl-PL": "Grupy, które porządkują katalog.",
+        "fr-FR": "Les groupes qui structurent le catalogue.",
+        "it-IT": "I gruppi che ordinano il catalogo.",
+        "es-ES": "Los grupos que ordenan el catálogo.",
+        "sk-SK": "Skupiny, ktoré udržiavajú katalóg v poriadku.",
+      },
+    },
   },
   defaultEntry: {
     [UserPermissionRole.ADMIN]: PRODUCTS_CATALOG_LIST_ALIAS,

@@ -132,7 +132,12 @@ export const translations: typeof enTranslations = {
         empty: "Ce partenaire n'a jamais demandé de versement.",
       },
       notFound: "Le code {{code}} n'existe pas.",
-      pickCode: "Saisissez un code de parrainage pour voir son rapport.",
+      pickCode:
+        "Choisissez un code dans le tableau de la vue d'ensemble ou saisissez-le ci-dessus.",
+      pickTitle: "Aucun code sélectionné",
+      browseCodes: "Parcourir les codes",
+      subtitle:
+        "Clics, inscriptions, revenus, commissions et solde du partenaire pour un code.",
       loading: "Chargement du rapport du code",
     },
   },

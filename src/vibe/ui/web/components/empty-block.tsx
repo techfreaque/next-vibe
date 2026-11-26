@@ -16,6 +16,8 @@ export type EmptyBlockProps = {
   title: string;
   message?: string;
   action?: EmptyBlockAction;
+  /** Outline action shown left of the primary action. */
+  secondaryAction?: EmptyBlockAction;
 } & StyleType;
 
 export function EmptyBlock({
@@ -24,6 +26,7 @@ export function EmptyBlock({
   title,
   message,
   action,
+  secondaryAction,
   className,
   style,
 }: EmptyBlockProps): React.JSX.Element {
@@ -72,21 +75,38 @@ export function EmptyBlock({
           </div>
         ) : null}
       </div>
-      {action ? (
-        <button
-          type="button"
-          onClick={action.onClick}
-          className={cn(
-            "mt-1 inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors",
-            page &&
-              "min-h-11 px-4 text-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
-            action.variant === "destructive"
-              ? "bg-destructive text-destructive-foreground hover:bg-destructive/90"
-              : "bg-primary text-primary-foreground hover:bg-primary/90",
-          )}
-        >
-          {action.label}
-        </button>
+      {action || secondaryAction ? (
+        <div className="mt-1 flex flex-wrap items-center justify-center gap-2">
+          {secondaryAction ? (
+            <button
+              type="button"
+              onClick={secondaryAction.onClick}
+              className={cn(
+                "inline-flex items-center gap-1.5 rounded-md border border-input px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-accent hover:text-accent-foreground",
+                page &&
+                  "min-h-11 px-4 text-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
+              )}
+            >
+              {secondaryAction.label}
+            </button>
+          ) : null}
+          {action ? (
+            <button
+              type="button"
+              onClick={action.onClick}
+              className={cn(
+                "inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors",
+                page &&
+                  "min-h-11 px-4 text-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
+                action.variant === "destructive"
+                  ? "bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  : "bg-primary text-primary-foreground hover:bg-primary/90",
+              )}
+            >
+              {action.label}
+            </button>
+          ) : null}
+        </div>
       ) : null}
     </div>
   );

@@ -18,6 +18,7 @@ import type { JwtPayloadType } from "../../identity/auth/types";
 import type { EndpointLogger } from "../../logger/types";
 import { extractSchemaDefaults } from "../_shared/utils";
 import { containsFile } from "./api-utils-shared";
+import { createFormErrorMap } from "./form-error-map";
 import { scopedTranslation as hooksTranslation } from "./i18n";
 import { buildKey, type CacheKeyRequestData } from "./query-key-builder";
 import {
@@ -166,7 +167,9 @@ export function useApiForm<TEndpoint extends CreateApiEndpointAny>(
   // Build form config with all options
   // Type annotation matches UseFormProps to ensure compatibility with react-hook-form
   const formConfig: UseFormProps<TEndpoint["types"]["FormValues"]> = {
-    resolver: zodResolver(endpoint.formSchema),
+    resolver: zodResolver(endpoint.formSchema, {
+      error: createFormErrorMap(locale),
+    }),
     mode: "onSubmit" as const,
     reValidateMode: "onChange" as const,
     ...restFormOptions,

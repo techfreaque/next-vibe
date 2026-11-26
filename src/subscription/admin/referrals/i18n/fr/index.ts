@@ -7,7 +7,7 @@ export const translations: typeof enTranslations = {
   },
   get: {
     title: "Tableau de bord des parrainages",
-    titleShort: "Parrainages (admin)",
+    titleShort: "Activité de parrainage",
     description: "Codes de parrainage, gains et versements",
     form: {
       title: "Gestion des parrainages",

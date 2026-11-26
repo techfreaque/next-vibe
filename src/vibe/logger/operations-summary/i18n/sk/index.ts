@@ -8,10 +8,10 @@ export const translations: typeof enTranslations = {
   title: "Prehľad prevádzky",
   description:
     "Skontrolujte otvorené chyby, neúspešné naplánované úlohy a stav pripojených inštancií.",
-  errors: "Otvorené chyby",
+  errors: "Otvorené triedy chýb",
   tasks: "Neúspešné úlohy",
   connections: "Pripojenia s problémami",
-  errorAlert: "Otvorené skupiny chýb ({{count}})",
+  errorAlert: "Otvorené triedy chýb bez upozornení ({{count}})",
   taskAlert: "Neúspešné naplánované úlohy ({{count}})",
   connectionAlert: "Pripojenia, ktoré si vyžadujú pozornosť ({{count}})",
   attention: "Vyžaduje pozornosť",

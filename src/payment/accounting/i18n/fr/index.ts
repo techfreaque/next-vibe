@@ -27,8 +27,7 @@ export const translations: typeof enTranslations = {
   consideration: "Compte de produits ou de passif",
   vat: "Compte de TVA collectée",
   expense: "Compte de frais",
-  zeroTax:
-    "Confirmez que la TVA non indiquée sur ce produit à taux nul est égale à zéro",
+  zeroTax: "Comptabiliser les ventes sans détail de TVA à 0 %",
   ids: "Identifiants des pièces vérifiées",
   dryRun: "Aperçu uniquement",
   submit: "Exécuter",
@@ -118,4 +117,29 @@ export const translations: typeof enTranslations = {
   noVatAccount:
     "Ajoutez un compte actif de TVA collectée au plan comptable pour le sélectionner ici.",
   saveOffer: "Enregistrer l’offre",
+  sectionOffer: "Offre",
+  sectionBooks: "Écritures",
+  sectionTax: "Taxe",
+  chooseAccount: "Choisir un compte",
+  chooseProduct: "Choisir un produit",
+  chooseCompanyFirst: "Choisissez d'abord une entreprise",
+  noMatchingAccount:
+    "Aucun compte correspondant dans le plan de cette entreprise.",
+  noMatchingProduct:
+    "Seuls les produits actifs avec une référence apparaissent ici.",
+  productHint:
+    "Le produit vendu par cette offre. Sa référence doit correspondre à l'offre du prestataire.",
+  receivableHint: "Créance client jusqu'au versement du prestataire.",
+  clearingHint: "Fonds encaissés par le prestataire mais pas encore versés.",
+  considerationHint: "Produit si comptabilisé à la vente, passif si différé.",
+  vatHint: "Facultatif. Nécessaire si le prestataire déclare la TVA.",
+  expenseHint: "Facultatif. Comptabilise les frais du prestataire.",
+  merchantHelp:
+    "Identifiant marchand ou de compte du tableau de bord du prestataire.",
+  merchantPlaceholder: "acct_1Nxxxxxxxx",
+  offerHelp:
+    "Identifiant de prix ou de produit de cette offre chez le prestataire.",
+  offerPlaceholder: "price_1Pxxxxxxxx",
+  zeroTaxHelp:
+    "Uniquement pour les produits exonérés. Sinon, ces ventes attendent une vérification jusqu'à ce que le prestataire fournisse un montant de TVA vérifié.",
 };

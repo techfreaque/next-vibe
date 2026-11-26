@@ -122,5 +122,9 @@ export const translations: typeof enTranslations = {
     submit: "Zahlung erfassen",
     paymentRecorded: "Zahlung wurde erfolgreich erfasst.",
     viewInvoice: "Rechnung ansehen",
+    amountDue: "{{amount}} offen",
+    notOpenTitle: "Diese Rechnung ist nicht offen",
+    notOpenMessage:
+      "Zahlungen gehen nur auf ausgestellte, unbezahlte Rechnungen. Stellen Sie die Rechnung zuerst aus oder öffnen Sie die richtige.",
   },
 };

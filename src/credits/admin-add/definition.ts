@@ -79,7 +79,7 @@ const { GET } = createEndpoint({
   path: ["credits", "admin-add"],
   aliases: ["verify-credit-grant"],
   title: "adminAdd.recipient.title",
-  titleShort: "adminAdd.recipient.title",
+  titleShort: "adminAdd.recipient.grant",
   description: "adminAdd.recipient.description",
   category: "credits",
   subCategory: "Management",

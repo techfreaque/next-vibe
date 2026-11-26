@@ -119,7 +119,7 @@ export const translations: typeof enTranslations = {
         labelActive: "Attivo",
         labelInactive: "Inattivo",
         labelEdit: "Modifica",
-        labelDelete: "Elimina",
+        labelDelete: "Disattiva",
         labelCompound: "Compound",
         empty:
           "Nessuna tassa imposta configurata. Aggiungi il tuo primo tasso per iniziare.",
@@ -157,6 +157,7 @@ export const translations: typeof enTranslations = {
         rates: "Aliquote fiscali",
         rate: {
           id: "ID",
+          company: "Azienda",
           name: "Nome",
           code: "Codice",
           type: "Tipologia",
@@ -217,7 +218,12 @@ export const translations: typeof enTranslations = {
       widget: {
         save: "Salva aliquota",
         backToList: "Torna a Tassi di Tassa",
-        failed: "Sfigato",
+        failed: "Aliquota non salvata",
+        subtitle: "{{company}} · {{code}}",
+        notFoundTitle: "Questa aliquota non esiste più",
+        notFoundMessage:
+          "È stata eliminata o appartiene a un’azienda a cui non hai accesso. Scegli un’aliquota dall’elenco.",
+        loadErrorTitle: "Impossibile caricare l’aliquota",
       },
       rateId: {
         label: "Tasso di imposta ID",
@@ -365,7 +371,8 @@ export const translations: typeof enTranslations = {
       retry: "Ricarica il report",
       scope:
         "Per le fatture di vendita vale la data della registrazione collegata o la data di creazione. Per gli acquisti vale la data della fattura. Le vendite alla cassa seguono la data di completamento (UTC) e includono le righe con aliquota positiva o imposta registrata. Se una fattura emessa condivide la registrazione contabile, la vendita compare in fattura.",
-      empty: "Nessuna riga di documento corrisponde ai filtri.",
+      empty:
+        "Qui compaiono fatture emesse, note di credito, fatture di acquisto e vendite alla cassa con imposta, raggruppate per aliquota.",
       range: "Dal {{from}} al {{to}}",
       total: "Totale",
       previousMonth: "Mostra il mese precedente",
@@ -375,6 +382,23 @@ export const translations: typeof enTranslations = {
       scopeHint:
         "Confronta l’IVA su vendite e acquisti per aliquota, azienda e periodo.",
       selectCompany: "Seleziona l’azienda per questo report.",
+      subtitle: "{{company}} · dal {{from}} al {{to}}",
+      errorTitle: "Impossibile caricare il report IVA",
+      emptyTitle: "Nessun documento con imposta in questo periodo",
+      period: {
+        label: "Periodo",
+        thisMonth: "Questo mese",
+        lastMonth: "Mese scorso",
+        thisQuarter: "Questo trimestre",
+        thisYear: "Quest’anno",
+        custom: "Personalizzato",
+      },
+      kpi: {
+        salesTax: "IVA a debito",
+        salesBase: "Vendite imponibili",
+        purchaseTax: "IVA a credito",
+        purchaseBase: "Acquisti imponibili",
+      },
     },
     currency: {
       label: "Valuta",

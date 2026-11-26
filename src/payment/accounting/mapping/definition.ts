@@ -79,11 +79,15 @@ const { POST } = createEndpoint({
       merchantId: requestField(scopedTranslation, {
         ...textField,
         label: "merchant",
+        description: "merchantHelp",
+        placeholder: "merchantPlaceholder",
         schema: z.string().trim().min(1).max(255),
       }),
       offerId: requestField(scopedTranslation, {
         ...textField,
         label: "offer",
+        description: "offerHelp",
+        placeholder: "offerPlaceholder",
         schema: z.string().trim().min(1).max(255),
       }),
       currency: requestField(scopedTranslation, {
@@ -138,6 +142,7 @@ const { POST } = createEndpoint({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "zeroTax",
+        description: "zeroTaxHelp",
         schema: z.boolean().default(false),
       }),
       id: responseField(scopedTranslation, {

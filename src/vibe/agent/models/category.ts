@@ -34,7 +34,45 @@ export const category: CategoryDefinition = {
   order: 2,
   adminPathPrefixes: ["vibe/agent/models"],
   landing: {
-    actions: ["models", "model-catalog-scan"],
+    destinations: ["models", "model-catalog-scan", "refusal-index-leaderboard"],
+    destinationDescriptions: {
+      models: {
+        "en-US": "Browse available models and compare prices.",
+        "en-GLOBAL": "Browse available models and compare prices.",
+        "de-DE": "Verfügbare Modelle ansehen und Preise vergleichen.",
+        "pl-PL": "Przeglądaj dostępne modele i porównuj ceny.",
+        "fr-FR": "Consultez les modèles disponibles et comparez les prix.",
+        "it-IT": "Esplori i modelli disponibili e confronti i prezzi.",
+        "es-ES": "Consulte los modelos disponibles y compare los precios.",
+        "sk-SK": "Prezrite si dostupné modely a porovnajte ceny.",
+      },
+      "model-catalog-scan": {
+        "en-US": "New upstream models, price drift and announced shutdowns.",
+        "en-GLOBAL":
+          "New upstream models, price drift and announced shutdowns.",
+        "de-DE":
+          "Neue Modelle der Anbieter, Preisänderungen und angekündigte Abschaltungen.",
+        "pl-PL":
+          "Nowe modele dostawców, zmiany cen i zapowiedziane wyłączenia.",
+        "fr-FR":
+          "Nouveaux modèles des fournisseurs, écarts de prix et arrêts annoncés.",
+        "it-IT":
+          "Nuovi modelli dei fornitori, variazioni di prezzo e dismissioni annunciate.",
+        "es-ES":
+          "Nuevos modelos de los proveedores, cambios de precio y cierres anunciados.",
+        "sk-SK": "Nové modely poskytovateľov, zmeny cien a ohlásené vypnutia.",
+      },
+      "refusal-index-leaderboard": {
+        "en-US": "How often each model answers, hedges or refuses.",
+        "en-GLOBAL": "How often each model answers, hedges or refuses.",
+        "de-DE": "Wie oft jedes Modell antwortet, ausweicht oder ablehnt.",
+        "pl-PL": "Jak często każdy model odpowiada, wykręca się lub odmawia.",
+        "fr-FR": "À quelle fréquence chaque modèle répond, esquive ou refuse.",
+        "it-IT": "Quanto spesso ogni modello risponde, divaga o rifiuta.",
+        "es-ES": "Con qué frecuencia cada modelo responde, evade o se niega.",
+        "sk-SK": "Ako často každý model odpovie, vyhne sa alebo odmietne.",
+      },
+    },
   },
   defaultEntry: {
     [UserPermissionRole.ADMIN]: "models",

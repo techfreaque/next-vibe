@@ -217,10 +217,12 @@ export function ReferralOverviewWidget({
     });
 
   return (
-    <WidgetShell className="gap-4">
+    <WidgetShell layout="page" className="min-w-0">
       {canControl && (
         <WidgetHeader
+          size="page"
           title={t("get.title")}
+          subtitle={t("get.widget.subtitle")}
           backButton={<NavigateButtonWidget field={children.backButton} />}
         />
       )}
@@ -404,7 +406,7 @@ export function ReferralOverviewWidget({
                 seriesLabel,
                 [1, 2],
               )}
-              variant="line"
+              variant={value.trend.buckets.length >= 3 ? "line" : "bar"}
               locale={locale}
               height={200}
             />

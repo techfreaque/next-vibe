@@ -43,12 +43,67 @@ export const category: CategoryDefinition = {
       homeArgs: { profile: "home" },
       progressive: true,
     },
+    overview: { alias: "business-overview", scope: "platform" },
     destinations: [
       "business-overview",
-      "vibe-sense-graphs",
       "acquisition-report",
+      "funnel-report",
+      "vibe-sense-graphs",
     ],
-    overview: { alias: "business-overview", scope: "platform" },
+    destinationDescriptions: {
+      "business-overview": {
+        "en-US":
+          "Traffic, signups, payers, revenue and AI cost for any period.",
+        "en-GLOBAL":
+          "Traffic, signups, payers, revenue and AI cost for any period.",
+        "de-DE":
+          "Traffic, Anmeldungen, Zahler, Umsatz und KI-Kosten für jeden Zeitraum.",
+        "pl-PL":
+          "Ruch, rejestracje, płacący, przychód i koszt AI w dowolnym okresie.",
+        "fr-FR":
+          "Trafic, inscriptions, payeurs, revenus et coût IA sur la période choisie.",
+        "it-IT":
+          "Traffico, iscrizioni, paganti, ricavi e costi IA per qualsiasi periodo.",
+        "es-ES":
+          "Tráfico, registros, pagadores, ingresos y coste de IA en cualquier periodo.",
+        "sk-SK":
+          "Návštevnosť, registrácie, platiaci, tržby a náklady na AI za ľubovoľné obdobie.",
+      },
+      "acquisition-report": {
+        "en-US": "See which sources bring visitors, leads and signups.",
+        "en-GLOBAL": "See which sources bring visitors, leads and signups.",
+        "de-DE":
+          "Sehen, welche Quellen Besucher, Leads und Anmeldungen bringen.",
+        "pl-PL": "Zobacz, które źródła dają odwiedziny, leady i rejestracje.",
+        "fr-FR":
+          "Voyez quelles sources apportent visiteurs, leads et inscriptions.",
+        "it-IT": "Veda quali fonti portano visitatori, lead e iscrizioni.",
+        "es-ES": "Vea qué fuentes traen visitas, leads y registros.",
+        "sk-SK":
+          "Pozrite si, ktoré zdroje prinášajú návštevy, leady a registrácie.",
+      },
+      "funnel-report": {
+        "en-US": "Find where visitors drop off before they pay.",
+        "en-GLOBAL": "Find where visitors drop off before they pay.",
+        "de-DE": "Erkennen, wo Besucher vor dem Bezahlen abspringen.",
+        "pl-PL": "Sprawdź, gdzie odwiedzający odpadają przed zapłatą.",
+        "fr-FR": "Repérez où les visiteurs décrochent avant de payer.",
+        "it-IT": "Scopra dove i visitatori abbandonano prima di pagare.",
+        "es-ES": "Detecte dónde abandonan los visitantes antes de pagar.",
+        "sk-SK": "Zistite, kde návštevníci odpadávajú pred platbou.",
+      },
+      "vibe-sense-graphs": {
+        "en-US": "Build and run metric graphs on live platform data.",
+        "en-GLOBAL": "Build and run metric graphs on live platform data.",
+        "de-DE": "Kennzahlen-Graphen auf Live-Daten bauen und ausführen.",
+        "pl-PL": "Buduj i uruchamiaj wykresy wskaźników na żywych danych.",
+        "fr-FR":
+          "Créez et exécutez des graphes d’indicateurs sur les données en direct.",
+        "it-IT": "Crei ed esegua grafi di metriche sui dati in tempo reale.",
+        "es-ES": "Cree y ejecute grafos de métricas con datos en vivo.",
+        "sk-SK": "Zostavte a spúšťajte grafy metrík nad živými dátami.",
+      },
+    },
   },
   defaultEntry: {
     [UserPermissionRole.ADMIN]: BUSINESS_OVERVIEW_ALIAS,

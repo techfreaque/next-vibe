@@ -2,7 +2,7 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   get: {
     title: "Statystyki subskrypcji",
-    titleShort: "Statystyki admin",
+    titleShort: "Wskaźniki subskrypcji",
     description: "Przychody, subskrypcje, kredyty i polecenia",
     form: {
       title: "Dashboard statystyk",

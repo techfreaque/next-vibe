@@ -71,6 +71,11 @@ export const translations: typeof enTranslations = {
       description: "Détails de l'entreprise récupérés",
     },
     widget: {
+      backToList: "Entreprises",
+      type: "Type de client",
+      loadFailed: "Impossible de charger cette entreprise",
+      retry: "Réessayer",
+      related: "Travailler dans cette entreprise",
       setupAccounting: "Configurer la comptabilité",
       back: "Retour",
       loading: "Chargement de l'entreprise...",
@@ -89,41 +94,32 @@ export const translations: typeof enTranslations = {
       email: "E-mail",
       phone: "Téléphone",
       website: "Site web",
-      createdAt: "Membre depuis",
+      createdAt: "Créée le",
       actions: "Actions",
       modules: {
-        title: "Modules",
         accounting: {
           label: "Comptabilité",
-          description: "Plan comptable, écritures, rapports",
         },
         invoices: {
           label: "Factures",
-          description: "Factures clients, devis, encaissements",
         },
         estimates: {
           label: "Devis",
-          description: "Brouillons de devis pour vos clients",
         },
         bills: {
           label: "Factures fournisseurs",
-          description: "Factures et paiements fournisseurs",
         },
         pos: {
           label: "Caisse",
-          description: "Terminaux, sessions, commandes",
         },
         purchasing: {
           label: "Achats",
-          description: "Bons de commande et fournisseurs",
         },
         inventory: {
           label: "Stocks",
-          description: "Stock, entrepôts, transferts",
         },
         team: {
           label: "Équipe",
-          description: "Membres et rôles",
         },
       },
     },

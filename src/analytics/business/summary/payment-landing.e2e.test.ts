@@ -57,6 +57,27 @@ describe("Payments workspace overview", () => {
           "platformSummary.netReceipts",
         ]);
         expect(result.data.summary.kpis[2]?.invertDelta).toBe(true);
+        // The landing lists who paid recently and what needs a look.
+        expect(result.data.summary.attentionAvailable).toBe(true);
+        for (const row of result.data.summary.recent) {
+          expect(row.label).toBe("platformSummary.receivedPayment");
+          expect(row.detail?.kind).toBe("money");
+          expect(row.drill.alias).toBe("payment-processor");
+          expect(row.drill.args?.transactionId).toBeTruthy();
+        }
+        await page
+          .getByRole("heading", {
+            name: t("platformSummary.recentPayments"),
+            exact: true,
+          })
+          .filter({ visible: true })
+          .first()
+          .waitFor({ timeout: 55000 });
+        if (!result.data.summary.recent.length) {
+          await page
+            .getByText(t("platformSummary.emptyPayments"), { exact: true })
+            .waitFor();
+        }
         for (const key of [
           "platformSummary.grossReceipts",
           "platformSummary.refunds",

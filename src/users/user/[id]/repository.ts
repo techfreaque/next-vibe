@@ -6,6 +6,7 @@
 import "server-only";
 
 import { and, count, eq, inArray, isNull, lt, or, sql, sum } from "drizzle-orm";
+import { chatThreads } from "next-vibe/agent/chat/db";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
@@ -30,6 +31,7 @@ import {
   computeFreeAllowance,
   poolHasConfirmedNewsletter,
 } from "@/credits/free-allowance";
+import { paymentTransactions } from "@/payment/db";
 import { referralCodes, referralEarnings, userReferrals } from "@/referral/db";
 import { ReferralEarningStatus } from "@/referral/enum";
 import { passwordResets } from "@/user/public/reset-password/db";
@@ -94,6 +96,9 @@ export class UserByIdRepository {
         favoritesResult,
         skillsResult,
         leadLinkResult,
+        paymentsCountResult,
+        creditEntriesCountResult,
+        threadsCountResult,
       ] = await Promise.all([
         UserRolesRepository.findByUserId(foundUser.id, logger, locale),
         // Who referred this user
@@ -161,6 +166,23 @@ export class UserByIdRepository {
           .select({ leadId: userLeadLinks.leadId })
           .from(userLeadLinks)
           .where(eq(userLeadLinks.userId, foundUser.id)),
+        // Related-record counts for the detail shortcuts
+        db
+          .select({ cnt: count() })
+          .from(paymentTransactions)
+          .where(eq(paymentTransactions.userId, foundUser.id)),
+        db
+          .select({ cnt: count() })
+          .from(creditTransactions)
+          .innerJoin(
+            creditWallets,
+            eq(creditTransactions.walletId, creditWallets.id),
+          )
+          .where(eq(creditWallets.userId, foundUser.id)),
+        db
+          .select({ cnt: count() })
+          .from(chatThreads)
+          .where(eq(chatThreads.userId, foundUser.id)),
       ]);
 
       // Default to empty array if roles fetch fails
@@ -224,6 +246,9 @@ export class UserByIdRepository {
       const favoritesCount = Number(firstFavorites?.cnt ?? 0);
       const [firstSkills] = skillsResult;
       const customSkillsCount = Number(firstSkills?.cnt ?? 0);
+      const paymentsCount = Number(paymentsCountResult[0]?.cnt ?? 0);
+      const creditEntriesCount = Number(creditEntriesCountResult[0]?.cnt ?? 0);
+      const threadsCount = Number(threadsCountResult[0]?.cnt ?? 0);
 
       // Free-allowance tier (user pool base, + newsletter bonus; see FREE_CREDIT_ALLOWANCE)
       const leadIds = leadLinkResult.map((row) => row.leadId);
@@ -270,6 +295,9 @@ export class UserByIdRepository {
           lifetimeCreditsSpent,
           favoritesCount,
           customSkillsCount,
+          paymentsCount,
+          creditEntriesCount,
+          threadsCount,
           newsletterConsent: foundUser.marketingConsent,
           hasConfirmedNewsletter,
         },

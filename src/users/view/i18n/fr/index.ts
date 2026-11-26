@@ -198,7 +198,7 @@ export const translations: typeof enTranslations = {
     actions: {
       retry: "Réessayer",
       more: "Plus",
-      browse: "Retour aux comptes",
+      browse: "Tous les utilisateurs",
       edit: "Modifier",
       addCredits: "Accorder des crédits",
       delete: "Supprimer l'utilisateur",

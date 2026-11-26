@@ -18,6 +18,7 @@ import {
 } from "@/companies/_shared/workspace-company";
 
 import { parseToolsInitialState } from "./initial-state";
+import { ToolsLoadError } from "./load-error";
 import { ToolsPageClient } from "./page-client";
 
 export interface ToolsPageProps {
@@ -33,6 +34,8 @@ export interface ToolsPageData {
   workspaceCompanies: WorkspaceCompany[] | null;
   workspaceCompanyId?: string;
   initialState: Partial<HelpGetRequestInput>;
+  /** The session could not be resolved: render a recovery page, never raw JSON. */
+  loadFailed?: boolean;
 }
 
 export async function tanstackLoader({
@@ -49,11 +52,31 @@ export async function tanstackLoader({
   const logger = createEndpointLogger(false, locale);
 
   const { AuthRepository } = await import("next-vibe/identity/auth/repository");
-  const user = await AuthRepository.getAuthMinimalUser(
+  const auth = await AuthRepository.getAuthMinimalUser(
     [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN],
     { platform: Platform.NEXT_PAGE, locale },
     logger,
+  ).then(
+    (resolved) => ({ user: resolved, failed: false }),
+    (error: Error) => {
+      logger.error("Unable to resolve the tools page session", {
+        error: parseError(error).message,
+      });
+      return { user: AuthRepository.anonymousPublicUser(), failed: true };
+    },
   );
+  if (auth.failed) {
+    return {
+      locale,
+      user: auth.user,
+      workspaceCompanies: null,
+      platform: Platform.NEXT_PAGE,
+      initialHelpData: null,
+      initialState,
+      loadFailed: true,
+    };
+  }
+  const user = auth.user;
 
   const [catalog, workspace] = await Promise.allSettled([
     import("next-vibe/help-tool/repository").then(({ HelpRepository }) =>
@@ -122,7 +145,11 @@ export function TanstackPage({
   workspaceCompanies,
   workspaceCompanyId,
   initialState,
+  loadFailed,
 }: ToolsPageData): JSX.Element {
+  if (loadFailed) {
+    return <ToolsLoadError locale={locale} />;
+  }
   return (
     <ToolsPageClient
       locale={locale}

@@ -8,7 +8,7 @@ export const translations = {
       description: "Only subscriptions on this plan",
     },
     title: "Subscriptions",
-    titleShort: "Sub List",
+    titleShort: "Subscriptions",
     description: "Browse all subscriptions",
     form: {
       title: "Subscription Management",

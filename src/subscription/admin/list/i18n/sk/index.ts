@@ -10,7 +10,7 @@ export const translations: typeof enTranslations = {
       description: "Iba predplatné s týmto plánom",
     },
     title: "Predplatné",
-    titleShort: "Zoznam predplatných",
+    titleShort: "Predplatné",
     description: "Prezrite si všetky predplatné",
     form: {
       title: "Správa predplatného",

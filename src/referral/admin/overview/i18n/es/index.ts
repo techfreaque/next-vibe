@@ -62,6 +62,8 @@ export const translations: typeof enTranslations = {
       payouts: "Cola de pagos",
     },
     widget: {
+      subtitle:
+        "Clics, registros, ingresos y comisiones por código de partner, frente al periodo anterior.",
       kpi: {
         clicks: "Clics",
         clicksHint: "Llegadas desde el navegador con un código",

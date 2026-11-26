@@ -128,8 +128,15 @@ export const translations: typeof enTranslations = {
       billingMonthly: "Mensuel",
       billingYearly: "Annuel",
       navCategories: "Catégories",
-      navTaxRates: "Taux de taxe",
+      navTaxRates: "Taux de TVA",
       back: "Retour",
+      count: "{{count}} produits",
+      columnSku: "Réf.",
+      columnPrice: "Prix",
+      emptyTitle: "Aucun produit pour l'instant",
+      emptyMessage:
+        "Les produits et services que vous vendez sont ici. Factures, caisse et achats reprennent leur prix, unité et TVA.",
+      clearFilters: "Effacer les filtres",
     },
   },
 };

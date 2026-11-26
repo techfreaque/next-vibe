@@ -2,120 +2,53 @@
 
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
+import { EmptyBlock } from "next-vibe/ui/components/empty-block";
 import { BookOpen } from "next-vibe/ui/components/icons/BookOpen";
+import { Plus } from "next-vibe/ui/components/icons/Plus";
+import { ListItem } from "next-vibe/ui/components/list-item";
+import { RecordTable } from "next-vibe/ui/components/record-table";
+import { Skeleton } from "next-vibe/ui/components/skeleton";
 import { Span } from "next-vibe/ui/components/span";
+import {
+  StatusPill,
+  type StatusPillVariant,
+} from "next-vibe/ui/components/status-pill";
+import { WidgetHeader } from "next-vibe/ui/components/widget-header";
+import { WidgetShell } from "next-vibe/ui/components/widget-shell";
+import { formatDocDate } from "next-vibe/unified-ui/_shared/format-money";
 import { usePickerCallback } from "next-vibe/unified-ui/_shared/picker-context";
 import {
+  useWidgetEndpointMutations,
   useWidgetForm,
+  useWidgetIsInteractive,
+  useWidgetLocale,
   useWidgetNavigation,
   useWidgetOnSubmit,
+  useWidgetResponse,
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { type JSX, useEffect, useRef } from "react";
 
+import { useWorkspaceCompany } from "@/companies/_shared/workspace-company-context";
+import { DocumentScopePicker } from "@/finance/document-list-ui";
+
+import {
+  JournalEntryStatus,
+  JournalEntryStatusOptions,
+  JournalSourceTypeOptions,
+} from "../../enum";
 import type definition from "./definition";
-import type { CoaJournalListResponseOutput } from "./definition";
 
-type JournalEntry = NonNullable<
-  CoaJournalListResponseOutput["entries"]
->[number];
-
-// Status — yellow/green/muted
-const STATUS_BADGE_CLASS: Record<string, string> = {
-  DRAFT: "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300",
-  POSTED:
-    "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300",
-  REVERSED: "bg-muted text-muted-foreground",
-};
-
-// Source type — contextual colors
-const SOURCE_BADGE_CLASS: Record<string, string> = {
-  MANUAL: "bg-muted text-muted-foreground",
-  AR_INVOICE:
-    "bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300",
-  AR_PAYMENT: "bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400",
-  POS_ORDER:
-    "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300",
-  AP_BILL:
-    "bg-orange-100 text-orange-800 dark:bg-orange-900/40 dark:text-orange-300",
-  AP_PAYMENT:
-    "bg-orange-50 text-orange-700 dark:bg-orange-900/20 dark:text-orange-400",
-  TAX_PAYMENT:
-    "bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-300",
-  PERIOD_CLOSE: "bg-muted text-muted-foreground",
-  CREDIT_TRANSACTION:
-    "bg-indigo-100 text-indigo-800 dark:bg-indigo-900/40 dark:text-indigo-300",
-};
-
-function InlineBadge({
-  label,
-  colorClass,
-}: {
-  label: string;
-  colorClass: string;
-}): JSX.Element {
-  return (
-    <Span
-      className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium shrink-0 ${colorClass}`}
-    >
-      {label}
-    </Span>
-  );
+function companyCell(name: string | null): JSX.Element {
+  return <Span className="whitespace-nowrap">{name ?? "-"}</Span>;
 }
 
-function JournalEntryRow({
-  entry,
-  onView,
-  statusLabel,
-  sourceTypeLabel,
-}: {
-  entry: JournalEntry;
-  onView: (id: string) => void;
-  statusLabel: string;
-  sourceTypeLabel: string;
-}): JSX.Element {
-  return (
-    <Div
-      className="flex items-center gap-3 py-2.5 px-4 border-b last:border-b-0 hover:bg-muted/30 transition-colors cursor-pointer"
-      onClick={() => {
-        onView(entry.id);
-      }}
-    >
-      {/* Left: number + date + description */}
-      <Div className="flex-1 min-w-0 flex flex-col gap-0.5">
-        <Div className="flex items-center gap-2">
-          <Span className="text-xs font-mono font-semibold text-muted-foreground shrink-0">
-            {entry.entryNumber}
-          </Span>
-          <Span className="text-xs text-muted-foreground shrink-0">
-            {entry.date.toISOString().slice(0, 10)}
-          </Span>
-        </Div>
-        <Span className="text-sm font-medium truncate text-foreground">
-          {entry.description}
-        </Span>
-      </Div>
-
-      {/* Right: source + status badges */}
-      <Div className="flex items-center gap-1.5 shrink-0">
-        <InlineBadge
-          label={sourceTypeLabel}
-          colorClass={
-            SOURCE_BADGE_CLASS[entry.sourceType] ??
-            "bg-muted text-muted-foreground"
-          }
-        />
-        <InlineBadge
-          label={statusLabel}
-          colorClass={
-            STATUS_BADGE_CLASS[entry.status] ?? "bg-muted text-muted-foreground"
-          }
-        />
-      </Div>
-    </Div>
-  );
-}
+const STATUS_VARIANT: Record<string, StatusPillVariant> = {
+  [JournalEntryStatus.DRAFT]: "muted",
+  [JournalEntryStatus.POSTED]: "success",
+  [JournalEntryStatus.REVERSED]: "muted",
+};
 
 export function CoaJournalListWidget(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -127,6 +60,10 @@ export function CoaJournalListWidget(
   const form = useWidgetForm<typeof definition.GET>();
   const navigation = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.GET>();
+  const locale = useWidgetLocale();
+  const interactive = useWidgetIsInteractive();
+  const response = useWidgetResponse();
+  const read = useWidgetEndpointMutations()?.read;
   const onSubmit = useWidgetOnSubmit();
   const onPick =
     usePickerCallback<
@@ -136,15 +73,21 @@ export function CoaJournalListWidget(
     >();
   const isPickerMode = !!onPick;
 
-  // Auto-load on mount — companyId is optional, backend returns all companies
+  // Auto-load on mount in the active company (all companies when none is
+  // active: the backend scopes to the admin's memberships).
+  const workspace = useWorkspaceCompany();
+  const activeCompanyId = workspace?.active?.id;
   const didAutoSubmit = useRef(false);
   useEffect(() => {
     if (!onSubmit || didAutoSubmit.current) {
       return;
     }
     didAutoSubmit.current = true;
+    if (activeCompanyId && !form.getValues("companyId")) {
+      form.setValue("companyId", activeCompanyId, { shouldDirty: true });
+    }
     onSubmit();
-  }, [onSubmit]);
+  }, [onSubmit, activeCompanyId, form]);
 
   const handleView = (entryId: string): void => {
     if (isPickerMode) {
@@ -181,102 +124,248 @@ export function CoaJournalListWidget(
     })();
   };
 
-  const statusLabels: Record<string, string> = {
-    DRAFT: t("enums.journalEntryStatus.DRAFT"),
-    POSTED: t("enums.journalEntryStatus.POSTED"),
-    REVERSED: t("enums.journalEntryStatus.REVERSED"),
+  const entries = data?.entries ?? [];
+  const total = data?.totalCount ?? entries.length;
+  const page = form.watch("page") ?? 1;
+  const pageSize = form.watch("pageSize") ?? 20;
+  const goToPage = (next: number): void => {
+    form.setValue("page", next, { shouldDirty: true });
+    onSubmit?.();
+  };
+  const showActions = interactive && !isPickerMode;
+  const statusLabel = (status: string): string => {
+    const option = JournalEntryStatusOptions.find((o) => o.value === status);
+    return option ? t(option.label) : status;
+  };
+  const sourceLabel = (source: string): string => {
+    const option = JournalSourceTypeOptions.find((o) => o.value === source);
+    return option ? t(option.label) : source;
+  };
+  const companyId = form.watch("companyId");
+  const chooseCompany = (id?: string): void => {
+    form.setValue("companyId", id, { shouldDirty: true });
+    form.setValue("page", 1, { shouldDirty: true });
+    onSubmit?.();
   };
 
-  const sourceTypeLabels: Record<string, string> = {
-    MANUAL: t("enums.journalSourceType.MANUAL"),
-    AR_INVOICE: t("enums.journalSourceType.AR_INVOICE"),
-    AR_PAYMENT: t("enums.journalSourceType.AR_PAYMENT"),
-    AP_BILL: t("enums.journalSourceType.AP_BILL"),
-    AP_PAYMENT: t("enums.journalSourceType.AP_PAYMENT"),
-    POS_ORDER: t("enums.journalSourceType.POS_ORDER"),
-    TAX_PAYMENT: t("enums.journalSourceType.TAX_PAYMENT"),
-    PERIOD_CLOSE: t("enums.journalSourceType.PERIOD_CLOSE"),
-    CREDIT_TRANSACTION: t("enums.journalSourceType.CREDIT_TRANSACTION"),
-  };
+  const pill = (status: string): JSX.Element => (
+    <StatusPill
+      status={status}
+      label={statusLabel(status)}
+      variant={STATUS_VARIANT[status] ?? "muted"}
+    />
+  );
 
-  // Loading state
-  if (!data) {
-    return (
-      <Div className="flex flex-col items-center gap-4 py-10 rounded-lg border border-dashed">
-        <Div className="flex h-14 w-14 items-center justify-center rounded-full bg-muted border-2 border-dashed border-muted-foreground/30">
-          <BookOpen className="h-6 w-6 text-muted-foreground" />
-        </Div>
-        <Span className="text-sm text-muted-foreground">
-          {t("journalList.widget.loading")}
-        </Span>
+  // Without an active company the list spans every company the admin is a
+  // member of: say whose books each entry belongs to.
+  const showCompany =
+    !companyId && new Set(entries.map((entry) => entry.companyId)).size > 1;
+  const columns = [
+    { id: "number", label: t("journalList.response.entryNumber") },
+    { id: "date", label: t("journalList.response.date") },
+    ...(showCompany
+      ? [{ id: "company", label: t("journalCreate.companyId.label") }]
+      : []),
+    { id: "description", label: t("journalList.response.description") },
+    { id: "source", label: t("journalList.response.sourceType") },
+    { id: "status", label: t("journalList.response.status") },
+  ];
+  const rows = entries.map((entry) => {
+    const number = (
+      <Span className="whitespace-nowrap font-semibold">
+        {entry.entryNumber}
+      </Span>
+    );
+    const date = (
+      <Span className="whitespace-nowrap tabular-nums">
+        {formatDocDate(entry.date, locale)}
+      </Span>
+    );
+    const source = (
+      <Span className="whitespace-nowrap text-muted-foreground">
+        {sourceLabel(entry.sourceType)}
+      </Span>
+    );
+    return {
+      id: entry.id,
+      onOpen: (): void => handleView(entry.id),
+      cells: {
+        number,
+        date,
+        company: companyCell(entry.companyName),
+        description: entry.description,
+        source,
+        status: pill(entry.status),
+      },
+    };
+  });
+
+  let body: JSX.Element;
+  if (response?.success === false) {
+    body = (
+      <EmptyBlock
+        size="page"
+        className="rounded-xl border bg-card"
+        title={t("journalList.widget.loadFailed")}
+        message={response.message}
+        action={
+          read && interactive
+            ? {
+                label: t("journalList.widget.retry"),
+                onClick: (): void => void read.refetch(),
+              }
+            : undefined
+        }
+      />
+    );
+  } else if (!data) {
+    body = (
+      <Div
+        aria-busy="true"
+        className="flex flex-col overflow-hidden rounded-lg border bg-card"
+      >
+        <Span className="sr-only">{t("journalList.widget.loading")}</Span>
+        {[0, 1, 2, 3, 4].map((row) => (
+          <Div
+            key={row}
+            className="flex items-center gap-4 border-b px-4 py-3 last:border-b-0"
+          >
+            <Skeleton className="h-4 w-20" />
+            <Skeleton className="h-4 w-24" />
+            <Skeleton className="h-4 flex-1" />
+            <Skeleton className="h-5 w-16 rounded-full" />
+          </Div>
+        ))}
       </Div>
+    );
+  } else if (entries.length === 0) {
+    body = (
+      <EmptyBlock
+        size="page"
+        className="rounded-xl border bg-card"
+        icon={<BookOpen className="h-6 w-6" />}
+        title={t("journalList.widget.emptyTitle")}
+        message={t("journalList.widget.emptyMessage")}
+        action={
+          showActions
+            ? {
+                label: t("journalList.widget.emptyAction"),
+                onClick: handleCreate,
+              }
+            : undefined
+        }
+        secondaryAction={
+          showActions
+            ? {
+                label: t("journalList.widget.periodsButton"),
+                onClick: handlePeriods,
+                variant: "outline",
+              }
+            : undefined
+        }
+      />
+    );
+  } else {
+    body = (
+      <RecordTable
+        label={t("journalList.title")}
+        columns={columns}
+        rows={rows}
+        compact={
+          <Div className="flex flex-col gap-2">
+            {entries.map((entry) => (
+              <ListItem
+                key={entry.id}
+                title={entry.description}
+                subtitle={[
+                  entry.entryNumber,
+                  formatDocDate(entry.date, locale),
+                  showCompany
+                    ? entry.companyName
+                    : sourceLabel(entry.sourceType),
+                ]
+                  .filter(Boolean)
+                  .join(" · ")}
+                badges={pill(entry.status)}
+                onClick={() => handleView(entry.id)}
+              />
+            ))}
+          </Div>
+        }
+      />
     );
   }
 
-  const entries = data.entries ?? [];
-
   return (
-    <Div className="flex flex-col gap-4">
-      {/* Header bar */}
-      <Div className="flex items-center justify-between gap-2">
-        <Span className="text-sm text-muted-foreground">
-          {data.totalCount ?? entries.length}{" "}
-          {t("journalList.response.entries")}
-        </Span>
-        {!isPickerMode && (
-          <Div className="flex gap-2">
-            <Button variant="outline" size="sm" onClick={handlePeriods}>
-              {t("journalList.widget.periodsButton")}
-            </Button>
-            <Button variant="default" size="sm" onClick={handleCreate}>
-              {t("journalList.widget.createButton")}
-            </Button>
-          </Div>
-        )}
-      </Div>
-
-      {/* Entries list or empty state */}
-      {entries.length > 0 ? (
-        <Div className="rounded-md border overflow-hidden">
-          {/* Column headers */}
-          <Div className="flex items-center gap-3 px-4 py-2 bg-muted/50 border-b text-xs font-medium text-muted-foreground">
-            <Div className="flex-1 min-w-0">
-              <Span>
-                {t("journalList.response.entryNumber")} /{" "}
-                {t("journalList.response.description")}
-              </Span>
-            </Div>
-            <Span className="shrink-0">
-              {t("journalList.response.sourceType")} /{" "}
-              {t("journalList.response.status")}
-            </Span>
-          </Div>
-
-          {entries.map((entry) => (
-            <JournalEntryRow
-              key={entry.id}
-              entry={entry}
-              onView={handleView}
-              statusLabel={statusLabels[entry.status] ?? entry.status}
-              sourceTypeLabel={
-                sourceTypeLabels[entry.sourceType] ?? entry.sourceType
-              }
-            />
-          ))}
-        </Div>
-      ) : (
-        <Div className="flex flex-col items-center gap-3 py-12 text-center border border-dashed rounded-md">
-          <BookOpen className="h-8 w-8 text-muted-foreground" />
-          <Span className="text-sm text-muted-foreground">
-            {t("journalList.widget.empty")}
-          </Span>
-          {!isPickerMode && (
-            <Button variant="default" size="sm" onClick={handleCreate}>
-              {t("journalList.widget.createButton")}
-            </Button>
-          )}
+    <WidgetShell layout={isPickerMode ? "compact" : "page"}>
+      <WidgetHeader
+        size={isPickerMode ? "section" : "page"}
+        title={t("journalList.title")}
+        subtitle={
+          data && entries.length > 0
+            ? t("journalList.widget.count", {
+                count: total.toLocaleString(locale),
+              })
+            : t("journalList.widget.subtitle")
+        }
+        actions={
+          showActions && (
+            <>
+              <Button type="button" variant="outline" onClick={handlePeriods}>
+                {t("journalList.widget.periodsButton")}
+              </Button>
+              <Button type="button" onClick={handleCreate}>
+                <Plus className="size-4" aria-hidden="true" />
+                {t("journalList.widget.createButton")}
+              </Button>
+            </>
+          )
+        }
+      />
+      {interactive && (
+        <Div className="flex flex-wrap items-end gap-2 rounded-lg border bg-card p-3">
+          <DocumentScopePicker
+            kind="company"
+            value={companyId}
+            appliedLabel={
+              workspace?.companies.find(({ id }) => id === companyId)?.name
+            }
+            onSelect={chooseCompany}
+            onClear={() => chooseCompany()}
+          />
         </Div>
       )}
-    </Div>
+      {body}
+      {interactive && data && total > pageSize && (
+        <Div className="flex items-center justify-between gap-2">
+          <Span className="text-sm tabular-nums text-muted-foreground">
+            {t("journalList.widget.pageOf", {
+              page: page.toLocaleString(locale),
+              pages: Math.ceil(total / pageSize).toLocaleString(locale),
+            })}
+          </Span>
+          <Div className="flex gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              disabled={page <= 1}
+              onClick={() => goToPage(page - 1)}
+            >
+              {t("journalList.widget.previous")}
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              disabled={page * pageSize >= total}
+              onClick={() => goToPage(page + 1)}
+            >
+              {t("journalList.widget.next")}
+            </Button>
+          </Div>
+        </Div>
+      )}
+    </WidgetShell>
   );
 }

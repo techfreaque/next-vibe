@@ -5,7 +5,7 @@ export const translations = {
   },
   get: {
     title: "Referral Dashboard",
-    titleShort: "Admin Referrals",
+    titleShort: "Referral activity",
     description: "Referral codes, earnings and payouts",
     form: {
       title: "Referral Management",

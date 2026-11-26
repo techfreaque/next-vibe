@@ -119,7 +119,7 @@ export const translations: typeof enTranslations = {
         labelActive: "Actif",
         labelInactive: "Inactif",
         labelEdit: "Modifier",
-        labelDelete: "Supprimer",
+        labelDelete: "Désactiver",
         labelCompound: "Composé",
         empty:
           "Aucun taux de taxe configuré. Ajoutez votre premier taux pour commencer.",
@@ -157,6 +157,7 @@ export const translations: typeof enTranslations = {
         rates: "Taux de taxe",
         rate: {
           id: "ID",
+          company: "Entreprise",
           name: "Nom",
           code: "Code",
           type: "Type",
@@ -217,7 +218,12 @@ export const translations: typeof enTranslations = {
       widget: {
         save: "Enregistrer le taux",
         backToList: "Retour aux taux de taxe",
-        failed: "Échec",
+        failed: "Taux non enregistré",
+        subtitle: "{{company}} · {{code}}",
+        notFoundTitle: "Ce taux n’existe plus",
+        notFoundMessage:
+          "Il a été supprimé ou appartient à une entreprise à laquelle vous n’avez pas accès. Choisissez un taux dans la liste.",
+        loadErrorTitle: "Impossible de charger le taux",
       },
       rateId: {
         label: "ID du taux",
@@ -358,7 +364,8 @@ export const translations: typeof enTranslations = {
       retry: "Relancer le rapport",
       scope:
         "Les factures de vente suivent la date de l’écriture liée ou leur date de création. Les achats suivent la date de la facture fournisseur. Les ventes en caisse suivent leur date de clôture (UTC), pour les lignes avec un taux positif ou un montant de taxe enregistré. Si une facture émise partage la même écriture, elle représente la vente.",
-      empty: "Aucune ligne de document ne correspond à ces filtres.",
+      empty:
+        "Les factures émises, avoirs, factures fournisseurs et ventes en caisse avec TVA apparaissent ici, regroupés par taux.",
       range: "Du {{from}} au {{to}}",
       total: "Total",
       previousMonth: "Afficher le mois précédent",
@@ -368,6 +375,23 @@ export const translations: typeof enTranslations = {
       scopeHint:
         "Comparez la TVA sur les ventes et les achats par taux pour une entreprise et une période.",
       selectCompany: "Sélectionnez l’entreprise concernée.",
+      subtitle: "{{company}} · du {{from}} au {{to}}",
+      errorTitle: "Impossible de charger le rapport de TVA",
+      emptyTitle: "Aucun document taxé sur cette période",
+      period: {
+        label: "Période",
+        thisMonth: "Ce mois-ci",
+        lastMonth: "Mois dernier",
+        thisQuarter: "Ce trimestre",
+        thisYear: "Cette année",
+        custom: "Personnalisée",
+      },
+      kpi: {
+        salesTax: "TVA collectée",
+        salesBase: "Ventes taxables",
+        purchaseTax: "TVA déductible",
+        purchaseBase: "Achats taxables",
+      },
     },
     currency: {
       label: "Devise",

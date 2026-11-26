@@ -35,6 +35,41 @@ export const translations: typeof enTranslations = {
       cancel: "Cancelar",
       submit: "Enviar",
       submitting: "Enviando...",
+      showResults: "Mostrar resultados",
+      saveChanges: "Guardar cambios",
+      saving: "Guardando...",
+      result: "Resultado",
+      fixFields: "Revisa los campos marcados e inténtalo de nuevo.",
+      hiddenInvalid:
+        "Falta «{{field}}» o no es válido. Recarga la página e inténtalo de nuevo.",
+    },
+    toolUnavailable: {
+      permissionTitle: "No tienes acceso a esta herramienta",
+      permissionMessage:
+        "Tu rol no puede abrirla. Pide acceso a un propietario del espacio.",
+      instanceTitle: "Esta herramienta no está en esta instancia",
+      instanceMessage:
+        "Funciona en otra instancia conectada. Cambia de instancia en la barra lateral para abrirla.",
+      setupTitle: "Esta herramienta necesita configuración",
+      setupMessage:
+        "Falta un ajuste obligatorio. Termina la configuración y vuelve a abrir la herramienta.",
+      unknownTitle: "Este enlace no lleva a ninguna herramienta",
+      unknownMessage: "Puede que el enlace esté desactualizado o mal escrito.",
+    },
+    recordState: {
+      loading: "Cargando",
+      notFoundMessage:
+        "Puede que se haya eliminado o que el enlace esté desactualizado.",
+      loadFailed: "No se pudo cargar: {{title}}",
+      serverError:
+        "Algo falló por nuestra parte. Inténtalo de nuevo en un momento.",
+      technicalDetails: "Detalles técnicos",
+      moreActions: "Más acciones",
+      more: "Más",
+      confirmCancel: "Cancelar",
+      details: "Detalles",
+      emptyTitle: "Aún no hay nada",
+      copy: "Copiar",
     },
     formField: {
       requiresContext: "Este campo requiere contexto",
@@ -91,6 +126,7 @@ export const translations: typeof enTranslations = {
         required: "Obligatorio",
         selectDate: "Selecciona una fecha",
         openCalendar: "Abrir el calendario",
+        time: "Hora",
         startDate: "Fecha de inicio",
         endDate: "Fecha de fin",
         decreaseValue: "Reducir el valor",
@@ -126,6 +162,18 @@ export const translations: typeof enTranslations = {
         },
       },
     },
+  },
+  formErrors: {
+    required: "Introduce un valor",
+    invalid: "Este valor no es válido",
+    minLength: "Usa al menos {{min}} caracteres",
+    maxLength: "Usa como máximo {{max}} caracteres",
+    minNumber: "Introduce {{min}} o más",
+    maxNumber: "Introduce {{max}} o menos",
+    minItems: "Añade al menos {{min}}",
+    email: "Introduce un correo electrónico válido",
+    url: "Introduce un enlace completo, por ejemplo https://example.com",
+    choose: "Elige una de las opciones",
   },
   localstorage: {
     noCallback:

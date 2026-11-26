@@ -131,7 +131,12 @@ export const translations: typeof enTranslations = {
         empty: "Questo partner non ha mai richiesto un pagamento.",
       },
       notFound: "Il codice {{code}} non esiste.",
-      pickCode: "Inserisci un codice invito per vedere il suo report.",
+      pickCode:
+        "Scegli un codice dalla tabella della panoramica o inseriscilo qui sopra.",
+      pickTitle: "Nessun codice selezionato",
+      browseCodes: "Sfoglia i codici",
+      subtitle:
+        "Clic, iscrizioni, ricavi, commissioni e saldo del partner per un codice.",
       loading: "Caricamento report codice",
     },
   },

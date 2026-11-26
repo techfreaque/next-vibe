@@ -7,7 +7,7 @@ export const translations: typeof enTranslations = {
   },
   get: {
     title: "Contenuto segnalato",
-    titleShort: "Queue di moderazione",
+    titleShort: "Coda di moderazione",
     description:
       "Posti segnalati e nascosti e discussioni condivise, la maggior parte urgente prima",
     fields: {

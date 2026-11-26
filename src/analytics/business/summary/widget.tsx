@@ -45,9 +45,11 @@ const sectionLabels = {
 function SummaryPanel({
   summary,
   section,
+  source,
 }: {
   summary: PlatformSummaryOutput["summary"];
   section?: "metrics" | "attention" | "recent";
+  source?: Section;
 }): JSX.Element {
   const t = useWidgetTranslation<typeof definitions.GET>();
   const locale = useWidgetLocale();
@@ -59,14 +61,24 @@ function SummaryPanel({
       section={section}
       locale={locale}
       translate={(key, args) => t(key, args)}
-      sectionName={t("platformSummary.operations")}
+      sectionName={
+        source === "payments" ? undefined : t("platformSummary.operations")
+      }
       emptyRecent={
-        section === "recent" ? t("platformSummary.emptyActivity") : undefined
+        source === "payments"
+          ? t("platformSummary.emptyPayments")
+          : section === "recent"
+            ? t("platformSummary.emptyActivity")
+            : undefined
       }
       attentionTitle={t("get.widget.alerts.title")}
       clearLabel={t("get.widget.alerts.none")}
       unavailable={t("platformSummary.unavailable")}
-      recentTitle={t("platformSummary.recent")}
+      recentTitle={
+        source === "payments"
+          ? t("platformSummary.recentPayments")
+          : t("platformSummary.recent")
+      }
       onOpen={
         interactive
           ? (drill) => {
@@ -113,6 +125,17 @@ function SummarySection({ section }: { section: Section }): JSX.Element {
     const timer = setTimeout(() => setExpired(attempt), SUMMARY_TIMEOUT_MS);
     return (): void => clearTimeout(timer);
   }, [attempt, ready, read.isError]);
+  if (ready && section === "payments") {
+    return (
+      <Div className="min-w-0 space-y-3">
+        <Div className="grid grid-cols-2 gap-2 @2xl:grid-cols-4">
+          <SummaryPanel summary={ready} section="metrics" source={section} />
+        </Div>
+        <SummaryPanel summary={ready} section="attention" source={section} />
+        <SummaryPanel summary={ready} section="recent" source={section} />
+      </Div>
+    );
+  }
   if (ready) {
     return (
       <SummaryPanel
@@ -130,7 +153,29 @@ function SummarySection({ section }: { section: Section }): JSX.Element {
 
   const tiles = "flex min-w-0 flex-col gap-2 rounded-lg border bg-card p-3";
   const failed = read.isError || expired === attempt;
-  return (
+  if (section === "payments" && !failed) {
+    return (
+      <Div className="min-w-0 space-y-3" aria-busy={true}>
+        <Div className="grid grid-cols-2 gap-2 @2xl:grid-cols-4">
+          {sectionLabels.payments.map((label) => (
+            <Div key={label} className={tiles}>
+              <P className="text-sm font-medium">{t(label)}</P>
+              <Skeleton className="h-8 w-3/4" />
+            </Div>
+          ))}
+        </Div>
+        <Div className={tiles}>
+          <P className="text-sm font-semibold">
+            {t("platformSummary.recentPayments")}
+          </P>
+          <Skeleton className="h-9 w-full" />
+          <Skeleton className="h-9 w-full" />
+          <Skeleton className="h-9 w-full" />
+        </Div>
+      </Div>
+    );
+  }
+  const fallback = (
     <>
       {sectionLabels[section].map((label) => (
         <Div
@@ -162,6 +207,11 @@ function SummarySection({ section }: { section: Section }): JSX.Element {
       ))}
     </>
   );
+  return section === "payments" ? (
+    <Div className="grid grid-cols-2 gap-2 @2xl:grid-cols-4">{fallback}</Div>
+  ) : (
+    fallback
+  );
 }
 
 export function PlatformSummaryWidget(): JSX.Element {
@@ -183,7 +233,9 @@ export function PlatformSummaryWidget(): JSX.Element {
         </P>
         <Div
           className={
-            section === "operations" || section === "activity"
+            section === "operations" ||
+            section === "activity" ||
+            section === "payments"
               ? ""
               : "grid grid-cols-2 gap-2"
           }

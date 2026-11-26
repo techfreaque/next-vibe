@@ -10,7 +10,7 @@ export const translations: typeof enTranslations = {
       description: "Solo suscripciones de este plan",
     },
     title: "Suscripciones",
-    titleShort: "Sub Lista",
+    titleShort: "Suscripciones",
     description: "Examine todas las suscripciones",
     form: {
       title: "Gestión de las suscripciones",

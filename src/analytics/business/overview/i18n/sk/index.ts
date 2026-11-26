@@ -28,6 +28,8 @@ export const translations: typeof enTranslations = {
       "Skontrolujte získavanie zákazníkov, výnosy a stav služieb za posledných 30 dní.",
     unavailable: "Údaj nie je dostupný",
     recent: "Posledná aktivita",
+    recentPayments: "Posledné platby",
+    emptyPayments: "Za posledných 30 dní žiadne platby.",
   },
   category: "Analytika",
   tags: {
@@ -133,6 +135,8 @@ export const translations: typeof enTranslations = {
         payouts: "Čakajúce žiadosti o výplatu: {{count}} (spolu {{amount}})",
         tasks: "Zlyhávajúce naplánované úlohy: {{count}}",
         connections: "Vzdialené pripojenia s problémami: {{count}}",
+        failedPayments: "Neúspešné platby za posledných 30 dní: {{count}}",
+        disputes: "Otvorené spory o platby: {{count}}",
         costCoverage:
           "Náklady na služby poskytovateľov sú známe len pre {{coverage}} spotreby AI. Marža vychádza z tejto časti.",
         unattributed: "Tržby bez známeho zdroja: {{share}} ({{amount}})",

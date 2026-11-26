@@ -6,7 +6,7 @@ export const translations: typeof enTranslations = {
   },
   get: {
     title: "Gemeldete Skills",
-    titleShort: "Moderation",
+    titleShort: "Gemeldete Skills",
     description: "Skills mit Meldungen, sortiert nach Anzahl der Meldungen",
     fields: {
       minReports: {

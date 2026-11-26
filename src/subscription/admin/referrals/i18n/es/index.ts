@@ -7,7 +7,7 @@ export const translations: typeof enTranslations = {
   },
   get: {
     title: "Panel de mando de referencia",
-    titleShort: "Referencias de Admin",
+    titleShort: "Actividad de referidos",
     description: "Códigos de referido, ingresos y pagos",
     form: {
       title: "Gestión de referencias",

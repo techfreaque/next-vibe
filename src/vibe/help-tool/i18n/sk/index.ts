@@ -23,6 +23,9 @@ export const translations: typeof enTranslations = {
     pinned: "Pripnuté nástroje",
     categoryTools: "Nástroje v tejto oblasti",
     results: "Výsledky vyhľadávania",
+    resultsForOne: "1 výsledok pre „{{query}}“",
+    resultsFor: "Výsledky pre „{{query}}“: {{count}}",
+    jumpTo: "Alebo otvorte pracovnú oblasť",
     tool: "Nástroj",
   },
   erp: {
@@ -136,6 +139,7 @@ export const translations: typeof enTranslations = {
     page: "Strana {{page}} z {{total}}",
     openSidebar: "Otvoriť bočný panel nástrojov",
     browse: "Prehliadať nástroje",
+    backHome: "Prejsť na úvod správy",
     toolUnavailableHint:
       "Odkaz už nemusí byť platný alebo vaša rola nemá prístup. Otvorte prehľad nástrojov, ktoré máte k dispozícii.",
     openError: "Nástroj sa nepodarilo otvoriť",

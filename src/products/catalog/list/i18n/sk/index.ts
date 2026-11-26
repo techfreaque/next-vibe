@@ -129,8 +129,15 @@ export const translations: typeof enTranslations = {
       billingMonthly: "Mesačne",
       billingYearly: "Ročne",
       navCategories: "Kategórie",
-      navTaxRates: "Sadzby dane",
+      navTaxRates: "Sadzby DPH",
       back: "Späť",
+      count: "Produkty: {{count}}",
+      columnSku: "Kód",
+      columnPrice: "Cena",
+      emptyTitle: "Zatiaľ žiadne produkty",
+      emptyMessage:
+        "Tu sú produkty a služby, ktoré predávate. Faktúry, pokladnica aj nákup z nich preberajú cenu, jednotku a DPH.",
+      clearFilters: "Zrušiť filtre",
     },
   },
 };

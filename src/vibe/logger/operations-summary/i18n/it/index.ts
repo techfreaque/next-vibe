@@ -8,10 +8,10 @@ export const translations: typeof enTranslations = {
   title: "Panoramica operativa",
   description:
     "Controlla gli errori aperti, le attività non riuscite e le istanze connesse.",
-  errors: "Errori aperti",
+  errors: "Classi di errori aperte",
   tasks: "Attività non riuscite",
   connections: "Connessioni con problemi",
-  errorAlert: "Gruppi di errori aperti ({{count}})",
+  errorAlert: "Classi di errori aperte, avvisi esclusi ({{count}})",
   taskAlert: "Attività pianificate non riuscite ({{count}})",
   connectionAlert: "Connessioni da verificare ({{count}})",
   attention: "Da verificare",

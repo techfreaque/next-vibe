@@ -6,7 +6,7 @@ export const translations: typeof enTranslations = {
   },
   get: {
     title: "Empfehlungs-Dashboard",
-    titleShort: "Admin-Referrals",
+    titleShort: "Empfehlungsaktivität",
     description: "Empfehlungscodes, Einnahmen und Auszahlungen",
     form: {
       title: "Empfehlungsverwaltung",

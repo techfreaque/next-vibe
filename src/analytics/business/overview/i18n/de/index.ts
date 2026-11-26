@@ -28,6 +28,8 @@ export const translations: typeof enTranslations = {
       "Prüfen Sie Kundengewinnung, Umsatz und Systemzustand der letzten 30 Tage.",
     unavailable: "Nicht verfügbar",
     recent: "Letzte Aktivitäten",
+    recentPayments: "Letzte Zahlungen",
+    emptyPayments: "Keine Zahlungen in den letzten 30 Tagen.",
   },
   category: "Analytik",
   tags: {
@@ -132,6 +134,9 @@ export const translations: typeof enTranslations = {
         payouts: "{{count}} Auszahlungsanträge offen ({{amount}})",
         tasks: "{{count}} geplante Aufgaben schlagen fehl",
         connections: "{{count}} Remote-Verbindungen gestört",
+        failedPayments:
+          "Fehlgeschlagene Zahlungen der letzten 30 Tage: {{count}}",
+        disputes: "Offene Zahlungsstreitfälle: {{count}}",
         costCoverage:
           "Anbieterkosten nur für {{coverage}} der KI-Nutzung bekannt, Marge ist unvollständig",
         unattributed:

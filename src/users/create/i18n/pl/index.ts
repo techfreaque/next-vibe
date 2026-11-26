@@ -243,8 +243,9 @@ export const translations: typeof enTranslations = {
   },
   widget: {
     headerCreated: "Użytkownik utworzony",
-    headerCreate: "Utwórz użytkownika",
-    headerSubtitle: "Utwórz nowe konto administratora lub klienta",
+    headerCreate: "Nowy użytkownik",
+    headerSubtitle:
+      "Dodaj konto administratora lub klienta. Logowanie działa od razu.",
     activeBadge: "Aktywny",
     verifiedBadge: "Zweryfikowany",
     copiedTooltip: "Skopiowano!",
@@ -256,6 +257,12 @@ export const translations: typeof enTranslations = {
     creditHistoryButton: "Historia kredytów",
     createAnotherButton: "Utwórz kolejnego użytkownika",
     createdPrefix: "Utworzony",
+    createButton: "Utwórz użytkownika",
+    sections: {
+      signIn: "Logowanie",
+      profile: "Profil",
+      access: "Dostęp",
+    },
   },
   email: {
     users: {

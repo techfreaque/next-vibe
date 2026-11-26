@@ -15,7 +15,15 @@ import {
 } from "next-vibe/ui/components/accordion";
 import { Button } from "next-vibe/ui/components/button";
 import { Checkbox } from "next-vibe/ui/components/checkbox";
+import { DetailField, DetailGrid } from "next-vibe/ui/components/detail-grid";
 import { Div } from "next-vibe/ui/components/div";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "next-vibe/ui/components/dropdown-menu";
 import {
   FormControl,
   FormField,
@@ -23,26 +31,26 @@ import {
   FormLabel,
   FormMessage,
 } from "next-vibe/ui/components/form/form";
-import { Bookmark } from "next-vibe/ui/components/icons/Bookmark";
 import { CheckCircle } from "next-vibe/ui/components/icons/CheckCircle";
 import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
+import { ChevronRight } from "next-vibe/ui/components/icons/ChevronRight";
 import { Coins } from "next-vibe/ui/components/icons/Coins";
 import { Copy } from "next-vibe/ui/components/icons/Copy";
 import { CreditCard } from "next-vibe/ui/components/icons/CreditCard";
 import { Edit } from "next-vibe/ui/components/icons/Edit";
-import { Gift } from "next-vibe/ui/components/icons/Gift";
-import { Mail } from "next-vibe/ui/components/icons/Mail";
 import { MessageSquare } from "next-vibe/ui/components/icons/MessageSquare";
-import { Shield } from "next-vibe/ui/components/icons/Shield";
-import { Sparkles } from "next-vibe/ui/components/icons/Sparkles";
+import { MoreHorizontal } from "next-vibe/ui/components/icons/MoreHorizontal";
 import { Trash2 } from "next-vibe/ui/components/icons/Trash2";
 import { User } from "next-vibe/ui/components/icons/User";
 import { Users } from "next-vibe/ui/components/icons/Users";
 import { Wallet } from "next-vibe/ui/components/icons/Wallet";
 import { XCircle } from "next-vibe/ui/components/icons/XCircle";
 import { Input } from "next-vibe/ui/components/input";
+import { MetricCard } from "next-vibe/ui/components/metric-card";
+import { MetricGrid } from "next-vibe/ui/components/metric-grid";
 import { SectionGroup } from "next-vibe/ui/components/section-group";
 import { Span } from "next-vibe/ui/components/span";
+import { StatusPill } from "next-vibe/ui/components/status-pill";
 import { H2, P } from "next-vibe/ui/components/typography";
 import { WidgetHeader } from "next-vibe/ui/components/widget-header";
 import { WidgetShell } from "next-vibe/ui/components/widget-shell";
@@ -82,6 +90,7 @@ import { formatNumber, formatReferralEarning } from "../../format";
 import type { UserViewTab } from "../../view/definition";
 import { scopedTranslation as accountTranslation } from "../../view/i18n";
 import definition from "./definition";
+import { UserDeleteDialog } from "./delete-dialog";
 
 interface GetWidgetProps {
   field: (typeof definition.GET)["fields"];
@@ -113,7 +122,7 @@ export function UserDetailContainer({
   const interactive = useWidgetIsInteractive();
   const responseOnly = useWidgetResponseOnly();
   const [copiedId, setCopiedId] = useState(false);
-  const [copiedLeadId, setCopiedLeadId] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
 
   // Flatten data - handle both nested and flat response formats
   const email = data?.email ?? data?.userProfile?.basicInfo?.email;
@@ -145,7 +154,7 @@ export function UserDetailContainer({
   const totalReferrals = referralInfo?.totalReferrals ?? 0;
   const earnings = referralInfo?.earningsByUnit ?? [];
   const fmtNum = (n: number | null | undefined): string =>
-    n === null || n === undefined ? "–" : formatNumber(n, locale);
+    n === null || n === undefined ? "-" : formatNumber(n, locale);
 
   const handleEdit = useCallback(async (): Promise<void> => {
     if (!userId) {
@@ -153,17 +162,6 @@ export function UserDetailContainer({
     }
     const defs = await import("./definition");
     navigate(defs.default.PUT, {
-      urlPathParams: { id: userId },
-      popNavigationOnSuccess: 1,
-    });
-  }, [navigate, userId]);
-
-  const handleDelete = useCallback(async (): Promise<void> => {
-    if (!userId) {
-      return;
-    }
-    const defs = await import("./definition");
-    navigate(defs.default.DELETE, {
       urlPathParams: { id: userId },
       popNavigationOnSuccess: 1,
     });
@@ -191,19 +189,6 @@ export function UserDetailContainer({
       }, 2000);
     })();
   }, [userId, logger]);
-
-  const handleCopyLeadId = useCallback((): void => {
-    if (!leadId) {
-      return;
-    }
-    void (async (): Promise<void> => {
-      await copyToClipboard(leadId, logger);
-      setCopiedLeadId(true);
-      setTimeout((): void => {
-        setCopiedLeadId(false);
-      }, 2000);
-    })();
-  }, [leadId, logger]);
 
   const requestedId = form?.watch("id");
   const openDirectory = (): void => {
@@ -297,20 +282,74 @@ export function UserDetailContainer({
   const name = privateName || publicName || email || t("id.widget.userProfile");
   const isAdmin =
     !viewer.isPublic && viewer.roles.includes(UserPermissionRole.ADMIN);
+  const credits = (n: number | null | undefined): string =>
+    n === null || n === undefined
+      ? "-"
+      : t("id.widget.creditsAmount", { count: formatNumber(n, locale) });
   const related = [
-    { tab: "billing", label: t("id.widget.relatedPayments"), icon: CreditCard },
-    { tab: "credits", label: accountT("tabs.credits"), icon: Wallet },
+    {
+      tab: "billing",
+      label: t("id.widget.relatedPayments"),
+      icon: CreditCard,
+      count: engagement?.paymentsCount,
+    },
+    {
+      tab: "credits",
+      label: accountT("tabs.credits"),
+      icon: Wallet,
+      count: engagement?.creditEntriesCount,
+    },
     {
       tab: "activity",
       label: t("id.widget.relatedThreadActivity"),
       icon: MessageSquare,
+      count: engagement?.threadsCount,
     },
-    { tab: "referrals", label: accountT("tabs.referrals"), icon: Users },
+    {
+      tab: "referrals",
+      label: accountT("tabs.referrals"),
+      icon: Users,
+      count: totalReferrals,
+    },
   ] satisfies Array<{
     tab: UserViewTab;
     label: string;
     icon: typeof CreditCard;
+    count: number | undefined;
   }>;
+  const earningsValue =
+    earnings.length === 0
+      ? t("id.widget.noEarnings")
+      : earnings
+          .map(({ unit, confirmed }) =>
+            formatReferralEarning(confirmed, unit, locale),
+          )
+          .join(" · ");
+  const pendingEarnings = earnings.filter(({ pending }) => pending > 0);
+  const moreActions = [
+    {
+      key: "edit",
+      label: t("id.widget.editAccount"),
+      icon: Edit,
+      run: (): void => void handleEdit(),
+    },
+    {
+      key: "copy",
+      label: t("id.widget.titleCopyUserId"),
+      icon: copiedId ? CheckCircle : Copy,
+      run: handleCopyUserId,
+    },
+    ...(leadId
+      ? [
+          {
+            key: "lead",
+            label: t("id.widget.viewLead"),
+            icon: User,
+            run: handleViewLead,
+          },
+        ]
+      : []),
+  ];
 
   return (
     <AdminRecordDetail
@@ -339,302 +378,277 @@ export function UserDetailContainer({
         variant: isActive ? "success" : "muted",
       }}
       titleAccessory={
-        <Span className="text-xs text-muted-foreground">
-          {accountT(emailVerified ? "status.verified" : "status.unverified")}
-        </Span>
+        <StatusPill
+          status={emailVerified ? "verified" : "unverified"}
+          label={accountT(
+            emailVerified ? "status.verified" : "status.unverified",
+          )}
+          variant={emailVerified ? "info" : "warning"}
+        />
       }
       actions={
         interactive &&
         userId && (
           <Div className="flex flex-wrap items-center gap-2">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button type="button" variant="outline">
+                  <MoreHorizontal aria-hidden="true" className="size-4" />
+                  {t("id.widget.moreActions")}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="min-w-48">
+                <DropdownMenuItem
+                  className="@md:hidden"
+                  onSelect={() => openProfile()}
+                >
+                  <User aria-hidden="true" className="size-4" />
+                  {t("id.widget.fullProfile")}
+                </DropdownMenuItem>
+                {moreActions.map(({ key, label, icon: ActionIcon, run }) => (
+                  <DropdownMenuItem key={key} onSelect={() => run()}>
+                    <ActionIcon aria-hidden="true" className="size-4" />
+                    {label}
+                  </DropdownMenuItem>
+                ))}
+                {isAdmin && (
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      className="text-destructive"
+                      onSelect={() => setDeleteOpen(true)}
+                    >
+                      <Trash2 aria-hidden="true" className="size-4" />
+                      {t("id.widget.deleteAccount")}
+                    </DropdownMenuItem>
+                  </>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <Button
+              type="button"
+              variant="outline"
+              className="hidden @md:inline-flex"
+              onClick={() => openProfile()}
+            >
+              {t("id.widget.fullProfile")}
+            </Button>
             {isAdmin && (
               <Button type="button" onClick={openGrant}>
                 <Coins aria-hidden="true" className="size-4" />
                 {accountT("widget.actions.addCredits")}
               </Button>
             )}
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => openProfile()}
-            >
-              {t("id.widget.fullProfile")}
-            </Button>
-            <Button
-              type="button"
-              variant="ghost"
-              onClick={() => void handleEdit()}
-            >
-              <Edit aria-hidden="true" className="size-4" />
-              {t("id.put.titleShort")}
-            </Button>
           </Div>
         )
       }
     >
-      <Div className="flex min-w-0 flex-col gap-4">
-        {publicName && publicName !== name && (
-          <P className="text-sm text-muted-foreground">{publicName}</P>
-        )}
-        {/* Roles */}
-        {userRoles.length > 0 && (
-          <Div className="flex items-center gap-2 flex-wrap">
-            <Shield className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-            {userRoles.map((r) => (
-              <AccountRoleBadge key={r.id} role={r.role} locale={locale} />
-            ))}
-          </Div>
-        )}
+      <MetricGrid columns={4}>
+        <MetricCard
+          label={t("id.widget.balance")}
+          value={credits(creditBalance)}
+          description={
+            freeAllowance === undefined
+              ? undefined
+              : t("id.widget.freeAllowanceHint", {
+                  count: formatNumber(freeAllowance, locale),
+                })
+          }
+          icon={<Wallet className="size-4" />}
+        />
+        <MetricCard
+          label={t("id.widget.lifetimeSpend")}
+          value={credits(lifetimeCreditsSpent)}
+          icon={<Coins className="size-4" />}
+        />
+        <MetricCard
+          label={t("id.widget.earned")}
+          value={earningsValue}
+          description={
+            pendingEarnings.length > 0
+              ? `${t("id.widget.earnedPending")} ${pendingEarnings
+                  .map(({ unit, pending }) =>
+                    formatReferralEarning(pending, unit, locale),
+                  )
+                  .join(" · ")}`
+              : undefined
+          }
+          className={
+            earnings.length === 0
+              ? "[&>div:nth-child(2)>span]:text-base [&>div:nth-child(2)>span]:font-medium [&>div:nth-child(2)>span]:text-muted-foreground"
+              : undefined
+          }
+          icon={<CreditCard className="size-4" />}
+        />
+        <MetricCard
+          label={t("id.widget.referred")}
+          value={fmtNum(totalReferrals)}
+          icon={<Users className="size-4" />}
+        />
+      </MetricGrid>
+
+      <Div className="grid min-w-0 gap-4 @4xl:grid-cols-[minmax(0,1fr)_minmax(0,22rem)]">
+        <SectionGroup title={t("id.widget.accountTitle")}>
+          <DetailGrid columns={2}>
+            <DetailField
+              label={t("id.widget.publicName")}
+              value={publicName || "-"}
+            />
+            <DetailField
+              label={t("id.widget.roles")}
+              value={
+                userRoles.length > 0 ? (
+                  <Div className="flex flex-wrap gap-1.5">
+                    {userRoles.map((r) => (
+                      <AccountRoleBadge
+                        key={r.id}
+                        role={r.role}
+                        locale={locale}
+                      />
+                    ))}
+                  </Div>
+                ) : (
+                  "-"
+                )
+              }
+            />
+            <DetailField
+              label={t("id.widget.newsletter")}
+              value={
+                <Span className="inline-flex items-center gap-1.5">
+                  {hasConfirmedNewsletter ? (
+                    <CheckCircle className="size-4 text-success" />
+                  ) : newsletterConsent ? (
+                    <CheckCircle className="size-4 text-warning" />
+                  ) : (
+                    <XCircle className="size-4 text-muted-foreground" />
+                  )}
+                  {t(
+                    hasConfirmedNewsletter
+                      ? "id.widget.newsletterConfirmed"
+                      : newsletterConsent
+                        ? "id.widget.newsletterConsent"
+                        : "id.widget.newsletterNone",
+                  )}
+                </Span>
+              }
+            />
+            <DetailField
+              label={t("id.widget.savedItems")}
+              value={t("id.widget.savedItemsValue", {
+                favorites: fmtNum(favoritesCount),
+                skills: fmtNum(customSkillsCount),
+              })}
+            />
+            <DetailField
+              label={t("id.widget.created")}
+              value={createdAt ? formatSimpleDate(createdAt, locale) : "-"}
+            />
+            <DetailField
+              label={t("id.widget.lastUpdated")}
+              value={updatedAt ? formatSimpleDate(updatedAt, locale) : "-"}
+            />
+          </DetailGrid>
+        </SectionGroup>
 
         {interactive && userId && (
           <SectionGroup title={t("id.widget.relatedRecords")}>
-            <Div className="grid grid-cols-2 gap-2 @lg:grid-cols-4">
-              {related.map(({ tab, label, icon: Icon }) => (
+            <Div className="-mx-2 flex flex-col">
+              {related.map(({ tab, label, icon: Icon, count }) => (
                 <Button
                   key={tab}
                   type="button"
-                  variant="outline"
-                  className="h-auto min-h-11 min-w-0 justify-start gap-2 whitespace-normal px-3 text-start"
+                  variant="ghost"
+                  className="h-auto min-h-11 w-full min-w-0 justify-start gap-3 px-2 text-start font-normal"
                   onClick={() => openProfile(tab)}
                 >
-                  <Icon aria-hidden="true" className="size-4 shrink-0" />
-                  <Span className="min-w-0 [overflow-wrap:anywhere]">
-                    {label}
-                  </Span>
+                  <Icon
+                    aria-hidden="true"
+                    className="size-4 shrink-0 text-muted-foreground"
+                  />
+                  <Span className="min-w-0 flex-1 truncate">{label}</Span>
+                  {count !== undefined && (
+                    <Span
+                      aria-hidden="true"
+                      className="rounded-full bg-muted px-2 text-xs tabular-nums text-muted-foreground"
+                    >
+                      {formatNumber(count, locale)}
+                    </Span>
+                  )}
+                  <ChevronRight
+                    aria-hidden="true"
+                    className="size-4 shrink-0 text-muted-foreground"
+                  />
                 </Button>
               ))}
             </Div>
           </SectionGroup>
         )}
-
-        {/* Timestamps */}
-        <Div className="grid grid-cols-2 gap-3 text-xs text-muted-foreground">
-          {createdAt && (
-            <Div>
-              <Span className="block font-medium text-foreground">
-                {t("id.widget.created")}
-              </Span>
-              {formatSimpleDate(createdAt, locale)}
-            </Div>
-          )}
-          {updatedAt && (
-            <Div>
-              <Span className="block font-medium text-foreground">
-                {t("id.widget.lastUpdated")}
-              </Span>
-              {formatSimpleDate(updatedAt, locale)}
-            </Div>
-          )}
-        </Div>
-
-        {/* Engagement & credits (target [id] user, not the viewer) */}
-        <Div className="pt-2 border-t">
-          <H2 className="text-base font-semibold">
-            {t("id.widget.engagementTitle")}
-          </H2>
-          <Div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-2">
-            <Div className="rounded-lg border bg-card p-3 flex flex-col gap-1">
-              <Div className="flex items-center gap-1 text-xs text-muted-foreground">
-                <Wallet className="h-3.5 w-3.5" />
-                {t("id.widget.balance")}
-              </Div>
-              <Span className="text-lg font-bold tabular-nums">
-                {fmtNum(creditBalance)}
-              </Span>
-            </Div>
-            <Div className="rounded-lg border bg-card p-3 flex flex-col gap-1">
-              <Div className="flex items-center gap-1 text-xs text-muted-foreground">
-                <Gift className="h-3.5 w-3.5" />
-                {t("id.widget.freeAllowance")}
-              </Div>
-              <Span className="text-lg font-bold tabular-nums">
-                {fmtNum(freeAllowance)}
-              </Span>
-            </Div>
-            <Div className="rounded-lg border bg-card p-3 flex flex-col gap-1">
-              <Div className="flex items-center gap-1 text-xs text-muted-foreground">
-                <Coins className="h-3.5 w-3.5" />
-                {t("id.widget.lifetimeSpend")}
-              </Div>
-              <Span className="text-lg font-bold tabular-nums">
-                {fmtNum(lifetimeCreditsSpent)}
-              </Span>
-            </Div>
-            <Div className="rounded-lg border bg-card p-3 flex flex-col gap-1">
-              <Div className="flex items-center gap-1 text-xs text-muted-foreground">
-                <CreditCard className="h-3.5 w-3.5" />
-                {t("id.widget.earned")}
-              </Div>
-              {earnings.length === 0 ? (
-                <Span className="text-sm text-muted-foreground">
-                  {t(
-                    referralInfo?.earningsByUnit
-                      ? "id.widget.noEarnings"
-                      : "id.widget.earningUnitsUnavailable",
-                  )}
-                </Span>
-              ) : (
-                earnings.map(({ unit, confirmed, pending }) => (
-                  <Div key={unit} className="flex min-w-0 flex-col gap-1">
-                    <Span className="text-lg font-semibold tabular-nums">
-                      {formatReferralEarning(confirmed, unit, locale)}
-                    </Span>
-                    {pending > 0 && (
-                      <Span className="text-xs text-muted-foreground">
-                        {t("id.widget.earnedPending")}{" "}
-                        {formatReferralEarning(pending, unit, locale)}
-                      </Span>
-                    )}
-                  </Div>
-                ))
-              )}
-            </Div>
-            <Div className="rounded-lg border bg-card p-3 flex flex-col gap-1">
-              <Div className="flex items-center gap-1 text-xs text-muted-foreground">
-                <Users className="h-3.5 w-3.5" />
-                {t("id.widget.referred")}
-              </Div>
-              <Span className="text-lg font-bold tabular-nums">
-                {fmtNum(totalReferrals)}
-              </Span>
-            </Div>
-            <Div className="rounded-lg border bg-card p-3 flex flex-col gap-1">
-              <Div className="flex items-center gap-1 text-xs text-muted-foreground">
-                <Bookmark className="h-3.5 w-3.5" />
-                {t("id.widget.favorites")}
-              </Div>
-              <Span className="text-lg font-bold tabular-nums">
-                {fmtNum(favoritesCount)}
-              </Span>
-            </Div>
-            <Div className="rounded-lg border bg-card p-3 flex flex-col gap-1">
-              <Div className="flex items-center gap-1 text-xs text-muted-foreground">
-                <Sparkles className="h-3.5 w-3.5" />
-                {t("id.widget.skills")}
-              </Div>
-              <Span className="text-lg font-bold tabular-nums">
-                {fmtNum(customSkillsCount)}
-              </Span>
-            </Div>
-            <Div className="rounded-lg border bg-card p-3 flex flex-col gap-1">
-              <Div className="flex items-center gap-1 text-xs text-muted-foreground">
-                <Mail className="h-3.5 w-3.5" />
-                {t("id.widget.newsletter")}
-              </Div>
-              <Span className="inline-flex items-center gap-1 text-sm font-medium">
-                {hasConfirmedNewsletter ? (
-                  <>
-                    <CheckCircle className="h-4 w-4 text-success" />
-                    {t("id.widget.newsletterConfirmed")}
-                  </>
-                ) : newsletterConsent ? (
-                  <>
-                    <CheckCircle className="h-4 w-4 text-warning" />
-                    {t("id.widget.newsletterConsent")}
-                  </>
-                ) : (
-                  <>
-                    <XCircle className="h-4 w-4 text-muted-foreground" />
-                    {t("id.widget.newsletterNone")}
-                  </>
-                )}
-              </Span>
-            </Div>
-          </Div>
-        </Div>
-        <Accordion collapsible className="rounded-lg border bg-card px-3">
-          <AccordionItem value="record-references" className="border-0">
-            <AccordionTrigger className="text-start">
-              {t("id.widget.identifiers")}
-            </AccordionTrigger>
-            <AccordionContent className="space-y-3">
-              {userId && (
-                <Div className="flex min-w-0 flex-wrap items-center gap-2 text-sm">
-                  <Span className="break-all font-mono text-xs text-muted-foreground">
-                    {userId}
-                  </Span>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleCopyUserId}
-                    aria-label={t("id.widget.titleCopyUserId")}
-                  >
-                    {copiedId ? (
-                      <CheckCircle className="size-4" />
-                    ) : (
-                      <Copy className="size-4" />
-                    )}
-                  </Button>
-                </Div>
-              )}
-              {/* Stripe info */}
-              {stripeCustomerId && (
-                <Div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <CreditCard className="h-4 w-4 flex-shrink-0" />
-                  <Span className="font-mono text-xs truncate">
-                    {stripeCustomerId}
-                  </Span>
-                </Div>
-              )}
-
-              {/* Lead ID info row */}
-              {leadId && (
-                <Div className="flex items-center gap-2 text-sm">
-                  <User className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-                  <Span className="text-muted-foreground text-xs">
-                    {t("id.widget.leadId")}
-                  </Span>
-                  <Span className="font-mono text-xs truncate max-w-[160px] text-muted-foreground">
-                    {leadId}
-                  </Span>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="size-9 p-0 text-muted-foreground hover:text-foreground"
-                    onClick={handleCopyLeadId}
-                    title={t("id.widget.copyLeadId")}
-                  >
-                    {copiedLeadId ? (
-                      <CheckCircle className="h-3 w-3 text-success" />
-                    ) : (
-                      <Copy className="h-3 w-3" />
-                    )}
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="h-9 px-2 text-sm text-muted-foreground hover:text-foreground"
-                    onClick={handleViewLead}
-                  >
-                    {t("id.widget.viewLead")}
-                  </Button>
-                </Div>
-              )}
-            </AccordionContent>
-          </AccordionItem>
-        </Accordion>
-        {interactive && isAdmin && userId && (
-          <SectionGroup title={t("id.widget.dangerZone")}>
-            <Div className="flex flex-wrap items-center justify-between gap-3">
-              <P className="min-w-0 break-words text-sm text-muted-foreground">
-                {t("id.widget.deleteAccountHint", { name })}
-              </P>
-              <Button
-                type="button"
-                variant="outline"
-                className="min-h-10 border-destructive/30 text-destructive"
-                onClick={() => void handleDelete()}
-              >
-                <Trash2 aria-hidden="true" className="size-4" />
-                {t("id.delete.titleShort")}
-              </Button>
-            </Div>
-          </SectionGroup>
-        )}
       </Div>
+
+      <Accordion collapsible className="rounded-lg border bg-card px-4">
+        <AccordionItem value="record-references" className="border-0">
+          <AccordionTrigger className="text-start text-sm">
+            {t("id.widget.identifiers")}
+          </AccordionTrigger>
+          <AccordionContent>
+            <DetailGrid columns={2}>
+              {userId && (
+                <DetailField
+                  label={t("id.widget.userId")}
+                  value={userId}
+                  mono
+                  copyable
+                  copyLabel={t("id.widget.titleCopyUserId")}
+                />
+              )}
+              {leadId && (
+                <DetailField
+                  label={t("id.widget.leadId")}
+                  value={leadId}
+                  mono
+                  copyable
+                  copyLabel={t("id.widget.copyLeadId")}
+                />
+              )}
+              {stripeCustomerId && (
+                <DetailField
+                  label={t("id.widget.stripeCustomer")}
+                  value={stripeCustomerId}
+                  mono
+                  copyable
+                />
+              )}
+            </DetailGrid>
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
+
+      {interactive && isAdmin && userId && (
+        <SectionGroup title={t("id.widget.dangerZone")}>
+          <Div className="flex flex-wrap items-center justify-between gap-3">
+            <P className="min-w-0 break-words text-sm text-muted-foreground">
+              {t("id.widget.deleteAccountHint", { name })}
+            </P>
+            <Button
+              type="button"
+              variant="outline"
+              className="min-h-10 border-destructive/30 text-destructive"
+              onClick={() => setDeleteOpen(true)}
+            >
+              <Trash2 aria-hidden="true" className="size-4" />
+              {t("id.widget.deleteAccount")}
+            </Button>
+          </Div>
+          <UserDeleteDialog
+            userId={userId}
+            name={name}
+            open={deleteOpen}
+            onOpenChange={setDeleteOpen}
+            onDeleted={openDirectory}
+          />
+        </SectionGroup>
+      )}
     </AdminRecordDetail>
   );
 }

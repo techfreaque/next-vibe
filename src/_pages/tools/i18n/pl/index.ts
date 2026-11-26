@@ -24,4 +24,11 @@ export const translations: typeof enTranslations = {
     requiresConfirmation: "wymaga potwierdzenia",
     loadingTools: "Ładowanie narzędzi...",
   },
+  loadError: {
+    title: "Nie udało się wczytać panelu",
+    message:
+      "Nie udało się sprawdzić sesji. Odśwież stronę, a jeśli problem wróci, zaloguj się ponownie.",
+    reload: "Odśwież",
+    signIn: "Zaloguj się",
+  },
 };

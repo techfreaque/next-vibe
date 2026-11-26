@@ -65,7 +65,7 @@ export const translations = {
 
   inbox: {
     title: "Platform Inbox",
-    titleShort: "Inbox",
+    titleShort: "Platform inbox",
     description: "List recent INBOX messages of the platform mailbox",
     container: {
       title: "Platform Inbox",

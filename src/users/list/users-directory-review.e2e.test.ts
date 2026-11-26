@@ -101,13 +101,14 @@ describe("User directory and detail readability", () => {
         directory.searchParams.set("arg.search", email);
         await page.setViewportSize({ width: 390, height: 844 });
         await visit(page, directory);
-        const row = page
-          .locator("#admin-tool-users-list tbody tr")
-          .filter({ hasText: email });
+        // Phone renders each account as a card button (name, balance, email, plan).
+        const cards = page
+          .locator("#admin-tool-users-list")
+          .getByRole("button", { name: t("widget.actions.openUser", { email }), exact: true })
+          .filter({ visible: true });
+        const row = cards.filter({ hasText: email });
         await row.getByText(email, { exact: true }).waitFor();
-        expect(
-          await page.locator("#admin-tool-users-list tbody tr").count(),
-        ).toBe(1);
+        expect(await cards.count()).toBe(1);
         const balance = row
           .getByText(t("widget.creditAmount", { count: "0" }), { exact: true })
           .filter({ visible: true });
@@ -181,7 +182,13 @@ describe("User directory and detail readability", () => {
         ).toBe(true);
         await capture(page, "list", locale);
         const direct = growthTranslation.scopedT(locale).t(ChannelType.DIRECT);
-        await row.getByText(direct, { exact: true }).waitFor();
+        await page.setViewportSize({ width: 1440, height: 900 });
+        await page
+          .locator("#admin-tool-users-list tbody tr")
+          .filter({ hasText: email })
+          .getByText(direct, { exact: true })
+          .waitFor();
+        await page.setViewportSize({ width: 390, height: 844 });
 
         const humans = page.getByRole("button", {
           name: t("widget.quick.humans"),

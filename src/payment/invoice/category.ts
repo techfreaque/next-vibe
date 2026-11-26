@@ -42,20 +42,65 @@ export const category: CategoryDefinition = {
     "payment_estimate_create_POST",
   ],
   landing: {
+    overview: {
+      alias: "payment-dashboard",
+      scope: "company",
+    },
     destinations: [
       "payment-invoice-list",
       "payment-bill-list",
       "payment-estimate-list",
+      "mail-bill-reviews",
     ],
     actions: [
-      "payment-invoice-list",
       "payment_invoice_create_POST",
-      "payment-bill-list",
-      "payment-estimate-list",
+      "payment_bill_create_POST",
+      "payment_estimate_create_POST",
     ],
-    overview: {
-      alias: "payment-dashboard",
-      scope: "company",
+    destinationDescriptions: {
+      "payment-invoice-list": {
+        "en-US": "Customer invoices by number, customer and status.",
+        "en-GLOBAL": "Customer invoices by number, customer and status.",
+        "de-DE": "Kundenrechnungen nach Nummer, Kunde und Status.",
+        "pl-PL": "Faktury klientów według numeru, klienta i statusu.",
+        "fr-FR": "Factures clients par numéro, client et statut.",
+        "it-IT": "Fatture clienti per numero, cliente e stato.",
+        "es-ES": "Facturas de clientes por número, cliente y estado.",
+        "sk-SK": "Faktúry zákazníkov podľa čísla, zákazníka a stavu.",
+      },
+      "payment-bill-list": {
+        "en-US": "Supplier bills to approve, pay and book.",
+        "en-GLOBAL": "Supplier bills to approve, pay and book.",
+        "de-DE": "Lieferantenrechnungen zum Freigeben, Bezahlen und Buchen.",
+        "pl-PL": "Rachunki dostawców do akceptacji, zapłaty i zaksięgowania.",
+        "fr-FR": "Factures fournisseurs à valider, payer et comptabiliser.",
+        "it-IT": "Fatture fornitori da approvare, pagare e registrare.",
+        "es-ES": "Facturas de proveedores para aprobar, pagar y contabilizar.",
+        "sk-SK": "Faktúry dodávateľov na schválenie, úhradu a zaúčtovanie.",
+      },
+      "payment-estimate-list": {
+        "en-US": "Quotes sent to customers and whether they accepted.",
+        "en-GLOBAL": "Quotes sent to customers and whether they accepted.",
+        "de-DE": "Angebote an Kunden und ob sie angenommen wurden.",
+        "pl-PL": "Oferty wysłane klientom i informacja, czy je przyjęli.",
+        "fr-FR": "Devis envoyés aux clients et leur réponse.",
+        "it-IT": "Preventivi inviati ai clienti ed eventuale accettazione.",
+        "es-ES": "Presupuestos enviados a clientes y si los aceptaron.",
+        "sk-SK": "Cenové ponuky odoslané zákazníkom a či ich prijali.",
+      },
+      "mail-bill-reviews": {
+        "en-US": "Invoices and receipts that arrived by email, ready to book.",
+        "en-GLOBAL":
+          "Invoices and receipts that arrived by email, ready to book.",
+        "de-DE":
+          "Per E-Mail eingegangene Rechnungen und Belege, bereit zum Buchen.",
+        "pl-PL": "Faktury i paragony z e-maila gotowe do zaksięgowania.",
+        "fr-FR": "Factures et reçus arrivés par e-mail, prêts à comptabiliser.",
+        "it-IT": "Fatture e ricevute arrivate via email, pronte da registrare.",
+        "es-ES":
+          "Facturas y recibos llegados por correo, listos para contabilizar.",
+        "sk-SK": "Faktúry a doklady z e-mailu pripravené na zaúčtovanie.",
+      },
     },
   },
   subcategories: {

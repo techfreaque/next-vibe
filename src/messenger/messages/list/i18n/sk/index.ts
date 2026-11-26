@@ -6,7 +6,7 @@ export const translations: typeof enTranslations = {
     emails: "E-maily",
   },
   title: "Zoznam e-mailov",
-  titleShort: "Zoznam e-mailov",
+  titleShort: "Denník e-mailov",
   description: "Načíta zoznam e-mailov s filtrami po jednotlivých stránkach",
   container: {
     title: "Zoznam e-mailov",

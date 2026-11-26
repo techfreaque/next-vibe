@@ -333,9 +333,12 @@ export const translations = {
   },
 
   widget: {
+    subtitle:
+      "Every error and warning grouped by class. Resolve what is fixed; a recurrence reopens it.",
     kpi: {
       unresolvedInScope: "Unresolved in this view",
-      unresolvedAllTimeLink: "Unresolved across all time: {{count}}",
+      unresolvedAllTimeLink:
+        "All unresolved classes, errors and warnings, all time: {{count}}",
       unresolvedMessages: "{{messages}} messages · {{occurrences}} occurrences",
       unresolvedMatching: "{{count}} unresolved match filters",
       unresolved: "Unresolved classes (all time)",

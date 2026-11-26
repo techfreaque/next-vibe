@@ -65,4 +65,24 @@ export const translations: typeof enTranslations = {
     "Klären Sie Leistungen aus dem Ausland mit Ihrer Steuerberatung. Auch für Kleinunternehmer kann die Steuerschuldnerschaft des Leistungsempfängers gelten.",
   saleConflict:
     "Die Umsatzsteuer widerspricht der Kleinunternehmerbefreiung. Prüfen Sie die Rechnungspositionen vor der Ausstellung.",
+  choose: "Umsatzsteuer-Behandlung wählen",
+  back: "Zurück",
+  appliesOn: "Umsatzsteuer-Behandlung am {{date}}",
+  invoiceText: "Hinweis auf Rechnungen",
+  savedTitle: "{{regime}} gilt ab {{date}}",
+  pickCompany: {
+    title: "Unternehmen wählen",
+    message:
+      "Sehen Sie, welche Umsatzsteuerregeln an einem Stichtag für seine Rechnungen gelten.",
+  },
+  hints: {
+    standard:
+      "Rechnungen weisen Umsatzsteuer zu den Steuersätzen des Unternehmens aus. Vorsteuer ist abziehbar.",
+    german:
+      "Rechnungen ohne Umsatzsteuer, mit Hinweis auf die Befreiung nach § 19 UStG.",
+    austrian:
+      "Rechnungen ohne Umsatzsteuer, mit Hinweis auf die österreichische Kleinunternehmerregelung.",
+    slovak:
+      "Rechnungen ohne Umsatzsteuer, da das Unternehmen nicht für die Umsatzsteuer registriert ist.",
+  },
 };

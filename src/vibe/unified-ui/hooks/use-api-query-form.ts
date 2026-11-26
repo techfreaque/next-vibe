@@ -23,6 +23,7 @@ import {
   restoreSavedQueryForm,
 } from "../_shared/query-form-reconciliation";
 import { extractSchemaDefaults } from "../_shared/utils";
+import { createFormErrorMap } from "./form-error-map";
 import { scopedTranslation as hooksScopedTranslation } from "./i18n";
 import { isQueryRequestValid } from "./query-executor";
 import { buildKey, type CacheKeyRequestData } from "./query-key-builder";
@@ -332,7 +333,9 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
   const formConfigWithDefaults: UseFormProps<TEndpoint["types"]["FormValues"]> =
     {
       ...restFormOptions,
-      resolver: zodResolver(endpoint.formSchema),
+      resolver: zodResolver(endpoint.formSchema, {
+        error: createFormErrorMap(locale),
+      }),
       defaultValues: mergedDefaultValues,
     };
 

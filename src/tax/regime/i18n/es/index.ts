@@ -66,4 +66,23 @@ export const translations: typeof enTranslations = {
     "Consulte con su asesor fiscal los servicios adquiridos en el extranjero. La inversión del sujeto pasivo también puede aplicarse a pequeñas empresas exentas.",
   saleConflict:
     "El IVA repercutido es incompatible con la exención. Revise las partidas antes de emitir la factura.",
+  choose: "Elige el régimen de IVA",
+  back: "Volver",
+  appliesOn: "Régimen de IVA a {{date}}",
+  invoiceText: "Texto en las facturas",
+  savedTitle: "{{regime}} se aplica desde el {{date}}",
+  pickCompany: {
+    title: "Elige una empresa",
+    message:
+      "Consulta qué reglas de IVA se aplican a sus facturas en cualquier fecha.",
+  },
+  hints: {
+    standard:
+      "Las facturas aplican IVA con los tipos de la empresa. El IVA soportado es deducible.",
+    german: "Facturas sin IVA, con la mención de exención del § 19 UStG.",
+    austrian:
+      "Facturas sin IVA, con la mención del régimen austriaco de pequeñas empresas.",
+    slovak:
+      "Facturas sin IVA, porque la empresa no está registrada a efectos del IVA.",
+  },
 };

@@ -24,4 +24,11 @@ export const translations: typeof enTranslations = {
     requiresConfirmation: "vyžaduje potvrdenie",
     loadingTools: "Načítavajú sa nástroje…",
   },
+  loadError: {
+    title: "Administráciu sa nepodarilo načítať",
+    message:
+      "Reláciu sa nepodarilo overiť. Obnovte stránku; ak to stále nefunguje, prihláste sa znova.",
+    reload: "Obnoviť",
+    signIn: "Prihlásiť sa",
+  },
 };

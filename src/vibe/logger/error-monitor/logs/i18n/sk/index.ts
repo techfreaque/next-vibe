@@ -340,9 +340,12 @@ export const translations: typeof enTranslations = {
   },
 
   widget: {
+    subtitle:
+      "Všetky chyby a upozornenia zoskupené podľa triedy. Opravené označte ako vyriešené, pri opakovaní sa znova otvoria.",
     kpi: {
       unresolvedInScope: "Nevyriešené v tomto zobrazení",
-      unresolvedAllTimeLink: "Nevyriešené za celé obdobie: {{count}}",
+      unresolvedAllTimeLink:
+        "Všetky nevyriešené triedy, chyby aj upozornenia, za celé obdobie: {{count}}",
       unresolvedMessages: "Správy: {{messages}} · výskyty: {{occurrences}}",
       unresolvedMatching: "Nevyriešené podľa filtrov: {{count}}",
       unresolved: "Nevyriešené triedy za celý čas",

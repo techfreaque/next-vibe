@@ -38,6 +38,73 @@ export const category: CategoryDefinition = {
   group: "comms",
   icon: "mail",
   order: 10,
+  landing: {
+    destinations: [
+      "system-mail-inbox",
+      "messenger-inbox",
+      "messenger-messages",
+      "email-stats",
+      "messenger-accounts",
+    ],
+    actions: ["messenger_accounts_create_POST"],
+    destinationDescriptions: {
+      "system-mail-inbox": {
+        "en-US": "Mail sent to the platform address, newest first.",
+        "en-GLOBAL": "Mail sent to the platform address, newest first.",
+        "de-DE": "Post an die Plattform-Adresse, neueste zuerst.",
+        "pl-PL": "Poczta na adres platformy, od najnowszej.",
+        "fr-FR":
+          "Courrier reçu à l’adresse de la plateforme, le plus récent d’abord.",
+        "it-IT":
+          "Posta ricevuta all’indirizzo della piattaforma, la più recente per prima.",
+        "es-ES":
+          "Correo recibido en la dirección de la plataforma, lo más reciente primero.",
+        "sk-SK": "Pošta na adresu platformy, najnovšia navrchu.",
+      },
+      "messenger-inbox": {
+        "en-US": "Read mail in your connected mailboxes.",
+        "en-GLOBAL": "Read mail in your connected mailboxes.",
+        "de-DE": "Post in verbundenen Postfächern lesen.",
+        "pl-PL": "Czytaj pocztę w podłączonych skrzynkach.",
+        "fr-FR": "Lisez le courrier de vos boîtes connectées.",
+        "it-IT": "Legga la posta delle caselle collegate.",
+        "es-ES": "Lea el correo de sus buzones conectados.",
+        "sk-SK": "Čítajte poštu v pripojených schránkach.",
+      },
+      "messenger-messages": {
+        "en-US": "Every email the platform sent, searchable and filtered.",
+        "en-GLOBAL": "Every email the platform sent, searchable and filtered.",
+        "de-DE": "Jede versendete E-Mail, durchsuchbar und filterbar.",
+        "pl-PL": "Każdy wysłany e-mail z wyszukiwaniem i filtrami.",
+        "fr-FR": "Chaque e-mail envoyé, avec recherche et filtres.",
+        "it-IT": "Ogni email inviata, con ricerca e filtri.",
+        "es-ES": "Cada correo enviado, con búsqueda y filtros.",
+        "sk-SK": "Každý odoslaný e-mail s vyhľadávaním a filtrami.",
+      },
+      "email-stats": {
+        "en-US": "Sends, opens, clicks and bounces over time.",
+        "en-GLOBAL": "Sends, opens, clicks and bounces over time.",
+        "de-DE": "Versand, Öffnungen, Klicks und Bounces im Verlauf.",
+        "pl-PL": "Wysyłki, otwarcia, kliknięcia i odbicia w czasie.",
+        "fr-FR": "Envois, ouvertures, clics et rebonds dans le temps.",
+        "it-IT": "Invii, aperture, clic e rimbalzi nel tempo.",
+        "es-ES": "Envíos, aperturas, clics y rebotes a lo largo del tiempo.",
+        "sk-SK": "Odoslané, otvorené, kliknutia a nedoručené v čase.",
+      },
+      "messenger-accounts": {
+        "en-US": "The accounts the platform sends from, on every channel.",
+        "en-GLOBAL": "The accounts the platform sends from, on every channel.",
+        "de-DE":
+          "Die Konten, über die die Plattform sendet, auf allen Kanälen.",
+        "pl-PL": "Konta, z których wysyła platforma, na wszystkich kanałach.",
+        "fr-FR": "Les comptes d’envoi de la plateforme, sur tous les canaux.",
+        "it-IT": "Gli account da cui invia la piattaforma, su ogni canale.",
+        "es-ES":
+          "Las cuentas desde las que envía la plataforma, en todos los canales.",
+        "sk-SK": "Účty, z ktorých platforma posiela, na všetkých kanáloch.",
+      },
+    },
+  },
   defaultEntry: {
     [UserPermissionRole.ADMIN]: MESSENGER_ACCOUNTS_ALIAS,
     [UserPermissionRole.CUSTOMER]: USER_ME_ALIAS,

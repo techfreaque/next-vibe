@@ -237,8 +237,9 @@ export const translations: typeof enTranslations = {
   },
   widget: {
     headerCreated: "Používateľ sa vytvoril",
-    headerCreate: "Vytvoriť používateľa",
-    headerSubtitle: "Vytvoriť nový účet správcu alebo zákazníka",
+    headerCreate: "Nový používateľ",
+    headerSubtitle:
+      "Pridajte účet admina alebo zákazníka. Prihlásiť sa môže hneď.",
     activeBadge: "Aktívny",
     verifiedBadge: "Overený",
     copiedTooltip: "Skopírované",
@@ -250,6 +251,12 @@ export const translations: typeof enTranslations = {
     creditHistoryButton: "História kreditov",
     createAnotherButton: "Vytvoriť ďalšieho používateľa",
     createdPrefix: "Vytvorené",
+    createButton: "Vytvoriť používateľa",
+    sections: {
+      signIn: "Prihlásenie",
+      profile: "Profil",
+      access: "Prístup",
+    },
   },
   email: {
     users: {

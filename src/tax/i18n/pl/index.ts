@@ -116,7 +116,7 @@ export const translations: typeof enTranslations = {
         labelActive: "Aktywna",
         labelInactive: "Nieaktywna",
         labelEdit: "Edytuj",
-        labelDelete: "Usuń",
+        labelDelete: "Dezaktywuj",
         labelCompound: "Złożona",
         empty:
           "Brak skonfigurowanych stawek podatkowych. Dodaj pierwszą stawkę.",
@@ -154,6 +154,7 @@ export const translations: typeof enTranslations = {
         rates: "Stawki podatkowe",
         rate: {
           id: "ID",
+          company: "Firma",
           name: "Nazwa",
           code: "Kod",
           type: "Typ",
@@ -211,7 +212,12 @@ export const translations: typeof enTranslations = {
       widget: {
         save: "Zapisz stawkę podatku",
         backToList: "Powrót do stawek podatkowych",
-        failed: "Nie udało się",
+        failed: "Nie zapisano stawki",
+        subtitle: "{{company}} · {{code}}",
+        notFoundTitle: "Ta stawka już nie istnieje",
+        notFoundMessage:
+          "Została usunięta albo należy do firmy, do której nie masz dostępu. Wybierz stawkę z listy.",
+        loadErrorTitle: "Nie udało się wczytać stawki",
       },
       rateId: {
         label: "ID stawki podatkowej",
@@ -346,7 +352,8 @@ export const translations: typeof enTranslations = {
       retry: "Wczytaj raport ponownie",
       scope:
         "Dla faktur sprzedaży obowiązuje data powiązanego księgowania lub data utworzenia. Zakupy liczymy według daty faktury. Sprzedaż kasową liczymy według daty zakończenia (UTC) i uwzględniamy pozycje z dodatnią stawką lub zapisaną kwotą podatku. Jeśli wystawiona faktura ma to samo księgowanie, ujmujemy sprzedaż na fakturze.",
-      empty: "Brak pozycji dokumentów spełniających kryteria.",
+      empty:
+        "Tu pojawią się wystawione faktury, korekty, faktury zakupu i sprzedaż kasowa z podatkiem, pogrupowane według stawek.",
       range: "{{from}} do {{to}}",
       total: "Razem",
       previousMonth: "Pokaż poprzedni miesiąc",
@@ -356,6 +363,23 @@ export const translations: typeof enTranslations = {
       scopeHint:
         "Porównaj VAT od sprzedaży i zakupów według stawek dla wybranej firmy i okresu.",
       selectCompany: "Wybierz firmę dla tego raportu.",
+      subtitle: "{{company}} · {{from}} do {{to}}",
+      errorTitle: "Nie udało się wczytać raportu podatkowego",
+      emptyTitle: "Brak opodatkowanych dokumentów w tym okresie",
+      period: {
+        label: "Okres",
+        thisMonth: "Ten miesiąc",
+        lastMonth: "Poprzedni miesiąc",
+        thisQuarter: "Ten kwartał",
+        thisYear: "Ten rok",
+        custom: "Własny",
+      },
+      kpi: {
+        salesTax: "VAT od sprzedaży",
+        salesBase: "Sprzedaż opodatkowana",
+        purchaseTax: "VAT od zakupów",
+        purchaseBase: "Zakupy opodatkowane",
+      },
     },
     currency: {
       label: "Waluta",

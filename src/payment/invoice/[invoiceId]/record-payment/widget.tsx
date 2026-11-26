@@ -10,6 +10,7 @@ import {
   FormMessage,
 } from "next-vibe/ui/components/form/form";
 import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
+import { ResultBanner } from "next-vibe/ui/components/result-banner";
 import {
   Select,
   SelectContent,
@@ -17,12 +18,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "next-vibe/ui/components/select";
-import { Span } from "next-vibe/ui/components/span";
 import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
+import { formatMoney } from "next-vibe/unified-ui/_shared/format-money";
 import {
   useWidgetDisabled,
   useWidgetForm,
   useWidgetIsInteractive,
+  useWidgetLocale,
   useWidgetLogger,
   useWidgetNavigation,
   useWidgetTranslation,
@@ -46,6 +48,7 @@ import { z } from "zod";
 
 import accountsDefinition from "@/chart-of-accounts/account/list/definition";
 import { AccountSubtype } from "@/chart-of-accounts/enum";
+import { InvoiceStatus } from "@/payment/enum";
 
 import invoiceListDefinition from "../../list/definition";
 import invoiceDefinition from "../get/definition";
@@ -65,6 +68,7 @@ export function InvoiceRecordPaymentWidget({
   const interactive = useWidgetIsInteractive();
   const logger = useWidgetLogger();
   const user = useWidgetUser();
+  const locale = useWidgetLocale();
   const invoiceId = form.watch("invoiceId");
   const formVisible = interactive && !data?.success;
   const invoiceOptions = useMemo(
@@ -87,9 +91,18 @@ export function InvoiceRecordPaymentWidget({
   const invoice = loadedInvoice?.id === invoiceId ? loadedInvoice : undefined;
   const companyId = invoice?.companyId ?? undefined;
   const currency = invoice?.currency;
+  const amountDue =
+    invoice && currency && Number(invoice.amountDue) > 0
+      ? Number(invoice.amountDue)
+      : undefined;
   const reference = [
     invoice?.invoiceNumber ?? invoice?.invoiceSequenceNumber,
     invoice?.customerName ?? invoice?.companyName,
+    amountDue !== undefined && currency
+      ? t("widget.amountDue", {
+          amount: formatMoney(amountDue, currency, locale),
+        })
+      : undefined,
   ]
     .filter(Boolean)
     .join(" · ");
@@ -132,6 +145,20 @@ export function InvoiceRecordPaymentWidget({
     }
   }, [form, formVisible]);
 
+  // Most payments settle the open balance: start from it, the user edits it.
+  const didPrefillAmount = useRef(false);
+  useEffect(() => {
+    if (
+      formVisible &&
+      amountDue !== undefined &&
+      !didPrefillAmount.current &&
+      form.getValues("amount") === undefined
+    ) {
+      didPrefillAmount.current = true;
+      form.setValue("amount", amountDue);
+    }
+  }, [amountDue, form, formVisible]);
+
   useEffect(() => {
     if (!receiptKey && !data?.success) {
       generatedReceiptKey.current ??= uuidv4();
@@ -157,14 +184,12 @@ export function InvoiceRecordPaymentWidget({
 
   if (data?.success === true) {
     return (
-      <Div className="flex flex-col gap-4 p-4 rounded-lg border bg-emerald-50/50 dark:bg-emerald-900/10 border-emerald-200 dark:border-emerald-800">
-        <Span className="text-xs font-semibold text-emerald-700 dark:text-emerald-400 uppercase tracking-wide">
-          {t("post.success.title")}
-        </Span>
-        <Span className="text-sm text-foreground">
-          {t("widget.paymentRecorded")}
-        </Span>
-        <Div className="flex gap-2">
+      <ResultBanner
+        variant="success"
+        title={t("post.success.title")}
+        message={t("widget.paymentRecorded")}
+      >
+        <Div className="flex flex-wrap gap-2">
           <Button
             type="button"
             variant="default"
@@ -184,7 +209,7 @@ export function InvoiceRecordPaymentWidget({
             </Button>
           )}
         </Div>
-      </Div>
+      </ResultBanner>
     );
   }
 
@@ -192,6 +217,15 @@ export function InvoiceRecordPaymentWidget({
     <AdminForm
       title={t("post.title")}
       description={reference || undefined}
+      alert={
+        invoice && invoice.status !== InvoiceStatus.OPEN ? (
+          <ResultBanner
+            variant="warning"
+            title={t("widget.notOpenTitle")}
+            message={t("widget.notOpenMessage")}
+          />
+        ) : undefined
+      }
       className="mx-auto max-w-3xl"
       backButton={
         <Button

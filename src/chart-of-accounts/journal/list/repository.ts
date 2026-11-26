@@ -4,7 +4,7 @@
 
 import "server-only";
 
-import { and, count, eq, gte, inArray, lte } from "drizzle-orm";
+import { and, count, desc, eq, gte, inArray, lte } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
@@ -16,14 +16,17 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { companyMembers } from "@/companies/db";
+import { companies, companyMembers } from "@/companies/db";
 import { CompanyMemberRole } from "@/companies/enum";
 import { CompanyAuthRepository } from "@/companies/repository";
 
 import { journalEntries } from "../../db";
 import { JournalEntryStatusDB, JournalSourceTypeDB } from "../../enum";
 import { scopedTranslation } from "../../i18n";
-import type { CoaJournalListRequestOutput } from "./definition";
+import type {
+  CoaJournalListRequestOutput,
+  CoaJournalListResponseOutput,
+} from "./definition";
 
 export class CoaJournalListRepository {
   static async listEntries(
@@ -31,20 +34,7 @@ export class CoaJournalListRepository {
     userId: string,
     logger: EndpointLogger,
     locale: CountryLanguage,
-  ): Promise<
-    ResponseType<{
-      entries: Array<{
-        id: string;
-        entryNumber: string;
-        date: Date;
-        description: string;
-        status: string;
-        sourceType: string;
-        postedAt: Date | null;
-      }>;
-      totalCount: number;
-    }>
-  > {
+  ): Promise<ResponseType<CoaJournalListResponseOutput>> {
     try {
       let companyIds: string[];
 
@@ -120,15 +110,19 @@ export class CoaJournalListRepository {
       const offset = (page - 1) * pageSize;
 
       const rows = await db
-        .select()
+        .select({
+          entry: journalEntries,
+          companyName: companies.name,
+        })
         .from(journalEntries)
+        .leftJoin(companies, eq(companies.id, journalEntries.companyId))
         .where(where)
-        .orderBy(journalEntries.date)
+        .orderBy(desc(journalEntries.date), desc(journalEntries.entryNumber))
         .limit(pageSize)
         .offset(offset);
 
       return success({
-        entries: rows.map((r) => ({
+        entries: rows.map(({ entry: r, companyName }) => ({
           id: r.id,
           entryNumber: r.entryNumber,
           date: r.date,
@@ -136,6 +130,8 @@ export class CoaJournalListRepository {
           status: r.status,
           sourceType: r.sourceType,
           postedAt: r.postedAt ?? null,
+          companyId: r.companyId,
+          companyName: companyName ?? null,
         })),
         totalCount: totalCount ?? 0,
       });

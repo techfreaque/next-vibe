@@ -356,7 +356,7 @@ export const translations = {
   },
   status: {
     title: "Finance",
-    titleShort: "Finance",
+    titleShort: "Costs and margin",
     description:
       "Revenue vs upstream cost: provider balances, margin, alerts and thresholds.",
     response: {

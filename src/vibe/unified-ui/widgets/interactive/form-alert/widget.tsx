@@ -9,7 +9,12 @@ import type { JSX } from "react";
 import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
 import type { ReactStaticWidgetProps } from "../../../_shared/react-types";
 import type { FieldUsageConfig } from "../../../_shared/types";
-import { useWidgetResponse } from "../../../_shared/use-widget-context";
+import {
+  useWidgetForm,
+  useWidgetLocale,
+  useWidgetResponse,
+} from "../../../_shared/use-widget-context";
+import { getRootFormErrorMessage } from "./root-error";
 import type { FormAlertWidgetConfig } from "./types";
 
 /**
@@ -26,6 +31,18 @@ export function FormAlertWidget<
   FormAlertWidgetConfig<TUsage, "widget">
 >): JSX.Element | null {
   const response = useWidgetResponse();
+  const form = useWidgetForm();
+  const locale = useWidgetLocale();
+  const rootError = getRootFormErrorMessage(form?.formState.errors, locale);
+
+  if (rootError) {
+    return (
+      <FormAlert
+        alert={{ variant: "destructive", message: { message: rootError } }}
+        className={field.className}
+      />
+    );
+  }
 
   if (response && response.success === false) {
     const alert: FormAlertState = {

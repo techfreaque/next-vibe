@@ -45,6 +45,7 @@ export type SelectTriggerProps = {
   children?: React.ReactNode;
   disabled?: boolean;
   id?: string;
+  ref?: React.RefCallback<{ focus: () => void }>;
 } & StyleType;
 
 export type SelectLabelProps = {

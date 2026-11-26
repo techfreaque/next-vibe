@@ -33,6 +33,8 @@ const summarySchema = categorySummarySchema(
     "platformSummary.completedTask",
     "get.widget.alerts.tasks",
     "get.widget.alerts.connections",
+    "get.widget.alerts.failedPayments",
+    "get.widget.alerts.disputes",
   ]),
 );
 const render = lazyWidget(() =>

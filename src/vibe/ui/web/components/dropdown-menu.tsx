@@ -216,6 +216,8 @@ export function DropdownMenuContent({
   className,
   style,
   sideOffset = 4,
+  onClick,
+  stopPropagation,
   ...props
 }: DropdownMenuContentProps): React.JSX.Element {
   return (
@@ -228,6 +230,14 @@ export function DropdownMenuContent({
           className,
         )}
         style={style}
+        onClick={
+          stopPropagation
+            ? (event) => {
+                event.stopPropagation();
+                onClick?.(event);
+              }
+            : onClick
+        }
         {...props}
       />
     </DropdownMenuPrimitive.Portal>

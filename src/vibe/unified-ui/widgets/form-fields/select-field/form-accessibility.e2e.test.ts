@@ -7,6 +7,8 @@ import { describe, expect } from "vitest";
 
 import { scopedTranslation as reportsTranslation } from "@/chart-of-accounts/i18n";
 import { prepareAtlasCompany } from "@/chart-of-accounts/tests/atlas-workflow-fixture";
+import leadCreateDefinition from "@/leads/create/definition";
+import { scopedTranslation as leadCreateTranslation } from "@/leads/create/i18n";
 import exportDefinition from "@/leads/export/definition";
 import { scopedTranslation as exportTranslation } from "@/leads/export/i18n";
 
@@ -30,6 +32,35 @@ async function labelTarget(control: Locator): Promise<string> {
 
 describe("Accessible administration form fields", () => {
   const e2e = useE2E("admin-form-accessibility");
+
+  e2e.it(
+    "focuses a required select when submission is blocked",
+    async (fixtures) => {
+      const { page } = fixtures;
+      const { t } = leadCreateTranslation.scopedT(E2E_LOCALE);
+      const source = page.getByRole("combobox", {
+        name: t("post.source.label"),
+        exact: true,
+      });
+      await fixtures.open(leadCreateDefinition.POST, {
+        ready: () => source.waitFor(),
+      });
+      await page
+        .getByRole("textbox", { name: t("post.email.label") })
+        .fill(fixtures.uniqueEmail("accessible-lead"));
+      await page
+        .getByRole("textbox", { name: t("post.businessName.label") })
+        .fill("E2E Accessible Lead");
+      await page
+        .getByRole("button", { name: t("post.submitButton.label") })
+        .click();
+      await source.and(page.locator('[aria-invalid="true"]')).waitFor();
+      await page.waitForFunction(
+        (id) => document.activeElement?.id === id,
+        await labelTarget(source),
+      );
+    },
+  );
 
   e2e.it(
     "focuses labeled filters and submits their keyboard-selected values",

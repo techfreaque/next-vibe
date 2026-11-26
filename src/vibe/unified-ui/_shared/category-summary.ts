@@ -62,12 +62,24 @@ export function categorySummarySchema<TLabel extends string>(
                 z.object({ kind: z.literal("name"), value: z.string().min(1) }),
               ])
               .optional(),
+            /** Who or what the row is about, e.g. the customer's display name. */
+            subject: z.string().min(1).max(120).optional(),
             at: z.iso.datetime(),
             drill,
           })
           .refine((row) => Boolean(row.title || row.label)),
       )
       .max(8),
+    /** Record counts for the landing's "Work with" shortcuts, keyed by tool alias. */
+    destinationCounts: z
+      .array(
+        z.object({
+          alias: z.string().min(1),
+          count: z.number().int().nonnegative(),
+        }),
+      )
+      .max(12)
+      .optional(),
   });
 }
 

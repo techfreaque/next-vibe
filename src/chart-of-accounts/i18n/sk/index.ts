@@ -244,6 +244,17 @@ export const translations: typeof enTranslations = {
       applyFilters: "Použiť filtre",
       selectCompany:
         "Zadajte ID firmy a použite filtre na načítanie účtovných zápisov.",
+      loadFailed: "Účtovné zápisy sa nepodarilo načítať",
+      retry: "Skúsiť znova",
+      emptyTitle: "Zatiaľ žiadne účtovné zápisy",
+      emptyMessage:
+        "Každá zaúčtovaná faktúra, došlá faktúra, platba aj ručný zápis sa tu zobrazí ako vyrovnaný zápis. Ostatné zaúčtujete ručne.",
+      emptyAction: "Zaúčtovať zápis",
+      count: "Zápisy: {{count}}",
+      subtitle: "Všetky zápisy v hlavnej knihe, najnovšie navrchu.",
+      pageOf: "Strana {{page}} z {{pages}}",
+      previous: "Predchádzajúca",
+      next: "Ďalšia",
     },
     title: "Účtovné zápisy",
     titleShort: "Účtovný denník",

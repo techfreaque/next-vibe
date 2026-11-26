@@ -919,6 +919,10 @@ export const translations: typeof enTranslations = {
       widget: {
         retry: "Erneut versuchen",
         noItems: "Diese Umlagerung enthält keine Positionen.",
+        noItemsHint:
+          "Legen Sie beim Erstellen der Umlagerung die Produkte fest, die bewegt werden. Ohne Positionen kann sie nicht versendet werden.",
+        receivedOf: "{{received}} von {{requested}} erhalten",
+        newTransfer: "Neue Umlagerung",
         back: "Zurück",
         dispatch: "Umlagerung versenden",
         receive: "Als empfangen markieren",
@@ -978,8 +982,8 @@ export const translations: typeof enTranslations = {
         status: "Status",
         reference: "Referenz",
         notes: "Hinweise",
-        createdAt: "Erstellt am",
-        completedAt: "Abgeschlossen am",
+        createdAt: "Erstellt",
+        completedAt: "Abgeschlossen",
         items: "Positionen",
         itemId: "Positions-ID",
         productId: "Produkt-ID",

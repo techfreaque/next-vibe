@@ -234,11 +234,22 @@ export const translations: typeof enTranslations = {
     widget: {
       loading: "Caricamento delle voci...",
       empty: "Nessun articolo trovato.",
-      createButton: "Nuova ammissione",
+      createButton: "Nuova registrazione",
       periodsButton: "Periodi",
       applyFilters: "Applicare filtri",
       selectCompany:
         "Immettere una Società ID sopra e applicare filtri per caricare le voci della rivista.",
+      loadFailed: "Impossibile caricare le registrazioni",
+      retry: "Riprova",
+      emptyTitle: "Ancora nessuna registrazione",
+      emptyMessage:
+        "Ogni fattura, fattura passiva, pagamento e registrazione manuale contabilizzata compare qui come scrittura bilanciata. Il resto lo registri a mano.",
+      emptyAction: "Registra una scrittura",
+      count: "{{count}} registrazioni",
+      subtitle: "Tutte le registrazioni del libro mastro, dalla più recente.",
+      pageOf: "Pagina {{page}} di {{pages}}",
+      previous: "Precedente",
+      next: "Successiva",
     },
     title: "Pubblicazioni",
     titleShort: "Libro giornale",

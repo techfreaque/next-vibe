@@ -19,6 +19,9 @@ export const translations = {
     pinned: "Pinned tools",
     categoryTools: "Tools in this workspace",
     results: "Search results",
+    resultsForOne: "1 result for “{{query}}”",
+    resultsFor: "{{count}} results for “{{query}}”",
+    jumpTo: "Or open a workspace",
     tool: "Tool",
   },
   erp: {
@@ -130,6 +133,7 @@ export const translations = {
     page: "Page {{page}} of {{total}}",
     openSidebar: "Open tool sidebar",
     browse: "Browse tools",
+    backHome: "Go to admin home",
     toolUnavailableHint:
       "This link may be out of date, or your role may not have access. Browse the tools available to you.",
     openError: "This tool could not open",

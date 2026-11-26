@@ -120,5 +120,9 @@ export const translations: typeof enTranslations = {
     submit: "Zaevidovať úhradu",
     paymentRecorded: "Úhrada bola zaevidovaná.",
     viewInvoice: "Zobraziť faktúru",
+    amountDue: "{{amount}} na úhradu",
+    notOpenTitle: "Táto faktúra nie je otvorená",
+    notOpenMessage:
+      "Platbu zapíšete len na vystavenú a neuhradenú faktúru. Najprv faktúru vystavte alebo otvorte správnu.",
   },
 };

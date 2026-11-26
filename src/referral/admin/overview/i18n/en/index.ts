@@ -60,6 +60,8 @@ export const translations = {
       payouts: "Payout queue",
     },
     widget: {
+      subtitle:
+        "Clicks, signups, revenue and commission per partner code, against the previous period.",
       kpi: {
         clicks: "Clicks",
         clicksHint: "Browser arrivals with a code",

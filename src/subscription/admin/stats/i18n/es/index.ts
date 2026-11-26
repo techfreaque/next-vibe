@@ -3,7 +3,7 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   get: {
     title: "Estadísticas de suscripción",
-    titleShort: "Estantes de Admin",
+    titleShort: "Métricas de suscripción",
     description: "Ingresos, suscripción, crédito y métricas de remisión",
     form: {
       title: "Oficina de Estadística",

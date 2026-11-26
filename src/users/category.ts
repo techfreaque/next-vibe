@@ -43,6 +43,33 @@ export const category: CategoryDefinition = {
     summary: { alias: "users-admin-summary", scope: "platform" },
     destinations: [USERS_LIST_ALIAS, USERS_STATS_ALIAS],
     actions: [USERS_CREATE_ALIAS],
+    destinationDescriptions: {
+      "users-list": {
+        "en-US":
+          "Every account with what it paid, spends and when it was last active.",
+        "en-GLOBAL":
+          "Every account with what it paid, spends and when it was last active.",
+        "de-DE": "Alle Konten mit Zahlungen, Verbrauch und letzter Aktivität.",
+        "pl-PL": "Każde konto z wpłatami, wydatkami i ostatnią aktywnością.",
+        "fr-FR":
+          "Chaque compte avec ses paiements, sa consommation et sa dernière activité.",
+        "it-IT": "Ogni account con pagamenti, consumi e ultima attività.",
+        "es-ES":
+          "Cada cuenta con lo que pagó, lo que gasta y su última actividad.",
+        "sk-SK": "Každý účet s platbami, spotrebou a poslednou aktivitou.",
+      },
+      "users-stats": {
+        "en-US": "Who signed up, from where, and who stayed and paid.",
+        "en-GLOBAL": "Who signed up, from where, and who stayed and paid.",
+        "de-DE":
+          "Wer sich angemeldet hat, woher, und wer geblieben ist und zahlt.",
+        "pl-PL": "Kto się zarejestrował, skąd, kto został i kto zapłacił.",
+        "fr-FR": "Qui s’est inscrit, d’où, et qui est resté et a payé.",
+        "it-IT": "Chi si è iscritto, da dove, e chi è rimasto e ha pagato.",
+        "es-ES": "Quién se registró, desde dónde, y quién se quedó y pagó.",
+        "sk-SK": "Kto sa zaregistroval, odkiaľ a kto zostal a zaplatil.",
+      },
+    },
   },
   createActions: [USERS_CREATE_ALIAS],
   recordSearch: {

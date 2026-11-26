@@ -132,7 +132,11 @@ export const translations: typeof enTranslations = {
         empty: "Tento partner ešte nežiadal o výplatu.",
       },
       notFound: "Kód {{code}} neexistuje.",
-      pickCode: "Zadajte kód odporúčania a zobrazte jeho prehľad.",
+      pickCode: "Vyberte kód z tabuľky v prehľade alebo ho zadajte vyššie.",
+      pickTitle: "Nie je vybraný žiadny kód",
+      browseCodes: "Prehliadať kódy",
+      subtitle:
+        "Kliknutia, registrácie, tržby, provízie a zostatok partnera pre jeden kód.",
       loading: "Načítava sa prehľad kódu",
     },
   },

@@ -241,6 +241,17 @@ export const translations: typeof enTranslations = {
       applyFilters: "Filter anwenden",
       selectCompany:
         "Unternehmens-ID eingeben und Filter anwenden, um Buchungen zu laden.",
+      loadFailed: "Buchungen konnten nicht geladen werden",
+      retry: "Erneut versuchen",
+      emptyTitle: "Noch keine Buchungen",
+      emptyMessage:
+        "Jede gebuchte Rechnung, Eingangsrechnung, Zahlung und manuelle Buchung erscheint hier als ausgeglichener Buchungssatz. Alles andere buchen Sie manuell.",
+      emptyAction: "Buchung erfassen",
+      count: "{{count}} Buchungen",
+      subtitle: "Alle Buchungen im Hauptbuch, neueste zuerst.",
+      pageOf: "Seite {{page}} von {{pages}}",
+      previous: "Zurück",
+      next: "Weiter",
     },
     title: "Buchungsjournal",
     titleShort: "Journal",

@@ -34,6 +34,8 @@ export function SubmitButtonWidget<
   TSchemaType extends "widget" = "widget",
 >({
   field,
+  label: labelOverride,
+  variant: variantOverride,
 }: ReactStaticWidgetProps<
   TEndpoint,
   TUsage,
@@ -42,9 +44,19 @@ export function SubmitButtonWidget<
     TUsage,
     TSchemaType
   >
->): JSX.Element | null {
+> & {
+  /**
+   * Translated label for the action this submit performs right now, e.g.
+   * "Reject payout" when the form's action field is "reject". Wins over the
+   * definition's text, so one dialog can say what it does instead of a
+   * generic "Confirm".
+   */
+  label?: string;
+  /** Per-render variant, e.g. "destructive" while a reject/delete is chosen. */
+  variant?: SubmitButtonWidgetConfig<string, TUsage, TSchemaType>["variant"];
+}): JSX.Element | null {
   const locale = useWidgetLocale();
-  const { t: tField } = useWidgetContext();
+  const { t: tField, endpoint } = useWidgetContext();
   const isDisabled = useWidgetDisabled();
   const form = useWidgetForm();
   const onSubmit = useWidgetOnSubmit();
@@ -56,7 +68,7 @@ export function SubmitButtonWidget<
     text: textKey,
     loadingText: loadingTextKey,
     icon,
-    variant = "default",
+    variant: configVariant,
     size = "default",
     iconSize,
     iconSpacing,
@@ -67,13 +79,35 @@ export function SubmitButtonWidget<
   const iconSizeClass = getIconSizeClassName(iconSize);
   const iconSpacingClass = getSpacingClassName("margin", iconSpacing);
 
-  const buttonText = textKey
-    ? tField(textKey)
-    : globalT("widgets.endpointRenderer.submit");
+  // Without configured text, say the action instead of a bare "Submit".
+  const isSave = endpoint.method === "PUT" || endpoint.method === "PATCH";
+  const isDelete = endpoint.method === "DELETE";
+  // A delete endpoint's submit is destructive unless the definition says
+  // otherwise ("default" is the builder's fallback, not a choice).
+  const variant =
+    variantOverride ??
+    (configVariant && configVariant !== "default"
+      ? configVariant
+      : isDelete
+        ? "destructive"
+        : "default");
+  const buttonText = labelOverride
+    ? labelOverride
+    : textKey
+      ? tField(textKey)
+      : endpoint.method === "GET"
+        ? globalT("widgets.endpointRenderer.showResults")
+        : isSave
+          ? globalT("widgets.endpointRenderer.saveChanges")
+          : tField(endpoint.titleShort ?? endpoint.title);
 
   const loadingText = loadingTextKey
     ? tField(loadingTextKey)
-    : globalT("widgets.endpointRenderer.submitting");
+    : globalT(
+        isSave
+          ? "widgets.endpointRenderer.saving"
+          : "widgets.endpointRenderer.submitting",
+      );
 
   // Hide submit button when form is undefined (e.g., when data is already loaded)
   if (!form || !onSubmit || isDisabled) {

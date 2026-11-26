@@ -341,9 +341,12 @@ export const translations: typeof enTranslations = {
   },
 
   widget: {
+    subtitle:
+      "Tutti gli errori e gli avvisi raggruppati per classe. Segna come risolto ciò che è corretto; se si ripresenta, si riapre.",
     kpi: {
       unresolvedInScope: "Irrisolte in questa vista",
-      unresolvedAllTimeLink: "Irrisolte dall’inizio: {{count}}",
+      unresolvedAllTimeLink:
+        "Tutte le classi irrisolte, errori e avvisi, dall’inizio: {{count}}",
       unresolvedMessages: "{{messages}} messaggi · {{occurrences}} occorrenze",
       unresolvedMatching: "{{count}} irrisolte corrispondono ai filtri",
       unresolved: "Classi irrisolte (totale)",

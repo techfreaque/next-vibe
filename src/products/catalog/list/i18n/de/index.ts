@@ -113,7 +113,7 @@ export const translations: typeof enTranslations = {
       previous: "Zurück",
       next: "Weiter",
       status: "Status",
-      addProduct: "Produkt hinzufügen",
+      addProduct: "Produkt anlegen",
       active: "Aktiv",
       inactive: "Inaktiv",
       empty:
@@ -130,6 +130,13 @@ export const translations: typeof enTranslations = {
       navCategories: "Kategorien",
       navTaxRates: "Steuersätze",
       back: "Zurück",
+      count: "{{count}} Produkte",
+      columnSku: "Artikelnr.",
+      columnPrice: "Preis",
+      emptyTitle: "Noch keine Produkte",
+      emptyMessage:
+        "Hier liegen die Produkte und Leistungen, die Sie verkaufen. Rechnungen, Kasse und Einkauf übernehmen Preis, Einheit und Steuersatz.",
+      clearFilters: "Filter zurücksetzen",
     },
   },
 };

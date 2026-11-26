@@ -504,12 +504,19 @@ describe("platform admin landing metadata", () => {
       titleShort: "Settlement accounts",
       path: ["settlements", "list"],
     };
-    const withList = getAdminCategoryLandings([category], [...operations, newList]);
+    const undeclared = {
+      ...category,
+      landing: { ...category.landing, destinations: undefined },
+    };
+    const withList = getAdminCategoryLandings([undeclared], [...operations, newList]);
     expect(withList.billing?.destinations).toContainEqual({
       alias: newList.toolName, title: "Settlement accounts",
     });
-    const afterRemoval = getAdminCategoryLandings([category], operations);
+    const afterRemoval = getAdminCategoryLandings([undeclared], operations);
     expect(afterRemoval.billing?.destinations.map(({alias}) => alias)).not.toContain(newList.toolName);
+    // A curated landing shows only its declared shortcuts.
+    const curated = getAdminCategoryLandings([category], [...operations, newList]);
+    expect(curated.billing?.destinations.map(({ alias }) => alias)).not.toContain(newList.toolName);
   });
 
   test("drops denied actions per effective role and leaves a permitted peer visible", () => {

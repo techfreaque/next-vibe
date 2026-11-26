@@ -22,6 +22,9 @@ export const translations: typeof enTranslations = {
     pinned: "Strumenti fissati",
     categoryTools: "Strumenti di quest’area",
     results: "Risultati di ricerca",
+    resultsForOne: "1 risultato per “{{query}}”",
+    resultsFor: "{{count}} risultati per “{{query}}”",
+    jumpTo: "Oppure apra un’area di lavoro",
     tool: "Strumento",
   },
   erp: {
@@ -136,6 +139,7 @@ export const translations: typeof enTranslations = {
     page: "Pagina {{page}} di {{total}}",
     openSidebar: "Aprire la barra laterale dello strumento",
     browse: "Sfoglia gli strumenti",
+    backHome: "Vai alla home dell’amministrazione",
     toolUnavailableHint:
       "Il collegamento potrebbe essere scaduto oppure il suo ruolo non consente l’accesso. Consulti gli strumenti disponibili.",
     openError: "Impossibile aprire lo strumento",

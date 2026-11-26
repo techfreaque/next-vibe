@@ -222,13 +222,24 @@ export const translations = {
     widget: {
       loading: "Loading journal entries...",
       empty: "No journal entries found.",
-      createButton: "New Entry",
+      createButton: "New entry",
       periodsButton: "Periods",
       applyFilters: "Apply Filters",
       selectCompany:
         "Enter a Company ID above and apply filters to load journal entries.",
+      loadFailed: "Could not load journal entries",
+      retry: "Try again",
+      emptyTitle: "No journal entries yet",
+      emptyMessage:
+        "Every posted invoice, bill, payment and manual booking lands here as a balanced entry. Record a manual entry for anything else.",
+      emptyAction: "Record a journal entry",
+      count: "{{count}} entries",
+      subtitle: "Every booking in your ledger, newest first.",
+      pageOf: "Page {{page}} of {{pages}}",
+      previous: "Previous",
+      next: "Next",
     },
-    title: "Journal Entries",
+    title: "Journal entries",
     titleShort: "Journal",
     description:
       "List journal entries with filters for company, period, status, source type, and date range",

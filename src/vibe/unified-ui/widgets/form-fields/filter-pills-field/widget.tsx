@@ -16,14 +16,7 @@ import {
   FormMessage,
 } from "next-vibe/ui/components/form/form";
 import { AlertCircle } from "next-vibe/ui/components/icons/AlertCircle";
-import { Info } from "next-vibe/ui/components/icons/Info";
 import { Span } from "next-vibe/ui/components/span";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "next-vibe/ui/components/tooltip";
 import type { JSX } from "react";
 
 import type { CreateApiEndpointAny } from "../../../../core/definition/endpoint-base";
@@ -39,6 +32,7 @@ import {
 } from "../../../_shared/use-widget-context";
 import { scopedTranslation as unifiedInterfaceScopedTranslation } from "../../../hooks/i18n";
 import { getTheme } from "../_shared/constants";
+import { FieldInfoTooltip } from "../_shared/field-info-tooltip";
 import { getFieldStyleClassName } from "../_shared/styling";
 import { getFieldValidationState } from "../_shared/validation";
 import { Icon } from "../icon-field/icon-component";
@@ -90,7 +84,7 @@ export function FilterPillsFieldWidget<
           <FormItem
             className={cn(styleClassName.containerClassName, field.className)}
           >
-            <Div className="flex flex-row items-start gap-2">
+            <Div className="flex flex-row items-center gap-1.5">
               <FormLabel
                 className={cn(
                   styleClassName.labelClassName,
@@ -102,25 +96,10 @@ export function FilterPillsFieldWidget<
                   <Span className="text-info font-bold">*</Span>
                 )}
                 {field.description && (
-                  <TooltipProvider delayDuration={300}>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          className="cursor-help inline-flex h-auto w-auto p-0"
-                        >
-                          <Info className="h-4 w-4 text-muted-foreground hover:text-foreground transition-colors" />
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent className="max-w-[250px]">
-                        <Span className="text-sm">
-                          {tField(field.description)}
-                        </Span>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
+                  <FieldInfoTooltip
+                    text={tField(field.description)}
+                    label={field.label ? tField(field.label) : undefined}
+                  />
                 )}
               </FormLabel>
               {style === "badge" && isRequired && (

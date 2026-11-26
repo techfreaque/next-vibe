@@ -131,7 +131,11 @@ export const translations: typeof enTranslations = {
         empty: "Ten partner nigdy nie złożył wniosku o wypłatę.",
       },
       notFound: "Kod {{code}} nie istnieje.",
-      pickCode: "Wpisz kod polecający, żeby zobaczyć jego raport.",
+      pickCode: "Wybierz kod z tabeli w przeglądzie albo wpisz go powyżej.",
+      pickTitle: "Nie wybrano kodu",
+      browseCodes: "Przeglądaj kody",
+      subtitle:
+        "Kliknięcia, rejestracje, przychód, prowizja i saldo partnera dla jednego kodu.",
       loading: "Wczytywanie raportu kodu",
     },
   },

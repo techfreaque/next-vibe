@@ -19,7 +19,7 @@ export const translations = {
   },
   get: {
     title: "My Companies",
-    titleShort: "My Companies",
+    titleShort: "Companies",
     description: "Companies you are a member of",
     page: {
       label: "Page",

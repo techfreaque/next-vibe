@@ -32,7 +32,34 @@ export const category: CategoryDefinition = {
   adminPathPrefixes: ["seo", "vibe/agent/chat/public-feed"],
   landing: {
     summary: { alias: "publishing-summary", scope: "platform" },
-    destinations: ["forum-threads"],
+    destinations: ["forum-threads", "chat-moderation"],
+    destinationDescriptions: {
+      "forum-threads": {
+        "en-US": "Public threads members shared with the community.",
+        "en-GLOBAL": "Public threads members shared with the community.",
+        "de-DE":
+          "Öffentliche Threads, die Mitglieder mit der Community teilen.",
+        "pl-PL": "Publiczne wątki udostępnione społeczności.",
+        "fr-FR": "Fils publics partagés avec la communauté.",
+        "it-IT": "Conversazioni pubbliche condivise con la community.",
+        "es-ES": "Conversaciones públicas compartidas con la comunidad.",
+        "sk-SK": "Verejné konverzácie zdieľané s komunitou.",
+      },
+      "chat-moderation": {
+        "en-US": "Reported and hidden public posts, most urgent first.",
+        "en-GLOBAL": "Reported and hidden public posts, most urgent first.",
+        "de-DE":
+          "Gemeldete und ausgeblendete öffentliche Beiträge, Dringendes zuerst.",
+        "pl-PL": "Zgłoszone i ukryte publiczne wpisy, najpilniejsze najpierw.",
+        "fr-FR":
+          "Publications publiques signalées ou masquées, les plus urgentes d’abord.",
+        "it-IT": "Post pubblici segnalati o nascosti, prima i più urgenti.",
+        "es-ES":
+          "Publicaciones públicas denunciadas u ocultas, primero las más urgentes.",
+        "sk-SK":
+          "Nahlásené a skryté verejné príspevky, najnaliehavejšie navrchu.",
+      },
+    },
   },
   subcategories: {
     forum: {

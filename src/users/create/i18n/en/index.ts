@@ -7,15 +7,15 @@ export const translations = {
     admin: "Admin",
   },
   post: {
-    title: "Create User",
-    titleShort: "Create User",
+    title: "Create user",
+    titleShort: "Create user",
     description: "Create a new user account",
     form: {
-      title: "User Creation Form",
+      title: "User creation form",
       description: "Fill in the details to create a new user",
     },
     email: {
-      label: "Email Address",
+      label: "Email address",
       description: "User's email address for login and communication",
     },
     password: {
@@ -23,19 +23,19 @@ export const translations = {
       description: "Secure password for the user account",
     },
     privateName: {
-      label: "Private Name",
+      label: "Private name",
       description: "User's full legal name (visible only to admins)",
     },
     publicName: {
-      label: "Public Name",
+      label: "Public name",
       description: "User's display name (visible to all users)",
     },
     firstName: {
-      label: "First Name",
+      label: "First name",
       description: "User's first name",
     },
     lastName: {
-      label: "Last Name",
+      label: "Last name",
       description: "User's last name",
     },
     company: {
@@ -43,19 +43,19 @@ export const translations = {
       description: "User's company or organization",
     },
     phone: {
-      label: "Phone Number",
+      label: "Phone number",
       description: "User's contact phone number",
     },
     preferredContactMethod: {
-      label: "Preferred Contact Method",
+      label: "Preferred contact method",
       description: "How the user prefers to be contacted",
     },
     roles: {
-      label: "User Roles",
+      label: "User roles",
       description: "Assign roles to the user",
     },
     imageUrl: {
-      label: "Profile Image URL",
+      label: "Profile image URL",
       description: "URL to the user's profile image",
     },
     bio: {
@@ -67,15 +67,15 @@ export const translations = {
       description: "User's personal or company website",
     },
     jobTitle: {
-      label: "Job Title",
+      label: "Job title",
       description: "User's job title or position",
     },
     emailVerified: {
-      label: "Email Verified",
+      label: "Email verified",
       description: "Whether the user's email is verified",
     },
     isActive: {
-      label: "Active Status",
+      label: "Active status",
       description: "Whether the user account is active",
     },
     leadId: {
@@ -91,13 +91,13 @@ export const translations = {
       description: "User's preferred language",
     },
     response: {
-      title: "User Created",
+      title: "User created",
       description: "Details of the newly created user",
       id: {
         content: "User ID",
       },
       leadId: {
-        content: "Associated Lead ID",
+        content: "Associated lead ID",
       },
       country: {
         label: "Country",
@@ -108,31 +108,31 @@ export const translations = {
         description: "User's preferred language",
       },
       email: {
-        content: "Email Address",
+        content: "Email address",
       },
       privateName: {
-        content: "Private Name",
+        content: "Private name",
       },
       publicName: {
-        content: "Public Name",
+        content: "Public name",
       },
       firstName: {
-        content: "First Name",
+        content: "First name",
       },
       lastName: {
-        content: "Last Name",
+        content: "Last name",
       },
       company: {
         content: "Company",
       },
       phone: {
-        content: "Phone Number",
+        content: "Phone number",
       },
       preferredContactMethod: {
-        content: "Preferred Contact Method",
+        content: "Preferred contact method",
       },
       imageUrl: {
-        content: "Profile Image",
+        content: "Profile image",
       },
       bio: {
         content: "Biography",
@@ -141,19 +141,19 @@ export const translations = {
         content: "Website",
       },
       jobTitle: {
-        content: "Job Title",
+        content: "Job title",
       },
       emailVerified: {
-        content: "Email Verified",
+        content: "Email verified",
       },
       isActive: {
-        content: "Active Status",
+        content: "Active status",
       },
       stripeCustomerId: {
-        content: "Stripe Customer ID",
+        content: "Stripe customer ID",
       },
       userRoles: {
-        content: "User Roles",
+        content: "User roles",
         id: {
           content: "Role ID",
         },
@@ -162,47 +162,47 @@ export const translations = {
         },
       },
       createdAt: {
-        content: "Created At",
+        content: "Created at",
       },
       updatedAt: {
-        content: "Updated At",
+        content: "Updated at",
       },
     },
     errors: {
       unauthorized: {
-        title: "Unauthorized Access",
+        title: "Unauthorized access",
         description: "You must be logged in to create users",
       },
       validation: {
-        title: "Validation Failed",
+        title: "Validation failed",
         description: "Please check the form data and try again",
       },
       server: {
-        title: "Server Error",
+        title: "Server error",
         description: "Unable to create user due to server error",
       },
       unknown: {
-        title: "Unknown Error",
+        title: "Unknown error",
         description: "An unexpected error occurred while creating user",
       },
       network: {
-        title: "Network Error",
+        title: "Network error",
         description: "Network connection failed during user creation",
       },
       forbidden: {
-        title: "Access Forbidden",
+        title: "Access forbidden",
         description: "You don't have permission to create users",
       },
       notFound: {
-        title: "Resource Not Found",
+        title: "Resource not found",
         description: "Required resource not found for user creation",
       },
       conflict: {
-        title: "User Already Exists",
+        title: "User already exists",
         description: "A user with this email already exists",
       },
       unsavedChanges: {
-        title: "Unsaved Changes",
+        title: "Unsaved changes",
         description: "You have unsaved changes that will be lost",
       },
       internal: {
@@ -213,17 +213,17 @@ export const translations = {
     sms: {
       errors: {
         welcome_failed: {
-          title: "SMS Welcome Failed",
+          title: "SMS welcome failed",
           description: "Failed to send welcome SMS to the user",
         },
         verification_failed: {
-          title: "SMS Verification Failed",
+          title: "SMS verification failed",
           description: "Failed to send verification SMS to the user",
         },
       },
     },
     success: {
-      title: "User Created Successfully",
+      title: "User created successfully",
       description: "The new user account has been created",
       message: {
         content: "User created successfully",
@@ -234,20 +234,27 @@ export const translations = {
     },
   },
   widget: {
-    headerCreated: "User Created",
-    headerCreate: "Create User",
-    headerSubtitle: "Create a new admin user or customer account",
+    headerCreated: "User created",
+    headerCreate: "New user",
+    headerSubtitle:
+      "Add an admin or customer account. They can sign in right away.",
     activeBadge: "Active",
     verifiedBadge: "Verified",
     copiedTooltip: "Copied!",
-    copyUserIdTooltip: "Copy User ID",
+    copyUserIdTooltip: "Copy user ID",
     copyIdButton: "Copy ID",
     copiedButton: "Copied!",
-    viewUserButton: "View User",
-    fullProfileButton: "Full Profile",
-    creditHistoryButton: "Credit History",
-    createAnotherButton: "Create Another User",
+    viewUserButton: "View user",
+    fullProfileButton: "Full profile",
+    creditHistoryButton: "Credit history",
+    createAnotherButton: "Create another user",
     createdPrefix: "Created",
+    createButton: "Create user",
+    sections: {
+      signIn: "Sign-in",
+      profile: "Profile",
+      access: "Access",
+    },
   },
   email: {
     users: {
@@ -257,25 +264,25 @@ export const translations = {
         subject: "Welcome to {{companyName}} - Your Account is Ready!",
         introduction:
           "Hi {{firstName}}, we're excited to have you on board! Your account has been successfully created and you can now access all our features.",
-        accountDetails: "Account Details",
+        accountDetails: "Account details",
         email: "Email",
         name: "Name",
-        publicName: "Display Name",
+        publicName: "Display name",
         company: "Company",
         phone: "Phone",
-        nextSteps: "Next Steps",
+        nextSteps: "Next steps",
         loginButton: "Login to Your Account",
         support:
           "If you have any questions, our support team is here to help. Contact us anytime!",
       },
       admin: {
-        newUser: "New User Created",
+        newUser: "New user created",
         preview: "A new user {{firstName}} {{lastName}} has been created",
         subject: "New User Account Created - {{firstName}} {{lastName}}",
         notification:
           "A new user account has been created in the system. Here are the details:",
-        userDetails: "User Details",
-        viewUser: "View User Profile",
+        userDetails: "User details",
+        viewUser: "View user profile",
       },
       errors: {
         missing_data: "Required user data is missing for email template",
@@ -289,8 +296,8 @@ export const translations = {
         id: "ID:",
         email: "Email:",
         name: "Name:",
-        privateName: "Full Name:",
-        publicName: "Display Name:",
+        privateName: "Full name:",
+        publicName: "Display name:",
         company: "Company:",
         created: "Created:",
         leadId: "Lead ID:",
@@ -308,11 +315,11 @@ export const translations = {
     },
     errors: {
       welcome_failed: {
-        title: "SMS Welcome Failed",
+        title: "SMS welcome failed",
         description: "Failed to send welcome SMS to the user",
       },
       verification_failed: {
-        title: "SMS Verification Failed",
+        title: "SMS verification failed",
         description: "Failed to send verification SMS to the user",
       },
     },
@@ -338,17 +345,17 @@ export const translations = {
     userRole: {
       public: "Public",
       customer: "Customer",
-      partnerAdmin: "Partner Admin",
-      partnerEmployee: "Partner Employee",
+      partnerAdmin: "Partner admin",
+      partnerEmployee: "Partner employee",
       admin: "Admin",
-      cliOff: "CLI Disabled",
-      cliAuthBypass: "CLI Auth Bypass",
-      aiToolOff: "AI Tool Disabled",
-      webOff: "Web Disabled",
-      mcpOff: "MCP Disabled",
-      mcpVisible: "MCP Visible",
-      productionOff: "Production Disabled",
-      skillOff: "Skill Disabled",
+      cliOff: "CLI disabled",
+      cliAuthBypass: "CLI auth bypass",
+      aiToolOff: "AI tool disabled",
+      webOff: "Web disabled",
+      mcpOff: "MCP disabled",
+      mcpVisible: "MCP visible",
+      productionOff: "Production disabled",
+      skillOff: "Skill disabled",
     },
   },
 };

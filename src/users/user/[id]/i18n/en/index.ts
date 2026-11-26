@@ -1,14 +1,14 @@
 export const translations = {
   category: "Users",
-  tag: "User Management",
+  tag: "User management",
 
   id: {
     roles: {
       post: {
-        title: "Add User Role",
+        title: "Add user role",
         description: "Grant a role to a specific user account",
         container: {
-          title: "Add Role",
+          title: "Add role",
           description: "Select a role to grant to this user",
         },
         id: {
@@ -22,17 +22,17 @@ export const translations = {
           placeholder: "Select a role...",
         },
         submit: {
-          label: "Add Role",
+          label: "Add role",
         },
         response: {
           roleId: {
-            content: "Role Assignment ID",
+            content: "Role assignment ID",
           },
           userId: {
             content: "User ID",
           },
           assignedRole: {
-            content: "Assigned Role",
+            content: "Assigned role",
           },
         },
         errors: {
@@ -41,48 +41,48 @@ export const translations = {
             description: "You must be logged in to manage user roles",
           },
           validation: {
-            title: "Validation Failed",
+            title: "Validation failed",
             description: "Please provide a valid user ID and role",
           },
           forbidden: {
-            title: "Access Forbidden",
+            title: "Access forbidden",
             description: "Only administrators can manage user roles",
           },
           notFound: {
-            title: "User Not Found",
+            title: "User not found",
             description: "The specified user could not be found",
           },
           conflict: {
-            title: "Role Already Assigned",
+            title: "Role already assigned",
             description: "This user already has the specified role",
           },
           network: {
-            title: "Network Error",
+            title: "Network error",
             description: "Unable to connect to the server",
           },
           unsavedChanges: {
-            title: "Unsaved Changes",
+            title: "Unsaved changes",
             description: "You have unsaved changes that will be lost",
           },
           server: {
-            title: "Server Error",
+            title: "Server error",
             description: "Unable to add role due to server error",
           },
           unknown: {
-            title: "Unknown Error",
+            title: "Unknown error",
             description: "An unexpected error occurred while adding the role",
           },
         },
         success: {
-          title: "Role Added",
+          title: "Role added",
           description: "The role has been successfully granted to the user",
         },
       },
       delete: {
-        title: "Remove User Role",
+        title: "Remove user role",
         description: "Revoke a role from a specific user account",
         container: {
-          title: "Remove Role",
+          title: "Remove role",
           description: "Select a role to revoke from this user",
         },
         id: {
@@ -96,11 +96,11 @@ export const translations = {
           placeholder: "Select a role...",
         },
         submit: {
-          label: "Remove Role",
+          label: "Remove role",
         },
         response: {
           success: {
-            content: "Role Removed",
+            content: "Role removed",
           },
         },
         errors: {
@@ -109,50 +109,50 @@ export const translations = {
             description: "You must be logged in to manage user roles",
           },
           validation: {
-            title: "Validation Failed",
+            title: "Validation failed",
             description: "Please provide a valid user ID and role",
           },
           forbidden: {
-            title: "Access Forbidden",
+            title: "Access forbidden",
             description: "Only administrators can manage user roles",
           },
           notFound: {
-            title: "User Not Found",
+            title: "User not found",
             description: "The specified user could not be found",
           },
           conflict: {
-            title: "Conflict Error",
+            title: "Conflict error",
             description: "Unable to remove role due to existing dependencies",
           },
           network: {
-            title: "Network Error",
+            title: "Network error",
             description: "Unable to connect to the server",
           },
           unsavedChanges: {
-            title: "Unsaved Changes",
+            title: "Unsaved changes",
             description: "You have unsaved changes that will be lost",
           },
           server: {
-            title: "Server Error",
+            title: "Server error",
             description: "Unable to remove role due to server error",
           },
           unknown: {
-            title: "Unknown Error",
+            title: "Unknown error",
             description: "An unexpected error occurred while removing the role",
           },
         },
         success: {
-          title: "Role Removed",
+          title: "Role removed",
           description: "The role has been successfully revoked from the user",
         },
       },
     },
     get: {
-      title: "Get User",
-      titleShort: "User Details",
+      title: "Get user",
+      titleShort: "User details",
       description: "Retrieve detailed information about a specific user",
       container: {
-        title: "User Details",
+        title: "User details",
         description: "View detailed user information",
       },
       id: {
@@ -162,41 +162,41 @@ export const translations = {
       },
       response: {
         userProfile: {
-          title: "User Profile",
+          title: "User profile",
           description: "Detailed user profile information",
           basicInfo: {
-            title: "Basic Information",
+            title: "Basic information",
             description: "Core user information",
             id: {
               content: "User ID",
             },
             email: {
-              content: "Email Address",
+              content: "Email address",
             },
             privateName: {
-              content: "Private Name",
+              content: "Private name",
             },
             publicName: {
-              content: "Public Name",
+              content: "Public name",
             },
             firstName: {
-              content: "First Name",
+              content: "First name",
             },
             lastName: {
-              content: "Last Name",
+              content: "Last name",
             },
             company: {
               content: "Company",
             },
           },
           contactDetails: {
-            title: "Contact Details",
+            title: "Contact details",
             description: "User contact information",
             phone: {
-              content: "Phone Number",
+              content: "Phone number",
             },
             preferredContactMethod: {
-              content: "Preferred Contact Method",
+              content: "Preferred contact method",
             },
             website: {
               content: "Website",
@@ -204,123 +204,132 @@ export const translations = {
           },
         },
         profileDetails: {
-          title: "Profile Details",
+          title: "Profile details",
           description: "Additional profile information",
           imageUrl: {
-            content: "Profile Image",
+            content: "Profile image",
           },
           bio: {
             content: "Biography",
           },
           jobTitle: {
-            content: "Job Title",
+            content: "Job title",
           },
           leadId: {
-            content: "Associated Lead ID",
+            content: "Associated lead ID",
           },
         },
         accountStatus: {
-          title: "Account Status",
+          title: "Account status",
           description: "User account status information",
           isActive: {
-            content: "Active Status",
+            content: "Active status",
           },
           emailVerified: {
-            content: "Email Verified",
+            content: "Email verified",
           },
           stripeCustomerId: {
-            content: "Stripe Customer ID",
+            content: "Stripe customer ID",
           },
           userRoles: {
-            content: "User Roles",
+            content: "User roles",
           },
         },
         timestamps: {
           title: "Timestamps",
           description: "Creation and update timestamps",
           createdAt: {
-            content: "Created At",
+            content: "Created at",
           },
           updatedAt: {
-            content: "Updated At",
+            content: "Updated at",
           },
         },
         referralInfo: {
-          title: "Referral Info",
+          title: "Referral info",
           description: "Referral chain and earnings",
           referredByUserId: {
-            content: "Referred By (User ID)",
+            content: "Referred by (User ID)",
           },
           referredByCode: {
-            content: "Referral Code Used",
+            content: "Referral code used",
           },
           totalReferrals: {
-            content: "Users Referred",
+            content: "Users referred",
           },
           totalEarnedCents: {
-            content: "Total Earned (cents)",
+            content: "Total earned (cents)",
           },
           confirmedEarnedCents: {
-            content: "Confirmed Earned (cents)",
+            content: "Confirmed earned (cents)",
           },
           pendingEarnedCents: {
-            content: "Pending Earned (cents)",
+            content: "Pending earned (cents)",
           },
         },
         engagement: {
-          title: "Credits & Engagement",
+          title: "Credits & engagement",
           description: "Balance, spend, earnings and activity",
           creditBalance: {
-            content: "Credit Balance",
+            content: "Credit balance",
           },
           freeAllowance: {
-            content: "Free Allowance",
+            content: "Free allowance",
           },
           lifetimeCreditsSpent: {
-            content: "Lifetime Spend",
+            content: "Lifetime spend",
           },
           favoritesCount: {
             content: "Favorites",
           },
           customSkillsCount: {
-            content: "Custom Skills",
+            content: "Custom skills",
           },
           newsletterConsent: {
-            content: "Newsletter Consent",
+            content: "Newsletter consent",
           },
           hasConfirmedNewsletter: {
-            content: "Newsletter Confirmed",
+            content: "Newsletter confirmed",
+          },
+          paymentsCount: {
+            content: "Payments",
+          },
+          creditEntriesCount: {
+            content: "Credit entries",
+          },
+          threadsCount: {
+            content: "Threads",
           },
         },
         leadId: {
-          content: "Associated Lead ID",
+          content: "Associated lead ID",
         },
         email: {
-          content: "Email Address",
+          content: "Email address",
         },
         privateName: {
-          content: "Private Name",
+          content: "Private name",
         },
         publicName: {
-          content: "Public Name",
+          content: "Public name",
         },
         firstName: {
-          content: "First Name",
+          content: "First name",
         },
         lastName: {
-          content: "Last Name",
+          content: "Last name",
         },
         company: {
           content: "Company",
         },
         phone: {
-          content: "Phone Number",
+          content: "Phone number",
         },
         preferredContactMethod: {
-          content: "Preferred Contact Method",
+          content: "Preferred contact method",
         },
         imageUrl: {
-          content: "Profile Image",
+          content: "Profile image",
         },
         bio: {
           content: "Biography",
@@ -329,69 +338,69 @@ export const translations = {
           content: "Website",
         },
         jobTitle: {
-          content: "Job Title",
+          content: "Job title",
         },
         emailVerified: {
-          content: "Email Verified",
+          content: "Email verified",
         },
         isActive: {
-          content: "Active Status",
+          content: "Active status",
         },
         stripeCustomerId: {
-          content: "Stripe Customer ID",
+          content: "Stripe customer ID",
         },
         userRoles: {
-          content: "User Roles",
+          content: "User roles",
         },
         createdAt: {
-          content: "Created At",
+          content: "Created at",
         },
         updatedAt: {
-          content: "Updated At",
+          content: "Updated at",
         },
       },
       errors: {
         unauthorized: {
-          title: "Unauthorized Access",
+          title: "Unauthorized access",
           description: "You must be logged in to view user details",
         },
         validation: {
-          title: "Validation Failed",
+          title: "Validation failed",
           description: "Invalid user ID provided",
         },
         forbidden: {
-          title: "Access Forbidden",
+          title: "Access forbidden",
           description: "You don't have permission to view this user",
         },
         notFound: {
-          title: "User Not Found",
+          title: "User not found",
           description: "The requested user could not be found",
           detail: "No user found with ID {{userId}}.",
         },
         conflict: {
-          title: "Conflict Error",
+          title: "Conflict error",
           description: "Unable to retrieve user due to existing conflicts",
         },
         network: {
-          title: "Network Error",
+          title: "Network error",
           description: "Unable to connect to the server",
         },
         unsavedChanges: {
-          title: "Unsaved Changes",
+          title: "Unsaved changes",
           description: "You have unsaved changes that will be lost",
         },
         server: {
-          title: "Server Error",
+          title: "Server error",
           description: "Unable to retrieve user due to server error",
           detail: "Could not load this user: {{error}}",
         },
         unknown: {
-          title: "Unknown Error",
+          title: "Unknown error",
           description: "An unexpected error occurred while retrieving user",
         },
       },
       success: {
-        title: "User Retrieved Successfully",
+        title: "User retrieved successfully",
         description: "User details have been retrieved successfully",
       },
     },
@@ -410,42 +419,42 @@ export const translations = {
       },
       sections: {
         basicInfo: {
-          title: "Basic Information",
+          title: "Basic information",
           description: "Update basic user information",
         },
         contactInfo: {
-          title: "Contact Information",
+          title: "Contact information",
           description: "Update contact details",
         },
         profileDetails: {
-          title: "Profile Details",
+          title: "Profile details",
           description: "Update additional profile information",
         },
         adminSettings: {
-          title: "Administrative Settings",
+          title: "Administrative settings",
           description: "Update administrative settings",
         },
       },
       email: {
-        label: "Email Address",
+        label: "Email address",
         description: "User's email address for login and communication",
         placeholder: "Enter email address...",
       },
       privateName: {
-        label: "Private Name",
+        label: "Private name",
         description: "User's full legal name (visible only to admins)",
       },
       publicName: {
-        label: "Public Name",
+        label: "Public name",
         description: "User's display name (visible to all users)",
       },
       firstName: {
-        label: "First Name",
+        label: "First name",
         description: "User's first name",
         placeholder: "Enter first name...",
       },
       lastName: {
-        label: "Last Name",
+        label: "Last name",
         description: "User's last name",
         placeholder: "Enter last name...",
       },
@@ -455,12 +464,12 @@ export const translations = {
         placeholder: "Enter company name...",
       },
       phone: {
-        label: "Phone Number",
+        label: "Phone number",
         description: "User's contact phone number",
         placeholder: "Enter phone number...",
       },
       preferredContactMethod: {
-        label: "Preferred Contact Method",
+        label: "Preferred contact method",
         description: "How the user prefers to be contacted",
       },
       bio: {
@@ -474,16 +483,16 @@ export const translations = {
         placeholder: "Enter website URL...",
       },
       jobTitle: {
-        label: "Job Title",
+        label: "Job title",
         description: "User's job title or position",
         placeholder: "Enter job title...",
       },
       emailVerified: {
-        label: "Email Verified",
+        label: "Email verified",
         description: "Whether the user's email is verified",
       },
       isActive: {
-        label: "Active Status",
+        label: "Active status",
         description: "Whether the user account is active",
       },
       leadId: {
@@ -496,39 +505,39 @@ export const translations = {
         description: "Whether the user is banned from the platform",
       },
       bannedReason: {
-        label: "Ban Reason",
+        label: "Ban reason",
         description: "Reason for banning the user",
       },
       response: {
         leadId: {
-          content: "Associated Lead ID",
+          content: "Associated lead ID",
         },
         email: {
-          content: "Email Address",
+          content: "Email address",
         },
         privateName: {
-          content: "Private Name",
+          content: "Private name",
         },
         publicName: {
-          content: "Public Name",
+          content: "Public name",
         },
         firstName: {
-          content: "First Name",
+          content: "First name",
         },
         lastName: {
-          content: "Last Name",
+          content: "Last name",
         },
         company: {
           content: "Company",
         },
         phone: {
-          content: "Phone Number",
+          content: "Phone number",
         },
         preferredContactMethod: {
-          content: "Preferred Contact Method",
+          content: "Preferred contact method",
         },
         imageUrl: {
-          content: "Profile Image",
+          content: "Profile image",
         },
         bio: {
           content: "Biography",
@@ -537,78 +546,78 @@ export const translations = {
           content: "Website",
         },
         jobTitle: {
-          content: "Job Title",
+          content: "Job title",
         },
         emailVerified: {
-          content: "Email Verified",
+          content: "Email verified",
         },
         isActive: {
-          content: "Active Status",
+          content: "Active status",
         },
         stripeCustomerId: {
-          content: "Stripe Customer ID",
+          content: "Stripe customer ID",
         },
         userRoles: {
-          content: "User Roles",
+          content: "User roles",
         },
         createdAt: {
-          content: "Created At",
+          content: "Created at",
         },
         updatedAt: {
-          content: "Updated At",
+          content: "Updated at",
         },
       },
       errors: {
         unauthorized: {
-          title: "Unauthorized Access",
+          title: "Unauthorized access",
           description: "You must be logged in to update users",
         },
         validation: {
-          title: "Validation Failed",
+          title: "Validation failed",
           description: "Please check the form data and try again",
         },
         forbidden: {
-          title: "Access Forbidden",
+          title: "Access forbidden",
           description: "You don't have permission to update this user",
         },
         notFound: {
-          title: "User Not Found",
+          title: "User not found",
           description: "The user to update could not be found",
           detail: "No user found with ID {{userId}}.",
         },
         conflict: {
-          title: "Update Conflict",
+          title: "Update conflict",
           description: "The user data conflicts with existing records",
         },
         server: {
-          title: "Server Error",
+          title: "Server error",
           description: "Unable to update user due to server error",
           detail: "Could not save changes to this user: {{error}}",
         },
         unknown: {
-          title: "Unknown Error",
+          title: "Unknown error",
           description: "An unexpected error occurred while updating user",
         },
         network: {
-          title: "Network Error",
+          title: "Network error",
           description: "Unable to connect to the server",
         },
         unsavedChanges: {
-          title: "Unsaved Changes",
+          title: "Unsaved changes",
           description: "You have unsaved changes that will be lost",
         },
       },
       success: {
-        title: "User Updated Successfully",
+        title: "User updated successfully",
         description: "User information has been updated successfully",
       },
     },
     delete: {
-      title: "Delete User",
-      titleShort: "Delete User",
+      title: "Delete user",
+      titleShort: "Delete user",
       description: "Permanently delete a user account",
       container: {
-        title: "Delete User",
+        title: "Delete user",
         description: "Permanently remove user from the system",
       },
       id: {
@@ -618,83 +627,83 @@ export const translations = {
         helpText: "WARNING: This action cannot be undone",
       },
       submitButton: {
-        label: "Delete User",
+        label: "Delete account",
         loadingText: "Deleting...",
       },
       response: {
         deletionResult: {
-          title: "Deletion Result",
+          title: "Deletion result",
           description: "Result of the deletion operation",
           success: {
-            content: "Deletion Success",
+            content: "Deletion success",
           },
           message: {
-            content: "Deletion Message",
+            content: "Deletion message",
           },
           deletedAt: {
-            content: "Deleted At",
+            content: "Deleted at",
           },
         },
         success: {
-          content: "Deletion Success",
+          content: "Deletion success",
         },
         message: {
-          content: "Deletion Message",
+          content: "Deletion message",
         },
       },
       errors: {
         unauthorized: {
-          title: "Unauthorized Access",
+          title: "Unauthorized access",
           description: "You must be logged in to delete users",
         },
         validation: {
-          title: "Validation Failed",
+          title: "Validation failed",
           description: "Invalid user ID provided for deletion",
         },
         forbidden: {
-          title: "Access Forbidden",
+          title: "Access forbidden",
           description: "You don't have permission to delete users",
         },
         notFound: {
-          title: "User Not Found",
+          title: "User not found",
           description: "The user to delete could not be found",
           detail: "No user found with ID {{userId}}.",
         },
         server: {
-          title: "Server Error",
+          title: "Server error",
           description: "Unable to delete user due to server error",
           detail: "Could not delete this user: {{error}}",
         },
         unknown: {
-          title: "Unknown Error",
+          title: "Unknown error",
           description: "An unexpected error occurred while deleting user",
         },
         conflict: {
-          title: "Conflict Error",
+          title: "Conflict error",
           description: "Unable to delete user due to existing dependencies",
         },
         network: {
-          title: "Network Error",
+          title: "Network error",
           description: "Unable to connect to the server",
         },
         unsavedChanges: {
-          title: "Unsaved Changes",
+          title: "Unsaved changes",
           description: "You have unsaved changes that will be lost",
         },
       },
       success: {
-        title: "User Deleted Successfully",
+        title: "User deleted successfully",
         description: "User has been deleted successfully",
       },
     },
     widget: {
-      userProfile: "User Profile",
+      userProfile: "User profile",
       active: "Active",
       inactive: "Inactive",
-      leadId: "Lead ID:",
-      viewLead: "View Lead",
-      created: "Created",
-      lastUpdated: "Last Updated",
+      leadId: "Lead ID",
+      viewLead: "View lead",
+      created: "Joined",
+      lastUpdated: "Last updated",
       relatedRecords: "Related records",
       relatedPayments: "Payments",
       relatedThreadActivity: "Thread activity",
@@ -702,44 +711,57 @@ export const translations = {
       confirmUnban: "Restore account access for {{name}}?",
       editAccountNamed: "Edit {{name}}",
       saveAccount: "Save changes",
-      fullProfile: "Full Profile",
+      fullProfile: "Open full profile",
       referrals: "Referrals",
       subscription: "Subscription",
-      creditHistory: "Credit History",
-      identifiers: "Account references",
+      creditHistory: "Credit history",
+      identifiers: "Technical details",
       engagementTitle: "Credits and activity",
       balance: "Credit balance",
       freeAllowance: "Free credit allowance",
       lifetimeSpend: "Credits spent",
-      earned: "Earned",
+      earned: "Referral earnings",
       earnedPending: "Pending:",
-      referred: "Referred",
+      referred: "Referred users",
       favorites: "Favorites",
       skills: "Skills",
       newsletter: "Newsletter",
       newsletterConfirmed: "Confirmed",
       newsletterConsent: "Opted in",
       newsletterNone: "None",
-      deleteUser: "Delete User",
+      deleteUser: "Delete user",
       userDeletedSuccessfully: "User deleted successfully",
       deletedAt: "Deleted at",
       dangerZone: "Danger zone",
       deleteAccountHint: "Permanently remove the account for {{name}}.",
       cancelDeletion: "Cancel",
-      confirmDeletion: "Confirm Deletion",
+      confirmDeletion: "Confirm deletion",
       confirmDeletionMessage:
         "Deleting this account is permanent. You cannot undo it.",
       titleReferralCodes: "View referral codes and stats",
       titleSubscription: "View subscription",
       copyLeadId: "Copy lead ID",
-      noEarnings: "No referral earnings",
+      noEarnings: "None yet",
       earningUnitsUnavailable: "Earnings breakdown unavailable",
-      titleCopyUserId: "Copy User ID",
+      titleCopyUserId: "Copy user ID",
+      creditsAmount: "{{count}} credits",
+      freeAllowanceHint: "Free allowance: {{count}} credits a month",
+      moreActions: "More",
+      editAccount: "Edit account",
+      deleteAccount: "Delete account",
+      deleteDialogTitle: "Delete the account of {{name}}?",
+      accountTitle: "Account",
+      publicName: "Public name",
+      roles: "Roles",
+      savedItems: "Saved items",
+      savedItemsValue: "{{favorites}} favorites, {{skills}} skills",
+      userId: "User ID",
+      stripeCustomer: "Stripe customer",
     },
     getCrm: {
       get: {
-        title: "Get User CRM Profile",
-        titleShort: "CRM Profile",
+        title: "Get user CRM profile",
+        titleShort: "CRM profile",
         description: "Retrieve a user's billing fields and note count",
         fields: {
           userId: {
@@ -750,7 +772,7 @@ export const translations = {
         },
         errors: {
           validation: {
-            title: "Validation Error",
+            title: "Validation error",
             description: "Invalid user ID",
           },
           unauthorized: {
@@ -762,7 +784,7 @@ export const translations = {
             description: "You don't have access to this user's CRM data",
           },
           notFound: {
-            title: "Not Found",
+            title: "Not found",
             description: "User not found",
           },
           conflict: {
@@ -770,55 +792,55 @@ export const translations = {
             description: "A conflict occurred",
           },
           network: {
-            title: "Network Error",
+            title: "Network error",
             description: "Network request failed",
           },
           unsavedChanges: {
-            title: "Unsaved Changes",
+            title: "Unsaved changes",
             description: "There are unsaved changes",
           },
           internal: {
-            title: "Internal Error",
+            title: "Internal error",
             description: "Server error — try again",
           },
           unknown: {
-            title: "Unknown Error",
+            title: "Unknown error",
             description: "An unexpected error occurred",
           },
         },
         success: {
-          title: "CRM Profile Loaded",
+          title: "CRM profile loaded",
           description: "User CRM data retrieved",
         },
         widget: {
-          addNote: "Add Note",
-          viewNotes: "View Notes",
+          addNote: "Add note",
+          viewNotes: "View notes",
         },
         response: {
           id: "User ID",
           email: "Email",
           privateName: "Name",
-          companyBillingName: "Company / Billing Name",
-          vatNumber: "VAT Number",
+          companyBillingName: "Company / billing name",
+          vatNumber: "VAT number",
           taxId: "Tax ID",
           phone: "Phone",
-          addressLine1: "Address Line 1",
-          addressLine2: "Address Line 2",
+          addressLine1: "Address line 1",
+          addressLine2: "Address line 2",
           city: "City",
           region: "Region",
-          postalCode: "Postal Code",
+          postalCode: "Postal code",
           billingCountry: "Country",
-          defaultCurrency: "Default Currency",
-          paymentTermsDays: "Payment Terms (days)",
-          notesCount: "Total Notes",
+          defaultCurrency: "Default currency",
+          paymentTermsDays: "Payment terms (days)",
+          notesCount: "Total notes",
         },
       },
       tag: "CRM",
     },
     notesCreate: {
       post: {
-        title: "Create User Note",
-        titleShort: "Create Note",
+        title: "Create user note",
+        titleShort: "Create note",
         description:
           "Add a CRM note, call log, email record, meeting or task for a user",
         fields: {
@@ -828,7 +850,7 @@ export const translations = {
             placeholder: "Select user",
           },
           type: {
-            label: "Activity Type",
+            label: "Activity type",
             description: "What kind of interaction this records",
             placeholder: "Select type",
           },
@@ -844,7 +866,7 @@ export const translations = {
         },
         errors: {
           validation: {
-            title: "Validation Error",
+            title: "Validation error",
             description: "Check the fields and try again",
           },
           unauthorized: {
@@ -856,7 +878,7 @@ export const translations = {
             description: "You don't have access to this user",
           },
           notFound: {
-            title: "Not Found",
+            title: "Not found",
             description: "User not found",
           },
           conflict: {
@@ -864,28 +886,28 @@ export const translations = {
             description: "A conflict occurred",
           },
           network: {
-            title: "Network Error",
+            title: "Network error",
             description: "Network request failed",
           },
           unsavedChanges: {
-            title: "Unsaved Changes",
+            title: "Unsaved changes",
             description: "There are unsaved changes",
           },
           internal: {
-            title: "Internal Error",
+            title: "Internal error",
             description: "Server error — try again",
           },
           unknown: {
-            title: "Unknown Error",
+            title: "Unknown error",
             description: "An unexpected error occurred",
           },
         },
         success: {
-          title: "Note Created",
+          title: "Note created",
           description: "The note was saved",
         },
         widget: {
-          created: "Note Created",
+          created: "Note created",
           noteId: "Note ID",
           backToNotes: "Back to Notes",
         },
@@ -896,16 +918,16 @@ export const translations = {
           type: "Type",
           content: "Content",
           isPrivate: "Private",
-          createdAt: "Created At",
-          updatedAt: "Updated At",
+          createdAt: "Created at",
+          updatedAt: "Updated at",
         },
       },
       tag: "CRM",
     },
     notesList: {
       get: {
-        title: "List User Notes",
-        titleShort: "User Notes",
+        title: "List user notes",
+        titleShort: "User notes",
         description:
           "List CRM notes for a user, filtered by type and visibility",
         fields: {
@@ -920,13 +942,13 @@ export const translations = {
             placeholder: "All types",
           },
           isPrivate: {
-            label: "Private Only",
+            label: "Private only",
             description: "Show only your private notes",
           },
         },
         errors: {
           validation: {
-            title: "Validation Error",
+            title: "Validation error",
             description: "Check the filters and try again",
           },
           unauthorized: {
@@ -938,7 +960,7 @@ export const translations = {
             description: "You don't have access to these notes",
           },
           notFound: {
-            title: "Not Found",
+            title: "Not found",
             description: "User not found",
           },
           conflict: {
@@ -946,28 +968,28 @@ export const translations = {
             description: "A conflict occurred",
           },
           network: {
-            title: "Network Error",
+            title: "Network error",
             description: "Network request failed",
           },
           unsavedChanges: {
-            title: "Unsaved Changes",
+            title: "Unsaved changes",
             description: "There are unsaved changes",
           },
           internal: {
-            title: "Internal Error",
+            title: "Internal error",
             description: "Server error — try again",
           },
           unknown: {
-            title: "Unknown Error",
+            title: "Unknown error",
             description: "An unexpected error occurred",
           },
         },
         success: {
-          title: "Notes Loaded",
+          title: "Notes loaded",
           description: "Notes retrieved successfully",
         },
         widget: {
-          addNote: "Add Note",
+          addNote: "Add note",
           total: "Total",
           empty: "No notes yet",
           delete: "Delete",
@@ -984,8 +1006,8 @@ export const translations = {
             type: "Type",
             content: "Content",
             isPrivate: "Private",
-            createdAt: "Created At",
-            updatedAt: "Updated At",
+            createdAt: "Created at",
+            updatedAt: "Updated at",
           },
         },
       },
@@ -993,8 +1015,8 @@ export const translations = {
     },
     noteDelete: {
       post: {
-        title: "Delete User Note",
-        titleShort: "Delete Note",
+        title: "Delete user note",
+        titleShort: "Delete note",
         description:
           "Delete a CRM note — only the author or an admin can do this",
         fields: {
@@ -1006,7 +1028,7 @@ export const translations = {
         },
         errors: {
           validation: {
-            title: "Validation Error",
+            title: "Validation error",
             description: "Invalid note ID",
           },
           unauthorized: {
@@ -1018,7 +1040,7 @@ export const translations = {
             description: "Only the author or an admin can delete this note",
           },
           notFound: {
-            title: "Not Found",
+            title: "Not found",
             description: "Note not found",
           },
           conflict: {
@@ -1026,24 +1048,24 @@ export const translations = {
             description: "A conflict occurred",
           },
           network: {
-            title: "Network Error",
+            title: "Network error",
             description: "Network request failed",
           },
           unsavedChanges: {
-            title: "Unsaved Changes",
+            title: "Unsaved changes",
             description: "There are unsaved changes",
           },
           internal: {
-            title: "Internal Error",
+            title: "Internal error",
             description: "Server error — try again",
           },
           unknown: {
-            title: "Unknown Error",
+            title: "Unknown error",
             description: "An unexpected error occurred",
           },
         },
         success: {
-          title: "Note Deleted",
+          title: "Note deleted",
           description: "The note was permanently removed",
         },
         widget: {

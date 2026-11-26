@@ -7,7 +7,7 @@ export const translations: typeof enTranslations = {
   },
   get: {
     title: "Nahlásený obsah",
-    titleShort: "Front moderovania",
+    titleShort: "Nahlásené príspevky",
     description:
       "Nahlásené a skryté príspevky z verejného fóra a zdieľané vlákna, od najnaliehavejších",
     fields: {

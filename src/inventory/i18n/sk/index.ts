@@ -925,6 +925,10 @@ export const translations: typeof enTranslations = {
       widget: {
         retry: "Skúsiť znova",
         noItems: "Tento presun neobsahuje žiadne položky.",
+        noItemsHint:
+          "Produkty na presun pridáte pri vytváraní presunu. Presun bez položiek sa nedá odoslať.",
+        receivedOf: "Prijaté {{received}} z {{requested}}",
+        newTransfer: "Nový presun",
         back: "Späť",
         dispatch: "Expedovať presun",
         receive: "Označiť ako prijatý",
@@ -987,8 +991,8 @@ export const translations: typeof enTranslations = {
         status: "Stav",
         reference: "Referenčné číslo",
         notes: "Poznámky",
-        createdAt: "Čas vytvorenia",
-        completedAt: "Čas dokončenia",
+        createdAt: "Vytvorené",
+        completedAt: "Dokončené",
         items: "Položky",
         itemId: "ID položky",
         productId: "ID produktu",

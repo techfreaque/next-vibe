@@ -266,7 +266,7 @@ export const translations: typeof enTranslations = {
     },
   },
   widget: {
-    planStatus: "Piano e stato",
+    planStatus: "Piano",
     accountActive: "Attivo",
     accountInactive: "Inattivo",
     none: "Nessuno",
@@ -366,5 +366,6 @@ export const translations: typeof enTranslations = {
       pageHint: "Pagina {{page}} / {{pages}}. Il prossimo: --page= {{next}}",
       detailHint: "Dettagli: vibe users-view --userId=<ID>",
     },
+    planFree: "Gratuito",
   },
 };

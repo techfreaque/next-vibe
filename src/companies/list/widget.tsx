@@ -8,6 +8,7 @@ import { ChevronRight } from "next-vibe/ui/components/icons/ChevronRight";
 import { Loader2 } from "next-vibe/ui/components/icons/Loader2";
 import { Plus } from "next-vibe/ui/components/icons/Plus";
 import { Span } from "next-vibe/ui/components/span";
+import { StatusPill } from "next-vibe/ui/components/status-pill";
 import { P } from "next-vibe/ui/components/typography";
 import { usePickerCallback } from "next-vibe/unified-ui/_shared/picker-context";
 import {
@@ -18,8 +19,6 @@ import {
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { type JSX } from "react";
 
-import type { CompanyMemberRoleValue, CompanyTypeValue } from "../enum";
-import { CompanyMemberRole, CompanyType } from "../enum";
 import { scopedTranslation as companiesScopedTranslation } from "../i18n";
 import type definition from "./definition";
 import type { CompanyListGetResponseOutput } from "./definition";
@@ -27,26 +26,6 @@ import type { CompanyListGetResponseOutput } from "./definition";
 type CompanyItem = NonNullable<
   CompanyListGetResponseOutput["companies"]
 >[number];
-
-const TYPE_COLOR: Record<typeof CompanyTypeValue, string> = {
-  [CompanyType.B2B]:
-    "bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300",
-  [CompanyType.B2C]:
-    "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300",
-  [CompanyType.INDIVIDUAL]:
-    "bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-300",
-};
-
-const ROLE_COLOR: Record<typeof CompanyMemberRoleValue, string> = {
-  [CompanyMemberRole.OWNER]:
-    "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300",
-  [CompanyMemberRole.ADMIN]:
-    "bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300",
-  [CompanyMemberRole.ACCOUNTANT]:
-    "bg-indigo-100 text-indigo-800 dark:bg-indigo-900/40 dark:text-indigo-300",
-  [CompanyMemberRole.MEMBER]: "bg-muted text-muted-foreground",
-  [CompanyMemberRole.VIEWER]: "bg-muted text-muted-foreground",
-};
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function CompanyListContainer(_props: {
@@ -211,30 +190,23 @@ export function CompanyListContainer(_props: {
                       {company.name}
                     </Span>
                     {inactive && (
-                      <Span className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium shrink-0 bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300">
-                        {t("get.widget.inactive")}
-                      </Span>
+                      <StatusPill
+                        status="inactive"
+                        label={t("get.widget.inactive")}
+                        variant="muted"
+                      />
                     )}
                   </Div>
-                  <Div className="flex items-center gap-1.5 flex-wrap">
-                    <Span
-                      className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium shrink-0 ${TYPE_COLOR[company.type] ?? "bg-muted text-muted-foreground"}`}
-                    >
-                      {tCompanies(company.type)}
-                    </Span>
-                    <Span
-                      className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium shrink-0 ${ROLE_COLOR[company.role] ?? "bg-muted text-muted-foreground"}`}
-                    >
-                      {tCompanies(company.role)}
-                    </Span>
-                    {(company.country ?? company.currency) && (
-                      <Span className="text-xs text-muted-foreground">
-                        {[company.country, company.currency]
-                          .filter(Boolean)
-                          .join(" · ")}
-                      </Span>
-                    )}
-                  </Div>
+                  <Span className="text-xs text-muted-foreground">
+                    {[
+                      tCompanies(company.role),
+                      tCompanies(company.type),
+                      company.country,
+                      company.currency,
+                    ]
+                      .filter(Boolean)
+                      .join(" · ")}
+                  </Span>
                 </Div>
                 <ChevronRight className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
               </Div>

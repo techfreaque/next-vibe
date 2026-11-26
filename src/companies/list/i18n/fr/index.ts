@@ -21,7 +21,7 @@ export const translations: typeof enTranslations = {
   },
   get: {
     title: "Mes entreprises",
-    titleShort: "Mes entreprises",
+    titleShort: "Entreprises",
     description: "Les entreprises dont vous êtes membre",
     page: {
       label: "Page",

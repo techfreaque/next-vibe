@@ -27,8 +27,7 @@ export const translations: typeof enTranslations = {
   consideration: "Erlös- oder Verbindlichkeitskonto",
   vat: "Umsatzsteuerkonto",
   expense: "Aufwandskonto für Gebühren",
-  zeroTax:
-    "Fehlende Steuer für dieses Produkt mit Nullsatz ausdrücklich als null bestätigen",
+  zeroTax: "Verkäufe ohne Steueraufschlüsselung mit 0 % buchen",
   ids: "IDs der verifizierten Belege",
   dryRun: "Nur Vorschau",
   submit: "Ausführen",
@@ -123,4 +122,27 @@ export const translations: typeof enTranslations = {
   noVatAccount:
     "Legen Sie im Kontenplan ein aktives Umsatzsteuerkonto an, um es hier auszuwählen.",
   saveOffer: "Angebot speichern",
+  sectionOffer: "Angebot",
+  sectionBooks: "Buchungen",
+  sectionTax: "Steuer",
+  chooseAccount: "Konto wählen",
+  chooseProduct: "Produkt wählen",
+  chooseCompanyFirst: "Zuerst Firma wählen",
+  noMatchingAccount: "Kein passendes Konto im Kontenplan dieser Firma.",
+  noMatchingProduct: "Hier erscheinen nur aktive Produkte mit Artikelnummer.",
+  productHint:
+    "Das Produkt, das dieses Angebot verkauft. Seine Artikelnummer muss zum Anbieterangebot passen.",
+  receivableHint: "Forderung an den Kunden, bis der Anbieter auszahlt.",
+  clearingHint:
+    "Geld, das der Anbieter eingenommen, aber noch nicht ausgezahlt hat.",
+  considerationHint:
+    "Erlöskonto bei sofortiger Realisierung, Verbindlichkeit bei Abgrenzung.",
+  vatHint: "Optional. Nötig, wenn der Anbieter Umsatzsteuer meldet.",
+  expenseHint: "Optional. Bucht die Gebühren des Anbieters.",
+  merchantHelp: "Händler- oder Konto-ID aus dem Dashboard des Anbieters.",
+  merchantPlaceholder: "acct_1Nxxxxxxxx",
+  offerHelp: "Preis- oder Produkt-ID dieses Angebots beim Anbieter.",
+  offerPlaceholder: "price_1Pxxxxxxxx",
+  zeroTaxHelp:
+    "Nur für steuerfreie Produkte. Ohne diese Option warten solche Verkäufe auf Prüfung, bis der Anbieter einen geprüften Steuerbetrag liefert.",
 };

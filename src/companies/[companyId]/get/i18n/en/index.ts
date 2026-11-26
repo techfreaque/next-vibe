@@ -68,6 +68,11 @@ export const translations = {
       description: "Company details retrieved",
     },
     widget: {
+      backToList: "Companies",
+      type: "Customer type",
+      loadFailed: "Could not load this company",
+      retry: "Try again",
+      related: "Work in this company",
       setupAccounting: "Set up accounting",
       back: "Back",
       loading: "Loading company...",
@@ -86,41 +91,32 @@ export const translations = {
       email: "Email",
       phone: "Phone",
       website: "Website",
-      createdAt: "Member Since",
+      createdAt: "Created",
       actions: "Actions",
       modules: {
-        title: "Modules",
         accounting: {
           label: "Accounting",
-          description: "Chart of accounts, journal entries, reports",
         },
         invoices: {
           label: "Invoices",
-          description: "AR invoices, estimates, payments",
         },
         estimates: {
           label: "Estimates",
-          description: "Draft quotes for clients",
         },
         bills: {
           label: "Bills",
-          description: "AP bills and vendor payments",
         },
         pos: {
           label: "Point of Sale",
-          description: "Terminals, sessions, orders",
         },
         purchasing: {
           label: "Purchasing",
-          description: "Purchase orders and vendors",
         },
         inventory: {
           label: "Inventory",
-          description: "Stock, warehouses, transfers",
         },
         team: {
           label: "Team",
-          description: "Members and roles",
         },
       },
     },

@@ -70,6 +70,11 @@ export const translations: typeof enTranslations = {
       description: "Údaje o firme sú pripravené.",
     },
     widget: {
+      backToList: "Firmy",
+      type: "Typ zákazníka",
+      loadFailed: "Firmu sa nepodarilo načítať",
+      retry: "Skúsiť znova",
+      related: "Práca v tejto firme",
       setupAccounting: "Nastaviť účtovníctvo",
       back: "Späť",
       loading: "Načítavajú sa údaje o firme…",
@@ -88,41 +93,32 @@ export const translations: typeof enTranslations = {
       email: "E-mail",
       phone: "Telefón",
       website: "Webové sídlo",
-      createdAt: "Členstvo od",
+      createdAt: "Vytvorená",
       actions: "Akcie",
       modules: {
-        title: "Moduly",
         accounting: {
           label: "Účtovníctvo",
-          description: "Účtový rozvrh, účtovné zápisy a prehľady",
         },
         invoices: {
           label: "Faktúry",
-          description: "Odberateľské faktúry, cenové ponuky a platby",
         },
         estimates: {
           label: "Cenové ponuky",
-          description: "Návrhy cenových ponúk pre odberateľov",
         },
         bills: {
           label: "Prijaté faktúry",
-          description: "Dodávateľské faktúry a úhrady dodávateľom",
         },
         pos: {
           label: "Predajné miesto",
-          description: "Terminály, pokladničné zmeny a objednávky",
         },
         purchasing: {
           label: "Nákup",
-          description: "Nákupné objednávky a dodávatelia",
         },
         inventory: {
           label: "Skladové hospodárstvo",
-          description: "Zásoby, sklady a presuny",
         },
         team: {
           label: "Tím",
-          description: "Členovia a oprávnenia",
         },
       },
     },

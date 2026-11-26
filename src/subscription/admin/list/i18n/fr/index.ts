@@ -10,7 +10,7 @@ export const translations: typeof enTranslations = {
       description: "Uniquement les abonnements de cette formule",
     },
     title: "Abonnements",
-    titleShort: "Liste abos",
+    titleShort: "Abonnements",
     description: "Parcourir tous les abonnements",
     form: {
       title: "Gestion des abonnements",

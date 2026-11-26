@@ -25,8 +25,7 @@ export const translations = {
   consideration: "Revenue or liability account",
   vat: "Output VAT account",
   expense: "Fee expense account",
-  zeroTax:
-    "Confirm explicitly that missing provider VAT means zero for this zero-rated product",
+  zeroTax: "Book sales without a VAT breakdown at 0 % VAT",
   ids: "Verified evidence IDs",
   dryRun: "Preview only",
   submit: "Run",
@@ -115,4 +114,26 @@ export const translations = {
   noVatAccount:
     "Add an active output VAT account to the company chart to select it here.",
   saveOffer: "Save offer",
+  sectionOffer: "Offer",
+  sectionBooks: "Bookings",
+  sectionTax: "Tax",
+  chooseAccount: "Choose an account",
+  chooseProduct: "Choose a product",
+  chooseCompanyFirst: "Choose a company first",
+  noMatchingAccount: "No matching account in this company's chart.",
+  noMatchingProduct: "Only active products with an SKU appear here.",
+  productHint:
+    "The product this offer sells. Its SKU must match the processor offer.",
+  receivableHint: "Customer balance until the processor settles.",
+  clearingHint: "Holds money the processor has collected but not paid out yet.",
+  considerationHint:
+    "Revenue when recognized on sale, a liability when deferred.",
+  vatHint: "Optional. Needed when the provider reports VAT.",
+  expenseHint: "Optional. Books the processor's fees.",
+  merchantHelp: "Merchant or account ID from the provider dashboard.",
+  merchantPlaceholder: "acct_1Nxxxxxxxx",
+  offerHelp: "Price or product ID of this offer at the provider.",
+  offerPlaceholder: "price_1Pxxxxxxxx",
+  zeroTaxHelp:
+    "Only for zero-rated products. Without this, those sales wait for review until the provider sends a verified VAT amount.",
 };

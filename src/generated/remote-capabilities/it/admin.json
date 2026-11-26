@@ -1818,7 +1818,9 @@
                                 "platformSummary.receivedPayment": "platformSummary.receivedPayment",
                                 "platformSummary.completedTask": "platformSummary.completedTask",
                                 "get.widget.alerts.tasks": "get.widget.alerts.tasks",
-                                "get.widget.alerts.connections": "get.widget.alerts.connections"
+                                "get.widget.alerts.connections": "get.widget.alerts.connections",
+                                "get.widget.alerts.failedPayments": "get.widget.alerts.failedPayments",
+                                "get.widget.alerts.disputes": "get.widget.alerts.disputes"
                               }
                             },
                             "type": "enum",
@@ -1836,7 +1838,9 @@
                               "platformSummary.receivedPayment": "platformSummary.receivedPayment",
                               "platformSummary.completedTask": "platformSummary.completedTask",
                               "get.widget.alerts.tasks": "get.widget.alerts.tasks",
-                              "get.widget.alerts.connections": "get.widget.alerts.connections"
+                              "get.widget.alerts.connections": "get.widget.alerts.connections",
+                              "get.widget.alerts.failedPayments": "get.widget.alerts.failedPayments",
+                              "get.widget.alerts.disputes": "get.widget.alerts.disputes"
                             },
                             "options": [
                               "get.widget.kpi.signups",
@@ -1852,7 +1856,9 @@
                               "platformSummary.receivedPayment",
                               "platformSummary.completedTask",
                               "get.widget.alerts.tasks",
-                              "get.widget.alerts.connections"
+                              "get.widget.alerts.connections",
+                              "get.widget.alerts.failedPayments",
+                              "get.widget.alerts.disputes"
                             ]
                           },
                           "value": {
@@ -2090,7 +2096,9 @@
                               "platformSummary.receivedPayment": "platformSummary.receivedPayment",
                               "platformSummary.completedTask": "platformSummary.completedTask",
                               "get.widget.alerts.tasks": "get.widget.alerts.tasks",
-                              "get.widget.alerts.connections": "get.widget.alerts.connections"
+                              "get.widget.alerts.connections": "get.widget.alerts.connections",
+                              "get.widget.alerts.failedPayments": "get.widget.alerts.failedPayments",
+                              "get.widget.alerts.disputes": "get.widget.alerts.disputes"
                             }
                           },
                           "type": "enum",
@@ -2108,7 +2116,9 @@
                             "platformSummary.receivedPayment": "platformSummary.receivedPayment",
                             "platformSummary.completedTask": "platformSummary.completedTask",
                             "get.widget.alerts.tasks": "get.widget.alerts.tasks",
-                            "get.widget.alerts.connections": "get.widget.alerts.connections"
+                            "get.widget.alerts.connections": "get.widget.alerts.connections",
+                            "get.widget.alerts.failedPayments": "get.widget.alerts.failedPayments",
+                            "get.widget.alerts.disputes": "get.widget.alerts.disputes"
                           },
                           "options": [
                             "get.widget.kpi.signups",
@@ -2124,7 +2134,9 @@
                             "platformSummary.receivedPayment",
                             "platformSummary.completedTask",
                             "get.widget.alerts.tasks",
-                            "get.widget.alerts.connections"
+                            "get.widget.alerts.connections",
+                            "get.widget.alerts.failedPayments",
+                            "get.widget.alerts.disputes"
                           ]
                         },
                         "value": {
@@ -2369,7 +2381,9 @@
                                 "platformSummary.receivedPayment": "platformSummary.receivedPayment",
                                 "platformSummary.completedTask": "platformSummary.completedTask",
                                 "get.widget.alerts.tasks": "get.widget.alerts.tasks",
-                                "get.widget.alerts.connections": "get.widget.alerts.connections"
+                                "get.widget.alerts.connections": "get.widget.alerts.connections",
+                                "get.widget.alerts.failedPayments": "get.widget.alerts.failedPayments",
+                                "get.widget.alerts.disputes": "get.widget.alerts.disputes"
                               }
                             },
                             "type": "enum",
@@ -2387,7 +2401,9 @@
                               "platformSummary.receivedPayment": "platformSummary.receivedPayment",
                               "platformSummary.completedTask": "platformSummary.completedTask",
                               "get.widget.alerts.tasks": "get.widget.alerts.tasks",
-                              "get.widget.alerts.connections": "get.widget.alerts.connections"
+                              "get.widget.alerts.connections": "get.widget.alerts.connections",
+                              "get.widget.alerts.failedPayments": "get.widget.alerts.failedPayments",
+                              "get.widget.alerts.disputes": "get.widget.alerts.disputes"
                             },
                             "options": [
                               "get.widget.kpi.signups",
@@ -2403,7 +2419,9 @@
                               "platformSummary.receivedPayment",
                               "platformSummary.completedTask",
                               "get.widget.alerts.tasks",
-                              "get.widget.alerts.connections"
+                              "get.widget.alerts.connections",
+                              "get.widget.alerts.failedPayments",
+                              "get.widget.alerts.disputes"
                             ]
                           },
                           "count": {
@@ -2558,7 +2576,9 @@
                               "platformSummary.receivedPayment": "platformSummary.receivedPayment",
                               "platformSummary.completedTask": "platformSummary.completedTask",
                               "get.widget.alerts.tasks": "get.widget.alerts.tasks",
-                              "get.widget.alerts.connections": "get.widget.alerts.connections"
+                              "get.widget.alerts.connections": "get.widget.alerts.connections",
+                              "get.widget.alerts.failedPayments": "get.widget.alerts.failedPayments",
+                              "get.widget.alerts.disputes": "get.widget.alerts.disputes"
                             }
                           },
                           "type": "enum",
@@ -2576,7 +2596,9 @@
                             "platformSummary.receivedPayment": "platformSummary.receivedPayment",
                             "platformSummary.completedTask": "platformSummary.completedTask",
                             "get.widget.alerts.tasks": "get.widget.alerts.tasks",
-                            "get.widget.alerts.connections": "get.widget.alerts.connections"
+                            "get.widget.alerts.connections": "get.widget.alerts.connections",
+                            "get.widget.alerts.failedPayments": "get.widget.alerts.failedPayments",
+                            "get.widget.alerts.disputes": "get.widget.alerts.disputes"
                           },
                           "options": [
                             "get.widget.kpi.signups",
@@ -2592,7 +2614,9 @@
                             "platformSummary.receivedPayment",
                             "platformSummary.completedTask",
                             "get.widget.alerts.tasks",
-                            "get.widget.alerts.connections"
+                            "get.widget.alerts.connections",
+                            "get.widget.alerts.failedPayments",
+                            "get.widget.alerts.disputes"
                           ]
                         },
                         "count": {
@@ -2763,7 +2787,9 @@
                                     "platformSummary.receivedPayment": "platformSummary.receivedPayment",
                                     "platformSummary.completedTask": "platformSummary.completedTask",
                                     "get.widget.alerts.tasks": "get.widget.alerts.tasks",
-                                    "get.widget.alerts.connections": "get.widget.alerts.connections"
+                                    "get.widget.alerts.connections": "get.widget.alerts.connections",
+                                    "get.widget.alerts.failedPayments": "get.widget.alerts.failedPayments",
+                                    "get.widget.alerts.disputes": "get.widget.alerts.disputes"
                                   }
                                 },
                                 "type": "enum",
@@ -2781,7 +2807,9 @@
                                   "platformSummary.receivedPayment": "platformSummary.receivedPayment",
                                   "platformSummary.completedTask": "platformSummary.completedTask",
                                   "get.widget.alerts.tasks": "get.widget.alerts.tasks",
-                                  "get.widget.alerts.connections": "get.widget.alerts.connections"
+                                  "get.widget.alerts.connections": "get.widget.alerts.connections",
+                                  "get.widget.alerts.failedPayments": "get.widget.alerts.failedPayments",
+                                  "get.widget.alerts.disputes": "get.widget.alerts.disputes"
                                 },
                                 "options": [
                                   "get.widget.kpi.signups",
@@ -2797,7 +2825,9 @@
                                   "platformSummary.receivedPayment",
                                   "platformSummary.completedTask",
                                   "get.widget.alerts.tasks",
-                                  "get.widget.alerts.connections"
+                                  "get.widget.alerts.connections",
+                                  "get.widget.alerts.failedPayments",
+                                  "get.widget.alerts.disputes"
                                 ]
                               }
                             },
@@ -2925,6 +2955,19 @@
                                     "type": "object"
                                   }
                                 ]
+                              }
+                            },
+                            "type": "optional"
+                          },
+                          "subject": {
+                            "def": {
+                              "type": "optional",
+                              "innerType": {
+                                "def": {
+                                  "type": "string",
+                                  "checks": [{}, {}]
+                                },
+                                "type": "string"
                               }
                             },
                             "type": "optional"
@@ -3080,7 +3123,9 @@
                                   "platformSummary.receivedPayment": "platformSummary.receivedPayment",
                                   "platformSummary.completedTask": "platformSummary.completedTask",
                                   "get.widget.alerts.tasks": "get.widget.alerts.tasks",
-                                  "get.widget.alerts.connections": "get.widget.alerts.connections"
+                                  "get.widget.alerts.connections": "get.widget.alerts.connections",
+                                  "get.widget.alerts.failedPayments": "get.widget.alerts.failedPayments",
+                                  "get.widget.alerts.disputes": "get.widget.alerts.disputes"
                                 }
                               },
                               "type": "enum",
@@ -3098,7 +3143,9 @@
                                 "platformSummary.receivedPayment": "platformSummary.receivedPayment",
                                 "platformSummary.completedTask": "platformSummary.completedTask",
                                 "get.widget.alerts.tasks": "get.widget.alerts.tasks",
-                                "get.widget.alerts.connections": "get.widget.alerts.connections"
+                                "get.widget.alerts.connections": "get.widget.alerts.connections",
+                                "get.widget.alerts.failedPayments": "get.widget.alerts.failedPayments",
+                                "get.widget.alerts.disputes": "get.widget.alerts.disputes"
                               },
                               "options": [
                                 "get.widget.kpi.signups",
@@ -3114,7 +3161,9 @@
                                 "platformSummary.receivedPayment",
                                 "platformSummary.completedTask",
                                 "get.widget.alerts.tasks",
-                                "get.widget.alerts.connections"
+                                "get.widget.alerts.connections",
+                                "get.widget.alerts.failedPayments",
+                                "get.widget.alerts.disputes"
                               ]
                             }
                           },
@@ -3246,6 +3295,19 @@
                           },
                           "type": "optional"
                         },
+                        "subject": {
+                          "def": {
+                            "type": "optional",
+                            "innerType": {
+                              "def": {
+                                "type": "string",
+                                "checks": [{}, {}]
+                              },
+                              "type": "string"
+                            }
+                          },
+                          "type": "optional"
+                        },
                         "at": {
                           "def": {
                             "type": "string",
@@ -3358,6 +3420,89 @@
                     },
                     "type": "object"
                   }
+                },
+                "destinationCounts": {
+                  "def": {
+                    "type": "optional",
+                    "innerType": {
+                      "def": {
+                        "type": "array",
+                        "element": {
+                          "def": {
+                            "type": "object",
+                            "shape": {
+                              "alias": {
+                                "def": {
+                                  "type": "string",
+                                  "checks": [{}]
+                                },
+                                "type": "string"
+                              },
+                              "count": {
+                                "def": {
+                                  "type": "number",
+                                  "checks": [
+                                    {
+                                      "def": {
+                                        "type": "number",
+                                        "check": "number_format",
+                                        "abort": false,
+                                        "format": "safeint"
+                                      },
+                                      "type": "number",
+                                      "isFinite": true
+                                    },
+                                    {}
+                                  ]
+                                },
+                                "type": "number",
+                                "isFinite": true
+                              }
+                            }
+                          },
+                          "type": "object"
+                        },
+                        "checks": [{}]
+                      },
+                      "type": "array",
+                      "element": {
+                        "def": {
+                          "type": "object",
+                          "shape": {
+                            "alias": {
+                              "def": {
+                                "type": "string",
+                                "checks": [{}]
+                              },
+                              "type": "string"
+                            },
+                            "count": {
+                              "def": {
+                                "type": "number",
+                                "checks": [
+                                  {
+                                    "def": {
+                                      "type": "number",
+                                      "check": "number_format",
+                                      "abort": false,
+                                      "format": "safeint"
+                                    },
+                                    "type": "number",
+                                    "isFinite": true
+                                  },
+                                  {}
+                                ]
+                              },
+                              "type": "number",
+                              "isFinite": true
+                            }
+                          }
+                        },
+                        "type": "object"
+                      }
+                    }
+                  },
+                  "type": "optional"
                 }
               }
             },
@@ -67359,7 +67504,7 @@
   {
     "toolName": "companies-list",
     "title": "Le mie aziende",
-    "titleShort": "Le mie aziende",
+    "titleShort": "Aziende",
     "description": "Aziende che si fanno parte di",
     "fields": {
       "usage": {
@@ -68008,7 +68153,7 @@
   {
     "toolName": "verify-credit-grant",
     "title": "Verificare il beneficiario della sovvenzione",
-    "titleShort": "Verificare il beneficiario della sovvenzione",
+    "titleShort": "Concedi crediti",
     "description": "Trovare l'account idoneo per ricevere i crediti bonus.",
     "fields": {
       "usage": {
@@ -108771,7 +108916,7 @@
   {
     "toolName": "finance-status",
     "title": "Finanza",
-    "titleShort": "Finanza",
+    "titleShort": "Costi e margine",
     "description": "Revenue vs costo a monte: bilancia dei fornitori, margine, avvisi e soglie.",
     "fields": {
       "usage": {
@@ -114138,7 +114283,7 @@
             },
             "createdAt": {
               "type": "text",
-              "label": "Creato a",
+              "label": "Creato il",
               "fieldType": "datetime",
               "schema": {
                 "def": {
@@ -114154,7 +114299,7 @@
             },
             "completedAt": {
               "type": "text",
-              "label": "Completo a",
+              "label": "Completato il",
               "fieldType": "datetime",
               "schema": {
                 "def": {
@@ -152086,6 +152231,19 @@
                                 },
                                 "type": "optional"
                               },
+                              "subject": {
+                                "def": {
+                                  "type": "optional",
+                                  "innerType": {
+                                    "def": {
+                                      "type": "string",
+                                      "checks": [{}, {}]
+                                    },
+                                    "type": "string"
+                                  }
+                                },
+                                "type": "optional"
+                              },
                               "at": {
                                 "def": {
                                   "type": "string",
@@ -152376,6 +152534,19 @@
                               },
                               "type": "optional"
                             },
+                            "subject": {
+                              "def": {
+                                "type": "optional",
+                                "innerType": {
+                                  "def": {
+                                    "type": "string",
+                                    "checks": [{}, {}]
+                                  },
+                                  "type": "string"
+                                }
+                              },
+                              "type": "optional"
+                            },
                             "at": {
                               "def": {
                                 "type": "string",
@@ -152488,6 +152659,89 @@
                         },
                         "type": "object"
                       }
+                    },
+                    "destinationCounts": {
+                      "def": {
+                        "type": "optional",
+                        "innerType": {
+                          "def": {
+                            "type": "array",
+                            "element": {
+                              "def": {
+                                "type": "object",
+                                "shape": {
+                                  "alias": {
+                                    "def": {
+                                      "type": "string",
+                                      "checks": [{}]
+                                    },
+                                    "type": "string"
+                                  },
+                                  "count": {
+                                    "def": {
+                                      "type": "number",
+                                      "checks": [
+                                        {
+                                          "def": {
+                                            "type": "number",
+                                            "check": "number_format",
+                                            "abort": false,
+                                            "format": "safeint"
+                                          },
+                                          "type": "number",
+                                          "isFinite": true
+                                        },
+                                        {}
+                                      ]
+                                    },
+                                    "type": "number",
+                                    "isFinite": true
+                                  }
+                                }
+                              },
+                              "type": "object"
+                            },
+                            "checks": [{}]
+                          },
+                          "type": "array",
+                          "element": {
+                            "def": {
+                              "type": "object",
+                              "shape": {
+                                "alias": {
+                                  "def": {
+                                    "type": "string",
+                                    "checks": [{}]
+                                  },
+                                  "type": "string"
+                                },
+                                "count": {
+                                  "def": {
+                                    "type": "number",
+                                    "checks": [
+                                      {
+                                        "def": {
+                                          "type": "number",
+                                          "check": "number_format",
+                                          "abort": false,
+                                          "format": "safeint"
+                                        },
+                                        "type": "number",
+                                        "isFinite": true
+                                      },
+                                      {}
+                                    ]
+                                  },
+                                  "type": "number",
+                                  "isFinite": true
+                                }
+                              }
+                            },
+                            "type": "object"
+                          }
+                        }
+                      },
+                      "type": "optional"
                     }
                   }
                 },
@@ -223714,7 +223968,7 @@
   {
     "toolName": "messenger-messages",
     "title": "Elenco delle email",
-    "titleShort": "Elenco delle email",
+    "titleShort": "Registro email",
     "description": "Recuperare un elenco impaginato di e-mail con filtraggio e impaginazione",
     "fields": {
       "usage": {
@@ -234203,7 +234457,7 @@
   {
     "toolName": "system-mail-inbox",
     "title": "Posto di accesso alla piattaforma",
-    "titleShort": "Posta in arrivo",
+    "titleShort": "Posta della piattaforma",
     "description": "Elenca i messaggi INBOX recenti della casella di posta della piattaforma",
     "fields": {
       "usage": {
@@ -242107,6 +242361,8 @@
           "type": "form_field",
           "fieldType": "text",
           "label": "Identità verificata dell’esercente",
+          "description": "ID esercente o account dalla dashboard del provider.",
+          "placeholder": "acct_1Nxxxxxxxx",
           "schema": {
             "def": {
               "type": "string",
@@ -242123,6 +242379,8 @@
           "type": "form_field",
           "fieldType": "text",
           "label": "ID dell’offerta o del prezzo",
+          "description": "ID prezzo o prodotto di questa offerta presso il provider.",
+          "placeholder": "price_1Pxxxxxxxx",
           "schema": {
             "def": {
               "type": "string",
@@ -242326,7 +242584,8 @@
         "allowUnstatedZeroTax": {
           "type": "form_field",
           "fieldType": "boolean",
-          "label": "Conferma che l’IVA non esposta per questo prodotto ad aliquota zero è pari a zero",
+          "label": "Registra le vendite senza dettaglio IVA allo 0 %",
+          "description": "Solo per prodotti ad aliquota zero. Senza questa opzione quelle vendite restano in revisione finché il provider non invia un importo IVA verificato.",
           "schema": {
             "def": {
               "type": "default",
@@ -291604,7 +291863,7 @@
   {
     "toolName": "referral_admin_payouts_GET",
     "title": "Richieste di pagamento",
-    "titleShort": "Richieste",
+    "titleShort": "Richieste di pagamento",
     "description": "Gestire richieste di pagamento referral",
     "fields": {
       "usage": {
@@ -299729,11 +299988,6 @@
     "titleShort": "Guadagni",
     "description": "Consulta lo storico dei guadagni da inviti",
     "fields": {
-      "type": "container",
-      "title": "Dettagli del Codice Referral",
-      "description": "Visualizza le informazioni sul codice referral",
-      "layoutType": "grid",
-      "columns": 12,
       "usage": {
         "request": "data",
         "response": true
@@ -299742,8 +299996,9 @@
         "targetUserId": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Consulta il codice invito",
+          "label": "Account partner",
           "hidden": true,
+          "includeInCacheKey": true,
           "schema": {
             "def": {
               "type": "optional",
@@ -299764,8 +300019,9 @@
         "limit": {
           "type": "form_field",
           "fieldType": "number",
-          "label": "Limite",
-          "description": "Numero massimo di risultati da restituire",
+          "label": "Righe per pagina",
+          "description": "Quanti guadagni mostrare per pagina",
+          "hidden": true,
           "schema": {
             "def": {
               "type": "optional",
@@ -299773,7 +300029,20 @@
                 "def": {
                   "type": "number",
                   "coerce": true,
-                  "checks": [{}]
+                  "checks": [
+                    {
+                      "def": {
+                        "type": "number",
+                        "check": "number_format",
+                        "abort": false,
+                        "format": "safeint"
+                      },
+                      "type": "number",
+                      "isFinite": true
+                    },
+                    {},
+                    {}
+                  ]
                 },
                 "type": "number",
                 "isFinite": true
@@ -299789,8 +300058,9 @@
         "offset": {
           "type": "form_field",
           "fieldType": "number",
-          "label": "Offset",
-          "description": "Numero di risultati per saltare",
+          "label": "Inizia da",
+          "description": "Numero di guadagni da saltare",
+          "hidden": true,
           "schema": {
             "def": {
               "type": "optional",
@@ -299798,7 +300068,19 @@
                 "def": {
                   "type": "number",
                   "coerce": true,
-                  "checks": [{}]
+                  "checks": [
+                    {
+                      "def": {
+                        "type": "number",
+                        "check": "number_format",
+                        "abort": false,
+                        "format": "safeint"
+                      },
+                      "type": "number",
+                      "isFinite": true
+                    },
+                    {}
+                  ]
                 },
                 "type": "number",
                 "isFinite": true
@@ -299812,138 +300094,346 @@
           "schemaType": "primitive"
         },
         "earnings": {
-          "type": "container",
-          "child": {
-            "type": "container",
-            "layoutType": "grid",
-            "columns": 12,
-            "usage": {
-              "response": true
+          "type": "text",
+          "schema": {
+            "def": {
+              "type": "array",
+              "element": {
+                "def": {
+                  "type": "object",
+                  "shape": {
+                    "id": {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    },
+                    "earnerUserId": {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    },
+                    "sourceUserId": {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    },
+                    "transactionId": {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    },
+                    "level": {
+                      "def": {
+                        "type": "number",
+                        "coerce": true,
+                        "checks": []
+                      },
+                      "type": "number",
+                      "isFinite": true
+                    },
+                    "amountCents": {
+                      "def": {
+                        "type": "number",
+                        "coerce": true,
+                        "checks": []
+                      },
+                      "type": "number",
+                      "isFinite": true
+                    },
+                    "currency": {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    },
+                    "status": {
+                      "def": {
+                        "type": "enum",
+                        "entries": {
+                          "enums.earningStatus.pending": "enums.earningStatus.pending",
+                          "enums.earningStatus.confirmed": "enums.earningStatus.confirmed",
+                          "enums.earningStatus.canceled": "enums.earningStatus.canceled"
+                        }
+                      },
+                      "type": "enum",
+                      "enum": {
+                        "enums.earningStatus.pending": "enums.earningStatus.pending",
+                        "enums.earningStatus.confirmed": "enums.earningStatus.confirmed",
+                        "enums.earningStatus.canceled": "enums.earningStatus.canceled"
+                      },
+                      "options": [
+                        "enums.earningStatus.pending",
+                        "enums.earningStatus.confirmed",
+                        "enums.earningStatus.canceled"
+                      ]
+                    },
+                    "createdAt": {
+                      "def": {
+                        "type": "pipe",
+                        "in": {
+                          "def": {
+                            "type": "union",
+                            "options": [
+                              {
+                                "def": {
+                                  "type": "string"
+                                },
+                                "type": "string"
+                              },
+                              {
+                                "def": {
+                                  "type": "date"
+                                },
+                                "type": "date"
+                              },
+                              {
+                                "def": {
+                                  "type": "number",
+                                  "coerce": true,
+                                  "checks": []
+                                },
+                                "type": "number",
+                                "isFinite": true
+                              }
+                            ]
+                          },
+                          "type": "union",
+                          "options": [
+                            {
+                              "def": {
+                                "type": "string"
+                              },
+                              "type": "string"
+                            },
+                            {
+                              "def": {
+                                "type": "date"
+                              },
+                              "type": "date"
+                            },
+                            {
+                              "def": {
+                                "type": "number",
+                                "coerce": true,
+                                "checks": []
+                              },
+                              "type": "number",
+                              "isFinite": true
+                            }
+                          ]
+                        },
+                        "out": {
+                          "def": {
+                            "type": "transform"
+                          },
+                          "type": "transform"
+                        }
+                      },
+                      "type": "pipe",
+                      "in": {
+                        "def": {
+                          "type": "union",
+                          "options": [
+                            {
+                              "def": {
+                                "type": "string"
+                              },
+                              "type": "string"
+                            },
+                            {
+                              "def": {
+                                "type": "date"
+                              },
+                              "type": "date"
+                            },
+                            {
+                              "def": {
+                                "type": "number",
+                                "coerce": true,
+                                "checks": []
+                              },
+                              "type": "number",
+                              "isFinite": true
+                            }
+                          ]
+                        },
+                        "type": "union",
+                        "options": [
+                          {
+                            "def": {
+                              "type": "string"
+                            },
+                            "type": "string"
+                          },
+                          {
+                            "def": {
+                              "type": "date"
+                            },
+                            "type": "date"
+                          },
+                          {
+                            "def": {
+                              "type": "number",
+                              "coerce": true,
+                              "checks": []
+                            },
+                            "type": "number",
+                            "isFinite": true
+                          }
+                        ]
+                      },
+                      "out": {
+                        "def": {
+                          "type": "transform"
+                        },
+                        "type": "transform"
+                      }
+                    }
+                  }
+                },
+                "type": "object"
+              }
             },
-            "children": {
-              "id": {
-                "type": "text",
-                "label": "ID",
-                "schema": {
-                  "def": {
+            "type": "array",
+            "element": {
+              "def": {
+                "type": "object",
+                "shape": {
+                  "id": {
+                    "def": {
+                      "type": "string"
+                    },
                     "type": "string"
                   },
-                  "type": "string"
-                },
-                "usage": {
-                  "response": true
-                },
-                "schemaType": "primitive"
-              },
-              "earnerUserId": {
-                "type": "text",
-                "label": "Utente di Earner ID",
-                "schema": {
-                  "def": {
+                  "earnerUserId": {
+                    "def": {
+                      "type": "string"
+                    },
                     "type": "string"
                   },
-                  "type": "string"
-                },
-                "usage": {
-                  "response": true
-                },
-                "schemaType": "primitive"
-              },
-              "sourceUserId": {
-                "type": "text",
-                "label": "Utente sorgente ID",
-                "schema": {
-                  "def": {
+                  "sourceUserId": {
+                    "def": {
+                      "type": "string"
+                    },
                     "type": "string"
                   },
-                  "type": "string"
-                },
-                "usage": {
-                  "response": true
-                },
-                "schemaType": "primitive"
-              },
-              "transactionId": {
-                "type": "text",
-                "label": "ID del movimento",
-                "schema": {
-                  "def": {
+                  "transactionId": {
+                    "def": {
+                      "type": "string"
+                    },
                     "type": "string"
                   },
-                  "type": "string"
-                },
-                "usage": {
-                  "response": true
-                },
-                "schemaType": "primitive"
-              },
-              "level": {
-                "type": "text",
-                "label": "Livello",
-                "schema": {
-                  "def": {
+                  "level": {
+                    "def": {
+                      "type": "number",
+                      "coerce": true,
+                      "checks": []
+                    },
                     "type": "number",
-                    "coerce": true,
-                    "checks": []
+                    "isFinite": true
                   },
-                  "type": "number",
-                  "isFinite": true
-                },
-                "usage": {
-                  "response": true
-                },
-                "schemaType": "primitive"
-              },
-              "amountCents": {
-                "type": "text",
-                "label": "Importo (centri)",
-                "schema": {
-                  "def": {
+                  "amountCents": {
+                    "def": {
+                      "type": "number",
+                      "coerce": true,
+                      "checks": []
+                    },
                     "type": "number",
-                    "coerce": true,
-                    "checks": []
+                    "isFinite": true
                   },
-                  "type": "number",
-                  "isFinite": true
-                },
-                "usage": {
-                  "response": true
-                },
-                "schemaType": "primitive"
-              },
-              "currency": {
-                "type": "text",
-                "label": "Valuta",
-                "schema": {
-                  "def": {
+                  "currency": {
+                    "def": {
+                      "type": "string"
+                    },
                     "type": "string"
                   },
-                  "type": "string"
-                },
-                "usage": {
-                  "response": true
-                },
-                "schemaType": "primitive"
-              },
-              "status": {
-                "type": "text",
-                "label": "Stato",
-                "schema": {
-                  "def": {
-                    "type": "string"
+                  "status": {
+                    "def": {
+                      "type": "enum",
+                      "entries": {
+                        "enums.earningStatus.pending": "enums.earningStatus.pending",
+                        "enums.earningStatus.confirmed": "enums.earningStatus.confirmed",
+                        "enums.earningStatus.canceled": "enums.earningStatus.canceled"
+                      }
+                    },
+                    "type": "enum",
+                    "enum": {
+                      "enums.earningStatus.pending": "enums.earningStatus.pending",
+                      "enums.earningStatus.confirmed": "enums.earningStatus.confirmed",
+                      "enums.earningStatus.canceled": "enums.earningStatus.canceled"
+                    },
+                    "options": [
+                      "enums.earningStatus.pending",
+                      "enums.earningStatus.confirmed",
+                      "enums.earningStatus.canceled"
+                    ]
                   },
-                  "type": "string"
-                },
-                "usage": {
-                  "response": true
-                },
-                "schemaType": "primitive"
-              },
-              "createdAt": {
-                "type": "text",
-                "label": "Creato a",
-                "schema": {
-                  "def": {
+                  "createdAt": {
+                    "def": {
+                      "type": "pipe",
+                      "in": {
+                        "def": {
+                          "type": "union",
+                          "options": [
+                            {
+                              "def": {
+                                "type": "string"
+                              },
+                              "type": "string"
+                            },
+                            {
+                              "def": {
+                                "type": "date"
+                              },
+                              "type": "date"
+                            },
+                            {
+                              "def": {
+                                "type": "number",
+                                "coerce": true,
+                                "checks": []
+                              },
+                              "type": "number",
+                              "isFinite": true
+                            }
+                          ]
+                        },
+                        "type": "union",
+                        "options": [
+                          {
+                            "def": {
+                              "type": "string"
+                            },
+                            "type": "string"
+                          },
+                          {
+                            "def": {
+                              "type": "date"
+                            },
+                            "type": "date"
+                          },
+                          {
+                            "def": {
+                              "type": "number",
+                              "coerce": true,
+                              "checks": []
+                            },
+                            "type": "number",
+                            "isFinite": true
+                          }
+                        ]
+                      },
+                      "out": {
+                        "def": {
+                          "type": "transform"
+                        },
+                        "type": "transform"
+                      }
+                    },
                     "type": "pipe",
                     "in": {
                       "def": {
@@ -300003,83 +300493,19 @@
                       },
                       "type": "transform"
                     }
-                  },
-                  "type": "pipe",
-                  "in": {
-                    "def": {
-                      "type": "union",
-                      "options": [
-                        {
-                          "def": {
-                            "type": "string"
-                          },
-                          "type": "string"
-                        },
-                        {
-                          "def": {
-                            "type": "date"
-                          },
-                          "type": "date"
-                        },
-                        {
-                          "def": {
-                            "type": "number",
-                            "coerce": true,
-                            "checks": []
-                          },
-                          "type": "number",
-                          "isFinite": true
-                        }
-                      ]
-                    },
-                    "type": "union",
-                    "options": [
-                      {
-                        "def": {
-                          "type": "string"
-                        },
-                        "type": "string"
-                      },
-                      {
-                        "def": {
-                          "type": "date"
-                        },
-                        "type": "date"
-                      },
-                      {
-                        "def": {
-                          "type": "number",
-                          "coerce": true,
-                          "checks": []
-                        },
-                        "type": "number",
-                        "isFinite": true
-                      }
-                    ]
-                  },
-                  "out": {
-                    "def": {
-                      "type": "transform"
-                    },
-                    "type": "transform"
                   }
-                },
-                "usage": {
-                  "response": true
-                },
-                "schemaType": "primitive"
-              }
-            },
-            "schemaType": "object"
+                }
+              },
+              "type": "object"
+            }
           },
-          "schemaType": "array",
           "usage": {
             "response": true
-          }
+          },
+          "schemaType": "primitive"
         },
         "totalCount": {
           "type": "text",
-          "label": "Totale conteggio",
           "schema": {
             "def": {
               "type": "number",
@@ -300095,6 +300521,7 @@
           "schemaType": "primitive"
         }
       },
+      "type": "custom-widget",
       "schemaType": "object"
     },
     "executionMode": "via-execute-route",
@@ -302291,6 +302718,19 @@
                             },
                             "type": "optional"
                           },
+                          "subject": {
+                            "def": {
+                              "type": "optional",
+                              "innerType": {
+                                "def": {
+                                  "type": "string",
+                                  "checks": [{}, {}]
+                                },
+                                "type": "string"
+                              }
+                            },
+                            "type": "optional"
+                          },
                           "at": {
                             "def": {
                               "type": "string",
@@ -302569,6 +303009,19 @@
                           },
                           "type": "optional"
                         },
+                        "subject": {
+                          "def": {
+                            "type": "optional",
+                            "innerType": {
+                              "def": {
+                                "type": "string",
+                                "checks": [{}, {}]
+                              },
+                              "type": "string"
+                            }
+                          },
+                          "type": "optional"
+                        },
                         "at": {
                           "def": {
                             "type": "string",
@@ -302681,6 +303134,89 @@
                     },
                     "type": "object"
                   }
+                },
+                "destinationCounts": {
+                  "def": {
+                    "type": "optional",
+                    "innerType": {
+                      "def": {
+                        "type": "array",
+                        "element": {
+                          "def": {
+                            "type": "object",
+                            "shape": {
+                              "alias": {
+                                "def": {
+                                  "type": "string",
+                                  "checks": [{}]
+                                },
+                                "type": "string"
+                              },
+                              "count": {
+                                "def": {
+                                  "type": "number",
+                                  "checks": [
+                                    {
+                                      "def": {
+                                        "type": "number",
+                                        "check": "number_format",
+                                        "abort": false,
+                                        "format": "safeint"
+                                      },
+                                      "type": "number",
+                                      "isFinite": true
+                                    },
+                                    {}
+                                  ]
+                                },
+                                "type": "number",
+                                "isFinite": true
+                              }
+                            }
+                          },
+                          "type": "object"
+                        },
+                        "checks": [{}]
+                      },
+                      "type": "array",
+                      "element": {
+                        "def": {
+                          "type": "object",
+                          "shape": {
+                            "alias": {
+                              "def": {
+                                "type": "string",
+                                "checks": [{}]
+                              },
+                              "type": "string"
+                            },
+                            "count": {
+                              "def": {
+                                "type": "number",
+                                "checks": [
+                                  {
+                                    "def": {
+                                      "type": "number",
+                                      "check": "number_format",
+                                      "abort": false,
+                                      "format": "safeint"
+                                    },
+                                    "type": "number",
+                                    "isFinite": true
+                                  },
+                                  {}
+                                ]
+                              },
+                              "type": "number",
+                              "isFinite": true
+                            }
+                          }
+                        },
+                        "type": "object"
+                      }
+                    }
+                  },
+                  "type": "optional"
                 }
               }
             },
@@ -305797,7 +306333,7 @@
   {
     "toolName": "subscription-admin-list",
     "title": "Abbonamenti",
-    "titleShort": "Elenco dei membri",
+    "titleShort": "Abbonamenti",
     "description": "Sfoglia tutti gli abbonamenti",
     "fields": {
       "usage": {
@@ -307619,7 +308155,7 @@
   {
     "toolName": "subscription-admin-purchases",
     "title": "Pacchetti crediti",
-    "titleShort": "Admin Acquisti",
+    "titleShort": "Vendite di pacchetti crediti",
     "description": "Storia dell'acquisto del pacchetto di credito",
     "fields": {
       "usage": {
@@ -308780,7 +309316,7 @@
   {
     "toolName": "subscription-admin-referrals",
     "title": "Referral Dashboard",
-    "titleShort": "Referrals dell'amministrazione",
+    "titleShort": "Attività referral",
     "description": "Codici invito, guadagni e pagamenti",
     "fields": {
       "usage": {
@@ -309953,7 +310489,7 @@
   {
     "toolName": "subscription-admin-stats",
     "title": "Statistiche dell'abbonamento",
-    "titleShort": "Admin Stats",
+    "titleShort": "Metriche abbonamenti",
     "description": "Revenue, abbonamenti, metriche di credito e di riferimento",
     "fields": {
       "usage": {
@@ -324410,6 +324946,38 @@
                 },
                 "schemaType": "primitive"
               },
+              "companyId": {
+                "type": "text",
+                "label": "Azienda",
+                "schema": {
+                  "def": {
+                    "type": "string",
+                    "format": "uuid",
+                    "check": "string_format",
+                    "abort": false,
+                    "pattern": {}
+                  },
+                  "type": "string"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "companyName": {
+                "type": "text",
+                "label": "Azienda",
+                "schema": {
+                  "def": {
+                    "type": "string"
+                  },
+                  "type": "string"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
               "name": {
                 "type": "text",
                 "label": "Nome",
@@ -325185,6 +325753,7 @@
           "type": "form_field",
           "fieldType": "select",
           "label": "Trattamento IVA",
+          "placeholder": "Scegli il regime IVA",
           "options": [
             {
               "value": "regimes.standard",
@@ -351110,6 +351679,19 @@
                             },
                             "type": "optional"
                           },
+                          "subject": {
+                            "def": {
+                              "type": "optional",
+                              "innerType": {
+                                "def": {
+                                  "type": "string",
+                                  "checks": [{}, {}]
+                                },
+                                "type": "string"
+                              }
+                            },
+                            "type": "optional"
+                          },
                           "at": {
                             "def": {
                               "type": "string",
@@ -351400,6 +351982,19 @@
                           },
                           "type": "optional"
                         },
+                        "subject": {
+                          "def": {
+                            "type": "optional",
+                            "innerType": {
+                              "def": {
+                                "type": "string",
+                                "checks": [{}, {}]
+                              },
+                              "type": "string"
+                            }
+                          },
+                          "type": "optional"
+                        },
                         "at": {
                           "def": {
                             "type": "string",
@@ -351512,6 +352107,89 @@
                     },
                     "type": "object"
                   }
+                },
+                "destinationCounts": {
+                  "def": {
+                    "type": "optional",
+                    "innerType": {
+                      "def": {
+                        "type": "array",
+                        "element": {
+                          "def": {
+                            "type": "object",
+                            "shape": {
+                              "alias": {
+                                "def": {
+                                  "type": "string",
+                                  "checks": [{}]
+                                },
+                                "type": "string"
+                              },
+                              "count": {
+                                "def": {
+                                  "type": "number",
+                                  "checks": [
+                                    {
+                                      "def": {
+                                        "type": "number",
+                                        "check": "number_format",
+                                        "abort": false,
+                                        "format": "safeint"
+                                      },
+                                      "type": "number",
+                                      "isFinite": true
+                                    },
+                                    {}
+                                  ]
+                                },
+                                "type": "number",
+                                "isFinite": true
+                              }
+                            }
+                          },
+                          "type": "object"
+                        },
+                        "checks": [{}]
+                      },
+                      "type": "array",
+                      "element": {
+                        "def": {
+                          "type": "object",
+                          "shape": {
+                            "alias": {
+                              "def": {
+                                "type": "string",
+                                "checks": [{}]
+                              },
+                              "type": "string"
+                            },
+                            "count": {
+                              "def": {
+                                "type": "number",
+                                "checks": [
+                                  {
+                                    "def": {
+                                      "type": "number",
+                                      "check": "number_format",
+                                      "abort": false,
+                                      "format": "safeint"
+                                    },
+                                    "type": "number",
+                                    "isFinite": true
+                                  },
+                                  {}
+                                ]
+                              },
+                              "type": "number",
+                              "isFinite": true
+                            }
+                          }
+                        },
+                        "type": "object"
+                      }
+                    }
+                  },
+                  "type": "optional"
                 }
               }
             },
@@ -352149,7 +352827,7 @@
             },
             "earningsByUnit": {
               "type": "text",
-              "content": "Guarnizione",
+              "content": "Guadagni da referral",
               "schema": {
                 "def": {
                   "type": "optional",
@@ -352406,6 +353084,57 @@
             "customSkillsCount": {
               "type": "text",
               "content": "Competenze personalizzate",
+              "schema": {
+                "def": {
+                  "type": "number",
+                  "coerce": true,
+                  "checks": []
+                },
+                "type": "number",
+                "isFinite": true
+              },
+              "usage": {
+                "response": true
+              },
+              "schemaType": "primitive"
+            },
+            "paymentsCount": {
+              "type": "text",
+              "content": "Pagamenti",
+              "schema": {
+                "def": {
+                  "type": "number",
+                  "coerce": true,
+                  "checks": []
+                },
+                "type": "number",
+                "isFinite": true
+              },
+              "usage": {
+                "response": true
+              },
+              "schemaType": "primitive"
+            },
+            "creditEntriesCount": {
+              "type": "text",
+              "content": "Movimenti crediti",
+              "schema": {
+                "def": {
+                  "type": "number",
+                  "coerce": true,
+                  "checks": []
+                },
+                "type": "number",
+                "isFinite": true
+              },
+              "usage": {
+                "response": true
+              },
+              "schemaType": "primitive"
+            },
+            "threadsCount": {
+              "type": "text",
+              "content": "Thread",
               "schema": {
                 "def": {
                   "type": "number",
@@ -385235,7 +385964,7 @@
   {
     "toolName": "chat-moderation",
     "title": "Contenuto segnalato",
-    "titleShort": "Queue di moderazione",
+    "titleShort": "Coda di moderazione",
     "description": "Posti segnalati e nascosti e discussioni condivise, la maggior parte urgente prima",
     "fields": {
       "usage": {
@@ -643580,7 +644309,7 @@
   {
     "toolName": "skill-moderation",
     "title": "Competenze segnalate",
-    "titleShort": "Moderazione",
+    "titleShort": "Skill segnalate",
     "description": "Elenca le competenze con i rapporti, ordinati per numero di relazione",
     "fields": {
       "usage": {
@@ -645207,6 +645936,19 @@
                             },
                             "type": "optional"
                           },
+                          "subject": {
+                            "def": {
+                              "type": "optional",
+                              "innerType": {
+                                "def": {
+                                  "type": "string",
+                                  "checks": [{}, {}]
+                                },
+                                "type": "string"
+                              }
+                            },
+                            "type": "optional"
+                          },
                           "at": {
                             "def": {
                               "type": "string",
@@ -645497,6 +646239,19 @@
                           },
                           "type": "optional"
                         },
+                        "subject": {
+                          "def": {
+                            "type": "optional",
+                            "innerType": {
+                              "def": {
+                                "type": "string",
+                                "checks": [{}, {}]
+                              },
+                              "type": "string"
+                            }
+                          },
+                          "type": "optional"
+                        },
                         "at": {
                           "def": {
                             "type": "string",
@@ -645609,6 +646364,89 @@
                     },
                     "type": "object"
                   }
+                },
+                "destinationCounts": {
+                  "def": {
+                    "type": "optional",
+                    "innerType": {
+                      "def": {
+                        "type": "array",
+                        "element": {
+                          "def": {
+                            "type": "object",
+                            "shape": {
+                              "alias": {
+                                "def": {
+                                  "type": "string",
+                                  "checks": [{}]
+                                },
+                                "type": "string"
+                              },
+                              "count": {
+                                "def": {
+                                  "type": "number",
+                                  "checks": [
+                                    {
+                                      "def": {
+                                        "type": "number",
+                                        "check": "number_format",
+                                        "abort": false,
+                                        "format": "safeint"
+                                      },
+                                      "type": "number",
+                                      "isFinite": true
+                                    },
+                                    {}
+                                  ]
+                                },
+                                "type": "number",
+                                "isFinite": true
+                              }
+                            }
+                          },
+                          "type": "object"
+                        },
+                        "checks": [{}]
+                      },
+                      "type": "array",
+                      "element": {
+                        "def": {
+                          "type": "object",
+                          "shape": {
+                            "alias": {
+                              "def": {
+                                "type": "string",
+                                "checks": [{}]
+                              },
+                              "type": "string"
+                            },
+                            "count": {
+                              "def": {
+                                "type": "number",
+                                "checks": [
+                                  {
+                                    "def": {
+                                      "type": "number",
+                                      "check": "number_format",
+                                      "abort": false,
+                                      "format": "safeint"
+                                    },
+                                    "type": "number",
+                                    "isFinite": true
+                                  },
+                                  {}
+                                ]
+                              },
+                              "type": "number",
+                              "isFinite": true
+                            }
+                          }
+                        },
+                        "type": "object"
+                      }
+                    }
+                  },
+                  "type": "optional"
                 }
               }
             },
@@ -655696,6 +656534,102 @@
           },
           "schemaType": "primitive"
         },
+        "ENABLE_BANKING_APP_ID": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "Enable Banking application identifier for read-only account information.",
+          "description": "Enable Banking application identifier for read-only account information.",
+          "placeholder": "",
+          "columns": 12,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "ENABLE_BANKING_PRIVATE_KEY": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "Private RSA signing key, encoded as one-line base64 PEM or inline PEM.",
+          "description": "Private RSA signing key, encoded as one-line base64 PEM or inline PEM.",
+          "placeholder": "",
+          "columns": 12,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "ENABLE_BANKING_PRIVATE_KEY_FILE": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "Optional local path to an Enable Banking RSA PEM file when an inline key is unavailable.",
+          "description": "Optional local path to an Enable Banking RSA PEM file when an inline key is unavailable.",
+          "placeholder": "",
+          "columns": 12,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "ENABLE_BANKING_DAILY_SYNC": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "Opt in to the daily production pull that saves matched bank transactions for feeds marked daily. Leave disabled until a dry run has been reviewed.",
+          "description": "Opt in to the daily production pull that saves matched bank transactions for feeds marked daily. Leave disabled until a dry run has been reviewed.",
+          "placeholder": "false",
+          "columns": 12,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
         "NOWPAYMENTS_EMAIL": {
           "type": "form_field",
           "fieldType": "email",
@@ -656536,6 +657470,30 @@
           },
           "schemaType": "primitive"
         },
+        "VIBE_DEV_REAL_SMTP": {
+          "type": "form_field",
+          "fieldType": "boolean",
+          "label": "Outside production, outgoing email goes to the local mail sink (.tmp/mail-sink/*.eml) instead of SMTP/Resend. Set true to send real mail from dev. Tests always use the sink.",
+          "description": "Outside production, outgoing email goes to the local mail sink (.tmp/mail-sink/*.eml) instead of SMTP/Resend. Set true to send real mail from dev. Tests always use the sink.",
+          "placeholder": "false",
+          "columns": 12,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
         "IMAP_SEED_ACCOUNT_NAME": {
           "type": "form_field",
           "fieldType": "text",
@@ -656704,6 +657662,126 @@
           },
           "schemaType": "primitive"
         },
+        "THEA_MAIL_BILLS_ENABLED": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "Opt in to production IMAP bill intake.",
+          "description": "Opt in to production IMAP bill intake.",
+          "placeholder": "false",
+          "columns": 12,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "THEA_MAIL_BILLS_FOLDER": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "Folder scanned without setting the Seen flag.",
+          "description": "Folder scanned without setting the Seen flag.",
+          "placeholder": "Bills",
+          "columns": 12,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "THEA_MAIL_BILLS_BINDINGS": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "JSON array of explicit mail recipient, sender, company, supplier and debit account bindings. For autoDraft, use a trusted Bills folder and set recipient, providerSender and providerSubjectPrefix.",
+          "description": "JSON array of explicit mail recipient, sender, company, supplier and debit account bindings. For autoDraft, use a trusted Bills folder and set recipient, providerSender and providerSubjectPrefix.",
+          "placeholder": "[]",
+          "columns": 12,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "THEA_MAIL_BILLS_UNATTENDED_APPLY": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "Allow an explicitly owned cron task to save supplier bill drafts. Leave disabled while reviewing previews.",
+          "description": "Allow an explicitly owned cron task to save supplier bill drafts. Leave disabled while reviewing previews.",
+          "placeholder": "false",
+          "columns": 12,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "THEA_MAIL_BILLS_ACTOR": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "Company document manager allowed to run scheduled bill intake.",
+          "description": "Company document manager allowed to run scheduled bill intake.",
+          "placeholder": "00000000-0000-4000-8000-000000000000",
+          "columns": 12,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
         "THEA_MAIL_ADDRESS": {
           "type": "form_field",
           "fieldType": "email",
@@ -656806,6 +657884,30 @@
           "label": "Safety limit: max sends per hour from the system mailbox.",
           "description": "Safety limit: max sends per hour from the system mailbox.",
           "placeholder": "20",
+          "columns": 12,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "PAYMENT_ACCOUNTING_WEBHOOK_CAPTURE": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "Opt in to saving verified payment webhooks as accounting evidence and posting them for configured offers. Leave disabled until a dry run has been reviewed.",
+          "description": "Opt in to saving verified payment webhooks as accounting evidence and posting them for configured offers. Leave disabled until a dry run has been reviewed.",
+          "placeholder": "false",
           "columns": 12,
           "schema": {
             "def": {
@@ -669945,6 +671047,19 @@
                             },
                             "type": "optional"
                           },
+                          "subject": {
+                            "def": {
+                              "type": "optional",
+                              "innerType": {
+                                "def": {
+                                  "type": "string",
+                                  "checks": [{}, {}]
+                                },
+                                "type": "string"
+                              }
+                            },
+                            "type": "optional"
+                          },
                           "at": {
                             "def": {
                               "type": "string",
@@ -670238,6 +671353,19 @@
                           },
                           "type": "optional"
                         },
+                        "subject": {
+                          "def": {
+                            "type": "optional",
+                            "innerType": {
+                              "def": {
+                                "type": "string",
+                                "checks": [{}, {}]
+                              },
+                              "type": "string"
+                            }
+                          },
+                          "type": "optional"
+                        },
                         "at": {
                           "def": {
                             "type": "string",
@@ -670350,6 +671478,89 @@
                     },
                     "type": "object"
                   }
+                },
+                "destinationCounts": {
+                  "def": {
+                    "type": "optional",
+                    "innerType": {
+                      "def": {
+                        "type": "array",
+                        "element": {
+                          "def": {
+                            "type": "object",
+                            "shape": {
+                              "alias": {
+                                "def": {
+                                  "type": "string",
+                                  "checks": [{}]
+                                },
+                                "type": "string"
+                              },
+                              "count": {
+                                "def": {
+                                  "type": "number",
+                                  "checks": [
+                                    {
+                                      "def": {
+                                        "type": "number",
+                                        "check": "number_format",
+                                        "abort": false,
+                                        "format": "safeint"
+                                      },
+                                      "type": "number",
+                                      "isFinite": true
+                                    },
+                                    {}
+                                  ]
+                                },
+                                "type": "number",
+                                "isFinite": true
+                              }
+                            }
+                          },
+                          "type": "object"
+                        },
+                        "checks": [{}]
+                      },
+                      "type": "array",
+                      "element": {
+                        "def": {
+                          "type": "object",
+                          "shape": {
+                            "alias": {
+                              "def": {
+                                "type": "string",
+                                "checks": [{}]
+                              },
+                              "type": "string"
+                            },
+                            "count": {
+                              "def": {
+                                "type": "number",
+                                "checks": [
+                                  {
+                                    "def": {
+                                      "type": "number",
+                                      "check": "number_format",
+                                      "abort": false,
+                                      "format": "safeint"
+                                    },
+                                    "type": "number",
+                                    "isFinite": true
+                                  },
+                                  {}
+                                ]
+                              },
+                              "type": "number",
+                              "isFinite": true
+                            }
+                          }
+                        },
+                        "type": "object"
+                      }
+                    }
+                  },
+                  "type": "optional"
                 }
               }
             },

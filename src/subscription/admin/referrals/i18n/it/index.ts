@@ -7,7 +7,7 @@ export const translations: typeof enTranslations = {
   },
   get: {
     title: "Referral Dashboard",
-    titleShort: "Referrals dell'amministrazione",
+    titleShort: "Attività referral",
     description: "Codici invito, guadagni e pagamenti",
     form: {
       title: "Gestione del riferimento",

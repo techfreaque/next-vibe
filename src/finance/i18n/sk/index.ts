@@ -377,7 +377,7 @@ export const translations: typeof enTranslations = {
   },
   status: {
     title: "Financie",
-    titleShort: "Financie",
+    titleShort: "Náklady a marža",
     description:
       "Tržby a náklady na poskytovateľov: zostatky, marža, upozornenia a prahy.",
     response: {

@@ -4,12 +4,17 @@ import { Button } from "next-vibe/ui/components/button";
 import { DetailField, DetailGrid } from "next-vibe/ui/components/detail-grid";
 import { Div } from "next-vibe/ui/components/div";
 import { EmptyBlock } from "next-vibe/ui/components/empty-block";
+import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
+import { ResultBanner } from "next-vibe/ui/components/result-banner";
 import { Skeleton } from "next-vibe/ui/components/skeleton";
+import { Span } from "next-vibe/ui/components/span";
 import { StatusPill } from "next-vibe/ui/components/status-pill";
 import { WidgetHeader } from "next-vibe/ui/components/widget-header";
 import { WidgetShell } from "next-vibe/ui/components/widget-shell";
+import { formatQuantity } from "next-vibe/unified-ui/_shared/format-money";
 import {
   useWidgetIsInteractive,
+  useWidgetLocale,
   useWidgetLogger,
   useWidgetNavigation,
   useWidgetTranslation,
@@ -41,6 +46,7 @@ export function TransferAction({
   const interactive = useWidgetIsInteractive();
   const logger = useWidgetLogger();
   const user = useWidgetUser();
+  const locale = useWidgetLocale();
   const valid = z.uuid().safeParse(transferId).success;
   const query = useApiQuery({
     endpoint: getDefinition.GET,
@@ -79,9 +85,16 @@ export function TransferAction({
             ? "transferDispatch.post.description"
             : "transferReceive.post.description",
         )}
-        breadcrumb={
+        backButton={
           interactive && (
-            <Button type="button" variant="ghost" size="sm" onClick={back}>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="self-start gap-1.5 -ml-2"
+              onClick={back}
+            >
+              <ChevronLeft className="size-4" aria-hidden="true" />
               {t(
                 valid
                   ? "transferDispatch.post.widget.backToTransfer"
@@ -93,13 +106,20 @@ export function TransferAction({
       />
       <FormAlertWidget field={{}} />
       {completed ? (
-        <EmptyBlock
+        <ResultBanner
+          variant="success"
           title={t(
             dispatch
               ? "transferDispatch.post.success.title"
               : "transferReceive.post.success.title",
           )}
-        />
+        >
+          {interactive && (
+            <Button type="button" size="sm" variant="outline" onClick={back}>
+              {t("transferDispatch.post.widget.backToTransfer")}
+            </Button>
+          )}
+        </ResultBanner>
       ) : !valid ? (
         picker
       ) : query.error ? (
@@ -113,7 +133,7 @@ export function TransferAction({
       ) : !transfer ? (
         <Skeleton className="h-24 w-full" />
       ) : (
-        <>
+        <Div className="flex min-w-0 flex-col gap-4 rounded-lg border bg-card p-4">
           <WidgetHeader
             title={transfer.reference || t("transferGet.get.titleShort")}
             border={false}
@@ -134,6 +154,23 @@ export function TransferAction({
               value={transfer.toWarehouseName}
             />
           </DetailGrid>
+          {transfer.items.length > 0 && (
+            <Div className="divide-y rounded-md border">
+              {transfer.items.map((item) => (
+                <Div
+                  key={item.id}
+                  className="flex min-w-0 items-baseline justify-between gap-3 px-3 py-2 text-sm"
+                >
+                  <Span className="min-w-0 break-words">
+                    {item.productName}
+                  </Span>
+                  <Span className="shrink-0 tabular-nums text-muted-foreground">
+                    {formatQuantity(item.quantityRequested, locale)}
+                  </Span>
+                </Div>
+              ))}
+            </Div>
+          )}
           {transfer.status !== expected ? (
             <EmptyBlock
               title={t(
@@ -149,9 +186,9 @@ export function TransferAction({
           ) : !transfer.items.length ? (
             <EmptyBlock title={t("transferGet.get.widget.noItems")} />
           ) : (
-            <Div className="self-start">{submit}</Div>
+            <Div className="self-end">{submit}</Div>
           )}
-        </>
+        </Div>
       )}
     </WidgetShell>
   );

@@ -40,7 +40,64 @@ export const category: CategoryDefinition = {
   icon: "send",
   order: 20,
   landing: {
-    actions: ["campaign-stats", "campaign-queue", "campaign-journey-variants"],
+    destinations: [
+      "campaign-stats",
+      "campaign-queue",
+      "lifecycle",
+      "campaign-journey-variants",
+    ],
+    destinationDescriptions: {
+      "campaign-stats": {
+        "en-US": "Sent, opened, clicked and bounced per journey and locale.",
+        "en-GLOBAL":
+          "Sent, opened, clicked and bounced per journey and locale.",
+        "de-DE":
+          "Gesendet, geöffnet, geklickt und gebounct je Journey und Sprache.",
+        "pl-PL":
+          "Wysłane, otwarte, kliknięte i odbite według ścieżki i języka.",
+        "fr-FR": "Envoyés, ouverts, cliqués et rebonds par parcours et langue.",
+        "it-IT":
+          "Inviate, aperte, cliccate e rimbalzate per percorso e lingua.",
+        "es-ES": "Enviados, abiertos, clics y rebotes por recorrido e idioma.",
+        "sk-SK":
+          "Odoslané, otvorené, kliknuté a nedoručené podľa cesty a jazyka.",
+      },
+      "campaign-queue": {
+        "en-US": "Leads waiting for their next campaign email.",
+        "en-GLOBAL": "Leads waiting for their next campaign email.",
+        "de-DE": "Leads, die auf ihre nächste Kampagnen-Mail warten.",
+        "pl-PL": "Leady czekające na kolejny e-mail kampanii.",
+        "fr-FR": "Leads en attente de leur prochain e-mail de campagne.",
+        "it-IT": "Lead in attesa della prossima email della campagna.",
+        "es-ES": "Leads a la espera de su próximo correo de campaña.",
+        "sk-SK": "Leady čakajúce na ďalší e-mail kampane.",
+      },
+      lifecycle: {
+        "en-US": "Journeys, enrollments and conversions, with the kill switch.",
+        "en-GLOBAL":
+          "Journeys, enrollments and conversions, with the kill switch.",
+        "de-DE": "Journeys, Anmeldungen und Conversions, mit Notschalter.",
+        "pl-PL": "Ścieżki, zapisy i konwersje, z wyłącznikiem awaryjnym.",
+        "fr-FR":
+          "Parcours, inscriptions et conversions, avec l’arrêt d’urgence.",
+        "it-IT":
+          "Percorsi, iscrizioni e conversioni, con l’interruttore di emergenza.",
+        "es-ES":
+          "Recorridos, inscripciones y conversiones, con el interruptor de emergencia.",
+        "sk-SK": "Cesty, zápisy a konverzie s núdzovým vypínačom.",
+      },
+      "campaign-journey-variants": {
+        "en-US": "The email journeys leads can be enrolled in.",
+        "en-GLOBAL": "The email journeys leads can be enrolled in.",
+        "de-DE": "Die E-Mail-Journeys, in die Leads aufgenommen werden können.",
+        "pl-PL": "Ścieżki e-mailowe, do których można zapisać leady.",
+        "fr-FR": "Les parcours e-mail auxquels un lead peut être inscrit.",
+        "it-IT": "I percorsi email a cui iscrivere i lead.",
+        "es-ES":
+          "Los recorridos de correo en los que se puede inscribir a los leads.",
+        "sk-SK": "E-mailové cesty, do ktorých možno zaradiť leady.",
+      },
+    },
   },
   defaultEntry: {
     [UserPermissionRole.ADMIN]: CAMPAIGN_STATS_ALIAS,

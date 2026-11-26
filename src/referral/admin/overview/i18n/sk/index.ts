@@ -62,6 +62,8 @@ export const translations: typeof enTranslations = {
       payouts: "Čakajúce výplaty",
     },
     widget: {
+      subtitle:
+        "Kliknutia, registrácie, tržby a provízie podľa partnerského kódu v porovnaní s predchádzajúcim obdobím.",
       kpi: {
         clicks: "Kliknutia",
         clicksHint: "Návštevy z prehliadača s kódom",

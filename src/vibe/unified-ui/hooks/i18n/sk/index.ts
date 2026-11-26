@@ -35,6 +35,40 @@ export const translations: typeof enTranslations = {
       cancel: "Zrušiť",
       submit: "Odoslať",
       submitting: "Odosiela sa…",
+      showResults: "Zobraziť výsledky",
+      saveChanges: "Uložiť zmeny",
+      saving: "Ukladá sa…",
+      result: "Výsledok",
+      fixFields: "Skontrolujte označené polia a skúste to znova.",
+      hiddenInvalid:
+        "Pole „{{field}}“ chýba alebo je neplatné. Obnovte stránku a skúste to znova.",
+    },
+    toolUnavailable: {
+      permissionTitle: "K tomuto nástroju nemáte prístup",
+      permissionMessage:
+        "Vaša rola ho nemôže otvoriť. Požiadajte vlastníka pracovného priestoru o prístup.",
+      instanceTitle: "Tento nástroj nie je na tejto inštancii",
+      instanceMessage:
+        "Beží na inej pripojenej inštancii. Prepnite inštanciu v bočnom paneli a otvorte ho tam.",
+      setupTitle: "Tento nástroj treba najprv nastaviť",
+      setupMessage:
+        "Chýba povinné nastavenie. Dokončite nastavenie a nástroj otvorte znova.",
+      unknownTitle: "Tento odkaz nevedie k žiadnemu nástroju",
+      unknownMessage: "Odkaz môže byť zastaraný alebo nesprávne zadaný.",
+    },
+    recordState: {
+      loading: "Načítava sa",
+      notFoundMessage: "Záznam mohol byť odstránený alebo je odkaz zastaraný.",
+      loadFailed: "{{title}} sa nepodarilo načítať",
+      serverError:
+        "Na našej strane sa niečo pokazilo. Skúste to o chvíľu znova.",
+      technicalDetails: "Technické podrobnosti",
+      moreActions: "Ďalšie akcie",
+      more: "Viac",
+      confirmCancel: "Zrušiť",
+      details: "Podrobnosti",
+      emptyTitle: "Zatiaľ tu nič nie je",
+      copy: "Kopírovať",
     },
     formField: {
       requiresContext: "Toto pole vyžaduje kontext",
@@ -91,6 +125,7 @@ export const translations: typeof enTranslations = {
         required: "Povinné",
         selectDate: "Vyberte dátum",
         openCalendar: "Otvorte kalendár",
+        time: "Čas",
         startDate: "Dátum začiatku",
         endDate: "Dátum konca",
         decreaseValue: "Znížte hodnotu",
@@ -126,6 +161,18 @@ export const translations: typeof enTranslations = {
         },
       },
     },
+  },
+  formErrors: {
+    required: "Zadajte hodnotu",
+    invalid: "Táto hodnota nie je platná",
+    minLength: "Použite aspoň {{min}} znakov",
+    maxLength: "Použite najviac {{max}} znakov",
+    minNumber: "Zadajte {{min}} alebo viac",
+    maxNumber: "Zadajte {{max}} alebo menej",
+    minItems: "Pridajte aspoň {{min}}",
+    email: "Zadajte platnú e-mailovú adresu",
+    url: "Zadajte celý odkaz, napríklad https://example.com",
+    choose: "Vyberte jednu z možností",
   },
   localstorage: {
     noCallback: "Operácii localStorage chýba spätné volanie",

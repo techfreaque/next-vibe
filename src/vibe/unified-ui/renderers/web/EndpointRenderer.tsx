@@ -15,7 +15,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { Form } from "next-vibe/ui/components/form/form";
-import { P } from "next-vibe/ui/components/typography";
 import type { JSX, ReactElement } from "react";
 import { useCallback, useContext, useMemo, useRef } from "react";
 import type {
@@ -31,9 +30,10 @@ import type { CreateApiEndpointAny } from "../../../core/definition/endpoint-bas
 import { EndpointErrorTypes, WidgetType } from "../../../core/definition/enums";
 import type { CountryLanguage } from "../../../core/i18n/core/config";
 import type { TranslatedKeyType } from "../../../core/i18n/core/scoped-translation";
-import type {
-  ContentBlock,
-  ResponseType,
+import {
+  type ContentBlock,
+  ErrorResponseTypes,
+  type ResponseType,
 } from "../../../core/route/response.schema";
 import type { WidgetData } from "../../../core/utils/json";
 import type { JwtPayloadType } from "../../../identity/auth/types";
@@ -43,7 +43,10 @@ import {
   AdminRecordContext,
   canRetryRecordRead,
 } from "../../_shared/admin-record-context";
-import { AdminRecordDetail } from "../../_shared/admin-record-detail";
+import {
+  AdminRecordDetail,
+  type AdminRecordSkeleton,
+} from "../../_shared/admin-record-detail";
 import {
   extractAllFields,
   scanForInlineButtons,
@@ -55,11 +58,14 @@ import type {
 } from "../../_shared/react-types";
 import { isResponseField } from "../../_shared/type-guards";
 import { WidgetContextProvider } from "../../_shared/WidgetContextProvider";
+import { createFormErrorMap } from "../../hooks/form-error-map";
+import { scopedTranslation as hooksTranslation } from "../../hooks/i18n";
 import { flattenFormErrors } from "../../hooks/serialize-form-errors";
 import {
   useNavigationStack,
   type UseNavigationStackReturn,
 } from "../../hooks/use-navigation-stack";
+import { INVALID_HIDDEN_FIELD_ERROR } from "../../widgets/interactive/form-alert/root-error";
 import { AdminSilentRead } from "./AdminSilentRead";
 import { ContentBlocksRenderer } from "./ContentBlocksRenderer";
 import { LazyWidgetRenderer } from "./LazyWidgetRenderer";
@@ -154,6 +160,73 @@ interface EndpointRendererProps<TEndpoint extends CreateApiEndpointAny> {
 }
 
 const STUCK_SUBMIT_THRESHOLD = 3;
+
+/** Skeleton that matches what the endpoint will render once loaded. */
+function getLoadingSkeleton(
+  endpoint: CreateApiEndpointAny,
+): AdminRecordSkeleton {
+  const hasList = extractAllFields(endpoint.fields).some(
+    ([, field]) =>
+      "schemaType" in field &&
+      (field.schemaType === "array" || field.schemaType === "array-optional") &&
+      "usage" in field &&
+      field.usage.response === true,
+  );
+  return hasList ? "table" : "record";
+}
+
+/**
+ * Human recovery copy for a failed admin read: never raw "Forbidden",
+ * "Not Found" or server error text as the headline.
+ */
+function describeReadError({
+  endpoint,
+  locale,
+  status,
+  errorKey,
+  message,
+  accessDeniedLabel,
+}: {
+  endpoint: CreateApiEndpointAny;
+  locale: CountryLanguage;
+  status: number;
+  errorKey: string;
+  message: string;
+  accessDeniedLabel: string;
+}): { title: string; message?: string; retry: boolean } {
+  const { t: widgetT } = hooksTranslation.scopedT(locale);
+  const endpointT = endpoint.scopedTranslation.scopedT(locale).t;
+  if (status === 401 || status === 403) {
+    return {
+      title: accessDeniedLabel,
+      message: endpointT(
+        endpoint.errorTypes[EndpointErrorTypes.FORBIDDEN].description,
+      ),
+      retry: false,
+    };
+  }
+  if (status === 404) {
+    return {
+      title: message,
+      message: widgetT("widgets.recordState.notFoundMessage"),
+      retry: false,
+    };
+  }
+  if (canRetryRecordRead(status)) {
+    const title = endpointT(endpoint.titleShort ?? endpoint.title);
+    return {
+      title: widgetT("widgets.recordState.loadFailed", { title }),
+      // Client-side failures (timeout, offline) carry a human message;
+      // server-side ones may carry internal wording, so use ours.
+      message:
+        errorKey === ErrorResponseTypes.HTTP_ERROR.errorKey
+          ? message
+          : widgetT("widgets.recordState.serverError"),
+      retry: true,
+    };
+  }
+  return { title: message, retry: false };
+}
 
 /**
  * Endpoint Renderer Component
@@ -301,12 +374,14 @@ export function EndpointRenderer<TEndpoint extends CreateApiEndpointAny>({
         // formSchema validates request-data ∪ url-path-params — the same merged
         // set EndpointFormValues holds — and is a concrete z.ZodObject zodResolver
         // accepts (endpoint.requestSchema alone omits url-path-param fields).
-        resolver: zodResolver(endpoint.formSchema),
+        resolver: zodResolver(endpoint.formSchema, {
+          error: createFormErrorMap(locale),
+        }),
         defaultValues: (data ?? {}) as DefaultValues<
           EndpointFormValues<TEndpoint>
         >,
       }),
-      [endpoint.formSchema, data],
+      [endpoint.formSchema, data, locale],
     );
   const internalForm =
     useForm<EndpointFormValues<TEndpoint>>(internalFormConfig);
@@ -393,10 +468,53 @@ export function EndpointRenderer<TEndpoint extends CreateApiEndpointAny>({
               : "Form validation blocked submit repeatedly",
             context,
           );
+          // Never block silently: bring the first visible invalid field into
+          // view, or explain the problem when the invalid field is not shown.
+          // Runs after React painted the field errors (aria-invalid).
+          const revealInvalidField = (): void => {
+            const doc = globalThis.document;
+            const escaped = firstInvalidField
+              ? (globalThis.CSS?.escape(firstInvalidField) ?? firstInvalidField)
+              : undefined;
+            const namedField = escaped
+              ? doc?.querySelector<HTMLElement>(
+                  `[name="${escaped}"]:not([aria-hidden="true"])`,
+                )
+              : null;
+            const target = namedField?.getClientRects().length
+              ? namedField
+              : doc?.querySelector<HTMLElement>('[aria-invalid="true"]');
+            if (target && target.getClientRects().length > 0) {
+              target.scrollIntoView({ block: "center" });
+              target.focus({ preventScroll: true });
+              return;
+            }
+            if (!firstInvalidField) {
+              return;
+            }
+            const rootName = firstInvalidField.split(".")[0];
+            const invalidField = extractAllFields(endpoint.fields).find(
+              ([name]) => name === rootName,
+            )?.[1];
+            // The alert widgets translate this at display time; the message
+            // carries only the localized field label.
+            form.setError("root", {
+              type: INVALID_HIDDEN_FIELD_ERROR,
+              message:
+                invalidField &&
+                "label" in invalidField &&
+                typeof invalidField.label === "string"
+                  ? endpoint.scopedTranslation
+                      .scopedT(locale)
+                      .t(invalidField.label)
+                  : "",
+            });
+          };
+          globalThis.setTimeout(revealInvalidField, 50);
         },
       )();
     }
-  }, [form, onSubmit, logger, endpoint]);
+  }, [form, onSubmit, logger, endpoint, locale]);
 
   const handleWidgetSubmitOrUndefined = onSubmit
     ? handleWidgetSubmit
@@ -476,46 +594,34 @@ export function EndpointRenderer<TEndpoint extends CreateApiEndpointAny>({
       </Button>
     );
     if (response?.success === false) {
-      const status = response.errorType.errorCode;
-      const retry = canRetryRecordRead(status)
-        ? endpointMutations?.read
-        : undefined;
+      const failure = describeReadError({
+        endpoint,
+        locale,
+        status: response.errorType.errorCode,
+        errorKey: response.errorType.errorKey,
+        message: response.message,
+        accessDeniedLabel: admin.accessDeniedLabel,
+      });
+      const retry = failure.retry ? endpointMutations?.read : undefined;
       const back = admin.recordBack(endpoint) ?? {
         label: admin.browseLabel,
         onClick: admin.browse,
       };
-      const accessDenied = status === 403;
-      const detail = accessDenied
-        ? endpoint.scopedTranslation
-            .scopedT(locale)
-            .t(endpoint.errorTypes[EndpointErrorTypes.FORBIDDEN].description)
-        : undefined;
       return (
         <AdminRecordDetail
           title={title}
-          breadcrumb={
-            retry ? (
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                className="self-start"
-                onClick={back.onClick}
-              >
-                {back.label}
-              </Button>
-            ) : undefined
-          }
+          locale={locale}
           state={{
             kind: "error",
-            title: accessDenied ? admin.accessDeniedLabel : response.message,
-            message: detail,
+            title: failure.title,
+            message: failure.message,
             action: retry
               ? {
                   label: admin.retryLabel,
                   onClick: () => void retry.refetch(),
                 }
               : back,
+            secondaryAction: retry ? back : undefined,
           }}
         />
       );
@@ -564,7 +670,12 @@ export function EndpointRenderer<TEndpoint extends CreateApiEndpointAny>({
         return (
           <AdminRecordDetail
             title={title}
-            state={{ kind: "loading", label: admin.loadingLabel }}
+            locale={locale}
+            state={{
+              kind: "loading",
+              label: admin.loadingLabel,
+              skeleton: getLoadingSkeleton(endpoint),
+            }}
           />
         );
       }
@@ -605,51 +716,39 @@ export function EndpointRenderer<TEndpoint extends CreateApiEndpointAny>({
     const pending = !data && (adminRead.isLoadingFresh || adminRead.isFetching);
     if (pending) {
       adminReadFeedback = (
-        <AdminRecordDetail title={title}>
-          <Div aria-live="polite">
-            <P className="text-sm text-muted-foreground">
-              {admin.loadingLabel}
-            </P>
-          </Div>
-        </AdminRecordDetail>
+        <AdminRecordDetail
+          title={title}
+          locale={locale}
+          state={{
+            kind: "loading",
+            label: admin.loadingLabel,
+            skeleton: getLoadingSkeleton(endpoint),
+          }}
+        />
       );
     } else if (response?.success === false) {
-      const status = response.errorType.errorCode;
-      const retry = canRetryRecordRead(status);
+      const failure = describeReadError({
+        endpoint,
+        locale,
+        status: response.errorType.errorCode,
+        errorKey: response.errorType.errorKey,
+        message: response.message,
+        accessDeniedLabel: admin.accessDeniedLabel,
+      });
       const back = admin.recordBack(endpoint) ?? {
         label: admin.browseLabel,
         onClick: admin.browse,
       };
-      const accessDenied = status === 403;
       adminReadFeedback = (
         <Div role="alert">
           <AdminRecordDetail
             title={title}
-            breadcrumb={
-              retry ? (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  className="self-start"
-                  onClick={back.onClick}
-                >
-                  {back.label}
-                </Button>
-              ) : undefined
-            }
+            locale={locale}
             state={{
               kind: "error",
-              title: accessDenied ? admin.accessDeniedLabel : response.message,
-              message: accessDenied
-                ? endpoint.scopedTranslation
-                    .scopedT(locale)
-                    .t(
-                      endpoint.errorTypes[EndpointErrorTypes.FORBIDDEN]
-                        .description,
-                    )
-                : undefined,
-              action: retry
+              title: failure.title,
+              message: failure.message,
+              action: failure.retry
                 ? {
                     label: admin.retryLabel,
                     onClick: (): void => {
@@ -657,6 +756,7 @@ export function EndpointRenderer<TEndpoint extends CreateApiEndpointAny>({
                     },
                   }
                 : back,
+              secondaryAction: failure.retry ? back : undefined,
             }}
           />
         </Div>

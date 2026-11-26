@@ -349,9 +349,17 @@ describe("Fresh-company first invoice browser journey", () => {
           })
           .last()
           .click();
-        await page
+        const amountInput = page
           .getByLabel(paymentT("amount.label"), { exact: true })
-          .fill(amount);
+          .last();
+        // The form starts from the open balance; the user edits it.
+        await page.waitForFunction(
+          (input) =>
+            input instanceof HTMLInputElement &&
+            Number(input.value.replace(/[^0-9.]/g, "")) > 0,
+          await amountInput.elementHandle(),
+        );
+        await amountInput.fill(amount);
         await page
           .getByRole("combobox", {
             name: paymentT("method.label"),

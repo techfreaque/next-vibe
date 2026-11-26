@@ -26,6 +26,8 @@ export const translations = {
       "Review acquisition, revenue and service health over the last 30 days.",
     unavailable: "Unavailable",
     recent: "Recent activity",
+    recentPayments: "Recent payments",
+    emptyPayments: "No payments in the last 30 days.",
   },
   category: "Analytics",
   tags: {
@@ -129,6 +131,8 @@ export const translations = {
         payouts: "{{count}} payout requests waiting ({{amount}})",
         tasks: "{{count}} scheduled tasks failing",
         connections: "{{count}} remote connections unhealthy",
+        failedPayments: "Failed payments in the last 30 days: {{count}}",
+        disputes: "Open payment disputes: {{count}}",
         costCoverage:
           "Provider cost known for only {{coverage}} of AI usage, margin is partial",
         unattributed: "{{share}} of revenue has no known source ({{amount}})",

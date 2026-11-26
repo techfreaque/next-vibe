@@ -5,7 +5,7 @@
 
 "use client";
 
-import { createContext, useContext } from "react";
+import { type Context, createContext, useContext } from "react";
 
 import type { CreateApiEndpointAny } from "../../core/definition/endpoint-base";
 import type { CountryLanguage } from "../../core/i18n/core/config";
@@ -24,10 +24,21 @@ import type {
  * React Context for the Zustand store
  * This allows us to have different store instances for different endpoint renderers
  */
-export const WidgetContextStoreContext = createContext<WidgetContextStoreType<
+type SharedWidgetContextStore = WidgetContextStoreType<
   CreateApiEndpointAny,
   ReactWidgetContext<CreateApiEndpointAny>
-> | null>(null);
+>;
+
+declare global {
+  var __vibeWidgetContextStore:
+    | Context<SharedWidgetContextStore | null>
+    | undefined;
+}
+
+// Vite can re-evaluate the provider and lazy widgets independently during SSR.
+export const WidgetContextStoreContext =
+  (globalThis.__vibeWidgetContextStore ??=
+    createContext<SharedWidgetContextStore | null>(null));
 
 /**
  * Hook to get the widget context store
@@ -365,4 +376,14 @@ export function useCliPlatform(): CliSurface {
 /** Returns true when rendering for an AI/MCP consumer (no ANSI, no decoration). */
 export function useIsMcp(): boolean {
   return useCliPlatform() === "mcp";
+}
+
+/**
+ * Locale of the surrounding widget context, or undefined when rendered
+ * outside one (e.g. shell-level states rendered before the provider).
+ */
+export function useOptionalWidgetLocale(): CountryLanguage | undefined {
+  const store = useContext(WidgetContextStoreContext);
+  // The provider is stable for a mounted subtree, so this call is stable too.
+  return store?.((state) => state.context.locale);
 }

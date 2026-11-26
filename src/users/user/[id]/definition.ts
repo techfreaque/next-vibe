@@ -300,6 +300,23 @@ const { GET } = createEndpoint({
               "id.get.response.engagement.customSkillsCount.content" as const,
             schema: z.coerce.number(),
           }),
+          paymentsCount: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            content:
+              "id.get.response.engagement.paymentsCount.content" as const,
+            schema: z.coerce.number(),
+          }),
+          creditEntriesCount: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            content:
+              "id.get.response.engagement.creditEntriesCount.content" as const,
+            schema: z.coerce.number(),
+          }),
+          threadsCount: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            content: "id.get.response.engagement.threadsCount.content" as const,
+            schema: z.coerce.number(),
+          }),
           newsletterConsent: responseField(scopedTranslation, {
             type: WidgetType.BADGE,
             text: "id.get.response.engagement.newsletterConsent.content" as const,
@@ -469,6 +486,9 @@ const { GET } = createEndpoint({
           lifetimeCreditsSpent: 0,
           favoritesCount: 0,
           customSkillsCount: 0,
+          paymentsCount: 0,
+          creditEntriesCount: 0,
+          threadsCount: 0,
           newsletterConsent: false,
           hasConfirmedNewsletter: false,
         },

@@ -51,12 +51,75 @@ export const category: CategoryDefinition = {
     actions: ["leads_create_POST"],
     destinations: [
       "leads-list",
-      "leads-search",
       "acquisition-report",
       "funnel-report",
       "abuse-report",
-      "campaign-stats",
+      "leads-import-status",
     ],
+    destinationDescriptions: {
+      "leads-list": {
+        "en-US": "Every lead with source, status and campaign stage.",
+        "en-GLOBAL": "Every lead with source, status and campaign stage.",
+        "de-DE": "Alle Leads mit Quelle, Status und Kampagnenstufe.",
+        "pl-PL": "Wszystkie leady ze źródłem, statusem i etapem kampanii.",
+        "fr-FR":
+          "Tous les leads avec leur source, statut et étape de campagne.",
+        "it-IT": "Tutti i lead con fonte, stato e fase della campagna.",
+        "es-ES": "Todos los leads con origen, estado y etapa de campaña.",
+        "sk-SK": "Všetky leady so zdrojom, stavom a fázou kampane.",
+      },
+      "acquisition-report": {
+        "en-US": "See which sources bring visitors, leads and signups.",
+        "en-GLOBAL": "See which sources bring visitors, leads and signups.",
+        "de-DE":
+          "Sehen, welche Quellen Besucher, Leads und Anmeldungen bringen.",
+        "pl-PL": "Zobacz, które źródła dają odwiedziny, leady i rejestracje.",
+        "fr-FR":
+          "Voyez quelles sources apportent visiteurs, leads et inscriptions.",
+        "it-IT": "Veda quali fonti portano visitatori, lead e iscrizioni.",
+        "es-ES": "Vea qué fuentes traen visitas, leads y registros.",
+        "sk-SK":
+          "Pozrite si, ktoré zdroje prinášajú návštevy, leady a registrácie.",
+      },
+      "funnel-report": {
+        "en-US": "Find where visitors drop off before they pay.",
+        "en-GLOBAL": "Find where visitors drop off before they pay.",
+        "de-DE": "Erkennen, wo Besucher vor dem Bezahlen abspringen.",
+        "pl-PL": "Sprawdź, gdzie odwiedzający odpadają przed zapłatą.",
+        "fr-FR": "Repérez où les visiteurs décrochent avant de payer.",
+        "it-IT": "Scopra dove i visitatori abbandonano prima di pagare.",
+        "es-ES": "Detecte dónde abandonan los visitantes antes de pagar.",
+        "sk-SK": "Zistite, kde návštevníci odpadávajú pred platbou.",
+      },
+      "abuse-report": {
+        "en-US":
+          "Bot bursts and free-credit burners, by network and user agent.",
+        "en-GLOBAL":
+          "Bot bursts and free-credit burners, by network and user agent.",
+        "de-DE":
+          "Bot-Wellen und Gratis-Credit-Verbraucher, nach Netz und User-Agent.",
+        "pl-PL":
+          "Fale botów i zużycie darmowych kredytów według sieci i przeglądarki.",
+        "fr-FR":
+          "Vagues de bots et consommateurs de crédits gratuits, par réseau et agent.",
+        "it-IT":
+          "Ondate di bot e consumo di crediti gratuiti, per rete e user agent.",
+        "es-ES":
+          "Oleadas de bots y consumo de créditos gratuitos, por red y agente.",
+        "sk-SK":
+          "Vlny botov a míňanie bezplatných kreditov podľa siete a prehliadača.",
+      },
+      "leads-import-status": {
+        "en-US": "Progress and errors of every CSV import.",
+        "en-GLOBAL": "Progress and errors of every CSV import.",
+        "de-DE": "Fortschritt und Fehler jedes CSV-Imports.",
+        "pl-PL": "Postęp i błędy każdego importu CSV.",
+        "fr-FR": "Avancement et erreurs de chaque import CSV.",
+        "it-IT": "Avanzamento ed errori di ogni importazione CSV.",
+        "es-ES": "Progreso y errores de cada importación CSV.",
+        "sk-SK": "Priebeh a chyby každého importu CSV.",
+      },
+    },
   },
   defaultEntry: {
     [UserPermissionRole.ADMIN]: ACQUISITION_REPORT_ALIAS,

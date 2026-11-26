@@ -1,21 +1,33 @@
 "use client";
 
 import { Button } from "next-vibe/ui/components/button";
-import { DetailField, DetailGrid } from "next-vibe/ui/components/detail-grid";
-import { Div } from "next-vibe/ui/components/div";
 import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
+import { Pencil } from "next-vibe/ui/components/icons/Pencil";
+import { Plus } from "next-vibe/ui/components/icons/Plus";
+import { ResultBanner } from "next-vibe/ui/components/result-banner";
 import {
+  AdminRecordDetail,
+  type AdminRecordFact,
+} from "next-vibe/unified-ui/_shared/admin-record-detail";
+import {
+  useWidgetEndpointMutations,
+  useWidgetForm,
   useWidgetIsInteractive,
   useWidgetLocale,
+  useWidgetLogger,
   useWidgetNavigation,
+  useWidgetResponse,
   useWidgetTranslation,
+  useWidgetUser,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import { AdminRecord } from "next-vibe/unified-ui/widgets/containers/admin-record/widget";
+import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
 import { EntityPickerFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/entity-picker-field/widget";
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
-import type { JSX } from "react";
+import { type JSX, useMemo } from "react";
+import { z } from "zod";
 
+import deactivateDefinition from "../deactivate/definition";
 import type definition from "./definition";
 
 export function VendorGetWidget({
@@ -28,6 +40,24 @@ export function VendorGetWidget({
   const t = useWidgetTranslation<typeof definition.GET>();
   const locale = useWidgetLocale();
   const interactive = useWidgetIsInteractive();
+  const response = useWidgetResponse();
+  const read = useWidgetEndpointMutations()?.read;
+  const logger = useWidgetLogger();
+  const user = useWidgetUser();
+  const form = useWidgetForm<typeof definition.GET>();
+  const requestedId = form?.watch("vendorId");
+  const vendorId = result?.id ?? "";
+  const deactivateOptions = useMemo(
+    () => ({ create: { urlPathParams: { vendorId } } }),
+    [vendorId],
+  );
+  const deactivate = useEndpoint(
+    deactivateDefinition,
+    deactivateOptions,
+    logger,
+    user,
+  ).create;
+  const deactivateFailed = deactivate?.response?.success === false;
 
   const back = (): void => {
     if (navigation.canGoBack) {
@@ -41,52 +71,43 @@ export function VendorGetWidget({
     );
   };
   const backButton = interactive && (
-    <Button type="button" size="sm" variant="ghost" onClick={back}>
+    <Button
+      type="button"
+      size="sm"
+      variant="ghost"
+      className="self-start gap-1.5 -ml-2"
+      onClick={back}
+    >
       <ChevronLeft className="size-4" aria-hidden="true" />
       {t("vendorGet.get.widget.backToList")}
     </Button>
   );
 
-  if (!result) {
-    return (
-      <AdminRecord
-        title={t("vendorGet.get.title")}
-        backButton={backButton}
-        details={{
-          title: t("vendorGet.get.widget.select"),
-          content: (
-            <>
-              <EntityPickerFieldWidget
-                fieldName="vendorId"
-                field={field.children.vendorId}
-              />
-              <SubmitButtonWidget<typeof definition.GET>
-                field={{ text: "vendorGet.get.widget.select" }}
-              />
-            </>
-          ),
-        }}
-      />
-    );
-  }
-
   const edit = (): void => {
+    if (!result) {
+      return;
+    }
     void import("../update/definition").then((mod) =>
       navigation.push(mod.default.PATCH, {
         urlPathParams: { vendorId: result.id },
         popNavigationOnSuccess: 1,
+        onSuccessCallback: () => void read?.refetch(),
       }),
     );
   };
-  const deactivate = (): void => {
-    void import("../deactivate/definition").then((mod) =>
-      navigation.push(mod.default.POST, {
-        urlPathParams: { vendorId: result.id },
-        popNavigationOnSuccess: 1,
-      }),
-    );
+  const runDeactivate = (): void => {
+    if (!deactivate) {
+      return;
+    }
+    void (async (): Promise<void> => {
+      await deactivate.submitForm();
+      await read?.refetch();
+    })();
   };
   const createOrder = (): void => {
+    if (!result) {
+      return;
+    }
     void import("../../../order/create/definition").then((mod) =>
       navigation.push(mod.default.POST, {
         data: { companyId: result.companyId, vendorId: result.id },
@@ -94,6 +115,9 @@ export function VendorGetWidget({
     );
   };
   const viewOrders = (): void => {
+    if (!result) {
+      return;
+    }
     void import("../../../order/list/definition").then((mod) =>
       navigation.push(mod.default.GET, {
         data: { companyId: result.companyId, vendorId: result.id },
@@ -101,154 +125,229 @@ export function VendorGetWidget({
     );
   };
 
-  const metrics = [];
-  if (result.orderCount !== undefined) {
-    metrics.push({
-      label: t("vendorGet.get.widget.orderCount"),
-      value: result.orderCount.toLocaleString(locale),
-    });
+  const address = result
+    ? [
+        result.addressLine1,
+        result.addressLine2,
+        [result.postalCode, result.city, result.region]
+          .filter(Boolean)
+          .join(" "),
+        result.country,
+      ]
+        .filter(Boolean)
+        .join(", ")
+    : "";
+
+  const facts: AdminRecordFact[] = result
+    ? [
+        ...(result.orderCount !== undefined
+          ? [
+              {
+                key: "orders",
+                label: t("vendorGet.get.widget.orderCount"),
+                value: result.orderCount.toLocaleString(locale),
+              },
+            ]
+          : []),
+        ...(result.receivingCount !== undefined
+          ? [
+              {
+                key: "receiving",
+                label: t("vendorGet.get.widget.receivingCount"),
+                value: result.receivingCount.toLocaleString(locale),
+              },
+            ]
+          : []),
+        {
+          key: "terms",
+          label: t("vendorGet.get.widget.paymentTerms"),
+          value:
+            result.defaultPaymentTermsDays === null
+              ? undefined
+              : result.defaultPaymentTermsDays === 0
+                ? t("vendorGet.get.widget.dueOnReceipt")
+                : t("vendorGet.get.widget.netDays", {
+                    days: result.defaultPaymentTermsDays.toLocaleString(locale),
+                  }),
+        },
+        {
+          key: "currency",
+          label: t("vendorGet.get.response.defaultCurrency"),
+          value: result.defaultCurrency,
+        },
+        {
+          key: "email",
+          label: t("vendorGet.get.response.email"),
+          value: result.email ?? undefined,
+        },
+        {
+          key: "phone",
+          label: t("vendorGet.get.response.phone"),
+          value: result.phone ?? undefined,
+        },
+        {
+          key: "website",
+          label: t("vendorGet.get.response.website"),
+          value: result.website ?? undefined,
+        },
+        {
+          key: "address",
+          label: t("vendorGet.get.widget.address"),
+          value: address || undefined,
+        },
+        {
+          key: "vat",
+          label: t("vendorGet.get.response.vatNumber"),
+          value: result.vatNumber ?? undefined,
+        },
+        {
+          key: "tax",
+          label: t("vendorGet.get.response.taxId"),
+          value: result.taxId ?? undefined,
+        },
+        {
+          key: "notes",
+          label: t("vendorGet.get.response.notes"),
+          value: result.notes ?? undefined,
+        },
+      ].filter((fact) => fact.value !== undefined && fact.value !== "")
+    : [];
+
+  if (
+    !result &&
+    response?.success !== false &&
+    !z.uuid().safeParse(requestedId).success
+  ) {
+    return (
+      <AdminRecordDetail
+        title={t("vendorGet.get.titleShort")}
+        backButton={backButton}
+      >
+        <EntityPickerFieldWidget
+          fieldName="vendorId"
+          field={field.children.vendorId}
+        />
+        <SubmitButtonWidget<typeof definition.GET>
+          field={{ text: "vendorGet.get.widget.select" }}
+        />
+      </AdminRecordDetail>
+    );
   }
-  if (result.receivingCount !== undefined) {
-    metrics.push({
-      label: t("vendorGet.get.widget.receivingCount"),
-      value: result.receivingCount.toLocaleString(locale),
-    });
-  }
-  const address = [
-    result.addressLine1,
-    result.addressLine2,
-    [result.postalCode, result.city, result.region].filter(Boolean).join(" "),
-    result.country,
-  ]
-    .filter(Boolean)
-    .join(", ");
 
   return (
-    <AdminRecord
-      title={result.name}
+    <AdminRecordDetail
+      title={result?.name ?? t("vendorGet.get.titleShort")}
       subtitle={
-        [result.code, result.companyName].filter(Boolean).join(" · ") ||
-        undefined
+        result
+          ? [result.code, result.companyName].filter(Boolean).join(" · ") ||
+            undefined
+          : undefined
       }
-      status={{
-        status: result.isActive ? "active" : "inactive",
-        label: t(
-          result.isActive
-            ? "vendorList.get.widget.active"
-            : "vendorList.get.widget.inactive",
-        ),
-        variant: result.isActive ? "success" : "muted",
-      }}
-      backButton={backButton}
-      actions={
-        interactive && (
-          <>
-            <Button
-              type="button"
-              variant={result.isActive ? "outline" : "default"}
-              size="sm"
-              onClick={edit}
-            >
-              {t("vendorGet.get.widget.edit")}
-            </Button>
-            {result.isActive && (
-              <Button type="button" size="sm" onClick={createOrder}>
-                {t("vendorGet.get.widget.createOrder")}
-              </Button>
-            )}
-          </>
-        )
-      }
-      metrics={metrics}
-      details={{
-        title: t("vendorGet.get.widget.details"),
-        content: (
-          <DetailGrid columns={2}>
-            {result.email && (
-              <DetailField
-                className="@sm:col-span-2 @lg:col-span-1"
-                label={t("vendorGet.get.response.email")}
-                value={result.email}
-              />
-            )}
-            {result.phone && (
-              <DetailField
-                label={t("vendorGet.get.response.phone")}
-                value={result.phone}
-              />
-            )}
-            {result.website && (
-              <DetailField
-                label={t("vendorGet.get.response.website")}
-                value={result.website}
-              />
-            )}
-            {address && (
-              <DetailField
-                label={t("vendorGet.get.response.addressLine1")}
-                value={address}
-              />
-            )}
-            {result.vatNumber && (
-              <DetailField
-                label={t("vendorGet.get.response.vatNumber")}
-                value={result.vatNumber}
-              />
-            )}
-            {result.taxId && (
-              <DetailField
-                label={t("vendorGet.get.response.taxId")}
-                value={result.taxId}
-              />
-            )}
-            <DetailField
-              label={t("vendorGet.get.response.defaultCurrency")}
-              value={result.defaultCurrency}
-            />
-            {result.defaultPaymentTermsDays !== null && (
-              <DetailField
-                label={t("vendorGet.get.response.defaultPaymentTermsDays")}
-                value={result.defaultPaymentTermsDays.toLocaleString(locale)}
-              />
-            )}
-            {result.notes && (
-              <DetailField
-                label={t("vendorGet.get.response.notes")}
-                value={result.notes}
-              />
-            )}
-          </DetailGrid>
-        ),
-      }}
-      related={
-        interactive
+      status={
+        result
           ? {
-              title: t("vendorGet.get.widget.related"),
-              content: (
-                <Div className="flex flex-wrap gap-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={viewOrders}
-                  >
-                    {t("vendorGet.get.widget.viewOrders")}
-                  </Button>
-                  {result.isActive && (
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      className="text-destructive"
-                      onClick={deactivate}
-                    >
-                      {t("vendorGet.get.widget.deactivate")}
-                    </Button>
-                  )}
-                </Div>
+              status: result.isActive ? "active" : "inactive",
+              label: t(
+                result.isActive
+                  ? "vendorList.get.widget.active"
+                  : "vendorList.get.widget.inactive",
               ),
+              variant: result.isActive ? "success" : "muted",
             }
           : undefined
+      }
+      backButton={backButton}
+      primaryAction={
+        interactive && result?.isActive
+          ? {
+              key: "order",
+              label: t("vendorGet.get.widget.createOrder"),
+              icon: <Plus className="size-4" aria-hidden="true" />,
+              onClick: createOrder,
+            }
+          : undefined
+      }
+      secondaryActions={
+        interactive && result
+          ? [
+              {
+                key: "orders",
+                label: t("vendorGet.get.widget.viewOrders"),
+                onClick: viewOrders,
+              },
+              {
+                key: "edit",
+                label: t("vendorGet.get.widget.edit"),
+                icon: <Pencil className="size-4" aria-hidden="true" />,
+                onClick: edit,
+              },
+            ]
+          : undefined
+      }
+      moreActions={
+        interactive && result?.isActive && deactivate
+          ? [
+              {
+                key: "deactivate",
+                label: t("vendorGet.get.widget.deactivate"),
+                destructive: true,
+                disabled: deactivate.isSubmitting,
+                onClick: runDeactivate,
+                confirm: {
+                  title: t("vendorGet.get.widget.deactivateTitle", {
+                    name: result.name,
+                  }),
+                  message: t("vendorGet.get.widget.deactivateMessage"),
+                  confirmLabel: t("vendorGet.get.widget.deactivate"),
+                },
+              },
+            ]
+          : undefined
+      }
+      feedback={
+        deactivateFailed ? (
+          <ResultBanner
+            variant="danger"
+            title={t("vendorGet.get.widget.deactivateFailed")}
+            message={deactivate?.response?.message}
+          />
+        ) : undefined
+      }
+      facts={facts}
+      technicalDetails={
+        result
+          ? [
+              {
+                key: "id",
+                label: t("vendorGet.get.vendorId.label"),
+                value: result.id,
+              },
+            ]
+          : undefined
+      }
+      state={
+        result
+          ? { kind: "ready" }
+          : response?.success === false
+            ? {
+                kind: "error",
+                title: t("vendorGet.get.widget.loadFailed"),
+                message: response.message,
+                action:
+                  read && interactive
+                    ? {
+                        label: t("vendorGet.get.widget.retry"),
+                        onClick: () => void read.refetch(),
+                      }
+                    : undefined,
+                secondaryAction: interactive
+                  ? {
+                      label: t("vendorGet.get.widget.backToList"),
+                      onClick: back,
+                    }
+                  : undefined,
+              }
+            : { kind: "loading", label: t("vendorGet.get.widget.loading") }
       }
     />
   );

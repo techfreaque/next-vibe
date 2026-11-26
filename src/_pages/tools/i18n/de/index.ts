@@ -25,4 +25,11 @@ export const translations: typeof enTranslations = {
     requiresConfirmation: "braucht Bestätigung",
     loadingTools: "Werkzeuge werden geladen...",
   },
+  loadError: {
+    title: "Der Admin-Bereich konnte nicht laden",
+    message:
+      "Deine Sitzung konnte nicht geprüft werden. Lade die Seite neu; wenn es weiter fehlschlägt, melde dich erneut an.",
+    reload: "Neu laden",
+    signIn: "Anmelden",
+  },
 };
