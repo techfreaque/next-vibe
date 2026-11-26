@@ -99,8 +99,7 @@ export const translations: typeof enTranslations = {
       "Ottieni il tuo link di riferimento. {{directPct}} su ogni pagamento: ricorrente, nessuna scadenza. Pubblicare una abilità e guadagnare {{skillBonusPct}} quando gli altri lo condividono.",
     signUp: "Crea account",
     logIn: "Accedi",
-    pitch1:
-      "Commissione di rinvio {{directPct}}: ricorrente, nessuna scadenza",
+    pitch1: "Commissione di rinvio {{directPct}}: ricorrente, nessuna scadenza",
     pitch2:
       "Pubblica un'abilità → {{skillBonusPct}} da ogni utente che gli altri portano",
     pitch3:

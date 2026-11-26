@@ -71,7 +71,7 @@ export const translations: typeof enTranslations = {
   promotion: {
     title: "Kąty które konwertują",
     angle1Title:
-      "\"Porównałem/am 10 narzędzi AI: to jedno, które zostawiłem/am\"",
+      '"Porównałem/am 10 narzędzi AI: to jedno, które zostawiłem/am"',
     angle1Body:
       "Treści porównawcze to najlepszy driver afiliacyjny w tej kategorii. Postaw na różnorodność modeli, ceny i pozycjonowanie wolności słowa vs. narzędzia z jednym modelem.",
     angle2Title: "Społeczności deweloperów",
@@ -82,7 +82,7 @@ export const translations: typeof enTranslations = {
       "r/selfhosted, fora privacy, Mastodon. Open source i opcja self-hostingu trafiają tu dobrze. Ci użytkownicy nienawidzą zamkniętych platform.",
     angle4Title: "Treści tutorialowe z narzędziem",
     angle4Body:
-      "\"Jak używać AI do X\" z {{appName}} jako konkretnym narzędziem. Asystent kodowania, pisanie, badania: konkretne przypadki użycia konwertują lepiej niż generyczne recenzje AI.",
+      '"Jak używać AI do X" z {{appName}} jako konkretnym narzędziem. Asystent kodowania, pisanie, badania: konkretne przypadki użycia konwertują lepiej niż generyczne recenzje AI.',
   },
   payouts: {
     title: "Mechanizm wypłat",

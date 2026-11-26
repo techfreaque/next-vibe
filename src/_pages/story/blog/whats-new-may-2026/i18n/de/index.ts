@@ -19,7 +19,7 @@ export const translations: typeof enTranslations = {
     subtitle:
       "Drei Systeme, die Chatverlauf in etwas verwandeln, das tatsächlich bleibt. Dazu Mediengenerierung, Bugfixes und ein ehrlicher Blick auf den aktuellen Stand.",
     quote:
-      "\"Ich erinnere mich jetzt an das, was dir wichtig ist. Nicht weil ich ein Protokoll gespeichert habe, weil ich es verstanden habe.\": Thea",
+      '"Ich erinnere mich jetzt an das, was dir wichtig ist. Nicht weil ich ein Protokoll gespeichert habe, weil ich es verstanden habe.": Thea',
   },
 
   honest: {
@@ -54,8 +54,7 @@ export const translations: typeof enTranslations = {
 
   cortex: {
     title: "Cortex: Euer gemeinsames Gehirn",
-    tagline:
-      "Alles, was deine KI über dich weiß: organisiert und durchsuchbar",
+    tagline: "Alles, was deine KI über dich weiß: organisiert und durchsuchbar",
     p1: "Cortex ist das dauerhafte Gedächtnis deiner KI. Was du über deine Ziele, deinen Alltag und deine Projekte erzählst, wird dort gespeichert. Erinnerungen, Dokumente, Threads, Uploads und Skills sind eingebettet und durchsuchbar.",
     p2: "Der richtige Kontext wird automatisch injiziert, wenn du ihn brauchst. Stell es dir als gemeinsames Gehirn zwischen dir und deiner KI vor. Du kannst es direkt einsehen und bearbeiten. Es gibt einen Cortex-Button im Chat-Eingabefeld.",
     p3: "Die Vision ist größer: irgendwann ein vollständiger Desktop-Sync, ein Dokumenten-Editor, ein Google-Drive-Ersatz, aber gebaut um deine KI herum, nicht um Ordner. Im Moment ist es ein leistungsfähiges Fundament.",

@@ -72,7 +72,7 @@ export const translations: typeof enTranslations = {
   promotion: {
     title: "Angles que convierten",
     angle1Title:
-      "\"Comparé 10 herramientas AI: aquí está la que guardé en realidad\"",
+      '"Comparé 10 herramientas AI: aquí está la que guardé en realidad"',
     angle1Body:
       "Comparación de contenidos es el mejor afiliado para esta categoría. Líder con variedad modelo, precios y el posicionamiento de voz libre vs herramientas de un solo modelo.",
     angle2Title: "Comunidades de desarrollo",
@@ -83,7 +83,7 @@ export const translations: typeof enTranslations = {
       "r/selfhosted, privacy forums, Mastodon. La base de código abierta y la opción de alojamiento propio aterrizan bien. Estos usuarios odian las plataformas cerradas.",
     angle4Title: "Contenido tutorial con la herramienta",
     angle4Body:
-      "\"Cómo utilizar AI para X\" con {{appName}} como herramienta específica. Asistente de codificación, escritura, investigación: casos de uso específico convierten mejor que los exámenes genéricos de AI.",
+      '"Cómo utilizar AI para X" con {{appName}} como herramienta específica. Asistente de codificación, escritura, investigación: casos de uso específico convierten mejor que los exámenes genéricos de AI.',
   },
   payouts: {
     title: "Mecánicas de pago",

@@ -6,7 +6,8 @@ export const translations: typeof enTranslations = {
     description:
       "Claude 5.5, GPT-6, Gemini 4 Argon, Grok 4.7 y nuevos modelos abiertos. Además NanoGPT, una alineación Venice más grande y los primeros modelos de imagen sin censura.",
     category: "Actualización del modelo",
-    imageAlt: "Ajustes al catálogo de modelos de {{appName}} en noviembre de 2026",
+    imageAlt:
+      "Ajustes al catálogo de modelos de {{appName}} en noviembre de 2026",
     keywords:
       "{{appName}}, Claude Opus 5.5, GPT-6, Gemini 4 Argon, Grok 4.7, AI sin censura, Venice, NanoGPT, Lustify, Chroma",
   },

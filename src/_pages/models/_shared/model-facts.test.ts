@@ -170,7 +170,9 @@ describe("own-worldview uncensored model comparisons", () => {
       return;
     }
     const linked = suggestComparisons(facts, ALL).map((pick) => pick.id);
-    const paths = new Set(collectSitemapEntries(ALL).map((entry) => entry.path));
+    const paths = new Set(
+      collectSitemapEntries(ALL).map((entry) => entry.path),
+    );
     for (const [a, b] of FEATURED_COMPARISON_PAIRS) {
       expect(linked).toContain(a === facts.id ? b : a);
       expect(

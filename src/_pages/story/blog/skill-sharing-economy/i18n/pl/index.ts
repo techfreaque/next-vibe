@@ -18,7 +18,7 @@ export const translations: typeof enTranslations = {
     subtitle:
       "Skonfiguruj ustawienie AI raz. Udostępnij wszędzie. Zarabiaj 10% cyklicznie od każdej płatności osób, które się przez to zarejestrują, wiecznie.",
     quote:
-      "\"Zbudowałem/am skill klinicznego rozumowania dla studentów medycyny. Trzy miesiące później opłaca mój własny abonament i jeszcze zostaje.\"",
+      '"Zbudowałem/am skill klinicznego rozumowania dla studentów medycyny. Trzy miesiące później opłaca mój własny abonament i jeszcze zostaje."',
   },
   whatAreSkills: {
     title: "Czym są skille na {{appName}}?",

@@ -9,18 +9,24 @@ describe("Widget registry warmup", () => {
     const Fixture = (): null => null;
     const changing = lazyWidget(async () => {
       calls++;
-      return restored ? { default: Fixture } : Promise.reject(new Error("Fixture module unavailable"));
+      return restored
+        ? { default: Fixture }
+        : Promise.reject(new Error("Fixture module unavailable"));
     });
     let availableLoads = 0;
     lazyWidget(async () => {
       availableLoads++;
-      return {default: Fixture};
+      return { default: Fixture };
     });
     await preloadAllLazyWidgets(true);
     expect(availableLoads).toBe(1);
     expect(calls).toBe(1);
-    await expect(changing.preload()).rejects.toMatchObject({message: "Fixture module unavailable"});
-    await expect(preloadAllLazyWidgets(false)).rejects.toMatchObject({message: "Fixture module unavailable"});
+    await expect(changing.preload()).rejects.toMatchObject({
+      message: "Fixture module unavailable",
+    });
+    await expect(preloadAllLazyWidgets(false)).rejects.toMatchObject({
+      message: "Fixture module unavailable",
+    });
     restored = true;
     await preloadAllLazyWidgets(true);
     const recoveredCalls = calls;

@@ -226,7 +226,7 @@ export const translations: typeof enTranslations = {
     statAnyDetail: "Forzada en tiempo de construcción, no convención",
     statLanguages: "Tres idiomas",
     statLanguagesDetail:
-      "Compile-time comprobado: t(\"typo.here\") es un error compilador",
+      'Compile-time comprobado: t("typo.here") es un error compilador',
     statsClosing:
       "Eso no es una convención. Se aplica a tiempo de construcción.",
   },

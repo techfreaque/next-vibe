@@ -139,8 +139,7 @@ export const translations: typeof enTranslations = {
       activeOff:
         "No está grabado: AI todavía puede llamar a la demanda. Haga clic en el pin",
       confirmOn: "Pide confirmación. Haga clic para deshabilitar",
-      confirmOff:
-        "Corre automáticamente. Haga clic para requerir confirmación",
+      confirmOff: "Corre automáticamente. Haga clic para requerir confirmación",
     },
   },
 
@@ -1280,8 +1279,7 @@ export const translations: typeof enTranslations = {
         "Kimi K2: avanzado modelo Mixture-of-Experts (MoE) por Moonshot AI con ventana de contexto grande",
       kimiK2Thinking:
         "Kimi K2 Thinking: variante centrada en el razonamiento con capacidades analíticas mejoradas",
-      deepseekV31Free:
-        "Potente modelo de parámetro 671B: completamente libre!",
+      deepseekV31Free: "Potente modelo de parámetro 671B: completamente libre!",
       deepseekV31: "Potente modelo de parámetro 671B con capacidades avanzadas",
       qwen3235bFree:
         "Modelo de mezcla de expertos (MoE) desarrollado por Qwen, soporta conmutación sin costuras entre modos.",

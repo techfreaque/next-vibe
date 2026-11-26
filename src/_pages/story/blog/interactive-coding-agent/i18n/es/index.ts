@@ -6,8 +6,7 @@ export const translations: typeof enTranslations = {
     description:
       "La herramienta coding-agent permite delegar cambios de código a Claude Code u OpenCode. El agente puede trabajar en segundo plano o en un terminal que puedes seguir en directo. Al terminar, envía el resultado. Ahora también entre instancias.",
     category: "Agente de programación",
-    imageAlt:
-      "Agente de programación interactivo: Claude Code en un terminal",
+    imageAlt: "Agente de programación interactivo: Claude Code en un terminal",
     keywords:
       "agente de codificación, Claude Code, OpenCode, AI terminal, MCP completa-tarea, AI auto hospedado, next-vibe, {{appName}}",
   },

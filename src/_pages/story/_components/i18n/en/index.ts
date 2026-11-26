@@ -317,8 +317,7 @@ export const translations = {
             reasoning1:
               "Searching flight aggregators for Berlin → Lisbon this weekend. Checking multiple sources: prices differ by platform.",
             searchQuery: "cheapest flight Berlin Lisbon this weekend 2026",
-            result1Title:
-              "Berlin to Lisbon from €67: Skyscanner weekend deals",
+            result1Title: "Berlin to Lisbon from €67: Skyscanner weekend deals",
             result1Snippet:
               "Ryanair Saturday BER→LIS from €67 one-way. Return options from €94 total. Baggage not included.",
             result2Title: "BER to LIS this weekend: Kayak price comparison",

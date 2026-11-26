@@ -215,7 +215,7 @@ export const translations = {
     statAnyDetail: "Enforced at build time, not convention",
     statLanguages: "Three languages",
     statLanguagesDetail:
-      "Compile-time checked: t(\"typo.here\") is a compiler error",
+      'Compile-time checked: t("typo.here") is a compiler error',
     statsClosing: "That's not convention. It's enforced at build time.",
   },
 

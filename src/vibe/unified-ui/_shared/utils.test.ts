@@ -34,7 +34,9 @@ describe("extractSchemaDefaults", () => {
       endpoint.requestSchema.parse({ paginationInfo: { page: 3 } })
         .paginationInfo,
     ).toEqual({ page: 3, limit: 50 });
-    expect(extractSchemaDefaults(endpoint.formSchema, noopLogger)).toMatchObject({
+    expect(
+      extractSchemaDefaults(endpoint.formSchema, noopLogger),
+    ).toMatchObject({
       paginationInfo: { page: 1, limit: 50 },
     });
   });

@@ -325,7 +325,8 @@ export const translations: typeof enTranslations = {
               "Berlino a Lisbona da 67€: Cerca offerte per il weekend",
             result1Snippet:
               "Ryanair sabato BER → LIS a partire da € 67 a tratta. Opzioni di ritorno da €94 totali. Bagaglio non incluso.",
-            result2Title: "Da BER a LIS questo fine settimana: confronto prezzi su Kayak",
+            result2Title:
+              "Da BER a LIS questo fine settimana: confronto prezzi su Kayak",
             result2Snippet:
               "Più basso trovato: €71 Vueling (1 fermata, 4h20). Voli diretti da 12€ con TAP. Set di allerta prezzi.",
             result3Title:

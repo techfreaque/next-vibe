@@ -105,10 +105,20 @@ export class V1VideosRepository {
     if (!gate.ok) {
       return openAiErrorResponse(gate.error);
     }
-    const model = resolveV1VideoModel(data.model, gate.user, await getEnvAvailability());
+    const model = resolveV1VideoModel(
+      data.model,
+      gate.user,
+      await getEnvAvailability(),
+    );
     if (!model) {
       return openAiErrorResponse(
-        v1Error(404, t("openai.modelNotFound", { model: data.model }), "not_found_error", "model_not_found", "model"),
+        v1Error(
+          404,
+          t("openai.modelNotFound", { model: data.model }),
+          "not_found_error",
+          "model_not_found",
+          "model",
+        ),
       );
     }
 
@@ -116,14 +126,30 @@ export class V1VideosRepository {
     if (data.input_reference) {
       if (data.input_reference.size > V1_MAX_IMAGE_BYTES) {
         return openAiErrorResponse(
-          v1Error(400, t("media.errors.imageTooLarge", { max: V1_MAX_IMAGE_BYTES / 1024 / 1024 }), "invalid_request_error", "file_too_large", "input_reference"),
+          v1Error(
+            400,
+            t("media.errors.imageTooLarge", {
+              max: V1_MAX_IMAGE_BYTES / 1024 / 1024,
+            }),
+            "invalid_request_error",
+            "file_too_large",
+            "input_reference",
+          ),
         );
       }
       reference = await fileToDataUri(data.input_reference);
     } else if (data.image_url) {
-      if (!/^(https?:\/\/|data:image\/[a-z0-9.+-]+;base64,)/i.test(data.image_url)) {
+      if (
+        !/^(https?:\/\/|data:image\/[a-z0-9.+-]+;base64,)/i.test(data.image_url)
+      ) {
         return openAiErrorResponse(
-          v1Error(400, t("openai.badImageUrl"), "invalid_request_error", "invalid_value", "image_url"),
+          v1Error(
+            400,
+            t("openai.badImageUrl"),
+            "invalid_request_error",
+            "invalid_value",
+            "image_url",
+          ),
         );
       }
       reference = data.image_url;
@@ -133,15 +159,36 @@ export class V1VideosRepository {
     const route = reference ? resolveVideoGenRouteForImageInput(model) : model;
     if (!route || route.id !== model.id) {
       return openAiErrorResponse(
-        v1Error(400, t("media.errors.modelNoImageInput", { model: model.id }), "invalid_request_error", "invalid_value", "model"),
+        v1Error(
+          400,
+          t("media.errors.modelNoImageInput", { model: model.id }),
+          "invalid_request_error",
+          "invalid_value",
+          "model",
+        ),
       );
     }
-    if (!reference && route.inputs.includes("image") && !route.inputs.includes("text")) {
+    if (
+      !reference &&
+      route.inputs.includes("image") &&
+      !route.inputs.includes("text")
+    ) {
       return openAiErrorResponse(
-        v1Error(400, t("media.errors.modelNeedsImage", { model: model.id }), "invalid_request_error", "missing_required_parameter", "input_reference"),
+        v1Error(
+          400,
+          t("media.errors.modelNeedsImage", { model: model.id }),
+          "invalid_request_error",
+          "missing_required_parameter",
+          "input_reference",
+        ),
       );
     }
-    const consent = await mediaConsentError({ model: route, user: gate.user, locale, logger });
+    const consent = await mediaConsentError({
+      model: route,
+      user: gate.user,
+      locale,
+      logger,
+    });
     if (consent) {
       return openAiErrorResponse(consent);
     }
@@ -155,7 +202,16 @@ export class V1VideosRepository {
       !supportedResolutions.includes(data.resolution)
     ) {
       return openAiErrorResponse(
-        v1Error(400, t("media.errors.resolutionUnsupported", { model: model.id, supported: supportedResolutions.join(", ") }), "invalid_request_error", "invalid_value", "resolution"),
+        v1Error(
+          400,
+          t("media.errors.resolutionUnsupported", {
+            model: model.id,
+            supported: supportedResolutions.join(", "),
+          }),
+          "invalid_request_error",
+          "invalid_value",
+          "resolution",
+        ),
       );
     }
     // A size only implies a resolution the model offers.
@@ -164,7 +220,10 @@ export class V1VideosRepository {
       (fromSize && supportedResolutions.includes(fromSize.resolution)
         ? fromSize.resolution
         : undefined);
-    const seconds = resolveVideoClipSeconds(route, data.seconds ?? route.defaultDurationSeconds);
+    const seconds = resolveVideoClipSeconds(
+      route,
+      data.seconds ?? route.defaultDurationSeconds,
+    );
 
     // Pre-flight on the listed price, so a short balance is a 402 now and
     // not a failed job later. The tool checks again and bills on success.
@@ -202,37 +261,43 @@ export class V1VideosRepository {
 
     const { t: videoT } = videoScopedTranslation.scopedT(locale);
     // Background: no request signal (the job outlives the request).
-    const toolContext = mediaToolContext(params.toolExecutionContext, undefined, crypto.randomUUID());
+    const toolContext = mediaToolContext(
+      params.toolExecutionContext,
+      undefined,
+      crypto.randomUUID(),
+    );
     startMediaJob(
       job,
       params.generate ??
         (async (): Promise<ResponseType<V1MediaJobOutput>> => {
-        const result = await VideoGenerationRepository.generateVideo(
-          {
-            prompt: data.prompt,
-            model: model.id,
-            duration: seconds,
-            aspectRatio,
-            resolution,
-            frameReferences: reference ? [{ url: reference, role: "first" }] : undefined,
-            negativePrompt: data.negative_prompt,
-          },
-          gate.user,
-          locale,
-          logger,
-          videoT,
-          toolContext,
-          platform,
-        );
-        if (!result.success) {
-          return result;
-        }
-        return success({
-          url: result.data.videoUrl,
-          creditCost: result.data.creditCost,
-          durationSeconds: result.data.durationSeconds,
-        });
-      }),
+          const result = await VideoGenerationRepository.generateVideo(
+            {
+              prompt: data.prompt,
+              model: model.id,
+              duration: seconds,
+              aspectRatio,
+              resolution,
+              frameReferences: reference
+                ? [{ url: reference, role: "first" }]
+                : undefined,
+              negativePrompt: data.negative_prompt,
+            },
+            gate.user,
+            locale,
+            logger,
+            videoT,
+            toolContext,
+            platform,
+          );
+          if (!result.success) {
+            return result;
+          }
+          return success({
+            url: result.data.videoUrl,
+            creditCost: result.data.creditCost,
+            durationSeconds: result.data.durationSeconds,
+          });
+        }),
       logger,
     );
     return openAiJson(mediaJobObject(job, request));

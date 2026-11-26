@@ -426,10 +426,7 @@ export const remoteConnectionAudit = pgTable(
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (t) => [
-    index("remote_connection_audit_user_created_idx").on(
-      t.userId,
-      t.createdAt,
-    ),
+    index("remote_connection_audit_user_created_idx").on(t.userId, t.createdAt),
   ],
 );
 

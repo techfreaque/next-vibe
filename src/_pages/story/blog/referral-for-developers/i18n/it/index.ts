@@ -26,13 +26,12 @@ export const translations: typeof enTranslations = {
     examples: [
       'GitHub README: "Ho costruito questo con {{appName}} \'s API. Provalo: [il tuo link]"',
       'Messaggio del blog piè di pagina: "Strumenti che uso:... {{appName}} per l\'accesso AI [ref link]"',
-      "Discord /Slack: \"Ho usato {{appName}}, ecco il mio referral se vuoi in\"",
+      'Discord /Slack: "Ho usato {{appName}}, ecco il mio referral se vuoi in"',
       'Descrizione YouTube: " Strumenti AI utilizzati in questo video: {{appName}} [referral link]"',
     ],
   },
   skillAngle: {
-    title:
-      "Pubblicare una abilità: guadagnare quando gli altri lo condividono",
+    title: "Pubblicare una abilità: guadagnare quando gli altri lo condividono",
     p1: "Ogni abilità che pubblichi ha un link condivisibile. Condividi da te e ottieni il 10% di sconto diretto. Quando un altro membro lo condivide con il proprio link, si guadagna ancora 5% di ogni pagamento da quegli utenti, per sempre.",
     p2: "Il 5% spetta a chi ha creato la skill. Se un utente la trova nella directory, condivide il link con un amico e l’amico si iscrive, ricevi automaticamente il 5% dei suoi pagamenti. La piattaforma attribuisce il compenso in base all’autore della skill. La skill continua a farti guadagnare anche quando non la promuovi.",
     p3: "Inserisci il tuo link di abilità in un GitHub README. Postarlo in uno sviluppatore Discord. Ogni persona che si iscrive attraverso di esso vi paga 10%. Ogni persona che qualcun altro porta alla tua abilità ti paga il 5%. Stessa abilità, due percorsi di reddito.",

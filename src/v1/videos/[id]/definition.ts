@@ -74,7 +74,9 @@ const { GET } = createEndpoint({
     description: "media.videos.get.success.description",
   },
   examples: {
-    urlPathParams: { default: { id: "video_8f2c0e5a7b1d4c3e9a6f0b2d4e6a8c1f" } },
+    urlPathParams: {
+      default: { id: "video_8f2c0e5a7b1d4c3e9a6f0b2d4e6a8c1f" },
+    },
     responses: { default: { status: "completed" } },
   },
 });

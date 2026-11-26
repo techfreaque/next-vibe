@@ -117,8 +117,7 @@ export const translations: typeof enTranslations = {
   },
   broken: {
     title: "Y las cosas que acaban de romperse",
-    intro:
-      "Estos fallos pasaban desapercibidos y afectaban a usuarios reales:",
+    intro: "Estos fallos pasaban desapercibidos y afectaban a usuarios reales:",
     items: {
       attachments:
         "URLs de archivos adjuntos de chat e informes de error del cliente devueltos 404.",

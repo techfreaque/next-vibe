@@ -223,7 +223,7 @@ export const translations: typeof enTranslations = {
     statAnyDetail: "Wymuszane w czasie budowania, nie konwencja",
     statLanguages: "Trzy języki",
     statLanguagesDetail:
-      "Sprawdzane w czasie kompilacji: t(\"typo.here\") to błąd kompilatora",
+      'Sprawdzane w czasie kompilacji: t("typo.here") to błąd kompilatora',
     statsClosing: "To nie jest konwencja. Jest wymuszane w czasie budowania.",
   },
 

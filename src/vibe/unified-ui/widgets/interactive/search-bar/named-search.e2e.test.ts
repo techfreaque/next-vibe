@@ -42,47 +42,39 @@ describe("Named admin search inputs", () => {
           .delete(paymentInvoices)
           .where(eq(paymentInvoices.id, invoiceId));
       });
-      await db
-        .insert(paymentInvoices)
-        .values({
-          id: invoiceId,
-          userId,
-          companyId,
-          providerInvoiceId: invoiceId,
-          invoiceNumber: "TEST-89",
-          amount: "0",
-          currency: "EUR",
-        });
-      await db
-        .insert(paymentBills)
-        .values({
-          id: billId,
-          companyId,
-          supplierName: "E2E Print Shop",
-          billNumber: "TEST-91",
-          billDate: new Date(),
-          currency: "EUR",
-        });
-      await db
-        .insert(paymentEstimates)
-        .values({
-          id: estimateId,
-          companyId,
-          estimateNumber: "TEST-94",
-          currency: "EUR",
-        });
-      await db
-        .insert(catalogProducts)
-        .values({
-          id: productId,
-          companyId,
-          ownerUserId: userId,
-          name,
-          sku,
-          type: ProductType.SERVICE,
-          basePrice: 12.5,
-          currency: "EUR",
-        });
+      await db.insert(paymentInvoices).values({
+        id: invoiceId,
+        userId,
+        companyId,
+        providerInvoiceId: invoiceId,
+        invoiceNumber: "TEST-89",
+        amount: "0",
+        currency: "EUR",
+      });
+      await db.insert(paymentBills).values({
+        id: billId,
+        companyId,
+        supplierName: "E2E Print Shop",
+        billNumber: "TEST-91",
+        billDate: new Date(),
+        currency: "EUR",
+      });
+      await db.insert(paymentEstimates).values({
+        id: estimateId,
+        companyId,
+        estimateNumber: "TEST-94",
+        currency: "EUR",
+      });
+      await db.insert(catalogProducts).values({
+        id: productId,
+        companyId,
+        ownerUserId: userId,
+        name,
+        sku,
+        type: ProductType.SERVICE,
+        basePrice: 12.5,
+        currency: "EUR",
+      });
       await page.route("**/api/*/pos/product-lookup*", (route) =>
         route.continue({
           headers: { ...route.request().headers(), ...headers },

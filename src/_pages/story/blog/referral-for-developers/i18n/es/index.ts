@@ -26,7 +26,7 @@ export const translations: typeof enTranslations = {
     examples: [
       'GitHub README : "Construí esto con {{appName}} \'s API. Pruébalo: [su enlace]"',
       'Blog post footer: "Herramientas que uso:... {{appName}} para el acceso AI [enlace de ref]"',
-      "Discord /Slack: \"He estado usando {{appName}}, aquí está mi referencia si quieres entrar\"",
+      'Discord /Slack: "He estado usando {{appName}}, aquí está mi referencia si quieres entrar"',
       'YouTube Descripción: " Herramientas AI utilizadas en este vídeo: {{appName}} [enlace referral]"',
     ],
   },

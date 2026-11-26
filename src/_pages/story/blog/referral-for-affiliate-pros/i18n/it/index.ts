@@ -72,7 +72,7 @@ export const translations: typeof enTranslations = {
   promotion: {
     title: "Angoli che convertono",
     angle1Title:
-      "\"Ho confrontato 10 strumenti AI: ecco quello che ho effettivamente tenuto\"",
+      '"Ho confrontato 10 strumenti AI: ecco quello che ho effettivamente tenuto"',
     angle1Body:
       "Il contenuto di confronto è il miglior driver di affiliazione per questa categoria. Condurre con varietà modello, prezzi e il posizionamento libero-speech vs mono-model strumenti.",
     angle2Title: "Comunità di sviluppo",
@@ -83,7 +83,7 @@ export const translations: typeof enTranslations = {
       "r/selfhosted, forum sulla privacy, Mastodon. La base di codice open-source e l'opzione self-hosting atterrare bene. Questi utenti odiano piattaforme chiuse.",
     angle4Title: "Contenuto tutorial con lo strumento",
     angle4Body:
-      "\"Come utilizzare AI per X\" con {{appName}} come strumento specifico. Assistente di codifica, scrittura, ricerca: casi di uso specifico convertono meglio delle recensioni generiche AI.",
+      '"Come utilizzare AI per X" con {{appName}} come strumento specifico. Assistente di codifica, scrittura, ricerca: casi di uso specifico convertono meglio delle recensioni generiche AI.',
   },
   payouts: {
     title: "Meccanica di pagamento",

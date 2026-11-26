@@ -74,7 +74,9 @@ const { GET } = createEndpoint({
     description: "media.music.content.success.description",
   },
   examples: {
-    urlPathParams: { default: { id: "music_3b9d1f7c5e2a4086b4c8d0e2f6a1c3e5" } },
+    urlPathParams: {
+      default: { id: "music_3b9d1f7c5e2a4086b4c8d0e2f6a1c3e5" },
+    },
     responses: { default: { status: "completed" } },
   },
 });

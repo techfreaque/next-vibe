@@ -22,7 +22,7 @@ export const translations: typeof enTranslations = {
   problem: {
     title: "Die kaputte Feedbackschleife",
     description:
-      "Bitte Claude Code, ein Feature hinzuzufügen. Macht es. ESLint laufen lassen: besteht. TypeScript laufen lassen: Fehler. Bitte Claude Code, den TypeScript-Fehler zu fixen. Macht es. ESLint nochmal: schlägt jetzt fehl. Hin und her. Drei Iterationen. Die KI ist bei jedem Schritt überzeugt. Jedes Mal: \"Ist gefixt.\"",
+      'Bitte Claude Code, ein Feature hinzuzufügen. Macht es. ESLint laufen lassen: besteht. TypeScript laufen lassen: Fehler. Bitte Claude Code, den TypeScript-Fehler zu fixen. Macht es. ESLint nochmal: schlägt jetzt fehl. Hin und her. Drei Iterationen. Die KI ist bei jedem Schritt überzeugt. Jedes Mal: "Ist gefixt."',
     fixLabel: "War es nie.",
     fixDescription:
       "Es war Whack-a-Mole mit einem Tool, das immer nur einen Linter gleichzeitig ausführt und nie das Gesamtbild sieht.",
@@ -103,7 +103,7 @@ export const translations: typeof enTranslations = {
       "Schau zu, wie Claude Code dreimal gegen den Checker anrennt, bevor es den richtigen Typ findet",
     round1Title: "Runde 1: KI schreibt `any`",
     round1Description:
-      "Frag Claude Code: \"Schreib eine Hilfsfunktion, die ein rohes API-Antwortobjekt nimmt und das Datenfeld extrahiert. Die Antwort kann verschiedene Formen haben. Nimm einfach irgendeinen Typ, der funktioniert.\"",
+      'Frag Claude Code: "Schreib eine Hilfsfunktion, die ein rohes API-Antwortobjekt nimmt und das Datenfeld extrahiert. Die Antwort kann verschiedene Formen haben. Nimm einfach irgendeinen Typ, der funktioniert."',
     round1Result: "Claude Code schreibt die einfache Lösung:",
     round2Title: "Runde 2: KI versucht `unknown`",
     round2Description:

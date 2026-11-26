@@ -325,7 +325,8 @@ export const translations: typeof enTranslations = {
               "Berlin nach Lissabon ab 67€: Skyscanner Wochenend-Deals",
             result1Snippet:
               "Ryanair Samstag BER→LIS ab 67€ einfach. Rückflug-Optionen ab 94€ gesamt. Gepäck nicht inbegriffen.",
-            result2Title: "Von BER nach LIS dieses Wochenende: Preisvergleich auf Kayak",
+            result2Title:
+              "Von BER nach LIS dieses Wochenende: Preisvergleich auf Kayak",
             result2Snippet:
               "Günstigstes: 71€ Vueling (1 Stopp, 4h20). Direktflüge ab 112€ mit TAP. Preisalarm gesetzt.",
             result3Title:

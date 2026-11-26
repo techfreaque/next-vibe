@@ -114,8 +114,7 @@ export const translations: typeof enTranslations = {
   },
   broken: {
     title: "E le cose che sono state appena rotte",
-    intro:
-      "Questi bug passavano inosservati e creavano problemi agli utenti:",
+    intro: "Questi bug passavano inosservati e creavano problemi agli utenti:",
     items: {
       attachments:
         "Gli URL degli allegati di chat e i rapporti di errore del client sono stati resi 404.",

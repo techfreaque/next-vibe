@@ -139,8 +139,7 @@ export const translations: typeof enTranslations = {
     examples: {
       alert: {
         label: "Alerta",
-        description:
-          "Llame a la prueba completa: Thea lo recoge de inmediato.",
+        description: "Llame a la prueba completa: Thea lo recoge de inmediato.",
       },
       campaign: {
         label: "Campaña",

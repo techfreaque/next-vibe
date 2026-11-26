@@ -97,8 +97,7 @@ export const translations: typeof enTranslations = {
       "Consigue tu enlace de referencia. {{directPct}} en cada pago: recurrente, sin expiración. Publish a habilidad y ganar {{skillBonusPct}} cuando otros lo comparten.",
     signUp: "Crear cuenta",
     logIn: "Iniciar sesión",
-    pitch1:
-      "Comisión de remisión de {{directPct}}: recurrido, sin vencimiento",
+    pitch1: "Comisión de remisión de {{directPct}}: recurrido, sin vencimiento",
     pitch2:
       "Publish a skill → {{skillBonusPct}} de cada usuario otros traen a él",
     pitch3:

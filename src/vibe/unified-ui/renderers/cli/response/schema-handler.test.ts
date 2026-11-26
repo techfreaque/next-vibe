@@ -25,8 +25,18 @@ describe("SchemaUIHandler defaults", () => {
     expect(metadata).toEqual([
       { name: "name", type: "input", required: false, defaultValue: "Atlas" },
       { name: "retries", type: "number", required: false, defaultValue: 0 },
-      { name: "enabled", type: "confirm", required: false, defaultValue: false },
-      { name: "tags", type: "checkbox", required: false, defaultValue: ["local"] },
+      {
+        name: "enabled",
+        type: "confirm",
+        required: false,
+        defaultValue: false,
+      },
+      {
+        name: "tags",
+        type: "checkbox",
+        required: false,
+        defaultValue: ["local"],
+      },
       {
         name: "required",
         type: "input",

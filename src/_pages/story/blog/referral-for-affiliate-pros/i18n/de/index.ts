@@ -72,7 +72,7 @@ export const translations: typeof enTranslations = {
   promotion: {
     title: "Ansätze, die konvertieren",
     angle1Title:
-      "\"Ich hab 10 KI-Tools verglichen, das eine, das ich behalten hab\"",
+      '"Ich hab 10 KI-Tools verglichen, das eine, das ich behalten hab"',
     angle1Body:
       "Vergleichs-Content ist der beste Affiliate-Treiber in dieser Kategorie. Heb Modellvielfalt, Preisgestaltung und Free-Speech-Positionierung gegenüber Single-Model-Tools hervor.",
     angle2Title: "Entwickler-Communities",
@@ -83,7 +83,7 @@ export const translations: typeof enTranslations = {
       "r/selfhosted, Privacy-Foren, Mastodon. Der Open-Source-Codebase und die Self-Hosting-Option kommen hier gut an. Diese Nutzer hassen geschlossene Plattformen.",
     angle4Title: "Tutorial-Content mit dem Tool",
     angle4Body:
-      "\"Wie du KI für X nutzt\" mit {{appName}} als konkretem Tool. Coding-Assistent, Schreiben, Recherche: spezifische Anwendungsfälle konvertieren besser als generische KI-Reviews.",
+      '"Wie du KI für X nutzt" mit {{appName}} als konkretem Tool. Coding-Assistent, Schreiben, Recherche: spezifische Anwendungsfälle konvertieren besser als generische KI-Reviews.',
   },
   payouts: {
     title: "Auszahlungsdetails",

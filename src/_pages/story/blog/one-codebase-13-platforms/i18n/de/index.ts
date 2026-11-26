@@ -224,7 +224,7 @@ export const translations: typeof enTranslations = {
     statAnyDetail: "Zur Build-Zeit erzwungen, keine Konvention",
     statLanguages: "Drei Sprachen",
     statLanguagesDetail:
-      "Zur Compile-Zeit geprüft: t(\"typo.here\") ist ein Compiler-Fehler",
+      'Zur Compile-Zeit geprüft: t("typo.here") ist ein Compiler-Fehler',
     statsClosing:
       "Das ist keine Konvention. Das wird zur Build-Zeit erzwungen.",
   },

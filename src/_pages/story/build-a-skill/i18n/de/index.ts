@@ -72,12 +72,12 @@ export const translations: typeof enTranslations = {
       "Das Modell liest den vollen Prompt bei jedem Turn. Kürzer gewinnt.",
     dont0Title: "AGB-artige Regellisten",
     dont0Body:
-      "\"Sei immer hilfreich, sei nie unhöflich\" (jede KI bekommt das. Reines Rauschen.)",
+      '"Sei immer hilfreich, sei nie unhöflich" (jede KI bekommt das. Reines Rauschen.)',
     dont1Title: '"Sei immer hilfreich"',
     dont1Body: "Das Modell weiß es bereits. Weglassen.",
     dont2Title: "Widersprüchliche Einschränkungen",
     dont2Body:
-      "\"Sei kreativ, aber bleib immer beim Thema\" (das Modell sichert ewig ab. Eines wählen.)",
+      '"Sei kreativ, aber bleib immer beim Thema" (das Modell sichert ewig ab. Eines wählen.)',
     dont3Title: "Lange Fähigkeitslisten",
     dont3Body:
       "Das Modell weiß, was es kann. Die Docs nicht im Prompt wiederholen.",

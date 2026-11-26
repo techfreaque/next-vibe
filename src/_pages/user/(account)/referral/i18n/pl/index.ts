@@ -97,8 +97,7 @@ export const translations: typeof enTranslations = {
       "Zdobądź link polecający. Zarabiaj {{directPct}} od każdej płatności: cyklicznie, bez daty ważności. Opublikuj skill i zarabiaj {{skillBonusPct}}, gdy inni go udostępniają.",
     signUp: "Utwórz konto",
     logIn: "Zaloguj się",
-    pitch1:
-      "{{directPct}} prowizji polecającej: cyklicznie, bez daty ważności",
+    pitch1: "{{directPct}} prowizji polecającej: cyklicznie, bez daty ważności",
     pitch2:
       "Opublikuj skill → {{skillBonusPct}} od każdego, kogo inni do niego przyprowadzą",
     pitch3:

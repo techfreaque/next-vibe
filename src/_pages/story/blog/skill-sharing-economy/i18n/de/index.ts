@@ -19,7 +19,7 @@ export const translations: typeof enTranslations = {
     subtitle:
       "Baue ein vorkonfiguriertes KI-Setup einmal. Teile es überall. Verdiene 10 % von jeder Zahlung der Leute, die sich dadurch anmelden, für immer.",
     quote:
-      "\"Ich hab einen klinischen Reasoning-Skill für Medizinstudenten gebaut. Nach drei Monaten bezahlt er mein eigenes Abo und mehr.\"",
+      '"Ich hab einen klinischen Reasoning-Skill für Medizinstudenten gebaut. Nach drei Monaten bezahlt er mein eigenes Abo und mehr."',
   },
   whatAreSkills: {
     title: "Was sind Skills auf {{appName}}?",

@@ -222,7 +222,7 @@ export const translations: typeof enTranslations = {
     statAnyDetail: "Costretto a tempo di costruzione, non convenzione",
     statLanguages: "Tre lingue",
     statLanguagesDetail:
-      "Compile-time check: t(\"typo.here\") è un errore compilatore",
+      'Compile-time check: t("typo.here") è un errore compilatore',
     statsClosing:
       "Non e' una convention. E' fatto rispettare al momento della costruzione.",
   },

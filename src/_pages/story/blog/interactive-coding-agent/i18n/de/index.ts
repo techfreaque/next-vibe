@@ -6,8 +6,7 @@ export const translations: typeof enTranslations = {
     description:
       "Mit dem Coding-Agent-Tool delegiert deine KI echte Code-Änderungen an Claude Code oder OpenCode: im Hintergrund oder als Live-Session in einem echten Terminalfenster, die sich nach getaner Arbeit zurückmeldet. Jetzt auch instanzübergreifend.",
     category: "Coding-Agent",
-    imageAlt:
-      "Interaktiver Coding-Agent: Claude Code in einem Terminalfenster",
+    imageAlt: "Interaktiver Coding-Agent: Claude Code in einem Terminalfenster",
     keywords:
       "Coding-Agent, Claude Code, OpenCode, KI-Terminal, MCP complete-task, selbst gehostete KI, next-vibe, {{appName}}",
   },

@@ -72,12 +72,12 @@ export const translations: typeof enTranslations = {
     do4Body: "El modelo lee el impulso completo cada vuelta. Ganas más cortas.",
     dont0Title: "Listas de reglas de estilo ToS",
     dont0Body:
-      "\"Siempre ser útil, nunca ser grosero\" (cada AI consigue esto. Estruendo puro.)",
+      '"Siempre ser útil, nunca ser grosero" (cada AI consigue esto. Estruendo puro.)',
     dont1Title: '"Siempre ser útil"',
     dont1Body: "El modelo ya lo sabe. Olvídalo.",
     dont2Title: "Limitaciones contradictorias",
     dont2Body:
-      "\"Sé creativo, pero siempre mantente en el tema\" (el modelo se erige para siempre. Escoge uno.)",
+      '"Sé creativo, pero siempre mantente en el tema" (el modelo se erige para siempre. Escoge uno.)',
     dont3Title: "Listas de capacidad largas",
     dont3Body: "El modelo sabe lo que puede hacer. No repitas los doctores.",
   },

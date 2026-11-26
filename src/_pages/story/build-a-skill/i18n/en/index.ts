@@ -67,12 +67,12 @@ export const translations = {
     do4Body: "The model reads the full prompt every turn. Shorter wins.",
     dont0Title: "ToS-style rule lists",
     dont0Body:
-      "\"Always be helpful, never be rude\" (every AI gets this. Pure noise.)",
+      '"Always be helpful, never be rude" (every AI gets this. Pure noise.)',
     dont1Title: '"Always be helpful"',
     dont1Body: "The model already knows. Skip it.",
     dont2Title: "Contradictory constraints",
     dont2Body:
-      "\"Be creative but always stay on topic\" (the model hedges forever. Pick one.)",
+      '"Be creative but always stay on topic" (the model hedges forever. Pick one.)',
     dont3Title: "Long capability lists",
     dont3Body: "The model knows what it can do. Don't repeat the docs.",
   },

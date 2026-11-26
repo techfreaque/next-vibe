@@ -837,7 +837,9 @@ export function PaletteSwitcher(): JSX.Element {
       </Div>
       <P className="text-xs text-muted-foreground">
         {PALETTES[activeIndex]?.description}
-        {activeIndex === 0 ? ". Use the first button to restore the default." : ""}
+        {activeIndex === 0
+          ? ". Use the first button to restore the default."
+          : ""}
       </P>
     </Div>
   );

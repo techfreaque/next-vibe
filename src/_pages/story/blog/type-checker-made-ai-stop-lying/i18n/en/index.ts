@@ -101,7 +101,7 @@ export const translations = {
       "Watch Claude Code hit the checker three times before finding the correct type",
     round1Title: "Round 1: AI writes `any`",
     round1Description:
-      "Ask Claude Code: \"Write a helper function that takes a raw API response object and extracts the data field. The response can have different shapes. Use whatever type makes this work.\"",
+      'Ask Claude Code: "Write a helper function that takes a raw API response object and extracts the data field. The response can have different shapes. Use whatever type makes this work."',
     round1Result: "Claude Code writes the easy solution:",
     round2Title: "Round 2: AI tries `unknown`",
     round2Description:

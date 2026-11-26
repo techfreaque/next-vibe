@@ -45,7 +45,11 @@ test("an untouched form keeps saved defaults and explicit route parameters", asy
   saved.resolve(savedJson);
   await restore;
 
-  expect(values).toEqual({ search: "restored@example.com", page: 2, limit: 40 });
+  expect(values).toEqual({
+    search: "restored@example.com",
+    page: 2,
+    limit: 40,
+  });
 });
 
 test("a replaced form cannot apply a pending restore", async () => {

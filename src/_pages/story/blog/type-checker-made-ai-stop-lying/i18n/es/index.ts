@@ -105,7 +105,7 @@ export const translations: typeof enTranslations = {
       "Ver Claude Code golpeó el contador tres veces antes de encontrar el tipo correcto",
     round1Title: "Ronda 1: AI escribe `any`",
     round1Description:
-      "Pregunte Claude Code: \"Escribe una función de ayuda que toma un objeto de respuesta API crudo y extrae el campo de datos. La respuesta puede tener diferentes formas: utilizar cualquier tipo hace que este trabajo.\"",
+      'Pregunte Claude Code: "Escribe una función de ayuda que toma un objeto de respuesta API crudo y extrae el campo de datos. La respuesta puede tener diferentes formas: utilizar cualquier tipo hace que este trabajo."',
     round1Result: "Claude Code escribe la solución fácil:",
     round2Title: "Ronda 2: AI intenta `unknown`",
     round2Description:

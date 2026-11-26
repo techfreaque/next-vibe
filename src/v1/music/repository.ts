@@ -63,7 +63,9 @@ export function musicDurationFor(
   let best: typeof MusicDurationValue = MusicDuration.MEDIUM;
   let bestDistance = Number.POSITIVE_INFINITY;
   for (const duration of Object.values(MusicDuration)) {
-    const distance = Math.abs((MUSIC_DURATION_SECONDS[duration] ?? 0) - seconds);
+    const distance = Math.abs(
+      (MUSIC_DURATION_SECONDS[duration] ?? 0) - seconds,
+    );
     if (distance < bestDistance) {
       best = duration;
       bestDistance = distance;
@@ -93,13 +95,28 @@ export class V1MusicRepository {
     if (!gate.ok) {
       return openAiErrorResponse(gate.error);
     }
-    const model = resolveV1MusicModel(data.model, gate.user, await getEnvAvailability());
+    const model = resolveV1MusicModel(
+      data.model,
+      gate.user,
+      await getEnvAvailability(),
+    );
     if (!model) {
       return openAiErrorResponse(
-        v1Error(404, t("openai.modelNotFound", { model: data.model }), "not_found_error", "model_not_found", "model"),
+        v1Error(
+          404,
+          t("openai.modelNotFound", { model: data.model }),
+          "not_found_error",
+          "model_not_found",
+          "model",
+        ),
       );
     }
-    const consent = await mediaConsentError({ model, user: gate.user, locale, logger });
+    const consent = await mediaConsentError({
+      model,
+      user: gate.user,
+      locale,
+      logger,
+    });
     if (consent) {
       return openAiErrorResponse(consent);
     }
@@ -124,7 +141,8 @@ export class V1MusicRepository {
       model: model.id,
       prompt: data.prompt,
       params: {
-        seconds: MUSIC_DURATION_SECONDS[duration] ?? model.defaultDurationSeconds,
+        seconds:
+          MUSIC_DURATION_SECONDS[duration] ?? model.defaultDurationSeconds,
         size: null,
         aspectRatio: null,
         resolution: null,
@@ -139,37 +157,41 @@ export class V1MusicRepository {
     const { t: musicT } = musicScopedTranslation.scopedT(locale);
     // Background: no request signal (the job outlives the request). A
     // thread namespace makes the tool store the file under the account.
-    const toolContext = mediaToolContext(params.toolExecutionContext, undefined, crypto.randomUUID());
+    const toolContext = mediaToolContext(
+      params.toolExecutionContext,
+      undefined,
+      crypto.randomUUID(),
+    );
     startMediaJob(
       job,
       params.generate ??
         (async (): Promise<ResponseType<V1MediaJobOutput>> => {
-        const result = await MusicGenerationRepository.generateMusic(
-          { prompt: data.prompt, model: model.id, duration },
-          gate.user,
-          locale,
-          logger,
-          musicT,
-          toolContext,
-          platform,
-        );
-        if (!result.success) {
-          return result;
-        }
-        // Storage failed and the provider handed back inline bytes: never
-        // keep a data: URI as the result (the file is not deliverable).
-        if (result.data.audioUrl.startsWith("data:")) {
-          return fail({
-            message: t("media.errors.storageFailed"),
-            errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          const result = await MusicGenerationRepository.generateMusic(
+            { prompt: data.prompt, model: model.id, duration },
+            gate.user,
+            locale,
+            logger,
+            musicT,
+            toolContext,
+            platform,
+          );
+          if (!result.success) {
+            return result;
+          }
+          // Storage failed and the provider handed back inline bytes: never
+          // keep a data: URI as the result (the file is not deliverable).
+          if (result.data.audioUrl.startsWith("data:")) {
+            return fail({
+              message: t("media.errors.storageFailed"),
+              errorType: ErrorResponseTypes.INTERNAL_ERROR,
+            });
+          }
+          return success({
+            url: result.data.audioUrl,
+            creditCost: result.data.creditCost,
+            durationSeconds: result.data.durationSeconds,
           });
-        }
-        return success({
-          url: result.data.audioUrl,
-          creditCost: result.data.creditCost,
-          durationSeconds: result.data.durationSeconds,
-        });
-      }),
+        }),
       logger,
     );
     return openAiJson(mediaJobObject(job, request));

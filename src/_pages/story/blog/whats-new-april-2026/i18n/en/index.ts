@@ -87,7 +87,7 @@ export const translations = {
     brilliantBody:
       "For hard problems. More expensive, but noticeably smarter when you're doing complex reasoning, writing or code. Worth it when the task demands it.",
     kimiLabel: "Smart",
-    kimiModel: "Kimi K2.5: \"Chinese Wisdom\"",
+    kimiModel: 'Kimi K2.5: "Chinese Wisdom"',
     kimiBody:
       "Open-source and genuinely sharp. The default for everyday use. Fast, good at reasoning, great value. You'll learn its personality quickly.",
     uncensoredLabel: "Uncensored",

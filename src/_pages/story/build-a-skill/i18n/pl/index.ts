@@ -72,12 +72,12 @@ export const translations: typeof enTranslations = {
     do4Body: "Model czyta cały prompt przy każdej turze. Krótszy jest lepszy.",
     dont0Title: "Listy reguł jak regulamin",
     dont0Body:
-      "\"Zawsze bądź pomocna, nigdy nie bądź niegrzeczna\" (każda AI dostaje to samo. Tylko szum.)",
+      '"Zawsze bądź pomocna, nigdy nie bądź niegrzeczna" (każda AI dostaje to samo. Tylko szum.)',
     dont1Title: '"Zawsze bądź pomocna"',
     dont1Body: "Model i tak to wie. Pominąć.",
     dont2Title: "Sprzeczne ograniczenia",
     dont2Body:
-      "\"Bądź kreatywna, ale zawsze trzymaj się tematu\" (model będzie się ciągle zabezpieczał. Wybierz jedno.)",
+      '"Bądź kreatywna, ale zawsze trzymaj się tematu" (model będzie się ciągle zabezpieczał. Wybierz jedno.)',
     dont3Title: "Za długie listy możliwości",
     dont3Body:
       "Model wie, co potrafi. Nie przepisuj instrukcji obsługi w system prompcie.",

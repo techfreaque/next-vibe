@@ -24,7 +24,7 @@ export const translations: typeof enTranslations = {
   problem: {
     title: "Zepsuta pętla sprzężenia zwrotnego",
     description:
-      "Poproś Claude Code o dodanie funkcji. Robi to. Uruchom ESLint: przechodzi. Uruchom TypeScript: błędy. Poproś Claude Code o naprawienie błędów TypeScript. Robi to. Uruchom ESLint. Teraz to się nie udaje. Tam i z powrotem. Trzy iteracje. AI jest pewne siebie na każdym kroku. Za każdym razem: \"To jest naprawione.\"",
+      'Poproś Claude Code o dodanie funkcji. Robi to. Uruchom ESLint: przechodzi. Uruchom TypeScript: błędy. Poproś Claude Code o naprawienie błędów TypeScript. Robi to. Uruchom ESLint. Teraz to się nie udaje. Tam i z powrotem. Trzy iteracje. AI jest pewne siebie na każdym kroku. Za każdym razem: "To jest naprawione."',
     fixLabel: "Nigdy nie było naprawione.",
     fixDescription:
       "To była gra w kreta z narzędziem, które uruchamia jeden linter na raz i nigdy nie widzi pełnego obrazu.",
@@ -104,7 +104,7 @@ export const translations: typeof enTranslations = {
       "Obserwuj, jak Claude Code trafia na sprawdzacz trzy razy przed znalezieniem właściwego typu",
     round1Title: "Runda 1: AI pisze `any`",
     round1Description:
-      "Zapytaj Claude Code: \"Napisz funkcję pomocniczą, która przyjmuje surowy obiekt odpowiedzi API i wyciąga pole danych. Odpowiedź może mieć różne kształty. Użyj dowolnego typu, byle działało.\"",
+      'Zapytaj Claude Code: "Napisz funkcję pomocniczą, która przyjmuje surowy obiekt odpowiedzi API i wyciąga pole danych. Odpowiedź może mieć różne kształty. Użyj dowolnego typu, byle działało."',
     round1Result: "Claude Code pisze proste rozwiązanie:",
     round2Title: "Runda 2: AI próbuje `unknown`",
     round2Description:

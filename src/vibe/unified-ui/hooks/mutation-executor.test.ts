@@ -3,8 +3,15 @@ import { describe, expect, it, mock, spyOn } from "bun:test";
 import ledgerDefinition from "@/chart-of-accounts/ledger/[accountId]/definition";
 
 import type { TranslatedKeyType } from "../../core/i18n/core/scoped-translation";
-import type { ErrorResponseType, ResponseType } from "../../core/route/response.schema";
-import { ErrorResponseTypes, fail, success } from "../../core/route/response.schema";
+import type {
+  ErrorResponseType,
+  ResponseType,
+} from "../../core/route/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "../../core/route/response.schema";
 import { executeMutation, settleMutationResult } from "./mutation-executor";
 
 // oxlint-disable-next-line restricted/restricted-syntax -- test fixture text
@@ -31,7 +38,8 @@ const toUnexpected = (parsedError: Error): ErrorResponseType =>
 describe("settleMutationResult (useApiMutation mutateAsync contract)", () => {
   it("passes a success through unchanged", async () => {
     const result = await settleMutationResult(
-      (): Promise<ResponseType<{ id: string }>> => Promise.resolve(success({ id: "a" })),
+      (): Promise<ResponseType<{ id: string }>> =>
+        Promise.resolve(success({ id: "a" })),
       toUnexpected,
     );
     expect(result).toEqual(success({ id: "a" }));
@@ -51,7 +59,8 @@ describe("settleMutationResult (useApiMutation mutateAsync contract)", () => {
 
   it("turns any other rejection into a fail() via onUnexpected", async () => {
     const result = await settleMutationResult(
-      (): Promise<ResponseType<{ id: string }>> => Promise.reject(new Error("boom")),
+      (): Promise<ResponseType<{ id: string }>> =>
+        Promise.reject(new Error("boom")),
       toUnexpected,
     );
     expect(result.success).toBe(false);
@@ -113,23 +122,44 @@ it("reports a caught browser chunk failure to recovery without replaying the mut
   void mock.module("./call-api", () => ({ callApi }));
   const recovery = mock(() => true);
   const chunkRecovery = await import("../../logger/chunk-reload");
-  const recover = spyOn(chunkRecovery, "handleChunkLoadFailure").mockImplementation(recovery);
+  const recover = spyOn(
+    chunkRecovery,
+    "handleChunkLoadFailure",
+  ).mockImplementation(recovery);
   const priorWindow = Object.getOwnPropertyDescriptor(globalThis, "window");
-  Object.defineProperty(globalThis, "window", { configurable: true, value: {} });
+  Object.defineProperty(globalThis, "window", {
+    configurable: true,
+    value: {},
+  });
   const error = mock(() => undefined);
   try {
     const result = await executeMutation({
       endpoint: ledgerDefinition.GET,
       locale: "en-GLOBAL",
-      logger: { error, warn: mock(), info: mock(), debug: mock(), vibe: mock(), isDebugEnabled: false },
+      logger: {
+        error,
+        warn: mock(),
+        info: mock(),
+        debug: mock(),
+        vibe: mock(),
+        isDebugEnabled: false,
+      },
       requestData: { page: 1, pageSize: 20 },
       pathParams: { accountId: "00000000-0000-4000-8000-0000000000aa" },
-      user: { isPublic: false, id: "00000000-0000-4000-8000-000000000001", leadId: "00000000-0000-4000-8000-000000000002", roles: [] },
+      user: {
+        isPublic: false,
+        id: "00000000-0000-4000-8000-000000000001",
+        leadId: "00000000-0000-4000-8000-000000000002",
+        roles: [],
+      },
     });
     expect(result.success).toBe(false);
     expect(callApi).toHaveBeenCalledTimes(1);
     expect(error).toHaveBeenCalled();
-    expect(recovery).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ source: "mutation-executor", error: chunk }));
+    expect(recovery).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({ source: "mutation-executor", error: chunk }),
+    );
   } finally {
     recover.mockRestore();
     if (priorWindow) {

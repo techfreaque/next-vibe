@@ -202,8 +202,7 @@ export const translations: typeof enTranslations = {
     },
     column3: {
       label: "Kolumna 3: Ewaluatory",
-      description:
-        "Warunki progowe. Każdy zwraca sygnał: wystrzelony lub nie.",
+      description: "Warunki progowe. Każdy zwraca sygnał: wystrzelony lub nie.",
       nodes: {
         leadDrop: {
           name: "eval_lead_drop",

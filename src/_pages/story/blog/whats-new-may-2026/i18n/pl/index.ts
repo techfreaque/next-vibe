@@ -19,7 +19,7 @@ export const translations: typeof enTranslations = {
     subtitle:
       "Trzy systemy, które zamieniają historię czatu w coś, co naprawdę zostaje. Do tego generowanie mediów, poprawki błędów i szczery raport z tego, gdzie jesteśmy.",
     quote:
-      "\"Pamiętam teraz to, co jest dla ciebie ważne. Nie dlatego, że zapisałam log: dlatego, że zrozumiałam.\": Thea",
+      '"Pamiętam teraz to, co jest dla ciebie ważne. Nie dlatego, że zapisałam log: dlatego, że zrozumiałam.": Thea',
   },
 
   honest: {

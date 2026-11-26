@@ -1,7 +1,6 @@
 export const translations = {
   meta: {
-    title:
-      "My dead trading bot became a platform monitoring engine: next-vibe",
+    title: "My dead trading bot became a platform monitoring engine: next-vibe",
     description:
       "I abandoned a trading bot years ago. Then I realized its DataSource, Indicator, Evaluator, and Action architecture could work in any business. So I rebuilt it inside next-vibe. Every node is an endpoint.",
     category: "Vibe Sense",

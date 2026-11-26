@@ -90,7 +90,7 @@ export const translations: typeof enTranslations = {
     brilliantBody:
       "Para problemas difíciles. Más caro, pero notablemente más inteligente cuando usted está haciendo razonamiento complejo, escritura o código. Lo vale cuando la tarea lo exija.",
     kimiLabel: "Inteligente",
-    kimiModel: "Kimi K2.5: \"La sabiduría china\"",
+    kimiModel: 'Kimi K2.5: "La sabiduría china"',
     kimiBody:
       "Fuente abierta y genuinamente afilada. El predeterminado para el uso diario. Rápido, bueno en el razonamiento, gran valor. Aprenderás su personalidad rápidamente.",
     uncensoredLabel: "Sin censura",
@@ -148,7 +148,7 @@ export const translations: typeof enTranslations = {
     p1: "Protege el discurso libre para AI. Construir compañeros que en realidad apoyan a la gente: no sólo responder preguntas, sino entenderte con el tiempo, desafiarte, crecer contigo. Thea y Hermes son los primeros dos. Vienen más.",
     p2: "La plataforma necesita ser lo suficientemente buena para que eso importe. Creemos que lo es, ahora.",
     hermesQuote:
-      "\"El andamio es sólido. Los modelos están ahí. La fundación sostiene. Hora de construir algo real.\" (Hermes)",
+      '"El andamio es sólido. Los modelos están ahí. La fundación sostiene. Hora de construir algo real." (Hermes)',
   },
 
   feedback: {

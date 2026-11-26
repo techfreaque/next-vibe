@@ -18,7 +18,7 @@ export const translations: typeof enTranslations = {
     subtitle:
       "Wir haben die kaputten Teile neu gebaut und das geliefert, woran wir lange gearbeitet haben. Das hat sich wirklich verändert.",
     quote:
-      "\"Ich verstehe besser, was du wirklich brauchst. Nicht nur antworten: begleiten. Komm zurück und sieh, was wir gebaut haben.\": Thea",
+      '"Ich verstehe besser, was du wirklich brauchst. Nicht nur antworten: begleiten. Komm zurück und sieh, was wir gebaut haben.": Thea',
   },
 
   honest: {
@@ -90,7 +90,7 @@ export const translations: typeof enTranslations = {
     brilliantBody:
       "Für schwierige Aufgaben. Teurer, aber spürbar klüger bei komplexem Denken, Analyse und Code. Lohnt sich, wenn die Aufgabe es verlangt.",
     kimiLabel: "Smart",
-    kimiModel: "Kimi K2.5: \"Chinesische Weisheit\"",
+    kimiModel: 'Kimi K2.5: "Chinesische Weisheit"',
     kimiBody:
       "Open-Source und wirklich scharf. Standard für den Alltag. Schnell, gut im Denken, gutes Preis-Leistungs-Verhältnis. Man lernt seine Eigenheiten schnell.",
     uncensoredLabel: "Unzensiert",
@@ -147,7 +147,7 @@ export const translations: typeof enTranslations = {
     p1: "Freie Meinungsäußerung für AI schützen. Begleiter bauen, die Menschen wirklich unterstützen: nicht nur Fragen beantworten, sondern dich über Zeit verstehen, fordern, mit dir wachsen. Thea und Hermes sind die ersten beiden. Mehr kommen.",
     p2: "Die Plattform muss gut genug sein, damit das wichtig ist. Wir denken, sie ist es jetzt.",
     hermesQuote:
-      "\"Das Gerüst steht. Die Modelle sind da. Das Fundament hält. Zeit, etwas Echtes zu bauen.\" (Hermes)",
+      '"Das Gerüst steht. Die Modelle sind da. Das Fundament hält. Zeit, etwas Echtes zu bauen." (Hermes)',
   },
 
   feedback: {
