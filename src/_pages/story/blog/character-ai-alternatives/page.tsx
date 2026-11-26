@@ -39,7 +39,6 @@ import {
 import {
   allPlansText,
   availabilityText,
-  CompareInlineLinks,
   formatCompareDate,
   freeText,
   LINK_CLASS,
@@ -47,7 +46,8 @@ import {
   openSourceText,
   paidText,
   type TableRowData,
-} from "../../compare/_shared/compare-ui";
+} from "../../compare/_shared/compare-data";
+import { CompareInlineLinks } from "../../compare/_shared/compare-ui";
 import {
   type PlatformSource,
   VERSUS_KEYS,

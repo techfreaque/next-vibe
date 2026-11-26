@@ -44,11 +44,11 @@ import {
 import { Callout, CardLink, Cta } from "../../_shared/marketing";
 import {
   allPlansText,
-  CompareInlineLinks,
   formatCompareDate,
   freeText,
   LINK_CLASS,
-} from "../../compare/_shared/compare-ui";
+} from "../../compare/_shared/compare-data";
+import { CompareInlineLinks } from "../../compare/_shared/compare-ui";
 import {
   COMPARE_CHECKED_DATE,
   isVersusKey,

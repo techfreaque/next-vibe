@@ -32,11 +32,11 @@ import {
 import { CardLink, Cta } from "../../_shared/marketing";
 import {
   allPlansText,
-  CompareInlineLinks,
   formatCompareDate,
   LINK_CLASS,
   planText,
-} from "../../compare/_shared/compare-ui";
+} from "../../compare/_shared/compare-data";
+import { CompareInlineLinks } from "../../compare/_shared/compare-ui";
 import {
   PLATFORMS,
   type PlatformSource,

@@ -42,12 +42,14 @@ import {
 } from "../../_shared/article";
 import { Callout, CardLink, Cta } from "../../_shared/marketing";
 import {
-  CompareInlineLinks,
-  CompareTable,
   formatCompareDate,
   LINK_CLASS,
   platformRow,
   usRow,
+} from "../../compare/_shared/compare-data";
+import {
+  CompareInlineLinks,
+  CompareTable,
 } from "../../compare/_shared/compare-ui";
 import {
   COMPARE_LATEST_CHECK_DATE,

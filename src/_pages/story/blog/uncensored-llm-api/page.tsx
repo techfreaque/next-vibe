@@ -49,7 +49,7 @@ import {
 } from "../../_shared/article";
 import { ArticleCode } from "../../_shared/article-code";
 import { Callout, CardLink, Cta } from "../../_shared/marketing";
-import { LINK_CLASS } from "../../compare/_shared/compare-ui";
+import { LINK_CLASS } from "../../compare/_shared/compare-data";
 import {
   isVersusKey,
   type PlatformKey,

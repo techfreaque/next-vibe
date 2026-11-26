@@ -39,10 +39,12 @@ import {
 import { CardLink, Cta } from "../../_shared/marketing";
 import {
   allPlansText,
-  CompareInlineLinks,
   formatCompareDate,
   freeText,
   LINK_CLASS,
+} from "../../compare/_shared/compare-data";
+import {
+  CompareInlineLinks,
   SourceList,
 } from "../../compare/_shared/compare-ui";
 import {

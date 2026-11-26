@@ -44,16 +44,14 @@ import {
   allPlansText,
   apiText,
   buildCompareArticle,
-  CompareLinks,
-  CompareTable,
   formatCompareDate,
   LINK_CLASS,
   mediaText,
   openSourceText,
   platformRow,
-  SourceList,
   usRow,
-} from "../_shared/compare-ui";
+} from "../_shared/compare-data";
+import { CompareLinks, CompareTable, SourceList } from "../_shared/compare-ui";
 import {
   ABLITERATION_SOURCES,
   COMPARE_HUB_PATH,

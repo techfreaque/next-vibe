@@ -21,14 +21,16 @@ import {
 } from "../../_shared/article";
 import { CardLink, Cta } from "../../_shared/marketing";
 import {
-  CompareInlineLinks,
-  CompareTable,
   formatCompareDate,
   formatUsd,
   LINK_CLASS,
-  SourceList,
   type TableRowData,
   usRow,
+} from "../../compare/_shared/compare-data";
+import {
+  CompareInlineLinks,
+  CompareTable,
+  SourceList,
 } from "../../compare/_shared/compare-ui";
 import { versusPath } from "../../compare/_shared/platforms";
 import type { UsParams } from "../../compare/_shared/us-facts";

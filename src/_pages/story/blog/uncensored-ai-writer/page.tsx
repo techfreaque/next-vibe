@@ -44,10 +44,8 @@ import {
   Step,
   StepList,
 } from "../../_shared/marketing";
-import {
-  CompareInlineLinks,
-  LINK_CLASS,
-} from "../../compare/_shared/compare-ui";
+import { LINK_CLASS } from "../../compare/_shared/compare-data";
+import { CompareInlineLinks } from "../../compare/_shared/compare-ui";
 import type { UsParams } from "../../compare/_shared/us-facts";
 import {
   type ComparePair,

@@ -42,7 +42,7 @@ import {
   Step,
   StepList,
 } from "../../_shared/marketing";
-import { LINK_CLASS } from "../../compare/_shared/compare-ui";
+import { LINK_CLASS } from "../../compare/_shared/compare-data";
 import type { UsParams } from "../../compare/_shared/us-facts";
 import { UncensoredModelTable, type UncensoredRow } from "../uncensored-rows";
 import { loadCheapestRowsByTier } from "../uncensored-rows-data";

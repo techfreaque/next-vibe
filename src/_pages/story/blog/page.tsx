@@ -26,7 +26,7 @@ import {
   buildItemList,
 } from "../../_components/structured-data";
 import { CONTAINER, Cta, CtaBand, PageHero } from "../_shared/marketing";
-import { formatCompareDate } from "../compare/_shared/compare-ui";
+import { formatCompareDate } from "../compare/_shared/compare-data";
 import {
   COMPARE_CHECKED_DATE,
   COMPARE_HUB_PATH,

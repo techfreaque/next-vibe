@@ -43,7 +43,7 @@ import {
   Step,
   StepList,
 } from "../../_shared/marketing";
-import { LINK_CLASS } from "../../compare/_shared/compare-ui";
+import { LINK_CLASS } from "../../compare/_shared/compare-data";
 import { ABLITERATION_SOURCES } from "../../compare/_shared/platforms";
 import type { UsParams } from "../../compare/_shared/us-facts";
 import {

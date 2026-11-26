@@ -44,13 +44,12 @@ import {
   allPlansText,
   apiText,
   buildCompareArticle,
-  CompareLinks,
   formatCompareDate,
   freeText,
   mediaText,
   openSourceText,
-  SourceList,
-} from "./compare-ui";
+} from "./compare-data";
+import { CompareLinks, SourceList } from "./compare-ui";
 import {
   COMPARE_HUB_PATH,
   platformCheckedDate,

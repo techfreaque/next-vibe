@@ -6,13 +6,13 @@ import { ArticleP, ArticleSection } from "../../_shared/article";
 import { CardLink } from "../../_shared/marketing";
 import {
   type CompareT,
-  CompareTable,
   formatCompareDate,
   planText,
   platformRow,
   type TableRowData,
   usRow,
-} from "../../compare/_shared/compare-ui";
+} from "../../compare/_shared/compare-data";
+import { CompareTable } from "../../compare/_shared/compare-ui";
 import {
   COMPARE_HUB_PATH,
   type PlatformKey,
