@@ -248617,7 +248617,7 @@
           "type": "form_field",
           "fieldType": "entity_picker",
           "labelField": "billNumber",
-          "label": "Rechnungs-ID",
+          "label": "Rechnung",
           "description": "Die zu bezahlende Rechnung",
           "hidden": true,
           "schema": {
@@ -248638,8 +248638,8 @@
         "accountNodeId": {
           "type": "form_field",
           "fieldType": "entity_picker",
-          "label": "Bank- / Kassenkonto",
-          "description": "Konto, von dem die Zahlung erfolgt (Bank oder Kasse)",
+          "label": "Bank- oder Kassenkonto",
+          "description": "Ohne Auswahl wird das Standardkonto für Zahlungen verwendet.",
           "columns": 6,
           "schema": {
             "def": {
@@ -250101,10 +250101,11 @@
         },
         "expenseAccountId": {
           "type": "form_field",
-          "fieldType": "uuid",
+          "fieldType": "entity_picker",
+          "labelField": "name",
           "label": "Aufwandskonto",
           "description": "Auf welches Aufwandskonto diese Position gebucht wird",
-          "placeholder": "Konto-UUID",
+          "placeholder": "Aufwandskonto auswählen",
           "columns": 12,
           "schema": {
             "def": {
@@ -283527,6 +283528,7 @@
           "schemaType": "primitive"
         },
         "input": {
+          "schemaType": "object-optional",
           "type": "container",
           "layoutType": "grid_2_columns",
           "usage": {
@@ -283611,8 +283613,7 @@
               },
               "schemaType": "primitive"
             }
-          },
-          "schemaType": "object"
+          }
         },
         "page": {
           "type": "form_field",

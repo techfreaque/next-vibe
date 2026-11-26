@@ -5830,7 +5830,7 @@ export const endpointsMeta: EndpointMeta[] = [
     allowedRoles: ["enums.userRole.admin"],
     aliases: [],
     title: "Prijať zásoby",
-    titleShort: "Stav príjmu",
+    titleShort: "Prijať zásoby",
     description:
       "Zaznamenať príjem zásob. Prepočíta sa množstvo na sklade aj vážená priemerná obstarávacia cena.",
     icon: "package",

@@ -52081,7 +52081,7 @@
   },
   {
     "toolName": "coa-account-list",
-    "title": "Chart of Accounts",
+    "title": "Chart of accounts",
     "titleShort": "Accounts",
     "description": "Full account tree for a company with hierarchical structure",
     "fields": {
@@ -52496,7 +52496,7 @@
         "pageSize": {
           "type": "form_field",
           "fieldType": "number",
-          "label": "Per Page",
+          "label": "Per page",
           "description": "Accounts per page (max 200)",
           "columns": 6,
           "schema": {
@@ -52976,7 +52976,7 @@
   },
   {
     "toolName": "accounting-dashboard",
-    "title": "Accounting Dashboard",
+    "title": "Accounting dashboard",
     "titleShort": "Dashboard",
     "description": "See outstanding balances, cash, profit and the current accounting period.",
     "fields": {
@@ -56345,8 +56345,8 @@
   },
   {
     "toolName": "coa-period-close",
-    "title": "Close Period",
-    "titleShort": "Close Period",
+    "title": "Close period",
+    "titleShort": "Close period",
     "description": "Close an accounting period. Requires no DRAFT journal entries in the period.",
     "fields": {
       "usage": {
@@ -66967,8 +66967,8 @@
   },
   {
     "toolName": "companies_companyId_members_memberId_remove_POST",
-    "title": "Remove Member",
-    "titleShort": "Remove Member",
+    "title": "Remove member",
+    "titleShort": "Remove member",
     "description": "Remove a member from the company. Cannot remove the last Owner.",
     "fields": {
       "usage": {
@@ -67051,8 +67051,8 @@
   },
   {
     "toolName": "companies_companyId_members_memberId_update-role_PATCH",
-    "title": "Update Member Role",
-    "titleShort": "Update Role",
+    "title": "Update member role",
+    "titleShort": "Update role",
     "description": "Change a member's role. Owner only.",
     "fields": {
       "usage": {
@@ -67106,7 +67106,7 @@
         "role": {
           "type": "form_field",
           "fieldType": "select",
-          "label": "New Role",
+          "label": "New role",
           "description": "Role to assign to this member",
           "placeholder": "Select role",
           "options": [
@@ -67497,8 +67497,8 @@
   },
   {
     "toolName": "company-members-list",
-    "title": "Team Members",
-    "titleShort": "Team Members",
+    "title": "Team members",
+    "titleShort": "Team members",
     "description": "List all members of this company",
     "fields": {
       "usage": {
@@ -68122,8 +68122,8 @@
   },
   {
     "toolName": "companies_companyId_update_PATCH",
-    "title": "Update Company",
-    "titleShort": "Update Company",
+    "title": "Update company",
+    "titleShort": "Update company",
     "description": "Edit company details. Requires Admin or Owner role.",
     "fields": {
       "usage": {
@@ -68163,7 +68163,7 @@
             "name": {
               "type": "form_field",
               "fieldType": "text",
-              "label": "Company Name",
+              "label": "Company name",
               "description": "Legal name of the company",
               "placeholder": "Acme GmbH",
               "schema": {
@@ -68187,7 +68187,7 @@
             "type": {
               "type": "form_field",
               "fieldType": "select",
-              "label": "Company Type",
+              "label": "Company type",
               "description": "Business model",
               "placeholder": "Select type",
               "options": [
@@ -68239,7 +68239,7 @@
             "vatNumber": {
               "type": "form_field",
               "fieldType": "text",
-              "label": "VAT Number",
+              "label": "VAT number",
               "description": "VAT identification number",
               "placeholder": "DE123456789",
               "schema": {
@@ -68287,7 +68287,7 @@
             "currency": {
               "type": "form_field",
               "fieldType": "text",
-              "label": "Default Currency",
+              "label": "Default currency",
               "description": "Primary invoicing currency",
               "placeholder": "EUR",
               "schema": {
@@ -68311,7 +68311,7 @@
             "email": {
               "type": "form_field",
               "fieldType": "email",
-              "label": "Company Email",
+              "label": "Company email",
               "description": "Primary business email",
               "placeholder": "contact@company.com",
               "schema": {
@@ -68444,7 +68444,7 @@
             "phone": {
               "type": "form_field",
               "fieldType": "tel",
-              "label": "Company Phone",
+              "label": "Company phone",
               "description": "Primary business phone",
               "placeholder": "+43 1 234 5678",
               "schema": {
@@ -73467,7 +73467,7 @@
   },
   {
     "toolName": "anti-farming-report",
-    "title": "Free Credit Farming Report",
+    "title": "Free credit farming report",
     "titleShort": "Farming report",
     "description": "Who is farming free credits. Top subnets by blocked attempts and by free pools claimed, top email domains among duplicate and disposable signups, and the active limits.",
     "fields": {
@@ -248617,7 +248617,7 @@
           "type": "form_field",
           "fieldType": "entity_picker",
           "labelField": "billNumber",
-          "label": "Bill ID",
+          "label": "Bill",
           "description": "The bill to mark as paid",
           "hidden": true,
           "schema": {
@@ -248638,8 +248638,8 @@
         "accountNodeId": {
           "type": "form_field",
           "fieldType": "entity_picker",
-          "label": "Bank / Cash Account",
-          "description": "Account node used to pay (Bank or Cash)",
+          "label": "Bank or cash account",
+          "description": "Leave blank to use the default payment account.",
           "columns": 6,
           "schema": {
             "def": {
@@ -250101,10 +250101,11 @@
         },
         "expenseAccountId": {
           "type": "form_field",
-          "fieldType": "uuid",
+          "fieldType": "entity_picker",
+          "labelField": "name",
           "label": "Expense account",
           "description": "Which expense account this posts to",
-          "placeholder": "Account UUID",
+          "placeholder": "Select expense account",
           "columns": 12,
           "schema": {
             "def": {
@@ -270241,7 +270242,7 @@
   },
   {
     "toolName": "payment-invoice-get",
-    "title": "Get Invoice",
+    "title": "Get invoice",
     "titleShort": "Invoice details",
     "description": "Retrieve a single invoice with all its line items",
     "fields": {
@@ -270454,7 +270455,7 @@
         },
         "invoiceSequenceNumber": {
           "type": "text",
-          "label": "Invoice Number",
+          "label": "Invoice number",
           "schema": {
             "def": {
               "type": "nullable",
@@ -270594,7 +270595,7 @@
         },
         "dueDate": {
           "type": "text",
-          "label": "Due Date",
+          "label": "Due date",
           "schema": {
             "def": {
               "type": "nullable",
@@ -270730,7 +270731,7 @@
         },
         "paidAt": {
           "type": "text",
-          "label": "Paid At",
+          "label": "Paid at",
           "schema": {
             "def": {
               "type": "nullable",
@@ -270886,7 +270887,7 @@
         },
         "journalEntryId": {
           "type": "text",
-          "label": "Journal Entry ID",
+          "label": "Journal entry ID",
           "schema": {
             "def": {
               "type": "nullable",
@@ -271078,7 +271079,7 @@
         },
         "createdAt": {
           "type": "text",
-          "label": "Created At",
+          "label": "Created at",
           "schema": {
             "def": {
               "type": "pipe",
@@ -271208,7 +271209,7 @@
         },
         "updatedAt": {
           "type": "text",
-          "label": "Updated At",
+          "label": "Updated at",
           "schema": {
             "def": {
               "type": "pipe",
@@ -271366,7 +271367,7 @@
               },
               "entryNumber": {
                 "type": "text",
-                "label": "Journal Entry",
+                "label": "Journal entry",
                 "schema": {
                   "def": {
                     "type": "string"
@@ -271696,7 +271697,7 @@
               },
               "reversalEntryNumber": {
                 "type": "text",
-                "label": "Journal Entry",
+                "label": "Journal entry",
                 "schema": {
                   "def": {
                     "type": "nullable",
@@ -271939,7 +271940,7 @@
               },
               "unitPrice": {
                 "type": "text",
-                "label": "Unit Price",
+                "label": "Unit price",
                 "schema": {
                   "def": {
                     "type": "number",
@@ -271955,7 +271956,7 @@
               },
               "taxRate": {
                 "type": "text",
-                "label": "Tax Rate",
+                "label": "Tax rate",
                 "schema": {
                   "def": {
                     "type": "nullable",
@@ -271977,7 +271978,7 @@
               },
               "taxAmount": {
                 "type": "text",
-                "label": "Tax Amount",
+                "label": "Tax amount",
                 "schema": {
                   "def": {
                     "type": "number",
@@ -271993,7 +271994,7 @@
               },
               "lineTotal": {
                 "type": "text",
-                "label": "Line Total",
+                "label": "Line total",
                 "schema": {
                   "def": {
                     "type": "number",
@@ -272009,7 +272010,7 @@
               },
               "sortOrder": {
                 "type": "text",
-                "label": "Sort Order",
+                "label": "Sort order",
                 "schema": {
                   "def": {
                     "type": "nullable",
@@ -272031,7 +272032,7 @@
               },
               "createdAt": {
                 "type": "text",
-                "label": "Line Created At",
+                "label": "Line created at",
                 "schema": {
                   "def": {
                     "type": "pipe",
@@ -272161,7 +272162,7 @@
               },
               "updatedAt": {
                 "type": "text",
-                "label": "Line Updated At",
+                "label": "Line updated at",
                 "schema": {
                   "def": {
                     "type": "pipe",
@@ -279138,8 +279139,8 @@
   },
   {
     "toolName": "pos-dashboard",
-    "title": "POS Dashboard",
-    "titleShort": "POS Dashboard",
+    "title": "POS dashboard",
+    "titleShort": "POS dashboard",
     "description": "Overview of terminals, active sessions, and today's sales.",
     "fields": {
       "usage": {
@@ -280298,8 +280299,8 @@
   },
   {
     "toolName": "pos_order_orderId_add-item_POST",
-    "title": "Add Item",
-    "titleShort": "Add Item",
+    "title": "Add item",
+    "titleShort": "Add item",
     "description": "Add a line item to an open order.",
     "fields": {
       "usage": {
@@ -280419,7 +280420,7 @@
             "unitPrice": {
               "type": "form_field",
               "fieldType": "number",
-              "label": "Unit Price",
+              "label": "Unit price",
               "description": "Price per unit",
               "placeholder": "3.50",
               "schema": {
@@ -280444,7 +280445,7 @@
             "taxRate": {
               "type": "form_field",
               "fieldType": "number",
-              "label": "Tax Rate",
+              "label": "Tax rate",
               "description": "Tax rate as decimal (e.g. 0.2 for 20%)",
               "placeholder": "0.20",
               "schema": {
@@ -280647,8 +280648,8 @@
   },
   {
     "toolName": "pos_order_orderId_add-payment_POST",
-    "title": "Add Payment",
-    "titleShort": "Add Payment",
+    "title": "Add payment",
+    "titleShort": "Add payment",
     "description": "Record a payment against an open order.",
     "fields": {
       "usage": {
@@ -280708,7 +280709,7 @@
             "method": {
               "type": "form_field",
               "fieldType": "select",
-              "label": "Payment Method",
+              "label": "Payment method",
               "description": "How the customer pays",
               "placeholder": "Select method",
               "options": [
@@ -280828,7 +280829,7 @@
             "accountNodeId": {
               "type": "form_field",
               "fieldType": "text",
-              "label": "Account Node",
+              "label": "Account node",
               "description": "Receiving account node (overrides terminal default)",
               "schema": {
                 "def": {
@@ -280993,8 +280994,8 @@
   },
   {
     "toolName": "pos_order_orderId_complete_POST",
-    "title": "Complete Order",
-    "titleShort": "Complete Order",
+    "title": "Complete order",
+    "titleShort": "Complete order",
     "description": "Complete an order. Validates full payment and posts journal entry.",
     "fields": {
       "usage": {
@@ -281162,8 +281163,8 @@
   },
   {
     "toolName": "pos-order-get",
-    "title": "Get Order",
-    "titleShort": "Order Details",
+    "title": "Get order",
+    "titleShort": "Order details",
     "description": "Retrieve a single order with its items and payments.",
     "fields": {
       "usage": {
@@ -282819,8 +282820,8 @@
   },
   {
     "toolName": "pos_order_orderId_remove-item_POST",
-    "title": "Remove Item",
-    "titleShort": "Remove Item",
+    "title": "Remove item",
+    "titleShort": "Remove item",
     "description": "Remove a line item from an open order.",
     "fields": {
       "usage": {
@@ -283175,8 +283176,8 @@
   },
   {
     "toolName": "pos_order_orderId_void_POST",
-    "title": "Void Order",
-    "titleShort": "Void Order",
+    "title": "Void order",
+    "titleShort": "Void order",
     "description": "Void an open order. Cannot be undone.",
     "fields": {
       "usage": {
@@ -283284,8 +283285,8 @@
   },
   {
     "toolName": "pos_order_create_POST",
-    "title": "Create Order",
-    "titleShort": "Create Order",
+    "title": "Create order",
+    "titleShort": "Create order",
     "description": "Create a new order in an open session.",
     "fields": {
       "usage": {
@@ -283527,6 +283528,7 @@
           "schemaType": "primitive"
         },
         "input": {
+          "schemaType": "object-optional",
           "type": "container",
           "layoutType": "grid_2_columns",
           "usage": {
@@ -283611,8 +283613,7 @@
               },
               "schemaType": "primitive"
             }
-          },
-          "schemaType": "object"
+          }
         },
         "page": {
           "type": "form_field",
@@ -283653,7 +283654,7 @@
         "pageSize": {
           "type": "form_field",
           "fieldType": "number",
-          "label": "Per Page",
+          "label": "Per page",
           "description": "Results per page (max 100)",
           "schema": {
             "def": {
@@ -284879,8 +284880,8 @@
   },
   {
     "toolName": "pos_session_close_POST",
-    "title": "Close Session",
-    "titleShort": "Close Session",
+    "title": "Close till",
+    "titleShort": "Close till",
     "description": "Close a cashier session and record the closing float.",
     "fields": {
       "usage": {
@@ -285038,7 +285039,7 @@
             },
             "closedAt": {
               "type": "text",
-              "label": "Closed At",
+              "label": "Closed at",
               "fieldType": "datetime",
               "schema": {
                 "def": {
@@ -285060,7 +285061,7 @@
             },
             "closingFloat": {
               "type": "text",
-              "label": "Closing Float",
+              "label": "Closing float",
               "schema": {
                 "def": {
                   "type": "nullable",
@@ -285082,7 +285083,7 @@
             },
             "expectedFloat": {
               "type": "text",
-              "label": "Expected Float",
+              "label": "Expected float",
               "schema": {
                 "def": {
                   "type": "number",
@@ -285098,7 +285099,7 @@
             },
             "cashSalesTotal": {
               "type": "text",
-              "label": "Cash Sales",
+              "label": "Cash sales",
               "schema": {
                 "def": {
                   "type": "number",
@@ -285114,7 +285115,7 @@
             },
             "cashRefundsTotal": {
               "type": "text",
-              "label": "Cash Refunds",
+              "label": "Cash refunds",
               "schema": {
                 "def": {
                   "type": "number",
@@ -285130,7 +285131,7 @@
             },
             "openingFloat": {
               "type": "text",
-              "label": "Opening Float",
+              "label": "Opening float",
               "schema": {
                 "def": {
                   "type": "number",
@@ -285162,7 +285163,7 @@
             },
             "orderCount": {
               "type": "text",
-              "label": "Order Count",
+              "label": "Order count",
               "schema": {
                 "def": {
                   "type": "number",

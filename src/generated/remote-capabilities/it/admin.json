@@ -248604,9 +248604,9 @@
   },
   {
     "toolName": "payment_bill_billId_pay_POST",
-    "title": "Paga Bill",
-    "titleShort": "Paga Bill",
-    "description": "Contrassegnare una fattura approvata come pagato e postare l'ingresso della rivista di pagamento",
+    "title": "Paga fattura",
+    "titleShort": "Paga fattura",
+    "description": "Segna una fattura approvata come pagata e contabilizza il pagamento.",
     "fields": {
       "usage": {
         "request": "data&urlPathParams",
@@ -248617,8 +248617,8 @@
           "type": "form_field",
           "fieldType": "entity_picker",
           "labelField": "billNumber",
-          "label": "Bill ID",
-          "description": "Il disegno di legge per contrassegnare come pagato",
+          "label": "Fattura",
+          "description": "La fattura da segnare come pagata.",
           "hidden": true,
           "schema": {
             "def": {
@@ -248638,8 +248638,8 @@
         "accountNodeId": {
           "type": "form_field",
           "fieldType": "entity_picker",
-          "label": "Banca / Conto Contanti",
-          "description": "Nodo conto usato per pagare (Bank o Cash)",
+          "label": "Conto bancario o di cassa",
+          "description": "Lascia il campo vuoto per usare il conto di pagamento predefinito.",
           "columns": 6,
           "schema": {
             "def": {
@@ -248869,7 +248869,7 @@
         },
         "paidAtResponse": {
           "type": "text",
-          "label": "Pagato a",
+          "label": "Data di pagamento",
           "schema": {
             "def": {
               "type": "nullable",
@@ -248896,7 +248896,7 @@
     "isAsync": true,
     "instanceId": "local",
     "category": "payments",
-    "tags": ["pagamento", "fatturazione", "contabilità-pagabile"],
+    "tags": ["pagamento", "fattura-fornitore", "debiti-verso-fornitori"],
     "credits": 0
   },
   {
@@ -250101,10 +250101,11 @@
         },
         "expenseAccountId": {
           "type": "form_field",
-          "fieldType": "uuid",
-          "label": "Conto passivo",
-          "description": "Che spese conto questo post a",
-          "placeholder": "Account UUID",
+          "fieldType": "entity_picker",
+          "labelField": "name",
+          "label": "Conto di costo",
+          "description": "Conto di costo su cui registrare questa riga",
+          "placeholder": "Seleziona conto di costo",
           "columns": 12,
           "schema": {
             "def": {
@@ -283527,6 +283528,7 @@
           "schemaType": "primitive"
         },
         "input": {
+          "schemaType": "object-optional",
           "type": "container",
           "layoutType": "grid_2_columns",
           "usage": {
@@ -283611,8 +283613,7 @@
               },
               "schemaType": "primitive"
             }
-          },
-          "schemaType": "object"
+          }
         },
         "page": {
           "type": "form_field",

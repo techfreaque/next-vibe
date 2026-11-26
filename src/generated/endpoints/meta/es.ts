@@ -13196,14 +13196,14 @@ export const endpointsMeta: EndpointMeta[] = [
     path: ["payment", "bill", "[billId]", "pay"],
     allowedRoles: ["enums.userRole.admin"],
     aliases: [],
-    title: "Pago",
-    titleShort: "Pago",
+    title: "Pagar factura",
+    titleShort: "Pagar factura",
     description:
-      "Marcar una factura aprobada como pago y publicar la entrada de la revista de pago",
+      "Marca una factura aprobada como pagada y contabiliza el pago.",
     icon: "credit-card",
     category: "payments",
     subCategory: "Transactions",
-    tags: ["pago", "factura", "cuentas pagaderas"],
+    tags: ["pago", "factura", "cuentas por pagar"],
     examples: {
       inputs: {
         default: {

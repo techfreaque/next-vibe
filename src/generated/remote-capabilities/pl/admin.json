@@ -248617,7 +248617,7 @@
           "type": "form_field",
           "fieldType": "entity_picker",
           "labelField": "billNumber",
-          "label": "ID faktury",
+          "label": "Faktura",
           "description": "Faktura do opłacenia",
           "hidden": true,
           "schema": {
@@ -248638,8 +248638,8 @@
         "accountNodeId": {
           "type": "form_field",
           "fieldType": "entity_picker",
-          "label": "Konto bankowe / kasowe",
-          "description": "Konto użyte do zapłaty (bank lub kasa)",
+          "label": "Konto bankowe lub kasowe",
+          "description": "Zostaw to pole puste, aby użyć domyślnego konta płatności.",
           "columns": 6,
           "schema": {
             "def": {
@@ -250101,10 +250101,11 @@
         },
         "expenseAccountId": {
           "type": "form_field",
-          "fieldType": "uuid",
+          "fieldType": "entity_picker",
+          "labelField": "name",
           "label": "Konto kosztowe",
           "description": "Na jakie konto kosztowe ta pozycja zostanie zaksięgowana",
-          "placeholder": "UUID konta",
+          "placeholder": "Wybierz konto kosztowe",
           "columns": 12,
           "schema": {
             "def": {
@@ -283527,6 +283528,7 @@
           "schemaType": "primitive"
         },
         "input": {
+          "schemaType": "object-optional",
           "type": "container",
           "layoutType": "grid_2_columns",
           "usage": {
@@ -283611,8 +283613,7 @@
               },
               "schemaType": "primitive"
             }
-          },
-          "schemaType": "object"
+          }
         },
         "page": {
           "type": "form_field",

@@ -115320,7 +115320,7 @@
             },
             "quantityOnHand": {
               "type": "text",
-              "label": "Nové na dosah",
+              "label": "Nové množstvo na sklade",
               "schema": {
                 "def": {
                   "type": "number",
@@ -115801,7 +115801,7 @@
   {
     "toolName": "inventory_stock_receive_POST",
     "title": "Prijať zásoby",
-    "titleShort": "Stav príjmu",
+    "titleShort": "Prijať zásoby",
     "description": "Zaznamenať príjem zásob. Prepočíta sa množstvo na sklade aj vážená priemerná obstarávacia cena.",
     "fields": {
       "usage": {
@@ -115980,7 +115980,7 @@
             },
             "quantityOnHand": {
               "type": "text",
-              "label": "Nové na dosah",
+              "label": "Nové množstvo na sklade",
               "schema": {
                 "def": {
                   "type": "number",
@@ -248617,8 +248617,8 @@
           "type": "form_field",
           "fieldType": "entity_picker",
           "labelField": "billNumber",
-          "label": "ID dodávateľskej faktúry",
-          "description": "Prijatá faktúra na označenie ako uhradená",
+          "label": "Prijatá faktúra",
+          "description": "Faktúra, ktorú chcete označiť ako uhradenú.",
           "hidden": true,
           "schema": {
             "def": {
@@ -248639,7 +248639,7 @@
           "type": "form_field",
           "fieldType": "entity_picker",
           "label": "Bankový alebo pokladničný účet",
-          "description": "Bankový alebo pokladničný účet použitý na úhradu",
+          "description": "Ak pole necháte prázdne, použije sa predvolený účet na úhrady.",
           "columns": 6,
           "schema": {
             "def": {
@@ -250101,10 +250101,11 @@
         },
         "expenseAccountId": {
           "type": "form_field",
-          "fieldType": "uuid",
+          "fieldType": "entity_picker",
+          "labelField": "name",
           "label": "Nákladový účet",
           "description": "Nákladový účet, na ktorý sa položka zaúčtuje",
-          "placeholder": "UUID účtu",
+          "placeholder": "Vybrať nákladový účet",
           "columns": 12,
           "schema": {
             "def": {
@@ -283527,6 +283528,7 @@
           "schemaType": "primitive"
         },
         "input": {
+          "schemaType": "object-optional",
           "type": "container",
           "layoutType": "grid_2_columns",
           "usage": {
@@ -283611,8 +283613,7 @@
               },
               "schemaType": "primitive"
             }
-          },
-          "schemaType": "object"
+          }
         },
         "page": {
           "type": "form_field",

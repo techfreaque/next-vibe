@@ -248623,7 +248623,7 @@
           "type": "form_field",
           "fieldType": "entity_picker",
           "labelField": "billNumber",
-          "label": "ID de la facture",
+          "label": "Facture",
           "description": "La facture à marquer comme payée",
           "hidden": true,
           "schema": {
@@ -248644,8 +248644,8 @@
         "accountNodeId": {
           "type": "form_field",
           "fieldType": "entity_picker",
-          "label": "Compte banque / caisse",
-          "description": "Compte utilisé pour le paiement (banque ou caisse)",
+          "label": "Compte bancaire ou de caisse",
+          "description": "Laissez ce champ vide pour utiliser le compte de règlement par défaut.",
           "columns": 6,
           "schema": {
             "def": {
@@ -250107,10 +250107,11 @@
         },
         "expenseAccountId": {
           "type": "form_field",
-          "fieldType": "uuid",
+          "fieldType": "entity_picker",
+          "labelField": "name",
           "label": "Compte de charges",
           "description": "Compte de charges sur lequel imputer cette ligne",
-          "placeholder": "UUID du compte",
+          "placeholder": "Sélectionner un compte de charges",
           "columns": 12,
           "schema": {
             "def": {
@@ -283533,6 +283534,7 @@
           "schemaType": "primitive"
         },
         "input": {
+          "schemaType": "object-optional",
           "type": "container",
           "layoutType": "grid_2_columns",
           "usage": {
@@ -283617,8 +283619,7 @@
               },
               "schemaType": "primitive"
             }
-          },
-          "schemaType": "object"
+          }
         },
         "page": {
           "type": "form_field",

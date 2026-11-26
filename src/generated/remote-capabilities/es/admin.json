@@ -248604,9 +248604,9 @@
   },
   {
     "toolName": "payment_bill_billId_pay_POST",
-    "title": "Pago",
-    "titleShort": "Pago",
-    "description": "Marcar una factura aprobada como pago y publicar la entrada de la revista de pago",
+    "title": "Pagar factura",
+    "titleShort": "Pagar factura",
+    "description": "Marca una factura aprobada como pagada y contabiliza el pago.",
     "fields": {
       "usage": {
         "request": "data&urlPathParams",
@@ -248617,8 +248617,8 @@
           "type": "form_field",
           "fieldType": "entity_picker",
           "labelField": "billNumber",
-          "label": "Bill ID",
-          "description": "La cuenta para marcar como pago",
+          "label": "Factura",
+          "description": "La factura que quieres marcar como pagada.",
           "hidden": true,
           "schema": {
             "def": {
@@ -248638,8 +248638,8 @@
         "accountNodeId": {
           "type": "form_field",
           "fieldType": "entity_picker",
-          "label": "Cuenta bancaria / efectivo",
-          "description": "Nodo de cuenta utilizado para pagar (Banco o Efectivo)",
+          "label": "Cuenta bancaria o de caja",
+          "description": "Deja el campo vacío para usar la cuenta de pago predeterminada.",
           "columns": 6,
           "schema": {
             "def": {
@@ -248869,7 +248869,7 @@
         },
         "paidAtResponse": {
           "type": "text",
-          "label": "Pagado en",
+          "label": "Fecha de pago",
           "schema": {
             "def": {
               "type": "nullable",
@@ -248896,7 +248896,7 @@
     "isAsync": true,
     "instanceId": "local",
     "category": "payments",
-    "tags": ["pago", "factura", "cuentas pagaderas"],
+    "tags": ["pago", "factura", "cuentas por pagar"],
     "credits": 0
   },
   {
@@ -250101,10 +250101,11 @@
         },
         "expenseAccountId": {
           "type": "form_field",
-          "fieldType": "uuid",
+          "fieldType": "entity_picker",
+          "labelField": "name",
           "label": "Cuenta de gastos",
-          "description": "¿Qué gastos representan estos puestos a",
-          "placeholder": "Cuenta UUID",
+          "description": "Cuenta de gastos en la que se contabiliza esta línea",
+          "placeholder": "Seleccionar cuenta de gastos",
           "columns": 12,
           "schema": {
             "def": {
@@ -283527,6 +283528,7 @@
           "schemaType": "primitive"
         },
         "input": {
+          "schemaType": "object-optional",
           "type": "container",
           "layoutType": "grid_2_columns",
           "usage": {
@@ -283611,8 +283613,7 @@
               },
               "schemaType": "primitive"
             }
-          },
-          "schemaType": "object"
+          }
         },
         "page": {
           "type": "form_field",
