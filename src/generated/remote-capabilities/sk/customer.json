@@ -284708,6 +284708,30 @@
                 },
                 "schemaType": "primitive"
               },
+              "rowId": {
+                "type": "text",
+                "hidden": true,
+                "schema": {
+                  "def": {
+                    "type": "optional",
+                    "innerType": {
+                      "def": {
+                        "type": "string",
+                        "format": "uuid",
+                        "check": "string_format",
+                        "abort": false,
+                        "pattern": {}
+                      },
+                      "type": "string"
+                    }
+                  },
+                  "type": "optional"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
               "skillId": {
                 "type": "text",
                 "hidden": true,
@@ -291491,6 +291515,7 @@
     "titleShort": "Pripojenie",
     "description": "Podrobný stav a nastavenia vzdialeného pripojenia",
     "fields": {
+      "noFormElement": true,
       "usage": {
         "response": true,
         "request": "urlPathParams"
