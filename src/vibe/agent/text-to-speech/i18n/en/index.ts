@@ -83,6 +83,8 @@ export const translations = {
       notConfigured:
         "{{label}} API key not configured. Add {{envKey}}=<your-key> to your .env file. Get your key at {{url}}",
       conversionFailed: "Speech synthesis failed: {{error}}",
+      providerUnavailable:
+        "The voice provider is temporarily unavailable. Your credits were not charged. Try again shortly or pick another voice.",
       noText: "No text provided",
       noAudioUrl: "No audio URL received from provider",
       audioFetchFailed: "Unable to create the audio file. Please try again",

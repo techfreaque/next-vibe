@@ -84,6 +84,8 @@ export const translations: typeof enTranslations = {
       notConfigured:
         "La tecla {{label}} API no está configurada. Añadir {{envKey}} = <your-key> a tu archivo.env. Obtener su llave en {{url}}",
       conversionFailed: "Sintetización del discurso falló: {{error}}",
+      providerUnavailable:
+        "El proveedor de voz no está disponible temporalmente. No se descontaron créditos. Inténtalo de nuevo en un momento o elige otra voz.",
       noText: "No se proporcionó texto",
       noAudioUrl: "No se recibió ningún URL de audio del proveedor",
       audioFetchFailed:

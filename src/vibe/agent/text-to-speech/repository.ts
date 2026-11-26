@@ -51,6 +51,11 @@ import type {
 import { parseElevenLabsProviderModel } from "./elevenlabs";
 import type { TextToSpeechT } from "./i18n";
 import { calculateTtsCharge, getBestTtsModel } from "./models";
+import {
+  fetchTtsWithRetry,
+  formatTtsProviderFailure,
+  isRetryableTtsNetworkError,
+} from "./provider-retry";
 
 /**
  * Formats each TTS provider can deliver. OpenAI-compatible providers take
@@ -153,8 +158,8 @@ export class TextToSpeechRepository {
     fetchImpl: typeof globalThis.fetch,
     output: TtsOutputOptions,
   ): Promise<ResponseType<string>> {
+    const { envKey, url, label } = PROVIDER_SETUP_INSTRUCTIONS.openAiTts;
     if (!agentEnv.OPENAI_API_KEY) {
-      const { envKey, url, label } = PROVIDER_SETUP_INSTRUCTIONS.openAiTts;
       return fail({
         message: t("post.errors.notConfigured", { label, envKey, url }),
         errorType: ErrorResponseTypes.BAD_REQUEST,
@@ -166,32 +171,60 @@ export class TextToSpeechRepository {
       language,
     });
 
-    const response = await fetchImpl("https://api.openai.com/v1/audio/speech", {
-      method: "POST",
-      headers: {
-        // eslint-disable-next-line i18next/no-literal-string
-        Authorization: `Bearer ${agentEnv.OPENAI_API_KEY}`,
-        "Content-Type": "application/json",
+    const fetchResult = await fetchTtsWithRetry({
+      fetchImpl,
+      url: "https://api.openai.com/v1/audio/speech",
+      init: {
+        method: "POST",
+        headers: {
+          // eslint-disable-next-line i18next/no-literal-string
+          Authorization: `Bearer ${agentEnv.OPENAI_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          // eslint-disable-next-line i18next/no-literal-string
+          model: "tts-1",
+          input: text,
+          voice: providerModel,
+          response_format: output.format,
+          speed: output.speed,
+        }),
       },
-      body: JSON.stringify({
-        // eslint-disable-next-line i18next/no-literal-string
-        model: "tts-1",
-        input: text,
-        voice: providerModel,
-        response_format: output.format,
-        speed: output.speed,
-      }),
+      logger,
+      providerLabel: label,
+      context: { voice: providerModel, inputChars: text.length },
     });
 
+    if (!fetchResult.ok) {
+      logger.error("[TTS] OpenAI TTS API network error", {
+        error: fetchResult.errorMessage,
+        voice: providerModel,
+        attempts: fetchResult.attempts,
+      });
+      return fail({
+        message: fetchResult.retryable
+          ? t("post.errors.providerUnavailable")
+          : t("post.errors.conversionFailed", {
+              error: fetchResult.errorMessage,
+            }),
+        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+      });
+    }
+
+    const { response } = fetchResult;
     if (!response.ok) {
       const errorText = await response.text();
       logger.error("[TTS] OpenAI TTS API error", {
         status: response.status,
         error: errorText,
+        attempts: fetchResult.attempts,
       });
-      return fail({
-        message: t("post.errors.conversionFailed", { error: errorText }),
-        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+      return formatTtsProviderFailure({
+        providerLabel: label,
+        status: response.status,
+        headers: response.headers,
+        rawBody: errorText,
+        t,
       });
     }
 
@@ -230,11 +263,13 @@ export class TextToSpeechRepository {
 
     logger.debug("[TTS] Calling gateway speech API", { target, model, voice });
 
-    const response = await fetchImpl(
-      target === "openRouter"
-        ? "https://openrouter.ai/api/v1/audio/speech"
-        : "https://api.nano-gpt.com/api/v1/audio/speech",
-      {
+    const fetchResult = await fetchTtsWithRetry({
+      fetchImpl,
+      url:
+        target === "openRouter"
+          ? "https://openrouter.ai/api/v1/audio/speech"
+          : "https://api.nano-gpt.com/api/v1/audio/speech",
+      init: {
         method: "POST",
         headers: {
           // eslint-disable-next-line i18next/no-literal-string
@@ -249,8 +284,38 @@ export class TextToSpeechRepository {
           speed: target === "nanoGPT" ? output.speed : undefined,
         }),
       },
-    );
+      logger,
+      providerLabel: label,
+      context: {
+        target,
+        model,
+        voice: voice ?? null,
+        inputChars: text.length,
+      },
+    });
 
+    if (!fetchResult.ok) {
+      logger.error("[TTS] Gateway speech API network error", {
+        target,
+        error: fetchResult.errorMessage,
+        model,
+        voice,
+        format: output.format ?? "default",
+        speed: output.speed ?? null,
+        inputChars: text.length,
+        attempts: fetchResult.attempts,
+      });
+      return fail({
+        message: fetchResult.retryable
+          ? t("post.errors.providerUnavailable")
+          : t("post.errors.conversionFailed", {
+              error: fetchResult.errorMessage,
+            }),
+        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+      });
+    }
+
+    const { response } = fetchResult;
     if (!response.ok) {
       const errorText = await response.text();
       logger.error("[TTS] Gateway speech API error", {
@@ -262,11 +327,15 @@ export class TextToSpeechRepository {
         format: output.format ?? "default",
         speed: output.speed ?? null,
         inputChars: text.length,
+        attempts: fetchResult.attempts,
         providerRequestId: response.headers.get("x-request-id"),
       });
-      return fail({
-        message: t("post.errors.conversionFailed", { error: errorText }),
-        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+      return formatTtsProviderFailure({
+        providerLabel: label,
+        status: response.status,
+        headers: response.headers,
+        rawBody: errorText,
+        t,
       });
     }
 
@@ -301,26 +370,55 @@ export class TextToSpeechRepository {
     const { model, voice } = parseEdenAiTtsProviderModel(providerModel);
     logger.debug("[TTS] Calling Eden AI TTS API", { model, voice });
 
-    const response = await fetchImpl(EDEN_AI_URLS.universalAi, {
-      method: "POST",
-      headers: {
-        // eslint-disable-next-line i18next/no-literal-string
-        Authorization: `Bearer ${agentEnv.EDEN_AI_API_KEY}`,
-        "Content-Type": "application/json",
+    const { label: edenLabel } = PROVIDER_SETUP_INSTRUCTIONS.edenAiTts;
+    const fetchResult = await fetchTtsWithRetry({
+      fetchImpl,
+      url: EDEN_AI_URLS.universalAi,
+      init: {
+        method: "POST",
+        headers: {
+          // eslint-disable-next-line i18next/no-literal-string
+          Authorization: `Bearer ${agentEnv.EDEN_AI_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ model, input: { text, voice } }),
       },
-      body: JSON.stringify({ model, input: { text, voice } }),
+      logger,
+      providerLabel: edenLabel,
+      context: { model, voice, inputChars: text.length },
     });
 
+    if (!fetchResult.ok) {
+      logger.error("[TTS] Eden AI TTS API network error", {
+        error: fetchResult.errorMessage,
+        model,
+        attempts: fetchResult.attempts,
+      });
+      return fail({
+        message: fetchResult.retryable
+          ? t("post.errors.providerUnavailable")
+          : t("post.errors.conversionFailed", {
+              error: fetchResult.errorMessage,
+            }),
+        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+      });
+    }
+
+    const { response } = fetchResult;
     if (!response.ok) {
       const errorText = await response.text();
       logger.error("[TTS] Eden AI TTS API error", {
         status: response.status,
         error: errorText,
         model,
+        attempts: fetchResult.attempts,
       });
-      return fail({
-        message: t("post.errors.conversionFailed", { error: errorText }),
-        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+      return formatTtsProviderFailure({
+        providerLabel: edenLabel,
+        status: response.status,
+        headers: response.headers,
+        rawBody: errorText,
+        t,
       });
     }
 
@@ -405,9 +503,11 @@ export class TextToSpeechRepository {
       ? ELEVENLABS_OUTPUT_FORMAT[output.format]
       : undefined;
     const query = outputFormat ? `?output_format=${outputFormat}` : "";
-    const response = await fetchImpl(
-      `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}${query}`,
-      {
+    const { label: elevenLabel } = PROVIDER_SETUP_INSTRUCTIONS.elevenlabs;
+    const fetchResult = await fetchTtsWithRetry({
+      fetchImpl,
+      url: `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}${query}`,
+      init: {
         method: "POST",
         headers: {
           // eslint-disable-next-line i18next/no-literal-string
@@ -426,17 +526,42 @@ export class TextToSpeechRepository {
               }),
         }),
       },
-    );
+      logger,
+      providerLabel: elevenLabel,
+      context: { modelId, voiceId, inputChars: text.length },
+    });
 
+    if (!fetchResult.ok) {
+      logger.error("[TTS] ElevenLabs TTS API network error", {
+        error: fetchResult.errorMessage,
+        modelId,
+        voiceId,
+        attempts: fetchResult.attempts,
+      });
+      return fail({
+        message: fetchResult.retryable
+          ? t("post.errors.providerUnavailable")
+          : t("post.errors.conversionFailed", {
+              error: fetchResult.errorMessage,
+            }),
+        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+      });
+    }
+
+    const { response } = fetchResult;
     if (!response.ok) {
       const errorText = await response.text();
       logger.error("[TTS] ElevenLabs TTS API error", {
         status: response.status,
         error: errorText,
+        attempts: fetchResult.attempts,
       });
-      return fail({
-        message: t("post.errors.conversionFailed", { error: errorText }),
-        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+      return formatTtsProviderFailure({
+        providerLabel: elevenLabel,
+        status: response.status,
+        headers: response.headers,
+        rawBody: errorText,
+        t,
       });
     }
 
@@ -787,7 +912,11 @@ export class TextToSpeechRepository {
       });
 
       return fail({
-        message: t("post.errors.conversionFailed", { error: errorMessage }),
+        message: isRetryableTtsNetworkError(
+          error instanceof Error ? error : errorMessage,
+        )
+          ? t("post.errors.providerUnavailable")
+          : t("post.errors.conversionFailed", { error: errorMessage }),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
       });
     }

@@ -84,6 +84,8 @@ export const translations: typeof enTranslations = {
       notConfigured:
         "Kľúč API pre {{label}} nie je nastavený. Do súboru .env pridajte {{envKey}}=<your-key>. Kľúč získate na {{url}}.",
       conversionFailed: "Syntéza reči zlyhala: {{error}}",
+      providerUnavailable:
+        "Poskytovateľ hlasu je dočasne nedostupný. Kredity sa neodpočítali. Skúste to znova o chvíľu alebo zvoľte iný hlas.",
       noText: "Chýba text na prečítanie.",
       noAudioUrl: "Poskytovateľ nevrátil URL výsledného zvuku.",
       audioFetchFailed:
