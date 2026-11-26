@@ -1,7 +1,7 @@
 export const translations = {
   get: {
     title: "Search",
-    titleShort: "Search Files",
+    titleShort: "Search files",
     description: "Find files by name or content. Searches everything.",
     dynamicTitle: "Search: {{query}}",
     status: {

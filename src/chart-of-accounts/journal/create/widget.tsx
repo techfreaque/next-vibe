@@ -359,14 +359,16 @@ export function CoaJournalCreateWidget({
                 variant="success"
               />
             )}
-            <SubmitButtonWidget<typeof definition.POST>
-              field={{ text: "journalCreate.widget.saveDraft" }}
-            />
+            {lineEditor.fields.length >= 2 && (
+              <SubmitButtonWidget<typeof definition.POST>
+                field={{ text: "journalCreate.widget.saveDraft" }}
+              />
+            )}
           </>
         }
       />
       <FormAlertWidget field={{}} />
-      <SectionGroup title={currency ?? t("journalCreate.widget.currency")}>
+      <SectionGroup title={t("journalCreate.widget.entryTotals")}>
         <DetailGrid columns={3} className="grid-cols-3 gap-x-2">
           <DetailField
             label={t("journalCreate.widget.totalDebits")}

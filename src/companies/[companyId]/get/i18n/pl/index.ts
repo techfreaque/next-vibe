@@ -70,6 +70,8 @@ export const translations: typeof enTranslations = {
       description: "Szczegóły firmy pobrane",
     },
     widget: {
+      address: "Adres",
+      activeMembers: "Aktywni członkowie",
       backToList: "Firmy",
       type: "Typ klienta",
       loadFailed: "Nie udało się wczytać firmy",

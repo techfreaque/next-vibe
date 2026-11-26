@@ -34,7 +34,8 @@ export const category: CategoryDefinition = {
   icon: "bell",
   order: 70,
   landing: {
-    destinations: ["notifications"],
+    overview: { alias: "notifications", scope: "platform" },
+    destinations: [],
     destinationDescriptions: {
       notifications: {
         "en-US": "Everything that finished while you were away, unread first.",

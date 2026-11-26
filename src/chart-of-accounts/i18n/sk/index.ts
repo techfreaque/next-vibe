@@ -297,6 +297,7 @@ export const translations: typeof enTranslations = {
       label: "Za stranu",
     },
     response: {
+      debitTotal: "Spolu na ťarchu",
       entries: "Zápisy",
       id: "ID",
       entryNumber: "Číslo zápisu",
@@ -319,6 +320,7 @@ export const translations: typeof enTranslations = {
       "Na strane Má dať alebo Dal zadajte kladnú sumu s najviac štyrmi desatinnými miestami.",
     errorAccount: "Vyberte platný účet z účtového rozvrhu tejto firmy.",
     widget: {
+      entryTotals: "Súčty zápisu",
       lineDescription: "Opis položky",
       incomplete: "Na každom riadku zadajte sumu na strane Má dať alebo Dal.",
       offByLessThan: "Rozdiel je menší ako {{amount}}.",

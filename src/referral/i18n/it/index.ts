@@ -238,13 +238,15 @@ export const translations: typeof enTranslations = {
     },
     list: {
       get: {
-        title: "Storico dei guadagni da inviti",
-        titleShort: "Guadagni",
-        description: "Consulta lo storico dei guadagni da inviti",
+        title: "Commissioni da invito",
+        titleShort: "Commissioni da invito",
+        description:
+          "Consulta le commissioni da invito. Gli amministratori della piattaforma possono vedere tutti i partner.",
         form: {
           title: "I tuoi guadagni da inviti",
           description: "Consulta i guadagni dei tuoi inviti",
           targetUserId: "Account partner",
+          personal: "Solo le mie commissioni",
           limit: {
             label: "Righe per pagina",
             description: "Quanti guadagni mostrare per pagina",
@@ -257,6 +259,10 @@ export const translations: typeof enTranslations = {
         widget: {
           subtitle:
             "Commissioni sui pagamenti degli utenti che hai invitato. Ognuna resta in attesa fino alla fine del periodo di rimborso.",
+          platformSubtitle:
+            "Commissioni da invito di tutti i partner. Le commissioni in attesa si sbloccano alla fine del periodo di rimborso.",
+          platformEmptyHint:
+            "Le commissioni appaiono qui quando i clienti invitati pagano.",
           direct: "Invito diretto",
           level: "Invito di livello {{level}}",
           empty: "Ancora nessun guadagno",
@@ -270,6 +276,7 @@ export const translations: typeof enTranslations = {
           next: "Avanti",
           pageTotal: "Totale di questa pagina ({{currency}})",
           col: {
+            partner: "Partner",
             date: "Data",
             source: "Origine",
             status: "Stato",

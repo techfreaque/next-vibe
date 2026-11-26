@@ -50,6 +50,8 @@ export const translations: typeof enTranslations = {
   persisted: "Gespeichert",
   skipped: "Übersprungen",
   flagged: "Markiert",
+  attachmentDescription:
+    "Originalrechnung oder Originalbeleg aus einer geprüften E-Mail herunterladen.",
   attachmentTitle: "Beleg herunterladen",
   download: "Herunterladen",
   errors: {

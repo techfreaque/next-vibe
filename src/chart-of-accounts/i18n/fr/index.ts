@@ -285,6 +285,7 @@ export const translations: typeof enTranslations = {
     page: { label: "Page" },
     pageSize: { label: "Par page" },
     response: {
+      debitTotal: "Total des débits",
       entries: "Écritures",
       id: "ID",
       entryNumber: "N° d'écriture",
@@ -308,6 +309,7 @@ export const translations: typeof enTranslations = {
       "Saisissez un montant positif au débit ou au crédit avec quatre décimales au maximum.",
     errorAccount: "Sélectionnez un compte valide de cette entreprise.",
     widget: {
+      entryTotals: "Totaux de l’écriture",
       lineDescription: "Libellé de la ligne",
       incomplete: "Saisissez un débit ou un crédit sur chaque ligne.",
       offByLessThan: "Écart inférieur à {{amount}}",

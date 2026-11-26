@@ -56,8 +56,9 @@ export const translations: typeof enTranslations = {
         description: "Si è verificato un errore di rete",
       },
       forbidden: {
-        title: "Accesso negato",
-        description: "Accesso non consentito",
+        title: "Autorizzazione richiesta",
+        description:
+          "Per registrare un pagamento devi avere il permesso di gestire questa fattura.",
       },
       notFound: {
         title: "Non trovato",
@@ -117,6 +118,9 @@ export const translations: typeof enTranslations = {
     automatic: "Usa il conto predefinito",
   },
   widget: {
+    backToInvoices: "Torna alle fatture",
+    retryInvoice: "Riprova",
+    loadingInvoice: "Verifica dell’accesso alla fattura…",
     details: "Dettagli del pagamento",
     back: "Indietro",
     submit: "Pagamento record",

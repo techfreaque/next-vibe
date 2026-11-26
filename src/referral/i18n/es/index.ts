@@ -239,13 +239,15 @@ export const translations: typeof enTranslations = {
     },
     list: {
       get: {
-        title: "Historial de ganancias por referidos",
-        titleShort: "Ganancias",
-        description: "Consulta tu historial de ganancias por referidos",
+        title: "Comisiones por referidos",
+        titleShort: "Comisiones por referidos",
+        description:
+          "Consulta las comisiones por referidos. Los administradores de la plataforma pueden ver a todos los socios.",
         form: {
           title: "Tus ganancias por referidos",
           description: "Consulta tus ganancias por referidos",
           targetUserId: "Cuenta del partner",
+          personal: "Solo mis comisiones",
           limit: {
             label: "Filas por página",
             description: "Cuántas ganancias mostrar por página",
@@ -258,6 +260,10 @@ export const translations: typeof enTranslations = {
         widget: {
           subtitle:
             "Comisión por los pagos de los usuarios que referiste. Cada una queda retenida hasta que vence el plazo de reembolso.",
+          platformSubtitle:
+            "Comisiones por referidos de todos los socios. Las comisiones pendientes se liberan cuando termina el plazo de reembolso.",
+          platformEmptyHint:
+            "Las comisiones aparecen aquí cuando pagan los clientes referidos.",
           direct: "Referido directo",
           level: "Referido de nivel {{level}}",
           empty: "Aún no hay ganancias",
@@ -271,6 +277,7 @@ export const translations: typeof enTranslations = {
           next: "Siguiente",
           pageTotal: "Total de esta página ({{currency}})",
           col: {
+            partner: "Socio",
             date: "Fecha",
             source: "Origen",
             status: "Estado",

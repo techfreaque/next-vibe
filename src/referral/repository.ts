@@ -721,10 +721,10 @@ export class ReferralRepository {
   }
 
   /**
-   * Get referral earnings for a user
+   * Get referral earnings for the authorized scope.
    */
   static async getReferralEarnings(
-    userId: string,
+    userId: string | null,
     limit: number,
     offset: number,
     logger: EndpointLogger,
@@ -733,23 +733,32 @@ export class ReferralRepository {
     try {
       logger.debug("Getting referral earnings", { userId, limit, offset });
 
-      const earnings = await db
-        .select()
-        .from(referralEarnings)
-        .where(eq(referralEarnings.earnerUserId, userId))
-        .orderBy(desc(referralEarnings.createdAt))
-        .limit(limit)
-        .offset(offset);
-
-      const [countResult] = await db
-        .select({ count: sql<number>`count(*)` })
-        .from(referralEarnings)
-        .where(eq(referralEarnings.earnerUserId, userId));
+      const where = userId
+        ? eq(referralEarnings.earnerUserId, userId)
+        : undefined;
+      const [earnings, [countResult]] = await Promise.all([
+        db
+          .select({
+            earning: referralEarnings,
+            earnerName: userId ? sql<null>`null` : users.publicName,
+          })
+          .from(referralEarnings)
+          .leftJoin(users, eq(users.id, referralEarnings.earnerUserId))
+          .where(where)
+          .orderBy(desc(referralEarnings.createdAt), desc(referralEarnings.id))
+          .limit(limit)
+          .offset(offset),
+        db
+          .select({ count: sql<number>`count(*)` })
+          .from(referralEarnings)
+          .where(where),
+      ]);
 
       return success({
-        earnings: earnings.map((e) => ({
+        earnings: earnings.map(({ earning: e, earnerName }) => ({
           id: e.id,
           earnerUserId: e.earnerUserId,
+          earnerName,
           sourceUserId: e.sourceUserId,
           transactionId: e.transactionId,
           level: e.level,
@@ -758,6 +767,7 @@ export class ReferralRepository {
           status: e.status,
           createdAt: e.createdAt,
         })),
+        platformWide: userId === null,
         totalCount: Number(countResult?.count || 0),
       });
     } catch (error) {

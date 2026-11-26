@@ -19,7 +19,7 @@ export const translations = {
   },
   post: {
     title: "Create Company",
-    titleShort: "New Company",
+    titleShort: "New company",
     description: "Register a new company. You become its owner automatically.",
     name: {
       label: "Company Name",

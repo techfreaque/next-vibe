@@ -76,6 +76,7 @@ export interface AdminRecordFact {
   key: string;
   label: string;
   value?: ReactNode;
+  className?: string;
 }
 
 export interface AdminRecordDetailProps {
@@ -324,8 +325,13 @@ export function AdminRecordDetail({
           {!!facts?.length && (
             <Div className="rounded-lg border bg-card p-4">
               <DetailGrid columns={3}>
-                {facts.map(({ key, label, value }) => (
-                  <DetailField key={key} label={label} value={value} />
+                {facts.map(({ key, label, value, className }) => (
+                  <DetailField
+                    key={key}
+                    label={label}
+                    value={value}
+                    className={className}
+                  />
                 ))}
               </DetailGrid>
             </Div>

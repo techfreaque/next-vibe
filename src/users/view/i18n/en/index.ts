@@ -105,7 +105,7 @@ export const translations = {
     lastPayment: "Last payment",
     stripeCustomerId: "Stripe customer",
     none: "No subscription",
-    noSubscriptionButPaid: "No subscription. Bought credits worth {{amount}}.",
+    noSubscriptionButPaid: "No subscription. Total paid: {{amount}}.",
   },
   credits: {
     subscription: "Subscription credits",

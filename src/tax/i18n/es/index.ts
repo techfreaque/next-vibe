@@ -453,8 +453,9 @@ export const translations: typeof enTranslations = {
         description: "Debes estar conectado.",
       },
       forbidden: {
-        title: "Acceso denegado",
-        description: "Usted no tiene permiso para ver los informes fiscales",
+        title: "Se requiere acceso al informe fiscal",
+        description:
+          "No tienes permiso para consultar el informe fiscal de esta empresa.",
       },
       notFound: {
         title: "No encontrado",

@@ -191,7 +191,7 @@ function SearchResults({
     />
   );
   return (
-    <Div className="flex w-full max-w-4xl flex-col gap-4">
+    <Div className="flex w-full min-w-0 flex-col gap-4">
       {[...sections].map(([key, entries]) => {
         const category = registry.get(key);
         const label = category
@@ -232,22 +232,34 @@ function LandingLinks({
   counts,
   locale,
   onOpenTool,
+  grid = false,
 }: {
   links: Landing["destinations"];
   counts?: Readonly<Record<string, number>>;
   locale: CountryLanguage;
   onOpenTool: PlatformAdminCatalogProps["onOpenTool"];
+  grid?: boolean;
 }): JSX.Element {
   const number = new Intl.NumberFormat(locale);
   return (
-    <Div className="flex min-w-0 flex-col divide-y">
+    <Div
+      className={
+        grid
+          ? "grid min-w-0 gap-3 @xl:grid-cols-2"
+          : "flex min-w-0 flex-col divide-y"
+      }
+    >
       {links.map(({ alias, title, description }) => (
         <Button
           key={alias}
           type="button"
           variant="ghost"
           size="unset"
-          className="h-auto min-h-11 w-full justify-between gap-3 whitespace-normal rounded-none px-3 py-2.5 text-start @lg:py-3"
+          className={
+            grid
+              ? "h-full min-h-20 w-full justify-between gap-3 whitespace-normal rounded-lg border bg-card px-4 py-3 text-start"
+              : "h-auto min-h-11 w-full justify-between gap-3 whitespace-normal rounded-none px-3 py-2.5 text-start @lg:py-3"
+          }
           onClick={() => onOpenTool(alias)}
         >
           <Div className="flex min-w-0 flex-col gap-1">
@@ -342,6 +354,8 @@ export function PlatformAdminCatalog({
       : index === 0 ||
         !destinations.some((item) => item.alias === action.alias),
   );
+  const shortcutGrid =
+    activeCategory === "cortex" || activeCategory === "accountSettings";
   const otherDestinations = destinations.filter(
     (destination) =>
       !actions.some((action) => action.alias === destination.alias),
@@ -360,7 +374,7 @@ export function PlatformAdminCatalog({
             >
               {t("admin.title")}
             </Button>
-            {section && (
+            {section && activeCategory !== "accountSettings" && (
               <>
                 <ChevronRight className="size-4 shrink-0" aria-hidden="true" />
                 <Span>{t(`groups.${section}`)}</Span>
@@ -524,11 +538,18 @@ export function PlatformAdminCatalog({
           {overview && <Div className="min-w-0">{overview}</Div>}
           <Div className="flex min-w-0 flex-col gap-3">
             {otherDestinations.length > 0 ? (
-              <Div className="min-w-0 rounded-xl border bg-card">
-                <H2 className="border-0 px-3 pb-1 pt-3 text-base font-semibold">
-                  {t("admin.destinations")}
-                </H2>
+              <Div
+                className={
+                  shortcutGrid ? "min-w-0" : "min-w-0 rounded-xl border bg-card"
+                }
+              >
+                {!shortcutGrid && (
+                  <H2 className="border-0 px-3 pb-1 pt-3 text-base font-semibold">
+                    {t("admin.destinations")}
+                  </H2>
+                )}
                 <LandingLinks
+                  grid={shortcutGrid}
                   links={otherDestinations}
                   counts={counts}
                   locale={locale}
@@ -647,6 +668,7 @@ export function PlatformAdminCatalog({
           ) : (
             <Div className="flex min-w-0 flex-col gap-6">
               <EmptyBlock
+                size="page"
                 className="rounded-xl border bg-card py-8"
                 icon={<Search className="size-6" />}
                 title={t(

@@ -209,9 +209,13 @@ export function ReferralCodeReportWidget({
         }
         onSubmit?.();
       }}
-      onRefresh={() => {
-        void read?.refetch();
-      }}
+      onRefresh={
+        code
+          ? (): void => {
+              void read?.refetch();
+            }
+          : undefined
+      }
       isLoading={read?.isFetching}
     >
       {codeInput}

@@ -31,6 +31,12 @@ export const category: CategoryDefinition = {
   order: 5,
   adminPathPrefixes: ["vibe/remote-connection"],
   landing: {
+    summary: {
+      alias: "platform-summary",
+      scope: "platform",
+      args: { section: "instances" },
+      progressive: true,
+    },
     destinations: ["remote-connections"],
     destinationDescriptions: {
       "remote-connections": {

@@ -594,6 +594,9 @@ export class HelpRepository {
     );
 
     if (query) {
+      if (searchWebCatalog && isAdmin && !viewAsRole) {
+        filtered = filtered.filter((tool) => !tool.admin?.hidden);
+      }
       filtered = searchCatalog(filtered, query, (tool) => tool.toolName);
       if (searchWebCatalog && isAdmin && !viewAsRole) {
         filtered = rankWorkspaceMatches(filtered, query);

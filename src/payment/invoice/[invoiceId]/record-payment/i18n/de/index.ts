@@ -63,8 +63,9 @@ export const translations: typeof enTranslations = {
         description: "Netzwerkfehler aufgetreten",
       },
       forbidden: {
-        title: "Verboten",
-        description: "Zugriff verboten",
+        title: "Zahlungsberechtigung erforderlich",
+        description:
+          "Sie benötigen Verwaltungsrechte für diese Rechnung, um eine Zahlung zu erfassen.",
       },
       notFound: {
         title: "Nicht gefunden",
@@ -117,6 +118,9 @@ export const translations: typeof enTranslations = {
     automatic: "Standardkonto verwenden",
   },
   widget: {
+    backToInvoices: "Zur Rechnungsliste",
+    retryInvoice: "Erneut versuchen",
+    loadingInvoice: "Rechnungszugriff wird geprüft…",
     details: "Zahlungsdetails",
     back: "Zurück",
     submit: "Zahlung erfassen",

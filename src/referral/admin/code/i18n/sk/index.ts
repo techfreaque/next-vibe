@@ -20,7 +20,7 @@ export const translations: typeof enTranslations = {
         label: "Kód odporúčania",
         description:
           "Kód, ktorého prehľad chcete zobraziť. Na veľkosti písmen nezáleží",
-        placeholder: "moemoe",
+        placeholder: "Zadajte kód odporúčania",
       },
     },
     response: {

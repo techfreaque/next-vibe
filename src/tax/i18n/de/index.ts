@@ -446,8 +446,9 @@ export const translations: typeof enTranslations = {
         description: "Anmeldung erforderlich",
       },
       forbidden: {
-        title: "Keine Berechtigung",
-        description: "Sie dürfen keine Steuerberichte einsehen",
+        title: "Zugriff auf Steuerbericht erforderlich",
+        description:
+          "Sie haben keine Berechtigung, den Steuerbericht dieses Unternehmens einzusehen.",
       },
       notFound: {
         title: "Nicht gefunden",

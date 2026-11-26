@@ -22,7 +22,7 @@ export const translations: typeof enTranslations = {
     },
     password: {
       label: "Heslo",
-      description: "Bezpečné heslo k používateľskému účtu",
+      description: "Použite aspoň 8 znakov.",
     },
     privateName: {
       label: "Súkromné meno",
@@ -54,6 +54,7 @@ export const translations: typeof enTranslations = {
     },
     roles: {
       label: "Používateľské roly",
+      placeholder: "Priraďte roly",
       description: "Priraďte používateľovi roly",
     },
     imageUrl: {
@@ -86,10 +87,12 @@ export const translations: typeof enTranslations = {
     },
     country: {
       label: "Krajina",
+      placeholder: "Vyberte krajinu",
       description: "Krajina pobytu používateľa",
     },
     language: {
       label: "Jazyk",
+      placeholder: "Vyberte jazyk",
       description: "Uprednostňovaný jazyk používateľa",
     },
     response: {

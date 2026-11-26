@@ -104,9 +104,10 @@ export const translations: typeof enTranslations = {
   codes: {
     list: {
       get: {
-        title: "Empfehlungscodes auflisten",
-        titleShort: "Meine Codes",
-        description: "Alle Ihre Empfehlungscodes mit Statistiken abrufen",
+        title: "Empfehlungsprovisionen",
+        titleShort: "Empfehlungsprovisionen",
+        description:
+          "Empfehlungsprovisionen einsehen. Plattformadministratoren sehen alle Partner.",
         form: {
           title: "Ihre Empfehlungscodes",
           description: "Ihre Empfehlungscodes anzeigen und verwalten",
@@ -237,13 +238,15 @@ export const translations: typeof enTranslations = {
     },
     list: {
       get: {
-        title: "Empfehlungseinnahmen auflisten",
-        titleShort: "Einnahmen",
-        description: "Ihre Empfehlungseinnahmen-Historie abrufen",
+        title: "Empfehlungsprovisionen",
+        titleShort: "Empfehlungsprovisionen",
+        description:
+          "Empfehlungsprovisionen einsehen. Plattformadministratoren sehen alle Partner.",
         form: {
           title: "Ihre Empfehlungseinnahmen",
           description: "Ihre Einnahmen aus Empfehlungen anzeigen",
           targetUserId: "Partnerkonto",
+          personal: "Nur meine Provisionen",
           limit: {
             label: "Zeilen pro Seite",
             description: "Wie viele Einnahmen pro Seite erscheinen",
@@ -256,6 +259,10 @@ export const translations: typeof enTranslations = {
         widget: {
           subtitle:
             "Provision aus Zahlungen deiner geworbenen Nutzer. Jede bleibt bis zum Ende der Rückerstattungsfrist in Wartezeit.",
+          platformSubtitle:
+            "Empfehlungsprovisionen aller Partner. Offene Provisionen werden nach Ablauf der Erstattungsfrist freigegeben.",
+          platformEmptyHint:
+            "Hier erscheinen Provisionen, sobald geworbene Kunden bezahlen.",
           direct: "Direkte Empfehlung",
           level: "Empfehlung Ebene {{level}}",
           empty: "Noch keine Einnahmen",
@@ -269,6 +276,7 @@ export const translations: typeof enTranslations = {
           next: "Weiter",
           pageTotal: "Summe dieser Seite ({{currency}})",
           col: {
+            partner: "Partner",
             date: "Datum",
             source: "Quelle",
             status: "Status",

@@ -106,7 +106,8 @@ export const translations: typeof enTranslations = {
     lastPayment: "Ostatnia płatność",
     stripeCustomerId: "Klient Stripe",
     none: "Brak subskrypcji",
-    noSubscriptionButPaid: "Brak subskrypcji. Kupił kredyty za {{amount}}.",
+    noSubscriptionButPaid:
+      "Brak subskrypcji. Łączna kwota płatności: {{amount}}.",
   },
   credits: {
     subscription: "Kredyty z subskrypcji",

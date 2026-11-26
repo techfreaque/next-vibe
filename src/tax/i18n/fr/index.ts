@@ -438,9 +438,9 @@ export const translations: typeof enTranslations = {
         description: "Vous devez être connecté",
       },
       forbidden: {
-        title: "Accès refusé",
+        title: "Accès au rapport fiscal requis",
         description:
-          "Vous n'avez pas le droit de consulter les rapports fiscaux",
+          "Vous n’avez pas accès au rapport fiscal de cette entreprise.",
       },
       notFound: { title: "Introuvable", description: "Entreprise introuvable" },
       conflict: { title: "Conflit", description: "Un conflit est survenu" },

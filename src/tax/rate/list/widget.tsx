@@ -3,7 +3,15 @@
 import { Badge } from "next-vibe/ui/components/badge";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "next-vibe/ui/components/dropdown-menu";
 import { EmptyBlock } from "next-vibe/ui/components/empty-block";
+import { MoreHorizontal } from "next-vibe/ui/components/icons/MoreHorizontal";
 import { RecordTable } from "next-vibe/ui/components/record-table";
 import { Skeleton } from "next-vibe/ui/components/skeleton";
 import { Span } from "next-vibe/ui/components/span";
@@ -92,7 +100,15 @@ export function TaxRateListWidget(): JSX.Element {
       ? [{ id: "actions", label: t("rate.list.widget.actions") }]
       : []),
   ];
-  const rows = (data?.rates ?? []).map((row) => {
+  const rates = data?.rates ?? [];
+  const companyIdsByName = new Map<string, Set<string>>();
+  for (const { companyName, companyId: rateCompanyId } of rates) {
+    const ids = companyIdsByName.get(companyName) ?? new Set<string>();
+    ids.add(rateCompanyId);
+    companyIdsByName.set(companyName, ids);
+  }
+  const regions = new Intl.DisplayNames(locale, { type: "region" });
+  const rows = rates.map((row) => {
     const type = TaxTypeDB.find((value) => value === row.type);
     const name = (
       <Div className="flex flex-wrap items-center gap-2">
@@ -116,36 +132,51 @@ export function TaxRateListWidget(): JSX.Element {
         {row.isCompound && (
           <Badge variant="outline">{t("rate.list.widget.labelCompound")}</Badge>
         )}
-        <Span className="text-xs text-muted-foreground">{row.code}</Span>
       </Div>
     );
     const actions = interactive && !onPick && (
-      <Div className="flex flex-wrap gap-1">
-        <Button
-          type="button"
-          size="sm"
-          variant="outline"
-          onClick={() => edit(row)}
-        >
-          {t("rate.list.widget.labelEdit")}
-        </Button>
-        <Button
-          type="button"
-          size="sm"
-          variant="ghost"
-          onClick={() => remove(row)}
-        >
-          {t("rate.list.widget.labelDelete")}
-        </Button>
-      </Div>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            aria-label={t("rate.list.widget.actions")}
+          >
+            <MoreHorizontal className="size-4" aria-hidden="true" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" collisionPadding={12}>
+          <DropdownMenuItem onSelect={() => edit(row)}>
+            {t("rate.list.widget.labelEdit")}
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem
+            className="text-destructive"
+            onSelect={() => remove(row)}
+          >
+            {t("rate.list.widget.labelDelete")}
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     );
+    const country =
+      row.country === "XX"
+        ? regions.of("ZZ")
+        : row.country && /^[A-Z]{2}$/u.test(row.country)
+          ? regions.of(row.country)
+          : row.country;
+    const companyLabel =
+      (companyIdsByName.get(row.companyName)?.size ?? 0) > 1
+        ? `${row.companyName} · ${row.companyId.slice(0, 8)}`
+        : row.companyName;
     return {
       id: row.id,
       cells: {
         name,
         actions,
-        company: row.companyName,
-        location: [row.country, row.region].filter(Boolean).join(", "),
+        company: companyLabel,
+        location: [country, row.region].filter(Boolean).join(", "),
         type: type ? t(type) : row.type,
         rate: formatPercent(row.rate, locale),
       },

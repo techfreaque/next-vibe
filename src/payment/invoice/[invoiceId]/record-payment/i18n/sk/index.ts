@@ -54,8 +54,9 @@ export const translations: typeof enTranslations = {
         description: "Skontrolujte pripojenie.",
       },
       forbidden: {
-        title: "Prístup zamietnutý",
-        description: "Nemáte potrebné oprávnenie.",
+        title: "Vyžaduje sa oprávnenie na platby",
+        description:
+          "Ak chcete zaznamenať platbu, potrebujete oprávnenie spravovať túto faktúru.",
       },
       notFound: {
         title: "Nenašlo sa",
@@ -115,6 +116,9 @@ export const translations: typeof enTranslations = {
     automatic: "Použiť predvolený účet",
   },
   widget: {
+    backToInvoices: "Späť na faktúry",
+    retryInvoice: "Skúsiť znova",
+    loadingInvoice: "Overuje sa prístup k faktúre…",
     details: "Podrobnosti úhrady",
     back: "Späť",
     submit: "Zaevidovať úhradu",

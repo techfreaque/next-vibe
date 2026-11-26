@@ -4,6 +4,7 @@ import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { EmptyBlock } from "next-vibe/ui/components/empty-block";
 import { Building } from "next-vibe/ui/components/icons/Building";
+import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
 import { ResultBanner } from "next-vibe/ui/components/result-banner";
 import { Skeleton } from "next-vibe/ui/components/skeleton";
 import { Span } from "next-vibe/ui/components/span";
@@ -17,11 +18,14 @@ import {
   useWidgetForm,
   useWidgetIsInteractive,
   useWidgetLocale,
+  useWidgetLogger,
   useWidgetNavigation,
   useWidgetResponse,
   useWidgetTranslation,
+  useWidgetUser,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
+import { useApiQuery } from "next-vibe/unified-ui/hooks/use-api-query";
 import {
   AdminForm,
   AdminFormSection,
@@ -31,12 +35,12 @@ import { EntityPickerFieldWidget } from "next-vibe/unified-ui/widgets/form-field
 import { SelectFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/select-field/widget";
 import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
-import { type JSX, useEffect } from "react";
+import { type JSX, useEffect, useState } from "react";
 
 import { formatAccountingDateInput } from "@/chart-of-accounts/shared/calendar-date";
 import { ReportAsOfControl } from "@/finance/report-period-control";
 
-import type definition from "./definition";
+import definition from "./definition";
 import { CompanyTaxRegime, type CompanyTaxRegimeValue } from "./enum";
 import type { TaxRegimeTranslationKey } from "./i18n";
 
@@ -69,6 +73,28 @@ export function CompanyTaxRegimeWidget({
   const interactive = useWidgetIsInteractive();
   const navigation = useWidgetNavigation();
   const effectiveFrom = form.watch("effectiveFrom");
+  const companyId = form.watch("companyId");
+  const logger = useWidgetLogger();
+  const user = useWidgetUser();
+  const [today] = useState(todayUtc);
+  const { data: review } = useApiQuery({
+    endpoint: definition.GET,
+    requestData: { companyId, asOf: today },
+    options: {
+      enabled: interactive && Boolean(companyId) && !result?.resultRegime,
+    },
+    logger,
+    user,
+  });
+  useEffect(() => {
+    if (
+      review &&
+      review.reviewedCompanyId === companyId &&
+      !form.getFieldState("election").isDirty
+    ) {
+      form.setValue("election", review.currentRegime);
+    }
+  }, [companyId, form, review]);
   useEffect(() => {
     if (interactive && !effectiveFrom) {
       form.setValue("effectiveFrom", todayUtc());
@@ -120,6 +146,7 @@ export function CompanyTaxRegimeWidget({
             onClick={() => navigation.pop()}
             className="self-start -ml-1"
           >
+            <ChevronLeft className="size-4" aria-hidden="true" />
             {t("back")}
           </Button>
         )
@@ -225,7 +252,7 @@ export function CompanyTaxRegimeReviewWidget({
               : "flex flex-col gap-3 rounded-lg border bg-card p-5"
           }
         >
-          <Span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+          <Span className="text-xs font-medium text-muted-foreground">
             {t("appliesOn", {
               date: formatDocDate(reviewed.effectiveOn, locale),
             })}

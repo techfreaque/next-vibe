@@ -158,6 +158,13 @@ const { GET } = createEndpoint({
               options: JournalEntryStatusOptions,
               schema: z.string(),
             }),
+            debitTotals: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              label: "journalList.response.debitTotal",
+              schema: z
+                .array(z.object({ currency: z.string(), amount: z.number() }))
+                .optional(),
+            }),
             sourceType: responseField(scopedTranslation, {
               type: WidgetType.BADGE,
               text: "journalList.response.sourceType" as const,

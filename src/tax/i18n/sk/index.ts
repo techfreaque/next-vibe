@@ -430,8 +430,8 @@ export const translations: typeof enTranslations = {
         description: "Prihláste sa.",
       },
       forbidden: {
-        title: "Prístup zamietnutý",
-        description: "Nemáte oprávnenie zobraziť daňové prehľady.",
+        title: "Vyžaduje sa prístup k daňovému výkazu",
+        description: "Nemáte oprávnenie zobraziť daňový výkaz tejto firmy.",
       },
       notFound: { title: "Nenašlo sa", description: "Firma sa nenašla" },
       conflict: { title: "Konflikt", description: "Údaje sú v rozpore." },

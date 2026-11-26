@@ -244,6 +244,8 @@ export interface ApiEndpoint<
   readonly method: TMethod;
   readonly path: readonly string[];
   readonly allowedRoles: TUserRoleValue;
+  /** Locale-specific validation copy for API, CLI, and other request consumers. */
+  readonly requestErrorMap?: (locale: CountryLanguage) => z.core.$ZodErrorMap;
 
   /**
    * Roles allowed to use client-side route (localStorage/IndexedDB)
@@ -839,6 +841,7 @@ export function buildEndpoint<
     tags: config.tags,
     fields: config.fields,
     allowedRoles: config.allowedRoles,
+    requestErrorMap: config.requestErrorMap,
     allowedClientRoles: config.allowedClientRoles,
     useClientRoute: config.useClientRoute,
     examples: config.examples,

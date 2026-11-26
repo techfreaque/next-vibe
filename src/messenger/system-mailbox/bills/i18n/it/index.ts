@@ -50,6 +50,8 @@ export const translations: typeof enTranslations = {
   persisted: "Salvate",
   skipped: "Ignorate",
   flagged: "Contrassegnate",
+  attachmentDescription:
+    "Scarica la fattura del fornitore o la ricevuta originale allegata a un’e-mail verificata.",
   attachmentTitle: "Scarica il documento",
   download: "Scarica",
   errors: {

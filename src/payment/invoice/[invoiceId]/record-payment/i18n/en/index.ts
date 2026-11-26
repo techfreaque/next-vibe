@@ -54,8 +54,9 @@ export const translations = {
         description: "Network error occurred",
       },
       forbidden: {
-        title: "Forbidden",
-        description: "Access forbidden",
+        title: "Payment access required",
+        description:
+          "You need permission to manage this invoice before you can record a payment.",
       },
       notFound: {
         title: "Not Found",
@@ -114,6 +115,9 @@ export const translations = {
     automatic: "Use the default account",
   },
   widget: {
+    backToInvoices: "Back to invoices",
+    retryInvoice: "Try again",
+    loadingInvoice: "Checking invoice access…",
     details: "Payment details",
     back: "Back",
     submit: "Record payment",

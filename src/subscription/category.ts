@@ -39,6 +39,12 @@ export const category: CategoryDefinition = {
   icon: "refresh-cw",
   order: 12,
   landing: {
+    summary: {
+      alias: "platform-summary",
+      scope: "platform",
+      args: { section: "subscriptions" },
+      progressive: true,
+    },
     destinations: [
       "subscription-admin-list",
       "subscription-admin-stats",

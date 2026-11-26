@@ -49,6 +49,8 @@ export const translations: typeof enTranslations = {
   persisted: "Uložené",
   skipped: "Preskočené",
   flagged: "Označené",
+  attachmentDescription:
+    "Stiahnite pôvodnú dodávateľskú faktúru alebo doklad z prílohy skontrolovaného e-mailu.",
   attachmentTitle: "Stiahnuť doklad",
   download: "Stiahnuť",
   errors: {

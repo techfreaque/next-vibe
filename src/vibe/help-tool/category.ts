@@ -35,6 +35,12 @@ export const category: CategoryDefinition = {
   icon: "settings",
   order: 20,
   landing: {
+    summary: {
+      alias: "platform-summary",
+      scope: "platform",
+      args: { section: "operations" },
+      progressive: true,
+    },
     destinations: ["system-settings", "vibe_env_settings_export-env_GET"],
     destinationDescriptions: {
       "system-settings": {

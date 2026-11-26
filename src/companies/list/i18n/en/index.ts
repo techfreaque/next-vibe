@@ -18,9 +18,15 @@ export const translations = {
     list: "List",
   },
   get: {
-    title: "My Companies",
-    titleShort: "Companies",
-    description: "Companies you are a member of",
+    title: "Companies",
+    titleShort: "Company directory",
+    description:
+      "Browse company memberships. Platform administrators can open the full directory.",
+    includeAll: {
+      label: "All companies",
+      description:
+        "Include companies you do not belong to. Platform administrators only.",
+    },
     page: {
       label: "Page",
       description: "Page number (starts at 1)",
@@ -72,10 +78,13 @@ export const translations = {
       description: "Company list retrieved",
     },
     widget: {
+      noMembership: "No membership",
       back: "Back",
       loading: "Loading companies...",
-      title: "My Companies",
-      create: "New Company",
+      title: "Companies",
+      create: "New company",
+      previous: "Previous",
+      next: "Next",
       total: "companies",
       totalSingular: "company",
       inactive: "Inactive",

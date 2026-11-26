@@ -80,7 +80,7 @@ const { GET } = createEndpoint({
         description: "id.get.id.description" as const,
         placeholder: "id.get.id.placeholder" as const,
         columns: 12,
-        schema: z.uuid("usersErrors.validation.id.invalid"),
+        schema: z.guid(),
       }),
 
       // === USER PROFILE INFORMATION ===
@@ -104,7 +104,7 @@ const { GET } = createEndpoint({
                 type: WidgetType.TEXT,
                 content:
                   "id.get.response.userProfile.basicInfo.id.content" as const,
-                schema: z.string().uuid().describe("User unique identifier"),
+                schema: z.guid().describe("User unique identifier"),
               }),
               email: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
@@ -599,7 +599,7 @@ const { PUT } = createEndpoint({
         description: "id.put.id.description" as const,
         placeholder: "id.put.id.placeholder" as const,
         columns: 12,
-        schema: z.string().uuid("usersErrors.validation.id.invalid"),
+        schema: z.guid(),
       }),
 
       // === BASIC INFORMATION ===
@@ -612,7 +612,7 @@ const { PUT } = createEndpoint({
         columns: 6,
         schema: z
           .string()
-          .email("usersErrors.validation.email.invalid")
+          .email()
           .transform((val) => val.toLowerCase().trim())
           .optional(),
       }),
@@ -624,8 +624,8 @@ const { PUT } = createEndpoint({
         columns: 6,
         schema: z
           .string()
-          .min(1, "usersErrors.validation.privateName.required")
-          .max(255, "usersErrors.validation.privateName.tooLong")
+          .min(1)
+          .max(255)
           .transform((val) => val.trim())
           .optional(),
       }),
@@ -637,8 +637,8 @@ const { PUT } = createEndpoint({
         columns: 6,
         schema: z
           .string()
-          .min(1, "usersErrors.validation.publicName.required")
-          .max(255, "usersErrors.validation.publicName.tooLong")
+          .min(1)
+          .max(255)
           .transform((val) => val.trim())
           .optional(),
       }),
@@ -881,7 +881,7 @@ const { DELETE } = createEndpoint({
         placeholder: "id.delete.id.placeholder" as const,
         helpText: "id.delete.id.helpText" as const,
         columns: 12,
-        schema: z.string().uuid("usersErrors.validation.id.invalid"),
+        schema: z.guid(),
       }),
 
       // === SUBMIT BUTTON ===

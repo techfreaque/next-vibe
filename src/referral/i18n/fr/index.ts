@@ -105,9 +105,10 @@ export const translations: typeof enTranslations = {
   codes: {
     list: {
       get: {
-        title: "Liste des codes de parrainage",
-        titleShort: "Mes codes",
-        description: "Tous vos codes de parrainage avec leurs statistiques",
+        title: "Commissions de parrainage",
+        titleShort: "Commissions de parrainage",
+        description:
+          "Consultez les commissions de parrainage. Les administrateurs de la plateforme voient tous les partenaires.",
         form: {
           title: "Vos codes de parrainage",
           description: "Consultez et gérez vos codes de parrainage",
@@ -239,13 +240,15 @@ export const translations: typeof enTranslations = {
     },
     list: {
       get: {
-        title: "Liste des gains de parrainage",
-        titleShort: "Gains",
-        description: "L'historique de vos gains de parrainage",
+        title: "Commissions de parrainage",
+        titleShort: "Commissions de parrainage",
+        description:
+          "Consultez les commissions de parrainage. Les administrateurs de la plateforme voient tous les partenaires.",
         form: {
           title: "Vos gains de parrainage",
           description: "Consultez les gains issus de vos parrainages",
           targetUserId: "Compte partenaire",
+          personal: "Mes commissions uniquement",
           limit: {
             label: "Lignes par page",
             description: "Nombre de gains affichés par page",
@@ -258,6 +261,10 @@ export const translations: typeof enTranslations = {
         widget: {
           subtitle:
             "Commissions sur les paiements des utilisateurs que vous avez parrainés. Chacune reste en attente jusqu'à la fin du délai de remboursement.",
+          platformSubtitle:
+            "Commissions de parrainage de tous les partenaires. Les commissions en attente sont bloquées jusqu’à la fin du délai de remboursement.",
+          platformEmptyHint:
+            "Les commissions apparaissent ici lorsque les clients parrainés paient.",
           direct: "Parrainage direct",
           level: "Parrainage niveau {{level}}",
           empty: "Aucun gain pour l'instant",
@@ -271,6 +278,7 @@ export const translations: typeof enTranslations = {
           next: "Suivant",
           pageTotal: "Total de cette page ({{currency}})",
           col: {
+            partner: "Partenaire",
             date: "Date",
             source: "Origine",
             status: "Statut",

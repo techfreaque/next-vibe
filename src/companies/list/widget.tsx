@@ -1,5 +1,6 @@
 "use client";
 
+import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { Button, type ButtonMouseEvent } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { Building } from "next-vibe/ui/components/icons/Building";
@@ -12,12 +13,15 @@ import { StatusPill } from "next-vibe/ui/components/status-pill";
 import { P } from "next-vibe/ui/components/typography";
 import { usePickerCallback } from "next-vibe/unified-ui/_shared/picker-context";
 import {
+  useWidgetForm,
+  useWidgetIsInteractive,
   useWidgetLocale,
   useWidgetNavigation,
   useWidgetTranslation,
+  useWidgetUser,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import { type JSX } from "react";
+import { type JSX, useEffect } from "react";
 
 import { scopedTranslation as companiesScopedTranslation } from "../i18n";
 import type definition from "./definition";
@@ -38,9 +42,22 @@ export function CompanyListContainer(_props: {
   const { t: tCompanies } = companiesScopedTranslation.scopedT(locale);
   const onPick = usePickerCallback<{ id: string; name: string }>();
   const isPickerMode = !!onPick;
+  const user = useWidgetUser();
+  const isAdmin =
+    !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN);
+  const interactive = useWidgetIsInteractive();
+  const form = useWidgetForm<typeof definition.GET>();
+  const page = form?.watch("page") ?? 1;
+  const pageSize = form?.watch("pageSize") ?? 20;
+  const includeAll = interactive && isAdmin && !isPickerMode;
+  useEffect(() => {
+    if (includeAll && form && form.getValues("includeAll") === undefined) {
+      form.setValue("includeAll", true);
+    }
+  }, [form, includeAll]);
 
   const companies = data?.companies ?? [];
-  const total = data?.total;
+  const total = data?.total ?? 0;
 
   const handleOpen =
     (company: CompanyItem) =>
@@ -103,7 +120,13 @@ export function CompanyListContainer(_props: {
 
   // ── Populated / Empty ───────────────────────────────────────────
   return (
-    <Div className="max-w-2xl mx-auto w-full px-4 pt-8 pb-6 flex flex-col gap-6">
+    <Div
+      className={
+        isPickerMode
+          ? "mx-auto flex w-full max-w-2xl flex-col gap-6 px-4 py-6"
+          : "mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-6 sm:px-8"
+      }
+    >
       {canGoBack && !isPickerMode && (
         <Button
           type="button"
@@ -124,19 +147,21 @@ export function CompanyListContainer(_props: {
             <Span className="text-lg font-semibold">
               {t("get.widget.title")}
             </Span>
-            {total !== undefined && (
-              <Span className="text-sm text-muted-foreground">({total})</Span>
-            )}
+            <Span className="text-sm text-muted-foreground">
+              ({total.toLocaleString(locale)})
+            </Span>
           </Div>
-          <Button
-            type="button"
-            size="sm"
-            onClick={handleCreate}
-            className="gap-1.5 shrink-0"
-          >
-            <Plus className="h-3.5 w-3.5" />
-            {t("get.widget.create")}
-          </Button>
+          {interactive && isAdmin && (
+            <Button
+              type="button"
+              size="sm"
+              onClick={handleCreate}
+              className="shrink-0 gap-1.5"
+            >
+              <Plus className="h-3.5 w-3.5" />
+              {t("get.widget.create")}
+            </Button>
+          )}
         </Div>
       )}
 
@@ -154,7 +179,7 @@ export function CompanyListContainer(_props: {
               {t("get.widget.empty.hint")}
             </P>
           </Div>
-          {!isPickerMode && (
+          {!isPickerMode && interactive && isAdmin && (
             <Button
               type="button"
               size="sm"
@@ -174,9 +199,12 @@ export function CompanyListContainer(_props: {
           {companies.map((company) => {
             const inactive = !company.isActive;
             return (
-              <Div
+              <Button
                 key={company.id}
-                className={`flex items-center gap-3 px-4 py-3 bg-card hover:bg-muted/50 transition-colors cursor-pointer group ${inactive ? "opacity-60" : ""}`}
+                type="button"
+                size="unset"
+                variant="ghost"
+                className={`group h-auto w-full justify-start gap-3 whitespace-normal rounded-none bg-card px-4 py-3 text-start hover:bg-muted/50 ${inactive ? "opacity-60" : ""}`}
                 onClick={handleOpen(company)}
               >
                 <Div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-primary/10">
@@ -199,7 +227,9 @@ export function CompanyListContainer(_props: {
                   </Div>
                   <Span className="text-xs text-muted-foreground">
                     {[
-                      tCompanies(company.role),
+                      company.role
+                        ? tCompanies(company.role)
+                        : t("get.widget.noMembership"),
                       tCompanies(company.type),
                       company.country,
                       company.currency,
@@ -208,10 +238,35 @@ export function CompanyListContainer(_props: {
                       .join(" · ")}
                   </Span>
                 </Div>
-                <ChevronRight className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
-              </Div>
+                <ChevronRight
+                  className="h-4 w-4 shrink-0 text-muted-foreground"
+                  aria-hidden="true"
+                />
+              </Button>
             );
           })}
+        </Div>
+      )}
+      {interactive && total > pageSize && (
+        <Div className="flex justify-end gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            disabled={page <= 1}
+            onClick={() => form.setValue("page", page - 1)}
+          >
+            {t("get.widget.previous")}
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            disabled={page * pageSize >= total}
+            onClick={() => form.setValue("page", page + 1)}
+          >
+            {t("get.widget.next")}
+          </Button>
         </Div>
       )}
     </Div>

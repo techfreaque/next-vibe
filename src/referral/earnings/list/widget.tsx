@@ -47,7 +47,7 @@ const statusVariants: Record<
   typeof ReferralEarningStatusValue,
   StatusPillVariant
 > = {
-  [ReferralEarningStatus.PENDING]: "warning",
+  [ReferralEarningStatus.PENDING]: "info",
   [ReferralEarningStatus.CONFIRMED]: "success",
   [ReferralEarningStatus.CANCELED]: "muted",
 };
@@ -96,6 +96,7 @@ export function EarningsListContainer(): JSX.Element {
   const hasError = response?.success === false;
   const earnings = data?.earnings ?? [];
   const total = data?.totalCount ?? 0;
+  const platformWide = data?.platformWide === true;
   const from = total === 0 ? 0 : offset + 1;
   const to = Math.min(total, offset + earnings.length);
 
@@ -170,6 +171,9 @@ export function EarningsListContainer(): JSX.Element {
     id: earning.id,
     cells: {
       date: dateText(earning),
+      partner: platformWide ? (
+        <Span>{earning.earnerName || earning.earnerUserId}</Span>
+      ) : undefined,
       source: sourceText(earning),
       status: statusPill(earning),
       amount: amountText(earning),
@@ -187,7 +191,7 @@ export function EarningsListContainer(): JSX.Element {
     <Div className="flex flex-col">
       {earnings.map((earning) => (
         <Span key={earning.id}>
-          {`${formatDocDate(earning.createdAt, locale)}  ${sourceLabel(earning)}  ${formatMoney(earning.amountCents / 100, displayCurrency(earning.currency), locale)}  [${t(earning.status)}]`}
+          {`${formatDocDate(earning.createdAt, locale)}  ${platformWide ? `${earning.earnerName || earning.earnerUserId}  ` : ""}${sourceLabel(earning)}  ${formatMoney(earning.amountCents / 100, displayCurrency(earning.currency), locale)}  [${t(earning.status)}]`}
         </Span>
       ))}
       {totals.map(({ currency, cents }) => (
@@ -204,6 +208,11 @@ export function EarningsListContainer(): JSX.Element {
           className="flex min-w-0 items-start justify-between gap-3 rounded-lg border bg-card p-3"
         >
           <Div className="flex min-w-0 flex-col">
+            {platformWide && (
+              <Span className="truncate text-sm font-semibold">
+                {earning.earnerName || earning.earnerUserId}
+              </Span>
+            )}
             <Span className="truncate text-sm font-medium">
               {sourceLabel(earning)}
             </Span>
@@ -234,7 +243,15 @@ export function EarningsListContainer(): JSX.Element {
       <WidgetHeader
         size={embedded ? "section" : "page"}
         title={t("earnings.list.get.titleShort")}
-        subtitle={embedded ? undefined : t("earnings.list.get.widget.subtitle")}
+        subtitle={
+          embedded || !data
+            ? undefined
+            : t(
+                platformWide
+                  ? "earnings.list.get.widget.platformSubtitle"
+                  : "earnings.list.get.widget.subtitle",
+              )
+        }
       />
       {hasError && (
         <EmptyBlock
@@ -263,7 +280,11 @@ export function EarningsListContainer(): JSX.Element {
         <EmptyBlock
           icon={<DollarSign className="size-6" />}
           title={t("earnings.list.get.widget.empty")}
-          message={t("earnings.list.get.widget.emptyHint")}
+          message={t(
+            platformWide
+              ? "earnings.list.get.widget.platformEmptyHint"
+              : "earnings.list.get.widget.emptyHint",
+          )}
         />
       )}
       {data && !hasError && earnings.length > 0 && (
@@ -278,6 +299,14 @@ export function EarningsListContainer(): JSX.Element {
             label={t("earnings.list.get.titleShort")}
             columns={[
               { id: "date", label: t("earnings.list.get.widget.col.date") },
+              ...(platformWide
+                ? [
+                    {
+                      id: "partner",
+                      label: t("earnings.list.get.widget.col.partner"),
+                    },
+                  ]
+                : []),
               {
                 id: "source",
                 label: t("earnings.list.get.widget.col.source"),

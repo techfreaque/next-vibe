@@ -265,8 +265,7 @@ export function CatalogListWidget(_props: {
             <>
               <Button
                 type="button"
-                variant="ghost"
-                className="hidden @md:inline-flex"
+                variant="outline"
                 aria-expanded={showCheckout}
                 onClick={() => setShowCheckout(!showCheckout)}
               >

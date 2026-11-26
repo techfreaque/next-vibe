@@ -4,7 +4,7 @@ export const translations = {
 
   list: {
     title: "Billing addresses",
-    titleShort: "My Addresses",
+    titleShort: "My addresses",
     description: "List your saved addresses",
     response: {
       addresses: "Addresses",

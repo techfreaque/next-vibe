@@ -290,6 +290,7 @@ export const translations: typeof enTranslations = {
     page: { label: "Seite" },
     pageSize: { label: "Pro Seite" },
     response: {
+      debitTotal: "Soll gesamt",
       entries: "Buchungen",
       id: "ID",
       entryNumber: "Buchungsnr.",
@@ -310,6 +311,7 @@ export const translations: typeof enTranslations = {
       "Geben Sie einen positiven Soll- oder Habenbetrag mit höchstens vier Nachkommastellen ein.",
     errorAccount: "Wählen Sie ein gültiges Konto dieses Unternehmens.",
     widget: {
+      entryTotals: "Buchungssummen",
       lineDescription: "Buchungstext",
       incomplete: "Geben Sie für jede Zeile einen Soll- oder Habenbetrag ein.",
       offByLessThan: "Abweichung unter {{amount}}",

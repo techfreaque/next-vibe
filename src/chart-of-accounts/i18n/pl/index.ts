@@ -283,6 +283,7 @@ export const translations: typeof enTranslations = {
     page: { label: "Strona" },
     pageSize: { label: "Na stronie" },
     response: {
+      debitTotal: "Suma Wn",
       entries: "Zapisy",
       id: "ID",
       entryNumber: "Nr zapisu",
@@ -305,6 +306,7 @@ export const translations: typeof enTranslations = {
       "Podaj dodatnią kwotę po stronie Wn lub Ma z dokładnością do czterech miejsc po przecinku.",
     errorAccount: "Wybierz odpowiednie konto tej firmy.",
     widget: {
+      entryTotals: "Sumy zapisu",
       lineDescription: "Opis pozycji",
       incomplete: "Wpisz kwotę po stronie Wn lub Ma w każdym wierszu.",
       offByLessThan: "Różnica poniżej {{amount}}",

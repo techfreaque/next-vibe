@@ -20,7 +20,7 @@ export const translations: typeof enTranslations = {
         label: "Empfehlungscode",
         description:
           "Der Code für den Bericht (Groß- und Kleinschreibung egal)",
-        placeholder: "moemoe",
+        placeholder: "Empfehlungscode eingeben",
       },
     },
     response: {

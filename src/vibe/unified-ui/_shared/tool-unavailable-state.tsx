@@ -5,6 +5,7 @@ import {
   type EmptyBlockAction,
 } from "next-vibe/ui/components/empty-block";
 import { Lock } from "next-vibe/ui/components/icons/Lock";
+import { Search } from "next-vibe/ui/components/icons/Search";
 import type { JSX } from "react";
 
 import type { CountryLanguage } from "../../core/i18n/core/config";
@@ -62,7 +63,13 @@ export function ToolUnavailableState({
       className={
         className ?? "mx-4 mt-6 rounded-xl border bg-card px-4 py-10 sm:mx-8"
       }
-      icon={<Lock className="h-5 w-5" />}
+      icon={
+        reason === "unknown" ? (
+          <Search className="size-5" />
+        ) : (
+          <Lock className="size-5" />
+        )
+      }
       title={copy.title}
       message={copy.message}
       action={fix ?? back}

@@ -3,7 +3,7 @@
  * Shared authorization helpers for company-scoped operations
  */
 
-import { and, eq } from "drizzle-orm";
+import { and, count, eq } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
@@ -99,6 +99,8 @@ export class CompaniesRepository {
       type: (typeof CompanyTypeDB)[number];
       vatNumber: string | null;
       taxId: string | null;
+      address: string | null;
+      memberCount: number;
       country: string | null;
       currency: string | null;
       email: string | null;
@@ -136,12 +138,32 @@ export class CompaniesRepository {
         });
       }
 
+      const [membership] = await db
+        .select({ total: count() })
+        .from(companyMembers)
+        .where(
+          and(
+            eq(companyMembers.companyId, companyId),
+            eq(companyMembers.isActive, true),
+          ),
+        );
+      const address = [
+        company.addressLine1,
+        company.addressLine2,
+        [company.postalCode, company.city].filter(Boolean).join(" "),
+        company.region,
+      ]
+        .filter(Boolean)
+        .join(", ");
+
       return success({
         id: company.id,
         name: company.name,
         type: company.type,
         vatNumber: company.vatNumber ?? null,
         taxId: company.taxId ?? null,
+        address: address || null,
+        memberCount: membership?.total ?? 0,
         country: company.country ?? null,
         currency: company.currency ?? null,
         email: company.email ?? null,

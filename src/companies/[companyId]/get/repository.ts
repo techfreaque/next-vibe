@@ -23,6 +23,8 @@ export class CompanyGetRepository {
       type: (typeof CompanyTypeDB)[number];
       vatNumber: string | null;
       taxId: string | null;
+      address: string | null;
+      memberCount: number;
       country: string | null;
       currency: string | null;
       email: string | null;

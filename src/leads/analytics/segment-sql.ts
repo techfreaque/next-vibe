@@ -120,13 +120,28 @@ export function humanLeadCreationsSql(leadCondition: SQL): SQL {
   const noLeadChat = sql`NOT EXISTS (
     SELECT 1 FROM chat_threads ct WHERE ct.lead_id = l.id AND ct.created_at IS NOT NULL
   )`;
-  const family = botFamilySql(sql`ident.ua`, chrome131Crawler(noLeadChat));
+  // Materialize distinct agents before applying the regexes. Without the
+  // fence PostgreSQL can push the classifier below DISTINCT and run it per lead.
+  const family = botFamilySql(sql`agents.ua`, sql`false`);
   return sql`
-    SELECT l.created_at
-    FROM leads l
-    CROSS JOIN LATERAL (SELECT ${leadUserAgentSql("l")} AS ua) ident
-    LEFT JOIN growth_journeys j ON j.lead_id = l.id
-    WHERE (${leadCondition}) AND ${family} = ${BotFamily.HUMAN}
+    WITH cohort AS MATERIALIZED (
+      SELECT l.created_at, ident.ua,
+        CASE WHEN ident.ua = ${CHROME_131_CRAWLER_UA} THEN ${chrome131Crawler(noLeadChat)}
+             ELSE false END AS automation
+      FROM leads l
+      CROSS JOIN LATERAL (SELECT ${leadUserAgentSql("l")} AS ua) ident
+      LEFT JOIN growth_journeys j ON j.lead_id = l.id
+      WHERE (${leadCondition}) AND ident.ua IS NOT NULL
+    ), agents AS MATERIALIZED (
+      SELECT DISTINCT ua FROM cohort
+    ), human_agents AS MATERIALIZED (
+      SELECT agents.ua
+      FROM agents
+      WHERE ${family} = ${BotFamily.HUMAN}
+    )
+    SELECT cohort.created_at
+    FROM cohort INNER JOIN human_agents USING (ua)
+    WHERE cohort.automation IS NOT TRUE
   `;
 }
 

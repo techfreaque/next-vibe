@@ -51,6 +51,8 @@ export const translations: typeof enTranslations = {
   persisted: "Guardadas",
   skipped: "Omitidas",
   flagged: "Marcadas",
+  attachmentDescription:
+    "Descarga la factura del proveedor o el recibo original adjunto a un correo revisado.",
   attachmentTitle: "Descargar justificante",
   download: "Descargar",
   errors: {

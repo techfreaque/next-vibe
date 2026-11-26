@@ -39,6 +39,12 @@ export const category: CategoryDefinition = {
   order: 35,
   createActions: ["companies_create_POST"],
   landing: {
+    summary: {
+      alias: "platform-summary",
+      scope: "platform",
+      args: { section: "companies" },
+      progressive: true,
+    },
     destinations: ["companies-list"],
     actions: ["companies_create_POST"],
     destinationDescriptions: {

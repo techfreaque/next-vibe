@@ -20,9 +20,15 @@ export const translations: typeof enTranslations = {
     list: "Elenco",
   },
   get: {
-    title: "Le mie aziende",
-    titleShort: "Aziende",
-    description: "Aziende che si fanno parte di",
+    title: "Aziende",
+    titleShort: "Elenco aziende",
+    description:
+      "Consulta le aziende di cui fai parte. Gli amministratori della piattaforma possono aprire l’elenco completo.",
+    includeAll: {
+      label: "Tutte le aziende",
+      description:
+        "Includi le aziende di cui non fai parte. Solo per gli amministratori della piattaforma.",
+    },
     page: {
       label: "Pagina",
       description: "Numero di pagina (a partire da 1)",
@@ -74,10 +80,13 @@ export const translations: typeof enTranslations = {
       description: "Elenco delle aziende recuperate",
     },
     widget: {
+      noMembership: "Nessuna appartenenza",
       back: "Indietro",
       loading: "Caricamento in corso...",
-      title: "Le mie aziende",
+      title: "Aziende",
       create: "Nuova azienda",
+      previous: "Indietro",
+      next: "Avanti",
       total: "aziende",
       totalSingular: "società",
       inactive: "Inattivo",

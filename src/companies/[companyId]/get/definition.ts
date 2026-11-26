@@ -78,6 +78,16 @@ const { GET } = createEndpoint({
         type: WidgetType.TEXT,
         schema: z.string().nullable(),
       }),
+      address: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "get.widget.address",
+        schema: z.string().nullable().optional(),
+      }),
+      memberCount: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "get.widget.activeMembers",
+        schema: z.number().int().nonnegative().optional(),
+      }),
       country: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.string().nullable(),

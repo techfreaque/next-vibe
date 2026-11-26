@@ -50,6 +50,8 @@ export const translations: typeof enTranslations = {
   persisted: "Zapisane",
   skipped: "Pominięte",
   flagged: "Oznaczone",
+  attachmentDescription:
+    "Pobierz oryginalną fakturę dostawcy lub paragon załączony do sprawdzonej wiadomości.",
   attachmentTitle: "Pobierz dokument",
   download: "Pobierz",
   errors: {

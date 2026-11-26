@@ -39,6 +39,12 @@ export const category: CategoryDefinition = {
   icon: "mail",
   order: 10,
   landing: {
+    summary: {
+      alias: "platform-summary",
+      scope: "platform",
+      args: { section: "messenger" },
+      progressive: true,
+    },
     destinations: [
       "system-mail-inbox",
       "messenger-inbox",

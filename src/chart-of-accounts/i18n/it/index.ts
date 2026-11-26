@@ -288,6 +288,7 @@ export const translations: typeof enTranslations = {
     page: { label: "Pagina" },
     pageSize: { label: "Per pagina" },
     response: {
+      debitTotal: "Totale Dare",
       entries: "Voci",
       id: "ID",
       entryNumber: "Entrata",
@@ -310,6 +311,7 @@ export const translations: typeof enTranslations = {
       "Inserisci un importo positivo in dare o avere con un massimo di quattro decimali.",
     errorAccount: "Seleziona un conto valido di questa azienda.",
     widget: {
+      entryTotals: "Totali della registrazione",
       lineDescription: "Descrizione riga",
       incomplete: "Inserisci un importo in Dare o in Avere per ogni riga.",
       offByLessThan: "Differenza inferiore a {{amount}}",

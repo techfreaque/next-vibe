@@ -124,6 +124,7 @@ export function TaxRateCreateWidget({
             field={{
               ...withValue(field.children.rate, undefined, null),
               description: undefined,
+              className: "[&_input]:h-10",
               placeholder: undefined,
             }}
           />

@@ -12,6 +12,7 @@ import { ShoppingBag } from "next-vibe/ui/components/icons/ShoppingBag";
 import { ShoppingCart } from "next-vibe/ui/components/icons/ShoppingCart";
 import { Users } from "next-vibe/ui/components/icons/Users";
 import { SectionGroup } from "next-vibe/ui/components/section-group";
+import { canRetryRecordRead } from "next-vibe/unified-ui/_shared/admin-record-context";
 import { AdminRecordDetail } from "next-vibe/unified-ui/_shared/admin-record-detail";
 import { formatDocDate } from "next-vibe/unified-ui/_shared/format-money";
 import {
@@ -219,6 +220,12 @@ export function CompanyGetWidget(_props: {
   const country = countryName(data?.country ?? null, locale);
   const facts = data?.id
     ? [
+        { key: "address", label: t("get.widget.address"), value: data.address },
+        {
+          key: "members",
+          label: t("get.widget.activeMembers"),
+          value: data.memberCount?.toLocaleString(locale),
+        },
         { key: "vat", label: t("get.widget.vatNumber"), value: data.vatNumber },
         { key: "tax", label: t("get.widget.taxId"), value: data.taxId },
         { key: "email", label: t("get.widget.email"), value: data.email },
@@ -294,10 +301,19 @@ export function CompanyGetWidget(_props: {
           : response?.success === false
             ? {
                 kind: "error",
-                title: t("get.widget.loadFailed"),
-                message: response.message,
+                title: t(
+                  response.errorType.errorCode === 403
+                    ? "get.errors.forbidden.title"
+                    : "get.widget.loadFailed",
+                ),
+                message:
+                  response.errorType.errorCode === 403
+                    ? t("get.errors.forbidden.description")
+                    : response.message,
                 action:
-                  read && interactive
+                  read &&
+                  interactive &&
+                  canRetryRecordRead(response.errorType.errorCode)
                     ? {
                         label: t("get.widget.retry"),
                         onClick: () => void read.refetch(),

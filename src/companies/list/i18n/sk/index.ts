@@ -20,9 +20,15 @@ export const translations: typeof enTranslations = {
     list: "Zoznam",
   },
   get: {
-    title: "Moje spoločnosti",
-    titleShort: "Spoločnosti",
-    description: "Spoločnosti, ktorých ste členom",
+    title: "Firmy",
+    titleShort: "Adresár firiem",
+    description:
+      "Prezerajte firmy, ktorých ste členom. Správcovia platformy majú prístup k úplnému zoznamu.",
+    includeAll: {
+      label: "Všetky firmy",
+      description:
+        "Zahrňte aj firmy, ktorých nie ste členom. Iba pre správcov platformy.",
+    },
     page: {
       label: "Stránka",
       description: "Číslo strany (začína na 1)",
@@ -74,10 +80,13 @@ export const translations: typeof enTranslations = {
       description: "Získaný zoznam spoločnosti",
     },
     widget: {
+      noMembership: "Bez členstva",
       back: "Späť",
       loading: "Načítavam spoločnosti...",
-      title: "Moje spoločnosti",
-      create: "Nová spoločnosť",
+      title: "Firmy",
+      create: "Nová firma",
+      previous: "Predchádzajúca",
+      next: "Nasledujúca",
       total: "spoločnosti",
       totalSingular: "spoločnosť",
       inactive: "Neaktívne",

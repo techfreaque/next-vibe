@@ -104,9 +104,10 @@ export const translations: typeof enTranslations = {
   codes: {
     list: {
       get: {
-        title: "Lista kodów polecających",
-        titleShort: "Moje kody",
-        description: "Pobierz wszystkie swoje kody polecające ze statystykami",
+        title: "Prowizje z poleceń",
+        titleShort: "Prowizje z poleceń",
+        description:
+          "Przeglądaj prowizje z poleceń. Administratorzy platformy widzą wszystkich partnerów.",
         form: {
           title: "Twoje kody polecające",
           description: "Wyświetl i zarządzaj swoimi kodami polecającymi",
@@ -233,13 +234,15 @@ export const translations: typeof enTranslations = {
     },
     list: {
       get: {
-        title: "Lista zarobków z poleceń",
-        titleShort: "Zarobki",
-        description: "Pobierz historię swoich zarobków z poleceń",
+        title: "Prowizje z poleceń",
+        titleShort: "Prowizje z poleceń",
+        description:
+          "Przeglądaj prowizje z poleceń. Administratorzy platformy widzą wszystkich partnerów.",
         form: {
           title: "Twoje zarobki z poleceń",
           description: "Wyświetl swoje zarobki z poleceń",
           targetUserId: "Konto partnera",
+          personal: "Tylko moje prowizje",
           limit: {
             label: "Wiersze na stronę",
             description: "Ile zarobków pokazać na stronie",
@@ -252,6 +255,10 @@ export const translations: typeof enTranslations = {
         widget: {
           subtitle:
             "Prowizja z płatności poleconych przez ciebie osób. Każda jest wstrzymana do końca okresu zwrotu.",
+          platformSubtitle:
+            "Prowizje z poleceń wszystkich partnerów. Oczekujące prowizje zostaną zwolnione po upływie terminu zwrotu.",
+          platformEmptyHint:
+            "Prowizje pojawią się tutaj, gdy poleceni klienci zapłacą.",
           direct: "Bezpośrednie polecenie",
           level: "Polecenie poziomu {{level}}",
           empty: "Nie masz jeszcze zarobków",
@@ -265,6 +272,7 @@ export const translations: typeof enTranslations = {
           next: "Dalej",
           pageTotal: "Suma na tej stronie ({{currency}})",
           col: {
+            partner: "Partner",
             date: "Data",
             source: "Źródło",
             status: "Status",

@@ -102,9 +102,10 @@ export const translations = {
   codes: {
     list: {
       get: {
-        title: "List Referral Codes",
-        titleShort: "My Codes",
-        description: "Get all your referral codes with statistics",
+        title: "Referral earnings",
+        titleShort: "Referral earnings",
+        description:
+          "Browse referral commissions. Platform administrators can view all partners.",
         form: {
           title: "Your Referral Codes",
           description: "View and manage your referral codes",
@@ -234,13 +235,15 @@ export const translations = {
     },
     list: {
       get: {
-        title: "List Referral Earnings",
-        titleShort: "Earnings",
-        description: "Get your referral earnings history",
+        title: "Referral earnings",
+        titleShort: "Referral earnings",
+        description:
+          "Browse referral commissions. Platform administrators can view all partners.",
         form: {
           title: "Your Referral Earnings",
           description: "View your earnings from referrals",
           targetUserId: "Partner account",
+          personal: "Only my earnings",
           limit: {
             label: "Rows per page",
             description: "How many earnings to show per page",
@@ -253,6 +256,10 @@ export const translations = {
         widget: {
           subtitle:
             "Commission from payments of users you referred. Each one is on hold until the refund window passes.",
+          platformSubtitle:
+            "Referral commissions across all partners. Pending commissions are held until the refund window closes.",
+          platformEmptyHint:
+            "Commissions will appear here when referred customers pay.",
           direct: "Direct referral",
           level: "Level {{level}} referral",
           empty: "No earnings yet",
@@ -266,6 +273,7 @@ export const translations = {
           next: "Next",
           pageTotal: "Total on this page ({{currency}})",
           col: {
+            partner: "Partner",
             date: "Date",
             source: "Source",
             status: "Status",
@@ -338,7 +346,7 @@ export const translations = {
   admin: {
     payouts: {
       get: {
-        title: "Payout Requests",
+        title: "Payout requests",
         titleShort: "Payout requests",
         description: "Manage referral payout requests",
       },
@@ -384,7 +392,7 @@ export const translations = {
           description: "Optional notes for this action",
         },
         rejectionReason: {
-          label: "Rejection Reason",
+          label: "Rejection reason",
           description: "Reason for rejecting the payout request",
         },
       },

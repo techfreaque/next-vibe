@@ -35,6 +35,12 @@ export const category: CategoryDefinition = {
   icon: "coins",
   order: 15,
   landing: {
+    summary: {
+      alias: "platform-summary",
+      scope: "platform",
+      args: { section: "credits" },
+      progressive: true,
+    },
     destinations: [
       "credit-usage-report",
       "verify-credit-grant",

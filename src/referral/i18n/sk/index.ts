@@ -237,13 +237,15 @@ export const translations: typeof enTranslations = {
     },
     list: {
       get: {
-        title: "Zobraziť provízie za odporúčania",
-        titleShort: "Provízie",
-        description: "Načíta históriu vašich provízií za odporúčania",
+        title: "Provízie za odporúčania",
+        titleShort: "Provízie za odporúčania",
+        description:
+          "Prezerajte provízie za odporúčania. Správcovia platformy vidia všetkých partnerov.",
         form: {
           title: "Vaše provízie za odporúčania",
           description: "Zobrazte si svoje provízie za odporúčania",
           targetUserId: "Účet partnera",
+          personal: "Len moje provízie",
           limit: {
             label: "Riadky na stranu",
             description: "Koľko provízií zobraziť na stranu",
@@ -256,6 +258,10 @@ export const translations: typeof enTranslations = {
         widget: {
           subtitle:
             "Provízie z platieb používateľov, ktorých ste odporučili. Každá je zadržaná, kým neuplynie lehota na vrátenie peňazí.",
+          platformSubtitle:
+            "Provízie za odporúčania všetkých partnerov. Čakajúce provízie sa uvoľnia po uplynutí lehoty na vrátenie platby.",
+          platformEmptyHint:
+            "Provízie sa tu zobrazia po zaplatení odporučenými zákazníkmi.",
           direct: "Priame odporúčanie",
           level: "Odporúčanie {{level}}. úrovne",
           empty: "Zatiaľ žiadne provízie",
@@ -269,6 +275,7 @@ export const translations: typeof enTranslations = {
           next: "Ďalej",
           pageTotal: "Spolu na tejto strane ({{currency}})",
           col: {
+            partner: "Partner",
             date: "Dátum",
             source: "Zdroj",
             status: "Stav",

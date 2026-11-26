@@ -237,7 +237,7 @@ export function UserDetailContainer({
             kind: "error",
             title: accountT("widget.unavailable"),
             message:
-              status === 404
+              status === 404 || status === 400
                 ? accountT("errors.notFound.description")
                 : response.message,
             action:
@@ -397,16 +397,24 @@ export function UserDetailContainer({
                   {t("id.widget.moreActions")}
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="min-w-48">
+              <DropdownMenuContent
+                align="end"
+                collisionPadding={12}
+                className="min-w-48"
+              >
                 <DropdownMenuItem
-                  className="@md:hidden"
+                  className="gap-2 @md:hidden"
                   onSelect={() => openProfile()}
                 >
                   <User aria-hidden="true" className="size-4" />
                   {t("id.widget.fullProfile")}
                 </DropdownMenuItem>
                 {moreActions.map(({ key, label, icon: ActionIcon, run }) => (
-                  <DropdownMenuItem key={key} onSelect={() => run()}>
+                  <DropdownMenuItem
+                    key={key}
+                    className="gap-2"
+                    onSelect={() => run()}
+                  >
                     <ActionIcon aria-hidden="true" className="size-4" />
                     {label}
                   </DropdownMenuItem>
@@ -415,7 +423,7 @@ export function UserDetailContainer({
                   <>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
-                      className="text-destructive"
+                      className="gap-2 text-destructive"
                       onSelect={() => setDeleteOpen(true)}
                     >
                       <Trash2 aria-hidden="true" className="size-4" />

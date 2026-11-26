@@ -38,9 +38,16 @@ export const category: CategoryDefinition = {
   icon: "share-2",
   order: 60,
   landing: {
+    summary: {
+      alias: "platform-summary",
+      scope: "platform",
+      args: { section: "referral" },
+      progressive: true,
+    },
     destinations: [
       "referral-overview",
       "referral_admin_payouts_GET",
+      "referral_earnings_list_GET",
       "referral-code-report",
     ],
     destinationDescriptions: {

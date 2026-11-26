@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "next-vibe/ui/components/button";
+import { DetailField, DetailGrid } from "next-vibe/ui/components/detail-grid";
 import { Div } from "next-vibe/ui/components/div";
 import { EmptyBlock } from "next-vibe/ui/components/empty-block";
 import { AlertCircle } from "next-vibe/ui/components/icons/AlertCircle";
@@ -31,6 +32,7 @@ import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/sub
 import { type JSX, useEffect, useRef } from "react";
 import { z } from "zod";
 
+import { TaxTypeDB } from "../../../enum";
 import listDefinition from "../../list/definition";
 import type definition from "./definition";
 
@@ -62,6 +64,7 @@ export function TaxRateUpdateWidget({
     user,
   });
   const stored = lookup.data?.rates?.find((row) => row.id === rateId);
+  const rateType = TaxTypeDB.find((type) => type === stored?.type);
   const initialized = useRef<string | undefined>(undefined);
   const defaults = form.formState.defaultValues;
   useEffect(() => {
@@ -127,14 +130,21 @@ export function TaxRateUpdateWidget({
   return (
     <AdminForm
       className="mx-auto max-w-3xl"
-      title={stored?.name ?? t("rate.update.title")}
+      title={
+        stored?.name ??
+        (selected && lookup.isSuccess && !lookup.isFetching
+          ? t("rate.list.titleShort")
+          : t("rate.update.title"))
+      }
       description={
         stored
           ? t("rate.update.widget.subtitle", {
               company: stored.companyName,
               code: stored.code,
             })
-          : t("rate.update.description")
+          : selected
+            ? undefined
+            : t("rate.update.description")
       }
       backButton={
         navigation.canGoBack && (
@@ -211,6 +221,21 @@ export function TaxRateUpdateWidget({
         )
       ) : (
         <AdminFormSection title={t("rate.details")} columns={2}>
+          {stored && (
+            <DetailGrid columns={2} className="col-span-full border-b pb-3">
+              <DetailField
+                label={t("rate.list.response.rate.type")}
+                value={rateType ? t(rateType) : stored.type}
+              />
+              <DetailField
+                label={t("rate.list.response.rate.country")}
+                value={
+                  [stored.country, stored.region].filter(Boolean).join(", ") ||
+                  undefined
+                }
+              />
+            </DetailGrid>
+          )}
           <TextFieldWidget
             fieldName="name"
             field={{
@@ -224,6 +249,7 @@ export function TaxRateUpdateWidget({
             field={{
               ...withValue(field.children.rate, undefined, null),
               description: undefined,
+              className: "[&_input]:h-10",
               placeholder: undefined,
             }}
           />

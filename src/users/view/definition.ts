@@ -55,7 +55,7 @@ export const { GET } = createEndpoint({
       userId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        schema: z.uuid(),
+        schema: z.guid(),
         label: "get.userId.label" as const,
         hidden: true,
         includeInCacheKey: true,

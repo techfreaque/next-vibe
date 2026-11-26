@@ -421,8 +421,9 @@ export const translations = {
         description: "You must be logged in",
       },
       forbidden: {
-        title: "Forbidden",
-        description: "You do not have permission to view tax reports",
+        title: "Tax report access required",
+        description:
+          "You do not have permission to view the tax report for this company.",
       },
       notFound: { title: "Not Found", description: "Company not found" },
       conflict: { title: "Conflict", description: "A conflict occurred" },

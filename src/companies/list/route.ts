@@ -12,6 +12,6 @@ export const { GET, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     handler: ({ data, logger, user, locale }) =>
-      CompaniesListRepository.listUserCompanies(user.id, data, logger, locale),
+      CompaniesListRepository.listUserCompanies(user, data, logger, locale),
   },
 });

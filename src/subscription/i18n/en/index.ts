@@ -213,7 +213,7 @@ export const translations = {
   // GET endpoint
   get: {
     title: "Get Subscription",
-    titleShort: "My Subscription",
+    titleShort: "My subscription",
     description: "Retrieve current subscription details",
     form: {
       title: "Subscription Details",

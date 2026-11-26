@@ -4,7 +4,7 @@
 
 import "server-only";
 
-import { and, count, desc, eq, gte, inArray, lte } from "drizzle-orm";
+import { and, asc, count, desc, eq, gte, inArray, lte, sql } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
@@ -20,8 +20,12 @@ import { companies, companyMembers } from "@/companies/db";
 import { CompanyMemberRole } from "@/companies/enum";
 import { CompanyAuthRepository } from "@/companies/repository";
 
-import { journalEntries } from "../../db";
-import { JournalEntryStatusDB, JournalSourceTypeDB } from "../../enum";
+import { journalEntries, journalEntryLines } from "../../db";
+import {
+  JournalEntryStatusDB,
+  JournalSourceTypeDB,
+  LineType,
+} from "../../enum";
 import { scopedTranslation } from "../../i18n";
 import type {
   CoaJournalListRequestOutput,
@@ -117,9 +121,47 @@ export class CoaJournalListRepository {
         .from(journalEntries)
         .leftJoin(companies, eq(companies.id, journalEntries.companyId))
         .where(where)
-        .orderBy(desc(journalEntries.date), desc(journalEntries.entryNumber))
+        .orderBy(
+          desc(journalEntries.date),
+          desc(journalEntries.entryNumber),
+          desc(journalEntries.id),
+        )
         .limit(pageSize)
         .offset(offset);
+
+      const amounts =
+        rows.length > 0
+          ? await db
+              .select({
+                entryId: journalEntryLines.journalEntryId,
+                currency: journalEntryLines.currency,
+                amount: sql<number>`sum(${journalEntryLines.amount})::float8`,
+              })
+              .from(journalEntryLines)
+              .where(
+                and(
+                  inArray(
+                    journalEntryLines.journalEntryId,
+                    rows.map(({ entry }) => entry.id),
+                  ),
+                  eq(journalEntryLines.type, LineType.DEBIT),
+                ),
+              )
+              .groupBy(
+                journalEntryLines.journalEntryId,
+                journalEntryLines.currency,
+              )
+              .orderBy(asc(journalEntryLines.currency))
+          : [];
+      const totalsByEntry = new Map<
+        string,
+        { currency: string; amount: number }[]
+      >();
+      for (const { entryId, currency, amount } of amounts) {
+        const totals = totalsByEntry.get(entryId) ?? [];
+        totals.push({ currency, amount });
+        totalsByEntry.set(entryId, totals);
+      }
 
       return success({
         entries: rows.map(({ entry: r, companyName }) => ({
@@ -132,6 +174,7 @@ export class CoaJournalListRepository {
           postedAt: r.postedAt ?? null,
           companyId: r.companyId,
           companyName: companyName ?? null,
+          debitTotals: totalsByEntry.get(r.id) ?? [],
         })),
         totalCount: totalCount ?? 0,
       });

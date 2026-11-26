@@ -10,6 +10,7 @@ import {
   FormMessage,
 } from "next-vibe/ui/components/form/form";
 import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
+import { LoadingBlock } from "next-vibe/ui/components/loading-block";
 import { ResultBanner } from "next-vibe/ui/components/result-banner";
 import {
   Select,
@@ -18,6 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "next-vibe/ui/components/select";
+import { canRetryRecordRead } from "next-vibe/unified-ui/_shared/admin-record-context";
 import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
 import { formatMoney } from "next-vibe/unified-ui/_shared/format-money";
 import {
@@ -70,25 +72,35 @@ export function InvoiceRecordPaymentWidget({
   const user = useWidgetUser();
   const locale = useWidgetLocale();
   const invoiceId = form.watch("invoiceId");
-  const formVisible = interactive && !data?.success;
+  const shouldLoadInvoice = interactive && !data?.success;
+  const validInvoiceId = z.uuid().safeParse(invoiceId).success;
   const invoiceOptions = useMemo(
     () => ({
       read: {
         urlPathParams: { invoiceId },
         queryOptions: {
-          enabled: formVisible && z.uuid().safeParse(invoiceId).success,
+          enabled: shouldLoadInvoice && validInvoiceId,
         },
       },
     }),
-    [formVisible, invoiceId],
+    [shouldLoadInvoice, validInvoiceId, invoiceId],
   );
-  const loadedInvoice = useEndpoint(
+  const invoiceRead = useEndpoint(
     invoiceDefinition,
     invoiceOptions,
     logger,
     user,
-  ).read?.data;
+  ).read;
+  const loadedInvoice = invoiceRead?.data;
   const invoice = loadedInvoice?.id === invoiceId ? loadedInvoice : undefined;
+  const readFailure =
+    invoiceRead?.response?.success === false ? invoiceRead.response : undefined;
+  const status = readFailure?.errorType.errorCode;
+  const formVisible =
+    shouldLoadInvoice &&
+    !readFailure &&
+    invoice?.canManage === true &&
+    invoice.status === InvoiceStatus.OPEN;
   const companyId = invoice?.companyId ?? undefined;
   const currency = invoice?.currency;
   const amountDue =
@@ -145,26 +157,32 @@ export function InvoiceRecordPaymentWidget({
     }
   }, [form, formVisible]);
 
-  // Most payments settle the open balance: start from it, the user edits it.
-  const didPrefillAmount = useRef(false);
+  // The number field can initialize to zero. Seed the balance only while
+  // the operator has left the amount untouched.
+  const prefilledInvoice = useRef<string | undefined>(undefined);
   useEffect(() => {
     if (
-      formVisible &&
-      amountDue !== undefined &&
-      !didPrefillAmount.current &&
-      form.getValues("amount") === undefined
+      !formVisible ||
+      amountDue === undefined ||
+      prefilledInvoice.current === invoiceId
     ) {
-      didPrefillAmount.current = true;
+      return;
+    }
+    prefilledInvoice.current = invoiceId;
+    if (
+      !form.getFieldState("amount").isDirty &&
+      !(form.getValues("amount") > 0)
+    ) {
       form.setValue("amount", amountDue);
     }
-  }, [amountDue, form, formVisible]);
+  }, [amountDue, form, formVisible, invoiceId]);
 
   useEffect(() => {
-    if (!receiptKey && !data?.success) {
+    if (!receiptKey && formVisible) {
       generatedReceiptKey.current ??= uuidv4();
       form.setValue("receiptKey", generatedReceiptKey.current);
     }
-  }, [data?.success, form, receiptKey]);
+  }, [formVisible, form, receiptKey]);
 
   const handleViewInvoice = (): void => {
     if (invoiceId) {
@@ -213,19 +231,72 @@ export function InvoiceRecordPaymentWidget({
     );
   }
 
-  return (
-    <AdminForm
-      title={t("post.title")}
-      description={reference || undefined}
-      alert={
-        invoice && invoice.status !== InvoiceStatus.OPEN ? (
+  if (!formVisible) {
+    const missing = !validInvoiceId || status === 404;
+    const denied = status === 403 || invoice?.canManage === false;
+    const unavailable = !missing && !denied && status !== undefined;
+    const closed =
+      invoice?.canManage === true && invoice.status !== InvoiceStatus.OPEN;
+    const error = missing ? "notFound" : denied ? "forbidden" : "server";
+    return (
+      <AdminForm
+        title={t("post.title")}
+        primaryAction={null}
+        className="mx-auto max-w-3xl"
+      >
+        {closed && !readFailure ? (
           <ResultBanner
             variant="warning"
             title={t("widget.notOpenTitle")}
             message={t("widget.notOpenMessage")}
-          />
-        ) : undefined
-      }
+          >
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              onClick={handleViewInvoice}
+            >
+              {t("widget.viewInvoice")}
+            </Button>
+          </ResultBanner>
+        ) : missing || denied || unavailable ? (
+          <ResultBanner
+            variant="danger"
+            title={t(`post.errors.${error}.title`)}
+            message={t(`post.errors.${error}.description`)}
+          >
+            <Div className="flex flex-wrap gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => navigation.push(invoiceListDefinition.GET)}
+              >
+                {t("widget.backToInvoices")}
+              </Button>
+              {status !== undefined && canRetryRecordRead(status) && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => void invoiceRead?.refetch()}
+                >
+                  {t("widget.retryInvoice")}
+                </Button>
+              )}
+            </Div>
+          </ResultBanner>
+        ) : (
+          <LoadingBlock message={t("widget.loadingInvoice")} />
+        )}
+      </AdminForm>
+    );
+  }
+
+  return (
+    <AdminForm
+      title={t("post.title")}
+      description={reference || undefined}
       className="mx-auto max-w-3xl"
       backButton={
         <Button

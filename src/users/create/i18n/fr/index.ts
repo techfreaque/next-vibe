@@ -24,7 +24,7 @@ export const translations: typeof enTranslations = {
     },
     password: {
       label: "Mot de passe",
-      description: "Mot de passe sécurisé du compte utilisateur",
+      description: "Utilisez au moins 8 caractères.",
     },
     privateName: {
       label: "Nom privé",
@@ -57,6 +57,7 @@ export const translations: typeof enTranslations = {
     },
     roles: {
       label: "Rôles de l'utilisateur",
+      placeholder: "Attribuer des rôles",
       description: "Attribuer des rôles à l'utilisateur",
     },
     imageUrl: {
@@ -89,10 +90,12 @@ export const translations: typeof enTranslations = {
     },
     country: {
       label: "Pays",
+      placeholder: "Choisir un pays",
       description: "Pays de résidence de l'utilisateur",
     },
     language: {
       label: "Langue",
+      placeholder: "Choisir une langue",
       description: "Langue préférée de l'utilisateur",
     },
     response: {

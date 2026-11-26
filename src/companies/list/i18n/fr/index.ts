@@ -20,9 +20,15 @@ export const translations: typeof enTranslations = {
     list: "Liste",
   },
   get: {
-    title: "Mes entreprises",
-    titleShort: "Entreprises",
-    description: "Les entreprises dont vous êtes membre",
+    title: "Entreprises",
+    titleShort: "Annuaire des entreprises",
+    description:
+      "Consultez vos entreprises. Les administrateurs de la plateforme ont accès à l’annuaire complet.",
+    includeAll: {
+      label: "Toutes les entreprises",
+      description:
+        "Inclure les entreprises dont vous ne faites pas partie. Réservé aux administrateurs de la plateforme.",
+    },
     page: {
       label: "Page",
       description: "Numéro de page (à partir de 1)",
@@ -74,10 +80,13 @@ export const translations: typeof enTranslations = {
       description: "Liste des entreprises récupérée",
     },
     widget: {
+      noMembership: "Aucune adhésion",
       back: "Retour",
       loading: "Chargement des entreprises...",
-      title: "Mes entreprises",
+      title: "Entreprises",
       create: "Nouvelle entreprise",
+      previous: "Précédent",
+      next: "Suivant",
       total: "entreprises",
       totalSingular: "entreprise",
       inactive: "Inactive",

@@ -20,7 +20,7 @@ export const translations: typeof enTranslations = {
         label: "Código de referido",
         description:
           "El código a analizar (no distingue mayúsculas y minúsculas)",
-        placeholder: "moemoe",
+        placeholder: "Introduce un código de referido",
       },
     },
     response: {

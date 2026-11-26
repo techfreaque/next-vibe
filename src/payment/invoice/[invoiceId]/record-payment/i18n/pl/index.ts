@@ -59,8 +59,9 @@ export const translations: typeof enTranslations = {
         description: "Wystąpił błąd sieci",
       },
       forbidden: {
-        title: "Zabronione",
-        description: "Dostęp zabroniony",
+        title: "Wymagane uprawnienie do płatności",
+        description:
+          "Aby zarejestrować płatność, musisz mieć uprawnienia do zarządzania tą fakturą.",
       },
       notFound: {
         title: "Nie znaleziono",
@@ -112,6 +113,9 @@ export const translations: typeof enTranslations = {
     automatic: "Użyj konta domyślnego",
   },
   widget: {
+    backToInvoices: "Wróć do faktur",
+    retryInvoice: "Spróbuj ponownie",
+    loadingInvoice: "Sprawdzanie dostępu do faktury…",
     details: "Szczegóły płatności",
     back: "Wróć",
     submit: "Zarejestruj płatność",

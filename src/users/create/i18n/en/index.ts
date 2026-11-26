@@ -20,7 +20,7 @@ export const translations = {
     },
     password: {
       label: "Password",
-      description: "Secure password for the user account",
+      description: "Use at least 8 characters.",
     },
     privateName: {
       label: "Private name",
@@ -52,6 +52,7 @@ export const translations = {
     },
     roles: {
       label: "User roles",
+      placeholder: "Assign roles",
       description: "Assign roles to the user",
     },
     imageUrl: {
@@ -84,10 +85,12 @@ export const translations = {
     },
     country: {
       label: "Country",
+      placeholder: "Choose a country",
       description: "User's country of residence",
     },
     language: {
       label: "Language",
+      placeholder: "Choose a language",
       description: "User's preferred language",
     },
     response: {

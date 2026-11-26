@@ -107,8 +107,7 @@ export const translations: typeof enTranslations = {
     lastPayment: "Posledná platba",
     stripeCustomerId: "Zákazník v Stripe",
     none: "Bez predplatného",
-    noSubscriptionButPaid:
-      "Bez predplatného. Hodnota kúpených kreditov: {{amount}}.",
+    noSubscriptionButPaid: "Bez predplatného. Celkovo zaplatené: {{amount}}.",
   },
   credits: {
     subscription: "Kredity z predplatného",

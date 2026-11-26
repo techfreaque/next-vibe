@@ -19,7 +19,7 @@ export const translations: typeof enTranslations = {
       code: {
         label: "Kod polecający",
         description: "Kod do raportu (wielkość liter nie ma znaczenia)",
-        placeholder: "moemoe",
+        placeholder: "Wpisz kod polecający",
       },
     },
     response: {

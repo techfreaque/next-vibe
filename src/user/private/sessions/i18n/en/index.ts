@@ -20,7 +20,7 @@ export const translations = {
 
   list: {
     title: "Signed-in devices",
-    titleShort: "My Sessions",
+    titleShort: "My sessions",
     description: "List all active sessions for your account",
     tag: "Sessions",
     response: {

@@ -22,7 +22,7 @@ export const translations: typeof enTranslations = {
     },
     password: {
       label: "Passwort",
-      description: "Sicheres Passwort für das Benutzerkonto",
+      description: "Mindestens 8 Zeichen verwenden.",
     },
     privateName: {
       label: "Privater Name",
@@ -55,6 +55,7 @@ export const translations: typeof enTranslations = {
     },
     roles: {
       label: "Benutzerrollen",
+      placeholder: "Rollen zuweisen",
       description: "Rollen dem Benutzer zuweisen",
     },
     imageUrl: {
@@ -87,10 +88,12 @@ export const translations: typeof enTranslations = {
     },
     country: {
       label: "Land",
+      placeholder: "Land auswählen",
       description: "Wohnsitzland des Benutzers",
     },
     language: {
       label: "Sprache",
+      placeholder: "Sprache auswählen",
       description: "Bevorzugte Sprache des Benutzers",
     },
     response: {

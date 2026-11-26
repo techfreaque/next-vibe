@@ -425,8 +425,9 @@ export const translations: typeof enTranslations = {
         description: "Musisz być zalogowany",
       },
       forbidden: {
-        title: "Brak dostępu",
-        description: "Nie masz uprawnień do przeglądania raportów podatkowych",
+        title: "Wymagany dostęp do raportu",
+        description:
+          "Nie masz uprawnień do wyświetlenia raportu podatkowego tej firmy.",
       },
       notFound: {
         title: "Nie znaleziono",

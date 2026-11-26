@@ -32,6 +32,7 @@ import {
   responseArrayField,
   responseField,
 } from "next-vibe/unified-ui/_shared/utils-i18n";
+import { createFormErrorMap } from "next-vibe/unified-ui/hooks/form-error-map";
 import { z } from "zod";
 
 import { USERS_CREATE_ALIAS } from "./constants";
@@ -50,6 +51,7 @@ const { POST } = createEndpoint({
   path: ["users", "create"],
   aliases: [USERS_CREATE_ALIAS] as const,
   allowedRoles: [UserRole.ADMIN] as const,
+  requestErrorMap: createFormErrorMap,
 
   title: "post.title" as const,
   titleShort: "post.titleShort",
@@ -84,8 +86,10 @@ const { POST } = createEndpoint({
             columns: 12,
             schema: z
               .string()
-              .email("usersErrors.validation.email.invalid")
-              .transform((val) => val.toLowerCase().trim()),
+              .trim()
+              .min(1)
+              .pipe(z.email())
+              .transform((value) => value.toLowerCase()),
           }),
           password: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
@@ -94,10 +98,7 @@ const { POST } = createEndpoint({
             description: "post.password.description" as const,
             helpText: "post.password.description" as const,
             columns: 12,
-            schema: z
-              .string()
-              .min(8, "usersErrors.validation.password.tooShort")
-              .max(128, "usersErrors.validation.password.tooLong"),
+            schema: z.string().min(1, { abort: true }).min(8).max(128),
           }),
           privateName: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
@@ -105,11 +106,7 @@ const { POST } = createEndpoint({
             label: "post.privateName.label" as const,
             description: "post.privateName.description" as const,
             columns: 6,
-            schema: z
-              .string()
-              .min(1, "usersErrors.validation.privateName.required")
-              .max(255, "usersErrors.validation.privateName.tooLong")
-              .transform((val) => val.trim()),
+            schema: z.string().trim().min(1).max(255),
           }),
           publicName: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
@@ -117,11 +114,7 @@ const { POST } = createEndpoint({
             label: "post.publicName.label" as const,
             description: "post.publicName.description" as const,
             columns: 6,
-            schema: z
-              .string()
-              .min(1, "usersErrors.validation.publicName.required")
-              .max(255, "usersErrors.validation.publicName.tooLong")
-              .transform((val) => val.trim()),
+            schema: z.string().trim().min(1).max(255),
           }),
 
           country: requestField(scopedTranslation, {
@@ -129,6 +122,7 @@ const { POST } = createEndpoint({
             fieldType: FieldDataType.SELECT,
             label: "post.country.label" as const,
             description: "post.country.description" as const,
+            placeholder: "post.country.placeholder",
             options: CountriesOptions,
             columns: 6,
             schema: z.enum(Countries),
@@ -139,6 +133,7 @@ const { POST } = createEndpoint({
             fieldType: FieldDataType.SELECT,
             label: "post.language.label" as const,
             description: "post.language.description" as const,
+            placeholder: "post.language.placeholder",
             options: LanguagesOptions,
             columns: 6,
             schema: z.enum(Languages),
@@ -160,6 +155,7 @@ const { POST } = createEndpoint({
             fieldType: FieldDataType.MULTISELECT,
             label: "post.roles.label" as const,
             description: "post.roles.description" as const,
+            placeholder: "post.roles.placeholder",
             helpText: "post.roles.description" as const,
             columns: 12,
             options: UserPermissionRoleOptions,

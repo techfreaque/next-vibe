@@ -59,7 +59,15 @@ export const { GET } = createEndpoint({
         label: "earnings.list.get.form.targetUserId" as const,
         hidden: true,
         includeInCacheKey: true,
-        schema: z.string().optional(),
+        schema: z.guid().optional(),
+      }),
+      personal: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "earnings.list.get.form.personal",
+        hidden: true,
+        includeInCacheKey: true,
+        schema: z.boolean().optional(),
       }),
       limit: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -67,6 +75,7 @@ export const { GET } = createEndpoint({
         label: "earnings.list.get.form.limit.label" as const,
         description: "earnings.list.get.form.limit.description" as const,
         hidden: true,
+        includeInCacheKey: true,
         schema: z.coerce.number().int().positive().max(200).optional(),
       }),
       offset: requestField(scopedTranslation, {
@@ -75,6 +84,7 @@ export const { GET } = createEndpoint({
         label: "earnings.list.get.form.offset.label" as const,
         description: "earnings.list.get.form.offset.description" as const,
         hidden: true,
+        includeInCacheKey: true,
         schema: z.coerce.number().int().min(0).optional(),
       }),
       earnings: responseField(scopedTranslation, {
@@ -83,6 +93,7 @@ export const { GET } = createEndpoint({
           z.object({
             id: z.string(),
             earnerUserId: z.string(),
+            earnerName: z.string().nullable().optional(),
             sourceUserId: z.string(),
             transactionId: z.string(),
             level: z.coerce.number(),
@@ -92,6 +103,10 @@ export const { GET } = createEndpoint({
             createdAt: dateSchema,
           }),
         ),
+      }),
+      platformWide: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        schema: z.boolean(),
       }),
       totalCount: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
@@ -124,10 +139,12 @@ export const { GET } = createEndpoint({
             createdAt: "2026-11-18T15:20:00.000Z",
           },
         ],
+        platformWide: false,
         totalCount: 1,
       },
       firstPage: {
         earnings: [],
+        platformWide: false,
         totalCount: 0,
       },
     },

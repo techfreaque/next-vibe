@@ -291,6 +291,7 @@ export const translations: typeof enTranslations = {
     page: { label: "Página" },
     pageSize: { label: "Por página" },
     response: {
+      debitTotal: "Total del debe",
       entries: "Entradas",
       id: "ID",
       entryNumber: "Entrada",
@@ -313,6 +314,7 @@ export const translations: typeof enTranslations = {
       "Introduce un importe positivo en el debe o el haber con un máximo de cuatro decimales.",
     errorAccount: "Selecciona una cuenta válida de esta empresa.",
     widget: {
+      entryTotals: "Totales del asiento",
       lineDescription: "Descripción de la línea",
       incomplete:
         "Introduce un importe en el debe o en el haber de cada línea.",

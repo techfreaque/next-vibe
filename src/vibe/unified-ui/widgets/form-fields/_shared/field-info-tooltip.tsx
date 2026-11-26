@@ -9,7 +9,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "next-vibe/ui/components/tooltip";
-import type { JSX } from "react";
+import { type JSX, useState } from "react";
 
 import { descriptionAddsInfo } from "./description-info";
 
@@ -24,24 +24,36 @@ export function FieldInfoTooltip({
   text: string;
   label?: string;
 }): JSX.Element | null {
+  const [hoverOpen, setHoverOpen] = useState(false);
+  const [pinned, setPinned] = useState(false);
   if (!descriptionAddsInfo(text, label)) {
     return null;
   }
+  const dismiss = (): void => {
+    setHoverOpen(false);
+    setPinned(false);
+  };
   return (
     <TooltipProvider delayDuration={300}>
-      <Tooltip>
+      <Tooltip open={hoverOpen || pinned} onOpenChange={setHoverOpen}>
         <TooltipTrigger asChild>
           <Button
             type="button"
             variant="ghost"
             size="unset"
             aria-label={text}
-            className="inline-flex h-4 w-4 shrink-0 cursor-help items-center justify-center rounded-full p-0 align-middle text-muted-foreground hover:bg-transparent hover:text-foreground"
+            aria-expanded={hoverOpen || pinned}
+            onClick={() => setPinned((open) => !open)}
+            className="inline-flex size-7 shrink-0 cursor-help items-center justify-center rounded-full p-0 align-middle text-muted-foreground hover:bg-transparent hover:text-foreground"
           >
             <Info className="h-3.5 w-3.5" />
           </Button>
         </TooltipTrigger>
-        <TooltipContent className="max-w-[260px]">
+        <TooltipContent
+          className="max-w-[260px]"
+          onEscapeKeyDown={dismiss}
+          onPointerDownOutside={dismiss}
+        >
           <Span className="text-sm">{text}</Span>
         </TooltipContent>
       </Tooltip>

@@ -15,7 +15,7 @@ export const translations = {
 
   get: {
     title: "System Settings",
-    titleShort: "System Settings",
+    titleShort: "System settings",
     description: "View and manage environment configuration grouped by module",
     tags: {
       settings: "Settings",

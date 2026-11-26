@@ -5,12 +5,12 @@ export const translations = {
     invoice: "invoice",
   },
   get: {
-    title: "Customer Invoices",
-    titleShort: "Customer Invoices",
+    title: "Customer invoices",
+    titleShort: "Customer invoices",
     description:
       "Search invoices by document number, invoice ID or customer ID, and filter by company or status.",
     form: {
-      title: "Invoice Filters",
+      title: "Invoice filters",
       description: "Filter the invoice list",
     },
     response: {
@@ -18,19 +18,19 @@ export const translations = {
       total: "Total",
       invoices: "Invoices",
       id: "Invoice ID",
-      invoiceSequenceNumber: "Invoice Number",
+      invoiceSequenceNumber: "Invoice number",
       customerId: "Customer ID",
       currency: "Currency",
       status: "Status",
       amount: "Amount",
-      dueDate: "Due Date",
+      dueDate: "Due date",
       notes: "Notes",
-      lineCount: "Line Count",
-      amountPaid: "Amount Paid",
-      amountDue: "Amount Due",
+      lineCount: "Line count",
+      amountPaid: "Amount paid",
+      amountDue: "Amount due",
       isOverdue: "Overdue",
-      createdAt: "Created At",
-      updatedAt: "Updated At",
+      createdAt: "Created at",
+      updatedAt: "Updated at",
     },
     errors: {
       unauthorized: {
@@ -38,19 +38,19 @@ export const translations = {
         description: "Authentication required",
       },
       validation: {
-        title: "Validation Error",
+        title: "Validation error",
         description: "Invalid filter parameters",
       },
       server: {
-        title: "Server Error",
+        title: "Server error",
         description: "Internal server error occurred",
       },
       unknown: {
-        title: "Unknown Error",
+        title: "Unknown error",
         description: "An unknown error occurred",
       },
       network: {
-        title: "Network Error",
+        title: "Network error",
         description: "Network error occurred",
       },
       forbidden: {
@@ -58,7 +58,7 @@ export const translations = {
         description: "Must be a member of this company",
       },
       notFound: {
-        title: "Not Found",
+        title: "Not found",
         description: "Company not found",
       },
       conflict: {
@@ -66,7 +66,7 @@ export const translations = {
         description: "A conflict occurred",
       },
       unsavedChanges: {
-        title: "Unsaved Changes",
+        title: "Unsaved changes",
         description: "There are unsaved changes",
       },
     },
@@ -110,17 +110,18 @@ export const translations = {
     description: "Page number",
   },
   pageSize: {
-    label: "Page Size",
+    label: "Page size",
     description: "Results per page",
   },
   widget: {
+    creditNote: "Credit note",
     creditable: "Select an invoice to credit",
     noCreditable: "No invoices have credit available.",
     filters: "Filters",
     partlyPaid: "Partly paid",
     pageCount: "Total pages",
-    title: "Customer Invoices",
-    newInvoice: "New Invoice",
+    title: "Customer invoices",
+    newInvoice: "New invoice",
     loading: "Loading invoices...",
     noInvoices: "No invoices yet.",
     noInvoicesHint: "Create your first invoice to get started.",
@@ -133,7 +134,7 @@ export const translations = {
     empty: {
       title: "No invoices yet.",
       hint: "Create your first invoice to get started.",
-      cta: "New Invoice",
+      cta: "New invoice",
     },
     status: {
       draft: "Draft",

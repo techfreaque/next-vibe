@@ -56,8 +56,9 @@ export const translations: typeof enTranslations = {
         description: "Une erreur réseau s'est produite",
       },
       forbidden: {
-        title: "Interdit",
-        description: "Accès interdit",
+        title: "Autorisation requise",
+        description:
+          "Vous devez pouvoir gérer cette facture pour enregistrer un paiement.",
       },
       notFound: {
         title: "Introuvable",
@@ -117,6 +118,9 @@ export const translations: typeof enTranslations = {
     automatic: "Utiliser le compte par défaut",
   },
   widget: {
+    backToInvoices: "Retour aux factures",
+    retryInvoice: "Réessayer",
+    loadingInvoice: "Vérification de l’accès à la facture…",
     details: "Détails du règlement",
     back: "Retour",
     submit: "Enregistrer le paiement",

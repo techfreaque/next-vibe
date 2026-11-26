@@ -65,12 +65,13 @@ export function validateData<TSchema extends z.ZodType>(
       // A per-parse error map supplies Slovak defaults while schema-defined
       // messages retain precedence and other requests keep their own defaults.
       error:
-        getLanguageFromLocale(locale) === Languages.SK
+        endpoint?.requestErrorMap?.(locale) ??
+        (getLanguageFromLocale(locale) === Languages.SK
           ? (issue): ReturnType<typeof slovakZodError> =>
               issue.code === "invalid_format" && issue.format === "email"
                 ? t("validation.invalidEmail")
                 : slovakZodError(issue)
-          : undefined,
+          : undefined),
     });
 
     if (!result.success) {

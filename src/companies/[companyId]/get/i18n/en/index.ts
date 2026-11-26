@@ -68,6 +68,8 @@ export const translations = {
       description: "Company details retrieved",
     },
     widget: {
+      address: "Address",
+      activeMembers: "Active members",
       backToList: "Companies",
       type: "Customer type",
       loadFailed: "Could not load this company",

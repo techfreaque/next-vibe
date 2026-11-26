@@ -38,6 +38,7 @@ import { humanUserSql } from "@/users/audience-sql";
 
 import type { BusinessOverviewT } from "../overview/i18n";
 import type { PlatformSummaryInput, PlatformSummaryOutput } from "./definition";
+import { getWorkspaceMetrics, isWorkspaceSection } from "./workspace-metrics";
 
 type Section = NonNullable<PlatformSummaryInput["section"]>;
 type Summary = PlatformSummaryOutput["summary"];
@@ -240,34 +241,18 @@ async function recentActivity(
   );
 }
 
-async function paymentActivity(
+async function paymentAttention(
   win: ReturnType<typeof resolveAnalyticsWindow>,
-): Promise<Pick<Summary, "attention" | "recent">> {
+): Promise<Summary["attention"]> {
   const from = utcTs(win.from),
     to = utcTs(win.to);
-  const [counts, rows] = await Promise.all([
-    db.execute<{ failed: string; disputes: string }>(sql`
+  const counts = await db.execute<{ failed: string; disputes: string }>(sql`
       SELECT
         (SELECT count(*) FROM payment_transactions pt
           WHERE pt.status = ${PaymentStatus.FAILED} AND pt.created_at >= ${from} AND pt.created_at < ${to}
             AND ${REPORTABLE_PAYMENT_SQL} AND ${reportingUserSql("pt.user_id")})::text AS failed,
         (SELECT count(*) FROM payment_disputes d
-          WHERE d.status IN (${DisputeStatus.NEEDS_RESPONSE}, ${DisputeStatus.WARNING_NEEDS_RESPONSE}, ${DisputeStatus.UNDER_REVIEW}, ${DisputeStatus.WARNING_UNDER_REVIEW}))::text AS disputes`),
-    db.execute<{
-      id: string;
-      at: string;
-      amount: string;
-      currency: string;
-      person: string | null;
-    }>(sql`
-      SELECT pt.id::text AS id, to_char(pt.created_at, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"') AS at,
-        pt.amount::text AS amount, pt.currency,
-        (SELECT COALESCE(NULLIF(u.private_name, ''), u.email) FROM users u WHERE u.id = pt.user_id) AS person
-      FROM payment_transactions pt
-      WHERE pt.created_at >= ${from} AND pt.created_at < ${to} AND ${REPORTABLE_PAYMENT_SQL}
-        AND ${reportingUserSql("pt.user_id")} AND pt.status IN (${PaymentStatus.SUCCEEDED}, ${PaymentStatus.REFUNDED})
-      ORDER BY pt.created_at DESC LIMIT ${RECENT_PAYMENT_ROWS}`),
-  ]);
+          WHERE d.status IN (${DisputeStatus.NEEDS_RESPONSE}, ${DisputeStatus.WARNING_NEEDS_RESPONSE}, ${DisputeStatus.UNDER_REVIEW}, ${DisputeStatus.WARNING_UNDER_REVIEW}))::text AS disputes`);
   const failed = Number(counts.rows[0]?.failed ?? 0);
   const disputes = Number(counts.rows[0]?.disputes ?? 0);
   const attention: Summary["attention"] = [];
@@ -290,6 +275,31 @@ async function paymentActivity(
       },
     });
   }
+  return attention;
+}
+
+async function paymentActivity(
+  win: ReturnType<typeof resolveAnalyticsWindow>,
+): Promise<Pick<Summary, "attention" | "recent">> {
+  const from = utcTs(win.from),
+    to = utcTs(win.to);
+  const [attention, rows] = await Promise.all([
+    paymentAttention(win),
+    db.execute<{
+      id: string;
+      at: string;
+      amount: string;
+      currency: string;
+      person: string | null;
+    }>(sql`
+      SELECT pt.id::text AS id, to_char(pt.created_at, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"') AS at,
+        pt.amount::text AS amount, pt.currency,
+        (SELECT COALESCE(NULLIF(u.private_name, ''), u.email) FROM users u WHERE u.id = pt.user_id) AS person
+      FROM payment_transactions pt
+      WHERE pt.created_at >= ${from} AND pt.created_at < ${to} AND ${REPORTABLE_PAYMENT_SQL}
+        AND ${reportingUserSql("pt.user_id")} AND pt.status IN (${PaymentStatus.SUCCEEDED}, ${PaymentStatus.REFUNDED})
+      ORDER BY pt.created_at DESC LIMIT ${RECENT_PAYMENT_ROWS}`),
+  ]);
   return {
     attention,
     recent: rows.rows.map((row) => ({
@@ -310,10 +320,14 @@ async function getSection(
   locale: CountryLanguage,
   section: Section,
   win: ReturnType<typeof resolveAnalyticsWindow>,
+  includePaymentAlerts: boolean,
 ): Promise<
   Pick<Summary, "kpis" | "attention" | "attentionAvailable"> &
     Partial<Pick<Summary, "recent">>
 > {
+  if (isWorkspaceSection(section)) {
+    return getWorkspaceMetrics(section, win);
+  }
   if (section === "activity") {
     return {
       kpis: [],
@@ -330,11 +344,11 @@ async function getSection(
     };
   }
   if (section === "operations") {
-    const [tasks, connections] = await Promise.all([
+    const [tasks, connections, attention] = await Promise.all([
       getFailingTaskCount(),
       getUnhealthyConnectionCount(),
+      includePaymentAlerts ? paymentAttention(win) : Promise.resolve([]),
     ]);
-    const attention: Summary["attention"] = [];
     if (tasks) {
       attention.push({
         label: "get.widget.alerts.tasks",
@@ -382,17 +396,20 @@ export class PlatformSummaryRepository {
     locale: CountryLanguage,
     section: Section,
     win: ReturnType<typeof resolveAnalyticsWindow>,
+    includePaymentAlerts: boolean,
   ): ReturnType<typeof getSection> {
     // The fixed 30-day window changes at UTC midnight. Only recent activity
     // resolves locale-specific task names. All sections are platform-wide.
-    const key = `${win.to.getTime()}:${section}:${section === "activity" ? locale : ""}`;
+    const key = `${win.to.getTime()}:${section}:${section === "activity" ? locale : ""}:${section === "operations" && includePaymentAlerts}`;
     const pending = PlatformSummaryRepository.pendingSections.get(key);
     if (pending) {
       return pending;
     }
-    const load = getSection(locale, section, win).finally(() => {
-      PlatformSummaryRepository.pendingSections.delete(key);
-    });
+    const load = getSection(locale, section, win, includePaymentAlerts).finally(
+      () => {
+        PlatformSummaryRepository.pendingSections.delete(key);
+      },
+    );
     PlatformSummaryRepository.pendingSections.set(key, load);
     return load;
   }
@@ -413,10 +430,15 @@ export class PlatformSummaryRepository {
       ? [section]
       : profile === "home"
         ? ["acquisition", "money", "usage", "operations", "activity"]
-        : ["acquisition", "money", "operations"];
+        : ["acquisition", "money"];
     const results = await Promise.allSettled(
       sections.map((name) =>
-        PlatformSummaryRepository.loadSection(locale, name, win),
+        PlatformSummaryRepository.loadSection(
+          locale,
+          name,
+          win,
+          profile === "home",
+        ),
       ),
     );
     const summary: Summary = {

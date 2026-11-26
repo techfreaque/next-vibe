@@ -26,7 +26,7 @@ const { GET } = createEndpoint({
   aliases: ["mail-bill-evidence"],
   title: "attachmentTitle",
   titleShort: "attachmentTitle",
-  description: "description",
+  description: "attachmentDescription",
   category: "finance",
   subCategory: "Finance: Suppliers",
   icon: "download",

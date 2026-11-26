@@ -70,6 +70,8 @@ export const translations: typeof enTranslations = {
       description: "Údaje o firme sú pripravené.",
     },
     widget: {
+      address: "Adresa",
+      activeMembers: "Aktívni členovia",
       backToList: "Firmy",
       type: "Typ zákazníka",
       loadFailed: "Firmu sa nepodarilo načítať",

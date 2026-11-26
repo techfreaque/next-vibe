@@ -2,7 +2,7 @@ export const translations = {
   // Main user profile routes
   get: {
     title: "Get User Profile",
-    titleShort: "My Profile",
+    titleShort: "My profile",
     description: "Retrieve current user profile information",
     response: {
       title: "User Profile Response",

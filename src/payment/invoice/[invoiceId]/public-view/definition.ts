@@ -40,6 +40,7 @@ const { GET } = createEndpoint({
   titleShort: "get.titleShort" as const,
   description: "get.description" as const,
   category: "payments",
+  admin: { hidden: true },
   subCategory: "Transactions",
   icon: "file-text" as const,
   tags: ["tags.payment" as const, "tags.invoice" as const],

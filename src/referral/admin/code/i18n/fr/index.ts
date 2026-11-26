@@ -20,7 +20,7 @@ export const translations: typeof enTranslations = {
         label: "Code de parrainage",
         description:
           "Le code à analyser (majuscules et minuscules indifférentes)",
-        placeholder: "moemoe",
+        placeholder: "Saisir un code de parrainage",
       },
     },
     response: {

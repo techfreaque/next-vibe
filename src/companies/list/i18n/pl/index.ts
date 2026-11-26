@@ -20,9 +20,15 @@ export const translations: typeof enTranslations = {
     list: "Lista",
   },
   get: {
-    title: "Moje firmy",
-    titleShort: "Firmy",
-    description: "Firmy, których jesteś członkiem",
+    title: "Firmy",
+    titleShort: "Katalog firm",
+    description:
+      "Przeglądaj firmy, do których należysz. Administratorzy platformy mają dostęp do pełnego katalogu.",
+    includeAll: {
+      label: "Wszystkie firmy",
+      description:
+        "Uwzględnij firmy, do których nie należysz. Tylko dla administratorów platformy.",
+    },
     page: {
       label: "Strona",
       description: "Numer strony (zaczyna się od 1)",
@@ -74,10 +80,13 @@ export const translations: typeof enTranslations = {
       description: "Lista firm pobrana",
     },
     widget: {
+      noMembership: "Brak członkostwa",
       back: "Wstecz",
       loading: "Ładowanie firm...",
-      title: "Moje firmy",
+      title: "Firmy",
       create: "Nowa firma",
+      previous: "Wstecz",
+      next: "Dalej",
       total: "firm",
       totalSingular: "firma",
       inactive: "Nieaktywna",

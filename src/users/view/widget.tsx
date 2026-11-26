@@ -31,6 +31,7 @@ import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
 import { Coins } from "next-vibe/ui/components/icons/Coins";
 import { Copy } from "next-vibe/ui/components/icons/Copy";
 import { DollarSign } from "next-vibe/ui/components/icons/DollarSign";
+import { MoreHorizontal } from "next-vibe/ui/components/icons/MoreHorizontal";
 import { Pencil } from "next-vibe/ui/components/icons/Pencil";
 import { Plus } from "next-vibe/ui/components/icons/Plus";
 import { Trash2 } from "next-vibe/ui/components/icons/Trash2";
@@ -455,7 +456,7 @@ export function UserViewContainer({
     const status =
       response?.success === false ? response.errorType.errorCode : undefined;
     const unavailableMessage =
-      status === 404
+      status === 404 || (requestedId && !validTarget)
         ? t("errors.notFound.description")
         : status === 403
           ? t("errors.forbidden.description")
@@ -659,17 +660,20 @@ export function UserViewContainer({
             aria-controls={mobileActionsId}
             onClick={() => setMobileActionsOpen((open) => !open)}
           >
+            <MoreHorizontal className="size-4" aria-hidden="true" />
             {t("widget.actions.more")}
           </Button>
           <Div className="hidden @lg:block">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button type="button" variant="outline" size="sm">
+                  <MoreHorizontal className="size-4" aria-hidden="true" />
                   {t("widget.actions.more")}
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 align="end"
+                collisionPadding={12}
                 className="min-w-48 data-[state=open]:animate-none"
               >
                 {moreActions.map(({ key, label, icon: ActionIcon, run }) => (
@@ -677,7 +681,7 @@ export function UserViewContainer({
                     {key === "delete" && <DropdownMenuSeparator />}
                     <DropdownMenuItem
                       className={
-                        key === "delete" ? "text-destructive" : undefined
+                        key === "delete" ? "gap-2 text-destructive" : "gap-2"
                       }
                       onSelect={() => void run()}
                     >
@@ -1064,7 +1068,7 @@ function OverviewTab({
             value={formatNumber(creditInfo.freeCreditsRemaining, locale)}
           />
         </MetricGrid>
-        <DetailGrid columns={3}>
+        <DetailGrid columns={3} className="border-t pt-4">
           <DetailField
             label={t("credits.purchased")}
             value={formatNumber(creditInfo.totalCreditsPurchased, locale)}

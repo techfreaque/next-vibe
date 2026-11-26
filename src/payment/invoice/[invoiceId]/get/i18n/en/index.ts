@@ -6,7 +6,7 @@ export const translations = {
   },
   get: {
     title: "Get Invoice",
-    titleShort: "Invoice Details",
+    titleShort: "Invoice details",
     description: "Retrieve a single invoice with all its line items",
     form: {
       title: "Invoice",

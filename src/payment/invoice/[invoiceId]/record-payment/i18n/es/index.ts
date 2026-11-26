@@ -56,8 +56,9 @@ export const translations: typeof enTranslations = {
         description: "Ocurrió un error de red",
       },
       forbidden: {
-        title: "Acceso denegado",
-        description: "No tienes acceso",
+        title: "Permiso de pago requerido",
+        description:
+          "Necesitas permiso para gestionar esta factura y registrar un pago.",
       },
       notFound: {
         title: "No encontrado",
@@ -117,6 +118,9 @@ export const translations: typeof enTranslations = {
     automatic: "Usar la cuenta predeterminada",
   },
   widget: {
+    backToInvoices: "Volver a facturas",
+    retryInvoice: "Reintentar",
+    loadingInvoice: "Comprobando el acceso a la factura…",
     details: "Detalles del cobro",
     back: "Atrás",
     submit: "Pago de registro",

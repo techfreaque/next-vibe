@@ -95,6 +95,8 @@ export function TaxReportWidget(): JSX.Element {
         (!from || data.reportDateFrom === from) &&
         (!to || data.reportDateTo === to)));
   const loading = !!read?.isLoadingFresh || !!read?.isFetching;
+  const accessDenied =
+    response?.success === false && response.errorType.errorCode === 403;
 
   const formatLocale = locale.replace(/-GLOBAL$/, "");
   const money = (amount: number): string =>
@@ -333,10 +335,18 @@ export function TaxReportWidget(): JSX.Element {
           <EmptyBlock
             size="page"
             icon={<AlertCircle className="h-6 w-6" />}
-            title={t("report.widget.errorTitle")}
-            message={response.message}
+            title={t(
+              accessDenied
+                ? "report.errors.forbidden.title"
+                : "report.widget.errorTitle",
+            )}
+            message={
+              accessDenied
+                ? t("report.errors.forbidden.description")
+                : response.message
+            }
             action={
-              showInputs && (read || onSubmit)
+              !accessDenied && showInputs && (read || onSubmit)
                 ? { label: t("report.widget.retry"), onClick: retry }
                 : undefined
             }

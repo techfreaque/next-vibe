@@ -444,8 +444,9 @@ export const translations: typeof enTranslations = {
         description: "Devi essere connesso",
       },
       forbidden: {
-        title: "Accesso negato",
-        description: "Non hai il permesso di visualizzare i rapporti fiscali",
+        title: "Accesso al report fiscale richiesto",
+        description:
+          "Non hai il permesso di consultare il report fiscale di questa azienda.",
       },
       notFound: { title: "Non trovato", description: "Società non trovata" },
       conflict: {

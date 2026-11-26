@@ -20,7 +20,7 @@ export const translations: typeof enTranslations = {
         label: "Codice invito",
         description:
           "Il codice da analizzare (maiuscole e minuscole indifferenti)",
-        placeholder: "moemoe",
+        placeholder: "Inserisci un codice invito",
       },
     },
     response: {

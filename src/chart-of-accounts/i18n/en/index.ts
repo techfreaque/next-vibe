@@ -272,6 +272,7 @@ export const translations = {
     page: { label: "Page" },
     pageSize: { label: "Per Page" },
     response: {
+      debitTotal: "Total debits",
       entries: "Entries",
       id: "ID",
       entryNumber: "Entry #",
@@ -294,6 +295,7 @@ export const translations = {
       "Enter a positive debit or credit amount with up to four decimal places.",
     errorAccount: "Select a valid account belonging to this company.",
     widget: {
+      entryTotals: "Entry totals",
       lineDescription: "Line description",
       incomplete: "Enter a debit or credit for each line.",
       offByLessThan: "Off by less than {{amount}}",
@@ -320,7 +322,7 @@ export const translations = {
       balanced: "Balanced",
       difference: "Difference",
     },
-    title: "Create Journal Entry",
+    title: "Create journal entry",
     titleShort: "New Entry",
     description:
       "Create a manual double-entry journal. Total debits must equal total credits.",
@@ -820,7 +822,7 @@ export const translations = {
       selectCompany: "Choose a company to view this report.",
     },
     title: "Tax Report",
-    titleShort: "Tax Report",
+    titleShort: "Ledger tax report",
     description: "Booked movements on VAT accounts for the selected dates.",
     companyId: {
       label: "Company",

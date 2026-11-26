@@ -15,7 +15,10 @@ import {
 } from "next-vibe/ui/components/status-pill";
 import { WidgetHeader } from "next-vibe/ui/components/widget-header";
 import { WidgetShell } from "next-vibe/ui/components/widget-shell";
-import { formatDocDate } from "next-vibe/unified-ui/_shared/format-money";
+import {
+  formatDocDate,
+  formatMoney,
+} from "next-vibe/unified-ui/_shared/format-money";
 import { usePickerCallback } from "next-vibe/unified-ui/_shared/picker-context";
 import {
   useWidgetEndpointMutations,
@@ -165,6 +168,11 @@ export function CoaJournalListWidget(
       : []),
     { id: "description", label: t("journalList.response.description") },
     { id: "source", label: t("journalList.response.sourceType") },
+    {
+      id: "amount",
+      label: t("journalList.response.debitTotal"),
+      numeric: true,
+    },
     { id: "status", label: t("journalList.response.status") },
   ];
   const rows = entries.map((entry) => {
@@ -183,6 +191,13 @@ export function CoaJournalListWidget(
         {sourceLabel(entry.sourceType)}
       </Span>
     );
+    const amountCell = (
+      <Div className="flex flex-col whitespace-nowrap tabular-nums">
+        {entry.debitTotals?.map(({ amount, currency }) => (
+          <Span key={currency}>{formatMoney(amount, currency, locale)}</Span>
+        ))}
+      </Div>
+    );
     return {
       id: entry.id,
       onOpen: (): void => handleView(entry.id),
@@ -192,6 +207,7 @@ export function CoaJournalListWidget(
         company: companyCell(entry.companyName),
         description: entry.description,
         source,
+        amount: amountCell,
         status: pill(entry.status),
       },
     };
@@ -284,6 +300,11 @@ export function CoaJournalListWidget(
                   .filter(Boolean)
                   .join(" · ")}
                 badges={pill(entry.status)}
+                meta={entry.debitTotals?.map(({ amount, currency }) => (
+                  <Span key={currency} className="font-semibold tabular-nums">
+                    {formatMoney(amount, currency, locale)}
+                  </Span>
+                ))}
                 onClick={() => handleView(entry.id)}
               />
             ))}

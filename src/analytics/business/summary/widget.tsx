@@ -40,6 +40,30 @@ const sectionLabels = {
   operations: ["get.widget.alerts.title"],
   usage: ["platformSummary.valuationCost", "platformSummary.valuationMargin"],
   activity: ["platformSummary.recent"],
+  credits: [
+    "platformSummary.creditsPurchased",
+    "platformSummary.creditsUsed",
+    "platformSummary.creditsUnused",
+  ],
+  subscriptions: [
+    "platformSummary.activeSubscriptions",
+    "platformSummary.renewalsSoon",
+    "platformSummary.pastDueSubscriptions",
+  ],
+  referral: [
+    "platformSummary.pendingPayouts",
+    "platformSummary.pendingPayoutValue",
+  ],
+  messenger: [
+    "platformSummary.messagesSent",
+    "platformSummary.messagesBounced",
+    "platformSummary.messagesFailed",
+  ],
+  instances: ["platformSummary.totalConnections"],
+  companies: [
+    "platformSummary.activeCompanies",
+    "platformSummary.inactiveCompanies",
+  ],
 } as const;
 
 function SummaryPanel({
@@ -62,7 +86,9 @@ function SummaryPanel({
       locale={locale}
       translate={(key, args) => t(key, args)}
       sectionName={
-        source === "payments" ? undefined : t("platformSummary.operations")
+        source === "payments" || source === "referral" || source === "instances"
+          ? undefined
+          : t("platformSummary.operations")
       }
       emptyRecent={
         source === "payments"
@@ -100,7 +126,13 @@ function SummaryPanel({
   );
 }
 
-function SummarySection({ section }: { section: Section }): JSX.Element {
+function SummarySection({
+  section,
+  profile,
+}: {
+  section: Section;
+  profile?: PlatformSummaryInput["profile"];
+}): JSX.Element {
   const t = useWidgetTranslation<typeof definitions.GET>();
   const logger = useWidgetLogger();
   const user = useWidgetUser();
@@ -109,11 +141,11 @@ function SummarySection({ section }: { section: Section }): JSX.Element {
   const [expired, setExpired] = useState<number | null>(null);
   const read = useApiQuery({
     endpoint: definitions.GET,
-    requestData: { section },
+    requestData: { section, profile },
     logger,
     user,
     options: {
-      queryKey: `platform-summary:${user.id}:${locale}:${section}:${attempt}`,
+      queryKey: `platform-summary:${user.id}:${locale}:${section}:${profile ?? ""}:${attempt}`,
       retry: 0,
     },
   });
@@ -133,6 +165,16 @@ function SummarySection({ section }: { section: Section }): JSX.Element {
         </Div>
         <SummaryPanel summary={ready} section="attention" source={section} />
         <SummaryPanel summary={ready} section="recent" source={section} />
+      </Div>
+    );
+  }
+  if (ready && (section === "referral" || section === "instances")) {
+    return (
+      <Div className="min-w-0 space-y-3">
+        <Div className="grid grid-cols-2 gap-2">
+          <SummaryPanel summary={ready} section="metrics" />
+        </Div>
+        <SummaryPanel summary={ready} section="attention" source={section} />
       </Div>
     );
   }
@@ -228,16 +270,24 @@ export function PlatformSummaryWidget(): JSX.Element {
   if (section && embedded && interactive) {
     return (
       <Div className="min-w-0 space-y-3">
-        <P className="text-xs text-muted-foreground">
-          {t("platformSummary.period")}
-        </P>
+        {["acquisition", "money", "payments", "messenger"].includes(
+          section,
+        ) && (
+          <P className="text-xs text-muted-foreground">
+            {t("platformSummary.period")}
+          </P>
+        )}
         <Div
           className={
-            section === "operations" ||
-            section === "activity" ||
-            section === "payments"
+            [
+              "operations",
+              "activity",
+              "payments",
+              "referral",
+              "instances",
+            ].includes(section)
               ? ""
-              : "grid grid-cols-2 gap-2"
+              : "grid grid-cols-2 gap-2 @2xl:grid-cols-3"
           }
         >
           <SummarySection section={section} />
@@ -265,8 +315,12 @@ export function PlatformSummaryWidget(): JSX.Element {
             </P>
           </Div>
         )}
-        <SummarySection section="operations" />
-        {home && <SummarySection section="activity" />}
+        {home && (
+          <>
+            <SummarySection section="operations" profile="home" />
+            <SummarySection section="activity" />
+          </>
+        )}
       </Div>
     );
   }

@@ -100,7 +100,7 @@ const TAB_ORDER = [
 const ALL_METHODS = "__all_payout_methods";
 
 const statusVariants: Record<typeof PayoutStatusValue, StatusPillVariant> = {
-  [PayoutStatus.PENDING]: "warning",
+  [PayoutStatus.PENDING]: "info",
   [PayoutStatus.APPROVED]: "info",
   [PayoutStatus.REJECTED]: "danger",
   [PayoutStatus.PROCESSING]: "info",
@@ -786,7 +786,7 @@ export function AdminPayoutsContainer({
           <Div
             role="tablist" // oxlint-disable-line jsx-a11y/prefer-tag-over-role -- Shared UI has no cross-platform tablist component.
             ariaLabel={t("admin.payouts.fields.status.label")}
-            className="-mx-1 flex min-w-0 gap-1 overflow-x-auto px-1 pb-1"
+            className="flex min-w-0 flex-wrap gap-1.5 pb-1"
           >
             {tabs.map(({ value, count }) => {
               const selected = activeStatus === value;

@@ -51,6 +51,8 @@ export const translations: typeof enTranslations = {
   persisted: "Enregistrées",
   skipped: "Ignorées",
   flagged: "Marquées",
+  attachmentDescription:
+    "Téléchargez la facture fournisseur ou le reçu d’origine joint à un e-mail vérifié.",
   attachmentTitle: "Télécharger le justificatif",
   download: "Télécharger",
   errors: {

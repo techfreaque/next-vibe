@@ -17,6 +17,7 @@ export const EarningsListRepository = {
   listEarnings(
     data: {
       targetUserId?: string | null;
+      personal?: boolean;
       limit?: number | null;
       offset?: number | null;
     },
@@ -34,7 +35,7 @@ export const EarningsListRepository = {
     }
     const isAdmin = user.roles.includes(UserPermissionRole.ADMIN);
     const targetUserId =
-      isAdmin && data.targetUserId ? data.targetUserId : user.id;
+      isAdmin && !data.personal ? (data.targetUserId ?? null) : user.id;
     return ReferralRepository.getReferralEarnings(
       targetUserId,
       data.limit ?? 50,

@@ -57,6 +57,7 @@ export type DropdownMenuSubContentProps = {
 export type DropdownMenuContentProps = {
   children?: React.ReactNode;
   sideOffset?: number;
+  collisionPadding?: number;
   align?: "start" | "center" | "end";
   onClick?: (event: DivMouseEvent) => void;
   onCloseAutoFocus?: (event: Event) => void;

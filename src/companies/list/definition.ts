@@ -1,6 +1,6 @@
 /**
  * Companies List API Route Definition
- * Lists all companies the calling user is a member of
+ * Lists company memberships or the platform directory
  */
 
 import { createEndpoint } from "next-vibe/core/definition/create-i18n";
@@ -46,7 +46,12 @@ const { GET } = createEndpoint({
   category: "companies",
   subCategory: "Company Management",
   tags: ["tags.companies", "tags.list"],
-  allowedRoles: [UserRole.ADMIN],
+  allowedRoles: [
+    UserRole.ADMIN,
+    UserRole.CUSTOMER,
+    UserRole.PARTNER_ADMIN,
+    UserRole.PARTNER_EMPLOYEE,
+  ],
   defaultWebPinned: [UserRole.CUSTOMER, UserRole.ADMIN],
   icon: "building",
 
@@ -54,10 +59,20 @@ const { GET } = createEndpoint({
     usage: { request: "data", response: true },
     render: CompanyListWidget,
     children: {
+      includeAll: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "get.includeAll.label",
+        description: "get.includeAll.description",
+        hidden: true,
+        includeInCacheKey: true,
+        schema: z.boolean().optional(),
+      }),
       page: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "get.page.label",
+        includeInCacheKey: true,
         description: "get.page.description",
         schema: z.number().int().min(1).optional(),
       }),
@@ -65,6 +80,7 @@ const { GET } = createEndpoint({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "get.pageSize.label",
+        includeInCacheKey: true,
         description: "get.pageSize.description",
         schema: z.number().int().min(1).max(100).optional(),
       }),
@@ -101,7 +117,7 @@ const { GET } = createEndpoint({
               type: WidgetType.BADGE,
               text: "get.response.role",
               enumOptions: CompanyMemberRoleOptions,
-              schema: z.enum(CompanyMemberRole),
+              schema: z.enum(CompanyMemberRole).nullable(),
             }),
             isActive: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
@@ -134,6 +150,8 @@ const { GET } = createEndpoint({
       }),
     },
   }),
+
+  options: { formOptions: { autoSubmit: true, debounceMs: 0 } },
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {

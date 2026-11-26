@@ -17,7 +17,7 @@ export const translations = {
       code: {
         label: "Referral code",
         description: "The code to report on (case does not matter)",
-        placeholder: "moemoe",
+        placeholder: "Enter a referral code",
       },
     },
     response: {

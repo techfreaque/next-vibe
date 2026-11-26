@@ -47,6 +47,8 @@ export const translations = {
   persisted: "Saved",
   skipped: "Skipped",
   flagged: "Flagged",
+  attachmentDescription:
+    "Download the original supplier invoice or receipt attached to a reviewed email.",
   attachmentTitle: "Download evidence",
   download: "Download",
   errors: {

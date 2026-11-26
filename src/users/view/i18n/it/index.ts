@@ -109,8 +109,7 @@ export const translations: typeof enTranslations = {
     lastPayment: "Ultimo pagamento",
     stripeCustomerId: "cliente Stripe",
     none: "Nessun abbonamento",
-    noSubscriptionButPaid:
-      "Nessun abbonamento. Crediti acquistati vale la pena {{amount}}.",
+    noSubscriptionButPaid: "Nessun abbonamento. Totale pagato: {{amount}}.",
   },
   credits: {
     subscription: "Crediti di abbonamento",
