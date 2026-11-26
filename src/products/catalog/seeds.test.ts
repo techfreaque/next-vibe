@@ -3,11 +3,12 @@ import { afterAll, beforeAll, expect, mock, test } from "bun:test";
 import { and, eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/pglite";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
+import { identityEnv } from "next-vibe/identity/env";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import type { LoggerMetadata } from "next-vibe/logger/types";
 
 import { DEMO_COMPANY_NAME } from "../../companies/demo-company";
-import { catalogProducts, productCategories } from "../db";
+import { catalogProducts, productCategories, productPrices } from "../db";
 
 const pg = new PGlite();
 const db = drizzle(pg);
@@ -21,8 +22,11 @@ const otherCompany = "00000000-0000-4000-8000-000000000004";
 beforeAll(async () => {
   await pg.exec(`
     CREATE TABLE users (id uuid PRIMARY KEY, email text, created_at timestamp);
-    CREATE TABLE companies (id uuid PRIMARY KEY, name text, owner_user_id uuid REFERENCES users(id), created_at timestamp);
-    CREATE TABLE company_members (company_id uuid REFERENCES companies(id), user_id uuid REFERENCES users(id), is_active boolean);
+    CREATE TABLE companies (
+      id uuid PRIMARY KEY, name text, owner_user_id uuid REFERENCES users(id), created_at timestamp,
+      is_active boolean NOT NULL DEFAULT true, currency text NOT NULL DEFAULT 'EUR'
+    );
+    CREATE TABLE company_members (company_id uuid REFERENCES companies(id), user_id uuid REFERENCES users(id), is_active boolean, role text);
     CREATE TABLE product_categories (
       id uuid PRIMARY KEY DEFAULT gen_random_uuid(), company_id uuid REFERENCES companies(id),
       owner_user_id uuid REFERENCES users(id), name text, parent_id uuid, sort_order integer,
@@ -35,6 +39,15 @@ beforeAll(async () => {
       currency text, default_tax_rate numeric, is_active boolean, image_url text,
       is_subscription boolean, billing_interval text, created_at timestamp, updated_at timestamp
     );
+    CREATE TABLE account_nodes (
+      id uuid PRIMARY KEY, company_id uuid REFERENCES companies(id), code text, subtype text,
+      is_active boolean, is_postable boolean
+    );
+    CREATE TABLE product_prices (
+      id uuid PRIMARY KEY DEFAULT gen_random_uuid(), product_id uuid REFERENCES catalog_products(id),
+      currency text, price numeric, tier_name text, is_active boolean DEFAULT true,
+      created_at timestamp, updated_at timestamp, UNIQUE (product_id, currency, tier_name)
+    );
     INSERT INTO users VALUES ('${olderUser}', 'older@example.com', '2020-01-01'), ('${demoOwner}', 'demo@example.com', '2021-01-01');
     INSERT INTO companies VALUES ('${otherCompany}', 'Other Company', '${demoOwner}', '2020-01-01');
     INSERT INTO product_categories (company_id, owner_user_id, name, is_active)
@@ -42,6 +55,10 @@ beforeAll(async () => {
     INSERT INTO catalog_products (company_id, owner_user_id, name, is_active)
       VALUES ('${otherCompany}', '${demoOwner}', 'Consulting Hour', true);
   `);
+  await pg.query("UPDATE users SET email = $1 WHERE id = $2", [
+    identityEnv.VIBE_ADMIN_USER_EMAIL,
+    demoOwner,
+  ]);
 });
 
 afterAll(async () => {
@@ -82,16 +99,22 @@ test("catalog seed uses only the demo company and its owner on every run", async
       ),
     )
     .where(eq(catalogProducts.companyId, demoCompany));
-  expect(products).toHaveLength(3);
-  expect(products.map((product) => product.ownerId)).toEqual([
-    demoOwner,
-    demoOwner,
-    demoOwner,
-  ]);
+  expect(products).toHaveLength(5);
+  expect(new Set(products.map((product) => product.ownerId))).toEqual(
+    new Set([demoOwner]),
+  );
   expect(new Set(products.map((product) => product.categoryId)).size).toBe(3);
   expect(
     await db.select({ id: catalogProducts.id }).from(catalogProducts),
-  ).toHaveLength(4);
+  ).toHaveLength(6);
+  const prices = await db
+    .select({ amount: productPrices.price, currency: productPrices.currency })
+    .from(productPrices)
+    .orderBy(productPrices.price);
+  expect(prices).toEqual([
+    { amount: 15, currency: "EUR" },
+    { amount: 39, currency: "EUR" },
+  ]);
   expect(
     await db.select({ id: productCategories.id }).from(productCategories),
   ).toHaveLength(4);
