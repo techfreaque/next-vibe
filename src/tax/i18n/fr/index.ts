@@ -169,6 +169,8 @@ export const translations: typeof enTranslations = {
           isCompound: "Composé",
           createdAt: "Créé le",
           updatedAt: "Mis à jour le",
+          validFrom: "Valable à partir du",
+          validTo: "Valable jusqu’au",
         },
       },
       success: {
@@ -209,6 +211,11 @@ export const translations: typeof enTranslations = {
           title: "Modifications non enregistrées",
           description: "Vous avez des modifications non enregistrées",
         },
+      },
+      validOn: {
+        label: "Valable le",
+        description:
+          "Afficher seulement les taux légalement applicables ce jour",
       },
     },
     update: {

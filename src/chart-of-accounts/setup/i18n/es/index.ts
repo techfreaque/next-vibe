@@ -6,6 +6,7 @@ export const translations: typeof enTranslations = {
       AT: "Austria (ÖKR)",
       DE: "Alemania (SKR03)",
       XX: "Plantilla NIIF genérica",
+      SK: "Eslovaquia (Rámcová účtová osnova)",
     },
   },
   post: {

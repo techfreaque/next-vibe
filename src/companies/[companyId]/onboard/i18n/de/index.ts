@@ -6,6 +6,7 @@ export const translations: typeof enTranslations = {
       AT: "Österreich (AT)",
       DE: "Deutschland (DE)",
       XX: "Allgemeiner Kontenrahmen (Steuersätze selbst festlegen)",
+      SK: "Slowakei (SK)",
     },
   },
   tags: {

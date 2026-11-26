@@ -93,6 +93,13 @@ const { GET } = createEndpoint({
         options: TaxTypeOptions,
         schema: z.enum(TaxTypeDB).optional(),
       }),
+      validOn: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.DATE,
+        label: "rate.list.validOn.label" as const,
+        description: "rate.list.validOn.description" as const,
+        schema: z.iso.date().optional(),
+      }),
       page: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
@@ -168,6 +175,16 @@ const { GET } = createEndpoint({
             region: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               label: "rate.list.response.rate.region" as const,
+              schema: z.string().nullable(),
+            }),
+            validFrom: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              label: "rate.list.response.rate.validFrom" as const,
+              schema: z.string().nullable(),
+            }),
+            validTo: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              label: "rate.list.response.rate.validTo" as const,
               schema: z.string().nullable(),
             }),
             isDefault: responseField(scopedTranslation, {
@@ -269,6 +286,8 @@ const { GET } = createEndpoint({
             rate: 0.2,
             country: "AT",
             region: null,
+            validFrom: null,
+            validTo: null,
             isDefault: true,
             isActive: true,
             isCompound: false,

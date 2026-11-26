@@ -17,6 +17,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { companies } from "../companies/db";
 import { findDemoCompany } from "../companies/demo-company.repository";
+import { profileCountry } from "./compliance/profiles";
 import { seedDefaultTaxRates } from "./default-tax-rates";
 import { companyTaxRegimes } from "./regime/db";
 import { CompanyTaxRegime } from "./regime/enum";
@@ -39,11 +40,27 @@ async function seedCompanyTaxRates(logger: EndpointLogger): Promise<void> {
   }
 
   for (const company of allCompanies) {
-    const country =
-      company.country === "AT" || company.country === "DE"
-        ? company.country
-        : "XX";
-    await seedDefaultTaxRates(company.id, country, logger);
+    try {
+      await seedDefaultTaxRates(
+        company.id,
+        profileCountry(company.country),
+        logger,
+      );
+    } catch (error) {
+      // Companies can disappear between the list and the insert (e2e
+      // cleanup on a shared dev DB). Skip those, keep every other failure.
+      const [stillThere] = await db
+        .select({ id: companies.id })
+        .from(companies)
+        .where(eq(companies.id, company.id))
+        .limit(1);
+      if (stillThere) {
+        return Promise.reject(error);
+      }
+      logger.debug("Tax seeds: company removed while seeding, skipped", {
+        companyId: company.id,
+      });
+    }
   }
 
   logger.info(

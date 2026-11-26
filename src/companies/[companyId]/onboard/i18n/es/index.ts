@@ -6,6 +6,7 @@ export const translations: typeof enTranslations = {
       AT: "Austria (AT)",
       DE: "Alemania (DE)",
       XX: "Plan genérico (tipos impositivos por configurar)",
+      SK: "Eslovaquia (SK)",
     },
   },
   tags: { companies: "empresas", onboard: "a bordo", setup: "Configuración" },

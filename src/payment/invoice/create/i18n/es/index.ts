@@ -141,4 +141,23 @@ export const translations: typeof enTranslations = {
     description: "Notas opcionales visibles en la factura",
     placeholder: "Por ejemplo. Condiciones de pago: 30 días",
   },
+  supplyDate: {
+    label: "Fecha de entrega",
+    description:
+      "Día de entrega de los bienes o de prestación del servicio. Por defecto, la fecha de emisión.",
+  },
+  vatTreatment: {
+    label: "Tratamiento del IVA",
+    description:
+      "IVA nacional, inversión del sujeto pasivo o exención. La inversión y las operaciones en la UE requieren el NIF-IVA del cliente.",
+    options: {
+      DOMESTIC: "Venta nacional con IVA",
+      REVERSE_CHARGE_DOMESTIC: "Inversión del sujeto pasivo nacional",
+      EU_SERVICES_REVERSE_CHARGE:
+        "Servicios a una empresa de la UE (inversión)",
+      EU_GOODS_EXEMPT: "Bienes a una empresa de la UE (exento)",
+      EXPORT_EXEMPT: "Exportación fuera de la UE (exenta)",
+      EXEMPT: "Operación exenta de IVA",
+    },
+  },
 };

@@ -46,6 +46,8 @@ export const translations: typeof enTranslations = {
     german: "Nemecko: oslobodenie malého podniku (§ 19 UStG)",
     austrian: "Rakúsko: oslobodenie malého podniku (§ 6 ods. 1 bod 27 UStG)",
     slovak: "Slovensko: neplatiteľ DPH",
+    slovakSection7: "Slovensko: registrácia podľa § 7 (neplatiteľ DPH)",
+    slovakSection7a: "Slovensko: registrácia podľa § 7a (neplatiteľ DPH)",
   },
   title: "Režim DPH firmy",
   description: "Vyberte režim DPH pre doklady od určeného dátumu.",
@@ -76,5 +78,9 @@ export const translations: typeof enTranslations = {
     austrian:
       "Faktúry bez DPH, s odkazom na rakúsky režim malých podnikateľov.",
     slovak: "Faktúry bez DPH, pretože podnik nie je registrovaný pre DPH.",
+    slovakSection7:
+      "Tuzemské faktúry sú bez DPH. Nadobudnutie tovaru z EÚ nad limit zdaníte sami cez svoje IČ DPH.",
+    slovakSection7a:
+      "Tuzemské faktúry sú bez DPH. Služby pre podnikateľov z EÚ fakturujete s prenesením daňovej povinnosti cez svoje IČ DPH.",
   },
 };

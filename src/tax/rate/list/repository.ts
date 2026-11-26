@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import { and, asc, count, desc, eq, inArray } from "drizzle-orm";
+import { and, asc, count, desc, eq, inArray, sql } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import {
@@ -89,6 +89,15 @@ export class TaxRateListRepository {
         conditions.push(eq(taxRates.type, data.type));
       }
 
+      // Statutory validity: documents only offer rates legal on their day.
+      if (data.validOn) {
+        const validOn = data.validOn;
+        conditions.push(
+          sql`(${taxRates.validFrom} is null or ${taxRates.validFrom} <= ${validOn})`,
+          sql`(${taxRates.validTo} is null or ${taxRates.validTo} >= ${validOn})`,
+        );
+      }
+
       const where = and(...conditions);
 
       const [{ value: total }] = await db
@@ -134,6 +143,8 @@ export class TaxRateListRepository {
           rate: row.rate,
           country: row.country,
           region: row.region,
+          validFrom: row.validFrom,
+          validTo: row.validTo,
           isDefault: row.isDefault,
           isActive: row.isActive,
           isCompound: row.isCompound,

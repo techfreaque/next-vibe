@@ -164,6 +164,8 @@ export const translations: typeof enTranslations = {
           isCompound: "Zložená",
           createdAt: "Vytvorené",
           updatedAt: "Aktualizované",
+          validFrom: "Platné od",
+          validTo: "Platné do",
         },
       },
       success: {
@@ -201,6 +203,10 @@ export const translations: typeof enTranslations = {
           title: "Neuložené zmeny",
           description: "Máte neuložené zmeny",
         },
+      },
+      validOn: {
+        label: "Platné dňa",
+        description: "Zobraziť len sadzby, ktoré v tento deň zákonne platia",
       },
     },
     update: {

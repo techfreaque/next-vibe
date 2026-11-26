@@ -169,6 +169,8 @@ export const translations: typeof enTranslations = {
           isCompound: "Zusammengesetzt",
           createdAt: "Erstellt",
           updatedAt: "Geändert",
+          validFrom: "Gültig ab",
+          validTo: "Gültig bis",
         },
       },
       success: {
@@ -212,6 +214,10 @@ export const translations: typeof enTranslations = {
           title: "Ungespeicherte Änderungen",
           description: "Es gibt ungespeicherte Änderungen",
         },
+      },
+      validOn: {
+        label: "Gültig am",
+        description: "Nur Sätze zeigen, die an diesem Tag gesetzlich gelten",
       },
     },
     update: {

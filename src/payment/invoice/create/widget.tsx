@@ -362,6 +362,15 @@ export function InvoiceCreateWidget({
                 fieldName="currency"
                 field={{ ...field.children.currency, description: undefined }}
               />
+              <DateFieldWidget
+                fieldName="supplyDate"
+                utcCalendarDay
+                field={field.children.supplyDate}
+              />
+              <SelectFieldWidget
+                fieldName="vatTreatment"
+                field={field.children.vatTreatment}
+              />
             </Div>
           </SectionGroup>
 

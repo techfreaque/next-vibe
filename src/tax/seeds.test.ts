@@ -18,7 +18,8 @@ test("dev tax seeding recovers when the committed insert loses its reply", async
     CREATE TABLE tax_rates (
       id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
       company_id uuid REFERENCES companies(id), name text, code text, type text,
-      rate numeric(5, 4), country text, region text, tax_payable_account_id uuid,
+      rate numeric(5, 4), country text, region text, valid_from date,
+      valid_to date, tax_payable_account_id uuid,
       tax_receivable_account_id uuid, is_default boolean, is_active boolean,
       is_compound boolean, created_at timestamp DEFAULT now(),
       updated_at timestamp DEFAULT now(), UNIQUE (company_id, code)
@@ -73,6 +74,10 @@ test("dev tax seeding recovers when the committed insert loses its reply", async
   mock.module("next-vibe/database", () => ({
     db: drizzle(pool),
     isPglite: true,
+  }));
+  // The demo regime step needs the users table; this test covers rates only.
+  mock.module("@/companies/demo-company.repository", () => ({
+    findDemoCompany: () => Promise.resolve(undefined),
   }));
 
   try {

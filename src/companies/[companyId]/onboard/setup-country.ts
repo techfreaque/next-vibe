@@ -1,6 +1,8 @@
+import { type ProfileCountry, profileCountry } from "@/tax/compliance/profiles";
+
+/** Setup country = the company's compliance profile country (XX = generic). */
 export function getCompanySetupCountry(
   country: string | null | undefined,
-): "AT" | "DE" | "XX" {
-  const normalized = country?.trim().toUpperCase();
-  return normalized === "AT" || normalized === "DE" ? normalized : "XX";
+): ProfileCountry {
+  return profileCountry(country);
 }

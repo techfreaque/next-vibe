@@ -52,6 +52,10 @@ export const translations: typeof enTranslations = {
     austrian:
       "Autriche : franchise des petites entreprises (§ 6, al. 1, point 27 UStG)",
     slovak: "Slovaquie : entreprise non immatriculée à la TVA",
+    slovakSection7:
+      "Slovaquie : immatriculée à la TVA selon le § 7 (non assujettie)",
+    slovakSection7a:
+      "Slovaquie : immatriculée à la TVA selon le § 7a (non assujettie)",
   },
   title: "Régime de TVA de l’entreprise",
   description:
@@ -84,5 +88,9 @@ export const translations: typeof enTranslations = {
       "Factures sans TVA, avec la mention de la franchise autrichienne des petites entreprises.",
     slovak:
       "Factures sans TVA, car l’entreprise n’est pas immatriculée à la TVA.",
+    slovakSection7:
+      "Factures nationales sans TVA. Les acquisitions de biens dans l’UE au-delà du seuil sont taxées par vous avec votre numéro de TVA SK.",
+    slovakSection7a:
+      "Factures nationales sans TVA. Les services aux entreprises de l’UE passent en autoliquidation avec votre numéro de TVA SK.",
   },
 };

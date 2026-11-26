@@ -51,6 +51,9 @@ export const translations: typeof enTranslations = {
     german: "Deutschland: Kleinunternehmer (§ 19 UStG)",
     austrian: "Österreich: Kleinunternehmer (§ 6 Abs. 1 Z 27 UStG)",
     slovak: "Slowakei: nicht umsatzsteuerpflichtig registriert",
+    slovakSection7: "Slowakei: nach § 7 registriert (kein Umsatzsteuerzahler)",
+    slovakSection7a:
+      "Slowakei: nach § 7a registriert (kein Umsatzsteuerzahler)",
   },
   title: "Umsatzsteuerregelung des Unternehmens",
   description: "Legen Sie fest, wie Belege ab dem Stichtag besteuert werden.",
@@ -84,5 +87,9 @@ export const translations: typeof enTranslations = {
       "Rechnungen ohne Umsatzsteuer, mit Hinweis auf die österreichische Kleinunternehmerregelung.",
     slovak:
       "Rechnungen ohne Umsatzsteuer, da das Unternehmen nicht für die Umsatzsteuer registriert ist.",
+    slovakSection7:
+      "Inlandsrechnungen ohne Umsatzsteuer. EU-Warenerwerbe über der Schwelle versteuern Sie selbst mit Ihrer SK-USt-IdNr.",
+    slovakSection7a:
+      "Inlandsrechnungen ohne Umsatzsteuer. Leistungen an EU-Unternehmen laufen im Reverse-Charge mit Ihrer SK-USt-IdNr.",
   },
 };

@@ -4,6 +4,7 @@ export const translations = {
       AT: "Austria (ÖKR)",
       DE: "Germany (SKR03)",
       XX: "Generic IFRS",
+      SK: "Slovakia (Rámcová účtová osnova)",
     },
   },
   post: {

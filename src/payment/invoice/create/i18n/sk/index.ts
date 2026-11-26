@@ -142,4 +142,22 @@ export const translations: typeof enTranslations = {
     description: "Nepovinné poznámky zobrazené na faktúre",
     placeholder: "Napr. splatnosť 30 dní",
   },
+  supplyDate: {
+    label: "Dátum dodania",
+    description:
+      "Deň dodania tovaru alebo služby. Predvolene dátum vyhotovenia.",
+  },
+  vatTreatment: {
+    label: "Režim DPH",
+    description:
+      "Tuzemská DPH, prenesenie daňovej povinnosti alebo oslobodenie. Prenesenie a dodania do EÚ vyžadujú IČ DPH odberateľa.",
+    options: {
+      DOMESTIC: "Tuzemský predaj s DPH",
+      REVERSE_CHARGE_DOMESTIC: "Tuzemské prenesenie daňovej povinnosti",
+      EU_SERVICES_REVERSE_CHARGE: "Služby podnikateľovi z EÚ (prenesenie)",
+      EU_GOODS_EXEMPT: "Tovar podnikateľovi z EÚ (oslobodené)",
+      EXPORT_EXEMPT: "Vývoz mimo EÚ (oslobodené)",
+      EXEMPT: "Oslobodené dodanie",
+    },
+  },
 };

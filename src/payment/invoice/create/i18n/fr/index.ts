@@ -144,4 +144,23 @@ export const translations: typeof enTranslations = {
     description: "Notes facultatives affichées sur la facture",
     placeholder: "ex. Conditions de paiement : 30 jours",
   },
+  supplyDate: {
+    label: "Date de livraison",
+    description:
+      "Jour de la livraison des biens ou de la prestation. Par défaut, la date d’émission.",
+  },
+  vatTreatment: {
+    label: "Traitement TVA",
+    description:
+      "TVA nationale, autoliquidation ou exonération. L’autoliquidation et les opérations UE exigent le numéro de TVA du client.",
+    options: {
+      DOMESTIC: "Vente nationale avec TVA",
+      REVERSE_CHARGE_DOMESTIC: "Autoliquidation nationale",
+      EU_SERVICES_REVERSE_CHARGE:
+        "Services à une entreprise de l’UE (autoliquidation)",
+      EU_GOODS_EXEMPT: "Biens à une entreprise de l’UE (exonéré)",
+      EXPORT_EXEMPT: "Export hors UE (exonéré)",
+      EXEMPT: "Opération exonérée de TVA",
+    },
+  },
 };

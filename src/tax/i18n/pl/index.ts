@@ -166,6 +166,8 @@ export const translations: typeof enTranslations = {
           isCompound: "Złożona",
           createdAt: "Utworzona",
           updatedAt: "Zaktualizowana",
+          validFrom: "Obowiązuje od",
+          validTo: "Obowiązuje do",
         },
       },
       success: {
@@ -203,6 +205,10 @@ export const translations: typeof enTranslations = {
           title: "Niezapisane zmiany",
           description: "Masz niezapisane zmiany",
         },
+      },
+      validOn: {
+        label: "Obowiązuje w dniu",
+        description: "Pokaż tylko stawki obowiązujące prawnie w tym dniu",
       },
     },
     update: {

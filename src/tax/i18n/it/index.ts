@@ -169,6 +169,8 @@ export const translations: typeof enTranslations = {
           isCompound: "Compound",
           createdAt: "Creato",
           updatedAt: "Aggiornato",
+          validFrom: "Valida dal",
+          validTo: "Valida fino al",
         },
       },
       success: {
@@ -209,6 +211,11 @@ export const translations: typeof enTranslations = {
           title: "Modifiche non salvate",
           description: "Hai modifiche non salvate",
         },
+      },
+      validOn: {
+        label: "Valida il",
+        description:
+          "Mostra solo le aliquote in vigore per legge in quel giorno",
       },
     },
     update: {

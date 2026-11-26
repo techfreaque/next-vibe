@@ -46,6 +46,9 @@ export const translations = {
     german: "Germany: small business (§ 19 UStG)",
     austrian: "Austria: small business (§ 6 Abs. 1 Z 27 UStG)",
     slovak: "Slovakia: business not registered for VAT",
+    slovakSection7: "Slovakia: registered for VAT under § 7 (not a VAT payer)",
+    slovakSection7a:
+      "Slovakia: registered for VAT under § 7a (not a VAT payer)",
   },
   title: "Company VAT regime",
   description: "Choose the VAT treatment for documents from an effective date.",
@@ -76,5 +79,9 @@ export const translations = {
       "Invoices carry no VAT and state the Austrian small-business exemption.",
     slovak:
       "Invoices carry no VAT because the business is not registered for VAT.",
+    slovakSection7:
+      "Domestic invoices carry no VAT. EU purchases of goods above the threshold are taxed by you through your SK VAT ID.",
+    slovakSection7a:
+      "Domestic invoices carry no VAT. Services to EU businesses use reverse charge with your SK VAT ID.",
   },
 };

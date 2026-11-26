@@ -6,6 +6,7 @@ export const translations: typeof enTranslations = {
       AT: "Rakúsko (AT)",
       DE: "Nemecko (DE)",
       XX: "Všeobecný účtový rozvrh (nastavte sadzby dane ručne)",
+      SK: "Slovensko (SK)",
     },
   },
   tags: { companies: "firmy", onboard: "spustenie", setup: "nastavenie" },

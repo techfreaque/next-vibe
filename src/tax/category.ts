@@ -44,6 +44,8 @@ export const category: CategoryDefinition = {
       "tax-rate-list",
       "coa-tax-report",
       "tax_report_GET",
+      "tax-compliance",
+      "tax-vat-return",
     ],
     actions: ["tax_rate_create_POST"],
     destinationDescriptions: {
@@ -90,6 +92,33 @@ export const category: CategoryDefinition = {
           "Imposta su fatture, acquisti e vendite in cassa, per aliquota.",
         "es-ES": "Impuesto en facturas, compras y ventas en caja, por tipo.",
         "sk-SK": "Daň z faktúr, nákupov a predaja v pokladni podľa sadzby.",
+      },
+      "tax-compliance": {
+        "en-US":
+          "Which legal requirements of your country are met, and what to fix.",
+        "en-GLOBAL":
+          "Which legal requirements of your country are met, and what to fix.",
+        "de-DE":
+          "Welche gesetzlichen Pflichten Ihres Landes erfüllt sind und was fehlt.",
+        "pl-PL":
+          "Które wymogi prawne Twojego kraju są spełnione i co poprawić.",
+        "fr-FR":
+          "Les obligations légales de votre pays déjà remplies, et ce qu’il reste à corriger.",
+        "it-IT":
+          "Quali obblighi di legge del suo Paese sono rispettati e cosa correggere.",
+        "es-ES": "Qué requisitos legales de su país se cumplen y qué corregir.",
+        "sk-SK": "Ktoré zákonné požiadavky vašej krajiny spĺňate a čo opraviť.",
+      },
+      "tax-vat-return": {
+        "en-US": "Slovak DPH return lines and the kontrolný výkaz XML.",
+        "en-GLOBAL": "Slovak DPH return lines and the kontrolný výkaz XML.",
+        "de-DE":
+          "Slowakische Umsatzsteuererklärung und Kontrollmeldung (KV DPH) als XML.",
+        "pl-PL": "Słowacka deklaracja VAT i kontrolny výkaz w XML.",
+        "fr-FR": "Déclaration de TVA slovaque et kontrolný výkaz en XML.",
+        "it-IT": "Dichiarazione IVA slovacca e kontrolný výkaz in XML.",
+        "es-ES": "Declaración de IVA eslovaca y kontrolný výkaz en XML.",
+        "sk-SK": "Daňové priznanie k DPH a kontrolný výkaz v XML.",
       },
     },
   },

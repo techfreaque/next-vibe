@@ -49,6 +49,10 @@ export const translations: typeof enTranslations = {
     austrian:
       "Austria: esenzione per piccole imprese (§ 6, comma 1, n. 27 UStG)",
     slovak: "Slovacchia: impresa non registrata ai fini IVA",
+    slovakSection7:
+      "Slovacchia: registrata ai fini IVA ai sensi del § 7 (non soggetto IVA)",
+    slovakSection7a:
+      "Slovacchia: registrata ai fini IVA ai sensi del § 7a (non soggetto IVA)",
   },
   title: "Regime IVA aziendale",
   description:
@@ -80,5 +84,9 @@ export const translations: typeof enTranslations = {
     austrian:
       "Fatture senza IVA, con la dicitura del regime austriaco per piccole imprese.",
     slovak: "Fatture senza IVA, perché l’impresa non è registrata ai fini IVA.",
+    slovakSection7:
+      "Fatture nazionali senza IVA. Gli acquisti di beni UE oltre la soglia li tassate voi con la partita IVA SK.",
+    slovakSection7a:
+      "Fatture nazionali senza IVA. I servizi alle imprese UE seguono l’inversione contabile con la partita IVA SK.",
   },
 };

@@ -52,6 +52,10 @@ export const translations: typeof enTranslations = {
     austrian:
       "Austria: exención para pequeñas empresas (§ 6, apdo. 1, n.º 27 UStG)",
     slovak: "Eslovaquia: empresa no registrada a efectos del IVA",
+    slovakSection7:
+      "Eslovaquia: registrada a efectos del IVA según el § 7 (no sujeto pasivo)",
+    slovakSection7a:
+      "Eslovaquia: registrada a efectos del IVA según el § 7a (no sujeto pasivo)",
   },
   title: "Régimen de IVA de la empresa",
   description:
@@ -84,5 +88,9 @@ export const translations: typeof enTranslations = {
       "Facturas sin IVA, con la mención del régimen austriaco de pequeñas empresas.",
     slovak:
       "Facturas sin IVA, porque la empresa no está registrada a efectos del IVA.",
+    slovakSection7:
+      "Facturas nacionales sin IVA. Las adquisiciones de bienes en la UE por encima del umbral las tributa usted con su NIF-IVA SK.",
+    slovakSection7a:
+      "Facturas nacionales sin IVA. Los servicios a empresas de la UE usan inversión del sujeto pasivo con su NIF-IVA SK.",
   },
 };

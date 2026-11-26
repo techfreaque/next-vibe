@@ -23,6 +23,9 @@ import {
 } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
+import { accountingDateSchema } from "@/chart-of-accounts/shared/calendar-date";
+import { VatTreatment, VatTreatmentDB } from "@/tax/compliance/enum";
+
 import { scopedTranslation } from "./i18n";
 
 const InvoiceCreateWidgetLazy = lazyWidget(() =>
@@ -89,6 +92,50 @@ const { POST } = createEndpoint({
         placeholder: "dueDate.placeholder" as const,
         columns: 6,
         schema: dateSchema.optional(),
+      }),
+
+      supplyDate: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.DATE,
+        label: "supplyDate.label" as const,
+        description: "supplyDate.description" as const,
+        columns: 6,
+        schema: accountingDateSchema.optional(),
+      }),
+
+      vatTreatment: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "vatTreatment.label" as const,
+        description: "vatTreatment.description" as const,
+        columns: 6,
+        options: [
+          {
+            value: VatTreatment.DOMESTIC,
+            label: "vatTreatment.options.DOMESTIC" as const,
+          },
+          {
+            value: VatTreatment.REVERSE_CHARGE_DOMESTIC,
+            label: "vatTreatment.options.REVERSE_CHARGE_DOMESTIC" as const,
+          },
+          {
+            value: VatTreatment.EU_SERVICES_REVERSE_CHARGE,
+            label: "vatTreatment.options.EU_SERVICES_REVERSE_CHARGE" as const,
+          },
+          {
+            value: VatTreatment.EU_GOODS_EXEMPT,
+            label: "vatTreatment.options.EU_GOODS_EXEMPT" as const,
+          },
+          {
+            value: VatTreatment.EXPORT_EXEMPT,
+            label: "vatTreatment.options.EXPORT_EXEMPT" as const,
+          },
+          {
+            value: VatTreatment.EXEMPT,
+            label: "vatTreatment.options.EXEMPT" as const,
+          },
+        ],
+        schema: z.enum(VatTreatmentDB).optional(),
       }),
 
       currency: requestField(scopedTranslation, {

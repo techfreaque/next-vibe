@@ -142,4 +142,23 @@ export const translations: typeof enTranslations = {
     description: "Optionale Hinweise auf der Rechnung",
     placeholder: "z.B. Zahlungsziel: 30 Tage",
   },
+  supplyDate: {
+    label: "Leistungsdatum",
+    description:
+      "Tag der Lieferung oder Leistung. Standard ist das Rechnungsdatum.",
+  },
+  vatTreatment: {
+    label: "Umsatzsteuer-Behandlung",
+    description:
+      "Inländische Umsatzsteuer, Reverse-Charge oder eine Befreiung. Reverse-Charge und EU-Umsätze brauchen die USt-IdNr. des Kunden.",
+    options: {
+      DOMESTIC: "Inlandsumsatz mit Umsatzsteuer",
+      REVERSE_CHARGE_DOMESTIC: "Reverse-Charge im Inland",
+      EU_SERVICES_REVERSE_CHARGE:
+        "Leistung an ein EU-Unternehmen (Reverse-Charge)",
+      EU_GOODS_EXEMPT: "Lieferung an ein EU-Unternehmen (steuerfrei)",
+      EXPORT_EXEMPT: "Ausfuhr außerhalb der EU (steuerfrei)",
+      EXEMPT: "Steuerfreier Umsatz",
+    },
+  },
 };

@@ -13,6 +13,9 @@ const taxNotices: Record<typeof CompanyTaxRegimeValue, string | null> = {
   [CompanyTaxRegime.AT_SMALL_BUSINESS]:
     "Umsatzsteuerbefreit gemäß § 6 Abs. 1 Z 27 UStG 1994.",
   [CompanyTaxRegime.SK_NON_PAYER]: "Dodávateľ nie je platiteľom DPH.",
+  // § 7 / § 7a registrants hold an IČ DPH but are not VAT payers at home.
+  [CompanyTaxRegime.SK_REGISTERED_7]: "Dodávateľ nie je platiteľom DPH.",
+  [CompanyTaxRegime.SK_REGISTERED_7A]: "Dodávateľ nie je platiteľom DPH.",
 };
 
 /** Legal document wording follows the issuer's elected regime and is snapshotted at issue. */

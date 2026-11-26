@@ -142,4 +142,23 @@ export const translations: typeof enTranslations = {
     description: "Note opzionali visibili sulla fattura",
     placeholder: "ad es. Termini di pagamento: 30 giorni",
   },
+  supplyDate: {
+    label: "Data di consegna",
+    description:
+      "Giorno di consegna dei beni o di esecuzione del servizio. Di default la data di emissione.",
+  },
+  vatTreatment: {
+    label: "Trattamento IVA",
+    description:
+      "IVA nazionale, inversione contabile o esenzione. Inversione contabile e cessioni UE richiedono la partita IVA del cliente.",
+    options: {
+      DOMESTIC: "Vendita nazionale con IVA",
+      REVERSE_CHARGE_DOMESTIC: "Inversione contabile nazionale",
+      EU_SERVICES_REVERSE_CHARGE:
+        "Servizi a un’impresa UE (inversione contabile)",
+      EU_GOODS_EXEMPT: "Beni a un’impresa UE (esente)",
+      EXPORT_EXEMPT: "Esportazione fuori UE (esente)",
+      EXEMPT: "Operazione esente IVA",
+    },
+  },
 };

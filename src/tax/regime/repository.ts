@@ -105,6 +105,8 @@ export class CompanyTaxRegimeRepository {
           [CompanyTaxRegime.DE_SMALL_BUSINESS]: "DE",
           [CompanyTaxRegime.AT_SMALL_BUSINESS]: "AT",
           [CompanyTaxRegime.SK_NON_PAYER]: "SK",
+          [CompanyTaxRegime.SK_REGISTERED_7]: "SK",
+          [CompanyTaxRegime.SK_REGISTERED_7A]: "SK",
         };
         const jurisdiction = countries[data.election];
         if (jurisdiction && member.country?.toUpperCase() !== jurisdiction) {

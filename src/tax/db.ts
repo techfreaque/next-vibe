@@ -7,6 +7,7 @@ import { relations } from "drizzle-orm";
 import {
   boolean,
   customType,
+  date,
   index,
   pgTable,
   text,
@@ -70,6 +71,11 @@ export const taxRates = pgTable(
     // Geographic scope (optional)
     country: text("country"),
     region: text("region"),
+
+    // Legal validity window (inclusive ISO days). Null = open ended.
+    // Used for statutory rate changes, e.g. Slovakia 20 % until 2024-12-31.
+    validFrom: date("valid_from"),
+    validTo: date("valid_to"),
 
     // Soft references to accountNodes (no FK — avoids circular dependency)
     taxPayableAccountId: uuid("tax_payable_account_id"),

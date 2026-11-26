@@ -41,7 +41,11 @@ const logger = createEndpointLogger(false, defaultLocale);
 beforeAll(async () => {
   await pg.exec(`
     CREATE TABLE company_tax_regimes (company_id uuid NOT NULL, effective_from date NOT NULL, regime text NOT NULL, recorded_by uuid, recorded_at timestamp DEFAULT now(), PRIMARY KEY (company_id, effective_from));
-    CREATE TABLE companies (id uuid PRIMARY KEY, currency text, name text, is_active boolean);
+    CREATE TABLE companies (
+      id uuid PRIMARY KEY, currency text, name text, is_active boolean,
+      address_line1 text, address_line2 text, city text, postal_code text, country text,
+      registration_number text, tax_id text, vat_number text, email text
+    );
     CREATE TABLE company_members (
       id uuid PRIMARY KEY DEFAULT gen_random_uuid(), company_id uuid, user_id uuid,
       role text, is_active boolean, invited_by_user_id uuid, joined_at timestamp,

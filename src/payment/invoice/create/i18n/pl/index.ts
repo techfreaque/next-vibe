@@ -139,4 +139,22 @@ export const translations: typeof enTranslations = {
     description: "Opcjonalne uwagi widoczne na fakturze",
     placeholder: "np. Termin płatności: 30 dni",
   },
+  supplyDate: {
+    label: "Data dostawy",
+    description:
+      "Dzień dostawy towarów lub wykonania usługi. Domyślnie data wystawienia.",
+  },
+  vatTreatment: {
+    label: "Rozliczenie VAT",
+    description:
+      "VAT krajowy, odwrotne obciążenie lub zwolnienie. Odwrotne obciążenie i dostawy w UE wymagają numeru VAT klienta.",
+    options: {
+      DOMESTIC: "Sprzedaż krajowa z VAT",
+      REVERSE_CHARGE_DOMESTIC: "Krajowe odwrotne obciążenie",
+      EU_SERVICES_REVERSE_CHARGE: "Usługi dla firmy z UE (odwrotne obciążenie)",
+      EU_GOODS_EXEMPT: "Towary dla firmy z UE (zwolnione)",
+      EXPORT_EXEMPT: "Eksport poza UE (zwolniony)",
+      EXEMPT: "Dostawa zwolniona z VAT",
+    },
+  },
 };

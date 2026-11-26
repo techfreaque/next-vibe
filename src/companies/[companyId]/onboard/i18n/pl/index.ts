@@ -6,6 +6,7 @@ export const translations: typeof enTranslations = {
       AT: "Austria (AT)",
       DE: "Niemcy (DE)",
       XX: "Ogólny plan kont (ręczna konfiguracja stawek podatku)",
+      SK: "Słowacja (SK)",
     },
   },
   tags: { companies: "firmy", onboard: "konfiguracja", setup: "setup" },

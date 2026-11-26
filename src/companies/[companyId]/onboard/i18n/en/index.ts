@@ -4,6 +4,7 @@ export const translations = {
       AT: "Austria (AT)",
       DE: "Germany (DE)",
       XX: "Generic chart (set tax rates manually)",
+      SK: "Slovakia (SK)",
     },
   },
   tags: { companies: "companies", onboard: "onboard", setup: "setup" },

@@ -121,8 +121,17 @@ export class InvoiceCreateRepository {
             dueDate: data.dueDate ? new Date(data.dueDate) : null,
             notes: data.notes ?? null,
             metadata:
-              data.customerId || lineSettlement
-                ? { customerId: data.customerId, lineSettlement }
+              data.customerId ||
+              lineSettlement ||
+              data.vatTreatment ||
+              data.supplyDate
+                ? {
+                    customerId: data.customerId,
+                    lineSettlement,
+                    // Read at issue by the country compliance checks.
+                    vatTreatment: data.vatTreatment,
+                    supplyDate: data.supplyDate?.toISOString().slice(0, 10),
+                  }
                 : null,
           })
           .returning();

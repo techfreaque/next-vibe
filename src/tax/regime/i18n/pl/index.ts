@@ -48,6 +48,10 @@ export const translations: typeof enTranslations = {
     german: "Niemcy: zwolnienie dla małych firm (§ 19 UStG)",
     austrian: "Austria: zwolnienie dla małych firm (§ 6 ust. 1 pkt 27 UStG)",
     slovak: "Słowacja: firma niezarejestrowana jako podatnik VAT",
+    slovakSection7:
+      "Słowacja: rejestracja VAT na podstawie § 7 (nie jest podatnikiem VAT)",
+    slovakSection7a:
+      "Słowacja: rejestracja VAT na podstawie § 7a (nie jest podatnikiem VAT)",
   },
   title: "Rozliczenie VAT firmy",
   description:
@@ -80,5 +84,9 @@ export const translations: typeof enTranslations = {
       "Faktury bez VAT, z adnotacją o austriackim zwolnieniu dla małych firm.",
     slovak:
       "Faktury bez VAT, bo firma nie jest zarejestrowana jako podatnik VAT.",
+    slovakSection7:
+      "Faktury krajowe bez VAT. Unijne nabycie towarów powyżej progu rozliczasz sam numerem SK VAT.",
+    slovakSection7a:
+      "Faktury krajowe bez VAT. Usługi dla firm z UE rozliczasz w odwrotnym obciążeniu numerem SK VAT.",
   },
 };

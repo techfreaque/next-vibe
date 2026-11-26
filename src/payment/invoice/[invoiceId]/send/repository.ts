@@ -28,6 +28,8 @@ import {
 } from "@/chart-of-accounts/shared/auto-post";
 import { lockLedgerCompany } from "@/chart-of-accounts/shared/ledger-write";
 import { getDocumentAccess } from "@/finance/document-company-scope";
+import { evaluateInvoiceIssue } from "@/tax/compliance/invoice-issue";
+import type { LegalSnapshot } from "@/tax/compliance/legal-snapshot";
 import { scopedTranslation as regimeTranslation } from "@/tax/regime/i18n";
 import { getCompanyTaxRegime, notesWithTaxNotice } from "@/tax/regime/policy";
 
@@ -109,6 +111,8 @@ export class InvoiceSendRepository {
 
         const today = new Date();
         let taxNotice: string | null = null;
+        let legalSnapshot: LegalSnapshot | null = null;
+        let legalNotes: string[] = [];
         let invoiceNumber = invoice.invoiceNumber;
         let journalEntryId: string | null = null;
         if (invoice.companyId) {
@@ -141,6 +145,28 @@ export class InvoiceSendRepository {
               errorType: ErrorResponseTypes.VALIDATION_ERROR,
             });
           }
+          // Country rules (e.g. Slovak IČO/DIČ/IČ DPH, rates on the supply
+          // date, reverse charge customer VAT id). Snapshot at issue.
+          const lineRates = await tx
+            .select({ rate: paymentInvoiceLines.taxRate })
+            .from(paymentInvoiceLines)
+            .where(eq(paymentInvoiceLines.invoiceId, invoice.id));
+          const compliance = await evaluateInvoiceIssue(tx, {
+            companyId: invoice.companyId,
+            regime: regime.code,
+            metadata: invoice.metadata,
+            issueDate: today,
+            lineRates: lineRates.map((line) => line.rate),
+            locale,
+          });
+          if (compliance.blockingMessage) {
+            return fail({
+              message: compliance.blockingMessage,
+              errorType: ErrorResponseTypes.VALIDATION_ERROR,
+            });
+          }
+          legalSnapshot = compliance.snapshot;
+          legalNotes = compliance.notes;
           const grossCents = totals?.grossCents ?? 0;
           const vatCents = totals?.vatCents ?? 0;
           if (
@@ -235,10 +261,18 @@ export class InvoiceSendRepository {
           .update(paymentInvoices)
           .set({
             status: InvoiceStatus.OPEN,
-            ...(taxNotice
+            ...(taxNotice || legalNotes.length > 0 || legalSnapshot
               ? {
-                  notes: notesWithTaxNotice(invoice.notes, taxNotice),
-                  metadata: sql`coalesce(${paymentInvoices.metadata}, '{}'::jsonb) || jsonb_build_object('taxExemptionNotice', ${taxNotice}::text)`,
+                  notes: [taxNotice, ...legalNotes].reduce(
+                    (notes, notice) => notesWithTaxNotice(notes, notice),
+                    invoice.notes,
+                  ),
+                  metadata: sql`coalesce(${paymentInvoices.metadata}, '{}'::jsonb) || ${JSON.stringify(
+                    {
+                      ...(taxNotice ? { taxExemptionNotice: taxNotice } : {}),
+                      ...(legalSnapshot ? { legal: legalSnapshot } : {}),
+                    },
+                  )}::jsonb`,
                 }
               : {}),
             invoiceNumber,

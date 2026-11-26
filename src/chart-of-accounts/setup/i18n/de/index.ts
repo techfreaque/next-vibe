@@ -6,6 +6,7 @@ export const translations: typeof enTranslations = {
       AT: "Österreich (ÖKR)",
       DE: "Deutschland (SKR03)",
       XX: "Allgemeine IFRS-Vorlage",
+      SK: "Slowakei (Rámcová účtová osnova)",
     },
   },
   post: {

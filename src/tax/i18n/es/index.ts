@@ -172,6 +172,8 @@ export const translations: typeof enTranslations = {
           isCompound: "Compuesto",
           createdAt: "Creado",
           updatedAt: "Actualizado",
+          validFrom: "Vigente desde",
+          validTo: "Vigente hasta",
         },
       },
       success: {
@@ -215,6 +217,10 @@ export const translations: typeof enTranslations = {
           title: "Cambios sin guardar",
           description: "Tienes cambios sin guardar",
         },
+      },
+      validOn: {
+        label: "Vigente el",
+        description: "Mostrar solo los tipos vigentes por ley ese día",
       },
     },
     update: {

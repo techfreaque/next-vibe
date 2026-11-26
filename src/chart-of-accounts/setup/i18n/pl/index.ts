@@ -6,6 +6,7 @@ export const translations: typeof enTranslations = {
       AT: "Austria (ÖKR)",
       DE: "Niemcy (SKR03)",
       XX: "Ogólny szablon MSSF",
+      SK: "Słowacja (Rámcová účtová osnova)",
     },
   },
   post: {

@@ -5,7 +5,7 @@ import {
   useWidgetUser,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { z } from "zod";
 
 import { TaxType } from "@/tax/enum";
@@ -23,17 +23,20 @@ export function useDocumentVatPolicy(
   const logger = useWidgetLogger();
   const user = useWidgetUser();
   const readEnabled = enabled && z.uuid().safeParse(companyId).success;
+  // New documents only offer rates that legally apply today (for example
+  // Slovakia 23 / 19 / 5 % since 2025, never the old 20 / 10 %).
+  const [validOn] = useState(() => new Date().toISOString().slice(0, 10));
   const options = useMemo(
     () => ({
       read: {
-        initialState: { companyId, type: TaxType.VAT, pageSize: 100 },
+        initialState: { companyId, type: TaxType.VAT, pageSize: 100, validOn },
         queryOptions: {
           enabled: readEnabled,
-          queryKey: `document-vat-rates:${companyId ?? ""}`,
+          queryKey: `document-vat-rates:${companyId ?? ""}:${validOn}`,
         },
       },
     }),
-    [companyId, readEnabled],
+    [companyId, readEnabled, validOn],
   );
   const { read } = useEndpoint(taxRatesDefinition, options, logger, user);
   if (!readEnabled || !read?.data || read.isLoadingFresh) {

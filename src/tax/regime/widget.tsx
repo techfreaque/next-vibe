@@ -52,6 +52,8 @@ const REGIME_HINTS: Record<
   [CompanyTaxRegime.DE_SMALL_BUSINESS]: "hints.german",
   [CompanyTaxRegime.AT_SMALL_BUSINESS]: "hints.austrian",
   [CompanyTaxRegime.SK_NON_PAYER]: "hints.slovak",
+  [CompanyTaxRegime.SK_REGISTERED_7]: "hints.slovakSection7",
+  [CompanyTaxRegime.SK_REGISTERED_7A]: "hints.slovakSection7a",
 };
 
 function todayUtc(): Date {

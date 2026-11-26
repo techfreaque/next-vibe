@@ -6,11 +6,11 @@ export const translations = {
     ar: "accounts-receivable",
   },
   post: {
-    title: "New Invoice",
-    titleShort: "New Invoice",
+    title: "New invoice",
+    titleShort: "New invoice",
     description: "Prepare an invoice for your customer.",
     form: {
-      title: "New Invoice",
+      title: "New invoice",
       description: "Fill in the invoice details",
     },
     response: {
@@ -22,14 +22,14 @@ export const translations = {
         id: "Invoice ID",
         companyId: "Company ID",
         customerId: "Customer ID",
-        invoiceSequenceNumber: "Invoice Number",
+        invoiceSequenceNumber: "Invoice number",
         currency: "Currency",
         status: "Status",
-        dueDate: "Due Date",
+        dueDate: "Due date",
         notes: "Notes",
         amount: "Amount",
-        createdAt: "Created At",
-        updatedAt: "Updated At",
+        createdAt: "Created at",
+        updatedAt: "Updated at",
       },
     },
     errors: {
@@ -38,19 +38,19 @@ export const translations = {
         description: "Authentication required",
       },
       validation: {
-        title: "Validation Error",
+        title: "Validation error",
         description: "Invalid invoice parameters",
       },
       server: {
-        title: "Server Error",
+        title: "Server error",
         description: "Internal server error occurred",
       },
       unknown: {
-        title: "Unknown Error",
+        title: "Unknown error",
         description: "An unknown error occurred",
       },
       network: {
-        title: "Network Error",
+        title: "Network error",
         description: "Network error occurred",
       },
       forbidden: {
@@ -58,7 +58,7 @@ export const translations = {
         description: "Must be an admin or accountant of this company",
       },
       notFound: {
-        title: "Not Found",
+        title: "Not found",
         description: "Company not found",
       },
       conflict: {
@@ -66,12 +66,12 @@ export const translations = {
         description: "A conflict occurred",
       },
       unsavedChanges: {
-        title: "Unsaved Changes",
+        title: "Unsaved changes",
         description: "There are unsaved changes",
       },
     },
     success: {
-      title: "Invoice Created",
+      title: "Invoice created",
       description: "Invoice created in draft status",
     },
     widget: {
@@ -109,7 +109,7 @@ export const translations = {
       saveFailed: "Could not save the invoice draft",
       saveFailedHint:
         "Your entries are still here. Review them, then save the draft again.",
-      viewButton: "View Invoice",
+      viewButton: "View invoice",
     },
   },
   companyId: {
@@ -123,7 +123,7 @@ export const translations = {
     placeholder: "Enter customer ID",
   },
   dueDate: {
-    label: "Due Date",
+    label: "Due date",
     description: "When this invoice is due",
     placeholder: "Select due date",
   },
@@ -137,5 +137,23 @@ export const translations = {
     label: "Notes",
     description: "Optional notes visible on the invoice",
     placeholder: "e.g. Payment terms: 30 days",
+  },
+  supplyDate: {
+    label: "Supply date",
+    description:
+      "Day the goods or services were delivered. Defaults to the issue date.",
+  },
+  vatTreatment: {
+    label: "VAT treatment",
+    description:
+      "Domestic VAT, reverse charge or an exemption. Reverse charge and EU supplies need the customer VAT ID.",
+    options: {
+      DOMESTIC: "Domestic sale with VAT",
+      REVERSE_CHARGE_DOMESTIC: "Domestic reverse charge",
+      EU_SERVICES_REVERSE_CHARGE: "Services to an EU business (reverse charge)",
+      EU_GOODS_EXEMPT: "Goods to an EU business (exempt)",
+      EXPORT_EXEMPT: "Export outside the EU (exempt)",
+      EXEMPT: "VAT exempt supply",
+    },
   },
 };

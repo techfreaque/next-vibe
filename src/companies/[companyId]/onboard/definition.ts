@@ -20,6 +20,8 @@ import {
 } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
+import { PROFILE_COUNTRIES } from "@/tax/compliance/profiles";
+
 import { scopedTranslation } from "./i18n";
 
 const CompanyOnboardWidget = lazyWidget(() =>
@@ -72,9 +74,10 @@ const { POST } = createEndpoint({
         options: [
           { value: "AT", label: "enums.country.AT" as const },
           { value: "DE", label: "enums.country.DE" as const },
+          { value: "SK", label: "enums.country.SK" as const },
           { value: "XX", label: "enums.country.XX" as const },
         ],
-        schema: z.enum(["AT", "DE", "XX"]),
+        schema: z.enum(PROFILE_COUNTRIES),
       }),
 
       openFirstPeriod: requestField(scopedTranslation, {

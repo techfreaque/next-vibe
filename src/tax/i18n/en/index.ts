@@ -162,6 +162,8 @@ export const translations = {
           isCompound: "Compound",
           createdAt: "Created",
           updatedAt: "Updated",
+          validFrom: "Valid from",
+          validTo: "Valid until",
         },
       },
       success: {
@@ -199,6 +201,10 @@ export const translations = {
           title: "Unsaved Changes",
           description: "You have unsaved changes",
         },
+      },
+      validOn: {
+        label: "Valid on",
+        description: "Only show rates that legally apply on this day",
       },
     },
     update: {
