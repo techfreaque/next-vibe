@@ -29,21 +29,11 @@ import type {
   HelpToolMetadataSerialized,
 } from "./definition";
 import type { HelpT } from "./i18n";
-import { localizedLabel } from "./localized-label";
+import { categoryLabel, localizedLabel } from "./localized-label";
 
 type CategorySummary = NonNullable<
   HelpGetResponseOutput["webCategories"]
 >[number];
-
-function categoryLabel(
-  key: string,
-  locale: CountryLanguage,
-  metadata?: CategoryDefinitionSerialized,
-): string {
-  return metadata
-    ? (localizedLabel(metadata.labels, locale) ?? metadata.label)
-    : key;
-}
 
 export function RecordSearch({
   targets,

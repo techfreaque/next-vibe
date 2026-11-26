@@ -190,6 +190,7 @@ import { localizedLabel } from "./localized-label";
 import { PlatformAdminCatalog } from "./platform-admin-catalog";
 import { PlatformAdminNav } from "./platform-admin-nav";
 import { resolveEffectiveUser } from "./repository/meta-filter";
+import { parseSidebarPathFromSearch } from "./sidebar-path";
 
 // ─── Constants ──────────────────────────────────────────────────────────────
 
@@ -436,21 +437,6 @@ function useSidebarCollapsed(
   );
 
   return [collapsed, setCollapsed];
-}
-
-/** Admin sidebar path ([cat] or [cat, sub]) encoded in the URL search params. */
-function parseSidebarPathFromSearch(search: {
-  get: (key: string) => string | null;
-}): string[] {
-  const cat = search.get("cat");
-  const sub = search.get("sub");
-  if (cat && sub) {
-    return [cat, sub];
-  }
-  if (cat) {
-    return [cat];
-  }
-  return [];
 }
 
 // ─── Label helpers ──────────────────────────────────────────────────────────
@@ -3099,7 +3085,9 @@ export function HelpToolsWidget(): JSX.Element {
     const createCompanyAction =
       response?.adminCategoryLandings?.companies?.createActions[0];
     const goHome = (): void => setSidebarPath([], "webPinned", "business");
-    const showDeveloperCatalog = (category?: string): void => {
+    // Required parameter on purpose: a bare `onClick={showDeveloperCatalog}`
+    // would pass the click event as the category (URL cat=[object Object]).
+    const showDeveloperCatalog = (category: string | undefined): void => {
       setSidebarPath(
         category ? [category] : [],
         category ? "web" : "webPinned",
@@ -3173,7 +3161,7 @@ export function HelpToolsWidget(): JSX.Element {
           !isSearching
         }
         onHome={goHome}
-        onAllTools={showDeveloperCatalog}
+        onAllTools={() => showDeveloperCatalog(undefined)}
         onOpenTool={(alias) => void handleOpenTool(alias)}
         onSelectCategory={(category) => {
           setSidebarPath([category], "web");

@@ -123,7 +123,7 @@ export function PlatformAdminNav({
           variant="ghost"
           size="sm"
           className="min-h-10 justify-start gap-2 font-medium"
-          onClick={onAllTools}
+          onClick={() => onAllTools()}
         >
           <Layers className="size-4 shrink-0" aria-hidden="true" />
           {t("catalog.allTools")}
