@@ -44,8 +44,14 @@ import {
   getRootMessages,
 } from "@/_pages/chat/lib/utils/thread-builder";
 
+import {
+  chatModelDefinitions,
+  isRetiredChatModel,
+  resolveChatModelForUser,
+} from "../../../../../ai-stream/models";
 import { useChatInputStore } from "../../../../../ai-stream/stream/hooks/input-store";
 import { useAIStream } from "../../../../../ai-stream/stream/hooks/use-ai-stream";
+import { scopedTranslation as aiStreamTranslation } from "../../../../../ai-stream/stream/i18n";
 import { useProviderAvailability } from "../../../../../env-availability-store";
 import characterDefinitions from "../../../../../skills/[id]/definition";
 import { ModelSelectionType } from "../../../../../skills/enum";
@@ -53,7 +59,7 @@ import type { FavoriteConfig } from "../../../../../skills/favorites/db";
 import { ChatFavoritesRepositoryClient } from "../../../../../skills/favorites/repository-client";
 import type { TtsModelId } from "../../../../../text-to-speech/models";
 import type { ChatMessage, MessageMetadata } from "../../../../db";
-import { NEW_MESSAGE_ID, ViewMode } from "../../../../enum";
+import { ChatMessageRole, NEW_MESSAGE_ID, ViewMode } from "../../../../enum";
 import { useChatBootContext } from "../../../../hooks/context";
 import { useChatNavigationStore } from "../../../../hooks/use-chat-navigation-store";
 import { useChatSettings } from "../../../../settings/hooks";
@@ -793,6 +799,32 @@ export function ChatMessages({ showBranding }: ChatMessagesProps): JSX.Element {
 
   // All messages from cache are real messages - no merge or sentinel filtering needed.
   const realMessages = activeThreadMessages;
+  const { path: realPath, branchInfo } = useMemo(
+    () => buildMessagePath(realMessages, branchIndices, leafMessageId),
+    [realMessages, branchIndices, leafMessageId],
+  );
+  const lastReplyModel = realPath.findLast(
+    (message) => message.role === ChatMessageRole.ASSISTANT && message.model,
+  )?.model;
+  const retiredModel =
+    selectedModel && isRetiredChatModel(selectedModel)
+      ? selectedModel
+      : lastReplyModel && isRetiredChatModel(lastReplyModel)
+        ? lastReplyModel
+        : null;
+  let retiredModelNotice = null;
+  if (retiredModel) {
+    const { t } = aiStreamTranslation.scopedT(locale);
+    const model = chatModelDefinitions[retiredModel].name;
+    const successor = resolveChatModelForUser(retiredModel, user, availability);
+    retiredModelNotice =
+      successor === retiredModel
+        ? t("errors.modelRetired", { model })
+        : t("modelRetiredNotice", {
+            model,
+            successor: chatModelDefinitions[successor].name,
+          });
+  }
 
   // Flat view: sorted messages by timestamp (memoized)
   const flatSortedMessages = useMemo(
@@ -1250,12 +1282,6 @@ export function ChatMessages({ showBranding }: ChatMessagesProps): JSX.Element {
               ) : (
                 // Linear view (ChatGPT style) - Build path through message tree
                 ((): JSX.Element => {
-                  const { path: realPath, branchInfo } = buildMessagePath(
-                    realMessages,
-                    branchIndices,
-                    leafMessageId,
-                  );
-
                   // Render window trimming: only render from last compaction boundary forward
                   // to keep DOM size small in long sessions with multiple compactions.
                   // Expands backwards compaction-by-compaction on scroll-up.
@@ -1425,6 +1451,14 @@ export function ChatMessages({ showBranding }: ChatMessagesProps): JSX.Element {
                 </Div>
               )}
 
+              {retiredModelNotice && (
+                <Div
+                  aria-live="polite"
+                  className="mx-auto max-w-3xl px-4 py-3 text-sm text-muted-foreground sm:px-8 md:px-10"
+                >
+                  {retiredModelNotice}
+                </Div>
+              )}
               <Div ref={messagesEndRef} />
             </Div>
           </Div>

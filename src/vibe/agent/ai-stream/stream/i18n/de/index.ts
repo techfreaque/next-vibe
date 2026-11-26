@@ -570,6 +570,8 @@ export const translations: typeof enTranslations = {
       "Das Modell hat einen fehlerhaften Tool-Aufruf gesendet, er wurde nicht ausgeführt. Mit „Weiter“ versucht es das Modell erneut.",
     providerBusy:
       "Dieses Modell ist gerade überlastet. Versuchen Sie es in ein paar Sekunden erneut oder wählen Sie ein anderes Modell.",
+    modelRetired:
+      "{{model}} wurde eingestellt. Wähle ein anderes Modell, um weiterzuschreiben.",
     modelUnavailable:
       "Das ausgewählte KI-Modell ist derzeit nicht verfügbar. Bitte versuchen Sie ein anderes Modell.",
     rateLimitExceeded:
@@ -603,6 +605,8 @@ export const translations: typeof enTranslations = {
       "Die KI hat nach {{steps}} Schritten pausiert. Schreib „Mach weiter“, um an dieser Stelle fortzufahren.",
     raiseTurnStepLimit: "Schrittlimit in den Chat-Einstellungen erhöhen",
   },
+  modelRetiredNotice:
+    "{{model}} wurde eingestellt. {{successor}} ist der Nachfolger. Dein Chatverlauf bleibt erhalten.",
   headless: {
     errors: {
       missingModelOrSkill:

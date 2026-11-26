@@ -592,6 +592,8 @@ export const translations: typeof enTranslations = {
       "Le modèle a envoyé un appel d'outil invalide, il n'a donc pas été exécuté. Cliquez sur Continuer et il réessaiera.",
     providerBusy:
       "Ce modèle est surchargé en ce moment. Réessayez dans quelques secondes ou choisissez un autre modèle.",
+    modelRetired:
+      "Le modèle {{model}} a été retiré. Choisis un autre modèle pour continuer.",
     modelUnavailable:
       "Le modèle IA choisi est actuellement indisponible. Essayez un autre modèle.",
     rateLimitExceeded: "Trop de requêtes. Patientez un instant puis réessayez.",
@@ -610,6 +612,8 @@ export const translations: typeof enTranslations = {
     unexpectedError:
       "Une erreur inattendue s'est produite : {{error}}. Veuillez réessayer.",
   },
+  modelRetiredNotice:
+    "Le modèle {{model}} a été retiré. {{successor}} le remplace. Ton historique reste accessible.",
   headless: {
     errors: {
       missingModelOrSkill:

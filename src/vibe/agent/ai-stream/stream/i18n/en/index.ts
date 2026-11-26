@@ -583,6 +583,8 @@ export const translations = {
       "The model sent a broken tool call, so it was not run. Press Continue and it will try again.",
     providerBusy:
       "This model is overloaded right now. Retry in a few seconds or pick another model.",
+    modelRetired:
+      "{{model}} has been retired. Choose another model to continue.",
     modelUnavailable:
       "The selected AI model is currently unavailable. Please try a different model.",
     rateLimitExceeded: "Too many requests. Please wait a moment and try again.",
@@ -601,6 +603,8 @@ export const translations = {
     unexpectedError:
       "An unexpected error occurred: {{error}}. Please try again.",
   },
+  modelRetiredNotice:
+    "{{model}} has been retired. Its replacement is {{successor}}. Your chat history is still here.",
   headless: {
     errors: {
       // Thrown when runHeadlessAiStream() is called without a resolvable model+skill.

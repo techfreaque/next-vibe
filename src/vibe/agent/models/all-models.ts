@@ -10,7 +10,11 @@
  * aggregate helpers (getModelCost, getAvailableModelCount, …).
  */
 
-import { chatModelDefinitions, chatModelOptions } from "../ai-stream/models";
+import {
+  chatModelDefinitions,
+  chatModelOptions,
+  chatModelOptionsIndex,
+} from "../ai-stream/models";
 import {
   type AudioVisionModelOption,
   type ImageVisionModelOption,
@@ -95,7 +99,10 @@ export function getUnavailableModelIds(
   for (const def of allModelDefinitions) {
     for (const provider of def.providers) {
       all.add(provider.id);
-      if (isApiProviderAvailable(provider.apiProvider, availability)) {
+      if (
+        (def.enabled !== false || def.enabledWithoutPrice === true) &&
+        isApiProviderAvailable(provider.apiProvider, availability)
+      ) {
         available.add(provider.id);
       }
     }
@@ -149,7 +156,9 @@ export function getModelCost(
   cacheWriteTokens = 0,
 ): number {
   const model =
-    allModelOptions.find((m) => m.id === modelId) ?? allModelOptions[0]!;
+    chatModelOptionsIndex[modelId] ??
+    allModelOptions.find((m) => m.id === modelId) ??
+    allModelOptions[0]!;
   return getCreditCostFromModel(
     model,
     actualInputTokens,

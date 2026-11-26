@@ -562,6 +562,8 @@ export const translations: typeof enTranslations = {
       "Model wysłał uszkodzone wywołanie narzędzia, więc nie zostało wykonane. Kliknij „Kontynuuj”, a spróbuje ponownie.",
     providerBusy:
       "Ten model jest teraz przeciążony. Spróbuj ponownie za kilka sekund albo wybierz inny model.",
+    modelRetired:
+      "Model {{model}} został wycofany. Wybierz inny model, aby kontynuować rozmowę.",
     modelUnavailable:
       "Wybrany model AI jest obecnie niedostępny. Spróbuj innego modelu.",
     rateLimitExceeded: "Zbyt wiele żądań. Poczekaj chwilę i spróbuj ponownie.",
@@ -595,6 +597,8 @@ export const translations: typeof enTranslations = {
       "AI zrobiła przerwę po {{steps}} krokach. Wpisz „Kontynuuj”, by wrócić do tego miejsca.",
     raiseTurnStepLimit: "Zwiększ limit kroków w ustawieniach czatu",
   },
+  modelRetiredNotice:
+    "Model {{model}} został wycofany. Zastąpił go {{successor}}. Historia rozmowy pozostaje dostępna.",
   headless: {
     errors: {
       missingModelOrSkill:

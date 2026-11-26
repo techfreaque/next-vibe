@@ -34,7 +34,7 @@ import {
   freePlanMessageCount,
 } from "@/products/credit-money";
 
-import { chatModelOptions } from "../../ai-stream/models";
+import { chatModelOptionsIndex } from "../../ai-stream/models";
 import {
   COMPACT_TRIGGER,
   COMPACT_TRIGGER_PERCENTAGE,
@@ -98,7 +98,7 @@ export interface ModelCreditDisplayProps {
  */
 function findModel(id: AnyModelId): AnyModelOption | undefined {
   return (
-    chatModelOptions.find((m) => m.id === id) ??
+    chatModelOptionsIndex[id] ??
     imageGenModelOptions.find((m) => m.id === id) ??
     musicGenModelOptions.find((m) => m.id === id) ??
     videoGenModelOptions.find((m) => m.id === id) ??

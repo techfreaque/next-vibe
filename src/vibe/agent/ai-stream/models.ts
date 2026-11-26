@@ -154,10 +154,10 @@ function buildChatModelOptions(): Record<ChatModelId, ChatModelOption> {
 export const chatModelOptionsIndex: Record<string, ChatModelOption> =
   buildChatModelOptions();
 
-/** One entry per model (cheapest provider overall). Used for display/UI and ID lookups. */
+/** One entry per selectable model. The index also keeps historical IDs for display. */
 export const chatModelOptions: ChatModelOption[] = Object.values(
   chatModelOptionsIndex,
-).filter((m): m is ChatModelOption => m !== undefined);
+).filter((model) => !isRetiredChatModel(model.id));
 
 /**
  * All (model, provider) combinations sorted cheapest-first.
@@ -168,7 +168,7 @@ function buildChatModelOptionsPool(): ChatModelOption[] {
   const pool: ChatModelOption[] = [];
   for (const modelId of Object.values(ChatModelId)) {
     const def = chatModelDefinitions[modelId];
-    if (!def) {
+    if (!def || isRetiredChatModel(modelId)) {
       continue;
     }
     const sortedProviders = [...def.providers].toSorted(
@@ -196,10 +196,12 @@ export const chatModelOptionsPool: ChatModelOption[] =
 
 export const ChatModelIdOptions = (
   Object.entries(ChatModelId) as [keyof typeof ChatModelId, ChatModelId][]
-).map(([key, id]) => ({
-  value: id,
-  label: `models.names.${key}` as `models.names.${keyof typeof ChatModelId}`,
-}));
+)
+  .filter(([, id]) => !isRetiredChatModel(id))
+  .map(([key, id]) => ({
+    value: id,
+    label: `models.names.${key}` as `models.names.${keyof typeof ChatModelId}`,
+  }));
 
 export function getChatModelById(modelId: ChatModelId): ChatModelOption;
 export function getChatModelById(
@@ -320,6 +322,12 @@ export function isLegacyChatModel(modelId: ChatModelId): boolean {
     return false;
   }
   return def.utilities.includes(ModelUtility.LEGACY);
+}
+
+/** Retired IDs remain readable in saved chats but have no callable route. */
+export function isRetiredChatModel(modelId: ChatModelId): boolean {
+  const def = chatModelDefinitions[modelId];
+  return def?.enabled === false && def.enabledWithoutPrice !== true;
 }
 
 /**

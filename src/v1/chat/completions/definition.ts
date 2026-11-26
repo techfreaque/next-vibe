@@ -5,6 +5,7 @@
  * response is nominal.
  */
 
+import { ChatModelId } from "next-vibe/agent/ai-stream/models";
 import { cacheControlSchema } from "next-vibe/agent/ai-stream/providers/shared/prompt-cache";
 import { createEndpoint } from "next-vibe/core/definition/create-i18n";
 import {
@@ -233,7 +234,7 @@ const { POST } = createEndpoint({
   examples: {
     requests: {
       default: {
-        model: "kimi-k2",
+        model: ChatModelId.KIMI_K3,
         messages: [{ role: "user", content: "Say hello in five words." }],
       },
     },

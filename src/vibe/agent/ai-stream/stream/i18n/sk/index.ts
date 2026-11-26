@@ -586,6 +586,8 @@ export const translations: typeof enTranslations = {
       "Model odoslal neplatné volanie nástroja a nástroj sa nespustil. Stlač „Pokračovať“ a model to skúsi znova.",
     providerBusy:
       "Model je preťažený. Skús znova o pár sekúnd alebo vyber iný model.",
+    modelRetired:
+      "Model {{model}} bol vyradený. Ak chceš pokračovať, vyber iný model.",
     modelUnavailable:
       "Vybraný model AI je momentálne nedostupný. Skús iný model.",
     rateLimitExceeded: "Príliš veľa požiadaviek. Chvíľu počkaj a skús znova.",
@@ -604,6 +606,8 @@ export const translations: typeof enTranslations = {
       "Po zhrnutí sa nepodarilo obnoviť čet. Skús vytvoriť vetvu zo staršej správy.",
     unexpectedError: "Nastala neočakávaná chyba: {{error}}. Skús znova.",
   },
+  modelRetiredNotice:
+    "Model {{model}} bol vyradený. Nahrádza ho {{successor}}. História chatu zostáva dostupná.",
   headless: {
     errors: {
       // Thrown when runHeadlessAiStream() is called without a resolvable model+skill.

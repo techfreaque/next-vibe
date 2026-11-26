@@ -110,20 +110,35 @@ export function resolveComparePair(
   b: string,
   availability: AgentEnvAvailability,
 ): { left: ModelFacts; right: ModelFacts } | null {
-  const leftId = findPublicModelId(a);
-  const rightId = findPublicModelId(b);
-  if (leftId === null || rightId === null || leftId === rightId) {
+  const left = resolveCompareModel(a, availability);
+  const right = resolveCompareModel(b, availability);
+  if (left === null || right === null) {
     return null;
   }
-  const left = getModelFacts(leftId, availability);
-  const right = getModelFacts(rightId, availability);
-  if (left === null || right === null) {
+  if (left.id === right.id) {
+    if (findRetiredModelId(a) !== null || findRetiredModelId(b) !== null) {
+      permanentRedirect(`/${locale}/models/${left.slug}`);
+    }
     return null;
   }
   if (left.slug !== a || right.slug !== b) {
     permanentRedirect(`/${locale}${canonicalComparisonPath(left, right)}`);
   }
   return { left, right };
+}
+
+function resolveCompareModel(
+  segment: string,
+  availability: AgentEnvAvailability,
+): ModelFacts | null {
+  const publicId = findPublicModelId(segment);
+  if (publicId !== null) {
+    return getModelFacts(publicId, availability);
+  }
+  const retiredId = findRetiredModelId(segment);
+  const successor =
+    retiredId === null ? null : resolveSuccessor(retiredId, availability);
+  return successor === null ? null : getModelFacts(successor.id, availability);
 }
 
 function blogLinks(

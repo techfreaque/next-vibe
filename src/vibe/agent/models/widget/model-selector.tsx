@@ -43,9 +43,12 @@ import { useMemo, useState } from "react";
 import {
   ChatModelId,
   chatModelOptions,
+  chatModelOptionsIndex,
   chatModelOptionsPool,
   filterChatModels,
   getBestChatModel,
+  isRetiredChatModel,
+  resolveChatModelSuccessor,
 } from "../../ai-stream/models";
 import {
   AudioVisionModelId,
@@ -138,9 +141,23 @@ function getAllModelOptions(): AnyModelOption[] {
  * Look up a model option by ID across all roles.
  * Local implementation - avoids importing cross-role utility from models.ts.
  */
-function lookupModelById(id: AnyModelId): AnyModelOption | undefined {
+function lookupModelById(
+  id: AnyModelId,
+  user: JwtPayloadType,
+  availability: AgentEnvAvailability,
+): AnyModelOption | undefined {
+  const chat = chatModelOptionsIndex[id];
+  if (chat && isRetiredChatModel(chat.id)) {
+    const successor = resolveChatModelSuccessor(chat.id);
+    const best = getBestChatModel(
+      { selectionType: ModelSelectionType.MANUAL, manualModelId: chat.id },
+      user,
+      availability,
+    );
+    return best?.id === successor ? best : undefined;
+  }
   return (
-    chatModelOptions.find((m) => m.id === id) ??
+    chat ??
     imageGenModelOptions.find((m) => m.id === id) ??
     musicGenModelOptions.find((m) => m.id === id) ??
     videoGenModelOptions.find((m) => m.id === id) ??
@@ -291,7 +308,7 @@ function getBestModelByRoleDispatch(
     "manualModelId" in selection &&
     selection.manualModelId
   ) {
-    const model = lookupModelById(selection.manualModelId);
+    const model = lookupModelById(selection.manualModelId, user, availability);
     if (
       model &&
       (!model.adminOnly || isAdmin) &&
@@ -1574,7 +1591,7 @@ export function ModelSelector({
 
   const bestModel = useMemo(() => {
     if (mode === ModelSelectionType.MANUAL && manualModelId) {
-      return lookupModelById(manualModelId) ?? null;
+      return lookupModelById(manualModelId, user, availability) ?? null;
     } else if (mode === ModelSelectionType.CHARACTER_BASED) {
       if (characterModelSelection) {
         return getBestModelByRoleDispatch(

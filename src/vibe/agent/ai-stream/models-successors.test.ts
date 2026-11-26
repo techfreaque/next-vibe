@@ -26,6 +26,8 @@ import { getBestChatModelForFavorite } from "../skills/favorites/[id]/definition
 import {
   chatModelDefinitions,
   ChatModelId,
+  ChatModelIdOptions,
+  chatModelOptions,
   chatModelOptionsPool,
   chatModelSuccessors,
   filterChatModels,
@@ -89,7 +91,34 @@ const openRouterOnly: AgentEnvAvailability = {
 
 const allChatIds = Object.values(ChatModelId);
 
+const retiredModels = [
+  [ChatModelId.GPT_5_CODEX, ChatModelId.GPT_6_2_SOL],
+  [ChatModelId.GPT_5_3_CHAT, ChatModelId.GPT_6_1_TERRA],
+  [ChatModelId.GPT_5_2_CHAT, ChatModelId.GPT_6_1_TERRA],
+  [ChatModelId.KIMI_K2, ChatModelId.KIMI_K3],
+  [ChatModelId.KIMI_K2_THINKING, ChatModelId.KIMI_K3],
+  [ChatModelId.MIMO_V2_PRO, ChatModelId.MIMO_V2_6_PRO],
+  [ChatModelId.MIMO_V2_5, ChatModelId.MIMO_V2_6_FLASH],
+  [ChatModelId.MIMO_V2_5_PRO, ChatModelId.MIMO_V2_6_PRO],
+  [ChatModelId.DEEPSEEK_R1_DISTILL, ChatModelId.DEEPSEEK_V4_1_FLASH],
+  [ChatModelId.QWEN_2_5_7B, ChatModelId.QWEN_3_8_FLASH],
+  [ChatModelId.CLAUDE_OPUS_5_FAST, ChatModelId.CLAUDE_OPUS_5_5],
+] as const;
+
 describe("chat model successor map", () => {
+  it("keeps retired models readable and resolves old picks without listing their routes", () => {
+    for (const [retired, successor] of retiredModels) {
+      expect(isLegacyChatModel(retired)).toBe(true);
+      expect(getChatModelById(retired).id).toBe(retired);
+      expect(chatModelOptions.some((option) => option.id === retired)).toBe(false);
+      expect(chatModelOptionsPool.some((option) => option.id === retired)).toBe(false);
+      expect(ChatModelIdOptions.some((option) => option.value === retired)).toBe(false);
+      expect(resolveChatModelForUser(retired, publicUser, openRouterOnly)).toBe(
+        successor,
+      );
+    }
+  });
+
   it("maps only legacy models, and only to current models", () => {
     for (const legacyId of allChatIds) {
       const successor = chatModelSuccessors[legacyId];

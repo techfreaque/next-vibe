@@ -22,6 +22,7 @@ import {
   getBestChatModel,
   getChatModelById,
   isLegacyChatModel,
+  isRetiredChatModel,
   resolveChatModelSuccessor,
 } from "../ai-stream/models";
 import type {
@@ -276,7 +277,7 @@ export class SkillsRepositoryClient {
     if (modelSelection.selectionType === ModelSelectionType.MANUAL) {
       const isAdmin =
         !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN);
-      // Legacy picks resolve to their successor first, then the original id.
+      // Fall back to the original model only while it still has a route.
       const successorId = resolveChatModelSuccessor(
         modelSelection.manualModelId,
       );
@@ -285,6 +286,9 @@ export class SkillsRepositoryClient {
           ? [successorId]
           : [successorId, modelSelection.manualModelId];
       for (const candidateId of candidateIds) {
+        if (isRetiredChatModel(candidateId)) {
+          continue;
+        }
         const model = getChatModelById(candidateId);
         if (model.adminOnly && !isAdmin) {
           continue;

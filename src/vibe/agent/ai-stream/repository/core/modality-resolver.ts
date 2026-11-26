@@ -52,8 +52,10 @@ import {
   VIDEO_VISION_FALLBACK_MODEL_IDS,
 } from "../../constants";
 import {
+  chatModelDefinitions,
   type ChatModelId,
   getBestChatModel,
+  isRetiredChatModel,
   resolveChatModelForUser,
   resolveChatModelSuccessor,
 } from "../../models";
@@ -248,6 +250,9 @@ export async function resolveModelSkill(params: {
       resolveChatModelSuccessor(model) === model
         ? model
         : resolveChatModelForUser(model, user, await getEnvAvailability());
+    if (isRetiredChatModel(resolvedModel)) {
+      return retiredModelError(resolvedModel, t);
+    }
     if (resolvedModel !== model) {
       logger.debug("[resolveModelSkill] Legacy model resolved to successor", {
         from: model,
@@ -278,6 +283,9 @@ export async function resolveModelSkill(params: {
           message: t("headless.errors.favoriteNotFound"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
+      }
+      if (isRetiredChatModel(resolved.model)) {
+        return retiredModelError(resolved.model, t);
       }
       return success({
         model: resolved.model,
@@ -366,6 +374,18 @@ export async function resolveModelSkill(params: {
   );
   return fail({
     message: t("headless.errors.missingModelOrSkill"),
+    errorType: ErrorResponseTypes.VALIDATION_ERROR,
+  });
+}
+
+function retiredModelError(
+  model: ChatModelId,
+  t: AiStreamT,
+): ResponseType<never> {
+  return fail({
+    message: t("errors.modelRetired", {
+      model: chatModelDefinitions[model].name,
+    }),
     errorType: ErrorResponseTypes.VALIDATION_ERROR,
   });
 }

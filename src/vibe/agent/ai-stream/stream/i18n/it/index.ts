@@ -597,6 +597,8 @@ export const translations: typeof enTranslations = {
       "Il modello ha inviato una chiamata a uno strumento non valida, quindi non è stata eseguita. Premi Continua e riproverà.",
     providerBusy:
       "Questo modello è sovraccaricato in questo momento. Riprovare in pochi secondi o scegliere un altro modello.",
+    modelRetired:
+      "Il modello {{model}} è stato ritirato. Scegli un altro modello per continuare.",
     modelUnavailable:
       "Attualmente non è disponibile il modello AI selezionato. Si prega di provare un modello diverso.",
     rateLimitExceeded:
@@ -618,6 +620,8 @@ export const translations: typeof enTranslations = {
     unexpectedError:
       "Si è verificato un errore inaspettato: {{error}}. Per favore, riprovate.",
   },
+  modelRetiredNotice:
+    "Il modello {{model}} è stato ritirato. Al suo posto c’è {{successor}}. La cronologia della chat resta disponibile.",
   headless: {
     errors: {
       // Thrown when runHeadlessAiStream() is called without a resolvable model+skill.
