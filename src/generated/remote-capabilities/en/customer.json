@@ -54464,7 +54464,7 @@
           "type": "form_field",
           "fieldType": "textarea",
           "label": "Find",
-          "description": "Text to find",
+          "description": "Text to find. Every match is replaced (no replace_all flag needed)",
           "columns": 12,
           "schema": {
             "def": {

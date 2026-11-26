@@ -54464,7 +54464,7 @@
           "type": "form_field",
           "fieldType": "textarea",
           "label": "Rechercher",
-          "description": "Texte à rechercher",
+          "description": "Texte à rechercher. Chaque occurrence est remplacée (pas besoin de replace_all)",
           "columns": 12,
           "schema": {
             "def": {

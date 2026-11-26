@@ -54464,7 +54464,7 @@
           "type": "form_field",
           "fieldType": "textarea",
           "label": "Trova",
-          "description": "Testo da trovare",
+          "description": "Testo da trovare. Ogni occorrenza viene sostituita (non serve replace_all)",
           "columns": 12,
           "schema": {
             "def": {

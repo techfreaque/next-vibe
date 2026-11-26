@@ -55196,6 +55196,41 @@
                   "response": true
                 },
                 "schemaType": "primitive"
+              },
+              "companyId": {
+                "type": "text",
+                "label": "Entreprise",
+                "hidden": true,
+                "schema": {
+                  "def": {
+                    "type": "string"
+                  },
+                  "type": "string"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "companyName": {
+                "type": "text",
+                "label": "Entreprise",
+                "schema": {
+                  "def": {
+                    "type": "nullable",
+                    "innerType": {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    }
+                  },
+                  "type": "nullable"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
               }
             },
             "schemaType": "object"
@@ -406333,7 +406368,7 @@
           "type": "form_field",
           "fieldType": "textarea",
           "label": "Rechercher",
-          "description": "Texte à rechercher",
+          "description": "Texte à rechercher. Chaque occurrence est remplacée (pas besoin de replace_all)",
           "columns": 12,
           "schema": {
             "def": {

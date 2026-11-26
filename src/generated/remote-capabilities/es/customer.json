@@ -54464,7 +54464,7 @@
           "type": "form_field",
           "fieldType": "textarea",
           "label": "Encontrar",
-          "description": "Texto para encontrar",
+          "description": "Texto para encontrar. Se reemplazan todas las coincidencias (no hace falta replace_all)",
           "columns": 12,
           "schema": {
             "def": {

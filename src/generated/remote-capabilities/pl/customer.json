@@ -54464,7 +54464,7 @@
           "type": "form_field",
           "fieldType": "textarea",
           "label": "Znajdź",
-          "description": "Tekst do znalezienia",
+          "description": "Tekst do znalezienia. Każde wystąpienie zostanie zastąpione (bez flagi replace_all)",
           "columns": 12,
           "schema": {
             "def": {

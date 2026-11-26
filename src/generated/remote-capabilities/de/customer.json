@@ -54464,7 +54464,7 @@
           "type": "form_field",
           "fieldType": "textarea",
           "label": "Suchen",
-          "description": "Diesen Text finden",
+          "description": "Diesen Text finden. Jeder Treffer wird ersetzt (kein replace_all nötig)",
           "columns": 12,
           "schema": {
             "def": {

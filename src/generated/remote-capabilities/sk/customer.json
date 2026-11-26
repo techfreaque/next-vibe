@@ -54464,7 +54464,7 @@
           "type": "form_field",
           "fieldType": "textarea",
           "label": "Nájsť",
-          "description": "Text, ktorý sa má nájsť",
+          "description": "Text, ktorý sa má nájsť. Nahradí sa každý výskyt (replace_all netreba)",
           "columns": 12,
           "schema": {
             "def": {
