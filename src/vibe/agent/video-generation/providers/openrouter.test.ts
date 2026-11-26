@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, expect, it, mock } from "bun:test";
+import { afterEach, beforeEach, expect, it, mock, spyOn } from "bun:test";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import sharp from "sharp";
 
@@ -63,4 +63,50 @@ it("submits WebP bookends as PNG, preserves audio references and returns a struc
   expect(handler).toHaveBeenCalledTimes(1);
   expect(result.success).toBe(false);
   if (!result.success) expect(result.message).toContain(detail);
+});
+
+it("stops retrying a BYOK-only model on the same unconfigured account", async () => {
+  const handler = mock(async () =>
+    Response.json(
+      {
+        error: {
+          code: 404,
+          message: "No endpoints found for minimax/hailuo-3.",
+          metadata: {
+            routing_funnel: [
+              { step: "Initial Endpoints", endpoint_count: 1 },
+              {
+                step: "Add BYOK Endpoints",
+                endpoint_count: 0,
+                reason: "The matches are BYOK-only and you have no MiniMax key",
+              },
+            ],
+          },
+        },
+      },
+      { status: 404 },
+    ),
+  );
+  const params = {
+    providerModel: "minimax/hailuo-3",
+    prompt: "fixture",
+    fetchImpl: Object.assign(handler, { preconnect: fetch.preconnect }),
+    logger: createEndpointLogger(false, "en-US"),
+    locale: "en-US",
+  } satisfies Parameters<typeof generateVideoWithOpenRouter>[0];
+  const result = await generateVideoWithOpenRouter(params);
+  expect(result.success).toBe(false);
+  if (!result.success) expect(result.message).toContain("minimax/hailuo-3");
+  await generateVideoWithOpenRouter(params);
+  expect(handler).toHaveBeenCalledTimes(1);
+  const clock = spyOn(Date, "now").mockReturnValue(Date.now() + 300_001);
+  try {
+    await generateVideoWithOpenRouter(params);
+    expect(handler).toHaveBeenCalledTimes(2);
+  } finally {
+    clock.mockRestore();
+  }
+  agentEnv.OPENROUTER_API_KEY = "another-local-provider-fixture";
+  await generateVideoWithOpenRouter(params);
+  expect(handler).toHaveBeenCalledTimes(3);
 });

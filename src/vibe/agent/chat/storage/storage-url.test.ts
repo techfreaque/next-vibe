@@ -101,9 +101,7 @@ describe("isStorageUrl", () => {
     expect(isStorageUrl(PORTABLE)).toBe(true);
     expect(isStorageUrl(`http://localhost:3000${PORTABLE}`)).toBe(true);
     expect(
-      isStorageUrl(
-        `/api/en-GLOBAL/agent/chat/threads/files/${THREAD}/${FILE}`,
-      ),
+      isStorageUrl(`/api/en-GLOBAL/agent/chat/threads/files/${THREAD}/${FILE}`),
     ).toBe(true);
   });
 
@@ -138,7 +136,9 @@ describe("rewriteStorageUrlsInText", () => {
   });
 
   it("stops at a JSON string delimiter", () => {
-    const json = JSON.stringify({ imageUrl: `http://localhost:3000${PORTABLE}` });
+    const json = JSON.stringify({
+      imageUrl: `http://localhost:3000${PORTABLE}`,
+    });
     expect(rewriteStorageUrlsInText(json)).toBe(
       JSON.stringify({ imageUrl: PORTABLE }),
     );
@@ -146,6 +146,17 @@ describe("rewriteStorageUrlsInText", () => {
 });
 
 describe("mediaUrlSchema", () => {
+  it("accepts Cortex upload entries emitted by the file listing", () => {
+    expect(
+      mediaUrlSchema.safeParse(
+        "/uploads/images/sample-thread-123/remote-file-1-png.md",
+      ).success,
+    ).toBe(true);
+    expect(
+      mediaUrlSchema.safeParse("/uploads/images/sample-thread-123/../file.md")
+        .success,
+    ).toBe(false);
+  });
   it("accepts a portable storage path (what tool results now return)", () => {
     expect(mediaUrlSchema.safeParse(PORTABLE).success).toBe(true);
   });

@@ -54,7 +54,13 @@ interface PhaseWindow {
   endedAt: number | null;
 }
 
+interface TimerStall {
+  startedAt: number;
+  endedAt: number;
+}
+
 interface ProfileSession {
+  timerStall?: TimerStall;
   /** Set once the sampling window closed (tail, window or hard cap) */
   released: boolean;
   /** Phases that overlapped the session (open ones are carried over) */
@@ -67,6 +73,7 @@ interface ProfileSession {
 }
 
 export interface StallProfile {
+  timerStall?: ReturnType<typeof summarizeTimerStall>;
   /** Wall clock of the profiled session (ms) */
   sessionStartedAt: number;
   sessionEndedAt: number;
@@ -248,6 +255,36 @@ function longestStreak(
   return [bestStart, bestEnd];
 }
 
+/** Count only samples whose earliest and latest possible times are inside the delay. */
+export function summarizeTimerStall(
+  traces: SamplingProfile["stackTraces"]["traces"],
+  sessionStart: number,
+  sessionEnd: number,
+  timer: TimerStall,
+): { startedAt: number; endedAt: number; samples: number; hotStacks: string } {
+  const stacks = new Map<string, number>();
+  const first = traces[0]?.timestamp ?? 0;
+  const last = traces.at(-1)?.timestamp ?? 0;
+  let samples = 0;
+  for (const trace of traces) {
+    const earliest =
+      sessionStart + Math.floor((trace.timestamp - first) * 1000);
+    const latest = sessionEnd - Math.floor((last - trace.timestamp) * 1000);
+    if (
+      earliest < timer.startedAt ||
+      latest > timer.endedAt ||
+      earliest > latest
+    ) {
+      continue;
+    }
+    samples++;
+    if (trace.frames.length > 0) {
+      bump(stacks, stackKey(trace.frames));
+    }
+  }
+  return { ...timer, samples, hotStacks: topCounts(stacks, 3) };
+}
+
 function summarize(
   result: SamplingProfile,
   session: ProfileSession,
@@ -284,6 +321,14 @@ function summarize(
   }
 
   return {
+    timerStall: session.timerStall
+      ? summarizeTimerStall(
+          traces,
+          session.startedAt,
+          endedAt,
+          session.timerStall,
+        )
+      : undefined,
     sessionStartedAt: session.startedAt,
     sessionEndedAt: endedAt,
     streakMs,
@@ -537,9 +582,12 @@ export class PhaseProfiler {
    * summary, so profileCovering(at) can answer. The lag monitor calls this
    * right after it measured a stall. No-op without a session.
    */
-  static async flush(at: number): Promise<void> {
+  static async flush(at: number, stallEndedAt?: number): Promise<void> {
     const current = globalThis.__vibePhaseProfiler;
     if (current && !current.released && current.startedAt <= at) {
+      if (stallEndedAt !== undefined) {
+        current.timerStall = { startedAt: at, endedAt: stallEndedAt };
+      }
       current.release();
     }
     const pending = globalThis.__vibeProfilerPending;

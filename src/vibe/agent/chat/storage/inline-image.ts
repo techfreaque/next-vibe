@@ -15,36 +15,60 @@ export function isInlineImageFilename(filename: string): boolean {
   );
 }
 
+/** Non-UUID attachment names cannot be embedded in portable storage URLs.
+ * Address their exact user message and array position instead. */
+export function inlineImageDownloadName(
+  attachment: { filename: string | null; name: string | null },
+  messageId: string,
+  index: number,
+): string | null {
+  if (attachment.filename && isInlineImageFilename(attachment.filename)) {
+    return attachment.filename;
+  }
+  const filename = attachment.filename ?? attachment.name ?? "";
+  const ext = /\.(webp|png|jpe?g|gif)$/i.exec(filename)?.[1];
+  return ext ? `inline-${messageId}-${index}.${ext.toLowerCase()}` : null;
+}
+
 /** Called after thread authorization for legacy images stored only in user messages. */
 export async function readInlineThreadImage(
   threadId: string,
   filename: string,
 ): Promise<StoredFileSource | null> {
-  if (!isInlineImageFilename(filename)) {
+  const indexed =
+    /^inline-([a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12})-([0-9]{1,9})\.(?:webp|png|jpe?g|gif)$/i.exec(
+      filename,
+    );
+  if (!indexed && !isInlineImageFilename(filename)) {
     return null;
   }
+  const candidates = indexed
+    ? sql`SELECT ${chatMessages.metadata}->'attachments'->${Number(indexed[2])}::int AS attachment
+          FROM ${chatMessages}
+          WHERE ${chatMessages.id} = ${indexed[1]} AND ${chatMessages.threadId} = ${threadId}
+            AND ${chatMessages.role} = ${ChatMessageRole.USER}`
+    : sql`SELECT attachment FROM ${chatMessages}
+          CROSS JOIN LATERAL jsonb_path_query(
+            ${chatMessages.metadata},
+            'strict $.attachments[*] ? (@.filename == $file && @.data.type() == "string")',
+            jsonb_build_object('file', ${filename}::text), true
+          ) attachment
+          WHERE ${chatMessages.threadId} = ${threadId} AND ${chatMessages.role} = ${ChatMessageRole.USER}
+          ORDER BY ${chatMessages.createdAt} DESC`;
   const result = await db.execute<{ data: string }>(sql`
-    SELECT attachment->>'data' AS data FROM ${chatMessages}
-    CROSS JOIN LATERAL jsonb_path_query(
-      ${chatMessages.metadata},
-      'strict $.attachments[*] ? (@.filename == $file && @.data.type() == "string")',
-      jsonb_build_object('file', ${filename}::text), true
-    ) attachment
-    WHERE ${chatMessages.threadId} = ${threadId}
-      AND ${chatMessages.role} = ${ChatMessageRole.USER}
-      AND coalesce(attachment->>'url', '') = ''
+    SELECT attachment->>'data' AS data FROM (${candidates}) images
+    WHERE coalesce(attachment->>'url', '') = ''
+      AND jsonb_typeof(attachment->'data') = 'string'
       AND length(attachment->>'data') BETWEEN 1 AND ${4 * Math.ceil(MAX_UPLOAD_BYTES / 3)}
-    ORDER BY ${chatMessages.createdAt} DESC
     LIMIT 1
   `);
   const data = result.rows[0]?.data;
   const contentType = data ? sniffImageMediaType(data) : null;
-  return data && contentType
-    ? {
-        threadId,
-        filename,
-        contentType,
-        inlineBytes: Buffer.from(data, "base64"),
-      }
+  if (!data || !contentType) {
+    return null;
+  }
+  const inlineBytes = Buffer.from(data, "base64");
+  return inlineBytes.length <= MAX_UPLOAD_BYTES
+    ? { threadId, filename, contentType, inlineBytes }
     : null;
 }

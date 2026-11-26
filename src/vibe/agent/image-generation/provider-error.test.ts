@@ -13,6 +13,8 @@ describe("classifyImageProviderError", () => {
       "External service error: Prompt violates our content policy (HTTP 400)",
       "NSFW content detected in the prompt",
       "Request flagged by moderation",
+      "Green net check rejected text (input)",
+      "Request failed because the input text 'content[0]' may contain sensitive information.",
     ]) {
       expect(classifyImageProviderError(message)).toBe(
         ImageProviderFailureKind.CONTENT_POLICY,
@@ -28,6 +30,7 @@ describe("classifyImageProviderError", () => {
       "Request failed: fetch failed",
       "External service error: Rate limit exceeded (HTTP 429)",
       "Provider returned a non-JSON response (HTTP 504): <html>",
+      "No endpoints found for minimax/hailuo-3-max.",
       "No allowed providers are available for the selected model",
     ]) {
       expect(classifyImageProviderError(message)).toBe(
@@ -39,6 +42,11 @@ describe("classifyImageProviderError", () => {
   it("leaves everything else as a plain failure", () => {
     expect(
       classifyImageProviderError("No image URL returned from provider"),
+    ).toBe(ImageProviderFailureKind.OTHER);
+    expect(
+      classifyImageProviderError(
+        "Video generation completed with no output (content may have been filtered)",
+      ),
     ).toBe(ImageProviderFailureKind.OTHER);
     expect(classifyImageProviderError("Invalid model id (HTTP 400)")).toBe(
       ImageProviderFailureKind.OTHER,

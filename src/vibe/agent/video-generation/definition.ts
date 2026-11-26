@@ -23,7 +23,7 @@ import {
 import { z } from "zod";
 
 import { mediaUrlSchema } from "../chat/storage/storage-url";
-import { DEFAULT_VIDEO_DURATION_SECONDS, VIDEO_GEN_ALIAS } from "./constants";
+import { VIDEO_GEN_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
 import { VideoGenModelId } from "./models";
 
@@ -105,12 +105,7 @@ const { POST } = createEndpoint({
         columns: 12,
         options: [],
         hiddenForPlatforms: [Platform.AI, Platform.MCP],
-        schema: z
-          .number()
-          .int()
-          .min(1)
-          .max(120)
-          .default(DEFAULT_VIDEO_DURATION_SECONDS),
+        schema: z.number().int().min(1).max(120).optional(),
       }),
       aspectRatio: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,

@@ -138,9 +138,18 @@ export function findStorageUrls(text: string): string[] {
  */
 export const mediaUrlSchema = z
   .string()
-  .refine((value) => isStorageUrl(value) || URL.canParse(value), {
-    message: "Expected an absolute URL or a storage file path",
-  });
+  .refine(
+    (value) =>
+      isStorageUrl(value) ||
+      URL.canParse(value) ||
+      /^\/uploads\/(?:images|audio|video|documents|other)\/[\w-]+\/[\w-]+\.md$/.test(
+        value,
+      ),
+    {
+      message:
+        "Expected an absolute URL, a storage file path or a Cortex upload path",
+    },
+  );
 
 /** Media URL fields a generation tool result carries, with their link label. */
 const MEDIA_LINK_FIELDS = [

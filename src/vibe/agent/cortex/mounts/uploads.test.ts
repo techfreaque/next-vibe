@@ -23,7 +23,7 @@ beforeAll(async () => {
   await pg.exec(`
     CREATE TABLE chat_threads (id uuid PRIMARY KEY, user_id uuid, title text);
     CREATE TABLE chat_messages (
-      thread_id uuid, metadata jsonb, content text, created_at timestamp, role text DEFAULT 'user'
+      id uuid PRIMARY KEY DEFAULT gen_random_uuid(), thread_id uuid, metadata jsonb, content text, created_at timestamp NOT NULL DEFAULT now(), role text DEFAULT 'user'
     );
   `);
   await pg.query("INSERT INTO chat_threads VALUES ($1, $2, 'Sample thread')", [
@@ -31,7 +31,7 @@ beforeAll(async () => {
     owner,
   ]);
   await pg.query(
-    "INSERT INTO chat_messages VALUES ($1, $2, $3, '2026-11-22 01:00:00')",
+    "INSERT INTO chat_messages (thread_id,metadata,content,created_at) VALUES ($1, $2, $3, '2026-11-22 01:00:00')",
     [
       threadId,
       JSON.stringify({
@@ -143,4 +143,54 @@ it("resolves an owned inline WebP from its virtual path and serves only its user
     `bytes 8-11/${bytes.length}`,
   );
   expect(await response?.text()).toBe("WEBP");
+});
+
+it("serves the listed Cortex image when its inline filename contains a browser copy suffix", async () => {
+  const { listUploadPath, resolveUploadAttachmentUrl } =
+    await import("./uploads");
+  const { readInlineThreadImage } =
+    await import("../../chat/storage/inline-image");
+  const messageId = crypto.randomUUID();
+  const filename = `remote-${crypto.randomUUID()} (1).png`;
+  const legacyName = `${crypto.randomUUID()}.png`;
+  const bytes = Buffer.from("iVBORw0KGgo=", "base64");
+  await pg.query(
+    "INSERT INTO chat_messages (id,thread_id,role,metadata) VALUES ($1,$2,'user',$3)",
+    [
+      messageId,
+      threadId,
+      JSON.stringify({
+        attachments: [
+          { name: "ignored" },
+          { filename, mimeType: "image/png", data: bytes.toString("base64") },
+          { name: legacyName, type: "image/png", data: bytes.toString("base64") },
+        ],
+      }),
+    ],
+  );
+  const dir = `/uploads/images/sample-thread-${threadId}`;
+  const files = await listUploadPath(owner, dir);
+  const legacyPath = files.find((entry) =>
+    entry.name.startsWith(legacyName.slice(0, 36)),
+  )?.path;
+  expect(legacyPath).toBeDefined();
+  if (!legacyPath) return;
+  expect(await resolveUploadAttachmentUrl(owner, legacyPath)).toEndWith(
+    `/inline-${messageId}-2.png`,
+  );
+  const path = files.find((entry) =>
+    entry.name.startsWith("remote-"),
+  )?.path;
+  expect(path).toBeDefined();
+  if (!path) return;
+  const key = `inline-${messageId}-1.png`;
+  expect(await resolveUploadAttachmentUrl(owner, path)).toEndWith("/" + key);
+  expect(await resolveUploadAttachmentUrl(otherUser, path)).toBeNull();
+  expect((await readInlineThreadImage(threadId, key))?.inlineBytes).toEqual(
+    bytes,
+  );
+  expect(await readInlineThreadImage(otherUser, key)).toBeNull();
+  expect(
+    await readInlineThreadImage(threadId, `inline-${messageId}-0.png`),
+  ).toBeNull();
 });

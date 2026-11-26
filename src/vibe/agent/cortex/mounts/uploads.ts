@@ -11,7 +11,7 @@ import { db } from "next-vibe/database";
 
 import { chatMessages, chatThreads } from "../../chat/db";
 import { ChatMessageRole } from "../../chat/enum";
-import { isInlineImageFilename } from "../../chat/storage/inline-image";
+import { inlineImageDownloadName } from "../../chat/storage/inline-image";
 import { buildStorageFilePath } from "../../chat/storage/storage-url";
 import type { VirtualListEntry, VirtualReadResult } from "./resolver";
 
@@ -129,6 +129,7 @@ async function loadUserAttachments(
             string | null
           >`left(${chatMessages.content}, ${MESSAGE_CONTEXT_LIMIT})`
         : sql<null>`NULL`,
+      messageId: chatMessages.id,
       role: chatMessages.role,
       createdAt: chatMessages.createdAt,
       threadId: chatMessages.threadId,
@@ -150,7 +151,7 @@ async function loadUserAttachments(
   const attachments: AttachmentRow[] = [];
 
   for (const row of rows) {
-    for (const att of row.attachments) {
+    for (const [index, att] of row.attachments.entries()) {
       // Support both url-hosted and base64-embedded attachments
       const filename = att.filename ?? att.name ?? "";
       if (!filename) {
@@ -161,14 +162,12 @@ async function loadUserAttachments(
       if (!url && !att.hasData) {
         continue;
       }
+      const inlineName =
+        !url && row.role === ChatMessageRole.USER
+          ? inlineImageDownloadName(att, row.messageId, index)
+          : null;
       attachments.push({
-        url:
-          !url &&
-          row.role === ChatMessageRole.USER &&
-          att.filename &&
-          isInlineImageFilename(att.filename)
-            ? buildStorageFilePath(row.threadId, att.filename)
-            : url,
+        url: inlineName ? buildStorageFilePath(row.threadId, inlineName) : url,
         filename,
         mimeType: att.mimeType ?? att.type ?? "application/octet-stream",
         size: att.size ?? 0,

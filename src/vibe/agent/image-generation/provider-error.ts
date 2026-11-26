@@ -33,6 +33,8 @@ const CONTENT_POLICY_PATTERNS: readonly RegExp[] = [
   /sensitive (content|image|prompt)/i,
   /unsafe (content|prompt|image)/i,
   /responsible ai/i,
+  /green net check rejected (?:text|image) \(input\)/i,
+  /input text ['"]content\[\d+\]['"] may contain sensitive information/i,
 ];
 
 const OUTAGE_PATTERNS: readonly RegExp[] = [
@@ -46,6 +48,7 @@ const OUTAGE_PATTERNS: readonly RegExp[] = [
   /internal (server )?error/i,
   /bad gateway|gateway/i,
   /temporar(y|ily)|try again later/i,
+  /no endpoints found for [\w.-]+\/[\w.-]+/i,
   /no (allowed )?providers? (are )?available/i,
 ];
 

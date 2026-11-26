@@ -16,7 +16,43 @@ import { parseBase64DataUri } from "../../shared/media-generation";
 import { pollDelay } from "../../shared/poll-delay";
 import { scopedTranslation } from "../i18n";
 
-type VideoProviderError = string | { message?: string; code?: number } | null;
+type VideoProviderError =
+  | string
+  | {
+      message?: string;
+      code?: number;
+      metadata?: {
+        routing_funnel?: {
+          step?: string;
+          endpoint_count?: number;
+          reason?: string;
+        }[];
+      };
+    }
+  | null;
+
+// A linked provider key can change outside this process. Recheck after five minutes.
+const missingLinkedKey = new Map<string, number>();
+let openRouterAccount: string | undefined;
+const LINKED_KEY_RECHECK_MS = 5 * 60_000;
+
+function requiresLinkedKey(error?: VideoProviderError): boolean {
+  if (!error || typeof error !== "object") {
+    return false;
+  }
+  const steps = error.metadata?.routing_funnel;
+  return (
+    Array.isArray(steps) &&
+    steps.some(
+      (step) =>
+        step?.step === "Add BYOK Endpoints" &&
+        step.endpoint_count === 0 &&
+        typeof step.reason === "string" &&
+        /byok-only/i.test(step.reason) &&
+        /you have no .*key/i.test(step.reason),
+    )
+  );
+}
 
 function providerErrorMessage(error?: VideoProviderError): string | undefined {
   return typeof error === "string" ? error : error?.message;
@@ -59,7 +95,9 @@ type FrameImageRole = "first" | "last" | "reference";
  * Auto-detect the OpenRouter input-reference kind from the URL file extension.
  * .mp4/.webm/.mov → video, audio files → audio, everything else → image.
  */
-function detectMediaKind(url: string): "image_url" | "audio_url" | "video_url" {
+export function detectMediaKind(
+  url: string,
+): "image_url" | "audio_url" | "video_url" {
   if (url.startsWith("data:video/")) {
     return "video_url";
   }
@@ -172,7 +210,8 @@ export async function generateVideoWithOpenRouter(params: {
   } = params;
   const { t } = scopedTranslation.scopedT(locale);
 
-  if (!agentEnv.OPENROUTER_API_KEY) {
+  const accountKey = agentEnv.OPENROUTER_API_KEY;
+  if (!accountKey) {
     return fail({
       message: t("post.errors.notConfigured", {
         label: "OpenRouter",
@@ -183,9 +222,21 @@ export async function generateVideoWithOpenRouter(params: {
     });
   }
 
+  if (openRouterAccount !== accountKey) {
+    missingLinkedKey.clear();
+    openRouterAccount = accountKey;
+  }
+  const unavailableModel = (): ReturnType<typeof fail> =>
+    fail({
+      message: t("post.errors.providerUnsupported", { label: providerModel }),
+      errorType: ErrorResponseTypes.NOT_FOUND,
+    });
+  if ((missingLinkedKey.get(providerModel) ?? 0) > Date.now()) {
+    return unavailableModel();
+  }
   const headers = {
     // eslint-disable-next-line i18next/no-literal-string
-    Authorization: `Bearer ${agentEnv.OPENROUTER_API_KEY}`,
+    Authorization: `Bearer ${accountKey}`,
     "Content-Type": "application/json",
     // eslint-disable-next-line i18next/no-literal-string
     "HTTP-Referer": "https://unbottled.ai",
@@ -300,6 +351,24 @@ export async function generateVideoWithOpenRouter(params: {
 
     if (!submitRes.ok || submitData.error) {
       const reason = providerErrorMessage(submitData.error);
+      if (submitRes.status === 404 && requiresLinkedKey(submitData.error)) {
+        if (openRouterAccount === accountKey) {
+          missingLinkedKey.set(
+            providerModel,
+            Date.now() + LINKED_KEY_RECHECK_MS,
+          );
+        }
+        logger.error(
+          "[OpenRouter Video] Model requires a linked provider key",
+          {
+            providerModel,
+            status: submitRes.status,
+            reason: "byok-only-missing-provider-key",
+            retryAfterMs: LINKED_KEY_RECHECK_MS,
+          },
+        );
+        return unavailableModel();
+      }
       logger.error("[OpenRouter Video] Submit failed", {
         status: submitRes.status,
         error: reason ?? submitText.slice(0, 200),

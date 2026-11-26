@@ -18,6 +18,7 @@ async function until(check) {
 async function run() {
   let rendererReady = false;
   let writable = true;
+  let dropLargeRequests = false;
   const renderer = http.createServer((...[, res]) => {
     if (rendererReady) {
       res.end("robots");
@@ -55,9 +56,17 @@ async function run() {
         }
         async connect() {
           return {
-            query: async () => ({
-              rows: writable ? [{ payload: "x".repeat(16384) }] : [],
-            }),
+            query: (sql, params) => {
+              if (dropLargeRequests && params?.[0]?.length >= 1400) {
+                return Promise.reject(
+                  new Error("outgoing full-size packets lost"),
+                );
+              }
+              const payload = sql.includes("$1::text")
+                ? params[0]
+                : "x".repeat(16384);
+              return Promise.resolve({ rows: writable ? [{ payload }] : [] });
+            },
             release: () => undefined,
           };
         }
@@ -96,6 +105,10 @@ async function run() {
   });
   await until(() => state(503, "v1-renderer-unavailable"));
   rendererReady = true;
+  await until(() => state(200, "v1-ready"));
+  dropLargeRequests = true;
+  await until(() => state(503, "v1-db-unavailable"));
+  dropLargeRequests = false;
   await until(() => state(200, "v1-ready"));
   writable = false;
   await until(() => state(503, "v1-db-unavailable"));
@@ -139,7 +152,7 @@ async function run() {
   writable = true;
   await until(async () => !(await databaseAdmission(true)).aborted);
   process.stdout.write(
-    "PASS renderer not listening, cold renderer timeout, warm recovery, DB rejection, missing/legacy/timed-out companion, strict readiness and recovery\n",
+    "PASS renderer not listening, cold renderer timeout, warm recovery, outgoing packet loss and recovery, DB rejection, missing/legacy/timed-out companion, strict readiness and recovery\n",
   );
 }
 

@@ -40,7 +40,7 @@ import {
   keepsExplicitMediaModel,
   resolveMediaReference,
 } from "../shared/media-generation";
-import { VIDEO_GEN_ALIAS } from "./constants";
+import { DEFAULT_VIDEO_DURATION_SECONDS, VIDEO_GEN_ALIAS } from "./constants";
 import {
   type VideoGenerationPostRequestInput,
   type VideoGenerationPostRequestOutput,
@@ -58,7 +58,10 @@ import {
 } from "./models";
 import { billableVideoSeconds, readMp4DurationSeconds } from "./mp4-duration";
 import { generateVideoWithModelsLab } from "./providers/modelslab";
-import { generateVideoWithOpenRouter } from "./providers/openrouter";
+import {
+  detectMediaKind,
+  generateVideoWithOpenRouter,
+} from "./providers/openrouter";
 import { generateVideoWithUnbottled } from "./providers/unbottled";
 import { generateVideoWithVenice } from "./providers/venice";
 
@@ -112,6 +115,18 @@ function providerFailure(
     message: t("post.errors.generationFailed", { error: reason }),
     errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
   });
+}
+
+function invalidBookend(
+  frame: NonNullable<
+    VideoGenerationPostRequestOutput["frameReferences"]
+  >[number],
+): boolean {
+  return (
+    (frame.role === "first" || frame.role === "last") &&
+    (detectMediaKind(frame.url) !== "image_url" ||
+      (frame.url.startsWith("data:") && !frame.url.startsWith("data:image/")))
+  );
 }
 
 function parseAspectRatio(r: string): number {
@@ -203,6 +218,12 @@ export class VideoGenerationRepository {
     // an i2v request. Move to an image-capable route (same model first), or
     // reject: a text-only route would drop the image or fail upstream with a
     // misleading init_image error.
+    if (data.frameReferences?.some(invalidBookend)) {
+      return fail({
+        message: t("post.errors.inputMediaRequired"),
+        errorType: ErrorResponseTypes.BAD_REQUEST,
+      });
+    }
     const seedImageUrl = resolveSeedImageUrl(data.frameReferences);
     const hasFrameImage = (data.frameReferences?.length ?? 0) > 0;
     if (hasFrameImage) {
@@ -248,8 +269,33 @@ export class VideoGenerationRepository {
       });
     }
 
-    // duration is now raw seconds from the widget
-    const rawDuration = data.duration ?? videoModel.defaultDurationSeconds;
+    // Veo accepts shorter text and bookend clips, but its reference-image
+    // mode requires eight seconds. Price that length before dispatch and
+    // let callers correct an explicit shorter duration before they spend.
+    const requiresEightSeconds =
+      videoModel.apiProvider === ApiProvider.OPENROUTER &&
+      (videoModel.providerModel === "google/veo-3.1-fast" ||
+        videoModel.providerModel === "google/veo-3.1") &&
+      data.frameReferences?.some(
+        (frame) => frame.role === undefined || frame.role === "reference",
+      );
+    if (
+      requiresEightSeconds &&
+      data.duration !== undefined &&
+      data.duration !== 8
+    ) {
+      return fail({
+        message: t("post.errors.unsupportedDuration", {
+          model: videoModel.name,
+          duration: String(data.duration),
+          supported: "8",
+        }),
+        errorType: ErrorResponseTypes.BAD_REQUEST,
+      });
+    }
+    const rawDuration =
+      data.duration ??
+      (requiresEightSeconds ? 8 : DEFAULT_VIDEO_DURATION_SECONDS);
 
     // Clamp to the route's range, then snap to its listed durations.
     const durationSeconds = resolveVideoClipSeconds(videoModel, rawDuration);
@@ -349,7 +395,14 @@ export class VideoGenerationRepository {
             errorType: ErrorResponseTypes.NOT_FOUND,
           });
         }
-        resolvedFrameReferences.push({ ...frame, url });
+        const resolvedFrame = { ...frame, url };
+        if (url !== frame.url && invalidBookend(resolvedFrame)) {
+          return fail({
+            message: t("post.errors.inputMediaRequired"),
+            errorType: ErrorResponseTypes.BAD_REQUEST,
+          });
+        }
+        resolvedFrameReferences.push(resolvedFrame);
       }
     }
     let resolvedSeedImageUrl: string | undefined;
@@ -448,6 +501,13 @@ export class VideoGenerationRepository {
     }
 
     if (!generationResult.success) {
+      if (
+        videoModel.apiProvider === ApiProvider.OPENROUTER &&
+        generationResult.errorType?.errorKey ===
+          ErrorResponseTypes.NOT_FOUND.errorKey
+      ) {
+        return generationResult;
+      }
       return providerFailure(generationResult.message, t);
     }
 

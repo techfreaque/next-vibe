@@ -17,9 +17,7 @@ export const VIDEO_GEN_ALIAS = "generate_video" as const;
 export const VIDEO_GEN_TOOL_NAME = "video_gen" as const;
 
 /**
- * Requested clip length when the caller sets none. The AI never sets one (the
- * field is hidden from AI/MCP), so every chat clip asks for this many seconds
- * and the route then clamps/snaps it (resolveVideoClipSeconds).
+ * Default requested length before applying provider and input-mode constraints.
  */
 export const DEFAULT_VIDEO_DURATION_SECONDS = 5;
 

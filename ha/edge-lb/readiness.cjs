@@ -45,6 +45,9 @@ function localAppAnswers() {
     });
   });
 }
+// A one-way large-packet failure can stall guest INSERTs while a short SQL
+// request and a large reply still succeed. Exercise both directions.
+const dbProbePayload = "x".repeat(16384);
 async function databaseAnswers() {
   // Destroy a failed connection. A client-side query timeout by itself leaves
   // the socket and its outstanding command in the pool.
@@ -52,9 +55,10 @@ async function databaseAnswers() {
   try {
     client = await pool.connect();
     const { rows } = await client.query(
-      "select repeat('x', 16384) as payload where not pg_is_in_recovery() and current_setting('transaction_read_only') = 'off'",
+      "select $1::text as payload where not pg_is_in_recovery() and current_setting('transaction_read_only') = 'off'",
+      [dbProbePayload],
     );
-    const ok = rows[0]?.payload.length === 16384;
+    const ok = rows[0]?.payload === dbProbePayload;
     client.release(!ok);
     return ok;
   } catch {

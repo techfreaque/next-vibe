@@ -230,6 +230,8 @@ function describeStallProfile(
         | "short-streak"
         | "no-js-samples"
         | "no-covering-sample";
+      timerStallSamples?: number;
+      timerStallHotStacks?: string;
       profileWindowStartedAt?: string;
       profileWindowEndedAt?: string;
     }
@@ -244,7 +246,13 @@ function describeStallProfile(
         }
       : undefined;
   }
+  const timer =
+    profile.timerStall?.startedAt === stallStartedAt
+      ? profile.timerStall
+      : undefined;
   return {
+    timerStallSamples: timer?.samples,
+    timerStallHotStacks: timer?.hotStacks || undefined,
     profileEvidence:
       profile.totalSamples === 0
         ? "no-js-samples"
@@ -893,7 +901,7 @@ export class ServerStartRepository {
           };
           // Close the sampling window that covered the stall now, so its
           // stack is summarized before the lag row below is written.
-          void PhaseProfiler.flush(startedAt);
+          void PhaseProfiler.flush(startedAt, endedAt);
         }
       }, STALL_TICK_MS);
       void stallTicker;
