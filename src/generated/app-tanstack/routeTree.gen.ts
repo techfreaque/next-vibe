@@ -28,6 +28,8 @@ import { Route as LocaleCreateIndexRouteImport } from './routes/$locale.create.i
 import { Route as LocaleDesignTestIndexRouteImport } from './routes/$locale.design-test.index'
 import { Route as LocaleFrameSplatRouteImport } from './routes/$locale.frame.$'
 import { Route as LocaleHelpIndexRouteImport } from './routes/$locale.help.index'
+import { Route as LocaleMediaStudioIndexRouteImport } from './routes/$locale.media-studio.index'
+import { Route as LocaleMediaStudioSplatRouteImport } from './routes/$locale.media-studio.$'
 import { Route as LocaleModelsIndexRouteImport } from './routes/$locale.models.index'
 import { Route as LocalePricingIndexRouteImport } from './routes/$locale.pricing.index'
 import { Route as LocaleSetupIndexRouteImport } from './routes/$locale.setup.index'
@@ -907,6 +909,16 @@ const LocaleHelpIndexRoute = LocaleHelpIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => LocaleHelpRoute,
+} as any)
+const LocaleMediaStudioIndexRoute = LocaleMediaStudioIndexRouteImport.update({
+  id: '/$locale/media-studio/',
+  path: '/$locale/media-studio/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LocaleMediaStudioSplatRoute = LocaleMediaStudioSplatRouteImport.update({
+  id: '/$locale/media-studio/$',
+  path: '/$locale/media-studio/$',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const LocaleModelsIndexRoute = LocaleModelsIndexRouteImport.update({
   id: '/',
@@ -5552,6 +5564,7 @@ export interface FileRoutesByFullPath {
   '/$locale/threads': typeof LocaleThreadsRouteWithChildren
   '/$locale/': typeof LocaleIndexRoute
   '/$locale/frame/$': typeof LocaleFrameSplatRoute
+  '/$locale/media-studio/$': typeof LocaleMediaStudioSplatRoute
   '/$locale/threads/$': typeof LocaleThreadsSplatRoute
   '/$locale/tools/$': typeof LocaleToolsSplatRoute
   '/$locale/user': typeof LocaleUserAuthRouteWithChildren
@@ -5567,6 +5580,7 @@ export interface FileRoutesByFullPath {
   '/$locale/create/': typeof LocaleCreateIndexRoute
   '/$locale/design-test/': typeof LocaleDesignTestIndexRoute
   '/$locale/help/': typeof LocaleHelpIndexRoute
+  '/$locale/media-studio/': typeof LocaleMediaStudioIndexRoute
   '/$locale/models/': typeof LocaleModelsIndexRoute
   '/$locale/pricing/': typeof LocalePricingIndexRoute
   '/$locale/setup/': typeof LocaleSetupIndexRoute
@@ -6350,6 +6364,7 @@ export interface FileRoutesByTo {
   '/$locale/docs': typeof LocaleDocsRouteWithChildren
   '/$locale': typeof LocaleIndexRoute
   '/$locale/frame/$': typeof LocaleFrameSplatRoute
+  '/$locale/media-studio/$': typeof LocaleMediaStudioSplatRoute
   '/$locale/threads/$': typeof LocaleThreadsSplatRoute
   '/$locale/tools/$': typeof LocaleToolsSplatRoute
   '/$locale/user': typeof LocaleUserAuthRouteWithChildren
@@ -6365,6 +6380,7 @@ export interface FileRoutesByTo {
   '/$locale/create': typeof LocaleCreateIndexRoute
   '/$locale/design-test': typeof LocaleDesignTestIndexRoute
   '/$locale/help': typeof LocaleHelpIndexRoute
+  '/$locale/media-studio': typeof LocaleMediaStudioIndexRoute
   '/$locale/models': typeof LocaleModelsIndexRoute
   '/$locale/pricing': typeof LocalePricingIndexRoute
   '/$locale/setup': typeof LocaleSetupIndexRoute
@@ -7154,6 +7170,7 @@ export interface FileRoutesById {
   '/$locale/threads': typeof LocaleThreadsRouteWithChildren
   '/$locale/': typeof LocaleIndexRoute
   '/$locale/frame/$': typeof LocaleFrameSplatRoute
+  '/$locale/media-studio/$': typeof LocaleMediaStudioSplatRoute
   '/$locale/threads/$': typeof LocaleThreadsSplatRoute
   '/$locale/tools/$': typeof LocaleToolsSplatRoute
   '/$locale/user/_account': typeof LocaleUserAccountRouteWithChildren
@@ -7170,6 +7187,7 @@ export interface FileRoutesById {
   '/$locale/create/': typeof LocaleCreateIndexRoute
   '/$locale/design-test/': typeof LocaleDesignTestIndexRoute
   '/$locale/help/': typeof LocaleHelpIndexRoute
+  '/$locale/media-studio/': typeof LocaleMediaStudioIndexRoute
   '/$locale/models/': typeof LocaleModelsIndexRoute
   '/$locale/pricing/': typeof LocalePricingIndexRoute
   '/$locale/setup/': typeof LocaleSetupIndexRoute
@@ -7961,6 +7979,7 @@ export interface FileRouteTypes {
     | '/$locale/threads'
     | '/$locale/'
     | '/$locale/frame/$'
+    | '/$locale/media-studio/$'
     | '/$locale/threads/$'
     | '/$locale/tools/$'
     | '/$locale/user'
@@ -7976,6 +7995,7 @@ export interface FileRouteTypes {
     | '/$locale/create/'
     | '/$locale/design-test/'
     | '/$locale/help/'
+    | '/$locale/media-studio/'
     | '/$locale/models/'
     | '/$locale/pricing/'
     | '/$locale/setup/'
@@ -8759,6 +8779,7 @@ export interface FileRouteTypes {
     | '/$locale/docs'
     | '/$locale'
     | '/$locale/frame/$'
+    | '/$locale/media-studio/$'
     | '/$locale/threads/$'
     | '/$locale/tools/$'
     | '/$locale/user'
@@ -8774,6 +8795,7 @@ export interface FileRouteTypes {
     | '/$locale/create'
     | '/$locale/design-test'
     | '/$locale/help'
+    | '/$locale/media-studio'
     | '/$locale/models'
     | '/$locale/pricing'
     | '/$locale/setup'
@@ -9562,6 +9584,7 @@ export interface FileRouteTypes {
     | '/$locale/threads'
     | '/$locale/'
     | '/$locale/frame/$'
+    | '/$locale/media-studio/$'
     | '/$locale/threads/$'
     | '/$locale/tools/$'
     | '/$locale/user/_account'
@@ -9578,6 +9601,7 @@ export interface FileRouteTypes {
     | '/$locale/create/'
     | '/$locale/design-test/'
     | '/$locale/help/'
+    | '/$locale/media-studio/'
     | '/$locale/models/'
     | '/$locale/pricing/'
     | '/$locale/setup/'
@@ -10368,6 +10392,7 @@ export interface RootRouteChildren {
   LocaleThreadsRoute: typeof LocaleThreadsRouteWithChildren
   LocaleIndexRoute: typeof LocaleIndexRoute
   LocaleFrameSplatRoute: typeof LocaleFrameSplatRoute
+  LocaleMediaStudioSplatRoute: typeof LocaleMediaStudioSplatRoute
   LocaleToolsSplatRoute: typeof LocaleToolsSplatRoute
   LocaleUserAccountRoute: typeof LocaleUserAccountRouteWithChildren
   LocaleUserAuthRoute: typeof LocaleUserAuthRouteWithChildren
@@ -10381,6 +10406,7 @@ export interface RootRouteChildren {
   ApiLocaleSubscriptionRoute: typeof ApiLocaleSubscriptionRouteWithChildren
   LocaleCortexIndexRoute: typeof LocaleCortexIndexRoute
   LocaleDesignTestIndexRoute: typeof LocaleDesignTestIndexRoute
+  LocaleMediaStudioIndexRoute: typeof LocaleMediaStudioIndexRoute
   LocalePricingIndexRoute: typeof LocalePricingIndexRoute
   LocaleSetupIndexRoute: typeof LocaleSetupIndexRoute
   LocaleSkillsIndexRoute: typeof LocaleSkillsIndexRoute
@@ -10969,6 +10995,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/$locale/help/'
       preLoaderRoute: typeof LocaleHelpIndexRouteImport
       parentRoute: typeof LocaleHelpRoute
+    }
+    '/$locale/media-studio/': {
+      id: '/$locale/media-studio/'
+      path: '/$locale/media-studio'
+      fullPath: '/$locale/media-studio/'
+      preLoaderRoute: typeof LocaleMediaStudioIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/$locale/media-studio/$': {
+      id: '/$locale/media-studio/$'
+      path: '/$locale/media-studio/$'
+      fullPath: '/$locale/media-studio/$'
+      preLoaderRoute: typeof LocaleMediaStudioSplatRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/$locale/models/': {
       id: '/$locale/models/'
@@ -17993,6 +18033,7 @@ const rootRouteChildren: RootRouteChildren = {
   LocaleThreadsRoute: LocaleThreadsRouteWithChildren,
   LocaleIndexRoute: LocaleIndexRoute,
   LocaleFrameSplatRoute: LocaleFrameSplatRoute,
+  LocaleMediaStudioSplatRoute: LocaleMediaStudioSplatRoute,
   LocaleToolsSplatRoute: LocaleToolsSplatRoute,
   LocaleUserAccountRoute: LocaleUserAccountRouteWithChildren,
   LocaleUserAuthRoute: LocaleUserAuthRouteWithChildren,
@@ -18006,6 +18047,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiLocaleSubscriptionRoute: ApiLocaleSubscriptionRouteWithChildren,
   LocaleCortexIndexRoute: LocaleCortexIndexRoute,
   LocaleDesignTestIndexRoute: LocaleDesignTestIndexRoute,
+  LocaleMediaStudioIndexRoute: LocaleMediaStudioIndexRoute,
   LocalePricingIndexRoute: LocalePricingIndexRoute,
   LocaleSetupIndexRoute: LocaleSetupIndexRoute,
   LocaleSkillsIndexRoute: LocaleSkillsIndexRoute,

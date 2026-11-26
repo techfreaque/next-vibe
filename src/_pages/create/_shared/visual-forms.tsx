@@ -143,7 +143,12 @@ export function StudioImage({
         }
       }}
       result={
-        <StudioMedia kind="image" url={result?.imageUrl} title={prompt} />
+        <StudioMedia
+          kind="image"
+          url={result?.imageUrl}
+          title={prompt}
+          model={id}
+        />
       }
     >
       <TextareaFieldWidget
@@ -274,7 +279,12 @@ export function StudioVideo({
         form?.setValue("negativePrompt", undefined, dirty);
       }}
       result={
-        <StudioMedia kind="video" url={result?.videoUrl} title={prompt} />
+        <StudioMedia
+          kind="video"
+          url={result?.videoUrl}
+          title={prompt}
+          model={id}
+        />
       }
     >
       <TextareaFieldWidget

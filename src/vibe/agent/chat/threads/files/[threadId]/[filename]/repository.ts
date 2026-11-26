@@ -26,6 +26,11 @@ import { SKILL_AVATAR_STORAGE_NAMESPACE } from "../../../../../skills/constants"
 import { chatFolders, chatThreads } from "../../../../db";
 import { canViewThread } from "../../../../permissions/permissions";
 import {
+  attachmentDisposition,
+  DOWNLOAD_NAME_PARAM,
+  sanitizeDownloadName,
+} from "../../../../storage/download-name";
+import {
   serveStoredFile,
   type StoredFileSource,
 } from "../../../../storage/file-response";
@@ -296,11 +301,23 @@ export class ChatFileRepository {
         logger,
         locale,
       );
+      // ?download=<name>: the Media Studio download button asks for a
+      // readable name; without it browsers keep `<uuid>.mp4` or a temp name.
+      const requestedName = new URL(request.url).searchParams.get(
+        DOWNLOAD_NAME_PARAM,
+      );
+      const downloadName =
+        source && requestedName
+          ? sanitizeDownloadName(requestedName, source.filename)
+          : null;
       const response =
         source &&
         (await serveStoredFile(source, request, {
           ...headers,
           ...fileResponseSecurityHeaders(source.contentType),
+          ...(downloadName
+            ? { "Content-Disposition": attachmentDisposition(downloadName) }
+            : {}),
         }));
       return response ? createStreamingResponse(response) : notFound();
     }

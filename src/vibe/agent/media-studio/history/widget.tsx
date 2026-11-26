@@ -6,6 +6,10 @@
  * open in chat. Used on /create (all kinds) and every /create/<kind> page.
  */
 
+import {
+  mediaDownloadHref,
+  mediaDownloadName,
+} from "next-vibe/agent/chat/storage/download-name";
 import { resolveMediaSrc } from "next-vibe/agent/chat/storage/media-src";
 import { Audio } from "next-vibe/ui/components/audio";
 import { Button, buttonVariants } from "next-vibe/ui/components/button";
@@ -86,20 +90,26 @@ export function StudioMedia({
   url,
   transcript,
   title,
+  model,
   showDownload = true,
 }: {
   kind: CreateKind;
   url?: string | null;
   transcript?: string | null;
   title: string;
+  /** Names the downloaded file (unbottled-<model>-<date>.<ext>). */
+  model?: string | null;
   showDownload?: boolean;
 }): JSX.Element | null {
   const locale = useWidgetLocale();
   const { t } = scopedTranslation.scopedT(locale);
   const src = url ? resolveMediaSrc(url) : undefined;
+  const downloadName = src
+    ? mediaDownloadName({ url: src, kind, model })
+    : null;
   const href = transcript
     ? `data:text/plain;charset=utf-8,${encodeURIComponent(transcript)}`
-    : src;
+    : src && mediaDownloadHref(src, downloadName);
   if (!href) {
     return null;
   }
@@ -146,7 +156,7 @@ export function StudioMedia({
       {showDownload && (
         <ExternalLink
           href={href}
-          download={transcript ? "transcript.txt" : true}
+          download={transcript ? "transcript.txt" : (downloadName ?? true)}
           className={cn(tileButton, "self-start")}
         >
           <Download className="size-4" />
@@ -304,9 +314,17 @@ function HistoryCard({
   const absolute = item.url
     ? resolveMediaSrc(item.url, { absolute: true })
     : undefined;
+  const downloadName = src
+    ? mediaDownloadName({
+        url: src,
+        kind: item.kind,
+        model: item.model,
+        createdAt: item.createdAt,
+      })
+    : null;
   const download = item.transcript
     ? `data:text/plain;charset=utf-8,${encodeURIComponent(item.transcript)}`
-    : src;
+    : src && mediaDownloadHref(src, downloadName);
   const prompt =
     typeof item.settings?.prompt === "string"
       ? item.settings.prompt
@@ -414,7 +432,9 @@ function HistoryCard({
           {done && download && (
             <ExternalLink
               href={download}
-              download={item.transcript ? "transcript.txt" : true}
+              download={
+                item.transcript ? "transcript.txt" : (downloadName ?? true)
+              }
               className={tileButton}
               title={t("widget.download")}
               aria-label={t("widget.download")}

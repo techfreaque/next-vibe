@@ -87,7 +87,12 @@ export function StudioMusic({
         form?.setValue("inputMediaUrl", undefined, dirty);
       }}
       result={
-        <StudioMedia kind="music" url={result?.audioUrl} title={prompt} />
+        <StudioMedia
+          kind="music"
+          url={result?.audioUrl}
+          title={prompt}
+          model={id}
+        />
       }
     >
       <TextareaFieldWidget
@@ -153,7 +158,14 @@ export function StudioSpeech({
           form?.setValue("voiceId", next, dirty);
         }
       }}
-      result={<StudioMedia kind="speech" title={text} url={result?.audioUrl} />}
+      result={
+        <StudioMedia
+          kind="speech"
+          title={text}
+          url={result?.audioUrl}
+          model={id}
+        />
+      }
     >
       <TextareaFieldWidget
         fieldName="text"

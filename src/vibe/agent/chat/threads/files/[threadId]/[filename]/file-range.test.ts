@@ -29,7 +29,12 @@ void mock.module("next-vibe/identity/auth/repository", () => ({
   },
 }));
 
-let requestFile: (method: "GET" | "HEAD", headers?: HeadersInit, owner?: boolean) => Promise<Response | undefined>;
+let requestFile: (
+  method: "GET" | "HEAD",
+  headers?: HeadersInit,
+  owner?: boolean,
+  query?: string,
+) => Promise<Response | undefined>;
 let storedFileUrl: string;
 let storedFilename: string;
 
@@ -47,13 +52,13 @@ beforeAll(async () => {
   storedFilename = stored.metadata.filename;
   const { wrapNextApiRoute } = await import("next-vibe/platforms/web/frameworks/tanstack-start/nextjs-compat-wrapper");
   const handlers = wrapNextApiRoute(() => import("./route"));
-  requestFile = (method, headers, owner = true) => {
+  requestFile = (method, headers, owner = true, query = "") => {
     const requestHeaders = new Headers(headers);
     if (owner) {
       requestHeaders.set("X-Fixture-Lead", leadId);
     }
     return Promise.resolve(handlers[method]?.({
-      request: new Request(`http://localhost${stored.url}`, { method, headers: requestHeaders }),
+      request: new Request(`http://localhost${stored.url}${query}`, { method, headers: requestHeaders }),
       params: { locale: defaultLocale, threadId, filename: stored.metadata.filename },
     }));
   };
@@ -110,6 +115,19 @@ test.each(fullResponseHeaders)("serves the full file for %j", async (headers) =>
   expect(response?.headers.get("Content-Length")).toBe(String(bytes.length));
   expect(response?.headers.get("Cache-Control")).toBe(cacheControl);
   expect(await response?.bytes()).toEqual(new Uint8Array(bytes));
+});
+
+test("?download= names the file as an attachment with the stored extension", async () => {
+  const named = await requestFile("GET", {}, true, "?download=unbottled-kling-2026-11-26.tmp");
+  expect(named?.status).toBe(200);
+  expect(named?.headers.get("Content-Disposition")).toBe(
+    "attachment; filename=\"unbottled-kling-2026-11-26.mp4\"; filename*=UTF-8''unbottled-kling-2026-11-26.mp4",
+  );
+  expect(await named?.bytes()).toEqual(new Uint8Array(bytes));
+  const plain = await requestFile("GET");
+  expect(plain?.headers.get("Content-Disposition")).toBeNull();
+  const stranger = await requestFile("GET", {}, false, "?download=x");
+  expect(stranger?.status).toBe(404);
 });
 
 test("HEAD returns full-file headers and no body", async () => {
