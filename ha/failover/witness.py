@@ -9,7 +9,8 @@ from urllib.request import Request, urlopen
 
 def request(path, timeout):
     url = "https://check-host.net/" + path
-    with urlopen(Request(url, headers={"Accept": "application/json"}), timeout=timeout) as response:
+    headers = {"Accept": "application/json", "User-Agent": "unbottled-ha/1.0 (operations: hi@unbottled.ai)"}
+    with urlopen(Request(url, headers=headers), timeout=timeout) as response:
         return json.load(response)
 
 

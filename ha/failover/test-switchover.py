@@ -2,6 +2,7 @@
 import asyncio
 import importlib.util
 import datetime
+import io
 import json
 import os
 import subprocess
@@ -28,6 +29,14 @@ DOWN = {name: [{"error": "Connection timed out"}] for name in NODES}
 
 
 class WitnessTests(unittest.TestCase):
+    def test_check_host_receives_an_identifiable_client(self):
+        with patch.object(w, "urlopen", return_value=io.BytesIO(b'{"ok":1}')) as opened:
+            self.assertEqual(w.request("check-result/example", 3), {"ok": 1})
+        request = opened.call_args.args[0]
+        self.assertEqual(request.get_header("Accept"), "application/json")
+        self.assertTrue(request.get_header("User-agent").startswith("unbottled-ha/"))
+        self.assertEqual(opened.call_args.kwargs["timeout"], 3)
+
     def test_quorum(self):
         self.assertEqual(w.classify(NODES, DOWN), "down")
         for bad in (None, [{}], [{"message": "probe failed"}], [{"error": "monitor unavailable"}]):
@@ -82,6 +91,16 @@ class GateTests(unittest.IsolatedAsyncioTestCase):
 
 
 class ConfigTests(unittest.TestCase):
+    def test_warm_creation_with_default_standby_role(self):
+        source = {"Image": "fixture", "Config": {"Env": ["DATABASE_URL=postgres://u:p@10.88.0.1/d",
+                  "MINIO_ROOT_USER=x", "MINIO_ROOT_PASSWORD=y"]}}
+        with patch.object(Path, "read_text", return_value="HA_NODE=s2"), patch.object(Path, "is_file", return_value=True), \
+                patch.object(warm.subprocess, "check_output", side_effect=["node=s2 role=standby pg=standby ts=1", json.dumps([source]), b"t"]), \
+                patch.object(warm.subprocess, "run") as run:
+            warm.main()
+        self.assertIn("http://localhost/containers/create?name=unbottled-ha-warm", run.call_args_list[0].args[0])
+        self.assertEqual(run.call_args_list[-1].args[0][-1], "ha-app-readiness@unbottled-ha-warm")
+
     def test_warm_target(self):
         base = {"DATABASE_URL": "postgres://u:a%40b@10.88.0.1:5454/d?sslmode=prefer",
                 "MINIO_ROOT_USER": "fixture", "MINIO_ROOT_PASSWORD": "fixture-key",

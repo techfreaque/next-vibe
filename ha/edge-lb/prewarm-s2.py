@@ -28,7 +28,11 @@ def prepare(source):
 def main():
     config = Path("/etc/ha-failover/ha.env").read_text().splitlines()
     state = Path("/var/lib/ha-failover")
-    if "HA_NODE=s2" not in config or not (state / "hold").is_file() or (state / "role").read_text().strip() != "standby":
+    warm = "unbottled-ha-warm"
+    if "HA_NODE=s2" not in config or not (state / "hold").is_file():
+        sys.exit("requires held S2 standby")
+    peer_state = subprocess.check_output(["/usr/local/sbin/ha-peer-cmd", "state"], text=True)
+    if peer_state.split()[:3] != ["node=s2", "role=standby", "pg=standby"]:
         sys.exit("requires held S2 standby")
     source = json.loads(subprocess.check_output(["docker", "inspect", "unbottled-app"]))[0]
     recovery = subprocess.check_output(["docker", "exec", "unbottled-pg-replica", "psql", "-U", "postgres",
