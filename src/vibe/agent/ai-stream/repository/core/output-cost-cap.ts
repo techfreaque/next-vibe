@@ -20,8 +20,10 @@ import {
 } from "@/products/constants";
 
 import { ModelUtility } from "../../../models/enum";
+import { ApiProvider } from "../../../models/models";
 import { activeTokenRates } from "../../../models/token-tariffs";
 import type { ChatModelOption } from "../../models";
+import { OPENROUTER_TOKEN_FALLBACK_MULTIPLIER } from "../../providers/openrouter/pricing";
 import { worstCaseInputCredits } from "./input-cost-gate";
 
 /**
@@ -72,11 +74,14 @@ export function worstCaseOutputTokenCost(
     model.outputs.includes("image") && "imageOutputTokenCost" in model
       ? (model.imageOutputTokenCost ?? 0)
       : 0;
-  return Math.max(
+  const listed = Math.max(
     activeTokenRates(model, promptTokens).outputTokenCost ??
       model.outputTokenCost,
     imageRate,
   );
+  return model.apiProvider === ApiProvider.OPENROUTER
+    ? listed * OPENROUTER_TOKEN_FALLBACK_MULTIPLIER
+    : listed;
 }
 
 /** Credits (with platform markup) that `outputTokens` cost at worst case */
@@ -154,18 +159,23 @@ export function computeOutputCap(params: {
       : { kind: "unaffordable", requiredCredits: modelCost };
   }
   const outputPrice = worstCaseOutputTokenCost(model, inputTokens);
-  if (outputPrice === null || outputPrice <= 0) {
-    return { kind: "uncapped" };
-  }
   const inputCredits = worstCaseInputCredits(model, inputTokens);
+  if (outputPrice === null || outputPrice <= 0) {
+    return remainingCredits + 1e-9 >= inputCredits
+      ? { kind: "uncapped" }
+      : { kind: "unaffordable", requiredCredits: inputCredits };
+  }
+  // An invoice rounds up to a tenth of a credit. Budget only the tenths the
+  // wallet can pay so an exact token cap cannot round past the balance.
+  const billableBudget = Math.floor(remainingCredits * 10 + 1e-9) / 10;
   const affordable = affordableOutputTokens(
     model,
-    remainingCredits - inputCredits,
+    billableBudget - inputCredits,
     inputTokens,
   );
   // The model can never write more than the context window leaves.
   const maxPossibleOutput = Math.max(0, model.contextWindow - inputTokens);
-  if (remainingCredits >= inputCredits && affordable >= maxPossibleOutput) {
+  if (billableBudget >= inputCredits && affordable >= maxPossibleOutput) {
     return { kind: "uncapped" };
   }
   const minOutput = minAffordableOutputTokens(model);
@@ -176,7 +186,8 @@ export function computeOutputCap(params: {
         Math.ceil(
           (inputCredits +
             worstCaseOutputCredits(model, minOutput, inputTokens)) *
-            10,
+            10 -
+            1e-9,
         ) / 10,
     };
   }

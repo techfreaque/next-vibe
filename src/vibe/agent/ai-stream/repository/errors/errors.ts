@@ -453,8 +453,7 @@ export class AbortErrorHandler {
 
           totalCredits += modelCreditCost;
 
-          // A cut-off step never reports the provider's real cost: actual-cost
-          // models fall back to the listed token price for it.
+          // A cut-off step never reports the provider's real cost.
           if (billsUpstreamCost(modelConfig)) {
             logger.warn(
               "[AI Stream] Upstream cost missing for cut-off step - billing estimated token price",
@@ -470,6 +469,7 @@ export class AbortErrorHandler {
                 imageCount: cutOffImageCount,
                 imageOutputTokens,
                 modelCreditCost,
+                ...stepEstimate.fallbackPricing,
                 upstreamCostEvidence: "stream-interrupted-before-cost",
               },
             );

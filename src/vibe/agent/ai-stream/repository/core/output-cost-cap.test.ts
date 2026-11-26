@@ -24,8 +24,8 @@ const kimi = getChatModelById(ChatModelId.KIMI_K3);
 const flat = getChatModelById(ChatModelId.UNCENSORED_LM_V1_2);
 
 describe("output price", () => {
-  it("kimi-k3 prices output at its listed token price", () => {
-    expect(worstCaseOutputTokenCost(kimi)).toBe(kimi.outputTokenCost);
+  it("kimi-k3 reserves enough for the OpenRouter output fallback", () => {
+    expect(worstCaseOutputTokenCost(kimi)).toBe((kimi.outputTokenCost ?? 0) * 1.5);
   });
 
   it("flat-priced models have no output price", () => {
@@ -53,9 +53,9 @@ describe("computeOutputCap", () => {
     if (cap.kind !== "capped") {
       return;
     }
-    // 20 credits - 11.7 input = 8.3 credits of output at $16/M = ~4k tokens
+    // 20 credits - 11.7 input = 8.3 credits of output at $24/M = ~2.7k tokens
     expect(cap.maxOutputTokens).toBeGreaterThan(MIN_AFFORDABLE_OUTPUT_TOKENS);
-    expect(cap.maxOutputTokens).toBeLessThan(5_000);
+    expect(cap.maxOutputTokens).toBeLessThan(3_000);
     const worstTurn =
       worstCaseInputCredits(kimi, inputTokens) +
       worstCaseOutputCredits(kimi, cap.maxOutputTokens);
@@ -88,17 +88,33 @@ describe("computeOutputCap", () => {
 
   it("refuses when the input leaves less than the minimum output", () => {
     // 10k tokens input = 5.9 credits; kimi-k3 reasons, so its 2048-token
-    // floor adds ~4.3
+    // floor adds ~6.4
     const base = { model: kimi, modelCost: 2.5, inputTokens: 10_000 };
     const refused = computeOutputCap({ ...base, remainingCredits: 7 });
     expect(refused.kind).toBe("unaffordable");
     if (refused.kind === "unaffordable") {
-      expect(refused.requiredCredits).toBeGreaterThan(10);
-      expect(refused.requiredCredits).toBeLessThan(11);
+      expect(refused.requiredCredits).toBeGreaterThan(12);
+      expect(refused.requiredCredits).toBeLessThan(13);
     }
-    expect(computeOutputCap({ ...base, remainingCredits: 11 }).kind).toBe(
+    expect(computeOutputCap({ ...base, remainingCredits: 13 }).kind).toBe(
       "capped",
     );
+  });
+
+  it("leaves room for invoice rounding on a fractional balance", () => {
+    const inputTokens = 20_000;
+    const cap = computeOutputCap({
+      model: kimi,
+      modelCost: 2.5,
+      remainingCredits: 20.09,
+      inputTokens,
+    });
+    expect(cap).toEqual(computeOutputCap({
+      model: kimi,
+      modelCost: 2.5,
+      remainingCredits: 20,
+      inputTokens,
+    }));
   });
 
   it("refuses unpaid input even when the prompt fills the context window", () => {

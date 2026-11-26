@@ -138,8 +138,21 @@ export async function deductAndEmitCredits(
   }
 
   if (deductResult.success) {
-    // Model usage can settle for less than the quoted step when the wallet empties.
     const deducted = deductResult.data?.deducted ?? params.amount;
+    if (params.type === "model" && deducted + 1e-9 < params.amount) {
+      // Provider usage is already incurred. Keep the capped debit and expose
+      // any shortfall from estimation error or another spend on the wallet.
+      w.deps.logger.warn(
+        "[AI Stream] Model charge exceeded spendable balance",
+        {
+          model: params.model,
+          apiProvider: params.apiProvider,
+          requestedCredits: params.amount,
+          deductedCredits: deducted,
+          shortfallCredits: params.amount - deducted,
+        },
+      );
+    }
     w.totalCreditsDeducted += deducted;
     await guardTaskStep(w, params);
     return;

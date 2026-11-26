@@ -8,16 +8,17 @@
  * Amazon Bedrock cost $1.94 (251.7 credits) and only 17.8 could be charged.
  *
  * This gate prices the ACTUAL prompt (system prompt + tools + messages) at
- * the most expensive likely input price and refuses when the wallet cannot
+ * the buffered input price and refuses when the wallet cannot
  * cover the input alone. Output is not capped here.
  */
 
 import type { ModelMessage } from "ai";
 import type { CoreTool } from "next-vibe/platforms/ai/tools-loader";
 
-import { upstreamCostToCredits } from "../../../models/models";
+import { ApiProvider, upstreamCostToCredits } from "../../../models/models";
 import { activeTokenRates } from "../../../models/token-tariffs";
 import type { ChatModelOption } from "../../models";
+import { OPENROUTER_TOKEN_FALLBACK_MULTIPLIER } from "../../providers/openrouter/pricing";
 import { estimateInputTokens } from "./token-estimator";
 
 /**
@@ -44,8 +45,8 @@ export function estimatePreflightInputTokens(params: {
 }
 
 /**
- * USD per 1M input tokens the call may be billed at: the most expensive
- * endpoint the router may pick (maxInputTokenCost), else the listed price.
+ * USD per 1M input tokens reserved for the call: the largest applicable
+ * tariff, including OpenRouter's observed maximum and fallback buffer.
  * null for flat-priced models (no token pricing: the flat check covers them).
  */
 export function worstCaseInputTokenCost(
@@ -57,11 +58,19 @@ export function worstCaseInputTokenCost(
   }
   const rates = activeTokenRates(model, inputTokens);
   const input = rates.inputTokenCost ?? model.inputTokenCost;
+  const multiplier =
+    model.apiProvider === ApiProvider.OPENROUTER
+      ? OPENROUTER_TOKEN_FALLBACK_MULTIPLIER
+      : 1;
   return Math.max(
-    input,
     model.maxInputTokenCost ?? 0,
-    rates.cacheWriteTokenCost ?? 0,
-    rates.cacheWrite1hTokenCost ?? 0,
+    multiplier *
+      Math.max(
+        input,
+        rates.cacheReadTokenCost ?? 0,
+        rates.cacheWriteTokenCost ?? 0,
+        rates.cacheWrite1hTokenCost ?? 0,
+      ),
   );
 }
 

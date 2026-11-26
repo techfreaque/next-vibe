@@ -9,11 +9,7 @@ import "server-only";
 import type { JSONValue, ModelMessage, ProviderMetadata } from "ai";
 
 import { ThreadStreamingState } from "../../../chat/enum";
-import {
-  ApiProvider,
-  calculateCreditCost,
-  upstreamCostToCredits,
-} from "../../../models/models";
+import { ApiProvider, calculateCreditCost } from "../../../models/models";
 import { truncateToContextWindow } from "../context/token-budget";
 import { AbortReason, StreamAbortError } from "../core/constants";
 import { buildSseMessageRow } from "../core/db-writer/sse-row";
@@ -29,7 +25,6 @@ import {
 } from "./helpers";
 import type { StreamLoopState } from "./state";
 import {
-  billsUpstreamCost,
   producedImageFile,
   readCacheUsage,
   readImageOutputTokens,
@@ -710,7 +705,7 @@ export function onStepFinish(
   // later, cut-off step are left for the abort path's estimate.
   state.p.ctx.stepImageCount = 0;
   const upstream = readStepUpstreamCost(stepResult.providerMetadata);
-  TokenAccumulator.recordUpstreamCost(
+  const stepCharge = TokenAccumulator.recordUpstreamCost(
     state.p.ctx,
     modelConfig,
     stepTokens,
@@ -731,22 +726,19 @@ export function onStepFinish(
       outputTokens > 0 ||
       typeof modelConfig.creditCost === "number")
   ) {
-    // Actual-cost models show the step's real cost; others the token price
-    // (full input: calculateCreditCost subtracts the cached part itself).
     const stepCreditCost =
-      billsUpstreamCost(modelConfig) && upstream.costUsd !== null
-        ? upstreamCostToCredits(upstream.costUsd)
-        : calculateCreditCost(
-            modelConfig,
-            inputTokens,
-            outputTokens,
-            cachedInputTokens,
-            cacheWriteTokens,
-            imageOutputTokens,
-            hourWriteTokens,
-            stepTokens.requestStartedAt,
-            stepTokens.promptCountKnown,
-          );
+      stepCharge ??
+      calculateCreditCost(
+        modelConfig,
+        inputTokens,
+        outputTokens,
+        cachedInputTokens,
+        cacheWriteTokens,
+        imageOutputTokens,
+        hourWriteTokens,
+        stepTokens.requestStartedAt,
+        stepTokens.promptCountKnown,
+      );
     ctx.dbWriter.emitTokensUpdated({
       messageId: stepAssistantMessageId,
       promptTokens: inputTokens,

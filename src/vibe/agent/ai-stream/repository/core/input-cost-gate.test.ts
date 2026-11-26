@@ -40,9 +40,9 @@ describe("worst-case input price", () => {
     expect(worstCaseInputTokenCost(kimi)).toBe(4.5);
   });
 
-  it("models without maxInputTokenCost use the listed price", () => {
+  it("OpenRouter models without maxInputTokenCost buffer the listed price", () => {
     const model = { ...kimi, maxInputTokenCost: undefined };
-    expect(worstCaseInputTokenCost(model)).toBe(kimi.inputTokenCost);
+    expect(worstCaseInputTokenCost(model)).toBe((kimi.inputTokenCost ?? 0) * 1.5);
   });
 
   it("covers a full one-hour cache write on Claude routes", () => {

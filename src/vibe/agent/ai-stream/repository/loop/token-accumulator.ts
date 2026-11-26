@@ -23,7 +23,9 @@ import {
   type ModelOptionTokenBased,
   upstreamCostToCredits,
 } from "../../../models/models";
+import { activeTokenRates } from "../../../models/token-tariffs";
 import type { ChatModelOption } from "../../models";
+import { OPENROUTER_TOKEN_FALLBACK_MULTIPLIER } from "../../providers/openrouter/pricing";
 import type { ToolExecutionContextImpl } from "../core/stream";
 
 /** The per-step token counters these ops read and write on the stream context. */
@@ -204,6 +206,64 @@ export interface CutOffStepEstimate {
   completionTokens: number;
   /** IMAGE part of completionTokens. */
   imageOutputTokens: number;
+  fallbackPricing?: OpenRouterFallbackPrice;
+}
+
+interface OpenRouterFallbackPrice {
+  listedUsd: number;
+  fallbackUsd: number;
+  fallbackMultiplier: number;
+  maxInputTokenCost: number | undefined;
+}
+
+function tokenCostUsd(model: UpstreamBilledModel, step: StepTokens): number {
+  return calculateTokenCostUsd(
+    model,
+    step.inputTokens,
+    step.outputTokens,
+    step.cachedInputTokens,
+    step.cacheWriteTokens,
+    step.imageOutputTokens ?? 0,
+    step.hourWriteTokens ?? 0,
+    step.requestStartedAt,
+    step.promptCountKnown,
+  );
+}
+
+function openRouterFallbackPrice(
+  model: UpstreamBilledModel,
+  step: StepTokens,
+  listedUsd: number,
+): OpenRouterFallbackPrice | undefined {
+  if (
+    model.apiProvider !== ApiProvider.OPENROUTER ||
+    typeof model.creditCost === "number"
+  ) {
+    return undefined;
+  }
+  const rates = activeTokenRates(
+    model,
+    step.promptCountKnown === false ? undefined : step.inputTokens,
+    step.requestStartedAt,
+  );
+  const listedInput = rates.inputTokenCost ?? 0;
+  const inputPremium = Math.max(
+    0,
+    (model.maxInputTokenCost ?? 0) - listedInput,
+  );
+  const uncachedInput = Math.max(
+    0,
+    step.inputTokens - step.cachedInputTokens - step.cacheWriteTokens,
+  );
+  return {
+    listedUsd,
+    fallbackUsd: Math.max(
+      listedUsd * OPENROUTER_TOKEN_FALLBACK_MULTIPLIER,
+      listedUsd + (uncachedInput * inputPremium) / 1_000_000,
+    ),
+    fallbackMultiplier: OPENROUTER_TOKEN_FALLBACK_MULTIPLIER,
+    maxInputTokenCost: model.maxInputTokenCost,
+  };
 }
 
 /**
@@ -214,9 +274,7 @@ export interface CutOffStepEstimate {
  * imageOutputTokenCost (models without one fall back to the output rate).
  */
 export function estimateCutOffStepCost(
-  modelConfig: Parameters<typeof calculateCreditCost>[0] & {
-    estimatedImageOutputTokens?: number;
-  },
+  modelConfig: ChatModelOption,
   promptTokens: number,
   textCompletionTokens: number,
   imageCount: number,
@@ -228,20 +286,27 @@ export function estimateCutOffStepCost(
       DEFAULT_ESTIMATED_IMAGE_OUTPUT_TOKENS);
   const completionTokens =
     Math.max(0, textCompletionTokens) + imageOutputTokens;
+  const step = {
+    inputTokens: promptTokens,
+    outputTokens: completionTokens,
+    cachedInputTokens: 0,
+    cacheWriteTokens: 0,
+    imageOutputTokens,
+    requestStartedAt,
+    promptCountKnown: false,
+  };
+  const listedUsd = tokenCostUsd(modelConfig, step);
+  const fallbackPricing = openRouterFallbackPrice(modelConfig, step, listedUsd);
   return {
-    credits: calculateCreditCost(
-      modelConfig,
-      promptTokens,
-      completionTokens,
-      0,
-      0,
-      imageOutputTokens,
-      0,
-      requestStartedAt,
-      false,
-    ),
+    credits:
+      typeof modelConfig.creditCost === "number"
+        ? calculateCreditCost(modelConfig, 0, 0)
+        : fallbackPricing
+          ? upstreamCostToCredits(fallbackPricing.fallbackUsd)
+          : listedCostToCredits(listedUsd),
     completionTokens,
     imageOutputTokens,
+    fallbackPricing,
   };
 }
 
@@ -360,8 +425,8 @@ export class TokenAccumulator {
   /**
    * Record one finished step's REAL upstream cost (actual-cost models only).
    * A step without a reported cost (stream cut, provider omitted it) falls
-   * back to its listed price and logs a warning, so finance can see
-   * how often that happens. Call once per finished step, next to accumulate().
+   * back to an estimate and logs a warning. Returns the step's credit cost
+   * when invoice or tariff accounting applies, for the live usage event.
    */
   static recordUpstreamCost(
     ctx: TokenCounters,
@@ -369,14 +434,14 @@ export class TokenAccumulator {
     step: StepTokens,
     upstream: StepUpstreamCost,
     logger: EndpointLogger,
-  ): void {
+  ): number | undefined {
     const usesInvoice = billsUpstreamCost(modelConfig);
     if (
       !usesInvoice &&
       !modelConfig.pricingTiers?.length &&
       !modelConfig.longContextPricing
     ) {
-      return;
+      return undefined;
     }
     if (usesInvoice && upstream.costUsd !== null) {
       ctx.upstreamCostUsd += upstream.costUsd;
@@ -384,36 +449,39 @@ export class TokenAccumulator {
       if (upstream.provider) {
         ctx.upstreamProvider = upstream.provider;
       }
-      return;
+      return upstreamCostToCredits(upstream.costUsd);
     }
     const flatCost = modelConfig.creditCost;
-    const fallbackUsd =
+    const listedUsd =
       typeof flatCost === "number"
         ? flatCost * CREDIT_VALUE_USD
-        : calculateTokenCostUsd(
-            modelConfig,
-            step.inputTokens,
-            step.outputTokens,
-            step.cachedInputTokens,
-            step.cacheWriteTokens,
-            step.imageOutputTokens ?? 0,
-            step.hourWriteTokens ?? 0,
-            step.requestStartedAt,
-            step.promptCountKnown,
-          );
+        : tokenCostUsd(modelConfig, step);
+    const fallbackPricing = openRouterFallbackPrice(
+      modelConfig,
+      step,
+      listedUsd,
+    );
+    const fallbackUsd = fallbackPricing?.fallbackUsd ?? listedUsd;
     ctx.upstreamFallbackCostUsd += fallbackUsd;
     ctx.upstreamCostMissingSteps += 1;
+    const credits =
+      typeof flatCost === "number"
+        ? calculateCreditCost(modelConfig, 0, 0)
+        : fallbackPricing
+          ? upstreamCostToCredits(fallbackUsd)
+          : listedCostToCredits(fallbackUsd);
     if (!usesInvoice) {
-      return;
+      return credits;
     }
     logger.warn(
-      `[AI Stream] Upstream cost missing for step - billing listed ${typeof flatCost === "number" ? "request" : "token"} price`,
+      "[AI Stream] Upstream cost missing for step - billing fallback price",
       {
         model: modelConfig.id,
         apiProvider: modelConfig.apiProvider,
         providerModel: modelConfig.providerModel,
         upstreamProvider: upstream.provider,
         ...step,
+        ...fallbackPricing,
         fallbackUsd,
         // What the provider DID report, so the next missing cost is diagnosable.
         reportedUsage: upstream.reportedUsage,
@@ -430,13 +498,14 @@ export class TokenAccumulator {
         emptyStep: step.inputTokens === 0 && step.outputTokens === 0,
       },
     );
+    return credits;
   }
 
   /**
    * What the accumulated finished steps are charged. Actual-cost models with
    * at least one costed step: (real cost + fallback token cost of uncosted
    * steps) x markup, ceil to 0.1 credit. Everything else (other providers,
-   * or no step reported a cost at all): listed token rates or one flat
+   * or no step reported a cost at all): fallback token rates or one flat
    * charge per finished request.
    */
   static resolveCharge(
@@ -471,7 +540,10 @@ export class TokenAccumulator {
     if (ctx.upstreamCostMissingSteps > 0) {
       // Tier thresholds and one-hour writes belong to individual calls.
       return {
-        credits: listedCostToCredits(ctx.upstreamFallbackCostUsd),
+        credits:
+          modelConfig.apiProvider === ApiProvider.OPENROUTER
+            ? upstreamCostToCredits(ctx.upstreamFallbackCostUsd)
+            : listedCostToCredits(ctx.upstreamFallbackCostUsd),
         upstreamCost: undefined,
       };
     }

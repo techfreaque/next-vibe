@@ -30,6 +30,7 @@ import { ChatModelId, getChatModelById } from "../../models";
 import { createNanoGPT } from "../../providers/nano-gpt";
 import streamDefinition from "../../stream/definition";
 import { scopedTranslation } from "../../stream/i18n";
+import { MidStreamCompactingHandler } from "../compacting/mid-stream";
 import { toAiSdkMessages } from "../context/convert";
 import {
   AbortReason,
@@ -477,6 +478,61 @@ it("prices the tool output sent to Kimi when the executor returns a large payloa
   expect(replay).toHaveBeenCalledTimes(2);
   expect(requestBodies[1]).toContain("Image ready.");
   expect(requestBodies[1]?.length).toBeLessThan(10_000);
+});
+
+it("refuses an unaffordable prepared first request before calling inference", async () => {
+  const { loop, replay, notice, deduction } = makeToolLoop({
+    model: ChatModelId.KIMI_K3,
+    creditBalance: 20,
+  });
+  loop.p.messages = [{ role: "user", content: "prompt ".repeat(30_000) }];
+
+  const result = await loop.run();
+
+  expect(replay).not.toHaveBeenCalled();
+  expect(deduction).not.toHaveBeenCalled();
+  expect(result).toMatchObject({
+    errorType: ErrorResponseTypes.PAYMENT_REQUIRED,
+  });
+  expect(notice).toHaveBeenCalledWith(
+    expect.objectContaining({
+      error: expect.objectContaining({
+        errorType: ErrorResponseTypes.PAYMENT_REQUIRED,
+      }),
+    }),
+  );
+});
+
+it("stops before dispatch when preparing the next step spends its budget", async () => {
+  const { loop, replay, notice, deduction, settled } = makeToolLoop({
+    model: ChatModelId.KIMI_K3,
+    creditBalance: 25,
+    finalAnswerAfter: 2,
+  });
+  loop.p.midStreamCompactingThreshold = 1;
+  const compact = spyOn(MidStreamCompactingHandler, "compact").mockImplementation(
+    async ({ ctx, stepMessages }) => {
+      ctx.dbWriter.totalCreditsDeducted += 17;
+      return { messages: stepMessages, compactingMessageId: crypto.randomUUID() };
+    },
+  );
+
+  await loop.run();
+
+  expect(compact).toHaveBeenCalledTimes(1);
+  expect(replay).toHaveBeenCalledTimes(1);
+  expect(notice).toHaveBeenCalledTimes(1);
+  expect(notice).toHaveBeenCalledWith(
+    expect.objectContaining({
+      content: t("errors.insufficientCredits"),
+      error: expect.objectContaining({
+        errorType: ErrorResponseTypes.PAYMENT_REQUIRED,
+      }),
+    }),
+  );
+  expect(deduction).toHaveBeenCalledTimes(1);
+  expect(deduction.mock.calls[0][0].amount).toBeLessThanOrEqual(8);
+  expect(settled).toHaveBeenCalledTimes(1);
 });
 
 it("sends live execute-tool image data through the model's media transport", async () => {

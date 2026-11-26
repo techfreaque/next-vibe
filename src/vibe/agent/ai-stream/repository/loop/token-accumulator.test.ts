@@ -31,12 +31,13 @@ import {
 } from "./token-accumulator";
 
 /** A token-priced option with round prices: $2/M in, $10/M out, $0.10/M cache read. */
-function pricedModel(): ChatModelOption {
+function pricedModel(maxInputTokenCost?: number): ChatModelOption {
   return {
     ...getChatModelById(ChatModelId.KIMI_K3),
     apiProvider: ApiProvider.OPENROUTER,
     creditCost: calculateCreditCost,
     inputTokenCost: 2,
+    maxInputTokenCost,
     outputTokenCost: 10,
     cacheReadTokenCost: 0.1,
     cacheWriteTokenCost: undefined,
@@ -411,28 +412,36 @@ describe("TokenAccumulator actual upstream cost billing", () => {
     });
   });
 
-  it("falls back to the token price for a step without cost and warns", () => {
+  it("buffers only the unreported step in a mixed OpenRouter charge and logs the estimate", () => {
     const warn = spyOn(logger, "warn");
     const ctx = freshCounters();
     runSteps(ctx, pricedModel(), [0.05, null, 0.04]);
     expect(warn).toHaveBeenCalledTimes(1);
-    warn.mockRestore();
-
     const step2 = STEPS[1];
     const step2Usd =
       ((step2.inputTokens - step2.cachedInputTokens) * 2 +
         step2.cachedInputTokens * 0.1 +
         step2.outputTokens * 10) /
       1_000_000;
+    const fallbackUsd = step2Usd * 1.5;
+    expect(warn).toHaveBeenCalledWith(
+      expect.stringContaining("Upstream cost missing for step"),
+      expect.objectContaining({
+        listedUsd: expect.closeTo(step2Usd, 12),
+        fallbackUsd: expect.closeTo(fallbackUsd, 12),
+        fallbackMultiplier: 1.5,
+      }),
+    );
+    warn.mockRestore();
     const charge = TokenAccumulator.resolveCharge(ctx, pricedModel(), {
       inputTokens: 66_000,
       outputTokens: 1_400,
       cachedInputTokens: 42_000,
       cacheWriteTokens: 0,
     });
-    expect(charge.credits).toBe(upstreamCostToCredits(0.09 + step2Usd));
+    expect(charge.credits).toBe(upstreamCostToCredits(0.09 + fallbackUsd));
     expect(charge.upstreamCost?.billingBasis).toBe("mixed");
-    expect(charge.upstreamCost?.fallbackCostUsd).toBeCloseTo(step2Usd, 12);
+    expect(charge.upstreamCost?.fallbackCostUsd).toBeCloseTo(fallbackUsd, 12);
   });
 
   it("uses the reported price of a flat request and the flat fee for missing cost", () => {
@@ -458,7 +467,7 @@ describe("TokenAccumulator actual upstream cost billing", () => {
     });
   });
 
-  it("uses the plain token price when no step reported a cost", () => {
+  it("uses the buffered OpenRouter price when no step reported a cost", () => {
     const warn = spyOn(logger, "warn");
     const ctx = freshCounters();
     runSteps(ctx, pricedModel(), [null, null, null]);
@@ -470,8 +479,21 @@ describe("TokenAccumulator actual upstream cost billing", () => {
       cachedInputTokens: 42_000,
       cacheWriteTokens: 0,
     });
-    expect(charge.credits).toBe(expectedCredits(STEPS_USD));
+    expect(charge.credits).toBe(upstreamCostToCredits(STEPS_USD * 1.5));
     expect(charge.upstreamCost).toBeUndefined();
+  });
+
+  it("uses the observed route ceiling when the price buffer is too small", () => {
+    const model = pricedModel(10);
+    const charge = TokenAccumulator.chargeSingleCall(
+      model,
+      FIRST_STEP,
+      undefined,
+      logger,
+    );
+    expect(charge.credits).toBe(
+      upstreamCostToCredits((20_000 * 10 + 300 * 10) / 1_000_000),
+    );
   });
 
   it("ignores reported cost for providers without a reliable cost", () => {
@@ -635,7 +657,7 @@ describe("image output tokens", () => {
     );
     expect(warn).toHaveBeenCalledTimes(1);
     warn.mockRestore();
-    expect(ctx.upstreamFallbackCostUsd).toBeCloseTo(IMAGE_STEP_USD, 12);
+    expect(ctx.upstreamFallbackCostUsd).toBeCloseTo(IMAGE_STEP_USD * 1.5, 12);
     expect(ctx.tokenImageOutput).toBe(1_120);
 
     // No step reported a cost: the token-price branch, image rate included.
@@ -645,7 +667,7 @@ describe("image output tokens", () => {
       return;
     }
     const charge = TokenAccumulator.resolveCharge(ctx, imageModel(), steps);
-    expect(charge.credits).toBe(expectedCredits(IMAGE_STEP_USD));
+    expect(charge.credits).toBe(upstreamCostToCredits(IMAGE_STEP_USD * 1.5));
     expect(charge.upstreamCost).toBeUndefined();
   });
 
@@ -678,7 +700,7 @@ describe("image output tokens", () => {
     });
     expect(charge.upstreamCost?.billingBasis).toBe("mixed");
     expect(charge.credits).toBe(
-      upstreamCostToCredits(0.0352875 + IMAGE_STEP_USD),
+      upstreamCostToCredits(0.0352875 + IMAGE_STEP_USD * 1.5),
     );
   });
 
@@ -781,8 +803,9 @@ describe("image output tokens", () => {
       200 + DEFAULT_ESTIMATED_IMAGE_OUTPUT_TOKENS,
     );
     expect(estimate.credits).toBe(
-      expectedCredits(
-        (1_000 * 1.5 + 200 * 7.5 + DEFAULT_ESTIMATED_IMAGE_OUTPUT_TOKENS * 30) /
+      upstreamCostToCredits(
+        (1.5 *
+          (1_000 * 1.5 + 200 * 7.5 + DEFAULT_ESTIMATED_IMAGE_OUTPUT_TOKENS * 30)) /
           1_000_000,
       ),
     );
@@ -792,8 +815,8 @@ describe("image output tokens", () => {
       2 * DEFAULT_ESTIMATED_IMAGE_OUTPUT_TOKENS,
     );
     expect(two.credits).toBe(
-      expectedCredits(
-        (1_000 * 1.5 + 2 * DEFAULT_ESTIMATED_IMAGE_OUTPUT_TOKENS * 30) /
+      upstreamCostToCredits(
+        (1.5 * (1_000 * 1.5 + 2 * DEFAULT_ESTIMATED_IMAGE_OUTPUT_TOKENS * 30)) /
           1_000_000,
       ),
     );
@@ -801,10 +824,11 @@ describe("image output tokens", () => {
 
   it("cut-off step without images keeps the text estimate", () => {
     const estimate = estimateCutOffStepCost(imageModel(), 1_000, 200, 0);
-    expect(estimate).toEqual({
-      credits: calculateCreditCost(imageModel(), 1_000, 200),
+    expect(estimate).toMatchObject({
+      credits: upstreamCostToCredits(0.003 * 1.5),
       completionTokens: 200,
       imageOutputTokens: 0,
+      fallbackPricing: { fallbackMultiplier: 1.5 },
     });
   });
 });

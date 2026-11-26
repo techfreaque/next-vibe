@@ -33,8 +33,7 @@ import type {
 import {
   APICallError,
   InvalidToolInputError,
-  stepCountIs,
-  type StopCondition,
+  modelMessageSchema,
   streamText as aiStreamText,
 } from "ai";
 import { errorResponseSchema } from "next-vibe/core/route/error-response.schema";
@@ -68,10 +67,7 @@ import {
   StreamErrorType,
 } from "../core/constants";
 import type { InlineThinkEvent } from "../core/inline-think-splitter";
-import {
-  computeOutputCap,
-  minAffordableOutputTokens,
-} from "../core/output-cost-cap";
+import { computeOutputCap, type OutputCap } from "../core/output-cost-cap";
 import { claimResultToolCallId, type PendingToolData } from "../core/stream";
 import { estimateInputTokens } from "../core/token-estimator";
 import { providerErrorTranslationKey } from "../errors/provider-error-key";
@@ -123,6 +119,12 @@ import {
 } from "./tool-parts";
 import { FirstPartWatchdog } from "./watchdog";
 
+interface PreparedStep {
+  messages?: ModelMessage[];
+  toolChoice?: "none";
+  maxOutputTokens?: number;
+}
+
 export class StreamLoop implements StreamLoopState {
   constructor(readonly p: StreamLoopParams) {}
 
@@ -159,96 +161,108 @@ export class StreamLoop implements StreamLoopState {
     return estimateInputTokens(messages, this.p.systemPrompt, this.p.tools);
   }
 
-  /**
-   * maxOutputTokens for a step sending `messages`: what the remaining balance
-   * can pay after the step's worst-case input. undefined = uncapped (wallet
-   * covers any output the model can write, or flat/free model). A step that
-   * cannot even pay the minimum still gets the minimum: setup refuses such
-   * turns up-front and stopWhen ends the loop before such a step, so this is
-   * only reached on estimate drift (bounded to minAffordableOutputTokens).
-   */
-  private stepOutputCap(
-    messages: ModelMessage[],
+  private applyStepOutputCap(
+    cap: Exclude<OutputCap, { kind: "unaffordable" }>,
+    inputTokens: number,
     stepNumber: number,
   ): number | undefined {
-    const { modelConfig, modelCost, ctx, logger } = this.p;
-    const remainingCredits = this.remainingCredits();
-    const inputTokens = this.estimateStepInput(messages);
-    const cap = computeOutputCap({
-      model: modelConfig,
-      modelCost,
-      remainingCredits,
-      inputTokens,
-    });
+    const { modelConfig, ctx, logger } = this.p;
     if (cap.kind === "uncapped") {
       return undefined;
     }
-    const maxOutputTokens =
-      cap.kind === "capped"
-        ? cap.maxOutputTokens
-        : minAffordableOutputTokens(modelConfig);
     ctx.creditBudgetCapped = true;
     logger.debug("[AI Stream] Output capped by remaining balance", {
       model: modelConfig.id,
       stepNumber,
-      remainingCredits,
+      remainingCredits: this.remainingCredits(),
       inputTokens,
-      maxOutputTokens,
+      maxOutputTokens: cap.maxOutputTokens,
     });
-    return maxOutputTokens;
+    return cap.maxOutputTokens;
   }
 
-  /**
-   * stopWhen: stop the tool loop when the remaining balance cannot pay the
-   * next step's input (last prompt + last output + tool results) plus the
-   * minimum output. Without it each step re-sends the whole context and the
-   * turn's cost grew past the wallet (billing deducts partially to 0).
-   */
-  private creditBudgetExhausted(steps: Array<StepResult<ToolSet>>): boolean {
+  /** Price a follow-up using the last reported prompt size to correct underestimates. */
+  private checkNextStepBudget(
+    messages: ModelMessage[],
+    priorPromptEstimate: number,
+    stepNumber: number,
+  ): { cap: OutputCap; inputTokens: number } {
     const { modelConfig, modelCost, ctx, logger } = this.p;
-    const lastStep = steps.at(-1);
-    if (!lastStep) {
-      return false;
-    }
-    const lastPrompt = Math.max(
-      ctx.lastStepInputTokens,
-      this.estimateStepInput([...this.lastPromptMessages]),
-    );
-    // The SDK appends response.messages to the next prompt. Raw tool
-    // results include executor-only data, and billed reasoning need not be
-    // replayed. Price the messages after the SDK's toModelOutput conversion.
-    const nextInputTokens =
-      lastPrompt +
-      estimateInputTokens(lastStep.response.messages, "", undefined);
+    const inputTokens =
+      this.estimateStepInput(messages) +
+      Math.max(0, ctx.lastStepInputTokens - priorPromptEstimate);
     const remainingCredits = this.remainingCredits();
     const cap = computeOutputCap({
       model: modelConfig,
       modelCost,
       remainingCredits,
-      inputTokens: nextInputTokens,
+      inputTokens,
     });
-    const requiredCredits =
-      cap.kind === "unaffordable"
-        ? cap.requiredCredits
-        : typeof modelConfig.creditCost === "number" &&
-            modelCost > 0 &&
-            remainingCredits < modelCost
-          ? modelCost
-          : null;
-    if (requiredCredits === null) {
-      return false;
+    if (cap.kind === "unaffordable") {
+      ctx.creditBudgetStopped = true;
+      ctx.creditBudgetNextInputTokens = inputTokens;
+      logger.info("[AI Stream] Balance cannot pay another step - ending loop", {
+        model: modelConfig.id,
+        threadId: this.p.threadId,
+        steps: stepNumber,
+        remainingCredits,
+        nextInputTokens: inputTokens,
+        requiredCredits: cap.requiredCredits,
+      });
     }
-    ctx.creditBudgetStopped = true;
-    ctx.creditBudgetNextInputTokens = nextInputTokens;
-    logger.info("[AI Stream] Balance cannot pay another step - ending loop", {
-      model: modelConfig.id,
-      threadId: this.p.threadId,
-      steps: steps.length,
-      remainingCredits,
-      nextInputTokens,
-      requiredCredits,
-    });
-    return true;
+    return { cap, inputTokens };
+  }
+
+  /**
+   * The SDK invokes stopWhen after recording the step and before requesting
+   * the next one. Prepare here so a late budget refusal can finish normally.
+   */
+  private async prepareAffordableNextStep(
+    steps: Array<StepResult<ToolSet>>,
+  ): Promise<PreparedStep | null> {
+    const lastStep = steps.at(-1);
+    if (!lastStep) {
+      return null;
+    }
+    const stepNumber = steps.length;
+    // The SDK uses the previous request plus the tool results after toModelOutput.
+    const priorPromptEstimate = this.estimateStepInput([
+      ...this.lastPromptMessages,
+    ]);
+    const nextMessages = [
+      ...this.lastPromptMessages,
+      ...lastStep.response.messages,
+    ];
+    const beforePrep = this.checkNextStepBudget(
+      nextMessages,
+      priorPromptEstimate,
+      stepNumber,
+    );
+    if (beforePrep.cap.kind === "unaffordable") {
+      return null;
+    }
+    const prepared = this.answerUnansweredToolCalls(
+      await this.prepareStep(nextMessages, stepNumber),
+      nextMessages,
+      stepNumber,
+    );
+    const messages = prepared.messages ?? nextMessages;
+    const { cap, inputTokens } = this.checkNextStepBudget(
+      messages,
+      priorPromptEstimate,
+      stepNumber,
+    );
+    if (cap.kind === "unaffordable") {
+      return null;
+    }
+    const maxOutputTokens = this.applyStepOutputCap(
+      cap,
+      inputTokens,
+      stepNumber,
+    );
+    this.lastPromptStep = stepNumber;
+    this.lastPromptMessages = messages;
+    return { ...prepared, messages, maxOutputTokens };
   }
 
   /** First-part watchdog timeout: a dead provider connection sent no output
@@ -291,12 +305,24 @@ export class StreamLoop implements StreamLoopState {
       t,
       dailyLimitMessage,
     } = this.p;
+    // JSON-reparse sanitizes tool results containing Drizzle dates before the
+    // SDK validates messages. Price the same prompt we will actually send.
+    const cleaned =
+      z
+        .array(modelMessageSchema)
+        .safeParse(JSON.parse(JSON.stringify(this.p.messages))).data ??
+      this.p.messages;
+    const messages = this.p.tools
+      ? this.answerUnansweredToolCalls({ messages: cleaned }, cleaned, 0)
+          .messages
+      : cleaned;
     const remainingCredits = this.remainingCredits();
+    const inputTokens = this.estimateStepInput(messages);
     const cap = computeOutputCap({
       model: modelConfig,
       modelCost,
       remainingCredits,
-      inputTokens: this.estimateStepInput(this.p.messages),
+      inputTokens,
     });
     if (cap.kind === "unaffordable") {
       const message =
@@ -341,17 +367,22 @@ export class StreamLoop implements StreamLoopState {
     };
     registerActiveLoop(drainable);
     try {
-      await this.runInner();
+      await this.runInner(
+        messages,
+        this.applyStepOutputCap(cap, inputTokens, 0),
+      );
     } finally {
       deregisterActiveLoop(drainable);
     }
   }
 
-  private async runInner(): Promise<void> {
+  private async runInner(
+    messages: ModelMessage[],
+    initialMaxOutputTokens: number | undefined,
+  ): Promise<void> {
     const {
       provider,
       modelConfig,
-      messages,
       streamAbortController,
       systemPrompt,
       tools: loadedTools,
@@ -431,17 +462,8 @@ export class StreamLoop implements StreamLoopState {
         ? { temperature: DEFAULT_TEMPERATURE }
         : {};
 
-    // ai@7 validates messages through modelMessageSchema (Zod). JSON-reparse
-    // converts Date objects and other non-JSON primitives (e.g. from Drizzle
-    // timestamp columns in tool results) to serializable values before the
-    // SDK runs its standardizePrompt validation on the messages array.
-    const messagesClean = JSON.parse(
-      JSON.stringify(messages),
-    ) as typeof messages;
-    this.lastPromptMessages = messagesClean;
-    // First step's output, bounded by the wallet (tool steps re-cap in
-    // prepareStep). Unset for wallets that cover the whole context window.
-    const initialMaxOutputTokens = this.stepOutputCap(messagesClean, 0);
+    this.lastPromptMessages = messages;
+    let nextStep: PreparedStep | null = null;
     // OpenRouter: the garbled-output guard may replace a broken attempt with
     // a retry mid-step; its in-band marker arrives as a `raw` part.
     const garbledGuardParams =
@@ -453,7 +475,7 @@ export class StreamLoop implements StreamLoopState {
         : {};
     const streamResult = aiStreamText({
       model: provider.chat(modelConfig.providerModel) as LanguageModel,
-      messages: messagesClean,
+      messages,
       ...garbledGuardParams,
       ...temperatureParam,
       ...(initialMaxOutputTokens !== undefined
@@ -466,69 +488,42 @@ export class StreamLoop implements StreamLoopState {
       ...(tools
         ? {
             tools,
-            stopWhen: [
-              this.p.maxToolCalls === undefined
-                ? ({ steps }): boolean => {
-                    const limit =
-                      this.p.turnStepLimit ?? DEFAULT_TURN_STEP_LIMIT;
-                    if (steps.length - ctx.turnStepOffset < limit) {
-                      return false;
-                    }
-                    ctx.reachedTurnStepLimit = limit;
-                    return true;
-                  }
-                : stepCountIs(this.p.maxToolCalls),
+            stopWhen: async ({ steps }): Promise<boolean> => {
               // endLoop / approve / wait: stop before the next AI turn starts.
               // The current step (tool calls + results) finishes naturally;
               // this predicate prevents the AI SDK from making another API
               // request. (wakeUp results do NOT stop the loop — they are
               // injected into the next step by prepareStep so the model
               // acknowledges them in-context.)
-              (
-                (): StopCondition<ToolSet> => () =>
-                  ctx.shouldStopLoop ||
-                  // endLoop with the answer already written (SDK-side view,
-                  // set in onStepFinish which the SDK awaits before this).
-                  ctx.sdkEndLoopStop ||
-                  ctx.stepHasToolsAwaitingConfirmation ||
-                  // execute-tool's confirmation gate sets the flag on the tool
-                  // execution context synchronously inside execute() - read it
-                  // here too so the SDK never starts the next step before the
-                  // part consumer has bridged it onto the loop context.
-                  this.p.toolExecutionContext
-                    .stepHasToolsAwaitingConfirmation === true ||
-                  this.p.toolExecutionContext.waitingForRemoteResult === true
-              )(),
-              // The wallet cannot pay another step.
-              ({ steps }): boolean => this.creditBudgetExhausted(steps),
-            ],
-            // Per-step message-list override — the official AI SDK hook.
-            // Pipeline: mid-stream compacting → wakeUp result injection →
-            // queued-message injection → cortex refresh.
-            prepareStep: async ({
-              messages: stepMessages,
-              stepNumber,
-            }: {
-              messages: ModelMessage[];
-              stepNumber: number;
-            }): Promise<{
-              messages?: ModelMessage[];
-              toolChoice?: "none";
-              maxOutputTokens?: number;
-            }> => {
-              const prepared = this.answerUnansweredToolCalls(
-                await this.prepareStep(stepMessages, stepNumber),
-                stepMessages,
-                stepNumber,
-              );
+              const { maxToolCalls, toolExecutionContext } = this.p;
+              if (
+                streamAbortController.signal.aborted ||
+                ctx.shouldStopLoop ||
+                ctx.sdkEndLoopStop ||
+                ctx.stepHasToolsAwaitingConfirmation ||
+                toolExecutionContext.stepHasToolsAwaitingConfirmation ===
+                  true ||
+                toolExecutionContext.waitingForRemoteResult === true
+              ) {
+                return true;
+              }
+              if (maxToolCalls !== undefined) {
+                if (steps.length === maxToolCalls) {
+                  return true;
+                }
+              } else {
+                const limit = this.p.turnStepLimit ?? DEFAULT_TURN_STEP_LIMIT;
+                if (steps.length - ctx.turnStepOffset >= limit) {
+                  ctx.reachedTurnStepLimit = limit;
+                  return true;
+                }
+              }
+              nextStep = await this.prepareAffordableNextStep(steps);
+              return nextStep === null || streamAbortController.signal.aborted;
+            },
+            prepareStep: (): PreparedStep => {
               ctx.stepPricingStartedAt = Date.now();
-              const sent = prepared.messages ?? stepMessages;
-              this.lastPromptStep = stepNumber;
-              this.lastPromptMessages = sent;
-              const maxOutputTokens = this.stepOutputCap(sent, stepNumber);
-              return maxOutputTokens !== undefined
-                ? { ...prepared, maxOutputTokens }
-                : prepared;
+              return nextStep ?? {};
             },
             onStepFinish: (stepResult): void => {
               // Read here (SDK-typed) so steps.ts stays free of the SDK's

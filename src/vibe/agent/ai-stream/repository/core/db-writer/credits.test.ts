@@ -112,6 +112,7 @@ describe("deductAndEmitCredits — fail closed", () => {
       .mockResolvedValueOnce(success({ deducted: 2, partialDeduction: true }));
     vi.spyOn(CreditRepository, "deductCreditsForFeature").mockResolvedValue(success());
     const writer = makeWriter(true);
+    const warn = vi.spyOn(writer.deps.logger, "warn");
     const model = ChatModelId.GLM_5_3_UNCENSORED;
     for (const cost of [8, 10]) {
       await writer.emitCompactingDone({
@@ -136,6 +137,14 @@ describe("deductAndEmitCredits — fail closed", () => {
       model: undefined,
     });
     await deductAndEmitCredits(writer, { user, amount: 5, feature: model, type: "model", model });
+    expect(warn).toHaveBeenCalledWith(
+      "[AI Stream] Model charge exceeded spendable balance",
+      expect.objectContaining({
+        requestedCredits: 5,
+        deductedCredits: 2,
+        shortfallCredits: 3,
+      }),
+    );
     const result = await shapeRunResult({
       headlessResult: {
         lastAiMessageId: "fixture-answer",
