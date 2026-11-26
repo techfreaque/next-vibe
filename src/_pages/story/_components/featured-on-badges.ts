@@ -168,6 +168,20 @@ export const FEATURED_ON_BADGES: readonly FeaturedOnBadge[] = [
     height: 48,
   },
   {
+    // Free listing (submitted 2026-11-26) stays pending until their checker
+    // finds this badge link on https://unbottled.ai. Snippet from the AAD
+    // dashboard ("Free listing badge").
+    kind: "image",
+    slug: "aiagentsdirectory",
+    name: "AI Agents Directory",
+    href: "https://aiagentsdirectory.com",
+    rel: "noopener",
+    img: "/images/badges/aiagentsdirectory.svg",
+    alt: "Featured on AI Agents Directory",
+    width: 200,
+    height: 50,
+  },
+  {
     kind: "text",
     slug: "aitooltrek",
     name: "AI Tool Trek",
