@@ -65,7 +65,9 @@ function accountTree(
   for (const row of rows) {
     if (
       search &&
-      !`${row.code} ${row.name}`.toLocaleLowerCase(locale).includes(search)
+      !`${row.code} ${row.name} ${row.officialName ?? ""}`
+        .toLocaleLowerCase(locale)
+        .includes(search)
     ) {
       continue;
     }
@@ -156,6 +158,11 @@ function AccountItem({
         >
           {account.name}
         </Button>
+        {account.officialName && (
+          <Span className="block text-xs text-muted-foreground [overflow-wrap:anywhere]">
+            {account.officialName}
+          </Span>
+        )}
         <Div className="mt-0.5 flex flex-wrap items-center gap-1 text-xs text-muted-foreground">
           <Span>{subtypeLabel}</Span>
           {!account.isActive && <FlagBadge label={inactiveLabel} />}

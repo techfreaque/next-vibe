@@ -16,6 +16,7 @@ import { findDemoCompany } from "@/companies/demo-company.repository";
 import { accountNodes, coaTemplateNodes, coaTemplates } from "./db";
 import { seedDemoLedger } from "./demo-ledger";
 import { AccountSubtype, AccountType } from "./enum";
+import { skNodes } from "./templates/sk";
 
 export const priority = 40;
 
@@ -1269,6 +1270,15 @@ const TEMPLATES = [
     isDefault: false,
     version: "2024",
     nodes: atNodes,
+  },
+  {
+    country: "SK",
+    name: "Rámcová účtová osnova (SK)",
+    description:
+      "Slovak framework chart of accounts for businesses (Opatrenie MF SR 23054/2002-92) for s.r.o. and sole traders.",
+    isDefault: false,
+    version: "2025",
+    nodes: skNodes,
   },
 ] as const;
 

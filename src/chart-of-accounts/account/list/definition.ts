@@ -122,6 +122,12 @@ const { GET } = createEndpoint({
               label: "get.response.name" as const,
               schema: z.string(),
             }),
+            officialName: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              label: "get.response.name" as const,
+              hidden: true,
+              schema: z.string().nullable(),
+            }),
             type: responseField(scopedTranslation, {
               type: WidgetType.BADGE,
               text: "get.response.type" as const,

@@ -16,13 +16,14 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { companyMembers } from "@/companies/db";
+import { companies, companyMembers } from "@/companies/db";
 import { CompanyMemberRole } from "@/companies/enum";
 import { CompanyAuthRepository } from "@/companies/repository";
 
 import { accountNodes, journalEntries, journalEntryLines } from "../../db";
 import { AccountType, ledgerEntryStatuses, LineType } from "../../enum";
 import { nextAccountingDay } from "../../shared/journal-validation";
+import { templateAccountLabel } from "../../templates/labels";
 import type { CoaAccountListRequestOutput } from "./definition";
 import { scopedTranslation } from "./i18n";
 
@@ -39,6 +40,8 @@ export class CoaAccountListRepository {
         id: string;
         code: string;
         name: string;
+        /** Stored official name when `name` shows a translated template label. */
+        officialName: string | null;
         type: string;
         subtype: string;
         parentId: string | null;
@@ -163,23 +166,46 @@ export class CoaAccountListRepository {
         }
       }
 
+      const companyIdsOnPage = [...new Set(rows.map((r) => r.companyId))];
+      const countries = new Map(
+        companyIdsOnPage.length
+          ? (
+              await db
+                .select({ id: companies.id, country: companies.country })
+                .from(companies)
+                .where(inArray(companies.id, companyIdsOnPage))
+            ).map(({ id, country }) => [id, country])
+          : [],
+      );
+
       return success({
         total: total ?? 0,
-        accounts: rows.map((r) => ({
-          id: r.id,
-          code: r.code,
-          name: r.name,
-          type: r.type,
-          subtype: r.subtype,
-          parentId: r.parentId ?? null,
-          isPostable: r.isPostable,
-          isActive: r.isActive,
-          isSystem: r.isSystem,
-          description: r.description ?? null,
-          sortOrder: r.sortOrder,
-          companyId: r.companyId,
-          balances: data.postableOnly ? undefined : (balances.get(r.id) ?? []),
-        })),
+        accounts: rows.map((r) => {
+          const name = templateAccountLabel(
+            countries.get(r.companyId),
+            r.code,
+            r.name,
+            locale,
+          );
+          return {
+            id: r.id,
+            code: r.code,
+            name,
+            officialName: name === r.name ? null : r.name,
+            type: r.type,
+            subtype: r.subtype,
+            parentId: r.parentId ?? null,
+            isPostable: r.isPostable,
+            isActive: r.isActive,
+            isSystem: r.isSystem,
+            description: r.description ?? null,
+            sortOrder: r.sortOrder,
+            companyId: r.companyId,
+            balances: data.postableOnly
+              ? undefined
+              : (balances.get(r.id) ?? []),
+          };
+        }),
       });
     } catch (error) {
       logger.error("Error listing accounts", parseError(error));
