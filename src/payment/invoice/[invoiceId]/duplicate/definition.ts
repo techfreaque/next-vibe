@@ -41,6 +41,19 @@ const { POST } = createEndpoint({
   tags: ["tags.payment" as const, "tags.invoice" as const, "tags.ar" as const],
   allowedRoles: [UserRole.ADMIN] as const,
 
+  options: {
+    mutationOptions: {
+      onSuccess: async (data) => {
+        const { refreshInvoiceDocuments } =
+          await import("@/finance/document-cache");
+        await refreshInvoiceDocuments(
+          data.logger,
+          data.responseData.invoice.id,
+        );
+      },
+    },
+  },
+
   fields: customWidgetObject({
     render: InvoiceDuplicateWidgetLazy,
     usage: { request: "urlPathParams", response: true },

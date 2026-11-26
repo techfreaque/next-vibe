@@ -51,6 +51,9 @@ export const translations: typeof enTranslations = {
   },
   estimateId: { label: "Stima ID", description: "La stima di agire su" },
   widget: {
+    loading: "Caricamento del preventivo",
+    unavailable: "Solo i preventivi inviati possono essere rifiutati.",
+    total: "Totale",
     back: "Indietro",
     submit: "Decidere la stima",
     declined: "Stima segnata come declinata.",

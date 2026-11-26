@@ -14,6 +14,9 @@ export const translations: typeof enTranslations = {
       description: "Zahlungsübersicht für Ihr Unternehmen",
     },
     response: {
+      invoiceNumber: "Rechnungsnummer",
+      customerName: "Kunde",
+      amountDue: "Offener Betrag",
       estimates: "Angebote",
       byCurrency: "Summen je Währung",
       openInvoices: "Offene Rechnungen",
@@ -74,11 +77,25 @@ export const translations: typeof enTranslations = {
     },
   },
   companyId: {
-    label: "Firmen-ID",
+    label: "Firma",
     description: "Unternehmen für die Übersicht",
     placeholder: "Firmen-ID eingeben",
   },
   widget: {
+    creditNote: "Gutschrift",
+    documentCountOne: "1 Beleg",
+    estimateDraftOne: "1 Entwurf",
+    documentCount: "{{count}} Belege",
+    draftHint: "Noch nicht ausgestellt",
+    noRecentEstimatesHint:
+      "Gesendete Angebote erscheinen hier mit der Antwort des Kunden.",
+    columns: {
+      number: "Nummer",
+      customer: "Kunde",
+      status: "Status",
+      total: "Summe",
+      open: "Offen",
+    },
     unnumberedInvoice: "Rechnung ohne Nummer",
     subtitle:
       "Rechnungen, Angebote und Belege, die du ausstellst. Karten- und Kryptozahlungen stehen bei den Zahlungstransaktionen.",

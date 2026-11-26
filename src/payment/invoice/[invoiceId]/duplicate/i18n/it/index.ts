@@ -84,6 +84,12 @@ export const translations: typeof enTranslations = {
     placeholder: "Inserire la fattura ID",
   },
   widget: {
+    duplicate: "Duplica",
+    cancel: "Annulla",
+    loading: "Caricamento della fattura",
+    total: "Totale",
+    duplicateNote:
+      "Viene creata una nuova bozza con lo stesso cliente, valuta e righe. Riceve il numero quando la emetti.",
     back: "Indietro",
     submit: "Fattura duplicata",
     duplicated: "Fattura duplicata",

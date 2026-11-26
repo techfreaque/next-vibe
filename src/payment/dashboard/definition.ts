@@ -23,7 +23,7 @@ import {
 } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
-import { EstimateStatus } from "../enum";
+import { EstimateStatus, InvoiceStatusDB } from "../enum";
 import { scopedTranslation } from "./i18n";
 
 const PaymentDashboardWidget = lazyWidget(() =>
@@ -81,6 +81,7 @@ const { GET } = createEndpoint({
             z.object({
               id: z.string(),
               estimateNumber: z.string(),
+              customerName: z.string().nullable(),
               status: z.enum(EstimateStatus),
               total: z.number(),
               currency: z.string(),
@@ -182,6 +183,21 @@ const { GET } = createEndpoint({
               label: "get.response.recentInvoices" as const,
               schema: z.string(),
             }),
+            invoiceNumber: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              label: "get.response.invoiceNumber" as const,
+              schema: z.string().nullable(),
+            }),
+            customerName: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              label: "get.response.customerName" as const,
+              schema: z.string().nullable(),
+            }),
+            amountDue: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              label: "get.response.amountDue" as const,
+              schema: z.number(),
+            }),
             invoiceSequenceNumber: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               label: "get.response.recentInvoices" as const,
@@ -195,7 +211,7 @@ const { GET } = createEndpoint({
             status: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               label: "get.response.recentInvoices" as const,
-              schema: z.string(),
+              schema: z.enum(InvoiceStatusDB),
             }),
             amount: responseField(scopedTranslation, {
               type: WidgetType.TEXT,

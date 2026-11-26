@@ -3,8 +3,8 @@ export const translations = {
     vibeSense: "vibe-sense",
   },
   post: {
-    title: "New Paying Customers",
-    titleShort: "New Payers",
+    title: "New paying customers",
+    titleShort: "New payers",
     description:
       "Users whose first payment ever (pack or subscription) landed in this bucket. Counts people, not payments. Admin accounts excluded.",
     fields: {

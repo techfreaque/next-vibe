@@ -62,6 +62,10 @@ export const translations: typeof enTranslations = {
     description: "La estimación se duplicará",
   },
   widget: {
+    cancel: "Cancelar",
+    loading: "Cargando presupuesto",
+    total: "Total",
+    created: "Borrador {{number}} creado con las mismas líneas.",
     back: "Atrás",
     submit: "Estimación duplicada",
     viewDuplicate: "Ver Duplicar",

@@ -59,6 +59,10 @@ export const translations: typeof enTranslations = {
     description: "Le devis à dupliquer",
   },
   widget: {
+    cancel: "Annuler",
+    loading: "Chargement du devis",
+    total: "Total",
+    created: "Brouillon {{number}} créé avec les mêmes lignes.",
     back: "Retour",
     submit: "Dupliquer le devis",
     viewDuplicate: "Voir la copie",

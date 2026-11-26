@@ -14,6 +14,9 @@ export const translations: typeof enTranslations = {
       description: "Przegląd płatności dla Twojej firmy",
     },
     response: {
+      invoiceNumber: "Numer faktury",
+      customerName: "Klient",
+      amountDue: "Do zapłaty",
       estimates: "Oferty",
       byCurrency: "Sumy według waluty",
       openInvoices: "Otwarte faktury",
@@ -74,11 +77,25 @@ export const translations: typeof enTranslations = {
     },
   },
   companyId: {
-    label: "ID firmy",
+    label: "Firma",
     description: "Firma do wyświetlenia danych pulpitu",
     placeholder: "Wprowadź ID firmy",
   },
   widget: {
+    creditNote: "Korekta",
+    documentCountOne: "1 dokument",
+    estimateDraftOne: "1 szkic",
+    documentCount: "Dokumenty: {{count}}",
+    draftHint: "Jeszcze nie wystawione",
+    noRecentEstimatesHint:
+      "Wysłane oferty pojawią się tu razem z odpowiedzią klienta.",
+    columns: {
+      number: "Numer",
+      customer: "Klient",
+      status: "Status",
+      total: "Suma",
+      open: "Otwarte",
+    },
     unnumberedInvoice: "Faktura bez numeru",
     subtitle:
       "Faktury, oferty i rachunki wystawiane przez Ciebie. Płatności kartą i krypto są w transakcjach płatności.",

@@ -7,29 +7,29 @@ export const translations = {
     creditNote: "credit-note",
   },
   post: {
-    title: "Create Credit Note",
-    titleShort: "Credit Note",
+    title: "Create credit note",
+    titleShort: "Credit note",
     description:
       "Issue a full or partial credit for a posted invoice. The note reverses the corresponding receivable, revenue and VAT.",
     form: {
-      title: "Create Credit Note",
+      title: "Create credit note",
       description: "Issue a credit against an existing invoice",
     },
     response: {
       success: "Credit note created",
       message: "Status message",
       creditNote: {
-        title: "Credit Note",
+        title: "Credit note",
         subtitle: "Created credit note details",
-        id: "Credit Note ID",
-        invoiceId: "Original Invoice ID",
+        id: "Credit note ID",
+        invoiceId: "Original invoice ID",
         companyId: "Company ID",
         currency: "Currency",
         status: "Status",
         amount: "Amount",
         reason: "Reason",
-        createdAt: "Created At",
-        updatedAt: "Updated At",
+        createdAt: "Created at",
+        updatedAt: "Updated at",
       },
     },
     errors: {
@@ -46,19 +46,19 @@ export const translations = {
         description: "Authentication required",
       },
       validation: {
-        title: "Validation Error",
+        title: "Validation error",
         description: "Invalid parameters",
       },
       server: {
-        title: "Server Error",
+        title: "Server error",
         description: "Internal server error occurred",
       },
       unknown: {
-        title: "Unknown Error",
+        title: "Unknown error",
         description: "An unknown error occurred",
       },
       network: {
-        title: "Network Error",
+        title: "Network error",
         description: "Network error occurred",
       },
       forbidden: {
@@ -66,15 +66,15 @@ export const translations = {
         description: "Access forbidden",
       },
       notFound: {
-        title: "Not Found",
+        title: "Not found",
         description: "Invoice not found",
       },
       conflict: {
-        title: "Cannot Credit",
+        title: "Cannot credit",
         description: "Only OPEN or PAID invoices can have credit notes",
       },
       unsavedChanges: {
-        title: "Unsaved Changes",
+        title: "Unsaved changes",
         description: "There are unsaved changes",
       },
     },
@@ -107,7 +107,7 @@ export const translations = {
       issue: "Issue credit note",
       issued: "Credit note issued",
       back: "Back",
-      submit: "Create Credit Note",
+      submit: "Create credit note",
     },
   },
   invoiceId: {
@@ -126,7 +126,7 @@ export const translations = {
     placeholder: "Describe the reason for the credit",
   },
   lineItems: {
-    label: "Line Items",
+    label: "Line items",
     description:
       "Optional partial credit lines. If omitted, full credit is applied.",
     placeholder: "",

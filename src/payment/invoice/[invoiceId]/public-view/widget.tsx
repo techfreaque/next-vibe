@@ -1,10 +1,14 @@
 "use client";
 
-import { formatSimpleDate } from "next-vibe/core/i18n/core/localization-utils";
-import { Badge } from "next-vibe/ui/components/badge";
 import { Div } from "next-vibe/ui/components/div";
 import { Span } from "next-vibe/ui/components/span";
+import { StatusPill } from "next-vibe/ui/components/status-pill";
 import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
+import {
+  formatDocDate,
+  formatMoney,
+  formatQuantity,
+} from "next-vibe/unified-ui/_shared/format-money";
 import {
   useWidgetLocale,
   useWidgetTranslation,
@@ -15,22 +19,10 @@ import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-a
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 import type { JSX } from "react";
 
-import type { InvoiceStatusDB } from "../../../enum";
-import { InvoiceStatus } from "../../../enum";
+import { documentStatusVariant } from "@/finance/document-status";
+
 import { scopedTranslation as paymentScopedTranslation } from "../../../i18n";
 import type definition from "./definition";
-
-function statusVariant(
-  status: (typeof InvoiceStatusDB)[number],
-): "default" | "secondary" | "outline" | "destructive" {
-  if (status === InvoiceStatus.PAID) {
-    return "default";
-  }
-  if (status === InvoiceStatus.VOID || status === InvoiceStatus.UNCOLLECTIBLE) {
-    return "destructive";
-  }
-  return "secondary";
-}
 
 export function InvoicePublicViewWidget({
   field,
@@ -43,60 +35,81 @@ export function InvoicePublicViewWidget({
   const paymentT = paymentScopedTranslation.scopedT(locale).t;
 
   if (data?.id) {
+    const money = (amount: number | string): string =>
+      formatMoney(amount, data.currency, locale);
+    const lines = data.lines ?? [];
     return (
-      <Div className="flex flex-col gap-4">
-        <Div className="flex flex-col gap-3 p-4 rounded-lg border">
-          <Div className="flex items-center justify-between">
-            <Div className="flex flex-col gap-0.5">
+      <Div className="flex min-w-0 flex-col gap-4">
+        <Div className="flex flex-col gap-4 rounded-xl border bg-card p-5">
+          <Div className="flex flex-wrap items-start justify-between gap-3">
+            <Div className="flex min-w-0 flex-col gap-0.5">
               {data.companyName && (
-                <Span className="text-xs text-muted-foreground">
+                <Span className="text-sm text-muted-foreground">
                   {data.companyName}
                 </Span>
               )}
-              <Span className="text-base font-semibold">
-                {data.invoiceNumber ?? data.id}
+              <Span className="whitespace-nowrap text-xl font-semibold">
+                {data.invoiceNumber ?? t("get.title")}
               </Span>
             </Div>
-            <Badge variant={statusVariant(data.status)} className="text-xs">
-              {paymentT(data.status)}
-            </Badge>
+            <StatusPill
+              status={data.status}
+              variant={documentStatusVariant(data.status)}
+              label={paymentT(data.status)}
+            />
           </Div>
-
-          <Div className="flex items-baseline gap-2 mt-1">
-            <Span className="text-3xl font-mono font-bold">{data.amount}</Span>
-            <Span className="text-sm text-muted-foreground font-semibold">
-              {data.currency}
-            </Span>
+          <Div className="flex flex-wrap items-end justify-between gap-3 border-t pt-4">
+            <Div className="flex flex-col gap-0.5">
+              <Span className="text-sm text-muted-foreground">
+                {t("get.response.createdAt")}
+              </Span>
+              <Span className="text-sm">
+                {formatDocDate(data.createdAt, locale)}
+              </Span>
+              {data.dueDate && (
+                <Span className="text-sm text-muted-foreground">
+                  {`${t("get.response.dueDate")}: ${formatDocDate(data.dueDate, locale)}`}
+                </Span>
+              )}
+            </Div>
+            <Div className="ml-auto flex flex-col items-end gap-0.5">
+              <Span className="text-sm text-muted-foreground">
+                {t("get.response.amount")}
+              </Span>
+              <Span className="whitespace-nowrap text-3xl font-semibold tabular-nums">
+                {money(data.amount)}
+              </Span>
+            </Div>
           </Div>
-
-          {data.dueDate && (
-            <Span className="text-sm text-muted-foreground">
-              {t("get.response.dueDate")}:{" "}
-              {formatSimpleDate(data.dueDate, locale)}
-            </Span>
-          )}
         </Div>
 
-        {data.lines && data.lines.length > 0 && (
-          <Div className="flex flex-col gap-1 rounded-lg border overflow-hidden">
-            <Div className="grid grid-cols-4 gap-2 px-3 py-2 bg-muted/50 text-xs font-semibold text-muted-foreground">
-              <Span className="col-span-2">
-                {t("get.response.lineDescription")}
-              </Span>
+        {lines.length > 0 && (
+          <Div className="overflow-hidden rounded-xl border bg-card">
+            <Div className="hidden grid-cols-[minmax(0,1fr)_5rem_8rem_8rem] gap-3 bg-muted/40 px-4 py-2 text-xs font-medium text-muted-foreground @md:grid">
+              <Span>{t("get.response.lineDescription")}</Span>
               <Span className="text-right">{t("get.response.quantity")}</Span>
+              <Span className="text-right">{t("get.response.unitPrice")}</Span>
               <Span className="text-right">{t("get.response.lineTotal")}</Span>
             </Div>
-            {data.lines.map((line) => (
+            {lines.map((line) => (
               <Div
                 key={line.id}
-                className="grid grid-cols-4 gap-2 px-3 py-2 text-sm border-t"
+                className="grid grid-cols-[minmax(0,1fr)_auto] gap-x-3 gap-y-1 border-t px-4 py-3 text-sm first:border-t-0 @md:grid-cols-[minmax(0,1fr)_5rem_8rem_8rem] @md:first:border-t"
               >
-                <Span className="col-span-2 text-sm">{line.description}</Span>
-                <Span className="text-right text-muted-foreground">
-                  {line.quantity}
+                <Span className="font-medium [overflow-wrap:anywhere]">
+                  {line.description}
                 </Span>
-                <Span className="text-right font-mono font-semibold">
-                  {line.lineTotal}
+                <Span className="hidden text-right tabular-nums text-muted-foreground @md:block">
+                  {formatQuantity(line.quantity, locale)}
+                </Span>
+                <Span className="hidden text-right tabular-nums text-muted-foreground @md:block">
+                  {money(line.unitPrice)}
+                </Span>
+                <Span className="text-right font-semibold tabular-nums">
+                  {money(line.lineTotal)}
+                </Span>
+                <Span className="col-span-2 text-xs text-muted-foreground @md:hidden">
+                  {`${formatQuantity(line.quantity, locale)} × ${money(line.unitPrice)}`}
                 </Span>
               </Div>
             ))}
@@ -104,8 +117,10 @@ export function InvoicePublicViewWidget({
         )}
 
         {data.notes && (
-          <Div className="p-3 rounded-lg border bg-muted/30">
-            <Span className="text-xs text-muted-foreground">{data.notes}</Span>
+          <Div className="rounded-xl border bg-card p-4">
+            <Span className="whitespace-pre-line text-sm text-muted-foreground">
+              {data.notes}
+            </Span>
           </Div>
         )}
       </Div>

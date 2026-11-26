@@ -14,6 +14,9 @@ export const translations: typeof enTranslations = {
       description: "Prehľad platieb vašej firmy",
     },
     response: {
+      invoiceNumber: "Číslo faktúry",
+      customerName: "Zákazník",
+      amountDue: "Zostáva uhradiť",
       estimates: "Cenové ponuky",
       byCurrency: "Súčty podľa meny",
       openInvoices: "Otvorené faktúry",
@@ -74,11 +77,25 @@ export const translations: typeof enTranslations = {
     },
   },
   companyId: {
-    label: "ID firmy",
+    label: "Firma",
     description: "Firma, ktorej údaje sa zobrazia v prehľade",
     placeholder: "Zadajte ID firmy",
   },
   widget: {
+    creditNote: "Dobropis",
+    documentCountOne: "1 doklad",
+    estimateDraftOne: "1 koncept",
+    documentCount: "Doklady: {{count}}",
+    draftHint: "Zatiaľ nevystavené",
+    noRecentEstimatesHint:
+      "Odoslané cenové ponuky sa tu zobrazia aj s odpoveďou zákazníka.",
+    columns: {
+      number: "Číslo",
+      customer: "Zákazník",
+      status: "Stav",
+      total: "Spolu",
+      open: "Otvorené",
+    },
     unnumberedInvoice: "Faktúra bez čísla",
     subtitle:
       "Faktúry, cenové ponuky a dodávateľské faktúry. Platby kartou a kryptomenami nájdete medzi transakciami spracovateľa platieb.",

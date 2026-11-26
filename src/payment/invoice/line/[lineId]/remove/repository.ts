@@ -111,6 +111,7 @@ export class InvoiceLineRemoveRepository {
         return success({
           success: true,
           message: null,
+          invoiceId: invoice.id,
         });
       });
     } catch (error) {

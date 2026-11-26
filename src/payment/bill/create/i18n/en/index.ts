@@ -9,7 +9,7 @@ export const translations = {
     titleShort: "New supplier bill",
     description: "Record the supplier and lines, then save a draft.",
     form: {
-      title: "New Supplier Bill",
+      title: "New supplier bill",
       description: "Enter the details of the bill you received",
     },
     errors: {
@@ -21,15 +21,15 @@ export const translations = {
       expenseAccount: "Choose an active expense account from this company.",
 
       validation: {
-        title: "Validation Error",
+        title: "Validation error",
         description: "Check all fields and try again",
       },
       unauthorized: {
-        title: "Not Signed In",
+        title: "Not signed in",
         description: "Sign in to create bills",
       },
       forbidden: {
-        title: "Access Denied",
+        title: "Access denied",
         description: "You need Accountant or Admin role",
       },
       conflict: {
@@ -38,25 +38,25 @@ export const translations = {
           "A bill already uses this supplier and invoice number. Check the existing bill before creating another.",
       },
       server: {
-        title: "Server Error",
+        title: "Server error",
         description: "Could not create the bill. Try again.",
       },
       unknown: {
-        title: "Unknown Error",
+        title: "Unknown error",
         description: "An unexpected error occurred",
       },
       network: {
-        title: "Network Error",
+        title: "Network error",
         description: "Check your connection and try again",
       },
-      notFound: { title: "Not Found", description: "Resource not found" },
+      notFound: { title: "Not found", description: "Resource not found" },
       unsavedChanges: {
-        title: "Unsaved Changes",
+        title: "Unsaved changes",
         description: "You have unsaved changes",
       },
     },
     success: {
-      title: "Bill Created",
+      title: "Bill created",
       description: "Supplier bill recorded successfully",
     },
     widget: {
@@ -90,16 +90,16 @@ export const translations = {
 
       back: "Back",
       submit: "Save draft",
-      viewButton: "View Bill",
-      addAnotherButton: "Add Another",
+      viewButton: "View bill",
+      addAnotherButton: "Add another",
     },
     response: {
       id: "Bill ID",
       companyId: "Company ID",
       supplierName: "Supplier",
-      billNumber: "Bill Number",
-      billDate: "Bill Date",
-      dueDate: "Due Date",
+      billNumber: "Bill number",
+      billDate: "Bill date",
+      dueDate: "Due date",
       currency: "Currency",
       subtotal: "Subtotal",
       taxAmount: "Tax",
@@ -128,27 +128,27 @@ export const translations = {
     description: "From the supplier directory",
   },
   supplierName: {
-    label: "Supplier Name",
+    label: "Supplier name",
     description: "Name of the supplier who sent this bill",
     placeholder: "Acme GmbH",
   },
   supplierVatNumber: {
-    label: "Supplier VAT Number",
+    label: "Supplier VAT number",
     description: "Supplier VAT/tax identification number",
     placeholder: "DE123456789",
   },
   billNumber: {
-    label: "Bill Number",
+    label: "Bill number",
     description: "Supplier's invoice/bill reference number",
     placeholder: "INV-2024-001",
   },
   billDate: {
-    label: "Bill Date",
+    label: "Bill date",
     description: "Date the bill was issued",
     placeholder: "Choose bill date",
   },
   dueDate: {
-    label: "Due Date",
+    label: "Due date",
     description: "Payment due date",
     placeholder: "Choose due date",
   },

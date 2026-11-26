@@ -14,6 +14,9 @@ export const translations: typeof enTranslations = {
       description: "Resumen de pagos para su empresa",
     },
     response: {
+      invoiceNumber: "Número de factura",
+      customerName: "Cliente",
+      amountDue: "Importe pendiente",
       estimates: "Presupuestos",
       byCurrency: "Totales por moneda",
       openInvoices: "Invocaciones abiertas",
@@ -74,11 +77,25 @@ export const translations: typeof enTranslations = {
     },
   },
   companyId: {
-    label: "Company ID",
+    label: "Empresa",
     description: "La empresa para mostrar datos de panel de control",
     placeholder: "Entrar en la empresa ID",
   },
   widget: {
+    creditNote: "Nota de crédito",
+    documentCountOne: "1 documento",
+    estimateDraftOne: "1 borrador",
+    documentCount: "{{count}} documentos",
+    draftHint: "Aún sin emitir",
+    noRecentEstimatesHint:
+      "Los presupuestos enviados aparecen aquí con la respuesta del cliente.",
+    columns: {
+      number: "Número",
+      customer: "Cliente",
+      status: "Estado",
+      total: "Total",
+      open: "Pendiente",
+    },
     unnumberedInvoice: "Factura sin número",
     subtitle:
       "Facturas, presupuestos y gastos que emites. Los pagos con tarjeta y cripto están en las transacciones de pago.",

@@ -5,8 +5,8 @@ export const translations = {
     admin: "admin",
   },
   post: {
-    title: "Ensure Stripe Prices",
-    titleShort: "Stripe Prices",
+    title: "Ensure Stripe prices",
+    titleShort: "Stripe prices",
     description:
       "Create every plan and credit pack price in the connected Stripe account (per currency and language), found by lookup key. Idempotent, no price ids in .env. Dry run lists what exists and what is missing.",
     fields: {

@@ -6,31 +6,31 @@ export const translations = {
     ar: "ar",
   },
   post: {
-    title: "Duplicate Invoice",
-    titleShort: "Duplicate Invoice",
+    title: "Duplicate invoice",
+    titleShort: "Duplicate invoice",
     description:
       "Clone an existing invoice into a new DRAFT. Copies all line items, customer, company, and currency. Gets a new invoice number and today's date.",
     form: {
-      title: "Duplicate Invoice",
+      title: "Duplicate invoice",
       description: "Creates a new draft invoice from this one",
     },
     response: {
       success: "Invoice duplicated",
       message: "Status message",
       invoice: {
-        title: "New Invoice",
+        title: "New invoice",
         subtitle: "Duplicated draft invoice",
-        id: "Invoice ID",
-        companyId: "Company ID",
-        customerId: "Customer ID",
-        invoiceSequenceNumber: "Invoice Number",
+        id: "Invoice",
+        companyId: "Company",
+        customerId: "Customer",
+        invoiceSequenceNumber: "Invoice number",
         currency: "Currency",
         status: "Status",
-        dueDate: "Due Date",
+        dueDate: "Due date",
         notes: "Notes",
         amount: "Amount",
-        createdAt: "Created At",
-        updatedAt: "Updated At",
+        createdAt: "Created",
+        updatedAt: "Updated",
       },
     },
     errors: {
@@ -39,19 +39,19 @@ export const translations = {
         description: "Authentication required",
       },
       validation: {
-        title: "Validation Error",
+        title: "Validation error",
         description: "Invalid parameters",
       },
       server: {
-        title: "Server Error",
+        title: "Server error",
         description: "Internal server error occurred",
       },
       unknown: {
-        title: "Unknown Error",
+        title: "Unknown error",
         description: "An unknown error occurred",
       },
       network: {
-        title: "Network Error",
+        title: "Network error",
         description: "Network error occurred",
       },
       forbidden: {
@@ -59,7 +59,7 @@ export const translations = {
         description: "Access forbidden",
       },
       notFound: {
-        title: "Not Found",
+        title: "Not found",
         description: "Invoice not found",
       },
       conflict: {
@@ -67,7 +67,7 @@ export const translations = {
         description: "A conflict occurred",
       },
       unsavedChanges: {
-        title: "Unsaved Changes",
+        title: "Unsaved changes",
         description: "There are unsaved changes",
       },
     },
@@ -77,15 +77,21 @@ export const translations = {
     },
   },
   invoiceId: {
-    label: "Invoice ID",
+    label: "Invoice",
     description: "ID of the invoice to duplicate",
     placeholder: "Enter invoice ID",
   },
   widget: {
+    duplicate: "Duplicate",
+    cancel: "Cancel",
+    loading: "Loading invoice",
+    total: "Total",
+    duplicateNote:
+      "A new draft is created with the same customer, currency and lines. It gets its own number when you issue it.",
     back: "Back",
-    submit: "Duplicate Invoice",
+    submit: "Duplicate invoice",
     duplicated: "Invoice duplicated",
     invoiceNumber: "Invoice #",
-    viewDuplicate: "View Duplicate",
+    viewDuplicate: "Open the copy",
   },
 };

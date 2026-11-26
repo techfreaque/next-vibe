@@ -16,26 +16,26 @@ export const translations = {
         description: "Authentication required",
       },
       validation: {
-        title: "Validation Error",
+        title: "Validation error",
         description: "Invalid parameters",
       },
-      server: { title: "Server Error", description: "Internal server error" },
+      server: { title: "Server error", description: "Internal server error" },
       unknown: {
-        title: "Unknown Error",
+        title: "Unknown error",
         description: "An unknown error occurred",
       },
       network: {
-        title: "Network Error",
+        title: "Network error",
         description: "Network error occurred",
       },
       forbidden: { title: "Forbidden", description: "Access denied" },
-      notFound: { title: "Not Found", description: "Estimate not found" },
+      notFound: { title: "Not found", description: "Estimate not found" },
       conflict: {
         title: "Conflict",
         description: "Cannot perform action in current status",
       },
       unsavedChanges: {
-        title: "Unsaved Changes",
+        title: "Unsaved changes",
         description: "There are unsaved changes",
       },
     },

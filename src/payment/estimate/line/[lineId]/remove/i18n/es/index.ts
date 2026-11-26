@@ -11,7 +11,11 @@ export const translations: typeof enTranslations = {
       title: "Quitar la línea de cálculo",
       description: "Retire este artículo de línea de la estimación",
     },
-    response: { success: "Operación completada", message: "Mensaje de Estado" },
+    response: {
+      estimateId: "Presupuesto",
+      success: "Operación completada",
+      message: "Mensaje de Estado",
+    },
     errors: {
       unauthorized: {
         title: "Se requiere autenticación",
@@ -58,6 +62,7 @@ export const translations: typeof enTranslations = {
     description: "El artículo de la línea para eliminar",
   },
   widget: {
+    lineTotal: "Total de la línea",
     back: "Atrás",
     submit: "Quitar la línea",
     removed: "Tema de línea eliminado de la estimación.",

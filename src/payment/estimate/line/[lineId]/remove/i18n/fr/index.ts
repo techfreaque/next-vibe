@@ -11,7 +11,11 @@ export const translations: typeof enTranslations = {
       title: "Supprimer une ligne du devis",
       description: "Supprimer cette ligne du devis",
     },
-    response: { success: "Succès", message: "Message de statut" },
+    response: {
+      estimateId: "Devis",
+      success: "Succès",
+      message: "Message de statut",
+    },
     errors: {
       unauthorized: {
         title: "Non autorisé",
@@ -52,6 +56,7 @@ export const translations: typeof enTranslations = {
   },
   lineId: { label: "ID de la ligne", description: "La ligne à supprimer" },
   widget: {
+    lineTotal: "Total de la ligne",
     back: "Retour",
     submit: "Supprimer la ligne",
     removed: "Ligne supprimée du devis.",

@@ -1,6 +1,6 @@
 export const translations = {
   // Main checkout titles and descriptions
-  title: "Create Subscription Checkout",
+  title: "Create subscription checkout",
   titleShort: "Checkout",
   description: "Create a Stripe checkout session for subscription",
   category: "Subscription",
@@ -14,21 +14,21 @@ export const translations = {
 
   // Form configuration
   form: {
-    title: "Checkout Configuration",
+    title: "Checkout configuration",
     description: "Configure checkout session parameters",
     fields: {
       planId: {
-        label: "Subscription Plan",
+        label: "Subscription plan",
         description: "Select the subscription plan",
         placeholder: "Choose a plan",
       },
       billingInterval: {
-        label: "Billing Interval",
+        label: "Billing interval",
         description: "Select billing frequency",
         placeholder: "Choose billing interval",
       },
       provider: {
-        label: "Payment Provider",
+        label: "Payment provider",
         description: "Choose how you want to pay",
         placeholder: "Select payment provider",
       },
@@ -51,11 +51,11 @@ export const translations = {
   // Error types
   errors: {
     validation: {
-      title: "Validation Error",
+      title: "Validation error",
       description: "Invalid request parameters",
     },
     network: {
-      title: "Network Error",
+      title: "Network error",
       description: "Network connection error",
     },
     unauthorized: {
@@ -67,19 +67,19 @@ export const translations = {
       description: "Access forbidden",
     },
     notFound: {
-      title: "Not Found",
+      title: "Not found",
       description: "Resource not found",
     },
     serverError: {
-      title: "Server Error",
+      title: "Server error",
       description: "Internal server error occurred",
     },
     unknown: {
-      title: "Unknown Error",
+      title: "Unknown error",
       description: "An unknown error occurred",
     },
     unsavedChanges: {
-      title: "Unsaved Changes",
+      title: "Unsaved changes",
       description: "You have unsaved changes",
     },
     conflict: {
@@ -96,24 +96,24 @@ export const translations = {
 
   // POST endpoint specific translations
   post: {
-    title: "Create Checkout Session",
+    title: "Create checkout session",
     description: "Create a new subscription checkout session",
     form: {
-      title: "Checkout Session Configuration",
+      title: "Checkout session configuration",
       description: "Configure the checkout session parameters",
     },
     response: {
-      title: "Checkout Response",
+      title: "Checkout response",
       description: "Checkout session response data",
     },
     errors: {
       alreadySubscribed: {
         detail: "You already have an active subscription (user {{userId}})",
-        title: "Already Subscribed",
+        title: "Already subscribed",
         description: "You already have an active subscription",
       },
       validation: {
-        title: "Validation Error",
+        title: "Validation error",
         description: "Invalid checkout parameters",
         reason: {
           yearlyNotAvailable:
@@ -123,7 +123,7 @@ export const translations = {
         },
       },
       network: {
-        title: "Network Error",
+        title: "Network error",
         description: "Network connection error",
       },
       unauthorized: {
@@ -136,20 +136,20 @@ export const translations = {
       },
       notFound: {
         detail: "No account found for user {{userId}}",
-        title: "Not Found",
+        title: "Not found",
         description: "Checkout session not found",
       },
       server: {
         detail: "Checkout could not be started: {{error}}",
-        title: "Server Error",
+        title: "Server error",
         description: "Internal server error occurred",
       },
       unknown: {
-        title: "Unknown Error",
+        title: "Unknown error",
         description: "An unknown error occurred",
       },
       unsavedChanges: {
-        title: "Unsaved Changes",
+        title: "Unsaved changes",
         description: "You have unsaved changes",
       },
       conflict: {

@@ -3,8 +3,8 @@ export const translations = {
     vibeSense: "vibe-sense",
   },
   post: {
-    title: "Paid Payments",
-    titleShort: "Paid Payments",
+    title: "Paid payments",
+    titleShort: "Paid payments",
     description:
       "Collected payments per bucket: packs, new subscriptions and renewals. Succeeded or later refunded, admin accounts excluded.",
     fields: {

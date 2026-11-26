@@ -51,6 +51,10 @@ export const translations: typeof enTranslations = {
     description: "Oferta, na której wykonywana jest akcja",
   },
   widget: {
+    cancel: "Anuluj",
+    loading: "Wczytywanie oferty",
+    unavailable: "Zaakceptować można tylko wysłaną ofertę.",
+    total: "Suma",
     back: "Wróć",
     submit: "Zaakceptuj ofertę",
     accepted: "Oferta oznaczona jako zaakceptowana.",

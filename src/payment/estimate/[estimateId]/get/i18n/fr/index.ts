@@ -52,6 +52,10 @@ export const translations: typeof enTranslations = {
   },
   estimateId: { label: "ID du devis", description: "Le devis concerné" },
   widget: {
+    itemColumn: "Article",
+    lineActions: "Actions",
+    removeLine: "Retirer",
+    removeLineNamed: "Retirer la ligne {{description}}",
     send: "Marquer comme envoyé",
     terms: "Conditions",
     noItems: "Ce devis ne contient aucune ligne.",

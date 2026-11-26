@@ -4,7 +4,7 @@ export const translations = {
     dashboard: "dashboard",
   },
   get: {
-    title: "Payment Dashboard",
+    title: "Payment dashboard",
     titleShort: "Dashboard",
     description: "Overview of invoices, bills, and payment activity",
     form: {
@@ -12,6 +12,9 @@ export const translations = {
       description: "Payment overview for your company",
     },
     response: {
+      invoiceNumber: "Invoice number",
+      customerName: "Customer",
+      amountDue: "Amount due",
       estimates: "Estimates",
       byCurrency: "Totals by currency",
       openInvoices: "Open invoices",
@@ -30,11 +33,11 @@ export const translations = {
     },
     errors: {
       validation: {
-        title: "Validation Error",
+        title: "Validation error",
         description: "Invalid request parameters",
       },
       network: {
-        title: "Network Error",
+        title: "Network error",
         description: "Network connection error",
       },
       unauthorized: {
@@ -46,19 +49,19 @@ export const translations = {
         description: "Must be a member of this company",
       },
       notFound: {
-        title: "Not Found",
+        title: "Not found",
         description: "Company not found",
       },
       server: {
-        title: "Server Error",
+        title: "Server error",
         description: "Internal server error occurred",
       },
       unknown: {
-        title: "Unknown Error",
+        title: "Unknown error",
         description: "An unknown error occurred",
       },
       unsavedChanges: {
-        title: "Unsaved Changes",
+        title: "Unsaved changes",
         description: "There are unsaved changes",
       },
       conflict: {
@@ -72,11 +75,24 @@ export const translations = {
     },
   },
   companyId: {
-    label: "Company ID",
+    label: "Company",
     description: "The company to show dashboard data for",
     placeholder: "Enter company ID",
   },
   widget: {
+    creditNote: "Credit note",
+    documentCountOne: "1 document",
+    estimateDraftOne: "1 draft",
+    documentCount: "{{count}} documents",
+    draftHint: "Not issued yet",
+    noRecentEstimatesHint: "Quotes you send appear here with their answer.",
+    columns: {
+      number: "Number",
+      customer: "Customer",
+      status: "Status",
+      total: "Total",
+      open: "Open",
+    },
     unnumberedInvoice: "Unnumbered invoice",
     subtitle:
       "Invoices, estimates and bills you issue. Card and crypto checkouts live in processor transactions.",

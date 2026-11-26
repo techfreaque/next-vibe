@@ -61,6 +61,10 @@ export const translations: typeof enTranslations = {
     description: "Cenová ponuka, ktorej sa úkon týka",
   },
   widget: {
+    itemColumn: "Položka",
+    lineActions: "Akcie",
+    removeLine: "Odstrániť",
+    removeLineNamed: "Odstrániť položku {{description}}",
     send: "Označiť ako odoslanú",
     terms: "Podmienky",
     noItems: "Táto cenová ponuka neobsahuje žiadne položky.",

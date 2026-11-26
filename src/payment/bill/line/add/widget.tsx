@@ -186,10 +186,10 @@ export function BillLineAddWidget({
     return (
       <Div className="flex flex-col gap-5">
         {/* Success banner */}
-        <Div className="rounded-lg border border-green-500/30 bg-green-500/10 px-4 py-3 flex items-center gap-3">
-          <Span className="text-green-500 text-lg">✓</Span>
+        <Div className="rounded-lg border border-success/30 bg-success/10 px-4 py-3 flex items-center gap-3">
+          <Span className="text-success text-lg">✓</Span>
           <Div className="flex flex-col">
-            <Span className="text-sm font-semibold text-green-700 dark:text-green-400">
+            <Span className="text-sm font-semibold text-success">
               {t("post.success.title")}
             </Span>
             <Span className="text-xs text-muted-foreground">
@@ -263,7 +263,7 @@ export function BillLineAddWidget({
               </Span>
               <Div className="flex items-center gap-2">
                 {selectedProduct.sku ? (
-                  <Span className="text-xs font-mono text-muted-foreground">
+                  <Span className="text-xs tabular-nums text-muted-foreground">
                     {selectedProduct.sku}
                   </Span>
                 ) : null}
@@ -332,7 +332,7 @@ export function BillLineAddWidget({
                         {product.name}
                       </Span>
                       {product.sku ? (
-                        <Span className="text-xs font-mono text-muted-foreground">
+                        <Span className="text-xs tabular-nums text-muted-foreground">
                           {product.sku}
                         </Span>
                       ) : null}

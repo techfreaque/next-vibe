@@ -16,6 +16,7 @@ export const translations: typeof enTranslations = {
       description: "Supprime définitivement cette ligne de la facture",
     },
     response: {
+      invoiceId: "Facture",
       success: "Ligne supprimée",
       message: "Message d'état",
     },
@@ -68,6 +69,11 @@ export const translations: typeof enTranslations = {
     placeholder: "Saisir l'ID de ligne",
   },
   widget: {
+    lineActions: "Actions",
+    remove: "Retirer",
+    removeNamed: "Retirer la ligne {{description}}",
+    cancel: "Annuler",
+    lineTotal: "Total de la ligne",
     back: "Retour",
     submit: "Supprimer la ligne",
     warning: "Cette ligne sera définitivement supprimée de la facture.",

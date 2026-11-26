@@ -30,8 +30,8 @@ export const translations = {
     },
   },
   post: {
-    title: "Review Bill Status",
-    titleShort: "Review Bill Status",
+    title: "Review bill status",
+    titleShort: "Review bill status",
     description: "Updates the status of a draft or received supplier bill.",
     billId: { label: "Bill ID", description: "The bill to approve" },
     errors: {
@@ -43,44 +43,44 @@ export const translations = {
         "Add bill lines with a positive total and use active expense accounts from this company.",
       posting:
         "Check the bill totals, company currency, accounting period and posting accounts.",
-      validation: { title: "Validation Error", description: "Invalid bill ID" },
+      validation: { title: "Validation error", description: "Invalid bill ID" },
       unauthorized: {
-        title: "Not Signed In",
+        title: "Not signed in",
         description: "Sign in to approve bills",
       },
       forbidden: {
-        title: "Access Denied",
+        title: "Access denied",
         description: "Accountant or Admin role required",
       },
       conflict: {
-        title: "Already Approved",
+        title: "Already approved",
         description: "Bill is already approved or paid",
       },
       server: {
-        title: "Server Error",
+        title: "Server error",
         description: "Could not approve the bill",
       },
       unknown: {
-        title: "Unknown Error",
+        title: "Unknown error",
         description: "An unexpected error occurred",
       },
-      network: { title: "Network Error", description: "Check your connection" },
+      network: { title: "Network error", description: "Check your connection" },
       notFound: {
-        title: "Bill Not Found",
+        title: "Bill not found",
         description: "This bill does not exist",
       },
       unsavedChanges: {
-        title: "Unsaved Changes",
+        title: "Unsaved changes",
         description: "You have unsaved changes",
       },
     },
     success: {
-      title: "Bill Approved",
+      title: "Bill approved",
       description: "Bill status advanced successfully",
     },
     response: {
-      status: "New Status",
-      journalEntryId: "Journal Entry ID",
+      status: "New status",
+      journalEntryId: "Journal entry ID",
     },
     widget: {
       back: "Back",

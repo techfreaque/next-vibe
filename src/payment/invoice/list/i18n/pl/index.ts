@@ -116,6 +116,7 @@ export const translations: typeof enTranslations = {
     description: "Wyniki na stronie",
   },
   widget: {
+    creditNote: "Korekta",
     creditable: "Wybierz fakturę do korekty",
     noCreditable: "Brak faktur z kwotą dostępną do korekty.",
     filters: "Filtry",

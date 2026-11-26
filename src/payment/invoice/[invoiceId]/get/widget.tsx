@@ -29,14 +29,17 @@ import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-a
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 import { type JSX } from "react";
 
+import { documentLineContext } from "@/finance/document-action-confirm";
 import { DocumentLineItems } from "@/finance/document-line-items";
 import { documentStatusVariant } from "@/finance/document-status";
 import { InvoiceStatus } from "@/payment/enum";
+import invoiceDuplicateDefinitions from "@/payment/invoice/[invoiceId]/duplicate/definition";
 import invoiceRecordPaymentDefinitions from "@/payment/invoice/[invoiceId]/record-payment/definition";
 import invoiceReversePaymentDefinitions from "@/payment/invoice/[invoiceId]/reverse-payment/definition";
 import invoiceSendDefinitions from "@/payment/invoice/[invoiceId]/send/definition";
 import invoiceSendReminderDefinitions from "@/payment/invoice/[invoiceId]/send-reminder/definition";
 import invoiceVoidDefinitions from "@/payment/invoice/[invoiceId]/void/definition";
+import invoiceLineRemoveDefinitions from "@/payment/invoice/line/[lineId]/remove/definition";
 import invoiceLineAddDefinitions from "@/payment/invoice/line/add/definition";
 
 import type definition from "./definition";
@@ -158,7 +161,6 @@ export function InvoiceGetWidget({
     navigate(invoiceSendReminderDefinitions.POST, {
       urlPathParams: { invoiceId: data.id },
       renderInModal: true,
-      popNavigationOnSuccess: 1,
     });
   };
 
@@ -211,7 +213,9 @@ export function InvoiceGetWidget({
     openRelated(
       () =>
         import("../../list/definition").then((module) => module.default.GET),
-      { data: { companyId: data.companyId ?? undefined } },
+      {
+        data: { companyId: data.companyId ?? undefined },
+      },
     );
   };
 
@@ -234,6 +238,42 @@ export function InvoiceGetWidget({
 
   const { t: shareT } =
     invoiceSendDefinitions.GET.scopedTranslation.scopedT(locale);
+  const { t: duplicateT } =
+    invoiceDuplicateDefinitions.POST.scopedTranslation.scopedT(locale);
+  const { t: removeLineT } =
+    invoiceLineRemoveDefinitions.POST.scopedTranslation.scopedT(locale);
+  const canDuplicate = data.canManage && totalAmount > 0 && !isDraft;
+  const handleDuplicate = (): void => {
+    void import("./definition").then((getDef) =>
+      navigate(invoiceDuplicateDefinitions.POST, {
+        urlPathParams: { invoiceId: data.id },
+        renderInModal: true,
+        replaceOnSuccess: {
+          endpoint: getDef.default.GET,
+          getUrlPathParams: (responseData) => ({
+            invoiceId: responseData.invoice.id,
+          }),
+        },
+      }),
+    );
+  };
+  const handleRemoveLine = (line: {
+    id: string;
+    description: string;
+    lineTotal: number;
+  }): void => {
+    documentLineContext.set(line.id, {
+      number: documentNumber,
+      party: data.customerName,
+      detail: line.description,
+      amount: money(line.lineTotal),
+    });
+    navigate(invoiceLineRemoveDefinitions.POST, {
+      urlPathParams: { lineId: line.id },
+      renderInModal: true,
+      popNavigationOnSuccess: 1,
+    });
+  };
   const canShare =
     data.canManage &&
     (data.status === InvoiceStatus.OPEN || data.status === InvoiceStatus.PAID);
@@ -246,6 +286,11 @@ export function InvoiceGetWidget({
           onClick={handleAddLine}
         >
           {t("widget.addLine")}
+        </Button>
+      )}
+      {canDuplicate && (
+        <Button type="button" variant="outline" onClick={handleDuplicate}>
+          {duplicateT("widget.duplicate")}
         </Button>
       )}
       {data.canManage && isOverdue && (
@@ -442,6 +487,27 @@ export function InvoiceGetWidget({
                 total: t("widget.total"),
               }}
               money={money}
+              action={
+                isInteractive && isDraft && data.canManage
+                  ? {
+                      label: removeLineT("widget.lineActions"),
+                      render: (line): JSX.Element => (
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="ghost"
+                          className="min-h-10 self-start text-destructive"
+                          aria-label={removeLineT("widget.removeNamed", {
+                            description: line.description,
+                          })}
+                          onClick={() => handleRemoveLine(line)}
+                        >
+                          {removeLineT("widget.remove")}
+                        </Button>
+                      ),
+                    }
+                  : undefined
+              }
             />
           )}
 

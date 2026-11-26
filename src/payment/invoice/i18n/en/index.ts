@@ -14,28 +14,28 @@ export const translations = {
     titleShort: "Invoice",
     description: "Invoice endpoint",
     form: {
-      title: "Invoice Configuration",
+      title: "Invoice configuration",
       description: "Configure invoice parameters",
     },
     response: {
       success: "Invoice created successfully",
       message: "Status message",
       invoice: {
-        title: "Invoice Details",
+        title: "Invoice details",
         description: "Generated invoice information",
         id: "Invoice ID",
         userId: "User ID",
-        stripeInvoiceId: "Stripe Invoice ID",
-        invoiceNumber: "Invoice Number",
+        stripeInvoiceId: "Stripe invoice ID",
+        invoiceNumber: "Invoice number",
         amount: "Amount",
         currency: "Currency",
         status: "Status",
         invoiceUrl: "Invoice URL",
         invoicePdf: "Invoice PDF",
-        dueDate: "Due Date",
-        paidAt: "Paid At",
-        createdAt: "Created At",
-        updatedAt: "Updated At",
+        dueDate: "Due date",
+        paidAt: "Paid at",
+        createdAt: "Created at",
+        updatedAt: "Updated at",
       },
     },
     errors: {
@@ -44,20 +44,20 @@ export const translations = {
         description: "Authentication required",
       },
       validation: {
-        title: "Validation Error",
+        title: "Validation error",
         description: "Invalid request parameters",
       },
       server: {
         detail: "Could not create the invoice: {{error}}",
-        title: "Server Error",
+        title: "Server error",
         description: "Internal server error occurred",
       },
       unknown: {
-        title: "Unknown Error",
+        title: "Unknown error",
         description: "An unknown error occurred",
       },
       network: {
-        title: "Network Error",
+        title: "Network error",
         description: "Network error occurred",
       },
       forbidden: {
@@ -66,7 +66,7 @@ export const translations = {
       },
       notFound: {
         noStripeCustomer: "No Stripe customer record exists for your account",
-        title: "Not Found",
+        title: "Not found",
         description: "Resource not found",
       },
       conflict: {
@@ -74,7 +74,7 @@ export const translations = {
         description: "Data conflict occurred",
       },
       unsavedChanges: {
-        title: "Unsaved Changes",
+        title: "Unsaved changes",
         description: "There are unsaved changes",
       },
     },
@@ -110,7 +110,7 @@ export const translations = {
     placeholder: "Enter description",
   },
   dueDate: {
-    label: "Due Date",
+    label: "Due date",
     description: "Payment due date",
     placeholder: "Select due date",
   },

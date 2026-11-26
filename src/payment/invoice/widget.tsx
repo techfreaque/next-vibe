@@ -1,12 +1,14 @@
 "use client";
 
-import { Badge } from "next-vibe/ui/components/badge";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
 import { Span } from "next-vibe/ui/components/span";
+import { StatusPill } from "next-vibe/ui/components/status-pill";
 import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
+import { formatMoney } from "next-vibe/unified-ui/_shared/format-money";
 import {
+  useWidgetLocale,
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetValue,
@@ -19,22 +21,10 @@ import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-a
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 import type { JSX } from "react";
 
-import type definition from "./definition";
+import { documentStatusVariant } from "@/finance/document-status";
 
-function statusVariant(
-  status: string,
-): "default" | "secondary" | "outline" | "destructive" {
-  if (status === "PAID") {
-    return "default";
-  }
-  if (status === "OPEN") {
-    return "secondary";
-  }
-  if (status === "VOID") {
-    return "outline";
-  }
-  return "secondary";
-}
+import { scopedTranslation as paymentTranslation } from "../i18n";
+import type definition from "./definition";
 
 export function PaymentInvoiceWidget({
   field,
@@ -45,24 +35,28 @@ export function PaymentInvoiceWidget({
   const navigation = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.POST>();
   const invoice = data?.invoice;
+  const locale = useWidgetLocale();
+  const { t: paymentT } = paymentTranslation.scopedT(locale);
 
   if (invoice) {
     return (
       <Div className="flex flex-col gap-4">
-        <Div className="flex flex-col gap-2 p-4 rounded-lg border bg-emerald-50/50 dark:bg-emerald-900/10 border-emerald-200 dark:border-emerald-800">
-          <Span className="text-xs font-semibold text-emerald-700 dark:text-emerald-400 uppercase tracking-wide">
+        <Div className="flex flex-col gap-2 p-4 rounded-lg border bg-success/10 border-success/30">
+          <Span className="text-xs font-semibold text-success">
             {t("post.success.title")}
           </Span>
           <Div className="flex items-center justify-between mt-1">
-            <Span className="text-sm font-semibold font-mono">
+            <Span className="whitespace-nowrap text-sm font-semibold">
               {invoice.invoiceNumber}
             </Span>
-            <Badge variant={statusVariant(invoice.status)} className="text-xs">
-              {invoice.status}
-            </Badge>
+            <StatusPill
+              status={invoice.status}
+              variant={documentStatusVariant(invoice.status)}
+              label={paymentT(invoice.status)}
+            />
           </Div>
-          <Span className="text-2xl font-mono font-bold">
-            {invoice.amount} {invoice.currency}
+          <Span className="text-2xl font-semibold tabular-nums">
+            {formatMoney(invoice.amount, invoice.currency, locale)}
           </Span>
           {invoice.invoiceUrl && (
             <Span className="text-xs text-muted-foreground truncate">

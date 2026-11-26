@@ -473,7 +473,7 @@ export function BillGetWidget({
                   <Span className="text-muted-foreground">
                     {t("widget.subtotal")}
                   </Span>
-                  <Span className="font-mono">{money(data.subtotal)}</Span>
+                  <Span className="tabular-nums">{money(data.subtotal)}</Span>
                 </Div>
                 {data.taxAmount !== null && data.taxAmount > 0 && (
                   <Div className="flex flex-wrap justify-between gap-2">
@@ -484,7 +484,9 @@ export function BillGetWidget({
                           : "widget.tax",
                       )}
                     </Span>
-                    <Span className="font-mono">{money(data.taxAmount)}</Span>
+                    <Span className="tabular-nums">
+                      {money(data.taxAmount)}
+                    </Span>
                   </Div>
                 )}
               </>

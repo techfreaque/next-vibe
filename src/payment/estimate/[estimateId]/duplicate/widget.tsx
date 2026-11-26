@@ -1,12 +1,12 @@
 "use client";
 
-import { Button } from "next-vibe/ui/components/button";
-import { Div } from "next-vibe/ui/components/div";
-import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
-import { Span } from "next-vibe/ui/components/span";
-import { P } from "next-vibe/ui/components/typography";
+import { formatMoney } from "next-vibe/unified-ui/_shared/format-money";
 import {
+  useWidgetForm,
+  useWidgetIsInteractive,
+  useWidgetLocale,
   useWidgetNavigation,
+  useWidgetResponseOnly,
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
@@ -14,6 +14,9 @@ import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-a
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 import type { JSX } from "react";
 
+import { DocumentActionConfirm } from "@/finance/document-action-confirm";
+
+import { useEstimateActionContext } from "../get/hooks";
 import type definition from "./definition";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -23,83 +26,65 @@ export function EstimateDuplicateWidget(_props: {
   const data = useWidgetValue<typeof definition.POST>();
   const navigation = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.POST>();
+  const locale = useWidgetLocale();
+  const form = useWidgetForm<typeof definition.POST>();
+  const responseOnly = useWidgetResponseOnly();
+  const interactive = useWidgetIsInteractive() && !responseOnly;
+  const estimateId = form.watch("estimateId");
+  const newEstimateId = data?.newEstimateId;
+  const { estimate, loading } = useEstimateActionContext(
+    estimateId,
+    interactive && !newEstimateId,
+  );
 
-  const handleViewDuplicate = (): void => {
-    void (async (): Promise<void> => {
-      const def = await import("../get/definition");
+  const openCopy = (): void => {
+    if (!newEstimateId) {
+      return;
+    }
+    void import("../get/definition").then((def) =>
       navigation.push(def.default.GET, {
-        urlPathParams: { estimateId: data?.newEstimateId ?? "" },
-      });
-    })();
+        urlPathParams: { estimateId: newEstimateId },
+      }),
+    );
   };
 
-  if (data?.newEstimateId) {
-    return (
-      <Div className="flex flex-col gap-4 p-4 rounded-lg border bg-emerald-50/50 dark:bg-emerald-900/10 border-emerald-200 dark:border-emerald-800">
-        <Div className="flex flex-col gap-1">
-          <Span className="text-xs font-semibold text-emerald-700 dark:text-emerald-400 uppercase tracking-wide">
-            {t("post.success.title")}
-          </Span>
-          <Div className="flex items-center gap-2 mt-1">
-            <Span className="font-mono text-sm font-bold text-muted-foreground">
-              {data.estimateNumber}
-            </Span>
-          </Div>
-        </Div>
-        <Div className="flex gap-2">
-          <Button
-            type="button"
-            variant="default"
-            size="sm"
-            onClick={handleViewDuplicate}
-          >
-            {t("widget.viewDuplicate")}
-          </Button>
-          {navigation.canGoBack && (
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => navigation.pop()}
-            >
-              {t("widget.back")}
-            </Button>
-          )}
-        </Div>
-      </Div>
-    );
-  }
-
   return (
-    <Div className="flex flex-col gap-4">
-      {navigation.canGoBack && (
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={() => navigation.pop()}
-          className="self-start gap-1.5 -ml-1"
-        >
-          <ChevronLeft className="h-4 w-4" />
-          {t("widget.back")}
-        </Button>
-      )}
-
-      <Div className="flex flex-col gap-2">
-        <Span className="text-base font-semibold">{t("post.title")}</Span>
-        <P className="text-sm text-muted-foreground">{t("post.description")}</P>
-      </Div>
-
-      <Div className="rounded-md border px-4 py-3 bg-muted/30">
-        <P className="text-sm text-muted-foreground">
-          {t("widget.duplicateNote")}
-        </P>
-      </Div>
-
-      <FormAlertWidget field={{}} />
-      <SubmitButtonWidget<typeof definition.POST>
-        field={{ text: "widget.submit" as const }}
-      />
-    </Div>
+    <DocumentActionConfirm
+      title={t("post.title")}
+      description={t("widget.duplicateNote")}
+      backLabel={navigation.canGoBack ? t("widget.cancel") : t("widget.back")}
+      closeLabel={t("widget.back")}
+      onBack={navigation.canGoBack ? (): void => navigation.pop() : undefined}
+      context={
+        estimate
+          ? {
+              number: estimate.estimateNumber,
+              party: estimate.customerName ?? estimate.customerEmail,
+              amount: formatMoney(estimate.total, estimate.currency, locale),
+              amountLabel: t("widget.total"),
+            }
+          : null
+      }
+      loadingText={loading ? t("widget.loading") : null}
+      alert={<FormAlertWidget field={{}} />}
+      submit={
+        <SubmitButtonWidget<typeof definition.POST>
+          field={{ text: "widget.submit" as const }}
+        />
+      }
+      success={
+        newEstimateId
+          ? {
+              title: t("post.success.title"),
+              message: t("widget.created", {
+                number: data?.estimateNumber ?? "",
+              }),
+              primary: interactive
+                ? { label: t("widget.viewDuplicate"), onClick: openCopy }
+                : undefined,
+            }
+          : null
+      }
+    />
   );
 }

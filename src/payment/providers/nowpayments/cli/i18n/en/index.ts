@@ -10,7 +10,7 @@ export const translations = {
       webhook: "Webhook",
     },
     form: {
-      title: "NOWPayments Tunnel",
+      title: "NOWPayments tunnel",
       description:
         "Start an ngrok tunnel to receive NOWPayments webhooks locally",
       fields: {
@@ -30,11 +30,11 @@ export const translations = {
           "ngrok is required to start the tunnel. Install it and try again.",
       },
       validationFailed: {
-        title: "Validation Error",
+        title: "Validation error",
         description: "Invalid parameters",
       },
       networkError: {
-        title: "Network Error",
+        title: "Network error",
         description: "Network connection failed",
       },
       unauthorized: {
@@ -46,20 +46,20 @@ export const translations = {
         description: "Access denied",
       },
       notFound: {
-        title: "Not Found",
+        title: "Not found",
         description: "Resource not found",
       },
       serverError: {
         noTunnelUrl: "Could not read the ngrok tunnel URL",
-        title: "Server Error",
+        title: "Server error",
         description: "Failed to start tunnel",
       },
       unknownError: {
-        title: "Unknown Error",
+        title: "Unknown error",
         description: "An unknown error occurred",
       },
       unsavedChanges: {
-        title: "Unsaved Changes",
+        title: "Unsaved changes",
         description: "There are unsaved changes",
       },
       conflict: {
@@ -68,7 +68,7 @@ export const translations = {
       },
     },
     success: {
-      title: "Tunnel Started",
+      title: "Tunnel started",
       description: "ngrok tunnel is running",
     },
   },

@@ -11,7 +11,11 @@ export const translations: typeof enTranslations = {
       title: "Odstrániť položku cenovej ponuky",
       description: "Odstrániť túto položku z cenovej ponuky",
     },
-    response: { success: "Úspech", message: "Stavová správa" },
+    response: {
+      estimateId: "Cenová ponuka",
+      success: "Úspech",
+      message: "Stavová správa",
+    },
     errors: {
       unauthorized: {
         title: "Vyžaduje sa prihlásenie",
@@ -52,6 +56,7 @@ export const translations: typeof enTranslations = {
   },
   lineId: { label: "ID riadku", description: "Položka riadok odstrániť" },
   widget: {
+    lineTotal: "Suma položky",
     back: "Späť",
     submit: "Odstrániť riadok",
     removed: "Položka bola odstránená z cenovej ponuky.",

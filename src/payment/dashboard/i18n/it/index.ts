@@ -15,6 +15,9 @@ export const translations: typeof enTranslations = {
       description: "Panoramica dei pagamenti per la tua azienda",
     },
     response: {
+      invoiceNumber: "Numero fattura",
+      customerName: "Cliente",
+      amountDue: "Importo dovuto",
       estimates: "Preventivi",
       byCurrency: "Totali per valuta",
       openInvoices: "Fatture aperte",
@@ -75,11 +78,25 @@ export const translations: typeof enTranslations = {
     },
   },
   companyId: {
-    label: "Società ID",
+    label: "Azienda",
     description: "La società per mostrare i dati del cruscotto per",
     placeholder: "Entra in azienda ID",
   },
   widget: {
+    creditNote: "Nota di credito",
+    documentCountOne: "1 documento",
+    estimateDraftOne: "1 bozza",
+    documentCount: "{{count}} documenti",
+    draftHint: "Non ancora emesse",
+    noRecentEstimatesHint:
+      "I preventivi inviati compaiono qui con la risposta del cliente.",
+    columns: {
+      number: "Numero",
+      customer: "Cliente",
+      status: "Stato",
+      total: "Totale",
+      open: "Aperto",
+    },
     unnumberedInvoice: "Fattura senza numero",
     subtitle:
       "Fatture, preventivi e bollette che emetti. I pagamenti con carta e cripto sono nelle transazioni di pagamento.",

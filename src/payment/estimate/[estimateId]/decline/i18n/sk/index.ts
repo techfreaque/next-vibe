@@ -57,6 +57,9 @@ export const translations: typeof enTranslations = {
     description: "Cenová ponuka, ktorej sa úkon týka",
   },
   widget: {
+    loading: "Načítava sa cenová ponuka",
+    unavailable: "Odmietnuť sa dá iba odoslaná cenová ponuka.",
+    total: "Spolu",
     back: "Späť",
     submit: "Odmietnuť cenovú ponuku",
     declined: "Cenová ponuka bola označená ako odmietnutá.",

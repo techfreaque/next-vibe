@@ -84,6 +84,12 @@ export const translations: typeof enTranslations = {
     placeholder: "Rechnungs-ID eingeben",
   },
   widget: {
+    duplicate: "Duplizieren",
+    cancel: "Abbrechen",
+    loading: "Rechnung wird geladen",
+    total: "Summe",
+    duplicateNote:
+      "Es entsteht ein neuer Entwurf mit demselben Kunden, derselben Währung und denselben Positionen. Die Nummer wird beim Ausstellen vergeben.",
     back: "Zurück",
     submit: "Rechnung duplizieren",
     duplicated: "Rechnung dupliziert",

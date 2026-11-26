@@ -62,6 +62,10 @@ export const translations: typeof enTranslations = {
     description: "Cenová ponuka na skopírovanie",
   },
   widget: {
+    cancel: "Zrušiť",
+    loading: "Načítava sa cenová ponuka",
+    total: "Spolu",
+    created: "Koncept {{number}} vytvorený s rovnakými položkami.",
     back: "Späť",
     submit: "Duplikát",
     viewDuplicate: "Duplikovať zobrazenie",

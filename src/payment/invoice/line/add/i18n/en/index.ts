@@ -6,11 +6,11 @@ export const translations = {
     lines: "lines",
   },
   post: {
-    title: "Add Invoice Line",
-    titleShort: "Add Line",
+    title: "Add invoice line",
+    titleShort: "Add line",
     description: "Add a line item to a draft invoice",
     form: {
-      title: "Line Item",
+      title: "Line item",
       description: "Define the billable item to add",
     },
     response: {
@@ -18,20 +18,20 @@ export const translations = {
       message: "Status message",
       line: {
         currency: "Currency",
-        title: "Line Details",
+        title: "Line details",
         subtitle: "Created invoice line",
         id: "Line ID",
         invoiceId: "Invoice ID",
         lineDescription: "Description",
         productId: "Product ID",
         quantity: "Quantity",
-        unitPrice: "Unit Price",
-        taxRate: "Tax Rate",
-        taxAmount: "Tax Amount",
-        lineTotal: "Line Total",
-        sortOrder: "Sort Order",
-        createdAt: "Created At",
-        updatedAt: "Updated At",
+        unitPrice: "Unit price",
+        taxRate: "Tax rate",
+        taxAmount: "Tax amount",
+        lineTotal: "Line total",
+        sortOrder: "Sort order",
+        createdAt: "Created at",
+        updatedAt: "Updated at",
       },
     },
     errors: {
@@ -40,19 +40,19 @@ export const translations = {
         description: "Authentication required",
       },
       validation: {
-        title: "Validation Error",
+        title: "Validation error",
         description: "Invalid line item parameters",
       },
       server: {
-        title: "Server Error",
+        title: "Server error",
         description: "Internal server error occurred",
       },
       unknown: {
-        title: "Unknown Error",
+        title: "Unknown error",
         description: "An unknown error occurred",
       },
       network: {
-        title: "Network Error",
+        title: "Network error",
         description: "Network error occurred",
       },
       forbidden: {
@@ -60,7 +60,7 @@ export const translations = {
         description: "Access forbidden",
       },
       notFound: {
-        title: "Not Found",
+        title: "Not found",
         description: "Invoice not found",
       },
       conflict: {
@@ -68,7 +68,7 @@ export const translations = {
         description: "Invoice is not in draft status",
       },
       unsavedChanges: {
-        title: "Unsaved Changes",
+        title: "Unsaved changes",
         description: "There are unsaved changes",
       },
     },
@@ -98,12 +98,12 @@ export const translations = {
     placeholder: "1",
   },
   unitPrice: {
-    label: "Unit Price",
+    label: "Unit price",
     description: "Price per unit",
     placeholder: "0.00",
   },
   taxRate: {
-    label: "Tax Rate",
+    label: "Tax rate",
     description: "Tax rate as a decimal (e.g. 0.23 for 23%)",
     placeholder: "0.00",
   },
@@ -118,8 +118,8 @@ export const translations = {
     taxLabel: "tax",
     linePreview: "Line total",
     lineAdded: "Line added",
-    addAnotherLine: "Add Another Line",
-    viewInvoice: "View Invoice",
-    submit: "Add Line",
+    addAnotherLine: "Add another line",
+    viewInvoice: "View invoice",
+    submit: "Add line",
   },
 };

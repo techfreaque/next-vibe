@@ -51,6 +51,9 @@ export const translations: typeof enTranslations = {
     description: "Oferta, na której wykonywana jest akcja",
   },
   widget: {
+    loading: "Wczytywanie oferty",
+    unavailable: "Odrzucić można tylko wysłaną ofertę.",
+    total: "Suma",
     back: "Wróć",
     submit: "Odrzuć ofertę",
     declined: "Oferta oznaczona jako odrzucona.",

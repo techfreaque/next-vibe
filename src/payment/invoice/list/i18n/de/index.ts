@@ -116,6 +116,7 @@ export const translations: typeof enTranslations = {
     description: "Ergebnisse pro Seite",
   },
   widget: {
+    creditNote: "Gutschrift",
     creditable: "Rechnung für die Gutschrift auswählen",
     noCreditable: "Für keine Rechnung ist eine Gutschrift verfügbar.",
     filters: "Filter",

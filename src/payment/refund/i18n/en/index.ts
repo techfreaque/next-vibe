@@ -1,8 +1,8 @@
 export const translations = {
-  title: "Process Refund",
+  title: "Process refund",
   titleShort: "Refund",
   description: "Process a refund for a payment transaction",
-  category: "Payment Refunds",
+  category: "Payment refunds",
 
   tags: {
     refund: "refund",
@@ -18,7 +18,7 @@ export const translations = {
   },
 
   form: {
-    title: "Refund Form",
+    title: "Refund form",
     description: "Enter refund details",
     fields: {
       transactionId: {
@@ -27,12 +27,12 @@ export const translations = {
         placeholder: "Enter transaction ID",
       },
       amount: {
-        label: "Refund Amount",
+        label: "Refund amount",
         description: "Optional partial refund in the transaction currency",
         placeholder: "Enter amount",
       },
       reason: {
-        label: "Refund Reason",
+        label: "Refund reason",
         description: "Reason for the refund",
         placeholder: "Enter reason",
       },
@@ -70,29 +70,29 @@ export const translations = {
   },
 
   post: {
-    title: "Process Refund",
+    title: "Process refund",
     description: "Process a payment refund",
     response: {
       success: "Refund processed successfully",
       message: "Status message",
       refund: {
-        title: "Refund Details",
+        title: "Refund details",
         description: "Processed refund information",
         id: "Refund ID",
         userId: "User ID",
         transactionId: "Transaction ID",
-        stripeRefundId: "Stripe Refund ID",
-        amount: "Refund Amount",
+        stripeRefundId: "Stripe refund ID",
+        amount: "Refund amount",
         currency: "Currency",
-        status: "Refund Status",
-        reason: "Refund Reason",
-        createdAt: "Created At",
-        updatedAt: "Updated At",
+        status: "Refund status",
+        reason: "Refund reason",
+        createdAt: "Created at",
+        updatedAt: "Updated at",
       },
     },
     errors: {
       validation: {
-        title: "Validation Error",
+        title: "Validation error",
         description: "Invalid refund parameters",
         ineligible: "This transaction is ineligible for a Stripe refund.",
       },
@@ -106,22 +106,22 @@ export const translations = {
       },
       notFound: {
         detail: "No transaction found with id {{transactionId}}",
-        title: "Not Found",
+        title: "Not found",
         description: "Transaction not found",
       },
       server: {
         detail: "Could not process the refund: {{error}}",
         noPaymentIntent:
           "This transaction has no linked Stripe payment, so it cannot be refunded",
-        title: "Server Error",
+        title: "Server error",
         description: "Internal server error occurred",
       },
       network: {
-        title: "Network Error",
+        title: "Network error",
         description: "Network connection error",
       },
       unknown: {
-        title: "Unknown Error",
+        title: "Unknown error",
         description: "An unexpected error occurred",
       },
       conflict: {
@@ -129,7 +129,7 @@ export const translations = {
         description: "Refund conflict detected",
       },
       unsavedChanges: {
-        title: "Unsaved Changes",
+        title: "Unsaved changes",
         description: "There are unsaved changes",
       },
     },

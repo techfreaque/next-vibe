@@ -16,6 +16,7 @@ export const translations: typeof enTranslations = {
       description: "Entfernt diese Position dauerhaft aus der Rechnung",
     },
     response: {
+      invoiceId: "Rechnung",
       success: "Position entfernt",
       message: "Statusmeldung",
     },
@@ -68,6 +69,11 @@ export const translations: typeof enTranslations = {
     placeholder: "Positions-ID eingeben",
   },
   widget: {
+    lineActions: "Aktionen",
+    remove: "Entfernen",
+    removeNamed: "Position {{description}} entfernen",
+    cancel: "Abbrechen",
+    lineTotal: "Positionssumme",
     back: "Zurück",
     submit: "Position entfernen",
     warning: "Diese Position wird dauerhaft aus der Rechnung entfernt.",

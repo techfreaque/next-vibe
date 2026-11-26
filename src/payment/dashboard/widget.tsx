@@ -1,17 +1,23 @@
 "use client";
 
-import { Badge } from "next-vibe/ui/components/badge";
-import { Button, type ButtonMouseEvent } from "next-vibe/ui/components/button";
+import { KpiGrid, KpiTile } from "next-vibe/ui/components/analytics";
+import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
-import { AlertTriangle } from "next-vibe/ui/components/icons/AlertTriangle";
+import { EmptyBlock } from "next-vibe/ui/components/empty-block";
 import { ArrowRight } from "next-vibe/ui/components/icons/ArrowRight";
 import { FilePlus } from "next-vibe/ui/components/icons/FilePlus";
-import { Loader2 } from "next-vibe/ui/components/icons/Loader2";
+import { FileText } from "next-vibe/ui/components/icons/FileText";
+import { ListItem } from "next-vibe/ui/components/list-item";
+import { LoadingBlock } from "next-vibe/ui/components/loading-block";
+import { RecordTable } from "next-vibe/ui/components/record-table";
 import { Span } from "next-vibe/ui/components/span";
-import { H3, P } from "next-vibe/ui/components/typography";
+import { StatusPill } from "next-vibe/ui/components/status-pill";
+import { WidgetHeader } from "next-vibe/ui/components/widget-header";
 import { WidgetShell } from "next-vibe/ui/components/widget-shell";
-import { formatMoney } from "next-vibe/unified-ui/_shared/format-money";
-import { useRelatedEntityNavigation } from "next-vibe/unified-ui/_shared/related-entities";
+import {
+  formatDocDate,
+  formatMoney,
+} from "next-vibe/unified-ui/_shared/format-money";
 import {
   useWidgetIsInteractive,
   useWidgetLocale,
@@ -21,73 +27,32 @@ import {
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
-import { type JSX } from "react";
+import type { JSX } from "react";
 
-import { InvoiceStatus } from "../enum";
+import { documentStatusVariant } from "@/finance/document-status";
+
+import {
+  EstimateStatus,
+  type EstimateStatusValue,
+  InvoiceStatus,
+  type InvoiceStatusValue,
+} from "../enum";
 import { scopedTranslation as paymentTranslation } from "../i18n";
 import type definition from "./definition";
 import type { PaymentDashboardResponseOutput } from "./definition";
 
 type RecentInvoice = PaymentDashboardResponseOutput["recentInvoices"][number];
+type RecentEstimate =
+  PaymentDashboardResponseOutput["estimates"]["recent"][number];
 
-function getStatusBadgeVariant(
-  status: string,
-): "default" | "secondary" | "destructive" | "outline" {
-  switch (status) {
-    case InvoiceStatus.PAID:
-      return "default";
-    case InvoiceStatus.OPEN:
-      return "secondary";
-    case InvoiceStatus.UNCOLLECTIBLE:
-      return "destructive";
-    default:
-      return "outline";
-  }
+function customerCell(row: RecentInvoice): JSX.Element {
+  return (
+    <Span className="block max-w-64 truncate">{row.customerName ?? "-"}</Span>
+  );
 }
 
-function KpiCard({
-  label,
-  count,
-  total,
-  currency,
-  highlight,
-  amounts,
-}: {
-  label: string;
-  count: number;
-  total?: number;
-  currency: string;
-  highlight?: boolean;
-  /** Per-currency amounts, preferred over a single total when present */
-  amounts?: string;
-}): JSX.Element {
-  const locale = useWidgetLocale();
-  return (
-    <Div
-      className={`rounded-lg border p-4 flex flex-col gap-1 ${highlight ? "border-destructive bg-destructive/5" : "bg-card"}`}
-    >
-      <Div className="flex items-center gap-1.5">
-        {highlight && (
-          <AlertTriangle className="h-3.5 w-3.5 text-destructive shrink-0" />
-        )}
-        <Span
-          className={`text-xs font-medium ${highlight ? "text-destructive" : "text-muted-foreground"}`}
-        >
-          {label}
-        </Span>
-      </Div>
-      <Span
-        className={`text-2xl font-bold ${highlight ? "text-destructive" : ""}`}
-      >
-        {count}
-      </Span>
-      {total !== undefined && (
-        <Span className="text-sm tabular-nums text-muted-foreground">
-          {amounts ?? formatMoney(total, currency, locale)}
-        </Span>
-      )}
-    </Div>
-  );
+function isCreditNote(row: RecentInvoice): boolean {
+  return Number(row.amount) < 0;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -97,22 +62,17 @@ export function PaymentDashboardWidget(_props: {
   const data = useWidgetValue<typeof definition.GET>();
   const locale = useWidgetLocale();
   const { t: tPayment } = paymentTranslation.scopedT(locale);
-  const { push: navigate } = useWidgetNavigation();
+  const navigation = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.GET>();
-  const openRelated = useRelatedEntityNavigation();
   const responseOnly = useWidgetResponseOnly();
   const isInteractive = useWidgetIsInteractive() && !responseOnly;
 
-  const currency = data?.currency ?? "EUR";
-
-  const handleNavNewInvoice = (e: ButtonMouseEvent): void => {
-    e.stopPropagation();
-    void (async (): Promise<void> => {
-      const [createDef, getDef] = await Promise.all([
-        import("@/payment/invoice/create/definition"),
-        import("@/payment/invoice/[invoiceId]/get/definition"),
-      ]);
-      navigate(createDef.default.POST, {
+  const newInvoice = (): void => {
+    void Promise.all([
+      import("@/payment/invoice/create/definition"),
+      import("@/payment/invoice/[invoiceId]/get/definition"),
+    ]).then(([createDef, getDef]) =>
+      navigation.push(createDef.default.POST, {
         renderInModal: true,
         replaceOnSuccess: {
           endpoint: getDef.default.GET,
@@ -120,26 +80,16 @@ export function PaymentDashboardWidget(_props: {
             invoiceId: responseData.invoice.id,
           }),
         },
-      });
-    })();
+      }),
+    );
   };
 
-  const handleNavAllInvoices = (e: ButtonMouseEvent): void => {
-    e.stopPropagation();
-    void (async (): Promise<void> => {
-      const def = await import("@/payment/invoice/list/definition");
-      navigate(def.default.GET, {});
-    })();
-  };
-
-  const handleNavNewEstimate = (e: ButtonMouseEvent): void => {
-    e.stopPropagation();
-    void (async (): Promise<void> => {
-      const [createDef, getDef] = await Promise.all([
-        import("@/payment/estimate/create/definition"),
-        import("@/payment/estimate/[estimateId]/get/definition"),
-      ]);
-      navigate(createDef.default.POST, {
+  const newEstimate = (): void => {
+    void Promise.all([
+      import("@/payment/estimate/create/definition"),
+      import("@/payment/estimate/[estimateId]/get/definition"),
+    ]).then(([createDef, getDef]) =>
+      navigation.push(createDef.default.POST, {
         renderInModal: true,
         replaceOnSuccess: {
           endpoint: getDef.default.GET,
@@ -147,363 +97,436 @@ export function PaymentDashboardWidget(_props: {
             estimateId: responseData.estimate.id,
           }),
         },
-      });
-    })();
+      }),
+    );
   };
 
-  const handleNavAllEstimates = (e: ButtonMouseEvent): void => {
-    e.stopPropagation();
-    void (async (): Promise<void> => {
-      const def = await import("@/payment/estimate/list/definition");
-      navigate(def.default.GET, {});
-    })();
+  const openInvoices = (
+    status?: "overdue" | typeof InvoiceStatusValue,
+  ): void => {
+    void import("@/payment/invoice/list/definition").then((def) =>
+      navigation.push(def.default.GET, status ? { data: { status } } : {}),
+    );
   };
 
-  const handleNavAllBills = (e: ButtonMouseEvent): void => {
-    e.stopPropagation();
-    void (async (): Promise<void> => {
-      const def = await import("@/payment/bill/list/definition");
-      navigate(def.default.GET, {});
-    })();
+  const openEstimates = (status?: typeof EstimateStatusValue): void => {
+    void import("@/payment/estimate/list/definition").then((def) =>
+      navigation.push(def.default.GET, status ? { data: { status } } : {}),
+    );
   };
 
-  const handleViewInvoice =
-    (invoiceId: string) =>
-    (e: ButtonMouseEvent): void => {
-      e.stopPropagation();
-      void (async (): Promise<void> => {
-        const def =
-          await import("@/payment/invoice/[invoiceId]/get/definition");
-        navigate(def.default.GET, { urlPathParams: { invoiceId } });
-      })();
-    };
+  const openBills = (): void => {
+    void import("@/payment/bill/list/definition").then((def) =>
+      navigation.push(def.default.GET, {}),
+    );
+  };
 
-  const perCurrency = (
+  const openProcessor = (): void => {
+    void import("../processor/definition").then((def) =>
+      navigation.push(def.default.GET, {}),
+    );
+  };
+
+  const openInvoice = (invoiceId: string): void => {
+    void import("@/payment/invoice/[invoiceId]/get/definition").then((def) =>
+      navigation.push(def.default.GET, { urlPathParams: { invoiceId } }),
+    );
+  };
+
+  const openEstimate = (estimateId: string): void => {
+    void import("@/payment/estimate/[estimateId]/get/definition").then((def) =>
+      navigation.push(def.default.GET, { urlPathParams: { estimateId } }),
+    );
+  };
+
+  const header = (
+    <WidgetHeader
+      size="page"
+      title={t("widget.commercialDocuments")}
+      subtitle={t("widget.subtitle")}
+      actions={
+        isInteractive ? (
+          <>
+            <Button type="button" variant="outline" onClick={newEstimate}>
+              <FilePlus className="mr-1.5 h-4 w-4" />
+              {t("widget.newEstimate")}
+            </Button>
+            <Button type="button" onClick={newInvoice}>
+              <FilePlus className="mr-1.5 h-4 w-4" />
+              {t("widget.newInvoice")}
+            </Button>
+          </>
+        ) : undefined
+      }
+    />
+  );
+
+  if (!data) {
+    return (
+      <WidgetShell layout="page">
+        {header}
+        <FormAlertWidget field={{}} />
+        <LoadingBlock message={t("widget.loading")} />
+      </WidgetShell>
+    );
+  }
+
+  const currency = data.currency;
+  const otherCurrencies = (
     key: "open" | "overdue" | "unpaid",
   ): string | undefined => {
-    const amounts = data?.byCurrency
-      .filter((row) => row[key] > 0)
+    const amounts = data.byCurrency
+      .filter((row) => row.currency !== currency && row[key] > 0)
       .map((row) => formatMoney(row[key], row.currency, locale));
-    return amounts?.length ? amounts.join(" · ") : undefined;
+    return amounts.length ? `+ ${amounts.join(" + ")}` : undefined;
   };
+  const hint = (count: number, key: "open" | "overdue" | "unpaid"): string =>
+    [
+      count === 1
+        ? t("widget.documentCountOne")
+        : t("widget.documentCount", { count }),
+      otherCurrencies(key),
+    ]
+      .filter(Boolean)
+      .join(" · ");
+  const estimateAmounts = data.estimates.sentByCurrency
+    .map((row) => formatMoney(row.total, row.currency, locale))
+    .join(" + ");
+
+  const invoiceNumber = (row: RecentInvoice): string =>
+    row.invoiceNumber ??
+    (row.invoiceSequenceNumber === null
+      ? t("widget.status.draft")
+      : `#${row.invoiceSequenceNumber}`);
+  const invoiceStatus = (row: RecentInvoice): JSX.Element => (
+    <StatusPill
+      status={row.status}
+      variant={
+        row.status === InvoiceStatus.VOID
+          ? "muted"
+          : documentStatusVariant(row.status, { overdue: row.isOverdue })
+      }
+      label={
+        row.isOverdue
+          ? t("widget.overdue")
+          : isCreditNote(row) && row.status === InvoiceStatus.OPEN
+            ? t("widget.creditNote")
+            : tPayment(row.status)
+      }
+      className={`whitespace-nowrap ${row.status === InvoiceStatus.VOID ? "line-through" : ""}`}
+    />
+  );
+  const dueCell = (row: RecentInvoice): JSX.Element =>
+    row.dueDate ? (
+      <Span
+        className={
+          row.isOverdue
+            ? "whitespace-nowrap font-medium text-destructive"
+            : "whitespace-nowrap text-foreground"
+        }
+      >
+        {formatDocDate(row.dueDate, locale)}
+      </Span>
+    ) : (
+      <Span className="text-muted-foreground">-</Span>
+    );
+  const money = (amount: number, code: string, muted = false): JSX.Element => (
+    <Span
+      className={`whitespace-nowrap tabular-nums ${muted ? "text-muted-foreground" : ""}`}
+    >
+      {formatMoney(amount, code, locale)}
+    </Span>
+  );
+
+  const numberCell = (row: RecentInvoice): JSX.Element => (
+    <Span className="whitespace-nowrap font-semibold">
+      {invoiceNumber(row)}
+    </Span>
+  );
+  const openCell = (row: RecentInvoice): JSX.Element => (
+    <Span
+      className={`whitespace-nowrap tabular-nums ${row.amountDue > 0 ? (row.isOverdue ? "font-semibold text-destructive" : "font-semibold") : "text-muted-foreground"}`}
+    >
+      {formatMoney(row.amountDue, row.currency, locale)}
+    </Span>
+  );
+
+  const estimateRow = (row: RecentEstimate): JSX.Element => (
+    <ListItem
+      key={row.id}
+      className="min-h-14 rounded-none border-0 border-b last:border-b-0"
+      title={row.estimateNumber}
+      subtitle={[
+        row.customerName,
+        row.validUntil
+          ? t("widget.validUntil", {
+              date: formatDocDate(row.validUntil, locale),
+            })
+          : null,
+      ]
+        .filter(Boolean)
+        .join(" · ")}
+      badges={
+        <StatusPill
+          status={row.status}
+          variant={documentStatusVariant(row.status)}
+          label={tPayment(row.status)}
+        />
+      }
+      meta={
+        <Span className="font-semibold tabular-nums text-foreground">
+          {formatMoney(row.total, row.currency, locale)}
+        </Span>
+      }
+      onClick={isInteractive ? (): void => openEstimate(row.id) : undefined}
+    />
+  );
 
   return (
-    <WidgetShell className="min-w-0 gap-6">
-      {isInteractive && (
-        <Div className="flex flex-wrap items-center justify-between gap-3">
-          <Div className="flex min-w-0 flex-col gap-0.5">
-            <Span className="text-base font-semibold">
-              {t("widget.commercialDocuments")}
-            </Span>
-            <Span className="text-xs text-muted-foreground">
-              {t("widget.subtitle")}
-            </Span>
-          </Div>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            className="whitespace-normal"
-            onClick={() =>
-              openRelated(() =>
-                import("../processor/definition").then(
-                  (module) => module.default.GET,
-                ),
-              )
-            }
-          >
-            {t("widget.processorDiagnostics")}
-          </Button>
-        </Div>
-      )}
+    <WidgetShell layout="page">
+      {header}
       <FormAlertWidget field={{}} />
 
-      {/* Loading state */}
-      {!data && (
-        <Div className="flex items-center justify-center py-12 text-muted-foreground">
-          <Loader2 className="h-5 w-5 animate-spin mr-2" />
-          <Span className="text-sm">{t("widget.loading")}</Span>
-        </Div>
-      )}
-
-      {data && (
-        <>
-          {/* KPI Cards */}
-          <Div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
-            <KpiCard
-              label={t("widget.openInvoices")}
-              count={data.openInvoices.count}
-              total={data.openInvoices.total}
-              currency={currency}
-              amounts={perCurrency("open")}
-            />
-            <KpiCard
-              label={t("widget.overdue")}
-              count={data.overdueInvoices.count}
-              total={data.overdueInvoices.total}
-              currency={currency}
-              amounts={perCurrency("overdue")}
-              highlight={data.overdueInvoices.count > 0}
-            />
-            <KpiCard
-              label={t("widget.unpaidBills")}
-              count={data.unpaidBills.count}
-              total={data.unpaidBills.total}
-              currency={currency}
-              amounts={perCurrency("unpaid")}
-            />
-            <KpiCard
-              label={t("widget.draftInvoices")}
-              count={data.draftInvoices.count}
-              currency={currency}
-            />
-            <KpiCard
-              label={t("widget.estimatesSent")}
-              count={data.estimates.sentCount}
-              currency={currency}
-              amounts={[
-                ...(data.estimates.sentByCurrency.length > 0
-                  ? [
-                      data.estimates.sentByCurrency
-                        .map((row) =>
-                          formatMoney(row.total, row.currency, locale),
-                        )
-                        .join(" + "),
-                    ]
-                  : [formatMoney(0, currency, locale)]),
-                t("widget.estimateDrafts", {
+      <KpiGrid columns={5}>
+        <KpiTile
+          wrapLabel
+          label={t("widget.openInvoices")}
+          value={data.openInvoices.total}
+          format="currency"
+          currency={currency}
+          locale={locale}
+          hint={hint(data.openInvoices.count, "open")}
+          onClick={isInteractive ? (): void => openInvoices() : undefined}
+        />
+        <KpiTile
+          wrapLabel
+          label={t("widget.overdue")}
+          value={data.overdueInvoices.total}
+          format="currency"
+          currency={currency}
+          locale={locale}
+          tone={data.overdueInvoices.count > 0 ? "negative" : "default"}
+          hint={hint(data.overdueInvoices.count, "overdue")}
+          onClick={
+            isInteractive ? (): void => openInvoices("overdue") : undefined
+          }
+        />
+        <KpiTile
+          wrapLabel
+          label={t("widget.unpaidBills")}
+          value={data.unpaidBills.total}
+          format="currency"
+          currency={currency}
+          locale={locale}
+          hint={hint(data.unpaidBills.count, "unpaid")}
+          onClick={isInteractive ? openBills : undefined}
+        />
+        <KpiTile
+          wrapLabel
+          label={t("widget.draftInvoices")}
+          value={data.draftInvoices.count}
+          locale={locale}
+          hint={t("widget.draftHint")}
+          onClick={
+            isInteractive
+              ? (): void => openInvoices(InvoiceStatus.DRAFT)
+              : undefined
+          }
+        />
+        <KpiTile
+          wrapLabel
+          label={t("widget.estimatesSent")}
+          value={data.estimates.sentCount}
+          locale={locale}
+          hint={[
+            estimateAmounts || null,
+            data.estimates.draftCount === 1
+              ? t("widget.estimateDraftOne")
+              : t("widget.estimateDrafts", {
                   count: data.estimates.draftCount,
                 }),
-              ].join(" · ")}
-            />
-          </Div>
+          ]
+            .filter(Boolean)
+            .join(" · ")}
+          onClick={
+            isInteractive
+              ? (): void => openEstimates(EstimateStatus.SENT)
+              : undefined
+          }
+        />
+      </KpiGrid>
 
-          {/* Quick Actions */}
-          <Div className="flex flex-col gap-2">
-            <H3 className="text-sm font-semibold text-muted-foreground">
-              {t("widget.quickActions")}
-            </H3>
-            <Div className="flex flex-wrap gap-2">
+      <Div className="flex min-w-0 flex-col gap-6">
+        <Div className="flex min-w-0 flex-col gap-3">
+          <Div className="flex items-center justify-between gap-2">
+            <Span className="text-base font-semibold">
+              {t("widget.recentInvoices")}
+            </Span>
+            {isInteractive && data.recentInvoices.length > 0 && (
               <Button
                 type="button"
+                variant="ghost"
                 size="sm"
-                onClick={handleNavNewInvoice}
-                className="gap-1.5"
-              >
-                <FilePlus className="h-4 w-4" />
-                {t("widget.newInvoice")}
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={handleNavAllInvoices}
-                className="gap-1.5"
+                className="min-h-10"
+                onClick={(): void => openInvoices()}
               >
                 {t("widget.allInvoices")}
-                <ArrowRight className="h-3.5 w-3.5" />
+                <ArrowRight className="ml-1 h-3.5 w-3.5" />
               </Button>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={handleNavNewEstimate}
-                className="gap-1.5"
-              >
-                <FilePlus className="h-4 w-4" />
-                {t("widget.newEstimate")}
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={handleNavAllEstimates}
-                className="gap-1.5"
-              >
-                {t("widget.allEstimates")}
-                <ArrowRight className="h-3.5 w-3.5" />
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={handleNavAllBills}
-                className="gap-1.5"
-              >
-                {t("widget.allBills")}
-                <ArrowRight className="h-3.5 w-3.5" />
-              </Button>
-            </Div>
-          </Div>
-
-          {/* Recent Estimates */}
-          <Div className="flex flex-col gap-2">
-            <H3 className="text-sm font-semibold text-muted-foreground">
-              {t("widget.recentEstimates")}
-            </H3>
-            {data.estimates.recent.length === 0 ? (
-              <Div className="rounded-md border border-dashed px-4 py-6 text-center">
-                <P className="text-sm text-muted-foreground">
-                  {t("widget.noRecentEstimates")}
-                </P>
-              </Div>
-            ) : (
-              <Div className="flex flex-col divide-y divide-border overflow-hidden rounded-lg border">
-                {data.estimates.recent.map((estimate) => (
-                  <Div
-                    key={estimate.id}
-                    className="flex flex-wrap items-center justify-between gap-2 bg-card px-4 py-3"
-                  >
-                    <Div className="flex min-w-0 flex-col gap-0.5">
-                      <Span className="font-mono text-sm font-semibold">
-                        {estimate.estimateNumber}
-                      </Span>
-                      <Span className="text-xs text-muted-foreground">
-                        {[
-                          tPayment(estimate.status),
-                          ...(estimate.validUntil
-                            ? [
-                                t("widget.validUntil", {
-                                  date: new Date(
-                                    estimate.validUntil,
-                                  ).toLocaleDateString(locale),
-                                }),
-                              ]
-                            : []),
-                        ].join(" · ")}
-                      </Span>
-                    </Div>
-                    <Div className="flex items-center gap-3">
-                      <Span className="text-sm font-medium tabular-nums">
-                        {formatMoney(estimate.total, estimate.currency, locale)}
-                      </Span>
-                      {isInteractive && (
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          onClick={() =>
-                            openRelated(
-                              () =>
-                                import("@/payment/estimate/[estimateId]/get/definition").then(
-                                  (module) => module.default.GET,
-                                ),
-                              { urlPathParams: { estimateId: estimate.id } },
-                            )
-                          }
-                        >
-                          {t("widget.view")}
-                        </Button>
-                      )}
-                    </Div>
-                  </Div>
-                ))}
-              </Div>
             )}
           </Div>
+          {data.recentInvoices.length === 0 ? (
+            <EmptyBlock
+              icon={<FileText className="h-6 w-6" />}
+              title={t("widget.noRecentInvoices")}
+              message={t("widget.notInvoicesHint")}
+              action={
+                isInteractive
+                  ? { label: t("widget.newInvoice"), onClick: newInvoice }
+                  : undefined
+              }
+              secondaryAction={
+                isInteractive
+                  ? {
+                      label: t("widget.openTransactions"),
+                      onClick: openProcessor,
+                      variant: "ghost",
+                    }
+                  : undefined
+              }
+            />
+          ) : (
+            <RecordTable
+              label={t("widget.recentInvoices")}
+              columns={[
+                { id: "number", label: t("widget.columns.number") },
+                { id: "customer", label: t("widget.columns.customer") },
+                { id: "due", label: t("widget.due") },
+                { id: "status", label: t("widget.columns.status") },
+                {
+                  id: "total",
+                  label: t("widget.columns.total"),
+                  numeric: true,
+                },
+                { id: "open", label: t("widget.columns.open"), numeric: true },
+              ]}
+              rows={data.recentInvoices.map((row) => ({
+                id: row.id,
+                onOpen: isInteractive
+                  ? (): void => openInvoice(row.id)
+                  : undefined,
+                cells: {
+                  number: numberCell(row),
+                  customer: customerCell(row),
+                  due: dueCell(row),
+                  status: invoiceStatus(row),
+                  total: money(Number(row.amount), row.currency),
+                  open: openCell(row),
+                },
+              }))}
+              compact={
+                <Div className="overflow-hidden rounded-lg border bg-card">
+                  {data.recentInvoices.map((row) => (
+                    <ListItem
+                      key={row.id}
+                      className="min-h-14 rounded-none border-0 border-b last:border-b-0"
+                      title={row.customerName ?? invoiceNumber(row)}
+                      subtitle={[
+                        row.customerName ? invoiceNumber(row) : null,
+                        row.dueDate
+                          ? `${t("widget.due")} ${formatDocDate(row.dueDate, locale)}`
+                          : null,
+                      ]
+                        .filter(Boolean)
+                        .join(" · ")}
+                      badges={invoiceStatus(row)}
+                      meta={
+                        <Span className="font-semibold tabular-nums text-foreground">
+                          {formatMoney(
+                            Number(row.amount),
+                            row.currency,
+                            locale,
+                          )}
+                        </Span>
+                      }
+                      onClick={
+                        isInteractive
+                          ? (): void => openInvoice(row.id)
+                          : undefined
+                      }
+                    />
+                  ))}
+                </Div>
+              }
+            />
+          )}
+        </Div>
 
-          {/* Recent Invoices */}
-          <Div className="flex flex-col gap-2">
-            <H3 className="text-sm font-semibold text-muted-foreground">
-              {t("widget.recentInvoices")}
-            </H3>
-
-            {data.recentInvoices.length === 0 ? (
-              <Div className="flex flex-col items-center gap-2 rounded-md border border-dashed px-4 py-8 text-center">
-                <P className="text-sm font-medium">
-                  {t("widget.noRecentInvoices")}
-                </P>
-                <P className="max-w-prose text-sm text-muted-foreground">
-                  {t("widget.notInvoicesHint")}
-                </P>
+        <Div className="grid min-w-0 gap-6 @3xl:grid-cols-[1.6fr_1fr]">
+          <Div className="flex min-w-0 flex-col gap-3">
+            <Div className="flex items-center justify-between gap-2">
+              <Span className="text-base font-semibold">
+                {t("widget.recentEstimates")}
+              </Span>
+              {isInteractive && data.estimates.recent.length > 0 && (
                 <Button
                   type="button"
-                  variant="link"
+                  variant="ghost"
                   size="sm"
-                  onClick={() =>
-                    openRelated(() =>
-                      import("../processor/definition").then(
-                        (module) => module.default.GET,
-                      ),
-                    )
-                  }
+                  className="min-h-10"
+                  onClick={(): void => openEstimates()}
                 >
-                  {t("widget.openTransactions")}
+                  {t("widget.allEstimates")}
+                  <ArrowRight className="ml-1 h-3.5 w-3.5" />
                 </Button>
-              </Div>
+              )}
+            </Div>
+            {data.estimates.recent.length === 0 ? (
+              <EmptyBlock
+                icon={<FileText className="h-6 w-6" />}
+                title={t("widget.noRecentEstimates")}
+                message={t("widget.noRecentEstimatesHint")}
+                action={
+                  isInteractive
+                    ? { label: t("widget.newEstimate"), onClick: newEstimate }
+                    : undefined
+                }
+              />
             ) : (
-              <Div className="flex flex-col divide-y divide-border rounded-lg border overflow-hidden">
-                {data.recentInvoices.map((inv: RecentInvoice) => (
-                  <Div
-                    key={inv.id}
-                    className="flex items-center justify-between px-4 py-3 bg-card hover:bg-muted/40 transition-colors"
-                  >
-                    <Div className="flex flex-col gap-0.5 min-w-0">
-                      <Div className="flex items-center gap-2">
-                        <Span className="font-mono text-sm font-semibold">
-                          {inv.invoiceSequenceNumber === null ||
-                          inv.invoiceSequenceNumber === undefined
-                            ? t("widget.unnumberedInvoice")
-                            : `#${inv.invoiceSequenceNumber}`}
-                        </Span>
-                        {inv.isOverdue && (
-                          <Span className="text-xs font-medium text-destructive">
-                            {t("widget.overdue")}
-                          </Span>
-                        )}
-                      </Div>
-                      <Div className="flex items-center gap-3 text-xs text-muted-foreground">
-                        <Span className="font-medium tabular-nums text-foreground">
-                          {formatMoney(inv.amount, inv.currency, locale)}
-                        </Span>
-                        {inv.dueDate && (
-                          <Span>
-                            {t("widget.due")}{" "}
-                            {new Date(inv.dueDate).toLocaleDateString()}
-                          </Span>
-                        )}
-                      </Div>
-                    </Div>
-
-                    <Div className="flex items-center gap-3 shrink-0">
-                      <Badge
-                        variant={getStatusBadgeVariant(inv.status)}
-                        className={
-                          inv.status === InvoiceStatus.VOID
-                            ? "line-through text-muted-foreground"
-                            : inv.status === InvoiceStatus.OPEN && inv.isOverdue
-                              ? "border-destructive text-destructive"
-                              : ""
-                        }
-                      >
-                        {inv.status === InvoiceStatus.DRAFT
-                          ? t("widget.status.draft")
-                          : inv.status === InvoiceStatus.OPEN
-                            ? t("widget.status.open")
-                            : inv.status === InvoiceStatus.PAID
-                              ? t("widget.status.paid")
-                              : inv.status === InvoiceStatus.VOID
-                                ? t("widget.status.void")
-                                : inv.status === InvoiceStatus.UNCOLLECTIBLE
-                                  ? t("widget.status.uncollectible")
-                                  : inv.status}
-                      </Badge>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={handleViewInvoice(inv.id)}
-                      >
-                        {t("widget.view")}
-                      </Button>
-                    </Div>
-                  </Div>
-                ))}
+              <Div className="overflow-hidden rounded-lg border bg-card">
+                {data.estimates.recent.map(estimateRow)}
               </Div>
             )}
           </Div>
-        </>
-      )}
+          {isInteractive && (
+            <Div className="flex h-fit flex-col gap-2 rounded-lg border bg-card p-4">
+              <Span className="text-sm font-semibold">
+                {t("widget.quickActions")}
+              </Span>
+              <Div className="grid gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="min-h-10 justify-between"
+                  onClick={openBills}
+                >
+                  {t("widget.allBills")}
+                  <ArrowRight className="h-3.5 w-3.5" />
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="min-h-10 justify-between"
+                  onClick={openProcessor}
+                >
+                  {t("widget.processorDiagnostics")}
+                  <ArrowRight className="h-3.5 w-3.5" />
+                </Button>
+              </Div>
+            </Div>
+          )}
+        </Div>
+      </Div>
     </WidgetShell>
   );
 }

@@ -59,6 +59,10 @@ export const translations: typeof enTranslations = {
     description: "La stima per duplicare",
   },
   widget: {
+    cancel: "Annulla",
+    loading: "Caricamento del preventivo",
+    total: "Totale",
+    created: "Bozza {{number}} creata con le stesse righe.",
     back: "Indietro",
     submit: "Stime duplicate",
     viewDuplicate: "Visualizza Duplicato",

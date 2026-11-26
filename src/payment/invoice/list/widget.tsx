@@ -273,6 +273,8 @@ export function InvoiceListWidget(): JSX.Element {
             ? tDocument("documents.noReference")
             : `INV-${row.invoiceSequenceNumber}`);
         const partialPayment = row.amountPaid > 0 && row.amountDue > 0;
+        const creditNote =
+          Number(row.amount) < 0 && row.status === InvoiceStatus.OPEN;
         const badges = (
           <StatusPill
             status={
@@ -280,7 +282,9 @@ export function InvoiceListWidget(): JSX.Element {
                 ? t("widget.overdue")
                 : partialPayment
                   ? t("widget.partlyPaid")
-                  : t(row.status)
+                  : creditNote
+                    ? t("widget.creditNote")
+                    : t(row.status)
             }
             variant={documentStatusVariant(row.status, {
               overdue: row.isOverdue,

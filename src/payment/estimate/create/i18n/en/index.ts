@@ -6,11 +6,11 @@ export const translations = {
     ar: "accounts-receivable",
   },
   post: {
-    title: "Create Estimate",
-    titleShort: "Create Estimate",
+    title: "Create estimate",
+    titleShort: "Create estimate",
     description: "Create a new sales estimate or quote in draft status",
     form: {
-      title: "New Estimate",
+      title: "New estimate",
       description: "Fill in the estimate details",
     },
     response: {
@@ -21,22 +21,22 @@ export const translations = {
         subtitle: "Created estimate",
         id: "Estimate ID",
         companyId: "Company ID",
-        estimateNumber: "Estimate Number",
+        estimateNumber: "Estimate number",
         status: "Status",
         customerId: "Customer ID",
-        customerEmail: "Customer Email",
-        customerName: "Customer Name",
+        customerEmail: "Customer email",
+        customerName: "Customer name",
         currency: "Currency",
-        validUntil: "Valid Until",
+        validUntil: "Valid until",
         title_field: "Title",
         notes: "Notes",
         terms: "Terms",
         subtotal: "Subtotal",
-        taxAmount: "Tax Amount",
+        taxAmount: "Tax amount",
         total: "Total",
         invoiceId: "Invoice ID",
-        createdAt: "Created At",
-        updatedAt: "Updated At",
+        createdAt: "Created at",
+        updatedAt: "Updated at",
       },
     },
     errors: {
@@ -45,19 +45,19 @@ export const translations = {
         description: "Authentication required",
       },
       validation: {
-        title: "Validation Error",
+        title: "Validation error",
         description: "Invalid estimate parameters",
       },
       server: {
-        title: "Server Error",
+        title: "Server error",
         description: "Internal server error occurred",
       },
       unknown: {
-        title: "Unknown Error",
+        title: "Unknown error",
         description: "An unknown error occurred",
       },
       network: {
-        title: "Network Error",
+        title: "Network error",
         description: "Network error occurred",
       },
       forbidden: {
@@ -65,7 +65,7 @@ export const translations = {
         description: "Must be an admin or accountant of this company",
       },
       notFound: {
-        title: "Not Found",
+        title: "Not found",
         description: "Company not found",
       },
       conflict: {
@@ -73,7 +73,7 @@ export const translations = {
         description: "A conflict occurred",
       },
       unsavedChanges: {
-        title: "Unsaved Changes",
+        title: "Unsaved changes",
         description: "There are unsaved changes",
       },
     },
@@ -93,8 +93,8 @@ export const translations = {
       summary: "Summary",
 
       back: "Back",
-      submit: "Create Estimate",
-      viewButton: "View Estimate",
+      submit: "Create estimate",
+      viewButton: "View estimate",
     },
   },
   companyId: {
@@ -108,12 +108,12 @@ export const translations = {
     placeholder: "Enter customer ID",
   },
   customerEmail: {
-    label: "Customer Email",
+    label: "Customer email",
     description: "Customer email address",
     placeholder: "customer@example.com",
   },
   customerName: {
-    label: "Customer Name",
+    label: "Customer name",
     description: "Customer name",
     placeholder: "Enter customer name",
   },
@@ -124,7 +124,7 @@ export const translations = {
     placeholder: "Company currency",
   },
   validUntil: {
-    label: "Valid Until",
+    label: "Valid until",
     description: "Date until which this estimate is valid",
     placeholder: "Select expiry date",
   },
@@ -144,7 +144,7 @@ export const translations = {
     placeholder: "e.g. 50% upfront, 50% on delivery",
   },
   lines: {
-    label: "Line Items",
+    label: "Line items",
     description: "Items included in this estimate",
   },
 };

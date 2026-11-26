@@ -34,8 +34,8 @@ export function InvoiceSendWidget(_props: {
   const t = useWidgetTranslation<typeof definition.POST>();
   if (data?.success === true) {
     return (
-      <Div className="flex flex-col gap-4 p-4 rounded-lg border bg-emerald-50/50 dark:bg-emerald-900/10 border-emerald-200 dark:border-emerald-800">
-        <Span className="text-xs font-semibold text-emerald-700 dark:text-emerald-400 uppercase tracking-wide">
+      <Div className="flex flex-col gap-4 p-4 rounded-lg border bg-success/10 border-success/30">
+        <Span className="text-xs font-semibold text-success">
           {t("post.success.title")}
         </Span>
         <Span className="text-sm font-medium text-foreground">

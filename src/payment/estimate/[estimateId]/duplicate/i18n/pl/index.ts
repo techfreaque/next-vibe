@@ -56,6 +56,10 @@ export const translations: typeof enTranslations = {
     description: "Oferta do zduplikowania",
   },
   widget: {
+    cancel: "Anuluj",
+    loading: "Wczytywanie oferty",
+    total: "Suma",
+    created: "Utworzono szkic {{number}} z tymi samymi pozycjami.",
     back: "Wróć",
     submit: "Duplikuj ofertę",
     viewDuplicate: "Zobacz duplikat",

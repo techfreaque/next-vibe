@@ -16,6 +16,7 @@ export const translations: typeof enTranslations = {
       description: "Trvalo odstráni tento riadok z faktúry",
     },
     response: {
+      invoiceId: "Faktúra",
       success: "Položka odstránená",
       message: "Stavová správa",
     },
@@ -68,6 +69,11 @@ export const translations: typeof enTranslations = {
     placeholder: "Zadajte ID riadku",
   },
   widget: {
+    lineActions: "Akcie",
+    remove: "Odstrániť",
+    removeNamed: "Odstrániť položku {{description}}",
+    cancel: "Zrušiť",
+    lineTotal: "Suma položky",
     back: "Späť",
     submit: "Odstrániť riadok",
     warning: "Tým sa natrvalo odstráni položka riadku z faktúry.",

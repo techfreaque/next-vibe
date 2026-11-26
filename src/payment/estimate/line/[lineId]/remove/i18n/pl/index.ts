@@ -11,7 +11,11 @@ export const translations: typeof enTranslations = {
       title: "Usuń pozycję oferty",
       description: "Usuń tę pozycję z oferty",
     },
-    response: { success: "Sukces", message: "Komunikat statusu" },
+    response: {
+      estimateId: "Oferta",
+      success: "Sukces",
+      message: "Komunikat statusu",
+    },
     errors: {
       unauthorized: {
         title: "Brak autoryzacji",
@@ -48,6 +52,7 @@ export const translations: typeof enTranslations = {
   },
   lineId: { label: "ID pozycji", description: "Pozycja do usunięcia" },
   widget: {
+    lineTotal: "Wartość pozycji",
     back: "Wróć",
     submit: "Usuń pozycję",
     removed: "Pozycja usunięta z oferty.",

@@ -24,19 +24,19 @@ export const translations = {
         description: "Authentication required",
       },
       validation: {
-        title: "Validation Error",
+        title: "Validation error",
         description: "Invalid parameters",
       },
       server: {
-        title: "Server Error",
+        title: "Server error",
         description: "Internal server error occurred",
       },
       unknown: {
-        title: "Unknown Error",
+        title: "Unknown error",
         description: "An unknown error occurred",
       },
       network: {
-        title: "Network Error",
+        title: "Network error",
         description: "Network error occurred",
       },
       forbidden: {
@@ -44,16 +44,16 @@ export const translations = {
         description: "Access forbidden",
       },
       notFound: {
-        title: "Not Found",
+        title: "Not found",
         description: "Invoice not found",
       },
       conflict: {
-        title: "Not Overdue",
+        title: "Not overdue",
         description:
           "A draft requires an open invoice with an outstanding balance and a past due date.",
       },
       unsavedChanges: {
-        title: "Unsaved Changes",
+        title: "Unsaved changes",
         description: "There are unsaved changes",
       },
     },
@@ -69,7 +69,7 @@ export const translations = {
     placeholder: "Enter invoice ID",
   },
   message: {
-    label: "Custom Message",
+    label: "Custom message",
     description: "Optional custom message to include in the reminder",
     placeholder: "Add a personal note to the reminder...",
   },
@@ -84,6 +84,6 @@ export const translations = {
     submit: "Prepare reminder",
     reminderSent:
       "Saved in invoice history. The reminder is ready to share with the customer.",
-    viewInvoice: "View Invoice",
+    viewInvoice: "View invoice",
   },
 };

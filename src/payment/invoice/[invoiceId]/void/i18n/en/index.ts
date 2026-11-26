@@ -6,12 +6,12 @@ export const translations = {
     ar: "ar",
   },
   post: {
-    title: "Void Invoice",
-    titleShort: "Void Invoice",
+    title: "Void invoice",
+    titleShort: "Void invoice",
     description:
       "Cancel a draft or open invoice. Paid invoices cannot be voided. If a journal entry exists, it is reversed.",
     form: {
-      title: "Void Invoice",
+      title: "Void invoice",
       description: "This action cannot be undone.",
     },
     response: {
@@ -28,19 +28,19 @@ export const translations = {
         description: "Authentication required",
       },
       validation: {
-        title: "Validation Error",
+        title: "Validation error",
         description: "Invalid parameters",
       },
       server: {
-        title: "Server Error",
+        title: "Server error",
         description: "Internal server error occurred",
       },
       unknown: {
-        title: "Unknown Error",
+        title: "Unknown error",
         description: "An unknown error occurred",
       },
       network: {
-        title: "Network Error",
+        title: "Network error",
         description: "Network error occurred",
       },
       forbidden: {
@@ -48,15 +48,15 @@ export const translations = {
         description: "Access forbidden",
       },
       notFound: {
-        title: "Not Found",
+        title: "Not found",
         description: "Invoice not found",
       },
       conflict: {
-        title: "Cannot Void",
+        title: "Cannot void",
         description: "Paid invoices cannot be voided",
       },
       unsavedChanges: {
-        title: "Unsaved Changes",
+        title: "Unsaved changes",
         description: "There are unsaved changes",
       },
     },
@@ -82,11 +82,11 @@ export const translations = {
     cancelOnly: "The invoice will be cancelled.",
     ineligible: "Only a draft or an unpaid, unapplied invoice can be voided.",
     back: "Back",
-    submit: "Void Invoice",
+    submit: "Void invoice",
     warning:
       "This action cannot be undone. The invoice will be permanently cancelled.",
-    confirm: "Void Invoice",
+    confirm: "Void invoice",
     voided: "Invoice voided",
-    backToList: "Back to Invoices",
+    backToList: "Back to invoices",
   },
 };

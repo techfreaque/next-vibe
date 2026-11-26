@@ -84,6 +84,12 @@ export const translations: typeof enTranslations = {
     placeholder: "Wprowadź ID faktury",
   },
   widget: {
+    duplicate: "Duplikuj",
+    cancel: "Anuluj",
+    loading: "Wczytywanie faktury",
+    total: "Suma",
+    duplicateNote:
+      "Powstanie nowy szkic z tym samym klientem, walutą i pozycjami. Numer otrzyma przy wystawieniu.",
     back: "Wróć",
     submit: "Duplikuj fakturę",
     duplicated: "Faktura zduplikowana",

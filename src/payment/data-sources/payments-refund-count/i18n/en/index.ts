@@ -3,7 +3,7 @@ export const translations = {
     vibeSense: "vibe-sense",
   },
   post: {
-    title: "Refund Count",
+    title: "Refund count",
     titleShort: "Refunds",
     description:
       "Number of succeeded refunds per bucket. Admin accounts excluded.",

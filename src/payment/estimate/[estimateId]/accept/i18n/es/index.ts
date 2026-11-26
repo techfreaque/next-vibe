@@ -57,6 +57,10 @@ export const translations: typeof enTranslations = {
     description: "La estimación para actuar en",
   },
   widget: {
+    cancel: "Cancelar",
+    loading: "Cargando presupuesto",
+    unavailable: "Solo se pueden aceptar presupuestos enviados.",
+    total: "Total",
     back: "Atrás",
     submit: "Estimación",
     accepted: "Estimación marcada como aceptada.",

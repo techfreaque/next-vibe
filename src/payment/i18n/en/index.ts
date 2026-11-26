@@ -2,7 +2,7 @@ export const translations = {
   // Import sub-domain translations
   checkout: {
     // Main checkout titles and descriptions
-    title: "Create Subscription Checkout",
+    title: "Create subscription checkout",
     description: "Create a Stripe checkout session for subscription",
     category: "Subscription",
 
@@ -15,21 +15,21 @@ export const translations = {
 
     // Form configuration
     form: {
-      title: "Checkout Configuration",
+      title: "Checkout configuration",
       description: "Configure checkout session parameters",
       fields: {
         planId: {
-          label: "Subscription Plan",
+          label: "Subscription plan",
           description: "Select the subscription plan",
           placeholder: "Choose a plan",
         },
         billingInterval: {
-          label: "Billing Interval",
+          label: "Billing interval",
           description: "Select billing frequency",
           placeholder: "Choose billing interval",
         },
         provider: {
-          label: "Payment Provider",
+          label: "Payment provider",
           description: "Choose how you want to pay",
           placeholder: "Select payment provider",
         },
@@ -52,11 +52,11 @@ export const translations = {
     // Error types
     errors: {
       validation: {
-        title: "Validation Error",
+        title: "Validation error",
         description: "Invalid request parameters",
       },
       network: {
-        title: "Network Error",
+        title: "Network error",
         description: "Network connection error",
       },
       unauthorized: {
@@ -68,19 +68,19 @@ export const translations = {
         description: "Access forbidden",
       },
       notFound: {
-        title: "Not Found",
+        title: "Not found",
         description: "Resource not found",
       },
       serverError: {
-        title: "Server Error",
+        title: "Server error",
         description: "Internal server error occurred",
       },
       unknown: {
-        title: "Unknown Error",
+        title: "Unknown error",
         description: "An unknown error occurred",
       },
       unsavedChanges: {
-        title: "Unsaved Changes",
+        title: "Unsaved changes",
         description: "You have unsaved changes",
       },
       conflict: {
@@ -97,30 +97,30 @@ export const translations = {
 
     // POST endpoint specific translations
     post: {
-      title: "Create Checkout Session",
+      title: "Create checkout session",
       description: "Create a new subscription checkout session",
       form: {
-        title: "Checkout Session Configuration",
+        title: "Checkout session configuration",
         description: "Configure the checkout session parameters",
       },
       response: {
-        title: "Checkout Response",
+        title: "Checkout response",
         description: "Checkout session response data",
       },
       errors: {
         alreadySubscribed: {
-          title: "Already Subscribed",
+          title: "Already subscribed",
           description: "You already have an active subscription",
         },
         validation: {
-          title: "Validation Error",
+          title: "Validation error",
           description: "Invalid checkout parameters",
           reason: {
             enterpriseCustomPricing: "ENTERPRISE plan requires custom pricing",
           },
         },
         network: {
-          title: "Network Error",
+          title: "Network error",
           description: "Network connection error",
         },
         unauthorized: {
@@ -132,19 +132,19 @@ export const translations = {
           description: "Access forbidden",
         },
         notFound: {
-          title: "Not Found",
+          title: "Not found",
           description: "Checkout session not found",
         },
         server: {
-          title: "Server Error",
+          title: "Server error",
           description: "Internal server error occurred",
         },
         unknown: {
-          title: "Unknown Error",
+          title: "Unknown error",
           description: "An unknown error occurred",
         },
         unsavedChanges: {
-          title: "Unsaved Changes",
+          title: "Unsaved changes",
           description: "You have unsaved changes",
         },
         conflict: {
@@ -189,28 +189,28 @@ export const translations = {
       title: "Invoice",
       description: "Invoice endpoint",
       form: {
-        title: "Invoice Configuration",
+        title: "Invoice configuration",
         description: "Configure invoice parameters",
       },
       response: {
         success: "Invoice created successfully",
         message: "Status message",
         invoice: {
-          title: "Invoice Details",
+          title: "Invoice details",
           description: "Generated invoice information",
           id: "Invoice ID",
           userId: "User ID",
-          stripeInvoiceId: "Stripe Invoice ID",
-          invoiceNumber: "Invoice Number",
+          stripeInvoiceId: "Stripe invoice ID",
+          invoiceNumber: "Invoice number",
           amount: "Amount",
           currency: "Currency",
           status: "Status",
           invoiceUrl: "Invoice URL",
           invoicePdf: "Invoice PDF",
-          dueDate: "Due Date",
-          paidAt: "Paid At",
-          createdAt: "Created At",
-          updatedAt: "Updated At",
+          dueDate: "Due date",
+          paidAt: "Paid at",
+          createdAt: "Created at",
+          updatedAt: "Updated at",
         },
       },
       errors: {
@@ -219,19 +219,19 @@ export const translations = {
           description: "Authentication required",
         },
         validation: {
-          title: "Validation Error",
+          title: "Validation error",
           description: "Invalid request parameters",
         },
         server: {
-          title: "Server Error",
+          title: "Server error",
           description: "Internal server error occurred",
         },
         unknown: {
-          title: "Unknown Error",
+          title: "Unknown error",
           description: "An unknown error occurred",
         },
         network: {
-          title: "Network Error",
+          title: "Network error",
           description: "Network error occurred",
         },
         forbidden: {
@@ -239,7 +239,7 @@ export const translations = {
           description: "Access forbidden",
         },
         notFound: {
-          title: "Not Found",
+          title: "Not found",
           description: "Resource not found",
         },
         conflict: {
@@ -247,7 +247,7 @@ export const translations = {
           description: "Data conflict occurred",
         },
         unsavedChanges: {
-          title: "Unsaved Changes",
+          title: "Unsaved changes",
           description: "There are unsaved changes",
         },
       },
@@ -283,7 +283,7 @@ export const translations = {
       placeholder: "Enter description",
     },
     dueDate: {
-      label: "Due Date",
+      label: "Due date",
       description: "Payment due date",
       placeholder: "Select due date",
     },
@@ -298,10 +298,10 @@ export const translations = {
       created: "Customer portal session created successfully",
     },
     post: {
-      title: "Customer Portal",
+      title: "Customer portal",
       description: "Create customer portal session for billing management",
       form: {
-        title: "Portal Configuration",
+        title: "Portal configuration",
         description: "Configure customer portal parameters",
       },
       returnUrl: {
@@ -320,19 +320,19 @@ export const translations = {
           description: "Authentication required",
         },
         validation: {
-          title: "Validation Error",
+          title: "Validation error",
           description: "Invalid request parameters",
         },
         server: {
-          title: "Server Error",
+          title: "Server error",
           description: "Internal server error occurred",
         },
         unknown: {
-          title: "Unknown Error",
+          title: "Unknown error",
           description: "An unknown error occurred",
         },
         network: {
-          title: "Network Error",
+          title: "Network error",
           description: "Network error occurred",
         },
         forbidden: {
@@ -340,7 +340,7 @@ export const translations = {
           description: "Access forbidden",
         },
         notFound: {
-          title: "Not Found",
+          title: "Not found",
           description: "Resource not found",
         },
         conflict: {
@@ -348,7 +348,7 @@ export const translations = {
           description: "Data conflict occurred",
         },
         unsavedChanges: {
-          title: "Unsaved Changes",
+          title: "Unsaved changes",
           description: "There are unsaved changes",
         },
       },
@@ -359,9 +359,9 @@ export const translations = {
     },
   },
   refund: {
-    title: "Process Refund",
+    title: "Process refund",
     description: "Process a refund for a payment transaction",
-    category: "Payment Refunds",
+    category: "Payment refunds",
 
     tags: {
       refund: "refund",
@@ -377,7 +377,7 @@ export const translations = {
     },
 
     form: {
-      title: "Refund Form",
+      title: "Refund form",
       description: "Enter refund details",
       fields: {
         transactionId: {
@@ -386,12 +386,12 @@ export const translations = {
           placeholder: "Enter transaction ID",
         },
         amount: {
-          label: "Refund Amount",
+          label: "Refund amount",
           description: "Amount to refund (optional, defaults to full amount)",
           placeholder: "Enter amount",
         },
         reason: {
-          label: "Refund Reason",
+          label: "Refund reason",
           description: "Reason for the refund",
           placeholder: "Enter reason",
         },
@@ -404,29 +404,29 @@ export const translations = {
     },
 
     post: {
-      title: "Process Refund",
+      title: "Process refund",
       description: "Process a payment refund",
       response: {
         success: "Refund processed successfully",
         message: "Status message",
         refund: {
-          title: "Refund Details",
+          title: "Refund details",
           description: "Processed refund information",
           id: "Refund ID",
           userId: "User ID",
           transactionId: "Transaction ID",
-          stripeRefundId: "Stripe Refund ID",
-          amount: "Refund Amount",
+          stripeRefundId: "Stripe refund ID",
+          amount: "Refund amount",
           currency: "Currency",
-          status: "Refund Status",
-          reason: "Refund Reason",
-          createdAt: "Created At",
-          updatedAt: "Updated At",
+          status: "Refund status",
+          reason: "Refund reason",
+          createdAt: "Created at",
+          updatedAt: "Updated at",
         },
       },
       errors: {
         validation: {
-          title: "Validation Error",
+          title: "Validation error",
           description: "Invalid refund parameters",
         },
         unauthorized: {
@@ -438,19 +438,19 @@ export const translations = {
           description: "Permission denied",
         },
         notFound: {
-          title: "Not Found",
+          title: "Not found",
           description: "Transaction not found",
         },
         server: {
-          title: "Server Error",
+          title: "Server error",
           description: "Internal server error occurred",
         },
         network: {
-          title: "Network Error",
+          title: "Network error",
           description: "Network connection error",
         },
         unknown: {
-          title: "Unknown Error",
+          title: "Unknown error",
           description: "An unexpected error occurred",
         },
         conflict: {
@@ -458,7 +458,7 @@ export const translations = {
           description: "Refund conflict detected",
         },
         unsavedChanges: {
-          title: "Unsaved Changes",
+          title: "Unsaved changes",
           description: "There are unsaved changes",
         },
       },
@@ -470,55 +470,55 @@ export const translations = {
   },
   providers: {
     stripe: {
-      title: "Stripe CLI Integration",
+      title: "Stripe CLI integration",
       description: "Manage Stripe CLI operations and webhook listening",
-      category: "Payment Integration",
+      category: "Payment integration",
       tags: {
         stripe: "Stripe",
-        cli: "Command Line",
+        cli: "Command line",
         webhook: "Webhook",
       },
 
       operations: {
-        check: "Check Installation",
+        check: "Check installation",
         install: "Install Stripe CLI",
-        listen: "Start Webhook Listener",
+        listen: "Start webhook listener",
         login: "Login to Stripe",
-        status: "Check Status",
+        status: "Check status",
       },
 
       form: {
-        title: "Stripe CLI Configuration",
+        title: "Stripe CLI configuration",
         description: "Configure Stripe CLI operations and webhook settings",
         fields: {
           operation: {
-            label: "Operation Type",
+            label: "Operation type",
             description: "Select the Stripe CLI operation to perform",
             placeholder: "Choose an operation...",
           },
           port: {
-            label: "Port Number",
+            label: "Port number",
             description: "Port number for webhook forwarding (1000-65535)",
             placeholder: "4242",
           },
           events: {
-            label: "Webhook Events",
+            label: "Webhook events",
             description: "Select Stripe events to listen for",
             placeholder: "Select events to monitor...",
-            paymentIntentSucceeded: "Payment Intent Succeeded",
-            paymentIntentFailed: "Payment Intent Failed",
-            subscriptionCreated: "Subscription Created",
-            subscriptionUpdated: "Subscription Updated",
-            invoicePaymentSucceeded: "Invoice Payment Succeeded",
-            invoicePaymentFailed: "Invoice Payment Failed",
+            paymentIntentSucceeded: "Payment intent succeeded",
+            paymentIntentFailed: "Payment intent failed",
+            subscriptionCreated: "Subscription created",
+            subscriptionUpdated: "Subscription updated",
+            invoicePaymentSucceeded: "Invoice payment succeeded",
+            invoicePaymentFailed: "Invoice payment failed",
           },
           forwardTo: {
-            label: "Forward To URL",
+            label: "Forward to URL",
             description: "Local endpoint to forward webhook events",
             placeholder: "localhost:3000/api/webhooks/stripe",
           },
           skipSslVerify: {
-            label: "Skip SSL Verification",
+            label: "Skip SSL verification",
             description: "Skip SSL certificate verification for development",
           },
         },
@@ -547,12 +547,12 @@ export const translations = {
 
       errors: {
         validation: {
-          title: "Invalid Configuration",
+          title: "Invalid configuration",
           description:
             "Please check your Stripe CLI configuration and try again",
         },
         network: {
-          title: "Network Error",
+          title: "Network error",
           description: "Unable to connect to Stripe services",
         },
         unauthorized: {
@@ -560,65 +560,65 @@ export const translations = {
           description: "You don't have permission to perform this operation",
         },
         forbidden: {
-          title: "Access Forbidden",
+          title: "Access forbidden",
           description: "This operation is not allowed for your account",
         },
         notFound: {
-          title: "Resource Not Found",
+          title: "Resource not found",
           description: "The requested Stripe resource was not found",
         },
         serverError: {
-          title: "Server Error",
+          title: "Server error",
           description:
             "An error occurred while processing the Stripe operation",
         },
         unknown: {
-          title: "Unknown Error",
+          title: "Unknown error",
           description: "An unexpected error occurred with Stripe CLI",
         },
         customerRetrievalFailed: {
-          title: "Customer Retrieval Failed",
+          title: "Customer retrieval failed",
           description: "Failed to retrieve Stripe customer information",
         },
         unsavedChanges: {
-          title: "Unsaved Changes",
+          title: "Unsaved changes",
           description: "You have unsaved configuration changes",
         },
         conflict: {
-          title: "Operation Conflict",
+          title: "Operation conflict",
           description: "Another Stripe operation is currently in progress",
         },
         execution_failed: "Stripe CLI operation failed to execute properly",
         userNotFound: {
-          title: "User Not Found",
+          title: "User not found",
           description: "The specified user was not found",
         },
         customerCreationFailed: {
-          title: "Customer Creation Failed",
+          title: "Customer creation failed",
           description: "Failed to create Stripe customer",
         },
         checkoutCreationFailed: {
-          title: "Checkout Creation Failed",
+          title: "Checkout creation failed",
           description: "Failed to create Stripe checkout session",
         },
         webhookVerificationFailed: {
-          title: "Webhook Verification Failed",
+          title: "Webhook verification failed",
           description: "Failed to verify webhook signature",
         },
         subscriptionRetrievalFailed: {
-          title: "Subscription Retrieval Failed",
+          title: "Subscription retrieval failed",
           description: "Failed to retrieve subscription from Stripe",
         },
         subscriptionCancellationFailed: {
-          title: "Subscription Cancellation Failed",
+          title: "Subscription cancellation failed",
           description: "Failed to cancel subscription in Stripe",
         },
         priceCreationFailed: {
-          title: "Price Creation Failed",
+          title: "Price creation failed",
           description: "Failed to create price in Stripe",
         },
         notConfigured: {
-          title: "Stripe Not Configured",
+          title: "Stripe not configured",
           description:
             "Stripe is not configured - set STRIPE_SECRET_KEY in your .env",
         },
@@ -627,7 +627,7 @@ export const translations = {
       },
 
       success: {
-        title: "Operation Successful",
+        title: "Operation successful",
         description: "Stripe CLI operation completed successfully",
       },
 
@@ -651,7 +651,7 @@ export const translations = {
         windows: {
           title: "Windows:",
           scoop: {
-            title: "Using Scoop",
+            title: "Using scoop",
           },
           github: {
             title: "Or download directly from GitHub releases:",
@@ -685,7 +685,7 @@ export const translations = {
             status: "Status",
           },
           form: {
-            title: "NOWPayments CLI Operations",
+            title: "NOWPayments CLI operations",
             description:
               "Configure and manage ngrok tunnel for NOWPayments webhooks",
             fields: {
@@ -703,11 +703,11 @@ export const translations = {
           },
           errors: {
             validationFailed: {
-              title: "Validation Error",
+              title: "Validation error",
               description: "Invalid operation or parameters",
             },
             networkError: {
-              title: "Network Error",
+              title: "Network error",
               description: "Network connection failed",
             },
             unauthorized: {
@@ -719,19 +719,19 @@ export const translations = {
               description: "Access denied",
             },
             notFound: {
-              title: "Not Found",
+              title: "Not found",
               description: "Resource not found",
             },
             serverError: {
-              title: "Server Error",
+              title: "Server error",
               description: "Failed to execute operation",
             },
             unknownError: {
-              title: "Unknown Error",
+              title: "Unknown error",
               description: "An unknown error occurred",
             },
             unsavedChanges: {
-              title: "Unsaved Changes",
+              title: "Unsaved changes",
               description: "There are unsaved changes",
             },
             conflict: {
@@ -762,67 +762,67 @@ export const translations = {
 
       errors: {
         userNotFound: {
-          title: "User Not Found",
+          title: "User not found",
           description: "The specified user could not be found",
         },
         customerCreationFailed: {
-          title: "Customer Creation Failed",
+          title: "Customer creation failed",
           description: "Failed to ensure NOWPayments customer: {error}",
         },
         productNotFound: {
-          title: "Product Not Found",
+          title: "Product not found",
           description: "The specified product could not be found: {productId}",
         },
         userEmailRequired: {
-          title: "User Email Required",
+          title: "User email required",
           description: "User email is required for subscriptions: {userId}",
         },
         checkoutCreationFailed: {
-          title: "Checkout Creation Failed",
+          title: "Checkout creation failed",
           description: "Failed to create NOWPayments checkout session: {error}",
         },
         invoiceCreationFailed: {
-          title: "Invoice Creation Failed",
+          title: "Invoice creation failed",
           description: "Failed to create NOWPayments invoice: {error}",
         },
         invalidApiKey: {
-          title: "Invalid API Key",
+          title: "Invalid API key",
           description:
             "Invalid NOWPayments API key. Please check your configuration and ensure you have a valid API key from https://nowpayments.io/app/dashboard",
         },
         planCreationFailed: {
-          title: "Plan Creation Failed",
+          title: "Plan creation failed",
           description:
             "Failed to create NOWPayments subscription plan: {error}",
         },
         subscriptionCreationFailed: {
-          title: "Subscription Creation Failed",
+          title: "Subscription creation failed",
           description: "Failed to create NOWPayments subscription: {error}",
         },
         subscriptionRetrievalFailed: {
-          title: "Subscription Retrieval Failed",
+          title: "Subscription retrieval failed",
           description: "Failed to retrieve NOWPayments subscription: {error}",
         },
         subscriptionCancellationFailed: {
-          title: "Subscription Cancellation Failed",
+          title: "Subscription cancellation failed",
           description: "Failed to cancel NOWPayments subscription: {error}",
         },
         subscriptionListFailed: {
-          title: "Subscription List Failed",
+          title: "Subscription list failed",
           description: "Failed to list NOWPayments subscriptions: {error}",
         },
         notConfigured: {
-          title: "NOWPayments Not Configured",
+          title: "NOWPayments not configured",
           description:
             "NOWPayments is not configured - set NOWPAYMENTS_API_KEY and NOWPAYMENTS_IPN_SECRET in your .env",
         },
         webhookVerificationFailed: {
-          title: "Webhook Verification Failed",
+          title: "Webhook verification failed",
           description:
             "Failed to verify NOWPayments webhook signature: {error}",
         },
         paymentStatusFailed: {
-          title: "Payment Status Retrieval Failed",
+          title: "Payment status retrieval failed",
           description:
             "Failed to retrieve payment status from NOWPayments: {error}",
         },
@@ -830,15 +830,15 @@ export const translations = {
 
       success: {
         invoiceCreated: {
-          title: "Invoice Created",
+          title: "Invoice created",
           description: "NOWPayments invoice created successfully",
         },
         webhookVerified: {
-          title: "Webhook Verified",
+          title: "Webhook verified",
           description: "NOWPayments webhook verified successfully",
         },
         paymentStatusRetrieved: {
-          title: "Payment Status Retrieved",
+          title: "Payment status retrieved",
           description: "NOWPayments payment status retrieved successfully",
         },
       },
@@ -850,7 +850,7 @@ export const translations = {
 
   // Main form configuration
   form: {
-    title: "Payment Configuration",
+    title: "Payment configuration",
     description: "Configure payment parameters",
   },
 
@@ -866,15 +866,15 @@ export const translations = {
 
   // Create payment endpoint
   create: {
-    title: "Create Payment Session",
-    titleShort: "Create Session",
+    title: "Create payment session",
+    titleShort: "Create session",
     description: "Create a new payment session with Stripe",
     form: {
-      title: "Payment Configuration",
+      title: "Payment configuration",
       description: "Configure payment session parameters",
     },
     paymentMethodTypes: {
-      label: "Payment Methods",
+      label: "Payment methods",
       description: "Select accepted payment methods",
     },
     successUrl: {
@@ -888,7 +888,7 @@ export const translations = {
       placeholder: "https://example.com/cancel",
     },
     customerEmail: {
-      label: "Customer Email",
+      label: "Customer email",
       description: "Customer email address for the payment",
       placeholder: "customer@example.com",
     },
@@ -901,11 +901,11 @@ export const translations = {
     },
     errors: {
       validation: {
-        title: "Validation Error",
+        title: "Validation error",
         description: "Invalid payment parameters",
       },
       internal: {
-        title: "Internal Error",
+        title: "Internal error",
         description: "An internal error occurred",
       },
       unauthorized: {
@@ -918,26 +918,26 @@ export const translations = {
       },
       notFound: {
         detail: "No account found for user {{userId}}",
-        title: "Not Found",
+        title: "Not found",
         description: "Payment session not found",
       },
       server: {
         detail: "Could not create the payment session: {{error}}",
         stripeNotConfigured:
           "Stripe is not set up yet. Add STRIPE_SECRET_KEY to your environment.",
-        title: "Server Error",
+        title: "Server error",
         description: "Internal server error occurred",
       },
       network: {
-        title: "Network Error",
+        title: "Network error",
         description: "Network connection error",
       },
       unknown: {
-        title: "Unknown Error",
+        title: "Unknown error",
         description: "An unexpected error occurred",
       },
       unsavedChanges: {
-        title: "Unsaved Changes",
+        title: "Unsaved changes",
         description: "There are unsaved changes",
       },
       conflict: {
@@ -966,7 +966,7 @@ export const translations = {
       amountUnavailable: "Amount unavailable",
     },
     form: {
-      title: "Payment Query",
+      title: "Payment query",
       description: "Query payment information",
     },
     response: {
@@ -979,11 +979,11 @@ export const translations = {
     },
     errors: {
       validation: {
-        title: "Validation Error",
+        title: "Validation error",
         description: "Invalid query parameters",
       },
       internal: {
-        title: "Internal Error",
+        title: "Internal error",
         description: "An internal error occurred",
       },
       unauthorized: {
@@ -995,24 +995,24 @@ export const translations = {
         description: "Permission denied",
       },
       notFound: {
-        title: "Not Found",
+        title: "Not found",
         description: "Payment information not found",
       },
       server: {
         detail: "Could not load your payment information: {{error}}",
-        title: "Server Error",
+        title: "Server error",
         description: "Internal server error occurred",
       },
       network: {
-        title: "Network Error",
+        title: "Network error",
         description: "Network connection error",
       },
       unknown: {
-        title: "Unknown Error",
+        title: "Unknown error",
         description: "An unexpected error occurred",
       },
       unsavedChanges: {
-        title: "Unsaved Changes",
+        title: "Unsaved changes",
         description: "There are unsaved changes",
       },
       conflict: {
@@ -1029,11 +1029,11 @@ export const translations = {
   // Top-level error handling
   errors: {
     validation: {
-      title: "Validation Error",
+      title: "Validation error",
       description: "Invalid payment parameters",
     },
     notFound: {
-      title: "Not Found",
+      title: "Not found",
       description: "Payment not found",
     },
     unauthorized: {
@@ -1047,19 +1047,19 @@ export const translations = {
     },
     server: {
       detail: "Payment webhook could not be processed: {{error}}",
-      title: "Server Error",
+      title: "Server error",
       description: "Internal server error occurred",
     },
     network: {
-      title: "Network Error",
+      title: "Network error",
       description: "Network connection error",
     },
     unknown: {
-      title: "Unknown Error",
+      title: "Unknown error",
       description: "An unexpected error occurred",
     },
     unsavedChanges: {
-      title: "Unsaved Changes",
+      title: "Unsaved changes",
       description: "There are unsaved changes",
     },
     conflict: {
@@ -1067,7 +1067,7 @@ export const translations = {
       description: "Payment conflict detected",
     },
     notImplemented: {
-      title: "Not Implemented",
+      title: "Not implemented",
       description: "This payment provider feature is not yet implemented",
     },
     customerCreationFailed: "Failed to create Stripe customer",
@@ -1100,7 +1100,7 @@ export const translations = {
     pln: "Polish Zloty (PLN)",
   },
   mode: {
-    label: "Payment Mode",
+    label: "Payment mode",
     description: "Type of payment session",
     placeholder: "Select payment mode",
   },
@@ -1145,7 +1145,7 @@ export const translations = {
     placeholder: "price_1234567890",
   },
   provider: {
-    label: "Payment Provider",
+    label: "Payment provider",
     description: "Choose your payment method",
     placeholder: "Select payment provider",
   },
@@ -1166,18 +1166,18 @@ export const translations = {
     },
     paymentMethodType: {
       card: "Credit/Debit Card",
-      bankTransfer: "Bank Transfer",
+      bankTransfer: "Bank transfer",
       paypal: "PayPal",
-      applePay: "Apple Pay",
-      googlePay: "Google Pay",
-      sepaDebit: "SEPA Direct Debit",
+      applePay: "Apple pay",
+      googlePay: "Google pay",
+      sepaDebit: "SEPA direct debit",
     },
     paymentIntentStatus: {
-      requiresPaymentMethod: "Requires Payment Method",
-      requiresConfirmation: "Requires Confirmation",
-      requiresAction: "Requires Action",
+      requiresPaymentMethod: "Requires payment method",
+      requiresConfirmation: "Requires confirmation",
+      requiresAction: "Requires action",
       processing: "Processing",
-      requiresCapture: "Requires Capture",
+      requiresCapture: "Requires capture",
       canceled: "Canceled",
       succeeded: "Succeeded",
     },
@@ -1196,9 +1196,9 @@ export const translations = {
       warningNeedsResponse: "Warning - Needs Response",
       warningUnderReview: "Warning - Under Review",
       warningClosed: "Warning - Closed",
-      needsResponse: "Needs Response",
-      underReview: "Under Review",
-      chargeRefunded: "Charge Refunded",
+      needsResponse: "Needs response",
+      underReview: "Under review",
+      chargeRefunded: "Charge refunded",
       won: "Won",
       lost: "Lost",
     },
@@ -1212,7 +1212,7 @@ export const translations = {
     taxStatus: {
       complete: "Complete",
       failed: "Failed",
-      requiresLocation: "Requires Location",
+      requiresLocation: "Requires location",
     },
     paymentInterval: {
       month: "Monthly",
@@ -1221,7 +1221,7 @@ export const translations = {
     },
     manualPaymentMethod: {
       cash: "Cash",
-      bankTransfer: "Bank Transfer",
+      bankTransfer: "Bank transfer",
       other: "Other",
     },
     billStatus: {

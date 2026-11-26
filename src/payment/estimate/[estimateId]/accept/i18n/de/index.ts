@@ -54,6 +54,10 @@ export const translations: typeof enTranslations = {
     description: "Das Angebot, auf das die Aktion angewendet wird",
   },
   widget: {
+    cancel: "Abbrechen",
+    loading: "Angebot wird geladen",
+    unavailable: "Nur versendete Angebote können angenommen werden.",
+    total: "Summe",
     back: "Zurück",
     submit: "Angebot annehmen",
     accepted: "Angebot als angenommen markiert.",

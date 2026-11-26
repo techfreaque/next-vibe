@@ -116,6 +116,7 @@ export const translations: typeof enTranslations = {
     description: "Počet výsledkov na strane",
   },
   widget: {
+    creditNote: "Dobropis",
     creditable: "Vyberte faktúru na dobropis",
     noCreditable: "Žiadna faktúra nemá sumu, ktorú možno dobropisovať.",
     filters: "Filtre",

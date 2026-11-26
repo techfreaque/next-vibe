@@ -16,6 +16,7 @@ import {
 } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
+import { users } from "next-vibe/identity/user/db";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { companies } from "@/companies/db";
@@ -178,6 +179,7 @@ export class PaymentDashboardRepository {
             .select({
               id: paymentEstimates.id,
               estimateNumber: paymentEstimates.estimateNumber,
+              customerName: paymentEstimates.customerName,
               status: paymentEstimates.status,
               total: paymentEstimates.total,
               currency: paymentEstimates.currency,
@@ -203,10 +205,21 @@ export class PaymentDashboardRepository {
       };
 
       // Recent invoices (last 5, any status)
+      const customerId = sql<string | null>`case
+        when jsonb_typeof(${paymentInvoices.metadata}->'customerId') = 'string'
+        then ${paymentInvoices.metadata}->>'customerId'
+      end`;
       const recentRows = await db
         .select({
           id: paymentInvoices.id,
+          invoiceNumber: paymentInvoices.invoiceNumber,
           invoiceSequenceNumber: paymentInvoices.invoiceSequenceNumber,
+          customerName: sql<string | null>`coalesce(
+            nullif(btrim(${users.publicName}), ''),
+            nullif(btrim(${users.privateName}), ''),
+            case when jsonb_typeof(${paymentInvoices.metadata}->'customerName') = 'string'
+              then nullif(btrim(${paymentInvoices.metadata}->>'customerName'), '') end
+          )`,
           currency: paymentInvoices.currency,
           status: paymentInvoices.status,
           amount: paymentInvoices.amount,
@@ -217,16 +230,26 @@ export class PaymentDashboardRepository {
         .from(paymentInvoices)
         .leftJoin(payments, paymentJoin)
         .leftJoin(credits, creditJoin)
+        .leftJoin(users, sql`${users.id}::text = ${customerId}`)
         .where(eq(paymentInvoices.companyId, data.companyId))
-        .orderBy(sql`${paymentInvoices.createdAt} DESC`)
+        .orderBy(
+          sql`${paymentInvoices.createdAt} DESC`,
+          sql`${paymentInvoices.id} DESC`,
+        )
         .limit(5);
 
       const recentInvoices = recentRows.map((row) => ({
         id: row.id,
+        invoiceNumber: row.invoiceNumber ?? null,
         invoiceSequenceNumber: row.invoiceSequenceNumber ?? null,
+        customerName: row.customerName ?? null,
         currency: row.currency,
         status: row.status,
         amount: row.amount,
+        amountDue:
+          row.status === InvoiceStatus.OPEN
+            ? Math.max(0, Number(row.openAmount))
+            : 0,
         dueDate: row.dueDate ?? null,
         isOverdue:
           row.status === InvoiceStatus.OPEN &&

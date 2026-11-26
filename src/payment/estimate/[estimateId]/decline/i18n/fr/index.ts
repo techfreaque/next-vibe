@@ -51,6 +51,9 @@ export const translations: typeof enTranslations = {
   },
   estimateId: { label: "ID du devis", description: "Le devis concerné" },
   widget: {
+    loading: "Chargement du devis",
+    unavailable: "Seuls les devis envoyés peuvent être refusés.",
+    total: "Total",
     back: "Retour",
     submit: "Refuser le devis",
     declined: "Devis marqué comme refusé.",

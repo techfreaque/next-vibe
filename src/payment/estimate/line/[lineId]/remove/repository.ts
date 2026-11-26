@@ -117,6 +117,7 @@ export class EstimateLineRemoveRepository {
         return success({
           success: true,
           message: null,
+          estimateId: estimate.id,
         });
       });
     } catch (error) {

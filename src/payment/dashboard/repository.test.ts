@@ -33,7 +33,7 @@ it("keeps dashboard amounts separated by currency and excludes bills already pai
       );
       CREATE TABLE payment_invoices (
         id uuid DEFAULT gen_random_uuid(), company_id uuid, currency text, status text,
-        amount numeric(10,2), invoice_sequence_number int, due_date timestamp,
+        amount numeric(10,2), invoice_number text, invoice_sequence_number int, due_date timestamp,
         metadata jsonb, created_at timestamp DEFAULT now()
       );
       CREATE TABLE account_nodes (id uuid PRIMARY KEY, company_id uuid, subtype text);
@@ -45,8 +45,10 @@ it("keeps dashboard amounts separated by currency and excludes bills already pai
       CREATE TABLE payment_bills (company_id uuid, currency text, status text, total numeric(12,4));
       CREATE TABLE payment_estimates (
         id uuid DEFAULT gen_random_uuid(), company_id uuid, currency text, status text,
-        total numeric(12,4), estimate_number text, valid_until timestamp, created_at timestamp
+        total numeric(12,4), estimate_number text, customer_name text,
+        valid_until timestamp, created_at timestamp
       );
+      CREATE TABLE users (id uuid PRIMARY KEY, private_name text, public_name text);
       INSERT INTO companies VALUES ('${companyId}', 'EUR');
       INSERT INTO company_members (company_id, user_id, role, is_active)
         VALUES ('${companyId}', '${userId}', '${CompanyMemberRole.VIEWER}', true);
@@ -54,8 +56,8 @@ it("keeps dashboard amounts separated by currency and excludes bills already pai
         ('${companyId}', 'USD', '${InvoiceStatus.OPEN}', 250, '2100-01-01'),
         ('${companyId}', 'EUR', '${InvoiceStatus.DRAFT}', 80, NULL),
         ('${companyId}', 'EUR', '${InvoiceStatus.PAID}', 60, NULL);
-      INSERT INTO payment_invoices (id, company_id, currency, status, amount, due_date) VALUES
-        ('${invoiceId}', '${companyId}', 'EUR', '${InvoiceStatus.OPEN}', 100, '2000-01-01');
+      INSERT INTO payment_invoices (id, company_id, currency, status, amount, due_date, invoice_number, metadata, created_at) VALUES
+        ('${invoiceId}', '${companyId}', 'EUR', '${InvoiceStatus.OPEN}', 100, '2000-01-01', 'INV-7', '{"customerName": "Lipa Studio"}', '2001-01-01');
       INSERT INTO payment_invoices (company_id, currency, status, amount, metadata) VALUES
         ('${companyId}', 'EUR', '${InvoiceStatus.OPEN}', -10, '{"originalInvoiceId": "${invoiceId}"}');
       INSERT INTO account_nodes VALUES ('${accountId}', '${companyId}', '${AccountSubtype.ACCOUNTS_RECEIVABLE}');
@@ -90,6 +92,13 @@ it("keeps dashboard amounts separated by currency and excludes bills already pai
           { currency: "USD", open: 250, overdue: 0, unpaid: 0 },
         ],
       },
+    });
+    const recent = response.success ? response.data.recentInvoices : [];
+    expect(recent.find((row) => row.id === invoiceId)).toMatchObject({
+      invoiceNumber: "INV-7",
+      customerName: "Lipa Studio",
+      amountDue: 70,
+      isOverdue: true,
     });
   } finally {
     await pg.close();

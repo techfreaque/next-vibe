@@ -54,6 +54,9 @@ export const translations: typeof enTranslations = {
     description: "Das Angebot, auf das die Aktion angewendet wird",
   },
   widget: {
+    loading: "Angebot wird geladen",
+    unavailable: "Nur versendete Angebote können abgelehnt werden.",
+    total: "Summe",
     back: "Zurück",
     submit: "Angebot ablehnen",
     declined: "Angebot als abgelehnt markiert.",

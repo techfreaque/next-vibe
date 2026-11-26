@@ -2,17 +2,17 @@ export const translations = {
   category: "Estimates",
   tags: { payment: "payment", estimate: "estimate", invoice: "invoice" },
   post: {
-    title: "Convert Estimate to Invoice",
-    titleShort: "Convert to Invoice",
+    title: "Convert estimate to invoice",
+    titleShort: "Convert to invoice",
     description: "Convert an accepted estimate into a draft invoice",
     form: {
-      title: "Convert to Invoice",
+      title: "Convert to invoice",
       description: "Convert this estimate to an invoice",
     },
     response: {
       success: "Converted to invoice",
       message: "Status message",
-      invoiceId: "Created Invoice ID",
+      invoiceId: "Created invoice ID",
     },
     errors: {
       reconcile:
@@ -22,26 +22,26 @@ export const translations = {
         description: "Authentication required",
       },
       validation: {
-        title: "Validation Error",
+        title: "Validation error",
         description: "Invalid parameters",
       },
-      server: { title: "Server Error", description: "Internal server error" },
+      server: { title: "Server error", description: "Internal server error" },
       unknown: {
-        title: "Unknown Error",
+        title: "Unknown error",
         description: "An unknown error occurred",
       },
       network: {
-        title: "Network Error",
+        title: "Network error",
         description: "Network error occurred",
       },
       forbidden: { title: "Forbidden", description: "Access denied" },
-      notFound: { title: "Not Found", description: "Estimate not found" },
+      notFound: { title: "Not found", description: "Estimate not found" },
       conflict: {
         title: "Conflict",
         description: "Estimate must be in SENT or ACCEPTED status to convert",
       },
       unsavedChanges: {
-        title: "Unsaved Changes",
+        title: "Unsaved changes",
         description: "There are unsaved changes",
       },
     },
@@ -50,7 +50,7 @@ export const translations = {
   estimateId: { label: "Estimate ID", description: "The estimate to convert" },
   widget: {
     back: "Back",
-    submit: "Convert to Invoice",
+    submit: "Convert to invoice",
     converted: "Invoice created from this estimate.",
     savedDraftNumber: "Draft invoice #{{number}} created",
     savedDraft: "Draft invoice created",

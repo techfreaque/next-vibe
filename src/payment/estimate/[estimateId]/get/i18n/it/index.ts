@@ -52,6 +52,10 @@ export const translations: typeof enTranslations = {
   },
   estimateId: { label: "Stima ID", description: "La stima di agire su" },
   widget: {
+    itemColumn: "Voce",
+    lineActions: "Azioni",
+    removeLine: "Rimuovi",
+    removeLineNamed: "Rimuovi la riga {{description}}",
     send: "Segna come inviato",
     terms: "Condizioni",
     noItems: "Questo preventivo non contiene voci.",

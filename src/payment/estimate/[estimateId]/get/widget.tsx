@@ -1,11 +1,14 @@
 "use client";
 
-import { Button, type ButtonMouseEvent } from "next-vibe/ui/components/button";
+import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
 import { Span } from "next-vibe/ui/components/span";
 import { P } from "next-vibe/ui/components/typography";
-import { AdminRecordDetail } from "next-vibe/unified-ui/_shared/admin-record-detail";
+import {
+  type AdminRecordAction,
+  AdminRecordDetail,
+} from "next-vibe/unified-ui/_shared/admin-record-detail";
 import {
   formatDocDate,
   formatMoney,
@@ -23,11 +26,20 @@ import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-a
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 import { type JSX } from "react";
 
+import { documentLineContext } from "@/finance/document-action-confirm";
 import { DocumentLineItems } from "@/finance/document-line-items";
 import { documentStatusVariant } from "@/finance/document-status";
 import { EstimateStatus } from "@/payment/enum";
 
 import type definition from "./definition";
+
+function action(
+  key: string,
+  label: string,
+  onClick: () => void,
+): AdminRecordAction {
+  return { key, label, onClick };
+}
 
 export function EstimateGetWidget({
   field,
@@ -90,8 +102,7 @@ export function EstimateGetWidget({
     }
   }
 
-  const handleConvertToInvoice = (e: ButtonMouseEvent): void => {
-    e.stopPropagation();
+  const handleConvertToInvoice = (): void => {
     void (async (): Promise<void> => {
       const [convertDef, invoiceGetDef] = await Promise.all([
         import("@/payment/estimate/[estimateId]/convert-to-invoice/definition"),
@@ -110,12 +121,12 @@ export function EstimateGetWidget({
     })();
   };
 
-  const openStatusAction = (action: "send" | "accept" | "decline"): void => {
+  const openStatusAction = (kind: "send" | "accept" | "decline"): void => {
     void (async (): Promise<void> => {
       const actionDefinition =
-        action === "send"
+        kind === "send"
           ? await import("../send/definition")
-          : action === "accept"
+          : kind === "accept"
             ? await import("../accept/definition")
             : await import("../decline/definition");
       navigate(actionDefinition.default.POST, {
@@ -148,6 +159,94 @@ export function EstimateGetWidget({
       );
     }
   };
+
+  const openDuplicate = (): void => {
+    void Promise.all([
+      import("../duplicate/definition"),
+      import("./definition"),
+    ]).then(([duplicateDef, getDef]) =>
+      navigate(duplicateDef.default.POST, {
+        urlPathParams: { estimateId: data.id },
+        renderInModal: true,
+        replaceOnSuccess: {
+          endpoint: getDef.default.GET,
+          getUrlPathParams: (responseData) => ({
+            estimateId: responseData.newEstimateId,
+          }),
+        },
+      }),
+    );
+  };
+
+  const removeLine = (line: {
+    id: string;
+    description: string;
+    lineTotal: number;
+  }): void => {
+    documentLineContext.set(line.id, {
+      number: data.estimateNumber,
+      party: data.customerName ?? data.customerEmail,
+      detail: line.description,
+      amount: money(line.lineTotal),
+    });
+    void import("../../line/[lineId]/remove/definition").then((module) =>
+      navigate(module.default.POST, {
+        urlPathParams: { lineId: line.id },
+        renderInModal: true,
+        popNavigationOnSuccess: 1,
+      }),
+    );
+  };
+
+  const canManage = isInteractive && data.canManage;
+  const isDraft = data.status === EstimateStatus.DRAFT;
+  const isSent = data.status === EstimateStatus.SENT;
+  const isAccepted = data.status === EstimateStatus.ACCEPTED;
+  const duplicateAction = action(
+    "duplicate",
+    t("widget.duplicate"),
+    openDuplicate,
+  );
+  const primaryAction: AdminRecordAction | undefined = !canManage
+    ? undefined
+    : isDraft
+      ? action("send", t("widget.send"), () => openStatusAction("send"))
+      : isSent
+        ? action("accept", t("widget.accept"), () => openStatusAction("accept"))
+        : isAccepted
+          ? action("convert", t("widget.convertToInvoice"), () =>
+              handleConvertToInvoice(),
+            )
+          : invoiceId
+            ? undefined
+            : duplicateAction;
+  const secondaryActions: AdminRecordAction[] = [
+    ...(canManage && isDraft
+      ? [action("addLine", t("widget.addLine"), addLine)]
+      : []),
+    ...(canManage && isSent
+      ? [
+          action("convert", t("widget.convertToInvoice"), () =>
+            handleConvertToInvoice(),
+          ),
+        ]
+      : []),
+    ...(isInteractive && invoiceId
+      ? [action("openInvoice", t("widget.openInvoice"), openInvoice)]
+      : []),
+  ];
+  const moreActions: AdminRecordAction[] = [
+    ...(canManage && primaryAction?.key !== "duplicate"
+      ? [duplicateAction]
+      : []),
+    ...(canManage && isSent
+      ? [
+          action("decline", t("widget.decline"), () =>
+            openStatusAction("decline"),
+          ),
+        ]
+      : []),
+  ];
 
   const title = `${t("widget.estimateNumber")} ${data.estimateNumber}`;
   const facts = [
@@ -194,62 +293,9 @@ export function EstimateGetWidget({
           </Button>
         )
       }
-      actions={
-        <>
-          {isInteractive &&
-            data.canManage &&
-            data.status === EstimateStatus.DRAFT && (
-              <>
-                <Button type="button" onClick={() => openStatusAction("send")}>
-                  {t("widget.send")}
-                </Button>
-                <Button type="button" variant="outline" onClick={addLine}>
-                  {t("widget.addLine")}
-                </Button>
-              </>
-            )}
-          {isInteractive &&
-            data.canManage &&
-            data.status === EstimateStatus.SENT && (
-              <>
-                <Button
-                  type="button"
-                  onClick={() => openStatusAction("accept")}
-                >
-                  {t("widget.accept")}
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => openStatusAction("decline")}
-                >
-                  {t("widget.decline")}
-                </Button>
-              </>
-            )}
-          {isInteractive &&
-            data.canManage &&
-            (data.status === EstimateStatus.SENT ||
-              data.status === EstimateStatus.ACCEPTED) && (
-              <Button
-                type="button"
-                variant={
-                  data.status === EstimateStatus.ACCEPTED
-                    ? "default"
-                    : "outline"
-                }
-                onClick={handleConvertToInvoice}
-              >
-                {t("widget.convertToInvoice")}
-              </Button>
-            )}
-          {isInteractive && invoiceId && (
-            <Button type="button" variant="outline" onClick={openInvoice}>
-              {t("widget.openInvoice")}
-            </Button>
-          )}
-        </>
-      }
+      primaryAction={primaryAction}
+      secondaryActions={secondaryActions}
+      moreActions={moreActions}
     >
       {/* Line items */}
       {data.lines.length > 0 ? (
@@ -257,12 +303,36 @@ export function EstimateGetWidget({
           title={t("widget.lineItems")}
           lines={data.lines}
           labels={{
+            description: t("widget.itemColumn"),
             quantity: t("widget.qty"),
             unitPrice: t("widget.unitPrice"),
             tax: t("widget.tax"),
             total: t("widget.total"),
           }}
           money={money}
+          action={
+            isInteractive &&
+            data.canManage &&
+            data.status === EstimateStatus.DRAFT
+              ? {
+                  label: t("widget.lineActions"),
+                  render: (line): JSX.Element => (
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="ghost"
+                      className="min-h-10 self-start text-destructive"
+                      aria-label={t("widget.removeLineNamed", {
+                        description: line.description,
+                      })}
+                      onClick={() => removeLine(line)}
+                    >
+                      {t("widget.removeLine")}
+                    </Button>
+                  ),
+                }
+              : undefined
+          }
         />
       ) : (
         <P className="rounded-lg border border-dashed p-4 text-sm text-muted-foreground">
@@ -292,21 +362,21 @@ export function EstimateGetWidget({
                 <Span className="text-muted-foreground">
                   {t("widget.subtotal")}
                 </Span>
-                <Span className="font-mono">{money(data.subtotal)}</Span>
+                <Span className="tabular-nums">{money(data.subtotal)}</Span>
               </Div>
               {data.taxAmount > 0 && (
                 <Div className="flex flex-wrap justify-between gap-2">
                   <Span className="text-muted-foreground">
                     {t("widget.tax")}
                   </Span>
-                  <Span className="font-mono">{money(data.taxAmount)}</Span>
+                  <Span className="tabular-nums">{money(data.taxAmount)}</Span>
                 </Div>
               )}
             </>
           )}
           <Div className="flex flex-wrap justify-between gap-2 border-t pt-1.5 font-semibold">
             <Span>{t("widget.total")}</Span>
-            <Span className="font-mono">{money(data.total)}</Span>
+            <Span className="tabular-nums">{money(data.total)}</Span>
           </Div>
         </Div>
       </Div>

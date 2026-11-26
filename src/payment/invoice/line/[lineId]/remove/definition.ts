@@ -42,6 +42,16 @@ const { POST } = createEndpoint({
   ],
   allowedRoles: [UserRole.ADMIN] as const,
 
+  options: {
+    mutationOptions: {
+      onSuccess: async (data) => {
+        const { refreshInvoiceDocuments } =
+          await import("@/finance/document-cache");
+        await refreshInvoiceDocuments(data.logger, data.responseData.invoiceId);
+      },
+    },
+  },
+
   fields: customWidgetObject({
     render: InvoiceLineRemoveWidgetLazy,
     usage: { request: "urlPathParams", response: true },
@@ -67,6 +77,12 @@ const { POST } = createEndpoint({
         type: WidgetType.TEXT,
         label: "post.response.message" as const,
         schema: z.string().nullable(),
+      }),
+
+      invoiceId: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "post.response.invoiceId" as const,
+        schema: z.uuid(),
       }),
     },
   }),
@@ -120,6 +136,7 @@ const { POST } = createEndpoint({
       default: {
         success: true,
         message: null,
+        invoiceId: "11111111-1111-4111-8111-111111111111",
       },
     },
   },

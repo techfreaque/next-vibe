@@ -7,10 +7,10 @@ export const translations = {
   },
   post: {
     title: "Remove bill line",
-    titleShort: "Remove Line",
+    titleShort: "Remove line",
     description: "Remove a line from a supplier bill draft",
     form: {
-      title: "Remove Line",
+      title: "Remove line",
       description: "Removes this line from the draft.",
     },
     response: {
@@ -23,19 +23,19 @@ export const translations = {
         description: "Authentication required",
       },
       validation: {
-        title: "Validation Error",
+        title: "Validation error",
         description: "Invalid parameters",
       },
       server: {
-        title: "Server Error",
+        title: "Server error",
         description: "Internal server error occurred",
       },
       unknown: {
-        title: "Unknown Error",
+        title: "Unknown error",
         description: "An unknown error occurred",
       },
       network: {
-        title: "Network Error",
+        title: "Network error",
         description: "Network error occurred",
       },
       forbidden: {
@@ -43,7 +43,7 @@ export const translations = {
         description: "Access forbidden",
       },
       notFound: {
-        title: "Not Found",
+        title: "Not found",
         description: "Line item not found",
       },
       conflict: {
@@ -52,7 +52,7 @@ export const translations = {
           "This line can only be removed from an editable supplier bill draft.",
       },
       unsavedChanges: {
-        title: "Unsaved Changes",
+        title: "Unsaved changes",
         description: "There are unsaved changes",
       },
     },
@@ -77,10 +77,10 @@ export const translations = {
     lineGross: "Line gross: {{amount}}",
 
     back: "Back",
-    submit: "Remove Line",
+    submit: "Remove line",
     warning:
       "This permanently removes the line and recalculates the draft total.",
-    confirm: "Remove Line",
+    confirm: "Remove line",
     removed: "Line item removed",
   },
 };

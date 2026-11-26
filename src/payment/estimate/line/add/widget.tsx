@@ -187,10 +187,10 @@ export function EstimateLineAddWidget({
     return (
       <Div className="flex flex-col gap-5">
         {/* Success banner */}
-        <Div className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 flex items-center gap-3">
-          <Span className="text-emerald-500 text-lg">✓</Span>
+        <Div className="rounded-lg border border-success/30 bg-success/10 px-4 py-3 flex items-center gap-3">
+          <Span className="text-success text-lg">✓</Span>
           <Div className="flex flex-col">
-            <Span className="text-sm font-semibold text-emerald-700 dark:text-emerald-400">
+            <Span className="text-sm font-semibold text-success">
               {t("post.success.title")}
             </Span>
             <Span className="text-xs text-muted-foreground">
@@ -266,7 +266,7 @@ export function EstimateLineAddWidget({
               </Span>
               <Div className="flex items-center gap-2">
                 {selectedProduct.sku ? (
-                  <Span className="text-xs font-mono text-muted-foreground">
+                  <Span className="text-xs tabular-nums text-muted-foreground">
                     {selectedProduct.sku}
                   </Span>
                 ) : null}
@@ -334,7 +334,7 @@ export function EstimateLineAddWidget({
                         {product.name}
                       </Span>
                       {product.sku ? (
-                        <Span className="text-xs font-mono text-muted-foreground">
+                        <Span className="text-xs tabular-nums text-muted-foreground">
                           {product.sku}
                         </Span>
                       ) : null}

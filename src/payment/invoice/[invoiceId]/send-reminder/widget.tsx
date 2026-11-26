@@ -3,6 +3,7 @@
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { SectionGroup } from "next-vibe/ui/components/section-group";
+import { Span } from "next-vibe/ui/components/span";
 import { P } from "next-vibe/ui/components/typography";
 import { WidgetHeader } from "next-vibe/ui/components/widget-header";
 import { WidgetShell } from "next-vibe/ui/components/widget-shell";
@@ -26,6 +27,7 @@ import type { JSX } from "react";
 
 import { DocumentTextExportButton } from "@/finance/document-text-export";
 
+import { useInvoiceActionContext } from "../get/hooks";
 import type definition from "./definition";
 
 export function InvoiceSendReminderWidget({
@@ -40,6 +42,7 @@ export function InvoiceSendReminderWidget({
   const interactive = useWidgetIsInteractive();
   const draft = useWidgetValue<typeof definition.POST>()?.draft;
   const invoiceId = form.watch("invoiceId");
+  const { invoice } = useInvoiceActionContext(invoiceId, interactive && !draft);
   const draftText = draft
     ? [
         t("widget.subject", { number: draft.invoiceNumber }),
@@ -108,10 +111,33 @@ export function InvoiceSendReminderWidget({
         </SectionGroup>
       ) : (
         <>
-          <EntityPickerFieldWidget
-            fieldName="invoiceId"
-            field={field.children.invoiceId}
-          />
+          {invoice ? (
+            <Div className="flex min-w-0 items-start justify-between gap-4 rounded-lg border bg-card px-4 py-3">
+              <Div className="flex min-w-0 flex-col gap-0.5">
+                <Span className="whitespace-nowrap text-sm font-semibold">
+                  {invoice.invoiceNumber ?? t("post.title")}
+                </Span>
+                {invoice.customerName && (
+                  <Span className="truncate text-sm text-muted-foreground">
+                    {invoice.customerName}
+                  </Span>
+                )}
+                {invoice.dueDate && (
+                  <Span className="text-sm text-destructive">
+                    {formatDocDate(invoice.dueDate, locale)}
+                  </Span>
+                )}
+              </Div>
+              <Span className="whitespace-nowrap text-base font-semibold tabular-nums">
+                {formatMoney(invoice.amountDue, invoice.currency, locale)}
+              </Span>
+            </Div>
+          ) : (
+            <EntityPickerFieldWidget
+              fieldName="invoiceId"
+              field={field.children.invoiceId}
+            />
+          )}
           <TextareaFieldWidget
             fieldName="message"
             field={field.children.message}

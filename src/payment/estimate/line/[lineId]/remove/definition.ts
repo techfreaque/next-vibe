@@ -42,6 +42,19 @@ const { POST } = createEndpoint({
   ],
   allowedRoles: [UserRole.ADMIN] as const,
 
+  options: {
+    mutationOptions: {
+      onSuccess: async (data) => {
+        const { refreshEstimateDocuments } =
+          await import("@/finance/document-cache");
+        await refreshEstimateDocuments(
+          data.logger,
+          data.responseData.estimateId,
+        );
+      },
+    },
+  },
+
   fields: customWidgetObject({
     render: EstimateLineRemoveWidgetLazy,
     usage: { request: "urlPathParams", response: true },
@@ -65,6 +78,12 @@ const { POST } = createEndpoint({
         type: WidgetType.TEXT,
         label: "post.response.message" as const,
         schema: z.string().nullable(),
+      }),
+
+      estimateId: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "post.response.estimateId" as const,
+        schema: z.uuid(),
       }),
     },
   }),
@@ -118,6 +137,7 @@ const { POST } = createEndpoint({
       default: {
         success: true,
         message: null,
+        estimateId: "11111111-1111-4111-8111-111111111111",
       },
     },
   },

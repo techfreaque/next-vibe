@@ -84,6 +84,12 @@ export const translations: typeof enTranslations = {
     placeholder: "Zadajte identifikačné číslo faktúry",
   },
   widget: {
+    duplicate: "Duplikovať",
+    cancel: "Zrušiť",
+    loading: "Načítava sa faktúra",
+    total: "Spolu",
+    duplicateNote:
+      "Vznikne nový koncept s rovnakým zákazníkom, menou a položkami. Číslo dostane pri vystavení.",
     back: "Späť",
     submit: "Duplikátna faktúra",
     duplicated: "Faktúra duplikovaná",

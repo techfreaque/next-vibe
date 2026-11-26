@@ -6,14 +6,15 @@ export const translations = {
     lines: "lines",
   },
   post: {
-    title: "Remove Invoice Line",
-    titleShort: "Remove Line",
+    title: "Remove invoice line",
+    titleShort: "Remove line",
     description: "Remove a line item from a draft invoice",
     form: {
-      title: "Remove Line",
+      title: "Remove line",
       description: "Permanently removes this line from the invoice",
     },
     response: {
+      invoiceId: "Invoice",
       success: "Line removed",
       message: "Status message",
     },
@@ -23,19 +24,19 @@ export const translations = {
         description: "Authentication required",
       },
       validation: {
-        title: "Validation Error",
+        title: "Validation error",
         description: "Invalid parameters",
       },
       server: {
-        title: "Server Error",
+        title: "Server error",
         description: "Internal server error occurred",
       },
       unknown: {
-        title: "Unknown Error",
+        title: "Unknown error",
         description: "An unknown error occurred",
       },
       network: {
-        title: "Network Error",
+        title: "Network error",
         description: "Network error occurred",
       },
       forbidden: {
@@ -43,7 +44,7 @@ export const translations = {
         description: "Access forbidden",
       },
       notFound: {
-        title: "Not Found",
+        title: "Not found",
         description: "Line item not found",
       },
       conflict: {
@@ -51,7 +52,7 @@ export const translations = {
         description: "Invoice is not in draft status",
       },
       unsavedChanges: {
-        title: "Unsaved Changes",
+        title: "Unsaved changes",
         description: "There are unsaved changes",
       },
     },
@@ -66,10 +67,15 @@ export const translations = {
     placeholder: "Enter line ID",
   },
   widget: {
+    lineActions: "Actions",
+    remove: "Remove",
+    removeNamed: "Remove line {{description}}",
+    cancel: "Cancel",
+    lineTotal: "Line total",
     back: "Back",
-    submit: "Remove Line",
+    submit: "Remove line",
     warning: "This will permanently remove the line item from the invoice.",
-    confirm: "Remove Line",
+    confirm: "Remove line",
     removed: "Line item removed",
   },
 };

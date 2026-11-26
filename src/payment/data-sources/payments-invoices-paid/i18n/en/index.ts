@@ -1,8 +1,8 @@
 export const translations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
-    title: "Invoices Paid",
-    titleShort: "Invoices Paid",
+    title: "Invoices paid",
+    titleShort: "Invoices paid",
     description: "Number of paid invoices per resolution bucket",
     fields: {
       resolution: { label: "Resolution", description: "Computation timeframe" },
@@ -11,7 +11,7 @@ export const translations = {
         label: "Lookback",
         description: "Extra bars before range start",
       },
-      result: { label: "Invoices Paid", description: "Output time series" },
+      result: { label: "Invoices paid", description: "Output time series" },
       meta: { label: "Meta", description: "Node execution metadata" },
     },
     success: {

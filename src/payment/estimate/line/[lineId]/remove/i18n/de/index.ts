@@ -11,7 +11,11 @@ export const translations: typeof enTranslations = {
       title: "Angebotsposition entfernen",
       description: "Diese Position aus dem Angebot entfernen",
     },
-    response: { success: "Erfolgreich", message: "Statusmeldung" },
+    response: {
+      estimateId: "Angebot",
+      success: "Erfolgreich",
+      message: "Statusmeldung",
+    },
     errors: {
       unauthorized: {
         title: "Nicht autorisiert",
@@ -51,6 +55,7 @@ export const translations: typeof enTranslations = {
   },
   lineId: { label: "Positions-ID", description: "Die zu entfernende Position" },
   widget: {
+    lineTotal: "Positionssumme",
     back: "Zurück",
     submit: "Position entfernen",
     removed: "Position aus dem Angebot entfernt.",

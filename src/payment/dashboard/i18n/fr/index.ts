@@ -15,6 +15,9 @@ export const translations: typeof enTranslations = {
       description: "Vue d'ensemble des paiements de votre entreprise",
     },
     response: {
+      invoiceNumber: "Numéro de facture",
+      customerName: "Client",
+      amountDue: "Montant dû",
       estimates: "Devis",
       byCurrency: "Totaux par devise",
       openInvoices: "Factures ouvertes",
@@ -75,11 +78,25 @@ export const translations: typeof enTranslations = {
     },
   },
   companyId: {
-    label: "ID de l'entreprise",
+    label: "Entreprise",
     description: "L'entreprise dont afficher le tableau de bord",
     placeholder: "Saisissez l'ID de l'entreprise",
   },
   widget: {
+    creditNote: "Avoir",
+    documentCountOne: "1 document",
+    estimateDraftOne: "1 brouillon",
+    documentCount: "{{count}} documents",
+    draftHint: "Pas encore émises",
+    noRecentEstimatesHint:
+      "Les devis envoyés apparaissent ici avec la réponse du client.",
+    columns: {
+      number: "Numéro",
+      customer: "Client",
+      status: "Statut",
+      total: "Total",
+      open: "Ouvert",
+    },
     unnumberedInvoice: "Facture sans numéro",
     subtitle:
       "Factures, devis et factures fournisseurs que vous émettez. Les paiements carte et crypto sont dans les transactions de paiement.",

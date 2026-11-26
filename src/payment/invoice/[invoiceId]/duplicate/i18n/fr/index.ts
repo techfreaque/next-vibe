@@ -84,6 +84,12 @@ export const translations: typeof enTranslations = {
     placeholder: "Saisir l'ID de facture",
   },
   widget: {
+    duplicate: "Dupliquer",
+    cancel: "Annuler",
+    loading: "Chargement de la facture",
+    total: "Total",
+    duplicateNote:
+      "Un nouveau brouillon est créé avec le même client, la même devise et les mêmes lignes. Il reçoit son numéro à l'émission.",
     back: "Retour",
     submit: "Dupliquer la facture",
     duplicated: "Facture dupliquée",

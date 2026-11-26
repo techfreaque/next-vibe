@@ -16,6 +16,7 @@ export const translations: typeof enTranslations = {
       description: "Trwale usuwa tę pozycję z faktury",
     },
     response: {
+      invoiceId: "Faktura",
       success: "Pozycja usunięta",
       message: "Komunikat statusu",
     },
@@ -68,6 +69,11 @@ export const translations: typeof enTranslations = {
     placeholder: "Wprowadź ID pozycji",
   },
   widget: {
+    lineActions: "Akcje",
+    remove: "Usuń",
+    removeNamed: "Usuń pozycję {{description}}",
+    cancel: "Anuluj",
+    lineTotal: "Wartość pozycji",
     back: "Wróć",
     submit: "Usuń pozycję",
     warning: "Ta pozycja zostanie trwale usunięta z faktury.",

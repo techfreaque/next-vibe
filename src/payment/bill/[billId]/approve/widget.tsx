@@ -66,8 +66,8 @@ export function BillApproveWidget({
 
   if (data?.status !== undefined) {
     return (
-      <Div className="flex flex-col gap-4 p-4 rounded-lg border bg-emerald-50/50 dark:bg-emerald-900/10 border-emerald-200 dark:border-emerald-800">
-        <Span className="text-xs font-semibold text-emerald-700 dark:text-emerald-400 uppercase tracking-wide">
+      <Div className="flex flex-col gap-4 p-4 rounded-lg border bg-success/10 border-success/30">
+        <Span className="text-xs font-semibold text-success">
           {t("post.success.title")}
         </Span>
         <Span className="text-sm font-medium text-foreground">
@@ -119,8 +119,8 @@ export function BillApproveWidget({
           {`${bill.supplierName} · ${bill.billNumber}`}
         </P>
       )}
-      <Div className="rounded-md border border-amber-200 bg-amber-50/60 dark:border-amber-800 dark:bg-amber-900/10 px-4 py-3">
-        <P className="text-sm text-amber-800 dark:text-amber-400">
+      <Div className="rounded-md border border-warning/30 bg-warning/10 px-4 py-3">
+        <P className="text-sm text-warning">
           {t("post.widget.confirmDescription")}
         </P>
       </Div>

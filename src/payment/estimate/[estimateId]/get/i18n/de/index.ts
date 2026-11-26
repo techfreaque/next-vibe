@@ -55,6 +55,10 @@ export const translations: typeof enTranslations = {
     description: "Das Angebot, auf das die Aktion angewendet wird",
   },
   widget: {
+    itemColumn: "Position",
+    lineActions: "Aktionen",
+    removeLine: "Entfernen",
+    removeLineNamed: "Position {{description}} entfernen",
     send: "Als versendet markieren",
     terms: "Konditionen",
     noItems: "Dieses Angebot enthält noch keine Positionen.",

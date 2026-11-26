@@ -1,8 +1,8 @@
 export const translations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
-    title: "Payments Failed",
-    titleShort: "Failed Payments",
+    title: "Payments failed",
+    titleShort: "Failed payments",
     description: "Number of failed payment transactions per resolution bucket",
     fields: {
       resolution: { label: "Resolution", description: "Computation timeframe" },
@@ -11,7 +11,7 @@ export const translations = {
         label: "Lookback",
         description: "Extra bars before range start",
       },
-      result: { label: "Failed Count", description: "Output time series" },
+      result: { label: "Failed count", description: "Output time series" },
       meta: { label: "Meta", description: "Node execution metadata" },
     },
     success: {

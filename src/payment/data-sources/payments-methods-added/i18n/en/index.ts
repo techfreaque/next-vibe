@@ -1,8 +1,8 @@
 export const translations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
-    title: "Payment Methods Added",
-    titleShort: "Payment Methods",
+    title: "Payment methods added",
+    titleShort: "Payment methods",
     description: "New payment methods added per resolution bucket",
     fields: {
       resolution: { label: "Resolution", description: "Computation timeframe" },
@@ -12,7 +12,7 @@ export const translations = {
         description: "Extra bars before range start",
       },
       result: {
-        label: "Methods Added",
+        label: "Methods added",
         description: "Output time series",
       },
       meta: { label: "Meta", description: "Node execution metadata" },

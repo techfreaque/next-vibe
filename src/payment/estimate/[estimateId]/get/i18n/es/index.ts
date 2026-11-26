@@ -58,6 +58,10 @@ export const translations: typeof enTranslations = {
     description: "La estimación para actuar en",
   },
   widget: {
+    itemColumn: "Concepto",
+    lineActions: "Acciones",
+    removeLine: "Quitar",
+    removeLineNamed: "Quitar la línea {{description}}",
     send: "Marcar como enviado",
     terms: "Condiciones",
     noItems: "Este presupuesto no contiene partidas.",

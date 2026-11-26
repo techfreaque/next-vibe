@@ -11,7 +11,11 @@ export const translations: typeof enTranslations = {
       title: "Rimuovere la linea di stima",
       description: "Rimuovere questo articolo di linea dal preventivo",
     },
-    response: { success: "Operazione riuscita", message: "Messaggio di stato" },
+    response: {
+      estimateId: "Preventivo",
+      success: "Operazione riuscita",
+      message: "Messaggio di stato",
+    },
     errors: {
       unauthorized: {
         title: "Autenticazione richiesta",
@@ -58,6 +62,7 @@ export const translations: typeof enTranslations = {
     description: "L'elemento di linea per rimuovere",
   },
   widget: {
+    lineTotal: "Totale riga",
     back: "Indietro",
     submit: "Rimuovi la linea",
     removed: "Elemento di linea rimosso dalla stima.",

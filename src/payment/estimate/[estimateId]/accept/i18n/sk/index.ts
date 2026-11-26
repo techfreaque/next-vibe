@@ -57,6 +57,10 @@ export const translations: typeof enTranslations = {
     description: "Cenová ponuka, ktorej sa úkon týka",
   },
   widget: {
+    cancel: "Zrušiť",
+    loading: "Načítava sa cenová ponuka",
+    unavailable: "Prijať sa dá iba odoslaná cenová ponuka.",
+    total: "Spolu",
     back: "Späť",
     submit: "Prijať cenovú ponuku",
     accepted: "Cenová ponuka bola označená ako prijatá.",
