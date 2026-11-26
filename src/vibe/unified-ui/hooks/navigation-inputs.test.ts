@@ -1,9 +1,28 @@
 import { describe, expect, it } from "vitest";
 import { z } from "zod";
 
-import { deserializeNavigationData } from "./use-url-nav-stack";
+import {
+  deserializeNavigationData,
+  serializeNavigationData,
+} from "./use-url-nav-stack";
 
 describe("admin tool URL inputs", () => {
+  it("round-trips nested action defaults in a tool URL", () => {
+    const schema = z.object({
+      details: z.object({
+        terminalId: z.string(),
+        openingFloat: z.number(),
+      }),
+    });
+    const data = { details: { terminalId: "till", openingFloat: 0 } };
+    const serialized = serializeNavigationData(data);
+    expect(serialized).toEqual({
+      "details.terminalId": "till",
+      "details.openingFloat": "0",
+    });
+    expect(deserializeNavigationData(serialized, schema)).toEqual(data);
+  });
+
   it("restores plain booleans and numbers only for matching schema fields", () => {
     const schema = z.object({
       dryRun: z.boolean().default(true),

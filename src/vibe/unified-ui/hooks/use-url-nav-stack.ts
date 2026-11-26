@@ -12,6 +12,7 @@ import { z } from "zod";
 import { endpointToUrlSegment } from "../../core/core-utils/path";
 import type { NavigationStackEntry } from "../../core/definition/endpoint";
 import type { CreateApiEndpointAny } from "../../core/definition/endpoint-base";
+import type { WidgetData } from "../../core/utils/json";
 import { createUrlNavigationRestore } from "../_shared/url-navigation-restore";
 import { resolveEndpoint } from "./resolve-endpoint";
 import type { UseNavigationStackReturn } from "./use-navigation-stack";
@@ -25,11 +26,13 @@ import type { UseNavigationStackReturn } from "./use-navigation-stack";
 // urlPathParams and primitive data fields are written as plain search params.
 // On popstate the URL is read back and the single current entry is reconstructed.
 
-export function serializeNavigationData(
-  data: NavigationStackEntry["params"]["data"],
-): Record<string, string> {
-  const params: Record<string, string> = {};
-  for (const [key, value] of Object.entries(data ?? {})) {
+function appendNavigationData(
+  data: Record<string, WidgetData>,
+  params: Record<string, string>,
+  prefix: string,
+): void {
+  for (const [name, value] of Object.entries(data)) {
+    const key = `${prefix}${name}`;
     if (value instanceof Date) {
       if (Number.isFinite(value.getTime())) {
         params[key] = value.toISOString();
@@ -46,7 +49,18 @@ export function serializeNavigationData(
       // Multi-selects use a distinct argument key, so literal search strings
       // that look like JSON are still restored as strings.
       params[`${key}[]`] = JSON.stringify(value);
+    } else if (value && typeof value === "object" && !Array.isArray(value)) {
+      appendNavigationData(value, params, `${key}.`);
     }
+  }
+}
+
+export function serializeNavigationData(
+  data: NavigationStackEntry["params"]["data"],
+): Record<string, string> {
+  const params: Record<string, string> = {};
+  if (data) {
+    appendNavigationData(data, params, "");
   }
   return params;
 }

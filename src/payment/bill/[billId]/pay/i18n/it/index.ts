@@ -3,17 +3,17 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   tags: {
     payment: "pagamento",
-    bill: "fatturazione",
-    ap: "contabilità-pagabile",
+    bill: "fattura-fornitore",
+    ap: "debiti-verso-fornitori",
   },
   post: {
-    title: "Paga Bill",
-    titleShort: "Paga Bill",
+    title: "Paga fattura",
+    titleShort: "Paga fattura",
     description:
-      "Contrassegnare una fattura approvata come pagato e postare l'ingresso della rivista di pagamento",
+      "Segna una fattura approvata come pagata e contabilizza il pagamento.",
     billId: {
-      label: "Bill ID",
-      description: "Il disegno di legge per contrassegnare come pagato",
+      label: "Fattura",
+      description: "La fattura da segnare come pagata.",
     },
     errors: {
       approvalPosting:
@@ -27,16 +27,16 @@ export const translations: typeof enTranslations = {
         description: "Input non valido",
       },
       unauthorized: {
-        title: "Non firmata",
-        description: "Accedi per pagare le bollette",
+        title: "Accedi per continuare",
+        description: "Accedi per pagare le fatture.",
       },
       forbidden: {
         title: "Accesso negato",
-        description: "Il ruolo contabile o amministrativo richiesto",
+        description: "Servono i permessi di contabile o amministratore.",
       },
       conflict: {
-        title: "Stato non valido",
-        description: "Bill deve essere APPROVED prima del pagamento",
+        title: "Impossibile pagare la fattura",
+        description: "Puoi segnare come pagate solo le fatture approvate.",
       },
       server: {
         title: "Errore del server",
@@ -51,8 +51,8 @@ export const translations: typeof enTranslations = {
         description: "Controlla la connessione",
       },
       notFound: {
-        title: "Bill non trovato",
-        description: "Questa legge non esiste",
+        title: "Fattura non trovata",
+        description: "Questa fattura non esiste.",
       },
       unsavedChanges: {
         title: "Modifiche non salvate",
@@ -60,32 +60,35 @@ export const translations: typeof enTranslations = {
       },
     },
     success: {
-      title: "Bill Paid",
-      description: "Bilancio indicato come corrisposto",
+      title: "Fattura pagata",
+      description: "La fattura è stata segnata come pagata.",
     },
     response: {
       status: "Stato",
-      paidAt: "Pagato a",
+      paidAt: "Data di pagamento",
     },
     widget: {
       back: "Indietro",
-      submit: "Mark come Paid",
+      details: "Dettagli del pagamento",
+      loadingBill: "Caricamento della fattura…",
+      retry: "Riprova",
+      submit: "Segna come pagata",
       paymentRecorded: "Pagamento registrato",
     },
   },
   enums: {
     billStatus: {
-      DRAFT: "Progetto",
-      RECEIVED: "Ricevuto.",
-      APPROVED: "Approvazione",
-      PAID: "Pagato",
-      DISPUTED: "Disputato",
+      DRAFT: "Bozza",
+      RECEIVED: "Ricevuta",
+      APPROVED: "Approvata",
+      PAID: "Pagata",
+      DISPUTED: "Contestata",
     },
   },
   accountNodeId: {
-    label: "Banca / Conto Contanti",
-    description: "Nodo conto usato per pagare (Bank o Cash)",
-    placeholder: "Account UUID",
+    label: "Conto bancario o di cassa",
+    description:
+      "Lascia il campo vuoto per usare il conto di pagamento predefinito.",
   },
   paidAt: {
     label: "Data di pagamento",

@@ -37,7 +37,7 @@ export class PosOrderListRepository {
     const { t } = scopedTranslation.scopedT(locale);
 
     try {
-      const sessionId = data.input.sessionId;
+      const sessionId = data.input?.sessionId;
       const conditions = [];
 
       if (sessionId) {
@@ -99,7 +99,7 @@ export class PosOrderListRepository {
         );
       }
 
-      if (data.input.status) {
+      if (data.input?.status) {
         conditions.push(eq(posOrders.status, data.input.status));
       }
 

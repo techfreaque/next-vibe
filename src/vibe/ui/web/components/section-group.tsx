@@ -56,8 +56,8 @@ export function SectionGroup({
             }
           : {})}
       >
-        <div className="flex items-center gap-2 flex-1 min-w-0">
-          <span className="text-sm font-semibold flex-1">{title}</span>
+        <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5 flex-1 min-w-0">
+          <span className="text-sm font-semibold shrink-0">{title}</span>
           {subtitle ? (
             typeof subtitle === "string" ? (
               <span className="text-xs text-muted-foreground">{subtitle}</span>

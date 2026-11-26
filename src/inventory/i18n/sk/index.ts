@@ -146,8 +146,8 @@ export const translations: typeof enTranslations = {
       widget: {
         subtitle: "Tu sú vaše zásoby. Otvorte sklad a uvidíte stav a hodnotu.",
         status: "Stav",
-        active: "v prevádzke",
-        inactive: "mimo prevádzky",
+        active: "Aktívny",
+        inactive: "Neaktívny",
         default: "Predvolený",
         total: "celkom",
         createWarehouse: "Nový sklad",
@@ -590,11 +590,11 @@ export const translations: typeof enTranslations = {
   stockReceive: {
     post: {
       title: "Prijať zásoby",
-      titleShort: "Stav príjmu",
+      titleShort: "Prijať zásoby",
       description:
         "Zaznamenať príjem zásob. Prepočíta sa množstvo na sklade aj vážená priemerná obstarávacia cena.",
       widget: {
-        backToStock: "Späť na sklade",
+        backToStock: "Späť na stav zásob",
       },
       warehouseId: {
         label: "Sklad",
@@ -665,7 +665,7 @@ export const translations: typeof enTranslations = {
         movementId: "ID pohybu zásob",
         productId: "ID produktu",
         warehouseId: "ID skladu",
-        quantityOnHand: "Nové na dosah",
+        quantityOnHand: "Nové množstvo na sklade",
         unitCost: "Nová jednotková obstarávacia cena",
       },
     },
@@ -677,7 +677,7 @@ export const translations: typeof enTranslations = {
       description:
         "Vydať zásoby zo skladu. Pred výdajom sa overí dostupné množstvo.",
       widget: {
-        backToStock: "Späť na sklade",
+        backToStock: "Späť na stav zásob",
       },
       warehouseId: {
         label: "Sklad",
@@ -749,7 +749,7 @@ export const translations: typeof enTranslations = {
         movementId: "ID pohybu zásob",
         productId: "ID produktu",
         warehouseId: "ID skladu",
-        quantityOnHand: "Nové na dosah",
+        quantityOnHand: "Nové množstvo na sklade",
         quantityAvailable: "Dostupné",
       },
     },

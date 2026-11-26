@@ -733,9 +733,19 @@ function EndpointsPageInternal<
     (finalNavigation.stack.length === 1 && topIsModal) ||
     navigationIsPushPending;
 
+  // The base layer mounts the first time it is visible and then stays mounted
+  // (hidden) to preserve its state under stacked entries. A page that opens
+  // straight onto a stack entry (a tool URL restored on load) never renders a
+  // hidden second copy of the same form: duplicate labels and ids broke
+  // accessible names and strict locators.
+  const [baseMounted, setBaseMounted] = useState(isBaseVisible);
+  if (isBaseVisible && !baseMounted) {
+    setBaseMounted(true);
+  }
+
   return (
     <>
-      {/* Base endpoint layer - always mounted to preserve state */}
+      {/* Base endpoint layer - mounted once shown, kept to preserve state */}
       <Div className={cn(className, !isBaseVisible && "hidden")}>
         {description && (
           <Div className="mb-6">
@@ -743,7 +753,7 @@ function EndpointsPageInternal<
           </Div>
         )}
 
-        {activeEndpoint && (
+        {activeEndpoint && baseMounted && (
           <>
             {disabled && (
               <EndpointRenderer
@@ -1155,6 +1165,7 @@ function StackEntryLayer({
   // Hooks called at top level of this component (before any conditional returns)
   const navigationPop = finalNavigation.pop;
   const navigationPush = finalNavigation.push;
+  const navigationReplace = finalNavigation.replace;
   // Expose the current entry as a single-element stack so that
   // mutationOptionsWithNav inside the stacked EndpointsPageInternal can read
   // popNavigationOnSuccess, replaceOnSuccess, onSuccessCallback from it.
@@ -1164,6 +1175,7 @@ function StackEntryLayer({
     if (isModal) {
       return {
         push: navigationPush,
+        replace: navigationReplace,
         pop: (): void => {
           setModalOpenState(
             (prev: Record<number, boolean>): Record<number, boolean> => ({
@@ -1178,35 +1190,21 @@ function StackEntryLayer({
         current: entry,
       };
     }
-    // Non-modal: allow back navigation when there's a stack to go back to
-    if (index > 0) {
-      return {
-        push: navigationPush,
-        pop: (): void => {
-          navigationPop();
-        },
-        canGoBack: true,
-        stack: entryStack,
-        current: entry,
-      };
-    }
-    // First entry (index === 0): back goes to base layer (pops this entry off parent stack)
     return {
       push: navigationPush,
-      pop: (): void => {
-        navigationPop();
-      },
+      replace: navigationReplace,
+      pop: navigationPop,
       canGoBack: true,
       stack: entryStack,
       current: entry,
     };
   }, [
     isModal,
-    index,
     entry,
     entryStack,
     navigationPop,
     navigationPush,
+    navigationReplace,
     setModalOpenState,
   ]);
 

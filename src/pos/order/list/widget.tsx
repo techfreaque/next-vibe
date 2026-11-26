@@ -14,6 +14,7 @@ import {
 } from "next-vibe/ui/components/status-pill";
 import { WidgetHeader } from "next-vibe/ui/components/widget-header";
 import { WidgetShell } from "next-vibe/ui/components/widget-shell";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import { formatMoney } from "next-vibe/unified-ui/_shared/format-money";
 import { usePickerCallback } from "next-vibe/unified-ui/_shared/picker-context";
 import {
@@ -36,7 +37,7 @@ import type {
 
 type Order = NonNullable<PosOrderListResponseOutput["orders"]>[number];
 type OrderStatusFilter =
-  | NonNullable<PosOrderListRequestOutput["input"]["status"]>
+  | NonNullable<NonNullable<PosOrderListRequestOutput["input"]>["status"]>
   | undefined;
 
 function statusVariant(status: string): StatusPillVariant {
@@ -55,6 +56,8 @@ const FILTERS: readonly OrderStatusFilter[] = [
   PosOrderStatus.OPEN,
   PosOrderStatus.VOIDED,
 ];
+const SALES_COLUMNS =
+  "grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,0.8fr)]";
 
 export function PosOrderListWidget(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -75,7 +78,6 @@ export function PosOrderListWidget(
   const openOrder = (order: Order): void => {
     if (pickerCallback) {
       pickerCallback(order);
-      navigation.pop();
       return;
     }
     void import("@/pos/order/[orderId]/get/definition").then((def) =>
@@ -153,6 +155,8 @@ export function PosOrderListWidget(
             type="button"
             size="sm"
             variant={status === filter ? "default" : "outline"}
+            className="min-h-10"
+            aria-pressed={status === filter}
             onClick={() => {
               form?.setValue("input.status", filter, { shouldDirty: true });
               form?.setValue("page", 1, { shouldDirty: true });
@@ -174,7 +178,12 @@ export function PosOrderListWidget(
         />
       ) : (
         <Div className="overflow-hidden rounded-xl border bg-card">
-          <Div className="hidden grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)_minmax(0,1fr)_auto_minmax(0,0.8fr)] gap-4 border-b px-4 py-2.5 text-xs font-medium text-muted-foreground @2xl:grid">
+          <Div
+            className={cn(
+              SALES_COLUMNS,
+              "hidden gap-4 border-b px-4 py-2.5 text-xs font-medium text-muted-foreground @2xl:grid",
+            )}
+          >
             <Span>{t("orderList.get.widget.colSale")}</Span>
             <Span>{t("orderList.get.response.terminalName")}</Span>
             <Span>{t("orderList.get.widget.colTime")}</Span>
@@ -185,45 +194,47 @@ export function PosOrderListWidget(
           </Div>
           <Div className="flex flex-col divide-y">
             {orders.map((order) => (
-              <Div
+              <Button
                 key={order.id}
-                tabIndex={0}
+                type="button"
+                variant="ghost"
                 onClick={() => openOrder(order)}
-                onKeyDown={(event) => {
-                  if (event.key === "Enter") {
-                    openOrder(order);
-                  }
-                }}
-                className={`flex cursor-pointer flex-col gap-1 px-4 py-3 transition-colors hover:bg-muted/40 @2xl:grid @2xl:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)_minmax(0,1fr)_auto_minmax(0,0.8fr)] @2xl:items-center @2xl:gap-4 ${order.status === PosOrderStatus.VOIDED ? "opacity-70" : ""}`}
+                className={cn(
+                  SALES_COLUMNS,
+                  "flex h-auto w-full flex-col items-stretch gap-1 rounded-none px-4 py-3 text-left whitespace-normal hover:bg-muted/40 @2xl:grid @2xl:items-center @2xl:gap-4",
+                  order.status === PosOrderStatus.VOIDED && "opacity-70",
+                )}
               >
-                <Div className="flex items-center justify-between gap-3 @2xl:contents">
+                <Span className="flex items-center justify-between gap-3 @2xl:contents">
                   <Span className="min-w-0 truncate text-sm font-semibold">
                     {order.orderNumber}
                   </Span>
                   <Span className="text-sm font-semibold tabular-nums @2xl:hidden">
                     {formatMoney(Number(order.total), order.currency, locale)}
                   </Span>
-                </Div>
+                </Span>
                 <Span className="hidden truncate text-sm text-muted-foreground @2xl:block">
                   {order.terminalName ?? ""}
                 </Span>
-                <Div className="flex items-center justify-between gap-3 @2xl:contents">
+                <Span className="flex items-center justify-between gap-3 @2xl:contents">
                   <Span className="text-xs text-muted-foreground tabular-nums @2xl:text-sm">
                     <Span className="@2xl:hidden">
                       {order.terminalName ? `${order.terminalName} · ` : ""}
                     </Span>
                     {formatDate(order.createdAt)}
                   </Span>
-                  <StatusPill
-                    status={order.status}
-                    variant={statusVariant(order.status)}
-                    label={statusLabel(order.status)}
-                  />
-                </Div>
+                  <Span>
+                    <StatusPill
+                      status={order.status}
+                      variant={statusVariant(order.status)}
+                      label={statusLabel(order.status)}
+                    />
+                  </Span>
+                </Span>
                 <Span className="hidden text-right text-sm font-semibold tabular-nums @2xl:block">
                   {formatMoney(Number(order.total), order.currency, locale)}
                 </Span>
-              </Div>
+              </Button>
             ))}
           </Div>
           <Div className="flex flex-wrap items-center justify-between gap-3 border-t bg-muted/30 px-4 py-3 text-sm">

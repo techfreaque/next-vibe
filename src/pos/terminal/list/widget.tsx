@@ -74,11 +74,6 @@ export function PosTerminalListWidget(
     );
   };
 
-  const pick = (terminal: TerminalRow): void => {
-    onPick?.(terminal);
-    navigation.pop();
-  };
-
   const terminals = data?.terminals ?? [];
   const selling = terminals.filter((row) => row.openSessionId).length;
   const companyCount = new Set(terminals.map((row) => row.companyName)).size;
@@ -159,8 +154,7 @@ export function PosTerminalListWidget(
               terminal={terminal}
               showCompany={companyCount > 1}
               interactive={interactive}
-              isPickerMode={isPickerMode}
-              onPick={pick}
+              onPick={onPick}
               onOpenRegister={openRegister}
               onOpenTill={openTill}
             />
@@ -175,7 +169,6 @@ function TerminalItem({
   terminal,
   showCompany,
   interactive,
-  isPickerMode,
   onPick,
   onOpenRegister,
   onOpenTill,
@@ -183,8 +176,7 @@ function TerminalItem({
   terminal: TerminalRow;
   showCompany: boolean;
   interactive: boolean;
-  isPickerMode: boolean;
-  onPick: (terminal: TerminalRow) => void;
+  onPick?: (terminal: TerminalRow) => void;
   onOpenRegister: (sessionId: string) => void;
   onOpenTill: (terminal: TerminalRow) => void;
 }): JSX.Element {
@@ -225,7 +217,7 @@ function TerminalItem({
     </Div>
   );
 
-  if (isPickerMode) {
+  if (onPick) {
     return (
       <Button
         type="button"

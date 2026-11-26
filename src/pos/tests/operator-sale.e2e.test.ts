@@ -235,29 +235,46 @@ describe("POS operator cash and stock on Atlas", () => {
       return;
     }
 
-    await page.goto(`${baseUrl}/en-US/tools/pos-dashboard?arg.companyId=${companyId}`, { waitUntil: "domcontentloaded" });
-    await show(terminalName);
-    await click(t("dashboard.get.widget.openTill"));
-    await page.getByLabel(t("sessionOpen.post.openingFloat.label"), { exact: true }).fill("50");
-    const opening = waitForPost("/pos/session/open");
-    await click(t("dashboard.get.widget.openTill"));
-    const opened = await opening;
-    expect(opened.ok()).toBe(true);
-    const sessionId = resultId.parse(await opened.json()).data.result.id;
+    const search = page.locator("#pos-register-search");
+    const openTillFromPage = async (openingFloat: string): Promise<string> => {
+      await show(terminalName);
+      await click(t("dashboard.get.widget.openTill"));
+      await page.waitForURL((url) =>
+        url.pathname.endsWith("/tools/pos-session-open") &&
+        url.searchParams.get("arg.details.terminalId") === terminalId,
+      );
+      await page
+        .getByLabel(t("sessionOpen.post.openingFloat.label"), { exact: true })
+        .fill(openingFloat);
+      const opening = waitForPost("/pos/session/open");
+      await click(t("dashboard.get.widget.openTill"));
+      const opened = await opening;
+      expect(opened.ok()).toBe(true);
+      const id = resultId.parse(await opened.json()).data.result.id;
+      for (const locale of localePaths) {
+        scopedReads.add(`/api/${locale}/pos/session/${id}/get`);
+        scopedReads.add(`/api/${locale}/pos/session/${id}/register`);
+      }
+      await page.waitForURL((url) =>
+        url.pathname.endsWith("/tools/pos-register") &&
+        url.searchParams.get("arg.sessionId") === id,
+      );
+      await search.waitFor({ timeout: 60_000 });
+      return id;
+    };
+    scopedReads.add("/api/en-US/pos/terminal/list");
+    await page.goto(`${baseUrl}/en-US/tools?cat=pos`, { waitUntil: "domcontentloaded" });
+    const sessionId = await openTillFromPage("50");
     receiptSessionId = sessionId;
-    for (const locale of localePaths) {
-      scopedReads.add(`/api/${locale}/pos/session/${sessionId}/get`);
-      scopedReads.add(`/api/${locale}/pos/session/${sessionId}/register`);
-    }
+    await page.goBack({ waitUntil: "commit" });
+    await page.waitForURL((url) =>
+      url.pathname.endsWith("/tools") && url.searchParams.get("cat") === "pos",
+    );
+    await show(terminalName);
+    await page.goForward({ waitUntil: "commit" });
+    await search.waitFor({ timeout: 60_000 });
 
     // The till screen: a scanner types the SKU and Enter, the sale starts itself.
-    const search = page.locator("#pos-register-search");
-    const openRegister = page.getByRole("button", { name: t("dashboard.get.widget.openRegister"), exact: true });
-    await search.or(openRegister).first().waitFor({ timeout: 60_000 });
-    if (await openRegister.isVisible()) {
-      await openRegister.click();
-    }
-    await search.waitFor({ timeout: 60_000 });
     const creating = waitForPost("/pos/order/create");
     const adding = waitForPost("/add-item");
     await search.fill("FIX-POS-1");
@@ -319,8 +336,10 @@ describe("POS operator cash and stock on Atlas", () => {
       ]));
     }
 
-    const otherSession = await postAtlas(fixture, "pos/session/open", { details: { terminalId, openingFloat: 0 } });
-    const failedDrawerId = resultId.parse(await otherSession.json()).data.result.id;
+    await page.goto(`${baseUrl}/en-US/tools/pos-terminals?arg.companyId=${companyId}`, {
+      waitUntil: "domcontentloaded",
+    });
+    const failedDrawerId = await openTillFromPage("0");
     const otherOrder = await postAtlas(fixture, "pos/order/create", { details: { sessionId: failedDrawerId } });
     const failedOrderId = resultId.parse(await otherOrder.json()).data.result.id;
     const failedPath = `pos/order/${failedOrderId}`;

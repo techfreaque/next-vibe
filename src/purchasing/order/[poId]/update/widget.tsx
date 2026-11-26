@@ -26,6 +26,8 @@ import { TextareaFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/te
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 import { type JSX, useEffect, useMemo, useRef } from "react";
 
+import warehouseGetDefinition from "@/inventory/warehouse/[warehouseId]/get/definition";
+
 import getDefinition from "../get/definition";
 import type definition from "./definition";
 
@@ -54,6 +56,27 @@ export function OrderUpdateWidget({
   );
   const read = useEndpoint(getDefinition, getOptions, logger, user).read;
   const order = read?.data?.result;
+  const deliveryWarehouseId = order?.deliveryWarehouseId ?? "";
+  const warehouseOptions = useMemo(
+    () => ({
+      read: {
+        urlPathParams: { warehouseId: deliveryWarehouseId },
+        queryOptions: { enabled: deliveryWarehouseId !== "" },
+      },
+    }),
+    [deliveryWarehouseId],
+  );
+  const deliveryWarehouseName = useEndpoint(
+    warehouseGetDefinition,
+    warehouseOptions,
+    logger,
+    user,
+  ).read?.data?.result?.name;
+  const orderCompanyId = order?.companyId;
+  const companyListData = useMemo(
+    () => (orderCompanyId ? { companyId: orderCompanyId } : undefined),
+    [orderCompanyId],
+  );
 
   const filledFor = useRef<string | null>(null);
   useEffect(() => {
@@ -160,6 +183,8 @@ export function OrderUpdateWidget({
             <EntityPickerFieldWidget
               fieldName="vendorId"
               field={field.children.vendorId}
+              listData={companyListData}
+              selectedLabel={order?.vendorName ?? undefined}
             />
             <CurrencySelectFieldWidget
               fieldName="currency"
@@ -182,6 +207,8 @@ export function OrderUpdateWidget({
             <EntityPickerFieldWidget
               fieldName="deliveryWarehouseId"
               field={field.children.deliveryWarehouseId}
+              listData={companyListData}
+              selectedLabel={deliveryWarehouseName}
             />
             <Div className="@lg:col-span-2">
               <TextareaFieldWidget

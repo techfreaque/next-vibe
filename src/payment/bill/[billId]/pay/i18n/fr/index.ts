@@ -12,7 +12,7 @@ export const translations: typeof enTranslations = {
     description:
       "Marquer une facture approuvée comme payée et passer l'écriture de règlement",
     billId: {
-      label: "ID de la facture",
+      label: "Facture",
       description: "La facture à marquer comme payée",
     },
     errors: {
@@ -35,8 +35,9 @@ export const translations: typeof enTranslations = {
         description: "Rôle Comptable ou Admin requis",
       },
       conflict: {
-        title: "Statut invalide",
-        description: "La facture doit être APPROVED avant le paiement",
+        title: "Impossible de régler la facture",
+        description:
+          "Vous pouvez marquer comme payées uniquement les factures approuvées.",
       },
       server: {
         title: "Erreur serveur",
@@ -69,6 +70,9 @@ export const translations: typeof enTranslations = {
     },
     widget: {
       back: "Retour",
+      details: "Détails du paiement",
+      loadingBill: "Chargement de la facture…",
+      retry: "Réessayer",
       submit: "Marquer comme payée",
       paymentRecorded: "Paiement enregistré",
     },
@@ -83,9 +87,9 @@ export const translations: typeof enTranslations = {
     },
   },
   accountNodeId: {
-    label: "Compte banque / caisse",
-    description: "Compte utilisé pour le paiement (banque ou caisse)",
-    placeholder: "UUID du compte",
+    label: "Compte bancaire ou de caisse",
+    description:
+      "Laissez ce champ vide pour utiliser le compte de règlement par défaut.",
   },
   paidAt: {
     label: "Date de paiement",

@@ -1035,7 +1035,6 @@ export const translations: typeof enTranslations = {
       description: "Einen Auftrag mit Positionen und Zahlungen abrufen.",
       widget: {
         refund: "Erstatten",
-        continueInRegister: "In der Kasse fortsetzen",
         addItem: "Artikel hinzufügen",
         addPayment: "Zahlung hinzufügen",
         complete: "Bestellung abschließen",

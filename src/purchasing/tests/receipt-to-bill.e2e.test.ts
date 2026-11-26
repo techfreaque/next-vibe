@@ -268,6 +268,9 @@ describe("Purchasing receipt and supplier bill", () => {
 
       await openOrder();
       await createBill.click();
+      await page
+        .getByText(t("orderConvertToBill.post.widget.consequence"), { exact: true })
+        .waitFor();
       const converted = page.waitForResponse((reply) =>
         new URL(reply.url()).pathname.endsWith(`${base}/convert-to-bill`),
       );

@@ -79,12 +79,18 @@ export function EntityPickerFieldWidget<
 >({
   field,
   fieldName,
+  listData,
+  selectedLabel,
   showLabel = true,
 }: ReactFormFieldProps<
   TEndpoint,
   TUsage,
   EntityPickerFieldWidgetConfig<TKey, TSchema, TUsage>
 > & {
+  /** Arguments for a contextual list, such as the record's company. */
+  listData?: Record<string, WidgetData>;
+  /** Human-readable label for a prefilled ID before the user picks a new one. */
+  selectedLabel?: string;
   /** False when the surrounding layout already renders the field label. */
   showLabel?: boolean;
 }): JSX.Element | null {
@@ -113,7 +119,8 @@ export function EntityPickerFieldWidget<
   // remembered for the picked id so the badge never degrades to a raw uuid.
   const pickedLabel =
     pickedLabelState ??
-    (isFilled ? pickedLabelsById.get(String(currentValue)) : undefined);
+    (isFilled ? pickedLabelsById.get(String(currentValue)) : undefined) ??
+    (isFilled ? selectedLabel : undefined);
 
   // Resolved list endpoint — listEndpoint may be an async resolver used to
   // break static import cycles, so it's resolved lazily. A direct endpoint is
@@ -152,6 +159,7 @@ export function EntityPickerFieldWidget<
   const handleOpen = (): void => {
     void resolveListEndpoint(field.listEndpoint).then((ep) => {
       navigation.push(ep, {
+        data: listData,
         renderInModal: true,
         pickerCallback: (value: WidgetData) => {
           const picked = value as Record<string, string>;
@@ -245,12 +253,6 @@ export function EntityPickerFieldWidget<
           >
             {pickedLabel ?? String(currentValue)}
           </Badge>
-          {pickedLabel && (
-            <Span className="text-xs text-muted-foreground font-mono truncate hidden sm:inline">
-              {/* eslint-disable-next-line i18n/no-literal-string */}
-              {String(currentValue).slice(0, 8)}…
-            </Span>
-          )}
         </Div>
         {control}
       </Div>

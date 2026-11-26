@@ -232,11 +232,19 @@ describe("E2E: approve, settle and reconcile a supplier bill", () => {
         await page
           .getByRole("button", { name: tPay("accountNodeId.label") })
           .click();
-        await page
-          .getByText(bankName, { exact: true })
-          .filter({ visible: true })
-          .last()
-          .click();
+        const accountPicker = page.getByRole("dialog").last();
+        const bankAccount = accountPicker.getByRole("button", {
+          name: bankName,
+          exact: true,
+        });
+        await bankAccount.waitFor();
+        expect(
+          await accountPicker.getByText(expenseName, { exact: true }).count(),
+        ).toBe(0);
+        expect(
+          await accountPicker.getByText(payableName, { exact: true }).count(),
+        ).toBe(0);
+        await bankAccount.click();
         await page.getByText(bankName, { exact: true }).waitFor();
         const payResponse = page.waitForResponse(
           (event) =>

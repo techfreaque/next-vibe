@@ -70,11 +70,11 @@ export const translations = {
   },
   dashboard: {
     get: {
-      title: "POS Dashboard",
-      titleShort: "POS Dashboard",
+      title: "POS dashboard",
+      titleShort: "POS dashboard",
       description: "Overview of terminals, active sessions, and today's sales.",
       widget: {
-        title: "Point of Sale",
+        title: "Point of sale",
         subtitle:
           "Open a till, ring up sales, close the shift with a cash count.",
         salesHistory: "Sales history",
@@ -118,38 +118,38 @@ export const translations = {
       },
       errors: {
         validation: {
-          title: "Validation Error",
+          title: "Validation error",
           description: "Check required fields",
         },
         unauthorized: {
-          title: "Not Signed In",
+          title: "Not signed in",
           description: "Sign in to view the POS dashboard",
         },
         forbidden: {
-          title: "Access Denied",
+          title: "Access denied",
           description: "No access to POS data",
         },
         conflict: { title: "Conflict", description: "Data conflict" },
         server: {
-          title: "Server Error",
+          title: "Server error",
           description: "Failed to load dashboard",
         },
         unknown: {
-          title: "Unknown Error",
+          title: "Unknown error",
           description: "An unexpected error occurred",
         },
         network: {
-          title: "Network Error",
+          title: "Network error",
           description: "Check your connection and try again",
         },
-        notFound: { title: "Not Found", description: "No POS data found" },
+        notFound: { title: "Not found", description: "No POS data found" },
         unsavedChanges: {
-          title: "Unsaved Changes",
+          title: "Unsaved changes",
           description: "You have unsaved changes",
         },
       },
       success: {
-        title: "Dashboard Loaded",
+        title: "Dashboard loaded",
         description: "POS overview retrieved",
       },
       response: {
@@ -456,18 +456,18 @@ export const translations = {
     post: {
       mixedCash:
         "Cash payments in another currency need reconciliation before this drawer can close.",
-      title: "Close Session",
-      titleShort: "Close Session",
+      title: "Close till",
+      titleShort: "Close till",
       description: "Close a cashier session and record the closing float.",
       widget: {
         backToTerminals: "Back",
-        sessionSummary: "Session Summary",
+        sessionSummary: "Session summary",
         terminal: "Terminal",
         openedAt: "Opened at",
         orderCount: "Orders: {{count}}",
         sessionRevenue: "Revenue",
         floatHint: "Count every note and coin in the drawer.",
-        reconciliation: "End of Day",
+        reconciliation: "End of day",
         sessionReady: "Session",
         active: "Active",
         openingFloat: "Opening float",
@@ -494,57 +494,57 @@ export const translations = {
       },
       errors: {
         validation: {
-          title: "Validation Error",
+          title: "Validation error",
           description: "Check required fields",
         },
         unauthorized: {
-          title: "Not Signed In",
+          title: "Not signed in",
           description: "Sign in to close a session",
         },
         forbidden: {
-          title: "Access Denied",
+          title: "Access denied",
           description: "You can only close your own session",
         },
         conflict: {
-          title: "Session Already Closed",
+          title: "Session already closed",
           description: "This session is already closed",
         },
         server: {
-          title: "Server Error",
+          title: "Server error",
           description: "Failed to close session",
         },
         unknown: {
-          title: "Unknown Error",
+          title: "Unknown error",
           description: "An unexpected error occurred",
         },
         network: {
-          title: "Network Error",
+          title: "Network error",
           description: "Check your connection and try again",
         },
         notFound: {
-          title: "Session Not Found",
+          title: "Session not found",
           description: "Session does not exist",
         },
         unsavedChanges: {
-          title: "Unsaved Changes",
+          title: "Unsaved changes",
           description: "You have unsaved changes",
         },
       },
       success: {
-        title: "Session Closed",
+        title: "Session closed",
         description: "Session closed successfully",
       },
       response: {
         id: "Session ID",
         status: "Status",
-        closedAt: "Closed At",
-        closingFloat: "Closing Float",
-        expectedFloat: "Expected Float",
-        cashSalesTotal: "Cash Sales",
-        cashRefundsTotal: "Cash Refunds",
-        openingFloat: "Opening Float",
+        closedAt: "Closed at",
+        closingFloat: "Closing float",
+        expectedFloat: "Expected float",
+        cashSalesTotal: "Cash sales",
+        cashRefundsTotal: "Cash refunds",
+        openingFloat: "Opening float",
         variance: "Variance",
-        orderCount: "Order Count",
+        orderCount: "Order count",
       },
     },
   },
@@ -640,8 +640,8 @@ export const translations = {
   // Order create
   orderCreate: {
     post: {
-      title: "Create Order",
-      titleShort: "Create Order",
+      title: "Create order",
+      titleShort: "Create order",
       description: "Create a new order in an open session.",
       widget: {
         addItem: "Add Item",
@@ -664,44 +664,44 @@ export const translations = {
       },
       errors: {
         validation: {
-          title: "Validation Error",
+          title: "Validation error",
           description: "Check required fields",
         },
         unauthorized: {
-          title: "Not Signed In",
+          title: "Not signed in",
           description: "Sign in to create orders",
         },
         forbidden: {
-          title: "Access Denied",
+          title: "Access denied",
           description: "No access to this session",
         },
         conflict: {
-          title: "Session Closed",
+          title: "Session closed",
           description: "Cannot create orders in a closed session",
         },
         server: {
-          title: "Server Error",
+          title: "Server error",
           description: "Failed to create order",
         },
         unknown: {
-          title: "Unknown Error",
+          title: "Unknown error",
           description: "An unexpected error occurred",
         },
         network: {
-          title: "Network Error",
+          title: "Network error",
           description: "Check your connection and try again",
         },
         notFound: {
-          title: "Session Not Found",
+          title: "Session not found",
           description: "Session does not exist",
         },
         unsavedChanges: {
-          title: "Unsaved Changes",
+          title: "Unsaved changes",
           description: "You have unsaved changes",
         },
       },
       success: {
-        title: "Order Created",
+        title: "Order created",
         description: "Order created successfully",
       },
       response: {
@@ -718,8 +718,8 @@ export const translations = {
   // Order add item
   orderAddItem: {
     post: {
-      title: "Add Item",
-      titleShort: "Add Item",
+      title: "Add item",
+      titleShort: "Add item",
       description: "Add a line item to an open order.",
       widget: {
         backToOrder: "Back to order",
@@ -751,7 +751,7 @@ export const translations = {
         placeholder: "1",
       },
       unitPrice: {
-        label: "Unit Price",
+        label: "Unit price",
         description: "Price per unit",
         placeholder: "3.50",
       },
@@ -760,46 +760,46 @@ export const translations = {
         description: "Raise the quantity of an existing line for this product",
       },
       taxRate: {
-        label: "Tax Rate",
+        label: "Tax rate",
         description: "Tax rate as decimal (e.g. 0.2 for 20%)",
         placeholder: "0.20",
       },
       errors: {
         validation: {
-          title: "Validation Error",
+          title: "Validation error",
           description: "Check required fields",
         },
         unauthorized: {
-          title: "Not Signed In",
+          title: "Not signed in",
           description: "Sign in to add items",
         },
         forbidden: {
-          title: "Access Denied",
+          title: "Access denied",
           description: "No access to this order",
         },
         conflict: {
-          title: "Order Not Open",
+          title: "Order not open",
           description: "Cannot add items to a non-open order",
         },
-        server: { title: "Server Error", description: "Failed to add item" },
+        server: { title: "Server error", description: "Failed to add item" },
         unknown: {
-          title: "Unknown Error",
+          title: "Unknown error",
           description: "An unexpected error occurred",
         },
         network: {
-          title: "Network Error",
+          title: "Network error",
           description: "Check your connection and try again",
         },
         notFound: {
-          title: "Order Not Found",
+          title: "Order not found",
           description: "Order does not exist",
         },
         unsavedChanges: {
-          title: "Unsaved Changes",
+          title: "Unsaved changes",
           description: "You have unsaved changes",
         },
       },
-      success: { title: "Item Added", description: "Item added to order" },
+      success: { title: "Item added", description: "Item added to order" },
       response: {
         id: "Item ID",
         description: "Description",
@@ -815,8 +815,8 @@ export const translations = {
   // Order remove item
   orderRemoveItem: {
     post: {
-      title: "Remove Item",
-      titleShort: "Remove Item",
+      title: "Remove item",
+      titleShort: "Remove item",
       description: "Remove a line item from an open order.",
       widget: {
         chooseLine: "Select a line item",
@@ -830,41 +830,41 @@ export const translations = {
       itemId: { label: "Line item", description: "Item to remove" },
       errors: {
         validation: {
-          title: "Validation Error",
+          title: "Validation error",
           description: "Check required fields",
         },
         unauthorized: {
-          title: "Not Signed In",
+          title: "Not signed in",
           description: "Sign in to remove items",
         },
         forbidden: {
-          title: "Access Denied",
+          title: "Access denied",
           description: "No access to this order",
         },
         conflict: {
-          title: "Order Not Open",
+          title: "Order not open",
           description: "Cannot remove items from a non-open order",
         },
-        server: { title: "Server Error", description: "Failed to remove item" },
+        server: { title: "Server error", description: "Failed to remove item" },
         unknown: {
-          title: "Unknown Error",
+          title: "Unknown error",
           description: "An unexpected error occurred",
         },
         network: {
-          title: "Network Error",
+          title: "Network error",
           description: "Check your connection and try again",
         },
         notFound: {
-          title: "Not Found",
+          title: "Not found",
           description: "Order or item not found",
         },
         unsavedChanges: {
-          title: "Unsaved Changes",
+          title: "Unsaved changes",
           description: "You have unsaved changes",
         },
       },
       success: {
-        title: "Item Removed",
+        title: "Item removed",
         description: "Item removed from order",
       },
       response: {
@@ -877,8 +877,8 @@ export const translations = {
   // Order complete
   orderComplete: {
     post: {
-      title: "Complete Order",
-      titleShort: "Complete Order",
+      title: "Complete order",
+      titleShort: "Complete order",
       description:
         "Complete an order. Validates full payment and posts journal entry.",
       widget: {
@@ -891,44 +891,44 @@ export const translations = {
       orderId: { label: "Order ID", description: "Order to complete" },
       errors: {
         validation: {
-          title: "Validation Error",
+          title: "Validation error",
           description: "Invalid order ID",
         },
         unauthorized: {
-          title: "Not Signed In",
+          title: "Not signed in",
           description: "Sign in to complete orders",
         },
         forbidden: {
-          title: "Access Denied",
+          title: "Access denied",
           description: "No access to this order",
         },
         conflict: {
-          title: "Unpaid Balance",
+          title: "Unpaid balance",
           description: "Total payments do not cover the order total",
         },
         server: {
-          title: "Server Error",
+          title: "Server error",
           description: "Failed to complete order",
         },
         unknown: {
-          title: "Unknown Error",
+          title: "Unknown error",
           description: "An unexpected error occurred",
         },
         network: {
-          title: "Network Error",
+          title: "Network error",
           description: "Check your connection and try again",
         },
         notFound: {
-          title: "Order Not Found",
+          title: "Order not found",
           description: "Order does not exist",
         },
         unsavedChanges: {
-          title: "Unsaved Changes",
+          title: "Unsaved changes",
           description: "You have unsaved changes",
         },
       },
       success: {
-        title: "Order Completed",
+        title: "Order completed",
         description: "Order completed and journal entry posted",
       },
       response: {
@@ -943,8 +943,8 @@ export const translations = {
   // Order void
   orderVoid: {
     post: {
-      title: "Void Order",
-      titleShort: "Void Order",
+      title: "Void order",
+      titleShort: "Void order",
       description: "Void an open order. Cannot be undone.",
       widget: {
         tendered:
@@ -955,40 +955,40 @@ export const translations = {
       orderId: { label: "Order", description: "Order to void" },
       errors: {
         validation: {
-          title: "Validation Error",
+          title: "Validation error",
           description: "Invalid order ID",
         },
         unauthorized: {
-          title: "Not Signed In",
+          title: "Not signed in",
           description: "Sign in to void orders",
         },
         forbidden: {
-          title: "Access Denied",
+          title: "Access denied",
           description: "No access to this order",
         },
         conflict: {
-          title: "Order Not Open",
+          title: "Order not open",
           description: "Only open orders can be voided",
         },
-        server: { title: "Server Error", description: "Failed to void order" },
+        server: { title: "Server error", description: "Failed to void order" },
         unknown: {
-          title: "Unknown Error",
+          title: "Unknown error",
           description: "An unexpected error occurred",
         },
         network: {
-          title: "Network Error",
+          title: "Network error",
           description: "Check your connection and try again",
         },
         notFound: {
-          title: "Order Not Found",
+          title: "Order not found",
           description: "Order does not exist",
         },
         unsavedChanges: {
-          title: "Unsaved Changes",
+          title: "Unsaved changes",
           description: "You have unsaved changes",
         },
       },
-      success: { title: "Order Voided", description: "Order has been voided" },
+      success: { title: "Order voided", description: "Order has been voided" },
       response: {
         id: "Order ID",
         status: "Status",
@@ -999,12 +999,11 @@ export const translations = {
   // Order get
   orderGet: {
     get: {
-      title: "Get Order",
-      titleShort: "Order Details",
+      title: "Get order",
+      titleShort: "Order details",
       description: "Retrieve a single order with its items and payments.",
       widget: {
         refund: "Refund",
-        continueInRegister: "Continue in register",
         addItem: "Add item",
         addPayment: "Add payment",
         complete: "Complete order",
@@ -1015,7 +1014,7 @@ export const translations = {
         qtyTimesPrice: "×",
         loading: "Loading order...",
         noItems: "Add the first item.",
-        viewJournalEntry: "View Journal Entry",
+        viewJournalEntry: "View journal entry",
         voidedStamp: "VOIDED",
         completedReadOnly: "This order is completed and cannot be modified.",
         select: "Select order",
@@ -1023,38 +1022,38 @@ export const translations = {
       orderId: { label: "Order ID", description: "Order to retrieve" },
       errors: {
         validation: {
-          title: "Validation Error",
+          title: "Validation error",
           description: "Invalid order ID",
         },
         unauthorized: {
-          title: "Not Signed In",
+          title: "Not signed in",
           description: "Sign in to view orders",
         },
         forbidden: {
-          title: "Access Denied",
+          title: "Access denied",
           description: "No access to this order",
         },
         conflict: { title: "Conflict", description: "Data conflict" },
-        server: { title: "Server Error", description: "Failed to load order" },
+        server: { title: "Server error", description: "Failed to load order" },
         unknown: {
-          title: "Unknown Error",
+          title: "Unknown error",
           description: "An unexpected error occurred",
         },
         network: {
-          title: "Network Error",
+          title: "Network error",
           description: "Check your connection and try again",
         },
         notFound: {
-          title: "Order Not Found",
+          title: "Order not found",
           description: "Order does not exist",
         },
         unsavedChanges: {
-          title: "Unsaved Changes",
+          title: "Unsaved changes",
           description: "You have unsaved changes",
         },
       },
       success: {
-        title: "Order Loaded",
+        title: "Order loaded",
         description: "Order details retrieved",
       },
       response: {
@@ -1133,42 +1132,42 @@ export const translations = {
       },
       page: { label: "Page", description: "Page number (starts at 1)" },
       pageSize: {
-        label: "Per Page",
+        label: "Per page",
         description: "Results per page (max 100)",
       },
       errors: {
         validation: {
-          title: "Validation Error",
+          title: "Validation error",
           description: "Check required fields",
         },
         unauthorized: {
-          title: "Not Signed In",
+          title: "Not signed in",
           description: "Sign in to list orders",
         },
         forbidden: {
-          title: "Access Denied",
+          title: "Access denied",
           description: "No access to this session",
         },
         conflict: { title: "Conflict", description: "Data conflict" },
-        server: { title: "Server Error", description: "Failed to list orders" },
+        server: { title: "Server error", description: "Failed to list orders" },
         unknown: {
-          title: "Unknown Error",
+          title: "Unknown error",
           description: "An unexpected error occurred",
         },
         network: {
-          title: "Network Error",
+          title: "Network error",
           description: "Check your connection and try again",
         },
         notFound: {
-          title: "Session Not Found",
+          title: "Session not found",
           description: "Session does not exist",
         },
         unsavedChanges: {
-          title: "Unsaved Changes",
+          title: "Unsaved changes",
           description: "You have unsaved changes",
         },
       },
-      success: { title: "Orders Loaded", description: "Order list retrieved" },
+      success: { title: "Orders loaded", description: "Order list retrieved" },
       response: {
         terminalName: "Till",
         count: "Total",
@@ -1283,8 +1282,8 @@ export const translations = {
   // Order add payment
   orderAddPayment: {
     post: {
-      title: "Add Payment",
-      titleShort: "Add Payment",
+      title: "Add payment",
+      titleShort: "Add payment",
       description: "Record a payment against an open order.",
       widget: {
         fullyPaid: "Fully paid",
@@ -1296,7 +1295,7 @@ export const translations = {
       },
       orderId: { label: "Order ID", description: "Order to pay" },
       method: {
-        label: "Payment Method",
+        label: "Payment method",
         description: "How the customer pays",
         placeholder: "Select method",
       },
@@ -1315,49 +1314,49 @@ export const translations = {
         description: "Card authorisation code or transfer reference",
       },
       accountNodeId: {
-        label: "Account Node",
+        label: "Account node",
         description: "Receiving account node (overrides terminal default)",
       },
       errors: {
         validation: {
-          title: "Validation Error",
+          title: "Validation error",
           description: "Check required fields",
         },
         unauthorized: {
-          title: "Not Signed In",
+          title: "Not signed in",
           description: "Sign in to add payments",
         },
         forbidden: {
-          title: "Access Denied",
+          title: "Access denied",
           description: "No access to this order",
         },
         conflict: {
-          title: "Order Not Open",
+          title: "Order not open",
           description: "Cannot add payments to a non-open order",
         },
         server: {
-          title: "Server Error",
+          title: "Server error",
           description: "Failed to record payment",
         },
         unknown: {
-          title: "Unknown Error",
+          title: "Unknown error",
           description: "An unexpected error occurred",
         },
         network: {
-          title: "Network Error",
+          title: "Network error",
           description: "Check your connection and try again",
         },
         notFound: {
-          title: "Order Not Found",
+          title: "Order not found",
           description: "Order does not exist",
         },
         unsavedChanges: {
-          title: "Unsaved Changes",
+          title: "Unsaved changes",
           description: "You have unsaved changes",
         },
       },
       success: {
-        title: "Payment Recorded",
+        title: "Payment recorded",
         description: "Payment recorded against order",
       },
       response: {

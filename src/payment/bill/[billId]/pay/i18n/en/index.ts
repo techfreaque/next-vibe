@@ -5,7 +5,7 @@ export const translations = {
     titleShort: "Pay bill",
     description:
       "Mark an approved bill as paid and post the payment journal entry",
-    billId: { label: "Bill ID", description: "The bill to mark as paid" },
+    billId: { label: "Bill", description: "The bill to mark as paid" },
     errors: {
       approvalPosting:
         "This bill needs a posted approval entry before payment.",
@@ -23,8 +23,8 @@ export const translations = {
         description: "Accountant or Admin role required",
       },
       conflict: {
-        title: "Invalid status",
-        description: "Bill must be APPROVED before payment",
+        title: "Bill cannot be paid",
+        description: "Only approved bills can be marked as paid.",
       },
       server: {
         title: "Server error",
@@ -51,7 +51,10 @@ export const translations = {
     },
     widget: {
       back: "Back",
-      submit: "Mark as Paid",
+      details: "Payment details",
+      loadingBill: "Loading bill…",
+      retry: "Try again",
+      submit: "Mark as paid",
       paymentRecorded: "Payment recorded",
     },
   },
@@ -65,9 +68,8 @@ export const translations = {
     },
   },
   accountNodeId: {
-    label: "Bank / Cash Account",
-    description: "Account node used to pay (Bank or Cash)",
-    placeholder: "Account UUID",
+    label: "Bank or cash account",
+    description: "Leave blank to use the default payment account.",
   },
   paidAt: {
     label: "Payment date",

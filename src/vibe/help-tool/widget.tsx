@@ -1851,14 +1851,21 @@ export function HelpToolsWidget(): JSX.Element {
         if (!canOpenLocalEndpoint(endpointDef)) {
           return;
         }
+        ++selectionRevision.current;
+        setUnavailableSelection(false);
+        setIsRestoringTool(false);
+        if (urlNavStack && endpointDef.method !== "GET") {
+          // The overview opens actions in the tool pane. Keep the stack entry
+          // so the form receives its prefill and success navigation.
+          setSelectedAdminEndpoint(endpointDef);
+          urlNavStack.push(endpointDef, { ...options, renderInModal: false });
+          return;
+        }
         const args = serializeNavigationData({
           ...options?.urlPathParams,
           ...options?.data,
         });
-        ++selectionRevision.current;
         const newPath = `/${locale}/${ADMIN_ENDPOINTS_PATH}/${endpointToUrlSegment(endpointDef)}`;
-        setUnavailableSelection(false);
-        setIsRestoringTool(false);
         setSelectedAdminEndpoint(endpointDef, args);
         urlNavStack?._clearStack();
         const sp = copyCatalogSearchParams(effectiveSearchRef.current);
@@ -3012,6 +3019,8 @@ export function HelpToolsWidget(): JSX.Element {
     );
     const recordEndpoint =
       recordNavigationEntry?.endpoint ?? selectedAdminEndpoint;
+    const companyScopedPage =
+      !!recordEndpoint && hasWorkspaceCompanyInput(recordEndpoint);
     const fixedRecordCompany =
       !!recordEndpoint && hasFixedRecordCompany(recordEndpoint);
     const recordCompanyKey =
@@ -3469,7 +3478,7 @@ export function HelpToolsWidget(): JSX.Element {
                 <ToolCompanyContext.Provider
                   value={hasLocalWorkspace ? selectedCompanyId : undefined}
                 >
-                  {companyScopedEndpoint &&
+                  {companyScopedPage &&
                   hasLocalWorkspace &&
                   workspace &&
                   !selectedCompanyId ? (

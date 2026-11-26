@@ -16,7 +16,7 @@ export const translations: typeof enTranslations = {
     titleShort: "Opłać rachunek",
     description:
       "Oznacz zatwierdzoną fakturę jako opłaconą i utwórz zapis płatności",
-    billId: { label: "ID faktury", description: "Faktura do opłacenia" },
+    billId: { label: "Faktura", description: "Faktura do opłacenia" },
     errors: {
       approvalPosting: "Przed płatnością zaksięguj zatwierdzenie tej faktury.",
       paymentAccount: "Wybierz aktywne konto bankowe lub kasowe tej firmy.",
@@ -34,8 +34,8 @@ export const translations: typeof enTranslations = {
         description: "Wymagana rola Księgowy lub Administrator",
       },
       conflict: {
-        title: "Nieprawidłowy status",
-        description: "Faktura musi być zatwierdzona przed opłaceniem",
+        title: "Nie można opłacić faktury",
+        description: "Tylko zatwierdzone faktury można oznaczyć jako opłacone.",
       },
       server: {
         title: "Błąd serwera",
@@ -65,14 +65,16 @@ export const translations: typeof enTranslations = {
     },
     widget: {
       back: "Wróć",
-      submit: "Oznacz jako opłacone",
+      details: "Szczegóły płatności",
+      loadingBill: "Wczytywanie faktury…",
+      retry: "Spróbuj ponownie",
+      submit: "Oznacz jako opłaconą",
       paymentRecorded: "Płatność zarejestrowana",
     },
   },
   accountNodeId: {
-    label: "Konto bankowe / kasowe",
-    description: "Konto użyte do zapłaty (bank lub kasa)",
-    placeholder: "UUID konta",
+    label: "Konto bankowe lub kasowe",
+    description: "Zostaw to pole puste, aby użyć domyślnego konta płatności.",
   },
   paidAt: {
     label: "Data płatności",

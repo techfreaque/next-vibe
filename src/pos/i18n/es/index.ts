@@ -1035,7 +1035,6 @@ export const translations: typeof enTranslations = {
       description: "Recuperar una sola orden con sus artículos y pagos.",
       widget: {
         refund: "Reembolsar",
-        continueInRegister: "Continuar en caja",
         addItem: "Añádase el tema",
         addPayment: "Agregar pago",
         complete: "Pedido completo",
@@ -1046,8 +1045,8 @@ export const translations: typeof enTranslations = {
         qtyTimesPrice: "×",
         loading: "Cargando pedidos...",
         noItems: "Todavía no hay artículos. añada el primer artículo.",
-        viewJournalEntry: "View Journal Entry",
-        voidedStamp: "VOIDED",
+        viewJournalEntry: "Ver asiento contable",
+        voidedStamp: "ANULADO",
         completedReadOnly: "Esta orden se completa y no puede ser modificada.",
         select: "Seleccione el orden",
       },

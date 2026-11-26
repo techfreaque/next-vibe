@@ -1052,7 +1052,6 @@ export const translations: typeof enTranslations = {
       description: "Afficher une commande avec ses articles et ses paiements.",
       widget: {
         refund: "Rembourser",
-        continueInRegister: "Continuer en caisse",
         addItem: "Ajouter un article",
         addPayment: "Ajouter un paiement",
         complete: "Finaliser la commande",

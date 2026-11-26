@@ -17,7 +17,7 @@ export const translations: typeof enTranslations = {
     description:
       "Genehmigte Rechnung als bezahlt markieren und Zahlungsbuchung erstellen",
     billId: {
-      label: "Rechnungs-ID",
+      label: "Rechnung",
       description: "Die zu bezahlende Rechnung",
     },
     errors: {
@@ -40,8 +40,9 @@ export const translations: typeof enTranslations = {
         description: "Buchhaltungs- oder Adminrolle erforderlich",
       },
       conflict: {
-        title: "Ungültiger Status",
-        description: "Rechnung muss genehmigt sein vor Zahlung",
+        title: "Rechnung kann nicht bezahlt werden",
+        description:
+          "Nur freigegebene Rechnungen lassen sich als bezahlt markieren.",
       },
       server: {
         title: "Serverfehler",
@@ -71,14 +72,16 @@ export const translations: typeof enTranslations = {
     },
     widget: {
       back: "Zurück",
+      details: "Zahlungsdetails",
+      loadingBill: "Rechnung wird geladen…",
+      retry: "Erneut versuchen",
       submit: "Als bezahlt markieren",
       paymentRecorded: "Zahlung erfasst",
     },
   },
   accountNodeId: {
-    label: "Bank- / Kassenkonto",
-    description: "Konto, von dem die Zahlung erfolgt (Bank oder Kasse)",
-    placeholder: "Konto-UUID",
+    label: "Bank- oder Kassenkonto",
+    description: "Ohne Auswahl wird das Standardkonto für Zahlungen verwendet.",
   },
   paidAt: {
     label: "Zahlungsdatum",

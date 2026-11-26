@@ -53,11 +53,6 @@ export function PosProductLookupWidget(
 
   const products = data?.products ?? [];
 
-  const pick = (product: ProductRow): void => {
-    onPick?.(product);
-    navigation.pop();
-  };
-
   return (
     <WidgetShell layout="page" className="mx-auto max-w-3xl">
       <WidgetHeader
@@ -125,13 +120,13 @@ export function PosProductLookupWidget(
       ) : (
         <Div className="flex flex-col divide-y overflow-hidden rounded-xl border bg-card">
           {products.map((product) =>
-            isPickerMode ? (
+            onPick ? (
               <Button
                 key={product.id}
                 type="button"
                 variant="ghost"
                 className="h-auto min-h-14 justify-start rounded-none px-4 py-3 text-left"
-                onClick={() => pick(product)}
+                onClick={() => onPick(product)}
               >
                 <ProductLine product={product} />
               </Button>

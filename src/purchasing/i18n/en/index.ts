@@ -89,7 +89,7 @@ export const translations = {
           title: "Network error",
           description: "Check your connection and try again",
         },
-        notFound: { title: "Not Found", description: "Company not found" },
+        notFound: { title: "Not found", description: "Company not found" },
         unsavedChanges: {
           title: "Unsaved changes",
           description: "You have unsaved changes",
@@ -250,7 +250,7 @@ export const translations = {
           title: "Network error",
           description: "Check your connection and try again",
         },
-        notFound: { title: "Not Found", description: "Company not found" },
+        notFound: { title: "Not found", description: "Company not found" },
         unsavedChanges: {
           title: "Unsaved changes",
           description: "You have unsaved changes",
@@ -321,7 +321,7 @@ export const translations = {
           description: "No access to this vendor",
         },
         conflict: { title: "Conflict", description: "Data conflict" },
-        server: { title: "Server Error", description: "Failed to load vendor" },
+        server: { title: "Server error", description: "Failed to load vendor" },
         unknown: {
           title: "Unknown error",
           description: "An unexpected error occurred",
@@ -778,7 +778,7 @@ export const translations = {
           title: "Network error",
           description: "Check your connection and try again",
         },
-        notFound: { title: "Not Found", description: "Company not found" },
+        notFound: { title: "Not found", description: "Company not found" },
         unsavedChanges: {
           title: "Unsaved changes",
           description: "You have unsaved changes",
@@ -1305,7 +1305,7 @@ export const translations = {
           description:
             "Only a fully received order without an existing bill can be converted.",
         },
-        server: { title: "Server Error", description: "Failed to create bill" },
+        server: { title: "Server error", description: "Failed to create bill" },
         unknown: {
           title: "Unknown error",
           description: "An unexpected error occurred",
@@ -1562,7 +1562,7 @@ export const translations = {
           title: "Network error",
           description: "Check your connection and try again",
         },
-        notFound: { title: "Not Found", description: "Company not found" },
+        notFound: { title: "Not found", description: "Company not found" },
         unsavedChanges: {
           title: "Unsaved changes",
           description: "You have unsaved changes",

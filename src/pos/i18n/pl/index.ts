@@ -1022,7 +1022,6 @@ export const translations: typeof enTranslations = {
       description: "Pobierz pojedyncze zamówienie z pozycjami i płatnościami.",
       widget: {
         refund: "Zwrot",
-        continueInRegister: "Kontynuuj w kasie",
         addItem: "Dodaj pozycję",
         addPayment: "Dodaj płatność",
         complete: "Zakończ zamówienie",

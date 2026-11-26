@@ -16,6 +16,7 @@ import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
 import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
 import {
   objectField,
+  objectOptionalField,
   requestField,
   responseArrayField,
   responseField,
@@ -57,7 +58,7 @@ const { GET } = createEndpoint({
         hidden: true,
         schema: z.uuid().optional(),
       }),
-      input: objectField(scopedTranslation, {
+      input: objectOptionalField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         layoutType: LayoutType.GRID_2_COLUMNS,
         usage: { request: "data" },

@@ -27,11 +27,11 @@ export const translations: typeof enTranslations = {
   },
   enums: {
     sessionStatus: {
-      open: "Otvoriť",
+      open: "Otvorené",
       closed: "Uzatvorené",
     },
     orderStatus: {
-      open: "Otvoriť",
+      open: "Otvorené",
       completed: "Dokončené",
       voided: "Stornované",
     },
@@ -1023,7 +1023,6 @@ export const translations: typeof enTranslations = {
       description: "Načítať objednávku s položkami a platbami.",
       widget: {
         refund: "Vrátiť",
-        continueInRegister: "Pokračovať v pokladni",
         addItem: "Pridať položku",
         addPayment: "Pridať platbu",
         complete: "Dokončiť objednávku",
@@ -1035,7 +1034,7 @@ export const translations: typeof enTranslations = {
         loading: "Načítava sa objednávka…",
         noItems: "Zatiaľ žiadne položky. Pridajte prvú položku.",
         viewJournalEntry: "Zobraziť účtovný zápis",
-        voidedStamp: "VOIDED",
+        voidedStamp: "STORNOVANÝ",
         completedReadOnly: "Objednávka je dokončená a už ju nemožno upravovať.",
         select: "Vyberte objednávku",
       },

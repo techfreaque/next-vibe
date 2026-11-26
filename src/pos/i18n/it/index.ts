@@ -1040,7 +1040,6 @@ export const translations: typeof enTranslations = {
         "Recuperare un unico ordine con i suoi articoli e pagamenti.",
       widget: {
         refund: "Rimborsa",
-        continueInRegister: "Continua in cassa",
         addItem: "Aggiungi l'articolo",
         addPayment: "Aggiungi pagamento",
         complete: "Ordine completo",
@@ -1051,8 +1050,8 @@ export const translations: typeof enTranslations = {
         qtyTimesPrice: "×",
         loading: "Ordine di caricamento...",
         noItems: "Non ci sono ancora elementi. aggiungere il primo elemento.",
-        viewJournalEntry: "Visualizza l'ingresso del giornale",
-        voidedStamp: "VOIDED",
+        viewJournalEntry: "Visualizza la registrazione contabile",
+        voidedStamp: "ANNULLATO",
         completedReadOnly:
           "Questo ordine è completato e non può essere modificato.",
         select: "Selezionare l'ordine",

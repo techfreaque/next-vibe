@@ -27,13 +27,12 @@ import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
 import { NumberFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/number-field/widget";
 import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
-import { type JSX, useEffect, useMemo, useRef } from "react";
+import { type JSX, useMemo } from "react";
 import { useWatch } from "react-hook-form";
 import { z } from "zod";
 
 import terminalListDefinition from "../../terminal/list/definition";
 import { posTerminalNameMap } from "../../terminal/list/widget";
-import registerDefinition from "../[sessionId]/register/definition";
 import type definition from "./definition";
 
 interface PosSessionOpenWidgetProps {
@@ -85,21 +84,6 @@ export function PosSessionOpenWidget({
   const terminalName =
     terminal?.name ?? posTerminalNameMap.get(terminalId) ?? "";
   const currency = result?.currency ?? terminal?.currency;
-
-  // An opened till always continues on its register. The caller's
-  // replaceOnSuccess does this when the stack carries it; the admin URL shell
-  // drops it, so land there once from here too (replace keeps Back sane).
-  const landed = useRef(false);
-  const openedId = interactive ? result?.id : undefined;
-  useEffect(() => {
-    if (!openedId || landed.current) {
-      return;
-    }
-    landed.current = true;
-    navigation.replace(registerDefinition.GET, {
-      urlPathParams: { sessionId: openedId },
-    });
-  }, [navigation, openedId]);
 
   const back = (): void => {
     if (navigation.canGoBack) {

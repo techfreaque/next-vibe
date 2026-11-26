@@ -8,8 +8,8 @@ export const translations: typeof enTranslations = {
     description:
       "Označiť schválenú dodávateľskú faktúru ako uhradenú a zaúčtovať platbu",
     billId: {
-      label: "ID dodávateľskej faktúry",
-      description: "Prijatá faktúra na označenie ako uhradená",
+      label: "Prijatá faktúra",
+      description: "Faktúra, ktorú chcete označiť ako uhradenú.",
     },
     errors: {
       approvalPosting:
@@ -31,8 +31,8 @@ export const translations: typeof enTranslations = {
         description: "Vyžaduje sa rola účtovníka alebo správcu.",
       },
       conflict: {
-        title: "Neplatný stav",
-        description: "Pred úhradou musí byť faktúra v stave APPROVED.",
+        title: "Faktúru nemožno uhradiť",
+        description: "Ako uhradené môžete označiť iba schválené faktúry.",
       },
       server: {
         title: "Chyba servera",
@@ -65,6 +65,9 @@ export const translations: typeof enTranslations = {
     },
     widget: {
       back: "Späť",
+      details: "Údaje o úhrade",
+      loadingBill: "Načítava sa faktúra…",
+      retry: "Skúsiť znova",
       submit: "Označiť ako uhradenú",
       paymentRecorded: "Úhrada bola zaevidovaná",
     },
@@ -74,14 +77,14 @@ export const translations: typeof enTranslations = {
       DRAFT: "Koncept",
       RECEIVED: "Prijatá",
       APPROVED: "Schválená",
-      PAID: "Zaplatené",
+      PAID: "Uhradená",
       DISPUTED: "Sporná",
     },
   },
   accountNodeId: {
     label: "Bankový alebo pokladničný účet",
-    description: "Bankový alebo pokladničný účet použitý na úhradu",
-    placeholder: "UUID účtu",
+    description:
+      "Ak pole necháte prázdne, použije sa predvolený účet na úhrady.",
   },
   paidAt: {
     label: "Dátum platby",

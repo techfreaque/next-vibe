@@ -72,12 +72,10 @@ export function OrderReceiveWidget({
     [interactive, poId, result],
   );
   const read = useEndpoint(detailDefinition, options, logger, user).read;
-  const order = read?.data?.result;
+  const loaded = read?.data?.result;
+  const order = loaded?.id === poId ? loaded : undefined;
   const openLines =
-    order?.id === poId
-      ? (order?.lines.filter((line) => line.quantityReceived < line.quantity) ??
-        [])
-      : [];
+    order?.lines.filter((line) => line.quantityReceived < line.quantity) ?? [];
   const number = new Intl.NumberFormat(locale, { maximumFractionDigits: 4 });
 
   const setQuantity = (poLineId: string, quantityReceived: number): void => {
@@ -220,10 +218,13 @@ export function OrderReceiveWidget({
           )}
         </AdminFormSection>
       )}
-      <EntityPickerFieldWidget
-        fieldName="warehouseId"
-        field={field.children.warehouseId}
-      />
+      {order && (
+        <EntityPickerFieldWidget
+          fieldName="warehouseId"
+          field={field.children.warehouseId}
+          listData={{ companyId: order.companyId }}
+        />
+      )}
       <TextareaFieldWidget
         fieldName="notes"
         field={withValue(field.children.notes, undefined, null)}

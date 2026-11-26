@@ -235,7 +235,7 @@ describe("E2E: vendor, purchase order and warehouse stock", () => {
       const receive = submit(t("orderGet.get.widget.receive"));
       await openOrder(() => receive.waitFor());
       await receive.click();
-      // The order's delivery warehouse is the receipt default; no override needed.
+      await picker(t("orderReceive.post.warehouseId.label"), warehouseName);
       await page.getByLabel(productName, { exact: true }).fill(String(units));
       const receiptReply = await submitAction(t("orderReceive.post.title"), `${apiOrder}/receive`);
       const receipt = z
