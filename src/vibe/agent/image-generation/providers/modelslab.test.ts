@@ -79,10 +79,13 @@ test("every enabled dedicated ModelsLab image model has an API route", () => {
 test("keeps documented v6 routes and sends pixel dimensions", async () => {
   const { result, calls } = run(
     "z-image-base",
-    [mockResponse({ status: "success", output: [IMAGE] })],
+    [mockResponse({ status: "success", id: 991, output: [IMAGE] })],
     { aspectRatio: "16:9" },
   );
-  expect(await result).toMatchObject({ success: true, data: { imageUrl: IMAGE } });
+  expect(await result).toMatchObject({
+    success: true,
+    data: { imageUrl: IMAGE, providerJobId: "991" },
+  });
   expect(calls).toEqual([
     {
       url: `${API}/v6/images/text2img`,
@@ -140,7 +143,10 @@ test("uses Seedream's edit ID and polls the v7 job by ID", async () => {
     ],
     { inputMediaUrl: IMAGE, aspectRatio: "16:9" },
   );
-  expect(await result).toMatchObject({ success: true, data: { imageUrl: IMAGE } });
+  expect(await result).toMatchObject({
+    success: true,
+    data: { imageUrl: IMAGE, providerJobId: "job-123" },
+  });
   expect(calls).toEqual([
     {
       url: `${API}/v7/images/image-to-image`,

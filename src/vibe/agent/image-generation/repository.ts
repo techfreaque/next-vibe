@@ -32,7 +32,10 @@ import { ChatMessageRole } from "../chat/enum";
 import { getStorageAdapter } from "../chat/storage/index";
 import { parseStorageUrl } from "../chat/storage/url-utils";
 import { getEnvAvailability } from "../env-availability";
-import { MediaStudioRepository } from "../media-studio/repository";
+import {
+  MediaStudioRepository,
+  type ProviderJobIdRecorder,
+} from "../media-studio/repository";
 import { toStudioSettings } from "../media-studio/settings";
 import {
   ApiProvider,
@@ -209,7 +212,7 @@ export class ImageGenerationRepository {
       user,
       locale,
       logger,
-      generate: () =>
+      generate: ({ recordProviderJobId }) =>
         ImageGenerationRepository.generateImage(
           { ...data, saveToStudio: undefined },
           user,
@@ -218,6 +221,7 @@ export class ImageGenerationRepository {
           t,
           toolExecutionContext,
           platform,
+          recordProviderJobId,
         ),
     });
   }
@@ -230,6 +234,7 @@ export class ImageGenerationRepository {
     t: ImageGenerationT,
     toolExecutionContext: ToolExecutionContext,
     platform: Platform,
+    onProviderJobId?: ProviderJobIdRecorder,
   ): Promise<ResponseType<ImageGenerationPostResponseOutput>> {
     // model is resolved via fieldDefaults in route.ts (from favorites/skill config)
     if (!data.model) {
@@ -402,6 +407,8 @@ export class ImageGenerationRepository {
       creditCost?: number;
       /** Real upstream USD charge (no markup), when the provider reports one. */
       upstreamCostUsd?: number;
+      /** Provider request/job/generation ID for dashboard charge matching. */
+      providerJobId?: string;
     }>;
     switch (imageModel.apiProvider) {
       case ApiProvider.MODELSLAB:
@@ -410,6 +417,7 @@ export class ImageGenerationRepository {
           prompt: data.prompt,
           aspectRatio,
           inputMediaUrl,
+          onProviderJobId,
           logger,
           locale,
           fetchImpl,
@@ -424,6 +432,7 @@ export class ImageGenerationRepository {
           prompt: data.prompt,
           aspectRatio,
           inputMediaUrl,
+          onProviderJobId,
           logger,
           locale,
           fetchImpl,
@@ -436,6 +445,7 @@ export class ImageGenerationRepository {
           prompt: data.prompt,
           size,
           inputMediaUrl,
+          onProviderJobId,
           logger,
           locale,
           fetchImpl,
@@ -449,6 +459,7 @@ export class ImageGenerationRepository {
           size,
           quality: data.quality,
           inputMediaUrl,
+          onProviderJobId,
           logger,
           locale,
           fetchImpl,
@@ -461,6 +472,7 @@ export class ImageGenerationRepository {
           prompt: data.prompt,
           size,
           inputMediaUrl,
+          onProviderJobId,
           logger,
           locale,
           fetchImpl,
@@ -474,6 +486,7 @@ export class ImageGenerationRepository {
           size,
           aspectRatio,
           inputMediaUrl,
+          onProviderJobId,
           logger,
           locale,
           fetchImpl,
@@ -605,7 +618,11 @@ export class ImageGenerationRepository {
         locale,
         logger,
         tCredits,
-        { modelId: imageModel.id, apiProvider: imageModel.apiProvider },
+        {
+          modelId: imageModel.id,
+          apiProvider: imageModel.apiProvider,
+          providerJobId: generationResult.data.providerJobId,
+        },
         generationResult.data.upstreamCostUsd,
       );
       if (!deductResult.success) {

@@ -12,6 +12,10 @@ import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import type { ChatMessage } from "../../../chat/db";
+import {
+  extractLanguageModelRequestId,
+  mergeProviderJobIds,
+} from "../../../shared/provider-job-id";
 import { type ChatModelId, getChatModelById } from "../../models";
 import {
   type InlineThinkEvent,
@@ -158,11 +162,17 @@ export async function runCompactingLLM(params: {
 
       if (part.type === "finish") {
         finishHandled = true;
-        const usageData = await streamResult.usage;
+        const [usageData, metadata, responseMeta] = await Promise.all([
+          streamResult.usage,
+          streamResult.providerMetadata,
+          streamResult.response,
+        ]);
         const inputTokens = usageData.inputTokens ?? 0;
         const outputTokens = usageData.outputTokens ?? 0;
         const totalTokens = usageData.totalTokens ?? 0;
-        const metadata = await streamResult.providerMetadata;
+        const providerJob = mergeProviderJobIds([
+          extractLanguageModelRequestId(responseMeta),
+        ]);
         const { cachedInputTokens, cacheWriteTokens, hourWriteTokens } =
           readCacheUsage(
             usageData,
@@ -218,6 +228,7 @@ export async function runCompactingLLM(params: {
           user,
           creditCost,
           upstreamCost,
+          providerJob,
         });
       }
 

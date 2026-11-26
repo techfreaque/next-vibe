@@ -196,6 +196,11 @@ export async function emitCompactingDone(
     creditCost: number;
     /** Real upstream cost behind creditCost (actual-cost models). */
     upstreamCost?: UsageUpstreamCost;
+    /** Provider request/generation ID(s) for matching provider dashboard charges. */
+    providerJob?: {
+      providerJobId?: string;
+      providerJobIds?: string[];
+    };
   },
 ): Promise<void> {
   const {
@@ -275,6 +280,7 @@ export async function emitCompactingDone(
     model,
     tokenUsage: params.tokenUsage,
     upstreamCost,
+    providerJob: params.providerJob,
   });
 
   // SSE: COMPACTING_DONE

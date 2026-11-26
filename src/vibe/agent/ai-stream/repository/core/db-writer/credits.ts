@@ -38,6 +38,11 @@ export type DeductAndEmitCreditsParams =
       upstreamCost?: UsageUpstreamCost;
       tokenUsage?: UsageCacheTokens;
       apiProvider?: UsageAttribution["apiProvider"];
+      /** Provider request/generation ID(s) for matching provider dashboard charges. */
+      providerJob?: {
+        providerJobId?: string;
+        providerJobIds?: string[];
+      };
     }
   | {
       user: JwtPayloadType;
@@ -118,6 +123,7 @@ export async function deductAndEmitCredits(
           params.upstreamCost,
           params.apiProvider,
           params.tokenUsage,
+          params.providerJob,
         )
       : CreditRepository.deductCreditsForFeature(
           params.user,

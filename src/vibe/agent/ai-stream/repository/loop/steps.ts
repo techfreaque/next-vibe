@@ -10,6 +10,7 @@ import type { JSONValue, ModelMessage, ProviderMetadata } from "ai";
 
 import { ThreadStreamingState } from "../../../chat/enum";
 import { ApiProvider, calculateCreditCost } from "../../../models/models";
+import { extractLanguageModelRequestId } from "../../../shared/provider-job-id";
 import { truncateToContextWindow } from "../context/token-budget";
 import { AbortReason, StreamAbortError } from "../core/constants";
 import { buildSseMessageRow } from "../core/db-writer/sse-row";
@@ -642,6 +643,10 @@ export function onStepFinish(
     };
     finishReason?: string;
     providerMetadata?: ProviderMetadata;
+    response?: {
+      id?: string;
+      headers?: Readonly<Record<string, string>>;
+    };
     files?: ReadonlyArray<{ mediaType: string }>;
     /** Visible text of this step (reasoning excluded). */
     text: string;
@@ -704,6 +709,13 @@ export function onStepFinish(
   // This step's images are billed from its real usage now; only images of a
   // later, cut-off step are left for the abort path's estimate.
   state.p.ctx.stepImageCount = 0;
+  const stepProviderJobId = extractLanguageModelRequestId(stepResult.response);
+  if (
+    stepProviderJobId &&
+    !state.p.ctx.providerJobIds.includes(stepProviderJobId)
+  ) {
+    state.p.ctx.providerJobIds.push(stepProviderJobId);
+  }
   const upstream = readStepUpstreamCost(stepResult.providerMetadata);
   const stepCharge = TokenAccumulator.recordUpstreamCost(
     state.p.ctx,

@@ -12,6 +12,10 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { agentEnv } from "../../env";
 import { pollDelay } from "../../shared/poll-delay";
+import {
+  extractHeaderRequestId,
+  normalizeProviderJobId,
+} from "../../shared/provider-job-id";
 import { scopedTranslation } from "../i18n";
 
 interface FalAiAudioResponse {
@@ -40,9 +44,10 @@ export async function generateMusicWithFalAi(params: {
   locale: CountryLanguage;
   signal?: AbortSignal;
   inputMediaUrl?: string;
+  onProviderJobId?: (providerJobId: string) => void;
   /** Fixture-aware fetch bound once per generation (see createFixtureFetch). */
   fetchImpl: typeof globalThis.fetch;
-}): Promise<ResponseType<{ audioUrl: string }>> {
+}): Promise<ResponseType<{ audioUrl: string; providerJobId?: string }>> {
   const {
     providerModel,
     prompt,
@@ -51,6 +56,7 @@ export async function generateMusicWithFalAi(params: {
     locale,
     signal,
     inputMediaUrl,
+    onProviderJobId,
     fetchImpl,
   } = params;
   const { t } = scopedTranslation.scopedT(locale);
@@ -100,6 +106,12 @@ export async function generateMusicWithFalAi(params: {
 
     const queueResult = (await submitResponse.json()) as FalAiQueueResponse;
     const requestId = queueResult.request_id;
+    const providerJobId =
+      normalizeProviderJobId(requestId) ??
+      extractHeaderRequestId(submitResponse.headers);
+    if (providerJobId) {
+      onProviderJobId?.(providerJobId);
+    }
     logger.debug("[Fal.ai Music] Request queued, polling", { requestId });
 
     let lastResponse: Response = submitResponse;
@@ -150,8 +162,10 @@ export async function generateMusicWithFalAi(params: {
             errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
           });
         }
-        logger.debug("[Fal.ai Music] Music generated successfully");
-        return success({ audioUrl });
+        logger.debug("[Fal.ai Music] Music generated successfully", {
+          providerJobId: providerJobId ?? null,
+        });
+        return success({ audioUrl, providerJobId });
       }
 
       if (statusData.status === "FAILED") {

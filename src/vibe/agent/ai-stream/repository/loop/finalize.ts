@@ -13,6 +13,10 @@ import {
   ApiProvider,
   creditsWithoutPlatformMarkup,
 } from "../../../models/models";
+import {
+  extractLanguageModelRequestId,
+  mergeProviderJobIds,
+} from "../../../shared/provider-job-id";
 import { StreamErrorType } from "../core/constants";
 import { clearStreamingState } from "../core/stream";
 import { providerErrorTranslationKey } from "../errors/provider-error-key";
@@ -163,6 +167,7 @@ export async function billCompletedSteps(
     },
     upstreamCost,
     apiProvider: modelConfig.apiProvider,
+    providerJob: mergeProviderJobIds(ctx.providerJobIds),
   });
   return { messageId, creditCost };
 }
@@ -201,11 +206,20 @@ export async function complete(
 ): Promise<void> {
   const { modelConfig, messages, model, threadId, logger } = state.p;
 
-  const [usageData, providerMeta, generatedFiles] = await Promise.all([
-    streamResult.usage,
-    streamResult.providerMetadata,
-    streamResult.files,
-  ]);
+  const [usageData, providerMeta, generatedFiles, responseMeta] =
+    await Promise.all([
+      streamResult.usage,
+      streamResult.providerMetadata,
+      streamResult.files,
+      streamResult.response,
+    ]);
+  const aggregateProviderJobId = extractLanguageModelRequestId(responseMeta);
+  if (
+    aggregateProviderJobId &&
+    !state.p.ctx.providerJobIds.includes(aggregateProviderJobId)
+  ) {
+    state.p.ctx.providerJobIds.push(aggregateProviderJobId);
+  }
 
   // For reasoning tokens we still read from the SDK's aggregate (output-only, not re-sent).
   const reasoningTokens = usageData.outputTokenDetails?.reasoningTokens ?? 0;
@@ -697,6 +711,7 @@ export async function complete(
     },
     upstreamCost,
     apiProvider: modelConfig.apiProvider,
+    providerJob: mergeProviderJobIds(ctx.providerJobIds),
   });
 
   // Flush ALL pending throttled writes BEFORE signaling idle. Anyone who

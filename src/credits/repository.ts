@@ -2783,6 +2783,10 @@ export class CreditRepository {
     upstreamCost?: UsageUpstreamCost,
     apiProvider?: UsageAttribution["apiProvider"],
     tokenUsage?: UsageCacheTokens,
+    providerJob?: {
+      providerJobId?: string;
+      providerJobIds?: string[];
+    },
   ): Promise<ResponseType<DeductCreditsResult>> {
     // Round amount to 6 decimal places to avoid floating point precision artifacts
     const roundedAmount = Math.round(amount * 1_000_000) / 1_000_000;
@@ -2973,6 +2977,19 @@ export class CreditRepository {
         // One provider call can debit several wallets, packs and free buckets.
         // Attribute its indivisible cache counts once, inside the same transaction.
         let pendingTokens = tokenUsage;
+        const normalizedJobIds: string[] = [];
+        for (const rawId of [
+          providerJob?.providerJobId,
+          ...(providerJob?.providerJobIds ?? []),
+        ]) {
+          const trimmed = rawId?.trim();
+          if (trimmed && !normalizedJobIds.includes(trimmed)) {
+            normalizedJobIds.push(trimmed);
+          }
+        }
+        const primaryProviderJobId = normalizedJobIds[0] ?? null;
+        const extraProviderJobIds =
+          normalizedJobIds.length > 1 ? normalizedJobIds : undefined;
         const invoiceRows: string[] = [];
         const insertUsage = async (
           row: Omit<typeof creditTransactions.$inferInsert, "metadata"> & {
@@ -2981,7 +2998,15 @@ export class CreditRepository {
         ): Promise<void> => {
           const insert = tx.insert(creditTransactions).values({
             ...row,
-            metadata: { ...row.metadata, ...upstreamCost, ...pendingTokens },
+            providerJobId: row.providerJobId ?? primaryProviderJobId,
+            metadata: {
+              ...row.metadata,
+              ...upstreamCost,
+              ...pendingTokens,
+              ...(extraProviderJobIds
+                ? { providerJobIds: extraProviderJobIds }
+                : {}),
+            },
           });
           pendingTokens = undefined;
           if (upstreamCost) {
@@ -4629,6 +4654,13 @@ export class CreditRepository {
         false,
         upstreamCost,
         attribution?.apiProvider,
+        undefined,
+        attribution
+          ? {
+              providerJobId: attribution.providerJobId,
+              providerJobIds: attribution.providerJobIds,
+            }
+          : undefined,
       );
 
       if (!result.success) {
@@ -4719,6 +4751,13 @@ export class CreditRepository {
         true, // allowPartial = true for TTS
         undefined,
         attribution?.apiProvider,
+        undefined,
+        attribution
+          ? {
+              providerJobId: attribution.providerJobId,
+              providerJobIds: attribution.providerJobIds,
+            }
+          : undefined,
       );
 
       if (!result.success) {
@@ -4802,6 +4841,13 @@ export class CreditRepository {
         true, // allowPartial = true for STT
         undefined,
         attribution?.apiProvider,
+        undefined,
+        attribution
+          ? {
+              providerJobId: attribution.providerJobId,
+              providerJobIds: attribution.providerJobIds,
+            }
+          : undefined,
       );
 
       if (!result.success) {
@@ -4860,6 +4906,10 @@ export class CreditRepository {
     upstreamCost?: UsageUpstreamCost,
     apiProvider?: UsageAttribution["apiProvider"],
     tokenUsage?: UsageCacheTokens,
+    providerJob?: {
+      providerJobId?: string;
+      providerJobIds?: string[];
+    },
   ): Promise<ResponseType<DeductForModelResult>> {
     if (cost <= 0) {
       logger.debug("Skipping credit deduction - zero or negative cost", {
@@ -4901,6 +4951,7 @@ export class CreditRepository {
         upstreamCost,
         apiProvider,
         tokenUsage,
+        providerJob,
       );
 
       if (!result.success) {

@@ -12,6 +12,10 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { agentEnv } from "../../env";
 import { pollDelay } from "../../shared/poll-delay";
+import {
+  extractHeaderRequestId,
+  normalizeProviderJobId,
+} from "../../shared/provider-job-id";
 import { scopedTranslation } from "../i18n";
 
 interface ReplicatePrediction {
@@ -33,8 +37,9 @@ async function pollPrediction(
   locale: CountryLanguage,
   fetchImpl: typeof globalThis.fetch,
   submitResponse: Response,
+  providerJobId: string | undefined,
   signal?: AbortSignal,
-): Promise<ResponseType<{ audioUrl: string }>> {
+): Promise<ResponseType<{ audioUrl: string; providerJobId?: string }>> {
   const { t } = scopedTranslation.scopedT(locale);
 
   let lastResponse: Response = submitResponse;
@@ -74,7 +79,7 @@ async function pollPrediction(
           errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
         });
       }
-      return success({ audioUrl });
+      return success({ audioUrl, providerJobId });
     }
     if (prediction.status === "failed" || prediction.status === "canceled") {
       return fail({
@@ -104,9 +109,10 @@ export async function generateMusicWithReplicate(params: {
   locale: CountryLanguage;
   signal?: AbortSignal;
   inputMediaUrl?: string;
+  onProviderJobId?: (providerJobId: string) => void;
   /** Fixture-aware fetch bound once per generation (see createFixtureFetch). */
   fetchImpl: typeof globalThis.fetch;
-}): Promise<ResponseType<{ audioUrl: string }>> {
+}): Promise<ResponseType<{ audioUrl: string; providerJobId?: string }>> {
   const {
     providerModel,
     prompt,
@@ -115,6 +121,7 @@ export async function generateMusicWithReplicate(params: {
     locale,
     signal,
     inputMediaUrl,
+    onProviderJobId,
     fetchImpl,
   } = params;
   const { t } = scopedTranslation.scopedT(locale);
@@ -168,6 +175,12 @@ export async function generateMusicWithReplicate(params: {
     }
 
     const prediction = (await response.json()) as ReplicatePrediction;
+    const providerJobId =
+      normalizeProviderJobId(prediction.id) ??
+      extractHeaderRequestId(response.headers);
+    if (providerJobId) {
+      onProviderJobId?.(providerJobId);
+    }
     logger.debug("[Replicate Music] Prediction created, polling", {
       predictionId: prediction.id,
     });
@@ -177,6 +190,7 @@ export async function generateMusicWithReplicate(params: {
       locale,
       fetchImpl,
       response,
+      providerJobId,
       signal,
     );
   } catch (error) {

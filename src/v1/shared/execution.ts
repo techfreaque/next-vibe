@@ -139,6 +139,7 @@ export interface V1Call {
     usage: InferenceUsage | undefined,
     outputChars: number,
     providerMetadata: ProviderMetadata | undefined,
+    providerJobId?: string | undefined,
   ) => Promise<V1Totals>;
 }
 
@@ -284,12 +285,13 @@ export async function prepareV1Call(
       estimatedInputTokens,
       logger,
       logTag: input.logTag,
-      bill: (usage, outputChars, providerMetadata) =>
+      bill: (usage, outputChars, providerMetadata, providerJobId) =>
         bill({
           user: payer,
           model,
           usage,
           providerMetadata,
+          providerJobId,
           estimatedInputTokens,
           requestStartedAt,
           outputChars,
@@ -401,6 +403,7 @@ async function bill(params: {
   model: ChatModelOption;
   usage: InferenceUsage | undefined;
   providerMetadata: ProviderMetadata | undefined;
+  providerJobId?: string | undefined;
   estimatedInputTokens: number;
   outputChars: number;
   locale: CountryLanguage;
@@ -450,6 +453,7 @@ async function bill(params: {
     upstreamCost,
     model.apiProvider,
     { cachedInputTokens, cacheWriteTokens },
+    params.providerJobId ? { providerJobId: params.providerJobId } : undefined,
   );
   if (!deducted.success) {
     logger.error(
@@ -497,6 +501,7 @@ export async function runV1Generate(
       result.usage,
       resultChars(result),
       result.providerMetadata,
+      result.providerJobId,
     );
     return { ok: true, result, totals };
   } catch (error) {
@@ -577,6 +582,7 @@ export function runV1Stream(
       let outputChars = 0;
       let usage: InferenceUsage | undefined;
       let providerMetadata: ProviderMetadata | undefined;
+      let providerJobId: string | undefined;
       let finishReason: OpenAiFinishReason = "stop";
       let failed: string | undefined;
       let failureSource: "error-event" | "exception" | undefined;
@@ -586,6 +592,7 @@ export function runV1Stream(
           if (event.type === "finish") {
             usage = event.usage;
             providerMetadata = event.providerMetadata;
+            providerJobId = event.providerJobId;
             finishReason = event.finishReason;
             continue;
           }
@@ -609,7 +616,12 @@ export function runV1Stream(
       }
       clearInterval(heartbeat);
       // Bill what ran - even on provider error or client abort.
-      const totals = await call.bill(usage, outputChars, providerMetadata);
+      const totals = await call.bill(
+        usage,
+        outputChars,
+        providerMetadata,
+        providerJobId,
+      );
       if (failed !== undefined) {
         call.logger.error(`[${call.logTag}] Stream failed`, {
           model: call.model.id,

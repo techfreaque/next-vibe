@@ -42,6 +42,10 @@ import {
   parseBase64DataUri,
   resolveMediaReference,
 } from "../shared/media-generation";
+import {
+  extractLanguageModelRequestId,
+  mergeProviderJobIds,
+} from "../shared/provider-job-id";
 import { chatFavorites, FAVORITE_CONFIG_COLUMNS } from "../skills/favorites/db";
 import { resolveFavoriteConfig } from "../skills/favorites/repository";
 import type {
@@ -236,6 +240,9 @@ export class DescribeVideoRepository {
           tCredits,
           locale,
           upstreamCost,
+          usedModel.apiProvider,
+          undefined,
+          mergeProviderJobIds([extractLanguageModelRequestId(result.response)]),
         );
         if (!deductResult.success) {
           if (creditPolicyReason(deductResult.errorType.errorKey)) {

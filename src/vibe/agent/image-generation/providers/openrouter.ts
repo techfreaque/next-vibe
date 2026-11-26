@@ -11,6 +11,10 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { agentEnv } from "../../env";
+import {
+  extractHeaderRequestId,
+  normalizeProviderJobId,
+} from "../../shared/provider-job-id";
 import { scopedTranslation } from "../i18n";
 import { classifyImageProviderError } from "../provider-error";
 
@@ -44,6 +48,7 @@ interface OpenRouterImageData {
 }
 
 interface OpenRouterImagesResponse {
+  id?: string;
   data?: OpenRouterImageData[];
   error?: { message?: string; code?: number };
   /** Real charge of the call in USD (no markup). */
@@ -72,9 +77,16 @@ export async function generateWithOpenRouter(params: {
   logger: EndpointLogger;
   locale: CountryLanguage;
   inputMediaUrl?: string | null;
+  onProviderJobId?: (providerJobId: string) => void;
   /** Fixture-aware fetch bound once per generation (see createFixtureFetch). */
   fetchImpl: typeof globalThis.fetch;
-}): Promise<ResponseType<{ imageUrl: string; upstreamCostUsd?: number }>> {
+}): Promise<
+  ResponseType<{
+    imageUrl: string;
+    upstreamCostUsd?: number;
+    providerJobId?: string;
+  }>
+> {
   const {
     providerModel,
     prompt,
@@ -82,6 +94,7 @@ export async function generateWithOpenRouter(params: {
     logger,
     locale,
     inputMediaUrl,
+    onProviderJobId,
     fetchImpl,
   } = params;
   const { t } = scopedTranslation.scopedT(locale);
@@ -204,11 +217,25 @@ export async function generateWithOpenRouter(params: {
       });
     }
 
+    const providerJobId =
+      extractHeaderRequestId(response.headers, [
+        "x-generation-id",
+        "x-request-id",
+      ]) ?? normalizeProviderJobId(data.id);
+    if (providerJobId) {
+      onProviderJobId?.(providerJobId);
+    }
+
     logger.debug("[OpenRouter Image] Image generated successfully", {
+      providerJobId: providerJobId ?? null,
       upstreamCostUsd: data.usage?.cost ?? null,
     });
     // The real charge (usage.cost) is billed x markup by the repository.
-    return success({ imageUrl, upstreamCostUsd: data.usage?.cost });
+    return success({
+      imageUrl,
+      upstreamCostUsd: data.usage?.cost,
+      providerJobId,
+    });
   } catch (error) {
     const errorMessage = parseError(error).message;
     logger.error("[OpenRouter Image] Request failed", { error: errorMessage });

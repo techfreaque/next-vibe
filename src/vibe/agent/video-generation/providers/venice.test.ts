@@ -57,11 +57,16 @@ const mp4 = (): Response =>
 
 const logger = createEndpointLogger(false, "en-GLOBAL");
 
-const baseParams = {
+const baseParams: {
+  providerModel: string;
+  prompt: string;
+  durationSeconds: number;
+  locale: CountryLanguage;
+} = {
   providerModel: "seedance-2-5-flash-text-to-video-basic",
   prompt: "a cat on a skateboard",
   durationSeconds: 4,
-  locale: "en-GLOBAL" satisfies CountryLanguage,
+  locale: "en-GLOBAL",
 };
 
 describe("generateVideoWithVenice", () => {
@@ -89,6 +94,7 @@ describe("generateVideoWithVenice", () => {
     }
     expect(result.data.mimeType).toBe("video/mp4");
     expect(result.data.videoBytes.byteLength).toBe(8);
+    expect(result.data.providerJobId).toBe("q1");
     expect(calls[0]?.url).toBe("https://api.venice.ai/api/v1/video/queue");
     expect(calls[0]?.body).toEqual({
       model: "seedance-2-5-flash-text-to-video-basic",

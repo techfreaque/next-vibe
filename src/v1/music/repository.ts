@@ -165,7 +165,7 @@ export class V1MusicRepository {
     startMediaJob(
       job,
       params.generate ??
-        (async (): Promise<ResponseType<V1MediaJobOutput>> => {
+        (async (onProviderJobId): Promise<ResponseType<V1MediaJobOutput>> => {
           const result = await MusicGenerationRepository.generateMusic(
             { prompt: data.prompt, model: model.id, duration },
             gate.user,
@@ -174,6 +174,8 @@ export class V1MusicRepository {
             musicT,
             toolContext,
             platform,
+            undefined,
+            onProviderJobId,
           );
           if (!result.success) {
             return result;

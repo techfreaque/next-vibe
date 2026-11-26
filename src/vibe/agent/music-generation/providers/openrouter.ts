@@ -11,10 +11,15 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { agentEnv } from "../../env";
+import {
+  extractHeaderRequestId,
+  normalizeProviderJobId,
+} from "../../shared/provider-job-id";
 import { scopedTranslation } from "../i18n";
 
 /** One SSE chunk of an OpenRouter chat completion with audio output. */
 interface OpenRouterAudioChunk {
+  id?: string;
   choices?: Array<{
     delta?: { content?: string | null; audio?: { data?: string } };
   }>;
@@ -32,13 +37,27 @@ export async function generateMusicWithOpenRouter(params: {
   providerModel: string;
   prompt: string;
   durationSeconds: number;
+  onProviderJobId?: (providerJobId: string) => void;
   logger: EndpointLogger;
   locale: CountryLanguage;
   /** Fixture-aware fetch bound once per generation (see createFixtureFetch). */
   fetchImpl: typeof globalThis.fetch;
-}): Promise<ResponseType<{ audioUrl: string; upstreamCostUsd?: number }>> {
-  const { providerModel, prompt, durationSeconds, logger, locale, fetchImpl } =
-    params;
+}): Promise<
+  ResponseType<{
+    audioUrl: string;
+    upstreamCostUsd?: number;
+    providerJobId?: string;
+  }>
+> {
+  const {
+    providerModel,
+    prompt,
+    durationSeconds,
+    onProviderJobId,
+    logger,
+    locale,
+    fetchImpl,
+  } = params;
   const { t } = scopedTranslation.scopedT(locale);
 
   if (!agentEnv.OPENROUTER_API_KEY) {
@@ -95,6 +114,10 @@ export async function generateMusicWithOpenRouter(params: {
 
     let audioBase64 = "";
     let upstreamCostUsd: number | undefined;
+    let providerJobId = extractHeaderRequestId(response.headers, [
+      "x-generation-id",
+      "x-request-id",
+    ]);
     for (const line of rawText.split("\n")) {
       if (!line.startsWith("data: {")) {
         continue;
@@ -111,6 +134,7 @@ export async function generateMusicWithOpenRouter(params: {
           errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
         });
       }
+      providerJobId ??= normalizeProviderJobId(chunk.id);
       audioBase64 += chunk.choices?.[0]?.delta?.audio?.data ?? "";
       upstreamCostUsd = chunk.usage?.cost ?? upstreamCostUsd;
     }
@@ -123,8 +147,13 @@ export async function generateMusicWithOpenRouter(params: {
       });
     }
 
+    if (providerJobId) {
+      onProviderJobId?.(providerJobId);
+    }
+
     logger.debug("[OpenRouter Music] Clip generated", {
       bytes: Math.floor((audioBase64.length * 3) / 4),
+      providerJobId: providerJobId ?? null,
       upstreamCostUsd: upstreamCostUsd ?? null,
     });
     // Lyria returns MP3 (ID3). The repository re-uploads to storage when the
@@ -133,6 +162,7 @@ export async function generateMusicWithOpenRouter(params: {
     return success({
       audioUrl: `data:audio/mpeg;base64,${audioBase64}`,
       upstreamCostUsd,
+      providerJobId,
     });
   } catch (error) {
     const errorMessage = parseError(error).message;

@@ -269,7 +269,7 @@ export class V1VideosRepository {
     startMediaJob(
       job,
       params.generate ??
-        (async (): Promise<ResponseType<V1MediaJobOutput>> => {
+        (async (onProviderJobId): Promise<ResponseType<V1MediaJobOutput>> => {
           const result = await VideoGenerationRepository.generateVideo(
             {
               prompt: data.prompt,
@@ -288,6 +288,8 @@ export class V1VideosRepository {
             videoT,
             toolContext,
             platform,
+            undefined,
+            onProviderJobId,
           );
           if (!result.success) {
             return result;

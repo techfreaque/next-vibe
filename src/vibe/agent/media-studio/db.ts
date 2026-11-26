@@ -32,6 +32,8 @@ export const studioGenerations = pgTable(
     url: text("url"),
     transcript: text("transcript"),
     credits: doublePrecision("credits"),
+    /** Provider request/job/generation ID for matching provider dashboard charges. */
+    providerJobId: text("provider_job_id"),
     /** Request settings (model options, prompt) so a result can be run again. */
     settings: jsonb("settings").$type<StudioSettings>(),
   },
@@ -48,5 +50,8 @@ export const studioGenerations = pgTable(
       table.leadId,
       table.createdAt,
     ),
+    index("studio_generations_provider_job_id_idx")
+      .on(table.providerJobId)
+      .where(sql`${table.providerJobId} IS NOT NULL`),
   ],
 );

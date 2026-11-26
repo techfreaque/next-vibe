@@ -12,6 +12,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { agentEnv } from "../../env";
 import { pollDelay } from "../../shared/poll-delay";
+import { normalizeProviderJobId } from "../../shared/provider-job-id";
 import { scopedTranslation, type VideoGenerationT } from "../i18n";
 
 /**
@@ -141,11 +142,18 @@ export async function generateVideoWithVenice(params: {
   generateAudio?: boolean;
   /** Seed image: a base64 data URI (own storage) or a public URL. */
   inputImageUrl?: string;
+  onProviderJobId?: (providerJobId: string) => void;
   logger: EndpointLogger;
   locale: CountryLanguage;
   /** Fixture-aware fetch bound once per generation (see createFixtureFetch). */
   fetchImpl: typeof globalThis.fetch;
-}): Promise<ResponseType<{ videoBytes: Uint8Array; mimeType: string }>> {
+}): Promise<
+  ResponseType<{
+    videoBytes: Uint8Array;
+    mimeType: string;
+    providerJobId?: string;
+  }>
+> {
   const {
     providerModel,
     prompt,
@@ -155,6 +163,7 @@ export async function generateVideoWithVenice(params: {
     negativePrompt,
     generateAudio,
     inputImageUrl,
+    onProviderJobId,
     logger,
     locale,
     fetchImpl,
@@ -255,6 +264,10 @@ export async function generateVideoWithVenice(params: {
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
       });
     }
+    const providerJobId = normalizeProviderJobId(queueId);
+    if (providerJobId) {
+      onProviderJobId?.(providerJobId);
+    }
     const downloadUrl = queueData.download_url;
 
     logger.debug("[Venice Video] Job queued, polling", {
@@ -293,6 +306,7 @@ export async function generateVideoWithVenice(params: {
         return success({
           videoBytes: bytes,
           mimeType: contentType.split(";")[0]?.trim() ?? "video/mp4",
+          providerJobId,
         });
       }
 
@@ -360,6 +374,7 @@ export async function generateVideoWithVenice(params: {
           mimeType: fileType.startsWith("video/")
             ? (fileType.split(";")[0]?.trim() ?? "video/mp4")
             : "video/mp4",
+          providerJobId,
         });
       }
       // PROCESSING (or COMPLETED without a link: the bytes arrive on the

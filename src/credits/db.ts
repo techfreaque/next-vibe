@@ -131,6 +131,10 @@ export interface UsageAttribution {
   modelId: AnyModelId | ToolChargeAttribution["modelId"];
   /** API that billed the instance, as distinct from an API's upstream endpoint. */
   apiProvider: ApiProvider | ToolChargeAttribution["apiProvider"];
+  /** Provider request/job/generation ID for matching provider dashboard charges. */
+  providerJobId?: string;
+  /** All provider request/job IDs when one ledger debit spans multiple calls (e.g. multi-step chat, multi-chunk STT). */
+  providerJobIds?: string[];
 }
 
 export interface UsageCacheTokens {
@@ -160,6 +164,8 @@ export interface UsageMetadata
   carriedUntil?: string;
   /** Idempotency key (uq_transactions_grant_key), e.g. free:user:<id>:signup-carryover */
   grantKey?: string;
+  /** Provider request/job/generation IDs when one debit spans multiple upstream calls. */
+  providerJobIds?: string[];
 }
 
 export interface ExpiryMetadata {
@@ -379,6 +385,8 @@ export const creditTransactions = pgTable(
     modelId: text("model_id").$type<UsageAttribution["modelId"]>(),
     feature: text("feature"),
     messageId: uuid("message_id"),
+    // Provider request/job/generation ID (OpenRouter gen-*, ModelsLab id, Venice queue_id, fal request_id, etc.)
+    providerJobId: text("provider_job_id"),
 
     // Reference to credit pack (for pack-specific transactions)
     packId: uuid("pack_id").references(() => creditPacks.id, {
@@ -410,6 +418,10 @@ export const creditTransactions = pgTable(
     index("idx_transactions_type").on(table.type, table.createdAt),
     // FK lookups when a pack is deleted (ON DELETE SET NULL)
     index("idx_transactions_pack").on(table.packId),
+    // Match provider dashboard charges back to our ledger rows
+    index("idx_transactions_provider_job_id")
+      .on(table.providerJobId)
+      .where(sql`${table.providerJobId} IS NOT NULL`),
     // Free grants are idempotent per pool + month + kind (metadata.grantKey):
     // concurrent reads can never mint the same monthly grant twice.
     uniqueIndex("uq_transactions_grant_key")

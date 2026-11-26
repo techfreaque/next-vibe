@@ -31,7 +31,10 @@ import { getStorageAdapter } from "../chat/storage/index";
 import { agentEnv } from "../env";
 import { PROVIDER_SETUP_INSTRUCTIONS } from "../env-availability";
 import { getEnvAvailability } from "../env-availability";
-import { MediaStudioRepository } from "../media-studio/repository";
+import {
+  MediaStudioRepository,
+  type ProviderJobIdRecorder,
+} from "../media-studio/repository";
 import { toStudioSettings } from "../media-studio/settings";
 import {
   EDEN_AI_URLS,
@@ -42,6 +45,10 @@ import {
 } from "../models/eden-ai";
 import { ApiProvider, calculateTtsCreditCost } from "../models/models";
 import { UncensoredConsentRepository } from "../models/uncensored-consent/repository";
+import {
+  extractHeaderRequestId,
+  normalizeProviderJobId,
+} from "../shared/provider-job-id";
 import { ModelSelectionType } from "../skills/enum";
 import { TTS_OUTPUT_FORMATS, type TtsOutputFormat } from "./constants";
 import type {
@@ -157,7 +164,7 @@ export class TextToSpeechRepository {
     t: TextToSpeechT,
     fetchImpl: typeof globalThis.fetch,
     output: TtsOutputOptions,
-  ): Promise<ResponseType<string>> {
+  ): Promise<ResponseType<{ audioUrl: string; providerJobId?: string }>> {
     const { envKey, url, label } = PROVIDER_SETUP_INSTRUCTIONS.openAiTts;
     if (!agentEnv.OPENAI_API_KEY) {
       return fail({
@@ -231,8 +238,15 @@ export class TextToSpeechRepository {
     const audioBuffer = await response.arrayBuffer();
     const contentType = response.headers.get("content-type") || "audio/mpeg";
     const base64Audio = Buffer.from(audioBuffer).toString("base64");
+    const providerJobId = extractHeaderRequestId(response.headers, [
+      "x-request-id",
+      "request-id",
+    ]);
     // eslint-disable-next-line i18next/no-literal-string
-    return success(`data:${contentType};base64,${base64Audio}`);
+    return success({
+      audioUrl: `data:${contentType};base64,${base64Audio}`,
+      providerJobId,
+    });
   }
 
   /**
@@ -247,7 +261,7 @@ export class TextToSpeechRepository {
     fetchImpl: typeof globalThis.fetch,
     output: TtsOutputOptions,
     target: "nanoGPT" | "openRouter",
-  ): Promise<ResponseType<string>> {
+  ): Promise<ResponseType<{ audioUrl: string; providerJobId?: string }>> {
     const { envKey, url, label } = PROVIDER_SETUP_INSTRUCTIONS[target];
     const apiKey = agentEnv[envKey];
     if (!apiKey) {
@@ -344,8 +358,16 @@ export class TextToSpeechRepository {
       response.headers.get("content-type") ||
       (output.format === "pcm" ? "audio/pcm" : "audio/mpeg");
     const base64Audio = Buffer.from(audioBuffer).toString("base64");
+    const providerJobId = extractHeaderRequestId(response.headers, [
+      "x-generation-id",
+      "x-request-id",
+      "request-id",
+    ]);
     // eslint-disable-next-line i18next/no-literal-string
-    return success(`data:${contentType};base64,${base64Audio}`);
+    return success({
+      audioUrl: `data:${contentType};base64,${base64Audio}`,
+      providerJobId,
+    });
   }
 
   /**
@@ -358,7 +380,13 @@ export class TextToSpeechRepository {
     logger: EndpointLogger,
     t: TextToSpeechT,
     fetchImpl: typeof globalThis.fetch,
-  ): Promise<ResponseType<{ audioUrl: string; costUsd: number | undefined }>> {
+  ): Promise<
+    ResponseType<{
+      audioUrl: string;
+      costUsd: number | undefined;
+      providerJobId?: string;
+    }>
+  > {
     if (!agentEnv.EDEN_AI_API_KEY) {
       const { envKey, url, label } = PROVIDER_SETUP_INSTRUCTIONS.edenAiTts;
       return fail({
@@ -469,10 +497,14 @@ export class TextToSpeechRepository {
     if (!audioResult.success) {
       return audioResult;
     }
+    const providerJobId =
+      normalizeProviderJobId(result.public_id ?? result.id) ??
+      extractHeaderRequestId(response.headers);
     // Eden AI reports what it charged us; billing prefers it over the list rate.
     return success({
       audioUrl: audioResult.data,
       costUsd: parseEdenAiCost(result.cost),
+      providerJobId,
     });
   }
 
@@ -487,7 +519,7 @@ export class TextToSpeechRepository {
     t: TextToSpeechT,
     fetchImpl: typeof globalThis.fetch,
     output: TtsOutputOptions,
-  ): Promise<ResponseType<string>> {
+  ): Promise<ResponseType<{ audioUrl: string; providerJobId?: string }>> {
     if (!agentEnv.ELEVENLABS_API_KEY) {
       const { envKey, url, label } = PROVIDER_SETUP_INSTRUCTIONS.elevenlabs;
       return fail({
@@ -568,8 +600,16 @@ export class TextToSpeechRepository {
     const audioBuffer = await response.arrayBuffer();
     const contentType = response.headers.get("content-type") || "audio/mpeg";
     const base64Audio = Buffer.from(audioBuffer).toString("base64");
+    const providerJobId = extractHeaderRequestId(response.headers, [
+      "history-item-id",
+      "request-id",
+      "x-request-id",
+    ]);
     // eslint-disable-next-line i18next/no-literal-string
-    return success(`data:${contentType};base64,${base64Audio}`);
+    return success({
+      audioUrl: `data:${contentType};base64,${base64Audio}`,
+      providerJobId,
+    });
   }
 
   /**
@@ -592,7 +632,7 @@ export class TextToSpeechRepository {
       user,
       locale,
       logger,
-      generate: () =>
+      generate: ({ recordProviderJobId }) =>
         TextToSpeechRepository.convertTextToSpeech(
           data,
           user,
@@ -600,6 +640,8 @@ export class TextToSpeechRepository {
           logger,
           t,
           toolExecutionContext,
+          {},
+          recordProviderJobId,
         ),
     });
   }
@@ -614,6 +656,7 @@ export class TextToSpeechRepository {
     toolExecutionContext: ToolExecutionContext,
     /** Audio format + speed (the /v1/audio/speech API); default mp3, 1x. */
     output: TtsOutputOptions = {},
+    onProviderJobId?: ProviderJobIdRecorder,
   ): Promise<ResponseType<TextToSpeechPostResponseOutput>> {
     // voiceId is resolved via fieldDefaults in route.ts (from favorites/skill config)
     if (!data.voiceId) {
@@ -726,7 +769,10 @@ export class TextToSpeechRepository {
     const fetchImpl = createFixtureFetch(toolExecutionContext, logger);
 
     try {
-      let audioResult: ResponseType<string>;
+      let audioResult: ResponseType<{
+        audioUrl: string;
+        providerJobId?: string;
+      }>;
       /** Real upstream charge in USD, when the provider reports one. */
       let providerCostUsd: number | undefined;
 
@@ -754,7 +800,10 @@ export class TextToSpeechRepository {
           if (!edenResult.success) {
             return edenResult;
           }
-          audioResult = success(edenResult.data.audioUrl);
+          audioResult = success({
+            audioUrl: edenResult.data.audioUrl,
+            providerJobId: edenResult.data.providerJobId,
+          });
           providerCostUsd = edenResult.data.costUsd;
           break;
         }
@@ -798,7 +847,11 @@ export class TextToSpeechRepository {
         return audioResult;
       }
 
-      let audioUrl = audioResult.data;
+      let audioUrl = audioResult.data.audioUrl;
+      const providerJobId = audioResult.data.providerJobId;
+      if (providerJobId) {
+        onProviderJobId?.(providerJobId);
+      }
 
       // Upload to storage so message history only ever carries a URL — a data
       // URI in the tool result blows up the model context on later turns.
@@ -880,7 +933,11 @@ export class TextToSpeechRepository {
         logger,
         locale,
         tCredits,
-        { modelId: modelOption.id, apiProvider: modelOption.apiProvider },
+        {
+          modelId: modelOption.id,
+          apiProvider: modelOption.apiProvider,
+          providerJobId,
+        },
       );
 
       if (!deductResult.success) {

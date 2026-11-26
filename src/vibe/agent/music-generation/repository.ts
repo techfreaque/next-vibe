@@ -25,6 +25,7 @@ import { getStorageAdapter } from "../chat/storage/index";
 import { isStorageUrl } from "../chat/storage/storage-url";
 import {
   MediaStudioRepository,
+  type ProviderJobIdRecorder,
   type StudioProgress,
 } from "../media-studio/repository";
 import { toStudioSettings } from "../media-studio/settings";
@@ -79,7 +80,7 @@ export class MusicGenerationRepository {
       user,
       locale,
       logger,
-      generate: (onProgress) =>
+      generate: ({ progress: onProgress, recordProviderJobId }) =>
         MusicGenerationRepository.generateMusic(
           data,
           user,
@@ -89,6 +90,7 @@ export class MusicGenerationRepository {
           toolExecutionContext,
           platform,
           onProgress,
+          recordProviderJobId,
         ),
     });
   }
@@ -102,6 +104,7 @@ export class MusicGenerationRepository {
     toolExecutionContext: ToolExecutionContext,
     platform: Platform,
     onProgress?: StudioProgress,
+    onProviderJobId?: ProviderJobIdRecorder,
   ): Promise<ResponseType<MusicGenerationPostResponseOutput>> {
     // model is resolved via requestDefaults in route.ts (from favorites/skill config)
     if (!data.model) {
@@ -213,6 +216,8 @@ export class MusicGenerationRepository {
       /** Real upstream USD charge (no markup), when the provider reports one. */
       upstreamCostUsd?: number;
       durationSeconds?: number;
+      /** Provider request/job/generation ID for dashboard charge matching. */
+      providerJobId?: string;
     }>;
     await onProgress?.("running");
     switch (audioModel.apiProvider) {
@@ -222,6 +227,7 @@ export class MusicGenerationRepository {
           prompt: data.prompt,
           durationSeconds,
           inputMediaUrl,
+          onProviderJobId,
           logger,
           locale,
           fetchImpl,
@@ -234,6 +240,7 @@ export class MusicGenerationRepository {
           prompt: data.prompt,
           durationSeconds,
           inputMediaUrl,
+          onProviderJobId,
           logger,
           locale,
           fetchImpl,
@@ -246,6 +253,7 @@ export class MusicGenerationRepository {
           prompt: data.prompt,
           durationSeconds,
           inputMediaUrl,
+          onProviderJobId,
           logger,
           locale,
           fetchImpl,
@@ -257,6 +265,7 @@ export class MusicGenerationRepository {
           providerModel: audioModel.providerModel,
           prompt: data.prompt,
           durationSeconds,
+          onProviderJobId,
           logger,
           locale,
           fetchImpl,
@@ -371,7 +380,11 @@ export class MusicGenerationRepository {
         locale,
         logger,
         tCredits,
-        { modelId: audioModel.id, apiProvider: audioModel.apiProvider },
+        {
+          modelId: audioModel.id,
+          apiProvider: audioModel.apiProvider,
+          providerJobId: generationResult.data.providerJobId,
+        },
         generationResult.data.upstreamCostUsd,
       );
       if (!deductResult.success) {

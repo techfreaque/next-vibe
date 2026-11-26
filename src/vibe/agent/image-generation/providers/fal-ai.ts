@@ -14,6 +14,10 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { agentEnv } from "../../env";
 import { pollDelay } from "../../shared/poll-delay";
+import {
+  extractHeaderRequestId,
+  normalizeProviderJobId,
+} from "../../shared/provider-job-id";
 import { scopedTranslation } from "../i18n";
 
 interface FalAiResponse {
@@ -39,9 +43,10 @@ export async function generateWithFalAi(params: {
   locale: CountryLanguage;
   signal?: AbortSignal;
   inputMediaUrl?: string;
+  onProviderJobId?: (providerJobId: string) => void;
   /** Fixture-aware fetch bound once per generation (see createFixtureFetch). */
   fetchImpl: typeof globalThis.fetch;
-}): Promise<ResponseType<{ imageUrl: string }>> {
+}): Promise<ResponseType<{ imageUrl: string; providerJobId?: string }>> {
   const {
     providerModel,
     prompt,
@@ -50,6 +55,7 @@ export async function generateWithFalAi(params: {
     locale,
     signal,
     inputMediaUrl,
+    onProviderJobId,
     fetchImpl,
   } = params;
   const { t } = scopedTranslation.scopedT(locale);
@@ -107,6 +113,12 @@ export async function generateWithFalAi(params: {
 
     const queueResult = (await submitResponse.json()) as FalAiQueueResponse;
     const requestId = queueResult.request_id;
+    const providerJobId =
+      normalizeProviderJobId(requestId) ??
+      extractHeaderRequestId(submitResponse.headers);
+    if (providerJobId) {
+      onProviderJobId?.(providerJobId);
+    }
     logger.debug("[Fal.ai] Request queued, polling", { requestId });
 
     let lastResponse: Response = submitResponse;
@@ -157,8 +169,10 @@ export async function generateWithFalAi(params: {
             errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
           });
         }
-        logger.debug("[Fal.ai] Image generated successfully");
-        return success({ imageUrl });
+        logger.debug("[Fal.ai] Image generated successfully", {
+          providerJobId: providerJobId ?? null,
+        });
+        return success({ imageUrl, providerJobId });
       }
 
       if (statusData.status === "FAILED") {

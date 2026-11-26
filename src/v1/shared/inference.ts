@@ -35,6 +35,7 @@ import {
   readImageOutputTokens,
 } from "next-vibe/agent/ai-stream/repository/loop/token-accumulator";
 import { createFixtureDownload } from "next-vibe/agent/shared/fixture-download";
+import { extractLanguageModelRequestId } from "next-vibe/agent/shared/provider-job-id";
 import type { ToolExecutionContext } from "next-vibe/core/execution-context";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import type { z } from "zod";
@@ -117,6 +118,8 @@ export interface InferenceResult {
   usage: InferenceUsage | undefined;
   /** Provider metadata of the call; carries OpenRouter's real usage.cost. */
   providerMetadata?: ProviderMetadata | undefined;
+  /** Provider request/generation ID for matching provider dashboard charges. */
+  providerJobId?: string | undefined;
 }
 
 export type InferenceStreamEvent =
@@ -135,6 +138,8 @@ export type InferenceStreamEvent =
       usage: InferenceUsage | undefined;
       /** Provider metadata of the finished step (OpenRouter usage.cost). */
       providerMetadata?: ProviderMetadata | undefined;
+      /** Provider request/generation ID for matching provider dashboard charges. */
+      providerJobId?: string | undefined;
     };
 
 export interface InferenceRunner {
@@ -383,6 +388,7 @@ export const aiSdkRunner: InferenceRunner = {
         requestsHourCache(request),
       ),
       providerMetadata: result.providerMetadata,
+      providerJobId: extractLanguageModelRequestId(result.response),
     };
   },
 
@@ -396,6 +402,7 @@ export const aiSdkRunner: InferenceRunner = {
     // metadata holds the real upstream cost billed for the call.
     let stepMetadata: ProviderMetadata | undefined;
     let stepUsage: InferenceUsage | undefined;
+    let stepProviderJobId: string | undefined;
     // Inline <think>…</think> in text deltas is reasoning, not answer text.
     const inlineThink = new InlineThinkSplitter();
     for await (const part of result.fullStream) {
@@ -460,6 +467,8 @@ export const aiSdkRunner: InferenceRunner = {
         return;
       } else if (part.type === "finish-step") {
         stepMetadata = part.providerMetadata ?? stepMetadata;
+        stepProviderJobId =
+          extractLanguageModelRequestId(part.response) ?? stepProviderJobId;
         stepUsage = mapUsage(
           part.usage,
           stepMetadata,
@@ -473,6 +482,7 @@ export const aiSdkRunner: InferenceRunner = {
             stepUsage ??
             mapUsage(part.totalUsage, stepMetadata, requestsHourCache(request)),
           providerMetadata: stepMetadata,
+          providerJobId: stepProviderJobId,
         };
       }
     }

@@ -12,6 +12,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { agentEnv } from "../../env";
 import { pollDelay } from "../../shared/poll-delay";
+import { extractModelsLabJobId } from "../../shared/provider-job-id";
 import { scopedTranslation } from "../i18n";
 
 interface ModelsLabMusicResponse {
@@ -41,9 +42,10 @@ export async function generateMusicWithModelsLab(params: {
   locale: CountryLanguage;
   signal?: AbortSignal;
   inputMediaUrl?: string;
+  onProviderJobId?: (providerJobId: string) => void;
   /** Fixture-aware fetch bound once per generation (see createFixtureFetch). */
   fetchImpl: typeof globalThis.fetch;
-}): Promise<ResponseType<{ audioUrl: string }>> {
+}): Promise<ResponseType<{ audioUrl: string; providerJobId?: string }>> {
   const {
     providerModel,
     prompt,
@@ -52,6 +54,7 @@ export async function generateMusicWithModelsLab(params: {
     locale,
     signal,
     inputMediaUrl,
+    onProviderJobId,
     fetchImpl,
   } = params;
   const { t } = scopedTranslation.scopedT(locale);
@@ -100,11 +103,21 @@ export async function generateMusicWithModelsLab(params: {
     }
 
     const result = (await submitResponse.json()) as ModelsLabMusicResponse;
+    const providerJobId = extractModelsLabJobId(
+      result.id,
+      result.fetch_result,
+      submitResponse.headers,
+    );
+    if (providerJobId) {
+      onProviderJobId?.(providerJobId);
+    }
 
     // Immediate success
     if (result.status === "success" && result.output?.[0]) {
-      logger.debug("[ModelsLab Music] Music generated immediately");
-      return success({ audioUrl: result.output[0] });
+      logger.debug("[ModelsLab Music] Music generated immediately", {
+        providerJobId: providerJobId ?? null,
+      });
+      return success({ audioUrl: result.output[0], providerJobId });
     }
 
     // Async processing - poll fetch_result URL
@@ -147,8 +160,16 @@ export async function generateMusicWithModelsLab(params: {
 
         const audioUrl = pollResult.output?.[0] ?? pollResult.future_links?.[0];
         if (pollResult.status === "success" && audioUrl) {
-          logger.debug("[ModelsLab Music] Music generated successfully");
-          return success({ audioUrl });
+          const finalJobId =
+            extractModelsLabJobId(pollResult.id, pollResult.fetch_result) ??
+            providerJobId;
+          if (finalJobId && finalJobId !== providerJobId) {
+            onProviderJobId?.(finalJobId);
+          }
+          logger.debug("[ModelsLab Music] Music generated successfully", {
+            providerJobId: finalJobId ?? null,
+          });
+          return success({ audioUrl, providerJobId: finalJobId });
         }
 
         if (pollResult.status === "error") {
@@ -191,7 +212,7 @@ export async function generateMusicWithModelsLab(params: {
             "[ModelsLab Music] Poll timed out but future_links file is ready",
             { futureUrl },
           );
-          return success({ audioUrl: futureUrl });
+          return success({ audioUrl: futureUrl, providerJobId });
         }
         return fail({
           message: t("post.errors.requestTimedOut"),

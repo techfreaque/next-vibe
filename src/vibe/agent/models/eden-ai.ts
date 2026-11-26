@@ -86,6 +86,8 @@ const edenAiCostSchema = z.union([z.string(), z.number()]).nullish();
 export const edenAiTtsResponseSchema = z.looseObject({
   status: z.string(),
   cost: edenAiCostSchema,
+  public_id: z.string().nullish(),
+  id: z.union([z.string(), z.number()]).nullish(),
   provider: z.string().nullish(),
   output: z.looseObject({ audio_resource_url: z.string().nullish() }).nullish(),
   error: edenAiErrorSchema,

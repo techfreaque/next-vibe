@@ -34,7 +34,7 @@ it("persists async progress for its owner and keeps other visitors and kinds iso
       settings: { prompt: "Blue boat" },
       locale: defaultLocale,
       logger: createEndpointLogger(false, defaultLocale),
-      generate: async (progress) => {
+      generate: async ({ progress }) => {
         // Nothing is listed before the run passes its checks.
         expect(await recentStudioHistory(user, "video")).toEqual([]);
         for (const status of ["running", "saving"] as const) {

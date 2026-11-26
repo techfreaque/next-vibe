@@ -28,6 +28,7 @@ import {
 } from "../image-generation/provider-error";
 import {
   MediaStudioRepository,
+  type ProviderJobIdRecorder,
   type StudioProgress,
 } from "../media-studio/repository";
 import { toStudioSettings } from "../media-studio/settings";
@@ -77,6 +78,8 @@ type GeneratedVideo = {
   /** Real upstream USD charge (no markup), when the provider reports one. */
   upstreamCostUsd?: number;
   durationSeconds?: number;
+  /** Provider request/job/generation ID for dashboard charge matching. */
+  providerJobId?: string;
 } & (
   | {
       videoUrl: string;
@@ -172,7 +175,7 @@ export class VideoGenerationRepository {
       user,
       locale,
       logger,
-      generate: (onProgress) =>
+      generate: ({ progress: onProgress, recordProviderJobId }) =>
         VideoGenerationRepository.generateVideo(
           { ...data, saveToStudio: undefined },
           user,
@@ -182,6 +185,7 @@ export class VideoGenerationRepository {
           toolExecutionContext,
           platform,
           onProgress,
+          recordProviderJobId,
         ),
     });
   }
@@ -195,6 +199,7 @@ export class VideoGenerationRepository {
     toolExecutionContext: ToolExecutionContext,
     platform: Platform,
     onProgress?: StudioProgress,
+    onProviderJobId?: ProviderJobIdRecorder,
   ): Promise<ResponseType<VideoGenerationPostResponseOutput>> {
     // model is resolved via fieldDefaults in route.ts (from favorites/skill config)
     if (!data.model) {
@@ -444,6 +449,7 @@ export class VideoGenerationRepository {
           aspectRatio: aspectRatio,
           resolution: data.resolution,
           inputImageUrl: resolvedSeedImageUrl,
+          onProviderJobId,
           logger,
           locale,
           fetchImpl,
@@ -480,6 +486,7 @@ export class VideoGenerationRepository {
           generateAudio: videoModel.generateAudio ?? false,
           supportedFrameImages: videoModel.supportedFrameImages,
           allowedPassthroughParameters: videoModel.allowedPassthroughParameters,
+          onProviderJobId,
           logger,
           locale,
           fetchImpl,
@@ -496,6 +503,7 @@ export class VideoGenerationRepository {
           negativePrompt: data.negativePrompt,
           generateAudio: videoModel.generateAudio ?? true,
           inputImageUrl: resolvedSeedImageUrl,
+          onProviderJobId,
           logger,
           locale,
           fetchImpl,
@@ -640,7 +648,11 @@ export class VideoGenerationRepository {
         locale,
         logger,
         tCredits,
-        { modelId: videoModel.id, apiProvider: videoModel.apiProvider },
+        {
+          modelId: videoModel.id,
+          apiProvider: videoModel.apiProvider,
+          providerJobId: generated.providerJobId,
+        },
         generated.upstreamCostUsd,
       );
       if (!deductResult.success) {

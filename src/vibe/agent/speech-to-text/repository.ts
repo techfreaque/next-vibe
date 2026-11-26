@@ -31,7 +31,10 @@ import {
   PROVIDER_SETUP_INSTRUCTIONS,
 } from "../env-availability";
 import { getEnvAvailability } from "../env-availability";
-import { MediaStudioRepository } from "../media-studio/repository";
+import {
+  MediaStudioRepository,
+  type ProviderJobIdRecorder,
+} from "../media-studio/repository";
 import { toStudioSettings } from "../media-studio/settings";
 import {
   EDEN_AI_URLS,
@@ -44,6 +47,11 @@ import {
 } from "../models/eden-ai";
 import { ApiProvider, calculateSttCreditCost } from "../models/models";
 import { pollDelay } from "../shared/poll-delay";
+import {
+  extractHeaderRequestId,
+  mergeProviderJobIds,
+  normalizeProviderJobId,
+} from "../shared/provider-job-id";
 import { ModelSelectionType } from "../skills/enum";
 import { DEFAULT_STT_MODEL_SELECTION } from "./constants";
 import type {
@@ -119,6 +127,7 @@ interface SttChunkResult {
   confidence: number | undefined;
   duration: number;
   providerCostUsd: number | undefined;
+  providerJobId?: string;
   segments?: SttSegment[];
 }
 
@@ -152,6 +161,7 @@ export class SpeechToTextRepository {
   private static readonly MINIMUM_BALANCE_SECONDS = 5;
 
   private static readonly compatibleTranscriptSchema = z.object({
+    id: z.string().optional(),
     text: z.string().optional(),
     duration: z.number().optional(),
     segments: z
@@ -184,6 +194,7 @@ export class SpeechToTextRepository {
     t: SpeechToTextT,
     fetchImpl: typeof globalThis.fetch,
     task: SttCallOptions["task"],
+    onProviderJobId?: ProviderJobIdRecorder,
   ): Promise<ResponseType<SttChunkResult>> {
     if (!modelOption) {
       return fail({
@@ -236,6 +247,7 @@ export class SpeechToTextRepository {
           logger,
           t,
           fetchImpl,
+          onProviderJobId,
         );
       case ApiProvider.DEEPGRAM:
         return SpeechToTextRepository.transcribeWithDeepgram(
@@ -283,7 +295,7 @@ export class SpeechToTextRepository {
       user,
       locale,
       logger,
-      generate: () =>
+      generate: ({ recordProviderJobId }) =>
         SpeechToTextRepository.transcribeAudio(
           data.fileUpload.files,
           user,
@@ -292,6 +304,7 @@ export class SpeechToTextRepository {
           data.modelId,
           toolExecutionContext,
           data.language,
+          recordProviderJobId,
         ),
     });
   }
@@ -305,6 +318,7 @@ export class SpeechToTextRepository {
     /** Fixture chain of the calling stream — provider calls bind it. */
     toolExecutionContext: ToolExecutionContext,
     language?: string,
+    onProviderJobId?: ProviderJobIdRecorder,
   ): Promise<ResponseType<SpeechToTextPostResponseOutput>> {
     const result = await SpeechToTextRepository.transcribe(
       files,
@@ -314,6 +328,7 @@ export class SpeechToTextRepository {
       sttModelSelection,
       toolExecutionContext,
       { language },
+      onProviderJobId,
     );
     if (!result.success) {
       return result;
@@ -342,6 +357,7 @@ export class SpeechToTextRepository {
     /** Fixture chain of the calling stream — provider calls bind it. */
     toolExecutionContext: ToolExecutionContext,
     options: SttCallOptions = {},
+    onProviderJobId?: ProviderJobIdRecorder,
   ): Promise<ResponseType<SttTranscription>> {
     const t = sttScopedTranslation.scopedT(locale).t;
     const language = options.language ?? getLanguageFromLocale(locale);
@@ -475,6 +491,7 @@ export class SpeechToTextRepository {
             t,
             fetchImpl,
             options.task,
+            onProviderJobId,
           );
           if (!results[i].success) {
             return;
@@ -568,6 +585,13 @@ export class SpeechToTextRepository {
         creditCostPerSecond: modelOption.creditCostPerSecond,
       });
 
+      const providerJobs = mergeProviderJobIds(
+        results.map((r) => (r.success ? r.data.providerJobId : undefined)),
+      );
+      if (providerJobs.providerJobId) {
+        onProviderJobId?.(providerJobs.providerJobId);
+      }
+
       // Deduct credits AFTER successful completion
       const deductResult = await CreditRepository.deductCreditsForSTT(
         user,
@@ -575,7 +599,11 @@ export class SpeechToTextRepository {
         logger,
         tCredits,
         locale,
-        { modelId: modelOption.id, apiProvider: modelOption.apiProvider },
+        {
+          modelId: modelOption.id,
+          apiProvider: modelOption.apiProvider,
+          ...providerJobs,
+        },
       );
 
       if (!deductResult.success) {
@@ -777,7 +805,21 @@ export class SpeechToTextRepository {
         }))
       : undefined;
 
-    return success({ text, confidence, duration, providerCostUsd, segments });
+    const providerJobId =
+      extractHeaderRequestId(response.headers, [
+        "x-generation-id",
+        "x-request-id",
+        "request-id",
+      ]) ?? normalizeProviderJobId(data.id);
+
+    return success({
+      text,
+      confidence,
+      duration,
+      providerCostUsd,
+      providerJobId,
+      segments,
+    });
   }
 
   /**
@@ -790,14 +832,8 @@ export class SpeechToTextRepository {
     logger: EndpointLogger,
     t: SpeechToTextT,
     fetchImpl: typeof globalThis.fetch,
-  ): Promise<
-    ResponseType<{
-      text: string;
-      confidence: number | undefined;
-      duration: number;
-      providerCostUsd: number | undefined;
-    }>
-  > {
+    onProviderJobId?: ProviderJobIdRecorder,
+  ): Promise<ResponseType<SttChunkResult>> {
     if (!(await getEnvAvailability()).voice) {
       logger.error(
         "[STT] Eden AI not configured",
@@ -847,6 +883,7 @@ export class SpeechToTextRepository {
       logger,
       t,
       fetchImpl,
+      onProviderJobId,
     );
   }
 
@@ -865,14 +902,8 @@ export class SpeechToTextRepository {
     logger: EndpointLogger,
     t: SpeechToTextT,
     fetchImpl: typeof globalThis.fetch,
-  ): Promise<
-    ResponseType<{
-      text: string;
-      confidence: number | undefined;
-      duration: number;
-      providerCostUsd: number | undefined;
-    }>
-  > {
+    onProviderJobId?: ProviderJobIdRecorder,
+  ): Promise<ResponseType<SttChunkResult>> {
     const model = edenAiSttModel(edenProvider);
     const formData = new FormData();
     formData.append("file", blob, fileName);
@@ -979,6 +1010,7 @@ export class SpeechToTextRepository {
       });
     }
     const publicId = created.data.public_id;
+    onProviderJobId?.(publicId);
 
     // Short audio usually finishes inline: the create response already holds
     // the result. Poll only while the job is still processing.
@@ -1028,12 +1060,7 @@ export class SpeechToTextRepository {
     uploadDuration: number | undefined,
     logger: EndpointLogger,
     t: SpeechToTextT,
-  ): ResponseType<{
-    text: string;
-    confidence: number | undefined;
-    duration: number;
-    providerCostUsd: number | undefined;
-  }> {
+  ): ResponseType<SttChunkResult> {
     if (job.status !== "success") {
       const jobError = edenAiErrorMessage(job.error);
       logger.error("[STT] Provider returned error", {
@@ -1090,6 +1117,7 @@ export class SpeechToTextRepository {
       confidence,
       duration,
       providerCostUsd,
+      providerJobId: normalizeProviderJobId(publicId),
     });
   }
 
@@ -1103,14 +1131,7 @@ export class SpeechToTextRepository {
     logger: EndpointLogger,
     t: SpeechToTextT,
     fetchImpl: typeof globalThis.fetch,
-  ): Promise<
-    ResponseType<{
-      text: string;
-      confidence: number | undefined;
-      duration: number;
-      providerCostUsd: number | undefined;
-    }>
-  > {
+  ): Promise<ResponseType<SttChunkResult>> {
     if (!agentEnv.DEEPGRAM_API_KEY) {
       const { envKey, url, label } = PROVIDER_SETUP_INSTRUCTIONS.deepgram;
       logger.error("[STT] Deepgram API key not configured");
@@ -1165,6 +1186,7 @@ export class SpeechToTextRepository {
         }>;
       };
       metadata?: {
+        request_id?: string;
         duration?: number;
       };
     };
@@ -1173,8 +1195,21 @@ export class SpeechToTextRepository {
     const text = alt?.transcript ?? "";
     const confidence = alt?.confidence;
     const duration = data.metadata?.duration ?? 0;
+    const providerJobId =
+      normalizeProviderJobId(data.metadata?.request_id) ??
+      extractHeaderRequestId(response.headers, [
+        "dg-request-id",
+        "x-request-id",
+        "request-id",
+      ]);
 
-    return success({ text, confidence, duration, providerCostUsd: undefined });
+    return success({
+      text,
+      confidence,
+      duration,
+      providerCostUsd: undefined,
+      providerJobId,
+    });
   }
 
   /**
@@ -1189,14 +1224,7 @@ export class SpeechToTextRepository {
     t: SpeechToTextT,
     fetchImpl: typeof globalThis.fetch,
     submitResponse: Response,
-  ): Promise<
-    ResponseType<{
-      text: string;
-      confidence: number | undefined;
-      duration: number;
-      providerCostUsd: number | undefined;
-    }>
-  > {
+  ): Promise<ResponseType<SttChunkResult>> {
     let attempts = 0;
     let lastResponse: Response = submitResponse;
 

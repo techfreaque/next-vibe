@@ -13,6 +13,10 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { agentEnv } from "../../env";
 import { parseBase64DataUri } from "../../shared/media-generation";
+import {
+  extractHeaderRequestId,
+  normalizeProviderJobId,
+} from "../../shared/provider-job-id";
 import { parseAspectRatio } from "../aspect-ratio";
 import { ImageSize } from "../enum";
 import { scopedTranslation } from "../i18n";
@@ -28,6 +32,7 @@ const VENICE_IMAGES_URL = "https://api.venice.ai/api/v1/images/generations";
 const VENICE_IMAGE_EDIT_URL = "https://api.venice.ai/api/v1/image/edit";
 
 interface VeniceImageResponse {
+  id?: string;
   data?: Array<{ b64_json?: string; url?: string }>;
   error?: string | { message?: string };
 }
@@ -98,17 +103,19 @@ export async function generateWithVenice(params: {
    * base64 string.
    */
   inputMediaUrl?: string | null;
+  onProviderJobId?: (providerJobId: string) => void;
   logger: EndpointLogger;
   locale: CountryLanguage;
   /** Fixture-aware fetch bound once per generation (see createFixtureFetch). */
   fetchImpl: typeof globalThis.fetch;
-}): Promise<ResponseType<{ imageUrl: string }>> {
+}): Promise<ResponseType<{ imageUrl: string; providerJobId?: string }>> {
   const {
     providerModel,
     prompt,
     size,
     aspectRatio,
     inputMediaUrl,
+    onProviderJobId,
     logger,
     locale,
     fetchImpl,
@@ -128,6 +135,7 @@ export async function generateWithVenice(params: {
       prompt,
       inputMediaUrl,
       aspectRatio,
+      onProviderJobId,
       logger,
       locale,
       fetchImpl,
@@ -199,8 +207,21 @@ export async function generateWithVenice(params: {
       });
     }
 
-    logger.debug("[Venice Images] Image generated successfully");
-    return success({ imageUrl });
+    const providerJobId =
+      normalizeProviderJobId(data.id) ??
+      extractHeaderRequestId(response.headers, [
+        "x-venice-request-id",
+        "x-request-id",
+        "request-id",
+      ]);
+    if (providerJobId) {
+      onProviderJobId?.(providerJobId);
+    }
+
+    logger.debug("[Venice Images] Image generated successfully", {
+      providerJobId: providerJobId ?? null,
+    });
+    return success({ imageUrl, providerJobId });
   } catch (error) {
     const errorMessage = parseError(error).message;
     logger.error("[Venice Images] Request failed", { error: errorMessage });
@@ -246,15 +267,17 @@ async function editWithVenice(params: {
   prompt: string;
   inputMediaUrl: string;
   aspectRatio?: string;
+  onProviderJobId?: (providerJobId: string) => void;
   logger: EndpointLogger;
   locale: CountryLanguage;
   fetchImpl: typeof globalThis.fetch;
-}): Promise<ResponseType<{ imageUrl: string }>> {
+}): Promise<ResponseType<{ imageUrl: string; providerJobId?: string }>> {
   const {
     providerModel,
     prompt,
     inputMediaUrl,
     aspectRatio,
+    onProviderJobId,
     logger,
     locale,
     fetchImpl,
@@ -349,8 +372,19 @@ async function editWithVenice(params: {
     const mime = imageMimeFromContentType(response.headers.get("content-type"));
     const imageUrl = `data:${mime};base64,${outBase64}`;
 
-    logger.debug("[Venice Images] Image edited successfully");
-    return success({ imageUrl });
+    const providerJobId = extractHeaderRequestId(response.headers, [
+      "x-venice-request-id",
+      "x-request-id",
+      "request-id",
+    ]);
+    if (providerJobId) {
+      onProviderJobId?.(providerJobId);
+    }
+
+    logger.debug("[Venice Images] Image edited successfully", {
+      providerJobId: providerJobId ?? null,
+    });
+    return success({ imageUrl, providerJobId });
   } catch (error) {
     const errorMessage = parseError(error).message;
     logger.error("[Venice Images] Edit request failed", {

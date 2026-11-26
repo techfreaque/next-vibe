@@ -253,6 +253,8 @@ export class ToolExecutionContextImpl {
   upstreamCostMissingSteps = 0;
   /** Upstream endpoint that served the last costed step (e.g. "Parasail"). */
   upstreamProvider: string | null = null;
+  /** Provider request/generation IDs seen across finished steps of this turn. */
+  providerJobIds: string[] = [];
 
   /** Provider first-part watchdog timer handle (see FirstPartWatchdog). */
   firstPartWatchdogTimer: ReturnType<typeof setTimeout> | null = null;

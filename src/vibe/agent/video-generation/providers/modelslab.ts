@@ -12,6 +12,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { agentEnv } from "../../env";
 import { pollDelay } from "../../shared/poll-delay";
+import { extractModelsLabJobId } from "../../shared/provider-job-id";
 import { scopedTranslation } from "../i18n";
 
 interface ModelsLabVideoResponse {
@@ -289,9 +290,10 @@ export async function generateVideoWithModelsLab(params: {
   aspectRatio?: string;
   resolution?: string;
   inputImageUrl?: string;
+  onProviderJobId?: (providerJobId: string) => void;
   /** Fixture-aware fetch bound once per generation (see createFixtureFetch). */
   fetchImpl: typeof globalThis.fetch;
-}): Promise<ResponseType<{ videoUrl: string }>> {
+}): Promise<ResponseType<{ videoUrl: string; providerJobId?: string }>> {
   const {
     providerModel,
     prompt,
@@ -303,6 +305,7 @@ export async function generateVideoWithModelsLab(params: {
     aspectRatio,
     resolution,
     inputImageUrl,
+    onProviderJobId,
     fetchImpl,
   } = params;
   const { t } = scopedTranslation.scopedT(locale);
@@ -397,13 +400,23 @@ export async function generateVideoWithModelsLab(params: {
     }
 
     const result = (await submitResponse.json()) as ModelsLabVideoResponse;
+    const providerJobId = extractModelsLabJobId(
+      result.id,
+      result.fetch_result,
+      submitResponse.headers,
+    );
+    if (providerJobId) {
+      onProviderJobId?.(providerJobId);
+    }
 
     // Immediate success
     if (result.status === "success") {
       const videoUrl = result.output?.[0] ?? result.proxy_links?.[0];
       if (videoUrl) {
-        logger.debug("[ModelsLab Video] Video generated immediately");
-        return success({ videoUrl });
+        logger.debug("[ModelsLab Video] Video generated immediately", {
+          providerJobId: providerJobId ?? null,
+        });
+        return success({ videoUrl, providerJobId });
       }
     }
 
@@ -458,8 +471,16 @@ export async function generateVideoWithModelsLab(params: {
           const videoUrl =
             pollResult.output?.[0] ?? pollResult.proxy_links?.[0];
           if (videoUrl) {
-            logger.debug("[ModelsLab Video] Video generated successfully");
-            return success({ videoUrl });
+            const finalJobId =
+              extractModelsLabJobId(pollResult.id, pollResult.fetch_result) ??
+              providerJobId;
+            if (finalJobId && finalJobId !== providerJobId) {
+              onProviderJobId?.(finalJobId);
+            }
+            logger.debug("[ModelsLab Video] Video generated successfully", {
+              providerJobId: finalJobId ?? null,
+            });
+            return success({ videoUrl, providerJobId: finalJobId });
           }
         }
 
@@ -487,7 +508,7 @@ export async function generateVideoWithModelsLab(params: {
                 "[ModelsLab Video] future_links ready mid-poll (status stuck on processing)",
                 { futureUrl, attempt: attempt + 1 },
               );
-              return success({ videoUrl: futureUrl });
+              return success({ videoUrl: futureUrl, providerJobId });
             }
           } catch {
             // File not ready yet — keep polling.
@@ -527,7 +548,7 @@ export async function generateVideoWithModelsLab(params: {
             "[ModelsLab Video] Poll timed out but future_links file is ready",
             { futureUrl },
           );
-          return success({ videoUrl: futureUrl });
+          return success({ videoUrl: futureUrl, providerJobId });
         }
       }
 

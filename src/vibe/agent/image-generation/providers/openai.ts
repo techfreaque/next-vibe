@@ -11,6 +11,7 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { agentEnv } from "../../env";
+import { extractHeaderRequestId } from "../../shared/provider-job-id";
 import { scopedTranslation } from "../i18n";
 
 interface OpenAIImageResponse {
@@ -40,11 +41,20 @@ export async function generateWithOpenAI(params: {
   logger: EndpointLogger;
   locale: CountryLanguage;
   inputMediaUrl?: string;
+  onProviderJobId?: (providerJobId: string) => void;
   /** Fixture-aware fetch bound once per generation (see createFixtureFetch). */
   fetchImpl: typeof globalThis.fetch;
-}): Promise<ResponseType<{ imageUrl: string }>> {
-  const { providerModel, prompt, size, quality, logger, locale, fetchImpl } =
-    params;
+}): Promise<ResponseType<{ imageUrl: string; providerJobId?: string }>> {
+  const {
+    providerModel,
+    prompt,
+    size,
+    quality,
+    logger,
+    locale,
+    onProviderJobId,
+    fetchImpl,
+  } = params;
   const { t } = scopedTranslation.scopedT(locale);
 
   if (!agentEnv.OPENAI_API_KEY) {
@@ -103,8 +113,18 @@ export async function generateWithOpenAI(params: {
       });
     }
 
-    logger.debug("[OpenAI Images] Image generated successfully");
-    return success({ imageUrl });
+    const providerJobId = extractHeaderRequestId(response.headers, [
+      "x-request-id",
+      "request-id",
+    ]);
+    if (providerJobId) {
+      onProviderJobId?.(providerJobId);
+    }
+
+    logger.debug("[OpenAI Images] Image generated successfully", {
+      providerJobId: providerJobId ?? null,
+    });
+    return success({ imageUrl, providerJobId });
   } catch (error) {
     const errorMessage = parseError(error).message;
     logger.error("[OpenAI Images] Request failed", { error: errorMessage });

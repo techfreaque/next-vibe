@@ -15,6 +15,7 @@ import { z } from "zod";
 
 import { agentEnv } from "../../env";
 import { pollDelay } from "../../shared/poll-delay";
+import { extractModelsLabJobId } from "../../shared/provider-job-id";
 import { modelsLabImageDimensions, snapAspectRatio } from "../aspect-ratio";
 import { scopedTranslation } from "../i18n";
 
@@ -108,9 +109,10 @@ export async function generateImageWithModelsLab(params: {
   signal?: AbortSignal;
   aspectRatio?: string;
   inputMediaUrl?: string;
+  onProviderJobId?: (providerJobId: string) => void;
   /** Fixture-aware fetch bound once per generation (see createFixtureFetch). */
   fetchImpl: typeof globalThis.fetch;
-}): Promise<ResponseType<{ imageUrl: string }>> {
+}): Promise<ResponseType<{ imageUrl: string; providerJobId?: string }>> {
   const {
     providerModel,
     prompt,
@@ -119,6 +121,7 @@ export async function generateImageWithModelsLab(params: {
     signal,
     aspectRatio,
     inputMediaUrl,
+    onProviderJobId,
     fetchImpl,
   } = params;
   const { t } = scopedTranslation.scopedT(locale);
@@ -169,7 +172,8 @@ export async function generateImageWithModelsLab(params: {
 
   const completed = (
     response: ModelsLabImageResponse,
-  ): ResponseType<{ imageUrl: string }> => {
+    submittedJobId?: string,
+  ): ResponseType<{ imageUrl: string; providerJobId?: string }> => {
     const reportedModel = response.meta?.model_id;
     if (reportedModel && reportedModel !== modelId) {
       logger.warn("[ModelsLab Image] Provider reported a different model", {
@@ -190,15 +194,20 @@ export async function generateImageWithModelsLab(params: {
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
       });
     }
+    const providerJobId = extractModelsLabJobId(response.id) ?? submittedJobId;
+    if (providerJobId && providerJobId !== submittedJobId) {
+      onProviderJobId?.(providerJobId);
+    }
     logger.debug("[ModelsLab Image] Image generated successfully", {
       requestedModel: modelId,
       reportedModel: reportedModel ?? null,
+      providerJobId: providerJobId ?? null,
       generationTime: response.generationTime ?? null,
       width: response.meta?.width ?? null,
       height: response.meta?.height ?? null,
       latencyMs: Math.round(performance.now() - startedAt),
     });
-    return success({ imageUrl });
+    return success({ imageUrl, providerJobId });
   };
 
   try {
@@ -265,9 +274,17 @@ export async function generateImageWithModelsLab(params: {
     }
 
     const result = modelsLabImageResponse.parse(await submitResponse.json());
+    const submittedJobId = extractModelsLabJobId(
+      result.id,
+      undefined,
+      submitResponse.headers,
+    );
+    if (submittedJobId) {
+      onProviderJobId?.(submittedJobId);
+    }
 
     if (result.status === "success") {
-      return completed(result);
+      return completed(result, submittedJobId);
     }
 
     if (
@@ -310,7 +327,7 @@ export async function generateImageWithModelsLab(params: {
         );
 
         if (pollResult.status === "success") {
-          return completed(pollResult);
+          return completed(pollResult, submittedJobId);
         }
 
         if (pollResult.status !== "processing") {

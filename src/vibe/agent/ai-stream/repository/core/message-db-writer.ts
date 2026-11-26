@@ -480,6 +480,10 @@ export class MessageDbWriter {
     user: JwtPayloadType;
     creditCost: number;
     upstreamCost?: UsageUpstreamCost;
+    providerJob?: {
+      providerJobId?: string;
+      providerJobIds?: string[];
+    };
   }): Promise<void> {
     return compactingWrites.emitCompactingDone(this, params);
   }

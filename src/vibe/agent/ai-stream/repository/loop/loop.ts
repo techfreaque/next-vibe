@@ -565,6 +565,7 @@ export class StreamLoop implements StreamLoopState {
                 usage: stepResult.usage,
                 finishReason: stepResult.finishReason,
                 providerMetadata: stepResult.providerMetadata,
+                response: stepResult.response,
                 files: stepResult.files,
                 text: stepResult.text,
                 requestedEndLoop: endLoopCalls.length > 0,
@@ -1547,6 +1548,10 @@ export class StreamLoop implements StreamLoopState {
     };
     finishReason?: string;
     providerMetadata?: ProviderMetadata;
+    response?: {
+      id?: string;
+      headers?: Readonly<Record<string, string>>;
+    };
     files?: ReadonlyArray<{ mediaType: string }>;
     text: string;
     requestedEndLoop: boolean;

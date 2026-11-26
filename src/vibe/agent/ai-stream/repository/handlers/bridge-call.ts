@@ -14,6 +14,10 @@ import { fetchStorageFileAsBase64 } from "../../../chat/storage/url-utils";
 import type { AgentEnvAvailability } from "../../../env-availability";
 import type { Modality } from "../../../models/enum";
 import type { ModelOptionTokenBased } from "../../../models/models";
+import {
+  extractLanguageModelRequestId,
+  mergeProviderJobIds,
+} from "../../../shared/provider-job-id";
 import type { ChatModelId } from "../../models";
 import type {
   AudioVisionModelId,
@@ -456,6 +460,9 @@ async function runBridgeCall(params: {
           cachedInputTokens: cache.cachedInputTokens,
           cacheWriteTokens: cache.cacheWriteTokens,
         },
+        providerJob: mergeProviderJobIds([
+          extractLanguageModelRequestId(result.response),
+        ]),
       });
     }
 

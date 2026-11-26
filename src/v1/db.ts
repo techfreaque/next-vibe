@@ -4,6 +4,7 @@
  * whichever node runs the generation.
  */
 
+import { sql } from "drizzle-orm";
 import {
   doublePrecision,
   index,
@@ -62,6 +63,8 @@ export const v1MediaJobs = pgTable(
     /** Length of the delivered clip, when the provider reports it */
     durationSeconds: doublePrecision("duration_seconds"),
     creditsCharged: doublePrecision("credits_charged"),
+    /** Provider request/job/generation ID for matching provider dashboard charges. */
+    providerJobId: text("provider_job_id"),
     errorCode: text("error_code"),
     errorMessage: text("error_message"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -70,6 +73,9 @@ export const v1MediaJobs = pgTable(
   },
   (table) => [
     index("v1_media_jobs_user_created_idx").on(table.userId, table.createdAt),
+    index("v1_media_jobs_provider_job_id_idx")
+      .on(table.providerJobId)
+      .where(sql`${table.providerJobId} IS NOT NULL`),
   ],
 );
 

@@ -14,6 +14,10 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { agentEnv } from "../../env";
 import { pollDelay } from "../../shared/poll-delay";
+import {
+  extractHeaderRequestId,
+  normalizeProviderJobId,
+} from "../../shared/provider-job-id";
 import { scopedTranslation } from "../i18n";
 
 interface ReplicatePrediction {
@@ -32,8 +36,9 @@ async function pollPrediction(
   locale: CountryLanguage,
   fetchImpl: typeof globalThis.fetch,
   submitResponse: Response,
+  providerJobId: string | undefined,
   signal?: AbortSignal,
-): Promise<ResponseType<{ imageUrl: string }>> {
+): Promise<ResponseType<{ imageUrl: string; providerJobId?: string }>> {
   const { t } = scopedTranslation.scopedT(locale);
 
   let lastResponse: Response = submitResponse;
@@ -73,7 +78,7 @@ async function pollPrediction(
           errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
         });
       }
-      return success({ imageUrl });
+      return success({ imageUrl, providerJobId });
     }
     if (prediction.status === "failed" || prediction.status === "canceled") {
       return fail({
@@ -103,9 +108,10 @@ export async function generateWithReplicate(params: {
   locale: CountryLanguage;
   signal?: AbortSignal;
   inputMediaUrl?: string;
+  onProviderJobId?: (providerJobId: string) => void;
   /** Fixture-aware fetch bound once per generation (see createFixtureFetch). */
   fetchImpl: typeof globalThis.fetch;
-}): Promise<ResponseType<{ imageUrl: string }>> {
+}): Promise<ResponseType<{ imageUrl: string; providerJobId?: string }>> {
   const {
     providerModel,
     prompt,
@@ -114,6 +120,7 @@ export async function generateWithReplicate(params: {
     locale,
     signal,
     inputMediaUrl,
+    onProviderJobId,
     fetchImpl,
   } = params;
   const { t } = scopedTranslation.scopedT(locale);
@@ -177,6 +184,12 @@ export async function generateWithReplicate(params: {
     }
 
     const prediction = (await response.json()) as ReplicatePrediction;
+    const providerJobId =
+      normalizeProviderJobId(prediction.id) ??
+      extractHeaderRequestId(response.headers);
+    if (providerJobId) {
+      onProviderJobId?.(providerJobId);
+    }
     logger.debug("[Replicate] Prediction created, polling", {
       predictionId: prediction.id,
     });
@@ -186,6 +199,7 @@ export async function generateWithReplicate(params: {
       locale,
       fetchImpl,
       response,
+      providerJobId,
       signal,
     );
   } catch (error) {

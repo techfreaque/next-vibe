@@ -14,6 +14,10 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import { agentEnv } from "../../env";
 import { parseBase64DataUri } from "../../shared/media-generation";
 import { pollDelay } from "../../shared/poll-delay";
+import {
+  extractHeaderRequestId,
+  normalizeProviderJobId,
+} from "../../shared/provider-job-id";
 import { scopedTranslation } from "../i18n";
 
 type VideoProviderError =
@@ -182,6 +186,7 @@ export async function generateVideoWithOpenRouter(params: {
   generateAudio?: boolean;
   supportedFrameImages?: readonly string[];
   allowedPassthroughParameters?: readonly string[];
+  onProviderJobId?: (providerJobId: string) => void;
   logger: EndpointLogger;
   locale: CountryLanguage;
   fetchImpl: typeof globalThis.fetch;
@@ -191,6 +196,7 @@ export async function generateVideoWithOpenRouter(params: {
     /** Real charge of the job in USD (no markup), when reported. */
     upstreamCostUsd?: number;
     downloadHeaders?: Record<string, string>;
+    providerJobId?: string;
   }>
 > {
   const {
@@ -204,6 +210,7 @@ export async function generateVideoWithOpenRouter(params: {
     generateAudio,
     supportedFrameImages,
     allowedPassthroughParameters,
+    onProviderJobId,
     logger,
     locale,
     fetchImpl,
@@ -388,6 +395,15 @@ export async function generateVideoWithOpenRouter(params: {
     }
 
     const jobId = submitData.id;
+    const submittedJobId =
+      normalizeProviderJobId(submitData.generation_id ?? jobId) ??
+      extractHeaderRequestId(submitRes.headers, [
+        "x-generation-id",
+        "x-request-id",
+      ]);
+    if (submittedJobId) {
+      onProviderJobId?.(submittedJobId);
+    }
     const pollUrl = `https://openrouter.ai/api/v1/videos/${jobId}`;
 
     logger.debug("[OpenRouter Video] Job submitted, polling", { jobId });
@@ -428,7 +444,16 @@ export async function generateVideoWithOpenRouter(params: {
           });
         }
         const upstreamCostUsd = statusData.usage?.cost;
-        logger.debug("[OpenRouter Video] Generation complete", { videoUrl });
+        const finalJobId =
+          normalizeProviderJobId(statusData.generation_id ?? statusData.id) ??
+          submittedJobId;
+        if (finalJobId && finalJobId !== submittedJobId) {
+          onProviderJobId?.(finalJobId);
+        }
+        logger.debug("[OpenRouter Video] Generation complete", {
+          videoUrl,
+          providerJobId: finalJobId ?? null,
+        });
         // The completed video URL is an OpenRouter /videos/<id>/content endpoint
         // that STILL requires the Bearer auth header — a bare GET returns 401 and
         // the "video" downloaded for storage is a tiny error JSON (broken .mp4).
@@ -436,6 +461,7 @@ export async function generateVideoWithOpenRouter(params: {
         return success({
           videoUrl,
           upstreamCostUsd,
+          providerJobId: finalJobId,
           downloadHeaders: {
             Authorization: headers.Authorization,
           },

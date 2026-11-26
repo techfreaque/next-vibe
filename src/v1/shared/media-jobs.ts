@@ -32,6 +32,7 @@ export interface V1MediaJobOutput {
   url: string;
   creditCost: number;
   durationSeconds: number | undefined;
+  providerJobId?: string;
 }
 
 export function newMediaJobId(kind: V1MediaJobKind): string {
@@ -54,9 +55,24 @@ export async function createMediaJob(
  */
 export function startMediaJob(
   job: V1MediaJob,
-  generate: () => Promise<ResponseType<V1MediaJobOutput>>,
+  generate: (
+    onProviderJobId?: (providerJobId: string) => void,
+  ) => Promise<ResponseType<V1MediaJobOutput>>,
   logger: EndpointLogger,
 ): void {
+  let recordedProviderJobId: string | undefined;
+  const onProviderJobId = (providerJobId: string): void => {
+    const trimmed = providerJobId.trim();
+    if (!trimmed) {
+      return;
+    }
+    recordedProviderJobId = trimmed;
+    void db
+      .update(v1MediaJobs)
+      .set({ providerJobId: trimmed })
+      .where(eq(v1MediaJobs.id, job.id))
+      .catch(() => undefined);
+  };
   const markFailed = async (code: string, message: string): Promise<void> => {
     await db
       .update(v1MediaJobs)
@@ -64,6 +80,9 @@ export function startMediaJob(
         status: "failed",
         errorCode: code,
         errorMessage: message,
+        ...(recordedProviderJobId
+          ? { providerJobId: recordedProviderJobId }
+          : {}),
         completedAt: new Date(),
       })
       .where(eq(v1MediaJobs.id, job.id));
@@ -74,8 +93,10 @@ export function startMediaJob(
         .update(v1MediaJobs)
         .set({ status: "in_progress", startedAt: new Date() })
         .where(eq(v1MediaJobs.id, job.id));
-      const result = await generate();
+      const result = await generate(onProviderJobId);
       if (result.success) {
+        const providerJobId =
+          result.data.providerJobId ?? recordedProviderJobId;
         await db
           .update(v1MediaJobs)
           .set({
@@ -83,6 +104,7 @@ export function startMediaJob(
             resultUrl: result.data.url,
             creditsCharged: result.data.creditCost,
             durationSeconds: result.data.durationSeconds ?? null,
+            ...(providerJobId ? { providerJobId } : {}),
             completedAt: new Date(),
           })
           .where(eq(v1MediaJobs.id, job.id));

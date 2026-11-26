@@ -19,6 +19,12 @@ import { studioGenerations } from "./db";
 import type { StudioSettings } from "./settings";
 
 export type StudioProgress = (status: "running" | "saving") => Promise<void>;
+export type ProviderJobIdRecorder = (providerJobId: string) => void;
+
+export interface StudioRunCallbacks {
+  progress?: StudioProgress;
+  recordProviderJobId?: ProviderJobIdRecorder;
+}
 
 interface MediaOutput {
   imageUrl?: string;
@@ -40,10 +46,10 @@ export class MediaStudioRepository {
     settings: StudioSettings;
     locale: CountryLanguage;
     logger: EndpointLogger;
-    generate: (progress?: StudioProgress) => Promise<ResponseType<T>>;
+    generate: (callbacks: StudioRunCallbacks) => Promise<ResponseType<T>>;
   }): Promise<ResponseType<T>> {
     if (!params.save) {
-      return params.generate();
+      return params.generate({});
     }
     const { user, kind, model, title, settings, locale, logger } = params;
     const { t } = scopedTranslation.scopedT(locale);
@@ -53,6 +59,7 @@ export class MediaStudioRepository {
     // or the final result): a refusal (no credits, no consent) never shows
     // up as a card, and nothing has to be deleted again.
     let created = false;
+    let recordedProviderJobId: string | undefined;
     const save = async (values: Row): Promise<void> => {
       if (created) {
         await db
@@ -69,6 +76,7 @@ export class MediaStudioRepository {
         title: title.trim().slice(0, 160),
         settings,
         status: "running",
+        providerJobId: recordedProviderJobId ?? null,
         userId: user.isPublic ? null : user.id,
         leadId: user.isPublic ? user.leadId : null,
         ...values,
@@ -82,13 +90,34 @@ export class MediaStudioRepository {
         });
       });
     };
-    const result = await params.generate(progress).catch((error: Error) => {
-      logger.error("Studio generation failed", parseError(error));
-      return fail({
-        message: t("failed"),
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+    const recordProviderJobId: ProviderJobIdRecorder = (providerJobId) => {
+      const trimmed = providerJobId.trim();
+      if (!trimmed) {
+        return;
+      }
+      recordedProviderJobId = trimmed;
+      if (created) {
+        void db
+          .update(studioGenerations)
+          .set({ providerJobId: trimmed })
+          .where(eq(studioGenerations.id, id))
+          .catch((error: Error) => {
+            logger.warn("Could not record Studio provider job ID", {
+              id,
+              error: error.message,
+            });
+          });
+      }
+    };
+    const result = await params
+      .generate({ progress, recordProviderJobId })
+      .catch((error: Error) => {
+        logger.error("Studio generation failed", parseError(error));
+        return fail({
+          message: t("failed"),
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        });
       });
-    });
     const refused =
       !result.success &&
       (result.errorType.errorCode ===
@@ -120,8 +149,16 @@ export class MediaStudioRepository {
               null,
             transcript: result.data.response?.text ?? null,
             credits: result.data.creditCost ?? null,
+            ...(recordedProviderJobId
+              ? { providerJobId: recordedProviderJobId }
+              : {}),
           }
-        : { status: "failed" },
+        : {
+            status: "failed",
+            ...(recordedProviderJobId
+              ? { providerJobId: recordedProviderJobId }
+              : {}),
+          },
     ).catch((error: Error) => {
       logger.error("Could not save Studio result", {
         id,
