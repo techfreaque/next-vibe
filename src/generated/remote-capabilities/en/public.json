@@ -2510,8 +2510,8 @@
   },
   {
     "toolName": "payment_invoice_invoiceId_public-view_GET",
-    "title": "View Invoice",
-    "titleShort": "View Invoice",
+    "title": "View invoice",
+    "titleShort": "View invoice",
     "description": "Public invoice view via secure token link",
     "fields": {
       "usage": {
@@ -2544,7 +2544,7 @@
         "token": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "View Token",
+          "label": "View token",
           "description": "Secure access token from your invoice email",
           "columns": 12,
           "schema": {
@@ -2575,7 +2575,7 @@
         },
         "invoiceNumber": {
           "type": "text",
-          "label": "Invoice Number",
+          "label": "Invoice number",
           "schema": {
             "def": {
               "type": "nullable",
@@ -2658,7 +2658,7 @@
         },
         "dueDate": {
           "type": "text",
-          "label": "Due Date",
+          "label": "Due date",
           "schema": {
             "def": {
               "type": "nullable",
@@ -2814,7 +2814,7 @@
         },
         "createdAt": {
           "type": "text",
-          "label": "Issue Date",
+          "label": "Issue date",
           "schema": {
             "def": {
               "type": "pipe",
@@ -2964,7 +2964,7 @@
         },
         "companyEmail": {
           "type": "text",
-          "label": "Company Email",
+          "label": "Company email",
           "schema": {
             "def": {
               "type": "nullable",
@@ -3059,7 +3059,7 @@
               },
               "unitPrice": {
                 "type": "text",
-                "label": "Unit Price",
+                "label": "Unit price",
                 "schema": {
                   "def": {
                     "type": "number",
@@ -3075,7 +3075,7 @@
               },
               "taxRate": {
                 "type": "text",
-                "label": "Tax Rate",
+                "label": "Tax rate",
                 "schema": {
                   "def": {
                     "type": "nullable",
@@ -3113,7 +3113,7 @@
               },
               "lineTotal": {
                 "type": "text",
-                "label": "Line Total",
+                "label": "Line total",
                 "schema": {
                   "def": {
                     "type": "number",
@@ -3171,7 +3171,7 @@
   {
     "toolName": "subscription_GET",
     "title": "Get Subscription",
-    "titleShort": "My Subscription",
+    "titleShort": "My subscription",
     "description": "Retrieve current subscription details",
     "fields": {
       "usage": {
@@ -4023,7 +4023,7 @@
   {
     "toolName": "user-me",
     "title": "Get User Profile",
-    "titleShort": "My Profile",
+    "titleShort": "My profile",
     "description": "Retrieve current user profile information",
     "fields": {
       "usage": {
@@ -9450,16 +9450,8 @@
               "label": "models.names.GPT_5_3_CODEX"
             },
             {
-              "value": "gpt-53-chat",
-              "label": "models.names.GPT_5_3_CHAT"
-            },
-            {
               "value": "gpt-52",
               "label": "models.names.GPT_5_2"
-            },
-            {
-              "value": "gpt-52-chat",
-              "label": "models.names.GPT_5_2_CHAT"
             },
             {
               "value": "gpt-52-pro",
@@ -9476,10 +9468,6 @@
             {
               "value": "gpt-5-pro",
               "label": "models.names.GTP_5_PRO"
-            },
-            {
-              "value": "gpt-5-codex",
-              "label": "models.names.GPT_5_CODEX"
             },
             {
               "value": "gpt-5",
@@ -9566,16 +9554,8 @@
               "label": "models.names.GLM_4_5V"
             },
             {
-              "value": "kimi-k2",
-              "label": "models.names.KIMI_K2"
-            },
-            {
               "value": "kimi_k2_5",
               "label": "models.names.KIMI_K2_5"
-            },
-            {
-              "value": "kimi-k2-thinking",
-              "label": "models.names.KIMI_K2_THINKING"
             },
             {
               "value": "deepseek-v3.2",
@@ -9592,14 +9572,6 @@
             {
               "value": "qwen3_235b-free",
               "label": "models.names.QWEN3_235B_FREE"
-            },
-            {
-              "value": "deepseek-r1-distill",
-              "label": "models.names.DEEPSEEK_R1_DISTILL"
-            },
-            {
-              "value": "qwen-2-5-7b",
-              "label": "models.names.QWEN_2_5_7B"
             },
             {
               "value": "claude-code-haiku",
@@ -9698,10 +9670,6 @@
               "label": "models.names.MINIMAX_M2_7"
             },
             {
-              "value": "mimo-v2-pro",
-              "label": "models.names.MIMO_V2_PRO"
-            },
-            {
               "value": "gemini-3.1-flash-image-preview",
               "label": "models.names.GEMINI_3_1_FLASH_IMAGE_PREVIEW"
             },
@@ -9748,10 +9716,6 @@
             {
               "value": "claude-opus-5",
               "label": "models.names.CLAUDE_OPUS_5"
-            },
-            {
-              "value": "claude-opus-5-fast",
-              "label": "models.names.CLAUDE_OPUS_5_FAST"
             },
             {
               "value": "claude-fable-5",
@@ -9820,14 +9784,6 @@
             {
               "value": "qwen-3.8-max",
               "label": "models.names.QWEN_3_8_MAX"
-            },
-            {
-              "value": "mimo-v2.5",
-              "label": "models.names.MIMO_V2_5"
-            },
-            {
-              "value": "mimo-v2.5-pro",
-              "label": "models.names.MIMO_V2_5_PRO"
             },
             {
               "value": "meta-muse-spark-1.2",

@@ -36,6 +36,14 @@ const loadData = createServerFn({ method: "GET" })
                 path: (data.params["_splat"] ?? "").split("/").filter(Boolean),
               } as { locale: CountryLanguage; path: string[] }),
             }),
+          () =>
+            page.generateMetadata({
+              params: Promise.resolve({
+                ...toNextParams(data.params),
+                path: (data.params["_splat"] ?? "").split("/").filter(Boolean),
+              } as { locale: CountryLanguage; path: string[] }),
+              searchParams: Promise.resolve(data.search),
+            }),
         ]),
       ]);
       return { page: pageData, head };

@@ -20,6 +20,8 @@ export async function getSeedModule(
       return (await import("../../chart-of-accounts/seeds")) as EnvironmentSeeds;
     case "companies":
       return (await import("../../companies/seeds")) as EnvironmentSeeds;
+    case "bank":
+      return (await import("../../finance/bank/seeds")) as EnvironmentSeeds;
     case "inventory":
       return (await import("../../inventory/seeds")) as EnvironmentSeeds;
     case "lead-magnet":
@@ -42,6 +44,8 @@ export async function getSeedModule(
       return (await import("../../purchasing/seeds")) as EnvironmentSeeds;
     case "subscription":
       return (await import("../../subscription/seeds")) as EnvironmentSeeds;
+    case "compliance":
+      return (await import("../../tax/compliance/seeds")) as EnvironmentSeeds;
     case "tax":
       return (await import("../../tax/seeds")) as EnvironmentSeeds;
     case "user":
@@ -76,6 +80,7 @@ export function getAllSeedModuleNames(): string[] {
   return [
     "chart-of-accounts",
     "companies",
+    "bank",
     "inventory",
     "lead-magnet",
     "leads",
@@ -87,6 +92,7 @@ export function getAllSeedModuleNames(): string[] {
     "catalog",
     "purchasing",
     "subscription",
+    "compliance",
     "tax",
     "user",
     "users",

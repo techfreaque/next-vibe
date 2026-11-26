@@ -1,5 +1,389 @@
 [
   {
+    "toolName": "companies-list",
+    "title": "Entreprises",
+    "titleShort": "Annuaire des entreprises",
+    "description": "Consultez vos entreprises. Les administrateurs de la plateforme ont accès à l’annuaire complet.",
+    "fields": {
+      "usage": {
+        "request": "data",
+        "response": true
+      },
+      "children": {
+        "includeAll": {
+          "type": "form_field",
+          "fieldType": "boolean",
+          "label": "Toutes les entreprises",
+          "description": "Inclure les entreprises dont vous ne faites pas partie. Réservé aux administrateurs de la plateforme.",
+          "hidden": true,
+          "includeInCacheKey": true,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "boolean"
+                },
+                "type": "boolean"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "page": {
+          "type": "form_field",
+          "fieldType": "number",
+          "label": "Page",
+          "includeInCacheKey": true,
+          "description": "Numéro de page (à partir de 1)",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "number",
+                  "checks": [
+                    {
+                      "def": {
+                        "type": "number",
+                        "check": "number_format",
+                        "abort": false,
+                        "format": "safeint"
+                      },
+                      "type": "number",
+                      "isFinite": true
+                    },
+                    {}
+                  ]
+                },
+                "type": "number",
+                "isFinite": true
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "pageSize": {
+          "type": "form_field",
+          "fieldType": "number",
+          "label": "Par page",
+          "includeInCacheKey": true,
+          "description": "Résultats par page (100 max.)",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "number",
+                  "checks": [
+                    {
+                      "def": {
+                        "type": "number",
+                        "check": "number_format",
+                        "abort": false,
+                        "format": "safeint"
+                      },
+                      "type": "number",
+                      "isFinite": true
+                    },
+                    {},
+                    {}
+                  ]
+                },
+                "type": "number",
+                "isFinite": true
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "total": {
+          "type": "text",
+          "label": "Total",
+          "schema": {
+            "def": {
+              "type": "number",
+              "checks": []
+            },
+            "type": "number",
+            "isFinite": true
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "companies": {
+          "type": "container",
+          "child": {
+            "type": "container",
+            "layoutType": "grid_2_columns",
+            "usage": {
+              "response": true
+            },
+            "children": {
+              "id": {
+                "type": "text",
+                "label": "ID",
+                "hidden": true,
+                "schema": {
+                  "def": {
+                    "type": "string",
+                    "format": "uuid",
+                    "check": "string_format",
+                    "abort": false,
+                    "pattern": {}
+                  },
+                  "type": "string"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "name": {
+                "type": "text",
+                "label": "Nom",
+                "schema": {
+                  "def": {
+                    "type": "string"
+                  },
+                  "type": "string"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "type": {
+                "type": "badge",
+                "text": "get.response.type",
+                "enumOptions": [
+                  {
+                    "value": "enums.companyType.b2b",
+                    "label": "enums.companyType.b2b"
+                  },
+                  {
+                    "value": "enums.companyType.b2c",
+                    "label": "enums.companyType.b2c"
+                  },
+                  {
+                    "value": "enums.companyType.individual",
+                    "label": "enums.companyType.individual"
+                  }
+                ],
+                "schema": {
+                  "def": {
+                    "type": "enum",
+                    "entries": {
+                      "B2B": "enums.companyType.b2b",
+                      "B2C": "enums.companyType.b2c",
+                      "INDIVIDUAL": "enums.companyType.individual"
+                    }
+                  },
+                  "type": "enum",
+                  "enum": {
+                    "B2B": "enums.companyType.b2b",
+                    "B2C": "enums.companyType.b2c",
+                    "INDIVIDUAL": "enums.companyType.individual"
+                  },
+                  "options": [
+                    "enums.companyType.b2b",
+                    "enums.companyType.b2c",
+                    "enums.companyType.individual"
+                  ]
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "role": {
+                "type": "badge",
+                "text": "get.response.role",
+                "enumOptions": [
+                  {
+                    "value": "enums.companyMemberRole.owner",
+                    "label": "enums.companyMemberRole.owner"
+                  },
+                  {
+                    "value": "enums.companyMemberRole.admin",
+                    "label": "enums.companyMemberRole.admin"
+                  },
+                  {
+                    "value": "enums.companyMemberRole.member",
+                    "label": "enums.companyMemberRole.member"
+                  },
+                  {
+                    "value": "enums.companyMemberRole.accountant",
+                    "label": "enums.companyMemberRole.accountant"
+                  },
+                  {
+                    "value": "enums.companyMemberRole.viewer",
+                    "label": "enums.companyMemberRole.viewer"
+                  }
+                ],
+                "schema": {
+                  "def": {
+                    "type": "nullable",
+                    "innerType": {
+                      "def": {
+                        "type": "enum",
+                        "entries": {
+                          "OWNER": "enums.companyMemberRole.owner",
+                          "ADMIN": "enums.companyMemberRole.admin",
+                          "MEMBER": "enums.companyMemberRole.member",
+                          "ACCOUNTANT": "enums.companyMemberRole.accountant",
+                          "VIEWER": "enums.companyMemberRole.viewer"
+                        }
+                      },
+                      "type": "enum",
+                      "enum": {
+                        "OWNER": "enums.companyMemberRole.owner",
+                        "ADMIN": "enums.companyMemberRole.admin",
+                        "MEMBER": "enums.companyMemberRole.member",
+                        "ACCOUNTANT": "enums.companyMemberRole.accountant",
+                        "VIEWER": "enums.companyMemberRole.viewer"
+                      },
+                      "options": [
+                        "enums.companyMemberRole.owner",
+                        "enums.companyMemberRole.admin",
+                        "enums.companyMemberRole.member",
+                        "enums.companyMemberRole.accountant",
+                        "enums.companyMemberRole.viewer"
+                      ]
+                    }
+                  },
+                  "type": "nullable"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "isActive": {
+                "type": "text",
+                "label": "Active",
+                "schema": {
+                  "def": {
+                    "type": "boolean"
+                  },
+                  "type": "boolean"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "country": {
+                "type": "text",
+                "label": "Pays",
+                "schema": {
+                  "def": {
+                    "type": "nullable",
+                    "innerType": {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    }
+                  },
+                  "type": "nullable"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "currency": {
+                "type": "text",
+                "label": "Devise",
+                "schema": {
+                  "def": {
+                    "type": "nullable",
+                    "innerType": {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    }
+                  },
+                  "type": "nullable"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "email": {
+                "type": "text",
+                "label": "E-mail",
+                "schema": {
+                  "def": {
+                    "type": "nullable",
+                    "innerType": {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    }
+                  },
+                  "type": "nullable"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "createdAt": {
+                "type": "text",
+                "label": "Créée le",
+                "fieldType": "datetime",
+                "schema": {
+                  "def": {
+                    "type": "date",
+                    "coerce": true
+                  },
+                  "type": "date"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              }
+            },
+            "schemaType": "object"
+          },
+          "schemaType": "array",
+          "usage": {
+            "response": true
+          }
+        }
+      },
+      "type": "custom-widget",
+      "schemaType": "object"
+    },
+    "executionMode": "via-execute-route",
+    "isAsync": true,
+    "instanceId": "local",
+    "category": "companies",
+    "tags": ["Entreprises", "Liste"],
+    "aliases": ["companies-list"],
+    "credits": 0
+  },
+  {
     "toolName": "contact-form",
     "title": "Parler à un humain",
     "titleShort": "Nous contacter",
@@ -9766,9 +10150,9 @@
   },
   {
     "toolName": "referral_codes_list_GET",
-    "title": "Liste des codes de parrainage",
-    "titleShort": "Mes codes",
-    "description": "Tous vos codes de parrainage avec leurs statistiques",
+    "title": "Commissions de parrainage",
+    "titleShort": "Commissions de parrainage",
+    "description": "Consultez les commissions de parrainage. Les administrateurs de la plateforme voient tous les partenaires.",
     "fields": {
       "usage": {
         "request": "data",
@@ -10086,9 +10470,9 @@
   },
   {
     "toolName": "referral_earnings_list_GET",
-    "title": "Liste des gains de parrainage",
-    "titleShort": "Gains",
-    "description": "L'historique de vos gains de parrainage",
+    "title": "Commissions de parrainage",
+    "titleShort": "Commissions de parrainage",
+    "description": "Consultez les commissions de parrainage. Les administrateurs de la plateforme voient tous les partenaires.",
     "fields": {
       "usage": {
         "request": "data",
@@ -10106,9 +10490,36 @@
               "type": "optional",
               "innerType": {
                 "def": {
-                  "type": "string"
+                  "type": "string",
+                  "format": "guid",
+                  "check": "string_format",
+                  "abort": false,
+                  "pattern": {}
                 },
                 "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "personal": {
+          "type": "form_field",
+          "fieldType": "boolean",
+          "label": "Mes commissions uniquement",
+          "hidden": true,
+          "includeInCacheKey": true,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "boolean"
+                },
+                "type": "boolean"
               }
             },
             "type": "optional"
@@ -10124,6 +10535,7 @@
           "label": "Lignes par page",
           "description": "Nombre de gains affichés par page",
           "hidden": true,
+          "includeInCacheKey": true,
           "schema": {
             "def": {
               "type": "optional",
@@ -10163,6 +10575,7 @@
           "label": "Commencer à",
           "description": "Nombre de gains ignorés",
           "hidden": true,
+          "includeInCacheKey": true,
           "schema": {
             "def": {
               "type": "optional",
@@ -10215,6 +10628,24 @@
                         "type": "string"
                       },
                       "type": "string"
+                    },
+                    "earnerName": {
+                      "def": {
+                        "type": "optional",
+                        "innerType": {
+                          "def": {
+                            "type": "nullable",
+                            "innerType": {
+                              "def": {
+                                "type": "string"
+                              },
+                              "type": "string"
+                            }
+                          },
+                          "type": "nullable"
+                        }
+                      },
+                      "type": "optional"
                     },
                     "sourceUserId": {
                       "def": {
@@ -10417,6 +10848,24 @@
                     },
                     "type": "string"
                   },
+                  "earnerName": {
+                    "def": {
+                      "type": "optional",
+                      "innerType": {
+                        "def": {
+                          "type": "nullable",
+                          "innerType": {
+                            "def": {
+                              "type": "string"
+                            },
+                            "type": "string"
+                          }
+                        },
+                        "type": "nullable"
+                      }
+                    },
+                    "type": "optional"
+                  },
                   "sourceUserId": {
                     "def": {
                       "type": "string"
@@ -10600,6 +11049,19 @@
               },
               "type": "object"
             }
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "platformWide": {
+          "type": "text",
+          "schema": {
+            "def": {
+              "type": "boolean"
+            },
+            "type": "boolean"
           },
           "usage": {
             "response": true
@@ -21068,16 +21530,8 @@
               "label": "models.names.GPT_5_3_CODEX"
             },
             {
-              "value": "gpt-53-chat",
-              "label": "models.names.GPT_5_3_CHAT"
-            },
-            {
               "value": "gpt-52",
               "label": "models.names.GPT_5_2"
-            },
-            {
-              "value": "gpt-52-chat",
-              "label": "models.names.GPT_5_2_CHAT"
             },
             {
               "value": "gpt-52-pro",
@@ -21094,10 +21548,6 @@
             {
               "value": "gpt-5-pro",
               "label": "models.names.GTP_5_PRO"
-            },
-            {
-              "value": "gpt-5-codex",
-              "label": "models.names.GPT_5_CODEX"
             },
             {
               "value": "gpt-5",
@@ -21184,16 +21634,8 @@
               "label": "models.names.GLM_4_5V"
             },
             {
-              "value": "kimi-k2",
-              "label": "models.names.KIMI_K2"
-            },
-            {
               "value": "kimi_k2_5",
               "label": "models.names.KIMI_K2_5"
-            },
-            {
-              "value": "kimi-k2-thinking",
-              "label": "models.names.KIMI_K2_THINKING"
             },
             {
               "value": "deepseek-v3.2",
@@ -21210,14 +21652,6 @@
             {
               "value": "qwen3_235b-free",
               "label": "models.names.QWEN3_235B_FREE"
-            },
-            {
-              "value": "deepseek-r1-distill",
-              "label": "models.names.DEEPSEEK_R1_DISTILL"
-            },
-            {
-              "value": "qwen-2-5-7b",
-              "label": "models.names.QWEN_2_5_7B"
             },
             {
               "value": "claude-code-haiku",
@@ -21316,10 +21750,6 @@
               "label": "models.names.MINIMAX_M2_7"
             },
             {
-              "value": "mimo-v2-pro",
-              "label": "models.names.MIMO_V2_PRO"
-            },
-            {
               "value": "gemini-3.1-flash-image-preview",
               "label": "models.names.GEMINI_3_1_FLASH_IMAGE_PREVIEW"
             },
@@ -21366,10 +21796,6 @@
             {
               "value": "claude-opus-5",
               "label": "models.names.CLAUDE_OPUS_5"
-            },
-            {
-              "value": "claude-opus-5-fast",
-              "label": "models.names.CLAUDE_OPUS_5_FAST"
             },
             {
               "value": "claude-fable-5",
@@ -21438,14 +21864,6 @@
             {
               "value": "qwen-3.8-max",
               "label": "models.names.QWEN_3_8_MAX"
-            },
-            {
-              "value": "mimo-v2.5",
-              "label": "models.names.MIMO_V2_5"
-            },
-            {
-              "value": "mimo-v2.5-pro",
-              "label": "models.names.MIMO_V2_5_PRO"
             },
             {
               "value": "meta-muse-spark-1.2",
@@ -37908,16 +38326,8 @@
               "label": "models.names.GPT_5_3_CODEX"
             },
             {
-              "value": "gpt-53-chat",
-              "label": "models.names.GPT_5_3_CHAT"
-            },
-            {
               "value": "gpt-52",
               "label": "models.names.GPT_5_2"
-            },
-            {
-              "value": "gpt-52-chat",
-              "label": "models.names.GPT_5_2_CHAT"
             },
             {
               "value": "gpt-52-pro",
@@ -37934,10 +38344,6 @@
             {
               "value": "gpt-5-pro",
               "label": "models.names.GTP_5_PRO"
-            },
-            {
-              "value": "gpt-5-codex",
-              "label": "models.names.GPT_5_CODEX"
             },
             {
               "value": "gpt-5",
@@ -38024,16 +38430,8 @@
               "label": "models.names.GLM_4_5V"
             },
             {
-              "value": "kimi-k2",
-              "label": "models.names.KIMI_K2"
-            },
-            {
               "value": "kimi_k2_5",
               "label": "models.names.KIMI_K2_5"
-            },
-            {
-              "value": "kimi-k2-thinking",
-              "label": "models.names.KIMI_K2_THINKING"
             },
             {
               "value": "deepseek-v3.2",
@@ -38050,14 +38448,6 @@
             {
               "value": "qwen3_235b-free",
               "label": "models.names.QWEN3_235B_FREE"
-            },
-            {
-              "value": "deepseek-r1-distill",
-              "label": "models.names.DEEPSEEK_R1_DISTILL"
-            },
-            {
-              "value": "qwen-2-5-7b",
-              "label": "models.names.QWEN_2_5_7B"
             },
             {
               "value": "claude-code-haiku",
@@ -38156,10 +38546,6 @@
               "label": "models.names.MINIMAX_M2_7"
             },
             {
-              "value": "mimo-v2-pro",
-              "label": "models.names.MIMO_V2_PRO"
-            },
-            {
               "value": "gemini-3.1-flash-image-preview",
               "label": "models.names.GEMINI_3_1_FLASH_IMAGE_PREVIEW"
             },
@@ -38206,10 +38592,6 @@
             {
               "value": "claude-opus-5",
               "label": "models.names.CLAUDE_OPUS_5"
-            },
-            {
-              "value": "claude-opus-5-fast",
-              "label": "models.names.CLAUDE_OPUS_5_FAST"
             },
             {
               "value": "claude-fable-5",
@@ -38278,14 +38660,6 @@
             {
               "value": "qwen-3.8-max",
               "label": "models.names.QWEN_3_8_MAX"
-            },
-            {
-              "value": "mimo-v2.5",
-              "label": "models.names.MIMO_V2_5"
-            },
-            {
-              "value": "mimo-v2.5-pro",
-              "label": "models.names.MIMO_V2_5_PRO"
             },
             {
               "value": "meta-muse-spark-1.2",

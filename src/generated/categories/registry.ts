@@ -1476,6 +1476,12 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
     order: 12,
     defaultEntryAlias: "subscription-admin-list",
     landing: {
+      summary: {
+        alias: "platform-summary",
+        scope: "platform",
+        args: { section: "subscriptions" },
+        progressive: true,
+      },
       destinations: [
         "subscription-admin-list",
         "subscription-admin-stats",
@@ -1610,6 +1616,12 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
     order: 15,
     defaultEntryAlias: "credit-usage-report",
     landing: {
+      summary: {
+        alias: "platform-summary",
+        scope: "platform",
+        args: { section: "credits" },
+        progressive: true,
+      },
       destinations: [
         "credit-usage-report",
         "verify-credit-grant",
@@ -1745,9 +1757,16 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
     order: 60,
     defaultEntryAlias: "referral-overview",
     landing: {
+      summary: {
+        alias: "platform-summary",
+        scope: "platform",
+        args: { section: "referral" },
+        progressive: true,
+      },
       destinations: [
         "referral-overview",
         "referral_admin_payouts_GET",
+        "referral_earnings_list_GET",
         "referral-code-report",
       ],
       destinationDescriptions: {
@@ -2678,6 +2697,8 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
         "tax-rate-list",
         "coa-tax-report",
         "tax_report_GET",
+        "tax-compliance",
+        "tax-vat-return",
       ],
       actions: ["tax_rate_create_POST"],
       destinationDescriptions: {
@@ -2725,6 +2746,35 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
             "Imposta su fatture, acquisti e vendite in cassa, per aliquota.",
           "es-ES": "Impuesto en facturas, compras y ventas en caja, por tipo.",
           "sk-SK": "Daň z faktúr, nákupov a predaja v pokladni podľa sadzby.",
+        },
+        "tax-compliance": {
+          "en-US":
+            "Which legal requirements of your country are met, and what to fix.",
+          "en-GLOBAL":
+            "Which legal requirements of your country are met, and what to fix.",
+          "de-DE":
+            "Welche gesetzlichen Pflichten Ihres Landes erfüllt sind und was fehlt.",
+          "pl-PL":
+            "Które wymogi prawne Twojego kraju są spełnione i co poprawić.",
+          "fr-FR":
+            "Les obligations légales de votre pays déjà remplies, et ce qu’il reste à corriger.",
+          "it-IT":
+            "Quali obblighi di legge del suo Paese sono rispettati e cosa correggere.",
+          "es-ES":
+            "Qué requisitos legales de su país se cumplen y qué corregir.",
+          "sk-SK":
+            "Ktoré zákonné požiadavky vašej krajiny spĺňate a čo opraviť.",
+        },
+        "tax-vat-return": {
+          "en-US": "Slovak DPH return lines and the kontrolný výkaz XML.",
+          "en-GLOBAL": "Slovak DPH return lines and the kontrolný výkaz XML.",
+          "de-DE":
+            "Slowakische Umsatzsteuererklärung und Kontrollmeldung (KV DPH) als XML.",
+          "pl-PL": "Słowacka deklaracja VAT i kontrolny výkaz w XML.",
+          "fr-FR": "Déclaration de TVA slovaque et kontrolný výkaz en XML.",
+          "it-IT": "Dichiarazione IVA slovacca e kontrolný výkaz in XML.",
+          "es-ES": "Declaración de IVA eslovaca y kontrolný výkaz en XML.",
+          "sk-SK": "Daňové priznanie k DPH a kontrolný výkaz v XML.",
         },
       },
     },
@@ -2792,7 +2842,8 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
     order: 70,
     defaultEntryAlias: "notifications",
     landing: {
-      destinations: ["notifications"],
+      overview: { alias: "notifications", scope: "platform" },
+      destinations: [],
       destinationDescriptions: {
         notifications: {
           "en-US":
@@ -2844,6 +2895,12 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
     order: 10,
     defaultEntryAlias: "messenger-accounts",
     landing: {
+      summary: {
+        alias: "platform-summary",
+        scope: "platform",
+        args: { section: "messenger" },
+        progressive: true,
+      },
       destinations: [
         "system-mail-inbox",
         "messenger-inbox",
@@ -3605,6 +3662,12 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
     order: 35,
     defaultEntryAlias: "companies-list",
     landing: {
+      summary: {
+        alias: "platform-summary",
+        scope: "platform",
+        args: { section: "companies" },
+        progressive: true,
+      },
       destinations: ["companies-list"],
       actions: ["companies_create_POST"],
       destinationDescriptions: {
@@ -4272,6 +4335,12 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
     order: 5,
     defaultEntryAlias: "remote-connections",
     landing: {
+      summary: {
+        alias: "platform-summary",
+        scope: "platform",
+        args: { section: "instances" },
+        progressive: true,
+      },
       destinations: ["remote-connections"],
       destinationDescriptions: {
         "remote-connections": {
@@ -4317,6 +4386,12 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
     order: 20,
     defaultEntryAlias: "system-settings",
     landing: {
+      summary: {
+        alias: "platform-summary",
+        scope: "platform",
+        args: { section: "operations" },
+        progressive: true,
+      },
       destinations: ["system-settings", "vibe_env_settings_export-env_GET"],
       destinationDescriptions: {
         "system-settings": {
