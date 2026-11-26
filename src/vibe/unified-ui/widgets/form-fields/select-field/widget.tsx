@@ -93,6 +93,17 @@ export function SelectFieldWidget<
         );
         const styleClassName = getFieldStyleClassName(validationState, theme);
         const { style } = theme;
+        // Server HTML has no mounted items, so Radix cannot show the value
+        // text before hydration; pass the selected label explicitly.
+        const selectedOption = field.options.find(
+          (option) =>
+            formField.value !== undefined &&
+            formField.value !== null &&
+            String(option.value) === String(formField.value),
+        );
+        const selectedLabel = selectedOption
+          ? tField(selectedOption.label, selectedOption.labelParams)
+          : undefined;
 
         return (
           <FormItem
@@ -179,7 +190,9 @@ export function SelectFieldWidget<
                           ? tField(field.placeholder)
                           : undefined
                       }
-                    />
+                    >
+                      {selectedLabel}
+                    </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     {field.options

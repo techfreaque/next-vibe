@@ -31,6 +31,7 @@ import { scopedTranslation as mailboxTranslation } from "../../system-mailbox/i1
 import type { SendMessageInput, SendMessageResult } from "../provider";
 import { SendOnlyProvider } from "../send-only-base";
 import { buildListUnsubscribeHeaders } from "./list-unsubscribe";
+import { isMailSinkActive, sinkMail } from "./mail-sink";
 import {
   EMAIL_LOGO_CID,
   EMAIL_LOGO_CONTENT_TYPE,
@@ -91,8 +92,46 @@ export class ResendMessengerProvider extends SendOnlyProvider {
         "noreply@example.com";
       const fromName = input.senderName ?? account?.name ?? "Messenger";
 
-      const resend = getResendClient(apiKey);
       const { html, logo } = await prepareEmailLogo(input.html);
+      const headers = input.unsubscribeUrl
+        ? buildListUnsubscribeHeaders(input.to, input.unsubscribeUrl)
+        : undefined;
+
+      // Non-production never calls the Resend API (see mail-sink.ts).
+      if (isMailSinkActive()) {
+        const sinked = await sinkMail(
+          {
+            from: `${fromName} <${fromEmail}>`,
+            to: input.to,
+            subject,
+            text: input.text,
+            html,
+            replyTo: input.replyTo,
+            headers,
+            attachments: logo
+              ? [
+                  {
+                    filename: EMAIL_LOGO_FILENAME,
+                    content: logo,
+                    cid: EMAIL_LOGO_CID,
+                    contentType: EMAIL_LOGO_CONTENT_TYPE,
+                  },
+                ]
+              : undefined,
+          },
+          logger,
+        );
+        return success({
+          messageId: sinked.messageId,
+          accountId: account?.id ?? "resend-env",
+          accountName: account?.name ?? "Resend",
+          accepted: sinked.accepted,
+          rejected: [],
+          providerResponse: sinked.response,
+        });
+      }
+
+      const resend = getResendClient(apiKey);
 
       const { data, error } = await resend.emails.send({
         from: `${fromName} <${fromEmail}>`,
@@ -111,9 +150,7 @@ export class ResendMessengerProvider extends SendOnlyProvider {
             ]
           : undefined,
         replyTo: input.replyTo,
-        headers: input.unsubscribeUrl
-          ? buildListUnsubscribeHeaders(input.to, input.unsubscribeUrl)
-          : undefined,
+        headers,
       });
 
       if (error || !data) {

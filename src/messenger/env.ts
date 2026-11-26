@@ -101,4 +101,15 @@ export const {
     commented: true,
     fieldType: "email",
   },
+  VIBE_DEV_REAL_SMTP: {
+    schema: z
+      .string()
+      .optional()
+      .transform((v) => v === "true"),
+    example: "false",
+    comment:
+      "Outside production, outgoing email goes to the local mail sink (.tmp/mail-sink/*.eml) instead of SMTP/Resend. Set true to send real mail from dev. Tests always use the sink.",
+    commented: true,
+    fieldType: "boolean",
+  },
 });

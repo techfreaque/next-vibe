@@ -33,6 +33,11 @@ import {
   EmailImapAuthMethod,
   EmailSecurityType,
 } from "../providers/email/enum";
+import {
+  isMailSinkActive,
+  MAIL_SINK_DIR,
+  writeSinkedMail,
+} from "../providers/email/mail-sink";
 import { SmtpRepository } from "../providers/email/smtp-client/repository";
 import type { ComposedMessage } from "./compose";
 import { composeMessage, isValidRecipient } from "./compose";
@@ -58,6 +63,7 @@ export interface SystemMailboxDeps {
   sendRaw: (
     config: SystemMailboxConfig,
     message: ComposedMessage,
+    logger: EndpointLogger,
   ) => Promise<void>;
   appendSent: (
     config: SystemMailboxConfig,
@@ -147,7 +153,12 @@ export const defaultSystemMailboxDeps: SystemMailboxDeps = {
       systemMailboxEnv.THEA_MAIL_RATE_LIMIT_PER_HOUR,
   }),
   loadRow: loadOrCreateRow,
-  sendRaw: async (config, message) => {
+  sendRaw: async (config, message, logger) => {
+    // Non-production never talks to the real mailbox (see mail-sink.ts).
+    if (isMailSinkActive()) {
+      await writeSinkedMail(message.raw, message, logger);
+      return;
+    }
     const transport = SmtpRepository.createTransportFromParams(config.smtp);
     try {
       await transport.sendMail({
@@ -158,7 +169,10 @@ export const defaultSystemMailboxDeps: SystemMailboxDeps = {
       transport.close();
     }
   },
-  appendSent: (config, message) => appendToSent(config.imap, message.raw),
+  appendSent: (config, message) =>
+    isMailSinkActive()
+      ? Promise.resolve(MAIL_SINK_DIR)
+      : appendToSent(config.imap, message.raw),
   countSentSince: async (accountId, since) => {
     if (!accountId) {
       return 0;
@@ -286,7 +300,7 @@ export class SystemMailboxRepository {
       const message = await composeMessage(config, input, now);
 
       try {
-        await deps.sendRaw(config, message);
+        await deps.sendRaw(config, message, logger);
       } catch (error) {
         logger.error("System mailbox SMTP send failed", parseError(error));
         return fail({

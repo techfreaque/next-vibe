@@ -36,6 +36,7 @@ import { scopedTranslation as mailboxTranslation } from "../../system-mailbox/i1
 import { LocalStateProvider } from "../local-state-base";
 import type { SendMessageInput, SendMessageResult } from "../provider";
 import { toImapShape } from "./imap-client/db";
+import { isMailSinkActive } from "./mail-sink";
 import { withHostedEmailLogo } from "./smtp-client/email-logo";
 import { scopedTranslation as smtpScopedTranslation } from "./smtp-client/i18n";
 import type { SmtpSelectionCriteria } from "./smtp-client/repository";
@@ -166,6 +167,10 @@ export class SmtpMessengerProvider extends LocalStateProvider {
     },
     logger: EndpointLogger,
   ): Promise<void> {
+    // A sinked mail was never sent; don't file it in the real Sent folder.
+    if (isMailSinkActive()) {
+      return;
+    }
     const sentPath = await this.getFolderPath(
       accountId,
       SpecialFolderType.SENT,

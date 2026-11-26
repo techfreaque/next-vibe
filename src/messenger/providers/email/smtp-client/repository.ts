@@ -41,6 +41,7 @@ import { emails } from "../../../messages/db";
 import { MessageStatus, MessageType } from "../../../messages/enum";
 import { EmailSecurityType } from "../enum";
 import { buildListUnsubscribeHeaders } from "../list-unsubscribe";
+import { createMailSinkTransport, isMailSinkActive } from "../mail-sink";
 import { SMTP_ERROR_MESSAGES } from "./constants";
 import type { SmtpClientT } from "./i18n";
 import { prepareSmtpEmailLogo } from "./inline-logo";
@@ -598,6 +599,11 @@ export class SmtpRepository {
     logger: EndpointLogger,
     t: SmtpClientT,
   ): Promise<ResponseType<Transporter<SMTPTransport.SentMessageInfo>>> {
+    // Non-production never talks to a real mail server (see mail-sink.ts).
+    if (isMailSinkActive()) {
+      return success(createMailSinkTransport(logger));
+    }
+
     const cacheKey = account.id;
 
     if (SmtpRepository.transportCache.has(cacheKey)) {

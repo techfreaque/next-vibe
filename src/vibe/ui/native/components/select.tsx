@@ -98,8 +98,9 @@ export function SelectValue({
   className,
   style,
   placeholder,
-  ...props
 }: SelectValueProps): React.JSX.Element {
+  // `children` (the web SSR label) is ignored: native renders the selected
+  // option label from the root value itself.
   const nativeStyle: ViewStyle | undefined = style
     ? convertCSSToViewStyle(style)
     : undefined;
@@ -111,7 +112,6 @@ export function SelectValue({
         nativeStyle,
         className,
       })}
-      {...props}
     />
   );
 }
