@@ -68,15 +68,5 @@ export async function dev(
   logger.debug("✅ POS seed complete");
 }
 
-/**
- * Production seed — same as dev
- */
-export async function prod(
-  logger: EndpointLogger,
-  locale: CountryLanguage,
-): Promise<void> {
-  return dev(logger, locale);
-}
-
 // Priority: after companies (80)
 export const priority = 5;

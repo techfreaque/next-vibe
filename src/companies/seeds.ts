@@ -95,15 +95,5 @@ export async function dev(
   logger.debug("✅ Companies seed complete");
 }
 
-/**
- * Production seed — same as dev: ensure at least one company exists for admin
- */
-export async function prod(
-  logger: EndpointLogger,
-  locale: CountryLanguage,
-): Promise<void> {
-  return dev(logger, locale);
-}
-
 // Priority: after users (100) but before POS (5)
 export const priority = 80;

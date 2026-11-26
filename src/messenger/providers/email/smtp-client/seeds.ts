@@ -8,7 +8,7 @@
  * - Leads account:  LEADS_EMAIL_* for SMTP, LEADS_IMAP_* for inbound
  */
 
-import { eq } from "drizzle-orm";
+import { and, eq, ne, sql } from "drizzle-orm";
 import { CountriesArr, LanguagesArr } from "next-vibe/core/i18n/core/config";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
@@ -241,6 +241,35 @@ function getLeadsAccountConfig(
   };
 }
 
+/**
+ * True when the leads mailbox is already owned by another account (the
+ * seeded system account or any other messenger_accounts row, e.g. the
+ * platform system mailbox). Syncing it twice would import every message twice.
+ */
+async function isMailboxSyncedElsewhere(
+  leadsAccount: NewMessengerAccount,
+  systemAccount: NewMessengerAccount | null,
+): Promise<boolean> {
+  const mailbox = leadsAccount.imapUsername?.trim().toLowerCase();
+  if (!mailbox) {
+    return false;
+  }
+  if (systemAccount?.imapUsername?.trim().toLowerCase() === mailbox) {
+    return true;
+  }
+  const others = await db
+    .select({ id: messengerAccounts.id })
+    .from(messengerAccounts)
+    .where(
+      and(
+        ne(messengerAccounts.name, leadsAccount.name),
+        sql`lower(trim(${messengerAccounts.imapUsername})) = ${mailbox}`,
+      ),
+    )
+    .limit(1);
+  return others.length > 0;
+}
+
 async function upsertAccounts(
   logger: EndpointLogger,
   label: string,
@@ -262,6 +291,13 @@ async function upsertAccounts(
   );
 
   try {
+    if (leadsAccount) {
+      leadsAccount.imapSyncEnabled = !(await isMailboxSyncedElsewhere(
+        leadsAccount,
+        systemAccount,
+      ));
+    }
+
     for (const account of accounts) {
       // Match by name (stable seed identifier) - fromEmail may be shared across accounts in dev
       const existing = await db
