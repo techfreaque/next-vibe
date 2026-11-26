@@ -1748,6 +1748,7 @@ function chatModelToImageGenOption(
         inputs: chat.inputs,
         outputs: chat.outputs,
         voiceMeta: chat.voiceMeta,
+        // GPT-5 Image / Gemini image: OpenAI and Google API terms assign output.
         commercialUse: commercialUse.allowed(
           CommercialUseReason.PROVIDER_TERMS,
         ),
@@ -1779,6 +1780,7 @@ function chatModelToImageGenOption(
         inputs: chat.inputs,
         outputs: chat.outputs,
         voiceMeta: chat.voiceMeta,
+        // GPT-5 Image / Gemini image: OpenAI and Google API terms assign output.
         commercialUse: commercialUse.allowed(
           CommercialUseReason.PROVIDER_TERMS,
         ),

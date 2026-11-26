@@ -6,7 +6,7 @@
  */
 
 import { describe, expect, test } from "bun:test";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { availableCountries, type CountryLanguage } from "next-vibe/core/i18n/core/config";
 
 import {
   CREDIT_PACK_PRODUCT_IDS,
@@ -42,6 +42,18 @@ describe("credit pack price", () => {
         expect(productsRepository.getProducts(locale)[id].price).toBe(
           checkout.price,
         );
+      }
+    }
+  });
+
+  test("a regional locale bills the configured currency at the established market price", () => {
+    for (const { code, currency, languages } of availableCountries) {
+      for (const language of languages) {
+        const locale: CountryLanguage = `${language}-${code}`;
+        const pack = productsRepository.getProduct(CREDIT_PACK_PRODUCT_IDS[0], locale, "one_time");
+        expect(pack.currency).toBe(currency);
+        expect(pack.price).toBe(currency === "PLN" ? 19 : 5);
+        expect(pack.country).toBe(code);
       }
     }
   });
