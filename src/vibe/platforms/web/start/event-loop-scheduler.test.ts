@@ -4,9 +4,33 @@ import {
   cpuPressureWindow,
   cpuThrottleWindow,
   describeSchedulerEvidence,
+  hostCpuStealPercent,
+  parseHostCpuSample,
   readThreadSchedulerSample,
   threadSchedulerDelta,
 } from "./event-loop-scheduler";
+
+describe("hostCpuStealPercent", () => {
+  it("matches the hourly host capture and excludes already counted guest ticks", () => {
+    const before = parseHostCpuSample("cpu  200 0 100 600 0 0 0 100 20 0");
+    const after = parseHostCpuSample(
+      "cpu  230 0 120 890 30 0 0 730 40 0\ncpu0 0 0 0 0 0 0 0 0",
+    );
+    expect(hostCpuStealPercent(before, after)).toBe(63);
+    expect(hostCpuStealPercent(before, { totalTicks: 1100, stealTicks: 100 })).toBe(0);
+  });
+
+  it("omits missing, reset and inconsistent measurements", () => {
+    const before = parseHostCpuSample("cpu  200 0 100 600 0 0 0 100");
+    expect(parseHostCpuSample("cpu0 1 2 3 4 5 6 7 8")).toBeUndefined();
+    expect(parseHostCpuSample("cpu  1 2 3 4 5 6 7")).toBeUndefined();
+    expect(parseHostCpuSample("cpu  1 2 3 4 5 6 broken 8")).toBeUndefined();
+    expect(hostCpuStealPercent(before, undefined)).toBeUndefined();
+    expect(hostCpuStealPercent(before, before)).toBeUndefined();
+    expect(hostCpuStealPercent(before, { totalTicks: 1100, stealTicks: 99 })).toBeUndefined();
+    expect(hostCpuStealPercent(before, { totalTicks: 1100, stealTicks: 201 })).toBeUndefined();
+  });
+});
 
 describe("describeSchedulerEvidence", () => {
   it("distinguishes main-thread work from runnable scheduler wait", () => {

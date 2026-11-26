@@ -95,8 +95,10 @@ import {
   cpuPressureWindow,
   cpuThrottleWindow,
   describeSchedulerEvidence,
+  hostCpuStealPercent,
   readCpuPressureSample,
   readCpuThrottleSample,
+  readHostCpuSample,
   readThreadSchedulerSample,
   threadSchedulerDelta,
 } from "./event-loop-scheduler";
@@ -924,6 +926,7 @@ export class ServerStartRepository {
       let lastRusage = process.resourceUsage();
       let lastCpuPressure = readCpuPressureSample();
       let lastCpuThrottle = readCpuThrottleSample();
+      let lastHostCpu = readHostCpuSample();
       let lagWindowStartedAt = Date.now();
       const logLagWindow = async (): Promise<void> => {
         try {
@@ -952,11 +955,15 @@ export class ServerStartRepository {
             previousCpuPressure,
             cpuThrottle,
             previousCpuThrottle,
+            hostCpu,
+            previousHostCpu,
           ] = await Promise.all([
             readCpuPressureSample(),
             lastCpuPressure,
             readCpuThrottleSample(),
             lastCpuThrottle,
+            readHostCpuSample(),
+            lastHostCpu,
           ]);
           const windowCpuPressure = cpuPressureWindow(
             previousCpuPressure,
@@ -968,6 +975,11 @@ export class ServerStartRepository {
             cpuThrottle,
           );
           lastCpuThrottle = Promise.resolve(cpuThrottle);
+          const windowHostCpuStealPct = hostCpuStealPercent(
+            previousHostCpu,
+            hostCpu,
+          );
+          lastHostCpu = Promise.resolve(hostCpu);
 
           const uptime2 = Math.floor(process.uptime());
           const mem = process.memoryUsage();
@@ -1014,6 +1026,11 @@ export class ServerStartRepository {
             ...tickerEvidence,
             windowCpuPressure,
             windowCpuThrottle,
+            windowHostCpuStealPct,
+            hostCpuStealEvidence:
+              windowHostCpuStealPct !== undefined && windowHostCpuStealPct >= 30
+                ? "elevated-hypervisor-cpu-steal-in-lag-window"
+                : undefined,
             heapMb,
             prevHeapMb,
             rssMb: Math.round(mem.rss / 1024 / 1024),

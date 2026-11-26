@@ -1,5 +1,54 @@
 import { readFile } from "node:fs/promises";
 
+interface HostCpuSample {
+  totalTicks: number;
+  stealTicks: number;
+}
+
+export function parseHostCpuSample(stat: string): HostCpuSample | undefined {
+  const aggregate = /^cpu[ \t]+([^\n]+)/m.exec(stat)?.[1];
+  const ticks = aggregate?.trim().split(/\s+/).slice(0, 8).map(Number);
+  const stealTicks = ticks?.[7];
+  if (
+    !ticks ||
+    stealTicks === undefined ||
+    ticks.some((value) => !Number.isSafeInteger(value) || value < 0)
+  ) {
+    return undefined;
+  }
+  // Guest and guest_nice are already included in user and nice.
+  return {
+    totalTicks: ticks.reduce((total, value) => total + value, 0),
+    stealTicks,
+  };
+}
+
+export async function readHostCpuSample(): Promise<HostCpuSample | undefined> {
+  if (process.platform !== "linux") {
+    return undefined;
+  }
+  try {
+    return parseHostCpuSample(await readFile("/proc/stat", "utf8"));
+  } catch {
+    // Some containers do not expose the host counters.
+    return undefined;
+  }
+}
+
+export function hostCpuStealPercent(
+  before: HostCpuSample | undefined,
+  after: HostCpuSample | undefined,
+): number | undefined {
+  if (!before || !after) {
+    return undefined;
+  }
+  const total = after.totalTicks - before.totalTicks;
+  const steal = after.stealTicks - before.stealTicks;
+  return total > 0 && steal >= 0 && steal <= total
+    ? Math.round((100 * steal) / total)
+    : undefined;
+}
+
 interface ThreadSchedulerSample {
   cpuNs: number;
   runQueueNs: number;

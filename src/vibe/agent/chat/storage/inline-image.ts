@@ -39,9 +39,18 @@ export async function readInlineThreadImage(
     /^inline-([a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12})-([0-9]{1,9})\.(?:webp|png|jpe?g|gif)$/i.exec(
       filename,
     );
-  if (!indexed && !isInlineImageFilename(filename)) {
+  // Older tool calls used an upload's Cortex slug as the storage filename.
+  // Accept only aliases that reconstruct the same remote ID, copy and format.
+  const cortexAlias =
+    /^remote-([a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12})-([0-9]+)-(webp|png|jpe?g|gif)\.(?:md|\3)$/i.exec(
+      filename,
+    );
+  if (!indexed && !cortexAlias && !isInlineImageFilename(filename)) {
     return null;
   }
+  const storedFilename = cortexAlias
+    ? `remote-${cortexAlias[1]} (${cortexAlias[2]}).${cortexAlias[3]}`
+    : filename;
   const candidates = indexed
     ? sql`SELECT ${chatMessages.metadata}->'attachments'->${Number(indexed[2])}::int AS attachment
           FROM ${chatMessages}
@@ -51,7 +60,7 @@ export async function readInlineThreadImage(
           CROSS JOIN LATERAL jsonb_path_query(
             ${chatMessages.metadata},
             'strict $.attachments[*] ? (@.filename == $file && @.data.type() == "string")',
-            jsonb_build_object('file', ${filename}::text), true
+            jsonb_build_object('file', ${storedFilename}::text), true
           ) attachment
           WHERE ${chatMessages.threadId} = ${threadId} AND ${chatMessages.role} = ${ChatMessageRole.USER}
           ORDER BY ${chatMessages.createdAt} DESC`;

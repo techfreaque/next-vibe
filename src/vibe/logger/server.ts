@@ -48,6 +48,8 @@ export const SERVER_LOG_FINGERPRINT_IGNORE_KEYS: ReadonlySet<string> = new Set([
   "stallThreadCpuMs",
   "schedulerSampleIntervalMs",
   "windowCpuPressure",
+  "windowHostCpuStealPct",
+  "hostCpuStealEvidence",
   "stallRunQueueMs",
   "heapMb",
   "heapUsedMb",

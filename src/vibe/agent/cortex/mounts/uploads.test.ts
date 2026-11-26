@@ -151,7 +151,8 @@ it("serves the listed Cortex image when its inline filename contains a browser c
   const { readInlineThreadImage } =
     await import("../../chat/storage/inline-image");
   const messageId = crypto.randomUUID();
-  const filename = `remote-${crypto.randomUUID()} (1).png`;
+  const remoteId = crypto.randomUUID();
+  const filename = `remote-${remoteId} (1).png`;
   const legacyName = `${crypto.randomUUID()}.png`;
   const bytes = Buffer.from("iVBORw0KGgo=", "base64");
   await pg.query(
@@ -192,5 +193,19 @@ it("serves the listed Cortex image when its inline filename contains a browser c
   expect(await readInlineThreadImage(otherUser, key)).toBeNull();
   expect(
     await readInlineThreadImage(threadId, `inline-${messageId}-0.png`),
+  ).toBeNull();
+  for (const extension of ["md", "png"]) {
+    const alias = `remote-${remoteId}-1-png.${extension}`;
+    expect(await readInlineThreadImage(threadId, alias)).toMatchObject({
+      contentType: "image/png",
+      inlineBytes: bytes,
+    });
+    expect(await readInlineThreadImage(otherUser, alias)).toBeNull();
+  }
+  expect(
+    await readInlineThreadImage(threadId, `remote-${remoteId}-2-png.png`),
+  ).toBeNull();
+  expect(
+    await readInlineThreadImage(threadId, `remote-${remoteId}-1-png.jpg`),
   ).toBeNull();
 });
