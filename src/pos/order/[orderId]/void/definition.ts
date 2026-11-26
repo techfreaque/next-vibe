@@ -23,7 +23,7 @@ import { z } from "zod";
 
 import { PosOrderStatus } from "../../../enum";
 import { scopedTranslation } from "../../../i18n";
-import { refreshPosOrder } from "../../refresh";
+import { refreshPosOrder, refreshPosRegister } from "../../refresh";
 
 const PosOrderVoidWidgetLazy = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.PosOrderVoidWidget })),
@@ -44,8 +44,12 @@ const { POST } = createEndpoint({
 
   options: {
     mutationOptions: {
-      onSuccess: ({ pathParams, logger }) =>
-        refreshPosOrder(pathParams.orderId, logger),
+      onSuccess: async ({ pathParams, responseData, logger }) => {
+        await Promise.all([
+          refreshPosOrder(pathParams.orderId, logger),
+          refreshPosRegister(responseData.result.sessionId, logger),
+        ]);
+      },
     },
   },
 
@@ -75,6 +79,11 @@ const { POST } = createEndpoint({
           id: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             label: "orderVoid.post.response.id",
+            schema: z.uuid(),
+          }),
+          sessionId: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            hidden: true,
             schema: z.uuid(),
           }),
           status: responseField(scopedTranslation, {
@@ -144,6 +153,7 @@ const { POST } = createEndpoint({
       default: {
         result: {
           id: "eeff1122-e89b-12d3-a456-426614174003",
+          sessionId: "ccddee00-e89b-12d3-a456-426614174002",
           status: PosOrderStatus.VOIDED,
         },
       },

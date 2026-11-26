@@ -2,143 +2,184 @@
 
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
+import { EmptyBlock } from "next-vibe/ui/components/empty-block";
 import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
+import { Package } from "next-vibe/ui/components/icons/Package";
+import { Search } from "next-vibe/ui/components/icons/Search";
+import { Input } from "next-vibe/ui/components/input";
+import { LoadingBlock } from "next-vibe/ui/components/loading-block";
 import { Span } from "next-vibe/ui/components/span";
-import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
+import { WidgetHeader } from "next-vibe/ui/components/widget-header";
+import { WidgetShell } from "next-vibe/ui/components/widget-shell";
 import {
   formatMoney,
   formatPercent,
 } from "next-vibe/unified-ui/_shared/format-money";
+import { usePickerCallback } from "next-vibe/unified-ui/_shared/picker-context";
 import {
+  useWidgetForm,
+  useWidgetIsInteractive,
   useWidgetLocale,
   useWidgetNavigation,
+  useWidgetResponseOnly,
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-field/widget";
 import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
-import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 import type { JSX } from "react";
-import { useState } from "react";
+import { useWatch } from "react-hook-form";
 
 import type definition from "./definition";
+import type { PosProductLookupGetResponseOutput } from "./definition";
 
-interface PosProductLookupWidgetProps {
-  field: (typeof definition.GET)["fields"];
-  onSelect?: (product: {
-    id: string;
-    name: string;
-    sku: string | null;
-    type: string;
-    basePrice: number;
-    currency: string;
-    defaultTaxRate: number | null;
-    unit: string | null;
-  }) => void;
-}
+type ProductRow = PosProductLookupGetResponseOutput["products"][number];
 
-export function PosProductLookupWidget({
-  field,
-  onSelect,
-}: PosProductLookupWidgetProps): JSX.Element {
+export function PosProductLookupWidget(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _props: {
+    field: (typeof definition.GET)["fields"];
+  },
+): JSX.Element {
   const data = useWidgetValue<typeof definition.GET>();
   const navigation = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.GET>();
-  const locale = useWidgetLocale();
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const form = useWidgetForm<typeof definition.GET>();
+  const isInteractive = useWidgetIsInteractive();
+  const responseOnly = useWidgetResponseOnly();
+  const interactive = isInteractive && !responseOnly;
+  const onPick = usePickerCallback<ProductRow>();
+  const isPickerMode = !!onPick;
+  const query = useWatch({ control: form.control, name: "query" }) ?? "";
 
   const products = data?.products ?? [];
 
-  const handleSelect = (product: {
-    id: string;
-    name: string;
-    sku: string | null;
-    type: string;
-    basePrice: number;
-    currency: string;
-    defaultTaxRate: number | null;
-    unit: string | null;
-  }): void => {
-    setSelectedId(product.id);
-    if (onSelect) {
-      onSelect(product);
-    } else {
-      navigation.pop();
-    }
+  const pick = (product: ProductRow): void => {
+    onPick?.(product);
+    navigation.pop();
   };
 
   return (
-    <Div className="flex flex-col gap-4">
-      {navigation.canGoBack && !onSelect && (
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={() => navigation.pop()}
-          className="self-start gap-1.5 -ml-1"
-        >
-          <ChevronLeft className="h-4 w-4" />
-          {t("productLookup.get.widget.back")}
-        </Button>
-      )}
-      <FormAlertWidget field={{}} />
+    <WidgetShell layout="page" className="mx-auto max-w-3xl">
+      <WidgetHeader
+        size="page"
+        title={
+          isPickerMode
+            ? t("productLookup.get.widget.pickTitle")
+            : t("productLookup.get.widget.title")
+        }
+        subtitle={t("productLookup.get.widget.subtitle")}
+        backButton={
+          interactive && navigation.canGoBack ? (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => navigation.pop()}
+              className="-ml-1 gap-1.5"
+            >
+              <ChevronLeft className="h-4 w-4" />
+              {t("productLookup.get.widget.back")}
+            </Button>
+          ) : undefined
+        }
+      />
 
-      {/* Search input + submit */}
-      <Div className="flex flex-col gap-2">
-        <TextFieldWidget
-          fieldName="query"
-          field={withValue(field.children.query, undefined, null)}
-        />
-        <SubmitButtonWidget<typeof definition.GET> field={{}} />
-      </Div>
-
-      {/* Results list */}
-      {products.length > 0 ? (
-        <Div className="rounded-lg border overflow-hidden divide-y">
-          {products.map((product) => {
-            const isSelected = selectedId === product.id;
-            return (
-              <Button
-                key={product.id}
-                variant={isSelected ? "default" : "ghost"}
-                className="w-full rounded-none h-auto px-4 py-3 flex items-center justify-between text-left"
-                onClick={() => handleSelect(product)}
-                type="button"
-              >
-                <Div className="flex flex-col gap-0.5 min-w-0 flex-1">
-                  <Span className="text-sm font-medium truncate">
-                    {product.name}
-                  </Span>
-                  {product.sku ? (
-                    <Span className="text-xs font-mono text-muted-foreground">
-                      {product.sku}
-                    </Span>
-                  ) : null}
-                </Div>
-                <Div className="flex flex-col items-end gap-0.5 ml-3 shrink-0">
-                  <Span className="text-sm font-mono font-semibold tabular-nums">
-                    {formatMoney(product.basePrice, product.currency, locale)}
-                  </Span>
-                  {product.defaultTaxRate !== null &&
-                  product.defaultTaxRate !== undefined &&
-                  product.defaultTaxRate > 0 ? (
-                    <Span className="text-xs text-muted-foreground">
-                      {formatPercent(product.defaultTaxRate, locale)}{" "}
-                      {t("productLookup.get.widget.tax")}
-                    </Span>
-                  ) : null}
-                </Div>
-              </Button>
-            );
-          })}
-        </Div>
-      ) : data !== null && data !== undefined ? (
-        <Div className="rounded-lg border border-dashed px-4 py-6 text-center">
-          <Span className="text-sm text-muted-foreground">
-            {t("productLookup.get.widget.noResults")}
-          </Span>
+      {interactive ? (
+        <Div className="relative">
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            type="text"
+            value={query}
+            aria-label={t("productLookup.get.query.label")}
+            placeholder={t("productLookup.get.query.placeholder")}
+            className="h-11 pl-9 text-base"
+            onChange={(event) =>
+              form.setValue("query", String(event.target.value) || undefined, {
+                shouldDirty: true,
+              })
+            }
+          />
         </Div>
       ) : null}
+
+      <FormAlertWidget field={{}} />
+
+      {!data ? (
+        <LoadingBlock message={t("productLookup.get.widget.loading")} />
+      ) : products.length === 0 ? (
+        <EmptyBlock
+          icon={<Package className="h-6 w-6" />}
+          title={
+            query.trim()
+              ? t("productLookup.get.widget.noMatchTitle", {
+                  query: query.trim(),
+                })
+              : t("productLookup.get.widget.emptyTitle")
+          }
+          message={
+            query.trim()
+              ? t("productLookup.get.widget.noMatchMessage")
+              : t("productLookup.get.widget.emptyMessage")
+          }
+        />
+      ) : (
+        <Div className="flex flex-col divide-y overflow-hidden rounded-xl border bg-card">
+          {products.map((product) =>
+            isPickerMode ? (
+              <Button
+                key={product.id}
+                type="button"
+                variant="ghost"
+                className="h-auto min-h-14 justify-start rounded-none px-4 py-3 text-left"
+                onClick={() => pick(product)}
+              >
+                <ProductLine product={product} />
+              </Button>
+            ) : (
+              <Div key={product.id} className="min-h-14 px-4 py-3">
+                <ProductLine product={product} />
+              </Div>
+            ),
+          )}
+        </Div>
+      )}
+    </WidgetShell>
+  );
+}
+
+function ProductLine({ product }: { product: ProductRow }): JSX.Element {
+  const t = useWidgetTranslation<typeof definition.GET>();
+  const locale = useWidgetLocale();
+  const secondary = [
+    product.sku,
+    product.unit
+      ? t("productLookup.get.widget.perUnit", { unit: product.unit })
+      : null,
+  ]
+    .filter(Boolean)
+    .join(" · ");
+  return (
+    <Div className="flex w-full min-w-0 items-center gap-3">
+      <Div className="flex min-w-0 flex-1 flex-col gap-0.5">
+        <Span className="truncate text-sm font-medium">{product.name}</Span>
+        {secondary ? (
+          <Span className="truncate text-[13px] text-muted-foreground">
+            {secondary}
+          </Span>
+        ) : null}
+      </Div>
+      <Div className="flex shrink-0 flex-col items-end gap-0.5">
+        <Span className="whitespace-nowrap text-sm font-semibold tabular-nums">
+          {formatMoney(product.basePrice, product.currency, locale)}
+        </Span>
+        <Span className="whitespace-nowrap text-xs text-muted-foreground tabular-nums">
+          {product.defaultTaxRate
+            ? t("productLookup.get.widget.vat", {
+                rate: formatPercent(product.defaultTaxRate, locale),
+              })
+            : t("productLookup.get.widget.noVat")}
+        </Span>
+      </Div>
     </Div>
   );
 }

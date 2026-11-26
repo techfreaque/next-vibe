@@ -85,6 +85,14 @@ const { POST } = createEndpoint({
             description: "orderRemoveItem.post.itemId.description",
             schema: z.uuid(),
           }),
+          quantity: requestField(scopedTranslation, {
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.NUMBER,
+            label: "orderRemoveItem.post.quantity.label",
+            description: "orderRemoveItem.post.quantity.description",
+            hidden: true,
+            schema: z.number().positive().optional(),
+          }),
         },
       }),
 

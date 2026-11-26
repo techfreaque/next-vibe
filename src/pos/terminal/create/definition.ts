@@ -40,6 +40,23 @@ const { POST } = createEndpoint({
   allowedRoles: [UserRole.ADMIN] as const,
   icon: "monitor",
 
+  options: {
+    mutationOptions: {
+      onSuccess: async ({ logger }) => {
+        const [{ apiClient }, list, dashboard] = await Promise.all([
+          import("next-vibe/unified-ui/hooks/store"),
+          import("../list/definition"),
+          import("../../dashboard/definition"),
+        ]);
+        // Refresh in the background: a slow list must not hold the form.
+        void Promise.all([
+          apiClient.refetchEndpoint(list.default.GET, logger),
+          apiClient.refetchEndpoint(dashboard.default.GET, logger),
+        ]);
+      },
+    },
+  },
+
   fields: customWidgetObject({
     render: PosTerminalCreateWidgetLazy,
     usage: { request: "data", response: true },
@@ -77,7 +94,7 @@ const { POST } = createEndpoint({
           }),
           currency: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.TEXT,
+            fieldType: FieldDataType.CURRENCY_SELECT,
             label: "terminalCreate.post.currency.label",
             description: "terminalCreate.post.currency.description",
             placeholder: "terminalCreate.post.currency.placeholder",
@@ -86,8 +103,8 @@ const { POST } = createEndpoint({
           warehouseId: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.TEXT,
-            label: "workflow.warehouse",
-            description: "workflow.warehouseInstruction",
+            label: "terminalCreate.post.warehouseId.label",
+            description: "terminalCreate.post.warehouseId.description",
             schema: z.uuid().optional(),
           }),
           cashAccountNodeId: requestField(scopedTranslation, {

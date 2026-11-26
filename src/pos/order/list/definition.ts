@@ -49,6 +49,14 @@ const { GET } = createEndpoint({
     render: PosOrderListWidgetLazy,
     usage: { request: "data", response: true },
     children: {
+      companyId: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "orderList.get.companyId.label",
+        description: "orderList.get.companyId.description",
+        hidden: true,
+        schema: z.uuid().optional(),
+      }),
       input: objectField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         layoutType: LayoutType.GRID_2_COLUMNS,
@@ -59,7 +67,7 @@ const { GET } = createEndpoint({
             fieldType: FieldDataType.TEXT,
             label: "orderList.get.sessionId.label",
             description: "orderList.get.sessionId.description",
-            schema: z.uuid(),
+            schema: z.uuid().optional(),
           }),
           status: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
@@ -115,6 +123,11 @@ const { GET } = createEndpoint({
               type: WidgetType.TEXT,
               label: "orderList.get.response.sessionId",
               schema: z.uuid(),
+            }),
+            terminalName: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              label: "orderList.get.response.terminalName",
+              schema: z.string().optional(),
             }),
             status: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
@@ -179,6 +192,13 @@ const { GET } = createEndpoint({
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title: "orderList.get.errors.unsavedChanges.title",
       description: "orderList.get.errors.unsavedChanges.description",
+    },
+  },
+
+  options: {
+    formOptions: {
+      autoSubmit: true,
+      debounceMs: 0,
     },
   },
 

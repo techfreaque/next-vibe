@@ -110,6 +110,14 @@ const { POST } = createEndpoint({
             placeholder: "orderAddItem.post.taxRate.placeholder",
             schema: z.number().min(0).max(1).optional(),
           }),
+          mergeWithLine: requestField(scopedTranslation, {
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.BOOLEAN,
+            label: "orderAddItem.post.mergeWithLine.label",
+            description: "orderAddItem.post.mergeWithLine.description",
+            hidden: true,
+            schema: z.boolean().optional(),
+          }),
         },
       }),
 

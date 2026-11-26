@@ -22,6 +22,7 @@ import {
 import { z } from "zod";
 
 import { scopedTranslation } from "../../i18n";
+import { refreshPosRegister } from "../refresh";
 
 const PosOrderCreateWidgetLazy = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.PosOrderCreateWidget })),
@@ -39,6 +40,13 @@ const { POST } = createEndpoint({
   tags: ["tags.pos", "tags.order", "tags.create"],
   allowedRoles: [UserRole.ADMIN],
   icon: "shopping-cart",
+
+  options: {
+    mutationOptions: {
+      onSuccess: ({ responseData, logger }) =>
+        refreshPosRegister(responseData.result.sessionId, logger),
+    },
+  },
 
   fields: customWidgetObject({
     render: PosOrderCreateWidgetLazy,

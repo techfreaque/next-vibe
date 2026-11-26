@@ -51,6 +51,7 @@ export class PosOrderCompleteRepository {
       result: {
         currency: string;
         id: string;
+        sessionId: string;
         status: string;
         total: number;
         journalEntryId: string | null;
@@ -295,6 +296,7 @@ export class PosOrderCompleteRepository {
             result: {
               currency: order.currency,
               id: orderId,
+              sessionId: order.sessionId,
               status: PosOrderStatus.COMPLETED,
               total: settlement.total,
               journalEntryId,

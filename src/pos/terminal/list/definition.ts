@@ -55,6 +55,13 @@ const { GET } = createEndpoint({
         description: "terminalList.get.companyId.description",
         schema: z.uuid().optional(),
       }),
+      terminalId: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "terminalList.get.terminalId.label",
+        description: "terminalList.get.terminalId.description",
+        schema: z.uuid().optional(),
+      }),
 
       terminals: responseArrayField(scopedTranslation, {
         type: WidgetType.CONTAINER,
@@ -88,6 +95,17 @@ const { GET } = createEndpoint({
               type: WidgetType.TEXT,
               label: "terminalList.get.response.isActive",
               schema: z.boolean(),
+            }),
+            companyName: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              label: "terminalList.get.response.companyName",
+              schema: z.string(),
+            }),
+            openSessionId: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              label: "terminalList.get.response.openSessionId",
+              hidden: true,
+              schema: z.uuid().nullable(),
             }),
             createdAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
@@ -156,6 +174,7 @@ const { GET } = createEndpoint({
     requests: {
       default: {
         companyId: undefined,
+        terminalId: undefined,
       },
     },
     responses: {
@@ -167,6 +186,8 @@ const { GET } = createEndpoint({
             location: "Front desk",
             currency: "EUR",
             isActive: true,
+            companyName: "Demo Company",
+            openSessionId: null,
             createdAt: new Date("2024-01-01T00:00:00.000Z"),
           },
         ],

@@ -42,6 +42,23 @@ const { POST } = createEndpoint({
   allowedRoles: [UserRole.ADMIN],
   icon: "play",
 
+  options: {
+    mutationOptions: {
+      onSuccess: async ({ logger }) => {
+        const [{ apiClient }, list, dashboard] = await Promise.all([
+          import("next-vibe/unified-ui/hooks/store"),
+          import("../../terminal/list/definition"),
+          import("../../dashboard/definition"),
+        ]);
+        // Refresh in the background: a slow list must not hold the form.
+        void Promise.all([
+          apiClient.refetchEndpoint(list.default.GET, logger),
+          apiClient.refetchEndpoint(dashboard.default.GET, logger),
+        ]);
+      },
+    },
+  },
+
   fields: customWidgetObject({
     usage: { request: "data", response: true },
     render: PosSessionOpenWidget,

@@ -22,6 +22,7 @@ import {
 import { z } from "zod";
 
 import { scopedTranslation } from "../../i18n";
+import { refreshPosRegister } from "../../order/refresh";
 
 const PosSessionCloseWidgetLazy = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.PosSessionCloseWidget })),
@@ -39,6 +40,13 @@ const { POST } = createEndpoint({
   tags: ["tags.pos", "tags.session", "tags.close"],
   allowedRoles: [UserRole.ADMIN],
   icon: "square",
+
+  options: {
+    mutationOptions: {
+      onSuccess: ({ requestData, logger }) =>
+        refreshPosRegister(requestData.details.sessionId, logger),
+    },
+  },
 
   fields: customWidgetObject({
     render: PosSessionCloseWidgetLazy,
@@ -118,6 +126,16 @@ const { POST } = createEndpoint({
             label: "sessionClose.post.response.cashSalesTotal",
             schema: z.number(),
           }),
+          cashRefundsTotal: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            label: "sessionClose.post.response.cashRefundsTotal",
+            schema: z.number(),
+          }),
+          openingFloat: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            label: "sessionClose.post.response.openingFloat",
+            schema: z.number(),
+          }),
           variance: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             label: "sessionClose.post.response.variance",
@@ -193,9 +211,11 @@ const { POST } = createEndpoint({
           status: "CLOSED",
           closedAt: new Date("2024-01-01T18:00:00.000Z"),
           closingFloat: 120.5,
-          expectedFloat: 118.75,
+          openingFloat: 50,
+          expectedFloat: 108.75,
           cashSalesTotal: 68.75,
-          variance: 1.75,
+          cashRefundsTotal: 10,
+          variance: 11.75,
           orderCount: 12,
         },
       },

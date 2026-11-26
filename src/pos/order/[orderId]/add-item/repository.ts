@@ -174,6 +174,84 @@ export class PosOrderAddItemRepository {
           const legacyTax = sql`round(${net} * ${taxRate}::numeric,4)`;
           const taxAmount = settled?.taxAmount ?? legacyTax;
           const lineTotal = settled?.lineTotal ?? sql`${net} + ${legacyTax}`;
+          // Register taps on a product already in the cart raise that line's
+          // quantity instead of adding a duplicate line.
+          if (item.mergeWithLine && item.productId) {
+            const [line] = await tx
+              .select({
+                id: posOrderItems.id,
+                quantity: posOrderItems.quantity,
+              })
+              .from(posOrderItems)
+              .where(
+                and(
+                  eq(posOrderItems.orderId, orderId),
+                  eq(posOrderItems.productId, item.productId),
+                  eq(posOrderItems.unitPrice, resolvedUnitPrice),
+                  eq(posOrderItems.taxRate, taxRate),
+                ),
+              )
+              .limit(1);
+            const mergedQuantity = line
+              ? Math.round(
+                  (Number(line.quantity) + resolvedQuantity) * 10_000,
+                ) / 10_000
+              : undefined;
+            if (line && mergedQuantity !== undefined) {
+              const mergedNet = sql`round(${mergedQuantity}::numeric * ${resolvedUnitPrice}::numeric,4)`;
+              const mergedSettled =
+                order.lineSettlement === LINE_SETTLEMENT_V1
+                  ? calculateSettledTaxLine({
+                      quantity: mergedQuantity,
+                      unitPrice: resolvedUnitPrice,
+                      taxRate,
+                    })
+                  : undefined;
+              const mergedLegacyTax = sql`round(${mergedNet} * ${taxRate}::numeric,4)`;
+              const [updatedLine] = await tx
+                .update(posOrderItems)
+                .set({
+                  quantity: mergedQuantity,
+                  taxAmount: mergedSettled?.taxAmount ?? mergedLegacyTax,
+                  lineTotal:
+                    mergedSettled?.lineTotal ??
+                    sql`${mergedNet} + ${mergedLegacyTax}`,
+                })
+                .where(eq(posOrderItems.id, line.id))
+                .returning({
+                  id: posOrderItems.id,
+                  description: posOrderItems.description,
+                  quantity: posOrderItems.quantity,
+                  unitPrice: posOrderItems.unitPrice,
+                  taxAmount: posOrderItems.taxAmount,
+                  lineTotal: posOrderItems.lineTotal,
+                });
+              if (updatedLine) {
+                const [mergedTotals] = await tx
+                  .select({
+                    subtotal: sum(posOrderItems.lineTotal),
+                    taxAmount: sum(posOrderItems.taxAmount),
+                  })
+                  .from(posOrderItems)
+                  .where(eq(posOrderItems.orderId, orderId));
+                const mergedSettlement = posSettlementAmounts(
+                  Number(mergedTotals?.subtotal ?? 0),
+                  Number(mergedTotals?.taxAmount ?? 0),
+                );
+                await tx
+                  .update(posOrders)
+                  .set({ ...mergedSettlement, updatedAt: new Date() })
+                  .where(eq(posOrders.id, orderId));
+                return success({
+                  result: {
+                    currency: order.currency,
+                    ...updatedLine,
+                    orderTotal: mergedSettlement.total,
+                  },
+                });
+              }
+            }
+          }
           // Get current sort order
           const existingItems = await tx
             .select({ sortOrder: posOrderItems.sortOrder })

@@ -1,10 +1,19 @@
 "use client";
 
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
+import { EmptyBlock } from "next-vibe/ui/components/empty-block";
 import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
+import { ChevronRight } from "next-vibe/ui/components/icons/ChevronRight";
+import { Receipt } from "next-vibe/ui/components/icons/Receipt";
+import { LoadingBlock } from "next-vibe/ui/components/loading-block";
 import { Span } from "next-vibe/ui/components/span";
+import {
+  StatusPill,
+  type StatusPillVariant,
+} from "next-vibe/ui/components/status-pill";
+import { WidgetHeader } from "next-vibe/ui/components/widget-header";
+import { WidgetShell } from "next-vibe/ui/components/widget-shell";
 import { formatMoney } from "next-vibe/unified-ui/_shared/format-money";
 import { usePickerCallback } from "next-vibe/unified-ui/_shared/picker-context";
 import {
@@ -15,8 +24,9 @@ import {
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
-import { type JSX } from "react";
+import type { JSX } from "react";
 
+import { PosOrderStatus, PosOrderStatusDB } from "../../enum";
 import { orderTotalsByCurrency } from "../display-totals";
 import type definition from "./definition";
 import type {
@@ -29,261 +39,235 @@ type OrderStatusFilter =
   | NonNullable<PosOrderListRequestOutput["input"]["status"]>
   | undefined;
 
-function orderStatusBadgeClass(status: string): string {
-  if (status.includes("open")) {
-    return "bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300";
+function statusVariant(status: string): StatusPillVariant {
+  if (status === PosOrderStatus.COMPLETED) {
+    return "success";
   }
-  if (status.includes("completed")) {
-    return "bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300";
+  if (status === PosOrderStatus.OPEN) {
+    return "info";
   }
-  return "bg-muted text-muted-foreground";
+  return "muted";
 }
 
-function OrderRow({
-  order,
-  locale,
-  onView,
-  statusLabel,
-  itemsLabel,
-}: {
-  order: Order;
-  locale: CountryLanguage;
-  onView: (id: string) => void;
-  statusLabel: string;
-  itemsLabel: string;
-}): JSX.Element {
-  return (
-    <Div
-      className="flex items-center gap-3 px-4 py-3 hover:bg-muted/30 cursor-pointer transition-colors border-b last:border-b-0"
-      onClick={() => onView(order.id)}
-    >
-      <Div className="flex-1 min-w-0">
-        <Div className="flex items-center gap-2 flex-wrap">
-          <Span className="text-sm font-mono font-bold">
-            #{order.orderNumber}
-          </Span>
-          <Span
-            className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${orderStatusBadgeClass(order.status)}`}
-          >
-            {statusLabel}
-          </Span>
-        </Div>
-        <Div className="flex items-center gap-2 mt-0.5">
-          <Span className="text-xs text-muted-foreground tabular-nums">
-            {new Date(order.createdAt).toLocaleString(locale)}
-          </Span>
-        </Div>
-      </Div>
-      <Div className="flex flex-col items-end gap-0.5 shrink-0">
-        <Span className="text-sm font-mono font-semibold tabular-nums">
-          {formatMoney(order.total, order.currency, locale)}
-        </Span>
-        <Span className="text-xs text-muted-foreground">{itemsLabel}</Span>
-      </Div>
-    </Div>
-  );
-}
-
-const STATUS_FILTERS: Array<{
-  value: OrderStatusFilter;
-  labelKey:
-    | "orderList.get.widget.filterAll"
-    | "enums.orderStatus.open"
-    | "enums.orderStatus.completed"
-    | "enums.orderStatus.voided";
-}> = [
-  { value: undefined, labelKey: "orderList.get.widget.filterAll" },
-  { value: "enums.orderStatus.open", labelKey: "enums.orderStatus.open" },
-  {
-    value: "enums.orderStatus.completed",
-    labelKey: "enums.orderStatus.completed",
-  },
-  { value: "enums.orderStatus.voided", labelKey: "enums.orderStatus.voided" },
+const FILTERS: readonly OrderStatusFilter[] = [
+  undefined,
+  PosOrderStatus.COMPLETED,
+  PosOrderStatus.OPEN,
+  PosOrderStatus.VOIDED,
 ];
 
 export function PosOrderListWidget(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  _props: {
-    field: (typeof definition.GET)["fields"];
-  },
+  _props: { field: (typeof definition.GET)["fields"] },
 ): JSX.Element {
   const data = useWidgetValue<typeof definition.GET>();
   const navigation = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.GET>();
   const form = useWidgetForm<typeof definition.GET>();
   const locale = useWidgetLocale();
-  const activeStatus = form?.watch("input.status");
-  const onPick =
-    usePickerCallback<
-      NonNullable<
-        (typeof definition.GET.types.ResponseOutput)["orders"]
-      >[number]
-    >();
-  const isPickerMode = !!onPick;
+  const pickerCallback = usePickerCallback<Order>();
 
-  const handleViewOrder = (orderId: string): void => {
-    if (isPickerMode) {
-      const order = (data?.orders ?? []).find((o) => o.id === orderId);
-      if (order && onPick) {
-        onPick(order);
-        navigation.pop();
-      }
+  const sessionId = form?.watch("input.sessionId");
+  const status = form?.watch("input.status");
+  const page = form?.watch("page") ?? 1;
+  const pageSize = form?.watch("pageSize") ?? 20;
+
+  const openOrder = (order: Order): void => {
+    if (pickerCallback) {
+      pickerCallback(order);
+      navigation.pop();
       return;
     }
-    void (async (): Promise<void> => {
-      const def = await import("@/pos/order/[orderId]/get/definition");
-      navigation.push(def.default.GET, { urlPathParams: { orderId } });
-    })();
-  };
-
-  const handleNewOrder = (): void => {
-    void (async (): Promise<void> => {
-      const def = await import("@/pos/order/create/definition");
-      const sessionId = form?.getValues("input.sessionId") ?? "";
-      navigation.push(def.default.POST, {
-        data: {
-          details: { sessionId, customerId: undefined, currency: undefined },
-        },
-      });
-    })();
-  };
-
-  const getStatusLabel = (status: string): string => {
-    // status value IS the translation key (e.g., "enums.orderStatus.open")
-    return t(status as Parameters<typeof t>[0]);
-  };
-
-  const handleFilterChange = (value: OrderStatusFilter): void => {
-    form?.setValue("input.status", value, { shouldDirty: true });
-  };
-
-  // Loading state
-  if (!data) {
-    return (
-      <Div className="max-w-2xl mx-auto w-full px-4 pt-8 pb-6 flex flex-col gap-4">
-        <FormAlertWidget field={{}} />
-        <Div className="flex flex-col items-center gap-3 py-12 text-center">
-          <Div className="h-12 w-12 rounded-full bg-muted animate-pulse" />
-          <Span className="text-sm text-muted-foreground">
-            {t("orderList.get.widget.loading")}
-          </Span>
-        </Div>
-      </Div>
+    void import("@/pos/order/[orderId]/get/definition").then((def) =>
+      navigation.push(def.default.GET, {
+        urlPathParams: { orderId: order.id },
+      }),
     );
-  }
+  };
 
-  const orders = data.orders ?? [];
+  const openRegister = (): void => {
+    if (!sessionId) {
+      return;
+    }
+    void import("../../session/[sessionId]/register/definition").then((def) =>
+      navigation.push(def.default.GET, { urlPathParams: { sessionId } }),
+    );
+  };
+
+  const statusLabel = (value: string): string => {
+    const key = PosOrderStatusDB.find((entry) => entry === value);
+    return key ? t(key) : value;
+  };
+
+  const formatDate = (value: Date): string =>
+    new Date(value).toLocaleString(locale, {
+      day: "2-digit",
+      month: "short",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+
+  const back = navigation.canGoBack ? (
+    <Button
+      type="button"
+      variant="ghost"
+      size="sm"
+      className="-ml-1 gap-1.5"
+      onClick={() => navigation.pop()}
+    >
+      <ChevronLeft className="h-4 w-4" />
+      {t("orderList.get.widget.back")}
+    </Button>
+  ) : undefined;
+
+  const orders = data?.orders ?? [];
   const totals = orderTotalsByCurrency(orders);
-
-  // Group: OPEN first, COMPLETED, then VOIDED
-  const openOrders = orders.filter((o: Order) => o.status.includes("open"));
-  const completedOrders = orders.filter((o: Order) =>
-    o.status.includes("completed"),
-  );
-  const voidedOrders = orders.filter((o: Order) => o.status.includes("void"));
-  const sortedOrders = [...openOrders, ...completedOrders, ...voidedOrders];
+  const total = data?.count ?? 0;
+  const lastPage = Math.max(1, Math.ceil(total / pageSize));
 
   return (
-    <Div className="max-w-2xl mx-auto w-full px-4 pt-8 pb-6 flex flex-col gap-4">
-      {/* Back button */}
-      {navigation.canGoBack && (
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={() => navigation.pop()}
-          className="self-start gap-1.5 -ml-1"
-        >
-          <ChevronLeft className="h-4 w-4" />
-          {t("orderList.get.widget.back")}
-        </Button>
-      )}
+    <WidgetShell layout="page">
+      <WidgetHeader
+        title={t("orderList.get.widget.title")}
+        subtitle={t(
+          sessionId
+            ? "orderList.get.widget.subtitleSession"
+            : "orderList.get.widget.subtitleAll",
+        )}
+        size="page"
+        backButton={back}
+        actions={
+          sessionId ? (
+            <Button type="button" onClick={openRegister}>
+              {t("orderList.get.widget.openRegister")}
+            </Button>
+          ) : undefined
+        }
+      />
+      <FormAlertWidget field={{}} />
 
-      {/* Header */}
-      <Div className="flex items-center justify-between gap-3">
-        <Div className="flex flex-col gap-0.5">
-          {totals.map((total) => (
-            <Span
-              key={total.currency}
-              className="text-base font-semibold tabular-nums"
-            >
-              {formatMoney(total.amount, total.currency, locale)}
-            </Span>
-          ))}
-          <Span className="text-xs text-muted-foreground">
-            {data.count} {t("orderList.get.widget.ordersTotal")}
-          </Span>
-        </Div>
-        {!isPickerMode && (
+      <Div className="flex flex-wrap gap-2">
+        {FILTERS.map((filter) => (
           <Button
+            key={filter ?? "all"}
             type="button"
             size="sm"
-            variant="default"
-            onClick={handleNewOrder}
+            variant={status === filter ? "default" : "outline"}
+            onClick={() => {
+              form?.setValue("input.status", filter, { shouldDirty: true });
+              form?.setValue("page", 1, { shouldDirty: true });
+            }}
           >
-            + {t("orderList.get.widget.newOrder")}
+            {filter ? statusLabel(filter) : t("orderList.get.widget.filterAll")}
           </Button>
-        )}
+        ))}
       </Div>
 
-      {/* Status filter tabs — full mode only */}
-      {!isPickerMode && (
-        <Div className="flex gap-1 border-b pb-2">
-          {STATUS_FILTERS.map((filter) => {
-            const isActive = activeStatus === filter.value;
-            return (
-              <Button
-                key={filter.value ?? "all"}
-                type="button"
-                size="sm"
-                variant={isActive ? "default" : "ghost"}
-                className="h-7 px-3 text-xs"
-                onClick={() => handleFilterChange(filter.value)}
+      {!data ? (
+        <LoadingBlock />
+      ) : orders.length === 0 ? (
+        <EmptyBlock
+          size="page"
+          icon={<Receipt className="h-6 w-6" />}
+          title={t("orderList.get.widget.empty")}
+          message={t("orderList.get.widget.emptyHint")}
+        />
+      ) : (
+        <Div className="overflow-hidden rounded-xl border bg-card">
+          <Div className="hidden grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)_minmax(0,1fr)_auto_minmax(0,0.8fr)] gap-4 border-b px-4 py-2.5 text-xs font-medium text-muted-foreground @2xl:grid">
+            <Span>{t("orderList.get.widget.colSale")}</Span>
+            <Span>{t("orderList.get.response.terminalName")}</Span>
+            <Span>{t("orderList.get.widget.colTime")}</Span>
+            <Span>{t("orderList.get.widget.colStatus")}</Span>
+            <Span className="text-right">
+              {t("orderList.get.widget.colTotal")}
+            </Span>
+          </Div>
+          <Div className="flex flex-col divide-y">
+            {orders.map((order) => (
+              <Div
+                key={order.id}
+                tabIndex={0}
+                onClick={() => openOrder(order)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter") {
+                    openOrder(order);
+                  }
+                }}
+                className={`flex cursor-pointer flex-col gap-1 px-4 py-3 transition-colors hover:bg-muted/40 @2xl:grid @2xl:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)_minmax(0,1fr)_auto_minmax(0,0.8fr)] @2xl:items-center @2xl:gap-4 ${order.status === PosOrderStatus.VOIDED ? "opacity-70" : ""}`}
               >
-                {t(filter.labelKey)}
-              </Button>
-            );
-          })}
+                <Div className="flex items-center justify-between gap-3 @2xl:contents">
+                  <Span className="min-w-0 truncate text-sm font-semibold">
+                    {order.orderNumber}
+                  </Span>
+                  <Span className="text-sm font-semibold tabular-nums @2xl:hidden">
+                    {formatMoney(Number(order.total), order.currency, locale)}
+                  </Span>
+                </Div>
+                <Span className="hidden truncate text-sm text-muted-foreground @2xl:block">
+                  {order.terminalName ?? ""}
+                </Span>
+                <Div className="flex items-center justify-between gap-3 @2xl:contents">
+                  <Span className="text-xs text-muted-foreground tabular-nums @2xl:text-sm">
+                    <Span className="@2xl:hidden">
+                      {order.terminalName ? `${order.terminalName} · ` : ""}
+                    </Span>
+                    {formatDate(order.createdAt)}
+                  </Span>
+                  <StatusPill
+                    status={order.status}
+                    variant={statusVariant(order.status)}
+                    label={statusLabel(order.status)}
+                  />
+                </Div>
+                <Span className="hidden text-right text-sm font-semibold tabular-nums @2xl:block">
+                  {formatMoney(Number(order.total), order.currency, locale)}
+                </Span>
+              </Div>
+            ))}
+          </Div>
+          <Div className="flex flex-wrap items-center justify-between gap-3 border-t bg-muted/30 px-4 py-3 text-sm">
+            <Span className="text-muted-foreground">
+              {t("orderList.get.widget.count", { count: String(total) })}
+            </Span>
+            <Span className="font-semibold tabular-nums">
+              {totals
+                .map((row) => formatMoney(row.amount, row.currency, locale))
+                .join(" · ")}
+            </Span>
+          </Div>
         </Div>
       )}
 
-      {/* Order list or empty */}
-      {orders.length === 0 ? (
-        <Div className="flex flex-col items-center gap-4 py-12 text-center rounded-lg border border-dashed">
-          <Div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted border border-muted-foreground/20" />
-          <Div className="flex flex-col gap-1">
-            <Span className="text-sm font-medium">
-              {t("orderList.get.widget.empty")}
-            </Span>
-            <Span className="text-xs text-muted-foreground">
-              {t("orderList.get.widget.emptyHint")}
-            </Span>
-          </Div>
-          {!isPickerMode && (
-            <Button
-              type="button"
-              size="sm"
-              variant="default"
-              onClick={handleNewOrder}
-            >
-              + {t("orderList.get.widget.newOrder")}
-            </Button>
-          )}
+      {lastPage > 1 ? (
+        <Div className="flex items-center justify-end gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            disabled={page <= 1}
+            onClick={() =>
+              form?.setValue("page", page - 1, { shouldDirty: true })
+            }
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+          <Span className="text-sm text-muted-foreground tabular-nums">
+            {page} / {lastPage}
+          </Span>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            disabled={page >= lastPage}
+            onClick={() =>
+              form?.setValue("page", page + 1, { shouldDirty: true })
+            }
+          >
+            <ChevronRight className="h-4 w-4" />
+          </Button>
         </Div>
-      ) : (
-        <Div className="rounded-lg border overflow-hidden">
-          {sortedOrders.map((order: Order) => (
-            <OrderRow
-              key={order.id}
-              order={order}
-              locale={locale}
-              onView={handleViewOrder}
-              statusLabel={getStatusLabel(order.status)}
-              itemsLabel={t("orderList.get.widget.tapToView")}
-            />
-          ))}
-        </Div>
-      )}
-    </Div>
+      ) : null}
+    </WidgetShell>
   );
 }

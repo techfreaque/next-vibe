@@ -88,6 +88,12 @@ const { GET } = createEndpoint({
         label: "dashboard.get.response.todaySalesTotal",
         schema: z.number(),
       }),
+      refundsToday: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "dashboard.get.response.refundsToday",
+        // amount: refunds paid today in `currency`; count: refunds in every currency
+        schema: z.object({ amount: z.number(), count: z.number() }),
+      }),
       currency: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         label: "dashboard.get.response.currency",
@@ -202,6 +208,7 @@ const { GET } = createEndpoint({
         openSessionsCount: 1,
         todayOrderCount: 14,
         todaySalesTotal: 487.5,
+        refundsToday: { amount: 12.5, count: 1 },
         salesByCurrency: [
           { currency: "EUR", amount: 487.5 },
           { currency: "USD", amount: 125.1251 },

@@ -1,0 +1,201 @@
+export const translations = {
+  tags: {
+    pos: "POS",
+    order: "Order",
+    refund: "Refund",
+  },
+  enums: {
+    paymentMethod: {
+      cash: "Cash",
+      card: "Card",
+      transfer: "Transfer",
+      other: "Other",
+    },
+  },
+  get: {
+    title: "Sale refunds",
+    titleShort: "Refunds",
+    description:
+      "What a sale sold, what went back, and what can still be refunded.",
+    orderId: {
+      label: "Sale",
+      description: "The completed sale",
+    },
+    response: {
+      orderId: "Sale",
+      orderNumber: "Sale number",
+      status: "Status",
+      currency: "Currency",
+      total: "Sale total",
+      refundedTotal: "Refunded",
+      refundableTotal: "Can still refund",
+      journalPosted: "Posted to the books",
+      lines: "Items",
+      orderItemId: "Line",
+      description: "Item",
+      quantity: "Sold",
+      refundedQuantity: "Refunded",
+      refundableQuantity: "Can refund",
+      unitPrice: "Unit price",
+      lineTotal: "Line total",
+      taxRate: "VAT rate",
+      refunds: "Refunds",
+      refundId: "Refund",
+      refundNumber: "Refund number",
+      method: "Refunded by",
+      reason: "Reason",
+      createdAt: "Date",
+      cashSession: "Cash drawer",
+      sessionId: "Session",
+      terminalName: "Till",
+      available: "Cash in drawer",
+    },
+    widget: {
+      back: "Back",
+      startRefund: "Refund items",
+      fullyRefunded: "Everything on this sale has been refunded.",
+      notCompleted: "Only completed sales can be refunded.",
+      history: "Refund history",
+      noRefunds: "No refunds on this sale yet.",
+      loading: "Loading sale",
+    },
+    success: {
+      title: "Refunds loaded",
+      description: "Sale and refund history are up to date.",
+    },
+  },
+  post: {
+    title: "Refund sale",
+    titleShort: "Refund",
+    description:
+      "Give money back for a completed sale, all of it or line by line. Stock goes back on the shelf and the books follow.",
+    orderId: {
+      label: "Sale",
+      description: "The completed sale to refund",
+    },
+    lines: {
+      label: "Items to refund",
+      description:
+        "Line and quantity per item. Leave empty to refund everything that is left.",
+    },
+    method: {
+      label: "Refund by",
+      description:
+        "How the money goes back. Cash comes out of an open till drawer.",
+      placeholder: "Pick how to refund",
+    },
+    sessionId: {
+      label: "Cash drawer",
+      description:
+        "Open session that pays out cash. Defaults to your open session on a till in the sale currency.",
+    },
+    reason: {
+      label: "Reason",
+      description: "Why the money goes back. Kept with the refund.",
+      placeholder: "For example, damaged item returned",
+    },
+    response: {
+      refundId: "Refund",
+      refundNumber: "Refund number",
+      orderId: "Sale",
+      sessionId: "Session",
+      method: "Refunded by",
+      currency: "Currency",
+      subtotal: "Net",
+      taxAmount: "VAT",
+      total: "Refunded now",
+      refundedTotal: "Refunded in total",
+      fullyRefunded: "Fully refunded",
+      journalEntryId: "Journal entry",
+      stockReturned: "Products back in stock",
+    },
+    widget: {
+      back: "Back to sale",
+      items: "What goes back",
+      selectAll: "Refund everything",
+      clear: "Clear",
+      decrease: "One less {{item}}",
+      increase: "One more {{item}}",
+      all: "All",
+      sold: "Sold {{quantity}}",
+      alreadyRefunded: "{{quantity}} already refunded",
+      nothingLeft: "Fully refunded",
+      summary: "Refund",
+      net: "Net",
+      vat: "VAT",
+      total: "Refund total",
+      cashFrom: "Paid from the drawer at {{terminal}}",
+      drawerAvailable: "In drawer: {{amount}}",
+      noCashSession: "Open a session on a till in {{currency}} to refund cash.",
+      drawerShort: "The drawer holds less cash than this refund.",
+      confirmTitle: "Refund {{amount}}?",
+      confirmDescription:
+        "The money goes back by {{method}}. Stock and books are updated. A refund cannot be undone.",
+      confirm: "Refund",
+      cancel: "Cancel",
+      pickItems: "Pick at least one item.",
+      reasonMissing: "Add a reason.",
+      loading: "Loading sale",
+      viewRefunds: "View refunds",
+      newSale: "Back to sale",
+    },
+    success: {
+      title: "Refund done",
+      description: "The money is on its way back to the customer.",
+    },
+  },
+  messages: {
+    notCompleted: "Only completed sales can be refunded.",
+    invalidLine: "Pick items from this sale with a quantity above zero.",
+    nothingLeft: "Nothing is left to refund on this sale.",
+    overRefund: "That is more than was sold minus earlier refunds.",
+    rounding: "This refund is too small to pay out. Add more items.",
+    cashSessionRequired:
+      "Cash refunds need an open session on a till in the sale currency.",
+    sessionInvalid: "Pick an open session of this company.",
+    cashCurrencyMismatch: "This till works in another currency than the sale.",
+    drawerShort: "The drawer holds less cash than this refund.",
+    postingUnavailable:
+      "The refund could not be posted to the books. Check that an accounting period is open.",
+    stockUnavailable:
+      "Stock could not be put back. Check that the warehouse is active.",
+  },
+  errors: {
+    validation: {
+      title: "Check the refund",
+      description: "Pick items, a refund method and a reason.",
+    },
+    unauthorized: {
+      title: "Sign in required",
+      description: "Sign in to refund sales.",
+    },
+    forbidden: {
+      title: "No access",
+      description: "You cannot refund sales for this company.",
+    },
+    notFound: {
+      title: "Sale not found",
+      description: "This sale does not exist or belongs to another company.",
+    },
+    conflict: {
+      title: "Refund not possible",
+      description: "The sale or the drawer does not allow this refund.",
+    },
+    server: {
+      title: "Refund failed",
+      description: "Nothing was refunded. Try again.",
+    },
+    unknown: {
+      title: "Refund failed",
+      description: "Nothing was refunded. Try again.",
+    },
+    network: {
+      title: "No connection",
+      description: "Check your connection and try again.",
+    },
+    unsavedChanges: {
+      title: "Unsaved changes",
+      description: "Finish or discard your changes first.",
+    },
+  },
+};

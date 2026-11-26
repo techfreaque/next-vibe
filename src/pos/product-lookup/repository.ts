@@ -3,7 +3,7 @@
  * Searches catalog products by name or SKU for POS use
  */
 
-import { and, eq, ilike, inArray, or } from "drizzle-orm";
+import { and, asc, desc, eq, ilike, inArray, or, sql } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
@@ -47,18 +47,36 @@ export class PosProductLookupRepository {
     const { t } = scopedTranslation.scopedT(locale);
 
     try {
-      const { query, companyId } = data;
+      const { companyId, currency } = data;
+      const query = (data.query ?? "").trim();
       const page = data.page ?? 1;
       const pageSize = data.pageSize ?? 20;
       const offset = (page - 1) * pageSize;
-      const searchPattern = `%${query}%`;
+      const escaped = query.replace(/[\\%_]/g, (char) => `\\${char}`);
+      const searchPattern = `%${escaped}%`;
 
-      const searchCondition = or(
-        ilike(catalogProducts.name, searchPattern),
-        ilike(catalogProducts.sku, searchPattern),
+      // Empty query browses the active catalog (register product grid).
+      const searchCondition = query
+        ? or(
+            ilike(catalogProducts.name, searchPattern),
+            ilike(catalogProducts.sku, searchPattern),
+          )
+        : undefined;
+      const currencyCondition = currency
+        ? eq(catalogProducts.currency, currency.toUpperCase())
+        : undefined;
+
+      const activeCondition = and(
+        eq(catalogProducts.isActive, true),
+        currencyCondition,
       );
-
-      const activeCondition = eq(catalogProducts.isActive, true);
+      // A scanned barcode or typed SKU matches exactly: list it first.
+      const ordering = [
+        desc(
+          sql<boolean>`lower(coalesce(${catalogProducts.sku}, '')) = lower(${query})`,
+        ),
+        asc(catalogProducts.name),
+      ];
 
       if (companyId) {
         // Verify user is a member of the specified company
@@ -92,6 +110,7 @@ export class PosProductLookupRepository {
               searchCondition,
             ),
           )
+          .orderBy(...ordering)
           .limit(pageSize)
           .offset(offset);
 
@@ -134,6 +153,7 @@ export class PosProductLookupRepository {
             searchCondition,
           ),
         )
+        .orderBy(...ordering)
         .limit(pageSize)
         .offset(offset);
 

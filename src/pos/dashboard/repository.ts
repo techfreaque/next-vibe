@@ -18,7 +18,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { getDocumentCompanies } from "@/finance/document-company-scope";
 
-import { posOrders, posSessions, posTerminals } from "../db";
+import { posOrders, posRefunds, posSessions, posTerminals } from "../db";
 import { PosOrderStatus, PosSessionStatus } from "../enum";
 import { scopedTranslation } from "../i18n";
 import type { PosDashboardGetResponseOutput } from "./definition";
@@ -48,6 +48,7 @@ export class PosDashboardRepository {
           openSessionsCount: 0,
           todayOrderCount: 0,
           todaySalesTotal: 0,
+          refundsToday: { amount: 0, count: 0 },
           currency: "EUR",
           terminals: [],
         });
@@ -124,6 +125,31 @@ export class PosDashboardRepository {
               )
               .groupBy(posOrders.currency)
               .orderBy(asc(posOrders.currency));
+      const refunds =
+        terminalIds.length === 0
+          ? []
+          : await db
+              .select({
+                currency: posRefunds.currency,
+                amount: sum(posRefunds.total).mapWith(Number),
+                count: sql<number>`count(*)::int`,
+              })
+              .from(posRefunds)
+              .innerJoin(posOrders, eq(posOrders.id, posRefunds.orderId))
+              .innerJoin(posSessions, eq(posSessions.id, posOrders.sessionId))
+              .where(
+                and(
+                  inArray(posSessions.terminalId, terminalIds),
+                  gte(posRefunds.createdAt, todayStart),
+                  lt(posRefunds.createdAt, tomorrow),
+                ),
+              )
+              .groupBy(posRefunds.currency);
+      const refundsToday = {
+        amount:
+          refunds.find((group) => group.currency === currency)?.amount ?? 0,
+        count: refunds.reduce((count, group) => count + group.count, 0),
+      };
       const todayOrderCount = sales.reduce(
         (count, group) => count + group.orders,
         0,
@@ -160,6 +186,7 @@ export class PosDashboardRepository {
         openSessionsCount: openSessionRows.length,
         todayOrderCount,
         todaySalesTotal,
+        refundsToday,
         salesByCurrency: sales.map((row) => ({
           currency: row.currency,
           amount: row.amount,

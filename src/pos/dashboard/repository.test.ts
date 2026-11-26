@@ -18,7 +18,8 @@ beforeAll(async () => {
  create table company_members(user_id uuid,company_id uuid,is_active boolean,role text);
  create table pos_terminals(id uuid primary key, company_id uuid,name text,location text,currency text,is_active boolean);
  create table pos_sessions(id uuid primary key,terminal_id uuid,status text);
- create table pos_orders(session_id uuid,currency text,status text,total numeric(12,4),updated_at timestamp,created_at timestamp);
+ create table pos_orders(session_id uuid,currency text,status text,total numeric(12,4),updated_at timestamp,created_at timestamp,id uuid default gen_random_uuid());
+ create table pos_refunds(id uuid primary key default gen_random_uuid(),order_id uuid,currency text,total numeric(12,4),created_at timestamp);
  `);
   await pg.query(
     "insert into companies values ($1,'Shop','EUR',true),($2,'Other','EUR',true)",
@@ -56,6 +57,19 @@ beforeAll(async () => {
       ],
     );
   }
+  // One refund today on a Shop EUR sale, one yesterday, one for the other company.
+  await pg.query(`
+    insert into pos_refunds(order_id,currency,total,created_at)
+    select o.id, o.currency, 2.5, t.at
+    from pos_orders o
+    join pos_sessions s on s.id = o.session_id
+    join pos_terminals p on p.id = s.terminal_id
+    cross join (values (now()), (current_date - 1)) as t(at)
+    where o.status = '${PosOrderStatus.COMPLETED}' and o.total = 7.25
+    union all
+    select o.id, o.currency, 9, now()
+    from pos_orders o
+    where o.total = 88`);
 }, 30_000);
 afterAll(() => pg.close());
 test("today's completed sales include closed drawers and remain separate by company and currency", async () => {
@@ -73,6 +87,7 @@ test("today's completed sales include closed drawers and remain separate by comp
     openSessionsCount: 0,
     currency: "EUR",
     todaySalesTotal: 7.25,
+    refundsToday: { amount: 2.5, count: 1 },
     salesByCurrency: [
       { currency: "EUR", amount: 7.25 },
       { currency: "USD", amount: 15.1251 },

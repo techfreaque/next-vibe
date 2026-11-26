@@ -45,7 +45,14 @@ import {
   paymentInvoices,
 } from "@/payment/db";
 import { BillStatus, InvoiceStatus } from "@/payment/enum";
-import { posOrderItems, posOrders, posSessions, posTerminals } from "@/pos/db";
+import {
+  posOrderItems,
+  posOrders,
+  posRefundLines,
+  posRefunds,
+  posSessions,
+  posTerminals,
+} from "@/pos/db";
 import { PosOrderStatus } from "@/pos/enum";
 
 import { scopedTranslation } from "../i18n";
@@ -320,10 +327,47 @@ export class TaxReportRepository {
           ),
         );
 
+      // POS refunds give back output VAT in the period of the refund, on
+      // the rate of the refunded sale line.
+      const posRefundRows = db
+        .select({
+          direction: sql<
+            typeof TaxReportDirectionValue
+          >`${TaxReportDirection.POS_SALES}::text`.as("direction"),
+          rate: sql<number | null>`${posOrderItems.taxRate}`
+            .mapWith(Number)
+            .as("rate"),
+          taxableAmount:
+            sql`${posRefundLines.taxAmount} - ${posRefundLines.lineTotal}`.as(
+              "taxable_amount",
+            ),
+          taxAmount: sql`-${posRefundLines.taxAmount}`.as("tax_amount"),
+        })
+        .from(posRefundLines)
+        .innerJoin(posRefunds, eq(posRefundLines.refundId, posRefunds.id))
+        .innerJoin(
+          posOrderItems,
+          eq(posRefundLines.orderItemId, posOrderItems.id),
+        )
+        .innerJoin(posOrders, eq(posRefunds.orderId, posOrders.id))
+        .innerJoin(posSessions, eq(posOrders.sessionId, posSessions.id))
+        .innerJoin(posTerminals, eq(posSessions.terminalId, posTerminals.id))
+        .where(
+          and(
+            eq(posTerminals.companyId, company.id),
+            eq(posRefunds.currency, currency),
+            gte(posRefunds.createdAt, start),
+            lt(posRefunds.createdAt, end),
+            or(gt(posOrderItems.taxRate, 0), ne(posRefundLines.taxAmount, 0)),
+            notExists(linkedInvoice),
+          ),
+        );
+
       const lines = invoiceLines
         .unionAll(billLines)
         .unionAll(reverseChargeLines)
         .unionAll(posLines)
+        .unionAll(posRefundRows)
         .as("document_lines");
       const grouped = await db
         .select({

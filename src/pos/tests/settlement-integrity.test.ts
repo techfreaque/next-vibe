@@ -65,6 +65,7 @@ beforeAll(async () => {
  CREATE TABLE pos_orders(id uuid PRIMARY KEY,session_id uuid,customer_id uuid,status text,order_number text,currency text,subtotal numeric,tax_amount numeric,total numeric,journal_entry_id uuid,created_at timestamp,updated_at timestamp,tax_exemption_notice text,line_settlement text);
  CREATE TABLE pos_order_items(id uuid PRIMARY KEY default gen_random_uuid(),order_id uuid,product_id uuid,description text,quantity numeric,unit_price numeric,tax_rate numeric,tax_amount numeric,line_total numeric,sort_order int,created_at timestamp,updated_at timestamp);
  CREATE TABLE pos_payments(id uuid PRIMARY KEY default gen_random_uuid(),order_id uuid,method text,amount numeric,change numeric,account_node_id uuid,reference text,created_at timestamp default now());
+ CREATE TABLE pos_refunds(id uuid PRIMARY KEY default gen_random_uuid(),order_id uuid,session_id uuid,method text,currency text,total numeric,created_at timestamp default now());
  CREATE TABLE warehouses(id uuid PRIMARY KEY, company_id uuid NOT NULL, is_active boolean NOT NULL);
  CREATE TABLE catalog_products(id uuid PRIMARY KEY, company_id uuid, owner_user_id uuid, type text NOT NULL);
  CREATE TABLE stock_levels(

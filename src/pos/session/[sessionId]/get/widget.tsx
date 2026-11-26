@@ -1,11 +1,17 @@
 "use client";
 
-import { Badge } from "next-vibe/ui/components/badge";
 import { Button } from "next-vibe/ui/components/button";
+import { DetailField, DetailGrid } from "next-vibe/ui/components/detail-grid";
 import { Div } from "next-vibe/ui/components/div";
 import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
+import { LoadingBlock } from "next-vibe/ui/components/loading-block";
 import { Span } from "next-vibe/ui/components/span";
+import { StatusPill } from "next-vibe/ui/components/status-pill";
+import { WidgetHeader } from "next-vibe/ui/components/widget-header";
+import { WidgetShell } from "next-vibe/ui/components/widget-shell";
+import { formatMoney } from "next-vibe/unified-ui/_shared/format-money";
 import {
+  useWidgetIsInteractive,
   useWidgetLocale,
   useWidgetNavigation,
   useWidgetTranslation,
@@ -14,8 +20,51 @@ import {
 import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import type { JSX } from "react";
 
-import { formatPosSettlement } from "../../../order/format-settlement";
+import { PosSessionStatus } from "../../../enum";
 import type definition from "./definition";
+
+type Tone = "success" | "warning" | "danger" | undefined;
+
+function CashRow({
+  label,
+  value,
+  strong = false,
+  tone,
+}: {
+  label: string;
+  value: string;
+  strong?: boolean;
+  tone?: Tone;
+}): JSX.Element {
+  const toneClass =
+    tone === "success"
+      ? "text-success"
+      : tone === "warning"
+        ? "text-warning"
+        : tone === "danger"
+          ? "text-destructive"
+          : "";
+  return (
+    <Div
+      className={`flex items-center justify-between gap-3 px-4 py-3 text-sm ${strong ? "font-semibold" : ""}`}
+    >
+      <Span className={strong ? "" : "text-muted-foreground"}>{label}</Span>
+      <Span
+        className={`whitespace-nowrap text-right tabular-nums ${toneClass}`}
+      >
+        {value}
+      </Span>
+    </Div>
+  );
+}
+
+function varianceTone(variance: number): Tone {
+  const cents = Math.round(Math.abs(variance) * 100);
+  if (cents === 0) {
+    return "success";
+  }
+  return cents <= 500 ? "warning" : "danger";
+}
 
 export function PosSessionGetWidget(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -27,199 +76,207 @@ export function PosSessionGetWidget(
   const navigation = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.GET>();
   const locale = useWidgetLocale();
+  const interactive = useWidgetIsInteractive();
   const session = data?.result;
 
-  const handleCloseSession = (sessionId: string): void => {
-    void (async (): Promise<void> => {
-      const def = await import("../../close/definition");
-      navigation.push(def.default.POST, {
-        data: {
-          details: {
-            sessionId,
-            closingFloat: 0,
-          },
-        },
-      });
-    })();
+  const openRegister = (sessionId: string): void => {
+    void import("../register/definition").then((def) =>
+      navigation.push(def.default.GET, { urlPathParams: { sessionId } }),
+    );
   };
 
-  const handleNewOrder = (sessionId: string, currency?: string): void => {
-    void (async (): Promise<void> => {
-      const def = await import("../../../order/create/definition");
-      navigation.push(def.default.POST, {
-        data: {
-          details: { sessionId, customerId: undefined, currency },
-        },
-      });
-    })();
-  };
-
-  const handleViewOrders = (sessionId: string): void => {
-    void (async (): Promise<void> => {
-      const def = await import("../../../order/list/definition");
+  const openSales = (sessionId: string): void => {
+    void import("../../../order/list/definition").then((def) =>
       navigation.push(def.default.GET, {
         data: {
           input: { sessionId, status: undefined },
           page: 1,
           pageSize: 50,
         },
-      });
-    })();
+      }),
+    );
   };
 
-  if (!data && !session) {
-    return (
-      <Div className="max-w-2xl mx-auto w-full px-4 pt-8 pb-6 flex flex-col gap-4">
-        <FormAlertWidget field={{}} />
-        <Div className="flex flex-col items-center gap-3 py-10 text-center">
-          <Div className="h-10 w-10 rounded-full bg-muted animate-pulse" />
-          <Span className="text-sm text-muted-foreground">
-            {t("sessionGet.get.widget.loading")}
-          </Span>
-        </Div>
-      </Div>
+  const closeTill = (sessionId: string): void => {
+    void import("../../close/definition").then((def) =>
+      navigation.push(def.default.POST, {
+        data: { details: { sessionId, closingFloat: 0 } },
+      }),
     );
-  }
+  };
+
+  const backButton =
+    interactive && navigation.canGoBack ? (
+      <Button
+        type="button"
+        variant="ghost"
+        size="sm"
+        onClick={() => navigation.pop()}
+        className="-ml-1 gap-1.5"
+      >
+        <ChevronLeft className="h-4 w-4" />
+        {t("sessionGet.get.widget.back")}
+      </Button>
+    ) : undefined;
 
   if (!session) {
     return (
-      <Div className="flex flex-col gap-4">
+      <WidgetShell layout="page" className="mx-auto max-w-3xl">
+        <WidgetHeader
+          size="page"
+          title={t("sessionGet.get.widget.title")}
+          backButton={backButton}
+        />
         <FormAlertWidget field={{}} />
-      </Div>
+        {data ? null : (
+          <LoadingBlock message={t("sessionGet.get.widget.loading")} />
+        )}
+      </WidgetShell>
     );
   }
 
-  const isOpen = session.status.includes("open");
+  const isOpen = session.status === PosSessionStatus.OPEN;
+  const money = (amount: number): string =>
+    formatMoney(amount, session.currency, locale);
+  const when = (date: Date): string =>
+    new Date(date).toLocaleString(locale, {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  const closing = session.closingFloat;
+  const variance =
+    closing === null
+      ? null
+      : (Math.round(closing * 10_000) -
+          Math.round(session.expectedCash * 10_000)) /
+        10_000;
+  const tone = variance === null ? undefined : varianceTone(variance);
 
   return (
-    <Div className="max-w-2xl mx-auto w-full px-4 pt-8 pb-6 flex flex-col gap-4">
-      {/* Back button */}
-      {navigation.canGoBack && (
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={() => navigation.pop()}
-          className="self-start gap-1.5 -ml-1"
-        >
-          <ChevronLeft className="h-4 w-4" />
-          {t("sessionGet.get.widget.back")}
-        </Button>
-      )}
+    <WidgetShell layout="page" className="mx-auto max-w-3xl">
+      <WidgetHeader
+        size="page"
+        title={session.terminalName ?? t("sessionGet.get.widget.title")}
+        titleAccessory={
+          <StatusPill
+            status={session.status}
+            variant={isOpen ? "success" : "muted"}
+            label={
+              isOpen
+                ? t("sessionGet.get.widget.selling")
+                : t("sessionGet.get.widget.closed")
+            }
+          />
+        }
+        subtitle={
+          isOpen
+            ? t("sessionGet.get.widget.subtitleOpen", {
+                time: when(session.openedAt),
+              })
+            : t("sessionGet.get.widget.subtitleClosed", {
+                time: when(session.closedAt ?? session.openedAt),
+              })
+        }
+        backButton={backButton}
+        actions={
+          interactive ? (
+            <>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => openSales(session.id)}
+              >
+                {t("sessionGet.get.widget.sales")}
+              </Button>
+              {isOpen ? (
+                <>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => closeTill(session.id)}
+                  >
+                    {t("sessionGet.get.widget.closeTill")}
+                  </Button>
+                  <Button
+                    type="button"
+                    onClick={() => openRegister(session.id)}
+                  >
+                    {t("sessionGet.get.widget.openRegister")}
+                  </Button>
+                </>
+              ) : null}
+            </>
+          ) : undefined
+        }
+      />
 
       <FormAlertWidget field={{}} />
 
-      {/* Session detail card */}
-      <Div className="rounded-lg border overflow-hidden divide-y">
-        <Div className="flex items-center justify-between px-4 py-3 bg-muted/30">
-          <Span className="text-sm font-semibold">
-            {session.terminalName ?? t("sessionGet.get.widget.sessionDetails")}
-          </Span>
-          <Badge
-            variant={isOpen ? "default" : "secondary"}
-            className={
-              isOpen ? "text-xs bg-blue-600 hover:bg-blue-600" : "text-xs"
-            }
-          >
-            {isOpen
-              ? t("enums.sessionStatus.open")
-              : t("enums.sessionStatus.closed")}
-          </Badge>
-        </Div>
-        <Div className="flex flex-wrap justify-between gap-2 px-4 py-3 text-sm text-muted-foreground">
-          <Span>{session.companyName}</Span>
-          <Span className="font-mono uppercase">{session.id.slice(0, 8)}</Span>
-        </Div>
-        <Div className="flex items-center justify-between px-4 py-3">
-          <Span className="text-sm text-muted-foreground">
-            {t("sessionGet.get.response.openedAt")}
-          </Span>
-          <Span className="text-sm tabular-nums">
-            {new Date(session.openedAt).toLocaleString(locale)}
-          </Span>
-        </Div>
-        <Div className="flex items-center justify-between px-4 py-3">
-          <Span className="text-sm text-muted-foreground">
-            {t("sessionGet.get.response.openingFloat")}
-          </Span>
-          <Span className="text-sm font-mono tabular-nums">
-            {formatPosSettlement(
-              session.openingFloat,
-              session.currency,
-              locale,
-            )}
-          </Span>
-        </Div>
-        {session.closedAt ? (
-          <Div className="flex items-center justify-between px-4 py-3">
-            <Span className="text-sm text-muted-foreground">
-              {t("sessionGet.get.response.closedAt")}
-            </Span>
-            <Span className="text-sm tabular-nums">
-              {new Date(session.closedAt).toLocaleString(locale)}
-            </Span>
-          </Div>
-        ) : null}
-        {session.closingFloat !== null && session.closingFloat !== undefined ? (
-          <Div className="flex items-center justify-between px-4 py-3">
-            <Span className="text-sm text-muted-foreground">
-              {t("sessionGet.get.response.closingFloat")}
-            </Span>
-            <Span className="text-sm font-mono tabular-nums">
-              {formatPosSettlement(
-                session.closingFloat,
-                session.currency,
-                locale,
-              )}
-            </Span>
-          </Div>
-        ) : null}
+      <Div className="rounded-xl border bg-card p-4">
+        <DetailGrid columns={3}>
+          <DetailField
+            label={t("sessionGet.get.response.companyName")}
+            value={session.companyName ?? "-"}
+          />
+          <DetailField
+            label={t("sessionGet.get.response.cashierName")}
+            value={session.cashierName ?? "-"}
+          />
+          <DetailField
+            label={t("sessionGet.get.response.openedAt")}
+            value={when(session.openedAt)}
+          />
+          {session.closedAt ? (
+            <DetailField
+              label={t("sessionGet.get.response.closedAt")}
+              value={when(session.closedAt)}
+            />
+          ) : null}
+        </DetailGrid>
       </Div>
 
-      {/* Actions */}
-      <Div className="flex flex-col gap-2">
-        {isOpen ? (
+      <Div className="flex flex-col divide-y overflow-hidden rounded-xl border bg-card">
+        <Span className="px-4 py-3 text-[15px] font-semibold">
+          {t("sessionGet.get.widget.drawerTitle")}
+        </Span>
+        <CashRow
+          label={t("sessionGet.get.response.openingFloat")}
+          value={money(session.openingFloat)}
+        />
+        <CashRow
+          label={t("sessionGet.get.response.cashSalesTotal")}
+          value={money(session.cashSalesTotal)}
+        />
+        <CashRow
+          label={t("sessionGet.get.response.cashRefundsTotal")}
+          value={money(
+            session.cashRefundsTotal === 0 ? 0 : -session.cashRefundsTotal,
+          )}
+        />
+        <CashRow
+          label={t("sessionGet.get.response.expectedCash")}
+          value={money(session.expectedCash)}
+          strong
+        />
+        {closing !== null && variance !== null ? (
           <>
-            <Button
-              type="button"
-              variant="default"
-              size="lg"
-              className="w-full"
-              onClick={() => handleNewOrder(session.id, session.currency)}
-            >
-              {t("sessionGet.get.widget.newOrder")}
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              className="w-full"
-              onClick={() => handleViewOrders(session.id)}
-            >
-              {t("sessionGet.get.widget.viewOrders")}
-            </Button>
-            <Button
-              type="button"
-              variant="destructive"
-              size="sm"
-              className="w-full"
-              onClick={() => handleCloseSession(session.id)}
-            >
-              {t("sessionGet.get.widget.closeSession")}
-            </Button>
+            <CashRow
+              label={t("sessionGet.get.response.closingFloat")}
+              value={money(closing)}
+              strong
+            />
+            <CashRow
+              label={t("sessionGet.get.widget.variance")}
+              value={`${variance > 0 ? "+" : ""}${money(variance)}`}
+              strong
+              tone={tone}
+            />
           </>
-        ) : (
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            className="w-full"
-            onClick={() => handleViewOrders(session.id)}
-          >
-            {t("sessionGet.get.widget.viewOrders")}
-          </Button>
-        )}
+        ) : null}
       </Div>
-    </Div>
+    </WidgetShell>
   );
 }

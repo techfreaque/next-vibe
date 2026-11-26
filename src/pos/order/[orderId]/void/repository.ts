@@ -32,6 +32,7 @@ export class PosOrderVoidRepository {
     ResponseType<{
       result: {
         id: string;
+        sessionId: string;
         status: string;
       };
     }>
@@ -56,7 +57,7 @@ export class PosOrderVoidRepository {
           notFound: t("orderVoid.post.errors.notFound.title"),
           conflict: t("orderVoid.post.errors.conflict.title"),
         },
-        async (tx) => {
+        async (tx, order) => {
           const [updated] = await tx
             .update(posOrders)
             .set({
@@ -77,7 +78,9 @@ export class PosOrderVoidRepository {
             });
           }
 
-          return success({ result: updated });
+          return success({
+            result: { ...updated, sessionId: order.sessionId },
+          });
         },
         { beforeTender: t("orderVoid.post.widget.tendered") },
       );

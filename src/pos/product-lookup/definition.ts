@@ -43,6 +43,13 @@ const { GET } = createEndpoint({
   allowedRoles: [UserRole.ADMIN],
   icon: "search",
 
+  options: {
+    formOptions: {
+      autoSubmit: true,
+      debounceMs: 250,
+    },
+  },
+
   fields: customWidgetObject({
     render: PosProductLookupWidgetLazy,
     usage: { request: "data", response: true },
@@ -60,7 +67,14 @@ const { GET } = createEndpoint({
         label: "productLookup.get.query.label",
         description: "productLookup.get.query.description",
         placeholder: "productLookup.get.query.placeholder",
-        schema: z.string().min(1),
+        schema: z.string().max(120).optional(),
+      }),
+      currency: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "productLookup.get.currency.label",
+        description: "productLookup.get.currency.description",
+        schema: z.string().length(3).optional(),
       }),
       page: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -181,6 +195,7 @@ const { GET } = createEndpoint({
       default: {
         companyId: undefined,
         query: "coffee",
+        currency: "EUR",
         page: 1,
         pageSize: 20,
       },

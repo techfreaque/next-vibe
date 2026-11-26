@@ -189,6 +189,69 @@ export const posPayments = pgTable(
 );
 
 /**
+ * POS Refunds table
+ * A refund against a completed order. The order keeps its COMPLETED status
+ * (the sale happened); refunds are separate documents with their own date.
+ */
+export const posRefunds = pgTable(
+  "pos_refunds",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    orderId: uuid("order_id")
+      .notNull()
+      .references(() => posOrders.id, { onDelete: "restrict" }),
+    // Session whose drawer paid a cash refund (required for cash, optional otherwise)
+    sessionId: uuid("session_id").references(() => posSessions.id, {
+      onDelete: "restrict",
+    }),
+    refundNumber: text("refund_number").notNull(),
+    method: text("method", { enum: PosPaymentMethodDB }).notNull(),
+    currency: text("currency").notNull(),
+    subtotal: numericNumber("subtotal").notNull(),
+    taxAmount: numericNumber("tax_amount").notNull(),
+    total: numericNumber("total").notNull(),
+    reason: text("reason").notNull(),
+    // Soft ref — no FK — points to journalEntries.id
+    journalEntryId: uuid("journal_entry_id"),
+    createdByUserId: uuid("created_by_user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "restrict" }),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_pos_refunds_order").on(table.orderId),
+    index("idx_pos_refunds_session").on(table.sessionId),
+    index("idx_pos_refunds_created_at").on(table.createdAt),
+  ],
+);
+
+/**
+ * POS Refund Lines table
+ * Quantity and amounts returned per original order line
+ */
+export const posRefundLines = pgTable(
+  "pos_refund_lines",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    refundId: uuid("refund_id")
+      .notNull()
+      .references(() => posRefunds.id, { onDelete: "cascade" }),
+    orderItemId: uuid("order_item_id")
+      .notNull()
+      .references(() => posOrderItems.id, { onDelete: "restrict" }),
+    quantity: numericNumber("quantity").notNull(),
+    // Gross share of the original line (same basis as posOrderItems.lineTotal)
+    lineTotal: numericNumber("line_total").notNull(),
+    taxAmount: numericNumber("tax_amount").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_pos_refund_lines_refund").on(table.refundId),
+    index("idx_pos_refund_lines_item").on(table.orderItemId),
+  ],
+);
+
+/**
  * Relations
  */
 export const posTerminalsRelations = relations(posTerminals, ({ many }) => ({
@@ -214,6 +277,7 @@ export const posOrdersRelations = relations(posOrders, ({ one, many }) => ({
   }),
   items: many(posOrderItems),
   payments: many(posPayments),
+  refunds: many(posRefunds),
 }));
 
 export const posOrderItemsRelations = relations(posOrderItems, ({ one }) => ({
@@ -227,6 +291,29 @@ export const posPaymentsRelations = relations(posPayments, ({ one }) => ({
   order: one(posOrders, {
     fields: [posPayments.orderId],
     references: [posOrders.id],
+  }),
+}));
+
+export const posRefundsRelations = relations(posRefunds, ({ one, many }) => ({
+  order: one(posOrders, {
+    fields: [posRefunds.orderId],
+    references: [posOrders.id],
+  }),
+  session: one(posSessions, {
+    fields: [posRefunds.sessionId],
+    references: [posSessions.id],
+  }),
+  lines: many(posRefundLines),
+}));
+
+export const posRefundLinesRelations = relations(posRefundLines, ({ one }) => ({
+  refund: one(posRefunds, {
+    fields: [posRefundLines.refundId],
+    references: [posRefunds.id],
+  }),
+  orderItem: one(posOrderItems, {
+    fields: [posRefundLines.orderItemId],
+    references: [posOrderItems.id],
   }),
 }));
 
@@ -248,6 +335,12 @@ export const insertPosOrderItemSchema = createInsertSchema(posOrderItems);
 export const selectPosPaymentSchema = createSelectSchema(posPayments);
 export const insertPosPaymentSchema = createInsertSchema(posPayments);
 
+export const selectPosRefundSchema = createSelectSchema(posRefunds);
+export const insertPosRefundSchema = createInsertSchema(posRefunds);
+
+export const selectPosRefundLineSchema = createSelectSchema(posRefundLines);
+export const insertPosRefundLineSchema = createInsertSchema(posRefundLines);
+
 /**
  * Types
  */
@@ -265,3 +358,9 @@ export type NewPosOrderItem = z.infer<typeof insertPosOrderItemSchema>;
 
 export type PosPayment = z.infer<typeof selectPosPaymentSchema>;
 export type NewPosPayment = z.infer<typeof insertPosPaymentSchema>;
+
+export type PosRefund = z.infer<typeof selectPosRefundSchema>;
+export type NewPosRefund = z.infer<typeof insertPosRefundSchema>;
+
+export type PosRefundLine = z.infer<typeof selectPosRefundLineSchema>;
+export type NewPosRefundLine = z.infer<typeof insertPosRefundLineSchema>;

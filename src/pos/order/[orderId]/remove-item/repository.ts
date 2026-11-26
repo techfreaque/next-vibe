@@ -3,7 +3,7 @@
  * Removes a line item from an open order and recalculates totals
  */
 
-import { and, eq, sum } from "drizzle-orm";
+import { and, eq, sql, sum } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
@@ -14,6 +14,11 @@ import {
 } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { EndpointLogger } from "next-vibe/logger/types";
+
+import {
+  calculateSettledTaxLine,
+  LINE_SETTLEMENT_V1,
+} from "@/tax/line-settlement";
 
 import { posOrderItems, posOrders } from "../../../db";
 import { scopedTranslation } from "../../../i18n";
@@ -58,10 +63,15 @@ export class PosOrderRemoveItemRepository {
           notFound: t("orderRemoveItem.post.errors.notFound.title"),
           conflict: t("orderRemoveItem.post.errors.conflict.title"),
         },
-        async (tx) => {
+        async (tx, order) => {
           // Verify item belongs to this order
           const [item] = await tx
-            .select({ id: posOrderItems.id })
+            .select({
+              id: posOrderItems.id,
+              quantity: posOrderItems.quantity,
+              unitPrice: posOrderItems.unitPrice,
+              taxRate: posOrderItems.taxRate,
+            })
             .from(posOrderItems)
             .where(
               and(
@@ -78,10 +88,37 @@ export class PosOrderRemoveItemRepository {
             });
           }
 
-          // Delete the item
-          await tx
-            .delete(posOrderItems)
-            .where(eq(posOrderItems.id, details.itemId));
+          const remaining =
+            details.quantity === undefined
+              ? 0
+              : Math.round(
+                  (Number(item.quantity) - details.quantity) * 10_000,
+                ) / 10_000;
+          if (remaining > 0) {
+            // Register minus button: lower the quantity, keep the line.
+            const net = sql`round(${remaining}::numeric * ${item.unitPrice}::numeric,4)`;
+            const settled =
+              order.lineSettlement === LINE_SETTLEMENT_V1
+                ? calculateSettledTaxLine({
+                    quantity: remaining,
+                    unitPrice: Number(item.unitPrice),
+                    taxRate: Number(item.taxRate),
+                  })
+                : undefined;
+            const legacyTax = sql`round(${net} * ${item.taxRate}::numeric,4)`;
+            await tx
+              .update(posOrderItems)
+              .set({
+                quantity: remaining,
+                taxAmount: settled?.taxAmount ?? legacyTax,
+                lineTotal: settled?.lineTotal ?? sql`${net} + ${legacyTax}`,
+              })
+              .where(eq(posOrderItems.id, details.itemId));
+          } else {
+            await tx
+              .delete(posOrderItems)
+              .where(eq(posOrderItems.id, details.itemId));
+          }
 
           // Recalculate order totals
           const [totals] = await tx

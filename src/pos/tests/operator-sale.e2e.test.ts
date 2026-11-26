@@ -23,6 +23,7 @@ import { LINE_SETTLEMENT_V1 } from "@/tax/line-settlement";
 import { posOrderItems, posOrders, posPayments, posSessions, posTerminals } from "../db";
 import { PosOrderStatus, PosPaymentMethod, PosSessionStatus } from "../enum";
 import { scopedTranslation } from "../i18n";
+import { scopedTranslation as registerTranslation } from "../session/[sessionId]/register/i18n";
 import { PosOrderAddItemRepository } from "../order/[orderId]/add-item/repository";
 import { PosOrderAddPaymentRepository } from "../order/[orderId]/add-payment/repository";
 import { PosOrderCompleteRepository } from "../order/[orderId]/complete/repository";
@@ -155,8 +156,10 @@ describe("POS operator cash and stock on Atlas", () => {
         new URL(reply.url()).pathname.endsWith(suffix),
     );
 
+    const { t: reg } = registerTranslation.scopedT("en-US");
     const closeDrawer = async (sessionId: string): Promise<void> => {
-      await click(t("sessionGet.get.widget.closeSession"));
+      await page.goto(`${baseUrl}/en-US/tools/pos-register?sessionId=${sessionId}`, { waitUntil: "commit", timeout: 60_000 });
+      await click(reg("widget.closeTill"));
       await page.getByLabel(t("sessionClose.post.closingFloat.label"), { exact: true }).fill("74.59");
       const closing = waitForPost("/pos/session/close");
       await click(t("sessionGet.get.widget.closeSession"));
@@ -189,7 +192,7 @@ describe("POS operator cash and stock on Atlas", () => {
         }
         await backToOrders.click();
         await page.waitForURL((url) => url.pathname.endsWith("/tools/pos-order-list"));
-        await show(`#${orderNumber}`);
+        await show(orderNumber);
       }
     };
 
@@ -223,8 +226,10 @@ describe("POS operator cash and stock on Atlas", () => {
         scopedReads.add(`/api/${language}/pos/order/${orderId}/get`);
       }
       await page.goto(`${baseUrl}/en-US/tools/pos-dashboard?arg.companyId=${companyId}`, { waitUntil: "commit", timeout: 60_000 });
+      for (const language of localePaths) {
+        scopedReads.add(`/api/${language}/pos/session/${sessionId}/register`);
+      }
       await show(terminalName);
-      await click(t("dashboard.get.widget.viewSession"));
       await closeDrawer(sessionId);
       await verifyDirectReceipts(orderId, orderNumber);
       return;
@@ -232,22 +237,31 @@ describe("POS operator cash and stock on Atlas", () => {
 
     await page.goto(`${baseUrl}/en-US/tools/pos-dashboard?arg.companyId=${companyId}`, { waitUntil: "domcontentloaded" });
     await show(terminalName);
-    await click(t("dashboard.get.widget.openSession"));
+    await click(t("dashboard.get.widget.openTill"));
     await page.getByLabel(t("sessionOpen.post.openingFloat.label"), { exact: true }).fill("50");
     const opening = waitForPost("/pos/session/open");
-    await click(t("dashboard.get.widget.openSession"));
+    await click(t("dashboard.get.widget.openTill"));
     const opened = await opening;
     expect(opened.ok()).toBe(true);
     const sessionId = resultId.parse(await opened.json()).data.result.id;
     receiptSessionId = sessionId;
     for (const locale of localePaths) {
       scopedReads.add(`/api/${locale}/pos/session/${sessionId}/get`);
+      scopedReads.add(`/api/${locale}/pos/session/${sessionId}/register`);
     }
-    await click(t("workflow.openDrawer"));
-    await click(t("sessionGet.get.widget.newOrder"));
-    await page.getByLabel(t("orderCreate.post.sessionId.label"), { exact: true }).waitFor();
+
+    // The till screen: a scanner types the SKU and Enter, the sale starts itself.
+    const search = page.locator("#pos-register-search");
+    const openRegister = page.getByRole("button", { name: t("dashboard.get.widget.openRegister"), exact: true });
+    await search.or(openRegister).first().waitFor({ timeout: 60_000 });
+    if (await openRegister.isVisible()) {
+      await openRegister.click();
+    }
+    await search.waitFor({ timeout: 60_000 });
     const creating = waitForPost("/pos/order/create");
-    await click(t("sessionGet.get.widget.newOrder"));
+    const adding = waitForPost("/add-item");
+    await search.fill("FIX-POS-1");
+    await search.press("Enter");
     const created = await creating;
     expect(created.ok()).toBe(true);
     const orderId = resultId.parse(await created.json()).data.result.id;
@@ -255,39 +269,25 @@ describe("POS operator cash and stock on Atlas", () => {
       scopedReads.add(`/api/${locale}/pos/order/${orderId}/get`);
     }
     const orderPath = `pos/order/${orderId}`;
-
-    await page.getByRole("button", { name: t("orderCreate.post.widget.addItem") }).last().click();
-    await page.getByPlaceholder(t("orderAddItem.post.widget.searchPlaceholder")).fill("FIX-POS-1");
-    await click(t("orderAddItem.post.widget.searchButton"));
-    await page.getByRole("button", { name: new RegExp(productName, "u") }).click();
-    const adding = waitForPost("/add-item");
-    await click(t("orderGet.get.widget.addItem"));
     expect((await adding).ok()).toBe(true);
-    await show(t("orderAddItem.post.success.title"));
-    await click(t("orderAddItem.post.widget.backToOrder"));
     await show(productName);
-
-    await click(t("orderGet.get.widget.addPayment"));
-    await show(t("workflow.amountDue"));
     await show(formatMoney(24.59, "PLN", "en-US"));
-    await page.getByLabel(t("orderAddPayment.post.amount.label"), { exact: true }).fill("25");
-    await show(formatMoney(0.41, "PLN", "en-US"));
+
+    await page.getByLabel(reg("widget.tender.amount"), { exact: true }).fill("25");
+    await show(reg("widget.tender.changeHint", { amount: formatMoney(0.41, "PLN", "en-US") }));
     if (process.env["POS_OPERATOR_SHOTS"] === "1") {
       await saveAdminViewMatrix(page, "pos", "operator-tender-en");
     }
     const paying = waitForPost("/add-payment");
-    await click(t("orderGet.get.widget.addPayment"));
+    const completing = waitForPost("/complete");
+    await click(reg("widget.tender.take", { amount: formatMoney(25, "PLN", "en-US") }));
     const paid = await paying;
     expect(paid.ok()).toBe(true);
     expect(await paid.json()).toMatchObject({ success: true, data: { result: { change: 0.41, outstanding: 0 } } });
-    await show(t("orderAddPayment.post.success.title"));
-    await click(t("orderAddPayment.post.widget.backToOrder"));
-    await click(t("orderGet.get.widget.complete"));
-    await show(t("orderComplete.post.widget.confirmTitle"));
-    const completing = waitForPost("/complete");
-    await click(t("orderGet.get.widget.complete"));
     expect((await completing).ok()).toBe(true);
-    await click(t("workflow.viewReceipt"));
+    await show(reg("widget.receipt.title"));
+    await show(reg("widget.receipt.giveChange"));
+    await click(reg("widget.receipt.open"));
     await show(t("workflow.receiptTitle"));
     expect(await page.getByRole("button", { name: t("orderGet.get.widget.back"), exact: true }).isVisible()).toBe(true);
     await show(t("orderGet.get.widget.completedReadOnly"));
@@ -295,7 +295,6 @@ describe("POS operator cash and stock on Atlas", () => {
     if (process.env["POS_OPERATOR_SHOTS"] === "1") {
       await saveAdminViewMatrix(page, "pos", "operator-receipt-en");
     }
-    await click(t("dashboard.get.widget.viewSession"));
     await closeDrawer(sessionId);
 
     const [drawer] = await db.select().from(posSessions).where(eq(posSessions.id, sessionId));

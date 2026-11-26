@@ -15,3 +15,20 @@ export async function refreshPosOrder(
     urlPathParams: { orderId },
   });
 }
+
+/** Refresh the till screen of a session after a sale starts, ends or is voided. */
+export async function refreshPosRegister(
+  sessionId: string | undefined,
+  logger: EndpointLogger,
+): Promise<void> {
+  if (!sessionId) {
+    return;
+  }
+  const [{ apiClient }, { default: endpoint }] = await Promise.all([
+    import("next-vibe/unified-ui/hooks/store"),
+    import("../session/[sessionId]/register/definition"),
+  ]);
+  await apiClient.refetchEndpoint(endpoint.GET, logger, {
+    urlPathParams: { sessionId },
+  });
+}

@@ -22,7 +22,7 @@ import {
 import { z } from "zod";
 
 import { scopedTranslation } from "../../../i18n";
-import { refreshPosOrder } from "../../refresh";
+import { refreshPosOrder, refreshPosRegister } from "../../refresh";
 
 const PosOrderCompleteWidgetLazy = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.PosOrderCompleteWidget })),
@@ -43,8 +43,12 @@ const { POST } = createEndpoint({
 
   options: {
     mutationOptions: {
-      onSuccess: ({ pathParams, logger }) =>
-        refreshPosOrder(pathParams.orderId, logger),
+      onSuccess: async ({ pathParams, responseData, logger }) => {
+        await Promise.all([
+          refreshPosOrder(pathParams.orderId, logger),
+          refreshPosRegister(responseData.result.sessionId, logger),
+        ]);
+      },
     },
   },
 
@@ -79,6 +83,11 @@ const { POST } = createEndpoint({
           id: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             label: "orderComplete.post.response.id",
+            schema: z.uuid(),
+          }),
+          sessionId: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            hidden: true,
             schema: z.uuid(),
           }),
           status: responseField(scopedTranslation, {
@@ -158,6 +167,7 @@ const { POST } = createEndpoint({
       default: {
         result: {
           id: "eeff1122-e89b-12d3-a456-426614174003",
+          sessionId: "ccddee00-e89b-12d3-a456-426614174002",
           status: "COMPLETED",
           total: 8.4,
           journalEntryId: "aabb1234-e89b-12d3-a456-426614174099",

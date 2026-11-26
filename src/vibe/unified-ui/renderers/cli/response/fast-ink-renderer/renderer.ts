@@ -478,6 +478,16 @@ function renderBox(node: RenderNode): string {
 
   let output = "";
 
+  // Row children that the web spaces apart (gap, justify-between, ...) would
+  // otherwise be glued together ("Total€47.60"): one space stands in for it.
+  const rowSeparator =
+    (props.columnGap ?? props.gap ?? 0) > 0 ||
+    props.justifyContent === "space-between" ||
+    props.justifyContent === "space-around" ||
+    props.justifyContent === "space-evenly"
+      ? " "
+      : "";
+
   // FlexDirection determines how children are joined
   // Exhaustive switch to ensure all flex directions are handled
   const flexDirection = props.flexDirection ?? "row"; // default is row
@@ -489,10 +499,10 @@ function renderBox(node: RenderNode): string {
       output = childOutputs.toReversed().join("\n");
       break;
     case "row":
-      output = childOutputs.join("");
+      output = childOutputs.join(rowSeparator);
       break;
     case "row-reverse":
-      output = childOutputs.toReversed().join("");
+      output = childOutputs.toReversed().join(rowSeparator);
       break;
     default: {
       // Exhaustive check - if Ink adds new flexDirection values, TypeScript will error here

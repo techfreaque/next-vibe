@@ -64,7 +64,9 @@ beforeAll(async () => {
       id uuid PRIMARY KEY, session_id uuid, currency text, status text,
       updated_at timestamp, journal_entry_id uuid
     );
-    CREATE TABLE pos_order_items (order_id uuid, tax_rate numeric(12,4), tax_amount numeric(12,4), line_total numeric(12,4));
+    CREATE TABLE pos_order_items (order_id uuid, tax_rate numeric(12,4), tax_amount numeric(12,4), line_total numeric(12,4), id uuid);
+    CREATE TABLE pos_refunds (id uuid PRIMARY KEY, order_id uuid, currency text, created_at timestamp);
+    CREATE TABLE pos_refund_lines (refund_id uuid, order_item_id uuid, line_total numeric(12,4), tax_amount numeric(12,4));
     CREATE TABLE pos_payments (order_id uuid, amount numeric(12,4));
 
     INSERT INTO companies (id, currency, name) VALUES
@@ -217,6 +219,44 @@ test("counts completed till lines once in the selected currency and UTC range", 
 
 afterAll(async () => {
   await pg.close();
+});
+
+test("POS refunds give back output VAT in the refund period", async () => {
+  await pg.exec(`
+    INSERT INTO pos_orders VALUES
+      ('${id(81)}', '${id(53)}', 'EUR', '${PosOrderStatus.COMPLETED}', '2026-05-15', null);
+    INSERT INTO pos_order_items VALUES ('${id(81)}', 0.2, 20, 120, '${id(82)}');
+    INSERT INTO pos_refunds VALUES
+      ('${id(83)}', '${id(81)}', 'EUR', '2026-06-10'),
+      ('${id(84)}', '${id(81)}', 'EUR', '2026-07-01');
+    INSERT INTO pos_refund_lines VALUES
+      ('${id(83)}', '${id(82)}', 60, 10),
+      ('${id(84)}', '${id(82)}', 60, 10);
+  `);
+  const { TaxReportRepository } = await import("./repository");
+  const june = await TaxReportRepository.getReport(
+    {
+      companyId,
+      dateFrom: new Date("2026-06-01"),
+      dateTo: new Date("2026-06-30"),
+    },
+    userId,
+    createEndpointLogger(false, defaultLocale),
+    defaultLocale,
+  );
+  expect(june).toMatchObject({
+    success: true,
+    data: {
+      rows: [
+        {
+          direction: TaxReportDirection.POS_SALES,
+          rate: 0.2,
+          taxableAmount: -50,
+          taxAmount: -10,
+        },
+      ],
+    },
+  });
 });
 
 test("groups saved document-line tax by direction and rate within the company, date, and currency", async () => {

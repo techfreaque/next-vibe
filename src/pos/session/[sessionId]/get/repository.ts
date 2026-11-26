@@ -14,6 +14,7 @@ import {
 } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
+import { users } from "next-vibe/identity/user/db";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { companies } from "@/companies/db";
@@ -22,6 +23,7 @@ import { CompanyAuthRepository } from "@/companies/repository";
 
 import { posSessions, posTerminals } from "../../../db";
 import { scopedTranslation } from "../../../i18n";
+import { getPosSessionCash } from "../../cash-totals";
 export class PosSessionGetRepository {
   static async getSession(
     sessionId: string,
@@ -37,11 +39,15 @@ export class PosSessionGetRepository {
         terminalName?: string;
         companyName?: string;
         cashierUserId: string;
+        cashierName?: string;
         status: string;
         openedAt: Date;
         closedAt: Date | null;
         openingFloat: number;
         closingFloat: number | null;
+        cashSalesTotal: number;
+        cashRefundsTotal: number;
+        expectedCash: number;
       };
     }>
   > {
@@ -58,8 +64,10 @@ export class PosSessionGetRepository {
           closedAt: posSessions.closedAt,
           openingFloat: posSessions.openingFloat,
           closingFloat: posSessions.closingFloat,
+          cashierName: users.privateName,
         })
         .from(posSessions)
+        .leftJoin(users, eq(users.id, posSessions.cashierUserId))
         .where(eq(posSessions.id, sessionId))
         .limit(1);
 
@@ -102,9 +110,17 @@ export class PosSessionGetRepository {
         }
       }
 
+      const cash = await getPosSessionCash(
+        db,
+        session.id,
+        session.openingFloat,
+      );
+
       return success({
         result: {
           ...session,
+          cashierName: session.cashierName ?? undefined,
+          ...cash,
           currency: terminal.currency,
           terminalName: terminal.terminalName,
           companyName: terminal.companyName,

@@ -1,17 +1,16 @@
 "use client";
 
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { Badge } from "next-vibe/ui/components/badge";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
 import { Span } from "next-vibe/ui/components/span";
+import {
+  StatusPill,
+  type StatusPillVariant,
+} from "next-vibe/ui/components/status-pill";
 import { WidgetHeader } from "next-vibe/ui/components/widget-header";
 import { WidgetShell } from "next-vibe/ui/components/widget-shell";
-import {
-  formatMoney,
-  formatQuantity,
-} from "next-vibe/unified-ui/_shared/format-money";
+import { formatQuantity } from "next-vibe/unified-ui/_shared/format-money";
 import {
   useWidgetLocale,
   useWidgetNavigation,
@@ -21,7 +20,7 @@ import {
 import { EntityPickerFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/entity-picker-field/widget";
 import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
-import { type JSX } from "react";
+import type { JSX } from "react";
 
 import {
   PosOrderStatus,
@@ -31,35 +30,15 @@ import {
 import { formatPosSettlement } from "../../format-settlement";
 import { isPosMinorUnitAmount } from "../../settlement-amounts";
 import type definition from "./definition";
-import type { PosOrderGetResponseOutput } from "./definition";
 
-type OrderItem = NonNullable<
-  PosOrderGetResponseOutput["result"]
->["items"][number];
-type OrderPayment = NonNullable<
-  PosOrderGetResponseOutput["result"]
->["payments"][number];
-
-function orderStatusBadgeClass(status: string): string {
-  if (status.includes("open")) {
-    return "bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300";
+function statusVariant(status: string): StatusPillVariant {
+  if (status === PosOrderStatus.COMPLETED) {
+    return "success";
   }
-  if (status.includes("completed")) {
-    return "bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300";
+  if (status === PosOrderStatus.OPEN) {
+    return "info";
   }
-  return "bg-muted text-muted-foreground";
-}
-
-function paymentMethodBadgeVariant(
-  method: string,
-): "default" | "secondary" | "outline" {
-  if (method.includes("cash")) {
-    return "default";
-  }
-  if (method.includes("card")) {
-    return "secondary";
-  }
-  return "outline";
+  return "muted";
 }
 
 export function PosOrderGetWidget({
@@ -73,104 +52,12 @@ export function PosOrderGetWidget({
   const locale = useWidgetLocale();
   const order = data?.result;
 
-  const handleAddItem = (orderId: string): void => {
-    void (async (): Promise<void> => {
-      const def = await import("../add-item/definition");
-      navigation.push(def.default.POST, {
-        urlPathParams: { orderId },
-        data: {
-          orderId,
-          item: {
-            productId: undefined,
-            description: "",
-            quantity: 1,
-            unitPrice: 0,
-            taxRate: undefined,
-          },
-        },
-      });
-    })();
-  };
-
-  const handleAddPayment = (orderId: string): void => {
-    void (async (): Promise<void> => {
-      const def = await import("../add-payment/definition");
-      const { PosPaymentMethod } = await import("@/pos/enum");
-      navigation.push(def.default.POST, {
-        urlPathParams: { orderId },
-        data: {
-          details: {
-            orderId,
-            method: PosPaymentMethod.CASH,
-            amount: 0,
-            change: undefined,
-            reference: undefined,
-            accountNodeId: undefined,
-          },
-        },
-      });
-    })();
-  };
-
-  const handleComplete = (orderId: string): void => {
-    void (async (): Promise<void> => {
-      const def = await import("../complete/definition");
-      navigation.push(def.default.POST, {
-        urlPathParams: { orderId },
-        data: { orderId },
-      });
-    })();
-  };
-
-  const handleVoid = (orderId: string): void => {
-    void (async (): Promise<void> => {
-      const def = await import("../void/definition");
-      navigation.push(def.default.POST, {
-        urlPathParams: { orderId },
-        data: { orderId },
-      });
-    })();
-  };
-
-  const handleViewSession = (sessionId: string): void => {
-    void (async (): Promise<void> => {
-      const def = await import("../../../session/[sessionId]/get/definition");
-      navigation.push(def.default.GET, { urlPathParams: { sessionId } });
-    })();
-  };
-
-  const handleViewJournalEntry = (journalEntryId: string): void => {
-    void (async (): Promise<void> => {
-      const def =
-        await import("@/chart-of-accounts/journal/[entryId]/get/definition");
-      navigation.push(def.default.GET, {
-        urlPathParams: { entryId: journalEntryId },
-      });
-    })();
-  };
-
-  const handleViewSessionOrders = (sessionId: string): void => {
-    void (async (): Promise<void> => {
-      const def = await import("../../list/definition");
-      navigation.push(def.default.GET, {
-        data: {
-          input: { sessionId, status: undefined },
-          page: 1,
-          pageSize: 50,
-        },
-      });
-    })();
-  };
-
-  const fmt = (n: number, currency: string): string =>
-    formatMoney(n, currency, locale);
-
   const back = navigation.canGoBack ? (
     <Button
       type="button"
       variant="ghost"
       size="sm"
-      className="self-start gap-1.5 -ml-1"
+      className="-ml-1 gap-1.5"
       onClick={() => navigation.pop()}
     >
       <ChevronLeft className="h-4 w-4" />
@@ -193,16 +80,24 @@ export function PosOrderGetWidget({
     );
   }
 
+  const money = (value: number): string =>
+    formatPosSettlement(value, order.currency, locale);
   const isOpen = order.status === PosOrderStatus.OPEN;
-  const isVoided = order.status === PosOrderStatus.VOIDED;
   const isCompleted = order.status === PosOrderStatus.COMPLETED;
-  const totalPaid = order.payments.reduce(
-    (sum: number, p: OrderPayment) =>
-      sum + Math.round(p.amount * 10_000) - Math.round(p.change * 10_000),
+  const isVoided = order.status === PosOrderStatus.VOIDED;
+  const paidUnits = order.payments.reduce(
+    (sum, payment) =>
+      sum +
+      Math.round(payment.amount * 10_000) -
+      Math.round(payment.change * 10_000),
     0,
   );
-  const outstanding = (Math.round(order.total * 10_000) - totalPaid) / 10_000;
-  const canEdit = isOpen && order.payments.length === 0;
+  const outstanding = (Math.round(order.total * 10_000) - paidUnits) / 10_000;
+  const changeGiven =
+    order.payments.reduce(
+      (sum, payment) => sum + Math.round(payment.change * 10_000),
+      0,
+    ) / 10_000;
   const legacyTender =
     !isPosMinorUnitAmount(order.total) ||
     order.payments.some(
@@ -210,237 +105,211 @@ export function PosOrderGetWidget({
         !isPosMinorUnitAmount(amount) || !isPosMinorUnitAmount(change),
     );
   const translatedStatus = PosOrderStatusDB.find((key) => key === order.status);
+  const methodLabel = (method: string): string => {
+    const key = PosPaymentMethodDB.find((entry) => entry === method);
+    return key ? t(key) : method;
+  };
+
+  const openSessionOrders = (): void => {
+    void import("../../list/definition").then((def) =>
+      navigation.push(def.default.GET, {
+        data: {
+          input: { sessionId: order.sessionId, status: undefined },
+          page: 1,
+          pageSize: 50,
+        },
+      }),
+    );
+  };
+  const openRegister = (): void => {
+    void import("../../../session/[sessionId]/register/definition").then(
+      (def) =>
+        navigation.push(def.default.GET, {
+          urlPathParams: { sessionId: order.sessionId },
+        }),
+    );
+  };
+  const openSession = (): void => {
+    void import("../../../session/[sessionId]/get/definition").then((def) =>
+      navigation.push(def.default.GET, {
+        urlPathParams: { sessionId: order.sessionId },
+      }),
+    );
+  };
+  const openRefunds = (): void => {
+    void import("../refund/definition").then((def) =>
+      navigation.push(def.default.GET, {
+        urlPathParams: { orderId: order.id },
+      }),
+    );
+  };
+  const openJournal = (entryId: string): void => {
+    void import("@/chart-of-accounts/journal/[entryId]/get/definition").then(
+      (def) => navigation.push(def.default.GET, { urlPathParams: { entryId } }),
+    );
+  };
 
   return (
     <WidgetShell layout="page" className="mx-auto max-w-3xl">
-      {!navigation.canGoBack && (
+      {!navigation.canGoBack ? (
         <Button
           type="button"
           variant="ghost"
           size="sm"
-          className="self-start gap-1.5 -ml-1"
-          onClick={() => handleViewSessionOrders(order.sessionId)}
+          className="-ml-1 gap-1.5 self-start"
+          onClick={openSessionOrders}
         >
           <ChevronLeft className="h-4 w-4" />
           {t("workflow.backToSessionOrders")}
         </Button>
-      )}
+      ) : null}
       <WidgetHeader
         title={t(isCompleted ? "workflow.receiptTitle" : "orderGet.get.title")}
+        size="page"
         backButton={back}
         titleAccessory={
-          <Span
-            className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${orderStatusBadgeClass(order.status)}`}
-          >
-            {translatedStatus ? t(translatedStatus) : order.status}
-          </Span>
+          <StatusPill
+            status={order.status}
+            variant={statusVariant(order.status)}
+            label={translatedStatus ? t(translatedStatus) : order.status}
+            className={isVoided ? "line-through" : undefined}
+          />
+        }
+        actions={
+          isOpen ? (
+            <Button type="button" onClick={openRegister}>
+              {t("dashboard.get.widget.openRegister")}
+            </Button>
+          ) : undefined
         }
       />
       <Div className="flex min-w-0 flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
-        <Span className="min-w-0 font-mono text-sm font-medium [overflow-wrap:anywhere]">
+        <Span className="min-w-0 text-sm font-semibold [overflow-wrap:anywhere]">
           #{order.orderNumber}
         </Span>
-        <Span className="text-xs text-muted-foreground tabular-nums">
-          {new Date(order.createdAt).toLocaleString(locale)}
+        <Span className="text-sm text-muted-foreground tabular-nums">
+          {new Date(order.createdAt).toLocaleString(locale, {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+          })}
         </Span>
       </Div>
       <FormAlertWidget field={{}} />
 
-      {/* Total summary */}
-      <Div className="rounded-lg border overflow-hidden divide-y">
-        <Div className="flex items-center justify-between px-4 py-3">
-          <Span className="text-sm text-muted-foreground">
-            {t("orderGet.get.response.subtotal")}
+      {isCompleted ? (
+        <Span className="text-sm text-muted-foreground">
+          {t("orderGet.get.widget.completedReadOnly")}
+        </Span>
+      ) : null}
+
+      <Div
+        className={`flex flex-col overflow-hidden rounded-xl border bg-card ${isVoided ? "opacity-70" : ""}`}
+      >
+        {order.items.length === 0 ? (
+          <Span className="px-4 py-6 text-center text-sm text-muted-foreground">
+            {t("orderGet.get.widget.noItems")}
           </Span>
-          <Span className="text-sm font-mono tabular-nums">
-            {formatPosSettlement(
-              Number(order.subtotal),
-              order.currency,
-              locale,
-            )}
-          </Span>
-        </Div>
-        {order.taxExemptionNotice && (
-          <Span className="text-sm text-muted-foreground">
-            {order.taxExemptionNotice}
-          </Span>
+        ) : (
+          <Div className="flex flex-col divide-y">
+            {order.items.map((item) => (
+              <Div
+                key={item.itemId}
+                className="flex items-start justify-between gap-3 px-4 py-3"
+              >
+                <Div className="min-w-0 flex-1">
+                  <Span className="block text-sm font-medium [overflow-wrap:anywhere]">
+                    {item.description}
+                  </Span>
+                  <Span className="text-xs text-muted-foreground tabular-nums">
+                    {formatQuantity(item.quantity, locale)}{" "}
+                    {t("orderGet.get.widget.qtyTimesPrice")}{" "}
+                    {money(item.unitPrice)}
+                  </Span>
+                </Div>
+                <Span className="shrink-0 text-sm font-semibold tabular-nums">
+                  {money(item.lineTotal)}
+                </Span>
+              </Div>
+            ))}
+          </Div>
         )}
-        {Number(order.taxAmount) > 0 ? (
-          <Div className="flex items-center justify-between px-4 py-3">
-            <Span className="text-sm text-muted-foreground">
-              {t("orderGet.get.response.taxAmount")}
+        <Div className="flex flex-col gap-1.5 border-t bg-muted/30 px-4 py-3">
+          <TotalRow
+            label={t("orderGet.get.response.subtotal")}
+            value={money(order.subtotal)}
+          />
+          {order.taxExemptionNotice ? (
+            <Span className="text-xs text-muted-foreground">
+              {order.taxExemptionNotice}
             </Span>
-            <Span className="text-sm font-mono tabular-nums">
-              {formatPosSettlement(
-                Number(order.taxAmount),
-                order.currency,
-                locale,
-              )}
+          ) : (
+            <TotalRow
+              label={t("orderGet.get.response.taxAmount")}
+              value={money(order.taxAmount)}
+            />
+          )}
+          <Div className="flex items-baseline justify-between gap-3 border-t pt-2">
+            <Span className="text-base font-semibold">
+              {t("orderGet.get.response.total")}
+            </Span>
+            <Span className="text-2xl font-bold tabular-nums">
+              {money(order.total)}
             </Span>
           </Div>
-        ) : null}
-        <Div className="flex items-center justify-between px-4 py-3 bg-muted/10">
-          <Span className="text-sm font-semibold">
-            {t("orderGet.get.response.total")}
-          </Span>
-          <Span className="text-lg font-mono font-bold tabular-nums">
-            {formatPosSettlement(Number(order.total), order.currency, locale)}
-          </Span>
+          {order.payments.map((payment) => (
+            <TotalRow
+              key={payment.paymentId}
+              label={methodLabel(payment.method)}
+              value={money(payment.amount)}
+              muted
+            />
+          ))}
+          {changeGiven > 0 ? (
+            <TotalRow
+              label={t("orderGet.get.response.change")}
+              value={money(changeGiven)}
+              muted
+            />
+          ) : null}
+          {isOpen && order.items.length > 0 ? (
+            <TotalRow
+              label={
+                outstanding > 0
+                  ? t("orderGet.get.widget.outstanding")
+                  : t("orderGet.get.widget.fullyPaid")
+              }
+              value={money(Math.max(outstanding, 0))}
+              strong
+            />
+          ) : null}
         </Div>
       </Div>
 
-      {/* Outstanding balance / fully paid indicator */}
-      {isOpen && order.items.length > 0 ? (
-        <OutstandingBalance
-          outstanding={outstanding}
-          currency={order.currency}
-          locale={locale}
-          t={t}
-        />
-      ) : null}
-
-      {/* Items list */}
-      {order.items.length > 0 ? (
-        <Div className="flex flex-col gap-1">
-          <Span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide px-1">
-            {t("orderGet.get.response.items")}
-          </Span>
-          <Div className="rounded-lg border overflow-hidden divide-y">
-            {order.items.map((item: OrderItem) => (
-              <Div
-                key={item.itemId}
-                className="flex items-center gap-3 px-4 py-3"
-              >
-                <Div className="flex-1 min-w-0">
-                  <Span className="text-sm font-medium truncate block">
-                    {item.description}
-                  </Span>
-                  <Span className="text-xs text-muted-foreground">
-                    {formatQuantity(item.quantity, locale)}{" "}
-                    {t("orderGet.get.widget.qtyTimesPrice")}{" "}
-                    {formatPosSettlement(
-                      item.unitPrice,
-                      order.currency,
-                      locale,
-                    )}
-                  </Span>
-                </Div>
-                <Span className="text-sm font-mono font-semibold tabular-nums shrink-0">
-                  {fmt(Number(item.lineTotal), order.currency)}
-                </Span>
-                {canEdit && (
-                  <Button
-                    type="button"
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => {
-                      void import("../remove-item/definition").then((mod) =>
-                        navigation.push(mod.default.POST, {
-                          urlPathParams: { orderId: order.id },
-                          data: {
-                            details: { orderId: order.id, itemId: item.itemId },
-                          },
-                        }),
-                      );
-                    }}
-                  >
-                    {t("orderRemoveItem.post.titleShort")}
-                  </Button>
-                )}
-              </Div>
-            ))}
-          </Div>
-        </Div>
-      ) : isOpen ? (
-        <Div className="flex flex-col items-center gap-2 py-6 text-center rounded-lg border border-dashed">
-          <Span className="text-sm text-muted-foreground">
-            {t("orderGet.get.widget.noItems")}
-          </Span>
-        </Div>
-      ) : null}
-
-      {legacyTender && (
+      {legacyTender ? (
         <Span className="text-sm text-muted-foreground">
           {t("workflow.legacyTenderRecorded")}
         </Span>
-      )}
-
-      {/* Payments list */}
-      {order.payments.length > 0 ? (
-        <Div className="flex flex-col gap-1">
-          <Span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide px-1">
-            {t("orderGet.get.response.payments")}
-          </Span>
-          <Div className="rounded-lg border overflow-hidden divide-y">
-            {order.payments.map((payment: OrderPayment) => (
-              <Div
-                key={payment.paymentId}
-                className="flex items-center gap-3 px-4 py-3"
-              >
-                <Badge
-                  variant={paymentMethodBadgeVariant(payment.method)}
-                  className="text-xs shrink-0"
-                >
-                  {PosPaymentMethodDB.filter((key) => key === payment.method)
-                    .map((key) => t(key))
-                    .at(0) ?? payment.method}
-                </Badge>
-                <Span className="flex-1 text-sm font-mono tabular-nums">
-                  {formatPosSettlement(
-                    Number(payment.amount),
-                    order.currency,
-                    locale,
-                  )}
-                </Span>
-                {Number(payment.change) > 0 ? (
-                  <Span className="text-xs text-muted-foreground tabular-nums shrink-0">
-                    {t("orderGet.get.response.change")}:{" "}
-                    {formatPosSettlement(
-                      Number(payment.change),
-                      order.currency,
-                      locale,
-                    )}
-                  </Span>
-                ) : null}
-              </Div>
-            ))}
-          </Div>
-        </Div>
       ) : null}
 
-      {/* VOIDED stamp */}
-      {isVoided ? (
-        <Div className="flex items-center justify-center rounded-lg border-2 border-dashed border-muted-foreground/40 py-4 opacity-60">
-          <Span className="text-2xl font-black tracking-widest text-muted-foreground select-none rotate-[-6deg] inline-block">
-            {t("orderGet.get.widget.voidedStamp")}
-          </Span>
-        </Div>
-      ) : null}
-
-      {/* COMPLETED read-only notice + journal entry */}
-      {isCompleted ? (
-        <Div className="flex flex-col gap-2">
-          <Div className="rounded-lg border border-green-500/30 bg-green-500/5 px-4 py-3">
-            <Span className="text-sm text-green-700 dark:text-green-400">
-              {t("orderGet.get.widget.completedReadOnly")}
-            </Span>
-          </Div>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={() => handleViewSession(order.sessionId)}
-          >
+      {!isOpen ? (
+        <Div className="flex flex-wrap gap-2">
+          {isCompleted ? (
+            <Button type="button" onClick={openRefunds}>
+              {t("orderGet.get.widget.refund")}
+            </Button>
+          ) : null}
+          <Button type="button" variant="outline" onClick={openSession}>
             {t("dashboard.get.widget.viewSession")}
           </Button>
           {order.journalEntryId ? (
             <Button
               type="button"
               variant="outline"
-              size="sm"
               onClick={() =>
-                order.journalEntryId &&
-                handleViewJournalEntry(order.journalEntryId)
+                order.journalEntryId && openJournal(order.journalEntryId)
               }
             >
               {t("orderGet.get.widget.viewJournalEntry")}
@@ -448,92 +317,27 @@ export function PosOrderGetWidget({
           ) : null}
         </Div>
       ) : null}
-
-      {/* Action buttons */}
-      {isOpen ? (
-        <Div className="flex flex-col gap-2">
-          <Div className="grid grid-cols-2 gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              disabled={!canEdit}
-              onClick={() => handleAddItem(order.id)}
-            >
-              + {t("orderGet.get.widget.addItem")}
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => handleAddPayment(order.id)}
-            >
-              {t("orderGet.get.widget.addPayment")}
-            </Button>
-          </Div>
-          <Button
-            type="button"
-            variant="default"
-            size="lg"
-            className="w-full"
-            onClick={() => handleComplete(order.id)}
-            disabled={outstanding > 0}
-          >
-            {t("orderGet.get.widget.complete")}
-          </Button>
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            className="w-full text-destructive hover:text-destructive"
-            disabled={!canEdit}
-            onClick={() => handleVoid(order.id)}
-          >
-            {t("orderGet.get.widget.void")}
-          </Button>
-        </Div>
-      ) : null}
     </WidgetShell>
   );
 }
 
-function OutstandingBalance({
-  outstanding,
-  currency,
-  locale,
-  t,
+function TotalRow({
+  label,
+  value,
+  muted = false,
+  strong = false,
 }: {
-  outstanding: number;
-  currency: string;
-  locale: CountryLanguage;
-  t: ReturnType<typeof useWidgetTranslation<typeof definition.GET>>;
+  label: string;
+  value: string;
+  muted?: boolean;
+  strong?: boolean;
 }): JSX.Element {
-  const fmt = (n: number): string => formatPosSettlement(n, currency, locale);
-
-  if (outstanding <= 0) {
-    return (
-      <Div className="flex items-center justify-between rounded-lg border border-green-500/30 bg-green-500/10 px-4 py-3">
-        <Span className="text-sm font-semibold text-green-700 dark:text-green-400">
-          {t("orderGet.get.widget.fullyPaid")}
-        </Span>
-        <Badge
-          variant="default"
-          className="text-xs bg-green-600 hover:bg-green-600"
-        >
-          ✓
-        </Badge>
-      </Div>
-    );
-  }
-
   return (
-    <Div className="flex items-center justify-between rounded-lg border border-destructive/30 bg-destructive/5 px-4 py-3">
-      <Span className="text-sm font-semibold">
-        {t("orderGet.get.widget.outstanding")}
-      </Span>
-      <Span className="text-lg font-mono font-bold text-destructive tabular-nums">
-        {fmt(outstanding)}
-      </Span>
+    <Div
+      className={`flex items-center justify-between gap-3 text-sm ${muted ? "text-muted-foreground" : ""} ${strong ? "font-semibold" : ""}`}
+    >
+      <Span>{label}</Span>
+      <Span className="tabular-nums">{value}</Span>
     </Div>
   );
 }

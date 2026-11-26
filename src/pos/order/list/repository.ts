@@ -3,7 +3,7 @@
  * Lists orders for a session with optional status filter and pagination
  */
 
-import { and, count, eq } from "drizzle-orm";
+import { and, count, desc, eq, inArray } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
@@ -16,6 +16,7 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
+import { companyMembers } from "@/companies/db";
 import { CompanyMemberRole } from "@/companies/enum";
 import { CompanyAuthRepository } from "@/companies/repository";
 
@@ -37,47 +38,66 @@ export class PosOrderListRepository {
 
     try {
       const sessionId = data.input.sessionId;
+      const conditions = [];
 
-      // Verify company membership via session → terminal → company
-      const [session] = await db
-        .select({ terminalId: posSessions.terminalId })
-        .from(posSessions)
-        .where(eq(posSessions.id, sessionId))
-        .limit(1);
-
-      if (!session) {
-        return fail({
-          message: t("orderList.get.errors.notFound.title"),
-          errorType: ErrorResponseTypes.NOT_FOUND,
-        });
+      if (sessionId) {
+        // Verify company membership via session -> terminal -> company
+        const [owner] = await db
+          .select({ companyId: posTerminals.companyId })
+          .from(posSessions)
+          .innerJoin(posTerminals, eq(posTerminals.id, posSessions.terminalId))
+          .where(eq(posSessions.id, sessionId))
+          .limit(1);
+        if (!owner) {
+          return fail({
+            message: t("orderList.get.errors.notFound.title"),
+            errorType: ErrorResponseTypes.NOT_FOUND,
+          });
+        }
+        const authResult = await CompanyAuthRepository.requireMember(
+          userId,
+          owner.companyId,
+          CompanyMemberRole.VIEWER,
+          logger,
+          locale,
+        );
+        if (!authResult.success) {
+          return authResult;
+        }
+        conditions.push(eq(posOrders.sessionId, sessionId));
+      } else if (data.companyId) {
+        const authResult = await CompanyAuthRepository.requireMember(
+          userId,
+          data.companyId,
+          CompanyMemberRole.VIEWER,
+          logger,
+          locale,
+        );
+        if (!authResult.success) {
+          return authResult;
+        }
+        conditions.push(eq(posTerminals.companyId, data.companyId));
+      } else {
+        // Sales history across every company the user belongs to.
+        const memberships = await db
+          .select({ companyId: companyMembers.companyId })
+          .from(companyMembers)
+          .where(
+            and(
+              eq(companyMembers.userId, userId),
+              eq(companyMembers.isActive, true),
+            ),
+          );
+        if (memberships.length === 0) {
+          return success({ count: 0, orders: [] });
+        }
+        conditions.push(
+          inArray(
+            posTerminals.companyId,
+            memberships.map((membership) => membership.companyId),
+          ),
+        );
       }
-
-      const [terminal] = await db
-        .select({ companyId: posTerminals.companyId })
-        .from(posTerminals)
-        .where(eq(posTerminals.id, session.terminalId))
-        .limit(1);
-
-      if (!terminal) {
-        return fail({
-          message: t("orderList.get.errors.notFound.title"),
-          errorType: ErrorResponseTypes.NOT_FOUND,
-        });
-      }
-
-      const authResult = await CompanyAuthRepository.requireMember(
-        userId,
-        terminal.companyId,
-        CompanyMemberRole.VIEWER,
-        logger,
-        locale,
-      );
-
-      if (!authResult.success) {
-        return authResult;
-      }
-
-      const conditions = [eq(posOrders.sessionId, sessionId)];
 
       if (data.input.status) {
         conditions.push(eq(posOrders.status, data.input.status));
@@ -88,6 +108,8 @@ export class PosOrderListRepository {
       const [{ value: total }] = await db
         .select({ value: count() })
         .from(posOrders)
+        .innerJoin(posSessions, eq(posSessions.id, posOrders.sessionId))
+        .innerJoin(posTerminals, eq(posTerminals.id, posSessions.terminalId))
         .where(where);
 
       const page = data.page ?? 1;
@@ -103,10 +125,13 @@ export class PosOrderListRepository {
           currency: posOrders.currency,
           total: posOrders.total,
           createdAt: posOrders.createdAt,
+          terminalName: posTerminals.name,
         })
         .from(posOrders)
+        .innerJoin(posSessions, eq(posSessions.id, posOrders.sessionId))
+        .innerJoin(posTerminals, eq(posTerminals.id, posSessions.terminalId))
         .where(where)
-        .orderBy(posOrders.createdAt)
+        .orderBy(desc(posOrders.createdAt))
         .limit(pageSize)
         .offset(offset);
 

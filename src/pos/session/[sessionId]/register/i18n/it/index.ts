@@ -1,0 +1,182 @@
+import type { translations as enTranslations } from "../en";
+
+export const translations: typeof enTranslations = {
+  tags: {
+    pos: "Cassa",
+    register: "Schermata cassa",
+  },
+  enums: {
+    sessionStatus: {
+      open: "Aperta",
+      closed: "Chiusa",
+    },
+  },
+  get: {
+    title: "Cassa",
+    titleShort: "Cassa",
+    description:
+      "Venda su una cassa aperta: scansioni o tocchi i prodotti, incassi, consegni lo scontrino.",
+    sessionId: {
+      label: "Turno di cassa",
+      description: "Il turno aperto su cui vende",
+    },
+    response: {
+      status: "Stato cassa",
+      terminalName: "Cassa",
+      companyName: "Azienda",
+      currency: "Valuta",
+      openedAt: "Aperta",
+      openingFloat: "Fondo cassa",
+      salesCount: "Vendite",
+      salesTotal: "Incasso",
+      openOrders: "Vendite sospese",
+      orderNumber: "Vendita",
+      itemCount: "Articoli",
+      total: "Totale",
+      createdAt: "Iniziata",
+    },
+    errors: {
+      validation: {
+        title: "Turno di cassa non valido",
+        description: "Apra la cassa dalla dashboard del punto vendita.",
+      },
+      unauthorized: {
+        title: "Accesso richiesto",
+        description: "Acceda per usare la cassa.",
+      },
+      forbidden: {
+        title: "Nessun accesso a questa cassa",
+        description: "Non è membro dell'azienda a cui appartiene questa cassa.",
+      },
+      conflict: {
+        title: "Cassa modificata",
+        description:
+          "La cassa è stata modificata altrove. Ricarichi e riprovi.",
+      },
+      server: {
+        title: "Impossibile caricare la cassa",
+        description:
+          "Qualcosa non ha funzionato da parte nostra. Riprovi tra poco.",
+      },
+      unknown: {
+        title: "Impossibile caricare la cassa",
+        description: "Si è verificato un errore imprevisto. Riprovi.",
+      },
+      network: {
+        title: "Nessuna connessione",
+        description: "Controlli la connessione e riprovi.",
+      },
+      notFound: {
+        title: "Turno non trovato",
+        description: "Questo turno non esiste più.",
+      },
+      unsavedChanges: {
+        title: "Modifiche non salvate",
+        description: "Concluda o annulli prima la vendita in corso.",
+      },
+    },
+    success: {
+      title: "Cassa pronta",
+      description: "La cassa è caricata.",
+    },
+  },
+  widget: {
+    back: "Indietro",
+    subtitle: "{{company}} · aperta dalle {{time}}",
+    takings: "Incasso del turno: {{total}} · Vendite: {{count}}",
+    sales: "Vendite",
+    closeTill: "Chiudi cassa",
+    search: {
+      label: "Cerca prodotti",
+      placeholder: "Scansioni un codice o cerchi un prodotto",
+      hint: "per cercare, Invio aggiunge l'articolo",
+      clear: "Cancella ricerca",
+    },
+    products: {
+      title: "Prodotti",
+      none: "Nessun risultato per «{{query}}».",
+      emptyCatalog: "Nessun prodotto attivo con prezzo in {{currency}}.",
+      addProducts: "Aggiungi prodotti",
+      inCart: "Nella vendita: {{count}}",
+      loading: "Caricamento prodotti",
+    },
+    custom: {
+      tile: "Articolo libero",
+      tileHint: "Importo libero",
+      title: "Articolo libero",
+      description: "Descrizione",
+      descriptionPlaceholder: "Confezione regalo",
+      price: "Prezzo",
+      vat: "IVA %",
+      add: "Aggiungi alla vendita",
+      cancel: "Annulla",
+    },
+    cart: {
+      title: "Vendita {{number}}",
+      newTitle: "Nuova vendita",
+      empty: "Scansioni o tocchi un prodotto per iniziare una vendita.",
+      items: "Articoli: {{count}}",
+      increase: "Un {{name}} in più",
+      decrease: "Un {{name}} in meno",
+      remove: "Rimuovi {{name}}",
+      each: "{{price}} cad.",
+      locked: "Pagamento registrato. Gli articoli sono bloccati.",
+      subtotal: "Imponibile",
+      vat: "IVA",
+      total: "Totale",
+      paid: "Pagato",
+      due: "Da pagare",
+      change: "Resto",
+      removePayment: "Rimuovi pagamento {{method}}",
+      parked: "Sospese",
+      park: "Sospendi",
+      resume: "Riprendi {{number}}",
+    },
+    tender: {
+      title: "Pagamento",
+      cash: "Contanti",
+      card: "Carta",
+      transfer: "Bonifico",
+      other: "Altro",
+      amount: "Importo ricevuto",
+      reference: "Riferimento (facoltativo)",
+      referencePlaceholder: "Ricevuta carta o ID bonifico",
+      exact: "Importo esatto",
+      take: "Incassa {{amount}}",
+      takeShort: "Incassa",
+      changeHint: "Resto da dare: {{amount}}",
+      complete: "Concludi vendita",
+      retryComplete: "Concludi vendita",
+      pay: "Incassa {{amount}}",
+      shortcut: "Ctrl+Invio",
+    },
+    void: {
+      action: "Annulla vendita",
+      title: "Annullare questa vendita?",
+      message:
+        "Il carrello viene svuotato. La vendita resta nello storico come annullata.",
+      confirm: "Annulla vendita",
+      cancel: "Mantieni vendita",
+      blocked: "Pagamento registrato. Rimuova il pagamento prima di annullare.",
+    },
+    receipt: {
+      title: "Vendita conclusa",
+      number: "Scontrino {{number}}",
+      giveChange: "Dia il resto",
+      newSale: "Nuova vendita",
+      refund: "Rimborsa",
+      open: "Apri scontrino",
+      paidWith: "Pagato con {{method}}",
+    },
+    closed: {
+      title: "Questa cassa è chiusa",
+      message: "Apra un nuovo turno dalla dashboard per vendere di nuovo.",
+      backToPos: "Torna al punto vendita",
+      sales: "Vendite di questo turno",
+    },
+    error: {
+      title: "Operazione non riuscita",
+      dismiss: "Chiudi",
+    },
+  },
+};

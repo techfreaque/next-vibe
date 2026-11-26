@@ -3,7 +3,7 @@
  * Closes an open cashier session
  */
 
-import { and, eq, inArray, ne, sql } from "drizzle-orm";
+import { and, eq, ne, sql } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
@@ -20,10 +20,17 @@ import { companies } from "@/companies/db";
 import { CompanyMemberRole } from "@/companies/enum";
 import { CompanyAuthRepository } from "@/companies/repository";
 
-import { posOrders, posPayments, posSessions, posTerminals } from "../../db";
+import {
+  posOrderItems,
+  posOrders,
+  posPayments,
+  posSessions,
+  posTerminals,
+} from "../../db";
 import { PosOrderStatus, PosPaymentMethod, PosSessionStatus } from "../../enum";
 import { scopedTranslation } from "../../i18n";
 import { isPosMinorUnitAmount } from "../../order/settlement-amounts";
+import { getPosSessionCash } from "../cash-totals";
 import type { PosSessionClosePostRequestOutput } from "./definition";
 
 export class PosSessionCloseRepository {
@@ -42,8 +49,10 @@ export class PosSessionCloseRepository {
         status: string;
         closedAt: Date | null;
         closingFloat: number | null;
+        openingFloat: number;
         expectedFloat: number;
         cashSalesTotal: number;
+        cashRefundsTotal: number;
         variance: number;
         orderCount: number;
       };
@@ -134,7 +143,21 @@ export class PosSessionCloseRepository {
           });
         }
 
-        // Fail if any orders in this session are still OPEN
+        // An empty cart left open (no items, no tender) is not a sale: void it
+        // so it never blocks closing the till.
+        await tx
+          .update(posOrders)
+          .set({ status: PosOrderStatus.VOIDED, updatedAt: new Date() })
+          .where(
+            and(
+              eq(posOrders.sessionId, details.sessionId),
+              eq(posOrders.status, PosOrderStatus.OPEN),
+              sql`not exists (select 1 from ${posOrderItems} where ${posOrderItems.orderId} = ${posOrders.id})`,
+              sql`not exists (select 1 from ${posPayments} where ${posPayments.orderId} = ${posOrders.id})`,
+            ),
+          );
+
+        // Fail if any sale in this session is still OPEN
         const [openOrder] = await tx
           .select({ id: posOrders.id })
           .from(posOrders)
@@ -148,7 +171,7 @@ export class PosSessionCloseRepository {
 
         if (openOrder) {
           return fail({
-            message: t("sessionClose.post.errors.conflict.title"),
+            message: t("sessionClose.post.widget.openSaleBlocks"),
             errorType: ErrorResponseTypes.CONFLICT,
           });
         }
@@ -198,9 +221,10 @@ export class PosSessionCloseRepository {
           });
         }
 
-        // Compute reconciliation: sum CASH payments on COMPLETED orders in this session
-        const completedOrders = await tx
-          .select({ id: posOrders.id })
+        // Reconciliation: opening float + cash kept from completed sales
+        // - cash paid out for refunds from this drawer.
+        const [orders] = await tx
+          .select({ count: sql<number>`count(*)::int` })
           .from(posOrders)
           .where(
             and(
@@ -208,32 +232,14 @@ export class PosSessionCloseRepository {
               eq(posOrders.status, PosOrderStatus.COMPLETED),
             ),
           );
-
-        const orderCount = completedOrders.length;
-        const completedOrderIds = completedOrders.map((o) => o.id);
-
-        let cashSalesTotal = 0;
-
-        if (completedOrderIds.length > 0) {
-          const [cashRow] = await tx
-            .select({
-              total: sql<string>`sum(${posPayments.amount}-${posPayments.change})`,
-            })
-            .from(posPayments)
-            .where(
-              and(
-                inArray(posPayments.orderId, completedOrderIds),
-                eq(posPayments.method, PosPaymentMethod.CASH),
-              ),
-            );
-          cashSalesTotal = Number(cashRow?.total ?? 0);
-        }
-
+        const orderCount = orders?.count ?? 0;
         const openingFloat = locked.openingFloat;
-        const expectedFloat =
-          (Math.round(openingFloat * 10_000) +
-            Math.round(cashSalesTotal * 10_000)) /
-          10_000;
+        const cash = await getPosSessionCash(
+          tx,
+          details.sessionId,
+          openingFloat,
+        );
+        const expectedFloat = cash.expectedCash;
         const variance =
           (Math.round(details.closingFloat * 10_000) -
             Math.round(expectedFloat * 10_000)) /
@@ -245,8 +251,10 @@ export class PosSessionCloseRepository {
             terminalName: terminal.terminalName,
             companyName: terminal.companyName,
             ...updated,
+            openingFloat,
             expectedFloat,
-            cashSalesTotal,
+            cashSalesTotal: cash.cashSalesTotal,
+            cashRefundsTotal: cash.cashRefundsTotal,
             variance,
             orderCount,
           },

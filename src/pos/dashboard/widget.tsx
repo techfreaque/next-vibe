@@ -1,10 +1,15 @@
 "use client";
-import { Badge } from "next-vibe/ui/components/badge";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
+import { EmptyBlock } from "next-vibe/ui/components/empty-block";
 import { Monitor } from "next-vibe/ui/components/icons/Monitor";
-import { ShoppingCart } from "next-vibe/ui/components/icons/ShoppingCart";
+import { Plus } from "next-vibe/ui/components/icons/Plus";
+import { LoadingBlock } from "next-vibe/ui/components/loading-block";
+import { MetricCard } from "next-vibe/ui/components/metric-card";
+import { MetricGrid } from "next-vibe/ui/components/metric-grid";
 import { Span } from "next-vibe/ui/components/span";
+import { StatusPill } from "next-vibe/ui/components/status-pill";
+import { WidgetHeader } from "next-vibe/ui/components/widget-header";
 import { WidgetShell } from "next-vibe/ui/components/widget-shell";
 import { formatMoney } from "next-vibe/unified-ui/_shared/format-money";
 import {
@@ -23,149 +28,6 @@ type TerminalRow = NonNullable<
   PosDashboardGetResponseOutput["terminals"]
 >[number];
 
-interface KpiCardProps {
-  label: string;
-  value: string | number;
-  highlight?: boolean;
-}
-
-function KpiCard({
-  label,
-  value,
-  highlight = false,
-}: KpiCardProps): JSX.Element {
-  return (
-    <Div
-      className={`flex flex-col gap-1 rounded-lg border px-4 py-3 ${highlight ? "border-blue-500/30 bg-blue-500/5" : ""}`}
-    >
-      <Span className="text-xs text-muted-foreground font-medium">{label}</Span>
-      <Span className="text-2xl font-bold tabular-nums">{value}</Span>
-    </Div>
-  );
-}
-
-interface TerminalCardProps {
-  terminal: TerminalRow;
-  onViewSession: (terminal: TerminalRow) => void;
-  onOpenSession: (terminal: TerminalRow) => void;
-  onViewOrders: (sessionId: string) => void;
-  activeLabel: string;
-  inactiveLabel: string;
-  openSessionLabel: string;
-  viewOrdersLabel: string;
-  sessionOpenLabel: string;
-  viewSessionLabel: string;
-}
-
-function TerminalCard({
-  terminal,
-  onViewSession,
-  onOpenSession,
-  onViewOrders,
-  activeLabel,
-  inactiveLabel,
-  openSessionLabel,
-  viewOrdersLabel,
-  sessionOpenLabel,
-  viewSessionLabel,
-}: TerminalCardProps): JSX.Element {
-  return (
-    <Div
-      className={`flex flex-wrap items-center gap-3 px-4 py-4 border-b last:border-b-0 transition-colors ${terminal.isActive ? "hover:bg-muted/30" : "opacity-55"}`}
-    >
-      {/* Icon */}
-      <Div
-        className={`flex h-10 w-10 items-center justify-center rounded-full shrink-0 ${
-          terminal.hasOpenSession
-            ? "bg-green-500/10 border border-green-500/30"
-            : terminal.isActive
-              ? "bg-blue-500/10 border border-blue-500/30"
-              : "bg-muted"
-        }`}
-      >
-        <Monitor
-          className={`h-5 w-5 ${
-            terminal.hasOpenSession
-              ? "text-green-600 dark:text-green-400"
-              : terminal.isActive
-                ? "text-blue-600 dark:text-blue-400"
-                : "text-muted-foreground"
-          }`}
-        />
-      </Div>
-
-      {/* Terminal identity and status */}
-      <Div className="flex-1 min-w-0">
-        <Div className="flex items-center gap-2 flex-wrap">
-          <Span className="text-sm font-semibold truncate">
-            {terminal.name}
-          </Span>
-          {terminal.hasOpenSession ? (
-            <Badge
-              variant="default"
-              className="text-xs py-0 h-4 bg-green-600 hover:bg-green-600"
-            >
-              {sessionOpenLabel}
-            </Badge>
-          ) : (
-            <Badge
-              variant={terminal.isActive ? "default" : "secondary"}
-              className={`text-xs py-0 h-4 ${terminal.isActive ? "bg-blue-600 hover:bg-blue-600" : ""}`}
-            >
-              {terminal.isActive ? activeLabel : inactiveLabel}
-            </Badge>
-          )}
-        </Div>
-        <Div className="flex items-center gap-2 mt-0.5 flex-wrap">
-          {terminal.location ? (
-            <Span className="text-xs text-muted-foreground">
-              {terminal.location}
-            </Span>
-          ) : null}
-          <Badge variant="outline" className="text-xs py-0 h-4 font-mono">
-            {terminal.currency}
-          </Badge>
-        </Div>
-      </Div>
-
-      {/* CTA */}
-      {terminal.hasOpenSession && terminal.openSessionId ? (
-        <Div className="flex w-full flex-wrap gap-2 @lg:w-auto">
-          <Button
-            type="button"
-            size="sm"
-            variant="outline"
-            className="shrink-0"
-            onClick={() => onViewSession(terminal)}
-          >
-            {viewSessionLabel}
-          </Button>
-          <Button
-            type="button"
-            size="sm"
-            variant="default"
-            className="shrink-0 bg-green-600 hover:bg-green-700"
-            onClick={() => onViewOrders(terminal.openSessionId ?? "")}
-          >
-            {viewOrdersLabel}
-          </Button>
-        </Div>
-      ) : (
-        <Button
-          type="button"
-          size="sm"
-          variant={terminal.isActive ? "outline" : "ghost"}
-          className="shrink-0"
-          onClick={() => onOpenSession(terminal)}
-          disabled={!terminal.isActive}
-        >
-          {openSessionLabel}
-        </Button>
-      )}
-    </Div>
-  );
-}
-
 export function PosDashboardWidget(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   _props: {
@@ -177,73 +39,79 @@ export function PosDashboardWidget(
   const locale = useWidgetLocale();
   const navigation = useWidgetNavigation();
 
-  const handleOpenSession = (terminal: TerminalRow): void => {
-    void (async (): Promise<void> => {
-      posTerminalNameMap.set(terminal.id, terminal.name);
-      const sessionDef = await import("../session/open/definition");
-      navigation.push(sessionDef.default.POST, {
-        data: {
-          details: {
-            terminalId: terminal.id,
-            openingFloat: 0,
-          },
+  const openRegister = (sessionId: string): void => {
+    void import("../session/[sessionId]/register/definition").then((def) =>
+      navigation.push(def.default.GET, { urlPathParams: { sessionId } }),
+    );
+  };
+
+  const openTill = (terminal: TerminalRow): void => {
+    posTerminalNameMap.set(terminal.id, terminal.name);
+    void Promise.all([
+      import("../session/open/definition"),
+      import("../session/[sessionId]/register/definition"),
+    ]).then(([openDef, registerDef]) =>
+      navigation.push(openDef.default.POST, {
+        data: { details: { terminalId: terminal.id, openingFloat: 0 } },
+        replaceOnSuccess: {
+          endpoint: registerDef.default.GET,
+          getUrlPathParams: (response) => ({ sessionId: response.result.id }),
         },
-      });
-    })();
+      }),
+    );
   };
 
-  const handleViewSession = (terminal: TerminalRow): void => {
-    if (terminal.openSessionId) {
-      void (async (): Promise<void> => {
-        const def = await import("../session/[sessionId]/get/definition");
-        navigation.push(def.default.GET, {
-          urlPathParams: { sessionId: terminal.openSessionId ?? "" },
-        });
-      })();
-    } else {
-      void (async (): Promise<void> => {
-        const def = await import("../terminal/list/definition");
-        navigation.push(def.default.GET, {});
-      })();
-    }
+  const closeTill = (sessionId: string): void => {
+    void import("../session/close/definition").then((def) =>
+      navigation.push(def.default.POST, {
+        data: { details: { sessionId, closingFloat: 0 } },
+      }),
+    );
   };
 
-  const handleViewOrders = (sessionId: string): void => {
-    void (async (): Promise<void> => {
-      const def = await import("../order/list/definition");
-      navigation.push(def.default.GET, {
-        data: {
-          input: { sessionId, status: undefined },
-          page: 1,
-          pageSize: 50,
-        },
-      });
-    })();
+  const openSalesHistory = (): void => {
+    void import("../order/list/definition").then((def) =>
+      navigation.push(def.default.GET, {}),
+    );
   };
 
-  const handleAllTerminals = (): void => {
-    void (async (): Promise<void> => {
-      const def = await import("../terminal/list/definition");
-      navigation.push(def.default.GET, {});
-    })();
+  const createTill = (): void => {
+    void import("../terminal/create/definition").then((def) =>
+      navigation.push(def.default.POST, {}),
+    );
   };
 
-  // Loading state
+  const manageTills = (): void => {
+    void import("../terminal/list/definition").then((def) =>
+      navigation.push(def.default.GET, {}),
+    );
+  };
+
+  const header = (
+    <WidgetHeader
+      title={t("dashboard.get.widget.title")}
+      subtitle={t("dashboard.get.widget.subtitle")}
+      size="page"
+      actions={
+        <Div className="flex flex-wrap gap-2">
+          <Button type="button" variant="outline" onClick={openSalesHistory}>
+            {t("dashboard.get.widget.salesHistory")}
+          </Button>
+          <Button type="button" variant="outline" onClick={createTill}>
+            <Plus className="mr-1.5 h-4 w-4" />
+            {t("dashboard.get.widget.newTill")}
+          </Button>
+        </Div>
+      }
+    />
+  );
+
   if (!data) {
     return (
-      <Div className="max-w-2xl mx-auto w-full px-4 pt-8 pb-6 flex flex-col items-center gap-4 py-12 rounded-lg border border-dashed">
-        <Div className="flex h-14 w-14 items-center justify-center rounded-full bg-muted border-2 border-dashed border-muted-foreground/30">
-          <ShoppingCart className="h-6 w-6 text-muted-foreground" />
-        </Div>
-        <Div className="flex flex-col gap-1 text-center px-4">
-          <Span className="text-base font-semibold">
-            {t("dashboard.get.widget.loading")}
-          </Span>
-          <Span className="text-sm text-muted-foreground">
-            {t("dashboard.get.widget.loadingHint")}
-          </Span>
-        </Div>
-      </Div>
+      <WidgetShell layout="page">
+        {header}
+        <LoadingBlock />
+      </WidgetShell>
     );
   }
 
@@ -251,92 +119,165 @@ export function PosDashboardWidget(
   const sales = data.salesByCurrency?.length
     ? data.salesByCurrency
     : [{ currency: data.currency, amount: data.todaySalesTotal ?? 0 }];
+  const orders = data.todayOrderCount ?? 0;
+  const primarySales =
+    sales.find((row) => row.currency === data.currency) ?? sales[0];
+  const average =
+    orders > 0 && primarySales && sales.length === 1
+      ? formatMoney(primarySales.amount / orders, primarySales.currency, locale)
+      : "-";
 
   return (
     <WidgetShell layout="page">
-      {/* KPI Row */}
-      <Div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <KpiCard
-          label={t("dashboard.get.widget.kpiTerminals")}
-          value={`${data.terminalsActive ?? 0} / ${data.terminalsTotal ?? 0}`}
-        />
-        <KpiCard
-          label={t("dashboard.get.widget.kpiOpenSessions")}
-          value={data.openSessionsCount ?? 0}
-          highlight={(data.openSessionsCount ?? 0) > 0}
-        />
-        <KpiCard
-          label={t("dashboard.get.widget.kpiTodayOrders")}
-          value={data.todayOrderCount ?? 0}
-        />
-        <KpiCard
-          label={t("dashboard.get.widget.kpiTodaySales")}
+      {header}
+
+      <MetricGrid columns={4}>
+        <MetricCard
+          label={t("dashboard.get.widget.kpiSalesToday")}
           value={sales
             .map((row) => formatMoney(row.amount, row.currency, locale))
             .join(" · ")}
-          highlight={sales.some((row) => row.amount > 0)}
+          description={t("dashboard.get.widget.kpiSalesCount", {
+            count: String(orders),
+          })}
         />
-      </Div>
+        <MetricCard
+          label={t("dashboard.get.widget.kpiOpenTills")}
+          value={data.openSessionsCount ?? 0}
+          description={t("dashboard.get.widget.kpiTillsTotal", {
+            active: String(data.terminalsActive ?? 0),
+            total: String(data.terminalsTotal ?? 0),
+          })}
+        />
+        <MetricCard
+          label={t("dashboard.get.widget.kpiAverage")}
+          value={average}
+        />
+        <MetricCard
+          label={t("dashboard.get.widget.kpiRefunds")}
+          value={formatMoney(
+            data.refundsToday?.amount ?? 0,
+            data.currency,
+            locale,
+          )}
+          description={t("dashboard.get.widget.kpiRefundsCount", {
+            count: String(data.refundsToday?.count ?? 0),
+          })}
+        />
+      </MetricGrid>
 
-      {/* Terminals header */}
       <Div className="flex items-center justify-between gap-3">
-        <Span className="text-sm font-semibold">
-          {t("dashboard.get.widget.terminalsHeading")}
+        <Span className="text-[15px] font-semibold">
+          {t("dashboard.get.widget.tillsTitle")}
         </Span>
-        <Div className="flex gap-2">
-          <Button
-            type="button"
-            size="sm"
-            variant="outline"
-            onClick={handleAllTerminals}
-          >
-            {t("dashboard.get.widget.allTerminals")}
+        {terminals.length > 0 ? (
+          <Button type="button" variant="ghost" size="sm" onClick={manageTills}>
+            {t("dashboard.get.widget.manageTills")}
           </Button>
-        </Div>
+        ) : null}
       </Div>
 
-      {/* Terminal list */}
       {terminals.length === 0 ? (
-        <Div className="flex flex-col items-center gap-5 py-14 text-center rounded-lg border border-dashed">
-          <Div className="flex h-14 w-14 items-center justify-center rounded-full bg-muted border border-muted-foreground/20">
-            <Monitor className="h-6 w-6 text-muted-foreground" />
-          </Div>
-          <Div className="flex flex-col gap-2 px-6">
-            <Span className="text-base font-semibold">
-              {t("dashboard.get.widget.emptyTerminals")}
-            </Span>
-            <Span className="text-sm text-muted-foreground">
-              {t("dashboard.get.widget.emptyTerminalsHint")}
-            </Span>
-          </Div>
-          <Button
-            type="button"
-            size="sm"
-            variant="outline"
-            onClick={handleAllTerminals}
-          >
-            {t("dashboard.get.widget.allTerminals")}
-          </Button>
-        </Div>
+        <EmptyBlock
+          size="page"
+          icon={<Monitor className="h-6 w-6" />}
+          title={t("dashboard.get.widget.emptyTitle")}
+          message={t("dashboard.get.widget.emptyMessage")}
+          action={{
+            label: t("dashboard.get.widget.createTill"),
+            onClick: createTill,
+          }}
+        />
       ) : (
-        <Div className="rounded-lg border overflow-hidden">
-          {terminals.map((terminal: TerminalRow) => (
-            <TerminalCard
+        <Div className="grid grid-cols-1 gap-3 @2xl:grid-cols-2 @5xl:grid-cols-3">
+          {terminals.map((terminal) => (
+            <TillCard
               key={terminal.id}
               terminal={terminal}
-              onViewSession={handleViewSession}
-              onOpenSession={handleOpenSession}
-              onViewOrders={handleViewOrders}
-              activeLabel={t("dashboard.get.widget.statusActive")}
-              inactiveLabel={t("dashboard.get.widget.statusInactive")}
-              openSessionLabel={t("dashboard.get.widget.openSession")}
-              viewOrdersLabel={t("dashboard.get.widget.viewOrders")}
-              sessionOpenLabel={t("dashboard.get.widget.statusSessionOpen")}
-              viewSessionLabel={t("dashboard.get.widget.viewSession")}
+              onOpenRegister={openRegister}
+              onOpenTill={openTill}
+              onCloseTill={closeTill}
             />
           ))}
         </Div>
       )}
     </WidgetShell>
+  );
+}
+
+function TillCard({
+  terminal,
+  onOpenRegister,
+  onOpenTill,
+  onCloseTill,
+}: {
+  terminal: TerminalRow;
+  onOpenRegister: (sessionId: string) => void;
+  onOpenTill: (terminal: TerminalRow) => void;
+  onCloseTill: (sessionId: string) => void;
+}): JSX.Element {
+  const t = useWidgetTranslation<typeof definition.GET>();
+  const sessionId = terminal.hasOpenSession ? terminal.openSessionId : null;
+
+  return (
+    <Div
+      className={`flex flex-col gap-4 rounded-xl border bg-card p-4 ${terminal.isActive ? "" : "opacity-70"}`}
+    >
+      <Div className="flex items-start gap-3">
+        <Div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-muted">
+          <Monitor className="h-5 w-5 text-muted-foreground" />
+        </Div>
+        <Div className="min-w-0 flex-1">
+          <Span className="block truncate text-base font-semibold">
+            {terminal.name}
+          </Span>
+          <Span className="block truncate text-sm text-muted-foreground">
+            {[terminal.location, terminal.currency].filter(Boolean).join(" · ")}
+          </Span>
+        </Div>
+        <StatusPill
+          status={terminal.id}
+          variant={sessionId ? "success" : terminal.isActive ? "info" : "muted"}
+          label={
+            sessionId
+              ? t("dashboard.get.widget.tillSelling")
+              : terminal.isActive
+                ? t("dashboard.get.widget.tillReady")
+                : t("dashboard.get.widget.tillInactive")
+          }
+        />
+      </Div>
+      {sessionId ? (
+        <Div className="flex flex-wrap gap-2">
+          <Button
+            type="button"
+            size="lg"
+            className="flex-1 px-4"
+            onClick={() => onOpenRegister(sessionId)}
+          >
+            {t("dashboard.get.widget.openRegister")}
+          </Button>
+          <Button
+            type="button"
+            size="lg"
+            variant="outline"
+            className="px-4"
+            onClick={() => onCloseTill(sessionId)}
+          >
+            {t("dashboard.get.widget.closeTill")}
+          </Button>
+        </Div>
+      ) : (
+        <Button
+          type="button"
+          size="lg"
+          variant="outline"
+          disabled={!terminal.isActive}
+          onClick={() => onOpenTill(terminal)}
+        >
+          {t("dashboard.get.widget.openTill")}
+        </Button>
+      )}
+    </Div>
   );
 }
