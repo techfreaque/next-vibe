@@ -8,7 +8,8 @@ import "server-only";
  * monthly update reaches every node without a restart. Only the country is
  * ever returned or stored; the IP is not persisted for this purpose.
  */
-import { gunzipSync } from "node:zlib";
+import { promisify } from "node:util";
+import { gunzip } from "node:zlib";
 
 import { eq } from "drizzle-orm";
 import { parseError } from "next-vibe/core/utils/parse-error";
@@ -22,6 +23,7 @@ export const GEO_SOURCE_ID = "dbip-country-lite";
 
 const RECHECK_MS = 6 * 60 * 60 * 1000;
 const MISSING_RECHECK_MS = 10 * 60 * 1000;
+const inflateGeoTable = promisify(gunzip);
 
 interface GeoCache {
   table: GeoTable | null;
@@ -73,8 +75,10 @@ async function refresh(logger: EndpointLogger): Promise<GeoTable | null> {
       .from(geoIpDatabases)
       .where(eq(geoIpDatabases.id, GEO_SOURCE_ID))
       .limit(1);
+    // A cold load can happen on either the request or the cron path. Keep
+    // decompression of the multi-megabyte table off the server event loop.
     const table = row
-      ? decodeGeoTable(gunzipSync(Buffer.from(row.data, "base64")))
+      ? decodeGeoTable(await inflateGeoTable(Buffer.from(row.data, "base64")))
       : null;
     if (!table) {
       logger.error("Geo IP table in the database is unreadable", {
@@ -108,7 +112,9 @@ export async function geoTableNow(
 
 /** Force the next lookup to re-read the stored version (after an update). */
 export function invalidateGeoCache(): void {
-  cache().checkedAt = 0;
+  // An older in-flight refresh must not replace the new release after it
+  // finishes decoding. Keep the previous table available as a fallback.
+  globalThis.__vibeGeoCache = { ...cache(), checkedAt: 0, loading: null };
 }
 
 /**

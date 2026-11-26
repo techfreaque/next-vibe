@@ -1,7 +1,7 @@
 import { gzipSync } from "node:zlib";
 
 import { PGlite } from "@electric-sql/pglite";
-import { afterAll, expect, it, mock } from "bun:test";
+import { afterAll, beforeAll, expect, it, mock } from "bun:test";
 import { drizzle } from "drizzle-orm/pglite";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { createEndpointLogger } from "next-vibe/logger/server";
@@ -9,11 +9,9 @@ import { createEndpointLogger } from "next-vibe/logger/server";
 const pg = new PGlite();
 mock.module("next-vibe/database", () => ({ db: drizzle(pg) }));
 
-afterAll(async () => {
-  await pg.close();
-});
+const logger = createEndpointLogger(false, defaultLocale);
 
-it("fills a healthy lead within the batch limit when newer rows have duplicate emails", async () => {
+beforeAll(async () => {
   await pg.exec(`
     CREATE TABLE geo_ip_databases (
       id text PRIMARY KEY, version text, data text, v4_ranges int,
@@ -28,13 +26,35 @@ it("fills a healthy lead within the batch limit when newer rows have duplicate e
       ('duplicate@example.test', NULL, '{"ipAddress":"198.51.100.77"}', '2026-11-21'),
       ('eligible@example.test', NULL, '{"ipAddress":"198.51.100.77"}', '2026-11-20');
   `);
-  const { backfillLeadCountries, storeGeoRelease } =
-    await import("./repository");
+  const { storeGeoRelease } = await import("./repository");
   await storeGeoRelease(
     "test-fixture",
     gzipSync("198.51.100.0,198.51.100.255,GB"),
   );
-  const logger = createEndpointLogger(false, defaultLocale);
+});
+
+afterAll(async () => {
+  await pg.close();
+});
+
+it("starts a new geo refresh when the current load is invalidated", async () => {
+  const { geoTableNow, invalidateGeoCache } = await import("../lookup");
+  const olderLoad = geoTableNow(logger);
+  invalidateGeoCache();
+  const currentLoad = geoTableNow(logger);
+  const concurrentLoad = geoTableNow(logger);
+
+  const older = await olderLoad;
+  const current = await currentLoad;
+  expect(current).not.toBeNull();
+  expect(older).toEqual(current);
+  expect(older).not.toBe(current);
+  expect(await concurrentLoad).toBe(current);
+  expect(await geoTableNow(logger)).toBe(current);
+});
+
+it("fills a healthy lead within the batch limit when newer rows have duplicate emails", async () => {
+  const { backfillLeadCountries } = await import("./repository");
   expect(await backfillLeadCountries(logger, 1)).toEqual({
     backfilled: 1,
     unresolved: 2,
