@@ -1465,6 +1465,13 @@
       "when": 1795711225593,
       "tag": "20261126164025_sk_fiscal_receipts_rate_validity",
       "breakpoints": true
+    },
+    {
+      "idx": 209,
+      "version": "7",
+      "when": 1795712779260,
+      "tag": "20261126170619_lead_fk_indexes",
+      "breakpoints": true
     }
   ]
 }
