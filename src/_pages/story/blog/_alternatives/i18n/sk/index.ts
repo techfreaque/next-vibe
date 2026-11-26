@@ -213,6 +213,8 @@ export const translations: typeof enTranslations = {
       "Smeruje volania modelov k rôznym poskytovateľom so záložnými kľúčmi. Pri nastavovaní skontroluj smerovanie a zaznamenávanie.",
     sandbase:
       "Jedno API spája volanie modelov, údaje z webu a izolované prostredia na spúšťanie kódu. Bezplatné volania majú denný limit.",
+    openUncensored:
+      "Predplatený kľúč namiesto účtu: 58 abliterovaných a necenzurovaných textových modelov plus modely na obrázky a video, zoradené podľa nameraných odmietnutí. Platíte cenu za tokeny poskytovateľa, ktorý požiadavku vybaví, dobitie od 5 $.",
     risuAi:
       "Klient na čet s postavami s otvoreným kódom. Má príručky k svetom postáv, skupinové čety, obrázky emócií a prevod textu na reč. API modelu si zabezpečíš a platíš sám.",
     agnai:

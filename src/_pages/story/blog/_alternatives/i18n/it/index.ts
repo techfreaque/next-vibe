@@ -213,6 +213,8 @@ export const translations: typeof enTranslations = {
       "Instrada le chiamate tra fornitori con chiavi di riserva. Verifica routing e log durante la configurazione.",
     sandbase:
       "Riunisce modelli, dati web e ambienti isolati per il codice in un’API. Le chiamate gratuite hanno un limite giornaliero.",
+    openUncensored:
+      "Chiave prepagata, nessun account: 58 modelli di testo abliterated e senza censura, più modelli per immagini e video, ordinati per rifiuti misurati. Paghi il prezzo per token del provider che risponde, ricariche da 5 $.",
     risuAi:
       "Client open source per chat con personaggi, con lorebook, chat di gruppo, immagini delle emozioni e TTS. L’API del modello la porti e la paghi tu.",
     agnai:

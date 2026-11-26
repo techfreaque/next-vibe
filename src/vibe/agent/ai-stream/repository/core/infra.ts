@@ -28,6 +28,7 @@ import {
   isChatCompletionBody,
   isJsonRecord,
 } from "../../providers/openrouter/routing";
+import { createOpenUncensored } from "../../providers/openuncensored";
 import { logProviderRequest } from "../../providers/shared/debug-file-logger";
 import type { ClientPromptCache } from "../../providers/shared/prompt-cache";
 import { createUncensoredAI } from "../../providers/uncensored-ai";
@@ -53,6 +54,7 @@ export class ProviderFactory {
     | typeof createGabAI
     | typeof createVeniceAI
     | typeof createNanoGPT
+    | typeof createOpenUncensored
     | typeof createClaudeCode
   > {
     const fetchImpl = createFixtureFetch(toolExecutionContext, logger);
@@ -74,6 +76,9 @@ export class ProviderFactory {
 
       case ApiProvider.NANO_GPT:
         return createNanoGPT(logger, fetchImpl, clientCache);
+
+      case ApiProvider.OPENUNCENSORED:
+        return createOpenUncensored(logger, fetchImpl, clientCache);
 
       default: {
         // Custom fetch wrapper that normalizes request body for stable caching

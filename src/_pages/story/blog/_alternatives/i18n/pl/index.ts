@@ -211,6 +211,8 @@ export const translations: typeof enTranslations = {
       "Przekazuje zapytania do różnych dostawców z awaryjnym przełączaniem kluczy. Sprawdź routing i logowanie w konfiguracji.",
     sandbase:
       "Łączy wywołania modeli, dane z sieci i izolowane środowiska kodu w jednym API. Bezpłatne zapytania mają dzienny limit.",
+    openUncensored:
+      "Klucz prepaid zamiast konta: 58 abliterowanych i nieocenzurowanych modeli tekstowych plus modele obrazu i wideo, ułożone według zmierzonych odmów. Płacisz cenę tokenów dostawcy, który obsłużył zapytanie, doładowanie od 5 $.",
     risuAi:
       "Klient czatu z postaciami open source z lorebookami, czatami grupowymi, obrazami emocji i TTS. API modelu podłączasz i opłacasz sam.",
     agnai:

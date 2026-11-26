@@ -75,6 +75,7 @@ export const ALTERNATIVE_GUIDES = {
   "openrouter-alternatives": {
     subject: { platform: "openRouter" },
     market: [
+      "openUncensored",
       "vercel",
       "liteLlm",
       "portkey",

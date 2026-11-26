@@ -967,6 +967,10 @@ function getSetupRequiredMessage(
       return availability.nanoGPT
         ? null
         : `${t("selector.addEnvKey")}: NANO_GPT_API_KEY → nano-gpt.com/api`;
+    case ApiProvider.OPENUNCENSORED:
+      return availability.openUncensored === true
+        ? null
+        : `${t("selector.addEnvKey")}: OPENUNCENSORED_API_KEY → openuncensored.com/credits`;
     case ApiProvider.CLAUDE_CODE:
       return availability.claudeCode
         ? null

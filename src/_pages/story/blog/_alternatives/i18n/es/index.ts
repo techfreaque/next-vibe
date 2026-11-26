@@ -212,6 +212,8 @@ export const translations: typeof enTranslations = {
       "Enruta llamadas entre proveedores con claves de respaldo. Revisa el enrutamiento y los registros al configurarlo.",
     sandbase:
       "Combina llamadas a modelos, datos web y entornos aislados de código en una API. Las llamadas gratuitas tienen un límite diario.",
+    openUncensored:
+      "Clave prepago, sin cuenta: 58 modelos de texto abliterated y sin censura, más modelos de imagen y vídeo, ordenados por rechazos medidos. Se cobra el precio por token del proveedor que responde, recargas desde 5 $.",
     risuAi:
       "Cliente de chat con personajes de código abierto, con libros de ambientación, chats de grupo, imágenes de emociones y TTS. La API del modelo la aportas y la pagas tú.",
     agnai:

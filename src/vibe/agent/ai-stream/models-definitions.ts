@@ -530,6 +530,16 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         cacheReadTokenCost: 0.275, // updated: 2026-11-07 from nano-gpt-api
       },
       {
+        // OpenUncensored (cheapest online tool host); used when configured and cheapest.
+        id: ChatModelId.MIMO_V2_6_FLASH_ABLITERATED,
+        apiProvider: ApiProvider.OPENUNCENSORED,
+        providerModel: "mimo-v2.6-flash-abliterated",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 0.5, // updated: 2026-11-26 from openuncensored-api
+        outputTokenCost: 1.5, // updated: 2026-11-26 from openuncensored-api
+        cacheReadTokenCost: 0.27, // updated: 2026-11-26 from openuncensored-api
+      },
+      {
         id: ChatModelId.MIMO_V2_6_FLASH_ABLITERATED,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "mimo-v2.6-flash-abliterated",
@@ -590,6 +600,16 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         cacheReadTokenCost: 0.3, // updated: 2026-11-07 from venice-api
       },
       {
+        // OpenUncensored (cheapest online tool host); used when configured and cheapest.
+        id: ChatModelId.GLM_5_3_UNCENSORED,
+        apiProvider: ApiProvider.OPENUNCENSORED,
+        providerModel: "glm-5.3-uncensored",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 0.39, // updated: 2026-11-26 from openuncensored-api
+        outputTokenCost: 1.32, // updated: 2026-11-26 from openuncensored-api
+        cacheReadTokenCost: 0.15, // updated: 2026-11-26 from openuncensored-api
+      },
+      {
         id: ChatModelId.GLM_5_3_UNCENSORED,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "glm-5.3-uncensored",
@@ -642,6 +662,16 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         inputTokenCost: 0.165, // updated: 2026-11-26 from venice-api
         outputTokenCost: 0.55, // updated: 2026-11-26 from venice-api
         cacheReadTokenCost: 0.033, // updated: 2026-11-26 from venice-api
+      },
+      {
+        // OpenUncensored (cheapest online tool host); used when configured and cheapest.
+        id: ChatModelId.GLM_5_3_FLASH_UNCENSORED,
+        apiProvider: ApiProvider.OPENUNCENSORED,
+        providerModel: "glm-5.3-flash-uncensored",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 0.2, // updated: 2026-11-26 from openuncensored-api
+        outputTokenCost: 0.8001, // updated: 2026-11-26 from openuncensored-api
+        cacheReadTokenCost: 0.0641, // updated: 2026-11-26 from openuncensored-api
       },
       {
         id: ChatModelId.GLM_5_3_FLASH_UNCENSORED,
@@ -6501,6 +6531,16 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         inputTokenCost: 1.25, // updated: 2026-11-07 from venice-api
         outputTokenCost: 2.5, // updated: 2026-11-07 from venice-api
         cacheReadTokenCost: 0.125, // updated: 2026-11-07 from venice-api
+      },
+      {
+        // OpenUncensored undated alias (cheapest online tool host); used when configured and cheapest.
+        id: ChatModelId.VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED,
+        apiProvider: ApiProvider.OPENUNCENSORED,
+        providerModel: "deepseek-v4.1-flash-uncensored",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 0.27, // updated: 2026-11-26 from openuncensored-api
+        outputTokenCost: 0.95, // updated: 2026-11-26 from openuncensored-api
+        cacheReadTokenCost: 0.06, // updated: 2026-11-26 from openuncensored-api
       },
       {
         id: ChatModelId.VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED,

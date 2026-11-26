@@ -998,6 +998,26 @@ export const MARKET_PLATFORMS = {
     open: "closed",
     sources: [{ kind: "home", url: "https://www.sandbase.ai/" }],
   },
+  openUncensored: {
+    // Checked 2026-11-26: home, /credits, /privacy, /agents.md and the
+    // public /v1/models list (58 text, 20 image, 3 image-to-video models).
+    name: "OpenUncensored",
+    kind: "gateway",
+    free: "unlisted",
+    paid: "usage",
+    fee: { kind: "noMarkup", rate: 0 },
+    filter: "permissive",
+    privacy: "upstream",
+    api: "dual",
+    media: "imageVideo",
+    open: "client",
+    sources: [
+      { kind: "home", url: "https://openuncensored.com/" },
+      { kind: "docs", url: "https://openuncensored.com/docs" },
+      { kind: "pricing", url: "https://openuncensored.com/credits" },
+      { kind: "privacy", url: "https://openuncensored.com/privacy" },
+    ],
+  },
   risuAi: {
     name: "RisuAI",
     kind: "frontend",

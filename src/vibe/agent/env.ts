@@ -120,6 +120,14 @@ const baseFields = {
     commented: true,
     sensitive: true,
   },
+  OPENUNCENSORED_API_KEY: {
+    schema: z.string().optional(),
+    example: "ou-your-openuncensored-key",
+    comment:
+      "OpenUncensored API key (optional) - extra route for abliterated models (GLM 5.3, DeepSeek V4.1 Flash, MiMo), used when it is the cheapest. Prepaid key from https://openuncensored.com/credits",
+    commented: true,
+    sensitive: true,
+  },
   EDEN_AI_API_KEY: {
     schema: z.string().optional(),
     example: "your-eden-ai-key",
@@ -329,6 +337,7 @@ export const agentPublicFlags = {
   NEXT_PUBLIC_AGENT_GAB_AI: Boolean(agentEnv.GAB_AI_API_KEY),
   NEXT_PUBLIC_AGENT_VENICE_AI: Boolean(agentEnv.VENICE_AI_API_KEY),
   NEXT_PUBLIC_AGENT_NANO_GPT: Boolean(agentEnv.NANO_GPT_API_KEY),
+  NEXT_PUBLIC_AGENT_OPENUNCENSORED: Boolean(agentEnv.OPENUNCENSORED_API_KEY),
   NEXT_PUBLIC_AGENT_SCRAPPEY: Boolean(agentEnv.SCRAPPEY_API_KEY),
   NEXT_PUBLIC_AGENT_OPEN_AI_IMAGES: Boolean(agentEnv.OPENAI_API_KEY),
   NEXT_PUBLIC_AGENT_OPEN_AI_STT: Boolean(agentEnv.OPENAI_API_KEY),

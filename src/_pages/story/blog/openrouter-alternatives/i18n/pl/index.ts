@@ -94,7 +94,7 @@ export const translations: typeof enTranslations = {
     title: "FAQ",
     best: {
       q: "Jaka jest najlepsza alternatywa dla OpenRoutera?",
-      a: "Zależy, czego ci w OpenRouterze brakuje. Dużo modeli bez cenzury i płatność za użycie: NanoGPT. Własne modele Venice i prywatność: Venice. Lokalnie i za darmo: Ollama. Modele bez cenzury, otwarte i mainstreamowe plus czat dla zespołu na jednym kluczu: {{appName}}.",
+      a: "Zależy, czego ci w OpenRouterze brakuje. Dużo modeli bez cenzury i płatność za użycie: NanoGPT. Tylko modele bez cenzury i klucz prepaid bez konta: OpenUncensored. Własne modele Venice i prywatność: Venice. Lokalnie i za darmo: Ollama. Modele bez cenzury, otwarte i mainstreamowe plus czat dla zespołu na jednym kluczu: {{appName}}.",
     },
     cheaper: {
       q: "Czy jest tańsza alternatywa dla OpenRoutera?",
@@ -102,7 +102,7 @@ export const translations: typeof enTranslations = {
     },
     uncensored: {
       q: "Która alternatywa dla OpenRoutera ma modele bez cenzury?",
-      a: "NanoGPT, Venice, uncensored.ai, Gab AI i {{appName}} udostępniają modele bez cenzury przez API. {{appName}} ma ich teraz w API {{apiUncensored}}: abliterowane i dostrojone obok {{ownModel}}.",
+      a: "NanoGPT, OpenUncensored, Venice, uncensored.ai, Gab AI i {{appName}} udostępniają modele bez cenzury przez API. {{appName}} ma ich teraz w API {{apiUncensored}}: abliterowane i dostrojone obok {{ownModel}}.",
     },
     sdk: {
       q: "Czy mogę zostawić swój kod z OpenAI SDK?",

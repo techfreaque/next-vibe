@@ -209,6 +209,8 @@ export const translations = {
       "Routes model calls across providers with key failover. Review routing and logging when you configure it.",
     sandbase:
       "Combines model calls, web data and code sandboxes in one API. Free calls have daily limits.",
+    openUncensored:
+      "Prepaid API key, no account: 58 abliterated and uncensored text models plus image and video models, ranked by measured refusals. Bills the serving provider's token price, top-ups from $5.",
     risuAi:
       "Open-source character chat client with lorebooks, group chats, emotion images and TTS. You bring and pay for the model API.",
     agnai:

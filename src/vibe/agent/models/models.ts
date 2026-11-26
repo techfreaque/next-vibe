@@ -92,6 +92,7 @@ export enum ApiProvider {
   UNCENSORED_AI = "uncensored-ai",
   VENICE_AI = "venice-ai",
   NANO_GPT = "nano-gpt",
+  OPENUNCENSORED = "openuncensored",
   OPENAI_IMAGES = "openai-images",
   REPLICATE = "replicate",
   FAL_AI = "fal-ai",
@@ -114,6 +115,7 @@ export const apiProviderDisplayNames: Record<ApiProvider, string> = {
   [ApiProvider.UNCENSORED_AI]: "Uncensored.ai",
   [ApiProvider.VENICE_AI]: "Venice.ai",
   [ApiProvider.NANO_GPT]: "NanoGPT",
+  [ApiProvider.OPENUNCENSORED]: "OpenUncensored",
   [ApiProvider.OPENAI_IMAGES]: "OpenAI Images",
   [ApiProvider.REPLICATE]: "Replicate",
   [ApiProvider.FAL_AI]: "Fal.ai",
@@ -822,6 +824,8 @@ export function isApiProviderAvailable(
       return env.veniceAI;
     case ApiProvider.NANO_GPT:
       return env.nanoGPT;
+    case ApiProvider.OPENUNCENSORED:
+      return env.openUncensored === true;
     case ApiProvider.OPENAI_IMAGES:
       return env.openAiImages;
     case ApiProvider.REPLICATE:
@@ -1155,8 +1159,8 @@ export const defaultLlmModality = {
 // ============================================
 
 /** Default token counts for representative price comparison per message */
-const PRICE_REFERENCE_INPUT_TOKENS = 5000;
-const PRICE_REFERENCE_OUTPUT_TOKENS = 1500;
+export const PRICE_REFERENCE_INPUT_TOKENS = 5000;
+export const PRICE_REFERENCE_OUTPUT_TOKENS = 1500;
 
 /** Normal chat scenario shown on model pages, in the selector, and on skill pages. */
 export const CHAT_MESSAGE_PRICE_REFERENCE = {

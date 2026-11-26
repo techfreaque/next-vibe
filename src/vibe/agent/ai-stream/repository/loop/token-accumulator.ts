@@ -84,14 +84,15 @@ export interface TurnCharge {
  * Providers that report the real charge of a call:
  * OpenRouter (`usage.cost`; it load-balances a model across endpoints up to
  * ~5x pricier than the cheapest one we list), NanoGPT (`usage.cost` /
- * `x_nanogpt_pricing`) and Venice (`cost.usd`). The NanoGPT and Venice
- * providers surface it as provider metadata `{ <apiProvider>: { usage: { cost } } }`,
+ * `x_nanogpt_pricing`), Venice (`cost.usd`) and OpenUncensored
+ * (`ou.cost_usd`). The NanoGPT, Venice and OpenUncensored providers surface it as provider metadata `{ <apiProvider>: { usage: { cost } } }`,
  * the same shape OpenRouter uses.
  */
 const UPSTREAM_COST_PROVIDERS: ReadonlySet<ApiProvider> = new Set([
   ApiProvider.OPENROUTER,
   ApiProvider.NANO_GPT,
   ApiProvider.VENICE_AI,
+  ApiProvider.OPENUNCENSORED,
   ApiProvider.CLAUDE_CODE,
 ]);
 

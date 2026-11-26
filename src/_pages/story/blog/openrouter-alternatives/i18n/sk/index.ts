@@ -96,7 +96,7 @@ export const translations: typeof enTranslations = {
     title: "Časté otázky",
     best: {
       q: "Ktorá alternatíva k OpenRouter je najlepšia?",
-      a: "Záleží na tom, čo ti v OpenRouter chýba. NanoGPT má veľa modelov bez cenzúry a platbu podľa spotreby. Venice ponúka vlastné modely a súkromie. Ollama beží lokálne a zadarmo. {{appName}} spája modely bez cenzúry, otvorené aj bežné modely s tímovým četom a jedným kľúčom.",
+      a: "Záleží na tom, čo ti v OpenRouter chýba. NanoGPT má veľa modelov bez cenzúry a platbu podľa spotreby. OpenUncensored má len modely bez cenzúry a predplatený kľúč bez účtu. Venice ponúka vlastné modely a súkromie. Ollama beží lokálne a zadarmo. {{appName}} spája modely bez cenzúry, otvorené aj bežné modely s tímovým četom a jedným kľúčom.",
     },
     cheaper: {
       q: "Existuje lacnejšia alternatíva k OpenRouter?",
@@ -104,7 +104,7 @@ export const translations: typeof enTranslations = {
     },
     uncensored: {
       q: "Ktorá alternatíva k OpenRouter má modely bez cenzúry?",
-      a: "NanoGPT, Venice, uncensored.ai, Gab AI a {{appName}} sprístupňujú modely bez cenzúry cez API. V API {{appName}} ich je aktuálne {{apiUncensored}}: abliterované, doladené aj {{ownModel}}.",
+      a: "NanoGPT, OpenUncensored, Venice, uncensored.ai, Gab AI a {{appName}} sprístupňujú modely bez cenzúry cez API. V API {{appName}} ich je aktuálne {{apiUncensored}}: abliterované, doladené aj {{ownModel}}.",
     },
     sdk: {
       q: "Môžem si ponechať kód pre OpenAI SDK?",

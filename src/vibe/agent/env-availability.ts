@@ -15,6 +15,11 @@ export interface AgentEnvAvailability {
   gabAI: boolean;
   veniceAI: boolean;
   nanoGPT: boolean;
+  /**
+   * OpenUncensored (optional route provider). Optional so hand-built
+   * availability objects (tests, fixtures) default to "not configured".
+   */
+  openUncensored?: boolean;
   scrappey: boolean;
   openAiImages: boolean;
   openAiStt: boolean;
@@ -52,6 +57,7 @@ const envAvailability: AgentEnvAvailability = (() => {
     gabAI: agentPublicFlags.NEXT_PUBLIC_AGENT_GAB_AI,
     veniceAI: agentPublicFlags.NEXT_PUBLIC_AGENT_VENICE_AI,
     nanoGPT: agentPublicFlags.NEXT_PUBLIC_AGENT_NANO_GPT,
+    openUncensored: agentPublicFlags.NEXT_PUBLIC_AGENT_OPENUNCENSORED,
     scrappey: agentPublicFlags.NEXT_PUBLIC_AGENT_SCRAPPEY,
     openAiImages: agentPublicFlags.NEXT_PUBLIC_AGENT_OPEN_AI_IMAGES,
     openAiStt: agentPublicFlags.NEXT_PUBLIC_AGENT_OPEN_AI_STT,
@@ -120,6 +126,11 @@ export const PROVIDER_SETUP_INSTRUCTIONS = {
     envKey: "NANO_GPT_API_KEY",
     url: "https://nano-gpt.com/api",
     label: "NanoGPT",
+  },
+  openUncensored: {
+    envKey: "OPENUNCENSORED_API_KEY",
+    url: "https://openuncensored.com/credits",
+    label: "OpenUncensored",
   },
   scrappey: {
     envKey: "SCRAPPEY_API_KEY",

@@ -212,6 +212,8 @@ export const translations: typeof enTranslations = {
       "Répartit les appels entre fournisseurs avec des clés de secours. Vérifiez le routage et les journaux à la configuration.",
     sandbase:
       "Réunit les appels aux modèles, les données web et les bacs à sable de code derrière une API. Les appels gratuits sont limités par jour.",
+    openUncensored:
+      "Une clé prépayée, sans compte : 58 modèles de texte abliterated et non censurés, plus des modèles d’image et de vidéo, classés selon les refus mesurés. Facturé au prix par token du fournisseur qui répond, recharge dès 5 $.",
     risuAi:
       "Client open source de chat avec des personnages : lorebooks, chats de groupe, images d’émotion et synthèse vocale. Vous fournissez et payez l’API du modèle.",
     agnai:

@@ -62,6 +62,7 @@ import { OpenRouterAudioPriceFetcher } from "./providers/openrouter-audio";
 import { OpenRouterImagePriceFetcher } from "./providers/openrouter-image";
 import { OpenRouterTokenPriceFetcher } from "./providers/openrouter-token";
 import { OpenRouterVideoPriceFetcher } from "./providers/openrouter-video";
+import { OpenUncensoredPriceFetcher } from "./providers/openuncensored";
 import { ReplicatePriceFetcher } from "./providers/replicate";
 import { UnbottledPriceFetcher } from "./providers/unbottled";
 import { UncensoredAiPriceFetcher } from "./providers/uncensored-ai";
@@ -96,6 +97,7 @@ const BASE_FETCHERS: PriceFetcher[] = [
   new GabAiPriceFetcher(),
   new VenicePriceFetcher(),
   new NanoGptPriceFetcher(),
+  new OpenUncensoredPriceFetcher(),
 ];
 
 /** Unbottled fetcher - web-only, instantiated per call with platform */

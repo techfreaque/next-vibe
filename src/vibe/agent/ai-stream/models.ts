@@ -61,6 +61,45 @@ export type ChatModelOption =
 
 type ChatProviderConfig = ModelDefinition["providers"][number];
 
+/**
+ * Providers that are only ever an ALTERNATE route for a model: aggregators
+ * such as OpenUncensored that resell hosts we may also reach directly. They
+ * join the availability-aware pool (getChatModelForUser / filterChatModels
+ * pick the cheapest CONFIGURED route), but never become the static primary
+ * option: that one is availability-blind and drives listed prices and
+ * display, so a cheap route on an instance without its key would show a
+ * price no turn there can get.
+ */
+const ROUTE_ONLY_PROVIDERS: ReadonlySet<ApiProvider> = new Set([
+  ApiProvider.OPENUNCENSORED,
+]);
+
+/**
+ * Static primary order: public direct routes, then route-only providers,
+ * then admin-only ones; cheapest first within each group (stable, so the
+ * definition order breaks price ties).
+ */
+export function compareStaticPrimaryRoutes(
+  a: ChatProviderConfig,
+  b: ChatProviderConfig,
+): number {
+  const group = (p: ChatProviderConfig): number =>
+    (p.adminOnly === true ? 2 : 0) +
+    (ROUTE_ONLY_PROVIDERS.has(p.apiProvider) ? 1 : 0);
+  return group(a) - group(b) || getProviderPrice(a) - getProviderPrice(b);
+}
+
+/**
+ * Routing order: cheapest first by listed price, ties keep the definition
+ * order (put the preferred route first, e.g. native tool calling).
+ */
+export function compareRoutesByPrice(
+  a: ChatProviderConfig,
+  b: ChatProviderConfig,
+): number {
+  return getProviderPrice(a) - getProviderPrice(b);
+}
+
 function buildChatOption(
   modelId: ChatModelId,
   def: ModelDefinition,
@@ -125,9 +164,7 @@ function buildChatModelOptions(): Record<ChatModelId, ChatModelOption> {
     // that model was rejected as FORBIDDEN. Admins get their admin-only
     // provider through getChatModelForUser instead.
     const sortedProviders = [...def.providers].toSorted(
-      (a, b) =>
-        Number(a.adminOnly === true) - Number(b.adminOnly === true) ||
-        getProviderPrice(a) - getProviderPrice(b),
+      compareStaticPrimaryRoutes,
     );
     for (const provider of sortedProviders) {
       if (
@@ -171,9 +208,7 @@ function buildChatModelOptionsPool(): ChatModelOption[] {
     if (!def || isRetiredChatModel(modelId)) {
       continue;
     }
-    const sortedProviders = [...def.providers].toSorted(
-      (a, b) => getProviderPrice(a) - getProviderPrice(b),
-    );
+    const sortedProviders = [...def.providers].toSorted(compareRoutesByPrice);
     for (const provider of sortedProviders) {
       if (
         provider.creditCostPerClip !== undefined ||

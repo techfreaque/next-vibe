@@ -66,6 +66,10 @@ export function getMissingProviderKeyMessage(
       return agentEnv.NANO_GPT_API_KEY
         ? null
         : buildMissingKeyMessage("nanoGPT");
+    case ApiProvider.OPENUNCENSORED:
+      return agentEnv.OPENUNCENSORED_API_KEY
+        ? null
+        : buildMissingKeyMessage("openUncensored");
     case ApiProvider.OPENAI_IMAGES:
       return agentEnv.OPENAI_API_KEY
         ? null

@@ -211,6 +211,8 @@ export const translations: typeof enTranslations = {
       "Leitet Modellanfragen an verschiedene Anbieter und kann bei Schlüsselfehlern ausweichen. Prüfe Routing und Protokollierung im Setup.",
     sandbase:
       "Verbindet Modellaufrufe, Webdaten und Code-Sandboxes in einer API. Kostenlose Aufrufe haben ein Tageslimit.",
+    openUncensored:
+      "Prepaid-Schlüssel statt Konto: 58 abliterierte und unzensierte Textmodelle plus Bild- und Videomodelle, gereiht nach gemessenen Verweigerungen. Abgerechnet wird der Tokenpreis des ausführenden Anbieters, Aufladung ab 5 $.",
     risuAi:
       "Open-Source-Client für Figurenchats mit Lorebooks, Gruppenchats, Emotionsbildern und TTS. Die Modell-API bringst und bezahlst du selbst.",
     agnai:
