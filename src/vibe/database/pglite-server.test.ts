@@ -81,6 +81,22 @@ describe("pglite-server", () => {
     });
   });
 
+  it("preserves PostgreSQL errors from simple and extended INSERT RETURNING", async () => {
+    const missing = {
+      severity: "ERROR",
+      code: "42P01",
+      message: 'relation "missing_wire_table" does not exist',
+    };
+    await expect(
+      client.query("INSERT INTO missing_wire_table VALUES (1) RETURNING *"),
+    ).rejects.toMatchObject(missing);
+    await expect(
+      client.query("INSERT INTO missing_wire_table VALUES ($1) RETURNING *", [
+        1,
+      ]),
+    ).rejects.toMatchObject(missing);
+  });
+
   it("keeps other clients out of a failed transaction until rollback", async () => {
     const other = new Client({ host: "127.0.0.1", port, user: "postgres" });
     await other.connect();

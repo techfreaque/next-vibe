@@ -81,15 +81,17 @@ function buildReadyForQuery(status: TransactionStatus = "I"): Buffer {
   return buf;
 }
 
-function buildErrorResponse(
-  severity: string,
-  code: string,
-  msg: string,
-): Buffer {
-  const fields = Buffer.from(
-    `S\0${severity}\0C\0${code}\0M\0${msg}\0\0`,
-    "utf8",
-  );
+function buildErrorResponse(error: Error | undefined): Buffer {
+  const code =
+    error &&
+    "code" in error &&
+    typeof error.code === "string" &&
+    /^[0-9A-Z]{5}$/.test(error.code)
+      ? error.code
+      : "XX000";
+  const message = error?.message ?? "PGlite error";
+  // Each field is a one-byte tag immediately followed by a C string.
+  const fields = Buffer.from(`SERROR\0C${code}\0M${message}\0\0`, "utf8");
   const len = 4 + fields.length;
   const buf = Buffer.allocUnsafe(1 + len);
   buf.writeUInt8(0x45, 0);
@@ -678,11 +680,7 @@ function handleConnection(pg: PGlite, socket: Socket): void {
           setTxStatus(txStatus === "I" ? "I" : "E");
           socket.write(
             Buffer.concat([
-              buildErrorResponse(
-                "ERROR",
-                "XX000",
-                e instanceof Error ? e.message : "PGlite error",
-              ),
+              buildErrorResponse(e instanceof Error ? e : undefined),
               buildReadyForQuery(txStatus),
             ]),
           );
@@ -735,11 +733,7 @@ function handleConnection(pg: PGlite, socket: Socket): void {
             socket.write(
               Buffer.concat([
                 parseComplete,
-                buildErrorResponse(
-                  "ERROR",
-                  "XX000",
-                  e instanceof Error ? e.message : "PGlite error",
-                ),
+                buildErrorResponse(e instanceof Error ? e : undefined),
                 buildReadyForQuery(txStatus),
               ]),
             );
@@ -774,11 +768,7 @@ function handleConnection(pg: PGlite, socket: Socket): void {
       setTxStatus(txStatus === "I" ? "I" : "E");
       socket.write(
         Buffer.concat([
-          buildErrorResponse(
-            "ERROR",
-            "XX000",
-            e instanceof Error ? e.message : "PGlite error",
-          ),
+          buildErrorResponse(e instanceof Error ? e : undefined),
           buildReadyForQuery(txStatus),
         ]),
       );
