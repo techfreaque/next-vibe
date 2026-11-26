@@ -5,34 +5,34 @@ export const translations = {
     create: "Create",
   },
   post: {
-    title: "Create Product Category",
-    titleShort: "Create Category",
+    title: "Create category",
+    titleShort: "Create category",
     description: "Add a category to organize your catalog products.",
     name: {
-      label: "Category Name",
+      label: "Category name",
       description: "Name of the product category",
-      placeholder: "Design Services",
+      placeholder: "Design services",
     },
     companyId: {
       label: "Company",
       description: "Associate this category with a company",
     },
     parentId: {
-      label: "Parent Category",
+      label: "Parent category",
       description: "Optional parent category for hierarchical organization",
     },
     sortOrder: {
-      label: "Sort Order",
-      description: "Display order — lower numbers appear first",
+      label: "Sort order",
+      description: "Display order: lower numbers appear first",
       placeholder: "0",
     },
     errors: {
       validation: {
-        title: "Validation Error",
+        title: "Check the form",
         description: "Check the form fields and try again",
       },
       unauthorized: {
-        title: "Not Signed In",
+        title: "Not signed in",
         description: "Sign in to create a category",
       },
       forbidden: {
@@ -40,40 +40,40 @@ export const translations = {
         description: "You do not have permission to create this category",
       },
       conflict: {
-        title: "Already Exists",
+        title: "Already exists",
         description: "A category with this name already exists",
       },
       server: {
-        title: "Server Error",
-        description: "Something went wrong on our end — try again",
+        title: "Server error",
+        description: "Something went wrong on our end. Try again.",
       },
       unknown: {
-        title: "Unknown Error",
+        title: "Unknown error",
         description: "An unexpected error occurred",
       },
       network: {
-        title: "Network Error",
+        title: "Network error",
         description: "Check your connection and try again",
       },
       notFound: {
-        title: "Not Found",
+        title: "Not found",
         description: "Resource not found",
       },
       unsavedChanges: {
-        title: "Unsaved Changes",
+        title: "Unsaved changes",
         description: "You have unsaved changes",
       },
     },
     success: {
-      title: "Category Created",
+      title: "Category created",
       description: "Your product category is ready.",
     },
     response: {
       id: "Category ID",
-      name: "Category Name",
+      name: "Category name",
     },
     widget: {
-      backToList: "Back to Categories",
+      backToList: "View categories",
       back: "Back",
     },
   },

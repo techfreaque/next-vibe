@@ -63,6 +63,7 @@ export const translations: typeof enTranslations = {
     },
     widget: {
       backToList: "Torna ai prodotti",
+      cancel: "Annulla",
       back: "Indietro",
       warning:
         "Questo disattiva il prodotto e rimuoverlo dal catalogo attivo. I dati vengono conservati.",

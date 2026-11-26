@@ -43,7 +43,7 @@ export const translations: typeof enTranslations = {
       },
       server: {
         title: "Serverfehler",
-        description: "Etwas ist schiefgelaufen — bitte erneut versuchen",
+        description: "Etwas ist schiefgelaufen. Bitte erneut versuchen.",
       },
       unknown: {
         title: "Unbekannter Fehler",
@@ -79,10 +79,15 @@ export const translations: typeof enTranslations = {
       addCategory: "Kategorie hinzufügen",
       active: "Aktiv",
       inactive: "Inaktiv",
-      empty: "Keine Kategorien gefunden. Legen Sie Ihre erste Kategorie an.",
-      viewProducts: "Produkte anzeigen →",
-      backToCatalog: "← Produkte",
+      emptyTitle: "Noch keine Kategorien",
+      empty:
+        "Kategorien gruppieren Produkte und machen den Katalog schneller filterbar.",
       back: "Zurück",
+      count: "{{count}} Kategorien",
+      columnName: "Kategorie",
+      columnOrder: "Reihenfolge",
+      columnStatus: "Status",
+      inParent: "In {{parent}}",
     },
   },
 };

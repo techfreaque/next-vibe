@@ -11,7 +11,7 @@ export const translations: typeof enTranslations = {
     balance: "saldo",
   },
   repository: {
-    bonusCreditsAdded: "Aggiunto Crediti bonus {{amount}}",
+    bonusCreditsAdded: "{{amount}} crediti bonus aggiunti",
     tts: "Testo a velocità",
     stt: "Discorso a testo",
     search: "Cerca",
@@ -83,15 +83,17 @@ export const translations: typeof enTranslations = {
   expire: {
     post: {
       title: "Scadenza dei crediti",
-      titleShort: "Crediti scaduti",
-      description: "Crediti abbonamenti vecchi (chiamati da cron)",
+      titleShort: "Fai scadere crediti",
+      description:
+        "Rimuove i crediti dell'abbonamento dopo la scadenza. Gira ogni giorno da solo; un avvio manuale fa scadere solo quanto dovuto.",
       tag: "scadenza",
       container: {
-        title: "Crediti scaduti",
-        description: "Risultati di scadenza dei crediti",
+        title: "Fai scadere crediti",
+        description:
+          "Scadono solo i pacchetti dell'abbonamento oltre la data di scadenza. Pacchetti acquistati e bonus restano.",
       },
       response: {
-        expiredCount: "Conte scaduto",
+        expiredCount: "Pacchetti scaduti",
       },
       success: {
         title: "Crediti scaduti",

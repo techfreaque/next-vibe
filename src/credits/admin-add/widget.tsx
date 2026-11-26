@@ -154,12 +154,6 @@ export function GrantRecipientContainer({
               label={t("adminAdd.recipient.joinedAt")}
               value={formatDate(value.joinedAt, locale, "PP")}
             />
-            <DetailField
-              label={t("adminAdd.recipient.accountId")}
-              value={value.id}
-              mono
-              copyable
-            />
           </DetailGrid>
           <Div className="flex min-w-0 flex-col gap-1">
             <Span className="text-xs font-medium text-muted-foreground">
@@ -308,6 +302,13 @@ export function AdminAddCreditsContainer({
 
   return (
     <WidgetShell padding="sm" className="gap-3">
+      {!responseOnly && grantComplete && (
+        <WidgetHeader
+          title={t("adminAdd.post.container.title")}
+          size="page"
+          className="pb-3 [&_h1]:text-lg"
+        />
+      )}
       {!responseOnly && !grantComplete && (
         <>
           <WidgetHeader
@@ -449,12 +450,6 @@ export function AdminAddCreditsContainer({
                               })
                             : t("adminAdd.recipient.noGrants")
                         }
-                      />
-                      <DetailField
-                        label={t("adminAdd.recipient.accountId")}
-                        value={recipient.id}
-                        mono
-                        copyable
                       />
                     </DetailGrid>
                     <Button

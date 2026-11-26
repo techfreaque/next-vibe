@@ -161,14 +161,15 @@ export const translations: typeof enTranslations = {
       title: "Wygaszanie kredytów",
       titleShort: "Wygaś kredyty",
       description:
-        "Wygasza stare kredyty subskrypcyjne (wywoływane przez cron)",
+        "Usuwa kredyty z subskrypcji po dacie ważności. Działa codziennie automatycznie; ręczne uruchomienie wygasza tylko należne pakiety.",
       tag: "wygaśnięcie",
       container: {
         title: "Wygaś kredyty",
-        description: "Wyniki wygasania kredytów",
+        description:
+          "Wygasają tylko pakiety subskrypcji po dacie ważności. Kupione pakiety i bonusy zostają.",
       },
       response: {
-        expiredCount: "Liczba wygasłych",
+        expiredCount: "Wygasłe pakiety",
       },
       success: {
         title: "Kredyty wygasły",

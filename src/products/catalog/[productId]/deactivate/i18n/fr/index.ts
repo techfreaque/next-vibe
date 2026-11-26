@@ -63,6 +63,7 @@ export const translations: typeof enTranslations = {
     },
     widget: {
       backToList: "Retour aux produits",
+      cancel: "Annuler",
       back: "Retour",
       warning:
         "Le produit sera désactivé et retiré du catalogue actif. Ses données sont conservées.",

@@ -5,47 +5,64 @@ export const translations = {
   },
   get: {
     perDayUnit: "credits/day",
-    title: "Get Public Free-Tier Cap",
-    titleShort: "Free-Tier Cap",
+    lead: "Visitor",
+    ip: "IP address",
+    globalCap: "Daily cap reached",
+    leadCap: "Visitor limit reached",
+    ipCap: "IP limit reached",
+    singleRequest: "Request too expensive",
+    failClosed: "Blocked, cap check failed",
+    poolReserved: "Credits reserved",
+    threshold80: "80% of cap used",
+    threshold100: "Cap fully used",
+    other: "Other",
+    changeCap: "Change cap",
+    limits: "Limits",
+    capHint: "Shared by every visitor without a paid plan",
+    usedOfCap: "{{used}} of {{cap}} used",
+    exceededHint: "Free visitors are blocked until the daily reset.",
+    resetAt: "Last reset {{time}}",
+    title: "Free-tier cap",
+    titleShort: "Free-tier cap",
     description: "View today's global free-tier credit spend and cap",
     container: {
-      title: "Public Free-Tier Daily Cap",
+      title: "Free-tier daily cap",
       description: "Global daily spend limit for non-paying users",
     },
     spendToday: {
-      content: "Spent Today",
+      content: "Spent today",
     },
     capAmount: {
-      content: "Daily Cap",
+      content: "Daily cap",
     },
     remainingToday: {
-      content: "Remaining Today",
+      content: "Remaining today",
     },
     percentUsed: {
       content: "Used",
     },
     lastResetAt: {
-      content: "Last Reset At",
+      content: "Last reset",
     },
     capExceeded: {
-      content: "Cap Exceeded",
+      content: "Cap exceeded",
     },
-    perLeadCap: { content: "Per-Lead Cap" },
-    perIpCap: { content: "Per-IP Cap" },
-    topSpenders: { content: "Top Free Spenders Today" },
-    recentEvents: { content: "Recent Cap Events" },
+    perLeadCap: { content: "Per visitor" },
+    perIpCap: { content: "Per IP address" },
+    topSpenders: { content: "Top free spenders today" },
+    recentEvents: { content: "Recent cap events" },
     noData: "Nothing yet today.",
     success: {
-      title: "Cap Status Retrieved",
+      title: "Cap status loaded",
       description: "Public free-tier cap status retrieved successfully",
     },
     errors: {
       validation: {
-        title: "Validation Error",
+        title: "Check the form",
         description: "Invalid request parameters",
       },
       network: {
-        title: "Network Error",
+        title: "Network error",
         description: "Network connection failed",
       },
       unauthorized: {
@@ -57,19 +74,19 @@ export const translations = {
         description: "Admin access required",
       },
       notFound: {
-        title: "Not Found",
+        title: "Not found",
         description: "Cap configuration not found",
       },
       server: {
-        title: "Server Error",
+        title: "Server error",
         description: "Failed to retrieve cap status",
       },
       unknown: {
-        title: "Unknown Error",
+        title: "Unknown error",
         description: "An unexpected error occurred",
       },
       unsavedChanges: {
-        title: "Unsaved Changes",
+        title: "Unsaved changes",
         description: "You have unsaved changes",
       },
       conflict: {
@@ -79,23 +96,27 @@ export const translations = {
     },
   },
   post: {
-    title: "Update Public Free-Tier Cap",
-    titleShort: "Update Cap",
+    perDayUnit: "credits per day",
+    back: "Back",
+    decrease: "Decrease by 100",
+    increase: "Increase by 100",
+    title: "Update free-tier cap",
+    titleShort: "Update cap",
     description:
       "Update the global daily credit spend cap for non-paying users",
     capAmount: {
-      label: "Daily Cap (credits)",
+      label: "Daily cap (credits)",
       description:
         "Maximum credits non-paying users can collectively spend per day",
       placeholder: "e.g. 500",
     },
     perLeadCap: {
-      label: "Per-Lead Daily Cap (credits)",
+      label: "Per visitor per day (credits)",
       description: "Max free credits one guest/lead can burn per day",
       placeholder: "e.g. 20",
     },
     perIpCap: {
-      label: "Per-IP Daily Cap (credits)",
+      label: "Per IP address per day (credits)",
       description: "Max free credits one IP can burn per day",
       placeholder: "e.g. 40",
     },
@@ -103,16 +124,16 @@ export const translations = {
       content: "Result",
     },
     success: {
-      title: "Cap Updated",
+      title: "Cap updated",
       description: "Daily cap updated successfully",
     },
     errors: {
       validation: {
-        title: "Validation Error",
+        title: "Check the form",
         description: "Cap amount must be a positive number",
       },
       network: {
-        title: "Network Error",
+        title: "Network error",
         description: "Network connection failed",
       },
       unauthorized: {
@@ -124,19 +145,19 @@ export const translations = {
         description: "Admin access required",
       },
       notFound: {
-        title: "Not Found",
+        title: "Not found",
         description: "Cap configuration not found",
       },
       server: {
-        title: "Server Error",
+        title: "Server error",
         description: "Failed to update cap",
       },
       unknown: {
-        title: "Unknown Error",
+        title: "Unknown error",
         description: "An unexpected error occurred",
       },
       unsavedChanges: {
-        title: "Unsaved Changes",
+        title: "Unsaved changes",
         description: "You have unsaved changes",
       },
       conflict: {

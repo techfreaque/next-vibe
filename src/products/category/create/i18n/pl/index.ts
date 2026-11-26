@@ -27,7 +27,7 @@ export const translations: typeof enTranslations = {
     sortOrder: {
       label: "Kolejność sortowania",
       description:
-        "Kolejność wyświetlania — niższe liczby pojawiają się pierwsze",
+        "Kolejność wyświetlania: niższe liczby pojawiają się pierwsze",
       placeholder: "0",
     },
     errors: {
@@ -49,7 +49,7 @@ export const translations: typeof enTranslations = {
       },
       server: {
         title: "Błąd serwera",
-        description: "Coś poszło nie tak — spróbuj ponownie",
+        description: "Coś poszło nie tak. Spróbuj ponownie.",
       },
       unknown: {
         title: "Nieznany błąd",

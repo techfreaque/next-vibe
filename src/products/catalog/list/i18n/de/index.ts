@@ -9,7 +9,7 @@ export const translations: typeof enTranslations = {
   enums: {
     productType: {
       service: "Dienstleistung",
-      physical: "Physisch",
+      physical: "Physisches Produkt",
       digital: "Digital",
     },
   },
@@ -62,7 +62,7 @@ export const translations: typeof enTranslations = {
       },
       server: {
         title: "Serverfehler",
-        description: "Etwas ist schiefgelaufen — bitte erneut versuchen",
+        description: "Etwas ist schiefgelaufen. Bitte erneut versuchen.",
       },
       unknown: {
         title: "Unbekannter Fehler",
@@ -107,7 +107,7 @@ export const translations: typeof enTranslations = {
       checkoutReference: "Checkout-Referenz",
       checkoutCredits: "Enthaltene Credits",
       oneTime: "Einmalpreis",
-      searchPage: "Diese Seite nach Name oder Artikelnummer durchsuchen",
+      searchPage: "Name oder Artikelnummer suchen",
       noMatches: "Keine passenden Produkte auf dieser Seite",
       retry: "Erneut versuchen",
       previous: "Zurück",

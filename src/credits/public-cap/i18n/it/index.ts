@@ -7,6 +7,24 @@ export const translations: typeof enTranslations = {
   },
   get: {
     perDayUnit: "crediti/giorno",
+    lead: "Visitatore",
+    ip: "Indirizzo IP",
+    globalCap: "Limite giornaliero raggiunto",
+    leadCap: "Limite visitatore raggiunto",
+    ipCap: "Limite IP raggiunto",
+    singleRequest: "Richiesta troppo costosa",
+    failClosed: "Bloccato, controllo del limite fallito",
+    poolReserved: "Crediti riservati",
+    threshold80: "80% del limite usato",
+    threshold100: "Limite esaurito",
+    other: "Altro",
+    changeCap: "Modifica limite",
+    limits: "Limiti",
+    capHint: "Condiviso da tutti i visitatori senza piano a pagamento",
+    usedOfCap: "{{used}} su {{cap}} usati",
+    exceededHint:
+      "I visitatori gratuiti sono bloccati fino al reset giornaliero.",
+    resetAt: "Ultimo reset {{time}}",
     title: "Ottieni il cappuccio pubblico di livello libero",
     titleShort: "Tappo di livello gratuito",
     description:
@@ -83,6 +101,10 @@ export const translations: typeof enTranslations = {
     },
   },
   post: {
+    perDayUnit: "crediti al giorno",
+    back: "Indietro",
+    decrease: "Riduci di 100",
+    increase: "Aumenta di 100",
     title: "Aggiornamento pubblico Free-Tier Cap",
     titleShort: "Aggiornamento Cap",
     description:

@@ -12,17 +12,17 @@ export const translations = {
     update: "Update",
   },
   patch: {
-    title: "Update Product",
-    titleShort: "Update Product",
+    title: "Update product",
+    titleShort: "Update product",
     description: "Update fields on an existing catalog product.",
     productId: {
       label: "Product ID",
       description: "The ID of the product to update",
     },
     name: {
-      label: "Product Name",
+      label: "Product name",
       description: "Updated name for the product",
-      placeholder: "Web Design Package",
+      placeholder: "Web design package",
     },
     productDescription: {
       label: "Description",
@@ -35,7 +35,7 @@ export const translations = {
       placeholder: "WD-001",
     },
     type: {
-      label: "Product Type",
+      label: "Product type",
       description: "Updated product type",
       placeholder: "Select type",
     },
@@ -45,7 +45,7 @@ export const translations = {
       placeholder: "hour",
     },
     basePrice: {
-      label: "Base Price",
+      label: "Base price",
       description: "Updated base price",
       placeholder: "150.00",
     },
@@ -55,7 +55,7 @@ export const translations = {
       placeholder: "EUR",
     },
     defaultTaxRate: {
-      label: "Default Tax Rate",
+      label: "Default tax rate",
       description: "Updated default tax rate as a decimal",
       placeholder: "0.19",
     },
@@ -74,11 +74,11 @@ export const translations = {
     },
     errors: {
       validation: {
-        title: "Validation Error",
+        title: "Validation error",
         description: "Check the fields and try again",
       },
       unauthorized: {
-        title: "Not Signed In",
+        title: "Not signed in",
         description: "Sign in to update a product",
       },
       forbidden: {
@@ -90,33 +90,33 @@ export const translations = {
         description: "A conflict occurred",
       },
       server: {
-        title: "Server Error",
-        description: "Something went wrong on our end — try again",
+        title: "Server error",
+        description: "Something went wrong on our end. Try again.",
       },
       unknown: {
-        title: "Unknown Error",
+        title: "Unknown error",
         description: "An unexpected error occurred",
       },
       network: {
-        title: "Network Error",
+        title: "Network error",
         description: "Check your connection and try again",
       },
       notFound: {
-        title: "Not Found",
+        title: "Not found",
         description: "Product not found",
       },
       unsavedChanges: {
-        title: "Unsaved Changes",
+        title: "Unsaved changes",
         description: "You have unsaved changes",
       },
     },
     success: {
-      title: "Product Updated",
+      title: "Product updated",
       description: "Product details have been saved.",
     },
     response: {
       id: "Product ID",
-      name: "Product Name",
+      name: "Product name",
     },
     widget: {
       catalogCompany: "Catalog company",
@@ -126,7 +126,7 @@ export const translations = {
       companyUnavailable: "Company name unavailable",
       couldNotLoad: "Could not load the product.",
       retry: "Retry",
-      backToList: "Back to Products",
+      backToList: "Back to products",
       back: "Back",
     },
   },

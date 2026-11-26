@@ -77,10 +77,15 @@ export const translations: typeof enTranslations = {
       addCategory: "Pridať kategóriu",
       active: "Aktívna",
       inactive: "Neaktívna",
-      empty: "Nenašli sa žiadne kategórie. Pridajte prvú kategóriu.",
-      viewProducts: "Zobraziť produkty →",
-      backToCatalog: "← Produkty",
+      emptyTitle: "Zatiaľ žiadne kategórie",
+      empty:
+        "Kategórie zoskupujú produkty, takže katalóg vyfiltrujete rýchlejšie.",
       back: "Späť",
+      count: "Kategórie: {{count}}",
+      columnName: "Kategória",
+      columnOrder: "Poradie",
+      columnStatus: "Stav",
+      inParent: "V kategórii {{parent}}",
     },
   },
 };

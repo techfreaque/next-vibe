@@ -101,7 +101,7 @@ export const translations: typeof enTranslations = {
       },
       server: {
         title: "Błąd serwera",
-        description: "Coś poszło nie tak — spróbuj ponownie",
+        description: "Coś poszło nie tak. Spróbuj ponownie.",
       },
       unknown: {
         title: "Nieznany błąd",

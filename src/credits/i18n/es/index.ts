@@ -11,7 +11,7 @@ export const translations: typeof enTranslations = {
     balance: "saldo",
   },
   repository: {
-    bonusCreditsAdded: "Créditos adicionales de bono {{amount}}",
+    bonusCreditsAdded: "{{amount}} créditos de bonificación añadidos",
     tts: "Texto a texto",
     stt: "Discurso a texto",
     search: "Buscar",
@@ -84,16 +84,17 @@ export const translations: typeof enTranslations = {
   expire: {
     post: {
       title: "Vencimiento de créditos",
-      titleShort: "Créditos de los gastos",
+      titleShort: "Vencer créditos",
       description:
-        "Expire créditos de suscripción antiguos (llamados por cron)",
+        "Retira los créditos de suscripción tras su fecha de vencimiento. Se ejecuta a diario; una ejecución manual solo vence lo que corresponde.",
       tag: "expiración",
       container: {
-        title: "Créditos de los gastos",
-        description: "Resultados de caducidad de créditos",
+        title: "Vencer créditos",
+        description:
+          "Solo vencen los packs de suscripción pasada su fecha. Los packs comprados y los bonos no se tocan.",
       },
       response: {
-        expiredCount: "Conde caro",
+        expiredCount: "Packs vencidos",
       },
       success: {
         title: "Créditos gastados",

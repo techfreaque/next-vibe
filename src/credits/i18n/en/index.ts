@@ -80,19 +80,21 @@ export const translations = {
   },
   expire: {
     post: {
-      title: "Expire Credits",
-      titleShort: "Expire Credits",
-      description: "Expire old subscription credits (called by cron)",
+      title: "Expire credits",
+      titleShort: "Expire credits",
+      description:
+        "Removes subscription credits past their expiry date. Runs daily on its own; a manual run only expires what is already due.",
       tag: "expire",
       container: {
-        title: "Expire Credits",
-        description: "Credits expiration results",
+        title: "Expire credits",
+        description:
+          "Only subscription packs past their expiry date expire. Bought packs and bonus grants stay untouched.",
       },
       response: {
-        expiredCount: "Expired Count",
+        expiredCount: "Expired packs",
       },
       success: {
-        title: "Credits Expired",
+        title: "Credits expired",
         description: "Old subscription credits expired successfully",
       },
       errors: {
@@ -602,8 +604,8 @@ export const translations = {
       stepTwo: "Step 2 of 2: amount",
       testerPreset: "Use {{amount}} credits",
       preview: "Balance {{before}} → {{after}} (+{{amount}})",
-      title: "Add Credits",
-      titleShort: "Add Credits",
+      title: "Add credits",
+      titleShort: "Add credits",
       description: "Add credit packs to a user account (admin only)",
       tag: "admin",
       container: {
@@ -623,7 +625,7 @@ export const translations = {
         placeholder: "e.g. 25",
       },
       packType: {
-        label: "Pack Type",
+        label: "Pack type",
         description: "Type of credit pack to add",
       },
       response: {
@@ -639,16 +641,16 @@ export const translations = {
         loadingText: "Granting credits…",
       },
       success: {
-        title: "Credits Added",
+        title: "Credits added",
         description: "Credits have been added to the user account",
       },
       errors: {
         validation: {
-          title: "Validation Error",
+          title: "Check the form",
           description: "Invalid request parameters",
         },
         network: {
-          title: "Network Error",
+          title: "Network error",
           description: "Network connection failed",
         },
         unauthorized: {
@@ -660,19 +662,19 @@ export const translations = {
           description: "Admin access required",
         },
         notFound: {
-          title: "Not Found",
+          title: "Not found",
           description: "User not found",
         },
         server: {
-          title: "Server Error",
+          title: "Server error",
           description: "Failed to add credits",
         },
         unknown: {
-          title: "Unknown Error",
+          title: "Unknown error",
           description: "An unexpected error occurred",
         },
         unsavedChanges: {
-          title: "Unsaved Changes",
+          title: "Unsaved changes",
           description: "You have unsaved changes",
         },
         conflict: {

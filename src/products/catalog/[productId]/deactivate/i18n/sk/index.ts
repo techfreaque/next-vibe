@@ -63,6 +63,7 @@ export const translations: typeof enTranslations = {
     },
     widget: {
       backToList: "Späť na produkty",
+      cancel: "Zrušiť",
       back: "Späť",
       warning:
         "Produkt sa deaktivuje a prestane sa zobrazovať v aktívnom katalógu. Jeho údaje zostanú uložené.",

@@ -6,11 +6,11 @@
 "use client";
 
 import { isCliPlatform, Platform } from "next-vibe/platforms/platforms";
-import { Div } from "next-vibe/ui/components/div";
 import { MetricCard } from "next-vibe/ui/components/metric-card";
 import { MetricGrid } from "next-vibe/ui/components/metric-grid";
 import { Pre } from "next-vibe/ui/components/pre";
-import { P } from "next-vibe/ui/components/typography";
+import { WidgetHeader } from "next-vibe/ui/components/widget-header";
+import { WidgetShell } from "next-vibe/ui/components/widget-shell";
 import {
   useWidgetPlatform,
   useWidgetResponseOnly,
@@ -44,8 +44,17 @@ export function YearlyCreditsWidget(): JSX.Element {
   }
 
   return (
-    <Div className="max-w-2xl mx-auto w-full px-4 pt-6 pb-6 flex flex-col gap-4">
-      <P className="text-sm text-muted-foreground">{t("post.widget.hint")}</P>
+    <WidgetShell layout="page">
+      <WidgetHeader
+        size="page"
+        title={t("post.title")}
+        subtitle={t("post.widget.hint")}
+        actions={
+          <SubmitButtonWidget<typeof definition.POST>
+            field={{ text: "post.widget.submit" as const }}
+          />
+        }
+      />
       <FormAlertWidget field={{}} />
       {result && (
         <MetricGrid columns={3}>
@@ -66,9 +75,6 @@ export function YearlyCreditsWidget(): JSX.Element {
           />
         </MetricGrid>
       )}
-      <SubmitButtonWidget<typeof definition.POST>
-        field={{ text: "post.widget.submit" as const }}
-      />
-    </Div>
+    </WidgetShell>
   );
 }

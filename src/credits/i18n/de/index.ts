@@ -160,14 +160,15 @@ export const translations: typeof enTranslations = {
       title: "Credits ablaufen lassen",
       titleShort: "Credits ablaufen",
       description:
-        "Alte Abonnement-Credits ablaufen lassen (von Cron aufgerufen)",
+        "Entfernt Abo-Credits nach ihrem Ablaufdatum. Läuft täglich automatisch; ein manueller Lauf lässt nur fällige Pakete ablaufen.",
       tag: "ablaufen",
       container: {
         title: "Credits ablaufen lassen",
-        description: "Ergebnisse des Credits-Ablaufs",
+        description:
+          "Nur Abo-Pakete nach Ablaufdatum verfallen. Gekaufte Pakete und Bonus-Gutschriften bleiben unberührt.",
       },
       response: {
-        expiredCount: "Abgelaufene Anzahl",
+        expiredCount: "Abgelaufene Pakete",
       },
       success: {
         title: "Credits abgelaufen",

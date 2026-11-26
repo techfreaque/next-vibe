@@ -40,6 +40,19 @@ const { POST } = createEndpoint({
   allowedRoles: [UserRole.ADMIN],
   icon: "folder",
 
+  options: {
+    mutationOptions: {
+      // "View categories" after success must show the new row, not the cached list.
+      onSuccess: async ({ logger }) => {
+        const [{ apiClient }, list] = await Promise.all([
+          import("next-vibe/unified-ui/hooks/store"),
+          import("../list/definition"),
+        ]);
+        await apiClient.refetchEndpoint(list.default.GET, logger);
+      },
+    },
+  },
+
   fields: customWidgetObject({
     render: ProductCategoryCreateWidgetLazy,
     usage: { request: "data", response: true },

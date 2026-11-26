@@ -8,6 +8,11 @@
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+} from "next-vibe/ui/components/alert";
+import {
   type AnalyticsTone,
   KpiGrid,
   KpiTile,
@@ -21,6 +26,7 @@ import { useRelatedEntityNavigation } from "next-vibe/unified-ui/_shared/related
 import {
   useWidgetContext,
   useWidgetLocale,
+  useWidgetResponse,
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
@@ -117,6 +123,7 @@ export function SubscriptionStatsContainer({
   const locale = useWidgetLocale();
   const [legacyOpen, setLegacyOpen] = useState(false);
   const data = useWidgetValue<typeof definition.GET>();
+  const response = useWidgetResponse();
   const isFetching = endpointMutations?.read?.isFetching ?? false;
 
   const revenueStats = data?.revenueStats;
@@ -192,6 +199,13 @@ export function SubscriptionStatsContainer({
           {t("widget.openRevenueReport")}
         </Button>
       </Div>
+
+      {response?.success === false ? (
+        <Alert variant="destructive">
+          <AlertTitle>{t("get.errors.server.title")}</AlertTitle>
+          <AlertDescription>{response.message}</AlertDescription>
+        </Alert>
+      ) : null}
 
       <Div className="flex flex-wrap items-center gap-2">
         <Button

@@ -7,7 +7,7 @@ export const translations = {
     titleShort: "Credit pack sales",
     description: "Credit pack purchase history",
     form: {
-      title: "Purchase History",
+      title: "Purchase history",
       description: "Browse credit pack purchases",
     },
     searchFilters: {
@@ -20,7 +20,7 @@ export const translations = {
       placeholder: "Search purchases...",
     },
     packType: {
-      label: "Pack Type",
+      label: "Pack type",
       description: "Filter by credit pack type",
       placeholder: "Any type",
     },
@@ -42,12 +42,12 @@ export const translations = {
       description: "Configure result sorting",
     },
     sortBy: {
-      label: "Sort By",
+      label: "Sort by",
       description: "Sort field",
       placeholder: "Select sort field...",
     },
     sortOrder: {
-      label: "Sort Order",
+      label: "Sort order",
       description: "Sort direction",
       placeholder: "Select order...",
     },
@@ -71,18 +71,18 @@ export const translations = {
         expiresAt: "Expires",
         createdAt: "Purchased",
       },
-      totalCount: "Total Purchases",
-      pageCount: "Total Pages",
+      totalCount: "Total purchases",
+      pageCount: "Total pages",
     },
     page: { label: "Page" },
-    limit: { label: "Per Page" },
+    limit: { label: "Per page" },
     errors: {
       unauthorized: {
         title: "Unauthorized",
         description: "Login required",
       },
       validation: {
-        title: "Validation Error",
+        title: "Validation error",
         description: "Invalid parameters",
       },
       forbidden: {
@@ -90,24 +90,24 @@ export const translations = {
         description: "Admin access required",
       },
       server: {
-        title: "Server Error",
+        title: "Server error",
         description: "Unable to retrieve purchases",
       },
       unknown: {
-        title: "Unknown Error",
+        title: "Unknown error",
         description: "Unexpected error",
       },
       conflict: { title: "Conflict", description: "Data conflict" },
       network: {
-        title: "Network Error",
+        title: "Network error",
         description: "Unable to connect",
       },
       notFound: {
-        title: "Not Found",
+        title: "Not found",
         description: "No purchases found",
       },
       unsavedChanges: {
-        title: "Unsaved Changes",
+        title: "Unsaved changes",
         description: "Unsaved changes",
       },
     },
@@ -187,10 +187,10 @@ export const translations = {
       referralEarning: "Referral earning",
     },
     purchaseSortField: {
-      createdAt: "Created At",
+      createdAt: "Created at",
       amount: "Amount",
       type: "Type",
-      userEmail: "User Email",
+      userEmail: "User email",
     },
     sortOrder: {
       asc: "Ascending",

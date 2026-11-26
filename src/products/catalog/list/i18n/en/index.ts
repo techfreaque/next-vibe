@@ -25,12 +25,12 @@ export const translations = {
       description: "Filter products in this category",
     },
     type: {
-      label: "Product Type",
+      label: "Product type",
       description: "Filter by service, physical, or digital",
       placeholder: "All types",
     },
     isActive: {
-      label: "Active Only",
+      label: "Active only",
       description: "Show only active products",
     },
     page: {
@@ -38,16 +38,16 @@ export const translations = {
       description: "Page number (starts at 1)",
     },
     pageSize: {
-      label: "Per Page",
+      label: "Per page",
       description: "Results per page (max 100)",
     },
     errors: {
       validation: {
-        title: "Validation Error",
+        title: "Validation error",
         description: "Check the filter parameters and try again",
       },
       unauthorized: {
-        title: "Not Signed In",
+        title: "Not signed in",
         description: "Sign in to view your catalog",
       },
       forbidden: {
@@ -59,41 +59,41 @@ export const translations = {
         description: "A conflict occurred",
       },
       server: {
-        title: "Server Error",
-        description: "Something went wrong on our end — try again",
+        title: "Server error",
+        description: "Something went wrong on our end. Try again.",
       },
       unknown: {
-        title: "Unknown Error",
+        title: "Unknown error",
         description: "An unexpected error occurred",
       },
       network: {
-        title: "Network Error",
+        title: "Network error",
         description: "Check your connection and try again",
       },
       notFound: {
-        title: "Not Found",
+        title: "Not found",
         description: "No products found",
       },
       unsavedChanges: {
-        title: "Unsaved Changes",
+        title: "Unsaved changes",
         description: "You have unsaved changes",
       },
     },
     success: {
-      title: "Products Retrieved",
+      title: "Products retrieved",
       description: "Your catalog products are listed below.",
     },
     response: {
       id: "Product ID",
-      name: "Product Name",
+      name: "Product name",
       type: "Type",
       sku: "SKU",
-      basePrice: "Base Price",
+      basePrice: "Base price",
       currency: "Currency",
       unit: "Unit",
       isActive: "Active",
       isSubscription: "Subscription",
-      billingInterval: "Billing Interval",
+      billingInterval: "Billing interval",
       categoryId: "Category",
       createdAt: "Created",
       total: "Total",
@@ -105,7 +105,7 @@ export const translations = {
       checkoutReference: "Checkout reference",
       checkoutCredits: "Credits included",
       oneTime: "One-time price",
-      searchPage: "Search this page by name or SKU",
+      searchPage: "Search by name or SKU",
       noMatches: "No matching products on this page",
       retry: "Try again",
       previous: "Previous",

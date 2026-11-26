@@ -8,7 +8,7 @@ export const translations: typeof enTranslations = {
   enums: {
     productType: {
       service: "Dienstleistung",
-      physical: "Physisch",
+      physical: "Physisches Produkt",
       digital: "Digital",
     },
   },

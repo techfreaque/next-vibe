@@ -41,7 +41,7 @@ export const translations: typeof enTranslations = {
       },
       server: {
         title: "Błąd serwera",
-        description: "Coś poszło nie tak — spróbuj ponownie",
+        description: "Coś poszło nie tak. Spróbuj ponownie.",
       },
       unknown: {
         title: "Nieznany błąd",
@@ -77,10 +77,14 @@ export const translations: typeof enTranslations = {
       addCategory: "Dodaj kategorię",
       active: "Aktywna",
       inactive: "Nieaktywna",
-      empty: "Nie znaleziono kategorii. Dodaj pierwszą kategorię.",
-      viewProducts: "Pokaż produkty →",
-      backToCatalog: "← Produkty",
+      emptyTitle: "Brak kategorii",
+      empty: "Kategorie grupują produkty, więc katalog filtrujesz szybciej.",
       back: "Wróć",
+      count: "Kategorie: {{count}}",
+      columnName: "Kategoria",
+      columnOrder: "Kolejność",
+      columnStatus: "Status",
+      inParent: "W {{parent}}",
     },
   },
 };

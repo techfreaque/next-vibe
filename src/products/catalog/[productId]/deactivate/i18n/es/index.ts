@@ -62,7 +62,8 @@ export const translations: typeof enTranslations = {
       isActive: "Situación activa",
     },
     widget: {
-      backToList: "Volver a Productos",
+      backToList: "Volver a productos",
+      cancel: "Cancelar",
       back: "Atrás",
       warning:
         "Esto desactivará el producto y lo eliminará del catálogo activo. Los datos se conservan.",

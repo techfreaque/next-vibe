@@ -17,7 +17,7 @@ export const translations = {
 
   // Free tier product
   free: {
-    name: "Free Tier",
+    name: "Free tier",
     description: "Get started with free credits - no card required",
   },
 
@@ -29,7 +29,7 @@ export const translations = {
     longDescription:
       "Monthly subscription with {{subCredits}} credits for all {{modelCount}} uncensored AI models",
     price: "Monthly subscription pricing",
-    cta: "Subscribe Now",
+    cta: "Subscribe now",
     features: {
       credits: "{{subCredits}} credits per month",
       allModels: "All {{modelCount}} AI models",
@@ -51,7 +51,7 @@ export const translations = {
 
   // Credit pack product
   creditPack: {
-    name: "Credit Pack",
+    name: "Credit pack",
     description: "Top up your plan. Credits never expire.",
     longDescription:
       "Run low before your plan renews? Add a pack. Packs stack on top of your monthly credits and never expire.",

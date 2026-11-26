@@ -4,11 +4,11 @@ export const translations = {
     titleShort: "Subscription metrics",
     description: "Revenue, subscription, credit and referral metrics",
     form: {
-      title: "Statistics Dashboard",
+      title: "Statistics dashboard",
       description: "Aggregate business metrics",
     },
     timePeriodOptions: {
-      title: "Time Period",
+      title: "Time period",
       description: "Configure time range",
     },
     timePeriod: {
@@ -16,7 +16,7 @@ export const translations = {
       description: "Grouping interval",
     },
     dateRangePreset: {
-      label: "Date Range",
+      label: "Date range",
       description: "Predefined date range",
     },
     response: {
@@ -38,7 +38,7 @@ export const translations = {
         churnRate: { label: "Churn rate" },
       },
       intervalStats: {
-        title: "Billing Intervals",
+        title: "Billing intervals",
         description: "Monthly vs yearly split",
         monthlyCount: { label: "Monthly" },
         yearlyCount: { label: "Yearly" },
@@ -85,7 +85,7 @@ export const translations = {
         description: "Login required to view statistics",
       },
       validation: {
-        title: "Validation Error",
+        title: "Validation error",
         description: "Invalid parameters",
       },
       forbidden: {
@@ -93,25 +93,25 @@ export const translations = {
         description: "Admin access required",
       },
       server: {
-        title: "Server Error",
+        title: "Server error",
         description: "Unable to generate statistics",
         detail: "Could not build the statistics: {{error}}",
       },
       unknown: {
-        title: "Unknown Error",
+        title: "Unknown error",
         description: "Unexpected error occurred",
       },
       conflict: { title: "Conflict", description: "Data conflict" },
       network: {
-        title: "Network Error",
+        title: "Network error",
         description: "Unable to connect",
       },
       notFound: {
-        title: "Not Found",
+        title: "Not found",
         description: "Statistics unavailable",
       },
       unsavedChanges: {
-        title: "Unsaved Changes",
+        title: "Unsaved changes",
         description: "You have unsaved changes",
       },
     },
@@ -171,14 +171,14 @@ export const translations = {
       last7Days: "Last 7 Days",
       last30Days: "Last 30 Days",
       last90Days: "Last 90 Days",
-      thisWeek: "This Week",
-      lastWeek: "Last Week",
-      thisMonth: "This Month",
-      lastMonth: "Last Month",
-      thisQuarter: "This Quarter",
-      lastQuarter: "Last Quarter",
-      thisYear: "This Year",
-      lastYear: "Last Year",
+      thisWeek: "This week",
+      lastWeek: "Last week",
+      thisMonth: "This month",
+      lastMonth: "Last month",
+      thisQuarter: "This quarter",
+      lastQuarter: "Last quarter",
+      thisYear: "This year",
+      lastYear: "Last year",
       custom: "Custom",
     },
   },

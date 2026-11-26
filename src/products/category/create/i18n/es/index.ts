@@ -77,7 +77,7 @@ export const translations: typeof enTranslations = {
       name: "Categoría Nombre",
     },
     widget: {
-      backToList: "Volver a Categorías",
+      backToList: "Ver categorías",
       back: "Atrás",
     },
   },

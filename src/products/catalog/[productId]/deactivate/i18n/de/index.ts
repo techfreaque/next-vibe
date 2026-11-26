@@ -35,7 +35,7 @@ export const translations: typeof enTranslations = {
       },
       server: {
         title: "Serverfehler",
-        description: "Etwas ist schiefgelaufen — bitte erneut versuchen",
+        description: "Etwas ist schiefgelaufen. Bitte erneut versuchen.",
       },
       unknown: {
         title: "Unbekannter Fehler",
@@ -64,6 +64,7 @@ export const translations: typeof enTranslations = {
     },
     widget: {
       backToList: "Zurück zu Produkten",
+      cancel: "Abbrechen",
       back: "Zurück",
       warning:
         "Das Produkt wird deaktiviert und aus dem aktiven Katalog entfernt. Die Daten bleiben erhalten.",

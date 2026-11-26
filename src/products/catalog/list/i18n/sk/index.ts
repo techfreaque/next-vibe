@@ -108,7 +108,7 @@ export const translations: typeof enTranslations = {
       checkoutReference: "Identifikátor ponuky",
       checkoutCredits: "Kredity v cene",
       oneTime: "Jednorazová cena",
-      searchPage: "Hľadajte na tejto strane podľa názvu alebo SKU",
+      searchPage: "Hľadať podľa názvu alebo SKU",
       noMatches: "Na tejto strane sa nenašli žiadne zodpovedajúce produkty",
       retry: "Skúste znova",
       previous: "Predchádzajúca",

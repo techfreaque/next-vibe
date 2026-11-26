@@ -1,12 +1,20 @@
 "use client";
 
-import { Badge } from "next-vibe/ui/components/badge";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
+import { EmptyBlock } from "next-vibe/ui/components/empty-block";
 import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
+import { Plus } from "next-vibe/ui/components/icons/Plus";
+import { ListItem } from "next-vibe/ui/components/list-item";
+import { LoadingBlock } from "next-vibe/ui/components/loading-block";
+import { RecordTable } from "next-vibe/ui/components/record-table";
 import { Span } from "next-vibe/ui/components/span";
+import { StatusPill } from "next-vibe/ui/components/status-pill";
+import { WidgetHeader } from "next-vibe/ui/components/widget-header";
+import { WidgetShell } from "next-vibe/ui/components/widget-shell";
 import { usePickerCallback } from "next-vibe/unified-ui/_shared/picker-context";
 import {
+  useWidgetLocale,
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetValue,
@@ -20,61 +28,6 @@ type Category = NonNullable<
   CategoryListGetResponseOutput["categories"]
 >[number];
 
-function CategoryRow({
-  category,
-  isChild,
-  onClick,
-  labelActive,
-  labelInactive,
-  labelViewProducts,
-}: {
-  category: Category;
-  isChild: boolean;
-  onClick: () => void;
-  labelActive: string;
-  labelInactive: string;
-  labelViewProducts: string;
-}): JSX.Element {
-  return (
-    <Div
-      className={[
-        "flex items-center gap-3 py-2.5 border-b last:border-b-0 cursor-pointer transition-colors group",
-        isChild ? "pl-8 pr-3" : "px-3",
-        category.isActive
-          ? "hover:bg-muted/20"
-          : "opacity-50 hover:bg-muted/10",
-      ].join(" ")}
-      onClick={onClick}
-    >
-      {isChild && (
-        <Span className="text-muted-foreground text-xs shrink-0">
-          {/* eslint-disable-next-line i18n/no-literal-string */}└
-        </Span>
-      )}
-      <Span className="text-sm font-medium flex-1 group-hover:text-primary transition-colors">
-        {category.name}
-      </Span>
-      <Div className="flex items-center gap-2 shrink-0">
-        <Span className="text-xs text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity">
-          {labelViewProducts}
-        </Span>
-        {category.sortOrder !== null && category.sortOrder !== undefined ? (
-          <Span className="text-xs text-muted-foreground font-mono">
-            {/* eslint-disable-next-line i18n/no-literal-string */}#
-            {category.sortOrder}
-          </Span>
-        ) : null}
-        <Badge
-          variant={category.isActive ? "default" : "secondary"}
-          className="text-xs"
-        >
-          {category.isActive ? labelActive : labelInactive}
-        </Badge>
-      </Div>
-    </Div>
-  );
-}
-
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function ProductCategoryListWidget(_props: {
   field: (typeof definition.GET)["fields"];
@@ -82,6 +35,7 @@ export function ProductCategoryListWidget(_props: {
   const data = useWidgetValue<typeof definition.GET>();
   const { push: navigate, pop, canGoBack } = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.GET>();
+  const locale = useWidgetLocale();
   const onPick = usePickerCallback<Category>();
   const isPickerMode = !!onPick;
 
@@ -91,146 +45,144 @@ export function ProductCategoryListWidget(_props: {
       navigate(def.default.POST, {});
     })();
   };
-
-  // Group: parent categories first, children nested by parentId
-  const categories = data?.categories ?? [];
-  const parents = categories.filter((c) => c.parentId === null);
-  const childrenByParent = new Map<string, Category[]>();
-  for (const c of categories) {
-    if (c.parentId !== null && c.parentId !== undefined) {
-      const list = childrenByParent.get(c.parentId) ?? [];
-      list.push(c);
-      childrenByParent.set(c.parentId, list);
+  const open = (category: Category): void => {
+    if (isPickerMode && onPick) {
+      onPick(category);
+      pop();
+      return;
     }
-  }
+    void (async (): Promise<void> => {
+      const def = await import("../../catalog/list/definition");
+      navigate(def.default.GET, {
+        data: { filters: { categoryId: category.id } },
+      });
+    })();
+  };
 
-  const labelActive = t("get.widget.active");
-  const labelInactive = t("get.widget.inactive");
-  const labelAddCategory = t("get.widget.addCategory");
-  const labelEmpty = t("get.widget.empty");
-  const labelViewProducts = t("get.widget.viewProducts");
+  // Parents first, each followed by its children; orphans at the end.
+  const categories = data?.categories ?? [];
+  const byId = new Map(categories.map((c) => [c.id, c]));
+  const parents = categories.filter(
+    (c) => !c.parentId || !byId.has(c.parentId),
+  );
+  const ordered = parents.flatMap((parent) => [
+    parent,
+    ...categories.filter((c) => c.parentId === parent.id),
+  ]);
+  const parentName = (category: Category): string =>
+    (category.parentId && byId.get(category.parentId)?.name) || "";
+
+  const statusPill = (isActive: boolean): JSX.Element => (
+    <StatusPill
+      status={isActive ? "active" : "inactive"}
+      label={isActive ? t("get.widget.active") : t("get.widget.inactive")}
+      variant={isActive ? "success" : "muted"}
+    />
+  );
+  const nameCell = (category: Category): JSX.Element => (
+    <Div className="flex min-w-0 flex-col">
+      <Span className="font-medium">{category.name}</Span>
+      {category.parentId && parentName(category) ? (
+        <Span className="text-xs text-muted-foreground">
+          {t("get.widget.inParent", { parent: parentName(category) })}
+        </Span>
+      ) : null}
+    </Div>
+  );
+
+  const orderCell = (category: Category): JSX.Element => (
+    <Span className="tabular-nums text-muted-foreground">
+      {new Intl.NumberFormat(locale).format(category.sortOrder ?? 0)}
+    </Span>
+  );
 
   return (
-    <Div className="max-w-2xl mx-auto w-full px-4 pt-8 pb-6 flex flex-col gap-4">
-      {canGoBack && (
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={() => pop()}
-          className="self-start gap-1.5 -ml-1"
-        >
-          <ChevronLeft className="h-4 w-4" />
-          {t("get.widget.back")}
-        </Button>
-      )}
+    <WidgetShell layout={isPickerMode ? "compact" : "page"}>
+      <WidgetHeader
+        size={isPickerMode ? "section" : "page"}
+        title={t("get.title")}
+        subtitle={
+          data && !isPickerMode
+            ? t("get.widget.count", {
+                count: new Intl.NumberFormat(locale).format(data.total),
+              })
+            : undefined
+        }
+        backButton={
+          canGoBack && !isPickerMode ? (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => pop()}
+            >
+              <ChevronLeft className="size-4" aria-hidden="true" />
+              {t("get.widget.back")}
+            </Button>
+          ) : undefined
+        }
+        actions={
+          !isPickerMode ? (
+            <Button type="button" onClick={handleCreate}>
+              <Plus className="size-4" aria-hidden="true" />
+              {t("get.widget.addCategory")}
+            </Button>
+          ) : undefined
+        }
+      />
 
-      <Div className="flex items-center justify-between">
-        <Div className="flex items-center gap-2">
-          {data?.total !== undefined ? (
-            <Span className="text-xs text-muted-foreground">
-              {data.total} {t("get.response.total").toLowerCase()}
-            </Span>
-          ) : null}
-        </Div>
-        {!isPickerMode && (
-          <Button
-            type="button"
-            size="sm"
-            variant="default"
-            onClick={handleCreate}
-          >
-            {labelAddCategory}
-          </Button>
-        )}
-      </Div>
-
-      {categories.length > 0 ? (
-        <Div className="rounded-md border overflow-hidden">
-          {parents.map((parent) => (
-            <Div key={parent.id}>
-              <CategoryRow
-                category={parent}
-                isChild={false}
-                onClick={(): void => {
-                  if (isPickerMode && onPick) {
-                    onPick(parent);
-                    pop();
-                    return;
+      {!data ? (
+        <LoadingBlock />
+      ) : ordered.length > 0 ? (
+        <RecordTable
+          label={t("get.title")}
+          columns={[
+            { id: "name", label: t("get.widget.columnName") },
+            { id: "order", label: t("get.widget.columnOrder"), numeric: true },
+            { id: "status", label: t("get.widget.columnStatus") },
+          ]}
+          rows={ordered.map((category) => ({
+            id: category.id,
+            onOpen: (): void => open(category),
+            cells: {
+              name: nameCell(category),
+              order: orderCell(category),
+              status: statusPill(category.isActive),
+            },
+          }))}
+          compact={
+            <Div className="flex flex-col gap-2">
+              {ordered.map((category) => (
+                <ListItem
+                  key={category.id}
+                  title={category.name}
+                  subtitle={
+                    category.parentId && parentName(category)
+                      ? t("get.widget.inParent", {
+                          parent: parentName(category),
+                        })
+                      : undefined
                   }
-                  void (async (): Promise<void> => {
-                    const def = await import("../../catalog/list/definition");
-                    navigate(def.default.GET, {
-                      data: { filters: { categoryId: parent.id } },
-                    });
-                  })();
-                }}
-                labelActive={labelActive}
-                labelInactive={labelInactive}
-                labelViewProducts={labelViewProducts}
-              />
-              {(childrenByParent.get(parent.id) ?? []).map((child) => (
-                <CategoryRow
-                  key={child.id}
-                  category={child}
-                  isChild
-                  onClick={(): void => {
-                    if (isPickerMode && onPick) {
-                      onPick(child);
-                      pop();
-                      return;
-                    }
-                    void (async (): Promise<void> => {
-                      const def = await import("../../catalog/list/definition");
-                      navigate(def.default.GET, {
-                        data: { filters: { categoryId: child.id } },
-                      });
-                    })();
-                  }}
-                  labelActive={labelActive}
-                  labelInactive={labelInactive}
-                  labelViewProducts={labelViewProducts}
+                  badges={statusPill(category.isActive)}
+                  onClick={(): void => open(category)}
                 />
               ))}
             </Div>
-          ))}
-          {/* Orphaned children (no parent found) */}
-          {categories
-            .filter(
-              (c) =>
-                c.parentId !== null &&
-                c.parentId !== undefined &&
-                !parents.some((p) => p.id === c.parentId),
-            )
-            .map((c) => (
-              <CategoryRow
-                key={c.id}
-                category={c}
-                isChild={false}
-                onClick={(): void => {
-                  if (isPickerMode && onPick) {
-                    onPick(c);
-                    pop();
-                    return;
-                  }
-                  void (async (): Promise<void> => {
-                    const def = await import("../../catalog/list/definition");
-                    navigate(def.default.GET, {
-                      data: { filters: { categoryId: c.id } },
-                    });
-                  })();
-                }}
-                labelActive={labelActive}
-                labelInactive={labelInactive}
-                labelViewProducts={labelViewProducts}
-              />
-            ))}
-        </Div>
-      ) : data?.categories !== undefined ? (
-        <Div className="text-center py-8 text-sm text-muted-foreground border border-dashed rounded-md">
-          {labelEmpty}
-        </Div>
-      ) : null}
-    </Div>
+          }
+        />
+      ) : (
+        <EmptyBlock
+          size="page"
+          className="rounded-xl border bg-card"
+          title={t("get.widget.emptyTitle")}
+          message={t("get.widget.empty")}
+          action={
+            isPickerMode
+              ? undefined
+              : { label: t("get.widget.addCategory"), onClick: handleCreate }
+          }
+        />
+      )}
+    </WidgetShell>
   );
 }

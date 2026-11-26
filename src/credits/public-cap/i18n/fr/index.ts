@@ -7,6 +7,24 @@ export const translations: typeof enTranslations = {
   },
   get: {
     perDayUnit: "crédits/jour",
+    lead: "Visiteur",
+    ip: "Adresse IP",
+    globalCap: "Plafond quotidien atteint",
+    leadCap: "Limite visiteur atteinte",
+    ipCap: "Limite IP atteinte",
+    singleRequest: "Requête trop coûteuse",
+    failClosed: "Bloqué, contrôle du plafond en échec",
+    poolReserved: "Crédits réservés",
+    threshold80: "80 % du plafond utilisés",
+    threshold100: "Plafond épuisé",
+    other: "Autre",
+    changeCap: "Modifier le plafond",
+    limits: "Limites",
+    capHint: "Partagé par tous les visiteurs sans offre payante",
+    usedOfCap: "{{used}} sur {{cap}} utilisés",
+    exceededHint:
+      "Les visiteurs gratuits sont bloqués jusqu'à la remise à zéro.",
+    resetAt: "Dernière remise à zéro {{time}}",
     title: "Voir le plafond public gratuit",
     titleShort: "Plafond gratuit",
     description:
@@ -82,6 +100,10 @@ export const translations: typeof enTranslations = {
     },
   },
   post: {
+    perDayUnit: "crédits par jour",
+    back: "Retour",
+    decrease: "Réduire de 100",
+    increase: "Augmenter de 100",
     title: "Modifier le plafond public gratuit",
     titleShort: "Modifier le plafond",
     description:

@@ -4,11 +4,11 @@ export const translations = {
     fields: { currency: "Revenue currency" },
   },
   get: {
-    title: "Referral Dashboard",
+    title: "Referral dashboard",
     titleShort: "Referral activity",
     description: "Referral codes, earnings and payouts",
     form: {
-      title: "Referral Management",
+      title: "Referral management",
       description: "Manage referral program",
     },
     searchFilters: {
@@ -21,7 +21,7 @@ export const translations = {
       placeholder: "Search referrals...",
     },
     payoutStatus: {
-      label: "Payout Status",
+      label: "Payout status",
       description: "Filter by payout request status",
       placeholder: "Any status",
     },
@@ -38,12 +38,12 @@ export const translations = {
       description: "Configure result sorting",
     },
     sortBy: {
-      label: "Sort By",
+      label: "Sort by",
       description: "Sort field",
       placeholder: "Select sort field...",
     },
     sortOrder: {
-      label: "Sort Order",
+      label: "Sort order",
       description: "Sort direction",
       placeholder: "Select order...",
     },
@@ -53,11 +53,11 @@ export const translations = {
       summary: {
         title: "Summary",
         description: "Aggregate referral stats",
-        totalCodes: { label: "Total Codes" },
-        totalSignups: { label: "Total Signups" },
-        totalEarned: { label: "Total Earned" },
-        totalPaidOut: { label: "Total Paid Out" },
-        pendingPayouts: { label: "Pending Payouts" },
+        totalCodes: { label: "Total codes" },
+        totalSignups: { label: "Total signups" },
+        totalEarned: { label: "Total earned" },
+        totalPaidOut: { label: "Total paid out" },
+        pendingPayouts: { label: "Pending payouts" },
       },
       codes: {
         code: "Code",
@@ -77,22 +77,22 @@ export const translations = {
         status: "Status",
         walletAddress: "Wallet",
         adminNotes: "Notes",
-        rejectionReason: "Rejection Reason",
+        rejectionReason: "Rejection reason",
         createdAt: "Requested",
         processedAt: "Processed",
       },
       totalCount: "Total",
-      pageCount: "Total Pages",
+      pageCount: "Total pages",
     },
     page: { label: "Page" },
-    limit: { label: "Per Page" },
+    limit: { label: "Per page" },
     errors: {
       unauthorized: {
         title: "Unauthorized",
         description: "Login required",
       },
       validation: {
-        title: "Validation Error",
+        title: "Validation error",
         description: "Invalid parameters",
       },
       forbidden: {
@@ -100,35 +100,35 @@ export const translations = {
         description: "Admin access required",
       },
       server: {
-        title: "Server Error",
+        title: "Server error",
         description: "Unable to retrieve referrals",
       },
       unknown: {
-        title: "Unknown Error",
+        title: "Unknown error",
         description: "Unexpected error",
       },
       conflict: { title: "Conflict", description: "Data conflict" },
       network: {
-        title: "Network Error",
+        title: "Network error",
         description: "Unable to connect",
       },
       notFound: {
-        title: "Not Found",
+        title: "Not found",
         description: "No referral data found",
       },
       unsavedChanges: {
-        title: "Unsaved Changes",
+        title: "Unsaved changes",
         description: "Unsaved changes",
       },
     },
     success: { title: "Success", description: "Referrals retrieved" },
   },
   post: {
-    title: "Payout Action",
-    titleShort: "Payout Action",
+    title: "Payout action",
+    titleShort: "Payout action",
     description: "Approve, reject, or complete a payout request",
     form: {
-      title: "Payout Action",
+      title: "Payout action",
       description: "Process a payout request",
     },
     requestId: {
@@ -142,12 +142,12 @@ export const translations = {
       placeholder: "Select action...",
     },
     adminNotes: {
-      label: "Admin Notes",
+      label: "Admin notes",
       description: "Optional notes",
       placeholder: "Add notes...",
     },
     rejectionReason: {
-      label: "Rejection Reason",
+      label: "Rejection reason",
       description: "Required when rejecting",
       placeholder: "Enter reason...",
     },
@@ -163,7 +163,7 @@ export const translations = {
         description: "Login required",
       },
       validation: {
-        title: "Validation Error",
+        title: "Validation error",
         description: "Invalid parameters",
       },
       forbidden: {
@@ -171,11 +171,11 @@ export const translations = {
         description: "Admin access required",
       },
       server: {
-        title: "Server Error",
+        title: "Server error",
         description: "Unable to process payout",
       },
       unknown: {
-        title: "Unknown Error",
+        title: "Unknown error",
         description: "Unexpected error",
       },
       conflict: {
@@ -183,15 +183,15 @@ export const translations = {
         description: "Payout already processed",
       },
       network: {
-        title: "Network Error",
+        title: "Network error",
         description: "Unable to connect",
       },
       notFound: {
-        title: "Not Found",
+        title: "Not found",
         description: "Payout request not found",
       },
       unsavedChanges: {
-        title: "Unsaved Changes",
+        title: "Unsaved changes",
         description: "Unsaved changes",
       },
     },
@@ -203,8 +203,8 @@ export const translations = {
     approve: "Approve",
     reject: "Reject",
     complete: "Complete",
-    sectionCodes: "Referral Codes",
-    sectionPayouts: "Payout Requests",
+    sectionCodes: "Referral codes",
+    sectionPayouts: "Payout requests",
     refresh: "Refresh",
     codeActive: "Active",
     codeInactive: "Inactive",
@@ -231,8 +231,8 @@ export const translations = {
       failed: "Failed",
     },
     referralSortField: {
-      createdAt: "Created At",
-      earnings: "Total Earnings",
+      createdAt: "Created at",
+      earnings: "Total earnings",
       signups: "Signups",
     },
     sortOrder: {

@@ -5,8 +5,8 @@ export const translations = {
     admin: "admin",
   },
   post: {
-    title: "Yearly Plans: Monthly Credits",
-    titleShort: "Yearly Credits",
+    title: "Yearly plans: monthly credits",
+    titleShort: "Yearly credits",
     description:
       "Give every yearly plan this month's credits. Runs daily; each month is granted once and expires when the month ends.",
     response: {
@@ -25,8 +25,8 @@ export const translations = {
     description: "Grants yearly plans their monthly credits",
   },
   backfill: {
-    title: "Yearly Plans: Backfill Missed Months",
-    titleShort: "Yearly Backfill",
+    title: "Yearly plans: backfill missed months",
+    titleShort: "Yearly backfill",
     description:
       "Months of the current yearly period that passed without monthly credits. Dry run lists them; turn it off to grant them once, as one pack that lasts until the period ends.",
     fields: {

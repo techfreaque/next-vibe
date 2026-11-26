@@ -42,6 +42,26 @@ const { POST } = createEndpoint({
   allowedRoles: [UserRole.ADMIN],
   icon: "package",
 
+  options: {
+    mutationOptions: {
+      // Without this the detail page popped back to after success still
+      // showed the product as active.
+      onSuccess: async ({ logger, pathParams: { productId } }) => {
+        const [{ apiClient }, detail, list] = await Promise.all([
+          import("next-vibe/unified-ui/hooks/store"),
+          import("../get/definition"),
+          import("../../list/definition"),
+        ]);
+        await Promise.all([
+          apiClient.refetchEndpoint(detail.default.GET, logger, {
+            urlPathParams: { productId },
+          }),
+          apiClient.refetchEndpoint(list.default.GET, logger),
+        ]);
+      },
+    },
+  },
+
   fields: customWidgetObject({
     render: CatalogProductDeactivateWidgetLazy,
     usage: { request: "urlPathParams", response: true },

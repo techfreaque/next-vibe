@@ -5,21 +5,21 @@ export const translations = {
     deactivate: "Deactivate",
   },
   post: {
-    title: "Deactivate Product",
+    title: "Deactivate product",
     titleShort: "Deactivate",
     description:
       "Soft-delete a catalog product by marking it inactive. The product data is retained.",
     productId: {
-      label: "Product ID",
+      label: "Product",
       description: "The ID of the product to deactivate",
     },
     errors: {
       validation: {
-        title: "Validation Error",
+        title: "Check the request",
         description: "Check the product ID and try again",
       },
       unauthorized: {
-        title: "Not Signed In",
+        title: "Not signed in",
         description: "Sign in to deactivate a product",
       },
       forbidden: {
@@ -31,36 +31,37 @@ export const translations = {
         description: "A conflict occurred",
       },
       server: {
-        title: "Server Error",
-        description: "Something went wrong on our end — try again",
+        title: "Server error",
+        description: "Something went wrong on our end. Try again.",
       },
       unknown: {
-        title: "Unknown Error",
+        title: "Unknown error",
         description: "An unexpected error occurred",
       },
       network: {
-        title: "Network Error",
+        title: "Network error",
         description: "Check your connection and try again",
       },
       notFound: {
-        title: "Not Found",
+        title: "Product not found",
         description: "Product not found",
       },
       unsavedChanges: {
-        title: "Unsaved Changes",
+        title: "Unsaved changes",
         description: "You have unsaved changes",
       },
     },
     success: {
-      title: "Product Deactivated",
+      title: "Product deactivated",
       description: "The product has been removed from the active catalog.",
     },
     response: {
-      id: "Product ID",
-      isActive: "Active Status",
+      id: "Product",
+      isActive: "Active",
     },
     widget: {
-      backToList: "Back to Products",
+      backToList: "Back to products",
+      cancel: "Cancel",
       back: "Back",
       warning:
         "This will deactivate the product and remove it from the active catalog. The data is retained.",

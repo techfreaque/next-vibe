@@ -85,14 +85,15 @@ export const translations: typeof enTranslations = {
       title: "Ukončiť platnosť kreditov",
       titleShort: "Ukončiť platnosť kreditov",
       description:
-        "Ukončiť platnosť starých kreditov z predplatného (spúšťa cron)",
+        "Odstráni kredity z predplatného po dátume platnosti. Spúšťa sa denne automaticky; ručné spustenie ukončí len splatné balíky.",
       tag: "skončenie platnosti",
       container: {
         title: "Ukončiť platnosť kreditov",
-        description: "Výsledky ukončenia platnosti kreditov",
+        description:
+          "Platnosť končí len balíkom z predplatného po dátume platnosti. Kúpené balíky a bonusy zostávajú.",
       },
       response: {
-        expiredCount: "Počet kreditov po platnosti",
+        expiredCount: "Balíky po platnosti",
       },
       success: {
         title: "Platnosť kreditov skončila",

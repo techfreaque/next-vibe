@@ -339,9 +339,24 @@ export function CatalogProductGetWidget({
               type="button"
               variant="outline"
               onClick={() => {
+                if (!product.isActive) {
+                  // Deactivate only ever sets isActive=false; reactivation goes
+                  // through the edit form with the active switch pre-set.
+                  void import("../update/definition").then(
+                    ({ default: editor }) => {
+                      push(editor.PATCH, {
+                        urlPathParams: { productId: product.id },
+                        data: { fields: { isActive: true } },
+                        popNavigationOnSuccess: 1,
+                      });
+                      return undefined;
+                    },
+                  );
+                  return;
+                }
                 void import("../deactivate/definition").then(
-                  ({ default: update }) => {
-                    push(update.POST, {
+                  ({ default: deactivate }) => {
+                    push(deactivate.POST, {
                       urlPathParams: { productId: product.id },
                       popNavigationOnSuccess: 1,
                     });

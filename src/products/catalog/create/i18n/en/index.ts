@@ -12,13 +12,13 @@ export const translations = {
     create: "Create",
   },
   post: {
-    title: "Create Product",
-    titleShort: "Create Product",
+    title: "Create product",
+    titleShort: "Create product",
     description: "Add a product or service to your catalog.",
     name: {
-      label: "Product Name",
+      label: "Product name",
       description: "Name of the product or service",
-      placeholder: "Web Design Package",
+      placeholder: "Web design package",
     },
     productDescription: {
       label: "Description",
@@ -27,11 +27,11 @@ export const translations = {
     },
     sku: {
       label: "SKU",
-      description: "Stock keeping unit — your internal product code",
+      description: "Stock keeping unit: your internal product code",
       placeholder: "WD-001",
     },
     type: {
-      label: "Product Type",
+      label: "Product type",
       description: "Whether this is a service, physical good, or digital item",
       placeholder: "Select type",
     },
@@ -41,7 +41,7 @@ export const translations = {
       placeholder: "hour",
     },
     basePrice: {
-      label: "Base Price",
+      label: "Base price",
       description: "Default price in the selected currency",
       placeholder: "150.00",
     },
@@ -51,7 +51,7 @@ export const translations = {
       placeholder: "EUR",
     },
     defaultTaxRate: {
-      label: "Default Tax Rate",
+      label: "Default tax rate",
       description: "Default VAT/tax rate as a decimal (e.g. 0.19 for 19%)",
       placeholder: "0.19",
     },
@@ -81,11 +81,11 @@ export const translations = {
     },
     errors: {
       validation: {
-        title: "Validation Error",
+        title: "Validation error",
         description: "Check the form fields and try again",
       },
       unauthorized: {
-        title: "Not Signed In",
+        title: "Not signed in",
         description: "Sign in to create a product",
       },
       forbidden: {
@@ -93,41 +93,41 @@ export const translations = {
         description: "You do not have permission to create this product",
       },
       conflict: {
-        title: "Already Exists",
+        title: "Already exists",
         description: "A product with this SKU already exists",
       },
       server: {
-        title: "Server Error",
-        description: "Something went wrong on our end — try again",
+        title: "Server error",
+        description: "Something went wrong on our end. Try again.",
       },
       unknown: {
-        title: "Unknown Error",
+        title: "Unknown error",
         description: "An unexpected error occurred",
       },
       network: {
-        title: "Network Error",
+        title: "Network error",
         description: "Check your connection and try again",
       },
       notFound: {
-        title: "Not Found",
+        title: "Not found",
         description: "Resource not found",
       },
       unsavedChanges: {
-        title: "Unsaved Changes",
+        title: "Unsaved changes",
         description: "You have unsaved changes",
       },
     },
     success: {
-      title: "Product Created",
+      title: "Product created",
       description: "Your product is now in the catalog.",
     },
     response: {
       id: "Product ID",
-      name: "Product Name",
+      name: "Product name",
     },
     widget: {
-      viewProduct: "View Product",
-      backToList: "Back to Products",
+      viewProduct: "View product",
+      backToList: "Back to products",
       back: "Back",
     },
   },

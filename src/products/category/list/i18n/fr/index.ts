@@ -78,10 +78,15 @@ export const translations: typeof enTranslations = {
       addCategory: "Ajouter une catégorie",
       active: "Active",
       inactive: "Inactive",
-      empty: "Aucune catégorie trouvée. Ajoutez votre première catégorie.",
-      viewProducts: "Voir les produits →",
-      backToCatalog: "← Produits",
+      emptyTitle: "Aucune catégorie",
+      empty:
+        "Les catégories regroupent les produits pour filtrer le catalogue plus vite.",
       back: "Retour",
+      count: "{{count}} catégories",
+      columnName: "Catégorie",
+      columnOrder: "Ordre",
+      columnStatus: "Statut",
+      inParent: "Dans {{parent}}",
     },
   },
 };

@@ -62,7 +62,7 @@ export const translations: typeof enTranslations = {
       },
       server: {
         title: "Błąd serwera",
-        description: "Coś poszło nie tak — spróbuj ponownie",
+        description: "Coś poszło nie tak. Spróbuj ponownie.",
       },
       unknown: {
         title: "Nieznany błąd",
@@ -107,7 +107,7 @@ export const translations: typeof enTranslations = {
       checkoutReference: "Identyfikator oferty",
       checkoutCredits: "Kredyty w cenie",
       oneTime: "Cena jednorazowa",
-      searchPage: "Szukaj na tej stronie według nazwy lub SKU",
+      searchPage: "Szukaj po nazwie lub SKU",
       noMatches: "Brak pasujących produktów na tej stronie",
       retry: "Spróbuj ponownie",
       previous: "Poprzednia",

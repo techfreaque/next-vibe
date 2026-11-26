@@ -107,7 +107,7 @@ export const translations: typeof enTranslations = {
       checkoutReference: "Riferimento di pagamento",
       checkoutCredits: "Crediti inclusi",
       oneTime: "Prezzo una tantum",
-      searchPage: "Cerca per nome o SKU in questa pagina",
+      searchPage: "Cerca per nome o SKU",
       noMatches: "Nessun prodotto corrispondente in questa pagina",
       retry: "Riprova",
       previous: "Indietro",

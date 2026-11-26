@@ -1,7 +1,7 @@
 export const translations = {
   post: {
-    title: "Sync Subscriptions from Stripe",
-    titleShort: "Stripe Sync",
+    title: "Sync subscriptions from Stripe",
+    titleShort: "Stripe sync",
     description:
       "Pull status, billing period and cancellation fields from Stripe into our subscription rows. Expires legacy rows with no Stripe id and an ended period. Never grants or revokes credits. Dry run by default.",
     fields: {

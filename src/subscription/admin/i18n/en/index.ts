@@ -10,14 +10,14 @@ export const translations = {
   // Stats endpoint translations
   stats: {
     get: {
-      title: "Subscription Statistics",
+      title: "Subscription statistics",
       description: "Revenue, subscription, credit and referral metrics",
       form: {
-        title: "Statistics Dashboard",
+        title: "Statistics dashboard",
         description: "Aggregate business metrics",
       },
       timePeriodOptions: {
-        title: "Time Period",
+        title: "Time period",
         description: "Configure time range",
       },
       timePeriod: {
@@ -25,7 +25,7 @@ export const translations = {
         description: "Grouping interval",
       },
       dateRangePreset: {
-        label: "Date Range",
+        label: "Date range",
         description: "Predefined date range",
       },
       response: {
@@ -34,8 +34,8 @@ export const translations = {
           description: "Revenue metrics",
           mrr: { label: "MRR" },
           arr: { label: "ARR" },
-          totalRevenue: { label: "Total Revenue" },
-          avgOrderValue: { label: "Avg Order" },
+          totalRevenue: { label: "Total revenue" },
+          avgOrderValue: { label: "Avg order" },
         },
         subscriptionStats: {
           title: "Subscriptions",
@@ -43,10 +43,10 @@ export const translations = {
           activeCount: { label: "Active" },
           trialingCount: { label: "Trialing" },
           canceledCount: { label: "Canceled" },
-          churnRate: { label: "Churn Rate" },
+          churnRate: { label: "Churn rate" },
         },
         intervalStats: {
-          title: "Billing Intervals",
+          title: "Billing intervals",
           description: "Monthly vs yearly split",
           monthlyCount: { label: "Monthly" },
           yearlyCount: { label: "Yearly" },
@@ -57,33 +57,33 @@ export const translations = {
           description: "Credit pack metrics",
           totalPurchased: { label: "Purchased" },
           totalSpent: { label: "Spent" },
-          packsSold: { label: "Packs Sold" },
-          avgPackSize: { label: "Avg Pack Size" },
+          packsSold: { label: "Packs sold" },
+          avgPackSize: { label: "Avg pack size" },
         },
         referralStats: {
           title: "Referrals",
           description: "Referral program metrics",
-          totalReferrals: { label: "Total Referrals" },
+          totalReferrals: { label: "Total referrals" },
           conversionRate: { label: "Conversion" },
-          totalEarned: { label: "Total Earned" },
-          pendingPayouts: { label: "Pending Payouts" },
+          totalEarned: { label: "Total earned" },
+          pendingPayouts: { label: "Pending payouts" },
         },
         growthMetrics: {
           title: "Growth",
           description: "Revenue and subscription trends",
           revenueChart: {
-            label: "Revenue Over Time",
+            label: "Revenue over time",
             description: "Revenue trend",
           },
           subscriptionChart: {
-            label: "Subscription Growth",
+            label: "Subscription growth",
             description: "Active subscription trend",
           },
         },
         businessInsights: {
           title: "Insights",
           description: "Generated metrics",
-          generatedAt: { label: "Generated At" },
+          generatedAt: { label: "Generated at" },
         },
       },
       errors: {
@@ -92,7 +92,7 @@ export const translations = {
           description: "Login required to view statistics",
         },
         validation: {
-          title: "Validation Error",
+          title: "Validation error",
           description: "Invalid parameters",
         },
         forbidden: {
@@ -100,24 +100,24 @@ export const translations = {
           description: "Admin access required",
         },
         server: {
-          title: "Server Error",
+          title: "Server error",
           description: "Unable to generate statistics",
         },
         unknown: {
-          title: "Unknown Error",
+          title: "Unknown error",
           description: "Unexpected error occurred",
         },
         conflict: { title: "Conflict", description: "Data conflict" },
         network: {
-          title: "Network Error",
+          title: "Network error",
           description: "Unable to connect",
         },
         notFound: {
-          title: "Not Found",
+          title: "Not found",
           description: "Statistics unavailable",
         },
         unsavedChanges: {
-          title: "Unsaved Changes",
+          title: "Unsaved changes",
           description: "You have unsaved changes",
         },
       },
@@ -131,10 +131,10 @@ export const translations = {
   // List endpoint translations
   list: {
     get: {
-      title: "Subscriptions List",
+      title: "Subscriptions list",
       description: "Browse all subscriptions",
       form: {
-        title: "Subscription Management",
+        title: "Subscription management",
         description: "Filter and browse subscriptions",
       },
       searchFilters: {
@@ -152,7 +152,7 @@ export const translations = {
         placeholder: "Select status...",
       },
       interval: {
-        label: "Billing Interval",
+        label: "Billing interval",
         description: "Filter by billing interval",
         placeholder: "Any interval",
       },
@@ -174,12 +174,12 @@ export const translations = {
         description: "Configure result sorting",
       },
       sortBy: {
-        label: "Sort By",
+        label: "Sort by",
         description: "Sort field",
         placeholder: "Select sort field...",
       },
       sortOrder: {
-        label: "Sort Order",
+        label: "Sort order",
         description: "Sort direction",
         placeholder: "Select order...",
       },
@@ -194,25 +194,25 @@ export const translations = {
           billingInterval: "Interval",
           status: "Status",
           createdAt: "Started",
-          currentPeriodEnd: "Period End",
-          cancelAtPeriodEnd: "Cancel at End",
-          canceledAt: "Canceled At",
-          cancellationReason: "Cancel Reason",
+          currentPeriodEnd: "Period end",
+          cancelAtPeriodEnd: "Cancel at end",
+          canceledAt: "Canceled at",
+          cancellationReason: "Cancel reason",
           provider: "Provider",
           providerSubscriptionId: "Provider ID",
         },
-        totalCount: "Total Subscriptions",
-        pageCount: "Total Pages",
+        totalCount: "Total subscriptions",
+        pageCount: "Total pages",
       },
       page: { label: "Page" },
-      limit: { label: "Per Page" },
+      limit: { label: "Per page" },
       errors: {
         unauthorized: {
           title: "Unauthorized",
           description: "Login required",
         },
         validation: {
-          title: "Validation Error",
+          title: "Validation error",
           description: "Invalid parameters",
         },
         forbidden: {
@@ -220,24 +220,24 @@ export const translations = {
           description: "Admin access required",
         },
         server: {
-          title: "Server Error",
+          title: "Server error",
           description: "Unable to retrieve subscriptions",
         },
         unknown: {
-          title: "Unknown Error",
+          title: "Unknown error",
           description: "Unexpected error",
         },
         conflict: { title: "Conflict", description: "Data conflict" },
         network: {
-          title: "Network Error",
+          title: "Network error",
           description: "Unable to connect",
         },
         notFound: {
-          title: "Not Found",
+          title: "Not found",
           description: "No subscriptions found",
         },
         unsavedChanges: {
-          title: "Unsaved Changes",
+          title: "Unsaved changes",
           description: "Unsaved changes",
         },
       },
@@ -254,10 +254,10 @@ export const translations = {
   // Purchases endpoint translations
   purchases: {
     get: {
-      title: "Credit Purchases",
+      title: "Credit purchases",
       description: "Credit pack purchase history",
       form: {
-        title: "Purchase History",
+        title: "Purchase history",
         description: "Browse credit pack purchases",
       },
       searchFilters: {
@@ -270,7 +270,7 @@ export const translations = {
         placeholder: "Search purchases...",
       },
       packType: {
-        label: "Pack Type",
+        label: "Pack type",
         description: "Filter by credit pack type",
         placeholder: "Any type",
       },
@@ -292,12 +292,12 @@ export const translations = {
         description: "Configure result sorting",
       },
       sortBy: {
-        label: "Sort By",
+        label: "Sort by",
         description: "Sort field",
         placeholder: "Select sort field...",
       },
       sortOrder: {
-        label: "Sort Order",
+        label: "Sort order",
         description: "Sort direction",
         placeholder: "Select order...",
       },
@@ -315,18 +315,18 @@ export const translations = {
           expiresAt: "Expires",
           createdAt: "Purchased",
         },
-        totalCount: "Total Purchases",
-        pageCount: "Total Pages",
+        totalCount: "Total purchases",
+        pageCount: "Total pages",
       },
       page: { label: "Page" },
-      limit: { label: "Per Page" },
+      limit: { label: "Per page" },
       errors: {
         unauthorized: {
           title: "Unauthorized",
           description: "Login required",
         },
         validation: {
-          title: "Validation Error",
+          title: "Validation error",
           description: "Invalid parameters",
         },
         forbidden: {
@@ -334,24 +334,24 @@ export const translations = {
           description: "Admin access required",
         },
         server: {
-          title: "Server Error",
+          title: "Server error",
           description: "Unable to retrieve purchases",
         },
         unknown: {
-          title: "Unknown Error",
+          title: "Unknown error",
           description: "Unexpected error",
         },
         conflict: { title: "Conflict", description: "Data conflict" },
         network: {
-          title: "Network Error",
+          title: "Network error",
           description: "Unable to connect",
         },
         notFound: {
-          title: "Not Found",
+          title: "Not found",
           description: "No purchases found",
         },
         unsavedChanges: {
-          title: "Unsaved Changes",
+          title: "Unsaved changes",
           description: "Unsaved changes",
         },
       },
@@ -369,10 +369,10 @@ export const translations = {
   // Referrals endpoint translations
   referrals: {
     get: {
-      title: "Referral Dashboard",
+      title: "Referral dashboard",
       description: "Referral codes, earnings and payouts",
       form: {
-        title: "Referral Management",
+        title: "Referral management",
         description: "Manage referral program",
       },
       searchFilters: {
@@ -385,7 +385,7 @@ export const translations = {
         placeholder: "Search referrals...",
       },
       payoutStatus: {
-        label: "Payout Status",
+        label: "Payout status",
         description: "Filter by payout request status",
         placeholder: "Any status",
       },
@@ -402,12 +402,12 @@ export const translations = {
         description: "Configure result sorting",
       },
       sortBy: {
-        label: "Sort By",
+        label: "Sort by",
         description: "Sort field",
         placeholder: "Select sort field...",
       },
       sortOrder: {
-        label: "Sort Order",
+        label: "Sort order",
         description: "Sort direction",
         placeholder: "Select order...",
       },
@@ -417,11 +417,11 @@ export const translations = {
         summary: {
           title: "Summary",
           description: "Aggregate referral stats",
-          totalCodes: { label: "Total Codes" },
-          totalSignups: { label: "Total Signups" },
-          totalEarned: { label: "Total Earned" },
-          totalPaidOut: { label: "Total Paid Out" },
-          pendingPayouts: { label: "Pending Payouts" },
+          totalCodes: { label: "Total codes" },
+          totalSignups: { label: "Total signups" },
+          totalEarned: { label: "Total earned" },
+          totalPaidOut: { label: "Total paid out" },
+          pendingPayouts: { label: "Pending payouts" },
         },
         codes: {
           code: "Code",
@@ -441,22 +441,22 @@ export const translations = {
           status: "Status",
           walletAddress: "Wallet",
           adminNotes: "Notes",
-          rejectionReason: "Rejection Reason",
+          rejectionReason: "Rejection reason",
           createdAt: "Requested",
           processedAt: "Processed",
         },
         totalCount: "Total",
-        pageCount: "Total Pages",
+        pageCount: "Total pages",
       },
       page: { label: "Page" },
-      limit: { label: "Per Page" },
+      limit: { label: "Per page" },
       errors: {
         unauthorized: {
           title: "Unauthorized",
           description: "Login required",
         },
         validation: {
-          title: "Validation Error",
+          title: "Validation error",
           description: "Invalid parameters",
         },
         forbidden: {
@@ -464,34 +464,34 @@ export const translations = {
           description: "Admin access required",
         },
         server: {
-          title: "Server Error",
+          title: "Server error",
           description: "Unable to retrieve referrals",
         },
         unknown: {
-          title: "Unknown Error",
+          title: "Unknown error",
           description: "Unexpected error",
         },
         conflict: { title: "Conflict", description: "Data conflict" },
         network: {
-          title: "Network Error",
+          title: "Network error",
           description: "Unable to connect",
         },
         notFound: {
-          title: "Not Found",
+          title: "Not found",
           description: "No referral data found",
         },
         unsavedChanges: {
-          title: "Unsaved Changes",
+          title: "Unsaved changes",
           description: "Unsaved changes",
         },
       },
       success: { title: "Success", description: "Referrals retrieved" },
     },
     post: {
-      title: "Payout Action",
+      title: "Payout action",
       description: "Approve, reject, or complete a payout request",
       form: {
-        title: "Payout Action",
+        title: "Payout action",
         description: "Process a payout request",
       },
       requestId: {
@@ -505,12 +505,12 @@ export const translations = {
         placeholder: "Select action...",
       },
       adminNotes: {
-        label: "Admin Notes",
+        label: "Admin notes",
         description: "Optional notes",
         placeholder: "Add notes...",
       },
       rejectionReason: {
-        label: "Rejection Reason",
+        label: "Rejection reason",
         description: "Required when rejecting",
         placeholder: "Enter reason...",
       },
@@ -526,7 +526,7 @@ export const translations = {
           description: "Login required",
         },
         validation: {
-          title: "Validation Error",
+          title: "Validation error",
           description: "Invalid parameters",
         },
         forbidden: {
@@ -534,11 +534,11 @@ export const translations = {
           description: "Admin access required",
         },
         server: {
-          title: "Server Error",
+          title: "Server error",
           description: "Unable to process payout",
         },
         unknown: {
-          title: "Unknown Error",
+          title: "Unknown error",
           description: "Unexpected error",
         },
         conflict: {
@@ -546,15 +546,15 @@ export const translations = {
           description: "Payout already processed",
         },
         network: {
-          title: "Network Error",
+          title: "Network error",
           description: "Unable to connect",
         },
         notFound: {
-          title: "Not Found",
+          title: "Not found",
           description: "Payout request not found",
         },
         unsavedChanges: {
-          title: "Unsaved Changes",
+          title: "Unsaved changes",
           description: "Unsaved changes",
         },
       },
@@ -566,8 +566,8 @@ export const translations = {
       approve: "Approve",
       reject: "Reject",
       complete: "Complete",
-      sectionCodes: "Referral Codes",
-      sectionPayouts: "Payout Requests",
+      sectionCodes: "Referral codes",
+      sectionPayouts: "Payout requests",
       refresh: "Refresh",
       codeActive: "Active",
       codeInactive: "Inactive",
@@ -591,7 +591,7 @@ export const translations = {
       all: "All",
       active: "Active",
       trialing: "Trialing",
-      pastDue: "Past Due",
+      pastDue: "Past due",
       canceled: "Canceled",
       unpaid: "Unpaid",
       paused: "Paused",
@@ -608,10 +608,10 @@ export const translations = {
     },
     subscriptionSortField: {
       periodEnd: "Period end",
-      createdAt: "Created At",
+      createdAt: "Created at",
       status: "Status",
       interval: "Interval",
-      userEmail: "User Email",
+      userEmail: "User email",
     },
     sortOrder: {
       asc: "Ascending",
@@ -626,16 +626,16 @@ export const translations = {
     },
     creditPackSourceFilter: {
       any: "Any",
-      stripePurchase: "Stripe Purchase",
-      stripeSubscription: "Subscription Grant",
-      adminGrant: "Admin Grant",
-      referralEarning: "Referral Earning",
+      stripePurchase: "Stripe purchase",
+      stripeSubscription: "Subscription grant",
+      adminGrant: "Admin grant",
+      referralEarning: "Referral earning",
     },
     purchaseSortField: {
-      createdAt: "Created At",
+      createdAt: "Created at",
       amount: "Amount",
       type: "Type",
-      userEmail: "User Email",
+      userEmail: "User email",
     },
     payoutStatusFilter: {
       all: "All",
@@ -647,8 +647,8 @@ export const translations = {
       failed: "Failed",
     },
     referralSortField: {
-      createdAt: "Created At",
-      earnings: "Total Earnings",
+      createdAt: "Created at",
+      earnings: "Total earnings",
       signups: "Signups",
     },
     payoutAction: {

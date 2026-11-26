@@ -86,14 +86,15 @@ export const translations: typeof enTranslations = {
       title: "Faire expirer les crédits",
       titleShort: "Expirer les crédits",
       description:
-        "Faire expirer les anciens crédits d'abonnement (appelé par le cron)",
+        "Retire les crédits d'abonnement après leur date d'expiration. S'exécute chaque jour ; un lancement manuel n'expire que ce qui est dû.",
       tag: "expiration",
       container: {
         title: "Faire expirer les crédits",
-        description: "Résultats de l'expiration des crédits",
+        description:
+          "Seuls les packs d'abonnement expirés sont retirés. Les packs achetés et les bonus restent intacts.",
       },
       response: {
-        expiredCount: "Nombre expirés",
+        expiredCount: "Packs expirés",
       },
       success: {
         title: "Crédits expirés",
