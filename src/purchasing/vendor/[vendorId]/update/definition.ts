@@ -179,7 +179,7 @@ const { PATCH } = createEndpoint({
       }),
       defaultCurrency: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
+        fieldType: FieldDataType.CURRENCY_SELECT,
         label: "vendorUpdate.patch.defaultCurrency.label" as const,
         description: "vendorUpdate.patch.defaultCurrency.description" as const,
         placeholder: "vendorUpdate.patch.defaultCurrency.placeholder" as const,
@@ -205,6 +205,15 @@ const { PATCH } = createEndpoint({
         placeholder: "vendorUpdate.patch.notes.placeholder" as const,
         columns: 12,
         schema: z.string().optional(),
+      }),
+
+      isActive: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "vendorUpdate.patch.isActive.label" as const,
+        description: "vendorUpdate.patch.isActive.description" as const,
+        columns: 12,
+        schema: z.boolean().optional(),
       }),
 
       result: objectField(scopedTranslation, {

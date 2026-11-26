@@ -1,228 +1,304 @@
 "use client";
 
-import { Badge } from "next-vibe/ui/components/badge";
 import { Button, type ButtonMouseEvent } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
+import { EmptyBlock } from "next-vibe/ui/components/empty-block";
+import { Building } from "next-vibe/ui/components/icons/Building";
 import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
-import { Loader2 } from "next-vibe/ui/components/icons/Loader2";
+import { ChevronRight } from "next-vibe/ui/components/icons/ChevronRight";
+import { Input } from "next-vibe/ui/components/input";
+import { LoadingBlock } from "next-vibe/ui/components/loading-block";
 import { Span } from "next-vibe/ui/components/span";
+import { StatusPill } from "next-vibe/ui/components/status-pill";
+import { WidgetHeader } from "next-vibe/ui/components/widget-header";
+import { WidgetShell } from "next-vibe/ui/components/widget-shell";
 import { usePickerCallback } from "next-vibe/unified-ui/_shared/picker-context";
 import {
+  useWidgetForm,
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import type { JSX } from "react";
+import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
+import { type JSX, useState } from "react";
 
 import type definition from "./definition";
 import type { VendorListGetResponseOutput } from "./definition";
 
 type Vendor = NonNullable<VendorListGetResponseOutput["vendors"]>[number];
+type VendorFilter = "all" | "active" | "inactive";
 
-function VendorRow({
-  vendor,
-  onOpen,
-  activeLabel,
-  inactiveLabel,
-  vatPrefix,
-  paymentTermsPrefix,
-  paymentTermsSuffix,
-}: {
-  vendor: Vendor;
-  onOpen: (id: string) => void;
-  activeLabel: string;
-  inactiveLabel: string;
-  vatPrefix: string;
-  paymentTermsPrefix: string;
-  paymentTermsSuffix: string;
-}): JSX.Element {
-  return (
-    <Div
-      className={[
-        "flex items-center gap-4 px-4 py-3 hover:bg-muted/30 cursor-pointer transition-colors border-b last:border-b-0",
-        !vendor.isActive ? "opacity-60" : "",
-      ]
-        .filter(Boolean)
-        .join(" ")}
-      onClick={(): void => onOpen(vendor.id)}
-    >
-      {/* Avatar initial */}
-      <Div className="h-9 w-9 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-        <Span className="text-sm font-semibold text-primary">
-          {vendor.name.charAt(0).toUpperCase()}
-        </Span>
-      </Div>
+const FILTERS: readonly VendorFilter[] = ["all", "active", "inactive"];
+const GRID =
+  "@3xl:grid-cols-[minmax(0,1.5fr)_minmax(0,1.4fr)_minmax(0,0.8fr)_4.5rem_6.5rem_1rem]";
 
-      {/* Main info */}
-      <Div className="flex-1 min-w-0">
-        <Div className="flex items-center gap-2 flex-wrap">
-          <Span className="text-sm font-medium truncate">{vendor.name}</Span>
-          {vendor.code ? (
-            <Span className="text-xs text-muted-foreground font-mono">
-              {vendor.code}
-            </Span>
-          ) : null}
-        </Div>
-        <Div className="flex items-center gap-3 mt-0.5 flex-wrap">
-          {vendor.email ? (
-            <Span className="text-xs text-muted-foreground">
-              {vendor.email}
-            </Span>
-          ) : null}
-          {vendor.vatNumber ? (
-            <Span className="text-xs text-muted-foreground">
-              {vatPrefix} {vendor.vatNumber}
-            </Span>
-          ) : null}
-          {vendor.defaultPaymentTermsDays !== null ? (
-            <Span className="text-xs text-muted-foreground">
-              {paymentTermsPrefix} {vendor.defaultPaymentTermsDays}
-              {paymentTermsSuffix}
-            </Span>
-          ) : null}
-        </Div>
-      </Div>
-
-      {/* Currency + Status */}
-      <Div className="flex items-center gap-2 shrink-0">
-        <Badge variant="outline" className="text-xs font-mono py-0 h-5">
-          {vendor.defaultCurrency}
-        </Badge>
-        <Badge
-          variant={vendor.isActive ? "default" : "secondary"}
-          className="text-xs py-0 h-5"
-        >
-          {vendor.isActive ? activeLabel : inactiveLabel}
-        </Badge>
-      </Div>
-    </Div>
-  );
-}
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export function VendorListWidget(_props: {
-  field: (typeof definition.GET)["fields"];
-}): JSX.Element {
+export function VendorListWidget(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _props: { field: (typeof definition.GET)["fields"] },
+): JSX.Element {
   const data = useWidgetValue<typeof definition.GET>();
   const navigation = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.GET>();
+  const form = useWidgetForm<typeof definition.GET>();
+  const companyId = form?.watch("companyId");
   const onPick = usePickerCallback<{ id: string; name: string }>();
   const isPickerMode = !!onPick;
+  const [filter, setFilter] = useState<VendorFilter>("active");
+  const [query, setQuery] = useState("");
 
-  const handleViewVendor = (vendorId: string): void => {
-    if (isPickerMode) {
-      const vendor = vendors.find((v) => v.id === vendorId);
-      if (vendor && onPick) {
-        onPick({ id: vendor.id, name: vendor.name });
-      }
+  const openVendor = (vendor: Vendor): void => {
+    if (onPick) {
+      onPick({ id: vendor.id, name: vendor.name });
       return;
     }
-    void (async (): Promise<void> => {
-      const def = await import("../[vendorId]/get/definition");
+    void import("../[vendorId]/get/definition").then((def) =>
       navigation.push(def.default.GET, {
-        urlPathParams: { vendorId },
+        urlPathParams: { vendorId: vendor.id },
+      }),
+    );
+  };
+
+  const createVendor = (e?: ButtonMouseEvent): void => {
+    e?.stopPropagation();
+    void (async (): Promise<void> => {
+      const [createDef, getDef] = await Promise.all([
+        import("../create/definition"),
+        import("../[vendorId]/get/definition"),
+      ]);
+      navigation.push(createDef.default.POST, {
+        data: { companyId },
+        replaceOnSuccess: {
+          endpoint: getDef.default.GET,
+          getUrlPathParams: (responseData) => ({
+            vendorId: responseData.id,
+          }),
+        },
       });
     })();
   };
 
-  const handleCreate = (e: ButtonMouseEvent): void => {
-    e.stopPropagation();
-    void (async (): Promise<void> => {
-      const def = await import("../create/definition");
-      navigation.push(def.default.POST, {});
-    })();
+  const vendors = (data?.vendors ?? []).toSorted((a, b) =>
+    a.name.localeCompare(b.name),
+  );
+  const counts: Record<VendorFilter, number> = {
+    all: vendors.length,
+    active: vendors.filter((v) => v.isActive).length,
+    inactive: vendors.filter((v) => !v.isActive).length,
   };
+  const needle = query.trim().toLowerCase();
+  const visible = vendors.filter(
+    (v) =>
+      (filter === "all" || v.isActive === (filter === "active")) &&
+      (!needle ||
+        [v.name, v.code, v.email, v.vatNumber].some((value) =>
+          value?.toLowerCase().includes(needle),
+        )),
+  );
 
-  const vendors = data?.vendors ?? [];
-  const activeCount = vendors.filter((v) => v.isActive).length;
-  const activeLabel = t("vendorList.get.widget.active");
-  const inactiveLabel = t("vendorList.get.widget.inactive");
-  const vatPrefix = t("vendorList.get.widget.vatPrefix");
-  const paymentTermsPrefix = t("vendorList.get.widget.paymentTermsPrefix");
-  const paymentTermsSuffix = t("vendorList.get.widget.paymentTermsSuffix");
+  const filterLabel = (value: VendorFilter): string =>
+    value === "all"
+      ? t("vendorList.get.widget.filterAll")
+      : value === "active"
+        ? t("vendorList.get.widget.active")
+        : t("vendorList.get.widget.inactive");
+
+  const terms = (vendor: Vendor): string =>
+    vendor.defaultPaymentTermsDays === null
+      ? "-"
+      : t("vendorList.get.widget.paymentTerms", {
+          days: String(vendor.defaultPaymentTermsDays),
+        });
+
+  const back =
+    navigation.canGoBack && !isPickerMode ? (
+      <Button
+        type="button"
+        variant="ghost"
+        size="sm"
+        className="-ml-1 gap-1.5"
+        onClick={() => navigation.pop()}
+      >
+        <ChevronLeft className="h-4 w-4" />
+        {t("vendorList.get.widget.back")}
+      </Button>
+    ) : undefined;
 
   return (
-    <Div className="max-w-2xl mx-auto w-full px-4 pt-8 pb-6 flex flex-col gap-4">
-      {/* Back button */}
-      {navigation.canGoBack && !isPickerMode && (
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={() => navigation.pop()}
-          className="self-start gap-1.5 -ml-1"
-        >
-          <ChevronLeft className="h-4 w-4" />
-          {t("vendorList.get.widget.back")}
-        </Button>
-      )}
-
-      {/* Toolbar */}
-      <Div className="flex items-center justify-between gap-3">
-        {data !== undefined ? (
-          <Span className="text-xs text-muted-foreground">
-            {activeCount} {activeLabel} / {vendors.length}{" "}
-            {t("vendorList.get.widget.total")}
-          </Span>
-        ) : (
-          <Span />
-        )}
-        {!isPickerMode && (
-          <Button
-            type="button"
-            size="sm"
-            variant="default"
-            onClick={handleCreate}
-          >
-            {t("vendorList.get.widget.createVendor")}
-          </Button>
-        )}
-      </Div>
-
-      {/* Loading */}
-      {!data && (
-        <Div className="flex items-center justify-center py-12 text-muted-foreground">
-          <Loader2 className="h-5 w-5 animate-spin mr-2" />
-          <Span className="text-sm">{t("vendorList.get.widget.loading")}</Span>
-        </Div>
-      )}
-
-      {/* Vendor list */}
-      {vendors.length > 0 ? (
-        <Div className="rounded-lg border overflow-hidden">
-          {vendors.map((vendor) => (
-            <VendorRow
-              key={vendor.id}
-              vendor={vendor}
-              onOpen={handleViewVendor}
-              activeLabel={activeLabel}
-              inactiveLabel={inactiveLabel}
-              vatPrefix={vatPrefix}
-              paymentTermsPrefix={paymentTermsPrefix}
-              paymentTermsSuffix={paymentTermsSuffix}
-            />
-          ))}
-        </Div>
-      ) : data !== undefined ? (
-        <Div className="flex flex-col items-center justify-center py-16 gap-3 text-center">
-          <Div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center">
-            <Span className="text-2xl font-bold text-muted-foreground">V</Span>
-          </Div>
-          <Span className="text-sm font-medium">
-            {t("vendorList.get.widget.empty")}
-          </Span>
-          {!isPickerMode && (
-            <Button
-              type="button"
-              size="sm"
-              variant="outline"
-              onClick={handleCreate}
-            >
+    <WidgetShell layout="page">
+      <WidgetHeader
+        size="page"
+        title={t("vendorList.get.title")}
+        subtitle={t("vendorList.get.widget.subtitle")}
+        backButton={back}
+        actions={
+          isPickerMode ? undefined : (
+            <Button type="button" onClick={createVendor}>
               {t("vendorList.get.widget.createVendor")}
             </Button>
-          )}
+          )
+        }
+      />
+      <FormAlertWidget field={{}} />
+
+      {!data ? (
+        <LoadingBlock message={t("vendorList.get.widget.loading")} />
+      ) : vendors.length === 0 ? (
+        <Div className="rounded-xl border bg-card">
+          <EmptyBlock
+            size="page"
+            icon={<Building className="h-6 w-6" />}
+            title={t("vendorList.get.widget.empty")}
+            message={t("vendorList.get.widget.emptyHint")}
+            action={
+              isPickerMode
+                ? undefined
+                : {
+                    label: t("vendorList.get.widget.createVendor"),
+                    onClick: () => createVendor(),
+                  }
+            }
+          />
         </Div>
-      ) : null}
-    </Div>
+      ) : (
+        <>
+          <Div className="flex flex-col gap-3 @2xl:flex-row @2xl:items-center @2xl:justify-between">
+            <Div className="flex gap-2 overflow-x-auto">
+              {FILTERS.map((value) => (
+                <Button
+                  key={value}
+                  type="button"
+                  size="sm"
+                  className="min-h-10 shrink-0 gap-2 @2xl:min-h-9"
+                  aria-pressed={filter === value}
+                  variant={filter === value ? "default" : "outline"}
+                  onClick={() => setFilter(value)}
+                >
+                  {filterLabel(value)}
+                  <Span className="tabular-nums opacity-80">
+                    {counts[value]}
+                  </Span>
+                </Button>
+              ))}
+            </Div>
+            <Div className="w-full @2xl:max-w-xs">
+              <Input
+                type="text"
+                aria-label={t("vendorList.get.widget.search")}
+                placeholder={t("vendorList.get.widget.search")}
+                value={query}
+                onChangeText={setQuery}
+              />
+            </Div>
+          </Div>
+
+          <Div className="overflow-hidden rounded-xl border bg-card">
+            <Div
+              className={`hidden gap-4 border-b px-4 py-2.5 text-xs font-medium text-muted-foreground @3xl:grid ${GRID}`}
+            >
+              <Span>{t("vendorList.get.widget.colVendor")}</Span>
+              <Span>{t("vendorList.get.widget.colContact")}</Span>
+              <Span>
+                {t("vendorList.get.response.defaultPaymentTermsDays")}
+              </Span>
+              <Span>{t("vendorList.get.widget.colCurrency")}</Span>
+              <Span>{t("vendorList.get.widget.colStatus")}</Span>
+              <Span />
+            </Div>
+            {visible.length === 0 ? (
+              <EmptyBlock
+                title={t("vendorList.get.widget.noMatch")}
+                action={{
+                  label: t("vendorList.get.widget.clearFilters"),
+                  variant: "outline",
+                  onClick: () => {
+                    setQuery("");
+                    setFilter("all");
+                  },
+                }}
+              />
+            ) : (
+              <Div className="flex flex-col divide-y">
+                {visible.map((vendor) => (
+                  <Div
+                    key={vendor.id}
+                    tabIndex={0}
+                    onClick={() => openVendor(vendor)}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter") {
+                        openVendor(vendor);
+                      }
+                    }}
+                    className={`flex min-h-14 cursor-pointer flex-col gap-1 px-4 py-3 transition-colors hover:bg-muted/40 @3xl:grid @3xl:items-center @3xl:gap-4 ${GRID} ${vendor.isActive ? "" : "opacity-70"}`}
+                  >
+                    <Div className="flex min-w-0 items-center justify-between gap-3 @3xl:block">
+                      <Div className="min-w-0">
+                        <Span className="block break-words text-sm font-semibold">
+                          {vendor.name}
+                        </Span>
+                        {vendor.code || vendor.vatNumber ? (
+                          <Span className="block text-xs text-muted-foreground">
+                            {[
+                              vendor.code,
+                              vendor.vatNumber
+                                ? `${t("vendorList.get.widget.vatLabel")} ${vendor.vatNumber}`
+                                : null,
+                            ]
+                              .filter(Boolean)
+                              .join(" · ")}
+                          </Span>
+                        ) : null}
+                      </Div>
+                      <Div className="shrink-0 @3xl:hidden">
+                        <StatusPill
+                          status={vendor.isActive ? "active" : "inactive"}
+                          variant={vendor.isActive ? "success" : "muted"}
+                          label={
+                            vendor.isActive
+                              ? t("vendorList.get.widget.active")
+                              : t("vendorList.get.widget.inactive")
+                          }
+                        />
+                      </Div>
+                    </Div>
+                    <Span className="min-w-0 break-all text-sm text-muted-foreground @3xl:break-words">
+                      {vendor.email ?? (
+                        <Span className="hidden @3xl:inline">-</Span>
+                      )}
+                    </Span>
+                    <Span className="text-xs text-muted-foreground @3xl:text-sm">
+                      <Span className="@3xl:hidden">
+                        {`${vendor.defaultCurrency} · `}
+                      </Span>
+                      {terms(vendor)}
+                    </Span>
+                    <Span className="hidden text-sm tabular-nums @3xl:block">
+                      {vendor.defaultCurrency}
+                    </Span>
+                    <Div className="hidden @3xl:block">
+                      <StatusPill
+                        status={vendor.isActive ? "active" : "inactive"}
+                        variant={vendor.isActive ? "success" : "muted"}
+                        label={
+                          vendor.isActive
+                            ? t("vendorList.get.widget.active")
+                            : t("vendorList.get.widget.inactive")
+                        }
+                      />
+                    </Div>
+                    <ChevronRight className="hidden h-4 w-4 text-muted-foreground @3xl:block" />
+                  </Div>
+                ))}
+              </Div>
+            )}
+            <Div className="border-t bg-muted/30 px-4 py-3 text-sm text-muted-foreground">
+              {t("vendorList.get.widget.count", {
+                shown: String(visible.length),
+                total: String(vendors.length),
+              })}
+            </Div>
+          </Div>
+        </>
+      )}
+    </WidgetShell>
   );
 }

@@ -25,6 +25,8 @@ import stockDefinition from "@/inventory/stock/list/definition";
 import { catalogProducts } from "@/products/db";
 import { ProductType } from "@/products/enum";
 
+import { paymentBills } from "@/payment/db";
+
 import { purchaseOrderLines, purchaseOrders, purchaseReceipts, purchasingVendors } from "../db";
 import { scopedTranslation } from "../i18n";
 import orderDefinition from "../order/[poId]/get/definition";
@@ -32,6 +34,8 @@ import receiveDefinition from "../order/[poId]/receive/definition";
 import createOrder from "../order/create/definition";
 import listOrders from "../order/list/definition";
 import createVendor from "../vendor/create/definition";
+import deactivateVendor from "../vendor/[vendorId]/deactivate/definition";
+import updateVendor from "../vendor/[vendorId]/update/definition";
 
 const companyName = "E2E Purchase Workshop";
 const vendorName = "E2E Birch Components";
@@ -70,6 +74,7 @@ describe("E2E: vendor, purchase order and warehouse stock", () => {
       const productId = crypto.randomUUID();
       fixtures.cleanup(async () => {
         await db.delete(purchaseOrders).where(eq(purchaseOrders.companyId, companyId));
+        await db.delete(paymentBills).where(eq(paymentBills.companyId, companyId));
         await db.delete(stockMovements).where(eq(stockMovements.warehouseId, warehouseId));
         await db.delete(stockLevels).where(eq(stockLevels.warehouseId, warehouseId));
         await db.delete(catalogProducts).where(eq(catalogProducts.id, productId));
@@ -221,7 +226,7 @@ describe("E2E: vendor, purchase order and warehouse stock", () => {
       const send = submit(t("orderGet.get.widget.send"));
       await openOrder(() => send.waitFor());
       await send.click();
-      await visibleText(t("orderSend.post.widget.warning")).waitFor();
+      await visibleText(t("orderSend.post.widget.consequence")).waitFor();
       await submitAction(t("orderSend.post.title"), `${apiOrder}/send`);
       const confirm = submit(t("orderGet.get.widget.confirm"));
       await openOrder(() => confirm.waitFor());
@@ -230,7 +235,7 @@ describe("E2E: vendor, purchase order and warehouse stock", () => {
       const receive = submit(t("orderGet.get.widget.receive"));
       await openOrder(() => receive.waitFor());
       await receive.click();
-      await picker(t("orderReceive.post.warehouseId.label"), warehouseName);
+      // The order's delivery warehouse is the receipt default; no override needed.
       await page.getByLabel(productName, { exact: true }).fill(String(units));
       const receiptReply = await submitAction(t("orderReceive.post.title"), `${apiOrder}/receive`);
       const receipt = z
@@ -439,7 +444,105 @@ describe("E2E: vendor, purchase order and warehouse stock", () => {
       })).waitFor();
       await visibleText(stockT("stockList.get.widget.lowStock")).waitFor();
       expect(await visibleText(stockT("stockList.get.widget.stockValuePrecision")).count()).toBe(0);
+
+      // Received order -> supplier bill through the confirmation page.
+      const convertToBill = submit(t("orderGet.get.widget.convertToBill"));
+      await openOrder(() => convertToBill.waitFor());
+      await convertToBill.click();
+      await visibleText(t("orderConvertToBill.post.widget.consequence")).waitFor();
+      await submitAction(t("orderConvertToBill.post.title"), `${apiOrder}/convert-to-bill`);
+      const [billedOrder] = await db
+        .select()
+        .from(purchaseOrders)
+        .where(eq(purchaseOrders.id, draft.id));
+      expect(billedOrder?.status).toBe("BILLED");
+      expect(billedOrder?.billId).toBeTruthy();
+      const bills = await db.select().from(paymentBills).where(eq(paymentBills.companyId, companyId));
+      expect(bills).toHaveLength(1);
+      expect(bills[0]).toMatchObject({
+        id: billedOrder?.billId,
+        supplierName: vendorName,
+        total: orderGross,
+        journalEntryId: null,
+      });
+      expect((await postAtlas(fixtures, `purchasing/order/${draft.id}/convert-to-bill`, {})).ok).toBe(false);
+
+      // A second draft: sending it empty is refused, cancelling it works.
+      const secondReply = await postAtlas(fixtures, "purchasing/order/create", {
+        companyId,
+        vendorId: vendor.id,
+        currency: "EUR",
+      });
+      expect(secondReply.ok).toBe(true);
+      const [second] = await db
+        .select()
+        .from(purchaseOrders)
+        .where(and(eq(purchaseOrders.companyId, companyId), eq(purchaseOrders.status, "DRAFT")));
+      expect(second).toBeTruthy();
+      if (!second) return;
+      expect((await postAtlas(fixtures, `purchasing/order/${second.id}/send`, {})).ok).toBe(false);
+      const cancelOrder = submit(t("orderGet.get.widget.cancel"));
+      await fixtures.open(orderDefinition.GET, {
+        query: { poId: second.id },
+        ready: () => cancelOrder.waitFor(),
+      });
+      await cancelOrder.click();
+      await visibleText(t("orderCancel.post.widget.warning")).waitFor();
+      await submitAction(t("orderCancel.post.title"), `/purchasing/order/${second.id}/cancel`);
+      const [cancelled] = await db
+        .select()
+        .from(purchaseOrders)
+        .where(eq(purchaseOrders.id, second.id));
+      expect(cancelled?.status).toBe("CANCELLED");
+
+      // Deactivate the vendor, prove new orders refuse it, then reactivate it.
+      await fixtures.open(deactivateVendor.POST, {
+        query: { vendorId: vendor.id },
+        ready: () => visibleText(t("vendorDeactivate.post.widget.warning")).waitFor(),
+      });
+      await submitAction(
+        t("vendorDeactivate.post.title"),
+        `/purchasing/vendor/${vendor.id}/deactivate`,
+      );
+      const vendorActive = async (): Promise<boolean | undefined> =>
+        (
+          await db
+            .select({ isActive: purchasingVendors.isActive })
+            .from(purchasingVendors)
+            .where(eq(purchasingVendors.id, vendor.id))
+        )[0]?.isActive;
+      expect(await vendorActive()).toBe(false);
+      const refused = await postAtlas(fixtures, "purchasing/order/create", {
+        companyId,
+        vendorId: vendor.id,
+        currency: "EUR",
+      });
+      expect(refused.ok).toBe(false);
+      await fixtures.open(updateVendor.PATCH, {
+        query: { vendorId: vendor.id },
+        ready: () => page.getByLabel(t("vendorUpdate.patch.name.label"), { exact: true }).waitFor(),
+      });
+      const nameInput = page.getByLabel(t("vendorUpdate.patch.name.label"), { exact: true });
+      for (let attempt = 0; attempt < 60; attempt++) {
+        if ((await nameInput.inputValue()) === vendorName) break;
+        await page.waitForTimeout(250);
+      }
+      expect(await nameInput.inputValue()).toBe(vendorName);
+      await page.getByLabel(t("vendorUpdate.patch.isActive.label"), { exact: true }).click();
+      const saved = page.waitForResponse(
+        (reply) =>
+          reply.request().method() === "PATCH" &&
+          new URL(reply.url()).pathname.endsWith(`/purchasing/vendor/${vendor.id}/update`),
+      );
+      await submit(t("vendorUpdate.patch.widget.save")).click();
+      expect((await saved).ok()).toBe(true);
+      expect(await vendorActive()).toBe(true);
+      const [stillNamed] = await db
+        .select()
+        .from(purchasingVendors)
+        .where(eq(purchasingVendors.id, vendor.id));
+      expect(stillNamed).toMatchObject({ name: vendorName, email: null });
     },
-    180_000,
+    300_000,
   );
 });

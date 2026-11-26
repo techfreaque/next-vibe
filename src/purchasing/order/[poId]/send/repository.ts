@@ -21,7 +21,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import { CompanyMemberRole } from "@/companies/enum";
 import { CompanyAuthRepository } from "@/companies/repository";
 
-import { purchaseOrders } from "../../../db";
+import { purchaseOrderLines, purchaseOrders } from "../../../db";
 import { scopedTranslation } from "../../../i18n";
 
 interface OrderSendResult {
@@ -73,6 +73,18 @@ export class OrderSendRepository {
         return fail({
           message: t("orderSend.post.errors.forbidden.title"),
           errorType: ErrorResponseTypes.FORBIDDEN,
+        });
+      }
+
+      const [line] = await db
+        .select({ id: purchaseOrderLines.id })
+        .from(purchaseOrderLines)
+        .where(eq(purchaseOrderLines.poId, poId))
+        .limit(1);
+      if (!line) {
+        return fail({
+          message: t("orderSend.post.widget.noLines"),
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
         });
       }
 

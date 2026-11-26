@@ -2,6 +2,14 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   category: "Compras",
+  orderAction: {
+    backToOrder: "Volver al pedido",
+    keepOrder: "Mantener pedido",
+    openOrder: "Abrir pedido",
+    expected: "Previsto",
+    total: "Total del pedido",
+    notAvailable: "No disponible para este pedido",
+  },
   tags: {
     purchasing: "Compras",
     vendor: "Vendor",
@@ -49,6 +57,10 @@ export const translations: typeof enTranslations = {
         back: "Atrás",
         viewVendor: "Vendedor abierto",
         createAnother: "Crear otro",
+        subtitle:
+          "Añade un proveedor una vez. Pedidos y facturas lo eligen por nombre.",
+        cancel: "Cancelar",
+        allVendors: "Todos los proveedores",
       },
       errors: {
         validation: {
@@ -196,13 +208,27 @@ export const translations: typeof enTranslations = {
         inactive: "Inactivo",
         total: "total",
         createVendor: "Nuevo proveedor",
-        empty: "No hay proveedores configurados. Añadir uno para empezar.",
-        vatLabel: "VAT",
+        empty: "Aún no hay proveedores",
+        vatLabel: "NIF-IVA",
         vatPrefix: "VAT:",
-        paymentTerms: "Días netos de {{days}}",
+        paymentTerms: "Pago a {{days}} días",
         paymentTermsPrefix: "Cifra",
         paymentTermsSuffix: "d",
         loading: "Cargando…",
+        subtitle:
+          "Los proveedores a los que compras, con condiciones y contacto.",
+        filterAll: "Todos",
+        statusFilter: "Estado del proveedor",
+        search: "Buscar nombre, código, email o NIF-IVA",
+        colVendor: "Proveedor",
+        colContact: "Email",
+        colCurrency: "Moneda",
+        colStatus: "Estado",
+        emptyHint:
+          "Añade los proveedores a los que compras. Pedidos y facturas de proveedor los eligen por nombre.",
+        noMatch: "Ningún proveedor coincide con el filtro",
+        clearFilters: "Borrar filtros",
+        count: "{{shown}} de {{total}} proveedores",
       },
       errors: {
         validation: {
@@ -364,9 +390,22 @@ export const translations: typeof enTranslations = {
       title: "Actualizar el proveedor",
       titleShort: "Actualizar el proveedor",
       description: "Actualice los detalles del vendedor.",
+      isActive: {
+        label: "Activo",
+        description:
+          "Los proveedores activos se pueden elegir en pedidos nuevos.",
+      },
       widget: {
         backToVendor: "Regreso al vendedor",
         viewVendor: "Ver proveedor",
+        sectionStatus: "Estado",
+        title: "Editar proveedor",
+        cancel: "Cancelar",
+        save: "Guardar cambios",
+        sectionCompany: "Empresa e impuestos",
+        sectionContact: "Contacto",
+        sectionAddress: "Dirección",
+        sectionTerms: "Condiciones de compra",
       },
       vendorId: { label: "Vendor ID", description: "Vendor para actualizar" },
       name: {
@@ -506,8 +545,15 @@ export const translations: typeof enTranslations = {
       vendorId: { label: "Vendor ID", description: "Vendor para desactivar" },
       widget: {
         warning:
-          "Esto desactivará el vendedor. Las órdenes de compra existentes no se verán afectadas.",
+          "Los nuevos pedidos ya no pueden elegir este proveedor. Los pedidos, recepciones y facturas existentes no cambian. Puedes reactivarlo más tarde desde Editar proveedor.",
         backToList: "Volver a los proveedores",
+        backToVendor: "Volver al proveedor",
+        subtitle: "Dejar de pedir a este proveedor.",
+        cancel: "Cancelar",
+        openVendor: "Abrir proveedor",
+        alreadyInactive: "Este proveedor ya está inactivo",
+        reactivateHint:
+          "Para volver a pedirle, abre el proveedor, elige Editar proveedor y vuelve a activarlo.",
       },
       errors: {
         validation: {
@@ -606,6 +652,13 @@ export const translations: typeof enTranslations = {
         browseWarehouses: "Navega los Almacenes",
         viewOrder: "Orden de compra abierta",
         backToList: "Volver a la lista",
+        subtitle:
+          "Elige el proveedor y el destino de la mercancía. Las líneas, en el siguiente paso.",
+        cancel: "Cancelar",
+        nextStep:
+          "El borrador está listo. Añade sus líneas y márcalo como enviado.",
+        sectionSupplier: "Proveedor",
+        sectionDelivery: "Entrega",
       },
       response: {
         id: "Orden de compra ID",
@@ -890,6 +943,12 @@ export const translations: typeof enTranslations = {
       description: "Editar un Borrador de pedido de compra. campos y líneas.",
       widget: {
         backToPO: "Volver a la orden de compra",
+        title: "Editar pedido",
+        cancel: "Cancelar",
+        save: "Guardar cambios",
+        lockedTitle: "Solo se pueden editar borradores",
+        lockedMessage:
+          "Este pedido ya se envió. Cancélalo y crea uno nuevo para cambiar proveedor, moneda o entrega.",
       },
       poId: {
         label: "Orden de compra ID",
@@ -1019,6 +1078,10 @@ export const translations: typeof enTranslations = {
       },
       widget: {
         back: "Atrás",
+        consequence:
+          "El pedido pasa a enviado. Confírmalo cuando responda el proveedor y luego recibe la mercancía.",
+        blocked: "Solo los borradores se pueden marcar como enviados.",
+        noLines: "Añade al menos una línea antes de enviar el pedido.",
         backToPO: "Volver a la orden de compra",
         warning:
           "El estado del pedido cambia a Enviado en este espacio de trabajo.",
@@ -1085,6 +1148,9 @@ export const translations: typeof enTranslations = {
       },
       widget: {
         back: "Atrás",
+        consequence:
+          "El proveedor aceptó el pedido. Sigue abierto para recepción hasta que llegue toda la mercancía.",
+        blocked: "Solo los pedidos enviados se pueden confirmar.",
         backToPO: "Volver a la orden de compra",
       },
       errors: {
@@ -1237,6 +1303,10 @@ export const translations: typeof enTranslations = {
         "Crea una factura de proveedor a partir de un pedido recibido por completo. Aprueba la factura para contabilizar la deuda.",
       widget: {
         back: "Atrás",
+        consequence:
+          "Crea una factura de proveedor sin contabilizar con las cantidades recibidas. Revísala y apruébala en facturas.",
+        blocked:
+          "Solo los pedidos recibidos por completo y sin factura se pueden convertir.",
         viewBill: "Ver la cuenta",
       },
       poId: {
@@ -1480,7 +1550,8 @@ export const translations: typeof enTranslations = {
         supplier: "Proveedor",
         expected: "Fecha prevista",
         orderTotal: "Total del pedido",
-        noDeliveries: "No hay entregas pendientes",
+        noDeliveries:
+          "No hay entregas pendientes. Los pedidos enviados y confirmados aparecen aquí hasta recibir la mercancía.",
         overdue: "Entregas atrasadas",
         dueSeven: "Vencen en los próximos 7 días",
         kpiDraft: "Proyectos",
@@ -1563,8 +1634,9 @@ export const translations: typeof enTranslations = {
       },
       widget: {
         back: "Atrás",
+        blocked: "Solo los borradores y pedidos enviados se pueden cancelar.",
         warning:
-          "Esto cancelará permanentemente el pedido de compra. Sólo se pueden cancelar los pedidos de compra o pedidos enviados.",
+          "El pedido se cierra definitivamente. Después no se podrá recibir mercancía ni facturar.",
       },
       errors: {
         validation: {

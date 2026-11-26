@@ -100,6 +100,7 @@ export class VendorUpdateRepository {
             ? { defaultPaymentTermsDays: data.defaultPaymentTermsDays }
             : {}),
           ...(data.notes !== undefined ? { notes: data.notes } : {}),
+          ...(data.isActive !== undefined ? { isActive: data.isActive } : {}),
           updatedAt: new Date(),
         })
         .where(eq(purchasingVendors.id, vendorId))

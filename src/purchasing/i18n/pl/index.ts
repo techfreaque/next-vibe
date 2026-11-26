@@ -2,6 +2,14 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   category: "Zakupy",
+  orderAction: {
+    backToOrder: "Wróć do zamówienia",
+    keepOrder: "Zachowaj zamówienie",
+    openOrder: "Otwórz zamówienie",
+    expected: "Oczekiwane",
+    total: "Wartość zamówienia",
+    notAvailable: "Niedostępne dla tego zamówienia",
+  },
   tags: {
     purchasing: "Zakupy",
     vendor: "Dostawca",
@@ -48,6 +56,10 @@ export const translations: typeof enTranslations = {
         back: "Wróć",
         viewVendor: "Otwórz dostawcę",
         createAnother: "Utwórz kolejnego",
+        subtitle:
+          "Dodaj dostawcę raz. Zamówienia i faktury wybiorą go po nazwie.",
+        cancel: "Anuluj",
+        allVendors: "Wszyscy dostawcy",
       },
       errors: {
         validation: {
@@ -194,13 +206,26 @@ export const translations: typeof enTranslations = {
         inactive: "Nieaktywny",
         total: "łącznie",
         createVendor: "Nowy dostawca",
-        empty: "Brak dostawców. Dodaj pierwszego.",
+        empty: "Brak dostawców",
         vatLabel: "NIP",
         vatPrefix: "NIP:",
-        paymentTerms: "Net {{days}} dni",
+        paymentTerms: "Termin {{days}} dni",
         paymentTermsPrefix: "Net",
         paymentTermsSuffix: "d",
         loading: "Wczytywanie…",
+        subtitle: "Dostawcy, od których kupujesz, z warunkami i kontaktem.",
+        filterAll: "Wszyscy",
+        statusFilter: "Status dostawcy",
+        search: "Szukaj nazwy, kodu, e-maila lub NIP",
+        colVendor: "Dostawca",
+        colContact: "E-mail",
+        colCurrency: "Waluta",
+        colStatus: "Status",
+        emptyHint:
+          "Dodaj dostawców, od których kupujesz. Zamówienia i faktury zakupowe wybierają ich po nazwie.",
+        noMatch: "Żaden dostawca nie pasuje do filtra",
+        clearFilters: "Wyczyść filtry",
+        count: "{{shown}} z {{total}} dostawców",
       },
       errors: {
         validation: {
@@ -360,9 +385,21 @@ export const translations: typeof enTranslations = {
       title: "Aktualizuj dostawcę",
       titleShort: "Zaktualizuj dostawcę",
       description: "Edytuj dane dostawcy.",
+      isActive: {
+        label: "Aktywny",
+        description: "Aktywnych dostawców można wybrać w nowych zamówieniach.",
+      },
       widget: {
         backToVendor: "Powrót do dostawcy",
         viewVendor: "Wyświetl dostawcę",
+        sectionStatus: "Status",
+        title: "Edytuj dostawcę",
+        cancel: "Anuluj",
+        save: "Zapisz zmiany",
+        sectionCompany: "Firma i podatki",
+        sectionContact: "Kontakt",
+        sectionAddress: "Adres",
+        sectionTerms: "Warunki zakupu",
       },
       vendorId: { label: "ID dostawcy", description: "Dostawca do edycji" },
       name: {
@@ -500,8 +537,15 @@ export const translations: typeof enTranslations = {
       },
       widget: {
         warning:
-          "Dostawca zostanie dezaktywowany. Istniejące zamówienia nie zostaną zmienione.",
+          "Nowe zamówienia nie mogą już wybrać tego dostawcy. Istniejące zamówienia, przyjęcia i faktury pozostają bez zmian. Możesz go później ponownie aktywować w Edytuj dostawcę.",
         backToList: "Powrót do dostawców",
+        backToVendor: "Wróć do dostawcy",
+        subtitle: "Przestań zamawiać u tego dostawcy.",
+        cancel: "Anuluj",
+        openVendor: "Otwórz dostawcę",
+        alreadyInactive: "Ten dostawca jest już nieaktywny",
+        reactivateHint:
+          "Aby znów zamawiać, otwórz dostawcę, wybierz Edytuj dostawcę i przełącz go na aktywnego.",
       },
       errors: {
         validation: {
@@ -598,6 +642,12 @@ export const translations: typeof enTranslations = {
         browseWarehouses: "Przeglądaj magazyny",
         viewOrder: "Otwórz zamówienie",
         backToList: "Powrót do listy",
+        subtitle:
+          "Wybierz dostawcę i miejsce dostawy. Pozycje dodasz w następnym kroku.",
+        cancel: "Anuluj",
+        nextStep: "Szkic gotowy. Dodaj pozycje, potem oznacz jako wysłane.",
+        sectionSupplier: "Dostawca",
+        sectionDelivery: "Dostawa",
       },
       response: {
         id: "ID zamówienia",
@@ -869,7 +919,15 @@ export const translations: typeof enTranslations = {
       title: "Aktualizuj zamówienie",
       titleShort: "Zaktualizuj zamówienie",
       description: "Edytuj dane i pozycje zamówienia roboczego.",
-      widget: { backToPO: "Powrót do zamówienia" },
+      widget: {
+        backToPO: "Powrót do zamówienia",
+        title: "Edytuj zamówienie",
+        cancel: "Anuluj",
+        save: "Zapisz zmiany",
+        lockedTitle: "Edytować można tylko szkice",
+        lockedMessage:
+          "To zamówienie zostało już wysłane. Anuluj je i utwórz nowe, aby zmienić dostawcę, walutę lub dostawę.",
+      },
       poId: { label: "ID zamówienia", description: "Zamówienie do edycji" },
       vendorId: {
         label: "Dostawca",
@@ -991,6 +1049,10 @@ export const translations: typeof enTranslations = {
       poId: { label: "ID zamówienia", description: "Zamówienie do wysłania" },
       widget: {
         back: "Wróć",
+        consequence:
+          "Zamówienie przechodzi w status wysłane. Potwierdź je po odpowiedzi dostawcy, potem przyjmij towar.",
+        blocked: "Jako wysłane można oznaczyć tylko szkice.",
+        noLines: "Dodaj co najmniej jedną pozycję przed wysłaniem.",
         backToPO: "Wróć do zamówienia",
         warning:
           "Status zamówienia w tym obszarze roboczym zmieni się na Wysłane.",
@@ -1055,6 +1117,9 @@ export const translations: typeof enTranslations = {
       },
       widget: {
         back: "Wróć",
+        consequence:
+          "Dostawca przyjął zamówienie. Pozostaje otwarte do przyjęcia, aż dotrze cały towar.",
+        blocked: "Potwierdzić można tylko wysłane zamówienia.",
         backToPO: "Wróć do zamówienia",
       },
       errors: {
@@ -1204,6 +1269,10 @@ export const translations: typeof enTranslations = {
         "Utwórz fakturę zakupu z w pełni przyjętego zamówienia. Zatwierdzenie faktury zaksięguje zobowiązanie.",
       widget: {
         back: "Wróć",
+        consequence:
+          "Tworzy niezaksięgowaną fakturę zakupu z przyjętymi ilościami. Sprawdź i zatwierdź ją w fakturach zakupu.",
+        blocked:
+          "Przekształcić można tylko w pełni przyjęte zamówienia bez faktury.",
         viewBill: "Pokaż fakturę",
       },
       poId: { label: "ID zamówienia", description: "Zamówienie do konwersji" },
@@ -1431,7 +1500,8 @@ export const translations: typeof enTranslations = {
         supplier: "Dostawca",
         expected: "Termin",
         orderTotal: "Wartość zamówienia",
-        noDeliveries: "Brak oczekujących dostaw",
+        noDeliveries:
+          "Brak oczekujących dostaw. Wysłane i potwierdzone zamówienia pojawiają się tutaj do czasu przyjęcia towaru.",
         overdue: "Opóźnione dostawy",
         dueSeven: "Termin w ciągu 7 dni",
         kpiDraft: "Szkice",
@@ -1510,8 +1580,9 @@ export const translations: typeof enTranslations = {
       poId: { label: "ID zamówienia", description: "Zamówienie do anulowania" },
       widget: {
         back: "Wróć",
+        blocked: "Anulować można tylko szkice i wysłane zamówienia.",
         warning:
-          "Spowoduje to trwałe anulowanie zamówienia. Anulować można tylko szkice lub wysłane zamówienia.",
+          "Zamówienie zostanie zamknięte na stałe. Potem nie da się przyjąć towaru ani wystawić faktury.",
       },
       errors: {
         validation: {

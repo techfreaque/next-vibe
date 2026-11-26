@@ -1,9 +1,17 @@
 export const translations = {
   category: "Purchasing",
+  orderAction: {
+    backToOrder: "Back to order",
+    keepOrder: "Keep order",
+    openOrder: "Open order",
+    expected: "Expected",
+    total: "Order total",
+    notAvailable: "Not available for this order",
+  },
   tags: {
     purchasing: "Purchasing",
     vendor: "Vendor",
-    order: "Purchase Order",
+    order: "Purchase order",
     receipt: "Receipt",
     create: "Create",
     list: "List",
@@ -14,15 +22,15 @@ export const translations = {
     confirm: "Confirm",
     receive: "Receive",
     cancel: "Cancel",
-    convertToBill: "Convert to Bill",
-    addLine: "Add Line",
-    removeLine: "Remove Line",
+    convertToBill: "Convert to bill",
+    addLine: "Add line",
+    removeLine: "Remove line",
   },
   endpointCategories: {
     purchasing: "Purchasing",
     vendors: "Vendors",
-    purchaseOrders: "Purchase Orders",
-    purchasingOrders: "Purchase Orders",
+    purchaseOrders: "Purchase orders",
+    purchasingOrders: "Purchase orders",
     purchasingVendors: "Vendors",
   },
   enums: {
@@ -30,7 +38,7 @@ export const translations = {
       draft: "Draft",
       sent: "Sent",
       confirmed: "Confirmed",
-      partiallyReceived: "Partially Received",
+      partiallyReceived: "Partially received",
       received: "Received",
       billed: "Billed",
       cancelled: "Cancelled",
@@ -40,51 +48,55 @@ export const translations = {
   // Vendor create
   vendorCreate: {
     post: {
-      title: "Create Vendor",
-      titleShort: "Create Vendor",
+      title: "Create vendor",
+      titleShort: "Create vendor",
       description: "Register a new supplier for your company.",
       widget: {
         back: "Back",
         viewVendor: "Open vendor",
         createAnother: "Create another",
+        subtitle:
+          "Add a supplier once. Purchase orders and bills pick it by name.",
+        cancel: "Cancel",
+        allVendors: "All vendors",
       },
       errors: {
         validation: {
-          title: "Validation Error",
+          title: "Validation error",
           description: "Check all fields and try again",
         },
         unauthorized: {
-          title: "Not Signed In",
+          title: "Not signed in",
           description: "Sign in to create vendors",
         },
         forbidden: {
-          title: "Access Denied",
-          description: "You need Member or higher role",
+          title: "Access denied",
+          description: "You need member or higher role",
         },
         conflict: {
-          title: "Code Already Exists",
+          title: "Code already exists",
           description: "A vendor with this code already exists",
         },
         server: {
-          title: "Server Error",
+          title: "Server error",
           description: "Failed to create vendor. Try again.",
         },
         unknown: {
-          title: "Unknown Error",
+          title: "Unknown error",
           description: "An unexpected error occurred",
         },
         network: {
-          title: "Network Error",
+          title: "Network error",
           description: "Check your connection and try again",
         },
         notFound: { title: "Not Found", description: "Company not found" },
         unsavedChanges: {
-          title: "Unsaved Changes",
+          title: "Unsaved changes",
           description: "You have unsaved changes",
         },
       },
       success: {
-        title: "Vendor Created",
+        title: "Vendor created",
         description: "Vendor registered successfully",
       },
       response: {
@@ -102,7 +114,7 @@ export const translations = {
       placeholder: "Company UUID",
     },
     name: {
-      label: "Vendor Name",
+      label: "Vendor name",
       description: "Legal name of the supplier",
       placeholder: "Acme GmbH",
     },
@@ -127,7 +139,7 @@ export const translations = {
       placeholder: "https://acme.com",
     },
     vatNumber: {
-      label: "VAT Number",
+      label: "VAT number",
       description: "Vendor VAT registration number",
       placeholder: "DE123456789",
     },
@@ -137,23 +149,23 @@ export const translations = {
       placeholder: "12345678",
     },
     addressLine1: {
-      label: "Address Line 1",
+      label: "Address line 1",
       description: "Street and number",
       placeholder: "123 Main Street",
     },
     addressLine2: {
-      label: "Address Line 2",
+      label: "Address line 2",
       description: "Suite, floor, etc.",
       placeholder: "Floor 2",
     },
     city: { label: "City", description: "City", placeholder: "Berlin" },
     region: {
-      label: "Region / State",
+      label: "Region / state",
       description: "Region or state",
       placeholder: "Berlin",
     },
     postalCode: {
-      label: "Postal Code",
+      label: "Postal code",
       description: "Postal or ZIP code",
       placeholder: "10115",
     },
@@ -163,12 +175,12 @@ export const translations = {
       placeholder: "DE",
     },
     defaultCurrency: {
-      label: "Default Currency",
+      label: "Default currency",
       description: "Currency for purchase orders to this vendor",
       placeholder: "EUR",
     },
     defaultPaymentTermsDays: {
-      label: "Payment Terms (days)",
+      label: "Payment terms (days)",
       description: "Default payment terms in days",
       placeholder: "30",
     },
@@ -191,48 +203,61 @@ export const translations = {
         inactive: "Inactive",
         total: "total",
         createVendor: "New vendor",
-        empty: "No vendors configured. Add one to get started.",
+        empty: "No vendors yet",
         vatLabel: "VAT",
         vatPrefix: "VAT:",
         paymentTerms: "Net {{days}} days",
         paymentTermsPrefix: "Net",
         paymentTermsSuffix: "d",
         loading: "Loading…",
+        subtitle: "Suppliers you buy from, with their terms and contact.",
+        filterAll: "All",
+        statusFilter: "Vendor status",
+        search: "Search name, code, email or VAT",
+        colVendor: "Vendor",
+        colContact: "Email",
+        colCurrency: "Currency",
+        colStatus: "Status",
+        emptyHint:
+          "Add the suppliers you buy from. Purchase orders and supplier bills pick them by name.",
+        noMatch: "No vendors match this filter",
+        clearFilters: "Clear filters",
+        count: "{{shown}} of {{total}} vendors",
       },
       errors: {
         validation: {
-          title: "Validation Error",
+          title: "Validation error",
           description: "Check required fields",
         },
         unauthorized: {
-          title: "Not Signed In",
+          title: "Not signed in",
           description: "Sign in to list vendors",
         },
         forbidden: {
-          title: "Access Denied",
+          title: "Access denied",
           description: "No access to this company",
         },
         conflict: { title: "Conflict", description: "Data conflict" },
         server: {
-          title: "Server Error",
+          title: "Server error",
           description: "Failed to list vendors",
         },
         unknown: {
-          title: "Unknown Error",
+          title: "Unknown error",
           description: "An unexpected error occurred",
         },
         network: {
-          title: "Network Error",
+          title: "Network error",
           description: "Check your connection and try again",
         },
         notFound: { title: "Not Found", description: "Company not found" },
         unsavedChanges: {
-          title: "Unsaved Changes",
+          title: "Unsaved changes",
           description: "You have unsaved changes",
         },
       },
       success: {
-        title: "Vendors Loaded",
+        title: "Vendors loaded",
         description: "Vendor list retrieved",
       },
       response: {
@@ -242,7 +267,7 @@ export const translations = {
         email: "Email",
         vatNumber: "VAT",
         defaultCurrency: "Currency",
-        defaultPaymentTermsDays: "Payment Terms",
+        defaultPaymentTermsDays: "Payment terms",
         isActive: "Active",
         createdAt: "Created",
       },
@@ -253,8 +278,8 @@ export const translations = {
   // Vendor get
   vendorGet: {
     get: {
-      title: "Get Vendor",
-      titleShort: "Vendor Details",
+      title: "Get vendor",
+      titleShort: "Vendor details",
       description: "Retrieve full details for a vendor.",
       widget: {
         companyName: "Company",
@@ -284,38 +309,38 @@ export const translations = {
       vendorId: { label: "Vendor ID", description: "Vendor to retrieve" },
       errors: {
         validation: {
-          title: "Validation Error",
+          title: "Validation error",
           description: "Invalid vendor ID",
         },
         unauthorized: {
-          title: "Not Signed In",
+          title: "Not signed in",
           description: "Sign in to view vendors",
         },
         forbidden: {
-          title: "Access Denied",
+          title: "Access denied",
           description: "No access to this vendor",
         },
         conflict: { title: "Conflict", description: "Data conflict" },
         server: { title: "Server Error", description: "Failed to load vendor" },
         unknown: {
-          title: "Unknown Error",
+          title: "Unknown error",
           description: "An unexpected error occurred",
         },
         network: {
-          title: "Network Error",
+          title: "Network error",
           description: "Check your connection and try again",
         },
         notFound: {
-          title: "Vendor Not Found",
+          title: "Vendor not found",
           description: "Vendor does not exist",
         },
         unsavedChanges: {
-          title: "Unsaved Changes",
+          title: "Unsaved changes",
           description: "You have unsaved changes",
         },
       },
       success: {
-        title: "Vendor Loaded",
+        title: "Vendor loaded",
         description: "Vendor details retrieved",
       },
       response: {
@@ -329,13 +354,13 @@ export const translations = {
         vatNumber: "VAT number",
         taxId: "Tax ID",
         addressLine1: "Address",
-        addressLine2: "Address Line 2",
+        addressLine2: "Address line 2",
         city: "City",
         region: "Region",
-        postalCode: "Postal Code",
+        postalCode: "Postal code",
         country: "Country",
         defaultCurrency: "Currency",
-        defaultPaymentTermsDays: "Payment Terms (days)",
+        defaultPaymentTermsDays: "Payment terms (days)",
         isActive: "Active",
         notes: "Notes",
         createdAt: "Created",
@@ -347,16 +372,28 @@ export const translations = {
   // Vendor update
   vendorUpdate: {
     patch: {
-      title: "Update Vendor",
-      titleShort: "Update Vendor",
+      title: "Update vendor",
+      titleShort: "Update vendor",
       description: "Update vendor details.",
+      isActive: {
+        label: "Active",
+        description: "Active vendors can be picked on new purchase orders.",
+      },
       widget: {
         backToVendor: "Back to vendor",
         viewVendor: "View vendor",
+        sectionStatus: "Status",
+        title: "Edit vendor",
+        cancel: "Cancel",
+        save: "Save changes",
+        sectionCompany: "Company and tax",
+        sectionContact: "Contact",
+        sectionAddress: "Address",
+        sectionTerms: "Purchasing terms",
       },
       vendorId: { label: "Vendor ID", description: "Vendor to update" },
       name: {
-        label: "Vendor Name",
+        label: "Vendor name",
         description: "Legal name of the supplier",
         placeholder: "Acme GmbH",
       },
@@ -381,7 +418,7 @@ export const translations = {
         placeholder: "https://acme.com",
       },
       vatNumber: {
-        label: "VAT Number",
+        label: "VAT number",
         description: "Vendor VAT registration number",
         placeholder: "DE123456789",
       },
@@ -391,23 +428,23 @@ export const translations = {
         placeholder: "12345678",
       },
       addressLine1: {
-        label: "Address Line 1",
+        label: "Address line 1",
         description: "Street and number",
         placeholder: "123 Main Street",
       },
       addressLine2: {
-        label: "Address Line 2",
+        label: "Address line 2",
         description: "Suite, floor, etc.",
         placeholder: "Floor 2",
       },
       city: { label: "City", description: "City", placeholder: "Berlin" },
       region: {
-        label: "Region / State",
+        label: "Region / state",
         description: "Region or state",
         placeholder: "Berlin",
       },
       postalCode: {
-        label: "Postal Code",
+        label: "Postal code",
         description: "Postal or ZIP code",
         placeholder: "10115",
       },
@@ -417,12 +454,12 @@ export const translations = {
         placeholder: "DE",
       },
       defaultCurrency: {
-        label: "Default Currency",
+        label: "Default currency",
         description: "Currency for purchase orders to this vendor",
         placeholder: "EUR",
       },
       defaultPaymentTermsDays: {
-        label: "Payment Terms (days)",
+        label: "Payment terms (days)",
         description: "Default payment terms in days",
         placeholder: "30",
       },
@@ -433,44 +470,44 @@ export const translations = {
       },
       errors: {
         validation: {
-          title: "Validation Error",
+          title: "Validation error",
           description: "Check required fields",
         },
         unauthorized: {
-          title: "Not Signed In",
+          title: "Not signed in",
           description: "Sign in to update vendors",
         },
         forbidden: {
-          title: "Access Denied",
+          title: "Access denied",
           description: "No access to this vendor",
         },
         conflict: {
-          title: "Code Conflict",
+          title: "Code conflict",
           description: "That vendor code is already taken",
         },
         server: {
-          title: "Server Error",
+          title: "Server error",
           description: "Failed to update vendor",
         },
         unknown: {
-          title: "Unknown Error",
+          title: "Unknown error",
           description: "An unexpected error occurred",
         },
         network: {
-          title: "Network Error",
+          title: "Network error",
           description: "Check your connection and try again",
         },
         notFound: {
-          title: "Vendor Not Found",
+          title: "Vendor not found",
           description: "Vendor does not exist",
         },
         unsavedChanges: {
-          title: "Unsaved Changes",
+          title: "Unsaved changes",
           description: "You have unsaved changes",
         },
       },
       success: {
-        title: "Vendor Updated",
+        title: "Vendor updated",
         description: "Vendor updated successfully",
       },
       response: {
@@ -485,53 +522,60 @@ export const translations = {
   // Vendor deactivate
   vendorDeactivate: {
     post: {
-      title: "Deactivate Vendor",
+      title: "Deactivate vendor",
       titleShort: "Deactivate",
       description:
         "Mark a vendor as inactive. Existing purchase orders are not affected.",
       vendorId: { label: "Vendor ID", description: "Vendor to deactivate" },
       widget: {
         warning:
-          "This will deactivate the vendor. Existing purchase orders will not be affected.",
+          "New purchase orders can no longer pick this vendor. Existing orders, receipts and bills stay as they are. You can reactivate it later from Edit vendor.",
         backToList: "Back to vendors",
+        backToVendor: "Back to vendor",
+        subtitle: "Stop ordering from this supplier.",
+        cancel: "Cancel",
+        openVendor: "Open vendor",
+        alreadyInactive: "This vendor is already inactive",
+        reactivateHint:
+          "To order from it again, open the vendor, choose Edit vendor and switch it back to active.",
       },
       errors: {
         validation: {
-          title: "Validation Error",
+          title: "Validation error",
           description: "Invalid vendor ID",
         },
         unauthorized: {
-          title: "Not Signed In",
+          title: "Not signed in",
           description: "Sign in to deactivate vendors",
         },
         forbidden: {
-          title: "Access Denied",
+          title: "Access denied",
           description: "No access to this vendor",
         },
         conflict: { title: "Conflict", description: "Data conflict" },
         server: {
-          title: "Server Error",
+          title: "Server error",
           description: "Failed to deactivate vendor",
         },
         unknown: {
-          title: "Unknown Error",
+          title: "Unknown error",
           description: "An unexpected error occurred",
         },
         network: {
-          title: "Network Error",
+          title: "Network error",
           description: "Check your connection and try again",
         },
         notFound: {
-          title: "Vendor Not Found",
+          title: "Vendor not found",
           description: "Vendor does not exist",
         },
         unsavedChanges: {
-          title: "Unsaved Changes",
+          title: "Unsaved changes",
           description: "You have unsaved changes",
         },
       },
       success: {
-        title: "Vendor Deactivated",
+        title: "Vendor deactivated",
         description: "Vendor is now inactive",
       },
       response: {
@@ -544,57 +588,63 @@ export const translations = {
   // PO create
   orderCreate: {
     post: {
-      title: "Create Purchase Order",
-      titleShort: "Create Order",
-      description: "Create a new purchase order in Draft status.",
+      title: "Create purchase order",
+      titleShort: "Create order",
+      description: "Create a new purchase order in draft status.",
       errors: {
         validation: {
-          title: "Validation Error",
+          title: "Validation error",
           description: "Check all fields and try again",
         },
         unauthorized: {
-          title: "Not Signed In",
+          title: "Not signed in",
           description: "Sign in to create purchase orders",
         },
         forbidden: {
-          title: "Access Denied",
-          description: "You need Member or higher role",
+          title: "Access denied",
+          description: "You need member or higher role",
         },
         conflict: { title: "Conflict", description: "Data conflict" },
         server: {
-          title: "Server Error",
+          title: "Server error",
           description: "Failed to create purchase order. Try again.",
         },
         unknown: {
-          title: "Unknown Error",
+          title: "Unknown error",
           description: "An unexpected error occurred",
         },
         network: {
-          title: "Network Error",
+          title: "Network error",
           description: "Check your connection and try again",
         },
         notFound: {
-          title: "Not Found",
+          title: "Not found",
           description: "Vendor or company not found",
         },
         unsavedChanges: {
-          title: "Unsaved Changes",
+          title: "Unsaved changes",
           description: "You have unsaved changes",
         },
       },
       success: {
-        title: "Purchase Order Created",
-        description: "Purchase order created in Draft status",
+        title: "Purchase order created",
+        description: "Purchase order created in draft status",
       },
       widget: {
-        browseVendors: "Browse Vendors",
-        browseWarehouses: "Browse Warehouses",
+        browseVendors: "Browse vendors",
+        browseWarehouses: "Browse warehouses",
         viewOrder: "Open purchase order",
         backToList: "Back to list",
+        subtitle:
+          "Pick the supplier and where the goods go. Add lines on the next screen.",
+        cancel: "Cancel",
+        nextStep: "The draft is ready. Add its lines, then mark it as sent.",
+        sectionSupplier: "Supplier",
+        sectionDelivery: "Delivery",
       },
       response: {
-        id: "Purchase Order ID",
-        poNumber: "Purchase Order Number",
+        id: "Purchase order ID",
+        poNumber: "Purchase order number",
         status: "Status",
         subtotal: "Subtotal",
         taxAmount: "Tax",
@@ -618,12 +668,12 @@ export const translations = {
       placeholder: "EUR",
     },
     expectedDeliveryDate: {
-      label: "Expected Delivery",
+      label: "Expected delivery",
       description: "Expected delivery date (optional)",
       placeholder: "2024-03-01",
     },
     deliveryWarehouseId: {
-      label: "Delivery Warehouse",
+      label: "Delivery warehouse",
       description: "Warehouse to receive goods (optional)",
       placeholder: "Warehouse UUID",
     },
@@ -633,7 +683,7 @@ export const translations = {
       placeholder: "Rush order",
     },
     lines: {
-      label: "Line Items",
+      label: "Line items",
       description: "Products and quantities to order",
     },
     lineDescription: {
@@ -652,17 +702,17 @@ export const translations = {
       placeholder: "10",
     },
     lineUnitPrice: {
-      label: "Unit Price",
+      label: "Unit price",
       description: "Price per unit",
       placeholder: "99.00",
     },
     lineTaxRate: {
-      label: "Tax Rate",
+      label: "Tax rate",
       description: "Tax rate as decimal (e.g. 0.19 = 19%)",
       placeholder: "0.19",
     },
     lineSortOrder: {
-      label: "Sort Order",
+      label: "Sort order",
       description: "Display order of this line",
       placeholder: "0",
     },
@@ -671,17 +721,17 @@ export const translations = {
   // PO list
   orderList: {
     get: {
-      title: "Purchase Orders",
+      title: "Purchase orders",
       titleShort: "Orders",
       description:
         "List purchase orders for a company with optional status filter.",
       widget: {
-        newOrder: "New Purchase Order",
+        newOrder: "New purchase order",
         empty: "No purchase orders found.",
         statusAll: "All",
         orders: "purchase orders",
         order: "purchase order",
-        colPoVendor: "Purchase Order / Vendor",
+        colPoVendor: "Purchase order / vendor",
         colDate: "Date",
         colAmount: "Amount",
         colStatus: "Status",
@@ -699,54 +749,54 @@ export const translations = {
         description: "Company to list purchase orders for",
       },
       status: {
-        label: "Status Filter",
+        label: "Status filter",
         description: "Filter by purchase order status (optional)",
       },
       errors: {
         validation: {
-          title: "Validation Error",
+          title: "Validation error",
           description: "Check required fields",
         },
         unauthorized: {
-          title: "Not Signed In",
+          title: "Not signed in",
           description: "Sign in to list purchase orders",
         },
         forbidden: {
-          title: "Access Denied",
+          title: "Access denied",
           description: "No access to this company",
         },
         conflict: { title: "Conflict", description: "Data conflict" },
         server: {
-          title: "Server Error",
+          title: "Server error",
           description: "Failed to list purchase orders",
         },
         unknown: {
-          title: "Unknown Error",
+          title: "Unknown error",
           description: "An unexpected error occurred",
         },
         network: {
-          title: "Network Error",
+          title: "Network error",
           description: "Check your connection and try again",
         },
         notFound: { title: "Not Found", description: "Company not found" },
         unsavedChanges: {
-          title: "Unsaved Changes",
+          title: "Unsaved changes",
           description: "You have unsaved changes",
         },
       },
       success: {
-        title: "Purchase Orders Loaded",
+        title: "Purchase orders loaded",
         description: "Purchase order list retrieved",
       },
       response: {
-        id: "Purchase Order ID",
-        poNumber: "Purchase Order Number",
+        id: "Purchase order ID",
+        poNumber: "Purchase order number",
         vendorId: "Vendor",
         vendorName: "Vendor",
         status: "Status",
         currency: "Currency",
         total: "Total",
-        expectedDeliveryDate: "Expected Delivery",
+        expectedDeliveryDate: "Expected delivery",
         createdAt: "Created",
       },
     },
@@ -755,29 +805,29 @@ export const translations = {
   // PO get
   orderGet: {
     get: {
-      title: "Get Purchase Order",
-      titleShort: "Order Details",
+      title: "Get purchase order",
+      titleShort: "Order details",
       description:
         "Retrieve a purchase order with all lines and receipt history.",
       widget: {
         precision:
           "Line totals use the original supplier unit price before display rounding.",
         back: "Back",
-        send: "Mark as Sent",
+        send: "Mark as sent",
         confirm: "Mark confirmed",
         receive: "Receive goods",
         convertToBill: "Convert to bill",
         viewBill: "View bill",
         addLine: "+ Add line",
-        cancel: "Cancel Order",
+        cancel: "Cancel order",
         edit: "Edit",
         select: "Select purchase order",
-        linesHeader: "Line Items",
-        receiptsHeader: "Receipt History",
+        linesHeader: "Line items",
+        receiptsHeader: "Receipt history",
         noLines: "No line items.",
         noReceipts: "No receipts yet.",
         colDescription: "Description",
-        colQtyPrice: "Qty × Price",
+        colQtyPrice: "Qty × price",
         colLineTotal: "Total",
         delivery: "Expected delivery:",
         overdue: "(overdue)",
@@ -786,57 +836,57 @@ export const translations = {
         vendorLabel: "Vendor:",
       },
       poId: {
-        label: "Purchase Order ID",
+        label: "Purchase order ID",
         description: "Purchase order to retrieve",
       },
       errors: {
         validation: {
-          title: "Validation Error",
+          title: "Validation error",
           description: "Invalid purchase order ID",
         },
         unauthorized: {
-          title: "Not Signed In",
+          title: "Not signed in",
           description: "Sign in to view purchase orders",
         },
         forbidden: {
-          title: "Access Denied",
+          title: "Access denied",
           description: "No access to this purchase order",
         },
         conflict: { title: "Conflict", description: "Data conflict" },
         server: {
-          title: "Server Error",
+          title: "Server error",
           description: "Failed to load purchase order",
         },
         unknown: {
-          title: "Unknown Error",
+          title: "Unknown error",
           description: "An unexpected error occurred",
         },
         network: {
-          title: "Network Error",
+          title: "Network error",
           description: "Check your connection and try again",
         },
         notFound: {
-          title: "Purchase Order Not Found",
+          title: "Purchase order not found",
           description: "Purchase order does not exist",
         },
         unsavedChanges: {
-          title: "Unsaved Changes",
+          title: "Unsaved changes",
           description: "You have unsaved changes",
         },
       },
       success: {
-        title: "Purchase Order Loaded",
+        title: "Purchase order loaded",
         description: "Purchase order details retrieved",
       },
       response: {
-        id: "Purchase Order ID",
+        id: "Purchase order ID",
         companyId: "Company ID",
         vendorId: "Vendor ID",
-        poNumber: "Purchase Order Number",
+        poNumber: "Purchase order number",
         status: "Status",
         currency: "Currency",
-        expectedDeliveryDate: "Expected Delivery",
-        deliveryWarehouseId: "Delivery Warehouse",
+        expectedDeliveryDate: "Expected delivery",
+        deliveryWarehouseId: "Delivery warehouse",
         notes: "Notes",
         subtotal: "Subtotal",
         taxAmount: "Tax",
@@ -851,14 +901,14 @@ export const translations = {
         lineProductId: "Product ID",
         lineDescription: "Description",
         lineQuantity: "Qty",
-        lineUnitPrice: "Unit Price",
-        lineTaxRate: "Tax Rate",
+        lineUnitPrice: "Unit price",
+        lineTaxRate: "Tax rate",
         lineTaxAmount: "Tax",
         lineTotal: "Total",
         lineQuantityReceived: "Received",
         receipts: "Receipts",
         receiptId: "Receipt ID",
-        receiptReceivedAt: "Received At",
+        receiptReceivedAt: "Received at",
         receiptNotes: "Notes",
       },
     },
@@ -867,14 +917,20 @@ export const translations = {
   // PO update
   orderUpdate: {
     patch: {
-      title: "Update Purchase Order",
-      titleShort: "Update Order",
+      title: "Update purchase order",
+      titleShort: "Update order",
       description: "Edit the details and line items on a draft purchase order.",
       widget: {
-        backToPO: "Back to Purchase Order",
+        backToPO: "Back to purchase order",
+        title: "Edit purchase order",
+        cancel: "Cancel",
+        save: "Save changes",
+        lockedTitle: "Only drafts can be edited",
+        lockedMessage:
+          "This order was already sent. Cancel it and raise a new one to change supplier, currency or delivery.",
       },
       poId: {
-        label: "Purchase Order ID",
+        label: "Purchase order ID",
         description: "Purchase order to update",
       },
       vendorId: {
@@ -888,12 +944,12 @@ export const translations = {
         placeholder: "EUR",
       },
       expectedDeliveryDate: {
-        label: "Expected Delivery",
+        label: "Expected delivery",
         description: "Expected delivery date",
         placeholder: "2024-03-01",
       },
       deliveryWarehouseId: {
-        label: "Delivery Warehouse",
+        label: "Delivery warehouse",
         description: "Warehouse to receive goods",
         placeholder: "Warehouse UUID",
       },
@@ -903,7 +959,7 @@ export const translations = {
         placeholder: "Rush order",
       },
       lines: {
-        label: "Line Items",
+        label: "Line items",
         description: "Replace all line items (optional)",
       },
       lineDescription: {
@@ -922,64 +978,64 @@ export const translations = {
         placeholder: "10",
       },
       lineUnitPrice: {
-        label: "Unit Price",
+        label: "Unit price",
         description: "Price per unit",
         placeholder: "99.00",
       },
       lineTaxRate: {
-        label: "Tax Rate",
+        label: "Tax rate",
         description: "Tax rate as decimal",
         placeholder: "0.19",
       },
       lineSortOrder: {
-        label: "Sort Order",
+        label: "Sort order",
         description: "Display order of this line",
         placeholder: "0",
       },
       errors: {
         validation: {
-          title: "Validation Error",
+          title: "Validation error",
           description: "Check required fields",
         },
         unauthorized: {
-          title: "Not Signed In",
+          title: "Not signed in",
           description: "Sign in to update purchase orders",
         },
         forbidden: {
-          title: "Access Denied",
+          title: "Access denied",
           description: "No access to this purchase order",
         },
         conflict: {
-          title: "Not a Draft",
+          title: "Not a draft",
           description: "Only draft purchase orders can be edited",
         },
         server: {
-          title: "Server Error",
+          title: "Server error",
           description: "Failed to update purchase order",
         },
         unknown: {
-          title: "Unknown Error",
+          title: "Unknown error",
           description: "An unexpected error occurred",
         },
         network: {
-          title: "Network Error",
+          title: "Network error",
           description: "Check your connection and try again",
         },
         notFound: {
-          title: "Purchase Order Not Found",
+          title: "Purchase order not found",
           description: "Purchase order does not exist",
         },
         unsavedChanges: {
-          title: "Unsaved Changes",
+          title: "Unsaved changes",
           description: "You have unsaved changes",
         },
       },
       success: {
-        title: "Purchase Order Updated",
+        title: "Purchase order updated",
         description: "Purchase order updated",
       },
       response: {
-        id: "Purchase Order ID",
+        id: "Purchase order ID",
         status: "Status",
         subtotal: "Subtotal",
         taxAmount: "Tax",
@@ -992,62 +1048,66 @@ export const translations = {
   // PO send
   orderSend: {
     post: {
-      title: "Mark Purchase Order as Sent",
-      titleShort: "Mark as Sent",
+      title: "Mark purchase order as sent",
+      titleShort: "Mark as sent",
       description: "Record that the purchase order was sent.",
       poId: {
-        label: "Purchase Order ID",
+        label: "Purchase order ID",
         description: "Purchase order to send",
       },
       widget: {
         back: "Back",
-        backToPO: "Back to Purchase Order",
-        warning: "This changes the order status to Sent in this workspace.",
+        consequence:
+          "The order moves to sent. Confirm it once the supplier replies, then receive the goods.",
+        blocked: "Only draft orders can be marked as sent.",
+        noLines: "Add at least one line before sending the order.",
+        backToPO: "Back to purchase order",
+        warning: "This changes the order status to sent in this workspace.",
       },
       errors: {
         validation: {
-          title: "Validation Error",
+          title: "Validation error",
           description: "Invalid purchase order ID",
         },
         unauthorized: {
-          title: "Not Signed In",
+          title: "Not signed in",
           description: "Sign in to send purchase orders",
         },
         forbidden: {
-          title: "Access Denied",
+          title: "Access denied",
           description: "No access to this purchase order",
         },
         conflict: {
-          title: "Not a Draft",
+          title: "Not a draft",
           description: "Only draft purchase orders can be sent",
         },
         server: {
-          title: "Server Error",
+          title: "Server error",
           description: "Failed to send purchase order",
         },
         unknown: {
-          title: "Unknown Error",
+          title: "Unknown error",
           description: "An unexpected error occurred",
         },
         network: {
-          title: "Network Error",
+          title: "Network error",
           description: "Check your connection and try again",
         },
         notFound: {
-          title: "Purchase Order Not Found",
+          title: "Purchase order not found",
           description: "Purchase order does not exist",
         },
         unsavedChanges: {
-          title: "Unsaved Changes",
+          title: "Unsaved changes",
           description: "You have unsaved changes",
         },
       },
       success: {
-        title: "Purchase Order Marked as Sent",
-        description: "The purchase order now has Sent status.",
+        title: "Purchase order marked as sent",
+        description: "The purchase order now has sent status.",
       },
       response: {
-        id: "Purchase Order ID",
+        id: "Purchase order ID",
         status: "Status",
       },
     },
@@ -1056,63 +1116,66 @@ export const translations = {
   // PO confirm
   orderConfirm: {
     post: {
-      title: "Confirm Purchase Order",
-      titleShort: "Confirm Order",
+      title: "Confirm purchase order",
+      titleShort: "Confirm order",
       description: "Record the supplier’s confirmation of this purchase order.",
       poId: {
-        label: "Purchase Order ID",
+        label: "Purchase order ID",
         description: "Purchase order to confirm",
       },
       widget: {
         back: "Back",
-        backToPO: "Back to Purchase Order",
+        consequence:
+          "The supplier accepted the order. It stays open for receiving until all goods arrive.",
+        blocked: "Only sent orders can be confirmed.",
+        backToPO: "Back to purchase order",
       },
       errors: {
         validation: {
-          title: "Validation Error",
+          title: "Validation error",
           description: "Invalid purchase order ID",
         },
         unauthorized: {
-          title: "Not Signed In",
+          title: "Not signed in",
           description: "Sign in to confirm purchase orders",
         },
         forbidden: {
-          title: "Access Denied",
+          title: "Access denied",
           description: "No access to this purchase order",
         },
         conflict: {
-          title: "Invalid Status",
+          title: "Invalid status",
           description: "Only sent purchase orders can be confirmed",
         },
         server: {
-          title: "Server Error",
+          title: "Server error",
           description: "Failed to confirm purchase order",
         },
         unknown: {
-          title: "Unknown Error",
+          title: "Unknown error",
           description: "An unexpected error occurred",
         },
         network: {
-          title: "Network Error",
+          title: "Network error",
           description: "Check your connection and try again",
         },
         notFound: {
-          title: "Purchase Order Not Found",
+          title: "Purchase order not found",
           description: "Purchase order does not exist",
         },
         unsavedChanges: {
-          title: "Unsaved Changes",
+          title: "Unsaved changes",
           description: "You have unsaved changes",
         },
       },
       success: {
-        title: "Purchase Order Confirmed",
-        description: "Purchase order marked as Confirmed",
+        title: "Purchase order confirmed",
+        description: "Purchase order marked as confirmed",
       },
       response: {
-        id: "Purchase Order ID",
+        id: "Purchase order ID",
         status: "Status",
-        confirmedAt: "Confirmed At",
+        confirmedAt: "Confirmed at",
       },
     },
   },
@@ -1120,8 +1183,8 @@ export const translations = {
   // PO receive
   orderReceive: {
     post: {
-      title: "Receive Goods",
-      titleShort: "Receive Goods",
+      title: "Receive goods",
+      titleShort: "Receive goods",
       description:
         "Record receipt of goods against a purchase order. Creates stock movements.",
       widget: {
@@ -1129,10 +1192,10 @@ export const translations = {
         loading: "Loading order…",
         remaining: "{{quantity}} remaining",
         noOpenLines: "All ordered quantities have been received.",
-        backToPO: "Back to Purchase Order",
+        backToPO: "Back to purchase order",
       },
       poId: {
-        label: "Purchase Order ID",
+        label: "Purchase order ID",
         description: "Purchase order to receive against",
       },
       warehouseId: {
@@ -1146,61 +1209,61 @@ export const translations = {
         placeholder: "Delivery note #12345",
       },
       lines: {
-        label: "Received Items",
+        label: "Received items",
         description: "Quantities received for each line",
       },
       linePoLineId: { label: "Line ID", description: "Purchase order line" },
       lineQuantityReceived: {
-        label: "Quantity Received",
+        label: "Quantity received",
         description: "Quantity received for this line",
       },
       errors: {
         validation: {
-          title: "Validation Error",
+          title: "Validation error",
           description: "Check all fields and quantities",
         },
         unauthorized: {
-          title: "Not Signed In",
+          title: "Not signed in",
           description: "Sign in to receive goods",
         },
         forbidden: {
-          title: "Access Denied",
+          title: "Access denied",
           description: "No access to this purchase order",
         },
         conflict: {
-          title: "Invalid Status",
+          title: "Invalid status",
           description:
-            "Purchase order must be Confirmed or Sent to receive goods",
+            "Purchase order must be confirmed or sent to receive goods",
         },
         server: {
-          title: "Server Error",
+          title: "Server error",
           description: "Failed to record receipt",
         },
         unknown: {
-          title: "Unknown Error",
+          title: "Unknown error",
           description: "An unexpected error occurred",
         },
         network: {
-          title: "Network Error",
+          title: "Network error",
           description: "Check your connection and try again",
         },
         notFound: {
-          title: "Purchase Order Not Found",
+          title: "Purchase order not found",
           description: "Purchase order or line not found",
         },
         unsavedChanges: {
-          title: "Unsaved Changes",
+          title: "Unsaved changes",
           description: "You have unsaved changes",
         },
       },
       success: {
-        title: "Goods Received",
+        title: "Goods received",
         description: "Receipt recorded and stock updated",
       },
       response: {
         receiptId: "Receipt ID",
-        status: "Purchase Order Status",
-        receivedAt: "Received At",
+        status: "Purchase order status",
+        receivedAt: "Received at",
       },
     },
   },
@@ -1208,16 +1271,19 @@ export const translations = {
   // PO convert to bill
   orderConvertToBill: {
     post: {
-      title: "Convert to Bill",
-      titleShort: "Convert to Bill",
+      title: "Convert to bill",
+      titleShort: "Convert to bill",
       description:
         "Create a supplier bill from a fully received purchase order. Approve the bill to post the payable.",
       widget: {
         back: "Back",
+        consequence:
+          "Creates an unposted supplier bill with the received quantities. Review and approve it under bills.",
+        blocked: "Only fully received orders without a bill can be converted.",
         viewBill: "View bill",
       },
       poId: {
-        label: "Purchase Order ID",
+        label: "Purchase order ID",
         description: "Purchase order to convert",
       },
       errors: {
@@ -1227,11 +1293,11 @@ export const translations = {
             "The bill currency must be supported and each total must match the order lines.",
         },
         unauthorized: {
-          title: "Not Signed In",
+          title: "Not signed in",
           description: "Sign in to create bills",
         },
         forbidden: {
-          title: "Access Denied",
+          title: "Access denied",
           description: "No access to this purchase order",
         },
         conflict: {
@@ -1241,30 +1307,30 @@ export const translations = {
         },
         server: { title: "Server Error", description: "Failed to create bill" },
         unknown: {
-          title: "Unknown Error",
+          title: "Unknown error",
           description: "An unexpected error occurred",
         },
         network: {
-          title: "Network Error",
+          title: "Network error",
           description: "Check your connection and try again",
         },
         notFound: {
-          title: "Purchase Order Not Found",
+          title: "Purchase order not found",
           description: "Purchase order does not exist",
         },
         unsavedChanges: {
-          title: "Unsaved Changes",
+          title: "Unsaved changes",
           description: "You have unsaved changes",
         },
       },
       success: {
-        title: "Bill Created",
+        title: "Bill created",
         description: "AP bill created from purchase order",
       },
       response: {
         billId: "Bill ID",
-        billNumber: "Bill Number",
-        poId: "Purchase Order ID",
+        billNumber: "Bill number",
+        poId: "Purchase order ID",
       },
     },
   },
@@ -1280,11 +1346,11 @@ export const translations = {
         backToOrder: "Back to order",
         lineAdded: "Line item added",
       },
-      title: "Add Line Item",
-      titleShort: "Add Line",
+      title: "Add line item",
+      titleShort: "Add line",
       description: "Add a line item to a purchase order.",
       poId: {
-        label: "Purchase Order ID",
+        label: "Purchase order ID",
         description: "Purchase order to add a line to",
       },
       productId: {
@@ -1303,55 +1369,55 @@ export const translations = {
         placeholder: "10",
       },
       unitPrice: {
-        label: "Unit Price",
+        label: "Unit price",
         description: "Price per unit",
         placeholder: "99.00",
       },
       taxRate: {
-        label: "Tax Rate",
+        label: "Tax rate",
         description: "Tax rate as decimal (e.g. 0.19 = 19%)",
         placeholder: "0.19",
       },
       errors: {
         validation: {
-          title: "Validation Error",
+          title: "Validation error",
           description: "Check all fields and try again",
         },
         unauthorized: {
-          title: "Not Signed In",
+          title: "Not signed in",
           description: "Sign in to add line items",
         },
         forbidden: {
-          title: "Access Denied",
+          title: "Access denied",
           description: "No access to this purchase order",
         },
         conflict: {
-          title: "Not a Draft",
+          title: "Not a draft",
           description: "Only draft purchase orders can be modified",
         },
         server: {
-          title: "Server Error",
+          title: "Server error",
           description: "Failed to add line item",
         },
         unknown: {
-          title: "Unknown Error",
+          title: "Unknown error",
           description: "An unexpected error occurred",
         },
         network: {
-          title: "Network Error",
+          title: "Network error",
           description: "Check your connection and try again",
         },
         notFound: {
-          title: "Purchase Order Not Found",
+          title: "Purchase order not found",
           description: "Purchase order does not exist",
         },
         unsavedChanges: {
-          title: "Unsaved Changes",
+          title: "Unsaved changes",
           description: "You have unsaved changes",
         },
       },
       success: {
-        title: "Line Added",
+        title: "Line added",
         description: "Line item added to purchase order",
       },
       response: {
@@ -1366,11 +1432,11 @@ export const translations = {
   // PO line remove
   orderLineRemove: {
     post: {
-      title: "Remove Line Item",
-      titleShort: "Remove Line",
+      title: "Remove line item",
+      titleShort: "Remove line",
       description: "Remove a line item from a purchase order.",
       poId: {
-        label: "Purchase Order ID",
+        label: "Purchase order ID",
         description: "Purchase order to remove a line from",
       },
       lineId: { label: "Line ID", description: "Line item to remove" },
@@ -1385,44 +1451,44 @@ export const translations = {
       },
       errors: {
         validation: {
-          title: "Validation Error",
+          title: "Validation error",
           description: "Invalid IDs",
         },
         unauthorized: {
-          title: "Not Signed In",
+          title: "Not signed in",
           description: "Sign in to remove line items",
         },
         forbidden: {
-          title: "Access Denied",
+          title: "Access denied",
           description: "No access to this purchase order",
         },
         conflict: {
-          title: "Not a Draft",
+          title: "Not a draft",
           description: "Only draft purchase orders can be modified",
         },
         server: {
-          title: "Server Error",
+          title: "Server error",
           description: "Failed to remove line item",
         },
         unknown: {
-          title: "Unknown Error",
+          title: "Unknown error",
           description: "An unexpected error occurred",
         },
         network: {
-          title: "Network Error",
+          title: "Network error",
           description: "Check your connection and try again",
         },
         notFound: {
-          title: "Not Found",
+          title: "Not found",
           description: "Purchase order or line item not found",
         },
         unsavedChanges: {
-          title: "Unsaved Changes",
+          title: "Unsaved changes",
           description: "You have unsaved changes",
         },
       },
       success: {
-        title: "Line Removed",
+        title: "Line removed",
         description: "Line item removed from purchase order",
       },
       response: {
@@ -1436,7 +1502,7 @@ export const translations = {
   // Purchasing Dashboard
   dashboard: {
     get: {
-      title: "Purchasing Overview",
+      title: "Purchasing overview",
       titleShort: "Overview",
       description:
         "Live snapshot of purchase orders and supplier activity for your company.",
@@ -1448,21 +1514,22 @@ export const translations = {
         supplier: "Supplier",
         expected: "Expected",
         orderTotal: "Order total",
-        noDeliveries: "No outstanding deliveries",
+        noDeliveries:
+          "No deliveries outstanding. Sent and confirmed orders appear here until their goods are received.",
         overdue: "Late deliveries",
         dueSeven: "Due in the next 7 days",
         kpiDraft: "Drafts",
         kpiConfirmed: "Confirmed",
-        kpiAwaitingReceipt: "Awaiting Receipt",
-        kpiActiveVendors: "Active Vendors",
+        kpiAwaitingReceipt: "Awaiting receipt",
+        kpiActiveVendors: "Active vendors",
         warningDueThisWeek:
           "One purchase order is due this week. Check its delivery date.",
         warningDueThisWeekPlural:
           "{{count}} purchase orders are due this week. Check their delivery dates.",
-        navNewPo: "New Purchase Order",
-        navAllPos: "All Purchase Orders",
+        navNewPo: "New purchase order",
+        navAllPos: "All purchase orders",
         navVendors: "Vendors",
-        navNewVendor: "New Vendor",
+        navNewVendor: "New vendor",
         loading: "Loading…",
       },
       companyId: {
@@ -1471,46 +1538,46 @@ export const translations = {
       },
       errors: {
         validation: {
-          title: "Validation Error",
+          title: "Validation error",
           description: "Check required fields",
         },
         unauthorized: {
-          title: "Not Signed In",
+          title: "Not signed in",
           description: "Sign in to view purchasing overview",
         },
         forbidden: {
-          title: "Access Denied",
+          title: "Access denied",
           description: "No access to this company",
         },
         conflict: { title: "Conflict", description: "Data conflict" },
         server: {
-          title: "Server Error",
+          title: "Server error",
           description: "Failed to load purchasing overview",
         },
         unknown: {
-          title: "Unknown Error",
+          title: "Unknown error",
           description: "An unexpected error occurred",
         },
         network: {
-          title: "Network Error",
+          title: "Network error",
           description: "Check your connection and try again",
         },
         notFound: { title: "Not Found", description: "Company not found" },
         unsavedChanges: {
-          title: "Unsaved Changes",
+          title: "Unsaved changes",
           description: "You have unsaved changes",
         },
       },
       success: {
-        title: "Dashboard Loaded",
+        title: "Dashboard loaded",
         description: "Purchasing overview retrieved",
       },
       response: {
-        draftCount: "Draft Purchase Orders",
-        confirmedCount: "Confirmed Purchase Orders",
-        awaitingReceiptCount: "Awaiting Receipt",
-        activeVendorCount: "Active Vendors",
-        dueThisWeekCount: "Due This Week",
+        draftCount: "Draft purchase orders",
+        confirmedCount: "Confirmed purchase orders",
+        awaitingReceiptCount: "Awaiting receipt",
+        activeVendorCount: "Active vendors",
+        dueThisWeekCount: "Due this week",
       },
     },
   },
@@ -1518,62 +1585,63 @@ export const translations = {
   // PO cancel
   orderCancel: {
     post: {
-      title: "Cancel Purchase Order",
-      titleShort: "Cancel Order",
-      description: "Cancel a Draft or Sent purchase order.",
+      title: "Cancel purchase order",
+      titleShort: "Cancel order",
+      description: "Cancel a draft or sent purchase order.",
       poId: {
-        label: "Purchase Order ID",
+        label: "Purchase order ID",
         description: "Purchase order to cancel",
       },
       widget: {
         back: "Back",
+        blocked: "Only draft or sent orders can be cancelled.",
         warning:
-          "This will permanently cancel the purchase order. Only draft or sent purchase orders can be cancelled.",
+          "The order is closed for good. Nothing can be received or billed on it afterwards.",
       },
       errors: {
         validation: {
-          title: "Validation Error",
+          title: "Validation error",
           description: "Invalid purchase order ID",
         },
         unauthorized: {
-          title: "Not Signed In",
+          title: "Not signed in",
           description: "Sign in to cancel purchase orders",
         },
         forbidden: {
-          title: "Access Denied",
+          title: "Access denied",
           description: "No access to this purchase order",
         },
         conflict: {
-          title: "Cannot Cancel",
+          title: "Cannot cancel",
           description: "Only draft or sent purchase orders can be cancelled",
         },
         server: {
-          title: "Server Error",
+          title: "Server error",
           description: "Failed to cancel purchase order",
         },
         unknown: {
-          title: "Unknown Error",
+          title: "Unknown error",
           description: "An unexpected error occurred",
         },
         network: {
-          title: "Network Error",
+          title: "Network error",
           description: "Check your connection and try again",
         },
         notFound: {
-          title: "Purchase Order Not Found",
+          title: "Purchase order not found",
           description: "Purchase order does not exist",
         },
         unsavedChanges: {
-          title: "Unsaved Changes",
+          title: "Unsaved changes",
           description: "You have unsaved changes",
         },
       },
       success: {
-        title: "Purchase Order Cancelled",
+        title: "Purchase order cancelled",
         description: "Purchase order cancelled",
       },
       response: {
-        id: "Purchase Order ID",
+        id: "Purchase order ID",
         status: "Status",
       },
     },

@@ -1,6 +1,5 @@
 "use client";
 
-import { Badge } from "next-vibe/ui/components/badge";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { EmptyBlock } from "next-vibe/ui/components/empty-block";
@@ -8,6 +7,7 @@ import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
 import { Label } from "next-vibe/ui/components/label";
 import { LoadingBlock } from "next-vibe/ui/components/loading-block";
 import { NumberInput } from "next-vibe/ui/components/number-input";
+import { ResultBanner } from "next-vibe/ui/components/result-banner";
 import { Span } from "next-vibe/ui/components/span";
 import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
 import {
@@ -95,35 +95,34 @@ export function OrderReceiveWidget({
   };
 
   if (result !== undefined) {
+    const partial = result.status === "PARTIALLY_RECEIVED";
     return (
-      <Div className="flex flex-col gap-4 p-4 rounded-lg border bg-emerald-50/50 dark:bg-emerald-900/10 border-emerald-200 dark:border-emerald-800">
-        <Div className="flex flex-col gap-1">
-          <Span className="text-xs font-semibold text-emerald-700 dark:text-emerald-400 uppercase tracking-wide">
-            {t("orderReceive.post.success.title")}
-          </Span>
-          <Div className="flex items-center gap-2 mt-2">
-            <Badge variant="default">
-              {result.status === "PARTIALLY_RECEIVED"
-                ? t("enums.poStatus.partiallyReceived")
-                : t("enums.poStatus.received")}
-            </Badge>
-            <Span className="text-xs text-muted-foreground">
-              {new Date(result.receivedAt).toLocaleDateString(locale)}
-            </Span>
-          </Div>
-        </Div>
-        {navigation.canGoBack && (
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={() => navigation.pop()}
-            className="self-start"
-          >
-            {t("orderReceive.post.widget.backToPO")}
-          </Button>
-        )}
-      </Div>
+      <AdminForm
+        title={t("orderReceive.post.success.title")}
+        description={order?.poNumber}
+        className="max-w-3xl"
+        primaryAction={
+          navigation.canGoBack ? (
+            <Button type="button" onClick={() => navigation.pop()}>
+              {t("orderReceive.post.widget.backToPO")}
+            </Button>
+          ) : null
+        }
+      >
+        <ResultBanner
+          variant="success"
+          title={
+            partial
+              ? t("enums.poStatus.partiallyReceived")
+              : t("enums.poStatus.received")
+          }
+          message={new Date(result.receivedAt).toLocaleDateString(locale, {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+          })}
+        />
+      </AdminForm>
     );
   }
 

@@ -2,6 +2,14 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   category: "Nákup",
+  orderAction: {
+    backToOrder: "Späť na objednávku",
+    keepOrder: "Ponechať objednávku",
+    openOrder: "Otvoriť objednávku",
+    expected: "Očakávané",
+    total: "Suma objednávky",
+    notAvailable: "Pre túto objednávku nie je dostupné",
+  },
   tags: {
     purchasing: "Nákup",
     vendor: "Dodávateľ",
@@ -47,6 +55,10 @@ export const translations: typeof enTranslations = {
         back: "Späť",
         viewVendor: "Otvoriť dodávateľa",
         createAnother: "Vytvoriť ďalšieho dodávateľa",
+        subtitle:
+          "Dodávateľa pridáte raz. Objednávky a faktúry ho vyberú podľa názvu.",
+        cancel: "Zrušiť",
+        allVendors: "Všetci dodávatelia",
       },
       errors: {
         validation: {
@@ -196,13 +208,27 @@ export const translations: typeof enTranslations = {
         inactive: "Neaktívne",
         total: "spolu",
         createVendor: "Nový dodávateľ",
-        empty: "Zatiaľ žiadni dodávatelia. Pridajte prvého dodávateľa.",
-        vatLabel: "DPH",
+        empty: "Zatiaľ žiadni dodávatelia",
+        vatLabel: "IČ DPH",
         vatPrefix: "DPH:",
-        paymentTerms: "Splatnosť v dňoch: {{days}}",
+        paymentTerms: "Splatnosť {{days}} dní",
         paymentTermsPrefix: "Splatnosť:",
         paymentTermsSuffix: " d.",
         loading: "Načítava sa…",
+        subtitle:
+          "Dodávatelia, od ktorých nakupujete, s podmienkami a kontaktom.",
+        filterAll: "Všetci",
+        statusFilter: "Stav dodávateľa",
+        search: "Hľadať názov, kód, e-mail alebo IČ DPH",
+        colVendor: "Dodávateľ",
+        colContact: "E-mail",
+        colCurrency: "Mena",
+        colStatus: "Stav",
+        emptyHint:
+          "Pridajte dodávateľov, od ktorých nakupujete. Objednávky a prijaté faktúry ich vyberajú podľa názvu.",
+        noMatch: "Tomuto filtru nezodpovedá žiadny dodávateľ",
+        clearFilters: "Zrušiť filtre",
+        count: "{{shown}} z {{total}} dodávateľov",
       },
       errors: {
         validation: {
@@ -369,9 +395,22 @@ export const translations: typeof enTranslations = {
       title: "Upraviť dodávateľa",
       titleShort: "Upraviť dodávateľa",
       description: "Upravte údaje o dodávateľovi.",
+      isActive: {
+        label: "Aktívny",
+        description:
+          "Aktívnych dodávateľov možno vybrať v nových objednávkach.",
+      },
       widget: {
         backToVendor: "Späť na dodávateľa",
         viewVendor: "Zobraziť dodávateľa",
+        sectionStatus: "Stav",
+        title: "Upraviť dodávateľa",
+        cancel: "Zrušiť",
+        save: "Uložiť zmeny",
+        sectionCompany: "Firma a dane",
+        sectionContact: "Kontakt",
+        sectionAddress: "Adresa",
+        sectionTerms: "Nákupné podmienky",
       },
       vendorId: {
         label: "ID dodávateľa",
@@ -519,8 +558,15 @@ export const translations: typeof enTranslations = {
       },
       widget: {
         warning:
-          "Dodávateľ sa deaktivuje. Existujúce nákupné objednávky zostanú zachované.",
+          "Nové objednávky už tohto dodávateľa nevyberú. Existujúce objednávky, príjemky a faktúry zostanú bez zmeny. Neskôr ho môžete znova aktivovať v časti Upraviť dodávateľa.",
         backToList: "Späť na zoznam dodávateľov",
+        backToVendor: "Späť na dodávateľa",
+        subtitle: "Od tohto dodávateľa už neobjednávať.",
+        cancel: "Zrušiť",
+        openVendor: "Otvoriť dodávateľa",
+        alreadyInactive: "Tento dodávateľ je už neaktívny",
+        reactivateHint:
+          "Ak od neho chcete znova objednávať, otvorte dodávateľa, zvoľte Upraviť dodávateľa a prepnite ho na aktívny.",
       },
       errors: {
         validation: {
@@ -623,6 +669,13 @@ export const translations: typeof enTranslations = {
         browseWarehouses: "Zobraziť sklady",
         viewOrder: "Otvoriť nákupnú objednávku",
         backToList: "Späť na zoznam",
+        subtitle:
+          "Vyberte dodávateľa a miesto dodania. Položky pridáte v ďalšom kroku.",
+        cancel: "Zrušiť",
+        nextStep:
+          "Koncept je pripravený. Pridajte položky a potom ho označte ako odoslaný.",
+        sectionSupplier: "Dodávateľ",
+        sectionDelivery: "Dodanie",
       },
       response: {
         id: "ID objednávky",
@@ -907,6 +960,12 @@ export const translations: typeof enTranslations = {
       description: "Upravte údaje a položky v koncepte nákupnej objednávky.",
       widget: {
         backToPO: "Späť na nákupnú objednávku",
+        title: "Upraviť objednávku",
+        cancel: "Zrušiť",
+        save: "Uložiť zmeny",
+        lockedTitle: "Upraviť možno len koncepty",
+        lockedMessage:
+          "Táto objednávka už bola odoslaná. Ak chcete zmeniť dodávateľa, menu alebo dodanie, zrušte ju a vytvorte novú.",
       },
       poId: {
         label: "ID objednávky",
@@ -1034,6 +1093,10 @@ export const translations: typeof enTranslations = {
       },
       widget: {
         back: "Späť",
+        consequence:
+          "Objednávka prejde do stavu odoslaná. Po odpovedi dodávateľa ju potvrďte a potom prijmite tovar.",
+        blocked: "Ako odoslané možno označiť len koncepty.",
+        noLines: "Pred odoslaním pridajte aspoň jednu položku.",
         backToPO: "Späť na nákupnú objednávku",
         warning:
           "Stav objednávky sa v tomto pracovnom priestore zmení na Odoslaná.",
@@ -1097,6 +1160,9 @@ export const translations: typeof enTranslations = {
       },
       widget: {
         back: "Späť",
+        consequence:
+          "Dodávateľ objednávku prijal. Zostáva otvorená na príjem, kým nedorazí všetok tovar.",
+        blocked: "Potvrdiť možno len odoslané objednávky.",
         backToPO: "Späť na nákupnú objednávku",
       },
       errors: {
@@ -1246,6 +1312,9 @@ export const translations: typeof enTranslations = {
         "Vytvorte prijatú faktúru z úplne dodanej objednávky. Schválením faktúry zaúčtujete záväzok.",
       widget: {
         back: "Späť",
+        consequence:
+          "Vytvorí nezaúčtovanú prijatú faktúru s prijatými množstvami. Skontrolujte a schváľte ju v prijatých faktúrach.",
+        blocked: "Previesť možno len úplne prijaté objednávky bez faktúry.",
         viewBill: "Zobraziť prijatú faktúru",
       },
       poId: {
@@ -1480,7 +1549,8 @@ export const translations: typeof enTranslations = {
         supplier: "Dodávateľ",
         expected: "Očakávané dodanie",
         orderTotal: "Celkom za objednávku",
-        noDeliveries: "Všetky dodávky boli prijaté.",
+        noDeliveries:
+          "Žiadne čakajúce dodávky. Odoslané a potvrdené objednávky sa tu zobrazia, kým tovar neprijmete.",
         overdue: "Oneskorené dodávky",
         dueSeven: "S termínom do 7 dní",
         kpiDraft: "Koncepty",
@@ -1563,8 +1633,9 @@ export const translations: typeof enTranslations = {
       },
       widget: {
         back: "Späť",
+        blocked: "Zrušiť možno len koncepty a odoslané objednávky.",
         warning:
-          "Nákupná objednávka sa natrvalo zruší. Zrušiť možno iba koncepty alebo odoslané nákupné objednávky.",
+          "Objednávka sa natrvalo uzavrie. Potom na ňu už nemožno prijať tovar ani vystaviť faktúru.",
       },
       errors: {
         validation: {

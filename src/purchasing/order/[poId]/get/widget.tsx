@@ -5,6 +5,8 @@ import { Div } from "next-vibe/ui/components/div";
 import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
 import { Span } from "next-vibe/ui/components/span";
 import { StatusPill } from "next-vibe/ui/components/status-pill";
+import { WidgetHeader } from "next-vibe/ui/components/widget-header";
+import { WidgetShell } from "next-vibe/ui/components/widget-shell";
 import {
   formatDocDate,
   formatMoney,
@@ -126,6 +128,7 @@ export function OrderGetWidget({
       const def = await import("../update/definition");
       navigation.push(def.default.PATCH, {
         urlPathParams: { poId: result.id },
+        popNavigationOnSuccess: 1,
       });
     })();
   };
@@ -175,113 +178,87 @@ export function OrderGetWidget({
   );
 
   return (
-    <Div className="max-w-2xl mx-auto w-full px-4 pt-8 pb-6 flex flex-col gap-4">
-      {/* Back button */}
-      {navigation.canGoBack && (
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={() => navigation.pop()}
-          className="self-start gap-1.5 -ml-1"
-        >
-          <ChevronLeft className="h-4 w-4" />
-          {t("orderGet.get.widget.back")}
-        </Button>
-      )}
-
-      {/* Header: PO number, vendor, status, actions */}
-      <Div className="flex flex-col items-start gap-3 sm:flex-row sm:justify-between">
-        <Div>
-          <Span className="text-xl font-semibold font-mono block">
-            {result.poNumber}
-          </Span>
-          <Div className="flex items-center gap-2 mt-0.5 flex-wrap">
-            <StatusPill status={status.label} variant={status.variant} />
-            <Span className="text-sm text-muted-foreground">
-              {result.currency}
-            </Span>
-          </Div>
-          {result.vendorName && (
-            <Div className="flex items-center gap-1 mt-1 text-xs text-muted-foreground">
-              <Span>{t("orderGet.get.widget.vendorLabel")}</Span>
-              <Span>{result.vendorName}</Span>
+    <WidgetShell layout="page" className="mx-auto w-full max-w-4xl">
+      <WidgetHeader
+        size="page"
+        title={result.poNumber}
+        titleAccessory={
+          <StatusPill status={status.label} variant={status.variant} />
+        }
+        subtitle={[result.vendorName, result.currency]
+          .filter(Boolean)
+          .join(" · ")}
+        backButton={
+          navigation.canGoBack ? (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => navigation.pop()}
+              className="-ml-1 gap-1.5 self-start"
+            >
+              <ChevronLeft className="h-4 w-4" />
+              {t("orderGet.get.widget.back")}
+            </Button>
+          ) : undefined
+        }
+        actions={
+          interactive && !responseOnly ? (
+            <Div className="flex flex-wrap items-center gap-2 @md:justify-end">
+              {CANCELLABLE_STATUSES.has(result.status) && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="text-destructive"
+                  onClick={handleCancel}
+                >
+                  {t("orderGet.get.widget.cancel")}
+                </Button>
+              )}
+              {EDITABLE_STATUSES.has(result.status) && (
+                <Button type="button" variant="outline" onClick={handleEdit}>
+                  {t("orderGet.get.widget.edit")}
+                </Button>
+              )}
+              {LINE_EDITABLE_STATUSES.has(result.status) && (
+                <Button
+                  type="button"
+                  variant={result.lines.length === 0 ? "default" : "outline"}
+                  onClick={handleAddLine}
+                >
+                  {t("orderGet.get.widget.addLine")}
+                </Button>
+              )}
+              {SENDABLE_STATUSES.has(result.status) &&
+                result.lines.length > 0 && (
+                  <Button type="button" onClick={handleSend}>
+                    {t("orderGet.get.widget.send")}
+                  </Button>
+                )}
+              {CONFIRMABLE_STATUSES.has(result.status) && (
+                <Button type="button" onClick={handleConfirm}>
+                  {t("orderGet.get.widget.confirm")}
+                </Button>
+              )}
+              {RECEIVABLE_STATUSES.has(result.status) && (
+                <Button type="button" onClick={handleReceive}>
+                  {t("orderGet.get.widget.receive")}
+                </Button>
+              )}
+              {result.status === "RECEIVED" && !result.billId && (
+                <Button type="button" onClick={handleConvertToBill}>
+                  {t("orderGet.get.widget.convertToBill")}
+                </Button>
+              )}
+              {result.status === "BILLED" && result.billId ? (
+                <Button type="button" onClick={handleViewBill}>
+                  {t("orderGet.get.widget.viewBill")}
+                </Button>
+              ) : null}
             </Div>
-          )}
-        </Div>
-        <Div className="flex items-center gap-2 flex-wrap justify-end">
-          {EDITABLE_STATUSES.has(result.status) && (
-            <Button
-              type="button"
-              size="sm"
-              variant="outline"
-              onClick={handleEdit}
-            >
-              {t("orderGet.get.widget.edit")}
-            </Button>
-          )}
-          {LINE_EDITABLE_STATUSES.has(result.status) && (
-            <Button
-              type="button"
-              size="sm"
-              variant="outline"
-              onClick={handleAddLine}
-            >
-              {t("orderGet.get.widget.addLine")}
-            </Button>
-          )}
-          {SENDABLE_STATUSES.has(result.status) && (
-            <Button
-              type="button"
-              size="sm"
-              variant="outline"
-              onClick={handleSend}
-            >
-              {t("orderGet.get.widget.send")}
-            </Button>
-          )}
-          {CONFIRMABLE_STATUSES.has(result.status) && (
-            <Button
-              type="button"
-              size="sm"
-              variant="outline"
-              onClick={handleConfirm}
-            >
-              {t("orderGet.get.widget.confirm")}
-            </Button>
-          )}
-          {RECEIVABLE_STATUSES.has(result.status) && (
-            <Button type="button" size="sm" onClick={handleReceive}>
-              {t("orderGet.get.widget.receive")}
-            </Button>
-          )}
-          {result.status === "RECEIVED" && !result.billId && (
-            <Button type="button" size="sm" onClick={handleConvertToBill}>
-              {t("orderGet.get.widget.convertToBill")}
-            </Button>
-          )}
-          {result.status === "BILLED" && result.billId ? (
-            <Button
-              type="button"
-              size="sm"
-              variant="outline"
-              onClick={handleViewBill}
-            >
-              {t("orderGet.get.widget.viewBill")}
-            </Button>
-          ) : null}
-          {CANCELLABLE_STATUSES.has(result.status) && (
-            <Button
-              type="button"
-              size="sm"
-              variant="destructive"
-              onClick={handleCancel}
-            >
-              {t("orderGet.get.widget.cancel")}
-            </Button>
-          )}
-        </Div>
-      </Div>
+          ) : undefined
+        }
+      />
 
       {/* Delivery info */}
       {result.expectedDeliveryDate ? (
@@ -451,6 +428,6 @@ export function OrderGetWidget({
           {t("orderGet.get.widget.billCreated")}
         </Div>
       ) : null}
-    </Div>
+    </WidgetShell>
   );
 }

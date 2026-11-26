@@ -3,22 +3,30 @@
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
-import { Span } from "next-vibe/ui/components/span";
+import { LoadingBlock } from "next-vibe/ui/components/loading-block";
+import { ResultBanner } from "next-vibe/ui/components/result-banner";
+import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
 import {
-  withValue,
-  withValueNonStrict,
-} from "next-vibe/unified-ui/_shared/field-helpers";
-import {
+  useWidgetForm,
+  useWidgetLogger,
   useWidgetNavigation,
   useWidgetTranslation,
+  useWidgetUser,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-field/widget";
+import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
+import {
+  AdminForm,
+  AdminFormSection,
+} from "next-vibe/unified-ui/widgets/containers/admin-form/widget";
+import { CurrencySelectFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/currency-select-field/widget";
+import { DateFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/date-field/widget";
+import { EntityPickerFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/entity-picker-field/widget";
 import { TextareaFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/textarea-field/widget";
-import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
-import type { JSX } from "react";
+import { type JSX, useEffect, useMemo, useRef } from "react";
 
+import getDefinition from "../get/definition";
 import type definition from "./definition";
 
 export function OrderUpdateWidget({
@@ -29,86 +37,161 @@ export function OrderUpdateWidget({
   const data = useWidgetValue<typeof definition.PATCH>();
   const navigation = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.PATCH>();
+  const form = useWidgetForm<typeof definition.PATCH>();
+  const logger = useWidgetLogger();
+  const user = useWidgetUser();
+  const poId = form?.watch("poId") ?? "";
 
-  const result = data?.result;
+  // Load the saved order so the form opens with its current values.
+  const getOptions = useMemo(
+    () => ({
+      read: {
+        urlPathParams: { poId },
+        queryOptions: { enabled: poId !== "" },
+      },
+    }),
+    [poId],
+  );
+  const read = useEndpoint(getDefinition, getOptions, logger, user).read;
+  const order = read?.data?.result;
 
-  if (result !== undefined) {
+  const filledFor = useRef<string | null>(null);
+  useEffect(() => {
+    if (!order || !form || filledFor.current === order.id) {
+      return;
+    }
+    filledFor.current = order.id;
+    const opts = { shouldDirty: false } as const;
+    form.setValue("vendorId", order.vendorId, opts);
+    form.setValue("currency", order.currency, opts);
+    form.setValue(
+      "expectedDeliveryDate",
+      order.expectedDeliveryDate ?? undefined,
+      opts,
+    );
+    form.setValue(
+      "deliveryWarehouseId",
+      order.deliveryWarehouseId ?? undefined,
+      opts,
+    );
+    form.setValue("notes", order.notes ?? undefined, opts);
+  }, [order, form]);
+
+  const backButton = navigation.canGoBack ? (
+    <Button
+      type="button"
+      variant="ghost"
+      size="sm"
+      onClick={() => navigation.pop()}
+      className="-ml-1 gap-1.5 self-start"
+    >
+      <ChevronLeft className="h-4 w-4" />
+      {t("orderUpdate.patch.widget.backToPO")}
+    </Button>
+  ) : undefined;
+
+  const subtitle = order
+    ? [order.poNumber, order.vendorName].filter(Boolean).join(" · ")
+    : undefined;
+
+  if (data?.result !== undefined) {
     return (
-      <Div className="flex flex-col gap-4 p-4 rounded-lg border bg-emerald-50/50 dark:bg-emerald-900/10 border-emerald-200 dark:border-emerald-800">
-        <Div className="flex flex-col gap-1">
-          <Span className="text-xs font-semibold text-emerald-700 dark:text-emerald-400 uppercase tracking-wide">
-            {t("orderUpdate.patch.success.title")}
-          </Span>
-          <Span className="text-sm text-muted-foreground mt-0.5">
-            {t("orderUpdate.patch.success.description")}
-          </Span>
-        </Div>
-        {navigation.canGoBack && (
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={() => navigation.pop()}
-            className="self-start"
-          >
-            {t("orderUpdate.patch.widget.backToPO")}
-          </Button>
-        )}
-      </Div>
+      <AdminForm
+        title={t("orderUpdate.patch.widget.title")}
+        description={subtitle}
+        backButton={backButton}
+        primaryAction={
+          navigation.canGoBack ? (
+            <Button type="button" onClick={() => navigation.pop()}>
+              {t("orderUpdate.patch.widget.backToPO")}
+            </Button>
+          ) : null
+        }
+      >
+        <ResultBanner
+          variant="success"
+          title={t("orderUpdate.patch.success.title")}
+          message={t("orderUpdate.patch.success.description")}
+        />
+      </AdminForm>
     );
   }
 
-  return (
-    <Div className="flex flex-col gap-4">
-      {navigation.canGoBack && (
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={() => navigation.pop()}
-          className="self-start gap-1.5 -ml-1"
-        >
-          <ChevronLeft className="h-4 w-4" />
-          {t("orderUpdate.patch.widget.backToPO")}
-        </Button>
-      )}
+  const editable = !order || order.status === "DRAFT";
 
-      <Div className="flex flex-col gap-3">
-        <TextFieldWidget
-          fieldName="vendorId"
-          field={withValue(field.children.vendorId, undefined, null)}
-        />
-        <Div className="grid grid-cols-2 gap-3">
-          <TextFieldWidget
-            fieldName="currency"
-            field={withValue(field.children.currency, undefined, null)}
+  return (
+    <AdminForm
+      title={t("orderUpdate.patch.widget.title")}
+      description={subtitle}
+      backButton={backButton}
+      secondaryActions={
+        navigation.canGoBack ? (
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => navigation.pop()}
+          >
+            {t("orderUpdate.patch.widget.cancel")}
+          </Button>
+        ) : undefined
+      }
+      primaryAction={
+        editable ? (
+          <SubmitButtonWidget<typeof definition.PATCH>
+            field={{ text: "orderUpdate.patch.widget.save" }}
           />
-          <TextFieldWidget
-            fieldName="expectedDeliveryDate"
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            field={
-              withValueNonStrict(
+        ) : null
+      }
+    >
+      {poId !== "" && !order && read?.isLoading ? (
+        <LoadingBlock />
+      ) : !editable ? (
+        <ResultBanner
+          variant="warning"
+          title={t("orderUpdate.patch.widget.lockedTitle")}
+          message={t("orderUpdate.patch.widget.lockedMessage")}
+        />
+      ) : (
+        <>
+          <AdminFormSection
+            title={t("orderCreate.post.widget.sectionSupplier")}
+            columns={2}
+          >
+            <EntityPickerFieldWidget
+              fieldName="vendorId"
+              field={field.children.vendorId}
+            />
+            <CurrencySelectFieldWidget
+              fieldName="currency"
+              field={withValue(field.children.currency, undefined, null)}
+            />
+          </AdminFormSection>
+          <AdminFormSection
+            title={t("orderCreate.post.widget.sectionDelivery")}
+            columns={2}
+          >
+            <DateFieldWidget
+              fieldName="expectedDeliveryDate"
+              utcCalendarDay
+              field={withValue(
                 field.children.expectedDeliveryDate,
                 undefined,
                 null,
-              ) as never
-            }
-          />
-        </Div>
-        <TextFieldWidget
-          fieldName="deliveryWarehouseId"
-          field={withValue(field.children.deliveryWarehouseId, undefined, null)}
-        />
-        <TextareaFieldWidget
-          fieldName="notes"
-          field={withValue(field.children.notes, undefined, null)}
-        />
-      </Div>
-
-      <FormAlertWidget field={{}} />
-      <SubmitButtonWidget<typeof definition.PATCH>
-        field={{ text: "orderUpdate.patch.title" }}
-      />
-    </Div>
+              )}
+            />
+            <EntityPickerFieldWidget
+              fieldName="deliveryWarehouseId"
+              field={field.children.deliveryWarehouseId}
+            />
+            <Div className="@lg:col-span-2">
+              <TextareaFieldWidget
+                fieldName="notes"
+                field={withValue(field.children.notes, undefined, null)}
+              />
+            </Div>
+          </AdminFormSection>
+        </>
+      )}
+    </AdminForm>
   );
 }

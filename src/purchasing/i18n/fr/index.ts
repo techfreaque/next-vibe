@@ -2,6 +2,14 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   category: "Achats",
+  orderAction: {
+    backToOrder: "Retour à la commande",
+    keepOrder: "Garder la commande",
+    openOrder: "Ouvrir la commande",
+    expected: "Prévue",
+    total: "Total de la commande",
+    notAvailable: "Indisponible pour cette commande",
+  },
   tags: {
     purchasing: "Achats",
     vendor: "Fournisseur",
@@ -49,6 +57,10 @@ export const translations: typeof enTranslations = {
         back: "Retour",
         viewVendor: "Ouvrir le fournisseur",
         createAnother: "En créer un autre",
+        subtitle:
+          "Ajoutez un fournisseur une fois. Commandes et factures le choisissent par nom.",
+        cancel: "Annuler",
+        allVendors: "Tous les fournisseurs",
       },
       errors: {
         validation: {
@@ -196,13 +208,27 @@ export const translations: typeof enTranslations = {
         inactive: "Inactif",
         total: "au total",
         createVendor: "Nouveau fournisseur",
-        empty: "Aucun fournisseur configuré. Ajoutez-en un pour commencer.",
+        empty: "Aucun fournisseur",
         vatLabel: "TVA",
         vatPrefix: "TVA :",
         paymentTerms: "Paiement à {{days}} jours",
         paymentTermsPrefix: "Paiement à",
         paymentTermsSuffix: "j",
         loading: "Chargement…",
+        subtitle:
+          "Les fournisseurs auprès desquels vous achetez, avec conditions et contact.",
+        filterAll: "Tous",
+        statusFilter: "Statut du fournisseur",
+        search: "Rechercher nom, code, e-mail ou TVA",
+        colVendor: "Fournisseur",
+        colContact: "E-mail",
+        colCurrency: "Devise",
+        colStatus: "Statut",
+        emptyHint:
+          "Ajoutez vos fournisseurs. Les bons de commande et factures fournisseurs les choisissent par nom.",
+        noMatch: "Aucun fournisseur ne correspond à ce filtre",
+        clearFilters: "Effacer les filtres",
+        count: "{{shown}} sur {{total}} fournisseurs",
       },
       errors: {
         validation: {
@@ -367,9 +393,22 @@ export const translations: typeof enTranslations = {
       title: "Modifier le fournisseur",
       titleShort: "Modifier le fournisseur",
       description: "Modifier les informations d'un fournisseur.",
+      isActive: {
+        label: "Actif",
+        description:
+          "Les fournisseurs actifs peuvent être choisis sur les nouvelles commandes.",
+      },
       widget: {
         backToVendor: "Retour au fournisseur",
         viewVendor: "Voir le fournisseur",
+        sectionStatus: "Statut",
+        title: "Modifier le fournisseur",
+        cancel: "Annuler",
+        save: "Enregistrer",
+        sectionCompany: "Société et fiscalité",
+        sectionContact: "Contact",
+        sectionAddress: "Adresse",
+        sectionTerms: "Conditions d'achat",
       },
       vendorId: {
         label: "ID du fournisseur",
@@ -515,8 +554,15 @@ export const translations: typeof enTranslations = {
       },
       widget: {
         warning:
-          "Le fournisseur sera désactivé. Les bons de commande existants ne changent pas.",
+          "Les nouvelles commandes ne peuvent plus choisir ce fournisseur. Les commandes, réceptions et factures existantes restent inchangées. Vous pouvez le réactiver plus tard via Modifier le fournisseur.",
         backToList: "Retour aux fournisseurs",
+        backToVendor: "Retour au fournisseur",
+        subtitle: "Ne plus commander chez ce fournisseur.",
+        cancel: "Annuler",
+        openVendor: "Ouvrir le fournisseur",
+        alreadyInactive: "Ce fournisseur est déjà inactif",
+        reactivateHint:
+          "Pour commander à nouveau, ouvrez le fournisseur, choisissez Modifier le fournisseur et réactivez-le.",
       },
       errors: {
         validation: {
@@ -614,6 +660,13 @@ export const translations: typeof enTranslations = {
         browseWarehouses: "Parcourir les entrepôts",
         viewOrder: "Ouvrir le bon de commande",
         backToList: "Retour à la liste",
+        subtitle:
+          "Choisissez le fournisseur et le lieu de livraison. Les lignes viennent ensuite.",
+        cancel: "Annuler",
+        nextStep:
+          "Le brouillon est prêt. Ajoutez ses lignes, puis marquez-le comme envoyé.",
+        sectionSupplier: "Fournisseur",
+        sectionDelivery: "Livraison",
       },
       response: {
         id: "ID du bon de commande",
@@ -900,6 +953,12 @@ export const translations: typeof enTranslations = {
         "Modifier un bon de commande au statut Brouillon : champs et lignes.",
       widget: {
         backToPO: "Retour au bon de commande",
+        title: "Modifier la commande",
+        cancel: "Annuler",
+        save: "Enregistrer",
+        lockedTitle: "Seuls les brouillons sont modifiables",
+        lockedMessage:
+          "Cette commande a déjà été envoyée. Annulez-la et créez-en une nouvelle pour changer fournisseur, devise ou livraison.",
       },
       poId: {
         label: "ID du bon de commande",
@@ -1030,6 +1089,10 @@ export const translations: typeof enTranslations = {
       },
       widget: {
         back: "Retour",
+        consequence:
+          "La commande passe à envoyée. Confirmez-la après la réponse du fournisseur, puis réceptionnez la marchandise.",
+        blocked: "Seuls les brouillons peuvent être marqués comme envoyés.",
+        noLines: "Ajoutez au moins une ligne avant d'envoyer la commande.",
         backToPO: "Retour au bon de commande",
         warning:
           "Le statut du bon de commande passe à Envoyé dans cet espace de travail.",
@@ -1097,6 +1160,9 @@ export const translations: typeof enTranslations = {
       },
       widget: {
         back: "Retour",
+        consequence:
+          "Le fournisseur a accepté la commande. Elle reste ouverte à la réception jusqu'à livraison complète.",
+        blocked: "Seules les commandes envoyées peuvent être confirmées.",
         backToPO: "Retour au bon de commande",
       },
       errors: {
@@ -1250,6 +1316,10 @@ export const translations: typeof enTranslations = {
         "Créez une facture fournisseur à partir d’une commande entièrement réceptionnée. La validation de la facture comptabilise la dette.",
       widget: {
         back: "Retour",
+        consequence:
+          "Crée une facture fournisseur non comptabilisée avec les quantités reçues. Vérifiez-la et approuvez-la dans les factures.",
+        blocked:
+          "Seules les commandes entièrement reçues sans facture peuvent être converties.",
         viewBill: "Voir la facture",
       },
       poId: {
@@ -1489,7 +1559,8 @@ export const translations: typeof enTranslations = {
         supplier: "Fournisseur",
         expected: "Date prévue",
         orderTotal: "Total de la commande",
-        noDeliveries: "Aucune livraison en attente",
+        noDeliveries:
+          "Aucune livraison en attente. Les commandes envoyées et confirmées apparaissent ici jusqu'à la réception.",
         overdue: "Livraisons en retard",
         dueSeven: "Attendues sous 7 jours",
         kpiDraft: "Brouillons",
@@ -1572,8 +1643,10 @@ export const translations: typeof enTranslations = {
       },
       widget: {
         back: "Retour",
+        blocked:
+          "Seuls les brouillons et commandes envoyées peuvent être annulés.",
         warning:
-          "Le bon de commande sera définitivement annulé. Seuls les bons de commande en brouillon ou envoyés peuvent être annulés.",
+          "La commande est fermée définitivement. Aucune réception ni facture ne sera possible ensuite.",
       },
       errors: {
         validation: {

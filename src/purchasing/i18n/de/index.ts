@@ -2,6 +2,14 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   category: "Einkauf",
+  orderAction: {
+    backToOrder: "Zurück zur Bestellung",
+    keepOrder: "Bestellung behalten",
+    openOrder: "Bestellung öffnen",
+    expected: "Erwartet",
+    total: "Bestellsumme",
+    notAvailable: "Für diese Bestellung nicht möglich",
+  },
   tags: {
     purchasing: "Einkauf",
     vendor: "Lieferant",
@@ -48,6 +56,10 @@ export const translations: typeof enTranslations = {
         back: "Zurück",
         viewVendor: "Lieferant öffnen",
         createAnother: "Weiteren anlegen",
+        subtitle:
+          "Lieferant einmal anlegen. Bestellungen und Rechnungen wählen ihn per Name.",
+        cancel: "Abbrechen",
+        allVendors: "Alle Lieferanten",
       },
       errors: {
         validation: {
@@ -195,13 +207,27 @@ export const translations: typeof enTranslations = {
         inactive: "Inaktiv",
         total: "gesamt",
         createVendor: "Neuer Lieferant",
-        empty: "Keine Lieferanten vorhanden. Jetzt einen hinzufügen.",
+        empty: "Noch keine Lieferanten",
         vatLabel: "USt-IdNr.",
         vatPrefix: "USt:",
         paymentTerms: "Zahlungsziel {{days}} Tage",
         paymentTermsPrefix: "Netto",
         paymentTermsSuffix: "T",
         loading: "Wird geladen…",
+        subtitle:
+          "Lieferanten, bei denen Sie einkaufen, mit Konditionen und Kontakt.",
+        filterAll: "Alle",
+        statusFilter: "Lieferantenstatus",
+        search: "Name, Kürzel, E-Mail oder USt-IdNr. suchen",
+        colVendor: "Lieferant",
+        colContact: "E-Mail",
+        colCurrency: "Währung",
+        colStatus: "Status",
+        emptyHint:
+          "Legen Sie Ihre Lieferanten an. Bestellungen und Eingangsrechnungen wählen sie per Name aus.",
+        noMatch: "Kein Lieferant passt zu diesem Filter",
+        clearFilters: "Filter zurücksetzen",
+        count: "{{shown}} von {{total}} Lieferanten",
       },
       errors: {
         validation: {
@@ -364,9 +390,22 @@ export const translations: typeof enTranslations = {
       title: "Lieferant aktualisieren",
       titleShort: "Lieferant aktualisieren",
       description: "Lieferantendaten bearbeiten.",
+      isActive: {
+        label: "Aktiv",
+        description:
+          "Aktive Lieferanten lassen sich in neuen Bestellungen wählen.",
+      },
       widget: {
         backToVendor: "Zurück zum Lieferanten",
         viewVendor: "Lieferant anzeigen",
+        sectionStatus: "Status",
+        title: "Lieferant bearbeiten",
+        cancel: "Abbrechen",
+        save: "Änderungen speichern",
+        sectionCompany: "Firma und Steuer",
+        sectionContact: "Kontakt",
+        sectionAddress: "Adresse",
+        sectionTerms: "Einkaufskonditionen",
       },
       vendorId: {
         label: "Lieferanten-ID",
@@ -511,8 +550,15 @@ export const translations: typeof enTranslations = {
       },
       widget: {
         warning:
-          "Lieferant wird deaktiviert. Bestehende Bestellungen bleiben unverändert.",
+          "Neue Bestellungen können diesen Lieferanten nicht mehr wählen. Bestehende Bestellungen, Wareneingänge und Rechnungen bleiben unverändert. Unter Lieferant bearbeiten lässt er sich später wieder aktivieren.",
         backToList: "Zurück zu Lieferanten",
+        backToVendor: "Zurück zum Lieferanten",
+        subtitle: "Bei diesem Lieferanten nicht mehr bestellen.",
+        cancel: "Abbrechen",
+        openVendor: "Lieferant öffnen",
+        alreadyInactive: "Dieser Lieferant ist bereits inaktiv",
+        reactivateHint:
+          "Um wieder zu bestellen, öffnen Sie den Lieferanten, wählen Lieferant bearbeiten und stellen ihn auf aktiv.",
       },
       errors: {
         validation: {
@@ -610,6 +656,13 @@ export const translations: typeof enTranslations = {
         browseWarehouses: "Lager durchsuchen",
         viewOrder: "Bestellung öffnen",
         backToList: "Zurück zur Liste",
+        subtitle:
+          "Lieferant und Lieferort wählen. Positionen folgen im nächsten Schritt.",
+        cancel: "Abbrechen",
+        nextStep:
+          "Der Entwurf steht. Positionen hinzufügen und dann als versendet markieren.",
+        sectionSupplier: "Lieferant",
+        sectionDelivery: "Lieferung",
       },
       response: {
         id: "Bestell-ID",
@@ -884,7 +937,15 @@ export const translations: typeof enTranslations = {
       titleShort: "Bestellung aktualisieren",
       description:
         "Bearbeiten Sie die Daten und Positionen des Bestellentwurfs.",
-      widget: { backToPO: "Zurück zur Bestellung" },
+      widget: {
+        backToPO: "Zurück zur Bestellung",
+        title: "Bestellung bearbeiten",
+        cancel: "Abbrechen",
+        save: "Änderungen speichern",
+        lockedTitle: "Nur Entwürfe sind bearbeitbar",
+        lockedMessage:
+          "Diese Bestellung wurde bereits versendet. Stornieren Sie sie und legen Sie eine neue an, um Lieferant, Währung oder Lieferung zu ändern.",
+      },
       poId: { label: "Bestell-ID", description: "Zu bearbeitende Bestellung" },
       vendorId: {
         label: "Lieferant",
@@ -1006,6 +1067,10 @@ export const translations: typeof enTranslations = {
       poId: { label: "Bestell-ID", description: "Zu sendende Bestellung" },
       widget: {
         back: "Zurück",
+        consequence:
+          "Die Bestellung wird auf versendet gesetzt. Bestätigen Sie sie nach der Antwort des Lieferanten und buchen Sie dann den Wareneingang.",
+        blocked: "Nur Entwürfe können als versendet markiert werden.",
+        noLines: "Fügen Sie vor dem Versand mindestens eine Position hinzu.",
         backToPO: "Zur Bestellung",
         warning:
           "Der Status der Bestellung wechselt in diesem Arbeitsbereich zu Gesendet.",
@@ -1067,6 +1132,9 @@ export const translations: typeof enTranslations = {
       poId: { label: "Bestell-ID", description: "Zu bestätigende Bestellung" },
       widget: {
         back: "Zurück",
+        consequence:
+          "Der Lieferant hat die Bestellung angenommen. Sie bleibt für den Wareneingang offen, bis alles geliefert ist.",
+        blocked: "Nur versendete Bestellungen können bestätigt werden.",
         backToPO: "Zur Bestellung",
       },
       errors: {
@@ -1213,6 +1281,10 @@ export const translations: typeof enTranslations = {
         "Erstellen Sie aus einer vollständig gelieferten Bestellung eine Eingangsrechnung. Die Freigabe bucht die Verbindlichkeit.",
       widget: {
         back: "Zurück",
+        consequence:
+          "Erstellt eine ungebuchte Eingangsrechnung mit den erhaltenen Mengen. Prüfen und freigeben unter Eingangsrechnungen.",
+        blocked:
+          "Nur vollständig erhaltene Bestellungen ohne Rechnung können umgewandelt werden.",
         viewBill: "Rechnung anzeigen",
       },
       poId: { label: "Bestell-ID", description: "Umzuwandelnde Bestellung" },
@@ -1445,7 +1517,8 @@ export const translations: typeof enTranslations = {
         supplier: "Lieferant",
         expected: "Erwartet am",
         orderTotal: "Bestellwert",
-        noDeliveries: "Keine ausstehenden Lieferungen",
+        noDeliveries:
+          "Keine offenen Lieferungen. Versendete und bestätigte Bestellungen erscheinen hier, bis die Ware eingegangen ist.",
         overdue: "Überfällige Lieferungen",
         dueSeven: "In den nächsten 7 Tagen fällig",
         kpiDraft: "Entwürfe",
@@ -1524,8 +1597,10 @@ export const translations: typeof enTranslations = {
       poId: { label: "Bestell-ID", description: "Zu stornierende Bestellung" },
       widget: {
         back: "Zurück",
+        blocked:
+          "Nur Entwürfe und versendete Bestellungen können storniert werden.",
         warning:
-          "Diese Bestellung wird dauerhaft storniert. Nur Entwurf- oder gesendete Bestellungen können storniert werden.",
+          "Die Bestellung wird endgültig geschlossen. Danach sind kein Wareneingang und keine Rechnung mehr möglich.",
       },
       errors: {
         validation: {

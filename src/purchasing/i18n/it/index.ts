@@ -2,6 +2,14 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   category: "Acquisti",
+  orderAction: {
+    backToOrder: "Torna all'ordine",
+    keepOrder: "Mantieni ordine",
+    openOrder: "Apri ordine",
+    expected: "Previsto",
+    total: "Totale ordine",
+    notAvailable: "Non disponibile per questo ordine",
+  },
   tags: {
     purchasing: "Acquisti",
     vendor: "Venditore",
@@ -49,6 +57,10 @@ export const translations: typeof enTranslations = {
         back: "Indietro",
         viewVendor: "Fornitore aperto",
         createAnother: "Crea un altro",
+        subtitle:
+          "Aggiungi un fornitore una volta. Ordini e fatture lo scelgono per nome.",
+        cancel: "Annulla",
+        allVendors: "Tutti i fornitori",
       },
       errors: {
         validation: {
@@ -193,13 +205,26 @@ export const translations: typeof enTranslations = {
         inactive: "Inattivo",
         total: "totale totale",
         createVendor: "Nuovo fornitore",
-        empty: "Nessun fornitore configurato. Aggiungine uno per iniziare.",
-        vatLabel: "VAT",
+        empty: "Nessun fornitore",
+        vatLabel: "P. IVA",
         vatPrefix: "VAT:",
-        paymentTerms: "Net {{days}} giorni",
+        paymentTerms: "Pagamento a {{days}} giorni",
         paymentTermsPrefix: "Rete netta",
         paymentTermsSuffix: "D",
         loading: "Caricamento…",
+        subtitle: "I fornitori da cui acquisti, con condizioni e contatto.",
+        filterAll: "Tutti",
+        statusFilter: "Stato fornitore",
+        search: "Cerca nome, codice, email o P. IVA",
+        colVendor: "Fornitore",
+        colContact: "Email",
+        colCurrency: "Valuta",
+        colStatus: "Stato",
+        emptyHint:
+          "Aggiungi i fornitori da cui acquisti. Ordini e fatture passive li scelgono per nome.",
+        noMatch: "Nessun fornitore corrisponde al filtro",
+        clearFilters: "Azzera filtri",
+        count: "{{shown}} di {{total}} fornitori",
       },
       errors: {
         validation: {
@@ -358,9 +383,22 @@ export const translations: typeof enTranslations = {
       title: "Aggiornamento Vendor",
       titleShort: "Aggiornamento Vendor",
       description: "Aggiorna i dettagli del fornitore.",
+      isActive: {
+        label: "Attivo",
+        description:
+          "I fornitori attivi si possono scegliere nei nuovi ordini.",
+      },
       widget: {
         backToVendor: "Torna al fornitore",
         viewVendor: "Visualizza venditore",
+        sectionStatus: "Stato",
+        title: "Modifica fornitore",
+        cancel: "Annulla",
+        save: "Salva modifiche",
+        sectionCompany: "Azienda e fisco",
+        sectionContact: "Contatto",
+        sectionAddress: "Indirizzo",
+        sectionTerms: "Condizioni di acquisto",
       },
       vendorId: {
         label: "Venditore ID",
@@ -506,8 +544,15 @@ export const translations: typeof enTranslations = {
       },
       widget: {
         warning:
-          "Questo disattiva il venditore. Gli ordini di acquisto esistenti non saranno interessati.",
+          "I nuovi ordini non possono più scegliere questo fornitore. Ordini, ricevimenti e fatture esistenti restano invariati. Puoi riattivarlo più tardi da Modifica fornitore.",
         backToList: "Torna ai venditori",
+        backToVendor: "Torna al fornitore",
+        subtitle: "Non ordinare più da questo fornitore.",
+        cancel: "Annulla",
+        openVendor: "Apri fornitore",
+        alreadyInactive: "Questo fornitore è già inattivo",
+        reactivateHint:
+          "Per ordinare di nuovo, apri il fornitore, scegli Modifica fornitore e riattivalo.",
       },
       errors: {
         validation: {
@@ -606,6 +651,13 @@ export const translations: typeof enTranslations = {
         browseWarehouses: "Sfoglia i Magazzini",
         viewOrder: "Ordine di acquisto aperto",
         backToList: "Torna alla lista",
+        subtitle:
+          "Scegli il fornitore e dove arriva la merce. Le righe nel passo successivo.",
+        cancel: "Annulla",
+        nextStep:
+          "La bozza è pronta. Aggiungi le righe, poi segnala come inviata.",
+        sectionSupplier: "Fornitore",
+        sectionDelivery: "Consegna",
       },
       response: {
         id: "Ordine ID",
@@ -888,6 +940,12 @@ export const translations: typeof enTranslations = {
         "Modificare un progetto di ordine di acquisto. campi e linee.",
       widget: {
         backToPO: "Torna all'acquisto",
+        title: "Modifica ordine",
+        cancel: "Annulla",
+        save: "Salva modifiche",
+        lockedTitle: "Solo le bozze sono modificabili",
+        lockedMessage:
+          "Questo ordine è già stato inviato. Annullalo e creane uno nuovo per cambiare fornitore, valuta o consegna.",
       },
       poId: {
         label: "Ordine ID",
@@ -1018,6 +1076,10 @@ export const translations: typeof enTranslations = {
       },
       widget: {
         back: "Indietro",
+        consequence:
+          "L'ordine passa a inviato. Confermalo dopo la risposta del fornitore, poi ricevi la merce.",
+        blocked: "Solo le bozze possono essere segnate come inviate.",
+        noLines: "Aggiungi almeno una riga prima di inviare l'ordine.",
         backToPO: "Torna all'acquisto",
         warning:
           "Lo stato dell’ordine passa a Inviato in questo spazio di lavoro.",
@@ -1085,6 +1147,9 @@ export const translations: typeof enTranslations = {
       },
       widget: {
         back: "Indietro",
+        consequence:
+          "Il fornitore ha accettato l'ordine. Resta aperto al ricevimento finché arriva tutta la merce.",
+        blocked: "Solo gli ordini inviati possono essere confermati.",
         backToPO: "Torna all'acquisto",
       },
       errors: {
@@ -1235,6 +1300,10 @@ export const translations: typeof enTranslations = {
         "Crea una fattura fornitore da un ordine ricevuto per intero. Approva la fattura per contabilizzare il debito.",
       widget: {
         back: "Indietro",
+        consequence:
+          "Crea una fattura passiva non registrata con le quantità ricevute. Controllala e approvala nelle fatture.",
+        blocked:
+          "Solo ordini ricevuti per intero e senza fattura possono essere convertiti.",
         viewBill: "Vedi il conto",
       },
       poId: {
@@ -1478,7 +1547,8 @@ export const translations: typeof enTranslations = {
         supplier: "Fornitore",
         expected: "Data prevista",
         orderTotal: "Totale ordine",
-        noDeliveries: "Nessuna consegna in sospeso",
+        noDeliveries:
+          "Nessuna consegna in sospeso. Gli ordini inviati e confermati compaiono qui fino al ricevimento della merce.",
         overdue: "Consegne in ritardo",
         dueSeven: "In scadenza nei prossimi 7 giorni",
         kpiDraft: "Progetti",
@@ -1558,8 +1628,9 @@ export const translations: typeof enTranslations = {
       },
       widget: {
         back: "Indietro",
+        blocked: "Solo bozze e ordini inviati possono essere annullati.",
         warning:
-          "Questo annulla definitivamente l'ordine di acquisto. Possono essere annullati solo gli ordini di acquisto redatti o inviati.",
+          "L'ordine viene chiuso definitivamente. Poi non si potrà più ricevere merce né fatturare.",
       },
       errors: {
         validation: {

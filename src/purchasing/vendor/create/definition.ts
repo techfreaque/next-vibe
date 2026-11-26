@@ -177,7 +177,7 @@ const { POST } = createEndpoint({
       }),
       defaultCurrency: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
+        fieldType: FieldDataType.CURRENCY_SELECT,
         label: "vendorCreate.defaultCurrency.label" as const,
         description: "vendorCreate.defaultCurrency.description" as const,
         placeholder: "vendorCreate.defaultCurrency.placeholder" as const,

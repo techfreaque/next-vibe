@@ -1,16 +1,20 @@
 "use client";
 
-import { Badge } from "next-vibe/ui/components/badge";
-import { Button, type ButtonMouseEvent } from "next-vibe/ui/components/button";
+import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
-import { Span } from "next-vibe/ui/components/span";
+import { ResultBanner } from "next-vibe/ui/components/result-banner";
 import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
 import {
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
+import {
+  AdminForm,
+  AdminFormSection,
+} from "next-vibe/unified-ui/widgets/containers/admin-form/widget";
+import { CurrencySelectFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/currency-select-field/widget";
 import { EmailFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/email-field/widget";
 import { EntityPickerFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/entity-picker-field/widget";
 import { NumberFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/number-field/widget";
@@ -18,7 +22,6 @@ import { PhoneFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/phone
 import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-field/widget";
 import { TextareaFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/textarea-field/widget";
 import { UrlFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/url-field/widget";
-import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 import { type JSX } from "react";
 
@@ -33,219 +36,190 @@ export function VendorCreateWidget({
   const navigation = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.POST>();
 
-  const handleViewVendor = (e: ButtonMouseEvent): void => {
-    e.stopPropagation();
+  const openVendor = (): void => {
     const id = data?.id;
     if (!id) {
       return;
     }
-    void (async (): Promise<void> => {
-      const def = await import("../[vendorId]/get/definition");
-      navigation.push(def.default.GET, {
-        urlPathParams: { vendorId: id },
-      });
-    })();
+    void import("../[vendorId]/get/definition").then((def) =>
+      navigation.push(def.default.GET, { urlPathParams: { vendorId: id } }),
+    );
   };
 
-  const handleCreateAnother = (e: ButtonMouseEvent): void => {
-    e.stopPropagation();
-    void (async (): Promise<void> => {
-      const def = await import("../list/definition");
-      navigation.push(def.default.GET, {});
-    })();
+  const openList = (): void => {
+    void import("../list/definition").then((def) =>
+      navigation.push(def.default.GET, {}),
+    );
   };
+
+  const backButton = navigation.canGoBack ? (
+    <Button
+      type="button"
+      variant="ghost"
+      size="sm"
+      onClick={() => navigation.pop()}
+      className="-ml-1 gap-1.5 self-start"
+    >
+      <ChevronLeft className="h-4 w-4" />
+      {t("vendorCreate.post.widget.back")}
+    </Button>
+  ) : undefined;
 
   if (data !== undefined) {
     return (
-      <Div className="flex flex-col gap-4 p-4 rounded-lg border border-success/30 bg-success/5">
-        {/* Success header */}
-        <Div className="flex items-start gap-3">
-          <Div className="h-10 w-10 rounded-full bg-success/15 flex items-center justify-center shrink-0 mt-0.5">
-            <Span className="text-success text-lg font-semibold">
-              {/* eslint-disable-next-line i18n/no-literal-string */}✓
-            </Span>
-          </Div>
-          <Div>
-            <Span className="text-base font-semibold block text-success">
-              {t("vendorCreate.post.success.title")}
-            </Span>
-            <Span className="text-sm text-muted-foreground block mt-0.5">
-              {t("vendorCreate.post.success.description")}
-            </Span>
-          </Div>
-        </Div>
-
-        {/* Vendor summary */}
-        <Div className="rounded-lg border bg-card p-4 flex items-center gap-4">
-          <Div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-            <Span className="text-sm font-bold text-primary">
-              {data.nameResponse?.charAt(0).toUpperCase() ?? "V"}
-            </Span>
-          </Div>
-          <Div className="flex-1 min-w-0">
-            <Span className="text-sm font-medium block">
-              {data.nameResponse}
-            </Span>
-            {data.codeResponse ? (
-              <Span className="text-xs text-muted-foreground font-mono">
-                {data.codeResponse}
-              </Span>
-            ) : null}
-            {data.emailResponse ? (
-              <Span className="text-xs text-muted-foreground block">
-                {data.emailResponse}
-              </Span>
-            ) : null}
-          </Div>
-          <Badge
-            variant="default"
-            className="text-xs shrink-0 bg-success/15 text-success border-success/20"
-          >
-            {t("vendorList.get.widget.active")}
-          </Badge>
-        </Div>
-
-        {/* Actions */}
-        <Div className="flex items-center gap-2">
-          <Button type="button" size="sm" onClick={handleViewVendor}>
+      <AdminForm
+        title={data.nameResponse}
+        description={[data.codeResponse, data.emailResponse]
+          .filter(Boolean)
+          .join(" · ")}
+        backButton={backButton}
+        secondaryActions={
+          <Button type="button" variant="outline" onClick={openList}>
+            {t("vendorCreate.post.widget.allVendors")}
+          </Button>
+        }
+        primaryAction={
+          <Button type="button" onClick={openVendor}>
             {t("vendorCreate.post.widget.viewVendor")}
           </Button>
-          <Button
-            type="button"
-            size="sm"
-            variant="outline"
-            onClick={handleCreateAnother}
-          >
-            {t("vendorCreate.post.widget.createAnother")}
-          </Button>
-        </Div>
-      </Div>
+        }
+      >
+        <ResultBanner
+          variant="success"
+          title={t("vendorCreate.post.success.title")}
+          message={t("vendorCreate.post.success.description")}
+        />
+      </AdminForm>
     );
   }
 
   return (
-    <Div className="flex flex-col gap-4">
-      {navigation.canGoBack && (
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={() => navigation.pop()}
-          className="self-start gap-1.5 -ml-1"
-        >
-          <ChevronLeft className="h-4 w-4" />
-          {t("vendorCreate.post.widget.back")}
-        </Button>
-      )}
-
-      <Div className="flex flex-col gap-4">
-        {/* Company Info */}
-        <Div className="flex flex-col gap-3">
-          <Div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <Div className="sm:col-span-2">
-              <TextFieldWidget
-                fieldName="name"
-                field={withValue(field.children.name, undefined, null)}
-              />
-            </Div>
-            <TextFieldWidget
-              fieldName="code"
-              field={withValue(field.children.code, undefined, null)}
-            />
-            <EntityPickerFieldWidget
-              fieldName="companyId"
-              field={field.children.companyId}
-            />
-          </Div>
-        </Div>
-
-        {/* Contact */}
-        <Div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <EmailFieldWidget
-            fieldName="email"
-            field={withValue(field.children.email, undefined, null)}
-          />
-          <PhoneFieldWidget
-            fieldName="phone"
-            field={withValue(field.children.phone, undefined, null)}
-          />
-          <Div className="sm:col-span-2">
-            <UrlFieldWidget
-              fieldName="website"
-              field={withValue(field.children.website, undefined, null)}
-            />
-          </Div>
-        </Div>
-
-        {/* Tax & Registration */}
-        <Div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <AdminForm
+      title={t("vendorCreate.post.title")}
+      description={t("vendorCreate.post.widget.subtitle")}
+      backButton={backButton}
+      secondaryActions={
+        navigation.canGoBack ? (
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => navigation.pop()}
+          >
+            {t("vendorCreate.post.widget.cancel")}
+          </Button>
+        ) : undefined
+      }
+      primaryAction={
+        <SubmitButtonWidget<typeof definition.POST>
+          field={{ text: "vendorCreate.post.title" }}
+        />
+      }
+    >
+      <AdminFormSection
+        title={t("vendorUpdate.patch.widget.sectionCompany")}
+        columns={2}
+      >
+        <Div className="@lg:col-span-2">
           <TextFieldWidget
-            fieldName="vatNumber"
-            field={withValue(field.children.vatNumber, undefined, null)}
-          />
-          <TextFieldWidget
-            fieldName="taxId"
-            field={withValue(field.children.taxId, undefined, null)}
+            fieldName="name"
+            field={withValue(field.children.name, undefined, null)}
           />
         </Div>
+        <EntityPickerFieldWidget
+          fieldName="companyId"
+          field={field.children.companyId}
+        />
+        <TextFieldWidget
+          fieldName="code"
+          field={withValue(field.children.code, undefined, null)}
+        />
+        <TextFieldWidget
+          fieldName="vatNumber"
+          field={withValue(field.children.vatNumber, undefined, null)}
+        />
+        <TextFieldWidget
+          fieldName="taxId"
+          field={withValue(field.children.taxId, undefined, null)}
+        />
+      </AdminFormSection>
 
-        {/* Address */}
-        <Div className="flex flex-col gap-3">
+      <AdminFormSection
+        title={t("vendorUpdate.patch.widget.sectionContact")}
+        columns={2}
+      >
+        <EmailFieldWidget
+          fieldName="email"
+          field={withValue(field.children.email, undefined, null)}
+        />
+        <PhoneFieldWidget
+          fieldName="phone"
+          field={withValue(field.children.phone, undefined, null)}
+        />
+        <Div className="@lg:col-span-2">
+          <UrlFieldWidget
+            fieldName="website"
+            field={withValue(field.children.website, undefined, null)}
+          />
+        </Div>
+      </AdminFormSection>
+
+      <AdminFormSection
+        title={t("vendorUpdate.patch.widget.sectionAddress")}
+        columns={2}
+      >
+        <Div className="@lg:col-span-2">
           <TextFieldWidget
             fieldName="addressLine1"
             field={withValue(field.children.addressLine1, undefined, null)}
           />
+        </Div>
+        <Div className="@lg:col-span-2">
           <TextFieldWidget
             fieldName="addressLine2"
             field={withValue(field.children.addressLine2, undefined, null)}
           />
-          <Div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <TextFieldWidget
-              fieldName="city"
-              field={withValue(field.children.city, undefined, null)}
-            />
-            <TextFieldWidget
-              fieldName="region"
-              field={withValue(field.children.region, undefined, null)}
-            />
-            <TextFieldWidget
-              fieldName="postalCode"
-              field={withValue(field.children.postalCode, undefined, null)}
-            />
-            <TextFieldWidget
-              fieldName="country"
-              field={withValue(field.children.country, undefined, null)}
-            />
-          </Div>
         </Div>
+        <TextFieldWidget
+          fieldName="postalCode"
+          field={withValue(field.children.postalCode, undefined, null)}
+        />
+        <TextFieldWidget
+          fieldName="city"
+          field={withValue(field.children.city, undefined, null)}
+        />
+        <TextFieldWidget
+          fieldName="region"
+          field={withValue(field.children.region, undefined, null)}
+        />
+        <TextFieldWidget
+          fieldName="country"
+          field={withValue(field.children.country, undefined, null)}
+        />
+      </AdminFormSection>
 
-        {/* Terms */}
-        <Div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <TextFieldWidget
-            fieldName="defaultCurrency"
-            field={withValue(field.children.defaultCurrency, undefined, null)}
+      <AdminFormSection
+        title={t("vendorUpdate.patch.widget.sectionTerms")}
+        columns={2}
+      >
+        <CurrencySelectFieldWidget
+          fieldName="defaultCurrency"
+          field={withValue(field.children.defaultCurrency, undefined, null)}
+        />
+        <NumberFieldWidget
+          fieldName="defaultPaymentTermsDays"
+          field={withValue(
+            field.children.defaultPaymentTermsDays,
+            undefined,
+            null,
+          )}
+        />
+        <Div className="@lg:col-span-2">
+          <TextareaFieldWidget
+            fieldName="notes"
+            field={withValue(field.children.notes, undefined, null)}
           />
-          <NumberFieldWidget
-            fieldName="defaultPaymentTermsDays"
-            field={withValue(
-              field.children.defaultPaymentTermsDays,
-              undefined,
-              null,
-            )}
-          />
-          <Div className="sm:col-span-2">
-            <TextareaFieldWidget
-              fieldName="notes"
-              field={withValue(field.children.notes, undefined, null)}
-            />
-          </Div>
         </Div>
-      </Div>
-
-      <FormAlertWidget field={{}} />
-      <SubmitButtonWidget<typeof definition.POST>
-        field={{ text: "vendorCreate.post.title" }}
-      />
-    </Div>
+      </AdminFormSection>
+    </AdminForm>
   );
 }

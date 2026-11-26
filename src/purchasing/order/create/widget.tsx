@@ -1,27 +1,25 @@
 "use client";
 
-import { Badge } from "next-vibe/ui/components/badge";
-import { Button, type ButtonMouseEvent } from "next-vibe/ui/components/button";
+import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
-import { Span } from "next-vibe/ui/components/span";
+import { ResultBanner } from "next-vibe/ui/components/result-banner";
+import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
 import {
-  withValue,
-  withValueNonStrict,
-} from "next-vibe/unified-ui/_shared/field-helpers";
-import { formatMoney } from "next-vibe/unified-ui/_shared/format-money";
-import {
-  useWidgetLocale,
   useWidgetNavigation,
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
+import {
+  AdminForm,
+  AdminFormSection,
+} from "next-vibe/unified-ui/widgets/containers/admin-form/widget";
+import { CurrencySelectFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/currency-select-field/widget";
+import { DateFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/date-field/widget";
 import { EntityPickerFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/entity-picker-field/widget";
-import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-field/widget";
 import { TextareaFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/textarea-field/widget";
-import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
-import { type JSX } from "react";
+import type { JSX } from "react";
 
 import type definition from "./definition";
 
@@ -33,113 +31,77 @@ export function OrderCreateWidget({
   const data = useWidgetValue<typeof definition.POST>();
   const navigation = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.POST>();
-  const locale = useWidgetLocale();
 
-  const formatAmount = (amount: number): string => {
-    return formatMoney(amount, data?.result?.currency, locale);
-  };
-
-  const handleViewOrder = (e: ButtonMouseEvent): void => {
-    e.stopPropagation();
+  const openOrder = (): void => {
     const id = data?.result?.id;
     if (!id) {
       return;
     }
-    void (async (): Promise<void> => {
-      const def = await import("../[poId]/get/definition");
-      navigation.push(def.default.GET, {
-        urlPathParams: { poId: id },
-      });
-    })();
+    void import("../[poId]/get/definition").then((def) =>
+      navigation.push(def.default.GET, { urlPathParams: { poId: id } }),
+    );
   };
 
-  const result = data?.result;
+  const backButton = navigation.canGoBack ? (
+    <Button
+      type="button"
+      variant="ghost"
+      size="sm"
+      onClick={() => navigation.pop()}
+      className="-ml-1 gap-1.5 self-start"
+    >
+      <ChevronLeft className="h-4 w-4" />
+      {t("orderCreate.post.widget.backToList")}
+    </Button>
+  ) : undefined;
 
+  const result = data?.result;
   if (result !== undefined) {
     return (
-      <Div className="flex flex-col gap-4 p-4 rounded-lg border bg-emerald-50/50 dark:bg-emerald-900/10 border-emerald-200 dark:border-emerald-800">
-        <Div className="flex flex-col gap-1">
-          <Span className="text-xs font-semibold text-emerald-700 dark:text-emerald-400 uppercase tracking-wide">
-            {t("orderCreate.post.success.title")}
-          </Span>
-          <Span className="text-sm text-muted-foreground mt-0.5">
-            {t("orderCreate.post.success.description")}
-          </Span>
-        </Div>
-
-        <Div className="rounded-lg border bg-card p-4">
-          <Div className="flex items-center justify-between mb-3">
-            <Span className="text-base font-semibold font-mono">
-              {result.poNumber}
-            </Span>
-            <Badge variant="secondary" className="text-xs">
-              {result.status}
-            </Badge>
-          </Div>
-
-          <Div className="grid grid-cols-3 gap-3 text-sm">
-            <Div className="p-2 rounded border bg-background">
-              <Span className="text-xs text-muted-foreground block">
-                {t("orderCreate.post.response.subtotal")}
-              </Span>
-              <Span className="font-medium text-sm">
-                {formatAmount(result.subtotal)}
-              </Span>
-            </Div>
-            <Div className="p-2 rounded border bg-background">
-              <Span className="text-xs text-muted-foreground block">
-                {t("orderCreate.post.response.taxAmount")}
-              </Span>
-              <Span className="font-medium text-sm">
-                {formatAmount(result.taxAmount)}
-              </Span>
-            </Div>
-            <Div className="p-2 rounded border bg-muted/30">
-              <Span className="text-xs text-muted-foreground block">
-                {t("orderCreate.post.response.total")}
-              </Span>
-              <Span className="font-semibold text-sm">
-                {formatAmount(result.total)}
-              </Span>
-            </Div>
-          </Div>
-        </Div>
-
-        <Div className="flex items-center gap-2">
-          <Button type="button" size="sm" onClick={handleViewOrder}>
+      <AdminForm
+        title={result.poNumber}
+        backButton={backButton}
+        primaryAction={
+          <Button type="button" onClick={openOrder}>
             {t("orderCreate.post.widget.viewOrder")}
           </Button>
-          {navigation.canGoBack && (
-            <Button
-              type="button"
-              size="sm"
-              variant="ghost"
-              onClick={() => navigation.pop()}
-            >
-              {t("orderCreate.post.widget.backToList")}
-            </Button>
-          )}
-        </Div>
-      </Div>
+        }
+      >
+        <ResultBanner
+          variant="success"
+          title={t("orderCreate.post.success.title")}
+          message={t("orderCreate.post.widget.nextStep")}
+        />
+      </AdminForm>
     );
   }
 
   return (
-    <Div className="flex flex-col gap-4">
-      {navigation.canGoBack && (
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={() => navigation.pop()}
-          className="self-start gap-1.5 -ml-1"
-        >
-          <ChevronLeft className="h-4 w-4" />
-          {t("orderCreate.post.widget.backToList")}
-        </Button>
-      )}
-
-      <Div className="flex flex-col gap-3">
+    <AdminForm
+      title={t("orderCreate.post.title")}
+      description={t("orderCreate.post.widget.subtitle")}
+      backButton={backButton}
+      secondaryActions={
+        navigation.canGoBack ? (
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => navigation.pop()}
+          >
+            {t("orderCreate.post.widget.cancel")}
+          </Button>
+        ) : undefined
+      }
+      primaryAction={
+        <SubmitButtonWidget<typeof definition.POST>
+          field={{ text: "orderCreate.post.title" }}
+        />
+      }
+    >
+      <AdminFormSection
+        title={t("orderCreate.post.widget.sectionSupplier")}
+        columns={2}
+      >
         <EntityPickerFieldWidget
           fieldName="companyId"
           field={field.children.companyId}
@@ -148,37 +110,35 @@ export function OrderCreateWidget({
           fieldName="vendorId"
           field={field.children.vendorId}
         />
-        <Div className="grid grid-cols-2 gap-3">
-          <TextFieldWidget
-            fieldName="currency"
-            field={withValue(field.children.currency, undefined, null)}
-          />
-          <TextFieldWidget
-            fieldName="expectedDeliveryDate"
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            field={
-              withValueNonStrict(
-                field.children.expectedDeliveryDate,
-                undefined,
-                null,
-              ) as never
-            }
-          />
-        </Div>
+        <CurrencySelectFieldWidget
+          fieldName="currency"
+          field={withValue(field.children.currency, undefined, null)}
+        />
+      </AdminFormSection>
+      <AdminFormSection
+        title={t("orderCreate.post.widget.sectionDelivery")}
+        columns={2}
+      >
+        <DateFieldWidget
+          fieldName="expectedDeliveryDate"
+          utcCalendarDay
+          field={withValue(
+            field.children.expectedDeliveryDate,
+            undefined,
+            null,
+          )}
+        />
         <EntityPickerFieldWidget
           fieldName="deliveryWarehouseId"
           field={field.children.deliveryWarehouseId}
         />
-        <TextareaFieldWidget
-          fieldName="notes"
-          field={withValue(field.children.notes, undefined, null)}
-        />
-      </Div>
-
-      <FormAlertWidget field={{}} />
-      <SubmitButtonWidget<typeof definition.POST>
-        field={{ text: "orderCreate.post.title" }}
-      />
-    </Div>
+        <Div className="@lg:col-span-2">
+          <TextareaFieldWidget
+            fieldName="notes"
+            field={withValue(field.children.notes, undefined, null)}
+          />
+        </Div>
+      </AdminFormSection>
+    </AdminForm>
   );
 }

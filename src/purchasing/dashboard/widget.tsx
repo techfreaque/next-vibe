@@ -159,7 +159,7 @@ export function PurchasingDashboardWidget(): JSX.Element {
           className={
             embedded
               ? "grid min-w-0 grid-cols-2 gap-2 [&>*]:px-3 [&>*]:py-2.5 [&>*>div:first-child>span]:whitespace-normal [&>*>div:nth-child(2)>span]:break-words [&>*>div:nth-child(2)>span]:text-base @sm:[&>*>div:nth-child(2)>span]:text-lg @2xl:[&>*>div:nth-child(2)>span]:text-2xl"
-              : "grid gap-3 rounded-lg border bg-card p-4 @md:grid-cols-2"
+              : "grid gap-3 @md:grid-cols-2"
           }
         >
           <MetricCard
@@ -175,7 +175,7 @@ export function PurchasingDashboardWidget(): JSX.Element {
       {data.deliveries && (
         <Div className="flex flex-col gap-2">
           <Div className="flex flex-wrap items-center justify-between gap-2">
-            <Span className="text-lg font-semibold">
+            <Span className="text-base font-semibold">
               {t("dashboard.get.widget.deliveries")}
             </Span>
             {Boolean(data.overdueDeliveryCount) && (
@@ -188,9 +188,9 @@ export function PurchasingDashboardWidget(): JSX.Element {
             )}
           </Div>
           {data.deliveries.length === 0 ? (
-            <Span className="text-sm text-muted-foreground">
+            <Div className="rounded-xl border bg-card px-4 py-6 text-center text-sm text-muted-foreground">
               {t("dashboard.get.widget.noDeliveries")}
-            </Span>
+            </Div>
           ) : (
             <RecordTable
               label={t("dashboard.get.widget.deliveries")}

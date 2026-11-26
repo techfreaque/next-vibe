@@ -21,6 +21,8 @@ import {
 } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
+import { accountingDateSchema } from "@/chart-of-accounts/shared/calendar-date";
+
 import { scopedTranslation } from "../../i18n";
 
 const OrderCreateWidgetLazy = lazyWidget(() =>
@@ -72,7 +74,7 @@ const { POST } = createEndpoint({
       }),
       currency: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
+        fieldType: FieldDataType.CURRENCY_SELECT,
         label: "orderCreate.currency.label" as const,
         description: "orderCreate.currency.description" as const,
         placeholder: "orderCreate.currency.placeholder" as const,
@@ -81,12 +83,12 @@ const { POST } = createEndpoint({
       }),
       expectedDeliveryDate: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
+        fieldType: FieldDataType.DATE,
         label: "orderCreate.expectedDeliveryDate.label" as const,
         description: "orderCreate.expectedDeliveryDate.description" as const,
         placeholder: "orderCreate.expectedDeliveryDate.placeholder" as const,
         columns: 4,
-        schema: z.coerce.date().optional(),
+        schema: accountingDateSchema.optional(),
       }),
       deliveryWarehouseId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,

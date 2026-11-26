@@ -22,6 +22,8 @@ import {
 } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
+import { accountingDateSchema } from "@/chart-of-accounts/shared/calendar-date";
+
 import { scopedTranslation } from "../../../i18n";
 
 const OrderUpdateWidgetLazy = lazyWidget(() =>
@@ -82,7 +84,7 @@ const { PATCH } = createEndpoint({
       }),
       currency: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
+        fieldType: FieldDataType.CURRENCY_SELECT,
         label: "orderUpdate.patch.currency.label" as const,
         description: "orderUpdate.patch.currency.description" as const,
         placeholder: "orderUpdate.patch.currency.placeholder" as const,
@@ -91,18 +93,21 @@ const { PATCH } = createEndpoint({
       }),
       expectedDeliveryDate: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
+        fieldType: FieldDataType.DATE,
         label: "orderUpdate.patch.expectedDeliveryDate.label" as const,
         description:
           "orderUpdate.patch.expectedDeliveryDate.description" as const,
         placeholder:
           "orderUpdate.patch.expectedDeliveryDate.placeholder" as const,
         columns: 4,
-        schema: z.coerce.date().optional(),
+        schema: accountingDateSchema.optional(),
       }),
       deliveryWarehouseId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.UUID,
+        fieldType: FieldDataType.ENTITY_PICKER,
+        listEndpoint: async () =>
+          (await import("@/inventory/warehouse/list/definition")).default.GET,
+        labelField: "name",
         label: "orderUpdate.patch.deliveryWarehouseId.label" as const,
         description:
           "orderUpdate.patch.deliveryWarehouseId.description" as const,

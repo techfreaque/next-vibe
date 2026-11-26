@@ -58,6 +58,9 @@ export function VendorGetWidget({
     user,
   ).create;
   const deactivateFailed = deactivate?.response?.success === false;
+  // The record refetch can return the cached row; trust the action result.
+  const isActive =
+    result?.isActive === true && deactivate?.response?.success !== true;
 
   const back = (): void => {
     if (navigation.canGoBack) {
@@ -176,9 +179,9 @@ export function VendorGetWidget({
           value: result.defaultCurrency,
         },
         {
-          key: "email",
-          label: t("vendorGet.get.response.email"),
-          value: result.email ?? undefined,
+          key: "vat",
+          label: t("vendorGet.get.response.vatNumber"),
+          value: result.vatNumber ?? undefined,
         },
         {
           key: "phone",
@@ -186,9 +189,10 @@ export function VendorGetWidget({
           value: result.phone ?? undefined,
         },
         {
-          key: "website",
-          label: t("vendorGet.get.response.website"),
-          value: result.website ?? undefined,
+          key: "email",
+          label: t("vendorGet.get.response.email"),
+          value: result.email ?? undefined,
+          className: "@sm:col-span-2 @lg:col-span-3",
         },
         {
           key: "address",
@@ -196,9 +200,9 @@ export function VendorGetWidget({
           value: address || undefined,
         },
         {
-          key: "vat",
-          label: t("vendorGet.get.response.vatNumber"),
-          value: result.vatNumber ?? undefined,
+          key: "website",
+          label: t("vendorGet.get.response.website"),
+          value: result.website ?? undefined,
         },
         {
           key: "tax",
@@ -246,19 +250,19 @@ export function VendorGetWidget({
       status={
         result
           ? {
-              status: result.isActive ? "active" : "inactive",
+              status: isActive ? "active" : "inactive",
               label: t(
-                result.isActive
+                isActive
                   ? "vendorList.get.widget.active"
                   : "vendorList.get.widget.inactive",
               ),
-              variant: result.isActive ? "success" : "muted",
+              variant: isActive ? "success" : "muted",
             }
           : undefined
       }
       backButton={backButton}
       primaryAction={
-        interactive && result?.isActive
+        interactive && isActive
           ? {
               key: "order",
               label: t("vendorGet.get.widget.createOrder"),
@@ -285,7 +289,7 @@ export function VendorGetWidget({
           : undefined
       }
       moreActions={
-        interactive && result?.isActive && deactivate
+        interactive && isActive && deactivate
           ? [
               {
                 key: "deactivate",
