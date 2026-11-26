@@ -4,6 +4,7 @@ import { ApiProvider } from "../models/models";
 import {
   deriveVideoModelInputs,
   getVideoGenModelById,
+  resolveVideoClipSeconds,
   resolveVideoGenRouteForImageInput,
   videoGenModelDefinitions,
   VideoGenModelId,
@@ -135,7 +136,11 @@ describe("video resolution pricing", () => {
   test("every priced resolution is an offered one, and vice versa", () => {
     for (const def of Object.values(videoGenModelDefinitions)) {
       for (const p of def.providers) {
-        if (!("creditCostPerSecond" in p) || !p.pricingByResolution) {
+        if (
+          p.creditCostPerSecond === undefined ||
+          p.defaultDurationSeconds === undefined ||
+          !p.pricingByResolution
+        ) {
           continue;
         }
         const offered = p.supportedResolutions ?? [];
@@ -146,6 +151,63 @@ describe("video resolution pricing", () => {
           priced: [...offered].toSorted(),
         });
       }
+    }
+  });
+});
+
+describe("video duration bounds", () => {
+  test("every route's min/max bounds cover all of its supportedDurations", () => {
+    for (const def of Object.values(videoGenModelDefinitions)) {
+      for (const p of def.providers) {
+        if (
+          p.creditCostPerSecond === undefined ||
+          p.defaultDurationSeconds === undefined ||
+          !p.supportedDurations ||
+          p.supportedDurations.length === 0
+        ) {
+          continue;
+        }
+        const durations = p.supportedDurations.map(Number);
+        const minSupported = Math.min(...durations);
+        const maxSupported = Math.max(...durations);
+        const label = `${p.id}/${p.apiProvider}`;
+        if (p.minDurationSeconds !== undefined) {
+          expect(
+            { label, min: p.minDurationSeconds },
+            `${label} minDurationSeconds exceeds smallest supported duration`,
+          ).toEqual({
+            label,
+            min: Math.min(p.minDurationSeconds, minSupported),
+          });
+        }
+        if (p.maxDurationSeconds !== undefined) {
+          expect(
+            { label, max: p.maxDurationSeconds },
+            `${label} maxDurationSeconds cuts off largest supported duration`,
+          ).toEqual({
+            label,
+            max: Math.max(p.maxDurationSeconds, maxSupported),
+          });
+        }
+      }
+    }
+  });
+
+  test("Kling V2.5 Turbo I2V allows both 5s and 10s clips", () => {
+    const def = videoGenModelDefinitions[VideoGenModelId.KLING_V2_5_TURBO_I2V];
+    for (const p of def.providers) {
+      if (
+        p.creditCostPerSecond === undefined ||
+        p.defaultDurationSeconds === undefined
+      ) {
+        expect.unreachable("Kling V2.5 Turbo I2V provider must be video-based");
+        continue;
+      }
+      expect(p.minDurationSeconds).toBe(5);
+      expect(p.maxDurationSeconds).toBe(10);
+      expect(p.supportedDurations).toEqual(["5", "10"]);
+      expect(resolveVideoClipSeconds(p, 5)).toBe(5);
+      expect(resolveVideoClipSeconds(p, 10)).toBe(10);
     }
   });
 });

@@ -506,7 +506,7 @@ export const videoGenModelDefinitions: Record<
         creditCostPerSecond: 4.2, // updated: 2026-11-09 from modelslab.com
         supportedFrameImages: ["first_frame"], // updated: 2026-11-13 from modelslab.com
         minDurationSeconds: 5, // updated: 2026-04-04 from modelslab.com
-        maxDurationSeconds: 8, // updated: 2026-07-10 from openrouter.ai
+        maxDurationSeconds: 10, // updated: 2026-11-26 from modelslab.com
         supportedDurations: ["5", "10"], // updated: 2026-07-10 from modelslab.com
         defaultDurationSeconds: 5,
       },
@@ -517,7 +517,7 @@ export const videoGenModelDefinitions: Record<
         creditCostPerSecond: 5.46, // updated: 2026-11-09 from unbottled.ai
         defaultDurationSeconds: 5,
         minDurationSeconds: 5,
-        maxDurationSeconds: 8,
+        maxDurationSeconds: 10,
         supportedDurations: ["5", "10"],
       },
     ],
