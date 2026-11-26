@@ -1458,6 +1458,13 @@
       "when": 1795707809595,
       "tag": "20261126154329_pos_refunds",
       "breakpoints": true
+    },
+    {
+      "idx": 208,
+      "version": "7",
+      "when": 1795711225593,
+      "tag": "20261126164025_sk_fiscal_receipts_rate_validity",
+      "breakpoints": true
     }
   ]
 }
