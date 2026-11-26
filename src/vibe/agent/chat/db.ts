@@ -405,6 +405,7 @@ export const chatFolders = pgTable(
   (table) => ({
     // Indexes for common queries
     userIdIdx: index("chat_folders_user_id_idx").on(table.userId),
+    leadIdIdx: index("chat_folders_lead_id_idx").on(table.leadId),
     rootFolderIdIdx: index("chat_folders_root_folder_id_idx").on(
       table.rootFolderId,
     ),
@@ -570,6 +571,7 @@ export const chatThreads = pgTable(
     ),
     // Additional indexes for common queries
     userIdIdx: index("chat_threads_user_id_idx").on(table.userId),
+    leadIdIdx: index("chat_threads_lead_id_idx").on(table.leadId),
     rootFolderIdIdx: index("chat_threads_root_folder_id_idx").on(
       table.rootFolderId,
     ),
@@ -744,6 +746,7 @@ export const threadReports = pgTable(
       table.createdAt,
     ),
     ipIdx: index("thread_reports_ip_idx").on(table.ipHash, table.createdAt),
+    messageIdIdx: index("thread_reports_message_id_idx").on(table.messageId),
   }),
 );
 

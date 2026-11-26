@@ -6,6 +6,7 @@
 import { relations } from "drizzle-orm";
 import {
   boolean,
+  index,
   integer,
   pgTable,
   text,
@@ -111,7 +112,10 @@ export const companyLeads = pgTable(
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },
-  (table) => [unique("uq_company_lead").on(table.companyId, table.leadId)],
+  (table) => [
+    unique("uq_company_lead").on(table.companyId, table.leadId),
+    index("idx_company_leads_lead").on(table.leadId),
+  ],
 );
 
 /**

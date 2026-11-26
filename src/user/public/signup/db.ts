@@ -49,6 +49,7 @@ export const pendingSignups = pgTable(
   (table) => [
     index("pending_signups_email_idx").on(table.email),
     index("pending_signups_expiry_idx").on(table.expiresAt),
+    index("pending_signups_lead_idx").on(table.leadId),
   ],
 );
 

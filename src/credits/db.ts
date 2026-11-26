@@ -408,6 +408,8 @@ export const creditTransactions = pgTable(
     index("idx_transactions_wallet").on(table.walletId, table.createdAt),
     // Query by transaction type
     index("idx_transactions_type").on(table.type, table.createdAt),
+    // FK lookups when a pack is deleted (ON DELETE SET NULL)
+    index("idx_transactions_pack").on(table.packId),
     // Free grants are idempotent per pool + month + kind (metadata.grantKey):
     // concurrent reads can never mint the same monthly grant twice.
     uniqueIndex("uq_transactions_grant_key")

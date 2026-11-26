@@ -5,6 +5,7 @@
 import { relations } from "drizzle-orm";
 import {
   boolean,
+  index,
   integer,
   pgTable,
   text,
@@ -56,17 +57,21 @@ export const referralCodes = pgTable("referral_codes", {
  * Multiple referral codes can be linked to a lead (user may click multiple referral links)
  * On signup, the latest referral is used and copied to user_referrals for permanent storage
  */
-export const leadReferrals = pgTable("lead_referrals", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  referralCodeId: uuid("referral_code_id")
-    .notNull()
-    .references(() => referralCodes.id, { onDelete: "cascade" }),
-  leadId: uuid("lead_id")
-    .notNull()
-    // No unique constraint - leads can have multiple referral codes (history)
-    .references(() => leads.id, { onDelete: "cascade" }),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-});
+export const leadReferrals = pgTable(
+  "lead_referrals",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    referralCodeId: uuid("referral_code_id")
+      .notNull()
+      .references(() => referralCodes.id, { onDelete: "cascade" }),
+    leadId: uuid("lead_id")
+      .notNull()
+      // No unique constraint - leads can have multiple referral codes (history)
+      .references(() => leads.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [index("idx_lead_referrals_lead").on(table.leadId)],
+);
 
 /**
  * User Referrals Table (Phase 2: Post-signup)

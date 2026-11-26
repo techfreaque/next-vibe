@@ -153,56 +153,60 @@ export const leads = pgTable(
  * Email Campaigns Table
  * Tracks individual email sends to leads
  */
-export const emailCampaigns = pgTable("email_campaigns", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  leadId: uuid("lead_id")
-    .notNull()
-    .references(() => leads.id, { onDelete: "cascade" }),
+export const emailCampaigns = pgTable(
+  "email_campaigns",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    leadId: uuid("lead_id")
+      .notNull()
+      .references(() => leads.id, { onDelete: "cascade" }),
 
-  // Campaign details
-  campaignType: text("campaign_type", { enum: CampaignTypeDB })
-    .notNull()
-    .default(CampaignType.LEAD_CAMPAIGN),
-  stage: text("stage", { enum: EmailCampaignStageDB }).notNull(),
-  journeyVariant: text("journey_variant", {
-    enum: EmailJourneyVariantDB,
-  }).notNull(),
-  subject: text("subject").notNull(),
-  templateName: text("template_name").notNull(),
+    // Campaign details
+    campaignType: text("campaign_type", { enum: CampaignTypeDB })
+      .notNull()
+      .default(CampaignType.LEAD_CAMPAIGN),
+    stage: text("stage", { enum: EmailCampaignStageDB }).notNull(),
+    journeyVariant: text("journey_variant", {
+      enum: EmailJourneyVariantDB,
+    }).notNull(),
+    subject: text("subject").notNull(),
+    templateName: text("template_name").notNull(),
 
-  // Scheduling
-  scheduledAt: timestamp("scheduled_at").notNull(),
-  sentAt: timestamp("sent_at"),
+    // Scheduling
+    scheduledAt: timestamp("scheduled_at").notNull(),
+    sentAt: timestamp("sent_at"),
 
-  // Status and tracking
-  status: text("status", { enum: EmailStatusDB })
-    .notNull()
-    .default(EmailStatus.PENDING),
-  emailProvider: text("email_provider", { enum: EmailProviderDB }).default(
-    EmailProvider.SMTP,
-  ),
-  externalId: text("external_id"), // Provider's email ID
-  smtpAccountId: uuid("smtp_account_id"), // SMTP account used for sending
+    // Status and tracking
+    status: text("status", { enum: EmailStatusDB })
+      .notNull()
+      .default(EmailStatus.PENDING),
+    emailProvider: text("email_provider", { enum: EmailProviderDB }).default(
+      EmailProvider.SMTP,
+    ),
+    externalId: text("external_id"), // Provider's email ID
+    smtpAccountId: uuid("smtp_account_id"), // SMTP account used for sending
 
-  // Engagement tracking
-  openedAt: timestamp("opened_at"),
-  clickedAt: timestamp("clicked_at"),
-  unsubscribedAt: timestamp("unsubscribed_at"),
-  bouncedAt: timestamp("bounced_at"),
+    // Engagement tracking
+    openedAt: timestamp("opened_at"),
+    clickedAt: timestamp("clicked_at"),
+    unsubscribedAt: timestamp("unsubscribed_at"),
+    bouncedAt: timestamp("bounced_at"),
 
-  // Error handling
-  error: text("error"),
-  retryCount: integer("retry_count").notNull().default(0),
+    // Error handling
+    error: text("error"),
+    retryCount: integer("retry_count").notNull().default(0),
 
-  // Metadata
-  metadata: jsonb("metadata")
-    .$type<Record<string, string | number | boolean>>()
-    .notNull()
-    .default({}),
+    // Metadata
+    metadata: jsonb("metadata")
+      .$type<Record<string, string | number | boolean>>()
+      .notNull()
+      .default({}),
 
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
-});
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [index("idx_email_campaigns_lead").on(table.leadId)],
+);
 
 /**
  * Email Send Log
@@ -253,6 +257,7 @@ export const emailSendLog = pgTable(
       table.email,
     ),
     index("idx_email_send_log_campaign").on(table.campaignId),
+    index("idx_email_send_log_lead").on(table.leadId),
   ],
 );
 
@@ -260,34 +265,41 @@ export const emailSendLog = pgTable(
  * Lead Engagements Table
  * Tracks individual engagement events for leads
  */
-export const leadEngagements = pgTable("lead_engagements", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  leadId: uuid("lead_id")
-    .notNull()
-    .references(() => leads.id, { onDelete: "cascade" }),
-  campaignId: uuid("campaign_id").references(() => emailCampaigns.id, {
-    onDelete: "set null",
-  }),
+export const leadEngagements = pgTable(
+  "lead_engagements",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    leadId: uuid("lead_id")
+      .notNull()
+      .references(() => leads.id, { onDelete: "cascade" }),
+    campaignId: uuid("campaign_id").references(() => emailCampaigns.id, {
+      onDelete: "set null",
+    }),
 
-  // Engagement details
-  engagementType: text("engagement_type", {
-    enum: EngagementTypesDB,
-  }).notNull(),
+    // Engagement details
+    engagementType: text("engagement_type", {
+      enum: EngagementTypesDB,
+    }).notNull(),
 
-  // Tracking information
-  ipAddress: text("ip_address"),
-  userAgent: text("user_agent"),
+    // Tracking information
+    ipAddress: text("ip_address"),
+    userAgent: text("user_agent"),
 
-  // Metadata
-  metadata: jsonb("metadata")
-    .$type<Record<string, string | number | boolean>>()
-    .notNull()
-    .default({}),
+    // Metadata
+    metadata: jsonb("metadata")
+      .$type<Record<string, string | number | boolean>>()
+      .notNull()
+      .default({}),
 
-  // Timestamps
-  timestamp: timestamp("timestamp").defaultNow().notNull(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-});
+    // Timestamps
+    timestamp: timestamp("timestamp").defaultNow().notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_lead_engagements_lead").on(table.leadId),
+    index("idx_lead_engagements_campaign").on(table.campaignId),
+  ],
+);
 
 /**
  * Relations
