@@ -8,6 +8,7 @@ import {
 import { identifyBrowserAutomation } from "./client-context";
 import {
   classifyResourceFailure,
+  classifyResponseSource,
   describeResourceResponse,
   resourceSourceKind,
   resourceTiming,
@@ -100,5 +101,60 @@ describe("browser failure attribution", () => {
     expect(readProxyTimingHeader(header)).toBe("upstream-timeout");
     expect(readEdgeTimingHeader('vibe-edge;desc="unknown"')).toBeNull();
     expect(readEdgeTimingHeader(null)).toBeNull();
+  });
+
+  it("names who answered a failed asset, replaying prod 2026-11-26 reports", () => {
+    const base = {
+      edgeTimingNode: null,
+      resourceOrigin: "same-origin" as const,
+      resourceTimingPhase: "no-request-start" as const,
+    };
+    // Stale tab after a deploy: our edge answered 404 (Server-Timing s1).
+    expect(
+      classifyResponseSource({
+        ...base,
+        edgeTimingNode: "s1",
+        responseStatus: 404,
+        resourceTimingPhase: "response",
+        nearbyAssetResponses: 2,
+        nearbyAssetEdgeTransfers: 2,
+      }),
+    ).toBe("edge");
+    // Meta crawler: synthetic 504 for a chunk the edge served 200, and none of
+    // its ~100 other assets came from the edge either.
+    expect(
+      classifyResponseSource({
+        ...base,
+        responseStatus: 504,
+        nearbyAssetResponses: 91,
+        nearbyAssetEdgeTransfers: 0,
+      }),
+    ).toBe("outside-edge");
+    // Headless scraper: 6 chunks never left the browser, 53 came from the edge.
+    expect(
+      classifyResponseSource({
+        ...base,
+        responseStatus: 0,
+        nearbyAssetResponses: 53,
+        nearbyAssetEdgeTransfers: 53,
+      }),
+    ).toBe("never-sent");
+    // A 504 without edge timing next to edge-served assets is not proof.
+    expect(
+      classifyResponseSource({
+        ...base,
+        responseStatus: 504,
+        nearbyAssetResponses: 53,
+        nearbyAssetEdgeTransfers: 53,
+      }),
+    ).toBeNull();
+    expect(
+      classifyResponseSource({
+        ...base,
+        resourceOrigin: "cross-origin",
+        responseStatus: 0,
+      }),
+    ).toBeNull();
+    expect(resourceTiming(null).responseSource).toBeNull();
   });
 });

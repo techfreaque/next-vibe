@@ -18,6 +18,16 @@ spec.loader.exec_module(assets)
 OLD_CHUNK = "chunks/552793.c92bc34adbec4758.js"
 NEW_CHUNK = "chunks/486147-49ed48a3f953da9b.js"
 LOCALE = "chunks/locales/V3icjTMls73LWteelCsVU/991135.js"
+# Names from the prod static tree of 998a07d72b: App Router segment chunks were
+# origin-only, so every old tab 404'd on its next client navigation after a deploy.
+APP_CHUNKS = [
+    "chunks/app/[locale]/layout-94fac8c647f3d689.js",
+    "chunks/app/[locale]/(auth)/signup/page-30a0cd9e8840ace5.js",
+    "chunks/app/[locale]/threads/[...path]/page-e007b32e8ceb0f18.js",
+    "chunks/app/api/[locale]/v1/music/[id]/route-8fe7c331abf9949c.js",
+    "chunks/app/_not-found/page-0d1c9a6b2f3e4a5b.js",
+]
+MEDIA = ["media/ba9851c3c22cd980-s.woff2", "media/inter-cyrillic-wght-normal.491cbc05.woff2"]
 
 
 def bundle(files):
@@ -38,8 +48,11 @@ def bundle(files):
 class ReleaseAssetsTest(unittest.TestCase):
     def test_both_images_and_cache_expiry(self):
         rejected = ["chunks/123.js", "chunks/secret.map", "../escape-deadbeef.js",
-                    "chunks/../private-deadbeef.js", "server/chunks/abcdef12.js"]
-        old = {OLD_CHUNK: b"old", LOCALE: b"locale", **{k: b"private" for k in rejected}}
+                    "chunks/../private-deadbeef.js", "server/chunks/abcdef12.js",
+                    "chunks/app/../../escape-deadbeef.js", "media/font.woff2",
+                    "media/x-deadbeef.html", "V3icjTMls73LWteelCsVU/_buildManifest.js"]
+        old = {OLD_CHUNK: b"old", LOCALE: b"locale", **{k: b"app" for k in APP_CHUNKS + MEDIA},
+               **{k: b"private" for k in rejected}}
         commands = []
 
         def staged(command, root, patched=True, authoritative=frozenset()):
@@ -57,17 +70,21 @@ class ReleaseAssetsTest(unittest.TestCase):
             assets.main("fixture-app", "fixture:candidate", folder)
             self.assertEqual(commands[0][:3], ["docker", "exec", "fixture-app"])
             self.assertIn("fixture:candidate", commands[1])
-            for key in (OLD_CHUNK, LOCALE, NEW_CHUNK):
-                self.assertTrue((root / key).is_file())
+            for key in (OLD_CHUNK, LOCALE, NEW_CHUNK, *APP_CHUNKS, *MEDIA):
+                self.assertTrue((root / key).is_file(), key)
             self.assertFalse(expired.exists())
             self.assertFalse((root / "chunks/secret-deadbeef.js").exists())
-            self.assertEqual(len([p for p in root.rglob("*") if p.is_file()]), 3)
+            self.assertFalse((Path(folder) / "ha-public" / "escape-deadbeef.js").exists())
+            self.assertEqual(len([p for p in root.rglob("*") if p.is_file()]), 3 + len(APP_CHUNKS + MEDIA))
         config = (HERE.parent / "ha/edge-lb/routing/ingress.caddy").read_text()
         matcher = re.search(r"path_regexp (\^/_next/static/[^\n]+)", config).group(1)
-        for name in [OLD_CHUNK, NEW_CHUNK, LOCALE, "css/96fc339f.css", *rejected]:
+        for name in [OLD_CHUNK, NEW_CHUNK, LOCALE, "css/96fc339f.css", *APP_CHUNKS, *MEDIA, *rejected]:
             accepted = name not in rejected
-            self.assertEqual(bool(assets.ASSET.fullmatch(name)), accepted, name)
-            self.assertEqual(bool(re.fullmatch(matcher, "/_next/static/" + name)), accepted, name)
+            self.assertEqual(assets.is_asset(name), accepted, name)
+            # Caddy cleans ".." segments before matching, so only the staging side
+            # needs the traversal guard; every other name must agree exactly.
+            if ".." not in name.split("/"):
+                self.assertEqual(bool(re.fullmatch(matcher, "/_next/static/" + name)), accepted, name)
 
     def test_runtime_env_sentinels_never_reach_the_edge_unpatched(self):
         raw_env = b'value:"__VIBE_RUNTIME_ENV_NEXT_PUBLIC_APP_URL__"'

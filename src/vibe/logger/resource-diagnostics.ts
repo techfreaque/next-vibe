@@ -116,6 +116,52 @@ interface ResourceTimingEvidence {
   proxyTimingStage: ProxyTimingStage | null;
   edgeTimingNode: ReturnType<typeof readEdgeTimingNode>;
   edgeRequestId: string | null;
+  responseSource: ResponseSource | null;
+}
+
+/**
+ * Who answered a failed same-origin asset request:
+ *  - "edge": our Caddy edge (every edge response carries vibe-edge Server-Timing);
+ *  - "outside-edge": a status without our timing while the page's other assets
+ *    also never came from the edge, i.e. a fetch layer in the client answers
+ *    for every subresource (prod 2026-11-26: Meta's crawler, synthetic 504/500
+ *    for chunks the edge served 200 at the same time);
+ *  - "never-sent": status 0 and the request never started, blocked inside the
+ *    client before it reached the network (headless scrapers, blockers);
+ *  - null: not enough evidence.
+ */
+export type ResponseSource = "edge" | "outside-edge" | "never-sent";
+
+export function classifyResponseSource(
+  evidence: Pick<
+    ResourceTimingEvidence,
+    | "edgeTimingNode"
+    | "resourceOrigin"
+    | "responseStatus"
+    | "resourceTimingPhase"
+    | "nearbyAssetResponses"
+    | "nearbyAssetEdgeTransfers"
+  >,
+): ResponseSource | null {
+  if (evidence.edgeTimingNode !== null) {
+    return "edge";
+  }
+  if (evidence.resourceOrigin !== "same-origin") {
+    return null;
+  }
+  const status = evidence.responseStatus;
+  if (
+    status !== null &&
+    status > 0 &&
+    (evidence.nearbyAssetResponses ?? 0) > 0 &&
+    evidence.nearbyAssetEdgeTransfers === 0
+  ) {
+    return "outside-edge";
+  }
+  if (status === 0 && evidence.resourceTimingPhase === "no-request-start") {
+    return "never-sent";
+  }
+  return null;
 }
 
 /** Compare a failed asset to other assets that finished around the same time.
@@ -287,6 +333,7 @@ export function resourceTiming(
     proxyTimingStage: null,
     edgeTimingNode: null,
     edgeRequestId: null,
+    responseSource: null,
   };
   if (!raw || typeof performance === "undefined") {
     return empty;
@@ -333,7 +380,7 @@ export function resourceTiming(
       "responseStatus" in entry && typeof entry.responseStatus === "number"
         ? entry.responseStatus
         : null;
-    return {
+    const evidence: ResourceTimingEvidence = {
       responseStatus,
       ...(sameOrigin && fetchStartedAt === undefined
         ? nearbyAssetEvidence(entry, resource.origin)
@@ -383,7 +430,10 @@ export function resourceTiming(
             )?.description,
           )
         : null,
+      responseSource: null,
     };
+    evidence.responseSource = classifyResponseSource(evidence);
+    return evidence;
   } catch {
     return empty;
   }

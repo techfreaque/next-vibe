@@ -11,11 +11,23 @@ import tempfile
 import time
 
 # Keep this allowlist aligned with @asset in ha/edge-lb/routing/ingress.caddy.
+# Every content-hashed file a browser of either release can request: shared and
+# dynamic chunks, App Router segment chunks (chunks/app/[locale]/(auth)/...),
+# per-build locale chunks, CSS and fonts/images under media/. Only the build
+# manifests (<buildId>/_buildManifest.js, unhashed) stay origin-only.
 ASSET = re.compile(
-    r"(?:(?:chunks|css)/(?:[a-zA-Z0-9_~-]+/)*[a-zA-Z0-9_.~-]*[0-9a-f]{8,}"
-    r"[a-zA-Z0-9_.~-]*\.(?:js|css)|chunks/locales/[a-zA-Z0-9_-]{8,}/[0-9]+\.js)"
+    r"(?:(?:chunks|css)/(?:[a-zA-Z0-9_.~()\[\]@-]+/)*[a-zA-Z0-9_.~-]*[0-9a-f]{8,}"
+    r"[a-zA-Z0-9_.~-]*\.(?:js|css)|chunks/locales/[a-zA-Z0-9_-]{8,}/[0-9]+\.js"
+    r"|media/[a-zA-Z0-9_.~-]*[0-9a-f]{8,}[a-zA-Z0-9_.~-]*"
+    r"\.(?:woff2?|ttf|otf|eot|png|jpe?g|gif|svg|webp|avif|ico))"
 )
 RETENTION_SECONDS = 7 * 24 * 60 * 60
+
+
+def is_asset(name):
+    """Allowlisted release file; segment names may hold dots ([...path]) but
+    never a "." or ".." segment that could leave the cache directory."""
+    return bool(ASSET.fullmatch(name)) and not {".", ".."} & set(name.split("/"))
 # Keep in sync with runtimeEnvPlaceholder() in
 # src/vibe/platforms/cli/runtime/runtime-env-placeholders.ts.
 RUNTIME_ENV_SENTINEL = re.compile(rb"__VIBE_RUNTIME_ENV_[A-Z0-9_]+__")
@@ -51,7 +63,7 @@ def stage(source, root, patched=True, authoritative=frozenset()):
     with tarfile.open(fileobj=source, mode="r|") as archive:
         for member in archive:
             name = member.name.removeprefix("./")
-            if not member.isfile() or not ASSET.fullmatch(name):
+            if not member.isfile() or not is_asset(name):
                 continue
             recognized += 1
             dest = root / name
@@ -99,7 +111,7 @@ def main(app, image, edge_dir):
         # Only published asset names are eligible for cache eviction.
         cutoff = time.time() - RETENTION_SECONDS
         for file in cache.rglob("*"):
-            if ASSET.fullmatch(file.relative_to(cache).as_posix()) and file.is_file():
+            if is_asset(file.relative_to(cache).as_posix()) and file.is_file():
                 if file.stat().st_mtime < cutoff:
                     file.unlink()
         print(f"Staged {len(outgoing)} outgoing and {len(incoming)} incoming immutable assets")

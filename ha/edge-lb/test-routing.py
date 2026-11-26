@@ -236,6 +236,24 @@ http://:{s1_ingress} {{
             asset.write_bytes(b"release asset")
             response, body = request(asset_path)
             assert response.status == 200 and body == b"release asset"
+            # Previous-release App Router, dynamic, locale and font files come
+            # from the edge cache, not the origin (which only has its own build).
+            for staged, requested in [
+                ("chunks/app/[locale]/(auth)/signup/page-30a0cd9e8840ace5.js",
+                 "chunks/app/%5Blocale%5D/(auth)/signup/page-30a0cd9e8840ace5.js"),
+                ("chunks/app/[locale]/threads/[...path]/page-e007b32e8ceb0f18.js",
+                 "chunks/app/%5Blocale%5D/threads/%5B...path%5D/page-e007b32e8ceb0f18.js"),
+                ("chunks/108786.e1fe03db148c379e.js",) * 2,
+                ("chunks/locales/PnzglcMe8Q45TzoCU5dNW/500920.js",) * 2,
+                ("media/inter-cyrillic-wght-normal.491cbc05.woff2",) * 2,
+            ]:
+                cached = work / "public" / "_next" / "static" / staged
+                cached.parent.mkdir(parents=True, exist_ok=True)
+                cached.write_bytes(b"previous release")
+                own.calls.clear()
+                response, body = request("/_next/static/" + requested)
+                assert response.status == 200 and body == b"previous release", (requested, response.status, body)
+                assert "immutable" in response.getheader("Cache-Control") and not own.calls and not warm.calls
             response, _ = request(asset_path, "POST", "write")
             assert response.status == 503 and not own.calls
             response, _ = request("/payment", "POST", "never-dispatched")

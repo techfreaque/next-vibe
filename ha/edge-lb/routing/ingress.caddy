@@ -79,9 +79,11 @@ route {
 		}
 	}
 	# Only release assets explicitly staged from the same image on both edges.
+	# Keep in sync with ASSET in scripts/ha-stage-next-assets.py. Caddy matches
+	# the decoded path, so App Router segments appear as [locale] / (auth).
 	@asset {
 		method GET HEAD
-		path_regexp ^/_next/static/((chunks|css)/([a-zA-Z0-9_~-]+/)*[a-zA-Z0-9_.~-]*[0-9a-f]{8,}[a-zA-Z0-9_.~-]*\.(js|css)|chunks/locales/[a-zA-Z0-9_-]{8,}/[0-9]+\.js)$
+		path_regexp ^/_next/static/((chunks|css)/([a-zA-Z0-9_.~()\[\]@-]+/)*[a-zA-Z0-9_.~-]*[0-9a-f]{8,}[a-zA-Z0-9_.~-]*\.(js|css)|chunks/locales/[a-zA-Z0-9_-]{8,}/[0-9]+\.js|media/[a-zA-Z0-9_.~-]*[0-9a-f]{8,}[a-zA-Z0-9_.~-]*\.(woff2?|ttf|otf|eot|png|jpe?g|gif|svg|webp|avif|ico))$
 		file {
 			root /data/ha-public
 		}
