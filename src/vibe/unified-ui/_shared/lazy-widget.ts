@@ -67,10 +67,39 @@ export function ensureGlobals(): void {
   };
 }
 
-// Registry of all lazyWidget preload functions. Populated at module-eval time
+// Weak registry of live lazyWidget instances. Populated at module-eval time
 // (factory references only — no imports fired). Call preloadAllLazyWidgets()
-// to fire them all.
-const _lazyWidgetRegistry: Array<() => Promise<void>> = [];
+// to fire all live ones.
+//
+// WeakRef + WeakMap is critical for Vite dev SSR: this module is a leaf
+// utility that scoped HMR reloads of widget.tsx / definition.ts / i18n files
+// never invalidate. A strong array retained every prior HMR generation's
+// `state.resolved` widget component and its entire transitive SSR module graph
+// (+25-30 MB per scoped reload, growing to ~20 GB over an agent session).
+// Live definition modules strongly reference their exported widget components,
+// so live entries stay reachable while invalidated generations are collected
+// as soon as Vite evicts their definition module.
+const _lazyWidgetRefs = new Set<WeakRef<CliComponent>>();
+const _lazyWidgetPreloaders = new WeakMap<CliComponent, () => Promise<void>>();
+const _lazyWidgetFinalizer =
+  typeof FinalizationRegistry !== "undefined"
+    ? new FinalizationRegistry<WeakRef<CliComponent>>((ref) => {
+        _lazyWidgetRefs.delete(ref);
+      })
+    : null;
+
+/** Current count of registered lazyWidget refs (for tests/diagnostics). */
+export function getLazyWidgetRegistrySize(): number {
+  let live = 0;
+  for (const ref of _lazyWidgetRefs) {
+    if (ref.deref()) {
+      live++;
+    } else {
+      _lazyWidgetRefs.delete(ref);
+    }
+  }
+  return live;
+}
 
 // Bounded-concurrency pool for SERVER-side widget factory imports. Widget
 // modules pull in large cyclic graphs, and racing HUNDREDS of such imports at
@@ -134,7 +163,18 @@ async function enqueueServerWidgetImport(
 export async function preloadAllLazyWidgets(
   allowStaleFactories = import.meta.env?.DEV === true,
 ): Promise<void> {
-  const preloads = _lazyWidgetRegistry.map((preload) => preload());
+  const preloads: Array<Promise<void>> = [];
+  for (const ref of _lazyWidgetRefs) {
+    const widget = ref.deref();
+    if (!widget) {
+      _lazyWidgetRefs.delete(ref);
+      continue;
+    }
+    const preload = _lazyWidgetPreloaders.get(widget);
+    if (preload) {
+      preloads.push(preload());
+    }
+  }
   // HMR can leave a previous definition's factory in the registry after the
   // source file moves. Only the widget actually being rendered is required.
   if (allowStaleFactories) {
@@ -184,15 +224,13 @@ export function lazyWidget(
     return state.modulePromise;
   }
 
-  // Register this widget's preload in the global registry.
-  // Only the factory reference is stored here — no import is triggered.
-  _lazyWidgetRegistry.push(async () => {
+  const preloadEntry = async (): Promise<void> => {
     // Skip in drizzle-kit / plain Node contexts without Vite.
     if (import.meta.env === undefined) {
       return;
     }
     await getOrCreateModulePromise();
-  });
+  };
 
   /**
    * Renders the widget via HmrWrapper ("use client").
@@ -223,7 +261,14 @@ export function lazyWidget(
       const result = await factory();
       state.resolved = result.default;
     },
-  });
+  }) as CliComponent;
 
-  return widget as CliComponent;
+  // Register this widget weakly in the preload registry — no import triggered,
+  // and no strong retention once its owning definition module is evicted.
+  const ref = new WeakRef(widget);
+  _lazyWidgetPreloaders.set(widget, preloadEntry);
+  _lazyWidgetRefs.add(ref);
+  _lazyWidgetFinalizer?.register(widget, ref);
+
+  return widget;
 }

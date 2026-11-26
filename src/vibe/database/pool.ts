@@ -178,6 +178,51 @@ export function resolveConnectRetryOptions(
 type PoolConnectCallback = Parameters<Pool["connect"]>[0];
 
 /**
+ * Run `fn` synchronously outside any active AsyncLocalStorage context when a
+ * boot-time root snapshot is available (captured in the Nitro dev worker
+ * preload before any HTTP request runs).
+ */
+function runSyncDetached<T>(fn: () => T): T {
+  const snapshot = globalThis.__vibeRootAsyncSnapshot;
+  return snapshot ? snapshot(fn) : fn();
+}
+
+/**
+ * Run `fn` outside any active AsyncLocalStorage context (such as TanStack
+ * Start's per-request `startOptions` context).
+ *
+ * Pooled TCP sockets created via `super.connect()` live on the process-wide
+ * pool across requests and dev HMR reloads. Under Bun, every `TCPSocket`
+ * callback (`open`, `data`, `drain`, `end`, `close`, `error`, `timeout`,
+ * `handshake`, `connectError`) captures the active `AsyncContextFrame` at
+ * socket creation time, pinning the creating request's `startOptions` ->
+ * `start.ts` -> entire old SSR module graph for the socket's lifetime.
+ * Uses the synchronous boot-time `AsyncLocalStorage.snapshot()` when present,
+ * falling back to a one-shot closed `MessageChannel` otherwise.
+ */
+export function runDetachedFromAsyncContext<T>(
+  fn: () => Promise<T>,
+): Promise<T> {
+  const snapshot = globalThis.__vibeRootAsyncSnapshot;
+  if (snapshot) {
+    return snapshot(fn);
+  }
+  if (typeof MessageChannel !== "function") {
+    return fn();
+  }
+  return new Promise<T>((resolve, reject) => {
+    const channel = new MessageChannel();
+    channel.port1.addEventListener("message", (): void => {
+      channel.port1.close();
+      channel.port2.close();
+      void fn().then(resolve).catch(reject);
+    });
+    channel.port1.start();
+    channel.port2.postMessage(null);
+  });
+}
+
+/**
  * pg Pool whose connect() (also used internally by pool.query()) retries
  * transient connect failures. Drizzle calls pool.query() for plain queries and
  * pool.connect() for transactions, so both paths are covered.
@@ -202,7 +247,10 @@ export class ResilientPool extends Pool {
   override connect(callback: PoolConnectCallback): void;
   override connect(callback?: PoolConnectCallback): Promise<PoolClient> | void {
     const connected = retryTransientConnect(async () => {
-      const client = await super.connect();
+      const client = await (globalThis.__vibeRootAsyncSnapshot ||
+      this.idleCount === 0
+        ? runDetachedFromAsyncContext(() => super.connect())
+        : super.connect());
       const { stream } = client.connection;
       const connectionError =
         this.connectionErrors.get(client) ?? stream.errored;
@@ -212,6 +260,15 @@ export class ResilientPool extends Pool {
         !stream.readableEnded &&
         !stream.writableEnded
       ) {
+        // pg-pool installs a fresh `client.release` per acquire; wrap it so
+        // its 30s idle timer and `_pulseQueue()` -> `newClient()` never bind
+        // to the releasing request's AsyncLocalStorage context.
+        const originalRelease = client.release.bind(client);
+        client.release = (releaseErr?: Error | boolean): void => {
+          runSyncDetached(() => {
+            originalRelease(releaseErr);
+          });
+        };
         return client;
       }
       const error =
@@ -361,6 +418,9 @@ declare global {
    */
   var __vibePgPools: Map<string, Pool> | undefined;
   var __vibePgCheckouts: WeakMap<Pool, Map<PoolClient, number>> | undefined;
+  var __vibeRootAsyncSnapshot:
+    | (<TResult>(fn: () => TResult) => TResult)
+    | undefined;
 }
 
 export const APP_POOL_KEY = "app";

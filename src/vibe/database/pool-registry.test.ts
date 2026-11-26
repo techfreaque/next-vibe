@@ -5,11 +5,14 @@
  * pg pools connect lazily.
  */
 
+import { AsyncLocalStorage } from "node:async_hooks";
+
 import { Pool } from "pg";
 import { afterEach, describe, expect, it } from "vitest";
 
 import {
   processSharedPool,
+  runDetachedFromAsyncContext,
   setProcessSharedPool,
   takeProcessSharedPool,
 } from "./pool";
@@ -55,5 +58,32 @@ describe("processSharedPool", () => {
     expect(takeProcessSharedPool(KEY)).toBe(replacement);
     expect(takeProcessSharedPool(KEY)).toBeNull();
     await replacement.end();
+  });
+});
+
+describe("runDetachedFromAsyncContext", () => {
+  it("breaks AsyncLocalStorage propagation via root snapshot and MessageChannel fallback", async () => {
+    const als = new AsyncLocalStorage<{ requestId: string }>();
+    const prevSnapshot = globalThis.__vibeRootAsyncSnapshot;
+    try {
+      // 1. MessageChannel fallback (when no boot-time snapshot is installed)
+      globalThis.__vibeRootAsyncSnapshot = undefined;
+      const fromFallback = await als.run({ requestId: "req-1" }, () =>
+        runDetachedFromAsyncContext(async () => als.getStore()),
+      );
+      expect(fromFallback).toBeUndefined();
+
+      // 2. Synchronous boot-time root snapshot path
+      const rootSnapshot = AsyncLocalStorage.snapshot();
+      globalThis.__vibeRootAsyncSnapshot = <TResult>(
+        fn: () => TResult,
+      ): TResult => rootSnapshot(fn);
+      const fromSnapshot = await als.run({ requestId: "req-2" }, () =>
+        runDetachedFromAsyncContext(async () => als.getStore()),
+      );
+      expect(fromSnapshot).toBeUndefined();
+    } finally {
+      globalThis.__vibeRootAsyncSnapshot = prevSnapshot;
+    }
   });
 });

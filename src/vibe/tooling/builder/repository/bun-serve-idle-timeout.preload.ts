@@ -13,7 +13,30 @@
  */
 /// <reference types="bun-types" />
 
+import { AsyncLocalStorage } from "node:async_hooks";
+
 import type { Serve, Server } from "bun";
+
+declare global {
+  /**
+   * Root AsyncLocalStorage snapshot captured at worker boot before any HTTP
+   * request enters a per-request context (e.g. TanStack Start's startOptions).
+   * Used by process-wide pools (src/vibe/database/pool.ts) so pooled TCP
+   * sockets and idle timers never pin old SSR module graphs across HMR.
+   */
+  var __vibeRootAsyncSnapshot:
+    | (<TResult>(fn: () => TResult) => TResult)
+    | undefined;
+}
+
+if (
+  typeof AsyncLocalStorage?.snapshot === "function" &&
+  globalThis.__vibeRootAsyncSnapshot === undefined
+) {
+  const snapshot = AsyncLocalStorage.snapshot();
+  globalThis.__vibeRootAsyncSnapshot = <TResult>(fn: () => TResult): TResult =>
+    snapshot(fn);
+}
 
 // HostnamePortServeOptions is the branch of Serve.Options srvx actually uses
 // (a TCP listener), and the one that carries `idleTimeout`. The full
