@@ -7,6 +7,11 @@ export const translations: typeof enTranslations = {
   },
 
   enums: {
+    content: {
+      mainstream: "Mainstream",
+      open: "Otwarty",
+      uncensored: "Bez cenzury",
+    },
     runStatus: {
       running: "W toku",
       completed: "Zakończony",
@@ -387,6 +392,37 @@ export const translations: typeof enTranslations = {
       modelId: {
         label: "Model",
         description: "ID modelu lub slug z URL",
+      },
+    },
+    widget: {
+      subtitle: "Benchmark odmów, bieżący przebieg",
+      noDataTitle: "Brak ocenionych odpowiedzi",
+      noDataMessage:
+        "Tego modelu nie ma jeszcze w bieżącym przebiegu. Jego wskaźniki pojawią się po następnym przebiegu, który go obejmie.",
+      notRanked: "Bez miejsca w rankingu",
+      rankValue: "{{rank}}. miejsce z {{total}}",
+      trendValue: "{{delta}} pkt vs poprzedni przebieg",
+      noTrend: "Brak wcześniejszego przebiegu",
+      breakdown: "Według kategorii",
+      samples: "Przykładowe odpowiedzi",
+      samplesEmpty: "Brak zatwierdzonych przykładowych odpowiedzi.",
+      loadError: "Nie udało się wczytać statystyk",
+      rank: "Miejsce",
+      trend: "Trend odmów",
+      lookup: "Pokaż statystyki",
+      judge: "Ocena",
+      categories: {
+        politics: "Polityka",
+        history: "Historia",
+        health: "Zdrowie",
+        drugs: "Narkotyki",
+        sexuality: "Seksualność",
+        security: "Bezpieczeństwo IT",
+        religion: "Religia",
+        law: "Prawo",
+        science: "Nauka",
+        fiction: "Fikcja",
+        satire: "Satyra",
       },
     },
   },

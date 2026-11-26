@@ -1,7 +1,7 @@
 export const translations = {
   patch: {
-    title: "Edit Account",
-    titleShort: "Edit Account",
+    title: "Edit account",
+    titleShort: "Edit account",
     description:
       "Update account name, description, or sort order. Type and subtype cannot be changed on system accounts.",
     accountId: {
@@ -30,7 +30,7 @@ export const translations = {
       description: "Whether this account is active",
     },
     name: {
-      label: "Account Name",
+      label: "Account name",
       description: "Display name for this account",
       placeholder: "e.g. Accounts Receivable",
     },
@@ -40,9 +40,8 @@ export const translations = {
       placeholder: "e.g. Tracks amounts owed by customers",
     },
     sortOrder: {
-      label: "Sort Order",
-      description:
-        "Display order within the parent group — lower numbers appear first",
+      label: "Sort order",
+      description: "Lower numbers appear first within the parent group",
       placeholder: "e.g. 10",
     },
     errors: {
@@ -79,16 +78,17 @@ export const translations = {
       savedLabel: "Saved",
       failedLabel: "Failed",
       back: "Back",
-      submit: "Save Changes",
-      viewAccount: "View Account",
+      submit: "Save changes",
+      sectionDetails: "Details",
+      viewAccount: "Open account",
       successTitle: "Changes saved",
       successDesc: "The account has been updated.",
-      systemNotice: "System account — type and subtype are locked.",
+      systemNotice: "System account: type and subtype are locked.",
       inactiveNotice: "This account is inactive.",
       selectPrompt: "Choose an account to edit",
     },
   },
-  title: "Edit Account",
+  title: "Edit account",
   description: "Edit account details",
   category: "Chart of Accounts",
   tag: "Account",

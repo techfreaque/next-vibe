@@ -66,7 +66,7 @@ export const translations: typeof enTranslations = {
     isInferenceProvider: {
       label: "Użyj jako dostawca wnioskowania",
       description:
-        "Pozwala tej instancji na uruchamianie strumieni AI — zdalna instancja obsługuje pętlę AI przez odwrotny kanał WS.",
+        "Pozwala tej instancji na uruchamianie strumieni AI. Zdalna instancja obsługuje pętlę AI przez odwrotny kanał WS.",
     },
     syncScope: {
       label: "Zakres synchronizacji",

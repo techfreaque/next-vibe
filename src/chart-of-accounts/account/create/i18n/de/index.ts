@@ -40,13 +40,13 @@ export const translations: typeof enTranslations = {
   },
   post: {
     title: "Konto erstellen",
-    titleShort: "Konto erstellen",
+    titleShort: "Neues Konto",
     description:
       "Benutzerdefiniertes Konto zum Kontenplan des Unternehmens hinzufügen",
     companyId: {
-      label: "Unternehmens-ID",
-      description: "Das Unternehmen, zu dem das Konto hinzugefügt wird",
-      placeholder: "Unternehmens-UUID eingeben",
+      label: "Unternehmen",
+      description: "Der Kontenplan dieses Unternehmens bekommt das Konto",
+      placeholder: "Unternehmen wählen",
     },
     code: {
       label: "Kontonummer",
@@ -71,10 +71,10 @@ export const translations: typeof enTranslations = {
     parentId: {
       label: "Übergeordnetes Konto",
       description: "Optionales übergeordnetes Konto für die Hierarchie",
-      placeholder: "UUID des übergeordneten Kontos (optional)",
+      placeholder: "Keins (oberste Ebene)",
     },
     response: {
-      id: "Konto-ID",
+      id: "Konto",
       code: "Kontonummer",
       name: "Bezeichnung",
     },
@@ -121,9 +121,12 @@ export const translations: typeof enTranslations = {
       description: "Das Konto wurde hinzugefügt",
     },
     widget: {
-      viewButton: "Konto anzeigen",
-      addAnotherButton: "Weiteres hinzufügen",
+      viewButton: "Konto öffnen",
+      addAnotherButton: "Weiteres Konto anlegen",
       back: "Zurück",
+      save: "Konto anlegen",
+      sectionAccount: "Konto",
+      sectionClassification: "Einordnung",
     },
   },
   title: "Konto erstellen",

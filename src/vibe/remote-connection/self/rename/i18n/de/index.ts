@@ -9,9 +9,11 @@ export const translations: typeof enTranslations = {
     title: "Diese Instanz umbenennen",
     titleShort: "Instanz umbenennen",
     description: "Anzeigenamen dieser Instanz aktualisieren",
+    renaming: "Wird umbenannt…",
     newInstanceId: {
-      label: "Neue Instanz-ID",
-      description: "Der neue Bezeichner für diese Instanz",
+      label: "Neuer Instanzname",
+      description:
+        "Unter diesem Namen sehen verbundene Instanzen diesen Server. Eindeutig, höchstens 32 Zeichen.",
       placeholder: "hermes",
     },
     errors: {

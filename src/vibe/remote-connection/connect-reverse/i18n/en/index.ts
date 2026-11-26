@@ -9,7 +9,7 @@ export const translations = {
     description:
       "Called by a local instance during connect flow to register itself on the cloud",
     instanceId: {
-      label: "Instance ID",
+      label: "Instance name",
       description: "The unique identifier of the local instance",
       placeholder: "hermes",
       validation: {

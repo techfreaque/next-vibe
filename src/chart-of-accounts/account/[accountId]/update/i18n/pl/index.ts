@@ -43,8 +43,7 @@ export const translations: typeof enTranslations = {
     },
     sortOrder: {
       label: "Kolejność",
-      description:
-        "Kolejność wyświetlania w grupie nadrzędnej — mniejsze liczby pojawiają się pierwsze",
+      description: "Mniejsze liczby są wyżej w grupie nadrzędnej",
       placeholder: "np. 10",
     },
     errors: {
@@ -88,10 +87,11 @@ export const translations: typeof enTranslations = {
       failedLabel: "Nie powiodło się",
       back: "Wstecz",
       submit: "Zapisz zmiany",
+      sectionDetails: "Szczegóły",
       viewAccount: "Zobacz konto",
       successTitle: "Zmiany zapisane",
       successDesc: "Konto zostało zaktualizowane.",
-      systemNotice: "Konto systemowe — typ i podtyp są zablokowane.",
+      systemNotice: "Konto systemowe: typ i podtyp są zablokowane.",
       inactiveNotice: "To konto jest nieaktywne.",
       selectPrompt: "Wybierz konto do edycji",
     },

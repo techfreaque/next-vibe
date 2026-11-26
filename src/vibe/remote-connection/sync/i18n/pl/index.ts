@@ -12,7 +12,7 @@ export const translations: typeof enTranslations = {
       description:
         "Dwukierunkowa synchronizacja oparta na kursorach między instancjami.",
       instanceId: {
-        label: "ID instancji",
+        label: "Nazwa instancji",
         description: "Identyfikator wywołującej instancji",
       },
       syncCursors: {

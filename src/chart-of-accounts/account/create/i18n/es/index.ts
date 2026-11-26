@@ -44,19 +44,19 @@ export const translations: typeof enTranslations = {
     description:
       "Añadir una cuenta personalizada a la carta de cuentas de la empresa",
     companyId: {
-      label: "Company ID",
-      description: "La empresa para añadir la cuenta a",
-      placeholder: "Entrar en la empresa UUID",
+      label: "Empresa",
+      description: "El plan de cuentas de esta empresa recibe la cuenta",
+      placeholder: "Elige una empresa",
     },
     code: {
-      label: "Código de Cuenta",
+      label: "Código de cuenta",
       description: "Código numérico único para la cuenta",
       placeholder: "por ejemplo 1150",
     },
     name: {
       label: "Nombre de la cuenta",
       description: "Nombre descriptivo para la cuenta",
-      placeholder: "Por ejemplo. Petty Cash",
+      placeholder: "p. ej. Caja chica",
     },
     type: {
       label: "Tipo de cuenta",
@@ -69,12 +69,12 @@ export const translations: typeof enTranslations = {
       placeholder: "Seleccionar subtipo",
     },
     parentId: {
-      label: "Cuenta para Padres",
-      description: "Cuenta de padres opcionales para agrupar jerarquías",
-      placeholder: "Cuenta de parientes UUID (opcional)",
+      label: "Cuenta superior",
+      description: "Agrupa la cuenta bajo otra en los informes",
+      placeholder: "Ninguna (nivel superior)",
     },
     response: {
-      id: "Cuenta ID",
+      id: "Cuenta",
       code: "Código",
       name: "Nombre",
     },
@@ -117,13 +117,16 @@ export const translations: typeof enTranslations = {
       },
     },
     success: {
-      title: "Cuenta Creada",
+      title: "Cuenta creada",
       description: "Se ha añadido la cuenta",
     },
     widget: {
-      viewButton: "Ver Cuenta",
-      addAnotherButton: "Añadir otro",
+      viewButton: "Abrir la cuenta",
+      addAnotherButton: "Añadir otra cuenta",
       back: "Atrás",
+      save: "Crear cuenta",
+      sectionAccount: "Cuenta",
+      sectionClassification: "Clasificación",
     },
   },
   title: "Crear cuenta",

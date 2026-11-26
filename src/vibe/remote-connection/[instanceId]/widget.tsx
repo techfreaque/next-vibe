@@ -48,6 +48,7 @@ import { UserPermissionRole } from "../../identity/roles/enum";
 import {
   useWidgetEndpoint,
   useWidgetEndpointMutations,
+  useWidgetForm,
   useWidgetLocale,
   useWidgetLogger,
   useWidgetNavigation,
@@ -319,9 +320,14 @@ function ViewWidget({
 
   const status = useWidgetValue<typeof definitionsType.GET>();
   const response = useWidgetResponse();
+  const form = useWidgetForm<typeof definitionsType.GET>();
+  // Opened from a list: the navigation params carry it. Opened by URL
+  // (/tools/remote-status?instanceId=x): only the form has it.
   const instanceId =
     (current?.params.urlPathParams as { instanceId?: string } | undefined)
-      ?.instanceId ?? instanceIdProp;
+      ?.instanceId ||
+    form?.watch("instanceId") ||
+    instanceIdProp;
   const isAdmin =
     !user.isPublic && user.roles?.includes(UserPermissionRole.ADMIN) === true;
 
@@ -371,7 +377,20 @@ function ViewWidget({
     return (
       <WidgetShell>
         <WidgetHeader
-          title={t("widget.notConnected.title")}
+          title={
+            status.isActive === false && instanceId
+              ? instanceId
+              : t("widget.notConnected.title")
+          }
+          titleAccessory={
+            status.isActive === false && instanceId ? (
+              <StatusPill
+                status="disconnected"
+                label={t("widget.notConnected.title")}
+                variant="danger"
+              />
+            ) : undefined
+          }
           backButton={
             canGoBack ? (
               <Button
@@ -387,7 +406,7 @@ function ViewWidget({
             ) : undefined
           }
         />
-        <SectionGroup title={t("widget.notConnected.title")}>
+        <Div className="flex flex-col rounded-lg border bg-card p-4">
           <P className="text-sm text-muted-foreground mb-3">
             {t("widget.notConnected.description")}
           </P>
@@ -400,7 +419,7 @@ function ViewWidget({
             <P>✓ {t("widget.notConnected.benefit3")}</P>
           </Div>
           {status.isActive === false && (
-            <DetailGrid columns={2}>
+            <DetailGrid columns={2} className="mb-4">
               {status.remoteUrl && (
                 <DetailField
                   label={t("widget.connected.connectedTo")}
@@ -430,7 +449,7 @@ function ViewWidget({
                 platform={platform}
               />
             )}
-        </SectionGroup>
+        </Div>
       </WidgetShell>
     );
   }

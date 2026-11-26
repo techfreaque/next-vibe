@@ -19,6 +19,14 @@ export const translations: typeof enTranslations = {
     },
   },
   fleet: {
+    reasonPart: {
+      register: "registro",
+      bridge: "puente",
+      sync: "sincronización",
+      notPaid: "sin plan de pago",
+      noConnection: "sin conexión",
+      connectionLimit: "límite de conexiones",
+    },
     title: "Estado de las conexiones",
     subtitle:
       "Todas las conexiones de este servidor. El estado refleja la última actividad registrada.",
@@ -192,7 +200,7 @@ export const translations: typeof enTranslations = {
         description: "Número de eventos que se omiten.",
       },
       auditConnection: {
-        label: "ID de conexión para el registro",
+        label: "Conexión",
         description: "Limita el registro a una conexión.",
       },
       fleetStatus: {
@@ -269,7 +277,7 @@ export const translations: typeof enTranslations = {
       reverseWs: "WS",
       directHttp: "HTTP",
     },
-    instanceId: "Instance ID",
+    instanceId: "Nombre de la instancia",
     remoteUrl: "Remoto URL",
     viewButton: "Vista",
     editButton: "Editar",
@@ -346,9 +354,9 @@ export const translations: typeof enTranslations = {
     },
     // Self-identity
     selfIdentity: {
-      title: "Su instalación ID",
+      title: "Nombre de tu instancia",
       description:
-        "Otras instancias ven este servidor como este ID. Debe ser único en todas las instancias conectadas.",
+        "Las demás instancias ven este servidor con este nombre. Debe ser único entre todas las instancias conectadas.",
     },
     // Sync settings (admin only)
     syncSettings: {

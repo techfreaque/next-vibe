@@ -2,8 +2,8 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   patch: {
-    title: "Modifica account",
-    titleShort: "Modifica account",
+    title: "Modifica conto",
+    titleShort: "Modifica conto",
     description:
       "Aggiorna il nome dell'account, la descrizione o l'ordine ordinario. Il tipo e il sottotipo non possono essere modificati sui conti di sistema.",
     accountId: {
@@ -42,7 +42,7 @@ export const translations: typeof enTranslations = {
       placeholder: "ad es. Tracce importi dovuti da parte dei clienti",
     },
     sortOrder: {
-      label: "Ordinare",
+      label: "Ordine",
       description:
         "Ordine di visualizzazione all'interno del gruppo genitore. i numeri più bassi appaiono prima",
       placeholder: "ad esempio 10",
@@ -88,16 +88,17 @@ export const translations: typeof enTranslations = {
       savedLabel: "Salvataggio",
       failedLabel: "Sfigato",
       back: "Indietro",
-      submit: "Salvare le modifiche",
+      submit: "Salva le modifiche",
+      sectionDetails: "Dettagli",
       viewAccount: "Visualizza Account",
       successTitle: "Modifiche salvate",
       successDesc: "L'account è stato aggiornato.",
-      systemNotice: "Conto di sistema. tipo e sottotipo sono bloccati.",
+      systemNotice: "Conto di sistema: tipo e sottotipo sono bloccati.",
       inactiveNotice: "Questo account è inattivo.",
       selectPrompt: "Scegli un account per modificare",
     },
   },
-  title: "Modifica account",
+  title: "Modifica conto",
   description: "Modifica dei dettagli dell'account",
   category: "Grafico dei conti",
   tag: "Account",

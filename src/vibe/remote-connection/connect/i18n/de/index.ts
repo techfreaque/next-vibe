@@ -68,7 +68,7 @@ export const translations: typeof enTranslations = {
     isInferenceProvider: {
       label: "Als Inference-Provider nutzen",
       description:
-        "Lässt diese Verbindung KI-Streams ausführen — die Remote-Instanz übernimmt den KI-Loop über den Rück-WS-Kanal.",
+        "Lässt diese Verbindung KI-Streams ausführen. Die Remote-Instanz übernimmt den KI-Loop über den Rück-WS-Kanal.",
     },
     syncScope: {
       label: "Sync-Umfang",

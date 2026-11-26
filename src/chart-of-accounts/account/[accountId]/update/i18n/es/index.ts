@@ -42,7 +42,7 @@ export const translations: typeof enTranslations = {
       placeholder: "Por ejemplo. Pistas de cantidades adeudadas por clientes",
     },
     sortOrder: {
-      label: "Ordenar orden",
+      label: "Orden",
       description:
         "Orden de visualización dentro del grupo padre. los números inferiores aparecen primero",
       placeholder: "por ejemplo 10",
@@ -88,6 +88,7 @@ export const translations: typeof enTranslations = {
       failedLabel: "Failed",
       back: "Atrás",
       submit: "Guardar cambios",
+      sectionDetails: "Detalles",
       viewAccount: "Ver Cuenta",
       successTitle: "Cambios salvados",
       successDesc: "La cuenta ha sido actualizada.",

@@ -42,7 +42,7 @@ export const translations: typeof enTranslations = {
       placeholder: "napr. Zisťuje sumy dlžné zákazníkmi",
     },
     sortOrder: {
-      label: "Poradie zoradenia",
+      label: "Poradie",
       description:
         "Poradie zobrazenia v nadradenej skupine. Nižšie čísla sa zobrazia ako prvé.",
       placeholder: "napr. 10",
@@ -85,10 +85,11 @@ export const translations: typeof enTranslations = {
       failedLabel: "Zlyhalo",
       back: "Späť",
       submit: "Uložiť zmeny",
+      sectionDetails: "Podrobnosti",
       viewAccount: "Zobraziť účet",
       successTitle: "Zmeny uložené",
       successDesc: "Účet bol aktualizovaný.",
-      systemNotice: "Systémový účet Typ a podtyp sú zamknuté.",
+      systemNotice: "Systémový účet: typ a podtyp sú uzamknuté.",
       inactiveNotice: "Tento účet je neaktívny.",
       selectPrompt: "Vyberte účet, ktorý chcete upraviť",
     },

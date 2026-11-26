@@ -49,14 +49,14 @@ const CONTENT_COLORS: Record<string, (s: string) => string> = {
   uncensored: chalk.red,
 };
 
-function intelligenceLabel(v: string): string {
+function intelligenceLabel(v: string, width = 0): string {
   const fn = INTELLIGENCE_COLORS[v] ?? chalk.white;
-  return fn(v);
+  return fn(v.padEnd(width));
 }
 
-function contentLabel(v: string): string {
+function contentLabel(v: string, width = 0): string {
   const fn = CONTENT_COLORS[v] ?? chalk.white;
-  return fn(v);
+  return fn(v.padEnd(width));
 }
 
 function priceLabel(price: number): string {
@@ -173,8 +173,9 @@ function renderListCli(data: ModelListGetResponseOutput): string {
     for (const m of typeModels) {
       const name = chalk.green(m.name.padEnd(maxNameLen + 1));
       const provider = chalk.dim(m.provider.padEnd(maxProviderLen + 1));
-      const intel = intelligenceLabel(m.intelligence.slice(0, 4));
-      const content = contentLabel(m.content.slice(0, 4));
+      // Full words, padded: "smar"/"main" read like typos.
+      const intel = intelligenceLabel(m.intelligence, 9);
+      const content = contentLabel(m.content, 10);
       const price = priceLabel(m.price);
       const ctx = m.contextWindow
         ? chalk.dim(formatContext(m.contextWindow).padEnd(8))

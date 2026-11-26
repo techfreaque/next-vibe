@@ -13,6 +13,8 @@ import {
   WidgetType,
 } from "next-vibe/core/definition/enums";
 import { UserRole } from "next-vibe/identity/roles/enum";
+import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
+import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
 import {
   objectField,
   requestUrlPathParamsField,
@@ -29,6 +31,10 @@ import {
   rateFields,
   runMetaFields,
 } from "../../public-fields";
+
+const ModelStatsWidget = lazyWidget(() =>
+  import("./widget").then((m) => ({ default: m.ModelStatsWidget })),
+);
 
 const { GET } = createEndpoint({
   scopedTranslation,
@@ -50,9 +56,8 @@ const { GET } = createEndpoint({
   subCategory: "Inference",
   tags: ["tags.refusalIndex" as const],
 
-  fields: objectField(scopedTranslation, {
-    type: WidgetType.CONTAINER,
-    layoutType: LayoutType.STACKED,
+  fields: customWidgetObject({
+    render: ModelStatsWidget,
     usage: { request: "urlPathParams", response: true } as const,
     children: {
       modelId: requestUrlPathParamsField(scopedTranslation, {

@@ -27,7 +27,7 @@ export const translations = {
     notConnected: {
       title: "Not connected",
       description:
-        "Connect to a cloud account (e.g. unbottled.ai) to sync memories and call AI tools from your terminal — from anywhere.",
+        "Connect to a cloud account (e.g. unbottled.ai) to sync memories and call AI tools from your terminal, wherever you are.",
       benefit1:
         "Memories sync automatically between this device and your cloud account",
       benefit2: "Run AI tools from the command line with",
@@ -89,7 +89,7 @@ export const translations = {
     titleShort: "Connection",
     description: "Full status and settings for a specific remote connection",
     instanceId: {
-      label: "Instance ID",
+      label: "Connection",
       description: "The connection instance to view",
     },
     errors: {
@@ -174,7 +174,7 @@ export const translations = {
     isInferenceProvider: {
       label: "Inference Provider",
       description:
-        "Allow this connection to serve AI inference — remote instance runs the LLM loop over reverse-WS.",
+        "Allow this connection to serve AI inference. The remote instance runs the LLM loop over reverse-WS.",
     },
     forceSystemProvider: {
       label: "Force System Provider",

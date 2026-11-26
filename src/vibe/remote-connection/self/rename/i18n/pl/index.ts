@@ -9,9 +9,11 @@ export const translations: typeof enTranslations = {
     title: "Zmień nazwę tej instancji",
     titleShort: "Zmień nazwę",
     description: "Zaktualizuj nazwę wyświetlaną tej instancji",
+    renaming: "Zmieniam nazwę…",
     newInstanceId: {
-      label: "Nowe ID instancji",
-      description: "Nowy identyfikator tej instancji",
+      label: "Nowa nazwa instancji",
+      description:
+        "Pod tą nazwą połączone instancje widzą ten serwer. Musi być unikalna, maks. 32 znaki.",
       placeholder: "hermes",
     },
     errors: {

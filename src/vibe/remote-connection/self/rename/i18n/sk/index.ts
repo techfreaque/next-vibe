@@ -9,9 +9,11 @@ export const translations: typeof enTranslations = {
     title: "Premenovať túto inštanciu",
     titleShort: "Premenovať inštanciu",
     description: "Zmeniť zobrazovaný názov vlastnej inštancie",
+    renaming: "Premenúva sa…",
     newInstanceId: {
-      label: "Nové ID inštancie",
-      description: "Nový identifikátor tejto inštancie",
+      label: "Nový názov inštancie",
+      description:
+        "Pod týmto názvom vidia pripojené inštancie tento server. Musí byť jedinečný, najviac 32 znakov.",
       placeholder: "hermes",
     },
     errors: {

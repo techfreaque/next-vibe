@@ -93,7 +93,7 @@ export const translations: typeof enTranslations = {
     description:
       "Estado completo y configuración para una conexión remota específica",
     instanceId: {
-      label: "Instance ID",
+      label: "Conexión",
       description: "La instancia de conexión a la vista",
     },
     errors: {

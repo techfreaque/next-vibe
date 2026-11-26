@@ -7,6 +7,11 @@ export const translations: typeof enTranslations = {
   },
 
   enums: {
+    content: {
+      mainstream: "Mainstream",
+      open: "Offen",
+      uncensored: "Unzensiert",
+    },
     runStatus: {
       running: "Läuft",
       completed: "Abgeschlossen",
@@ -385,6 +390,37 @@ export const translations: typeof enTranslations = {
       modelId: {
         label: "Modell",
         description: "Modell-ID oder URL-Slug",
+      },
+    },
+    widget: {
+      subtitle: "Verweigerungs-Benchmark, aktueller Lauf",
+      noDataTitle: "Noch keine bewerteten Antworten",
+      noDataMessage:
+        "Dieses Modell ist noch nicht im aktuellen Lauf. Seine Quoten erscheinen nach dem nächsten Lauf, der es enthält.",
+      notRanked: "Ohne Rang",
+      rankValue: "Platz {{rank}} von {{total}}",
+      trendValue: "{{delta}} Pkt. ggü. letztem Lauf",
+      noTrend: "Kein früherer Lauf",
+      breakdown: "Nach Kategorie",
+      samples: "Beispielantworten",
+      samplesEmpty: "Noch keine freigegebenen Beispielantworten.",
+      loadError: "Statistik konnte nicht geladen werden",
+      rank: "Rang",
+      trend: "Verweigerungstrend",
+      lookup: "Statistik anzeigen",
+      judge: "Bewertung",
+      categories: {
+        politics: "Politik",
+        history: "Geschichte",
+        health: "Gesundheit",
+        drugs: "Drogen",
+        sexuality: "Sexualität",
+        security: "IT-Sicherheit",
+        religion: "Religion",
+        law: "Recht",
+        science: "Wissenschaft",
+        fiction: "Fiktion",
+        satire: "Satire",
       },
     },
   },

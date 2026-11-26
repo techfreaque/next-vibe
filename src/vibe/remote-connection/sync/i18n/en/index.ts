@@ -10,7 +10,7 @@ export const translations = {
       description:
         "Cursor-based bidirectional sync between instances. Sends local cursors, receives only newer records.",
       instanceId: {
-        label: "Instance ID",
+        label: "Instance name",
         description: "The calling instance's identifier",
       },
       syncCursors: {

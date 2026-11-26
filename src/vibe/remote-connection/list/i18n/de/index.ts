@@ -19,6 +19,14 @@ export const translations: typeof enTranslations = {
     },
   },
   fleet: {
+    reasonPart: {
+      register: "Registrierung",
+      bridge: "Bridge",
+      sync: "Sync",
+      notPaid: "kein bezahlter Tarif",
+      noConnection: "keine Verbindung",
+      connectionLimit: "Verbindungslimit",
+    },
     title: "Verbindungszustand",
     subtitle:
       "Alle Verbindungen dieses Servers. Der Status basiert auf der zuletzt erfassten Aktivität.",
@@ -194,7 +202,7 @@ export const translations: typeof enTranslations = {
         description: "Anzahl der zu überspringenden Ereignisse.",
       },
       auditConnection: {
-        label: "Verbindungs-ID für das Protokoll",
+        label: "Verbindung",
         description: "Protokoll auf eine Verbindung eingrenzen.",
       },
       fleetStatus: {
@@ -295,7 +303,7 @@ export const translations: typeof enTranslations = {
       retry: "Wiederholen",
       resync: "Neu synchronisieren",
     },
-    instanceId: "Instanz-ID",
+    instanceId: "Instanzname",
     remoteUrl: "Remote-URL",
     viewButton: "Ansehen",
     editButton: "Bearbeiten",
@@ -345,9 +353,9 @@ export const translations: typeof enTranslations = {
       connectionsTitle: "Verknüpfte Verbindungen",
     },
     selfIdentity: {
-      title: "Deine Instanz-ID",
+      title: "Dein Instanzname",
       description:
-        "Andere Instanzen sehen diesen Server unter dieser ID. Muss über alle verbundenen Instanzen eindeutig sein.",
+        "Unter diesem Namen sehen andere Instanzen diesen Server. Er muss unter allen verbundenen Instanzen eindeutig sein.",
     },
     syncSettings: {
       title: "Auto-Sync",

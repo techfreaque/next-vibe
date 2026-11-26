@@ -12,7 +12,7 @@ export const translations: typeof enTranslations = {
       description:
         "Synchronisation bidirectionnelle par curseurs entre instances. Envoie les curseurs locaux, ne reçoit que les enregistrements plus récents.",
       instanceId: {
-        label: "ID d'instance",
+        label: "Nom de l'instance",
         description: "L'identifiant de l'instance appelante",
       },
       syncCursors: {

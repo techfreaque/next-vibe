@@ -39,14 +39,14 @@ export const translations: typeof enTranslations = {
     },
   },
   post: {
-    title: "Crea account",
-    titleShort: "Nuovo account",
+    title: "Crea conto",
+    titleShort: "Nuovo conto",
     description:
       "Aggiungi un account personalizzato al grafico degli account dell'azienda",
     companyId: {
-      label: "Società ID",
-      description: "La società per aggiungere il conto a",
-      placeholder: "Entra in azienda UUID",
+      label: "Società",
+      description: "Il piano dei conti di questa società riceve il conto",
+      placeholder: "Scegli una società",
     },
     code: {
       label: "Codice contabile",
@@ -56,7 +56,7 @@ export const translations: typeof enTranslations = {
     name: {
       label: "Nome del conto",
       description: "Nome descrittivo dell'account",
-      placeholder: "ad es. Petty Cash",
+      placeholder: "ad es. Piccola cassa",
     },
     type: {
       label: "Tipo di conto",
@@ -64,17 +64,17 @@ export const translations: typeof enTranslations = {
       placeholder: "Selezionare il tipo",
     },
     subtype: {
-      label: "Sottotitoli",
+      label: "Sottotipo di conto",
       description: "Classificazione dettagliata all'interno del tipo",
       placeholder: "Selezionare il sottotipo",
     },
     parentId: {
-      label: "Account principale",
-      description: "Conto madre opzionale per il raggruppamento gerarchico",
-      placeholder: "Account principale UUID (opzionale)",
+      label: "Conto padre",
+      description: "Raggruppa il conto sotto un altro nei report",
+      placeholder: "Nessuno (livello superiore)",
     },
     response: {
-      id: "Account ID",
+      id: "Conto",
       code: "Codice",
       name: "Nome",
     },
@@ -114,16 +114,19 @@ export const translations: typeof enTranslations = {
       },
     },
     success: {
-      title: "Account Creato",
+      title: "Conto creato",
       description: "Il conto è stato aggiunto",
     },
     widget: {
-      viewButton: "Visualizza Account",
-      addAnotherButton: "Aggiungi un altro",
+      viewButton: "Apri il conto",
+      addAnotherButton: "Aggiungi un altro conto",
       back: "Indietro",
+      save: "Crea conto",
+      sectionAccount: "Conto",
+      sectionClassification: "Classificazione",
     },
   },
-  title: "Crea account",
+  title: "Crea conto",
   description: "Aggiungi un account personalizzato",
   category: "Grafico dei conti",
   tag: "Account",

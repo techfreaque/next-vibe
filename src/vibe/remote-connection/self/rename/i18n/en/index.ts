@@ -4,12 +4,14 @@ export const translations = {
     remoteConnection: "Remote Connection",
   },
   patch: {
-    title: "Rename This Instance",
-    titleShort: "Rename Instance",
+    title: "Rename this instance",
+    titleShort: "Rename instance",
     description: "Update the friendly name of your own instance",
+    renaming: "Renaming…",
     newInstanceId: {
-      label: "New Instance ID",
-      description: "The new identifier for this instance",
+      label: "New instance name",
+      description:
+        "Connected instances see this server under this name. Must be unique, up to 32 characters.",
       placeholder: "hermes",
     },
     errors: {

@@ -146,6 +146,14 @@ export const translations: typeof enTranslations = {
     },
 
     browser: {
+      subtitle:
+        "Tutti i modelli della piattaforma con prezzo, finestra di contesto e livello di contenuto.",
+      emptyTitle: "Nessun modello corrisponde a questi filtri",
+      emptyHint:
+        "Scegli un altro tipo o livello di contenuto, oppure svuota la ricerca.",
+      clearFilters: "Azzera filtri",
+      toolCalls: "Chiamate a strumenti",
+      context: "{{size}} di contesto",
       supportsTools: "✓ strumenti",
       noModels: "Nessun modello corrisponde ai tuoi filtri.",
       allLabel: "Tutti",

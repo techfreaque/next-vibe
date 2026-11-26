@@ -88,6 +88,7 @@ export const translations: typeof enTranslations = {
       failedLabel: "Échec",
       back: "Retour",
       submit: "Enregistrer les modifications",
+      sectionDetails: "Détails",
       viewAccount: "Voir le compte",
       successTitle: "Modifications enregistrées",
       successDesc: "Le compte a été mis à jour.",

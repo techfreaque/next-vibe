@@ -11,7 +11,7 @@ export const translations: typeof enTranslations = {
     description:
       "Wywoływane przez lokalną instancję podczas łączenia, aby zarejestrować się w chmurze",
     instanceId: {
-      label: "ID instancji",
+      label: "Nazwa instancji",
       description: "Unikalny identyfikator lokalnej instancji",
       placeholder: "hermes",
       validation: {

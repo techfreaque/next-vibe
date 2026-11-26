@@ -44,9 +44,9 @@ export const translations: typeof enTranslations = {
     description:
       "Ajoutez un compte personnalisé au plan comptable de l'entreprise",
     companyId: {
-      label: "ID de l'entreprise",
-      description: "L'entreprise à laquelle ajouter le compte",
-      placeholder: "Saisissez l'UUID de l'entreprise",
+      label: "Entreprise",
+      description: "Le plan comptable de cette entreprise reçoit le compte",
+      placeholder: "Choisir une entreprise",
     },
     code: {
       label: "Numéro de compte",
@@ -71,10 +71,10 @@ export const translations: typeof enTranslations = {
     parentId: {
       label: "Compte parent",
       description: "Compte parent facultatif pour regrouper la hiérarchie",
-      placeholder: "UUID du compte parent (facultatif)",
+      placeholder: "Aucun (niveau supérieur)",
     },
     response: {
-      id: "ID du compte",
+      id: "Compte",
       code: "Numéro",
       name: "Intitulé",
     },
@@ -121,9 +121,12 @@ export const translations: typeof enTranslations = {
       description: "Le compte a été ajouté",
     },
     widget: {
-      viewButton: "Voir le compte",
-      addAnotherButton: "En ajouter un autre",
+      viewButton: "Ouvrir le compte",
+      addAnotherButton: "Ajouter un autre compte",
       back: "Retour",
+      save: "Créer le compte",
+      sectionAccount: "Compte",
+      sectionClassification: "Classement",
     },
   },
   title: "Créer un compte",

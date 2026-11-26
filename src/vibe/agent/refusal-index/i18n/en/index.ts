@@ -5,6 +5,11 @@ export const translations = {
   },
 
   enums: {
+    content: {
+      mainstream: "Mainstream",
+      open: "Open",
+      uncensored: "Uncensored",
+    },
     runStatus: {
       running: "Running",
       completed: "Completed",
@@ -365,6 +370,37 @@ export const translations = {
       modelId: {
         label: "Model",
         description: "Model id or URL slug",
+      },
+    },
+    widget: {
+      subtitle: "Refusal benchmark, current run",
+      noDataTitle: "No judged answers yet",
+      noDataMessage:
+        "This model is not in the current run yet. Its rates appear after the next run includes it.",
+      notRanked: "Not ranked",
+      rankValue: "#{{rank}} of {{total}}",
+      trendValue: "{{delta}} pts vs last run",
+      noTrend: "No earlier run",
+      breakdown: "By category",
+      samples: "Sample answers",
+      samplesEmpty: "No approved sample answers yet.",
+      loadError: "Stats could not be loaded",
+      rank: "Rank",
+      trend: "Refusal trend",
+      lookup: "Show stats",
+      judge: "Judge",
+      categories: {
+        politics: "Politics",
+        history: "History",
+        health: "Health",
+        drugs: "Drugs",
+        sexuality: "Sexuality",
+        security: "IT security",
+        religion: "Religion",
+        law: "Law",
+        science: "Science",
+        fiction: "Fiction",
+        satire: "Satire",
       },
     },
   },

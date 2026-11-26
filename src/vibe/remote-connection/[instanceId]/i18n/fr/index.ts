@@ -93,7 +93,7 @@ export const translations: typeof enTranslations = {
     titleShort: "Connexion",
     description: "État complet et paramètres d'une connexion distante",
     instanceId: {
-      label: "ID d'instance",
+      label: "Connexion",
       description: "L'instance de connexion à afficher",
     },
     errors: {

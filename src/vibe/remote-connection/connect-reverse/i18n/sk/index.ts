@@ -11,7 +11,7 @@ export const translations: typeof enTranslations = {
     description:
       "Pri pripájaní zavolá miestna inštancia tento koncový bod, aby sa zaregistrovala na cloudovej inštancii.",
     instanceId: {
-      label: "ID inštancie",
+      label: "Názov inštancie",
       description: "Jedinečný identifikátor miestnej inštancie",
       placeholder: "hermes",
       validation: {

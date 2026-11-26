@@ -9,9 +9,11 @@ export const translations: typeof enTranslations = {
     title: "Rinominare il presente Tribunale",
     titleShort: "Rinominare il nome",
     description: "Aggiornare il nome amichevole della propria istanza",
+    renaming: "Rinomina in corso…",
     newInstanceId: {
-      label: "Nuovo sistema ID",
-      description: "Il nuovo identificatore per questa istanza",
+      label: "Nuovo nome dell'istanza",
+      description:
+        "Le istanze collegate vedono questo server con questo nome. Deve essere unico, massimo 32 caratteri.",
       placeholder: "hermes",
     },
     errors: {

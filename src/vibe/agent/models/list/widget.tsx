@@ -3,29 +3,42 @@
 import { Badge } from "next-vibe/ui/components/badge";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
+import { EmptyBlock } from "next-vibe/ui/components/empty-block";
+import { Image as ImageIcon } from "next-vibe/ui/components/icons/Image";
+import { MessageSquare } from "next-vibe/ui/components/icons/MessageSquare";
+import { Music } from "next-vibe/ui/components/icons/Music";
 import { Search } from "next-vibe/ui/components/icons/Search";
+import { Video } from "next-vibe/ui/components/icons/Video";
+import { Wrench } from "next-vibe/ui/components/icons/Wrench";
 import { Input } from "next-vibe/ui/components/input";
+import { Skeleton } from "next-vibe/ui/components/skeleton";
 import { Span } from "next-vibe/ui/components/span";
+import {
+  StatusPill,
+  type StatusPillVariant,
+} from "next-vibe/ui/components/status-pill";
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
 } from "next-vibe/ui/components/tabs";
-import { P } from "next-vibe/ui/components/typography";
+import { WidgetHeader } from "next-vibe/ui/components/widget-header";
+import { WidgetShell } from "next-vibe/ui/components/widget-shell";
 import { usePickerCallback } from "next-vibe/unified-ui/_shared/picker-context";
 import {
+  useWidgetForm,
   useWidgetLocale,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { SelectFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/select-field/widget";
 import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-field/widget";
 import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
-import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 import type { JSX } from "react";
 import { useMemo, useState } from "react";
 
 import { CONTENT_DISPLAY } from "../../skills/enum";
+import { ModelUtility } from "../enum";
 import { scopedTranslation as modelsScopedTranslation } from "../i18n";
 import type { AnyModelId } from "../models";
 import { ModelCreditDisplay } from "../widget/model-credit-display";
@@ -33,32 +46,67 @@ import type definition from "./definition";
 import type { ModelListItem } from "./definition";
 import { scopedTranslation } from "./i18n";
 
-// ── Tier colors ───────────────────────────────────────────────────────────────
+// ── Labels and colors ─────────────────────────────────────────────────────────
 
-const INTELLIGENCE_VARIANT: Record<
-  string,
-  "default" | "secondary" | "outline"
-> = {
-  quick: "outline",
-  smart: "secondary",
-  brilliant: "default",
-};
-
-const CONTENT_VARIANT: Record<string, "default" | "secondary" | "destructive"> =
-  {
-    mainstream: "secondary",
-    open: "default",
-    uncensored: "destructive",
-  };
-
-const TYPE_ICONS: Record<string, string> = {
-  text: "💬",
-  image: "🖼",
-  video: "🎬",
-  audio: "🎵",
-};
+type ListT = ReturnType<typeof scopedTranslation.scopedT>["t"];
+type ModelsT = ReturnType<typeof modelsScopedTranslation.scopedT>["t"];
 
 const TYPE_ORDER = ["text", "image", "video", "audio"] as const;
+type ModelTypeKey = (typeof TYPE_ORDER)[number];
+
+const TYPE_ICONS: Record<ModelTypeKey, typeof MessageSquare> = {
+  text: MessageSquare,
+  image: ImageIcon,
+  video: Video,
+  audio: Music,
+};
+
+const TYPE_LABELS = {
+  text: "enums.modelType.text",
+  image: "enums.modelType.image",
+  video: "enums.modelType.video",
+  audio: "enums.modelType.audio",
+} as const;
+
+const INTELLIGENCE_LABELS: Partial<
+  Record<
+    string,
+    | "enums.intelligence.quick"
+    | "enums.intelligence.smart"
+    | "enums.intelligence.brilliant"
+  >
+> = {
+  quick: "enums.intelligence.quick",
+  smart: "enums.intelligence.smart",
+  brilliant: "enums.intelligence.brilliant",
+};
+
+const CONTENT_LABELS: Partial<
+  Record<
+    string,
+    | "enums.content.mainstream"
+    | "enums.content.open"
+    | "enums.content.uncensored"
+  >
+> = {
+  mainstream: "enums.content.mainstream",
+  open: "enums.content.open",
+  uncensored: "enums.content.uncensored",
+};
+
+/** Content level is a property, not a problem: no red. */
+const CONTENT_VARIANT: Partial<Record<string, StatusPillVariant>> = {
+  mainstream: "muted",
+  open: "info",
+  uncensored: "warning",
+};
+
+const UTILITY_KEYS = Object.values(ModelUtility);
+
+function utilityLabel(utility: string, tModels: ModelsT): string {
+  const key = UTILITY_KEYS.find((k) => k.endsWith(`.${utility}`));
+  return key ? tModels(key) : utility;
+}
 
 function formatContext(ctx: number | null): string | null {
   if (!ctx) {
@@ -73,61 +121,96 @@ function formatContext(ctx: number | null): string | null {
   return String(ctx);
 }
 
+const MAX_TAGS = 3;
+
 // ── Model Card ────────────────────────────────────────────────────────────────
 
 function ModelCard({
   model,
   locale,
   t,
-  nameClassName,
+  tModels,
   onClick,
 }: {
   model: ModelListItem;
   locale: Parameters<typeof ModelCreditDisplay>[0]["locale"];
-  t: ReturnType<typeof scopedTranslation.scopedT>["t"];
-  nameClassName?: string;
+  t: ListT;
+  tModels: ModelsT;
   onClick?: () => void;
 }): JSX.Element {
-  const typeIcon = TYPE_ICONS[model.type] ?? "•";
+  const intelligenceKey = INTELLIGENCE_LABELS[model.intelligence];
+  const contentKey = CONTENT_LABELS[model.content];
+  const context = formatContext(model.contextWindow);
+  // The content level already shows as a pill; don't repeat it as a tag.
+  const tags = model.utilities.filter(
+    (u) => u !== model.content && u !== model.intelligence,
+  );
 
   return (
     <Div
-      className={`group flex flex-col gap-2 rounded-xl border bg-card p-3 transition-colors hover:bg-accent/40${onClick ? " cursor-pointer" : ""}`}
+      className={`flex min-w-0 flex-col gap-2.5 rounded-lg border bg-card p-4 transition-colors${onClick ? " cursor-pointer hover:bg-muted/40" : ""}`}
       onClick={onClick}
     >
-      {/* Header row */}
-      <Div className="flex items-start gap-2">
-        <Span className="text-base leading-none mt-0.5" aria-hidden="true">
-          {typeIcon}
-        </Span>
-        <Div className="flex-1 min-w-0">
-          <Div className="flex items-center gap-1.5 flex-wrap">
-            <Span
-              className={`font-semibold text-sm truncate${nameClassName ? ` ${nameClassName}` : ""}`}
-            >
-              {model.name}
-            </Span>
-            <Span className="text-xs text-muted-foreground">
-              {model.provider}
-            </Span>
-          </Div>
-          {/* Tier badges */}
-          <Div className="flex flex-wrap gap-1 mt-1">
-            <Badge
-              variant={INTELLIGENCE_VARIANT[model.intelligence] ?? "outline"}
-              className="text-[10px] h-4 px-1"
-            >
-              {model.intelligence}
-            </Badge>
-            <Badge
-              variant={CONTENT_VARIANT[model.content] ?? "secondary"}
-              className="text-[10px] h-4 px-1"
-            >
-              {model.content}
-            </Badge>
-          </Div>
+      <Div className="min-w-0">
+        <Div className="truncate text-sm font-semibold" title={model.name}>
+          {model.name}
         </Div>
-        {/* Price */}
+        <Div className="truncate text-[13px] text-muted-foreground">
+          {`${model.provider} · ${intelligenceKey ? t(intelligenceKey) : model.intelligence}`}
+        </Div>
+      </Div>
+
+      <Div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
+        <StatusPill
+          status={model.content}
+          label={contentKey ? t(contentKey) : model.content}
+          variant={CONTENT_VARIANT[model.content] ?? "muted"}
+        />
+        {context && (
+          <Span className="text-xs text-muted-foreground">
+            {t("get.browser.context", { size: context })}
+          </Span>
+        )}
+        {model.supportsTools && (
+          <Span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
+            <Wrench className="h-3 w-3" />
+            {t("get.browser.toolCalls")}
+          </Span>
+        )}
+      </Div>
+
+      {tags.length > 0 && (
+        <Div className="flex flex-wrap gap-1">
+          {tags.slice(0, MAX_TAGS).map((u) => (
+            <Badge
+              key={u}
+              variant="outline"
+              className="h-5 px-1.5 text-[11px] font-normal text-muted-foreground"
+            >
+              {utilityLabel(u, tModels)}
+            </Badge>
+          ))}
+          {tags.length > MAX_TAGS && (
+            <Span
+              className="self-center text-[11px] text-muted-foreground"
+              title={tags
+                .slice(MAX_TAGS)
+                .map((u) => utilityLabel(u, tModels))
+                .join(", ")}
+            >
+              +{String(tags.length - MAX_TAGS)}
+            </Span>
+          )}
+        </Div>
+      )}
+
+      <Div className="mt-auto flex min-w-0 items-center justify-between gap-3 pt-1">
+        <Span
+          className="min-w-0 truncate font-mono text-[11px] text-muted-foreground/70"
+          title={model.id}
+        >
+          {model.id}
+        </Span>
         <Div className="shrink-0">
           <ModelCreditDisplay
             modelId={model.id as AnyModelId}
@@ -137,41 +220,6 @@ function ModelCard({
           />
         </Div>
       </Div>
-
-      {/* Meta row */}
-      <Div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
-        {model.contextWindow ? (
-          <Span>
-            {formatContext(model.contextWindow)} {t("get.browser.ctx")}
-          </Span>
-        ) : null}
-        {model.supportsTools && (
-          <Span className="text-success">{t("get.browser.supportsTools")}</Span>
-        )}
-        <Span className="font-mono text-[10px] opacity-60 truncate">
-          {model.id}
-        </Span>
-      </Div>
-
-      {/* Capability tags (top 5) */}
-      {model.utilities.length > 0 && (
-        <Div className="flex flex-wrap gap-1">
-          {model.utilities.slice(0, 5).map((u) => (
-            <Badge
-              key={u}
-              variant="outline"
-              className="text-[10px] h-4 px-1 font-normal"
-            >
-              {u}
-            </Badge>
-          ))}
-          {model.utilities.length > 5 && (
-            <Span className="text-[10px] text-muted-foreground self-center">
-              +{String(model.utilities.length - 5)}
-            </Span>
-          )}
-        </Div>
-      )}
     </Div>
   );
 }
@@ -181,31 +229,64 @@ function ModelCard({
 function ModelGrid({
   models,
   t,
+  tModels,
   locale,
   onPick,
+  onClear,
 }: {
   models: ModelListItem[];
-  t: ReturnType<typeof scopedTranslation.scopedT>["t"];
+  t: ListT;
+  tModels: ModelsT;
   locale: Parameters<typeof ModelCreditDisplay>[0]["locale"];
   onPick?: (model: ModelListItem) => void;
+  onClear?: () => void;
 }): JSX.Element {
   if (models.length === 0) {
     return (
-      <P className="text-sm text-muted-foreground text-center py-8">
-        {t("get.browser.noModels")}
-      </P>
+      <EmptyBlock
+        icon={<Search className="h-6 w-6" />}
+        title={t("get.browser.emptyTitle")}
+        message={t("get.browser.emptyHint")}
+        action={
+          onClear
+            ? {
+                label: t("get.browser.clearFilters"),
+                onClick: onClear,
+                variant: "outline",
+              }
+            : undefined
+        }
+      />
     );
   }
   return (
-    <Div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+    <Div className="grid grid-cols-1 gap-3 @2xl:grid-cols-2 @5xl:grid-cols-3">
       {models.map((model) => (
         <ModelCard
           key={model.id}
           model={model}
           locale={locale}
           t={t}
+          tModels={tModels}
           onClick={onPick ? (): void => onPick(model) : undefined}
         />
+      ))}
+    </Div>
+  );
+}
+
+function ModelGridSkeleton(): JSX.Element {
+  return (
+    <Div className="grid grid-cols-1 gap-3 @2xl:grid-cols-2 @5xl:grid-cols-3">
+      {[0, 1, 2, 3, 4, 5].map((i) => (
+        <Div
+          key={i}
+          className="flex flex-col gap-3 rounded-lg border bg-card p-4"
+        >
+          <Skeleton className="h-4 w-2/3" />
+          <Skeleton className="h-3 w-1/2" />
+          <Skeleton className="h-5 w-24" />
+        </Div>
       ))}
     </Div>
   );
@@ -217,15 +298,16 @@ interface ModelsListWidgetProps {
   field: (typeof definition.GET)["fields"];
 }
 
-/** Server-side filters — the request form. Without it the page had no way to pick a modelType. */
+/** Server-side filters (the request form). Applies on change, no submit button. */
 function ModelsListFilters({
   fields: children,
 }: {
   fields: ModelsListWidgetProps["field"]["children"];
 }): JSX.Element {
   return (
-    <Div className="flex flex-col gap-2">
-      <Div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+    <Div className="flex flex-col gap-3 rounded-lg border bg-card p-4">
+      <Div className="grid grid-cols-1 gap-3 @lg:grid-cols-2 @4xl:grid-cols-4">
+        <TextFieldWidget fieldName="query" field={children.query} />
         <SelectFieldWidget fieldName="modelType" field={children.modelType} />
         <SelectFieldWidget
           fieldName="contentLevel"
@@ -236,9 +318,7 @@ function ModelsListFilters({
           field={children.intelligence}
         />
       </Div>
-      <TextFieldWidget fieldName="query" field={children.query} />
       <FormAlertWidget field={{}} />
-      <SubmitButtonWidget<typeof definition.GET> field={{}} />
     </Div>
   );
 }
@@ -250,6 +330,7 @@ export function ModelsListWidget({
   const { t } = scopedTranslation.scopedT(locale);
   const { t: tModels } = modelsScopedTranslation.scopedT(locale);
   const value = useWidgetValue<typeof definition.GET>();
+  const form = useWidgetForm<typeof definition.GET>();
   const onPick = usePickerCallback<ModelListItem>();
   const isPickerMode = !!onPick;
 
@@ -279,25 +360,25 @@ export function ModelsListWidget({
     return models;
   }, [value, localQuery, activeContent]);
 
-  if (!value) {
-    return isPickerMode ? (
-      <Div />
-    ) : (
-      <ModelsListFilters fields={field.children} />
-    );
-  }
-
-  const types = TYPE_ORDER.filter((type) =>
-    value.models.some((m) => m.type === type),
+  const filterValues = form?.watch();
+  const hasServerFilters = Boolean(
+    filterValues?.query ||
+    filterValues?.modelType ||
+    filterValues?.contentLevel ||
+    filterValues?.intelligence,
   );
-  const contentLevels = [...new Set(value.models.map((m) => m.content))];
-  const defaultTab = types[0] ?? "text";
+  const clearServerFilters = (): void => {
+    form?.reset({});
+  };
 
-  return (
-    <Div className="space-y-3">
-      {!isPickerMode && <ModelsListFilters fields={field.children} />}
-      {/* Picker mode: instant local search + content filter over the loaded list */}
-      {isPickerMode && (
+  // Picker mode: instant local search + content filter over the loaded list.
+  if (isPickerMode) {
+    if (!value) {
+      return <ModelGridSkeleton />;
+    }
+    const contentLevels = [...new Set(value.models.map((m) => m.content))];
+    return (
+      <Div className="@container flex flex-col gap-3">
         <Div className="flex flex-col gap-2">
           <Div className="relative">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -311,7 +392,7 @@ export function ModelsListWidget({
             />
           </Div>
           {contentLevels.length > 1 && (
-            <Div className="flex gap-1 flex-wrap">
+            <Div className="flex flex-wrap gap-1">
               <Button
                 variant={activeContent === null ? "default" : "outline"}
                 size="sm"
@@ -344,58 +425,93 @@ export function ModelsListWidget({
             </Div>
           )}
         </Div>
-      )}
+        <ModelGrid
+          models={filtered}
+          t={t}
+          tModels={tModels}
+          locale={locale}
+          onPick={onPick}
+          onClear={() => {
+            setLocalQuery("");
+            setActiveContent(null);
+          }}
+        />
+      </Div>
+    );
+  }
 
-      {/* Stats */}
-      {!isPickerMode && (
-        <Div className="text-xs text-muted-foreground">
-          <Span>
-            {t("get.browser.statsLabel", {
-              matched: filtered.length,
-              total: value.totalCount,
-            })}
-          </Span>
-        </Div>
-      )}
+  const types = value
+    ? TYPE_ORDER.filter((type) => value.models.some((m) => m.type === type))
+    : [];
+  const defaultTab = types[0] ?? "text";
 
-      {/* Tabs by model type — full mode; flat grid in picker mode */}
-      {/* No tabs to show for an empty result — ModelGrid renders the empty state */}
-      {isPickerMode || types.length === 0 ? (
-        <ModelGrid models={filtered} t={t} locale={locale} onPick={onPick} />
+  return (
+    <WidgetShell layout="page">
+      <WidgetHeader
+        size="page"
+        title={t("get.title")}
+        subtitle={t("get.browser.subtitle")}
+      />
+      <ModelsListFilters fields={field.children} />
+
+      {!value ? (
+        <ModelGridSkeleton />
+      ) : types.length === 0 ? (
+        <ModelGrid
+          models={[]}
+          t={t}
+          tModels={tModels}
+          locale={locale}
+          onClear={hasServerFilters ? clearServerFilters : undefined}
+        />
       ) : (
         // Remount when the type set changes (a refetch narrowed to other types),
         // else the uncontrolled tab stays on a type that no longer exists.
-        <Tabs key={types.join(",")} defaultValue={defaultTab}>
-          <TabsList>
-            {types.map((type) => {
-              const count = filtered.filter((m) => m.type === type).length;
-              return (
-                <TabsTrigger key={type} value={type}>
-                  {TYPE_ICONS[type]} {type}
-                  {count > 0 && (
-                    <Badge
-                      variant="secondary"
-                      className="ml-1 text-[10px] h-4 px-1"
-                    >
-                      {String(count)}
-                    </Badge>
-                  )}
-                </TabsTrigger>
-              );
-            })}
-          </TabsList>
+        <Tabs
+          key={types.join(",")}
+          defaultValue={defaultTab}
+          className="flex flex-col gap-3"
+        >
+          <Div className="flex min-w-0 flex-wrap items-center justify-between gap-2">
+            <Div className="-mx-1 min-w-0 max-w-full overflow-x-auto px-1">
+              <TabsList>
+                {types.map((type) => {
+                  const TypeIcon = TYPE_ICONS[type];
+                  const count = value.models.filter(
+                    (m) => m.type === type,
+                  ).length;
+                  return (
+                    <TabsTrigger key={type} value={type} className="gap-1.5">
+                      <TypeIcon className="h-4 w-4" />
+                      {t(TYPE_LABELS[type])}
+                      <Span className="tabular-nums text-xs opacity-70">
+                        {String(count)}
+                      </Span>
+                    </TabsTrigger>
+                  );
+                })}
+              </TabsList>
+            </Div>
+            <Span className="text-[13px] tabular-nums text-muted-foreground">
+              {t("get.browser.statsLabel", {
+                matched: value.models.length,
+                total: value.totalCount,
+              })}
+            </Span>
+          </Div>
           {types.map((type) => (
-            <TabsContent key={type} value={type} className="mt-3">
+            <TabsContent key={type} value={type} className="mt-0">
               <ModelGrid
-                models={filtered.filter((m) => m.type === type)}
+                models={value.models.filter((m) => m.type === type)}
                 t={t}
+                tModels={tModels}
                 locale={locale}
               />
             </TabsContent>
           ))}
         </Tabs>
       )}
-    </Div>
+    </WidgetShell>
   );
 }
 

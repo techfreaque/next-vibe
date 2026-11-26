@@ -44,7 +44,7 @@ export const translations: typeof enTranslations = {
     sortOrder: {
       label: "Reihenfolge",
       description:
-        "Anzeigereihenfolge innerhalb der übergeordneten Gruppe — kleinere Zahlen erscheinen zuerst",
+        "Kleinere Zahlen stehen in der übergeordneten Gruppe weiter oben",
       placeholder: "z. B. 10",
     },
     errors: {
@@ -91,10 +91,11 @@ export const translations: typeof enTranslations = {
       failedLabel: "Fehlgeschlagen",
       back: "Zurück",
       submit: "Änderungen speichern",
+      sectionDetails: "Details",
       viewAccount: "Konto anzeigen",
       successTitle: "Änderungen gespeichert",
       successDesc: "Das Konto wurde aktualisiert.",
-      systemNotice: "Systemkonto — Typ und Untertyp sind gesperrt.",
+      systemNotice: "Systemkonto: Typ und Untertyp sind gesperrt.",
       inactiveNotice: "Dieses Konto ist inaktiv.",
       selectPrompt: "Konto zum Bearbeiten wählen",
     },

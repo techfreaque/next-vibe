@@ -7,6 +7,11 @@ export const translations: typeof enTranslations = {
   },
 
   enums: {
+    content: {
+      mainstream: "Mainstream",
+      open: "Otvorený",
+      uncensored: "Bez cenzúry",
+    },
     runStatus: {
       running: "Prebieha",
       completed: "Dokončené",
@@ -395,6 +400,37 @@ export const translations: typeof enTranslations = {
       modelId: {
         label: "Model",
         description: "ID modelu alebo jeho identifikátor v adrese URL",
+      },
+    },
+    widget: {
+      subtitle: "Benchmark odmietnutí, aktuálne meranie",
+      noDataTitle: "Zatiaľ žiadne hodnotené odpovede",
+      noDataMessage:
+        "Tento model ešte nie je v aktuálnom meraní. Jeho miery sa zobrazia po ďalšom meraní, ktoré ho zahrnie.",
+      notRanked: "Bez poradia",
+      rankValue: "{{rank}}. z {{total}}",
+      trendValue: "{{delta}} b. oproti minulému meraniu",
+      noTrend: "Žiadne skoršie meranie",
+      breakdown: "Podľa kategórie",
+      samples: "Ukážkové odpovede",
+      samplesEmpty: "Zatiaľ žiadne schválené ukážkové odpovede.",
+      loadError: "Štatistiky sa nepodarilo načítať",
+      rank: "Poradie",
+      trend: "Trend odmietnutí",
+      lookup: "Zobraziť štatistiky",
+      judge: "Hodnotenie",
+      categories: {
+        politics: "Politika",
+        history: "História",
+        health: "Zdravie",
+        drugs: "Drogy",
+        sexuality: "Sexualita",
+        security: "Bezpečnosť IT",
+        religion: "Náboženstvo",
+        law: "Právo",
+        science: "Veda",
+        fiction: "Fikcia",
+        satire: "Satira",
       },
     },
   },

@@ -12,7 +12,7 @@ export const translations: typeof enTranslations = {
       description:
         "Sincronizzazione bidirezionale basata su cursor tra le istanze. Invia i cursori locali, riceve solo i record più recenti.",
       instanceId: {
-        label: "Articolo ID",
+        label: "Nome dell'istanza",
         description: "L'identificatore dell'istanza di chiamata",
       },
       syncCursors: {

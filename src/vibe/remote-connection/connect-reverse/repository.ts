@@ -26,8 +26,6 @@ import {
 import { db } from "../../database";
 import type { JwtPrivatePayloadType } from "../../identity/auth/types";
 import type { EndpointLogger } from "../../logger/types";
-import { instanceIdentities, remoteConnections, SyncScopeSchema } from "../db";
-import { RemoteConnectionRepository } from "../repository";
 import {
   checkRemoteCustomerAccess,
   CUSTOMER_TRANSPORT,
@@ -35,6 +33,8 @@ import {
   recordRemoteAudit,
   validateCustomerInstanceUrl,
 } from "../customer-access/access";
+import { instanceIdentities, remoteConnections, SyncScopeSchema } from "../db";
+import { RemoteConnectionRepository } from "../repository";
 import { RemoteTransport } from "../transport";
 import type { RemoteRegisterPostRequestInput } from "./definition";
 import type { RemoteRegisterT } from "./i18n";

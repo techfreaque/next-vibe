@@ -19,6 +19,14 @@ export const translations: typeof enTranslations = {
     },
   },
   fleet: {
+    reasonPart: {
+      register: "registrácia",
+      bridge: "most",
+      sync: "synchronizácia",
+      notPaid: "bez plateného plánu",
+      noConnection: "bez pripojenia",
+      connectionLimit: "limit pripojení",
+    },
     title: "Stav pripojenia",
     subtitle:
       "Všetky inštancie pripojené k tomuto serveru. Stav vychádza z poslednej zaznamenanej aktivity.",
@@ -196,7 +204,7 @@ export const translations: typeof enTranslations = {
         description: "Počet udalostí auditu, ktoré sa majú preskočiť",
       },
       auditConnection: {
-        label: "ID pripojenia pre audit",
+        label: "Pripojenie",
         description: "Zobraziť udalosti auditu iba pre vybrané pripojenie.",
       },
       fleetStatus: {
@@ -273,7 +281,7 @@ export const translations: typeof enTranslations = {
       reverseWs: "WS",
       directHttp: "HTTP",
     },
-    instanceId: "ID inštancie",
+    instanceId: "Názov inštancie",
     remoteUrl: "Adresa URL vzdialenej inštancie",
     viewButton: "Zobraziť",
     editButton: "Upraviť",
@@ -350,9 +358,9 @@ export const translations: typeof enTranslations = {
     },
     // Self-identity
     selfIdentity: {
-      title: "ID tvojej inštancie",
+      title: "Názov vašej inštancie",
       description:
-        "Ostatné inštancie rozpoznajú tento server podľa tohto ID. Medzi prepojenými inštanciami musí byť jedinečné.",
+        "Pod týmto názvom vidia tento server ostatné inštancie. Musí byť jedinečný medzi všetkými pripojenými inštanciami.",
     },
     // Sync settings (admin only)
     syncSettings: {

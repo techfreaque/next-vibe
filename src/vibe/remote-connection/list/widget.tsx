@@ -905,9 +905,18 @@ export function RemoteConnectionsListContainer(): JSX.Element {
   }
 
   return (
-    <WidgetShell className="min-w-0">
+    <WidgetShell
+      className="min-w-0"
+      layout={isToolsPage && !isPickerMode ? "page" : "compact"}
+    >
       {showBillingHeader && <CreditsTabHeader activeTab="remote" />}
       <WidgetHeader
+        size={isToolsPage && !isPickerMode ? "page" : "section"}
+        subtitle={
+          fleet && !isTextSurface && isToolsPage
+            ? t("fleet.subtitle")
+            : undefined
+        }
         title={t("widget.title")}
         backButton={
           canGoBack && (
@@ -948,6 +957,7 @@ export function RemoteConnectionsListContainer(): JSX.Element {
           onRefresh={() => void read?.refetch()}
           auditOpen={auditOpen}
           setAuditOpen={setAuditOpen}
+          showSubtitle={!isToolsPage}
         />
       )}
       {data &&

@@ -12,7 +12,7 @@ export const translations: typeof enTranslations = {
       description:
         "Cursorbasierte bidirektionale Synchronisation zwischen Instanzen.",
       instanceId: {
-        label: "Instanz-ID",
+        label: "Instanzname",
         description: "Bezeichner der aufrufenden Instanz",
       },
       syncCursors: {

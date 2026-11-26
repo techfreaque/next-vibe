@@ -147,6 +147,14 @@ export const translations: typeof enTranslations = {
     },
 
     browser: {
+      subtitle:
+        "Všetky modely platformy s cenou, kontextovým oknom a úrovňou obsahu.",
+      emptyTitle: "Týmto filtrom nezodpovedá žiadny model",
+      emptyHint:
+        "Vyberte iný typ alebo úroveň obsahu, alebo vymažte vyhľadávanie.",
+      clearFilters: "Zrušiť filtre",
+      toolCalls: "Volania nástrojov",
+      context: "Kontext {{size}}",
       supportsTools: "✓ nástroje",
       noModels: "Žiadne modely sa nezhodujú s vašimi filtrami.",
       allLabel: "Všetky",

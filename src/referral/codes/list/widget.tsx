@@ -5,23 +5,37 @@
 "use client";
 
 import { coreClientEnv as envClient } from "next-vibe/core/env-client";
-import { CountriesArr, LanguagesArr } from "next-vibe/core/i18n/core/config";
+import {
+  CountriesArr,
+  type CountryLanguage,
+  LanguagesArr,
+} from "next-vibe/core/i18n/core/config";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
+import { EmptyBlock } from "next-vibe/ui/components/empty-block";
 import { AlertCircle } from "next-vibe/ui/components/icons/AlertCircle";
 import { Check } from "next-vibe/ui/components/icons/Check";
 import { Copy } from "next-vibe/ui/components/icons/Copy";
-import { DollarSign } from "next-vibe/ui/components/icons/DollarSign";
 import { Link2 } from "next-vibe/ui/components/icons/Link2";
-import { TrendingUp } from "next-vibe/ui/components/icons/TrendingUp";
-import { Users } from "next-vibe/ui/components/icons/Users";
 import { Input } from "next-vibe/ui/components/input";
-import { LoadingBlock } from "next-vibe/ui/components/loading-block";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "next-vibe/ui/components/select";
+import { Skeleton } from "next-vibe/ui/components/skeleton";
 import { Span } from "next-vibe/ui/components/span";
+import { WidgetHeader } from "next-vibe/ui/components/widget-header";
+import { WidgetShell } from "next-vibe/ui/components/widget-shell";
+import { usePathname } from "next-vibe/ui/hooks/use-pathname";
 import { copyToClipboard } from "next-vibe/ui/lib/clipboard";
 import { getCurrentOrigin } from "next-vibe/ui/lib/location";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
+import { formatMoney } from "next-vibe/unified-ui/_shared/format-money";
 import {
+  useWidgetLocale,
   useWidgetLogger,
   useWidgetSelector,
   useWidgetTranslation,
@@ -30,6 +44,7 @@ import { useCallback, useState } from "react";
 
 import { REFERRAL_CONFIG } from "../../config";
 import type definition from "./definition";
+import type { ReferralCode } from "./definition";
 
 /**
  * Matches all valid CountryLanguage locale path prefixes.
@@ -42,13 +57,6 @@ const ALL_LOCALES = LanguagesArr.flatMap((lang) =>
 const LOCALE_PREFIX_RE = new RegExp(
   `^/(${[...ALL_LOCALES, ...LanguagesArr].join("|")})(/|$)`,
 );
-
-function formatDollars(cents: number): string {
-  const dollars = cents / 100;
-  return dollars % 1 === 0
-    ? `$${dollars.toFixed(0)}`
-    : `$${dollars.toFixed(2)}`;
-}
 
 /**
  * Extract a locale-free path from a pasted URL.
@@ -144,6 +152,19 @@ function LinkGenerator({
   );
 }
 
+/** The admin tool page gets a page header; the account referral page has its own. */
+function useIsToolsPage(): boolean {
+  const [, firstSegment, secondSegment] = usePathname().split("/");
+  return firstSegment === "tools" || secondSegment === "tools";
+}
+
+const STAT_GRID =
+  "grid grid-cols-2 gap-x-4 gap-y-2 @2xl:grid-cols-[minmax(0,2.4fr)_repeat(4,minmax(0,1fr))_10rem] @2xl:items-center @2xl:gap-y-0";
+
+function money(cents: number, locale: CountryLanguage): string {
+  return formatMoney(cents / 100, "USD", locale);
+}
+
 /**
  * Custom container widget for referral codes list
  */
@@ -154,185 +175,231 @@ export function ReferralCodesListContainer(): React.JSX.Element {
     (data) => data?.codes,
   );
   const t = useWidgetTranslation<typeof definition.GET>();
-  const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
+  const locale = useWidgetLocale();
+  const isToolsPage = useIsToolsPage();
+  const [copiedCode, setCopiedCode] = useState<string | null>(null);
+  const [linkCode, setLinkCode] = useState<string | null>(null);
   const logger = useWidgetLogger();
 
-  const handleCopy = async (code: string, index: number): Promise<void> => {
+  const handleCopy = async (code: string): Promise<void> => {
     await copyToClipboard(`${getCurrentOrigin()}/track?ref=${code}`, logger);
-    setCopiedIndex(index);
+    setCopiedCode(code);
     setTimeout(() => {
-      setCopiedIndex(null);
+      setCopiedCode(null);
     }, 2000);
   };
 
-  if (!codes) {
-    return <LoadingBlock message={t("codes.list.widget.loading")} />;
-  }
+  const header = isToolsPage ? (
+    <WidgetHeader
+      size="page"
+      title={t("codes.list.get.form.title")}
+      subtitle={t("codes.list.get.form.description")}
+    />
+  ) : null;
+  const shell = (children: React.ReactNode): React.JSX.Element =>
+    isToolsPage ? (
+      <WidgetShell layout="page">
+        {header}
+        {children}
+      </WidgetShell>
+    ) : (
+      <Div className="@container flex min-w-0 flex-col gap-4">{children}</Div>
+    );
 
-  if (codes.length === 0) {
-    return (
-      <Div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-dashed bg-card px-6 py-12 text-center">
-        <Div className="flex h-11 w-11 items-center justify-center rounded-full bg-muted">
-          <Link2 className="h-5 w-5 text-muted-foreground" />
-        </Div>
-        <Div className="flex flex-col gap-1">
-          <Div className="text-sm font-semibold text-foreground">
-            {t("codes.list.widget.empty")}
+  if (!codes) {
+    return shell(
+      <Div
+        className="flex flex-col divide-y rounded-lg border bg-card"
+        aria-label={t("codes.list.widget.loading")}
+        aria-busy="true"
+      >
+        {[0, 1].map((row) => (
+          <Div key={row} className="flex items-center gap-4 px-4 py-4">
+            <Div className="flex flex-1 flex-col gap-2">
+              <Skeleton className="h-4 w-32" />
+              <Skeleton className="h-3 w-48" />
+            </Div>
+            <Skeleton className="h-9 w-28" />
           </Div>
-          <Div className="text-sm text-muted-foreground">
-            {t("codes.list.widget.emptyHint")}
-          </Div>
-        </Div>
-      </Div>
+        ))}
+      </Div>,
     );
   }
 
-  const stats = (code: (typeof codes)[number]): StatItem[] => [
-    {
-      key: "visitors",
-      icon: <Users className="h-3.5 w-3.5" />,
-      label: t("codes.list.widget.visitors"),
-      value: code.currentVisitors.toLocaleString(),
-    },
-    {
-      key: "signups",
-      icon: <TrendingUp className="h-3.5 w-3.5" />,
-      label: t("codes.list.widget.signups"),
-      value: code.totalSignups.toLocaleString(),
-    },
-    {
-      key: "revenue",
-      icon: <DollarSign className="h-3.5 w-3.5" />,
-      label: t("codes.list.widget.revenue"),
-      value: formatDollars(code.totalRevenueCents),
-    },
-    {
-      key: "earnings",
-      icon: <DollarSign className="h-3.5 w-3.5" />,
-      label: t("codes.list.widget.earnings"),
-      value: formatDollars(code.totalEarningsCents),
-      highlight: true,
-    },
-  ];
+  if (codes.length === 0) {
+    return shell(
+      <EmptyBlock
+        icon={<Link2 className="h-6 w-6" />}
+        title={t("codes.list.widget.empty")}
+        message={t("codes.list.widget.emptyHint")}
+      />,
+    );
+  }
 
-  return (
-    <Div className="flex flex-col gap-4">
-      {codes.map((code, index) => {
-        const referralUrl = `${envClient.NEXT_PUBLIC_APP_URL}/track?ref=${code.code}`;
-        return (
-          <Div
-            key={code.code}
-            className="overflow-hidden rounded-xl border bg-card shadow-sm"
-          >
-            {/* Code + share link */}
-            <Div className="flex flex-col gap-3 p-4 sm:p-5">
-              <Div className="flex items-start justify-between gap-3">
-                <Div className="min-w-0">
-                  <Div className="font-mono text-base font-semibold tracking-wide">
-                    {code.code}
-                  </Div>
-                  {code.label && (
-                    <Div className="mt-0.5 text-sm text-muted-foreground">
-                      {code.label}
-                    </Div>
-                  )}
-                </Div>
-                {!code.isActive && (
-                  <Span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-destructive/10 px-2 py-0.5 text-xs font-medium text-destructive">
-                    <AlertCircle className="h-3 w-3" />
-                    {t("codes.list.widget.inactive")}
-                  </Span>
-                )}
-              </Div>
-              <Div className="flex flex-col gap-2 sm:flex-row">
-                <Div className="flex h-11 min-w-0 flex-1 items-center rounded-md border bg-muted/50 px-3 sm:h-10">
-                  <Span className="truncate font-mono text-xs text-muted-foreground">
-                    {referralUrl}
-                  </Span>
-                </Div>
-                <Button
-                  className="h-11 shrink-0 gap-2 sm:h-10"
-                  onClick={() => handleCopy(code.code, index)}
-                >
-                  {copiedIndex === index ? (
-                    <>
-                      <Check className="h-4 w-4" />
-                      {t("codes.list.widget.copied")}
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="h-4 w-4" />
-                      {t("codes.list.widget.copy")}
-                    </>
-                  )}
-                </Button>
-              </Div>
-            </Div>
+  const activeCodes = codes.filter((code) => code.isActive);
+  const selectable = activeCodes.length > 0 ? activeCodes : codes;
+  const selectedCode =
+    selectable.find((code) => code.code === linkCode)?.code ??
+    selectable[0]?.code ??
+    "";
 
-            {/* Stats */}
-            <Div className="grid grid-cols-2 border-t md:grid-cols-4">
-              {stats(code).map((stat, statIndex) => (
-                <Div
-                  key={stat.key}
-                  className={cn(
-                    "flex flex-col gap-1 p-4",
-                    statIndex % 2 === 1 && "border-l",
-                    statIndex >= 2 && "border-t md:border-t-0",
-                    statIndex === 2 && "md:border-l",
-                  )}
-                >
-                  <Div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
-                    {stat.icon}
-                    {stat.label}
-                  </Div>
-                  <Div
-                    className={cn(
-                      "text-lg font-semibold tabular-nums",
-                      stat.highlight ? "text-primary" : "text-foreground",
-                    )}
-                  >
-                    {stat.value}
-                  </Div>
-                </Div>
-              ))}
-            </Div>
-
-            {/* Deep-link generator */}
-            <Div className="flex flex-col gap-2 border-t bg-muted/30 px-4 py-4 sm:px-5">
-              <Div className="flex flex-col gap-0.5">
-                <Span className="text-sm font-medium text-foreground">
-                  {t("codes.list.widget.linkGen")}
-                </Span>
-                <Span className="text-xs text-muted-foreground">
-                  {t("codes.list.widget.linkGenHint")}
-                </Span>
-              </Div>
-              <LinkGenerator code={code.code} t={t} />
-              <Span className="pt-1 text-xs text-muted-foreground">
-                {t("codes.list.widget.conversionHint", {
-                  exampleEarning: formatDollars(
-                    Math.round(
-                      REFERRAL_CONFIG.EXAMPLE_PRICE_CENTS *
-                        REFERRAL_CONFIG.DIRECT_PERCENTAGE,
-                    ),
-                  ),
-                  examplePrice: formatDollars(
-                    REFERRAL_CONFIG.EXAMPLE_PRICE_CENTS,
-                  ),
-                })}
-              </Span>
-            </Div>
-          </Div>
-        );
-      })}
+  const statCell = (
+    label: string,
+    value: string,
+    tone?: "positive",
+  ): React.JSX.Element => (
+    <Div className="flex min-w-0 flex-col gap-0.5 @2xl:items-end">
+      <Span className="text-xs text-muted-foreground @2xl:hidden">{label}</Span>
+      <Span
+        className={cn(
+          "whitespace-nowrap text-sm tabular-nums",
+          tone === "positive" ? "font-semibold text-success" : undefined,
+          value === "0" || value === money(0, locale)
+            ? "text-muted-foreground"
+            : undefined,
+        )}
+      >
+        {value}
+      </Span>
     </Div>
   );
-}
 
-interface StatItem {
-  key: string;
-  icon: React.JSX.Element;
-  label: string;
-  value: string;
-  highlight?: boolean;
+  const row = (code: ReferralCode): React.JSX.Element => {
+    const referralUrl = `${envClient.NEXT_PUBLIC_APP_URL}/track?ref=${code.code}`;
+    const copied = copiedCode === code.code;
+    return (
+      <Div
+        key={code.code}
+        className={cn(STAT_GRID, "px-4 py-3", !code.isActive && "opacity-70")}
+      >
+        <Div className="col-span-2 flex min-w-0 items-start justify-between gap-3 @2xl:col-span-1">
+          <Div className="min-w-0">
+            <Div
+              className="truncate font-mono text-sm font-semibold"
+              title={referralUrl}
+            >
+              {code.code}
+            </Div>
+            {code.label && (
+              <Div className="truncate text-[13px] text-muted-foreground">
+                {code.label}
+              </Div>
+            )}
+            {!code.isActive && (
+              <Div className="mt-0.5 flex items-center gap-1 text-xs text-destructive">
+                <AlertCircle className="h-3 w-3 shrink-0" />
+                {t("codes.list.widget.inactive")}
+              </Div>
+            )}
+          </Div>
+        </Div>
+        {statCell(
+          t("codes.list.widget.visitors"),
+          code.currentVisitors.toLocaleString(locale),
+        )}
+        {statCell(
+          t("codes.list.widget.signups"),
+          code.totalSignups.toLocaleString(locale),
+        )}
+        {statCell(
+          t("codes.list.widget.revenue"),
+          money(code.totalRevenueCents, locale),
+        )}
+        {statCell(
+          t("codes.list.widget.earnings"),
+          money(code.totalEarningsCents, locale),
+          code.totalEarningsCents > 0 ? "positive" : undefined,
+        )}
+        <Div className="col-span-2 flex justify-end @2xl:col-span-1">
+          <Button
+            type="button"
+            variant={codes.length === 1 ? "default" : "outline"}
+            size="sm"
+            className="h-10 w-full gap-1.5 @2xl:h-9"
+            onClick={() => handleCopy(code.code)}
+          >
+            {copied ? (
+              <>
+                <Check className="h-4 w-4" />
+                {t("codes.list.widget.copied")}
+              </>
+            ) : (
+              <>
+                <Copy className="h-4 w-4" />
+                {t("codes.list.widget.copy")}
+              </>
+            )}
+          </Button>
+        </Div>
+      </Div>
+    );
+  };
+
+  return shell(
+    <>
+      <Div className="@container flex min-w-0 flex-col divide-y rounded-lg border bg-card">
+        <Div
+          className={cn(
+            STAT_GRID,
+            "hidden bg-muted/30 px-4 py-2 text-xs font-medium text-muted-foreground @2xl:grid",
+          )}
+          aria-hidden="true"
+        >
+          <Span>{t("codes.list.get.response.codes.code")}</Span>
+          <Span className="text-right">{t("codes.list.widget.visitors")}</Span>
+          <Span className="text-right">{t("codes.list.widget.signups")}</Span>
+          <Span className="text-right">{t("codes.list.widget.revenue")}</Span>
+          <Span className="text-right">{t("codes.list.widget.earnings")}</Span>
+          <Span />
+        </Div>
+        {codes.map(row)}
+      </Div>
+
+      {/* Deep-link generator: one for all codes, code picked when there are several */}
+      <Div className="flex min-w-0 flex-col gap-3 rounded-lg border bg-card p-4">
+        <Div className="flex flex-col gap-0.5">
+          <Span className="text-sm font-semibold text-foreground">
+            {t("codes.list.widget.linkGen")}
+          </Span>
+          <Span className="text-[13px] text-muted-foreground">
+            {t("codes.list.widget.linkGenHint")}
+          </Span>
+        </Div>
+        <Div className="flex min-w-0 flex-col gap-2 @lg:flex-row @lg:items-center">
+          {selectable.length > 1 && (
+            <Select value={selectedCode} onValueChange={setLinkCode}>
+              <SelectTrigger
+                className="h-10 w-full font-mono text-xs @lg:w-48"
+                aria-label={t("codes.list.get.response.codes.code")}
+              >
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {selectable.map((code) => (
+                  <SelectItem key={code.code} value={code.code}>
+                    {code.label ?? code.code}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
+          <Div className="min-w-0 flex-1">
+            <LinkGenerator code={selectedCode} t={t} />
+          </Div>
+        </Div>
+        <Span className="text-xs text-muted-foreground">
+          {t("codes.list.widget.conversionHint", {
+            exampleEarning: money(
+              Math.round(
+                REFERRAL_CONFIG.EXAMPLE_PRICE_CENTS *
+                  REFERRAL_CONFIG.DIRECT_PERCENTAGE,
+              ),
+              locale,
+            ),
+            examplePrice: money(REFERRAL_CONFIG.EXAMPLE_PRICE_CENTS, locale),
+          })}
+        </Span>
+      </Div>
+    </>,
+  );
 }

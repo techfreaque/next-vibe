@@ -20,8 +20,8 @@ export const translations = {
       "Capabilities snapshot sent every sync - Thea always knows what this instance can do",
   },
   post: {
-    title: "Connect to Remote Account",
-    titleShort: "Remote Connect",
+    title: "Connect to a remote account",
+    titleShort: "Remote connect",
     description:
       "Connect your account to a remote instance to sync memories and use AI tools from anywhere",
     remoteUrl: {
@@ -63,16 +63,16 @@ export const translations = {
       description: "Lead ID from the remote instance (set automatically)",
     },
     isInferenceProvider: {
-      label: "Use as Inference Provider",
+      label: "Use as inference provider",
       description:
-        "Let this connection run AI streams — the remote instance handles the AI loop over the reverse WS channel.",
+        "Let this connection run AI streams. The remote instance handles the AI loop over the reverse WS channel.",
     },
     syncScope: {
-      label: "Sync Scope",
+      label: "Sync scope",
       description: "Which data syncs over this connection.",
     },
     credentialWarning:
-      "Your credentials go directly from your browser to the remote server. However, the token stored here grants the operator of this server full access to your remote account - they can do anything you can do there. Only connect on servers you fully trust.",
+      "Your credentials go directly from your browser to the remote server. However, the token stored here grants the operator of this server full access to your remote account: they can do anything you can do there. Only connect on servers you fully trust.",
     actions: {
       submit: "Connect",
       submitting: "Connecting...",

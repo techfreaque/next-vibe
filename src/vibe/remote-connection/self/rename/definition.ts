@@ -62,7 +62,7 @@ const { PATCH } = createEndpoint({
       submitButton: widgetField(scopedTranslation, {
         type: WidgetType.SUBMIT_BUTTON,
         text: "patch.title" as const,
-        loadingText: "patch.title" as const,
+        loadingText: "patch.renaming" as const,
         icon: "pencil",
         variant: "default",
         size: "default",

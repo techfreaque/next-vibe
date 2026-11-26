@@ -28,7 +28,7 @@ export const translations: typeof enTranslations = {
     notConnected: {
       title: "Brak połączenia",
       description:
-        "Połącz się z kontem w chmurze (np. unbottled.ai), aby synchronizować wspomnienia i korzystać z narzędzi AI z terminala — z dowolnego miejsca.",
+        "Połącz się z kontem w chmurze (np. unbottled.ai), aby synchronizować wspomnienia i korzystać z narzędzi AI z terminala, z dowolnego miejsca.",
       benefit1:
         "Wspomnienia synchronizują się automatycznie między tym urządzeniem a kontem w chmurze",
       benefit2: "Uruchamiaj narzędzia AI z wiersza poleceń za pomocą",
@@ -83,7 +83,7 @@ export const translations: typeof enTranslations = {
     titleShort: "Połączenie",
     description: "Pełny status i ustawienia określonego połączenia zdalnego",
     instanceId: {
-      label: "ID instancji",
+      label: "Połączenie",
       description: "Instancja połączenia do wyświetlenia",
     },
     errors: {
@@ -164,7 +164,7 @@ export const translations: typeof enTranslations = {
     isInferenceProvider: {
       label: "Dostawca wnioskowania",
       description:
-        "Pozwól temu połączeniu obsługiwać wnioskowanie AI — zdalna instancja uruchamia pętlę LLM przez odwrotny WS.",
+        "Pozwól temu połączeniu obsługiwać wnioskowanie AI. Zdalna instancja uruchamia pętlę LLM przez odwrotny WS.",
     },
     forceSystemProvider: {
       label: "Wymuś dostawcę systemowego",
@@ -202,7 +202,7 @@ export const translations: typeof enTranslations = {
     reconnectNow: {
       label: "Połącz ponownie",
       description:
-        "Zamknij i wznów połączenie — uruchamia synchronizację pull-on-connect.",
+        "Zamknij i wznów połączenie. To uruchamia synchronizację pull-on-connect.",
     },
     errors: {
       validation: {

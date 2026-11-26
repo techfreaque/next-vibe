@@ -44,7 +44,7 @@ export const translations = {
         placeholder: "All types",
       },
       contentLevel: {
-        label: "Content Level",
+        label: "Content level",
         description:
           "Filter by content policy. Mainstream = standard safety filters. Open = fewer restrictions. Uncensored = no filters.",
         placeholder: "All content levels",
@@ -142,6 +142,13 @@ export const translations = {
     },
 
     browser: {
+      subtitle:
+        "Every model on the platform with its price, context window and content level.",
+      emptyTitle: "No models match these filters",
+      emptyHint: "Try another type or content level, or clear the search.",
+      clearFilters: "Clear filters",
+      toolCalls: "Tool calls",
+      context: "{{size}} context",
       supportsTools: "✓ tools",
       noModels: "No models match your filters.",
       allLabel: "All",

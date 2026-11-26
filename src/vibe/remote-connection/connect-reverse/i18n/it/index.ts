@@ -11,7 +11,7 @@ export const translations: typeof enTranslations = {
     description:
       "Chiamato da un'istanza locale durante il flusso di connessione per registrarsi sul cloud",
     instanceId: {
-      label: "Articolo ID",
+      label: "Nome dell'istanza",
       description: "L'identificatore unico dell'istanza locale",
       placeholder: "hermes",
       validation: {

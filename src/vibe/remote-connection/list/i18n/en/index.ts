@@ -17,6 +17,14 @@ export const translations = {
     },
   },
   fleet: {
+    reasonPart: {
+      register: "registration",
+      bridge: "bridge",
+      sync: "sync",
+      notPaid: "no paid plan",
+      noConnection: "no connection",
+      connectionLimit: "connection limit",
+    },
     title: "Connection health",
     subtitle:
       "All linked peers on this server. Health reflects the last recorded activity.",
@@ -176,7 +184,7 @@ export const translations = {
     },
   },
   get: {
-    title: "Remote Connections",
+    title: "Remote connections",
     titleShort: "Connections",
     description:
       "Your linked instances. Admins also see the health of every connection on this server.",
@@ -190,7 +198,7 @@ export const translations = {
         description: "Number of audit events to skip.",
       },
       auditConnection: {
-        label: "Audit connection ID",
+        label: "Connection",
         description: "Limit audit events to one connection.",
       },
       fleetStatus: {
@@ -243,7 +251,7 @@ export const translations = {
     transportLabel: "Transport",
     viewConnection: "Open connection {{instance}}",
     pickConnection: "Choose",
-    title: "Remote Connections",
+    title: "Remote connections",
     addButton: "Add Connection",
     emptyState:
       "No instances are linked. Link an instance to share selected data and tools.",
@@ -264,7 +272,7 @@ export const translations = {
       reverseWs: "WS",
       directHttp: "HTTP",
     },
-    instanceId: "Instance ID",
+    instanceId: "Instance name",
     remoteUrl: "Remote URL",
     viewButton: "View",
     editButton: "Edit",
@@ -340,9 +348,9 @@ export const translations = {
     },
     // Self-identity
     selfIdentity: {
-      title: "Your Instance ID",
+      title: "Your instance name",
       description:
-        "Other instances see this server as this ID. Must be unique across all connected instances.",
+        "Other instances see this server under this name. It must be unique across all connected instances.",
     },
     // Sync settings (admin only)
     syncSettings: {

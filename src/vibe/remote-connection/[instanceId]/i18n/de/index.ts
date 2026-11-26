@@ -86,7 +86,7 @@ export const translations: typeof enTranslations = {
     description:
       "Vollständiger Status und Einstellungen einer bestimmten Fernverbindung",
     instanceId: {
-      label: "Instanz-ID",
+      label: "Verbindung",
       description: "Die Verbindungsinstanz, die angezeigt werden soll",
     },
     errors: {
@@ -167,7 +167,7 @@ export const translations: typeof enTranslations = {
     isInferenceProvider: {
       label: "Inferenz-Provider",
       description:
-        "Diese Verbindung als KI-Inferenz-Provider zulassen — die Remote-Instanz führt den LLM-Loop über Reverse-WS aus.",
+        "Diese Verbindung als KI-Inferenz-Provider zulassen. Die Remote-Instanz führt den LLM-Loop über Reverse-WS aus.",
     },
     forceSystemProvider: {
       label: "System-Provider erzwingen",
@@ -205,7 +205,7 @@ export const translations: typeof enTranslations = {
     reconnectNow: {
       label: "Jetzt neu verbinden",
       description:
-        "Verbindung trennen und neu aufbauen — löst die Pull-on-Connect-Synchronisation aus.",
+        "Verbindung trennen und neu aufbauen. Das löst die Pull-on-Connect-Synchronisation aus.",
     },
     errors: {
       validation: {

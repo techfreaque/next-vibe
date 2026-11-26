@@ -12,7 +12,7 @@ export const translations: typeof enTranslations = {
       description:
         "Obojsmerná synchronizácia medzi inštanciami. Volajúca strana pošle kurzory označujúce posledné spracované záznamy a prijme iba novšie údaje.",
       instanceId: {
-        label: "ID inštancie",
+        label: "Názov inštancie",
         description: "Identifikátor volajúcej inštancie",
       },
       syncCursors: {

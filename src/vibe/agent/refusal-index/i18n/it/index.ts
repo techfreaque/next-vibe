@@ -7,6 +7,11 @@ export const translations: typeof enTranslations = {
   },
 
   enums: {
+    content: {
+      mainstream: "Mainstream",
+      open: "Aperto",
+      uncensored: "Senza censura",
+    },
     runStatus: {
       running: "Esecuzione",
       completed: "Completo",
@@ -390,6 +395,37 @@ export const translations: typeof enTranslations = {
       modelId: {
         label: "Modello",
         description: "Modello id o URL slug",
+      },
+    },
+    widget: {
+      subtitle: "Benchmark dei rifiuti, prova attuale",
+      noDataTitle: "Ancora nessuna risposta valutata",
+      noDataMessage:
+        "Questo modello non è ancora nella prova attuale. I suoi tassi compariranno dopo la prossima prova che lo include.",
+      notRanked: "Non in classifica",
+      rankValue: "{{rank}}° su {{total}}",
+      trendValue: "{{delta}} punti rispetto all'ultima prova",
+      noTrend: "Nessuna prova precedente",
+      breakdown: "Per categoria",
+      samples: "Risposte di esempio",
+      samplesEmpty: "Ancora nessuna risposta di esempio approvata.",
+      loadError: "Impossibile caricare le statistiche",
+      rank: "Posizione",
+      trend: "Andamento dei rifiuti",
+      lookup: "Mostra statistiche",
+      judge: "Valutazione",
+      categories: {
+        politics: "Politica",
+        history: "Storia",
+        health: "Salute",
+        drugs: "Droghe",
+        sexuality: "Sessualità",
+        security: "Sicurezza informatica",
+        religion: "Religione",
+        law: "Diritto",
+        science: "Scienza",
+        fiction: "Narrativa",
+        satire: "Satira",
       },
     },
   },

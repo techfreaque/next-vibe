@@ -43,9 +43,9 @@ export const translations: typeof enTranslations = {
     titleShort: "Nový účet",
     description: "Pridať vlastný účet do prehľadu účtov spoločnosti",
     companyId: {
-      label: "ID firmy",
-      description: "Spoločnosť na pridanie účtu do",
-      placeholder: "Zadajte UUID spoločnosti",
+      label: "Spoločnosť",
+      description: "Účet pribudne do účtovného rozvrhu tejto spoločnosti",
+      placeholder: "Vyberte spoločnosť",
     },
     code: {
       label: "Kód účtu",
@@ -55,7 +55,7 @@ export const translations: typeof enTranslations = {
     name: {
       label: "Názov účtu",
       description: "Opisný názov účtu",
-      placeholder: "napr. Petty Cash",
+      placeholder: "napr. Pokladnica",
     },
     type: {
       label: "Typ účtu",
@@ -68,12 +68,12 @@ export const translations: typeof enTranslations = {
       placeholder: "Vybrať podtyp",
     },
     parentId: {
-      label: "Rodičovský účet",
-      description: "Nepovinný materský účet pre hierarchické zoskupenie",
-      placeholder: "Rodičovský účet UUID (nepovinné)",
+      label: "Nadradený účet",
+      description: "Zaradí účet v prehľadoch pod iný účet",
+      placeholder: "Žiadny (najvyššia úroveň)",
     },
     response: {
-      id: "ID účtu",
+      id: "Účet",
       code: "Kód",
       name: "Názov",
     },
@@ -117,9 +117,12 @@ export const translations: typeof enTranslations = {
       description: "Účet bol pridaný",
     },
     widget: {
-      viewButton: "Zobraziť účet",
-      addAnotherButton: "Pridať ďalšie",
+      viewButton: "Otvoriť účet",
+      addAnotherButton: "Pridať ďalší účet",
       back: "Späť",
+      save: "Vytvoriť účet",
+      sectionAccount: "Účet",
+      sectionClassification: "Zaradenie",
     },
   },
   title: "Vytvoriť účet",

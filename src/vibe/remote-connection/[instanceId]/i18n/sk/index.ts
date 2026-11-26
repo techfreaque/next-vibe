@@ -91,7 +91,7 @@ export const translations: typeof enTranslations = {
     titleShort: "Pripojenie",
     description: "Podrobný stav a nastavenia vzdialeného pripojenia",
     instanceId: {
-      label: "ID inštancie",
+      label: "Pripojenie",
       description: "Inštancia, ktorej pripojenie chceš zobraziť",
     },
     errors: {

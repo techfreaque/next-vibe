@@ -43,9 +43,9 @@ export const translations: typeof enTranslations = {
     titleShort: "Nowe konto",
     description: "Dodaj niestandardowe konto do planu kont firmy",
     companyId: {
-      label: "ID firmy",
-      description: "Firma, do której dodawane jest konto",
-      placeholder: "Podaj UUID firmy",
+      label: "Firma",
+      description: "Konto trafi do planu kont tej firmy",
+      placeholder: "Wybierz firmę",
     },
     code: {
       label: "Numer konta",
@@ -70,10 +70,10 @@ export const translations: typeof enTranslations = {
     parentId: {
       label: "Konto nadrzędne",
       description: "Opcjonalne konto nadrzędne dla hierarchii",
-      placeholder: "UUID konta nadrzędnego (opcjonalne)",
+      placeholder: "Brak (najwyższy poziom)",
     },
     response: {
-      id: "ID konta",
+      id: "Konto",
       code: "Numer",
       name: "Nazwa",
     },
@@ -117,9 +117,12 @@ export const translations: typeof enTranslations = {
     },
     success: { title: "Konto utworzone", description: "Konto zostało dodane" },
     widget: {
-      viewButton: "Pokaż konto",
-      addAnotherButton: "Dodaj kolejne",
+      viewButton: "Otwórz konto",
+      addAnotherButton: "Dodaj kolejne konto",
       back: "Wstecz",
+      save: "Utwórz konto",
+      sectionAccount: "Konto",
+      sectionClassification: "Klasyfikacja",
     },
   },
   title: "Utwórz konto",

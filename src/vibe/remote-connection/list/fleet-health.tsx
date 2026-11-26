@@ -215,12 +215,31 @@ function actionLabel(action: AuditAction, t: FleetT): string {
   return t(`fleet.action.${action}`);
 }
 
+const REASON_PARTS = {
+  register: "fleet.reasonPart.register",
+  bridge: "fleet.reasonPart.bridge",
+  sync: "fleet.reasonPart.sync",
+  notPaid: "fleet.reasonPart.notPaid",
+  noConnection: "fleet.reasonPart.noConnection",
+  connectionLimit: "fleet.reasonPart.connectionLimit",
+} as const;
+
+function isReasonPart(part: string): part is keyof typeof REASON_PARTS {
+  return part in REASON_PARTS;
+}
+
+/** Machine reason parts ("sync", "notPaid") in the viewer's words. */
+function reasonPartLabel(part: string, t: FleetT): string {
+  return isReasonPart(part) ? t(REASON_PARTS[part]) : part;
+}
+
 /** "purpose:reason" for display; "rateLimited" repeats the action, drop it. */
-function reasonText(reason: string): string {
+function reasonText(reason: string, t: FleetT): string {
   return reason
     .split(":")
     .reduce<string[]>(
-      (out, part) => (part === "rateLimited" ? out : [...out, part]),
+      (out, part) =>
+        part === "rateLimited" ? out : [...out, reasonPartLabel(part, t)],
       [],
     )
     .join(" · ");
@@ -235,7 +254,8 @@ function reasonLabel(key: string | null, t: FleetT): string {
   const match = AUDIT_ACTIONS.find((a) => a === action);
   const head = match ? actionLabel(match, t) : (action ?? "");
   const tail = rest.reduce<string[]>(
-    (out, part) => (part === "rateLimited" ? out : [...out, part]),
+    (out, part) =>
+      part === "rateLimited" ? out : [...out, reasonPartLabel(part, t)],
     [],
   );
   return tail.length > 0 ? `${head} · ${tail.join(" · ")}` : head;
@@ -380,7 +400,7 @@ function denialText(
   }
   return t("fleet.issue.denial", {
     action: actionLabel(d.action, t),
-    reason: d.reason ? reasonText(d.reason) : t("fleet.detail.unknown"),
+    reason: d.reason ? reasonText(d.reason, t) : t("fleet.detail.unknown"),
     at: relative(d.createdAt, locale, t),
   });
 }
@@ -498,7 +518,7 @@ function fleetAuditLines(
   for (const event of a.recent) {
     const subject = event.instanceId ? ` · ${event.instanceId}` : "";
     lines.push(
-      `  ${shortDate(event.createdAt, locale)} · ${actionLabel(event.action, t)}${subject}${event.reason ? ` · ${reasonText(event.reason)}` : ""}`,
+      `  ${shortDate(event.createdAt, locale)} · ${actionLabel(event.action, t)}${subject}${event.reason ? ` · ${reasonText(event.reason, t)}` : ""}`,
     );
   }
   return lines;
@@ -991,12 +1011,15 @@ export function FleetHealthReport({
   onRefresh,
   auditOpen,
   setAuditOpen,
+  showSubtitle = true,
 }: {
   fleet: Fleet;
   isLoading: boolean;
   onRefresh: () => void;
   auditOpen: boolean;
   setAuditOpen: (open: boolean) => void;
+  /** False when the page header already says it. */
+  showSubtitle?: boolean;
 }): JSX.Element {
   const t = useWidgetTranslation<typeof endpoints.GET>();
   const locale = useWidgetLocale();
@@ -1058,7 +1081,11 @@ export function FleetHealthReport({
       aria-label={t("fleet.title")}
       className="@container flex min-w-0 scroll-mt-4 flex-col gap-4"
     >
-      <P className="m-0 text-xs text-muted-foreground">{t("fleet.subtitle")}</P>
+      {showSubtitle && (
+        <P className="m-0 text-xs text-muted-foreground">
+          {t("fleet.subtitle")}
+        </P>
+      )}
       <KpiGrid columns={2}>
         <KpiTile
           label={t("fleet.kpi.attention")}
@@ -1322,7 +1349,7 @@ export function FleetHealthReport({
                       </Span>
                       {e.reason && (
                         <Span className="text-muted-foreground">
-                          {reasonText(e.reason)}
+                          {reasonText(e.reason, t)}
                         </Span>
                       )}
                       <Span className="min-w-0 truncate font-mono">

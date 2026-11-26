@@ -19,6 +19,14 @@ export const translations: typeof enTranslations = {
     },
   },
   fleet: {
+    reasonPart: {
+      register: "rejestracja",
+      bridge: "most",
+      sync: "synchronizacja",
+      notPaid: "brak płatnego planu",
+      noConnection: "brak połączenia",
+      connectionLimit: "limit połączeń",
+    },
     title: "Stan połączeń",
     subtitle:
       "Wszystkie połączenia tego serwera. Stan wynika z ostatniej zarejestrowanej aktywności.",
@@ -193,7 +201,7 @@ export const translations: typeof enTranslations = {
         description: "Liczba zdarzeń do pominięcia.",
       },
       auditConnection: {
-        label: "ID połączenia w dzienniku",
+        label: "Połączenie",
         description: "Ogranicz dziennik do jednego połączenia.",
       },
       fleetStatus: {
@@ -294,7 +302,7 @@ export const translations: typeof enTranslations = {
       retry: "Spróbuj ponownie",
       resync: "Zsynchronizuj ponownie",
     },
-    instanceId: "ID instancji",
+    instanceId: "Nazwa instancji",
     remoteUrl: "Zdalny URL",
     viewButton: "Podgląd",
     editButton: "Edytuj",
@@ -344,9 +352,9 @@ export const translations: typeof enTranslations = {
       connectionsTitle: "Połączone instancje",
     },
     selfIdentity: {
-      title: "Twoje ID instancji",
+      title: "Nazwa Twojej instancji",
       description:
-        "Inne instancje widzą ten serwer pod tym ID. Musi być unikalne wśród wszystkich połączonych instancji.",
+        "Pod tą nazwą inne instancje widzą ten serwer. Musi być unikalna wśród wszystkich połączonych instancji.",
     },
     syncSettings: {
       title: "Auto-synchronizacja",

@@ -32,8 +32,8 @@ import type { JwtPayloadType } from "../../identity/auth/types";
 import { UserPermissionRole } from "../../identity/roles/enum";
 import type { EndpointLogger } from "../../logger/types";
 import {
-  type RemoteConnectionAuditAction,
   remoteConnectionAudit,
+  type RemoteConnectionAuditAction,
   remoteConnections,
   type TransportMode,
 } from "../db";

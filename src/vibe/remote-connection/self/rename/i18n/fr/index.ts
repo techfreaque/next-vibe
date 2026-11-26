@@ -9,9 +9,11 @@ export const translations: typeof enTranslations = {
     title: "Renommer cette instance",
     titleShort: "Renommer l'instance",
     description: "Modifier le nom lisible de votre propre instance",
+    renaming: "Renommage…",
     newInstanceId: {
-      label: "Nouvel ID d'instance",
-      description: "Le nouvel identifiant de cette instance",
+      label: "Nouveau nom de l'instance",
+      description:
+        "Les instances connectées voient ce serveur sous ce nom. Unique, 32 caractères maximum.",
       placeholder: "hermes",
     },
     errors: {
