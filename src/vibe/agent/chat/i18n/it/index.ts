@@ -919,6 +919,9 @@ export const translations: typeof enTranslations = {
         "Qwen 4 Max - La nuova ammiraglia di Alibaba. Il ragionamento anteriore, il codice e l'analisi, legge immagini e video. 1M-token contesto.",
       kimiK31ProUncensored:
         "Kimi K3.1 Pro Uncensored - Moonshot AI è il più forte Kimi con i rifiuti rimossi (abliterati). Bandiera ragionamento, nessuna lezione, strumenti inclusi. 1M-token contesto.",
+      hy4: "Hy4 - Il modello di punta di Tencent. Ragiona di default, programma, legge immagini, usa strumenti. Prezzo basso per la sua fascia. Contesto da 1M token.",
+      hy4Flash:
+        "Hy4 Flash - L'Hy4 piccolo e veloce di Tencent. Testo e immagini in ingresso, codice e chiamate a strumenti quasi gratis. Contesto da 1M token.",
       deepseekV41Flash:
         "DeepSeek V4.1 Flash - modello aperto rapido di DeepSeek, ora con visione. Codifica seria per quasi nulla. contesto 1M-token.",
       qwen38Flash:

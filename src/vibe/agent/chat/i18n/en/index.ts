@@ -911,6 +911,9 @@ export const translations = {
         "Qwen 4 Max - Alibaba's new flagship. Frontier reasoning, code and analysis, reads images and video. 1M-token context.",
       kimiK31ProUncensored:
         "Kimi K3.1 Pro Uncensored - Moonshot AI's strongest Kimi with the refusals removed (abliterated). Flagship reasoning, no lectures, tools included. 1M-token context.",
+      hy4: "Hy4 - Tencent's flagship. Reasons by default, codes, reads images, calls tools. Low price for its tier. 1M-token context.",
+      hy4Flash:
+        "Hy4 Flash - Tencent's small, fast Hy4. Text and images in, code and tool calls out, for almost nothing. 1M-token context.",
       deepseekV41Flash:
         "DeepSeek V4.1 Flash - DeepSeek's fast open model, now with vision. Serious coding for almost nothing. 1M-token context.",
       qwen38Flash:

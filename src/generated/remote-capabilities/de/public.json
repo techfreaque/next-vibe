@@ -5539,7 +5539,9 @@
                           "SUPERGEMMA_4_26B": "supergemma4-26b-uncensored",
                           "DEEPSEEK_V4_1_FLASH_CSF": "deepseek-v4.1-flash-1017-abliterated-csf",
                           "QWEN_4_MAX": "qwen-4-max",
-                          "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
+                          "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored",
+                          "HY_4": "hy4",
+                          "HY_4_FLASH": "hy4-flash"
                         }
                       },
                       "type": "enum",
@@ -5681,7 +5683,9 @@
                         "SUPERGEMMA_4_26B": "supergemma4-26b-uncensored",
                         "DEEPSEEK_V4_1_FLASH_CSF": "deepseek-v4.1-flash-1017-abliterated-csf",
                         "QWEN_4_MAX": "qwen-4-max",
-                        "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
+                        "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored",
+                        "HY_4": "hy4",
+                        "HY_4_FLASH": "hy4-flash"
                       },
                       "options": [
                         "gpt-55",
@@ -5821,7 +5825,9 @@
                         "supergemma4-26b-uncensored",
                         "deepseek-v4.1-flash-1017-abliterated-csf",
                         "qwen-4-max",
-                        "kimi-k3.1-pro-uncensored"
+                        "kimi-k3.1-pro-uncensored",
+                        "hy4",
+                        "hy4-flash"
                       ]
                     }
                   },
@@ -8706,7 +8712,9 @@
                               "SUPERGEMMA_4_26B": "supergemma4-26b-uncensored",
                               "DEEPSEEK_V4_1_FLASH_CSF": "deepseek-v4.1-flash-1017-abliterated-csf",
                               "QWEN_4_MAX": "qwen-4-max",
-                              "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
+                              "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored",
+                              "HY_4": "hy4",
+                              "HY_4_FLASH": "hy4-flash"
                             }
                           },
                           "type": "enum",
@@ -8848,7 +8856,9 @@
                             "SUPERGEMMA_4_26B": "supergemma4-26b-uncensored",
                             "DEEPSEEK_V4_1_FLASH_CSF": "deepseek-v4.1-flash-1017-abliterated-csf",
                             "QWEN_4_MAX": "qwen-4-max",
-                            "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
+                            "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored",
+                            "HY_4": "hy4",
+                            "HY_4_FLASH": "hy4-flash"
                           },
                           "options": [
                             "gpt-55",
@@ -8988,7 +8998,9 @@
                             "supergemma4-26b-uncensored",
                             "deepseek-v4.1-flash-1017-abliterated-csf",
                             "qwen-4-max",
-                            "kimi-k3.1-pro-uncensored"
+                            "kimi-k3.1-pro-uncensored",
+                            "hy4",
+                            "hy4-flash"
                           ]
                         }
                       },
@@ -9960,6 +9972,14 @@
             {
               "value": "kimi-k3.1-pro-uncensored",
               "label": "models.names.KIMI_K3_1_PRO_UNCENSORED"
+            },
+            {
+              "value": "hy4",
+              "label": "models.names.HY_4"
+            },
+            {
+              "value": "hy4-flash",
+              "label": "models.names.HY_4_FLASH"
             }
           ],
           "columns": 6,
@@ -10108,7 +10128,9 @@
                     "SUPERGEMMA_4_26B": "supergemma4-26b-uncensored",
                     "DEEPSEEK_V4_1_FLASH_CSF": "deepseek-v4.1-flash-1017-abliterated-csf",
                     "QWEN_4_MAX": "qwen-4-max",
-                    "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
+                    "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored",
+                    "HY_4": "hy4",
+                    "HY_4_FLASH": "hy4-flash"
                   }
                 },
                 "type": "enum",
@@ -10250,7 +10272,9 @@
                   "SUPERGEMMA_4_26B": "supergemma4-26b-uncensored",
                   "DEEPSEEK_V4_1_FLASH_CSF": "deepseek-v4.1-flash-1017-abliterated-csf",
                   "QWEN_4_MAX": "qwen-4-max",
-                  "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
+                  "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored",
+                  "HY_4": "hy4",
+                  "HY_4_FLASH": "hy4-flash"
                 },
                 "options": [
                   "gpt-55",
@@ -10390,7 +10414,9 @@
                   "supergemma4-26b-uncensored",
                   "deepseek-v4.1-flash-1017-abliterated-csf",
                   "qwen-4-max",
-                  "kimi-k3.1-pro-uncensored"
+                  "kimi-k3.1-pro-uncensored",
+                  "hy4",
+                  "hy4-flash"
                 ]
               }
             },
@@ -21933,7 +21959,9 @@
                         "SUPERGEMMA_4_26B": "supergemma4-26b-uncensored",
                         "DEEPSEEK_V4_1_FLASH_CSF": "deepseek-v4.1-flash-1017-abliterated-csf",
                         "QWEN_4_MAX": "qwen-4-max",
-                        "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
+                        "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored",
+                        "HY_4": "hy4",
+                        "HY_4_FLASH": "hy4-flash"
                       }
                     },
                     "type": "enum",
@@ -22075,7 +22103,9 @@
                       "SUPERGEMMA_4_26B": "supergemma4-26b-uncensored",
                       "DEEPSEEK_V4_1_FLASH_CSF": "deepseek-v4.1-flash-1017-abliterated-csf",
                       "QWEN_4_MAX": "qwen-4-max",
-                      "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
+                      "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored",
+                      "HY_4": "hy4",
+                      "HY_4_FLASH": "hy4-flash"
                     },
                     "options": [
                       "gpt-55",
@@ -22215,7 +22245,9 @@
                       "supergemma4-26b-uncensored",
                       "deepseek-v4.1-flash-1017-abliterated-csf",
                       "qwen-4-max",
-                      "kimi-k3.1-pro-uncensored"
+                      "kimi-k3.1-pro-uncensored",
+                      "hy4",
+                      "hy4-flash"
                     ]
                   }
                 },
@@ -24954,7 +24986,9 @@
                           "SUPERGEMMA_4_26B": "supergemma4-26b-uncensored",
                           "DEEPSEEK_V4_1_FLASH_CSF": "deepseek-v4.1-flash-1017-abliterated-csf",
                           "QWEN_4_MAX": "qwen-4-max",
-                          "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
+                          "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored",
+                          "HY_4": "hy4",
+                          "HY_4_FLASH": "hy4-flash"
                         }
                       },
                       "type": "enum",
@@ -25096,7 +25130,9 @@
                         "SUPERGEMMA_4_26B": "supergemma4-26b-uncensored",
                         "DEEPSEEK_V4_1_FLASH_CSF": "deepseek-v4.1-flash-1017-abliterated-csf",
                         "QWEN_4_MAX": "qwen-4-max",
-                        "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
+                        "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored",
+                        "HY_4": "hy4",
+                        "HY_4_FLASH": "hy4-flash"
                       },
                       "options": [
                         "gpt-55",
@@ -25236,7 +25272,9 @@
                         "supergemma4-26b-uncensored",
                         "deepseek-v4.1-flash-1017-abliterated-csf",
                         "qwen-4-max",
-                        "kimi-k3.1-pro-uncensored"
+                        "kimi-k3.1-pro-uncensored",
+                        "hy4",
+                        "hy4-flash"
                       ]
                     }
                   },
@@ -26174,7 +26212,9 @@
                     "SUPERGEMMA_4_26B": "supergemma4-26b-uncensored",
                     "DEEPSEEK_V4_1_FLASH_CSF": "deepseek-v4.1-flash-1017-abliterated-csf",
                     "QWEN_4_MAX": "qwen-4-max",
-                    "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
+                    "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored",
+                    "HY_4": "hy4",
+                    "HY_4_FLASH": "hy4-flash"
                   }
                 },
                 "type": "enum",
@@ -26316,7 +26356,9 @@
                   "SUPERGEMMA_4_26B": "supergemma4-26b-uncensored",
                   "DEEPSEEK_V4_1_FLASH_CSF": "deepseek-v4.1-flash-1017-abliterated-csf",
                   "QWEN_4_MAX": "qwen-4-max",
-                  "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
+                  "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored",
+                  "HY_4": "hy4",
+                  "HY_4_FLASH": "hy4-flash"
                 },
                 "options": [
                   "gpt-55",
@@ -26456,7 +26498,9 @@
                   "supergemma4-26b-uncensored",
                   "deepseek-v4.1-flash-1017-abliterated-csf",
                   "qwen-4-max",
-                  "kimi-k3.1-pro-uncensored"
+                  "kimi-k3.1-pro-uncensored",
+                  "hy4",
+                  "hy4-flash"
                 ]
               }
             },
@@ -27195,7 +27239,9 @@
                           "SUPERGEMMA_4_26B": "supergemma4-26b-uncensored",
                           "DEEPSEEK_V4_1_FLASH_CSF": "deepseek-v4.1-flash-1017-abliterated-csf",
                           "QWEN_4_MAX": "qwen-4-max",
-                          "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
+                          "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored",
+                          "HY_4": "hy4",
+                          "HY_4_FLASH": "hy4-flash"
                         }
                       },
                       "type": "enum",
@@ -27337,7 +27383,9 @@
                         "SUPERGEMMA_4_26B": "supergemma4-26b-uncensored",
                         "DEEPSEEK_V4_1_FLASH_CSF": "deepseek-v4.1-flash-1017-abliterated-csf",
                         "QWEN_4_MAX": "qwen-4-max",
-                        "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
+                        "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored",
+                        "HY_4": "hy4",
+                        "HY_4_FLASH": "hy4-flash"
                       },
                       "options": [
                         "gpt-55",
@@ -27477,7 +27525,9 @@
                         "supergemma4-26b-uncensored",
                         "deepseek-v4.1-flash-1017-abliterated-csf",
                         "qwen-4-max",
-                        "kimi-k3.1-pro-uncensored"
+                        "kimi-k3.1-pro-uncensored",
+                        "hy4",
+                        "hy4-flash"
                       ]
                     }
                   },
@@ -35084,7 +35134,9 @@
                                             "SUPERGEMMA_4_26B": "supergemma4-26b-uncensored",
                                             "DEEPSEEK_V4_1_FLASH_CSF": "deepseek-v4.1-flash-1017-abliterated-csf",
                                             "QWEN_4_MAX": "qwen-4-max",
-                                            "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
+                                            "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored",
+                                            "HY_4": "hy4",
+                                            "HY_4_FLASH": "hy4-flash"
                                           }
                                         },
                                         "type": "enum",
@@ -35226,7 +35278,9 @@
                                           "SUPERGEMMA_4_26B": "supergemma4-26b-uncensored",
                                           "DEEPSEEK_V4_1_FLASH_CSF": "deepseek-v4.1-flash-1017-abliterated-csf",
                                           "QWEN_4_MAX": "qwen-4-max",
-                                          "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
+                                          "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored",
+                                          "HY_4": "hy4",
+                                          "HY_4_FLASH": "hy4-flash"
                                         },
                                         "options": [
                                           "gpt-55",
@@ -35366,7 +35420,9 @@
                                           "supergemma4-26b-uncensored",
                                           "deepseek-v4.1-flash-1017-abliterated-csf",
                                           "qwen-4-max",
-                                          "kimi-k3.1-pro-uncensored"
+                                          "kimi-k3.1-pro-uncensored",
+                                          "hy4",
+                                          "hy4-flash"
                                         ]
                                       },
                                       "intelligenceRange": {
@@ -36164,7 +36220,9 @@
                                           "SUPERGEMMA_4_26B": "supergemma4-26b-uncensored",
                                           "DEEPSEEK_V4_1_FLASH_CSF": "deepseek-v4.1-flash-1017-abliterated-csf",
                                           "QWEN_4_MAX": "qwen-4-max",
-                                          "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
+                                          "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored",
+                                          "HY_4": "hy4",
+                                          "HY_4_FLASH": "hy4-flash"
                                         }
                                       },
                                       "type": "enum",
@@ -36306,7 +36364,9 @@
                                         "SUPERGEMMA_4_26B": "supergemma4-26b-uncensored",
                                         "DEEPSEEK_V4_1_FLASH_CSF": "deepseek-v4.1-flash-1017-abliterated-csf",
                                         "QWEN_4_MAX": "qwen-4-max",
-                                        "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
+                                        "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored",
+                                        "HY_4": "hy4",
+                                        "HY_4_FLASH": "hy4-flash"
                                       },
                                       "options": [
                                         "gpt-55",
@@ -36446,7 +36506,9 @@
                                         "supergemma4-26b-uncensored",
                                         "deepseek-v4.1-flash-1017-abliterated-csf",
                                         "qwen-4-max",
-                                        "kimi-k3.1-pro-uncensored"
+                                        "kimi-k3.1-pro-uncensored",
+                                        "hy4",
+                                        "hy4-flash"
                                       ]
                                     },
                                     "intelligenceRange": {
@@ -37924,7 +37986,9 @@
                                           "SUPERGEMMA_4_26B": "supergemma4-26b-uncensored",
                                           "DEEPSEEK_V4_1_FLASH_CSF": "deepseek-v4.1-flash-1017-abliterated-csf",
                                           "QWEN_4_MAX": "qwen-4-max",
-                                          "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
+                                          "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored",
+                                          "HY_4": "hy4",
+                                          "HY_4_FLASH": "hy4-flash"
                                         }
                                       },
                                       "type": "enum",
@@ -38066,7 +38130,9 @@
                                         "SUPERGEMMA_4_26B": "supergemma4-26b-uncensored",
                                         "DEEPSEEK_V4_1_FLASH_CSF": "deepseek-v4.1-flash-1017-abliterated-csf",
                                         "QWEN_4_MAX": "qwen-4-max",
-                                        "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
+                                        "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored",
+                                        "HY_4": "hy4",
+                                        "HY_4_FLASH": "hy4-flash"
                                       },
                                       "options": [
                                         "gpt-55",
@@ -38206,7 +38272,9 @@
                                         "supergemma4-26b-uncensored",
                                         "deepseek-v4.1-flash-1017-abliterated-csf",
                                         "qwen-4-max",
-                                        "kimi-k3.1-pro-uncensored"
+                                        "kimi-k3.1-pro-uncensored",
+                                        "hy4",
+                                        "hy4-flash"
                                       ]
                                     },
                                     "intelligenceRange": {
@@ -39004,7 +39072,9 @@
                                         "SUPERGEMMA_4_26B": "supergemma4-26b-uncensored",
                                         "DEEPSEEK_V4_1_FLASH_CSF": "deepseek-v4.1-flash-1017-abliterated-csf",
                                         "QWEN_4_MAX": "qwen-4-max",
-                                        "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
+                                        "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored",
+                                        "HY_4": "hy4",
+                                        "HY_4_FLASH": "hy4-flash"
                                       }
                                     },
                                     "type": "enum",
@@ -39146,7 +39216,9 @@
                                       "SUPERGEMMA_4_26B": "supergemma4-26b-uncensored",
                                       "DEEPSEEK_V4_1_FLASH_CSF": "deepseek-v4.1-flash-1017-abliterated-csf",
                                       "QWEN_4_MAX": "qwen-4-max",
-                                      "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
+                                      "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored",
+                                      "HY_4": "hy4",
+                                      "HY_4_FLASH": "hy4-flash"
                                     },
                                     "options": [
                                       "gpt-55",
@@ -39286,7 +39358,9 @@
                                       "supergemma4-26b-uncensored",
                                       "deepseek-v4.1-flash-1017-abliterated-csf",
                                       "qwen-4-max",
-                                      "kimi-k3.1-pro-uncensored"
+                                      "kimi-k3.1-pro-uncensored",
+                                      "hy4",
+                                      "hy4-flash"
                                     ]
                                   },
                                   "intelligenceRange": {
@@ -48216,7 +48290,6 @@
                                                   "GPT_5_4_NANO": "gpt-5.4-nano",
                                                   "GPT_5_3_CODEX": "gpt-53-codex",
                                                   "GPT_5_2": "gpt-52",
-                                                  "GPT_5_2_CHAT": "gpt-52-chat",
                                                   "GPT_5_2_PRO": "gpt-52-pro",
                                                   "GPT_5_1": "gpt-51",
                                                   "GPT_5_1_CODEX": "gpt-51-codex",
@@ -48276,7 +48349,6 @@
                                                   "MINIMAX_M3": "minimax-m3",
                                                   "QWEN_3_7_FLASH": "qwen-3.7-flash",
                                                   "QWEN_3_8_MAX": "qwen-3.8-max",
-                                                  "MIMO_V2_5": "mimo-v2.5",
                                                   "META_MUSE_SPARK_1_2": "meta-muse-spark-1.2",
                                                   "MISTRAL_MEDIUM_3_5": "mistral-medium-3.5",
                                                   "CLAUDE_OPUS_5_5": "claude-opus-5.5",
@@ -48309,7 +48381,9 @@
                                                   "GPT_6_2_SOL": "gpt-6.2-sol",
                                                   "GPT_6_2_ASTRA": "gpt-6.2-astra",
                                                   "SUPERGEMMA_4_26B": "supergemma4-26b-uncensored",
-                                                  "QWEN_4_MAX": "qwen-4-max"
+                                                  "QWEN_4_MAX": "qwen-4-max",
+                                                  "HY_4": "hy4",
+                                                  "HY_4_FLASH": "hy4-flash"
                                                 }
                                               },
                                               "type": "enum",
@@ -48322,7 +48396,6 @@
                                                 "GPT_5_4_NANO": "gpt-5.4-nano",
                                                 "GPT_5_3_CODEX": "gpt-53-codex",
                                                 "GPT_5_2": "gpt-52",
-                                                "GPT_5_2_CHAT": "gpt-52-chat",
                                                 "GPT_5_2_PRO": "gpt-52-pro",
                                                 "GPT_5_1": "gpt-51",
                                                 "GPT_5_1_CODEX": "gpt-51-codex",
@@ -48382,7 +48455,6 @@
                                                 "MINIMAX_M3": "minimax-m3",
                                                 "QWEN_3_7_FLASH": "qwen-3.7-flash",
                                                 "QWEN_3_8_MAX": "qwen-3.8-max",
-                                                "MIMO_V2_5": "mimo-v2.5",
                                                 "META_MUSE_SPARK_1_2": "meta-muse-spark-1.2",
                                                 "MISTRAL_MEDIUM_3_5": "mistral-medium-3.5",
                                                 "CLAUDE_OPUS_5_5": "claude-opus-5.5",
@@ -48415,7 +48487,9 @@
                                                 "GPT_6_2_SOL": "gpt-6.2-sol",
                                                 "GPT_6_2_ASTRA": "gpt-6.2-astra",
                                                 "SUPERGEMMA_4_26B": "supergemma4-26b-uncensored",
-                                                "QWEN_4_MAX": "qwen-4-max"
+                                                "QWEN_4_MAX": "qwen-4-max",
+                                                "HY_4": "hy4",
+                                                "HY_4_FLASH": "hy4-flash"
                                               },
                                               "options": [
                                                 "gpt-55",
@@ -48426,7 +48500,6 @@
                                                 "gpt-5.4-nano",
                                                 "gpt-53-codex",
                                                 "gpt-52",
-                                                "gpt-52-chat",
                                                 "gpt-52-pro",
                                                 "gpt-51",
                                                 "gpt-51-codex",
@@ -48486,7 +48559,6 @@
                                                 "minimax-m3",
                                                 "qwen-3.7-flash",
                                                 "qwen-3.8-max",
-                                                "mimo-v2.5",
                                                 "meta-muse-spark-1.2",
                                                 "mistral-medium-3.5",
                                                 "claude-opus-5.5",
@@ -48519,7 +48591,9 @@
                                                 "gpt-6.2-sol",
                                                 "gpt-6.2-astra",
                                                 "supergemma4-26b-uncensored",
-                                                "qwen-4-max"
+                                                "qwen-4-max",
+                                                "hy4",
+                                                "hy4-flash"
                                               ]
                                             },
                                             "intelligenceRange": {
@@ -49190,7 +49264,6 @@
                                                 "GPT_5_4_NANO": "gpt-5.4-nano",
                                                 "GPT_5_3_CODEX": "gpt-53-codex",
                                                 "GPT_5_2": "gpt-52",
-                                                "GPT_5_2_CHAT": "gpt-52-chat",
                                                 "GPT_5_2_PRO": "gpt-52-pro",
                                                 "GPT_5_1": "gpt-51",
                                                 "GPT_5_1_CODEX": "gpt-51-codex",
@@ -49250,7 +49323,6 @@
                                                 "MINIMAX_M3": "minimax-m3",
                                                 "QWEN_3_7_FLASH": "qwen-3.7-flash",
                                                 "QWEN_3_8_MAX": "qwen-3.8-max",
-                                                "MIMO_V2_5": "mimo-v2.5",
                                                 "META_MUSE_SPARK_1_2": "meta-muse-spark-1.2",
                                                 "MISTRAL_MEDIUM_3_5": "mistral-medium-3.5",
                                                 "CLAUDE_OPUS_5_5": "claude-opus-5.5",
@@ -49283,7 +49355,9 @@
                                                 "GPT_6_2_SOL": "gpt-6.2-sol",
                                                 "GPT_6_2_ASTRA": "gpt-6.2-astra",
                                                 "SUPERGEMMA_4_26B": "supergemma4-26b-uncensored",
-                                                "QWEN_4_MAX": "qwen-4-max"
+                                                "QWEN_4_MAX": "qwen-4-max",
+                                                "HY_4": "hy4",
+                                                "HY_4_FLASH": "hy4-flash"
                                               }
                                             },
                                             "type": "enum",
@@ -49296,7 +49370,6 @@
                                               "GPT_5_4_NANO": "gpt-5.4-nano",
                                               "GPT_5_3_CODEX": "gpt-53-codex",
                                               "GPT_5_2": "gpt-52",
-                                              "GPT_5_2_CHAT": "gpt-52-chat",
                                               "GPT_5_2_PRO": "gpt-52-pro",
                                               "GPT_5_1": "gpt-51",
                                               "GPT_5_1_CODEX": "gpt-51-codex",
@@ -49356,7 +49429,6 @@
                                               "MINIMAX_M3": "minimax-m3",
                                               "QWEN_3_7_FLASH": "qwen-3.7-flash",
                                               "QWEN_3_8_MAX": "qwen-3.8-max",
-                                              "MIMO_V2_5": "mimo-v2.5",
                                               "META_MUSE_SPARK_1_2": "meta-muse-spark-1.2",
                                               "MISTRAL_MEDIUM_3_5": "mistral-medium-3.5",
                                               "CLAUDE_OPUS_5_5": "claude-opus-5.5",
@@ -49389,7 +49461,9 @@
                                               "GPT_6_2_SOL": "gpt-6.2-sol",
                                               "GPT_6_2_ASTRA": "gpt-6.2-astra",
                                               "SUPERGEMMA_4_26B": "supergemma4-26b-uncensored",
-                                              "QWEN_4_MAX": "qwen-4-max"
+                                              "QWEN_4_MAX": "qwen-4-max",
+                                              "HY_4": "hy4",
+                                              "HY_4_FLASH": "hy4-flash"
                                             },
                                             "options": [
                                               "gpt-55",
@@ -49400,7 +49474,6 @@
                                               "gpt-5.4-nano",
                                               "gpt-53-codex",
                                               "gpt-52",
-                                              "gpt-52-chat",
                                               "gpt-52-pro",
                                               "gpt-51",
                                               "gpt-51-codex",
@@ -49460,7 +49533,6 @@
                                               "minimax-m3",
                                               "qwen-3.7-flash",
                                               "qwen-3.8-max",
-                                              "mimo-v2.5",
                                               "meta-muse-spark-1.2",
                                               "mistral-medium-3.5",
                                               "claude-opus-5.5",
@@ -49493,7 +49565,9 @@
                                               "gpt-6.2-sol",
                                               "gpt-6.2-astra",
                                               "supergemma4-26b-uncensored",
-                                              "qwen-4-max"
+                                              "qwen-4-max",
+                                              "hy4",
+                                              "hy4-flash"
                                             ]
                                           },
                                           "intelligenceRange": {
@@ -50189,7 +50263,6 @@
                                                   "MINIMAX_M3": "minimax-m3",
                                                   "QWEN_3_7_FLASH": "qwen-3.7-flash",
                                                   "QWEN_3_8_MAX": "qwen-3.8-max",
-                                                  "MIMO_V2_5": "mimo-v2.5",
                                                   "META_MUSE_SPARK_1_2": "meta-muse-spark-1.2",
                                                   "GEMINI_4_ARGON": "gemini-4-argon",
                                                   "GEMINI_3_8_FLASH": "gemini-3.8-flash",
@@ -50224,7 +50297,6 @@
                                                 "MINIMAX_M3": "minimax-m3",
                                                 "QWEN_3_7_FLASH": "qwen-3.7-flash",
                                                 "QWEN_3_8_MAX": "qwen-3.8-max",
-                                                "MIMO_V2_5": "mimo-v2.5",
                                                 "META_MUSE_SPARK_1_2": "meta-muse-spark-1.2",
                                                 "GEMINI_4_ARGON": "gemini-4-argon",
                                                 "GEMINI_3_8_FLASH": "gemini-3.8-flash",
@@ -50257,7 +50329,6 @@
                                                 "minimax-m3",
                                                 "qwen-3.7-flash",
                                                 "qwen-3.8-max",
-                                                "mimo-v2.5",
                                                 "meta-muse-spark-1.2",
                                                 "gemini-4-argon",
                                                 "gemini-3.8-flash",
@@ -50950,7 +51021,6 @@
                                                 "MINIMAX_M3": "minimax-m3",
                                                 "QWEN_3_7_FLASH": "qwen-3.7-flash",
                                                 "QWEN_3_8_MAX": "qwen-3.8-max",
-                                                "MIMO_V2_5": "mimo-v2.5",
                                                 "META_MUSE_SPARK_1_2": "meta-muse-spark-1.2",
                                                 "GEMINI_4_ARGON": "gemini-4-argon",
                                                 "GEMINI_3_8_FLASH": "gemini-3.8-flash",
@@ -50985,7 +51055,6 @@
                                               "MINIMAX_M3": "minimax-m3",
                                               "QWEN_3_7_FLASH": "qwen-3.7-flash",
                                               "QWEN_3_8_MAX": "qwen-3.8-max",
-                                              "MIMO_V2_5": "mimo-v2.5",
                                               "META_MUSE_SPARK_1_2": "meta-muse-spark-1.2",
                                               "GEMINI_4_ARGON": "gemini-4-argon",
                                               "GEMINI_3_8_FLASH": "gemini-3.8-flash",
@@ -51018,7 +51087,6 @@
                                               "minimax-m3",
                                               "qwen-3.7-flash",
                                               "qwen-3.8-max",
-                                              "mimo-v2.5",
                                               "meta-muse-spark-1.2",
                                               "gemini-4-argon",
                                               "gemini-3.8-flash",
@@ -51724,7 +51792,6 @@
                                                   "GEMINI_3_6_FLASH": "gemini-3.6-flash",
                                                   "GEMINI_3_5_FLASH_LITE": "gemini-3.5-flash-lite",
                                                   "GEMINI_3_7_FLASH": "gemini-3.7-flash",
-                                                  "MIMO_V2_5": "mimo-v2.5",
                                                   "GEMINI_4_ARGON": "gemini-4-argon",
                                                   "GEMINI_3_8_FLASH": "gemini-3.8-flash",
                                                   "MIMO_V2_6_PRO": "mimo-v2.6-pro",
@@ -51747,7 +51814,6 @@
                                                 "GEMINI_3_6_FLASH": "gemini-3.6-flash",
                                                 "GEMINI_3_5_FLASH_LITE": "gemini-3.5-flash-lite",
                                                 "GEMINI_3_7_FLASH": "gemini-3.7-flash",
-                                                "MIMO_V2_5": "mimo-v2.5",
                                                 "GEMINI_4_ARGON": "gemini-4-argon",
                                                 "GEMINI_3_8_FLASH": "gemini-3.8-flash",
                                                 "MIMO_V2_6_PRO": "mimo-v2.6-pro",
@@ -51768,7 +51834,6 @@
                                                 "gemini-3.6-flash",
                                                 "gemini-3.5-flash-lite",
                                                 "gemini-3.7-flash",
-                                                "mimo-v2.5",
                                                 "gemini-4-argon",
                                                 "gemini-3.8-flash",
                                                 "mimo-v2.6-pro",
@@ -52449,7 +52514,6 @@
                                                 "GEMINI_3_6_FLASH": "gemini-3.6-flash",
                                                 "GEMINI_3_5_FLASH_LITE": "gemini-3.5-flash-lite",
                                                 "GEMINI_3_7_FLASH": "gemini-3.7-flash",
-                                                "MIMO_V2_5": "mimo-v2.5",
                                                 "GEMINI_4_ARGON": "gemini-4-argon",
                                                 "GEMINI_3_8_FLASH": "gemini-3.8-flash",
                                                 "MIMO_V2_6_PRO": "mimo-v2.6-pro",
@@ -52472,7 +52536,6 @@
                                               "GEMINI_3_6_FLASH": "gemini-3.6-flash",
                                               "GEMINI_3_5_FLASH_LITE": "gemini-3.5-flash-lite",
                                               "GEMINI_3_7_FLASH": "gemini-3.7-flash",
-                                              "MIMO_V2_5": "mimo-v2.5",
                                               "GEMINI_4_ARGON": "gemini-4-argon",
                                               "GEMINI_3_8_FLASH": "gemini-3.8-flash",
                                               "MIMO_V2_6_PRO": "mimo-v2.6-pro",
@@ -52493,7 +52556,6 @@
                                               "gemini-3.6-flash",
                                               "gemini-3.5-flash-lite",
                                               "gemini-3.7-flash",
-                                              "mimo-v2.5",
                                               "gemini-4-argon",
                                               "gemini-3.8-flash",
                                               "mimo-v2.6-pro",
@@ -53388,7 +53450,9 @@
                                           "SUPERGEMMA_4_26B": "supergemma4-26b-uncensored",
                                           "DEEPSEEK_V4_1_FLASH_CSF": "deepseek-v4.1-flash-1017-abliterated-csf",
                                           "QWEN_4_MAX": "qwen-4-max",
-                                          "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
+                                          "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored",
+                                          "HY_4": "hy4",
+                                          "HY_4_FLASH": "hy4-flash"
                                         }
                                       },
                                       "type": "enum",
@@ -53530,7 +53594,9 @@
                                         "SUPERGEMMA_4_26B": "supergemma4-26b-uncensored",
                                         "DEEPSEEK_V4_1_FLASH_CSF": "deepseek-v4.1-flash-1017-abliterated-csf",
                                         "QWEN_4_MAX": "qwen-4-max",
-                                        "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
+                                        "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored",
+                                        "HY_4": "hy4",
+                                        "HY_4_FLASH": "hy4-flash"
                                       },
                                       "options": [
                                         "gpt-55",
@@ -53670,7 +53736,9 @@
                                         "supergemma4-26b-uncensored",
                                         "deepseek-v4.1-flash-1017-abliterated-csf",
                                         "qwen-4-max",
-                                        "kimi-k3.1-pro-uncensored"
+                                        "kimi-k3.1-pro-uncensored",
+                                        "hy4",
+                                        "hy4-flash"
                                       ]
                                     },
                                     "intelligenceRange": {
@@ -54468,7 +54536,9 @@
                                         "SUPERGEMMA_4_26B": "supergemma4-26b-uncensored",
                                         "DEEPSEEK_V4_1_FLASH_CSF": "deepseek-v4.1-flash-1017-abliterated-csf",
                                         "QWEN_4_MAX": "qwen-4-max",
-                                        "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
+                                        "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored",
+                                        "HY_4": "hy4",
+                                        "HY_4_FLASH": "hy4-flash"
                                       }
                                     },
                                     "type": "enum",
@@ -54610,7 +54680,9 @@
                                       "SUPERGEMMA_4_26B": "supergemma4-26b-uncensored",
                                       "DEEPSEEK_V4_1_FLASH_CSF": "deepseek-v4.1-flash-1017-abliterated-csf",
                                       "QWEN_4_MAX": "qwen-4-max",
-                                      "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
+                                      "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored",
+                                      "HY_4": "hy4",
+                                      "HY_4_FLASH": "hy4-flash"
                                     },
                                     "options": [
                                       "gpt-55",
@@ -54750,7 +54822,9 @@
                                       "supergemma4-26b-uncensored",
                                       "deepseek-v4.1-flash-1017-abliterated-csf",
                                       "qwen-4-max",
-                                      "kimi-k3.1-pro-uncensored"
+                                      "kimi-k3.1-pro-uncensored",
+                                      "hy4",
+                                      "hy4-flash"
                                     ]
                                   },
                                   "intelligenceRange": {
@@ -56226,7 +56300,9 @@
                                         "SUPERGEMMA_4_26B": "supergemma4-26b-uncensored",
                                         "DEEPSEEK_V4_1_FLASH_CSF": "deepseek-v4.1-flash-1017-abliterated-csf",
                                         "QWEN_4_MAX": "qwen-4-max",
-                                        "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
+                                        "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored",
+                                        "HY_4": "hy4",
+                                        "HY_4_FLASH": "hy4-flash"
                                       }
                                     },
                                     "type": "enum",
@@ -56368,7 +56444,9 @@
                                       "SUPERGEMMA_4_26B": "supergemma4-26b-uncensored",
                                       "DEEPSEEK_V4_1_FLASH_CSF": "deepseek-v4.1-flash-1017-abliterated-csf",
                                       "QWEN_4_MAX": "qwen-4-max",
-                                      "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
+                                      "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored",
+                                      "HY_4": "hy4",
+                                      "HY_4_FLASH": "hy4-flash"
                                     },
                                     "options": [
                                       "gpt-55",
@@ -56508,7 +56586,9 @@
                                       "supergemma4-26b-uncensored",
                                       "deepseek-v4.1-flash-1017-abliterated-csf",
                                       "qwen-4-max",
-                                      "kimi-k3.1-pro-uncensored"
+                                      "kimi-k3.1-pro-uncensored",
+                                      "hy4",
+                                      "hy4-flash"
                                     ]
                                   },
                                   "intelligenceRange": {
@@ -57304,7 +57384,9 @@
                                       "SUPERGEMMA_4_26B": "supergemma4-26b-uncensored",
                                       "DEEPSEEK_V4_1_FLASH_CSF": "deepseek-v4.1-flash-1017-abliterated-csf",
                                       "QWEN_4_MAX": "qwen-4-max",
-                                      "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
+                                      "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored",
+                                      "HY_4": "hy4",
+                                      "HY_4_FLASH": "hy4-flash"
                                     }
                                   },
                                   "type": "enum",
@@ -57446,7 +57528,9 @@
                                     "SUPERGEMMA_4_26B": "supergemma4-26b-uncensored",
                                     "DEEPSEEK_V4_1_FLASH_CSF": "deepseek-v4.1-flash-1017-abliterated-csf",
                                     "QWEN_4_MAX": "qwen-4-max",
-                                    "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
+                                    "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored",
+                                    "HY_4": "hy4",
+                                    "HY_4_FLASH": "hy4-flash"
                                   },
                                   "options": [
                                     "gpt-55",
@@ -57586,7 +57670,9 @@
                                     "supergemma4-26b-uncensored",
                                     "deepseek-v4.1-flash-1017-abliterated-csf",
                                     "qwen-4-max",
-                                    "kimi-k3.1-pro-uncensored"
+                                    "kimi-k3.1-pro-uncensored",
+                                    "hy4",
+                                    "hy4-flash"
                                   ]
                                 },
                                 "intelligenceRange": {
@@ -66516,7 +66602,6 @@
                                                 "GPT_5_4_NANO": "gpt-5.4-nano",
                                                 "GPT_5_3_CODEX": "gpt-53-codex",
                                                 "GPT_5_2": "gpt-52",
-                                                "GPT_5_2_CHAT": "gpt-52-chat",
                                                 "GPT_5_2_PRO": "gpt-52-pro",
                                                 "GPT_5_1": "gpt-51",
                                                 "GPT_5_1_CODEX": "gpt-51-codex",
@@ -66576,7 +66661,6 @@
                                                 "MINIMAX_M3": "minimax-m3",
                                                 "QWEN_3_7_FLASH": "qwen-3.7-flash",
                                                 "QWEN_3_8_MAX": "qwen-3.8-max",
-                                                "MIMO_V2_5": "mimo-v2.5",
                                                 "META_MUSE_SPARK_1_2": "meta-muse-spark-1.2",
                                                 "MISTRAL_MEDIUM_3_5": "mistral-medium-3.5",
                                                 "CLAUDE_OPUS_5_5": "claude-opus-5.5",
@@ -66609,7 +66693,9 @@
                                                 "GPT_6_2_SOL": "gpt-6.2-sol",
                                                 "GPT_6_2_ASTRA": "gpt-6.2-astra",
                                                 "SUPERGEMMA_4_26B": "supergemma4-26b-uncensored",
-                                                "QWEN_4_MAX": "qwen-4-max"
+                                                "QWEN_4_MAX": "qwen-4-max",
+                                                "HY_4": "hy4",
+                                                "HY_4_FLASH": "hy4-flash"
                                               }
                                             },
                                             "type": "enum",
@@ -66622,7 +66708,6 @@
                                               "GPT_5_4_NANO": "gpt-5.4-nano",
                                               "GPT_5_3_CODEX": "gpt-53-codex",
                                               "GPT_5_2": "gpt-52",
-                                              "GPT_5_2_CHAT": "gpt-52-chat",
                                               "GPT_5_2_PRO": "gpt-52-pro",
                                               "GPT_5_1": "gpt-51",
                                               "GPT_5_1_CODEX": "gpt-51-codex",
@@ -66682,7 +66767,6 @@
                                               "MINIMAX_M3": "minimax-m3",
                                               "QWEN_3_7_FLASH": "qwen-3.7-flash",
                                               "QWEN_3_8_MAX": "qwen-3.8-max",
-                                              "MIMO_V2_5": "mimo-v2.5",
                                               "META_MUSE_SPARK_1_2": "meta-muse-spark-1.2",
                                               "MISTRAL_MEDIUM_3_5": "mistral-medium-3.5",
                                               "CLAUDE_OPUS_5_5": "claude-opus-5.5",
@@ -66715,7 +66799,9 @@
                                               "GPT_6_2_SOL": "gpt-6.2-sol",
                                               "GPT_6_2_ASTRA": "gpt-6.2-astra",
                                               "SUPERGEMMA_4_26B": "supergemma4-26b-uncensored",
-                                              "QWEN_4_MAX": "qwen-4-max"
+                                              "QWEN_4_MAX": "qwen-4-max",
+                                              "HY_4": "hy4",
+                                              "HY_4_FLASH": "hy4-flash"
                                             },
                                             "options": [
                                               "gpt-55",
@@ -66726,7 +66812,6 @@
                                               "gpt-5.4-nano",
                                               "gpt-53-codex",
                                               "gpt-52",
-                                              "gpt-52-chat",
                                               "gpt-52-pro",
                                               "gpt-51",
                                               "gpt-51-codex",
@@ -66786,7 +66871,6 @@
                                               "minimax-m3",
                                               "qwen-3.7-flash",
                                               "qwen-3.8-max",
-                                              "mimo-v2.5",
                                               "meta-muse-spark-1.2",
                                               "mistral-medium-3.5",
                                               "claude-opus-5.5",
@@ -66819,7 +66903,9 @@
                                               "gpt-6.2-sol",
                                               "gpt-6.2-astra",
                                               "supergemma4-26b-uncensored",
-                                              "qwen-4-max"
+                                              "qwen-4-max",
+                                              "hy4",
+                                              "hy4-flash"
                                             ]
                                           },
                                           "intelligenceRange": {
@@ -67490,7 +67576,6 @@
                                               "GPT_5_4_NANO": "gpt-5.4-nano",
                                               "GPT_5_3_CODEX": "gpt-53-codex",
                                               "GPT_5_2": "gpt-52",
-                                              "GPT_5_2_CHAT": "gpt-52-chat",
                                               "GPT_5_2_PRO": "gpt-52-pro",
                                               "GPT_5_1": "gpt-51",
                                               "GPT_5_1_CODEX": "gpt-51-codex",
@@ -67550,7 +67635,6 @@
                                               "MINIMAX_M3": "minimax-m3",
                                               "QWEN_3_7_FLASH": "qwen-3.7-flash",
                                               "QWEN_3_8_MAX": "qwen-3.8-max",
-                                              "MIMO_V2_5": "mimo-v2.5",
                                               "META_MUSE_SPARK_1_2": "meta-muse-spark-1.2",
                                               "MISTRAL_MEDIUM_3_5": "mistral-medium-3.5",
                                               "CLAUDE_OPUS_5_5": "claude-opus-5.5",
@@ -67583,7 +67667,9 @@
                                               "GPT_6_2_SOL": "gpt-6.2-sol",
                                               "GPT_6_2_ASTRA": "gpt-6.2-astra",
                                               "SUPERGEMMA_4_26B": "supergemma4-26b-uncensored",
-                                              "QWEN_4_MAX": "qwen-4-max"
+                                              "QWEN_4_MAX": "qwen-4-max",
+                                              "HY_4": "hy4",
+                                              "HY_4_FLASH": "hy4-flash"
                                             }
                                           },
                                           "type": "enum",
@@ -67596,7 +67682,6 @@
                                             "GPT_5_4_NANO": "gpt-5.4-nano",
                                             "GPT_5_3_CODEX": "gpt-53-codex",
                                             "GPT_5_2": "gpt-52",
-                                            "GPT_5_2_CHAT": "gpt-52-chat",
                                             "GPT_5_2_PRO": "gpt-52-pro",
                                             "GPT_5_1": "gpt-51",
                                             "GPT_5_1_CODEX": "gpt-51-codex",
@@ -67656,7 +67741,6 @@
                                             "MINIMAX_M3": "minimax-m3",
                                             "QWEN_3_7_FLASH": "qwen-3.7-flash",
                                             "QWEN_3_8_MAX": "qwen-3.8-max",
-                                            "MIMO_V2_5": "mimo-v2.5",
                                             "META_MUSE_SPARK_1_2": "meta-muse-spark-1.2",
                                             "MISTRAL_MEDIUM_3_5": "mistral-medium-3.5",
                                             "CLAUDE_OPUS_5_5": "claude-opus-5.5",
@@ -67689,7 +67773,9 @@
                                             "GPT_6_2_SOL": "gpt-6.2-sol",
                                             "GPT_6_2_ASTRA": "gpt-6.2-astra",
                                             "SUPERGEMMA_4_26B": "supergemma4-26b-uncensored",
-                                            "QWEN_4_MAX": "qwen-4-max"
+                                            "QWEN_4_MAX": "qwen-4-max",
+                                            "HY_4": "hy4",
+                                            "HY_4_FLASH": "hy4-flash"
                                           },
                                           "options": [
                                             "gpt-55",
@@ -67700,7 +67786,6 @@
                                             "gpt-5.4-nano",
                                             "gpt-53-codex",
                                             "gpt-52",
-                                            "gpt-52-chat",
                                             "gpt-52-pro",
                                             "gpt-51",
                                             "gpt-51-codex",
@@ -67760,7 +67845,6 @@
                                             "minimax-m3",
                                             "qwen-3.7-flash",
                                             "qwen-3.8-max",
-                                            "mimo-v2.5",
                                             "meta-muse-spark-1.2",
                                             "mistral-medium-3.5",
                                             "claude-opus-5.5",
@@ -67793,7 +67877,9 @@
                                             "gpt-6.2-sol",
                                             "gpt-6.2-astra",
                                             "supergemma4-26b-uncensored",
-                                            "qwen-4-max"
+                                            "qwen-4-max",
+                                            "hy4",
+                                            "hy4-flash"
                                           ]
                                         },
                                         "intelligenceRange": {
@@ -68489,7 +68575,6 @@
                                                 "MINIMAX_M3": "minimax-m3",
                                                 "QWEN_3_7_FLASH": "qwen-3.7-flash",
                                                 "QWEN_3_8_MAX": "qwen-3.8-max",
-                                                "MIMO_V2_5": "mimo-v2.5",
                                                 "META_MUSE_SPARK_1_2": "meta-muse-spark-1.2",
                                                 "GEMINI_4_ARGON": "gemini-4-argon",
                                                 "GEMINI_3_8_FLASH": "gemini-3.8-flash",
@@ -68524,7 +68609,6 @@
                                               "MINIMAX_M3": "minimax-m3",
                                               "QWEN_3_7_FLASH": "qwen-3.7-flash",
                                               "QWEN_3_8_MAX": "qwen-3.8-max",
-                                              "MIMO_V2_5": "mimo-v2.5",
                                               "META_MUSE_SPARK_1_2": "meta-muse-spark-1.2",
                                               "GEMINI_4_ARGON": "gemini-4-argon",
                                               "GEMINI_3_8_FLASH": "gemini-3.8-flash",
@@ -68557,7 +68641,6 @@
                                               "minimax-m3",
                                               "qwen-3.7-flash",
                                               "qwen-3.8-max",
-                                              "mimo-v2.5",
                                               "meta-muse-spark-1.2",
                                               "gemini-4-argon",
                                               "gemini-3.8-flash",
@@ -69250,7 +69333,6 @@
                                               "MINIMAX_M3": "minimax-m3",
                                               "QWEN_3_7_FLASH": "qwen-3.7-flash",
                                               "QWEN_3_8_MAX": "qwen-3.8-max",
-                                              "MIMO_V2_5": "mimo-v2.5",
                                               "META_MUSE_SPARK_1_2": "meta-muse-spark-1.2",
                                               "GEMINI_4_ARGON": "gemini-4-argon",
                                               "GEMINI_3_8_FLASH": "gemini-3.8-flash",
@@ -69285,7 +69367,6 @@
                                             "MINIMAX_M3": "minimax-m3",
                                             "QWEN_3_7_FLASH": "qwen-3.7-flash",
                                             "QWEN_3_8_MAX": "qwen-3.8-max",
-                                            "MIMO_V2_5": "mimo-v2.5",
                                             "META_MUSE_SPARK_1_2": "meta-muse-spark-1.2",
                                             "GEMINI_4_ARGON": "gemini-4-argon",
                                             "GEMINI_3_8_FLASH": "gemini-3.8-flash",
@@ -69318,7 +69399,6 @@
                                             "minimax-m3",
                                             "qwen-3.7-flash",
                                             "qwen-3.8-max",
-                                            "mimo-v2.5",
                                             "meta-muse-spark-1.2",
                                             "gemini-4-argon",
                                             "gemini-3.8-flash",
@@ -70024,7 +70104,6 @@
                                                 "GEMINI_3_6_FLASH": "gemini-3.6-flash",
                                                 "GEMINI_3_5_FLASH_LITE": "gemini-3.5-flash-lite",
                                                 "GEMINI_3_7_FLASH": "gemini-3.7-flash",
-                                                "MIMO_V2_5": "mimo-v2.5",
                                                 "GEMINI_4_ARGON": "gemini-4-argon",
                                                 "GEMINI_3_8_FLASH": "gemini-3.8-flash",
                                                 "MIMO_V2_6_PRO": "mimo-v2.6-pro",
@@ -70047,7 +70126,6 @@
                                               "GEMINI_3_6_FLASH": "gemini-3.6-flash",
                                               "GEMINI_3_5_FLASH_LITE": "gemini-3.5-flash-lite",
                                               "GEMINI_3_7_FLASH": "gemini-3.7-flash",
-                                              "MIMO_V2_5": "mimo-v2.5",
                                               "GEMINI_4_ARGON": "gemini-4-argon",
                                               "GEMINI_3_8_FLASH": "gemini-3.8-flash",
                                               "MIMO_V2_6_PRO": "mimo-v2.6-pro",
@@ -70068,7 +70146,6 @@
                                               "gemini-3.6-flash",
                                               "gemini-3.5-flash-lite",
                                               "gemini-3.7-flash",
-                                              "mimo-v2.5",
                                               "gemini-4-argon",
                                               "gemini-3.8-flash",
                                               "mimo-v2.6-pro",
@@ -70749,7 +70826,6 @@
                                               "GEMINI_3_6_FLASH": "gemini-3.6-flash",
                                               "GEMINI_3_5_FLASH_LITE": "gemini-3.5-flash-lite",
                                               "GEMINI_3_7_FLASH": "gemini-3.7-flash",
-                                              "MIMO_V2_5": "mimo-v2.5",
                                               "GEMINI_4_ARGON": "gemini-4-argon",
                                               "GEMINI_3_8_FLASH": "gemini-3.8-flash",
                                               "MIMO_V2_6_PRO": "mimo-v2.6-pro",
@@ -70772,7 +70848,6 @@
                                             "GEMINI_3_6_FLASH": "gemini-3.6-flash",
                                             "GEMINI_3_5_FLASH_LITE": "gemini-3.5-flash-lite",
                                             "GEMINI_3_7_FLASH": "gemini-3.7-flash",
-                                            "MIMO_V2_5": "mimo-v2.5",
                                             "GEMINI_4_ARGON": "gemini-4-argon",
                                             "GEMINI_3_8_FLASH": "gemini-3.8-flash",
                                             "MIMO_V2_6_PRO": "mimo-v2.6-pro",
@@ -70793,7 +70868,6 @@
                                             "gemini-3.6-flash",
                                             "gemini-3.5-flash-lite",
                                             "gemini-3.7-flash",
-                                            "mimo-v2.5",
                                             "gemini-4-argon",
                                             "gemini-3.8-flash",
                                             "mimo-v2.6-pro",
@@ -72285,7 +72359,7 @@
           "variant": "muted",
           "label": "Wähle aus {{count}} Modellen mit präziser Steuerung von Intelligenz, Geschwindigkeit und Kosten",
           "contentParams": {
-            "count": 266
+            "count": 268
           },
           "usage": {
             "response": true
@@ -72813,7 +72887,9 @@
                                 "SUPERGEMMA_4_26B": "supergemma4-26b-uncensored",
                                 "DEEPSEEK_V4_1_FLASH_CSF": "deepseek-v4.1-flash-1017-abliterated-csf",
                                 "QWEN_4_MAX": "qwen-4-max",
-                                "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
+                                "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored",
+                                "HY_4": "hy4",
+                                "HY_4_FLASH": "hy4-flash"
                               }
                             },
                             "type": "enum",
@@ -72955,7 +73031,9 @@
                               "SUPERGEMMA_4_26B": "supergemma4-26b-uncensored",
                               "DEEPSEEK_V4_1_FLASH_CSF": "deepseek-v4.1-flash-1017-abliterated-csf",
                               "QWEN_4_MAX": "qwen-4-max",
-                              "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
+                              "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored",
+                              "HY_4": "hy4",
+                              "HY_4_FLASH": "hy4-flash"
                             },
                             "options": [
                               "gpt-55",
@@ -73095,7 +73173,9 @@
                               "supergemma4-26b-uncensored",
                               "deepseek-v4.1-flash-1017-abliterated-csf",
                               "qwen-4-max",
-                              "kimi-k3.1-pro-uncensored"
+                              "kimi-k3.1-pro-uncensored",
+                              "hy4",
+                              "hy4-flash"
                             ]
                           }
                         },
@@ -73599,7 +73679,7 @@
           "hiddenForPlatforms": ["ai", "mcp"],
           "schema": {
             "def": {
-              "type": "default",
+              "type": "optional",
               "innerType": {
                 "def": {
                   "type": "number",
@@ -73622,7 +73702,7 @@
                 "isFinite": true
               }
             },
-            "type": "default"
+            "type": "optional"
           },
           "usage": {
             "request": "data"

@@ -1852,6 +1852,9 @@ export const translations: typeof enTranslations = {
           "Nowy flagowiec Alibaby i pierwszy Qwen 4. Rozumowanie, kod i analiza na najwyższym poziomie, czyta obrazy i wideo, wywołuje narzędzia, 1M kontekstu. Luźniejsze filtry niż u amerykańskich laboratoriów. Myśli przed każdą odpowiedzią, więc chwilę to trwa. O jedną czwartą tańszy od Qwen 3.8 Max, który zastępuje.",
         kimiK31ProUncensored:
           "Najmocniejsze Kimi od Moonshot AI z usuniętymi odmowami (abliterated), dostarczane przez Lyber. Nowy szczyt wśród modeli bez cenzury: rozumowanie, kod, długie teksty i narzędzia, 1M kontekstu. Odmowy usunięte, światopogląd nietknięty: w polityce odpowiada tak, jak ujmuje to bazowe Kimi. Po poglądy polityczne pod prąd mainstreamu weź UncensoredLM. Tylko tekst. Cena premium, kilka razy więcej niż GLM 5.3 Uncensored, tańszy ciężki zawodnik.",
+        hy4: "Hy4, flagowiec Tencenta. Domyślnie rozumuje, programuje, czyta obrazy, wywołuje narzędzia, kontekst 1M. Standardowe filtry w niskiej cenie jak na tę klasę. To nowa nazwa, więc sprawdź go na własnych promptach. Hy4 Flash to tańszy i szybszy brat.",
+        hy4Flash:
+          "Mały Hy4 od Tencenta. Czyta tekst i obrazy, programuje, wywołuje narzędzia, kontekst 1M. Jeden z najtańszych modeli w katalogu, stworzony do pracy na dużą skalę. Szybkość zamiast głębi: trudne zadania zostaw Hy4.",
         deepseekV41Flash:
           "Szybki model DeepSeek, teraz także z rozumieniem obrazów. Poważne kodowanie i analiza prawie za darmo: najtańszy model w katalogu. Wywołuje narzędzia, 1M kontekstu, luźniejsze filtry. Nie myśli głęboko. Do trudnych problemów weź DeepSeek V4 Pro, a bez odmów DeepSeek V4.1 Flash Uncensored.",
         qwen38Flash:

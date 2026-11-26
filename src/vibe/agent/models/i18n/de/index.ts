@@ -416,6 +416,8 @@ export const translations: typeof enTranslations = {
     VOXTRAL_SMALL_TRANSCRIBE: "Voxtral Small Transcribe",
     QWEN_4_MAX: "Qwen 4 Max",
     KIMI_K3_1_PRO_UNCENSORED: "Kimi K3.1 Pro Uncensored",
+    HY_4: "Hy4",
+    HY_4_FLASH: "Hy4 Flash",
     GROK_IMAGINE_IMAGE_2: "Grok Imagine Image 2.0",
     QWEN_IMAGE_3: "Qwen Image 3",
     QWEN_IMAGE_3_PRO: "Qwen Image 3 Pro",

@@ -1650,8 +1650,8 @@ export const videoGenModelDefinitions: Record<
         id: VideoGenModelId.SEEDANCE_2_FAST,
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "bytedance/seedance-2.0-fast",
-        creditCostPerSecond: 9.072, // updated: 2026-11-08 from openrouter.ai video_tokens (24fps, 720p)
-        pricingByResolution: { "480p": 4.0352, "720p": 9.072 }, // updated: 2026-11-09 from openrouter.ai
+        creditCostPerSecond: 12.096, // updated: 2026-11-26 from openrouter.ai video_tokens $0.0000056 (24fps, 720p)
+        pricingByResolution: { "480p": 5.3803, "720p": 12.096 }, // updated: 2026-11-26 from openrouter.ai
         allowedPassthroughParameters: ["watermark", "req_key"], // updated: 2026-11-09 from openrouter.ai
         supportedSizes: [
           "480x480",
@@ -1702,7 +1702,7 @@ export const videoGenModelDefinitions: Record<
         id: VideoGenModelId.SEEDANCE_2_FAST,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "seedance-2-fast",
-        creditCostPerSecond: 11.7936, // updated: 2026-11-09 from unbottled.ai
+        creditCostPerSecond: 15.7248, // updated: 2026-11-26 (OpenRouter 12.096 x 1.3 relay markup)
         defaultDurationSeconds: 5,
         minDurationSeconds: 4,
         maxDurationSeconds: 15,
@@ -1745,7 +1745,7 @@ export const videoGenModelDefinitions: Record<
           "1280x720",
           "1680x720",
         ],
-        pricingByResolution: { "480p": 5.2458, "720p": 11.7936 }, // updated: 2026-11-09 from unbottled.ai
+        pricingByResolution: { "480p": 6.9944, "720p": 15.7248 }, // updated: 2026-11-26 (OpenRouter x 1.3 relay markup)
       },
     ],
     utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],

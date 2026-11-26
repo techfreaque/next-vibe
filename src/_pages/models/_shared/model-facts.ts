@@ -243,6 +243,25 @@ export function findModelPageAlias(segment: string): ChatModelId | null {
     : null;
 }
 
+/**
+ * Delisted (enabled: false) chat models that have a successor, by slug. They
+ * get no page of their own; their old URLs 308 to the successor's page.
+ */
+const retiredIdBySlug = new Map<string, ChatModelId>(
+  Object.values(ChatModelId)
+    .filter(
+      (id) =>
+        !isPublicDefinition(chatModelDefinitions[id]) &&
+        chatModelSuccessors[id] !== undefined,
+    )
+    .map((id) => [toModelSlug(id), id]),
+);
+
+/** The delisted model a URL segment names, or null. */
+export function findRetiredModelId(segment: string): ChatModelId | null {
+  return retiredIdBySlug.get(normalizeSegment(segment)) ?? null;
+}
+
 /** Resolve a URL segment (slug, or the raw model id) to a public model. */
 export function findPublicModelId(segment: string): ChatModelId | null {
   const decoded = decodeURIComponent(segment).toLowerCase();

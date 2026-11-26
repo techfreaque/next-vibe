@@ -13,7 +13,6 @@ export enum ImageVisionModelId {
   GPT_5_4_NANO = "gpt-5.4-nano",
   GPT_5_3_CODEX = "gpt-53-codex",
   GPT_5_2 = "gpt-52",
-  GPT_5_2_CHAT = "gpt-52-chat",
   GPT_5_2_PRO = "gpt-52-pro",
   GPT_5_1 = "gpt-51",
   GPT_5_1_CODEX = "gpt-51-codex",
@@ -73,7 +72,6 @@ export enum ImageVisionModelId {
   MINIMAX_M3 = "minimax-m3",
   QWEN_3_7_FLASH = "qwen-3.7-flash",
   QWEN_3_8_MAX = "qwen-3.8-max",
-  MIMO_V2_5 = "mimo-v2.5",
   META_MUSE_SPARK_1_2 = "meta-muse-spark-1.2",
   MISTRAL_MEDIUM_3_5 = "mistral-medium-3.5",
   CLAUDE_OPUS_5_5 = "claude-opus-5.5",
@@ -107,6 +105,8 @@ export enum ImageVisionModelId {
   GPT_6_2_ASTRA = "gpt-6.2-astra",
   SUPERGEMMA_4_26B = "supergemma4-26b-uncensored",
   QWEN_4_MAX = "qwen-4-max",
+  HY_4 = "hy4",
+  HY_4_FLASH = "hy4-flash",
 }
 
 export enum VideoVisionModelId {
@@ -125,7 +125,6 @@ export enum VideoVisionModelId {
   MINIMAX_M3 = "minimax-m3",
   QWEN_3_7_FLASH = "qwen-3.7-flash",
   QWEN_3_8_MAX = "qwen-3.8-max",
-  MIMO_V2_5 = "mimo-v2.5",
   META_MUSE_SPARK_1_2 = "meta-muse-spark-1.2",
   GEMINI_4_ARGON = "gemini-4-argon",
   GEMINI_3_8_FLASH = "gemini-3.8-flash",
@@ -154,7 +153,6 @@ export enum AudioVisionModelId {
   GEMINI_3_6_FLASH = "gemini-3.6-flash",
   GEMINI_3_5_FLASH_LITE = "gemini-3.5-flash-lite",
   GEMINI_3_7_FLASH = "gemini-3.7-flash",
-  MIMO_V2_5 = "mimo-v2.5",
   GEMINI_4_ARGON = "gemini-4-argon",
   GEMINI_3_8_FLASH = "gemini-3.8-flash",
   MIMO_V2_6_PRO = "mimo-v2.6-pro",

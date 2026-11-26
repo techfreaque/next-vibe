@@ -1872,6 +1872,9 @@ export const translations = {
           "Alibaba's new flagship and the first Qwen 4. Frontier-tier reasoning, code and analysis, reads images and video, calls tools, 1M context. Lighter filters than the US labs. Thinks before every answer, so replies take a moment. A quarter cheaper than Qwen 3.8 Max, which it replaces.",
         kimiK31ProUncensored:
           "Moonshot AI's strongest Kimi with its refusals removed (abliterated), served by Lyber. The new top end of the uncensored set: reasoning, code, long-form writing and tools, 1M context. Refusals removed, worldview untouched: on politics it answers in base Kimi's framing. For political takes against the mainstream, take UncensoredLM. Text only. Premium price, several times GLM 5.3 Uncensored, the cheaper heavy hitter.",
+        hy4: "Tencent's flagship Hy4. Reasons by default, codes, reads images, calls tools, 1M context. Mainstream filters at a low price for its tier. A newer name, so test it on your own prompts. Hy4 Flash is the cheap, fast sibling.",
+        hy4Flash:
+          "Tencent's small Hy4. Reads text and images, codes, calls tools, 1M context. One of the cheapest models in the catalog, built for high-volume work. Trades depth for speed: Hy4 takes the harder problems.",
         deepseekV41Flash:
           "DeepSeek's fast model, now with vision. Serious coding and analysis for almost nothing: the cheapest model in the catalog. Calls tools, 1M context, lighter filters. Not a deep reasoner. Step up to DeepSeek V4 Pro for hard problems, or pick DeepSeek V4.1 Flash Uncensored for no refusals.",
         qwen38Flash:

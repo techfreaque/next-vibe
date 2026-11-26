@@ -1898,6 +1898,9 @@ export const translations: typeof enTranslations = {
           "El nuevo buque insignia de Alibaba y el primer Qwen 4. Razonamiento, código y análisis de vanguardia, lee imágenes y vídeos, llama herramientas, contexto 1M. Filtros más ligeros que los laboratorios US. Piensa antes de cada respuesta, así que las respuestas toman un momento. Un cuarto más barato que Qwen 3.8 Max, que reemplaza.",
         kimiK31ProUncensored:
           "El Kimi más potente de Moonshot AI, con los rechazos eliminados mediante abliteration, disponible en Lyber. Una opción de gama alta sin censura para razonamiento, código y textos largos. Usa herramientas y tiene contexto de 1M. Conserva la postura política del Kimi original. Para posturas políticas a contracorriente, elige UncensoredLM. Solo acepta texto. Cuesta varias veces lo que GLM 5.3 Uncensored, la alternativa potente a menor precio.",
+        hy4: "Hy4, el buque insignia de Tencent. Razona por defecto, programa, lee imágenes y usa herramientas, contexto de 1M. Filtros convencionales a un precio bajo para su nivel. Es un nombre nuevo: pruébalo con tus propios prompts. Hy4 Flash es su hermano barato y rápido.",
+        hy4Flash:
+          "El Hy4 pequeño de Tencent. Lee texto e imágenes, programa y usa herramientas, contexto de 1M. Uno de los modelos más baratos del catálogo, hecho para trabajo en volumen. Cambia profundidad por velocidad: para los problemas difíciles, Hy4.",
         deepseekV41Flash:
           "El modelo rápido de DeepSeek ahora lee imágenes. Rinde bien en código y análisis y es el más económico del catálogo. Usa herramientas, tiene contexto de 1M y filtros más leves. Para problemas que exigen más razonamiento, elige DeepSeek V4 Pro. Para respuestas sin rechazos, elige DeepSeek V4.1 Flash Uncensored.",
         qwen38Flash:

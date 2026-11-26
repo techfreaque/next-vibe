@@ -1879,6 +1879,9 @@ export const translations: typeof enTranslations = {
           "Vlajkový model od Alibaby a prvý Qwen 4. Zvláda špičkové uvažovanie, programovanie a analýzu, prijíma obrázky a video, volá nástroje a má kontext 1 milión tokenov. Používa miernejšie filtre ako americkí poskytovatelia. Uvažuje pred každou odpoveďou, preto odpovede chvíľu trvajú. Nahrádza Qwen 3.8 Max a je o štvrtinu lacnejší.",
         kimiK31ProUncensored:
           "Najvýkonnejší Kimi od Moonshot AI s odstráneným odmietaním, dostupný cez Lyber. Patrí k špičkovým modelom bez cenzúry na uvažovanie, programovanie, dlhé písanie a volanie nástrojov. Pracuje len s textom a má kontext 1 milión tokenov. Pri politike zachováva pohľad základného modelu. Názory mimo hlavného prúdu ponúka UncensoredLM. Stojí niekoľkonásobok ceny výkonného GLM 5.3 Uncensored.",
+        hy4: "Hy4, vlajková loď Tencentu. Predvolene uvažuje, programuje, číta obrázky, volá nástroje, kontext 1M. Bežné filtre za nízku cenu na svoju triedu. Je to nové meno, preto ho vyskúšaj na vlastných promptoch. Hy4 Flash je jeho lacnejší a rýchlejší súrodenec.",
+        hy4Flash:
+          "Malý Hy4 od Tencentu. Číta text a obrázky, programuje, volá nástroje, kontext 1M. Jeden z najlacnejších modelov v katalógu, stavaný na veľké objemy. Rýchlosť namiesto hĺbky: ťažké úlohy prenechaj Hy4.",
         deepseekV41Flash:
           "Rýchly DeepSeek teraz spracúva obrázky. Zvláda náročné programovanie a analýzu za najnižšiu cenu v katalógu. Volá nástroje, má kontext 1 milión tokenov a miernejšie filtre. Na dôkladné uvažovanie je vhodnejší DeepSeek V4 Pro. Na odpovede bez odmietania vyberte DeepSeek V4.1 Flash Uncensored.",
         qwen38Flash:

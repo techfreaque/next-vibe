@@ -31,6 +31,7 @@ import {
 import {
   canonicalComparisonPath,
   findPublicModelId,
+  findRetiredModelId,
   getModelFacts,
   type ModelFacts,
   resolveSuccessor,
@@ -74,6 +75,12 @@ export function resolveModelFacts(
 ): ModelFacts | null {
   const id = findPublicModelId(modelId);
   if (id === null) {
+    const retired = findRetiredModelId(modelId);
+    const successor =
+      retired === null ? null : resolveSuccessor(retired, availability);
+    if (successor !== null) {
+      permanentRedirect(`/${locale}/models/${successor.slug}`);
+    }
     return null;
   }
   const facts = getModelFacts(id, availability);

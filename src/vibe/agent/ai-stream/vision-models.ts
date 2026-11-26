@@ -125,9 +125,6 @@ const imageVisionModelOptionsIndex: Record<
   [ImageVisionModelId.GPT_5_2]: makeImageVisionOption(
     ImageVisionModelId.GPT_5_2,
   ),
-  [ImageVisionModelId.GPT_5_2_CHAT]: makeImageVisionOption(
-    ImageVisionModelId.GPT_5_2_CHAT,
-  ),
   [ImageVisionModelId.GPT_5_2_PRO]: makeImageVisionOption(
     ImageVisionModelId.GPT_5_2_PRO,
   ),
@@ -305,9 +302,6 @@ const imageVisionModelOptionsIndex: Record<
   [ImageVisionModelId.QWEN_4_MAX]: makeImageVisionOption(
     ImageVisionModelId.QWEN_4_MAX,
   ),
-  [ImageVisionModelId.MIMO_V2_5]: makeImageVisionOption(
-    ImageVisionModelId.MIMO_V2_5,
-  ),
   [ImageVisionModelId.META_MUSE_SPARK_1_2]: makeImageVisionOption(
     ImageVisionModelId.META_MUSE_SPARK_1_2,
   ),
@@ -337,6 +331,10 @@ const imageVisionModelOptionsIndex: Record<
   ),
   [ImageVisionModelId.SUPERGEMMA_4_26B]: makeImageVisionOption(
     ImageVisionModelId.SUPERGEMMA_4_26B,
+  ),
+  [ImageVisionModelId.HY_4]: makeImageVisionOption(ImageVisionModelId.HY_4),
+  [ImageVisionModelId.HY_4_FLASH]: makeImageVisionOption(
+    ImageVisionModelId.HY_4_FLASH,
   ),
   [ImageVisionModelId.GPT_6_ASTRA]: makeImageVisionOption(
     ImageVisionModelId.GPT_6_ASTRA,
@@ -460,9 +458,6 @@ const videoVisionModelOptionsIndex: Record<
   [VideoVisionModelId.QWEN_4_MAX]: makeVideoVisionOption(
     VideoVisionModelId.QWEN_4_MAX,
   ),
-  [VideoVisionModelId.MIMO_V2_5]: makeVideoVisionOption(
-    VideoVisionModelId.MIMO_V2_5,
-  ),
   [VideoVisionModelId.META_MUSE_SPARK_1_2]: makeVideoVisionOption(
     VideoVisionModelId.META_MUSE_SPARK_1_2,
   ),
@@ -541,9 +536,6 @@ const audioVisionModelOptionsIndex: Record<
   ),
   [AudioVisionModelId.GEMINI_3_7_FLASH]: makeAudioVisionOption(
     AudioVisionModelId.GEMINI_3_7_FLASH,
-  ),
-  [AudioVisionModelId.MIMO_V2_5]: makeAudioVisionOption(
-    AudioVisionModelId.MIMO_V2_5,
   ),
   [AudioVisionModelId.GEMINI_4_ARGON]: makeAudioVisionOption(
     AudioVisionModelId.GEMINI_4_ARGON,

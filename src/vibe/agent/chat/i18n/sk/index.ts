@@ -907,6 +907,9 @@ export const translations: typeof enTranslations = {
         "Qwen 4 Max. Vlajkový model od Alibaby na pokročilé uvažovanie, programovanie a analýzu. Pracuje s obrázkami a videom. Kontext: 1 milión tokenov.",
       kimiK31ProUncensored:
         "Kimi K3.1 Pro Uncensored. Najvýkonnejší model Kimi od Moonshot AI s odstráneným odmietaním pomocou metódy abliteration. Špičkové uvažovanie, odpovede bez poučovania a volanie nástrojov. Kontext: 1 milión tokenov.",
+      hy4: "Hy4 - Vlajková loď Tencentu. Predvolene uvažuje, programuje, číta obrázky, volá nástroje. Nízka cena na svoju triedu. Kontext 1M tokenov.",
+      hy4Flash:
+        "Hy4 Flash - Malý a rýchly Hy4 od Tencentu. Text a obrázky na vstupe, kód a volania nástrojov takmer zadarmo. Kontext 1M tokenov.",
       deepseekV41Flash:
         "DeepSeek V4.1 Flash. Rýchly otvorený model od DeepSeek teraz pracuje aj s obrázkami. Zvláda náročné programovanie za veľmi nízku cenu. Kontext: 1 milión tokenov.",
       qwen38Flash:

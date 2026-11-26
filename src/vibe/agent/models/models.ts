@@ -652,6 +652,7 @@ export const modelProviders: Record<string, ModelProvider> = {
   },
   jiunsong: { name: "Jiunsong", icon: "brain" },
   jcartu: { name: "jcartu", icon: "si-deepseek" },
+  tencent: { name: "Tencent", icon: "brain" },
   microsoft: { name: "Microsoft", icon: "image" },
   theDrummer: {
     // eslint-disable-next-line i18next/no-literal-string -- Provider name is technical identifier
