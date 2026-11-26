@@ -22,7 +22,7 @@ const lifecycleRunTask = createCronTask(definitions.POST, tools.POST, {
   description: "run.post.description",
   schedule: CRON_SCHEDULES.EVERY_15_MINUTES,
   category: TaskCategory.MAINTENANCE,
-  enabled: true,
+  enabled: false, // off until Max approves the journeys; prod row is user-overridable
   hidden: false,
   priority: CronTaskPriority.LOW,
   timeout: TASK_TIMEOUTS.MEDIUM,
