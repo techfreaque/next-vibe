@@ -89,7 +89,7 @@ export class CliInputParser {
   private static setNestedValue(
     obj: Record<string, WidgetData>,
     path: string,
-    value: string | number | boolean,
+    value: WidgetData,
   ): void {
     // Convert kebab-case path segments to camelCase for API compatibility
     const keys = path.split(".").map((s) => this.kebabToCamelCase(s));
@@ -735,15 +735,14 @@ export class CliInputParser {
   /** Preserve literal text, and decode structured flags before local or remote dispatch. */
   private static normalizeNamedValue(
     value: WidgetData,
-    field: z.ZodType | undefined,
+    field: z.core.$ZodType | undefined,
   ): WidgetData {
     if (
-      !field ||
       typeof value !== "string" ||
       !(
         value.trimStart().startsWith("{") || value.trimStart().startsWith("[")
       ) ||
-      field.safeParse(value).success
+      (field && z.safeParse(field, value).success)
     ) {
       return this.normalizeCliValue(value);
     }
@@ -753,6 +752,32 @@ export class CliInputParser {
     } catch {
       return value;
     }
+  }
+
+  private static resolveNamedField(
+    schema: z.ZodType | undefined,
+    path: string,
+  ): z.core.$ZodType | undefined {
+    let field: z.core.$ZodType | undefined = schema;
+    for (const key of path.split(".")) {
+      while (
+        field instanceof z.ZodOptional ||
+        field instanceof z.ZodNullable ||
+        field instanceof z.ZodDefault ||
+        field instanceof z.ZodPrefault
+      ) {
+        field = field.unwrap();
+      }
+      if (field instanceof z.ZodObject) {
+        const shape = field.shape;
+        field = Object.hasOwn(shape, key) ? shape[key] : undefined;
+      } else if (field instanceof z.ZodArray && /^\d+$/.test(key)) {
+        field = field.element;
+      } else {
+        return undefined;
+      }
+    }
+    return field;
   }
 
   /**
@@ -793,26 +818,20 @@ export class CliInputParser {
         continue;
       }
 
-      const field = shape?.[this.kebabToCamelCase(key)];
+      const camelCaseKey = this.kebabToCamelCase(key);
       const normalizedValue = this.normalizeNamedValue(
         value,
-        field instanceof z.ZodType ? field : undefined,
+        this.resolveNamedField(schema, camelCaseKey) ??
+          this.resolveNamedField(
+            endpoint?.requestUrlPathParamsSchema,
+            camelCaseKey,
+          ),
       );
 
       // Use setNestedValue to expand dot-notation keys (e.g. response.output → { response: { output } })
       if (key.includes(".")) {
-        // `data` is already Record<string, WidgetData>; normalizeCliValue
-        // returns exactly the primitive union setNestedValue accepts, so the
-        // upstream assertions here were redundant.
-        if (
-          typeof normalizedValue === "string" ||
-          typeof normalizedValue === "number" ||
-          typeof normalizedValue === "boolean"
-        ) {
-          this.setNestedValue(data, key, normalizedValue);
-        }
+        this.setNestedValue(data, key, normalizedValue);
       } else {
-        const camelCaseKey = this.kebabToCamelCase(key);
         data[camelCaseKey] = normalizedValue;
       }
     }
@@ -929,12 +948,11 @@ export class CliInputParser {
     const urlPathParams = params.urlPathParams;
     const interactive = params.interactive;
 
-    // Re-parse tokens with endpoint boolean field awareness when raw tokens are available.
-    // The initial parse in vibe-runtime.ts didn't know the endpoint yet, so boolean flags
-    // may have incorrectly consumed the next token as their value. Re-parsing fixes that.
+    // Use the complete token list even when the tool only exists on the peer.
+    // When the local definition is available it also supplies the boolean fields.
     let positionalArgs = params.positionalArgs;
     let namedArgs = params.namedArgs;
-    if (params.rawTokens && endpoint) {
+    if (params.rawTokens) {
       const reparsed = CliInputParser.parseCliArgumentsSimple(
         params.rawTokens,
         endpoint,

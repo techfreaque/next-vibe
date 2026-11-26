@@ -60,9 +60,7 @@ export async function runEndpointByName(params: {
   if (!result.success) {
     return result;
   }
-  const payload: WidgetData = result.data.result ?? result.data;
-  const data: WidgetData = JSON.parse(JSON.stringify(payload));
-  return success(data, {
+  return success(result.data.result ?? result.data, {
     ...(result.isErrorResponse && { isErrorResponse: true }),
     ...(result.performance && { performance: result.performance }),
   });

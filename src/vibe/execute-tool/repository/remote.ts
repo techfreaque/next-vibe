@@ -46,6 +46,7 @@ import { ResultSignals } from "./result-signals";
 import { generateTaskId } from "./task-id";
 import { callToolDirect } from "./transport/direct";
 import { emitToolRequest } from "./transport/events";
+import { reviveRemoteResultDates } from "./transport/result";
 import {
   marshalFilesForWire,
   repairCallerEnumShorthands,
@@ -533,7 +534,21 @@ export class RemoteDispatch {
       // clobber the EVENT-protocol attestation right after a relay. The
       // lastTransportUsed stamp belongs to pushRemoteEvent's delivery legs —
       // the wire the relay actually rode.
-      return { kind: "return", value: direct };
+      return {
+        kind: "return",
+        value: direct.success
+          ? {
+              ...direct,
+              data: {
+                ...direct.data,
+                result: reviveRemoteResultDates(
+                  direct.data.result,
+                  dispatchToolDef?.responseSchema,
+                ),
+              },
+            }
+          : direct,
+      };
     }
 
     logger.debug("[RouteExecute] Remote dispatch (event)", {
@@ -906,7 +921,12 @@ export class RemoteDispatch {
         : wireOutput;
     return {
       kind: "return",
-      value: success({ result: toolOutput ?? {} }),
+      value: success({
+        result: reviveRemoteResultDates(
+          toolOutput ?? {},
+          dispatchToolDef?.responseSchema,
+        ),
+      }),
     };
   }
 }

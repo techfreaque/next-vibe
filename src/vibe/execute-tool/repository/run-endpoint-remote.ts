@@ -85,9 +85,8 @@ export async function runEndpointRemote<TDef extends CreateApiEndpointAny>(
   if (!result.success) {
     return result as ResponseType<TDef["types"]["ResponseOutput"]>;
   }
-  const payload: WidgetData = result.data.result ?? result.data;
-  const data: WidgetData = JSON.parse(JSON.stringify(payload));
-  return success(data as TDef["types"]["ResponseOutput"], {
+  const payload = result.data.result ?? result.data;
+  return success(payload as TDef["types"]["ResponseOutput"], {
     ...(result.isErrorResponse && { isErrorResponse: true }),
     ...(result.performance && { performance: result.performance }),
   });
