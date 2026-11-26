@@ -42,10 +42,10 @@ class ReleaseAssetsTest(unittest.TestCase):
         old = {OLD_CHUNK: b"old", LOCALE: b"locale", **{k: b"private" for k in rejected}}
         commands = []
 
-        def staged(command, root):
+        def staged(command, root, patched=True, authoritative=frozenset()):
             commands.append(command)
             files = old if command[1] == "exec" else {NEW_CHUNK: b"new"}
-            return assets.stage(bundle(files), root)
+            return assets.stage(bundle(files), root, patched, authoritative)
 
         with tempfile.TemporaryDirectory() as folder, patch.object(assets, "stage_release", staged):
             root = Path(folder) / "ha-public" / "_next" / "static"
@@ -68,6 +68,41 @@ class ReleaseAssetsTest(unittest.TestCase):
             accepted = name not in rejected
             self.assertEqual(bool(assets.ASSET.fullmatch(name)), accepted, name)
             self.assertEqual(bool(re.fullmatch(matcher, "/_next/static/" + name)), accepted, name)
+
+    def test_runtime_env_sentinels_never_reach_the_edge_unpatched(self):
+        raw_env = b'value:"__VIBE_RUNTIME_ENV_NEXT_PUBLIC_APP_URL__"'
+        patched_env = b'value:"https://unbottled.ai"'
+        guard = b'r.startsWith("__VIBE_RUNTIME_ENV_")'
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            # A raw image copy poisoned by an earlier run must not survive.
+            (root / "chunks").mkdir()
+            (root / NEW_CHUNK).write_bytes(raw_env)
+            names = assets.stage(
+                bundle({NEW_CHUNK: raw_env, OLD_CHUNK: guard}), root, patched=False
+            )
+            self.assertEqual(names, {OLD_CHUNK})
+            self.assertFalse((root / NEW_CHUNK).exists())
+            self.assertEqual((root / OLD_CHUNK).read_bytes(), guard)
+
+            # The running container's patched copy replaces a differing cache entry.
+            (root / NEW_CHUNK).write_bytes(raw_env)
+            outgoing = assets.stage(bundle({NEW_CHUNK: patched_env}), root)
+            self.assertEqual((root / NEW_CHUNK).read_bytes(), patched_env)
+            # ...and the raw image of the next release leaves it in place.
+            assets.stage(bundle({NEW_CHUNK: raw_env}), root, patched=False,
+                         authoritative=frozenset(outgoing))
+            self.assertEqual((root / NEW_CHUNK).read_bytes(), patched_env)
+
+    def test_prod_poisoned_env_chunk_is_rejected(self):
+        """Replay of the 2026-11-26 outage: the staged raw chunk kept three sentinels."""
+        raw = (b'NEXT_PUBLIC_APP_URL:{value:"__VIBE_RUNTIME_ENV_NEXT_PUBLIC_APP_URL__"},'
+               b'NEXT_PUBLIC_VIBE_MODE:{value:"__VIBE_RUNTIME_ENV_NEXT_PUBLIC_VIBE_MODE__"}')
+        name = "chunks/153721-aa860b19c81fb1fc.js"
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            self.assertEqual(assets.stage(bundle({name: raw}), root, patched=False), set())
+            self.assertFalse((root / name).exists())
 
     def test_unrecognized_release_fails_preflight(self):
         with tempfile.TemporaryDirectory() as folder, self.assertRaises(ValueError):

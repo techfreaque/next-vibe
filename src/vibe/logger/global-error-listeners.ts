@@ -459,4 +459,23 @@ export function installGlobalErrorListeners(logger: EndpointLogger): void {
     }
   });
   observeChunkReloadOutcome(logger);
+  reportEnvPlaceholderLeaks(logger);
+}
+
+/**
+ * Client env keys that still held their build sentinel at load time
+ * (define-env-client.ts fell back to the default). Always a deploy bug: the
+ * served bundle skipped the start-time runtime env patch.
+ */
+function reportEnvPlaceholderLeaks(logger: EndpointLogger): void {
+  const leaks = globalThis.__vibeEnvPlaceholderLeaks;
+  if (!leaks?.length) {
+    return;
+  }
+  globalThis.__vibeEnvPlaceholderLeaks = [];
+  logger.error("[env] Unpatched runtime env placeholder reached the browser", {
+    keys: leaks.join(", ").slice(0, 500),
+    buildId: currentBuildId(),
+    errorSource: "runtime-env-patch",
+  });
 }

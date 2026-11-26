@@ -8,6 +8,11 @@ import { z as zod } from "zod";
 
 import { isRuntimeEnvPlaceholder } from "../platforms/cli/runtime/runtime-env-placeholders";
 
+declare global {
+  /** Client env keys whose runtime-env sentinel was never patched (module:key). */
+  var __vibeEnvPlaceholderLeaks: string[] | undefined;
+}
+
 interface FieldDef<T extends z.ZodTypeAny = z.ZodTypeAny> {
   schema: T;
   value: z.input<T>; // Must pass explicit process.env.VAR_NAME
@@ -58,6 +63,10 @@ export interface EnvExample {
  */
 export function defineEnvClient<T extends Fields>(
   fields: T,
+  options?: {
+    /** Which client env module this is, for the placeholder-leak report. */
+    name?: string;
+  },
 ): {
   envClient: InferEnv<T>;
   schema: z.ZodObject<{ [K in keyof T]: T[K]["schema"] }>;
@@ -93,14 +102,27 @@ export function defineEnvClient<T extends Fields>(
       if (v === "") {
         return [k, undefined];
       }
-      if (
-        process.env["VIBE_BUILD_PLACEHOLDER_ENV"] === "true" &&
-        typeof v === "string" &&
-        isRuntimeEnvPlaceholder(v)
-      ) {
+      if (typeof v !== "string" || !isRuntimeEnvPlaceholder(v)) {
+        return [k, v];
+      }
+      if (process.env["VIBE_BUILD_PLACEHOLDER_ENV"] === "true") {
         return [k, undefined];
       }
-      return [k, v];
+      // A sentinel the start-time patch never replaced reached a runtime that
+      // reads it. Failing its schema here would throw at module load and
+      // take down every page with Next's bare "This page couldn't load"
+      // (prod 2026-11-25/26: the HA edge cached the unpatched image copy of
+      // the env chunk). Fall back to the schema default and record the key;
+      // installGlobalErrorListeners reports it once a logger exists.
+      const field = fields[k];
+      if (!field || field.schema.safeParse(v).success) {
+        return [k, v];
+      }
+      if (typeof window !== "undefined") {
+        const leaks = (globalThis.__vibeEnvPlaceholderLeaks ??= []);
+        leaks.push(`${options?.name ?? "client"}:${k}`);
+      }
+      return [k, undefined];
     }),
   );
   const envClient = schema.parse(valuesForParse) as InferEnv<T>;
