@@ -8,18 +8,15 @@ import { UserPermissionRole, UserRole } from "next-vibe/identity/roles/enum";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import { Platform } from "next-vibe/platforms/platforms";
 import * as navigationModule from "next-vibe/ui/hooks/use-navigation";
-import { NextRequest } from "next-vibe/ui/lib/request";
 import { renderToStaticMarkup } from "react-dom/server";
 
 import { toModelSlug } from "@/_pages/models/_shared/model-facts";
-import { LEAD_ID_COOKIE_NAME, LOCALE_COOKIE_NAME } from "@/env/constants";
-import * as geo from "@/leads/geo/lookup";
-import { CHROME_131_CRAWLER_UA } from "@/leads/growth/chrome-131-crawler";
+import { LEAD_ID_COOKIE_NAME } from "@/env/constants";
 import { NewsletterSubscriptionStatus } from "@/newsletter/enum";
 
 import {
   DEGRADED_PUBLIC_DOCUMENT_HEADER,
-  forwardDegradedPublicDocument,
+  VERIFIED_CRAWLER_HEADER,
 } from "./public-document";
 
 const requestHeaders = new Headers();
@@ -203,77 +200,35 @@ it("renders marked public documents without a lead or optional database reads", 
   getState.mockRestore();
 });
 
-it("provisions a lead and resolves a guest session for browser navigation", async () => {
-  const { proxy } = await import("@/proxy");
-  const { GrowthJourneyRepository } =
-    await import("@/leads/growth/repository");
+it("resolves verified crawler documents as leadless public users without enabling degraded SSR", async () => {
   const { AuthRepository } = await import("next-vibe/identity/auth/repository");
-  const { LeadAuthRepository } =
-    await import("next-vibe/identity/lead/device-auth");
-  const leadOps = await import("next-vibe/identity/lead/middleware-ops");
-  const locale = "en-US";
+  const { isDegradedPublicDocument, isVerifiedCrawlerDocument } =
+    await import("./public-document.server");
+  const locale = defaultLocale;
   const logger = createEndpointLogger(false, locale);
-  const createLead = spyOn(leadOps, "createAnonymousLead");
-  const validateLead = spyOn(
-    LeadAuthRepository,
-    "validateLeadId",
-  ).mockResolvedValue(true);
-  const lookup = spyOn(geo, "geoCountryForIp").mockResolvedValue(null);
-  const recordTouch = spyOn(
-    GrowthJourneyRepository,
-    "recordTouch",
-  ).mockResolvedValue(undefined);
+  const page = { platform: Platform.NEXT_PAGE, locale };
 
-  try {
-    requestPath = `/${locale}/models`;
-    const browserHeaderSets: Record<string, string>[] = [
-      {
-        "sec-fetch-site": "cross-site",
-        "sec-fetch-dest": "document",
-        "sec-fetch-mode": "navigate",
-        "sec-fetch-user": "?1",
-      },
-      { cookie: `${LOCALE_COOKIE_NAME}=${locale}` },
-    ];
-    for (const browserHeaders of browserHeaderSets) {
-      const leadId = crypto.randomUUID();
-      createLead.mockResolvedValueOnce(leadId);
-      const request = new NextRequest(`https://example.test${requestPath}`, {
-        headers: {
-          "user-agent": CHROME_131_CRAWLER_UA,
-          accept: "text/html",
-          referer: "https://www.google.com/",
-          ...browserHeaders,
-        },
-      });
-      const response = await proxy(request);
-      expect(response.status).toBe(200);
-      expect(response.cookies.get(LEAD_ID_COOKIE_NAME)?.value).toBe(leadId);
-      expect(response.headers.get("x-middleware-request-cookie")).toContain(
-        `${LEAD_ID_COOKIE_NAME}=${leadId}`,
-      );
-      expect(forwardDegradedPublicDocument(requestHeaders, response)).toBe(
-        false,
-      );
+  requestHeaders.delete(DEGRADED_PUBLIC_DOCUMENT_HEADER);
+  requestHeaders.set(VERIFIED_CRAWLER_HEADER, "1");
+  requestPath = `/${locale}/story/refusal-index`;
+  logQuery.mockClear();
 
-      readCookies.mockReturnValue(
-        new Map([[LEAD_ID_COOKIE_NAME, { value: leadId }]]),
-      );
-      const guest = await AuthRepository.getAuthMinimalUser(
-        [UserRole.PUBLIC],
-        { platform: Platform.NEXT_PAGE, locale, request },
-        logger,
-      );
-      expect(guest.isPublic).toBeTruthy();
-      expect(guest.leadId).toBe(leadId);
-      expect(guest.roles).toEqual([UserPermissionRole.PUBLIC]);
-      expect(validateLead).toHaveBeenLastCalledWith(leadId, logger);
-    }
-    expect(createLead).toHaveBeenCalledTimes(2);
-  } finally {
-    createLead.mockRestore();
-    validateLead.mockRestore();
-    lookup.mockRestore();
-    recordTouch.mockRestore();
-  }
+  expect(await isVerifiedCrawlerDocument()).toBe(true);
+  expect(await isDegradedPublicDocument()).toBe(false);
+
+  const guest = await AuthRepository.getAuthMinimalUser(
+    [UserRole.PUBLIC],
+    page,
+    logger,
+  );
+  expect(guest.isPublic).toBe(true);
+  expect(guest.leadId).toBe("");
+  expect(guest.roles).toEqual([UserPermissionRole.PUBLIC]);
+  expect(logQuery).not.toHaveBeenCalled();
+
+  await expect(
+    AuthRepository.getAuthMinimalUser([UserRole.ADMIN], page, logger),
+  ).rejects.toThrow("Public user");
+
+  requestHeaders.delete(VERIFIED_CRAWLER_HEADER);
 });

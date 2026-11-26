@@ -2184,6 +2184,15 @@ export class CreditRepository {
       // Side effects first: ensure wallets exist + monthly reset
       let poolResult: ResponseType<CreditPool>;
       if (user.isPublic) {
+        if (!user.leadId) {
+          logger.debug(
+            "Skipping credit balance lookup for leadless public request",
+          );
+          return fail({
+            message: t("errors.getBalanceFailed"),
+            errorType: ErrorResponseTypes.UNAUTHORIZED,
+          });
+        }
         // Same pool resolution as deductions: a logged-out device whose lead
         // belongs to an account draws on that account's free allowance.
         poolResult = await CreditRepository.getLeadPool(

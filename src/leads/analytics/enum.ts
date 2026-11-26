@@ -45,6 +45,21 @@ export const {
   NO_UA: "leadAnalytics.botFamily.noUa",
 });
 
+export const BotFamilyDB = [
+  BotFamily.HUMAN,
+  BotFamily.META,
+  BotFamily.GOOGLE,
+  BotFamily.BING,
+  BotFamily.OPENAI,
+  BotFamily.ANTHROPIC,
+  BotFamily.PERPLEXITY,
+  BotFamily.OTHER_AI,
+  BotFamily.SOCIAL_PREVIEW,
+  BotFamily.AUTOMATION,
+  BotFamily.OTHER_BOT,
+  BotFamily.NO_UA,
+] as const;
+
 /** A known bot family (HUMAN and NO_UA = unknown are not bots). */
 export function isBotFamily(
   family: (typeof BotFamily)[keyof typeof BotFamily],

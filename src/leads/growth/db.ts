@@ -14,6 +14,7 @@ import {
   index,
   integer,
   pgTable,
+  primaryKey,
   text,
   timestamp,
   unique,
@@ -25,6 +26,7 @@ import { leads } from "next-vibe/identity/lead/db";
 import { users } from "next-vibe/identity/user/db";
 import type { z } from "zod";
 
+import { BotFamilyDB } from "../analytics/enum";
 import { ChannelTypeDB, PaidKindDB } from "./enum";
 
 /** One measured arrival. Signup and referral credit never write to this table. */
@@ -50,6 +52,24 @@ export const growthVisits = pgTable(
     index("idx_growth_visits_visited_at").on(table.visitedAt),
     index("idx_growth_visits_ref_code").on(table.refCode),
     index("idx_growth_visits_lead_id").on(table.leadId),
+  ],
+);
+
+/**
+ * Hourly bot-visit buckets for verified crawlers that bypass lead creation.
+ * Keeps bot visit counts and BotFamily breakdowns accurate without minting
+ * guest lead rows, wallets or lead_lead_links.
+ */
+export const crawlerVisits = pgTable(
+  "crawler_visits",
+  {
+    bucketHour: timestamp("bucket_hour").notNull(),
+    botFamily: text("bot_family", { enum: BotFamilyDB }).notNull(),
+    visitCount: integer("visit_count").notNull().default(0),
+  },
+  (table) => [
+    primaryKey({ columns: [table.bucketHour, table.botFamily] }),
+    index("idx_crawler_visits_bucket_hour").on(table.bucketHour),
   ],
 );
 

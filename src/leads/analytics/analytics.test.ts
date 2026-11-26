@@ -16,6 +16,7 @@ import {
   BotFamily,
   FunnelReach,
   LeadChannelFilter,
+  LeadDeviceFilter,
   LeadDimension,
   NONE_FILTER_VALUE,
   TrafficFilter,
@@ -46,6 +47,12 @@ beforeAll(async () => {
       signed_up_at timestamp, first_chat_at timestamp, first_paid_at timestamp
     );
     CREATE TABLE growth_visits (id serial, lead_id uuid, visited_at timestamp);
+    CREATE TABLE crawler_visits (
+      bucket_hour timestamp NOT NULL,
+      bot_family text NOT NULL,
+      visit_count integer NOT NULL DEFAULT 0,
+      PRIMARY KEY (bucket_hour, bot_family)
+    );
     CREATE TABLE chat_threads (id serial, lead_id uuid, user_id uuid, created_at timestamp);
     CREATE TABLE payment_transactions (user_id uuid, amount numeric, currency text, status text, mode text DEFAULT 'enums.checkoutMode.subscription', created_at timestamp, metadata jsonb, provider_session_id text, provider_payment_intent_id text);
     CREATE TABLE credit_wallets (id uuid PRIMARY KEY, lead_id uuid, user_id uuid);
@@ -663,4 +670,76 @@ test("acquisition headline matches current, previous and all-time activity", asy
   const headline = await getAcquisitionHeadline(custom);
   expect(headline.humanLeads).toEqual({ value: 1, previous: 1 });
   expect(headline.signups).toEqual({ value: 4, previous: 1 });
+});
+
+test("crawler_visits buckets count verified crawler visits as bots without creating leads", async () => {
+  const { computeAcquisitionBreakdown, computeAcquisitionCore } =
+    await import("./acquisition/repository");
+  await pg.exec(`
+    INSERT INTO crawler_visits (bucket_hour, bot_family, visit_count) VALUES
+      ('2026-06-10 10:00:00', '${BotFamily.GOOGLE}', 42),
+      ('2026-06-10 11:00:00', '${BotFamily.BING}', 15),
+      ('2026-06-03 10:00:00', '${BotFamily.GOOGLE}', 10);
+  `);
+  const crawlerWin = resolveAnalyticsWindow(
+    {
+      range: AnalyticsRange.CUSTOM,
+      from: "2026-06-08",
+      to: "2026-06-14",
+    },
+    new Date("2026-06-15T00:00:00Z"),
+  );
+
+  const all = await computeAcquisitionCore(crawlerWin, {});
+  expect(all.kpis.botVisits).toEqual({ value: 57, previous: 10 });
+  expect(all.kpis.visits).toEqual({ value: 57, previous: 10 });
+  expect(all.kpis.humanVisits.value).toBe(0);
+  expect(all.kpis.botLeads.value).toBe(0);
+  expect(all.kpis.humanLeads.value).toBe(0);
+  const botSeriesSum = (
+    all.trend.series.find((s) => s.key === "botVisits")?.values ?? []
+  ).reduce((a, b) => a + b, 0);
+  expect(botSeriesSum).toBe(57);
+
+  // Bot-family filter narrows to the matching crawler family.
+  const googleOnly = await computeAcquisitionCore(crawlerWin, {
+    botFamily: BotFamily.GOOGLE,
+  });
+  expect(googleOnly.kpis.botVisits).toEqual({ value: 42, previous: 10 });
+
+  // Human / non-bot traffic filters exclude crawler_visits completely.
+  const humansOnly = await computeAcquisitionCore(crawlerWin, {
+    traffic: TrafficFilter.HUMANS,
+  });
+  expect(humansOnly.kpis.botVisits.value).toBe(0);
+  expect(humansOnly.kpis.visits.value).toBe(0);
+
+  // Agents (BOT_FAMILY) and DEVICE breakdowns include verified crawler visits.
+  const agents = await computeAcquisitionBreakdown(
+    crawlerWin,
+    {},
+    LeadDimension.BOT_FAMILY,
+  );
+  expect(agents).toEqual([
+    expect.objectContaining({
+      key: BotFamily.GOOGLE,
+      metrics: expect.objectContaining({ visits: 42, leads: 0, botLeads: 0 }),
+    }),
+    expect.objectContaining({
+      key: BotFamily.BING,
+      metrics: expect.objectContaining({ visits: 15, leads: 0, botLeads: 0 }),
+    }),
+  ]);
+
+  const devices = await computeAcquisitionBreakdown(
+    crawlerWin,
+    {},
+    LeadDimension.DEVICE,
+  );
+  expect(devices).toEqual([
+    expect.objectContaining({
+      key: LeadDeviceFilter.BOT,
+      metrics: expect.objectContaining({ visits: 57, leads: 0 }),
+    }),
+  ]);
 });

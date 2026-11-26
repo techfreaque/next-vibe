@@ -228,6 +228,9 @@ export async function studioHistoryPage(
   user: JwtPayloadType,
   params: { kind?: CreateKind; page: number; limit: number },
 ): Promise<StudioHistoryPage> {
+  if (user.isPublic && !user.leadId) {
+    return { items: [], totalCount: 0 };
+  }
   const { kind, page, limit } = params;
   const offset = (page - 1) * limit;
   const depth = offset + limit;

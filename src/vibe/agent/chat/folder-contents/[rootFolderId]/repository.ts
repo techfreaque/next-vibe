@@ -133,16 +133,22 @@ export class FolderContentsRepository {
     locale: CountryLanguage,
   ): Promise<ResponseType<FolderContentsResponseOutput>> {
     const userIdentifier = user.isPublic ? user.leadId : user.id;
+    const { rootFolderId } = urlPathParams;
 
-    if (!userIdentifier) {
-      logger.error("Missing user identifier", { user });
+    if (!userIdentifier && rootFolderId !== DefaultFolderId.PUBLIC) {
+      if (user.isPublic) {
+        logger.debug(
+          "Skipping non-public folder contents for leadless public user",
+          { rootFolderId },
+        );
+      } else {
+        logger.error("Missing user identifier", { user });
+      }
       return fail({
         message: t("get.errors.unauthorized.title"),
         errorType: ErrorResponseTypes.UNAUTHORIZED,
       });
     }
-
-    const { rootFolderId } = urlPathParams;
     const subFolderId = data.subFolderId ?? null;
     const threadIds = data.threadIds ?? null;
 

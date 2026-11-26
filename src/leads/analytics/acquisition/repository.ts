@@ -39,9 +39,20 @@ import { usdSql } from "@/payment/analytics/money-sql";
 import { PaymentStatus } from "@/payment/enum";
 
 import { isBotFamilySql } from "../bot-sql";
-import { BotFamily, LeadChannelFilter, LeadDimension } from "../enum";
+import {
+  BotFamily,
+  isBotFamily,
+  LeadChannelFilter,
+  LeadDeviceFilter,
+  LeadDimension,
+  TrafficFilter,
+} from "../enum";
 import type { LeadSegmentFilters } from "../filters";
-import { hasSegmentFilters } from "../filters";
+import {
+  hasSegmentFilters,
+  LEAD_SEGMENT_TEXT_KEYS,
+  pickSegmentFilters,
+} from "../filters";
 import {
   andAll,
   dimensionColumn,
@@ -100,6 +111,37 @@ const NO_UA = BotFamily.NO_UA;
 /** Known bot (unknown / no user agent is neither human nor bot). */
 const isBot = (family: SQL): SQL => isBotFamilySql(family);
 
+/**
+ * Filter condition on `crawler_visits` (`cv` alias) matching `filters`.
+ * Returns `sql\`FALSE\`` when filters exclude leadless crawler visits (e.g.
+ * humans-only, non-bot device, channel/attribution/geo text filters).
+ */
+function crawlerVisitsCondition(filters: LeadSegmentFilters): SQL {
+  const picked = pickSegmentFilters(filters);
+  if (
+    picked.traffic === TrafficFilter.HUMANS ||
+    picked.traffic === TrafficFilter.UNKNOWN ||
+    picked.traffic === TrafficFilter.NOT_BOTS
+  ) {
+    return sql`FALSE`;
+  }
+  if (picked.botFamily && !isBotFamily(picked.botFamily)) {
+    return sql`FALSE`;
+  }
+  if (picked.device && picked.device !== LeadDeviceFilter.BOT) {
+    return sql`FALSE`;
+  }
+  if (picked.channelType) {
+    return sql`FALSE`;
+  }
+  if (LEAD_SEGMENT_TEXT_KEYS.some((key) => picked[key] !== undefined)) {
+    return sql`FALSE`;
+  }
+  return picked.botFamily
+    ? sql`cv.bot_family = ${picked.botFamily}`
+    : isBot(sql`cv.bot_family`);
+}
+
 function kpi(value: number, previous: number, win: AnalyticsWindow): Kpi {
   return { value, previous: win.previousFrom ? previous : null };
 }
@@ -148,6 +190,8 @@ export async function computeAcquisitionCore(
   const chat = sql`first_chat_at`;
   const paid = sql`first_paid_at`;
   const visited = sql`v.visited_at`;
+  const crawlerFilter = crawlerVisitsCondition(filters);
+  const crawlerBucket = sql`cv.bucket_hour`;
   // Both reports reuse this CTE several times. Carry only the fields the
   // aggregates need, while still applying all requested filters to lead facts.
   const segment = segmentCte(
@@ -199,6 +243,13 @@ export async function computeAcquisitionCore(
         count(*) FILTER (WHERE ${p(visited)} AND seg.bot_family = ${NO_UA})::int AS "prevUnknownVisits"
       FROM growth_visits v JOIN seg ON seg.id = v.lead_id
       WHERE ${w(visited)} OR ${p(visited)}
+    ),
+    crawler_visit_totals AS (
+      SELECT
+        coalesce(sum(cv.visit_count) FILTER (WHERE ${w(crawlerBucket)}), 0)::int AS visits,
+        coalesce(sum(cv.visit_count) FILTER (WHERE ${p(crawlerBucket)}), 0)::int AS "prevVisits"
+      FROM crawler_visits cv
+      WHERE (${crawlerFilter}) AND (${w(crawlerBucket)} OR ${p(crawlerBucket)})
     )
     SELECT
       count(*) FILTER (WHERE ${w(created)} AND bot_family = ${HUMAN})::int AS "humanLeads",
@@ -213,14 +264,14 @@ export async function computeAcquisitionCore(
       (SELECT count(*)::int FROM seg_users WHERE ${p(signed)}) AS "prevSignups",
       count(DISTINCT ${PERSON}) FILTER (WHERE ${p(chat)})::int AS "prevFirstChats",
       (SELECT count(*)::int FROM seg_users WHERE ${p(paid)}) AS "prevPayers",
-      (SELECT visits FROM visit_totals) AS visits,
+      ((SELECT visits FROM visit_totals) + (SELECT visits FROM crawler_visit_totals))::int AS visits,
       (SELECT visitors FROM visit_totals) AS visitors,
-      (SELECT "prevVisits" FROM visit_totals) AS "prevVisits",
+      ((SELECT "prevVisits" FROM visit_totals) + (SELECT "prevVisits" FROM crawler_visit_totals))::int AS "prevVisits",
       (SELECT "prevVisitors" FROM visit_totals) AS "prevVisitors",
       (SELECT "humanVisits" FROM visit_totals) AS "humanVisits",
       (SELECT "prevHumanVisits" FROM visit_totals) AS "prevHumanVisits",
-      (SELECT "botVisits" FROM visit_totals) AS "botVisits",
-      (SELECT "prevBotVisits" FROM visit_totals) AS "prevBotVisits",
+      ((SELECT "botVisits" FROM visit_totals) + (SELECT visits FROM crawler_visit_totals))::int AS "botVisits",
+      ((SELECT "prevBotVisits" FROM visit_totals) + (SELECT "prevVisits" FROM crawler_visit_totals))::int AS "prevBotVisits",
       (SELECT "unknownVisits" FROM visit_totals) AS "unknownVisits",
       (SELECT "prevUnknownVisits" FROM visit_totals) AS "prevUnknownVisits"
     FROM seg
@@ -232,13 +283,30 @@ export async function computeAcquisitionCore(
   >(sql`
     WITH ${segment},
     visits_by_bucket AS (
-      SELECT ${bucketSql(visited, bucket)} AS bucket,
-        count(*)::int AS visits,
-        count(*) FILTER (WHERE seg.bot_family = ${HUMAN})::int AS human_visits,
-        count(*) FILTER (WHERE ${isBot(sql`seg.bot_family`)})::int AS bot_visits,
-        count(DISTINCT v.lead_id)::int AS visitors
-      FROM growth_visits v JOIN seg ON seg.id = v.lead_id
-      WHERE ${w(visited)}
+      SELECT bucket,
+        sum(visits)::int AS visits,
+        sum(human_visits)::int AS human_visits,
+        sum(bot_visits)::int AS bot_visits,
+        sum(visitors)::int AS visitors
+      FROM (
+        SELECT ${bucketSql(visited, bucket)} AS bucket,
+          count(*)::int AS visits,
+          count(*) FILTER (WHERE seg.bot_family = ${HUMAN})::int AS human_visits,
+          count(*) FILTER (WHERE ${isBot(sql`seg.bot_family`)})::int AS bot_visits,
+          count(DISTINCT v.lead_id)::int AS visitors
+        FROM growth_visits v JOIN seg ON seg.id = v.lead_id
+        WHERE ${w(visited)}
+        GROUP BY 1
+        UNION ALL
+        SELECT ${bucketSql(crawlerBucket, bucket)} AS bucket,
+          sum(cv.visit_count)::int AS visits,
+          0::int AS human_visits,
+          sum(cv.visit_count)::int AS bot_visits,
+          0::int AS visitors
+        FROM crawler_visits cv
+        WHERE (${crawlerFilter}) AND ${w(crawlerBucket)}
+        GROUP BY 1
+      ) combined_visits
       GROUP BY 1
     )
     SELECT 'humanLeads' AS key, ${bucketSql(created, bucket)} AS bucket, count(*)::int AS value
@@ -330,6 +398,15 @@ export async function computeAcquisitionBreakdown(
 ): Promise<BreakdownRow[]> {
   const w = (column: SQL): SQL => inWindowSql(column, win);
   const key = dimensionColumn(dimension);
+  const crawlerDimKey =
+    dimension === LeadDimension.BOT_FAMILY
+      ? sql`cv.bot_family`
+      : dimension === LeadDimension.DEVICE
+        ? sql`${LeadDeviceFilter.BOT}`
+        : null;
+  const crawlerFilter = crawlerDimKey
+    ? crawlerVisitsCondition(filters)
+    : sql`FALSE`;
   const { rows } = await db.execute<
     QueryResultRow & {
       key: string | null;
@@ -361,7 +438,7 @@ export async function computeAcquisitionBreakdown(
       SELECT v.lead_id, count(*)::int AS n FROM growth_visits v
       WHERE ${w(sql`v.visited_at`)} GROUP BY v.lead_id
     ),
-    rows AS (
+    lead_rows AS (
       SELECT f.key AS key,
         coalesce(sum(vc.n), 0)::int AS visits,
         count(*) FILTER (WHERE ${w(sql`f.created_at`)})::int AS leads,
@@ -372,6 +449,31 @@ export async function computeAcquisitionBreakdown(
       FROM keyed f
       LEFT JOIN visit_counts vc ON vc.lead_id = f.id
       GROUP BY 1
+    ),
+    crawler_rows AS (
+      SELECT ${crawlerDimKey ?? sql`NULL::text`} AS key,
+        coalesce(sum(cv.visit_count), 0)::int AS visits
+      FROM crawler_visits cv
+      WHERE (${crawlerFilter}) AND ${w(sql`cv.bucket_hour`)}
+      GROUP BY 1
+    ),
+    rows AS (
+      SELECT key,
+        sum(visits)::int AS visits,
+        sum(leads)::int AS leads,
+        sum("humanLeads")::int AS "humanLeads",
+        sum("botLeads")::int AS "botLeads",
+        sum(signups)::int AS signups,
+        sum(payers)::int AS payers
+      FROM (
+        SELECT key, visits, leads, "humanLeads", "botLeads", signups, payers
+        FROM lead_rows
+        UNION ALL
+        SELECT key, visits, 0::int AS leads, 0::int AS "humanLeads",
+          0::int AS "botLeads", 0::int AS signups, 0::int AS payers
+        FROM crawler_rows
+      ) combined
+      GROUP BY key
     )
     SELECT rows.*, coalesce(rr.usd, 0)::float8 AS "revenueUsd"
     FROM rows LEFT JOIN row_revenue rr ON rr.key IS NOT DISTINCT FROM rows.key

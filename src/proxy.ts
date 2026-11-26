@@ -13,7 +13,9 @@ import type { CountryLanguage } from "./vibe/core/i18n/core/config";
 import { middleware } from "./vibe/platforms/web/middleware";
 import {
   forwardDegradedPublicDocument,
+  forwardVerifiedCrawlerDocument,
   markDegradedPublicDocument,
+  markVerifiedCrawlerDocument,
 } from "./vibe/platforms/web/middleware/public-document";
 import { applyResponseIdentityCookies } from "./vibe/platforms/web/middleware/utils";
 
@@ -41,6 +43,10 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
   if (response.headers.get("x-middleware-next") === "1") {
     const requestHeaders = new Headers(request.headers);
     const degraded = forwardDegradedPublicDocument(requestHeaders, response);
+    const verifiedCrawler = forwardVerifiedCrawlerDocument(
+      requestHeaders,
+      response,
+    );
     requestHeaders.set("x-pathname", request.nextUrl.pathname);
     applyResponseIdentityCookies(
       requestHeaders,
@@ -69,6 +75,9 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
     });
     if (degraded) {
       markDegradedPublicDocument(withPathname);
+    }
+    if (verifiedCrawler) {
+      markVerifiedCrawlerDocument(withPathname);
     }
     return withPathname;
   }

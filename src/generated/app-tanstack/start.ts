@@ -23,6 +23,8 @@ import { fetchServerFunction } from "next-vibe/platforms/web/frameworks/tanstack
 import {
   DEGRADED_PUBLIC_DOCUMENT_HEADER,
   forwardDegradedPublicDocument,
+  forwardVerifiedCrawlerDocument,
+  VERIFIED_CRAWLER_HEADER,
 } from "next-vibe/platforms/web/middleware/public-document";
 import { applyResponseIdentityCookies } from "next-vibe/platforms/web/middleware/utils";
 import { readEdgeRequestId } from "next-vibe/realtime/core/proxy-timing";
@@ -182,6 +184,9 @@ const proxyMiddleware = createMiddleware().server(async ({ next, request }) => {
   if (request.headers.has(DEGRADED_PUBLIC_DOCUMENT_HEADER)) {
     request.headers.delete(DEGRADED_PUBLIC_DOCUMENT_HEADER);
   }
+  if (request.headers.has(VERIFIED_CRAWLER_HEADER)) {
+    request.headers.delete(VERIFIED_CRAWLER_HEADER);
+  }
   // Preload all lazy widgets before the first SSR render. By the time this
   // middleware runs, all route modules that call lazyWidget() have been
   // evaluated and registered their factories. Awaiting here ensures the first
@@ -253,6 +258,7 @@ const proxyMiddleware = createMiddleware().server(async ({ next, request }) => {
   if (forwardDegradedPublicDocument(request.headers, proxyResponse)) {
     setResponseHeader("Cache-Control", "private, no-store");
   }
+  forwardVerifiedCrawlerDocument(request.headers, proxyResponse);
 
   // Forward Set-Cookie headers from the proxy response onto the TanStack
   // response via the H3 event (the only reliable way in TanStack middleware).

@@ -53,16 +53,21 @@ export class ChatFoldersRepository {
     // For anonymous users (public), use leadId instead of userId
     // For authenticated users, use userId
     const userIdentifier = user.isPublic ? user.leadId : user.id;
+    const { rootFolderId } = data;
 
-    if (!userIdentifier) {
-      logger.error("Missing user identifier", { user });
+    if (!userIdentifier && rootFolderId !== DefaultFolderId.PUBLIC) {
+      if (user.isPublic) {
+        logger.debug("Skipping non-public folders for leadless public user", {
+          rootFolderId,
+        });
+      } else {
+        logger.error("Missing user identifier", { user });
+      }
       return fail({
         message: t("get.errors.unauthorized.title"),
         errorType: ErrorResponseTypes.UNAUTHORIZED,
       });
     }
-
-    const { rootFolderId } = data;
 
     try {
       logger.debug("Fetching folders", { userIdentifier, rootFolderId });

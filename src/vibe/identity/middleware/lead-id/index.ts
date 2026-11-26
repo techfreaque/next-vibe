@@ -21,6 +21,7 @@ import {
   isLikelyBot,
 } from "@/leads/growth/attribution";
 import { matchesChrome131CrawlerHeaders } from "@/leads/growth/chrome-131-crawler";
+import { recordVerifiedCrawlerVisit } from "@/leads/growth/crawler-visits";
 
 import { coreEnv } from "../../../core/env";
 import type { CountryLanguage } from "../../../core/i18n/core/config";
@@ -40,6 +41,7 @@ import { frameExchangeTokens } from "../../../platforms/vibe-frame/db";
 import {
   canRenderWithoutLead,
   markDegradedPublicDocument,
+  markVerifiedCrawlerDocument,
 } from "../../../platforms/web/middleware/public-document";
 import {
   isToolsDocument,
@@ -57,6 +59,7 @@ import {
   createAnonymousLead,
   validateLeadIdExists,
 } from "../../lead/middleware-ops";
+import { verifyCrawler } from "./verified-crawler";
 
 export const UUID_REGEX =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -348,23 +351,50 @@ export async function createLeadId(
     !request.cookies.get(AUTH_TOKEN_COOKIE_NAME)?.value &&
     !request.headers.has("authorization");
 
+  const ipAddress = clientIpFromHeaders(request.headers);
+  const userAgent = request.headers.get("user-agent");
+
+  // Verified search & social crawlers render full SSR HTML on public pages
+  // without minting a guest lead row or setting a lead cookie. Visits are
+  // still counted as bots in hourly analytics buckets.
+  if (
+    anonymousRead &&
+    !request.nextUrl.pathname.startsWith("/api/") &&
+    !request.headers.has("next-action")
+  ) {
+    const remainingMs = Math.max(0, deadlineMs - performance.now());
+    const verifiedCrawler = await verifyCrawler(userAgent, ipAddress, {
+      timeoutMs: Math.min(150, remainingMs),
+    });
+    if (verifiedCrawler) {
+      const isDocumentGet =
+        request.method === "GET" &&
+        request.headers.get("rsc") === null &&
+        request.headers.get("next-router-prefetch") === null &&
+        !request.headers.get("purpose")?.includes("prefetch") &&
+        !request.headers.get("sec-purpose")?.includes("prefetch");
+      if (isDocumentGet) {
+        recordVerifiedCrawlerVisit(verifiedCrawler.botFamily, logger);
+      }
+      const response = NextResponseClass.next();
+      markVerifiedCrawlerDocument(response);
+      return response;
+    }
+  }
+
   let leadId: string;
   let stage: LeadCreationStage = "crawler-policy";
   try {
     if (
       anonymousRead &&
-      (await withinGuestBudget(
-        skipCrawlerLead(request.headers.get("user-agent"), logger),
-        deadlineMs,
-      ))
+      (await withinGuestBudget(skipCrawlerLead(userAgent, logger), deadlineMs))
     ) {
       return NextResponseClass.next();
     }
 
     stage = "geo";
-    const ipAddress = clientIpFromHeaders(request.headers);
     const clientInfo = {
-      userAgent: request.headers.get("user-agent") || undefined,
+      userAgent: userAgent || undefined,
       referer: request.headers.get("referer") || undefined,
       ipAddress,
       geoCountry: await withinGuestBudget(

@@ -3,8 +3,10 @@ import type { NextRequest } from "next-vibe/ui/lib/request";
 import { AUTH_TOKEN_COOKIE_NAME } from "@/env/constants";
 
 export const DEGRADED_PUBLIC_DOCUMENT_HEADER = "x-vibe-leadless-document";
+export const VERIFIED_CRAWLER_HEADER = "x-vibe-verified-crawler";
 
 const markedResponses = new WeakSet<Response>();
+const verifiedCrawlerResponses = new WeakSet<Response>();
 const localeIndexPath = /^\/[a-z]{2}-[A-Z]+\/?$/;
 
 /** Public pages whose loaders can render without a visitor identity. */
@@ -14,6 +16,7 @@ const publicPages = new Set([
   "story",
   "story/abliterated-ai-chat",
   "story/about-us",
+  "story/business",
   "story/blog",
   "story/careers",
   "story/earn",
@@ -80,6 +83,30 @@ export function forwardDegradedPublicDocument(
   }
   if (headers.has(DEGRADED_PUBLIC_DOCUMENT_HEADER)) {
     headers.delete(DEGRADED_PUBLIC_DOCUMENT_HEADER);
+  }
+  return false;
+}
+
+/**
+ * Mark a middleware response as a verified search/social crawler document read.
+ * Unlike degraded public documents, verified crawlers still receive full SSR
+ * HTML (refusal stats, leaderboards, structured data) while skipping guest lead
+ * creation and lead cookies.
+ */
+export function markVerifiedCrawlerDocument(response: Response): void {
+  verifiedCrawlerResponses.add(response);
+}
+
+export function forwardVerifiedCrawlerDocument(
+  headers: Headers,
+  response: Response,
+): boolean {
+  if (verifiedCrawlerResponses.has(response)) {
+    headers.set(VERIFIED_CRAWLER_HEADER, "1");
+    return true;
+  }
+  if (headers.has(VERIFIED_CRAWLER_HEADER)) {
+    headers.delete(VERIFIED_CRAWLER_HEADER);
   }
   return false;
 }

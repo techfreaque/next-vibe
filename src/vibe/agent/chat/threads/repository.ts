@@ -518,60 +518,38 @@ export class ThreadsRepository {
         isPublic: user.isPublic,
       });
 
-      if (!userIdentifier) {
-        return fail({
-          message: t("get.errors.unauthorized.title"),
-          errorType: ErrorResponseTypes.UNAUTHORIZED,
-        });
-      }
-
-      // Build where clause - use leadId for anonymous users, userId for authenticated users
-      // For PUBLIC folder, show all public threads from all users
-      // For SHARED folder, show user's own threads + threads where user is moderator
-      // For other folders, only show user's own threads
-      // If no rootFolderId specified, show threads from all folders (filtered by permissions later)
       const conditions = [];
 
       // Track whether the query guarantees all results are owned by the current user.
       // When true, we skip the per-thread canViewThread loop (owner always has view).
       let allThreadsOwnedByUser = false;
 
-      if (rootFolderId === DefaultFolderId.PUBLIC) {
-        // PUBLIC folder: Show all threads in public folder (from all users)
+      if (
+        rootFolderId === DefaultFolderId.PUBLIC ||
+        (user.isPublic && !rootFolderId)
+      ) {
         conditions.push(eq(chatThreads.rootFolderId, DefaultFolderId.PUBLIC));
-      } else if (rootFolderId === DefaultFolderId.SHARED) {
-        // SHARED folder: Show user's own threads
-        conditions.push(eq(chatThreads.rootFolderId, DefaultFolderId.SHARED));
-        // For public users, filter by leadId; for authenticated users, filter by userId
-        if (user.isPublic) {
-          conditions.push(eq(chatThreads.leadId, userIdentifier));
-        } else {
-          conditions.push(eq(chatThreads.userId, userIdentifier));
-        }
-        allThreadsOwnedByUser = true;
-      } else if (rootFolderId) {
-        // Specific folder: Show only user's own threads in that folder
-        // For public users, filter by leadId; for authenticated users, filter by userId
-        if (user.isPublic) {
-          conditions.push(eq(chatThreads.leadId, userIdentifier));
-        } else {
-          conditions.push(eq(chatThreads.userId, userIdentifier));
-        }
-        conditions.push(eq(chatThreads.rootFolderId, rootFolderId));
-        allThreadsOwnedByUser = true;
       } else {
-        // No rootFolderId specified: Show threads from all folders
-        // For public users, show threads from public folder
-        // For authenticated users, show their own threads from all folders + all public threads
-        // Permission filtering happens later via canViewThread
-        if (user.isPublic) {
-          // Public users: Show all threads from public folder
-          conditions.push(eq(chatThreads.rootFolderId, DefaultFolderId.PUBLIC));
+        if (!userIdentifier) {
+          return fail({
+            message: t("get.errors.unauthorized.title"),
+            errorType: ErrorResponseTypes.UNAUTHORIZED,
+          });
+        }
+        const ownedByUser = user.isPublic
+          ? eq(chatThreads.leadId, userIdentifier)
+          : eq(chatThreads.userId, userIdentifier);
+        if (rootFolderId) {
+          conditions.push(
+            ownedByUser,
+            eq(chatThreads.rootFolderId, rootFolderId),
+          );
+          allThreadsOwnedByUser = true;
         } else {
-          // Authenticated users: Show their own threads from all folders + all threads from public folder
+          // A signed-in user without a folder filter can see their own and public threads.
           conditions.push(
             or(
-              eq(chatThreads.userId, userIdentifier),
+              ownedByUser,
               eq(chatThreads.rootFolderId, DefaultFolderId.PUBLIC),
             )!,
           );

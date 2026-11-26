@@ -40,7 +40,10 @@ import { throwErrorResponse } from "../../core/route/error-response-error";
 import type { ResponseType } from "../../core/route/response.schema";
 import type { EndpointLogger } from "../../logger/types";
 import { isCliPlatform, Platform } from "../../platforms/platforms";
-import { isDegradedPublicDocument } from "../../platforms/web/middleware/public-document.server";
+import {
+  isDegradedPublicDocument,
+  isVerifiedCrawlerDocument,
+} from "../../platforms/web/middleware/public-document.server";
 import { V1_API_PATH_REGEX } from "../../platforms/web/middleware/utils";
 import {
   filterUserPermissionRoles,
@@ -269,8 +272,9 @@ export class AuthRepository {
     // not mint a replacement when the page resolves its public auth context.
     if (
       platform === Platform.NEXT_PAGE &&
-      protectionEnv.FREE_CRAWLER_MODE === "enforce" &&
-      crawlerUserAgent((await headers()).get("user-agent"))
+      ((await isVerifiedCrawlerDocument()) ||
+        (protectionEnv.FREE_CRAWLER_MODE === "enforce" &&
+          crawlerUserAgent((await headers()).get("user-agent"))))
     ) {
       return { leadId: null, shouldUpdateCookie: false };
     }
@@ -1247,11 +1251,13 @@ export class AuthRepository {
     context: AuthContext,
     logger: EndpointLogger,
   ): Promise<InferUserType<TRoles>> {
-    // Middleware marks public documents that should render without a lead.
+    // Middleware marks public documents (DB outage fallback or verified
+    // search/social crawlers) that should render without a lead.
     // Resolve the public context without guest identity lookup or creation.
     if (
       context.platform === Platform.NEXT_PAGE &&
-      (await isDegradedPublicDocument())
+      ((await isDegradedPublicDocument()) ||
+        (await isVerifiedCrawlerDocument()))
     ) {
       if (roles.includes(UserRole.PUBLIC)) {
         return AuthRepository.createPublicUser<TRoles>("");
