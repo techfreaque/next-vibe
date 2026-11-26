@@ -1,99 +1,53 @@
-/**
- * Companies seeds
- * Creates a demo company with the admin user as owner + member
- */
-
-import { and, eq } from "drizzle-orm";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { db } from "next-vibe/database";
-import { users } from "next-vibe/identity/user/db";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { companies, companyMembers } from "./db";
 import { DEMO_COMPANY_NAME } from "./demo-company";
+import {
+  demoRecordId,
+  findDemoAdmin,
+  findDemoCompany,
+} from "./demo-company.repository";
 import { CompanyMemberRole, CompanyType } from "./enum";
 
-/**
- * Development seed — creates a demo company and makes the admin user its owner
- */
-export async function dev(
-  logger: EndpointLogger,
-  locale: CountryLanguage,
-): Promise<void> {
-  void locale;
-  const firstUserRow = (
-    await db.select({ id: users.id, email: users.email }).from(users).limit(1)
-  )[0];
+export const priority = 80;
 
-  if (!firstUserRow) {
-    logger.warn("No users found — skipping companies seed");
+export async function dev(logger: EndpointLogger): Promise<void> {
+  const adminId = await findDemoAdmin();
+  if (!adminId) {
+    logger.warn("Configured development admin is missing; skipping ERP demo");
     return;
   }
+  const existing = await findDemoCompany(adminId);
+  const companyId = existing?.id ?? demoRecordId(adminId, "company");
 
-  const adminUser = firstUserRow;
-
-  // Check if demo company already exists
-  const existing = await db
-    .select({ id: companies.id })
-    .from(companies)
-    .where(eq(companies.name, DEMO_COMPANY_NAME))
-    .orderBy(companies.createdAt, companies.id)
-    .limit(1);
-
-  let companyId: string;
-
-  if (existing.length > 0) {
-    companyId = existing[0].id;
-    logger.debug(`Demo company already exists: ${companyId}`);
-  } else {
-    const [inserted] = await db
-      .insert(companies)
-      .values({
-        name: DEMO_COMPANY_NAME,
-        type: CompanyType.B2C,
-        ownerUserId: adminUser.id,
-        currency: "EUR",
-        country: "DE",
-        isActive: true,
-      })
-      .returning({ id: companies.id });
-
-    if (!inserted) {
-      logger.warn("Failed to retrieve demo company id after insert — skipping");
-      return;
+  await db.transaction(async (tx) => {
+    if (!existing) {
+      await tx
+        .insert(companies)
+        .values({
+          id: companyId,
+          name: DEMO_COMPANY_NAME,
+          type: CompanyType.B2B,
+          ownerUserId: adminId,
+          currency: "EUR",
+          country: "DE",
+          city: "Berlin",
+          email: "accounts@demo-company.example",
+          website: "https://demo-company.example",
+        })
+        .onConflictDoNothing();
     }
-    companyId = inserted.id;
-    logger.debug(`Created demo company: ${companyId}`);
-  }
 
-  // Ensure admin user is an active OWNER member
-  const existingMember = await db
-    .select({ id: companyMembers.id })
-    .from(companyMembers)
-    .where(
-      and(
-        eq(companyMembers.companyId, companyId),
-        eq(companyMembers.userId, adminUser.id),
-      ),
-    )
-    .limit(1);
-
-  if (existingMember.length === 0) {
-    await db.insert(companyMembers).values({
-      companyId,
-      userId: adminUser.id,
-      role: CompanyMemberRole.OWNER,
-      isActive: true,
-    });
-    logger.debug(
-      `Added admin user ${adminUser.email} as OWNER of demo company`,
-    );
-  } else {
-    logger.debug(`Admin user is already a member of demo company`);
-  }
-
-  logger.debug("✅ Companies seed complete");
+    await tx
+      .insert(companyMembers)
+      .values({
+        companyId,
+        userId: adminId,
+        role: CompanyMemberRole.OWNER,
+        joinedAt: new Date(),
+      })
+      .onConflictDoNothing();
+  });
+  logger.debug("ERP demo company is ready", { companyId });
 }
-
-// Priority: after users (100) but before POS (5)
-export const priority = 80;

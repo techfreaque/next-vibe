@@ -9,8 +9,8 @@ import { paymentBills } from "@/payment/db";
 
 import { financeProviderSnapshots } from "../db";
 import type { ProviderSources } from "../enum";
+import { monthRange } from "../report-period";
 import { supplierEvidenceRecords } from "./db";
-import { monthRange } from "./monthly";
 
 export async function getMonthlyProviderReview(
   companyId: string,

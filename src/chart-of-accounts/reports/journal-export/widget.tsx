@@ -21,6 +21,7 @@ import {
   useWidgetIsInteractive,
   useWidgetLocale,
   useWidgetLogger,
+  useWidgetOnSubmit,
   useWidgetResponse,
   useWidgetResponseOnly,
   useWidgetTranslation,
@@ -28,26 +29,24 @@ import {
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
-import { DateFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/date-field/widget";
 import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 import { type JSX, useEffect, useMemo, useState } from "react";
 
+import { useToolCompanyId } from "@/companies/_shared/workspace-company-context";
 import companyDefinition from "@/companies/[companyId]/get/definition";
 import { DocumentScopePicker } from "@/finance/document-list-ui";
 import { DocumentTextExportButton } from "@/finance/document-text-export";
+import { ReportRangeControl } from "@/finance/report-period-control";
 
 import { formatAccountingDateInput } from "../../shared/calendar-date";
 import type definition from "./definition";
 
-export function JournalExportWidget({
-  field: { children },
-}: {
-  field: typeof definition.GET.fields;
-}): JSX.Element {
+export function JournalExportWidget(): JSX.Element {
   const t = useWidgetTranslation<typeof definition.GET>();
   const data = useWidgetValue<typeof definition.GET>();
   const form = useWidgetForm<typeof definition.GET>();
+  const onSubmit = useWidgetOnSubmit();
   const locale = useWidgetLocale();
   const logger = useWidgetLogger();
   const user = useWidgetUser();
@@ -55,6 +54,7 @@ export function JournalExportWidget({
   const interactive = useWidgetIsInteractive();
   const responseOnly = useWidgetResponseOnly();
   const showInputs = interactive && !responseOnly;
+  const toolCompanyId = useToolCompanyId();
   const companyId = form.watch("companyId");
   const currency = form.watch("currency")?.trim().toUpperCase();
   const [otherCurrency, setOtherCurrency] = useState(false);
@@ -128,32 +128,34 @@ export function JournalExportWidget({
       />
       {showInputs && (
         <Div className="grid min-w-0 items-start gap-3 @sm:grid-cols-2 @lg:grid-cols-4">
-          <Div className="flex min-w-0 flex-col gap-1.5">
-            <Span className="text-sm font-medium">{t("company")}</Span>
-            <DocumentScopePicker
-              kind="company"
-              required
-              value={companyId}
-              appliedLabel={
-                company?.id === companyId
-                  ? company?.name
-                  : data?.companyIdOut === companyId
-                    ? data?.companyName
-                    : undefined
-              }
-              onSelect={(id) => {
-                if (id === companyId) {
-                  return;
+          {!toolCompanyId && (
+            <Div className="flex min-w-0 flex-col gap-1.5">
+              <Span className="text-sm font-medium">{t("company")}</Span>
+              <DocumentScopePicker
+                kind="company"
+                required
+                value={companyId}
+                appliedLabel={
+                  company?.id === companyId
+                    ? company?.name
+                    : data?.companyIdOut === companyId
+                      ? data?.companyName
+                      : undefined
                 }
-                setOtherCurrency(false);
-                form.setValue("companyId", id, {
-                  shouldDirty: true,
-                  shouldValidate: true,
-                });
-                form.setValue("currency", "", { shouldDirty: true });
-              }}
-            />
-          </Div>
+                onSelect={(id) => {
+                  if (id === companyId) {
+                    return;
+                  }
+                  setOtherCurrency(false);
+                  form.setValue("companyId", id, {
+                    shouldDirty: true,
+                    shouldValidate: true,
+                  });
+                  form.setValue("currency", "", { shouldDirty: true });
+                }}
+              />
+            </Div>
+          )}
           <Div className="flex min-w-0 flex-col gap-1.5">
             <Span className="text-sm font-medium">{t("currency")}</Span>
             <Select
@@ -195,15 +197,17 @@ export function JournalExportWidget({
               />
             )}
           </Div>
-          <DateFieldWidget
-            utcCalendarDay
-            fieldName="dateFrom"
-            field={children.dateFrom}
-          />
-          <DateFieldWidget
-            utcCalendarDay
-            fieldName="dateTo"
-            field={children.dateTo}
+          <ReportRangeControl
+            from={from}
+            to={to}
+            fromLabel={t("from")}
+            toLabel={t("to")}
+            defaultPreset="lastMonth"
+            onChange={({ from: start, to: end }) => {
+              form.setValue("dateFrom", start, { shouldDirty: true });
+              form.setValue("dateTo", end, { shouldDirty: true });
+              onSubmit?.();
+            }}
           />
         </Div>
       )}

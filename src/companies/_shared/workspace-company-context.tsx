@@ -3,6 +3,7 @@
 import { useLogger } from "next-vibe/ui/hooks/use-logger";
 import { setCookie } from "next-vibe/ui/lib/cookies";
 import {
+  type Context,
   createContext,
   type JSX,
   type ReactNode,
@@ -12,8 +13,8 @@ import {
 
 import {
   resolveWorkspaceCompany,
-  WORKSPACE_COMPANY_COOKIE,
   type WorkspaceCompany,
+  workspaceCompanyCookieName,
 } from "./workspace-company";
 
 interface WorkspaceCompanyState {
@@ -23,9 +24,18 @@ interface WorkspaceCompanyState {
   register: (company: WorkspaceCompany) => void;
 }
 
-const WorkspaceCompanyContext = createContext<WorkspaceCompanyState | null>(
-  null,
-);
+declare global {
+  var __vibeWorkspaceCompanyContext:
+    | Context<WorkspaceCompanyState | null>
+    | undefined;
+  var __vibeToolCompanyContext: Context<string | undefined> | undefined;
+}
+
+const WorkspaceCompanyContext = (globalThis.__vibeWorkspaceCompanyContext ??=
+  createContext<WorkspaceCompanyState | null>(null));
+
+export const ToolCompanyContext = (globalThis.__vibeToolCompanyContext ??=
+  createContext<string | undefined>(undefined));
 
 export function WorkspaceCompanyProvider({
   companies,
@@ -67,8 +77,8 @@ export function WorkspaceCompanyProvider({
             if (available.some(({ id }) => id === companyId)) {
               setPreferredId(companyId);
               void setCookie(
-                WORKSPACE_COMPANY_COOKIE,
-                `${userId}.${companyId}`,
+                workspaceCompanyCookieName(userId),
+                companyId,
                 logger,
               );
             }
@@ -85,4 +95,8 @@ export function WorkspaceCompanyProvider({
 
 export function useWorkspaceCompany(): WorkspaceCompanyState | null {
   return useContext(WorkspaceCompanyContext);
+}
+
+export function useToolCompanyId(): string | undefined {
+  return useContext(ToolCompanyContext);
 }

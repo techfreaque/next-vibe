@@ -19,7 +19,6 @@ import {
   AnalyticsGranularity,
   AnalyticsRange,
 } from "next-vibe/unified-ui/analytics/enum";
-import { analyticsWindowFields } from "next-vibe/unified-ui/analytics/fields";
 import {
   analyticsWindowSchema,
   breakdownSchema,
@@ -27,6 +26,8 @@ import {
   timeSeriesSchema,
 } from "next-vibe/unified-ui/analytics/schema";
 import { z } from "zod";
+
+import { reportAnalyticsWindowFields } from "@/finance/report-analytics-fields";
 
 import { BUSINESS_OVERVIEW_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
@@ -120,7 +121,7 @@ const { GET } = createEndpoint({
     usage: { request: "data", response: true },
     render: BusinessOverviewWidgetLazy,
     children: {
-      ...analyticsWindowFields,
+      ...reportAnalyticsWindowFields,
       window: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         label: "get.response.window" as const,

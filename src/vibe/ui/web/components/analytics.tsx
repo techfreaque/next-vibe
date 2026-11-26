@@ -1164,6 +1164,8 @@ export type AnalyticsToolbarProps = {
   children?: React.ReactNode;
   /** Hide the granularity switch (reports without charts). */
   hideGranularity?: boolean;
+  /** Optional date controls for reports with calendar periods. */
+  rangeControls?: React.ReactNode;
 } & StyleType;
 
 const RANGE_PRESETS = [
@@ -1237,6 +1239,7 @@ export function AnalyticsToolbar({
   onClearFilters,
   children,
   hideGranularity = false,
+  rangeControls,
   className,
   style,
 }: AnalyticsToolbarProps): React.JSX.Element {
@@ -1247,16 +1250,18 @@ export function AnalyticsToolbar({
   return (
     <div className={cn("flex flex-col gap-2", className)} style={style}>
       <div className="flex flex-wrap items-center gap-2">
-        <AnalyticsSegmented
-          label={t("analytics.range.label")}
-          value={range}
-          onSelect={(next) => onChange({ range: next })}
-          options={RANGE_PRESETS.map((preset) => ({
-            value: preset,
-            label: t(ANALYTICS_RANGE_SHORT_KEY[preset]),
-            title: t(preset),
-          }))}
-        />
+        {rangeControls ?? (
+          <AnalyticsSegmented
+            label={t("analytics.range.label")}
+            value={range}
+            onSelect={(next) => onChange({ range: next })}
+            options={RANGE_PRESETS.map((preset) => ({
+              value: preset,
+              label: t(ANALYTICS_RANGE_SHORT_KEY[preset]),
+              title: t(preset),
+            }))}
+          />
+        )}
         {!hideGranularity ? (
           <AnalyticsSegmented
             label={t("analytics.granularity.label")}
@@ -1306,7 +1311,7 @@ export function AnalyticsToolbar({
           ) : null}
         </div>
       </div>
-      {range === AnalyticsRange.CUSTOM ? (
+      {!rangeControls && range === AnalyticsRange.CUSTOM ? (
         <div className="flex flex-wrap items-center gap-2 text-xs">
           <label className="flex items-center gap-1.5">
             <span className="text-muted-foreground">

@@ -35,6 +35,8 @@ export const translations: typeof enTranslations = {
       bills: "Faktury zakupu",
     },
     overview: {
+      noCompany:
+        "Utwórz firmę lub dołącz do istniejącej, aby użyć tego narzędzia.",
       chooseCompany: "Wybierz firmę, której raport chcesz zobaczyć.",
       loading: "Ładowanie podsumowania firmy",
       loadError: "Nie udało się wczytać podsumowania firmy",

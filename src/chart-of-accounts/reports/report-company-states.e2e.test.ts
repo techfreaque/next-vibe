@@ -16,7 +16,7 @@ import type { Response, Route } from "playwright";
 import { describe, expect } from "vitest";
 import { z } from "zod";
 
-import { WORKSPACE_COMPANY_COOKIE } from "@/companies/_shared/workspace-company";
+import { workspaceCompanyCookieName } from "@/companies/_shared/workspace-company";
 import { scopedTranslation as helpTranslation } from "@/vibe/help-tool/i18n";
 import { scopedTranslation as documentsTranslation } from "@/finance/i18n";
 
@@ -173,7 +173,7 @@ describe("Ledger report company selection", () => {
   const e2e = useE2E("ledger-report-company-selection");
 
   e2e.it(
-    "uses one company picker for each report and retries an unavailable tax read",
+    "restores the company in the shared header and retries an unavailable tax read",
     async (fixtures) => {
       const { baseUrl, page } = fixtures;
       const companyName = "Disposable Ledger Report Workshop";
@@ -233,9 +233,11 @@ describe("Ledger report company selection", () => {
         for (const report of reports.filter(
           ({ key }) => !taxOnly || key === "tax-report",
         )) {
-          await fixtures.context.clearCookies({
-            name: WORKSPACE_COMPANY_COOKIE,
-          });
+          await fixtures.context.addCookies([{
+            name: workspaceCompanyCookieName(identity.id),
+            value: alternative.companyId,
+            url: baseUrl,
+          }]);
           const reportSlug = endpointToUrlSegment(report.definition);
           const endpointPath = "/" + report.definition.path.join("/");
           const api = `**/api/${locale}${endpointPath}*`;
@@ -272,38 +274,12 @@ describe("Ledger report company selection", () => {
             .waitFor();
           const view = page.locator(`#admin-tool-${reportSlug}`);
           const prompt = view.getByText(t(report.prompt), { exact: true });
-          await prompt.waitFor();
-          const picker = view.getByRole("button", {
+          const picker = page.locator("#erp-company-switch");
+          expect(await picker.textContent()).toContain("Disposable Alternative Ledger");
+          expect(await view.getByRole("button", {
             name: docs("documents.chooseCompany"),
             exact: true,
-          });
-          expect(await picker.count()).toBe(1);
-          expect(
-            await view
-              .getByRole("button", {
-                name: t("reports.widget.retry"),
-                exact: true,
-              })
-              .count(),
-          ).toBe(0);
-          if (isTax)
-            await view
-              .getByText(t("taxReport.widget.scopeHint"), { exact: true })
-              .waitFor();
-          if (capture && isTax) {
-            await saveAdminViewMatrix(
-              page,
-              "ledger-report-company-states",
-              `tax-unselected-${locale}`,
-              async () => {
-                await prompt.waitFor();
-                await view
-                  .getByText(t("taxReport.widget.scopeHint"), { exact: true })
-                  .waitFor();
-              },
-            );
-          }
-
+          }).count()).toBe(0);
           await picker.click();
           const reportResponse = (): Promise<Response> =>
             page.waitForResponse(
@@ -317,10 +293,7 @@ describe("Ledger report company selection", () => {
               },
               { timeout: 60_000 },
             );
-          const companyOption = page
-            .getByText(companyName, { exact: true })
-            .filter({ visible: true })
-            .last();
+          const companyOption = page.getByRole("menuitemradio").filter({ hasText: companyName });
           const firstResult = isTax
             ? undefined
             : Promise.all([reportResponse(), companyOption.click()]);

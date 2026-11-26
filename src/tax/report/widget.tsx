@@ -36,79 +36,24 @@ import {
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import { type JSX, useState } from "react";
+import type { JSX } from "react";
 
 import {
   ReportCompanyPicker,
-  ReportDateFilter,
   ReportMenu,
 } from "@/chart-of-accounts/reports/balance-sheet/report-controls";
 import { formatAccountingDateInput } from "@/chart-of-accounts/shared/calendar-date";
+import { ReportRangeControl } from "@/finance/report-period-control";
 
 import type definition from "./definition";
 import type { TaxReportResponseOutput } from "./definition";
 import { TaxReportDirection, TaxReportDirectionDB } from "./enum";
-
-type ReportPeriod = "thisMonth" | "lastMonth" | "thisQuarter" | "thisYear";
-type PeriodChoice = ReportPeriod | "custom";
-
-const PERIODS: readonly ReportPeriod[] = [
-  "thisMonth",
-  "lastMonth",
-  "thisQuarter",
-  "thisYear",
-];
 
 const SALES_SIDE: readonly string[] = [
   TaxReportDirection.SALES,
   TaxReportDirection.POS_SALES,
   TaxReportDirection.CREDIT_NOTES,
 ];
-
-function utcDay(year: number, month: number, day: number): Date {
-  return new Date(Date.UTC(year, month, day));
-}
-
-/** Calendar range of a preset, ending today for the running period. */
-export function taxReportPeriodRange(
-  period: ReportPeriod,
-  today: Date,
-): { from: Date; to: Date } {
-  const year = today.getUTCFullYear();
-  const month = today.getUTCMonth();
-  const now = utcDay(year, month, today.getUTCDate());
-  switch (period) {
-    case "lastMonth":
-      return { from: utcDay(year, month - 1, 1), to: utcDay(year, month, 0) };
-    case "thisQuarter":
-      return { from: utcDay(year, month - (month % 3), 1), to: now };
-    case "thisYear":
-      return { from: utcDay(year, 0, 1), to: now };
-    default:
-      return { from: utcDay(year, month, 1), to: now };
-  }
-}
-
-function isoDay(date: Date): string {
-  return date.toISOString().slice(0, 10);
-}
-
-/** Which preset the applied range matches, or "custom". */
-export function taxReportPeriodOf(
-  from: string | undefined,
-  to: string | undefined,
-  today: Date,
-): PeriodChoice {
-  if (!from && !to) {
-    return "thisMonth";
-  }
-  return (
-    PERIODS.find((period) => {
-      const range = taxReportPeriodRange(period, today);
-      return isoDay(range.from) === from && isoDay(range.to) === to;
-    }) ?? "custom"
-  );
-}
 
 function sumWhere(
   totals: TaxReportResponseOutput["totals"] | undefined,
@@ -140,14 +85,6 @@ export function TaxReportWidget(): JSX.Element {
   const currency = form.watch("currency");
   const from = formatAccountingDateInput(form.watch("dateFrom"));
   const to = formatAccountingDateInput(form.watch("dateTo"));
-  const [customOpen, setCustomOpen] = useState(false);
-  const [today] = useState(() => new Date());
-  const appliedPeriod = taxReportPeriodOf(
-    from ?? data?.reportDateFrom,
-    to ?? data?.reportDateTo,
-    today,
-  );
-  const period: PeriodChoice = customOpen ? "custom" : appliedPeriod;
   const hasCompany = Boolean(companyId || data?.reportCompanyId);
   const needsCompany = showInputs && !hasCompany;
   const matches =
@@ -176,14 +113,6 @@ export function TaxReportWidget(): JSX.Element {
   const applyRange = (range: { from: Date; to: Date }): void => {
     form.setValue("dateFrom", range.from, { shouldDirty: true });
     form.setValue("dateTo", range.to, { shouldDirty: true });
-  };
-  const pickPeriod = (next: PeriodChoice): void => {
-    if (next === "custom") {
-      setCustomOpen(true);
-      return;
-    }
-    setCustomOpen(false);
-    applyRange(taxReportPeriodRange(next, today));
   };
   const retry = (): void => {
     if (read) {
@@ -327,15 +256,6 @@ export function TaxReportWidget(): JSX.Element {
             icon={<Receipt className="h-6 w-6" />}
             title={t("report.widget.emptyTitle")}
             message={t("report.widget.empty")}
-            action={
-              showInputs && appliedPeriod !== "lastMonth"
-                ? {
-                    label: t("report.widget.previousMonth"),
-                    onClick: (): void => pickPeriod("lastMonth"),
-                    variant: "outline",
-                  }
-                : undefined
-            }
           />
         </Div>
       )}
@@ -372,14 +292,12 @@ export function TaxReportWidget(): JSX.Element {
               }
             />
             {!needsCompany && (
-              <AnalyticsSegmented<PeriodChoice>
-                label={t("report.widget.period.label")}
-                value={period}
-                onSelect={pickPeriod}
-                options={[...PERIODS, "custom" as const].map((value) => ({
-                  value,
-                  label: t(`report.widget.period.${value}`),
-                }))}
+              <ReportRangeControl
+                fromLabel={t("report.dateFrom.label")}
+                toLabel={t("report.dateTo.label")}
+                from={from ?? data?.reportDateFrom}
+                to={to ?? data?.reportDateTo}
+                onChange={applyRange}
               />
             )}
             <Div className={needsCompany ? "hidden" : "ms-auto"}>
@@ -399,26 +317,6 @@ export function TaxReportWidget(): JSX.Element {
               />
             </Div>
           </Div>
-          {period === "custom" && (
-            <Div className="flex flex-wrap items-end gap-3">
-              <ReportDateFilter
-                id="tax-report-start"
-                label={t("report.dateFrom.label")}
-                day={from ?? data?.reportDateFrom}
-                onChange={(value) =>
-                  form.setValue("dateFrom", value, { shouldDirty: true })
-                }
-              />
-              <ReportDateFilter
-                id="tax-report-end"
-                label={t("report.dateTo.label")}
-                day={to ?? data?.reportDateTo}
-                onChange={(value) =>
-                  form.setValue("dateTo", value, { shouldDirty: true })
-                }
-              />
-            </Div>
-          )}
         </Div>
       )}
       {needsCompany ? (

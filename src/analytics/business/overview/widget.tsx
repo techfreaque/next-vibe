@@ -39,6 +39,7 @@ import { formatAnalyticsValue } from "next-vibe/unified-ui/analytics/format";
 import { resolveEndpoint } from "next-vibe/unified-ui/hooks/resolve-endpoint";
 import type { JSX } from "react";
 
+import { ReportAnalyticsPeriod } from "@/finance/report-analytics-period";
 import { LeadChannelFilter } from "@/leads/analytics/enum";
 
 import type definition from "./definition";
@@ -149,10 +150,10 @@ export function BusinessOverviewWidget(): JSX.Element {
     if (patch.granularity !== undefined) {
       form.setValue("granularity", patch.granularity, { shouldDirty: true });
     }
-    if ("from" in patch) {
+    if (patch.from !== undefined) {
       form.setValue("from", patch.from, { shouldDirty: true });
     }
-    if ("to" in patch) {
+    if (patch.to !== undefined) {
       form.setValue("to", patch.to, { shouldDirty: true });
     }
     onSubmit?.();
@@ -161,6 +162,13 @@ export function BusinessOverviewWidget(): JSX.Element {
   return (
     <WidgetShell padding="none" className="gap-4">
       <AnalyticsToolbar
+        rangeControls={
+          <ReportAnalyticsPeriod
+            {...windowValue}
+            applied={value?.window}
+            onChange={onWindowChange}
+          />
+        }
         locale={locale}
         value={windowValue}
         onChange={onWindowChange}

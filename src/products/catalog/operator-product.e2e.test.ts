@@ -47,10 +47,7 @@ describe("Catalog pricing operator", () => {
       const { t: detailT } = detailCopy.scopedT(locale);
       const { t: typesT } = productCopy.scopedT(locale);
       const { t: helpT } = helpCopy.scopedT(locale);
-      const workspaceSwitch = page.getByRole("button", {
-        name: helpT("erp.companySwitch.select"),
-        exact: true,
-      });
+      const workspaceSwitch = page.locator("#erp-company-switch");
       const companyBadge = page.getByRole("button", {
         name: helpT("erp.companySwitch.current", { name: "E2E Catalog Pricing" }),
         exact: true,
@@ -65,13 +62,14 @@ describe("Catalog pricing operator", () => {
       const subscription = page.getByRole("checkbox", { name: createT("post.isSubscription.label"), exact: false });
       const prepare = async (name: string, sku: string): Promise<void> => {
         await fixtures.goto(path, locale);
+        await workspaceSwitch.waitFor();
+        if ((await workspaceSwitch.textContent())?.trim() !== "E2E Catalog Pricing") {
+          await workspaceSwitch.click();
+          await page.getByRole("menuitemradio").filter({ hasText: "E2E Catalog Pricing" }).click();
+          await companyBadge.waitFor();
+        }
         await textbox(createT("post.name.label")).fill(name);
         await textbox(createT("post.sku.label")).fill(sku);
-        await page.getByRole("button")
-          .filter({ hasText: createT("post.companyId.label") })
-          .filter({ hasText: "+", visible: true })
-          .click();
-        await page.getByText("E2E Catalog Pricing", { exact: true }).filter({ visible: true }).last().click();
         await page.getByRole("combobox", { name: createT("post.type.label"), exact: true }).click();
         await page.getByRole("option", { name: typesT(ProductType.SERVICE), exact: true }).click();
         await textbox(createT("post.currency.label")).fill("EUR");

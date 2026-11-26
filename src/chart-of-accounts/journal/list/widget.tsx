@@ -30,7 +30,10 @@ import {
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { type JSX, useEffect, useRef } from "react";
 
-import { useWorkspaceCompany } from "@/companies/_shared/workspace-company-context";
+import {
+  useToolCompanyId,
+  useWorkspaceCompany,
+} from "@/companies/_shared/workspace-company-context";
 import { DocumentScopePicker } from "@/finance/document-list-ui";
 
 import {
@@ -73,21 +76,16 @@ export function CoaJournalListWidget(
     >();
   const isPickerMode = !!onPick;
 
-  // Auto-load on mount in the active company (all companies when none is
-  // active: the backend scopes to the admin's memberships).
   const workspace = useWorkspaceCompany();
-  const activeCompanyId = workspace?.active?.id;
+  const toolCompanyId = useToolCompanyId();
   const didAutoSubmit = useRef(false);
   useEffect(() => {
     if (!onSubmit || didAutoSubmit.current) {
       return;
     }
     didAutoSubmit.current = true;
-    if (activeCompanyId && !form.getValues("companyId")) {
-      form.setValue("companyId", activeCompanyId, { shouldDirty: true });
-    }
     onSubmit();
-  }, [onSubmit, activeCompanyId, form]);
+  }, [onSubmit]);
 
   const handleView = (entryId: string): void => {
     if (isPickerMode) {
@@ -158,8 +156,7 @@ export function CoaJournalListWidget(
 
   // Without an active company the list spans every company the admin is a
   // member of: say whose books each entry belongs to.
-  const showCompany =
-    !companyId && new Set(entries.map((entry) => entry.companyId)).size > 1;
+  const showCompany = !companyId;
   const columns = [
     { id: "number", label: t("journalList.response.entryNumber") },
     { id: "date", label: t("journalList.response.date") },
@@ -322,7 +319,7 @@ export function CoaJournalListWidget(
           )
         }
       />
-      {interactive && (
+      {interactive && !toolCompanyId && (
         <Div className="flex flex-wrap items-end gap-2 rounded-lg border bg-card p-3">
           <DocumentScopePicker
             kind="company"

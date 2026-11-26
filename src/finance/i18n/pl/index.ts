@@ -2,6 +2,10 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   profit: {
+    periodInvalid:
+      "Wybierz datę końcową przypadającą w dniu rozpoczęcia lub później.",
+    periodFrom: "Od",
+    periodTo: "Do",
     run: "Pokaż raport",
     unallocatedRevenue:
       "Zaksięgowane przychody bez przypisania do modeli: {{amount}}",

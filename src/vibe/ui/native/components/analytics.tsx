@@ -463,6 +463,7 @@ export function AnalyticsToolbar({
   period,
   filters,
   hideGranularity = false,
+  rangeControls,
   className,
 }: AnalyticsToolbarProps): React.JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
@@ -470,29 +471,31 @@ export function AnalyticsToolbar({
   const granularity = value.granularity ?? AnalyticsGranularity.AUTO;
   return (
     <StyledView className={cn("flex-col gap-2", className)}>
+      {rangeControls}
       <StyledScrollView horizontal>
         <StyledView className="flex-row gap-1">
-          {RANGE_PRESETS.map((preset) => (
-            <StyledPressable
-              key={preset}
-              onPress={() => onChange({ range: preset })}
-              className={cn(
-                "rounded-md border border-border px-2.5 py-1",
-                preset === range && "bg-primary",
-              )}
-            >
-              <Text
+          {!rangeControls &&
+            RANGE_PRESETS.map((preset) => (
+              <StyledPressable
+                key={preset}
+                onPress={() => onChange({ range: preset })}
                 className={cn(
-                  "text-xs",
-                  preset === range
-                    ? "text-primary-foreground"
-                    : "text-foreground",
+                  "rounded-md border border-border px-2.5 py-1",
+                  preset === range && "bg-primary",
                 )}
               >
-                {t(ANALYTICS_RANGE_SHORT_KEY[preset])}
-              </Text>
-            </StyledPressable>
-          ))}
+                <Text
+                  className={cn(
+                    "text-xs",
+                    preset === range
+                      ? "text-primary-foreground"
+                      : "text-foreground",
+                  )}
+                >
+                  {t(ANALYTICS_RANGE_SHORT_KEY[preset])}
+                </Text>
+              </StyledPressable>
+            ))}
           {!hideGranularity
             ? GRANULARITIES.map((g) => (
                 <StyledPressable

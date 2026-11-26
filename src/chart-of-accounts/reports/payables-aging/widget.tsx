@@ -5,7 +5,6 @@ import {
   CurrenciesArr,
 } from "next-vibe/core/i18n/core/config";
 import { Button } from "next-vibe/ui/components/button";
-import { DatePicker } from "next-vibe/ui/components/date-picker";
 import { DetailField, DetailGrid } from "next-vibe/ui/components/detail-grid";
 import { Div } from "next-vibe/ui/components/div";
 import { EmptyBlock } from "next-vibe/ui/components/empty-block";
@@ -41,12 +40,13 @@ import {
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import { parseFormDate } from "next-vibe/unified-ui/widgets/form-fields/_shared/date-value";
 import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import { type JSX, useState } from "react";
 
-import { useWorkspaceCompany } from "@/companies/_shared/workspace-company-context";
+import { useToolCompanyId } from "@/companies/_shared/workspace-company-context";
 import { DocumentScopePicker } from "@/finance/document-list-ui";
+import { reportDay } from "@/finance/report-period";
+import { ReportAsOfControl } from "@/finance/report-period-control";
 
 import type definition from "./definition";
 import type { PayablesAgingResponse } from "./definition";
@@ -274,7 +274,7 @@ export function PayablesAgingWidget(): JSX.Element {
   const t = useWidgetTranslation<typeof definition.GET>();
   const locale = useWidgetLocale();
   const form = useWidgetForm<typeof definition.GET>();
-  const workspace = useWorkspaceCompany();
+  const toolCompanyId = useToolCompanyId();
   const { push, pop, canGoBack } = useWidgetNavigation();
   const interactive = useWidgetIsInteractive();
   const responseOnly = useWidgetResponseOnly();
@@ -282,7 +282,7 @@ export function PayablesAgingWidget(): JSX.Element {
   const companyId = form.watch("companyId");
   const reportCompanyId = companyId || data?.reportCompanyId || undefined;
   const isActiveCompany = Boolean(
-    reportCompanyId && workspace?.active?.id === reportCompanyId,
+    reportCompanyId && toolCompanyId === reportCompanyId,
   );
   const currency = form.watch("currency");
   const agingDate = form.watch("agingDate");
@@ -364,23 +364,13 @@ export function PayablesAgingWidget(): JSX.Element {
               </SelectContent>
             </Select>
           </Div>
-          <Div className="flex w-44 flex-col gap-1.5">
-            <Label htmlFor="payables-date">{t("agingDate.label")}</Label>
-            <DatePicker
-              name="payables-date"
-              value={parseFormDate(visibleDate)}
-              onChange={(date) => {
-                const day = date
-                  ? [
-                      String(date.getFullYear()).padStart(4, "0"),
-                      String(date.getMonth() + 1).padStart(2, "0"),
-                      String(date.getDate()).padStart(2, "0"),
-                    ].join("-")
-                  : undefined;
-                form.setValue("agingDate", day, { shouldDirty: true });
-              }}
-            />
-          </Div>
+          <ReportAsOfControl
+            label={t("agingDate.label")}
+            day={visibleDate}
+            onChange={(day) =>
+              form.setValue("agingDate", reportDay(day), { shouldDirty: true })
+            }
+          />
         </Div>
       )}
       <FormAlertWidget field={{}} />

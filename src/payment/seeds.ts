@@ -8,6 +8,14 @@ import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
+export async function dev(
+  logger: EndpointLogger,
+  locale: CountryLanguage,
+): Promise<void> {
+  const { seedDemoDocuments } = await import("./demo-documents");
+  await seedDemoDocuments(logger, locale);
+}
+
 export async function prod(
   logger: EndpointLogger,
   locale: CountryLanguage,

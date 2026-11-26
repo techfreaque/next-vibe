@@ -202,9 +202,7 @@ describe("category landing primary actions", () => {
         name: localizedLabel(category.labels, locale) ?? category.label,
         exact: true,
       }).locator("xpath=../../..");
-      let companyMenu = toolbar.getByRole("button", {
-        name: t("erp.companySwitch.select"), exact: true,
-      });
+      let companyMenu = toolbar.locator("#erp-company-switch");
       const selections = [
         states[0],
         states[1],
@@ -334,9 +332,7 @@ describe("category landing primary actions", () => {
         const toolbar = page.locator('#admin-tools-toolbar[data-admin-ready="true"]');
         await toolbar.waitFor();
         if (key === "purchasing") {
-          await toolbar.getByRole("button", {
-            name: t("erp.companySwitch.select"), exact: true,
-          }).click();
+          await toolbar.locator("#erp-company-switch").click();
           await page.getByRole("menuitemradio").filter({ hasText: "Fixture KPI workshop" }).click();
         }
         const action = page.getByRole("button", { name: actionLabel, exact: true }).first();

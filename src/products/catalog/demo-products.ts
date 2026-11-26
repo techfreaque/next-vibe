@@ -1,0 +1,3 @@
+export const DEMO_STOCK_SKU = "STAND-01";
+export const DEMO_SUBSCRIPTION_SKU = "STUDIO-MONTH";
+export const DEMO_CREDIT_PACK_SKU = "STUDIO-CREDITS-100";

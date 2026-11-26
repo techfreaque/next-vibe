@@ -2,6 +2,7 @@ import { z } from "zod";
 
 import type { NavigationStackEntry } from "../core/definition/endpoint";
 import type { CreateApiEndpointAny } from "../core/definition/endpoint-base";
+import type { WidgetData } from "../core/utils/json";
 
 export const erpCategories: ReadonlySet<string> = new Set([
   "accounting",
@@ -16,29 +17,79 @@ export const erpCategories: ReadonlySet<string> = new Set([
 ]);
 
 type ToolInputs = NavigationStackEntry["params"];
+type CompanyInput = { kind: "path" } | { kind: "data"; group?: string };
 
 function companyInput(
   endpoint: CreateApiEndpointAny,
-): keyof ToolInputs | undefined {
+): CompanyInput | undefined {
   if (!erpCategories.has(endpoint.category)) {
     return undefined;
   }
   if (endpoint.path.includes("[companyId]")) {
-    return "urlPathParams";
+    return { kind: "path" };
   }
-  return endpoint.requestSchema instanceof z.ZodObject &&
-    Object.hasOwn(endpoint.requestSchema.shape, "companyId")
-    ? "data"
-    : undefined;
+  if (!(endpoint.requestSchema instanceof z.ZodObject)) {
+    return undefined;
+  }
+  if (Object.hasOwn(endpoint.requestSchema.shape, "companyId")) {
+    return { kind: "data" };
+  }
+  for (const [group, field] of Object.entries(endpoint.requestSchema.shape)) {
+    let schema: z.core.$ZodType = field;
+    while (
+      schema instanceof z.ZodOptional ||
+      schema instanceof z.ZodNullable ||
+      schema instanceof z.ZodDefault ||
+      schema instanceof z.ZodPrefault
+    ) {
+      schema = schema.unwrap();
+    }
+    if (
+      schema instanceof z.ZodObject &&
+      Object.hasOwn(schema.shape, "companyId")
+    ) {
+      return { kind: "data", group };
+    }
+  }
+  return undefined;
+}
+
+function requestGroup(
+  value: WidgetData,
+): Record<string, WidgetData> | undefined {
+  if (
+    value &&
+    typeof value === "object" &&
+    !Array.isArray(value) &&
+    !(value instanceof Date)
+  ) {
+    return value;
+  }
+  return undefined;
+}
+
+export function hasWorkspaceCompanyInput(
+  endpoint: CreateApiEndpointAny,
+): boolean {
+  return companyInput(endpoint) !== undefined;
 }
 
 export function readWorkspaceCompanyOverride(
   endpoint: CreateApiEndpointAny,
   inputs: ToolInputs,
 ): string | undefined {
-  const key = companyInput(endpoint);
-  const companyId = key ? inputs[key]?.companyId : undefined;
-  return typeof companyId === "string" ? companyId : undefined;
+  const field = companyInput(endpoint);
+  const companyId =
+    field?.kind === "path"
+      ? inputs.urlPathParams?.companyId
+      : field?.group
+        ? requestGroup(inputs.data?.[field.group])?.companyId
+        : field
+          ? inputs.data?.companyId
+          : undefined;
+  return typeof companyId === "string" && companyId !== ""
+    ? companyId
+    : undefined;
 }
 
 export function applyWorkspaceCompany(
@@ -46,14 +97,21 @@ export function applyWorkspaceCompany(
   inputs: ToolInputs,
   companyId?: string,
 ): ToolInputs {
-  if (!companyId) {
+  const field = companyInput(endpoint);
+  if (!field || !companyId || readWorkspaceCompanyOverride(endpoint, inputs)) {
     return inputs;
   }
-  const key = companyInput(endpoint);
-  if (!key || inputs[key]?.companyId !== undefined) {
-    return inputs;
+  if (field.kind === "path") {
+    return { ...inputs, urlPathParams: { ...inputs.urlPathParams, companyId } };
   }
-  return { ...inputs, [key]: { ...inputs[key], companyId } };
+  if (field.group) {
+    const group = requestGroup(inputs.data?.[field.group]);
+    return {
+      ...inputs,
+      data: { ...inputs.data, [field.group]: { ...group, companyId } },
+    };
+  }
+  return { ...inputs, data: { ...inputs.data, companyId } };
 }
 
 export function applyWorkspaceCompanyToEntry(

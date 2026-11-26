@@ -1,7 +1,6 @@
 "use client";
 
 import { Button } from "next-vibe/ui/components/button";
-import { DatePicker } from "next-vibe/ui/components/date-picker";
 import { Div } from "next-vibe/ui/components/div";
 import {
   DropdownMenu,
@@ -18,13 +17,9 @@ import {
   useWidgetNavigation,
   useWidgetResponse,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import {
-  pickerDateFromUtcDay,
-  utcDayFromPickerDate,
-} from "next-vibe/unified-ui/widgets/form-fields/date-field/calendar-date";
 import { type JSX, useId } from "react";
 
-import { useWorkspaceCompany } from "@/companies/_shared/workspace-company-context";
+import { useToolCompanyId } from "@/companies/_shared/workspace-company-context";
 import { DocumentScopePicker } from "@/finance/document-list-ui";
 
 import {
@@ -189,10 +184,10 @@ export function ReportCompanyPicker({
   reportName?: string;
   onChange: (id: string) => void;
 }): JSX.Element | null {
-  const workspace = useWorkspaceCompany();
+  const toolCompanyId = useToolCompanyId();
   const id = useId();
   const value = selectedId || reportId;
-  if (value && workspace?.active?.id === value) {
+  if (toolCompanyId) {
     return null;
   }
   const picker = (
@@ -212,65 +207,5 @@ export function ReportCompanyPicker({
     </Div>
   ) : (
     picker
-  );
-}
-
-export function ReportDateFilter({
-  id,
-  label,
-  day,
-  onChange,
-}: {
-  id: string;
-  label: string;
-  day?: string;
-  onChange: (value: Date | undefined) => void;
-}): JSX.Element {
-  return (
-    <Div className="flex min-w-0 flex-col gap-1.5 @sm:w-44">
-      <Label htmlFor={id}>{label}</Label>
-      <DatePicker
-        name={id}
-        value={pickerDateFromUtcDay(day)}
-        onChange={(date) => onChange(utcDayFromPickerDate(date))}
-      />
-    </Div>
-  );
-}
-
-export function ReportPeriodMenu({
-  onChange,
-}: {
-  onChange: (range: { from: Date; to: Date }) => void;
-}): JSX.Element {
-  const { t } = scopedTranslation.scopedT(useWidgetLocale());
-  function pickMonth(previous: boolean): void {
-    const today = new Date();
-    const year = today.getUTCFullYear();
-    const month = today.getUTCMonth();
-    onChange({
-      from: new Date(Date.UTC(year, month - Number(previous), 1)),
-      to: previous
-        ? new Date(Date.UTC(year, month, 0))
-        : new Date(Date.UTC(year, month, today.getUTCDate())),
-    });
-  }
-
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button type="button" variant="outline" size="sm">
-          {t("reports.widget.quickDates")}
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="start">
-        <DropdownMenuItem onSelect={() => pickMonth(false)}>
-          {t("reports.widget.thisMonth")}
-        </DropdownMenuItem>
-        <DropdownMenuItem onSelect={() => pickMonth(true)}>
-          {t("reports.widget.previousMonth")}
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
   );
 }

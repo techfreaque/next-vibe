@@ -30,19 +30,17 @@ import {
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { scopedTranslation as frameworkTranslation } from "next-vibe/unified-ui/hooks/i18n";
-import { DateFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/date-field/widget";
 import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 import type { JSX } from "react";
 
+import { ReportRangeControl } from "@/finance/report-period-control";
+
 import { LineType } from "../../enum";
+import { formatAccountingDateInput } from "../../shared/calendar-date";
 import type definition from "./definition";
 
-export function CoaLedgerWidget({
-  field: { children },
-}: {
-  field: typeof definition.GET.fields;
-}): JSX.Element {
+export function CoaLedgerWidget(): JSX.Element {
   const data = useWidgetValue<typeof definition.GET>();
   const t = useWidgetTranslation<typeof definition.GET>();
   const navigation = useWidgetNavigation();
@@ -57,7 +55,8 @@ export function CoaLedgerWidget({
 
   const pathParams = navigation.current?.params?.urlPathParams;
   const hasAccountId =
-    !!pathParams && "accountId" in pathParams && !!pathParams.accountId;
+    !!form.watch("accountId") ||
+    (!!pathParams && "accountId" in pathParams && !!pathParams.accountId);
 
   const page = form.watch("page") ?? 1;
   const pageSize = form.watch("pageSize") ?? 20;
@@ -109,18 +108,19 @@ export function CoaLedgerWidget({
         }
       />
       {showInputs && hasAccountId && (
-        <Div className="grid gap-3 @sm:grid-cols-2">
-          <DateFieldWidget
-            utcCalendarDay
-            fieldName="dateFrom"
-            field={children.dateFrom}
-          />
-          <DateFieldWidget
-            utcCalendarDay
-            fieldName="dateTo"
-            field={children.dateTo}
-          />
-        </Div>
+        <ReportRangeControl
+          from={formatAccountingDateInput(form.watch("dateFrom"))}
+          to={formatAccountingDateInput(form.watch("dateTo"))}
+          fromLabel={t("ledger.dateFrom.label")}
+          toLabel={t("ledger.dateTo.label")}
+          defaultPreset="yearToDate"
+          onChange={({ from, to }) => {
+            form.setValue("dateFrom", from, { shouldDirty: true });
+            form.setValue("dateTo", to, { shouldDirty: true });
+            form.setValue("page", 1, { shouldDirty: true });
+            onSubmit?.();
+          }}
+        />
       )}
       <FormAlertWidget field={{}} />
 

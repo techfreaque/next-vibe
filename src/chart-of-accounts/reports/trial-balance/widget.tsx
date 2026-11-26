@@ -24,12 +24,12 @@ import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-f
 import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import type { JSX } from "react";
 
+import { ReportAsOfControl } from "@/finance/report-period-control";
+
 import { formatAccountingDateInput } from "../../shared/calendar-date";
 import {
   ReportCompanyPicker,
-  ReportDateFilter,
   ReportMenu,
-  ReportPeriodMenu,
   ReportReadState,
 } from "../balance-sheet/report-controls";
 import { reportAmountClass } from "../report-amount-class";
@@ -155,17 +155,11 @@ export function TrialBalanceWidget(
               }}
             />
           </Div>
-          <ReportDateFilter
-            id="report-as-of"
+          <ReportAsOfControl
             label={t("trialBalance.asOfDate.label")}
             day={asOf ?? formatAccountingDateInput(data?.asOfDateResponse)}
             onChange={(date) =>
               form.setValue("asOfDate", date, { shouldDirty: true })
-            }
-          />
-          <ReportPeriodMenu
-            onChange={({ to: end }) =>
-              form.setValue("asOfDate", end, { shouldDirty: true })
             }
           />
         </Div>

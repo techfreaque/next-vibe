@@ -33,6 +33,9 @@ import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-a
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 import { type JSX, useEffect } from "react";
 
+import { formatAccountingDateInput } from "@/chart-of-accounts/shared/calendar-date";
+import { ReportAsOfControl } from "@/finance/report-period-control";
+
 import type definition from "./definition";
 import { CompanyTaxRegime, type CompanyTaxRegimeValue } from "./enum";
 import type { TaxRegimeTranslationKey } from "./i18n";
@@ -195,13 +198,13 @@ export function CompanyTaxRegimeReviewWidget({
               field={withValue(field.children.companyId, undefined, null)}
             />
           )}
-          <Div className="@xl:max-w-56">
-            <DateFieldWidget
-              utcCalendarDay
-              fieldName="asOf"
-              field={withValue(field.children.asOf, undefined, null)}
-            />
-          </Div>
+          <ReportAsOfControl
+            label={t("asOf")}
+            day={formatAccountingDateInput(form.watch("asOf"))}
+            onChange={(date) =>
+              form.setValue("asOf", date, { shouldDirty: true })
+            }
+          />
         </Div>
       )}
       <FormAlertWidget field={{}} />

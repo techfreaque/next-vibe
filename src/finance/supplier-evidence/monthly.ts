@@ -20,6 +20,7 @@ import { groupProviderCostUsd, PAID_FUNDING } from "../consumption";
 import { ConsumptionRepository } from "../consumption-repository";
 import { FLAT_RATE_PROVIDERS } from "../cost-providers";
 import type { ProviderSources } from "../enum";
+import { monthRange } from "../report-period";
 import { PROVIDER_ADAPTERS } from "../sources/providers";
 import { supplierEvidenceRecords } from "./db";
 import { aggregateModelCosts, type MonthlyModelEstimate } from "./model-costs";
@@ -69,9 +70,10 @@ export function excludePeriodClosing(): SQL {
 export async function getMonthlySupplierExpenses(
   companyId: string,
   currency: string,
-  month: string,
+  period: string | { start: Date; end: Date },
 ): Promise<{ area: (typeof areaValues)[number]; expense: string }[]> {
-  const { start, end } = monthRange(month);
+  const { start, end } =
+    typeof period === "string" ? monthRange(period) : period;
 
   const isSupplierEntry = sql`(
     lineage.source_type = ${JournalSourceType.SUPPLIER_EVIDENCE}
@@ -138,7 +140,7 @@ export async function getMonthlySupplierExpenses(
 }
 
 export async function getMonthlyModelEstimates(
-  month: string,
+  period: string | { start: Date; end: Date },
   providers: readonly (typeof ProviderSources)[number][],
 ): Promise<MonthlyModelEstimate[]> {
   if (providers.length === 0) {
@@ -149,7 +151,8 @@ export async function getMonthlyModelEstimates(
       providers.some((provider) => provider === source),
     ).flatMap(({ apiProviders }) => apiProviders),
   );
-  const { start, end } = monthRange(month);
+  const { start, end } =
+    typeof period === "string" ? monthRange(period) : period;
   const groups = await ConsumptionRepository.groups(GraphResolution.ONE_MONTH, {
     from: start,
     to: end,
@@ -174,11 +177,4 @@ export async function getMonthlyModelEstimates(
     exactUsdCheckoutOnly: true,
   });
   return aggregateModelCosts(attributedGroups, prices).slice(0, 20);
-}
-
-export function monthRange(month: string): { start: Date; end: Date } {
-  const start = new Date(`${month}-01T00:00:00.000Z`);
-  const end = new Date(start);
-  end.setUTCMonth(end.getUTCMonth() + 1);
-  return { start, end };
 }

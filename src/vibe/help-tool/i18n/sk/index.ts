@@ -37,6 +37,8 @@ export const translations: typeof enTranslations = {
       bills: "Prijaté faktúry",
     },
     overview: {
+      noCompany:
+        "Vytvorte spoločnosť alebo sa pridajte k existujúcej a použite tento nástroj.",
       chooseCompany: "Vyberte spoločnosť, ktorej prehľad chcete zobraziť.",
       loading: "Načítava sa prehľad firmy",
       loadError: "Prehľad firmy sa nepodarilo načítať",

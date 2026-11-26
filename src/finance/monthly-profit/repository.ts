@@ -24,12 +24,12 @@ import {
 
 import { getDocumentAccess } from "../document-company-scope";
 import type { FinanceT } from "../i18n";
+import { monthRange, reportMonth } from "../report-period";
 import { supplierProviderBindings } from "../supplier-evidence/db";
 import {
   excludePeriodClosing,
   getMonthlyModelEstimates,
   getMonthlySupplierExpenses,
-  monthRange,
 } from "../supplier-evidence/monthly";
 import { ledgerAmountTotal, ledgerUnitsDecimal } from "./amount";
 import type { MonthlyProfitRequest, MonthlyProfitResponse } from "./definition";
@@ -42,8 +42,23 @@ export class MonthlyProfitRepository {
     logger: EndpointLogger,
   ): Promise<ResponseType<MonthlyProfitResponse>> {
     const { companyId } = data;
-    const month = data.month ?? new Date().toISOString().slice(0, 7);
-    const { start, end } = monthRange(month);
+    const periodDate = data.from ?? data.to;
+    const month =
+      data.month ??
+      (periodDate ? periodDate.slice(0, 7) : reportMonth(new Date()));
+    const monthBounds = monthRange(month);
+    const start = data.from ? new Date(data.from) : monthBounds.start;
+    const end = data.to ? new Date(data.to) : monthBounds.end;
+    if (data.to) {
+      end.setUTCDate(end.getUTCDate() + 1);
+    }
+    if (start >= end) {
+      return fail({
+        message: t("profit.periodInvalid"),
+        errorType: ErrorResponseTypes.VALIDATION_ERROR,
+      });
+    }
+    const period = { start, end };
     try {
       const access = await getDocumentAccess(userId, { companyId });
       if (!access?.companyName) {
@@ -122,14 +137,18 @@ export class MonthlyProfitRepository {
                 revenueAccounts,
                 expenseAccounts,
                 expenseAreas: expenseAccounts.length
-                  ? await getMonthlySupplierExpenses(companyId, currency, month)
+                  ? await getMonthlySupplierExpenses(
+                      companyId,
+                      currency,
+                      period,
+                    )
                   : [],
               };
             },
           ),
         ),
         getMonthlyModelEstimates(
-          month,
+          period,
           bindings.map(({ provider }) => provider),
         ),
       ]);
@@ -137,6 +156,8 @@ export class MonthlyProfitRepository {
         report: {
           companyName: access.companyName,
           month,
+          periodFrom: data.from,
+          periodTo: data.to,
           currencies,
           estimates,
         },

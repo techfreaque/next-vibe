@@ -56,9 +56,7 @@ describe("Admin landing actions and destinations", () => {
         if (category === "ai") {
           expect(landing.heading).toBe(locale === "de-DE" ? "KI" : "AI");
         } else {
-          const switcher = toolbar.getByRole("button", {
-            name: t("erp.companySwitch.select"), exact: true,
-          });
+          const switcher = toolbar.locator("#erp-company-switch");
           if (await switcher.isVisible()) {
             await switcher.click();
             await page.getByRole("menuitemradio").filter({ hasText: "Fixture purchasing books" }).click();

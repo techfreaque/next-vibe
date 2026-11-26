@@ -1,11 +1,12 @@
 export const dynamic = "force-dynamic";
 
+import { coreEnv } from "next-vibe/core/env";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { HelpGetResponseOutput } from "next-vibe/help-tool/definition";
 import type { HelpGetRequestInput } from "next-vibe/help-tool/definition";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import { UserPermissionRole, UserRole } from "next-vibe/identity/roles/enum";
+import { UserRole } from "next-vibe/identity/roles/enum";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import { Platform } from "next-vibe/platforms/platforms";
 import { cookies } from "next-vibe/ui/lib/headers";
@@ -15,7 +16,9 @@ import {
   readWorkspaceCompanyCookie,
   WORKSPACE_COMPANY_COOKIE,
   type WorkspaceCompany,
+  workspaceCompanyCookieName,
 } from "@/companies/_shared/workspace-company";
+import { DEMO_COMPANY_NAME } from "@/companies/demo-company";
 
 import { parseToolsInitialState } from "./initial-state";
 import { ToolsLoadError } from "./load-error";
@@ -53,7 +56,13 @@ export async function tanstackLoader({
 
   const { AuthRepository } = await import("next-vibe/identity/auth/repository");
   const auth = await AuthRepository.getAuthMinimalUser(
-    [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN],
+    [
+      UserRole.PUBLIC,
+      UserRole.CUSTOMER,
+      UserRole.PARTNER_ADMIN,
+      UserRole.PARTNER_EMPLOYEE,
+      UserRole.ADMIN,
+    ],
     { platform: Platform.NEXT_PAGE, locale },
     logger,
   ).then(
@@ -92,16 +101,18 @@ export async function tanstackLoader({
         logger,
       ),
     ),
-    !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN)
+    !user.isPublic
       ? Promise.all([
           import("@/companies/_shared/workspace-company.repository").then(
             ({ listWorkspaceCompanies }) => listWorkspaceCompanies(user.id),
           ),
-          cookies().then((store) =>
-            readWorkspaceCompanyCookie(
-              store.get(WORKSPACE_COMPANY_COOKIE)?.value,
-              user.id,
-            ),
+          cookies().then(
+            (store) =>
+              store.get(workspaceCompanyCookieName(user.id))?.value ??
+              readWorkspaceCompanyCookie(
+                store.get(WORKSPACE_COMPANY_COOKIE)?.value,
+                user.id,
+              ),
           ),
         ])
       : null,
@@ -121,11 +132,16 @@ export async function tanstackLoader({
     catalog.status === "fulfilled" && catalog.value.success
       ? catalog.value.data
       : null;
-  const [workspaceCompanies, workspaceCompanyId] =
+  const [workspaceCompanies, savedCompanyId] =
     workspace.status === "fulfilled" && workspace.value
       ? workspace.value
       : [null, undefined];
 
+  const workspaceCompanyId =
+    savedCompanyId ??
+    (coreEnv.NODE_ENV === "development"
+      ? workspaceCompanies?.find(({ name }) => name === DEMO_COMPANY_NAME)?.id
+      : undefined);
   return {
     locale,
     user,

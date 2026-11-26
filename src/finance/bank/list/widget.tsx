@@ -38,7 +38,8 @@ export function BankListWidget(): JSX.Element {
   const onSubmit = useWidgetOnSubmit();
   const { push } = useWidgetNavigation();
   const companyId = form.watch("companyId");
-  const accountId = form.watch("accountId");
+  const accountId =
+    form.watch("accountId") ?? data?.selectedAccountId ?? undefined;
   const responseOnly = useWidgetResponseOnly();
   const interactive = useWidgetIsInteractive() && !responseOnly;
 

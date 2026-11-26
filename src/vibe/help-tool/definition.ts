@@ -110,6 +110,8 @@ const { GET } = createEndpoint({
   allowedRoles: [
     UserRole.PUBLIC,
     UserRole.CUSTOMER,
+    UserRole.PARTNER_ADMIN,
+    UserRole.PARTNER_EMPLOYEE,
     UserRole.ADMIN,
     UserRole.MCP_VISIBLE,
     UserRole.CLI_AUTH_BYPASS,

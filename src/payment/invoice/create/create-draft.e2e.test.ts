@@ -156,17 +156,9 @@ describe("E2E: invoice draft save and retry", () => {
         await page.goto(
           `${baseUrl}/${locale}/tools/${pathToAliasMap.payment_invoice_create_POST}`,
         );
-        await page
-          .getByRole("button", {
-            name: tFinance("documents.chooseCompany"),
-            exact: true,
-          })
-          .click();
-        await page
-          .getByRole("dialog")
-          .getByText(companyName, { exact: true })
-          .filter({ visible: true })
-          .click();
+        const switcher = page.locator("#erp-company-switch");
+        await switcher.click();
+        await page.getByRole("menuitemradio").filter({ hasText: companyName }).click();
         await page
           .getByRole("button", {
             name: tFinance("documents.chooseCustomer"),

@@ -41,6 +41,7 @@ import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/sub
 import { type JSX, useEffect, useMemo, useState } from "react";
 import { useFieldArray } from "react-hook-form";
 
+import { useToolCompanyId } from "@/companies/_shared/workspace-company-context";
 import companyDefinition from "@/companies/[companyId]/get/definition";
 import { DocumentScopePicker } from "@/finance/document-list-ui";
 
@@ -74,6 +75,7 @@ export function CoaJournalCreateWidget({
   const editing = interactive && !responseOnly && !data?.id;
   const lineEditor = useFieldArray({ control: form.control, name: "lines" });
   const lines = form.watch("lines") ?? [];
+  const toolCompanyId = useToolCompanyId();
   const companyId = form.watch("companyId");
   const [fixedCompanyId] = useState(() => companyId);
   const periodId = form.watch("periodId");
@@ -429,22 +431,24 @@ export function CoaJournalCreateWidget({
       </SectionGroup>
       <SectionGroup title={t("journalCreate.widget.details")}>
         <Div className="grid min-w-0 gap-3 @md:grid-cols-2 @xl:grid-cols-3">
-          <Div className="flex flex-col gap-1">
-            <Span className="text-sm font-medium">
-              {t("journalCreate.companyId.label")}
-            </Span>
-            {fixedCompanyId && company?.name ? (
-              <Span className="min-h-9 py-1.5 text-sm">{company.name}</Span>
-            ) : (
-              <DocumentScopePicker
-                kind="company"
-                required
-                value={companyId}
-                appliedLabel={company?.name}
-                onSelect={pickCompany}
-              />
-            )}
-          </Div>
+          {!toolCompanyId && (
+            <Div className="flex flex-col gap-1">
+              <Span className="text-sm font-medium">
+                {t("journalCreate.companyId.label")}
+              </Span>
+              {fixedCompanyId && company?.name ? (
+                <Span className="min-h-9 py-1.5 text-sm">{company.name}</Span>
+              ) : (
+                <DocumentScopePicker
+                  kind="company"
+                  required
+                  value={companyId}
+                  appliedLabel={company?.name}
+                  onSelect={pickCompany}
+                />
+              )}
+            </Div>
+          )}
           <Div className="flex flex-col gap-1">
             <Span className="text-sm font-medium">
               {t("journalCreate.periodId.label")}

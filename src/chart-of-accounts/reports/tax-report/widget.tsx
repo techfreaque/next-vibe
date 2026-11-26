@@ -28,14 +28,12 @@ import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-f
 import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import type { JSX } from "react";
 
-import { useWorkspaceCompany } from "@/companies/_shared/workspace-company-context";
+import { ReportRangeControl } from "@/finance/report-period-control";
 
 import { formatAccountingDateInput } from "../../shared/calendar-date";
 import {
   ReportCompanyPicker,
-  ReportDateFilter,
   ReportMenu,
-  ReportPeriodMenu,
   ReportReadState,
 } from "../balance-sheet/report-controls";
 import { reportAmountClass } from "../report-amount-class";
@@ -85,7 +83,6 @@ export function TaxReportWidget({
   const interactive = useWidgetIsInteractive();
   const responseOnly = useWidgetResponseOnly();
   const showInputs = interactive && !responseOnly;
-  const workspace = useWorkspaceCompany();
   const companyId = form.watch("companyId");
   const hasCompany = Boolean(companyId || data?.reportCompanyId);
   const requestedCurrency = form.watch("currency")?.trim().toUpperCase();
@@ -122,7 +119,6 @@ export function TaxReportWidget({
           reportId={data?.reportCompanyId}
           reportName={data?.reportCompanyName}
           onChange={(id) => {
-            workspace?.select(id);
             form.setValue("companyId", id, { shouldDirty: true });
           }}
         />
@@ -135,22 +131,6 @@ export function TaxReportWidget({
             </AccordionTrigger>
             <AccordionContent>
               <Div className="flex flex-wrap items-end gap-2">
-                <ReportDateFilter
-                  id="report-from"
-                  label={t("taxReport.from.label")}
-                  day={from ?? formatAccountingDateInput(data?.fromResponse)}
-                  onChange={(date) =>
-                    form.setValue("from", date, { shouldDirty: true })
-                  }
-                />
-                <ReportDateFilter
-                  id="report-to"
-                  label={t("taxReport.to.label")}
-                  day={to ?? formatAccountingDateInput(data?.toResponse)}
-                  onChange={(date) =>
-                    form.setValue("to", date, { shouldDirty: true })
-                  }
-                />
                 <Div className="w-32">
                   <TextFieldWidget
                     fieldName="currency"
@@ -161,7 +141,12 @@ export function TaxReportWidget({
                     }}
                   />
                 </Div>
-                <ReportPeriodMenu
+                <ReportRangeControl
+                  fromLabel={t("taxReport.from.label")}
+                  toLabel={t("taxReport.to.label")}
+                  from={from ?? formatAccountingDateInput(data?.fromResponse)}
+                  to={to ?? formatAccountingDateInput(data?.toResponse)}
+                  defaultPreset="yearToDate"
                   onChange={({ from: start, to: end }) => {
                     form.setValue("from", start, { shouldDirty: true });
                     form.setValue("to", end, { shouldDirty: true });

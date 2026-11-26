@@ -109,7 +109,10 @@ import {
   parseToolsInitialState,
   readEndpointSearchParams,
 } from "@/_pages/tools/initial-state";
-import { useWorkspaceCompany } from "@/companies/_shared/workspace-company-context";
+import {
+  ToolCompanyContext,
+  useWorkspaceCompany,
+} from "@/companies/_shared/workspace-company-context";
 import {
   ADMIN_GROUPS,
   CATEGORY_REGISTRY,
@@ -178,6 +181,7 @@ import {
   applyWorkspaceCompany,
   applyWorkspaceCompanyToEntry,
   hasFixedRecordCompany,
+  hasWorkspaceCompanyInput,
   readWorkspaceCompanyOverride,
 } from "./erp-company-scope";
 import { ErpCompanySwitch } from "./erp-company-switch";
@@ -527,7 +531,7 @@ export function HelpToolsWidget(): JSX.Element {
     () => false,
   );
   const hasLocalWorkspace =
-    isAdminUser && !activeViewAsRole && !activeInstanceId;
+    !user.isPublic && !activeViewAsRole && !activeInstanceId;
   const activeCompany = hasLocalWorkspace ? workspace?.active : undefined;
   const [recordCompany, setRecordCompany] = useState<{
     key: string;
@@ -2303,6 +2307,7 @@ export function HelpToolsWidget(): JSX.Element {
             if (
               value &&
               (activeCatKey || selectedAdminEndpoint) &&
+              isAdminUser &&
               hasLocalWorkspace &&
               !showAllTools
             ) {
@@ -3016,7 +3021,6 @@ export function HelpToolsWidget(): JSX.Element {
       ? (catalogDestinations?.[endpointToUrlSegment(displayedEndpoint)]
           ?.category ?? displayedEndpoint.category)
       : undefined;
-    const displayedMethod = displayedEndpoint?.method;
     const recordNavigationEntry = urlNavStack?.stack.findLast(
       (entry) => !entry.renderInModal,
     );
@@ -3041,6 +3045,14 @@ export function HelpToolsWidget(): JSX.Element {
           activeNavigationEntry?.params ?? selectedToolInputs,
         )
       : undefined;
+    const companyScopedEndpoint =
+      !!displayedEndpoint && hasWorkspaceCompanyInput(displayedEndpoint);
+    const boundRecord =
+      !!displayedEndpoint?.path.some(
+        (segment) => segment.startsWith("[") && segment !== "[companyId]",
+      ) ||
+      (displayedEndpoint?.category === "companies" &&
+        explicitCompanyId !== undefined);
     const companyInToolbar =
       explicitCompanyId === undefined
         ? activeCompany
@@ -3053,28 +3065,30 @@ export function HelpToolsWidget(): JSX.Element {
       hasLocalWorkspace &&
       workspace &&
       workspace.companies.length > 0 &&
-      (categoryByKey.get(selectedCategory ?? activeCatKey ?? "")?.group ===
-        "business" ||
-        explicitCompanyId !== undefined) &&
+      (companyScopedEndpoint ||
+        (!displayedEndpoint &&
+          isAdminUser &&
+          (!activeCatKey ||
+            categoryByKey.get(activeCatKey)?.group === "business"))) &&
       (explicitCompanyId === undefined || companyInToolbar !== undefined);
     const selectWorkspaceCompany = (id: string): void => {
       if (id !== activeCompany?.id) {
         setReportAction(undefined);
       }
       workspace?.select(id);
-      if (displayedMethod !== "GET" || explicitCompanyId === undefined) {
-        return;
+      if (
+        displayedEndpoint &&
+        Object.keys(readEndpointSearchParams(effectiveSearchRef.current))
+          .length > 0
+      ) {
+        // Company-specific record filters in the link belong to the old company.
+        const search = copyCatalogSearchParams(effectiveSearchRef.current);
+        writeSilentUrl(effectivePathnameRef.current, search);
+        urlNavStack?._clearStack();
+        void restoreBaseTool();
       }
-      // An explicit switch changes the current report. Browser navigation still
-      // restores any explicit company passed by a link or earlier override.
-      const search = new URLSearchParams(effectiveSearchRef.current);
-      search.set("arg.companyId", id);
-      search.delete("companyId");
-      writeSilentUrl(effectivePathnameRef.current, search);
-      urlNavStack?._clearStack();
-      void restoreBaseTool();
     };
-    const showPlatformAdmin = hasLocalWorkspace && !showAllTools;
+    const showPlatformAdmin = isAdminUser && hasLocalWorkspace && !showAllTools;
     const createActions = [
       ...new Map(
         Object.values(response?.adminCategoryLandings ?? {})
@@ -3082,6 +3096,8 @@ export function HelpToolsWidget(): JSX.Element {
           .map((action) => [action.alias, action]),
       ).values(),
     ];
+    const createCompanyAction =
+      response?.adminCategoryLandings?.companies?.createActions[0];
     const goHome = (): void => setSidebarPath([], "webPinned", "business");
     const showDeveloperCatalog = (category?: string): void => {
       setSidebarPath(
@@ -3110,33 +3126,34 @@ export function HelpToolsWidget(): JSX.Element {
         setSidebarPath(sidebarPath);
       }
     };
-    const companySwitch = companyOnRecord ? (
+    const fixedToolbarCompany =
+      companyOnRecord ??
+      (companySwitcherVisible &&
+      (boundRecord || workspace.companies.length === 1)
+        ? companyInToolbar
+        : undefined);
+    const companySwitch = fixedToolbarCompany ? (
       <Span
-        title={companyOnRecord.name}
+        title={fixedToolbarCompany.name}
         className="inline-flex min-h-8 min-w-0 max-w-full items-center gap-2 rounded-md border bg-background px-2 py-1 text-sm sm:max-w-80"
       >
         <Building className="size-4 shrink-0" aria-hidden="true" />
         <Span className="sr-only">
-          {t("erp.companySwitch.current", { name: companyOnRecord.name })}
+          {t("erp.companySwitch.current", { name: fixedToolbarCompany.name })}
         </Span>
         <Span
           aria-hidden="true"
           className="line-clamp-2 min-w-0 [overflow-wrap:anywhere]"
         >
-          {companyOnRecord.name}
+          {fixedToolbarCompany.name}
         </Span>
       </Span>
-    ) : companySwitcherVisible ? (
+    ) : companySwitcherVisible && companyInToolbar ? (
       <ErpCompanySwitch
         t={t}
         activeCompany={companyInToolbar}
         companies={workspace.companies}
-        onSelect={
-          !isRestoringTool &&
-          (displayedMethod === undefined || displayedMethod === "GET")
-            ? selectWorkspaceCompany
-            : undefined
-        }
+        onSelect={selectWorkspaceCompany}
         onBrowse={isMobile && selectedAdminEndpoint ? browseTools : undefined}
       />
     ) : undefined;
@@ -3164,12 +3181,11 @@ export function HelpToolsWidget(): JSX.Element {
             setSearchQuery("");
           }
         }}
-        company={isMobile || fixedRecordCompany ? undefined : companySwitch}
         instances={instanceControls}
       />
     ) : (
       <Div className="flex h-full min-h-0 flex-col">
-        {hasLocalWorkspace && (
+        {isAdminUser && hasLocalWorkspace && (
           <Div className="shrink-0 border-b p-2">
             <Button
               type="button"
@@ -3327,26 +3343,12 @@ export function HelpToolsWidget(): JSX.Element {
         return undefined;
       }
       if (report.scope === "company" && !activeCompany) {
-        const createCompany =
-          response?.adminCategoryLandings?.companies?.createActions[0];
-        if (workspace?.companies.length) {
-          return (
-            <Div className="flex min-w-0 flex-col items-start gap-3 rounded-xl border bg-card p-5">
-              <P className="font-medium">{t("erp.overview.chooseCompany")}</P>
-              <ErpCompanySwitch
-                t={t}
-                companies={workspace.companies}
-                onSelect={selectWorkspaceCompany}
-              />
-            </Div>
-          );
-        }
         return (
           <Div className="flex flex-col items-start gap-3 rounded-xl border bg-card p-5">
-            <P className="font-medium">{t("erp.overview.chooseCompany")}</P>
-            {createCompany && (
+            <P className="font-medium">{t("erp.overview.noCompany")}</P>
+            {createCompanyAction && (
               <Link
-                href={`/${locale}/${ADMIN_ENDPOINTS_PATH}/${createCompany.alias}`}
+                href={`/${locale}/${ADMIN_ENDPOINTS_PATH}/${createCompanyAction.alias}`}
                 className="inline-flex min-h-10 items-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground hover:bg-primary/90"
               >
                 {t("erp.createCompany")}
@@ -3476,7 +3478,29 @@ export function HelpToolsWidget(): JSX.Element {
                     : null
                 }
               >
-                {renderSelectedTool(selectedAdminEndpoint)}
+                <ToolCompanyContext.Provider
+                  value={hasLocalWorkspace ? selectedCompanyId : undefined}
+                >
+                  {companyScopedEndpoint &&
+                  hasLocalWorkspace &&
+                  workspace &&
+                  !selectedCompanyId ? (
+                    <EmptyBlock
+                      title={t("erp.overview.noCompany")}
+                      action={
+                        createCompanyAction
+                          ? {
+                              label: t("erp.createCompany"),
+                              onClick: (): void =>
+                                openTool(createCompanyAction.alias),
+                            }
+                          : undefined
+                      }
+                    />
+                  ) : (
+                    renderSelectedTool(selectedAdminEndpoint)
+                  )}
+                </ToolCompanyContext.Provider>
               </AdminRecordCompanyContext.Provider>
             </AdminRecordContext.Provider>
           </Div>
@@ -3783,11 +3807,7 @@ export function HelpToolsWidget(): JSX.Element {
               {(companySwitch ||
                 (!showPlatformAdmin && selectedAdminEndpoint)) && (
                 <Div className="flex min-w-0 flex-1 items-center justify-end gap-2">
-                  {(companyOnRecord ||
-                    isMobile ||
-                    adminSidebarCollapsed ||
-                    !showPlatformAdmin) &&
-                    companySwitch}
+                  {companySwitch}
                   {selectedAdminEndpoint && !showPlatformAdmin && (
                     <Button
                       type="button"

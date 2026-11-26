@@ -1,0 +1,1 @@
+export const DEMO_MAIN_WAREHOUSE_CODE = "WH-01";

@@ -45,6 +45,7 @@ const { GET } = createEndpoint({
   allowedRoles: [UserRole.ADMIN],
   tags: ["tags.finance"],
   errorTypes: financeErrorTypes,
+  options: { formOptions: { autoSubmit: false } },
   successTypes: { title: "success.title", description: "success.description" },
   fields: customWidgetObject({
     render: ProfitWidget,
@@ -65,12 +66,26 @@ const { GET } = createEndpoint({
         label: "suppliers.month",
         schema: evidenceMonth.optional(),
       }),
+      from: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "profit.periodFrom",
+        schema: z.iso.date().optional(),
+      }),
+      to: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "profit.periodTo",
+        schema: z.iso.date().optional(),
+      }),
       report: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         label: "profit.title",
         schema: z.object({
           companyName: z.string(),
           month: evidenceMonth,
+          periodFrom: z.iso.date().optional(),
+          periodTo: z.iso.date().optional(),
           currencies: z.array(
             z.object({
               currency: z.string(),

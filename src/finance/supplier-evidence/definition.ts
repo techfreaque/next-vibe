@@ -81,6 +81,7 @@ const { GET } = createEndpoint({
   titleShort: "suppliers.title",
   description: "suppliers.description",
   icon: "building",
+  options: { formOptions: { autoSubmit: false } },
   fields: customWidgetObject({
     render: ListWidget,
     usage: { request: "data", response: true },

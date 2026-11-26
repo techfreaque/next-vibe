@@ -33,6 +33,7 @@ export const translations = {
       bills: "Supplier bills",
     },
     overview: {
+      noCompany: "Create or join a company to use this tool.",
       chooseCompany: "Choose a company to view its report.",
       loading: "Loading the company overview",
       loadError: "The company overview could not load",

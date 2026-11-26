@@ -37,6 +37,8 @@ export const translations: typeof enTranslations = {
       bills: "Eingangsrechnungen",
     },
     overview: {
+      noCompany:
+        "Legen Sie ein Unternehmen an oder treten Sie einem bei, um dieses Werkzeug zu nutzen.",
       chooseCompany: "Wählen Sie ein Unternehmen für diesen Bericht.",
       loading: "Unternehmensübersicht wird geladen",
       loadError: "Die Unternehmensübersicht konnte nicht geladen werden",

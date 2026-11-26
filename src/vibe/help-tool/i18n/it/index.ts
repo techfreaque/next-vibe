@@ -36,6 +36,8 @@ export const translations: typeof enTranslations = {
       bills: "Fatture fornitori",
     },
     overview: {
+      noCompany:
+        "Crea una società o accedi a una esistente per usare questo strumento.",
       chooseCompany:
         "Selezioni l’azienda di cui desidera consultare il report.",
       loading: "Caricamento del riepilogo aziendale",

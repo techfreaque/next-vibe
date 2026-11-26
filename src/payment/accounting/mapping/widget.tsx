@@ -34,7 +34,7 @@ import { z } from "zod";
 
 import accountsDefinition from "@/chart-of-accounts/account/list/definition";
 import { AccountSubtype, AccountType } from "@/chart-of-accounts/enum";
-import { useWorkspaceCompany } from "@/companies/_shared/workspace-company-context";
+import { useToolCompanyId } from "@/companies/_shared/workspace-company-context";
 import productsDefinition from "@/products/catalog/list/definition";
 
 import type definition from "./definition";
@@ -106,13 +106,7 @@ export function AccountMappingWidget({
   const logger = useWidgetLogger();
   const user = useWidgetUser();
   const companyId = form.watch("companyId");
-  const activeCompanyId = useWorkspaceCompany()?.active?.id;
-  // Smart default: start in the company the admin is working in.
-  useEffect(() => {
-    if (activeCompanyId && !form.getValues("companyId")) {
-      form.setValue("companyId", activeCompanyId, { shouldDirty: true });
-    }
-  }, [activeCompanyId, form]);
+  const toolCompanyId = useToolCompanyId();
   const scopeReady = z.uuid().safeParse(companyId).success;
   const productOptions = useMemo(
     () => ({
@@ -243,14 +237,16 @@ export function AccountMappingWidget({
       primaryAction={<SubmitButtonWidget field={{ text: "saveOffer" }} />}
     >
       <AdminFormSection title={t("sectionOffer")} columns={2}>
-        <Div data-field="companyId" className="flex min-w-0 flex-col gap-2">
-          <Label>{t("company")}</Label>
-          <EntityPickerFieldWidget
-            fieldName="companyId"
-            field={children.companyId}
-            showLabel={false}
-          />
-        </Div>
+        {!toolCompanyId && (
+          <Div data-field="companyId" className="flex min-w-0 flex-col gap-2">
+            <Label>{t("company")}</Label>
+            <EntityPickerFieldWidget
+              fieldName="companyId"
+              field={children.companyId}
+              showLabel={false}
+            />
+          </Div>
+        )}
         <MappingOption
           name="productId"
           label={t("product")}

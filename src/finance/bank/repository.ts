@@ -410,21 +410,23 @@ export class BankReconciliationRepository {
     locale: CountryLanguage,
   ): Promise<ResponseType<BankListResponse>> {
     const { t } = scopedTranslation.scopedT(locale);
-    if (!data.companyId || !data.accountId) {
-      return success({
-        lines: [],
-        total: 0,
-        currentPage: 1,
-        pageCount: 1,
-        selectedCompanyId: data.companyId ?? null,
-        selectedAccountId: null,
-        selectedAccountName: null,
-        selectedCompanyName: null,
-      });
+    const companyId = data.companyId;
+    const empty = {
+      lines: [],
+      total: 0,
+      currentPage: 1,
+      pageCount: 1,
+      selectedCompanyId: companyId ?? null,
+      selectedAccountId: null,
+      selectedAccountName: null,
+      selectedCompanyName: null,
+    };
+    if (!companyId) {
+      return success(empty);
     }
     const auth = await CompanyAuthRepository.requireMember(
       userId,
-      data.companyId,
+      companyId,
       CompanyMemberRole.VIEWER,
       logger,
       locale,
@@ -434,10 +436,29 @@ export class BankReconciliationRepository {
     }
 
     try {
+      let accountId = data.accountId;
+      if (!accountId) {
+        const accounts = await db
+          .select({ id: accountNodes.id })
+          .from(accountNodes)
+          .where(
+            and(
+              eq(accountNodes.companyId, companyId),
+              eq(accountNodes.subtype, AccountSubtype.BANK),
+              eq(accountNodes.isActive, true),
+              eq(accountNodes.isPostable, true),
+            ),
+          )
+          .limit(2);
+        if (accounts.length !== 1) {
+          return success(empty);
+        }
+        accountId = accounts[0].id;
+      }
       const account = await BankReconciliationRepository.getBankAccount(
         db,
-        data.companyId,
-        data.accountId,
+        companyId,
+        accountId,
         false,
       );
       if (!account) {
@@ -447,8 +468,8 @@ export class BankReconciliationRepository {
         });
       }
       const where = and(
-        eq(bankStatementLines.companyId, data.companyId),
-        eq(bankStatementLines.accountId, data.accountId),
+        eq(bankStatementLines.companyId, companyId),
+        eq(bankStatementLines.accountId, accountId),
         isNull(bankStatementLines.matchedJournalLineId),
       );
       const [{ total }] = await db
@@ -489,8 +510,8 @@ export class BankReconciliationRepository {
             .from(bankAccountReconciliationSettings)
             .where(
               and(
-                eq(bankAccountReconciliationSettings.companyId, data.companyId),
-                eq(bankAccountReconciliationSettings.accountId, data.accountId),
+                eq(bankAccountReconciliationSettings.companyId, companyId),
+                eq(bankAccountReconciliationSettings.accountId, accountId),
               ),
             )
         : [];
@@ -499,8 +520,8 @@ export class BankReconciliationRepository {
         total,
         currentPage: pagination.currentPage,
         pageCount: pagination.pageCount,
-        selectedCompanyId: data.companyId,
-        selectedAccountId: data.accountId,
+        selectedCompanyId: companyId,
+        selectedAccountId: accountId,
         selectedAccountName: account.name,
         selectedCurrency: account.currency ?? "EUR",
         selectedCompanyName: account.companyName,

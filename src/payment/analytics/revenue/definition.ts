@@ -21,7 +21,6 @@ import {
   requestField,
   responseField,
 } from "next-vibe/unified-ui/_shared/utils-i18n";
-import { analyticsWindowFields } from "next-vibe/unified-ui/analytics/fields";
 import {
   analyticsWindowSchema,
   breakdownSchema,
@@ -30,6 +29,7 @@ import {
 } from "next-vibe/unified-ui/analytics/schema";
 import { z } from "zod";
 
+import { reportAnalyticsWindowFields } from "@/finance/report-analytics-fields";
 import { SubscriptionPlan, SubscriptionPlanOptions } from "@/subscription/enum";
 
 import {
@@ -101,7 +101,7 @@ const { GET } = createEndpoint({
       backButton: backButton(scopedTranslation, {
         usage: { response: true },
       }),
-      ...analyticsWindowFields,
+      ...reportAnalyticsWindowFields,
       kind: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,

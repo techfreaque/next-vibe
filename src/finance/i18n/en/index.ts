@@ -1,5 +1,8 @@
 export const translations = {
   profit: {
+    periodInvalid: "Choose an end date on or after the start date.",
+    periodFrom: "From",
+    periodTo: "Through",
     run: "Show report",
     unallocatedRevenue: "Posted revenue without model allocation: {{amount}}",
     estimatedCosts: "Estimated model costs: {{amount}}",

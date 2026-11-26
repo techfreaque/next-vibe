@@ -600,7 +600,12 @@ export const translations: typeof enTranslations = {
     widget: {
       quickDates: "Vybrať obdobie",
       thisMonth: "Tento mesiac",
-      previousMonth: "Predchádzajúci mesiac",
+      previousMonth: "Minulý mesiac",
+      thisQuarter: "Tento štvrťrok",
+      yearToDate: "Od začiatku roka",
+      lastYear: "Minulý rok",
+      customPeriod: "Vlastné obdobie",
+      year: "Rok",
       autoCurrency: "Automaticky",
       run: "Zobraziť",
       running: "Načítava sa prehľad…",

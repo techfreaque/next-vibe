@@ -117,7 +117,7 @@ describe("Fixed company on authorized ERP records", () => {
       await page.setViewportSize({ width: 390, height: 844 });
       await openTool("/tools?cat=accounting");
       await toolbar.waitFor();
-      await toolbar.getByRole("button", { name: t("erp.companySwitch.select"), exact: true }).click();
+      await toolbar.locator("#erp-company-switch").click();
       await page.getByRole("menuitemradio").filter({ hasText: workspaceName }).click();
       await savedSwitcher.waitFor();
 

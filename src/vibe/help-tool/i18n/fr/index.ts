@@ -36,6 +36,8 @@ export const translations: typeof enTranslations = {
       bills: "Factures fournisseurs",
     },
     overview: {
+      noCompany:
+        "Créez une société ou rejoignez-en une pour utiliser cet outil.",
       chooseCompany: "Choisissez une société pour afficher son rapport.",
       loading: "Chargement du tableau de bord de l’entreprise",
       loadError: "Impossible de charger le tableau de bord de l’entreprise",

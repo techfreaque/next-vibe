@@ -38,6 +38,7 @@ import { type JSX, useEffect, useMemo, useRef } from "react";
 import { useController, useFieldArray, useWatch } from "react-hook-form";
 import { z } from "zod";
 
+import { useToolCompanyId } from "@/companies/_shared/workspace-company-context";
 import { useWorkspaceCompany } from "@/companies/_shared/workspace-company-context";
 import companyDefinition from "@/companies/[companyId]/get/definition";
 import { DocumentDraftLines } from "@/finance/document-draft-lines";
@@ -80,6 +81,7 @@ export function InvoiceCreateWidget({
       control: form.control,
       name: "customerId",
     });
+  const toolCompanyId = useToolCompanyId();
   const companyId = companyField.value;
   const customerId = customerField.value;
   const responseOnly = useWidgetResponseOnly();
@@ -294,27 +296,29 @@ export function InvoiceCreateWidget({
         <Div className="flex min-w-0 flex-col gap-4">
           <SectionGroup title={t("post.widget.details")}>
             <Div className="grid min-w-0 grid-cols-1 gap-3 @md:grid-cols-2">
-              <Div className="flex min-w-0 flex-col items-start gap-2">
-                <Span className="text-sm font-medium">
-                  {t("companyId.label")}
-                </Span>
-                {interactive && !disabled ? (
-                  <DocumentScopePicker
-                    kind="company"
-                    value={companyId}
-                    appliedLabel={
-                      company?.id === companyId ? company?.name : undefined
-                    }
-                    required
-                    onSelect={(id) => companyField.onChange(id)}
-                  />
-                ) : (
-                  <EntityPickerFieldWidget
-                    fieldName="companyId"
-                    field={field.children.companyId}
-                  />
-                )}
-              </Div>
+              {!toolCompanyId && (
+                <Div className="flex min-w-0 flex-col items-start gap-2">
+                  <Span className="text-sm font-medium">
+                    {t("companyId.label")}
+                  </Span>
+                  {interactive && !disabled ? (
+                    <DocumentScopePicker
+                      kind="company"
+                      value={companyId}
+                      appliedLabel={
+                        company?.id === companyId ? company?.name : undefined
+                      }
+                      required
+                      onSelect={(id) => companyField.onChange(id)}
+                    />
+                  ) : (
+                    <EntityPickerFieldWidget
+                      fieldName="companyId"
+                      field={field.children.companyId}
+                    />
+                  )}
+                </Div>
+              )}
               <Div className="flex min-w-0 flex-col items-start gap-2">
                 <Span className="text-sm font-medium">
                   {t("customerId.label")}

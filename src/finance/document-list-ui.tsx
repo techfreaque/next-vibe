@@ -38,6 +38,8 @@ import {
 import { type JSX, type ReactNode, useId, useState } from "react";
 import { z } from "zod";
 
+import { useToolCompanyId } from "@/companies/_shared/workspace-company-context";
+
 import { useDocumentListCopy } from "./document-list-hooks";
 
 const pickSchema = z.object({
@@ -62,8 +64,9 @@ export function DocumentScopePicker({
   required?: boolean;
   onSelect: (id: string) => void;
   onClear?: () => void;
-}): JSX.Element {
+}): JSX.Element | null {
   const { push } = useWidgetNavigation();
+  const toolCompanyId = useToolCompanyId();
   const t = useDocumentListCopy();
   const [selection, setSelection] = useState<z.infer<typeof pickSchema>>();
   const isCompany = kind === "company";
@@ -92,6 +95,9 @@ export function DocumentScopePicker({
       });
     })();
   };
+  if (isCompany && toolCompanyId) {
+    return null;
+  }
   return (
     <Div className="flex min-w-0 items-center">
       <Button

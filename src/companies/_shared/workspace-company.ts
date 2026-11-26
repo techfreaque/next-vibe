@@ -6,6 +6,10 @@ export interface WorkspaceCompany {
 
 export const WORKSPACE_COMPANY_COOKIE = "erp-workspace-company";
 
+export function workspaceCompanyCookieName(userId: string): string {
+  return `${WORKSPACE_COMPANY_COOKIE}.${userId}`;
+}
+
 export function readWorkspaceCompanyCookie(
   value: string | undefined,
   userId: string,
@@ -18,8 +22,5 @@ export function resolveWorkspaceCompany(
   companies: readonly WorkspaceCompany[],
   preferredId: string | undefined,
 ): WorkspaceCompany | undefined {
-  return (
-    companies.find(({ id }) => id === preferredId) ??
-    (companies.length === 1 ? companies[0] : undefined)
-  );
+  return companies.find(({ id }) => id === preferredId) ?? companies[0];
 }

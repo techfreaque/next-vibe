@@ -585,7 +585,12 @@ export const translations: typeof enTranslations = {
     widget: {
       quickDates: "Scegli periodo",
       thisMonth: "Questo mese",
-      previousMonth: "Mese precedente",
+      previousMonth: "Mese scorso",
+      thisQuarter: "Questo trimestre",
+      yearToDate: "Da inizio anno",
+      lastYear: "Anno scorso",
+      customPeriod: "Personalizzato",
+      year: "Anno",
       autoCurrency: "Automatica",
       run: "Corri!",
       running: "Caricamento del report…",

@@ -2,6 +2,10 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   profit: {
+    periodInvalid:
+      "Dátum konca musí byť rovnaký alebo neskorší ako dátum začiatku.",
+    periodFrom: "Od",
+    periodTo: "Do",
     run: "Zobraziť výkaz",
     unallocatedRevenue:
       "Zaúčtované výnosy bez priradenia k modelom: {{amount}}",

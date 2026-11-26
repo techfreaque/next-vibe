@@ -8,6 +8,7 @@
  * onboarding needs seedDefaultTaxRates at runtime.
  */
 
+import { eq } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { db, isPglite } from "next-vibe/database";
 import { isTransientConnectError } from "next-vibe/database/pool";
@@ -15,7 +16,10 @@ import { formatDatabase } from "next-vibe/logger/formatters";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { companies } from "../companies/db";
+import { findDemoCompany } from "../companies/demo-company.repository";
 import { seedDefaultTaxRates } from "./default-tax-rates";
+import { companyTaxRegimes } from "./regime/db";
+import { CompanyTaxRegime } from "./regime/enum";
 
 export const priority = 50;
 
@@ -73,6 +77,26 @@ export async function dev(
       cause,
     );
     await seedCompanyTaxRates(logger);
+  }
+
+  const company = await findDemoCompany();
+  if (company) {
+    const [regime] = await db
+      .select({ effectiveFrom: companyTaxRegimes.effectiveFrom })
+      .from(companyTaxRegimes)
+      .where(eq(companyTaxRegimes.companyId, company.id))
+      .limit(1);
+    if (!regime) {
+      await db
+        .insert(companyTaxRegimes)
+        .values({
+          companyId: company.id,
+          effectiveFrom: "2020-01-01",
+          regime: CompanyTaxRegime.STANDARD,
+          recordedBy: company.adminId,
+        })
+        .onConflictDoNothing();
+    }
   }
 }
 

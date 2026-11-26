@@ -550,7 +550,12 @@ export const translations = {
     widget: {
       quickDates: "Other dates",
       thisMonth: "This month",
-      previousMonth: "Previous month",
+      previousMonth: "Last month",
+      thisQuarter: "This quarter",
+      yearToDate: "YTD",
+      lastYear: "Last year",
+      customPeriod: "Custom",
+      year: "Year",
       autoCurrency: "Automatic",
       run: "Run",
       running: "Loading report…",

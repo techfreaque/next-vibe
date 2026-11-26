@@ -2,7 +2,6 @@
 
 import { CurrenciesArr } from "next-vibe/core/i18n/core/config";
 import { Button } from "next-vibe/ui/components/button";
-import { DatePicker } from "next-vibe/ui/components/date-picker";
 import { Div } from "next-vibe/ui/components/div";
 import { EmptyBlock } from "next-vibe/ui/components/empty-block";
 import { Label } from "next-vibe/ui/components/label";
@@ -32,13 +31,14 @@ import {
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import { parseFormDate } from "next-vibe/unified-ui/widgets/form-fields/_shared/date-value";
 import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 import { type JSX, useState } from "react";
 
-import { useWorkspaceCompany } from "@/companies/_shared/workspace-company-context";
+import { useToolCompanyId } from "@/companies/_shared/workspace-company-context";
 import { DocumentScopePicker } from "@/finance/document-list-ui";
+import { reportDay } from "@/finance/report-period";
+import { ReportAsOfControl } from "@/finance/report-period-control";
 
 import type { ChartOfAccountsTranslationKey } from "../../i18n";
 import type definition from "./definition";
@@ -80,11 +80,11 @@ export function ReceivablesAgingWidget(): JSX.Element {
   const interactive = useWidgetIsInteractive();
   const responseOnly = useWidgetResponseOnly();
   const showInputs = interactive && !responseOnly;
-  const workspace = useWorkspaceCompany();
+  const toolCompanyId = useToolCompanyId();
   const companyId = form.watch("companyId");
   const reportCompanyId = companyId || data?.reportCompanyId || undefined;
   const isActiveCompany = Boolean(
-    reportCompanyId && workspace?.active?.id === reportCompanyId,
+    reportCompanyId && toolCompanyId === reportCompanyId,
   );
   const currency = form.watch("currency");
   const date = form.watch("asOfDate");
@@ -275,25 +275,13 @@ export function ReceivablesAgingWidget(): JSX.Element {
               </SelectContent>
             </Select>
           </Div>
-          <Div className="flex w-44 flex-col gap-1">
-            <Label htmlFor="receivables-aging-date">
-              {t("receivablesAging.asOfDate.label")}
-            </Label>
-            <DatePicker
-              name="receivables-aging-date"
-              value={parseFormDate(visibleDate)}
-              onChange={(next) => {
-                const value = next
-                  ? [
-                      String(next.getFullYear()).padStart(4, "0"),
-                      String(next.getMonth() + 1).padStart(2, "0"),
-                      String(next.getDate()).padStart(2, "0"),
-                    ].join("-")
-                  : undefined;
-                form.setValue("asOfDate", value, { shouldDirty: true });
-              }}
-            />
-          </Div>
+          <ReportAsOfControl
+            label={t("receivablesAging.asOfDate.label")}
+            day={visibleDate}
+            onChange={(day) =>
+              form.setValue("asOfDate", reportDay(day), { shouldDirty: true })
+            }
+          />
           <SubmitButtonWidget<typeof definition.GET>
             field={{
               text: "reports.widget.run",

@@ -24,6 +24,8 @@ import {
 } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
+import { reportDay, reportPeriodRange } from "@/finance/report-period";
+
 import { LineTypeOptions } from "../../enum";
 import { scopedTranslation } from "../../i18n";
 import { accountingDateSchema } from "../../shared/calendar-date";
@@ -71,7 +73,9 @@ const { GET } = createEndpoint({
         description: "ledger.dateFrom.description" as const,
         placeholder: "ledger.dateFrom.placeholder" as const,
         columns: 6,
-        schema: accountingDateSchema.optional(),
+        schema: accountingDateSchema.prefault(() =>
+          reportDay(reportPeriodRange("yearToDate").from),
+        ),
       }),
       dateTo: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -80,7 +84,9 @@ const { GET } = createEndpoint({
         description: "ledger.dateTo.description" as const,
         placeholder: "ledger.dateTo.placeholder" as const,
         columns: 6,
-        schema: accountingDateSchema.optional(),
+        schema: accountingDateSchema.prefault(() =>
+          reportDay(reportPeriodRange("yearToDate").to),
+        ),
       }),
       page: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,

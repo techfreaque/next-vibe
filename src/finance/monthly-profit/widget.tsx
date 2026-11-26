@@ -9,25 +9,36 @@ import { H3, P } from "next-vibe/ui/components/typography";
 import { WidgetHeader } from "next-vibe/ui/components/widget-header";
 import { WidgetShell } from "next-vibe/ui/components/widget-shell";
 import {
+  formatDocDate,
   formatMoney,
   formatQuantity,
 } from "next-vibe/unified-ui/_shared/format-money";
 import {
+  useWidgetForm,
   useWidgetIsInteractive,
   useWidgetLocale,
   useWidgetNavigation,
+  useWidgetOnSubmit,
+  useWidgetResponseOnly,
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { EntityPickerFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/entity-picker-field/widget";
-import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-field/widget";
 import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
-import type { JSX } from "react";
+import { type JSX, useState } from "react";
 
 import { scopedTranslation as chartTranslation } from "@/chart-of-accounts/i18n";
 
 import { costProviderLabel } from "../cost-providers";
+import {
+  monthRange,
+  type ReportDateRange,
+  reportDay,
+  reportMonth,
+} from "../report-period";
+import { MonthPicker, ReportRangeControl } from "../report-period-control";
+import { evidenceMonth } from "../supplier-evidence/rules";
 import type definition from "./definition";
 import type { MonthlyProfitResponse } from "./definition";
 
@@ -39,8 +50,31 @@ export function MonthlyProfitWidget({
   const data = useWidgetValue<typeof definition.GET>();
   const locale = useWidgetLocale();
   const t = useWidgetTranslation<typeof definition.GET>();
-  const interactive = useWidgetIsInteractive();
+  const responseOnly = useWidgetResponseOnly();
+  const interactive = useWidgetIsInteractive() && !responseOnly;
+  const form = useWidgetForm<typeof definition.GET>();
+  const onSubmit = useWidgetOnSubmit();
   const report = data?.report;
+
+  const monthResult = evidenceMonth.safeParse(form.watch("month"));
+  const month = monthResult.success ? monthResult.data : undefined;
+  const from = form.watch("from");
+  const to = form.watch("to");
+  const [currentMonth] = useState(() => reportMonth(new Date()));
+  const bounds =
+    month && month !== currentMonth ? monthRange(month) : undefined;
+  const selectedFrom = from ?? (bounds ? reportDay(bounds.start) : undefined);
+  const selectedTo =
+    to ??
+    (bounds
+      ? reportDay(new Date(bounds.end.getTime() - 86_400_000))
+      : undefined);
+  const selectRange = (range: ReportDateRange): void => {
+    form.setValue("month", undefined, { shouldDirty: true });
+    form.setValue("from", reportDay(range.from), { shouldDirty: true });
+    form.setValue("to", reportDay(range.to), { shouldDirty: true });
+    onSubmit?.();
+  };
 
   return (
     <WidgetShell layout="page">
@@ -55,7 +89,26 @@ export function MonthlyProfitWidget({
             fieldName="companyId"
             field={field.children.companyId}
           />
-          <TextFieldWidget fieldName="month" field={field.children.month} />
+          <ReportRangeControl
+            from={selectedFrom}
+            to={selectedTo}
+            fromLabel={t("profit.periodFrom")}
+            toLabel={t("profit.periodTo")}
+            onChange={selectRange}
+            customControl={
+              <MonthPicker
+                month={month ?? from?.slice(0, 7)}
+                label={t("suppliers.month")}
+                onChange={(value) => {
+                  const { start, end } = monthRange(value);
+                  selectRange({
+                    from: start,
+                    to: new Date(end.getTime() - 86_400_000),
+                  });
+                }}
+              />
+            }
+          />
           <SubmitButtonWidget<typeof definition.GET>
             field={{ text: "profit.run" }}
           />
@@ -67,11 +120,13 @@ export function MonthlyProfitWidget({
           <Div className="flex flex-wrap justify-between gap-2">
             <H3>{report.companyName}</H3>
             <P className="text-sm text-muted-foreground">
-              {new Intl.DateTimeFormat(locale, {
-                month: "long",
-                year: "numeric",
-                timeZone: "UTC",
-              }).format(new Date(`${report.month}-01T00:00:00.000Z`))}
+              {report.periodFrom && report.periodTo
+                ? `${formatDocDate(report.periodFrom, locale)} – ${formatDocDate(report.periodTo, locale)}`
+                : new Intl.DateTimeFormat(locale.replace(/-GLOBAL$/u, ""), {
+                    month: "long",
+                    year: "numeric",
+                    timeZone: "UTC",
+                  }).format(new Date(`${report.month}-01T00:00:00.000Z`))}
             </P>
           </Div>
           {report.currencies.length === 0 && <P>{t("profit.empty")}</P>}
@@ -128,12 +183,16 @@ export function MonthlyProfitWidget({
                   rows={row.revenueAccounts}
                   currency={row.currency}
                   month={report.month}
+                  from={report.periodFrom}
+                  to={report.periodTo}
                 />
                 <AccountRows
                   title={t("profit.expenses")}
                   rows={row.expenseAccounts}
                   currency={row.currency}
                   month={report.month}
+                  from={report.periodFrom}
+                  to={report.periodTo}
                 />
               </Div>
             </SectionGroup>
@@ -237,11 +296,15 @@ function AccountRows({
   rows,
   currency,
   month,
+  from,
+  to,
 }: {
   title: string;
   rows: MonthlyProfitResponse["report"]["currencies"][number]["revenueAccounts"];
   currency: string;
   month: string;
+  from?: string;
+  to?: string;
 }): JSX.Element {
   const locale = useWidgetLocale();
   const t = useWidgetTranslation<typeof definition.GET>();
@@ -250,9 +313,12 @@ function AccountRows({
   const interactive = useWidgetIsInteractive();
 
   const drill = (accountId: string): void => {
-    const dateFrom = new Date(`${month}-01T00:00:00.000Z`);
-    const dateTo = new Date(dateFrom);
-    dateTo.setUTCMonth(dateTo.getUTCMonth() + 1, 0);
+    const dateFrom = new Date(from ?? `${month}-01`);
+    const dateTo = to
+      ? new Date(to)
+      : new Date(
+          Date.UTC(dateFrom.getUTCFullYear(), dateFrom.getUTCMonth() + 1, 0),
+        );
     void import("@/chart-of-accounts/ledger/[accountId]/definition").then(
       ({ default: routes }) => {
         return push(routes.GET, {

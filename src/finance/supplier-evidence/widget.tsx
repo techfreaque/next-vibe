@@ -20,6 +20,7 @@ import {
   useWidgetLocale,
   useWidgetLogger,
   useWidgetNavigation,
+  useWidgetOnSubmit,
   useWidgetResponseOnly,
   useWidgetTranslation,
   useWidgetUser,
@@ -40,6 +41,7 @@ import bankBillDefinition from "@/payment/bill/[billId]/get/definition";
 import { scopedTranslation as paymentTranslation } from "@/payment/i18n";
 
 import { formatObservedProviderBalance } from "../credit-liabilities/format-observed-balance";
+import { ReportMonthControl } from "../report-period-control";
 import type definition from "./definition";
 import { evidenceCurrencies } from "./rules";
 
@@ -62,17 +64,12 @@ export function SupplierEvidenceListWidget({
   const { t: tChart } = chartTranslation.scopedT(locale);
   const { t: tPayment } = paymentTranslation.scopedT(locale);
   const form = useWidgetForm<typeof definition.GET>();
+  const onSubmit = useWidgetOnSubmit();
   const companyId = form.watch("companyId");
   const { push } = useWidgetNavigation();
   const isInteractive = useWidgetIsInteractive();
   const responseOnly = useWidgetResponseOnly();
   const interactive = isInteractive && !responseOnly;
-
-  useEffect(() => {
-    if (interactive && !form.getValues("month")) {
-      form.setValue("month", new Date().toISOString().slice(0, 7));
-    }
-  }, [form, interactive]);
 
   return (
     <WidgetShell layout="page">
@@ -102,7 +99,14 @@ export function SupplierEvidenceListWidget({
             fieldName="companyId"
             field={field.children.companyId}
           />
-          <TextFieldWidget fieldName="month" field={field.children.month} />
+          <ReportMonthControl
+            month={form.watch("month") ?? data?.monthly?.month}
+            label={t("suppliers.month")}
+            onChange={(month) => {
+              form.setValue("month", month, { shouldDirty: true });
+              onSubmit?.();
+            }}
+          />
           <SubmitButtonWidget<typeof definition.GET>
             field={{ text: "suppliers.run", loadingText: "suppliers.run" }}
           />

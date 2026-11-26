@@ -6,14 +6,15 @@
  * - XX: IFRS Generic (multi-country default)
  */
 
-import { and, eq } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { db } from "next-vibe/database";
 import { formatDatabase } from "next-vibe/logger/formatters";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { companies, companyMembers } from "@/companies/db";
+import { findDemoCompany } from "@/companies/demo-company.repository";
 
 import { accountNodes, coaTemplateNodes, coaTemplates } from "./db";
+import { seedDemoLedger } from "./demo-ledger";
 import { AccountSubtype, AccountType } from "./enum";
 
 export const priority = 40;
@@ -1459,16 +1460,10 @@ export async function dev(logger: EndpointLogger): Promise<void> {
     await seedTemplate(logger, template);
   }
 
-  // Setup CoA for demo company if it exists
-  const demoCompany = await db
-    .select({ id: companies.id })
-    .from(companies)
-    .innerJoin(companyMembers, eq(companyMembers.companyId, companies.id))
-    .where(and(eq(companyMembers.isActive, true)))
-    .limit(1);
-
-  if (demoCompany.length > 0 && demoCompany[0]) {
-    await setupDemoCompanyCoA(logger, demoCompany[0].id);
+  const company = await findDemoCompany();
+  if (company) {
+    await setupDemoCompanyCoA(logger, company.id);
+    await seedDemoLedger(company);
   }
   logger.info(
     formatDatabase(`CoA templates: ${TEMPLATES.length} countries`, "📊"),

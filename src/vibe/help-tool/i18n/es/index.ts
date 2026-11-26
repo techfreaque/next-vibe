@@ -36,6 +36,8 @@ export const translations: typeof enTranslations = {
       bills: "Facturas de proveedores",
     },
     overview: {
+      noCompany:
+        "Crea una empresa o únete a una existente para usar esta herramienta.",
       chooseCompany: "Seleccione la empresa cuyo informe desea consultar.",
       loading: "Cargando el resumen de la empresa",
       loadError: "No se pudo cargar el resumen de la empresa",

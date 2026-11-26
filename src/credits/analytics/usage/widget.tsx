@@ -36,6 +36,8 @@ import type { BreakdownRow } from "next-vibe/unified-ui/analytics/schema";
 import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/navigate-button/widget";
 import type { JSX } from "react";
 
+import { ReportAnalyticsPeriod } from "@/finance/report-analytics-period";
+
 import type definitions from "./definition";
 import {
   UsageActor,
@@ -383,6 +385,20 @@ export function CreditUsageReportWidget({
         }
       />
       <AnalyticsToolbar
+        rangeControls={
+          <ReportAnalyticsPeriod
+            range={form.watch("range")}
+            from={form.watch("from")}
+            to={form.watch("to")}
+            applied={win}
+            onChange={({ range, from, to }) => {
+              form.setValue("range", range, { shouldDirty: true });
+              form.setValue("from", from, { shouldDirty: true });
+              form.setValue("to", to, { shouldDirty: true });
+              submit();
+            }}
+          />
+        }
         locale={locale}
         period={win}
         isLoading={isLoading}
@@ -402,10 +418,10 @@ export function CreditUsageReportWidget({
               shouldDirty: true,
             });
           }
-          if ("from" in patch) {
+          if (patch.from !== undefined) {
             form.setValue("from", patch.from, { shouldDirty: true });
           }
-          if ("to" in patch) {
+          if (patch.to !== undefined) {
             form.setValue("to", patch.to, { shouldDirty: true });
           }
           submit();

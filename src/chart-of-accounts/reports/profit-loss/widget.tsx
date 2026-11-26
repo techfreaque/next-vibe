@@ -23,12 +23,12 @@ import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-f
 import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import type { JSX } from "react";
 
+import { ReportRangeControl } from "@/finance/report-period-control";
+
 import { formatAccountingDateInput } from "../../shared/calendar-date";
 import {
   ReportCompanyPicker,
-  ReportDateFilter,
   ReportMenu,
-  ReportPeriodMenu,
   ReportReadState,
 } from "../balance-sheet/report-controls";
 import { reportAmountClass } from "../report-amount-class";
@@ -175,23 +175,12 @@ export function ProfitLossWidget({
               }}
             />
           </Div>
-          <ReportDateFilter
-            id="report-from"
-            label={t("profitLoss.from.label")}
-            day={from ?? formatAccountingDateInput(data?.fromResponse)}
-            onChange={(date) =>
-              form.setValue("from", date, { shouldDirty: true })
-            }
-          />
-          <ReportDateFilter
-            id="report-to"
-            label={t("profitLoss.to.label")}
-            day={to ?? formatAccountingDateInput(data?.toResponse)}
-            onChange={(date) =>
-              form.setValue("to", date, { shouldDirty: true })
-            }
-          />
-          <ReportPeriodMenu
+          <ReportRangeControl
+            fromLabel={t("profitLoss.from.label")}
+            toLabel={t("profitLoss.to.label")}
+            from={from ?? formatAccountingDateInput(data?.fromResponse)}
+            to={to ?? formatAccountingDateInput(data?.toResponse)}
+            defaultPreset="yearToDate"
             onChange={({ from: start, to: end }) => {
               form.setValue("from", start, { shouldDirty: true });
               form.setValue("to", end, { shouldDirty: true });
