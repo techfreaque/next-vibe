@@ -6,6 +6,7 @@
 [Interface]
 Address = 10.88.0.2/24
 ListenPort = 51820
+MTU = 1280
 PrivateKey = __SRV2_PRIVATE_KEY__
 # No DNS / no default-route changes: this tunnel carries ONLY 10.88.0.0/24.
 
