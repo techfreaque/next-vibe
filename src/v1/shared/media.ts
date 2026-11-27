@@ -34,6 +34,7 @@ import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { identityEnv } from "next-vibe/identity/env";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
+import { API_KEY_UPSTREAM_RATE_LIMIT_RETRY_AFTER_SECONDS } from "@/api-keys/constants";
 import { buildPublicOrigin } from "@/api-keys/repository";
 
 import { type V1Error, v1Error } from "./errors";
@@ -104,7 +105,33 @@ export function v1ErrorFromToolFailure(failure: ErrorResponseType): V1Error {
   if (status === 400) {
     return v1Error(400, message, "invalid_request_error", "invalid_request");
   }
+  if (status === 429) {
+    return v1Error(
+      429,
+      message,
+      "rate_limit_error",
+      "rate_limit_exceeded",
+      null,
+      {
+        "Retry-After": String(API_KEY_UPSTREAM_RATE_LIMIT_RETRY_AFTER_SECONDS),
+      },
+    );
+  }
   if (key === ErrorResponseTypes.EXTERNAL_SERVICE_ERROR.errorKey) {
+    if (/\b429\b|rate.?limit/i.test(message)) {
+      return v1Error(
+        429,
+        message,
+        "rate_limit_error",
+        "rate_limit_exceeded",
+        null,
+        {
+          "Retry-After": String(
+            API_KEY_UPSTREAM_RATE_LIMIT_RETRY_AFTER_SECONDS,
+          ),
+        },
+      );
+    }
     return v1Error(502, message, "server_error", "upstream_error");
   }
   return v1Error(500, message, "server_error", null);

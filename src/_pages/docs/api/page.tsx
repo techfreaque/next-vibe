@@ -29,11 +29,7 @@ import {
   CODING_TOOL_IDS,
   CODING_TOOL_MODEL,
 } from "@/api-keys/coding-tools";
-import {
-  API_KEY_DEFAULT_RATE_LIMIT_PER_MINUTE,
-  API_KEY_MAX_ACTIVE,
-  API_KEYS_PAGE_PATH,
-} from "@/api-keys/constants";
+import { API_KEY_MAX_ACTIVE, API_KEYS_PAGE_PATH } from "@/api-keys/constants";
 import { scopedTranslation as apiKeysScopedTranslation } from "@/api-keys/i18n";
 import { configScopedTranslation } from "@/env/i18n";
 import {
@@ -214,7 +210,6 @@ export function TanstackPage({
   const snippets = buildDocsSnippets(baseUrl);
   const toolSnippets = buildCodingToolSnippets({ baseUrl });
   const prices = getApiAccessPrices(locale);
-  const rate = API_KEY_DEFAULT_RATE_LIMIT_PER_MINUTE;
   const keysHref = `/${locale}/${API_KEYS_PAGE_PATH}`;
   const unlockHref = `/${locale}/${API_UNLOCK_PATH}`;
   const copy = {
@@ -329,7 +324,7 @@ export function TanstackPage({
                 t("hero.facts.models", { modelCount }),
                 t("hero.facts.formats"),
                 t("hero.facts.streaming"),
-                t("hero.facts.rate", { rate }),
+                t("hero.facts.rate"),
               ].map((fact) => (
                 <Span key={fact} className="inline-flex items-center gap-2">
                   <Check className="h-4 w-4 text-primary" />
@@ -1136,7 +1131,7 @@ export function TanstackPage({
                     key: code,
                     term: code,
                     status,
-                    text: t(`errors.rows.${key}`, { rate }),
+                    text: t(`errors.rows.${key}`),
                   }))}
                 />
                 <Callout icon={AlertTriangle} tone="neutral">
@@ -1146,7 +1141,7 @@ export function TanstackPage({
               <SubBlock
                 id="limits"
                 title={t("limits.title")}
-                body={t("limits.body", { rate })}
+                body={t("limits.body")}
               >
                 <CodeTabs
                   title="429"

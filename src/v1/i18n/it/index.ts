@@ -35,7 +35,11 @@ export const translations: typeof enTranslations = {
     insufficientCredits:
       "Crediti insufficienti. Questa chiamata ha bisogno di {{cost}}, hai {{balance}}. Continuate a camminare.",
     rateLimited:
-      "Limite di tariffa raggiunto: richieste {{limit}} al minuto per questa chiave. Recuperare in {{seconds}} s.",
+      "Troppe richieste ravvicinate per questa chiave. Riprova tra {{seconds}} s.",
+    tooManyStreams:
+      "Troppi stream simultanei aperti per questa chiave (limite {{limit}}). Chiudi uno stream attivo o riprova tra {{seconds}} s.",
+    upstreamRateLimited:
+      "Il fornitore del modello sta limitando temporaneamente le richieste: {{error}}",
     upstreamFailed: "Il fornitore del modello ha fallito: {{error}}",
     balanceCheckFailed:
       "Non è possibile verificare il saldo di credito. Non c'era niente da scappare. Riprova.",
@@ -364,7 +368,7 @@ export const translations: typeof enTranslations = {
         title: "Stato del lavoro video",
         titleShort: "v1 stato video",
         description:
-          "Stato, progresso e risultato URL di un lavoro video. L'inquinamento è libero e non conta contro il limite di tasso.",
+          "Stato, avanzamento e URL del risultato di un job video. Il polling è gratuito e non conta nei limiti anti-abuso.",
         success: {
           title: "Lavoro video",
           description: "Stato attuale del lavoro",
@@ -392,7 +396,7 @@ export const translations: typeof enTranslations = {
         title: "Situazione del lavoro musicale",
         titleShort: "v1 stato della musica",
         description:
-          "Stato e risultato URL di un lavoro musicale. L'inquinamento è libero e non conta contro il limite di tasso.",
+          "Stato e URL del risultato di un job musicale. Il polling è gratuito e non conta nei limiti anti-abuso.",
         success: {
           title: "Lavoro di musica",
           description: "Stato attuale del lavoro",

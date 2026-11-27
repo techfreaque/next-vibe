@@ -35,7 +35,7 @@ export const translations: typeof enTranslations = {
     messages:
       "POST /v1/messages používa formát Anthropic Messages API. Podporuje priebežné odpovede aj nástroje. Sem sa pripájajú Claude Code a oficiálne SDK od Anthropic.",
     countTokens:
-      "POST /v1/messages/count_tokens nespotrebuje kredity. Počet tokenov odhadne lokálne bez volania modelu a požiadavku nezaráta do minútového limitu. Claude Code ho často používa na odhad veľkosti kontextu.",
+      "POST /v1/messages/count_tokens nespotrebuje kredity. Počet tokenov odhadne lokálne bez volania modelu a požiadavku nezaráta do ochrany proti zneužitiu. Claude Code ho často používa na odhad veľkosti kontextu.",
     models:
       "GET /v1/models zobrazí všetky modely dostupné pre tvoj kľúč, ich dĺžku kontextu, podporu nástrojov aj ceny. Rovnaké telo odpovede spracujú SDK od OpenAI aj od Anthropicu.",
     media:
@@ -193,7 +193,7 @@ export const translations: typeof enTranslations = {
       "API neuchováva stav. Pri Responses API sa používa store nastavené na false a previous_response_id sa odmieta. Pri každom volaní odošli celú históriu. Platí to pre všetky koncové body.",
     maxTokens: "Výstup má limit {{maxTokens}} tokenov na požiadavku.",
     rateLimit:
-      "Predvolený limit je {{rateLimit}} požiadaviek za minútu na kľúč. Pri jeho prekročení sa vráti 429 s hlavičkou Retry-After. Agentom s mnohými volaniami prideľ samostatné kľúče.",
+      "Bez pevného limitu požiadaviek. Platíš za každé volanie zo svojich kreditov a platí veľkorysá ochrana proti zneužitiu. Chyby 429 od poskytovateľov posielame ďalej s hlavičkou Retry-After.",
     countTokens:
       "count_tokens vracia odhad podľa miestneho výpočtu. Skutočný tokenizér poskytovateľa sa môže líšiť. Odhad slúži na plánovanie kontextu, nie na výpočet faktúry.",
     tools:

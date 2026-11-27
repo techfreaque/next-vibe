@@ -51,10 +51,7 @@ import {
   CODING_TOOL_MODEL,
   type CodingToolSetup,
 } from "@/api-keys/coding-tools";
-import {
-  API_KEY_DEFAULT_RATE_LIMIT_PER_MINUTE,
-  API_KEYS_PAGE_PATH,
-} from "@/api-keys/constants";
+import { API_KEYS_PAGE_PATH } from "@/api-keys/constants";
 import { scopedTranslation as apiKeysScopedTranslation } from "@/api-keys/i18n";
 import { configScopedTranslation } from "@/env/i18n";
 import { ProductIds, productsRepository } from "@/products/platform-products";
@@ -292,7 +289,6 @@ export function TanstackPage({
   const docs = buildDocsSnippets(baseUrl);
   const tools = buildCodingToolSnippets({ baseUrl });
   const limits = {
-    rateLimit: API_KEY_DEFAULT_RATE_LIMIT_PER_MINUTE,
     maxTokens: V1_MAX_OUTPUT_TOKENS,
   };
   const prices = { subPrice, subCredits, packPrice, packCredits };

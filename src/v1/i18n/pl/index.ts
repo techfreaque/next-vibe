@@ -36,7 +36,11 @@ export const translations: typeof enTranslations = {
     insufficientCredits:
       "Za mało kredytów. To wywołanie potrzebuje około {{cost}}, masz {{balance}}. Doładuj, żeby kontynuować.",
     rateLimited:
-      "Limit osiągnięty: {{limit}} zapytań na minutę dla tego klucza. Spróbuj za {{seconds}} s.",
+      "Zbyt wiele zapytań w krótkim czasie dla tego klucza. Spróbuj za {{seconds}} s.",
+    tooManyStreams:
+      "Zbyt wiele jednoczesnych streamów dla tego klucza (limit {{limit}}). Zamknij aktywny stream lub spróbuj za {{seconds}} s.",
+    upstreamRateLimited:
+      "Dostawca modelu tymczasowo ogranicza liczbę zapytań: {{error}}",
     upstreamFailed: "Dostawca modelu zawiódł: {{error}}",
     balanceCheckFailed:
       "Nie udało się sprawdzić salda. Nic nie zostało uruchomione. Spróbuj ponownie.",
@@ -352,7 +356,7 @@ export const translations: typeof enTranslations = {
         title: "Status zadania wideo",
         titleShort: "v1 status wideo",
         description:
-          "Status, postęp i URL wyniku zadania wideo. Sprawdzanie jest darmowe i nie wlicza się do limitu zapytań.",
+          "Status, postęp i URL wyniku zadania wideo. Sprawdzanie jest darmowe i nie wlicza się do ochrony przed nadużyciami.",
         success: {
           title: "Zadanie wideo",
           description: "Aktualny stan zadania",
@@ -380,7 +384,7 @@ export const translations: typeof enTranslations = {
         title: "Status zadania muzycznego",
         titleShort: "v1 status muzyki",
         description:
-          "Status i URL wyniku zadania muzycznego. Sprawdzanie jest darmowe i nie wlicza się do limitu zapytań.",
+          "Status i URL wyniku zadania muzycznego. Sprawdzanie jest darmowe i nie wlicza się do ochrony przed nadużyciami.",
         success: {
           title: "Zadanie muzyczne",
           description: "Aktualny stan zadania",

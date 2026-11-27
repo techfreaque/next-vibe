@@ -36,7 +36,11 @@ export const translations: typeof enTranslations = {
     insufficientCredits:
       "Nemáš dosť kreditov. Táto požiadavka stojí približne {{cost}}, zostatok je {{balance}}. Doplň kredity a pokračuj.",
     rateLimited:
-      "Dosiahol sa limit {{limit}} požiadaviek za minútu pre tento kľúč. Skús znova o {{seconds}} s.",
+      "Príliš veľa požiadaviek v krátkom slede pre tento kľúč. Skús znova o {{seconds}} s.",
+    tooManyStreams:
+      "Príliš veľa súbežných streamov pre tento kľúč (limit {{limit}}). Zatvor aktívny stream alebo skús znova o {{seconds}} s.",
+    upstreamRateLimited:
+      "Poskytovateľ modelu dočasne obmedzuje požiadavky: {{error}}",
     upstreamFailed: "Poskytovateľ modelu vrátil chybu: {{error}}",
     balanceCheckFailed:
       "Zostatok kreditov sa nepodarilo overiť. Požiadavka sa nespustila. Skús znova.",
@@ -366,7 +370,7 @@ export const translations: typeof enTranslations = {
         title: "Stav tvorby videa",
         titleShort: "Stav videa v1",
         description:
-          "Vráti stav úlohy, priebeh a adresu výsledného videa. Overenie stavu je bezplatné a nezapočítava sa do limitu požiadaviek.",
+          "Vráti stav úlohy, priebeh a adresu výsledného videa. Overenie stavu je bezplatné a nezapočítava sa do ochrany proti zneužitiu.",
         success: {
           title: "Úloha na tvorbu videa",
           description: "Aktuálny stav úlohy",
@@ -397,7 +401,7 @@ export const translations: typeof enTranslations = {
         title: "Stav tvorby hudby",
         titleShort: "Stav hudby v1",
         description:
-          "Vráti stav úlohy a adresu výslednej hudby. Overenie stavu je bezplatné a nezapočítava sa do limitu požiadaviek.",
+          "Vráti stav úlohy a adresu výslednej hudby. Overenie stavu je bezplatné a nezapočítava sa do ochrany proti zneužitiu.",
         success: {
           title: "Úloha na tvorbu hudby",
           description: "Aktuálny stav úlohy",

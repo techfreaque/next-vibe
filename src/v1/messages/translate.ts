@@ -613,8 +613,14 @@ export function anthropicStreamEncoder(
         emit("message_stop", {})
       );
     },
-    fail: (message) =>
-      closeAll() + emit("error", { error: { type: "api_error", message } }),
+    fail: (message, rateLimit) =>
+      closeAll() +
+      emit("error", {
+        error: {
+          type: rateLimit ? "rate_limit_error" : "api_error",
+          message,
+        },
+      }),
     heartbeat: () => emit("ping", {}),
   };
 }

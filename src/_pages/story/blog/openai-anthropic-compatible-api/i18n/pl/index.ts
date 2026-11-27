@@ -35,7 +35,7 @@ export const translations: typeof enTranslations = {
     messages:
       "POST /v1/messages: Anthropic Messages API. Streaming i tool use. Z tym rozmawiają Claude Code i SDK Anthropic.",
     countTokens:
-      "POST /v1/messages/count_tokens: nie zużywa kredytów. Lokalne oszacowanie bez wywołania modelu, które nie zjada limitu zapytań na minutę. Claude Code woła go non stop, żeby mierzyć swój kontekst.",
+      "POST /v1/messages/count_tokens: nie zużywa kredytów. Lokalne oszacowanie bez wywołania modelu, które nie wlicza się do ochrony przed nadużyciami. Claude Code woła go non stop, żeby mierzyć swój kontekst.",
     models:
       "GET /v1/models: każdy model, który twój klucz może teraz wywołać, z długością kontekstu, obsługą narzędzi i cenami. Jedna odpowiedź, którą parsują zarówno SDK OpenAI, jak i Anthropic.",
     media:
@@ -192,7 +192,7 @@ export const translations: typeof enTranslations = {
     maxTokens:
       "Odpowiedź jest ograniczona do {{maxTokens}} tokenów na zapytanie.",
     rateLimit:
-      "Domyślnie {{rateLimit}} zapytań na minutę na klucz. Po przekroczeniu dostajesz 429 z nagłówkiem Retry-After. Agenci, którzy odpalają dużo wywołań, dostają własny klucz.",
+      "Brak sztywnego limitu zapytań. Rozliczenie za każde wywołanie z Twoich kredytów i wysoka ochrona przed nadużyciami. Odpowiedzi 429 od dostawcy modelu przekazujemy dalej z nagłówkiem Retry-After.",
     countTokens:
       "count_tokens to oszacowanie, nie dokładny tokenizer dostawcy. Dobre do mierzenia kontekstu, nie do rozliczeń.",
     tools:

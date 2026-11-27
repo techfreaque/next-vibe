@@ -126,7 +126,7 @@ export const translations = {
     tools:
       "A model without tool support returns 400 tools_not_supported once the agent sends tools. Check supports_tools in GET /v1/models.",
     rateLimit:
-      "Each key allows 60 requests per minute. Agents fire many small calls. If you hit 429, give the agent its own key.",
+      "No fixed rate limit. Usage is billed per request from your credits, with generous abuse protection for runaway loops. Upstream provider 429s pass through with their Retry-After header so your agent can back off and retry.",
   },
   cta: {
     title: "Wired up in one command.",

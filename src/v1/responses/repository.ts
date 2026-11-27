@@ -23,7 +23,7 @@ import {
   runV1Generate,
   runV1Stream,
 } from "../shared/execution";
-import { gateApiKeyRequest } from "../shared/gate";
+import { acquireV1StreamSlot, gateApiKeyRequest } from "../shared/gate";
 import { aiSdkRunner, type InferenceRunner } from "../shared/inference";
 import { openAiError, openAiErrorResponse, openAiJson } from "../shared/openai";
 import type { V1ResponsesPostRequestOutput } from "./definition";
@@ -131,10 +131,19 @@ export class V1ResponsesRepository {
     };
 
     if (data.stream === true) {
+      const slot = acquireV1StreamSlot(gate.key.id, t);
+      if (!slot.ok) {
+        return openAiErrorResponse(slot.error);
+      }
       return runV1Stream(
         call,
         runner,
         responsesStreamEncoder(echo, toolSet.kinds),
+        {
+          renderError: openAiErrorResponse,
+          t,
+          onDone: slot.release,
+        },
       );
     }
 

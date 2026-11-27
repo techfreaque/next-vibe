@@ -37,7 +37,11 @@ export const translations: typeof enTranslations = {
     insufficientCredits:
       "Nicht genug Credits. Dieser Aufruf braucht etwa {{cost}}, du hast {{balance}}. Lade auf, um weiterzumachen.",
     rateLimited:
-      "Limit erreicht: {{limit}} Anfragen pro Minute für diesen Schlüssel. Neuer Versuch in {{seconds}} s.",
+      "Zu viele Anfragen in kurzer Folge für diesen Schlüssel. Neuer Versuch in {{seconds}} s.",
+    tooManyStreams:
+      "Zu viele gleichzeitige Streams für diesen Schlüssel (Limit {{limit}}). Schließe einen laufenden Stream oder versuch es in {{seconds}} s erneut.",
+    upstreamRateLimited:
+      "Der Modellanbieter drosselt Anfragen vorübergehend: {{error}}",
     upstreamFailed: "Der Modellanbieter ist fehlgeschlagen: {{error}}",
     balanceCheckFailed:
       "Dein Guthaben konnte nicht geprüft werden. Es wurde nichts ausgeführt. Versuch es erneut.",
@@ -361,7 +365,7 @@ export const translations: typeof enTranslations = {
         title: "Videojob-Status",
         titleShort: "v1-Videostatus",
         description:
-          "Status, Fortschritt und Ergebnis-URL eines Videojobs. Abfragen ist kostenlos und zählt nicht gegen das Ratenlimit.",
+          "Status, Fortschritt und Ergebnis-URL eines Videojobs. Abfragen ist kostenlos und zählt nicht gegen den Missbrauchsschutz.",
         success: { title: "Videojob", description: "Aktueller Jobzustand" },
       },
       content: {
@@ -386,7 +390,7 @@ export const translations: typeof enTranslations = {
         title: "Musikjob-Status",
         titleShort: "v1-Musikstatus",
         description:
-          "Status und Ergebnis-URL eines Musikjobs. Abfragen ist kostenlos und zählt nicht gegen das Ratenlimit.",
+          "Status und Ergebnis-URL eines Musikjobs. Abfragen ist kostenlos und zählt nicht gegen den Missbrauchsschutz.",
         success: { title: "Musikjob", description: "Aktueller Jobzustand" },
       },
       content: {

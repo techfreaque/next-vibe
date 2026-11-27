@@ -54,14 +54,13 @@ export const translations: typeof enTranslations = {
     revoking: "Revocando...",
     revokeFailed: "No pude revocar esa llave. Inténtalo de nuevo.",
     maskedKey: "{{prefix}}…",
-    meta: "{{lastUsed}} · Creado {{created}} · {{rate}}",
-    rateLimit: "{{n}} req/min",
+    meta: "{{lastUsed}} · Creado {{created}}",
     uncensoredLabel: "Permitir modelos sin censura con mis claves",
     uncensoredHint:
       "Soy 18+ y acepto que los modelos no censurados pueden producir contenido ofensivo, falso, peligroso, ilegal o malicioso, sin filtrar. Soy responsable de cómo lo uso. Sin esto, los ids modelo sin censura regresan HTTP 403.",
     uncensoredFailed: "No se pudo guardar. Inténtalo de nuevo.",
     billingNote:
-      "De los créditos devuelve HTTP 402. Streaming funciona en cada punto final.",
+      "Sin límite fijo de peticiones. El consumo se descuenta por solicitud de tus créditos, con una protección antiabuso generosa. Sin créditos devuelve HTTP 402. El streaming funciona en todos los endpoints.",
   },
 
   codingTools: {

@@ -7,6 +7,7 @@
  * pre-flight and deduction are the real code on the real DB.
  */
 
+import { APICallError } from "ai";
 import { eq } from "drizzle-orm";
 import {
   createE2ECreditUser,
@@ -32,6 +33,7 @@ import { API_UNLOCK_PATH, getApiAccessPrices } from "@/api-keys/access";
 import { ApiKeyAuth } from "@/api-keys/auth";
 import { userApiKeys } from "@/api-keys/db";
 import apiKeysEndpoints from "@/api-keys/definition";
+import { apiKeysEnv } from "@/api-keys/env";
 import { generateApiKey, resetRateLimit } from "@/api-keys/keys";
 import { resetPaidCache } from "@/api-keys/paid";
 import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
@@ -556,40 +558,83 @@ describe("coding-agent formats", () => {
       expect(poor.status).toBe(402);
       expect(await poor.json()).toMatchObject({ type: "error", error: { type: "billing_error" } });
       expect(poor.headers.get("x-should-retry")).toBe("false");
+
+      // Upstream provider 429 passes through in Anthropic format with Retry-After and x-should-retry: true.
+      const upstream429Runner: InferenceRunner = {
+        generate: () =>
+          Promise.reject(
+            new APICallError({
+              message: "Upstream rate limit",
+              url: "https://provider.example/v1/messages",
+              requestBodyValues: {},
+              statusCode: 429,
+              responseHeaders: { "Retry-After": "19" },
+            }),
+          ),
+        // eslint-disable-next-line require-yield -- Immediately throws upstream 429 before emitting chunks
+        async *stream() {
+          throw new APICallError({
+            message: "Upstream rate limit",
+            url: "https://provider.example/v1/messages",
+            requestBodyValues: {},
+            statusCode: 429,
+            responseHeaders: { "Retry-After": "19" },
+          });
+        },
+      };
+      const limited = await messagesCall(
+        { "x-api-key": key },
+        { model: toolModelId, stream: true },
+        upstream429Runner,
+      );
+      expect(limited.status).toBe(429);
+      expect(limited.headers.get("retry-after")).toBe("19");
+      expect(limited.headers.get("x-should-retry")).toBe("true");
+      expect(await limited.json()).toMatchObject({
+        type: "error",
+        error: { type: "rate_limit_error" },
+      });
     });
   });
 
   describe("POST /v1/messages/count_tokens", () => {
-    it("estimates input tokens without spending credits or rate-limit budget", async () => {
+    it("estimates input tokens without spending credits or burst-limit budget", async () => {
       const { id, key } = await createKey(user.user, "count-tokens");
-      await db.update(userApiKeys).set({ rateLimitPerMinute: 1 }).where(eq(userApiKeys.id, id));
-      resetRateLimit(id);
-      const before = await balanceOf(user.user);
-      for (let i = 0; i < 3; i++) {
-        const request = v1Request(
-          "/messages/count_tokens",
-          { "x-api-key": key },
-          "{}",
-        );
-        const out = await V1CountTokensRepository.count({
-          data: {
-            model: "claude-sonnet-4-5",
-            system: "You are a coding agent.",
-            messages: [{ role: "user", content: "Read notes.txt and summarize it." }],
-            tools: [readFileAnthropic],
-          },
-          user: await authed(request),
-          request,
-          locale: defaultLocale,
-          t,
-          logger,
-        });
-        expect(out.response.status).toBe(200);
-        expect(((await out.response.json()) as { input_tokens: number }).input_tokens).toBeGreaterThan(10);
+      const prevBurst = apiKeysEnv.API_KEY_BURST_LIMIT_PER_MINUTE;
+      try {
+        apiKeysEnv.API_KEY_BURST_LIMIT_PER_MINUTE = 1;
+        await db.update(userApiKeys).set({ rateLimitPerMinute: 1 }).where(eq(userApiKeys.id, id));
+        resetRateLimit(id);
+        const before = await balanceOf(user.user);
+        for (let i = 0; i < 3; i++) {
+          const request = v1Request(
+            "/messages/count_tokens",
+            { "x-api-key": key },
+            "{}",
+          );
+          const out = await V1CountTokensRepository.count({
+            data: {
+              model: "claude-sonnet-4-5",
+              system: "You are a coding agent.",
+              messages: [{ role: "user", content: "Read notes.txt and summarize it." }],
+              tools: [readFileAnthropic],
+            },
+            user: await authed(request),
+            request,
+            locale: defaultLocale,
+            t,
+            logger,
+          });
+          expect(out.response.status).toBe(200);
+          expect(((await out.response.json()) as { input_tokens: number }).input_tokens).toBeGreaterThan(10);
+        }
+        expect(await balanceOf(user.user)).toBe(before);
+        // the one real call this minute is still available
+        expect((await messagesCall({ "x-api-key": key }, { model: toolModelId }, textRunner)).status).toBe(200);
+      } finally {
+        apiKeysEnv.API_KEY_BURST_LIMIT_PER_MINUTE = prevBurst;
+        resetRateLimit(id);
       }
-      expect(await balanceOf(user.user)).toBe(before);
-      // the one real call this minute is still available
-      expect((await messagesCall({ "x-api-key": key }, { model: toolModelId }, textRunner)).status).toBe(200);
     });
   });
 

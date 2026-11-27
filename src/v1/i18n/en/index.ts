@@ -32,7 +32,11 @@ export const translations = {
     insufficientCredits:
       "Insufficient credits. This call needs about {{cost}}, you have {{balance}}. Top up to continue.",
     rateLimited:
-      "Rate limit reached: {{limit}} requests per minute for this key. Retry in {{seconds}}s.",
+      "Too many requests in a short burst for this key. Retry in {{seconds}}s.",
+    tooManyStreams:
+      "Too many concurrent streams open for this key (limit {{limit}}). Close an active stream or retry in {{seconds}}s.",
+    upstreamRateLimited:
+      "The model provider is temporarily rate-limiting requests: {{error}}",
     upstreamFailed: "The model provider failed: {{error}}",
     balanceCheckFailed:
       "Could not verify your credit balance. Nothing was run. Try again.",
@@ -341,7 +345,7 @@ export const translations = {
         title: "Video job status",
         titleShort: "v1 video status",
         description:
-          "Status, progress and result URL of a video job. Polling is free and does not count against the rate limit.",
+          "Status, progress and result URL of a video job. Polling is free and does not count against abuse limits.",
         success: { title: "Video job", description: "Current job state" },
       },
       content: {
@@ -363,7 +367,7 @@ export const translations = {
         title: "Music job status",
         titleShort: "v1 music status",
         description:
-          "Status and result URL of a music job. Polling is free and does not count against the rate limit.",
+          "Status and result URL of a music job. Polling is free and does not count against abuse limits.",
         success: { title: "Music job", description: "Current job state" },
       },
       content: {

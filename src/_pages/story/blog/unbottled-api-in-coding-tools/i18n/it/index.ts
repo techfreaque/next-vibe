@@ -130,7 +130,7 @@ export const translations: typeof enTranslations = {
     tools:
       "Un modello senza supporto per utensili restituisce 400 tools_not_supported una volta che l'agente invia strumenti. Controllare supports_tools in GET /v1/models.",
     rateLimit:
-      "Ogni chiave consente 60 richieste al minuto. Gli agenti licenziano molte piccole chiamate. Se si colpisce 429, dare all'agente la propria chiave.",
+      "Nessun limite fisso di richieste. Ogni chiamata scala i crediti dal tuo saldo, con un'ampia protezione anti-abuso contro i loop fuori controllo. I 429 dei provider vengono inoltrati con l'header Retry-After così il tuo agente può attendere e riprovare.",
   },
   cta: {
     title: "Filato in un unico comando.",

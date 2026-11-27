@@ -6,6 +6,7 @@
  * real DB.
  */
 
+import { APICallError } from "ai";
 import { eq } from "drizzle-orm";
 import {
   createE2ECreditUser,
@@ -33,8 +34,14 @@ import { API_UNLOCK_PATH, getApiAccessPrices } from "@/api-keys/access";
 import { ApiKeyAuth } from "@/api-keys/auth";
 import { userApiKeys } from "@/api-keys/db";
 import apiKeysEndpoints from "@/api-keys/definition";
-import { findActiveKey, hashApiKey, resetRateLimit } from "@/api-keys/keys";
-import { generateApiKey } from "@/api-keys/keys";
+import { apiKeysEnv } from "@/api-keys/env";
+import {
+  findActiveKey,
+  generateApiKey,
+  getActiveStreamCount,
+  hashApiKey,
+  resetRateLimit,
+} from "@/api-keys/keys";
 import { resetPaidCache } from "@/api-keys/paid";
 import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
 import { CreditRepository } from "@/credits/repository";
@@ -394,14 +401,140 @@ describe("OpenAI-compatible API", () => {
       expect(res.status).toBe(401);
     });
 
-    it("429 once the per-key rate limit is hit", async () => {
+    it("does not throttle paying keys at legacy 60/min; enforces high burst ceiling via env", async () => {
       const { id, key } = await createKey(alice.user, "ratelimit");
-      await db.update(userApiKeys).set({ rateLimitPerMinute: 1 }).where(eq(userApiKeys.id, id));
+      // Simulate a legacy DB key row that still has rate_limit_per_minute = 60.
+      await db
+        .update(userApiKeys)
+        .set({ rateLimitPerMinute: 60 })
+        .where(eq(userApiKeys.id, id));
       resetRateLimit(id);
-      expect((await completionsCall(key, { model: modelId })).status).toBe(200);
-      const limited = await completionsCall(key, { model: modelId });
-      expect(limited.status).toBe(429);
-      expect(limited.headers.get("retry-after")).not.toBeNull();
+      const prevBurst = apiKeysEnv.API_KEY_BURST_LIMIT_PER_MINUTE;
+      try {
+        // With the default burst ceiling (1,200/min), a legacy 60 row still passes freely.
+        expect((await completionsCall(key, { model: modelId })).status).toBe(200);
+        // Lowering the env abuse burst ceiling triggers 429 + Retry-After.
+        apiKeysEnv.API_KEY_BURST_LIMIT_PER_MINUTE = 1;
+        await db
+          .update(userApiKeys)
+          .set({ rateLimitPerMinute: 1 })
+          .where(eq(userApiKeys.id, id));
+        resetRateLimit(id);
+        expect((await completionsCall(key, { model: modelId })).status).toBe(200);
+        const limited = await completionsCall(key, { model: modelId });
+        expect(limited.status).toBe(429);
+        expect(limited.headers.get("retry-after")).not.toBeNull();
+      } finally {
+        apiKeysEnv.API_KEY_BURST_LIMIT_PER_MINUTE = prevBurst;
+        resetRateLimit(id);
+      }
+    });
+
+    it("429 + Retry-After when concurrent stream abuse cap is reached, then frees on close", async () => {
+      const { id, key } = await createKey(alice.user, "stream-cap");
+      resetRateLimit(id);
+      const prevCap = apiKeysEnv.API_KEY_MAX_CONCURRENT_STREAMS;
+      let releaseFirst: (() => void) | undefined;
+      const holdOpen = new Promise<void>((resolve) => {
+        releaseFirst = resolve;
+      });
+      const heldRunner: InferenceRunner = {
+        generate: fakeRunner.generate,
+        async *stream() {
+          yield { type: "text", text: "first " };
+          await holdOpen;
+          yield { type: "text", text: "done" };
+          yield {
+            type: "finish",
+            finishReason: "stop",
+            usage: {
+              inputTokens: 1_000,
+              outputTokens: 100,
+              cachedInputTokens: 0,
+              reasoningTokens: 0,
+            },
+          };
+        },
+      };
+      try {
+        apiKeysEnv.API_KEY_MAX_CONCURRENT_STREAMS = 1;
+        const firstRes = await completionsCall(
+          key,
+          { model: modelId, stream: true },
+          heldRunner,
+        );
+        expect(firstRes.status).toBe(200);
+        expect(getActiveStreamCount(id)).toBe(1);
+
+        // Second concurrent stream hits the per-key concurrency cap.
+        const secondRes = await completionsCall(
+          key,
+          { model: modelId, stream: true },
+          heldRunner,
+        );
+        expect(secondRes.status).toBe(429);
+        expect(secondRes.headers.get("retry-after")).not.toBeNull();
+
+        // Finish the first stream; the slot is released.
+        releaseFirst?.();
+        await firstRes.text();
+        expect(getActiveStreamCount(id)).toBe(0);
+
+        const afterRes = await completionsCall(key, {
+          model: modelId,
+          stream: true,
+        });
+        expect(afterRes.status).toBe(200);
+        await afterRes.text();
+        expect(getActiveStreamCount(id)).toBe(0);
+      } finally {
+        releaseFirst?.();
+        apiKeysEnv.API_KEY_MAX_CONCURRENT_STREAMS = prevCap;
+        resetRateLimit(id);
+      }
+    });
+
+    it("passes through upstream provider 429 with Retry-After (non-stream and stream)", async () => {
+      const { id, key } = await createKey(alice.user, "upstream-429");
+      const before = await balanceOf(alice.user);
+      const provider429 = new APICallError({
+        message: "Provider rate limit exceeded",
+        url: "https://provider.example/v1/chat/completions",
+        requestBodyValues: {},
+        statusCode: 429,
+        responseHeaders: { "retry-after": "23" },
+      });
+      const rateLimitedRunner: InferenceRunner = {
+        generate: () => Promise.reject(provider429),
+        // eslint-disable-next-line require-yield -- Immediately throws upstream 429 before emitting chunks
+        async *stream() {
+          throw provider429;
+        },
+      };
+
+      const nonStream = await completionsCall(
+        key,
+        { model: modelId },
+        rateLimitedRunner,
+      );
+      expect(nonStream.status).toBe(429);
+      expect(nonStream.headers.get("retry-after")).toBe("23");
+      const nonStreamBody = (await nonStream.json()) as {
+        error: { type: string; code: string };
+      };
+      expect(nonStreamBody.error.type).toBe("rate_limit_error");
+      expect(nonStreamBody.error.code).toBe("rate_limit_exceeded");
+
+      const streamRes = await completionsCall(
+        key,
+        { model: modelId, stream: true },
+        rateLimitedRunner,
+      );
+      expect(streamRes.status).toBe(429);
+      expect(streamRes.headers.get("retry-after")).toBe("23");
+      expect(getActiveStreamCount(id)).toBe(0);
+      // Nothing charged on upstream 429.
+      expect(await balanceOf(alice.user)).toBe(before);
     });
 
     it("402 insufficient_credits when the account is empty", async () => {

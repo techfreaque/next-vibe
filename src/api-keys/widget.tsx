@@ -474,7 +474,6 @@ export function ApiKeysContainer(): JSX.Element {
                       ? `${t("widget.lastUsed")} ${new Date(k.lastUsedAt).toLocaleString(locale)}`
                       : t("widget.neverUsed"),
                     created: new Date(k.createdAt).toLocaleDateString(locale),
-                    rate: t("widget.rateLimit", { n: k.rateLimitPerMinute }),
                   })}
                 </Span>
               </Div>

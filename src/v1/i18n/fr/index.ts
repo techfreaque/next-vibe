@@ -36,7 +36,11 @@ export const translations: typeof enTranslations = {
     insufficientCredits:
       "Crédits insuffisants. Cet appel nécessite environ {{cost}}, vous avez {{balance}}. Rechargez pour continuer.",
     rateLimited:
-      "Limite de débit atteinte : {{limit}} requêtes par minute pour cette clé. Réessayez dans {{seconds}} s.",
+      "Trop de requêtes en rafale pour cette clé. Réessayez dans {{seconds}} s.",
+    tooManyStreams:
+      "Trop de flux simultanés ouverts pour cette clé (limite {{limit}}). Fermez un flux actif ou réessayez dans {{seconds}} s.",
+    upstreamRateLimited:
+      "Le fournisseur du modèle limite temporairement les requêtes : {{error}}",
     upstreamFailed: "Le fournisseur du modèle a échoué : {{error}}",
     balanceCheckFailed:
       "Impossible de vérifier votre solde de crédits. Rien n'a été exécuté. Réessayez.",
@@ -362,7 +366,7 @@ export const translations: typeof enTranslations = {
         title: "Statut d'une tâche vidéo",
         titleShort: "v1 statut vidéo",
         description:
-          "Statut, progression et URL du résultat d'une tâche vidéo. Le suivi est gratuit et ne compte pas dans la limite de débit.",
+          "Statut, progression et URL du résultat d'une tâche vidéo. Le suivi est gratuit et ne compte pas dans la protection anti-abus.",
         success: {
           title: "Tâche vidéo",
           description: "État actuel de la tâche",
@@ -390,7 +394,7 @@ export const translations: typeof enTranslations = {
         title: "Statut d'une tâche musicale",
         titleShort: "v1 statut musique",
         description:
-          "Statut et URL du résultat d'une tâche musicale. Le suivi est gratuit et ne compte pas dans la limite de débit.",
+          "Statut et URL du résultat d'une tâche musicale. Le suivi est gratuit et ne compte pas dans la protection anti-abus.",
         success: {
           title: "Tâche musicale",
           description: "État actuel de la tâche",

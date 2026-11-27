@@ -130,7 +130,7 @@ export const translations: typeof enTranslations = {
     tools:
       "Ak model nepodporuje nástroje, požiadavka s nástrojmi vráti chybu 400 tools_not_supported. Pole supports_tools overíš cez GET /v1/models.",
     rateLimit:
-      "Každý kľúč povoľuje 60 požiadaviek za minútu. Agenti posielajú veľa krátkych volaní. Ak dostávaš chybu 429, daj agentovi vlastný kľúč.",
+      "Bez pevného limitu požiadaviek. Platíš za každé volanie z kreditov, s veľkorysou ochranou proti zneužitiu pri zaseknutých slučkách. Chyby 429 od poskytovateľov posielame ďalej s hlavičkou Retry-After, aby agent počkal a zopakoval volanie.",
   },
   cta: {
     title: "Pripoj nástroj jediným príkazom",

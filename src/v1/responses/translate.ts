@@ -795,14 +795,17 @@ export function responsesStreamEncoder(
         )
       );
     },
-    fail: (message, totals) => {
+    fail: (message, rateLimit, totals) => {
       const out = closeAll();
       return (
         out +
         emit("response.failed", {
           response: responseObject(echo, "failed", outputSoFar(), {
             usage: responsesUsage(totals),
-            error: { code: "server_error", message },
+            error: {
+              code: rateLimit ? "rate_limit_exceeded" : "server_error",
+              message,
+            },
           }),
         })
       );

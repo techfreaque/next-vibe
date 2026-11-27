@@ -55,7 +55,7 @@ export const translations: typeof enTranslations = {
       models: "Modelos de chat {{modelCount}}",
       formats: "OpenAI + formato Anthropic",
       streaming: "Streaming y llamadas de herramientas",
-      rate: "Solicitudes de {{rate}} por minuto por clave",
+      rate: "Sin límite fijo de peticiones",
     },
   },
   code: {
@@ -247,7 +247,7 @@ export const translations: typeof enTranslations = {
   },
   limits: {
     title: "Tasa límite",
-    body: "Cada clave permite solicitudes {{rate}} por minuto por defecto. Con el límite consigues HTTP 429 con un encabezado `Retry-After` en segundos. Retrocede por tanto tiempo y reingrese. Los límites son por clave, así que dividir las cargas de trabajo pesadas a través de llaves.",
+    body: "Sin límite fijo de peticiones para cuentas de pago. El uso se cobra por solicitud desde tu saldo de créditos y se detiene con HTTP 402 cuando te quedas sin saldo. Se aplica una protección antiabuso generosa (techo alto de ráfagas y límite de streams simultáneos) para que los bucles descontrolados no saturen el servicio. Los HTTP 429 de los proveedores de modelos se reenvían con su encabezado `Retry-After`. Si recibes HTTP 429, espera los segundos indicados en `Retry-After` y reintenta.",
   },
   errors: {
     title: "Errores y límites de tarifas",
@@ -272,7 +272,7 @@ export const translations: typeof enTranslations = {
         "El proveedor de medios rechazó el aviso. No se cobra nada. Rephrase o elija otro modelo.",
       consent:
         "Los modelos no censurados necesitan una confirmación de 18+ de una sola vez en su cuenta. Confirme una vez en la página de teclas API, luego vuelva a entrar.",
-      rate: "Más solicitudes de {{rate}} por minuto para esta clave. Lea `Retry-After`.",
+      rate: "Protección antiabuso activada (ráfaga o streams simultáneos) o 429 del proveedor del modelo. Lee `Retry-After` y reintenta.",
       upstream:
         "El proveedor de modelos falló. Seguro para volver a entrar. Las corrientes terminan con un evento de error.",
       balance:
@@ -400,7 +400,7 @@ export const translations: typeof enTranslations = {
     },
     poll: {
       title: "Votación y descarga",
-      body: "`GET /v1/videos/{id}` devuelve el estado (extraído, `in_progress`, completado, fallado), progreso y, cuando está hecho, una url firmada. La votación es gratuita y se salta el límite de velocidad. `GET /v1/videos/{id}/content` transmite el MP4.",
+      body: "`GET /v1/videos/{id}` devuelve el estado (queued, `in_progress`, completed, failed), el progreso y, cuando termina, una url firmada. Consultar el estado es gratis y no cuenta para la protección antiabuso. `GET /v1/videos/{id}/content` transmite el MP4.",
     },
     points: {
       image:

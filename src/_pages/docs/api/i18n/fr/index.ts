@@ -56,7 +56,7 @@ export const translations: typeof enTranslations = {
       models: "{{modelCount}} modèles de chat",
       formats: "Formats OpenAI et Anthropic",
       streaming: "Streaming et appels d'outils",
-      rate: "{{rate}} requêtes par minute par clé",
+      rate: "Aucune limite de débit fixe",
     },
   },
   code: {
@@ -248,7 +248,7 @@ export const translations: typeof enTranslations = {
   },
   limits: {
     title: "Limites de débit",
-    body: "Chaque clé autorise par défaut {{rate}} requêtes par minute. Au-delà, vous recevez HTTP 429 avec un en-tête `Retry-After` en secondes. Attendez ce délai, puis réessayez. Les limites s'appliquent par clé : répartissez les charges lourdes sur plusieurs clés.",
+    body: "Aucune limite de débit fixe pour les comptes payants. L'usage est facturé à la requête sur votre solde de crédits, et les appels s'arrêtent en HTTP 402 lorsque votre solde est épuisé. Une protection anti-abus généreuse s'applique (plafond de rafale élevé et limite de flux simultanés) afin d'éviter qu'une boucle infinie ne sature le service. Les réponses 429 des fournisseurs de modèles sont transmises telles quelles avec leur en-tête `Retry-After`. En cas de HTTP 429, attendez le délai indiqué par `Retry-After` puis réessayez.",
   },
   errors: {
     title: "Erreurs et limites",
@@ -273,7 +273,7 @@ export const translations: typeof enTranslations = {
         "Le fournisseur média a refusé le prompt. Rien n'est facturé. Reformulez ou choisissez un autre modèle.",
       consent:
         "Les modèles non censurés demandent une confirmation unique de majorité (18+) sur votre compte. Confirmez une fois sur la page des clés API, puis relancez.",
-      rate: "Plus de {{rate}} requêtes par minute pour cette clé. Lisez `Retry-After`.",
+      rate: "Protection anti-abus déclenchée (rafale ou flux simultanés) ou 429 du fournisseur de modèle. Lisez `Retry-After` et réessayez.",
       upstream:
         "Le fournisseur du modèle a échoué. Vous pouvez réessayer sans risque. Les streams se terminent par un événement d'erreur.",
       balance:
@@ -401,7 +401,7 @@ export const translations: typeof enTranslations = {
     },
     poll: {
       title: "Suivre et télécharger",
-      body: "`GET /v1/videos/{id}` renvoie status (queued, `in_progress`, completed, failed), progress et, une fois terminé, une url signée. Le suivi est gratuit et ne compte pas dans la limite de débit. `GET /v1/videos/{id}/content` envoie le MP4.",
+      body: "`GET /v1/videos/{id}` renvoie status (queued, `in_progress`, completed, failed), progress et, une fois terminé, une url signée. Le suivi est gratuit et ne compte pas dans la protection anti-abus. `GET /v1/videos/{id}/content` envoie le MP4.",
     },
     points: {
       image:

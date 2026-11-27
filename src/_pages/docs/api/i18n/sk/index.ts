@@ -55,7 +55,7 @@ export const translations: typeof enTranslations = {
       models: "Počet modelov na čet: {{modelCount}}",
       formats: "Formáty OpenAI a Anthropic",
       streaming: "Streamovanie a volanie nástrojov",
-      rate: "Limit na kľúč za minútu: {{rate}}",
+      rate: "Bez pevného limitu požiadaviek",
     },
   },
   code: {
@@ -249,7 +249,7 @@ export const translations: typeof enTranslations = {
   },
   limits: {
     title: "Limity požiadaviek",
-    body: "Limit na kľúč je predvolene {{rate}} požiadaviek za minútu. Pri prekročení dostaneš HTTP 429. Hlavička `Retry-After` uvádza, koľko sekúnd máš počkať pred ďalším pokusom. Limit platí pre každý kľúč zvlášť, takže väčší objem požiadaviek môžeš rozdeliť medzi viac kľúčov.",
+    body: "Pre platené účty neplatí žiadny pevný limit požiadaviek. Používanie sa účtuje za každú požiadavku z tvojho zostatku kreditov a pri vyčerpaní sa zastaví chybou HTTP 402. Platí len veľkorysá ochrana proti zneužitiu (vysoký strop pre nárazové špičky a limit súbežných streamov), aby nekontrolované slučky nepreťažili službu. Odpovede HTTP 429 od poskytovateľov modelov posielame ďalej vrátane hlavičky `Retry-After`. Ak dostaneš HTTP 429, počkaj podľa `Retry-After` a skús znova.",
   },
   errors: {
     title: "Chyby a limity požiadaviek",
@@ -274,7 +274,7 @@ export const translations: typeof enTranslations = {
         "Poskytovateľ médií odmietol zadanie. Nič neúčtujeme. Uprav zadanie alebo vyber iný model.",
       consent:
         "Modely bez cenzúry vyžadujú jednorazové potvrdenie veku 18+. Potvrď ho na stránke s kľúčmi API a volanie zopakuj.",
-      rate: "Tento kľúč prekročil limit {{rate}} požiadaviek za minútu. Pozri hlavičku `Retry-After`.",
+      rate: "Zasiahla ochrana proti zneužitiu (nárazová špička alebo súbežné streamy) alebo 429 od poskytovateľa modelu. Pozri `Retry-After` a skús znova.",
       upstream:
         "Poskytovateľ modelu zlyhal. Volanie môžeš bezpečne zopakovať. Streamy sa ukončia chybovou udalosťou.",
       balance:
@@ -402,7 +402,7 @@ export const translations: typeof enTranslations = {
     },
     poll: {
       title: "Kontrola stavu a stiahnutie",
-      body: "`GET /v1/videos/{id}` vráti stav (`queued`, `in_progress`, `completed`, `failed`), priebeh a po dokončení podpísanú adresu `url`. Kontroly stavu sú bezplatné a nezapočítavajú sa do limitu. `GET /v1/videos/{id}/content` streamuje MP4.",
+      body: "`GET /v1/videos/{id}` vráti stav (`queued`, `in_progress`, `completed`, `failed`), priebeh a po dokončení podpísanú adresu `url`. Kontroly stavu sú bezplatné a nezapočítavajú sa do ochrany proti zneužitiu. `GET /v1/videos/{id}/content` streamuje MP4.",
     },
     points: {
       image:

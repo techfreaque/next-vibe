@@ -55,7 +55,7 @@ export const translations: typeof enTranslations = {
       models: "{{modelCount}} modeli czatu",
       formats: "Format OpenAI i Anthropic",
       streaming: "Streaming i narzędzia",
-      rate: "{{rate}} zapytań na minutę na klucz",
+      rate: "Brak sztywnego limitu zapytań",
     },
   },
   code: {
@@ -248,7 +248,7 @@ export const translations: typeof enTranslations = {
   },
   limits: {
     title: "Limity zapytań",
-    body: "Każdy klucz domyślnie pozwala na {{rate}} zapytań na minutę. Powyżej limitu dostajesz HTTP 429 z nagłówkiem `Retry-After` w sekundach. Odczekaj tyle i spróbuj ponownie. Limity są na klucz, więc większe obciążenia rozłóż na kilka kluczy.",
+    body: "Brak sztywnego limitu zapytań dla płacących kont. Rozliczamy każde wywołanie z Twojego salda kredytów, a gdy zabraknie środków, API zwraca HTTP 402. Obowiązuje wysoka ochrona przed nadużyciami (wysoki pułap krótkich serii zapytań i limit jednoczesnych streamów), żeby błędne pętle nie przeciążały usługi. Odpowiedzi 429 od dostawców modeli przekazujemy dalej wraz z nagłówkiem `Retry-After`. Jeśli dostaniesz HTTP 429, odczekaj czas z `Retry-After` i ponów.",
   },
   errors: {
     title: "Błędy i limity",
@@ -273,7 +273,7 @@ export const translations: typeof enTranslations = {
         "Dostawca multimediów odrzucił prompt. Nic nie pobieramy. Przeformułuj albo wybierz inny model.",
       consent:
         "Modele bez cenzury wymagają jednorazowego potwierdzenia 18+ na koncie. Potwierdź raz na stronie Klucze API i wyślij ponownie.",
-      rate: "Ponad {{rate}} zapytań na minutę dla tego klucza. Przeczytaj `Retry-After`.",
+      rate: "Zadziałała ochrona przed nadużyciami (nagły skok lub limit streamów) albo 429 od dostawcy modelu. Przeczytaj `Retry-After` i ponów.",
       upstream:
         "Dostawca modelu zawiódł. Ponowienie jest bezpieczne. Streamy kończą się zdarzeniem błędu.",
       balance: "Nie udało się odczytać salda, więc nic nie ruszyło. Ponów.",
@@ -399,7 +399,7 @@ export const translations: typeof enTranslations = {
     },
     poll: {
       title: "Sprawdzanie i pobieranie",
-      body: "`GET /v1/videos/{id}` zwraca status (queued, `in_progress`, completed, failed), progress, a na końcu podpisany url. Sprawdzanie jest darmowe i nie wlicza się do limitu zapytań. `GET /v1/videos/{id}/content` przesyła MP4.",
+      body: "`GET /v1/videos/{id}` zwraca status (queued, `in_progress`, completed, failed), progress, a na końcu podpisany url. Sprawdzanie jest darmowe i nie wlicza się do ochrony przed nadużyciami. `GET /v1/videos/{id}/content` przesyła MP4.",
     },
     points: {
       image:

@@ -128,7 +128,7 @@ export const translations: typeof enTranslations = {
     tools:
       "Ein Modell ohne Tool-Support antwortet mit 400 tools_not_supported, sobald der Agent Tools mitschickt. Prüf supports_tools in GET /v1/models.",
     rateLimit:
-      "Jeder Key erlaubt 60 Anfragen pro Minute. Agents feuern viele kleine Aufrufe. Bei 429 bekommt der Agent einen eigenen Key.",
+      "Kein festes Ratenlimit. Abrechnung pro Anfrage aus deinem Guthaben, mit großzügigem Missbrauchsschutz gegen Endlosschleifen. HTTP 429 vom Modellanbieter wird samt Retry-After-Header durchgereicht, damit dein Agent sauber warten und wiederholen kann.",
   },
   cta: {
     title: "Mit einem Befehl verdrahtet.",

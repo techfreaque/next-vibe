@@ -14,7 +14,29 @@ export const API_KEY_PREFIX = "sk-unb-" as const;
 /** Characters of the key kept in plaintext for display (prefix + a few chars). */
 export const API_KEY_DISPLAY_LENGTH = 14;
 
-export const API_KEY_DEFAULT_RATE_LIMIT_PER_MINUTE = 60;
+/**
+ * Default per-key burst ceiling (requests per minute). Paying accounts have no
+ * fixed low rate limit; credit billing is the natural limit. This ceiling is
+ * only a high abuse guard and is configurable via API_KEY_BURST_LIMIT_PER_MINUTE.
+ */
+export const API_KEY_DEFAULT_BURST_LIMIT_PER_MINUTE = 1_200;
+
+/** @deprecated The existing framework page still displays the default API burst ceiling. */
+export const API_KEY_DEFAULT_RATE_LIMIT_PER_MINUTE =
+  API_KEY_DEFAULT_BURST_LIMIT_PER_MINUTE;
+
+/**
+ * Default per-key concurrency cap (simultaneous in-flight streams). Prevents
+ * runaway clients from exhausting server sockets/memory. Configurable via
+ * API_KEY_MAX_CONCURRENT_STREAMS.
+ */
+export const API_KEY_DEFAULT_MAX_CONCURRENT_STREAMS = 50;
+
+/** Retry-After (seconds) returned when the per-key concurrent stream cap is hit. */
+export const API_KEY_CONCURRENCY_RETRY_AFTER_SECONDS = 5;
+
+/** Fallback Retry-After (seconds) when an upstream provider 429 omits the header. */
+export const API_KEY_UPSTREAM_RATE_LIMIT_RETRY_AFTER_SECONDS = 5;
 
 /** Max active keys per user. */
 export const API_KEY_MAX_ACTIVE = 20;

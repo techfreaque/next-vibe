@@ -128,7 +128,7 @@ export const translations: typeof enTranslations = {
     tools:
       "Model bez obsługi narzędzi zwraca 400 tools_not_supported, gdy tylko agent wyśle narzędzia. Sprawdź supports_tools w GET /v1/models.",
     rateLimit:
-      "Każdy klucz to 60 żądań na minutę. Agenci strzelają wieloma małymi wywołaniami. Jeśli trafisz na 429, daj agentowi osobny klucz.",
+      "Brak sztywnego limitu zapytań. Rozliczenie za każde wywołanie z Twoich kredytów, z wysoką ochroną przed nadużyciami na wypadek błędnych pętli. Odpowiedzi 429 od dostawcy modelu przekazujemy dalej z nagłówkiem Retry-After, żeby agent mógł odczekać i ponowić.",
   },
   cta: {
     title: "Podłączone jednym poleceniem.",

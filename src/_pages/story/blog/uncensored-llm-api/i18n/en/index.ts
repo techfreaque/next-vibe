@@ -74,7 +74,7 @@ export const translations = {
       "Stateless. No conversation is kept on our side. Send the full history every turn.",
     maxTokens: "Output is capped at {{maxTokens}} tokens per request.",
     rateLimit:
-      "{{rateLimit}} requests per minute per key by default. Over the limit you get 429 with a Retry-After header.",
+      "No fixed rate limit. Usage is billed per request from your credits, and generous abuse protection applies. Upstream provider 429s pass through with a Retry-After header.",
     tools:
       "Tool calls only work on models that support them. The table shows which do. Otherwise you get 400 tools_not_supported.",
     refusals:

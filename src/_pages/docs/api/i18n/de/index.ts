@@ -55,7 +55,7 @@ export const translations: typeof enTranslations = {
       models: "{{modelCount}} Chatmodelle",
       formats: "OpenAI- und Anthropic-Format",
       streaming: "Streaming und Tool-Aufrufe",
-      rate: "{{rate}} Anfragen pro Minute je Schlüssel",
+      rate: "Kein festes Ratenlimit",
     },
   },
   code: {
@@ -247,7 +247,7 @@ export const translations: typeof enTranslations = {
   },
   limits: {
     title: "Rate Limits",
-    body: "Jeder Schlüssel erlaubt standardmäßig {{rate}} Anfragen pro Minute. Darüber liefert die API HTTP 429 mit dem Header `Retry-After` in Sekunden. Warte so lange und versuche es erneut. Limits gelten pro Schlüssel: Verteile große Lasten auf mehrere Schlüssel.",
+    body: "Kein festes Ratenlimit für zahlende Konten. Die Nutzung wird pro Anfrage aus deinem Guthaben abgerechnet; sind die Credits leer, stoppt die API mit HTTP 402. Es gilt ein großzügiger Missbrauchsschutz (hohe Burst-Obergrenze und ein Limit für gleichzeitige Streams), damit Endlosschleifen den Dienst nicht überlasten. HTTP 429 von Modellanbietern wird samt `Retry-After`-Header durchgereicht. Warte bei 429 die angegebenen Sekunden und versuche es erneut.",
   },
   errors: {
     title: "Fehler und Rate Limits",
@@ -273,7 +273,7 @@ export const translations: typeof enTranslations = {
         "Der Medienanbieter hat den Prompt abgelehnt. Nichts wird berechnet. Formuliere um oder nimm ein anderes Modell.",
       consent:
         "Unzensierte Modelle brauchen eine einmalige Ü18-Bestätigung im Konto. Einmal auf der Seite API-Schlüssel bestätigen, dann erneut senden.",
-      rate: "Über {{rate}} Anfragen pro Minute für diesen Schlüssel. Lies `Retry-After`.",
+      rate: "Missbrauchsschutz ausgelöst (Burst oder gleichzeitige Streams) oder 429 vom Modellanbieter. Lies `Retry-After` und versuche es erneut.",
       upstream:
         "Der Modellanbieter ist ausgefallen. Wiederholen ist sicher. Streams enden mit einem Fehler-Event.",
       balance:
@@ -399,7 +399,7 @@ export const translations: typeof enTranslations = {
     },
     poll: {
       title: "Abfragen und herunterladen",
-      body: "`GET /v1/videos/{id}` liefert status (queued, `in_progress`, completed, failed), progress und am Ende eine signierte url. Abfragen ist kostenlos und zählt nicht gegen das Ratenlimit. `GET /v1/videos/{id}/content` streamt das MP4.",
+      body: "`GET /v1/videos/{id}` liefert status (queued, `in_progress`, completed, failed), progress und am Ende eine signierte url. Abfragen ist kostenlos und zählt nicht gegen den Missbrauchsschutz. `GET /v1/videos/{id}/content` streamt das MP4.",
     },
     points: {
       image:

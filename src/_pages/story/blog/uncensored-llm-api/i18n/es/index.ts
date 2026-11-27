@@ -78,7 +78,7 @@ export const translations: typeof enTranslations = {
       "Sin estado. No guardamos ninguna conversación. Envía el historial completo en cada turno.",
     maxTokens: "La salida está limitada a {{maxTokens}} tokens por petición.",
     rateLimit:
-      "{{rateLimit}} peticiones por minuto y clave por defecto. Si te pasas, recibes un 429 con la cabecera Retry-After.",
+      "Sin límite fijo de peticiones. El consumo se cobra por solicitud desde tus créditos y se aplica una protección antiabuso generosa. Los 429 de los proveedores pasan con la cabecera Retry-After.",
     tools:
       "Las llamadas a herramientas solo funcionan en modelos que las admiten. La tabla indica cuáles. Si no, recibes 400 tools_not_supported.",
     refusals:

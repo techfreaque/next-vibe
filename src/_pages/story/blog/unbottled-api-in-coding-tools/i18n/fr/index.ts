@@ -130,7 +130,7 @@ export const translations: typeof enTranslations = {
     tools:
       "Un modèle sans support des outils renvoie 400 tools_not_supported dès que l'agent envoie des outils. Vérifiez supports_tools dans GET /v1/models.",
     rateLimit:
-      "Chaque clé autorise 60 requêtes par minute. Les agents enchaînent beaucoup de petits appels. Si vous prenez un 429, donnez à l'agent sa propre clé.",
+      "Aucune limite de débit fixe. Facturation à la requête sur vos crédits, avec une protection anti-abus généreuse contre les boucles infinies. Les 429 des fournisseurs passent tels quels avec leur en-tête Retry-After pour que votre agent patiente et réessaie.",
   },
   cta: {
     title: "Branché en une commande.",

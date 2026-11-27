@@ -33,7 +33,7 @@ export const translations = {
     messages:
       "POST /v1/messages: the Anthropic Messages API. Streaming and tool use. This is what Claude Code and the Anthropic SDKs talk to.",
     countTokens:
-      "POST /v1/messages/count_tokens: costs no credits. A local estimate, no model call, and it does not count against your per-minute rate limit. Claude Code calls it constantly to size its context.",
+      "POST /v1/messages/count_tokens: costs no credits. A local estimate, no model call, and it does not count against abuse limits. Claude Code calls it constantly to size its context.",
     models:
       "GET /v1/models: every model your key can call right now, with context length, tool support and prices. One response body that both the OpenAI and the Anthropic SDKs parse.",
     media:
@@ -189,7 +189,7 @@ export const translations = {
       "Stateless. The Responses API runs with store set to false and rejects previous_response_id. Send the full history every turn. That holds for every endpoint.",
     maxTokens: "Output is capped at {{maxTokens}} tokens per request.",
     rateLimit:
-      "{{rateLimit}} requests per minute per key by default. Over the limit you get 429 with a Retry-After header. Agents that fire many calls get their own key.",
+      "No fixed rate limit. Usage is billed per request from your credits, and generous abuse protection applies. Upstream provider 429s pass through with a Retry-After header.",
     countTokens:
       "count_tokens is an estimate, not the provider's exact tokenizer. Good for sizing context, not for billing math.",
     tools:

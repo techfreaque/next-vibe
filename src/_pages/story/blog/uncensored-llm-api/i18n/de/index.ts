@@ -79,7 +79,7 @@ export const translations: typeof enTranslations = {
       "Zustandslos. Bei uns wird kein Gespräch gespeichert. Schicken Sie jedes Mal den vollen Verlauf.",
     maxTokens: "Die Ausgabe ist auf {{maxTokens}} Token pro Request begrenzt.",
     rateLimit:
-      "Standardmäßig {{rateLimit}} Requests pro Minute und Schlüssel. Darüber gibt es 429 mit Retry-After-Header.",
+      "Kein festes Ratenlimit. Abrechnung pro Anfrage aus Ihrem Guthaben, mit großzügigem Missbrauchsschutz. HTTP 429 vom Modellanbieter wird mit Retry-After-Header durchgereicht.",
     tools:
       "Tool-Calls funktionieren nur bei Modellen, die sie unterstützen. Die Tabelle zeigt, welche. Sonst kommt 400 tools_not_supported.",
     refusals:

@@ -79,7 +79,7 @@ export const translations: typeof enTranslations = {
       "Sans état. Aucune conversation n'est conservée chez nous. Envoyez l'historique complet à chaque tour.",
     maxTokens: "La sortie est plafonnée à {{maxTokens}} tokens par requête.",
     rateLimit:
-      "{{rateLimit}} requêtes par minute et par clé par défaut. Au-delà, vous recevez un 429 avec un en-tête Retry-After.",
+      "Aucune limite de débit fixe. Facturation à la requête sur vos crédits, avec une protection anti-abus généreuse. Les 429 des fournisseurs de modèles passent avec un en-tête Retry-After.",
     tools:
       "Les appels d'outils ne marchent qu'avec les modèles qui les prennent en charge. Le tableau indique lesquels. Sinon, vous recevez 400 tools_not_supported.",
     refusals:

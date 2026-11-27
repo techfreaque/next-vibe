@@ -33,7 +33,14 @@ import { formatCreditAmount } from "@/products/credit-money";
 
 import type { V1T } from "../i18n";
 import { V1_MAX_OUTPUT_TOKENS } from "./constants";
-import { type V1Error, v1Error } from "./errors";
+import {
+  extractUpstreamRateLimit,
+  type UpstreamRateLimit,
+  upstreamRateLimitError,
+  type V1Error,
+  v1Error,
+  type V1ErrorRenderer,
+} from "./errors";
 import type {
   InferenceRequest,
   InferenceResult,
@@ -505,6 +512,20 @@ export async function runV1Generate(
     );
     return { ok: true, result, totals };
   } catch (error) {
+    const rateLimit = extractUpstreamRateLimit(
+      error instanceof Error ? error : undefined,
+    );
+    if (rateLimit) {
+      call.logger.warn(`[${call.logTag}] Upstream rate limited`, {
+        model: call.model.id,
+        apiProvider: call.inference.model.apiProvider,
+        retryAfter: rateLimit.retryAfter,
+      });
+      return {
+        ok: false,
+        error: upstreamRateLimitError(rateLimit, t),
+      };
+    }
     const parsedError = parseError(error);
     const { message } = parsedError;
     call.logger.error(`[${call.logTag}] Inference failed`, parsedError, {
@@ -537,20 +558,34 @@ export interface V1StreamEncoder {
   /** normal end; the call is already billed */
   finish(finishReason: OpenAiFinishReason, totals: V1Totals): string;
   /** provider error mid-stream; what ran is already billed */
-  fail(message: string, totals: V1Totals): string;
+  fail(
+    message: string,
+    rateLimit: UpstreamRateLimit | undefined,
+    totals: V1Totals,
+  ): string;
   /** keeps idle-timeout clients alive while the model thinks */
   heartbeat(): string;
 }
 
+export interface RunV1StreamOptions {
+  renderError: V1ErrorRenderer;
+  t: V1T;
+  /** Called once when the stream ends, fails, or is cancelled (e.g. release concurrency slot). */
+  onDone?: () => void;
+}
+
 /**
  * Streams one call through an encoder. Bills what ran in every case: normal
- * finish, provider error, or client abort.
+ * finish, provider error, or client abort. If the upstream provider rejects
+ * immediately with HTTP 429 before any content is streamed, passes through
+ * HTTP 429 with Retry-After and charges nothing.
  */
-export function runV1Stream(
+export async function runV1Stream(
   call: V1Call,
   runner: InferenceRunner,
   encoder: V1StreamEncoder,
-): StreamingResponse {
+  options: RunV1StreamOptions,
+): Promise<StreamingResponse> {
   const encoderBytes = new TextEncoder();
   const abort = new AbortController();
   call.inference.abortSignal?.addEventListener("abort", () => abort.abort());
@@ -558,6 +593,61 @@ export function runV1Stream(
     ...call.inference,
     abortSignal: abort.signal,
   };
+
+  const iterator = runner.stream(run)[Symbol.asyncIterator]();
+  let firstEvent: InferenceStreamEvent | undefined;
+  let firstDone = false;
+  let initialFailure:
+    | {
+        message: string;
+        source: "error-event" | "exception";
+        rateLimit?: UpstreamRateLimit;
+      }
+    | undefined;
+
+  try {
+    const first = await iterator.next();
+    if (first.done) {
+      firstDone = true;
+    } else if (first.value.type === "error") {
+      if (first.value.upstreamRateLimit) {
+        call.logger.warn(`[${call.logTag}] Upstream rate limited`, {
+          model: call.model.id,
+          apiProvider: run.model.apiProvider,
+          retryAfter: first.value.upstreamRateLimit.retryAfter,
+        });
+        options.onDone?.();
+        return options.renderError(
+          upstreamRateLimitError(first.value.upstreamRateLimit, options.t),
+        );
+      }
+      initialFailure = {
+        message: first.value.message,
+        source: "error-event",
+      };
+      firstDone = true;
+    } else {
+      firstEvent = first.value;
+    }
+  } catch (error) {
+    const rateLimit = extractUpstreamRateLimit(
+      error instanceof Error ? error : undefined,
+    );
+    if (rateLimit) {
+      call.logger.warn(`[${call.logTag}] Upstream rate limited`, {
+        model: call.model.id,
+        apiProvider: run.model.apiProvider,
+        retryAfter: rateLimit.retryAfter,
+      });
+      options.onDone?.();
+      return options.renderError(upstreamRateLimitError(rateLimit, options.t));
+    }
+    initialFailure = {
+      message: parseError(error).message,
+      source: "exception",
+    };
+    firstDone = true;
+  }
 
   const body = new ReadableStream<Uint8Array>({
     async start(controller): Promise<void> {
@@ -584,71 +674,101 @@ export function runV1Stream(
       let providerMetadata: ProviderMetadata | undefined;
       let providerJobId: string | undefined;
       let finishReason: OpenAiFinishReason = "stop";
-      let failed: string | undefined;
-      let failureSource: "error-event" | "exception" | undefined;
-      send(encoder.start());
-      try {
-        for await (const event of runner.stream(run)) {
-          if (event.type === "finish") {
-            usage = event.usage;
-            providerMetadata = event.providerMetadata;
-            providerJobId = event.providerJobId;
-            finishReason = event.finishReason;
-            continue;
-          }
-          if (event.type === "error") {
-            failed = event.message;
-            failureSource = "error-event";
-            continue;
-          }
-          if (event.type === "text" || event.type === "reasoning") {
-            outputChars += event.text.length;
-          } else if (event.type === "tool-call-start") {
-            outputChars += event.name.length;
-          } else if (event.type === "tool-call-delta") {
-            outputChars += event.argumentsDelta.length;
-          }
-          send(encoder.event(event));
+      let failed: string | undefined = initialFailure?.message;
+      let failureSource: "error-event" | "exception" | undefined =
+        initialFailure?.source;
+      let failureRateLimit: UpstreamRateLimit | undefined =
+        initialFailure?.rateLimit;
+
+      const processEvent = (event: InferenceStreamEvent): void => {
+        if (event.type === "finish") {
+          usage = event.usage;
+          providerMetadata = event.providerMetadata;
+          providerJobId = event.providerJobId;
+          finishReason = event.finishReason;
+          return;
         }
-      } catch (error) {
-        failed = parseError(error).message;
-        failureSource = "exception";
-      }
-      clearInterval(heartbeat);
-      // Bill what ran - even on provider error or client abort.
-      const totals = await call.bill(
-        usage,
-        outputChars,
-        providerMetadata,
-        providerJobId,
-      );
-      if (failed !== undefined) {
-        call.logger.error(`[${call.logTag}] Stream failed`, {
-          model: call.model.id,
-          streamFailureEvidence: {
-            apiProvider: run.model.apiProvider,
-            providerModel: run.model.providerModel,
-            promptToolHistory: summarizePromptToolHistory(run.messages),
-            offeredToolCount: run.tools?.length ?? 0,
-            outputChars,
-            usageReported: usage !== undefined,
-            aborted: abort.signal.aborted,
-            failureSource,
-          },
-          error: failed,
-        });
-        send(encoder.fail(failed, totals));
-      } else {
-        send(encoder.finish(finishReason, totals));
-      }
+        if (event.type === "error") {
+          failed = event.message;
+          failureSource = "error-event";
+          failureRateLimit = event.upstreamRateLimit;
+          return;
+        }
+        if (event.type === "text" || event.type === "reasoning") {
+          outputChars += event.text.length;
+        } else if (event.type === "tool-call-start") {
+          outputChars += event.name.length;
+        } else if (event.type === "tool-call-delta") {
+          outputChars += event.argumentsDelta.length;
+        }
+        send(encoder.event(event));
+      };
+
       try {
-        controller.close();
-      } catch {
-        // already closed by cancel
+        send(encoder.start());
+        if (firstEvent !== undefined) {
+          processEvent(firstEvent);
+        }
+        if (!firstDone && failed === undefined) {
+          try {
+            while (true) {
+              const next = await iterator.next();
+              if (next.done) {
+                break;
+              }
+              processEvent(next.value);
+              if (failed !== undefined) {
+                break;
+              }
+            }
+          } catch (error) {
+            failureRateLimit = extractUpstreamRateLimit(
+              error instanceof Error ? error : undefined,
+            );
+            failed = failureRateLimit?.message ?? parseError(error).message;
+            failureSource = "exception";
+          }
+        }
+        clearInterval(heartbeat);
+        // Bill what ran - even on provider error or client abort.
+        const totals = await call.bill(
+          usage,
+          outputChars,
+          providerMetadata,
+          providerJobId,
+        );
+        if (failed !== undefined) {
+          call.logger.error(`[${call.logTag}] Stream failed`, {
+            model: call.model.id,
+            streamFailureEvidence: {
+              apiProvider: run.model.apiProvider,
+              providerModel: run.model.providerModel,
+              promptToolHistory: summarizePromptToolHistory(run.messages),
+              offeredToolCount: run.tools?.length ?? 0,
+              outputChars,
+              usageReported: usage !== undefined,
+              aborted: abort.signal.aborted,
+              failureSource,
+            },
+            error: failed,
+          });
+          send(encoder.fail(failed, failureRateLimit, totals));
+        } else {
+          send(encoder.finish(finishReason, totals));
+        }
+        try {
+          controller.close();
+        } catch {
+          // already closed by cancel
+        }
+      } finally {
+        clearInterval(heartbeat);
+        options.onDone?.();
       }
     },
     cancel(): void {
       abort.abort();
+      options.onDone?.();
     },
   });
 

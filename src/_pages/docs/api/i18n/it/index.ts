@@ -55,7 +55,7 @@ export const translations: typeof enTranslations = {
       models: "Modelli di chat {{modelCount}}",
       formats: "OpenAI + formato Anthropic",
       streaming: "Streaming e chiamate degli strumenti",
-      rate: "Richieste {{rate}} al minuto per chiave",
+      rate: "Nessun limite fisso di richieste",
     },
   },
   code: {
@@ -250,7 +250,7 @@ export const translations: typeof enTranslations = {
   },
   limits: {
     title: "Limiti di tasso",
-    body: "Ogni chiave consente di default alle richieste {{rate}} al minuto. Nel limite si ottiene HTTP 429 con un intestazione `Retry-After` in pochi secondi. Ritiratevi per quel lungo e riprovate. I limiti sono per chiave, così i carichi di lavoro pesanti divisi tra le chiavi.",
+    body: "Nessun limite fisso di richieste per gli account a pagamento. L'utilizzo viene scalato per singola richiesta dal tuo saldo di crediti e si ferma con HTTP 402 quando il saldo finisce. Si applica un'ampia protezione anti-abuso (soglia di picco molto alta e limite di stream simultanei) per evitare che loop fuori controllo sovraccarichino il servizio. Gli HTTP 429 dei fornitori di modelli vengono inoltrati con il loro header `Retry-After`. Se ricevi HTTP 429, attendi i secondi indicati in `Retry-After` e riprova.",
   },
   errors: {
     title: "Errori e limiti di velocità",
@@ -275,7 +275,7 @@ export const translations: typeof enTranslations = {
         "Il fornitore dei media ha rifiutato il prompt. Non c'e' niente che sia accusato. Riformulare o scegliere un altro modello.",
       consent:
         "I modelli non censurati hanno bisogno di una sola volta 18+ conferma sul tuo conto. Confermare una volta sulla pagina delle chiavi API, quindi riprovare.",
-      rate: "Oltre {{rate}} richiede al minuto per questa chiave. Leggi `Retry-After`.",
+      rate: "Protezione anti-abuso attivata (picco o stream simultanei) oppure 429 dal fornitore del modello. Leggi `Retry-After` e riprova.",
       upstream:
         "Il fornitore di modelli non è riuscito. Sicuro da riprovare. I flussi terminano con un evento di errore.",
       balance:
@@ -402,7 +402,7 @@ export const translations: typeof enTranslations = {
     },
     poll: {
       title: "Sondaggi e download",
-      body: "`GET /v1/videos/{id}` restituisce lo stato (queued, `in_progress`, completato, fallito), il progresso e, quando fatto, un url firmato. L'inquinamento è gratuito e salta il limite di velocità. `GET /v1/videos/{id}/content` trasmette il MP4.",
+      body: "`GET /v1/videos/{id}` restituisce lo stato (queued, `in_progress`, completato, fallito), il progresso e, quando pronto, un url firmato. Il polling è gratuito e non rientra nei limiti anti-abuso. `GET /v1/videos/{id}/content` trasmette l'MP4.",
     },
     points: {
       image:

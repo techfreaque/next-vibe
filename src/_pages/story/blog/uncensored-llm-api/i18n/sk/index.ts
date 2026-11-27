@@ -78,7 +78,7 @@ export const translations: typeof enTranslations = {
       "API je bezstavové. Konverzácie u nás nezostávajú. Pri každej správe pošli celú históriu.",
     maxTokens: "Jedna požiadavka môže vrátiť najviac {{maxTokens}} tokenov.",
     rateLimit:
-      "Predvolený limit je {{rateLimit}} požiadaviek za minútu na kľúč. Po prekročení dostaneš chybu 429 s hlavičkou Retry-After.",
+      "Bez pevného limitu požiadaviek. Platíš za každé volanie zo svojich kreditov a platí veľkorysá ochrana proti zneužitiu. Chyby 429 od poskytovateľov posielame ďalej s hlavičkou Retry-After.",
     tools:
       "Nástroje fungujú len na modeloch, ktoré ich podporujú. Nájdeš ich v tabuľke. Ostatné vrátia chybu 400 tools_not_supported.",
     refusals:

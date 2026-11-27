@@ -29,11 +29,7 @@ import {
   API_KEY_PLACEHOLDER,
   buildPublicApiBaseUrl,
 } from "@/api-keys/coding-tools";
-import {
-  API_DOCS_PATH,
-  API_KEY_DEFAULT_RATE_LIMIT_PER_MINUTE,
-  API_KEYS_PAGE_PATH,
-} from "@/api-keys/constants";
+import { API_DOCS_PATH, API_KEYS_PAGE_PATH } from "@/api-keys/constants";
 import { configScopedTranslation } from "@/env/i18n";
 import { V1_MAX_OUTPUT_TOKENS } from "@/v1/shared/constants";
 
@@ -175,7 +171,6 @@ export function TanstackPage({
     count: rows.length,
     subPrice,
     ownModel: own?.name ?? "",
-    rateLimit: API_KEY_DEFAULT_RATE_LIMIT_PER_MINUTE,
     maxTokens: V1_MAX_OUTPUT_TOKENS,
     example: example?.id ?? "",
   };

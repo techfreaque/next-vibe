@@ -11,8 +11,13 @@ import { and, eq, isNull } from "drizzle-orm";
 import { db } from "next-vibe/database";
 import { users } from "next-vibe/identity/user/db";
 
-import { API_KEY_DISPLAY_LENGTH, API_KEY_PREFIX } from "./constants";
+import {
+  API_KEY_CONCURRENCY_RETRY_AFTER_SECONDS,
+  API_KEY_DISPLAY_LENGTH,
+  API_KEY_PREFIX,
+} from "./constants";
 import { type UserApiKey, userApiKeys } from "./db";
+import { apiKeysEnv } from "./env";
 
 /** Keys are 256 bits of CSPRNG output - a fast hash is sufficient (no passwords). */
 export function hashApiKey(plaintext: string): string {
@@ -79,19 +84,39 @@ export async function touchKey(keyId: string): Promise<void> {
     .where(eq(userApiKeys.id, keyId));
 }
 
-// ── Per-key sliding-window rate limit (per process) ─────────────────────────
+// ── Per-key abuse guards (per process) ──────────────────────────────────────
+// Paying accounts have no fixed low per-key limit; billing (credits) is the
+// natural limit. Only a high burst ceiling and a concurrent-stream cap apply
+// so runaway loops cannot overload the server.
 const WINDOW_MS = 60_000;
 const hits = new Map<string, number[]>();
+const inFlightStreams = new Map<string, number>();
+
+/**
+ * Effective burst ceiling for a paying key: always at least the configured
+ * abuse-guard ceiling so legacy DB rows (which defaulted to 60) are never
+ * throttled at 60 req/min. An explicit higher per-key override still applies.
+ */
+export function effectiveBurstLimit(
+  storedLimitPerMinute?: number,
+  envCeiling: number = apiKeysEnv.API_KEY_BURST_LIMIT_PER_MINUTE,
+): number {
+  return Math.max(envCeiling, storedLimitPerMinute ?? 0);
+}
 
 export function consumeRateLimit(
   keyId: string,
-  limitPerMinute: number,
+  limitPerMinute: number = apiKeysEnv.API_KEY_BURST_LIMIT_PER_MINUTE,
   now: number = Date.now(),
 ): { allowed: boolean; retryAfterSeconds: number } {
   const recent = (hits.get(keyId) ?? []).filter((ts) => now - ts < WINDOW_MS);
   if (recent.length >= limitPerMinute) {
     const oldest = recent[0] ?? now;
-    hits.set(keyId, recent);
+    if (recent.length > 0) {
+      hits.set(keyId, recent);
+    } else {
+      hits.delete(keyId);
+    }
     return {
       allowed: false,
       retryAfterSeconds: Math.max(
@@ -105,6 +130,55 @@ export function consumeRateLimit(
   return { allowed: true, retryAfterSeconds: 0 };
 }
 
-export function resetRateLimit(keyId: string): void {
-  hits.delete(keyId);
+export type StreamSlotResult =
+  | { allowed: true; release: () => void }
+  | { allowed: false; retryAfterSeconds: number };
+
+/**
+ * Reserves one in-flight stream slot for `keyId`. Callers MUST invoke
+ * `release()` when the stream finishes, errors, or is cancelled. `release()`
+ * is idempotent so calling it in both `finally` and `cancel` is safe.
+ */
+export function acquireStreamSlot(
+  keyId: string,
+  maxConcurrent: number = apiKeysEnv.API_KEY_MAX_CONCURRENT_STREAMS,
+): StreamSlotResult {
+  const current = inFlightStreams.get(keyId) ?? 0;
+  if (current >= maxConcurrent) {
+    return {
+      allowed: false,
+      retryAfterSeconds: API_KEY_CONCURRENCY_RETRY_AFTER_SECONDS,
+    };
+  }
+  inFlightStreams.set(keyId, current + 1);
+  let released = false;
+  return {
+    allowed: true,
+    release: (): void => {
+      if (released) {
+        return;
+      }
+      released = true;
+      const active = inFlightStreams.get(keyId) ?? 0;
+      if (active <= 1) {
+        inFlightStreams.delete(keyId);
+      } else {
+        inFlightStreams.set(keyId, active - 1);
+      }
+    },
+  };
+}
+
+export function getActiveStreamCount(keyId: string): number {
+  return inFlightStreams.get(keyId) ?? 0;
+}
+
+export function resetRateLimit(keyId?: string): void {
+  if (keyId) {
+    hits.delete(keyId);
+    inFlightStreams.delete(keyId);
+  } else {
+    hits.clear();
+    inFlightStreams.clear();
+  }
 }

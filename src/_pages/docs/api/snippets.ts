@@ -483,7 +483,7 @@ audio.write_to_file("speech.mp3")`,
   "credits_charged": 42,
   "error": null
 }`,
-    videoPoll: `# Poll until status is completed or failed (free, no rate budget)
+    videoPoll: `# Poll until status is completed or failed (free, skipped by abuse guard)
 curl ${baseUrl}/videos/${DOCS_VIDEO_ID} \\
   ${auth}
 

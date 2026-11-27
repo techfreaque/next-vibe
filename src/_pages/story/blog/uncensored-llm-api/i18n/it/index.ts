@@ -78,7 +78,7 @@ export const translations: typeof enTranslations = {
       "Senza stato. Da noi non resta nessuna conversazione. Invia la cronologia completa a ogni turno.",
     maxTokens: "L'output è limitato a {{maxTokens}} token per richiesta.",
     rateLimit:
-      "{{rateLimit}} richieste al minuto per chiave di default. Oltre il limite ricevi un 429 con header Retry-After.",
+      "Nessun limite fisso di richieste. L'utilizzo viene scalato per chiamata dal tuo saldo di crediti e si applica un'ampia protezione anti-abuso. I 429 dei provider passano con l'header Retry-After.",
     tools:
       "Le chiamate a strumenti funzionano solo sui modelli che le supportano. La tabella dice quali. Altrimenti ricevi 400 tools_not_supported.",
     refusals:

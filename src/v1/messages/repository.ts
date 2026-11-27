@@ -24,7 +24,7 @@ import {
   runV1Generate,
   runV1Stream,
 } from "../shared/execution";
-import { gateApiKeyRequest } from "../shared/gate";
+import { acquireV1StreamSlot, gateApiKeyRequest } from "../shared/gate";
 import { aiSdkRunner, type InferenceRunner } from "../shared/inference";
 import { openAiJson } from "../shared/openai";
 import type { V1MessagesPostRequestOutput } from "./definition";
@@ -115,6 +115,10 @@ export class V1MessagesRepository {
 
     const omitThinking = data.thinking?.display === "omitted";
     if (data.stream === true) {
+      const slot = acquireV1StreamSlot(gate.key.id, t);
+      if (!slot.ok) {
+        return anthropicErrorResponse(slot.error);
+      }
       return runV1Stream(
         call,
         runner,
@@ -123,6 +127,11 @@ export class V1MessagesRepository {
           call.estimatedInputTokens,
           omitThinking,
         ),
+        {
+          renderError: anthropicErrorResponse,
+          t,
+          onDone: slot.release,
+        },
       );
     }
 

@@ -27,8 +27,9 @@ import type {
   ApiKeysGetResponseOutput,
   ApiKeysPostResponseOutput,
 } from "./definition";
+import { apiKeysEnv } from "./env";
 import type { ApiKeysT } from "./i18n";
-import { generateApiKey, resetRateLimit } from "./keys";
+import { effectiveBurstLimit, generateApiKey, resetRateLimit } from "./keys";
 import { isPaidUser } from "./paid";
 
 /** Public base URL of the OpenAI-compatible API, derived from the request. */
@@ -79,7 +80,10 @@ export class ApiKeysRepository {
       return success({
         baseUrl: buildApiBaseUrl(request, locale),
         isPaid: await isPaidUser(user.id),
-        keys: rows,
+        keys: rows.map((row) => ({
+          ...row,
+          rateLimitPerMinute: effectiveBurstLimit(row.rateLimitPerMinute),
+        })),
       });
     } catch (error) {
       logger.error("Failed to list API keys", parseError(error));
@@ -133,6 +137,7 @@ export class ApiKeysRepository {
           name,
           keyPrefix: generated.keyPrefix,
           hashedKey: generated.hashedKey,
+          rateLimitPerMinute: apiKeysEnv.API_KEY_BURST_LIMIT_PER_MINUTE,
         })
         .returning({ id: userApiKeys.id });
       if (!row) {

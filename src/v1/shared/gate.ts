@@ -20,7 +20,12 @@ import {
   type ApiKeyResolution,
 } from "@/api-keys/auth";
 import type { UserApiKey } from "@/api-keys/db";
-import { consumeRateLimit } from "@/api-keys/keys";
+import { apiKeysEnv } from "@/api-keys/env";
+import {
+  acquireStreamSlot,
+  consumeRateLimit,
+  effectiveBurstLimit,
+} from "@/api-keys/keys";
 import { isPaidUser } from "@/api-keys/paid";
 import { buildPublicOrigin } from "@/api-keys/repository";
 
@@ -112,14 +117,14 @@ export async function gateApiKeyRequest(
   if (options.consumeRateLimit === false) {
     return { ok: true, user, key };
   }
-  const limit = consumeRateLimit(key.id, key.rateLimitPerMinute);
+  const burstLimit = effectiveBurstLimit(key.rateLimitPerMinute);
+  const limit = consumeRateLimit(key.id, burstLimit);
   if (!limit.allowed) {
     return {
       ok: false,
       error: v1Error(
         429,
         t("openai.rateLimited", {
-          limit: key.rateLimitPerMinute,
           seconds: limit.retryAfterSeconds,
         }),
         "rate_limit_error",
@@ -130,4 +135,37 @@ export async function gateApiKeyRequest(
     };
   }
   return { ok: true, user, key };
+}
+
+export type StreamSlotGateResult =
+  | { ok: true; release: () => void }
+  | { ok: false; error: V1Error };
+
+/**
+ * Reserves one concurrent stream slot for a key before opening an SSE stream.
+ * Returns a 429 V1Error with Retry-After when the per-key abuse cap is reached.
+ */
+export function acquireV1StreamSlot(
+  keyId: string,
+  t: V1T,
+  maxConcurrent: number = apiKeysEnv.API_KEY_MAX_CONCURRENT_STREAMS,
+): StreamSlotGateResult {
+  const slot = acquireStreamSlot(keyId, maxConcurrent);
+  if (!slot.allowed) {
+    return {
+      ok: false,
+      error: v1Error(
+        429,
+        t("openai.tooManyStreams", {
+          limit: maxConcurrent,
+          seconds: slot.retryAfterSeconds,
+        }),
+        "rate_limit_error",
+        "rate_limit_exceeded",
+        null,
+        { "Retry-After": String(slot.retryAfterSeconds) },
+      ),
+    };
+  }
+  return { ok: true, release: slot.release };
 }

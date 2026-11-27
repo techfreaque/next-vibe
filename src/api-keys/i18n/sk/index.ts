@@ -52,14 +52,13 @@ export const translations: typeof enTranslations = {
     revoking: "Platnosť sa ruší…",
     revokeFailed: "Platnosť kľúča sa nepodarilo zrušiť. Skús znova.",
     maskedKey: "{{prefix}}…",
-    meta: "{{lastUsed}} · Vytvorené {{created}} · {{rate}}",
-    rateLimit: "{{n}} pož./min",
+    meta: "{{lastUsed}} · Vytvorené {{created}}",
     uncensoredLabel: "Povoliť modely bez cenzúry pre moje kľúče",
     uncensoredHint:
       "Mám aspoň 18 rokov a beriem na vedomie, že modely bez cenzúry môžu vytvárať urážlivý, nepravdivý, nebezpečný, nezákonný alebo škodlivý obsah bez filtrovania. Zodpovedám za jeho použitie. Bez potvrdenia vrátia ID modelov bez cenzúry HTTP 403.",
     uncensoredFailed: "Uloženie zlyhalo. Skús znova.",
     billingNote:
-      "Ak nemáš kredity, API vráti HTTP 402. Streamovanie funguje vo všetkých koncových bodoch.",
+      "Bez pevného limitu požiadaviek. Platíš za každé volanie zo svojich kreditov, s veľkorysou ochranou proti zneužitiu. Ak nemáš kredity, API vráti HTTP 402. Streamovanie funguje vo všetkých koncových bodoch.",
   },
 
   codingTools: {

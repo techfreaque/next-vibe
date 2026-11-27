@@ -12,7 +12,7 @@ export const translations = {
     planItem: "{{name}} {{price}} a month for {{credits}} credits",
     credit:
       "1 credit = {{creditValue}}. Every model page lists its price per message.",
-    api: "API: OpenAI chat completions, OpenAI Responses and Anthropic Messages formats on one base URL ({{apiBaseUrl}}). The same key calls {{mediaCount}} media models through OpenAI-format endpoints: /v1/images/generations, /v1/images/edits, /v1/audio/speech, /v1/audio/transcriptions, /v1/audio/translations, /v1/videos, /v1/music (video and music run as async jobs). It needs a paid account: any plan, from {{subPrice}} a month. Free accounts get HTTP 402.",
+    api: "API: OpenAI chat completions, OpenAI Responses and Anthropic Messages formats on one base URL ({{apiBaseUrl}}). The same key calls {{mediaCount}} media models through OpenAI-format endpoints: /v1/images/generations, /v1/images/edits, /v1/audio/speech, /v1/audio/transcriptions, /v1/audio/translations, /v1/videos, /v1/music (video and music run as async jobs). It needs a paid account: any plan, from {{subPrice}} a month. Free accounts get HTTP 402. No fixed rate limit: usage is billed per request from your credits, with generous abuse protection.",
     uncensored:
       "Uncensored tier: two kinds of models. Abliterated models are mainstream models changed so they stop dodging questions. Truly uncensored models like UncensoredLM are trained on books and documents banned from the mainstream internet, which gives them contrary political opinions. The uncensored tier needs a one-time 18+ confirmation.",
     openSource:

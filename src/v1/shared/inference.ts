@@ -40,6 +40,8 @@ import type { ToolExecutionContext } from "next-vibe/core/execution-context";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import type { z } from "zod";
 
+import { extractUpstreamRateLimit, type UpstreamRateLimit } from "./errors";
+
 /** A client-defined function tool: the model may call it, the CLIENT runs it. */
 export interface InferenceTool {
   name: string;
@@ -131,7 +133,7 @@ export type InferenceStreamEvent =
   | { type: "tool-call-delta"; id: string; argumentsDelta: string }
   /** the call's arguments are complete */
   | { type: "tool-call-end"; id: string }
-  | { type: "error"; message: string }
+  | { type: "error"; message: string; upstreamRateLimit?: UpstreamRateLimit }
   | {
       type: "finish";
       finishReason: OpenAiFinishReason;
@@ -456,13 +458,18 @@ export const aiSdkRunner: InferenceRunner = {
           yield { type: "tool-call-end", id: part.toolCallId };
         }
       } else if (part.type === "error") {
-        // Surface provider errors to the caller (becomes an SSE error + billing of what ran).
+        // Surface provider errors to the caller (becomes an HTTP 429 on
+        // immediate rate limits, or an SSE error + billing of what ran).
+        const upstreamRateLimit = extractUpstreamRateLimit(
+          part.error instanceof Error ? part.error : undefined,
+        );
         yield {
           type: "error",
           message:
             part.error instanceof Error
               ? part.error.message
               : String(part.error),
+          ...(upstreamRateLimit ? { upstreamRateLimit } : {}),
         };
         return;
       } else if (part.type === "finish-step") {

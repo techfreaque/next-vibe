@@ -53,7 +53,7 @@ export const translations = {
       models: "{{modelCount}} chat models",
       formats: "OpenAI + Anthropic format",
       streaming: "Streaming and tool calls",
-      rate: "{{rate}} requests per minute per key",
+      rate: "No fixed rate limit",
     },
   },
   code: {
@@ -243,7 +243,7 @@ export const translations = {
   },
   limits: {
     title: "Rate limits",
-    body: "Each key allows {{rate}} requests per minute by default. Over the limit you get HTTP 429 with a `Retry-After` header in seconds. Back off for that long and retry. Limits are per key, so split heavy workloads across keys.",
+    body: "No fixed rate limit for paying accounts. Usage is billed per request from your credits, and calls stop with HTTP 402 when you run out. Generous abuse protection applies (a high burst ceiling and a concurrent stream cap) so runaway loops cannot overload the service. Upstream provider 429s pass through with their `Retry-After` header. If you get HTTP 429, back off for `Retry-After` seconds and retry.",
   },
   errors: {
     title: "Errors and rate limits",
@@ -268,7 +268,7 @@ export const translations = {
         "The media provider refused the prompt. Nothing is charged. Rephrase or pick another model.",
       consent:
         "Uncensored models need a one-time 18+ confirmation on your account. Confirm it once on the API keys page, then retry.",
-      rate: "Over {{rate}} requests per minute for this key. Read `Retry-After`.",
+      rate: "Abuse protection triggered (burst or concurrent streams) or upstream provider 429. Read `Retry-After` and retry.",
       upstream:
         "The model provider failed. Safe to retry. Streams end with an error event.",
       balance: "We could not read your balance, so nothing ran. Retry.",
@@ -393,7 +393,7 @@ export const translations = {
     },
     poll: {
       title: "Poll and download",
-      body: "`GET /v1/videos/{id}` returns status (queued, `in_progress`, completed, failed), progress and, when done, a signed url. Polling is free and skips the rate limit. `GET /v1/videos/{id}/content` streams the MP4.",
+      body: "`GET /v1/videos/{id}` returns status (queued, `in_progress`, completed, failed), progress and, when done, a signed url. Polling is free and skips abuse limits. `GET /v1/videos/{id}/content` streams the MP4.",
     },
     points: {
       image:

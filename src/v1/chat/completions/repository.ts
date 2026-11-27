@@ -30,7 +30,7 @@ import {
   type V1StreamEncoder,
   type V1Totals,
 } from "../../shared/execution";
-import { gateApiKeyRequest } from "../../shared/gate";
+import { acquireV1StreamSlot, gateApiKeyRequest } from "../../shared/gate";
 import {
   aiSdkRunner,
   type InferenceRunner,
@@ -336,6 +336,10 @@ export class V1ChatCompletionsRepository {
     const { call } = prepared;
 
     if (data.stream === true) {
+      const slot = acquireV1StreamSlot(gate.key.id, t);
+      if (!slot.ok) {
+        return openAiErrorResponse(slot.error);
+      }
       return runV1Stream(
         call,
         runner,
@@ -343,6 +347,11 @@ export class V1ChatCompletionsRepository {
           call.model.id,
           data.stream_options?.include_usage === true,
         ),
+        {
+          renderError: openAiErrorResponse,
+          t,
+          onDone: slot.release,
+        },
       );
     }
 
@@ -484,8 +493,14 @@ function chatCompletionEncoder(
       }
       return `${out}data: [DONE]\n\n`;
     },
-    fail: (message) =>
-      `data: ${JSON.stringify(openAiErrorBody(message, "server_error", "upstream_error"))}\n\ndata: [DONE]\n\n`,
+    fail: (message, rateLimit) =>
+      `data: ${JSON.stringify(
+        openAiErrorBody(
+          message,
+          rateLimit ? "rate_limit_error" : "server_error",
+          rateLimit ? "rate_limit_exceeded" : "upstream_error",
+        ),
+      )}\n\ndata: [DONE]\n\n`,
     heartbeat: () => ": keepalive\n\n",
   };
 }

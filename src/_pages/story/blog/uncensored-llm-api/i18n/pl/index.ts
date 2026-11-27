@@ -77,7 +77,7 @@ export const translations: typeof enTranslations = {
       "Bezstanowo. Nie przechowujemy rozmowy. Za każdym razem wysyłaj pełną historię.",
     maxTokens: "Odpowiedź ma limit {{maxTokens}} tokenów na zapytanie.",
     rateLimit:
-      "Domyślnie {{rateLimit}} zapytań na minutę na klucz. Powyżej dostajesz 429 z nagłówkiem Retry-After.",
+      "Brak sztywnego limitu zapytań. Rozliczenie za każde wywołanie z Twoich kredytów i wysoka ochrona przed nadużyciami. Odpowiedzi 429 od dostawcy modelu przekazujemy dalej z nagłówkiem Retry-After.",
     tools:
       "Wywołania narzędzi działają tylko w modelach, które je obsługują. Tabela pokazuje które. W innym razie dostajesz 400 tools_not_supported.",
     refusals:
