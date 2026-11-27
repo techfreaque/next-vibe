@@ -254,6 +254,7 @@ export function TanstackPage({
           <ArticleList
             items={[
               t("account.credits", stats),
+              t("account.newsletter", stats),
               t("account.sync"),
               t("account.control"),
               t("account.plans", stats),

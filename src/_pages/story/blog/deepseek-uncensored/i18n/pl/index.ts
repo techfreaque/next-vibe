@@ -114,7 +114,7 @@ export const translations: typeof enTranslations = {
     },
     free: {
       q: "Czy mogę wypróbować za darmo?",
-      a: "Tak. {{guestCredits}} darmowych kredytów miesięcznie bez konta, {{freeCredits}} z darmowym kontem. Starczy na sporo wiadomości z tańszymi buildami.",
+      a: "Tak. {{guestCredits}} darmowych kredytów miesięcznie bez konta, {{freeCredits}} z darmowym kontem, {{maxCredits}} z newsletterem. Starczy na sporo wiadomości z tańszymi buildami.",
     },
     directoryLink: "Wszystkie modele abliterowane, z kontekstem i ceną",
     bestLink: "Najlepszy LLM bez cenzury, według zadania",

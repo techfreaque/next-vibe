@@ -84,7 +84,7 @@ export const translations = {
     privacy:
       "Privacy: incognito chats stay in your browser's local storage, no account needed. Private chats are saved to your account only.",
     price:
-      "Price: {{guestCredits}} free credits a month without an account, {{freeCredits}} with one. Plans from {{subPrice}} a month. Uncensored models unlock after a one-time 18+ confirmation.",
+      "Price: {{guestCredits}} free credits a month without an account, {{freeCredits}} with one, {{maxCredits}} with the newsletter. Plans from {{subPrice}} a month. Uncensored models unlock after a one-time 18+ confirmation.",
     api: "API: the same models over OpenAI and Anthropic compatible endpoints. Any plan from {{apiSubPrice}} a month unlocks it.",
     weak: "Where we are weaker: no flat plan, every message costs credits by model, and Gab lists {{gabModels}} models where we run {{modelCount}}. Gab's credit packs work without a plan; ours top up an active plan and never expire.",
     hubLink: "Uncensored AI chat: all models, with context and price",
@@ -126,7 +126,7 @@ export const translations = {
     },
     free: {
       q: "Is there a free Gab AI alternative?",
-      a: "Yes. FreedomGPT starts free with no account, LM Studio is free on your own hardware. {{appName}} gives {{guestCredits}} free credits a month without an account and {{freeCredits}} with one, uncensored models included after a one-time 18+ confirmation.",
+      a: "Yes. FreedomGPT starts free with no account, LM Studio is free on your own hardware. {{appName}} gives {{guestCredits}} free credits a month without an account and {{freeCredits}} with one, {{maxCredits}} with the newsletter, uncensored models included after a one-time 18+ confirmation.",
     },
     arya: {
       q: "Can I use Gab's Arya outside Gab AI?",

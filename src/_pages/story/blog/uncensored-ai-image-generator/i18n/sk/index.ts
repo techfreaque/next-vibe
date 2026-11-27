@@ -136,7 +136,7 @@ export const translations: typeof enTranslations = {
       "Najlacnejší je teraz {{cheapestName}} za {{cheapestPrice}}. Z necenzurovaných je najlacnejší {{uncensoredName}} za {{uncensoredPrice}}. Najdrahší je {{priciestName}} za {{priciestPrice}}.",
     failed:
       "Kredity odpočítame až po doručení obrázka. Pri chybe či odmietnutí zadania poskytovateľom neplatíš.",
-    free: "Zdarma máš mesačne {{guestCredits}} kred. bez účtu alebo {{freeCredits}} s bezplatným účtom. Pri {{uncensoredName}} to stačí na {{freeUncensoredImages}} bezplatných obrázkov za mesiac.",
+    free: "Zdarma máš mesačne {{guestCredits}} kred. bez účtu alebo {{freeCredits}} s bezplatným účtom, {{maxCredits}} pri odbere noviniek. Pri {{uncensoredName}} to stačí na {{freeUncensoredImages}} bezplatných obrázkov za mesiac.",
     sub: "Mesačné predplatné má štyri úrovne. Najnižšia zahŕňa {{subCredits}} kred. za {{subPrice}}.",
     pack: "Balíky pre predplatiteľov: {{packCredits}} kred. za {{packPrice}}. Kredity nevypršia. Zaplatíš kartou, cez PayPal alebo kryptomenou.",
     link: "Pozrieť si plány a balíky kreditov",
@@ -164,7 +164,7 @@ export const translations: typeof enTranslations = {
     },
     free: {
       q: "Existuje bezplatný necenzurovaný generátor obrázkov?",
-      a: "Začať môžeš zdarma. Mesačne dostaneš {{guestCredits}} kred. bez registrácie alebo {{freeCredits}} s bezplatným účtom. Pri {{uncensoredName}} stojí obrázok {{uncensoredCredits}} kred. Ďalšie kredity ponúka predplatné od {{subPrice}} mesačne.",
+      a: "Začať môžeš zdarma. Mesačne dostaneš {{guestCredits}} kred. bez registrácie alebo {{freeCredits}} s bezplatným účtom, {{maxCredits}} pri odbere noviniek. Pri {{uncensoredName}} stojí obrázok {{uncensoredCredits}} kred. Ďalšie kredity ponúka predplatné od {{subPrice}} mesačne.",
     },
     cheapest: {
       q: "Ktorý generátor obrázkov s AI je najlacnejší?",

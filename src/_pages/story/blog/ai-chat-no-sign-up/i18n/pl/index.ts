@@ -98,6 +98,8 @@ export const translations: typeof enTranslations = {
     intro: "Nigdy nie jest wymagane. Czasem się przydaje.",
     credits:
       "Do {{freeCredits}} darmowych kredytów miesięcznie z potwierdzonym mailem, zamiast {{guestCredits}}.",
+    newsletter:
+      "Potwierdź newsletter, a miesięczna pula rośnie do {{maxCredits}} kredytów: {{newsletterBonus}} kredytów bonusu na wierzchu.",
     sync: "Czaty zapisane w twoich prywatnych folderach, na każdym urządzeniu, na którym się zalogujesz.",
     control:
       "Wyeksportuj wszystkie swoje dane jako JSON albo usuń konto w Ustawieniach. Usunięcie kasuje twoje dane osobowe.",

@@ -126,7 +126,7 @@ export const translations: typeof enTranslations = {
     },
     free: {
       q: "Posso confrontare i modelli gratis?",
-      a: "Sì. Ricevi {{guestCredits}} crediti gratuiti al mese senza account e {{freeCredits}} con un account gratuito. Cambiare modello in una chat non costa nulla in più.",
+      a: "Sì. Ricevi {{guestCredits}} crediti gratuiti al mese senza account e {{freeCredits}} con un account gratuito, {{maxCredits}} con la newsletter. Cambiare modello in una chat non costa nulla in più.",
     },
     refusalLink: "L'indice dei rifiuti: quale IA risponde davvero",
     jailbreakLink:

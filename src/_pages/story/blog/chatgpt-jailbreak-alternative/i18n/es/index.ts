@@ -132,7 +132,7 @@ export const translations: typeof enTranslations = {
     },
     free: {
       q: "¿Puedo probar gratis un modelo sin censura?",
-      a: "Sí. {{appName}} da {{guestCredits}} créditos gratis al mes sin cuenta y {{freeCredits}} con una cuenta gratuita. Cuántos mensajes son depende del modelo y de la longitud del chat.",
+      a: "Sí. {{appName}} da {{guestCredits}} créditos gratis al mes sin cuenta y {{freeCredits}} con una cuenta gratuita, {{maxCredits}} con el boletín. Cuántos mensajes son depende del modelo y de la longitud del chat.",
     },
     alternativeLink: "Una alternativa a ChatGPT sin filtros: nuestra selección",
     refusalLink: "¿Qué IA responde de verdad? El índice de negativas",

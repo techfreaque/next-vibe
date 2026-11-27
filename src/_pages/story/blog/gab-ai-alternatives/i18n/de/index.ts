@@ -88,7 +88,7 @@ export const translations: typeof enTranslations = {
     privacy:
       "Datenschutz: Inkognito-Chats bleiben im lokalen Speicher deines Browsers, ohne Konto. Private Chats werden nur in deinem Konto gespeichert.",
     price:
-      "Preis: {{guestCredits}} Gratis-Credits im Monat ohne Konto, {{freeCredits}} mit Konto. Tarife ab {{subPrice}} im Monat. Unzensierte Modelle werden nach einer einmaligen 18+-Bestätigung freigeschaltet.",
+      "Preis: {{guestCredits}} Gratis-Credits im Monat ohne Konto, {{freeCredits}} mit Konto, {{maxCredits}} mit Newsletter. Tarife ab {{subPrice}} im Monat. Unzensierte Modelle werden nach einer einmaligen 18+-Bestätigung freigeschaltet.",
     api: "API: dieselben Modelle über OpenAI- und Anthropic-kompatible Endpunkte. Jeder Tarif ab {{apiSubPrice}} im Monat schaltet sie frei.",
     weak: "Wo wir schwächer sind: kein Pauschaltarif, jede Nachricht kostet Credits je nach Modell, und Gab listet {{gabModels}} Modelle, wir betreiben {{modelCount}}. Gabs Credit-Pakete funktionieren ohne Abo; unsere stocken einen aktiven Tarif auf und verfallen nie.",
     hubLink: "Unzensierter KI-Chat: alle Modelle mit Kontext und Preis",
@@ -130,7 +130,7 @@ export const translations: typeof enTranslations = {
     },
     free: {
       q: "Gibt es eine kostenlose Gab AI Alternative?",
-      a: "Ja. FreedomGPT startet kostenlos ohne Konto, LM Studio ist auf eigener Hardware gratis. {{appName}} gibt {{guestCredits}} Gratis-Credits im Monat ohne Konto und {{freeCredits}} mit Konto, unzensierte Modelle inklusive nach einer einmaligen 18+-Bestätigung.",
+      a: "Ja. FreedomGPT startet kostenlos ohne Konto, LM Studio ist auf eigener Hardware gratis. {{appName}} gibt {{guestCredits}} Gratis-Credits im Monat ohne Konto und {{freeCredits}} mit Konto, {{maxCredits}} mit Newsletter, unzensierte Modelle inklusive nach einer einmaligen 18+-Bestätigung.",
     },
     arya: {
       q: "Kann ich Gabs Arya außerhalb von Gab AI nutzen?",

@@ -66,7 +66,7 @@ export const translations = {
     privacy:
       "Privacy: incognito chats stay in your browser's local storage, no account needed.",
     price:
-      "Price: {{guestCredits}} free credits a month without an account, {{freeCredits}} with one. Plans: {{planList}}. One balance for every model.",
+      "Price: {{guestCredits}} free credits a month without an account, {{freeCredits}} with one, {{maxCredits}} with the newsletter. Plans: {{planList}}. One balance for every model.",
     api: "API: OpenAI and Anthropic compatible endpoints, so you can still point SillyTavern at our models. Any purchase unlocks it.",
     weak: "Where SillyTavern wins: total control over prompts, presets and extensions, group chats, lorebooks and card import. Ours is open source too, but it is a platform, not a roleplay toolkit.",
     ownLink: "See {{ownModel}}",
@@ -103,7 +103,7 @@ export const translations = {
     },
     free: {
       q: "Is there a free SillyTavern alternative?",
-      a: "RisuAI, Agnaistic, KoboldCpp and Talemate are free software. You still pay the model unless you run it on your own hardware. {{appName}} gives {{guestCredits}} free credits a month without an account and {{freeCredits}} with one, models included.",
+      a: "RisuAI, Agnaistic, KoboldCpp and Talemate are free software. You still pay the model unless you run it on your own hardware. {{appName}} gives {{guestCredits}} free credits a month without an account and {{freeCredits}} with one, {{maxCredits}} with the newsletter, models included.",
     },
     filter: {
       q: "Which alternatives allow uncensored roleplay?",

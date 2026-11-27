@@ -87,7 +87,7 @@ export const translations: typeof enTranslations = {
     privacy:
       "Privacy: le chat in incognito restano nella memoria locale del browser, senza account. Le chat private si salvano solo nel tuo account.",
     price:
-      "Prezzo: {{guestCredits}} crediti gratis al mese senza account, {{freeCredits}} con un account. Piani da {{subPrice}} al mese. I modelli senza censura si sbloccano dopo una conferma unica dei 18 anni.",
+      "Prezzo: {{guestCredits}} crediti gratis al mese senza account, {{freeCredits}} con un account, {{maxCredits}} con la newsletter. Piani da {{subPrice}} al mese. I modelli senza censura si sbloccano dopo una conferma unica dei 18 anni.",
     api: "API: gli stessi modelli tramite endpoint compatibili con OpenAI e Anthropic. Qualsiasi piano da {{apiSubPrice}} al mese la sblocca.",
     weak: "Dove siamo più deboli: niente piano forfettario, ogni messaggio costa crediti in base al modello, e Gab elenca {{gabModels}} modelli dove noi ne facciamo girare {{modelCount}}. I pacchetti di Gab funzionano senza piano; i nostri ricaricano un piano attivo e non scadono mai.",
     hubLink: "Chat AI senza censura: tutti i modelli con contesto e prezzo",
@@ -129,7 +129,7 @@ export const translations: typeof enTranslations = {
     },
     free: {
       q: "Esiste un'alternativa gratuita a Gab AI?",
-      a: "Sì. FreedomGPT parte gratis senza account, LM Studio è gratis sul tuo hardware. {{appName}} dà {{guestCredits}} crediti gratis al mese senza account e {{freeCredits}} con un account, modelli senza censura inclusi dopo una conferma unica dei 18 anni.",
+      a: "Sì. FreedomGPT parte gratis senza account, LM Studio è gratis sul tuo hardware. {{appName}} dà {{guestCredits}} crediti gratis al mese senza account e {{freeCredits}} con un account, {{maxCredits}} con la newsletter, modelli senza censura inclusi dopo una conferma unica dei 18 anni.",
     },
     arya: {
       q: "Posso usare Arya fuori da Gab AI?",

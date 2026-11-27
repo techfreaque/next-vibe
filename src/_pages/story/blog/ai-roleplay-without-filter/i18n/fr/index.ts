@@ -142,7 +142,7 @@ export const translations: typeof enTranslations = {
       "Chaque réponse coûte des crédits selon le modèle et la longueur de la scène. Le tableau montre une longue scène. 1 crédit = {{creditValue}}.",
     cheapest:
       "Réponse la moins chère : {{cheapestName}} à {{cheapestPrice}}, environ {{cheapestPerUnit}} réponses pour {{unit}}. Non censuré le moins cher : {{uncensoredName}} à {{uncensoredPrice}}, environ {{uncensoredPerUnit}} réponses pour {{unit}}.",
-    free: "Gratuit : {{guestCredits}} crédits par mois sans compte, {{freeCredits}} avec un compte gratuit. De quoi mener une longue première campagne sur un modèle bon marché.",
+    free: "Gratuit : {{guestCredits}} crédits par mois sans compte, {{freeCredits}} avec un compte gratuit, {{maxCredits}} avec la newsletter. De quoi mener une longue première campagne sur un modèle bon marché.",
     sub: "Formules mensuelles : quatre tailles, dès {{subCredits}} crédits pour {{subPrice}}.",
     pack: "Packs de crédits : une recharge pour les abonnés, {{packCredits}} crédits pour {{packPrice}}. Ils n'expirent jamais. Carte, PayPal ou crypto.",
     link: "Voir les abonnements et les packs",
@@ -167,7 +167,7 @@ export const translations: typeof enTranslations = {
     },
     free: {
       q: "Le jeu de rôle IA sans filtre est-il gratuit ?",
-      a: "Vous pouvez commencer gratuitement : {{guestCredits}} crédits par mois sans compte, {{freeCredits}} avec un compte gratuit. Une réponse sur {{uncensoredName}} coûte environ {{uncensoredCredits}} crédits dans une longue scène. Ensuite : une formule, dès {{subPrice}} par mois.",
+      a: "Vous pouvez commencer gratuitement : {{guestCredits}} crédits par mois sans compte, {{freeCredits}} avec un compte gratuit, {{maxCredits}} avec la newsletter. Une réponse sur {{uncensoredName}} coûte environ {{uncensoredCredits}} crédits dans une longue scène. Ensuite : une formule, dès {{subPrice}} par mois.",
     },
     nsfw: {
       q: "Le roleplay NSFW est-il possible ?",

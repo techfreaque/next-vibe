@@ -70,7 +70,7 @@ export const translations: typeof enTranslations = {
     privacy:
       "Súkromie: Anonymné čety zostávajú v lokálnom úložisku prehliadača bez účtu. Súkromné čety sa ukladajú len do tvojho účtu.",
     price:
-      "Cena: {{guestCredits}} kred. zadarmo mesačne bez účtu alebo {{freeCredits}} s účtom. Plány: {{planList}}. Všetky modely používajú jeden zostatok bez samostatných prémiových kreditov.",
+      "Cena: {{guestCredits}} kred. zadarmo mesačne bez účtu alebo {{freeCredits}} s účtom, {{maxCredits}} pri odbere noviniek. Plány: {{planList}}. Všetky modely používajú jeden zostatok bez samostatných prémiových kreditov.",
     api: "API: Rovnaké modely cez koncové body kompatibilné s OpenAI aj Anthropicom. Prístup odomkne každý platený nákup.",
     weak: "Kde CrushOn vedie: Má veľkú knižnicu hotových postáv pre dospelých a čet postavený výhradne na nich. My sme všeobecná platforma so zručnosťou na hranie rolí.",
     ownLink: "Pozrieť si {{ownModel}}",
@@ -106,7 +106,7 @@ export const translations: typeof enTranslations = {
     },
     free: {
       q: "Existuje bezplatná alternatíva k CrushOn AI?",
-      a: "Janitor AI ponúka neobmedzený čet na štandardnom modeli. Perchance je zadarmo v prehliadači. SillyTavern je zadarmo s lokálnym modelom. {{appName}} dáva mesačne {{guestCredits}} kred. bez účtu alebo {{freeCredits}} s účtom.",
+      a: "Janitor AI ponúka neobmedzený čet na štandardnom modeli. Perchance je zadarmo v prehliadači. SillyTavern je zadarmo s lokálnym modelom. {{appName}} dáva mesačne {{guestCredits}} kred. bez účtu alebo {{freeCredits}} s účtom, {{maxCredits}} pri odbere noviniek.",
     },
     filter: {
       q: "Ktoré alternatívy povoľujú čet pre dospelých?",

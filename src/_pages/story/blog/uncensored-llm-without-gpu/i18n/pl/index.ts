@@ -114,7 +114,7 @@ export const translations: typeof enTranslations = {
     title: "Ile to kosztuje: lokalnie kontra online",
     intro: "Lokalnie nie ma ceny za wiadomość. Ceną jest sprzęt.",
     guest:
-      "Online u nas: {{guestCredits}} darmowych kredytów miesięcznie bez konta, {{freeCredits}} z darmowym kontem.",
+      "Online u nas: {{guestCredits}} darmowych kredytów miesięcznie bez konta, {{freeCredits}} z darmowym kontem, {{maxCredits}} z newsletterem.",
     plan: "Plany od {{subPrice}} miesięcznie. Pakiety kredytów doładowują aktywny plan i nigdy nie wygasają.",
     local:
       "Lokalnie: za darmo za wiadomość, ale GPU do dużych modeli kosztuje więcej niż lata hostowanych rozmów. Do tego prąd.",
@@ -133,7 +133,7 @@ export const translations: typeof enTranslations = {
     },
     free: {
       q: "Czy jest darmowy nieocenzurowany LLM online?",
-      a: "Na {{appName}} dostajesz {{guestCredits}} darmowych kredytów miesięcznie bez konta i {{freeCredits}} z darmowym kontem. Ile to wiadomości, zależy od modelu i długości rozmowy. Nieocenzurowane modele wymagają jednorazowego potwierdzenia 18+.",
+      a: "Na {{appName}} dostajesz {{guestCredits}} darmowych kredytów miesięcznie bez konta i {{freeCredits}} z darmowym kontem, {{maxCredits}} z newsletterem. Ile to wiadomości, zależy od modelu i długości rozmowy. Nieocenzurowane modele wymagają jednorazowego potwierdzenia 18+.",
     },
     vram: {
       q: "Ile VRAM potrzebuję, żeby uruchomić nieocenzurowany model lokalnie?",

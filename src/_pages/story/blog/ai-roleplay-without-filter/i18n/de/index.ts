@@ -143,7 +143,7 @@ export const translations: typeof enTranslations = {
       "Jede Antwort kostet Credits, abhängig von Modell und Länge der Szene. Die Tabelle zeigt eine lange Szene. 1 Credit = {{creditValue}}.",
     cheapest:
       "Günstigste Antwort: {{cheapestName}} für {{cheapestPrice}}, rund {{cheapestPerUnit}} Antworten für {{unit}}. Günstigstes unzensiertes Modell: {{uncensoredName}} für {{uncensoredPrice}}, rund {{uncensoredPerUnit}} Antworten für {{unit}}.",
-    free: "Kostenlos: {{guestCredits}} Credits im Monat ohne Konto, {{freeCredits}} mit kostenlosem Konto. Reicht für eine lange erste Kampagne auf einem günstigen Modell.",
+    free: "Kostenlos: {{guestCredits}} Credits im Monat ohne Konto, {{freeCredits}} mit kostenlosem Konto, {{maxCredits}} mit Newsletter. Reicht für eine lange erste Kampagne auf einem günstigen Modell.",
     sub: "Monatstarife: vier Größen, ab {{subCredits}} Credits für {{subPrice}}.",
     pack: "Credit-Pakete: Aufstockung für Abonnenten, {{packCredits}} Credits für {{packPrice}}. Sie verfallen nie. Karte, PayPal oder Krypto.",
     link: "Abos und Credit-Pakete ansehen",
@@ -168,7 +168,7 @@ export const translations: typeof enTranslations = {
     },
     free: {
       q: "Ist KI-Rollenspiel ohne Filter kostenlos?",
-      a: "Der Einstieg ist kostenlos: {{guestCredits}} Credits im Monat ohne Konto, {{freeCredits}} mit kostenlosem Konto. Eine Antwort auf {{uncensoredName}} kostet in einer langen Szene rund {{uncensoredCredits}} Credits. Danach: ein Tarif, ab {{subPrice}} im Monat.",
+      a: "Der Einstieg ist kostenlos: {{guestCredits}} Credits im Monat ohne Konto, {{freeCredits}} mit kostenlosem Konto, {{maxCredits}} mit Newsletter. Eine Antwort auf {{uncensoredName}} kostet in einer langen Szene rund {{uncensoredCredits}} Credits. Danach: ein Tarif, ab {{subPrice}} im Monat.",
     },
     nsfw: {
       q: "Geht NSFW-Rollenspiel?",

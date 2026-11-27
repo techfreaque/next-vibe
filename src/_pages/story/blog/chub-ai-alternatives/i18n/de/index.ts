@@ -68,7 +68,7 @@ export const translations: typeof enTranslations = {
     privacy:
       "Datenschutz: Inkognito-Chats bleiben im lokalen Speicher Ihres Browsers, kein Konto nötig.",
     price:
-      "Preis: {{guestCredits}} Gratis-Credits im Monat ohne Konto, {{freeCredits}} mit Konto. Abos: {{planList}}, bezahlt per Karte oder Krypto. Credit-Pakete stocken ein aktives Abo auf.",
+      "Preis: {{guestCredits}} Gratis-Credits im Monat ohne Konto, {{freeCredits}} mit Konto, {{maxCredits}} mit Newsletter. Abos: {{planList}}, bezahlt per Karte oder Krypto. Credit-Pakete stocken ein aktives Abo auf.",
     api: "API: dieselben Modelle über OpenAI- und Anthropic-kompatible Endpunkte. Jeder Kauf schaltet sie frei.",
     weak: "Wo Chub gewinnt: Die Kartenbibliothek ist weit größer, und es gibt Lorebooks mit Stichwort-Triggern. Einen Import für Chub-Karten haben wir noch nicht, Sie fügen die Beschreibung der Figur in einen neuen Skill ein.",
     ownLink: "{{ownModel}} ansehen",
@@ -105,7 +105,7 @@ export const translations: typeof enTranslations = {
     },
     free: {
       q: "Gibt es eine kostenlose Alternative zu Chub AI?",
-      a: "Ja. Perchance und Character Tavern sind im Browser gratis. SillyTavern, RisuAI und KoboldCpp sind freie Software: Sie zahlen nur das Modell oder betreiben es lokal. {{appName}} gibt {{guestCredits}} Gratis-Credits im Monat ohne Konto und {{freeCredits}} mit Konto.",
+      a: "Ja. Perchance und Character Tavern sind im Browser gratis. SillyTavern, RisuAI und KoboldCpp sind freie Software: Sie zahlen nur das Modell oder betreiben es lokal. {{appName}} gibt {{guestCredits}} Gratis-Credits im Monat ohne Konto und {{freeCredits}} mit Konto, {{maxCredits}} mit Newsletter.",
     },
     filter: {
       q: "Welche Chub-Alternativen erlauben NSFW-Rollenspiel?",

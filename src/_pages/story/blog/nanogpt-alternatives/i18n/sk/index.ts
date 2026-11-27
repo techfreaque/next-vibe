@@ -69,7 +69,7 @@ export const translations: typeof enTranslations = {
     privacy:
       "Súkromie: Čety v anonymnom režime zostávajú v lokálnom úložisku prehliadača. Účet nepotrebuješ.",
     price:
-      "Cena: Mesačne {{guestCredits}} kred. bez účtu alebo {{freeCredits}} s účtom. Plány: {{planList}}. K aktívnemu plánu si dokúpiš kredity, ktoré nevypršia.",
+      "Cena: Mesačne {{guestCredits}} kred. bez účtu alebo {{freeCredits}} s účtom, {{maxCredits}} pri odbere noviniek. Plány: {{planList}}. K aktívnemu plánu si dokúpiš kredity, ktoré nevypršia.",
     api: "API: Koncové body kompatibilné s OpenAI aj Anthropicom. Odomkne ich každý platený nákup.",
     weak: "Kde má NanoGPT navrch: Má oveľa viac modelov a väčšinu účtuje za cenníkové ceny. My pripočítavame {{markup}} % a balíky kreditov si môžeš dokúpiť s aktívnym plánom.",
     ownLink: "Pozrieť si {{ownModel}}",
@@ -107,7 +107,7 @@ export const translations: typeof enTranslations = {
     },
     free: {
       q: "Existuje bezplatná alternatíva k NanoGPT?",
-      a: "OpenRouter má denné limity pre bezplatné modely. LM Studio aj Ollama sú na vlastnom zariadení zadarmo. {{appName}} dáva mesačne {{guestCredits}} kred. zadarmo bez účtu alebo {{freeCredits}} s účtom.",
+      a: "OpenRouter má denné limity pre bezplatné modely. LM Studio aj Ollama sú na vlastnom zariadení zadarmo. {{appName}} dáva mesačne {{guestCredits}} kred. zadarmo bez účtu alebo {{freeCredits}} s účtom, {{maxCredits}} pri odbere noviniek.",
     },
     filter: {
       q: "Ktoré alternatívy majú modely bez cenzúry?",

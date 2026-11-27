@@ -66,7 +66,7 @@ export const translations: typeof enTranslations = {
     privacy:
       "Prywatność: czaty incognito zostają w pamięci lokalnej twojej przeglądarki, bez konta. Czaty prywatne są zapisywane tylko na twoim koncie.",
     price:
-      "Cena: {{guestCredits}} darmowych kredytów miesięcznie bez konta, {{freeCredits}} z kontem. Plany od {{subPrice}} miesięcznie. Pakiety kredytów doładowują aktywny plan i nigdy nie wygasają.",
+      "Cena: {{guestCredits}} darmowych kredytów miesięcznie bez konta, {{freeCredits}} z kontem, {{maxCredits}} z newsletterem. Plany od {{subPrice}} miesięcznie. Pakiety kredytów doładowują aktywny plan i nigdy nie wygasają.",
     api: "API: te same modele przez endpointy zgodne z OpenAI i Anthropic. Odblokowuje je każdy plan od {{apiSubPrice}} miesięcznie.",
     weak: "Gdzie jesteśmy słabsi: brak planu bez limitu. Każda wiadomość kosztuje kredyty, a cena zależy od wybranego modelu.",
     hubLink: "Czat AI bez cenzury: wszystkie modele z kontekstem i ceną",
@@ -107,7 +107,7 @@ export const translations: typeof enTranslations = {
     },
     free: {
       q: "Czy jest darmowa alternatywa dla NoFilterGPT?",
-      a: "Tak. FreedomGPT startuje za darmo bez konta. LM Studio jest darmowe na własnym sprzęcie. {{appName}} daje {{guestCredits}} darmowych kredytów miesięcznie bez konta i {{freeCredits}} z kontem, modele bez cenzury w cenie po jednorazowym potwierdzeniu 18+.",
+      a: "Tak. FreedomGPT startuje za darmo bez konta. LM Studio jest darmowe na własnym sprzęcie. {{appName}} daje {{guestCredits}} darmowych kredytów miesięcznie bez konta i {{freeCredits}} z kontem, {{maxCredits}} z newsletterem, modele bez cenzury w cenie po jednorazowym potwierdzeniu 18+.",
     },
     models: {
       q: "Jakiego modelu używa NoFilterGPT?",

@@ -68,7 +68,7 @@ export const translations: typeof enTranslations = {
     privacy:
       "Súkromie: inkognito čety ostávajú v lokálnom úložisku tvojho prehliadača aj bez účtu.",
     price:
-      "Cena: každý mesiac {{guestCredits}} kreditov zdarma bez účtu alebo {{freeCredits}} s bezplatným účtom. Plány: {{planList}}. Zaplatíš kartou alebo kryptomenou. Balíky kreditov dobíjajú aktívny plán.",
+      "Cena: každý mesiac {{guestCredits}} kreditov zdarma bez účtu alebo {{freeCredits}} s bezplatným účtom, {{maxCredits}} pri odbere noviniek. Plány: {{planList}}. Zaplatíš kartou alebo kryptomenou. Balíky kreditov dobíjajú aktívny plán.",
     api: "API: rovnaké modely cez rozhrania kompatibilné s OpenAI a Anthropic. Prístup odomkne každý nákup.",
     weak: "V čom má Chub navrch: má oveľa väčšiu knižnicu kariet a jeho lorebooky reagujú na kľúčové slová. Import kariet Chub zatiaľ nemáme. Opis postavy môžeš vložiť do novej zručnosti.",
     ownLink: "Pozrieť model {{ownModel}}",
@@ -105,7 +105,7 @@ export const translations: typeof enTranslations = {
     },
     free: {
       q: "Existuje bezplatná alternatíva k Chub AI?",
-      a: "Áno. Perchance a Character Tavern fungujú zdarma v prehliadači. SillyTavern, RisuAI a KoboldCpp sú bezplatné nástroje. Platíš len za model alebo si ho spustíš lokálne. Na {{appName}} máš každý mesiac {{guestCredits}} kreditov zdarma bez účtu alebo {{freeCredits}} s bezplatným účtom.",
+      a: "Áno. Perchance a Character Tavern fungujú zdarma v prehliadači. SillyTavern, RisuAI a KoboldCpp sú bezplatné nástroje. Platíš len za model alebo si ho spustíš lokálne. Na {{appName}} máš každý mesiac {{guestCredits}} kreditov zdarma bez účtu alebo {{freeCredits}} s bezplatným účtom, {{maxCredits}} pri odbere noviniek.",
     },
     filter: {
       q: "Ktoré alternatívy k Chub povoľujú hranie rolí pre dospelých?",

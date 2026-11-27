@@ -46,7 +46,7 @@ export const translations: typeof enTranslations = {
     skills:
       "Le mode jeu de rôle demande au modèle de rester dans son personnage et de vous laisser décider des actions du vôtre. Thea et Hermes sont deux compagnons intégrés pour des échanges suivis. Si vous aimez surtout parcourir des personnages prêts à jouer, le répertoire de Janitor est plus pratique.",
     limit:
-      "Sans compte, vous disposez de {{guestCredits}} crédits gratuits par mois, contre {{freeCredits}} avec un compte gratuit. Une longue scène avec un modèle premium peut épuiser ce solde. Si vous préférez écrire sans compter les répliques, le chat standard gratuit de Janitor convient mieux.",
+      "Sans compte, vous disposez de {{guestCredits}} crédits gratuits par mois, contre {{freeCredits}} avec un compte gratuit, {{maxCredits}} avec la newsletter. Une longue scène avec un modèle premium peut épuiser ce solde. Si vous préférez écrire sans compter les répliques, le chat standard gratuit de Janitor convient mieux.",
     link: "Découvrir le mode jeu de rôle",
   },
   list: "Quelle plateforme pour votre prochaine histoire ?",

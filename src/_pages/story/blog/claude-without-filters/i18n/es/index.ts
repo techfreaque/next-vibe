@@ -143,7 +143,7 @@ export const translations: typeof enTranslations = {
     },
     free: {
       q: "¿Puedo probarlo gratis?",
-      a: "Sí. {{guestCredits}} créditos gratis al mes sin cuenta, {{freeCredits}} con una cuenta gratuita. Modelos sin censura incluidos tras una confirmación única de mayoría de edad.",
+      a: "Sí. {{guestCredits}} créditos gratis al mes sin cuenta, {{freeCredits}} con una cuenta gratuita, {{maxCredits}} con el boletín. Modelos sin censura incluidos tras una confirmación única de mayoría de edad.",
     },
     chatLink: "Chat de IA sin censura: elige un modelo y empieza",
     roleplayLink: "Rol con IA sin filtro",

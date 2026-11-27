@@ -135,7 +135,7 @@ export const translations: typeof enTranslations = {
       "Le moins cher en ce moment : {{cheapestName}} à {{cheapestPrice}}. Le moins cher sans censure : {{uncensoredName}} à {{uncensoredPrice}}. Le plus cher : {{priciestName}} à {{priciestPrice}}.",
     failed:
       "Les crédits ne sont débités qu'une fois l'image livrée. Échec ou refus du fournisseur : vous ne payez rien.",
-    free: "Gratuit : {{guestCredits}} crédits par mois sans compte, {{freeCredits}} avec un compte gratuit. Sur {{uncensoredName}}, cela fait {{freeUncensoredImages}} images par mois sans rien payer.",
+    free: "Gratuit : {{guestCredits}} crédits par mois sans compte, {{freeCredits}} avec un compte gratuit, {{maxCredits}} avec la newsletter. Sur {{uncensoredName}}, cela fait {{freeUncensoredImages}} images par mois sans rien payer.",
     sub: "Formules mensuelles : quatre tailles, dès {{subCredits}} crédits pour {{subPrice}}.",
     pack: "Packs de crédits : une recharge pour les abonnés, {{packCredits}} crédits pour {{packPrice}}. Ils n'expirent jamais. Carte, PayPal ou crypto.",
     link: "Voir les abonnements et les packs",
@@ -163,7 +163,7 @@ export const translations: typeof enTranslations = {
     },
     free: {
       q: "Existe-t-il un générateur d'images IA sans censure gratuit ?",
-      a: "Vous pouvez commencer gratuitement. {{guestCredits}} crédits par mois sans compte, {{freeCredits}} avec un compte gratuit. {{uncensoredName}} coûte {{uncensoredCredits}} crédits par image. Ensuite : une formule, dès {{subPrice}} par mois.",
+      a: "Vous pouvez commencer gratuitement. {{guestCredits}} crédits par mois sans compte, {{freeCredits}} avec un compte gratuit, {{maxCredits}} avec la newsletter. {{uncensoredName}} coûte {{uncensoredCredits}} crédits par image. Ensuite : une formule, dès {{subPrice}} par mois.",
     },
     cheapest: {
       q: "Quel est le générateur d'images IA le moins cher ?",

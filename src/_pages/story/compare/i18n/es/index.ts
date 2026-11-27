@@ -133,7 +133,7 @@ export const translations: typeof enTranslations = {
   },
   us: {
     kind: "Un chat con modelos convencionales, abiertos y sin censura",
-    free: "Sí. {{guestCredits}} créditos al mes sin cuenta y {{freeCredits}} con cuenta.",
+    free: "Sí. {{guestCredits}} créditos al mes sin cuenta y {{freeCredits}} con cuenta, {{maxCredits}} con el boletín.",
     paid: "Desde {{subPrice}} al mes",
     filterShort:
       "Tú eliges el filtro en cada chat. Para usar los modelos sin censura, confirma una sola vez que tienes 18 años o más.",
@@ -584,7 +584,7 @@ export const translations: typeof enTranslations = {
       privacy:
         "Los chats en incógnito se guardan en el navegador y funcionan sin cuenta. Los privados se sincronizan con tu cuenta. Enviamos cada mensaje al proveedor que lo responde.",
       pricing:
-        "{{guestCredits}} créditos gratis al mes sin cuenta y {{freeCredits}} con cuenta. Planes mensuales: {{planList}}. Puedes recargar un plan activo con créditos que no caducan. Paga con tarjeta, PayPal o criptomonedas.",
+        "{{guestCredits}} créditos gratis al mes sin cuenta y {{freeCredits}} con cuenta, {{maxCredits}} con el boletín. Planes mensuales: {{planList}}. Puedes recargar un plan activo con créditos que no caducan. Paga con tarjeta, PayPal o criptomonedas.",
       api: "API compatible con OpenAI y Anthropic para chat, imágenes, video y voz. Se activa al contratar un plan (desde {{apiSubPrice}}) o comprar créditos.",
       media:
         "{{imageModels}} modelos de imagen, {{videoModels}} de video, {{musicModels}} de música y {{voiceModels}} de voz con el mismo saldo.",
@@ -1183,7 +1183,7 @@ export const translations: typeof enTranslations = {
       },
       usPros: {
         a: "{{ownModel}} y otros {{modelCount}} modelos en un solo chat: compara su respuesta con modelos convencionales y abliterados en el mismo hilo.",
-        b: "{{guestCredits}} créditos gratis al mes sin cuenta, {{freeCredits}} con cuenta.",
+        b: "{{guestCredits}} créditos gratis al mes sin cuenta, {{freeCredits}} con cuenta, {{maxCredits}} con el boletín.",
         c: "Imágenes, vídeo, música y voz en el mismo saldo, y toda la plataforma es de código abierto.",
       },
       usCons: {

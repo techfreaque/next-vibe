@@ -124,7 +124,7 @@ export const translations: typeof enTranslations = {
     },
     free: {
       q: "Czy mogę porównywać modele za darmo?",
-      a: "Tak. Dostajesz {{guestCredits}} darmowych kredytów miesięcznie bez konta i {{freeCredits}} z darmowym kontem. Zmiana modelu w czacie nic dodatkowo nie kosztuje.",
+      a: "Tak. Dostajesz {{guestCredits}} darmowych kredytów miesięcznie bez konta i {{freeCredits}} z darmowym kontem, {{maxCredits}} z newsletterem. Zmiana modelu w czacie nic dodatkowo nie kosztuje.",
     },
     refusalLink: "Indeks odmów: która AI naprawdę odpowiada",
     jailbreakLink: "Dlaczego jailbreaki ChatGPT ciągle przestają działać",

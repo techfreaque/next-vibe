@@ -75,7 +75,7 @@ export const translations: typeof enTranslations = {
     privacy:
       "Le chat incognito fonctionne sans compte. L’historique reste dans le navigateur. Le fournisseur du modèle reçoit chaque message pour y répondre.",
     price:
-      "{{guestCredits}} crédits par mois en accès invité ou {{freeCredits}} avec un compte gratuit. Abonnements à partir de {{subPrice}} par mois. L’utilisation des modèles consomme des crédits.",
+      "{{guestCredits}} crédits par mois en accès invité ou {{freeCredits}} avec un compte gratuit, {{maxCredits}} avec la newsletter. Abonnements à partir de {{subPrice}} par mois. L’utilisation des modèles consomme des crédits.",
     weak: "Character.AI et Janitor AI offrent plus de choix pour découvrir des personnages. Un forfait fixe peut aussi être plus prévisible si vous jouez beaucoup.",
     skillsLink: "Parcourir les compétences intégrées et communautaires",
     roleplayLink: "Ouvrir la compétence Jeu de rôle",
@@ -270,7 +270,7 @@ export const translations: typeof enTranslations = {
     },
     free: {
       q: "Existe-t-il une alternative gratuite à Character.AI ?",
-      a: "Janitor AI offre le chat standard sans plafond. Nomi offre 50 messages par jour. SillyTavern est gratuit et demande un modèle séparé. {{appName}} donne {{guestCredits}} crédits mensuels en accès invité ou {{freeCredits}} avec un compte gratuit.",
+      a: "Janitor AI offre le chat standard sans plafond. Nomi offre 50 messages par jour. SillyTavern est gratuit et demande un modèle séparé. {{appName}} donne {{guestCredits}} crédits mensuels en accès invité ou {{freeCredits}} avec un compte gratuit, {{maxCredits}} avec la newsletter.",
     },
     import: {
       q: "Puis-je transférer mes personnages et mes discussions Character.AI ?",

@@ -185,7 +185,7 @@ export const translations: typeof enTranslations = {
     },
     free: {
       q: "Posso provare gratis i modelli senza censura?",
-      a: "Sì. {{guestCredits}} crediti gratuiti al mese senza account e {{freeCredits}} con un account gratuito. Bastano per la prova di dieci minuti sui modelli senza censura più economici. Quelli di fascia alta costano di più a messaggio.",
+      a: "Sì. {{guestCredits}} crediti gratuiti al mese senza account e {{freeCredits}} con un account gratuito, {{maxCredits}} con la newsletter. Bastano per la prova di dieci minuti sui modelli senza censura più economici. Quelli di fascia alta costano di più a messaggio.",
     },
     legal: {
       q: "I modelli IA senza censura sono legali?",

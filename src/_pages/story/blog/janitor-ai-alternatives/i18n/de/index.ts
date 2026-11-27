@@ -46,7 +46,7 @@ export const translations: typeof enTranslations = {
     skills:
       "Der Rollenspiel-Skill gibt dem Modell vor, in seiner Rolle zu bleiben und dir die Entscheidungen über deine Figur zu überlassen. Für fortlaufende Gespräche gibt es die Begleiter Thea und Hermes. Möchtest du vor allem in fertigen Figuren stöbern, findest du bei Janitor leichter einen Einstieg.",
     limit:
-      "Gäste erhalten monatlich {{guestCredits}} kostenlose Credits, mit einem Gratiskonto sind es {{freeCredits}}. Eine lange Szene mit einem Premiummodell kann das Guthaben aufbrauchen. Wer einfach weiterschreiben möchte, fährt mit Janitors kostenlosen Standardchats besser.",
+      "Gäste erhalten monatlich {{guestCredits}} kostenlose Credits, mit einem Gratiskonto sind es {{freeCredits}}, {{maxCredits}} mit Newsletter. Eine lange Szene mit einem Premiummodell kann das Guthaben aufbrauchen. Wer einfach weiterschreiben möchte, fährt mit Janitors kostenlosen Standardchats besser.",
     link: "Den Rollenspiel-Skill ansehen",
   },
   list: "Welche Plattform passt zu deiner Geschichte?",

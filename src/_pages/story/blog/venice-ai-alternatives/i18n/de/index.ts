@@ -49,7 +49,7 @@ export const translations: typeof enTranslations = {
     privacy:
       "Datenschutz: Inkognito-Chats bleiben im lokalen Speicher Ihres Browsers, kein Konto nötig. Private Chats werden nur in Ihrem Konto gespeichert.",
     price:
-      "Preis: {{guestCredits}} Gratis-Credits im Monat ohne Konto, {{freeCredits}} mit Konto. Abos ab {{subPrice}} im Monat. Credit-Pakete stocken ein aktives Abo auf und verfallen nie.",
+      "Preis: {{guestCredits}} Gratis-Credits im Monat ohne Konto, {{freeCredits}} mit Konto, {{maxCredits}} mit Newsletter. Abos ab {{subPrice}} im Monat. Credit-Pakete stocken ein aktives Abo auf und verfallen nie.",
     api: "API: dieselben Modelle über OpenAI- und Anthropic-kompatible Endpunkte. Jedes Abo ab {{apiSubPrice}} im Monat schaltet sie frei.",
     weak: "Wo wir schwächer sind: Der Katalog von Venice ist größer, und bei den eigenen Modellen ist Venice pro Token günstiger, weil wir auf unseren Einkaufspreis {{markup}} % aufschlagen. Kein x402 pro Anfrage und keine Token-Ebene wie VVV oder DIEM: Unsere API braucht ein Konto und einen Kauf.",
     directoryLink: "Alle abliterierten Modelle mit Kontext und Preis",
@@ -110,7 +110,7 @@ export const translations: typeof enTranslations = {
     },
     free: {
       q: "Gibt es eine kostenlose Alternative zu Venice AI?",
-      a: "Ja. Die Gratis-Stufe von Venice selbst umfasst 10 Text- und 15 Bild-Prompts am Tag. FreedomGPT startet gratis und ohne Konto. LM Studio ist auf eigener Hardware kostenlos. {{appName}} gibt Ihnen {{guestCredits}} Gratis-Credits im Monat ohne Konto und {{freeCredits}} mit Konto, unzensierte Modelle inklusive, nach einer einmaligen 18+-Bestätigung.",
+      a: "Ja. Die Gratis-Stufe von Venice selbst umfasst 10 Text- und 15 Bild-Prompts am Tag. FreedomGPT startet gratis und ohne Konto. LM Studio ist auf eigener Hardware kostenlos. {{appName}} gibt Ihnen {{guestCredits}} Gratis-Credits im Monat ohne Konto und {{freeCredits}} mit Konto, {{maxCredits}} mit Newsletter, unzensierte Modelle inklusive, nach einer einmaligen 18+-Bestätigung.",
     },
     private: {
       q: "Welche Venice-Alternative ist am privatesten?",

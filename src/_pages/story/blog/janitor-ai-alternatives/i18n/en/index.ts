@@ -44,7 +44,7 @@ export const translations = {
     skills:
       "The Roleplay skill asks the model to stay in character and leave your character’s actions to you. Thea and Hermes are built-in companion skills for an ongoing conversation. If you just want a ready-made cast to browse, Janitor’s character directory is the easier starting point.",
     limit:
-      "Guests get {{guestCredits}} free credits per month. A free account gets {{freeCredits}}. A premium model can use up that allowance during a long scene. Janitor’s free standard chat is a better fit if you want to keep writing without counting replies.",
+      "Guests get {{guestCredits}} free credits per month. A free account gets {{freeCredits}}, {{maxCredits}} with the newsletter. A premium model can use up that allowance during a long scene. Janitor’s free standard chat is a better fit if you want to keep writing without counting replies.",
     link: "See how the Roleplay skill works",
   },
   list: "Which alternative fits your next story?",

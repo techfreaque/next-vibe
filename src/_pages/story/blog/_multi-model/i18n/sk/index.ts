@@ -34,7 +34,7 @@ export const translations: typeof enTranslations = {
     intro:
       "Prepínaj modely v tej istej konverzácii bez nastavovania kľúčov API. V katalógu je {{modelCount}} modelov na chatovanie. Z toho je {{mainstream}} bežných, {{open}} otvorených a {{uncensored}} bez cenzúry. Prístup k modelom bez cenzúry vyžaduje potvrdenie veku aspoň 18 rokov.",
     price:
-      "Každý mesiac dostaneš {{guestCredits}} kreditov zdarma bez účtu alebo {{freeCredits}} s účtom. Predplatné začína na {{subPrice}} mesačne. Kredity sa odpočítavajú podľa sadzby vybraného modelu.",
+      "Každý mesiac dostaneš {{guestCredits}} kreditov zdarma bez účtu alebo {{freeCredits}} s účtom, {{maxCredits}} pri odbere noviniek. Predplatné začína na {{subPrice}} mesačne. Kredity sa odpočítavajú podľa sadzby vybraného modelu.",
     privacy:
       "V režime inkognito zostáva história v prehliadači. Model prevádzkovaný u poskytovateľa dostane zadanie, ktoré potrebuje na odpoveď.",
     api: "Platený prístup k API kompatibilným s OpenAI a Anthropic začína na {{apiSubPrice}} mesačne.",

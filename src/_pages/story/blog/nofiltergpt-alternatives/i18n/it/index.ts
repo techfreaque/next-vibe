@@ -66,7 +66,7 @@ export const translations: typeof enTranslations = {
     privacy:
       "Privacy: le chat in incognito restano nella memoria locale del tuo browser, senza account. Le chat private vengono salvate solo nel tuo account.",
     price:
-      "Prezzo: {{guestCredits}} crediti gratuiti al mese senza account, {{freeCredits}} con un account. Piani da {{subPrice}} al mese. I pacchetti di crediti ricaricano un piano attivo e non scadono mai.",
+      "Prezzo: {{guestCredits}} crediti gratuiti al mese senza account, {{freeCredits}} con un account, {{maxCredits}} con la newsletter. Piani da {{subPrice}} al mese. I pacchetti di crediti ricaricano un piano attivo e non scadono mai.",
     api: "API: gli stessi modelli tramite endpoint compatibili con OpenAI e Anthropic. La sblocca qualsiasi piano da {{apiSubPrice}} al mese.",
     weak: "Dove siamo più deboli: niente piano illimitato. Ogni messaggio costa crediti e il prezzo dipende dal modello scelto.",
     hubLink: "Chat IA senza censura: tutti i modelli con contesto e prezzo",
@@ -107,7 +107,7 @@ export const translations: typeof enTranslations = {
     },
     free: {
       q: "Esiste un'alternativa gratuita a NoFilterGPT?",
-      a: "Sì. FreedomGPT parte gratis senza account. LM Studio è gratuito sul tuo hardware. {{appName}} dà {{guestCredits}} crediti gratuiti al mese senza account e {{freeCredits}} con un account, modelli senza censura inclusi dopo una sola conferma dei 18 anni.",
+      a: "Sì. FreedomGPT parte gratis senza account. LM Studio è gratuito sul tuo hardware. {{appName}} dà {{guestCredits}} crediti gratuiti al mese senza account e {{freeCredits}} con un account, {{maxCredits}} con la newsletter, modelli senza censura inclusi dopo una sola conferma dei 18 anni.",
     },
     models: {
       q: "Che modello usa NoFilterGPT?",

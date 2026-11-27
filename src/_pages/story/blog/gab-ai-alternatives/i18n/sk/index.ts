@@ -87,7 +87,7 @@ export const translations: typeof enTranslations = {
     privacy:
       "Súkromie: inkognito čety ostávajú v lokálnom úložisku prehliadača aj bez účtu. Súkromné čety sa ukladajú iba do tvojho účtu.",
     price:
-      "Cena: každý mesiac {{guestCredits}} kreditov zdarma bez účtu alebo {{freeCredits}} s bezplatným účtom. Predplatné od {{subPrice}} mesačne. Stačí raz potvrdiť vek 18+ a modely bez cenzúry sa odomknú.",
+      "Cena: každý mesiac {{guestCredits}} kreditov zdarma bez účtu alebo {{freeCredits}} s bezplatným účtom, {{maxCredits}} pri odbere noviniek. Predplatné od {{subPrice}} mesačne. Stačí raz potvrdiť vek 18+ a modely bez cenzúry sa odomknú.",
     api: "API: rovnaké modely sprístupňujeme cez rozhrania kompatibilné s OpenAI a Anthropic. Stačí ktorýkoľvek plán od {{apiSubPrice}} mesačne.",
     weak: "V čom má Gab výhodu: neponúkame paušál a každá správa stojí kredity podľa modelu. Gab uvádza {{gabModels}} modelov, my {{modelCount}}. Balíky kreditov od Gab fungujú aj bez plánu. Naše balíky dobíjajú aktívny plán a nikdy nevypršia.",
     hubLink: "Čet s AI bez cenzúry: všetky modely, kontext a ceny",
@@ -129,7 +129,7 @@ export const translations: typeof enTranslations = {
     },
     free: {
       q: "Existuje bezplatná alternatíva k Gab AI?",
-      a: "Áno. FreedomGPT si vyskúšaš zdarma bez účtu a LM Studio beží zdarma na tvojom hardvéri. Na {{appName}} máš každý mesiac {{guestCredits}} kreditov zdarma bez účtu alebo {{freeCredits}} s bezplatným účtom. Modely bez cenzúry sprístupní jednorazové potvrdenie veku 18+.",
+      a: "Áno. FreedomGPT si vyskúšaš zdarma bez účtu a LM Studio beží zdarma na tvojom hardvéri. Na {{appName}} máš každý mesiac {{guestCredits}} kreditov zdarma bez účtu alebo {{freeCredits}} s bezplatným účtom, {{maxCredits}} pri odbere noviniek. Modely bez cenzúry sprístupní jednorazové potvrdenie veku 18+.",
     },
     arya: {
       q: "Môžem používať Aryu aj mimo Gab AI?",

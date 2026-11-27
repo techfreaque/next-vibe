@@ -46,7 +46,7 @@ export const translations: typeof enTranslations = {
     skills:
       "La modalità gioco di ruolo chiede al modello di restare nel personaggio e di lasciare a te le decisioni sul tuo. Thea e Hermes sono due compagni integrati per conversazioni continuative. Se preferisci sfogliare personaggi pronti da giocare, il catalogo di Janitor è più immediato.",
     limit:
-      "Come ospite ricevi {{guestCredits}} crediti gratuiti al mese, con un account gratuito ne ricevi {{freeCredits}}. Una lunga scena con un modello premium può esaurire il saldo. Per scrivere senza contare le battute, la chat standard gratuita di Janitor è più adatta.",
+      "Come ospite ricevi {{guestCredits}} crediti gratuiti al mese, con un account gratuito ne ricevi {{freeCredits}}, {{maxCredits}} con la newsletter. Una lunga scena con un modello premium può esaurire il saldo. Per scrivere senza contare le battute, la chat standard gratuita di Janitor è più adatta.",
     link: "Scopri la modalità gioco di ruolo",
   },
   list: "Dove ambientare la tua prossima storia?",

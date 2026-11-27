@@ -60,6 +60,7 @@ import { configScopedTranslation } from "@/env/i18n";
 import {
   CREDIT_VALUE_USD,
   FREE_CREDIT_ALLOWANCE,
+  FREE_CREDIT_MAX_TOTAL,
   FREE_CREDIT_SIGNED_IN_TOTAL,
 } from "@/products/constants";
 import { ProductIds, productsRepository } from "@/products/platform-products";
@@ -374,6 +375,7 @@ export function TanstackPage({
     roleplayContext: formatTokenCount(roleplayRow?.contextWindow ?? 0),
     guestCredits: FREE_CREDIT_ALLOWANCE.guest,
     freeCredits: FREE_CREDIT_SIGNED_IN_TOTAL,
+    maxCredits: FREE_CREDIT_MAX_TOTAL,
     subPrice,
     subCredits,
     packPrice,

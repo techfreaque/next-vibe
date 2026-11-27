@@ -62,6 +62,7 @@ import { configScopedTranslation } from "@/env/i18n";
 import {
   CREDIT_VALUE_USD,
   FREE_CREDIT_ALLOWANCE,
+  FREE_CREDIT_MAX_TOTAL,
   FREE_CREDIT_SIGNED_IN_TOTAL,
   STANDARD_MARKUP_PERCENTAGE,
 } from "@/products/constants";
@@ -409,6 +410,7 @@ export function TanstackPage({
     defaultModel: defaultModelName,
     guestCredits: FREE_CREDIT_ALLOWANCE.guest,
     freeCredits: FREE_CREDIT_SIGNED_IN_TOTAL,
+    maxCredits: FREE_CREDIT_MAX_TOTAL,
     subPrice,
     subCredits,
     packPrice,

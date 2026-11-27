@@ -140,7 +140,7 @@ export const translations = {
     },
     free: {
       q: "Can I try it for free?",
-      a: "Yes. {{guestCredits}} free credits a month without an account, {{freeCredits}} with a free one. Uncensored models included after a one-time 18+ confirmation.",
+      a: "Yes. {{guestCredits}} free credits a month without an account, {{freeCredits}} with a free one, {{maxCredits}} with the newsletter. Uncensored models included after a one-time 18+ confirmation.",
     },
     chatLink: "Uncensored AI chat: pick a model and start",
     roleplayLink: "AI roleplay without a filter",

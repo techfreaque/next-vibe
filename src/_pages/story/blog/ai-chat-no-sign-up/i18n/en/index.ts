@@ -94,6 +94,8 @@ export const translations = {
     intro: "Never required. Sometimes useful.",
     credits:
       "Up to {{freeCredits}} free credits a month with a verified email, instead of {{guestCredits}}.",
+    newsletter:
+      "Confirm the newsletter and the monthly total grows to {{maxCredits}}: a {{newsletterBonus}} credit bonus on top.",
     sync: "Chats saved to your private folders, on every device you sign in on.",
     control:
       "Export all your data as JSON or delete your account from Settings. Deletion erases your personal data.",

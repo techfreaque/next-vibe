@@ -46,7 +46,7 @@ export const translations: typeof enTranslations = {
     skills:
       "Tryb odgrywania ról poleca modelowi trzymać się postaci i zostawiać jej rozmówcy decyzje o własnych działaniach. Do dłuższych rozmów służą wbudowani towarzysze Thea i Hermes. Jeśli chcesz po prostu wybrać gotową postać i zacząć pisać, łatwiej będzie zajrzeć do katalogu Janitora.",
     limit:
-      "Gość dostaje co miesiąc {{guestCredits}} darmowych kredytów, a osoba z bezpłatnym kontem {{freeCredits}}. Długa scena na modelu premium może zużyć całą pulę. Jeśli wolisz pisać bez liczenia odpowiedzi, standardowy czat Janitora sprawdzi się lepiej.",
+      "Gość dostaje co miesiąc {{guestCredits}} darmowych kredytów, a osoba z bezpłatnym kontem {{freeCredits}}, {{maxCredits}} z newsletterem. Długa scena na modelu premium może zużyć całą pulę. Jeśli wolisz pisać bez liczenia odpowiedzi, standardowy czat Janitora sprawdzi się lepiej.",
     link: "Zobacz, jak działa tryb odgrywania ról",
   },
   list: "Gdzie rozegrać następną scenę?",

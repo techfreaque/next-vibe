@@ -49,7 +49,7 @@ export const translations: typeof enTranslations = {
     privacy:
       "Privacy: le chat in incognito restano nella memoria locale del tuo browser, senza account. Le chat private si salvano solo nel tuo account.",
     price:
-      "Prezzo: {{guestCredits}} crediti gratuiti al mese senza account, {{freeCredits}} con un account. Piani da {{subPrice}} al mese. I pacchetti di crediti ricaricano un piano attivo e non scadono mai.",
+      "Prezzo: {{guestCredits}} crediti gratuiti al mese senza account, {{freeCredits}} con un account, {{maxCredits}} con la newsletter. Piani da {{subPrice}} al mese. I pacchetti di crediti ricaricano un piano attivo e non scadono mai.",
     api: "API: gli stessi modelli tramite endpoint compatibili OpenAI e Anthropic. Qualsiasi piano da {{apiSubPrice}} al mese la sblocca.",
     weak: "Dove siamo più deboli: il catalogo di Venice è più grande, e sui suoi modelli Venice costa meno a token, perché sul prezzo che paghiamo aggiungiamo un ricarico del {{markup}}%. Niente pagamento a richiesta con x402 e nessuno strato di token come VVV o DIEM: la nostra API richiede un account e un acquisto.",
     directoryLink: "Tutti i modelli abliterated, con contesto e prezzo",
@@ -110,7 +110,7 @@ export const translations: typeof enTranslations = {
     },
     free: {
       q: "Esiste un'alternativa gratuita a Venice AI?",
-      a: "Sì. Il piano gratuito di Venice offre 10 richieste di testo e 15 di immagini al giorno. FreedomGPT parte gratis e senza account. LM Studio è gratis sul tuo hardware. {{appName}} dà {{guestCredits}} crediti gratuiti al mese senza account e {{freeCredits}} con un account, modelli senza censura inclusi dopo un'unica conferma dei 18 anni.",
+      a: "Sì. Il piano gratuito di Venice offre 10 richieste di testo e 15 di immagini al giorno. FreedomGPT parte gratis e senza account. LM Studio è gratis sul tuo hardware. {{appName}} dà {{guestCredits}} crediti gratuiti al mese senza account e {{freeCredits}} con un account, {{maxCredits}} con la newsletter, modelli senza censura inclusi dopo un'unica conferma dei 18 anni.",
     },
     private: {
       q: "Quale alternativa a Venice è la più privata?",

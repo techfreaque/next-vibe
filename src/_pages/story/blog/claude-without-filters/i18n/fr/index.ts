@@ -145,7 +145,7 @@ export const translations: typeof enTranslations = {
     },
     free: {
       q: "Puis-je l'essayer gratuitement ?",
-      a: "Oui. {{guestCredits}} crédits gratuits par mois sans compte, {{freeCredits}} avec un compte gratuit. Modèles non censurés inclus après une confirmation unique de majorité.",
+      a: "Oui. {{guestCredits}} crédits gratuits par mois sans compte, {{freeCredits}} avec un compte gratuit, {{maxCredits}} avec la newsletter. Modèles non censurés inclus après une confirmation unique de majorité.",
     },
     chatLink: "Chat IA non censuré : choisissez un modèle et lancez-vous",
     roleplayLink: "Jeu de rôle IA sans filtre",

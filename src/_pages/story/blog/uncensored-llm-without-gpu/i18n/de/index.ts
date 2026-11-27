@@ -114,7 +114,7 @@ export const translations: typeof enTranslations = {
     intro:
       "Lokal gibt es keinen Preis pro Nachricht. Die Hardware ist der Preis.",
     guest:
-      "Online bei uns: {{guestCredits}} Gratis-Credits im Monat ohne Konto, {{freeCredits}} mit kostenlosem Konto.",
+      "Online bei uns: {{guestCredits}} Gratis-Credits im Monat ohne Konto, {{freeCredits}} mit kostenlosem Konto, {{maxCredits}} mit Newsletter.",
     plan: "Abos ab {{subPrice}} im Monat. Credit-Pakete stocken ein aktives Abo auf und verfallen nie.",
     local:
       "Lokal: gratis pro Nachricht, aber eine Grafikkarte für die großen Modelle kostet mehr als Jahre gehosteter Chats. Dazu der Strom.",
@@ -133,7 +133,7 @@ export const translations: typeof enTranslations = {
     },
     free: {
       q: "Gibt es ein kostenloses unzensiertes LLM online?",
-      a: "Auf {{appName}} erhalten Sie {{guestCredits}} Gratis-Credits im Monat ohne Konto und {{freeCredits}} mit kostenlosem Konto. Wie viele Nachrichten das sind, hängt vom Modell und der Chatlänge ab. Unzensierte Modelle verlangen einmalig eine 18+-Bestätigung.",
+      a: "Auf {{appName}} erhalten Sie {{guestCredits}} Gratis-Credits im Monat ohne Konto und {{freeCredits}} mit kostenlosem Konto, {{maxCredits}} mit Newsletter. Wie viele Nachrichten das sind, hängt vom Modell und der Chatlänge ab. Unzensierte Modelle verlangen einmalig eine 18+-Bestätigung.",
     },
     vram: {
       q: "Wie viel VRAM brauche ich für ein lokales unzensiertes Modell?",

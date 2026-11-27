@@ -143,7 +143,7 @@ export const translations: typeof enTranslations = {
     },
     free: {
       q: "Môžem si to vyskúšať zdarma?",
-      a: "Áno. Mesačne {{guestCredits}} kr. zdarma bez účtu alebo {{freeCredits}} kr. s bezplatným účtom. Modely bez cenzúry sú dostupné po jednorazovom potvrdení veku aspoň 18 rokov.",
+      a: "Áno. Mesačne {{guestCredits}} kr. zdarma bez účtu alebo {{freeCredits}} kr. s bezplatným účtom, {{maxCredits}} pri odbere noviniek. Modely bez cenzúry sú dostupné po jednorazovom potvrdení veku aspoň 18 rokov.",
     },
     chatLink: "Čet s AI bez cenzúry: vyber model a začni",
     roleplayLink: "Hranie rolí s AI bez filtra",

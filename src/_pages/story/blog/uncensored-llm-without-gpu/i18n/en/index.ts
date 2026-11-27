@@ -111,7 +111,7 @@ export const translations = {
     title: "What it costs, local vs online",
     intro: "Local has no per-message price. The hardware is the price.",
     guest:
-      "Online here: {{guestCredits}} free credits a month without an account, {{freeCredits}} with a free account.",
+      "Online here: {{guestCredits}} free credits a month without an account, {{freeCredits}} with a free account, {{maxCredits}} with the newsletter.",
     plan: "Plans from {{subPrice}} a month. Credit packs top up an active plan and never expire.",
     local:
       "Local: free per message, but a GPU that runs the big models costs more than years of hosted chat. Electricity too.",
@@ -130,7 +130,7 @@ export const translations = {
     },
     free: {
       q: "Is there a free uncensored LLM online?",
-      a: "On {{appName}} you get {{guestCredits}} free credits a month without an account and {{freeCredits}} with a free account. How many messages that buys depends on the model and the chat length. Uncensored models need a one-time 18+ confirmation.",
+      a: "On {{appName}} you get {{guestCredits}} free credits a month without an account and {{freeCredits}} with a free account, {{maxCredits}} with the newsletter. How many messages that buys depends on the model and the chat length. Uncensored models need a one-time 18+ confirmation.",
     },
     vram: {
       q: "How much VRAM do I need to run an uncensored model locally?",

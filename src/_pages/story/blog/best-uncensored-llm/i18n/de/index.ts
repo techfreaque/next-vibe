@@ -130,7 +130,7 @@ export const translations: typeof enTranslations = {
     },
     free: {
       q: "Welches ist das beste kostenlose unzensierte LLM?",
-      a: "Online gibt Ihnen {{appName}} {{guestCredits}} Gratis-Credits im Monat ohne Konto und {{freeCredits}} mit kostenlosem Konto. Das günstigste unzensierte Modell, {{cheapestModel}}, kostet {{cheapestPrice}} pro Nachricht. Unzensierte Modelle fragen einmalig nach einer 18+-Bestätigung.",
+      a: "Online gibt Ihnen {{appName}} {{guestCredits}} Gratis-Credits im Monat ohne Konto und {{freeCredits}} mit kostenlosem Konto, {{maxCredits}} mit Newsletter. Das günstigste unzensierte Modell, {{cheapestModel}}, kostet {{cheapestPrice}} pro Nachricht. Unzensierte Modelle fragen einmalig nach einer 18+-Bestätigung.",
     },
     roleplay: {
       q: "Welches ist das beste unzensierte Modell für Rollenspiel?",

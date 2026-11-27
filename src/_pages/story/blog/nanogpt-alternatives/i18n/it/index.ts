@@ -68,7 +68,7 @@ export const translations: typeof enTranslations = {
     privacy:
       "Privacy: le chat in incognito restano nella memoria locale del tuo browser, senza account.",
     price:
-      "Prezzo: {{guestCredits}} crediti gratuiti al mese senza account, {{freeCredits}} con un account. Piani: {{planList}}. I pacchetti di crediti ricaricano un piano attivo e non scadono mai.",
+      "Prezzo: {{guestCredits}} crediti gratuiti al mese senza account, {{freeCredits}} con un account, {{maxCredits}} con la newsletter. Piani: {{planList}}. I pacchetti di crediti ricaricano un piano attivo e non scadono mai.",
     api: "API: endpoint compatibili OpenAI e Anthropic. Qualsiasi acquisto la sblocca.",
     weak: "Dove siamo più deboli: NanoGPT elenca molti più modelli e ne fa pagare la maggior parte a prezzo di listino. Noi aggiungiamo un ricarico del {{markup}}% e serve un piano prima di comprare pacchetti di crediti.",
     ownLink: "Guarda {{ownModel}}",
@@ -106,7 +106,7 @@ export const translations: typeof enTranslations = {
     },
     free: {
       q: "Esiste un'alternativa gratuita a NanoGPT?",
-      a: "OpenRouter ha limiti giornalieri sui modelli gratuiti. LM Studio e Ollama sono gratuiti sul tuo hardware. {{appName}} dà {{guestCredits}} crediti gratuiti al mese senza account e {{freeCredits}} con un account.",
+      a: "OpenRouter ha limiti giornalieri sui modelli gratuiti. LM Studio e Ollama sono gratuiti sul tuo hardware. {{appName}} dà {{guestCredits}} crediti gratuiti al mese senza account e {{freeCredits}} con un account, {{maxCredits}} con la newsletter.",
     },
     filter: {
       q: "Quali alternative hanno modelli senza censura?",

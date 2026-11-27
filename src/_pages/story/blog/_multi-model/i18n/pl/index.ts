@@ -34,7 +34,7 @@ export const translations: typeof enTranslations = {
     intro:
       "Zmieniasz model w trakcie rozmowy bez konfigurowania własnego klucza API. W katalogu jest {{modelCount}} modeli do czatu, w tym {{mainstream}} modeli głównego nurtu, {{open}} otwartych i {{uncensored}} bez cenzury. Dostęp do modeli bez cenzury wymaga potwierdzenia pełnoletności.",
     price:
-      "Na start dostajesz co miesiąc {{guestCredits}} darmowych kredytów bez konta albo {{freeCredits}} z kontem. Plany zaczynają się od {{subPrice}} miesięcznie. Liczba zużytych kredytów zależy od stawki wybranego modelu.",
+      "Na start dostajesz co miesiąc {{guestCredits}} darmowych kredytów bez konta albo {{freeCredits}} z kontem, {{maxCredits}} z newsletterem. Plany zaczynają się od {{subPrice}} miesięcznie. Liczba zużytych kredytów zależy od stawki wybranego modelu.",
     privacy:
       "W trybie incognito historia zostaje w przeglądarce. Model w chmurze otrzymuje zapytanie potrzebne do odpowiedzi.",
     api: "Dostęp do interfejsów API zgodnych z OpenAI i Anthropic kosztuje od {{apiSubPrice}} miesięcznie.",

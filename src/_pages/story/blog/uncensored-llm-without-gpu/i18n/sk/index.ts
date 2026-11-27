@@ -115,7 +115,7 @@ export const translations: typeof enTranslations = {
     intro:
       "Pri lokálnom spustení platíš za hardvér. Jednotlivé správy cenu nemajú.",
     guest:
-      "Online máš každý mesiac {{guestCredits}} kreditov zdarma bez účtu alebo {{freeCredits}} s bezplatným účtom.",
+      "Online máš každý mesiac {{guestCredits}} kreditov zdarma bez účtu alebo {{freeCredits}} s bezplatným účtom, {{maxCredits}} pri odbere noviniek.",
     plan: "Plány od {{subPrice}} mesačne. K aktívnemu plánu si môžeš dokúpiť kredity, ktoré nevypršia.",
     local:
       "Lokálne správy sú zdarma. Grafická karta, ktorá zvládne veľké modely, však stojí viac než roky četovania online. A spotrebúva elektrinu.",
@@ -134,7 +134,7 @@ export const translations: typeof enTranslations = {
     },
     free: {
       q: "Existuje LLM bez cenzúry, ktorý môžem používať online zadarmo?",
-      a: "Na {{appName}} máš každý mesiac {{guestCredits}} kreditov zdarma bez účtu alebo {{freeCredits}} s bezplatným účtom. Počet správ závisí od modelu aj dĺžky četu. Pri modeloch bez cenzúry stačí raz potvrdiť vek 18+.",
+      a: "Na {{appName}} máš každý mesiac {{guestCredits}} kreditov zdarma bez účtu alebo {{freeCredits}} s bezplatným účtom, {{maxCredits}} pri odbere noviniek. Počet správ závisí od modelu aj dĺžky četu. Pri modeloch bez cenzúry stačí raz potvrdiť vek 18+.",
     },
     vram: {
       q: "Koľko VRAM potrebujem na lokálne spustenie modelu bez cenzúry?",

@@ -34,7 +34,7 @@ export const translations: typeof enTranslations = {
     intro:
       "Cambia modello durante la conversazione senza configurare chiavi API. Il catalogo contiene {{modelCount}} modelli per la chat, tra cui {{mainstream}} di largo uso, {{open}} aperti e {{uncensored}} senza censura. Per accedere a quelli senza censura, conferma di avere almeno 18 anni.",
     price:
-      "Hai {{guestCredits}} crediti gratuiti al mese senza account o {{freeCredits}} con un account. I piani partono da {{subPrice}} al mese. Ogni richiesta consuma crediti alla tariffa del modello scelto.",
+      "Hai {{guestCredits}} crediti gratuiti al mese senza account o {{freeCredits}} con un account, {{maxCredits}} con la newsletter. I piani partono da {{subPrice}} al mese. Ogni richiesta consuma crediti alla tariffa del modello scelto.",
     privacy:
       "In incognito la cronologia resta nel browser. Un modello ospitato online riceve comunque il prompt necessario per rispondere.",
     api: "L’accesso alle API compatibili con OpenAI e Anthropic parte da {{apiSubPrice}} al mese.",

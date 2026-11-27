@@ -137,7 +137,7 @@ export const translations: typeof enTranslations = {
     },
     free: {
       q: "Gibt es eine kostenlose unzensierte KI zum Geschichtenschreiben?",
-      a: "Sie bekommen {{guestCredits}} Gratis-Credits im Monat ohne Konto und {{freeCredits}} mit kostenlosem Konto. Das reicht für eine gute Zahl Szenen auf den günstigeren Modellen. Für längere Projekte gibt es Abos ab {{subPrice}} im Monat.",
+      a: "Sie bekommen {{guestCredits}} Gratis-Credits im Monat ohne Konto und {{freeCredits}} mit kostenlosem Konto, {{maxCredits}} mit Newsletter. Das reicht für eine gute Zahl Szenen auf den günstigeren Modellen. Für längere Projekte gibt es Abos ab {{subPrice}} im Monat.",
     },
     adult: {
       q: "Kann eine unzensierte KI erotische und NSFW-Fiktion schreiben?",

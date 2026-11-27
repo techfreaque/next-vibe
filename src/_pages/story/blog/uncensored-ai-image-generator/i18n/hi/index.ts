@@ -132,7 +132,7 @@ export const translations: typeof enTranslations = {
       "अभी सबसे सस्ता: {{cheapestName}}, {{cheapestPrice}} में। सबसे सस्ता अनसेंसर्ड: {{uncensoredName}}, {{uncensoredPrice}} में। सबसे महँगा: {{priciestName}}, {{priciestPrice}} में।",
     failed:
       "क्रेडिट तभी कटते हैं जब इमेज डिलीवर हो जाए। जॉब फ़ेल हुआ या प्रोवाइडर ने मना किया: आपका कुछ नहीं लगता।",
-    free: "फ़्री: बिना अकाउंट हर महीने {{guestCredits}} क्रेडिट, फ़्री अकाउंट के साथ {{freeCredits}}। {{uncensoredName}} पर यह हर महीने {{freeUncensoredImages}} इमेज मुफ़्त में है।",
+    free: "फ़्री: बिना अकाउंट हर महीने {{guestCredits}} क्रेडिट, फ़्री अकाउंट के साथ {{freeCredits}}, न्यूज़लेटर के साथ {{maxCredits}}। {{uncensoredName}} पर यह हर महीने {{freeUncensoredImages}} इमेज मुफ़्त में है।",
     sub: "मंथली प्लान: चार साइज़, {{subPrice}} में {{subCredits}} क्रेडिट से शुरू।",
     pack: "क्रेडिट पैक: सब्सक्राइबर के लिए टॉप-अप, {{packPrice}} में {{packCredits}} क्रेडिट। कभी एक्सपायर नहीं होते। कार्ड, PayPal या क्रिप्टो से पेमेंट।",
     link: "प्लान और क्रेडिट पैक देखें",
@@ -160,7 +160,7 @@ export const translations: typeof enTranslations = {
     },
     free: {
       q: "क्या कोई फ़्री अनसेंसर्ड AI इमेज जनरेटर है?",
-      a: "आप फ़्री में शुरू कर सकते हैं। बिना अकाउंट हर महीने {{guestCredits}} क्रेडिट, फ़्री अकाउंट के साथ {{freeCredits}}। {{uncensoredName}} पर हर इमेज के {{uncensoredCredits}} क्रेडिट लगते हैं। उसके बाद: प्लान, {{subPrice}} प्रति महीने से।",
+      a: "आप फ़्री में शुरू कर सकते हैं। बिना अकाउंट हर महीने {{guestCredits}} क्रेडिट, फ़्री अकाउंट के साथ {{freeCredits}}, न्यूज़लेटर के साथ {{maxCredits}}। {{uncensoredName}} पर हर इमेज के {{uncensoredCredits}} क्रेडिट लगते हैं। उसके बाद: प्लान, {{subPrice}} प्रति महीने से।",
     },
     cheapest: {
       q: "सबसे सस्ता AI इमेज जनरेटर कौन सा है?",

@@ -81,6 +81,7 @@ export interface UsFacts {
   guestCredits: number;
   freeCredits: number;
   maxCredits: number;
+  newsletterBonus: number;
   /** "Starter $8, Plus $20, ..." in the locale's currency. */
   planList: string;
   subPrice: string;
@@ -152,6 +153,7 @@ export async function loadUsFacts(locale: CountryLanguage): Promise<UsFacts> {
     guestCredits: FREE_CREDIT_ALLOWANCE.guest,
     freeCredits: FREE_CREDIT_SIGNED_IN_TOTAL,
     maxCredits: FREE_CREDIT_MAX_TOTAL,
+    newsletterBonus: FREE_CREDIT_ALLOWANCE.newsletterBonus,
     planList: planTiers
       .map((tier) => `${productT(tier.name)} ${tier.priceLabel}`)
       .join(", "),
@@ -184,6 +186,7 @@ export function usParams(facts: UsFacts): UsParams {
     guestCredits: facts.guestCredits,
     freeCredits: facts.freeCredits,
     maxCredits: facts.maxCredits,
+    newsletterBonus: facts.newsletterBonus,
     planList: facts.planList,
     subPrice: facts.subPrice,
     subCredits: facts.subCredits,

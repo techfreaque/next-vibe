@@ -74,7 +74,7 @@ export const translations: typeof enTranslations = {
     privacy:
       "Čet v režime inkognito funguje aj bez účtu. Prepis sa ukladá v tvojom prehliadači, ale jednotlivé zadania pri odpovedaní dostáva poskytovateľ modelu.",
     price:
-      "Ako hosť máš mesačne {{guestCredits}} kred., s bezplatným účtom {{freeCredits}}. Predplatné sa začína od {{subPrice}} mesačne. Spotreba kreditov závisí od používania modelu.",
+      "Ako hosť máš mesačne {{guestCredits}} kred., s bezplatným účtom {{freeCredits}}, {{maxCredits}} pri odbere noviniek. Predplatné sa začína od {{subPrice}} mesačne. Spotreba kreditov závisí od používania modelu.",
     weak: "Character.AI a Janitor AI ponúkajú širší výber komunitných postáv. Ak hráš veľa, služba s pevným paušálom ti môže lepšie vyhovovať aj vďaka predvídateľným nákladom.",
     skillsLink: "Prezrieť vstavané a komunitné zručnosti",
     roleplayLink: "Otvoriť zručnosť Hranie rolí",
@@ -268,7 +268,7 @@ export const translations: typeof enTranslations = {
     },
     free: {
       q: "Existuje bezplatná alternatíva k Character.AI?",
-      a: "Janitor AI ponúka neobmedzené štandardné čety. Nomi má 50 správ denne. SillyTavern je bezplatný softvér, ku ktorému pripojíš model. V {{appName}} máš mesačne {{guestCredits}} kred. bez účtu alebo {{freeCredits}} s bezplatným účtom.",
+      a: "Janitor AI ponúka neobmedzené štandardné čety. Nomi má 50 správ denne. SillyTavern je bezplatný softvér, ku ktorému pripojíš model. V {{appName}} máš mesačne {{guestCredits}} kred. bez účtu alebo {{freeCredits}} s bezplatným účtom, {{maxCredits}} pri odbere noviniek.",
     },
     import: {
       q: "Môžem si z Character.AI preniesť postavy aj rozhovory?",

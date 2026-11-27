@@ -135,7 +135,7 @@ export const translations: typeof enTranslations = {
       "Aktuell am günstigsten: {{cheapestName}} für {{cheapestPrice}}. Günstigstes unzensiertes Modell: {{uncensoredName}} für {{uncensoredPrice}}. Am teuersten: {{priciestName}} für {{priciestPrice}}.",
     failed:
       "Abgebucht wird erst, wenn das Bild da ist. Fehlgeschlagener Auftrag oder Ablehnung beim Anbieter: Du zahlst nichts.",
-    free: "Kostenlos: {{guestCredits}} Credits im Monat ohne Konto, {{freeCredits}} mit kostenlosem Konto. Mit {{uncensoredName}} sind das {{freeUncensoredImages}} Bilder im Monat, gratis.",
+    free: "Kostenlos: {{guestCredits}} Credits im Monat ohne Konto, {{freeCredits}} mit kostenlosem Konto, {{maxCredits}} mit Newsletter. Mit {{uncensoredName}} sind das {{freeUncensoredImages}} Bilder im Monat, gratis.",
     sub: "Monatstarife: vier Größen, ab {{subCredits}} Credits für {{subPrice}}.",
     pack: "Credit-Pakete: Aufstockung für Abonnenten, {{packCredits}} Credits für {{packPrice}}. Sie verfallen nie. Karte, PayPal oder Krypto.",
     link: "Abos und Credit-Pakete ansehen",
@@ -163,7 +163,7 @@ export const translations: typeof enTranslations = {
     },
     free: {
       q: "Gibt es einen kostenlosen KI-Bildgenerator ohne Zensur?",
-      a: "Der Einstieg ist kostenlos. {{guestCredits}} Credits im Monat ohne Konto, {{freeCredits}} mit kostenlosem Konto. {{uncensoredName}} kostet {{uncensoredCredits}} Credits pro Bild. Danach: ein Tarif, ab {{subPrice}} im Monat.",
+      a: "Der Einstieg ist kostenlos. {{guestCredits}} Credits im Monat ohne Konto, {{freeCredits}} mit kostenlosem Konto, {{maxCredits}} mit Newsletter. {{uncensoredName}} kostet {{uncensoredCredits}} Credits pro Bild. Danach: ein Tarif, ab {{subPrice}} im Monat.",
     },
     cheapest: {
       q: "Welcher KI-Bildgenerator ist am günstigsten?",

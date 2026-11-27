@@ -87,7 +87,7 @@ export const translations: typeof enTranslations = {
     privacy:
       "Confidentialité : les chats incognito restent dans le stockage local de votre navigateur, sans compte. Les chats privés sont enregistrés dans votre compte uniquement.",
     price:
-      "Prix : {{guestCredits}} crédits gratuits par mois sans compte, {{freeCredits}} avec. Forfaits dès {{subPrice}} par mois. Les modèles sans censure se débloquent après une confirmation unique de vos 18 ans.",
+      "Prix : {{guestCredits}} crédits gratuits par mois sans compte, {{freeCredits}} avec, {{maxCredits}} avec la newsletter. Forfaits dès {{subPrice}} par mois. Les modèles sans censure se débloquent après une confirmation unique de vos 18 ans.",
     api: "API : les mêmes modèles via des endpoints compatibles OpenAI et Anthropic. Tout forfait dès {{apiSubPrice}} par mois la débloque.",
     weak: "Là où nous sommes moins forts : pas de forfait illimité, chaque message coûte des crédits selon le modèle, et Gab affiche {{gabModels}} modèles quand nous en faisons tourner {{modelCount}}. Les packs de Gab fonctionnent sans forfait ; les nôtres complètent un forfait actif et n'expirent jamais.",
     hubLink: "Chat IA sans censure : tous les modèles, avec contexte et prix",
@@ -129,7 +129,7 @@ export const translations: typeof enTranslations = {
     },
     free: {
       q: "Existe-t-il une alternative gratuite à Gab AI ?",
-      a: "Oui. FreedomGPT démarre gratuitement sans compte, LM Studio est gratuit sur votre propre matériel. {{appName}} offre {{guestCredits}} crédits gratuits par mois sans compte et {{freeCredits}} avec un compte, modèles sans censure compris après une confirmation unique de vos 18 ans.",
+      a: "Oui. FreedomGPT démarre gratuitement sans compte, LM Studio est gratuit sur votre propre matériel. {{appName}} offre {{guestCredits}} crédits gratuits par mois sans compte et {{freeCredits}} avec un compte, {{maxCredits}} avec la newsletter, modèles sans censure compris après une confirmation unique de vos 18 ans.",
     },
     arya: {
       q: "Peut-on utiliser Arya ailleurs que sur Gab AI ?",

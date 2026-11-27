@@ -75,7 +75,7 @@ export const translations: typeof enTranslations = {
     privacy:
       "Czat incognito działa bez konta. Historia zostaje w przeglądarce, a każdą wiadomość nadal przetwarza dostawca modelu.",
     price:
-      "{{guestCredits}} kredytów miesięcznie dla gościa lub {{freeCredits}} na darmowym koncie. Abonamenty od {{subPrice}} miesięcznie. Użycie modelu zużywa kredyty.",
+      "{{guestCredits}} kredytów miesięcznie dla gościa lub {{freeCredits}} na darmowym koncie, {{maxCredits}} z newsletterem. Abonamenty od {{subPrice}} miesięcznie. Użycie modelu zużywa kredyty.",
     weak: "Character.AI i Janitor AI ułatwiają odkrywanie postaci. Jeśli dużo piszesz, łatwiej przewidzisz rachunek przy stałej cenie w serwisie do odgrywania ról.",
     skillsLink: "Przeglądaj umiejętności wbudowane i społecznościowe",
     roleplayLink: "Otwórz umiejętność do odgrywania ról",
@@ -269,7 +269,7 @@ export const translations: typeof enTranslations = {
     },
     free: {
       q: "Czy istnieje darmowa alternatywa dla Character.AI?",
-      a: "Janitor AI ma nielimitowane standardowe czaty, a Nomi daje 50 wiadomości dziennie. SillyTavern jest darmowy i wymaga osobnego modelu. W {{appName}} dostajesz {{guestCredits}} kredytów miesięcznie jako gość albo {{freeCredits}} z bezpłatnym kontem.",
+      a: "Janitor AI ma nielimitowane standardowe czaty, a Nomi daje 50 wiadomości dziennie. SillyTavern jest darmowy i wymaga osobnego modelu. W {{appName}} dostajesz {{guestCredits}} kredytów miesięcznie jako gość albo {{freeCredits}} z bezpłatnym kontem, {{maxCredits}} z newsletterem.",
     },
     import: {
       q: "Czy mogę przenieść postacie i rozmowy z Character.AI?",

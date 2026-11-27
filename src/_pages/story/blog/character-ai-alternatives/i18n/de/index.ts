@@ -75,7 +75,7 @@ export const translations: typeof enTranslations = {
     privacy:
       "Der Inkognito-Chat läuft ohne Konto. Der Verlauf bleibt im Browser. Jede Eingabe geht zur Verarbeitung an den Modellanbieter.",
     price:
-      "{{guestCredits}} Credits im Monat als Gast oder {{freeCredits}} mit einem Gratis-Konto. Abos beginnen bei {{subPrice}} im Monat. Die Modelle verbrauchen Credits.",
+      "{{guestCredits}} Credits im Monat als Gast oder {{freeCredits}} mit einem Gratis-Konto, {{maxCredits}} mit Newsletter. Abos beginnen bei {{subPrice}} im Monat. Die Modelle verbrauchen Credits.",
     weak: "Charaktere lassen sich bei Character.AI und Janitor AI leichter entdecken. Wer viel spielt, kann die Ausgaben mit einem Pauschaltarif besser planen.",
     skillsLink: "Integrierte und veröffentlichte Skills ansehen",
     roleplayLink: "Rollenspiel-Skill öffnen",
@@ -269,7 +269,7 @@ export const translations: typeof enTranslations = {
     },
     free: {
       q: "Gibt es eine kostenlose Alternative zu Character.AI?",
-      a: "Janitor AI bietet unbegrenzte Standardchats. Bei Nomi sind 50 Nachrichten pro Tag gratis. SillyTavern ist kostenlos und braucht ein separates Modell. Bei {{appName}} bekommst du {{guestCredits}} Credits im Monat als Gast oder {{freeCredits}} mit einem Gratis-Konto.",
+      a: "Janitor AI bietet unbegrenzte Standardchats. Bei Nomi sind 50 Nachrichten pro Tag gratis. SillyTavern ist kostenlos und braucht ein separates Modell. Bei {{appName}} bekommst du {{guestCredits}} Credits im Monat als Gast oder {{freeCredits}} mit einem Gratis-Konto, {{maxCredits}} mit Newsletter.",
     },
     import: {
       q: "Kann ich Figuren und Chats aus Character.AI mitnehmen?",

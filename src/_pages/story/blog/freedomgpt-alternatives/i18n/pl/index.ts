@@ -87,7 +87,7 @@ export const translations: typeof enTranslations = {
     privacy:
       "Prywatność: czaty incognito zostają w lokalnej pamięci twojej przeglądarki, bez konta. Czaty prywatne zapisują się tylko na twoim koncie.",
     price:
-      "Cena: {{guestCredits}} darmowych kredytów miesięcznie bez konta, {{freeCredits}} z kontem. Plany od {{subPrice}} miesięcznie. Modele bez cenzury odblokowujesz jednorazowym potwierdzeniem, że masz 18 lat.",
+      "Cena: {{guestCredits}} darmowych kredytów miesięcznie bez konta, {{freeCredits}} z kontem, {{maxCredits}} z newsletterem. Plany od {{subPrice}} miesięcznie. Modele bez cenzury odblokowujesz jednorazowym potwierdzeniem, że masz 18 lat.",
     open: "Open source: cała platforma jest na GitHubie i aktywnie rozwijana. Chcesz własną instancję, hostujesz ją sam.",
     weak: "Gdzie jesteśmy słabsi: brak płaskiego planu na wszystko, a wideo kosztuje u nas też sporo kredytów. Darmowy start FreedomGPT bez konta jest tak samo prosty jak nasz.",
     hubLink: "Czat AI bez cenzury: wszystkie modele z kontekstem i ceną",
@@ -129,7 +129,7 @@ export const translations: typeof enTranslations = {
     },
     free: {
       q: "Czy jest darmowa alternatywa dla FreedomGPT?",
-      a: "Tak. Ollama jest darmowa i otwarta na twoim sprzęcie, LM Studio też działa lokalnie za darmo. {{appName}} daje {{guestCredits}} darmowych kredytów miesięcznie bez konta i {{freeCredits}} z kontem, modele bez cenzury w cenie po jednorazowym potwierdzeniu 18 lat.",
+      a: "Tak. Ollama jest darmowa i otwarta na twoim sprzęcie, LM Studio też działa lokalnie za darmo. {{appName}} daje {{guestCredits}} darmowych kredytów miesięcznie bez konta i {{freeCredits}} z kontem, {{maxCredits}} z newsletterem, modele bez cenzury w cenie po jednorazowym potwierdzeniu 18 lat.",
     },
     liberty: {
       q: "Czy mogę używać FreedomGPT Liberty gdzie indziej?",

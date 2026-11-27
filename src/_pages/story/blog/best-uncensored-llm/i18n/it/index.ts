@@ -131,7 +131,7 @@ export const translations: typeof enTranslations = {
     },
     free: {
       q: "Qual è il miglior LLM senza censura gratuito?",
-      a: "Online, {{appName}} ti dà {{guestCredits}} crediti gratuiti al mese senza account e {{freeCredits}} con un account gratuito. Il modello senza censura più economico, {{cheapestModel}}, costa {{cheapestPrice}} per messaggio. I modelli senza censura chiedono una conferma 18+ una tantum.",
+      a: "Online, {{appName}} ti dà {{guestCredits}} crediti gratuiti al mese senza account e {{freeCredits}} con un account gratuito, {{maxCredits}} con la newsletter. Il modello senza censura più economico, {{cheapestModel}}, costa {{cheapestPrice}} per messaggio. I modelli senza censura chiedono una conferma 18+ una tantum.",
     },
     roleplay: {
       q: "Qual è il miglior modello senza censura per il roleplay?",

@@ -69,7 +69,7 @@ export const translations: typeof enTranslations = {
     privacy:
       "Súkromie: inkognito čety ostávajú v lokálnom úložisku tvojho prehliadača aj bez účtu.",
     price:
-      "Cena: každý mesiac {{guestCredits}} kreditov zdarma bez účtu alebo {{freeCredits}} s bezplatným účtom. Plány: {{planList}}.",
+      "Cena: každý mesiac {{guestCredits}} kreditov zdarma bez účtu alebo {{freeCredits}} s bezplatným účtom, {{maxCredits}} pri odbere noviniek. Plány: {{planList}}.",
     api: "API: rozhrania kompatibilné s OpenAI a Anthropic vrátane modelov Claude. Prístup odomkne každý nákup.",
     weak: "V čom má Claude navrch: Claude Code, Projects a Cowork sú vlastné aplikácie Anthropic. Ak Claude intenzívne používaš každý deň, predplatné Claude vyjde lacnejšie než platba za správu s našou prirážkou {{markup}} %. Aj Claude na {{appName}} sa riadi pravidlami Anthropic.",
     ownLink: "Pozrieť model {{ownModel}}",
@@ -105,7 +105,7 @@ export const translations: typeof enTranslations = {
     },
     free: {
       q: "Existuje bezplatná alternatíva k Claude?",
-      a: "ChatGPT, Gemini, Grok, DeepSeek aj Mistral majú bezplatné plány s limitmi. LM Studio a Ollama sú zdarma na vlastnom hardvéri. Na {{appName}} máš každý mesiac {{guestCredits}} kreditov zdarma bez účtu alebo {{freeCredits}} s bezplatným účtom a môžeš ich minúť aj na Claude.",
+      a: "ChatGPT, Gemini, Grok, DeepSeek aj Mistral majú bezplatné plány s limitmi. LM Studio a Ollama sú zdarma na vlastnom hardvéri. Na {{appName}} máš každý mesiac {{guestCredits}} kreditov zdarma bez účtu alebo {{freeCredits}} s bezplatným účtom, {{maxCredits}} pri odbere noviniek a môžeš ich minúť aj na Claude.",
     },
     filter: {
       q: "Existuje Claude bez cenzúry?",

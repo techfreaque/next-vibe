@@ -184,7 +184,7 @@ export const translations: typeof enTranslations = {
     },
     free: {
       q: "Puis-je essayer les modèles non censurés gratuitement ?",
-      a: "Oui. {{guestCredits}} crédits gratuits par mois sans compte, {{freeCredits}} avec un compte gratuit. De quoi faire le test de dix minutes sur les modèles non censurés les moins chers. Les modèles premium coûtent plus cher par message.",
+      a: "Oui. {{guestCredits}} crédits gratuits par mois sans compte, {{freeCredits}} avec un compte gratuit, {{maxCredits}} avec la newsletter. De quoi faire le test de dix minutes sur les modèles non censurés les moins chers. Les modèles premium coûtent plus cher par message.",
     },
     legal: {
       q: "Les modèles d'IA non censurés sont-ils légaux ?",

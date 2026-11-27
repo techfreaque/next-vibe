@@ -112,7 +112,7 @@ export const translations = {
     },
     free: {
       q: "Can I try it for free?",
-      a: "Yes. {{guestCredits}} free credits a month without an account, {{freeCredits}} with a free one. Enough for plenty of messages on the cheaper builds.",
+      a: "Yes. {{guestCredits}} free credits a month without an account, {{freeCredits}} with a free one, {{maxCredits}} with the newsletter. Enough for plenty of messages on the cheaper builds.",
     },
     directoryLink: "All abliterated models, with context and price",
     bestLink: "The best uncensored LLM, picked by job",

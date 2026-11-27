@@ -49,7 +49,7 @@ export const translations: typeof enTranslations = {
     privacy:
       "Prywatność: czaty incognito zostają w pamięci lokalnej twojej przeglądarki, bez konta. Prywatne czaty zapisują się tylko na twoim koncie.",
     price:
-      "Cena: {{guestCredits}} darmowych kredytów miesięcznie bez konta, {{freeCredits}} z kontem. Plany od {{subPrice}} miesięcznie. Pakiety kredytów doładowują aktywny plan i nigdy nie wygasają.",
+      "Cena: {{guestCredits}} darmowych kredytów miesięcznie bez konta, {{freeCredits}} z kontem, {{maxCredits}} z newsletterem. Plany od {{subPrice}} miesięcznie. Pakiety kredytów doładowują aktywny plan i nigdy nie wygasają.",
     api: "API: te same modele przez endpointy zgodne z OpenAI i Anthropic. Odblokowuje je każdy plan od {{apiSubPrice}} miesięcznie.",
     weak: "Gdzie jesteśmy słabsi: katalog Venice jest większy, a na własnych modelach Venice jest tańsze za token, bo my doliczamy {{markup}} % narzutu do tego, co sami płacimy. Nie mamy płatności x402 za zapytanie ani warstwy tokenów jak VVV czy DIEM: nasze API wymaga konta i zakupu.",
     directoryLink: "Wszystkie abliterowane modele z kontekstem i ceną",
@@ -110,7 +110,7 @@ export const translations: typeof enTranslations = {
     },
     free: {
       q: "Czy jest darmowa alternatywa dla Venice AI?",
-      a: "Tak. Własny darmowy plan Venice to 10 promptów tekstowych i 15 obrazowych dziennie. FreedomGPT startuje za darmo i bez konta. LM Studio jest darmowe na Twoim sprzęcie. {{appName}} daje {{guestCredits}} darmowych kredytów miesięcznie bez konta i {{freeCredits}} z kontem, w tym modele bez cenzury po jednorazowym potwierdzeniu 18+.",
+      a: "Tak. Własny darmowy plan Venice to 10 promptów tekstowych i 15 obrazowych dziennie. FreedomGPT startuje za darmo i bez konta. LM Studio jest darmowe na Twoim sprzęcie. {{appName}} daje {{guestCredits}} darmowych kredytów miesięcznie bez konta i {{freeCredits}} z kontem, {{maxCredits}} z newsletterem, w tym modele bez cenzury po jednorazowym potwierdzeniu 18+.",
     },
     private: {
       q: "Która alternatywa dla Venice jest najbardziej prywatna?",

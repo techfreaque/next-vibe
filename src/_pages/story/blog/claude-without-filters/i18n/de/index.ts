@@ -143,7 +143,7 @@ export const translations: typeof enTranslations = {
     },
     free: {
       q: "Kann ich es kostenlos testen?",
-      a: "Ja. {{guestCredits}} Gratis-Credits im Monat ohne Konto, {{freeCredits}} mit einem kostenlosen Konto. Unzensierte Modelle inklusive, nach einer einmaligen Bestätigung ab 18.",
+      a: "Ja. {{guestCredits}} Gratis-Credits im Monat ohne Konto, {{freeCredits}} mit einem kostenlosen Konto, {{maxCredits}} mit Newsletter. Unzensierte Modelle inklusive, nach einer einmaligen Bestätigung ab 18.",
     },
     chatLink: "Unzensierter KI-Chat: Modell wählen und loslegen",
     roleplayLink: "KI-Rollenspiel ohne Filter",

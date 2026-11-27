@@ -49,7 +49,7 @@ export const translations: typeof enTranslations = {
     privacy:
       "Súkromie: Anonymné čety zostávajú v lokálnom úložisku prehliadača a účet nepotrebuješ. Súkromné čety sa ukladajú len do tvojho účtu.",
     price:
-      "Cena: Mesačne dostaneš {{guestCredits}} kred. bez účtu alebo {{freeCredits}} s účtom. Plány začínajú na {{subPrice}} mesačne. K aktívnemu plánu si môžeš dokúpiť kredity, ktoré nevypršia.",
+      "Cena: Mesačne dostaneš {{guestCredits}} kred. bez účtu alebo {{freeCredits}} s účtom, {{maxCredits}} pri odbere noviniek. Plány začínajú na {{subPrice}} mesačne. K aktívnemu plánu si môžeš dokúpiť kredity, ktoré nevypršia.",
     api: "API: Rovnaké modely sú dostupné cez rozhrania kompatibilné s OpenAI aj Anthropicom. Prístup získaš s ktorýmkoľvek plánom od {{apiSubPrice}} mesačne.",
     weak: "Kde sme slabší: katalóg Venice je väčší a na vlastných modeloch je Venice lacnejšie za token, lebo k cene, ktorú platíme my, pripočítavame prirážku {{markup}} %. Nemáme platbu za požiadavku cez x402 ani tokenovú vrstvu ako VVV či DIEM: naše API vyžaduje účet a nákup.",
     directoryLink: "Všetky abliterované modely, ich kontext a ceny",
@@ -110,7 +110,7 @@ export const translations: typeof enTranslations = {
     },
     free: {
       q: "Existuje bezplatná alternatíva k Venice AI?",
-      a: "Áno. Bezplatný plán Venice dáva 10 textových a 15 obrazových zadaní denne. FreedomGPT začína zadarmo a bez účtu. LM Studio je zadarmo na tvojom hardvéri. {{appName}} dáva mesačne {{guestCredits}} kreditov zadarmo bez účtu a {{freeCredits}} s účtom, vrátane modelov bez cenzúry po jednorazovom potvrdení veku 18+.",
+      a: "Áno. Bezplatný plán Venice dáva 10 textových a 15 obrazových zadaní denne. FreedomGPT začína zadarmo a bez účtu. LM Studio je zadarmo na tvojom hardvéri. {{appName}} dáva mesačne {{guestCredits}} kreditov zadarmo bez účtu a {{freeCredits}} s účtom, {{maxCredits}} pri odbere noviniek, vrátane modelov bez cenzúry po jednorazovom potvrdení veku 18+.",
     },
     private: {
       q: "Ktorá alternatíva k Venice poskytuje najviac súkromia?",

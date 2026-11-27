@@ -49,7 +49,7 @@ export const translations: typeof enTranslations = {
     privacy:
       "Confidentialité : les chats incognito restent dans le stockage local de votre navigateur, sans compte. Les chats privés sont enregistrés uniquement dans votre compte.",
     price:
-      "Prix : {{guestCredits}} crédits gratuits par mois sans compte, {{freeCredits}} avec un compte. Abonnements à partir de {{subPrice}} par mois. Les packs de crédits complètent un abonnement actif et n'expirent jamais.",
+      "Prix : {{guestCredits}} crédits gratuits par mois sans compte, {{freeCredits}} avec un compte, {{maxCredits}} avec la newsletter. Abonnements à partir de {{subPrice}} par mois. Les packs de crédits complètent un abonnement actif et n'expirent jamais.",
     api: "API : les mêmes modèles via des endpoints compatibles OpenAI et Anthropic. N'importe quel abonnement à partir de {{apiSubPrice}} par mois la débloque.",
     weak: "Là où nous sommes plus faibles : le catalogue de Venice est plus grand, et sur ses propres modèles Venice est moins cher au token, car nous ajoutons {{markup}} % à ce que nous payons. Pas de x402 à la requête, pas de couche de tokens comme VVV ou DIEM : notre API demande un compte et un achat.",
     directoryLink: "Tous les modèles abliterated, avec contexte et prix",
@@ -110,7 +110,7 @@ export const translations: typeof enTranslations = {
     },
     free: {
       q: "Existe-t-il une alternative gratuite à Venice AI ?",
-      a: "Oui. L’offre gratuite de Venice même, c’est 10 prompts texte et 15 prompts image par jour. FreedomGPT démarre gratuitement et sans compte. LM Studio est gratuit sur votre propre matériel. {{appName}} offre {{guestCredits}} crédits gratuits par mois sans compte et {{freeCredits}} avec un compte, modèles non censurés inclus après une confirmation 18+ unique.",
+      a: "Oui. L’offre gratuite de Venice même, c’est 10 prompts texte et 15 prompts image par jour. FreedomGPT démarre gratuitement et sans compte. LM Studio est gratuit sur votre propre matériel. {{appName}} offre {{guestCredits}} crédits gratuits par mois sans compte et {{freeCredits}} avec un compte, {{maxCredits}} avec la newsletter, modèles non censurés inclus après une confirmation 18+ unique.",
     },
     private: {
       q: "Quelle alternative à Venice est la plus privée ?",

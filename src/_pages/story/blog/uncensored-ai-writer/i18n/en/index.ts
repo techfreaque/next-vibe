@@ -133,7 +133,7 @@ export const translations = {
     },
     free: {
       q: "Is there a free uncensored AI story writer?",
-      a: "You get {{guestCredits}} free credits a month without an account and {{freeCredits}} with a free account. That covers a good number of scenes on the cheaper models. Plans start at {{subPrice}} a month for longer projects.",
+      a: "You get {{guestCredits}} free credits a month without an account and {{freeCredits}} with a free account, {{maxCredits}} with the newsletter. That covers a good number of scenes on the cheaper models. Plans start at {{subPrice}} a month for longer projects.",
     },
     adult: {
       q: "Can an uncensored AI write adult and NSFW fiction?",

@@ -34,7 +34,7 @@ export const translations: typeof enTranslations = {
     intro:
       "Wechsle mitten im Gespräch das Modell, ganz ohne eigene API-Schlüssel. Im Katalog stehen {{modelCount}} Chatmodelle, darunter {{mainstream}} Mainstream-Modelle, {{open}} offene und {{uncensored}} unzensierte Modelle. Für unzensierte Modelle bestätigst du, dass du mindestens 18 bist.",
     price:
-      "Als Gast erhältst du monatlich {{guestCredits}} Gratiscredits, mit Konto {{freeCredits}}. Tarife beginnen bei {{subPrice}} im Monat. Welche Credits eine Anfrage verbraucht, hängt vom Modell ab.",
+      "Als Gast erhältst du monatlich {{guestCredits}} Gratiscredits, mit Konto {{freeCredits}}, {{maxCredits}} mit Newsletter. Tarife beginnen bei {{subPrice}} im Monat. Welche Credits eine Anfrage verbraucht, hängt vom Modell ab.",
     privacy:
       "Im Inkognitomodus bleibt der Verlauf im Browser. Ein gehostetes Modell erhält weiterhin die Eingabe, die es für seine Antwort benötigt.",
     api: "Zugang zu den OpenAI- und Anthropic-kompatiblen APIs gibt es ab {{apiSubPrice}} im Monat.",

@@ -133,7 +133,7 @@ export const translations: typeof enTranslations = {
   },
   us: {
     kind: "Czat z wieloma modelami: mainstream, open i bez cenzury",
-    free: "Tak: {{guestCredits}} kredytów miesięcznie bez konta, {{freeCredits}} z kontem",
+    free: "Tak: {{guestCredits}} kredytów miesięcznie bez konta, {{freeCredits}} z kontem, {{maxCredits}} z newsletterem",
     paid: "Od {{subPrice}}/mies.",
     filterShort:
       "Sam ustawiasz poziom dla każdego czatu. Bez cenzury po jednorazowym potwierdzeniu 18+",
@@ -579,7 +579,7 @@ export const translations: typeof enTranslations = {
       privacy:
         "Czaty incognito są w Twojej przeglądarce, nie na naszych serwerach, i nie wymagają konta. Prywatne czaty synchronizują się z Twoim kontem. Każda wiadomość i tak przechodzi przez nas do dostawcy, który odpowiada.",
       pricing:
-        "{{guestCredits}} darmowych kredytów miesięcznie bez konta, {{freeCredits}} z kontem. Plany: {{planList}} miesięcznie. Pakiety kredytów doładowują aktywny plan i nigdy nie wygasają. Karta, PayPal albo krypto.",
+        "{{guestCredits}} darmowych kredytów miesięcznie bez konta, {{freeCredits}} z kontem, {{maxCredits}} z newsletterem. Plany: {{planList}} miesięcznie. Pakiety kredytów doładowują aktywny plan i nigdy nie wygasają. Karta, PayPal albo krypto.",
       api: "API zgodne z OpenAI i Anthropic: czat, obrazy, wideo i mowa, po dowolnym planie (od {{apiSubPrice}}) albo zakupie kredytów.",
       media:
         "{{imageModels}} modeli obrazu, {{videoModels}} wideo, {{musicModels}} muzyki i {{voiceModels}} głosu na tym samym saldzie.",
@@ -1176,7 +1176,7 @@ export const translations: typeof enTranslations = {
       },
       usPros: {
         a: "{{ownModel}} plus {{modelCount}} innych modeli w jednym czacie: porównasz jego odpowiedź z modelami mainstream i abliterowanymi w tym samym wątku.",
-        b: "{{guestCredits}} darmowych kredytów miesięcznie bez konta, {{freeCredits}} z kontem.",
+        b: "{{guestCredits}} darmowych kredytów miesięcznie bez konta, {{freeCredits}} z kontem, {{maxCredits}} z newsletterem.",
         c: "Obrazy, wideo, muzyka i głos na tym samym saldzie, a cała platforma jest open source.",
       },
       usCons: {

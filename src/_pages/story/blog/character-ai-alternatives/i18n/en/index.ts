@@ -73,7 +73,7 @@ export const translations = {
     privacy:
       "Incognito chat works without an account and keeps the transcript in your browser. A hosted provider still receives each prompt.",
     price:
-      "{{guestCredits}} monthly guest credits or {{freeCredits}} with a free account. Subscriptions start at {{subPrice}} a month. Model usage spends credits.",
+      "{{guestCredits}} monthly guest credits or {{freeCredits}} with a free account, {{maxCredits}} with the newsletter. Subscriptions start at {{subPrice}} a month. Model usage spends credits.",
     weak: "Character.AI and Janitor AI offer deeper character discovery. Heavy users can also get more predictable bills from a flat plan on a dedicated roleplay service.",
     skillsLink: "Browse built-in and community skills",
     roleplayLink: "Open the Roleplay skill",
@@ -263,7 +263,7 @@ export const translations = {
     },
     free: {
       q: "Is there a free Character.AI alternative?",
-      a: "Janitor AI offers unlimited standard chats. Nomi offers 50 messages a day. SillyTavern is free software and needs a separate model. {{appName}} gives {{guestCredits}} monthly guest credits or {{freeCredits}} with a free account.",
+      a: "Janitor AI offers unlimited standard chats. Nomi offers 50 messages a day. SillyTavern is free software and needs a separate model. {{appName}} gives {{guestCredits}} monthly guest credits or {{freeCredits}} with a free account, {{maxCredits}} with the newsletter.",
     },
     import: {
       q: "Can I move my Character.AI characters and conversations?",

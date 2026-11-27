@@ -133,7 +133,7 @@ export const translations = {
       "Cheapest right now: {{cheapestName}} at {{cheapestPrice}}. Cheapest uncensored: {{uncensoredName}} at {{uncensoredPrice}}. Priciest: {{priciestName}} at {{priciestPrice}}.",
     failed:
       "Credits come off only after an image is delivered. Failed job or upstream refusal: you pay nothing.",
-    free: "Free: {{guestCredits}} credits a month without an account, {{freeCredits}} with a free account. On {{uncensoredName}} that is {{freeUncensoredImages}} images a month for nothing.",
+    free: "Free: {{guestCredits}} credits a month without an account, {{freeCredits}} with a free account, {{maxCredits}} with the newsletter. On {{uncensoredName}} that is {{freeUncensoredImages}} images a month for nothing.",
     sub: "Monthly plans: four sizes, starting at {{subCredits}} credits for {{subPrice}}.",
     pack: "Credit packs: a top-up for subscribers, {{packCredits}} credits for {{packPrice}}. They never expire. Card, PayPal or crypto.",
     link: "See plans and credit packs",
@@ -161,7 +161,7 @@ export const translations = {
     },
     free: {
       q: "Is there a free uncensored AI image generator?",
-      a: "You can start free. {{guestCredits}} credits a month without an account, {{freeCredits}} with a free account. {{uncensoredName}} costs {{uncensoredCredits}} credits per image. After that: a plan, from {{subPrice}} a month.",
+      a: "You can start free. {{guestCredits}} credits a month without an account, {{freeCredits}} with a free account, {{maxCredits}} with the newsletter. {{uncensoredName}} costs {{uncensoredCredits}} credits per image. After that: a plan, from {{subPrice}} a month.",
     },
     cheapest: {
       q: "What is the cheapest AI image generator?",

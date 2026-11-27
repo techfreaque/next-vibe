@@ -113,7 +113,7 @@ export const translations: typeof enTranslations = {
     title: "Combien ça coûte, local contre en ligne",
     intro: "En local, pas de prix par message. Le prix, c'est le matériel.",
     guest:
-      "En ligne chez nous : {{guestCredits}} crédits gratuits par mois sans compte, {{freeCredits}} avec un compte gratuit.",
+      "En ligne chez nous : {{guestCredits}} crédits gratuits par mois sans compte, {{freeCredits}} avec un compte gratuit, {{maxCredits}} avec la newsletter.",
     plan: "Abonnements à partir de {{subPrice}} par mois. Les packs de crédits complètent un abonnement actif et n'expirent jamais.",
     local:
       "En local : gratuit par message, mais un GPU capable de faire tourner les gros modèles coûte plus cher que des années de chat hébergé. Sans compter l'électricité.",
@@ -132,7 +132,7 @@ export const translations: typeof enTranslations = {
     },
     free: {
       q: "Existe-t-il un LLM non censuré gratuit en ligne ?",
-      a: "Sur {{appName}}, vous recevez {{guestCredits}} crédits gratuits par mois sans compte et {{freeCredits}} avec un compte gratuit. Le nombre de messages dépend du modèle et de la longueur de la conversation. Les modèles non censurés demandent une confirmation 18+ unique.",
+      a: "Sur {{appName}}, vous recevez {{guestCredits}} crédits gratuits par mois sans compte et {{freeCredits}} avec un compte gratuit, {{maxCredits}} avec la newsletter. Le nombre de messages dépend du modèle et de la longueur de la conversation. Les modèles non censurés demandent une confirmation 18+ unique.",
     },
     vram: {
       q: "Combien de VRAM faut-il pour faire tourner un modèle non censuré en local ?",

@@ -66,7 +66,7 @@ export const translations: typeof enTranslations = {
     privacy:
       "Súkromie: Anonymné čety zostávajú v lokálnom úložisku prehliadača a účet nepotrebuješ. Súkromné čety sa ukladajú len do tvojho účtu.",
     price:
-      "Cena: Mesačne {{guestCredits}} kred. bez účtu alebo {{freeCredits}} s účtom. Plány od {{subPrice}} mesačne. K aktívnemu plánu si dokúpiš kredity, ktoré nevypršia.",
+      "Cena: Mesačne {{guestCredits}} kred. bez účtu alebo {{freeCredits}} s účtom, {{maxCredits}} pri odbere noviniek. Plány od {{subPrice}} mesačne. K aktívnemu plánu si dokúpiš kredity, ktoré nevypršia.",
     api: "API: Rovnaké modely ponúkame cez koncové body kompatibilné s OpenAI aj Anthropicom. Odomkne ich každý plán od {{apiSubPrice}} mesačne.",
     weak: "Kde máme slabinu: Neponúkame neobmedzený paušál. Každá správa stojí kredity podľa vybraného modelu.",
     hubLink: "Čet s AI bez cenzúry: všetky modely, ich kontext a ceny",
@@ -107,7 +107,7 @@ export const translations: typeof enTranslations = {
     },
     free: {
       q: "Existuje bezplatná alternatíva k NoFilterGPT?",
-      a: "Áno. FreedomGPT funguje na začiatok aj zadarmo bez účtu. LM Studio je zadarmo na vlastnom zariadení. {{appName}} poskytuje {{guestCredits}} kred. mesačne bez účtu alebo {{freeCredits}} s účtom. Modely bez cenzúry sa odomknú po jednorazovom potvrdení veku 18+.",
+      a: "Áno. FreedomGPT funguje na začiatok aj zadarmo bez účtu. LM Studio je zadarmo na vlastnom zariadení. {{appName}} poskytuje {{guestCredits}} kred. mesačne bez účtu alebo {{freeCredits}} s účtom, {{maxCredits}} pri odbere noviniek. Modely bez cenzúry sa odomknú po jednorazovom potvrdení veku 18+.",
     },
     models: {
       q: "Aký model používa NoFilterGPT?",

@@ -142,7 +142,7 @@ export const translations: typeof enTranslations = {
       "हर जवाब पर मॉडल और सीन की लंबाई के हिसाब से क्रेडिट लगते हैं। टेबल एक लंबे सीन की कीमत दिखाती है। 1 क्रेडिट = {{creditValue}}।",
     cheapest:
       "सबसे सस्ता जवाब: {{cheapestName}}, {{cheapestPrice}} में, लगभग {{cheapestPerUnit}} जवाब प्रति {{unit}}। सबसे सस्ता अनसेंसर्ड: {{uncensoredName}}, {{uncensoredPrice}} में, लगभग {{uncensoredPerUnit}} जवाब प्रति {{unit}}।",
-    free: "फ़्री: बिना अकाउंट हर महीने {{guestCredits}} क्रेडिट, फ़्री अकाउंट के साथ {{freeCredits}}। किसी सस्ते मॉडल पर एक लंबे पहले कैंपेन के लिए काफ़ी।",
+    free: "फ़्री: बिना अकाउंट हर महीने {{guestCredits}} क्रेडिट, फ़्री अकाउंट के साथ {{freeCredits}}, न्यूज़लेटर के साथ {{maxCredits}}। किसी सस्ते मॉडल पर एक लंबे पहले कैंपेन के लिए काफ़ी।",
     sub: "मंथली प्लान: चार साइज़, {{subPrice}} में {{subCredits}} क्रेडिट से शुरू।",
     pack: "क्रेडिट पैक: सब्सक्राइबर के लिए टॉप-अप, {{packPrice}} में {{packCredits}} क्रेडिट। कभी एक्सपायर नहीं होते। कार्ड, PayPal या क्रिप्टो से पेमेंट।",
     link: "प्लान और क्रेडिट पैक देखें",
@@ -167,7 +167,7 @@ export const translations: typeof enTranslations = {
     },
     free: {
       q: "क्या बिना फ़िल्टर AI रोलप्ले फ़्री है?",
-      a: "आप फ़्री में शुरू कर सकते हैं: बिना अकाउंट हर महीने {{guestCredits}} क्रेडिट, फ़्री अकाउंट के साथ {{freeCredits}}। लंबे सीन में {{uncensoredName}} पर एक जवाब के लगभग {{uncensoredCredits}} क्रेडिट लगते हैं। उसके बाद: प्लान, {{subPrice}} प्रति महीने से।",
+      a: "आप फ़्री में शुरू कर सकते हैं: बिना अकाउंट हर महीने {{guestCredits}} क्रेडिट, फ़्री अकाउंट के साथ {{freeCredits}}, न्यूज़लेटर के साथ {{maxCredits}}। लंबे सीन में {{uncensoredName}} पर एक जवाब के लगभग {{uncensoredCredits}} क्रेडिट लगते हैं। उसके बाद: प्लान, {{subPrice}} प्रति महीने से।",
     },
     nsfw: {
       q: "क्या मैं NSFW रोलप्ले कर सकता हूँ?",

@@ -143,7 +143,7 @@ export const translations: typeof enTranslations = {
       "Cena odpovede závisí od modelu a dĺžky scény. Tabuľka počíta s dlhou scénou. Jeden kredit má hodnotu {{creditValue}}.",
     cheapest:
       "Najlacnejšiu odpoveď ponúka {{cheapestName}} za {{cheapestPrice}}. Za {{unit}} dostaneš asi {{cheapestPerUnit}} odpovedí. Z necenzurovaných je najlacnejší {{uncensoredName}} za {{uncensoredPrice}}, teda približne {{uncensoredPerUnit}} odpovedí za {{unit}}.",
-    free: "Zdarma každý mesiac: {{guestCredits}} kred. bez účtu alebo {{freeCredits}} s bezplatným účtom. Pri lacnom modeli to stačí aj na dlhšiu prvú kampaň.",
+    free: "Zdarma každý mesiac: {{guestCredits}} kred. bez účtu alebo {{freeCredits}} s bezplatným účtom, {{maxCredits}} pri odbere noviniek. Pri lacnom modeli to stačí aj na dlhšiu prvú kampaň.",
     sub: "Na výber sú štyri mesačné predplatné. Najnižšie zahŕňa {{subCredits}} kred. za {{subPrice}}.",
     pack: "Balíky pre predplatiteľov: {{packCredits}} kred. za {{packPrice}}. Kredity nevypršia. Zaplatíš kartou, cez PayPal alebo kryptomenou.",
     link: "Pozrieť si plány a balíky kreditov",
@@ -168,7 +168,7 @@ export const translations: typeof enTranslations = {
     },
     free: {
       q: "Dá sa hrať bez filtrov aj zdarma?",
-      a: "Začať môžeš zdarma. Mesačne dostaneš {{guestCredits}} kred. bez účtu a {{freeCredits}} s bezplatným účtom. Pri dlhej scéne stojí odpoveď modelu {{uncensoredName}} približne {{uncensoredCredits}} kred. Ďalšie kredity ponúka predplatné od {{subPrice}} mesačne.",
+      a: "Začať môžeš zdarma. Mesačne dostaneš {{guestCredits}} kred. bez účtu a {{freeCredits}} s bezplatným účtom, {{maxCredits}} pri odbere noviniek. Pri dlhej scéne stojí odpoveď modelu {{uncensoredName}} približne {{uncensoredCredits}} kred. Ďalšie kredity ponúka predplatné od {{subPrice}} mesačne.",
     },
     nsfw: {
       q: "Môžem hrať aj scény pre dospelých?",

@@ -66,7 +66,7 @@ export const translations: typeof enTranslations = {
     privacy:
       "Confidentialité : les chats en navigation privée restent dans le stockage local de votre navigateur, sans compte. Les chats privés sont enregistrés uniquement dans votre compte.",
     price:
-      "Prix : {{guestCredits}} crédits gratuits par mois sans compte, {{freeCredits}} avec un compte. Offres à partir de {{subPrice}} par mois. Les packs de crédits complètent une offre active et n'expirent jamais.",
+      "Prix : {{guestCredits}} crédits gratuits par mois sans compte, {{freeCredits}} avec un compte, {{maxCredits}} avec la newsletter. Offres à partir de {{subPrice}} par mois. Les packs de crédits complètent une offre active et n'expirent jamais.",
     api: "API : les mêmes modèles via des endpoints compatibles OpenAI et Anthropic. Toute offre à partir de {{apiSubPrice}} par mois la débloque.",
     weak: "Là où nous sommes moins forts : pas de forfait illimité. Chaque message coûte des crédits, selon le modèle choisi.",
     hubLink: "Chat IA sans censure : tous les modèles, contexte et prix",
@@ -107,7 +107,7 @@ export const translations: typeof enTranslations = {
     },
     free: {
       q: "Existe-t-il une alternative gratuite à NoFilterGPT ?",
-      a: "Oui. FreedomGPT démarre gratuitement sans compte. LM Studio est gratuit sur votre propre matériel. {{appName}} offre {{guestCredits}} crédits gratuits par mois sans compte et {{freeCredits}} avec un compte, modèles non censurés compris après une confirmation unique de majorité.",
+      a: "Oui. FreedomGPT démarre gratuitement sans compte. LM Studio est gratuit sur votre propre matériel. {{appName}} offre {{guestCredits}} crédits gratuits par mois sans compte et {{freeCredits}} avec un compte, {{maxCredits}} avec la newsletter, modèles non censurés compris après une confirmation unique de majorité.",
     },
     models: {
       q: "Quel modèle utilise NoFilterGPT ?",

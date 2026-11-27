@@ -69,7 +69,7 @@ export const translations: typeof enTranslations = {
     privacy:
       "Confidentialité : les chats incognito restent dans le stockage local de votre navigateur, sans compte.",
     price:
-      "Prix : {{guestCredits}} crédits gratuits par mois sans compte, {{freeCredits}} avec un compte. Abonnements : {{planList}}, payables par carte ou en crypto. Les packs de crédits complètent un abonnement actif.",
+      "Prix : {{guestCredits}} crédits gratuits par mois sans compte, {{freeCredits}} avec un compte, {{maxCredits}} avec la newsletter. Abonnements : {{planList}}, payables par carte ou en crypto. Les packs de crédits complètent un abonnement actif.",
     api: "API : les mêmes modèles via des endpoints compatibles OpenAI et Anthropic. N'importe quel achat la débloque.",
     weak: "Là où Chub gagne : sa bibliothèque de fiches est bien plus grande, et il a des lorebooks avec déclencheurs par mots-clés. Nous n'importons pas encore les fiches Chub : vous collez la description du personnage dans une nouvelle compétence.",
     ownLink: "Voir {{ownModel}}",
@@ -106,7 +106,7 @@ export const translations: typeof enTranslations = {
     },
     free: {
       q: "Existe-t-il une alternative gratuite à Chub AI ?",
-      a: "Oui. Perchance et Character Tavern sont gratuits dans le navigateur. SillyTavern, RisuAI et KoboldCpp sont des logiciels gratuits : vous ne payez que le modèle, ou vous le faites tourner en local. {{appName}} offre {{guestCredits}} crédits gratuits par mois sans compte et {{freeCredits}} avec un compte.",
+      a: "Oui. Perchance et Character Tavern sont gratuits dans le navigateur. SillyTavern, RisuAI et KoboldCpp sont des logiciels gratuits : vous ne payez que le modèle, ou vous le faites tourner en local. {{appName}} offre {{guestCredits}} crédits gratuits par mois sans compte et {{freeCredits}} avec un compte, {{maxCredits}} avec la newsletter.",
     },
     filter: {
       q: "Quelles alternatives à Chub autorisent le jeu de rôle NSFW ?",

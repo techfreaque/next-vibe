@@ -66,7 +66,7 @@ export const translations = {
     privacy:
       "Privacy: incognito chats stay in your browser's local storage, no account needed.",
     price:
-      "Price: {{guestCredits}} free credits a month without an account, {{freeCredits}} with one. Plans: {{planList}}, paid by card or crypto. Credit packs top up an active plan.",
+      "Price: {{guestCredits}} free credits a month without an account, {{freeCredits}} with one, {{maxCredits}} with the newsletter. Plans: {{planList}}, paid by card or crypto. Credit packs top up an active plan.",
     api: "API: the same models over OpenAI and Anthropic compatible endpoints. Any purchase unlocks it.",
     weak: "Where Chub wins: its card library is far bigger, and it has lorebooks with keyword triggers. We have no Chub card import yet, so you paste the character's description into a new skill.",
     ownLink: "See {{ownModel}}",
@@ -103,7 +103,7 @@ export const translations = {
     },
     free: {
       q: "Is there a free Chub AI alternative?",
-      a: "Yes. Perchance and Character Tavern are free in the browser. SillyTavern, RisuAI and KoboldCpp are free software, you pay only the model or run it locally. {{appName}} gives {{guestCredits}} free credits a month without an account and {{freeCredits}} with one.",
+      a: "Yes. Perchance and Character Tavern are free in the browser. SillyTavern, RisuAI and KoboldCpp are free software, you pay only the model or run it locally. {{appName}} gives {{guestCredits}} free credits a month without an account and {{freeCredits}} with one, {{maxCredits}} with the newsletter.",
     },
     filter: {
       q: "Which Chub alternatives allow NSFW roleplay?",

@@ -121,7 +121,7 @@ export const translations = {
     },
     free: {
       q: "Can I compare models for free?",
-      a: "Yes. You get {{guestCredits}} free credits a month without an account and {{freeCredits}} with a free account. Switching models inside a chat costs nothing extra.",
+      a: "Yes. You get {{guestCredits}} free credits a month without an account and {{freeCredits}} with a free account, {{maxCredits}} with the newsletter. Switching models inside a chat costs nothing extra.",
     },
     refusalLink: "The refusal index: which AI actually answers",
     jailbreakLink: "Why ChatGPT jailbreaks keep breaking",

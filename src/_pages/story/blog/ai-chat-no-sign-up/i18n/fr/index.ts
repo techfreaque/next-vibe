@@ -97,6 +97,8 @@ export const translations: typeof enTranslations = {
     intro: "Jamais obligatoire. Parfois utile.",
     credits:
       "Jusqu'à {{freeCredits}} crédits gratuits par mois avec un e-mail vérifié, au lieu de {{guestCredits}}.",
+    newsletter:
+      "Confirmez la newsletter et votre total mensuel passe à {{maxCredits}} crédits : {{newsletterBonus}} crédits de bonus en plus.",
     sync: "Vos chats enregistrés dans vos dossiers privés, sur chaque appareil où vous vous connectez.",
     control:
       "Exportez toutes vos données en JSON ou supprimez votre compte depuis les Paramètres. La suppression efface vos données personnelles.",

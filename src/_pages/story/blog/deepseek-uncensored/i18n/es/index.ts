@@ -114,7 +114,7 @@ export const translations: typeof enTranslations = {
     },
     free: {
       q: "¿Puedo probarlo gratis?",
-      a: "Sí. {{guestCredits}} créditos gratis al mes sin cuenta, {{freeCredits}} con una cuenta gratuita. Da para muchos mensajes con las versiones más baratas.",
+      a: "Sí. {{guestCredits}} créditos gratis al mes sin cuenta, {{freeCredits}} con una cuenta gratuita, {{maxCredits}} con el boletín. Da para muchos mensajes con las versiones más baratas.",
     },
     directoryLink: "Todos los modelos abliterated, con contexto y precio",
     bestLink: "El mejor LLM sin censura, elegido por tarea",

@@ -136,7 +136,7 @@ export const translations: typeof enTranslations = {
       "Los más baratos ahora: {{cheapestName}} at {{cheapestPrice}}. Los más baratos sin censura: {{uncensoredName}} en {{uncensoredPrice}}. Priciest: {{priciestName}} en {{priciestPrice}}.",
     failed:
       "Los créditos salen sólo después de que una imagen sea entregada. Trabajo fallido o rechazo de corriente: no pagas nada.",
-    free: "Gratis: {{guestCredits}} credits a month without an account, {{freeCredits}} with a free account. En {{uncensoredName}} que es imágenes de {{freeUncensoredImages}} al mes para nada.",
+    free: "Gratis: {{guestCredits}} créditos al mes sin cuenta, {{freeCredits}} con una cuenta gratuita, {{maxCredits}} con el boletín. Con {{uncensoredName}} son {{freeUncensoredImages}} imágenes al mes sin pagar nada.",
     sub: "Planes mensuales: cuatro tamaños, comenzando en créditos {{subCredits}} para {{subPrice}}.",
     pack: "Paquetes para recargar los créditos de tu suscripción. {{packCredits}} créditos por {{packPrice}}. Nunca vencen. Paga con tarjeta, PayPal o criptomonedas.",
     link: "Ver planes y paquetes de crédito",
@@ -164,7 +164,7 @@ export const translations: typeof enTranslations = {
     },
     free: {
       q: "¿Hay un generador de imagen AI sin censura?",
-      a: "{{guestCredits}} acredita un mes sin cuenta, {{freeCredits}} con una cuenta gratuita. {{uncensoredName}} cuesta créditos {{uncensoredCredits}} por imagen. Después de eso: un plan, desde {{subPrice}} al mes.",
+      a: "{{guestCredits}} créditos al mes sin cuenta, {{freeCredits}} con una cuenta gratuita, {{maxCredits}} con el boletín. {{uncensoredName}} cuesta {{uncensoredCredits}} créditos por imagen. Después de eso: un plan, desde {{subPrice}} al mes.",
     },
     cheapest: {
       q: "¿Cuál es el generador de imagen AI más barato?",

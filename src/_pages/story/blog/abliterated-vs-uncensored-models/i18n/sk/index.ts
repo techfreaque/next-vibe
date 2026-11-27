@@ -182,7 +182,7 @@ export const translations: typeof enTranslations = {
     },
     free: {
       q: "Môžem modely bez cenzúry vyskúšať zadarmo?",
-      a: "Áno. Mesačne máš {{guestCredits}} kred. zadarmo bez účtu alebo {{freeCredits}} s bezplatným účtom. Na desaťminútové porovnanie lacnejších modelov to stačí. Prémiové modely stoja viac za správu.",
+      a: "Áno. Mesačne máš {{guestCredits}} kred. zadarmo bez účtu alebo {{freeCredits}} s bezplatným účtom, {{maxCredits}} pri odbere noviniek. Na desaťminútové porovnanie lacnejších modelov to stačí. Prémiové modely stoja viac za správu.",
     },
     legal: {
       q: "Sú modely AI bez cenzúry legálne?",

@@ -141,7 +141,7 @@ export const translations: typeof enTranslations = {
     },
     free: {
       q: "Czy mogę wypróbować za darmo?",
-      a: "Tak. {{guestCredits}} darmowych kredytów miesięcznie bez konta, {{freeCredits}} z darmowym kontem. Modele bez cenzury w zestawie po jednorazowym potwierdzeniu 18+.",
+      a: "Tak. {{guestCredits}} darmowych kredytów miesięcznie bez konta, {{freeCredits}} z darmowym kontem, {{maxCredits}} z newsletterem. Modele bez cenzury w zestawie po jednorazowym potwierdzeniu 18+.",
     },
     chatLink: "Czat AI bez cenzury: wybierz model i zacznij",
     roleplayLink: "Roleplay z AI bez filtra",

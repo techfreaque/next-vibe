@@ -88,7 +88,7 @@ export const translations: typeof enTranslations = {
     privacy:
       "Privacidad: los chats de incógnito se quedan en el almacenamiento local de tu navegador, sin cuenta. Los chats privados se guardan solo en tu cuenta.",
     price:
-      "Precio: {{guestCredits}} créditos gratis al mes sin cuenta, {{freeCredits}} con cuenta. Planes desde {{subPrice}} al mes. Los modelos sin censura se desbloquean con una confirmación única de que tienes 18 años.",
+      "Precio: {{guestCredits}} créditos gratis al mes sin cuenta, {{freeCredits}} con cuenta, {{maxCredits}} con el boletín. Planes desde {{subPrice}} al mes. Los modelos sin censura se desbloquean con una confirmación única de que tienes 18 años.",
     open: "Código abierto: toda la plataforma está en GitHub y en desarrollo activo. Si quieres tu propia instancia, la alojas tú.",
     weak: "Dónde somos más flojos: no hay plan plano para todo, y el vídeo aquí también cuesta créditos de verdad. El arranque gratis y sin cuenta de FreedomGPT es tan fácil como el nuestro.",
     hubLink: "Chat de IA sin censura: todos los modelos, con contexto y precio",
@@ -130,7 +130,7 @@ export const translations: typeof enTranslations = {
     },
     free: {
       q: "¿Hay una alternativa gratis a FreedomGPT?",
-      a: "Sí. Ollama es gratis y de código abierto en tu propio hardware, LM Studio es gratis en local. {{appName}} da {{guestCredits}} créditos gratis al mes sin cuenta y {{freeCredits}} con cuenta, modelos sin censura incluidos tras una confirmación única de que tienes 18 años.",
+      a: "Sí. Ollama es gratis y de código abierto en tu propio hardware, LM Studio es gratis en local. {{appName}} da {{guestCredits}} créditos gratis al mes sin cuenta y {{freeCredits}} con cuenta, {{maxCredits}} con el boletín, modelos sin censura incluidos tras una confirmación única de que tienes 18 años.",
     },
     liberty: {
       q: "¿Puedo usar FreedomGPT Liberty en otro sitio?",

@@ -116,7 +116,7 @@ export const translations: typeof enTranslations = {
     },
     free: {
       q: "Môžem si ho vyskúšať zdarma?",
-      a: "Áno. Bez účtu dostaneš mesačne {{guestCredits}} kred. zdarma a s bezplatným účtom {{freeCredits}}. Na lacnejších modeloch to stačí na veľa správ.",
+      a: "Áno. Bez účtu dostaneš mesačne {{guestCredits}} kred. zdarma a s bezplatným účtom {{freeCredits}}, {{maxCredits}} pri odbere noviniek. Na lacnejších modeloch to stačí na veľa správ.",
     },
     directoryLink: "Všetky abliterované modely, ich kontext a ceny",
     bestLink: "Ako vybrať necenzurovaný jazykový model podľa úlohy",

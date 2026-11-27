@@ -133,7 +133,7 @@ export const translations: typeof enTranslations = {
   },
   us: {
     kind: "Multi-Modell-Chat: Mainstream, offen und unzensiert",
-    free: "Ja: {{guestCredits}} Credits pro Monat ohne Konto, {{freeCredits}} mit Konto",
+    free: "Ja: {{guestCredits}} Credits pro Monat ohne Konto, {{freeCredits}} mit Konto, {{maxCredits}} mit Newsletter",
     paid: "Ab {{subPrice}}/Monat",
     filterShort:
       "Du wählst die Stufe pro Chat. Unzensiert nach einmaliger 18+-Bestätigung",
@@ -579,7 +579,7 @@ export const translations: typeof enTranslations = {
       privacy:
         "Inkognito-Chats liegen in deinem Browser, nicht auf unseren Servern, und brauchen kein Konto. Private Chats synchronisieren mit deinem Konto. Jede Nachricht läuft trotzdem über uns zum Anbieter, der sie beantwortet.",
       pricing:
-        "{{guestCredits}} Gratis-Credits pro Monat ohne Konto, {{freeCredits}} mit Konto. Tarife: {{planList}} pro Monat. Credit-Pakete laden einen aktiven Tarif auf und verfallen nie. Karte, PayPal oder Krypto.",
+        "{{guestCredits}} Gratis-Credits pro Monat ohne Konto, {{freeCredits}} mit Konto, {{maxCredits}} mit Newsletter. Tarife: {{planList}} pro Monat. Credit-Pakete laden einen aktiven Tarif auf und verfallen nie. Karte, PayPal oder Krypto.",
       api: "OpenAI- und Anthropic-kompatible API für Chat, Bilder, Video und Sprache, nach jedem Tarif (ab {{apiSubPrice}}) oder einem Credit-Kauf.",
       media:
         "{{imageModels}} Bild-, {{videoModels}} Video-, {{musicModels}} Musik- und {{voiceModels}} Sprachmodelle auf demselben Guthaben.",
@@ -1175,7 +1175,7 @@ export const translations: typeof enTranslations = {
       },
       usPros: {
         a: "{{ownModel}} plus {{modelCount}} weitere Modelle in einem Chat: Vergleich seine Antwort im selben Thread mit Mainstream- und abliterierten Modellen.",
-        b: "{{guestCredits}} Gratis-Credits pro Monat ohne Konto, {{freeCredits}} mit Konto.",
+        b: "{{guestCredits}} Gratis-Credits pro Monat ohne Konto, {{freeCredits}} mit Konto, {{maxCredits}} mit Newsletter.",
         c: "Bilder, Video, Musik und Sprache auf demselben Guthaben, und die gesamte Plattform ist Open Source.",
       },
       usCons: {

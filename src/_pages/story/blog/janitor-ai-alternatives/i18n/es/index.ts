@@ -46,7 +46,7 @@ export const translations: typeof enTranslations = {
     skills:
       "La habilidad de rol pide al modelo que mantenga su papel y te deje decidir las acciones de tu personaje. Thea y Hermes son compañeros integrados para conversaciones continuadas. Si lo que más te gusta es descubrir personajes listos para jugar, el directorio de Janitor te lo pone más fácil.",
     limit:
-      "Como invitado recibes {{guestCredits}} créditos gratis al mes. Con una cuenta gratuita recibes {{freeCredits}}. Una escena larga con un modelo prémium puede agotar el saldo. Para escribir sin contar las respuestas, el chat estándar gratuito de Janitor encaja mejor.",
+      "Como invitado recibes {{guestCredits}} créditos gratis al mes. Con una cuenta gratuita recibes {{freeCredits}}, {{maxCredits}} con el boletín. Una escena larga con un modelo prémium puede agotar el saldo. Para escribir sin contar las respuestas, el chat estándar gratuito de Janitor encaja mejor.",
     link: "Ver cómo funciona la habilidad de rol",
   },
   list: "Dónde escribir tu próxima historia",

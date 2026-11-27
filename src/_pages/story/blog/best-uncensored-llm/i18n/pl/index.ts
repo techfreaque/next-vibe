@@ -129,7 +129,7 @@ export const translations: typeof enTranslations = {
     },
     free: {
       q: "Jaki jest najlepszy darmowy nieocenzurowany LLM?",
-      a: "Online {{appName}} daje ci {{guestCredits}} darmowych kredytów miesięcznie bez konta i {{freeCredits}} z darmowym kontem. Najtańszy nieocenzurowany model, {{cheapestModel}}, kosztuje {{cheapestPrice}} za wiadomość. Nieocenzurowane modele raz proszą o potwierdzenie 18+.",
+      a: "Online {{appName}} daje ci {{guestCredits}} darmowych kredytów miesięcznie bez konta i {{freeCredits}} z darmowym kontem, {{maxCredits}} z newsletterem. Najtańszy nieocenzurowany model, {{cheapestModel}}, kosztuje {{cheapestPrice}} za wiadomość. Nieocenzurowane modele raz proszą o potwierdzenie 18+.",
     },
     roleplay: {
       q: "Jaki jest najlepszy nieocenzurowany model do roleplayu?",

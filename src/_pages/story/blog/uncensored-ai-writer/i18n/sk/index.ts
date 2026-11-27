@@ -135,7 +135,7 @@ export const translations: typeof enTranslations = {
     },
     free: {
       q: "Dá sa písať príbehy s AI bez cenzúry zadarmo?",
-      a: "Bez účtu máš každý mesiac k dispozícii {{guestCredits}} kreditov zdarma, s bezplatným účtom {{freeCredits}}. Pri lacnejších modeloch to vystačí na slušný počet scén. Na dlhšie projekty sú tu plány od {{subPrice}} mesačne.",
+      a: "Bez účtu máš každý mesiac k dispozícii {{guestCredits}} kreditov zdarma, s bezplatným účtom {{freeCredits}}, {{maxCredits}} pri odbere noviniek. Pri lacnejších modeloch to vystačí na slušný počet scén. Na dlhšie projekty sú tu plány od {{subPrice}} mesačne.",
     },
     adult: {
       q: "Dokáže AI bez cenzúry písať explicitnú beletriu pre dospelých?",

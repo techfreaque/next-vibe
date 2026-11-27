@@ -184,7 +184,7 @@ export const translations: typeof enTranslations = {
     },
     free: {
       q: "Kann ich unzensierte Modelle kostenlos testen?",
-      a: "Ja. {{guestCredits}} kostenlose Credits im Monat ohne Konto, {{freeCredits}} mit kostenlosem Konto. Genug für den Zehn-Minuten-Test mit den günstigeren unzensierten Modellen. Die Premium-Modelle kosten mehr pro Nachricht.",
+      a: "Ja. {{guestCredits}} kostenlose Credits im Monat ohne Konto, {{freeCredits}} mit kostenlosem Konto, {{maxCredits}} mit Newsletter. Genug für den Zehn-Minuten-Test mit den günstigeren unzensierten Modellen. Die Premium-Modelle kosten mehr pro Nachricht.",
     },
     legal: {
       q: "Sind unzensierte KI-Modelle legal?",

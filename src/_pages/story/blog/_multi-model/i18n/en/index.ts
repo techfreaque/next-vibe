@@ -32,7 +32,7 @@ export const translations = {
     intro:
       "Switch models in the same conversation without setting up a provider key. The catalog has {{modelCount}} chat models, including {{mainstream}} mainstream, {{open}} open and {{uncensored}} uncensored models. Uncensored access requires confirming you are 18 or older.",
     price:
-      "Start with {{guestCredits}} free credits a month as a guest or {{freeCredits}} with an account. Plans start at {{subPrice}} a month. Usage draws credits at the selected model’s rate.",
+      "Start with {{guestCredits}} free credits a month as a guest or {{freeCredits}} with an account, {{maxCredits}} with the newsletter. Plans start at {{subPrice}} a month. Usage draws credits at the selected model’s rate.",
     privacy:
       "Incognito history stays in your browser. A hosted model still receives the prompt it needs to answer.",
     api: "Paid access to OpenAI and Anthropic compatible APIs starts at {{apiSubPrice}} a month.",

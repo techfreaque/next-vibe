@@ -137,7 +137,7 @@ export const translations: typeof enTranslations = {
     },
     free: {
       q: "Existe-t-il une IA gratuite et sans censure pour écrire des histoires ?",
-      a: "Vous recevez {{guestCredits}} crédits gratuits par mois sans compte et {{freeCredits}} avec un compte gratuit. De quoi écrire bon nombre de scènes sur les modèles les moins chers. Pour les projets plus longs, les abonnements commencent à {{subPrice}} par mois.",
+      a: "Vous recevez {{guestCredits}} crédits gratuits par mois sans compte et {{freeCredits}} avec un compte gratuit, {{maxCredits}} avec la newsletter. De quoi écrire bon nombre de scènes sur les modèles les moins chers. Pour les projets plus longs, les abonnements commencent à {{subPrice}} par mois.",
     },
     adult: {
       q: "Une IA non censurée peut-elle écrire de la fiction adulte et NSFW ?",

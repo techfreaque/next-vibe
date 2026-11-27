@@ -97,6 +97,8 @@ export const translations: typeof enTranslations = {
     intro: "Čet funguje aj bez účtu. Účet ti pridá tieto možnosti.",
     credits:
       "S overeným e-mailom až {{freeCredits}} kred. zadarmo mesačne. Bez účtu je prídel {{guestCredits}}.",
+    newsletter:
+      "Potvrď newsletter a mesačný prídel stúpne na {{maxCredits}} kred.: bonus {{newsletterBonus}} kred. navyše.",
     sync: "Čety sa ukladajú do súkromných priečinkov. Nájdeš ich na každom zariadení, na ktorom sa prihlásiš.",
     control:
       "V nastaveniach môžeš exportovať všetky údaje vo formáte JSON alebo zmazať účet. Zmazaním účtu sa odstránia tvoje osobné údaje.",

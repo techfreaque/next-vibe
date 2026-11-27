@@ -49,7 +49,7 @@ export const translations: typeof enTranslations = {
     privacy:
       "Privacidad: los chats de incógnito se quedan en el almacenamiento local de tu navegador, sin cuenta. Los chats privados se guardan solo en tu cuenta.",
     price:
-      "Precio: {{guestCredits}} créditos gratis al mes sin cuenta, {{freeCredits}} con cuenta. Planes desde {{subPrice}} al mes. Los paquetes de créditos recargan un plan activo y no caducan nunca.",
+      "Precio: {{guestCredits}} créditos gratis al mes sin cuenta, {{freeCredits}} con cuenta, {{maxCredits}} con el boletín. Planes desde {{subPrice}} al mes. Los paquetes de créditos recargan un plan activo y no caducan nunca.",
     api: "API: los mismos modelos a través de endpoints compatibles con OpenAI y Anthropic. Cualquier plan desde {{apiSubPrice}} al mes la desbloquea.",
     weak: "Dónde flojeamos: el catálogo de Venice es más grande, y en sus propios modelos Venice es más barato por token, porque sobre lo que pagamos añadimos un margen del {{markup}}%. No tenemos pago por solicitud con x402 ni capa de tokens como VVV o DIEM: nuestra API exige cuenta y una compra.",
     directoryLink: "Todos los modelos abliterados, con contexto y precio",
@@ -110,7 +110,7 @@ export const translations: typeof enTranslations = {
     },
     free: {
       q: "¿Hay una alternativa gratis a Venice AI?",
-      a: "Sí. El plan gratis de Venice son 10 consultas de texto y 15 de imagen al día. FreedomGPT empieza gratis y sin cuenta. LM Studio es gratis en tu propio hardware. {{appName}} da {{guestCredits}} créditos gratis al mes sin cuenta y {{freeCredits}} con cuenta, con modelos sin censura incluidos tras una única confirmación de mayoría de edad.",
+      a: "Sí. El plan gratis de Venice son 10 consultas de texto y 15 de imagen al día. FreedomGPT empieza gratis y sin cuenta. LM Studio es gratis en tu propio hardware. {{appName}} da {{guestCredits}} créditos gratis al mes sin cuenta y {{freeCredits}} con cuenta, {{maxCredits}} con el boletín, con modelos sin censura incluidos tras una única confirmación de mayoría de edad.",
     },
     private: {
       q: "¿Qué alternativa a Venice es la más privada?",

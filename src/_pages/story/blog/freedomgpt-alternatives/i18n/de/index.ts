@@ -86,7 +86,7 @@ export const translations: typeof enTranslations = {
     privacy:
       "Datenschutz: Inkognito-Chats bleiben im lokalen Speicher deines Browsers, ohne Konto. Private Chats werden nur in deinem Konto gespeichert.",
     price:
-      "Preis: {{guestCredits}} Gratis-Credits im Monat ohne Konto, {{freeCredits}} mit Konto. Tarife ab {{subPrice}} im Monat. Unzensierte Modelle werden nach einer einmaligen 18+-Bestätigung freigeschaltet.",
+      "Preis: {{guestCredits}} Gratis-Credits im Monat ohne Konto, {{freeCredits}} mit Konto, {{maxCredits}} mit Newsletter. Tarife ab {{subPrice}} im Monat. Unzensierte Modelle werden nach einer einmaligen 18+-Bestätigung freigeschaltet.",
     open: "Open Source: Die gesamte Plattform liegt auf GitHub und wird aktiv entwickelt. Wer eine eigene Instanz will, hostet sie selbst.",
     weak: "Wo wir schwächer sind: kein pauschaler All-in-Tarif, und Video kostet auch bei uns spürbar Credits. Der kontolose Gratis-Einstieg von FreedomGPT ist so einfach wie unserer.",
     hubLink: "Unzensierter KI-Chat: alle Modelle mit Kontext und Preis",
@@ -128,7 +128,7 @@ export const translations: typeof enTranslations = {
     },
     free: {
       q: "Gibt es eine kostenlose FreedomGPT Alternative?",
-      a: "Ja. Ollama ist quelloffen und auf eigener Hardware kostenlos, LM Studio läuft lokal ebenfalls gratis. {{appName}} gibt {{guestCredits}} Gratis-Credits im Monat ohne Konto und {{freeCredits}} mit Konto, unzensierte Modelle inklusive nach einer einmaligen 18+-Bestätigung.",
+      a: "Ja. Ollama ist quelloffen und auf eigener Hardware kostenlos, LM Studio läuft lokal ebenfalls gratis. {{appName}} gibt {{guestCredits}} Gratis-Credits im Monat ohne Konto und {{freeCredits}} mit Konto, {{maxCredits}} mit Newsletter, unzensierte Modelle inklusive nach einer einmaligen 18+-Bestätigung.",
     },
     liberty: {
       q: "Kann ich FreedomGPT Liberty auch woanders nutzen?",

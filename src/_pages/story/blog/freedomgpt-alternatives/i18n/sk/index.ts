@@ -89,7 +89,7 @@ export const translations: typeof enTranslations = {
     privacy:
       "Súkromie: inkognito čety ostávajú v lokálnom úložisku prehliadača aj bez účtu. Súkromné čety sa ukladajú iba do tvojho účtu.",
     price:
-      "Cena: každý mesiac {{guestCredits}} kreditov zdarma bez účtu alebo {{freeCredits}} s bezplatným účtom. Predplatné od {{subPrice}} mesačne. Stačí raz potvrdiť vek 18+ a modely bez cenzúry sa odomknú.",
+      "Cena: každý mesiac {{guestCredits}} kreditov zdarma bez účtu alebo {{freeCredits}} s bezplatným účtom, {{maxCredits}} pri odbere noviniek. Predplatné od {{subPrice}} mesačne. Stačí raz potvrdiť vek 18+ a modely bez cenzúry sa odomknú.",
     open: "Otvorený kód: celú platformu nájdeš na GitHube a ďalej ju aktívne vyvíjame. Môžeš si spustiť vlastnú inštanciu.",
     weak: "V čom máme obmedzenia: neponúkame paušál na všetko a aj u nás video stojí kredity. FreedomGPT si môžeš vyskúšať bezplatne a bez účtu rovnako ľahko ako našu službu.",
     hubLink: "Čet s AI bez cenzúry: všetky modely, kontext a ceny",
@@ -131,7 +131,7 @@ export const translations: typeof enTranslations = {
     },
     free: {
       q: "Existuje bezplatná alternatíva k FreedomGPT?",
-      a: "Áno. Ollama má otvorený kód a rovnako ako LM Studio ju môžeš používať bezplatne na vlastnom hardvéri. Na {{appName}} máš každý mesiac {{guestCredits}} kreditov zdarma bez účtu alebo {{freeCredits}} s bezplatným účtom. Modely bez cenzúry sprístupní jednorazové potvrdenie veku 18+.",
+      a: "Áno. Ollama má otvorený kód a rovnako ako LM Studio ju môžeš používať bezplatne na vlastnom hardvéri. Na {{appName}} máš každý mesiac {{guestCredits}} kreditov zdarma bez účtu alebo {{freeCredits}} s bezplatným účtom, {{maxCredits}} pri odbere noviniek. Modely bez cenzúry sprístupní jednorazové potvrdenie veku 18+.",
     },
     liberty: {
       q: "Môžem FreedomGPT Liberty používať aj inde?",

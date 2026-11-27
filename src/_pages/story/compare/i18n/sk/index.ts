@@ -133,7 +133,7 @@ export const translations: typeof enTranslations = {
   },
   us: {
     kind: "Čet s bežnými, otvorenými aj necenzurovanými modelmi",
-    free: "Áno. Bez účtu {{guestCredits}} kr. mesačne, s účtom {{freeCredits}} kr.",
+    free: "Áno. Bez účtu {{guestCredits}} kr. mesačne, s účtom {{freeCredits}} kr., s newsletterom {{maxCredits}} kr.",
     paid: "Od {{subPrice}} mesačne",
     filterShort:
       "Úroveň si vyberieš pre každý čet. Modely bez cenzúry sprístupní jednorazové potvrdenie veku aspoň 18 rokov.",
@@ -581,7 +581,7 @@ export const translations: typeof enTranslations = {
       privacy:
         "Čety inkognito zostávajú v prehliadači bez uloženia na serveroch a fungujú bez účtu. Súkromné čety sa synchronizujú s účtom. Každá správa stále prejde cez nás k poskytovateľovi, ktorý na ňu odpovie.",
       pricing:
-        "Mesačne zdarma {{guestCredits}} kr. bez účtu alebo {{freeCredits}} kr. s účtom. Cena predplatného mesačne: {{planList}}. Balíky dopĺňajú kredity pri aktívnom predplatnom a ich platnosť nekončí. Platba kartou, cez PayPal alebo v kryptomene.",
+        "Mesačne zdarma {{guestCredits}} kr. bez účtu alebo {{freeCredits}} kr. s účtom, {{maxCredits}} pri odbere noviniek. Cena predplatného mesačne: {{planList}}. Balíky dopĺňajú kredity pri aktívnom predplatnom a ich platnosť nekončí. Platba kartou, cez PayPal alebo v kryptomene.",
       api: "API kompatibilné s OpenAI a Anthropic na čet, obrázky, video a reč sprístupní ktorékoľvek predplatné (od {{apiSubPrice}}) alebo nákup kreditov.",
       media:
         "Spoločný zostatok pre všetky modely podľa typu: obrázky {{imageModels}}, video {{videoModels}}, hudba {{musicModels}} a hlas {{voiceModels}}.",
@@ -1175,7 +1175,7 @@ export const translations: typeof enTranslations = {
       },
       usPros: {
         a: "Model {{ownModel}} a ďalšie modely ({{modelCount}}) v jednom čete. Porovnaj jeho odpoveď s bežnými aj upravenými modelmi bez zmeny konverzácie.",
-        b: "Mesačne zdarma {{guestCredits}} kr. bez účtu alebo {{freeCredits}} kr. s účtom.",
+        b: "Mesačne zdarma {{guestCredits}} kr. bez účtu alebo {{freeCredits}} kr. s účtom, {{maxCredits}} pri odbere noviniek.",
         c: "Obrázky, video, hudba a hlas z jedného zostatku. Celá platforma má otvorený kód.",
       },
       usCons: {

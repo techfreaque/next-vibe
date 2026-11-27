@@ -58,6 +58,7 @@ import { scopedTranslation as modelsScopedTranslation } from "@/_pages/models/i1
 import { configScopedTranslation } from "@/env/i18n";
 import {
   FREE_CREDIT_ALLOWANCE,
+  FREE_CREDIT_MAX_TOTAL,
   FREE_CREDIT_SIGNED_IN_TOTAL,
 } from "@/products/constants";
 
@@ -277,6 +278,7 @@ export function TanstackPage({
     ownContext: formatTokenCount(ownContext),
     guestCredits: FREE_CREDIT_ALLOWANCE.guest,
     freeCredits: FREE_CREDIT_SIGNED_IN_TOTAL,
+    maxCredits: FREE_CREDIT_MAX_TOTAL,
   };
   const faq = FAQ_KEYS.map((key) => ({
     key,

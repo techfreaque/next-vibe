@@ -97,6 +97,8 @@ export const translations: typeof enTranslations = {
     intro: "Nie Pflicht. Manchmal nützlich.",
     credits:
       "Bis zu {{freeCredits}} Gratis-Credits im Monat mit bestätigter E-Mail statt {{guestCredits}}.",
+    newsletter:
+      "Bestätigen Sie den Newsletter, und aus dem Monatskontingent werden {{maxCredits}} Credits: {{newsletterBonus}} Bonus-Credits obendrauf.",
     sync: "Chats in Ihren privaten Ordnern, auf jedem Gerät, auf dem Sie angemeldet sind.",
     control:
       "Alle Ihre Daten als JSON exportieren oder das Konto in den Einstellungen löschen. Die Löschung entfernt Ihre personenbezogenen Daten.",

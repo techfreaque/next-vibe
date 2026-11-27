@@ -135,7 +135,7 @@ export const translations: typeof enTranslations = {
       "Teraz najtańszy: {{cheapestName}} za {{cheapestPrice}}. Najtańszy bez cenzury: {{uncensoredName}} za {{uncensoredPrice}}. Najdroższy: {{priciestName}} za {{priciestPrice}}.",
     failed:
       "Kredyty schodzą dopiero po dostarczeniu obrazu. Nieudane zadanie albo odmowa dostawcy: nie płacisz nic.",
-    free: "Za darmo co miesiąc: kredyty bez konta: {{guestCredits}}, z darmowym kontem: {{freeCredits}}. Na {{uncensoredName}} wystarczy to na tyle obrazów miesięcznie: {{freeUncensoredImages}}, bez płacenia.",
+    free: "Za darmo co miesiąc: kredyty bez konta: {{guestCredits}}, z darmowym kontem: {{freeCredits}}, {{maxCredits}} z newsletterem. Na {{uncensoredName}} wystarczy to na tyle obrazów miesięcznie: {{freeUncensoredImages}}, bez płacenia.",
     sub: "Plany miesięczne: cztery rozmiary, od {{subCredits}} kredytów za {{subPrice}}.",
     pack: "Pakiety kredytów: doładowanie dla subskrybentów, {{packCredits}} kredytów za {{packPrice}}. Nigdy nie wygasają. Karta, PayPal albo krypto.",
     link: "Zobacz plany i pakiety kredytów",
@@ -163,7 +163,7 @@ export const translations: typeof enTranslations = {
     },
     free: {
       q: "Czy jest darmowy generator obrazów AI bez cenzury?",
-      a: "Zaczniesz za darmo. Kredyty co miesiąc bez konta: {{guestCredits}}, z darmowym kontem: {{freeCredits}}. {{uncensoredName}} kosztuje za obraz tyle kredytów: {{uncensoredCredits}}. Potem: plan, od {{subPrice}} miesięcznie.",
+      a: "Zaczniesz za darmo. Kredyty co miesiąc bez konta: {{guestCredits}}, z darmowym kontem: {{freeCredits}}, {{maxCredits}} z newsletterem. {{uncensoredName}} kosztuje za obraz tyle kredytów: {{uncensoredCredits}}. Potem: plan, od {{subPrice}} miesięcznie.",
     },
     cheapest: {
       q: "Jaki generator obrazów AI jest najtańszy?",

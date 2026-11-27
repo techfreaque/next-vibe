@@ -69,7 +69,7 @@ export const translations: typeof enTranslations = {
     privacy:
       "Confidentialité : les chats incognito restent dans le stockage local de votre navigateur, sans compte. Les chats privés sont enregistrés uniquement dans votre compte.",
     price:
-      "Prix : {{guestCredits}} crédits gratuits par mois sans compte, {{freeCredits}} avec un compte. Abonnements : {{planList}}. Un seul solde pour tous les modèles, pas de crédits premium à part.",
+      "Prix : {{guestCredits}} crédits gratuits par mois sans compte, {{freeCredits}} avec un compte, {{maxCredits}} avec la newsletter. Abonnements : {{planList}}. Un seul solde pour tous les modèles, pas de crédits premium à part.",
     api: "API : les mêmes modèles via des endpoints compatibles OpenAI et Anthropic. N'importe quel achat la débloque.",
     weak: "Là où CrushOn gagne : une grande bibliothèque de personnages adultes prêts à l'emploi et un chat conçu uniquement pour ça. Nous sommes une plateforme généraliste avec une compétence Jeu de rôle, pas une place de marché de personnages.",
     ownLink: "Voir {{ownModel}}",
@@ -106,7 +106,7 @@ export const translations: typeof enTranslations = {
     },
     free: {
       q: "Existe-t-il une alternative gratuite à CrushOn AI ?",
-      a: "Janitor AI offre des chats illimités sur son modèle standard. Perchance est gratuit dans le navigateur. SillyTavern est gratuit avec un modèle local. {{appName}} offre {{guestCredits}} crédits gratuits par mois sans compte et {{freeCredits}} avec un compte.",
+      a: "Janitor AI offre des chats illimités sur son modèle standard. Perchance est gratuit dans le navigateur. SillyTavern est gratuit avec un modèle local. {{appName}} offre {{guestCredits}} crédits gratuits par mois sans compte et {{freeCredits}} avec un compte, {{maxCredits}} avec la newsletter.",
     },
     filter: {
       q: "Quelles alternatives autorisent le chat NSFW ?",

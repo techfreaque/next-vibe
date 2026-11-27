@@ -46,7 +46,7 @@ export const translations: typeof enTranslations = {
     skills:
       "Zručnosť Roleplay dáva modelu pokyn zostať v role a nerozhodovať o činoch tvojej postavy. Thea a Hermes sú vstavaní spoločníci na dlhšie rozhovory. Ak si chceš len vybrať z množstva hotových postáv, jednoduchšie je začať v katalógu Janitor AI.",
     limit:
-      "Ako hosť dostaneš mesačne {{guestCredits}} kred. zdarma, s bezplatným účtom {{freeCredits}}. Prémiový model môže počas dlhej scény vyčerpať celý prídel. Ak chceš písať bez počítania odpovedí, viac ti môže vyhovovať bezplatný štandardný čet na Janitor AI.",
+      "Ako hosť dostaneš mesačne {{guestCredits}} kred. zdarma, s bezplatným účtom {{freeCredits}}, {{maxCredits}} pri odbere noviniek. Prémiový model môže počas dlhej scény vyčerpať celý prídel. Ak chceš písať bez počítania odpovedí, viac ti môže vyhovovať bezplatný štandardný čet na Janitor AI.",
     link: "Pozrieť, ako funguje zručnosť Roleplay",
   },
   list: "Čo sa hodí pre tvoj ďalší príbeh?",

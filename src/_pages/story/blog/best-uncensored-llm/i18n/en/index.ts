@@ -126,7 +126,7 @@ export const translations = {
     },
     free: {
       q: "What is the best free uncensored LLM?",
-      a: "Online, {{appName}} gives you {{guestCredits}} free credits a month without an account and {{freeCredits}} with a free account. The cheapest uncensored model, {{cheapestModel}}, costs {{cheapestPrice}} per message. Uncensored models ask for a one-time 18+ confirmation.",
+      a: "Online, {{appName}} gives you {{guestCredits}} free credits a month without an account and {{freeCredits}} with a free account, {{maxCredits}} with the newsletter. The cheapest uncensored model, {{cheapestModel}}, costs {{cheapestPrice}} per message. Uncensored models ask for a one-time 18+ confirmation.",
     },
     roleplay: {
       q: "What is the best uncensored model for roleplay?",

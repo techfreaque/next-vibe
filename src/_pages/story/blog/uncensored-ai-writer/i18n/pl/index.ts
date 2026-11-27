@@ -136,7 +136,7 @@ export const translations: typeof enTranslations = {
     },
     free: {
       q: "Czy jest darmowa AI bez cenzury do pisania opowiadań?",
-      a: "Dostajesz {{guestCredits}} darmowych kredytów miesięcznie bez konta i {{freeCredits}} z darmowym kontem. To starczy na sporo scen na tańszych modelach. Przy dłuższych projektach plany zaczynają się od {{subPrice}} miesięcznie.",
+      a: "Dostajesz {{guestCredits}} darmowych kredytów miesięcznie bez konta i {{freeCredits}} z darmowym kontem, {{maxCredits}} z newsletterem. To starczy na sporo scen na tańszych modelach. Przy dłuższych projektach plany zaczynają się od {{subPrice}} miesięcznie.",
     },
     adult: {
       q: "Czy AI bez cenzury może pisać fikcję dla dorosłych i NSFW?",

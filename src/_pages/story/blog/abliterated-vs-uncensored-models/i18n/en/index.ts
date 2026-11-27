@@ -181,7 +181,7 @@ export const translations = {
     },
     free: {
       q: "Can I try uncensored models for free?",
-      a: "Yes. {{guestCredits}} free credits a month without an account, {{freeCredits}} with a free account. Enough to run the ten-minute test on the cheaper uncensored models. The premium ones cost more per message.",
+      a: "Yes. {{guestCredits}} free credits a month without an account, {{freeCredits}} with a free account, {{maxCredits}} with the newsletter. Enough to run the ten-minute test on the cheaper uncensored models. The premium ones cost more per message.",
     },
     legal: {
       q: "Are uncensored AI models legal?",

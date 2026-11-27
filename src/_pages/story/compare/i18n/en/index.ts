@@ -131,7 +131,7 @@ export const translations = {
   },
   us: {
     kind: "Multi-model chat: mainstream, open and uncensored",
-    free: "Yes: {{guestCredits}} credits a month without an account, {{freeCredits}} with one",
+    free: "Yes: {{guestCredits}} credits a month without an account, {{freeCredits}} with one, {{maxCredits}} with the newsletter",
     paid: "From {{subPrice}}/month",
     filterShort:
       "You pick the level per chat. Uncensored after a one-time 18+ confirmation",
@@ -573,7 +573,7 @@ export const translations = {
       privacy:
         "Incognito chats live in your browser, not on our servers, and need no account. Private chats sync to your account. Every message still passes through us to the provider that answers it.",
       pricing:
-        "{{guestCredits}} free credits a month without an account, {{freeCredits}} with one. Plans: {{planList}} a month. Credit packs top up an active plan and never expire. Card, PayPal or crypto.",
+        "{{guestCredits}} free credits a month without an account, {{freeCredits}} with one, {{maxCredits}} with the newsletter. Plans: {{planList}} a month. Credit packs top up an active plan and never expire. Card, PayPal or crypto.",
       api: "OpenAI and Anthropic compatible API for chat, images, video and speech, after any plan (from {{apiSubPrice}}) or a credit purchase.",
       media:
         "{{imageModels}} image, {{videoModels}} video, {{musicModels}} music and {{voiceModels}} voice models on the same balance.",
@@ -1166,7 +1166,7 @@ export const translations = {
       },
       usPros: {
         a: "{{ownModel}} plus {{modelCount}} other models in one chat: compare its answer against mainstream and abliterated models in the same thread.",
-        b: "{{guestCredits}} free credits a month without an account, {{freeCredits}} with one.",
+        b: "{{guestCredits}} free credits a month without an account, {{freeCredits}} with one, {{maxCredits}} with the newsletter.",
         c: "Images, video, music and voice on the same balance, and the whole platform is open source.",
       },
       usCons: {

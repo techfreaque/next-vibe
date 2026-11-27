@@ -67,7 +67,7 @@ export const translations: typeof enTranslations = {
     privacy:
       "प्राइवेसी: इनकॉग्निटो चैट आपके ब्राउज़र के लोकल स्टोरेज में रहती हैं, अकाउंट की ज़रूरत नहीं।",
     price:
-      "कीमत: बिना अकाउंट हर महीने {{guestCredits}} फ़्री क्रेडिट, अकाउंट के साथ {{freeCredits}}। प्लान: {{planList}}।",
+      "कीमत: बिना अकाउंट हर महीने {{guestCredits}} फ़्री क्रेडिट, अकाउंट के साथ {{freeCredits}}, न्यूज़लेटर के साथ {{maxCredits}}। प्लान: {{planList}}।",
     api: "API: OpenAI और Anthropic कम्पैटिबल एंडपॉइंट, Claude समेत। कोई भी खरीद इसे अनलॉक करती है।",
     weak: "जहाँ Claude जीतता है: Claude Code, Projects और Cowork Anthropic के अपने ऐप हैं, और खुद Claude का भारी रोज़ाना इस्तेमाल Claude प्लान पर सस्ता पड़ता है, हमारे {{markup}}% मार्कअप वाले प्रति मैसेज रेट से। {{appName}} पर Claude भी Anthropic की पॉलिसी मानता है।",
     ownLink: "{{ownModel}} देखें",
@@ -103,7 +103,7 @@ export const translations: typeof enTranslations = {
     },
     free: {
       q: "क्या Claude का कोई फ़्री विकल्प है?",
-      a: "ChatGPT, Gemini, Grok, DeepSeek और Mistral सभी के फ़्री टियर हैं, लिमिट के साथ। LM Studio और Ollama आपके अपने हार्डवेयर पर फ़्री हैं। {{appName}} बिना अकाउंट हर महीने {{guestCredits}} फ़्री क्रेडिट देता है और अकाउंट के साथ {{freeCredits}}, Claude समेत।",
+      a: "ChatGPT, Gemini, Grok, DeepSeek और Mistral सभी के फ़्री टियर हैं, लिमिट के साथ। LM Studio और Ollama आपके अपने हार्डवेयर पर फ़्री हैं। {{appName}} बिना अकाउंट हर महीने {{guestCredits}} फ़्री क्रेडिट देता है और अकाउंट के साथ {{freeCredits}}, न्यूज़लेटर के साथ {{maxCredits}}, Claude समेत।",
     },
     filter: {
       q: "क्या कोई अनसेंसर्ड Claude है?",

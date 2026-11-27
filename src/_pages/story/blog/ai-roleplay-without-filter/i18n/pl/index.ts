@@ -142,7 +142,7 @@ export const translations: typeof enTranslations = {
       "Każda odpowiedź kosztuje kredyty zależnie od modelu i długości sceny. Tabela pokazuje długą scenę. 1 kredyt = {{creditValue}}.",
     cheapest:
       "Najtańsza odpowiedź: {{cheapestName}} za {{cheapestPrice}}, odpowiedzi za {{unit}}: ok. {{cheapestPerUnit}}. Najtańszy bez cenzury: {{uncensoredName}} za {{uncensoredPrice}}, odpowiedzi za {{unit}}: ok. {{uncensoredPerUnit}}.",
-    free: "Za darmo co miesiąc: kredyty bez konta: {{guestCredits}}, z darmowym kontem: {{freeCredits}}. Starczy na długą pierwszą kampanię na tanim modelu.",
+    free: "Za darmo co miesiąc: kredyty bez konta: {{guestCredits}}, z darmowym kontem: {{freeCredits}}, {{maxCredits}} z newsletterem. Starczy na długą pierwszą kampanię na tanim modelu.",
     sub: "Plany miesięczne: cztery rozmiary, od {{subCredits}} kredytów za {{subPrice}}.",
     pack: "Pakiety kredytów: doładowanie dla subskrybentów, {{packCredits}} kredytów za {{packPrice}}. Nigdy nie wygasają. Karta, PayPal albo krypto.",
     link: "Zobacz plany i pakiety kredytów",
@@ -167,7 +167,7 @@ export const translations: typeof enTranslations = {
     },
     free: {
       q: "Czy roleplay AI bez filtra jest darmowy?",
-      a: "Zaczniesz za darmo. Kredyty co miesiąc bez konta: {{guestCredits}}, z darmowym kontem: {{freeCredits}}. Odpowiedź na {{uncensoredName}} w długiej scenie kosztuje ok. {{uncensoredCredits}} kr. Potem: plan, od {{subPrice}} miesięcznie.",
+      a: "Zaczniesz za darmo. Kredyty co miesiąc bez konta: {{guestCredits}}, z darmowym kontem: {{freeCredits}}, {{maxCredits}} z newsletterem. Odpowiedź na {{uncensoredName}} w długiej scenie kosztuje ok. {{uncensoredCredits}} kr. Potem: plan, od {{subPrice}} miesięcznie.",
     },
     nsfw: {
       q: "Czy mogę prowadzić roleplay NSFW?",

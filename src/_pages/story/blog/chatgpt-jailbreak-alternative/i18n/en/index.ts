@@ -129,7 +129,7 @@ export const translations = {
     },
     free: {
       q: "Can I try an uncensored model for free?",
-      a: "Yes. {{appName}} gives {{guestCredits}} free credits a month without an account and {{freeCredits}} with a free account. How many messages that is depends on the model and the chat length.",
+      a: "Yes. {{appName}} gives {{guestCredits}} free credits a month without an account and {{freeCredits}} with a free account, {{maxCredits}} with the newsletter. How many messages that is depends on the model and the chat length.",
     },
     alternativeLink: "A ChatGPT alternative without filters: model picks",
     refusalLink: "Which AI actually answers? The refusal index",

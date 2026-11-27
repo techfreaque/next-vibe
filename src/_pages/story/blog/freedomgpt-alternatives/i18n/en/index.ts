@@ -85,7 +85,7 @@ export const translations = {
     privacy:
       "Privacy: incognito chats stay in your browser's local storage, no account needed. Private chats are saved to your account only.",
     price:
-      "Price: {{guestCredits}} free credits a month without an account, {{freeCredits}} with one. Plans from {{subPrice}} a month. Uncensored models unlock after a one-time 18+ confirmation.",
+      "Price: {{guestCredits}} free credits a month without an account, {{freeCredits}} with one, {{maxCredits}} with the newsletter. Plans from {{subPrice}} a month. Uncensored models unlock after a one-time 18+ confirmation.",
     open: "Open source: the whole platform is on GitHub and actively developed. Self-host it if you want your own instance.",
     weak: "Where we are weaker: no flat all-in plan, and video costs real credits here too. FreedomGPT's free start with no account is as easy as ours.",
     hubLink: "Uncensored AI chat: all models, with context and price",
@@ -127,7 +127,7 @@ export const translations = {
     },
     free: {
       q: "Is there a free FreedomGPT alternative?",
-      a: "Yes. Ollama is free and open source on your own hardware, LM Studio is free to run locally. {{appName}} gives {{guestCredits}} free credits a month without an account and {{freeCredits}} with one, uncensored models included after a one-time 18+ confirmation.",
+      a: "Yes. Ollama is free and open source on your own hardware, LM Studio is free to run locally. {{appName}} gives {{guestCredits}} free credits a month without an account and {{freeCredits}} with one, {{maxCredits}} with the newsletter, uncensored models included after a one-time 18+ confirmation.",
     },
     liberty: {
       q: "Can I still use FreedomGPT Liberty somewhere else?",

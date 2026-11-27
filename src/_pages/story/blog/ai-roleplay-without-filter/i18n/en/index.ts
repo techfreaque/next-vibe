@@ -140,7 +140,7 @@ export const translations = {
       "Each reply costs credits based on the model and the length of the scene. The table shows a long scene. 1 credit = {{creditValue}}.",
     cheapest:
       "Cheapest reply: {{cheapestName}} at {{cheapestPrice}}, about {{cheapestPerUnit}} replies per {{unit}}. Cheapest uncensored: {{uncensoredName}} at {{uncensoredPrice}}, about {{uncensoredPerUnit}} replies per {{unit}}.",
-    free: "Free: {{guestCredits}} credits a month without an account, {{freeCredits}} with a free account. Enough for a long first campaign on a cheap model.",
+    free: "Free: {{guestCredits}} credits a month without an account, {{freeCredits}} with a free account, {{maxCredits}} with the newsletter. Enough for a long first campaign on a cheap model.",
     sub: "Monthly plans: four sizes, starting at {{subCredits}} credits for {{subPrice}}.",
     pack: "Credit packs: a top-up for subscribers, {{packCredits}} credits for {{packPrice}}. They never expire. Card, PayPal or crypto.",
     link: "See plans and credit packs",
@@ -165,7 +165,7 @@ export const translations = {
     },
     free: {
       q: "Is unfiltered AI roleplay free?",
-      a: "You can start free: {{guestCredits}} credits a month without an account, {{freeCredits}} with a free account. A reply on {{uncensoredName}} costs about {{uncensoredCredits}} credits in a long scene. After that: a plan, from {{subPrice}} a month.",
+      a: "You can start free: {{guestCredits}} credits a month without an account, {{freeCredits}} with a free account, {{maxCredits}} with the newsletter. A reply on {{uncensoredName}} costs about {{uncensoredCredits}} credits in a long scene. After that: a plan, from {{subPrice}} a month.",
     },
     nsfw: {
       q: "Can I do NSFW roleplay?",

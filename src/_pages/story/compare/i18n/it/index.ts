@@ -133,7 +133,7 @@ export const translations: typeof enTranslations = {
   },
   us: {
     kind: "Chat con modelli mainstream, aperti e senza censura",
-    free: "Sì. {{guestCredits}} crediti al mese senza account, {{freeCredits}} con un account.",
+    free: "Sì. {{guestCredits}} crediti al mese senza account, {{freeCredits}} con un account, {{maxCredits}} con la newsletter.",
     paid: "Da {{subPrice}} al mese",
     filterShort:
       "Scegli il filtro per ogni chat. Per i modelli senza censura basta confermare una volta di avere almeno 18 anni.",
@@ -583,7 +583,7 @@ export const translations: typeof enTranslations = {
       privacy:
         "Le chat in incognito si salvano nel browser e funzionano senza account. Quelle private si sincronizzano con il tuo account. Inviamo ogni messaggio al fornitore che risponde.",
       pricing:
-        "{{guestCredits}} crediti gratis al mese senza account e {{freeCredits}} con un account. Piani mensili: {{planList}}. Puoi ricaricare un piano attivo con crediti che non scadono. Paghi con carta, PayPal o criptovalute.",
+        "{{guestCredits}} crediti gratis al mese senza account e {{freeCredits}} con un account, {{maxCredits}} con la newsletter. Piani mensili: {{planList}}. Puoi ricaricare un piano attivo con crediti che non scadono. Paghi con carta, PayPal o criptovalute.",
       api: "API compatibile con OpenAI e Anthropic per chat, immagini, video e voce. Si attiva con un piano (da {{apiSubPrice}}) o con l’acquisto di crediti.",
       media:
         "{{imageModels}} modelli per immagini, {{videoModels}} per video, {{musicModels}} per musica e {{voiceModels}} per voce con un unico saldo.",
@@ -1184,7 +1184,7 @@ export const translations: typeof enTranslations = {
       },
       usPros: {
         a: "{{ownModel}} più altri {{modelCount}} modelli in una sola chat: confronta la sua risposta con modelli mainstream e abliterati nella stessa conversazione.",
-        b: "{{guestCredits}} crediti gratuiti al mese senza account, {{freeCredits}} con un account.",
+        b: "{{guestCredits}} crediti gratuiti al mese senza account, {{freeCredits}} con un account, {{maxCredits}} con la newsletter.",
         c: "Immagini, video, musica e voce sullo stesso saldo, e l’intera piattaforma è open source.",
       },
       usCons: {

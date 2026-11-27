@@ -132,7 +132,7 @@ export const translations: typeof enTranslations = {
     },
     free: {
       q: "Môžem si model bez cenzúry vyskúšať zdarma?",
-      a: "Áno. Služba {{appName}} dáva mesačne {{guestCredits}} kr. zdarma bez účtu a {{freeCredits}} kr. s bezplatným účtom. Počet správ závisí od modelu a dĺžky četu.",
+      a: "Áno. Služba {{appName}} dáva mesačne {{guestCredits}} kr. zdarma bez účtu a {{freeCredits}} kr. s bezplatným účtom, {{maxCredits}} pri odbere noviniek. Počet správ závisí od modelu a dĺžky četu.",
     },
     alternativeLink: "Alternatíva k ChatGPT bez filtrov: výber modelov",
     refusalLink: "Ktorá AI naozaj odpovie? Index odmietania",

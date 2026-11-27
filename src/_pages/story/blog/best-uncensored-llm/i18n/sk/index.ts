@@ -129,7 +129,7 @@ export const translations: typeof enTranslations = {
     },
     free: {
       q: "Ktorý LLM bez cenzúry si môžem vyskúšať zadarmo?",
-      a: "Na {{appName}} máš každý mesiac bezplatné kredity. Bez účtu ich dostaneš {{guestCredits}}, s bezplatným účtom {{freeCredits}}. Najlacnejší model bez cenzúry, {{cheapestModel}}, stojí {{cheapestPrice}} za správu. Pri modeloch bez cenzúry stačí raz potvrdiť vek 18+.",
+      a: "Na {{appName}} máš každý mesiac bezplatné kredity. Bez účtu ich dostaneš {{guestCredits}}, s bezplatným účtom {{freeCredits}}, {{maxCredits}} pri odbere noviniek. Najlacnejší model bez cenzúry, {{cheapestModel}}, stojí {{cheapestPrice}} za správu. Pri modeloch bez cenzúry stačí raz potvrdiť vek 18+.",
     },
     roleplay: {
       q: "Ktorý model bez cenzúry je najlepší na hranie rolí?",

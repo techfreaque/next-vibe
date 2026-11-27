@@ -69,7 +69,7 @@ export const translations: typeof enTranslations = {
     privacy:
       "Súkromie: inkognito čety ostávajú v lokálnom úložisku tvojho prehliadača aj bez účtu.",
     price:
-      "Cena: každý mesiac {{guestCredits}} kreditov zdarma bez účtu alebo {{freeCredits}} s bezplatným účtom. Plány: {{planList}}. Všetky modely čerpajú z jedného zostatku.",
+      "Cena: každý mesiac {{guestCredits}} kreditov zdarma bez účtu alebo {{freeCredits}} s bezplatným účtom, {{maxCredits}} pri odbere noviniek. Plány: {{planList}}. Všetky modely čerpajú z jedného zostatku.",
     api: "API: rozhrania kompatibilné s OpenAI a Anthropic umožňujú pripojiť SillyTavern k našim modelom. Prístup odomkne každý nákup.",
     weak: "V čom má SillyTavern navrch: dáva ti úplnú kontrolu nad zadaniami, predvoľbami a rozšíreniami. Podporuje skupinové čety, lorebooky a import kariet. Aj náš kód je otvorený, ale naša platforma má širšie zameranie.",
     ownLink: "Pozrieť model {{ownModel}}",
@@ -106,7 +106,7 @@ export const translations: typeof enTranslations = {
     },
     free: {
       q: "Existuje bezplatná alternatíva k SillyTavern?",
-      a: "RisuAI, Agnaistic, KoboldCpp a Talemate sú bezplatné nástroje. Za model však platíš, pokiaľ ho nespustíš na vlastnom hardvéri. Na {{appName}} máš každý mesiac {{guestCredits}} kreditov zdarma bez účtu alebo {{freeCredits}} s bezplatným účtom a modely už máš pripojené.",
+      a: "RisuAI, Agnaistic, KoboldCpp a Talemate sú bezplatné nástroje. Za model však platíš, pokiaľ ho nespustíš na vlastnom hardvéri. Na {{appName}} máš každý mesiac {{guestCredits}} kreditov zdarma bez účtu alebo {{freeCredits}} s bezplatným účtom, {{maxCredits}} pri odbere noviniek a modely už máš pripojené.",
     },
     filter: {
       q: "Ktoré alternatívy umožňujú hranie rolí bez cenzúry?",

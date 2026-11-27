@@ -68,7 +68,7 @@ export const translations: typeof enTranslations = {
     privacy:
       "Prywatność: czaty incognito zostają w pamięci lokalnej twojej przeglądarki, bez konta.",
     price:
-      "Cena: {{guestCredits}} darmowych kredytów miesięcznie bez konta, {{freeCredits}} z kontem. Plany: {{planList}}.",
+      "Cena: {{guestCredits}} darmowych kredytów miesięcznie bez konta, {{freeCredits}} z kontem, {{maxCredits}} z newsletterem. Plany: {{planList}}.",
     api: "API: endpointy zgodne z OpenAI i Anthropic, Claude w zestawie. Odblokowuje je każdy zakup.",
     weak: "Gdzie Claude wygrywa: Claude Code, Projects i Cowork to własne aplikacje Anthropic, a intensywne codzienne używanie samego Claude wychodzi taniej w planie Claude niż za wiadomość z naszą marżą {{markup}}%. Claude na {{appName}} też podlega zasadom Anthropic.",
     ownLink: "Zobacz {{ownModel}}",
@@ -105,7 +105,7 @@ export const translations: typeof enTranslations = {
     },
     free: {
       q: "Czy jest darmowa alternatywa dla Claude?",
-      a: "ChatGPT, Gemini, Grok, DeepSeek i Mistral mają darmowe plany z limitami. LM Studio i Ollama są darmowe na własnym sprzęcie. {{appName}} daje {{guestCredits}} darmowych kredytów miesięcznie bez konta i {{freeCredits}} z kontem, łącznie z Claude.",
+      a: "ChatGPT, Gemini, Grok, DeepSeek i Mistral mają darmowe plany z limitami. LM Studio i Ollama są darmowe na własnym sprzęcie. {{appName}} daje {{guestCredits}} darmowych kredytów miesięcznie bez konta i {{freeCredits}} z kontem, {{maxCredits}} z newsletterem, łącznie z Claude.",
     },
     filter: {
       q: "Czy istnieje Claude bez cenzury?",

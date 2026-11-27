@@ -123,7 +123,7 @@ export const translations: typeof enTranslations = {
     },
     free: {
       q: "Môžem porovnať modely zadarmo?",
-      a: "Áno. Každý mesiac máš {{guestCredits}} kreditov zdarma bez účtu alebo {{freeCredits}} s bezplatným účtom. Za prepínanie modelov v čete nič navyše neplatíš.",
+      a: "Áno. Každý mesiac máš {{guestCredits}} kreditov zdarma bez účtu alebo {{freeCredits}} s bezplatným účtom, {{maxCredits}} pri odbere noviniek. Za prepínanie modelov v čete nič navyše neplatíš.",
     },
     refusalLink: "Rebríček odmietania: ktoré modely naozaj odpovedajú",
     jailbreakLink: "Prečo obchádzanie obmedzení ChatGPT stále zlyháva",
