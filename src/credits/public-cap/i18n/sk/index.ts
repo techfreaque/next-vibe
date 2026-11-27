@@ -176,7 +176,7 @@ export const translations: typeof enTranslations = {
     capExceeded:
       "Dnešný bezplatný limit na túto požiadavku nestačí. Skús to zajtra alebo použi platené kredity.",
     leadCapExceeded:
-      "Táto požiadavka prekračuje tvoj dnešný bezplatný limit. Skús to zajtra alebo použi platené kredity.",
+      "Denný bezplatný limit na tomto zariadení alebo v tejto sieti je vyčerpaný. Tvoje bezplatné kredity ti zostávajú a zajtra zase fungujú. Platené kredity fungujú hneď.",
     reservedByRunningReply:
       "Tvoje bezplatné kredity ešte pokrývajú rozpracovanú odpoveď. Počkaj, kým skončí, a potom pošli znova.",
     capUnavailable: "Bezplatné kredity sú dočasne nedostupné. Skús to neskôr.",

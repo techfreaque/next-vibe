@@ -174,7 +174,7 @@ export const translations: typeof enTranslations = {
     capExceeded:
       "Das heutige Gratiskontingent reicht für diese Anfrage nicht aus. Versuch es morgen erneut oder nutze bezahlte Credits.",
     leadCapExceeded:
-      "Diese Anfrage überschreitet dein heutiges Gratislimit. Versuch es morgen erneut oder nutze bezahlte Credits.",
+      "Tageslimit für Gratis-Nutzung auf diesem Gerät oder Netzwerk erreicht. Deine Gratis-Credits bleiben erhalten und funktionieren morgen wieder. Bezahlte Credits gehen sofort.",
     reservedByRunningReply:
       "Deine Gratis-Credits decken gerade noch eine laufende Antwort. Warte, bis sie fertig ist, und sende dann erneut.",
     capUnavailable:

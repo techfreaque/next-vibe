@@ -171,7 +171,7 @@ export const translations = {
     capExceeded:
       "Today's free allowance can't cover this request. Try again tomorrow or use paid credits.",
     leadCapExceeded:
-      "This request exceeds your free limit for today. Try again tomorrow or use paid credits.",
+      "Daily free limit reached on this device or network. Your free credits stay in your account and work again tomorrow. Paid credits work right away.",
     reservedByRunningReply:
       "Your free credits are still covering a reply in progress. Let it finish, then send again.",
     capUnavailable:

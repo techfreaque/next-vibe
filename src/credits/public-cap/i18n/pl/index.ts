@@ -176,7 +176,7 @@ export const translations: typeof enTranslations = {
     capExceeded:
       "Na to zapytanie nie wystarczy już darmowych kredytów z dzisiejszej puli. Spróbuj jutro lub skorzystaj z płatnych kredytów.",
     leadCapExceeded:
-      "To zapytanie przekracza Twój dzisiejszy bezpłatny limit. Spróbuj jutro lub skorzystaj z płatnych kredytów.",
+      "Dzienny darmowy limit na tym urządzeniu lub w tej sieci jest wyczerpany. Twoje darmowe kredyty zostają na koncie i znowu zadziałają jutro. Płatne kredyty działają od razu.",
     reservedByRunningReply:
       "Twoje darmowe kredyty pokrywają jeszcze trwającą odpowiedź. Poczekaj, aż się skończy, i wyślij ponownie.",
     capUnavailable:

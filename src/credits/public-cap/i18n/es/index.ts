@@ -177,7 +177,7 @@ export const translations: typeof enTranslations = {
     capExceeded:
       "La cuota gratuita de hoy no alcanza para esta solicitud. Vuelve a intentarlo mañana o usa créditos de pago.",
     leadCapExceeded:
-      "Esta solicitud supera tu límite gratuito de hoy. Vuelve a intentarlo mañana o usa créditos de pago.",
+      "Has alcanzado el límite gratuito diario en este dispositivo o red. Tus créditos gratuitos siguen en tu cuenta y vuelven a funcionar mañana. Los créditos de pago funcionan al instante.",
     reservedByRunningReply:
       "Tus créditos gratuitos aún cubren una respuesta en curso. Espera a que termine y vuelve a enviar.",
     capUnavailable:
