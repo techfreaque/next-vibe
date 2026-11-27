@@ -38,7 +38,7 @@ export const Route = createRootRoute({
     meta: [{ charSet: "utf-8" }, ...viewportToHead(rootViewport)],
     links: [
       { rel: "stylesheet", href: globalsUrl },
-      { rel: "icon", href: "/images/apple-icon.png", type: "image/png", sizes: "180x180" },
+      { rel: "icon", href: "/favicon.ico", sizes: "any" },
       { rel: "apple-touch-icon", href: "/images/apple-icon.png" },
     ],
   }),
