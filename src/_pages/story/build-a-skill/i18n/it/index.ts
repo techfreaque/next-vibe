@@ -70,12 +70,12 @@ export const translations: typeof enTranslations = {
     do4Body: "Il modello legge il prompt completo ogni volta. Vince più breve.",
     dont0Title: "Elenchi delle regole di stile ToS",
     dont0Body:
-      "\"Sempre essere utile, mai essere scortese\" (ogni AI ottiene questo. Un rumore puro.)",
+      '"Sempre essere utile, mai essere scortese" (ogni AI ottiene questo. Un rumore puro.)',
     dont1Title: '"Sempre essere utile"',
     dont1Body: "Il modello lo sa già. Salta.",
     dont2Title: "Limiti di contrasto",
     dont2Body:
-      "\"Sii creativo ma sempre rimanere sull'argomento\" (il modello siepi per sempre. Scegline uno.)",
+      '"Sii creativo ma sempre rimanere sull\'argomento" (il modello siepi per sempre. Scegline uno.)',
     dont3Title: "Liste di capacità lunghe",
     dont3Body: "Il modello sa cosa può fare. Non ripetere i documenti.",
   },

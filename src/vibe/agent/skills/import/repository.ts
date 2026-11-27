@@ -28,11 +28,7 @@ import { FetchUrlContentRepository } from "../../fetch-url-content/repository";
 import { SKILL_AVATAR_STORAGE_NAMESPACE } from "../constants";
 import type { SkillImportSource } from "../db";
 import { customSkills } from "../db";
-import {
-  SkillCategory,
-  SkillStatus,
-  SkillType,
-} from "../enum";
+import { SkillCategory, SkillStatus, SkillType } from "../enum";
 import { scopedTranslation as skillsScopedTranslation } from "../i18n";
 import { SkillsRepository } from "../repository";
 import type {

@@ -463,7 +463,10 @@ export function hasSlotChildren<
 /**
  * Type guard to check if children is a union of variants
  */
-export function isUnionVariants<TKey extends string, TUsage extends FieldUsageConfig>(
+export function isUnionVariants<
+  TKey extends string,
+  TUsage extends FieldUsageConfig,
+>(
   children:
     | ObjectChildrenConstraint<TKey, TUsage>
     | ArrayChildConstraint<TKey, TUsage>
@@ -481,7 +484,10 @@ export function isUnionVariants<TKey extends string, TUsage extends FieldUsageCo
 /**
  * Type guard to check if children is a single child constraint (array element)
  */
-export function isArrayChild<TKey extends string, TUsage extends FieldUsageConfig>(
+export function isArrayChild<
+  TKey extends string,
+  TUsage extends FieldUsageConfig,
+>(
   children:
     | ObjectChildrenConstraint<TKey, TUsage>
     | ArrayChildConstraint<TKey, TUsage>

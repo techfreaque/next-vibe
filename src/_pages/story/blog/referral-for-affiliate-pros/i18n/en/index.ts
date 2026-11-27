@@ -70,7 +70,7 @@ export const translations = {
   },
   promotion: {
     title: "Angles that convert",
-    angle1Title: "\"I compared 10 AI tools: here's the one I actually kept\"",
+    angle1Title: '"I compared 10 AI tools: here\'s the one I actually kept"',
     angle1Body:
       "Comparison content is the best affiliate driver for this category. Lead with model variety, pricing, and the free-speech positioning vs single-model tools.",
     angle2Title: "Developer communities",
@@ -81,7 +81,7 @@ export const translations = {
       "r/selfhosted, privacy forums, Mastodon. The open-source codebase and self-hosting option land well. These users hate closed platforms.",
     angle4Title: "Tutorial content with the tool",
     angle4Body:
-      "\"How to use AI for X\" with {{appName}} as the specific tool. Coding assistant, writing, research: specific use cases convert better than generic AI reviews.",
+      '"How to use AI for X" with {{appName}} as the specific tool. Coding assistant, writing, research: specific use cases convert better than generic AI reviews.',
   },
   payouts: {
     title: "Payout mechanics",

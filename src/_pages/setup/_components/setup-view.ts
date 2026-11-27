@@ -31,5 +31,8 @@ export function resolveSetupView({
     return { kind: "wizard", step: "admin" };
   }
   const step = parseSetupStep(stepCookie);
-  return { kind: "wizard", step: step === "admin" || step === "done" ? "ai" : step };
+  return {
+    kind: "wizard",
+    step: step === "admin" || step === "done" ? "ai" : step,
+  };
 }

@@ -350,8 +350,7 @@ export async function verifyCrawler(
   }
 
   // Never treat loopback/private addresses as public search crawlers.
-  const lookupIp =
-    parsed.v === 4 ? parsed.octets.join(".") : ipAddress.trim();
+  const lookupIp = parsed.v === 4 ? parsed.octets.join(".") : ipAddress.trim();
   if (isPrivateAddress(lookupIp)) {
     return null;
   }

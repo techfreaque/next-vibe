@@ -114,7 +114,7 @@ export function matchesCidrSet(ip: ParsedIp, set: CompiledCidrSet): boolean {
   if (ip.v === 4) {
     const addr = v4ToUint32(ip.octets);
     for (const range of set.v4) {
-      if (((addr & range.mask) >>> 0) === range.network) {
+      if ((addr & range.mask) >>> 0 === range.network) {
         return true;
       }
     }
@@ -124,10 +124,10 @@ export function matchesCidrSet(ip: ParsedIp, set: CompiledCidrSet): boolean {
   const words = v6ToWords(ip.hextets);
   for (const range of set.v6) {
     if (
-      ((words[0] & range.masks[0]) >>> 0) === range.words[0] &&
-      ((words[1] & range.masks[1]) >>> 0) === range.words[1] &&
-      ((words[2] & range.masks[2]) >>> 0) === range.words[2] &&
-      ((words[3] & range.masks[3]) >>> 0) === range.words[3]
+      (words[0] & range.masks[0]) >>> 0 === range.words[0] &&
+      (words[1] & range.masks[1]) >>> 0 === range.words[1] &&
+      (words[2] & range.masks[2]) >>> 0 === range.words[2] &&
+      (words[3] & range.masks[3]) >>> 0 === range.words[3]
     ) {
       return true;
     }
