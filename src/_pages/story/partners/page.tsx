@@ -58,8 +58,9 @@ const TERM_ROWS = [
 ] as const;
 
 /**
- * Independent reviews of the platform. Reciprocal arrangements (free review in
- * exchange for a link from this page) get rel="sponsored".
+ * Independent reviews of the platform (tested with free credits, no payment).
+ * They are editorial citations, so the links are plain (no rel="sponsored").
+ * Paid placements never go in this list.
  */
 const PRESS_REVIEWS = [
   {
@@ -265,7 +266,7 @@ export function TanstackPage({ locale }: PartnersPageData): JSX.Element {
                 <ExternalLink
                   href={review.url}
                   target="_blank"
-                  rel="sponsored noopener"
+                  rel="noopener"
                   className="inline-flex min-h-11 items-center gap-1.5 text-sm font-medium text-primary underline-offset-4 hover:underline"
                 >
                   {t(`press.items.${review.id}.link`)}
