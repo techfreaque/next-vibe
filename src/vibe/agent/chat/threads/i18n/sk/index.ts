@@ -397,6 +397,12 @@ export const translations: typeof enTranslations = {
           note: "Beží na tvojej pripojenej inštancii.",
         },
       },
+      remoteSidebar: {
+        title: "Žiadne pripojené inštancie",
+        description:
+          "Prepoj svoju vlastnú inštanciu next-vibe a synchronizuj jej konverzácie priamo sem.",
+        cta: "Pripojiť inštanciu",
+      },
       use: {
         everyday: {
           good: "Výskum, písanie a každodenné úlohy",

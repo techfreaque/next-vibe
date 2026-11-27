@@ -395,9 +395,15 @@ export const translations: typeof enTranslations = {
         public: { label: "Pubblico", note: "Visibile a tutti." },
         cron: { label: "Sfondo", note: "Gli agenti lavorano qui da soli." },
         remote: {
-          label: "Telecomando",
-          note: "Corre sulla vostra istanza collegata.",
+          label: "Remoto",
+          note: "Funziona sulla tua istanza collegata.",
         },
+      },
+      remoteSidebar: {
+        title: "Nessuna istanza collegata",
+        description:
+          "Collega una tua istanza next-vibe per sincronizzare e gestire qui le sue conversazioni.",
+        cta: "Collega un'istanza",
       },
       use: {
         everyday: {

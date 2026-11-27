@@ -391,6 +391,12 @@ export const translations: typeof enTranslations = {
           note: "Działa na Twojej połączonej instancji.",
         },
       },
+      remoteSidebar: {
+        title: "Brak połączonych instancji",
+        description:
+          "Połącz własną instancję next-vibe, aby synchronizować i prowadzić jej wątki tutaj.",
+        cta: "Połącz instancję",
+      },
       use: {
         everyday: {
           good: "Research, teksty i codzienne zadania",

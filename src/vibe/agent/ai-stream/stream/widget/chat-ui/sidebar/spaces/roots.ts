@@ -30,13 +30,19 @@ export interface SpaceEntry {
 }
 
 /**
- * Keep the chat spaces in config order and include the signup gates for
- * Private and Shared.
+ * Every space shown in the switcher, in config order. Guests also get the
+ * account-only spaces (private, shared, background, remote) as locked entries,
+ * exactly like the committed root picker, so the full model is visible before signup.
  */
 export function spaceEntries(user: JwtPayloadType): SpaceEntry[] {
   const open = visibleRoots(user);
   const lockedForGuests = user.isPublic
-    ? [DefaultFolderId.PRIVATE, DefaultFolderId.SHARED]
+    ? [
+        DefaultFolderId.PRIVATE,
+        DefaultFolderId.SHARED,
+        DefaultFolderId.BACKGROUND,
+        DefaultFolderId.REMOTE,
+      ]
     : [];
   return Object.values(DEFAULT_FOLDER_CONFIGS)
     .toSorted((a, b) => a.order - b.order)

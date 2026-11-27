@@ -19,6 +19,7 @@ export const TOUR_DATA_ATTRS = {
   PRIVATE_FOLDER: "private-folder",
   SHARED_FOLDER: "shared-folder",
   BACKGROUND_FOLDER: "background-folder",
+  REMOTE_FOLDER: "remote-folder",
   NEW_CHAT_BUTTON: "new-chat-button",
   SIDEBAR_LOGIN: "sidebar-login",
   SUBSCRIPTION_BUTTON: "subscription-button",
@@ -46,6 +47,7 @@ export const getFolderTourAttr = (
     public: TOUR_DATA_ATTRS.PUBLIC_FOLDER,
     incognito: TOUR_DATA_ATTRS.INCOGNITO_FOLDER,
     cron: TOUR_DATA_ATTRS.BACKGROUND_FOLDER,
+    remote: TOUR_DATA_ATTRS.REMOTE_FOLDER,
   };
   return folderMap[folderId];
 };

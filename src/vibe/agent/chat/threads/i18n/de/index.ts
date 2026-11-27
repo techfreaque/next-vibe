@@ -396,6 +396,12 @@ export const translations: typeof enTranslations = {
           note: "Läuft auf deiner verbundenen Instanz.",
         },
       },
+      remoteSidebar: {
+        title: "Keine verbundenen Instanzen",
+        description:
+          "Verknüpfe eine eigene next-vibe-Instanz, um ihre Threads hier zu synchronisieren und zu steuern.",
+        cta: "Instanz verbinden",
+      },
       use: {
         everyday: {
           good: "Recherche, Texte und tägliche Aufgaben",

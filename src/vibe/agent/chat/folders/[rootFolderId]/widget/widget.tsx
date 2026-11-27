@@ -6,7 +6,6 @@
 
 "use client";
 import { DefaultFolderId } from "next-vibe/core/execution-context";
-import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { Button } from "next-vibe/ui/components/button";
 import {
   Dialog,
@@ -104,6 +103,13 @@ const ROOT_FOLDER_COLOR_MAP: Record<
     button:
       "bg-green-500/15 text-success-foreground hover:bg-green-500/20 border-green-500/30",
   },
+  indigo: {
+    active:
+      "bg-indigo-500/15 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-500/20",
+    hover: "hover:bg-indigo-500/10 hover:text-indigo-600",
+    button:
+      "bg-indigo-500/15 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-500/20 border-indigo-500/30",
+  },
 };
 /* eslint-enable i18next/no-literal-string */
 
@@ -119,12 +125,10 @@ function RootFolderBar({
   activeRootFolderId,
   onSelectFolder,
   isAuthenticated,
-  isAdmin,
 }: {
   activeRootFolderId: DefaultFolderId;
   onSelectFolder: (folderId: DefaultFolderId) => void;
   isAuthenticated: boolean;
-  isAdmin: boolean;
 }): React.JSX.Element {
   const { locale } = useWidgetContext();
   const { t } = scopedTranslation.scopedT(locale);
@@ -134,11 +138,10 @@ function RootFolderBar({
 
   const rootFolders = useMemo(
     () =>
-      Object.values(DEFAULT_FOLDER_CONFIGS)
-        .filter((f) => f.id !== DefaultFolderId.REMOTE || isAdmin)
-        .filter((f) => f.id !== DefaultFolderId.BACKGROUND || isAuthenticated)
-        .toSorted((a, b) => a.order - b.order),
-    [isAdmin, isAuthenticated],
+      Object.values(DEFAULT_FOLDER_CONFIGS).toSorted(
+        (a, b) => a.order - b.order,
+      ),
+    [],
   );
 
   const isFolderAccessible = (folderId: string): boolean => {
@@ -286,16 +289,6 @@ export function FoldersListContainer(): React.JSX.Element {
 
   const isAuthenticated = useMemo(
     () => user !== undefined && !user.isPublic,
-    [user],
-  );
-  const isAdmin = useMemo(
-    () =>
-      user !== undefined &&
-      !user.isPublic &&
-      "roles" in user &&
-      (user as { roles?: string[] }).roles?.includes(
-        UserPermissionRole.ADMIN,
-      ) === true,
     [user],
   );
 
@@ -459,7 +452,6 @@ export function FoldersListContainer(): React.JSX.Element {
         activeRootFolderId={activeRootFolderId}
         onSelectFolder={handleSelectRootFolder}
         isAuthenticated={isAuthenticated}
-        isAdmin={isAdmin}
       />
 
       <Div className="flex flex-row items-center gap-1 px-3 pb-2 min-w-max">

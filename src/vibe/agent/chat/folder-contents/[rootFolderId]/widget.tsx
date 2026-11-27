@@ -55,10 +55,12 @@ import { MessageSquarePlus } from "next-vibe/ui/components/icons/MessageSquarePl
 import { MoreVertical } from "next-vibe/ui/components/icons/MoreVertical";
 import { Pin } from "next-vibe/ui/components/icons/Pin";
 import { PinOff } from "next-vibe/ui/components/icons/PinOff";
+import { Plug } from "next-vibe/ui/components/icons/Plug";
 import { Share2 } from "next-vibe/ui/components/icons/Share2";
 import { Shield } from "next-vibe/ui/components/icons/Shield";
 import { Trash2 } from "next-vibe/ui/components/icons/Trash2";
 import { Input } from "next-vibe/ui/components/input";
+import { Link } from "next-vibe/ui/components/link";
 import { Span } from "next-vibe/ui/components/span";
 import { useRouter, useSilentHistory } from "next-vibe/ui/hooks/use-navigation";
 import { useTouchDevice } from "next-vibe/ui/hooks/use-touch-device";
@@ -166,6 +168,12 @@ function getFolderHoverClasses(color: string | null): {
         hover: "hover:bg-zinc-500/8",
         active: "bg-zinc-500/12",
         border: "border-zinc-400",
+      };
+    case "indigo":
+      return {
+        hover: "hover:bg-indigo-500/8",
+        active: "bg-indigo-500/12",
+        border: "border-indigo-400",
       };
     default:
       return {
@@ -1887,6 +1895,7 @@ export function FolderContentsWidget({
   );
   const { locale, logger, user } = useWidgetContext();
   const { t } = foldersScopedTranslation.scopedT(locale);
+  const { t: tThreads } = threadsScopedTranslation.scopedT(locale);
 
   const foldersEndpoint = useEndpoint(
     foldersDefinition,
@@ -1997,6 +2006,34 @@ export function FolderContentsWidget({
     grouped.older.length === 0;
 
   if (isEmpty) {
+    if (activeRootFolderId === DefaultFolderId.REMOTE && !widgetSubFolderId) {
+      return (
+        /* eslint-disable i18next/no-literal-string */
+        <Div
+          data-testid="remote-folder-empty-state"
+          className="mx-2 my-3 flex flex-col items-center gap-2.5 rounded-lg border border-dashed border-border bg-muted/30 px-3 py-5 text-center"
+        >
+          <Div className="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-500/15 text-indigo-700 dark:text-indigo-300">
+            <Plug className="h-4 w-4" />
+          </Div>
+          <Div className="flex flex-col gap-1">
+            <Span className="text-xs font-semibold text-foreground">
+              {tThreads("widget.emptyState.remoteSidebar.title")}
+            </Span>
+            <Span className="text-xs leading-relaxed text-muted-foreground">
+              {tThreads("widget.emptyState.remoteSidebar.description")}
+            </Span>
+          </Div>
+          <Link
+            href={`/${locale}/subscription/remote`}
+            className="inline-flex h-8 items-center justify-center rounded-md bg-primary px-3 text-xs font-medium text-primary-foreground no-underline transition-colors hover:bg-primary/90"
+          >
+            {tThreads("widget.emptyState.remoteSidebar.cta")}
+          </Link>
+        </Div>
+        /* eslint-enable i18next/no-literal-string */
+      );
+    }
     return (
       /* eslint-disable i18next/no-literal-string */
       <Div className="px-3 py-4 text-xs text-muted-foreground text-center">

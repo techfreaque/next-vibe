@@ -397,6 +397,12 @@ export const translations: typeof enTranslations = {
         },
         remote: { label: "Remoto", note: "Corre en tu instancia conectada." },
       },
+      remoteSidebar: {
+        title: "Sin instancias conectadas",
+        description:
+          "Vincula tu propia instancia de next-vibe para sincronizar y ejecutar sus hilos aquí.",
+        cta: "Conectar una instancia",
+      },
       use: {
         everyday: {
           good: "Investigación, escritura y tareas diarias",

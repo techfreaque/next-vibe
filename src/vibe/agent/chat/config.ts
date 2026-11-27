@@ -243,10 +243,10 @@ export const DEFAULT_FOLDER_CONFIGS = {
     descriptionKey: "folders.remoteDescription",
     order: 5,
     color: "indigo",
-    rolesView: [UserRole.ADMIN], // Admin-only: local instance owners + connected remote instances
-    rolesManage: [UserRole.ADMIN],
-    rolesCreateThread: [UserRole.ADMIN],
-    rolesPost: [UserRole.ADMIN],
+    rolesView: [UserRole.CUSTOMER, UserRole.ADMIN], // Authenticated users see their own connected remote instances
+    rolesManage: [UserRole.ADMIN], // Owners manage their own folders; admins can manage all
+    rolesCreateThread: [UserRole.CUSTOMER, UserRole.ADMIN], // Users create threads in their connected remote instances
+    rolesPost: [UserRole.CUSTOMER, UserRole.ADMIN], // Users post in their own remote threads
     rolesModerate: [UserRole.ADMIN],
     rolesAdmin: [UserRole.ADMIN],
   },

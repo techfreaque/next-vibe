@@ -388,6 +388,12 @@ export const translations = {
         cron: { label: "Background", note: "Agents work here on their own." },
         remote: { label: "Remote", note: "Runs on your connected instance." },
       },
+      remoteSidebar: {
+        title: "No connected instances",
+        description:
+          "Link a self-hosted next-vibe instance to sync and run its threads here.",
+        cta: "Connect an instance",
+      },
       use: {
         everyday: {
           good: "Research, writing and daily tasks",

@@ -400,6 +400,12 @@ export const translations: typeof enTranslations = {
           note: "S'exécute sur votre instance connectée.",
         },
       },
+      remoteSidebar: {
+        title: "Aucune instance connectée",
+        description:
+          "Reliez votre propre instance next-vibe pour synchroniser et gérer ses discussions ici.",
+        cta: "Connecter une instance",
+      },
       use: {
         everyday: {
           good: "Recherche, rédaction et tâches du quotidien",

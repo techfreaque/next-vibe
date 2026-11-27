@@ -11,7 +11,7 @@ describe("chat space visibility", () => {
       visibleRoots({ isPublic: true, leadId: id, roles: [UserRole.PUBLIC] }),
     ).toEqual([DefaultFolderId.INCOGNITO, DefaultFolderId.PUBLIC]);
   });
-  test("members see their own background tasks", () => {
+  test("members see their own background tasks and remote instance folders", () => {
     expect(
       visibleRoots({
         isPublic: false,
@@ -25,6 +25,7 @@ describe("chat space visibility", () => {
       DefaultFolderId.SHARED,
       DefaultFolderId.PUBLIC,
       DefaultFolderId.BACKGROUND,
+      DefaultFolderId.REMOTE,
     ]);
   });
   test("admins also see all root folders", () => {
@@ -49,9 +50,11 @@ describe("space entries", () => {
       { id: DefaultFolderId.INCOGNITO, locked: false },
       { id: DefaultFolderId.SHARED, locked: true },
       { id: DefaultFolderId.PUBLIC, locked: false },
+      { id: DefaultFolderId.BACKGROUND, locked: true },
+      { id: DefaultFolderId.REMOTE, locked: true },
     ]);
   });
-  test("members see their permitted root spaces with nothing locked", () => {
+  test("members see all root spaces with nothing locked", () => {
     const entries = spaceEntries({
       isPublic: false,
       leadId: id,
@@ -64,6 +67,7 @@ describe("space entries", () => {
       DefaultFolderId.SHARED,
       DefaultFolderId.PUBLIC,
       DefaultFolderId.BACKGROUND,
+      DefaultFolderId.REMOTE,
     ]);
     expect(entries.every((entry) => !entry.locked)).toBe(true);
   });
