@@ -38,6 +38,11 @@ export type DeductAndEmitCreditsParams =
       upstreamCost?: UsageUpstreamCost;
       tokenUsage?: UsageCacheTokens;
       apiProvider?: UsageAttribution["apiProvider"];
+      turnBudget?: {
+        startingCredits: number;
+        trackedModelSteps: number;
+        settlement: "completed-turn" | "ended-early";
+      };
       /** Provider request/generation ID(s) for matching provider dashboard charges. */
       providerJob?: {
         providerJobId?: string;
@@ -148,6 +153,8 @@ export async function deductAndEmitCredits(
     if (params.type === "model" && deducted + 1e-9 < params.amount) {
       // Provider usage is already incurred. Keep the capped debit and expose
       // any shortfall from estimation error or another spend on the wallet.
+      const turnBudget = params.turnBudget;
+      const creditsDeductedBeforeCharge = w.totalCreditsDeducted;
       w.deps.logger.warn(
         "[AI Stream] Model charge exceeded spendable balance",
         {
@@ -156,6 +163,15 @@ export async function deductAndEmitCredits(
           requestedCredits: params.amount,
           deductedCredits: deducted,
           shortfallCredits: params.amount - deducted,
+          creditsDeductedBeforeCharge,
+          turnBudget,
+          ...(turnBudget
+            ? {
+                chargeExceedsTurnBudget:
+                  creditsDeductedBeforeCharge + params.amount >
+                  turnBudget.startingCredits + 1e-9,
+              }
+            : {}),
         },
       );
     }

@@ -134,6 +134,8 @@ export interface DomGuardEvent {
   summary: boolean;
   /** Summary only: "operation:resolution=count" list */
   operations: string | null;
+  /** Summary only: tags of the expected parent, target, and actual parent. */
+  mutationSamples: string | null;
 }
 
 export type DomGuardReporter = (
@@ -156,6 +158,7 @@ let occurrences = 0;
 let summaryArmed = false;
 const laterOperations = new Map<string, number>();
 const laterSamples: string[] = [];
+const laterMutationSamples: string[] = [];
 const laterTargetMarkers = new Set<string>();
 let reporter: DomGuardReporter | null = null;
 const buffered: DomGuardEvent[] = [];
@@ -190,6 +193,9 @@ function record(
     laterOperations.set(kind, (laterOperations.get(kind) ?? 0) + 1);
     if (laterSamples.length < SUMMARY_SAMPLE_LIMIT) {
       laterSamples.push(describeNode(target));
+      laterMutationSamples.push(
+        `${kind}: ${parent.nodeName} > ${target.nodeName} > ${target.parentNode?.nodeName ?? "detached"}`,
+      );
       const markers = getMutationTargetMarkers(target);
       if (markers) {
         for (const marker of markers.split(",")) {
@@ -213,6 +219,7 @@ function record(
     path: sanitizeTelemetryUrl(window.location.pathname) ?? "/",
     summary: false,
     operations: null,
+    mutationSamples: null,
   };
   if (reporter) {
     reporter(event, getDomEnvironmentHints());
@@ -251,9 +258,11 @@ function armSummary(): void {
       operations: [...laterOperations.entries()]
         .map(([kind, count]) => `${kind}=${count}`)
         .join(", "),
+      mutationSamples: laterMutationSamples.join(" | ").slice(0, 450),
     };
     laterOperations.clear();
     laterSamples.length = 0;
+    laterMutationSamples.length = 0;
     laterTargetMarkers.clear();
     if (reporter) {
       reporter(event, getDomEnvironmentHints());

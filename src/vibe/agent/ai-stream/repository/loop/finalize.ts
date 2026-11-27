@@ -167,6 +167,11 @@ export async function billCompletedSteps(
     },
     upstreamCost,
     apiProvider: modelConfig.apiProvider,
+    turnBudget: {
+      startingCredits: state.p.creditBalance,
+      trackedModelSteps: ctx.tokenStepCount,
+      settlement: "ended-early",
+    },
     providerJob: mergeProviderJobIds(ctx.providerJobIds),
   });
   return { messageId, creditCost };
@@ -529,6 +534,8 @@ export async function complete(
         budgetCutStage: ctx.creditBudgetStopped ? "next-step-input" : "output",
         budgetNextInputTokens: ctx.creditBudgetNextInputTokens,
         outputCapped: ctx.creditBudgetCapped,
+        maxOutputTokens: ctx.creditBudgetOutputTokens,
+        configuredOutputModalities: modelConfig.outputs,
         balanceEvidence: {
           spendableCreditsAtStart: state.p.creditBalance,
           creditsAlreadyDeducted: ctx.dbWriter.totalCreditsDeducted,
@@ -618,6 +625,8 @@ export async function complete(
       reasoningTokens,
       finishReason: finishReason ?? null,
       outputCapped: ctx.creditBudgetCapped,
+      maxOutputTokens: ctx.creditBudgetOutputTokens,
+      configuredOutputModalities: modelConfig.outputs,
       loopStopped: ctx.creditBudgetStopped,
     };
     if (pausedAt !== null) {
@@ -711,6 +720,11 @@ export async function complete(
     },
     upstreamCost,
     apiProvider: modelConfig.apiProvider,
+    turnBudget: {
+      startingCredits: state.p.creditBalance,
+      trackedModelSteps: ctx.tokenStepCount,
+      settlement: "completed-turn",
+    },
     providerJob: mergeProviderJobIds(ctx.providerJobIds),
   });
 

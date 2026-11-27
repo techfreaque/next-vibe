@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, test } from "bun:test";
+import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
 import type { JSONValue } from "ai";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { createEndpointLogger } from "next-vibe/logger/server";
@@ -184,6 +184,47 @@ describe("media provider adapters capture providerJobId", () => {
       expect(result.data.providerJobId).toBe("gen-img-openrouter-1");
     }
     expect(recorded).toEqual(["gen-img-openrouter-1"]);
+  });
+
+  test("OpenRouter image logs a 502 outage with its provider request ID", async () => {
+    const failedRequestLogger = createEndpointLogger(false, locale);
+    const logError = spyOn(failedRequestLogger, "error").mockImplementation(
+      () => undefined,
+    );
+    const recorded: string[] = [];
+    const result = await generateWithOpenRouter({
+      providerModel: "black-forest-labs/flux.2-klein",
+      prompt: "cube",
+      logger: failedRequestLogger,
+      locale,
+      onProviderJobId: (id) => recorded.push(id),
+      fetchImpl: makeFetch([
+        Response.json(
+          {
+            error: {
+              message: "The server had an error while processing your request",
+              code: 502,
+            },
+          },
+          {
+            status: 502,
+            headers: { "x-request-id": "req-img-openrouter-502" },
+          },
+        ),
+      ]),
+    });
+
+    expect(result.success).toBe(false);
+    expect(recorded).toEqual([]);
+    expect(logError).toHaveBeenCalledWith(
+      "[OpenRouter Image] API error",
+      expect.objectContaining({
+        status: 502,
+        providerErrorCode: 502,
+        providerJobId: "req-img-openrouter-502",
+        failureKind: "outage",
+      }),
+    );
   });
 
   test("fal.ai image records request_id on submit and returns it", async () => {

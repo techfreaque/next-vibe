@@ -68,7 +68,11 @@ import {
 } from "../core/constants";
 import type { InlineThinkEvent } from "../core/inline-think-splitter";
 import { computeOutputCap, type OutputCap } from "../core/output-cost-cap";
-import { claimResultToolCallId, type PendingToolData } from "../core/stream";
+import {
+  claimResultToolCallId,
+  type PendingToolData,
+  QueueRegistry,
+} from "../core/stream";
 import { estimateInputTokens } from "../core/token-estimator";
 import { providerErrorTranslationKey } from "../errors/provider-error-key";
 import { isTransientErrorText } from "../errors/transient";
@@ -84,7 +88,11 @@ import {
   finalizeAssistant,
   runAbortHandler,
 } from "./finalize";
-import { DEFAULT_TEMPERATURE, isThreadRenameCall } from "./helpers";
+import {
+  DEFAULT_TEMPERATURE,
+  endLoopNeedsAnswerStep,
+  isThreadRenameCall,
+} from "./helpers";
 import { extractMediaPrompt, onFilePart } from "./media-parts";
 import {
   isContextOverflowText,
@@ -123,6 +131,36 @@ interface PreparedStep {
   messages?: ModelMessage[];
   toolChoice?: "none";
   maxOutputTokens?: number;
+}
+
+function validationRejectedToolCalls(step: StepResult<ToolSet>): Set<string> {
+  return new Set(
+    step.toolResults
+      .filter(
+        (result) =>
+          errorResponseSchema.safeParse(result.output).data?.errorType
+            .errorKey === ErrorResponseTypes.VALIDATION_ERROR.errorKey,
+      )
+      .map((result) => result.toolCallId),
+  );
+}
+
+function onlyRejectedRenames(step: StepResult<ToolSet>): boolean {
+  const rejected = validationRejectedToolCalls(step);
+  return (
+    step.toolCalls.length > 0 &&
+    step.toolCalls.every((call) => {
+      const { wrappedToolName } = modelDispatchControls(
+        call.toolName,
+        WidgetDataSchema.safeParse(call.input).data,
+      );
+      return (
+        isThreadRenameCall(call.toolName, wrappedToolName) &&
+        (rejected.has(call.toolCallId) ||
+          InvalidToolInputError.isInstance(call.error))
+      );
+    })
+  );
 }
 
 export class StreamLoop implements StreamLoopState {
@@ -473,6 +511,7 @@ export class StreamLoop implements StreamLoopState {
             headers: { [GARBLED_REPLACE_HEADER]: "1" },
           }
         : {};
+    ctx.creditBudgetOutputTokens = initialMaxOutputTokens ?? null;
     const streamResult = aiStreamText({
       model: provider.chat(modelConfig.providerModel) as LanguageModel,
       messages,
@@ -507,6 +546,18 @@ export class StreamLoop implements StreamLoopState {
               ) {
                 return true;
               }
+              // One repair attempt is enough for metadata after an answer.
+              // Keep running if there is new user input or a completed tool to deliver.
+              if (
+                ctx.sdkTurnHasAnswerText &&
+                endLoopNeedsAnswerStep(toolExecutionContext) &&
+                steps.length - ctx.turnStepOffset >= 2 &&
+                ctx.pendingWakeUpInjections.length === 0 &&
+                !QueueRegistry.hasQueued(this.p.threadId) &&
+                steps.slice(-2).every(onlyRejectedRenames)
+              ) {
+                return true;
+              }
               if (maxToolCalls !== undefined) {
                 if (steps.length === maxToolCalls) {
                   return true;
@@ -523,22 +574,15 @@ export class StreamLoop implements StreamLoopState {
             },
             prepareStep: (): PreparedStep => {
               ctx.stepPricingStartedAt = Date.now();
+              ctx.creditBudgetOutputTokens =
+                nextStep?.maxOutputTokens ?? initialMaxOutputTokens ?? null;
               return nextStep ?? {};
             },
             onStepFinish: (stepResult): void => {
               // Read here (SDK-typed) so steps.ts stays free of the SDK's
               // untyped tool input: which calls of this step asked endLoop,
               // and were they all the silent rename?
-              const rejected = new Set(
-                stepResult.toolResults
-                  .filter(
-                    (result) =>
-                      errorResponseSchema.safeParse(result.output).data
-                        ?.errorType.errorKey ===
-                      ErrorResponseTypes.VALIDATION_ERROR.errorKey,
-                  )
-                  .map((result) => result.toolCallId),
-              );
+              const rejected = validationRejectedToolCalls(stepResult);
               const endLoopCalls = stepResult.toolCalls.flatMap((call) => {
                 if (
                   rejected.has(call.toolCallId) ||

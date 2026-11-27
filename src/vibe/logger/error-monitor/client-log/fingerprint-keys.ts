@@ -75,9 +75,12 @@ export const CLIENT_LOG_FINGERPRINT_IGNORE_KEYS: ReadonlySet<string> = new Set([
   "responseWaitMs",
   "responseReadMs",
   "requestBodySize",
+  "attachmentBytes",
+  "attachmentIndex",
   // 2026-11-18 triage: per-occurrence counters (dom-guard, WS reconnects)
   "occurrence",
   "fontWrapperCount",
+  "mutationSamples",
   "attempts",
   "acknowledgedChannels",
   "failedHandshakesDuringDrop",

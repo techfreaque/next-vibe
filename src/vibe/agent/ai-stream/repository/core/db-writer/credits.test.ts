@@ -136,13 +136,31 @@ describe("deductAndEmitCredits — fail closed", () => {
       type: "tool",
       model: undefined,
     });
-    await deductAndEmitCredits(writer, { user, amount: 5, feature: model, type: "model", model });
+    await deductAndEmitCredits(writer, {
+      user,
+      amount: 5,
+      feature: model,
+      type: "model",
+      model,
+      turnBudget: {
+        startingCredits: 30,
+        trackedModelSteps: 2,
+        settlement: "completed-turn",
+      },
+    });
     expect(warn).toHaveBeenCalledWith(
       "[AI Stream] Model charge exceeded spendable balance",
       expect.objectContaining({
         requestedCredits: 5,
         deductedCredits: 2,
         shortfallCredits: 3,
+        creditsDeductedBeforeCharge: 25,
+        turnBudget: {
+          startingCredits: 30,
+          trackedModelSteps: 2,
+          settlement: "completed-turn",
+        },
+        chargeExceedsTurnBudget: false,
       }),
     );
     const result = await shapeRunResult({

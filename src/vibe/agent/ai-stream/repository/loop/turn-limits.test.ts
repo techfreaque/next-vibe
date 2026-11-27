@@ -349,6 +349,46 @@ it("preserves a target validation error and lets the model correct an endLoop ca
   expect(stored.mock.calls[0]?.[0].toolCall.args).toEqual(missingTitle);
 });
 
+it("stops after one failed rename repair once the answer is visible", async () => {
+  const missingInput = { toolName: "rename-thread" };
+  const { loop, replay, dispatch, stored } = makeRenameReplay([
+    { answer: "Hello!", args: missingInput },
+    { args: missingInput },
+    { args: rename },
+  ]);
+  const handler = await getRouteHandler("rename-thread");
+  const validation = await handler?.({
+    data: {},
+    urlPathParams: {},
+    user: loop.p.user,
+    platform: Platform.AI,
+    locale,
+    logger: loop.p.logger,
+    toolExecutionContext: loop.p.toolExecutionContext,
+  });
+  expect(validation).toMatchObject({
+    success: false,
+    errorType: ErrorResponseTypes.VALIDATION_ERROR,
+  });
+  if (!validation || !("success" in validation) || validation.success) {
+    return;
+  }
+  dispatch.mockResolvedValue(validation);
+
+  await loop.run();
+
+  expect(replay).toHaveBeenCalledTimes(2);
+  expect(dispatch).toHaveBeenCalledTimes(2);
+  expect(stored).toHaveBeenCalledTimes(2);
+  expect(
+    stored.mock.calls.every(
+      ([result]) =>
+        result.toolCall.error?.errorType.errorKey ===
+        ErrorResponseTypes.VALIDATION_ERROR.errorKey,
+    ),
+  ).toBe(true);
+});
+
 it("asks for an answer once if the successful rename was preceded only by thinking", async () => {
   const { loop, replay, requestBodies } = makeRenameReplay([
     { answer: "<think>Pick a title.</think>", args: rename },
@@ -478,6 +518,10 @@ it("prices the tool output sent to Kimi when the executor returns a large payloa
   expect(replay).toHaveBeenCalledTimes(2);
   expect(requestBodies[1]).toContain("Image ready.");
   expect(requestBodies[1]?.length).toBeLessThan(10_000);
+  const finalRequest = z
+    .object({ max_tokens: z.number().positive() })
+    .parse(JSON.parse(requestBodies[1] ?? "{}"));
+  expect(loop.p.ctx.creditBudgetOutputTokens).toBe(finalRequest.max_tokens);
 });
 
 it("refuses an unaffordable prepared first request before calling inference", async () => {

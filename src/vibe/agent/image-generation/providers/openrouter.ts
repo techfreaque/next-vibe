@@ -157,12 +157,18 @@ export async function generateWithOpenRouter(params: {
       rawText = await response.text();
     }
 
+    const headerRequestId = extractHeaderRequestId(response.headers, [
+      "x-generation-id",
+      "x-request-id",
+    ]);
     let data: OpenRouterImagesResponse;
     try {
       data = JSON.parse(rawText) as OpenRouterImagesResponse;
     } catch {
       logger.error("[OpenRouter Image] Failed to parse response as JSON", {
+        model: providerModel,
         status: response.status,
+        providerJobId: headerRequestId ?? null,
         body: rawText.slice(0, 500),
       });
       return fail({
@@ -174,12 +180,15 @@ export async function generateWithOpenRouter(params: {
       });
     }
 
+    const providerJobId = headerRequestId ?? normalizeProviderJobId(data.id);
     if (!response.ok || data.error) {
       const errorMsg = data.error?.message ?? `HTTP ${response.status}`;
+      const errorWithStatus = `${errorMsg} (HTTP ${response.status})`;
       logger.error("[OpenRouter Image] API error", {
         error: errorMsg,
         status: response.status,
         providerErrorCode: data.error?.code ?? null,
+        providerJobId: providerJobId ?? null,
         model: providerModel,
         imageToImage: Boolean(inputMediaUrl),
         requestedAspectRatio: aspectRatio ?? null,
@@ -187,12 +196,12 @@ export async function generateWithOpenRouter(params: {
         // contentPolicy = the provider refused the prompt (user sees the
         // "refused by the content filter, not charged" message); outage /
         // other = ours or theirs to fix.
-        failureKind: classifyImageProviderError(errorMsg),
+        failureKind: classifyImageProviderError(errorWithStatus),
       });
       return fail({
         // The status tells a refusal (400/403) from an outage (5xx/429).
         message: t("post.errors.externalServiceError", {
-          message: `${errorMsg} (HTTP ${String(response.status)})`,
+          message: errorWithStatus,
         }),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
       });
@@ -208,6 +217,8 @@ export async function generateWithOpenRouter(params: {
 
     if (!imageUrl) {
       logger.error("[OpenRouter Image] No image in response", {
+        model: providerModel,
+        providerJobId: providerJobId ?? null,
         hasData: Boolean(data.data),
         dataCount: data.data?.length ?? 0,
       });
@@ -217,11 +228,6 @@ export async function generateWithOpenRouter(params: {
       });
     }
 
-    const providerJobId =
-      extractHeaderRequestId(response.headers, [
-        "x-generation-id",
-        "x-request-id",
-      ]) ?? normalizeProviderJobId(data.id);
     if (providerJobId) {
       onProviderJobId?.(providerJobId);
     }

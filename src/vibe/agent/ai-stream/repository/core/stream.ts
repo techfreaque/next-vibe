@@ -144,6 +144,8 @@ export class ToolExecutionContextImpl {
   forcedAnswerStepUsed = false;
   /** A step ran with maxOutputTokens bounded by the wallet (output-cost-cap). */
   creditBudgetCapped = false;
+  /** Output cap supplied to the SDK for the most recent model request. */
+  creditBudgetOutputTokens: number | null = null;
   /** stopWhen ended the tool loop: the wallet cannot pay another step. */
   creditBudgetStopped = false;
   /** The SDK would have started another tool round at this limit. */
