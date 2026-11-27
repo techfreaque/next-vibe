@@ -1,0 +1,92 @@
+import type { translations as enTranslations } from "../en";
+
+export const translations: typeof enTranslations = {
+  lineRounding: "लाइन राउंडिंग",
+  category: "एस्टिमेट",
+  tags: { payment: "payment", estimate: "estimate" },
+  post: {
+    title: "एस्टिमेट देखें",
+    titleShort: "एस्टिमेट देखें",
+    description: "सभी लाइनों के साथ एक एस्टिमेट लाएँ",
+    form: {
+      title: "एस्टिमेट देखें",
+      description: "सभी लाइनों के साथ एक एस्टिमेट लाएँ",
+    },
+    response: { success: "सफल", message: "स्थिति का संदेश" },
+    errors: {
+      unauthorized: {
+        title: "अनधिकृत",
+        description: "ऑथेंटिकेशन ज़रूरी है",
+      },
+      validation: {
+        title: "वैलिडेशन एरर",
+        description: "पैरामीटर गलत हैं",
+      },
+      server: { title: "सर्वर एरर", description: "आंतरिक सर्वर एरर" },
+      unknown: {
+        title: "अनजान एरर",
+        description: "कोई अनजान एरर आई",
+      },
+      network: {
+        title: "नेटवर्क एरर",
+        description: "नेटवर्क एरर हुई",
+      },
+      forbidden: { title: "मना है", description: "एक्सेस नहीं मिला" },
+      notFound: { title: "नहीं मिला", description: "एस्टिमेट नहीं मिला" },
+      conflict: {
+        title: "टकराव",
+        description: "मौजूदा स्थिति में यह कार्रवाई नहीं हो सकती",
+      },
+      unsavedChanges: {
+        title: "बिना सेव किए बदलाव",
+        description: "बिना सेव किए बदलाव हैं",
+      },
+    },
+    success: {
+      title: "सफल",
+      description: "सभी लाइनों के साथ एक एस्टिमेट लाएँ",
+    },
+  },
+  estimateId: {
+    label: "एस्टिमेट ID",
+    description: "जिस एस्टिमेट पर कार्रवाई करनी है",
+  },
+  widget: {
+    itemColumn: "आइटम",
+    lineActions: "कार्रवाइयाँ",
+    removeLine: "हटाएँ",
+    removeLineNamed: "लाइन {{description}} हटाएँ",
+    send: "भेजा हुआ चिह्नित करें",
+    terms: "शर्तें",
+    noItems: "इस एस्टिमेट में कोई लाइन आइटम नहीं है।",
+    addLine: "लाइन जोड़ें",
+    accept: "स्वीकृति दर्ज करें",
+    decline: "अस्वीकृति दर्ज करें",
+    openInvoice: "इनवॉइस खोलें",
+    back: "वापस",
+    submit: "एस्टिमेट खोजें",
+    estimateNumber: "एस्टिमेट",
+    valid: "मान्य तारीख़",
+    customer: "ग्राहक",
+    lineItems: "लाइन आइटम",
+    description: "विवरण",
+    qty: "मात्रा",
+    unitPrice: "यूनिट कीमत",
+    tax: "टैक्स",
+    total: "कुल",
+    subtotal: "उप-योग",
+    sendEstimate: "भेजें",
+    acceptEstimate: "स्वीकार करें",
+    declineEstimate: "अस्वीकार करें",
+    convertToInvoice: "इनवॉइस में बदलें",
+    duplicate: "डुप्लिकेट करें",
+    status: {
+      draft: "ड्राफ़्ट",
+      sent: "भेजा गया",
+      accepted: "स्वीकृत",
+      declined: "अस्वीकृत",
+      expired: "समाप्त",
+      converted: "बदला गया",
+    },
+  },
+};

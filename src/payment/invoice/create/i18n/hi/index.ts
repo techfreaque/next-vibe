@@ -1,0 +1,157 @@
+import type { translations as enTranslations } from "../en";
+
+export const translations: typeof enTranslations = {
+  category: "बिलिंग",
+  tags: {
+    payment: "payment",
+    invoice: "invoice",
+    ar: "accounts-receivable",
+  },
+  post: {
+    title: "नया इनवॉइस",
+    titleShort: "नया इनवॉइस",
+    description: "अपने ग्राहक के लिए इनवॉइस तैयार करें।",
+    form: {
+      title: "नया इनवॉइस",
+      description: "इनवॉइस का ब्योरा भरें",
+    },
+    response: {
+      success: "इनवॉइस बन गया",
+      message: "स्थिति का संदेश",
+      invoice: {
+        title: "इनवॉइस",
+        subtitle: "बना हुआ इनवॉइस",
+        id: "इनवॉइस ID",
+        companyId: "कंपनी ID",
+        customerId: "ग्राहक ID",
+        invoiceSequenceNumber: "इनवॉइस नंबर",
+        currency: "करेंसी",
+        status: "स्थिति",
+        dueDate: "देय तारीख़",
+        notes: "नोट्स",
+        amount: "रकम",
+        createdAt: "बनाया गया",
+        updatedAt: "अपडेट किया गया",
+      },
+    },
+    errors: {
+      unauthorized: {
+        title: "अनधिकृत",
+        description: "ऑथेंटिकेशन ज़रूरी है",
+      },
+      validation: {
+        title: "वैलिडेशन एरर",
+        description: "इनवॉइस के पैरामीटर गलत हैं",
+      },
+      server: {
+        title: "सर्वर एरर",
+        description: "आंतरिक सर्वर एरर हुई",
+      },
+      unknown: {
+        title: "अनजान एरर",
+        description: "कोई अनजान एरर आई",
+      },
+      network: {
+        title: "नेटवर्क एरर",
+        description: "नेटवर्क एरर हुई",
+      },
+      forbidden: {
+        title: "मना है",
+        description: "इस कंपनी का एडमिन या अकाउंटेंट होना ज़रूरी है",
+      },
+      notFound: {
+        title: "नहीं मिला",
+        description: "कंपनी नहीं मिली",
+      },
+      conflict: {
+        title: "टकराव",
+        description: "टकराव हो गया",
+      },
+      unsavedChanges: {
+        title: "बिना सेव किए बदलाव",
+        description: "बिना सेव किए बदलाव हैं",
+      },
+    },
+    success: {
+      title: "इनवॉइस बन गया",
+      description: "इनवॉइस ड्राफ़्ट स्थिति में बना",
+    },
+    widget: {
+      draftSaved: "ड्राफ़्ट इनवॉइस सेव हुआ",
+      draftSavedNumber: "ड्राफ़्ट इनवॉइस #{{number}} सेव हुआ",
+      details: "इनवॉइस का ब्योरा",
+      draftHint: "जारी करने से पहले देखने के लिए ड्राफ़्ट सेव करें।",
+      items: "लाइन आइटम",
+      itemsDescription: "वैकल्पिक ड्राफ़्ट लाइनें। VAT दर 0 से 1 के बीच दशमलव में दें।",
+      itemsHint: "इनवॉइस का कुल निकालने के लिए सामान या सेवाएँ जोड़ें।",
+      item: "विवरण",
+      quantity: "मात्रा",
+      unitPrice: "यूनिट कीमत",
+      manualTaxRate: "दूसरी दर",
+      taxRate: "VAT %",
+      addItem: "आइटम जोड़ें",
+      removeItem: "आइटम हटाएँ",
+      itemError: "विवरण, धनात्मक मात्रा, कीमत और 0 से 100% के बीच VAT दर दर्ज करें।",
+      itemsTotalError: "कुल एक इनवॉइस के लिए बहुत बड़ा है।",
+      summary: "सारांश",
+      net: "नेट",
+      tax: "VAT",
+      total: "कुल",
+      customerSelected: "ग्राहक चुना गया",
+      clearCustomer: "ग्राहक हटाएँ",
+      lineTotal: "लाइन कुल",
+      companyCurrencyValue: "कंपनी की करेंसी: {{currency}}",
+      companyCurrency: "आप कोई और न चुनें तो कंपनी की करेंसी इस्तेमाल होती है।",
+      back: "वापस",
+      submit: "ड्राफ़्ट सेव करें",
+      saving: "ड्राफ़्ट सेव हो रहा है…",
+      retrySave: "ड्राफ़्ट फिर सेव करें",
+      saveFailed: "इनवॉइस ड्राफ़्ट सेव नहीं हो सका",
+      saveFailedHint: "आपकी एंट्री अब भी यहीं हैं। उन्हें देखें, फिर ड्राफ़्ट दोबारा सेव करें।",
+      viewButton: "इनवॉइस देखें",
+    },
+  },
+  companyId: {
+    label: "कंपनी",
+    description: "इनवॉइस जारी करने वाली कंपनी",
+    placeholder: "कंपनी ID दर्ज करें",
+  },
+  customerId: {
+    label: "ग्राहक",
+    description: "नाम से ग्राहक खोजें।",
+    placeholder: "ग्राहक ID दर्ज करें",
+  },
+  dueDate: {
+    label: "देय तारीख़",
+    description: "इनवॉइस कब देय है",
+    placeholder: "देय तारीख़ चुनें",
+  },
+  currency: {
+    code: "{{code}}",
+    label: "करेंसी",
+    description: "इनवॉइस की करेंसी",
+    placeholder: "कंपनी की करेंसी",
+  },
+  notes: {
+    label: "नोट्स",
+    description: "इनवॉइस पर दिखने वाले वैकल्पिक नोट्स",
+    placeholder: "जैसे पेमेंट शर्तें: 30 दिन",
+  },
+  supplyDate: {
+    label: "आपूर्ति की तारीख़",
+    description: "वह दिन जब सामान या सेवाएँ दी गईं। डिफ़ॉल्ट जारी करने की तारीख़।",
+  },
+  vatTreatment: {
+    label: "VAT ट्रीटमेंट",
+    description:
+      "घरेलू VAT, रिवर्स चार्ज या छूट। रिवर्स चार्ज और EU आपूर्ति के लिए ग्राहक की VAT ID चाहिए।",
+    options: {
+      DOMESTIC: "VAT के साथ घरेलू बिक्री",
+      REVERSE_CHARGE_DOMESTIC: "घरेलू रिवर्स चार्ज",
+      EU_SERVICES_REVERSE_CHARGE: "EU के व्यवसाय को सेवाएँ (रिवर्स चार्ज)",
+      EU_GOODS_EXEMPT: "EU के व्यवसाय को सामान (छूट)",
+      EXPORT_EXEMPT: "EU के बाहर निर्यात (छूट)",
+      EXEMPT: "VAT से छूट प्राप्त आपूर्ति",
+    },
+  },
+};

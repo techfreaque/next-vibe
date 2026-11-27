@@ -9,6 +9,7 @@ export const scopedTranslation = createScopedTranslation({
   fr: () => require("./fr").translations,
   it: () => require("./it").translations,
   sk: () => require("./sk").translations,
+  hi: () => require("./hi").translations,
   es: () => require("./es").translations,
 });
 
