@@ -11,6 +11,7 @@ import { Container } from "next-vibe/ui/components/container";
 import { CheckCircle } from "next-vibe/ui/components/icons/CheckCircle";
 import { XCircle } from "next-vibe/ui/components/icons/XCircle";
 import { Link } from "next-vibe/ui/components/link";
+import { Span } from "next-vibe/ui/components/span";
 import { H1 } from "next-vibe/ui/components/typography";
 import { useLogger } from "next-vibe/ui/hooks/use-logger";
 import { useRouter, useSearchParams } from "next-vibe/ui/hooks/use-navigation";
@@ -20,6 +21,7 @@ import { useEffect } from "react";
 import { CreditsTabHeaderContent } from "@/credits/credits-tab-header";
 import type { CreditsGetResponseOutput } from "@/credits/definition";
 import { CreditsOverview } from "@/credits/widget";
+import { scopedTranslation as subscriptionScopedTranslation } from "@/subscription/i18n";
 
 import { scopedTranslation } from "../i18n";
 
@@ -36,6 +38,7 @@ function PaymentResultBanner({
 }): JSX.Element | null {
   const searchParams = useSearchParams();
   const { t } = scopedTranslation.scopedT(locale);
+  const { t: subscriptionT } = subscriptionScopedTranslation.scopedT(locale);
 
   const paymentStatus = searchParams.get("payment");
   const paymentType =
@@ -71,6 +74,12 @@ function PaymentResultBanner({
       </AlertTitle>
       <AlertDescription>
         {t(`subscription.payment.${paymentStatus}.${paymentType}`)}
+        {!isSuccess && (
+          <Span className="mt-2 block">
+            {subscriptionT("checkoutTip.body")}{" "}
+            {subscriptionT("checkoutTip.other")}
+          </Span>
+        )}
         {!isSuccess && (
           <Link
             href={`/${locale}/subscription/buy`}

@@ -444,6 +444,10 @@ export const translations: typeof enTranslations = {
     cancelAt: "Plánované zrušenie",
     canceledAt: "Zrušené",
     endedAt: "Dátum skončenia",
+    gracePeriodEndsAt: "Koniec ochrannej lehoty",
+    retryPaymentUrl: "Odkaz na opakovanie platby",
+    cardCountry: "Krajina karty",
+    recentCardAuthFailure: "Nedávno neúspešné overenie karty",
     checkoutProviders: "Dostupné spôsoby platby",
     nowPaymentsAcceptsCards: "Krypto platba prijíma karty",
     trialStart: "Začiatok skúšobného obdobia",
@@ -695,6 +699,25 @@ export const translations: typeof enTranslations = {
     title: "Predplatné sa skončilo",
     description:
       "Tvoje predplatné sa skončilo. Obnov ho a získaš prístup ku všetkým funkciám.",
+  },
+  pastDue: {
+    title: "Posledná platba neprešla",
+    description:
+      "Plán aj kredity ostávajú aktívne do {{date}}. Dovtedy si môžeš dokúpiť aj jednorazový balík kreditov, kartou alebo kryptom.",
+    reason:
+      "Banka platbu často podrží, kým ju neschváliš (3D Secure alebo OTP kód).",
+    indiaMandate:
+      "Tvoja karta je z Indie: indické banky povoľujú opakované platby kartou len so schváleným e-mandátom a sumy nad 15 000 ₹ zakaždým vyžadujú OTP kód. Pred každým obnovením sleduj SMS alebo upozornenie v aplikácii banky.",
+    retry: "Schváliť alebo zopakovať platbu",
+    buyPack: "Dobiť balíkom kreditov",
+    payCrypto: "Zaplatiť kryptom",
+  },
+  checkoutTip: {
+    title: "Karta pýta kód?",
+    body: "Potvrď OTP kód alebo overenie 3D Secure v aplikácii banky či cez SMS a nechaj kartu s platbou otvorenú, kým sa nepotvrdí.",
+    india:
+      "Indické karty: medzinárodné online platby sú často predvolene vypnuté. Zapni ich v aplikácii banky (nastavenia karty) a skús to znova.",
+    other: "Stále to nejde? Skús inú kartu alebo zaplať kryptom.",
   },
   noSubscription: {
     title: "Zatiaľ nemáš predplatné",

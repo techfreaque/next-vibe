@@ -77,6 +77,14 @@ interface SyncSubscriptionResult {
   changes: string[];
 }
 
+/** Card facts from Stripe behind the card-specific payment hints. */
+interface CardPaymentHint {
+  /** ISO country of the card that paid or failed last, null if unknown. */
+  cardCountry: string | null;
+  /** A 3DS/OTP step failed and no payment succeeded after it. */
+  recentCardAuthFailure: boolean;
+}
+
 /**
  * Subscription Repository - Static class pattern
  */
@@ -218,6 +226,159 @@ export class SubscriptionRepository {
    */
   private static readonly PROVIDER_SYNC_INTERVAL_MS = 10 * 60 * 1000;
   private static readonly lastProviderSync = new Map<string, number>();
+  private static readonly RETRY_URL_CACHE_MS = 5 * 60 * 1000;
+  /** Hint lookups never hold a page: a slow Stripe call just omits the hint. */
+  private static readonly HINT_TIMEOUT_MS = 2500;
+  private static readonly retryUrlCache = new Map<
+    string,
+    { url: string | null; at: number }
+  >();
+
+  private static readonly cardHintCache = new Map<
+    string,
+    { hint: CardPaymentHint | null; at: number }
+  >();
+
+  /**
+   * Card country and 3DS outcome of the user's recent Stripe payments, read
+   * from Stripe (not IP: Indian cards often browse from elsewhere). Drives the
+   * card-specific hints (OTP approval, Indian e-mandates). Only read for users
+   * without a healthy plan, cached for a few minutes.
+   */
+  private static async resolveCardPaymentHint(
+    userId: string,
+    logger: EndpointLogger,
+  ): Promise<CardPaymentHint | null> {
+    const cached = SubscriptionRepository.cardHintCache.get(userId);
+    if (
+      cached &&
+      Date.now() - cached.at < SubscriptionRepository.RETRY_URL_CACHE_MS
+    ) {
+      return cached.hint;
+    }
+    const stripeClient = StripeProvider.getStripe();
+    if (!stripeClient) {
+      return null;
+    }
+    try {
+      const { users } = await import("next-vibe/identity/user/db");
+      const [user] = await db
+        .select({ stripeCustomerId: users.stripeCustomerId })
+        .from(users)
+        .where(eq(users.id, userId))
+        .limit(1);
+      if (!user?.stripeCustomerId) {
+        SubscriptionRepository.cardHintCache.set(userId, {
+          hint: null,
+          at: Date.now(),
+        });
+        return null;
+      }
+      const since = Math.floor(Date.now() / 1000) - 35 * 24 * 60 * 60;
+      const intents = await stripeClient.paymentIntents.list(
+        {
+          customer: user.stripeCustomerId,
+          created: { gte: since },
+          limit: 5,
+          expand: ["data.payment_method"],
+        },
+        {
+          timeout: SubscriptionRepository.HINT_TIMEOUT_MS,
+          maxNetworkRetries: 0,
+        },
+      );
+      let cardCountry: string | null = null;
+      let recentCardAuthFailure = false;
+      // Newest first: the latest outcome wins, an older 3DS failure followed
+      // by a successful payment is no longer a problem.
+      for (const intent of intents.data) {
+        const failedMethod = intent.last_payment_error?.payment_method;
+        const method =
+          failedMethod ??
+          (typeof intent.payment_method === "object"
+            ? intent.payment_method
+            : null);
+        if (!cardCountry && method?.card?.country) {
+          cardCountry = method.card.country;
+        }
+        if (intent.status === "succeeded") {
+          break;
+        }
+        if (
+          intent.last_payment_error?.code ===
+          "payment_intent_authentication_failure"
+        ) {
+          recentCardAuthFailure = true;
+        }
+      }
+      const hint: CardPaymentHint = { cardCountry, recentCardAuthFailure };
+      SubscriptionRepository.cardHintCache.set(userId, {
+        hint,
+        at: Date.now(),
+      });
+      return hint;
+    } catch (error) {
+      logger.error("Failed to load recent card payments for hints", {
+        error: parseError(error),
+        userId,
+      });
+      SubscriptionRepository.cardHintCache.set(userId, {
+        hint: null,
+        at: Date.now(),
+      });
+      return null;
+    }
+  }
+
+  /**
+   * Stripe-hosted page of the subscription's open (failed) invoice. It is the
+   * one place a customer can approve a payment their bank held back (3DS, an
+   * Indian e-mandate charge above the auto-debit limit) or pay with another
+   * card. Only read for PAST_DUE Stripe plans, cached for a few minutes.
+   */
+  private static async resolveRetryPaymentUrl(
+    providerSubscriptionId: string,
+    logger: EndpointLogger,
+  ): Promise<string | null> {
+    const cached = SubscriptionRepository.retryUrlCache.get(
+      providerSubscriptionId,
+    );
+    if (
+      cached &&
+      Date.now() - cached.at < SubscriptionRepository.RETRY_URL_CACHE_MS
+    ) {
+      return cached.url;
+    }
+    const stripeClient = StripeProvider.getStripe();
+    if (!stripeClient) {
+      return null;
+    }
+    try {
+      const invoices = await stripeClient.invoices.list(
+        {
+          subscription: providerSubscriptionId,
+          status: "open",
+          limit: 1,
+        },
+        {
+          timeout: SubscriptionRepository.HINT_TIMEOUT_MS,
+          maxNetworkRetries: 0,
+        },
+      );
+      const url = invoices.data[0]?.hosted_invoice_url ?? null;
+      SubscriptionRepository.retryUrlCache.set(providerSubscriptionId, {
+        url,
+        at: Date.now(),
+      });
+      return url;
+    } catch (error) {
+      logger.error("Failed to load open invoice for past-due subscription", {
+        error: parseError(error),
+        providerSubscriptionId,
+      });
+      return null;
+    }
+  }
 
   /**
    * Get the user's latest subscription.
@@ -275,7 +436,14 @@ export class SubscriptionRepository {
       if (results.length === 0) {
         // No subscription is a valid state, not an error - the widget renders
         // a subscribe CTA from this response.
-        return success({ hasSubscription: false });
+        const hint = syncWithProvider
+          ? await SubscriptionRepository.resolveCardPaymentHint(userId, logger)
+          : null;
+        return success({
+          hasSubscription: false,
+          cardCountry: hint?.cardCountry ?? undefined,
+          recentCardAuthFailure: hint?.recentCardAuthFailure || undefined,
+        });
       }
 
       let subscription = results[0];
@@ -429,8 +597,30 @@ export class SubscriptionRepository {
         }
       }
 
+      const isPastDue = subscription.status === SubscriptionStatus.PAST_DUE;
+      const retryPaymentUrl =
+        isPastDue &&
+        syncWithProvider &&
+        subscription.providerSubscriptionId &&
+        subscription.provider !== PaymentProvider.NOWPAYMENTS
+          ? await SubscriptionRepository.resolveRetryPaymentUrl(
+              subscription.providerSubscriptionId,
+              logger,
+            )
+          : null;
+      const needsCardHint =
+        syncWithProvider &&
+        subscription.provider !== PaymentProvider.NOWPAYMENTS &&
+        subscription.status !== SubscriptionStatus.ACTIVE &&
+        subscription.status !== SubscriptionStatus.TRIALING;
+      const cardHint = needsCardHint
+        ? await SubscriptionRepository.resolveCardPaymentHint(userId, logger)
+        : null;
+
       return success({
         hasSubscription: true,
+        cardCountry: cardHint?.cardCountry ?? undefined,
+        recentCardAuthFailure: cardHint?.recentCardAuthFailure || undefined,
         id: subscription.id,
         plan: SubscriptionRepository.normalizePlanId(subscription.planId),
         billingInterval: subscription.billingInterval,
@@ -441,6 +631,11 @@ export class SubscriptionRepository {
         cancelAt: subscription.cancelAt?.toISOString(),
         canceledAt: subscription.canceledAt?.toISOString(),
         endedAt: subscription.endedAt?.toISOString(),
+        gracePeriodEndsAt:
+          isPastDue && subscription.gracePeriodEndsAt
+            ? subscription.gracePeriodEndsAt.toISOString()
+            : undefined,
+        retryPaymentUrl: retryPaymentUrl ?? undefined,
         provider: subscription.provider,
         providerSubscriptionId:
           subscription.providerSubscriptionId || undefined,

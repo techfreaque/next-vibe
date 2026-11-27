@@ -35,6 +35,7 @@ import {
 import { type SubscriptionGetResponseOutput } from "@/subscription/definition";
 import { SubscriptionStatus } from "@/subscription/enum";
 import { scopedTranslation as subscriptionScopedTranslation } from "@/subscription/i18n";
+import { SubscriptionPastDueNotice } from "@/subscription/past-due-notice";
 
 interface SubscriptionStatusCardProps {
   locale: CountryLanguage;
@@ -82,6 +83,7 @@ export function SubscriptionStatusCard({
 
   const isCanceled = status === SubscriptionStatus.CANCELED;
   const isCanceling = !isCanceled && initialSubscription.cancelAt;
+  const isPastDue = status === SubscriptionStatus.PAST_DUE;
 
   const getProviderName = (provider?: string): string => {
     if (provider === PaymentProvider.NOWPAYMENTS) {
@@ -115,7 +117,7 @@ export function SubscriptionStatusCard({
   return (
     <Card className="border-2 border-primary">
       <CardHeader>
-        <Div className="flex items-start justify-between">
+        <Div className="flex flex-wrap items-start justify-between gap-3">
           <Div className="flex flex-col gap-1">
             <CardTitle className="flex items-center gap-3">
               <Div className="p-2 rounded-lg bg-primary/10">
@@ -132,12 +134,12 @@ export function SubscriptionStatusCard({
                 : t("subscription.description")}
             </CardDescription>
           </Div>
-          <Div className="flex gap-2">
+          <Div className="flex flex-wrap gap-2">
             <Badge
               className={
                 isCanceled
                   ? "bg-destructive text-destructive-foreground"
-                  : isCanceling
+                  : isCanceling || isPastDue
                     ? "bg-warning text-warning-foreground"
                     : "bg-success text-success-foreground"
               }
@@ -259,6 +261,16 @@ export function SubscriptionStatusCard({
               </Div>
             </Div>
           </Div>
+        )}
+
+        {isPastDue && (
+          <SubscriptionPastDueNotice
+            locale={locale}
+            gracePeriodEndsAt={initialSubscription.gracePeriodEndsAt}
+            retryPaymentUrl={initialSubscription.retryPaymentUrl}
+            cardCountry={initialSubscription.cardCountry}
+            onUpdatePaymentMethod={handleManageSubscription}
+          />
         )}
 
         {isCanceled && (

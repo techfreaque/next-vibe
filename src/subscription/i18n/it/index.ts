@@ -449,6 +449,10 @@ export const translations: typeof enTranslations = {
     cancelAt: "Annullare",
     canceledAt: "Annullato a",
     endedAt: "Fine a",
+    gracePeriodEndsAt: "Fine del periodo di tolleranza",
+    retryPaymentUrl: "Link per ripetere il pagamento",
+    cardCountry: "Paese della carta",
+    recentCardAuthFailure: "Recente autenticazione della carta non riuscita",
     checkoutProviders: "Metodi di pagamento disponibili",
     nowPaymentsAcceptsCards: "Il checkout crypto accetta carte",
     trialStart: "Data di inizio del processo",
@@ -703,6 +707,25 @@ export const translations: typeof enTranslations = {
     title: "Abbonamento terminato",
     description:
       "Il tuo abbonamento è terminato. Rinnovalo per riavere accesso a tutte le funzioni.",
+  },
+  pastDue: {
+    title: "L'ultimo pagamento non è andato a buon fine",
+    description:
+      "Piano e crediti restano attivi fino al {{date}}. Fino ad allora puoi anche ricaricare con un pacchetto di crediti una tantum, con carta o crypto.",
+    reason:
+      "Spesso la banca trattiene il pagamento in attesa della tua approvazione (3D Secure o codice OTP).",
+    indiaMandate:
+      "La tua carta è indiana: le banche indiane consentono addebiti ricorrenti su carta solo con un e-mandate approvato, e sopra i 15.000 ₹ ogni addebito richiede il tuo OTP. Prima di ogni rinnovo controlla l'SMS o la notifica dell'app della banca.",
+    retry: "Approva o riprova il pagamento",
+    buyPack: "Ricarica con un pacchetto di crediti",
+    payCrypto: "Paga in crypto",
+  },
+  checkoutTip: {
+    title: "La carta chiede un codice?",
+    body: "Conferma l'OTP o il controllo 3D Secure nell'app della banca o via SMS, e tieni aperta la scheda del pagamento finché non viene confermato.",
+    india:
+      "Carte indiane: i pagamenti online internazionali sono spesso disattivati di default. Attivali nell'app della banca (controlli della carta) e riprova.",
+    other: "Non funziona ancora? Prova un'altra carta o paga in crypto.",
   },
   noSubscription: {
     title: "Nessun abbonamento attivo",

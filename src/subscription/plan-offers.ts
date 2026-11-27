@@ -54,6 +54,7 @@ export type SubscriptionSnapshot = Pick<
   "hasSubscription" | "status" | "plan" | "billingInterval" | "provider"
 > & {
   currentPeriodEnd?: SubscriptionGetResponseOutput["currentPeriodEnd"];
+  gracePeriodEndsAt?: SubscriptionGetResponseOutput["gracePeriodEndsAt"];
 };
 
 /** True while the subscription still counts as a plan (mirrors hasLivePlan). */
@@ -66,8 +67,12 @@ export function isLivePlan(
   }
   const { status } = subscription;
   if (status === SubscriptionStatus.PAST_DUE) {
-    // The grace period is server-side; the pack checkout re-checks it.
-    return true;
+    // Live while the grace period runs (mirrors hasLivePlan). Without the
+    // date the pack checkout still re-checks it server-side.
+    return (
+      !subscription.gracePeriodEndsAt ||
+      new Date(subscription.gracePeriodEndsAt).getTime() > now
+    );
   }
   if (
     status !== SubscriptionStatus.ACTIVE &&

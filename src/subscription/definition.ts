@@ -106,6 +106,26 @@ const { GET } = createEndpoint({
         label: "response.endedAt",
         schema: z.string().optional(),
       }),
+      gracePeriodEndsAt: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "response.gracePeriodEndsAt",
+        schema: z.string().optional(),
+      }),
+      retryPaymentUrl: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "response.retryPaymentUrl",
+        schema: z.string().optional(),
+      }),
+      cardCountry: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "response.cardCountry",
+        schema: z.string().optional(),
+      }),
+      recentCardAuthFailure: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "response.recentCardAuthFailure",
+        schema: z.boolean().optional(),
+      }),
       // Providers that can open a new checkout right now (Stripe drops out
       // while its account is paused). Optional: older peers omit it, which
       // the buy UI reads as "all providers".

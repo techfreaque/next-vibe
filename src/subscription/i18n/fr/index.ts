@@ -448,6 +448,10 @@ export const translations: typeof enTranslations = {
     cancelAt: "Résiliation le",
     canceledAt: "Résilié le",
     endedAt: "Terminé le",
+    gracePeriodEndsAt: "Fin du délai de grâce",
+    retryPaymentUrl: "Lien pour relancer le paiement",
+    cardCountry: "Pays de la carte",
+    recentCardAuthFailure: "Échec récent d'authentification de la carte",
     checkoutProviders: "Moyens de paiement disponibles",
     nowPaymentsAcceptsCards: "Le paiement crypto accepte les cartes",
     trialStart: "Début de l'essai",
@@ -704,6 +708,25 @@ export const translations: typeof enTranslations = {
     title: "Abonnement terminé",
     description:
       "Votre abonnement est terminé. Renouvelez-le pour retrouver toutes les fonctionnalités.",
+  },
+  pastDue: {
+    title: "Votre dernier paiement n'est pas passé",
+    description:
+      "Votre offre et vos crédits restent actifs jusqu'au {{date}}. D'ici là, vous pouvez aussi recharger avec un pack de crédits ponctuel, par carte ou en crypto.",
+    reason:
+      "Souvent, la banque bloque le paiement en attendant votre accord (3D Secure ou code OTP).",
+    indiaMandate:
+      "Votre carte est indienne : les banques indiennes n'autorisent les prélèvements récurrents par carte qu'avec un e-mandat validé, et au-delà de 15 000 ₹ chaque prélèvement demande votre code OTP. Surveillez le SMS ou la notification de votre banque avant chaque renouvellement.",
+    retry: "Valider ou relancer le paiement",
+    buyPack: "Recharger avec un pack de crédits",
+    payCrypto: "Payer en crypto",
+  },
+  checkoutTip: {
+    title: "Votre carte demande un code ?",
+    body: "Validez le code OTP ou la vérification 3D Secure dans l'application de votre banque ou par SMS, et gardez l'onglet de paiement ouvert jusqu'à la confirmation.",
+    india:
+      "Cartes indiennes : les paiements internationaux en ligne sont souvent désactivés par défaut. Activez-les dans l'application de votre banque (gestion de la carte), puis réessayez.",
+    other: "Toujours bloqué ? Essayez une autre carte ou payez en crypto.",
   },
   noSubscription: {
     title: "Pas encore d'abonnement",

@@ -449,6 +449,10 @@ export const translations: typeof enTranslations = {
     cancelAt: "Kündigung am",
     canceledAt: "Gekündigt am",
     endedAt: "Beendet am",
+    gracePeriodEndsAt: "Kulanzfrist endet am",
+    retryPaymentUrl: "URL für erneute Zahlung",
+    cardCountry: "Kartenland",
+    recentCardAuthFailure: "Kürzlich fehlgeschlagene Kartenbestätigung",
     checkoutProviders: "Verfügbare Zahlungsarten",
     nowPaymentsAcceptsCards: "Krypto-Checkout nimmt Karten",
     trialStart: "Testphase Start",
@@ -703,6 +707,26 @@ export const translations: typeof enTranslations = {
     title: "Abonnement beendet",
     description:
       "Dein Abo ist beendet. Schließ es neu ab, um wieder alles nutzen zu können.",
+  },
+  pastDue: {
+    title: "Deine letzte Zahlung ist nicht durchgegangen",
+    description:
+      "Plan und Credits bleiben bis {{date}} aktiv. Bis dahin kannst du auch einmalig ein Credit-Paket kaufen, per Karte oder Krypto.",
+    reason:
+      "Oft hält die Bank die Zahlung zur Freigabe zurück (3D Secure oder OTP).",
+    indiaMandate:
+      "Deine Karte stammt aus Indien: Indische Banken erlauben wiederkehrende Kartenzahlungen nur mit freigegebenem E-Mandat, Beträge über 15.000 ₹ brauchen jedes Mal deinen OTP-Code. Achte vor jeder Verlängerung auf die SMS oder App-Meldung deiner Bank.",
+    retry: "Zahlung freigeben oder neu versuchen",
+    buyPack: "Mit Credit-Paket aufladen",
+    payCrypto: "Mit Krypto zahlen",
+  },
+  checkoutTip: {
+    title: "Karte will einen Code?",
+    body: "Bestätige den OTP oder die 3D-Secure-Prüfung in deiner Banking-App oder per SMS und lass den Zahlungs-Tab offen, bis er bestätigt.",
+    india:
+      "Indische Karten: Internationale Online-Zahlungen sind oft ab Werk gesperrt. Schalte sie in deiner Banking-App frei (Kartensteuerung) und versuch es erneut.",
+    other:
+      "Klappt es weiter nicht? Nimm eine andere Karte oder zahl mit Krypto.",
   },
   noSubscription: {
     title: "Noch kein Abo",

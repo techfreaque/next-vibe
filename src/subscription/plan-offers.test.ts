@@ -24,7 +24,7 @@ const activeCard = {
   plan: SubscriptionPlan.PLUS,
   billingInterval: BillingInterval.MONTHLY,
   provider: PaymentProvider.STRIPE,
-  currentPeriodEnd: new Date(NOW + 10 * DAY).toISOString(),
+  currentPeriodEnd: new Date(NOW + 10 * DAY),
 };
 
 describe("isLivePlan", () => {
@@ -43,6 +43,22 @@ describe("isLivePlan", () => {
     ).toBe(true);
   });
 
+  it("keeps a past-due plan live only while its grace period runs", () => {
+    const pastDue = { ...activeCard, status: SubscriptionStatus.PAST_DUE };
+    expect(
+      isLivePlan(
+        { ...pastDue, gracePeriodEndsAt: new Date(NOW + DAY).toISOString() },
+        NOW,
+      ),
+    ).toBe(true);
+    expect(
+      isLivePlan(
+        { ...pastDue, gracePeriodEndsAt: new Date(NOW - DAY).toISOString() },
+        NOW,
+      ),
+    ).toBe(false);
+  });
+
   it("drops canceled plans and periods long over", () => {
     expect(
       isLivePlan({ ...activeCard, status: SubscriptionStatus.CANCELED }, NOW),
@@ -51,7 +67,7 @@ describe("isLivePlan", () => {
       isLivePlan(
         {
           ...activeCard,
-          currentPeriodEnd: new Date(NOW - 3 * DAY).toISOString(),
+          currentPeriodEnd: new Date(NOW - 3 * DAY),
         },
         NOW,
       ),
@@ -59,7 +75,7 @@ describe("isLivePlan", () => {
     // Renewal webhook still on its way: one day over is still live
     expect(
       isLivePlan(
-        { ...activeCard, currentPeriodEnd: new Date(NOW - DAY).toISOString() },
+        { ...activeCard, currentPeriodEnd: new Date(NOW - DAY) },
         NOW,
       ),
     ).toBe(true);

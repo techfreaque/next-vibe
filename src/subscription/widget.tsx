@@ -41,6 +41,7 @@ import {
 
 import type definition from "./definition";
 import { SubscriptionStatus } from "./enum";
+import { SubscriptionPastDueNotice } from "./past-due-notice";
 
 /**
  * Format date for display
@@ -122,6 +123,7 @@ export function SubscriptionOverviewContainer(_props: {
 
   const isCanceled = status === SubscriptionStatus.CANCELED;
   const isCanceling = !isCanceled && subscription.cancelAt;
+  const isPastDue = status === SubscriptionStatus.PAST_DUE;
 
   const getProviderName = (provider?: string): string => {
     if (provider === PaymentProvider.NOWPAYMENTS) {
@@ -168,7 +170,7 @@ export function SubscriptionOverviewContainer(_props: {
     >
       <Card className="border-2 border-primary">
         <CardHeader>
-          <Div className="flex items-start justify-between">
+          <Div className="flex flex-wrap items-start justify-between gap-3">
             <Div className="flex flex-col gap-1">
               <CardTitle className="flex items-center gap-3">
                 <Div className="p-2 rounded-lg bg-primary/10">
@@ -185,12 +187,12 @@ export function SubscriptionOverviewContainer(_props: {
                   : t("description")}
               </CardDescription>
             </Div>
-            <Div className="flex gap-2">
+            <Div className="flex flex-wrap gap-2">
               <Badge
                 className={
                   isCanceled
                     ? "bg-destructive text-destructive-foreground"
-                    : isCanceling
+                    : isCanceling || isPastDue
                       ? "bg-warning text-warning-foreground"
                       : "bg-success text-success-foreground"
                 }
@@ -290,6 +292,16 @@ export function SubscriptionOverviewContainer(_props: {
                 </Div>
               </Div>
             </Div>
+          )}
+
+          {isPastDue && (
+            <SubscriptionPastDueNotice
+              locale={locale}
+              gracePeriodEndsAt={subscription.gracePeriodEndsAt}
+              retryPaymentUrl={subscription.retryPaymentUrl}
+              cardCountry={subscription.cardCountry}
+              onUpdatePaymentMethod={handleManageSubscription}
+            />
           )}
 
           {/* Canceled Info */}

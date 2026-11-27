@@ -444,6 +444,10 @@ export const translations: typeof enTranslations = {
     cancelAt: "Cancelar",
     canceledAt: "Cancelado",
     endedAt: "Finalizada el",
+    gracePeriodEndsAt: "Fin del periodo de gracia",
+    retryPaymentUrl: "Enlace para reintentar el pago",
+    cardCountry: "País de la tarjeta",
+    recentCardAuthFailure: "Fallo reciente de autenticación de la tarjeta",
     checkoutProviders: "Métodos de pago disponibles",
     nowPaymentsAcceptsCards: "El pago cripto acepta tarjetas",
     trialStart: "Fecha de inicio del juicio",
@@ -696,6 +700,25 @@ export const translations: typeof enTranslations = {
     title: "Suscripción finalizada",
     description:
       "Tu suscripción terminó. Renuévala para recuperar el acceso a todas las funciones.",
+  },
+  pastDue: {
+    title: "Tu último pago no se completó",
+    description:
+      "Tu plan y tus créditos siguen activos hasta el {{date}}. Hasta entonces también puedes recargar con un paquete de créditos único, con tarjeta o cripto.",
+    reason:
+      "Muchas veces el banco retiene el pago hasta que lo apruebes (3D Secure o código OTP).",
+    indiaMandate:
+      "Tu tarjeta es de India: los bancos indios solo permiten cobros recurrentes con tarjeta si hay un e-mandato aprobado, y por encima de 15.000 ₹ cada cobro pide tu OTP. Antes de cada renovación, atento al SMS o aviso de la app de tu banco.",
+    retry: "Aprobar o reintentar el pago",
+    buyPack: "Recargar con un paquete de créditos",
+    payCrypto: "Pagar con cripto",
+  },
+  checkoutTip: {
+    title: "¿Tu tarjeta pide un código?",
+    body: "Aprueba el OTP o la verificación 3D Secure en la app de tu banco o por SMS, y deja abierta la pestaña del pago hasta que se confirme.",
+    india:
+      "Tarjetas indias: los pagos internacionales en línea suelen venir desactivados. Actívalos en la app de tu banco (control de tarjeta) y vuelve a intentarlo.",
+    other: "¿Sigue fallando? Prueba otra tarjeta o paga con cripto.",
   },
   noSubscription: {
     title: "Aún no tienes una suscripción",

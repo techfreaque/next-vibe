@@ -444,6 +444,10 @@ export const translations: typeof enTranslations = {
     cancelAt: "Anulacja o",
     canceledAt: "Anulowano o",
     endedAt: "Zakończono o",
+    gracePeriodEndsAt: "Koniec okresu karencji",
+    retryPaymentUrl: "Link do ponownej płatności",
+    cardCountry: "Kraj karty",
+    recentCardAuthFailure: "Niedawno nieudane potwierdzenie karty",
     checkoutProviders: "Dostępne metody płatności",
     nowPaymentsAcceptsCards: "Checkout krypto przyjmuje karty",
     trialStart: "Początek okresu próbnego",
@@ -694,6 +698,25 @@ export const translations: typeof enTranslations = {
     title: "Subskrypcja zakończona",
     description:
       "Twoja subskrypcja dobiegła końca. Odnów ją, aby odzyskać dostęp do wszystkich funkcji.",
+  },
+  pastDue: {
+    title: "Ostatnia płatność nie przeszła",
+    description:
+      "Plan i kredyty działają do {{date}}. Do tego czasu możesz też dokupić jednorazowy pakiet kredytów, kartą lub kryptowalutą.",
+    reason:
+      "Często bank wstrzymuje płatność do Twojej akceptacji (3D Secure lub kod OTP).",
+    indiaMandate:
+      "Twoja karta jest z Indii: indyjskie banki pozwalają na płatności cykliczne kartą tylko z zatwierdzonym e-mandatem, a kwoty powyżej 15 000 ₹ za każdym razem wymagają kodu OTP. Przed każdym odnowieniem wypatruj SMS-a lub powiadomienia z aplikacji banku.",
+    retry: "Zatwierdź lub ponów płatność",
+    buyPack: "Doładuj pakietem kredytów",
+    payCrypto: "Zapłać kryptowalutą",
+  },
+  checkoutTip: {
+    title: "Karta prosi o kod?",
+    body: "Potwierdź kod OTP lub weryfikację 3D Secure w aplikacji banku albo SMS-em i nie zamykaj karty płatności, dopóki się nie potwierdzi.",
+    india:
+      "Karty z Indii: płatności międzynarodowe online są często domyślnie wyłączone. Włącz je w aplikacji banku (ustawienia karty) i spróbuj ponownie.",
+    other: "Dalej nie działa? Użyj innej karty albo zapłać kryptowalutą.",
   },
   noSubscription: {
     title: "Brak subskrypcji",

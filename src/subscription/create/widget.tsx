@@ -67,6 +67,7 @@ import { PaymentProvider, type PaymentProviderValue } from "@/payment/enum";
 import { ProductIds, productsRepository } from "@/products/platform-products";
 import { getPricingParams } from "@/products/repository-client";
 
+import { CheckoutCardTip } from "../checkout-card-tip";
 import subscriptionDefinitions from "../definition";
 import {
   BillingInterval,
@@ -343,6 +344,13 @@ export function SubscriptionCreateContainer(): JSX.Element {
   }, [packValue?.checkoutUrl]);
   const packError =
     packResponse?.success === false ? packResponse.message : null;
+
+  const cardTip = currentSubscription?.recentCardAuthFailure ? (
+    <CheckoutCardTip
+      locale={locale}
+      cardCountry={currentSubscription.cardCountry}
+    />
+  ) : null;
 
   const planPicker = (
     <PlanPicker
@@ -860,11 +868,13 @@ export function SubscriptionCreateContainer(): JSX.Element {
         </Div>
       ) : offerState.mode === "topUp" ? (
         <>
+          {cardTip}
           {packCard}
           {planPicker}
         </>
       ) : (
         <>
+          {cardTip}
           {planPicker}
           <Div
             data-testid="packs-locked"

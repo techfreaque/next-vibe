@@ -441,6 +441,10 @@ export const translations = {
     cancelAt: "Cancel At",
     canceledAt: "Canceled At",
     endedAt: "Ended At",
+    gracePeriodEndsAt: "Grace Period Ends At",
+    retryPaymentUrl: "Retry Payment URL",
+    cardCountry: "Card Country",
+    recentCardAuthFailure: "Recent Card Authentication Failure",
     checkoutProviders: "Available Payment Methods",
     nowPaymentsAcceptsCards: "Crypto Checkout Takes Cards",
     trialStart: "Trial Start Date",
@@ -691,6 +695,24 @@ export const translations = {
     title: "Subscription Ended",
     description:
       "Your subscription has ended. Renew to regain access to all features.",
+  },
+  pastDue: {
+    title: "Your last payment didn't go through",
+    description:
+      "Your plan and credits stay active until {{date}}. Until then you can also top up with a one-time credit pack, by card or crypto.",
+    reason: "Often the bank held it back for your approval (3D Secure or OTP).",
+    indiaMandate:
+      "Your card is from India: Indian banks only allow recurring card charges with an approved e-mandate, and charges over ₹15,000 need your OTP every time. Watch for your bank's SMS or app notice before each renewal.",
+    retry: "Approve or retry payment",
+    buyPack: "Top up with a credit pack",
+    payCrypto: "Pay with crypto",
+  },
+  checkoutTip: {
+    title: "Card asked for a code?",
+    body: "Approve the OTP or 3D Secure check in your bank app or SMS, and keep the payment tab open until it confirms.",
+    india:
+      "Indian cards: international online payments are often switched off by default. Turn them on in your bank app (card controls), then try again.",
+    other: "Still failing? Try another card or pay with crypto.",
   },
   noSubscription: {
     title: "No Subscription Yet",
