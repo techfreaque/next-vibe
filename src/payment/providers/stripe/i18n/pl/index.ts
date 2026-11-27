@@ -86,6 +86,10 @@ export const translations: typeof enTranslations = {
       title: "Pobieranie klienta nie powiodło się",
       description: "Nie udało się pobrać informacji o kliencie Stripe",
     },
+    checkoutUnavailable: {
+      detail:
+        "Płatność kartą jest teraz niedostępna po naszej stronie. Wiemy o tym i już to naprawiamy. Spróbuj ponownie później.",
+    },
     checkoutCreationFailed: {
       detail: "Nie udało się rozpocząć płatności: {{error}}",
       title: "Tworzenie checkout nie powiodło się",

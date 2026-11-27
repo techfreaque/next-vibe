@@ -86,6 +86,10 @@ export const translations: typeof enTranslations = {
       title: "Vytvorenie zákazníka zlyhalo",
       description: "Zákazníka v Stripe sa nepodarilo vytvoriť",
     },
+    checkoutUnavailable: {
+      detail:
+        "Platba kartou je teraz u nás nedostupná. Vieme o tom a riešime to. Skús to neskôr.",
+    },
     checkoutCreationFailed: {
       detail: "Platbu sa nepodarilo spustiť: {{error}}",
       title: "Nepodarilo sa vytvoriť platobnú reláciu",

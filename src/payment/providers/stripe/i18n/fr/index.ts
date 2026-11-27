@@ -88,6 +88,10 @@ export const translations: typeof enTranslations = {
       title: "Échec de la création du client",
       description: "Impossible de créer le client Stripe",
     },
+    checkoutUnavailable: {
+      detail:
+        "Le paiement par carte est indisponible de notre côté pour le moment. Nous sommes prévenus et nous nous en occupons. Réessayez plus tard.",
+    },
     checkoutCreationFailed: {
       detail: "Impossible de lancer le paiement : {{error}}",
       title: "Échec de la création du paiement",

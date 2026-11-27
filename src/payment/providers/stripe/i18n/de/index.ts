@@ -85,6 +85,10 @@ export const translations: typeof enTranslations = {
       title: "Kundenabruf fehlgeschlagen",
       description: "Stripe-Kundeninformationen konnten nicht abgerufen werden",
     },
+    checkoutUnavailable: {
+      detail:
+        "Die Kartenzahlung ist bei uns gerade gestört. Wir wissen Bescheid und kümmern uns darum. Versuch es später noch einmal.",
+    },
     checkoutCreationFailed: {
       detail: "Bezahlvorgang konnte nicht gestartet werden: {{error}}",
       title: "Checkout-Erstellung fehlgeschlagen",

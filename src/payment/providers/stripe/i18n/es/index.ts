@@ -86,6 +86,10 @@ export const translations: typeof enTranslations = {
       title: "Creación del cliente fallada",
       description: "Failed to create Stripe customer",
     },
+    checkoutUnavailable: {
+      detail:
+        "El pago con tarjeta no funciona ahora mismo por un problema nuestro. Ya lo sabemos y lo estamos resolviendo. Inténtalo más tarde.",
+    },
     checkoutCreationFailed: {
       detail: "No podía empezar el checkout: {{error}}",
       title: "Creación de checkout fracasado",

@@ -329,15 +329,54 @@ export class StripeProvider implements PaymentProvider {
         providerProductId: priceResult.data.productId,
       });
     } catch (error) {
+      const stripeError =
+        error instanceof Stripe.errors.StripeError ? error : null;
+      // Account-level refusals (charges disabled, revoked or restricted key)
+      // fail every checkout until someone fixes the Stripe account. Prod
+      // 2026-11-27: "Your account cannot currently make live charges" was
+      // shown to buyers verbatim, reading as if THEIR account was blocked.
+      const accountBlocked =
+        stripeError !== null &&
+        (stripeError instanceof Stripe.errors.StripePermissionError ||
+          stripeError instanceof Stripe.errors.StripeAuthenticationError ||
+          /cannot currently make live charges/i.test(stripeError.message));
+      const account = accountBlocked
+        ? await StripeProvider.getStripe()
+            ?.accounts.retrieveCurrent()
+            .then((acct) => ({
+              chargesEnabled: acct.charges_enabled,
+              disabledReason: acct.requirements?.disabled_reason ?? null,
+              currentlyDue: acct.requirements?.currently_due?.length ?? 0,
+              pastDue: acct.requirements?.past_due?.length ?? 0,
+            }))
+            .catch((lookupError: Error) => ({
+              lookupFailed: parseError(lookupError).message,
+            }))
+        : undefined;
+      // Compact fields: the raw SDK error carried every response header and a
+      // unique request id, so each refusal became its own error row.
       logger.error("Failed to create Stripe checkout session", {
-        error: parseError(error),
+        error: stripeError
+          ? {
+              name: stripeError.type,
+              message: stripeError.message,
+            }
+          : parseError(error),
+        stripeCode: stripeError?.code ?? null,
+        stripeStatus: stripeError?.statusCode ?? null,
+        remoteRequestId: stripeError?.requestId ?? null,
+        accountBlocked,
+        account: account ?? null,
         userId: params.userId,
+        interval: params.interval,
       });
       const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: t("errors.checkoutCreationFailed.detail", {
-          error: parseError(error).message,
-        }),
+        message: accountBlocked
+          ? t("errors.checkoutUnavailable.detail")
+          : t("errors.checkoutCreationFailed.detail", {
+              error: parseError(error).message,
+            }),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
       });
     }

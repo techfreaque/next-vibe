@@ -83,6 +83,10 @@ export const translations = {
       title: "Customer creation failed",
       description: "Failed to create Stripe customer",
     },
+    checkoutUnavailable: {
+      detail:
+        "Card checkout is down on our side right now. We got the alert and are on it. Try again later.",
+    },
     checkoutCreationFailed: {
       detail: "Could not start checkout: {{error}}",
       title: "Checkout creation failed",
