@@ -2010,6 +2010,7 @@ export const videoGenModelDefinitions: Record<
   },
 
   [VideoGenModelId.HAILUO_3]: {
+    enabled: false, // 2026-11-27: only route is OpenRouter, which needs MiniMax BYOK (never BYOK); re-enable with a direct MiniMax/fal route
     name: "Hailuo 3",
     commercialUse: commercialUse.unclear(CommercialUseReason.TERMS_UNCONFIRMED),
     by: "miniMax",
@@ -2747,6 +2748,7 @@ export const videoGenModelDefinitions: Record<
   },
 
   [VideoGenModelId.HAILUO_3_MAX]: {
+    enabled: false, // 2026-11-27: only route is OpenRouter, which needs MiniMax BYOK (never BYOK); re-enable with a direct MiniMax/fal route
     name: "Hailuo 3 Max",
     commercialUse: commercialUse.unclear(CommercialUseReason.TERMS_UNCONFIRMED),
     by: "miniMax",

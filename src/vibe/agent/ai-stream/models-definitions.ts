@@ -6971,6 +6971,16 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         cacheReadTokenCost: 4, // updated: 2026-11-21 from nano-gpt-api (Lyber hosted tariff, no cache discount)
       },
       {
+        // OpenUncensored (Refuseless host, $1.50/$3.00 vs NanoGPT $4/$15); used when configured and cheapest.
+        id: ChatModelId.KIMI_K3_1_PRO_UNCENSORED,
+        apiProvider: ApiProvider.OPENUNCENSORED,
+        providerModel: "kimi-k3.1-pro-uncensored",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 1.5, // updated: 2026-11-27 from openuncensored-api
+        outputTokenCost: 3, // updated: 2026-11-27 from openuncensored-api
+        cacheReadTokenCost: 1.5, // updated: 2026-11-27 from openuncensored-api (no cache price listed)
+      },
+      {
         id: ChatModelId.KIMI_K3_1_PRO_UNCENSORED,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "kimi-k3.1-pro-uncensored",
