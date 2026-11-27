@@ -1,5 +1,6 @@
 "use client";
 
+import { platform } from "next-vibe/core/env-client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import {
@@ -18,9 +19,14 @@ import { useRouter, useSearchParams } from "next-vibe/ui/hooks/use-navigation";
 import type { JSX } from "react";
 import { useEffect } from "react";
 
+import {
+  pricingGuestVariant,
+  useGrowthExposure,
+} from "@/_pages/_components/use-growth-experiment";
 import { CreditsTabHeaderContent } from "@/credits/credits-tab-header";
 import type { CreditsGetResponseOutput } from "@/credits/definition";
 import { CreditsOverview } from "@/credits/widget";
+import { FREE_CREDIT_SIGNED_IN_TOTAL } from "@/products/constants";
 import { scopedTranslation as subscriptionScopedTranslation } from "@/subscription/i18n";
 
 import { scopedTranslation } from "../i18n";
@@ -111,6 +117,13 @@ export function OverviewPageClient({
   const logger = useLogger();
   const router = useRouter();
   const { t } = scopedTranslation.scopedT(locale);
+  const variant = platform.isReactNative ? null : pricingGuestVariant(user);
+  useGrowthExposure({
+    experiment: "pricing-guest-signup-v1",
+    locale,
+    variant,
+    user: user.isPublic ? user : undefined,
+  });
 
   return (
     <Container className="max-w-6xl px-0 py-4 sm:px-2 sm:py-8 lg:px-2">
@@ -126,6 +139,19 @@ export function OverviewPageClient({
             user={user}
             locale={locale}
             logger={logger}
+            guestSignupCopy={
+              variant === "treatment"
+                ? {
+                    description: t(
+                      "subscription.overview.guestOffer.description",
+                      {
+                        count: FREE_CREDIT_SIGNED_IN_TOTAL,
+                      },
+                    ),
+                    action: t("subscription.overview.guestOffer.action"),
+                  }
+                : undefined
+            }
             onTabChange={(tab) => router.push(`/${locale}/subscription/${tab}`)}
           />
         }

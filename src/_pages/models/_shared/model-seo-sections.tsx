@@ -32,9 +32,10 @@ import {
   type FaqItem,
 } from "@/_pages/_components/faq-structured-data";
 
-import { Cta, PageSection } from "../../story/_shared/marketing";
+import { PageSection } from "../../story/_shared/marketing";
 import { scopedTranslation } from "../i18n";
 import { formatNumber, mediaUnitText, modelHref } from "./model-format";
+import { ModelPlanChatCta } from "./model-plan-chat-cta";
 import type {
   BestForContent,
   NearestRow,
@@ -184,7 +185,7 @@ function PlansSection({
       <P className="mt-4 text-xs text-muted-foreground">{plans.footnote}</P>
       {plans.cta !== null && (
         <Div className="mt-6">
-          <Cta href={plans.cta.href} label={plans.cta.label} />
+          <ModelPlanChatCta href={plans.cta.href} label={plans.cta.label} />
         </Div>
       )}
     </PageSection>

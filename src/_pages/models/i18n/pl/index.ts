@@ -475,6 +475,16 @@ export const translations: typeof enTranslations = {
     perInputTokens: "tokeny wejściowe",
     perOutputTokens: "tokeny wyjściowe",
   },
+  starterPrompt: {
+    coding:
+      "Napisz funkcję w TypeScripcie, która liczy wystąpienia każdego słowa w zdaniu. Dodaj dwa testy.",
+    reasoning:
+      "Mam 45 minut i trzy zadania na 10, 20 i 30 minut. Które dwa zdążę zrobić? Uzasadnij wybór w dwóch zdaniach.",
+    creative:
+      "Napisz w trzech zdaniach początek kryminału. Wszystko zaczyna się od klucza znalezionego w książce z biblioteki.",
+    general:
+      "Podaj trzy pomysły na obiad z jajek, ryżu i szpinaku. Każdy ma być gotowy w 15 minut.",
+  },
   chatPrompt:
     "W czym jesteś najlepszy? Pokaż mi to na jednym krótkim, konkretnym przykładzie.",
   catalog: {

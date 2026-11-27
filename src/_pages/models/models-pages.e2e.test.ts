@@ -18,11 +18,12 @@ import type { Locator, Page } from "playwright";
 import { describe, expect } from "vitest";
 
 import { getModelFacts, toModelSlug } from "./_shared/model-facts";
+import { modelStarterPrompt } from "./_shared/model-format";
 import { listMediaFacts } from "./_shared/model-media-facts";
 import { scopedTranslation } from "./i18n";
 
 /** Same provider-key availability the pages render with. */
-const availability = await getEnvAvailability();
+const availability = getEnvAvailability();
 
 const PHONE = { width: 390, height: 844 } as const;
 const DESKTOP = { width: 1440, height: 900 } as const;
@@ -60,11 +61,15 @@ describe("E2E: model pages", () => {
     e2e.it(
       `model page renders the fact sheet at ${viewport.width}px`,
       async ({ page, gotoReady }) => {
-        const facts = getModelFacts(MODEL, availability);
+        const facts = getModelFacts(MODEL, await availability);
         expect(facts).not.toBeNull();
         if (facts === null) {
           return;
         }
+        const variant = viewport === PHONE ? "treatment" : "control";
+        await page.addInitScript((arm) => {
+          localStorage.setItem("growth-experiment:model-starter-v1", arm);
+        }, variant);
         await page.setViewportSize(viewport);
         const heading = page.locator("h1").first();
         await gotoReady(`/models/${toModelSlug(MODEL)}`, async () => {
@@ -83,15 +88,21 @@ describe("E2E: model pages", () => {
           facts.labName,
         );
 
-        const cta = page
-          .getByRole("link", { name: t("model.chatCta", { model: facts.name }) })
-          .first();
-        const href = await cta.getAttribute("href");
-        expect(href).not.toBeNull();
-        const url = new URL(href ?? "", "http://x");
-        expect(url.pathname).toMatch(/\/threads\/private\/new$/);
-        expect(url.searchParams.get("q")).toBe(t("chatPrompt"));
-        expect(url.searchParams.get("model")).toBe(MODEL);
+        const expectedPrompt =
+          variant === "treatment"
+            ? modelStarterPrompt(defaultLocale, facts.strengths)
+            : t("chatPrompt");
+        const ctas = page.locator('a[href*="/threads/private/new?"]');
+        await until("all three model CTAs carry the assigned prompt", async () => {
+          const urls = await ctas.evaluateAll((links) =>
+            links.map((link) => new URL(link.getAttribute("href") ?? "", document.baseURI).href),
+          );
+          return urls.length === 3 && urls.every((href) => {
+            const url = new URL(href);
+            return url.searchParams.get("q") === expectedPrompt &&
+              url.searchParams.get("model") === MODEL;
+          });
+        });
 
         await expectNoPlaceholders(page, facts.slug);
         await expectNoOverflow(page, `${facts.slug} @${viewport.width}`);
@@ -101,8 +112,9 @@ describe("E2E: model pages", () => {
     e2e.it(
       `compare page renders both models at ${viewport.width}px`,
       async ({ page, gotoReady }) => {
-        const left = getModelFacts(MODEL, availability);
-        const right = getModelFacts(OTHER, availability);
+        const available = await availability;
+        const left = getModelFacts(MODEL, available);
+        const right = getModelFacts(OTHER, available);
         expect(left !== null && right !== null).toBe(true);
         if (left === null || right === null) {
           return;
@@ -140,7 +152,7 @@ describe("E2E: model pages", () => {
     expect(await page.locator("[data-tier]").count()).toBeGreaterThanOrEqual(2);
     await expectNoOverflow(page, "index");
 
-    const facts = getModelFacts(OTHER, availability);
+    const facts = getModelFacts(OTHER, await availability);
     expect(facts).not.toBeNull();
     if (facts === null) {
       return;
@@ -165,7 +177,7 @@ describe("E2E: model pages", () => {
   });
 
   e2e.it("legacy model page links its successor", async ({ page, gotoReady }) => {
-    const facts = getModelFacts(LEGACY, availability);
+    const facts = getModelFacts(LEGACY, await availability);
     expect(facts?.successor).toBeTruthy();
     if (facts === null || facts.successor === null) {
       return;
@@ -185,7 +197,7 @@ describe("E2E: model pages", () => {
     page,
     gotoReady,
   }) => {
-    const media = listMediaFacts(availability).find((facts) => facts.type === "image");
+    const media = listMediaFacts(await availability).find((facts) => facts.type === "image");
     expect(media).toBeTruthy();
     if (media === undefined) {
       return;
@@ -243,7 +255,7 @@ describe("E2E: model pages", () => {
       await context.addInitScript((key: string) => {
         localStorage.setItem(key, "true");
       }, STORAGE_KEYS.SELECTOR_ONBOARDING_SHOWN);
-      const facts = getModelFacts(LINKED, availability);
+      const facts = getModelFacts(LINKED, await availability);
       expect(facts).not.toBeNull();
       if (facts === null) {
         return;

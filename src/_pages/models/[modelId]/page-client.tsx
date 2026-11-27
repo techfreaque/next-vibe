@@ -8,6 +8,11 @@ import { P } from "next-vibe/ui/components/typography";
 import type { JSX, ReactNode } from "react";
 
 import {
+  useGrowthExposure,
+  useModelStarterVariant,
+} from "@/_pages/_components/use-growth-experiment";
+
+import {
   Callout,
   CardLink,
   Cta,
@@ -21,9 +26,11 @@ import {
   chatHref,
   compareHref,
   modelHref,
+  modelStarterPrompt,
   priceFootnote,
 } from "../_shared/model-format";
 import { ModelPicker } from "../_shared/model-picker";
+import { ModelPlanChatHref } from "../_shared/model-plan-chat-cta";
 import { ModelIcon, SampleAnswersSlot, TierBadge } from "../_shared/model-ui";
 import { scopedTranslation } from "../i18n";
 import { MediaModelPageClient } from "./media-page-client";
@@ -74,10 +81,21 @@ function ChatModelPage({
   const rows = buildFactRows(facts, locale).filter((row) => !row.missing);
   const statKeys = new Set(["price", "context", "inputs", "intelligence"]);
   const chatModel = facts.isLegacy ? facts.successor : facts;
+  const variant = useModelStarterVariant(!facts.isLegacy);
+  useGrowthExposure({
+    experiment: "model-starter-v1",
+    locale,
+    variant,
+    model: facts.id,
+  });
+  const starterHref =
+    variant === "treatment"
+      ? chatHref(locale, facts, modelStarterPrompt(locale, facts.strengths))
+      : undefined;
   const tryInChat =
     chatModel === null ? null : (
       <Cta
-        href={chatHref(locale, chatModel)}
+        href={starterHref ?? chatHref(locale, chatModel)}
         label={t("model.chatCta", { model: chatModel.name })}
       />
     );
@@ -168,7 +186,9 @@ function ChatModelPage({
 
       <SampleAnswersSlot modelId={facts.id} locale={locale} stats={refusal} />
 
-      {sections}
+      <ModelPlanChatHref.Provider value={starterHref}>
+        {sections}
+      </ModelPlanChatHref.Provider>
 
       {chatModel !== null && (
         <CtaBand

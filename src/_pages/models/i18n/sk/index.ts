@@ -476,6 +476,16 @@ export const translations: typeof enTranslations = {
     perInputTokens: "vstupné tokeny",
     perOutputTokens: "výstupné tokeny",
   },
+  starterPrompt: {
+    coding:
+      "Napíš funkciu v TypeScripte, ktorá spočíta výskyty každého slova vo vete. Pridaj dva testy.",
+    reasoning:
+      "Mám 45 minút a tri úlohy na 10, 20 a 30 minút. Ktoré dve stihnem? Výber zdôvodni v dvoch riadkoch.",
+    creative:
+      "Napíš začiatok detektívky v troch vetách. Všetko sa začne kľúčom, ktorý niekto nájde v knihe z knižnice.",
+    general:
+      "Navrhni tri obedy z vajec, ryže a špenátu, ktoré pripravím za 15 minút.",
+  },
   chatPrompt:
     "V čom vynikáš? Ukáž mi to na jednom krátkom, konkrétnom príklade.",
   catalog: {

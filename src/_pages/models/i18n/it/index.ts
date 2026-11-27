@@ -478,6 +478,16 @@ export const translations: typeof enTranslations = {
     perInputTokens: "token in ingresso",
     perOutputTokens: "token in uscita",
   },
+  starterPrompt: {
+    coding:
+      "Scrivi una funzione TypeScript che conti quante volte compare ogni parola in una frase. Aggiungi due test.",
+    reasoning:
+      "Ho 45 minuti e tre attività da 10, 20 e 30 minuti. Quali due riesco a fare? Spiega la scelta in due righe.",
+    creative:
+      "Scrivi l’inizio di un giallo in tre frasi. Tutto comincia con una chiave trovata in un libro della biblioteca.",
+    general:
+      "Dammi tre idee per un pranzo pronto in 15 minuti con uova, riso e spinaci.",
+  },
   chatPrompt: "In cosa eccelli? Mostramelo con un esempio breve e concreto.",
   catalog: {
     typesLabel: "Tipo di modello",

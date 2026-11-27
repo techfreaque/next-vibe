@@ -59,6 +59,11 @@ export const translations: typeof enTranslations = {
       },
     },
     overview: {
+      guestOffer: {
+        description:
+          "Nach der E-Mail-Bestätigung sind in deinem kostenlosen Konto bis zu {{count}} Credits pro Monat enthalten. Ohne Kreditkarte.",
+        action: "Kostenloses Konto erstellen",
+      },
       howItWorks: {
         title: "So funktionieren Credits",
         description:

@@ -58,6 +58,11 @@ export const translations: typeof enTranslations = {
       },
     },
     overview: {
+      guestOffer: {
+        description:
+          "Po overení e-mailu získaš s bezplatným účtom až {{count}} kreditov mesačne. Platobnú kartu nepotrebuješ.",
+        action: "Vytvoriť bezplatný účet",
+      },
       howItWorks: {
         title: "Ako fungujú kredity",
         description:

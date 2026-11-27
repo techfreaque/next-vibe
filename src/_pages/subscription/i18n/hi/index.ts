@@ -58,6 +58,11 @@ export const translations: typeof enTranslations = {
       },
     },
     overview: {
+      guestOffer: {
+        description:
+          "ईमेल की पुष्टि के बाद मुफ़्त खाते में हर महीने {{count}} क्रेडिट तक मिलते हैं। कार्ड की ज़रूरत नहीं।",
+        action: "मुफ़्त खाता बनाएँ",
+      },
       howItWorks: {
         title: "क्रेडिट कैसे काम करते हैं",
         description:

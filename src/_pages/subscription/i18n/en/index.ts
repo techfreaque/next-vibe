@@ -57,6 +57,11 @@ export const translations = {
       },
     },
     overview: {
+      guestOffer: {
+        description:
+          "After you verify your email, your free account includes up to {{count}} credits a month. No card needed.",
+        action: "Create free account",
+      },
       howItWorks: {
         title: "How credits work",
         description:

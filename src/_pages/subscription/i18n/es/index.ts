@@ -59,6 +59,11 @@ export const translations: typeof enTranslations = {
       },
     },
     overview: {
+      guestOffer: {
+        description:
+          "Confirma tu correo y tendrás hasta {{count}} créditos al mes en tu cuenta gratuita. Sin tarjeta.",
+        action: "Crea una cuenta gratis",
+      },
       howItWorks: {
         title: "Cómo funcionan los créditos",
         description:

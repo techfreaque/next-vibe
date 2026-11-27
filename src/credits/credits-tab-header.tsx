@@ -126,6 +126,7 @@ export function CreditsTabHeaderContent({
   logger,
   initialBalance,
   onTabChange,
+  guestSignupCopy,
 }: {
   activeTab: TabId;
   locale: CountryLanguage;
@@ -133,6 +134,7 @@ export function CreditsTabHeaderContent({
   logger: EndpointLogger;
   initialBalance: CreditsGetResponseOutput | undefined;
   onTabChange: (tab: TabId) => void;
+  guestSignupCopy?: { description: string; action: string };
 }): JSX.Element {
   const { locale: currentLocale } = useTranslation();
   const { t } = scopedTranslation.scopedT(currentLocale);
@@ -316,14 +318,15 @@ export function CreditsTabHeaderContent({
                   : t("get.balance.guestPlan")}
               </Span>
               <Span className="text-sm text-muted-foreground">
-                {t("get.balance.free.descriptionGuest", freeTiers)}
+                {guestSignupCopy?.description ??
+                  t("get.balance.free.descriptionGuest", freeTiers)}
               </Span>
             </Div>
             <Link
               href={`/${locale}/user/signup`}
               className="inline-flex h-11 shrink-0 items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground no-underline transition-colors hover:bg-primary/90 sm:h-10"
             >
-              {t("get.balance.signUp")}
+              {guestSignupCopy?.action ?? t("get.balance.signUp")}
             </Link>
           </Div>
         </Div>

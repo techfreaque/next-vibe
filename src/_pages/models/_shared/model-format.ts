@@ -4,7 +4,7 @@
  */
 
 import type { ChatModelId } from "next-vibe/agent/ai-stream/models";
-import type { Modality } from "next-vibe/agent/models/enum";
+import { type Modality, ModelUtility } from "next-vibe/agent/models/enum";
 import {
   CHAT_MESSAGE_PRICE_REFERENCE,
   providerUsdToCredits,
@@ -548,11 +548,38 @@ export function compareHref(
  * Public visitors get redirected to incognito by the threads page, which
  * keeps both params.
  */
-export function chatHref(locale: CountryLanguage, facts: ModelRef): string {
+export function chatHref(
+  locale: CountryLanguage,
+  facts: ModelRef,
+  prompt?: string,
+): string {
   const { t } = scopedTranslation.scopedT(locale);
   const query = new URLSearchParams({
     [MODEL_PARAM]: facts.id,
-    [PREFILL_PARAM]: t("chatPrompt"),
+    [PREFILL_PARAM]: prompt ?? t("chatPrompt"),
   });
   return `/${locale}/threads/private/new?${query.toString()}`;
+}
+
+export function modelStarterPrompt(
+  locale: CountryLanguage,
+  strengths: ModelFacts["strengths"],
+): string {
+  const { t } = scopedTranslation.scopedT(locale);
+  for (const strength of strengths) {
+    switch (strength) {
+      case ModelUtility.CODING:
+        return t("starterPrompt.coding");
+      case ModelUtility.REASONING:
+      case ModelUtility.ANALYSIS:
+        return t("starterPrompt.reasoning");
+      case ModelUtility.CREATIVE:
+      case ModelUtility.ROLEPLAY:
+      case ModelUtility.ROLEPLAY_DARK:
+        return t("starterPrompt.creative");
+      default:
+        break;
+    }
+  }
+  return t("starterPrompt.general");
 }

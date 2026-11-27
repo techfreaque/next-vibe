@@ -462,6 +462,16 @@ export const translations = {
     perInputTokens: "input tokens",
     perOutputTokens: "output tokens",
   },
+  starterPrompt: {
+    coding:
+      "Write a TypeScript function that counts how many times each word appears in a sentence. Include two tests.",
+    reasoning:
+      "I have 45 minutes and three tasks that take 10, 20, and 30 minutes. Which pair fits? Show your reasoning in two lines.",
+    creative:
+      "Write the opening to a mystery in three sentences. It starts with a key in a library book.",
+    general:
+      "Give me three lunches I can make in 15 minutes with eggs, rice, and spinach.",
+  },
   chatPrompt: "What are you best at? Show me in one short, concrete example.",
   catalog: {
     typesLabel: "Model type",

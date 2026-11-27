@@ -59,6 +59,11 @@ export const translations: typeof enTranslations = {
       },
     },
     overview: {
+      guestOffer: {
+        description:
+          "Po potwierdzeniu adresu e-mail darmowe konto daje do {{count}} kredytów miesięcznie. Karta nie jest potrzebna.",
+        action: "Załóż darmowe konto",
+      },
       howItWorks: {
         title: "Jak działają kredyty",
         description:
