@@ -12,6 +12,8 @@ import { UserRole } from "next-vibe/identity/roles/enum";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import { Platform } from "next-vibe/platforms/platforms";
 
+import { toModelSlug } from "../../models/_shared/model-facts";
+import type { CommercialUseRow } from "./commercial-use-overview";
 import { CREATE_KINDS, type CreateKind } from "./create-kinds";
 import { HUB_HISTORY_PAGE_SIZE } from "./studio-constants";
 import { studioModelLists, studioModels } from "./studio-models";
@@ -24,6 +26,8 @@ export interface StudioPageData {
   /** First history page, rendered on the server; undefined if it failed. */
   history: MediaHistoryResponseOutput | undefined;
   models: StudioModel[];
+  /** License status of this tool's models, for the commercial-use overview. */
+  commercialUse: CommercialUseRow[];
 }
 
 /** Cheapest model and model count per tool, for the hub cards. */
@@ -72,6 +76,21 @@ export async function studioData(
     locale,
     history: history.success ? history.data : undefined,
     models,
+    commercialUse: kind
+      ? models.flatMap((model) =>
+          model.commercialUse
+            ? [
+                {
+                  id: model.id,
+                  name: model.name,
+                  kind,
+                  info: model.commercialUse,
+                  href: `/${locale}/models/${toModelSlug(model.id)}`,
+                },
+              ]
+            : [],
+        )
+      : [],
     platform: Platform.NEXT_PAGE,
   };
 }

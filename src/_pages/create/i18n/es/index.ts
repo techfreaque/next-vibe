@@ -45,7 +45,15 @@ export const translations: typeof enTranslations = {
     "No podía abrir su historia de Studio. Por favor, inténtalo de nuevo.",
   unavailable: "No hay modelo disponible para este generador ahora mismo.",
   file: "Archivo de audio",
-  language: "Grabación del idioma",
+  language: "Idioma de la grabación",
+  languageAuto: "Detectar automáticamente",
+  commercialUse: {
+    title: "Uso comercial por modelo",
+    intro:
+      "La licencia de cada modelo decide qué puedes hacer con el resultado, por ejemplo en un anuncio o un proyecto para un cliente. Revisa el estado antes de publicar.",
+    showAll:
+      "Los {{count}} modelos por licencia ({{allowed}} permiten uso comercial)",
+  },
   referenceAudio: "Audio de referencia URL",
   durationSeconds: "Longitud de grabación en segundos",
   duration: "Duración",

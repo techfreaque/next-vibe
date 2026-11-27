@@ -53,7 +53,7 @@ import {
   normalizeProviderJobId,
 } from "../shared/provider-job-id";
 import { ModelSelectionType } from "../skills/enum";
-import { DEFAULT_STT_MODEL_SELECTION } from "./constants";
+import { DEFAULT_STT_MODEL_SELECTION, STT_AUTO_LANGUAGE } from "./constants";
 import type {
   SpeechToTextPostRequestOutput,
   SpeechToTextPostResponseOutput,
@@ -189,7 +189,8 @@ export class SpeechToTextRepository {
   private static async transcribeChunk(
     file: File,
     modelOption: ReturnType<typeof getBestSttModel>,
-    language: string,
+    /** ISO-639-1; undefined = the provider detects it */
+    language: string | undefined,
     logger: EndpointLogger,
     t: SpeechToTextT,
     fetchImpl: typeof globalThis.fetch,
@@ -360,7 +361,12 @@ export class SpeechToTextRepository {
     onProviderJobId?: ProviderJobIdRecorder,
   ): Promise<ResponseType<SttTranscription>> {
     const t = sttScopedTranslation.scopedT(locale).t;
-    const language = options.language ?? getLanguageFromLocale(locale);
+    // "auto" lets the model detect the spoken language (Studio default):
+    // forcing the UI language garbles audio in any other language.
+    const language =
+      options.language === STT_AUTO_LANGUAGE
+        ? undefined
+        : (options.language ?? getLanguageFromLocale(locale));
 
     // Accept raw SttModelId string or full selection object; fall back to default
     const selection: SttModelSelection =
@@ -654,7 +660,7 @@ export class SpeechToTextRepository {
         sttModelId: modelOption.id,
         confidence,
         duration,
-        language,
+        language: language ?? STT_AUTO_LANGUAGE,
         segments,
       });
     } catch (error) {
@@ -678,7 +684,8 @@ export class SpeechToTextRepository {
   private static async transcribeWithOpenAI(
     file: File,
     providerModel: string,
-    language: string,
+    /** ISO-639-1; undefined = the provider detects it */
+    language: string | undefined,
     logger: EndpointLogger,
     t: SpeechToTextT,
     fetchImpl: typeof globalThis.fetch,
@@ -720,7 +727,7 @@ export class SpeechToTextRepository {
     formData.append("file", normalizedFile, normalizedFile.name);
     formData.append("model", providerModel);
     // Translations always produce English; the endpoint takes no language.
-    if (task !== "translate") {
+    if (task !== "translate" && language) {
       formData.append("language", language);
     }
     // Plain JSON works across gateway models whose timing support varies.
@@ -828,7 +835,8 @@ export class SpeechToTextRepository {
   private static async transcribeWithEdenAI(
     file: File,
     providerModel: string,
-    language: string,
+    /** ISO-639-1; undefined = the provider detects it */
+    language: string | undefined,
     logger: EndpointLogger,
     t: SpeechToTextT,
     fetchImpl: typeof globalThis.fetch,
@@ -898,7 +906,8 @@ export class SpeechToTextRepository {
     fileName: string,
     mimeType: string,
     edenProvider: string,
-    language: string,
+    /** ISO-639-1; undefined = the provider detects it */
+    language: string | undefined,
     logger: EndpointLogger,
     t: SpeechToTextT,
     fetchImpl: typeof globalThis.fetch,
@@ -1127,7 +1136,8 @@ export class SpeechToTextRepository {
   private static async transcribeWithDeepgram(
     file: File,
     providerModel: string,
-    language: string,
+    /** ISO-639-1; undefined = the provider detects it */
+    language: string | undefined,
     logger: EndpointLogger,
     t: SpeechToTextT,
     fetchImpl: typeof globalThis.fetch,
@@ -1151,7 +1161,11 @@ export class SpeechToTextRepository {
 
     const url = new URL("https://api.deepgram.com/v1/listen");
     url.searchParams.set("model", providerModel);
-    url.searchParams.set("language", language);
+    if (language) {
+      url.searchParams.set("language", language);
+    } else {
+      url.searchParams.set("detect_language", "true");
+    }
 
     const response = await fetchImpl(url.toString(), {
       method: "POST",

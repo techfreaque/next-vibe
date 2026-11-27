@@ -16,6 +16,11 @@ export const translations: typeof enTranslations = {
         description:
           "image, video, music, speech oder transcribe. Leer lassen für alles.",
       },
+      cursor: {
+        label: "Seiten-Cursor",
+        description:
+          "Leer lassen für die neuesten Ergebnisse. Zum Weiterblättern nextCursor der vorherigen Seite übergeben.",
+      },
     },
     response: {
       items: "Generierungen",
@@ -32,6 +37,7 @@ export const translations: typeof enTranslations = {
       source: "Erstellt in",
       threadId: "Chat",
       rootFolderId: "Ordner",
+      nextCursor: "Cursor der nächsten Seite",
     },
     success: {
       title: "Verlauf geladen",
@@ -89,6 +95,10 @@ export const translations: typeof enTranslations = {
     count: "{{count}} insgesamt",
     error: "Dein Verlauf wurde nicht geladen.",
     retry: "Neu laden",
+    loadMore: "Mehr laden",
+    loadingMore: "Lädt",
+    loadMoreFailed: "Weitere Ergebnisse ließen sich nicht laden.",
+    endOfList: "Mehr gibt es nicht.",
     emptyTitle: "Noch nichts erstellt",
     emptyHint: "Jedes Ergebnis landet hier, fertig zum Herunterladen.",
     emptyKindHint: "Dein erstes Ergebnis erscheint hier, sobald es fertig ist.",

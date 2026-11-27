@@ -14,6 +14,11 @@ export const translations = {
         description:
           "image, video, music, speech or transcribe. Leave empty for everything.",
       },
+      cursor: {
+        label: "Page cursor",
+        description:
+          "Leave empty for the newest results. To continue, pass nextCursor from the previous page.",
+      },
     },
     response: {
       items: "Generations",
@@ -30,6 +35,7 @@ export const translations = {
       source: "Made in",
       threadId: "Thread",
       rootFolderId: "Folder",
+      nextCursor: "Next page cursor",
     },
     success: {
       title: "History loaded",
@@ -86,6 +92,10 @@ export const translations = {
     count: "{{count}} total",
     error: "Your history did not load.",
     retry: "Try again",
+    loadMore: "Load more",
+    loadingMore: "Loading",
+    loadMoreFailed: "More results did not load.",
+    endOfList: "That is everything.",
     emptyTitle: "Nothing made yet",
     emptyHint: "Every result you generate lands here, ready to download.",
     emptyKindHint: "Your first result appears here the moment it finishes.",

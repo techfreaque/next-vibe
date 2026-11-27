@@ -31,7 +31,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   });
 }
 
-export type StudioHubData = Omit<StudioPageData, "models"> & {
+export type StudioHubData = Omit<StudioPageData, "models" | "commercialUse"> & {
   summaries: StudioKindSummary[];
 };
 

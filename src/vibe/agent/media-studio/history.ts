@@ -3,14 +3,17 @@ import "server-only";
 import {
   and,
   count,
-  desc,
   eq,
+  gte,
   inArray,
   isNull,
+  lt,
   ne,
+  or,
   type SQL,
   sql,
 } from "drizzle-orm";
+import type { PgColumn } from "drizzle-orm/pg-core";
 import { DefaultFolderId } from "next-vibe/core/execution-context";
 import { db } from "next-vibe/database";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
@@ -57,6 +60,8 @@ export interface StudioEntry {
 export interface StudioHistoryPage {
   items: StudioEntry[];
   totalCount: number;
+  /** Pass back as `cursor` for the next page; null on the last page. */
+  nextCursor: string | null;
 }
 
 const TOOL_NAMES = {
@@ -132,11 +137,99 @@ function apiFilter(
   );
 }
 
+/** Position in the newest-first list: millisecond timestamp, then id. */
+interface HistoryKey {
+  ms: number;
+  id: string;
+}
+
+const CURSOR_SEPARATOR = "_";
+
+/** Opaque "load more" cursor: the last item a page returned. */
+export function encodeHistoryCursor(key: HistoryKey): string {
+  return `${key.ms.toString(36)}${CURSOR_SEPARATOR}${key.id}`;
+}
+
+export function decodeHistoryCursor(cursor: string): HistoryKey | undefined {
+  const at = cursor.indexOf(CURSOR_SEPARATOR);
+  const ms = Number.parseInt(cursor.slice(0, at), 36);
+  const id = cursor.slice(at + 1);
+  return at > 0 && Number.isSafeInteger(ms) && ms >= 0 && id
+    ? { ms, id }
+    : undefined;
+}
+
+/** Negative when `a` comes first (is newer). Ids compare by code unit, like `COLLATE "C"`. */
+function compareKeys(a: HistoryKey, b: HistoryKey): number {
+  if (a.ms !== b.ms) {
+    return b.ms - a.ms;
+  }
+  return a.id === b.id ? 0 : a.id < b.id ? 1 : -1;
+}
+
+function entryKey(entry: StudioEntry): HistoryKey {
+  return { ms: Date.parse(entry.createdAt), id: entry.id };
+}
+
+/**
+ * Rows strictly older than the cursor. Timestamps carry microseconds but the
+ * list (and the cursor) only milliseconds, so rows inside the cursor's
+ * millisecond fall back to the id.
+ */
+function olderThan(
+  createdAt: PgColumn,
+  id: PgColumn,
+  cursor: HistoryKey | undefined,
+): SQL | undefined {
+  if (!cursor) {
+    return undefined;
+  }
+  const start = new Date(cursor.ms);
+  return or(
+    lt(createdAt, start),
+    and(
+      gte(createdAt, start),
+      lt(createdAt, new Date(cursor.ms + 1)),
+      sql`${id}::text COLLATE "C" < ${cursor.id}`,
+    ),
+  );
+}
+
+/** SQL order matching `compareKeys`. */
+function newestFirst(createdAt: PgColumn, id: PgColumn): SQL[] {
+  return [
+    sql`date_trunc('milliseconds', ${createdAt}) DESC`,
+    sql`${id}::text COLLATE "C" DESC`,
+  ];
+}
+
+interface SourcePage {
+  entries: StudioEntry[];
+  /** Last row read, valid or not; set only when the source has more rows. */
+  truncatedAt: HistoryKey | undefined;
+}
+
+function sourcePage(
+  entries: StudioEntry[],
+  rows: { id: string; createdAt: Date }[],
+  fetched: number,
+): SourcePage {
+  const last = rows.at(-1);
+  return {
+    entries,
+    truncatedAt:
+      rows.length >= fetched && last
+        ? { ms: last.createdAt.getTime(), id: last.id }
+        : undefined,
+  };
+}
+
 async function chatHistory(
   user: JwtPayloadType,
   kind: CreateKind | undefined,
   limit: number,
-): Promise<StudioEntry[]> {
+  cursor: HistoryKey | undefined,
+): Promise<SourcePage> {
   const rows = await db
     .select({
       id: chatMessages.id,
@@ -148,10 +241,15 @@ async function chatHistory(
     })
     .from(chatThreads)
     .innerJoin(chatMessages, eq(chatMessages.threadId, chatThreads.id))
-    .where(chatFilter(user, kind))
-    .orderBy(desc(chatMessages.createdAt), desc(chatMessages.id))
+    .where(
+      and(
+        chatFilter(user, kind),
+        olderThan(chatMessages.createdAt, chatMessages.id, cursor),
+      ),
+    )
+    .orderBy(...newestFirst(chatMessages.createdAt, chatMessages.id))
     .limit(limit);
-  return rows.flatMap((row) => {
+  const entries = rows.flatMap((row): StudioEntry[] => {
     const call = row.metadata?.toolCall;
     const mediaKind = CREATE_KINDS.find(
       (k) => TOOL_NAMES[k] === call?.toolName,
@@ -190,12 +288,13 @@ async function chatHistory(
         model:
           args.data?.model ?? args.data?.voiceId ?? args.data?.modelId ?? null,
         settings: settings.success ? settings.data : null,
-        source: "chat" as const,
+        source: "chat",
         threadId: row.threadId,
         rootFolderId: row.rootFolderId,
       },
     ];
   });
+  return sourcePage(entries, rows, limit);
 }
 
 async function countRows(
@@ -218,97 +317,144 @@ async function countRows(
   return (studio[0]?.n ?? 0) + (chat[0]?.n ?? 0) + (jobs[0]?.n ?? 0);
 }
 
+async function studioRows(
+  user: JwtPayloadType,
+  kind: CreateKind | undefined,
+  limit: number,
+  cursor: HistoryKey | undefined,
+): Promise<SourcePage> {
+  const rows = await db
+    .select({
+      id: studioGenerations.id,
+      kind: studioGenerations.kind,
+      title: studioGenerations.title,
+      createdAt: studioGenerations.createdAt,
+      status: studioGenerations.status,
+      url: studioGenerations.url,
+      transcript: studioGenerations.transcript,
+      credits: studioGenerations.credits,
+      model: studioGenerations.model,
+      settings: studioGenerations.settings,
+    })
+    .from(studioGenerations)
+    .where(
+      and(
+        studioFilter(user, kind),
+        olderThan(studioGenerations.createdAt, studioGenerations.id, cursor),
+      ),
+    )
+    .orderBy(...newestFirst(studioGenerations.createdAt, studioGenerations.id))
+    .limit(limit);
+  const entries = rows.map((row): StudioEntry => ({
+    ...row,
+    model: row.model || null,
+    settings: row.settings ?? null,
+    source: "studio",
+    threadId: null,
+    rootFolderId: null,
+    createdAt: row.createdAt.toISOString(),
+    status:
+      row.status !== "completed" &&
+      row.status !== "failed" &&
+      Date.now() - row.createdAt.getTime() > V1_MEDIA_JOB_STALE_MS
+        ? "failed"
+        : row.status,
+  }));
+  return sourcePage(entries, rows, limit);
+}
+
+async function apiRows(
+  user: JwtPayloadType,
+  kind: CreateKind | undefined,
+  limit: number,
+  cursor: HistoryKey | undefined,
+): Promise<SourcePage> {
+  const api = apiFilter(user, kind);
+  if (!api) {
+    return { entries: [], truncatedAt: undefined };
+  }
+  const rows = await db
+    .select({
+      id: v1MediaJobs.id,
+      kind: v1MediaJobs.kind,
+      title: v1MediaJobs.prompt,
+      createdAt: v1MediaJobs.createdAt,
+      url: v1MediaJobs.resultUrl,
+      credits: v1MediaJobs.creditsCharged,
+      model: v1MediaJobs.model,
+    })
+    .from(v1MediaJobs)
+    .where(and(api, olderThan(v1MediaJobs.createdAt, v1MediaJobs.id, cursor)))
+    .orderBy(...newestFirst(v1MediaJobs.createdAt, v1MediaJobs.id))
+    .limit(limit);
+  const entries = rows.map((row): StudioEntry => ({
+    ...row,
+    title: row.title.slice(0, 160),
+    createdAt: row.createdAt.toISOString(),
+    status: "completed",
+    transcript: null,
+    settings: { prompt: row.title, model: row.model },
+    source: "api",
+    threadId: null,
+    rootFolderId: null,
+  }));
+  return sourcePage(entries, rows, limit);
+}
+
 /**
  * The visitor's generations across the Studio, chat threads and the /v1 API,
  * newest first. Guests see what their lead made; incognito chats are never
- * read (they live in the browser). Each source is read up to the end of the
- * requested page, merged, then sliced, so pages stay stable across sources.
+ * read (they live in the browser).
+ *
+ * Two ways to page: `page` (offset, for the CLI and page numbers) or
+ * `cursor` (the previous page's `nextCursor`, for "load more"; stable while
+ * new results arrive on top). Each source reads one row past the requested
+ * window. When a source had more rows, the merged list is only trusted down
+ * to the last row that source read, and the next page starts there.
  */
 export async function studioHistoryPage(
   user: JwtPayloadType,
-  params: { kind?: CreateKind; page: number; limit: number },
+  params: {
+    kind?: CreateKind;
+    page: number;
+    limit: number;
+    cursor?: string;
+  },
 ): Promise<StudioHistoryPage> {
   if (user.isPublic && !user.leadId) {
-    return { items: [], totalCount: 0 };
+    return { items: [], totalCount: 0, nextCursor: null };
   }
-  const { kind, page, limit } = params;
-  const offset = (page - 1) * limit;
-  const depth = offset + limit;
-  const api = apiFilter(user, kind);
+  const { kind, limit } = params;
+  const cursor = params.cursor ? decodeHistoryCursor(params.cursor) : undefined;
+  const offset = cursor ? 0 : (params.page - 1) * limit;
+  const fetched = offset + limit + 1;
   const [studio, chat, jobs, totalCount] = await Promise.all([
-    db
-      .select({
-        id: studioGenerations.id,
-        kind: studioGenerations.kind,
-        title: studioGenerations.title,
-        createdAt: studioGenerations.createdAt,
-        status: studioGenerations.status,
-        url: studioGenerations.url,
-        transcript: studioGenerations.transcript,
-        credits: studioGenerations.credits,
-        model: studioGenerations.model,
-        settings: studioGenerations.settings,
-      })
-      .from(studioGenerations)
-      .where(studioFilter(user, kind))
-      .orderBy(desc(studioGenerations.createdAt), desc(studioGenerations.id))
-      .limit(depth),
-    chatHistory(user, kind, depth),
-    api
-      ? db
-          .select({
-            id: v1MediaJobs.id,
-            kind: v1MediaJobs.kind,
-            title: v1MediaJobs.prompt,
-            createdAt: v1MediaJobs.createdAt,
-            url: v1MediaJobs.resultUrl,
-            credits: v1MediaJobs.creditsCharged,
-            model: v1MediaJobs.model,
-          })
-          .from(v1MediaJobs)
-          .where(api)
-          .orderBy(desc(v1MediaJobs.createdAt), desc(v1MediaJobs.id))
-          .limit(depth)
-      : [],
+    studioRows(user, kind, fetched, cursor),
+    chatHistory(user, kind, fetched, cursor),
+    apiRows(user, kind, fetched, cursor),
     countRows(user, kind),
   ]);
-  const entries: StudioEntry[] = [
-    ...studio.map((row) => ({
-      ...row,
-      model: row.model || null,
-      settings: row.settings ?? null,
-      source: "studio" as const,
-      threadId: null,
-      rootFolderId: null,
-      createdAt: row.createdAt.toISOString(),
-      status:
-        row.status !== "completed" &&
-        row.status !== "failed" &&
-        Date.now() - row.createdAt.getTime() > V1_MEDIA_JOB_STALE_MS
-          ? ("failed" as const)
-          : row.status,
-    })),
-    ...chat,
-    ...jobs.map((row) => ({
-      ...row,
-      title: row.title.slice(0, 160),
-      createdAt: row.createdAt.toISOString(),
-      status: "completed" as const,
-      transcript: null,
-      settings: { prompt: row.title, model: row.model },
-      source: "api" as const,
-      threadId: null,
-      rootFolderId: null,
-    })),
-  ];
+  const boundary = [studio, chat, jobs]
+    .flatMap((source) => (source.truncatedAt ? [source.truncatedAt] : []))
+    .toSorted(compareKeys)
+    .at(0);
+  const merged = [...studio.entries, ...chat.entries, ...jobs.entries]
+    .toSorted((a, b) => compareKeys(entryKey(a), entryKey(b)))
+    .filter(
+      (entry) => !boundary || compareKeys(entryKey(entry), boundary) <= 0,
+    );
+  const items = merged.slice(offset, offset + limit);
+  const last = items.at(-1);
+  const more = merged.length > offset + limit || boundary !== undefined;
+  const next = !more
+    ? undefined
+    : items.length === limit && last
+      ? entryKey(last)
+      : boundary;
   return {
-    items: entries
-      .toSorted(
-        (a, b) =>
-          b.createdAt.localeCompare(a.createdAt) || b.id.localeCompare(a.id),
-      )
-      .slice(offset, depth),
+    items,
     totalCount,
+    nextCursor: next ? encodeHistoryCursor(next) : null,
   };
 }
 

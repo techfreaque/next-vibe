@@ -84,6 +84,14 @@ const { GET } = createEndpoint({
         includeInCacheKey: true,
         schema: z.enum(CREATE_KINDS).optional(),
       }),
+      cursor: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "get.fields.cursor.label",
+        description: "get.fields.cursor.description",
+        hidden: true,
+        schema: z.string().max(200).optional(),
+      }),
       items: responseArrayField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         child: objectField(scopedTranslation, {
@@ -164,6 +172,11 @@ const { GET } = createEndpoint({
           },
         }),
       }),
+      nextCursor: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "get.response.nextCursor",
+        schema: z.string().nullable(),
+      }),
       paginationInfo: paginationField({ order: 2 }),
     },
   }),
@@ -218,10 +231,12 @@ const { GET } = createEndpoint({
     responses: {
       default: {
         items: [EXAMPLE_ITEM],
+        nextCursor: null,
         paginationInfo: { totalCount: 1, pageCount: 1 },
       },
       images: {
         items: [EXAMPLE_ITEM],
+        nextCursor: null,
         paginationInfo: { totalCount: 1, pageCount: 1 },
       },
     },

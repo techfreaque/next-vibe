@@ -16,6 +16,11 @@ export const translations: typeof enTranslations = {
         description:
           "image, video, music, speech o transcribe. Lascia vuoto per vedere tutto.",
       },
+      cursor: {
+        label: "Cursore di pagina",
+        description:
+          "Lascia vuoto per i risultati più recenti. Per continuare, passa il nextCursor della pagina precedente.",
+      },
     },
     response: {
       items: "Creazioni",
@@ -32,6 +37,7 @@ export const translations: typeof enTranslations = {
       source: "Creato in",
       threadId: "Chat",
       rootFolderId: "Cartella",
+      nextCursor: "Cursore della pagina successiva",
     },
     success: {
       title: "Cronologia caricata",
@@ -88,6 +94,10 @@ export const translations: typeof enTranslations = {
     count: "{{count}} in totale",
     error: "Impossibile caricare la cronologia.",
     retry: "Aggiorna",
+    loadMore: "Mostra altri",
+    loadingMore: "Caricamento",
+    loadMoreFailed: "Impossibile caricare altri risultati.",
+    endOfList: "Non c'è altro.",
     emptyTitle: "Ancora niente",
     emptyHint: "Ogni risultato finisce qui, pronto da scaricare.",
     emptyKindHint: "Il tuo primo risultato compare qui appena è pronto.",

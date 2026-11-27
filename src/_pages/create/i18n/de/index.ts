@@ -46,6 +46,14 @@ export const translations: typeof enTranslations = {
   unavailable: "Für dieses Format ist gerade kein Modell verfügbar.",
   file: "Audiodatei",
   language: "Sprache der Aufnahme",
+  languageAuto: "Automatisch erkennen",
+  commercialUse: {
+    title: "Kommerzielle Nutzung je Modell",
+    intro:
+      "Die Lizenz des Modells entscheidet, was du mit dem Ergebnis machen darfst, etwa in einer Anzeige oder einem Kundenprojekt. Prüf den Status, bevor du veröffentlichst.",
+    showAll:
+      "Alle {{count}} Modelle nach Lizenz ({{allowed}} erlauben kommerzielle Nutzung)",
+  },
   referenceAudio: "URL der Audiovorlage",
   durationSeconds: "Aufnahmelänge in Sekunden",
   duration: "Dauer",

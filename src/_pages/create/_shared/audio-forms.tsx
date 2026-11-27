@@ -15,11 +15,15 @@ import {
   getMusicGenModelById,
   MusicGenModelId,
 } from "next-vibe/agent/music-generation/models";
+import {
+  STT_AUTO_LANGUAGE,
+  STT_LANGUAGES,
+  STT_MULTILINGUAL_MODEL_IDS,
+} from "next-vibe/agent/speech-to-text/constants";
 import type sttDefinitions from "next-vibe/agent/speech-to-text/definition";
 import { SttModelId } from "next-vibe/agent/speech-to-text/models";
 import ttsDefinitions from "next-vibe/agent/text-to-speech/definition";
 import { TtsModelId } from "next-vibe/agent/text-to-speech/models";
-import { Languages } from "next-vibe/core/i18n/core/config";
 import { getLanguageFromLocale } from "next-vibe/core/i18n/core/language-utils";
 import { Div } from "next-vibe/ui/components/div";
 import { Input } from "next-vibe/ui/components/input";
@@ -38,6 +42,26 @@ import { StudioForm, StudioSelect } from "./studio-form";
 import type { StudioModel } from "./studio-types";
 
 const dirty = { shouldDirty: true };
+
+/**
+ * Default transcription model for a spoken language: the cheapest one for
+ * English, a strong multilingual one for anything else or auto-detect
+ * (small cheap models mangle e.g. Portuguese).
+ */
+export function defaultSttModel(
+  models: StudioModel[],
+  language: string | undefined,
+): StudioModel | undefined {
+  const usable = models.filter((m) => !m.requiresImage);
+  if (language === "en") {
+    return usable[0];
+  }
+  return (
+    STT_MULTILINGUAL_MODEL_IDS.map((id) =>
+      usable.find((m) => m.id === id),
+    ).find((m) => m !== undefined) ?? usable[0]
+  );
+}
 
 export function StudioMusic({
   models,
@@ -191,11 +215,19 @@ export function StudioTranscribe({
     name: "fileUpload.files",
   })?.[0];
   const language =
-    useWatch({ control: form?.control, name: "language" }) ??
-    getLanguageFromLocale(locale);
+    useWatch({ control: form?.control, name: "language" }) ?? STT_AUTO_LANGUAGE;
   const names = new Intl.DisplayNames([getLanguageFromLocale(locale)], {
     type: "language",
   });
+  // Until the visitor picks a model, it follows the spoken language.
+  const [modelPicked, setModelPicked] = useState(false);
+  const languageOptions = [
+    { value: STT_AUTO_LANGUAGE, label: t("languageAuto") },
+    ...STT_LANGUAGES.map((code) => ({
+      value: code,
+      label: names.of(code) ?? code,
+    })).toSorted((a, b) => a.label.localeCompare(b.label, locale)),
+  ];
   const fileId = useId();
   const durationId = useId();
   const [duration, setDuration] = useState<number>();
@@ -249,6 +281,7 @@ export function StudioTranscribe({
       onModel={(value) => {
         const next = Object.values(SttModelId).find((v) => v === value);
         if (next) {
+          setModelPicked(true);
           form?.setValue("modelId", next, dirty);
         }
       }}
@@ -281,11 +314,17 @@ export function StudioTranscribe({
       <StudioSelect
         label={t("language")}
         value={language}
-        options={Object.values(Languages).map((v) => ({
-          value: v,
-          label: names.of(v) ?? v,
-        }))}
-        onChange={(v) => form?.setValue("language", v, dirty)}
+        options={languageOptions}
+        onChange={(v) => {
+          form?.setValue("language", v, dirty);
+          const next = modelPicked ? undefined : defaultSttModel(models, v);
+          const nextId = Object.values(SttModelId).find(
+            (value) => value === next?.id,
+          );
+          if (nextId) {
+            form?.setValue("modelId", nextId, dirty);
+          }
+        }}
       />
       {file && needsDuration && (
         <Div className="flex flex-col gap-2">

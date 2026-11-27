@@ -46,6 +46,14 @@ export const translations: typeof enTranslations = {
     "Pre tento druh tvorby momentálne nie je k dispozícii žiadny model.",
   file: "Zvukový súbor",
   language: "Jazyk nahrávky",
+  languageAuto: "Rozpoznať automaticky",
+  commercialUse: {
+    title: "Komerčné použitie podľa modelu",
+    intro:
+      "Licencia modelu určuje, čo smiete s výsledkom robiť, napríklad v reklame alebo v projekte pre klienta. Pred zverejnením si overte stav.",
+    showAll:
+      "Všetky modely podľa licencie: {{count}} (komerčné použitie povoľuje {{allowed}})",
+  },
   referenceAudio: "URL referenčnej nahrávky",
   durationSeconds: "Dĺžka nahrávky v sekundách",
   duration: "Trvanie",

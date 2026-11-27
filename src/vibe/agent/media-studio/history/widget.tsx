@@ -14,6 +14,7 @@ import { resolveMediaSrc } from "next-vibe/agent/chat/storage/media-src";
 import { Audio } from "next-vibe/ui/components/audio";
 import { Button, buttonVariants } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
+import { type DivRefObject } from "next-vibe/ui/components/div";
 import { AlertTriangle } from "next-vibe/ui/components/icons/AlertTriangle";
 import { Check } from "next-vibe/ui/components/icons/Check";
 import { Copy } from "next-vibe/ui/components/icons/Copy";
@@ -37,7 +38,6 @@ import { H2, P } from "next-vibe/ui/components/typography";
 import { Video } from "next-vibe/ui/components/video";
 import { copyToClipboard } from "next-vibe/ui/lib/clipboard";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
-import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
 import {
   useWidgetEndpointMutations,
   useWidgetForm,
@@ -48,8 +48,8 @@ import {
   useWidgetUser,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { useWidgetValue } from "next-vibe/unified-ui/_shared/use-widget-value";
-import { PaginationWidget } from "next-vibe/unified-ui/widgets/containers/pagination/widget";
-import { type JSX, useEffect, useState } from "react";
+import { apiClient } from "next-vibe/unified-ui/hooks/store";
+import { type JSX, useEffect, useRef, useState } from "react";
 
 import {
   CREATE_KINDS,
@@ -59,6 +59,7 @@ import {
 } from "@/_pages/create/_shared/create-kinds";
 import { formatCreditAmount } from "@/products/credit-money";
 
+import { MEDIA_HISTORY_PAGE_SIZE } from "./constants";
 import type definition from "./definition";
 import type { MediaHistoryItem } from "./definition";
 import { scopedTranslation } from "./i18n";
@@ -75,6 +76,61 @@ const KIND_ICONS = {
 const POLL_MS = 4000;
 
 const STEPS = ["queued", "running", "saving"] as const;
+
+/** "Load more" reads two tool-page screens at once. */
+const LOAD_MORE_LIMIT = MEDIA_HISTORY_PAGE_SIZE * 2;
+/** Start loading the next page this far before the end scrolls into view. */
+const LOAD_MORE_MARGIN = "600px 0px";
+
+function newestFirst(a: MediaHistoryItem, b: MediaHistoryItem): number {
+  const byTime =
+    new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+  return byTime || (a.id === b.id ? 0 : a.id < b.id ? 1 : -1);
+}
+
+/**
+ * Union by id, newest first. `fresh` wins, so polled status updates on the
+ * first page replace the copies kept from earlier pages.
+ */
+function mergeItems(
+  fresh: MediaHistoryItem[],
+  kept: MediaHistoryItem[],
+): MediaHistoryItem[] {
+  const ids = new Set(fresh.map((item) => item.id));
+  return [...fresh, ...kept.filter((item) => !ids.has(item.id))].toSorted(
+    newestFirst,
+  );
+}
+
+/** Calls `onVisible` when it nears the viewport: infinite scroll. */
+function LoadMoreSentinel({
+  onVisible,
+}: {
+  onVisible: () => void;
+}): JSX.Element {
+  const ref = useRef<DivRefObject>(null);
+  const callback = useRef(onVisible);
+  useEffect(() => {
+    callback.current = onVisible;
+  });
+  useEffect(() => {
+    const node = ref.current;
+    if (!(node instanceof Element)) {
+      return undefined;
+    }
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          callback.current();
+        }
+      },
+      { rootMargin: LOAD_MORE_MARGIN },
+    );
+    observer.observe(node);
+    return (): void => observer.disconnect();
+  }, []);
+  return <Div ref={ref} aria-hidden={true} className="h-px w-full" />;
+}
 
 const tileButton = cn(
   buttonVariants({ variant: "ghost", size: "sm" }),
@@ -496,11 +552,7 @@ function CompactList({ items }: { items: MediaHistoryItem[] }): JSX.Element {
   );
 }
 
-export function MediaHistoryWidget({
-  field,
-}: {
-  field: (typeof definition.GET)["fields"];
-}): JSX.Element {
+export function MediaHistoryWidget(): JSX.Element {
   const value = useWidgetValue<typeof definition.GET>();
   const response = useWidgetResponse();
   const form = useWidgetForm<typeof definition.GET>();
@@ -508,12 +560,56 @@ export function MediaHistoryWidget({
   const responseOnly = useWidgetResponseOnly();
   const locale = useWidgetLocale();
   const { t } = scopedTranslation.scopedT(locale);
+  const user = useWidgetUser();
+  const logger = useWidgetLogger();
   const kind = form?.watch("kind");
-  const items = value?.items ?? [];
+  const firstPage = value?.items ?? [];
   const pagination = value?.paginationInfo;
   const fetching = mutations?.read?.isFetching ?? false;
   const refetch = mutations?.read?.refetch;
-  const running = items.some(
+  // Pages past the first. Everything shown when "load more" ran is kept, so
+  // a new result arriving on top never pushes an item out of the list.
+  const [more, setMore] = useState<{
+    kind: CreateKind | undefined;
+    items: MediaHistoryItem[];
+    nextCursor: string | null;
+  } | null>(null);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [loadMoreError, setLoadMoreError] = useState(false);
+  const loaded = more?.kind === kind ? more : null;
+  const items = loaded ? mergeItems(firstPage, loaded.items) : firstPage;
+  const nextCursor = loaded ? loaded.nextCursor : (value?.nextCursor ?? null);
+  const loadMore = async (): Promise<void> => {
+    if (!nextCursor || loadingMore || !user) {
+      return;
+    }
+    setLoadingMore(true);
+    setLoadMoreError(false);
+    const { default: endpoint } = await import("./definition");
+    const page = await apiClient.fetch(
+      endpoint.GET,
+      logger,
+      user,
+      {
+        kind,
+        cursor: nextCursor,
+        paginationInfo: { page: 1, limit: LOAD_MORE_LIMIT },
+      },
+      undefined,
+      locale,
+    );
+    setLoadingMore(false);
+    if (!page.success) {
+      setLoadMoreError(true);
+      return;
+    }
+    setMore({
+      kind,
+      items: mergeItems(items, page.data.items),
+      nextCursor: page.data.nextCursor,
+    });
+  };
+  const running = firstPage.some(
     (item) => item.status !== "completed" && item.status !== "failed",
   );
   // Polling, not data loading: async jobs (video, music) report progress
@@ -632,15 +728,42 @@ export function MediaHistoryWidget({
         </Div>
       )}
 
-      {pagination && pagination.pageCount > 1 && (
-        <PaginationWidget
-          field={withValue(
-            { ...field.children.paginationInfo, className: "flex-wrap gap-3" },
-            pagination,
-            value,
+      {value && nextCursor && (
+        <Div className="flex flex-col items-center gap-2 pt-1">
+          {kind && !loadMoreError && (
+            <LoadMoreSentinel
+              onVisible={() => {
+                void loadMore();
+              }}
+            />
           )}
-          fieldName="paginationInfo"
-        />
+          {loadMoreError && (
+            <P className="m-0 text-sm text-destructive">
+              {t("widget.loadMoreFailed")}
+            </P>
+          )}
+          <Button
+            type="button"
+            variant="outline"
+            className="min-h-11 w-full gap-2 sm:w-auto"
+            disabled={loadingMore}
+            onClick={() => {
+              void loadMore();
+            }}
+          >
+            {loadingMore && <Loader2 className="size-4 animate-spin" />}
+            {loadingMore
+              ? t("widget.loadingMore")
+              : loadMoreError
+                ? t("widget.retry")
+                : t("widget.loadMore")}
+          </Button>
+        </Div>
+      )}
+      {value && !nextCursor && loaded && (
+        <P className="m-0 text-center text-sm text-muted-foreground">
+          {t("widget.endOfList")}
+        </P>
       )}
     </Div>
   );

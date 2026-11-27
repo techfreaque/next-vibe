@@ -10,7 +10,7 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { studioHistoryPage } from "../history";
+import { decodeHistoryCursor, studioHistoryPage } from "../history";
 import { MEDIA_HISTORY_MAX_LIMIT } from "./constants";
 import type {
   MediaHistoryRequestOutput,
@@ -30,17 +30,25 @@ export class MediaHistoryRepository {
       MEDIA_HISTORY_MAX_LIMIT,
     );
     const page = Math.max(Math.floor(data.paginationInfo.page), 1);
+    if (data.cursor && !decodeHistoryCursor(data.cursor)) {
+      return fail({
+        message: t("get.errors.validation.description"),
+        errorType: ErrorResponseTypes.VALIDATION_ERROR,
+      });
+    }
     try {
-      const { items, totalCount } = await studioHistoryPage(user, {
+      const { items, totalCount, nextCursor } = await studioHistoryPage(user, {
         kind: data.kind,
         page,
         limit,
+        cursor: data.cursor,
       });
       return success({
         items: items.map((item) => ({
           ...item,
           createdAt: new Date(item.createdAt),
         })),
+        nextCursor,
         paginationInfo: {
           totalCount,
           pageCount: Math.ceil(totalCount / limit),

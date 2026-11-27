@@ -16,6 +16,11 @@ export const translations: typeof enTranslations = {
         description:
           "image, video, music, speech lub transcribe. Zostaw puste, żeby zobaczyć wszystko.",
       },
+      cursor: {
+        label: "Kursor strony",
+        description:
+          "Zostaw puste, żeby zobaczyć najnowsze wyniki. Aby iść dalej, podaj nextCursor z poprzedniej strony.",
+      },
     },
     response: {
       items: "Generacje",
@@ -32,6 +37,7 @@ export const translations: typeof enTranslations = {
       source: "Źródło",
       threadId: "Wątek",
       rootFolderId: "Folder",
+      nextCursor: "Kursor następnej strony",
     },
     success: {
       title: "Historia wczytana",
@@ -88,6 +94,10 @@ export const translations: typeof enTranslations = {
     count: "{{count}} łącznie",
     error: "Nie udało się wczytać historii.",
     retry: "Odśwież",
+    loadMore: "Pokaż więcej",
+    loadingMore: "Ładowanie",
+    loadMoreFailed: "Nie udało się wczytać kolejnych wyników.",
+    endOfList: "To już wszystko.",
     emptyTitle: "Jeszcze nic tu nie ma",
     emptyHint: "Każdy wynik trafia tutaj, gotowy do pobrania.",
     emptyKindHint:

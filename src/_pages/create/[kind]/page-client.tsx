@@ -9,6 +9,7 @@ import {
   getMusicGenModelById,
   MusicGenModelId,
 } from "next-vibe/agent/music-generation/models";
+import { STT_AUTO_LANGUAGE } from "next-vibe/agent/speech-to-text/constants";
 import sttDefinitions from "next-vibe/agent/speech-to-text/definition";
 import { SttModelId } from "next-vibe/agent/speech-to-text/models";
 import ttsDefinitions from "next-vibe/agent/text-to-speech/definition";
@@ -23,10 +24,12 @@ import type { JSX } from "react";
 import { z } from "zod";
 
 import {
+  defaultSttModel,
   StudioMusic,
   StudioSpeech,
   StudioTranscribe,
 } from "../_shared/audio-forms";
+import { CommercialUseOverview } from "../_shared/commercial-use-overview";
 import {
   CREATE_MODEL_PARAM,
   CREATE_SETTINGS_PARAM,
@@ -183,9 +186,18 @@ function GenerationForm({
       );
     }
     case "transcribe": {
-      const id = z.enum(SttModelId).parse(model.id);
       const language =
-        typeof settings?.language === "string" ? settings.language : undefined;
+        typeof settings?.language === "string"
+          ? settings.language
+          : STT_AUTO_LANGUAGE;
+      const id = z
+        .enum(SttModelId)
+        .parse(
+          (requested && models.some((m) => m.id === requested)
+            ? model
+            : (defaultSttModel(models, language) ?? model)
+          ).id,
+        );
       return (
         <EndpointsPage
           {...props}
@@ -223,6 +235,11 @@ export function CreatePageClient(data: CreatePageData): JSX.Element {
           />
         </Div>
       </Div>
+      <CommercialUseOverview
+        locale={data.locale}
+        rows={data.commercialUse}
+        className="mt-10 sm:mt-12"
+      />
     </StudioShell>
   );
 }

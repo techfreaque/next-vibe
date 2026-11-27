@@ -16,6 +16,11 @@ export const translations: typeof enTranslations = {
         description:
           "image, video, music, speech o transcribe. Déjalo vacío para verlo todo.",
       },
+      cursor: {
+        label: "Cursor de página",
+        description:
+          "Déjalo vacío para ver los resultados más recientes. Para seguir, pasa el nextCursor de la página anterior.",
+      },
     },
     response: {
       items: "Creaciones",
@@ -32,6 +37,7 @@ export const translations: typeof enTranslations = {
       source: "Creado en",
       threadId: "Chat",
       rootFolderId: "Carpeta",
+      nextCursor: "Cursor de la página siguiente",
     },
     success: {
       title: "Historial cargado",
@@ -89,6 +95,10 @@ export const translations: typeof enTranslations = {
     count: "{{count}} en total",
     error: "No se pudo cargar tu historial.",
     retry: "Actualizar",
+    loadMore: "Cargar más",
+    loadingMore: "Cargando",
+    loadMoreFailed: "No se pudieron cargar más resultados.",
+    endOfList: "Eso es todo.",
     emptyTitle: "Aún no has creado nada",
     emptyHint: "Cada resultado llega aquí, listo para descargar.",
     emptyKindHint: "Tu primer resultado aparece aquí en cuanto esté listo.",

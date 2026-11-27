@@ -15,10 +15,19 @@ import type { JSX } from "react";
 import { configScopedTranslation } from "@/env/i18n";
 
 import { buildBreadcrumbList } from "../_components/structured-data";
+import {
+  CommercialUseOverview,
+  type CommercialUseRow,
+} from "../create/_shared/commercial-use-overview";
+import type { CreateKind } from "../create/_shared/create-kinds";
+import { CONTAINER } from "../story/_shared/marketing";
 import { CompareSection } from "../story/compare/_shared/compare-ui";
 import {
+  CATALOG_DEFINITIONS,
   type CatalogMediaModelCounts,
+  type CatalogType,
   getCatalogMediaModelCounts,
+  listCatalogEntries,
 } from "./_shared/model-catalog-entries";
 import {
   buildModelDirectory,
@@ -29,6 +38,39 @@ import { scopedTranslation } from "./i18n";
 import { ModelsIndexClient } from "./page-client";
 
 export const revalidate = 3600;
+
+/** Media catalog tabs and the Studio tool each one maps to. */
+const MEDIA_KINDS: [CatalogType, CreateKind][] = [
+  ["image", "image"],
+  ["video", "video"],
+  ["audio", "music"],
+  ["tts", "speech"],
+  ["stt", "transcribe"],
+];
+
+/** Every current media model with its commercial-use label. */
+function commercialUseRows(
+  locale: CountryLanguage,
+  availability: Awaited<ReturnType<typeof getEnvAvailability>>,
+): CommercialUseRow[] {
+  return MEDIA_KINDS.flatMap(([type, kind]) =>
+    listCatalogEntries(type, { availability }).flatMap((entry) => {
+      const defKey = entry.key.slice(type.length + 1);
+      const info = CATALOG_DEFINITIONS[type][defKey]?.commercialUse;
+      return info && !entry.isLegacy
+        ? [
+            {
+              id: entry.key,
+              name: entry.name,
+              kind,
+              info,
+              href: entry.slug ? `/${locale}/models/${entry.slug}` : null,
+            },
+          ]
+        : [];
+    }),
+  );
+}
 
 interface Props {
   params: Promise<{ locale: CountryLanguage }>;
@@ -59,6 +101,8 @@ export interface ModelsIndexPageData {
   directory: DirectoryGroup[];
   /** BreadcrumbList JSON-LD: Home > Models. */
   structuredData: JsonLdNode;
+  /** License status of every media model, for the commercial-use overview. */
+  commercialUse: CommercialUseRow[];
 }
 
 export async function tanstackLoader({
@@ -78,6 +122,7 @@ export async function tanstackLoader({
     },
     chatModelCount: getAvailableChatModelCount(false, availability),
     mediaModelCounts: getCatalogMediaModelCounts(availability),
+    commercialUse: commercialUseRows(locale, availability),
   };
 }
 
@@ -92,6 +137,12 @@ export function TanstackPage(data: ModelsIndexPageData): JSX.Element {
         mediaModelCounts={data.mediaModelCounts}
         directorySection={
           <>
+            <CommercialUseOverview
+              locale={data.locale}
+              rows={data.commercialUse}
+              showKind
+              className={`${CONTAINER} py-12 md:py-16`}
+            />
             <ModelDirectory locale={data.locale} groups={data.directory} />
             <Link
               href={`/${data.locale}/models/compare`}

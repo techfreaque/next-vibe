@@ -27,7 +27,11 @@ const SpeechToTextContainer = lazyWidget(() =>
 
 import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
 
-import { DEFAULT_STT_MODEL_ID, TRANSCRIBE_AUDIO_ALIAS } from "./constants";
+import {
+  DEFAULT_STT_MODEL_ID,
+  STT_AUTO_LANGUAGE,
+  TRANSCRIBE_AUDIO_ALIAS,
+} from "./constants";
 import { scopedTranslation } from "./i18n";
 import { SttModelId } from "./models";
 
@@ -136,8 +140,7 @@ const { POST } = createEndpoint({
         fieldType: FieldDataType.TEXT,
         label: "hotkey.post.language.label",
         schema: z
-          .string()
-          .regex(/^[a-z]{2}$/)
+          .union([z.literal(STT_AUTO_LANGUAGE), z.string().regex(/^[a-z]{2}$/)])
           .optional(),
       }),
       modelId: requestField(scopedTranslation, {

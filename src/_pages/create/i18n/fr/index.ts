@@ -45,6 +45,14 @@ export const translations: typeof enTranslations = {
   unavailable: "Aucun modèle n’est disponible pour ce format pour le moment.",
   file: "Fichier audio",
   language: "Langue de l’enregistrement",
+  languageAuto: "Détection automatique",
+  commercialUse: {
+    title: "Usage commercial par modèle",
+    intro:
+      "La licence de chaque modèle fixe ce que vous pouvez faire du résultat, par exemple dans une pub ou un projet client. Vérifiez le statut avant de publier.",
+    showAll:
+      "Les {{count}} modèles par licence ({{allowed}} autorisent l'usage commercial)",
+  },
   referenceAudio: "URL de l’extrait de référence",
   durationSeconds: "Durée de l’enregistrement en secondes",
   duration: "Durée",

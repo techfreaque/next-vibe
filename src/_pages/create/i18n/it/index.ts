@@ -46,7 +46,15 @@ export const translations: typeof enTranslations = {
   unavailable:
     "Nessun modello è disponibile per questo generatore in questo momento.",
   file: "File audio",
-  language: "Lingua di registrazione",
+  language: "Lingua della registrazione",
+  languageAuto: "Rileva automaticamente",
+  commercialUse: {
+    title: "Uso commerciale per modello",
+    intro:
+      "La licenza di ogni modello decide cosa puoi fare con il risultato, per esempio in una pubblicità o in un progetto per un cliente. Controlla lo stato prima di pubblicare.",
+    showAll:
+      "Tutti i {{count}} modelli per licenza ({{allowed}} consentono l'uso commerciale)",
+  },
   referenceAudio: "audio di riferimento URL",
   durationSeconds: "Lunghezza di registrazione in pochi secondi",
   duration: "Durata",

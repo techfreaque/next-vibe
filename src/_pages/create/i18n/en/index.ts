@@ -43,6 +43,14 @@ export const translations = {
   unavailable: "No model is available for this generator right now.",
   file: "Audio file",
   language: "Recording language",
+  languageAuto: "Detect automatically",
+  commercialUse: {
+    title: "Commercial use by model",
+    intro:
+      "Each model's license decides what you may do with its output, for example in an ad or a client project. Check the status before you publish.",
+    showAll:
+      "All {{count}} models by license ({{allowed}} allow commercial use)",
+  },
   referenceAudio: "Reference audio URL",
   durationSeconds: "Recording length in seconds",
   duration: "Duration",

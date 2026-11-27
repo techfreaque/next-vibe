@@ -16,6 +16,11 @@ export const translations: typeof enTranslations = {
         description:
           "Povolené hodnoty: image, video, music, speech alebo transcribe. Prázdne pole zobrazí všetky typy.",
       },
+      cursor: {
+        label: "Kurzor stránky",
+        description:
+          "Nechajte prázdne pre najnovšie výsledky. Ak chcete pokračovať, zadajte nextCursor z predchádzajúcej stránky.",
+      },
     },
     response: {
       items: "Vytvorené médiá",
@@ -32,6 +37,7 @@ export const translations: typeof enTranslations = {
       source: "Vytvorené v",
       threadId: "Vlákno",
       rootFolderId: "Priečinok",
+      nextCursor: "Kurzor ďalšej stránky",
     },
     success: {
       title: "História sa načítala",
@@ -88,6 +94,10 @@ export const translations: typeof enTranslations = {
     count: "Celkový počet: {{count}}",
     error: "Históriu sa nepodarilo načítať.",
     retry: "Skúsiť znova",
+    loadMore: "Načítať ďalšie",
+    loadingMore: "Načítava sa",
+    loadMoreFailed: "Ďalšie výsledky sa nepodarilo načítať.",
+    endOfList: "To je všetko.",
     emptyTitle: "Zatiaľ tu nič nie je",
     emptyHint: "Tu nájdeš všetko, čo vytvoríš, a môžeš si to stiahnuť.",
     emptyKindHint: "Prvý výsledok sa tu zobrazí po dokončení.",
