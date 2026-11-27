@@ -767,7 +767,7 @@ function ModelsVisual({
   }[] = [
     {
       id: "mainstream",
-      name: "Mainstream",
+      name: t("home.capabilities.models.demo.mainstreamTab"),
       className:
         "bg-indigo-50 dark:bg-indigo-500/15 text-indigo-800 dark:text-indigo-200 border-indigo-200 dark:border-indigo-500/30",
       activeRingClass: "ring-2 ring-indigo-500",
@@ -779,7 +779,7 @@ function ModelsVisual({
     },
     {
       id: "open",
-      name: "Open",
+      name: t("home.capabilities.models.demo.openTab"),
       className:
         "bg-emerald-50 dark:bg-emerald-500/15 text-emerald-800 dark:text-emerald-200 border-emerald-200 dark:border-emerald-500/30",
       activeRingClass: "ring-2 ring-emerald-500",
@@ -791,7 +791,7 @@ function ModelsVisual({
     },
     {
       id: "uncensored",
-      name: "Uncensored",
+      name: t("home.capabilities.models.demo.uncensoredTab"),
       className:
         "bg-rose-50 dark:bg-rose-500/15 text-rose-800 dark:text-rose-200 border-rose-200 dark:border-rose-500/30",
       activeRingClass: "ring-2 ring-rose-500",
