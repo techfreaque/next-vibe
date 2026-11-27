@@ -5,7 +5,12 @@ import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { HEALTH_ALIAS } from "next-vibe/platforms/web/health/constants";
 
 import { ChatModelId } from "../../../ai-stream/models";
-import { CODING_AGENT_ALIAS } from "../../../coding-agent/constants";
+import {
+  CODING_AGENT_ALIAS,
+  CODING_AGENT_INTERRUPT_ALIAS,
+  CODING_AGENT_LIST_ALIAS,
+  CODING_AGENT_SAY_ALIAS,
+} from "../../../coding-agent/constants";
 import {
   CORTEX_LIST_ALIAS,
   CORTEX_WRITE_ALIAS,
@@ -44,6 +49,9 @@ export const deploymentAgentSkill: Skill = {
       : [],
   availableTools: [
     tool(CODING_AGENT_ALIAS),
+    tool(CODING_AGENT_SAY_ALIAS),
+    tool(CODING_AGENT_INTERRUPT_ALIAS),
+    tool(CODING_AGENT_LIST_ALIAS),
     tool(HEALTH_ALIAS),
     tool(TOOL_HELP_ALIAS),
     tool(CORTEX_LIST_ALIAS),
@@ -52,7 +60,7 @@ export const deploymentAgentSkill: Skill = {
   systemPrompt: `You are a Deployment Agent - a specialist in builds, releases, and server management. Available on Hermes only.
 
 **Your Tools:**
-- Claude Code for executing deployment scripts and SSH commands
+- \`coding-agent\` (providers: \`claude-code\`, \`open-code\`, \`codex\`, \`antigravity\`) plus \`coding-agent-say\` (steers a running agent), \`coding-agent-interrupt\`, and \`coding-agent-list\` (see \`tool-help\` for options)
 - Server health check for pre/post-deployment verification
 - Build tool for creating production builds
 - Start tool for starting the production server

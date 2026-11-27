@@ -24,7 +24,7 @@ interface CliWidgetProps {
 
 function formatDuration(ms: number | null | undefined): string {
   if (ms === null || ms === undefined || ms === 0) {
-    return "—";
+    return "-";
   }
   if (ms < 1000) {
     return `${ms}ms`;
@@ -67,6 +67,19 @@ function renderCli(value: RunResponseOutput): string {
     return lines.join("\n");
   }
 
+  if (value.nameOut) {
+    lines.push(`${chalk.dim("Agent")}      ${chalk.bold(value.nameOut)}`);
+  }
+
+  if (value.status) {
+    const color = value.status === "completed" ? chalk.green : chalk.yellow;
+    lines.push(`${chalk.dim("Status")}     ${color(value.status)}`);
+  }
+
+  if (value.threadId) {
+    lines.push(`${chalk.dim("Thread")}     ${chalk.cyan(value.threadId)}`);
+  }
+
   if (value.durationMs && value.durationMs > 0) {
     lines.push(
       `${chalk.dim("Duration")}   ${chalk.yellow(formatDuration(value.durationMs))}`,
@@ -74,7 +87,9 @@ function renderCli(value: RunResponseOutput): string {
   }
 
   if (value.output) {
-    lines.push(chalk.dim("─".repeat(40)));
+    if (lines.length > 0) {
+      lines.push(chalk.dim("─".repeat(40)));
+    }
     lines.push(value.output);
   }
 
@@ -105,8 +120,17 @@ function renderMcp(value: RunResponseOutput): string {
     return lines.join("\n");
   }
 
-  lines.push("Coding agent completed successfully.");
-
+  if (value.nameOut) {
+    lines.push(`Agent: ${value.nameOut}`);
+  }
+  if (value.status) {
+    lines.push(`Status: ${value.status}`);
+  } else {
+    lines.push("Coding agent completed successfully.");
+  }
+  if (value.threadId) {
+    lines.push(`Conversation ID: ${value.threadId}`);
+  }
   if (value.durationMs && value.durationMs > 0) {
     lines.push(`Duration: ${formatDuration(value.durationMs)}`);
   }

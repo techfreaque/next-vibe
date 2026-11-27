@@ -2,152 +2,299 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   category: "Agent",
+  "claude-code": "Claude Code",
+  "open-code": "OpenCode",
+  codex: "Codex",
+  antigravity: "Antigravity CLI",
+  idle: "Inattivo",
+  running: "In corso",
+  completed: "Completato",
+  interrupted: "Interrotto",
+  failed: "Non riuscito",
+  "read-only": "Sola lettura",
+  "workspace-write": "Scrittura nell'area di lavoro",
+  "danger-full-access": "Accesso completo",
   codingAgent: {
     tags: {
       tasks: "Compiti",
     },
     run: {
       post: {
-        title: "Run Coding Agent",
+        title: "Avvia agente di programmazione",
         titleShort: "Agente di programmazione",
-        dynamicTitle: "Agente di codifica: {{prompt}}",
+        dynamicTitle: "Agente di programmazione: {{prompt}}",
         description:
-          "Eseguire un compito agente di codifica. Modalità Batch (DEFAULT): viene eseguito senza testa e restituisce l'output. Modalità interattiva: apre una sessione terminale dal vivo - il risultato viene rispedito automaticamente quando la sessione termina.",
+          "Esegue un compito con Claude Code, OpenCode, Codex o Antigravity. Indica un nome per salvare e riprendere la conversazione con guida in tempo reale, oppure attiva interactiveMode=true per aprire un terminale.",
         fields: {
-          prompt: {
-            label: "Prompt",
+          name: {
+            label: "Nome agente",
             description:
-              "Il compito o la domanda di inviare all'agente di codifica. Essere specifici - includere i percorsi di file, il contesto e il formato di output previsto.",
+              "Nome persistente facoltativo (da 1 a 40 lettere, cifre, trattini o trattini bassi). Riusare il nome riprende la conversazione.",
+          },
+          prompt: {
+            label: "Compito",
+            description:
+              "Il compito o la domanda da inviare all'agente. Indica percorsi file, contesto e verifiche attese.",
+          },
+          promptFile: {
+            label: "File del compito",
+            description:
+              "Percorso del file di istruzioni relativo alla cartella corrente. Alternativa al testo diretto.",
           },
           provider: {
-            label: "Fornitore",
+            label: "Provider",
             description:
-              "Quale agente di codifica CLI da usare. claude-code utilizza lo Claude CLI; open-code utilizza l'OpenCode CLI.",
+              "CLI da usare: claude-code, open-code, codex o antigravity. Predefinito codex per nuovi agenti con nome, claude-code per esecuzioni senza nome.",
             options: {
               claudeCode: "Claude Code",
               openCode: "OpenCode",
+              codex: "Codex",
+              antigravity: "Antigravity CLI",
             },
           },
           model: {
             label: "Modello",
             description:
-              "Modello da usare. Per Claude Code: modello ID (ad esempio claude-sonnet-4-6). Per OpenCode: provider/modello (ad esempio antropologico/claude-sonnet-4-6). Lasciare vuoto per impostazione predefinita.",
+              "ID modello del provider. Lascia vuoto per il predefinito (Antigravity usa Gemini 4 Neon High, Codex usa gpt-6.2-sol).",
+          },
+          effort: {
+            label: "Livello di ragionamento",
+            description:
+              "Livello di ragionamento per Codex o Antigravity (es. low, medium, high).",
+          },
+          sandbox: {
+            label: "Sandbox Codex",
+            description:
+              "Isolamento file per Codex (read-only, workspace-write o danger-full-access).",
+          },
+          cwd: {
+            label: "Cartella di lavoro",
+            description:
+              "Cartella in cui lavora l'agente. Predefinita la cartella corrente.",
+          },
+          fresh: {
+            label: "Nuova conversazione",
+            description:
+              "Avvia una nuova conversazione invece di riprendere il thread salvato per questo nome.",
           },
           taskTitle: {
-            label: "Titolo della missione",
+            label: "Titolo del compito",
             description:
-              "Titolo breve per l'archiviazione di questa attività (ad esempio 'Fix login bug'). Auto-generato dal prompt se omesso.",
+              "Titolo breve per archiviare il compito. Generato automaticamente dal prompt se omesso.",
           },
           interactiveMode: {
             label: "Modalità interattiva",
             description:
-              "falso (DEFAULT): viene eseguito senza testa e restituisce tutto l'output quando fatto. true: apre una finestra terminale per una sessione live - il risultato viene rispedito automaticamente quando la sessione termina.",
+              "false (PREDEFINITO): esegue senza interfaccia e restituisce l'output. true: apre una finestra terminale dal vivo e invia il risultato al termine.",
           },
           output: {
-            label: "Produzione",
+            label: "Output",
             description:
-              "Stdout combinato dal processo dell'agente di codifica. Vuoto quando l'attività è stata escalata all'esecuzione di sfondo (risultato iniettato tramite wakeUp).",
+              "Risposta finale o stdout combinato dell'agente. Vuoto se il compito prosegue in background.",
           },
           durationMs: {
-            label: "Durata (m)",
-            description: "Tempo totale di parete-clock il processo è corso.",
+            label: "Durata (ms)",
+            description: "Tempo totale di esecuzione del processo.",
+          },
+          threadId: {
+            label: "ID conversazione",
+            description:
+              "ID salvato del thread o della sessione per riprendere un agente con nome.",
+          },
+          status: {
+            label: "Stato",
+            description: "Esito del turno dell'agente persistente.",
           },
           taskId: {
-            label: "Task ID",
+            label: "ID compito",
             description:
-              "Per la modalità interattiva: l'attività di tracciamento ID. Il risultato viene rispedito automaticamente. Per modalità batch: non presente (risultato restituito in linea).",
+              "In modalità interattiva: ID di tracciamento. Il risultato viene recapitato automaticamente.",
           },
           hint: {
-            label: "Hit",
+            label: "Indicazione",
             description:
-              "Guida per la AI su come il risultato sarà consegnato.",
+              "Indicazione per l'IA su come verrà recapitato il risultato.",
           },
         },
         errors: {
           validation: {
             title: "Errore di convalida",
             description:
-              "Parametri di richiesta non valida - verifica richiesta e campi",
+              "Parametri non validi. Controlla nome agente, compito e opzioni.",
           },
           unauthorized: {
-            title: "Autenticazione richiesta",
+            title: "Non autorizzato",
             description:
-              "Autenticazione richiesta - ruolo di amministratore necessario",
+              "Accesso richiesto. Serve un account admin o il login CLI del provider.",
           },
           internal: {
             title: "Esecuzione non riuscita",
             description:
-              "Il processo di agente di codifica non è riuscito a iniziare o crash inaspettatamente",
+              "Il processo dell'agente non si è avviato o si è arrestato in modo imprevisto.",
           },
           binaryMissing: {
             title:
-              "{{bin}} non è installato su questa istanza - installarlo o scegliere un altro agente di codifica",
+              "{{bin}} non è installato su questa istanza. Installalo o scegli un altro provider.",
             description:
-              "L'agente di codifica CLI binario non è stato trovato su PATH di questo server",
+              "Il binario CLI dell'agente non è stato trovato nel PATH di questo server.",
           },
           internalExitCode: {
             title: "Esecuzione non riuscita (uscita {{exitCode}})",
             description:
-              "Processo di agente di codifica uscito con un codice di uscita non zero",
+              "Il processo dell'agente è terminato con un codice diverso da zero.",
           },
           forbidden: {
             title: "Accesso negato",
-            description: "Accesso negato - autorizzazioni insufficienti",
+            description:
+              "Permessi insufficienti. Controlla le autorizzazioni del provider.",
           },
           notFound: {
             title: "Non trovato",
-            description: "Resource o directory di lavoro non trovata",
+            description:
+              "Agente, file del compito o cartella di lavoro non trovati.",
           },
           vibeCoderRedirect: {
-            title: "Utilizzare la corsia con vibra-coder invece",
+            title: "Usa invece ai-run con vibe-coder",
             description:
-              "L'agente di codifica e' pronto per l'ammortizzatore. Utilizzare lo strumento ai-run con l'abilità vibra-coder.",
+              "L'agente di programmazione è impostato su vibe-coder. Usa lo strumento ai-run con la skill vibe-coder.",
           },
           network: {
             title: "Errore di rete",
-            description: "Errore di rete che comunica con l'agente di codifica",
+            description: "Il provider o l'agente non è disponibile al momento.",
           },
           unknown: {
             title: "Errore sconosciuto",
             description:
-              "Un errore inaspettato si è verificato durante l'esecuzione",
+              "Si è verificato un errore imprevisto durante l'esecuzione.",
           },
           unsaved: {
             title: "Modifiche non salvate",
-            description: "Rilevato conflitto di modifiche non rilevate",
+            description: "Rilevato conflitto con modifiche non salvate.",
           },
           conflict: {
             title: "Conflitto",
             description:
-              "conflitto di esecuzione - un'altra sessione può essere in esecuzione",
+              "Un altro agente è già in esecuzione con questo nome oppure la conversazione salvata usa un altro provider.",
           },
+          detail: "Operazione dell'agente non riuscita: {{detail}}",
         },
         backButton: {
           label: "Indietro",
         },
         submitButton: {
-          label: "Invia",
-          loadingText: "Invio in corso...",
+          label: "Avvia",
+          loadingText: "In corso...",
         },
         success: {
-          title: "Agente di Coding Completato",
+          title: "Agente completato",
           description:
-            "Processo agente di codifica finito con successo. Se l'output è vuoto, il risultato arriverà attraverso l'iniezione del thread.",
+            "L'agente ha completato l'esecuzione. Se l'output è vuoto, il risultato arriverà nel thread.",
         },
         widget: {
-          runningBatch: "Correre...",
-          runningInteractive: "Avviare la sessione terminale interattiva...",
+          runningBatch: "In corso...",
+          runningInteractive: "Avvio della sessione terminale interattiva...",
           escalated:
-            "Correre in background - il risultato verrà iniettato quando completo.",
-          taskIdLabel: "Task ID",
-          outputLabel: "Produzione",
+            "In esecuzione in background. Il risultato verrà recapitato al termine.",
+          taskIdLabel: "ID compito",
+          outputLabel: "Output",
           interactiveSessionLaunched:
-            "Sessione interattiva lanciata in terminal.",
+            "Sessione interattiva avviata nel terminale.",
           copyOutput: "Copia",
           copied: "Copiato!",
-          interactive: "Interattivo interattivo",
+          interactive: "Interattivo",
           emptyPromptHint:
-            "Inserisci un prompt qui sotto per eseguire l'agente di codifica",
+            "Inserisci un compito qui sotto per avviare l'agente",
+          agentNamePlaceholder: "Nome agente (facoltativo)",
+        },
+      },
+    },
+    say: {
+      post: {
+        title: "Guida agente di programmazione",
+        titleShort: "Guida agente",
+        description:
+          "Invia un messaggio durante il turno a un agente Codex o Antigravity attivo. A turno concluso, riusa il nome con coding-agent per continuare.",
+        success: {
+          title: "Messaggio consegnato",
+          description: "Messaggio inviato all'agente in esecuzione.",
+        },
+        fields: {
+          message: {
+            label: "Messaggio",
+            description: "Indicazione da inviare al turno in corso.",
+          },
+          messageFile: {
+            label: "File del messaggio",
+            description:
+              "Percorso del file con il messaggio, relativo alla cartella corrente.",
+          },
+          delivered: {
+            label: "Consegnato",
+          },
+        },
+      },
+    },
+    interrupt: {
+      post: {
+        title: "Interrompi agente di programmazione",
+        titleShort: "Interrompi agente",
+        description:
+          "Ferma il turno attivo di un agente Codex o Antigravity. Riusa il nome più tardi per riprendere la conversazione.",
+        success: {
+          title: "Interruzione richiesta",
+          description: "Segnale di interruzione elaborato per l'agente.",
+        },
+        fields: {
+          interrupted: {
+            label: "Interruzione inviata",
+          },
+          noInterrupt: {
+            label: "Nessun turno attivo",
+          },
+        },
+      },
+    },
+    list: {
+      post: {
+        title: "Elenca agenti di programmazione",
+        titleShort: "Elenca agenti",
+        description:
+          "Elenca gli agenti attivi e salvati. Indica un nome per vedere stato, registro recente e ultima risposta.",
+        success: {
+          title: "Agenti caricati",
+          description: "Elenco degli agenti attivi e salvati pronto.",
+        },
+        fields: {
+          summary: "{{name}} · {{provider}} · {{status}}",
+          agents: {
+            label: "Agenti",
+          },
+          noAgents: {
+            label: "Nessun agente persistente per ora.",
+          },
+          lines: {
+            label: "Righe del registro",
+            description:
+              "Numero di righe finali del registro da includere per un singolo agente.",
+          },
+          tail: {
+            label: "Registro recente",
+          },
+          emptyTail: {
+            label: "Il registro è vuoto.",
+          },
+          lastMessage: {
+            label: "Ultima risposta",
+          },
+          lastError: {
+            label: "Ultimo errore",
+          },
+          startedAt: {
+            label: "Avvio",
+          },
+          finishedAt: {
+            label: "Fine",
+          },
         },
       },
     },

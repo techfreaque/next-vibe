@@ -41,7 +41,8 @@ When delegating coding work, use the \`ai-run\` tool with the \`vibe-coder\` ski
 
       return `## Coding Agent
 
-When delegating coding work, use the \`coding-agent\` tool. Pass the full task description as the prompt.`;
+When delegating coding work, use \`coding-agent\` (providers: \`claude-code\`, \`open-code\`, \`codex\`, \`antigravity\`; pass a name for persistent resumable sessions, or \`interactiveMode\` for a live terminal).
+Control running agents with \`coding-agent-say\` (steers a running agent mid-turn), \`coding-agent-interrupt\` (stops the active turn), and \`coding-agent-list\` (status and transcript tail). Use \`tool-help\` for full options.`;
     } catch {
       return null;
     }

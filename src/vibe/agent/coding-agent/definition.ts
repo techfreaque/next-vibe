@@ -1,13 +1,15 @@
 /**
  * Coding Agent API Definition
- * POST endpoint that dispatches to a coding agent CLI (claude-code or open-code).
- * - interactiveMode:false (DEFAULT) → batch mode; output collected and returned.
- * - interactiveMode:true → live terminal session; result delivered back automatically when done.
+ *
+ * Unified POST endpoint supporting:
+ * - Batch & interactive sessions (Claude Code, OpenCode, Codex, Antigravity)
+ * - Named persistent sub-agents with conversation resume, mid-turn steering
+ *   (coding-agent-say), interrupt (coding-agent-interrupt) and status/tail
+ *   inspection (coding-agent-list).
  */
 
 import { createEndpoint } from "next-vibe/core/definition/create-i18n";
 import {
-  EndpointErrorTypes,
   FieldDataType,
   Methods,
   WidgetType,
@@ -24,6 +26,15 @@ import {
 import { z } from "zod";
 
 import { CODING_AGENT_ALIAS } from "./constants";
+import {
+  CodingAgentProvider,
+  codingAgentProviderOptions,
+  codingAgentProviderSchema,
+  sandboxOptions,
+  sandboxSchema,
+  successfulStatusSchema,
+} from "./enum";
+import { codingAgentErrorTypes, codingAgentRoles } from "./fields";
 import { scopedTranslation } from "./i18n";
 
 const CodingAgentWidget = lazyWidget(() =>
@@ -38,11 +49,9 @@ const { POST } = createEndpoint({
   titleShort: "codingAgent.run.post.titleShort",
   description: "codingAgent.run.post.description",
   dynamicTitle: ({ request }) => {
-    if (request?.prompt) {
-      const prompt =
-        request.prompt.length > 40
-          ? `${request.prompt.slice(0, 40)}...`
-          : request.prompt;
+    const label = request?.name || request?.prompt;
+    if (label) {
+      const prompt = label.length > 40 ? `${label.slice(0, 40)}...` : label;
       return {
         message: "codingAgent.run.post.dynamicTitle" as const,
         messageParams: { prompt },
@@ -54,16 +63,24 @@ const { POST } = createEndpoint({
   category: "ai",
   subCategory: "Tools",
   tags: ["codingAgent.tags.tasks" as const],
-  allowedRoles: [UserRole.ADMIN],
+  allowedRoles: codingAgentRoles,
   defaultAiPinned: [UserRole.ADMIN] as const,
   defaultWebPinned: [UserRole.ADMIN] as const,
-  aliases: [CODING_AGENT_ALIAS, "claude-code", "claude", "open-code"],
+  aliases: [
+    CODING_AGENT_ALIAS,
+    "subagent-run",
+    "claude-code",
+    "claude",
+    "open-code",
+    "codex",
+    "antigravity",
+  ],
 
   // No timeout - sessions can run indefinitely
   timeoutMs: 0,
 
   cli: {
-    firstCliArgKey: "prompt",
+    firstCliArgKey: "name",
   },
 
   fields: customWidgetObject({
@@ -71,13 +88,29 @@ const { POST } = createEndpoint({
     usage: { request: "data", response: true },
     children: {
       // ── Request fields ──────────────────────────────────────────────────
+      name: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "codingAgent.run.post.fields.name.label",
+        description: "codingAgent.run.post.fields.name.description",
+        columns: 6,
+        schema: z.string().optional(),
+      }),
       prompt: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXTAREA,
         label: "codingAgent.run.post.fields.prompt.label",
         description: "codingAgent.run.post.fields.prompt.description",
         columns: 12,
-        schema: z.string().min(1),
+        schema: z.string().optional(),
+      }),
+      promptFile: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "codingAgent.run.post.fields.promptFile.label",
+        description: "codingAgent.run.post.fields.promptFile.description",
+        columns: 12,
+        schema: z.string().optional(),
       }),
       provider: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -85,19 +118,8 @@ const { POST } = createEndpoint({
         label: "codingAgent.run.post.fields.provider.label",
         description: "codingAgent.run.post.fields.provider.description",
         columns: 6,
-        options: [
-          {
-            value: "claude-code",
-            label:
-              "codingAgent.run.post.fields.provider.options.claudeCode" as const,
-          },
-          {
-            value: "open-code",
-            label:
-              "codingAgent.run.post.fields.provider.options.openCode" as const,
-          },
-        ],
-        schema: z.enum(["claude-code", "open-code"]).default("claude-code"),
+        options: codingAgentProviderOptions,
+        schema: codingAgentProviderSchema.optional(),
       }),
       model: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -106,6 +128,39 @@ const { POST } = createEndpoint({
         description: "codingAgent.run.post.fields.model.description",
         columns: 6,
         schema: z.string().optional(),
+      }),
+      effort: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "codingAgent.run.post.fields.effort.label",
+        description: "codingAgent.run.post.fields.effort.description",
+        columns: 6,
+        schema: z.string().optional(),
+      }),
+      sandbox: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "codingAgent.run.post.fields.sandbox.label",
+        description: "codingAgent.run.post.fields.sandbox.description",
+        columns: 6,
+        options: sandboxOptions,
+        schema: sandboxSchema.optional(),
+      }),
+      cwd: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "codingAgent.run.post.fields.cwd.label",
+        description: "codingAgent.run.post.fields.cwd.description",
+        columns: 12,
+        schema: z.string().optional(),
+      }),
+      fresh: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "codingAgent.run.post.fields.fresh.label",
+        description: "codingAgent.run.post.fields.fresh.description",
+        columns: 6,
+        schema: z.boolean().optional(),
       }),
       taskTitle: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -151,6 +206,23 @@ const { POST } = createEndpoint({
         label: "codingAgent.run.post.fields.durationMs.label",
         schema: z.number(),
       }),
+      nameOut: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z.string().optional(),
+      }),
+      threadId: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "codingAgent.run.post.fields.threadId.label",
+        hidden: true,
+        schema: z.string().optional(),
+      }),
+      status: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "codingAgent.run.post.fields.status.label",
+        hidden: true,
+        schema: successfulStatusSchema.optional(),
+      }),
       taskId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         hidden: true,
@@ -169,44 +241,7 @@ const { POST } = createEndpoint({
     },
   }),
 
-  errorTypes: {
-    [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "codingAgent.run.post.errors.validation.title",
-      description: "codingAgent.run.post.errors.validation.description",
-    },
-    [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "codingAgent.run.post.errors.unauthorized.title",
-      description: "codingAgent.run.post.errors.unauthorized.description",
-    },
-    [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "codingAgent.run.post.errors.internal.title",
-      description: "codingAgent.run.post.errors.internal.description",
-    },
-    [EndpointErrorTypes.FORBIDDEN]: {
-      title: "codingAgent.run.post.errors.forbidden.title",
-      description: "codingAgent.run.post.errors.forbidden.description",
-    },
-    [EndpointErrorTypes.NOT_FOUND]: {
-      title: "codingAgent.run.post.errors.notFound.title",
-      description: "codingAgent.run.post.errors.notFound.description",
-    },
-    [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "codingAgent.run.post.errors.network.title",
-      description: "codingAgent.run.post.errors.network.description",
-    },
-    [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "codingAgent.run.post.errors.unknown.title",
-      description: "codingAgent.run.post.errors.unknown.description",
-    },
-    [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "codingAgent.run.post.errors.unsaved.title",
-      description: "codingAgent.run.post.errors.unsaved.description",
-    },
-    [EndpointErrorTypes.CONFLICT]: {
-      title: "codingAgent.run.post.errors.conflict.title",
-      description: "codingAgent.run.post.errors.conflict.description",
-    },
-  },
+  errorTypes: codingAgentErrorTypes,
 
   successTypes: {
     title: "codingAgent.run.post.success.title",
@@ -218,24 +253,34 @@ const { POST } = createEndpoint({
       default: {
         prompt:
           "Add a new feature to the coding-agent endpoint that tracks how many times it has been called.",
-        provider: "claude-code",
+        provider: CodingAgentProvider.CLAUDE_CODE,
         interactiveMode: false,
       },
-      batch: {
-        prompt:
-          "Read src/vibe/agent/coding-agent/route.ts and summarize what it does in 2 sentences.",
-        provider: "claude-code",
+      namedCodex: {
+        name: "fix-login",
+        promptFile: ".tmp/briefs/fix-login.md",
+        interactiveMode: false,
+      },
+      namedAntigravity: {
+        name: "review-login",
+        provider: CodingAgentProvider.ANTIGRAVITY,
+        prompt: "Review the login flow and summarize your findings.",
+        interactiveMode: false,
+      },
+      followUp: {
+        name: "fix-login",
+        prompt: "Now also cover the logout path.",
         interactiveMode: false,
       },
       interactive: {
         prompt: "Fix the login bug - check the auth flow and patch it.",
-        provider: "claude-code",
+        provider: CodingAgentProvider.CLAUDE_CODE,
         interactiveMode: true,
         taskTitle: "Fix login bug",
       },
       openCode: {
         prompt: "Refactor the auth module to use the new token format.",
-        provider: "open-code",
+        provider: CodingAgentProvider.OPEN_CODE,
         model: "anthropic/claude-sonnet-4-6",
         interactiveMode: false,
       },
@@ -247,8 +292,15 @@ const { POST } = createEndpoint({
       },
       batch: {
         output:
-          "The route dispatches to the selected coding agent provider (claude-code or open-code) based on the provider field.",
+          "The route dispatches to the selected coding agent provider based on the provider field.",
         durationMs: 8342,
+      },
+      persistent: {
+        output: "Fixed the redirect and passed the login tests.",
+        durationMs: 42100,
+        nameOut: "fix-login",
+        threadId: "019e0000-0000-7000-8000-000000000000",
+        status: "completed",
       },
       escalated: {
         output: "",

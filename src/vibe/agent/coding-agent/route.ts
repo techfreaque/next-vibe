@@ -1,7 +1,9 @@
 /**
  * Coding Agent Route Handler
- * Dispatches to the selected provider config based on data.provider.
+ * Dispatches to the selected provider (Claude Code, OpenCode, Codex, or Antigravity).
  */
+
+import "server-only";
 
 import { Methods } from "next-vibe/core/definition/enums";
 import { endpointsHandler } from "next-vibe/core/route/multi";

@@ -1,8 +1,8 @@
 /**
  * Coding Agent Widget
  *
- * Chat-style layout. Selector slot shows provider toggle (claude-code / open-code)
- * and interactive mode toggle. Model is a text field in the form below.
+ * Chat-style layout. Selector slot shows provider toggle (Claude Code / OpenCode /
+ * Codex / Antigravity CLI), optional persistent agent name, and interactive mode toggle.
  */
 
 "use client";
@@ -12,6 +12,7 @@ import { Div } from "next-vibe/ui/components/div";
 import { ChevronDown } from "next-vibe/ui/components/icons/ChevronDown";
 import { Mic } from "next-vibe/ui/components/icons/Mic";
 import { Terminal } from "next-vibe/ui/components/icons/Terminal";
+import { Input } from "next-vibe/ui/components/input";
 import { Markdown } from "next-vibe/ui/components/markdown";
 import {
   Popover,
@@ -57,7 +58,9 @@ import type { MessageGroup } from "../chat/threads/[threadId]/messages/widget/me
 import { StaticUserMessageBubble } from "../chat/threads/[threadId]/messages/widget/user-message-bubble";
 import { NO_SKILL_ID } from "../skills/constants";
 import type definition from "./definition";
+import { CodingAgentProvider } from "./enum";
 import { scopedTranslation } from "./i18n";
+import type { CodingAgentProviderValue } from "./types";
 
 interface WidgetProps {
   field: (typeof definition.POST)["fields"];
@@ -118,9 +121,11 @@ function makeUserMessage(content: string, id: string): ChatMessage {
   };
 }
 
-const PROVIDER_TO_MODEL: Record<string, ChatModelId> = {
-  "claude-code": ChatModelId.CLAUDE_SONNET_5_5,
-  "open-code": ChatModelId.CLAUDE_SONNET_5_5, // fallback until OpenCode model added
+const PROVIDER_TO_MODEL: Record<CodingAgentProviderValue, ChatModelId> = {
+  [CodingAgentProvider.CLAUDE_CODE]: ChatModelId.CLAUDE_SONNET_5_5,
+  [CodingAgentProvider.OPEN_CODE]: ChatModelId.CLAUDE_SONNET_5_5,
+  [CodingAgentProvider.CODEX]: ChatModelId.GPT_6_1_TERRA,
+  [CodingAgentProvider.ANTIGRAVITY]: ChatModelId.GEMINI_4_ARGON,
 };
 
 function makeAssistantMessage(
@@ -153,22 +158,44 @@ function makeAssistantMessage(
   };
 }
 
-const PROVIDERS = [
-  { value: "claude-code" as const, label: "Claude Code" },
-  { value: "open-code" as const, label: "OpenCode" },
+const PROVIDERS: readonly {
+  value: CodingAgentProviderValue;
+  labelKey:
+    | "codingAgent.run.post.fields.provider.options.claudeCode"
+    | "codingAgent.run.post.fields.provider.options.openCode"
+    | "codingAgent.run.post.fields.provider.options.codex"
+    | "codingAgent.run.post.fields.provider.options.antigravity";
+}[] = [
+  {
+    value: CodingAgentProvider.CLAUDE_CODE,
+    labelKey: "codingAgent.run.post.fields.provider.options.claudeCode",
+  },
+  {
+    value: CodingAgentProvider.OPEN_CODE,
+    labelKey: "codingAgent.run.post.fields.provider.options.openCode",
+  },
+  {
+    value: CodingAgentProvider.CODEX,
+    labelKey: "codingAgent.run.post.fields.provider.options.codex",
+  },
+  {
+    value: CodingAgentProvider.ANTIGRAVITY,
+    labelKey: "codingAgent.run.post.fields.provider.options.antigravity",
+  },
 ];
 
 function ProviderSelector({
   provider,
   onProviderChange,
   disabled,
+  labels,
 }: {
-  provider: "claude-code" | "open-code";
-  onProviderChange: (p: "claude-code" | "open-code") => void;
+  provider: CodingAgentProviderValue;
+  onProviderChange: (p: CodingAgentProviderValue) => void;
   disabled?: boolean;
+  labels: Record<CodingAgentProviderValue, string>;
 }): JSX.Element {
   const [open, setOpen] = useState(false);
-  const current = PROVIDERS.find((p) => p.value === provider) ?? PROVIDERS[0];
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -183,14 +210,14 @@ function ProviderSelector({
             disabled && "opacity-70 pointer-events-none",
           )}
         >
-          <Span className="hidden @md:inline max-w-[90px] truncate text-muted-foreground">
-            {current.label}
+          <Span className="hidden @md:inline max-w-[110px] truncate text-muted-foreground">
+            {labels[provider]}
           </Span>
           <ChevronDown className="h-4 w-4 opacity-50 shrink-0" />
         </Button>
       </PopoverTrigger>
       <PopoverContent
-        className="p-1 w-40"
+        className="p-1 w-44"
         align="start"
         side="top"
         sideOffset={8}
@@ -210,7 +237,7 @@ function ProviderSelector({
               setOpen(false);
             }}
           >
-            {p.label}
+            {labels[p.value]}
           </Button>
         ))}
       </PopoverContent>
@@ -233,17 +260,34 @@ export function CodingAgentWidget({ field }: WidgetProps): JSX.Element {
   const result = useWidgetValue<typeof definition.POST>();
   const rawResponse = useWidgetResponse();
   const promptValue = form.watch("prompt") ?? "";
-  const providerValue = form.watch("provider") ?? "claude-code";
+  const nameValue = form.watch("name") ?? "";
+  const providerValue: CodingAgentProviderValue =
+    form.watch("provider") ??
+    (nameValue ? CodingAgentProvider.CODEX : CodingAgentProvider.CLAUDE_CODE);
   const interactiveMode = form.watch("interactiveMode") ?? false;
 
-  // Derive response data from multiple sources (context store, raw response, form defaults).
-  // useWidgetValue uses useShallow which can miss on initial render in some cases,
-  // so we also check the raw response and form defaults as fallbacks.
+  const providerLabels: Record<CodingAgentProviderValue, string> = useMemo(
+    () => ({
+      [CodingAgentProvider.CLAUDE_CODE]: t(
+        "codingAgent.run.post.fields.provider.options.claudeCode",
+      ),
+      [CodingAgentProvider.OPEN_CODE]: t(
+        "codingAgent.run.post.fields.provider.options.openCode",
+      ),
+      [CodingAgentProvider.CODEX]: t(
+        "codingAgent.run.post.fields.provider.options.codex",
+      ),
+      [CodingAgentProvider.ANTIGRAVITY]: t(
+        "codingAgent.run.post.fields.provider.options.antigravity",
+      ),
+    }),
+    [t],
+  );
+
   const effectiveResult = useMemo(() => {
     if (result) {
       return result;
     }
-    // Fallback: read response data directly from context (bypasses useShallow)
     if (rawResponse?.success && rawResponse.data) {
       const d: Record<string, string | number | boolean | null | undefined> =
         rawResponse.data;
@@ -251,6 +295,13 @@ export function CodingAgentWidget({ field }: WidgetProps): JSX.Element {
         return {
           output: d["output"],
           durationMs: typeof d["durationMs"] === "number" ? d["durationMs"] : 0,
+          nameOut: typeof d["nameOut"] === "string" ? d["nameOut"] : undefined,
+          threadId:
+            typeof d["threadId"] === "string" ? d["threadId"] : undefined,
+          status:
+            d["status"] === "completed" || d["status"] === "interrupted"
+              ? d["status"]
+              : undefined,
           taskId: typeof d["taskId"] === "string" ? d["taskId"] : undefined,
           hint: typeof d["hint"] === "string" ? d["hint"] : undefined,
           terminalPending:
@@ -263,7 +314,6 @@ export function CodingAgentWidget({ field }: WidgetProps): JSX.Element {
     if (!isDisabled) {
       return undefined;
     }
-    // Last resort: response fields are merged into form defaults by EndpointRenderer
     const vals: Record<string, string | number | boolean | null | undefined> =
       form.getValues();
     const output = vals["output"];
@@ -287,7 +337,6 @@ export function CodingAgentWidget({ field }: WidgetProps): JSX.Element {
     }
   }, [effectiveResult, isSubmitting]);
 
-  // Fresh message ids whenever the prompt is edited (adjusted during render)
   const [msgIds, setMsgIds] = useState(() => ({
     prompt: promptValue,
     user: makeMsgId(),
@@ -319,8 +368,15 @@ export function CodingAgentWidget({ field }: WidgetProps): JSX.Element {
   }, [form, interactiveMode]);
 
   const handleProviderChange = useCallback(
-    (p: "claude-code" | "open-code") => {
+    (p: CodingAgentProviderValue) => {
       form.setValue("provider", p, { shouldDirty: true });
+    },
+    [form],
+  );
+
+  const handleNameChange = useCallback(
+    (val: string) => {
+      form.setValue("name", val || undefined, { shouldDirty: true });
     },
     [form],
   );
@@ -362,13 +418,33 @@ export function CodingAgentWidget({ field }: WidgetProps): JSX.Element {
       effectiveResult.durationMs === 0 &&
       !!effectiveResult.output;
     if (escalated) {
-      return `⟳ Running in background…\n\nTask ID: \`${effectiveResult.taskId}\`${effectiveResult.hint ? `\n\n${effectiveResult.hint}` : ""}`;
+      return `⟳ ${t("codingAgent.run.post.widget.escalated")}\n\n${t("codingAgent.run.post.widget.taskIdLabel")}: \`${effectiveResult.taskId}\`${effectiveResult.hint ? `\n\n${effectiveResult.hint}` : ""}`;
     }
     if (interactiveLaunched) {
-      return `◆ Interactive session launched in terminal\n\nTask ID: \`${effectiveResult.taskId}\`${effectiveResult.output ? `\n\n${effectiveResult.output}` : ""}`;
+      return `◆ ${t("codingAgent.run.post.widget.interactiveSessionLaunched")}\n\n${t("codingAgent.run.post.widget.taskIdLabel")}: \`${effectiveResult.taskId}\`${effectiveResult.output ? `\n\n${effectiveResult.output}` : ""}`;
+    }
+    if (effectiveResult.threadId || effectiveResult.status) {
+      const statusLabel =
+        effectiveResult.status === "completed"
+          ? t("completed")
+          : effectiveResult.status === "interrupted"
+            ? t("interrupted")
+            : undefined;
+      const header = [
+        effectiveResult.nameOut ? `**${effectiveResult.nameOut}**` : undefined,
+        statusLabel,
+        effectiveResult.threadId
+          ? `\`${effectiveResult.threadId}\``
+          : undefined,
+      ]
+        .filter(Boolean)
+        .join(" · ");
+      return header
+        ? `${header}\n\n${effectiveResult.output ?? ""}`
+        : (effectiveResult.output ?? "");
     }
     return effectiveResult.output ?? "";
-  }, [effectiveResult]);
+  }, [effectiveResult, t]);
 
   const isAssistantLoading = (isSubmitting || isDisabled) && !effectiveResult;
 
@@ -399,7 +475,17 @@ export function CodingAgentWidget({ field }: WidgetProps): JSX.Element {
           provider={providerValue}
           onProviderChange={handleProviderChange}
           disabled={isDisabled}
+          labels={providerLabels}
         />
+        {!isDisabled && (
+          <Input
+            type="text"
+            value={nameValue}
+            onChange={(event) => handleNameChange(event.target.value)}
+            placeholder={t("codingAgent.run.post.widget.agentNamePlaceholder")}
+            className="h-8 w-36 text-xs"
+          />
+        )}
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
@@ -433,9 +519,7 @@ export function CodingAgentWidget({ field }: WidgetProps): JSX.Element {
               </Div>
             </TooltipTrigger>
             <TooltipContent>
-              {interactiveMode
-                ? "Interactive terminal mode - click to switch to batch"
-                : "Batch mode - click to switch to interactive terminal"}
+              {t("codingAgent.run.post.fields.interactiveMode.description")}
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
@@ -444,6 +528,9 @@ export function CodingAgentWidget({ field }: WidgetProps): JSX.Element {
     [
       providerValue,
       handleProviderChange,
+      providerLabels,
+      nameValue,
+      handleNameChange,
       interactiveMode,
       handleInteractiveToggle,
       isDisabled,
@@ -462,7 +549,6 @@ export function CodingAgentWidget({ field }: WidgetProps): JSX.Element {
           void startRecording();
         }}
         disabled={isDisabled}
-        title="Voice input"
       >
         <Mic className="h-4 w-4" />
       </Button>
@@ -577,7 +663,10 @@ export function CodingAgentWidget({ field }: WidgetProps): JSX.Element {
             <WidgetChatInput
               content={promptValue}
               onContentChange={handleContentChange}
-              modelId={ChatModelId.CLAUDE_SONNET_5_5}
+              modelId={
+                PROVIDER_TO_MODEL[providerValue] ??
+                ChatModelId.CLAUDE_SONNET_5_5
+              }
               skillId={NO_SKILL_ID}
               onModelChange={() => undefined}
               onSkillChange={() => undefined}

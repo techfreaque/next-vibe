@@ -14,6 +14,12 @@ import type { ChatTranslationKey } from "@/_pages/chat/i18n";
 
 import { DefaultFolderId } from "../../core/execution-context";
 import {
+  CODING_AGENT_ALIAS,
+  CODING_AGENT_INTERRUPT_ALIAS,
+  CODING_AGENT_LIST_ALIAS,
+  CODING_AGENT_SAY_ALIAS,
+} from "../coding-agent/constants";
+import {
   CORTEX_DELETE_ALIAS,
   CORTEX_EDIT_ALIAS,
   CORTEX_EXEC_ALIAS,
@@ -60,7 +66,10 @@ export const FOLDER_DENIED_TOOL_IDS: Partial<
     // fallback path, so the deny protected nothing. The async modes it could
     // open are blocked by FOLDER_BLOCKED_CALLBACK_MODES, and every denied
     // TARGET below is still refused by the execute-tool permission guard.
-    "coding-agent",
+    CODING_AGENT_ALIAS,
+    CODING_AGENT_SAY_ALIAS,
+    CODING_AGENT_INTERRUPT_ALIAS,
+    CODING_AGENT_LIST_ALIAS,
     CORTEX_EXEC_ALIAS,
     "await-task",
     "complete-task",
@@ -79,7 +88,10 @@ export const FOLDER_DENIED_TOOL_IDS: Partial<
     CORTEX_SEARCH_ALIAS,
   ],
   [DefaultFolderId.PUBLIC]: [
-    "coding-agent",
+    CODING_AGENT_ALIAS,
+    CODING_AGENT_SAY_ALIAS,
+    CODING_AGENT_INTERRUPT_ALIAS,
+    CODING_AGENT_LIST_ALIAS,
     CORTEX_EXEC_ALIAS,
     EXECUTE_TOOL_ALIAS,
     "await-task",

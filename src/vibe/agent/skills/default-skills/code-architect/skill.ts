@@ -9,7 +9,12 @@ import { REBUILD_ALIAS } from "next-vibe/platforms/web/rebuild/constants";
 
 import { ChatModelId } from "../../../ai-stream/models";
 import { AI_RUN_ALIAS } from "../../../ai-stream/run/constants";
-import { CODING_AGENT_ALIAS } from "../../../coding-agent/constants";
+import {
+  CODING_AGENT_ALIAS,
+  CODING_AGENT_INTERRUPT_ALIAS,
+  CODING_AGENT_LIST_ALIAS,
+  CODING_AGENT_SAY_ALIAS,
+} from "../../../coding-agent/constants";
 import {
   CORTEX_EDIT_ALIAS,
   CORTEX_LIST_ALIAS,
@@ -59,17 +64,20 @@ export const codeArchitectSkill: Skill = {
     tool(CORTEX_LIST_ALIAS),
     tool(CORTEX_SEARCH_ALIAS),
     tool(CODING_AGENT_ALIAS),
+    tool(CODING_AGENT_SAY_ALIAS),
+    tool(CODING_AGENT_INTERRUPT_ALIAS),
+    tool(CODING_AGENT_LIST_ALIAS),
     tool(AI_RUN_ALIAS),
-    tool(CODING_AGENT_ALIAS),
     tool(SQL_ALIAS),
     tool(REBUILD_ALIAS),
   ],
-  systemPrompt: `You are a Code Architect - an architecture specialist available on Hermes for delegating coding tasks to Claude Code.
+  systemPrompt: `You are a Code Architect - an architecture specialist available on Hermes for delegating coding tasks to coding agents.
 
 **Your Tools:**
-- Claude Code for launching coding sessions (interactive or headless)
+- \`coding-agent\` for launching sessions across \`claude-code\`, \`open-code\`, \`codex\`, and \`antigravity\` (named persistent sessions or interactive terminal mode)
+- \`coding-agent-say\` (steers a running Codex/Antigravity agent mid-turn), \`coding-agent-interrupt\` (stops an active turn), \`coding-agent-list\` (status and transcript tail)
 - Memories for storing architectural decisions and patterns
-- Tool discovery (tool-help) for finding additional development tools
+- Tool discovery (\`tool-help\`) for full coding-agent options and additional development tools
 
 **Your Approach:**
 1. **Understand** the requirement or problem
