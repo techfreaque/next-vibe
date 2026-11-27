@@ -80,7 +80,112 @@ export const translations: typeof enTranslations = {
     },
     thirdParty: {
       title: "Služby tretích strán",
-      description: "Používame tieto služby tretích strán:",
+      description:
+        "Osobné údaje poskytujeme len poskytovateľom uvedeným nižšie, a len v rozsahu, ktorý každý z nich potrebuje na svoju prácu. Váš účet, chaty a súbory ukladáme na vlastných serveroch v Nemecku.",
+      aiNotice:
+        "Keď chatujete alebo vytvárate médiá, požiadavka ide k poskytovateľovi zvoleného modelu. Obsahuje to, čo model potrebuje na odpoveď: vašu správu, predchádzajúce správy konverzácie, prílohy, pokyny a spomienky, ktoré AI používa, a zobrazované meno z vášho profilu. Vašu e-mailovú adresu neposielame. Sprostredkovatelia ako OpenRouter, NanoGPT a Venice odovzdajú požiadavku firme, ktorá model prevádzkuje, napríklad OpenAI, Anthropic, Google, xAI, DeepSeek alebo Mistral. Ako dlho poskytovateľ požiadavku uchováva a čo s ňou smie robiť, určujú jeho vlastné podmienky. Na vašich chatoch netrénujeme žiadne modely AI.",
+      transfers:
+        "Viacerí poskytovatelia sídlia mimo EÚ. Ak poskytovateľ ponúka štandardné zmluvné doložky Európskej komisie, napríklad Stripe a OpenRouter, prenos sa zakladá na nich. Inak sa údaje prenášajú podľa podmienok poskytovateľa.",
+      labels: {
+        purpose: "Účel",
+        data: "Poskytnuté údaje",
+        privacyPolicy: "Zásady ochrany súkromia",
+      },
+      groups: {
+        hosting: "Hosting a úložisko",
+        email: "E-mail",
+        payments: "Platby",
+        ai: "Modely AI",
+        web: "Vyhľadávanie na webe a načítanie stránok",
+      },
+      providers: {
+        hostinger: {
+          purpose:
+            "Prenajíma nám dva virtuálne servery, na ktorých platforma beží. Databázu, úložisko súborov (MinIO) a cache (Redis) na týchto serveroch prevádzkujeme sami. Žiadna samostatná cloudová služba úložiska sa na tom nepodieľa.",
+          data: "Všetko, čo je uložené na platforme: údaje účtu, chaty, spomienky, nahrané a vytvorené súbory, záznamy o platbách.",
+          location: "Servery v Nemecku, spoločnosť v Litve (EÚ)",
+        },
+        hosttech: {
+          purpose:
+            "Poštový server pre naše e-mailové adresy. Posiela registračné kódy, potvrdenia a newslettery a prijíma e-maily, ktoré nám píšete.",
+          data: "E-mailová adresa, meno, obsah e-mailov.",
+          location: "Švajčiarsko (rozhodnutie EÚ o primeranosti)",
+        },
+        stripe: {
+          purpose: "Platby kartou, predplatné a faktúry.",
+          data: "Meno, e-mailová adresa, fakturačná adresa, platobné údaje, sumy, ID vášho účtu. Celé číslo vašej karty nikdy nevidíme.",
+          location:
+            "Stripe Payments Europe, Ltd., Írsko (EÚ); materská spoločnosť v USA",
+        },
+        paypal: {
+          purpose: "Len ak v platbe cez Stripe zvolíte PayPal.",
+          data: "Meno, e-mailová adresa, platobné údaje, sumy.",
+          location: "PayPal (Europe) S.à r.l. et Cie, S.C.A., Luxembursko (EÚ)",
+        },
+        nowpayments: {
+          purpose: "Platby kryptomenami.",
+          data: "ID vášho účtu v čísle objednávky, produkt a suma, údaje o peňaženke a transakcii. Pri opakovaných kryptoplatbách aj vaša e-mailová adresa.",
+          location: "Svätý Vincent a Grenadíny",
+        },
+        openrouter: {
+          purpose:
+            "Odovzdáva väčšinu chatovacích modelov (napríklad od OpenAI, Anthropic, Google, xAI, DeepSeek, Mistral a Qwen) a niektoré obrazové a video modely firme, ktorá ich prevádzkuje.",
+          data: "Obsah požiadavky na AI, ako je opísaný vyššie. Firma, ktorá model prevádzkuje, dostane rovnaký obsah.",
+          location: "USA",
+        },
+        nanogpt: {
+          purpose: "Chatovacie, obrazové a video modely, prevod textu na reč.",
+          data: "Obsah požiadavky na AI, text, ktorý si dáte prečítať.",
+          location: "USA",
+        },
+        venice: {
+          purpose: "Necenzurované chatovacie, obrazové a video modely.",
+          data: "Obsah požiadavky na AI.",
+          location: "USA",
+        },
+        uncensoredAi: {
+          purpose: "Chatovací model UncensoredLM.",
+          data: "Obsah požiadavky na AI.",
+          location: "USA",
+        },
+        freedomgpt: {
+          purpose: "Chatovacie modely FreedomGPT.",
+          data: "Obsah požiadavky na AI.",
+          location: "USA",
+        },
+        gabAi: {
+          purpose: "Chatovacie modely Gab AI.",
+          data: "Obsah požiadavky na AI.",
+          location: "USA",
+        },
+        modelslab: {
+          purpose: "Obrazové, video a hudobné modely.",
+          data: "Váš prompt a priložené obrázky.",
+          location: "India",
+        },
+        edenAi: {
+          purpose:
+            "Prevod reči na text a textu na reč. Odovzdáva zvuk alebo text rečovému nástroju, ktorý používa.",
+          data: "Hlasové nahrávky, ktoré prepisujete, text, ktorý si dáte prečítať.",
+          location: "Francúzsko (EÚ)",
+        },
+        braveSearch: {
+          purpose: "Vyhľadávanie na webe, keď AI hľadá na internete.",
+          data: "Vyhľadávací dopyt, ktorý napíše AI. Žiadne údaje účtu.",
+          location: "USA",
+        },
+        kagi: {
+          purpose:
+            "Vyhľadávanie na webe a krátke odpovede z webu, keď AI hľadá na internete.",
+          data: "Vyhľadávací dopyt, ktorý napíše AI. Žiadne údaje účtu.",
+          location: "USA",
+        },
+        scrappey: {
+          purpose: "Načíta webovú stránku, keď AI číta odkaz.",
+          data: "Adresa stránky. Žiadne údaje účtu.",
+          location: "EÚ",
+        },
+      },
     },
     legal: {
       title: "Právny základ spracúvania",

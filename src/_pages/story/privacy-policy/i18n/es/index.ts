@@ -80,7 +80,112 @@ export const translations: typeof enTranslations = {
     },
     thirdParty: {
       title: "Servicios de terceros",
-      description: "Usamos los siguientes servicios de terceros:",
+      description:
+        "Solo compartimos datos personales con los proveedores que aparecen abajo, y solo en la medida en que cada uno los necesita para su trabajo. Tu cuenta, tus chats y tus archivos se guardan en nuestros propios servidores en Alemania.",
+      aiNotice:
+        "Cuando chateas o generas contenido multimedia, la solicitud va al proveedor del modelo que elegiste. Contiene lo que el modelo necesita para responder: tu mensaje, los mensajes anteriores de la conversación, los adjuntos, las instrucciones y recuerdos que usa la IA y el nombre visible de tu perfil. No enviamos tu dirección de correo. Intermediarios como OpenRouter, NanoGPT y Venice pasan la solicitud a la empresa que ejecuta el modelo, por ejemplo OpenAI, Anthropic, Google, xAI, DeepSeek o Mistral. Cuánto tiempo guarda un proveedor una solicitud y qué puede hacer con ella lo deciden sus propias condiciones. No entrenamos modelos de IA con tus chats.",
+      transfers:
+        "Varios proveedores tienen su sede fuera de la UE. Cuando un proveedor ofrece las cláusulas contractuales tipo de la Comisión Europea, como Stripe y OpenRouter, la transferencia se basa en ellas. En los demás casos, los datos se transfieren según las condiciones del proveedor.",
+      labels: {
+        purpose: "Finalidad",
+        data: "Datos compartidos",
+        privacyPolicy: "Política de privacidad",
+      },
+      groups: {
+        hosting: "Alojamiento y almacenamiento",
+        email: "Correo electrónico",
+        payments: "Pagos",
+        ai: "Modelos de IA",
+        web: "Búsqueda web y carga de páginas",
+      },
+      providers: {
+        hostinger: {
+          purpose:
+            "Nos alquila los dos servidores virtuales en los que funciona la plataforma. La base de datos, el almacenamiento de archivos (MinIO) y la caché (Redis) los operamos nosotros en esos servidores. No interviene ningún servicio de almacenamiento en la nube aparte.",
+          data: "Todo lo que se guarda en la plataforma: datos de la cuenta, chats, recuerdos, archivos subidos y generados, registros de pago.",
+          location: "Servidores en Alemania, empresa en Lituania (UE)",
+        },
+        hosttech: {
+          purpose:
+            "Servidor de correo de nuestras direcciones. Envía códigos de registro, recibos y boletines, y recibe los correos que nos escribes.",
+          data: "Dirección de correo, nombre, contenido de los correos.",
+          location: "Suiza (decisión de adecuación de la UE)",
+        },
+        stripe: {
+          purpose: "Pagos con tarjeta, suscripciones y facturas.",
+          data: "Nombre, dirección de correo, dirección de facturación, datos de pago, importes, el ID de tu cuenta. Nunca vemos el número completo de tu tarjeta.",
+          location:
+            "Stripe Payments Europe, Ltd., Irlanda (UE); empresa matriz en EE. UU.",
+        },
+        paypal: {
+          purpose: "Solo si eliges PayPal en el pago de Stripe.",
+          data: "Nombre, dirección de correo, datos de pago, importes.",
+          location: "PayPal (Europe) S.à r.l. et Cie, S.C.A., Luxemburgo (UE)",
+        },
+        nowpayments: {
+          purpose: "Pagos con criptomonedas.",
+          data: "El ID de tu cuenta en el número de pedido, producto e importe, datos de la billetera y de la transacción. En pagos cripto recurrentes, también tu dirección de correo.",
+          location: "San Vicente y las Granadinas",
+        },
+        openrouter: {
+          purpose:
+            "Lleva la mayoría de los modelos de chat (por ejemplo de OpenAI, Anthropic, Google, xAI, DeepSeek, Mistral y Qwen) y algunos modelos de imagen y video a la empresa que los ejecuta.",
+          data: "Contenido de la solicitud a la IA, como se describe arriba. La empresa que ejecuta el modelo recibe el mismo contenido.",
+          location: "EE. UU.",
+        },
+        nanogpt: {
+          purpose: "Modelos de chat, imagen y video, texto a voz.",
+          data: "Contenido de la solicitud a la IA, texto que quieres escuchar.",
+          location: "EE. UU.",
+        },
+        venice: {
+          purpose: "Modelos de chat, imagen y video sin censura.",
+          data: "Contenido de la solicitud a la IA.",
+          location: "EE. UU.",
+        },
+        uncensoredAi: {
+          purpose: "Modelo de chat UncensoredLM.",
+          data: "Contenido de la solicitud a la IA.",
+          location: "EE. UU.",
+        },
+        freedomgpt: {
+          purpose: "Modelos de chat de FreedomGPT.",
+          data: "Contenido de la solicitud a la IA.",
+          location: "EE. UU.",
+        },
+        gabAi: {
+          purpose: "Modelos de chat de Gab AI.",
+          data: "Contenido de la solicitud a la IA.",
+          location: "EE. UU.",
+        },
+        modelslab: {
+          purpose: "Modelos de imagen, video y música.",
+          data: "Tu prompt y las imágenes que adjuntes.",
+          location: "India",
+        },
+        edenAi: {
+          purpose:
+            "Voz a texto y texto a voz. Pasa el audio o el texto al motor de voz que utiliza.",
+          data: "Grabaciones de voz que transcribes, texto que quieres escuchar.",
+          location: "Francia (UE)",
+        },
+        braveSearch: {
+          purpose: "Búsqueda web cuando la IA busca en internet.",
+          data: "La consulta que escribe la IA. Sin datos de la cuenta.",
+          location: "EE. UU.",
+        },
+        kagi: {
+          purpose:
+            "Búsqueda web y respuestas web breves cuando la IA busca en internet.",
+          data: "La consulta que escribe la IA. Sin datos de la cuenta.",
+          location: "EE. UU.",
+        },
+        scrappey: {
+          purpose: "Carga una página web cuando la IA lee un enlace.",
+          data: "La dirección de la página. Sin datos de la cuenta.",
+          location: "UE",
+        },
+      },
     },
     legal: {
       title: "Base jurídica del tratamiento",

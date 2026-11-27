@@ -78,7 +78,113 @@ export const translations: typeof enTranslations = {
     },
     thirdParty: {
       title: "Usługi stron trzecich",
-      description: "Korzystamy z następujących usług stron trzecich:",
+      description:
+        "Dane osobowe przekazujemy tylko wymienionym niżej usługodawcom i tylko w takim zakresie, jakiego każdy z nich potrzebuje do swojej pracy. Twoje konto, czaty i pliki przechowujemy na własnych serwerach w Niemczech.",
+      aiNotice:
+        "Gdy czatujesz albo generujesz media, zapytanie trafia do dostawcy wybranego modelu. Zawiera to, czego model potrzebuje do odpowiedzi: Twoją wiadomość, wcześniejsze wiadomości z rozmowy, załączniki, instrukcje i wspomnienia, z których korzysta AI, oraz nazwę wyświetlaną z Twojego profilu. Twojego adresu e-mail nie wysyłamy. Pośrednicy tacy jak OpenRouter, NanoGPT i Venice przekazują zapytanie firmie, która uruchamia model, na przykład OpenAI, Anthropic, Google, xAI, DeepSeek albo Mistral. Jak długo dostawca przechowuje zapytanie i co może z nim zrobić, określa jego regulamin. Nie trenujemy modeli AI na Twoich czatach.",
+      transfers:
+        "Kilku dostawców ma siedzibę poza UE. Jeśli dostawca oferuje standardowe klauzule umowne Komisji Europejskiej, jak Stripe i OpenRouter, to one są podstawą przekazania danych. W pozostałych przypadkach dane są przekazywane na warunkach dostawcy.",
+      labels: {
+        purpose: "Cel",
+        data: "Przekazywane dane",
+        privacyPolicy: "Polityka prywatności",
+      },
+      groups: {
+        hosting: "Hosting i przechowywanie",
+        email: "E-mail",
+        payments: "Płatności",
+        ai: "Modele AI",
+        web: "Wyszukiwanie w sieci i pobieranie stron",
+      },
+      providers: {
+        hostinger: {
+          purpose:
+            "Wynajmuje nam dwa serwery wirtualne, na których działa platforma. Bazę danych, magazyn plików (MinIO) i cache (Redis) obsługujemy sami na tych serwerach. Żadna osobna usługa chmurowa nie bierze w tym udziału.",
+          data: "Wszystko, co jest zapisane na platformie: dane konta, czaty, wspomnienia, przesłane i wygenerowane pliki, dane płatności.",
+          location: "Serwery w Niemczech, firma na Litwie (UE)",
+        },
+        hosttech: {
+          purpose:
+            "Serwer poczty dla naszych adresów e-mail. Wysyła kody rejestracji, potwierdzenia i newslettery oraz odbiera Twoje wiadomości do nas.",
+          data: "Adres e-mail, imię i nazwisko, treść wiadomości.",
+          location:
+            "Szwajcaria (decyzja UE stwierdzająca odpowiedni stopień ochrony)",
+        },
+        stripe: {
+          purpose: "Płatności kartą, subskrypcje i faktury.",
+          data: "Imię i nazwisko, adres e-mail, adres rozliczeniowy, dane płatności, kwoty, ID Twojego konta. Pełnego numeru karty nigdy nie widzimy.",
+          location:
+            "Stripe Payments Europe, Ltd., Irlandia (UE); spółka matka w USA",
+        },
+        paypal: {
+          purpose: "Tylko jeśli wybierzesz PayPal w płatności Stripe.",
+          data: "Imię i nazwisko, adres e-mail, dane płatności, kwoty.",
+          location: "PayPal (Europe) S.à r.l. et Cie, S.C.A., Luksemburg (UE)",
+        },
+        nowpayments: {
+          purpose: "Płatności kryptowalutami.",
+          data: "ID Twojego konta w numerze zamówienia, produkt i kwota, dane portfela i transakcji. Przy cyklicznych płatnościach krypto także Twój adres e-mail.",
+          location: "Saint Vincent i Grenadyny",
+        },
+        openrouter: {
+          purpose:
+            "Przekazuje większość modeli czatu (na przykład od OpenAI, Anthropic, Google, xAI, DeepSeek, Mistral i Qwen) oraz część modeli obrazu i wideo firmie, która je uruchamia.",
+          data: "Treść zapytania do AI opisana wyżej. Firma uruchamiająca model otrzymuje tę samą treść.",
+          location: "USA",
+        },
+        nanogpt: {
+          purpose: "Modele czatu, obrazu i wideo, zamiana tekstu na mowę.",
+          data: "Treść zapytania do AI, tekst, który chcesz odsłuchać.",
+          location: "USA",
+        },
+        venice: {
+          purpose: "Modele czatu, obrazu i wideo bez cenzury.",
+          data: "Treść zapytania do AI.",
+          location: "USA",
+        },
+        uncensoredAi: {
+          purpose: "Model czatu UncensoredLM.",
+          data: "Treść zapytania do AI.",
+          location: "USA",
+        },
+        freedomgpt: {
+          purpose: "Modele czatu FreedomGPT.",
+          data: "Treść zapytania do AI.",
+          location: "USA",
+        },
+        gabAi: {
+          purpose: "Modele czatu Gab AI.",
+          data: "Treść zapytania do AI.",
+          location: "USA",
+        },
+        modelslab: {
+          purpose: "Modele obrazu, wideo i muzyki.",
+          data: "Twój prompt i dołączone obrazy.",
+          location: "Indie",
+        },
+        edenAi: {
+          purpose:
+            "Zamiana mowy na tekst i tekstu na mowę. Przekazuje dźwięk lub tekst do używanego silnika mowy.",
+          data: "Nagrania głosowe do transkrypcji, tekst, który chcesz odsłuchać.",
+          location: "Francja (UE)",
+        },
+        braveSearch: {
+          purpose: "Wyszukiwanie w sieci, gdy AI szuka w internecie.",
+          data: "Zapytanie, które formułuje AI. Bez danych konta.",
+          location: "USA",
+        },
+        kagi: {
+          purpose:
+            "Wyszukiwanie w sieci i krótkie odpowiedzi z sieci, gdy AI szuka w internecie.",
+          data: "Zapytanie, które formułuje AI. Bez danych konta.",
+          location: "USA",
+        },
+        scrappey: {
+          purpose: "Pobiera stronę internetową, gdy AI czyta link.",
+          data: "Adres strony. Bez danych konta.",
+          location: "UE",
+        },
+      },
     },
     legal: {
       title: "Podstawa prawna przetwarzania",

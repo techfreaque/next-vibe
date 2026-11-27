@@ -81,7 +81,113 @@ export const translations: typeof enTranslations = {
     },
     thirdParty: {
       title: "Services tiers",
-      description: "Nous utilisons les services tiers suivants :",
+      description:
+        "Nous ne transmettons des données personnelles qu'aux prestataires listés ci-dessous, et seulement dans la mesure où chacun en a besoin pour sa mission. Votre compte, vos conversations et vos fichiers sont stockés sur nos propres serveurs en Allemagne.",
+      aiNotice:
+        "Quand vous discutez ou générez des médias, la requête part chez le fournisseur du modèle choisi. Elle contient ce dont le modèle a besoin pour répondre : votre message, les messages précédents de la conversation, les pièces jointes, les instructions et souvenirs utilisés par l'IA, ainsi que le nom d'affichage de votre profil. Nous n'envoyons pas votre adresse e-mail. Des intermédiaires comme OpenRouter, NanoGPT et Venice transmettent la requête à l'entreprise qui exploite le modèle, par exemple OpenAI, Anthropic, Google, xAI, DeepSeek ou Mistral. La durée de conservation d'une requête et l'usage qu'un fournisseur peut en faire relèvent de ses propres conditions. Nous n'entraînons aucun modèle d'IA sur vos conversations.",
+      transfers:
+        "Plusieurs prestataires sont établis hors de l'UE. Lorsqu'un prestataire propose les clauses contractuelles types de la Commission européenne, comme Stripe et OpenRouter, le transfert repose sur celles-ci. Sinon, les données sont transférées selon les conditions du prestataire.",
+      labels: {
+        purpose: "Finalité",
+        data: "Données transmises",
+        privacyPolicy: "Politique de confidentialité",
+      },
+      groups: {
+        hosting: "Hébergement et stockage",
+        email: "E-mail",
+        payments: "Paiements",
+        ai: "Modèles d'IA",
+        web: "Recherche web et chargement de pages",
+      },
+      providers: {
+        hostinger: {
+          purpose:
+            "Nous loue les deux serveurs virtuels qui font tourner la plateforme. Nous exploitons nous-mêmes la base de données, le stockage de fichiers (MinIO) et le cache (Redis) sur ces serveurs. Aucun service de stockage cloud séparé n'intervient.",
+          data: "Tout ce qui est stocké sur la plateforme : données de compte, conversations, souvenirs, fichiers envoyés et générés, historique des paiements.",
+          location: "Serveurs en Allemagne, société en Lituanie (UE)",
+        },
+        hosttech: {
+          purpose:
+            "Serveur de messagerie de nos adresses e-mail. Envoie les codes d'inscription, reçus et newsletters, et reçoit les e-mails que vous nous écrivez.",
+          data: "Adresse e-mail, nom, contenu des e-mails.",
+          location: "Suisse (décision d'adéquation de l'UE)",
+        },
+        stripe: {
+          purpose: "Paiements par carte, abonnements et factures.",
+          data: "Nom, adresse e-mail, adresse de facturation, données de paiement, montants, l'identifiant de votre compte. Nous ne voyons jamais votre numéro de carte complet.",
+          location:
+            "Stripe Payments Europe, Ltd., Irlande (UE) ; société mère aux États-Unis",
+        },
+        paypal: {
+          purpose:
+            "Uniquement si vous choisissez PayPal lors du paiement Stripe.",
+          data: "Nom, adresse e-mail, données de paiement, montants.",
+          location: "PayPal (Europe) S.à r.l. et Cie, S.C.A., Luxembourg (UE)",
+        },
+        nowpayments: {
+          purpose: "Paiements en cryptomonnaies.",
+          data: "L'identifiant de votre compte dans le numéro de commande, produit et montant, données de portefeuille et de transaction. Pour les paiements crypto récurrents, aussi votre adresse e-mail.",
+          location: "Saint-Vincent-et-les-Grenadines",
+        },
+        openrouter: {
+          purpose:
+            "Achemine la plupart des modèles de chat (par exemple d'OpenAI, Anthropic, Google, xAI, DeepSeek, Mistral et Qwen) et certains modèles d'image et de vidéo vers l'entreprise qui les exploite.",
+          data: "Contenu de la requête IA décrit ci-dessus. L'entreprise qui exploite le modèle reçoit le même contenu.",
+          location: "États-Unis",
+        },
+        nanogpt: {
+          purpose: "Modèles de chat, d'image et de vidéo, synthèse vocale.",
+          data: "Contenu de la requête IA, texte que vous faites lire à voix haute.",
+          location: "États-Unis",
+        },
+        venice: {
+          purpose: "Modèles de chat, d'image et de vidéo non censurés.",
+          data: "Contenu de la requête IA.",
+          location: "États-Unis",
+        },
+        uncensoredAi: {
+          purpose: "Modèle de chat UncensoredLM.",
+          data: "Contenu de la requête IA.",
+          location: "États-Unis",
+        },
+        freedomgpt: {
+          purpose: "Modèles de chat FreedomGPT.",
+          data: "Contenu de la requête IA.",
+          location: "États-Unis",
+        },
+        gabAi: {
+          purpose: "Modèles de chat Gab AI.",
+          data: "Contenu de la requête IA.",
+          location: "États-Unis",
+        },
+        modelslab: {
+          purpose: "Modèles d'image, de vidéo et de musique.",
+          data: "Votre prompt et les images jointes.",
+          location: "Inde",
+        },
+        edenAi: {
+          purpose:
+            "Transcription vocale et synthèse vocale. Transmet l'audio ou le texte au moteur vocal utilisé.",
+          data: "Enregistrements vocaux que vous transcrivez, texte que vous faites lire à voix haute.",
+          location: "France (UE)",
+        },
+        braveSearch: {
+          purpose: "Recherche web quand l'IA cherche sur internet.",
+          data: "La requête de recherche rédigée par l'IA. Aucune donnée de compte.",
+          location: "États-Unis",
+        },
+        kagi: {
+          purpose:
+            "Recherche web et réponses web courtes quand l'IA cherche sur internet.",
+          data: "La requête de recherche rédigée par l'IA. Aucune donnée de compte.",
+          location: "États-Unis",
+        },
+        scrappey: {
+          purpose: "Charge une page web quand l'IA lit un lien.",
+          data: "L'adresse de la page. Aucune donnée de compte.",
+          location: "UE",
+        },
+      },
     },
     legal: {
       title: "Base juridique du traitement",

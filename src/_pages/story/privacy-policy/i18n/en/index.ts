@@ -78,7 +78,112 @@ export const translations = {
     },
     thirdParty: {
       title: "Third-Party Services",
-      description: "We use the following third-party services:",
+      description:
+        "We share personal data only with the service providers listed below, and only as far as each one needs it to do its job. Your account, chats and files are stored on our own servers in Germany.",
+      aiNotice:
+        "When you chat or generate media, the request goes to the provider of the model you picked. It contains what the model needs to answer: your message, earlier messages of the conversation, attachments, the instructions and memories the AI uses, and the display name you set in your profile. We do not send your email address. Routers such as OpenRouter, NanoGPT and Venice pass the request on to the company that runs the model, for example OpenAI, Anthropic, Google, xAI, DeepSeek or Mistral. How long a provider keeps a request and what it may do with it is governed by that provider's terms. We do not train AI models on your chats.",
+      transfers:
+        "Several providers are based outside the EU. Where a provider offers the European Commission's Standard Contractual Clauses, for example Stripe and OpenRouter, they are the basis for the transfer. Otherwise, data is transferred under the provider's terms.",
+      labels: {
+        purpose: "Purpose",
+        data: "Data shared",
+        privacyPolicy: "Privacy policy",
+      },
+      groups: {
+        hosting: "Hosting and storage",
+        email: "Email",
+        payments: "Payments",
+        ai: "AI models",
+        web: "Web search and page fetching",
+      },
+      providers: {
+        hostinger: {
+          purpose:
+            "Rents us the two virtual servers that run the platform. We operate the database, file storage (MinIO) and cache (Redis) ourselves on these servers. No separate cloud storage service is involved.",
+          data: "Everything stored on the platform: account details, chats, memories, uploaded and generated files, payment records.",
+          location: "Servers in Germany, company in Lithuania (EU)",
+        },
+        hosttech: {
+          purpose:
+            "Mail server for our email addresses. Sends sign-up codes, receipts and newsletters and receives the emails you send us.",
+          data: "Email address, name, content of the emails.",
+          location: "Switzerland (EU adequacy decision)",
+        },
+        stripe: {
+          purpose: "Card payments, subscriptions and invoices.",
+          data: "Name, email address, billing address, payment details, amounts, your account ID. We never see your full card number.",
+          location:
+            "Stripe Payments Europe, Ltd., Ireland (EU); parent company in the USA",
+        },
+        paypal: {
+          purpose: "Only if you choose PayPal in the Stripe checkout.",
+          data: "Name, email address, payment details, amounts.",
+          location: "PayPal (Europe) S.à r.l. et Cie, S.C.A., Luxembourg (EU)",
+        },
+        nowpayments: {
+          purpose: "Cryptocurrency payments.",
+          data: "Your account ID in the order number, product and amount, wallet and transaction data. For recurring crypto payments also your email address.",
+          location: "Saint Vincent and the Grenadines",
+        },
+        openrouter: {
+          purpose:
+            "Routes most chat models (for example from OpenAI, Anthropic, Google, xAI, DeepSeek, Mistral and Qwen) and some image and video models to the company that runs them.",
+          data: "Content of the AI request as described above. The company that runs the model receives the same content.",
+          location: "USA",
+        },
+        nanogpt: {
+          purpose: "Chat, image and video models, text to speech.",
+          data: "Content of the AI request, text you have read aloud.",
+          location: "USA",
+        },
+        venice: {
+          purpose: "Uncensored chat, image and video models.",
+          data: "Content of the AI request.",
+          location: "USA",
+        },
+        uncensoredAi: {
+          purpose: "UncensoredLM chat model.",
+          data: "Content of the AI request.",
+          location: "USA",
+        },
+        freedomgpt: {
+          purpose: "FreedomGPT chat models.",
+          data: "Content of the AI request.",
+          location: "USA",
+        },
+        gabAi: {
+          purpose: "Gab AI chat models.",
+          data: "Content of the AI request.",
+          location: "USA",
+        },
+        modelslab: {
+          purpose: "Image, video and music models.",
+          data: "Your prompt and any images you attach.",
+          location: "India",
+        },
+        edenAi: {
+          purpose:
+            "Speech to text and text to speech. Passes audio or text on to the speech engine it uses.",
+          data: "Voice recordings you transcribe, text you have read aloud.",
+          location: "France (EU)",
+        },
+        braveSearch: {
+          purpose: "Web search when the AI searches the internet.",
+          data: "The search query the AI writes. No account data.",
+          location: "USA",
+        },
+        kagi: {
+          purpose:
+            "Web search and short web answers when the AI searches the internet.",
+          data: "The search query the AI writes. No account data.",
+          location: "USA",
+        },
+        scrappey: {
+          purpose: "Loads a web page when the AI reads a link.",
+          data: "The address of the page. No account data.",
+          location: "EU",
+        },
+      },
     },
     legal: {
       title: "Legal Basis for Processing",

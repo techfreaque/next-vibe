@@ -80,7 +80,112 @@ export const translations: typeof enTranslations = {
     },
     thirdParty: {
       title: "Drittanbieterdienste",
-      description: "Wir nutzen folgende Drittanbieterdienste:",
+      description:
+        "Personenbezogene Daten geben wir nur an die unten genannten Dienstleister weiter, und nur so weit, wie der jeweilige Dienst sie braucht. Ihr Konto, Ihre Chats und Dateien liegen auf unseren eigenen Servern in Deutschland.",
+      aiNotice:
+        "Wenn Sie chatten oder Medien erzeugen, geht die Anfrage an den Anbieter des gewählten Modells. Sie enthält, was das Modell für die Antwort braucht: Ihre Nachricht, frühere Nachrichten des Gesprächs, Anhänge, die Anweisungen und Erinnerungen, die die KI nutzt, sowie den Anzeigenamen aus Ihrem Profil. Ihre E-Mail-Adresse senden wir nicht mit. Vermittler wie OpenRouter, NanoGPT und Venice leiten die Anfrage an das Unternehmen weiter, das das Modell betreibt, zum Beispiel OpenAI, Anthropic, Google, xAI, DeepSeek oder Mistral. Wie lange ein Anbieter eine Anfrage speichert und was er damit tun darf, regeln dessen eigene Bedingungen. Wir trainieren keine KI-Modelle mit Ihren Chats.",
+      transfers:
+        "Mehrere Anbieter sitzen außerhalb der EU. Bietet ein Anbieter die Standardvertragsklauseln der EU-Kommission an, etwa Stripe und OpenRouter, stützt sich die Übermittlung darauf. Andernfalls erfolgt die Übermittlung nach den Bedingungen des Anbieters.",
+      labels: {
+        purpose: "Zweck",
+        data: "Übermittelte Daten",
+        privacyPolicy: "Datenschutzerklärung",
+      },
+      groups: {
+        hosting: "Hosting und Speicherung",
+        email: "E-Mail",
+        payments: "Zahlungen",
+        ai: "KI-Modelle",
+        web: "Websuche und Seitenabruf",
+      },
+      providers: {
+        hostinger: {
+          purpose:
+            "Vermietet uns die zwei virtuellen Server, auf denen die Plattform läuft. Datenbank, Dateispeicher (MinIO) und Cache (Redis) betreiben wir selbst auf diesen Servern. Ein separater Cloud-Speicherdienst ist nicht beteiligt.",
+          data: "Alles, was auf der Plattform gespeichert ist: Kontodaten, Chats, Erinnerungen, hochgeladene und erzeugte Dateien, Zahlungsbelege.",
+          location: "Server in Deutschland, Unternehmen in Litauen (EU)",
+        },
+        hosttech: {
+          purpose:
+            "Mailserver für unsere E-Mail-Adressen. Versendet Anmeldecodes, Belege und Newsletter und empfängt Ihre E-Mails an uns.",
+          data: "E-Mail-Adresse, Name, Inhalt der E-Mails.",
+          location: "Schweiz (Angemessenheitsbeschluss der EU)",
+        },
+        stripe: {
+          purpose: "Kartenzahlungen, Abonnements und Rechnungen.",
+          data: "Name, E-Mail-Adresse, Rechnungsadresse, Zahlungsdaten, Beträge, Ihre Konto-ID. Ihre vollständige Kartennummer sehen wir nie.",
+          location:
+            "Stripe Payments Europe, Ltd., Irland (EU); Muttergesellschaft in den USA",
+        },
+        paypal: {
+          purpose: "Nur wenn Sie im Stripe-Checkout PayPal wählen.",
+          data: "Name, E-Mail-Adresse, Zahlungsdaten, Beträge.",
+          location: "PayPal (Europe) S.à r.l. et Cie, S.C.A., Luxemburg (EU)",
+        },
+        nowpayments: {
+          purpose: "Zahlungen mit Kryptowährungen.",
+          data: "Ihre Konto-ID in der Bestellnummer, Produkt und Betrag, Wallet- und Transaktionsdaten. Bei wiederkehrenden Kryptozahlungen zusätzlich Ihre E-Mail-Adresse.",
+          location: "St. Vincent und die Grenadinen",
+        },
+        openrouter: {
+          purpose:
+            "Vermittelt die meisten Chatmodelle (etwa von OpenAI, Anthropic, Google, xAI, DeepSeek, Mistral und Qwen) sowie einige Bild- und Videomodelle an das Unternehmen, das sie betreibt.",
+          data: "Inhalt der KI-Anfrage wie oben beschrieben. Das Unternehmen, das das Modell betreibt, erhält denselben Inhalt.",
+          location: "USA",
+        },
+        nanogpt: {
+          purpose: "Chat-, Bild- und Videomodelle, Sprachausgabe.",
+          data: "Inhalt der KI-Anfrage, Text, den Sie vorlesen lassen.",
+          location: "USA",
+        },
+        venice: {
+          purpose: "Unzensierte Chat-, Bild- und Videomodelle.",
+          data: "Inhalt der KI-Anfrage.",
+          location: "USA",
+        },
+        uncensoredAi: {
+          purpose: "Chatmodell UncensoredLM.",
+          data: "Inhalt der KI-Anfrage.",
+          location: "USA",
+        },
+        freedomgpt: {
+          purpose: "Chatmodelle von FreedomGPT.",
+          data: "Inhalt der KI-Anfrage.",
+          location: "USA",
+        },
+        gabAi: {
+          purpose: "Chatmodelle von Gab AI.",
+          data: "Inhalt der KI-Anfrage.",
+          location: "USA",
+        },
+        modelslab: {
+          purpose: "Bild-, Video- und Musikmodelle.",
+          data: "Ihr Prompt und angehängte Bilder.",
+          location: "Indien",
+        },
+        edenAi: {
+          purpose:
+            "Spracherkennung und Sprachausgabe. Leitet Audio oder Text an die genutzte Sprach-Engine weiter.",
+          data: "Sprachaufnahmen, die Sie transkribieren, Text, den Sie vorlesen lassen.",
+          location: "Frankreich (EU)",
+        },
+        braveSearch: {
+          purpose: "Websuche, wenn die KI im Internet sucht.",
+          data: "Die Suchanfrage, die die KI formuliert. Keine Kontodaten.",
+          location: "USA",
+        },
+        kagi: {
+          purpose:
+            "Websuche und kurze Webantworten, wenn die KI im Internet sucht.",
+          data: "Die Suchanfrage, die die KI formuliert. Keine Kontodaten.",
+          location: "USA",
+        },
+        scrappey: {
+          purpose: "Lädt eine Webseite, wenn die KI einen Link liest.",
+          data: "Die Adresse der Seite. Keine Kontodaten.",
+          location: "EU",
+        },
+      },
     },
     legal: {
       title: "Rechtsgrundlage der Verarbeitung",

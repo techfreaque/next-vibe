@@ -2,8 +2,13 @@ import type { Metadata } from "next";
 import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
+import { Div } from "next-vibe/ui/components/div";
 import { Shield } from "next-vibe/ui/components/icons/Shield";
+import { Li } from "next-vibe/ui/components/li";
 import { ExternalLink } from "next-vibe/ui/components/link";
+import { Span } from "next-vibe/ui/components/span";
+import { P } from "next-vibe/ui/components/typography";
+import { Ul } from "next-vibe/ui/components/ul";
 import type { JSX } from "react";
 
 import { contactClientRepository } from "@/contact/repository-client";
@@ -18,6 +23,7 @@ import {
 } from "../_shared/legal";
 import { PrintButton } from "../_shared/print-button";
 import { scopedTranslation } from "./i18n";
+import { PROCESSOR_GROUPS } from "./processors";
 
 interface Props {
   params: Promise<{ locale: CountryLanguage }>;
@@ -147,6 +153,60 @@ export function TanstackPage({
               <LegalP>{t("sections.businessTransfers.description")}</LegalP>
               <LegalH3>{t("sections.thirdParty.title")}</LegalH3>
               <LegalP>{t("sections.thirdParty.description")}</LegalP>
+              <LegalP>{t("sections.thirdParty.aiNotice")}</LegalP>
+              <LegalP>{t("sections.thirdParty.transfers")}</LegalP>
+              {PROCESSOR_GROUPS.map((group) => (
+                <Div key={group.id} className="flex flex-col gap-3">
+                  <P className="mt-2 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+                    {t(`sections.thirdParty.groups.${group.id}`)}
+                  </P>
+                  <Ul className="flex flex-col gap-3">
+                    {group.processors.map((processor) => (
+                      <Li
+                        key={processor.id}
+                        className="rounded-xl border border-border bg-card p-4 text-sm leading-relaxed text-foreground/85"
+                      >
+                        <Div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+                          <Span className="text-base font-semibold text-foreground">
+                            {processor.name}
+                          </Span>
+                          <Span className="text-muted-foreground">
+                            {t(
+                              `sections.thirdParty.providers.${processor.id}.location`,
+                            )}
+                          </Span>
+                        </Div>
+                        <Div className="mt-2 grid gap-x-4 gap-y-1 sm:grid-cols-[9rem_minmax(0,1fr)]">
+                          <Span className="font-medium text-foreground">
+                            {t("sections.thirdParty.labels.purpose")}
+                          </Span>
+                          <Span>
+                            {t(
+                              `sections.thirdParty.providers.${processor.id}.purpose`,
+                            )}
+                          </Span>
+                          <Span className="font-medium text-foreground">
+                            {t("sections.thirdParty.labels.data")}
+                          </Span>
+                          <Span>
+                            {t(
+                              `sections.thirdParty.providers.${processor.id}.data`,
+                            )}
+                          </Span>
+                        </Div>
+                        <ExternalLink
+                          href={processor.privacyUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="mt-2 inline-block font-medium text-primary underline-offset-4 hover:underline"
+                        >
+                          {t("sections.thirdParty.labels.privacyPolicy")}
+                        </ExternalLink>
+                      </Li>
+                    ))}
+                  </Ul>
+                </Div>
+              ))}
               <LegalH3>{t("sections.legal.title")}</LegalH3>
               <LegalP>{t("sections.legal.description")}</LegalP>
             </>
