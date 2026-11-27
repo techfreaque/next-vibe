@@ -258,6 +258,9 @@ if (typeof window !== "undefined" && import.meta.hot) {
 }
 
 /** Page visibility, null outside a browser document (SSR, workers). */
+/** Stays well under the browsers' shared 64 KB keepalive budget. */
+const KEEPALIVE_MAX_BODY_CHARS = 16_000;
+
 function currentVisibility(): string | null {
   try {
     return getVisibilityState();
@@ -712,6 +715,17 @@ async function callApiInner<TEndpoint extends CreateApiEndpointAny>(
 
     if (endpoint.method !== Methods.GET && postBody) {
       options.body = postBody;
+      // A request started while the tab is hidden (final telemetry/vitals
+      // flush, last autosave) is torn down if the page unloads next. keepalive
+      // lets it finish; browsers cap keepalive bodies at 64 KB in total.
+      if (
+        platform.isBrowser &&
+        typeof postBody === "string" &&
+        postBody.length < KEEPALIVE_MAX_BODY_CHARS &&
+        currentVisibility() === "hidden"
+      ) {
+        options.keepalive = true;
+      }
     }
 
     diag.phase = "fetch";

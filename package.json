@@ -338,6 +338,7 @@
     "victory": "37.4.1",
     "victory-native": "43.0.1",
     "vite": "8.3.5",
+    "web-vitals": "6.2.3",
     "webpack": "5.112.2",
     "xlsx": "0.18.5",
     "zod": "4.6.7",

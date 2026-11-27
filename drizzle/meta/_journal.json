@@ -1507,6 +1507,13 @@
       "when": 1795736885818,
       "tag": "20261126234805_tool_navigation_preferences",
       "breakpoints": true
+    },
+    {
+      "idx": 215,
+      "version": "7",
+      "when": 1795754385458,
+      "tag": "20261127043945_web_vitals",
+      "breakpoints": true
     }
   ]
 }

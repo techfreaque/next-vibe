@@ -9,7 +9,7 @@ import { Span } from "next-vibe/ui/components/span";
 import { Ul } from "next-vibe/ui/components/ul";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
 import type { JSX } from "react";
-import { useState } from "react";
+import { startTransition, useEffect, useState } from "react";
 
 import { scopedTranslation } from "./i18n";
 import { getLocaleModel, type RegionEntry } from "./model";
@@ -38,6 +38,13 @@ export function LocalePickerPanel({
   const model = getLocaleModel(locale);
   const { choose } = useLocaleChoice(locale, user);
   const [query, setQuery] = useState("");
+  // The full region list is ~200 rows. Rendering it in the tap that opens the
+  // picker kept the sheet from painting (INP ~190 ms on a mid-range phone):
+  // paint languages + featured regions first, the long tail in a transition.
+  const [showRest, setShowRest] = useState(false);
+  useEffect(() => {
+    startTransition(() => setShowRest(true));
+  }, []);
   const { currentRegion } = model;
 
   const featuredList = model.featuredFor(model.language);
@@ -159,7 +166,9 @@ export function LocalePickerPanel({
               <>
                 <Div className="flex flex-col">{featured.map(regionRow)}</Div>
                 <Div className="mx-3 my-1.5 border-t border-border" />
-                <Div className="flex flex-col">{rest.map(regionRow)}</Div>
+                {showRest && (
+                  <Div className="flex flex-col">{rest.map(regionRow)}</Div>
+                )}
               </>
             )}
           </Div>

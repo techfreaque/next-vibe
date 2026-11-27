@@ -4,7 +4,6 @@
  */
 
 import type { AgentEnvAvailability } from "next-vibe/agent/env-availability";
-import { AgentAvailabilityProvider } from "next-vibe/agent/env-availability-store";
 import { TranslationProvider } from "next-vibe/core/i18n/core/client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { TabIdentitySync } from "next-vibe/identity/auth/tab-identity-sync";
@@ -18,7 +17,10 @@ import { LoggerProvider } from "next-vibe/ui/hooks/logger-provider";
 import { QueryProvider } from "next-vibe/unified-ui/hooks/query-provider";
 import type { JSX, ReactNode } from "react";
 
+import { WebVitalsProvider } from "@/analytics/web-vitals/reporter-provider";
+
 import { LeadTrackingProvider } from "./_components/lead-tracking-provider";
+import { RootAgentAvailability } from "./_components/root-agent-availability";
 
 export function RootProviders({
   locale,
@@ -42,12 +44,13 @@ export function RootProviders({
           enableSystem={true}
         >
           <TranslationProvider currentLocale={locale}>
-            <AgentAvailabilityProvider availability={availability}>
+            <RootAgentAvailability availability={availability}>
               <ErrorBoundary locale={locale}>{children}</ErrorBoundary>
               <LeadTrackingProvider />
+              <WebVitalsProvider locale={locale} />
               <TabIdentitySync />
               <Toaster />
-            </AgentAvailabilityProvider>
+            </RootAgentAvailability>
           </TranslationProvider>
         </ThemeProvider>
       </LoggerProvider>
