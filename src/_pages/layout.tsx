@@ -68,11 +68,9 @@ export async function generateMetadata({
       alternates: null,
       robots: null,
       icons: {
-        icon: {
-          url: "/images/apple-icon.png",
-          type: "image/png",
-          sizes: "180x180",
-        },
+        // The multi-size favicon.ico is the tab icon. apple-icon.png is a
+        // black line drawing on transparency and disappears on dark tabs.
+        icon: { url: "/favicon.ico", sizes: "any" },
         apple: "/images/apple-icon.png",
       },
       // Search Console / Bing Webmaster tokens, rendered on every page.
