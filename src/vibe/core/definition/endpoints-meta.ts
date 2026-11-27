@@ -20,7 +20,10 @@
  * files stay pure data at runtime - safe to import on any platform, client included.
  */
 
-import type { UserRoleValue } from "../../identity/roles/enum";
+import type {
+  UserPermissionRoleValue,
+  UserRoleValue,
+} from "../../identity/roles/enum";
 import type { IconKey } from "../../unified-ui/widgets/form-fields/icon-field/icons";
 import type { WidgetData } from "../utils/json";
 
@@ -39,12 +42,22 @@ export type AdminToolPlacement = {
   configuredWhen?: string[][];
 };
 
+// oxlint-disable-next-line typescript/consistent-type-definitions -- Serialized with endpoint and category metadata.
+export type ToolNavigationDefaults = {
+  web?: boolean;
+  chat?: boolean;
+  aiEnabled?: boolean;
+  defaultWebPinned?: (typeof UserPermissionRoleValue)[];
+  defaultChatPinned?: (typeof UserPermissionRoleValue)[];
+};
+
 // eslint-disable-next-line typescript/consistent-type-definitions, @typescript-eslint/consistent-type-definitions -- Must be a type alias, not an interface: only aliases get the implicit index signature that lets the generator hand EndpointMeta[] straight to jsonToTs(WidgetData) without a cast.
 export type EndpointMeta = {
   /** Full tool name: path segments joined by "_" + "_" + METHOD */
   toolName: string;
   method: string;
   admin?: AdminToolPlacement;
+  navigation?: ToolNavigationDefaults;
   /** Original path segments array from the definition */
   path: string[];
   /**

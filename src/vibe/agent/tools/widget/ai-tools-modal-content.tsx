@@ -1,7 +1,9 @@
 "use client";
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { HelpGetRequestInput } from "next-vibe/help-tool/definition";
 import helpDefinitions from "next-vibe/help-tool/definition";
+import { ChatToolNavigationContext } from "next-vibe/help-tool/tool-navigation";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import type { Platform } from "next-vibe/platforms/platforms";
@@ -24,6 +26,10 @@ interface AIToolsModalContentProps {
   locale: CountryLanguage;
   user: JwtPayloadType;
   platform: Platform;
+  context?: Pick<
+    HelpGetRequestInput,
+    "chatRootFolderId" | "chatFavoriteId" | "chatSkillId"
+  >;
 }
 
 /**
@@ -35,13 +41,14 @@ export function AIToolsModalContent({
   locale,
   user,
   platform,
+  context,
 }: AIToolsModalContentProps): JSX.Element {
   const logger = useWidgetLogger();
   const isAdmin = !user.isPublic && user.roles.includes(UserRole.ADMIN);
   const { t: toolsT } = scopedTranslation.scopedT(locale);
 
   return (
-    <DialogContent className="sm:max-w-[750px] max-h-[90dvh] flex flex-col overflow-hidden p-0">
+    <DialogContent className="flex h-[min(85dvh,48rem)] w-[min(96vw,56rem)] max-w-4xl flex-col gap-0 overflow-hidden p-0">
       {/* /tools is the admin console, never a user destination. */}
       {isAdmin && (
         <Link
@@ -53,7 +60,7 @@ export function AIToolsModalContent({
         </Link>
       )}
 
-      <DialogHeader className="px-6 pt-6 pb-0 shrink-0">
+      <DialogHeader className="shrink-0 border-b px-4 pb-4 pt-5 sm:px-6">
         <DialogTitle className="flex items-center gap-2">
           <Zap className="h-5 w-5" />
           {toolsT("modal.title")}
@@ -61,22 +68,26 @@ export function AIToolsModalContent({
         <DialogDescription>{toolsT("modal.description")}</DialogDescription>
       </DialogHeader>
 
-      <EndpointsPage
-        logger={logger}
-        endpoint={helpDefinitions}
-        locale={locale}
-        user={user}
-        platform={platform}
-        endpointOptions={{
-          read: {
-            queryOptions: {
-              staleTime: 60 * 1000,
-              refetchOnWindowFocus: false,
+      <ChatToolNavigationContext.Provider value>
+        <EndpointsPage
+          logger={logger}
+          endpoint={helpDefinitions}
+          locale={locale}
+          user={user}
+          platform={platform}
+          endpointOptions={{
+            read: {
+              initialState: { statsFilter: "chatPinned", ...context },
+              formOptions: { persistForm: false, autoSubmit: false },
+              queryOptions: {
+                staleTime: 60 * 1000,
+                refetchOnWindowFocus: false,
+              },
             },
-          },
-        }}
-        className="flex-1 overflow-scroll max-h-[75dvh]"
-      />
+          }}
+          className="flex min-h-0 flex-1 flex-col overflow-hidden"
+        />
+      </ChatToolNavigationContext.Provider>
     </DialogContent>
   );
 }

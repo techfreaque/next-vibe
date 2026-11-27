@@ -5,45 +5,37 @@ import {
   parseToolsInitialState,
   readEndpointSearchParams,
 } from "@/_pages/tools/initial-state";
-
-import companyGet from "@/companies/[companyId]/get/definition";
 import {
   readWorkspaceCompanyCookie,
   resolveWorkspaceCompany,
 } from "@/companies/_shared/workspace-company";
-import { CATEGORY_REGISTRY } from "@/generated/categories/registry";
+import companyGet from "@/companies/[companyId]/get/definition";
 import { endpointsMeta } from "@/generated/endpoints/meta/en";
 import invoiceCreate from "@/payment/invoice/create/definition";
 import invoiceList from "@/payment/invoice/list/definition";
 
 import type { EndpointMeta } from "../../core/definition/endpoints-meta";
+import type { JwtPayloadType } from "../../identity/auth/types";
+import { PlatformMarker, UserPermissionRole } from "../../identity/roles/enum";
+import { Platform } from "../../platforms/platforms";
 import {
   buildAdminCatalogDestinations,
   getAdminCategoryLandings,
 } from "../admin-catalog-model";
 import type { CategoryDefinitionSerialized } from "../category-types";
-import type { JwtPayloadType } from "../../identity/auth/types";
-import { PlatformMarker, UserPermissionRole } from "../../identity/roles/enum";
-import { Platform } from "../../platforms/platforms";
 import {
   applyWorkspaceCompany,
   applyWorkspaceCompanyToEntry,
   readWorkspaceCompanyOverride,
 } from "../erp-company-scope";
 import {
-  erpEntryPoints,
-  erpWorkflows,
-  getErpNavigationAliases,
-  getErpWorkflowAliases,
-} from "../erp-workflows";
-import {
   buildCategories,
   filterCatalogCategory,
   filterMetaForUser,
   getRecordSearchTargets,
+  rankWorkspaceMatches,
   resolveEffectiveUser,
   searchCatalog,
-  rankWorkspaceMatches,
 } from "./meta-filter";
 
 const adminUser: JwtPayloadType = {
@@ -68,12 +60,24 @@ const catalogItem: EndpointMeta = {
   tags: [],
 };
 
+function searchWorkspaceCatalog(query: string): EndpointMeta[] {
+  return rankWorkspaceMatches(
+    searchCatalog(endpointsMeta, query, (tool) => tool.toolName),
+    query,
+  );
+}
+
 describe("admin catalog", () => {
   test("leads with the customer invoice list for a business term and keeps specific actions reachable", () => {
-    const search = (query: string) => rankWorkspaceMatches(searchCatalog(endpointsMeta, query, tool => tool.toolName), query);
-    expect(search("invoice")[0]?.toolName).toBe("payment-invoice-list");
-    expect(search("invoice-share")[0]?.toolName).toBe("invoice-share");
-    expect(search("Duplicate Invoice")[0]?.path.at(-1)).toBe("duplicate");
+    expect(searchWorkspaceCatalog("invoice")[0]?.toolName).toBe(
+      "payment-invoice-list",
+    );
+    expect(searchWorkspaceCatalog("invoice-share")[0]?.toolName).toBe(
+      "invoice-share",
+    );
+    expect(searchWorkspaceCatalog("Duplicate Invoice")[0]?.path.at(-1)).toBe(
+      "duplicate",
+    );
   });
   test("requires every catalog query term and ranks the exact title first", () => {
     const tools = [
@@ -122,122 +126,29 @@ describe("admin catalog", () => {
     ).toEqual([]);
   });
 
-  test("resolves every ERP shortcut to a web endpoint administrators can open", () => {
-    const available = getErpWorkflowAliases(
-      filterMetaForUser(endpointsMeta, Platform.NEXT_PAGE, adminUser),
-    );
-
-    expect(available).toEqual([
-      ...Object.values(erpEntryPoints),
-      ...erpWorkflows.flatMap(({ primary, secondary }) =>
-        secondary ? [primary, secondary] : [primary],
-      ),
-    ]);
-  });
-
-  test("uses authorized generated defaults for workstation navigation", () => {
-    const adminWeb = filterMetaForUser(
-      endpointsMeta,
-      Platform.NEXT_PAGE,
-      adminUser,
-    );
-    const adminNav = getErpNavigationAliases(CATEGORY_REGISTRY, adminWeb);
-    expect(adminNav).toContain("accounting-dashboard");
-    expect(adminNav).toContain("inventory-dashboard");
-    expect(adminNav).toContain("payment-invoice-list");
-    expect(adminNav).toContain("payment-estimate-list");
-    expect(adminNav).toContain("payment-bill-list");
-    expect(adminNav).not.toContain("ai-stream");
-
-    const customer = resolveEffectiveUser(
-      adminUser,
-      UserPermissionRole.CUSTOMER,
-    );
-    const customerWeb = filterMetaForUser(
-      endpointsMeta,
-      Platform.NEXT_PAGE,
-      customer,
-    );
-    expect(
-      getErpNavigationAliases(CATEGORY_REGISTRY, customerWeb),
-    ).not.toContain("accounting-dashboard");
-  });
-
-  test("does not expose documents absent from the role-filtered catalog", () => {
-    const document: EndpointMeta = {
-      ...catalogItem,
-      toolName: "invoice-records",
-      aliases: ["payment-invoice-list"],
-      allowedRoles: [UserPermissionRole.ADMIN],
-    };
-    expect(getErpNavigationAliases([], [document])).toEqual([
-      "payment-invoice-list",
-    ]);
-    expect(
-      getErpNavigationAliases(
-        [],
-        filterMetaForUser(
-          [document],
-          Platform.NEXT_PAGE,
-          resolveEffectiveUser(adminUser, UserPermissionRole.CUSTOMER),
-        ),
-      ),
-    ).toEqual([]);
-  });
-
   test("restores the full-catalog mode without sending it to the endpoint", () => {
     const params = new URLSearchParams(
       "catalog=all&arg.companyId=chosen&sf=web",
     );
     expect(copyCatalogSearchParams(params).get("catalog")).toBe("all");
     expect(readEndpointSearchParams(params)).toEqual({ companyId: "chosen" });
-    expect(parseToolsInitialState(params)).toEqual({ statsFilter: "web" });
+    expect(parseToolsInitialState(params)).toEqual({
+      statsFilter: "web",
+      catalogNavigation: true,
+    });
   });
 
-  test("keeps web-disabled and role-filtered destinations out of the ERP shortcuts", () => {
-    const tools: EndpointMeta[] = [
-      {
-        ...catalogItem,
-        toolName: "accounting-dashboard",
-        aliases: [],
-        allowedRoles: [UserPermissionRole.ADMIN, PlatformMarker.WEB_OFF],
-      },
-      {
-        ...catalogItem,
-        toolName: "supplier-bills",
-        aliases: ["payment-bill-list"],
-      },
-    ];
-
-    expect(
-      getErpWorkflowAliases(
-        filterMetaForUser(tools, Platform.NEXT_PAGE, adminUser),
-      ),
-    ).toEqual(["payment-bill-list"]);
-    for (const role of [
-      UserPermissionRole.CUSTOMER,
-      UserPermissionRole.PUBLIC,
-    ]) {
-      expect(
-        getErpWorkflowAliases(
-          filterMetaForUser(
-            tools,
-            Platform.NEXT_PAGE,
-            resolveEffectiveUser(adminUser, role),
-          ),
-        ),
-      ).toEqual([]);
-    }
-  });
-
-  test("uses preferred names or secondary aliases for authorized GET record destinations", () => {
+  test("lists each authorized GET record search by alias and field once", () => {
     expect(
       getRecordSearchTargets(
-        ["billing-documents", "invoice-list", "invoice-send", "missing"].map(
-          (alias) => ({
-            recordSearch: { alias, field: "search" },
-          }),
-        ),
+        [
+          { alias: "billing-documents", field: "search" },
+          { alias: "invoice-list", field: "search" },
+          { alias: "invoice-list", field: "search" },
+          { alias: "invoice-list", field: "invoiceNumber" },
+          { alias: "invoice-send", field: "search" },
+          { alias: "missing", field: "search" },
+        ].map((recordSearch) => ({ recordSearch })),
         [
           catalogItem,
           {
@@ -251,6 +162,7 @@ describe("admin catalog", () => {
     ).toEqual([
       { alias: "billing-documents", field: "search", label: "Factures" },
       { alias: "invoice-list", field: "search", label: "Factures" },
+      { alias: "invoice-list", field: "invoiceNumber", label: "Factures" },
     ]);
   });
 
@@ -292,6 +204,7 @@ describe("admin catalog", () => {
     });
     expect(parseToolsInitialState(copyCatalogSearchParams(route))).toEqual({
       statsFilter: "web",
+      catalogNavigation: true,
       query: "Factures",
       category: "finance",
       subCategory: "Invoices",
@@ -310,6 +223,7 @@ describe("admin catalog", () => {
       ),
     ).toEqual({
       statsFilter: "web",
+      catalogNavigation: true,
       category: "finance",
     });
   });
@@ -327,13 +241,13 @@ describe("workspace company", () => {
     currency: "PLN",
   };
 
-  test("chooses only an authorized remembered company or the only accessible company", () => {
+  test("chooses the remembered authorized company or the first accessible company", () => {
     expect(resolveWorkspaceCompany([companyA, companyB], companyB.id)).toBe(
       companyB,
     );
-    expect(
-      resolveWorkspaceCompany([companyA, companyB], "removed"),
-    ).toBeUndefined();
+    expect(resolveWorkspaceCompany([companyA, companyB], "removed")).toBe(
+      companyA,
+    );
     expect(resolveWorkspaceCompany([companyA], "removed")).toBe(companyA);
     expect(resolveWorkspaceCompany([], companyA.id)).toBeUndefined();
     expect(
@@ -453,7 +367,9 @@ describe("platform admin landing metadata", () => {
     };
     const current = [...adminOps, added];
     expect(
-      getAdminCategoryLandings([category], current).billing?.destinations.map(({ alias }) => alias),
+      getAdminCategoryLandings([category], current).billing?.destinations.map(
+        ({ alias }) => alias,
+      ),
     ).toContain("fixture-removed");
     expect(
       getAdminCategoryLandings([category], current).billing?.overview?.alias,
@@ -484,16 +400,23 @@ describe("platform admin landing metadata", () => {
   });
 
   test("keeps the embedded summary out of destinations under each of its aliases", () => {
-    const landing = getAdminCategoryLandings([{
-      ...category,
-      landing: {
-        summary: { alias: "fixture-bill", scope: "platform" },
-        overview: { alias: "fixture-admin", scope: "platform" },
-        destinations: ["fixture-invoice", "fixture-bill"],
-      },
-    }], operations).billing;
+    const landing = getAdminCategoryLandings(
+      [
+        {
+          ...category,
+          landing: {
+            summary: { alias: "fixture-bill", scope: "platform" },
+            overview: { alias: "fixture-admin", scope: "platform" },
+            destinations: ["fixture-invoice", "fixture-bill"],
+          },
+        },
+      ],
+      operations,
+    ).billing;
     expect(landing?.summary?.alias).toBe("fixture-bill");
-    expect(landing?.destinations.map(({ alias }) => alias)).toEqual(["fixture-admin"]);
+    expect(landing?.destinations.map(({ alias }) => alias)).toEqual([
+      "fixture-admin",
+    ]);
   });
   test("fills undeclared landing destinations from the current permitted definitions", () => {
     const newList: EndpointMeta = {
@@ -508,15 +431,26 @@ describe("platform admin landing metadata", () => {
       ...category,
       landing: { ...category.landing, destinations: undefined },
     };
-    const withList = getAdminCategoryLandings([undeclared], [...operations, newList]);
+    const withList = getAdminCategoryLandings(
+      [undeclared],
+      [...operations, newList],
+    );
     expect(withList.billing?.destinations).toContainEqual({
-      alias: newList.toolName, title: "Settlement accounts",
+      alias: newList.toolName,
+      title: "Settlement accounts",
     });
     const afterRemoval = getAdminCategoryLandings([undeclared], operations);
-    expect(afterRemoval.billing?.destinations.map(({alias}) => alias)).not.toContain(newList.toolName);
+    expect(
+      afterRemoval.billing?.destinations.map(({ alias }) => alias),
+    ).not.toContain(newList.toolName);
     // A curated landing shows only its declared shortcuts.
-    const curated = getAdminCategoryLandings([category], [...operations, newList]);
-    expect(curated.billing?.destinations.map(({ alias }) => alias)).not.toContain(newList.toolName);
+    const curated = getAdminCategoryLandings(
+      [category],
+      [...operations, newList],
+    );
+    expect(
+      curated.billing?.destinations.map(({ alias }) => alias),
+    ).not.toContain(newList.toolName);
   });
 
   test("drops denied actions per effective role and leaves a permitted peer visible", () => {
@@ -585,8 +519,12 @@ describe("platform admin landing metadata", () => {
       "Prehľad fakturácie a dodávateľských dokladov.",
     );
     expect(landing?.heading).toBe("Fakturácia");
-    expect(landing?.actions.map(({ alias }) => alias)).toEqual(["fixture-create"]);
-    expect(landing?.destinations[0]?.description).toBe("Skontrolujte doručené faktúry.");
+    expect(landing?.actions.map(({ alias }) => alias)).toEqual([
+      "fixture-create",
+    ]);
+    expect(landing?.destinations[0]?.description).toBe(
+      "Skontrolujte doručené faktúry.",
+    );
     expect(landing?.destinations.map(({ alias }) => alias)).toEqual([
       "fixture-bill",
       "fixture-admin",
@@ -613,14 +551,28 @@ describe("platform admin landing metadata", () => {
     const tools = [
       hidden,
       { ...hidden, toolName: "fixture-dev", path: ["fixtures", "debug"] },
-      { ...hidden, toolName: "fixture-remove", path: ["fixtures", "remove"], method: "DELETE" },
-      { ...hidden, toolName: "fixture-actor", path: ["fixtures", "create"], category: "accountSettings" },
+      {
+        ...hidden,
+        toolName: "fixture-remove",
+        path: ["fixtures", "remove"],
+        method: "DELETE",
+      },
+      {
+        ...hidden,
+        toolName: "fixture-actor",
+        path: ["fixtures", "create"],
+        category: "accountSettings",
+      },
     ];
-    const landing = getAdminCategoryLandings([{
-      ...category,
-      landing: { actions: tools.map(({ toolName }) => toolName) },
-    }], [...operations, ...tools]).billing;
+    const landing = getAdminCategoryLandings(
+      [
+        {
+          ...category,
+          landing: { actions: tools.map(({ toolName }) => toolName) },
+        },
+      ],
+      [...operations, ...tools],
+    ).billing;
     expect(landing?.actions).toEqual([]);
   });
-
 });

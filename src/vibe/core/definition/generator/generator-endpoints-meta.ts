@@ -18,6 +18,7 @@ import { join } from "node:path";
 
 import { GENERATED_DIR, VIBE_DIR } from "@/env/paths";
 
+import { filterUserPermissionRoles } from "../../../identity/roles/enum";
 import { formatCount, formatWarning } from "../../../logger/formatters";
 import type { EndpointLogger } from "../../../logger/types";
 import {
@@ -391,6 +392,7 @@ class EndpointsMetaGenerator {
           : [],
         aliases,
         ...(definition.admin ? { admin: definition.admin } : {}),
+        ...(definition.navigation ? { navigation: definition.navigation } : {}),
         title,
         titleShort,
         description,
@@ -404,19 +406,17 @@ class EndpointsMetaGenerator {
         ...(definition.requiresConfirmation
           ? { requiresConfirmation: true }
           : {}),
-        ...(definition.defaultAiPinned &&
-        (definition.defaultAiPinned as readonly string[]).length > 0
+        ...(definition.defaultAiPinned
           ? {
               defaultAiPinned: [
-                ...(definition.defaultAiPinned as readonly string[]),
+                ...filterUserPermissionRoles(definition.defaultAiPinned),
               ],
             }
           : {}),
-        ...(definition.defaultWebPinned &&
-        (definition.defaultWebPinned as readonly string[]).length > 0
+        ...(definition.defaultWebPinned
           ? {
               defaultWebPinned: [
-                ...(definition.defaultWebPinned as readonly string[]),
+                ...filterUserPermissionRoles(definition.defaultWebPinned),
               ],
             }
           : {}),
@@ -545,12 +545,12 @@ export const endpointsMeta: EndpointMeta[] = ${entriesTs};
 
     for (const { definition } of loaded) {
       const preferredName = getPreferredToolName(definition);
-      const aiRoles = definition.defaultAiPinned as
-        | readonly string[]
-        | undefined;
-      const webRoles = definition.defaultWebPinned as
-        | readonly string[]
-        | undefined;
+      const aiRoles =
+        definition.defaultAiPinned &&
+        filterUserPermissionRoles(definition.defaultAiPinned);
+      const webRoles =
+        definition.defaultWebPinned &&
+        filterUserPermissionRoles(definition.defaultWebPinned);
 
       if (aiRoles) {
         for (const role of aiRoles) {

@@ -30,6 +30,10 @@ import {
   turnStepLimitSchema,
 } from "./constants";
 import { scopedTranslation } from "./i18n";
+import {
+  toolPreferencePatchSchema,
+  toolPreferencesSchema,
+} from "./tool-preferences";
 
 const ChatSettingsWidget = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.ChatSettingsWidget })),
@@ -179,6 +183,12 @@ const { GET } = createEndpoint({
         type: WidgetType.TEXT,
         hidden: true,
         schema: z.array(z.string()).nullable(),
+      }),
+
+      toolPreferences: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: toolPreferencesSchema.optional(),
       }),
 
       // Pulse folder UUIDs - null if the folder hasn't been created yet (task never enabled)
@@ -501,6 +511,13 @@ const { POST } = createEndpoint({
         hidden: true,
         label: "post.webPinnedTools.label" as const,
         schema: z.array(z.string()).nullable().optional(),
+      }),
+      toolPreference: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.JSON,
+        hidden: true,
+        label: "post.webPinnedTools.label",
+        schema: toolPreferencePatchSchema.optional(),
       }),
     },
   }),

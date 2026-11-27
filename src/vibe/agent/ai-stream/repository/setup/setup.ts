@@ -7,6 +7,7 @@ import "server-only";
 
 import type { ModelMessage } from "ai";
 import { and, eq, sql } from "drizzle-orm";
+import { getPreferredName } from "next-vibe/core/core-utils/path";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translation";
 import {
@@ -1183,7 +1184,9 @@ export async function setupAiStream(params: {
     if (resolvedToolConfig.deniedToolIds.size === 0 || !tools) {
       return tools;
     }
-    return tools.filter((t) => !resolvedToolConfig.deniedToolIds.has(t.toolId));
+    return tools.filter(
+      (t) => !resolvedToolConfig.deniedToolIds.has(getPreferredName(t.toolId)),
+    );
   };
 
   // Remove media generation tools when:
@@ -1278,6 +1281,7 @@ export async function setupAiStream(params: {
         availableTools: filterUnavailableMediaTools(
           applyDeniedFilter(resolvedToolConfig.availableTools),
         ),
+        deniedToolIds: resolvedToolConfig.deniedToolIds,
         confirmationOverrides: resolvedToolConfig.availableTools,
         rootFolderId: data.rootFolderId,
         user,

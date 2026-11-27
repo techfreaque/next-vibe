@@ -148,5 +148,8 @@ export function getFullPath(aliasOrPath: string): string | null {
  * Use this when you only have a string, not a full endpoint object.
  */
 export function getPreferredName(nameOrAlias: string): string {
-  return getAliasMap()[nameOrAlias] ?? nameOrAlias;
+  const aliases = getAliasMap();
+  return Object.hasOwn(aliases, nameOrAlias)
+    ? (aliases[nameOrAlias] ?? nameOrAlias)
+    : nameOrAlias;
 }

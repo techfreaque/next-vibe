@@ -908,7 +908,16 @@ function AiRunFormView({ field }: CustomWidgetProps): JSX.Element {
           </Div>
         </Div>
       </Div>
-      <AIToolsModal locale={locale} user={user} platform={widgetPlatform} />
+      <AIToolsModal
+        locale={locale}
+        user={user}
+        platform={widgetPlatform}
+        context={{
+          chatRootFolderId: rootFolderValue,
+          chatFavoriteId: favoriteIdValue || undefined,
+          chatSkillId: skillValue || undefined,
+        }}
+      />
       <CortexModal locale={locale} user={user} platform={widgetPlatform} />
     </InputHeightProvider>
   );

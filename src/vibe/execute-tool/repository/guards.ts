@@ -21,6 +21,7 @@ import type { WidgetData } from "../../core/utils/json";
 import type { JwtPayloadType } from "../../identity/auth/types";
 import type { EndpointLogger } from "../../logger/types";
 import type { AiT } from "../../platforms/ai/i18n";
+import { Platform } from "../../platforms/platforms";
 import { CallbackMode } from "../constants";
 import type {
   RouteExecuteRequestOutput,
@@ -142,6 +143,7 @@ export class ExecuteToolGuards {
     user: JwtPayloadType;
     rootFolderId: DefaultFolderId;
     logger: EndpointLogger;
+    applyAiPreferences: boolean;
   }): Promise<ResolvedToolPermissions> {
     const { resolveAgentContext } =
       await import("../../agent/skills/resolve-context");
@@ -151,6 +153,7 @@ export class ExecuteToolGuards {
       user: params.user,
       rootFolderId: params.rootFolderId,
       logger: params.logger,
+      applyAiPreferences: params.applyAiPreferences,
     });
     return {
       availableTools: resolved.availableTools,
@@ -312,6 +315,7 @@ export class ExecuteToolGuards {
       user,
       rootFolderId: toolExecutionContext.rootFolderId,
       logger,
+      applyAiPreferences: ctx.platform === Platform.AI,
     });
 
     const permissionBlock = ExecuteToolGuards.checkToolPermission(

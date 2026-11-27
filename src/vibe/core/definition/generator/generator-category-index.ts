@@ -229,9 +229,12 @@ function generateContent(
       const createActions = c.def.createActions?.length
         ? `\n    createActions: ${jsonToTs([...c.def.createActions], 2, "    createActions: ".length)},`
         : "";
+      const navigation = c.def.navigation
+        ? `\n    navigation: ${jsonToTs(c.def.navigation, 2, "    navigation: ".length)},`
+        : "";
       const placement = serializeAdminPlacement(c.def, 2);
 
-      return `  {\n    key: "${key}",\n    label: "${labelFallback}",\n    labels: ${labelsJson},\n    group: "${group}",\n    icon: "${icon}",\n    order: ${order ?? 99},${defaultEntryPart}${searchPart}${overviewPart}${landing}${descriptions}${createActions}${placement}${subcatBlock}\n  },`;
+      return `  {\n    key: "${key}",\n    label: "${labelFallback}",\n    labels: ${labelsJson},\n    group: "${group}",\n    icon: "${icon}",\n    order: ${order ?? 99},${defaultEntryPart}${searchPart}${overviewPart}${landing}${descriptions}${createActions}${navigation}${placement}${subcatBlock}\n  },`;
     })
     .join("\n");
 
@@ -258,8 +261,8 @@ export const ADMIN_GROUPS: AdminGroup[] = [
   "billing",
   "analytics",
   "content",
-  "business",
   "system",
+  "business",
   "comms",
   "platform",
 ];

@@ -62,7 +62,10 @@ import type {
   InferSchemaFromField,
   MergeFormValues,
 } from "./endpoint";
-import type { AdminToolPlacement } from "./endpoints-meta";
+import type {
+  AdminToolPlacement,
+  ToolNavigationDefaults,
+} from "./endpoints-meta";
 import type { EndpointErrorTypes, Methods } from "./enums";
 import type { FieldUsage } from "./enums";
 
@@ -387,6 +390,7 @@ export interface ApiEndpoint<
    */
   readonly defaultWebPinned?: readonly UserRoleValue[];
   readonly admin?: AdminToolPlacement;
+  readonly navigation?: ToolNavigationDefaults;
   /**
    * Stream timeout in milliseconds when this tool is called by AI and escalates
    * to a background task (via escalateToTask or remote queue).
@@ -860,6 +864,7 @@ export function buildEndpoint<
     defaultAiPinned: config.defaultAiPinned,
     defaultWebPinned: config.defaultWebPinned,
     admin: config.admin,
+    navigation: config.navigation,
     events: config.events as TEvents | undefined,
     channel: config.channel as TChannel,
     icon: config.icon,

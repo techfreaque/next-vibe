@@ -1209,14 +1209,30 @@ defaultAiPinned: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
 **Never AI-pin:** UI-only tools (dashboards, lists with custom widgets), endpoints that only make sense through browser interaction, tools with large response payloads that waste context.
 
+### Tool navigation and personal defaults
+
+Declare the label, group, order, landing text, and primary tools in the owning `category.ts`. Endpoints enter the appropriate directory automatically when their role, platform, and discovery rules allow it.
+
+Set `navigation` on a category for a shared default, or on an endpoint to override that default. An explicit empty pin list clears inherited pins for that endpoint.
+
+| Metadata                                                         | Effect                                                                                                                                   |
+| ---------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| `navigation.web`                                                 | Show the tool in the web catalog. An unset endpoint value falls back to `admin.hidden` and then the category default.                    |
+| `navigation.chat`                                                | Show the tool in the composer picker when the endpoint can run on the AI platform.                                                       |
+| `navigation.defaultWebPinned` and `navigation.defaultChatPinned` | Default favorites for the stated permission roles. The existing endpoint `defaultWebPinned` also supplies web favorites.                 |
+| `navigation.aiEnabled`                                           | Default AI availability. The user's AI preference can override this default within applicable role, platform, folder, and profile rules. |
+| `defaultAiPinned`                                                | Default model context. The current favorite or skill can supply different context pins.                                                  |
+
+Keep `allowedRoles` and platform markers authoritative. Hiding a tool from the catalog leaves authorized tool URLs usable. Personal favorites and hides are stored separately for the web and chat surfaces. CLI and MCP discovery continues to use their platform markers.
+
 ### Tool Titles and Labels
 
-Tool titles appear in the sidebar grid, CLI output, and MCP tool lists. They must work across all surfaces.
+Tool titles appear in the web and chat directories, CLI output, and MCP tool lists. They must work across all surfaces.
 
 **Rules:**
 
 - Lead with the noun, not the verb: "Invoice List" not "List Invoices". Exception: action endpoints ("Generate Image", "Run AI Stream").
-- Max 3 words for sidebar display. Longer titles get truncated in the 72px grid cells.
+- Aim for 3 words or fewer for sidebar links.
 - No redundant category prefix: "Dashboard" not "Payment Dashboard" (the category already shows "Payments").
 - Fluffless: "Models" not "Browse Available AI Models". "Credits" not "Credit Balance Overview".
 - Consistent within a module: if one endpoint says "List" the sibling says "Create", not "New" or "Add".

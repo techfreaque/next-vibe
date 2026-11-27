@@ -9,7 +9,14 @@ export const { GET, tools } = endpointsHandler({
   endpoint: helpEndpoints,
   [Methods.GET]: {
     email: undefined,
-    handler: ({ data, user, platform, locale, logger }) =>
-      HelpRepository.getTools(data, user, locale, platform, logger),
+    handler: ({ data, user, platform, locale, logger, toolExecutionContext }) =>
+      HelpRepository.getTools(
+        data,
+        user,
+        locale,
+        platform,
+        logger,
+        toolExecutionContext,
+      ),
   },
 });

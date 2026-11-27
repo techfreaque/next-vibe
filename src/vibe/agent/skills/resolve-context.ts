@@ -25,6 +25,7 @@
 
 import "server-only";
 
+import { getPreferredName } from "next-vibe/core/core-utils/path";
 import type { DefaultFolderId } from "next-vibe/core/execution-context";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
@@ -32,7 +33,12 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 
 import type { ChatModelId } from "../ai-stream/models";
 import { FOLDER_DENIED_TOOL_IDS } from "../chat/config";
+import {
+  getPersonalAiToolDenies,
+  readToolPreferences,
+} from "../chat/settings/ai-tool-policy";
 import type { ToolConfigItem } from "../chat/settings/definition";
+import type { ToolPreferences } from "../chat/settings/tool-preferences";
 import { THREAD_RENAME_ALIAS } from "../chat/threads/rename/constants";
 import type { AgentEnvAvailability } from "../env-availability";
 import { DEFAULT_SKILLS } from "./config";
@@ -74,6 +80,8 @@ export interface ResolveAgentContextParams {
   /** Folder the conversation lives in — drives the folder-aware role defaults + folder denies. */
   rootFolderId: DefaultFolderId;
   logger: EndpointLogger;
+  toolPreferences?: ToolPreferences;
+  applyAiPreferences?: boolean;
   /** For symmetry with future model resolution; unused by the tool cascade today. */
   availability?: AgentEnvAvailability;
   locale?: CountryLanguage;
@@ -186,16 +194,21 @@ export async function resolveAgentContext(
   const effectiveSkillId = ctx.favorite?.skillId ?? skillId ?? NO_SKILL_ID;
   const skillCfg = resolveSkillToolConfig(effectiveSkillId, ctx.customSkill);
 
-  // ── denied = union(skill, favorite, folder) ──────────────────────────────
-  const deniedToolIds = new Set<string>();
+  const personalDenies =
+    params.applyAiPreferences === false
+      ? []
+      : await getPersonalAiToolDenies(
+          params.toolPreferences ?? (await readToolPreferences(user)),
+        );
+  const deniedToolIds = new Set(personalDenies);
   for (const t of skillCfg.deniedTools ?? []) {
-    deniedToolIds.add(t.toolId);
+    deniedToolIds.add(getPreferredName(t.toolId));
   }
   for (const t of ctx.favorite?.deniedTools ?? []) {
-    deniedToolIds.add(t.toolId);
+    deniedToolIds.add(getPreferredName(t.toolId));
   }
   for (const toolId of FOLDER_DENIED_TOOL_IDS[rootFolderId] ?? []) {
-    deniedToolIds.add(toolId);
+    deniedToolIds.add(getPreferredName(toolId));
   }
 
   // ── Cascade bases: favorite field wins, else skill field (pre-union) ──────

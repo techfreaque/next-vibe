@@ -19,6 +19,7 @@ export function Nav({
   className,
   style,
   id,
+  "aria-label": label,
 }: NavProps): React.JSX.Element {
   // Convert CSS style to React Native ViewStyle if provided
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
@@ -30,6 +31,7 @@ export function Nav({
         className,
       })}
       nativeID={id}
+      accessibilityLabel={label}
     >
       {children}
     </StyledView>

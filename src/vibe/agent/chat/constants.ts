@@ -5,7 +5,10 @@
 
 import { DefaultFolderId } from "next-vibe/core/execution-context";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import { UserPermissionRole, UserRole } from "next-vibe/identity/roles/enum";
+import {
+  filterUserPermissionRoles,
+  UserRole,
+} from "next-vibe/identity/roles/enum";
 
 import {
   DEFAULT_AI_PINNED_IDS,
@@ -83,25 +86,24 @@ export function getAgentMessageMaxLength(
 export function getDefaultToolIdsForUser(
   user: JwtPayloadType,
 ): readonly string[] {
-  if (user.isPublic) {
-    return getDefaultToolIds(false, false);
-  }
-  const isAdmin = user.roles.includes(UserPermissionRole.ADMIN);
-  return getDefaultToolIds(isAdmin, !isAdmin);
+  return defaultPinsForUser(DEFAULT_AI_PINNED_IDS, user);
 }
 
-/**
- * Convenience wrapper: return the role-appropriate default web-sidebar-pinned tool IDs.
- */
+/** Role defaults include each permission role carried by the current viewer. */
 export function getDefaultWebPinnedIdsForUser(
   user: JwtPayloadType,
 ): readonly string[] {
-  const role = user.isPublic
-    ? UserRole.PUBLIC
-    : user.roles.includes(UserPermissionRole.ADMIN)
-      ? UserRole.ADMIN
-      : UserRole.CUSTOMER;
-  return DEFAULT_WEB_PINNED_IDS[role] ?? [];
+  return defaultPinsForUser(DEFAULT_WEB_PINNED_IDS, user);
+}
+
+function defaultPinsForUser(
+  registry: Readonly<Record<string, readonly string[]>>,
+  user: JwtPayloadType,
+): string[] {
+  const roles = user.isPublic
+    ? [UserRole.PUBLIC]
+    : filterUserPermissionRoles(user.roles);
+  return [...new Set(roles.flatMap((role) => registry[role] ?? []))];
 }
 
 /**

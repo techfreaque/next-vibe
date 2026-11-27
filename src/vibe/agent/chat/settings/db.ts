@@ -12,6 +12,7 @@ import type { z } from "zod";
 import type { ChatModelId } from "../../ai-stream/models";
 import type { SearchProviderValue } from "../../web-search/enum";
 import type { ViewModeValue } from "../enum";
+import type { ToolPreferences } from "./tool-preferences";
 
 /**
  * Chat Settings Table
@@ -78,6 +79,7 @@ export const chatSettings = pgTable("chat_settings", {
   // Stored as plain tool ID strings (no requiresConfirmation).
   // null = no overrides (show nothing pinned in sidebar).
   webPinnedTools: jsonb("web_pinned_tools").$type<string[] | null>(),
+  toolPreferences: jsonb("tool_preferences").$type<ToolPreferences>(),
 
   // Timestamps
   createdAt: timestamp("created_at").defaultNow().notNull(),

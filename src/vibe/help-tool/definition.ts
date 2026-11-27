@@ -19,6 +19,7 @@ import {
   Methods,
   WidgetType,
 } from "../core/definition/enums";
+import { DefaultFolderId } from "../core/execution-context";
 import { WidgetDataSchema } from "../core/utils/json";
 import { UserPermissionRole, UserRole } from "../identity/roles/enum";
 import { Platform } from "../platforms/platforms";
@@ -278,6 +279,10 @@ const { GET } = createEndpoint({
             "pinned",
             "allowed",
             "webPinned",
+            "hidden",
+            "chat",
+            "chatPinned",
+            "chatHidden",
             "cliAllowed",
             "mcpPinned",
             "mcpAllowed",
@@ -289,6 +294,35 @@ const { GET } = createEndpoint({
           Platform.CRON,
           Platform.REMOTE_SKILL,
         ],
+      }),
+
+      catalogNavigation: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        hidden: true,
+        label: "get.fields.statsFilter.label",
+        schema: z.boolean().optional(),
+      }),
+      chatRootFolderId: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        hidden: true,
+        label: "get.fields.statsFilter.label",
+        schema: z.enum(DefaultFolderId).optional(),
+      }),
+      chatFavoriteId: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        hidden: true,
+        label: "get.fields.statsFilter.label",
+        schema: z.string().optional(),
+      }),
+      chatSkillId: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        hidden: true,
+        label: "get.fields.statsFilter.label",
+        schema: z.string().optional(),
       }),
 
       // === RESPONSE FIELDS ===
@@ -328,6 +362,32 @@ const { GET } = createEndpoint({
         ],
       }),
 
+      navigationCategories: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "get.fields.categories.title",
+        schema: categoriesSchema.optional(),
+      }),
+
+      navigationPins: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "admin.workspaces",
+        schema: z
+          .object({ web: z.array(z.string()), chat: z.array(z.string()) })
+          .optional(),
+      }),
+
+      aiAvailableToolIds: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "admin.workspaces",
+        schema: z.array(z.string()).optional(),
+      }),
+
+      navigationScope: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "admin.workspaces",
+        schema: z.string().optional(),
+      }),
+
       adminCatalogDestinations: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         label: "admin.workspaces",
@@ -337,10 +397,10 @@ const { GET } = createEndpoint({
             z.object({
               category: z.string(),
               subCategory: z.string().optional(),
+              title: z.string().optional(),
             }),
           )
           .optional(),
-        visibleFor: [UserPermissionRole.ADMIN],
         hiddenForPlatforms: [
           Platform.AI,
           Platform.MCP,
@@ -403,36 +463,6 @@ const { GET } = createEndpoint({
         type: WidgetType.TEXT,
         label: "catalog.overview",
         schema: z.string().optional(),
-        visibleFor: [UserPermissionRole.ADMIN],
-        hiddenForPlatforms: [
-          Platform.AI,
-          Platform.MCP,
-          Platform.CRON,
-          Platform.REMOTE_SKILL,
-          Platform.CLI,
-          Platform.CLI_PACKAGE,
-        ],
-      }),
-
-      erpWorkflowAliases: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        label: "erp.title",
-        schema: z.array(z.string()).optional(),
-        visibleFor: [UserPermissionRole.ADMIN],
-        hiddenForPlatforms: [
-          Platform.AI,
-          Platform.MCP,
-          Platform.CRON,
-          Platform.REMOTE_SKILL,
-          Platform.CLI,
-          Platform.CLI_PACKAGE,
-        ],
-      }),
-
-      erpNavigationAliases: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        label: "erp.title",
-        schema: z.array(z.string()).optional(),
         visibleFor: [UserPermissionRole.ADMIN],
         hiddenForPlatforms: [
           Platform.AI,

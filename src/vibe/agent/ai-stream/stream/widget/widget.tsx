@@ -252,6 +252,11 @@ function AiStreamChatArea(): JSX.Element {
               locale={locale}
               user={user}
               platform={widgetPlatform}
+              context={{
+                chatRootFolderId: rootFolderId,
+                chatFavoriteId: chatSettings?.activeFavoriteId ?? undefined,
+                chatSkillId: chatSettings?.selectedSkill ?? undefined,
+              }}
             />
           </ErrorBoundary>
 

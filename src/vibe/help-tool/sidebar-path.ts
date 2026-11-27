@@ -1,3 +1,5 @@
+import type { HelpGetRequestInput } from "./definition";
+
 /** Admin sidebar path ([cat] or [cat, sub]) encoded in the URL search params. */
 export function parseSidebarPathFromSearch(search: {
   get: (key: string) => string | null;
@@ -17,4 +19,18 @@ export function parseSidebarPathFromSearch(search: {
     return [cat];
   }
   return [];
+}
+
+/** Match asynchronous catalog data to the current visibility settings. */
+export function toolNavigationScope(
+  filters: Pick<
+    HelpGetRequestInput,
+    "viewAsRole" | "instanceId" | "includeProdOnly"
+  >,
+): string {
+  return JSON.stringify([
+    filters.viewAsRole ?? null,
+    filters.instanceId ?? null,
+    filters.includeProdOnly === true,
+  ]);
 }

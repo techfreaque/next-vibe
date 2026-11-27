@@ -18,6 +18,11 @@
 
 import "server-only";
 
+import {
+  normalizeToolPreferences,
+  type ToolPreferences,
+} from "../../agent/chat/settings/tool-preferences";
+import { getPreferredName } from "../../core/core-utils/path";
 import type { EndpointMeta } from "../../core/definition/endpoints-meta";
 import { permissionsRegistry } from "../../core/permissions/registry";
 import type { JwtPayloadType } from "../../identity/auth/types";
@@ -30,6 +35,9 @@ import { filterMetaForUser, inSet } from "./meta-filter";
 type ToolBase = Array<{ toolId: string; requiresConfirmation: boolean }>;
 
 export interface AgentPinResolution {
+  toolPreferences: ToolPreferences;
+  legacyWebPins: string[] | null;
+  aiAvailableToolIds?: string[];
   pinnedCount: number | undefined;
   allowedCount: number | undefined;
   webPinnedCount: number | undefined;
@@ -58,6 +66,10 @@ export async function resolveAgentPins(params: {
   viewAsRole: HelpGetRequestOutput["viewAsRole"];
   statsFilter: NonNullable<HelpGetRequestOutput["statsFilter"]>;
   isAdmin: boolean;
+  chatContext?: Pick<
+    HelpGetRequestOutput,
+    "chatRootFolderId" | "chatFavoriteId" | "chatSkillId"
+  >;
   logger: EndpointLogger;
 }): Promise<AgentPinResolution> {
   const {
@@ -69,12 +81,15 @@ export async function resolveAgentPins(params: {
     viewAsRole,
     statsFilter,
     isAdmin,
+    chatContext,
     logger,
   } = params;
 
   // Resolution failure must not blank the listing — fall through with the
   // unfiltered list and no counts, exactly as the inline version did.
   const fallback: AgentPinResolution = {
+    toolPreferences: {},
+    legacyWebPins: null,
     pinnedCount: undefined,
     allowedCount: undefined,
     webPinnedCount: undefined,
@@ -114,6 +129,7 @@ export async function resolveAgentPins(params: {
       .select({
         activeFavoriteId: chatSettings.activeFavoriteId,
         webPinnedTools: chatSettings.webPinnedTools,
+        toolPreferences: chatSettings.toolPreferences,
       })
       .from(chatSettings)
       .where(eq(chatSettings.userId, userId))
@@ -123,23 +139,37 @@ export async function resolveAgentPins(params: {
       dbWebPinned = settingsRow.webPinnedTools ?? null;
     }
 
-    if (settingsRow?.activeFavoriteId) {
-      const { resolveAgentContext } =
-        await import("../../agent/skills/resolve-context");
-      // Central cascade (favorite → skill → NO_SKILL/role defaults). The
-      // help tool only needs the effective PINNED list + the pre-union
-      // skill bases (cascadeBase/pinnedBase) for its toggle-off materialize.
-      const resolved = await resolveAgentContext({
-        favoriteId: settingsRow.activeFavoriteId,
-        skillId: undefined,
-        user,
-        rootFolderId: DefaultFolderId.PRIVATE,
-        logger,
-      });
-      dbPinned = resolved.pinnedTools;
-      cascadeBase = resolved.cascadeBase;
-      pinnedBase = resolved.pinnedBase;
-    }
+    const toolPreferences = viewAsRole
+      ? {}
+      : normalizeToolPreferences(settingsRow?.toolPreferences);
+    const { resolveAgentContext } =
+      await import("../../agent/skills/resolve-context");
+    const resolved = await resolveAgentContext({
+      favoriteId: viewAsRole
+        ? undefined
+        : (chatContext?.chatFavoriteId ??
+          (chatContext?.chatSkillId
+            ? undefined
+            : settingsRow?.activeFavoriteId)),
+      skillId: viewAsRole ? undefined : chatContext?.chatSkillId,
+      user: effectiveUser,
+      rootFolderId: chatContext?.chatRootFolderId ?? DefaultFolderId.PRIVATE,
+      logger,
+      toolPreferences,
+    });
+    dbPinned = resolved.pinnedTools;
+    cascadeBase = resolved.cascadeBase;
+    pinnedBase = resolved.pinnedBase;
+    const callable = resolved.availableTools?.map(({ toolId }) =>
+      getPreferredName(toolId),
+    );
+    const aiAvailableToolIds = aiMeta
+      .map(({ toolName }) => getPreferredName(toolName))
+      .filter(
+        (id) =>
+          !resolved.deniedToolIds.has(id) &&
+          (!callable || callable.includes(id)),
+      );
 
     // Web sidebar pinned: from webPinnedTools on settings (null = use defaults)
     const webPinnedIds: Set<string> =
@@ -237,6 +267,9 @@ export async function resolveAgentPins(params: {
     }
 
     return {
+      toolPreferences,
+      legacyWebPins: viewAsRole ? null : dbWebPinned,
+      aiAvailableToolIds,
       pinnedCount,
       allowedCount,
       webPinnedCount,
@@ -248,7 +281,10 @@ export async function resolveAgentPins(params: {
       pinnedBase,
       filteredMeta,
     };
-  } catch {
+  } catch (error) {
+    logger.warn("Unable to load tool preferences", {
+      message: error instanceof Error ? error.message : String(error),
+    });
     // Favorite fetch failed - fall through with unfiltered list
     return fallback;
   }

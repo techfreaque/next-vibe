@@ -20,6 +20,12 @@ import { z } from "zod";
 
 import { CATEGORY_REGISTRY } from "@/generated/categories/registry";
 
+import {
+  isToolDiscoverable,
+  isToolPinnedByDefault,
+  mergeWebPins,
+} from "../agent/chat/settings/tool-preferences";
+import { getPreferredName } from "../core/core-utils/path";
 import { isAdminToolConfigured } from "../core/definition/admin-availability.server";
 import type { CreateApiEndpointAny } from "../core/definition/endpoint-base";
 import {
@@ -29,6 +35,7 @@ import {
 import type { EndpointMeta } from "../core/definition/endpoints-meta";
 import { FieldUsage } from "../core/definition/enums";
 import { coreClientEnv as envClient } from "../core/env-client";
+import type { ToolExecutionContext } from "../core/execution-context";
 import type { CountryLanguage } from "../core/i18n/core/config";
 import { getLanguageFromLocale } from "../core/i18n/core/language-utils";
 import type { InferJwtPayloadTypeFromRoles } from "../core/route/handler-roles";
@@ -50,17 +57,13 @@ import {
   buildAdminCatalogDestinations,
   getAdminCategoryLandings,
 } from "./admin-catalog-model";
-import { classifyAdminCatalog } from "./admin-classification";
+import { classifyAdminCatalog, getAdminToolRole } from "./admin-classification";
 import type {
   HelpGetRequestOutput,
   HelpGetResponseOutput,
   HelpToolMetadataSerialized,
   HelpToolParameters,
 } from "./definition";
-import {
-  getErpNavigationAliases,
-  getErpWorkflowAliases,
-} from "./erp-workflows";
 import { scopedTranslation } from "./i18n";
 import { narrowPublicPins, resolveAgentPins } from "./repository/agent-pins";
 import {
@@ -86,6 +89,7 @@ import {
   serializeMeta,
   serializeMetaMinimal,
 } from "./repository/serialize";
+import { toolNavigationScope } from "./sidebar-path";
 
 export class HelpRepository {
   /** Surfaces that pay per token, so detail is rationed as the result set grows. */
@@ -218,6 +222,7 @@ export class HelpRepository {
     locale: CountryLanguage,
     platform: Platform,
     logger: EndpointLogger,
+    toolExecutionContext?: ToolExecutionContext,
   ): Promise<ResponseType<HelpGetResponseOutput>> {
     // Three distinct output paths, one definition. Each shows/requires only what
     // its surface needs:
@@ -296,10 +301,27 @@ export class HelpRepository {
       `help:metadata-import:${language}`,
     );
     const metaModule = await metadata[language]().finally(endMetadataLoad);
-    const allMeta =
-      isAdmin && isWebPlatform
-        ? metaModule.endpointsMeta.filter(isAdminToolConfigured)
-        : metaModule.endpointsMeta;
+    let allMeta = metaModule.endpointsMeta.filter(isAdminToolConfigured);
+    if (platform === Platform.AI && toolExecutionContext) {
+      const { resolveAgentContext } =
+        await import("../agent/skills/resolve-context");
+      const context = await resolveAgentContext({
+        favoriteId: toolExecutionContext.favoriteId,
+        skillId: toolExecutionContext.skillId,
+        rootFolderId: toolExecutionContext.rootFolderId,
+        user,
+        logger,
+      });
+      const allowed =
+        context.availableTools &&
+        new Set(
+          context.availableTools.map(({ toolId }) => getPreferredName(toolId)),
+        );
+      allMeta = allMeta.filter(({ toolName }) => {
+        const id = getPreferredName(toolName);
+        return !context.deniedToolIds.has(id) && (!allowed || allowed.has(id));
+      });
+    }
 
     // Discovery platform - what platform context are we listing tools for?
     // Compact (AI/MCP/CRON): always the actual platform so counts/filtering match
@@ -309,7 +331,7 @@ export class HelpRepository {
     // Non-admins on web/CLI: their actual calling platform.
     const discoveryPlatform: Platform = isCompact
       ? platform
-      : isAdmin
+      : isAdmin && !data.viewAsRole
         ? Platform.CLI
         : platform;
 
@@ -335,28 +357,7 @@ export class HelpRepository {
       !data.includeProdOnly ||
       !tool.allowedRoles.includes(PlatformMarker.PRODUCTION_OFF);
     const webCatalog = webMeta.filter(allowedForProduction);
-    const webCategories = isWebPlatform
-      ? buildCategories(
-          webCatalog.filter(
-            (tool) => !isAdmin || !!viewAsRole || !tool.admin?.hidden,
-          ),
-        )
-      : undefined;
-    const recordSearchTargets =
-      isAdmin && isWebPlatform && !viewAsRole
-        ? getRecordSearchTargets(CATEGORY_REGISTRY, webCatalog)
-        : undefined;
-    const showErp = isAdmin && isWebPlatform && !viewAsRole && !data.instanceId;
-    const erpWorkflowAliases = showErp
-      ? getErpWorkflowAliases(webCatalog)
-      : undefined;
-    const erpNavigationAliases = showErp
-      ? getErpNavigationAliases(CATEGORY_REGISTRY, webCatalog)
-      : undefined;
-    const catalogOverview =
-      isAdmin && isWebPlatform && !viewAsRole
-        ? getCatalogOverview(CATEGORY_REGISTRY, webCatalog)
-        : undefined;
+
     const allAccessibleMeta =
       isAdmin && isWebPlatform
         ? [
@@ -390,9 +391,18 @@ export class HelpRepository {
     // statsFilter: web platforms (NEXT_PAGE, NEXT_API, TRPC, FRAME, ELECTRON) default to "pinned"
     // to avoid loading all tools unnecessarily in the web UI.
     // Compact platforms (AI/MCP/CRON) and CLI default to "all" - no pinned filtering needed.
-    const statsFilter =
+    const requestedFilter =
       data.statsFilter ??
       (isWebPlatform ? (isAdmin ? "webPinned" : "pinned") : "all");
+    const statsFilter =
+      viewAsRole &&
+      (requestedFilter === "all" ||
+        requestedFilter === "cliAllowed" ||
+        requestedFilter === "mcpPinned" ||
+        requestedFilter === "mcpAllowed" ||
+        requestedFilter === "hidden")
+        ? "web"
+        : requestedFilter;
 
     // aiMeta: always AI-platform tools for the current user's role — independent of any
     // admin platformFilter. Used for AI pin/allowed counts and stats, and as the fallback
@@ -409,7 +419,8 @@ export class HelpRepository {
             user,
             viewAsRole,
             statsFilter,
-            isAdmin,
+            isAdmin: isAdmin && !viewAsRole,
+            chatContext: isWebPlatform ? data : undefined,
             logger,
           })
         : null;
@@ -427,27 +438,132 @@ export class HelpRepository {
         )) ?? platformFilteredMeta;
     }
 
-    // Admin web/CLI debug fields. Excluded from compact (AI/MCP) output — a tool
-    // list returned to an agent shouldn't carry server env/platform debug noise.
+    const prefs = pins?.toolPreferences ?? {};
+    const categoriesByKey = new Map(
+      CATEGORY_REGISTRY.map(({ key, navigation }) => [key, navigation]),
+    );
+    const discoverable = (
+      tools: EndpointMeta[],
+      surface: "web" | "chat",
+    ): EndpointMeta[] =>
+      tools.filter((tool) =>
+        isToolDiscoverable(tool, categoriesByKey.get(tool.category), surface),
+      );
+    const eligibleWeb = isWebPlatform ? discoverable(webCatalog, "web") : [];
+    const hiddenWeb = eligibleWeb.filter(
+      (tool) => prefs.webHidden?.[getPreferredName(tool.toolName)],
+    );
+    const visibleWeb = eligibleWeb.filter(
+      (tool) => !prefs.webHidden?.[getPreferredName(tool.toolName)],
+    );
+    const chatView =
+      statsFilter === "chat" ||
+      statsFilter === "chatPinned" ||
+      statsFilter === "chatHidden";
+    const usesNavigation =
+      isWebPlatform && (data.catalogNavigation || chatView);
+    const eligibleChat = isWebPlatform
+      ? discoverable(aiMeta.filter(allowedForProduction), "chat")
+      : [];
+    const hiddenChat = eligibleChat.filter(
+      (tool) => prefs.chatHidden?.[getPreferredName(tool.toolName)],
+    );
+    const visibleChat = eligibleChat.filter(
+      (tool) => !prefs.chatHidden?.[getPreferredName(tool.toolName)],
+    );
+    const webPinIds = new Set(
+      mergeWebPins(
+        pins?.legacyWebPins ??
+          eligibleWeb
+            .filter((tool) =>
+              isToolPinnedByDefault(
+                tool,
+                categoriesByKey.get(tool.category),
+                "web",
+                effectiveUser,
+              ),
+            )
+            .map(({ toolName }) => toolName),
+        prefs.webPins,
+      ),
+    );
+    const chatPinIds = new Set(
+      visibleChat
+        .filter(
+          (tool) =>
+            prefs.chatPins?.[getPreferredName(tool.toolName)] ??
+            isToolPinnedByDefault(
+              tool,
+              categoriesByKey.get(tool.category),
+              "chat",
+              effectiveUser,
+            ),
+        )
+        .map(({ toolName }) => getPreferredName(toolName)),
+    );
+
+    if (usesNavigation) {
+      if (statsFilter === "web") {
+        platformFilteredMeta = visibleWeb;
+      } else if (statsFilter === "webPinned") {
+        platformFilteredMeta = visibleWeb.filter((tool) =>
+          webPinIds.has(getPreferredName(tool.toolName)),
+        );
+      } else if (statsFilter === "hidden") {
+        platformFilteredMeta = hiddenWeb;
+      } else if (statsFilter === "chat") {
+        platformFilteredMeta = visibleChat;
+      } else if (statsFilter === "chatPinned") {
+        platformFilteredMeta = visibleChat.filter((tool) =>
+          chatPinIds.has(getPreferredName(tool.toolName)),
+        );
+      } else if (statsFilter === "chatHidden") {
+        platformFilteredMeta = hiddenChat;
+      } else {
+        platformFilteredMeta = platformFilteredMeta.filter(
+          (tool) => !prefs.webHidden?.[getPreferredName(tool.toolName)],
+        );
+      }
+    }
+    const recordSearchTargets =
+      isAdmin && isWebPlatform && !viewAsRole
+        ? getRecordSearchTargets(CATEGORY_REGISTRY, visibleWeb)
+        : undefined;
+    const catalogOverview =
+      isAdmin && isWebPlatform && !viewAsRole
+        ? getCatalogOverview(CATEGORY_REGISTRY, visibleWeb)
+        : undefined;
+    const landings =
+      isAdmin && isWebPlatform && !viewAsRole
+        ? getAdminCategoryLandings(CATEGORY_REGISTRY, visibleWeb, locale)
+        : undefined;
+
+    const navigationMeta = isWebPlatform
+      ? {
+          navigationScope: toolNavigationScope({ ...data, viewAsRole }),
+          navigationCategories: buildCategories(
+            chatView ? visibleChat : platformFilteredMeta,
+            true,
+          ),
+          webCategories: buildCategories(visibleWeb, true),
+          navigationPins: { web: [...webPinIds], chat: [...chatPinIds] },
+          aiAvailableToolIds: pins?.aiAvailableToolIds,
+          adminCatalogDestinations: buildAdminCatalogDestinations(
+            webCatalog,
+            new Set(visibleWeb.map(({ toolName }) => toolName)),
+          ),
+        }
+      : {};
     const adminMeta =
       isAdmin && !isCompact
         ? {
             currentPlatform: platform,
             currentEnv,
-            ...(isWebPlatform
-              ? {
-                  webCategories,
-                  adminCatalogDestinations:
-                    buildAdminCatalogDestinations(webCatalog),
-                  adminCategoryLandings: getAdminCategoryLandings(
-                    CATEGORY_REGISTRY,
-                    webCatalog,
-                    locale,
-                  ),
-                }
-              : {}),
+            adminCategoryLandings: landings,
           }
         : {};
+
+    const catalogMeta = { ...navigationMeta, ...adminMeta };
 
     // Web-only: server-computed counts for the pinned/allowed/all filter tabs.
     // allAiToolIds: flat list of all AI-platform tool names — used by the widget when
@@ -458,7 +574,11 @@ export class HelpRepository {
       ? {
           pinnedCount: pins?.pinnedCount,
           allowedCount: pins?.allowedCount,
-          webPinnedCount: pins?.webPinnedCount,
+          webPinnedCount: isWebPlatform
+            ? visibleWeb.filter((tool) =>
+                webPinIds.has(getPreferredName(tool.toolName)),
+              ).length
+            : pins?.webPinnedCount,
           ...(isAdmin && {
             cliAllowedCount: pins?.cliAllowedCount,
             mcpPinnedCount: pins?.mcpPinnedCount,
@@ -489,7 +609,7 @@ export class HelpRepository {
           totalCount,
           matchedCount: 0,
           hint: t("get.hints.toolNotFound", { name: data.toolName }),
-          ...adminMeta,
+          ...catalogMeta,
           ...statsMeta,
         });
       }
@@ -526,7 +646,7 @@ export class HelpRepository {
                 })
               : "",
         }),
-        ...adminMeta,
+        ...catalogMeta,
         ...statsMeta,
       });
     }
@@ -580,27 +700,62 @@ export class HelpRepository {
                   })
                 : "",
           }),
-          ...adminMeta,
+          ...catalogMeta,
           ...statsMeta,
         });
       }
     }
 
     let filtered = filterCatalogCategory(
-      searchWebCatalog ? webCatalog : platformFilteredMeta,
+      searchWebCatalog
+        ? usesNavigation
+          ? visibleWeb
+          : webCatalog
+        : platformFilteredMeta,
       category,
       data.subCategory,
-      isWebPlatform && (statsFilter === "web" || !!data.subCategory),
+      isWebPlatform &&
+        (usesNavigation || statsFilter === "web" || !!data.subCategory),
     );
 
     if (query) {
-      if (searchWebCatalog && isAdmin && !viewAsRole) {
+      if (searchWebCatalog && !usesNavigation && isAdmin && !viewAsRole) {
         filtered = filtered.filter((tool) => !tool.admin?.hidden);
       }
       filtered = searchCatalog(filtered, query, (tool) => tool.toolName);
-      if (searchWebCatalog && isAdmin && !viewAsRole) {
+      if (
+        isWebPlatform &&
+        (statsFilter === "web" || searchWebCatalog) &&
+        isAdmin &&
+        !viewAsRole
+      ) {
         filtered = rankWorkspaceMatches(filtered, query);
       }
+    }
+
+    if (usesNavigation && statsFilter === "web" && category && !query) {
+      const landing = Object.entries(landings ?? {}).find(
+        ([key]) => key.toLowerCase() === category,
+      )?.[1];
+      const promoted =
+        !data.subCategory && landing
+          ? new Set(
+              [...landing.destinations, ...landing.actions].map(({ alias }) =>
+                getPreferredName(alias),
+              ),
+            )
+          : undefined;
+      filtered = filtered.filter((tool) => {
+        const role = getAdminToolRole(tool);
+        const standaloneAction =
+          role === "record" &&
+          tool.admin?.role !== "record" &&
+          !tool.path.some((segment) => segment.startsWith("["));
+        return (
+          (role === "destination" || role === "create" || standaloneAction) &&
+          !promoted?.has(getPreferredName(tool.toolName))
+        );
+      });
     }
 
     // Web: if no filters at all (no query, no category, no toolName), return categories only.
@@ -611,6 +766,8 @@ export class HelpRepository {
       statsFilter === "pinned" ||
       statsFilter === "webPinned" ||
       statsFilter === "web" ||
+      statsFilter === "hidden" ||
+      chatView ||
       statsFilter === "allowed" ||
       statsFilter === "all" ||
       statsFilter === "cliAllowed" ||
@@ -632,7 +789,7 @@ export class HelpRepository {
         totalCount,
         matchedCount: 0,
         categories,
-        ...adminMeta,
+        ...catalogMeta,
         ...statsMeta,
       });
     }
@@ -660,7 +817,7 @@ export class HelpRepository {
           matchedCount,
           categories,
           hint: t("get.hints.noToolsMatched"),
-          ...adminMeta,
+          ...catalogMeta,
         });
       }
       if (matchedCount <= COMPACT_FULL_DETAIL_THRESHOLD) {
@@ -692,7 +849,7 @@ export class HelpRepository {
           totalCount,
           matchedCount,
           hint: t("get.hints.compactFullSchema", { count: matchedCount }),
-          ...adminMeta,
+          ...catalogMeta,
         });
       }
       // Above COMPACT_CATEGORY_ONLY_THRESHOLD: return only categories, no tool names (saves tokens)
@@ -708,7 +865,7 @@ export class HelpRepository {
             listThreshold: COMPACT_CATEGORY_ONLY_THRESHOLD,
             detailThreshold: COMPACT_FULL_DETAIL_THRESHOLD,
           }),
-          ...adminMeta,
+          ...catalogMeta,
         });
       }
       // Between COMPACT_FULL_DETAIL_THRESHOLD and COMPACT_CATEGORY_ONLY_THRESHOLD: show tool names
@@ -743,7 +900,7 @@ export class HelpRepository {
         ...(totalPages > 1
           ? { currentPage: safePage, effectivePageSize, totalPages }
           : {}),
-        ...adminMeta,
+        ...catalogMeta,
       });
     }
 
@@ -774,7 +931,7 @@ export class HelpRepository {
           matchedCount === 0
             ? t("get.hints.noToolsMatched")
             : t("get.hints.cliFullDetail", { count: matchedCount }),
-        ...adminMeta,
+        ...catalogMeta,
         ...statsMeta,
       });
     }
@@ -786,10 +943,7 @@ export class HelpRepository {
       totalCount,
       matchedCount,
       categories,
-      webCategories,
       recordSearchTargets,
-      erpWorkflowAliases,
-      erpNavigationAliases,
       catalogOverview,
       hint:
         totalPages > 1
@@ -802,7 +956,7 @@ export class HelpRepository {
       currentPage: safePage,
       effectivePageSize,
       totalPages,
-      ...adminMeta,
+      ...catalogMeta,
       ...statsMeta,
     });
   }

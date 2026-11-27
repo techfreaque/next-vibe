@@ -35,7 +35,7 @@ interface ToolsButtonProps {
  *
  * Count shows total available tools for the user (role-filtered).
  * When enabledTools is passed: shows enabledTools.length
- * When not passed: reads totalCount from help endpoint (all tools available to user's role)
+ * When not passed: reads AI availability from the shared catalog.
  */
 export function ToolsButton({
   disabled = false,
@@ -64,7 +64,9 @@ export function ToolsButton({
     user,
   );
 
-  const totalToolCount = helpEndpoint.read?.data?.totalCount ?? 0;
+  const catalog = helpEndpoint.read?.data;
+  const totalToolCount =
+    catalog?.aiAvailableToolIds?.length ?? catalog?.totalCount ?? 0;
 
   // The help count can already sit in the client cache while the server
   // rendered without it — render the count only after hydration so SSR and

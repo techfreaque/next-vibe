@@ -11,6 +11,7 @@
 import type { pathToAliasMap } from "@/generated/endpoints/alias-map-dev";
 
 import type { CreateApiEndpointAny } from "../core/definition/endpoint-base";
+import type { ToolNavigationDefaults } from "../core/definition/endpoints-meta";
 import type { CountryLanguage } from "../core/i18n/core/config";
 import type { UserPermissionRole } from "../identity/roles/enum";
 import type { IconKey } from "../unified-ui/widgets/form-fields/icon-field/icons";
@@ -92,6 +93,7 @@ export interface RecordSearchDestination<
  * Must be a plain const (no dynamic imports) - the generator reads this at build time.
  */
 export interface CategoryDefinition extends AdminPlacement {
+  navigation?: ToolNavigationDefaults;
   description?: Partial<Record<CountryLanguage, string>>;
   createActions?: readonly CatalogAlias[];
   landing?: CategoryLanding<CatalogAlias>;
@@ -106,9 +108,9 @@ export interface CategoryDefinition extends AdminPlacement {
   /** Sort order within the group (lower = first) */
   order: number;
   /**
-   * Alias of the primary endpoint to open when a user clicks the category header.
-   * If omitted, clicking expands the category to show all tools.
-   * Use the endpoint's first alias string (from its constants.ts).
+   * Preferred entry by role. On a category landing without explicit
+   * destinations, the admin entry leads the list when it is a permitted
+   * standalone GET tool. Use the endpoint's first alias.
    */
   defaultEntry: {
     [UserPermissionRole.ADMIN]: keyof typeof pathToAliasMap;
@@ -133,6 +135,7 @@ export interface CategoryDefinition extends AdminPlacement {
  * — safe to include in generated files.
  */
 export interface CategoryDefinitionSerialized extends AdminPlacement {
+  navigation?: ToolNavigationDefaults;
   descriptions?: Record<string, string>;
   createActions?: readonly string[];
   landing?: CategoryLanding;

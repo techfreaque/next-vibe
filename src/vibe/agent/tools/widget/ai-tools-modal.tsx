@@ -1,6 +1,7 @@
 "use client";
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { HelpGetRequestInput } from "next-vibe/help-tool/definition";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { Platform } from "next-vibe/platforms/platforms";
 import { Dialog } from "next-vibe/ui/components/dialog";
@@ -20,6 +21,10 @@ interface AIToolsModalProps {
   locale: CountryLanguage;
   user: JwtPayloadType;
   platform: Platform;
+  context?: Pick<
+    HelpGetRequestInput,
+    "chatRootFolderId" | "chatFavoriteId" | "chatSkillId"
+  >;
 }
 
 /**
@@ -30,6 +35,7 @@ export function AIToolsModal({
   locale,
   user,
   platform,
+  context,
 }: AIToolsModalProps): JSX.Element {
   const open = useToolsModalStore((state) => state.isOpen);
   const setOpen = useToolsModalStore((state) => state.setOpen);
@@ -42,6 +48,7 @@ export function AIToolsModal({
             locale={locale}
             user={user}
             platform={platform}
+            context={context}
           />
         </Suspense>
       )}

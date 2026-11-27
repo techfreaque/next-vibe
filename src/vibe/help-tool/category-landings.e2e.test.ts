@@ -96,8 +96,8 @@ describe("authorized admin category landings", () => {
             name: homeTitle,
             exact: true,
           });
-          const homeWorkspaces = page.getByRole("heading", {
-            name: String(t("admin.workspaces")),
+          const homeFavorites = page.getByRole("heading", {
+            name: String(t("catalog.favorites")),
             exact: true,
           });
           const loading = page
@@ -156,7 +156,7 @@ describe("authorized admin category landings", () => {
           )) {
             let retries = await waitForCatalogControl(
               page,
-              homeWorkspaces,
+              homeFavorites,
               retry,
             );
             const category = CATEGORY_REGISTRY.find(({ key }) => key === name);
@@ -172,26 +172,20 @@ describe("authorized admin category landings", () => {
               proofPath,
               JSON.stringify({ category: name, started: true }) + "\n",
             );
-            if (name === "accountSettings") {
+            const sidebar = page
+              .locator("#platform-admin-navigation")
+              .filter({ visible: true });
+            if (!(await sidebar.isVisible())) {
               await page
                 .getByRole("button", {
-                  name: String(t("admin.accountMenu")),
+                  name: t("catalog.openSidebar"),
                   exact: true,
                 })
                 .click();
-              await page
-                .getByRole("menuitem", { name: label, exact: true })
-                .click();
-            } else {
-              const card = homeWorkspaces
-                .locator("xpath=..")
-                .getByRole("button")
-                .filter({
-                  has: page.getByText(label, { exact: true }),
-                });
-              expect(await card.count(), name).toBe(1);
-              await card.click();
             }
+            await sidebar
+              .getByRole("button", { name: label, exact: true })
+              .click();
 
             await page.waitForURL(
               (url) => url.searchParams.get("cat") === name,
@@ -208,7 +202,9 @@ describe("authorized admin category landings", () => {
             await loading.waitFor({ state: "hidden", timeout: 40_000 });
             const reportedDestinations = [
               ...new Set([
-                ...(landing.contextualActions ? [] : landing.actions).map(({ title }) => title),
+                ...(landing.contextualActions ? [] : landing.actions).map(
+                  ({ title }) => title,
+                ),
                 ...landing.destinations.map(({ title }) => title),
               ]),
             ];
@@ -264,27 +260,16 @@ describe("authorized admin category landings", () => {
               }
               advanced.push(key);
             }
-            if (
-              !reportedDestinations.length &&
-              !advanced.length &&
-              !landing.overview &&
-              !landing.summary
-            ) {
-              await page
-                .getByText(String(t("admin.noDestinations")), { exact: true })
-                .waitFor({ timeout: 10_000 });
-            }
             await loading.waitFor({ state: "hidden", timeout: 40_000 });
             await page
-              .getByRole("button", { name: homeTitle, exact: true })
-              .filter({ visible: true })
-              .last()
+              .locator("#admin-catalog")
+              .getByRole("button", { name: t("erp.home"), exact: true })
               .click();
             await page.waitForURL((url) => !url.searchParams.has("cat"), {
               timeout: 10_000,
             });
             await home.waitFor({ timeout: 10_000 });
-            retries += await waitForCatalogControl(page, homeWorkspaces, retry);
+            retries += await waitForCatalogControl(page, homeFavorites, retry);
             await appendFile(
               proofPath,
               JSON.stringify({

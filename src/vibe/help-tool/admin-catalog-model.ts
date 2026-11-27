@@ -9,10 +9,13 @@ import { localizedLabel } from "./localized-label";
 
 export function buildAdminCatalogDestinations(
   webCatalog: readonly EndpointMeta[],
-): Record<string, { category: string; subCategory?: string }> {
+  visibleTools?: ReadonlySet<string>,
+): Record<string, { category: string; subCategory?: string; title?: string }> {
   return Object.fromEntries(
-    webCatalog.flatMap((tool) =>
-      [
+    webCatalog.flatMap((tool) => {
+      const canonical =
+        tool.aliases[0] ?? [...tool.path, tool.method].join("/");
+      return [
         tool.toolName,
         ...tool.aliases,
         [...tool.path, tool.method].join("/"),
@@ -21,9 +24,16 @@ export function buildAdminCatalogDestinations(
         {
           category: tool.category,
           subCategory: tool.subCategory || undefined,
+          // Issue display metadata only for the canonical URL. Hidden tools remain available through authorized deep links.
+          title:
+            route === canonical &&
+            (visibleTools?.has(tool.toolName) ?? !tool.admin?.hidden) &&
+            !tool.path.some((segment) => segment.startsWith("["))
+              ? tool.titleShort || tool.title
+              : undefined,
         },
-      ]),
-    ),
+      ]);
+    }),
   );
 }
 
@@ -66,7 +76,9 @@ export function getAdminCategoryLandings(
     developerCount: number;
   }
 > {
-  const workspaceTools = webCatalog.filter((tool) => !tool.admin?.hidden);
+  const workspaceTools = webCatalog.filter(
+    (tool) => tool.navigation?.web ?? !tool.admin?.hidden,
+  );
   const destinations = new Map(
     workspaceTools.flatMap((tool) =>
       [tool.toolName, ...tool.aliases].map((alias) => [alias, tool] as const),
@@ -108,7 +120,7 @@ export function getAdminCategoryLandings(
   }
   return Object.fromEntries(
     [...visibleCategories].map((key) => {
-      const { landing, descriptions, createActions } =
+      const { landing, descriptions, createActions, defaultEntryAlias } =
         byCategory.get(key) ?? {};
       const categoryTools = workspaceTools.filter(
         ({ category }) => category === key,
@@ -171,6 +183,9 @@ export function getAdminCategoryLandings(
         : links(
             [
               ...declaredDestinations,
+              ...(defaultEntryAlias && isDestination(defaultEntryAlias)
+                ? [defaultEntryAlias]
+                : []),
               ...roleLinks("destination").filter(isDestination),
             ],
             landing,
@@ -234,7 +249,7 @@ export function groupVisibleCategories(
     }[]
   >();
   for (const { name, count } of summaries) {
-    if (count <= 0 || name === "accountSettings") {
+    if (count <= 0) {
       continue;
     }
     const metadata = registry.get(name);
@@ -251,32 +266,51 @@ export function groupVisibleCategories(
     categories.push({ name, label, count, metadata });
     groups.set(group, categories);
   }
-  const sectionOrder: readonly AdminGroup[] = [
-    "ai",
-    "people",
-    "billing",
-    "analytics",
-    "content",
-    "system",
-    "business",
-  ];
-  return [...new Set([...sectionOrder, ...order, ...groups.keys()])].flatMap(
-    (group) => {
-      const categories = groups.get(group);
-      if (!categories?.length) {
-        return [];
-      }
-      return [
-        {
-          group,
-          categories: categories.toSorted(
-            (a, b) =>
-              (a.metadata?.order ?? Infinity) -
-                (b.metadata?.order ?? Infinity) ||
-              a.label.localeCompare(b.label, locale),
-          ),
-        },
-      ];
-    },
-  );
+  return [...new Set([...order, ...groups.keys()])].flatMap((group) => {
+    const categories = groups.get(group);
+    if (!categories?.length) {
+      return [];
+    }
+    return [
+      {
+        group,
+        categories: categories.toSorted(
+          (a, b) =>
+            (a.metadata?.order ?? Infinity) - (b.metadata?.order ?? Infinity) ||
+            a.label.localeCompare(b.label, locale),
+        ),
+      },
+    ];
+  });
+}
+
+export function recentToolIds(
+  current: readonly string[],
+  opened: string,
+): string[] {
+  return [opened, ...current.filter((id) => id !== opened)].slice(0, 8);
+}
+
+export function orderSubcategories(
+  subcategories: readonly { name: string; count: number }[],
+  metadata: CategoryDefinitionSerialized | undefined,
+  locale: CountryLanguage,
+): { name: string; count: number; label: string }[] {
+  return subcategories
+    .filter(({ name, count }) => name.trim() && count > 0)
+    .map((entry) => {
+      const section = metadata?.subcategories?.[entry.name];
+      return {
+        ...entry,
+        label: section
+          ? (localizedLabel(section.labels, locale) ?? section.label)
+          : humanCategoryName(entry.name),
+      };
+    })
+    .toSorted(
+      (a, b) =>
+        (metadata?.subcategories?.[a.name]?.order ?? Infinity) -
+          (metadata?.subcategories?.[b.name]?.order ?? Infinity) ||
+        a.label.localeCompare(b.label, locale),
+    );
 }

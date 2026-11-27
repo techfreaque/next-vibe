@@ -76,10 +76,16 @@ export function getRecordSearchTargets(
   categories: readonly { recordSearch?: { alias: string; field: string } }[],
   webCatalog: EndpointMeta[],
 ): { alias: string; field: string; label: string }[] {
+  const seenTargets = new Set<string>();
   return categories.flatMap(({ recordSearch }) => {
     if (!recordSearch) {
       return [];
     }
+    const key = `${recordSearch.alias}:${recordSearch.field}`;
+    if (seenTargets.has(key)) {
+      return [];
+    }
+    seenTargets.add(key);
     const endpoint = webCatalog.find(
       (tool) =>
         tool.method === "GET" &&
@@ -227,7 +233,10 @@ export function filterCatalogCategory<TTool extends CatalogMetadata>(
     : filtered;
 }
 
-export function buildCategories(meta: CatalogMetadata[]): Array<{
+export function buildCategories(
+  meta: CatalogMetadata[],
+  includeSingleSubCategory = false,
+): Array<{
   name: string;
   count: number;
   subCategories?: Array<{ name: string; count: number }>;
@@ -253,7 +262,9 @@ export function buildCategories(meta: CatalogMetadata[]): Array<{
       return {
         name,
         count,
-        ...(subCategories.length > 1 && { subCategories }),
+        ...((subCategories.length > 1 || includeSingleSubCategory) && {
+          subCategories,
+        }),
       };
     });
 }

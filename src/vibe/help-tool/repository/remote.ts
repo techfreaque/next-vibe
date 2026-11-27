@@ -26,6 +26,7 @@ import type {
   HelpToolParameters,
 } from "../definition";
 import { scopedTranslation } from "../i18n";
+import { toolNavigationScope } from "../sidebar-path";
 import {
   buildCategories,
   filterCatalogCategory,
@@ -250,6 +251,7 @@ export async function getToolsFromRemoteInstance(
       totalCount: 0,
       matchedCount: 0,
       hint: t("get.hints.noCapabilitySnapshot", { instanceId }),
+      ...(isWeb && { navigationScope: toolNavigationScope(data) }),
     });
   }
 
@@ -362,7 +364,9 @@ export async function getToolsFromRemoteInstance(
     matchedCount,
     ...(isWeb && {
       categories: buildCategories(filtered),
-      webCategories: buildCategories(allTools),
+      webCategories: buildCategories(allTools, true),
+      navigationCategories: buildCategories(allTools, true),
+      navigationScope: toolNavigationScope(data),
       currentPage: safePage,
       effectivePageSize,
       totalPages,

@@ -35,6 +35,7 @@ export class ToolsSetupHandler {
     modelConfig: ChatModelOption;
     pinnedTools: ToolConfigItem[] | null | undefined;
     availableTools: ToolConfigItem[] | null | undefined;
+    deniedToolIds?: ReadonlySet<string>;
     /**
      * Raw client-provided availableTools before cascade override.
      * requiresConfirmation values here always take precedence over the cascade,
@@ -140,7 +141,9 @@ export class ToolsSetupHandler {
     }
 
     const toolsResult = await loadTools({
-      requestedTools: visibleToolIds,
+      requestedTools: visibleToolIds.filter(
+        (id) => !params.deniedToolIds?.has(resolveToolIdToPreferredName(id)),
+      ),
       user: params.user,
       locale: params.locale,
       logger: params.logger,

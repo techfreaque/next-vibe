@@ -6,6 +6,7 @@
 import "server-only";
 
 import { and, count, eq, isNull, sql } from "drizzle-orm";
+import { getPreferredName } from "next-vibe/core/core-utils/path";
 import { DefaultFolderId } from "next-vibe/core/execution-context";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
@@ -21,6 +22,7 @@ import { cronTasks } from "next-vibe/tasks/cron/db";
 
 import { resolveChatModelForUser } from "../../ai-stream/models";
 import { getEnvAvailability } from "../../env-availability";
+import { getDefaultWebPinnedIdsForUser } from "../constants";
 import { chatFolders, chatThreads } from "../db";
 import { chatSettings } from "./db";
 import type {
@@ -38,6 +40,11 @@ import {
   MAMA_DEFAULT_SCHEDULE,
 } from "./pulse/repository";
 import { ChatSettingsRepositoryClient } from "./repository-client";
+import {
+  mergeWebPins,
+  normalizeToolPreferences,
+  withToolPreference,
+} from "./tool-preferences";
 
 /**
  * Chat Settings Repository
@@ -175,6 +182,15 @@ export class ChatSettingsRepository {
         user,
         availability,
       );
+      const toolPreferences = setting.toolPreferences
+        ? normalizeToolPreferences(setting.toolPreferences)
+        : undefined;
+      const webPinnedTools = toolPreferences?.webPins
+        ? mergeWebPins(
+            setting.webPinnedTools ?? getDefaultWebPinnedIdsForUser(user),
+            toolPreferences.webPins,
+          )
+        : (setting.webPinnedTools ?? null);
       const result: ChatSettingsGetResponseOutput = {
         // Stored legacy model ids resolve to their successor at read time.
         selectedModel: setting.selectedModel
@@ -205,7 +221,8 @@ export class ChatSettingsRepository {
         mamaEnabled: setting.mamaEnabled ?? false,
         mamaSchedule: setting.mamaSchedule ?? MAMA_DEFAULT_SCHEDULE,
         mamaPrompt: setting.mamaPrompt ?? null,
-        webPinnedTools: setting.webPinnedTools ?? null,
+        webPinnedTools,
+        toolPreferences,
         dreamerSubFolderId,
         dreamerThreadCount,
         autopilotSubFolderId,
@@ -257,6 +274,25 @@ export class ChatSettingsRepository {
         user,
         await getEnvAvailability(),
       );
+
+      const patch = data.toolPreference;
+      // PostgreSQL applies this expression to the row held by UPDATE, so
+      // simultaneous changes for different tools do not overwrite each other.
+      const preferencesBase =
+        data.webPinnedTools === undefined
+          ? sql`coalesce(${chatSettings.toolPreferences}, '{}'::jsonb)`
+          : sql`coalesce(${chatSettings.toolPreferences}, '{}'::jsonb) - 'webPins'`;
+      const nextPreferences = patch
+        ? sql`jsonb_set(
+            (${preferencesBase}),
+            array[${patch.key}]::text[],
+            coalesce((${preferencesBase})->${patch.key}::text, '{}'::jsonb)
+              || jsonb_build_object(${getPreferredName(patch.toolId)}::text, ${patch.value}::boolean),
+            true
+          )`
+        : data.webPinnedTools !== undefined
+          ? preferencesBase
+          : undefined;
 
       let result: typeof existing;
 
@@ -352,10 +388,8 @@ export class ChatSettingsRepository {
               data.mamaSchedule !== undefined ? data.mamaSchedule : undefined,
             mamaPrompt:
               data.mamaPrompt !== undefined ? data.mamaPrompt : undefined,
-            webPinnedTools:
-              data.webPinnedTools !== undefined
-                ? data.webPinnedTools
-                : undefined,
+            webPinnedTools: data.webPinnedTools,
+            toolPreferences: nextPreferences,
           })
           .where(eq(chatSettings.userId, userId))
           .returning();
@@ -434,8 +468,8 @@ export class ChatSettingsRepository {
             mamaSchedule:
               data.mamaSchedule !== undefined ? data.mamaSchedule : null,
             mamaPrompt: data.mamaPrompt !== undefined ? data.mamaPrompt : null,
-            webPinnedTools:
-              data.webPinnedTools !== undefined ? data.webPinnedTools : null,
+            webPinnedTools: data.webPinnedTools,
+            toolPreferences: patch ? withToolPreference({}, patch) : undefined,
           })
           // Two saves of a brand-new user race (2026-11-17: both read "no
           // row", the second insert hit the user_id unique key -> 500). The

@@ -4,6 +4,7 @@
  */
 
 import type { HelpGetRequestInput } from "next-vibe/help-tool/definition";
+import { parseSidebarPathFromSearch } from "next-vibe/help-tool/sidebar-path";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 
 interface SearchParamsReader {
@@ -18,6 +19,7 @@ const STATS_FILTERS: readonly StatsFilter[] = [
   "all",
   "web",
   "webPinned",
+  "hidden",
   "cliAllowed",
   "mcpPinned",
   "mcpAllowed",
@@ -79,7 +81,10 @@ export function readEndpointSearchParams(
 export function parseToolsInitialState(
   searchParams: SearchParamsReader,
 ): Partial<HelpGetRequestInput> {
-  const state: Partial<HelpGetRequestInput> = { statsFilter: "webPinned" };
+  const state: Partial<HelpGetRequestInput> = {
+    statsFilter: "webPinned",
+    catalogNavigation: true,
+  };
 
   const q = searchParams.get("q");
   if (q) {
@@ -108,16 +113,17 @@ export function parseToolsInitialState(
     state.instanceId = inst;
   }
 
-  const cat = searchParams.get("cat");
-  if (cat) {
-    state.category = cat;
-    const sub = searchParams.get("sub");
-    if (sub) {
-      state.subCategory = sub;
-    }
-    if (!isStatsFilter(sf)) {
-      state.statsFilter = "web";
-    }
+  const [category, subCategory] = parseSidebarPathFromSearch(searchParams);
+  if (category) {
+    state.category = category;
+    state.subCategory = subCategory;
+  }
+  if (!isStatsFilter(sf)) {
+    state.statsFilter = inst
+      ? "all"
+      : category || q || searchParams.get("catalog") === "all"
+        ? "web"
+        : "webPinned";
   }
 
   const page = positiveInt(searchParams.get("p"));
