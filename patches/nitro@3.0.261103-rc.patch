@@ -14,7 +14,25 @@ diff --git a/dist/runtime/internal/vite/dev-worker.mjs b/dist/runtime/internal/v
  
      this.reload();
    }
-@@ -119,11 +123,9 @@
+@@ -116,14 +120,27 @@
+         return;
+       }
+       try {
++        // A request can be assembling TanStack's lazy route tree while the
++        // next entry reloads. Its remaining imports must finish before we
++        // retire their generation, or both trees can mutate the same routes.
++        for (;;) {
++          const pendingRoutes = [];
++          for (const mod of this.runner.evaluatedModules.idToModuleMap.values()) {
++            if (!mod.evaluated && mod.promise && mod.file.endsWith("/routeTree.gen.ts")) {
++              pendingRoutes.push(mod.promise);
++            }
++          }
++          if (!pendingRoutes.length) {
++            break;
++          }
++          await Promise.allSettled(pendingRoutes);
++        }
          if (all) {
            // Nothing to scope the reload to (added or removed handlers): drop
            // every evaluation, the same way Vite's own full-reload handler does.
@@ -28,7 +46,7 @@ diff --git a/dist/runtime/internal/vite/dev-worker.mjs b/dist/runtime/internal/v
          }
          this.entry = await this.runner.import(this.entryPath);
          this.entryError = undefined;
-@@ -137,28 +139,42 @@
+@@ -137,28 +154,42 @@
      return queuedReload;
    }
  
@@ -88,7 +106,7 @@ diff --git a/dist/runtime/internal/vite/dev-worker.mjs b/dist/runtime/internal/v
    }
  
    // Whether `file` is part of this environment's evaluated module graph.
-@@ -312,10 +328,10 @@
+@@ -312,10 +343,10 @@
        // requests (requests and messages are not ordered in workerd).
        if (message.event === "nitro:invalidate") {
          const { id, env: name, moduleId } = message.data;
