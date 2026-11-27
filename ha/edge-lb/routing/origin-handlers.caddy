@@ -35,6 +35,13 @@ handle /_ha/admit {
 		handle_response @renderer_starting {
 			copy_response
 		}
+		@renderer_cpu_steal {
+			status 503
+			header X-HA-Readiness v1-renderer-cpu-steal
+		}
+		handle_response @renderer_cpu_steal {
+			copy_response
+		}
 		@ready status 200
 		handle_response @ready {
 			copy_response

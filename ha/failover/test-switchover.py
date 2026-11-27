@@ -254,6 +254,8 @@ class CutTests(unittest.TestCase):
                 return "F/123"
             if "replay_lsn" in query:
                 return "t"
+            if "from users" in query:
+                return "1|1|2|0|4" if node == "s2" and failure == "counts" else "1|1|2|0|3"
             return "f" if node == "s1" else "t"
         with patch.object(cut, "ssh", ssh), patch.object(cut, "sql", sql), patch.object(cut, "idle", return_value=True), \
              patch.object(cut, "verified_warm", return_value=True), patch.object(cut, "event"):
@@ -274,6 +276,9 @@ class CutTests(unittest.TestCase):
         before = self.simulate("busy")
         self.assertFalse(any("fence-local" in c or "promote --planned" in c for c in before))
         self.assertEqual(sum("mv -T switchover.pause" in c for c in before), 2)
+        mismatch = self.simulate("counts")
+        self.assertFalse(any("fence-local" in c or "promote --planned" in c for c in mismatch))
+        self.assertEqual(sum("mv -T switchover.pause" in c for c in mismatch), 2)
         after = self.simulate("fence")
         self.assertFalse(any("mv -T switchover.pause" in c or "promote --planned" in c for c in after))
 

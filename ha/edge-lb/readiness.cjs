@@ -1,13 +1,13 @@
 // Runs inside the existing app container with its own DATABASE_URL and network
 // namespace. One bounded sample for all readers, including both nameservers.
 const { writeFileSync } = require("node:fs");
+const { readFile } = require("node:fs/promises");
 const { createServer, get } = require("node:http");
 const { Pool } = require("pg");
 
 if (!URL.canParse(process.env.DATABASE_URL)) {
-  process.stderr.write(
-    "HA readiness requires a valid application database URL\n",
-  );
+  // eslint-disable-next-line no-console -- standalone edge service, stdout/stderr is its log
+  console.error("HA readiness requires a valid application database URL");
   process.exit(1);
 }
 const dbPath =
@@ -22,26 +22,55 @@ const pool = new Pool({
   query_timeout: 750,
   statement_timeout: 650,
 });
-pool.on("error", () => undefined);
+pool.on("error", () => {
+  // Idle-client errors resurface on the next sampled query; keep the process alive.
+});
 let sampledAt = -Infinity;
 let result;
 let lastStatus;
+async function readHostCpu() {
+  try {
+    const stat = await readFile("/proc/stat", "utf8");
+    const aggregate = /^cpu[ \t]+([^\n]+)/m.exec(stat)?.[1];
+    const ticks = aggregate?.trim().split(/\s+/).slice(0, 8).map(Number);
+    if (
+      ticks?.length === 8 &&
+      ticks.every((n) => Number.isSafeInteger(n) && n >= 0)
+    ) {
+      return {
+        total: ticks.reduce((total, n) => total + n, 0),
+        steal: ticks[7],
+      };
+    }
+  } catch {
+    // The readiness check still works when procfs is unavailable.
+  }
+  return undefined;
+}
+
 function localAppAnswers() {
   return new Promise((resolve) => {
     const req = get("http://127.0.0.1:3000/robots.txt", (res) => {
       res.resume();
-      resolve(res.statusCode === 200 ? "ready" : "unavailable");
+      resolve({
+        state: res.statusCode === 200 ? "ready" : "unavailable",
+        reason: `http-${res.statusCode}`,
+      });
     });
     const timer = setTimeout(() => {
-      resolve("unavailable");
+      resolve({ state: "unavailable", reason: "deadline" });
       req.destroy();
     }, 850);
     req.once("close", () => {
       clearTimeout(timer);
-      resolve("unavailable");
+      resolve({ state: "unavailable", reason: "closed-before-response" });
     });
     req.once("error", (error) => {
-      resolve(error.code === "ECONNREFUSED" ? "not-listening" : "unavailable");
+      resolve({
+        state: error.code === "ECONNREFUSED" ? "not-listening" : "unavailable",
+        reason:
+          error.code === "ECONNREFUSED" ? "connection-refused" : "socket-error",
+      });
     });
   });
 }
@@ -67,18 +96,47 @@ async function databaseAnswers() {
   }
 }
 async function sample() {
-  const [db, app] = await Promise.all([databaseAnswers(), localAppAnswers()]);
-  sampledAt = performance.now();
+  const database = databaseAnswers();
+  const before = await readHostCpu();
+  const probeStartedAt = performance.now();
+  const app = await localAppAnswers();
+  const probeMs = Math.round(performance.now() - probeStartedAt);
+  const after =
+    app.state === "unavailable" && before ? await readHostCpu() : undefined;
+  let cpuStealPct;
+  if (before && after) {
+    const total = after.total - before.total;
+    const steal = after.steal - before.steal;
+    if (total > 0 && steal >= 0 && steal <= total) {
+      cpuStealPct = Math.round((100 * steal) / total);
+    }
+  }
+  const db = await database;
+  const cpuStealDuringProbe = probeMs >= 250 && cpuStealPct >= 30;
+  // Reject fresh requests during a measured host-wide stall without changing
+  // the admission behavior for an isolated renderer probe failure.
   result = !db
     ? "v1-db-unavailable"
-    : app === "ready"
+    : app.state === "ready"
       ? "v1-ready"
-      : app === "not-listening"
+      : app.state === "not-listening"
         ? "v1-renderer-not-listening"
-        : "v1-renderer-unavailable";
-  const status = `db=${db} app=${app}`;
+        : cpuStealDuringProbe
+          ? "v1-renderer-cpu-steal"
+          : "v1-renderer-unavailable";
+  sampledAt = performance.now();
+  const status = `db=${db} app=${app.state} readiness=${result} rendererProbe=${app.reason}`;
   if (status !== lastStatus) {
-    process.stdout.write(`${new Date().toISOString()} ${status}\n`);
+    // eslint-disable-next-line no-console -- standalone edge service, stdout/stderr is its log
+    console.log(
+      new Date().toISOString(),
+      status,
+      `rendererProbeMs=${probeMs}`,
+      `hostCpuStealPct=${cpuStealPct ?? "unmeasured"}`,
+      ...(cpuStealDuringProbe
+        ? ["evidence=hypervisor-cpu-steal-during-renderer-probe"]
+        : []),
+    );
   }
   lastStatus = status;
   setTimeout(sample, 700);

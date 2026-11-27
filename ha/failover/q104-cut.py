@@ -12,7 +12,7 @@ IPS = {"s1": "72.61.156.49", "s2": "179.198.214.41"}
 DIR = {"s1": "/caddy/data/ha-drain", "s2": "/root/caddy_data/ha-drain"}
 CADDY = {"s1": "caddy-caddy-1", "s2": "caddy"}
 APP = {"s1": "next-vibe-app:3000", "s2": "unbottled-app:3000"}
-TOKEN = "q104-20261126"
+TOKEN = "q104-20261127"
 
 
 def event(message):
@@ -159,6 +159,13 @@ def cut():
             raise RuntimeError("invalid final WAL position")
         wait_for(lambda: sql("s2", f"select pg_last_wal_replay_lsn() >= '{target}'::pg_lsn") == "t", 2)
         event("S2 replayed fixed flush LSN " + target)
+        counts_query = ("select (select count(*) from users), (select count(*) from user_roles), "
+                        "(select count(*) from chat_threads), (select count(*) from credit_packs), "
+                        "(select count(*) from leads)")
+        source, replica = both(lambda node: sql(node, counts_query))
+        if source != replica or not re.fullmatch(r"\d+(\|\d+){4}", source):
+            raise RuntimeError("row counts differ at the replay barrier")
+        event("S1 and S2 barrier counts (users, roles, threads, credit packs, leads) " + source)
         fencing = True
         ssh("s1", "/usr/local/sbin/ha-peer-cmd fence-local")
         event("S1 writer stopped with restart disabled")
@@ -187,6 +194,6 @@ if __name__ == "__main__":
             event(result)
         sys.exit(0)
     now = datetime.datetime.now(datetime.timezone.utc)
-    if sys.argv[1:] != ["--execute-q104"] or now.strftime("%Y-%m-%d") != "2026-11-26" or not ("03:00" <= now.strftime("%H:%M") < "03:20"):
-        sys.exit("Q104 cut requires --execute-q104 during 03:00 to 03:20 UTC on November 26")
+    if sys.argv[1:] != ["--execute-q104"] or now.strftime("%Y-%m-%d") != "2026-11-27" or not ("03:15" <= now.strftime("%H:%M") < "04:30"):
+        sys.exit("Q104 cut requires --execute-q104 during 03:15 to 04:30 UTC on November 27")
     cut()

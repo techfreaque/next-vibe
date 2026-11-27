@@ -63,6 +63,11 @@ unbottled.ai {
 	}
 	@meta_crawler header_regexp User-Agent (?i)facebookexternalhit|meta-externalagent|meta-externalfetcher|meta-webindexer
 	log_append @meta_crawler automation meta-crawler
+	# Search engine crawlers: keep the page path on their 5xx so a Search Console
+	# "Server error (5xx)" report can be matched to a route and a time.
+	@search_crawler header_regexp User-Agent (?i)googlebot|google-inspectiontool|bingbot|applebot|duckduckbot|yandexbot
+	log_append @search_crawler automation search-crawler
+	log_append @search_crawler crawler_path {http.request.orig_uri.path}
 	@next_asset path /_next/*
 	log_append @next_asset surface next-asset
 	@next_bundle path_regexp ^/_next/static/chunks/[a-zA-Z0-9_./~-]+\.(js|css)$

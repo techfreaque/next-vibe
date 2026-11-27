@@ -91,6 +91,7 @@ route {
 	handle @asset {
 		root * /data/ha-public
 		header Cache-Control "public, max-age=31536000, immutable"
+		encode zstd gzip
 		file_server
 	}
 	import /data/ha-routing/pause.caddy

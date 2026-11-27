@@ -3,6 +3,7 @@
 Usage: python3 ha/edge-lb/test-routing.py /path/to/caddy
 """
 import concurrent.futures
+import gzip
 import http.client
 import json
 import os
@@ -97,7 +98,7 @@ def run(caddy, work):
         s = s.replace("/data/ha-public", str(work / "public"))
         (work / source.name).write_text(s)
     config = work / "Caddyfile"
-    config.write_text(f"""{{
+    config.write_text(f"""{{ 
     admin off
     auto_https off
 }}
@@ -150,6 +151,13 @@ http://:{s1_ingress} {{
             response, body = request("/checkout?renderer-starting", "POST", "signed-once")
             assert response.status == 200 and json.loads(body) == ["POST", "/checkout?renderer-starting", "signed-once", "fixture=1"]
             assert not own.calls and peer.calls == [("POST", "/checkout?renderer-starting")]
+            peer.calls.clear()
+            own.reason = "v1-renderer-cpu-steal"
+            response, _ = request("/_ha/admit", port=origin)
+            assert response.status == 503 and response.getheader("X-HA-Readiness") == "v1-renderer-cpu-steal"
+            response, body = request("/checkout?cpu-steal", "POST", "signed-once")
+            assert response.status == 200 and json.loads(body) == ["POST", "/checkout?cpu-steal", "signed-once", "fixture=1"]
+            assert not own.calls and peer.calls == [("POST", "/checkout?cpu-steal")]
             own.ready = True
             peer.calls.clear()
             # Allow the active health check to clear the deliberate rejection.
@@ -233,9 +241,22 @@ http://:{s1_ingress} {{
             asset_path = "/_next/static/chunks/abcd1234.js"
             asset = work / "public" / asset_path.lstrip("/")
             asset.parent.mkdir(parents=True)
-            asset.write_bytes(b"release asset")
-            response, body = request(asset_path)
-            assert response.status == 200 and body == b"release asset"
+            asset_bytes = b"const releaseAsset = 'cached fixture';\n" * 256
+            asset.write_bytes(asset_bytes)
+            for port in (s1_ingress, ingress):
+                for accepted, expected in [("zstd, gzip", "zstd"), ("gzip", "gzip"), ("identity", None)]:
+                    response, body = request(asset_path, headers={"Accept-Encoding": accepted}, port=port)
+                    assert response.status == 200 and response.getheader("Content-Encoding") == expected
+                    assert "immutable" in response.getheader("Cache-Control")
+                    if expected is None:
+                        assert body == asset_bytes
+                    else:
+                        assert "accept-encoding" in response.getheader("Vary", "").lower()
+                        assert 0 < len(body) < len(asset_bytes)
+                        if expected == "gzip":
+                            assert gzip.decompress(body) == asset_bytes
+                        else:
+                            assert body.startswith(b"\x28\xb5\x2f\xfd")
             # Previous-release App Router, dynamic, locale and font files come
             # from the edge cache, not the origin (which only has its own build).
             for staged, requested in [

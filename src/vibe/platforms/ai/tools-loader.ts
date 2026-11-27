@@ -812,11 +812,8 @@ export async function loadTools(params: {
     const enabledEndpoints = loaded.filter(
       (e): e is CreateApiEndpointAny =>
         e !== null &&
-        permissionsRegistry.filterEndpointsByPermissions(
-          [e],
-          params.user,
-          Platform.AI,
-        ).length > 0,
+        permissionsRegistry.validateEndpointAccess(e, params.user, Platform.AI)
+          .allowed,
     );
 
     params.logger.debug("[Tools Loader] Loading requested tools", {

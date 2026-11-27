@@ -47,6 +47,8 @@ services:
       caddy_internal_10.log.format.fields.resp_headers: "delete"
       caddy_internal_10.log.format.fields.user_id: "delete"
       caddy_internal_10.@meta_crawler.header_regexp: "User-Agent (?i)facebookexternalhit|meta-externalagent|meta-externalfetcher|meta-webindexer"
+      # Search engine crawlers: keep the page path on their 5xx (Search Console triage).
+      caddy_internal_10.@search_crawler.header_regexp: "User-Agent (?i)googlebot|google-inspectiontool|bingbot|applebot|duckduckbot|yandexbot"
       caddy_internal_10.@next_asset.path: "/_next/*"
       caddy_internal_10.@next_bundle.path_regexp: '^/_next/static/chunks/[a-zA-Z0-9_./~-]+\.(js|css)$'
       caddy_internal_10.@public_badge.path_regexp: '^/images/badges/((dang|postmake|toolpilot)-(dark|light)\.png|(aitoolscapital|bestekitools)-(dark|light)\.svg|opensourcealternatives\.svg|whatsthebigdata\.jpg)$'
@@ -64,6 +66,8 @@ services:
       caddy_internal_10.8_log_append: "upstream_duration_ms {rp.upstream.duration_ms}"
       caddy_internal_10.9_log_append: "@next_bundle asset_path {http.request.orig_uri.path}"
       caddy_internal_10.10_log_append: "@public_badge asset_path {http.request.orig_uri.path}"
+      caddy_internal_10.11_log_append: "@search_crawler automation search-crawler"
+      caddy_internal_10.12_log_append: "@search_crawler crawler_path {http.request.orig_uri.path}"
       caddy_internal_10.tls.issuer: "acme"
       caddy_internal_10.tls.issuer.disable_tlsalpn_challenge: ""
       caddy_internal_10.handle_errors: "502 503 504"
