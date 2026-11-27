@@ -3794,6 +3794,310 @@
           },
           "schemaType": "primitive"
         },
+        "gracePeriodEndsAt": {
+          "type": "text",
+          "label": "Koniec ochrannej lehoty",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "retryPaymentUrl": {
+          "type": "text",
+          "label": "Odkaz na opakovanie platby",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "cardCountry": {
+          "type": "text",
+          "label": "Krajina karty",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "recentCardAuthFailure": {
+          "type": "text",
+          "label": "Nedávno neúspešné overenie karty",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "boolean"
+                },
+                "type": "boolean"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "checkoutProviders": {
+          "type": "text",
+          "label": "Dostupné spôsoby platby",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "array",
+                  "element": {
+                    "def": {
+                      "type": "enum",
+                      "entries": {
+                        "enums.paymentProvider.stripe": "enums.paymentProvider.stripe",
+                        "enums.paymentProvider.nowpayments": "enums.paymentProvider.nowpayments"
+                      }
+                    },
+                    "type": "enum",
+                    "enum": {
+                      "enums.paymentProvider.stripe": "enums.paymentProvider.stripe",
+                      "enums.paymentProvider.nowpayments": "enums.paymentProvider.nowpayments"
+                    },
+                    "options": [
+                      "enums.paymentProvider.stripe",
+                      "enums.paymentProvider.nowpayments"
+                    ]
+                  }
+                },
+                "type": "array",
+                "element": {
+                  "def": {
+                    "type": "enum",
+                    "entries": {
+                      "enums.paymentProvider.stripe": "enums.paymentProvider.stripe",
+                      "enums.paymentProvider.nowpayments": "enums.paymentProvider.nowpayments"
+                    }
+                  },
+                  "type": "enum",
+                  "enum": {
+                    "enums.paymentProvider.stripe": "enums.paymentProvider.stripe",
+                    "enums.paymentProvider.nowpayments": "enums.paymentProvider.nowpayments"
+                  },
+                  "options": [
+                    "enums.paymentProvider.stripe",
+                    "enums.paymentProvider.nowpayments"
+                  ]
+                }
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "nowPaymentsAcceptsCards": {
+          "type": "text",
+          "label": "Krypto platba prijíma karty",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "boolean"
+                },
+                "type": "boolean"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "cryptoCoins": {
+          "type": "text",
+          "label": "Kryptomeny a minimálne sumy",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "array",
+                  "element": {
+                    "def": {
+                      "type": "object",
+                      "shape": {
+                        "coin": {
+                          "def": {
+                            "type": "enum",
+                            "entries": {
+                              "cryptoCoin.btc": "cryptoCoin.btc",
+                              "cryptoCoin.eth": "cryptoCoin.eth",
+                              "cryptoCoin.usdtTrc20": "cryptoCoin.usdtTrc20",
+                              "cryptoCoin.usdtErc20": "cryptoCoin.usdtErc20",
+                              "cryptoCoin.usdtBsc": "cryptoCoin.usdtBsc",
+                              "cryptoCoin.usdc": "cryptoCoin.usdc",
+                              "cryptoCoin.sol": "cryptoCoin.sol",
+                              "cryptoCoin.ltc": "cryptoCoin.ltc",
+                              "cryptoCoin.xmr": "cryptoCoin.xmr",
+                              "cryptoCoin.doge": "cryptoCoin.doge",
+                              "cryptoCoin.trx": "cryptoCoin.trx",
+                              "cryptoCoin.bnbBsc": "cryptoCoin.bnbBsc"
+                            }
+                          },
+                          "type": "enum",
+                          "enum": {
+                            "cryptoCoin.btc": "cryptoCoin.btc",
+                            "cryptoCoin.eth": "cryptoCoin.eth",
+                            "cryptoCoin.usdtTrc20": "cryptoCoin.usdtTrc20",
+                            "cryptoCoin.usdtErc20": "cryptoCoin.usdtErc20",
+                            "cryptoCoin.usdtBsc": "cryptoCoin.usdtBsc",
+                            "cryptoCoin.usdc": "cryptoCoin.usdc",
+                            "cryptoCoin.sol": "cryptoCoin.sol",
+                            "cryptoCoin.ltc": "cryptoCoin.ltc",
+                            "cryptoCoin.xmr": "cryptoCoin.xmr",
+                            "cryptoCoin.doge": "cryptoCoin.doge",
+                            "cryptoCoin.trx": "cryptoCoin.trx",
+                            "cryptoCoin.bnbBsc": "cryptoCoin.bnbBsc"
+                          },
+                          "options": [
+                            "cryptoCoin.btc",
+                            "cryptoCoin.eth",
+                            "cryptoCoin.usdtTrc20",
+                            "cryptoCoin.usdtErc20",
+                            "cryptoCoin.usdtBsc",
+                            "cryptoCoin.usdc",
+                            "cryptoCoin.sol",
+                            "cryptoCoin.ltc",
+                            "cryptoCoin.xmr",
+                            "cryptoCoin.doge",
+                            "cryptoCoin.trx",
+                            "cryptoCoin.bnbBsc"
+                          ]
+                        },
+                        "minUsd": {
+                          "def": {
+                            "type": "number",
+                            "checks": []
+                          },
+                          "type": "number",
+                          "isFinite": true
+                        }
+                      }
+                    },
+                    "type": "object"
+                  }
+                },
+                "type": "array",
+                "element": {
+                  "def": {
+                    "type": "object",
+                    "shape": {
+                      "coin": {
+                        "def": {
+                          "type": "enum",
+                          "entries": {
+                            "cryptoCoin.btc": "cryptoCoin.btc",
+                            "cryptoCoin.eth": "cryptoCoin.eth",
+                            "cryptoCoin.usdtTrc20": "cryptoCoin.usdtTrc20",
+                            "cryptoCoin.usdtErc20": "cryptoCoin.usdtErc20",
+                            "cryptoCoin.usdtBsc": "cryptoCoin.usdtBsc",
+                            "cryptoCoin.usdc": "cryptoCoin.usdc",
+                            "cryptoCoin.sol": "cryptoCoin.sol",
+                            "cryptoCoin.ltc": "cryptoCoin.ltc",
+                            "cryptoCoin.xmr": "cryptoCoin.xmr",
+                            "cryptoCoin.doge": "cryptoCoin.doge",
+                            "cryptoCoin.trx": "cryptoCoin.trx",
+                            "cryptoCoin.bnbBsc": "cryptoCoin.bnbBsc"
+                          }
+                        },
+                        "type": "enum",
+                        "enum": {
+                          "cryptoCoin.btc": "cryptoCoin.btc",
+                          "cryptoCoin.eth": "cryptoCoin.eth",
+                          "cryptoCoin.usdtTrc20": "cryptoCoin.usdtTrc20",
+                          "cryptoCoin.usdtErc20": "cryptoCoin.usdtErc20",
+                          "cryptoCoin.usdtBsc": "cryptoCoin.usdtBsc",
+                          "cryptoCoin.usdc": "cryptoCoin.usdc",
+                          "cryptoCoin.sol": "cryptoCoin.sol",
+                          "cryptoCoin.ltc": "cryptoCoin.ltc",
+                          "cryptoCoin.xmr": "cryptoCoin.xmr",
+                          "cryptoCoin.doge": "cryptoCoin.doge",
+                          "cryptoCoin.trx": "cryptoCoin.trx",
+                          "cryptoCoin.bnbBsc": "cryptoCoin.bnbBsc"
+                        },
+                        "options": [
+                          "cryptoCoin.btc",
+                          "cryptoCoin.eth",
+                          "cryptoCoin.usdtTrc20",
+                          "cryptoCoin.usdtErc20",
+                          "cryptoCoin.usdtBsc",
+                          "cryptoCoin.usdc",
+                          "cryptoCoin.sol",
+                          "cryptoCoin.ltc",
+                          "cryptoCoin.xmr",
+                          "cryptoCoin.doge",
+                          "cryptoCoin.trx",
+                          "cryptoCoin.bnbBsc"
+                        ]
+                      },
+                      "minUsd": {
+                        "def": {
+                          "type": "number",
+                          "checks": []
+                        },
+                        "type": "number",
+                        "isFinite": true
+                      }
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
         "provider": {
           "type": "text",
           "label": "Poskytovateľ platby",

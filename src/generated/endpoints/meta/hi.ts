@@ -15768,11 +15768,11 @@ export const endpointsMeta: EndpointMeta[] = [
     aliases: ["stripe-cli"],
     title: "Stripe CLI",
     titleShort: "Stripe CLI",
-    description: "Listen for Stripe webhooks locally",
+    description: "लोकल में Stripe वेबहुक सुनें",
     icon: "credit-card",
     category: "payments",
     subCategory: "Providers",
-    tags: ["Stripe", "Command line", "Webhook"],
+    tags: ["Stripe", "कमांड लाइन", "वेबहुक"],
     examples: { inputs: { default: { port: 3000 } } },
   },
   {

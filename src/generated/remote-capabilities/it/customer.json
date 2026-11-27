@@ -2421,6 +2421,121 @@
           },
           "schemaType": "primitive"
         },
+        "payCurrency": {
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "enum",
+                  "entries": {
+                    "cryptoCoin.btc": "cryptoCoin.btc",
+                    "cryptoCoin.eth": "cryptoCoin.eth",
+                    "cryptoCoin.usdtTrc20": "cryptoCoin.usdtTrc20",
+                    "cryptoCoin.usdtErc20": "cryptoCoin.usdtErc20",
+                    "cryptoCoin.usdtBsc": "cryptoCoin.usdtBsc",
+                    "cryptoCoin.usdc": "cryptoCoin.usdc",
+                    "cryptoCoin.sol": "cryptoCoin.sol",
+                    "cryptoCoin.ltc": "cryptoCoin.ltc",
+                    "cryptoCoin.xmr": "cryptoCoin.xmr",
+                    "cryptoCoin.doge": "cryptoCoin.doge",
+                    "cryptoCoin.trx": "cryptoCoin.trx",
+                    "cryptoCoin.bnbBsc": "cryptoCoin.bnbBsc"
+                  }
+                },
+                "type": "enum",
+                "enum": {
+                  "cryptoCoin.btc": "cryptoCoin.btc",
+                  "cryptoCoin.eth": "cryptoCoin.eth",
+                  "cryptoCoin.usdtTrc20": "cryptoCoin.usdtTrc20",
+                  "cryptoCoin.usdtErc20": "cryptoCoin.usdtErc20",
+                  "cryptoCoin.usdtBsc": "cryptoCoin.usdtBsc",
+                  "cryptoCoin.usdc": "cryptoCoin.usdc",
+                  "cryptoCoin.sol": "cryptoCoin.sol",
+                  "cryptoCoin.ltc": "cryptoCoin.ltc",
+                  "cryptoCoin.xmr": "cryptoCoin.xmr",
+                  "cryptoCoin.doge": "cryptoCoin.doge",
+                  "cryptoCoin.trx": "cryptoCoin.trx",
+                  "cryptoCoin.bnbBsc": "cryptoCoin.bnbBsc"
+                },
+                "options": [
+                  "cryptoCoin.btc",
+                  "cryptoCoin.eth",
+                  "cryptoCoin.usdtTrc20",
+                  "cryptoCoin.usdtErc20",
+                  "cryptoCoin.usdtBsc",
+                  "cryptoCoin.usdc",
+                  "cryptoCoin.sol",
+                  "cryptoCoin.ltc",
+                  "cryptoCoin.xmr",
+                  "cryptoCoin.doge",
+                  "cryptoCoin.trx",
+                  "cryptoCoin.bnbBsc"
+                ]
+              }
+            },
+            "type": "optional"
+          },
+          "type": "form_field",
+          "fieldType": "select",
+          "label": "Criptovaluta",
+          "description": "Moneta con cui paghi (solo cripto)",
+          "placeholder": "Scegli una moneta",
+          "options": [
+            {
+              "value": "cryptoCoin.btc",
+              "label": "post.payCurrency.label"
+            },
+            {
+              "value": "cryptoCoin.eth",
+              "label": "post.payCurrency.label"
+            },
+            {
+              "value": "cryptoCoin.usdtTrc20",
+              "label": "post.payCurrency.label"
+            },
+            {
+              "value": "cryptoCoin.usdtErc20",
+              "label": "post.payCurrency.label"
+            },
+            {
+              "value": "cryptoCoin.usdtBsc",
+              "label": "post.payCurrency.label"
+            },
+            {
+              "value": "cryptoCoin.usdc",
+              "label": "post.payCurrency.label"
+            },
+            {
+              "value": "cryptoCoin.sol",
+              "label": "post.payCurrency.label"
+            },
+            {
+              "value": "cryptoCoin.ltc",
+              "label": "post.payCurrency.label"
+            },
+            {
+              "value": "cryptoCoin.xmr",
+              "label": "post.payCurrency.label"
+            },
+            {
+              "value": "cryptoCoin.doge",
+              "label": "post.payCurrency.label"
+            },
+            {
+              "value": "cryptoCoin.trx",
+              "label": "post.payCurrency.label"
+            },
+            {
+              "value": "cryptoCoin.bnbBsc",
+              "label": "post.payCurrency.label"
+            }
+          ],
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
         "checkoutUrl": {
           "schema": {
             "def": {
@@ -9358,6 +9473,122 @@
           },
           "schemaType": "primitive"
         },
+        "payCurrency": {
+          "type": "form_field",
+          "fieldType": "select",
+          "label": "Criptovaluta",
+          "description": "Moneta con cui paghi. Lascia vuoto per sceglierla nella pagina di pagamento.",
+          "placeholder": "Scegli una moneta",
+          "columns": 12,
+          "options": [
+            {
+              "value": "cryptoCoin.btc",
+              "label": "cryptoCoin.btc"
+            },
+            {
+              "value": "cryptoCoin.eth",
+              "label": "cryptoCoin.eth"
+            },
+            {
+              "value": "cryptoCoin.usdtTrc20",
+              "label": "cryptoCoin.usdtTrc20"
+            },
+            {
+              "value": "cryptoCoin.usdtErc20",
+              "label": "cryptoCoin.usdtErc20"
+            },
+            {
+              "value": "cryptoCoin.usdtBsc",
+              "label": "cryptoCoin.usdtBsc"
+            },
+            {
+              "value": "cryptoCoin.usdc",
+              "label": "cryptoCoin.usdc"
+            },
+            {
+              "value": "cryptoCoin.sol",
+              "label": "cryptoCoin.sol"
+            },
+            {
+              "value": "cryptoCoin.ltc",
+              "label": "cryptoCoin.ltc"
+            },
+            {
+              "value": "cryptoCoin.xmr",
+              "label": "cryptoCoin.xmr"
+            },
+            {
+              "value": "cryptoCoin.doge",
+              "label": "cryptoCoin.doge"
+            },
+            {
+              "value": "cryptoCoin.trx",
+              "label": "cryptoCoin.trx"
+            },
+            {
+              "value": "cryptoCoin.bnbBsc",
+              "label": "cryptoCoin.bnbBsc"
+            }
+          ],
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "enum",
+                  "entries": {
+                    "cryptoCoin.btc": "cryptoCoin.btc",
+                    "cryptoCoin.eth": "cryptoCoin.eth",
+                    "cryptoCoin.usdtTrc20": "cryptoCoin.usdtTrc20",
+                    "cryptoCoin.usdtErc20": "cryptoCoin.usdtErc20",
+                    "cryptoCoin.usdtBsc": "cryptoCoin.usdtBsc",
+                    "cryptoCoin.usdc": "cryptoCoin.usdc",
+                    "cryptoCoin.sol": "cryptoCoin.sol",
+                    "cryptoCoin.ltc": "cryptoCoin.ltc",
+                    "cryptoCoin.xmr": "cryptoCoin.xmr",
+                    "cryptoCoin.doge": "cryptoCoin.doge",
+                    "cryptoCoin.trx": "cryptoCoin.trx",
+                    "cryptoCoin.bnbBsc": "cryptoCoin.bnbBsc"
+                  }
+                },
+                "type": "enum",
+                "enum": {
+                  "cryptoCoin.btc": "cryptoCoin.btc",
+                  "cryptoCoin.eth": "cryptoCoin.eth",
+                  "cryptoCoin.usdtTrc20": "cryptoCoin.usdtTrc20",
+                  "cryptoCoin.usdtErc20": "cryptoCoin.usdtErc20",
+                  "cryptoCoin.usdtBsc": "cryptoCoin.usdtBsc",
+                  "cryptoCoin.usdc": "cryptoCoin.usdc",
+                  "cryptoCoin.sol": "cryptoCoin.sol",
+                  "cryptoCoin.ltc": "cryptoCoin.ltc",
+                  "cryptoCoin.xmr": "cryptoCoin.xmr",
+                  "cryptoCoin.doge": "cryptoCoin.doge",
+                  "cryptoCoin.trx": "cryptoCoin.trx",
+                  "cryptoCoin.bnbBsc": "cryptoCoin.bnbBsc"
+                },
+                "options": [
+                  "cryptoCoin.btc",
+                  "cryptoCoin.eth",
+                  "cryptoCoin.usdtTrc20",
+                  "cryptoCoin.usdtErc20",
+                  "cryptoCoin.usdtBsc",
+                  "cryptoCoin.usdc",
+                  "cryptoCoin.sol",
+                  "cryptoCoin.ltc",
+                  "cryptoCoin.xmr",
+                  "cryptoCoin.doge",
+                  "cryptoCoin.trx",
+                  "cryptoCoin.bnbBsc"
+                ]
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
         "metadata": {
           "type": "form_field",
           "fieldType": "json",
@@ -12667,6 +12898,121 @@
           },
           "schemaType": "primitive"
         },
+        "payCurrency": {
+          "type": "form_field",
+          "fieldType": "select",
+          "label": "Criptovaluta",
+          "description": "Moneta con cui paghi (solo pagamento in cripto)",
+          "options": [
+            {
+              "value": "cryptoCoin.btc",
+              "label": "form.fields.payCurrency.label"
+            },
+            {
+              "value": "cryptoCoin.eth",
+              "label": "form.fields.payCurrency.label"
+            },
+            {
+              "value": "cryptoCoin.usdtTrc20",
+              "label": "form.fields.payCurrency.label"
+            },
+            {
+              "value": "cryptoCoin.usdtErc20",
+              "label": "form.fields.payCurrency.label"
+            },
+            {
+              "value": "cryptoCoin.usdtBsc",
+              "label": "form.fields.payCurrency.label"
+            },
+            {
+              "value": "cryptoCoin.usdc",
+              "label": "form.fields.payCurrency.label"
+            },
+            {
+              "value": "cryptoCoin.sol",
+              "label": "form.fields.payCurrency.label"
+            },
+            {
+              "value": "cryptoCoin.ltc",
+              "label": "form.fields.payCurrency.label"
+            },
+            {
+              "value": "cryptoCoin.xmr",
+              "label": "form.fields.payCurrency.label"
+            },
+            {
+              "value": "cryptoCoin.doge",
+              "label": "form.fields.payCurrency.label"
+            },
+            {
+              "value": "cryptoCoin.trx",
+              "label": "form.fields.payCurrency.label"
+            },
+            {
+              "value": "cryptoCoin.bnbBsc",
+              "label": "form.fields.payCurrency.label"
+            }
+          ],
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "enum",
+                  "entries": {
+                    "cryptoCoin.btc": "cryptoCoin.btc",
+                    "cryptoCoin.eth": "cryptoCoin.eth",
+                    "cryptoCoin.usdtTrc20": "cryptoCoin.usdtTrc20",
+                    "cryptoCoin.usdtErc20": "cryptoCoin.usdtErc20",
+                    "cryptoCoin.usdtBsc": "cryptoCoin.usdtBsc",
+                    "cryptoCoin.usdc": "cryptoCoin.usdc",
+                    "cryptoCoin.sol": "cryptoCoin.sol",
+                    "cryptoCoin.ltc": "cryptoCoin.ltc",
+                    "cryptoCoin.xmr": "cryptoCoin.xmr",
+                    "cryptoCoin.doge": "cryptoCoin.doge",
+                    "cryptoCoin.trx": "cryptoCoin.trx",
+                    "cryptoCoin.bnbBsc": "cryptoCoin.bnbBsc"
+                  }
+                },
+                "type": "enum",
+                "enum": {
+                  "cryptoCoin.btc": "cryptoCoin.btc",
+                  "cryptoCoin.eth": "cryptoCoin.eth",
+                  "cryptoCoin.usdtTrc20": "cryptoCoin.usdtTrc20",
+                  "cryptoCoin.usdtErc20": "cryptoCoin.usdtErc20",
+                  "cryptoCoin.usdtBsc": "cryptoCoin.usdtBsc",
+                  "cryptoCoin.usdc": "cryptoCoin.usdc",
+                  "cryptoCoin.sol": "cryptoCoin.sol",
+                  "cryptoCoin.ltc": "cryptoCoin.ltc",
+                  "cryptoCoin.xmr": "cryptoCoin.xmr",
+                  "cryptoCoin.doge": "cryptoCoin.doge",
+                  "cryptoCoin.trx": "cryptoCoin.trx",
+                  "cryptoCoin.bnbBsc": "cryptoCoin.bnbBsc"
+                },
+                "options": [
+                  "cryptoCoin.btc",
+                  "cryptoCoin.eth",
+                  "cryptoCoin.usdtTrc20",
+                  "cryptoCoin.usdtErc20",
+                  "cryptoCoin.usdtBsc",
+                  "cryptoCoin.usdc",
+                  "cryptoCoin.sol",
+                  "cryptoCoin.ltc",
+                  "cryptoCoin.xmr",
+                  "cryptoCoin.doge",
+                  "cryptoCoin.trx",
+                  "cryptoCoin.bnbBsc"
+                ]
+              }
+            },
+            "type": "optional"
+          },
+          "hidden": true,
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
         "catalogProductId": {
           "type": "form_field",
           "fieldType": "entity_picker",
@@ -13359,6 +13705,310 @@
                   "type": "string"
                 },
                 "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "gracePeriodEndsAt": {
+          "type": "text",
+          "label": "Fine del periodo di tolleranza",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "retryPaymentUrl": {
+          "type": "text",
+          "label": "Link per ripetere il pagamento",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "cardCountry": {
+          "type": "text",
+          "label": "Paese della carta",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "recentCardAuthFailure": {
+          "type": "text",
+          "label": "Recente autenticazione della carta non riuscita",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "boolean"
+                },
+                "type": "boolean"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "checkoutProviders": {
+          "type": "text",
+          "label": "Metodi di pagamento disponibili",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "array",
+                  "element": {
+                    "def": {
+                      "type": "enum",
+                      "entries": {
+                        "enums.paymentProvider.stripe": "enums.paymentProvider.stripe",
+                        "enums.paymentProvider.nowpayments": "enums.paymentProvider.nowpayments"
+                      }
+                    },
+                    "type": "enum",
+                    "enum": {
+                      "enums.paymentProvider.stripe": "enums.paymentProvider.stripe",
+                      "enums.paymentProvider.nowpayments": "enums.paymentProvider.nowpayments"
+                    },
+                    "options": [
+                      "enums.paymentProvider.stripe",
+                      "enums.paymentProvider.nowpayments"
+                    ]
+                  }
+                },
+                "type": "array",
+                "element": {
+                  "def": {
+                    "type": "enum",
+                    "entries": {
+                      "enums.paymentProvider.stripe": "enums.paymentProvider.stripe",
+                      "enums.paymentProvider.nowpayments": "enums.paymentProvider.nowpayments"
+                    }
+                  },
+                  "type": "enum",
+                  "enum": {
+                    "enums.paymentProvider.stripe": "enums.paymentProvider.stripe",
+                    "enums.paymentProvider.nowpayments": "enums.paymentProvider.nowpayments"
+                  },
+                  "options": [
+                    "enums.paymentProvider.stripe",
+                    "enums.paymentProvider.nowpayments"
+                  ]
+                }
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "nowPaymentsAcceptsCards": {
+          "type": "text",
+          "label": "Il checkout crypto accetta carte",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "boolean"
+                },
+                "type": "boolean"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "cryptoCoins": {
+          "type": "text",
+          "label": "Criptovalute e minimi",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "array",
+                  "element": {
+                    "def": {
+                      "type": "object",
+                      "shape": {
+                        "coin": {
+                          "def": {
+                            "type": "enum",
+                            "entries": {
+                              "cryptoCoin.btc": "cryptoCoin.btc",
+                              "cryptoCoin.eth": "cryptoCoin.eth",
+                              "cryptoCoin.usdtTrc20": "cryptoCoin.usdtTrc20",
+                              "cryptoCoin.usdtErc20": "cryptoCoin.usdtErc20",
+                              "cryptoCoin.usdtBsc": "cryptoCoin.usdtBsc",
+                              "cryptoCoin.usdc": "cryptoCoin.usdc",
+                              "cryptoCoin.sol": "cryptoCoin.sol",
+                              "cryptoCoin.ltc": "cryptoCoin.ltc",
+                              "cryptoCoin.xmr": "cryptoCoin.xmr",
+                              "cryptoCoin.doge": "cryptoCoin.doge",
+                              "cryptoCoin.trx": "cryptoCoin.trx",
+                              "cryptoCoin.bnbBsc": "cryptoCoin.bnbBsc"
+                            }
+                          },
+                          "type": "enum",
+                          "enum": {
+                            "cryptoCoin.btc": "cryptoCoin.btc",
+                            "cryptoCoin.eth": "cryptoCoin.eth",
+                            "cryptoCoin.usdtTrc20": "cryptoCoin.usdtTrc20",
+                            "cryptoCoin.usdtErc20": "cryptoCoin.usdtErc20",
+                            "cryptoCoin.usdtBsc": "cryptoCoin.usdtBsc",
+                            "cryptoCoin.usdc": "cryptoCoin.usdc",
+                            "cryptoCoin.sol": "cryptoCoin.sol",
+                            "cryptoCoin.ltc": "cryptoCoin.ltc",
+                            "cryptoCoin.xmr": "cryptoCoin.xmr",
+                            "cryptoCoin.doge": "cryptoCoin.doge",
+                            "cryptoCoin.trx": "cryptoCoin.trx",
+                            "cryptoCoin.bnbBsc": "cryptoCoin.bnbBsc"
+                          },
+                          "options": [
+                            "cryptoCoin.btc",
+                            "cryptoCoin.eth",
+                            "cryptoCoin.usdtTrc20",
+                            "cryptoCoin.usdtErc20",
+                            "cryptoCoin.usdtBsc",
+                            "cryptoCoin.usdc",
+                            "cryptoCoin.sol",
+                            "cryptoCoin.ltc",
+                            "cryptoCoin.xmr",
+                            "cryptoCoin.doge",
+                            "cryptoCoin.trx",
+                            "cryptoCoin.bnbBsc"
+                          ]
+                        },
+                        "minUsd": {
+                          "def": {
+                            "type": "number",
+                            "checks": []
+                          },
+                          "type": "number",
+                          "isFinite": true
+                        }
+                      }
+                    },
+                    "type": "object"
+                  }
+                },
+                "type": "array",
+                "element": {
+                  "def": {
+                    "type": "object",
+                    "shape": {
+                      "coin": {
+                        "def": {
+                          "type": "enum",
+                          "entries": {
+                            "cryptoCoin.btc": "cryptoCoin.btc",
+                            "cryptoCoin.eth": "cryptoCoin.eth",
+                            "cryptoCoin.usdtTrc20": "cryptoCoin.usdtTrc20",
+                            "cryptoCoin.usdtErc20": "cryptoCoin.usdtErc20",
+                            "cryptoCoin.usdtBsc": "cryptoCoin.usdtBsc",
+                            "cryptoCoin.usdc": "cryptoCoin.usdc",
+                            "cryptoCoin.sol": "cryptoCoin.sol",
+                            "cryptoCoin.ltc": "cryptoCoin.ltc",
+                            "cryptoCoin.xmr": "cryptoCoin.xmr",
+                            "cryptoCoin.doge": "cryptoCoin.doge",
+                            "cryptoCoin.trx": "cryptoCoin.trx",
+                            "cryptoCoin.bnbBsc": "cryptoCoin.bnbBsc"
+                          }
+                        },
+                        "type": "enum",
+                        "enum": {
+                          "cryptoCoin.btc": "cryptoCoin.btc",
+                          "cryptoCoin.eth": "cryptoCoin.eth",
+                          "cryptoCoin.usdtTrc20": "cryptoCoin.usdtTrc20",
+                          "cryptoCoin.usdtErc20": "cryptoCoin.usdtErc20",
+                          "cryptoCoin.usdtBsc": "cryptoCoin.usdtBsc",
+                          "cryptoCoin.usdc": "cryptoCoin.usdc",
+                          "cryptoCoin.sol": "cryptoCoin.sol",
+                          "cryptoCoin.ltc": "cryptoCoin.ltc",
+                          "cryptoCoin.xmr": "cryptoCoin.xmr",
+                          "cryptoCoin.doge": "cryptoCoin.doge",
+                          "cryptoCoin.trx": "cryptoCoin.trx",
+                          "cryptoCoin.bnbBsc": "cryptoCoin.bnbBsc"
+                        },
+                        "options": [
+                          "cryptoCoin.btc",
+                          "cryptoCoin.eth",
+                          "cryptoCoin.usdtTrc20",
+                          "cryptoCoin.usdtErc20",
+                          "cryptoCoin.usdtBsc",
+                          "cryptoCoin.usdc",
+                          "cryptoCoin.sol",
+                          "cryptoCoin.ltc",
+                          "cryptoCoin.xmr",
+                          "cryptoCoin.doge",
+                          "cryptoCoin.trx",
+                          "cryptoCoin.bnbBsc"
+                        ]
+                      },
+                      "minUsd": {
+                        "def": {
+                          "type": "number",
+                          "checks": []
+                        },
+                        "type": "number",
+                        "isFinite": true
+                      }
+                    }
+                  },
+                  "type": "object"
+                }
               }
             },
             "type": "optional"
